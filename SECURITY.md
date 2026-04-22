@@ -302,10 +302,10 @@ The Cross-Artifact Incongruence Engine enforces:
 
 | Date | Auditor | Fixes Applied |
 |------|---------|---------------|
-| 2025-04 | Security audit (DeepSeek) | P0-1 through P0-4, P1-5 through P1-8, P2-9 through P2-13, P3-14 through P3-16 (16 fixes) |
-| 2025-04 | Security audit (round 2) | V-002 MCP transport security, V-003 rate limiting on all 21 tools, V-004 base_dir symlink validation, activate_honey_token env hijack fix, safe_grep total scan volume limit |
-| 2025-04 | Kimi integration (round 3) | CrossArtifactIncongruenceEngine (`vigia/tools/caie.py`) implemented and integrated in PeircePlanner (Rule 10), `load_investigation_state` schema+HMAC validation, canonicalizacion forzada via `Path.resolve()` en todos los entry points, symlink guard con `os.lstat` + `stat.S_ISLNK` (atomico). 100% de hallazgos Kimi P0-P3 mitigados. |
-| 2025-04 | Gemini + Kimi hardening (round 4) | Grep fullmatch (P0), Infinity Guard / math.isfinite (P0), word_search special char support, Prompt Vault with SHA-256 integrity, Dictionary integrity with VIGIA_PHONETIC_HASH, PNG metadata silence detection (P1-7), Windows sandbox fail-safe (P1-8), Atomic image access via O_NOFOLLOW fd (P1-9), LLM signal sanitization stripping XML/control chars (P1-10). 10 fixes. |
+| 2026-04 | Security audit (DeepSeek) | P0-1 through P0-4, P1-5 through P1-8, P2-9 through P2-13, P3-14 through P3-16 (16 fixes) |
+| 2026-04 | Security audit (round 2) | V-002 MCP transport security, V-003 rate limiting on all 21 tools, V-004 base_dir symlink validation, activate_honey_token env hijack fix, safe_grep total scan volume limit |
+| 2026-04 | Kimi integration (round 3) | CrossArtifactIncongruenceEngine (`vigia/tools/caie.py`) implemented and integrated in PeircePlanner (Rule 10), `load_investigation_state` schema+HMAC validation, canonicalizacion forzada via `Path.resolve()` en todos los entry points, symlink guard con `os.lstat` + `stat.S_ISLNK` (atomico). 100% de hallazgos Kimi P0-P3 mitigados. |
+| 2026-04 | Gemini + Kimi hardening (round 4) | Grep fullmatch (P0), Infinity Guard / math.isfinite (P0), word_search special char support, Prompt Vault with SHA-256 integrity, Dictionary integrity with VIGIA_PHONETIC_HASH, PNG metadata silence detection (P1-7), Windows sandbox fail-safe (P1-8), Atomic image access via O_NOFOLLOW fd (P1-9), LLM signal sanitization stripping XML/control chars (P1-10). 10 fixes. |
 
 ### CAIE — Cross-Artifact Incongruence Engine
 
