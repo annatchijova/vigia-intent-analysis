@@ -1,0 +1,96 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# VIGIA — Docker Compose for Forensic Isolation
+#
+# Security properties:
+#   * Evidence mounted read-only (:ro) — cannot be modified by analysis
+#   * Network disabled (network_mode: "none") — no exfiltration possible
+#   * Reports directory is the ONLY writable mount
+#   * HMAC key injected via Docker secret
+#   * Resource limits enforced (memory, CPU, PIDs)
+#   * Read-only root filesystem with tmpfs for /tmp
+#
+# Usage:
+#   EVIDENCE_PATH=/path/to/evidence docker compose up
+#   docker compose run vigia python3 check_determinism.py
+# ─────────────────────────────────────────────────────────────────────────────
+
+services:
+  vigia:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: vigia-forensic
+
+    # ── Network isolation ─────────────────────────────────────────────────
+    # No network access. VIGIA cannot exfiltrate evidence or phone home.
+    # If Ollama is needed, use vigia-with-ollama profile below.
+    network_mode: "none"
+
+    # ── Volumes ───────────────────────────────────────────────────────────
+    volumes:
+      # Evidence: READ-ONLY. Analysis cannot modify the source.
+      - ${EVIDENCE_PATH:?Set EVIDENCE_PATH to the evidence directory}:/app/evidence:ro
+
+      # Reports: writable output directory for investigation results
+      - ./reports:/app/reports:rw
+
+      # Audit logs: persistent forensic trail
+      - ./logs:/var/log/vigia:rw
+
+    # ── HMAC key via Docker secret ────────────────────────────────────────
+    secrets:
+      - vigia_hmac_key
+
+    # ── Environment ───────────────────────────────────────────────────────
+    environment:
+      - VIGIA_EVIDENCE_DIR=/app/evidence
+      - VIGIA_LOG_DIR=/var/log/vigia
+      - VIGIA_LLM_BACKEND=none
+      - VIGIA_HMAC_KEY_FILE=/run/secrets/vigia_hmac_key
+      - VIGIA_STRICT_MODEL_CHECK=false
+
+    # ── Resource limits ───────────────────────────────────────────────────
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+          cpus: "2.0"
+          pids: 100
+        reservations:
+          memory: 512M
+
+    # ── Security hardening ────────────────────────────────────────────────
+    read_only: true
+    tmpfs:
+      - /tmp:size=100M,noexec,nosuid,nodev
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+
+    # ── Stdin for MCP stdio transport ─────────────────────────────────────
+    stdin_open: true
+    tty: false
+
+  # ── Profile: VIGIA with Ollama access ───────────────────────────────────
+  # Use: docker compose --profile with-ollama up
+  vigia-with-ollama:
+    extends:
+      service: vigia
+    container_name: vigia-forensic-ollama
+    profiles:
+      - with-ollama
+
+    # Override: allow localhost network for Ollama
+    network_mode: "host"
+    environment:
+      - VIGIA_EVIDENCE_DIR=/app/evidence
+      - VIGIA_LOG_DIR=/var/log/vigia
+      - VIGIA_LLM_BACKEND=ollama
+      - VIGIA_OLLAMA_HOST=http://127.0.0.1:11434
+      - VIGIA_HMAC_KEY_FILE=/run/secrets/vigia_hmac_key
+
+# ── Secrets ───────────────────────────────────────────────────────────────
+secrets:
+  vigia_hmac_key:
+    file: ${VIGIA_HMAC_KEY_FILE:-./hmac_key.secret}

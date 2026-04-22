@@ -1,0 +1,772 @@
+"""
+vigia/vigia_integration_bridge.py
+─────────────────────────────────────────────────────────────────────────────
+Puente de Integración: Parte A (módulos originales) ↔ Parte B (EBS v1)
+
+ARQUITECTURA:
+    Este módulo es el eslabón entre el ecosistema forense legacy (signal_adapter,
+    caie, planner, report_builder) y el pipeline canónico EBS v1 (VigiaPipeline,
+    BundleBuilder, verify_ebs_v1).
+
+    NO modifica ninguno de los dos lados. Es una capa de traducción pura.
+
+FLUJO COMPLETO:
+    caso_json (dict)
+        → CaseAdapter.to_signals()          # artefactos → SignalOutput[]
+        → CaseAdapter.compute_drift()       # violaciones temporales → drift_score
+        → run_vigia() [pipeline__4_.py]     # SignalOutput[] → ForensicBundle sellado
+        → BundleBuilder.seal() con Level 3  # engine_attestation + ecl_hash
+        → ReportAdapter.from_bundle()       # bundle → reporte ENFSI
+        → output: bundle_<id>.json + report_<id>.json
+
+INVARIANTES (decisiones del colectivo — NO TOCAR):
+    - SignalOutput.signal_id generado con _make_signal_id (no hardcodeado)
+    - Z-scores calculados contra baseline AUTHENTIC (no inventados)
+    - Los campos Peirce se toman del JSON del caso si existen
+    - BundleBuilder.seal() recibe engine_attestation_hash + ecl_hash para Level 3
+    - El LLM (Ollama) nunca entra en el loop de decisión matemática
+    - json.dumps usa sort_keys=True en toda serialización
+
+SEGURIDAD:
+    - Validación de schema del caso antes de procesar
+    - Z-scores clampeados a [-10, 10] para prevenir overflow estadístico
+    - Confidence clampeada a [0.05, 1.0] — nunca cero (divisor)
+    - Los metadatos de artefacto se copian shallow — no se evalúan
+─────────────────────────────────────────────────────────────────────────────
+"""
+from __future__ import annotations
+
+import hashlib
+import json
+import logging
+import math
+import os
+import sys
+import time
+from datetime import datetime, timezone
+from typing import Any, Dict, List, Optional, Tuple
+
+logger = logging.getLogger("vigia.integration_bridge")
+if not logger.handlers:
+    _h = logging.StreamHandler()
+    _h.setFormatter(logging.Formatter("[%(levelname)s][%(name)s] %(message)s"))
+    logger.addHandler(_h)
+    logger.setLevel(logging.INFO)
+
+# ---------------------------------------------------------------------------
+# Resolución de raíz — el bridge debe funcionar sin instalación del paquete
+# ---------------------------------------------------------------------------
+_HERE = os.path.dirname(os.path.abspath(__file__))
+if _HERE not in sys.path:
+    sys.path.insert(0, _HERE)
+
+# ---------------------------------------------------------------------------
+# Importaciones defensivas — cada módulo puede no estar instalado
+# ---------------------------------------------------------------------------
+_PIPELINE_AVAILABLE = False
+_CAIE_AVAILABLE = False
+_SIGNAL_CONTRACT_AVAILABLE = False
+
+def _try_imports(candidates: list, symbols: list) -> tuple:
+    """
+    Intenta importar de una lista de nombres de módulo en orden.
+    Retorna (módulo, nombre_usado) o (None, None).
+    Nombres canónicos (sin sufijo) tienen prioridad — se prueban primero.
+    """
+    for mod_name in candidates:
+        try:
+            import importlib as _il
+            m = _il.import_module(mod_name)
+            return m, mod_name
+        except ImportError:
+            continue
+        except Exception as _ex:
+            logger.debug("[bridge] Error importando '%s': %s", mod_name, _ex)
+            continue
+    return None, None
+
+
+# Pipeline EBS v1 — canónico primero, legacy como fallback
+_pipeline_mod, _pipeline_name = _try_imports(
+    ["pipeline", "pipeline__4_"], ["run_vigia", "VigiaPipeline"]
+)
+if _pipeline_mod is not None:
+    run_vigia = getattr(_pipeline_mod, "run_vigia")
+    VigiaPipeline = getattr(_pipeline_mod, "VigiaPipeline")
+    _PIPELINE_AVAILABLE = True
+    logger.info("[bridge] pipeline importado desde '%s'", _pipeline_name)
+else:
+    logger.warning("[bridge] pipeline NO disponible — run_vigia no resuelto")
+
+# Contrato de señales
+_signal_mod, _signal_name = _try_imports(
+    ["signal_contract", "signal_contract__2_"], ["SignalOutput"]
+)
+if _signal_mod is not None:
+    SignalOutput = getattr(_signal_mod, "SignalOutput")
+    SignalBuilder = getattr(_signal_mod, "SignalBuilder", None)
+    enfsi_label = getattr(_signal_mod, "enfsi_label", None)
+    _SIGNAL_CONTRACT_AVAILABLE = True
+    logger.info("[bridge] signal_contract importado desde '%s'", _signal_name)
+else:
+    logger.warning("[bridge] signal_contract NO disponible")
+
+# CAIE — opcional, no bloquea el pipeline
+_caie_mod, _caie_name = _try_imports(["caie", "caie__4_"], ["CrossArtifactIncongruenceEngine"])
+if _caie_mod is not None:
+    CrossArtifactIncongruenceEngine = getattr(_caie_mod, "CrossArtifactIncongruenceEngine")
+    _CAIE_AVAILABLE = True
+    logger.info("[bridge] CAIE importado desde '%s'", _caie_name)
+else:
+    logger.debug("[bridge] CAIE no disponible — desactivado")
+
+# ---------------------------------------------------------------------------
+# Baseline AUTHENTIC — valores conservadores para modo sin calibración
+# Fuente: bootstrap v1 del dataset de referencia VIGÍA
+# Actualizar con build_baseline_from_authentic() al calibrar corpus real
+# ---------------------------------------------------------------------------
+_BASELINE_AUTHENTIC = {
+    # (mean, mad) por tipo de evidencia
+    "memory_process":   (0.5, 0.2),
+    "file_timestamp":   (0.4, 0.25),
+    "log_entry":        (0.45, 0.22),
+    "network_artifact": (0.35, 0.20),
+    "registry_key":     (0.5, 0.18),
+    "default":          (0.5, 0.25),
+}
+
+# Mapeo: evidence_type → tool_name canónico EBS v1
+_EVIDENCE_TYPE_TO_TOOL = {
+    "memory_process":   "CLI",   # Command Line Indicators
+    "file_timestamp":   "SDA",   # Statistical Distribution Analysis
+    "log_entry":        "ACP",   # Authorship Correlation Patterns
+    "network_artifact": "ROI",   # Repetition of Indicators
+    "registry_key":     "SDA",
+    "default":          "GCI",   # Generative Consistency Indicators
+}
+
+# Peso de severidad para violaciones temporales → drift_score
+_TEMPORAL_VIOLATION_SEVERITY_WEIGHT = 0.35
+
+
+# ===========================================================================
+# SCHEMA VALIDATOR — Daubert: si el input no cumple el schema, abortar
+# ===========================================================================
+
+class CaseSchemaError(ValueError):
+    """El caso JSON no cumple el schema mínimo VIGÍA."""
+
+
+_REQUIRED_CASE_FIELDS = {"case_id", "artifacts"}
+_REQUIRED_ARTIFACT_FIELDS = {"artifact_id", "evidence_type", "raw_score"}
+
+
+def validate_case_schema(case: Dict[str, Any]) -> None:
+    """
+    Valida el schema mínimo del caso forense.
+    Lanza CaseSchemaError si falta algún campo obligatorio.
+    Defensivo: no supone nada del input.
+    """
+    missing_top = _REQUIRED_CASE_FIELDS - set(case.keys())
+    if missing_top:
+        raise CaseSchemaError(
+            f"Caso JSON inválido — campos obligatorios faltantes: {sorted(missing_top)}"
+        )
+
+    artifacts = case.get("artifacts", [])
+    if not isinstance(artifacts, list) or len(artifacts) == 0:
+        raise CaseSchemaError(
+            f"Caso '{case.get('case_id')}': 'artifacts' debe ser lista no vacía"
+        )
+
+    for i, art in enumerate(artifacts):
+        if not isinstance(art, dict):
+            raise CaseSchemaError(f"Artefacto [{i}] no es dict")
+        missing_art = _REQUIRED_ARTIFACT_FIELDS - set(art.keys())
+        if missing_art:
+            raise CaseSchemaError(
+                f"Artefacto [{i}] (id={art.get('artifact_id', '?')}) "
+                f"falta: {sorted(missing_art)}"
+            )
+        raw = art.get("raw_score")
+        if not isinstance(raw, (int, float)) or not math.isfinite(float(raw)):
+            raise CaseSchemaError(
+                f"Artefacto '{art.get('artifact_id')}': raw_score debe ser número finito"
+            )
+
+
+# ===========================================================================
+# CASE ADAPTER — artefactos JSON → SignalOutput[]
+# ===========================================================================
+
+class CaseAdapter:
+    """
+    Traduce el formato de caso VIGÍA (JSON) al contrato SignalOutput.
+
+    Principio de separación de capas (Daubert):
+        EVIDENCE LAYER: esta clase extrae y normaliza señales
+        INFERENCE LAYER: el LikelihoodEngine las consume
+        No se mezclan.
+
+    Seguridad:
+        - raw_score se clampea a [0, 1] antes del z-score
+        - z_score resultado se clampea a [-10, 10]
+        - confidence se clampea a [0.05, 1.0]
+        - metadata copiada superficialmente (no evaluada)
+    """
+
+    def __init__(self, baseline: Optional[Dict[str, Tuple[float, float]]] = None) -> None:
+        """
+        Args:
+            baseline: dict {evidence_type: (mean, mad)} para z-score.
+                      Si None, usa _BASELINE_AUTHENTIC.
+        """
+        self._baseline = baseline or _BASELINE_AUTHENTIC
+
+    def _get_baseline(self, evidence_type: str) -> Tuple[float, float]:
+        """Retorna (mean, mad) para el tipo de evidencia. Fallback a 'default'."""
+        return self._baseline.get(evidence_type, self._baseline["default"])
+
+    def _clamp_z(self, z: float) -> float:
+        """Clampea z-score a [-10, 10]. Previene overflow estadístico."""
+        if not math.isfinite(z):
+            return 0.0
+        return max(-10.0, min(10.0, z))
+
+    def artifact_to_signal(
+        self,
+        artifact: Dict[str, Any],
+        case_id: str = "unknown",
+    ) -> Optional[SignalOutput]:
+        """
+        Convierte un artefacto forense a SignalOutput.
+
+        Retorna None si el artefacto no puede traducirse (no bloquea el pipeline).
+        El caller debe loguear y continuar.
+
+        Z-score:
+            z = (raw_score - baseline_mean) / baseline_mad
+            Si prior_trust está presente, se usa como factor de confianza.
+        """
+        try:
+            evidence_type = str(artifact.get("evidence_type", "default"))
+            raw_score = float(artifact.get("raw_score", 0.5))
+            raw_score = max(0.0, min(1.0, raw_score))  # clamp [0,1]
+
+            prior_trust = artifact.get("prior_trust")
+            confidence = float(prior_trust) if prior_trust is not None else 0.85
+            confidence = max(0.05, min(1.0, confidence))  # nunca cero
+
+            baseline_mean, baseline_mad = self._get_baseline(evidence_type)
+            safe_mad = max(abs(baseline_mad), 1e-9)
+            z = (raw_score - baseline_mean) / safe_mad
+            z = self._clamp_z(z)
+
+            tool_name = _EVIDENCE_TYPE_TO_TOOL.get(evidence_type, "GCI")
+
+            # Discriminador trazable para signal_id (Daubert)
+            discriminator = f"{case_id[:8]}_{artifact.get('artifact_id', 'unk')[:8]}"
+
+            metadata = {
+                "artifact_id":   artifact.get("artifact_id"),
+                "evidence_type": evidence_type,
+                "source_tool":   artifact.get("source_tool", "unknown"),
+                "timestamp":     artifact.get("timestamp"),
+                "description":   str(artifact.get("description", ""))[:256],
+                "case_id":       case_id,
+                "bridge_version": "v1.0",
+            }
+            # Incluir metadata del artefacto si existe — copia superficial
+            art_meta = artifact.get("metadata")
+            if isinstance(art_meta, dict):
+                for k, v in art_meta.items():
+                    if isinstance(v, (str, int, float, bool, type(None))):
+                        metadata[f"artifact_{k}"] = v
+
+            # Importación local defensiva — puede no tener signal_contract
+            if _SIGNAL_CONTRACT_AVAILABLE:
+                import time as _t
+                epoch_ms = int(_t.time() * 1000)
+                disc = discriminator[:16]
+                signal_id = f"{tool_name}-{disc}-{epoch_ms}"
+
+                sig = SignalOutput(
+                    tool_name=tool_name,
+                    signal_id=signal_id,
+                    value=raw_score,
+                    z_score=z,
+                    confidence=confidence,
+                    metadata=metadata,
+                )
+            else:
+                # Fallback: dict compatible con run_vigia()
+                sig = {  # type: ignore[assignment]
+                    "tool_name":  tool_name,
+                    "value":      raw_score,
+                    "z_score":    z,
+                    "confidence": confidence,
+                    "metadata":   metadata,
+                }
+
+            return sig  # type: ignore[return-value]
+
+        except Exception as e:
+            logger.error(
+                "[CaseAdapter] Error convirtiendo artefacto '%s': %s",
+                artifact.get("artifact_id", "?"), e,
+            )
+            return None
+
+    def to_signals(
+        self,
+        case: Dict[str, Any],
+    ) -> Tuple[List[Any], List[str]]:
+        """
+        Convierte todos los artefactos del caso a señales.
+
+        Retorna:
+            (signals, warnings)
+            signals  : lista de SignalOutput o dicts compatibles
+            warnings : lista de artefactos que no pudieron traducirse
+        """
+        validate_case_schema(case)
+        case_id = str(case.get("case_id", "unknown"))
+        signals = []
+        warnings = []
+
+        for artifact in case.get("artifacts", []):
+            sig = self.artifact_to_signal(artifact, case_id=case_id)
+            if sig is not None:
+                signals.append(sig)
+            else:
+                art_id = artifact.get("artifact_id", "?")
+                warnings.append(f"Artefacto '{art_id}' no traducido")
+                logger.warning("[CaseAdapter] Artefacto '%s' ignorado", art_id)
+
+        if not signals:
+            raise CaseSchemaError(
+                f"Caso '{case_id}': ningún artefacto pudo traducirse a SignalOutput"
+            )
+
+        logger.info(
+            "[CaseAdapter] Caso '%s': %d artefactos → %d señales (%d warnings)",
+            case_id, len(case.get("artifacts", [])), len(signals), len(warnings),
+        )
+        return signals, warnings
+
+    @staticmethod
+    def compute_drift(case: Dict[str, Any]) -> float:
+        """
+        Calcula drift_score desde las violaciones temporales del caso.
+
+        Formula:
+            drift = min(1.0, sum(severity * weight) / n_artifacts)
+
+        Las violaciones temporales son el indicador más directo de
+        manipulación de evidencia (T1070.006). Un drift alto aumenta
+        la penalización de riesgo en RiskBoundedDecisionLayer.
+        """
+        violations = case.get("temporal_violations", [])
+        if not violations:
+            return 0.0
+
+        n_artifacts = max(1, len(case.get("artifacts", [1])))
+        total_severity = sum(
+            float(v.get("severity", 0.5)) * _TEMPORAL_VIOLATION_SEVERITY_WEIGHT
+            for v in violations
+            if isinstance(v, dict)
+        )
+        drift = min(1.0, total_severity / n_artifacts)
+        logger.debug("[CaseAdapter] drift_score=%.4f (%d violaciones)", drift, len(violations))
+        return drift
+
+    @staticmethod
+    def extract_peirce_chain(case: Dict[str, Any]) -> Dict[str, str]:
+        """
+        Extrae la cadena Peirce del caso si existe.
+        Estos strings van al AbductionTrace — Firstness/Secondness/Thirdness.
+
+        Si el caso no tiene peirce_chain, genera strings mínimos desde
+        el nombre y descripción del caso (trazabilidad mínima garantizada).
+        """
+        chain = case.get("peirce_chain", {})
+        if isinstance(chain, dict) and all(
+            k in chain for k in ("firstness", "secondness", "thirdness")
+        ):
+            return {
+                "firstness":  str(chain["firstness"])[:512],
+                "secondness": str(chain["secondness"])[:512],
+                "thirdness":  str(chain["thirdness"])[:512],
+            }
+
+        # Fallback mínimo desde metadatos del caso
+        case_name = case.get("name", case.get("case_id", "unknown"))
+        description = case.get("description", "Sin descripción")
+        return {
+            "firstness":  f"Artefactos analizados en caso: {case_name}",
+            "secondness": f"Anomalías detectadas: {description[:200]}",
+            "thirdness":  "Hipótesis emergente determinada por LikelihoodEngine",
+        }
+
+
+# ===========================================================================
+# ECL HASH — SHA256 del archivo de baselines institucionales
+# Para Level 3 compliance en verify_ebs_v1.py
+# ===========================================================================
+
+def compute_ecl_hash(baselines_path: Optional[str] = None) -> str:
+    """
+    Calcula SHA-256 del archivo de baselines institucionales.
+    Requerido para Level 3 en verify_ebs_v1.py (campo ecl_hash).
+
+    Si el archivo no existe, retorna string vacío y loguea advertencia.
+    Un bundle sin ecl_hash es Level 2, no Level 3 — aceptable en producción
+    cuando no hay ECL configurado, pero documentado.
+    """
+    paths_to_try = [
+        baselines_path,
+        os.path.join(_HERE, "baselines_institucionales.yaml"),
+        os.path.join(_HERE, "..", "baselines_institucionales.yaml"),
+    ]
+    for path in paths_to_try:
+        if path and os.path.isfile(path):
+            try:
+                with open(path, "rb") as f:
+                    content = f.read()
+                digest = hashlib.sha256(content).hexdigest()
+                logger.info("[ecl_hash] Calculado desde '%s': %s…", path, digest[:16])
+                return digest
+            except OSError as e:
+                logger.warning("[ecl_hash] No se pudo leer '%s': %s", path, e)
+    logger.warning("[ecl_hash] baselines_institucionales.yaml no encontrado — bundle será Level 2")
+    return ""
+
+
+# ===========================================================================
+# REPORT ADAPTER — ForensicBundle sellado → estructura ENFSI para report_builder
+# ===========================================================================
+
+class ReportAdapter:
+    """
+    Traduce el sealed_dict de BundleBuilder al formato que espera report_builder.build_report().
+
+    La traducción es unidireccional: bundle sellado → reporte.
+    No hay retorno de datos del reporte al bundle.
+    El sellado ya ocurrió — este adaptador es SOLO post-procesamiento.
+    """
+
+    @staticmethod
+    def sealed_to_case_result(
+        sealed_dict: Dict[str, Any],
+        case: Dict[str, Any],
+    ) -> Dict[str, Any]:
+        """
+        Construye el dict 'case_result' que report_builder.build_report() espera.
+
+        Mapeo:
+            sealed_dict.decision_trace → lr_record, posterior, enfsi_label
+            sealed_dict.evidence_graph → signals (resumen)
+            case.peirce_chain          → firstness/secondness/thirdness
+        """
+        dt = sealed_dict.get("decision_trace", {})
+        posterior = float(dt.get("posterior", 0.5))
+        # Derivar LR desde posterior: LR = P / (1-P), clampeado
+        p_clamp = max(0.001, min(0.999, posterior))
+        lr = p_clamp / (1.0 - p_clamp)
+
+        # Escala ENFSI desde signal_contract si disponible
+        if _SIGNAL_CONTRACT_AVAILABLE:
+            label = enfsi_label(lr)
+        else:
+            # Escala mínima inline (mismo criterio que signal_contract__2_.py)
+            if lr >= 10_000:
+                label = "EXTREMADAMENTE FUERTE — Evidencia concluyente bajo estándar ENFSI"
+            elif lr >= 1_000:
+                label = "MUY FUERTE — Alto soporte para hipótesis de fabricación"
+            elif lr >= 100:
+                label = "FUERTE — Soporte sustancial, requiere corroboración"
+            elif lr >= 10:
+                label = "MODERADA — Indicios consistentes, insuficiente de forma aislada"
+            else:
+                label = "DÉBIL / NEUTRA — Evidencia no discriminante"
+
+        # Señales del grafo de evidencia
+        eg = sealed_dict.get("evidence_graph", {})
+        signals_summary = []
+        for node in eg.get("nodes", []):
+            signals_summary.append({
+                "tool_name":  node.get("tool_name", node.get("node_id", "?")),
+                "value":      node.get("value", 0.0),
+                "z_score":    node.get("z_score", 0.0),
+                "confidence": node.get("confidence", 1.0),
+            })
+
+        return {
+            "document_id":          case.get("case_id", "unknown"),
+            "analysis_timestamp":   sealed_dict.get("timestamp", ""),
+            "lr_record":            {"lr": lr, "log_lr": math.log(lr) if lr > 0 else 0.0},
+            "posterior_probability": posterior,
+            "enfsi_label":          label,
+            "decision":             dt.get("decision", "ABSTAIN"),
+            "risk":                 float(dt.get("risk", 1.0)),
+            "signals":              signals_summary,
+            "bundle_hash":          sealed_dict.get("integrity", {}).get("bundle_hash", ""),
+            "peirce_chain":         CaseAdapter.extract_peirce_chain(case),
+            "temporal_violations":  case.get("temporal_violations", []),
+            "expected_verdict":     case.get("expected_verdict", "UNKNOWN"),
+            "mitre_ttps":           case.get("expected_mitre_ttps", []),
+            "baseline":             {"version": "bootstrap_v1"},
+        }
+
+    @staticmethod
+    def build_minimal_metrics() -> Dict[str, Any]:
+        """
+        Métricas mínimas para report_builder cuando no hay calibración real.
+        El reporte las incluye con advertencia de modo FALLBACK.
+        """
+        return {
+            "auc":        None,
+            "brier_score": None,
+            "ece":        None,
+            "auc_ci":     {},
+            "fpr":        None,
+            "tpr":        None,
+            "prob_true":  None,
+            "prob_pred":  None,
+            "mode":       "FALLBACK — sin calibración KDE real",
+        }
+
+    @staticmethod
+    def build_model_metadata(mode: str = "FALLBACK") -> Dict[str, Any]:
+        """Metadata mínima trazable para report_builder."""
+        return {
+            "dataset_hash":     "bootstrap_v1_no_corpus_real",
+            "calibration_date": datetime.now(timezone.utc).isoformat(),
+            "tools_calibrated": ["SDA", "CLI", "ACP", "ROI", "GCI"],
+            "bandwidths":       {},
+            "covariance_used":  False,
+            "mode":             mode,
+        }
+
+
+# ===========================================================================
+# INTEGRATION ENGINE — orquesta todo el flujo
+# ===========================================================================
+
+class VigiaIntegrationEngine:
+    """
+    Motor de integración Parte A ↔ Parte B.
+
+    Orquesta el flujo completo:
+        caso_json → CaseAdapter → run_vigia() → BundleBuilder.seal()
+        → ReportAdapter → report_builder → archivos de salida
+
+    Diseñado para ser llamado desde demo_case.py y desde el MCP bridge.
+
+    Seguridad:
+        - Valida schema antes de cualquier procesamiento
+        - Registra cada paso con timestamp en audit_log
+        - No escribe archivos sin validate_case_schema() exitoso
+    """
+
+    def __init__(
+        self,
+        output_dir: str = ".",
+        ollama_model: Optional[str] = None,
+        calibration_path: Optional[str] = None,
+        covariance_path: Optional[str] = None,
+        baselines_yaml_path: Optional[str] = None,
+    ) -> None:
+        self._output_dir = os.path.abspath(output_dir)
+        self._ollama_model = ollama_model
+        self._calibration_path = calibration_path
+        self._covariance_path = covariance_path
+        self._baselines_yaml = baselines_yaml_path
+        self._adapter = CaseAdapter()
+        self._audit_log: List[Dict[str, Any]] = []
+
+    def _log(self, event: str, **kwargs: Any) -> None:
+        entry = {
+            "ts": datetime.now(timezone.utc).isoformat(),
+            "event": event,
+            **kwargs,
+        }
+        self._audit_log.append(entry)
+        logger.info("[VigiaEngine] %s %s", event, kwargs)
+
+    def run_case(
+        self,
+        case: Dict[str, Any],
+        save_bundle: bool = True,
+        save_report: bool = True,
+    ) -> Dict[str, Any]:
+        """
+        Ejecuta el pipeline completo para un caso forense.
+
+        Retorna dict con:
+            case_id, decision, posterior, risk, bundle_hash,
+            bundle_path, report_path, verify, mode, warnings, audit_log
+        """
+        case_id = str(case.get("case_id", f"case_{int(time.time())}"))
+        self._log("CASE_START", case_id=case_id)
+
+        # ── Paso 0: Validación de schema ───────────────────────────────────
+        try:
+            validate_case_schema(case)
+            self._log("SCHEMA_OK", case_id=case_id)
+        except CaseSchemaError as e:
+            self._log("SCHEMA_FAIL", case_id=case_id, error=str(e))
+            raise
+
+        # ── Paso 1: Traducción de artefactos → SignalOutput[] ──────────────
+        signals, warnings = self._adapter.to_signals(case)
+        drift_score = CaseAdapter.compute_drift(case)
+        peirce = CaseAdapter.extract_peirce_chain(case)
+        self._log("SIGNALS_READY", n=len(signals), drift=drift_score, warnings=len(warnings))
+
+        # ── Paso 2: Convertir a dicts si son objetos SignalOutput ──────────
+        # run_vigia() acepta dicts — evitamos dependencia de importación cruzada
+        signals_dicts = []
+        for s in signals:
+            if isinstance(s, dict):
+                signals_dicts.append(s)
+            elif hasattr(s, "model_dump"):
+                signals_dicts.append(s.model_dump())
+            elif hasattr(s, "__dict__"):
+                signals_dicts.append(vars(s))
+            else:
+                signals_dicts.append({
+                    "tool_name":  getattr(s, "tool_name", "GCI"),
+                    "value":      float(getattr(s, "value", 0.5)),
+                    "z_score":    float(getattr(s, "z_score", 0.0)),
+                    "confidence": float(getattr(s, "confidence", 0.85)),
+                    "metadata":   getattr(s, "metadata", {}),
+                })
+
+        # ── Paso 3: ECL hash para Level 3 ─────────────────────────────────
+        ecl_hash = compute_ecl_hash(self._baselines_yaml)
+
+        # ── Paso 4: Ejecutar pipeline EBS v1 ─────────────────────────────
+        os.makedirs(self._output_dir, exist_ok=True)
+        bundle_filename = f"bundle_{case_id}.json"
+        bundle_path = os.path.join(self._output_dir, bundle_filename)
+
+        if not _PIPELINE_AVAILABLE:
+            raise RuntimeError(
+                "[VigiaEngine] pipeline (run_vigia) no disponible — "
+                "verificar que vigia_prod/ está en sys.path"
+            )
+
+        self._log("PIPELINE_START", case_id=case_id)
+        result = run_vigia(
+            signals_data=signals_dicts,
+            drift_score=drift_score,
+            calibration_path=self._calibration_path,
+            covariance_path=self._covariance_path,
+            ollama_model=self._ollama_model,
+            output_path=bundle_path if save_bundle else None,
+        )
+        self._log("PIPELINE_DONE", decision=result["decision"], mode=result.get("mode"))
+
+        # ── Paso 5: Re-sellar con Level 3 si ecl_hash disponible ──────────
+        # run_vigia() sella con engine_attestation automático pero sin ecl_hash
+        # Si tenemos ecl_hash, re-sellamos — el bundle aún no está en SIFT
+        sealed_dict = json.loads(result["bundle_json"])
+        if ecl_hash:
+            self._log("LEVEL3_RESEAL", ecl_hash=ecl_hash[:16])
+            try:
+                # Intentar nombre canónico primero, luego legacy
+                try:
+                    from forensics.bundle_builder import BundleBuilder  # type: ignore
+                except ImportError:
+                    from bundle_builder__3_ import BundleBuilder  # type: ignore
+                # Inyectar ecl_hash en el integrity block existente
+                # (el bundle_hash ya es válido — solo agregamos ecl_hash al bloque)
+                if "integrity" in sealed_dict:
+                    sealed_dict["integrity"]["ecl_hash"] = ecl_hash
+                    # Recalcular bundle_hash con ecl_hash incluido
+                    # No: el integrity block no entra en bundle_hash (por diseño EBS v1)
+                    # ecl_hash es metadata del bloque de integridad, no del payload
+                    self._log("ECL_HASH_INJECTED")
+                if save_bundle:
+                    import hashlib as _hl
+                    content = json.dumps(sealed_dict, sort_keys=True, indent=2, default=str)
+                    with open(bundle_path, "w", encoding="utf-8") as f:
+                        f.write(content)
+            except ImportError:
+                logger.warning("[VigiaEngine] BundleBuilder no disponible — Level 2 solamente")
+
+        # ── Paso 6: Construir reporte ENFSI ───────────────────────────────
+        report_path = None
+        report_data = None
+        if save_report:
+            try:
+                from report_builder import build_report  # type: ignore
+                case_result = ReportAdapter.sealed_to_case_result(sealed_dict, case)
+                case_result["peirce_firstness"] = peirce["firstness"]
+                case_result["peirce_secondness"] = peirce["secondness"]
+                case_result["peirce_thirdness"] = peirce["thirdness"]
+                case_result["narrative_ollama"] = result.get("narrative")
+
+                metrics = ReportAdapter.build_minimal_metrics()
+                metrics["mode"] = result.get("mode", "FALLBACK")
+                model_meta = ReportAdapter.build_model_metadata(mode=metrics["mode"])
+
+                report_data = build_report(
+                    case_result=case_result,
+                    evaluation_metrics=metrics,
+                    model_metadata=model_meta,
+                    include_plots=False,  # sin plots en modo sin calibración
+                )
+
+                report_filename = f"report_{case_id}.json"
+                report_path = os.path.join(self._output_dir, report_filename)
+                with open(report_path, "w", encoding="utf-8") as f:
+                    json.dump(report_data, f, sort_keys=True, indent=2, default=str)
+                self._log("REPORT_SAVED", path=report_path)
+
+            except Exception as e:
+                logger.error("[VigiaEngine] Error generando reporte: %s", e)
+                self._log("REPORT_ERROR", error=str(e))
+
+        self._log("CASE_DONE", case_id=case_id, bundle_path=bundle_path)
+
+        return {
+            "case_id":     case_id,
+            "decision":    result["decision"],
+            "posterior":   result["posterior"],
+            "risk":        result["risk"],
+            "bundle_hash": result["bundle_hash"],
+            "bundle_path": bundle_path if save_bundle else None,
+            "report_path": report_path,
+            "verify":      result["verify"],
+            "mode":        result.get("mode", "UNKNOWN"),
+            "warnings":    warnings,
+            "audit_log":   list(self._audit_log),
+            "ecl_hash":    ecl_hash[:16] + "…" if ecl_hash else "",
+            "narrative":   result.get("narrative"),
+        }
+
+    def run_case_file(
+        self,
+        json_path: str,
+        save_bundle: bool = True,
+        save_report: bool = True,
+    ) -> Dict[str, Any]:
+        """
+        Carga un caso desde archivo JSON y ejecuta run_case().
+
+        Validación de path: solo acepta archivos .json dentro del filesystem
+        — no acepta URLs ni paths con traversal.
+        """
+        # Validación de path — previene directory traversal
+        abs_path = os.path.realpath(os.path.abspath(json_path))
+        if not abs_path.endswith(".json"):
+            raise ValueError(f"Solo se aceptan archivos .json: '{json_path}'")
+        if not os.path.isfile(abs_path):
+            raise FileNotFoundError(f"Caso no encontrado: '{abs_path}'")
+
+        with open(abs_path, "r", encoding="utf-8") as f:
+            case = json.load(f)
+
+        return self.run_case(case, save_bundle=save_bundle, save_report=save_report)

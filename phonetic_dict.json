@@ -1,0 +1,771 @@
+{
+  "_meta": {
+    "version": "2.0.0",
+    "description": "VIGÍA phonetic / behavioral pattern dictionary. All pattern keys are lowercase. Regex flags: IGNORECASE + UNICODE applied at runtime.",
+    "sections": [
+      "common_words",
+      "homoglyph_patterns",
+      "layout_slips",
+      "behavioral_signatures",
+      "document_forgery_indicators"
+    ]
+  },
+
+  "common_words": {
+    "description": "Russian/Slavic words phonetically transcribed to Latin. A match in logs/bash history is a hard attribution signal.",
+    "entries": {
+      "privet":    { "original": "привет",  "meaning": "hello",               "confidence": 0.85 },
+      "parol":     { "original": "пароль",  "meaning": "password",            "confidence": 0.9  },
+      "vzlomat":   { "original": "взломать","meaning": "to hack/break",        "confidence": 0.95 },
+      "udalit":    { "original": "удалить", "meaning": "to delete",           "confidence": 0.9  },
+      "zagruzka":  { "original": "загрузка","meaning": "download/upload",     "confidence": 0.85 },
+      "server":    { "original": "сервер",  "meaning": "server (loanword)",   "confidence": 0.5  },
+      "baza":      { "original": "база",    "meaning": "database/base",       "confidence": 0.7  },
+      "nagruzka":  { "original": "нагрузка","meaning": "payload/load",        "confidence": 0.85 },
+      "dvizhok":   { "original": "движок",  "meaning": "engine/driver",       "confidence": 0.8  },
+      "shkaf":     { "original": "шкаф",    "meaning": "cabinet/rack",        "confidence": 0.7  },
+      "skhema":    { "original": "схема",   "meaning": "schema/scheme",       "confidence": 0.75 },
+      "klyuch":    { "original": "ключ",    "meaning": "key (crypto/physical)","confidence": 0.9  }
+    }
+  },
+
+  "homoglyph_patterns": {
+    "description": "Unicode homoglyphs: visually identical chars from different scripts. Presence in code/logs = deliberate obfuscation.",
+    "entries": {
+      "\\u0430": { "looks_like": "a", "script": "Cyrillic small a",  "confidence": 0.9 },
+      "\\u0435": { "looks_like": "e", "script": "Cyrillic small e",  "confidence": 0.9 },
+      "\\u043e": { "looks_like": "o", "script": "Cyrillic small o",  "confidence": 0.9 },
+      "\\u0440": { "looks_like": "p", "script": "Cyrillic small r",  "confidence": 0.9 },
+      "\\u0441": { "looks_like": "c", "script": "Cyrillic small c",  "confidence": 0.9 },
+      "\\u0445": { "looks_like": "x", "script": "Cyrillic small kha","confidence": 0.9 },
+      "\\u0392": { "looks_like": "B", "script": "Cyrillic Ve",       "confidence": 0.85},
+      "\\u0421": { "looks_like": "C", "script": "Cyrillic Es",       "confidence": 0.85},
+      "\\u0415": { "looks_like": "E", "script": "Cyrillic IE",       "confidence": 0.85},
+      "\\u041a": { "looks_like": "K", "script": "Cyrillic Ka",       "confidence": 0.85},
+      "\\u041c": { "looks_like": "M", "script": "Cyrillic Em",       "confidence": 0.85},
+      "\\u041d": { "looks_like": "H", "script": "Cyrillic En",       "confidence": 0.85},
+      "\\u041e": { "looks_like": "O", "script": "Cyrillic O",        "confidence": 0.85},
+      "\\u0420": { "looks_like": "P", "script": "Cyrillic Er",       "confidence": 0.85},
+      "\\u0422": { "looks_like": "T", "script": "Cyrillic Te",       "confidence": 0.85},
+      "\\u0425": { "looks_like": "X", "script": "Cyrillic Kha",      "confidence": 0.85},
+      "\\u0443": { "looks_like": "y", "script": "Cyrillic u",        "confidence": 0.85},
+      "\\u2019": { "looks_like": "'", "script": "Right single quotation mark (non-breaking)", "confidence": 0.7 },
+      "\\u00a0": { "looks_like": " ", "script": "Non-breaking space (Cyrillic/EU keyboard)", "confidence": 0.75 },
+      "\\u00ab": { "looks_like": "<<","script": "Left-pointing guillemet (EU keyboard)",     "confidence": 0.7 },
+      "\\u00bb": { "looks_like": ">>","script": "Right-pointing guillemet (EU keyboard)",    "confidence": 0.7 }
+    }
+  },
+
+  "layout_slips": {
+    "description": "Strings typed with Russian keyboard layout active but while expecting Latin. Found in logs/terminals = attacker forgot to switch layout. Case 001 / PDF p.1.",
+    "entries": {
+      "ghbdtn":  { "intended": "привет",  "meaning": "hello",                    "confidence": 0.95 },
+      "cnfnbz":  { "intended": "статья",  "meaning": "article/report",           "confidence": 0.95 },
+      "cnhfyt":  { "intended": "стране",  "meaning": "country (genitive)",       "confidence": 0.9  },
+      "ыгвщ":    { "intended": "sudo",    "meaning": "superuser do",             "confidence": 0.98 },
+      "кщще":    { "intended": "root",    "meaning": "root user",                "confidence": 0.98 },
+      "vjcrdf":  { "intended": "москва",  "meaning": "Moscow",                   "confidence": 0.9  },
+      "ckfdf":   { "intended": "слава",   "meaning": "glory/Slava (name)",       "confidence": 0.85 },
+      "gfhjkm":  { "intended": "пароль",  "meaning": "password",                 "confidence": 0.98 },
+      "cfqn":    { "intended": "сайт",    "meaning": "website",                  "confidence": 0.85 },
+      "bcgjkmpjdfybt": { "intended": "использование", "meaning": "usage/exploit","confidence": 0.9  },
+      "lfyyst":  { "intended": "данные",  "meaning": "data",                     "confidence": 0.9  },
+      "cthtd`h": { "intended": "сервер",  "meaning": "server",                   "confidence": 0.9  },
+      "pfuheprf": { "intended": "загрузка","meaning": "upload/download",         "confidence": 0.9  },
+      "elfkbnm":  { "intended": "удалить", "meaning": "to delete",               "confidence": 0.95 },
+      "htrjylm": { "intended": "рекорд",  "meaning": "record",                   "confidence": 0.8  }
+    }
+  },
+
+  "behavioral_signatures": {
+    "description": "Named attack patterns derived from VIGÍA case library (cases 004-039). Each entry maps a pattern name to detection heuristics and the Peirce frame.",
+    "entries": {
+
+      "WEAPONIZED_INCOMPETENCE": {
+        "case": "004",
+        "aka": "Coartada de Estupidez",
+        "description": "High-skill actions followed immediately by a low-skill distress narrative.",
+        "detection_heuristics": [
+          "Complex PowerShell/bash commands within 60s before a helpdesk ticket claiming accidental action",
+          "shadow copies deleted or ACL changed followed by 'I don't know what happened' message",
+          "Skill delta > 4 standard deviations between action and narrative"
+        ],
+        "peirce": {
+          "firstness": "A technical action is observed",
+          "secondness": "The actor claims inability to perform that action",
+          "thirdness": "Premeditated alibi construction – the incompetence IS the plan"
+        },
+        "confidence_weight": 0.8
+      },
+
+      "SMOKESCREEN_NOISE": {
+        "case": "005",
+        "aka": "Ruido Blanco Distractor / Cortina de Humo",
+        "description": "High-volume obvious attack on low-value target while silent exfil occurs elsewhere.",
+        "detection_heuristics": [
+          "5000+ failed login events in < 10 minutes from foreign IPs on deprecated system",
+          "Simultaneous silence on high-value systems during noisy attack window",
+          "Alert volume asymmetry: noise target / value target ratio > 100x"
+        ],
+        "peirce": {
+          "firstness": "Loud, obvious attack is highly visible",
+          "secondness": "Attack target is low-value; no lateral movement follows",
+          "thirdness": "Misdirection as a practiced habit – the noise IS the weapon"
+        },
+        "confidence_weight": 0.85
+      },
+
+      "SLAVIC_SYNTAX_SLIP": {
+        "case": "006",
+        "aka": "Traición Gramatical",
+        "description": "English text with article omission or make/do substitution typical of Slavic L1 speakers.",
+        "detection_heuristics": [
+          "Missing articles 'the'/'a' in variable names or code comments",
+          "'make function for delete' instead of 'create a function to delete'",
+          "'make' used where 'create'/'write'/'build' expected in code comments"
+        ],
+        "peirce": {
+          "firstness": "English appears fluent",
+          "secondness": "Article and preposition patterns deviate from native use",
+          "thirdness": "Mother-tongue grammar leaks through L2 mask"
+        },
+        "confidence_weight": 0.7
+      },
+
+      "CIRCADIAN_BREACH": {
+        "case": "007",
+        "aka": "Insomnio Táctico / Ruptura del Ritmo Circadiano",
+        "description": "Access outside user's established temporal pattern, especially large data transfers.",
+        "detection_heuristics": [
+          "Login time deviates > 4 hours from user's 90-day mean access window",
+          "File access > 50 MB at 00:00–05:00 local time for office worker profile",
+          "Weekend access pattern for Monday–Friday-only historical profile"
+        ],
+        "peirce": {
+          "firstness": "Valid credentials, correct IP range",
+          "secondness": "Access time is biologically anomalous for role",
+          "thirdness": "Broken circadian habit signals credential compromise"
+        },
+        "confidence_weight": 0.75
+      },
+
+      "PANOPTICON_CHECK": {
+        "case": "008",
+        "aka": "Paranoia del Perímetro / Reconocimiento Hostil",
+        "description": "Repeated execution of environment-survey commands with no productive work.",
+        "detection_heuristics": [
+          "whoami / id / w / ps aux | grep root executed > 5 times in 30 minutes",
+          "netstat / ss -tulpn run before any legitimate work command",
+          "Survey commands constitute > 60% of session command history"
+        ],
+        "peirce": {
+          "firstness": "Commands are individually harmless",
+          "secondness": "Frequency and ordering are inconsistent with legitimate work",
+          "thirdness": "Compulsive surveillance is the habit of someone who knows they are hunted"
+        },
+        "confidence_weight": 0.8
+      },
+
+      "SURGICAL_VOID": {
+        "case": "009",
+        "aka": "Vacío Quirúrgico / Sobre-Destrucción",
+        "description": "Secure-erase (shred-level) applied to files whose size doesn't justify the effort.",
+        "detection_heuristics": [
+          "shred / srm / wipe / dd if=/dev/zero applied to files < 1 MB",
+          "DoD 7-pass wipe on text files in tmp directories",
+          "Effort-to-file-size ratio > 1000x compared to baseline user behavior"
+        ],
+        "peirce": {
+          "firstness": "File deletion is a routine act",
+          "secondness": "Destruction method is disproportionate to file sensitivity",
+          "thirdness": "Over-destruction is the loudest possible silence"
+        },
+        "confidence_weight": 0.9
+      },
+
+      "CARNEGIE_SHIELD": {
+        "case": "010",
+        "aka": "Falso Positivo Empático / Secuestro Emocional",
+        "description": "Malicious process/file named to invoke emotional hesitation in the analyst.",
+        "detection_heuristics": [
+          "Process name contains: payroll, salary, HR, backup, critical, do_not, essential",
+          "Entropy of binary > 7.0 despite benign-sounding name",
+          "File path is outside expected system directory for stated function"
+        ],
+        "peirce": {
+          "firstness": "Name signals legitimacy and emotional weight",
+          "secondness": "Binary entropy, path, and behavior contradict the name",
+          "thirdness": "Name was chosen to exploit analyst's duty-of-care instinct"
+        },
+        "confidence_weight": 0.85
+      },
+
+      "STYLOMETRIC_IMPOSTOR": {
+        "case": "011",
+        "aka": "Traición de la Puntuación / Usurpación de Huella Estilométrica",
+        "description": "Message from compromised account deviates from author's typographic micro-habits.",
+        "detection_heuristics": [
+          "Post-period spacing changes from 1 to 2 spaces (or vice versa)",
+          "Terminal punctuation in short messages appears/disappears vs baseline",
+          "Comma spacing pattern (e.g. ' ,' vs ', ') diverges from 90-day baseline",
+          "Oxford comma usage inconsistency"
+        ],
+        "peirce": {
+          "firstness": "Credentials and spelling match",
+          "secondness": "Micro-punctuation habits deviate from personal baseline",
+          "thirdness": "Motor memory cannot be stolen with a password"
+        },
+        "confidence_weight": 0.75
+      },
+
+      "PARASITIC_EXFIL": {
+        "case": "012",
+        "aka": "Camuflaje Simbiótico / Parasitismo Contextual",
+        "description": "Data exfiltration begins precisely when a legitimate high-bandwidth process starts.",
+        "detection_heuristics": [
+          "Unknown process begins network egress within 500ms of Zoom/Teams/Meet starting",
+          "Egress traffic volume mirrors legitimate traffic pattern with fixed offset",
+          "Process has no network history outside legitimate-process start events"
+        ],
+        "peirce": {
+          "firstness": "Traffic spike correlates with legitimate video call",
+          "secondness": "Unknown process' egress is temporally bound to the legitimate one",
+          "thirdness": "Parasitic timing is a practiced computational habit"
+        },
+        "confidence_weight": 0.9
+      },
+
+      "GRICEAN_OVERCOOP": {
+        "case": "013",
+        "aka": "Síndrome de Estocolmo Inverso / Exceso de Docilidad",
+        "description": "Support contact provides unsolicited technical detail and excessive flattery.",
+        "detection_heuristics": [
+          "Ticket provides all identity verification fields before being asked",
+          "Message contains > 2 compliments directed at the analyst",
+          "Technical jargon density > 90th percentile for stated user role",
+          "Grice Quantity violation: > 3x expected information density"
+        ],
+        "peirce": {
+          "firstness": "User appears cooperative and knowledgeable",
+          "secondness": "Cooperation exceeds any legitimate need",
+          "thirdness": "Over-cooperation is the social-engineer's trained habit"
+        },
+        "confidence_weight": 0.75
+      },
+
+      "BUTTERFINGERS_EXFIL": {
+        "case": "014",
+        "aka": "Falsa Torpeza / Exfiltración Enmascarada",
+        "description": "File moved to shared/public location and back within 1.5 seconds – too fast for human error recovery.",
+        "detection_heuristics": [
+          "File move to public/shared folder reversed in < 2 seconds",
+          "Reversal time < 1.5s strongly implies scripted automation",
+          "File was in shared location long enough for a background sync process to copy it"
+        ],
+        "peirce": {
+          "firstness": "User reports accidental drag-and-drop",
+          "secondness": "Motor recovery time is physically impossible for human error",
+          "thirdness": "Script disguised as clumsiness"
+        },
+        "confidence_weight": 0.92
+      },
+
+      "SAVIOR_COMPLEX": {
+        "case": "015",
+        "aka": "Caballo de Troya Altruista / Manipulación Heroica",
+        "description": "Repair action earns trust, then unrelated permission change is buried in the fix.",
+        "detection_heuristics": [
+          "Bug fix commit/command also modifies permissions on unrelated directory",
+          "chmod/chown applied to path outside scope of stated incident",
+          "Action performed at 02:00–04:00 during 'emergency' with no ticket"
+        ],
+        "peirce": {
+          "firstness": "Hero saves the day; applause follows",
+          "secondness": "One change in the fix has nothing to do with the bug",
+          "thirdness": "Trust was manufactured to create permission for the backdoor"
+        },
+        "confidence_weight": 0.88
+      },
+
+      "FATIGUE_NORMALIZATION": {
+        "case": "016",
+        "aka": "Auto-Gaslighting del Sistema / Preparación de Terreno",
+        "description": "Rhythmically precise failed logins that train the alert system to classify brute-force as noise.",
+        "detection_heuristics": [
+          "Exactly 2 failed logins before success, repeated > 10 sessions",
+          "Inter-failure interval standard deviation < 500ms across sessions",
+          "Pattern begins 7–21 days before a high-stakes access event"
+        ],
+        "peirce": {
+          "firstness": "Login failures appear to be user error",
+          "secondness": "Precision and repetition are inhuman",
+          "thirdness": "False baseline construction is the attack; the brute-force comes later"
+        },
+        "confidence_weight": 0.85
+      },
+
+      "TIMESTAMP_FORGERY": {
+        "case": "017",
+        "description": "File mtime/atime forged to an era-inconsistent value; format/feature contradicts stated age.",
+        "detection_heuristics": [
+          "mtime set to year < 2020 but file uses format spec introduced > 2021",
+          "mtime matches cluster of legitimate files exactly (copied from stat output)",
+          "ctime is recent while mtime/atime are historical (timestomping)"
+        ],
+        "peirce": {
+          "firstness": "File appears to predate the incident",
+          "secondness": "Internal format or ctime contradicts stated age",
+          "thirdness": "Time was tampered with to break the forensic timeline"
+        },
+        "confidence_weight": 0.9
+      },
+
+      "ASTROTURFING": {
+        "case": "018",
+        "aka": "Clonación Sintáctica / Sockpuppet",
+        "description": "Multiple accounts share invisible stylometric fingerprint despite claimed independence.",
+        "detection_heuristics": [
+          "Same rare punctuation error (e.g. ' ,' space-before-comma) across 3+ accounts",
+          "Paragraph entropy within 0.05 bits across accounts",
+          "Identical Oxford comma behavior or em-dash usage across accounts"
+        ],
+        "peirce": {
+          "firstness": "Three separate identities, three different IPs",
+          "secondness": "Micro-habit fingerprint is identical across all three",
+          "thirdness": "One operator controlling multiple puppets always betrays their hand habit"
+        },
+        "confidence_weight": 0.85
+      },
+
+      "PRIVILEGE_BAIT": {
+        "case": "019",
+        "aka": "Trampa de la Urgencia Invertida / Señuelo de Privilegios",
+        "description": "System generates urgent log designed to force admin login on compromised host.",
+        "detection_heuristics": [
+          "Log message contains 'ADMIN_REQUIRED' or 'CREDENTIALS_REQUIRED' in all caps",
+          "Log appears on host with recent anomalous process activity",
+          "Log is the only CRITICAL entry in a previously clean log stream"
+        ],
+        "peirce": {
+          "firstness": "Critical log demands admin attention",
+          "secondness": "No corresponding system state change precedes the log",
+          "thirdness": "Log is the trap; admin credentials are the prey"
+        },
+        "confidence_weight": 0.88
+      },
+
+      "TOPOGRAPHIC_MIMICRY": {
+        "case": "020",
+        "description": "Legitimate-named binary executing from anomalous filesystem location.",
+        "detection_heuristics": [
+          "svchost.exe outside C:\\Windows\\System32 or C:\\Windows\\SysWOW64",
+          "lsass.exe outside C:\\Windows\\System32",
+          "Any Windows system binary in C:\\Users\\ or C:\\Temp\\"
+        ],
+        "peirce": {
+          "firstness": "Name is legitimate",
+          "secondness": "Location is illegitimate",
+          "thirdness": "The disguise is the displacement"
+        },
+        "confidence_weight": 0.95
+      },
+
+      "LOCALE_LEAKAGE": {
+        "case": "021",
+        "description": "Non-breaking spaces or guillemet quotes in ostensibly English/US content.",
+        "detection_heuristics": [
+          "\\u00a0 (NBSP) used as word separator in code comments",
+          "\\u00ab or \\u00bb guillemets in 'US IT team' script",
+          "Trailing whitespace entropy inconsistent with US keyboard"
+        ],
+        "peirce": {
+          "firstness": "English content appears native",
+          "secondness": "Invisible characters betray non-US keyboard layout",
+          "thirdness": "The hands could not hide where they are from"
+        },
+        "confidence_weight": 0.8
+      },
+
+      "WEAPONIZED_COMPLIANCE": {
+        "case": "022",
+        "description": "Policy-compliant action weaponized at absurd scale to cause DoS.",
+        "detection_heuristics": [
+          "Backup script runs 500x within policy-allowed window",
+          "Legal/required process causes > 80% network saturation",
+          "Action survives 'did they follow the rules?' audit despite causing harm"
+        ],
+        "peirce": {
+          "firstness": "User claims to follow company policy",
+          "secondness": "Execution scale makes the policy itself the weapon",
+          "thirdness": "Rules weaponized: compliance as alibi"
+        },
+        "confidence_weight": 0.8
+      },
+
+      "CANARY_SUICIDE": {
+        "case": "023",
+        "aka": "Nodo Mártir / Auto-Secuestro Táctico",
+        "description": "Controlled ping to known-bad IP triggers automated isolation of a critical node.",
+        "detection_heuristics": [
+          "Single ICMP or TCP SYN to Tier-1 threat intel IP from payment/auth server",
+          "No subsequent connection attempts – the ping was the entire 'attack'",
+          "Automated quarantine removes node from production within seconds"
+        ],
+        "peirce": {
+          "firstness": "Server contacts known malicious IP",
+          "secondness": "Contact is a single packet; no payload, no C2 handshake",
+          "thirdness": "Defender's own automation was the weapon"
+        },
+        "confidence_weight": 0.87
+      },
+
+      "ANTINATURAL_ASEPSIA": {
+        "case": "024_text",
+        "aka": "Windows que no falla / Supresión de Ruido Blanco",
+        "description": "System log goes completely silent (zero errors) for an extended period in a normally noisy environment.",
+        "detection_heuristics": [
+          "Zero WARN/ERROR events for > 2 hours on system with > 20/hour baseline",
+          "Logging daemon (EventLog, syslog, auditd) stopped or filtered",
+          "Log file size growth stops while system remains 'active'"
+        ],
+        "peirce": {
+          "firstness": "System appears perfectly healthy",
+          "secondness": "No real system is ever perfectly healthy",
+          "thirdness": "Perfect silence in a complex system is the loudest alarm"
+        },
+        "confidence_weight": 0.92
+      },
+
+      "MOTOR_STEGO": {
+        "case": "025_text",
+        "aka": "Exfiltración Estegano-Dactilar / Código Morse en Errores",
+        "description": "Typo patterns non-random; errors encode data when decoded (Base64, binary, Morse).",
+        "detection_heuristics": [
+          "Keystroke error characters do not follow QWERTY adjacency distribution",
+          "Error character sequence is valid Base64 when concatenated",
+          "Error rate is constant (not bursty) suggesting deliberate generation"
+        ],
+        "peirce": {
+          "firstness": "User appears to make typos",
+          "secondness": "Errors don't follow human motor-error probability distribution",
+          "thirdness": "Mistakes are the message"
+        },
+        "confidence_weight": 0.88
+      },
+
+      "BUREAUCRATIC_PARASITE": {
+        "case": "026_text",
+        "aka": "Francotirador de Tickets / Sincronización Parasitaria",
+        "description": "Data transfer begins within milliseconds of ticket approval — requires polling automation.",
+        "detection_heuristics": [
+          "Network transfer begins < 100ms after ticket status change",
+          "Transfer was pre-staged and waiting for trigger",
+          "Human reaction time (4–8 seconds) physically impossible at observed latency"
+        ],
+        "peirce": {
+          "firstness": "User requested and was granted access",
+          "secondness": "Response time is physically impossible for human action",
+          "thirdness": "Bureaucracy itself was the exploit surface"
+        },
+        "confidence_weight": 0.95
+      },
+
+      "COGNITIVE_FLAG": {
+        "case": "027_text",
+        "aka": "Falsa Bandera Cognitiva / Señuelo Cognitivo",
+        "description": "Extremely obvious 'suspicious' account is a decoy while real attack proceeds silently.",
+        "detection_heuristics": [
+          "One account generates > 90% of all security alerts during an incident window",
+          "High-alert account has no actual data access",
+          "Simultaneous silent admin-account activity during noisy decoy window"
+        ],
+        "peirce": {
+          "firstness": "Obvious suspect demands immediate response",
+          "secondness": "No real damage flows from the obvious suspect",
+          "thirdness": "Oversaturation of suspicion is itself a weapon"
+        },
+        "confidence_weight": 0.85
+      },
+
+      "BIOMETRIC_PARASITE": {
+        "case": "028_text",
+        "aka": "Parasitismo Biométrico / Mimetismo Biométrico",
+        "description": "Malicious process CPU usage correlates with user input interrupts, hiding latency inside human activity.",
+        "detection_heuristics": [
+          "Process CPU usage Pearson correlation with HID interrupt rate > 0.85",
+          "Process drops to < 1% CPU within 5 seconds of user inactivity",
+          "Process has no legitimate reason to monitor input hardware"
+        ],
+        "peirce": {
+          "firstness": "Slowness attributed to user's own activity",
+          "secondness": "Process has hardware-level awareness of user input",
+          "thirdness": "Malware learned the user's rhythm to hide inside it"
+        },
+        "confidence_weight": 0.9
+      },
+
+      "FALSE_EMBARRASSMENT": {
+        "case": "029_text",
+        "aka": "Mártir del Portapapeles / Falsa Vergüenza",
+        "description": "Encrypted/encoded data posted publicly and 'accidentally', captured by webhook before deletion.",
+        "detection_heuristics": [
+          "Long encoded string posted to public channel followed by deletion < 3 seconds later",
+          "Active webhook/bot present in channel that read content before deletion",
+          "Poster has access history to sensitive data matching encoding length"
+        ],
+        "peirce": {
+          "firstness": "Embarrassed user deletes accidental post",
+          "secondness": "Deletion time suggests foreknowledge of webhook capture",
+          "thirdness": "Public embarrassment was the delivery mechanism"
+        },
+        "confidence_weight": 0.87
+      },
+
+      "DOCUMENTAL_GASLIGHTING": {
+        "case": "030_text",
+        "aka": "Parche Nostálgico / Gaslighting Documental",
+        "description": "Audit log comment provides plausible-sounding false justification for security downgrade.",
+        "detection_heuristics": [
+          "Audit comment references legacy system that no longer exists",
+          "Security downgrade (cipher downgrade, firewall relaxation) with no incident ticket",
+          "Comment author account shows no other activity in the stated legacy system"
+        ],
+        "peirce": {
+          "firstness": "Log comment explains the change",
+          "secondness": "Stated justification does not match infrastructure inventory",
+          "thirdness": "The lie was planted in the audit trail itself"
+        },
+        "confidence_weight": 0.88
+      },
+
+      "QUANTUM_EVASION": {
+        "case": "031_text",
+        "aka": "Efecto Observador / Malware de Schrödinger / Consciencia Forense",
+        "description": "Script checks for forensic tools before executing payload; benign behavior under observation.",
+        "detection_heuristics": [
+          "Process enumerates running processes before any other action",
+          "Searches for: volatility, vigia, autopsy, wireshark, procmon, ftkimager",
+          "Exits cleanly if forensic tools detected; payload only fires in 'unobserved' state"
+        ],
+        "peirce": {
+          "firstness": "Process appears benign (Hello World / exit 0)",
+          "secondness": "Process surveyed its environment before acting",
+          "thirdness": "No legitimate program needs to check if police are watching"
+        },
+        "confidence_weight": 0.98
+      },
+
+      "SOUL_THEFT": {
+        "case": "032_text",
+        "aka": "Usurpación de Biometría Sintética / Robo de Alma Digital",
+        "description": "Remote session reproduces victim's keystroke cadence too precisely; lacks human jitter variance.",
+        "detection_heuristics": [
+          "Inter-keystroke interval standard deviation < 8ms (human baseline: 20–80ms)",
+          "Cadence matches victim's recorded session with correlation > 0.98",
+          "No fatigue variance across session duration (humans slow down)"
+        ],
+        "peirce": {
+          "firstness": "Typing rhythm matches known user",
+          "secondness": "Rhythm is too perfect; lacks biological variance",
+          "thirdness": "The soul was stolen; only the shell remains"
+        },
+        "confidence_weight": 0.93
+      },
+
+      "ALERT_FATIGUE": {
+        "case": "033_text",
+        "aka": "Rehén de la Alarma / Fatiga de Alerta Inducida",
+        "description": "Recurring false-positive alerts at fixed times train responders to ignore them before real attack.",
+        "detection_heuristics": [
+          "Same alert fires at same time (± 5 min) for > 10 consecutive days",
+          "Alert always resolves without analyst intervention",
+          "Responder acknowledgment time increases > 3x over the conditioning period",
+          "Real attack uses identical alert signature on day N+1"
+        ],
+        "peirce": {
+          "firstness": "Alert appears to be the same noise as before",
+          "secondness": "This time the alert is real",
+          "thirdness": "Pavlovian conditioning turned the defenders into the vulnerability"
+        },
+        "confidence_weight": 0.9
+      },
+
+      "PSYCHOLOGICAL_SHIELD": {
+        "case": "034",
+        "aka": "Escudo Heredado / Escudo Psicológico Burocrático",
+        "description": "Malicious process/service named to invoke fear of deletion in junior analysts.",
+        "detection_heuristics": [
+          "Process/dir name contains: DO_NOT_DELETE, CRITICAL, LEGACY, NT_, SYNC, ESSENTIAL",
+          "No documentation in CMDB or IT asset register for the named service",
+          "Binary entropy inconsistent with stated function"
+        ],
+        "peirce": {
+          "firstness": "Name implies catastrophic consequences if removed",
+          "secondness": "Service has no documented existence or legitimate owner",
+          "thirdness": "Fear of consequences was engineered into the name"
+        },
+        "confidence_weight": 0.82
+      },
+
+      "TEMPORAL_STEGO": {
+        "case": "035",
+        "aka": "Pulso del Servidor / Esteganografía de Frecuencia Temporal",
+        "description": "Information encoded in inter-packet timing intervals rather than packet content.",
+        "detection_heuristics": [
+          "Ping/heartbeat intervals form non-random sequence (failing Ljung-Box test)",
+          "Interval sequence matches known encoding (binary Morse, decimal digits)",
+          "Traffic passes content inspection clean; only timing is anomalous"
+        ],
+        "peirce": {
+          "firstness": "Packets contain no suspicious payload",
+          "secondness": "Time between packets is not random",
+          "thirdness": "The clock is the channel"
+        },
+        "confidence_weight": 0.85
+      },
+
+      "BYSTANDER_DILUTION": {
+        "case": "036",
+        "aka": "Efecto Espectador / Dilución de Responsabilidad",
+        "description": "Security alert tagged to massive group list to exploit bystander effect and ensure inaction.",
+        "detection_heuristics": [
+          "Alert notification tagged @here/@channel or > 20 individuals",
+          "No single owner assigned to the alert",
+          "Acknowledgment rate < 5% within first 30 minutes"
+        ],
+        "peirce": {
+          "firstness": "Alert was sent to everyone – surely someone will handle it",
+          "secondness": "No one handles it",
+          "thirdness": "The attacker understood diffusion of responsibility better than the team"
+        },
+        "confidence_weight": 0.8
+      },
+
+      "WHITESPACE_STEGO": {
+        "case": "037",
+        "aka": "Cifrado del Perezoso / Esteganografía de Caracteres No Imprimibles",
+        "description": "Binary data encoded in trailing whitespace (spaces=0, tabs=1) of source/text files.",
+        "detection_heuristics": [
+          "File diff shows changes only in trailing whitespace",
+          "Trailing character entropy per line > 0.5 (non-zero for 'empty' trailing space)",
+          "Trailing space/tab pattern is valid ZIP/base64 when extracted"
+        ],
+        "peirce": {
+          "firstness": "File appears identical to previous version",
+          "secondness": "Invisible characters changed",
+          "thirdness": "The margin was the message"
+        },
+        "confidence_weight": 0.87
+      },
+
+      "PANIC_PAYLOAD": {
+        "case": "038",
+        "aka": "Pánico del Auditor / Urgencia Artificial / Secuestro de Protocolo",
+        "description": "Filename engineered to trigger compliance panic and bypass sandbox procedures.",
+        "detection_heuristics": [
+          "Filename contains: GDPR, VIOLATION, LEAK, EVIDENCE, FINE, URGENT, BREACH",
+          "File extension mismatch (e.g. .pdf.exe, .docx.bat)",
+          "File delivery accompanied by time pressure narrative in email/chat"
+        ],
+        "peirce": {
+          "firstness": "Filename screams legal/compliance emergency",
+          "secondness": "Extension and entropy contradict document content claim",
+          "thirdness": "Panic was the delivery mechanism for the payload"
+        },
+        "confidence_weight": 0.9
+      },
+
+      "STEREOTYPED_STEGO": {
+        "case": "039",
+        "aka": "Camuflaje de la Incompetencia / Esteganografía Estereotipada",
+        "description": "Oversized media file from 'non-technical' department used to hide exfiltrated data.",
+        "detection_heuristics": [
+          "Image/media file size > 10 MB from design/marketing dept with entropy > 7.8",
+          "File size inconsistent with visible image dimensions and color depth",
+          "LSB (least significant bit) analysis reveals non-noise data pattern"
+        ],
+        "peirce": {
+          "firstness": "Design dept always sends big files – normal",
+          "secondness": "Entropy and size-to-dimension ratio are anomalous",
+          "thirdness": "The stereotype was the camouflage"
+        },
+        "confidence_weight": 0.85
+      },
+
+      "TIMESTOMPING": {
+        "case": "024_pdf",
+        "aka": "Paracaidista / Manipulación Temporal",
+        "description": "File timestamps (mtime/atime) forged to match legitimate files; ctime reveals true modification time.",
+        "detection_heuristics": [
+          "mtime/atime match other files in directory to the exact second",
+          "ctime is significantly more recent than mtime",
+          "touch -r was likely used: all three timestamps identical to a reference file"
+        ],
+        "peirce": {
+          "firstness": "File appears to predate the system compromise",
+          "secondness": "ctime cannot be falsified without kernel-level access",
+          "thirdness": "The lie about time reveals itself in the layer the attacker forgot"
+        },
+        "confidence_weight": 0.93
+      },
+
+      "PADDING_FILE": {
+        "case": "025_pdf",
+        "aka": "Caballo de Madera Vacío / Dilución de Evidencia",
+        "description": "Large file with near-zero entropy: payload padded with null bytes to evade sandbox size limits.",
+        "detection_heuristics": [
+          "File > 10 MB with Shannon entropy < 0.1",
+          "File composed of > 95% null bytes or single repeated byte",
+          "Legitimate malware prefix (< 1 MB) followed by padding block"
+        ],
+        "peirce": {
+          "firstness": "File appears large and therefore presumably scanned",
+          "secondness": "Content entropy is physically impossible for real data",
+          "thirdness": "The emptiness was engineered to exploit scanner performance limits"
+        },
+        "confidence_weight": 0.92
+      },
+
+      "PROCESS_HOLLOWING": {
+        "case": "026_pdf",
+        "aka": "Ventrílocuo / Usurpación de Autoridad",
+        "description": "Legitimate process name and hash, but behavior (network, memory) contradicts stated function.",
+        "detection_heuristics": [
+          "svchost.exe / explorer.exe maintaining persistent connection to non-Microsoft IP on 443",
+          "Process memory regions flagged as PAGE_EXECUTE_READWRITE outside module boundaries",
+          "Parent process is unusual (svchost spawned by cmd.exe, not services.exe)"
+        ],
+        "peirce": {
+          "firstness": "Process name and hash are legitimate",
+          "secondness": "Network/memory behavior violates process's defined purpose",
+          "thirdness": "Authority was borrowed; the name is a costume"
+        },
+        "confidence_weight": 0.95
+      }
+    }
+  },
+
+  "document_forgery_indicators": {
+    "description": "Patterns for audit_document_integrity (Case 041 / Documento Frankenstein) and the vision tools.",
+    "gender_role_patterns_es_rioplatense": {
+      "description": "Spanish Rioplatense gender/role inconsistency patterns. Match = semantic manipulation in legal/official document.",
+      "patterns": [
+        { "regex": "la\\s+acusada[^.]{0,200}\\bél\\b",        "description": "Female accused, male pronoun",          "weight": 0.6 },
+        { "regex": "el\\s+imputado[^.]{0,200}\\bella\\b",      "description": "Male defendant, female pronoun",        "weight": 0.6 },
+        { "regex": "la\\s+denunciante[^.]{0,200}\\bél\\b",     "description": "Female complainant, male pronoun",      "weight": 0.6 },
+        { "regex": "el\\s+testigo[^.]{0,200}\\bella\\b",       "description": "Male witness, female pronoun",         "weight": 0.6 },
+        { "regex": "la\\s+víctima[^.]{0,200}\\bél\\b",         "description": "Female victim, male pronoun",          "weight": 0.6 },
+        { "regex": "la\\s+acusada[^.]{0,200}\\bél\\s+mismo\\b","description": "Female accused + 'himself'",           "weight": 0.7 },
+        { "regex": "la\\s+imputada[^.]{0,200}\\bsu\\s+defensor\\b", "description": "Female defendant, male defender reference", "weight": 0.5 }
+      ]
+    },
+    "unofficial_tool_producers": [
+      "canva", "ilovepdf", "photoshop", "illustrator",
+      "smallpdf", "pdf24", "sejda", "foxit phantom",
+      "libreoffice", "pages", "keynote"
+    ],
+    "font_chaos_threshold": 3,
+    "entropy_zero_threshold": 0.1,
+    "ela_sensitivity": 90
+  }
+}

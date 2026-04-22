@@ -1,0 +1,60 @@
+{
+  "case_id": "case_001_temporal",
+  "name": "Impossible Timeline — Effect Before Cause",
+  "description": "File write occurs before the process that created it was spawned. Classic timestomp + process hollowing.",
+  "artifacts": [
+    {
+      "artifact_id": "proc_001",
+      "evidence_type": "memory_process",
+      "source_tool": "list_processes",
+      "timestamp": "2026-04-10T10:00:05Z",
+      "raw_score": 0.9,
+      "prior_trust": 0.95,
+      "provenance_chain": ["sha256:abc123def456", "sha256:789xyz012"],
+      "description": "Process svchost.exe (PID 4412) spawned at 10:00:05",
+      "metadata": {"pid": 4412, "parent_pid": 888, "image": "svchost.exe"}
+    },
+    {
+      "artifact_id": "file_001",
+      "evidence_type": "file_timestamp",
+      "source_tool": "read_evidence",
+      "timestamp": "2026-04-10T10:00:00Z",
+      "raw_score": 0.85,
+      "prior_trust": 0.7,
+      "provenance_chain": ["sha256:aaa111bbb222"],
+      "description": "C:\\Windows\\Temp\\payload.dll written at 10:00:00 — 5s BEFORE PID 4412 existed",
+      "metadata": {"path": "C:\\Windows\\Temp\\payload.dll", "size_bytes": 143360, "writer_pid": 4412}
+    },
+    {
+      "artifact_id": "log_001",
+      "evidence_type": "log_entry",
+      "source_tool": "read_evidence",
+      "timestamp": "2026-04-10T10:00:02Z",
+      "raw_score": 0.6,
+      "prior_trust": 0.5,
+      "provenance_chain": ["sha256:ccc333ddd444"],
+      "description": "EventLog 4663: File creation by PID 4412 at 10:00:02",
+      "metadata": {"event_id": 4663, "object_name": "payload.dll", "process_id": 4412}
+    }
+  ],
+  "temporal_violations": [
+    {
+      "type": "EFFECT_BEFORE_CAUSE",
+      "severity": 1.0,
+      "cause": {"artifact_id": "proc_001", "timestamp": "2026-04-10T10:00:05Z", "description": "Process creation"},
+      "effect": {"artifact_id": "file_001", "timestamp": "2026-04-10T10:00:00Z", "description": "File written by that process"},
+      "delta_seconds": -5,
+      "interpretation": "File written 5s before process existed. Physically impossible — timestamps manipulated (T1070.006)."
+    }
+  ],
+  "expected_verdict": "MALICE",
+  "expected_confidence": 0.95,
+  "expected_mitre_ttps": ["T1070.006", "T1055", "T1036"],
+  "peirce_chain": {
+    "firstness": "File write timestamp precedes process spawn by 5 seconds",
+    "secondness": "No clock skew explains negative delta — this is physical law violation",
+    "thirdness": "Deliberate timestomp to plant pre-existing payload"
+  },
+  "demo_command": "python run_vigia_case.py cases/case_001_temporal.json",
+  "demo_quote": "Here, a file is written before the process exists. This is physically impossible. The system flags fabrication."
+}
