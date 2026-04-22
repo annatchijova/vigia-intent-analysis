@@ -6,8 +6,8 @@
 
 | Severity | Contact | Response Time |
 |----------|---------|--------------|
-| Critical (evidence integrity) | security@vigia-forensics.org | 4 hours |
-| High (attribution bypass) | security@vigia-forensics.org | 24 hours |
+| Critical (evidence integrity) | anna.tchijova@icloud.com | 4 hours |
+| High (attribution bypass) | anna.tchijova@icloud.com | 24 hours |
 | Medium/Low | GitHub Issues | 7 days |
 
 ## Hardened Security Architecture
