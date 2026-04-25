@@ -1,11 +1,127 @@
-__pycache__/
-*.pyc
-*.pyo
-*.pkl
-*.egg-info/
+# =============================================================================
+# VIGÍA — .gitignore
+# Copyright (c) 2026 Anna Tchijova
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# SEGURIDAD CRÍTICA — nunca versionar
+# -----------------------------------------------------------------------------
 .env
-output/
-vigia_output/
-vigia_demo_output/
-*.log
+.env.local
+.env.*.local
+*.key
+*.pem
+*.p12
+*.pfx
+vigia_hmac.key
+vigia_mcp_token
+
+# Modelos CLIP (binarios grandes, no van en git — usar releases o LFS)
+*.pt
+*.pth
+*.bin
+*.safetensors
+
+# Calibración KDE y covarianza (datos de entrenamiento, no código)
+*.pkl
+calibration_*.json
+covariance_*.json
+
+# -----------------------------------------------------------------------------
+# EVIDENCIA FORENSE — nunca versionar datos reales
+# -----------------------------------------------------------------------------
+evidence/
+/var/lib/vigia/
+honey_tokens/
+*.pcap
+*.pcapng
+*.evtx
+*.dd
+*.raw
+*.img
+
+# -----------------------------------------------------------------------------
+# Python
+# -----------------------------------------------------------------------------
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+dist/
+*.egg-info/
+.eggs/
+*.egg
+.installed.cfg
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+pip-wheel-metadata/
+
+# Entornos virtuales
+.venv/
+venv/
+ENV/
+env/
+.env/
+
+# MyPy / type checking
+.mypy_cache/
+.dmypy.json
+dmypy.json
+.pytype/
+
+# Ruff / linters
+.ruff_cache/
+
+# -----------------------------------------------------------------------------
+# Tests y cobertura
+# -----------------------------------------------------------------------------
+.pytest_cache/
+.coverage
+.coverage.*
+coverage.xml
+htmlcov/
+*.coveragerc
+nosetests.xml
+test-results/
+
+# -----------------------------------------------------------------------------
+# IDEs
+# -----------------------------------------------------------------------------
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
 .DS_Store
+Thumbs.db
+
+# -----------------------------------------------------------------------------
+# Logs del sistema
+# -----------------------------------------------------------------------------
+*.log
+logs/
+/var/log/vigia/
+
+# -----------------------------------------------------------------------------
+# Docker
+# -----------------------------------------------------------------------------
+.docker/
+
+# -----------------------------------------------------------------------------
+# Documentación interna de auditoría (minutas de sesión, no docs públicos)
+# Están eliminadas del repo, esta sección es por si se regeneran accidentalmente
+# -----------------------------------------------------------------------------
+docs/internal/
+KIMI_*.md
+DIFF_P0_*.md
+BRIDGE_WIRED_*.md
+HITO_*.md
+RESUMEN_EJECUTIVO_*.md
+TARASENKO_*.md

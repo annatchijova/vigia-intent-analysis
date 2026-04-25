@@ -1,12 +1,8 @@
-# VIGÍA Forensic Suite: Autonomous Intentionality Analysis for DFIR
-
-**The Carnegie Differentiator — Inverted Persuasion as DFIR Detection**
-
-Most forensic tools look for technical mistakes: malware signatures, broken headers, mismatched entropy. VIGÍA looks for psychological overcompensation. Based on the Carnegie framework of persuasion, VIGÍA inverts human manipulation tactics into deterministic detection rules. When an attacker or a fabricator tries too hard to be credible — inhumanly perfect 2.000s log intervals, excessive cultural markers with zero technical footprint, overlapping prescriptions to feign legality — VIGÍA detects the cognitive friction. We don't just find the forged artifact; we mathematically reconstruct the intentionality behind it.
-
-Built on an Evidence Bundle Specification (EBS v1) and fully compliant with the Daubert Standard, VIGÍA uses Bayesian inference with Ledoit-Wolf regularized covariance and Symbolic Regression (Peirce semiotics) to seal immutable, cryptographically verifiable forensic evidence bundles — ready for SIFT integration and court-admissible expert testimony.
+# VIGÍA — Intentionality Analysis Bridge for SIFT Workstation
 
 > *"Making deception computationally expensive for the attacker."*
+>
+> Today, lying in a log or faking an attack is free. VIGÍA charges that price by evaluating the logical fractures in the lie.
 
 **SANS FIND EVIL Hackathon 2026** | Author: Anna Tchijova | Architects: VIGÍA AI Collective (Gemini, Claude, Kimi) | License: MIT
 

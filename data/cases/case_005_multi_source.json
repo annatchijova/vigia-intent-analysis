@@ -1,0 +1,85 @@
+{
+  "case_id": "case_005_multi_source",
+  "name": "Multi-Source Consistent — High Trust Evidence",
+  "description": "Independent sources (memory, network, disk) with consistent timeline, intact provenance chains, and low cross-correlation. High composite trust. VIGÍA confirms as reliable evidence.",
+  "artifacts": [
+    {
+      "artifact_id": "memory_multi_001",
+      "evidence_type": "memory_process",
+      "source_tool": "list_processes",
+      "timestamp": "2026-04-10T14:00:00Z",
+      "raw_score": 0.91,
+      "prior_trust": 0.95,
+      "provenance_chain": ["sha256:acquire_001", "sha256:examiner_sign_001", "sha256:hash_chain_root_001"],
+      "description": "Memory: Process injection detected. PID 2244 injected into lsass.exe. Kernel structure anomaly confirmed.",
+      "metadata": {"injected_pid": 2244, "target": "lsass.exe", "technique": "process_hollowing", "kernel_anomaly": true}
+    },
+    {
+      "artifact_id": "network_multi_001",
+      "evidence_type": "dns_record",
+      "source_tool": "audit_network",
+      "timestamp": "2026-04-10T14:00:15Z",
+      "raw_score": 0.78,
+      "prior_trust": 0.82,
+      "provenance_chain": ["sha256:pcap_001", "sha256:netflow_hash_001"],
+      "description": "DNS: beacon to c2-domain.evil every 300s ± 45s. Consistent with Cobalt Strike default beacon interval.",
+      "metadata": {
+        "domain": "c2-domain.evil",
+        "interval_seconds": 300,
+        "interval_jitter": 45,
+        "resolved_ip": "185.220.101.50",
+        "query_count": 12
+      }
+    },
+    {
+      "artifact_id": "disk_multi_001",
+      "evidence_type": "file_hash",
+      "source_tool": "generate_forensic_hash",
+      "timestamp": "2026-04-10T14:00:30Z",
+      "raw_score": 0.88,
+      "prior_trust": 0.92,
+      "provenance_chain": ["sha256:image_hash_001", "sha256:examiner_sign_002", "sha256:sector_hash_001"],
+      "description": "Disk: beacon DLL found in C:\\Windows\\System32\\windef.dll (impersonation). Hash matches known Cobalt Strike beacon.",
+      "metadata": {
+        "path": "C:\\Windows\\System32\\windef.dll",
+        "sha256": "aabbccdd1122334455667788990011223344556677889900aabbccddeeff0011",
+        "vt_detections": 52,
+        "legitimate_file_impersonated": "Windows Defender Module"
+      }
+    },
+    {
+      "artifact_id": "tpm_multi_001",
+      "evidence_type": "TPM_attestation",
+      "source_tool": "audit_network",
+      "timestamp": "2026-04-10T14:01:00Z",
+      "raw_score": 0.97,
+      "prior_trust": 0.99,
+      "provenance_chain": ["sha256:tpm_pcr_001", "sha256:tpm_quote_001", "sha256:tpm_ak_cert_001"],
+      "description": "TPM PCR values confirm boot integrity was NOT compromised. Attack is post-boot, runtime injection only.",
+      "metadata": {
+        "pcr_0_valid": true,
+        "pcr_7_valid": true,
+        "attestation_key_valid": true,
+        "spoofability": 0.05
+      }
+    }
+  ],
+  "temporal_violations": [],
+  "correlation_analysis": {
+    "source_independence": "HIGH — memory (kernel), network (pcap), disk (image), hardware (TPM) are independent acquisition paths",
+    "cross_correlation_estimated": 0.12,
+    "diversity_bonus_applies": true,
+    "sources_count": 4,
+    "unique_acquisition_methods": ["memory_forensics", "network_capture", "disk_image", "tpm_attestation"]
+  },
+  "expected_verdict": "MALICE",
+  "expected_confidence": 0.94,
+  "expected_mitre_ttps": ["T1055", "T1036.005", "T1498"],
+  "peirce_chain": {
+    "firstness": "Independent memory, network, disk, and TPM artifacts all flagging the same entity",
+    "secondness": "Low cross-correlation — these sources cannot have been fabricated together",
+    "thirdness": "Cobalt Strike beacon with process injection confirmed. Evidence is reliable."
+  },
+  "demo_command": "python run_vigia_case.py cases/case_005_multi_source.json",
+  "demo_quote": "Independent sources, high trust, consistent timeline. Correlation is low, and trust remains high. VIGÍA confirms this as reliable evidence."
+}
