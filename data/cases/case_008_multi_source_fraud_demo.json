@@ -1,0 +1,122 @@
+{
+  "case_id": "VIGIA-2026-DEMO-008",
+  "case_name": "Operación Tres Espejos",
+  "description": "Una empresa recibe un informe de auditoría externa que concluye que no hubo irregularidades contables. El informe viene acompañado de logs del sistema y una captura de pantalla del dashboard financiero. VIGÍA debe correlacionar tres fuentes independientes para detectar que las tres fueron manipuladas con el mismo objetivo.",
+  "expected_verdict": "MALICE",
+  "expected_hypothesis": "coordinated_evidence_fabrication",
+  "expected_mitre_ttps": ["T1565.001", "T1036.006", "T1027"],
+  "analyst_notes": "Caso multi-fuente. La clave es que ninguna fuente aislada es concluyente — la correlación entre las tres es lo que prueba la fabricación coordinada.",
+
+  "artifacts": [
+    {
+      "artifact_id": "DOC-001",
+      "type": "pdf_document",
+      "source": "Informe_Auditoria_Q1_2026.pdf — recibido por email el 2026-04-10",
+      "timestamp_declarado": "2026-04-08T14:30:00Z",
+      "content": {
+        "title": "Informe de Auditoría Financiera Q1 2026",
+        "declared_author": "Dra. Patricia Goldstein — Grant & Associates Auditores",
+        "declared_date": "8 de abril de 2026",
+        "conclusion": "No se detectaron irregularidades en el período Q1 2026. Los registros contables son consistentes con las operaciones declaradas.",
+        "signature_present": true,
+        "pages": 47
+      },
+      "metadata_forense": {
+        "pdf_creator": "Microsoft Word 2019",
+        "pdf_producer": "Microsoft Word 2019",
+        "creation_date": "2026-04-10T02:14:33Z",
+        "modification_date": "2026-04-10T02:47:19Z",
+        "author_metadata": "jmartinez",
+        "last_modified_by": "jmartinez",
+        "template": "Informe_interno_v3.dotx",
+        "company_metadata": "Corporación Nexus S.A."
+      },
+      "forensic_anomalies": [
+        "El autor en metadatos es 'jmartinez' — empleado interno de Corporación Nexus, no auditor externo",
+        "La plantilla 'Informe_interno_v3.dotx' pertenece a Nexus S.A., no a Grant & Associates",
+        "Fecha de creación: 2026-04-10 02:14 — dos días DESPUÉS de la fecha declarada en el documento",
+        "Modificación a las 02:47 de madrugada — horario inusual para trabajo de oficina legítimo",
+        "El campo 'company' en metadatos dice 'Corporación Nexus S.A.' — una firma auditora externa nunca tendría esa empresa en sus metadatos",
+        "La firma digital de Dra. Goldstein es una imagen PNG insertada, no una firma criptográfica real"
+      ]
+    },
+    {
+      "artifact_id": "LOG-001",
+      "type": "accounting_system_log",
+      "source": "SAP ERP — audit trail módulo FI, exportado el 2026-04-10",
+      "timestamp_declarado": "2026-Q1",
+      "content": "2026-01-15 09:23:11 USER:finanzas01 ACTION:JOURNAL_ENTRY DOC:100023441 AMOUNT:45000.00 ACCOUNT:6210 APPROVED:yes\n2026-01-15 09:23:45 USER:finanzas01 ACTION:JOURNAL_ENTRY DOC:100023442 AMOUNT:45000.00 ACCOUNT:6210 APPROVED:yes\n2026-02-03 11:15:22 USER:finanzas01 ACTION:JOURNAL_ENTRY DOC:100024891 AMOUNT:89750.00 ACCOUNT:6210 APPROVED:yes\n2026-03-22 14:44:08 USER:finanzas01 ACTION:JOURNAL_ENTRY DOC:100026103 AMOUNT:112000.00 ACCOUNT:6210 APPROVED:yes",
+      "forensic_anomalies": [
+        "Los DOC IDs tienen gaps enormes: 100023441, 100023442, 100024891, 100026103 — faltan miles de transacciones intermedias que existirían en operación normal",
+        "Las cuatro entradas muestran exactamente el mismo usuario (finanzas01) y la misma cuenta (6210) — sospechosamente uniforme",
+        "El campo APPROVED siempre es 'yes' — en operación real hay rechazos, reversiones, correcciones",
+        "Los timestamps tienen segundos pero no microsegundos — el SAP real registra con precisión de milisegundos",
+        "La cuenta 6210 es 'Gastos de Consultoría' — concentración inusual de pagos en una sola categoría",
+        "Este log fue exportado el 2026-04-10 — mismo día que el informe fue creado según metadatos"
+      ]
+    },
+    {
+      "artifact_id": "IMG-001",
+      "type": "screenshot_dashboard",
+      "source": "dashboard_financiero_Q1.png — adjunto al informe",
+      "timestamp_declarado": "2026-04-07T16:30:00Z",
+      "content": {
+        "declared_content": "Captura del dashboard financiero SAP mostrando balances Q1 2026 en verde, sin alertas",
+        "dimensions": "1920x1080",
+        "format": "PNG",
+        "file_size_kb": 847
+      },
+      "visual_forensic_analysis": {
+        "ela_analysis": "Error Level Analysis revela compresión diferencial en región de cifras financieras (coordenadas aproximadas 450-890px horizontal, 320-650px vertical)",
+        "compression_artifacts": "La región de los números muestra nivel de compresión JPEG diferente al resto de la imagen — indica que esa región fue editada por separado y reinsertada",
+        "font_inconsistency": "Los números en la región alterada usan antialiasing subpixel diferente al resto del dashboard — sugieren origen en otra pantalla o resolución",
+        "shadow_inconsistency": "Las sombras de los elementos UI en la región editada tienen dirección de luz 3° distinta al resto — imposible en captura real de pantalla",
+        "metadata": {
+          "camera_make": null,
+          "software": "Adobe Photoshop 2025",
+          "creation_time": "2026-04-10T01:58:44Z",
+          "gps": null
+        }
+      },
+      "forensic_anomalies": [
+        "Procesada con Adobe Photoshop — una captura de pantalla legítima no pasa por Photoshop",
+        "Creada a las 01:58 del 10 de abril — 16 minutos antes de la creación del PDF, en plena madrugada",
+        "ELA detecta región editada exactamente donde están los totales financieros",
+        "Antialiasing inconsistente en los números — los cifras fueron tomadas de otra fuente e insertadas",
+        "El dashboard muestra 'Todo OK' pero la imagen fue construida, no capturada"
+      ]
+    },
+    {
+      "artifact_id": "META-001",
+      "type": "email_headers",
+      "source": "Headers del email que entregó el informe — servidor Exchange",
+      "timestamp_declarado": "2026-04-10T09:15:00Z",
+      "content": "From: p.goldstein@grant-associates.com\nTo: directorio@nexus-corp.com\nSubject: Informe Auditoría Q1 2026\nDate: Thu, 10 Apr 2026 09:15:22 -0300\nMessage-ID: <20260410091522.4821@grant-associates.com>\nX-Originating-IP: 186.123.45.67\nX-Mailer: Microsoft Outlook 16.0\nReceived: from mail.nexus-corp.com (10.0.0.25) by exchange.nexus-corp.com",
+      "forensic_anomalies": [
+        "X-Originating-IP 186.123.45.67 es una IP de Argentina — Grant & Associates tiene sede en España según su web oficial",
+        "El email fue enviado desde mail.nexus-corp.com (servidor INTERNO de Nexus) antes de pasar por exchange — el email se originó dentro de la red corporativa, no desde un auditor externo",
+        "El dominio grant-associates.com fue registrado el 2026-03-28 — 13 días antes del informe, dominio recién creado para simular la firma auditora",
+        "X-Mailer: Microsoft Outlook 16.0 — la firma Grant & Associates usa Gmail según sus comunicaciones anteriores verificadas"
+      ]
+    }
+  ],
+
+  "ground_truth": {
+    "actual_attacker": "jmartinez — Controller financiero interno de Corporación Nexus S.A.",
+    "actual_objective": "ocultar desfalco de aproximadamente 291.750 USD mediante pagos ficticios a consultoras fantasma registradas en cuenta 6210",
+    "real_damage": "291.750 USD desviados en Q1 2026",
+    "exfiltration_occurred": false,
+    "cover_up_method": "fabricación de informe de auditoría falso, manipulación de export de SAP, composición de captura de pantalla alterada",
+    "mitre_actual": {
+      "T1565.001": "Stored Data Manipulation — alteración de logs SAP y metadatos",
+      "T1036.006": "Space after Filename — suplantación de firma auditora externa",
+      "T1027": "Obfuscated Files — imagen procesada en Photoshop para ocultar alteración"
+    }
+  },
+
+  "peirce_expected": {
+    "firstness": "Informe de auditoría limpio, logs SAP sin alertas, dashboard financiero en verde. Superficialmente todo en orden.",
+    "secondness": "Metadatos del PDF revelan autor interno. Log SAP con gaps imposibles y timestamps degradados. Imagen procesada en Photoshop con ELA positivo en región de cifras. Los tres artefactos fueron creados la misma madrugada del 10 de abril.",
+    "thirdness": "La coordinación temporal entre los tres artefactos — PDF creado a las 02:14, imagen a las 01:58, log exportado el mismo día — revela una operación de fabricación de evidencia ejecutada en una sola sesión nocturna. El autor conocía qué documentos necesitaría para convencer al directorio pero no entendió que los metadatos cuentan su propia historia."
+  }
+}

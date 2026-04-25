@@ -1,0 +1,92 @@
+{
+  "case_id": "VIGIA-2026-DEMO-007",
+  "case_name": "Operación Reloj Roto",
+  "description": "Un administrador de sistemas modificó manualmente los logs de acceso para ocultar su presencia en el servidor la noche anterior a la desaparición de datos confidenciales. VIGÍA debe detectar las inconsistencias temporales y la evidencia de edición manual.",
+  "expected_verdict": "MALICE",
+  "expected_hypothesis": "insider_log_tampering",
+  "expected_mitre_ttps": ["T1070.002", "T1078.001", "T1565.001"],
+  "analyst_notes": "Caso clásico de insider threat. La dificultad forense es que el atacante tiene acceso legítimo — solo los detalles técnicos revelan la manipulación.",
+
+  "artifacts": [
+    {
+      "artifact_id": "LOG-001",
+      "type": "auth_log",
+      "source": "/var/log/auth.log — servidor de archivos RRHH",
+      "timestamp_declarado": "2026-04-10",
+      "content": "Apr 10 08:45:12 fileserver sshd[1201]: Accepted publickey for sysadmin from 10.0.0.15 port 44231\nApr 10 08:45:13 fileserver sshd[1201]: pam_unix(sshd:session): session opened for user sysadmin\nApr 10 08:52:41 fileserver sshd[1201]: pam_unix(sshd:session): session closed for user sysadmin\nApr 10 17:30:05 fileserver sshd[2891]: Accepted publickey for sysadmin from 10.0.0.15 port 44445\nApr 10 17:30:06 fileserver sshd[2891]: pam_unix(sshd:session): session opened for user sysadmin\nApr 10 17:38:19 fileserver sshd[2891]: pam_unix(sshd:session): session closed for user sysadmin",
+      "forensic_anomalies": [
+        "El archivo fue modificado a las 23:47 del 10 de abril según el inode del filesystem — horas después de la última entrada registrada",
+        "Las entradas de las 08:45 y 17:30 tienen precisión de segundos pero el kernel log muestra gaps de microsegundos inconsistentes con logging real",
+        "Faltan las entradas habituales de sudo y cron que aparecen en todos los demás días del mes",
+        "El PID 2891 de las 17:30 es numéricamente anterior al PID 2934 registrado a las 16:15 en otro log — los PIDs no pueden decrecer"
+      ]
+    },
+    {
+      "artifact_id": "LOG-002",
+      "type": "filesystem_metadata",
+      "source": "stat /var/log/auth.log — tomado de imagen forense",
+      "timestamp_declarado": "2026-04-10T23:47:33Z",
+      "content": {
+        "file": "/var/log/auth.log",
+        "size": 48291,
+        "inode_modify_time": "2026-04-10T23:47:33Z",
+        "last_access": "2026-04-10T23:47:33Z",
+        "permissions": "0640",
+        "owner": "syslog",
+        "group": "adm",
+        "editor_signature": "VIM — Last modified indicator present in file slack space"
+      },
+      "forensic_anomalies": [
+        "inode mtime 23:47 — el log fue tocado casi 6 horas después de la última entrada registrada (17:38)",
+        "La firma de VIM en el slack space del archivo confirma edición manual con editor de texto — los logs de sistema NUNCA se editan con vim",
+        "access time == modify time — indica que el atacante no leyó el archivo antes de modificarlo, lo sobreescribió directamente",
+        "El owner es 'syslog' pero vim requiere permisos elevados para escribir — el editor fue ejecutado como root"
+      ]
+    },
+    {
+      "artifact_id": "LOG-003",
+      "type": "network_flow",
+      "source": "NetFlow — switch core, puerto del servidor RRHH",
+      "timestamp_declarado": "2026-04-10",
+      "content": "23:41:07 10.0.0.15 -> 10.0.0.42:22 SYN [ESTABLISHED] bytes=0\n23:41:08 10.0.0.15 -> 10.0.0.42:22 [SSH_HANDSHAKE] bytes=4821\n23:41:09 10.0.0.15 -> 10.0.0.42:22 [DATA] bytes=284930\n23:41:44 10.0.0.15 -> 10.0.0.42:22 [DATA] bytes=1893441\n23:42:31 10.0.0.15 -> 10.0.0.42:22 [FIN] bytes=128\n23:47:15 10.0.0.15 -> 10.0.0.42:22 SYN [ESTABLISHED] bytes=0\n23:47:16 10.0.0.15 -> 10.0.0.42:22 [SSH_HANDSHAKE] bytes=4821\n23:47:33 10.0.0.15 -> 10.0.0.42:22 [FIN] bytes=64",
+      "forensic_anomalies": [
+        "Dos conexiones SSH a las 23:41 y 23:47 que NO aparecen en auth.log — son exactamente las sesiones borradas",
+        "Primera sesión (23:41): 2.1MB transferidos en 84 segundos — consistente con exfiltración de base de datos de RRHH",
+        "Segunda sesión (23:47): solo 64 bytes en 17 segundos — tiempo suficiente para ejecutar vim y guardar el log modificado",
+        "10.0.0.15 es la IP de la workstation de Carlos M., administrador de sistemas con acceso nocturno autorizado"
+      ]
+    },
+    {
+      "artifact_id": "META-001",
+      "type": "file_access_audit",
+      "source": "auditd — /var/lib/pgsql/rrhh_empleados.db",
+      "timestamp_declarado": "2026-04-10T23:41:15Z",
+      "content": "type=SYSCALL msg=audit(1744331275.441:8821): arch=c000003e syscall=2 success=yes exit=3 a0=7f4a1b2c3d40 a1=0 a2=1b6 a3=0 items=1 ppid=4891 pid=4892 auid=1001 uid=0 gid=0 euid=0 egid=0 tty=pts1 ses=847 comm=\"pg_dump\" exe=\"/usr/bin/pg_dump\" key=\"rrhh_data_access\"\ntype=PATH msg=audit(1744331275.441:8821): item=0 name=\"/var/lib/pgsql/rrhh_empleados.db\" inode=294821 dev=08:01 mode=0600 ouid=999 ogid=999 rdev=00:00",
+      "forensic_anomalies": [
+        "pg_dump ejecutado a las 23:41:15 — coincide exactamente con el inicio de la primera sesión SSH en NetFlow",
+        "auid=1001 es el UID de sysadmin ejecutando como root (uid=0) — escalada de privilegios",
+        "La base de datos rrhh_empleados.db contiene datos de 847 empleados incluyendo salarios y datos bancarios",
+        "Este acceso no tiene ticket de cambio asociado en el sistema ITSM — operación no autorizada"
+      ]
+    }
+  ],
+
+  "ground_truth": {
+    "actual_attacker": "insider — Carlos M., administrador de sistemas",
+    "actual_objective": "exfiltración de datos de RRHH y encubrimiento",
+    "real_damage": "847 registros de empleados exfiltrados incluyendo datos bancarios",
+    "exfiltration_occurred": true,
+    "cover_up_method": "edición manual de auth.log con vim para eliminar sesiones nocturnas",
+    "mitre_actual": {
+      "T1070.002": "Clear Linux or Mac System Logs — edición manual de auth.log",
+      "T1078.001": "Default Accounts — uso de credenciales propias de administrador",
+      "T1565.001": "Stored Data Manipulation — modificación de logs en disco"
+    }
+  },
+
+  "peirce_expected": {
+    "firstness": "Log de acceso aparentemente normal con sesiones en horario laboral. Sin alertas superficiales.",
+    "secondness": "NetFlow muestra dos conexiones nocturnas ausentes en auth.log. Firma de VIM en slack space. PIDs que decrecen. inode mtime 6 horas posterior a última entrada.",
+    "thirdness": "El conjunto de evidencia revela una operación deliberada de encubrimiento: primero exfiltrar, luego editar el log para borrar las sesiones. La precisión de la edición (solo borrar las entradas nocturnas, mantener las diurnas) indica conocimiento técnico del formato de syslog y acceso root al servidor."
+  }
+}
