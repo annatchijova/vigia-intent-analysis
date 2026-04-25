@@ -52,7 +52,7 @@ import hashlib
 import json
 import math
 import sys
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional, Tuple
 
 
@@ -63,7 +63,30 @@ from typing import Any, Dict, List, Optional, Tuple
 
 _EBS_VERSION = "1.0"
 _EBS_SUPPORTED_VERSIONS = ["1.0"]
-_VERIFIER_VERSION = "1.1.0"   # bumped por refactorizacion
+_VERIFIER_VERSION = "1.2.0"   # bumped por P0-1 float determinismo
+
+
+# ---------------------------------------------------------------------------
+# Normalizacion determinista de floats — P0-1 (Kimi audit)
+# Debe ser IDENTICA a bundle_builder._round_floats para hash cross-OS.
+# ---------------------------------------------------------------------------
+_DETERMINISTIC_FLOAT_PREC = 6
+
+
+def _round_floats(obj: Any) -> Any:
+    """
+    Normalizacion recursiva de floats para hashing determinista cross-OS.
+    Aplicar SIEMPRE antes de json.dumps en contexto de hash.
+    """
+    if isinstance(obj, float):
+        if not math.isfinite(obj):
+            return str(obj)  # "nan" / "inf" — reproducible
+        return round(obj, _DETERMINISTIC_FLOAT_PREC)
+    if isinstance(obj, dict):
+        return {k: _round_floats(v) for k, v in obj.items()}
+    if isinstance(obj, list):
+        return [_round_floats(v) for v in obj]
+    return obj
 
 
 # ---------------------------------------------------------------------------
@@ -71,7 +94,13 @@ _VERIFIER_VERSION = "1.1.0"   # bumped por refactorizacion
 # ---------------------------------------------------------------------------
 
 def _sha256_dict(obj: Dict) -> str:
-    serialized = json.dumps(obj, sort_keys=True, default=str).encode("utf-8")
+    """
+    SHA-256 determinístico de un dict.
+    sort_keys=True garantiza orden canonico.
+    _round_floats() garantiza estabilidad cross-OS en valores float.
+    """
+    normalized = _round_floats(obj)
+    serialized = json.dumps(normalized, sort_keys=True, default=str).encode("utf-8")
     return hashlib.sha256(serialized).hexdigest()
 
 
@@ -85,7 +114,7 @@ class VerificationResult:
         self.checks: List[Dict[str, Any]] = []
         self.conformity_level: int = 0
         self.passed: bool = False
-        self.timestamp: str = datetime.utcnow().isoformat() + "Z"
+        self.timestamp: str = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
 
     def add(
         self,
