@@ -1,18 +1,18 @@
 [build-system]
 requires = ["setuptools>=68", "wheel"]
-build-backend = "setuptools.backends.legacy:build"
+build-backend = "setuptools.build_meta"
 
 [project]
 name = "vigia-forensic"
-version = "1.0.0"
+version = "2.0.0"
 description = "VIGÍA Forensic Suite — Intentionality Analysis for DFIR (SANS FIND EVIL 2026)"
 readme = "README.md"
 license = { text = "AGPL-3.0-or-later" }
 requires-python = ">=3.10"
 authors = [
-    { name = "Annia Tchijova", email = "anna.tchijova@gmail.com" },
+    { name = "Anna Tchijova", email = "anna.tchijova@gmail.com" },
 ]
-keywords = ["forensics", "dfir", "sift", "llm-detection", "evidence-bundle", "bayesian"]
+keywords = ["forensics", "dfir", "sift", "mcp", "llm-detection", "evidence-bundle", "bayesian", "peirce"]
 classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Information Technology",
@@ -26,28 +26,34 @@ classifiers = [
 
 # ---------------------------------------------------------------------------
 # Dependencias
-#
-# Core (sin sklearn):  stdlib + pydantic opcional — el sistema corre en FALLBACK.
-# Full (con sklearn):  activa KDE calibrado + Ledoit-Wolf (modo FULL).
+# Core (sin sklearn): stdlib + pydantic opcional — el sistema corre en FALLBACK.
+# Full (con sklearn): activa KDE calibrado + Ledoit-Wolf (modo FULL).
 # ---------------------------------------------------------------------------
 dependencies = [
-    # Pydantic v2 preferido — fallback a dataclasses si no está disponible
     "pydantic>=2.0",
+    "anthropic>=0.18.0",
+    "mcp>=0.1.0",
+    "fastmcp>=0.4.0",
+    "psutil>=5.9.0",
+    "numpy>=1.24.0",
+    "PyYAML>=6.0",
+    "python-dateutil>=2.8.0",
 ]
 
 [project.optional-dependencies]
 # Motor de inferencia completo
 full = [
-    "numpy>=1.24",
     "scipy>=1.11",
     "scikit-learn>=1.3",
+    "Pillow>=10.0.0",
 ]
 # Entorno de desarrollo y tests
 dev = [
-    "numpy>=1.24",
     "scipy>=1.11",
     "scikit-learn>=1.3",
+    "Pillow>=10.0.0",
     "pytest>=7.0",
+    "pytest-asyncio>=0.21.0",
     "pytest-cov>=4.0",
     "black>=23.0",
     "ruff>=0.1",
@@ -55,19 +61,16 @@ dev = [
 ]
 
 [project.scripts]
-# Punto de entrada del verificador independiente (sin dependencias de producción)
-vigia-verify = "forensics.verify_ebs_v1:main"
-# Punto de entrada del pipeline principal
-vigia = "pipeline:main"
+vigia = "cli:main"
 
 [project.urls]
-Repository = "https://github.com/annatchijova/vigia"
-"Bug Tracker" = "https://github.com/annatchijova/vigia/issues"
+Repository = "https://github.com/annatchijova/vigia-intent-analysis"
+"Bug Tracker" = "https://github.com/annatchijova/vigia-intent-analysis/issues"
 
 [tool.setuptools.packages.find]
 where = ["."]
-include = ["models*", "engine*", "governance*", "audit*", "forensics*"]
-exclude = ["*__pycache__*", "*.pyc"]
+include = ["vigia*", "pipeline*", "scripts*"]
+exclude = ["*__pycache__*", "*.pyc", "tests*", "data*", "docs*"]
 
 [tool.setuptools.package-data]
 "*" = ["*.json", "*.yaml", "*.md"]
@@ -77,17 +80,14 @@ exclude = ["*__pycache__*", "*.pyc"]
 # ---------------------------------------------------------------------------
 
 [tool.pytest.ini_options]
-testpaths = ["."]
-python_files = ["test_*.py"]
-python_functions = ["t0*", "t1*", "t2*", "t3*", "t4*", "t5*", "t6*"]
-# El test runner personalizado maneja la ejecución; pytest como runner alternativo
+testpaths = ["tests"]
+python_files = ["test_*.py", "*_test.py"]
+python_functions = ["test_*"]
 addopts = "-v --tb=short"
 
 [tool.ruff]
 line-length = 100
 target-version = "py310"
-select = ["E", "F", "W", "I"]
-ignore = ["E501"]  # líneas largas — código forense tiene comentarios descriptivos
 
 [tool.black]
 line-length = 100
@@ -97,4 +97,4 @@ target-version = ["py310", "py311", "py312"]
 python_version = "3.10"
 warn_return_any = true
 warn_unused_configs = true
-ignore_missing_imports = true  # dependencias opcionales (numpy, sklearn)
+ignore_missing_imports = true
