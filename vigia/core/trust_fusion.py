@@ -1,18 +1,3 @@
-# Copyright (c) 2026 Anna Tchijova
-# Vigía - Autonomous Incident Response Engine
-#
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU Affero General Public License as
-# published by the Free Software Foundation, either version 3 of the
-# License, or (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-# GNU Affero General Public License for more details.
-#
-# You should have received a copy of the GNU Affero General Public License
-# along with this program. If not, see <https://www.gnu.org/licenses/>.
 """
 vigia/core/trust_fusion.py  — VIGÍA Trust Fusion Engine (P2)
 Extraído desde trust_fusion_hardened.py (raíz) hacia ruta correcta del paquete.
@@ -425,11 +410,25 @@ async def trust_fusion_analysis(
     engine = TrustFusionEngine(temporal_window_seconds=temporal_window_seconds)
     violations = temporal_violations or []
     temporal_artifacts = []
+
     for i, art_dict in enumerate(artifacts):
         try:
             art_dict = dict(art_dict)
+
+            # Normalizador de formato — acepta artefactos de Claude Code y otros callers
+            # Claude Code puede pasar: {indicator, value, confidence, weight}
+            # CAIE espera:             {artifact_id, evidence_type, prior_trust, ...}
+            if "indicator" in art_dict and "artifact_id" not in art_dict:
+                art_dict["artifact_id"] = f"mcp_{i}_{hash(str(art_dict)) & 0xFFFF:04x}"
+            if "confidence" in art_dict and "prior_trust" not in art_dict:
+                art_dict["prior_trust"] = float(art_dict["confidence"])
+            if "evidence_type" not in art_dict:
+                art_dict["evidence_type"] = art_dict.get("type", art_dict.get("label", "unknown"))
+            if "source_tool" not in art_dict:
+                art_dict["source_tool"] = art_dict.get("label", "mcp_caller")
             if "artifact_id" not in art_dict:
                 art_dict["artifact_id"] = f"artifact_{i}_{hash(str(art_dict)) & 0xFFFF:04x}"
+
             if violations:
                 factor = TrustFusionEngine.compute_temporal_trust_factor(violations, art_dict["artifact_id"])
                 prov = float(art_dict.get("base_trust", art_dict.get("prior_trust", 1.0)))
