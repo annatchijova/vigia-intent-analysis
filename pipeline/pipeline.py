@@ -1,18 +1,3 @@
-# Copyright (c) 2026 Anna Tchijova
-# Vigía - Autonomous Incident Response Engine
-#
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU Affero General Public License as
-# published by the Free Software Foundation, either version 3 of the
-# License, or (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-# GNU Affero General Public License for more details.
-#
-# You should have received a copy of the GNU Affero General Public License
-# along with this program. If not, see <https://www.gnu.org/licenses/>.
 """
 vigia/pipeline.py
 ─────────────────────────────────────────────────────────────────────────────
@@ -122,6 +107,14 @@ except ImportError:
     LRCalibrator = None  # type: ignore
     _LR_CALIBRATOR_AVAILABLE = False
     logger.warning("[Pipeline] LRCalibrator no disponible — LR sin calibración isotónica")
+
+try:
+    from vigia.core.execution_logger import VigiaExecutionLogger
+    _EXEC_LOGGER_AVAILABLE = True
+except ImportError:
+    VigiaExecutionLogger = None  # type: ignore
+    _EXEC_LOGGER_AVAILABLE = False
+    logger.warning("[Pipeline] VigiaExecutionLogger no disponible — Agent Execution Logs desactivados")
 
 
 # ---------------------------------------------------------------------------
@@ -320,6 +313,16 @@ class VigiaPipeline:
             len(signals), drift_score, detected_phase or "UNKNOWN",
         )
 
+        # ── Agent Execution Logger — SANS Find Evil! entregable obligatorio ──
+        # Genera data/logs/{case_id}_execution.jsonl con cada paso del razonamiento
+        _case_id = (metadata or {}).get("case_id", "unknown")
+        _exec_log = None
+        if _EXEC_LOGGER_AVAILABLE and VigiaExecutionLogger is not None:
+            try:
+                _exec_log = VigiaExecutionLogger(_case_id)
+            except Exception as _el_exc:
+                logger.warning("[Pipeline] ExecutionLogger no pudo iniciar: %s", _el_exc)
+
         # ── H27: Recalcular drift internamente — no confiar en el parámetro externo ──
         # Si el caller (CLI o script externo) pasa drift_score=0.0 para anular
         # la Risk Bounded Layer, el pipeline lo detecta y lo sobreescribe con el
@@ -392,6 +395,14 @@ class VigiaPipeline:
         # señales adicionales antes de que entren al LikelihoodEngine.
         vision_signals: List[SignalOutput] = []
         vision_metadata: Dict[str, Any] = {}
+        if _exec_log:
+            _exec_log.log_event(
+                phase=detected_phase or "UNKNOWN",
+                peirce_layer="FIRSTNESS",
+                artifact="vision_input",
+                finding=f"{len(image_paths or [])} imagen(es) para análisis visual",
+                tool_called="vision_intent_audit",
+            )
         if _VISION_AVAILABLE and image_paths and vision_intent_audit is not None:
             import asyncio as _asyncio
             for img_path in image_paths:
@@ -481,6 +492,18 @@ class VigiaPipeline:
             posterior, inference_result["lr"], inference_result["mode"],
             len(all_signals), lr_calibration_method,
         )
+        if _exec_log:
+            _exec_log.log_event(
+                phase=detected_phase or "UNKNOWN",
+                peirce_layer="SECONDNESS",
+                artifact=f"{len(all_signals)} señales",
+                finding=(
+                    f"posterior={posterior:.4f} LR={inference_result['lr']:.4f} "
+                    f"mode={inference_result['mode']} calibration={lr_calibration_method}"
+                ),
+                tool_called="likelihood_engine",
+                confidence=posterior,
+            )
 
         # ── TERCERIDAD: AbductiveIntentEngine ───────────────────────────────
         abductive_result: Optional[Dict[str, Any]] = None
@@ -502,6 +525,20 @@ class VigiaPipeline:
                     consistency_score,
                     float(abductive_result.get("hypothesis_cost", 0.0)),
                 )
+                if _exec_log:
+                    _exec_log.log_event(
+                        phase=detected_phase or "UNKNOWN",
+                        peirce_layer="THIRDNESS",
+                        artifact="abductive_engine",
+                        finding=(
+                            f"hipótesis={abductive_result.get('best_hypothesis', 'N/A')} "
+                            f"consistency={consistency_score:.4f} "
+                            f"cost={float(abductive_result.get('hypothesis_cost', 0.0)):.3f}"
+                        ),
+                        intent_hypothesis=abductive_result.get("best_hypothesis"),
+                        tool_called="abductive_intent_engine",
+                        confidence=consistency_score,
+                    )
 
                 # REGLA DE ORO: Disonancia Semántica
                 # Posterior indica fabricación pero Ockham no encuentra hipótesis.
@@ -530,6 +567,24 @@ class VigiaPipeline:
             decision_trace.decision, decision_trace.reason_code,
             decision_trace.risk, decision_trace.omega_intention, consistency_score,
         )
+        if _exec_log:
+            if decision_trace.decision == "ABSTAIN":
+                _exec_log.log_abstain(
+                    reason_code=decision_trace.reason_code,
+                    explanation=decision_trace.abstain_reason or "Zona de incertidumbre honesta",
+                )
+            else:
+                _exec_log.log_event(
+                    phase=detected_phase or "UNKNOWN",
+                    peirce_layer="THIRDNESS",
+                    artifact="risk_bounded_layer",
+                    finding=(
+                        f"risk={decision_trace.risk:.6f} "
+                        f"reason={decision_trace.reason_code}"
+                    ),
+                    verdict_partial=decision_trace.decision,
+                    confidence=float(decision_trace.posterior),
+                )
 
         # ── INTERVENCIÓN (si no es ACCEPT) ──────────────────────────────────
         intervention = None
@@ -619,6 +674,19 @@ class VigiaPipeline:
             bundle.bundle_id[:12], verify_msg,
             decision_trace.decision, decision_trace.reason_code,
         )
+
+        # Registrar veredicto final en el execution log
+        if _exec_log:
+            _bundle_hash = sealed_dict.get("integrity", {}).get("bundle_hash", "")
+            _exec_log.log_verdict(
+                verdict=decision_trace.decision,
+                confidence=float(decision_trace.posterior * 100),
+                reason_code=decision_trace.reason_code,
+                bundle_hash=_bundle_hash[:16] + "…" if _bundle_hash else "",
+                carnegie_pattern=getattr(abductive_result, "carnegie_pattern", None)
+                    if abductive_result else None,
+            )
+            logger.info("[Pipeline] Agent Execution Log guardado: %s", _exec_log.log_file)
 
         return {
             "bundle":          bundle,
