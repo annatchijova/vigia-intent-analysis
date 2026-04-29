@@ -451,7 +451,10 @@ class SemioticDetectorV2:
 
         # Alert level
         alert_level = "NORMAL"
-        if critical_patterns:
+        # CRITICAL si: ECO_SEMIOTIC_COLLISION presente O MI > 0.5 O 4+ patrones detectados
+        fsv_mi = fsv.get("manipulation_index", {})
+        mi_val = fsv_mi.get("num", 0) / max(fsv_mi.get("den", 1), 1)
+        if critical_patterns or mi_val > 0.5 or len(all_matches) >= 4:
             alert_level = "CRITICAL"
             total_num, total_den = 25, 100
 
