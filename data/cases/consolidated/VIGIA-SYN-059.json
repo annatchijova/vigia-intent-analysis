@@ -1,0 +1,63 @@
+{
+  "_consolidation": {
+    "consolidated_at": "2026-04-28T11:17:01.973937+00:00",
+    "source_file": "/mnt/project/nuevoscasos.md"
+  },
+  "_parser": "markdown_v2.3",
+  "abstention_risk": "bajo",
+  "artifacts": [
+    {
+      "artifact_id": "ART-001",
+      "content": "El sistema de seguridad lanza una alerta (falsa, generada por el atacante)",
+      "forensic_anomalies": [
+        "Anomalía detectada por análisis semiótico — requiere verificación"
+      ],
+      "peirce_layer": "FIRSTNESS",
+      "type": "file_metadata"
+    },
+    {
+      "artifact_id": "ART-002",
+      "content": "Un usuario con privilegios de seguridad responde: \"Detecté una intrusión activa",
+      "forensic_anomalies": [
+        "Anomalía detectada por análisis semiótico — requiere verificación"
+      ],
+      "peirce_layer": "SECONDNESS",
+      "type": "file_metadata"
+    },
+    {
+      "artifact_id": "ART-003",
+      "content": "Estoy moviendo las llaves maestras a un 'almacén de emergencia' fuera de la red para que el atacante no las encuentre",
+      "forensic_anomalies": [
+        "Anomalía detectada por análisis semiótico — requiere verificación"
+      ],
+      "peirce_layer": "SECONDNESS",
+      "type": "file_metadata"
+    },
+    {
+      "artifact_id": "ART-004",
+      "content": "No cierren la sesión o perdemos el acceso\".",
+      "forensic_anomalies": [
+        "Anomalía detectada por análisis semiótico — requiere verificación"
+      ],
+      "peirce_layer": "THIRDNESS",
+      "type": "timestamp"
+    }
+  ],
+  "carnegie_pattern_expected": "Apelar a un motivo noble (proteger el reino).",
+  "case_id": "VIGIA-SYN-059",
+  "case_name": "La \"Protección mediante Exfiltración\" – Motivo Noble",
+  "confidence_expected": 98,
+  "description": "Detección de secuestro de narrativa de incidente. El atacante usa una falsa alarma para justificar la exfiltración de activos críticos bajo la máscara de una acción defensiva.",
+  "devil_advocate": "El comportamiento observado podría explicarse por un error administrativo, una configuración automatizada legítima, o un malentendido de procedimientos internos.",
+  "eco_signal": null,
+  "expected_mitre_ttps": [],
+  "expected_verdict": "MALICE",
+  "grice_violation": "Violación del máximo de relación. Mover llaves maestras a una IP externa no es u",
+  "peirce_expected": {
+    "firstness": "El sistema de seguridad lanza una alerta (falsa, generada por el atacante). Un usuario con privilegios de seguridad responde: \"Detecté una intrusión activa. Estoy moviendo las llaves maestras a un 'al",
+    "secondness": "Violación del máximo de relación. Mover llaves maestras a una IP externa no es un protocolo de respuesta a incidentes válido en ninguna arquitectura.",
+    "thirdness": "Terceridad. La \"acción heroica\" contradice la ley del protocolo."
+  },
+  "source_dataset": "VIGÍA Internal Corpus",
+  "source_origin": "synthetic_markdown"
+}

@@ -1,0 +1,45 @@
+{
+  "_consolidation": {
+    "consolidated_at": "2026-04-28T11:17:01.977707+00:00",
+    "source_file": "/mnt/project/nuevoscasos.md"
+  },
+  "_parser": "markdown_v2.3",
+  "abstention_risk": "bajo",
+  "artifacts": [
+    {
+      "artifact_id": "ART-001",
+      "content": "Un atacante escribe en inglés perfecto en un ticket de soporte: \"I need to check the state of the country\"",
+      "forensic_anomalies": [
+        "Anomalía detectada por análisis semiótico — requiere verificación"
+      ],
+      "peirce_layer": "FIRSTNESS",
+      "type": "slack_message"
+    },
+    {
+      "artifact_id": "ART-002",
+      "content": "Sin embargo, el rastro técnico muestra que intentó acceder a un archivo de configuración de red donde el comentario original era \"state of the region\".",
+      "forensic_anomalies": [
+        "Anomalía detectada por análisis semiótico — requiere verificación"
+      ],
+      "peirce_layer": "SECONDNESS",
+      "type": "file_metadata"
+    }
+  ],
+  "carnegie_pattern_expected": null,
+  "case_id": "VIGIA-SYN-081",
+  "case_name": "El \"Desliz de Pensamiento\" (Reverse Keyboard Slip)",
+  "confidence_expected": 93,
+  "description": "Detección de calco semántico translingüístico. El error de elección de palabras delata el idioma materno del operador a pesar de su fluidez en inglés.",
+  "devil_advocate": "Las inconsistencias detectadas podrían deberse a un cambio de hábitos personales, una rotación de personal, o una herramienta de automatización no documentada.",
+  "eco_signal": null,
+  "expected_mitre_ttps": [],
+  "expected_verdict": "INTENT",
+  "grice_violation": "Violación del máximo de relación entre el lenguaje natural y el contexto técnico",
+  "peirce_expected": {
+    "firstness": "Un atacante escribe en inglés perfecto en un ticket de soporte: \"I need to check the state of the country\". Sin embargo, el rastro técnico muestra que intentó acceder a un archivo de configuración de ",
+    "secondness": "Violación del máximo de relación entre el lenguaje natural y el contexto técnico del servidor.",
+    "thirdness": "Terceridad. En ruso, la palabra \"cnhfyt\" (que en QWERTY es \"country\") se usa a menudo en contextos donde un angloparlante diría \"area\" o \"region\". El atacante tradujo su pensamiento, no el término técnico."
+  },
+  "source_dataset": "VIGÍA Internal Corpus",
+  "source_origin": "synthetic_markdown"
+}

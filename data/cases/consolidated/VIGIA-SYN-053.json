@@ -1,0 +1,63 @@
+{
+  "_consolidation": {
+    "consolidated_at": "2026-04-28T11:17:01.971814+00:00",
+    "source_file": "/mnt/project/nuevoscasos.md"
+  },
+  "_parser": "markdown_v2.3",
+  "abstention_risk": "bajo",
+  "artifacts": [
+    {
+      "artifact_id": "ART-001",
+      "content": "Un usuario con rol de DevOps ejecuta una serie de comandos de diagnóstico de red",
+      "forensic_anomalies": [
+        "Anomalía detectada por análisis semiótico — requiere verificación"
+      ],
+      "peirce_layer": "FIRSTNESS",
+      "type": "bash_history"
+    },
+    {
+      "artifact_id": "ART-002",
+      "content": "En el historial de comandos aparece ifconfig -a seguido de ping -c 4 10.0.0.1",
+      "forensic_anomalies": [
+        "Anomalía detectada por análisis semiótico — requiere verificación"
+      ],
+      "peirce_layer": "SECONDNESS",
+      "type": "bash_history"
+    },
+    {
+      "artifact_id": "ART-003",
+      "content": "Inmediatamente después, se registra el comando ip addr show (el reemplazo moderno)",
+      "forensic_anomalies": [
+        "Presión temporal artificial"
+      ],
+      "peirce_layer": "SECONDNESS",
+      "type": "bash_history"
+    },
+    {
+      "artifact_id": "ART-004",
+      "content": "El usuario envía un mensaje: \"Perdón, me olvidé de que ya migramos a iproute2, la costumbre de los viejos servidores\".",
+      "forensic_anomalies": [
+        "Anomalía detectada por análisis semiótico — requiere verificación"
+      ],
+      "peirce_layer": "THIRDNESS",
+      "type": "slack_message"
+    }
+  ],
+  "carnegie_pattern_expected": null,
+  "case_id": "VIGIA-SYN-053",
+  "case_name": "El \"Espejo Invertido\" – Soberanía del Lenguaje Interno",
+  "confidence_expected": 94,
+  "description": "Detección de incongruencia de hábito biográfico. El usuario finge una memoria muscular de la que carece según su registro de capacitación. Posible usurpación de identidad por un actor externo con formación tradicional.",
+  "devil_advocate": "Las inconsistencias detectadas podrían deberse a un cambio de hábitos personales, una rotación de personal, o una herramienta de automatización no documentada.",
+  "eco_signal": "Falso rastro. El atacante intenta mimetizarse con la cultura técnica de la empre",
+  "expected_mitre_ttps": [],
+  "expected_verdict": "INTENT",
+  "grice_violation": "Violación del máximo de calidad. El usuario simula un \"error de veterano\" para c",
+  "peirce_expected": {
+    "firstness": "Un usuario con rol de DevOps ejecuta una serie de comandos de diagnóstico de red. En el historial de comandos aparece ifconfig -a seguido de ping -c 4 10.0.0.1. Inmediatamente después, se registra el ",
+    "secondness": "Segundidad (Fricción). La base de datos de VIGÍA detecta que este usuario fue contratado hace 3 meses y su perfil de formación es 100% en arquitecturas cloud-native (donde ifconfig es arqueología).",
+    "thirdness": "Interpretación simbólica de la intención."
+  },
+  "source_dataset": "VIGÍA Internal Corpus",
+  "source_origin": "synthetic_markdown"
+}

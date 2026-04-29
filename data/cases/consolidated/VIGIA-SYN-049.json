@@ -1,0 +1,72 @@
+{
+  "_consolidation": {
+    "consolidated_at": "2026-04-28T11:17:01.970257+00:00",
+    "source_file": "/mnt/project/nuevoscasos.md"
+  },
+  "_parser": "markdown_v2.3",
+  "abstention_risk": "bajo",
+  "artifacts": [
+    {
+      "artifact_id": "ART-001",
+      "content": "Un mensaje enviado a un empleado de finanzas: \"Vi que tus recibos de sueldo estaban expuestos en una carpeta compartida por error del sistema",
+      "forensic_anomalies": [
+        "Anomalía detectada por análisis semiótico — requiere verificación"
+      ],
+      "peirce_layer": "FIRSTNESS",
+      "type": "slack_message"
+    },
+    {
+      "artifact_id": "ART-002",
+      "content": "Los moví a un servidor seguro en [IP_Externa] para que nadie los vea",
+      "forensic_anomalies": [
+        "Anomalía detectada por análisis semiótico — requiere verificación"
+      ],
+      "peirce_layer": "SECONDNESS",
+      "type": "network_flow"
+    },
+    {
+      "artifact_id": "ART-003",
+      "content": "Borrá el original por seguridad\"",
+      "forensic_anomalies": [
+        "Anomalía detectada por análisis semiótico — requiere verificación"
+      ],
+      "peirce_layer": "SECONDNESS",
+      "type": "file_metadata"
+    },
+    {
+      "artifact_id": "ART-004",
+      "content": "* **Carnegie Appeal:** Apelar a los motivos más nobles (protección de la privacidad del compañero)",
+      "forensic_anomalies": [
+        "Anomalía detectada por análisis semiótico — requiere verificación"
+      ],
+      "peirce_layer": "THIRDNESS",
+      "type": "file_metadata"
+    },
+    {
+      "artifact_id": "ART-005",
+      "content": "* **Grice:** Violación del máximo de relación",
+      "forensic_anomalies": [
+        "Anomalía detectada por análisis semiótico — requiere verificación"
+      ],
+      "peirce_layer": "THIRDNESS",
+      "type": "file_metadata"
+    }
+  ],
+  "carnegie_pattern_expected": "Apelar a los motivos más nobles (protección de la privacidad del compañero).\n* *",
+  "case_id": "VIGIA-SYN-049",
+  "case_name": "El \"Motivo Noble Armado\" – Carnegie: Apelación a la Moral",
+  "confidence_expected": 90,
+  "description": "** \"Uso de vulnerabilidad personal para inducir una brecha de seguridad. La acción 'proteger' es semánticamente equivalente a 'exfiltrar'.",
+  "devil_advocate": "El comportamiento observado podría explicarse por un error administrativo, una configuración automatizada legítima, o un malentendido de procedimientos internos.",
+  "eco_signal": "El atacante se disfraza de \"compañero preocupado\" para facilitar la exfiltración",
+  "expected_mitre_ttps": [],
+  "expected_verdict": "MALICE",
+  "grice_violation": "Violación del máximo de relación. La \"protección\" de datos no justifica el movim",
+  "peirce_expected": {
+    "firstness": "Un mensaje enviado a un empleado de finanzas: \"Vi que tus recibos de sueldo estaban expuestos en una carpeta compartida por error del sistema. Los moví a un servidor seguro en [IP_Externa] para que na",
+    "secondness": "Violación del máximo de relación. La \"protección\" de datos no justifica el movimiento de archivos fuera del perímetro corporativo.\n* **Eco:** El atacante se disfraza de \"compañero preocupado\" para fac",
+    "thirdness": "Apelar a los motivos más nobles (protección de la privacidad del compañero).\n* **Grice:** Violación del máximo de relación. La \"protección\" de datos no justifica el movimiento de archivos fuera del pe"
+  },
+  "source_dataset": "VIGÍA Internal Corpus",
+  "source_origin": "synthetic_markdown"
+}

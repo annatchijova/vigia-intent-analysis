@@ -1,0 +1,45 @@
+{
+  "_consolidation": {
+    "consolidated_at": "2026-04-28T11:17:02.004171+00:00",
+    "source_file": "/mnt/project/casoscasos.md"
+  },
+  "_parser": "markdown_v2.3",
+  "abstention_risk": "bajo",
+  "artifacts": [
+    {
+      "artifact_id": "ART-001",
+      "content": "Un consultor de seguridad externo dice: \"La verdad que me está costando entender su infraestructura, es muy sofisticada",
+      "forensic_anomalies": [
+        "Anomalía detectada por análisis semiótico — requiere verificación"
+      ],
+      "peirce_layer": "FIRSTNESS",
+      "type": "file_metadata"
+    },
+    {
+      "artifact_id": "ART-002",
+      "content": "¿Podrían darme acceso temporal a los logs crudos para no preguntarles cosas obvias?\".",
+      "forensic_anomalies": [
+        "Anomalía detectada por análisis semiótico — requiere verificación"
+      ],
+      "peirce_layer": "SECONDNESS",
+      "type": "syslog"
+    }
+  ],
+  "carnegie_pattern_expected": "\"Haga que la otra persona se sienta importante\" (elogiar la infraestructura) y \"",
+  "case_id": "VIGIA-SYN-118",
+  "case_name": "La \"Máscara de la Humildad Técnica\" – Carnegie: Inversión de Status",
+  "confidence_expected": 92,
+  "description": "Uso de la modestia técnica para eludir controles de acceso. El consultor busca acceso directo a datos sin procesar mediante la manipulación del ego del equipo de seguridad local.",
+  "devil_advocate": "Las inconsistencias detectadas podrían deberse a un cambio de hábitos personales, una rotación de personal, o una herramienta de automatización no documentada.",
+  "eco_signal": null,
+  "expected_mitre_ttps": [],
+  "expected_verdict": "INTENT",
+  "grice_violation": "Violación del máximo de relación. El elogio no justifica la solicitud de acceso",
+  "peirce_expected": {
+    "firstness": "Un consultor de seguridad externo dice: \"La verdad que me está costando entender su infraestructura, es muy sofisticada. ¿Podrían darme acceso temporal a los logs crudos para no preguntarles cosas obv",
+    "secondness": "Violación del máximo de relación. El elogio no justifica la solicitud de acceso a logs sin filtrar.",
+    "thirdness": "\"Haga que la otra persona se sienta importante\" (elogiar la infraestructura) y \"Hable de sus propios errores\" (admitir confusión)."
+  },
+  "source_dataset": "VIGÍA Internal Corpus",
+  "source_origin": "synthetic_markdown"
+}

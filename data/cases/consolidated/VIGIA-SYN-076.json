@@ -1,0 +1,45 @@
+{
+  "_consolidation": {
+    "consolidated_at": "2026-04-28T11:17:01.976197+00:00",
+    "source_file": "/mnt/project/nuevoscasos.md"
+  },
+  "_parser": "markdown_v2.3",
+  "abstention_risk": "bajo",
+  "artifacts": [
+    {
+      "artifact_id": "ART-001",
+      "content": "Durante la investigación de un incidente, un empleado se ofrece como voluntario para ayudar al equipo de respuesta: \"Sé mucho de este servidor, déjenme que les filtre los logs de red para que no pierdan tiempo buscando en la basura\"",
+      "forensic_anomalies": [
+        "Anomalía detectada por análisis semiótico — requiere verificación"
+      ],
+      "peirce_layer": "FIRSTNESS",
+      "type": "syslog"
+    },
+    {
+      "artifact_id": "ART-002",
+      "content": "Los logs que entrega son impecables, pero omiten las conexiones salientes de un rango de IPs específico.",
+      "forensic_anomalies": [
+        "Anomalía detectada por análisis semiótico — requiere verificación"
+      ],
+      "peirce_layer": "SECONDNESS",
+      "type": "syslog"
+    }
+  ],
+  "carnegie_pattern_expected": "\"Interésese genuinamente en los demás\" (ayudar al equipo de IR a \"ahorrar tiempo",
+  "case_id": "VIGIA-SYN-076",
+  "case_name": "El \"Sabotaje Cooperativo\" – Carnegie: Interés Genuino",
+  "confidence_expected": 97,
+  "description": "Detección de asistencia obstructiva. El colaborador utiliza el sesgo de gratitud del equipo forense para actuar como filtro de la evidencia.",
+  "devil_advocate": "El comportamiento observado podría explicarse por un error administrativo, una configuración automatizada legítima, o un malentendido de procedimientos internos.",
+  "eco_signal": null,
+  "expected_mitre_ttps": [],
+  "expected_verdict": "MALICE",
+  "grice_violation": "Violación del máximo de cantidad (omisión selectiva).",
+  "peirce_expected": {
+    "firstness": "Durante la investigación de un incidente, un empleado se ofrece como voluntario para ayudar al equipo de respuesta: \"Sé mucho de este servidor, déjenme que les filtre los logs de red para que no pierd",
+    "secondness": "Violación del máximo de cantidad (omisión selectiva).",
+    "thirdness": "Terceridad. La \"ayuda\" es el signo usado para dirigir la investigación hacia un callejón sin salida."
+  },
+  "source_dataset": "VIGÍA Internal Corpus",
+  "source_origin": "synthetic_markdown"
+}

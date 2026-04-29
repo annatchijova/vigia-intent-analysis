@@ -1,0 +1,51 @@
+{
+  "abstention_risk": "bajo",
+  "artifacts": [
+    {
+      "artifact_id": "ART-001",
+      "content": "2024-03-10 09:05:12 | user: maria.garcia | login attempt 1: FAILED (password mismatch) | 09:05:18 | attempt 2: FAILED | 09:05:25 | attempt 3: SUCCESS | Source IP: 10.0.1.45 (oficina principal)",
+      "forensic_anomalies": [
+        "Múltiples intentos fallidos seguidos de éxito",
+        "Timing entre intentos: 6s, 7s (humano, no automatizado)"
+      ],
+      "peirce_layer": "FIRSTNESS",
+      "type": "auth_log"
+    },
+    {
+      "artifact_id": "ART-002",
+      "content": "09:05-17:30 | Normal work pattern: Outlook, Excel, Teams, internal sites | No sudo | No external access | No file transfers | Keystroke dynamics: high variance, consistent with new mechanical keyboard (purchased 2024-03-08, ticket IT-4492)",
+      "forensic_anomalies": [
+        "Patrón de trabajo normal de 8 horas",
+        "Sin actividad anómala post-login"
+      ],
+      "peirce_layer": "SECONDNESS",
+      "type": "bash_history"
+    },
+    {
+      "artifact_id": "ART-003",
+      "content": "IT ticket IT-4492: 'Maria Garcia solicita teclado mecánico Keychron K2' | Approved: 2024-03-05 | Delivered: 2024-03-08 | Asset tag: KB-2024-044 | Photo of old membrane keyboard in recycling bin",
+      "forensic_anomalies": [
+        "Ticket de IT verificable para cambio de hardware",
+        "Fotografía del teclado viejo descartado"
+      ],
+      "peirce_layer": "THIRDNESS",
+      "type": "file_metadata"
+    }
+  ],
+  "carnegie_pattern_expected": null,
+  "case_id": "VIGIA-BEN-005",
+  "case_name": "El Teclado Nuevo — Login Fallido Inocente",
+  "confidence_expected": 80,
+  "description": "Usuario con teclado mecánico nuevo (switches diferentes) comete 3 errores de tipeo antes de acertar la contraseña. El patrón es: error, corrección rápida, login exitoso, actividad normal de 8 horas.",
+  "devil_advocate": "Maria Garcia es un atacante que robó sus credenciales y está probando el teclado nuevo como coartada para explicar los errores de fuerza bruta",
+  "devil_refutation": "La hipótesis de atacante no explica por qué el timing es humano (no automatizado), por qué hay 8 horas de actividad normal post-login, ni por qué el teclado fue solicitado 3 días antes. La explicación benigna es más simple.",
+  "expected_mitre_ttps": [],
+  "expected_verdict": "NOISE",
+  "peirce_expected": {
+    "firstness": "Tres intentos fallidos de login seguidos de éxito",
+    "secondness": "Los intentos fallidos tienen timing humano variable (6s, 7s). Post-login hay 8 horas de actividad normal sin anomalías. El teclado nuevo fue solicitado formalmente.",
+    "thirdness": "Es un usuario legítimo adaptándose a un teclado nuevo. Los errores de tipeo son físicos (adaptación táctil), no fuerza bruta. La hipótesis benigna explica todos los artefactos sin contradicciones."
+  },
+  "source_origin": "synthetic_validation",
+  "why_not_malice": "Los errores tienen explicación física verificable. No hay segunda anomalía (exfiltración, escalada, horario raro)."
+}

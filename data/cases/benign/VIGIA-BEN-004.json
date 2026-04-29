@@ -1,0 +1,51 @@
+{
+  "abstention_risk": "bajo",
+  "artifacts": [
+    {
+      "artifact_id": "ART-001",
+      "content": "ansible-playbook deploy_production.yml --check --diff | 47 tasks executed | 0 failures | 0 changed (dry run) | 2024-06-10 02:00:00 UTC | User: ansible_svc | SSH key: ansible@tower.company.com",
+      "forensic_anomalies": [
+        "Ejecución perfecta sin errores humanos",
+        "Timing exacto entre comandos (automatización)"
+      ],
+      "peirce_layer": "FIRSTNESS",
+      "type": "bash_history"
+    },
+    {
+      "artifact_id": "ART-002",
+      "content": "Playbook: deploy_production.yml | Git commit: a1b2c3d | Approved by: change_advisory_board #2024-06-05 | Jira ticket: CHG-0042 | Reviewer: senior_dev_lead | Signed off: 2024-06-07",
+      "forensic_anomalies": [
+        "Cambio aprobado por board formal",
+        "Playbook versionado en Git con firma"
+      ],
+      "peirce_layer": "SECONDNESS",
+      "type": "file_metadata"
+    },
+    {
+      "artifact_id": "ART-003",
+      "content": "Parent: ansible-tower.service (PID 1234) | Child: ssh ansible_svc@target | Ansible facts gathered: 2024-06-10 02:00:01 | No interactive shell | No TTY allocated",
+      "forensic_anomalies": [
+        "Proceso sin TTY (automatización, no interactivo)",
+        "Parent es servicio de Ansible Tower"
+      ],
+      "peirce_layer": "THIRDNESS",
+      "type": "process_list"
+    }
+  ],
+  "carnegie_pattern_expected": null,
+  "case_id": "VIGIA-BEN-004",
+  "case_name": "El Script Perfecto — Ansible No Humano",
+  "confidence_expected": 90,
+  "description": "Script de despliegue ejecuta 47 comandos sin errores, sin reintentos, con timing exacto. Es generado por Ansible Tower con playbook aprobado por change management.",
+  "devil_advocate": "El atacante comprometió Ansible Tower y usa su infraestructura de confianza para ejecutar comandos maliciosos sin levantar alertas",
+  "devil_refutation": "La hipótesis de compromiso de Tower no explica por qué el playbook está en Git con commit firmado, por qué pasó review de senior_dev_lead, ni por qué no hay comandos fuera del playbook. La explicación benigna es más simple.",
+  "expected_mitre_ttps": [],
+  "expected_verdict": "NOISE",
+  "peirce_expected": {
+    "firstness": "Script ejecuta 47 comandos sin error con timing mecánico",
+    "secondness": "El proceso es hijo de ansible-tower.service, no de un login interactivo. El playbook está aprobado por change board y versionado en Git.",
+    "thirdness": "Es automatización legítima de infraestructura. La 'perfección' es característica de Ansible, no indicio de atacante. La ausencia de entropía humana es esperada en procesos automatizados."
+  },
+  "source_origin": "synthetic_validation",
+  "why_not_malice": "La ejecución perfecta tiene raíz verificable en infraestructura de automatización aprobada. No hay desviación del playbook."
+}

@@ -1,0 +1,74 @@
+{
+  "_consolidation": {
+    "consolidated_at": "2026-04-28T05:51:15.348820+00:00",
+    "parser_version": "1.0",
+    "schema_version": "1.0",
+    "source_file": "vigia_forensic_cases.json"
+  },
+  "abstention_risk": "bajo",
+  "artifacts": [
+    {
+      "artifact_id": "ART-001",
+      "content": "Apache access.log | IP atacante: 192.168.56.102 | User-Agent: sqlmap/1.* (herramienta automatizada) | Requests: GET /dvwa/vulnerabilities/sqli/?id=1 AND 1=1 UNION SELECT... | Otro User-Agent: IceWeasel (navegador típico de Kali Linux)",
+      "forensic_anomalies": [
+        "Presencia de User-Agent de sqlmap indicando ataque de SQL injection automatizado",
+        "La IP 192.168.56.102 es típica de máquinas virtuales Kali Linux en VirtualBox"
+      ],
+      "peirce_layer": "FIRSTNESS",
+      "type": "network_flow"
+    },
+    {
+      "artifact_id": "ART-002",
+      "content": "Comandos ejecutados via webshell/cmd.exe: net user user1 user1 /add | net localgroup 'Remote Desktop Users' user1 /add | netsh advfirewall firewall add rule name='Remote Desktop' dir=in action=allow protocol=TCP localport=3389 remoteip=192.168.56.0/24 | net user hacker hacker /add",
+      "forensic_anomalies": [
+        "Creación simultánea de dos cuentas de usuario no autorizadas (user1 y hacker)",
+        "Modificación del firewall para permitir RDP desde subred específica del atacante"
+      ],
+      "peirce_layer": "SECONDNESS",
+      "type": "bash_history"
+    },
+    {
+      "artifact_id": "ART-003",
+      "content": "httpd.exe PID 2796 y PID 2880 (Apache HTTP Server) | Memory strings muestran trazas de comandos ejecutados | Archivos temporales: tmpukudk.php, tmpbiwuc.php (droppers PHP) | Volatility profile: Win2008SP2x86 | Hostname: WIN-L0ZZQ76PMUF",
+      "forensic_anomalies": [
+        "Procesos httpd.exe contienen strings de comandos de sistema en memoria",
+        "Archivos PHP temporales con nombres aleatorios indican webshells dropeados"
+      ],
+      "peirce_layer": "SECONDNESS",
+      "type": "process_list"
+    },
+    {
+      "artifact_id": "ART-004",
+      "content": "SAM Registry Hive: Usuarios creados simultáneamente - user1 [SID 1005] y hacker [SID 1006] | MFT entries de tmpukudk y tmpbiwuc | Archivo webshells.zip contiene shells incluyendo C99 | Timestamp creación usuarios: 02/09/2015 09:04:35 PDT",
+      "forensic_anomalies": [
+        "Dos usuarios nuevos con SIDs consecutivos creados en el mismo timestamp",
+        "Presencia de C99 shell en archivo webshells.zip"
+      ],
+      "peirce_layer": "SECONDNESS",
+      "type": "file_metadata"
+    }
+  ],
+  "carnegie_pattern_expected": null,
+  "case_id": "VIGIA-REAL-003",
+  "case_name": "Ali Hadi Web Server Compromise",
+  "confidence_expected": 94,
+  "description": "El servidor web de una empresa con Windows Server 2008 Standard y XAMPP fue comprometido a través de SQL injection en DVWA. El atacante desplegó webshells PHP, creó cuentas de usuario y configuró acceso RDP desde la subred interna.",
+  "devil_advocate": "El administrador del sistema estaba realizando pruebas de penetración autorizadas internamente",
+  "expected_mitre_ttps": [
+    "T1190",
+    "T1059",
+    "T1136.001",
+    "T1021.001",
+    "T1505.003",
+    "T1070"
+  ],
+  "expected_verdict": "MALICE",
+  "peirce_expected": {
+    "firstness": "Logs de Apache muestran requests de sqlmap y webshells PHP en servidor comprometido",
+    "secondness": "Los comandos net user y firewall rules correlacionan con la creación de cuentas en SAM y la apertura de RDP",
+    "thirdness": "El atacante explotó SQLi, desplegó webshells para persistencia, escaló privilegios creando cuentas y preparó acceso remoto vía RDP"
+  },
+  "source_dataset": "Ali Hadi Challenge #1 - Web Server Case",
+  "source_origin": "public_dataset",
+  "source_url": "https://www.ashemery.com/dfir.html"
+}

@@ -1,0 +1,72 @@
+{
+  "_consolidation": {
+    "consolidated_at": "2026-04-28T11:17:01.968950+00:00",
+    "source_file": "/mnt/project/nuevoscasos.md"
+  },
+  "_parser": "markdown_v2.3",
+  "abstention_risk": "bajo",
+  "artifacts": [
+    {
+      "artifact_id": "ART-001",
+      "content": "En una sesión de bash, el historial registra: `ls -la`, `cd /etc`, `д -дф`",
+      "forensic_anomalies": [
+        "Anomalía detectada por análisis semiótico — requiere verificación"
+      ],
+      "peirce_layer": "FIRSTNESS",
+      "type": "bash_history"
+    },
+    {
+      "artifact_id": "ART-002",
+      "content": "* **Peirce:** Primeridad (El rastro físico)",
+      "forensic_anomalies": [
+        "Anomalía detectada por análisis semiótico — requiere verificación"
+      ],
+      "peirce_layer": "SECONDNESS",
+      "type": "file_metadata"
+    },
+    {
+      "artifact_id": "ART-003",
+      "content": "La cadena `д -дф` es el resultado de intentar escribir `ls -la` con el teclado configurado en layout ruso (ЙЦУКЕН)",
+      "forensic_anomalies": [
+        "Desliz de teclado — atribución lingüística"
+      ],
+      "peirce_layer": "SECONDNESS",
+      "type": "file_metadata"
+    },
+    {
+      "artifact_id": "ART-004",
+      "content": "* **Carnegie:** N/A (Falla técnica pura)",
+      "forensic_anomalies": [
+        "Anomalía detectada por análisis semiótico — requiere verificación"
+      ],
+      "peirce_layer": "THIRDNESS",
+      "type": "file_metadata"
+    },
+    {
+      "artifact_id": "ART-005",
+      "content": "* **Eco:** Falso rastro de origen",
+      "forensic_anomalies": [
+        "Anomalía detectada por análisis semiótico — requiere verificación"
+      ],
+      "peirce_layer": "THIRDNESS",
+      "type": "file_metadata"
+    }
+  ],
+  "carnegie_pattern_expected": "N/A (Falla técnica pura).\n* **Eco:** Falso rastro de origen. El atacante jura se",
+  "case_id": "VIGIA-SYN-046",
+  "case_name": "El \"Pivot de Layout\" – Peirce: Primeridad (Index)",
+  "confidence_expected": 90,
+  "description": "** \"Detección de desliz de teclado (Keyboard Slip). El comando `ls -la` fue tipeado con layout ruso. La mentira sobre la identidad geográfica se derrumba ante la física del teclado.",
+  "devil_advocate": "Las inconsistencias detectadas podrían deberse a un cambio de hábitos personales, una rotación de personal, o una herramienta de automatización no documentada.",
+  "eco_signal": "Falso rastro de origen. El atacante jura ser un empleado de Buenos Aires en sus",
+  "expected_mitre_ttps": [],
+  "expected_verdict": "INTENT",
+  "grice_violation": null,
+  "peirce_expected": {
+    "firstness": "Primeridad (El rastro físico). La cadena `д -дф` es el resultado de intentar escribir `ls -la` con el teclado configurado en layout ruso (ЙЦУКЕН).\n* **Carnegie:** N/A (Falla técnica pura).\n* **Eco:** Falso rastro de origen. El atacante jura ser un empleado de Buenos Aires en sus correos, pero su har",
+    "secondness": "Contradicción indexical en los artefactos.",
+    "thirdness": "N/A (Falla técnica pura).\n* **Eco:** Falso rastro de origen. El atacante jura ser un empleado de Buenos Aires en sus correos, pero su hardware tiene una memoria muscular táctil diferente.\n* **Interpre"
+  },
+  "source_dataset": "VIGÍA Internal Corpus",
+  "source_origin": "synthetic_markdown"
+}

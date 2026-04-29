@@ -1,0 +1,54 @@
+{
+  "_consolidation": {
+    "consolidated_at": "2026-04-28T11:17:01.983401+00:00",
+    "source_file": "/mnt/project/casoscasos.md"
+  },
+  "_parser": "markdown_v2.3",
+  "abstention_risk": "bajo",
+  "artifacts": [
+    {
+      "artifact_id": "ART-001",
+      "content": "Un empleado senior detecta un malware y lo reporta: \"Instalé una app de clima que resultó tener un troyano",
+      "forensic_anomalies": [
+        "Anomalía detectada por análisis semiótico — requiere verificación"
+      ],
+      "peirce_layer": "FIRSTNESS",
+      "type": "file_metadata"
+    },
+    {
+      "artifact_id": "ART-002",
+      "content": "Soy un irresponsable, ya estoy formateando mi equipo para que no se propague\"",
+      "forensic_anomalies": [
+        "Anomalía detectada por análisis semiótico — requiere verificación"
+      ],
+      "peirce_layer": "SECONDNESS",
+      "type": "network_flow"
+    },
+    {
+      "artifact_id": "ART-003",
+      "content": "VIGÍA detecta que el \"formateo\" borró el registro de una conexión persistente a la base de datos de patentes que ocurrió desde ese equipo 2 horas antes de la denuncia.",
+      "forensic_anomalies": [
+        "Anomalía detectada por análisis semiótico — requiere verificación"
+      ],
+      "peirce_layer": "SECONDNESS",
+      "type": "network_flow"
+    }
+  ],
+  "carnegie_pattern_expected": "\"Admita sus errores rápida y enfáticamente\". El atacante se incrimina en una fal",
+  "case_id": "VIGIA-SYN-114",
+  "case_name": "El \"Cebo del Mártir Corporativo\" – Carnegie: El Sacrificio",
+  "confidence_expected": 98,
+  "description": "Uso de la autodenuncia como método de destrucción de evidencia. La 'transparencia' sobre el troyano es la máscara necesaria para el purgado de logs de acceso a propiedad intelectual.",
+  "devil_advocate": "El comportamiento observado podría explicarse por un error administrativo, una configuración automatizada legítima, o un malentendido de procedimientos internos.",
+  "eco_signal": "Falso rastro de incompetencia.",
+  "expected_mitre_ttps": [],
+  "expected_verdict": "MALICE",
+  "grice_violation": null,
+  "peirce_expected": {
+    "firstness": "Un empleado senior detecta un malware y lo reporta: \"Instalé una app de clima que resultó tener un troyano. Soy un irresponsable, ya estoy formateando mi equipo para que no se propague\". VIGÍA detecta",
+    "secondness": "Contradicción indexical en los artefactos.",
+    "thirdness": "\"Admita sus errores rápida y enfáticamente\". El atacante se incrimina en una falta menor (el troyano del clima) para justificar la destrucción de la evidencia de la falta mayor (espionaje industrial)."
+  },
+  "source_dataset": "VIGÍA Internal Corpus",
+  "source_origin": "synthetic_markdown"
+}

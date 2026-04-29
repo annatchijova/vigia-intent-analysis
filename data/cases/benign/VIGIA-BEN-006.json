@@ -1,0 +1,51 @@
+{
+  "abstention_risk": "bajo",
+  "artifacts": [
+    {
+      "artifact_id": "ART-001",
+      "content": "sudo systemctl restart postgresql | sudo apt update | sudo apt upgrade -y | sudo reboot | User: admin.carlos | Time: 2024-02-15 01:00-03:00 UTC | 12 sudo commands total",
+      "forensic_anomalies": [
+        "Múltiples ejecuciones de sudo en horario nocturno",
+        "Comandos de sistema críticos (restart, upgrade, reboot)"
+      ],
+      "peirce_layer": "FIRSTNESS",
+      "type": "bash_history"
+    },
+    {
+      "artifact_id": "ART-002",
+      "content": "Calendar event: 'DB Server Maintenance — Carlos Rodriguez' | Date: 2024-02-15 01:00 UTC | Attendees: dba_team, security_oncall | Change ticket: CHG-0038 | Approved by: CTO | VPN from: admin.carlos home IP (registered)",
+      "forensic_anomalies": [
+        "Acceso desde IP residencial registrada",
+        "Mantenimiento programado en calendario corporativo"
+      ],
+      "peirce_layer": "SECONDNESS",
+      "type": "auth_log"
+    },
+    {
+      "artifact_id": "ART-003",
+      "content": "Post-maintenance report: Carlos Rodriguez | 'PostgreSQL updated to 15.4, kernel patched, reboot completed. Downtime: 45 min. Next maintenance: 2024-03-15.' | Signed off by DBA lead",
+      "forensic_anomalies": [
+        "Reporte post-mantenimiento con detalles técnicos",
+        "Firma del DBA lead como verificación"
+      ],
+      "peirce_layer": "THIRDNESS",
+      "type": "file_metadata"
+    }
+  ],
+  "carnegie_pattern_expected": null,
+  "case_id": "VIGIA-BEN-006",
+  "case_name": "El Mantenimiento de Sudo — Admin de Turno",
+  "confidence_expected": 87,
+  "description": "Logs muestran 12 ejecuciones de sudo en 2 horas. Es el mantenimiento mensual del servidor de base de datos, programado en calendario compartido, con ticket de change approval.",
+  "devil_advocate": "Carlos Rodriguez es un insider que usa la ventana de mantenimiento aprobada para instalar backdoors mientras el equipo de respaldo no mira",
+  "devil_refutation": "La hipótesis insider no explica por qué el mantenimiento está en calendario público, por qué hay reporte post-ejecución firmado, ni por qué no hay procesos nuevos persistentes. La explicación benigna es más simple.",
+  "expected_mitre_ttps": [],
+  "expected_verdict": "NOISE",
+  "peirce_expected": {
+    "firstness": "Múltiples comandos sudo en horario nocturno",
+    "secondness": "El mantenimiento está en calendario compartido, aprobado por CTO, con equipo de respaldo presente. El usuario usa VPN desde IP registrada.",
+    "thirdness": "Es mantenimiento programado y aprobado de infraestructura crítica. La concentración de sudo es esperada en ventanas de mantenimiento. No hay exfiltración ni persistencia instalada."
+  },
+  "source_origin": "synthetic_validation",
+  "why_not_malice": "La actividad tiene raíz programada, aprobada y verificable. No hay desviación del scope de mantenimiento."
+}

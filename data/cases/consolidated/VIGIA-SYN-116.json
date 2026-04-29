@@ -1,0 +1,54 @@
+{
+  "_consolidation": {
+    "consolidated_at": "2026-04-28T11:17:02.003298+00:00",
+    "source_file": "/mnt/project/casoscasos.md"
+  },
+  "_parser": "markdown_v2.3",
+  "abstention_risk": "bajo",
+  "artifacts": [
+    {
+      "artifact_id": "ART-001",
+      "content": "Se encuentra un archivo en la papelera llamado evidencia_recuperada.zip",
+      "forensic_anomalies": [
+        "Anomalía detectada por análisis semiótico — requiere verificación"
+      ],
+      "peirce_layer": "FIRSTNESS",
+      "type": "network_flow"
+    },
+    {
+      "artifact_id": "ART-002",
+      "content": "Contiene logs de acceso que parecen demostrar un ataque externo desde una IP de Corea del Norte",
+      "forensic_anomalies": [
+        "Anomalía detectada por análisis semiótico — requiere verificación"
+      ],
+      "peirce_layer": "SECONDNESS",
+      "type": "syslog"
+    },
+    {
+      "artifact_id": "ART-003",
+      "content": "VIGÍA detecta que el software utilizado para \"recuperar\" los logs (Recuva) dejó marcas de tiempo que indican que los archivos fueron creados y borrados en el mismo minuto.",
+      "forensic_anomalies": [
+        "Anomalía detectada por análisis semiótico — requiere verificación"
+      ],
+      "peirce_layer": "SECONDNESS",
+      "type": "syslog"
+    }
+  ],
+  "carnegie_pattern_expected": null,
+  "case_id": "VIGIA-SYN-116",
+  "case_name": "El \"Anacronismo del Perito\" – Eco: Falso Rastro de Procedimiento",
+  "confidence_expected": 99,
+  "description": "Detección de teatro forense. La evidencia es una fabricación 'plantada' para ser descubierta y dirigir la investigación hacia una atribución geopolítica falsa.",
+  "devil_advocate": "El comportamiento observado podría explicarse por un error administrativo, una configuración automatizada legítima, o un malentendido de procedimientos internos.",
+  "eco_signal": "El atacante fabrica una \"evidencia encontrada\" para que el perito crea que tuvo",
+  "expected_mitre_ttps": [],
+  "expected_verdict": "MALICE",
+  "grice_violation": null,
+  "peirce_expected": {
+    "firstness": "Se encuentra un archivo en la papelera llamado evidencia_recuperada.zip. Contiene logs de acceso que parecen demostrar un ataque externo desde una IP de Corea del Norte. VIGÍA detecta que el software ",
+    "secondness": "Contradicción indexical en los artefactos.",
+    "thirdness": "Terceridad. El rastro es demasiado conveniente; viola la ley de la entropía de un borrado real."
+  },
+  "source_dataset": "VIGÍA Internal Corpus",
+  "source_origin": "synthetic_markdown"
+}

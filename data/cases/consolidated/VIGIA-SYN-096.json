@@ -1,0 +1,45 @@
+{
+  "_consolidation": {
+    "consolidated_at": "2026-04-28T11:17:01.923239+00:00",
+    "source_file": "/mnt/project/casosfinal.md"
+  },
+  "_parser": "markdown_v2.3",
+  "abstention_risk": "bajo",
+  "artifacts": [
+    {
+      "artifact_id": "ART-001",
+      "content": "Durante un ataque de fuerza bruta, el \"Administrador\" recibe 50 alertas falsas de Telegram simultáneas",
+      "forensic_anomalies": [
+        "Anomalía detectada por análisis semiótico — requiere verificación"
+      ],
+      "peirce_layer": "FIRSTNESS",
+      "type": "file_metadata"
+    },
+    {
+      "artifact_id": "ART-002",
+      "content": "El administrador escribe en el chat: \"Estoy desbordado, desactiven el MFA 5 minutos para que pueda entrar rápido y bloquear las IPs\".",
+      "forensic_anomalies": [
+        "Anomalía detectada por análisis semiótico — requiere verificación"
+      ],
+      "peirce_layer": "SECONDNESS",
+      "type": "slack_message"
+    }
+  ],
+  "carnegie_pattern_expected": "Generar compasión y urgencia ante el estrés para forzar una concesión.",
+  "case_id": "VIGIA-SYN-096",
+  "case_name": "La \"Entropía de Pánico\" – Sabotaje de MFA",
+  "confidence_expected": 97,
+  "description": "Detección de ingeniería social por saturación sensorial. La solicitud de degradar la seguridad es la meta del ataque, no la solución.",
+  "devil_advocate": "El comportamiento observado podría explicarse por un error administrativo, una configuración automatizada legítima, o un malentendido de procedimientos internos.",
+  "eco_signal": null,
+  "expected_mitre_ttps": [],
+  "expected_verdict": "MALICE",
+  "grice_violation": "Violación del máximo de relación. Desactivar el MFA no soluciona un ataque de re",
+  "peirce_expected": {
+    "firstness": "Durante un ataque de fuerza bruta, el \"Administrador\" recibe 50 alertas falsas de Telegram simultáneas. El administrador escribe en el chat: \"Estoy desbordado, desactiven el MFA 5 minutos para que pue",
+    "secondness": "Violación del máximo de relación. Desactivar el MFA no soluciona un ataque de red, lo facilita.",
+    "thirdness": "Generar compasión y urgencia ante el estrés para forzar una concesión."
+  },
+  "source_dataset": "VIGÍA Internal Corpus",
+  "source_origin": "synthetic_markdown"
+}

@@ -1,0 +1,45 @@
+{
+  "_consolidation": {
+    "consolidated_at": "2026-04-28T11:17:01.982994+00:00",
+    "source_file": "/mnt/project/casoscasos.md"
+  },
+  "_parser": "markdown_v2.3",
+  "abstention_risk": "bajo",
+  "artifacts": [
+    {
+      "artifact_id": "ART-001",
+      "content": "Ante una alerta de exfiltración de 50GB, el administrador de red responde con un reporte técnico impecable donde demuestra que \"fue un error del sensor de flujo debido a un loop de broadcast\"",
+      "forensic_anomalies": [
+        "Anomalía detectada por análisis semiótico — requiere verificación"
+      ],
+      "peirce_layer": "FIRSTNESS",
+      "type": "file_metadata"
+    },
+    {
+      "artifact_id": "ART-002",
+      "content": "VIGÍA detecta que el reporte fue generado por una IA y que los logs de broadcast que adjunta fueron inyectados en el sistema 15 minutos después del evento.",
+      "forensic_anomalies": [
+        "Anomalía detectada por análisis semiótico — requiere verificación"
+      ],
+      "peirce_layer": "SECONDNESS",
+      "type": "syslog"
+    }
+  ],
+  "carnegie_pattern_expected": null,
+  "case_id": "VIGIA-SYN-113",
+  "case_name": "La \"Sinfonía de la Negación\" – Gaslighting Técnico",
+  "confidence_expected": 99,
+  "description": "Detección de falsificación de causalidad post-evento. El reporte de 'loop de broadcast' es un objeto semántico fabricado para neutralizar el hallazgo forense.",
+  "devil_advocate": "El comportamiento observado podría explicarse por un error administrativo, una configuración automatizada legítima, o un malentendido de procedimientos internos.",
+  "eco_signal": null,
+  "expected_mitre_ttps": [],
+  "expected_verdict": "MALICE",
+  "grice_violation": "Violación del máximo de calidad. El reporte es una construcción de verdad sintét",
+  "peirce_expected": {
+    "firstness": "Ante una alerta de exfiltración de 50GB, el administrador de red responde con un reporte técnico impecable donde demuestra que \"fue un error del sensor de flujo debido a un loop de broadcast\". VIGÍA d",
+    "secondness": "Terceridad. La \"explicación técnica\" es un signo simbólico que busca reinterpretar la Segundidad (la exfiltración física) como un error de lectura.",
+    "thirdness": "Terceridad. La \"explicación técnica\" es un signo simbólico que busca reinterpretar la Segundidad (la exfiltración física) como un error de lectura."
+  },
+  "source_dataset": "VIGÍA Internal Corpus",
+  "source_origin": "synthetic_markdown"
+}

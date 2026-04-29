@@ -1,0 +1,51 @@
+{
+  "abstention_risk": "bajo",
+  "artifacts": [
+    {
+      "artifact_id": "ART-001",
+      "content": "From: ceo@company.com | To: cfo@company.com | Subject: URGENTE: Reporte financiero Q4 para junta de inversores | Date: 2024-03-15 08:00 | DKIM: PASS | SPF: PASS | Reply-To: ceo@company.com",
+      "forensic_anomalies": [
+        "Uso de palabra URGENTE en asunto",
+        "Solicitud de documento confidencial con deadline corto"
+      ],
+      "peirce_layer": "FIRSTNESS",
+      "type": "email_header"
+    },
+    {
+      "artifact_id": "ART-002",
+      "content": "Calendar event: 'Junta de Inversores — Presentación Q4' | Date: 2024-03-15 10:00 | Location: Sala A | Attendees: board_members, cfo, ceo | Created: 2024-02-01 by executive_assistant",
+      "forensic_anomalies": [
+        "Junta real en calendario corporativo",
+        "Creada con 6 semanas de anticipación"
+      ],
+      "peirce_layer": "SECONDNESS",
+      "type": "email_header"
+    },
+    {
+      "artifact_id": "ART-003",
+      "content": "Email thread: 2024-03-08 | ceo→cfo: 'Por favor prepara reporte Q4 para junta del 15' | cfo→ceo: 'OK, lo tendré para el 12' | 2024-03-12 | cfo→ceo: 'Adjunto borrador' | 2024-03-14 | ceo→cfo: 'Necesito versión final URGENTE'",
+      "forensic_anomalies": [
+        "Secuencia de emails previos con contexto completo",
+        "Deadline incumplido por CFO (12→15) justifica urgencia"
+      ],
+      "peirce_layer": "THIRDNESS",
+      "type": "email_header"
+    }
+  ],
+  "carnegie_pattern_expected": null,
+  "case_id": "VIGIA-BEN-010",
+  "case_name": "El Jefe con Deadline Real — Urgencia Legítima",
+  "confidence_expected": 83,
+  "description": "Email del CEO con 'URGENTE: necesito el reporte para la junta de inversores en 2 horas'. Es real: la junta está en calendario, el reporte fue solicitado hace una semana, y el CEO nunca usa palabra 'urgente' excepto en contextos de junta.",
+  "devil_advocate": "El CEO es un impostor que comprometió su cuenta y usa la junta real como pretexto para obtener el reporte financiero",
+  "devil_refutation": "La hipótesis de impostor no explica por qué el email tiene DKIM/SPF pass, por qué el thread previo es coherente, ni por qué el Reply-To no cambió. La explicación benigna es más simple.",
+  "expected_mitre_ttps": [],
+  "expected_verdict": "NOISE",
+  "peirce_expected": {
+    "firstness": "Email con palabra URGENTE solicitando documento confidencial",
+    "secondness": "La junta existe en calendario desde hace 6 semanas. Hay thread de emails previos mostrando que el reporte fue solicitado con anticipación y el deadline se extendió. El Reply-To es legítimo.",
+    "thirdness": "Es una urgencia corporativa legítima derivada de un deadline incumplido. El CEO no está manipulando; está gestionando una contingencia de agenda. La hipótesis benigna explica el contexto completo."
+  },
+  "source_origin": "synthetic_validation",
+  "why_not_malice": "La urgencia tiene raíz en evento calendariado y deadline incumplido. No hay anomalías de identidad ni de comunicación."
+}

@@ -1,0 +1,45 @@
+{
+  "_consolidation": {
+    "consolidated_at": "2026-04-28T11:17:01.957670+00:00",
+    "source_file": "/mnt/project/casosfinal.md"
+  },
+  "_parser": "markdown_v2.3",
+  "abstention_risk": "bajo",
+  "artifacts": [
+    {
+      "artifact_id": "ART-001",
+      "content": "Una factura en PDF enviada a finanzas tiene una \"falla de impresión\" que cubre justo el CBU/IBAN original",
+      "forensic_anomalies": [
+        "Anomalía detectada por análisis semiótico — requiere verificación"
+      ],
+      "peirce_layer": "FIRSTNESS",
+      "type": "file_metadata"
+    },
+    {
+      "artifact_id": "ART-002",
+      "content": "El remitente envía un mail: \"Uy, salió mal el PDF, te paso el número de cuenta por acá para que no te trabes con el pago\".",
+      "forensic_anomalies": [
+        "Anomalía detectada por análisis semiótico — requiere verificación"
+      ],
+      "peirce_layer": "SECONDNESS",
+      "type": "file_metadata"
+    }
+  ],
+  "carnegie_pattern_expected": "\"Haga que la otra persona se sienta feliz de hacer lo que usted sugiere\" (facili",
+  "case_id": "VIGIA-SYN-106",
+  "case_name": "La \"Mimesis del Error Administrativo\" – Grice: Máximo de Cantidad",
+  "confidence_expected": 94,
+  "description": "Detección de sabotaje de integridad documental. El error de impresión es un signo fabricado para forzar el uso de un canal no auditable.",
+  "devil_advocate": "El comportamiento observado podría explicarse por un error administrativo, una configuración automatizada legítima, o un malentendido de procedimientos internos.",
+  "eco_signal": null,
+  "expected_mitre_ttps": [],
+  "expected_verdict": "MALICE",
+  "grice_violation": "Violación del máximo de cantidad (información incompleta en el canal oficial) y",
+  "peirce_expected": {
+    "firstness": "Una factura en PDF enviada a finanzas tiene una \"falla de impresión\" que cubre justo el CBU/IBAN original. El remitente envía un mail: \"Uy, salió mal el PDF, te paso el número de cuenta por acá para q",
+    "secondness": "Violación del máximo de cantidad (información incompleta en el canal oficial) y violación del máximo de manera (uso de un canal informal para corregir un dato crítico).",
+    "thirdness": "\"Haga que la otra persona se sienta feliz de hacer lo que usted sugiere\" (facilitar el pago rápido)."
+  },
+  "source_dataset": "VIGÍA Internal Corpus",
+  "source_origin": "synthetic_markdown"
+}

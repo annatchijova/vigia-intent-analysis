@@ -1,0 +1,51 @@
+{
+  "abstention_risk": "bajo",
+  "artifacts": [
+    {
+      "artifact_id": "ART-001",
+      "content": "[dmitri.volkov@server ~]$ ghbdtn (привет) | [dmitri.volkov@server ~]$ ls -la /var/log | [dmitri.volkov@server ~]$ cnfnbz.py (статья.py)",
+      "forensic_anomalies": [
+        "Caracteres cirílicos tipeados con layout latino",
+        "Patrón consistente con teclado ruso nativo"
+      ],
+      "peirce_layer": "FIRSTNESS",
+      "type": "bash_history"
+    },
+    {
+      "artifact_id": "ART-002",
+      "content": "User dmitri.volkov from IP 185.XXX.XXX.XXX (Moscow ISP) | GeoIP: RU | Timezone: Europe/Moscow | Login consistente con horario laboral local (09:00-18:00 MSK)",
+      "forensic_anomalies": [
+        "IP geolocalizada en Rusia",
+        "Horario de login coincide con jornada laboral rusa"
+      ],
+      "peirce_layer": "SECONDNESS",
+      "type": "auth_log"
+    },
+    {
+      "artifact_id": "ART-003",
+      "content": "HR record: Dmitri Volkov, Senior SysAdmin, hired 2023-03-15 | Contract: Remote from Moscow | Hardware provisioned: Lenovo with RU keyboard | VPN access: Moscow endpoint",
+      "forensic_anomalies": [
+        "Documentación de empleado verificable en HR",
+        "Hardware con teclado ruso registrado"
+      ],
+      "peirce_layer": "THIRDNESS",
+      "type": "file_metadata"
+    }
+  ],
+  "carnegie_pattern_expected": null,
+  "case_id": "VIGIA-BEN-001",
+  "case_name": "El Administrador de Moscú — Layout Legítimo",
+  "confidence_expected": 85,
+  "description": "Logs de servidor muestran comandos con caracteres cirílicos en teclado latino. El administrador asignado es Dmitri Volkov, empleado remoto en Moscú, con teclado ЙЦУКЕН configurado por política de IT.",
+  "devil_advocate": "Dmitri Volkov es un espía ruso que se infiltró como empleado remoto y usa su teclado nativo como coartada perfecta",
+  "devil_refutation": "La hipótesis espía no explica por qué sus actividades son transparentes, documentadas en HR, y consistentes con su rol. La explicación benigna es más simple (Ockham cost 1).",
+  "expected_mitre_ttps": [],
+  "expected_verdict": "NOISE",
+  "peirce_expected": {
+    "firstness": "Comandos con caracteres cirílicos en bash history",
+    "secondness": "IP y horario consistentes con empleado remoto en Moscú; no hay exfiltración ni escalada",
+    "thirdness": "El administrador es un empleado legítimo con teclado ruso configurado; la apariencia de 'layout slip' es su configuración normal de trabajo"
+  },
+  "source_origin": "synthetic_validation",
+  "why_not_malice": "La anomalía (teclado ruso) tiene explicación verificable en registros de RRHH y política de IT. No hay segunda anomalía que la acompañe (exfiltración, escalada, horario raro)."
+}

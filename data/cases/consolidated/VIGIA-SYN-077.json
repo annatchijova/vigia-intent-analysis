@@ -1,0 +1,54 @@
+{
+  "_consolidation": {
+    "consolidated_at": "2026-04-28T11:17:01.976530+00:00",
+    "source_file": "/mnt/project/nuevoscasos.md"
+  },
+  "_parser": "markdown_v2.3",
+  "abstention_risk": "bajo",
+  "artifacts": [
+    {
+      "artifact_id": "ART-001",
+      "content": "Un usuario ejecuta comandos sospechosos",
+      "forensic_anomalies": [
+        "Anomalía detectada por análisis semiótico — requiere verificación"
+      ],
+      "peirce_layer": "FIRSTNESS",
+      "type": "bash_history"
+    },
+    {
+      "artifact_id": "ART-002",
+      "content": "VIGÍA nota que el atacante usa alias de Bash (ll, la, ..) que coinciden exactamente con los alias configurados en el .bashrc del usuario legítimo",
+      "forensic_anomalies": [
+        "Anomalía detectada por análisis semiótico — requiere verificación"
+      ],
+      "peirce_layer": "SECONDNESS",
+      "type": "bash_history"
+    },
+    {
+      "artifact_id": "ART-003",
+      "content": "Sin embargo, comete un error: tipea un comando con un espacio extra al final (ls -la ), un hábito que el usuario real nunca tiene en sus 5 años de historial.",
+      "forensic_anomalies": [
+        "Anomalía detectada por análisis semiótico — requiere verificación"
+      ],
+      "peirce_layer": "SECONDNESS",
+      "type": "bash_history"
+    }
+  ],
+  "carnegie_pattern_expected": null,
+  "case_id": "VIGIA-SYN-077",
+  "case_name": "El \"Camaleón de Alias\" – Peirce: Hábito Simbolizado",
+  "confidence_expected": 91,
+  "description": "Detección de mimesis de entorno con falla de micro-hábito. La replicación de alias es deliberada, pero el 'ruido' en la ejecución delata una mano externa.",
+  "devil_advocate": "Las inconsistencias detectadas podrían deberse a un cambio de hábitos personales, una rotación de personal, o una herramienta de automatización no documentada.",
+  "eco_signal": "Sobre-interpretación. El atacante intentó una mimesis perfecta del entorno, pero",
+  "expected_mitre_ttps": [],
+  "expected_verdict": "INTENT",
+  "grice_violation": null,
+  "peirce_expected": {
+    "firstness": "Un usuario ejecuta comandos sospechosos. VIGÍA nota que el atacante usa alias de Bash (ll, la, ..) que coinciden exactamente con los alias configurados en el .bashrc del usuario legítimo. Sin embargo,",
+    "secondness": "Contradicción indexical en los artefactos.",
+    "thirdness": "Terceridad (Hábito). El atacante estudió los alias (signos simbólicos), pero no pudo replicar la cadencia micro-conductual (el espacio extra)."
+  },
+  "source_dataset": "VIGÍA Internal Corpus",
+  "source_origin": "synthetic_markdown"
+}

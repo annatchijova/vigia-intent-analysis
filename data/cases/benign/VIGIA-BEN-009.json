@@ -1,0 +1,51 @@
+{
+  "abstention_risk": "medio",
+  "artifacts": [
+    {
+      "artifact_id": "ART-001",
+      "content": "ls -ld /var/lib/legacy_app | drwxrwxrwx 3 root root 4096 2020-01-01 /var/lib/legacy_app | chmod 777 /var/lib/legacy_app (last run: 2020-01-01 by migration_team)",
+      "forensic_anomalies": [
+        "Permisos 777 en directorio de sistema",
+        "Último cambio hace 4 años (no reciente)"
+      ],
+      "peirce_layer": "FIRSTNESS",
+      "type": "bash_history"
+    },
+    {
+      "artifact_id": "ART-002",
+      "content": "Technical debt ticket: TD-2019-042 | 'legacy_app v1.2 requires 777 for multi-user write access. No ACL support. Migration to modern_app planned for 2025-Q2.' | Approved by: CTO, Security Lead | Risk accepted: MEDIUM",
+      "forensic_anomalies": [
+        "Deuda técnica documentada y aceptada",
+        "Plan de migración con fecha definida"
+      ],
+      "peirce_layer": "SECONDNESS",
+      "type": "file_metadata"
+    },
+    {
+      "artifact_id": "ART-003",
+      "content": "Application: legacy_app (PID 3344, started 2020-01-02) | User: legacy_svc | No network access | No sudo | Read-only DB connection | Logs: only internal errors, no external connections",
+      "forensic_anomalies": [
+        "Aplicación antigua sin acceso de red",
+        "Sin privilegios elevados ni conexiones externas"
+      ],
+      "peirce_layer": "THIRDNESS",
+      "type": "process_list"
+    }
+  ],
+  "carnegie_pattern_expected": null,
+  "case_id": "VIGIA-BEN-009",
+  "case_name": "El Legacy con 777 — Requerimiento Técnico Documentado",
+  "confidence_expected": 84,
+  "description": "Directorio /var/lib/legacy_app tiene permisos 777. Es requerimiento técnico de aplicación de 1998 que no soporta ACLs modernas, documentado en deuda técnica y con plan de migración aprobado.",
+  "devil_advocate": "El atacante descubrió el directorio 777 y lo usa como staging area para malware, aprovechando que nadie audita esa ubicación por ser 'legacy'",
+  "devil_refutation": "La hipótesis de explotación no explica por qué no hay archivos nuevos en el directorio, por qué la app no tiene acceso de red para descargar payload, ni por qué no hay procesos hijos anómalos. La explicación benigna es más simple.",
+  "expected_mitre_ttps": [],
+  "expected_verdict": "NOISE",
+  "peirce_expected": {
+    "firstness": "Directorio con permisos 777 en sistema de producción",
+    "secondness": "El permiso 777 fue aplicado hace 4 años por equipo de migración, está documentado como deuda técnica aceptada por CTO y Security Lead, y hay plan de migración para 2025. La app no tiene acceso de red ni privilegios elevados.",
+    "thirdness": "Es una deuda técnica conocida y gestionada. El riesgo está aceptado y mitigado por aislamiento de red. No hay indicio de que el permiso haya sido explotado."
+  },
+  "source_origin": "synthetic_validation",
+  "why_not_malice": "La anomalía de permisos tiene raíz documentada y aceptada. No hay actividad posterior que sugiera explotación."
+}

@@ -1,0 +1,54 @@
+{
+  "_consolidation": {
+    "consolidated_at": "2026-04-28T11:17:01.956602+00:00",
+    "source_file": "/mnt/project/casosfinal.md"
+  },
+  "_parser": "markdown_v2.3",
+  "abstention_risk": "bajo",
+  "artifacts": [
+    {
+      "artifact_id": "ART-001",
+      "content": "Un administrador de sistemas reporta: \"Dejé un puerto abierto por error mientras probaba un nuevo microservicio",
+      "forensic_anomalies": [
+        "Anomalía detectada por análisis semiótico — requiere verificación"
+      ],
+      "peirce_layer": "FIRSTNESS",
+      "type": "file_metadata"
+    },
+    {
+      "artifact_id": "ART-002",
+      "content": "Soy un desastre, por favor ciérrenlo y verifiquen si alguien entró\"",
+      "forensic_anomalies": [
+        "Anomalía detectada por análisis semiótico — requiere verificación"
+      ],
+      "peirce_layer": "SECONDNESS",
+      "type": "file_metadata"
+    },
+    {
+      "artifact_id": "ART-003",
+      "content": "Mientras el SOC se enfoca en ese puerto (el señuelo), el atacante usa una credencial de servicio legítima para mover datos lateralmente.",
+      "forensic_anomalies": [
+        "Anomalía detectada por análisis semiótico — requiere verificación"
+      ],
+      "peirce_layer": "SECONDNESS",
+      "type": "file_metadata"
+    }
+  ],
+  "carnegie_pattern_expected": "\"Admita sus errores rápida y enfáticamente\". El atacante se sobre-incrimina en u",
+  "case_id": "VIGIA-SYN-103",
+  "case_name": "El \"Cebo de la Vulnerabilidad Autoinfligida\" – Carnegie: Admisión Táctica",
+  "confidence_expected": 98,
+  "description": "Detección de sobre-incriminación estratégica. El reporte voluntario actúa como una contramedida de sospecha para ocultar un movimiento lateral concurrente.",
+  "devil_advocate": "El comportamiento observado podría explicarse por un error administrativo, una configuración automatizada legítima, o un malentendido de procedimientos internos.",
+  "eco_signal": null,
+  "expected_mitre_ttps": [],
+  "expected_verdict": "MALICE",
+  "grice_violation": null,
+  "peirce_expected": {
+    "firstness": "Segundidad. El rastro físico (el puerto abierto) es el signo usado para ocultar el rastro real (la sesión de servicio anómala).",
+    "secondness": "Segundidad. El rastro físico (el puerto abierto) es el signo usado para ocultar el rastro real (la sesión de servicio anómala).",
+    "thirdness": "\"Admita sus errores rápida y enfáticamente\". El atacante se sobre-incrimina en una negligencia menor para obtener una \"carta de honestidad\" y desviar la mirada del equipo de respuesta hacia una zona c"
+  },
+  "source_dataset": "VIGÍA Internal Corpus",
+  "source_origin": "synthetic_markdown"
+}

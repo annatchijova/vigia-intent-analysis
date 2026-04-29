@@ -1,0 +1,54 @@
+{
+  "_consolidation": {
+    "consolidated_at": "2026-04-28T11:17:02.005392+00:00",
+    "source_file": "/mnt/project/casoscasos.md"
+  },
+  "_parser": "markdown_v2.3",
+  "abstention_risk": "bajo",
+  "artifacts": [
+    {
+      "artifact_id": "ART-001",
+      "content": "Se encuentra un archivo llamado passwords.txt en el escritorio de un servidor",
+      "forensic_anomalies": [
+        "Anomalía detectada por análisis semiótico — requiere verificación"
+      ],
+      "peirce_layer": "FIRSTNESS",
+      "type": "file_metadata"
+    },
+    {
+      "artifact_id": "ART-002",
+      "content": "Adentro hay contraseñas obvias como 123456",
+      "forensic_anomalies": [
+        "Anomalía detectada por análisis semiótico — requiere verificación"
+      ],
+      "peirce_layer": "SECONDNESS",
+      "type": "file_metadata"
+    },
+    {
+      "artifact_id": "ART-003",
+      "content": "Mientras el analista se ríe de lo \"malo\" que es el atacante, un proceso de sistema legítimo (svchost.exe) ha sido modificado para exfiltrar el tráfico de red mediante esteganografía en los paquetes ICMP.",
+      "forensic_anomalies": [
+        "Anomalía detectada por análisis semiótico — requiere verificación"
+      ],
+      "peirce_layer": "SECONDNESS",
+      "type": "file_metadata"
+    }
+  ],
+  "carnegie_pattern_expected": null,
+  "case_id": "VIGIA-SYN-121",
+  "case_name": "El \"Señuelo de la Competencia Mediocre\" – Eco: Falso Rastro de Script-Kiddie",
+  "confidence_expected": 99,
+  "description": "Detección de señuelo de capacidad técnica. El rastro de 'aficionado' es una contramedida semiótica para ocultar una persistencia de alta sofisticación.",
+  "devil_advocate": "El comportamiento observado podría explicarse por un error administrativo, una configuración automatizada legítima, o un malentendido de procedimientos internos.",
+  "eco_signal": "Falso rastro de competencia técnica inferior. El atacante quiere que el perito s",
+  "expected_mitre_ttps": [],
+  "expected_verdict": "MALICE",
+  "grice_violation": null,
+  "peirce_expected": {
+    "firstness": "Se encuentra un archivo llamado passwords.txt en el escritorio de un servidor. Adentro hay contraseñas obvias como 123456. Mientras el analista se ríe de lo \"malo\" que es el atacante, un proceso de si",
+    "secondness": "Contradicción indexical en los artefactos.",
+    "thirdness": "Terceridad. La \"estupidez\" del rastro es una ley de distracción."
+  },
+  "source_dataset": "VIGÍA Internal Corpus",
+  "source_origin": "synthetic_markdown"
+}

@@ -1,0 +1,63 @@
+{
+  "_consolidation": {
+    "consolidated_at": "2026-04-28T11:17:01.972162+00:00",
+    "source_file": "/mnt/project/nuevoscasos.md"
+  },
+  "_parser": "markdown_v2.3",
+  "abstention_risk": "bajo",
+  "artifacts": [
+    {
+      "artifact_id": "ART-001",
+      "content": "El administrador de base de datos (DBA_Admin) detecta una anomalía en las tablas de auditoría y envía un mensaje general: \"Chicos, qué desastre, borré sin querer el log de ayer haciendo limpieza de espacio",
+      "forensic_anomalies": [
+        "Anomalía detectada por análisis semiótico — requiere verificación"
+      ],
+      "peirce_layer": "FIRSTNESS",
+      "type": "syslog"
+    },
+    {
+      "artifact_id": "ART-002",
+      "content": "Menos mal que tengo el backup local en mi laptop",
+      "forensic_anomalies": [
+        "Anomalía detectada por análisis semiótico — requiere verificación"
+      ],
+      "peirce_layer": "SECONDNESS",
+      "type": "file_metadata"
+    },
+    {
+      "artifact_id": "ART-003",
+      "content": "Ya lo estoy subiendo\"",
+      "forensic_anomalies": [
+        "Anomalía detectada por análisis semiótico — requiere verificación"
+      ],
+      "peirce_layer": "SECONDNESS",
+      "type": "file_metadata"
+    },
+    {
+      "artifact_id": "ART-004",
+      "content": "El backup que sube tiene los hashes correctos pero el contenido ha sido sutilmente alterado para eliminar un acceso específico.",
+      "forensic_anomalies": [
+        "Destrucción de evidencia potencial"
+      ],
+      "peirce_layer": "THIRDNESS",
+      "type": "file_metadata"
+    }
+  ],
+  "carnegie_pattern_expected": "\"Admita su error rápida y enfáticamente\". El atacante se sobre-incrimina en una",
+  "case_id": "VIGIA-SYN-054",
+  "case_name": "El \"Cebo del Error Humano\" – Teatralidad Carnegie",
+  "confidence_expected": 97,
+  "description": "Uso de la confesión como contramedida de sospecha. El borrado no fue un error; fue el pretexto necesario para re-inyectar un log manipulado.",
+  "devil_advocate": "El comportamiento observado podría explicarse por un error administrativo, una configuración automatizada legítima, o un malentendido de procedimientos internos.",
+  "eco_signal": null,
+  "expected_mitre_ttps": [],
+  "expected_verdict": "MALICE",
+  "grice_violation": "Violación del máximo de manera (la \"limpieza de espacio\" es una explicación ambi",
+  "peirce_expected": {
+    "firstness": "El administrador de base de datos (DBA_Admin) detecta una anomalía en las tablas de auditoría y envía un mensaje general: \"Chicos, qué desastre, borré sin querer el log de ayer haciendo limpieza de es",
+    "secondness": "Violación del máximo de manera (la \"limpieza de espacio\" es una explicación ambigua para una acción técnica tan precisa).",
+    "thirdness": "Terceridad. El hábito de un DBA senior contradice la \"torpeza\" de un rm masivo sobre logs de auditoría sin dry-run."
+  },
+  "source_dataset": "VIGÍA Internal Corpus",
+  "source_origin": "synthetic_markdown"
+}

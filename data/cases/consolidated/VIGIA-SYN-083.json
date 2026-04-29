@@ -1,0 +1,45 @@
+{
+  "_consolidation": {
+    "consolidated_at": "2026-04-28T11:17:01.918242+00:00",
+    "source_file": "/mnt/project/casosfinal.md"
+  },
+  "_parser": "markdown_v2.3",
+  "abstention_risk": "bajo",
+  "artifacts": [
+    {
+      "artifact_id": "ART-001",
+      "content": "Un analista senior envía un mail urgente: \"Me acabo de dar cuenta de que por error dejé mi sesión de SSH abierta en un servidor público durante 4 horas",
+      "forensic_anomalies": [
+        "Presión temporal artificial"
+      ],
+      "peirce_layer": "FIRSTNESS",
+      "type": "timestamp"
+    },
+    {
+      "artifact_id": "ART-002",
+      "content": "Soy un irresponsable, por favor revóquenme los accesos hasta que termine la auditoría de mi cuenta\".",
+      "forensic_anomalies": [
+        "Anomalía detectada por análisis semiótico — requiere verificación"
+      ],
+      "peirce_layer": "SECONDNESS",
+      "type": "file_metadata"
+    }
+  ],
+  "carnegie_pattern_expected": "\"Admita sus errores rápida y enfáticamente\". El atacante se auto-denuncia por un",
+  "case_id": "VIGIA-SYN-083",
+  "case_name": "El \"Sacrificio del Peón\" – Carnegie: Admisión de Culpa Instrumental",
+  "confidence_expected": 97,
+  "description": "Detección de sobre-incriminación estratégica. El usuario busca saturar el sesgo de confianza del auditor. El timing entre la confesión y la creación del cron job indica una maniobra de distracción.",
+  "devil_advocate": "El comportamiento observado podría explicarse por un error administrativo, una configuración automatizada legítima, o un malentendido de procedimientos internos.",
+  "eco_signal": null,
+  "expected_mitre_ttps": [],
+  "expected_verdict": "MALICE",
+  "grice_violation": "Violación del máximo de calidad. La denuncia es real, pero el motivo es falso: n",
+  "peirce_expected": {
+    "firstness": "Un analista senior envía un mail urgente: \"Me acabo de dar cuenta de que por error dejé mi sesión de SSH abierta en un servidor público durante 4 horas. Soy un irresponsable, por favor revóquenme los ",
+    "secondness": "Segundidad. Mientras el equipo de seguridad \"audita\" su cuenta con benevolencia, una tarea programada (cron job) instalada 5 minutos antes de la denuncia empieza a exfiltrar datos bajo la identidad de un servicio de sistema.",
+    "thirdness": "\"Admita sus errores rápida y enfáticamente\". El atacante se auto-denuncia por una falta de política (dejar sesión abierta) para ganar una coartada de \"honestidad extrema\"."
+  },
+  "source_dataset": "VIGÍA Internal Corpus",
+  "source_origin": "synthetic_markdown"
+}

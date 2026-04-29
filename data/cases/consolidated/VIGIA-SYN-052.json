@@ -1,0 +1,72 @@
+{
+  "_consolidation": {
+    "consolidated_at": "2026-04-28T11:17:01.971437+00:00",
+    "source_file": "/mnt/project/nuevoscasos.md"
+  },
+  "_parser": "markdown_v2.3",
+  "abstention_risk": "bajo",
+  "artifacts": [
+    {
+      "artifact_id": "ART-001",
+      "content": "Un atacante deja un archivo llamado `PLAN_DE_ATAQUE_RUSO.txt` en el escritorio, con coordenadas de GPS en Moscú y una lista de \"objetivos gubernamentales\"",
+      "forensic_anomalies": [
+        "Desliz de teclado — atribución lingüística"
+      ],
+      "peirce_layer": "FIRSTNESS",
+      "type": "file_metadata"
+    },
+    {
+      "artifact_id": "ART-002",
+      "content": "Al mismo tiempo, el ataque real se está ejecutando desde una IP de una universidad local mediante una vulnerabilidad de día cero (`0-day`)",
+      "forensic_anomalies": [
+        "Anomalía detectada por análisis semiótico — requiere verificación"
+      ],
+      "peirce_layer": "SECONDNESS",
+      "type": "network_flow"
+    },
+    {
+      "artifact_id": "ART-003",
+      "content": "* **Eco:** El atacante crea un signo tan obvio que solo puede ser falso",
+      "forensic_anomalies": [
+        "Anomalía detectada por análisis semiótico — requiere verificación"
+      ],
+      "peirce_layer": "SECONDNESS",
+      "type": "file_metadata"
+    },
+    {
+      "artifact_id": "ART-004",
+      "content": "Es un \"falso rastro\" para analistas mediocres",
+      "forensic_anomalies": [
+        "Anomalía detectada por análisis semiótico — requiere verificación"
+      ],
+      "peirce_layer": "THIRDNESS",
+      "type": "file_metadata"
+    },
+    {
+      "artifact_id": "ART-005",
+      "content": "* **Peirce:** Terceridad",
+      "forensic_anomalies": [
+        "Anomalía detectada por análisis semiótico — requiere verificación"
+      ],
+      "peirce_layer": "THIRDNESS",
+      "type": "file_metadata"
+    }
+  ],
+  "carnegie_pattern_expected": null,
+  "case_id": "VIGIA-SYN-052",
+  "case_name": "El \"Falso Rastro de Aficionado\" – Eco: Sobre-interpretación",
+  "confidence_expected": 90,
+  "description": "** \"Detección de teatro forense. La atribución explícita es una contramedida semiótica para desviar la investigación de la verdadera fuente interna.",
+  "devil_advocate": "El comportamiento observado podría explicarse por un error administrativo, una configuración automatizada legítima, o un malentendido de procedimientos internos.",
+  "eco_signal": "El atacante crea un signo tan obvio que solo puede ser falso. Es un \"falso rastr",
+  "expected_mitre_ttps": [],
+  "expected_verdict": "MALICE",
+  "grice_violation": null,
+  "peirce_expected": {
+    "firstness": "Un atacante deja un archivo llamado `PLAN_DE_ATAQUE_RUSO.txt` en el escritorio, con coordenadas de GPS en Moscú y una lista de \"objetivos gubernamentales\". Al mismo tiempo, el ataque real se está ejec",
+    "secondness": "Contradicción indexical en los artefactos.",
+    "thirdness": "Terceridad. La obviedad del signo de atribución delata su carácter de fabricación. Un atacante real no rotula sus planes en el escritorio.\n* **Interpretación de VIGÍA:** \"Detección de teatro forense. La atribución explícita es una contramedida semiótica para desviar la investigación de la verdadera "
+  },
+  "source_dataset": "VIGÍA Internal Corpus",
+  "source_origin": "synthetic_markdown"
+}

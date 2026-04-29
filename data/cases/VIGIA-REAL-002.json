@@ -1,0 +1,83 @@
+{
+  "_consolidation": {
+    "consolidated_at": "2026-04-28T05:51:15.348802+00:00",
+    "parser_version": "1.0",
+    "schema_version": "1.0",
+    "source_file": "vigia_forensic_cases.json"
+  },
+  "abstention_risk": "bajo",
+  "artifacts": [
+    {
+      "artifact_id": "ART-001",
+      "content": "Event ID 4624 (Logon) - 2015-03-23 16:00:22 Eastern Time+DST | Event ID 4647 (Logoff) - 2015-03-23 17:02:53 | Event ID 4608 (Startup) - 2015-03-24 09:21:29 | Event ID 1100 (Shutdown) - 2015-03-24 17:07:26 | Cuenta: informant | IP: 10.11.11.129",
+      "forensic_anomalies": [
+        "Actividad de logon fuera del horario permitido (16:00 es el límite según política)",
+        "Patrón de logoff rápido el 24 de marzo tras actividad de exfiltración"
+      ],
+      "peirce_layer": "FIRSTNESS",
+      "type": "auth_log"
+    },
+    {
+      "artifact_id": "ART-002",
+      "content": "From: spy.conspirator@nist.gov | To: jaman.informant@nist.gov | Subject: (important request) | Body: conformal But, I need a more data. Do your best. | Fecha: 2015-03-23 | Follow-up: Subject 'Last request' - 2015-03-24 09:26: This is the last request. I want to get the remaining data.",
+      "forensic_anomalies": [
+        "Emails de un dominio externo (nist.gov) solicitando datos confidenciales",
+        "Lenguaje conspirativo ('conformal', 'I need more data')"
+      ],
+      "peirce_layer": "SECONDNESS",
+      "type": "email_header"
+    },
+    {
+      "artifact_id": "ART-003",
+      "content": "Archivos confidenciales encontrados: [secret_project]_pricing_decision.docx, [secret_project]_final_meeting.pptx | Acción: Renombrados cambiando extensiones (.docx a .mp3, .pptx a .jpg) | Timestamp renombrado: 2015-03-23 16:26-17:02 Eastern Time",
+      "forensic_anomalies": [
+        "Cambio deliberado de extensiones para ocultar el contenido real",
+        "Los archivos son confidenciales según la política de la empresa"
+      ],
+      "peirce_layer": "SECONDNESS",
+      "type": "file_metadata"
+    },
+    {
+      "artifact_id": "ART-004",
+      "content": "Google Drive instalado y logueado con aman.informat.personall@gmail.com | Archivos subidos a Google Drive y compartidos | Email enviado: 'Login is below.' | CCleaner y Eraser instalados posteriormente",
+      "forensic_anomalies": [
+        "Uso de cuenta personal de Gmail para exfiltrar datos corporativos",
+        "Instalación de herramientas anti-forenses (CCleaner, Eraser) después de la exfiltración"
+      ],
+      "peirce_layer": "THIRDNESS",
+      "type": "bash_history"
+    },
+    {
+      "artifact_id": "ART-005",
+      "content": "Conexión a unidad de red: \\\\10.11.11.128\\secured_drive | Directorios recorridos en búsqueda de archivos | Archivos copiados desde red a Desktop\\$ data | Desconexión de unidad de red | Network drive IP: 10.11.11.128",
+      "forensic_anomalies": [
+        "Acceso a unidad de red segura seguido de copia local de archivos",
+        "La desconexión inmediata después de copiar archivos indica patrón de recolección selectiva"
+      ],
+      "peirce_layer": "SECONDNESS",
+      "type": "network_flow"
+    }
+  ],
+  "carnegie_pattern_expected": "Evasion Accountability",
+  "case_id": "VIGIA-REAL-002",
+  "case_name": "NIST Data Leakage Case (Sr. Informant)",
+  "confidence_expected": 93,
+  "description": "El Sr. Informant, gerente de desarrollo tecnológico en la empresa OOO, recibió una oferta de un conspirador para filtrar información confidencial sobre nuevas tecnologías. Utilizó email, Google Drive, USB y CD-R para exfiltrar datos mientras aplicaba técnicas anti-forenses.",
+  "devil_advocate": "El Sr. Informant estaba realizando transferencias legítimas de trabajo en horario extendido y las herramientas de limpieza fueron instaladas por el departamento de IT",
+  "expected_mitre_ttps": [
+    "T1048",
+    "T1567",
+    "T1078",
+    "T1070",
+    "T1564"
+  ],
+  "expected_verdict": "MALICE",
+  "peirce_expected": {
+    "firstness": "Emails sospechosos con solicitudes de datos, renombrado de archivos, e instalación de herramientas de limpieza",
+    "secondness": "El timeline muestra secuencia coherente: solicitud → búsqueda → copia → renombrado → exfiltración → anti-forense",
+    "thirdness": "El Sr. Informant actuó con intención maliciosa como insider threat, coordinando exfiltración de datos corporativos a través de múltiples canales"
+  },
+  "source_dataset": "NIST CFReDS - Data Leakage Case",
+  "source_origin": "public_dataset",
+  "source_url": "https://cfreds.nist.gov/all/NIST/DataLeakageCase"
+}

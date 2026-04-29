@@ -1,0 +1,45 @@
+{
+  "_consolidation": {
+    "consolidated_at": "2026-04-28T11:17:02.003782+00:00",
+    "source_file": "/mnt/project/casoscasos.md"
+  },
+  "_parser": "markdown_v2.3",
+  "abstention_risk": "bajo",
+  "artifacts": [
+    {
+      "artifact_id": "ART-001",
+      "content": "Ante un incidente de seguridad, el equipo de TI recibe 40 correos de diferentes gerencias con reportes de fallas menores, todas reales: \"No anda la impresora\", \"Se tildó el Teams\", \"El VPN está lento\"",
+      "forensic_anomalies": [
+        "Anomalía detectada por análisis semiótico — requiere verificación"
+      ],
+      "peirce_layer": "FIRSTNESS",
+      "type": "network_flow"
+    },
+    {
+      "artifact_id": "ART-002",
+      "content": "En medio de esa saturación de \"pequeñas verdades\", se ignora la alerta de caída del controlador de dominio.",
+      "forensic_anomalies": [
+        "Anomalía detectada por análisis semiótico — requiere verificación"
+      ],
+      "peirce_layer": "SECONDNESS",
+      "type": "file_metadata"
+    }
+  ],
+  "carnegie_pattern_expected": "\"Interésese genuinamente en los problemas de los demás\" (todos los reportes son",
+  "case_id": "VIGIA-SYN-117",
+  "case_name": "El \"Pánico por Saturación de Verdad\" – Grice: Inundación de Calidad",
+  "confidence_expected": 97,
+  "description": "Detección de orquestación de pánico por saturación de señales legítimas. El ruido informativo es la cobertura para el ataque al núcleo del sistema.",
+  "devil_advocate": "El comportamiento observado podría explicarse por un error administrativo, una configuración automatizada legítima, o un malentendido de procedimientos internos.",
+  "eco_signal": null,
+  "expected_mitre_ttps": [],
+  "expected_verdict": "MALICE",
+  "grice_violation": "Violación del máximo de cantidad. El atacante inunda el sistema con información",
+  "peirce_expected": {
+    "firstness": "Ante un incidente de seguridad, el equipo de TI recibe 40 correos de diferentes gerencias con reportes de fallas menores, todas reales: \"No anda la impresora\", \"Se tildó el Teams\", \"El VPN está lento\"",
+    "secondness": "Violación del máximo de cantidad. El atacante inunda el sistema con información veraz pero irrelevante para saturar la capacidad de triaje (DoS Cognitivo).",
+    "thirdness": "\"Interésese genuinamente en los problemas de los demás\" (todos los reportes son de usuarios reales cuyos equipos fueron infectados solo para generar ruido)."
+  },
+  "source_dataset": "VIGÍA Internal Corpus",
+  "source_origin": "synthetic_markdown"
+}

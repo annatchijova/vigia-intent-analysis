@@ -1,0 +1,51 @@
+{
+  "abstention_risk": "bajo",
+  "artifacts": [
+    {
+      "artifact_id": "ART-001",
+      "content": "PID: 7 | Name: kworker/0:1H | PPID: 2 (kthreadd) | User: root | CPU: 0.0% | MEM: 0.0% | Start: boot time | pslist shows NO parent (expected for kernel threads)",
+      "forensic_anomalies": [
+        "Proceso sin parent visible en pslist",
+        "Nombre no descriptivo (kworker)"
+      ],
+      "peirce_layer": "FIRSTNESS",
+      "type": "process_list"
+    },
+    {
+      "artifact_id": "ART-002",
+      "content": "Parent in kernel space: kthreadd (PID 2) | All kernel threads children of kthreadd | /proc/7/status: PPid: 2 | /proc/7/comm: kworker/0:1H | Kernel doc: 'Workqueue mechanism for deferred work'",
+      "forensic_anomalies": [
+        "Parent existe en espacio de kernel (no visible en pslist de usuario)",
+        "Documentación oficial del kernel confirma propósito"
+      ],
+      "peirce_layer": "SECONDNESS",
+      "type": "process_list"
+    },
+    {
+      "artifact_id": "ART-003",
+      "content": "System: Ubuntu 22.04 LTS | Kernel: 5.15.0-generic | Uptime: 45 days | 12 other kworker threads present | No anomalous network connections | No file descriptors to suspicious files",
+      "forensic_anomalies": [
+        "Múltiples kworker threads presentes (normal)",
+        "Sin conexiones de red ni archivos sospechosos"
+      ],
+      "peirce_layer": "THIRDNESS",
+      "type": "bash_history"
+    }
+  ],
+  "carnegie_pattern_expected": null,
+  "case_id": "VIGIA-BEN-012",
+  "case_name": "El Kernel Thread Huérfano — Proceso Legítimo del SO",
+  "confidence_expected": 93,
+  "description": "Proceso kworker/0:1H aparece sin parent en pslist. Es un kernel worker thread de Linux, normal en sistemas con I/O intensivo, documentado en kernel.org y presente en todas las distribuciones.",
+  "devil_advocate": "El atacante instaló un rootkit que se camufla como kworker thread para evadir detección, aprovechando que los analistas ignoran estos procesos",
+  "devil_refutation": "La hipótesis de rootkit no explica por qué el proceso tiene el parent correcto en kernel space, por qué no hay network connections, ni por qué no hay file descriptors anómalos. Un rootkit real ocultaría estas trazas. La explicación benigna es más simple.",
+  "expected_mitre_ttps": [],
+  "expected_verdict": "NOISE",
+  "peirce_expected": {
+    "firstness": "Proceso sin parent visible con nombre críptico",
+    "secondness": "El parent existe en kernel space (kthreadd, PID 2), documentado en kernel.org. Es un mecanismo estándar de workqueue de Linux. Hay 12 threads similares en el sistema.",
+    "thirdness": "Es un kernel worker thread legítimo del sistema operativo. La apariencia de 'huérfano' es artefacto de herramientas de usuario que no ven kernel space. No hay comportamiento anómalo, no hay network, no hay files sospechosos."
+  },
+  "source_origin": "synthetic_validation",
+  "why_not_malice": "El proceso es mecanismo estándar del kernel Linux, documentado y presente en todas las instancias. No hay desviación de comportamiento."
+}

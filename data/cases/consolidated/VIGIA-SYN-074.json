@@ -1,0 +1,63 @@
+{
+  "_consolidation": {
+    "consolidated_at": "2026-04-28T11:17:01.975512+00:00",
+    "source_file": "/mnt/project/nuevoscasos.md"
+  },
+  "_parser": "markdown_v2.3",
+  "abstention_risk": "bajo",
+  "artifacts": [
+    {
+      "artifact_id": "ART-001",
+      "content": "Un servidor aparece cifrado",
+      "forensic_anomalies": [
+        "Anomalía detectada por análisis semiótico — requiere verificación"
+      ],
+      "peirce_layer": "FIRSTNESS",
+      "type": "file_metadata"
+    },
+    {
+      "artifact_id": "ART-002",
+      "content": "En lugar de una nota de rescate clásica, hay un archivo SEGURIDAD_AVISO.txt: \"Tuvimos que cifrar sus bases de datos porque detectamos una vulnerabilidad crítica de exfiltración activa",
+      "forensic_anomalies": [
+        "Anomalía detectada por análisis semiótico — requiere verificación"
+      ],
+      "peirce_layer": "SECONDNESS",
+      "type": "file_metadata"
+    },
+    {
+      "artifact_id": "ART-003",
+      "content": "Sus datos están seguros ahora",
+      "forensic_anomalies": [
+        "Anomalía detectada por análisis semiótico — requiere verificación"
+      ],
+      "peirce_layer": "SECONDNESS",
+      "type": "timestamp"
+    },
+    {
+      "artifact_id": "ART-004",
+      "content": "Contacte a este ID de Telegram para recibir la llave una vez que arreglen su firewall\".",
+      "forensic_anomalies": [
+        "Anomalía detectada por análisis semiótico — requiere verificación"
+      ],
+      "peirce_layer": "THIRDNESS",
+      "type": "file_metadata"
+    }
+  ],
+  "carnegie_pattern_expected": "Apelar a los motivos más nobles (la seguridad del cliente).",
+  "case_id": "VIGIA-SYN-074",
+  "case_name": "El \"Ransomware de Motivo Noble\" – Inversión Semántica",
+  "confidence_expected": 99,
+  "description": "Secuestro de narrativa de respuesta a incidentes. El cifrado sin consentimiento es un acto hostil, independientemente de la máscara de protección.",
+  "devil_advocate": "El comportamiento observado podría explicarse por un error administrativo, una configuración automatizada legítima, o un malentendido de procedimientos internos.",
+  "eco_signal": "Falso rastro. El atacante intenta transformar un acto de extorsión en una \"consu",
+  "expected_mitre_ttps": [],
+  "expected_verdict": "MALICE",
+  "grice_violation": null,
+  "peirce_expected": {
+    "firstness": "Un servidor aparece cifrado. En lugar de una nota de rescate clásica, hay un archivo SEGURIDAD_AVISO.txt: \"Tuvimos que cifrar sus bases de datos porque detectamos una vulnerabilidad crítica de exfiltr",
+    "secondness": "Segundidad. El objeto físico (datos inaccesibles) contradice la ley del servicio (disponibilidad).",
+    "thirdness": "Segundidad. El objeto físico (datos inaccesibles) contradice la ley del servicio (disponibilidad)."
+  },
+  "source_dataset": "VIGÍA Internal Corpus",
+  "source_origin": "synthetic_markdown"
+}

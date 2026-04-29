@@ -1,0 +1,51 @@
+{
+  "abstention_risk": "bajo",
+  "artifacts": [
+    {
+      "artifact_id": "ART-001",
+      "content": "File: salaries_2024_confidential.pdf | Owner: juan.manager | Location: ~/Desktop | Created: 2024-01-10 10:00 | Source: email attachment from hr@company.com | Size: 2.3MB | Encrypted: No",
+      "forensic_anomalies": [
+        "Archivo confidencial en Desktop sin encriptación",
+        "Descargado desde email corporativo"
+      ],
+      "peirce_layer": "FIRSTNESS",
+      "type": "file_metadata"
+    },
+    {
+      "artifact_id": "ART-002",
+      "content": "From: hr@company.com | To: managers@company.com (distribution list, 45 recipients) | Subject: 'Guía de Compensación 2024 — Uso interno' | Date: 2024-01-10 09:55 | DKIM: PASS | SPF: PASS",
+      "forensic_anomalies": [
+        "Email de RRHH a lista de distribución amplia",
+        "Asunto indica uso interno restricto"
+      ],
+      "peirce_layer": "SECONDNESS",
+      "type": "email_header"
+    },
+    {
+      "artifact_id": "ART-003",
+      "content": "HR policy HR-2023-044: 'Guía de compensación se distribuye anualmente a managers via email. No imprimir. No reenviar.' | Acknowledgment signed by juan.manager: 2024-01-10 10:05 | Training completion: Data Handling 2023",
+      "forensic_anomalies": [
+        "Política de RRHH que autoriza la distribución",
+        "Acknowledgment firmado por el receptor"
+      ],
+      "peirce_layer": "THIRDNESS",
+      "type": "file_metadata"
+    }
+  ],
+  "carnegie_pattern_expected": null,
+  "case_id": "VIGIA-BEN-007",
+  "case_name": "El PDF de RRHH — Descarga Legítima",
+  "confidence_expected": 86,
+  "description": "Archivo 'salaries_2024_confidential.pdf' aparece en Desktop de empleado. Es la guía de compensación anual distribuida por RRHH a todos los managers, con email de distribución y lista de destinatarios.",
+  "devil_advocate": "Juan Manager es un insider que solicitó la guía de compensación para venderla a competidores",
+  "devil_refutation": "La hipótesis insider no explica por qué el archivo fue enviado a 45 managers (no solo a Juan), por qué está firmado el acknowledgment, ni por qué no hay trazas de exfiltración. La explicación benigna es más simple.",
+  "expected_mitre_ttps": [],
+  "expected_verdict": "NOISE",
+  "peirce_expected": {
+    "firstness": "Archivo confidencial en Desktop de manager",
+    "secondness": "El archivo proviene de email legítimo de RRHH a lista de distribución autorizada. El receptor firmó acknowledgment de política de manejo de datos.",
+    "thirdness": "Es distribución corporativa autorizada de documento interno. La presencia en Desktop es práctica común (aunque no ideal) y no indica exfiltración."
+  },
+  "source_origin": "synthetic_validation",
+  "why_not_malice": "El archivo tiene raíz de distribución corporativa autorizada. No hay actividad post-descarga que sugiera exfiltración."
+}

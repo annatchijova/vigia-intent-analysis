@@ -1,0 +1,45 @@
+{
+  "_consolidation": {
+    "consolidated_at": "2026-04-28T11:17:01.920745+00:00",
+    "source_file": "/mnt/project/casosfinal.md"
+  },
+  "_parser": "markdown_v2.3",
+  "abstention_risk": "bajo",
+  "artifacts": [
+    {
+      "artifact_id": "ART-001",
+      "content": "Una sesión de administración remota dura 45 minutos",
+      "forensic_anomalies": [
+        "Anomalía detectada por análisis semiótico — requiere verificación"
+      ],
+      "peirce_layer": "FIRSTNESS",
+      "type": "timestamp"
+    },
+    {
+      "artifact_id": "ART-002",
+      "content": "Los tiempos entre comandos tienen una varianza de exactamente 0.05 segundos en el 90% de la sesión.",
+      "forensic_anomalies": [
+        "Anomalía detectada por análisis semiótico — requiere verificación"
+      ],
+      "peirce_layer": "SECONDNESS",
+      "type": "bash_history"
+    }
+  ],
+  "carnegie_pattern_expected": null,
+  "case_id": "VIGIA-SYN-089",
+  "case_name": "La \"Huella de la Perfección\" – Jitter Sintético",
+  "confidence_expected": 95,
+  "description": "Detección de aleatoriedad artificial. El patrón temporal carece de la entropía cognitiva propia de un operador humano analizando resultados.",
+  "devil_advocate": "Las inconsistencias detectadas podrían deberse a un cambio de hábitos personales, una rotación de personal, o una herramienta de automatización no documentada.",
+  "eco_signal": null,
+  "expected_mitre_ttps": [],
+  "expected_verdict": "INTENT",
+  "grice_violation": "N/A.",
+  "peirce_expected": {
+    "firstness": "Una sesión de administración remota dura 45 minutos. Los tiempos entre comandos tienen una varianza de exactamente 0.05 segundos en el 90% de la sesión.",
+    "secondness": "N/A.",
+    "thirdness": "Terceridad (Ley). Los humanos no piensan con cronómetro. Una varianza tan estable es ley de máquina intentando simular el ritmo de un humano (Anti-Forensics)."
+  },
+  "source_dataset": "VIGÍA Internal Corpus",
+  "source_origin": "synthetic_markdown"
+}

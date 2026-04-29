@@ -1,0 +1,45 @@
+{
+  "_consolidation": {
+    "consolidated_at": "2026-04-28T11:17:01.959830+00:00",
+    "source_file": "/mnt/project/casosfinal.md"
+  },
+  "_parser": "markdown_v2.3",
+  "abstention_risk": "bajo",
+  "artifacts": [
+    {
+      "artifact_id": "ART-001",
+      "content": "En medio de un incidente real de red, aparecen 20 tickets de soporte de cuentas distintas diciendo: \"No puedo entrar al mail\", \"El servidor está caído\", \"¿Nos hackearon?\"",
+      "forensic_anomalies": [
+        "Anomalía detectada por análisis semiótico — requiere verificación"
+      ],
+      "peirce_layer": "FIRSTNESS",
+      "type": "slack_message"
+    },
+    {
+      "artifact_id": "ART-002",
+      "content": "Ninguna de esas cuentas tiene problemas reales de acceso al mail según los logs de O365.",
+      "forensic_anomalies": [
+        "Anomalía detectada por análisis semiótico — requiere verificación"
+      ],
+      "peirce_layer": "SECONDNESS",
+      "type": "syslog"
+    }
+  ],
+  "carnegie_pattern_expected": "\"Haga que la otra persona se sienta feliz de hacer lo que usted sugiere\" (en est",
+  "case_id": "VIGIA-SYN-112",
+  "case_name": "La \"Sincronización del Pánico Semántico\" – Grice: Máximo de Manera",
+  "confidence_expected": 97,
+  "description": "Detección de ataque de denegación de servicio cognitivo (Cognitive DoS). El flujo coordinado de reportes falsos busca paralizar la capacidad de triaje del SOC durante un ataque real.",
+  "devil_advocate": "El comportamiento observado podría explicarse por un error administrativo, una configuración automatizada legítima, o un malentendido de procedimientos internos.",
+  "eco_signal": null,
+  "expected_mitre_ttps": [],
+  "expected_verdict": "MALICE",
+  "grice_violation": "Violación del máximo de manera (caos informativo deliberado).",
+  "peirce_expected": {
+    "firstness": "En medio de un incidente real de red, aparecen 20 tickets de soporte de cuentas distintas diciendo: \"No puedo entrar al mail\", \"El servidor está caído\", \"¿Nos hackearon?\". Ninguna de esas cuentas tien",
+    "secondness": "Violación del máximo de manera (caos informativo deliberado).",
+    "thirdness": "\"Haga que la otra persona se sienta feliz de hacer lo que usted sugiere\" (en este caso, unirse al pánico para saturar al equipo de seguridad)."
+  },
+  "source_dataset": "VIGÍA Internal Corpus",
+  "source_origin": "synthetic_markdown"
+}

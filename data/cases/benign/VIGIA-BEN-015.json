@@ -1,0 +1,51 @@
+{
+  "abstention_risk": "bajo",
+  "artifacts": [
+    {
+      "artifact_id": "ART-001",
+      "content": "ls -l /data | 100 files with identical mtime: 2024-05-10 03:47:22 | atime varies | ctime identical | All files from same snapshot",
+      "forensic_anomalies": [
+        "100 archivos con timestamp de modificación idéntico",
+        "ctime y mtime coinciden exactamente"
+      ],
+      "peirce_layer": "FIRSTNESS",
+      "type": "file_metadata"
+    },
+    {
+      "artifact_id": "ART-002",
+      "content": "Infrastructure ticket INF-2024-0551: 'Hardware failure on VM host node-07. 47 VMs affected. Restored from backup snapshot 2024-05-09-23:00.' | Technician: infra_team | Approval: VP Infrastructure | Downtime: 4 hours",
+      "forensic_anomalies": [
+        "Ticket de incidente de infraestructura con 47 VMs afectadas",
+        "Restauración desde snapshot aprobada por VP"
+      ],
+      "peirce_layer": "SECONDNESS",
+      "type": "bash_history"
+    },
+    {
+      "artifact_id": "ART-003",
+      "content": "Backup system: Veeam | Snapshot: 2024-05-09-23:00 | Restore point: 2024-05-10-03:47 (completion time) | 47 VMs restored simultaneously | All show identical mtime for restored files | atime reflects post-restore access",
+      "forensic_anomalies": [
+        "47 VMs restauradas simultáneamente",
+        "Sistema de backup Veeam con logs de restauración"
+      ],
+      "peirce_layer": "THIRDNESS",
+      "type": "file_metadata"
+    }
+  ],
+  "carnegie_pattern_expected": null,
+  "case_id": "VIGIA-BEN-015",
+  "case_name": "El Snapshot Restaurado — Timestamps Idénticos",
+  "confidence_expected": 91,
+  "description": "100 archivos en /data muestran timestamp idéntico de modificación. Es restauración de snapshot de VM después de incidente de hardware, documentado en ticket de infraestructura, con afectación de 47 usuarios.",
+  "devil_advocate": "El atacante causó el 'hardware failure' para forzar la restauración de snapshot, sabiendo que los timestamps idénticos pasarían desapercibidos como 'normalidad post-restore'",
+  "devil_refutation": "La hipótesis de sabotaje no explica por qué el hardware failure fue confirmado por vendor (Dell con warranty claim), por qué 47 VMs fueron afectadas (ataque indiscriminado), ni por qué no hay persistencia post-restore. La explicación benigna es más simple.",
+  "expected_mitre_ttps": [],
+  "expected_verdict": "NOISE",
+  "peirce_expected": {
+    "firstness": "Múltiples archivos con timestamp de modificación idéntico",
+    "secondness": "El timestamp idéntico coincide con el tiempo de finalización de restauración de snapshot documentada en ticket de infraestructura. Hay 47 VMs afectadas, todas con el mismo patrón. El sistema de backup (Veeam) tiene logs de la operación.",
+    "thirdness": "Es artefacto de restauración masiva de VMs desde snapshot. Los timestamps idénticos son característicos de operaciones de restore, no de timestomping. La hipótesis benigna explica la escala (100 archivos, 47 VMs) sin requerir coordinación maliciosa."
+  },
+  "source_origin": "synthetic_validation",
+  "why_not_malice": "Los timestamps idénticos tienen raíz en evento de infraestructura documentado y verificable por vendor. La escala (47 VMs) es consistente con fallo de hardware, no con ataque dirigido."
+}
