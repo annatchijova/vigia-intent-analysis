@@ -1,1 +1,1 @@
-from vigia.core.pipeline import VigiaPipeline, analyze_artifact
+from pipeline.pipeline import VigiaPipeline, run_vigia

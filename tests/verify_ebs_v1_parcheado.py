@@ -79,6 +79,13 @@ from __future__ import annotations
 
 # STDLIB ONLY — cero imports de produccion
 import argparse
+import os as _os
+import sys as _sys
+# Auto-path: agregar raíz del repo para imports standalone
+_HERE = _os.path.dirname(_os.path.abspath(__file__))
+_REPO_ROOT = _os.path.dirname(_HERE)  # tests/ -> repo/
+if _REPO_ROOT not in _sys.path:
+    _sys.path.insert(0, _REPO_ROOT)
 import hashlib
 import json
 import math
@@ -104,6 +111,61 @@ _VERIFIER_VERSION = "1.2.0"   # bumped por P0-1 float determinismo
 _DETERMINISTIC_FLOAT_PREC = 6
 
 
+# Implementación standalone de _canonicalize/_sha256_dict
+# Copiada de vigia/core/bundle_builder.py para funcionar sin PYTHONPATH
+def _canonicalize(obj: Any) -> Any:
+    """
+    Convierte recursivamente un objeto a forma canónica estricta para hasheo (H22).
+
+    Problema: JSON no distingue int de float (1 vs 1.0 → strings distintos).
+    Si el Optimizer produce un score como int y otro módulo lo lee como float,
+    el bundle_hash cambia sin que el contenido haya cambiado — rompe Invariante I2.
+
+    Reglas de canonicalización:
+    - float  → string con 8 decimales fijos ("1.00000000")
+    - int    → string con sufijo ":int" ("1:int") — diferencia de float(1)
+    - bool   → "true" / "false" (minúsculas, antes de int porque bool es subclase)
+    - None   → "null"
+    - str    → sin cambios
+    - dict   → keys ordenadas, valores recursivos
+    - list   → elementos recursivos (orden preservado — listas son ordenadas)
+    """
+    if isinstance(obj, bool):
+        return "true" if obj else "false"
+    if isinstance(obj, int):
+        return f"{obj}:int"
+    if isinstance(obj, float):
+        if obj != obj:          # NaN
+            return "nan"
+        if obj == float("inf"):
+            return "inf"
+        if obj == float("-inf"):
+            return "-inf"
+        return f"{obj:.8f}"
+    if isinstance(obj, str):
+        return obj
+    if obj is None:
+        return "null"
+    if isinstance(obj, dict):
+        return {k: _canonicalize(v) for k, v in sorted(obj.items())}
+    if isinstance(obj, (list, tuple)):
+        return [_canonicalize(v) for v in obj]
+    # Fallback para tipos no reconocidos — str() para no romper el hash
+    return str(obj)
+
+
+def _sha256_dict(obj: Dict) -> str:
+    """
+    SHA-256 determinístico de un dict con forma canónica estricta (H22).
+
+    Usa _canonicalize() antes de serializar para garantizar que
+    int(1) y float(1.0) produzcan hashes distintos y reproducibles
+    entre arquitecturas y versiones de Python.
+    """
+    canonical = _canonicalize(obj)
+    serialized = json.dumps(canonical, sort_keys=True, ensure_ascii=True).encode("utf-8")
+    return hashlib.sha256(serialized).hexdigest()
+
 def _round_floats(obj: Any) -> Any:
     """
     Normalizacion recursiva de floats para hashing determinista cross-OS.
@@ -125,13 +187,9 @@ def _round_floats(obj: Any) -> Any:
 # ---------------------------------------------------------------------------
 
 def _sha256_dict(obj: Dict) -> str:
-    """
-    SHA-256 determinístico de un dict.
-    sort_keys=True garantiza orden canonico.
-    _round_floats() garantiza estabilidad cross-OS en valores float.
-    """
-    normalized = _round_floats(obj)
-    serialized = json.dumps(normalized, sort_keys=True, default=str).encode("utf-8")
+    """SHA-256 determinístico — usa _canonicalize() igual que bundle_builder."""
+    canonical = _canonicalize(obj)
+    serialized = json.dumps(canonical, sort_keys=True, ensure_ascii=True).encode('utf-8')
     return hashlib.sha256(serialized).hexdigest()
 
 

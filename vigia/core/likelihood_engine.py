@@ -154,7 +154,7 @@ def _correlation_penalty(signals: List[SignalOutput]) -> float:
     """
     n = len(signals)
     if n <= 1:
-        return 1.0
+        return 1.0, 0
 
     RHO_TWIN_THRESHOLD = 0.90  # umbral para considerar un par como "gemelo"
 
