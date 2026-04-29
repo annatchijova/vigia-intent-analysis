@@ -85,7 +85,7 @@ PARA QUÉ SIRVE CADA CHECK:
      Sin esto, un atacante envía 10M deltas y el servidor se congela.
 
 9. ANTI_JAILBREAK_PROMPT
-   → Verifica que system_prompt_peirce.md contenga la regla
+   → Verifica que docs/system_prompt_peirce.md contenga la regla
      ANTI-JAILBREAK y NONCE_SOURCE_TAMPERING. Si el LLM puede ser
      convencido de "olvida estas instrucciones", todo el sistema cae.
 
@@ -136,21 +136,21 @@ from typing import Dict, List, Set, Tuple
 
 CRITICAL_FILES = [
     "vigia_sift_bridge.py",
-    "graph_stability.py",
-    "abductive_intent_engine_P0.py",
-    "visible_variables_P0.py",
-    "picerl_mapping_P0.py",
-    "mitre_clustering_P0.py",
-    "resource_optimizer.py",
-    "shadow_mode.py",
-    "eml_symbolic.py",
-    "eml_gci.py",
-    "risk_bounded_layer.py",
-    "vigia_planner.py",
-    "vision_audit.py",
+    "vigia/core/graph_stability.py",
+    "vigia/tools/abductive_intent_engine.py",
+    "vigia/tools/visible_variables.py",
+    "vigia/tools/picerl_mapping.py",
+    "vigia/tools/mitre_clustering.py",
+    "vigia/core/resource_optimizer.py",
+    "vigia/core/shadow_mode.py",
+    "vigia/tools/eml_symbolic.py",
+    "vigia/tools/eml_gci.py",
+    "vigia/core/risk_bounded_layer.py",
+    "vigia/tools/vigia_planner.py",
+    "vigia/forensics/vision_audit.py",
 ]
 
-PROMPT_FILE = "system_prompt_peirce.md"
+PROMPT_FILE = "docs/system_prompt_peirce.md"
 
 # ============================================================================
 # MOTOR DE CHECKS
@@ -223,10 +223,10 @@ class VIGIACIValidator:
     def check_tablas_congeladas(self) -> None:
         """Verifica que tablas maestras usen MappingProxyType."""
         tabla_files = [
-            "mitre_clustering_P0.py",
-            "visible_variables_P0.py",
-            "picerl_mapping_P0.py",
-            "abductive_intent_engine_P0.py",
+            "vigia/tools/mitre_clustering.py",
+            "vigia/tools/visible_variables.py",
+            "vigia/tools/picerl_mapping.py",
+            "vigia/tools/abductive_intent_engine.py",
         ]
         missing = []
         for fname in tabla_files:
@@ -337,7 +337,7 @@ class VIGIACIValidator:
     # ------------------------------------------------------------------
     def check_exclusion_entropy(self) -> None:
         """Verifica que graph_stability reporte aristas excluidas."""
-        content = self._load_file("graph_stability.py")
+        content = self._load_file("vigia/core/graph_stability.py")
         if not content:
             self._add_result("EXCLUSION_ENTROPY_PRESENTE", False, "graph_stability.py no encontrado.")
             return
@@ -390,8 +390,8 @@ class VIGIACIValidator:
     def check_input_validation(self) -> None:
         """Busca validaciones de tamaño en entry points."""
         entry_points = [
-            ("eml_symbolic.py", "analyze_symbolic_regression"),
-            ("eml_gci.py", "analyze_gci"),
+            ("vigia/tools/eml_symbolic.py", "analyze_symbolic_regression"),
+            ("vigia/tools/eml_gci.py", "analyze_gci"),
             ("vigia_sift_bridge.py", "reason_with_llm"),
         ]
         missing = []
@@ -453,7 +453,7 @@ class VIGIACIValidator:
     # ------------------------------------------------------------------
     def check_residual_uncertainty(self) -> None:
         """Verifica residual_uncertainty en mitre_clustering."""
-        content = self._load_file("mitre_clustering_P0.py")
+        content = self._load_file("vigia/tools/mitre_clustering.py")
         if not content:
             self._add_result("RESIDUAL_UNCERTAINTY", False, "mitre_clustering_P0.py no encontrado.")
             return

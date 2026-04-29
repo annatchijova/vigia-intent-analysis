@@ -54,7 +54,7 @@ import os
 import re
 import sys
 import unicodedata
-import uuid
+import uuid  # _derive_session_nonce: uuid usado solo para IDs STIX (no nonces forenses)
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
