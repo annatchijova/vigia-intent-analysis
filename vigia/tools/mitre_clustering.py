@@ -1,18 +1,3 @@
-# Copyright (c) 2026 Anna Tchijova
-# Vigía - Autonomous Incident Response Engine
-#
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU Affero General Public License as
-# published by the Free Software Foundation, either version 3 of the
-# License, or (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-# GNU Affero General Public License for more details.
-#
-# You should have received a copy of the GNU Affero General Public License
-# along with this program. If not, see <https://www.gnu.org/licenses/>.
 """
 MITRE ATT&CK Clustering — Hito 2.2
 
@@ -87,12 +72,12 @@ HYPOTHESIS_TO_MITRE: Dict[str, List[MITRETechnique]] = {
             technique_name="Gather Victim Org Information",
             tactics=[MITRETactic.RECONNAISSANCE],
             subtechniques=["T1592.001", "T1592.002"],
-        residual_uncertainty=0.1),
+            residual_uncertainty=0.1),
         MITRETechnique(
             technique_id="T1589",
             technique_name="Gather Victim Identity Information",
             tactics=[MITRETactic.RECONNAISSANCE],
-        residual_uncertainty=0.1),
+            residual_uncertainty=0.1),
     ],
     
     "H_RE_002": [  # osint_gathering
@@ -101,12 +86,12 @@ HYPOTHESIS_TO_MITRE: Dict[str, List[MITRETechnique]] = {
             technique_name="Gather Victim Identity Information",
             tactics=[MITRETactic.RECONNAISSANCE],
             subtechniques=["T1591.004"],  # Social media
-        residual_uncertainty=0.1),
+            residual_uncertainty=0.1),
         MITRETechnique(
             technique_id="T1598",
             technique_name="Phishing for Information",
             tactics=[MITRETactic.RECONNAISSANCE],
-        residual_uncertainty=0.1),
+            residual_uncertainty=0.1),
     ],
     
     "H_RE_003": [  # opportunistic_scanning
@@ -115,7 +100,7 @@ HYPOTHESIS_TO_MITRE: Dict[str, List[MITRETechnique]] = {
             technique_name="Active Scanning",
             tactics=[MITRETactic.RECONNAISSANCE],
             subtechniques=["T1595.001", "T1595.002", "T1595.003"],
-        residual_uncertainty=0.1),
+            residual_uncertainty=0.1),
     ],
     
     # INITIAL_ACCESS
@@ -125,7 +110,7 @@ HYPOTHESIS_TO_MITRE: Dict[str, List[MITRETechnique]] = {
             technique_name="Phishing",
             tactics=[MITRETactic.INITIAL_ACCESS],
             subtechniques=["T1566.001", "T1566.002"],  # Email, spearphishing
-        residual_uncertainty=0.1),
+            residual_uncertainty=0.1),
     ],
     
     "H_IA_002": [  # exploitation_public_facing
@@ -133,7 +118,7 @@ HYPOTHESIS_TO_MITRE: Dict[str, List[MITRETechnique]] = {
             technique_id="T1190",
             technique_name="Exploit Public-Facing Application",
             tactics=[MITRETactic.INITIAL_ACCESS],
-        residual_uncertainty=0.1),
+            residual_uncertainty=0.1),
     ],
     
     "H_IA_003": [  # supply_chain_compromise
@@ -142,7 +127,7 @@ HYPOTHESIS_TO_MITRE: Dict[str, List[MITRETechnique]] = {
             technique_name="Supply Chain Compromise",
             tactics=[MITRETactic.INITIAL_ACCESS],
             subtechniques=["T1195.001", "T1195.002", "T1195.003"],
-        residual_uncertainty=0.1),
+            residual_uncertainty=0.1),
     ],
     
     # EXECUTION
@@ -152,7 +137,7 @@ HYPOTHESIS_TO_MITRE: Dict[str, List[MITRETechnique]] = {
             technique_name="Command and Scripting Interpreter",
             tactics=[MITRETactic.EXECUTION],
             subtechniques=["T1059.001", "T1059.003"],  # Cmd, Powershell
-        residual_uncertainty=0.1),
+            residual_uncertainty=0.1),
     ],
     
     "H_EX_002": [  # scheduled_task_abuse
@@ -161,7 +146,7 @@ HYPOTHESIS_TO_MITRE: Dict[str, List[MITRETechnique]] = {
             technique_name="Scheduled Task/Job",
             tactics=[MITRETactic.EXECUTION, MITRETactic.PERSISTENCE],
             subtechniques=["T1053.005", "T1053.006"],  # Windows Task, cron
-        residual_uncertainty=0.1),
+            residual_uncertainty=0.1),
     ],
     
     "H_EX_003": [  # powershell_living_off_the_land
@@ -170,12 +155,12 @@ HYPOTHESIS_TO_MITRE: Dict[str, List[MITRETechnique]] = {
             technique_name="Command and Scripting Interpreter",
             tactics=[MITRETactic.EXECUTION],
             subtechniques=["T1059.001"],  # PowerShell
-        residual_uncertainty=0.1),
+            residual_uncertainty=0.1),
         MITRETechnique(
             technique_id="T1140",
             technique_name="Deobfuscate/Decode Files or Information",
             tactics=[MITRETactic.DEFENSE_EVASION],
-        residual_uncertainty=0.1),
+            residual_uncertainty=0.1),
     ],
     
     # PERSISTENCE
@@ -185,7 +170,7 @@ HYPOTHESIS_TO_MITRE: Dict[str, List[MITRETechnique]] = {
             technique_name="Boot or Logon Autostart Execution",
             tactics=[MITRETactic.PERSISTENCE, MITRETactic.PRIVILEGE_ESCALATION],
             subtechniques=["T1547.001"],  # Registry run keys
-        residual_uncertainty=0.1),
+            residual_uncertainty=0.1),
     ],
     
     "H_PE_002": [  # multi_mechanism_persistence
@@ -193,18 +178,18 @@ HYPOTHESIS_TO_MITRE: Dict[str, List[MITRETechnique]] = {
             technique_id="T1547",
             technique_name="Boot or Logon Autostart Execution",
             tactics=[MITRETactic.PERSISTENCE],
-        residual_uncertainty=0.1),
+            residual_uncertainty=0.1),
         MITRETechnique(
             technique_id="T1053",
             technique_name="Scheduled Task/Job",
             tactics=[MITRETactic.PERSISTENCE],
-        residual_uncertainty=0.1),
+            residual_uncertainty=0.1),
         MITRETechnique(
             technique_id="T1543",
             technique_name="Create or Modify System Process",
             tactics=[MITRETactic.PERSISTENCE],
             subtechniques=["T1543.004"],  # Windows Service
-        residual_uncertainty=0.1),
+            residual_uncertainty=0.1),
     ],
     
     "H_PE_003": [  # redundant_persistence
@@ -212,12 +197,12 @@ HYPOTHESIS_TO_MITRE: Dict[str, List[MITRETechnique]] = {
             technique_id="T1547",
             technique_name="Boot or Logon Autostart Execution",
             tactics=[MITRETactic.PERSISTENCE],
-        residual_uncertainty=0.1),
+            residual_uncertainty=0.1),
         MITRETechnique(
             technique_id="T1098",
             technique_name="Account Manipulation",
             tactics=[MITRETactic.PERSISTENCE],
-        residual_uncertainty=0.1),
+            residual_uncertainty=0.1),
     ],
     
     # PRIVILEGE_ESCALATION
@@ -227,7 +212,7 @@ HYPOTHESIS_TO_MITRE: Dict[str, List[MITRETechnique]] = {
             technique_name="Access Token Manipulation",
             tactics=[MITRETactic.PRIVILEGE_ESCALATION, MITRETactic.DEFENSE_EVASION],
             subtechniques=["T1134.001", "T1134.003"],  # Token impersonation, make and impersonate
-        residual_uncertainty=0.1),
+            residual_uncertainty=0.1),
     ],
     
     "H_PE_005": [  # exploit_vulnerability
@@ -235,7 +220,7 @@ HYPOTHESIS_TO_MITRE: Dict[str, List[MITRETechnique]] = {
             technique_id="T1068",
             technique_name="Exploitation for Privilege Escalation",
             tactics=[MITRETactic.PRIVILEGE_ESCALATION],
-        residual_uncertainty=0.1),
+            residual_uncertainty=0.1),
     ],
     
     "H_PE_006": [  # kerberoasting
@@ -244,7 +229,7 @@ HYPOTHESIS_TO_MITRE: Dict[str, List[MITRETechnique]] = {
             technique_name="Steal or Forge Kerberos Tickets",
             tactics=[MITRETactic.CREDENTIAL_ACCESS],
             subtechniques=["T1558.003"],  # Kerberoasting
-        residual_uncertainty=0.1),
+            residual_uncertainty=0.1),
     ],
     
     # DEFENSE_EVASION
@@ -254,13 +239,13 @@ HYPOTHESIS_TO_MITRE: Dict[str, List[MITRETechnique]] = {
             technique_name="Impair Defenses",
             tactics=[MITRETactic.DEFENSE_EVASION],
             subtechniques=["T1562.002"],  # Clear Windows event logs
-        residual_uncertainty=0.1),
+            residual_uncertainty=0.1),
         MITRETechnique(
             technique_id="T1070",
             technique_name="Indicator Removal",
             tactics=[MITRETactic.DEFENSE_EVASION],
             subtechniques=["T1070.001"],  # Clear logs
-        residual_uncertainty=0.1),
+            residual_uncertainty=0.1),
     ],
     
     "H_DE_002": [  # log_deletion_after_exfil
@@ -269,7 +254,7 @@ HYPOTHESIS_TO_MITRE: Dict[str, List[MITRETechnique]] = {
             technique_name="Indicator Removal",
             tactics=[MITRETactic.DEFENSE_EVASION],
             subtechniques=["T1070.001"],  # Clear logs
-        residual_uncertainty=0.1),
+            residual_uncertainty=0.1),
     ],
     
     "H_DE_003": [  # anti_forensics_preparation
@@ -278,7 +263,7 @@ HYPOTHESIS_TO_MITRE: Dict[str, List[MITRETechnique]] = {
             technique_name="Indicator Removal",
             tactics=[MITRETactic.DEFENSE_EVASION],
             subtechniques=["T1070.006"],  # Timestomp
-        residual_uncertainty=0.1),
+            residual_uncertainty=0.1),
     ],
     
     "H_SE_001": [  # false_security_theater (NUEVO)
@@ -287,12 +272,12 @@ HYPOTHESIS_TO_MITRE: Dict[str, List[MITRETechnique]] = {
             technique_name="Masquerading",
             tactics=[MITRETactic.DEFENSE_EVASION],
             subtechniques=["T1036.006"],  # Match legitimate name/location
-        residual_uncertainty=0.1),
+            residual_uncertainty=0.1),
         MITRETechnique(
             technique_id="T1078",
             technique_name="Valid Accounts",
             tactics=[MITRETactic.DEFENSE_EVASION, MITRETactic.PERSISTENCE],
-        residual_uncertainty=0.1),
+            residual_uncertainty=0.1),
     ],
     
     # CREDENTIAL_ACCESS
@@ -301,12 +286,12 @@ HYPOTHESIS_TO_MITRE: Dict[str, List[MITRETechnique]] = {
             technique_id="T1110",
             technique_name="Brute Force",
             tactics=[MITRETactic.CREDENTIAL_ACCESS],
-        residual_uncertainty=0.1),
+            residual_uncertainty=0.1),
         MITRETechnique(
             technique_id="T1187",
             technique_name="Forced Authentication",
             tactics=[MITRETactic.CREDENTIAL_ACCESS],
-        residual_uncertainty=0.1),
+            residual_uncertainty=0.1),
     ],
     
     "H_CA_002": [  # brute_force
@@ -315,7 +300,7 @@ HYPOTHESIS_TO_MITRE: Dict[str, List[MITRETechnique]] = {
             technique_name="Brute Force",
             tactics=[MITRETactic.CREDENTIAL_ACCESS],
             subtechniques=["T1110.001", "T1110.003"],  # Password guessing, password spraying
-        residual_uncertainty=0.1),
+            residual_uncertainty=0.1),
     ],
     
     "H_CA_003": [  # keylogger_deployment
@@ -324,7 +309,7 @@ HYPOTHESIS_TO_MITRE: Dict[str, List[MITRETechnique]] = {
             technique_name="Input Capture",
             tactics=[MITRETactic.COLLECTION, MITRETactic.CREDENTIAL_ACCESS],
             subtechniques=["T1056.004"],  # Keylogging
-        residual_uncertainty=0.1),
+            residual_uncertainty=0.1),
     ],
     
     # LATERAL_MOVEMENT
@@ -334,7 +319,7 @@ HYPOTHESIS_TO_MITRE: Dict[str, List[MITRETechnique]] = {
             technique_name="Use Alternate Authentication Material",
             tactics=[MITRETactic.LATERAL_MOVEMENT],
             subtechniques=["T1550.002"],  # Pass the hash
-        residual_uncertainty=0.1),
+            residual_uncertainty=0.1),
     ],
     
     # COLLECTION
@@ -343,12 +328,12 @@ HYPOTHESIS_TO_MITRE: Dict[str, List[MITRETechnique]] = {
             technique_id="T1123",
             technique_name="Audio Capture",
             tactics=[MITRETactic.COLLECTION],
-        residual_uncertainty=0.1),
+            residual_uncertainty=0.1),
         MITRETechnique(
             technique_id="T1119",
             technique_name="Automated Exfiltration",
             tactics=[MITRETactic.EXFILTRATION],
-        residual_uncertainty=0.1),
+            residual_uncertainty=0.1),
     ],
     
     "H_CO_002": [  # clipboard_and_screen_capture
@@ -356,12 +341,12 @@ HYPOTHESIS_TO_MITRE: Dict[str, List[MITRETechnique]] = {
             technique_id="T1115",
             technique_name="Clipboard Data",
             tactics=[MITRETactic.COLLECTION],
-        residual_uncertainty=0.1),
+            residual_uncertainty=0.1),
         MITRETechnique(
             technique_id="T1113",
             technique_name="Screen Capture",
             tactics=[MITRETactic.COLLECTION],
-        residual_uncertainty=0.1),
+            residual_uncertainty=0.1),
     ],
     
     "H_CO_003": [  # audio_and_video_surveillance
@@ -369,12 +354,12 @@ HYPOTHESIS_TO_MITRE: Dict[str, List[MITRETechnique]] = {
             technique_id="T1123",
             technique_name="Audio Capture",
             tactics=[MITRETactic.COLLECTION],
-        residual_uncertainty=0.1),
+            residual_uncertainty=0.1),
         MITRETechnique(
             technique_id="T1125",
             technique_name="Video Capture",
             tactics=[MITRETactic.COLLECTION],
-        residual_uncertainty=0.1),
+            residual_uncertainty=0.1),
     ],
     
     # COMMAND_AND_CONTROL
@@ -384,7 +369,7 @@ HYPOTHESIS_TO_MITRE: Dict[str, List[MITRETechnique]] = {
             technique_name="Application Layer Protocol",
             tactics=[MITRETactic.COMMAND_AND_CONTROL],
             subtechniques=["T1071.001"],  # Web Protocols
-        residual_uncertainty=0.1),
+            residual_uncertainty=0.1),
     ],
     
     "H_C2_002": [  # dns_tunnel_c2
@@ -393,7 +378,7 @@ HYPOTHESIS_TO_MITRE: Dict[str, List[MITRETechnique]] = {
             technique_name="Application Layer Protocol",
             tactics=[MITRETactic.COMMAND_AND_CONTROL],
             subtechniques=["T1071.004"],  # DNS
-        residual_uncertainty=0.1),
+            residual_uncertainty=0.1),
     ],
     
     "H_C2_003": [  # dead_drop_resolver
@@ -401,7 +386,7 @@ HYPOTHESIS_TO_MITRE: Dict[str, List[MITRETechnique]] = {
             technique_id="T1008",
             technique_name="Fallback Channels",
             tactics=[MITRETactic.COMMAND_AND_CONTROL],
-        residual_uncertainty=0.1),
+            residual_uncertainty=0.1),
     ],
     
     # EXFILTRATION
@@ -410,12 +395,12 @@ HYPOTHESIS_TO_MITRE: Dict[str, List[MITRETechnique]] = {
             technique_id="T1030",
             technique_name="Data Transfer Size Limits",
             tactics=[MITRETactic.EXFILTRATION],
-        residual_uncertainty=0.1),
+            residual_uncertainty=0.1),
         MITRETechnique(
             technique_id="T1020",
             technique_name="Automated Exfiltration",
             tactics=[MITRETactic.EXFILTRATION],
-        residual_uncertainty=0.1),
+            residual_uncertainty=0.1),
     ],
     
     # IMPACT
@@ -424,7 +409,7 @@ HYPOTHESIS_TO_MITRE: Dict[str, List[MITRETechnique]] = {
             technique_id="T1486",
             technique_name="Data Encrypted for Impact",
             tactics=[MITRETactic.IMPACT],
-        residual_uncertainty=0.1),
+            residual_uncertainty=0.1),
     ],
     
     "H_IM_002": [  # wiper_destruction
@@ -433,12 +418,12 @@ HYPOTHESIS_TO_MITRE: Dict[str, List[MITRETechnique]] = {
             technique_name="Disk Wipe",
             tactics=[MITRETactic.IMPACT],
             subtechniques=["T1561.001"],  # Disk content wipe
-        residual_uncertainty=0.1),
+            residual_uncertainty=0.1),
         MITRETechnique(
             technique_id="T1531",
             technique_name="Account Access Removal",
             tactics=[MITRETactic.IMPACT],
-        residual_uncertainty=0.1),
+            residual_uncertainty=0.1),
     ],
     
     "H_IM_003": [  # defacement_and_humiliation
@@ -447,7 +432,7 @@ HYPOTHESIS_TO_MITRE: Dict[str, List[MITRETechnique]] = {
             technique_name="Defacement",
             tactics=[MITRETactic.IMPACT],
             subtechniques=["T1491.001"],  # Internal defacement
-        residual_uncertainty=0.1),
+            residual_uncertainty=0.1),
     ],
 }
 
@@ -655,7 +640,7 @@ if __name__ == "__main__":
     print("=" * 80)
     
     # Ejemplo 1: Una hipótesis
-    print("\n Ejemplo: H_SE_001 (False Security Theater)")
+    print("\n✅ Ejemplo: H_SE_001 (False Security Theater)")
     techniques = clusterer.get_mitre_techniques_for_hypothesis("H_SE_001")
     print(f"   MITRE Techniques:")
     for tech in techniques:
@@ -668,7 +653,7 @@ if __name__ == "__main__":
         print(f"   Rationale: {intent_cluster.attacker_rationale}")
     
     # Ejemplo 2: Clustering por tactic
-    print("\n Clustering por MITRE Tactic:")
+    print("\n✅ Clustering por MITRE Tactic:")
     tactic_clusters = clusterer.cluster_by_tactic()
     for tactic in sorted(tactic_clusters.keys(), key=lambda t: t.value):
         hyps = tactic_clusters[tactic]
@@ -679,14 +664,14 @@ if __name__ == "__main__":
             print(f"      ... y {len(hyps)-3} más")
     
     # Ejemplo 3: Clustering por intención
-    print("\n Clustering por Intent Semántico:")
+    print("\n✅ Clustering por Intent Semántico:")
     intent_clusters = clusterer.cluster_by_intent()
     for intent_id, hyps in intent_clusters.items():
         cluster = clusterer.intent_clusters[intent_id]
         print(f"   {cluster.cluster_name} ({intent_id}): {len(hyps)} hipótesis")
         print(f"      Rationale: {cluster.attacker_rationale}")
     
-    print("\n JSON Export ready for auditing")
+    print("\n✅ JSON Export ready for auditing")
     print(f"   Keys: hypothesis_to_mitre, intent_clusters")
-    print(f"   Deterministic:  (no ML, tablas explícitas)")
-    print(f"   Falsable:  (cada hipótesis tiene técnicas MITRE verificables)")
+    print(f"   Deterministic: ✓ (no ML, tablas explícitas)")
+    print(f"   Falsable: ✓ (cada hipótesis tiene técnicas MITRE verificables)")
