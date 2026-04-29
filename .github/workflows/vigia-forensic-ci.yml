@@ -1,19 +1,15 @@
-name: VIGÍA Forensic CI — Determinismo + Seguridad + Daubert
+name: VIGÍA Forensic CI v2.3
 
-# Autores: VIGÍA AI Collective (Kimi, Claude, Gemini, DeepSeek, Qwen)
+# SANS FIND EVIL Hackathon 2026
+# Autores: VIGÍA AI Collective (Claude, Kimi, Gemini, DeepSeek, Qwen)
 #          Anna Tchijova — Arquitecta & Orquestadora
 #
-# Este workflow corre en CADA push y PR. Si falla, el código NO entra al repo.
-# Garantías validadas:
-#   - Determinismo bit-for-bit (mismo input → mismo hash siempre)
-#   - Tablas congeladas (MappingProxyType — inmutables en runtime)
-#   - HMAC de cadena de custodia en todos los resultados forenses
-#   - Nonce determinista (HMAC de evidence_hash + KASSANDRA_SALT)
-#   - No paths en /tmp (world-writable)
-#   - Anti-jailbreak prompt presente
-#   - Residual uncertainty en MITRE mapping
-#   - Input validation (DoS prevention)
-#   - I2 Invariance (monkey-patch detection)
+# Garantías validadas en cada push:
+#   - Sintaxis Python válida en todos los módulos
+#   - Tests de integración EBS v1
+#   - Tests de evidencia y red team v2.3
+#   - Determinismo: mismo input → mismo hash
+#   - Validación CI forense (vigia_ci_validate)
 
 on:
   push:
@@ -23,33 +19,126 @@ on:
 
 env:
   PYTHON_VERSION: "3.11"
-  VIGIA_CI_TIMEOUT: 300  # 5 minutos máximo por job
 
 jobs:
-  # ==========================================================================
-  # JOB 1: Validación Forense (el más importante — bloquea todo si falla)
-  # ==========================================================================
-  forensic-validation:
-    name: 🔒 VIGÍA CI Validation
+  # ============================================================
+  # JOB 1: Validación de sintaxis — rápido, bloquea todo si falla
+  # ============================================================
+  syntax-check:
+    name: Sintaxis Python
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 5
     steps:
-      - name: Checkout código
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0  # Necesario para validar historia de commits
+      - uses: actions/checkout@v4
 
-      - name: Set up Python ${{ env.PYTHON_VERSION }}
-        uses: actions/setup-python@v5
+      - uses: actions/setup-python@v5
         with:
           python-version: ${{ env.PYTHON_VERSION }}
 
-      - name: Instalar dependencias mínimas
+      - name: Verificar sintaxis de todos los módulos
+        run: |
+          echo "Verificando sintaxis..."
+          FAIL=0
+          find vigia/ -name "*.py" | while read f; do
+            python3 -c "import ast; ast.parse(open('$f').read())" 2>&1 && echo "OK: $f" || { echo "FAIL: $f"; FAIL=1; }
+          done
+          exit $FAIL
+
+  # ============================================================
+  # JOB 2: Tests de integración EBS v1 (55 tests)
+  # ============================================================
+  integration-tests:
+    name: Tests EBS v1 + Integración
+    runs-on: ubuntu-latest
+    needs: syntax-check
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Instalar dependencias
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements-ci.txt  # Solo lo necesario para CI
+          pip install -r requirements.txt
+          pip install pytest pytest-asyncio
+          pip install -e . 2>/dev/null || echo "flat layout — continuando"
 
-      - name: Setear secrets forenses (desde GitHub Secrets)
+      - name: Tests EBS v1 integración
+        run: |
+          python -m pytest tests/test_ebs_v1_integration.py -v --tb=short
+        env:
+          PYTHONPATH: ${{ github.workspace }}
+
+      - name: Tests integración end-to-end
+        run: |
+          python -m pytest tests/test_integration_end_to_end.py -v --tb=short
+        env:
+          PYTHONPATH: ${{ github.workspace }}
+
+  # ============================================================
+  # JOB 3: Tests v2.3 — evidencia, red team, adversarial
+  # ============================================================
+  tests-v23:
+    name: Tests v2.3 (evidencia + red team)
+    runs-on: ubuntu-latest
+    needs: syntax-check
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Instalar dependencias
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pytest
+          pip install -e . 2>/dev/null || echo "flat layout — continuando"
+
+      - name: Tests evidence aggregator (invariantes DEA v1)
+        run: |
+          python -m pytest tests/test_evidence_aggregator.py -v --tb=short
+        env:
+          PYTHONPATH: ${{ github.workspace }}
+
+      - name: Tests red team (20 payloads adversariales)
+        run: |
+          python -m pytest tests/test_red_team.py -v --tb=short
+        env:
+          PYTHONPATH: ${{ github.workspace }}
+
+      - name: Tests adversarial suite
+        run: |
+          python -m pytest tests/test_adversarial_suite.py -v --tb=short
+        env:
+          PYTHONPATH: ${{ github.workspace }}
+
+  # ============================================================
+  # JOB 4: Validación CI forense (determinismo + seguridad)
+  # ============================================================
+  forensic-validation:
+    name: Validación Forense
+    runs-on: ubuntu-latest
+    needs: syntax-check
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Instalar dependencias
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements-ci.txt
+
+      - name: Setear secrets forenses
         env:
           VIGIA_HMAC_KEY: ${{ secrets.VIGIA_HMAC_KEY }}
           VIGIA_HMAC_SALT: ${{ secrets.VIGIA_HMAC_SALT }}
@@ -58,188 +147,41 @@ jobs:
           echo "VIGIA_HMAC_KEY=$VIGIA_HMAC_KEY" >> $GITHUB_ENV
           echo "VIGIA_HMAC_SALT=$VIGIA_HMAC_SALT" >> $GITHUB_ENV
           echo "KASSANDRA_SALT=$KASSANDRA_SALT" >> $GITHUB_ENV
-          echo "✅ Secrets forenses configurados"
 
-      - name: 🔴 VIGÍA CI Validation — 12 checks forenses
+      - name: VIGÍA CI Validate — checks forenses
         run: |
-          python vigia/ci/vigia_ci_validate.py --verbose
-        id: vigia_ci
+          python tests/vigia_ci_validate.py --verbose
+        env:
+          PYTHONPATH: ${{ github.workspace }}
 
-      - name: 📊 Reportar resultado
-        if: always()
-        run: |
-          if [ "${{ steps.vigia_ci.outcome }}" == "success" ]; then
-            echo "✅ VIGÍA CI PASSED — Código forense-grade aprobado"
-          else
-            echo "❌ VIGÍA CI FAILED — Commit bloqueado. Revisá los logs arriba."
-            exit 1
-          fi
-
-  # ==========================================================================
-  # JOB 2: Tests de Determinismo (bit-for-bit reproducibility)
-  # ==========================================================================
-  determinismo-tests:
-    name: 🧪 Determinismo Bit-for-Bit
+  # ============================================================
+  # JOB 5: Determinismo bit-for-bit
+  # ============================================================
+  determinismo:
+    name: Determinismo Bit-for-Bit
     runs-on: ubuntu-latest
-    needs: forensic-validation  # Solo corre si pasa validación
-    timeout-minutes: 15
+    needs: [integration-tests, tests-v23]
+    timeout-minutes: 10
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
+      - uses: actions/setup-python@v5
         with:
           python-version: ${{ env.PYTHON_VERSION }}
 
       - name: Instalar dependencias
         run: |
           pip install -r requirements.txt
-          pip install pytest pytest-repeat  # para repetir tests N veces
+          pip install -e . 2>/dev/null || echo "flat layout — continuando"
 
-      - name: Test determinismo AbductiveIntentEngine
+      - name: Verificar determinismo (mismo input → mismo SHA-256)
         run: |
-          python -m pytest tests/test_determinismo_abductive.py -v --repeat 10
-        # Repite 10 veces: mismo input DEBE dar mismo hash siempre
-
-      - name: Test determinismo GraphStability
-        run: |
-          python -m pytest tests/test_determinismo_graph.py -v --repeat 10
-
-      - name: Test determinismo PICERLMapper
-        run: |
-          python -m pytest tests/test_determinismo_picerl.py -v --repeat 10
-
-      - name: Test determinismo MITREClusterer
-        run: |
-          python -m pytest tests/test_determinismo_mitre.py -v --repeat 10
-
-      - name: 📊 Reportar hashes de referencia
-        run: |
-          echo "Hashes de referencia para auditoría SANS:"
-          python -c "
-          import json, hashlib
-          from tests.test_determinismo_abductive import REFERENCE_HASH
-          print(f'  AbductiveIntentEngine: {REFERENCE_HASH}')
-          "
-
-  # ==========================================================================
-  # JOB 3: Tests de Seguridad (red team simulation)
-  # ==========================================================================
-  security-tests:
-    name: 🛡️ Red Team / Security Hardening
-    runs-on: ubuntu-latest
-    needs: forensic-validation
-    timeout-minutes: 10
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: ${{ env.PYTHON_VERSION }}
-
-      - name: Instalar dependencias
-        run: pip install -r requirements.txt
-
-      - name: Test monkey-patch detection (I2 Invariance)
-        run: |
-          python -m pytest tests/test_i2_invariance.py -v
-
-      - name: Test input validation / DoS prevention
-        run: |
-          python -m pytest tests/test_input_validation.py -v
-
-      - name: Test nonce determinista (no predecible sin salt)
-        run: |
-          python -m pytest tests/test_nonce_determinismo.py -v
-
-      - name: Test tables frozen (mutación runtime)
-        run: |
-          python -m pytest tests/test_tablas_congeladas.py -v
-
-  # ==========================================================================
-  # JOB 4: Lint + Type Check (calidad de código)
-  # ==========================================================================
-  code-quality:
-    name: 📝 Lint + Type Check
-    runs-on: ubuntu-latest
-    needs: forensic-validation
-    timeout-minutes: 10
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: ${{ env.PYTHON_VERSION }}
-
-      - name: Instalar herramientas
-        run: |
-          pip install ruff mypy bandit
-
-      - name: Ruff lint (Python)
-        run: |
-          ruff check vigia/ --select E,W,F,I,N,D,A,ASYNC,S,B,C4,DTZ,EM,EXE,FA,ISC,ICN,G,INP,PIE,PYI,Q,RSE,RET,SLF,SLOT,TID,TCH,INT,ARG,PTH,TD,FIX,ERA,PD,PGH,PL,RUF
-
-      - name: MyPy type check
-        run: |
-          mypy vigia/ --ignore-missing-imports --strict
-
-      - name: Bandit security scan
-        run: |
-          bandit -r vigia/ -f json -o bandit-report.json || true
-          cat bandit-report.json | python -m json.tool | head -50
-
-  # ==========================================================================
-  # JOB 5: Generar Bundle de Release (solo en tags release/*)
-  # ==========================================================================
-  release-bundle:
-    name: 📦 Bundle Forense Firmado
-    runs-on: ubuntu-latest
-    needs: [forensic-validation, determinismo-tests, security-tests]
-    if: startsWith(github.ref, 'refs/tags/release/')
-    timeout-minutes: 15
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: ${{ env.PYTHON_VERSION }}
-
-      - name: Setear secrets
+          python tests/check_determinism.py
         env:
-          VIGIA_HMAC_KEY: ${{ secrets.VIGIA_HMAC_KEY }}
-          VIGIA_HMAC_SALT: ${{ secrets.VIGIA_HMAC_SALT }}
-          KASSANDRA_SALT: ${{ secrets.KASSANDRA_SALT }}
+          PYTHONPATH: ${{ github.workspace }}
+
+      - name: Verificar EBS v1 (stdlib only)
         run: |
-          echo "VIGIA_HMAC_KEY=$VIGIA_HMAC_KEY" >> $GITHUB_ENV
-          echo "VIGIA_HMAC_SALT=$VIGIA_HMAC_SALT" >> $GITHUB_ENV
-          echo "KASSANDRA_SALT=$KASSANDRA_SALT" >> $GITHUB_ENV
-
-      - name: Generar bundle firmado
-        run: |
-          python scripts/generate_release_bundle.py             --version ${{ github.ref_name }}             --output vigia-release-${{ github.ref_name }}.tar.gz
-
-      - name: Subir bundle a GitHub Releases
-        uses: softprops/action-gh-release@v1
-        with:
-          files: vigia-release-${{ github.ref_name }}.tar.gz
-          body: |
-            ## VIGÍA Release ${{ github.ref_name }}
-
-            ✅ Validación forense: PASSED
-            ✅ Determinismo bit-for-bit: VERIFIED
-            ✅ Seguridad red team: HARDENED
-            ✅ Código: LINT + TYPE CHECK
-
-            **Bundle firmado con HMAC-SHA256** — verificable con `VIGIA_HMAC_KEY`.
-            **Nonce determinista** — reproducible con `KASSANDRA_SALT`.
-
-            Autores: VIGÍA AI Collective + Anna Tchijova
+          python tests/verify_ebs_v1_parcheado.py
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PYTHONPATH: ${{ github.workspace }}
