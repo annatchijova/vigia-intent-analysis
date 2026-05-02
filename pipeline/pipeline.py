@@ -642,13 +642,16 @@ class VigiaPipeline:
         if not verify_ok:
             logger.error("[Pipeline] ALERTA: bundle inválido post-sellado: %s", verify_msg)
 
-        # H21: inyectar redundancy_alerts en el bundle sellado para el perito
-        # El bundle ya está sellado (hash calculado sobre el payload) — la alerta
-        # va en una sección de metadata forense fuera del payload hasheado.
-        # Esto permite que el perito vea la alerta sin invalidar el bundle_hash.
+        # H21: inyectar redundancy_alerts en el bloque INTEGRITY del bundle sellado
+        # El bundle ya está sellado (hash calculado sobre el payload).
+        # La alerta va DENTRO del bloque integrity — que está EXCLUIDO del hash.
+        # Esto permite que el perito vea la alerta SIN invalidar el bundle_hash.
+        # === FIX APLICADO ===
         _redundancy = inference_result.get("redundancy_alerts", {})
         if _redundancy.get("twin_pairs_detected", 0) > 0:
-            sealed_dict.setdefault("forensic_alerts", []).append({
+            # Agregar al bloque integrity, NO al payload hasheado
+            integrity_block = sealed_dict.setdefault("integrity", {})
+            integrity_block.setdefault("forensic_alerts", []).append({
                 "type": "REDUNDANCY_LOCAL",
                 "severity": "WARNING",
                 "twin_pairs": _redundancy["twin_pairs_detected"],
@@ -662,7 +665,7 @@ class VigiaPipeline:
             })
             logger.warning(
                 "[Pipeline] H21: %d par(es) gemelo(s) — alerta de redundancia "
-                "inyectada en el bundle forense.",
+                "inyectada en integrity block (NO invalida bundle_hash).",
                 _redundancy["twin_pairs_detected"],
             )
 
