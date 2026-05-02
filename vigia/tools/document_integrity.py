@@ -1,6 +1,2 @@
-"""Shim: reexporta document_integrity desde raíz del proyecto."""
-import importlib as _il, sys as _sys, os as _os
-_root = _os.path.dirname(_os.path.dirname(_os.path.dirname(_os.path.abspath(__file__))))
-if _root not in _sys.path: _sys.path.insert(0, _root)
-_m = _il.import_module("document_integrity")
-globals().update({k: getattr(_m, k) for k in dir(_m) if not k.startswith("__")})
+from vigia.forensics.document_integrity import audit_document_integrity, analyze_image_layers, detect_document_geometry, ocr_semantic_validator
+__all__ = ["audit_document_integrity", "analyze_image_layers", "detect_document_geometry", "ocr_semantic_validator"]

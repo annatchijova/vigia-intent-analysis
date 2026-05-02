@@ -3284,8 +3284,8 @@ class LLMShield:
             raise ValueError(msg) from e
 
 
-# ALLOWED_COMMANDS — whitelist de binarios SIFT permitidos, definida en vigia_seguridad
-from vigia_seguridad import ALLOWED_COMMANDS  # noqa: F401 — re-export para tests
+# ALLOWED_COMMANDS — whitelist de binarios SIFT permitidos (SIFT tools)
+ALLOWED_COMMANDS: frozenset = frozenset({"ss", "ewfmount", "mount", "sha256sum", "vol", "vol.py", "log2timeline.py", "psort.py", "pinfo.py", "yara"})
 
 
 async def _run_sift_command(cmd: list, timeout: int = 30) -> dict:
