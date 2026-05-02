@@ -10,7 +10,7 @@ P0-001 FIX:
   - Comentario de guardia en get_policy_spec() para prevenir inversión futura.
 """
 
-from decimal import Decimal, ROUND_HALF_EVEN, InvalidOperation
+from decimal import Decimal, ROUND_HALF_EVEN, InvalidOperation, getcontext as _getcontext
 from typing import Optional, Dict, Any
 from dataclasses import dataclass
 
@@ -69,7 +69,7 @@ class RiskBoundedDecisionLayer:
 
     def __init__(self, policy: RiskParameters):
         self.policy = policy
-        self.ctx = Decimal.getcontext()
+        self.ctx = _getcontext()
         self.ctx.prec = self._DEFAULT_PRECISION
         self.ctx.rounding = ROUND_HALF_EVEN
 

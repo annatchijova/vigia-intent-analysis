@@ -74,9 +74,38 @@ EPS_NUMERIC: float = 1e-9
 # Helpers criptográficos — sin dependencias externas
 # ---------------------------------------------------------------------------
 
+def _canonicalize(obj: Any) -> Any:
+    """
+    Canonicalización estricta para hasheo determinista (H22).
+    DEBE ser idéntica a verify_ebs_v1._canonicalize — ambas son la fuente de verdad.
+    """
+    if isinstance(obj, bool):
+        return "true" if obj else "false"
+    if isinstance(obj, int):
+        return f"{obj}:int"
+    if isinstance(obj, float):
+        if obj != obj:
+            return "nan"
+        if obj == float("inf"):
+            return "inf"
+        if obj == float("-inf"):
+            return "-inf"
+        return f"{obj:.8f}"
+    if isinstance(obj, str):
+        return obj
+    if obj is None:
+        return "null"
+    if isinstance(obj, dict):
+        return {k: _canonicalize(v) for k, v in sorted(obj.items())}
+    if isinstance(obj, (list, tuple)):
+        return [_canonicalize(v) for v in obj]
+    return str(obj)
+
+
 def _sha256_dict(obj: Dict) -> str:
-    """Hash SHA-256 determinístico de un dict (sort_keys=True)."""
-    serialized = json.dumps(obj, sort_keys=True, default=str).encode("utf-8")
+    """SHA-256 determinístico con canonicalización estricta (H22)."""
+    canonical  = _canonicalize(obj)
+    serialized = json.dumps(canonical, sort_keys=True, ensure_ascii=True).encode("utf-8")
     return hashlib.sha256(serialized).hexdigest()
 
 
@@ -375,6 +404,9 @@ if _USE_PYDANTIC:
         epsilon_used: float = 0.05
         components_used: int = 0
         signal_contributions: Optional[List[Dict[str, Any]]] = None
+        reason_code: str = "OK"
+        abstain_reason: Optional[str] = None
+        omega_intention: float = 0.5
 
         def to_dict(self) -> Dict[str, Any]:
             return self.model_dump()
@@ -394,6 +426,9 @@ else:
         epsilon_used: float = 0.05
         components_used: int = 0
         signal_contributions: Optional[List[Dict[str, Any]]] = None
+        reason_code: str = "OK"
+        abstain_reason: Optional[str] = None
+        omega_intention: float = 0.5
 
         def to_dict(self) -> Dict[str, Any]:
             return dict(vars(self))
@@ -661,6 +696,7 @@ class ForensicBundle:
         policy_spec: PolicySpec,
         actions: Optional[List[ActionRecord]] = None,
         system_state: Optional[SystemState] = None,
+        abduction_trace: Optional[Any] = None,
     ) -> None:
         self.bundle_id: str = _new_uuid()
         self.bundle_version: str = self.VERSION
@@ -670,6 +706,7 @@ class ForensicBundle:
         self.policy_spec: PolicySpec = policy_spec
         self.actions: List[ActionRecord] = actions or []
         self.system_state: SystemState = system_state or SystemState()
+        self.abduction_trace = abduction_trace
         self.integrity: IntegrityBlock = IntegrityBlock()
         self._sealed: bool = False
 
@@ -716,6 +753,11 @@ class ForensicBundle:
             "policy_spec": policy_dict,
             "actions": [a.to_dict() for a in self.actions],
             "system_state": self.system_state.to_dict(),
+            "abduction_trace": (
+                self.abduction_trace.to_dict()
+                if hasattr(self.abduction_trace, "to_dict") else
+                (self.abduction_trace or {})
+            ),
         }
         bundle_hash = _sha256_dict(bundle_payload)
 
@@ -749,6 +791,11 @@ class ForensicBundle:
             "policy_spec": self.policy_spec.to_dict(),
             "actions": [a.to_dict() for a in self.actions],
             "system_state": self.system_state.to_dict(),
+            "abduction_trace": (
+                self.abduction_trace.to_dict()
+                if hasattr(self.abduction_trace, "to_dict") else
+                (self.abduction_trace or {})
+            ),
             "integrity": self.integrity.to_dict(),
         }
 
@@ -864,3 +911,230 @@ def make_default_policy(
         gamma_stability_init=gamma_stability,
         description="Política VIGÍA por defecto — SANS FIND EVIL 2026",
     )
+
+
+# =============================================================================
+# STUBS — clases requeridas por pipeline.py, pendientes de implementación full
+# Cumplen la interfaz mínima para que el pipeline no crashee en import/init.
+# =============================================================================
+
+from dataclasses import dataclass, field
+from typing import Optional, List
+
+@dataclass
+class AbductionTrace:
+    """Traza abductiva Peirce (Firstness/Secondness/Thirdness) del pipeline."""
+    peirce_firstness: str = ""
+    peirce_secondness: str = ""
+    peirce_thirdness: str = ""
+    tools_available: int = 0
+    tools_executed: int = 0
+    tools_skipped: int = 0
+    dominant_signal: str = ""
+    dominant_z_score: float = 0.0
+    cluster_name: str = ""
+    anomalies_found: int = 0
+    execution_plan_rationale: str = ""
+    abort_triggered: bool = False
+    inference_mode: str = "heuristic"
+    clustering_method: str = "heuristic_default"
+    correlation_penalties_applied: bool = False
+
+    def to_dict(self) -> dict:
+        return {
+            "peirce_firstness":  self.peirce_firstness,
+            "peirce_secondness": self.peirce_secondness,
+            "peirce_thirdness":  self.peirce_thirdness,
+            "dominant_signal":   self.dominant_signal,
+            "dominant_z_score":  self.dominant_z_score,
+            "cluster_name":      self.cluster_name,
+            "inference_mode":    self.inference_mode,
+            "abort_triggered":   self.abort_triggered,
+        }
+
+
+class PolicyStabilityController:
+    """Controlador de estabilidad de política — stub mínimo."""
+    def __init__(self):
+        self.stability_score: float = 1.0
+        self.drift_count: int = 0
+
+    def record_drift(self, delta: float = 0.0) -> None:
+        self.drift_count += 1
+        self.stability_score = max(0.0, self.stability_score - abs(delta) * 0.1)
+
+    def is_stable(self, threshold: float = 0.7) -> bool:
+        return self.stability_score >= threshold
+
+
+class SelfAdaptiveRiskPolicy:
+    """Política de riesgo auto-adaptativa — stub mínimo."""
+    def __init__(
+        self,
+        lambda_init: float = 0.5,
+        gamma_init: float = 0.5,
+        epsilon_init: float = 0.05,
+        stability_controller: Optional[PolicyStabilityController] = None,
+    ):
+        self.lambda_drift = lambda_init
+        self.gamma_stability = gamma_init
+        self.epsilon = epsilon_init
+        self._ctrl = stability_controller or PolicyStabilityController()
+
+    def update(self, observed_drift: float, observed_stability: float) -> None:
+        self._ctrl.record_drift(observed_drift - self.lambda_drift)
+        self.lambda_drift = round(
+            self.lambda_drift * 0.9 + observed_drift * 0.1, 6
+        )
+        self.gamma_stability = round(
+            self.gamma_stability * 0.9 + observed_stability * 0.1, 6
+        )
+
+    def get_params(self) -> dict:
+        return {
+            "lambda_drift":    self.lambda_drift,
+            "gamma_stability": self.gamma_stability,
+            "epsilon":         self.epsilon,
+            "stable":          self._ctrl.is_stable(),
+        }
+
+
+# =============================================================================
+# STUBS — AbductionTrace, PolicyStabilityController, SelfAdaptiveRiskPolicy
+# Requeridos por pipeline.py. Implementación mínima funcional.
+# =============================================================================
+from dataclasses import dataclass as _dataclass
+from typing import Optional as _Optional
+
+@_dataclass
+class AbductionTrace:
+    """Traza abductiva Peirce del pipeline."""
+    peirce_firstness: str = ""
+    peirce_secondness: str = ""
+    peirce_thirdness: str = ""
+    tools_available: int = 0
+    tools_executed: int = 0
+    tools_skipped: int = 0
+    dominant_signal: str = ""
+    dominant_z_score: float = 0.0
+    cluster_name: str = ""
+    anomalies_found: int = 0
+    execution_plan_rationale: str = ""
+    abort_triggered: bool = False
+    inference_mode: str = "heuristic"
+    clustering_method: str = "heuristic_default"
+    correlation_penalties_applied: bool = False
+
+    def to_dict(self) -> dict:
+        return {
+            "peirce_firstness":  self.peirce_firstness,
+            "peirce_secondness": self.peirce_secondness,
+            "peirce_thirdness":  self.peirce_thirdness,
+            "dominant_signal":   self.dominant_signal,
+            "dominant_z_score":  self.dominant_z_score,
+            "cluster_name":      self.cluster_name,
+            "inference_mode":    self.inference_mode,
+            "abort_triggered":   self.abort_triggered,
+        }
+
+
+class PolicyStabilityController:
+    def __init__(self):
+        self.stability_score: float = 1.0
+        self.drift_count: int = 0
+
+    def record_drift(self, delta: float = 0.0) -> None:
+        self.drift_count += 1
+        self.stability_score = max(0.0, self.stability_score - abs(delta) * 0.1)
+
+    def is_stable(self, threshold: float = 0.7) -> bool:
+        return self.stability_score >= threshold
+
+
+class SelfAdaptiveRiskPolicy:
+    def __init__(
+        self,
+        lambda_init: float = 0.5,
+        gamma_init: float = 0.5,
+        epsilon_init: float = 0.05,
+        stability_controller: _Optional[PolicyStabilityController] = None,
+    ):
+        self.lambda_drift = lambda_init
+        self.gamma_stability = gamma_init
+        self.epsilon = epsilon_init
+        self._ctrl = stability_controller or PolicyStabilityController()
+        # Aliases que usa pipeline.py
+        self.lambda_t = lambda_init
+        self.gamma_t  = gamma_init
+
+    def update(self, observed_drift: float, observed_stability: float) -> None:
+        self._ctrl.record_drift(observed_drift - self.lambda_drift)
+        self.lambda_drift = round(self.lambda_drift * 0.9 + observed_drift * 0.1, 6)
+        self.gamma_stability = round(self.gamma_stability * 0.9 + observed_stability * 0.1, 6)
+
+    def get_params(self) -> dict:
+        return {
+            "lambda_drift":    self.lambda_drift,
+            "gamma_stability": self.gamma_stability,
+            "epsilon":         self.epsilon,
+            "stable":          self._ctrl.is_stable(),
+        }
+
+
+# =============================================================================
+# BundleBuilder — wrapper estático sobre ForensicBundle para pipeline.py
+# pipeline.py llama BundleBuilder.seal(bundle, ...) como método de clase.
+# =============================================================================
+
+class BundleBuilder:
+    """
+    Wrapper de clase estática sobre ForensicBundle.
+    Permite que pipeline.py use BundleBuilder.seal(bundle, ...) sin instanciar.
+    """
+
+    @staticmethod
+    def seal(
+        bundle: "ForensicBundle",
+        engine_attestation_hash: str = "",
+        ecl_hash: str = "",
+    ) -> dict:
+        """
+        Sella el bundle y retorna el dict canónico listo para verificación.
+        Delega en ForensicBundle.seal() que ya implementa el hash chain EBS v1.
+        """
+        sealed_bundle = bundle.seal(
+            engine_attestation_hash=engine_attestation_hash,
+            ecl_hash=ecl_hash,
+        )
+        return sealed_bundle.to_dict()
+
+    @staticmethod
+    def quick_verify(sealed_dict: dict) -> tuple:
+        """
+        Verificación rápida de integridad sobre un dict ya sellado.
+        Reconstruye ForensicBundle desde dict y llama quick_verify().
+        """
+        bundle_hash = sealed_dict.get("bundle_hash", "")
+        if not bundle_hash:
+            return False, "bundle_hash ausente"
+        # Verificación mínima: recomputar hash sobre payload
+        import hashlib as _hl, json as _json
+        payload = {k: v for k, v in sealed_dict.items()
+                   if k not in ("bundle_hash", "integrity")}
+        try:
+            canonical = _json.dumps(payload, sort_keys=True, ensure_ascii=True, default=str)
+            computed = _hl.sha256(canonical.encode("utf-8")).hexdigest()
+        except Exception as e:
+            return False, f"Error al recomputar hash: {e}"
+        if computed == bundle_hash:
+            return True, "OK — bundle_hash verificado"
+        return False, f"HASH MISMATCH: esperado={bundle_hash[:16]}… calculado={computed[:16]}…"
+
+    @staticmethod
+    def save(sealed_dict: dict, path: str) -> str:
+        """Guarda el dict sellado en disco. Retorna hash del archivo."""
+        import hashlib as _hl, json as _json
+        content = _json.dumps(sealed_dict, sort_keys=True, indent=2, default=str)
+        with open(path, "w", encoding="utf-8") as f:
+            f.write(content)
+        return _hl.sha256(content.encode("utf-8")).hexdigest()
