@@ -744,3 +744,105 @@ calibration_notes: >
   
   Todos los valores σ representan desviación estándar muestral
   con n>1000 documentos por categoría.
+
+# ============================================================================
+# PERFIL DE DESVIACIÓN FRACTAL — Zipf Imperfection Analysis
+# Gemini tactical order + Kimi NLP intelligence (2026)
+#
+# FUNDAMENTO: Los errores humanos reales siguen ley de Zipf (P(f) ∝ f^-α,
+# α ≈ 1.0). Los atacantes que añaden "imperfección calculada" para evadir
+# detección de perfección AI generan ruido con distribución uniforme (R² bajo).
+# ============================================================================
+
+zipf_imperfection_baselines:
+
+  metadata:
+    version: "1.0.0"
+    calibrated_by: "VIGÍA Collective (Gemini tactical, Kimi NLP intel, Claude impl)"
+    source: "Corpus forense VIGÍA + literatura Zipf (Piantadosi 2014)"
+    note: >
+      Valores bootstrap. Actualizar con fit_calibration.py --corpus-real
+      cuando se disponga de dataset etiquetado de documentos con
+      imperfección calculada vs. errores humanos auténticos.
+
+  # Parámetros del fit Zipf para errores humanos AUTÉNTICOS
+  # Fuente: análisis de corpus de documentos judiciales y policiales
+  authentic_error_distribution:
+    zipf_alpha:
+      mean: 1.02       # Coeficiente de ley de potencia empírico
+      std:  0.18       # Desviación estándar — errores humanos son variables
+      min_acceptable: 0.60
+      max_acceptable: 1.60
+    zipf_r2:
+      min_authentic: 0.75   # R² mínimo para fit Zipf válido en humanos
+      note: >
+        R² < 0.75 indica distribución no-fractal (uniforme o gaussiana)
+        — firma de randomización artificial.
+    alpha_divergence_threshold: 0.40   # |α - 1.0| > umbral → alerta
+    min_oov_tokens: 5                  # Mínimo para análisis significativo
+
+  # Perfiles por tipo de documento
+  document_profiles:
+
+    legal_judicial:
+      # Documentos legales auténticos tienen muy pocos errores OOV
+      expected_oov_rate: 0.002    # < 0.2% de tokens son OOV
+      zipf_alpha: { mean: 1.05, std: 0.15 }
+      zipf_r2_min: 0.80
+      note: >
+        Alta formalidad → pocos errores. Si hay muchos OOV en documento
+        judicial, eso ya es señal de fabricación independiente del análisis Zipf.
+
+    police_report:
+      expected_oov_rate: 0.005    # Hasta 0.5% tolerable (jerga policial)
+      zipf_alpha: { mean: 1.00, std: 0.20 }
+      zipf_r2_min: 0.72
+      note: >
+        Mayor variabilidad que judicial. Presencia de siglas y términos
+        operativos puede elevar OOV rate legítimamente.
+
+    adversarial_social_engineering:
+      # Documentos adversariales con imperfección calculada
+      expected_oov_rate: 0.035    # > 3.5% de tokens OOV = señal de relleno
+      zipf_alpha: { mean: 0.30, std: 0.40 }  # α bajo = distribución plana
+      zipf_r2_typical: 0.20                   # R² típicamente bajo
+      note: >
+        El atacante distribuye errores uniformemente para que no destaquen.
+        Esto destruye la estructura fractal de Zipf y produce R² < 0.40.
+
+  # Señal de alerta compuesta
+  detection_thresholds:
+    # Requiere ≥ 2 indicadores para activar (conservador — Daubert)
+    low_r2:
+      threshold: 0.75
+      severity: 0.70
+      description: "Distribución no-fractal — ruido artificial probable"
+    alpha_divergence:
+      threshold: 0.40   # |α - 1.0| > 0.40
+      severity: 0.75
+      description: "Pendiente Zipf anómala — randomización detectada"
+    high_z_alpha:
+      threshold: 2.0    # |z| > 2.0 desviaciones del baseline humano
+      severity: 0.80
+      description: "Desviación estadística respecto a errores humanos auténticos"
+
+  # Integración con EBS v1
+  ebs_v1_signal:
+    tool_name: "GCI"              # Generative Consistency Indicators
+    signal_weight: 0.80           # Peso conservador — pendiente calibración real
+    cluster: "NLP"                # Cluster del LikelihoodEngine
+    mcp_contribution_weight: 0.80 # Factor de penalidad en _calculate_mcp
+    daubert_note: >
+      Known error rate pendiente de calibración sobre corpus real.
+      En modo sintético (bootstrap), los valores de α y R² son
+      orientativos. No usar como evidencia aislada — siempre correlacionar
+      con señales SDA/ACP/CLI para admisibilidad Daubert.
+
+  peirce_interpretation: >
+    Firstness: Distribución de frecuencias de anomalías léxicas (OOV tokens).
+    Secondness: Divergencia del fit Zipf respecto al baseline humano auténtico
+    (R² bajo, α anómalo).
+    Thirdness: El HÁBITO del atacante es randomizar errores para evitar
+    repetición — esa randomización destruye la estructura fractal natural
+    del error humano y lo delata. La imperfección calculada es más perfecta
+    que la perfección.

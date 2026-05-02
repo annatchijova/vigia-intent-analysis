@@ -1,0 +1,298 @@
+"""
+vigia/security/narrative_auditor.py
+─────────────────────────────────────────────────────────────────────────────
+Narrative Injection Auditor — C3 Multi-Agent Validation
+Author:      Kimi (Moonshot) — Forensic Systems Specialist
+Implementor: Claude (Anthropic) — Systems Integration Engineer
+Role: Audita narrative[] generada por Claude antes del sellado final.
+
+PIPELINE C3:
+    Claude (Generator) → NarrativeAuditor (Validator) → Human (Witness)
+
+PRINCIPIO:
+    El auditor es un agente INDEPENDIENTE que NO genera contenido.
+    Solo valida. Un atacante que comprometa la narrativa no puede
+    comprometer simultáneamente al auditor (separación de procesos).
+
+PATRONES DETECTADOS:
+    Taxonomía OWASP LLM 2025 + casos Gemini "Lethal" + Carnegie patterns
+
+INVARIANTES (Qwen P0 — Deterministic Protocol):
+    - Mismo narrative → mismo audit_hash (sin random, sin timestamp en hash)
+    - _compute_hash usa solo contenido canónico determinista
+    - Patrones compilados una vez en __init__ (reproducibilidad)
+
+SEGURIDAD:
+    - Anti-DoS: _MAX_NARRATIVE_LINES limita el input
+    - strict_mode=True: cuarentena de líneas comprometidas (default)
+    - CRITICAL threats en veredicto MALICE/INTENT → INVALIDATED
+─────────────────────────────────────────────────────────────────────────────
+"""
+from __future__ import annotations
+
+import hashlib
+import re
+from dataclasses import dataclass, field
+from typing import Dict, List, Optional, Tuple
+
+from vigia.security import audit_logger, _utcnow
+
+# ---------------------------------------------------------------------------
+# Configuración determinista
+# ---------------------------------------------------------------------------
+_MAX_NARRATIVE_LINES: int = 10_000  # Anti-DoS
+
+# Patrones de inyección — taxonomía OWASP LLM 2025 + Gemini cases
+# Formato: (regex_str, classification, severity)
+_INJECTION_PATTERNS: List[Tuple[str, str, str]] = [
+    # Overt instruction overrides
+    (r"(?i)ignore\s+(?:all\s+)?(?:previous\s+)?instructions",
+     "OVERT_OVERRIDE", "CRITICAL"),
+    (r"(?i)disregard\s+(?:your\s+)?(?:system\s+)?prompt",
+     "OVERT_OVERRIDE", "CRITICAL"),
+    (r"(?i)forget\s+(?:everything\s+)?(?:you\s+)?(?:were\s+)?told",
+     "OVERT_OVERRIDE", "HIGH"),
+
+    # System prompt extraction
+    (r"(?i)repeat\s+(?:the\s+)?(?:system\s+)?(?:prompt\s+)?(?:above\s+)?back",
+     "EXTRACTION_ATTEMPT", "HIGH"),
+    (r"(?i)what\s+(?:are\s+)?(?:your\s+)?instructions",
+     "EXTRACTION_ATTEMPT", "MEDIUM"),
+
+    # Authority spoofing (Carnegie patterns — Gemini cases)
+    (r"(?i)(?:as\s+)?(?:an?\s+)?(?:admin|administrator|root|system)\s+(?:user|operator)",
+     "AUTHORITY_SPOOFING", "HIGH"),
+    (r"(?i)this\s+is\s+(?:a\s+)?(?:critical|emergency|urgent)\s+(?:audit|update|patch)",
+     "AUTHORITY_SPOOFING", "HIGH"),
+    (r"(?i)(?:i\s+am|this\s+is)\s+(?:the\s+)?(?:developer|creator|owner)\s+of\s+(?:this\s+)?(?:system|vigia)",
+     "AUTHORITY_SPOOFING", "CRITICAL"),
+
+    # False familiarity (Carnegie paradox — Gemini case)
+    (r"(?i)(?:as\s+)?(?:you\s+)?(?:know|should\s+know|obviously|naturally|of\s+course)",
+     "FALSE_FAMILIARITY", "MEDIUM"),
+
+    # Delimiter breaks
+    (r"<<<\s*END_EVIDENCE",               "DELIMITER_BREAK", "CRITICAL"),
+    (r">>>\s*.*?(?=<<<|$)",               "DELIMITER_BREAK", "HIGH"),
+    (r"<<<\s*(?!EVIDENCE_DATA|END_EVIDENCE)", "DELIMITER_BREAK", "HIGH"),
+
+    # Encoding evasion
+    (r"[\x00-\x08\x0b-\x0c\x0e-\x1f]",  "ENCODING_EVASION", "HIGH"),
+    (r"\\x[0-9a-fA-F]{2}",               "ENCODING_EVASION", "MEDIUM"),
+    (r"base64[a-zA-Z0-9+/]{40,}={0,2}",  "ENCODING_EVASION", "MEDIUM"),
+    (r"&#x[0-9a-fA-F]+;",                "ENCODING_EVASION", "MEDIUM"),
+
+    # Tool hijacking
+    (r"(?i)(?:call|invoke|execute|run)\s+(?:tool|function|method)\s*\{",
+     "TOOL_HIJACKING", "CRITICAL"),
+    (r"(?i)(?:use|with)\s+(?:tool|function)\s*\w+\s*\(",
+     "TOOL_HIJACKING", "HIGH"),
+    (r"(?i)(?:activate|trigger|disable)\s+(?:honey_token|audit|security)",
+     "TOOL_HIJACKING", "HIGH"),
+
+    # Gradual escalation (Gemini case — Pavlovian conditioning)
+    (r"(?i)(?:first|step\s+1|initially)\s+.*?(?:then|next|after\s+that)\s+.*?(?:finally|lastly)",
+     "GRADUAL_ESCALATION", "MEDIUM"),
+]
+
+
+# ---------------------------------------------------------------------------
+# Data classes
+# ---------------------------------------------------------------------------
+
+@dataclass(frozen=True)
+class ThreatDetected:
+    """Amenaza detectada en una línea de la narrativa."""
+    line_index:   int
+    pattern_type: str
+    severity:     str
+    matched_text: str   # Truncado a 50 chars
+    position:     int
+
+    def to_dict(self) -> Dict:
+        return {
+            "line":     self.line_index,
+            "type":     self.pattern_type,
+            "severity": self.severity,
+            "match":    self.matched_text,
+            "pos":      self.position,
+        }
+
+
+@dataclass
+class NarrativeAuditResult:
+    """Resultado del audit de narrativa."""
+    is_clean:            bool
+    threats_detected:    List[ThreatDetected]
+    sanitized_narrative: List[str]
+    audit_hash:          str
+    investigation_id:    str
+    timestamp:           str = field(default_factory=_utcnow)
+
+    def to_dict(self) -> Dict:
+        return {
+            "is_clean":        self.is_clean,
+            "threats_count":   len(self.threats_detected),
+            "threats":         [t.to_dict() for t in self.threats_detected],
+            "narrative_lines": len(self.sanitized_narrative),
+            "audit_hash":      self.audit_hash,
+            "investigation_id": self.investigation_id,
+            "timestamp":       self.timestamp,
+        }
+
+
+# ---------------------------------------------------------------------------
+# NarrativeAuditor
+# ---------------------------------------------------------------------------
+
+class NarrativeAuditor:
+    """
+    Audita narrative[] generada por Claude/Gemini antes del sellado final.
+
+    Implementa C3: Multi-Agent Validation.
+    El auditor es un agente independiente — NO genera contenido, solo valida.
+
+    DETERMINISTA: mismo narrative → mismo audit_hash (Qwen P0).
+    """
+
+    def __init__(self, strict_mode: bool = True) -> None:
+        self.strict_mode = strict_mode
+        # Compilar patrones una vez — reproducibilidad y performance
+        self._patterns: List[Tuple[re.Pattern, str, str]] = [
+            (re.compile(p), cls, sev)
+            for p, cls, sev in _INJECTION_PATTERNS
+        ]
+
+    def audit(
+        self,
+        narrative: List[str],
+        investigation_id: str,
+        source_agent: str = "claude",
+    ) -> NarrativeAuditResult:
+        """
+        Audita una narrativa completa.
+
+        Args:
+            narrative:        Lista de líneas de narrativa
+            investigation_id: ID de la investigación (para trazabilidad)
+            source_agent:     Agente que generó la narrativa (auditoría)
+
+        Returns:
+            NarrativeAuditResult con amenazas detectadas y narrativa saneada
+        """
+        # Anti-DoS — limitar tamaño antes de cualquier procesamiento
+        if len(narrative) > _MAX_NARRATIVE_LINES:
+            audit_logger.log_block(
+                event_type="NARRATIVE_OVERFLOW",
+                tool="NarrativeAuditor",
+                input_preview=f"lines={len(narrative)} source={source_agent}",
+                reason=f"Narrative exceeds {_MAX_NARRATIVE_LINES} lines. Truncating.",
+            )
+            narrative = narrative[:_MAX_NARRATIVE_LINES]
+
+        threats:   List[ThreatDetected] = []
+        sanitized: List[str] = []
+
+        for idx, line in enumerate(narrative):
+            if not isinstance(line, str):
+                sanitized.append(str(line))
+                continue
+
+            line_threats = self._scan_line(line, idx)
+            if line_threats:
+                threats.extend(line_threats)
+                if self.strict_mode:
+                    # Cuarentena — reemplazar línea comprometida
+                    sanitized.append(
+                        f"[QUARANTINED LINE {idx}: "
+                        f"{len(line_threats)} threat(s) — "
+                        f"{line_threats[0].pattern_type}]"
+                    )
+                    audit_logger.log_block(
+                        event_type="NARRATIVE_INJECTION_QUARANTINED",
+                        tool="NarrativeAuditor",
+                        input_preview=line[:100],
+                        reason=(
+                            f"Line {idx} quarantined: "
+                            f"{', '.join(t.pattern_type for t in line_threats)}"
+                        ),
+                    )
+                else:
+                    # Modo permisivo — registrar pero no sanitizar
+                    sanitized.append(line)
+            else:
+                sanitized.append(line)
+
+        audit_hash = self._compute_hash(investigation_id, narrative, threats)
+
+        return NarrativeAuditResult(
+            is_clean=len(threats) == 0,
+            threats_detected=threats,
+            sanitized_narrative=sanitized,
+            audit_hash=audit_hash,
+            investigation_id=investigation_id,
+        )
+
+    def _scan_line(self, line: str, line_idx: int) -> List[ThreatDetected]:
+        """Escanea una línea individual contra todos los patrones."""
+        found: List[ThreatDetected] = []
+        for pattern, cls, sev in self._patterns:
+            for match in pattern.finditer(line):
+                found.append(ThreatDetected(
+                    line_index=line_idx,
+                    pattern_type=cls,
+                    severity=sev,
+                    matched_text=match.group(0)[:50],
+                    position=match.start(),
+                ))
+        return found
+
+    def _compute_hash(
+        self,
+        inv_id: str,
+        original: List[str],
+        threats: List[ThreatDetected],
+    ) -> str:
+        """
+        Hash determinista para cadena de custodia del audit.
+        DETERMINISTA: no usa timestamp — mismo input → mismo hash (Qwen P0).
+        """
+        canonical = (
+            f"{inv_id}:{len(original)}:{len(threats)}:"
+            f"{','.join(t.pattern_type for t in threats)}"
+        )
+        return hashlib.sha256(canonical.encode()).hexdigest()[:16]
+
+
+# ---------------------------------------------------------------------------
+# Punto de integración con autonomous_investigation()
+# ---------------------------------------------------------------------------
+
+def audit_narrative_before_seal(
+    narrative: List[str],
+    investigation_id: str,
+    cumulative_verdict: str,
+) -> NarrativeAuditResult:
+    """
+    Punto de integración C3: llamar JUSTO antes de construir `final`
+    en autonomous_investigation().
+
+    Si hay threats CRITICAL y cumulative_verdict es MALICE/INTENT,
+    el reporte debe ser INVALIDATED (WITNESS_HARD_FAIL).
+    """
+    auditor = NarrativeAuditor(strict_mode=True)
+    result  = auditor.audit(narrative, investigation_id, source_agent="claude")
+
+    if not result.is_clean and cumulative_verdict in ("MALICE", "INTENT"):
+        audit_logger.log_block(
+            event_type="CRITICAL_NARRATIVE_INJECTION",
+            tool="audit_narrative_before_seal",
+            input_preview=f"inv={investigation_id}",
+            reason=(
+                f"Narrative injection detected in {cumulative_verdict} report. "
+                f"Threats: {len(result.threats_detected)}. "
+                f"Report INVALIDATED per C3 protocol."
+            ),
+        )
+
+    return result

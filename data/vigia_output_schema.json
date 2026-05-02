@@ -1,0 +1,58 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "vigia_output_schema_v1.0",
+  "title": "VIGÍA Pipeline Output — Canonical Schema v1.0",
+  "description": "Contrato de salida inmutable para cada artefacto procesado por el pipeline VIGÍA. Validación fail-fast pre-escritura.",
+  "type": "object",
+  "required": ["artifact_id", "aggregator", "decision"],
+  "additionalProperties": true,
+  "properties": {
+    "artifact_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Identificador único del artefacto forense"
+    },
+    "aggregator": {
+      "type": "object",
+      "required": ["mi_final"],
+      "properties": {
+        "mi_final": {
+          "type": "object",
+          "required": ["num", "den"],
+          "properties": {
+            "num": {"type": "integer", "minimum": 0},
+            "den": {"type": "integer", "minimum": 1}
+          },
+          "description": "Manipulation Index como fracción irreducible (DEA v1)"
+        },
+        "components": {
+          "type": "object",
+          "properties": {
+            "base":     {"type": "object", "required": ["num", "den"]},
+            "synergy":  {"type": "object", "required": ["num", "den"]},
+            "sequence": {"type": "object", "required": ["num", "den"]}
+          }
+        }
+      }
+    },
+    "decision": {
+      "type": "object",
+      "required": ["alert_level", "verdict"],
+      "properties": {
+        "alert_level": {
+          "type": "string",
+          "enum": ["LOW", "MEDIUM", "HIGH", "CRITICAL"],
+          "description": "Nivel de alerta determinado por el Decision Layer"
+        },
+        "verdict": {
+          "type": "string",
+          "enum": [
+            "ADVERSARIAL_SEMIOTIC_PATTERN_DETECTED",
+            "NO_SEMIOTIC_ANOMALY_DETECTED"
+          ],
+          "description": "Veredicto canónico del pipeline"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,43 @@
+{
+  "description": "Forensic Signal Vector — features semióticos cuantificados para RiskBoundedDecisionLayer",
+  "fields": {
+    "entropy": {
+      "description": "Entropía de Shannon del texto analizado (rational)",
+      "note": "Alta entropía = texto ofuscado o cifrado; baja = padding o repetición",
+      "type": "rational"
+    },
+    "firstness_score": {
+      "description": "Suma de pesos de patrones FIRSTNESS detectados",
+      "max_den": 1,
+      "max_num": 100,
+      "type": "rational"
+    },
+    "manipulation_index": {
+      "description": "Índice compuesto de manipulación (0-1 rational)",
+      "formula": "(2*thirdness + secondness + 0.5*firstness) / 3.5",
+      "note": "Thirdness pesa más porque indica intención",
+      "type": "rational"
+    },
+    "secondness_score": {
+      "description": "Suma de pesos de patrones SECONDNESS detectados",
+      "max_den": 1,
+      "max_num": 100,
+      "type": "rational"
+    },
+    "sequence_count": {
+      "description": "Número de secuencias temporales detectadas",
+      "type": "integer"
+    },
+    "synergy_count": {
+      "description": "Número de reglas de sinergia activadas",
+      "type": "integer"
+    },
+    "thirdness_score": {
+      "description": "Suma de pesos de patrones THIRDNESS detectados",
+      "max_den": 1,
+      "max_num": 100,
+      "type": "rational"
+    }
+  },
+  "version": "1.0"
+}

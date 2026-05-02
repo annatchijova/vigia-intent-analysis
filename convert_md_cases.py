@@ -1,3 +1,10 @@
+#!/usr/bin/env python3
+# Copyright (c) 2026 Anna Tchijova
+# Vigía - Autonomous Incident Response Engine
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
 # License, or (at your option) any later version.
 
 """
@@ -35,12 +42,18 @@ OUTPUT_DIR = "data/cases/consolidated"
 
 # Regex para el formato de Anna
 CASE_RE = re.compile(
-    r'#{2,4}\s*Caso\s+(\d+):\s*(.+?)\s*[\u2013\-]\s*(.+)',
+    r'#{2,4}\s*Caso\s+(\d+)[:\s]*[\u201c\u201d"\']?([^\u201c\u201d"\'\n\-\u2013]+)[\u201c\u201d"\']?\s*[\u2013\-]\s*([^\n]+)',
     re.IGNORECASE,
 )
 
 VERDICT_RE = re.compile(
     r'Veredicto[:\s]*\**\s*(MALICE|INTENT|SUSPICION|NOISE|ABSTAIN)\**\s*\(?(\d+)?%?\)?',
+    re.IGNORECASE,
+)
+
+# Veredicto dentro de la interpretación de VIGÍA
+VERDICT_IN_INTERP_RE = re.compile(
+    r'Veredicto[:\s]+\**\s*(MALICE|INTENT|SUSPICION|NOISE|ABSTAIN)\**\s*\((\d+)%\)',
     re.IGNORECASE,
 )
 
@@ -119,7 +132,10 @@ def parse_case_body(num, name, subtitle, body, source_file):
     """Extrae los campos de un caso desde su cuerpo de texto."""
 
     # Veredicto — obligatorio
-    verdict_match = VERDICT_RE.search(body)
+    # Buscar primero en la interpretación de VIGÍA (formato más común)
+    verdict_match = VERDICT_IN_INTERP_RE.search(body)
+    if not verdict_match:
+        verdict_match = VERDICT_RE.search(body)
     if not verdict_match:
         # Intentar encontrar veredicto en el texto sin formato
         for v in ["MALICE", "INTENT", "SUSPICION", "NOISE", "ABSTAIN"]:

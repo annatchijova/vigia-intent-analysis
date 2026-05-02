@@ -72,15 +72,15 @@ async def _run_tool(tool_name: str, kwargs: dict) -> dict:
     """
     Import and execute a VIGIA tool by name.
     Returns the tool's result dict.
+
+    Import strategy:
+    1. Try the canonical module path first (vigia.tools.*)
+    2. For bridge tools, try multiple candidate module names since the
+       bridge file may be named differently in different environments
+       (vigia_sift_bridge.py, vigia_sift_bridge__5_.py, etc.)
     """
-    # Map tool names to their module locations
-    TOOL_MAP = {
-        "calculate_shannon_entropy": (
-            "vigia_sift_bridge", "calculate_shannon_entropy"
-        ),
-        "generate_forensic_hash": (
-            "vigia_sift_bridge", "generate_forensic_hash"
-        ),
+    # ── Tools with stable module paths (vigia package) ────────────────────
+    STABLE_TOOLS = {
         "audit_document_integrity": (
             "vigia.tools.document_integrity", "audit_document_integrity"
         ),
@@ -90,26 +90,84 @@ async def _run_tool(tool_name: str, kwargs: dict) -> dict:
         "detect_document_geometry": (
             "vigia.tools.document_integrity", "detect_document_geometry"
         ),
+        "ocr_semantic_validator": (
+            "vigia.tools.document_integrity", "ocr_semantic_validator"
+        ),
         "vision_intent_audit": (
             "vigia.tools.vision_audit", "vision_intent_audit"
         ),
     }
 
-    if tool_name not in TOOL_MAP:
-        return {"error": f"Unknown tool: {tool_name}. Available: {list(TOOL_MAP.keys())}"}
+    # ── Tools that live in the bridge (variable filename) ─────────────────
+    BRIDGE_TOOLS = {
+        "calculate_shannon_entropy",
+        "generate_forensic_hash",
+        "read_evidence",
+        "list_files",
+        "search_pattern",
+        "audit_image_metadata",
+        "analyze_stylometry",
+        "calculate_human_entropy",
+        "infer_intent",
+        "detect_habit_incongruence",
+        "detect_human_jitter",
+        "audit_grice_maxims",
+        "detect_eco_overinterpretation",
+    }
 
-    module_path, func_name = TOOL_MAP[tool_name]
+    # Candidate bridge module names (tried in order)
+    _BRIDGE_CANDIDATES = [
+        "vigia_sift_bridge",
+        "vigia_sift_bridge__5_",
+        "vigia_sift_bridge__5_2",
+    ]
+
+    if tool_name not in STABLE_TOOLS and tool_name not in BRIDGE_TOOLS:
+        all_tools = sorted(set(STABLE_TOOLS.keys()) | BRIDGE_TOOLS)
+        return {"error": f"Unknown tool: {tool_name}. Available: {all_tools}"}
+
+    import importlib
+
+    # ── Stable tools: direct import ───────────────────────────────────────
+    if tool_name in STABLE_TOOLS:
+        module_path, func_name = STABLE_TOOLS[tool_name]
+        try:
+            mod = importlib.import_module(module_path)
+            func = getattr(mod, func_name)
+        except (ImportError, AttributeError) as exc:
+            return {"error": f"Cannot import {module_path}.{func_name}: {exc}"}
+
+        try:
+            return await func(**kwargs)
+        except Exception as exc:
+            return {"error": f"Tool execution failed: {exc}"}
+
+    # ── Bridge tools: try candidate module names ──────────────────────────
+    bridge_mod = None
+    tried = []
+    for candidate in _BRIDGE_CANDIDATES:
+        try:
+            bridge_mod = importlib.import_module(candidate)
+            break
+        except ImportError:
+            tried.append(candidate)
+            continue
+
+    if bridge_mod is None:
+        return {
+            "error": (
+                f"Cannot find bridge module. Tried: {tried}. "
+                "Rename your bridge file to vigia_sift_bridge.py or set "
+                "PYTHONPATH to include its directory."
+            )
+        }
+
+    func = getattr(bridge_mod, tool_name, None)
+    if func is None:
+        return {"error": f"Tool '{tool_name}' not found in bridge module {bridge_mod.__name__}"}
 
     try:
-        import importlib
-        mod = importlib.import_module(module_path)
-        func = getattr(mod, func_name)
-    except (ImportError, AttributeError) as exc:
-        return {"error": f"Cannot import {module_path}.{func_name}: {exc}"}
-
-    try:
-        result = await func(**kwargs)
-        return result
+        return await func(**kwargs)
     except Exception as exc:
         return {"error": f"Tool execution failed: {exc}"}
 

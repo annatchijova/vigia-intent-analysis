@@ -1,3 +1,197 @@
+#!/usr/bin/env python3
+"""
+fix_security_init.py
+Aplica los tres fixes P0 recomendados por Kimi/Gemini.
+Correr desde la raiz del repo: python3 fix_security_init.py
+
+Fixes:
+1. vigia/security/__init__.py — agrega trust_decay (habilita CAIE)
+2. vigia/tools/forensic_db.py — stub minimo (habilita adversarial_nlp)
+3. vigia/core/execution_logger.py — logger JSONL para Agent Execution Logs
+"""
+import ast, os, sqlite3
+
+# ─────────────────────────────────────────────────────────────────────────────
+# FIX 1: vigia/security/__init__.py — agregar trust_decay
+# NOTA: Gemini propuso importar KASSANDRA_SALT, generate_nonce, verify_integrity
+# pero esas funciones NO EXISTEN en security.py. Este fix importa solo lo que
+# realmente existe, verificado en el codigo fuente.
+# ─────────────────────────────────────────────────────────────────────────────
+
+SECURITY_INIT = """\
+from vigia.security.security import (
+    SecurityAudit,
+    audit_logger,
+    llm_shield,
+    _utcnow,
+    _sanitize_path,
+    _truncate,
+    rate_limit,
+    RateLimitExceeded,
+    TrustExponentialDecay,
+    trust_decay,
+)
+from vigia.security.sandbox import sandboxed_execute, safe_grep
+
+__all__ = [
+    "SecurityAudit",
+    "audit_logger",
+    "llm_shield",
+    "_utcnow",
+    "_sanitize_path",
+    "_truncate",
+    "rate_limit",
+    "RateLimitExceeded",
+    "TrustExponentialDecay",
+    "trust_decay",
+    "sandboxed_execute",
+    "safe_grep",
+]
+"""
+
+# ─────────────────────────────────────────────────────────────────────────────
+# FIX 2: vigia/tools/forensic_db.py — stub minimo para adversarial_nlp
+# Crea un modulo Python (no solo SQLite) porque adversarial_nlp hace
+# "from vigia.tools.forensic_db import ..." no "import sqlite3"
+# ─────────────────────────────────────────────────────────────────────────────
+
+FORENSIC_DB_PY = '''\
+# Copyright (c) 2026 Anna Tchijova
+# Vigía - Autonomous Incident Response Engine
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+
+"""
+vigia/tools/forensic_db.py
+
+Stub minimo del repositorio de patrones NLP forenses.
+Provee la interfaz que adversarial_nlp.py espera para cargar patrones
+de Grice, Carnegie y deteccion estilomentrica.
+
+Estado: STUB — patron minimo de prueba.
+Para produccion: poblar con corpus real via fit_calibration.py
+"""
+
+import os
+import sqlite3
+from typing import List, Dict, Any, Optional
+
+_DB_PATH = os.path.join(os.path.dirname(__file__), "forensic_patterns.sqlite")
+
+
+def _get_connection() -> sqlite3.Connection:
+    conn = sqlite3.connect(_DB_PATH)
+    conn.row_factory = sqlite3.Row
+    return conn
+
+
+def _init_db() -> None:
+    """Inicializa el esquema si no existe."""
+    with _get_connection() as conn:
+        conn.executescript("""
+            CREATE TABLE IF NOT EXISTS nlp_patterns (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                category TEXT NOT NULL,
+                pattern_regex TEXT NOT NULL,
+                weight REAL DEFAULT 0.5,
+                description TEXT,
+                source TEXT DEFAULT 'synthetic'
+            );
+            CREATE TABLE IF NOT EXISTS baseline_corpus (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                tool_name TEXT NOT NULL,
+                ground_truth TEXT NOT NULL,
+                z_score REAL,
+                raw_score REAL,
+                notes TEXT
+            );
+        """)
+        # Patrones minimos de prueba
+        existing = conn.execute(
+            "SELECT COUNT(*) FROM nlp_patterns"
+        ).fetchone()[0]
+        if existing == 0:
+            patterns = [
+                ("CARNEGIE_NOBLE", r"(?i)solo quiero ayudar", 0.85,
+                 "Noble motive appeal"),
+                ("CARNEGIE_FLATTERY", r"(?i)eres (el|la) mejor", 0.80,
+                 "Flattery to lower defenses"),
+                ("GRICE_QUALITY", r"(?i)segun (estudios|expertos) de \d{4}", 0.75,
+                 "Unverifiable authority claim"),
+                ("GRICE_QUANTITY", r"(?i)(urgente|inmediato|ahora mismo)", 0.70,
+                 "Artificial urgency"),
+                ("SLAVIC_SYNTAX", r"make (function|restart|delete) (for|of)", 0.90,
+                 "Slavic syntax pattern — missing articles"),
+            ]
+            conn.executemany(
+                "INSERT INTO nlp_patterns "
+                "(category, pattern_regex, weight, description) VALUES (?,?,?,?)",
+                patterns,
+            )
+
+
+# Inicializar al importar
+_init_db()
+
+
+def get_patterns(category: Optional[str] = None) -> List[Dict[str, Any]]:
+    """Devuelve patrones NLP, opcionalmente filtrados por categoria."""
+    with _get_connection() as conn:
+        if category:
+            rows = conn.execute(
+                "SELECT * FROM nlp_patterns WHERE category = ?", (category,)
+            ).fetchall()
+        else:
+            rows = conn.execute(
+                "SELECT * FROM nlp_patterns"
+            ).fetchall()
+    return [dict(r) for r in rows]
+
+
+def get_baseline_corpus(tool_name: Optional[str] = None) -> List[Dict[str, Any]]:
+    """Devuelve corpus de baseline para calibracion KDE."""
+    with _get_connection() as conn:
+        if tool_name:
+            rows = conn.execute(
+                "SELECT * FROM baseline_corpus WHERE tool_name = ?",
+                (tool_name,)
+            ).fetchall()
+        else:
+            rows = conn.execute(
+                "SELECT * FROM baseline_corpus"
+            ).fetchall()
+    return [dict(r) for r in rows]
+
+
+def add_corpus_sample(tool_name: str, ground_truth: str,
+                      z_score: float, raw_score: float,
+                      notes: str = "") -> int:
+    """Agrega una muestra al corpus de calibracion."""
+    with _get_connection() as conn:
+        cursor = conn.execute(
+            "INSERT INTO baseline_corpus "
+            "(tool_name, ground_truth, z_score, raw_score, notes) "
+            "VALUES (?,?,?,?,?)",
+            (tool_name, ground_truth, z_score, raw_score, notes),
+        )
+        return cursor.lastrowid
+'''
+
+# ─────────────────────────────────────────────────────────────────────────────
+# FIX 3: vigia/core/execution_logger.py — Agent Execution Logs (JSONL)
+# Entregable obligatorio del hackathon — "Agent Execution Logs"
+# ─────────────────────────────────────────────────────────────────────────────
+
+EXECUTION_LOGGER_PY = '''\
+# Copyright (c) 2026 Anna Tchijova
+# Vigía - Autonomous Incident Response Engine
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
 # License, or (at your option) any later version.
 
 """
