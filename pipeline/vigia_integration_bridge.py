@@ -195,6 +195,177 @@ def _sanitize_case_input(case: Dict[str, Any]) -> Dict[str, Any]:
     return {k: v for k, v in case.items() if k not in _RESERVED_CASE_FIELDS}
 
 
+# ===========================================================================
+# SCHEMA NORMALIZER — convierte schema legacy (type/content/forensic_anomalies)
+# al schema canónico EBS v1 (evidence_type/raw_score/source_tool).
+# Activado automáticamente cuando un artefacto carece de evidence_type.
+# Determinista: usa aritmética de enteros, sin float, reproducible bit-a-bit.
+# ===========================================================================
+
+# Mapeo canónico: type (legacy) → evidence_type (EBS v1)
+# Principio de mínima sorpresa: si no está en la tabla → "default"
+_LEGACY_TYPE_TO_EVIDENCE: Dict[str, str] = {
+    "registry":                   "registry_key",
+    "network_flow":               "network_artifact",
+    "network_capture_summary":    "network_artifact",
+    "flujo_red":                  "network_artifact",
+    "bash_history":               "log_entry",
+    "auth_log":                   "log_entry",
+    "system_log":                 "log_entry",
+    "file_metadata":              "file_timestamp",
+    "filesystem_metadata":        "file_timestamp",
+    "file_access_audit":          "file_timestamp",
+    "timestamp":                  "file_timestamp",
+    "process_list":               "memory_process",
+    "memory_string":              "memory_process",
+    "email_header":               "log_entry",
+    "email_headers":              "log_entry",
+    "pdf_document":               "log_entry",
+    "accounting_system_log":      "log_entry",
+    "screenshot_dashboard":       "log_entry",
+    "registro_acceso":            "log_entry",
+    "historial_accesos_referencia": "log_entry",
+    "contexto_usuario":           "log_entry",
+}
+
+# Mapeo: peirce_layer → multiplicador de score (numerador/denominador, enteros)
+# THIRDNESS = inferencia interpretativa = mayor peso forense
+_PEIRCE_WEIGHT_NUM: Dict[str, int] = {
+    "FIRSTNESS":  8,   # 8/10 = 0.80
+    "SECONDNESS": 9,   # 9/10 = 0.90
+    "THIRDNESS":  10,  # 10/10 = 1.00 (máximo peso)
+}
+_PEIRCE_WEIGHT_DEN = 10
+
+# Escala base: max anomalies esperadas = 4 (calibrado sobre corpus VIGIA-REAL).
+# Justificación Daubert: en DFIR, 2 anomalías corroboradas en un artefacto forense
+# constituye evidencia significativa. Una escala de 8 inflaría la tolerancia del
+# motor más allá de lo que el corpus real justifica.
+_ANOMALY_SCALE = 4
+
+# Bonus por analyst_flag (entero): +1 por flag, sobre escala *100
+_FLAG_BONUS_PER_FLAG = 5   # = 5/100 = 0.05 por flag
+
+
+def _normalize_artifact_legacy(artifact: Dict[str, Any], idx: int) -> Dict[str, Any]:
+    """
+    Normaliza un artefacto legacy al schema EBS v1.
+
+    Si ya tiene evidence_type y raw_score → devuelve copia sin modificar.
+    Si usa schema legacy (type + content + forensic_anomalies) → convierte.
+
+    raw_score se calcula como entero / denominador para garantizar
+    determinismo bit-a-bit sin floating point:
+
+        score_num = n_anomalies * peirce_weight_num + n_flags * FLAG_BONUS
+        score_den = ANOMALY_SCALE * PEIRCE_WEIGHT_DEN * 100  (por FLAG_BONUS en centésimas)
+        raw_score = clamp(score_num / score_den, 0.05, 0.95)
+
+    El clamp inferior 0.05 evita score=0 que haría divergir el z-score.
+    El clamp superior 0.95 preserva espacio para calibración posterior.
+    """
+    # Artefacto ya canónico → pass-through
+    if "evidence_type" in artifact and "raw_score" in artifact:
+        return dict(artifact)
+
+    art = dict(artifact)
+
+    # --- evidence_type ---
+    legacy_type = str(art.get("type", "")).strip().lower()
+    art["evidence_type"] = _LEGACY_TYPE_TO_EVIDENCE.get(legacy_type, "default")
+
+    # --- source_tool ---
+    if "source_tool" not in art:
+        art["source_tool"] = art.pop("source", "legacy_import")
+
+    # --- raw_score (aritmética entera) ---
+    anomalies = art.get("forensic_anomalies", [])
+    if not isinstance(anomalies, list):
+        anomalies = []
+    n_anomalies = len(anomalies)
+
+    analyst_flags = art.get("analyst_flags", [])
+    if not isinstance(analyst_flags, list):
+        analyst_flags = []
+    n_flags = len(analyst_flags)
+
+    peirce_layer = str(art.get("peirce_layer", "SECONDNESS")).upper()
+    peirce_num = _PEIRCE_WEIGHT_NUM.get(peirce_layer, _PEIRCE_WEIGHT_NUM["SECONDNESS"])
+
+    # Numerador: anomalies * peirce_weight (sobre base 10) + flags * 5 (centésimas)
+    # Denominador común: ANOMALY_SCALE * 10 * 100 = 8000
+    denom = _ANOMALY_SCALE * _PEIRCE_WEIGHT_DEN * 100
+    score_num = n_anomalies * peirce_num * 100 + n_flags * _FLAG_BONUS_PER_FLAG * _PEIRCE_WEIGHT_DEN
+    # Clamp [0.05, 0.95] en enteros sobre denom=8000
+    low  = 5 * denom // 100   # = 400 → 0.05
+    high = 95 * denom // 100  # = 7600 → 0.95
+    score_num = max(low, min(high, score_num))
+    art["raw_score"] = round(score_num / denom, 4)
+
+    # --- prior_trust: heurística conservadora si no presente ---
+    if "prior_trust" not in art:
+        # SECONDNESS/THIRDNESS = alta confianza; FIRSTNESS = moderada
+        art["prior_trust"] = {
+            "FIRSTNESS": 0.70,
+            "SECONDNESS": 0.85,
+            "THIRDNESS": 0.90,
+        }.get(peirce_layer, 0.75)
+
+    # --- provenance_chain: si falta, marcar como desconocida ---
+    if "provenance_chain" not in art:
+        art["provenance_chain"] = ["sha256:legacy_unknown_provenance"]
+
+    logger.debug(
+        "[normalize_legacy] artifact[%d] id=%s type=%s→evidence_type=%s raw_score=%.4f",
+        idx, art.get("artifact_id", "?"), legacy_type,
+        art["evidence_type"], art["raw_score"],
+    )
+    return art
+
+
+def normalize_case_schema(case: Dict[str, Any]) -> Dict[str, Any]:
+    """
+    Punto de entrada público del normalizador.
+
+    Detecta si el caso usa schema legacy (ningún artefacto tiene evidence_type)
+    y aplica _normalize_artifact_legacy a cada artefacto.
+
+    Si el schema ya es EBS v1 → devuelve copia sin modificar (idempotente).
+
+    Invariante: esta función nunca lanza excepción — los errores de schema
+    son responsabilidad de validate_case_schema() que sigue después.
+    """
+    artifacts = case.get("artifacts", [])
+    if not isinstance(artifacts, list) or not artifacts:
+        return dict(case)  # validate_case_schema lo rechazará después
+
+    # Detección: ¿algún artefacto ya tiene evidence_type?
+    has_canonical = any("evidence_type" in a for a in artifacts if isinstance(a, dict))
+
+    if has_canonical:
+        # Schema mixto o canónico → normalizar solo los legacy
+        normalized_arts = [
+            _normalize_artifact_legacy(a, i) if isinstance(a, dict) else a
+            for i, a in enumerate(artifacts)
+        ]
+        case_out = dict(case)
+        case_out["artifacts"] = normalized_arts
+        return case_out
+
+    # Schema 100% legacy
+    logger.info(
+        "[normalize_case_schema] caso '%s': schema legacy detectado — normalizando %d artefactos",
+        case.get("case_id", "?"), len(artifacts),
+    )
+    normalized_arts = [
+        _normalize_artifact_legacy(a, i) if isinstance(a, dict) else a
+        for i, a in enumerate(artifacts)
+    ]
+    case_out = dict(case)
+    case_out["artifacts"] = normalized_arts
+    return case_out
+
+
 def validate_case_schema(case: Dict[str, Any]) -> None:
     """
     Valida el schema mínimo del caso forense.
@@ -790,7 +961,8 @@ class VigiaIntegrationEngine:
         self._log("CASE_START", case_id=case_id)
 
         # ── Paso 0: Sanitización + Validación de schema ────────────────────
-        case = _sanitize_case_input(case)   # H15: eliminar campos reservados inyectados
+        case = _sanitize_case_input(case)        # H15: eliminar campos reservados inyectados
+        case = normalize_case_schema(case)       # compatibilidad schema legacy → EBS v1
         try:
             validate_case_schema(case)
             self._log("SCHEMA_OK", case_id=case_id)

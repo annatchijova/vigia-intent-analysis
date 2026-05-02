@@ -1,2 +1,1 @@
-"""vigia.core — Motores de razonamiento forense."""
-from vigia.core.trust_fusion import TrustFusionEngine  # noqa: F401
+"""vigia/core — shim: reexporta módulos desde raíz del proyecto."""

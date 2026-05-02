@@ -1,2 +1,6 @@
-from vigia.security.sandbox import sandboxed_execute, safe_grep
-__all__ = ["sandboxed_execute", "safe_grep"]
+"""Shim: reexporta sandbox desde raíz del proyecto."""
+import importlib as _il, sys as _sys, os as _os
+_root = _os.path.dirname(_os.path.dirname(_os.path.abspath(__file__)))
+if _root not in _sys.path: _sys.path.insert(0, _root)
+_m = _il.import_module("sandbox")
+globals().update({k: getattr(_m, k) for k in dir(_m) if not k.startswith("__")})

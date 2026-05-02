@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 """
 forensics/verify_ebs_v1.py
 ─────────────────────────────────────────────────────────────────────────────
@@ -47,13 +48,6 @@ from __future__ import annotations
 
 # STDLIB ONLY — cero imports de produccion
 import argparse
-import os as _os
-import sys as _sys
-# Auto-path: agregar raíz del repo para imports standalone
-_HERE = _os.path.dirname(_os.path.abspath(__file__))
-_REPO_ROOT = _os.path.dirname(_HERE)  # tests/ -> repo/
-if _REPO_ROOT not in _sys.path:
-    _sys.path.insert(0, _REPO_ROOT)
 import hashlib
 import json
 import math
@@ -69,18 +63,13 @@ from typing import Any, Dict, List, Optional, Tuple
 
 _EBS_VERSION = "1.0"
 _EBS_SUPPORTED_VERSIONS = ["1.0"]
-_VERIFIER_VERSION = "1.2.0"   # bumped por P0-1 float determinismo
+_VERIFIER_VERSION = "1.1.0"   # bumped por refactorizacion
 
 
 # ---------------------------------------------------------------------------
-# Normalizacion determinista de floats — P0-1 (Kimi audit)
-# Debe ser IDENTICA a bundle_builder._round_floats para hash cross-OS.
+# Hash helper — implementacion local, identica a bundle_builder._sha256_dict
 # ---------------------------------------------------------------------------
-_DETERMINISTIC_FLOAT_PREC = 6
 
-
-# Implementación standalone de _canonicalize/_sha256_dict
-# Copiada de vigia/core/bundle_builder.py para funcionar sin PYTHONPATH
 def _canonicalize(obj: Any) -> Any:
     """
     Convierte recursivamente un objeto a forma canónica estricta para hasheo (H22).
@@ -132,32 +121,6 @@ def _sha256_dict(obj: Dict) -> str:
     """
     canonical = _canonicalize(obj)
     serialized = json.dumps(canonical, sort_keys=True, ensure_ascii=True).encode("utf-8")
-    return hashlib.sha256(serialized).hexdigest()
-
-def _round_floats(obj: Any) -> Any:
-    """
-    Normalizacion recursiva de floats para hashing determinista cross-OS.
-    Aplicar SIEMPRE antes de json.dumps en contexto de hash.
-    """
-    if isinstance(obj, float):
-        if not math.isfinite(obj):
-            return str(obj)  # "nan" / "inf" — reproducible
-        return round(obj, _DETERMINISTIC_FLOAT_PREC)
-    if isinstance(obj, dict):
-        return {k: _round_floats(v) for k, v in obj.items()}
-    if isinstance(obj, list):
-        return [_round_floats(v) for v in obj]
-    return obj
-
-
-# ---------------------------------------------------------------------------
-# Hash helper — implementacion local, identica a bundle_builder._sha256_dict
-# ---------------------------------------------------------------------------
-
-def _sha256_dict(obj: Dict) -> str:
-    """SHA-256 determinístico — usa _canonicalize() igual que bundle_builder."""
-    canonical = _canonicalize(obj)
-    serialized = json.dumps(canonical, sort_keys=True, ensure_ascii=True).encode('utf-8')
     return hashlib.sha256(serialized).hexdigest()
 
 

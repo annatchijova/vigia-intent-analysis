@@ -20,6 +20,13 @@ import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
+# Normalizador de schema legacy → EBS v1 (casos REAL y demo avanzados)
+try:
+    from vigia_integration_bridge import normalize_case_schema as _normalize_case
+except ImportError:
+    def _normalize_case(c):  # type: ignore[misc]
+        return c  # fallback no-op: el caso se procesa como viene
+
 # Colores ANSI para terminal
 RED = "\033[91m"
 YEL = "\033[93m"
@@ -248,6 +255,7 @@ def run_case(case_path: str) -> None:
 
     with open(path, encoding="utf-8") as f:
         case = json.load(f)
+    case = _normalize_case(case)  # compatibilidad schema legacy → EBS v1
 
     print(f"\n{BLD}{'=' * 62}{RST}")
     print(f"{BLD}VIGÍA FORENSIC ANALYSIS{RST}")

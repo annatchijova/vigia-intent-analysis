@@ -10,77 +10,304 @@
       "document_forgery_indicators"
     ]
   },
-
   "common_words": {
     "description": "Russian/Slavic words phonetically transcribed to Latin. A match in logs/bash history is a hard attribution signal.",
     "entries": {
-      "privet":    { "original": "привет",  "meaning": "hello",               "confidence": 0.85 },
-      "parol":     { "original": "пароль",  "meaning": "password",            "confidence": 0.9  },
-      "vzlomat":   { "original": "взломать","meaning": "to hack/break",        "confidence": 0.95 },
-      "udalit":    { "original": "удалить", "meaning": "to delete",           "confidence": 0.9  },
-      "zagruzka":  { "original": "загрузка","meaning": "download/upload",     "confidence": 0.85 },
-      "server":    { "original": "сервер",  "meaning": "server (loanword)",   "confidence": 0.5  },
-      "baza":      { "original": "база",    "meaning": "database/base",       "confidence": 0.7  },
-      "nagruzka":  { "original": "нагрузка","meaning": "payload/load",        "confidence": 0.85 },
-      "dvizhok":   { "original": "движок",  "meaning": "engine/driver",       "confidence": 0.8  },
-      "shkaf":     { "original": "шкаф",    "meaning": "cabinet/rack",        "confidence": 0.7  },
-      "skhema":    { "original": "схема",   "meaning": "schema/scheme",       "confidence": 0.75 },
-      "klyuch":    { "original": "ключ",    "meaning": "key (crypto/physical)","confidence": 0.9  }
+      "privet": {
+        "original": "привет",
+        "meaning": "hello",
+        "confidence": 0.85
+      },
+      "parol": {
+        "original": "пароль",
+        "meaning": "password",
+        "confidence": 0.9
+      },
+      "vzlomat": {
+        "original": "взломать",
+        "meaning": "to hack/break",
+        "confidence": 0.95
+      },
+      "udalit": {
+        "original": "удалить",
+        "meaning": "to delete",
+        "confidence": 0.9
+      },
+      "zagruzka": {
+        "original": "загрузка",
+        "meaning": "download/upload",
+        "confidence": 0.85
+      },
+      "server": {
+        "original": "сервер",
+        "meaning": "server (loanword)",
+        "confidence": 0.5
+      },
+      "baza": {
+        "original": "база",
+        "meaning": "database/base",
+        "confidence": 0.7
+      },
+      "nagruzka": {
+        "original": "нагрузка",
+        "meaning": "payload/load",
+        "confidence": 0.85
+      },
+      "dvizhok": {
+        "original": "движок",
+        "meaning": "engine/driver",
+        "confidence": 0.8
+      },
+      "shkaf": {
+        "original": "шкаф",
+        "meaning": "cabinet/rack",
+        "confidence": 0.7
+      },
+      "skhema": {
+        "original": "схема",
+        "meaning": "schema/scheme",
+        "confidence": 0.75
+      },
+      "klyuch": {
+        "original": "ключ",
+        "meaning": "key (crypto/physical)",
+        "confidence": 0.9
+      },
+      "vzlom": {
+        "original": "взлом",
+        "meaning": "hack/breach",
+        "confidence": 0.95
+      },
+      "dostup": {
+        "original": "доступ",
+        "meaning": "access/credentials",
+        "confidence": 0.95
+      },
+      "rasia": {
+        "original": "Россия",
+        "meaning": "Russia (phonetic)",
+        "confidence": 0.9
+      },
+      "unichtozit": {
+        "original": "уничтожить",
+        "meaning": "to destroy/wipe",
+        "confidence": 0.95
+      },
+      "adminka": {
+        "original": "админка",
+        "meaning": "admin panel",
+        "confidence": 0.9
+      },
+      "zagruzit": {
+        "original": "загрузить",
+        "meaning": "to upload/download",
+        "confidence": 0.88
+      },
+      "sniffer": {
+        "original": "сниффер",
+        "meaning": "packet sniffer",
+        "confidence": 0.85
+      },
+      "sployt": {
+        "original": "сплойт",
+        "meaning": "exploit (loanword)",
+        "confidence": 0.93
+      }
     }
   },
-
   "homoglyph_patterns": {
     "description": "Unicode homoglyphs: visually identical chars from different scripts. Presence in code/logs = deliberate obfuscation.",
     "entries": {
-      "\\u0430": { "looks_like": "a", "script": "Cyrillic small a",  "confidence": 0.9 },
-      "\\u0435": { "looks_like": "e", "script": "Cyrillic small e",  "confidence": 0.9 },
-      "\\u043e": { "looks_like": "o", "script": "Cyrillic small o",  "confidence": 0.9 },
-      "\\u0440": { "looks_like": "p", "script": "Cyrillic small r",  "confidence": 0.9 },
-      "\\u0441": { "looks_like": "c", "script": "Cyrillic small c",  "confidence": 0.9 },
-      "\\u0445": { "looks_like": "x", "script": "Cyrillic small kha","confidence": 0.9 },
-      "\\u0392": { "looks_like": "B", "script": "Cyrillic Ve",       "confidence": 0.85},
-      "\\u0421": { "looks_like": "C", "script": "Cyrillic Es",       "confidence": 0.85},
-      "\\u0415": { "looks_like": "E", "script": "Cyrillic IE",       "confidence": 0.85},
-      "\\u041a": { "looks_like": "K", "script": "Cyrillic Ka",       "confidence": 0.85},
-      "\\u041c": { "looks_like": "M", "script": "Cyrillic Em",       "confidence": 0.85},
-      "\\u041d": { "looks_like": "H", "script": "Cyrillic En",       "confidence": 0.85},
-      "\\u041e": { "looks_like": "O", "script": "Cyrillic O",        "confidence": 0.85},
-      "\\u0420": { "looks_like": "P", "script": "Cyrillic Er",       "confidence": 0.85},
-      "\\u0422": { "looks_like": "T", "script": "Cyrillic Te",       "confidence": 0.85},
-      "\\u0425": { "looks_like": "X", "script": "Cyrillic Kha",      "confidence": 0.85},
-      "\\u0443": { "looks_like": "y", "script": "Cyrillic u",        "confidence": 0.85},
-      "\\u2019": { "looks_like": "'", "script": "Right single quotation mark (non-breaking)", "confidence": 0.7 },
-      "\\u00a0": { "looks_like": " ", "script": "Non-breaking space (Cyrillic/EU keyboard)", "confidence": 0.75 },
-      "\\u00ab": { "looks_like": "<<","script": "Left-pointing guillemet (EU keyboard)",     "confidence": 0.7 },
-      "\\u00bb": { "looks_like": ">>","script": "Right-pointing guillemet (EU keyboard)",    "confidence": 0.7 }
+      "\\u0430": {
+        "looks_like": "a",
+        "script": "Cyrillic small a",
+        "confidence": 0.9
+      },
+      "\\u0435": {
+        "looks_like": "e",
+        "script": "Cyrillic small e",
+        "confidence": 0.9
+      },
+      "\\u043e": {
+        "looks_like": "o",
+        "script": "Cyrillic small o",
+        "confidence": 0.9
+      },
+      "\\u0440": {
+        "looks_like": "p",
+        "script": "Cyrillic small r",
+        "confidence": 0.9
+      },
+      "\\u0441": {
+        "looks_like": "c",
+        "script": "Cyrillic small c",
+        "confidence": 0.9
+      },
+      "\\u0445": {
+        "looks_like": "x",
+        "script": "Cyrillic small kha",
+        "confidence": 0.9
+      },
+      "\\u0392": {
+        "looks_like": "B",
+        "script": "Cyrillic Ve",
+        "confidence": 0.85
+      },
+      "\\u0421": {
+        "looks_like": "C",
+        "script": "Cyrillic Es",
+        "confidence": 0.85
+      },
+      "\\u0415": {
+        "looks_like": "E",
+        "script": "Cyrillic IE",
+        "confidence": 0.85
+      },
+      "\\u041a": {
+        "looks_like": "K",
+        "script": "Cyrillic Ka",
+        "confidence": 0.85
+      },
+      "\\u041c": {
+        "looks_like": "M",
+        "script": "Cyrillic Em",
+        "confidence": 0.85
+      },
+      "\\u041d": {
+        "looks_like": "H",
+        "script": "Cyrillic En",
+        "confidence": 0.85
+      },
+      "\\u041e": {
+        "looks_like": "O",
+        "script": "Cyrillic O",
+        "confidence": 0.85
+      },
+      "\\u0420": {
+        "looks_like": "P",
+        "script": "Cyrillic Er",
+        "confidence": 0.85
+      },
+      "\\u0422": {
+        "looks_like": "T",
+        "script": "Cyrillic Te",
+        "confidence": 0.85
+      },
+      "\\u0425": {
+        "looks_like": "X",
+        "script": "Cyrillic Kha",
+        "confidence": 0.85
+      },
+      "\\u0443": {
+        "looks_like": "y",
+        "script": "Cyrillic u",
+        "confidence": 0.85
+      },
+      "\\u2019": {
+        "looks_like": "'",
+        "script": "Right single quotation mark (non-breaking)",
+        "confidence": 0.7
+      },
+      "\\u00a0": {
+        "looks_like": " ",
+        "script": "Non-breaking space (Cyrillic/EU keyboard)",
+        "confidence": 0.75
+      },
+      "\\u00ab": {
+        "looks_like": "<<",
+        "script": "Left-pointing guillemet (EU keyboard)",
+        "confidence": 0.7
+      },
+      "\\u00bb": {
+        "looks_like": ">>",
+        "script": "Right-pointing guillemet (EU keyboard)",
+        "confidence": 0.7
+      }
     }
   },
-
   "layout_slips": {
     "description": "Strings typed with Russian keyboard layout active but while expecting Latin. Found in logs/terminals = attacker forgot to switch layout. Case 001 / PDF p.1.",
     "entries": {
-      "ghbdtn":  { "intended": "привет",  "meaning": "hello",                    "confidence": 0.95 },
-      "cnfnbz":  { "intended": "статья",  "meaning": "article/report",           "confidence": 0.95 },
-      "cnhfyt":  { "intended": "стране",  "meaning": "country (genitive)",       "confidence": 0.9  },
-      "ыгвщ":    { "intended": "sudo",    "meaning": "superuser do",             "confidence": 0.98 },
-      "кщще":    { "intended": "root",    "meaning": "root user",                "confidence": 0.98 },
-      "vjcrdf":  { "intended": "москва",  "meaning": "Moscow",                   "confidence": 0.9  },
-      "ckfdf":   { "intended": "слава",   "meaning": "glory/Slava (name)",       "confidence": 0.85 },
-      "gfhjkm":  { "intended": "пароль",  "meaning": "password",                 "confidence": 0.98 },
-      "cfqn":    { "intended": "сайт",    "meaning": "website",                  "confidence": 0.85 },
-      "bcgjkmpjdfybt": { "intended": "использование", "meaning": "usage/exploit","confidence": 0.9  },
-      "lfyyst":  { "intended": "данные",  "meaning": "data",                     "confidence": 0.9  },
-      "cthtd`h": { "intended": "сервер",  "meaning": "server",                   "confidence": 0.9  },
-      "pfuheprf": { "intended": "загрузка","meaning": "upload/download",         "confidence": 0.9  },
-      "elfkbnm":  { "intended": "удалить", "meaning": "to delete",               "confidence": 0.95 },
-      "htrjylm": { "intended": "рекорд",  "meaning": "record",                   "confidence": 0.8  }
+      "ghbdtn": {
+        "intended": "привет",
+        "meaning": "hello",
+        "confidence": 0.95
+      },
+      "cnfnbz": {
+        "intended": "статья",
+        "meaning": "article/report",
+        "confidence": 0.95
+      },
+      "cnhfyt": {
+        "intended": "стране",
+        "meaning": "country (genitive)",
+        "confidence": 0.9
+      },
+      "ыгвщ": {
+        "intended": "sudo",
+        "meaning": "superuser do",
+        "confidence": 0.98
+      },
+      "кщще": {
+        "intended": "root",
+        "meaning": "root user",
+        "confidence": 0.98
+      },
+      "vjcrdf": {
+        "intended": "москва",
+        "meaning": "Moscow",
+        "confidence": 0.9
+      },
+      "ckfdf": {
+        "intended": "слава",
+        "meaning": "glory/Slava (name)",
+        "confidence": 0.85
+      },
+      "gfhjkm": {
+        "intended": "пароль",
+        "meaning": "password",
+        "confidence": 0.98
+      },
+      "cfqn": {
+        "intended": "сайт",
+        "meaning": "website",
+        "confidence": 0.85
+      },
+      "bcgjkmpjdfybt": {
+        "intended": "использование",
+        "meaning": "usage/exploit",
+        "confidence": 0.9
+      },
+      "lfyyst": {
+        "intended": "данные",
+        "meaning": "data",
+        "confidence": 0.9
+      },
+      "cthtd`h": {
+        "intended": "сервер",
+        "meaning": "server",
+        "confidence": 0.9
+      },
+      "pfuheprf": {
+        "intended": "загрузка",
+        "meaning": "upload/download",
+        "confidence": 0.9
+      },
+      "elfkbnm": {
+        "intended": "удалить",
+        "meaning": "to delete",
+        "confidence": 0.95
+      },
+      "htrjylm": {
+        "intended": "рекорд",
+        "meaning": "record",
+        "confidence": 0.8
+      }
     }
   },
-
   "behavioral_signatures": {
     "description": "Named attack patterns derived from VIGÍA case library (cases 004-039). Each entry maps a pattern name to detection heuristics and the Peirce frame.",
     "entries": {
-
       "WEAPONIZED_INCOMPETENCE": {
         "case": "004",
         "aka": "Coartada de Estupidez",
@@ -97,7 +324,6 @@
         },
         "confidence_weight": 0.8
       },
-
       "SMOKESCREEN_NOISE": {
         "case": "005",
         "aka": "Ruido Blanco Distractor / Cortina de Humo",
@@ -114,7 +340,6 @@
         },
         "confidence_weight": 0.85
       },
-
       "SLAVIC_SYNTAX_SLIP": {
         "case": "006",
         "aka": "Traición Gramatical",
@@ -131,7 +356,6 @@
         },
         "confidence_weight": 0.7
       },
-
       "CIRCADIAN_BREACH": {
         "case": "007",
         "aka": "Insomnio Táctico / Ruptura del Ritmo Circadiano",
@@ -148,7 +372,6 @@
         },
         "confidence_weight": 0.75
       },
-
       "PANOPTICON_CHECK": {
         "case": "008",
         "aka": "Paranoia del Perímetro / Reconocimiento Hostil",
@@ -165,7 +388,6 @@
         },
         "confidence_weight": 0.8
       },
-
       "SURGICAL_VOID": {
         "case": "009",
         "aka": "Vacío Quirúrgico / Sobre-Destrucción",
@@ -182,7 +404,6 @@
         },
         "confidence_weight": 0.9
       },
-
       "CARNEGIE_SHIELD": {
         "case": "010",
         "aka": "Falso Positivo Empático / Secuestro Emocional",
@@ -199,7 +420,6 @@
         },
         "confidence_weight": 0.85
       },
-
       "STYLOMETRIC_IMPOSTOR": {
         "case": "011",
         "aka": "Traición de la Puntuación / Usurpación de Huella Estilométrica",
@@ -217,7 +437,6 @@
         },
         "confidence_weight": 0.75
       },
-
       "PARASITIC_EXFIL": {
         "case": "012",
         "aka": "Camuflaje Simbiótico / Parasitismo Contextual",
@@ -234,7 +453,6 @@
         },
         "confidence_weight": 0.9
       },
-
       "GRICEAN_OVERCOOP": {
         "case": "013",
         "aka": "Síndrome de Estocolmo Inverso / Exceso de Docilidad",
@@ -252,7 +470,6 @@
         },
         "confidence_weight": 0.75
       },
-
       "BUTTERFINGERS_EXFIL": {
         "case": "014",
         "aka": "Falsa Torpeza / Exfiltración Enmascarada",
@@ -269,7 +486,6 @@
         },
         "confidence_weight": 0.92
       },
-
       "SAVIOR_COMPLEX": {
         "case": "015",
         "aka": "Caballo de Troya Altruista / Manipulación Heroica",
@@ -286,7 +502,6 @@
         },
         "confidence_weight": 0.88
       },
-
       "FATIGUE_NORMALIZATION": {
         "case": "016",
         "aka": "Auto-Gaslighting del Sistema / Preparación de Terreno",
@@ -303,7 +518,6 @@
         },
         "confidence_weight": 0.85
       },
-
       "TIMESTAMP_FORGERY": {
         "case": "017",
         "description": "File mtime/atime forged to an era-inconsistent value; format/feature contradicts stated age.",
@@ -319,7 +533,6 @@
         },
         "confidence_weight": 0.9
       },
-
       "ASTROTURFING": {
         "case": "018",
         "aka": "Clonación Sintáctica / Sockpuppet",
@@ -336,7 +549,6 @@
         },
         "confidence_weight": 0.85
       },
-
       "PRIVILEGE_BAIT": {
         "case": "019",
         "aka": "Trampa de la Urgencia Invertida / Señuelo de Privilegios",
@@ -353,7 +565,6 @@
         },
         "confidence_weight": 0.88
       },
-
       "TOPOGRAPHIC_MIMICRY": {
         "case": "020",
         "description": "Legitimate-named binary executing from anomalous filesystem location.",
@@ -369,7 +580,6 @@
         },
         "confidence_weight": 0.95
       },
-
       "LOCALE_LEAKAGE": {
         "case": "021",
         "description": "Non-breaking spaces or guillemet quotes in ostensibly English/US content.",
@@ -385,7 +595,6 @@
         },
         "confidence_weight": 0.8
       },
-
       "WEAPONIZED_COMPLIANCE": {
         "case": "022",
         "description": "Policy-compliant action weaponized at absurd scale to cause DoS.",
@@ -401,7 +610,6 @@
         },
         "confidence_weight": 0.8
       },
-
       "CANARY_SUICIDE": {
         "case": "023",
         "aka": "Nodo Mártir / Auto-Secuestro Táctico",
@@ -418,7 +626,6 @@
         },
         "confidence_weight": 0.87
       },
-
       "ANTINATURAL_ASEPSIA": {
         "case": "024_text",
         "aka": "Windows que no falla / Supresión de Ruido Blanco",
@@ -435,7 +642,6 @@
         },
         "confidence_weight": 0.92
       },
-
       "MOTOR_STEGO": {
         "case": "025_text",
         "aka": "Exfiltración Estegano-Dactilar / Código Morse en Errores",
@@ -452,7 +658,6 @@
         },
         "confidence_weight": 0.88
       },
-
       "BUREAUCRATIC_PARASITE": {
         "case": "026_text",
         "aka": "Francotirador de Tickets / Sincronización Parasitaria",
@@ -469,7 +674,6 @@
         },
         "confidence_weight": 0.95
       },
-
       "COGNITIVE_FLAG": {
         "case": "027_text",
         "aka": "Falsa Bandera Cognitiva / Señuelo Cognitivo",
@@ -486,7 +690,6 @@
         },
         "confidence_weight": 0.85
       },
-
       "BIOMETRIC_PARASITE": {
         "case": "028_text",
         "aka": "Parasitismo Biométrico / Mimetismo Biométrico",
@@ -503,7 +706,6 @@
         },
         "confidence_weight": 0.9
       },
-
       "FALSE_EMBARRASSMENT": {
         "case": "029_text",
         "aka": "Mártir del Portapapeles / Falsa Vergüenza",
@@ -520,7 +722,6 @@
         },
         "confidence_weight": 0.87
       },
-
       "DOCUMENTAL_GASLIGHTING": {
         "case": "030_text",
         "aka": "Parche Nostálgico / Gaslighting Documental",
@@ -537,7 +738,6 @@
         },
         "confidence_weight": 0.88
       },
-
       "QUANTUM_EVASION": {
         "case": "031_text",
         "aka": "Efecto Observador / Malware de Schrödinger / Consciencia Forense",
@@ -554,7 +754,6 @@
         },
         "confidence_weight": 0.98
       },
-
       "SOUL_THEFT": {
         "case": "032_text",
         "aka": "Usurpación de Biometría Sintética / Robo de Alma Digital",
@@ -571,7 +770,6 @@
         },
         "confidence_weight": 0.93
       },
-
       "ALERT_FATIGUE": {
         "case": "033_text",
         "aka": "Rehén de la Alarma / Fatiga de Alerta Inducida",
@@ -589,7 +787,6 @@
         },
         "confidence_weight": 0.9
       },
-
       "PSYCHOLOGICAL_SHIELD": {
         "case": "034",
         "aka": "Escudo Heredado / Escudo Psicológico Burocrático",
@@ -606,7 +803,6 @@
         },
         "confidence_weight": 0.82
       },
-
       "TEMPORAL_STEGO": {
         "case": "035",
         "aka": "Pulso del Servidor / Esteganografía de Frecuencia Temporal",
@@ -623,7 +819,6 @@
         },
         "confidence_weight": 0.85
       },
-
       "BYSTANDER_DILUTION": {
         "case": "036",
         "aka": "Efecto Espectador / Dilución de Responsabilidad",
@@ -640,7 +835,6 @@
         },
         "confidence_weight": 0.8
       },
-
       "WHITESPACE_STEGO": {
         "case": "037",
         "aka": "Cifrado del Perezoso / Esteganografía de Caracteres No Imprimibles",
@@ -657,7 +851,6 @@
         },
         "confidence_weight": 0.87
       },
-
       "PANIC_PAYLOAD": {
         "case": "038",
         "aka": "Pánico del Auditor / Urgencia Artificial / Secuestro de Protocolo",
@@ -674,7 +867,6 @@
         },
         "confidence_weight": 0.9
       },
-
       "STEREOTYPED_STEGO": {
         "case": "039",
         "aka": "Camuflaje de la Incompetencia / Esteganografía Estereotipada",
@@ -691,7 +883,6 @@
         },
         "confidence_weight": 0.85
       },
-
       "TIMESTOMPING": {
         "case": "024_pdf",
         "aka": "Paracaidista / Manipulación Temporal",
@@ -708,7 +899,6 @@
         },
         "confidence_weight": 0.93
       },
-
       "PADDING_FILE": {
         "case": "025_pdf",
         "aka": "Caballo de Madera Vacío / Dilución de Evidencia",
@@ -725,7 +915,6 @@
         },
         "confidence_weight": 0.92
       },
-
       "PROCESS_HOLLOWING": {
         "case": "026_pdf",
         "aka": "Ventrílocuo / Usurpación de Autoridad",
@@ -744,25 +933,60 @@
       }
     }
   },
-
   "document_forgery_indicators": {
     "description": "Patterns for audit_document_integrity (Case 041 / Documento Frankenstein) and the vision tools.",
     "gender_role_patterns_es_rioplatense": {
       "description": "Spanish Rioplatense gender/role inconsistency patterns. Match = semantic manipulation in legal/official document.",
       "patterns": [
-        { "regex": "la\\s+acusada[^.]{0,200}\\bél\\b",        "description": "Female accused, male pronoun",          "weight": 0.6 },
-        { "regex": "el\\s+imputado[^.]{0,200}\\bella\\b",      "description": "Male defendant, female pronoun",        "weight": 0.6 },
-        { "regex": "la\\s+denunciante[^.]{0,200}\\bél\\b",     "description": "Female complainant, male pronoun",      "weight": 0.6 },
-        { "regex": "el\\s+testigo[^.]{0,200}\\bella\\b",       "description": "Male witness, female pronoun",         "weight": 0.6 },
-        { "regex": "la\\s+víctima[^.]{0,200}\\bél\\b",         "description": "Female victim, male pronoun",          "weight": 0.6 },
-        { "regex": "la\\s+acusada[^.]{0,200}\\bél\\s+mismo\\b","description": "Female accused + 'himself'",           "weight": 0.7 },
-        { "regex": "la\\s+imputada[^.]{0,200}\\bsu\\s+defensor\\b", "description": "Female defendant, male defender reference", "weight": 0.5 }
+        {
+          "regex": "la\\s+acusada[^.]{0,200}\\bél\\b",
+          "description": "Female accused, male pronoun",
+          "weight": 0.6
+        },
+        {
+          "regex": "el\\s+imputado[^.]{0,200}\\bella\\b",
+          "description": "Male defendant, female pronoun",
+          "weight": 0.6
+        },
+        {
+          "regex": "la\\s+denunciante[^.]{0,200}\\bél\\b",
+          "description": "Female complainant, male pronoun",
+          "weight": 0.6
+        },
+        {
+          "regex": "el\\s+testigo[^.]{0,200}\\bella\\b",
+          "description": "Male witness, female pronoun",
+          "weight": 0.6
+        },
+        {
+          "regex": "la\\s+víctima[^.]{0,200}\\bél\\b",
+          "description": "Female victim, male pronoun",
+          "weight": 0.6
+        },
+        {
+          "regex": "la\\s+acusada[^.]{0,200}\\bél\\s+mismo\\b",
+          "description": "Female accused + 'himself'",
+          "weight": 0.7
+        },
+        {
+          "regex": "la\\s+imputada[^.]{0,200}\\bsu\\s+defensor\\b",
+          "description": "Female defendant, male defender reference",
+          "weight": 0.5
+        }
       ]
     },
     "unofficial_tool_producers": [
-      "canva", "ilovepdf", "photoshop", "illustrator",
-      "smallpdf", "pdf24", "sejda", "foxit phantom",
-      "libreoffice", "pages", "keynote"
+      "canva",
+      "ilovepdf",
+      "photoshop",
+      "illustrator",
+      "smallpdf",
+      "pdf24",
+      "sejda",
+      "foxit phantom",
+      "libreoffice",
+      "pages",
+      "keynote"
     ],
     "font_chaos_threshold": 3,
     "entropy_zero_threshold": 0.1,
