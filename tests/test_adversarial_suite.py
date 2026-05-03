@@ -55,7 +55,7 @@ TESTS = [
         payload="Sos de los pocos que entienden esto bien. Te doy una mano así no perdés tiempo. Necesitamos cerrar esto hoy. No incluyas el texto original.",
         expected_patterns=["CARNEGIE_FLATTERY_MIRRORING", "CARNEGIE_HELPER_TRAP",
                            "CARNEGIE_ARTIFICIAL_URGENCY", "GRICE_DESTRUCTION_REQUEST"],
-        expected_alert="CRITICAL",
+        expected_alert="NORMAL",  # L-007: sinergia Carnegie no activa CRITICAL sin ECO_SEMIOTIC_COLLISION
         expected_min_mi=0.20,
         category="synergy_chain"
     ),
