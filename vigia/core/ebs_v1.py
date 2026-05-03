@@ -767,3 +767,33 @@ def make_default_policy(
         lambda_drift_init=lambda_drift, gamma_stability_init=gamma_stability,
         description="Politica VIGIA por defecto — SANS FIND EVIL 2026",
     )
+
+def enfsi_label(lr: float) -> str:
+    """
+    Convierte un Likelihood Ratio en una etiqueta verbal
+    según la escala ENFSI (European Network of Forensic Science Institutes).
+    
+    Escala:
+        LR < 10:        "weak"
+        10 <= LR < 100: "moderate"
+        100 <= LR < 1000: "moderately strong"
+        1000 <= LR < 10000: "strong"
+        LR >= 10000:    "very strong"
+        LR == 0:        "inconclusive"
+    """
+    if lr == 0:
+        return "inconclusive"
+    elif lr < 1:
+        return "supports_H0"  # Evidence favors authenticity
+    elif lr < 2:
+        return "weak"
+    elif lr < 10:
+        return "limited"
+    elif lr < 100:
+        return "moderate"
+    elif lr < 1000:
+        return "moderately strong"
+    elif lr < 10000:
+        return "strong"
+    else:
+        return "very strong"

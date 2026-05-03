@@ -58,7 +58,10 @@ TYPE_TOOL = {
     "usb": "ACP", "prefetch": "ACP", "lnk": "ACP",
     "scheduled_task": "ROI", "service": "ROI", "user_account": "SDA",
     "crypto": "DGPI", "timeline": "GCI", "file_metadata": "ACP",
-    "artifact": "ACP",
+    "artifact": "ACP",    "GEOPOLITICAL": "GEO",
+    "forensic_image_analyzer": "VISION",
+    "VISION_AUDIT": "VISION",
+    "audit_grice_maxims": "GRICE",
 }
 
 # ── C28: cache de error — evita retry y traceback spam en batch ───────

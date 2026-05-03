@@ -51,7 +51,7 @@ def test(name: str):
 
 @test("T01 — SignalOutput crea y clipea correctamente")
 def t01():
-    from models.ebs_v1 import SignalOutput, Z_CLIP_MAX
+    from vigia.core.ebs_v1 import SignalOutput, Z_CLIP_MAX
     s = SignalOutput(tool_name="SDA", value=0.8, z_score=2.5, confidence=0.9)
     assert s.z_score == 2.5
     s2 = SignalOutput(tool_name="CLI", value=99, z_score=999.0)
@@ -60,7 +60,7 @@ def t01():
 
 @test("T02 — ForensicBundle es estructura de datos pura (sin seal)")
 def t02():
-    from models.ebs_v1 import ForensicBundle, EvidenceGraph, DecisionTrace, make_default_policy
+    from vigia.core.ebs_v1 import ForensicBundle, EvidenceGraph, DecisionTrace, make_default_policy
     b = ForensicBundle(
         evidence_graph=EvidenceGraph(nodes=[], edges=[]),
         decision_trace=DecisionTrace(decision="REJECT", posterior=0.75, risk=0.42),
@@ -75,7 +75,7 @@ def t02():
 
 @test("T03 — SystemState no tiene campos LLM/infraestructura")
 def t03():
-    from models.ebs_v1 import SystemState
+    from vigia.core.ebs_v1 import SystemState
     import inspect
     sig = inspect.signature(SystemState.__init__) if hasattr(SystemState, '__init__') else None
     s = SystemState()
@@ -89,7 +89,7 @@ def t03():
 
 @test("T04 — EvidenceGraph.global_stability penaliza grafos fracturados")
 def t04():
-    from models.ebs_v1 import EvidenceGraph, EvidenceEdge
+    from vigia.core.ebs_v1 import EvidenceGraph, EvidenceEdge
     # Grafo con 6 nodos pero solo 1 arista fuerte
     # n_possible = 6*5/2 = 15, n_stable = 1, coverage = 1/15
     edges = [EvidenceEdge(source="SDA", target="ACP", stability=0.92)]
@@ -113,7 +113,7 @@ def t04():
 
 @test("T05 — EvidenceGraph sin nodos o 1 nodo — casos limite")
 def t05():
-    from models.ebs_v1 import EvidenceGraph
+    from vigia.core.ebs_v1 import EvidenceGraph
     g0 = EvidenceGraph(nodes=[], edges=[])
     assert g0.global_stability() == 1.0  # sin nodos: convencion
     g1 = EvidenceGraph(nodes=["SDA"], edges=[])
@@ -126,7 +126,7 @@ def t05():
 
 @test("T10 — BundleBuilder.seal() produce bundle valido")
 def t10():
-    from models.ebs_v1 import ForensicBundle, EvidenceGraph, DecisionTrace, make_default_policy
+    from vigia.core.ebs_v1 import ForensicBundle, EvidenceGraph, DecisionTrace, make_default_policy
     from forensics.bundle_builder import BundleBuilder
 
     b = ForensicBundle(
@@ -145,7 +145,7 @@ def t10():
 
 @test("T11 — BundleBuilder.quick_verify PASS bundle valido")
 def t11():
-    from models.ebs_v1 import ForensicBundle, EvidenceGraph, DecisionTrace, make_default_policy
+    from vigia.core.ebs_v1 import ForensicBundle, EvidenceGraph, DecisionTrace, make_default_policy
     from forensics.bundle_builder import BundleBuilder
 
     b = ForensicBundle(
@@ -160,7 +160,7 @@ def t11():
 
 @test("T12 — BundleBuilder detecta tamper post-sellado")
 def t12():
-    from models.ebs_v1 import ForensicBundle, EvidenceGraph, DecisionTrace, make_default_policy
+    from vigia.core.ebs_v1 import ForensicBundle, EvidenceGraph, DecisionTrace, make_default_policy
     from forensics.bundle_builder import BundleBuilder
 
     b = ForensicBundle(
@@ -182,7 +182,7 @@ def t12():
 @test("T13 — BundleBuilder.seal() es deterministico en contenido")
 def t13():
     """El bundle_hash depende del contenido. Mismo contenido = mismo bundle_hash."""
-    from models.ebs_v1 import ForensicBundle, EvidenceGraph, DecisionTrace, make_default_policy
+    from vigia.core.ebs_v1 import ForensicBundle, EvidenceGraph, DecisionTrace, make_default_policy
     from forensics.bundle_builder import BundleBuilder
     import json
 
@@ -208,7 +208,7 @@ def t13():
 
 @test("T14 — BundleBuilder.save y load produce bundle verificable")
 def t14():
-    from models.ebs_v1 import ForensicBundle, EvidenceGraph, DecisionTrace, make_default_policy
+    from vigia.core.ebs_v1 import ForensicBundle, EvidenceGraph, DecisionTrace, make_default_policy
     from forensics.bundle_builder import BundleBuilder
     from forensics.verify_ebs_v1 import verify_bundle
     import tempfile, os
@@ -263,7 +263,7 @@ def t20():
 
 @test("T21 — verify_ebs_v1 PASS bundle Level 2 valido")
 def t21():
-    from models.ebs_v1 import ForensicBundle, EvidenceGraph, DecisionTrace, make_default_policy
+    from vigia.core.ebs_v1 import ForensicBundle, EvidenceGraph, DecisionTrace, make_default_policy
     from forensics.bundle_builder import BundleBuilder
     from forensics.verify_ebs_v1 import verify_bundle
 
@@ -283,7 +283,7 @@ def t21():
 
 @test("T22 — verify_ebs_v1 FAIL bundle tampereado (R1)")
 def t22():
-    from models.ebs_v1 import ForensicBundle, EvidenceGraph, DecisionTrace, make_default_policy
+    from vigia.core.ebs_v1 import ForensicBundle, EvidenceGraph, DecisionTrace, make_default_policy
     from forensics.bundle_builder import BundleBuilder
     from forensics.verify_ebs_v1 import verify_bundle
     import copy
@@ -311,7 +311,7 @@ def t22():
 
 @test("T23 — verify_ebs_v1 FAIL violacion de politica (R2)")
 def t23():
-    from models.ebs_v1 import (
+    from vigia.core.ebs_v1 import (
         ForensicBundle, EvidenceGraph, DecisionTrace,
         make_default_policy, ActionRecord,
     )
@@ -340,7 +340,7 @@ def t23():
 
 @test("T24 — verify_ebs_v1 FAIL decision incoherente (R3)")
 def t24():
-    from models.ebs_v1 import ForensicBundle, EvidenceGraph, DecisionTrace, make_default_policy
+    from vigia.core.ebs_v1 import ForensicBundle, EvidenceGraph, DecisionTrace, make_default_policy
     from forensics.bundle_builder import BundleBuilder
     from forensics.verify_ebs_v1 import verify_bundle
     import copy
@@ -372,7 +372,7 @@ def t24():
 
 @test("T30 — LikelihoodEngine fallback gaussiano funciona")
 def t30():
-    from models.ebs_v1 import SignalOutput
+    from vigia.core.ebs_v1 import SignalOutput
     from engine.likelihood_engine import LikelihoodEngine
 
     engine = LikelihoodEngine()
@@ -388,7 +388,7 @@ def t30():
 
 @test("T31 — LikelihoodEngine naming emergente con EvidenceGraph")
 def t31():
-    from models.ebs_v1 import SignalOutput, EvidenceGraph, EvidenceEdge
+    from vigia.core.ebs_v1 import SignalOutput, EvidenceGraph, EvidenceEdge
     from engine.likelihood_engine import LikelihoodEngine
 
     engine = LikelihoodEngine()
@@ -419,7 +419,7 @@ def t31():
 
 @test("T32 — LikelihoodEngine sin EvidenceGraph usa DEFAULT_CLUSTERS (heuristico)")
 def t32():
-    from models.ebs_v1 import SignalOutput
+    from vigia.core.ebs_v1 import SignalOutput
     from engine.likelihood_engine import LikelihoodEngine
 
     engine = LikelihoodEngine()
@@ -434,7 +434,7 @@ def t33():
     Dos senales correlacionadas (mismo z_score) deben producir LR menor
     que la suma directa (inflacion artificial).
     """
-    from models.ebs_v1 import SignalOutput
+    from vigia.core.ebs_v1 import SignalOutput
     from engine.likelihood_engine import LikelihoodEngine, _correlation_penalty
 
     # Senas identicas = correlacion maxima = maxima penalizacion
@@ -463,7 +463,7 @@ def t33():
 
 @test("T34 — Penalizacion de correlacion no anula evidencia (minimo 0.1)")
 def t34():
-    from models.ebs_v1 import SignalOutput
+    from vigia.core.ebs_v1 import SignalOutput
     from engine.likelihood_engine import _correlation_penalty
 
     signals = [
@@ -510,7 +510,7 @@ def t42():
     Con el nuevo global_stability() penalizado, un grafo fracturado produce
     S bajo -> riesgo alto -> ABSTAIN o REJECT aunque el posterior sea neutro.
     """
-    from models.ebs_v1 import EvidenceGraph, EvidenceEdge
+    from vigia.core.ebs_v1 import EvidenceGraph, EvidenceEdge
     from governance.risk_bounded_layer import RiskBoundedDecisionLayer
 
     # Grafo con 6 nodos y solo 1 arista: S = 0.92 * (1/15) = 0.061
@@ -534,7 +534,7 @@ def t42():
 
 @test("T50 — VigiaPipeline end-to-end con BundleBuilder")
 def t50():
-    from models.ebs_v1 import SignalOutput
+    from vigia.core.ebs_v1 import SignalOutput
     from pipeline import VigiaPipeline
     from forensics.bundle_builder import BundleBuilder
 
@@ -616,7 +616,7 @@ def t53():
 @test("T60 — verify_ebs_v1.py ejecutable como CLI standalone")
 def t60():
     import subprocess, tempfile, os
-    from models.ebs_v1 import ForensicBundle, EvidenceGraph, DecisionTrace, make_default_policy
+    from vigia.core.ebs_v1 import ForensicBundle, EvidenceGraph, DecisionTrace, make_default_policy
     from forensics.bundle_builder import BundleBuilder
 
     b = ForensicBundle(
@@ -697,7 +697,7 @@ def t71():
 @test("T72 — Regla de aborto activa con posterior >= 1-epsilon")
 def t72():
     from engine.resource_optimizer import ResourceOptimizer
-    from models.ebs_v1 import make_default_policy
+    from vigia.core.ebs_v1 from vigia.core.ebs_v1 import make_default_policy
 
     policy = make_default_policy(epsilon=0.05)
     opt = ResourceOptimizer(policy=policy)
@@ -718,7 +718,7 @@ def t72():
 @test("T73 — Regla de aborto NO activa en zona de incertidumbre (ABSTAIN)")
 def t73():
     from engine.resource_optimizer import ResourceOptimizer
-    from models.ebs_v1 import make_default_policy
+    from vigia.core.ebs_v1 from vigia.core.ebs_v1 import make_default_policy
 
     policy = make_default_policy(epsilon=0.05)
     opt = ResourceOptimizer(policy=policy)
@@ -798,7 +798,7 @@ def t76():
 
 @test("T80 — LikelihoodEngine hint_threshold derivado de PolicySpec (no hardcodeado)")
 def t80():
-    from models.ebs_v1 import make_default_policy, SignalOutput
+    from vigia.core.ebs_v1 from vigia.core.ebs_v1 from vigia.core.ebs_v1 import make_default_policy, SignalOutput
     from engine.likelihood_engine import LikelihoodEngine
 
     # Con epsilon=0.10, hint_threshold_reject debe ser 0.90
@@ -836,7 +836,7 @@ def t80():
 @test("T81 — VigiaPipeline conecta hint_threshold con PolicySpec automaticamente")
 def t81():
     from pipeline import VigiaPipeline
-    from models.ebs_v1 import make_default_policy
+    from vigia.core.ebs_v1 from vigia.core.ebs_v1 import make_default_policy
 
     # Con epsilon=0.15, el motor debe tener thresholds coherentes
     policy = make_default_policy(epsilon=0.15)
@@ -919,7 +919,7 @@ def t84():
 
 @test("T85 — AbductionTrace existe en ebs_v1 y tiene campos Peirce")
 def t85():
-    from models.ebs_v1 import AbductionTrace
+    from vigia.core.ebs_v1 import AbductionTrace
     trace = AbductionTrace()
     assert hasattr(trace, "peirce_firstness")
     assert hasattr(trace, "peirce_secondness")
@@ -932,7 +932,7 @@ def t85():
 
 @test("T86 — ForensicBundle acepta abduction_trace y lo incluye en bundle_hash")
 def t86():
-    from models.ebs_v1 import (
+    from vigia.core.ebs_v1 import (
         ForensicBundle, EvidenceGraph, DecisionTrace,
         make_default_policy, AbductionTrace,
     )
@@ -969,7 +969,7 @@ def t86():
 
 @test("T87 — VigiaPipeline construye AbductionTrace automaticamente")
 def t87():
-    from models.ebs_v1 import SignalOutput
+    from vigia.core.ebs_v1 import SignalOutput
     from pipeline import VigiaPipeline
 
     pipeline = VigiaPipeline(adaptive_policy=False)
@@ -992,7 +992,7 @@ def t88():
     """
     Modificar abduction_trace post-sellado debe invalidar bundle_hash (I2).
     """
-    from models.ebs_v1 import (
+    from vigia.core.ebs_v1 import (
         ForensicBundle, EvidenceGraph, DecisionTrace,
         make_default_policy, AbductionTrace,
     )
@@ -1064,7 +1064,7 @@ def t90():
     Esto garantiza que type hints funcionan correctamente en runtime.
     """
     import inspect
-    from models.ebs_v1 import AbductionTrace, ForensicBundle
+    from vigia.core.ebs_v1 import AbductionTrace, ForensicBundle
 
     # AbductionTrace debe ser una clase real, no un string
     hint = ForensicBundle.__init__.__annotations__.get("abduction_trace", None)
@@ -1074,7 +1074,7 @@ def t90():
     assert trace.peirce_firstness == "test forward ref"
 
     # ForensicBundle debe aceptar AbductionTrace sin error de tipo
-    from models.ebs_v1 import EvidenceGraph, DecisionTrace, make_default_policy
+    from vigia.core.ebs_v1 import EvidenceGraph, DecisionTrace, make_default_policy
     b = ForensicBundle(
         evidence_graph=EvidenceGraph(nodes=[], edges=[]),
         decision_trace=DecisionTrace(decision="ACCEPT", posterior=0.1, risk=0.02),
@@ -1091,7 +1091,7 @@ def t91():
     El bundle_hash debe cambiar si cambia el abduction_trace.
     Esto garantiza que el razonamiento es parte de la prueba auditorial.
     """
-    from models.ebs_v1 import (
+    from vigia.core.ebs_v1 import (
         ForensicBundle, EvidenceGraph, DecisionTrace,
         make_default_policy, AbductionTrace,
     )
@@ -1267,7 +1267,7 @@ def t97():
     y policy.epsilon_reject. Ningun umbral hardcodeado en el codigo.
     """
     from governance.risk_bounded_layer import RiskBoundedDecisionLayer
-    from models.ebs_v1 import make_default_policy
+    from vigia.core.ebs_v1 from vigia.core.ebs_v1 import make_default_policy
 
     # PolicySpec con epsilon=0.20 (mas permisivo)
     policy_lax = make_default_policy(epsilon=0.20)
@@ -1299,7 +1299,7 @@ def t98():
     Verificar que los epsilons del layer coinciden con los del PolicySpec.
     """
     from pipeline import VigiaPipeline
-    from models.ebs_v1 import make_default_policy
+    from vigia.core.ebs_v1 from vigia.core.ebs_v1 import make_default_policy
 
     policy = make_default_policy(epsilon=0.08)
     pipeline = VigiaPipeline(policy=policy, adaptive_policy=False)

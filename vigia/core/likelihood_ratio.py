@@ -39,7 +39,7 @@ import hashlib
 from dataclasses import dataclass, field
 from typing import Dict, List, Optional, Tuple
 
-from vigia.core.signal_contract import SignalOutput, enfsi_label
+from vigia.core.ebs_v1 import SignalOutput, enfsi_label
 
 # Calibrador opcional — import lazy para evitar dependencia circular
 try:

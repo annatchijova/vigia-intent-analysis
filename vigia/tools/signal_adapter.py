@@ -33,7 +33,7 @@ from __future__ import annotations
 import math
 from typing import Any, Dict, List, Optional
 
-from vigia.core.signal_contract import SignalOutput, SignalBuilder
+from vigia.core.ebs_v1 import SignalOutput, SignalBuilder
 
 import datetime
 import hashlib
