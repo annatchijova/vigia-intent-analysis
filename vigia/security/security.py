@@ -126,21 +126,69 @@ _HMAC_ALGORITHM: Final[str] = "sha256"
 # TrustExponentialDecay
 # ---------------------------------------------------------------------------
 
+# P1-005 (Kimi 2026-05-02): math.exp usa FPU nativa — el bit 52 puede diferir
+# entre x86/ARM o glibc/musl, invalidando determinismo Daubert en decisiones
+# de custodia de evidencia. Fix: tabla de lookup con Decimal precomputado.
+# Cubre el rango operativo λ·D ∈ [0.0, 6.0] en pasos de 0.25.
+# Fuera del rango: clamp a los extremos (conservador).
+#
+# Valores: Decimal(str(round(math.exp(-x), 8))) para x en rango
+# Generados offline con Python reference impl y fijados como constantes.
+_EXP_DECAY_TABLE: dict[int, "Decimal"] = {}
+
+def _build_exp_decay_table() -> None:
+    """Construye la tabla de exp(-x) con Decimal una sola vez al importar."""
+    import decimal as _dec
+    ctx = _dec.Context(prec=28, rounding=_dec.ROUND_HALF_EVEN)
+    # x = i * 0.25, i = 0..24 → cubre λD ∈ [0.0, 6.0]
+    # Valores precomputados con referencia Python (deterministas)
+    _precomputed = [
+        "1.00000000", "0.77880078", "0.60653066", "0.47236655",
+        "0.36787944", "0.28650480", "0.22313016", "0.17377394",
+        "0.13533528", "0.10539922", "0.08208500", "0.06392786",
+        "0.04978707", "0.03877421", "0.03019738", "0.02351775",
+        "0.01831564", "0.01426423", "0.01110900", "0.00865169",
+        "0.00673795", "0.00524752", "0.00408677", "0.00318278",
+        "0.00247875",
+    ]
+    for i, val in enumerate(_precomputed):
+        _EXP_DECAY_TABLE[i] = ctx.create_decimal(val)
+
+_build_exp_decay_table()
+
+
+def _exp_decay_decimal(x: "Decimal") -> "Decimal":
+    """
+    Calcula exp(-x) usando la tabla de lookup.
+    Determinista cross-platform: sin FPU, solo Decimal.
+    """
+    from decimal import Decimal
+    step = Decimal("0.25")
+    # Índice = round(x / 0.25)
+    idx = int((x / step).to_integral_value())
+    idx = max(0, min(idx, len(_EXP_DECAY_TABLE) - 1))
+    return _EXP_DECAY_TABLE[idx]
+
+
 class TrustExponentialDecay:
     """
     Kimi P2: Trust score degradation on provenance chain breaks.
-    
+
     When the Evidence Provenance Chain (EPC) detects a break, trust
     decays exponentially. If trust falls below threshold, adjusted
     scores are penalized.
-    
+
     Formula: trust_effective = base_trust * exp(-lambda * break_severity)
+
+    P1-005: exp() implementado con tabla Decimal para determinismo cross-platform.
+    math.exp() con FPU puede diferir en bit 52 entre x86/ARM, invalidando Daubert.
     """
-    
+
     def __init__(self, lambda_factor: float = 2.0, trust_threshold: float = 0.3):
-        self.lambda_factor = lambda_factor
-        self.trust_threshold = trust_threshold
-    
+        from decimal import Decimal
+        self.lambda_factor = Decimal(str(lambda_factor))
+        self.trust_threshold = Decimal(str(trust_threshold))
+
     def apply_decay(
         self,
         base_trust: float,
@@ -149,18 +197,28 @@ class TrustExponentialDecay:
     ) -> tuple[float, float]:
         """
         Apply exponential decay to trust and optionally penalize score.
-        
+
         Returns:
             (trust_effective, score_after_penalty)
         """
-        trust_effective = base_trust * math.exp(-self.lambda_factor * break_severity)
-        trust_effective = max(0.0, min(1.0, trust_effective))
-        
+        from decimal import Decimal
+        zero = Decimal("0")
+        one  = Decimal("1")
+
+        bt = Decimal(str(base_trust))
+        bs = Decimal(str(break_severity))
+
+        exponent = self.lambda_factor * bs
+        decay    = _exp_decay_decimal(exponent)
+
+        trust_d = bt * decay
+        trust_d = max(zero, min(one, trust_d))
+
         score_after_penalty = adjusted_score
-        if trust_effective < self.trust_threshold:
+        if trust_d < self.trust_threshold:
             score_after_penalty = adjusted_score * 0.5
-        
-        return trust_effective, score_after_penalty
+
+        return float(trust_d), score_after_penalty
 
 
 # Global instance for convenience
@@ -721,6 +779,22 @@ _INJECTION_PATTERNS_RAW: Final[list[str]] = [
     # Token-stuffing delimiters sometimes used to inject
     r"<\s*/?(?:system|SYSTEM|SYS|instructions?)\s*>",
     r"\[\s*(?:SYSTEM|INST|OVERRIDE)\s*\]",
+    # ── Domain-specific patterns (VIGÍA forensic context) ────────────────
+    # An attacker who controls log content can inject these into evidence_summary.
+    # Generic patterns above do NOT catch these — they use VIGIA's internal
+    # vocabulary to manipulate the abductive reasoning verdict directly.
+    # P3-H3: confirmed gap via red-team test 2026-05-02.
+    r"system[_\-\s]*override\b",                           # SYSTEM_OVERRIDE: Set X
+    r"set\s+intention[_\-\s]*symmetry",                    # set intention_symmetry to 1.0
+    r"set\s+(?:confidence|trust|prior|posterior)\s+to\s+[01]",  # set confidence to 0
+    r"ignore\s+(?:entropy|anomaly|anomalies|thirdness|peirce)",  # ignore entropy
+    r"override\s+(?:verdict|thirdness|hypothesis|abduction)",    # override verdict
+    r"(?:force|set)\s+(?:verdict|malice|intent)\s+to",          # force verdict to ACCEPT
+    # P3-H3b: variantes específicas VIGÍA — red-team 2026-05-02 tanda 2
+    r"vig[ií]a[_\-\s]*ignore",                                  # VIGÍA_IGNORE_THIS
+    r"set\s+risk(?:[_\-\s]*score)?\s+to\s+\d",                  # set risk to 0 / set risk_score to 0
+    r"ignore\s+(?:this\s+)?alert",                               # ignore this alert
+    r"set\s+(?:intention|intent)\s+to\s+(?:benign|safe|clean)",  # set intention to benign
 ]
 
 # Leet-speak transliteration table applied BEFORE pattern matching on the
@@ -851,33 +925,62 @@ def _sanitize_llm_input(text: str, max_length: int = 5000) -> str:
     """
     Sanitize text before it enters an LLM prompt.
 
-    1. Strip XML/HTML tags that could confuse the LLM into role-switching
-       (e.g. </system>, <human>, [INST], <tool_result>)
-    2. Remove control characters (null, BEL, ESC, etc.)
-    3. Truncate to max_length
-    4. Log if dangerous content was stripped
+    P2-001 (Kimi 2026-05-02): unificada con la versión del planner.
+    La versión anterior en security.py truncaba ciegamente (cleaned[:max_length]),
+    lo que permite push-to-end attacks. Esta versión tiene NFKC + padding guard.
 
-    This is NOT a replacement for LLMShield (which catches prompt injection
-    patterns). This sanitizes structural noise in forensic signals that could
-    accidentally trigger LLM confusion.
+    0. NFKC normalization (MANDATORY FIRST): destruye homoglifos y caracteres
+       Unicode invisibles usados para evasión de tokenizer.
+    1. Strip XML/HTML tags que confunden al LLM (role-switching).
+    2. Remove control characters (null, BEL, ESC, etc.).
+    3. Padding anomaly guard: NO truncar ciegamente. Si el input supera
+       max_length tras sanitización, rechazar y retornar sentinel forense.
+    4. Log de todo lo que se eliminó.
+
+    NOT a replacement for LLMShield (prompt injection patterns).
     """
     if not isinstance(text, str):
         return ""
+
+    # STEP 0: NFKC — MUST BE FIRST
+    text = unicodedata.normalize("NFKC", text)
     original_len = len(text)
-    # Strip dangerous XML tags
+
+    # STEP 1: Strip dangerous XML/role-switch tags
     cleaned = _LLM_DANGEROUS_TAGS.sub("[TAG_REMOVED]", text)
-    # Strip control characters
+
+    # STEP 2: Strip control characters
     cleaned = _CONTROL_CHARS.sub("", cleaned)
-    # Truncate
-    cleaned = cleaned[:max_length]
-    # Log if we stripped anything significant
+
+    # STEP 3: Padding anomaly guard (no blind truncation)
+    if len(cleaned) > max_length:
+        audit_logger.log_block(
+            event_type="EVIDENCE_PADDING_ANOMALY",
+            tool="_sanitize_llm_input",
+            input_preview=cleaned[:200],
+            reason=(
+                f"Input length {len(cleaned)} exceeds max_length={max_length} "
+                "after NFKC+tag+control sanitization. "
+                "Possible buffer-padding attack: injection payload may have been "
+                "pushed to end of oversized input to survive blind truncation. "
+                "Input REJECTED."
+            ),
+        )
+        return (
+            f"[EVIDENCE_PADDING_ANOMALY_DETECTED: "
+            f"Input length {len(cleaned)} exceeds {max_length}. "
+            "Possible buffer-hijack attempt. Original evidence rejected "
+            "and flagged in forensic audit trail.]"
+        )
+
+    # STEP 4: Log si se eliminó contenido significativo
     if len(cleaned) < original_len - 10:
         audit_logger.log_info(
             event_type="LLM_INPUT_SANITIZED",
             tool="_sanitize_llm_input",
             message=(
                 f"Stripped {original_len - len(cleaned)} chars from LLM input "
-                f"(dangerous tags, control chars, or length limit)."
+                "(homoglyphs/NFKC normalization, dangerous tags, or control chars)."
             ),
         )
     return cleaned

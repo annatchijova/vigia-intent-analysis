@@ -1,18 +1,3 @@
-# Copyright (c) 2026 Anna Tchijova
-# Vigía - Autonomous Incident Response Engine
-#
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU Affero General Public License as
-# published by the Free Software Foundation, either version 3 of the
-# License, or (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-# GNU Affero General Public License for more details.
-#
-# You should have received a copy of the GNU Affero General Public License
-# along with this program. If not, see <https://www.gnu.org/licenses/>.
 """
 vigia/tools/adversarial_nlp.py
 ================================
@@ -255,27 +240,158 @@ class ConfigLoader:
 # MOTOR P0 — DETECCIÓN DE IDIOMA
 # ============================================================================
 
+@dataclass(frozen=True)
+class LanguageProfile:
+    """
+    Perfil forense por idioma. Umbrales sintácticos y léxicos calibrados
+    específicamente para cada familia lingüística.
+    Agregado en merge P4 — canónico adversarial_nlp multilingüe (2026-05-02).
+    """
+    code: str
+    name: str
+    nv_ratio_min: float
+    nv_ratio_max: float
+    nominalization_min: float
+    fog_simple: float
+    fog_standard: float
+    fog_complex: float
+    fog_obscure: float
+    noun_suffixes: tuple
+    verb_suffixes: tuple
+    adj_suffixes: tuple
+    adv_suffixes: tuple
+    function_words: frozenset
+    legal_markers: frozenset
+    technical_markers: frozenset
+    narrative_markers: frozenset
+    urgent_markers: frozenset
+
+
+ENGLISH_PROFILE = LanguageProfile(
+    code="en", name="English",
+    nv_ratio_min=2.5, nv_ratio_max=6.0, nominalization_min=0.50,
+    fog_simple=6.0, fog_standard=12.0, fog_complex=16.0, fog_obscure=20.0,
+    noun_suffixes=("tion", "sion", "ment", "ness", "ity", "er", "or", "ism",
+                   "ure", "age", "ance", "ence", "dom", "ship", "hood"),
+    verb_suffixes=("ing", "ed", "en", "ize", "ise", "ify", "ate"),
+    adj_suffixes=("able", "ible", "al", "ful", "less", "ous", "ive", "ic", "ish"),
+    adv_suffixes=("ly", "ward", "wards", "wise"),
+    function_words=ENGLISH_FUNCTION_WORDS,
+    legal_markers=ENGLISH_LEGAL_MARKERS,
+    technical_markers=ENGLISH_TECHNICAL_MARKERS,
+    narrative_markers=ENGLISH_NARRATIVE_MARKERS,
+    urgent_markers=ENGLISH_URGENT_MARKERS,
+)
+
+SPANISH_PROFILE = LanguageProfile(
+    code="es", name="Spanish",
+    nv_ratio_min=1.8, nv_ratio_max=4.0, nominalization_min=0.45,
+    fog_simple=8.0, fog_standard=12.0, fog_complex=16.0, fog_obscure=20.0,
+    noun_suffixes=("ción", "sión", "dad", "miento", "anza", "encia", "eza",
+                   "ura", "aje", "or", "ario", "orio"),
+    verb_suffixes=("ando", "iendo", "ado", "ido", "aba", "ía", "ará", "ería"),
+    adj_suffixes=("able", "ible", "oso", "ico", "ivo", "al", "ario"),
+    adv_suffixes=("mente",),
+    function_words=SPANISH_FUNCTION_WORDS,
+    legal_markers=SPANISH_LEGAL_MARKERS,
+    technical_markers=SPANISH_TECHNICAL_MARKERS,
+    narrative_markers=SPANISH_NARRATIVE_MARKERS,
+    urgent_markers=SPANISH_URGENT_MARKERS,
+)
+
+
+@dataclass
+class AuthorialBaseline:
+    """Baseline estilométrico por autor — dependencia de AuthorialFingerprintingEngine."""
+    author_id: str
+    document_count: int = 0
+    mean_ttr: float = 0.0
+    std_ttr: float = 0.01
+    mean_lexical_entropy: float = 0.0
+    mean_zipf: float = 0.0
+
+    def update(self, ttr: float, lex_entropy: float, zipf: float) -> None:
+        self.document_count += 1
+        n = self.document_count
+        prev_mean = self.mean_ttr
+        self.mean_ttr = prev_mean + (ttr - prev_mean) / n
+        self.mean_lexical_entropy = self.mean_lexical_entropy + (lex_entropy - self.mean_lexical_entropy) / n
+        self.mean_zipf = self.mean_zipf + (zipf - self.mean_zipf) / n
+        if n > 1:
+            self.std_ttr = max(0.01, abs(ttr - self.mean_ttr) * 0.5 + self.std_ttr * 0.5)
+
+
+@dataclass(frozen=True)
+class GriceanAnalysis:
+    """Resultado de análisis de violación de Manera de Grice."""
+    fog_index: float
+    ambiguity_density: float
+    avg_sentence_length: float
+    ambiguity_count: int
+    manner_violation_score: float
+    register_content_mismatch: bool
+    severity: float
+
+    def to_dict(self) -> dict:
+        return {
+            "fog_index": round(self.fog_index, 4),
+            "ambiguity_density": round(self.ambiguity_density, 4),
+            "avg_sentence_length": round(self.avg_sentence_length, 4),
+            "ambiguity_count": self.ambiguity_count,
+            "manner_violation_score": round(self.manner_violation_score, 4),
+            "register_content_mismatch": self.register_content_mismatch,
+            "severity": round(self.severity, 4),
+        }
+
+
 class LanguageDetector:
-    """Detección determinista de idioma sin dependencias externas."""
+    """
+    Detector de idioma basado en bigramas de alta frecuencia.
+    Versión extendida del canónico (2026-05-02): usa LanguageProfile,
+    bigramas ampliados, y expone get_profile() para las capas P4.
+    """
 
-    EN_BIGRAMS: frozenset = frozenset({"th", "he", "in", "er", "an", "re", "on", "at", "en", "nd"})
-    ES_BIGRAMS: frozenset = frozenset({"de", "la", "el", "en", "os", "ar", "ue", "es", "ra", "as"})
+    EN_BIGRAMS: frozenset = frozenset({
+        "th", "he", "in", "er", "an", "re", "on", "at", "en", "nd",
+        "ti", "es", "or", "te", "of", "ed", "is", "it", "al", "ar",
+        "st", "to", "nt", "ng", "se", "ha", "as", "ou", "io", "le",
+        "ve", "co", "me", "de", "hi", "ri", "ro", "ic", "ne", "ea",
+    })
+    ES_BIGRAMS: frozenset = frozenset({
+        "de", "la", "el", "en", "os", "ar", "ue", "es", "ra", "as",
+        "ad", "or", "nt", "te", "co", "re", "na", "al", "do", "on",
+        "io", "ro", "se", "li", "ta", "an", "qu", "ie", "ll", "rr",
+    })
+    EN_FUNCTION: frozenset = ENGLISH_FUNCTION_WORDS
+    ES_FUNCTION: frozenset = SPANISH_FUNCTION_WORDS
 
-    def detect(self, text: str) -> Language:
-        text_lower = text[:10_000].lower()  # Limitar análisis (Qwen)
-        bigrams = {text_lower[i:i+2] for i in range(len(text_lower)-1) if text_lower[i:i+2].isalpha()}
-        score_en = len(bigrams & self.EN_BIGRAMS)
-        score_es = len(bigrams & self.ES_BIGRAMS) * 2
+    @classmethod
+    def detect(cls, text: str) -> Language:
+        text_lower = text[:10_000].lower()
+        bigrams = {text_lower[i:i+2] for i in range(len(text_lower)-1)
+                   if text_lower[i:i+2].isalpha()}
+        score_en = len(bigrams & cls.EN_BIGRAMS)
+        score_es = len(bigrams & cls.ES_BIGRAMS) * 2
         if any(c in text for c in "áéíóúñÁÉÍÓÚÑ"):
             score_es += 20
         words = set(re.findall(r"\b[a-zA-ZáéíóúñÁÉÍÓÚÑ]+\b", text_lower))
-        score_en += len(words & ENGLISH_FUNCTION_WORDS) * 5
-        score_es += len(words & SPANISH_FUNCTION_WORDS) * 5
+        score_en += len(words & cls.EN_FUNCTION) * 5
+        score_es += len(words & cls.ES_FUNCTION) * 5
+        if re.search(r'\b(the|and|of|to|in|is|that|for|with|as)\b', text_lower):
+            score_en += 15
         if score_es > score_en * 1.3:
             return Language.SPANISH
         if score_en > score_es * 1.3:
             return Language.ENGLISH
-        return Language.SPANISH if score_es >= score_en else Language.ENGLISH
+        if any(c in text for c in "áéíóúñ"):
+            return Language.SPANISH
+        return Language.ENGLISH if score_en > score_es else Language.UNKNOWN
+
+    @classmethod
+    def get_profile(cls, lang: Language) -> LanguageProfile:
+        if lang == Language.ENGLISH:
+            return ENGLISH_PROFILE
+        return SPANISH_PROFILE  # default español para SANS compliance
 
 
 # ============================================================================
@@ -1084,6 +1200,316 @@ class ForensicEngine:
 
     def save_config_template(self, path: str) -> None:
         self.config.save_default_config(path)
+
+
+# ============================================================================
+# CAPA P4: ESTILOMETRÍA FORENSE MULTILINGÜE
+# Merge del canónico adversarial_nlp — 2026-05-02
+# Autores: Gemini (diseño P4), Kimi (calibración), Claude (integración)
+# ============================================================================
+
+@dataclass(frozen=True)
+class SyntacticDensityProfile:
+    noun_count: int
+    verb_count: int
+    adj_count: int
+    adv_count: int
+    noun_verb_ratio: float
+    nominalization_score: float
+    syntactic_density_index: float
+    language: str
+
+    def to_dict(self) -> dict:
+        return {
+            "noun_count": self.noun_count,
+            "verb_count": self.verb_count,
+            "adj_count": self.adj_count,
+            "adv_count": self.adv_count,
+            "noun_verb_ratio": round(self.noun_verb_ratio, 4),
+            "nominalization_score": round(self.nominalization_score, 4),
+            "syntactic_density_index": round(self.syntactic_density_index, 4),
+            "language": self.language,
+        }
+
+
+class SyntacticDensityAnalyzer:
+    """
+    Analizador de densidad sintáctica multilingüe.
+    Aplica umbrales específicos según el idioma detectado.
+    """
+
+    def __init__(self):
+        self.lang_detector = LanguageDetector()
+
+    def _is_noun_proxy(self, word: str, profile: LanguageProfile) -> bool:
+        w = word.lower()
+        if w in profile.legal_markers or w in profile.technical_markers:
+            return True
+        for suffix in profile.noun_suffixes:
+            if w.endswith(suffix) and len(w) > len(suffix) + 2:
+                if any(w.endswith(vs) for vs in profile.verb_suffixes[:3]):
+                    return False
+                return True
+        return False
+
+    def _is_verb_proxy(self, word: str, profile: LanguageProfile) -> bool:
+        w = word.lower()
+        for suffix in profile.verb_suffixes:
+            if w.endswith(suffix) and len(w) > len(suffix) + 1:
+                return True
+        return False
+
+    def _is_adjective_proxy(self, word: str, profile: LanguageProfile) -> bool:
+        w = word.lower()
+        for suffix in profile.adj_suffixes:
+            if w.endswith(suffix) and len(w) > len(suffix) + 2:
+                return True
+        return False
+
+    def _is_adverb_proxy(self, word: str, profile: LanguageProfile) -> bool:
+        w = word.lower()
+        for suffix in profile.adv_suffixes:
+            if w.endswith(suffix) and len(w) > len(suffix) + 2:
+                return True
+        if profile.code == "es":
+            return w in {"muy", "más", "menos", "bastante", "demasiado", "poco", "mucho"}
+        return w in {"very", "more", "most", "quite", "rather", "too", "so", "really"}
+
+    def analyze(self, text: str) -> SyntacticDensityProfile:
+        lang = self.lang_detector.detect(text)
+        profile = self.lang_detector.get_profile(lang)
+        if profile.code == "es":
+            words = re.findall(r'\b[a-zA-ZáéíóúñÁÉÍÓÚÑ]+\b', text.lower())
+        else:
+            words = re.findall(r'\b[a-zA-Z]+\b', text.lower())
+        total_words = len(words)
+        if total_words == 0:
+            return SyntacticDensityProfile(0, 0, 0, 0, 0.0, 0.0, 0.0, profile.code)
+        nouns = sum(1 for w in words if self._is_noun_proxy(w, profile))
+        verbs = sum(1 for w in words if self._is_verb_proxy(w, profile))
+        adjectives = sum(1 for w in words if self._is_adjective_proxy(w, profile))
+        adverbs = sum(1 for w in words if self._is_adverb_proxy(w, profile))
+        nv_ratio = nouns / max(verbs, 1)
+        content_words = max(nouns + verbs + adjectives, 1)
+        nominalization = nouns / content_words
+        sdi = ((nouns * 1.5) + (adjectives * 0.8)) / max(verbs + adverbs, 1)
+        return SyntacticDensityProfile(
+            noun_count=nouns, verb_count=verbs,
+            adj_count=adjectives, adv_count=adverbs,
+            noun_verb_ratio=nv_ratio, nominalization_score=nominalization,
+            syntactic_density_index=sdi, language=profile.code,
+        )
+
+    def detect_syntactic_dance_malice(
+        self,
+        profile: SyntacticDensityProfile,
+        declared_register: str = "legal_judicial",
+    ) -> tuple:
+        if declared_register != "legal_judicial":
+            return False, 0.0, "SDA only applies to legal register"
+        lang_prof = ENGLISH_PROFILE if profile.language == "en" else SPANISH_PROFILE
+        violations = []
+        severity_acc = 0.0
+        if profile.noun_verb_ratio < lang_prof.nv_ratio_min:
+            dev = (lang_prof.nv_ratio_min - profile.noun_verb_ratio) / lang_prof.nv_ratio_min
+            severity_acc += min(0.5, dev * 0.5)
+            violations.append(f"N/V={profile.noun_verb_ratio:.2f} < {lang_prof.nv_ratio_min}")
+        if profile.nominalization_score < lang_prof.nominalization_min:
+            dev = (lang_prof.nominalization_min - profile.nominalization_score) / lang_prof.nominalization_min
+            severity_acc += min(0.4, dev * 0.4)
+            violations.append(f"Nom={profile.nominalization_score:.2f} < {lang_prof.nominalization_min}")
+        if profile.syntactic_density_index < 1.5:
+            severity_acc += 0.3
+            violations.append(f"SDI={profile.syntactic_density_index:.2f}")
+        is_malice = len(violations) > 0 and severity_acc > 0.3
+        reason = " | ".join(violations) if violations else "Syntax consistent with legal register"
+        return is_malice, min(1.0, severity_acc), reason
+
+
+class AuthorialFingerprintingEngine:
+    """
+    Motor de huella dactilar con TTR normalizado por idioma.
+    Usa function words específicas para filtrado.
+    """
+
+    ZSCORE_CRITICAL: float = 2.0
+    ZSCORE_SEVERE: float = 3.0
+
+    def __init__(self):
+        self.baselines: dict = {}
+        self.lang_detector = LanguageDetector()
+
+    def get_or_create_baseline(self, author_id: str, lang: Language) -> AuthorialBaseline:
+        key = f"{author_id}_{lang.value if hasattr(lang, 'value') else lang}"
+        if key not in self.baselines:
+            self.baselines[key] = AuthorialBaseline(author_id=key)
+        return self.baselines[key]
+
+    def calculate_ttr(self, text: str, language: Optional[Language] = None) -> float:
+        if language is None:
+            language = self.lang_detector.detect(text)
+        profile = self.lang_detector.get_profile(language)
+        if profile.code == "es":
+            words = re.findall(r'\b[a-zA-ZáéíóúñÁÉÍÓÚÑ]+\b', text.lower())
+        else:
+            words = re.findall(r'\b[a-zA-Z]+\b', text.lower())
+        if not words:
+            return 0.0
+        content_words = [w for w in words if w not in profile.function_words]
+        if not content_words:
+            return 0.0
+        window_size = 400 if profile.code == "en" else 350
+        if len(content_words) > window_size:
+            ttrs = []
+            for i in range(0, len(content_words) - window_size + 1, window_size):
+                window = content_words[i:i + window_size]
+                ttrs.append(len(set(window)) / len(window))
+            return statistics.mean(ttrs) if ttrs else 0.0
+        return len(set(content_words)) / len(content_words)
+
+    def analyze_authorial_consistency(
+        self, text: str, author_id: str,
+        lexical_entropy: float, zipf_slope: float,
+    ) -> dict:
+        language = self.lang_detector.detect(text)
+        current_ttr = self.calculate_ttr(text, language)
+        baseline = self.get_or_create_baseline(author_id, language)
+        if baseline.document_count < 2:
+            baseline.update(current_ttr, lexical_entropy, zipf_slope)
+            return {
+                "author_id": author_id,
+                "language": str(language),
+                "baseline_documents": baseline.document_count,
+                "current_ttr": round(current_ttr, 4),
+                "zscore_ttr": 0.0,
+                "is_inconsistent": False,
+                "severity": 0.0,
+                "reason": "INSUFFICIENT_BASELINE",
+            }
+        z_ttr = self._zscore(current_ttr, baseline.mean_ttr, baseline.std_ttr)
+        z_lex = self._zscore(lexical_entropy, baseline.mean_lexical_entropy, baseline.std_ttr or 0.01)
+        z_zipf = self._zscore(zipf_slope, baseline.mean_zipf, baseline.std_ttr or 0.01)
+        outlier_dims = sum([
+            abs(z_ttr) > self.ZSCORE_CRITICAL,
+            abs(z_lex) > self.ZSCORE_CRITICAL,
+            abs(z_zipf) > self.ZSCORE_CRITICAL,
+        ])
+        is_inconsistent = outlier_dims >= 2 or max(abs(z_ttr), abs(z_lex), abs(z_zipf)) > self.ZSCORE_SEVERE
+        max_z = max(abs(z_ttr), abs(z_lex), abs(z_zipf))
+        severity = (min(1.0, (max_z - self.ZSCORE_SEVERE) / 2.0 + 0.7)
+                    if max_z > self.ZSCORE_SEVERE
+                    else min(0.6, (max_z - self.ZSCORE_CRITICAL) / 1.0 + 0.3)
+                    if max_z > self.ZSCORE_CRITICAL else 0.0)
+        if not is_inconsistent:
+            baseline.update(current_ttr, lexical_entropy, zipf_slope)
+        return {
+            "author_id": author_id,
+            "language": str(language),
+            "baseline_documents": baseline.document_count,
+            "current_ttr": round(current_ttr, 4),
+            "baseline_ttr_mean": round(baseline.mean_ttr, 4),
+            "zscore_ttr": round(z_ttr, 4),
+            "is_inconsistent": is_inconsistent,
+            "severity": round(severity, 4),
+            "reason": "AUTHORIAL_INCONSISTENCY" if is_inconsistent else "CONSISTENT",
+        }
+
+    @staticmethod
+    def _zscore(value: float, mean: float, std: float) -> float:
+        return 0.0 if std == 0 else (value - mean) / std
+
+
+class GriceanMannerAnalyzer:
+    """
+    Análisis de Violación de Manera con Gunning Fog calibrado por idioma.
+    """
+
+    EN_AMBIGUITY_MARKERS: frozenset = frozenset({
+        "perhaps", "maybe", "possibly", "probably", "likely", "presumably",
+        "in a sense", "sort of", "kind of", "more or less", "approximately",
+        "around", "about", "roughly", "somehow", "somewhat", "relatively",
+        "fairly", "quite", "rather", "basically", "essentially", "practically",
+        "allegedly", "reportedly", "supposedly", "apparently", "seemingly",
+        "in due course", "as appropriate", "where applicable", "if necessary",
+        "subject to", "without prejudice", "pending review",
+    })
+    ES_AMBIGUITY_MARKERS: frozenset = frozenset({
+        "podría", "quizás", "tal vez", "posiblemente", "probablemente",
+        "en cierto modo", "de alguna forma", "más o menos", "aproximadamente",
+        "en torno a", "sin perjuicio de", "salvo mejor opinión",
+        "a los efectos oportunos", "en su caso", "según corresponda",
+        "previo análisis", "no obstante lo cual", "en virtud de lo expuesto",
+    })
+
+    def __init__(self):
+        self.lang_detector = LanguageDetector()
+
+    def count_syllables(self, word: str, language: Language) -> int:
+        w = word.lower().strip()
+        if not w:
+            return 0
+        vowels_es = "aeiouáéíóúü"
+        vowels_en = "aeiouy"
+        vowels = vowels_es if (hasattr(language, 'value') and
+                               str(language) in ("Language.SPANISH", "SPANISH", "es")) else vowels_en
+        syllables = 0
+        prev_vowel = False
+        for c in w:
+            is_v = c in vowels
+            if is_v and not prev_vowel:
+                syllables += 1
+            prev_vowel = is_v
+        if vowels == vowels_en and w.endswith("e") and syllables > 1 and not w.endswith("le"):
+            syllables -= 1
+        return max(1, syllables)
+
+    def analyze(self, text: str, declared_register: str = "legal_judicial") -> GriceanAnalysis:
+        language = self.lang_detector.detect(text)
+        profile = self.lang_detector.get_profile(language)
+        if profile.code == "es":
+            sentences = [s.strip() for s in re.split(r'[.!?;]+', text) if len(s.strip()) > 5]
+            words = re.findall(r'\b[a-zA-ZáéíóúñÁÉÍÓÚÑ]+\b', text.lower())
+        else:
+            sentences = [s.strip() for s in re.split(r'[.!?;]+', text) if len(s.strip()) > 5]
+            words = re.findall(r'\b[a-zA-Z]+\b', text.lower())
+        if not words or not sentences:
+            return GriceanAnalysis(0.0, 0.0, 0.0, 0, 0.0, False, 0.0)
+        avg_sent_len = len(words) / len(sentences)
+        threshold = 2 if profile.code == "en" else 3
+        complex_words = [w for w in words if self.count_syllables(w, language) > threshold]
+        complex_ratio = len(complex_words) / len(words)
+        fog = 0.4 * (avg_sent_len + 100 * complex_ratio)
+        text_lower = text.lower()
+        amb_markers = self.ES_AMBIGUITY_MARKERS if profile.code == "es" else self.EN_AMBIGUITY_MARKERS
+        amb_count = sum(text_lower.count(m) for m in amb_markers)
+        amb_density = amb_count / len(words)
+        register_content_mismatch = (
+            declared_register in ("legal_judicial", "academic_scientific")
+            and fog > profile.fog_obscure
+        )
+        manner_score = 0.0
+        if fog > profile.fog_obscure:
+            manner_score += min(0.4, (fog - profile.fog_obscure) / 20.0)
+        elif fog > profile.fog_complex:
+            manner_score += min(0.2, (fog - profile.fog_complex) / 20.0)
+        if amb_density > 0.05:
+            manner_score += min(0.3, amb_density * 3.0)
+        elif amb_density > 0.02:
+            manner_score += min(0.15, amb_density * 2.0)
+        if avg_sent_len > 40:
+            manner_score += min(0.2, (avg_sent_len - 40) / 100.0)
+        if register_content_mismatch:
+            manner_score += 0.2
+        severity = min(1.0, manner_score)
+        return GriceanAnalysis(
+            fog_index=round(fog, 4),
+            ambiguity_density=round(amb_density, 4),
+            avg_sentence_length=round(avg_sent_len, 4),
+            ambiguity_count=amb_count,
+            manner_violation_score=round(manner_score, 4),
+            register_content_mismatch=register_content_mismatch,
+            severity=round(severity, 4),
+        )
 
 
 # ============================================================================
