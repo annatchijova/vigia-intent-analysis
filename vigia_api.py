@@ -30,20 +30,26 @@ class CasePath(BaseModel):
 
 
 def _run_pipeline(case_path: Path) -> dict:
-    """Corre el pipeline determinista y retorna dict con verdict + hash."""
+    """Corre el scorer forense + pipeline EBS v1 para bundle hash."""
+    import time, subprocess as _sub, tempfile as _tmp
+    # Scorer forense (mismo que run_vigia_case.py)
+    from vigia_scorer import _vigia_score, _normalize_case
     from pipeline.vigia_integration_bridge import CaseAdapter, normalize_case_schema, validate_case_schema
     from pipeline.pipeline import VigiaPipeline
-    import time, subprocess as _sub, tempfile as _tmp
 
     with open(case_path) as f:
         case = json.load(f)
-    case = normalize_case_schema(case)
-    validate_case_schema(case)
-    adapter = CaseAdapter()
-    signals, _ = adapter.to_signals(case)
-    drift = CaseAdapter.compute_drift(case)
+    case_norm = _normalize_case(case)
 
     t0 = time.perf_counter()
+    score = _vigia_score(case_norm)
+
+    # Pipeline EBS v1 para bundle hash
+    case_ebs = normalize_case_schema(dict(case))
+    validate_case_schema(case_ebs)
+    adapter = CaseAdapter()
+    signals, _ = adapter.to_signals(case_ebs)
+    drift = CaseAdapter.compute_drift(case_ebs)
     result = VigiaPipeline().run_full(signals=signals, drift_score=drift)
     elapsed = (time.perf_counter() - t0) * 1000
 
@@ -52,7 +58,6 @@ def _run_pipeline(case_path: Path) -> dict:
     bh = integ.get("bundle_hash", "N/A")
     ts = integ.get("sealed_at", sd.get("timestamp", "N/A"))
 
-    # Verificación externa
     tf = _tmp.NamedTemporaryFile(suffix=".json", delete=False, mode="w")
     json.dump(sd, tf, sort_keys=True, indent=2, default=str)
     tf.close()
@@ -62,11 +67,11 @@ def _run_pipeline(case_path: Path) -> dict:
     level = next((l for l in ["Level 3", "Level 2", "Level 1"] if l in v.stdout), "?")
     os.unlink(tf.name)
 
-    dt = sd.get("decision_trace", {})
     return {
-        "verdict":     dt.get("decision", "ABSTAIN"),
-        "posterior":   round(dt.get("posterior", 0.0), 4),
-        "risk":        round(dt.get("risk", 0.0), 4),
+        "verdict":     score["verdict"],
+        "score":       score["score"],
+        "confidence":  score["confidence"],
+        "reason":      score["reason"],
         "bundle_hash": bh,
         "timestamp":   ts,
         "verify":      f"{verif} — {level}",
