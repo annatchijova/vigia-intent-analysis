@@ -45,6 +45,11 @@ from vigia_sift_bridge import (
 
 class TestSecurityConstraints:
 
+    def setup_method(self):
+        import os
+        os.makedirs("/tmp/vigia_test_evidence/logs", exist_ok=True)
+        open("/tmp/vigia_test_evidence/logs/test.log", "a").close()
+
     def test_path_traversal_blocked(self):
         with pytest.raises(ValueError):
             _sanitize_path("../../etc/passwd")
