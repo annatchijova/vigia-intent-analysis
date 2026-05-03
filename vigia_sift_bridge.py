@@ -457,7 +457,7 @@ SYSTEM_PROMPT_PEIRCE = _load_system_brain()
 
 # ─────────────────────────────────────────────────────────────────────────────
 # SESSION NONCE — Deterministic Cryptographic Binding (P0_CRITICO — Directiva C2 v2)
-# Gemini P0 metafísico: uuid.uuid4() rompe determinismo bit-for-bit.
+# P0 CRITICO: nonce aleatorio rompe determinismo bit-for-bit.
 # El nonce se deriva criptográficamente de:
 #   1. Hash SHA-256 de la PRIMERA evidencia procesada (evidence_seed)
 #   2. KASSANDRA_SALT del entorno (secret de proceso, nunca expuesto)
