@@ -104,7 +104,7 @@ def _vigia_score(case: dict) -> dict:
             "evidence_type": a.get("evidence_type"),
             "raw_score": a.get("raw_score", 0),
             "effective_trust": effective,
-            "adjusted_score": round(a.get("raw_score", 0) * (1 - a.get("raw_score", 0) * 0.3) * effective, 4),
+            "adjusted_score": round(a.get("raw_score", 0) * (1 - a.get("raw_score", 0) * 0.3) * (0.5 + 0.5 * effective), 4),
         })
 
     # --- Paso 2: Correlation decay simplificado ---
@@ -191,17 +191,24 @@ def _vigia_score(case: dict) -> dict:
         max(0.0, min(0.99, composite + fracture_malice_boost - fracture_credibility_penalty)),
         4
     )
-    final_score = raw_intent_score
+    import math as _math
+    n_artifacts = len(artifacts)
+    support_score = round(min(1.0, _math.log(1 + n_artifacts) / _math.log(5)), 4)
+    isolation_penalty = 0.85 if n_artifacts <= 2 else 1.0
+    n_boost = 1.0 + max(0, (n_artifacts - 2) * 0.03)
+    final_score = round(raw_intent_score * (0.9 + 0.1 * support_score), 4)
 
     mean_effective = sum(e["effective_trust"] for e in effective_trusts) / len(effective_trusts)
 
     # Provenance total ROTA anula incluso el boost por fractures
     # (no podemos acusar sin cadena de custodia)
     provenance_collapsed = (
-        mean_effective < 0.15
+        mean_effective < 0.01
         and not fractures  # si hay fractures, es evidencia de plantación → SUSPICION
     )
 
+    if n_artifacts < 2 and final_score > 0.65:
+        final_score = 0.65
     if hard_temporal:
         verdict = "MALICE"
         confidence = 0.95
@@ -219,14 +226,18 @@ def _vigia_score(case: dict) -> dict:
         verdict = "MALICE"
         confidence = round(final_score, 2)
         reason = f"Intent score {final_score:.2f} excede umbral MALICE"
-    elif final_score > 0.35:
+    elif final_score > 0.55:
         verdict = "SUSPICION"
         confidence = round(final_score, 2)
-        reason = f"Intent score {final_score:.2f} en rango SUSPICION"
+        reason = f"Señal significativa con soporte estructural (score={final_score:.2f})"
+    elif final_score > 0.25:
+        verdict = "UNKNOWN"
+        confidence = round(final_score * 0.5, 2)
+        reason = f"Anomalía sin suficiente soporte estructural (score={final_score:.2f})"
     else:
         verdict = "NOISE"
         confidence = round(1.0 - final_score, 2)
-        reason = f"Intent score {final_score:.2f} bajo umbral de detección"
+        reason = f"Sin evidencia suficiente de intención maliciosa (score={final_score:.2f})"
 
     return {
         "verdict": verdict,
