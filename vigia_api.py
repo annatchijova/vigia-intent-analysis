@@ -80,7 +80,7 @@ def _run_narrative(case_path: Path) -> str:
     if not ask_sh.exists():
         return ""
     r = subprocess.run(["bash", str(ask_sh), str(case_path)],
-                       capture_output=True, text=True, timeout=120)
+                       capture_output=True, text=True, timeout=300)
     out = r.stdout
     if "...done thinking." in out:
         out = out.split("...done thinking.")[-1].strip()
@@ -112,7 +112,10 @@ def analyze_by_path(payload: CasePath):
         raise HTTPException(404, f"Caso no encontrado: {payload.case_path}")
     try:
         pipeline = _run_pipeline(case_path)
-        narrative = _run_narrative(case_path)
+        try:
+            narrative = _run_narrative(case_path)
+        except Exception:
+            narrative = "[narrativa no disponible]"
         return {**pipeline, "narrative": narrative, "case": case_path.name}
     except Exception as e:
         raise HTTPException(500, str(e))
@@ -126,7 +129,10 @@ def analyze_by_json(payload: CasePayload):
     tf.close()
     try:
         pipeline = _run_pipeline(Path(tf.name))
-        narrative = _run_narrative(Path(tf.name))
+        try:
+            narrative = _run_narrative(Path(tf.name))
+        except Exception:
+            narrative = "[narrativa no disponible]"
         return {**pipeline, "narrative": narrative,
                 "case": payload.case_data.get("case_id", "inline")}
     except Exception as e:
