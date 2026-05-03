@@ -14,6 +14,71 @@ globals().update({k: getattr(_base_mod, k) for k in dir(_base_mod) if not k.star
 # Re-exportar LikelihoodEngine con interfaz extendida
 _BaseLikelihoodEngine = _base_mod.LikelihoodEngine
 
+
+
+def _build_contributions(signals, evidence_graph, base_contributions):
+    """
+    Construye lista de contributions con nombres de cluster emergentes.
+    Si evidence_graph es None, retorna base_contributions sin modificar.
+    Si evidence_graph provisto, asigna cada señal a su componente conectado
+    usando nombres G_{tool}_{i} (determinístico: mismo grafo = mismo resultado).
+    """
+    if evidence_graph is None:
+        return base_contributions
+
+    # Construir componentes conectados del grafo (Union-Find simple)
+    edges = getattr(evidence_graph, "edges", [])
+    nodes = list(getattr(evidence_graph, "nodes", []))
+    threshold = getattr(evidence_graph, "stability_threshold", 0.0)
+
+    # Mapeo tool_name -> componente
+    parent = {n: n for n in nodes}
+
+    def find(x):
+        while parent.get(x, x) != x:
+            parent[x] = parent.get(parent[x], x)
+            x = parent[x]
+        return x
+
+    def union(a, b):
+        ra, rb = find(a), find(b)
+        if ra != rb:
+            parent[ra] = rb
+
+    for edge in edges:
+        src = getattr(edge, "source", None)
+        tgt = getattr(edge, "target", None)
+        stab = getattr(edge, "stability", 0.0)
+        if src and tgt and stab >= threshold:
+            union(src, tgt)
+
+    # Asignar índice a cada componente (orden determinístico)
+    comp_roots = {}
+    comp_idx = {}
+    idx = 0
+    for node in sorted(nodes):
+        root = find(node)
+        if root not in comp_roots:
+            comp_roots[root] = node
+            comp_idx[root] = idx
+            idx += 1
+
+    result = []
+    for sig in signals:
+        tool = getattr(sig, "tool_name", "unknown")
+        root = find(tool) if tool in parent else None
+        if root and root in comp_idx:
+            representative = comp_roots[root]
+            cluster_name = f"G_{representative}_{comp_idx[root]}"
+        else:
+            cluster_name = "unassigned"
+        result.append({
+            "tool": tool,
+            "cluster": cluster_name,
+            "z_score": getattr(sig, "z_score", 0.0),
+        })
+    return result
+
 class LikelihoodEngine(_BaseLikelihoodEngine):
     """
     LikelihoodEngine con interfaz extendida para pipeline.py.
@@ -43,7 +108,7 @@ class LikelihoodEngine(_BaseLikelihoodEngine):
         self.hint_threshold_accept = hint_threshold_accept
         self._calibration_path = calibration_path
         self._covariance_path = covariance_path
-        self._mode = "calibrated" if _calibrator else "fallback"
+        self._mode = "CALIBRATED" if _calibrator else "FALLBACK"
 
     def infer(self, signals, evidence_graph=None, **kwargs):
         """
@@ -66,16 +131,46 @@ class LikelihoodEngine(_BaseLikelihoodEngine):
             # Campos opcionales (accedidos con .get())
             "log_lr":             log_lr,
             "redundancy_alerts":  {},
-            "contributions":      d.get("contributions", []),
+            "contributions":      _build_contributions(signals, evidence_graph, d.get("contributions", [])),
             "components_used":    d.get("n_signals", len(signals)),
             "clustering_method":  "heuristic_default",
             "enfsi_label":        d.get("enfsi_label", "EQUIVOCAL"),
             "signal_count":       d.get("n_signals", len(signals)),
             "calibration_method": "fallback_gaussian",
             "_record":            d,
+            # decision_hint basado en hint_thresholds
+            "decision_hint": (
+                "ACCEPT" if posterior < self.hint_threshold_accept
+                else "REJECT" if posterior >= self.hint_threshold_reject
+                else "ABSTAIN"
+            ),
+            # clustering_method depende de si se pasó evidence_graph
+            "clustering_method": (
+                "graph_conditioned_emergent"
+                if evidence_graph is not None
+                else "heuristic_default"
+            ),
         }
 
 
 def _correlation_penalty(signals):
-    """Stub de compatibilidad para imports que lo usan directamente."""
-    return 0.0
+    """
+    Calcula el factor de penalizacion por correlacion entre senales.
+    Retorna float en [0.1, 1.0]: 1.0 = sin penalizacion, 0.1 = maxima.
+    Señales con z_scores identicos = maxima correlacion = minimo factor.
+    Determinista: opera solo sobre z_scores (enteros/floats puros).
+    """
+    if not signals or len(signals) < 2:
+        return 1.0
+    z_scores = [getattr(s, "z_score", 0.0) for s in signals]
+    n = len(z_scores)
+    mean_z = sum(z_scores) / n
+    variance = sum((z - mean_z) ** 2 for z in z_scores) / n
+    # Señales identicas (variance=0) -> max correlacion -> min factor (0.1)
+    # Señales muy distintas (variance alta) -> min correlacion -> factor 1.0
+    # Factor = max(0.1, 1.0 - exp(-variance / 2.0))
+    import math as _math
+    if variance < 1e-9:
+        return 0.1
+    factor = max(0.1, min(1.0, 1.0 - _math.exp(-variance / 2.0)))
+    return round(factor, 4)
