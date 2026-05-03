@@ -455,15 +455,17 @@ class CaseAdapter:
         """
         try:
             evidence_type = str(artifact.get("evidence_type", "default"))
-            raw_score = float(artifact.get("raw_score", 0.5))
-            raw_score = max(0.0, min(1.0, raw_score))  # clamp [0,1]
+            from fractions import Fraction as _F
+            _raw = artifact.get("raw_score", 0.5)
+            raw_score = _F(str(_raw)) if not isinstance(_raw, _F) else _raw
+            raw_score = max(_F(0), min(_F(1), raw_score))  # clamp [0,1]
 
             prior_trust = artifact.get("prior_trust")
-            confidence = float(prior_trust) if prior_trust is not None else 0.85
-            confidence = max(0.05, min(1.0, confidence))  # nunca cero
+            confidence = _F(str(prior_trust)) if prior_trust is not None else _F(17, 20)
+            confidence = max(_F(1, 20), min(_F(1), confidence))  # nunca cero
 
             baseline_mean, baseline_mad = self._get_baseline(evidence_type)
-            safe_mad = max(abs(baseline_mad), 1e-9)
+            safe_mad = max(abs(baseline_mad), _F(1, 10**9))
             z = (raw_score - baseline_mean) / safe_mad
             z = self._clamp_z(z)
 
