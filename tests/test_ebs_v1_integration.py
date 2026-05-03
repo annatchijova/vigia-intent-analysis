@@ -23,8 +23,10 @@ import traceback
 
 _HERE = os.path.dirname(os.path.abspath(__file__))
 HERE = _HERE  # alias publico para tests que lo usan
-if _HERE not in sys.path:
-    sys.path.insert(0, _HERE)
+_ROOT = os.path.dirname(_HERE)
+for _p in [_HERE, _ROOT]:
+    if _p not in sys.path:
+        sys.path.insert(0, _p)
 
 PASSED, FAILED = [], []
 
