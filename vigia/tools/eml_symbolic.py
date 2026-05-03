@@ -37,7 +37,8 @@ import math
 import statistics
 from typing import Dict, List, Optional, Tuple
 
-from vigia.core.ebs_v1 import SignalOutput, SignalBuilder
+from vigia.core.ebs_v1 import SignalOutput
+from vigia.core.signal_contract import SignalBuilder
 
 # ---------------------------------------------------------------------------
 # Constantes de detección (justificadas para Daubert)

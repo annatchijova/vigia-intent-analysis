@@ -698,7 +698,7 @@ def t71():
 @test("T72 — Regla de aborto activa con posterior >= 1-epsilon")
 def t72():
     from engine.resource_optimizer import ResourceOptimizer
-    from vigia.core.ebs_v1 from vigia.core.ebs_v1 import make_default_policy
+    from vigia.core.ebs_v1 import make_default_policy
 
     policy = make_default_policy(epsilon=0.05)
     opt = ResourceOptimizer(policy=policy)
@@ -719,7 +719,7 @@ def t72():
 @test("T73 — Regla de aborto NO activa en zona de incertidumbre (ABSTAIN)")
 def t73():
     from engine.resource_optimizer import ResourceOptimizer
-    from vigia.core.ebs_v1 from vigia.core.ebs_v1 import make_default_policy
+    from vigia.core.ebs_v1 import make_default_policy
 
     policy = make_default_policy(epsilon=0.05)
     opt = ResourceOptimizer(policy=policy)
@@ -799,7 +799,7 @@ def t76():
 
 @test("T80 — LikelihoodEngine hint_threshold derivado de PolicySpec (no hardcodeado)")
 def t80():
-    from vigia.core.ebs_v1 from vigia.core.ebs_v1 from vigia.core.ebs_v1 import make_default_policy, SignalOutput
+    from vigia.core.ebs_v1 import make_default_policy, SignalOutput
     from engine.likelihood_engine import LikelihoodEngine
 
     # Con epsilon=0.10, hint_threshold_reject debe ser 0.90
@@ -837,7 +837,7 @@ def t80():
 @test("T81 — VigiaPipeline conecta hint_threshold con PolicySpec automaticamente")
 def t81():
     from pipeline import VigiaPipeline
-    from vigia.core.ebs_v1 from vigia.core.ebs_v1 import make_default_policy
+    from vigia.core.ebs_v1 import make_default_policy
 
     # Con epsilon=0.15, el motor debe tener thresholds coherentes
     policy = make_default_policy(epsilon=0.15)
@@ -1268,7 +1268,7 @@ def t97():
     y policy.epsilon_reject. Ningun umbral hardcodeado en el codigo.
     """
     from governance.risk_bounded_layer import RiskBoundedDecisionLayer
-    from vigia.core.ebs_v1 from vigia.core.ebs_v1 import make_default_policy
+    from vigia.core.ebs_v1 import make_default_policy
 
     # PolicySpec con epsilon=0.20 (mas permisivo)
     policy_lax = make_default_policy(epsilon=0.20)
@@ -1300,7 +1300,7 @@ def t98():
     Verificar que los epsilons del layer coinciden con los del PolicySpec.
     """
     from pipeline import VigiaPipeline
-    from vigia.core.ebs_v1 from vigia.core.ebs_v1 import make_default_policy
+    from vigia.core.ebs_v1 import make_default_policy
 
     policy = make_default_policy(epsilon=0.08)
     pipeline = VigiaPipeline(policy=policy, adaptive_policy=False)
