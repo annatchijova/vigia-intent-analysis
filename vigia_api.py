@@ -106,7 +106,7 @@ def list_cases():
 
 @app.post("/analyze/path")
 def analyze_by_path(payload: CasePath):
-    """Analiza un caso por path relativo al repo."""
+    """Analiza un caso forense VIGÍA dado su path relativo al repo (ej: data/cases/VIGIA-REAL-001.json). USAR ESTE ENDPOINT para analizar casos existentes."""
     case_path = REPO / payload.case_path
     if not case_path.exists():
         raise HTTPException(404, f"Caso no encontrado: {payload.case_path}")
