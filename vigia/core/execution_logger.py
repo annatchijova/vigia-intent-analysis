@@ -134,12 +134,17 @@ class VigiaExecutionLogger:
 
         # Recanonicalizar con todos los campos para la línea final del JSONL
         final_line = json.dumps(_canonicalize(event), sort_keys=True, ensure_ascii=True)
-        # Append directo al JSONL.
-        # O_APPEND es atómico para writes < PIPE_BUF (4KB) en Linux/POSIX —
-        # suficiente para líneas JSONL. El tempfile+rename anterior sobrescribía
-        # el archivo en cada evento, perdiendo todo excepto el último (Kimi CRÍTICO 4).
+        # P1-17: validar tamaño antes de escribir — O_APPEND atómico solo < PIPE_BUF (4KB)
+        _PIPE_BUF = 4096
+        _encoded = (final_line + "\n").encode("utf-8")
+        if len(_encoded) > _PIPE_BUF:
+            # Truncar el evento y agregar nota de truncado
+            _trunc_event = {"_truncated": True, "_original_size": len(_encoded),
+                            "event_type": event.get("event_type", "UNKNOWN"),
+                            "_local_timestamp": event.get("_local_timestamp")}
+            _encoded = (json.dumps(_trunc_event, sort_keys=True) + "\n").encode("utf-8")
         with open(self.log_path, "a", encoding="utf-8") as f:
-            f.write(final_line + "\n")
+            f.write(_encoded.decode("utf-8"))
 
     def log_tool_call(
         self,

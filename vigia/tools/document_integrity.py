@@ -175,6 +175,11 @@ async def audit_document_integrity(file_path: str) -> dict:
             doc.close()
 
     except ImportError:
+        # P1-18: fallback pypdf — advertir diferencias determinísticas
+        import sys
+        print("[VIGÍA][WARNING] PyMuPDF no disponible — usando pypdf. "
+              "Resultados pueden diferir entre plataformas. "
+              "Instalar PyMuPDF para análisis forense determinístico.", file=sys.stderr)
         try:
             from pypdf import PdfReader
 
