@@ -22,7 +22,7 @@ from typing import Dict, List, Tuple
 
 # ── Configuración ─────────────────────────────────────────────────────────
 
-NEGATION_WINDOW_CHARS = 50  # caracteres antes y después del match
+NEGATION_WINDOW_CHARS = 200  # P1-16: aumentado de 50 a 200 chars — previene bypass con espacios o caracteres invisibles entre negación y verbo
 
 # Negaciones fuertes → atenuación 50%
 STRONG_NEGATION = {

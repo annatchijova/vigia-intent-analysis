@@ -406,9 +406,12 @@ class LRCalibrator:
 # ---------------------------------------------------------------------------
 
 def _dataset_hash(z_scores: List[float], labels: List[int]) -> str:
-    """Hash SHA-256 del dataset de calibración para trazabilidad Daubert."""
+    """Hash SHA-256 del dataset de calibración para trazabilidad Daubert.
+    P1-15: usar Decimal exacto — sin round() para evitar colisiones de hash.
+    """
+    from decimal import Decimal
     payload = json.dumps(
-        {"z": [round(z, 6) for z in z_scores], "y": labels},
+        {"z": [str(Decimal(str(z))) for z in z_scores], "y": labels},
         sort_keys=True
     )
     return hashlib.sha256(payload.encode()).hexdigest()[:16]
