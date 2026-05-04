@@ -61,7 +61,7 @@ This document enumerates the epistemological and design limitations of VIGÍA th
 
 **Mitigation:** Implement breaker after N failed attempts to reduce entropy.
 
-**Status:** P1. To be resolved in current sprint.
+**Status:** Partially mitigated. `PlannerConfig.max_steps=10` limits iterations. `eco_max_attempts=1` limits abductive refutation. Verified May 2026.
 
 ---
 
