@@ -25,6 +25,7 @@ Security
 """
 
 from __future__ import annotations
+from fractions import Fraction
 
 import hashlib
 import io
@@ -281,7 +282,7 @@ async def audit_document_integrity(file_path: str) -> dict:
         # Not scored – just advisory
 
     # --- Final score cap and verdict ---
-    suspicion_score = round(min(suspicion_score, 1.0), 2)
+    suspicion_score = min(Fraction(str(suspicion_score)).limit_denominator(100), Fraction(1))
     verdict = _score_to_verdict(suspicion_score)
 
     summary = findings[0] if findings else "Document appears structurally clean."
@@ -446,7 +447,7 @@ async def analyze_image_layers(image_path: str, ela_quality: int = ELA_QUALITY) 
         except OSError:
             pass
 
-    suspicion_score = round(min(suspicion_score, 1.0), 2)
+    suspicion_score = min(Fraction(str(suspicion_score)).limit_denominator(100), Fraction(1))
     verdict = _score_to_verdict(suspicion_score)
 
     return {
@@ -575,7 +576,7 @@ async def detect_document_geometry(file_path: str) -> dict:
     finally:
         doc.close()
 
-    suspicion_score = round(min(suspicion_score, 1.0), 2)
+    suspicion_score = min(Fraction(str(suspicion_score)).limit_denominator(100), Fraction(1))
     verdict = _score_to_verdict(suspicion_score)
 
     return {
@@ -748,7 +749,7 @@ async def ocr_semantic_validator(
         )
         suspicion_score += 0.7
 
-    suspicion_score = round(min(suspicion_score, 1.0), 2)
+    suspicion_score = min(Fraction(str(suspicion_score)).limit_denominator(100), Fraction(1))
     verdict = _score_to_verdict(suspicion_score)
 
     return {
