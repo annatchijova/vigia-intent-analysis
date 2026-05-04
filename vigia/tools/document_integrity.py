@@ -147,6 +147,10 @@ async def audit_document_integrity(file_path: str) -> dict:
 
         doc = fitz.open(path)
         try:
+            # P1-9: prevenir PDF bombs
+            if len(doc) > 1000:
+                doc.close()
+                raise ValueError(f"PDF bomb detectada: {len(doc)} páginas (max 1000)")
             total_pages = len(doc)
             text_parts: list[str] = []
 

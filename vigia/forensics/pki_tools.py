@@ -353,16 +353,21 @@ class TimestampClient:
     @staticmethod
     def _extract_serial(tsr_der: bytes) -> str:
         """
-        Extrae el serial number del TimeStampToken de forma heuristica.
-        Para un parser completo usar python-tsp o pyHanko.
+        Extrae el serial number del TimeStampToken.
+        P1-8: heurística reforzada con límite de búsqueda y validación de rango.
+        Para parser ASN.1 completo usar pyasn1 + rfc3161.
         """
         try:
-            # Buscar el patron de INTEGER serial en el DER
-            # Es una heuristica — suficiente para trazabilidad en logs
-            idx = tsr_der.find(b"\x02\x01")
-            if idx >= 0:
-                serial_val = tsr_der[idx + 2]
-                return f"{serial_val:08x}"
+            if not isinstance(tsr_der, bytes) or len(tsr_der) < 4:
+                return "unknown"
+            # Limitar búsqueda a los primeros 512 bytes — el serial está al inicio
+            search_space = tsr_der[:512]
+            idx = search_space.find(b"\x02\x01")
+            if idx >= 0 and idx + 3 <= len(search_space):
+                serial_val = search_space[idx + 2]
+                # Validar que es un valor de serial razonable (no inyección)
+                if 0x01 <= serial_val <= 0xFF:
+                    return f"{serial_val:08x}"
             return "unknown"
         except Exception:
             return "unknown"

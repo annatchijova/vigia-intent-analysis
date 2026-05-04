@@ -86,7 +86,7 @@ CHROMA_SUBSAMPLING_ANOMALY_THRESHOLD: Final[float] = 0.3      # Chroma channel v
 # To populate: run  sha256sum ~/.cache/clip/ViT-B-32.pt
 
 _STRICT_MODEL_CHECK: Final[bool] = (
-    os.getenv("VIGIA_STRICT_MODEL_CHECK", "false").lower() == "true"
+    os.getenv("VIGIA_STRICT_MODEL_CHECK", "true").lower() == "true"  # P1-7: default seguro
 )
 
 # Hardcoded fallback — override via env vars above
