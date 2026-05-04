@@ -133,7 +133,14 @@ if __name__ == "__main__":
     dataset_hash = hashlib.sha256(output.encode()).hexdigest()
     print(f"  Dataset hash: {dataset_hash[:16]}...")
 
-    out_path = sys.argv[1] if len(sys.argv) > 1 else "/tmp/calibration_dataset.json"
+    # P1-6: sanitizar path de salida para evitar path traversal
+    _raw_path = sys.argv[1] if len(sys.argv) > 1 else "/tmp/calibration_dataset.json"
+    import pathlib
+    _resolved = pathlib.Path(_raw_path).resolve()
+    _allowed = [pathlib.Path("/tmp"), pathlib.Path.home() / "vigia-repo" / "data"]
+    if not any(str(_resolved).startswith(str(a)) for a in _allowed):
+        raise SystemExit(f"[VIGÍA] Path rechazado por seguridad: {_resolved}")
+    out_path = str(_resolved)
     with open(out_path, "w") as f:
         f.write(output)
     print(f"  Guardado en: {out_path}")

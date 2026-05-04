@@ -897,6 +897,10 @@ class ZipfImperfectionAnalyzer:
 
     @staticmethod
     def _tokenize(text: str) -> List[str]:
+        # P1-5: ReDoS — truncar texto antes del regex para evitar backtracking catastrófico
+        _MAX_TOKENIZE_LEN = 50_000
+        if len(text) > _MAX_TOKENIZE_LEN:
+            text = text[:_MAX_TOKENIZE_LEN]
         return [
             w.lower() for w in re.findall(r"\b[a-zA-ZáéíóúñÁÉÍÓÚÑ]{3,}\b", text)
         ]
