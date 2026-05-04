@@ -89,44 +89,8 @@ def _validate_output_schema(result: Dict[str, Any]) -> None:
         raise ValueError(f"[SCHEMA] {aid}: verdict inválido: {verdict!r}")
 
 
-def _canonicalize(obj: Any, _key: str = "") -> Any:
-    """
-    Canonicaliza output del pipeline para json.dumps (I2 + I7).
-
-    - bool  → "true:bool" / "false:bool"
-    - int   → "N:int"
-    - str   → "str:{val}" — prefijo evita colisión con "1:int" (Gemini V17)
-    - float sin _ prefix → TypeError (fuga de I7)
-    - Fraction suelta → TypeError (debe ser {num, den} en el core)
-    """
-    if isinstance(obj, bool):
-        return "true:bool" if obj else "false:bool"
-    if isinstance(obj, int):
-        return f"{obj}:int"
-    if isinstance(obj, str):
-        # Prefijo explícito para evitar colisión de dominios (V17)
-        # Sanitizar delimitadores de prompt injection para pipelines downstream (Gemini V13)
-        sanitized = re.sub(
-            r'</?system>|<\|?im_start\|?>|<\|im_end\|>|\[INST\]|<</?SYS>>',
-            '[SANITIZED]', obj, flags=re.IGNORECASE
-        )
-        return f"str:{sanitized}"
-    if obj is None:
-        return "null:none"
-    if isinstance(obj, float):
-        if _key.startswith("_"):
-            return obj
-        raise TypeError(
-            f"Float en campo '{_key}' viola I7. "
-            f"Usar Fraction → {{num, den}} o renombrar a '_{_key}' si es display."
-        )
-    if isinstance(obj, dict):
-        return {k: _canonicalize(v, _key=k) for k, v in sorted(obj.items())}
-    if isinstance(obj, (list, tuple)):
-        return [_canonicalize(v, _key=_key) for v in obj]
-    if isinstance(obj, Fraction):
-        raise TypeError(f"Fraction suelta en '{_key}'. Convertir a {{num, den}}.")
-    raise TypeError(f"Tipo no serializable en '{_key}': {type(obj).__name__}")
+# P1-19: importar _canonicalize canónico
+from vigia.core.canonicalize import _canonicalize  # noqa: F401
 
 try:
     from vigia.core.semiotic_detector_v2 import SemioticDetectorV2

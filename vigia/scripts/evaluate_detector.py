@@ -30,27 +30,8 @@ from typing import Dict, List, Any, Optional
 # ── Canonicalización explícita (I2 + I7) ─────────────────────────────────
 # Falla ruidosamente si hay un Fraction suelto — eso es un bug de arquitectura.
 
-def _canonicalize(obj: Any, _key: str = "") -> Any:
-    """Canonicaliza output para json.dumps con prefijos de tipo explícitos (V17)."""
-    if isinstance(obj, bool): return "true:bool" if obj else "false:bool"
-    if isinstance(obj, int): return f"{obj}:int"
-    if isinstance(obj, str):
-        sanitized = re.sub(
-            r'</?system>|<\|?im_start\|?>|<\|im_end\|>|\[INST\]|<</?SYS>>',
-            '[SANITIZED]', obj, flags=re.IGNORECASE
-        )
-        return f"str:{sanitized}"
-    if obj is None: return "null:none"
-    if isinstance(obj, float):
-        if _key.startswith("_"): return obj
-        raise TypeError(f"Float en '{_key}' viola I7.")
-    if isinstance(obj, dict):
-        return {k: _canonicalize(v, _key=k) for k, v in sorted(obj.items())}
-    if isinstance(obj, (list, tuple)):
-        return [_canonicalize(v, _key=_key) for v in obj]
-    if isinstance(obj, Fraction):
-        raise TypeError(f"Fraction suelta en '{_key}'.")
-    raise TypeError(f"Tipo no serializable en '{_key}': {type(obj).__name__}")
+# P1-19: importar _canonicalize canónico
+from vigia.core.canonicalize import _canonicalize  # noqa: F401
 
 # ── Configuración ─────────────────────────────────────────────────────────
 DETECTION_THRESHOLD = "MEDIUM"

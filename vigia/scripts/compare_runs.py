@@ -35,13 +35,8 @@ LEVEL_ORDER = ["INFO", "LOW", "MEDIUM", "HIGH", "CRITICAL"]
 
 # ── I2 Compliant canonical hash ──────────────────────────────────────────
 
-def _canonicalize(v: Any) -> Any:
-    if isinstance(v, bool): return "true" if v else "false"
-    if isinstance(v, int): return f"{v}:int"
-    if isinstance(v, float): return f"{v:.8f}"
-    if isinstance(v, dict): return {k: _canonicalize(v) for k, v in sorted(v.items())}
-    if isinstance(v, (list, tuple)): return [_canonicalize(x) for x in v]
-    return str(v)
+# P1-19: importar _canonicalize canónico
+from vigia.core.canonicalize import _canonicalize  # noqa: F401
 
 def hash_forensic(obj: Dict) -> str:
     raw = json.dumps(_canonicalize(obj), sort_keys=True, ensure_ascii=True).encode()

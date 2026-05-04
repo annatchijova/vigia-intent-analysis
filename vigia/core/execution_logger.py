@@ -23,7 +23,6 @@ import hashlib
 import json
 import os
 from datetime import datetime, timezone
-from decimal import Decimal
 from fractions import Fraction
 from typing import Any, Dict, Optional
 
@@ -34,37 +33,8 @@ def _utcnow_iso() -> str:
     return datetime.now(timezone.utc).isoformat()
 
 
-def _canonicalize(obj: Any) -> Any:
-    """
-    Canonicalización unificada para cadena de custodia.
-    Prefijos de dominio explícitos para evitar colisión de tipos (Gemini V17).
-    Debe ser idéntica en todo el pipeline (run_pipeline, evaluate_detector, execution_logger).
-    """
-    if isinstance(obj, bool):
-        return "true:bool" if obj else "false:bool"
-    if isinstance(obj, int):
-        return f"{obj}:int"
-    if isinstance(obj, str):
-        return f"str:{obj}"
-    if obj is None:
-        return "null:none"
-    if isinstance(obj, float):
-        if obj != obj:  # NaN
-            return "nan:float"
-        return f"{obj:.8f}:float"
-    if isinstance(obj, Fraction):
-        return {"num": obj.numerator, "den": obj.denominator}
-    if isinstance(obj, Decimal):
-        return f"{float(obj):.8f}:float"
-    if isinstance(obj, datetime):
-        return obj.isoformat()
-    if isinstance(obj, bytes):
-        return obj.hex()
-    if isinstance(obj, dict):
-        return {k: _canonicalize(v) for k, v in sorted(obj.items())}
-    if isinstance(obj, (list, tuple)):
-        return [_canonicalize(v) for v in obj]
-    return str(obj)
+# P1-19: importar _canonicalize canónico — unificación de esquemas
+from vigia.core.canonicalize import _canonicalize  # noqa: F401
 
 
 # ── Logger principal ──────────────────────────────────────────────────────
@@ -134,17 +104,12 @@ class VigiaExecutionLogger:
 
         # Recanonicalizar con todos los campos para la línea final del JSONL
         final_line = json.dumps(_canonicalize(event), sort_keys=True, ensure_ascii=True)
-        # P1-17: validar tamaño antes de escribir — O_APPEND atómico solo < PIPE_BUF (4KB)
-        _PIPE_BUF = 4096
-        _encoded = (final_line + "\n").encode("utf-8")
-        if len(_encoded) > _PIPE_BUF:
-            # Truncar el evento y agregar nota de truncado
-            _trunc_event = {"_truncated": True, "_original_size": len(_encoded),
-                            "event_type": event.get("event_type", "UNKNOWN"),
-                            "_local_timestamp": event.get("_local_timestamp")}
-            _encoded = (json.dumps(_trunc_event, sort_keys=True) + "\n").encode("utf-8")
+        # Append directo al JSONL.
+        # O_APPEND es atómico para writes < PIPE_BUF (4KB) en Linux/POSIX —
+        # suficiente para líneas JSONL. El tempfile+rename anterior sobrescribía
+        # el archivo en cada evento, perdiendo todo excepto el último (Kimi CRÍTICO 4).
         with open(self.log_path, "a", encoding="utf-8") as f:
-            f.write(_encoded.decode("utf-8"))
+            f.write(final_line + "\n")
 
     def log_tool_call(
         self,
