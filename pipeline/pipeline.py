@@ -1134,7 +1134,8 @@ def run_vigia(
     # reales de las señales usando PSI. El parámetro externo se usa solo como
     # fallback documentado cuando no hay suficientes señales para PSI.
     internal_drift = drift_score  # fallback documentado
-    if len(signals) >= 4:
+    # P1-21: umbral bajado de 4 a 2 — atacante no puede evadir con 3 señales
+    if len(signals) >= 2:
         try:
             from vigia.core.risk_bounded_layer import RiskBoundedDecisionLayer
             z_scores = [s.z_score for s in signals if hasattr(s, "z_score")]

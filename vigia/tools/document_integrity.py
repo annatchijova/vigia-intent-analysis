@@ -447,7 +447,8 @@ async def analyze_image_layers(image_path: str, ela_quality: int = ELA_QUALITY) 
             evidence_dir = CONFIG.evidence_base_dir
             ela_out = os.path.join(
                 evidence_dir,
-                f"ela_{Path(path).stem}_{_utcnow()[:10]}.jpg",
+                # P1-20: usar hash del archivo como nombre — previene symlink race
+                f"ela_{_sha256_file(path)[:16]}_{_utcnow()[:10]}.jpg",
             )
             enhanced.save(ela_out, "JPEG", quality=95)
             ela_output_path = ela_out
