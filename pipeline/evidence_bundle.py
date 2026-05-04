@@ -12,10 +12,18 @@ from typing import Dict, Any, Optional
 # ---------------------------------------------------------------------------
 
 def sha256_file(path: str) -> str:
+    """P1-10: usa O_NOFOLLOW para prevenir TOCTOU via symlink race."""
+    import os
     h = hashlib.sha256()
-    with open(path, "rb") as f:
-        for chunk in iter(lambda: f.read(8192), b""):
-            h.update(chunk)
+    # O_NOFOLLOW rechaza symlinks — previene sustitución entre validación y apertura
+    flags = os.O_RDONLY | getattr(os, "O_NOFOLLOW", 0) | getattr(os, "O_CLOEXEC", 0)
+    fd = os.open(path, flags)
+    try:
+        with os.fdopen(fd, "rb", closefd=False) as f:
+            for chunk in iter(lambda: f.read(8192), b""):
+                h.update(chunk)
+    finally:
+        os.close(fd)
     return h.hexdigest()
 
 
