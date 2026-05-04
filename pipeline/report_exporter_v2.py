@@ -38,15 +38,28 @@ def utc_now() -> str:
 # ---------------------------------------------------------------------------
 
 def sign_hash(hash_hex: str, private_key=None) -> Optional[str]:
-    """
-    Firma el hash si se provee clave privada.
-    Placeholder: integrar con cryptography o HSM.
-    """
+    """P1-13: firma RSA-PSS real. Si private_key es None retorna None."""
     if private_key is None:
         return None
-
-    # Ejemplo conceptual (NO producción)
-    return f"SIGNED({hash_hex[:16]})"
+    try:
+        from cryptography.hazmat.primitives import hashes, serialization
+        from cryptography.hazmat.primitives.asymmetric import padding
+        import pathlib
+        if isinstance(private_key, (str, pathlib.Path)):
+            with open(private_key, "rb") as f:
+                key = serialization.load_pem_private_key(f.read(), password=None)
+        elif isinstance(private_key, bytes):
+            key = serialization.load_pem_private_key(private_key, password=None)
+        else:
+            key = private_key
+        sig = key.sign(
+            hash_hex.encode("utf-8"),
+            padding.PSS(mgf=padding.MGF1(hashes.SHA256()), salt_length=padding.PSS.MAX_LENGTH),
+            hashes.SHA256(),
+        )
+        return sig.hex()
+    except Exception as e:
+        raise RuntimeError(f"[VIGÍA] Firma fallida: {e}") from e
 
 
 # ---------------------------------------------------------------------------

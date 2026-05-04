@@ -2942,6 +2942,9 @@ mcp.tool()(vision_intent_audit)        # CLIP zero-shot: intencionalidad visual 
 # CAIE — Cross-Artifact Incongruence Engine (Kimi P0 → v2.0 hardened)
 # Registro condicional con audit log. Activar: VIGIA_CAIE_ENABLED=true
 # ---------------------------------------------------------------------------
+# P1-14: alertar si módulo crítico desactivado explícitamente
+if os.getenv("VIGIA_CAIE_ENABLED", "true").lower() != "true":
+    print("[VIGIA][SECURITY ALERT] VIGIA_CAIE_ENABLED=false — Terceridad CAIE desactivada. Capacidad forense degradada.", file=sys.stderr, flush=True)
 if os.getenv("VIGIA_CAIE_ENABLED", "true").lower() == "true":
     try:
         from vigia.tools.caie import cross_artifact_analysis
@@ -2968,6 +2971,8 @@ if os.getenv("VIGIA_CAIE_ENABLED", "true").lower() == "true":
 # effective_trust = provenance_trust × exp(-2 × max_weighted_severity)
 # Activar: VIGIA_TRUST_FUSION_ENABLED=true
 # ---------------------------------------------------------------------------
+if os.getenv("VIGIA_TRUST_FUSION_ENABLED", "true").lower() != "true":
+    print("[VIGIA][SECURITY ALERT] VIGIA_TRUST_FUSION_ENABLED=false — Trust Fusion desactivado. Cadena de confianza degradada.", file=sys.stderr, flush=True)
 if os.getenv("VIGIA_TRUST_FUSION_ENABLED", "true").lower() == "true":
     try:
         from vigia.core.trust_fusion import trust_fusion_analysis
