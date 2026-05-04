@@ -99,8 +99,8 @@ _CANDIDATE_PATHS: list[Path] = [
     # 3. <project_root>/phonetic_dict.json (compatibilidad con bridge raíz)
     _HERE.parent / "phonetic_dict.json",
 
-    # 4. cwd fallback para desarrollo
-    Path.cwd() / "phonetic_dict.json",
+    # 4. cwd eliminado (P1-24: atacante puede colocar dict envenenado en cwd)
+    # Path.cwd() / "phonetic_dict.json",  # REMOVED — security risk
 ]
 
 # Filtrar el placeholder si VIGIA_PHONETIC_DICT no está seteado

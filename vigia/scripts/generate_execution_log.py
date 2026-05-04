@@ -258,13 +258,19 @@ def main() -> None:
 
     detector = SemioticDetectorV2()
 
+    _MAX_JSON_SIZE = 50 * 1024 * 1024  # P1-22: 50MB max
+    import os as _os
     if args.case:
+        if _os.path.getsize(args.case) > _MAX_JSON_SIZE:
+            raise SystemExit(f"[VIGÍA] JSON demasiado grande: {args.case}")
         with open(args.case, "r", encoding="utf-8") as f:
             case = json.load(f)
         output_path = str(args.output) if args.output else None
         process_case(case, detector, output_path=output_path)
 
     elif args.input:
+        if _os.path.getsize(args.input) > _MAX_JSON_SIZE:
+            raise SystemExit(f"[VIGÍA] JSON demasiado grande: {args.input}")
         with open(args.input, "r", encoding="utf-8") as f:
             data = json.load(f)
         cases = data if isinstance(data, list) else [data]

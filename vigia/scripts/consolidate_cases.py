@@ -126,6 +126,9 @@ class MarkdownCaseParser:
     INTERPRETATION_RE = re.compile(r'Interpretación\s+de\s+VIG[IÍ]A[^:]*:[:\s]*[""«]?(.+?)[""»]?(?:\s*Veredicto|$)', re.DOTALL | re.IGNORECASE)
 
     def parse_file(self, path: str) -> List[Dict[str, Any]]:
+        import os as _os
+        if _os.path.getsize(path) > 2 * 1024 * 1024:
+            raise ValueError(f"[VIGIA] Markdown demasiado grande: {path}")
         with open(path, "r", encoding="utf-8") as f:
             text = f.read()
 
