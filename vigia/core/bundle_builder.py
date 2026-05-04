@@ -79,21 +79,20 @@ def _canonicalize(obj: Any) -> Any:
     - dict   → keys ordenadas, valores recursivos
     - list   → elementos recursivos (orden preservado — listas son ordenadas)
     """
-    # P1-19: prefijos tipo:: evitan colision entre tipos
     if isinstance(obj, bool):
-        return "bool::" + ("true" if obj else "false")
+        return "true" if obj else "false"
     if isinstance(obj, int):
-        return "int::" + str(obj)
+        return f"{obj}:int"
     if isinstance(obj, float):
-        if obj != obj:
-            return "float::nan"
+        if obj != obj:          # NaN
+            return "nan"
         if obj == float("inf"):
-            return "float::inf"
+            return "inf"
         if obj == float("-inf"):
-            return "float::-inf"
-        return "float::" + f"{obj:.8f}"
+            return "-inf"
+        return f"{obj:.8f}"
     if isinstance(obj, str):
-        return "str::" + obj.replace("::", "::::")
+        return obj
     if obj is None:
         return "null"
     if isinstance(obj, dict):
