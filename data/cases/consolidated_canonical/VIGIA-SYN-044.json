@@ -1,0 +1,156 @@
+{
+  "case_id": "VIGIA-SYN-044",
+  "name": "El \"Anacronismo del Script-Kiddie\" – Falla de Eco",
+  "description": "** \"Detección de anacronismo táctico. La herramienta utilizada es incompatible con el entorno, revelando un actor externo que opera por volumen y no por precisión.",
+  "artifacts": [
+    {
+      "artifact_id": "ART-001",
+      "evidence_type": "log_entry",
+      "source_tool": "synthetic_generator",
+      "timestamp": "2026-04-10T10:00:00Z",
+      "raw_score": 0.8,
+      "prior_trust": 0.75,
+      "provenance_chain": [
+        "sha256:synthetic_VIGIA-SYN-044_ART-001"
+      ],
+      "description": "Ejecución de un payload Base64 en PowerShell que intenta modificar registros de Windows para habilitar `Remote Desktop`",
+      "metadata": {
+        "original_type": "bash_history",
+        "synthetic_case": "VIGIA-SYN-044",
+        "peirce_layer": "FIRSTNESS",
+        "forensic_anomalies": [
+          "Anomalía detectada por análisis semiótico — requiere verificación"
+        ],
+        "content": "Ejecución de un payload Base64 en PowerShell que intenta modificar registros de Windows para habilitar `Remote Desktop`"
+      }
+    },
+    {
+      "artifact_id": "ART-002",
+      "evidence_type": "log_entry",
+      "source_tool": "synthetic_generator",
+      "timestamp": "2026-04-11T10:00:00Z",
+      "raw_score": 0.82,
+      "prior_trust": 0.75,
+      "provenance_chain": [
+        "sha256:synthetic_VIGIA-SYN-044_ART-002"
+      ],
+      "description": "El comando incluye parámetros específicos para una versión de Windows 7, a pesar de que el sistema analizado es un Windows 11 Enterprise de 2026",
+      "metadata": {
+        "original_type": "bash_history",
+        "synthetic_case": "VIGIA-SYN-044",
+        "peirce_layer": "SECONDNESS",
+        "forensic_anomalies": [
+          "Anomalía detectada por análisis semiótico — requiere verificación"
+        ],
+        "content": "El comando incluye parámetros específicos para una versión de Windows 7, a pesar de que el sistema analizado es un Windows 11 Enterprise de 2026"
+      }
+    },
+    {
+      "artifact_id": "ART-003",
+      "evidence_type": "file_timestamp",
+      "source_tool": "synthetic_generator",
+      "timestamp": "2026-04-12T10:00:00Z",
+      "raw_score": 0.84,
+      "prior_trust": 0.75,
+      "provenance_chain": [
+        "sha256:synthetic_VIGIA-SYN-044_ART-003"
+      ],
+      "description": "* **Peirce:** Segundidad",
+      "metadata": {
+        "original_type": "file_metadata",
+        "synthetic_case": "VIGIA-SYN-044",
+        "peirce_layer": "SECONDNESS",
+        "forensic_anomalies": [
+          "Anomalía detectada por análisis semiótico — requiere verificación"
+        ],
+        "content": "* **Peirce:** Segundidad"
+      }
+    },
+    {
+      "artifact_id": "ART-004",
+      "evidence_type": "network_artifact",
+      "source_tool": "synthetic_generator",
+      "timestamp": "2026-04-13T10:00:00Z",
+      "raw_score": 0.86,
+      "prior_trust": 0.75,
+      "provenance_chain": [
+        "sha256:synthetic_VIGIA-SYN-044_ART-004"
+      ],
+      "description": "El objeto técnico (el script viejo) no pertenece al entorno temporal del sistema actual",
+      "metadata": {
+        "original_type": "network_flow",
+        "synthetic_case": "VIGIA-SYN-044",
+        "peirce_layer": "THIRDNESS",
+        "forensic_anomalies": [
+          "Anomalía detectada por análisis semiótico — requiere verificación"
+        ],
+        "content": "El objeto técnico (el script viejo) no pertenece al entorno temporal del sistema actual"
+      }
+    },
+    {
+      "artifact_id": "ART-005",
+      "evidence_type": "file_timestamp",
+      "source_tool": "synthetic_generator",
+      "timestamp": "2026-04-14T10:00:00Z",
+      "raw_score": 0.88,
+      "prior_trust": 0.75,
+      "provenance_chain": [
+        "sha256:synthetic_VIGIA-SYN-044_ART-005"
+      ],
+      "description": "Es un anacronismo forense",
+      "metadata": {
+        "original_type": "file_metadata",
+        "synthetic_case": "VIGIA-SYN-044",
+        "peirce_layer": "THIRDNESS",
+        "forensic_anomalies": [
+          "Anomalía detectada por análisis semiótico — requiere verificación"
+        ],
+        "content": "Es un anacronismo forense"
+      }
+    }
+  ],
+  "temporal_violations": [
+    {
+      "type": "STATISTICAL_UNIFORMITY",
+      "severity": 0.6,
+      "cause": {
+        "artifact_id": "ART-001",
+        "timestamp": "2026-04-10T10:00:00Z",
+        "description": "Gricean maxim violation detected"
+      },
+      "effect": {
+        "artifact_id": "ART-005",
+        "timestamp": "2026-04-10T10:00:00Z",
+        "description": "Grice violation: Violación del máximo de relación. El script es irrelevante para la arquitectura"
+      },
+      "delta_seconds": 0,
+      "interpretation": "Cooperative principle violated: Violación del máximo de relación. El script es irrelevante para la arquitectura"
+    }
+  ],
+  "expected_verdict": "MALICE",
+  "expected_confidence": 0.9,
+  "expected_mitre_ttps": [
+    "T1070.006"
+  ],
+  "peirce_chain": {
+    "firstness": "Ejecución de un payload Base64 en PowerShell que intenta modificar registros de Windows para habilitar `Remote Desktop`. El comando incluye parámetros específicos para una versión de Windows 7, a pesa",
+    "secondness": "Segundidad. El objeto técnico (el script viejo) no pertenece al entorno temporal del sistema actual. Es un anacronismo forense.\n* **Grice:** Violación del máximo de relación. El script es irrelevante para la arquitectura de seguridad actual, revelando que el atacante está usando un repositorio de ex",
+    "thirdness": "Interpretación simbólica de la intención."
+  },
+  "extra_metadata": {
+    "eco_signal": "El atacante intenta un rastro de \"normalización\" (parecer un script de mantenimi",
+    "devil_advocate": "Las inconsistencias detectadas podrían deberse a un cambio de hábitos personales, una rotación de personal, o una herramienta de automatización no documentada.",
+    "grice_violation": "Violación del máximo de relación. El script es irrelevante para la arquitectura",
+    "carnegie_pattern": null,
+    "abstention_risk": "bajo",
+    "source_origin": "synthetic_markdown",
+    "source_dataset": "VIGÍA Internal Corpus",
+    "_parser": "markdown_v2.3",
+    "_consolidation": {
+      "consolidated_at": "2026-04-28T11:17:01.968008+00:00",
+      "source_file": "/mnt/project/nuevoscasos.md"
+    }
+  },
+  "demo_command": "python tests/run_vigia_case.py data/cases/consolidated/VIGIA-SYN-044.json",
+  "demo_quote": "** \"Detección de anacronismo táctico. La herramienta utilizada es incompatible con el entorno, revelando un actor externo que opera por volumen y no por precisión."
+}

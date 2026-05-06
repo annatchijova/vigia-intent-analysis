@@ -1,0 +1,97 @@
+{
+  "case_id": "VIGIA-SYN-101",
+  "name": "El \"Denunciante de Humo\" – Trap Reporting",
+  "description": "Detección de ataque de inversión de roles (Trap Reporting). El denunciante es el vector y la denuncia es el disparador.",
+  "artifacts": [
+    {
+      "artifact_id": "ART-001",
+      "evidence_type": "file_timestamp",
+      "source_tool": "synthetic_generator",
+      "timestamp": "2026-04-10T10:00:00Z",
+      "raw_score": 0.85,
+      "prior_trust": 0.75,
+      "provenance_chain": [
+        "sha256:synthetic_VIGIA-SYN-101_ART-001"
+      ],
+      "description": "Un usuario reporta: \"Creo que me hackearon, veo archivos raros en mi carpeta\"",
+      "metadata": {
+        "original_type": "file_metadata",
+        "synthetic_case": "VIGIA-SYN-101",
+        "peirce_layer": "FIRSTNESS",
+        "forensic_anomalies": [
+          "Anomalía detectada por análisis semiótico — requiere verificación"
+        ],
+        "content": "Un usuario reporta: \"Creo que me hackearon, veo archivos raros en mi carpeta\""
+      }
+    },
+    {
+      "artifact_id": "ART-002",
+      "evidence_type": "network_artifact",
+      "source_tool": "synthetic_generator",
+      "timestamp": "2026-04-11T10:00:00Z",
+      "raw_score": 0.87,
+      "prior_trust": 0.75,
+      "provenance_chain": [
+        "sha256:synthetic_VIGIA-SYN-101_ART-002"
+      ],
+      "description": "El equipo de seguridad (con privilegios de Admin) entra a mirar",
+      "metadata": {
+        "original_type": "network_flow",
+        "synthetic_case": "VIGIA-SYN-101",
+        "peirce_layer": "SECONDNESS",
+        "forensic_anomalies": [
+          "Anomalía detectada por análisis semiótico — requiere verificación"
+        ],
+        "content": "El equipo de seguridad (con privilegios de Admin) entra a mirar"
+      }
+    },
+    {
+      "artifact_id": "ART-003",
+      "evidence_type": "file_timestamp",
+      "source_tool": "synthetic_generator",
+      "timestamp": "2026-04-12T10:00:00Z",
+      "raw_score": 0.89,
+      "prior_trust": 0.75,
+      "provenance_chain": [
+        "sha256:synthetic_VIGIA-SYN-101_ART-003"
+      ],
+      "description": "El usuario es el atacante: el archivo \"raro\" es un exploit que se activa al ser abierto por el visor del administrador.",
+      "metadata": {
+        "original_type": "file_metadata",
+        "synthetic_case": "VIGIA-SYN-101",
+        "peirce_layer": "SECONDNESS",
+        "forensic_anomalies": [
+          "Anomalía detectada por análisis semiótico — requiere verificación"
+        ],
+        "content": "El usuario es el atacante: el archivo \"raro\" es un exploit que se activa al ser abierto por el visor del administrador."
+      }
+    }
+  ],
+  "temporal_violations": [],
+  "expected_verdict": "MALICE",
+  "expected_confidence": 0.98,
+  "expected_mitre_ttps": [
+    "T1070.006"
+  ],
+  "peirce_chain": {
+    "firstness": "Un usuario reporta: \"Creo que me hackearon, veo archivos raros en mi carpeta\". El equipo de seguridad (con privilegios de Admin) entra a mirar. El usuario es el atacante: el archivo \"raro\" es un explo",
+    "secondness": "Contradicción indexical en los artefactos.",
+    "thirdness": "\"Haga que la otra persona se sienta importante\" (pedir ayuda al \"experto\")."
+  },
+  "extra_metadata": {
+    "eco_signal": "El reporte es un cebo semántico diseñado para elevar privilegios mediante el uso",
+    "devil_advocate": "El comportamiento observado podría explicarse por un error administrativo, una configuración automatizada legítima, o un malentendido de procedimientos internos.",
+    "grice_violation": null,
+    "carnegie_pattern": "\"Haga que la otra persona se sienta importante\" (pedir ayuda al \"experto\").",
+    "abstention_risk": "bajo",
+    "source_origin": "synthetic_markdown",
+    "source_dataset": "VIGÍA Internal Corpus",
+    "_parser": "markdown_v2.3",
+    "_consolidation": {
+      "consolidated_at": "2026-04-28T11:17:01.955637+00:00",
+      "source_file": "/mnt/project/casosfinal.md"
+    }
+  },
+  "demo_command": "python tests/run_vigia_case.py data/cases/consolidated/VIGIA-SYN-101.json",
+  "demo_quote": "Detección de ataque de inversión de roles (Trap Reporting). El denunciante es el vector y la denuncia es el disparador."
+}

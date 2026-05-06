@@ -1,0 +1,97 @@
+{
+  "case_id": "VIGIA-SYN-120",
+  "name": "La \"Disonancia del Ritmo de Comando\" – Keystroke Dynamics",
+  "description": "Detección de inyección de comandos por script disfrazado de actividad humana. La cadencia es mecánica, no orgánica.",
+  "artifacts": [
+    {
+      "artifact_id": "ART-001",
+      "evidence_type": "log_entry",
+      "source_tool": "synthetic_generator",
+      "timestamp": "2026-04-10T10:00:00Z",
+      "raw_score": 0.8,
+      "prior_trust": 0.75,
+      "provenance_chain": [
+        "sha256:synthetic_VIGIA-SYN-120_ART-001"
+      ],
+      "description": "Un administrador senior tipea comandos",
+      "metadata": {
+        "original_type": "bash_history",
+        "synthetic_case": "VIGIA-SYN-120",
+        "peirce_layer": "FIRSTNESS",
+        "forensic_anomalies": [
+          "Anomalía detectada por análisis semiótico — requiere verificación"
+        ],
+        "content": "Un administrador senior tipea comandos"
+      }
+    },
+    {
+      "artifact_id": "ART-002",
+      "evidence_type": "file_timestamp",
+      "source_tool": "synthetic_generator",
+      "timestamp": "2026-04-11T10:00:00Z",
+      "raw_score": 0.82,
+      "prior_trust": 0.75,
+      "provenance_chain": [
+        "sha256:synthetic_VIGIA-SYN-120_ART-002"
+      ],
+      "description": "Su velocidad de tecleo habitual es de 60 ppm",
+      "metadata": {
+        "original_type": "file_metadata",
+        "synthetic_case": "VIGIA-SYN-120",
+        "peirce_layer": "SECONDNESS",
+        "forensic_anomalies": [
+          "Anomalía detectada por análisis semiótico — requiere verificación"
+        ],
+        "content": "Su velocidad de tecleo habitual es de 60 ppm"
+      }
+    },
+    {
+      "artifact_id": "ART-003",
+      "evidence_type": "log_entry",
+      "source_tool": "synthetic_generator",
+      "timestamp": "2026-04-12T10:00:00Z",
+      "raw_score": 0.84,
+      "prior_trust": 0.75,
+      "provenance_chain": [
+        "sha256:synthetic_VIGIA-SYN-120_ART-003"
+      ],
+      "description": "De repente, la velocidad sube a 120 ppm durante la ejecución de una cadena compleja de comandos de cifrado de disco, sin un solo error de retroceso.",
+      "metadata": {
+        "original_type": "bash_history",
+        "synthetic_case": "VIGIA-SYN-120",
+        "peirce_layer": "SECONDNESS",
+        "forensic_anomalies": [
+          "Anomalía detectada por análisis semiótico — requiere verificación"
+        ],
+        "content": "De repente, la velocidad sube a 120 ppm durante la ejecución de una cadena compleja de comandos de cifrado de disco, sin un solo error de retroceso."
+      }
+    }
+  ],
+  "temporal_violations": [],
+  "expected_verdict": "MALICE",
+  "expected_confidence": 0.96,
+  "expected_mitre_ttps": [
+    "T1070.006"
+  ],
+  "peirce_chain": {
+    "firstness": "Un administrador senior tipea comandos. Su velocidad de tecleo habitual es de 60 ppm. De repente, la velocidad sube a 120 ppm durante la ejecución de una cadena compleja de comandos de cifrado de disc",
+    "secondness": "Segundidad (Index). La física del tecleo es incompatible con la carga cognitiva de la tarea. Un humano comete errores cuando el comando es largo y complejo.",
+    "thirdness": "Interpretación simbólica de la intención."
+  },
+  "extra_metadata": {
+    "eco_signal": null,
+    "devil_advocate": "Las inconsistencias detectadas podrían deberse a un cambio de hábitos personales, una rotación de personal, o una herramienta de automatización no documentada.",
+    "grice_violation": null,
+    "carnegie_pattern": null,
+    "abstention_risk": "bajo",
+    "source_origin": "synthetic_markdown",
+    "source_dataset": "VIGÍA Internal Corpus",
+    "_parser": "markdown_v2.3",
+    "_consolidation": {
+      "consolidated_at": "2026-04-28T11:17:02.005061+00:00",
+      "source_file": "/mnt/project/casoscasos.md"
+    }
+  },
+  "demo_command": "python tests/run_vigia_case.py data/cases/consolidated/VIGIA-SYN-120.json",
+  "demo_quote": "Detección de inyección de comandos por script disfrazado de actividad humana. La cadencia es mecánica, no orgánica."
+}

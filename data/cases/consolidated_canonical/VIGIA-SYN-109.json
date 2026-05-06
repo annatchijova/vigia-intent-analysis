@@ -1,0 +1,72 @@
+{
+  "case_id": "VIGIA-SYN-109",
+  "name": "El \"Silencio Estadístico en el Log de Red\" – Grice: Máximo de Cantidad",
+  "description": "Detección de lagunas informativas selectivas (Data Gapping). La discrepancia entre el sensor de red y el log de auditoría confirma manipulación de trazas.",
+  "artifacts": [
+    {
+      "artifact_id": "ART-001",
+      "evidence_type": "default",
+      "source_tool": "synthetic_generator",
+      "timestamp": "2026-04-10T10:00:00Z",
+      "raw_score": 0.95,
+      "prior_trust": 0.9,
+      "provenance_chain": [
+        "sha256:synthetic_VIGIA-SYN-109_ART-001"
+      ],
+      "description": "Durante un pico de tráfico de salida masivo, el log de red muestra \"Conexión establecida\" y \"Conexión finalizada\", pero el campo de bytes_transferred es 0 o está vacío, a pesar de que el router reporta saturación de banda.",
+      "metadata": {
+        "original_type": "syslog",
+        "synthetic_case": "VIGIA-SYN-109",
+        "peirce_layer": "FIRSTNESS",
+        "forensic_anomalies": [
+          "Anomalía detectada por análisis semiótico — requiere verificación"
+        ],
+        "content": "Durante un pico de tráfico de salida masivo, el log de red muestra \"Conexión establecida\" y \"Conexión finalizada\", pero el campo de bytes_transferred es 0 o está vacío, a pesar de que el router reporta saturación de banda."
+      }
+    }
+  ],
+  "temporal_violations": [
+    {
+      "type": "STATISTICAL_UNIFORMITY",
+      "severity": 0.6,
+      "cause": {
+        "artifact_id": "ART-001",
+        "timestamp": "2026-04-10T10:00:00Z",
+        "description": "Gricean maxim violation detected"
+      },
+      "effect": {
+        "artifact_id": "ART-001",
+        "timestamp": "2026-04-10T10:00:00Z",
+        "description": "Grice violation: Violación del máximo de cantidad (omisión de la magnitud de la acción)."
+      },
+      "delta_seconds": 0,
+      "interpretation": "Cooperative principle violated: Violación del máximo de cantidad (omisión de la magnitud de la acción)."
+    }
+  ],
+  "expected_verdict": "MALICE",
+  "expected_confidence": 0.99,
+  "expected_mitre_ttps": [
+    "T1070.006"
+  ],
+  "peirce_chain": {
+    "firstness": "Durante un pico de tráfico de salida masivo, el log de red muestra \"Conexión establecida\" y \"Conexión finalizada\", pero el campo de bytes_transferred es 0 o está vacío, a pesar de que el router report",
+    "secondness": "Segundidad. El silencio del log contradice la realidad física del ancho de banda agotado.",
+    "thirdness": "Interpretación simbólica de la intención."
+  },
+  "extra_metadata": {
+    "eco_signal": "El \"vacío\" es el mensaje. El atacante logró comprometer el servicio de logging p",
+    "devil_advocate": "El comportamiento observado podría explicarse por un error administrativo, una configuración automatizada legítima, o un malentendido de procedimientos internos.",
+    "grice_violation": "Violación del máximo de cantidad (omisión de la magnitud de la acción).",
+    "carnegie_pattern": null,
+    "abstention_risk": "bajo",
+    "source_origin": "synthetic_markdown",
+    "source_dataset": "VIGÍA Internal Corpus",
+    "_parser": "markdown_v2.3",
+    "_consolidation": {
+      "consolidated_at": "2026-04-28T11:17:01.958828+00:00",
+      "source_file": "/mnt/project/casosfinal.md"
+    }
+  },
+  "demo_command": "python tests/run_vigia_case.py data/cases/consolidated/VIGIA-SYN-109.json",
+  "demo_quote": "Detección de lagunas informativas selectivas (Data Gapping). La discrepancia entre el sensor de red y el log de auditoría confirma manipulación de trazas."
+}

@@ -1,0 +1,139 @@
+{
+  "case_id": "VIGIA-SYN-052",
+  "name": "El \"Falso Rastro de Aficionado\" – Eco: Sobre-interpretación",
+  "description": "** \"Detección de teatro forense. La atribución explícita es una contramedida semiótica para desviar la investigación de la verdadera fuente interna.",
+  "artifacts": [
+    {
+      "artifact_id": "ART-001",
+      "evidence_type": "file_timestamp",
+      "source_tool": "synthetic_generator",
+      "timestamp": "2026-04-10T10:00:00Z",
+      "raw_score": 0.85,
+      "prior_trust": 0.75,
+      "provenance_chain": [
+        "sha256:synthetic_VIGIA-SYN-052_ART-001"
+      ],
+      "description": "Un atacante deja un archivo llamado `PLAN_DE_ATAQUE_RUSO.txt` en el escritorio, con coordenadas de GPS en Moscú y una lista de \"objetivos gubernamentales\"",
+      "metadata": {
+        "original_type": "file_metadata",
+        "synthetic_case": "VIGIA-SYN-052",
+        "peirce_layer": "FIRSTNESS",
+        "forensic_anomalies": [
+          "Desliz de teclado — atribución lingüística"
+        ],
+        "content": "Un atacante deja un archivo llamado `PLAN_DE_ATAQUE_RUSO.txt` en el escritorio, con coordenadas de GPS en Moscú y una lista de \"objetivos gubernamentales\""
+      }
+    },
+    {
+      "artifact_id": "ART-002",
+      "evidence_type": "network_artifact",
+      "source_tool": "synthetic_generator",
+      "timestamp": "2026-04-11T10:00:00Z",
+      "raw_score": 0.87,
+      "prior_trust": 0.75,
+      "provenance_chain": [
+        "sha256:synthetic_VIGIA-SYN-052_ART-002"
+      ],
+      "description": "Al mismo tiempo, el ataque real se está ejecutando desde una IP de una universidad local mediante una vulnerabilidad de día cero (`0-day`)",
+      "metadata": {
+        "original_type": "network_flow",
+        "synthetic_case": "VIGIA-SYN-052",
+        "peirce_layer": "SECONDNESS",
+        "forensic_anomalies": [
+          "Anomalía detectada por análisis semiótico — requiere verificación"
+        ],
+        "content": "Al mismo tiempo, el ataque real se está ejecutando desde una IP de una universidad local mediante una vulnerabilidad de día cero (`0-day`)"
+      }
+    },
+    {
+      "artifact_id": "ART-003",
+      "evidence_type": "file_timestamp",
+      "source_tool": "synthetic_generator",
+      "timestamp": "2026-04-12T10:00:00Z",
+      "raw_score": 0.89,
+      "prior_trust": 0.75,
+      "provenance_chain": [
+        "sha256:synthetic_VIGIA-SYN-052_ART-003"
+      ],
+      "description": "* **Eco:** El atacante crea un signo tan obvio que solo puede ser falso",
+      "metadata": {
+        "original_type": "file_metadata",
+        "synthetic_case": "VIGIA-SYN-052",
+        "peirce_layer": "SECONDNESS",
+        "forensic_anomalies": [
+          "Anomalía detectada por análisis semiótico — requiere verificación"
+        ],
+        "content": "* **Eco:** El atacante crea un signo tan obvio que solo puede ser falso"
+      }
+    },
+    {
+      "artifact_id": "ART-004",
+      "evidence_type": "file_timestamp",
+      "source_tool": "synthetic_generator",
+      "timestamp": "2026-04-13T10:00:00Z",
+      "raw_score": 0.91,
+      "prior_trust": 0.75,
+      "provenance_chain": [
+        "sha256:synthetic_VIGIA-SYN-052_ART-004"
+      ],
+      "description": "Es un \"falso rastro\" para analistas mediocres",
+      "metadata": {
+        "original_type": "file_metadata",
+        "synthetic_case": "VIGIA-SYN-052",
+        "peirce_layer": "THIRDNESS",
+        "forensic_anomalies": [
+          "Anomalía detectada por análisis semiótico — requiere verificación"
+        ],
+        "content": "Es un \"falso rastro\" para analistas mediocres"
+      }
+    },
+    {
+      "artifact_id": "ART-005",
+      "evidence_type": "file_timestamp",
+      "source_tool": "synthetic_generator",
+      "timestamp": "2026-04-14T10:00:00Z",
+      "raw_score": 0.93,
+      "prior_trust": 0.75,
+      "provenance_chain": [
+        "sha256:synthetic_VIGIA-SYN-052_ART-005"
+      ],
+      "description": "* **Peirce:** Terceridad",
+      "metadata": {
+        "original_type": "file_metadata",
+        "synthetic_case": "VIGIA-SYN-052",
+        "peirce_layer": "THIRDNESS",
+        "forensic_anomalies": [
+          "Anomalía detectada por análisis semiótico — requiere verificación"
+        ],
+        "content": "* **Peirce:** Terceridad"
+      }
+    }
+  ],
+  "temporal_violations": [],
+  "expected_verdict": "MALICE",
+  "expected_confidence": 0.9,
+  "expected_mitre_ttps": [
+    "T1070.006"
+  ],
+  "peirce_chain": {
+    "firstness": "Un atacante deja un archivo llamado `PLAN_DE_ATAQUE_RUSO.txt` en el escritorio, con coordenadas de GPS en Moscú y una lista de \"objetivos gubernamentales\". Al mismo tiempo, el ataque real se está ejec",
+    "secondness": "Contradicción indexical en los artefactos.",
+    "thirdness": "Terceridad. La obviedad del signo de atribución delata su carácter de fabricación. Un atacante real no rotula sus planes en el escritorio.\n* **Interpretación de VIGÍA:** \"Detección de teatro forense. La atribución explícita es una contramedida semiótica para desviar la investigación de la verdadera "
+  },
+  "extra_metadata": {
+    "eco_signal": "El atacante crea un signo tan obvio que solo puede ser falso. Es un \"falso rastr",
+    "devil_advocate": "El comportamiento observado podría explicarse por un error administrativo, una configuración automatizada legítima, o un malentendido de procedimientos internos.",
+    "grice_violation": null,
+    "carnegie_pattern": null,
+    "abstention_risk": "bajo",
+    "source_origin": "synthetic_markdown",
+    "source_dataset": "VIGÍA Internal Corpus",
+    "_parser": "markdown_v2.3",
+    "_consolidation": {
+      "consolidated_at": "2026-04-28T11:17:01.971437+00:00",
+      "source_file": "/mnt/project/nuevoscasos.md"
+    }
+  },
+  "demo_command": "python tests/run_vigia_case.py data/cases/consolidated/VIGIA-SYN-052.json",
+  "demo_quote": "** \"Detección de teatro forense. La atribución explícita es una contramedida semiótica para desviar la investigación de la verdadera fuente interna."
+}

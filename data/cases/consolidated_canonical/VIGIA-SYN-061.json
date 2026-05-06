@@ -1,0 +1,76 @@
+{
+  "case_id": "VIGIA-SYN-061",
+  "name": "El \"Silencio Estadístico\" – Jitter Fabricado",
+  "description": "Detección de aleatoriedad sintética. La falta de entropía real en los intervalos delata un proceso automatizado intentando simular una presencia humana.",
+  "artifacts": [
+    {
+      "artifact_id": "ART-001",
+      "evidence_type": "log_entry",
+      "source_tool": "synthetic_generator",
+      "timestamp": "2026-04-10T10:00:00Z",
+      "raw_score": 0.95,
+      "prior_trust": 0.9,
+      "provenance_chain": [
+        "sha256:synthetic_VIGIA-SYN-061_ART-001"
+      ],
+      "description": "Se analizan los intervalos de tiempo entre comandos de una sesión remota",
+      "metadata": {
+        "original_type": "bash_history",
+        "synthetic_case": "VIGIA-SYN-061",
+        "peirce_layer": "FIRSTNESS",
+        "forensic_anomalies": [
+          "Anomalía detectada por análisis semiótico — requiere verificación"
+        ],
+        "content": "Se analizan los intervalos de tiempo entre comandos de una sesión remota"
+      }
+    },
+    {
+      "artifact_id": "ART-002",
+      "evidence_type": "file_timestamp",
+      "source_tool": "synthetic_generator",
+      "timestamp": "2026-04-11T10:00:00Z",
+      "raw_score": 0.95,
+      "prior_trust": 0.9,
+      "provenance_chain": [
+        "sha256:synthetic_VIGIA-SYN-061_ART-002"
+      ],
+      "description": "Los retrasos son: 1.2s, 0.8s, 1.1s, 0.9s, 1.0s.",
+      "metadata": {
+        "original_type": "file_metadata",
+        "synthetic_case": "VIGIA-SYN-061",
+        "peirce_layer": "SECONDNESS",
+        "forensic_anomalies": [
+          "Anomalía detectada por análisis semiótico — requiere verificación"
+        ],
+        "content": "Los retrasos son: 1.2s, 0.8s, 1.1s, 0.9s, 1.0s."
+      }
+    }
+  ],
+  "temporal_violations": [],
+  "expected_verdict": "MALICE",
+  "expected_confidence": 0.93,
+  "expected_mitre_ttps": [
+    "T1070.006"
+  ],
+  "peirce_chain": {
+    "firstness": "Se analizan los intervalos de tiempo entre comandos de una sesión remota. Los retrasos son: 1.2s, 0.8s, 1.1s, 0.9s, 1.0s.",
+    "secondness": "Contradicción indexical en los artefactos.",
+    "thirdness": "Terceridad. El jitter (la variación) sigue una distribución uniforme perfecta. La variabilidad humana es caótica y sigue una distribución normal (campana de Gauss) con errores y pausas de pensamiento."
+  },
+  "extra_metadata": {
+    "eco_signal": "El atacante agregó un sleep(random.uniform(0.8, 1.2)) en su script para \"parecer",
+    "devil_advocate": "Las inconsistencias detectadas podrían deberse a un cambio de hábitos personales, una rotación de personal, o una herramienta de automatización no documentada.",
+    "grice_violation": null,
+    "carnegie_pattern": null,
+    "abstention_risk": "bajo",
+    "source_origin": "synthetic_markdown",
+    "source_dataset": "VIGÍA Internal Corpus",
+    "_parser": "markdown_v2.3",
+    "_consolidation": {
+      "consolidated_at": "2026-04-28T11:17:01.974589+00:00",
+      "source_file": "/mnt/project/nuevoscasos.md"
+    }
+  },
+  "demo_command": "python tests/run_vigia_case.py data/cases/consolidated/VIGIA-SYN-061.json",
+  "demo_quote": "Detección de aleatoriedad sintética. La falta de entropía real en los intervalos delata un proceso automatizado intentando simular una presencia humana."
+}

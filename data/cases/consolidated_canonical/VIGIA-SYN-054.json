@@ -1,0 +1,135 @@
+{
+  "case_id": "VIGIA-SYN-054",
+  "name": "El \"Cebo del Error Humano\" – Teatralidad Carnegie",
+  "description": "Uso de la confesión como contramedida de sospecha. El borrado no fue un error; fue el pretexto necesario para re-inyectar un log manipulado.",
+  "artifacts": [
+    {
+      "artifact_id": "ART-001",
+      "evidence_type": "default",
+      "source_tool": "synthetic_generator",
+      "timestamp": "2026-04-10T10:00:00Z",
+      "raw_score": 0.85,
+      "prior_trust": 0.75,
+      "provenance_chain": [
+        "sha256:synthetic_VIGIA-SYN-054_ART-001"
+      ],
+      "description": "El administrador de base de datos (DBA_Admin) detecta una anomalía en las tablas de auditoría y envía un mensaje general: \"Chicos, qué desastre, borré sin querer el log de ayer haciendo limpieza de espacio",
+      "metadata": {
+        "original_type": "syslog",
+        "synthetic_case": "VIGIA-SYN-054",
+        "peirce_layer": "FIRSTNESS",
+        "forensic_anomalies": [
+          "Anomalía detectada por análisis semiótico — requiere verificación"
+        ],
+        "content": "El administrador de base de datos (DBA_Admin) detecta una anomalía en las tablas de auditoría y envía un mensaje general: \"Chicos, qué desastre, borré sin querer el log de ayer haciendo limpieza de espacio"
+      }
+    },
+    {
+      "artifact_id": "ART-002",
+      "evidence_type": "file_timestamp",
+      "source_tool": "synthetic_generator",
+      "timestamp": "2026-04-11T10:00:00Z",
+      "raw_score": 0.87,
+      "prior_trust": 0.75,
+      "provenance_chain": [
+        "sha256:synthetic_VIGIA-SYN-054_ART-002"
+      ],
+      "description": "Menos mal que tengo el backup local en mi laptop",
+      "metadata": {
+        "original_type": "file_metadata",
+        "synthetic_case": "VIGIA-SYN-054",
+        "peirce_layer": "SECONDNESS",
+        "forensic_anomalies": [
+          "Anomalía detectada por análisis semiótico — requiere verificación"
+        ],
+        "content": "Menos mal que tengo el backup local en mi laptop"
+      }
+    },
+    {
+      "artifact_id": "ART-003",
+      "evidence_type": "file_timestamp",
+      "source_tool": "synthetic_generator",
+      "timestamp": "2026-04-12T10:00:00Z",
+      "raw_score": 0.89,
+      "prior_trust": 0.75,
+      "provenance_chain": [
+        "sha256:synthetic_VIGIA-SYN-054_ART-003"
+      ],
+      "description": "Ya lo estoy subiendo\"",
+      "metadata": {
+        "original_type": "file_metadata",
+        "synthetic_case": "VIGIA-SYN-054",
+        "peirce_layer": "SECONDNESS",
+        "forensic_anomalies": [
+          "Anomalía detectada por análisis semiótico — requiere verificación"
+        ],
+        "content": "Ya lo estoy subiendo\""
+      }
+    },
+    {
+      "artifact_id": "ART-004",
+      "evidence_type": "file_timestamp",
+      "source_tool": "synthetic_generator",
+      "timestamp": "2026-04-13T10:00:00Z",
+      "raw_score": 0.91,
+      "prior_trust": 0.75,
+      "provenance_chain": [
+        "sha256:synthetic_VIGIA-SYN-054_ART-004"
+      ],
+      "description": "El backup que sube tiene los hashes correctos pero el contenido ha sido sutilmente alterado para eliminar un acceso específico.",
+      "metadata": {
+        "original_type": "file_metadata",
+        "synthetic_case": "VIGIA-SYN-054",
+        "peirce_layer": "THIRDNESS",
+        "forensic_anomalies": [
+          "Destrucción de evidencia potencial"
+        ],
+        "content": "El backup que sube tiene los hashes correctos pero el contenido ha sido sutilmente alterado para eliminar un acceso específico."
+      }
+    }
+  ],
+  "temporal_violations": [
+    {
+      "type": "STATISTICAL_UNIFORMITY",
+      "severity": 0.6,
+      "cause": {
+        "artifact_id": "ART-001",
+        "timestamp": "2026-04-10T10:00:00Z",
+        "description": "Gricean maxim violation detected"
+      },
+      "effect": {
+        "artifact_id": "ART-004",
+        "timestamp": "2026-04-10T10:00:00Z",
+        "description": "Grice violation: Violación del máximo de manera (la \"limpieza de espacio\" es una explicación ambi"
+      },
+      "delta_seconds": 0,
+      "interpretation": "Cooperative principle violated: Violación del máximo de manera (la \"limpieza de espacio\" es una explicación ambi"
+    }
+  ],
+  "expected_verdict": "MALICE",
+  "expected_confidence": 0.97,
+  "expected_mitre_ttps": [
+    "T1070.006"
+  ],
+  "peirce_chain": {
+    "firstness": "El administrador de base de datos (DBA_Admin) detecta una anomalía en las tablas de auditoría y envía un mensaje general: \"Chicos, qué desastre, borré sin querer el log de ayer haciendo limpieza de es",
+    "secondness": "Violación del máximo de manera (la \"limpieza de espacio\" es una explicación ambigua para una acción técnica tan precisa).",
+    "thirdness": "Terceridad. El hábito de un DBA senior contradice la \"torpeza\" de un rm masivo sobre logs de auditoría sin dry-run."
+  },
+  "extra_metadata": {
+    "eco_signal": null,
+    "devil_advocate": "El comportamiento observado podría explicarse por un error administrativo, una configuración automatizada legítima, o un malentendido de procedimientos internos.",
+    "grice_violation": "Violación del máximo de manera (la \"limpieza de espacio\" es una explicación ambi",
+    "carnegie_pattern": "\"Admita su error rápida y enfáticamente\". El atacante se sobre-incrimina en una",
+    "abstention_risk": "bajo",
+    "source_origin": "synthetic_markdown",
+    "source_dataset": "VIGÍA Internal Corpus",
+    "_parser": "markdown_v2.3",
+    "_consolidation": {
+      "consolidated_at": "2026-04-28T11:17:01.972162+00:00",
+      "source_file": "/mnt/project/nuevoscasos.md"
+    }
+  },
+  "demo_command": "python tests/run_vigia_case.py data/cases/consolidated/VIGIA-SYN-054.json",
+  "demo_quote": "Uso de la confesión como contramedida de sospecha. El borrado no fue un error; fue el pretexto necesario para re-inyectar un log manipulado."
+}

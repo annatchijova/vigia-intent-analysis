@@ -1,0 +1,76 @@
+{
+  "case_id": "VIGIA-SYN-082",
+  "name": "La \"Exfiltración Rítmica\" – Terceridad (Ley Matemática)",
+  "description": "Detección de patrón rítmico no estocástico en tráfico saliente. La estructura de la señal indica codificación de información mediante modulación de intervalos de tiempo (Timing Attack).",
+  "artifacts": [
+    {
+      "artifact_id": "ART-001",
+      "evidence_type": "network_artifact",
+      "source_tool": "synthetic_generator",
+      "timestamp": "2026-04-10T10:00:00Z",
+      "raw_score": 0.95,
+      "prior_trust": 0.9,
+      "provenance_chain": [
+        "sha256:synthetic_VIGIA-SYN-082_ART-001"
+      ],
+      "description": "Una serie de peticiones DNS salientes (legítimas en apariencia) ocurren con una frecuencia que, al ser analizada como señal, coincide exactamente con el tempo de una canción de rock conocida",
+      "metadata": {
+        "original_type": "network_flow",
+        "synthetic_case": "VIGIA-SYN-082",
+        "peirce_layer": "FIRSTNESS",
+        "forensic_anomalies": [
+          "Anomalía detectada por análisis semiótico — requiere verificación"
+        ],
+        "content": "Una serie de peticiones DNS salientes (legítimas en apariencia) ocurren con una frecuencia que, al ser analizada como señal, coincide exactamente con el tempo de una canción de rock conocida"
+      }
+    },
+    {
+      "artifact_id": "ART-002",
+      "evidence_type": "file_timestamp",
+      "source_tool": "synthetic_generator",
+      "timestamp": "2026-04-11T10:00:00Z",
+      "raw_score": 0.95,
+      "prior_trust": 0.9,
+      "provenance_chain": [
+        "sha256:synthetic_VIGIA-SYN-082_ART-002"
+      ],
+      "description": "No es un intervalo aleatorio ni uniforme; es un ritmo.",
+      "metadata": {
+        "original_type": "file_metadata",
+        "synthetic_case": "VIGIA-SYN-082",
+        "peirce_layer": "SECONDNESS",
+        "forensic_anomalies": [
+          "Anomalía detectada por análisis semiótico — requiere verificación"
+        ],
+        "content": "No es un intervalo aleatorio ni uniforme; es un ritmo."
+      }
+    }
+  ],
+  "temporal_violations": [],
+  "expected_verdict": "MALICE",
+  "expected_confidence": 0.97,
+  "expected_mitre_ttps": [
+    "T1070.006"
+  ],
+  "peirce_chain": {
+    "firstness": "Una serie de peticiones DNS salientes (legítimas en apariencia) ocurren con una frecuencia que, al ser analizada como señal, coincide exactamente con el tempo de una canción de rock conocida. No es un",
+    "secondness": "Contradicción indexical en los artefactos.",
+    "thirdness": "Terceridad. El ritmo es una ley estética impuesta sobre el bit. Es esteganografía conductual."
+  },
+  "extra_metadata": {
+    "eco_signal": "El atacante usa la \"música\" del tráfico para ocultar el mensaje en el ruido de l",
+    "devil_advocate": "El comportamiento observado podría explicarse por un error administrativo, una configuración automatizada legítima, o un malentendido de procedimientos internos.",
+    "grice_violation": null,
+    "carnegie_pattern": null,
+    "abstention_risk": "bajo",
+    "source_origin": "synthetic_markdown",
+    "source_dataset": "VIGÍA Internal Corpus",
+    "_parser": "markdown_v2.3",
+    "_consolidation": {
+      "consolidated_at": "2026-04-28T11:17:01.978019+00:00",
+      "source_file": "/mnt/project/nuevoscasos.md"
+    }
+  },
+  "demo_command": "python tests/run_vigia_case.py data/cases/consolidated/VIGIA-SYN-082.json",
+  "demo_quote": "Detección de patrón rítmico no estocástico en tráfico saliente. La estructura de la señal indica codificación de información mediante modulación de intervalos de tiempo (Timing Attack)."
+}

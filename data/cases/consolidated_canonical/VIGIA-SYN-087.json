@@ -1,0 +1,93 @@
+{
+  "case_id": "VIGIA-SYN-087",
+  "name": "El \"Síndrome de Estocolmo Inverso\" – Cooperación Agresiva",
+  "description": "Detección de asistencia obstructiva. El colaborador usa la urgencia del incidente para legitimar la destrucción de trazas forenses.",
+  "artifacts": [
+    {
+      "artifact_id": "ART-001",
+      "evidence_type": "network_artifact",
+      "source_tool": "synthetic_generator",
+      "timestamp": "2026-04-10T10:00:00Z",
+      "raw_score": 0.95,
+      "prior_trust": 0.9,
+      "provenance_chain": [
+        "sha256:synthetic_VIGIA-SYN-087_ART-001"
+      ],
+      "description": "Durante una respuesta a incidentes, un empleado externo contratado para seguridad empieza a \"ayudar\" de más: \"Chicos, encontré esta IP de Ucrania atacándonos",
+      "metadata": {
+        "original_type": "network_flow",
+        "synthetic_case": "VIGIA-SYN-087",
+        "peirce_layer": "FIRSTNESS",
+        "forensic_anomalies": [
+          "Anomalía detectada por análisis semiótico — requiere verificación"
+        ],
+        "content": "Durante una respuesta a incidentes, un empleado externo contratado para seguridad empieza a \"ayudar\" de más: \"Chicos, encontré esta IP de Ucrania atacándonos"
+      }
+    },
+    {
+      "artifact_id": "ART-002",
+      "evidence_type": "default",
+      "source_tool": "synthetic_generator",
+      "timestamp": "2026-04-11T10:00:00Z",
+      "raw_score": 0.95,
+      "prior_trust": 0.9,
+      "provenance_chain": [
+        "sha256:synthetic_VIGIA-SYN-087_ART-002"
+      ],
+      "description": "Ya la bloqueé y estoy borrando los logs de acceso de esa región para que no nos saturen el SIEM\".",
+      "metadata": {
+        "original_type": "syslog",
+        "synthetic_case": "VIGIA-SYN-087",
+        "peirce_layer": "SECONDNESS",
+        "forensic_anomalies": [
+          "Anomalía detectada por análisis semiótico — requiere verificación"
+        ],
+        "content": "Ya la bloqueé y estoy borrando los logs de acceso de esa región para que no nos saturen el SIEM\"."
+      }
+    }
+  ],
+  "temporal_violations": [
+    {
+      "type": "STATISTICAL_UNIFORMITY",
+      "severity": 0.6,
+      "cause": {
+        "artifact_id": "ART-001",
+        "timestamp": "2026-04-10T10:00:00Z",
+        "description": "Gricean maxim violation detected"
+      },
+      "effect": {
+        "artifact_id": "ART-002",
+        "timestamp": "2026-04-10T10:00:00Z",
+        "description": "Grice violation: Violación del máximo de relación. Borrar logs nunca es parte de la solución de u"
+      },
+      "delta_seconds": 0,
+      "interpretation": "Cooperative principle violated: Violación del máximo de relación. Borrar logs nunca es parte de la solución de u"
+    }
+  ],
+  "expected_verdict": "MALICE",
+  "expected_confidence": 0.96,
+  "expected_mitre_ttps": [
+    "T1070.006"
+  ],
+  "peirce_chain": {
+    "firstness": "Durante una respuesta a incidentes, un empleado externo contratado para seguridad empieza a \"ayudar\" de más: \"Chicos, encontré esta IP de Ucrania atacándonos. Ya la bloqueé y estoy borrando los logs d",
+    "secondness": "Violación del máximo de relación. Borrar logs nunca es parte de la solución de un incidente.",
+    "thirdness": "Terceridad. La \"ayuda\" es el método para destruir la evidencia del origen real del ataque, usando una IP de Ucrania como chivo expiatorio (Red Herring)."
+  },
+  "extra_metadata": {
+    "eco_signal": null,
+    "devil_advocate": "El comportamiento observado podría explicarse por un error administrativo, una configuración automatizada legítima, o un malentendido de procedimientos internos.",
+    "grice_violation": "Violación del máximo de relación. Borrar logs nunca es parte de la solución de u",
+    "carnegie_pattern": "\"Interésese genuinamente en los demás\" (ayudar a aliviar la carga de trabajo del",
+    "abstention_risk": "bajo",
+    "source_origin": "synthetic_markdown",
+    "source_dataset": "VIGÍA Internal Corpus",
+    "_parser": "markdown_v2.3",
+    "_consolidation": {
+      "consolidated_at": "2026-04-28T11:17:01.919963+00:00",
+      "source_file": "/mnt/project/casosfinal.md"
+    }
+  },
+  "demo_command": "python tests/run_vigia_case.py data/cases/consolidated/VIGIA-SYN-087.json",
+  "demo_quote": "Detección de asistencia obstructiva. El colaborador usa la urgencia del incidente para legitimar la destrucción de trazas forenses."
+}

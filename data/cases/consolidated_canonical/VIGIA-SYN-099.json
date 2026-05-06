@@ -1,0 +1,97 @@
+{
+  "case_id": "VIGIA-SYN-099",
+  "name": "El \"Troyano Emocional\" – Eco: El Tabú de la Muerte",
+  "description": "Detección de secuestro de narrativa emocional. El atacante usa un tabú social para anular el protocolo de desconfianza técnica.",
+  "artifacts": [
+    {
+      "artifact_id": "ART-001",
+      "evidence_type": "file_timestamp",
+      "source_tool": "synthetic_generator",
+      "timestamp": "2026-04-10T10:00:00Z",
+      "raw_score": 0.85,
+      "prior_trust": 0.75,
+      "provenance_chain": [
+        "sha256:synthetic_VIGIA-SYN-099_ART-001"
+      ],
+      "description": "Mail de \"Recursos Humanos\": \"Debido al fallecimiento de un colega, estamos recolectando fondos",
+      "metadata": {
+        "original_type": "file_metadata",
+        "synthetic_case": "VIGIA-SYN-099",
+        "peirce_layer": "FIRSTNESS",
+        "forensic_anomalies": [
+          "Anomalía detectada por análisis semiótico — requiere verificación"
+        ],
+        "content": "Mail de \"Recursos Humanos\": \"Debido al fallecimiento de un colega, estamos recolectando fondos"
+      }
+    },
+    {
+      "artifact_id": "ART-002",
+      "evidence_type": "file_timestamp",
+      "source_tool": "synthetic_generator",
+      "timestamp": "2026-04-11T10:00:00Z",
+      "raw_score": 0.87,
+      "prior_trust": 0.75,
+      "provenance_chain": [
+        "sha256:synthetic_VIGIA-SYN-099_ART-002"
+      ],
+      "description": "Revisen el PDF adjunto para las donaciones\"",
+      "metadata": {
+        "original_type": "file_metadata",
+        "synthetic_case": "VIGIA-SYN-099",
+        "peirce_layer": "SECONDNESS",
+        "forensic_anomalies": [
+          "Anomalía detectada por análisis semiótico — requiere verificación"
+        ],
+        "content": "Revisen el PDF adjunto para las donaciones\""
+      }
+    },
+    {
+      "artifact_id": "ART-003",
+      "evidence_type": "network_artifact",
+      "source_tool": "synthetic_generator",
+      "timestamp": "2026-04-12T10:00:00Z",
+      "raw_score": 0.89,
+      "prior_trust": 0.75,
+      "provenance_chain": [
+        "sha256:synthetic_VIGIA-SYN-099_ART-003"
+      ],
+      "description": "El PDF tiene un script que roba tokens de sesión de navegador.",
+      "metadata": {
+        "original_type": "network_flow",
+        "synthetic_case": "VIGIA-SYN-099",
+        "peirce_layer": "SECONDNESS",
+        "forensic_anomalies": [
+          "Anomalía detectada por análisis semiótico — requiere verificación"
+        ],
+        "content": "El PDF tiene un script que roba tokens de sesión de navegador."
+      }
+    }
+  ],
+  "temporal_violations": [],
+  "expected_verdict": "MALICE",
+  "expected_confidence": 0.99,
+  "expected_mitre_ttps": [
+    "T1070.006"
+  ],
+  "peirce_chain": {
+    "firstness": "Mail de \"Recursos Humanos\": \"Debido al fallecimiento de un colega, estamos recolectando fondos. Revisen el PDF adjunto para las donaciones\". El PDF tiene un script que roba tokens de sesión de navegad",
+    "secondness": "Contradicción indexical en los artefactos.",
+    "thirdness": "Apelar a la simpatía y al dolor ajeno para anular el juicio crítico."
+  },
+  "extra_metadata": {
+    "eco_signal": "El signo de la \"muerte\" es la barrera semántica definitiva; nadie se atreve a cu",
+    "devil_advocate": "El comportamiento observado podría explicarse por un error administrativo, una configuración automatizada legítima, o un malentendido de procedimientos internos.",
+    "grice_violation": null,
+    "carnegie_pattern": "Apelar a la simpatía y al dolor ajeno para anular el juicio crítico.",
+    "abstention_risk": "bajo",
+    "source_origin": "synthetic_markdown",
+    "source_dataset": "VIGÍA Internal Corpus",
+    "_parser": "markdown_v2.3",
+    "_consolidation": {
+      "consolidated_at": "2026-04-28T11:17:01.924435+00:00",
+      "source_file": "/mnt/project/casosfinal.md"
+    }
+  },
+  "demo_command": "python tests/run_vigia_case.py data/cases/consolidated/VIGIA-SYN-099.json",
+  "demo_quote": "Detección de secuestro de narrativa emocional. El atacante usa un tabú social para anular el protocolo de desconfianza técnica."
+}

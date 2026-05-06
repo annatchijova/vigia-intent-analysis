@@ -1,0 +1,93 @@
+{
+  "case_id": "VIGIA-SYN-112",
+  "name": "La \"Sincronización del Pánico Semántico\" – Grice: Máximo de Manera",
+  "description": "Detección de ataque de denegación de servicio cognitivo (Cognitive DoS). El flujo coordinado de reportes falsos busca paralizar la capacidad de triaje del SOC durante un ataque real.",
+  "artifacts": [
+    {
+      "artifact_id": "ART-001",
+      "evidence_type": "default",
+      "source_tool": "synthetic_generator",
+      "timestamp": "2026-04-10T10:00:00Z",
+      "raw_score": 0.95,
+      "prior_trust": 0.9,
+      "provenance_chain": [
+        "sha256:synthetic_VIGIA-SYN-112_ART-001"
+      ],
+      "description": "En medio de un incidente real de red, aparecen 20 tickets de soporte de cuentas distintas diciendo: \"No puedo entrar al mail\", \"El servidor está caído\", \"¿Nos hackearon?\"",
+      "metadata": {
+        "original_type": "slack_message",
+        "synthetic_case": "VIGIA-SYN-112",
+        "peirce_layer": "FIRSTNESS",
+        "forensic_anomalies": [
+          "Anomalía detectada por análisis semiótico — requiere verificación"
+        ],
+        "content": "En medio de un incidente real de red, aparecen 20 tickets de soporte de cuentas distintas diciendo: \"No puedo entrar al mail\", \"El servidor está caído\", \"¿Nos hackearon?\""
+      }
+    },
+    {
+      "artifact_id": "ART-002",
+      "evidence_type": "default",
+      "source_tool": "synthetic_generator",
+      "timestamp": "2026-04-11T10:00:00Z",
+      "raw_score": 0.95,
+      "prior_trust": 0.9,
+      "provenance_chain": [
+        "sha256:synthetic_VIGIA-SYN-112_ART-002"
+      ],
+      "description": "Ninguna de esas cuentas tiene problemas reales de acceso al mail según los logs de O365.",
+      "metadata": {
+        "original_type": "syslog",
+        "synthetic_case": "VIGIA-SYN-112",
+        "peirce_layer": "SECONDNESS",
+        "forensic_anomalies": [
+          "Anomalía detectada por análisis semiótico — requiere verificación"
+        ],
+        "content": "Ninguna de esas cuentas tiene problemas reales de acceso al mail según los logs de O365."
+      }
+    }
+  ],
+  "temporal_violations": [
+    {
+      "type": "STATISTICAL_UNIFORMITY",
+      "severity": 0.6,
+      "cause": {
+        "artifact_id": "ART-001",
+        "timestamp": "2026-04-10T10:00:00Z",
+        "description": "Gricean maxim violation detected"
+      },
+      "effect": {
+        "artifact_id": "ART-002",
+        "timestamp": "2026-04-10T10:00:00Z",
+        "description": "Grice violation: Violación del máximo de manera (caos informativo deliberado)."
+      },
+      "delta_seconds": 0,
+      "interpretation": "Cooperative principle violated: Violación del máximo de manera (caos informativo deliberado)."
+    }
+  ],
+  "expected_verdict": "MALICE",
+  "expected_confidence": 0.97,
+  "expected_mitre_ttps": [
+    "T1070.006"
+  ],
+  "peirce_chain": {
+    "firstness": "En medio de un incidente real de red, aparecen 20 tickets de soporte de cuentas distintas diciendo: \"No puedo entrar al mail\", \"El servidor está caído\", \"¿Nos hackearon?\". Ninguna de esas cuentas tien",
+    "secondness": "Violación del máximo de manera (caos informativo deliberado).",
+    "thirdness": "\"Haga que la otra persona se sienta feliz de hacer lo que usted sugiere\" (en este caso, unirse al pánico para saturar al equipo de seguridad)."
+  },
+  "extra_metadata": {
+    "eco_signal": null,
+    "devil_advocate": "El comportamiento observado podría explicarse por un error administrativo, una configuración automatizada legítima, o un malentendido de procedimientos internos.",
+    "grice_violation": "Violación del máximo de manera (caos informativo deliberado).",
+    "carnegie_pattern": "\"Haga que la otra persona se sienta feliz de hacer lo que usted sugiere\" (en est",
+    "abstention_risk": "bajo",
+    "source_origin": "synthetic_markdown",
+    "source_dataset": "VIGÍA Internal Corpus",
+    "_parser": "markdown_v2.3",
+    "_consolidation": {
+      "consolidated_at": "2026-04-28T11:17:01.959830+00:00",
+      "source_file": "/mnt/project/casosfinal.md"
+    }
+  },
+  "demo_command": "python tests/run_vigia_case.py data/cases/consolidated/VIGIA-SYN-112.json",
+  "demo_quote": "Detección de ataque de denegación de servicio cognitivo (Cognitive DoS). El flujo coordinado de reportes falsos busca paralizar la capacidad de triaje del SOC durante un ataque real."
+}

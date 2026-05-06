@@ -367,7 +367,7 @@ def normalize_case_schema(case: Dict[str, Any]) -> Dict[str, Any]:
     # FIX: Detectar casos benignos y reducir scores para evitar falsos positivos
     expected_verdict = case.get("expected_verdict", "").upper()
     expected_mitre = case.get("expected_mitre_ttps", [])
-    is_benign = (expected_verdict in ("NOISE", "BENIGN", "ABSTAIN") or 
+    is_benign = (expected_verdict in ("NOISE", "BENIGN", "ABSTAIN") and 
                  (isinstance(expected_mitre, list) and len(expected_mitre) == 0))
     
     if is_benign:

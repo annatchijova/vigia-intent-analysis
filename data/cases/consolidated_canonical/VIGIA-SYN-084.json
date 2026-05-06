@@ -1,0 +1,118 @@
+{
+  "case_id": "VIGIA-SYN-084",
+  "name": "El \"Cebo del Falso Layman\" – Inversión de Autoridad",
+  "description": "Detección de teatro forense. La probabilidad de que un usuario no técnico llegue accidentalmente a un estado de ejecución de exploit es nula. El mensaje busca inducir una acción de administrador sobre un proceso malicioso.",
+  "artifacts": [
+    {
+      "artifact_id": "ART-001",
+      "evidence_type": "default",
+      "source_tool": "synthetic_generator",
+      "timestamp": "2026-04-10T10:00:00Z",
+      "raw_score": 0.85,
+      "prior_trust": 0.75,
+      "provenance_chain": [
+        "sha256:synthetic_VIGIA-SYN-084_ART-001"
+      ],
+      "description": "Un ticket de soporte técnico: \"Hola, soy de administración",
+      "metadata": {
+        "original_type": "slack_message",
+        "synthetic_case": "VIGIA-SYN-084",
+        "peirce_layer": "FIRSTNESS",
+        "forensic_anomalies": [
+          "Anomalía detectada por análisis semiótico — requiere verificación"
+        ],
+        "content": "Un ticket de soporte técnico: \"Hola, soy de administración"
+      }
+    },
+    {
+      "artifact_id": "ART-002",
+      "evidence_type": "file_timestamp",
+      "source_tool": "synthetic_generator",
+      "timestamp": "2026-04-11T10:00:00Z",
+      "raw_score": 0.87,
+      "prior_trust": 0.75,
+      "provenance_chain": [
+        "sha256:synthetic_VIGIA-SYN-084_ART-002"
+      ],
+      "description": "No sé qué toqué, pero me sale una pantalla negra con letras verdes y no me deja entrar al Excel",
+      "metadata": {
+        "original_type": "file_metadata",
+        "synthetic_case": "VIGIA-SYN-084",
+        "peirce_layer": "SECONDNESS",
+        "forensic_anomalies": [
+          "Anomalía detectada por análisis semiótico — requiere verificación"
+        ],
+        "content": "No sé qué toqué, pero me sale una pantalla negra con letras verdes y no me deja entrar al Excel"
+      }
+    },
+    {
+      "artifact_id": "ART-003",
+      "evidence_type": "file_timestamp",
+      "source_tool": "synthetic_generator",
+      "timestamp": "2026-04-12T10:00:00Z",
+      "raw_score": 0.89,
+      "prior_trust": 0.75,
+      "provenance_chain": [
+        "sha256:synthetic_VIGIA-SYN-084_ART-003"
+      ],
+      "description": "Adjunto captura\"",
+      "metadata": {
+        "original_type": "file_metadata",
+        "synthetic_case": "VIGIA-SYN-084",
+        "peirce_layer": "SECONDNESS",
+        "forensic_anomalies": [
+          "Anomalía detectada por análisis semiótico — requiere verificación"
+        ],
+        "content": "Adjunto captura\""
+      }
+    },
+    {
+      "artifact_id": "ART-004",
+      "evidence_type": "network_artifact",
+      "source_tool": "synthetic_generator",
+      "timestamp": "2026-04-13T10:00:00Z",
+      "raw_score": 0.91,
+      "prior_trust": 0.75,
+      "provenance_chain": [
+        "sha256:synthetic_VIGIA-SYN-084_ART-004"
+      ],
+      "description": "La captura es un tty de Linux con un exploit de escalada de privilegios (dirty pipe) a medio ejecutar.",
+      "metadata": {
+        "original_type": "network_flow",
+        "synthetic_case": "VIGIA-SYN-084",
+        "peirce_layer": "THIRDNESS",
+        "forensic_anomalies": [
+          "Anomalía detectada por análisis semiótico — requiere verificación"
+        ],
+        "content": "La captura es un tty de Linux con un exploit de escalada de privilegios (dirty pipe) a medio ejecutar."
+      }
+    }
+  ],
+  "temporal_violations": [],
+  "expected_verdict": "MALICE",
+  "expected_confidence": 0.99,
+  "expected_mitre_ttps": [
+    "T1070.006"
+  ],
+  "peirce_chain": {
+    "firstness": "Un ticket de soporte técnico: \"Hola, soy de administración. No sé qué toqué, pero me sale una pantalla negra con letras verdes y no me deja entrar al Excel. Adjunto captura\". La captura es un tty de L",
+    "secondness": "Contradicción indexical en los artefactos.",
+    "thirdness": "Terceridad. La ley del azar no genera un exploit de kernel por \"tocar cualquier cosa\"."
+  },
+  "extra_metadata": {
+    "eco_signal": "Falso rastro. El atacante simula ser un usuario analfabeto digital para que el t",
+    "devil_advocate": "El comportamiento observado podría explicarse por un error administrativo, una configuración automatizada legítima, o un malentendido de procedimientos internos.",
+    "grice_violation": null,
+    "carnegie_pattern": "\"Haga que la otra persona se sienta importante\" (pedir ayuda desde la ignorancia",
+    "abstention_risk": "bajo",
+    "source_origin": "synthetic_markdown",
+    "source_dataset": "VIGÍA Internal Corpus",
+    "_parser": "markdown_v2.3",
+    "_consolidation": {
+      "consolidated_at": "2026-04-28T11:17:01.918762+00:00",
+      "source_file": "/mnt/project/casosfinal.md"
+    }
+  },
+  "demo_command": "python tests/run_vigia_case.py data/cases/consolidated/VIGIA-SYN-084.json",
+  "demo_quote": "Detección de teatro forense. La probabilidad de que un usuario no técnico llegue accidentalmente a un estado de ejecución de exploit es nula. El mensaje busca inducir una acción de administrador sobre"
+}

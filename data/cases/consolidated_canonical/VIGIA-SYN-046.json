@@ -1,0 +1,139 @@
+{
+  "case_id": "VIGIA-SYN-046",
+  "name": "El \"Pivot de Layout\" – Peirce: Primeridad (Index)",
+  "description": "** \"Detección de desliz de teclado (Keyboard Slip). El comando `ls -la` fue tipeado con layout ruso. La mentira sobre la identidad geográfica se derrumba ante la física del teclado.",
+  "artifacts": [
+    {
+      "artifact_id": "ART-001",
+      "evidence_type": "log_entry",
+      "source_tool": "synthetic_generator",
+      "timestamp": "2026-04-10T10:00:00Z",
+      "raw_score": 0.8,
+      "prior_trust": 0.75,
+      "provenance_chain": [
+        "sha256:synthetic_VIGIA-SYN-046_ART-001"
+      ],
+      "description": "En una sesión de bash, el historial registra: `ls -la`, `cd /etc`, `д -дф`",
+      "metadata": {
+        "original_type": "bash_history",
+        "synthetic_case": "VIGIA-SYN-046",
+        "peirce_layer": "FIRSTNESS",
+        "forensic_anomalies": [
+          "Anomalía detectada por análisis semiótico — requiere verificación"
+        ],
+        "content": "En una sesión de bash, el historial registra: `ls -la`, `cd /etc`, `д -дф`"
+      }
+    },
+    {
+      "artifact_id": "ART-002",
+      "evidence_type": "file_timestamp",
+      "source_tool": "synthetic_generator",
+      "timestamp": "2026-04-11T10:00:00Z",
+      "raw_score": 0.82,
+      "prior_trust": 0.75,
+      "provenance_chain": [
+        "sha256:synthetic_VIGIA-SYN-046_ART-002"
+      ],
+      "description": "* **Peirce:** Primeridad (El rastro físico)",
+      "metadata": {
+        "original_type": "file_metadata",
+        "synthetic_case": "VIGIA-SYN-046",
+        "peirce_layer": "SECONDNESS",
+        "forensic_anomalies": [
+          "Anomalía detectada por análisis semiótico — requiere verificación"
+        ],
+        "content": "* **Peirce:** Primeridad (El rastro físico)"
+      }
+    },
+    {
+      "artifact_id": "ART-003",
+      "evidence_type": "file_timestamp",
+      "source_tool": "synthetic_generator",
+      "timestamp": "2026-04-12T10:00:00Z",
+      "raw_score": 0.84,
+      "prior_trust": 0.75,
+      "provenance_chain": [
+        "sha256:synthetic_VIGIA-SYN-046_ART-003"
+      ],
+      "description": "La cadena `д -дф` es el resultado de intentar escribir `ls -la` con el teclado configurado en layout ruso (ЙЦУКЕН)",
+      "metadata": {
+        "original_type": "file_metadata",
+        "synthetic_case": "VIGIA-SYN-046",
+        "peirce_layer": "SECONDNESS",
+        "forensic_anomalies": [
+          "Desliz de teclado — atribución lingüística"
+        ],
+        "content": "La cadena `д -дф` es el resultado de intentar escribir `ls -la` con el teclado configurado en layout ruso (ЙЦУКЕН)"
+      }
+    },
+    {
+      "artifact_id": "ART-004",
+      "evidence_type": "file_timestamp",
+      "source_tool": "synthetic_generator",
+      "timestamp": "2026-04-13T10:00:00Z",
+      "raw_score": 0.86,
+      "prior_trust": 0.75,
+      "provenance_chain": [
+        "sha256:synthetic_VIGIA-SYN-046_ART-004"
+      ],
+      "description": "* **Carnegie:** N/A (Falla técnica pura)",
+      "metadata": {
+        "original_type": "file_metadata",
+        "synthetic_case": "VIGIA-SYN-046",
+        "peirce_layer": "THIRDNESS",
+        "forensic_anomalies": [
+          "Anomalía detectada por análisis semiótico — requiere verificación"
+        ],
+        "content": "* **Carnegie:** N/A (Falla técnica pura)"
+      }
+    },
+    {
+      "artifact_id": "ART-005",
+      "evidence_type": "file_timestamp",
+      "source_tool": "synthetic_generator",
+      "timestamp": "2026-04-14T10:00:00Z",
+      "raw_score": 0.88,
+      "prior_trust": 0.75,
+      "provenance_chain": [
+        "sha256:synthetic_VIGIA-SYN-046_ART-005"
+      ],
+      "description": "* **Eco:** Falso rastro de origen",
+      "metadata": {
+        "original_type": "file_metadata",
+        "synthetic_case": "VIGIA-SYN-046",
+        "peirce_layer": "THIRDNESS",
+        "forensic_anomalies": [
+          "Anomalía detectada por análisis semiótico — requiere verificación"
+        ],
+        "content": "* **Eco:** Falso rastro de origen"
+      }
+    }
+  ],
+  "temporal_violations": [],
+  "expected_verdict": "MALICE",
+  "expected_confidence": 0.9,
+  "expected_mitre_ttps": [
+    "T1070.006"
+  ],
+  "peirce_chain": {
+    "firstness": "Primeridad (El rastro físico). La cadena `д -дф` es el resultado de intentar escribir `ls -la` con el teclado configurado en layout ruso (ЙЦУКЕН).\n* **Carnegie:** N/A (Falla técnica pura).\n* **Eco:** Falso rastro de origen. El atacante jura ser un empleado de Buenos Aires en sus correos, pero su har",
+    "secondness": "Contradicción indexical en los artefactos.",
+    "thirdness": "N/A (Falla técnica pura).\n* **Eco:** Falso rastro de origen. El atacante jura ser un empleado de Buenos Aires en sus correos, pero su hardware tiene una memoria muscular táctil diferente.\n* **Interpre"
+  },
+  "extra_metadata": {
+    "eco_signal": "Falso rastro de origen. El atacante jura ser un empleado de Buenos Aires en sus",
+    "devil_advocate": "Las inconsistencias detectadas podrían deberse a un cambio de hábitos personales, una rotación de personal, o una herramienta de automatización no documentada.",
+    "grice_violation": null,
+    "carnegie_pattern": "N/A (Falla técnica pura).\n* **Eco:** Falso rastro de origen. El atacante jura se",
+    "abstention_risk": "bajo",
+    "source_origin": "synthetic_markdown",
+    "source_dataset": "VIGÍA Internal Corpus",
+    "_parser": "markdown_v2.3",
+    "_consolidation": {
+      "consolidated_at": "2026-04-28T11:17:01.968950+00:00",
+      "source_file": "/mnt/project/nuevoscasos.md"
+    }
+  },
+  "demo_command": "python tests/run_vigia_case.py data/cases/consolidated/VIGIA-SYN-046.json",
+  "demo_quote": "** \"Detección de desliz de teclado (Keyboard Slip). El comando `ls -la` fue tipeado con layout ruso. La mentira sobre la identidad geográfica se derrumba ante la física del teclado."
+}

@@ -1,0 +1,76 @@
+{
+  "case_id": "VIGIA-SYN-093",
+  "name": "El \"Deepfake de Estilo\" – Mimesis Algorítmica",
+  "description": "Detección de mimesis estilística artificial. La consistencia es estadística, no biográfica. El atacante usó una IA para redactar código que 'parezca' legítimo.",
+  "artifacts": [
+    {
+      "artifact_id": "ART-001",
+      "evidence_type": "file_timestamp",
+      "source_tool": "synthetic_generator",
+      "timestamp": "2026-04-10T10:00:00Z",
+      "raw_score": 0.95,
+      "prior_trust": 0.9,
+      "provenance_chain": [
+        "sha256:synthetic_VIGIA-SYN-093_ART-001"
+      ],
+      "description": "Commits de código que imitan a la perfección el estilo del Arquitecto Jefe (espaciado, nombres de variables, incluso los mismos errores gramaticales en los comentarios)",
+      "metadata": {
+        "original_type": "file_metadata",
+        "synthetic_case": "VIGIA-SYN-093",
+        "peirce_layer": "FIRSTNESS",
+        "forensic_anomalies": [
+          "Anomalía detectada por análisis semiótico — requiere verificación"
+        ],
+        "content": "Commits de código que imitan a la perfección el estilo del Arquitecto Jefe (espaciado, nombres de variables, incluso los mismos errores gramaticales en los comentarios)"
+      }
+    },
+    {
+      "artifact_id": "ART-002",
+      "evidence_type": "default",
+      "source_tool": "synthetic_generator",
+      "timestamp": "2026-04-11T10:00:00Z",
+      "raw_score": 0.95,
+      "prior_trust": 0.9,
+      "provenance_chain": [
+        "sha256:synthetic_VIGIA-SYN-093_ART-002"
+      ],
+      "description": "Pero los metadatos muestran que se subieron vía una clave API genérica a las 4:00 AM, mientras el log del arquitecto dice que estaba desconectado.",
+      "metadata": {
+        "original_type": "syslog",
+        "synthetic_case": "VIGIA-SYN-093",
+        "peirce_layer": "SECONDNESS",
+        "forensic_anomalies": [
+          "Anomalía detectada por análisis semiótico — requiere verificación"
+        ],
+        "content": "Pero los metadatos muestran que se subieron vía una clave API genérica a las 4:00 AM, mientras el log del arquitecto dice que estaba desconectado."
+      }
+    }
+  ],
+  "temporal_violations": [],
+  "expected_verdict": "MALICE",
+  "expected_confidence": 0.98,
+  "expected_mitre_ttps": [
+    "T1070.006"
+  ],
+  "peirce_chain": {
+    "firstness": "Commits de código que imitan a la perfección el estilo del Arquitecto Jefe (espaciado, nombres de variables, incluso los mismos errores gramaticales en los comentarios). Pero los metadatos muestran qu",
+    "secondness": "Contradicción indexical en los artefactos.",
+    "thirdness": "Terceridad (Hábito). El hábito es demasiado perfecto. Carece de la variabilidad orgánica del pensamiento humano."
+  },
+  "extra_metadata": {
+    "eco_signal": "El estilo es un signo fabricado (Doble).",
+    "devil_advocate": "El comportamiento observado podría explicarse por un error administrativo, una configuración automatizada legítima, o un malentendido de procedimientos internos.",
+    "grice_violation": null,
+    "carnegie_pattern": null,
+    "abstention_risk": "bajo",
+    "source_origin": "synthetic_markdown",
+    "source_dataset": "VIGÍA Internal Corpus",
+    "_parser": "markdown_v2.3",
+    "_consolidation": {
+      "consolidated_at": "2026-04-28T11:17:01.922303+00:00",
+      "source_file": "/mnt/project/casosfinal.md"
+    }
+  },
+  "demo_command": "python tests/run_vigia_case.py data/cases/consolidated/VIGIA-SYN-093.json",
+  "demo_quote": "Detección de mimesis estilística artificial. La consistencia es estadística, no biográfica. El atacante usó una IA para redactar código que 'parezca' legítimo."
+}

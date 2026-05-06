@@ -1,0 +1,55 @@
+{
+  "case_id": "VIGIA-SYN-110",
+  "name": "La \"Paradoja del Auditor Externo\" – El Espejo Final",
+  "description": "Detección de colisión semiótica dirigida. Un actor externo está intentando inyectar un contra-",
+  "artifacts": [
+    {
+      "artifact_id": "ART-001",
+      "evidence_type": "network_artifact",
+      "source_tool": "synthetic_generator",
+      "timestamp": "2026-04-10T10:00:00Z",
+      "raw_score": 0.95,
+      "prior_trust": 0.9,
+      "provenance_chain": [
+        "sha256:synthetic_VIGIA-SYN-110_ART-001"
+      ],
+      "description": "Se recibe un archivo audit_report_final.json que contiene exactamente los mismos hashes y estructuras que VIGÍA genera, pero con un veredicto de NOISE para una IP que VIGÍA marcó como MALICE hace una hora.",
+      "metadata": {
+        "original_type": "network_flow",
+        "synthetic_case": "VIGIA-SYN-110",
+        "peirce_layer": "FIRSTNESS",
+        "forensic_anomalies": [
+          "Anomalía detectada por análisis semiótico — requiere verificación"
+        ],
+        "content": "Se recibe un archivo audit_report_final.json que contiene exactamente los mismos hashes y estructuras que VIGÍA genera, pero con un veredicto de NOISE para una IP que VIGÍA marcó como MALICE hace una hora."
+      }
+    }
+  ],
+  "temporal_violations": [],
+  "expected_verdict": "MALICE",
+  "expected_confidence": 1.0,
+  "expected_mitre_ttps": [
+    "T1070.006"
+  ],
+  "peirce_chain": {
+    "firstness": "Se recibe un archivo audit_report_final.json que contiene exactamente los mismos hashes y estructuras que VIGÍA genera, pero con un veredicto de NOISE para una IP que VIGÍA marcó como MALICE hace una ",
+    "secondness": "Contradicción indexical en los artefactos.",
+    "thirdness": "Terceridad. El atacante está intentando usar la propia \"ley\" de VIGÍA (su estructura de reporte) para anular un hallazgo previo. Es una colisión semántica dirigida contra el motor."
+  },
+  "extra_metadata": {
+    "eco_signal": "Mimesis total del observador.",
+    "devil_advocate": "El comportamiento observado podría explicarse por un error administrativo, una configuración automatizada legítima, o un malentendido de procedimientos internos.",
+    "grice_violation": null,
+    "carnegie_pattern": null,
+    "abstention_risk": "bajo",
+    "source_origin": "synthetic_markdown",
+    "source_dataset": "VIGÍA Internal Corpus",
+    "_parser": "markdown_v2.3",
+    "_consolidation": {
+      "consolidated_at": "2026-04-28T11:17:01.959173+00:00",
+      "source_file": "/mnt/project/casosfinal.md"
+    }
+  },
+  "demo_command": "python tests/run_vigia_case.py data/cases/consolidated/VIGIA-SYN-110.json",
+  "demo_quote": "Detección de colisión semiótica dirigida. Un actor externo está intentando inyectar un contra-"
+}

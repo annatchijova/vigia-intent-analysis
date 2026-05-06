@@ -1,0 +1,55 @@
+{
+  "case_id": "VIGIA-SYN-104",
+  "name": "El \"Error de Layout en el Comentario\" – Peirce: Index (Física del Error)",
+  "description": "Detección de desliz de teclado (Keyboard Slip) en comentarios de código. La cadena 'cnfnbz' delata la configuración de hardware nativa del operador.",
+  "artifacts": [
+    {
+      "artifact_id": "ART-001",
+      "evidence_type": "network_artifact",
+      "source_tool": "synthetic_generator",
+      "timestamp": "2026-04-10T10:00:00Z",
+      "raw_score": 0.95,
+      "prior_trust": 0.9,
+      "provenance_chain": [
+        "sha256:synthetic_VIGIA-SYN-104_ART-001"
+      ],
+      "description": "Un script de mantenimiento en producción tiene un comentario nuevo: # TODO: arreglar el script cnfnbz.py.",
+      "metadata": {
+        "original_type": "network_flow",
+        "synthetic_case": "VIGIA-SYN-104",
+        "peirce_layer": "FIRSTNESS",
+        "forensic_anomalies": [
+          "Anomalía detectada por análisis semiótico — requiere verificación"
+        ],
+        "content": "Un script de mantenimiento en producción tiene un comentario nuevo: # TODO: arreglar el script cnfnbz.py."
+      }
+    }
+  ],
+  "temporal_violations": [],
+  "expected_verdict": "MALICE",
+  "expected_confidence": 0.97,
+  "expected_mitre_ttps": [
+    "T1070.006"
+  ],
+  "peirce_chain": {
+    "firstness": "Primeridad (Index). La palabra cnfnbz no tiene sentido en español ni en inglés. Al mapear el teclado, cnfnbz es el resultado de escribir статья (artículo/reporte) con el layout ruso activo.",
+    "secondness": "Primeridad (Index). La palabra cnfnbz no tiene sentido en español ni en inglés. Al mapear el teclado, cnfnbz es el resultado de escribir статья (artículo/reporte) con el layout ruso activo.",
+    "thirdness": "Interpretación simbólica de la intención."
+  },
+  "extra_metadata": {
+    "eco_signal": "Falso rastro. El atacante intentó mimetizarse escribiendo comentarios de \"desarr",
+    "devil_advocate": "El comportamiento observado podría explicarse por un error administrativo, una configuración automatizada legítima, o un malentendido de procedimientos internos.",
+    "grice_violation": null,
+    "carnegie_pattern": null,
+    "abstention_risk": "bajo",
+    "source_origin": "synthetic_markdown",
+    "source_dataset": "VIGÍA Internal Corpus",
+    "_parser": "markdown_v2.3",
+    "_consolidation": {
+      "consolidated_at": "2026-04-28T11:17:01.956973+00:00",
+      "source_file": "/mnt/project/casosfinal.md"
+    }
+  },
+  "demo_command": "python tests/run_vigia_case.py data/cases/consolidated/VIGIA-SYN-104.json",
+  "demo_quote": "Detección de desliz de teclado (Keyboard Slip) en comentarios de código. La cadena 'cnfnbz' delata la configuración de hardware nativa del operador."
+}

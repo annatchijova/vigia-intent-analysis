@@ -1,0 +1,114 @@
+{
+  "case_id": "VIGIA-SYN-073",
+  "name": "El \"Narcisismo Epistémico\" – Carnegie: Admisión de Error Táctico",
+  "description": "Detección de sobre-incriminación distractiva. La confesión de una falta menor busca legitimar la destrucción de evidencia (borrado de logs).",
+  "artifacts": [
+    {
+      "artifact_id": "ART-001",
+      "evidence_type": "file_timestamp",
+      "source_tool": "synthetic_generator",
+      "timestamp": "2026-04-10T10:00:00Z",
+      "raw_score": 0.85,
+      "prior_trust": 0.75,
+      "provenance_chain": [
+        "sha256:synthetic_VIGIA-SYN-073_ART-001"
+      ],
+      "description": "Un administrador de sistemas envía un reporte proactivo: \"Detecté que usé una versión de nmap no autorizada para un escaneo interno",
+      "metadata": {
+        "original_type": "file_metadata",
+        "synthetic_case": "VIGIA-SYN-073",
+        "peirce_layer": "FIRSTNESS",
+        "forensic_anomalies": [
+          "Anomalía detectada por análisis semiótico — requiere verificación"
+        ],
+        "content": "Un administrador de sistemas envía un reporte proactivo: \"Detecté que usé una versión de nmap no autorizada para un escaneo interno"
+      }
+    },
+    {
+      "artifact_id": "ART-002",
+      "evidence_type": "file_timestamp",
+      "source_tool": "synthetic_generator",
+      "timestamp": "2026-04-11T10:00:00Z",
+      "raw_score": 0.87,
+      "prior_trust": 0.75,
+      "provenance_chain": [
+        "sha256:synthetic_VIGIA-SYN-073_ART-002"
+      ],
+      "description": "Pido disculpas, fue por apuro",
+      "metadata": {
+        "original_type": "file_metadata",
+        "synthetic_case": "VIGIA-SYN-073",
+        "peirce_layer": "SECONDNESS",
+        "forensic_anomalies": [
+          "Anomalía detectada por análisis semiótico — requiere verificación"
+        ],
+        "content": "Pido disculpas, fue por apuro"
+      }
+    },
+    {
+      "artifact_id": "ART-003",
+      "evidence_type": "default",
+      "source_tool": "synthetic_generator",
+      "timestamp": "2026-04-12T10:00:00Z",
+      "raw_score": 0.89,
+      "prior_trust": 0.75,
+      "provenance_chain": [
+        "sha256:synthetic_VIGIA-SYN-073_ART-003"
+      ],
+      "description": "Ya borré los logs para no ensuciar la auditoría central\".",
+      "metadata": {
+        "original_type": "syslog",
+        "synthetic_case": "VIGIA-SYN-073",
+        "peirce_layer": "SECONDNESS",
+        "forensic_anomalies": [
+          "Anomalía detectada por análisis semiótico — requiere verificación"
+        ],
+        "content": "Ya borré los logs para no ensuciar la auditoría central\"."
+      }
+    }
+  ],
+  "temporal_violations": [
+    {
+      "type": "STATISTICAL_UNIFORMITY",
+      "severity": 0.6,
+      "cause": {
+        "artifact_id": "ART-001",
+        "timestamp": "2026-04-10T10:00:00Z",
+        "description": "Gricean maxim violation detected"
+      },
+      "effect": {
+        "artifact_id": "ART-003",
+        "timestamp": "2026-04-10T10:00:00Z",
+        "description": "Grice violation: Violación del máximo de cantidad. La explicación es excesiva para una herramient"
+      },
+      "delta_seconds": 0,
+      "interpretation": "Cooperative principle violated: Violación del máximo de cantidad. La explicación es excesiva para una herramient"
+    }
+  ],
+  "expected_verdict": "MALICE",
+  "expected_confidence": 0.96,
+  "expected_mitre_ttps": [
+    "T1070.006"
+  ],
+  "peirce_chain": {
+    "firstness": "Un administrador de sistemas envía un reporte proactivo: \"Detecté que usé una versión de nmap no autorizada para un escaneo interno. Pido disculpas, fue por apuro. Ya borré los logs para no ensuciar l",
+    "secondness": "Violación del máximo de cantidad. La explicación es excesiva para una herramienta tan común, buscando saturar la duda del auditor.",
+    "thirdness": "Terceridad. El hábito de un administrador disciplinado nunca es borrar logs \"para no ensuciar\"; la ley de la administración es la preservación."
+  },
+  "extra_metadata": {
+    "eco_signal": null,
+    "devil_advocate": "El comportamiento observado podría explicarse por un error administrativo, una configuración automatizada legítima, o un malentendido de procedimientos internos.",
+    "grice_violation": "Violación del máximo de cantidad. La explicación es excesiva para una herramient",
+    "carnegie_pattern": "\"Admita sus errores rápida y enfáticamente\". El atacante se incrimina en una fal",
+    "abstention_risk": "bajo",
+    "source_origin": "synthetic_markdown",
+    "source_dataset": "VIGÍA Internal Corpus",
+    "_parser": "markdown_v2.3",
+    "_consolidation": {
+      "consolidated_at": "2026-04-28T11:17:01.975216+00:00",
+      "source_file": "/mnt/project/nuevoscasos.md"
+    }
+  },
+  "demo_command": "python tests/run_vigia_case.py data/cases/consolidated/VIGIA-SYN-073.json",
+  "demo_quote": "Detección de sobre-incriminación distractiva. La confesión de una falta menor busca legitimar la destrucción de evidencia (borrado de logs)."
+}

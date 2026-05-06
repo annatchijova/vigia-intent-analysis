@@ -1,0 +1,114 @@
+{
+  "case_id": "VIGIA-SYN-091",
+  "name": "La \"Disonancia del Motivo Noble\" – Carnegie: Apelación a la Moral",
+  "description": "Uso de vulnerabilidad social y falsa solidaridad para inducir una acción de riesgo. El motivo noble es el envoltorio de un ataque de phishing interno.",
+  "artifacts": [
+    {
+      "artifact_id": "ART-001",
+      "evidence_type": "default",
+      "source_tool": "synthetic_generator",
+      "timestamp": "2026-04-10T10:00:00Z",
+      "raw_score": 0.85,
+      "prior_trust": 0.75,
+      "provenance_chain": [
+        "sha256:synthetic_VIGIA-SYN-091_ART-001"
+      ],
+      "description": "Un mensaje de Slack: \"Che, vi que dejaste tu contraseña en un post-it en la cámara de la reunión",
+      "metadata": {
+        "original_type": "slack_message",
+        "synthetic_case": "VIGIA-SYN-091",
+        "peirce_layer": "FIRSTNESS",
+        "forensic_anomalies": [
+          "Anomalía detectada por análisis semiótico — requiere verificación"
+        ],
+        "content": "Un mensaje de Slack: \"Che, vi que dejaste tu contraseña en un post-it en la cámara de la reunión"
+      }
+    },
+    {
+      "artifact_id": "ART-002",
+      "evidence_type": "file_timestamp",
+      "source_tool": "synthetic_generator",
+      "timestamp": "2026-04-11T10:00:00Z",
+      "raw_score": 0.87,
+      "prior_trust": 0.75,
+      "provenance_chain": [
+        "sha256:synthetic_VIGIA-SYN-091_ART-002"
+      ],
+      "description": "La anoté y la borré de la captura de pantalla para que nadie te denuncie a seguridad",
+      "metadata": {
+        "original_type": "file_metadata",
+        "synthetic_case": "VIGIA-SYN-091",
+        "peirce_layer": "SECONDNESS",
+        "forensic_anomalies": [
+          "Anomalía detectada por análisis semiótico — requiere verificación"
+        ],
+        "content": "La anoté y la borré de la captura de pantalla para que nadie te denuncie a seguridad"
+      }
+    },
+    {
+      "artifact_id": "ART-003",
+      "evidence_type": "file_timestamp",
+      "source_tool": "synthetic_generator",
+      "timestamp": "2026-04-12T10:00:00Z",
+      "raw_score": 0.89,
+      "prior_trust": 0.75,
+      "provenance_chain": [
+        "sha256:synthetic_VIGIA-SYN-091_ART-003"
+      ],
+      "description": "Te la paso por acá para que no te la olvides: [Link_Malicioso]\".",
+      "metadata": {
+        "original_type": "file_metadata",
+        "synthetic_case": "VIGIA-SYN-091",
+        "peirce_layer": "SECONDNESS",
+        "forensic_anomalies": [
+          "Anomalía detectada por análisis semiótico — requiere verificación"
+        ],
+        "content": "Te la paso por acá para que no te la olvides: [Link_Malicioso]\"."
+      }
+    }
+  ],
+  "temporal_violations": [
+    {
+      "type": "STATISTICAL_UNIFORMITY",
+      "severity": 0.6,
+      "cause": {
+        "artifact_id": "ART-001",
+        "timestamp": "2026-04-10T10:00:00Z",
+        "description": "Gricean maxim violation detected"
+      },
+      "effect": {
+        "artifact_id": "ART-003",
+        "timestamp": "2026-04-10T10:00:00Z",
+        "description": "Grice violation: Violación del máximo de calidad. No hay evidencia de tal post-it en los logs de"
+      },
+      "delta_seconds": 0,
+      "interpretation": "Cooperative principle violated: Violación del máximo de calidad. No hay evidencia de tal post-it en los logs de"
+    }
+  ],
+  "expected_verdict": "MALICE",
+  "expected_confidence": 0.95,
+  "expected_mitre_ttps": [
+    "T1070.006"
+  ],
+  "peirce_chain": {
+    "firstness": "Un mensaje de Slack: \"Che, vi que dejaste tu contraseña en un post-it en la cámara de la reunión. La anoté y la borré de la captura de pantalla para que nadie te denuncie a seguridad. Te la paso por a",
+    "secondness": "Violación del máximo de calidad. No hay evidencia de tal post-it en los logs de la cámara.",
+    "thirdness": "Terceridad. La \"protección\" del compañero es el vehículo para el robo de credenciales."
+  },
+  "extra_metadata": {
+    "eco_signal": null,
+    "devil_advocate": "El comportamiento observado podría explicarse por un error administrativo, una configuración automatizada legítima, o un malentendido de procedimientos internos.",
+    "grice_violation": "Violación del máximo de calidad. No hay evidencia de tal post-it en los logs de",
+    "carnegie_pattern": "\"Haga que la otra persona se sienta feliz de hacer lo que usted sugiere\" (salvar",
+    "abstention_risk": "bajo",
+    "source_origin": "synthetic_markdown",
+    "source_dataset": "VIGÍA Internal Corpus",
+    "_parser": "markdown_v2.3",
+    "_consolidation": {
+      "consolidated_at": "2026-04-28T11:17:01.921651+00:00",
+      "source_file": "/mnt/project/casosfinal.md"
+    }
+  },
+  "demo_command": "python tests/run_vigia_case.py data/cases/consolidated/VIGIA-SYN-091.json",
+  "demo_quote": "Uso de vulnerabilidad social y falsa solidaridad para inducir una acción de riesgo. El motivo noble es el envoltorio de un ataque de phishing interno."
+}

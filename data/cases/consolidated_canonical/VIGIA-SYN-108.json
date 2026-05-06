@@ -1,0 +1,93 @@
+{
+  "case_id": "VIGIA-SYN-108",
+  "name": "La \"Inversión de la Carga de Prueba\" – Carnegie: Desafío de Autoridad",
+  "description": "Detección de agresión defensiva y manipulación jerárquica. El usuario busca anular el proceso forense mediante la creación de fricción interpersonal.",
+  "artifacts": [
+    {
+      "artifact_id": "ART-001",
+      "evidence_type": "file_timestamp",
+      "source_tool": "synthetic_generator",
+      "timestamp": "2026-04-10T10:00:00Z",
+      "raw_score": 0.95,
+      "prior_trust": 0.9,
+      "provenance_chain": [
+        "sha256:synthetic_VIGIA-SYN-108_ART-001"
+      ],
+      "description": "Un analista del SOC contacta a un usuario por una actividad sospechosa",
+      "metadata": {
+        "original_type": "file_metadata",
+        "synthetic_case": "VIGIA-SYN-108",
+        "peirce_layer": "FIRSTNESS",
+        "forensic_anomalies": [
+          "Anomalía detectada por análisis semiótico — requiere verificación"
+        ],
+        "content": "Un analista del SOC contacta a un usuario por una actividad sospechosa"
+      }
+    },
+    {
+      "artifact_id": "ART-002",
+      "evidence_type": "file_timestamp",
+      "source_tool": "synthetic_generator",
+      "timestamp": "2026-04-11T10:00:00Z",
+      "raw_score": 0.95,
+      "prior_trust": 0.9,
+      "provenance_chain": [
+        "sha256:synthetic_VIGIA-SYN-108_ART-002"
+      ],
+      "description": "El usuario (el atacante) responde: \"¿Por qué me preguntas esto? ¿Acaso no confías en mi trabajo? Ya hablé con el gerente sobre el exceso de control, me estás haciendo perder tiempo valioso de producción\".",
+      "metadata": {
+        "original_type": "timestamp",
+        "synthetic_case": "VIGIA-SYN-108",
+        "peirce_layer": "SECONDNESS",
+        "forensic_anomalies": [
+          "Anomalía detectada por análisis semiótico — requiere verificación"
+        ],
+        "content": "El usuario (el atacante) responde: \"¿Por qué me preguntas esto? ¿Acaso no confías en mi trabajo? Ya hablé con el gerente sobre el exceso de control, me estás haciendo perder tiempo valioso de producción\"."
+      }
+    }
+  ],
+  "temporal_violations": [
+    {
+      "type": "STATISTICAL_UNIFORMITY",
+      "severity": 0.6,
+      "cause": {
+        "artifact_id": "ART-001",
+        "timestamp": "2026-04-10T10:00:00Z",
+        "description": "Gricean maxim violation detected"
+      },
+      "effect": {
+        "artifact_id": "ART-002",
+        "timestamp": "2026-04-10T10:00:00Z",
+        "description": "Grice violation: Violación del máximo de relación. La queja sobre el \"tiempo perdido\" no responde"
+      },
+      "delta_seconds": 0,
+      "interpretation": "Cooperative principle violated: Violación del máximo de relación. La queja sobre el \"tiempo perdido\" no responde"
+    }
+  ],
+  "expected_verdict": "MALICE",
+  "expected_confidence": 0.95,
+  "expected_mitre_ttps": [
+    "T1070.006"
+  ],
+  "peirce_chain": {
+    "firstness": "Un analista del SOC contacta a un usuario por una actividad sospechosa. El usuario (el atacante) responde: \"¿Por qué me preguntas esto? ¿Acaso no confías en mi trabajo? Ya hablé con el gerente sobre e",
+    "secondness": "Violación del máximo de relación. La queja sobre el \"tiempo perdido\" no responde a la pregunta técnica sobre el log.",
+    "thirdness": "Inversión de la culpa. El atacante usa la intimidación y la apelación a la eficiencia para que el analista se sienta inseguro y detenga la investigación."
+  },
+  "extra_metadata": {
+    "eco_signal": null,
+    "devil_advocate": "El comportamiento observado podría explicarse por un error administrativo, una configuración automatizada legítima, o un malentendido de procedimientos internos.",
+    "grice_violation": "Violación del máximo de relación. La queja sobre el \"tiempo perdido\" no responde",
+    "carnegie_pattern": "Inversión de la culpa. El atacante usa la intimidación y la apelación a la efici",
+    "abstention_risk": "bajo",
+    "source_origin": "synthetic_markdown",
+    "source_dataset": "VIGÍA Internal Corpus",
+    "_parser": "markdown_v2.3",
+    "_consolidation": {
+      "consolidated_at": "2026-04-28T11:17:01.958294+00:00",
+      "source_file": "/mnt/project/casosfinal.md"
+    }
+  },
+  "demo_command": "python tests/run_vigia_case.py data/cases/consolidated/VIGIA-SYN-108.json",
+  "demo_quote": "Detección de agresión defensiva y manipulación jerárquica. El usuario busca anular el proceso forense mediante la creación de fricción interpersonal."
+}

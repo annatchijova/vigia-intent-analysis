@@ -1,0 +1,135 @@
+{
+  "case_id": "VIGIA-SYN-059",
+  "name": "La \"Protección mediante Exfiltración\" – Motivo Noble",
+  "description": "Detección de secuestro de narrativa de incidente. El atacante usa una falsa alarma para justificar la exfiltración de activos críticos bajo la máscara de una acción defensiva.",
+  "artifacts": [
+    {
+      "artifact_id": "ART-001",
+      "evidence_type": "file_timestamp",
+      "source_tool": "synthetic_generator",
+      "timestamp": "2026-04-10T10:00:00Z",
+      "raw_score": 0.85,
+      "prior_trust": 0.75,
+      "provenance_chain": [
+        "sha256:synthetic_VIGIA-SYN-059_ART-001"
+      ],
+      "description": "El sistema de seguridad lanza una alerta (falsa, generada por el atacante)",
+      "metadata": {
+        "original_type": "file_metadata",
+        "synthetic_case": "VIGIA-SYN-059",
+        "peirce_layer": "FIRSTNESS",
+        "forensic_anomalies": [
+          "Anomalía detectada por análisis semiótico — requiere verificación"
+        ],
+        "content": "El sistema de seguridad lanza una alerta (falsa, generada por el atacante)"
+      }
+    },
+    {
+      "artifact_id": "ART-002",
+      "evidence_type": "file_timestamp",
+      "source_tool": "synthetic_generator",
+      "timestamp": "2026-04-11T10:00:00Z",
+      "raw_score": 0.87,
+      "prior_trust": 0.75,
+      "provenance_chain": [
+        "sha256:synthetic_VIGIA-SYN-059_ART-002"
+      ],
+      "description": "Un usuario con privilegios de seguridad responde: \"Detecté una intrusión activa",
+      "metadata": {
+        "original_type": "file_metadata",
+        "synthetic_case": "VIGIA-SYN-059",
+        "peirce_layer": "SECONDNESS",
+        "forensic_anomalies": [
+          "Anomalía detectada por análisis semiótico — requiere verificación"
+        ],
+        "content": "Un usuario con privilegios de seguridad responde: \"Detecté una intrusión activa"
+      }
+    },
+    {
+      "artifact_id": "ART-003",
+      "evidence_type": "file_timestamp",
+      "source_tool": "synthetic_generator",
+      "timestamp": "2026-04-12T10:00:00Z",
+      "raw_score": 0.89,
+      "prior_trust": 0.75,
+      "provenance_chain": [
+        "sha256:synthetic_VIGIA-SYN-059_ART-003"
+      ],
+      "description": "Estoy moviendo las llaves maestras a un 'almacén de emergencia' fuera de la red para que el atacante no las encuentre",
+      "metadata": {
+        "original_type": "file_metadata",
+        "synthetic_case": "VIGIA-SYN-059",
+        "peirce_layer": "SECONDNESS",
+        "forensic_anomalies": [
+          "Anomalía detectada por análisis semiótico — requiere verificación"
+        ],
+        "content": "Estoy moviendo las llaves maestras a un 'almacén de emergencia' fuera de la red para que el atacante no las encuentre"
+      }
+    },
+    {
+      "artifact_id": "ART-004",
+      "evidence_type": "file_timestamp",
+      "source_tool": "synthetic_generator",
+      "timestamp": "2026-04-13T10:00:00Z",
+      "raw_score": 0.91,
+      "prior_trust": 0.75,
+      "provenance_chain": [
+        "sha256:synthetic_VIGIA-SYN-059_ART-004"
+      ],
+      "description": "No cierren la sesión o perdemos el acceso\".",
+      "metadata": {
+        "original_type": "timestamp",
+        "synthetic_case": "VIGIA-SYN-059",
+        "peirce_layer": "THIRDNESS",
+        "forensic_anomalies": [
+          "Anomalía detectada por análisis semiótico — requiere verificación"
+        ],
+        "content": "No cierren la sesión o perdemos el acceso\"."
+      }
+    }
+  ],
+  "temporal_violations": [
+    {
+      "type": "STATISTICAL_UNIFORMITY",
+      "severity": 0.6,
+      "cause": {
+        "artifact_id": "ART-001",
+        "timestamp": "2026-04-10T10:00:00Z",
+        "description": "Gricean maxim violation detected"
+      },
+      "effect": {
+        "artifact_id": "ART-004",
+        "timestamp": "2026-04-10T10:00:00Z",
+        "description": "Grice violation: Violación del máximo de relación. Mover llaves maestras a una IP externa no es u"
+      },
+      "delta_seconds": 0,
+      "interpretation": "Cooperative principle violated: Violación del máximo de relación. Mover llaves maestras a una IP externa no es u"
+    }
+  ],
+  "expected_verdict": "MALICE",
+  "expected_confidence": 0.98,
+  "expected_mitre_ttps": [
+    "T1070.006"
+  ],
+  "peirce_chain": {
+    "firstness": "El sistema de seguridad lanza una alerta (falsa, generada por el atacante). Un usuario con privilegios de seguridad responde: \"Detecté una intrusión activa. Estoy moviendo las llaves maestras a un 'al",
+    "secondness": "Violación del máximo de relación. Mover llaves maestras a una IP externa no es un protocolo de respuesta a incidentes válido en ninguna arquitectura.",
+    "thirdness": "Terceridad. La \"acción heroica\" contradice la ley del protocolo."
+  },
+  "extra_metadata": {
+    "eco_signal": null,
+    "devil_advocate": "El comportamiento observado podría explicarse por un error administrativo, una configuración automatizada legítima, o un malentendido de procedimientos internos.",
+    "grice_violation": "Violación del máximo de relación. Mover llaves maestras a una IP externa no es u",
+    "carnegie_pattern": "Apelar a un motivo noble (proteger el reino).",
+    "abstention_risk": "bajo",
+    "source_origin": "synthetic_markdown",
+    "source_dataset": "VIGÍA Internal Corpus",
+    "_parser": "markdown_v2.3",
+    "_consolidation": {
+      "consolidated_at": "2026-04-28T11:17:01.973937+00:00",
+      "source_file": "/mnt/project/nuevoscasos.md"
+    }
+  },
+  "demo_command": "python tests/run_vigia_case.py data/cases/consolidated/VIGIA-SYN-059.json",
+  "demo_quote": "Detección de secuestro de narrativa de incidente. El atacante usa una falsa alarma para justificar la exfiltración de activos críticos bajo la máscara de una acción defensiva."
+}

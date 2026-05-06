@@ -1,0 +1,97 @@
+{
+  "case_id": "VIGIA-SYN-115",
+  "name": "El \"Desliz de la Identidad Latente\" – Peirce: Atribución Trans-Teclado",
+  "description": "Detección de incongruencia de hábito táctil. El operador muestra una memoria muscular de Linux en un entorno Windows. Probable intruso externo con formación en pentesting operando credenciales robadas.",
+  "artifacts": [
+    {
+      "artifact_id": "ART-001",
+      "evidence_type": "log_entry",
+      "source_tool": "synthetic_generator",
+      "timestamp": "2026-04-10T10:00:00Z",
+      "raw_score": 0.8,
+      "prior_trust": 0.75,
+      "provenance_chain": [
+        "sha256:synthetic_VIGIA-SYN-115_ART-001"
+      ],
+      "description": "Un usuario en una terminal de Windows tipea comandos en inglés perfecto",
+      "metadata": {
+        "original_type": "bash_history",
+        "synthetic_case": "VIGIA-SYN-115",
+        "peirce_layer": "FIRSTNESS",
+        "forensic_anomalies": [
+          "Anomalía detectada por análisis semiótico — requiere verificación"
+        ],
+        "content": "Un usuario en una terminal de Windows tipea comandos en inglés perfecto"
+      }
+    },
+    {
+      "artifact_id": "ART-002",
+      "evidence_type": "file_timestamp",
+      "source_tool": "synthetic_generator",
+      "timestamp": "2026-04-11T10:00:00Z",
+      "raw_score": 0.82,
+      "prior_trust": 0.75,
+      "provenance_chain": [
+        "sha256:synthetic_VIGIA-SYN-115_ART-002"
+      ],
+      "description": "En un momento de apuro, intenta borrar una línea con la combinación de teclas Ctrl+U",
+      "metadata": {
+        "original_type": "file_metadata",
+        "synthetic_case": "VIGIA-SYN-115",
+        "peirce_layer": "SECONDNESS",
+        "forensic_anomalies": [
+          "Destrucción de evidencia potencial"
+        ],
+        "content": "En un momento de apuro, intenta borrar una línea con la combinación de teclas Ctrl+U"
+      }
+    },
+    {
+      "artifact_id": "ART-003",
+      "evidence_type": "log_entry",
+      "source_tool": "synthetic_generator",
+      "timestamp": "2026-04-12T10:00:00Z",
+      "raw_score": 0.84,
+      "prior_trust": 0.75,
+      "provenance_chain": [
+        "sha256:synthetic_VIGIA-SYN-115_ART-003"
+      ],
+      "description": "En la shell de Windows (CMD/PowerShell), Ctrl+U no borra la línea; es un hábito de Bash (Linux).",
+      "metadata": {
+        "original_type": "bash_history",
+        "synthetic_case": "VIGIA-SYN-115",
+        "peirce_layer": "SECONDNESS",
+        "forensic_anomalies": [
+          "Anomalía detectada por análisis semiótico — requiere verificación"
+        ],
+        "content": "En la shell de Windows (CMD/PowerShell), Ctrl+U no borra la línea; es un hábito de Bash (Linux)."
+      }
+    }
+  ],
+  "temporal_violations": [],
+  "expected_verdict": "MALICE",
+  "expected_confidence": 0.95,
+  "expected_mitre_ttps": [
+    "T1070.006"
+  ],
+  "peirce_chain": {
+    "firstness": "Un usuario en una terminal de Windows tipea comandos en inglés perfecto. En un momento de apuro, intenta borrar una línea con la combinación de teclas Ctrl+U. En la shell de Windows (CMD/PowerShell), ",
+    "secondness": "Segundidad (Index). La memoria muscular delata a un operador habituado a sistemas Unix/Linux operando bajo una identidad de usuario administrativo de Windows.",
+    "thirdness": "Interpretación simbólica de la intención."
+  },
+  "extra_metadata": {
+    "eco_signal": "El atacante estudió la narrativa (el \"qué decir\"), pero falló en la física (el \"",
+    "devil_advocate": "Las inconsistencias detectadas podrían deberse a un cambio de hábitos personales, una rotación de personal, o una herramienta de automatización no documentada.",
+    "grice_violation": null,
+    "carnegie_pattern": null,
+    "abstention_risk": "bajo",
+    "source_origin": "synthetic_markdown",
+    "source_dataset": "VIGÍA Internal Corpus",
+    "_parser": "markdown_v2.3",
+    "_consolidation": {
+      "consolidated_at": "2026-04-28T11:17:01.983739+00:00",
+      "source_file": "/mnt/project/casoscasos.md"
+    }
+  },
+  "demo_command": "python tests/run_vigia_case.py data/cases/consolidated/VIGIA-SYN-115.json",
+  "demo_quote": "Detección de incongruencia de hábito táctil. El operador muestra una memoria muscular de Linux en un entorno Windows. Probable intruso externo con formación en pentesting operando credenciales robadas"
+}

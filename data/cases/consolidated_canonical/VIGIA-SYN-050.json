@@ -1,0 +1,156 @@
+{
+  "case_id": "VIGIA-SYN-050",
+  "name": "La \"Máscara de Confusión Masiva\" – Sincronización de Pánico",
+  "description": "** \"Detección de ataque de normalización por pánico. La cascada de reportes falsos busca anular la visibilidad del borrado de evidencias.",
+  "artifacts": [
+    {
+      "artifact_id": "ART-001",
+      "evidence_type": "default",
+      "source_tool": "synthetic_generator",
+      "timestamp": "2026-04-10T10:00:00Z",
+      "raw_score": 0.85,
+      "prior_trust": 0.75,
+      "provenance_chain": [
+        "sha256:synthetic_VIGIA-SYN-050_ART-001"
+      ],
+      "description": "Durante un despliegue de software, aparecen múltiples mensajes de cuentas distintas preguntando: \"¿Vieron el error en el cluster?\", \"¿También les salió el timeout?\", \"A mí me está borrando archivos, ¡ayuda!\"",
+      "metadata": {
+        "original_type": "slack_message",
+        "synthetic_case": "VIGIA-SYN-050",
+        "peirce_layer": "FIRSTNESS",
+        "forensic_anomalies": [
+          "Anomalía detectada por análisis semiótico — requiere verificación"
+        ],
+        "content": "Durante un despliegue de software, aparecen múltiples mensajes de cuentas distintas preguntando: \"¿Vieron el error en el cluster?\", \"¿También les salió el timeout?\", \"A mí me está borrando archivos, ¡ayuda!\""
+      }
+    },
+    {
+      "artifact_id": "ART-002",
+      "evidence_type": "default",
+      "source_tool": "synthetic_generator",
+      "timestamp": "2026-04-11T10:00:00Z",
+      "raw_score": 0.87,
+      "prior_trust": 0.75,
+      "provenance_chain": [
+        "sha256:synthetic_VIGIA-SYN-050_ART-002"
+      ],
+      "description": "En medio de la confusión, se borran los logs de auditoría del servidor principal",
+      "metadata": {
+        "original_type": "syslog",
+        "synthetic_case": "VIGIA-SYN-050",
+        "peirce_layer": "SECONDNESS",
+        "forensic_anomalies": [
+          "Anomalía detectada por análisis semiótico — requiere verificación"
+        ],
+        "content": "En medio de la confusión, se borran los logs de auditoría del servidor principal"
+      }
+    },
+    {
+      "artifact_id": "ART-003",
+      "evidence_type": "file_timestamp",
+      "source_tool": "synthetic_generator",
+      "timestamp": "2026-04-12T10:00:00Z",
+      "raw_score": 0.89,
+      "prior_trust": 0.75,
+      "provenance_chain": [
+        "sha256:synthetic_VIGIA-SYN-050_ART-003"
+      ],
+      "description": "* **Carnegie Appeal:** \"Haga que la otra persona se sienta feliz de hacer lo que usted sugiere\" (en este caso, unirse al pánico colectivo)",
+      "metadata": {
+        "original_type": "file_metadata",
+        "synthetic_case": "VIGIA-SYN-050",
+        "peirce_layer": "SECONDNESS",
+        "forensic_anomalies": [
+          "Anomalía detectada por análisis semiótico — requiere verificación"
+        ],
+        "content": "* **Carnegie Appeal:** \"Haga que la otra persona se sienta feliz de hacer lo que usted sugiere\" (en este caso, unirse al pánico colectivo)"
+      }
+    },
+    {
+      "artifact_id": "ART-004",
+      "evidence_type": "file_timestamp",
+      "source_tool": "synthetic_generator",
+      "timestamp": "2026-04-13T10:00:00Z",
+      "raw_score": 0.91,
+      "prior_trust": 0.75,
+      "provenance_chain": [
+        "sha256:synthetic_VIGIA-SYN-050_ART-004"
+      ],
+      "description": "* **Grice:** Violación del máximo de manera (caos informativo)",
+      "metadata": {
+        "original_type": "file_metadata",
+        "synthetic_case": "VIGIA-SYN-050",
+        "peirce_layer": "THIRDNESS",
+        "forensic_anomalies": [
+          "Anomalía detectada por análisis semiótico — requiere verificación"
+        ],
+        "content": "* **Grice:** Violación del máximo de manera (caos informativo)"
+      }
+    },
+    {
+      "artifact_id": "ART-005",
+      "evidence_type": "file_timestamp",
+      "source_tool": "synthetic_generator",
+      "timestamp": "2026-04-14T10:00:00Z",
+      "raw_score": 0.93,
+      "prior_trust": 0.75,
+      "provenance_chain": [
+        "sha256:synthetic_VIGIA-SYN-050_ART-005"
+      ],
+      "description": "* **Peirce:** Terceridad",
+      "metadata": {
+        "original_type": "file_metadata",
+        "synthetic_case": "VIGIA-SYN-050",
+        "peirce_layer": "THIRDNESS",
+        "forensic_anomalies": [
+          "Anomalía detectada por análisis semiótico — requiere verificación"
+        ],
+        "content": "* **Peirce:** Terceridad"
+      }
+    }
+  ],
+  "temporal_violations": [
+    {
+      "type": "STATISTICAL_UNIFORMITY",
+      "severity": 0.6,
+      "cause": {
+        "artifact_id": "ART-001",
+        "timestamp": "2026-04-10T10:00:00Z",
+        "description": "Gricean maxim violation detected"
+      },
+      "effect": {
+        "artifact_id": "ART-005",
+        "timestamp": "2026-04-10T10:00:00Z",
+        "description": "Grice violation: Violación del máximo de manera (caos informativo).\n* **Peirce:** Terceridad. La"
+      },
+      "delta_seconds": 0,
+      "interpretation": "Cooperative principle violated: Violación del máximo de manera (caos informativo).\n* **Peirce:** Terceridad. La"
+    }
+  ],
+  "expected_verdict": "MALICE",
+  "expected_confidence": 0.9,
+  "expected_mitre_ttps": [
+    "T1070.006"
+  ],
+  "peirce_chain": {
+    "firstness": "Durante un despliegue de software, aparecen múltiples mensajes de cuentas distintas preguntando: \"¿Vieron el error en el cluster?\", \"¿También les salió el timeout?\", \"A mí me está borrando archivos, ¡",
+    "secondness": "Violación del máximo de manera (caos informativo).\n* **Peirce:** Terceridad. La crisis es el signo fabricado para saturar la respuesta de incidentes.\n* **Eco:** El \"ruido\" es el mensaje central.\n* **I",
+    "thirdness": "Terceridad. La crisis es el signo fabricado para saturar la respuesta de incidentes.\n* **Eco:** El \"ruido\" es el mensaje central.\n* **Interpretación de VIGÍA:** \"Detección de ataque de normalización por pánico. La cascada de reportes falsos busca anular la visibilidad del borrado de evidencias. Vere"
+  },
+  "extra_metadata": {
+    "eco_signal": "El \"ruido\" es el mensaje central.\n* **Interpretación de VIGÍA:** \"Detección de a",
+    "devil_advocate": "El comportamiento observado podría explicarse por un error administrativo, una configuración automatizada legítima, o un malentendido de procedimientos internos.",
+    "grice_violation": "Violación del máximo de manera (caos informativo).\n* **Peirce:** Terceridad. La",
+    "carnegie_pattern": "\"Haga que la otra persona se sienta feliz de hacer lo que usted sugiere\" (en est",
+    "abstention_risk": "bajo",
+    "source_origin": "synthetic_markdown",
+    "source_dataset": "VIGÍA Internal Corpus",
+    "_parser": "markdown_v2.3",
+    "_consolidation": {
+      "consolidated_at": "2026-04-28T11:17:01.970590+00:00",
+      "source_file": "/mnt/project/nuevoscasos.md"
+    }
+  },
+  "demo_command": "python tests/run_vigia_case.py data/cases/consolidated/VIGIA-SYN-050.json",
+  "demo_quote": "** \"Detección de ataque de normalización por pánico. La cascada de reportes falsos busca anular la visibilidad del borrado de evidencias."
+}

@@ -1,0 +1,72 @@
+{
+  "case_id": "VIGIA-SYN-017",
+  "name": "Cronología Asimétrica (The Time – Traveler's Slip)",
+  "description": "“El archivo audit_log.zip no contiene logs reales. El remitente violó el principio cooperativo de Grice al presentar un signo que no corresponde a la realidad. Posible falsificación de auditoría.",
+  "artifacts": [
+    {
+      "artifact_id": "ART-001",
+      "evidence_type": "network_artifact",
+      "source_tool": "synthetic_generator",
+      "timestamp": "2026-04-10T10:00:00Z",
+      "raw_score": 0.95,
+      "prior_trust": 0.9,
+      "provenance_chain": [
+        "sha256:synthetic_VIGIA-SYN-017_ART-001"
+      ],
+      "description": "Uso de términos técnicos con errores semánticos (por ejemplo, “cifrar” en lugar de “encriptar” cuando no se aplica criptografía), falta de metadatos en archivos.",
+      "metadata": {
+        "original_type": "network_flow",
+        "synthetic_case": "VIGIA-SYN-017",
+        "peirce_layer": "FIRSTNESS",
+        "forensic_anomalies": [
+          "Anomalía detectada por análisis semiótico — requiere verificación"
+        ],
+        "content": "Uso de términos técnicos con errores semánticos (por ejemplo, “cifrar” en lugar de “encriptar” cuando no se aplica criptografía), falta de metadatos en archivos."
+      }
+    }
+  ],
+  "temporal_violations": [
+    {
+      "type": "STATISTICAL_UNIFORMITY",
+      "severity": 0.6,
+      "cause": {
+        "artifact_id": "ART-001",
+        "timestamp": "2026-04-10T10:00:00Z",
+        "description": "Gricean maxim violation detected"
+      },
+      "effect": {
+        "artifact_id": "ART-001",
+        "timestamp": "2026-04-10T10:00:00Z",
+        "description": "Grice violation: \"Yo solo estaba cumpliendo el protocolo\"."
+      },
+      "delta_seconds": 0,
+      "interpretation": "Cooperative principle violated: \"Yo solo estaba cumpliendo el protocolo\"."
+    }
+  ],
+  "expected_verdict": "MALICE",
+  "expected_confidence": 0.9,
+  "expected_mitre_ttps": [
+    "T1070.006"
+  ],
+  "peirce_chain": {
+    "firstness": "Uso de términos técnicos con errores semánticos (por ejemplo, “cifrar” en lugar de “encriptar” cuando no se aplica criptografía), falta de metadatos en archivos.",
+    "secondness": "\"Yo solo estaba cumpliendo el protocolo\".",
+    "thirdness": "“Es un error común en los protocolos, pero no es un problema grave” (reducción del riesgo para minimizar la atención)."
+  },
+  "extra_metadata": {
+    "eco_signal": "Silencio significativo – la ausencia de firmas digitales en un archivo que deber",
+    "devil_advocate": "El comportamiento observado podría explicarse por un error administrativo, una configuración automatizada legítima, o un malentendido de procedimientos internos.",
+    "grice_violation": "\"Yo solo estaba cumpliendo el protocolo\".",
+    "carnegie_pattern": "“Es un error común en los protocolos, pero no es un problema grave” (reducción d",
+    "abstention_risk": "bajo",
+    "source_origin": "synthetic_markdown",
+    "source_dataset": "VIGÍA Internal Corpus",
+    "_parser": "markdown_v2.3",
+    "_consolidation": {
+      "consolidated_at": "2026-04-28T11:17:01.980574+00:00",
+      "source_file": "/mnt/project/casos2.md"
+    }
+  },
+  "demo_command": "python tests/run_vigia_case.py data/cases/consolidated/VIGIA-SYN-017.json",
+  "demo_quote": "“El archivo audit_log.zip no contiene logs reales. El remitente violó el principio cooperativo de Grice al presentar un signo que no corresponde a la realidad. Posible falsificación de auditoría."
+}

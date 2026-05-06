@@ -1,0 +1,93 @@
+{
+  "case_id": "VIGIA-SYN-081",
+  "name": "El \"Desliz de Pensamiento\" (Reverse Keyboard Slip)",
+  "description": "Detección de calco semántico translingüístico. El error de elección de palabras delata el idioma materno del operador a pesar de su fluidez en inglés.",
+  "artifacts": [
+    {
+      "artifact_id": "ART-001",
+      "evidence_type": "default",
+      "source_tool": "synthetic_generator",
+      "timestamp": "2026-04-10T10:00:00Z",
+      "raw_score": 0.95,
+      "prior_trust": 0.9,
+      "provenance_chain": [
+        "sha256:synthetic_VIGIA-SYN-081_ART-001"
+      ],
+      "description": "Un atacante escribe en inglés perfecto en un ticket de soporte: \"I need to check the state of the country\"",
+      "metadata": {
+        "original_type": "slack_message",
+        "synthetic_case": "VIGIA-SYN-081",
+        "peirce_layer": "FIRSTNESS",
+        "forensic_anomalies": [
+          "Anomalía detectada por análisis semiótico — requiere verificación"
+        ],
+        "content": "Un atacante escribe en inglés perfecto en un ticket de soporte: \"I need to check the state of the country\""
+      }
+    },
+    {
+      "artifact_id": "ART-002",
+      "evidence_type": "file_timestamp",
+      "source_tool": "synthetic_generator",
+      "timestamp": "2026-04-11T10:00:00Z",
+      "raw_score": 0.95,
+      "prior_trust": 0.9,
+      "provenance_chain": [
+        "sha256:synthetic_VIGIA-SYN-081_ART-002"
+      ],
+      "description": "Sin embargo, el rastro técnico muestra que intentó acceder a un archivo de configuración de red donde el comentario original era \"state of the region\".",
+      "metadata": {
+        "original_type": "file_metadata",
+        "synthetic_case": "VIGIA-SYN-081",
+        "peirce_layer": "SECONDNESS",
+        "forensic_anomalies": [
+          "Anomalía detectada por análisis semiótico — requiere verificación"
+        ],
+        "content": "Sin embargo, el rastro técnico muestra que intentó acceder a un archivo de configuración de red donde el comentario original era \"state of the region\"."
+      }
+    }
+  ],
+  "temporal_violations": [
+    {
+      "type": "STATISTICAL_UNIFORMITY",
+      "severity": 0.6,
+      "cause": {
+        "artifact_id": "ART-001",
+        "timestamp": "2026-04-10T10:00:00Z",
+        "description": "Gricean maxim violation detected"
+      },
+      "effect": {
+        "artifact_id": "ART-002",
+        "timestamp": "2026-04-10T10:00:00Z",
+        "description": "Grice violation: Violación del máximo de relación entre el lenguaje natural y el contexto técnico"
+      },
+      "delta_seconds": 0,
+      "interpretation": "Cooperative principle violated: Violación del máximo de relación entre el lenguaje natural y el contexto técnico"
+    }
+  ],
+  "expected_verdict": "MALICE",
+  "expected_confidence": 0.93,
+  "expected_mitre_ttps": [
+    "T1070.006"
+  ],
+  "peirce_chain": {
+    "firstness": "Un atacante escribe en inglés perfecto en un ticket de soporte: \"I need to check the state of the country\". Sin embargo, el rastro técnico muestra que intentó acceder a un archivo de configuración de ",
+    "secondness": "Violación del máximo de relación entre el lenguaje natural y el contexto técnico del servidor.",
+    "thirdness": "Terceridad. En ruso, la palabra \"cnhfyt\" (que en QWERTY es \"country\") se usa a menudo en contextos donde un angloparlante diría \"area\" o \"region\". El atacante tradujo su pensamiento, no el término técnico."
+  },
+  "extra_metadata": {
+    "eco_signal": null,
+    "devil_advocate": "Las inconsistencias detectadas podrían deberse a un cambio de hábitos personales, una rotación de personal, o una herramienta de automatización no documentada.",
+    "grice_violation": "Violación del máximo de relación entre el lenguaje natural y el contexto técnico",
+    "carnegie_pattern": null,
+    "abstention_risk": "bajo",
+    "source_origin": "synthetic_markdown",
+    "source_dataset": "VIGÍA Internal Corpus",
+    "_parser": "markdown_v2.3",
+    "_consolidation": {
+      "consolidated_at": "2026-04-28T11:17:01.977707+00:00",
+      "source_file": "/mnt/project/nuevoscasos.md"
+    }
+  },
+  "demo_command": "python tests/run_vigia_case.py data/cases/consolidated/VIGIA-SYN-081.json",
+  "demo_quote": "Detección de calco semántico translingüístico. El error de elección de palabras delata el idioma materno del operador a pesar de su fluidez en inglés."
+}

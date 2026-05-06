@@ -1,0 +1,93 @@
+{
+  "case_id": "VIGIA-SYN-094",
+  "name": "El \"Agujero Negro Burocrático\" – Inundación por Cumplimiento",
+  "description": "Detección de entrelazamiento documental. La narrativa de 'cumplimiento histórico' es una fabricación temporal de último minuto.",
+  "artifacts": [
+    {
+      "artifact_id": "ART-001",
+      "evidence_type": "file_timestamp",
+      "source_tool": "synthetic_generator",
+      "timestamp": "2026-04-10T10:00:00Z",
+      "raw_score": 0.95,
+      "prior_trust": 0.9,
+      "provenance_chain": [
+        "sha256:synthetic_VIGIA-SYN-094_ART-001"
+      ],
+      "description": "Ante una auditoría por una fuga de datos, el responsable entrega 200 PDFs de \"Reportes de Integridad\"",
+      "metadata": {
+        "original_type": "file_metadata",
+        "synthetic_case": "VIGIA-SYN-094",
+        "peirce_layer": "FIRSTNESS",
+        "forensic_anomalies": [
+          "Anomalía detectada por análisis semiótico — requiere verificación"
+        ],
+        "content": "Ante una auditoría por una fuga de datos, el responsable entrega 200 PDFs de \"Reportes de Integridad\""
+      }
+    },
+    {
+      "artifact_id": "ART-002",
+      "evidence_type": "file_timestamp",
+      "source_tool": "synthetic_generator",
+      "timestamp": "2026-04-11T10:00:00Z",
+      "raw_score": 0.95,
+      "prior_trust": 0.9,
+      "provenance_chain": [
+        "sha256:synthetic_VIGIA-SYN-094_ART-002"
+      ],
+      "description": "VIGÍA detecta que todos los metadatos de creación de esos 200 archivos tienen una diferencia exacta de 1.2 segundos entre sí.",
+      "metadata": {
+        "original_type": "file_metadata",
+        "synthetic_case": "VIGIA-SYN-094",
+        "peirce_layer": "SECONDNESS",
+        "forensic_anomalies": [
+          "Anomalía detectada por análisis semiótico — requiere verificación"
+        ],
+        "content": "VIGÍA detecta que todos los metadatos de creación de esos 200 archivos tienen una diferencia exacta de 1.2 segundos entre sí."
+      }
+    }
+  ],
+  "temporal_violations": [
+    {
+      "type": "STATISTICAL_UNIFORMITY",
+      "severity": 0.6,
+      "cause": {
+        "artifact_id": "ART-001",
+        "timestamp": "2026-04-10T10:00:00Z",
+        "description": "Gricean maxim violation detected"
+      },
+      "effect": {
+        "artifact_id": "ART-002",
+        "timestamp": "2026-04-10T10:00:00Z",
+        "description": "Grice violation: Violación del máximo de cantidad. Provee información masiva para ocultar la falt"
+      },
+      "delta_seconds": 0,
+      "interpretation": "Cooperative principle violated: Violación del máximo de cantidad. Provee información masiva para ocultar la falt"
+    }
+  ],
+  "expected_verdict": "MALICE",
+  "expected_confidence": 0.99,
+  "expected_mitre_ttps": [
+    "T1070.006"
+  ],
+  "peirce_chain": {
+    "firstness": "Ante una auditoría por una fuga de datos, el responsable entrega 200 PDFs de \"Reportes de Integridad\". VIGÍA detecta que todos los metadatos de creación de esos 200 archivos tienen una diferencia exac",
+    "secondness": "Segundidad (Index). La física de la creación de los archivos delata un script de generación masiva (\"Fábrica de Consistencia\"), no una gestión humana de meses.",
+    "thirdness": "Interpretación simbólica de la intención."
+  },
+  "extra_metadata": {
+    "eco_signal": null,
+    "devil_advocate": "El comportamiento observado podría explicarse por un error administrativo, una configuración automatizada legítima, o un malentendido de procedimientos internos.",
+    "grice_violation": "Violación del máximo de cantidad. Provee información masiva para ocultar la falt",
+    "carnegie_pattern": null,
+    "abstention_risk": "bajo",
+    "source_origin": "synthetic_markdown",
+    "source_dataset": "VIGÍA Internal Corpus",
+    "_parser": "markdown_v2.3",
+    "_consolidation": {
+      "consolidated_at": "2026-04-28T11:17:01.922601+00:00",
+      "source_file": "/mnt/project/casosfinal.md"
+    }
+  },
+  "demo_command": "python tests/run_vigia_case.py data/cases/consolidated/VIGIA-SYN-094.json",
+  "demo_quote": "Detección de entrelazamiento documental. La narrativa de 'cumplimiento histórico' es una fabricación temporal de último minuto."
+}

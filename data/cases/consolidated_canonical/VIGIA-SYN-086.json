@@ -1,0 +1,55 @@
+{
+  "case_id": "VIGIA-SYN-086",
+  "name": "El \"Doble Salto de Layout\" – Peirce: Index (Física del Error)",
+  "description": "Detección de Keyboard Slip (Layout ЙЦУКЕН). La corrección inmediata indica un operador con alta disciplina de ocultamiento que falló en la fase de inicialización. Atribución lingüística: Ruso.",
+  "artifacts": [
+    {
+      "artifact_id": "ART-001",
+      "evidence_type": "file_timestamp",
+      "source_tool": "synthetic_generator",
+      "timestamp": "2026-04-10T10:00:00Z",
+      "raw_score": 0.95,
+      "prior_trust": 0.9,
+      "provenance_chain": [
+        "sha256:synthetic_VIGIA-SYN-086_ART-001"
+      ],
+      "description": "En una consola se registra: кщще, luego un borrado rápido, y después sudo.",
+      "metadata": {
+        "original_type": "file_metadata",
+        "synthetic_case": "VIGIA-SYN-086",
+        "peirce_layer": "FIRSTNESS",
+        "forensic_anomalies": [
+          "Desliz de teclado — atribución lingüística"
+        ],
+        "content": "En una consola se registra: кщще, luego un borrado rápido, y después sudo."
+      }
+    }
+  ],
+  "temporal_violations": [],
+  "expected_verdict": "MALICE",
+  "expected_confidence": 0.98,
+  "expected_mitre_ttps": [
+    "T1070.006"
+  ],
+  "peirce_chain": {
+    "firstness": "Primeridad (Rastro físico). кщще es root en el teclado ruso. El hecho de que el atacante se haya dado cuenta y haya borrado inmediatamente para poner sudo indica que es un operador humano consciente de su OPSEC, pero traicionado por su memoria muscular inicial.",
+    "secondness": "Contradicción indexical en los artefactos.",
+    "thirdness": "Interpretación simbólica de la intención."
+  },
+  "extra_metadata": {
+    "eco_signal": "El uso posterior de sudo (comando más común en entornos modernos) es un intento",
+    "devil_advocate": "El comportamiento observado podría explicarse por un error administrativo, una configuración automatizada legítima, o un malentendido de procedimientos internos.",
+    "grice_violation": null,
+    "carnegie_pattern": null,
+    "abstention_risk": "bajo",
+    "source_origin": "synthetic_markdown",
+    "source_dataset": "VIGÍA Internal Corpus",
+    "_parser": "markdown_v2.3",
+    "_consolidation": {
+      "consolidated_at": "2026-04-28T11:17:01.919537+00:00",
+      "source_file": "/mnt/project/casosfinal.md"
+    }
+  },
+  "demo_command": "python tests/run_vigia_case.py data/cases/consolidated/VIGIA-SYN-086.json",
+  "demo_quote": "Detección de Keyboard Slip (Layout ЙЦУКЕН). La corrección inmediata indica un operador con alta disciplina de ocultamiento que falló en la fase de inicialización. Atribución lingüística: Ruso."
+}

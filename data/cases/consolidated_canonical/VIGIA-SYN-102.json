@@ -1,0 +1,76 @@
+{
+  "case_id": "VIGIA-SYN-102",
+  "name": "El \"Espejo del Soporte\" – Mimesis Lingüística",
+  "description": "Detección de mimetismo lingüístico táctico. El atacante usa el 'lenguaje de la casa' para anular la alerta del operador.",
+  "artifacts": [
+    {
+      "artifact_id": "ART-001",
+      "evidence_type": "file_timestamp",
+      "source_tool": "synthetic_generator",
+      "timestamp": "2026-04-10T10:00:00Z",
+      "raw_score": 0.95,
+      "prior_trust": 0.9,
+      "provenance_chain": [
+        "sha256:synthetic_VIGIA-SYN-102_ART-001"
+      ],
+      "description": "Un atacante interactúa con un técnico",
+      "metadata": {
+        "original_type": "file_metadata",
+        "synthetic_case": "VIGIA-SYN-102",
+        "peirce_layer": "FIRSTNESS",
+        "forensic_anomalies": [
+          "Anomalía detectada por análisis semiótico — requiere verificación"
+        ],
+        "content": "Un atacante interactúa con un técnico"
+      }
+    },
+    {
+      "artifact_id": "ART-002",
+      "evidence_type": "file_timestamp",
+      "source_tool": "synthetic_generator",
+      "timestamp": "2026-04-11T10:00:00Z",
+      "raw_score": 0.95,
+      "prior_trust": 0.9,
+      "provenance_chain": [
+        "sha256:synthetic_VIGIA-SYN-102_ART-002"
+      ],
+      "description": "Copia y pega las muletillas exactas del técnico (\"Entiendo su frustración\", \"Estamos trabajando en ello\") para pedir un \"reset de contraseña de emergencia\" de una cuenta de alto nivel.",
+      "metadata": {
+        "original_type": "file_metadata",
+        "synthetic_case": "VIGIA-SYN-102",
+        "peirce_layer": "SECONDNESS",
+        "forensic_anomalies": [
+          "Anomalía detectada por análisis semiótico — requiere verificación"
+        ],
+        "content": "Copia y pega las muletillas exactas del técnico (\"Entiendo su frustración\", \"Estamos trabajando en ello\") para pedir un \"reset de contraseña de emergencia\" de una cuenta de alto nivel."
+      }
+    }
+  ],
+  "temporal_violations": [],
+  "expected_verdict": "MALICE",
+  "expected_confidence": 0.94,
+  "expected_mitre_ttps": [
+    "T1070.006"
+  ],
+  "peirce_chain": {
+    "firstness": "Un atacante interactúa con un técnico. Copia y pega las muletillas exactas del técnico (\"Entiendo su frustración\", \"Estamos trabajando en ello\") para pedir un \"reset de contraseña de emergencia\" de un",
+    "secondness": "Contradicción indexical en los artefactos.",
+    "thirdness": "Terceridad (Mimesis)."
+  },
+  "extra_metadata": {
+    "eco_signal": null,
+    "devil_advocate": "El comportamiento observado podría explicarse por un error administrativo, una configuración automatizada legítima, o un malentendido de procedimientos internos.",
+    "grice_violation": null,
+    "carnegie_pattern": "El efecto espejo (mirroring) para generar una falsa sensación de pertenencia y c",
+    "abstention_risk": "bajo",
+    "source_origin": "synthetic_markdown",
+    "source_dataset": "VIGÍA Internal Corpus",
+    "_parser": "markdown_v2.3",
+    "_consolidation": {
+      "consolidated_at": "2026-04-28T11:17:01.956254+00:00",
+      "source_file": "/mnt/project/casosfinal.md"
+    }
+  },
+  "demo_command": "python tests/run_vigia_case.py data/cases/consolidated/VIGIA-SYN-102.json",
+  "demo_quote": "Detección de mimetismo lingüístico táctico. El atacante usa el 'lenguaje de la casa' para anular la alerta del operador."
+}

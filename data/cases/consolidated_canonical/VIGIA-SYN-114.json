@@ -1,0 +1,97 @@
+{
+  "case_id": "VIGIA-SYN-114",
+  "name": "El \"Cebo del Mártir Corporativo\" – Carnegie: El Sacrificio",
+  "description": "Uso de la autodenuncia como método de destrucción de evidencia. La 'transparencia' sobre el troyano es la máscara necesaria para el purgado de logs de acceso a propiedad intelectual.",
+  "artifacts": [
+    {
+      "artifact_id": "ART-001",
+      "evidence_type": "file_timestamp",
+      "source_tool": "synthetic_generator",
+      "timestamp": "2026-04-10T10:00:00Z",
+      "raw_score": 0.85,
+      "prior_trust": 0.75,
+      "provenance_chain": [
+        "sha256:synthetic_VIGIA-SYN-114_ART-001"
+      ],
+      "description": "Un empleado senior detecta un malware y lo reporta: \"Instalé una app de clima que resultó tener un troyano",
+      "metadata": {
+        "original_type": "file_metadata",
+        "synthetic_case": "VIGIA-SYN-114",
+        "peirce_layer": "FIRSTNESS",
+        "forensic_anomalies": [
+          "Anomalía detectada por análisis semiótico — requiere verificación"
+        ],
+        "content": "Un empleado senior detecta un malware y lo reporta: \"Instalé una app de clima que resultó tener un troyano"
+      }
+    },
+    {
+      "artifact_id": "ART-002",
+      "evidence_type": "network_artifact",
+      "source_tool": "synthetic_generator",
+      "timestamp": "2026-04-11T10:00:00Z",
+      "raw_score": 0.87,
+      "prior_trust": 0.75,
+      "provenance_chain": [
+        "sha256:synthetic_VIGIA-SYN-114_ART-002"
+      ],
+      "description": "Soy un irresponsable, ya estoy formateando mi equipo para que no se propague\"",
+      "metadata": {
+        "original_type": "network_flow",
+        "synthetic_case": "VIGIA-SYN-114",
+        "peirce_layer": "SECONDNESS",
+        "forensic_anomalies": [
+          "Anomalía detectada por análisis semiótico — requiere verificación"
+        ],
+        "content": "Soy un irresponsable, ya estoy formateando mi equipo para que no se propague\""
+      }
+    },
+    {
+      "artifact_id": "ART-003",
+      "evidence_type": "network_artifact",
+      "source_tool": "synthetic_generator",
+      "timestamp": "2026-04-12T10:00:00Z",
+      "raw_score": 0.89,
+      "prior_trust": 0.75,
+      "provenance_chain": [
+        "sha256:synthetic_VIGIA-SYN-114_ART-003"
+      ],
+      "description": "VIGÍA detecta que el \"formateo\" borró el registro de una conexión persistente a la base de datos de patentes que ocurrió desde ese equipo 2 horas antes de la denuncia.",
+      "metadata": {
+        "original_type": "network_flow",
+        "synthetic_case": "VIGIA-SYN-114",
+        "peirce_layer": "SECONDNESS",
+        "forensic_anomalies": [
+          "Anomalía detectada por análisis semiótico — requiere verificación"
+        ],
+        "content": "VIGÍA detecta que el \"formateo\" borró el registro de una conexión persistente a la base de datos de patentes que ocurrió desde ese equipo 2 horas antes de la denuncia."
+      }
+    }
+  ],
+  "temporal_violations": [],
+  "expected_verdict": "MALICE",
+  "expected_confidence": 0.98,
+  "expected_mitre_ttps": [
+    "T1070.006"
+  ],
+  "peirce_chain": {
+    "firstness": "Un empleado senior detecta un malware y lo reporta: \"Instalé una app de clima que resultó tener un troyano. Soy un irresponsable, ya estoy formateando mi equipo para que no se propague\". VIGÍA detecta",
+    "secondness": "Contradicción indexical en los artefactos.",
+    "thirdness": "\"Admita sus errores rápida y enfáticamente\". El atacante se incrimina en una falta menor (el troyano del clima) para justificar la destrucción de la evidencia de la falta mayor (espionaje industrial)."
+  },
+  "extra_metadata": {
+    "eco_signal": "Falso rastro de incompetencia.",
+    "devil_advocate": "El comportamiento observado podría explicarse por un error administrativo, una configuración automatizada legítima, o un malentendido de procedimientos internos.",
+    "grice_violation": null,
+    "carnegie_pattern": "\"Admita sus errores rápida y enfáticamente\". El atacante se incrimina en una fal",
+    "abstention_risk": "bajo",
+    "source_origin": "synthetic_markdown",
+    "source_dataset": "VIGÍA Internal Corpus",
+    "_parser": "markdown_v2.3",
+    "_consolidation": {
+      "consolidated_at": "2026-04-28T11:17:01.983401+00:00",
+      "source_file": "/mnt/project/casoscasos.md"
+    }
+  },
+  "demo_command": "python tests/run_vigia_case.py data/cases/consolidated/VIGIA-SYN-114.json",
+  "demo_quote": "Uso de la autodenuncia como método de destrucción de evidencia. La 'transparencia' sobre el troyano es la máscara necesaria para el purgado de logs de acceso a propiedad intelectual."
+}

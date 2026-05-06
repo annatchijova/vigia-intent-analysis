@@ -1,0 +1,97 @@
+{
+  "case_id": "VIGIA-SYN-078",
+  "name": "El \"Teatro del Dead Man's Switch\" – Eco: Signo de Fuerza",
+  "description": "Detección de coacción semántica. El mensaje busca paralizar la respuesta forense mediante una amenaza técnica de baja verosimilitud.",
+  "artifacts": [
+    {
+      "artifact_id": "ART-001",
+      "evidence_type": "default",
+      "source_tool": "synthetic_generator",
+      "timestamp": "2026-04-10T10:00:00Z",
+      "raw_score": 0.85,
+      "prior_trust": 0.75,
+      "provenance_chain": [
+        "sha256:synthetic_VIGIA-SYN-078_ART-001"
+      ],
+      "description": "Un mensaje automático llega a la consola de administración: \"Sistema de autodestrucción de logs activado",
+      "metadata": {
+        "original_type": "syslog",
+        "synthetic_case": "VIGIA-SYN-078",
+        "peirce_layer": "FIRSTNESS",
+        "forensic_anomalies": [
+          "Anomalía detectada por análisis semiótico — requiere verificación"
+        ],
+        "content": "Un mensaje automático llega a la consola de administración: \"Sistema de autodestrucción de logs activado"
+      }
+    },
+    {
+      "artifact_id": "ART-002",
+      "evidence_type": "file_timestamp",
+      "source_tool": "synthetic_generator",
+      "timestamp": "2026-04-11T10:00:00Z",
+      "raw_score": 0.87,
+      "prior_trust": 0.75,
+      "provenance_chain": [
+        "sha256:synthetic_VIGIA-SYN-078_ART-002"
+      ],
+      "description": "Si la cuenta 'X' es bloqueada, se purgarán todas las evidencias de los últimos 6 meses",
+      "metadata": {
+        "original_type": "file_metadata",
+        "synthetic_case": "VIGIA-SYN-078",
+        "peirce_layer": "SECONDNESS",
+        "forensic_anomalies": [
+          "Anomalía detectada por análisis semiótico — requiere verificación"
+        ],
+        "content": "Si la cuenta 'X' es bloqueada, se purgarán todas las evidencias de los últimos 6 meses"
+      }
+    },
+    {
+      "artifact_id": "ART-003",
+      "evidence_type": "network_artifact",
+      "source_tool": "synthetic_generator",
+      "timestamp": "2026-04-12T10:00:00Z",
+      "raw_score": 0.89,
+      "prior_trust": 0.75,
+      "provenance_chain": [
+        "sha256:synthetic_VIGIA-SYN-078_ART-003"
+      ],
+      "description": "No intenten rastrear la IP\".",
+      "metadata": {
+        "original_type": "network_flow",
+        "synthetic_case": "VIGIA-SYN-078",
+        "peirce_layer": "SECONDNESS",
+        "forensic_anomalies": [
+          "Anomalía detectada por análisis semiótico — requiere verificación"
+        ],
+        "content": "No intenten rastrear la IP\"."
+      }
+    }
+  ],
+  "temporal_violations": [],
+  "expected_verdict": "MALICE",
+  "expected_confidence": 0.98,
+  "expected_mitre_ttps": [
+    "T1070.006"
+  ],
+  "peirce_chain": {
+    "firstness": "Un mensaje automático llega a la consola de administración: \"Sistema de autodestrucción de logs activado. Si la cuenta 'X' es bloqueada, se purgarán todas las evidencias de los últimos 6 meses. No int",
+    "secondness": "Contradicción indexical en los artefactos.",
+    "thirdness": "Terceridad. La ley de \"autodestrucción\" suele ser una narrativa de ficción usada para ganar tiempo de exfiltración."
+  },
+  "extra_metadata": {
+    "eco_signal": "El mensaje es un signo diseñado para que el analista \"sobre-interprete\" el riesg",
+    "devil_advocate": "El comportamiento observado podría explicarse por un error administrativo, una configuración automatizada legítima, o un malentendido de procedimientos internos.",
+    "grice_violation": null,
+    "carnegie_pattern": "Uso del miedo y la autoridad para forzar una inacción.",
+    "abstention_risk": "bajo",
+    "source_origin": "synthetic_markdown",
+    "source_dataset": "VIGÍA Internal Corpus",
+    "_parser": "markdown_v2.3",
+    "_consolidation": {
+      "consolidated_at": "2026-04-28T11:17:01.976816+00:00",
+      "source_file": "/mnt/project/nuevoscasos.md"
+    }
+  },
+  "demo_command": "python tests/run_vigia_case.py data/cases/consolidated/VIGIA-SYN-078.json",
+  "demo_quote": "Detección de coacción semántica. El mensaje busca paralizar la respuesta forense mediante una amenaza técnica de baja verosimilitud."
+}
