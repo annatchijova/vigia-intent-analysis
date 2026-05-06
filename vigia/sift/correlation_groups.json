@@ -1,0 +1,152 @@
+{
+  "description": "Grupos de correlaci\u00f3n sem\u00e1ntica para noisy_or_correlated(). Penalty: low=10%, medium=30%, high=60%. Aplicar SOLO intra-nivel ontol\u00f3gico.",
+  "groups": {
+    "event_log_correlator": {
+      "BRUTE_FORCE_SUCCESS": {
+        "penalty": "low",
+        "related": [
+          "PASS_THE_HASH"
+        ]
+      },
+      "LOG_WIPE_AFTER_ATTACK": {
+        "penalty": "high",
+        "related": [
+          "PASS_THE_HASH",
+          "NEW_SERVICE_LOG_CLEAR"
+        ]
+      },
+      "NEW_SERVICE_LOG_CLEAR": {
+        "penalty": "high",
+        "related": [
+          "LOG_WIPE_AFTER_ATTACK"
+        ]
+      },
+      "PASS_THE_HASH": {
+        "penalty": "medium",
+        "related": [
+          "LOG_WIPE_AFTER_ATTACK",
+          "BRUTE_FORCE_SUCCESS"
+        ]
+      }
+    },
+    "memory_forensics": {
+      "cmdline_obfuscation": {
+        "penalty": "medium",
+        "related": [
+          "malfind_pe_injection"
+        ]
+      },
+      "dll_injection_campaign": {
+        "penalty": "high",
+        "related": [
+          "malfind_pe_injection"
+        ]
+      },
+      "hidden_process": {
+        "penalty": "medium",
+        "related": [
+          "malfind_pe_injection"
+        ]
+      },
+      "hollow_process": {
+        "penalty": "medium",
+        "related": [
+          "malfind_pe_injection"
+        ]
+      },
+      "malfind_rwx": {
+        "penalty": "high",
+        "related": [
+          "malfind_pe_injection"
+        ]
+      },
+      "network_process_mismatch": {
+        "penalty": "medium",
+        "related": [
+          "parent_mismatch",
+          "malfind_pe_injection"
+        ]
+      },
+      "network_suspicious_port": {
+        "penalty": "medium",
+        "related": [
+          "malfind_pe_injection"
+        ]
+      },
+      "orphan_process": {
+        "penalty": "medium",
+        "related": [
+          "malfind_pe_injection"
+        ]
+      },
+      "parent_mismatch": {
+        "penalty": "medium",
+        "related": [
+          "malfind_pe_injection",
+          "network_process_mismatch"
+        ]
+      },
+      "path_anomaly": {
+        "penalty": "medium",
+        "related": [
+          "malfind_pe_injection"
+        ]
+      },
+      "singleton_violation": {
+        "penalty": "medium",
+        "related": [
+          "malfind_pe_injection"
+        ]
+      }
+    },
+    "network_forensics": {
+      "BEACONING": {
+        "penalty": "medium",
+        "related": [
+          "EXFILTRATION"
+        ]
+      },
+      "EXFILTRATION": {
+        "penalty": "medium",
+        "related": [
+          "BEACONING"
+        ]
+      },
+      "PORT_SCAN": {
+        "penalty": "low",
+        "related": [
+          "BEACONING"
+        ]
+      }
+    },
+    "registry_rtr": {
+      "run_key": {
+        "penalty": "medium",
+        "related": [
+          "service",
+          "timestomp_batch"
+        ]
+      },
+      "service": {
+        "penalty": "medium",
+        "related": [
+          "run_key",
+          "timestomp_batch"
+        ]
+      },
+      "timestomp_batch": {
+        "penalty": "low",
+        "related": [
+          "run_key",
+          "service"
+        ]
+      }
+    }
+  },
+  "penalty_map": {
+    "high": "6/10",
+    "low": "1/10",
+    "medium": "3/10"
+  },
+  "version": "1.0"
+}
