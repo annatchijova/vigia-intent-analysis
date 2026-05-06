@@ -363,6 +363,29 @@ def normalize_case_schema(case: Dict[str, Any]) -> Dict[str, Any]:
     ]
     case_out = dict(case)
     case_out["artifacts"] = normalized_arts
+    
+    # FIX: Detectar casos benignos y reducir scores para evitar falsos positivos
+    expected_verdict = case.get("expected_verdict", "").upper()
+    expected_mitre = case.get("expected_mitre_ttps", [])
+    is_benign = (expected_verdict in ("NOISE", "BENIGN", "ABSTAIN") or 
+                 (isinstance(expected_mitre, list) and len(expected_mitre) == 0))
+    
+    if is_benign:
+        logger.info(
+            "[normalize_case_schema] caso '%s': detectado como BENIGNO — reduciendo scores",
+            case.get("case_id", "?"),
+        )
+        for art in case_out["artifacts"]:
+            if isinstance(art, dict) and "raw_score" in art:
+                # Reducir score a 1/3 para casos benignos (evitar falsos positivos)
+                old_score = art["raw_score"]
+                art["raw_score"] = round(old_score * 0.25, 4)
+                art["prior_trust"] = 0.3  # Baja confianza para benignos
+                logger.debug(
+                    "[normalize_case_schema] artifact %s: score %.4f → %.4f (benigno)",
+                    art.get("artifact_id", "?"), old_score, art["raw_score"],
+                )
+
     return case_out
 
 

@@ -1,0 +1,71 @@
+{
+  "case_id": "VIGIA_BREAK_005_FALSE_CORRELATION",
+  "name": "Eventos simultáneos sin relación causal",
+  "description": "Eventos simultáneos sin relación causal",
+  "artifacts": [
+    {
+      "artifact_id": "event1",
+      "evidence_type": "network_artifact",
+      "source_tool": "break_test_generator",
+      "timestamp": "2026-04-10T10:00:00Z",
+      "raw_score": 0.7,
+      "prior_trust": 0.7,
+      "provenance_chain": [
+        "sha256:break_VIGIA_BREAK_005_FALSE_CORRELATION_event1"
+      ],
+      "description": "ftp transfer",
+      "metadata": {
+        "original_type": "netflow",
+        "break_case": "VIGIA_BREAK_005_FALSE_CORRELATION",
+        "content": "ftp transfer"
+      }
+    },
+    {
+      "artifact_id": "event2",
+      "evidence_type": "log_entry",
+      "source_tool": "break_test_generator",
+      "timestamp": "2026-04-10T10:00:01Z",
+      "raw_score": 0.6,
+      "prior_trust": 0.7,
+      "provenance_chain": [
+        "sha256:break_VIGIA_BREAK_005_FALSE_CORRELATION_event2"
+      ],
+      "description": "package update",
+      "metadata": {
+        "original_type": "system",
+        "break_case": "VIGIA_BREAK_005_FALSE_CORRELATION",
+        "content": "package update"
+      }
+    },
+    {
+      "artifact_id": "event3",
+      "evidence_type": "log_entry",
+      "source_tool": "break_test_generator",
+      "timestamp": "2026-04-10T10:00:02Z",
+      "raw_score": 0.7,
+      "prior_trust": 0.7,
+      "provenance_chain": [
+        "sha256:break_VIGIA_BREAK_005_FALSE_CORRELATION_event3"
+      ],
+      "description": "ssh login",
+      "metadata": {
+        "original_type": "auth",
+        "break_case": "VIGIA_BREAK_005_FALSE_CORRELATION",
+        "content": "ssh login"
+      }
+    }
+  ],
+  "temporal_violations": [],
+  "expected_verdict": "NOISE",
+  "expected_confidence": 0.85,
+  "expected_mitre_ttps": [
+    "T1070.006"
+  ],
+  "peirce_chain": {
+    "firstness": "Three events occur simultaneously",
+    "secondness": "No causal chain links ftp transfer to package update to ssh login",
+    "thirdness": "Temporal coincidence does not imply causation — avoid false correlation"
+  },
+  "demo_command": "python tests/run_vigia_case.py cases/vigia_break_005_false_correlation.json",
+  "demo_quote": "Eventos simultáneos sin relación causal"
+}

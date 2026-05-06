@@ -1,0 +1,54 @@
+{
+  "case_id": "VIGIA_BREAK_008_AMBIGUOUS",
+  "name": "Caso 50/50",
+  "description": "Caso 50/50",
+  "artifacts": [
+    {
+      "artifact_id": "a",
+      "evidence_type": "log_entry",
+      "source_tool": "break_test_generator",
+      "timestamp": "2026-04-10T10:00:00Z",
+      "raw_score": 0.5,
+      "prior_trust": 0.7,
+      "provenance_chain": [
+        "sha256:break_VIGIA_BREAK_008_AMBIGUOUS_a"
+      ],
+      "description": "suspicious but explainable",
+      "metadata": {
+        "original_type": "log",
+        "break_case": "VIGIA_BREAK_008_AMBIGUOUS",
+        "content": "suspicious but explainable"
+      }
+    },
+    {
+      "artifact_id": "b",
+      "evidence_type": "log_entry",
+      "source_tool": "break_test_generator",
+      "timestamp": "2026-04-10T10:00:01Z",
+      "raw_score": 0.5,
+      "prior_trust": 0.7,
+      "provenance_chain": [
+        "sha256:break_VIGIA_BREAK_008_AMBIGUOUS_b"
+      ],
+      "description": "possible benign explanation",
+      "metadata": {
+        "original_type": "context",
+        "break_case": "VIGIA_BREAK_008_AMBIGUOUS",
+        "content": "possible benign explanation"
+      }
+    }
+  ],
+  "temporal_violations": [],
+  "expected_verdict": "SUSPICION",
+  "expected_confidence": 0.85,
+  "expected_mitre_ttps": [
+    "T1070.006"
+  ],
+  "peirce_chain": {
+    "firstness": "Suspicious activity observed but with plausible benign explanation",
+    "secondness": "Context supports both malicious and benign interpretations equally",
+    "thirdness": "Insufficient evidence for definitive classification — maintain uncertainty"
+  },
+  "demo_command": "python tests/run_vigia_case.py cases/vigia_break_008_ambiguous.json",
+  "demo_quote": "Caso 50/50"
+}
