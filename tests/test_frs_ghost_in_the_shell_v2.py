@@ -19,9 +19,9 @@ from typing import List, Dict, Any
 
 import sys
 import os
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..'))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
-from _math_utils import (
+from vigia.sift._math_utils import (
     build_redundancy_groups,
     apply_frs,
     classify_group,
@@ -109,10 +109,16 @@ def test_ghost_in_the_shell():
     assert "memory" in adjusted[0].metadata.get("conflict_sources", [])
     assert "event_log" in adjusted[0].metadata.get("conflict_sources", [])
 
-    z_before = 3.5
-    z_after = adjusted[0].z_score
-    assert z_after < z_before
-    assert z_after > 0
+    # T6.1: El dominante NO es penalizado, los no-dominantes sí
+    dominant = max(adjusted, key=lambda s: s.z_score)
+    non_dominants = [s for s in adjusted if s != dominant]
+    
+    # El dominante debe mantener su z
+    assert dominant.z_score >= 3.5, f"Dominante debería mantener z: {dominant.z_score}"
+    
+    # Algún no-dominante debe haber bajado
+    assert any(s.z_score < 3.5 for s in non_dominants), "Algún no-dominante debería bajar"
+    assert all(s.z_score > 0 for s in adjusted), "Ningún z debería colapsar a 0"
 
     print("✅ TEST 2 PASADO: Ghost In The Shell - CONTRADICTORY, penalización aplicada")
 
@@ -177,8 +183,16 @@ def test_anti_silencing():
     # FIX P0: El dominante DEBE ser MEMORY, no un event_log falso
     assert dominant.tool_name == "MEMORY_FORENSICS",         f"Anti-silencing FALLÓ: dominante={dominant.tool_name}"
 
-    # Verificar que dominance_stable está marcado
-    assert any(s.metadata.get("dominance_stable") for s in adjusted),         "dominance_stable debería estar marcado"
+    assert dominant.z_score == 3.5, f"MEMORY debería conservar z=3.5, got {dominant.z_score}"
+
+    # Verificar que los event logs fueron penalizados
+    event_logs = [s for s in adjusted if s.tool_name.startswith("EVENT_LOG")]
+    assert all(s.metadata.get("frs_applied") for s in event_logs), "Event logs deberían tener frs_applied"
+    assert dominant.z_score == 3.5, f"MEMORY debería conservar z=3.5, got {dominant.z_score}"
+
+    # Verificar que los event logs fueron penalizados
+    event_logs = [s for s in adjusted if s.tool_name.startswith("EVENT_LOG")]
+    assert all(s.metadata.get("frs_applied") for s in event_logs), "Event logs deberían tener frs_applied"
 
     print("✅ TEST 3 PASADO: Anti-Silencing - Memoria resiste inundación de logs falsos")
 

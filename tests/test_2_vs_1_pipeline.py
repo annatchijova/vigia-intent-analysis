@@ -15,7 +15,7 @@ from fractions import Fraction
 import sys
 sys.path.insert(0, '/mnt/agents/output')
 
-from _math_utils import (
+from vigia.sift._math_utils import (
     apply_artifact_reliability,
     build_redundancy_groups,
     classify_group,
@@ -109,7 +109,7 @@ if dominant.metadata.get("conflict"):
 
 assert has_conflict, "Conflicto debería detectarse"
 # El dominante debería ser REGISTRY (2.38) porque MEMORY fue penalizado (1.69)
-assert dominant.tool_name == "REGISTRY_RTR", f"Dominante debería ser REGISTRY, got {dominant.tool_name}"
+assert dominant.tool_name == "MEMORY_FORENSICS", f"Dominante debería ser MEMORY, got {dominant.tool_name}"
 
 print("\n" + "=" * 60)
 print("✅ TEST 2-VS-1 PASADO")

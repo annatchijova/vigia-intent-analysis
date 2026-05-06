@@ -16,7 +16,7 @@ from fractions import Fraction
 import sys
 sys.path.insert(0, '/mnt/agents/output')
 
-from _math_utils import (
+from vigia.sift._math_utils import (
     apply_artifact_reliability,
     build_redundancy_groups,
     classify_group,

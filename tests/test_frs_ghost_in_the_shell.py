@@ -31,9 +31,9 @@ class MockSignalOutput:
 # Importar funciones a testear (usar paths relativos para test standalone)
 import sys
 import os
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..'))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
-from _math_utils import (
+from vigia.sift._math_utils import (
     build_redundancy_groups,
     apply_frs,
     classify_group,
@@ -155,11 +155,17 @@ def test_ghost_in_the_shell():
     assert "memory" in adjusted[0].metadata.get("conflict_sources", [])
     assert "event_log" in adjusted[0].metadata.get("conflict_sources", [])
 
-    # Verificar z ajustado
-    z_before = 3.5
-    z_after = adjusted[0].z_score
-    assert z_after < z_before, f"z debería bajar: {z_after} >= {z_before}"
-    assert z_after > 0, f"z no debería colapsar a 0: {z_after}"
+    # Verificar z ajustado (T6.1: dominante NO es penalizado, no-dominantes sí)
+    # Encontrar el dominante (z más alto antes del conflicto)
+    dominant = max(adjusted, key=lambda s: s.z_score)
+    non_dominants = [s for s in adjusted if s != dominant]
+    
+    # El dominante debe mantener su z (no penalizado)
+    assert dominant.z_score >= 3.5, f"Dominante debería mantener z: {dominant.z_score}"
+    
+    # Algún no-dominante debe haber bajado
+    assert any(s.z_score < 3.5 for s in non_dominants), f"Algún no-dominante debería bajar"
+    assert all(s.z_score > 0 for s in adjusted), f"Ningún z debería colapsar a 0"
 
     print("✅ TEST 2 PASADO: Ghost In The Shell - CONTRADICTORY, penalización aplicada")
 

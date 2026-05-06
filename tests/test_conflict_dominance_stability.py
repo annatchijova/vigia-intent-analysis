@@ -32,8 +32,8 @@ class MockSignal:
 # Importar la función a testear
 import sys
 import os
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "sift"))
-from _math_utils import apply_conflict_penalty
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
+from vigia.sift._math_utils import apply_conflict_penalty
 
 
 def _run_conflict(
