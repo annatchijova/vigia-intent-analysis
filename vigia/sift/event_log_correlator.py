@@ -15,7 +15,13 @@ import json
 import logging
 import re
 import subprocess
-import xml.etree.ElementTree as ET
+try:
+    from defusedxml import ElementTree as ET
+except ImportError as _defused_err:
+    raise ImportError(
+        "FIX P2: defusedxml es obligatorio para protección contra XXE/Billion Laughs. "
+        "Instalar: pip install defusedxml>=0.7.1"
+    ) from _defused_err
 from collections import defaultdict
 from dataclasses import dataclass, field
 from fractions import Fraction
@@ -162,7 +168,7 @@ class WindowsEventLogParser:
             if p.exists() and p.stat().st_size > MAX_LOG_SIZE_BYTES:
                 logger.warning("Archivo XML excede límite de 50MB: %s", xml_path)
                 return []
-            tree = ET.parse(xml_path)
+            tree = ET.parse(xml_path)  # FIX P2: defusedxml garantiza protección XXE
             for elem in tree.findall(".//{http://schemas.microsoft.com/win/2004/08/events/event}Event"):
                 r = self._parse_element(elem)
                 if r:
@@ -176,7 +182,7 @@ class WindowsEventLogParser:
             # FIX: Limitar tamaño de string XML
             if len(xml_str) > 1024 * 1024:  # 1MB por registro
                 return None
-            root = ET.fromstring(xml_str)
+            root = ET.fromstring(xml_str)  # FIX P2: defusedxml garantiza protección XXE
             return self._parse_element(root)
         except ET.ParseError:
             return None

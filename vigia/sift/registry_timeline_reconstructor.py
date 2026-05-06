@@ -145,7 +145,20 @@ class RegRipperInterface:
     """FIX P0: Lista de argumentos + validación de path. NUNCA shell=True."""
 
     def __init__(self, rip_binary: str = "rip.pl"):
-        self._rip = rip_binary
+        # FIX P2 (V24): Validar binario RegRipper
+        self._rip = self._validate_binary(rip_binary)
+
+    @staticmethod
+    def _validate_binary(binary: str) -> str:
+        import shutil
+        if os.path.isabs(binary):
+            if not os.path.isfile(binary):
+                raise FileNotFoundError(f"RegRipper no encontrado: {binary}")
+            return binary
+        found = shutil.which(binary)
+        if not found:
+            raise FileNotFoundError(f"RegRipper 'rip.pl' no encontrado en PATH. Especifique ruta absoluta.")
+        return found
 
     @staticmethod
     def _validate_path(path: str) -> Path:
@@ -238,8 +251,8 @@ class PersistenceDetector:
             il = ipath.lower()
             # Limitar longitud para evadir ReDoS
             il_trunc = il[:300]
-            suspicious = any(s in il_trunc for s in ["\\temp\\", "\\appdata\\local\\temp\\", "\\downloads\\"])
-            if suspicious or (il_trunc.endswith(".dll") and "\\system32\\" not in il_trunc) or len(Path(il_trunc).stem) <= 3:
+            suspicious = any(s in il_trunc for s in [r'\\temp\\', r'\\appdata\\local\\temp\\', r'\\downloads\\'])
+            if suspicious or (il_trunc.endswith('.dll') and '\\system32\\' not in il_trunc) or len(Path(il_trunc).stem) <= 3:
                 findings.append(PersistenceFinding(
                     persistence_type="service", registry_path="SYSTEM\\Services",
                     value_name="ImagePath", value_data=ipath, severity=Fraction(78, 100),
@@ -373,6 +386,7 @@ class RegistryTimelineReconstructor:
                 try:
                     values = tuple(sorted((v.name, v.value_type, str(v.value)[:500]) for v in entry.iter_values()))
                     all_data = "".join(v[2] for v in values)
+                    # FIX P2: Entropía de caracteres sobre valores de registro (detecta compresión/encriptación)
                     entropy = _entropy_shannon(all_data)
                     keys.append(RegistryKey(
                         hive=Path(hive_path).stem, path=entry.path, name=entry.name,

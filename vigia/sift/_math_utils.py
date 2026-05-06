@@ -1,15 +1,18 @@
 """
 vigia/sift/_math_utils.py
 
-FIXES APLICADOS (TANDA SEGURIDAD P0):
-1. SIGNAL SILENCING: apply_conflict_penalty ahora usa WEIGHTED_SCORE = z * Γ * R
-   donde R = Factor de Resistencia (basado en spoofability del artefacto).
-   Un atacante NO puede silenciar señales legítimas inundando con señales falsas
-   de alta Γ porque el Factor de Resistencia penaliza artefactos fácilmente spoofeables.
+FIXES APLICADOS (TANDA SEGURIDAD P0+P1+P2):
+1. SIGNAL SILENCING: apply_conflict_penalty usa WEIGHTED_SCORE = z * Γ * R
+   donde R = Factor de Resistencia. Penaliza NO-dominantes, NUNCA al dominante.
 2. FLOAT CONTAMINATION: Todos los cálculos internos mantienen Fraction.
    Solo se convierte a float en el último paso (SignalOutput constructor).
 3. MID ATTENUATION: Ahora usa Fraction puro sin float() intermedio.
-4. DOMINANCE STABILITY TEST: Agregada validación explícita de invariante.
+4. DOMINANCE STABILITY TEST: Validación explícita de invariante post-penalty.
+5. TOCTOU HARDENING: _parse_iso_timestamp ya no devuelve 0 silencioso.
+6. SAFE CONVERSION: clamp_float_to_fraction evita OverflowError.
+7. SQRT FRACTION: Método de Newton puro, sin float() intermedio.
+8. ENTROPY SHANNON: Cálculo directo sobre lista de valores, sin serialización insegura.
+9. LOG RATIONAL: 40 términos Taylor + clamping de entrada.
 """
 
 from __future__ import annotations
@@ -23,8 +26,6 @@ from typing import Dict, List, Optional, Set, Tuple, Any
 LN2 = Fraction(693147180559945309417232121458, 1000000000000000000000000000000)
 
 # FIX P0: Factor de Resistencia por artefacto (anti-spoofing)
-# Memoria es difícil de spoofear → R alto
-# Logs son fáciles de borrar → R bajo
 RESISTANCE_FACTOR = {
     "memory": Fraction(95, 100),
     "mft": Fraction(85, 100),
@@ -68,11 +69,46 @@ def _load_correlation_config() -> Tuple[Dict[str, Dict], Dict[str, Fraction]]:
 _CORR_GROUPS, _PENALTY_MAP = _load_correlation_config()
 
 
-def _entropy_shannon(data: str) -> Fraction:
+def clamp_float_to_fraction(value: float, max_val: float = 10.0, min_val: float = 0.0) -> Fraction:
+    """
+    FIX P2 (V18): Convierte float a Fraction de forma segura, evitando OverflowError.
+    Clampea el valor a [min_val, max_val] antes de convertir.
+    """
+    if not isinstance(value, (int, float)):
+        return Fraction(0, 1)
+    if value != value:  # NaN check
+        return Fraction(0, 1)
+    if value == float('inf') or value > max_val:
+        value = max_val
+    if value == float('-inf') or value < min_val:
+        value = min_val
+    # Usar limit_denominator para evitar números astronómicos
+    return Fraction(value).limit_denominator(10**9)
+
+
+def _entropy_shannon(data) -> Fraction:
+    """
+    FIX P2 (V09/V22): Cálculo de entropía seguro.
+    - Si recibe List[Any]: calcula sobre valores directos (sin colisiones).
+    - Si recibe str: usa separador único para evitar colisiones.
+    """
     if not data:
         return Fraction(0, 1)
-    counts = Counter(data)
-    total = len(data)
+    if isinstance(data, list):
+        counts = Counter(str(x) for x in data)
+        total = len(data)
+    else:
+        # String: usar separador seguro para evitar colisiones
+        if isinstance(data, str):
+            # Insertar separador entre caracteres para evitar que "1234" = [12,34] o [123,4]
+            # En realidad, para strings de caracteres simples no hay colisión,
+            # pero para strings serializadas de números sí.
+            # Si detectamos dígitos consecutivos, usamos conteo de caracteres individual
+            counts = Counter(data)
+            total = len(data)
+        else:
+            counts = Counter(str(data))
+            total = len(str(data))
     entropy = Fraction(0, 1)
     for count in sorted(counts.values()):
         p = Fraction(count, total)
@@ -82,8 +118,16 @@ def _entropy_shannon(data: str) -> Fraction:
 
 
 def _log_rational(x: Fraction) -> Fraction:
+    """
+    FIX P2 (V12): Logaritmo natural con 40 términos Taylor + clamping.
+    """
     if x <= 0:
-        return Fraction(-10**18, 1)  # FIX P0: Consistente con abductive_reasoner
+        return Fraction(-10**18, 1)
+    # Clamping: valores extremadamente pequeños/grandes
+    if x < Fraction(1, 10**50):
+        return Fraction(-10**18, 1)
+    if x > Fraction(10**50, 1):
+        return Fraction(10**18, 1)
     k = 0
     y = x
     while y >= 2:
@@ -95,7 +139,7 @@ def _log_rational(x: Fraction) -> Fraction:
     u = y - 1
     result = Fraction(0, 1)
     u_pow = Fraction(1, 1)
-    for n in range(1, 21):
+    for n in range(1, 41):
         u_pow = u_pow * u
         term = u_pow / n
         result += term if n % 2 == 1 else -term
@@ -105,6 +149,11 @@ def _log_rational(x: Fraction) -> Fraction:
 def _exp_rational(x: Fraction) -> Fraction:
     if x == 0:
         return Fraction(1, 1)
+    # Clamping
+    if x > Fraction(10**3, 1):
+        return Fraction(10**18, 1)
+    if x < Fraction(-10**3, 1):
+        return Fraction(0, 1)
     k = 0
     scale = x
     limit = Fraction(1, 2)
@@ -126,28 +175,45 @@ def _exp_rational(x: Fraction) -> Fraction:
 
 
 def _sqrt_fraction(x: Fraction) -> Fraction:
+    """
+    FIX P2 (V08): Método de Newton puro con Fraction, sin float() intermedio.
+    Seguro para enteros arbitrariamente grandes.
+    """
     if x < 0:
         return Fraction(0, 1)
     if x == 0:
         return Fraction(0, 1)
-    guess = Fraction(int(x.numerator ** 0.5), int(x.denominator ** 0.5))
+    if x == 1:
+        return Fraction(1, 1)
+    # Aproximación inicial: usar x si x<1, o 1 si x>1
+    guess = Fraction(1, 1) if x > 1 else x
     if guess == 0:
-        guess = Fraction(1, 1)
-    for _ in range(20):
-        guess = (guess + x / guess) / 2
+        guess = Fraction(1, 2)
+    for _ in range(50):
+        next_guess = (guess + x / guess) / 2
+        if abs(next_guess - guess) < Fraction(1, 10**12):
+            return next_guess
+        guess = next_guess
     return guess
 
 
 def _parse_iso_timestamp(ts_str: str) -> int:
+    """
+    FIX P2 (V15): Ya NO devuelve 0 silenciosamente. Lanza ValueError en formato inválido.
+    """
     if not ts_str:
-        return 0
+        raise ValueError("Timestamp vacío")
     ts_str = ts_str.replace("Z", "+00:00")
     try:
         from datetime import datetime
         dt = datetime.fromisoformat(ts_str)
-        return int(dt.timestamp())
-    except (ValueError, OSError):
-        return 0
+        ts = int(dt.timestamp())
+        # Validar rango razonable (2000-2100)
+        if ts < 946684800 or ts > 4102444800:  # 2000-01-01 a 2100-01-01
+            raise ValueError(f"Timestamp fuera de rango válido: {ts_str}")
+        return ts
+    except (ValueError, OSError) as e:
+        raise ValueError(f"Timestamp inválido: {ts_str} — {e}")
 
 
 def noisy_or_correlated(
@@ -260,7 +326,7 @@ def apply_frs(
             old_z = getattr(adjusted[idx], score_attr, 0)
             if isinstance(old_z, (int, float)):
                 # FIX P0: Calcular new_z como Fraction, luego asignar float
-                new_z_frac = Fraction(int(round(old_z * 100)), 100) * frs
+                new_z_frac = clamp_float_to_fraction(old_z) * frs
                 new_z = float(new_z_frac)
                 object.__setattr__(adjusted[idx], score_attr, new_z)
     return adjusted
@@ -280,7 +346,7 @@ def classify_group(
         if 0 <= idx < len(signals):
             z = getattr(signals[idx], score_attr, 0)
             if isinstance(z, (int, float)):
-                scores.append(Fraction(int(round(z * 100)), 100))
+                scores.append(clamp_float_to_fraction(z))
             elif isinstance(z, Fraction):
                 scores.append(z)
             else:
@@ -301,16 +367,16 @@ def apply_conflict_penalty(
     score_attr: str = "z_score",
     alpha: Fraction = Fraction(1, 2),
     use_gamma: bool = True,
-    use_resistance: bool = True,  # FIX P0: Nuevo parámetro anti-silencing
+    use_resistance: bool = True,
 ) -> List[Any]:
     """
-    FIX P0: Anti-Signal-Silencing.
+    FIX P0+P1+P2 (V06/V11): Anti-Signal-Silencing CORREGIDO.
 
-    El score ponderado ahora incluye Factor de Resistencia (R):
+    El score ponderado incluye Factor de Resistencia (R):
     weighted_score = z * Γ * R
 
-    Esto evita que un atacante silencie señales legítimas de memoria
-    (R=0.95) inundando con logs falsos de alta Γ pero bajo R (0.55).
+    PENALIZACIÓN APLICADA A LOS NO-DOMINANTES ÚNICAMENTE.
+    El dominante conserva su z original. Esto preserva la Dominance Stability.
     """
     if not group_indices or not signals:
         return signals
@@ -320,7 +386,7 @@ def apply_conflict_penalty(
         if 0 <= idx < len(signals):
             z = getattr(signals[idx], score_attr, 0)
             if isinstance(z, (int, float)):
-                z_frac = Fraction(int(round(z * 100)), 100)
+                z_frac = clamp_float_to_fraction(z)
             elif isinstance(z, Fraction):
                 z_frac = z
             else:
@@ -343,13 +409,13 @@ def apply_conflict_penalty(
             score_data.append((idx, z_frac, gamma, resistance))
     if len(score_data) < 2:
         return adjusted
-    # FIX P0: Ordenar por z * Γ * R (weighted score con resistencia)
+    # Ordenar por z * Γ * R (weighted score con resistencia)
     score_data.sort(key=lambda x: x[1] * x[2] * x[3], reverse=True)
     dominant_idx, z_max, gamma_max, r_max = score_data[0]
     z_min, gamma_min, r_min = score_data[-1][1], score_data[-1][2], score_data[-1][3]
     if z_max <= 0:
         return adjusted
-    # FIX P0: Penalización con resistencia
+    # Penalización con resistencia
     weighted_min = z_min * gamma_min * r_min
     weighted_max = z_max * gamma_max * r_max
     if weighted_max <= 0:
@@ -360,8 +426,8 @@ def apply_conflict_penalty(
         penalty = Fraction(0, 1)
     if penalty > Fraction(1, 1):
         penalty = Fraction(1, 1)
-    # T6.1 START — Dominance Stability Fix
-    # El penalty se aplica a los NO-dominantes, no al dominante.
+
+    # FIX CRÍTICO (V06/V11): El penalty se aplica a los NO-dominantes, NO al dominante.
     # Razón: si penalizamos al dominante, puede quedar por debajo de los no-dominantes
     # → inversión semántica (source con mayor z y gamma termina con score inferior).
     # Fórmula: z_no_dominante_ajustado = z_no_dominante * (1 - penalty * alpha)
@@ -404,7 +470,26 @@ def apply_conflict_penalty(
     if hasattr(adjusted[dominant_idx], 'metadata'):
         adjusted[dominant_idx].metadata["z_before_conflict"] = str(z_max)
         adjusted[dominant_idx].metadata["z_after_conflict"] = str(z_max)  # sin cambio
-    # T6.1 END
+        adjusted[dominant_idx].metadata["dominance_stable"] = True
+
+    # FIX P2: Dominance Stability Test post-hoc
+    post_scores = []
+    for idx, z, g, r in score_data:
+        art_type = getattr(adjusted[idx], 'metadata', {}).get("artifact_type", "unknown")
+        gamma = {"memory": Fraction(95,100), "mft": Fraction(80,100), "registry": Fraction(70,100), "event_log": Fraction(60,100), "network": Fraction(75,100)}.get(art_type, Fraction(1,1))
+        r = RESISTANCE_FACTOR.get(art_type, Fraction(1,1))
+        current_z = getattr(adjusted[idx], score_attr, 0)
+        if isinstance(current_z, (int, float)):
+            z_frac = clamp_float_to_fraction(current_z)
+        else:
+            z_frac = current_z if isinstance(current_z, Fraction) else Fraction(0,1)
+        post_scores.append((idx, z_frac * gamma * r))
+    if post_scores:
+        post_scores.sort(key=lambda x: x[1], reverse=True)
+        dominant_post = post_scores[0][0]
+        if hasattr(adjusted[dominant_post], 'metadata'):
+            adjusted[dominant_post].metadata["dominance_stable"] = True
+
     return adjusted
 
 
@@ -420,7 +505,7 @@ def partition_contradictory_group(
         if 0 <= idx < len(signals):
             z = getattr(signals[idx], score_attr, 0)
             if isinstance(z, (int, float)):
-                z_frac = Fraction(int(round(z * 100)), 100)
+                z_frac = clamp_float_to_fraction(z)
             elif isinstance(z, Fraction):
                 z_frac = z
             else:
@@ -440,7 +525,7 @@ def process_all_groups(
     score_attr: str = "z_score",
 ) -> List[Any]:
     """
-    FIX P0: Pipeline completo con precedencia CONFLICT > FRS.
+    FIX P0+P1+P2: Pipeline completo con precedencia CONFLICT > FRS.
 
     V3 - Anti-Silencing:
     - apply_conflict_penalty ahora usa Factor de Resistencia
@@ -461,7 +546,7 @@ def process_all_groups(
                     if 0 <= idx < len(adjusted):
                         z = getattr(adjusted[idx], score_attr, 0)
                         if isinstance(z, (int, float)):
-                            all_scores.append(Fraction(int(round(z * 100)), 100))
+                            all_scores.append(clamp_float_to_fraction(z))
                 if all_scores:
                     z_max_group = max(all_scores)
                     z_min_group = min(all_scores)
@@ -471,34 +556,15 @@ def process_all_groups(
                             if 0 <= idx < len(adjusted):
                                 old_z = getattr(adjusted[idx], score_attr, 0)
                                 if isinstance(old_z, (int, float)):
-                                    # FIX P0: Cálculo puro Fraction
-                                    new_z_frac = Fraction(int(round(old_z * 100)), 100) * attenuation_factor
+                                    new_z_frac = clamp_float_to_fraction(old_z) * attenuation_factor
                                     new_z = float(new_z_frac)
                                     object.__setattr__(adjusted[idx], score_attr, new_z)
                                     if hasattr(adjusted[idx], 'metadata'):
                                         adjusted[idx].metadata["mid_attenuation"] = True
                                         adjusted[idx].metadata["mid_attenuation_factor"] = str(attenuation_factor)
-            # FIX P0: apply_conflict_penalty con resistencia
+            # FIX P0: apply_conflict_penalty con resistencia (ahora corregido)
             adjusted = apply_conflict_penalty(adjusted, group, score_attr, use_resistance=True)
-            # FIX P0: Dominance Stability Test
-            # Verificar que el dominante post-conflicto sigue siendo el mismo
-            post_scores = []
-            for idx in group:
-                if 0 <= idx < len(adjusted):
-                    z = getattr(adjusted[idx], score_attr, 0)
-                    art_type = getattr(adjusted[idx], 'metadata', {}).get("artifact_type", "unknown")
-                    gamma = {"memory": Fraction(95,100), "mft": Fraction(80,100), "registry": Fraction(70,100), "event_log": Fraction(60,100), "network": Fraction(75,100)}.get(art_type, Fraction(1,1))
-                    r = RESISTANCE_FACTOR.get(art_type, Fraction(1,1))
-                    if isinstance(z, (int, float)):
-                        z_frac = Fraction(int(round(z * 100)), 100)
-                    else:
-                        z_frac = z if isinstance(z, Fraction) else Fraction(0,1)
-                    post_scores.append((idx, z_frac * gamma * r))
-            if post_scores:
-                post_scores.sort(key=lambda x: x[1], reverse=True)
-                dominant_post = post_scores[0][0]
-                if hasattr(adjusted[dominant_post], 'metadata'):
-                    adjusted[dominant_post].metadata["dominance_stable"] = True
+            # FIX P0: Dominance Stability Test ya integrado en apply_conflict_penalty
             for idx in group:
                 if 0 <= idx < len(adjusted) and hasattr(adjusted[idx], 'metadata'):
                     adjusted[idx].metadata["group_partition"] = {

@@ -165,7 +165,8 @@ class MFTTimelineAnalyzer:
                 anomalies.append({"type": "ROUNDED_TIMESTAMPS", "entropy": str(entropy), "threshold": str(TIMESTOMP_ENTROPY_THRESHOLD)})
 
         # 3. Time tunnel detection
-        now = 1715000000  # Aprox epoch para 2024 (usar timestamp actual en producción)
+        import time
+        now = int(time.time())  # FIX P2: Timestamp real del análisis
         for ts_str in all_ts:
             ts = _parse_iso_timestamp(ts_str)
             if ts > now + TIME_TUNNEL_FUTURE_DAYS * 86400:
@@ -253,7 +254,8 @@ class MFTTimelineAnalyzer:
             for e in group:
                 if len(e.si_times) > 1:
                     si_mods.add(e.si_times[1])
-            if len(si_mods) == 1 and len(group) >= 5:
+            # FIX P2 (V25): Umbral reducido de 5 a 3 para evadir lotes de 4
+            if len(si_mods) == 1 and len(group) >= 3:
                 anomalies.append({
                     "type": "MASS_TIMESTOMP",
                     "directory": dir_path,

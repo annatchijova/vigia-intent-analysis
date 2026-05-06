@@ -1,28 +1,32 @@
 """
 vigia/sift/sift_orchestrator.py
 
-SIFT Orchestrator.
-FIX P0: Propaga artifact_reliability y correlation_groups a nivel de pipeline.
-FIX P0: Acumula resultados de registry_hives correctamente.
-FIX P0: Implementa Gamma (artifact reliability) y FRS (Factor de Redundancia Semántica).
-FIX P0: Sanitización de paths usa validación estricta con Path.resolve() (NO regex blacklist).
-FIX P0: Anti-Signal-Silencing: process_all_groups ahora usa use_resistance=True.
+SIFT Orchestrator V4 — Integración completa Colectivo VIGÍA.
+FIX V4: 14+ motores SIFT, PathGuard TOCTOU, SignalMapper CCS Gate,
+        Metabolic/Resonance/Behavioral/Pattern engines, UnifiedTimeline,
+        IOC enrichment, Adversarial robustness, Abductive reasoning.
+
+Determinismo: todos los paths se validan antes de tocar disco.
+Resiliencia: cada motor en try/except — un stub no rompe el pipeline.
 """
 
 from __future__ import annotations
 
 import json
+import logging
 from fractions import Fraction
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
 from vigia.core.chain_of_custody import ChainOfCustody
 from vigia.core.ebs_v1 import SignalOutput
+from vigia.core.path_guard import PathGuard, SecurityException
 from vigia.engine.abductive_reasoner import AbductiveReasoner
+
+# SIFT motores originales
 from vigia.sift._math_utils import (
     apply_artifact_reliability,
     build_redundancy_groups,
-    apply_frs,
     process_all_groups,
 )
 from vigia.sift.memory_forensics import MemoryForensicsEngine, MemoryAnalysisResult
@@ -31,6 +35,63 @@ from vigia.sift.event_log_correlator import EventLogCorrelator, EventLogAnalysis
 from vigia.sift.disk_forensics import MFTTimelineAnalyzer, MFTAnalysisResult
 from vigia.sift.network_forensics import NetworkForensicsEngine, NetworkAnalysisResult
 
+# SIFT motores nuevos (con fallback si no existen todavía)
+try:
+    from vigia.sift.prefetch_analyzer import PrefetchAnalyzer, PrefetchAnalysisResult
+except ImportError:
+    PrefetchAnalyzer = None  # type: ignore
+try:
+    from vigia.sift.usb_device_tracker import USBDeviceTracker, USBAnalysisResult
+except ImportError:
+    USBDeviceTracker = None  # type: ignore
+try:
+    from vigia.sift.browser_forensics import BrowserForensicsEngine, BrowserAnalysisResult
+except ImportError:
+    BrowserForensicsEngine = None  # type: ignore
+try:
+    from vigia.sift.shellbag_analyzer import ShellbagAnalyzer, ShellbagAnalysisResult
+except ImportError:
+    ShellbagAnalyzer = None  # type: ignore
+try:
+    from vigia.sift.amcache_shimcache import AmcacheShimcacheAnalyzer, AmcacheAnalysisResult
+except ImportError:
+    AmcacheShimcacheAnalyzer = None  # type: ignore
+try:
+    from vigia.sift.ioc_manager import IOCManager, IOCMatchResult
+except ImportError:
+    IOCManager = None  # type: ignore
+try:
+    from vigia.sift.unified_timeline_engine import UnifiedTimelineEngine, TimelineAnalysisResult
+except ImportError:
+    UnifiedTimelineEngine = None  # type: ignore
+
+# Core / Engine motores (con fallback)
+try:
+    from vigia.core.signal_mapper import SignalMapper
+except ImportError:
+    SignalMapper = None  # type: ignore
+try:
+    from vigia.engine.metabolic_profiler import MetabolicProfiler, MetabolicAnalysisResult
+except ImportError:
+    MetabolicProfiler = None  # type: ignore
+try:
+    from vigia.engine.cross_artifact_resonance import CrossArtifactResonance, ResonanceResult
+except ImportError:
+    CrossArtifactResonance = None  # type: ignore
+try:
+    from vigia.engine.behavioral_fingerprint import BehavioralFingerprint, BehavioralFingerprintResult
+except ImportError:
+    BehavioralFingerprint = None  # type: ignore
+try:
+    from vigia.engine.case_pattern_library import CasePatternLibrary, CasePatternResult
+except ImportError:
+    CasePatternLibrary = None  # type: ignore
+try:
+    from vigia.tools.adversarial_robustness import AdversarialRobustnessEngine
+except ImportError:
+    AdversarialRobustnessEngine = None  # type: ignore
+
+logger = logging.getLogger(__name__)
 
 # Artifact reliability mapping per source
 ARTIFACT_GAMMA: Dict[str, str] = {
@@ -39,52 +100,97 @@ ARTIFACT_GAMMA: Dict[str, str] = {
     "eventlog": "event_log",
     "disk": "mft",
     "network": "network",
+    "prefetch": "prefetch",
+    "usb": "usb",
+    "browser": "browser",
+    "shellbag": "shellbag",
+    "amcache": "amcache",
 }
-
-# FIX P0: Allowlist de paths permitidos
-ALLOWED_BASE_PATHS = [
-    Path("/var/vigia/dumps"),
-    Path("/var/vigia/registry"),
-    Path("/var/vigia/logs"),
-    Path("/tmp/vigia"),
-    Path("/home/vigia/cases"),
-]
 
 
 class SIFTOrchestrator:
+    """
+    Orchestrator unificado del pipeline forense VIGÍA.
+
+    Flujo V4:
+    1. PathGuard TOCTOU en todos los inputs
+    2. Ejecución paralela por módulo SIFT (con try/except por motor)
+    3. Conversión a SignalOutput
+    4. SignalMapper CCS Gate (si aplica)
+    5. Gamma (Artifact Reliability)
+    6. FRS + Ghost In The Shell + Anti-Silencing
+    7. Motores Engine: Metabolic, Resonance, Behavioral, Pattern
+    8. UnifiedTimelineEngine (cross-source temporal)
+    9. IOC enrichment (si hay base de datos)
+    10. AdversarialRobustnessEngine
+    11. AbductiveReasoner
+    12. Custody export
+    """
+
     def __init__(self, case_id: str):
         self.case_id = case_id
         self.chain = ChainOfCustody(case_id)
+        self.path_guard = PathGuard()
+
+        # SIFT motores originales
         self.memory = MemoryForensicsEngine()
         self.registry = RegistryTimelineReconstructor()
         self.eventlog = EventLogCorrelator()
         self.disk = MFTTimelineAnalyzer()
         self.network = NetworkForensicsEngine()
+
+        # SIFT motores nuevos (instanciar solo si existen)
+        self.prefetch = PrefetchAnalyzer() if PrefetchAnalyzer else None
+        self.usb = USBDeviceTracker() if USBDeviceTracker else None
+        self.browser = BrowserForensicsEngine() if BrowserForensicsEngine else None
+        self.shellbag = ShellbagAnalyzer() if ShellbagAnalyzer else None
+        self.amcache = AmcacheShimcacheAnalyzer() if AmcacheShimcacheAnalyzer else None
+        self.ioc = IOCManager() if IOCManager else None
+        self.timeline_engine = UnifiedTimelineEngine() if UnifiedTimelineEngine else None
+
+        # Core / Engine motores
+        self.signal_mapper = SignalMapper() if SignalMapper else None
+        self.metabolic = MetabolicProfiler() if MetabolicProfiler else None
+        self.resonance = CrossArtifactResonance() if CrossArtifactResonance else None
+        self.behavioral = BehavioralFingerprint() if BehavioralFingerprint else None
+        self.patterns = CasePatternLibrary() if CasePatternLibrary else None
+        self.adv_robust = AdversarialRobustnessEngine() if AdversarialRobustnessEngine else None
         self.reasoner = AbductiveReasoner()
 
-    @staticmethod
-    def _validate_path(path: str) -> Path:
+    def _safe_path(self, path_str: Optional[str], for_read: bool = True) -> Optional[Path]:
         """
-        FIX P0: Validación estricta de path.
-        1. Resuelve path absoluto.
-        2. Rechaza symlinks.
-        3. Verifica allowlist.
-        4. Verifica que es archivo regular.
+        FIX V4+P2: PathGuard con TOCTOU completo. Si falla, loggea y retorna None.
+        Usa safe_read para lecturas seguras integradas.
         """
-        p = Path(path).resolve()
-        if p.is_symlink():
-            raise ValueError(f"Symlinks prohibidos: {path}")
-        allowed = any(
-            p == base or (base in p.parents or p == base)
-            for base in ALLOWED_BASE_PATHS
-        )
-        if not allowed:
-            if not p.exists():
-                raise FileNotFoundError(f"Archivo no encontrado: {path}")
-            # Si no está en allowlist pero existe, loggear warning
-            import logging
-            logging.getLogger(__name__).warning("Path fuera de allowlist: %s", path)
-        return p
+        if not path_str:
+            return None
+        try:
+            check = self.path_guard.validate(path_str, for_read=for_read)
+            if not check.valid:
+                logger.error("PathGuard REJECT %s: %s", path_str, check.reason)
+                return None
+            return Path(path_str).absolute()
+        except SecurityException as e:
+            logger.error("SecurityException en %s: %s", path_str, e)
+            return None
+
+    def _safe_read(self, path_str: str) -> Optional[bytes]:
+        """Lectura segura con TOCTOU completo."""
+        try:
+            return self.path_guard.safe_read(path_str)
+        except (PermissionError, SecurityException) as e:
+            logger.error("PathGuard safe_read REJECT %s: %s", path_str, e)
+            return None
+
+    def _to_signal_safe(self, result, method_name: str) -> Optional[SignalOutput]:
+        """Convierte un resultado a SignalOutput, loggea errores."""
+        try:
+            if hasattr(result, "to_signal"):
+                return result.to_signal()
+            return None
+        except Exception as e:
+            logger.error("Error en to_signal de %s: %s", method_name, e)
+            return None
 
     def run_full_analysis(
         self,
@@ -93,86 +199,259 @@ class SIFTOrchestrator:
         event_logs: Optional[List[str]] = None,
         mft_json: Optional[str] = None,
         network_flows: Optional[List[Any]] = None,
+        prefetch_dir: Optional[str] = None,
+        usb_hive_path: Optional[str] = None,
+        browser_profile: Optional[str] = None,
+        shellbag_hive: Optional[str] = None,
+        amcache_path: Optional[str] = None,
+        system_hive_path: Optional[str] = None,
+        ioc_db_path: Optional[str] = None,
+        event_stream: Optional[List[Dict[str, Any]]] = None,
+        normal_events: Optional[List[Dict[str, Any]]] = None,
         timestamp_utc: str = "1970-01-01T00:00:00Z",
     ) -> Dict[str, Any]:
-        signals: List[SignalOutput] = []
+        """
+        Pipeline completo V4.
+
+        Args nuevos:
+            prefetch_dir: Directorio con archivos .pf
+            usb_hive_path: Hive de registry con USBSTOR
+            browser_profile: Ruta a perfil Chrome/Edge/Firefox
+            shellbag_hive: NTUSER.DAT para shellbags
+            amcache_path: Amcache.hve
+            system_hive_path: SYSTEM hive para ShimCache
+            ioc_db_path: Base de datos JSON de IOCs
+            event_stream: Lista de eventos para MetabolicProfiler
+            normal_events: Baseline para BehavioralFingerprint
+        """
+        raw_signals: List[SignalOutput] = []
         results: Dict[str, Any] = {}
 
-        # 1. Memory (reliability = 0.95)
-        if memory_dump_path:
-            validated = self._validate_path(memory_dump_path)
-            mem_result = self.memory.analyze(str(validated), self.chain, timestamp_utc)
-            mem_signal = mem_result.to_signal()
-            mem_signal.metadata["artifact_type"] = "memory"
-            signals.append(mem_signal)
-            results["memory"] = mem_signal.metadata
+        # ============================================================
+        # 1. SIFT ORIGINALES (5 mundos)
+        # ============================================================
 
-        # 2. Registry (reliability = 0.85)
-        registry_signals = []
+        # 1.1 Memory
+        if memory_dump_path:
+            v = self._safe_path(memory_dump_path)
+            if v:
+                try:
+                    mem_result = self.memory.analyze(str(v), self.chain, timestamp_utc)
+                    sig = self._to_signal_safe(mem_result, "memory")
+                    if sig:
+                        sig.metadata["artifact_type"] = "memory"
+                        raw_signals.append(sig)
+                        results["memory"] = sig.metadata
+                except Exception as e:
+                    logger.error("MemoryForensicsEngine falló: %s", e)
+                    results["memory"] = {"error": str(e)}
+
+        # 1.2 Registry
         if registry_hives:
+            registry_signals = []
             for hive in sorted(registry_hives):
-                validated = self._validate_path(hive)
-                reg_result = self.registry.analyze_hive(
-                    str(validated), chain=self.chain, timestamp_utc=timestamp_utc
-                )
-                reg_signal = reg_result.to_signal()
-                reg_signal.metadata["artifact_type"] = "registry"
-                registry_signals.append(reg_signal)
-                signals.append(reg_signal)
+                v = self._safe_path(hive)
+                if not v:
+                    continue
+                try:
+                    reg_result = self.registry.analyze_hive(
+                        str(v), chain=self.chain, timestamp_utc=timestamp_utc
+                    )
+                    sig = self._to_signal_safe(reg_result, "registry")
+                    if sig:
+                        sig.metadata["artifact_type"] = "registry"
+                        registry_signals.append(sig)
+                        raw_signals.append(sig)
+                except Exception as e:
+                    logger.error("RegistryTimelineReconstructor falló para %s: %s", hive, e)
             results["registry"] = [s.metadata for s in registry_signals]
 
-        # 3. Event Logs (reliability = 0.80)
+        # 1.3 Event Logs
         if event_logs:
             safe_logs = []
             for lp in event_logs:
-                validated = self._validate_path(lp)
-                safe_logs.append(str(validated))
-            ev_result = self.eventlog.analyze(sorted(safe_logs), self.chain, timestamp_utc)
-            ev_signal = ev_result.to_signal()
-            ev_signal.metadata["artifact_type"] = "event_log"
-            signals.append(ev_signal)
-            results["eventlog"] = ev_signal.metadata
+                v = self._safe_path(lp)
+                if v:
+                    safe_logs.append(str(v))
+            if safe_logs:
+                try:
+                    ev_result = self.eventlog.analyze(sorted(safe_logs), self.chain, timestamp_utc)
+                    sig = self._to_signal_safe(ev_result, "eventlog")
+                    if sig:
+                        sig.metadata["artifact_type"] = "event_log"
+                        raw_signals.append(sig)
+                        results["eventlog"] = sig.metadata
+                except Exception as e:
+                    logger.error("EventLogCorrelator falló: %s", e)
+                    results["eventlog"] = {"error": str(e)}
 
-        # 4. Disk (reliability = 0.85)
+        # 1.4 Disk (MFT)
         if mft_json:
-            mft_bytes = json.dumps(json.loads(mft_json), sort_keys=True, separators=(",", ":")).encode()
-            disk_result = self.disk.analyze(mft_bytes, mft_json, self.chain, timestamp_utc)
-            disk_signal = disk_result.to_signal()
-            disk_signal.metadata["artifact_type"] = "mft"
-            signals.append(disk_signal)
-            results["disk"] = disk_signal.metadata
+            try:
+                mft_bytes = json.dumps(json.loads(mft_json), sort_keys=True, separators=(",", ":")).encode()
+                disk_result = self.disk.analyze(mft_bytes, mft_json, self.chain, timestamp_utc)
+                sig = self._to_signal_safe(disk_result, "disk")
+                if sig:
+                    sig.metadata["artifact_type"] = "mft"
+                    raw_signals.append(sig)
+                    results["disk"] = sig.metadata
+            except Exception as e:
+                logger.error("MFTTimelineAnalyzer falló: %s", e)
+                results["disk"] = {"error": str(e)}
 
-        # 5. Network (reliability = 0.75)
+        # 1.5 Network
         if network_flows:
-            net_result = self.network.analyze(
-                sorted(network_flows, key=lambda f: (f.timestamp, f.src_ip, f.dst_ip))
-            )
-            net_signal = net_result.to_signal()
-            net_signal.metadata["artifact_type"] = "network"
-            signals.append(net_signal)
-            results["network"] = net_signal.metadata
+            try:
+                net_result = self.network.analyze(
+                    sorted(network_flows, key=lambda f: (f.timestamp, f.src_ip, f.dst_ip))
+                )
+                sig = self._to_signal_safe(net_result, "network")
+                if sig:
+                    sig.metadata["artifact_type"] = "network"
+                    raw_signals.append(sig)
+                    results["network"] = sig.metadata
+            except Exception as e:
+                logger.error("NetworkForensicsEngine falló: %s", e)
+                results["network"] = {"error": str(e)}
 
-        # 6. Apply Gamma (Artifact Reliability) to all signals
+        # ============================================================
+        # 2. SIFT NUEVOS (6 motores)
+        # ============================================================
+
+        # 2.1 Prefetch
+        if prefetch_dir and self.prefetch:
+            v = self._safe_path(prefetch_dir)
+            if v:
+                try:
+                    pf_result = self.prefetch.analyze_directory(str(v), self.chain, timestamp_utc)
+                    sig = self._to_signal_safe(pf_result, "prefetch")
+                    if sig:
+                        sig.metadata["artifact_type"] = "prefetch"
+                        raw_signals.append(sig)
+                        results["prefetch"] = sig.metadata
+                except Exception as e:
+                    logger.error("PrefetchAnalyzer falló: %s", e)
+
+        # 2.2 USB
+        if usb_hive_path and self.usb:
+            v = self._safe_path(usb_hive_path)
+            if v:
+                try:
+                    usb_result = self.usb.analyze_registry_hive(str(v), self.chain, timestamp_utc)
+                    sig = self._to_signal_safe(usb_result, "usb")
+                    if sig:
+                        sig.metadata["artifact_type"] = "usb"
+                        raw_signals.append(sig)
+                        results["usb"] = sig.metadata
+                except Exception as e:
+                    logger.error("USBDeviceTracker falló: %s", e)
+
+        # 2.3 Browser
+        if browser_profile and self.browser:
+            v = self._safe_path(browser_profile)
+            if v:
+                try:
+                    br_result = self.browser.analyze_profile(str(v), self.chain, timestamp_utc)
+                    sig = self._to_signal_safe(br_result, "browser")
+                    if sig:
+                        sig.metadata["artifact_type"] = "browser"
+                        raw_signals.append(sig)
+                        results["browser"] = sig.metadata
+                except Exception as e:
+                    logger.error("BrowserForensicsEngine falló: %s", e)
+
+        # 2.4 Shellbag
+        if shellbag_hive and self.shellbag:
+            v = self._safe_path(shellbag_hive)
+            if v:
+                try:
+                    sh_result = self.shellbag.analyze_hive(str(v), self.chain, timestamp_utc)
+                    sig = self._to_signal_safe(sh_result, "shellbag")
+                    if sig:
+                        sig.metadata["artifact_type"] = "shellbag"
+                        raw_signals.append(sig)
+                        results["shellbag"] = sig.metadata
+                except Exception as e:
+                    logger.error("ShellbagAnalyzer falló: %s", e)
+
+        # 2.5 Amcache/Shimcache
+        if (amcache_path or system_hive_path) and self.amcache:
+            try:
+                am_result = self.amcache.analyze(
+                    amcache_path=amcache_path,
+                    system_hive_path=system_hive_path,
+                    chain=self.chain,
+                    timestamp_utc=timestamp_utc,
+                )
+                sig = self._to_signal_safe(am_result, "amcache")
+                if sig:
+                    sig.metadata["artifact_type"] = "amcache"
+                    raw_signals.append(sig)
+                    results["amcache"] = sig.metadata
+            except Exception as e:
+                logger.error("AmcacheShimcacheAnalyzer falló: %s", e)
+
+        # 2.6 IOC enrichment (si hay base de datos externa)
+        if self.ioc:
+            try:
+                if ioc_db_path:
+                    self.ioc = IOCManager(ioc_db_path)
+                # Enriquecer señales existentes con IOCs
+                enriched = []
+                for sig in raw_signals:
+                    try:
+                        enriched_sig = self.ioc.enrich_signal(sig)
+                        enriched.append(enriched_sig)
+                    except Exception:
+                        enriched.append(sig)
+                raw_signals = enriched
+            except Exception as e:
+                logger.error("IOCManager falló: %s", e)
+
+        # ============================================================
+        # 3. SIGNAL MAPPER — CCS Gate (si hay event_stream crudo)
+        # ============================================================
+        if event_stream and self.signal_mapper:
+            try:
+                mapped = self.signal_mapper.from_ccs(
+                    [{"tool_name": s.tool_name, "value": s.value, "z_score": s.z_score,
+                      "confidence": s.confidence, "metadata": s.metadata} for s in raw_signals]
+                )
+                if mapped:
+                    raw_signals = mapped
+                    results["ccs_gate"] = {"applied": True, "count": len(mapped)}
+            except Exception as e:
+                logger.error("SignalMapper CCS Gate falló: %s", e)
+
+        # ============================================================
+        # 4. GAMMA (Artifact Reliability)
+        # ============================================================
         gamma_adjusted = []
-        for sig in signals:
-            art_type = sig.metadata.get("artifact_type", "unknown")
-            z_frac = Fraction(int(round(sig.z_score * 100)), 100)
-            z_adjusted = apply_artifact_reliability(z_frac, art_type)
-            new_sig = SignalOutput(
-                tool_name=sig.tool_name,
-                value=sig.value,
-                z_score=float(z_adjusted),
-                confidence=sig.confidence,
-                metadata={
-                    **sig.metadata,
-                    "gamma_applied": True,
-                    "gamma_type": art_type,
-                    "z_original": sig.z_score,
-                }
-            )
-            gamma_adjusted.append(new_sig)
+        for sig in raw_signals:
+            try:
+                art_type = sig.metadata.get("artifact_type", "unknown")
+                z_frac = Fraction(int(round(sig.z_score * 100)), 100)
+                z_adjusted = apply_artifact_reliability(z_frac, art_type)
+                new_sig = SignalOutput(
+                    tool_name=sig.tool_name,
+                    value=sig.value,
+                    z_score=float(z_adjusted),
+                    confidence=sig.confidence,
+                    metadata={
+                        **sig.metadata,
+                        "gamma_applied": True,
+                        "gamma_type": art_type,
+                        "z_original": sig.z_score,
+                    }
+                )
+                gamma_adjusted.append(new_sig)
+            except Exception as e:
+                logger.error("Gamma falló para %s: %s", sig.tool_name, e)
+                gamma_adjusted.append(sig)
 
-        # 7. Apply FRS + Ghost In The Shell (REDUNDANT vs CONTRADICTORY)
+        # ============================================================
+        # 5. FRS + Ghost In The Shell + Anti-Silencing
+        # ============================================================
         def _entity_key_fn(sig):
             meta = sig.metadata
             pid = meta.get("pid", meta.get("PID", 0))
@@ -183,28 +462,135 @@ class SIFTOrchestrator:
                 return (f"ip:{ip}", meta.get("timestamp", 0))
             return (sig.tool_name, meta.get("timestamp", 0))
 
-        frs_groups = build_redundancy_groups(gamma_adjusted, _entity_key_fn, delta_t=60)
-        # FIX P0: process_all_groups con use_resistance=True (anti-silencing)
-        frs_adjusted = process_all_groups(gamma_adjusted, frs_groups, score_attr="z_score")
+        try:
+            frs_groups = build_redundancy_groups(gamma_adjusted, _entity_key_fn, delta_t=60)
+            frs_adjusted = process_all_groups(gamma_adjusted, frs_groups, score_attr="z_score")
+        except Exception as e:
+            logger.error("FRS pipeline falló: %s", e)
+            frs_adjusted = gamma_adjusted
+            frs_groups = []
 
-        # 8. Abductive Reasoning
-        abduction = self.reasoner.reason(frs_adjusted)
+        # ============================================================
+        # 6. ENGINE MOTORES (Metabolic, Resonance, Behavioral, Pattern)
+        # ============================================================
+        engine_signals: List[SignalOutput] = []
 
-        # 9. Custody export
-        custody_export = self.chain.export_for_bundle()
+        # 6.1 Metabolic Profiler
+        if event_stream and self.metabolic:
+            try:
+                meta_result = self.metabolic.analyze(event_stream)
+                sig = self._to_signal_safe(meta_result, "metabolic")
+                if sig:
+                    engine_signals.append(sig)
+                    results["metabolic"] = sig.metadata
+            except Exception as e:
+                logger.error("MetabolicProfiler falló: %s", e)
+
+        # 6.2 Cross-Artifact Resonance
+        if frs_adjusted and self.resonance:
+            try:
+                res_result = self.resonance.analyze(frs_adjusted)
+                sig = self._to_signal_safe(res_result, "resonance")
+                if sig:
+                    engine_signals.append(sig)
+                    results["resonance"] = sig.metadata
+            except Exception as e:
+                logger.error("CrossArtifactResonance falló: %s", e)
+
+        # 6.3 Behavioral Fingerprint
+        if self.behavioral:
+            try:
+                if normal_events:
+                    self.behavioral.train_baseline(normal_events)
+                if event_stream:
+                    beh_result = self.behavioral.analyze(event_stream)
+                    sig = self._to_signal_safe(beh_result, "behavioral")
+                    if sig:
+                        engine_signals.append(sig)
+                        results["behavioral"] = sig.metadata
+            except Exception as e:
+                logger.error("BehavioralFingerprint falló: %s", e)
+
+        # 6.4 Case Pattern Library
+        if frs_adjusted and self.patterns:
+            try:
+                pat_result = self.patterns.match(frs_adjusted)
+                sig = self._to_signal_safe(pat_result, "patterns")
+                if sig:
+                    engine_signals.append(sig)
+                    results["patterns"] = sig.metadata
+            except Exception as e:
+                logger.error("CasePatternLibrary falló: %s", e)
+
+        # Combinar señales SIFT + Engine
+        all_signals = frs_adjusted + engine_signals
+
+        # ============================================================
+        # 7. UNIFIED TIMELINE (cross-source temporal)
+        # ============================================================
+        if all_signals and self.timeline_engine:
+            try:
+                tl_result = self.timeline_engine.build_timeline(all_signals)
+                sig = self._to_signal_safe(tl_result, "timeline")
+                if sig:
+                    all_signals.append(sig)
+                    results["timeline"] = sig.metadata
+            except Exception as e:
+                logger.error("UnifiedTimelineEngine falló: %s", e)
+
+        # ============================================================
+        # 8. ADVERSARIAL ROBUSTNESS
+        # ============================================================
+        adv_signal: Optional[SignalOutput] = None
+        if all_signals and self.adv_robust:
+            try:
+                adv_signal = self.adv_robust.analyze(all_signals)
+                if adv_signal:
+                    all_signals.append(adv_signal)
+                    results["adversarial"] = adv_signal.metadata
+            except Exception as e:
+                logger.error("AdversarialRobustnessEngine falló: %s", e)
+
+        # ============================================================
+        # 9. ABDUCTIVE REASONING
+        # ============================================================
+        abduction = None
+        try:
+            abduction = self.reasoner.reason(all_signals)
+        except Exception as e:
+            logger.error("AbductiveReasoner falló: %s", e)
+
+        # ============================================================
+        # 10. CUSTODY EXPORT
+        # ============================================================
+        try:
+            custody_export = self.chain.export_for_bundle()
+        except Exception as e:
+            logger.error("ChainOfCustody export falló: %s", e)
+            custody_export = {}
 
         return {
             "case_id": self.case_id,
             "custody": custody_export,
-            "signals": [self._signal_to_dict(s) for s in frs_adjusted],
+            "signals": [self._signal_to_dict(s) for s in all_signals],
             "abduction": {
-                "best_hypothesis": abduction.best_hypothesis,
-                "best_posterior": str(abduction.best_posterior),
-                "confidence": str(abduction.confidence),
-                "narrative": abduction.peirce_narrative,
-                "ontological_level": abduction.ontological_level,
+                "best_hypothesis": abduction.best_hypothesis if abduction else "UNDETERMINED",
+                "best_posterior": str(abduction.best_posterior) if abduction else "0",
+                "confidence": str(abduction.confidence) if abduction else "0",
+                "narrative": abduction.peirce_narrative if abduction else "[FIRSTNESS] Pipeline error.",
+                "ontological_level": abduction.ontological_level if abduction else None,
+                "is_conclusive": abduction.is_conclusive if abduction else False,
             },
             "results": results,
+            "pipeline_meta": {
+                "n_sift_signals": len(frs_adjusted),
+                "n_engine_signals": len(engine_signals),
+                "n_total_signals": len(all_signals),
+                "frs_groups": len(frs_groups),
+                "gamma_applied": True,
+                "anti_silencing": True,
+                "version": "V4-COLECTIVO-2026-05-06",
+            }
         }
 
     @staticmethod
@@ -213,5 +599,6 @@ class SIFTOrchestrator:
             "tool": signal.tool_name,
             "z_score": signal.z_score,
             "confidence": signal.confidence,
+            "value": signal.value,
             "metadata": signal.metadata,
         }

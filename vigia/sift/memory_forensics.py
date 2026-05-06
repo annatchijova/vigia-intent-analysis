@@ -188,9 +188,23 @@ class Volatility3Interface:
     """FIX P0: Toda ejecución usa lista de argumentos + shlex.quote. NUNCA shell=True."""
 
     def __init__(self, vol_binary: str = "vol", timeout_seconds: int = 300):
-        self._vol_binary = vol_binary
+        # FIX P2 (V24): Validar que el binario sea ruta absoluta y verificable
+        self._vol_binary = self._validate_binary(vol_binary)
         self._timeout = timeout_seconds
         self._version = self._detect_version()
+
+    @staticmethod
+    def _validate_binary(binary: str) -> str:
+        import shutil
+        if os.path.isabs(binary):
+            if not os.path.isfile(binary):
+                raise FileNotFoundError(f"Volatility3 binary no encontrado: {binary}")
+            return binary
+        # Si no es absoluto, buscar en PATH pero loggear warning
+        found = shutil.which(binary)
+        if not found:
+            raise FileNotFoundError(f"Volatility3 'vol' no encontrado en PATH. Especifique ruta absoluta.")
+        return found
 
     @staticmethod
     def _validate_path(dump_path: str) -> Path:

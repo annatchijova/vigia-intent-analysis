@@ -142,8 +142,8 @@ class NetworkForensicsEngine:
             # Un atacante con jitter introduce entropía, pero NO aleatoriedad pura
             # La entropía de un beacon con jitter está entre 1.5 y 3.0
             # Tráfico legítimo (navegación web) tiene entropía > 3.5
-            interval_str = "".join(str(i) for i in intervals)
-            entropy = _entropy_shannon(interval_str)
+            # FIX P2: Pasar lista directa para evitar colisiones de serialización
+            entropy = _entropy_shannon(intervals)
 
             # FIX 3: Test de tendencia Mann-Kendall simplificado
             # C2 real tiene tendencia monótona (creciente o decreciente)
@@ -154,12 +154,22 @@ class NetworkForensicsEngine:
             # Detecta periodicidad aunque haya jitter
             periodicity_score = self._periodicity_score(intervals)
 
-            # Decisión: beaconing si (CV bajo O periodicidad alta) Y entropía controlada
-            is_beaconing = (
-                (cv < cv_threshold or periodicity_score >= Fraction(7, 10))
-                and entropy < Fraction(35, 10)  # 3.5 bits
-                and has_trend
-            )
+            # FIX P2 (V27): Umbral de entropía dinámico + score compuesto
+            # Entropía relativa: comparar contra entropía máxima teórica para n muestras
+            from vigia.sift._math_utils import _log_rational, LN2
+            max_entropy_theoretical = _log_rational(Fraction(n, 1)) / LN2 if n > 1 else Fraction(1, 1)
+            entropy_ratio = entropy / max_entropy_theoretical if max_entropy_theoretical > 0 else Fraction(0, 1)
+            # Score compuesto: CV bajo + periodicidad + entropía no aleatoria + tendencia
+            beacon_score = Fraction(0, 1)
+            if cv < cv_threshold:
+                beacon_score += Fraction(3, 10)
+            if periodicity_score >= Fraction(6, 10):
+                beacon_score += Fraction(3, 10)
+            if entropy_ratio < Fraction(7, 10):  # No es completamente aleatorio
+                beacon_score += Fraction(2, 10)
+            if has_trend:
+                beacon_score += Fraction(2, 10)
+            is_beaconing = beacon_score >= Fraction(7, 10)
 
             if is_beaconing:
                 anomalies.append({
