@@ -16,6 +16,7 @@ from typing import List, Dict, Optional, Any
 from fractions import Fraction
 
 from vigia.core.ebs_v1 import SignalOutput
+from vigia.sift._math_utils import clamp_float_to_fraction
 
 TOOL_NAME = "ADV_ROBUST"
 
@@ -56,7 +57,7 @@ class AdversarialRobustnessEngine:
             if s.tool_name in {
                 "MEMORY_FORENSICS", "REGISTRY_RTR", "EVENT_LOG", "MFT_ANALYZER", "NETWORK_FORENSICS"
             }:
-                z_frac = Fraction(int(round(s.z_score * 100)), 100)
+                z_frac = clamp_float_to_fraction(s.z_score)
                 if z_frac >= SIFT_CRITICAL_Z:
                     sift_critical.append(s)
 
@@ -120,7 +121,7 @@ class AdversarialRobustnessEngine:
             if th is None:
                 continue
             applicable += 1
-            z = Fraction(int(round(signal.z_score * 100)), 100)
+            z = clamp_float_to_fraction(signal.z_score)
             margin = th - z
             if F_ZERO < margin < (th * F_THRESHOLD_MARGIN):
                 near_tools.append(signal.tool_name)
@@ -148,7 +149,7 @@ class AdversarialRobustnessEngine:
     def _detect_coordinated_evasion(self, signals: List[SignalOutput]) -> Optional[Dict[str, Any]]:
         if len(signals) < 3:
             return None
-        z_scores = [Fraction(int(round(s.z_score * 100)), 100) for s in signals]
+        z_scores = [clamp_float_to_fraction(s.z_score) for s in signals]
         mean_z = sum(z_scores) / len(z_scores)
         if mean_z >= Fraction(150, 100):
             return None
@@ -205,7 +206,7 @@ class AdversarialRobustnessEngine:
         high_signals = []
         for signal in signals:
             th = THRESHOLDS.get(signal.tool_name)
-            z = Fraction(int(round(signal.z_score * 100)), 100)
+            z = clamp_float_to_fraction(signal.z_score)
             if th and z < th * Fraction(75, 100):
                 low_signals.append(signal)
             elif z >= Fraction(250, 100):
