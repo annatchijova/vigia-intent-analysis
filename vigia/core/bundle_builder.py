@@ -163,10 +163,11 @@ class BundleBuilder:
 
         # Paso 1: graph_hash excluye el campo graph_hash del grafo
         graph_dict_for_hash = {
-            k: v for k, v in graph_dict_full.items() if k != "graph_hash"
+            k: v for k, v in graph_dict_full.items() if k not in ("graph_hash", "generated_at")
         }
         graph_hash = _sha256_dict(graph_dict_for_hash)
-        policy_hash = _sha256_dict(policy_dict)
+        policy_dict_for_hash = {k: v for k, v in policy_dict.items() if k != "created_at"}
+        policy_hash = _sha256_dict(policy_dict_for_hash)
         decision_hash = _sha256_dict(decision_dict)
 
         # Paso 2: dict final del grafo con graph_hash incluido
@@ -236,7 +237,7 @@ class BundleBuilder:
 
             # Verificar graph_hash
             graph = sealed_dict.get("evidence_graph", {})
-            graph_for_hash = {k: v for k, v in graph.items() if k != "graph_hash"}
+            graph_for_hash = {k: v for k, v in graph.items() if k not in ("graph_hash", "generated_at")}
             recomputed_graph = _sha256_dict(graph_for_hash)
             if recomputed_graph != stored_graph_hash:
                 return False, f"graph_hash invalido: {recomputed_graph[:8]}!={stored_graph_hash[:8]}"
