@@ -541,14 +541,17 @@ class CaseAdapter:
                     metadata=metadata,
                 )
             else:
-                # Fallback: dict compatible con run_vigia()
-                sig = {  # type: ignore[assignment]
-                    "tool_name":  tool_name,
-                    "value":      raw_score,
-                    "z_score":    z,
-                    "confidence": confidence,
-                    "metadata":   metadata,
-                }
+                # Fallback: SimpleNamespace compatible con run_vigia()
+                # y con atributos .z_score, .confidence para likelihood_ratio.py
+                from types import SimpleNamespace
+                sig = SimpleNamespace(
+                    tool_name=tool_name,
+                    signal_id=f"{tool_name}-{artifact.get('artifact_id', 'unk')}",
+                    value=raw_score,
+                    z_score=z,
+                    confidence=confidence,
+                    metadata=metadata,
+                )
 
             return sig  # type: ignore[return-value]
 

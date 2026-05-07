@@ -17,8 +17,8 @@ subprocess.run([sys.executable, "tests/run_vigia_case.py", case_file])
 # 2. Bundle hash + verificación
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 try:
-    from pipeline.vigia_integration_bridge import CaseAdapter, normalize_case_schema, validate_case_schema
-    from pipeline.pipeline import VigiaPipeline
+    from vigia.pipeline.vigia_integration_bridge import CaseAdapter, normalize_case_schema, validate_case_schema
+    from vigia.pipeline.pipeline import VigiaPipeline
 
     with open(case_file) as f:
         case = json.load(f)

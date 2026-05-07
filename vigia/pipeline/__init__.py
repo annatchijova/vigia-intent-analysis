@@ -1,1 +1,1 @@
-from pipeline.pipeline import VigiaPipeline, run_vigia
+from vigia.pipeline.pipeline import VigiaPipeline, run_vigia
