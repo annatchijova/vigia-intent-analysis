@@ -714,12 +714,16 @@ class CrossArtifactIncongruenceEngine:
         # ===================================================================
 
         # Rule 6: TEMPORAL_CAUSALITY_VIOLATION (TCV)
-        # Effect-before-cause: Network log timestamp < Process creation timestamp
-        network_artifacts = [a for a in self._artifacts if "network" in a.description.lower()]
-        process_artifacts = [a for a in self._artifacts if a.evidence_type == "memory_process"]
+        # Effect-before-cause: Any activity timestamp < Process creation timestamp
+        # FIX: Buscar network_log_time en CUALQUIER artifact, no solo en "network"
+        network_artifacts = [a for a in self._artifacts 
+                            if a.metadata.get("network_log_time") or a.metadata.get("file_write_time")]
+        process_artifacts = [a for a in self._artifacts 
+                            if a.evidence_type == "memory_process" 
+                            or a.metadata.get("process_creation_time")]
 
         for net in network_artifacts:
-            net_time_str = net.metadata.get("network_log_time") or net.timestamp
+            net_time_str = net.metadata.get("network_log_time") or net.metadata.get("file_write_time") or net.timestamp
             for proc in process_artifacts:
                 proc_time_str = proc.metadata.get("process_creation_time") or proc.timestamp
 
