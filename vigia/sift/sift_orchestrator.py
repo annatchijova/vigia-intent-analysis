@@ -569,6 +569,52 @@ class SIFTOrchestrator:
             logger.error("ChainOfCustody export falló: %s", e)
             custody_export = {}
 
+
+        # ====================== CAIE INTEGRATION v1.0 ======================
+        caie_result = None
+        try:
+            from vigia.core.forensic_adapter import ForensicAdapter
+            context = ForensicAdapter.build_context(all_signals, results)
+            if context.caie_artifacts:
+                caie_input = [
+                    {
+                        "source_tool": a.source_tool,
+                        "evidence_type": a.evidence_type,
+                        "raw_score": a.raw_score,
+                        "description": a.description,
+                        "metadata": a.metadata,
+                        "base_trust": getattr(a, 'base_trust', 1.0),
+                    }
+                    for a in context.caie_artifacts
+                ]
+                from vigia.tools.caie import cross_artifact_analysis
+                caie_result = cross_artifact_analysis(caie_input)
+                results["caie"] = caie_result
+                logger.info("CAIE executed: %s | composite=%s | fractures=%s",
+                           caie_result.get('verdict'),
+                           caie_result.get('composite_score'),
+                           caie_result.get('fractures_detected', 0))
+            else:
+                results["caie"] = {"status": "NO_ARTIFACTS"}
+        except Exception as e:
+            logger.error("CAIE failed (non-blocking): %s", e)
+            results["caie"] = {"status": "ERROR", "error": str(e)}
+        # ====================== ABDUCTIVE V2 PLACEHOLDER ======================
+        abduction_v2 = None
+        try:
+            from vigia.core.forensic_adapter import ForensicAdapter
+            context = ForensicAdapter.build_context(all_signals, results)
+            if context.abductive_records and context.causal_links:
+                abduction_v2 = {
+                    "status": "READY",
+                    "n_artifacts": len(context.abductive_records),
+                    "layers": sorted(set(r.layer.name for r in context.abductive_records)),
+                    "n_causal_links": len(context.causal_links),
+                    "note": "Para ejecutar run_pipeline(), proporcionar candidate_hypotheses",
+                }
+        except Exception as e:
+            logger.error("AbductiveV2 prep failed: %s", e)
+        # ====================================================================
         return {
             "case_id": self.case_id,
             "custody": custody_export,
