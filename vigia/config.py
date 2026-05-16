@@ -42,7 +42,7 @@ from typing import Final, Literal
 # Try to use Pydantic V2 (preferred); fall back to manual dataclass
 # ---------------------------------------------------------------------------
 try:
-    from pydantic import BaseModel, Field, field_validator
+    from pydantic import BaseModel, Field, field_validator, ConfigDict
     _PYDANTIC_AVAILABLE = True
 except ImportError:
     _PYDANTIC_AVAILABLE = False
@@ -146,9 +146,10 @@ if _PYDANTIC_AVAILABLE:
                 raise ValueError(f"llm_backend must be one of {allowed}, got {v!r}")
             return v
 
-        class Config:
+        model_config = ConfigDict(
             # Allow extra fields from env without crashing
-            extra = "ignore"
+            extra="ignore"
+        )
 
 else:
     # Minimal dataclass fallback (no validation, just defaults from env)

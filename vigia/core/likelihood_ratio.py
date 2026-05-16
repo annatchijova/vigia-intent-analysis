@@ -336,7 +336,7 @@ class LikelihoodEngine:
 def _utcnow() -> str:
     """ISO 8601 UTC sin dependencias externas."""
     import datetime
-    return datetime.datetime.utcnow().isoformat() + "Z"
+    return datetime.datetime.now(datetime.timezone.utc).isoformat() + "Z"
 
 
 def compute_correlation_matrix_from_values(
