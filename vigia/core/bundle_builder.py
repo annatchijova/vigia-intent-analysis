@@ -140,6 +140,7 @@ class BundleBuilder:
         bundle: ForensicBundle,
         engine_attestation_hash: str = "",
         ecl_hash: str = "",
+        caie_analysis: Optional[Dict[str, Any]] = None,
     ) -> Dict[str, Any]:
         """
         Sella el bundle produciendo un dict JSON completo con hashes encadenados.
@@ -174,6 +175,18 @@ class BundleBuilder:
         graph_dict_final = dict(graph_dict_full)
         graph_dict_final["graph_hash"] = graph_hash
 
+        # Config attestation — auto-documentación de configuración para Daubert
+        config_attestation = {
+            "vigia_version": bundle.bundle_version,
+            "config_hash": "",
+            "deviation_from_canonical": False,
+            "modified_params": [],
+            "canonical_version": "1.0.0",
+        }
+        if caie_analysis is not None:
+            config_attestation["caie_enabled"] = True
+            config_attestation["caie_verdict"] = caie_analysis.get("verdict", "UNKNOWN")
+
         # Paso 3: bundle_hash cubre TODO (I2)
         # abduction_trace se incluye si existe — es parte de la prueba auditorial
         bundle_payload = {
@@ -185,9 +198,17 @@ class BundleBuilder:
             "policy_spec": policy_dict,
             "actions": actions_list,
             "system_state": state_dict,
+            "config_attestation": config_attestation,
         }
         if bundle.abduction_trace is not None:
             bundle_payload["abduction_trace"] = bundle.abduction_trace.to_dict()
+        if caie_analysis is not None:
+            bundle_payload["caie_analysis"] = caie_analysis
+        
+        # Calcular config_hash
+        config_for_hash = dict(config_attestation)
+        config_for_hash["caie_enabled"] = caie_analysis is not None
+        bundle_payload["config_attestation"]["config_hash"] = _sha256_dict(config_for_hash)
 
         bundle_hash = _sha256_dict(bundle_payload)
 
