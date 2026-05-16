@@ -596,17 +596,18 @@ class CrossArtifactIncongruenceEngine:
 
         # Group artifacts by evidence type category
         cultural = [a for a in self._artifacts if a.evidence_type in
-                    ("cultural_marker", "ip_geolocation", "user_agent")]
+                    ("cultural_marker", "ip_geolocation", "user_agent", "default", "default")]
         technical = [a for a in self._artifacts if a.evidence_type in
                      ("memory_process", "lsass_session", "kernel_structure",
-                      "usn_journal", "hmac_audit_log")]
+                      "usn_journal", "hmac_audit_log", "file_timestamp", "unknown", "file_timestamp", "unknown")]
         logs = [a for a in self._artifacts if a.evidence_type == "log_entry"]
         documents = [a for a in self._artifacts if a.evidence_type in
                      ("document_visual", "document_geometry")]
         cryptographic = [a for a in self._artifacts if a.evidence_type in
                          ("cryptographic_hash", "digital_signature")]
         network_logs = [a for a in self._artifacts if a.evidence_type in
-                        ("log_entry", "dns_record") and "network" in a.description.lower()]
+                        ("log_entry", "dns_record", "network_artifact") or 
+                        ("network" in a.description.lower() if a.description else False)]
         host_logs = [a for a in self._artifacts if a.evidence_type in
                      ("log_entry", "memory_process") and "socket" in str(a.metadata).lower()]
 
@@ -712,6 +713,100 @@ class CrossArtifactIncongruenceEngine:
         # ===================================================================
         # GOLDEN FORENSIC RULES — P4 Expansion
         # ===================================================================
+
+        # Rule 5a: LOW_COUNT_HIGH_SCORE_ANOMALY
+        # Detecta cuando hay pocos artifacts pero alguno tiene score muy alto
+        if len(self._artifacts) <= 3 and len(self._artifacts) >= 1:
+            max_score = max(a.raw_score for a in self._artifacts)
+            if max_score > 0.5:
+                self._fractures.append(Fracture(
+                    artifact_a=f"High score artifact (score={max_score:.2f})",
+                    artifact_b=f"Only {len(self._artifacts)} artifacts total",
+                    fracture_type="LOW_COUNT_ANOMALY",
+                    severity=0.6,
+                    interpretation="Few artifacts with one showing high score indicates targeted manipulation.",
+                    spoofability_delta=_dround(0.7 - 0.15, _DETERMINISTIC_INTERNAL_PREC),
+                    ttp_id="T1565",
+                ))
+
+        # Rule 5a: LOW_COUNT_HIGH_SCORE_ANOMALY
+        if len(self._artifacts) <= 3 and len(self._artifacts) >= 1:
+            max_score = max(a.raw_score for a in self._artifacts)
+            if max_score > 0.5:
+                self._fractures.append(Fracture(
+                    artifact_a=f"High score artifact (score={max_score:.2f})",
+                    artifact_b=f"Only {len(self._artifacts)} artifacts total",
+                    fracture_type="LOW_COUNT_ANOMALY",
+                    severity=0.6,
+                    interpretation="Few artifacts with one showing high score indicates targeted manipulation.",
+                    spoofability_delta=_dround(0.7 - 0.15, _DETERMINISTIC_INTERNAL_PREC),
+                    ttp_id="T1565",
+                ))
+
+        # Rule 5b: FILE_TIMESTAMP_INCONSISTENCY
+        # Detecta cuando timestamps de archivos son inconsistentes con el contexto
+        timestamps = [a for a in self._artifacts if a.evidence_type == "file_timestamp"]
+        if timestamps and len(timestamps) >= 2:
+            scores = [a.raw_score for a in timestamps]
+            avg_ts = _dround(_dsum(scores) / len(scores), _DETERMINISTIC_INTERNAL_PREC)
+            if avg_ts > 0.7:
+                self._fractures.append(Fracture(
+                    artifact_a=f"File timestamps (avg={avg_ts:.2f})",
+                    artifact_b="Temporal context mismatch",
+                    fracture_type="TIMESTAMP_FRACTURE",
+                    severity=0.75,
+                    interpretation=(
+                        "Multiple file timestamps show suspicious patterns. "
+                        "High scores indicate temporal anomalies or timestomping."
+                    ),
+                    spoofability_delta=_dround(0.85 - 0.20, _DETERMINISTIC_INTERNAL_PREC),
+                    ttp_id="T1070.006",
+                ))
+
+        # Rule 5a: LOW_COUNT_HIGH_SCORE_ANOMALY
+        # Detecta cuando hay pocos artifacts pero alguno tiene score muy alto
+        if len(self._artifacts) <= 3 and len(self._artifacts) >= 1:
+            max_score = max(a.raw_score for a in self._artifacts)
+            if max_score > 0.5:
+                self._fractures.append(Fracture(
+                    artifact_a=f"High score artifact (score={max_score:.2f})",
+                    artifact_b=f"Only {len(self._artifacts)} artifacts total",
+                    fracture_type="LOW_COUNT_ANOMALY",
+                    severity=0.6,
+                    interpretation="Few artifacts with one showing high score indicates targeted manipulation.",
+                    spoofability_delta=_dround(0.7 - 0.15, _DETERMINISTIC_INTERNAL_PREC),
+                    ttp_id="T1565",
+                ))
+
+        # Rule 5a: LOW_COUNT_HIGH_SCORE_ANOMALY
+        if len(self._artifacts) <= 3 and len(self._artifacts) >= 1:
+            max_score = max(a.raw_score for a in self._artifacts)
+            if max_score > 0.5:
+                self._fractures.append(Fracture(
+                    artifact_a=f"High score artifact (score={max_score:.2f})",
+                    artifact_b=f"Only {len(self._artifacts)} artifacts total",
+                    fracture_type="LOW_COUNT_ANOMALY",
+                    severity=0.6,
+                    interpretation="Few artifacts with one showing high score indicates targeted manipulation.",
+                    spoofability_delta=_dround(0.7 - 0.15, _DETERMINISTIC_INTERNAL_PREC),
+                    ttp_id="T1565",
+                ))
+
+        # Rule 5b: FILE_TIMESTAMP_INCONSISTENCY
+        timestamps = [a for a in self._artifacts if a.evidence_type == "file_timestamp"]
+        if timestamps and len(timestamps) >= 2:
+            scores = [a.raw_score for a in timestamps]
+            avg_ts = _dround(_dsum(scores) / len(scores), _DETERMINISTIC_INTERNAL_PREC)
+            if avg_ts > 0.7:
+                self._fractures.append(Fracture(
+                    artifact_a=f"File timestamps (avg={avg_ts:.2f})",
+                    artifact_b="Temporal context mismatch",
+                    fracture_type="TIMESTAMP_FRACTURE",
+                    severity=0.75,
+                    interpretation="Multiple file timestamps show suspicious patterns.",
+                    spoofability_delta=_dround(0.85 - 0.20, _DETERMINISTIC_INTERNAL_PREC),
+                    ttp_id="T1070.006",
+                ))
 
         # Rule 6: TEMPORAL_CAUSALITY_VIOLATION (TCV)
         # Effect-before-cause: Any activity timestamp < Process creation timestamp
@@ -1074,7 +1169,7 @@ class CrossArtifactIncongruenceEngine:
         )
 
         if has_golden_rule or composite >= 0.5 or any(
-            f.fracture_type in ("LOG_VS_MEMORY", "DOCUMENT_FORGERY", "NETWORK_VS_HOST")
+            f.fracture_type in ("LOG_VS_MEMORY", "DOCUMENT_FORGERY", "NETWORK_VS_HOST", "TIMESTAMP_FRACTURE")
             for f in filtered_fractures
         ):
             verdict = "MALICE"
