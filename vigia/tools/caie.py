@@ -715,16 +715,20 @@ class CrossArtifactIncongruenceEngine:
         # ===================================================================
 
         # Rule 5a: LOW_COUNT_HIGH_SCORE_ANOMALY
-        # Detecta cuando hay pocos artifacts pero alguno tiene score muy alto
+        # Detecta cuando hay pocos artifacts TODOS con scores altos — indica manipulación
+        # No se activa si hay evidencia mixta (algún artifact con score < 0.2)
         if len(self._artifacts) <= 3 and len(self._artifacts) >= 1:
             max_score = max(a.raw_score for a in self._artifacts)
-            if max_score > 0.5:
+            min_score = min(a.raw_score for a in self._artifacts)
+            # Solo activar si todos los artifacts tienen score significativo (>0.2)
+            # y al menos uno es muy alto (>0.5)
+            if max_score > 0.5 and min_score > 0.2:
                 self._fractures.append(Fracture(
                     artifact_a=f"High score artifact (score={max_score:.2f})",
-                    artifact_b=f"Only {len(self._artifacts)} artifacts total",
+                    artifact_b=f"Only {len(self._artifacts)} artifacts total, all scores > 0.2",
                     fracture_type="LOW_COUNT_ANOMALY",
                     severity=0.6,
-                    interpretation="Few artifacts with one showing high score indicates targeted manipulation.",
+                    interpretation="Few artifacts all showing significant scores indicates targeted manipulation.",
                     spoofability_delta=_dround(0.7 - 0.15, _DETERMINISTIC_INTERNAL_PREC),
                     ttp_id="T1565",
                 ))
@@ -761,35 +765,6 @@ class CrossArtifactIncongruenceEngine:
                     ),
                     spoofability_delta=_dround(0.85 - 0.20, _DETERMINISTIC_INTERNAL_PREC),
                     ttp_id="T1070.006",
-                ))
-
-        # Rule 5a: LOW_COUNT_HIGH_SCORE_ANOMALY
-        # Detecta cuando hay pocos artifacts pero alguno tiene score muy alto
-        if len(self._artifacts) <= 3 and len(self._artifacts) >= 1:
-            max_score = max(a.raw_score for a in self._artifacts)
-            if max_score > 0.5:
-                self._fractures.append(Fracture(
-                    artifact_a=f"High score artifact (score={max_score:.2f})",
-                    artifact_b=f"Only {len(self._artifacts)} artifacts total",
-                    fracture_type="LOW_COUNT_ANOMALY",
-                    severity=0.6,
-                    interpretation="Few artifacts with one showing high score indicates targeted manipulation.",
-                    spoofability_delta=_dround(0.7 - 0.15, _DETERMINISTIC_INTERNAL_PREC),
-                    ttp_id="T1565",
-                ))
-
-        # Rule 5a: LOW_COUNT_HIGH_SCORE_ANOMALY
-        if len(self._artifacts) <= 3 and len(self._artifacts) >= 1:
-            max_score = max(a.raw_score for a in self._artifacts)
-            if max_score > 0.5:
-                self._fractures.append(Fracture(
-                    artifact_a=f"High score artifact (score={max_score:.2f})",
-                    artifact_b=f"Only {len(self._artifacts)} artifacts total",
-                    fracture_type="LOW_COUNT_ANOMALY",
-                    severity=0.6,
-                    interpretation="Few artifacts with one showing high score indicates targeted manipulation.",
-                    spoofability_delta=_dround(0.7 - 0.15, _DETERMINISTIC_INTERNAL_PREC),
-                    ttp_id="T1565",
                 ))
 
         # Rule 5b: FILE_TIMESTAMP_INCONSISTENCY
@@ -1169,7 +1144,7 @@ class CrossArtifactIncongruenceEngine:
         )
 
         if has_golden_rule or composite >= 0.5 or any(
-            f.fracture_type in ("LOG_VS_MEMORY", "DOCUMENT_FORGERY", "NETWORK_VS_HOST", "TIMESTAMP_FRACTURE")
+            f.fracture_type in ("LOG_VS_MEMORY", "DOCUMENT_FORGERY", "NETWORK_VS_HOST", "TIMESTAMP_FRACTURE", "FALSE_FLAG_PATTERN")
             for f in filtered_fractures
         ):
             verdict = "MALICE"

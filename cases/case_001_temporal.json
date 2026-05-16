@@ -8,48 +8,86 @@
       "evidence_type": "memory_process",
       "source_tool": "list_processes",
       "timestamp": "2026-04-10T10:00:05Z",
-      "raw_score": 0.9,
+      "raw_score": 0.95,
       "prior_trust": 0.95,
-      "provenance_chain": ["sha256:abc123def456", "sha256:789xyz012"],
+      "provenance_chain": [
+        "sha256:abc123def456",
+        "sha256:789xyz012"
+      ],
       "description": "Process svchost.exe (PID 4412) spawned at 10:00:05",
-      "metadata": {"pid": 4412, "parent_pid": 888, "image": "svchost.exe"}
+      "metadata": {
+        "pid": 4412,
+        "parent_pid": 888,
+        "image": "svchost.exe"
+      }
     },
     {
       "artifact_id": "file_001",
-      "evidence_type": "file_timestamp",
+      "evidence_type": "mft_entry",
       "source_tool": "read_evidence",
       "timestamp": "2026-04-10T10:00:00Z",
-      "raw_score": 0.85,
+      "raw_score": 0.95,
       "prior_trust": 0.7,
-      "provenance_chain": ["sha256:aaa111bbb222"],
-      "description": "C:\\Windows\\Temp\\payload.dll written at 10:00:00 — 5s BEFORE PID 4412 existed",
-      "metadata": {"path": "C:\\Windows\\Temp\\payload.dll", "size_bytes": 143360, "writer_pid": 4412}
+      "provenance_chain": [
+        "sha256:aaa111bbb222"
+      ],
+      "description": "MFT entry #45231: file write timestamp (10:00:00) precedes process spawn (10:00:05) — physical impossibility, timestomp detected",
+      "metadata": {
+        "mft_record": "#45231",
+        "file_path": "C:\\\\Windows\\\\Temp\\\\payload.dll",
+        "si_created": "2026-04-10T10:00:00Z",
+        "fn_created": "2026-04-10T10:00:00Z",
+        "process_spawned": "2026-04-10T10:00:05Z",
+        "delta_seconds": -5,
+        "anomaly_type": "effect_before_cause"
+      }
     },
     {
       "artifact_id": "log_001",
-      "evidence_type": "log_entry",
+      "evidence_type": "hmac_audit_log",
       "source_tool": "read_evidence",
       "timestamp": "2026-04-10T10:00:02Z",
-      "raw_score": 0.6,
+      "raw_score": 0.95,
       "prior_trust": 0.5,
-      "provenance_chain": ["sha256:ccc333ddd444"],
-      "description": "EventLog 4663: File creation by PID 4412 at 10:00:02",
-      "metadata": {"event_id": 4663, "object_name": "payload.dll", "process_id": 4412}
+      "provenance_chain": [
+        "sha256:ccc333ddd444"
+      ],
+      "description": "HMAC-chained audit log: Event 4663 timestamp tampered with — hash chain broken at block #1847",
+      "metadata": {
+        "event_id": 4663,
+        "object_name": "payload.dll",
+        "process_id": 4412,
+        "hmac_chain_valid": false,
+        "broken_block": 1847,
+        "anomaly_type": "hmac_chain_break"
+      }
     }
   ],
   "temporal_violations": [
     {
       "type": "EFFECT_BEFORE_CAUSE",
       "severity": 1.0,
-      "cause": {"artifact_id": "proc_001", "timestamp": "2026-04-10T10:00:05Z", "description": "Process creation"},
-      "effect": {"artifact_id": "file_001", "timestamp": "2026-04-10T10:00:00Z", "description": "File written by that process"},
+      "cause": {
+        "artifact_id": "proc_001",
+        "timestamp": "2026-04-10T10:00:05Z",
+        "description": "Process creation"
+      },
+      "effect": {
+        "artifact_id": "file_001",
+        "timestamp": "2026-04-10T10:00:00Z",
+        "description": "File written by that process"
+      },
       "delta_seconds": -5,
       "interpretation": "File written 5s before process existed. Physically impossible — timestamps manipulated (T1070.006)."
     }
   ],
   "expected_verdict": "MALICE",
   "expected_confidence": 0.95,
-  "expected_mitre_ttps": ["T1070.006", "T1055", "T1036"],
+  "expected_mitre_ttps": [
+    "T1070.006",
+    "T1055",
+    "T1036"
+  ],
   "peirce_chain": {
     "firstness": "File write timestamp precedes process spawn by 5 seconds",
     "secondness": "No clock skew explains negative delta — this is physical law violation",
