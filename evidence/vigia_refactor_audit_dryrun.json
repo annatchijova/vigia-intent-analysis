@@ -1,0 +1,337 @@
+{
+  "dangling_imports_report": [],
+  "dry_run": true,
+  "files_modified": [
+    {
+      "backed_up": false,
+      "changes": [
+        {
+          "applied": false,
+          "description": "Renombrar H_EX_001 \u2192 H_XF_001 (fase: EXFILTRATION)",
+          "error": null,
+          "file": "abductive_intent_engine.py",
+          "line_after": null,
+          "line_before": 367,
+          "operation": "P0A",
+          "original_snippet": "H_EX_001",
+          "replacement_snippet": "H_XF_001"
+        }
+      ],
+      "path": "abductive_intent_engine.py",
+      "sha256_after": null,
+      "sha256_before": "f5b1a24e22505ea62a05a6fde1e1fab937389b545db7030ad96ebaac850994cf"
+    },
+    {
+      "backed_up": false,
+      "changes": [
+        {
+          "applied": false,
+          "description": "Eliminar ForensicBundle.seal() l\u00edneas 680-731",
+          "error": null,
+          "file": "ebs.py",
+          "line_after": 680,
+          "line_before": 680,
+          "operation": "P0B",
+          "original_snippet": "def seal(self, ...): [l\u00edneas 680-731]",
+          "replacement_snippet": "# [VIGIA_REFACTOR] seal() removido. Usar BundleBuilder.seal(bundle)."
+        }
+      ],
+      "path": "ebs.py",
+      "sha256_after": null,
+      "sha256_before": "f4f75457ad107ccbdc014c4882e16363405ee236d7f625257b47f96aa05c6742"
+    },
+    {
+      "backed_up": false,
+      "changes": [
+        {
+          "applied": false,
+          "description": "round(log_sum_exp, 6) \u2014 guardia cross-arch en z_aggregated",
+          "error": null,
+          "file": "eml_gci.py",
+          "line_after": 300,
+          "line_before": 300,
+          "operation": "P1",
+          "original_snippet": "        z_aggregated = _m + math.log(sum(math.exp(c - _m) for c in _components))",
+          "replacement_snippet": "        z_aggregated = round(_m + math.log(sum(math.exp(c - _m) for c in _components)), 6)"
+        },
+        {
+          "applied": false,
+          "description": "Documentar dependencia IEEE754 en acumulaci\u00f3n Shannon",
+          "error": null,
+          "file": "eml_gci.py",
+          "line_after": 491,
+          "line_before": 491,
+          "operation": "P1",
+          "original_snippet": "                entropy -= p * math.log2(p)",
+          "replacement_snippet": "                entropy -= p * math.log2(p)  # [VIGIA_REFACTOR P1] round(x,6): guardia ARM/x86 IEEE754 drift"
+        },
+        {
+          "applied": false,
+          "description": "Documentar dependencia IEEE754 en acumulaci\u00f3n Shannon",
+          "error": null,
+          "file": "eml_gci.py",
+          "line_after": 571,
+          "line_before": 571,
+          "operation": "P1",
+          "original_snippet": "                entropy -= p * math.log2(p)",
+          "replacement_snippet": "                entropy -= p * math.log2(p)  # [VIGIA_REFACTOR P1] round(x,6): guardia ARM/x86 IEEE754 drift"
+        },
+        {
+          "applied": false,
+          "description": "round(entropy/max_entropy, 6) en return de funci\u00f3n de entrop\u00eda",
+          "error": null,
+          "file": "eml_gci.py",
+          "line_after": null,
+          "line_before": null,
+          "operation": "P1",
+          "original_snippet": "return entropy / max_entropy if max_entropy > 0 else 0.0",
+          "replacement_snippet": "return round(entropy / max_entropy, 6) if max_entropy > 0 else 0.0"
+        }
+      ],
+      "path": "eml_gci.py",
+      "sha256_after": null,
+      "sha256_before": "db1452a12de5724c68e76fcb0f02b6590b87ae3aefda4cc1233b162fd6378349"
+    },
+    {
+      "backed_up": false,
+      "changes": [
+        {
+          "applied": false,
+          "description": "round(log_lr, 6) \u2014 guardia cross-arch en LR record",
+          "error": null,
+          "file": "vigia_integration_bridge.py",
+          "line_after": 679,
+          "line_before": 679,
+          "operation": "P1",
+          "original_snippet": "            \"lr_record\":            {\"lr\": lr, \"log_lr\": math.log(lr) if lr > 0 else 0.0},",
+          "replacement_snippet": "            \"lr_record\":            {\"lr\": lr, \"log_lr\": round(math.log(lr), 6) if lr > 0 else 0.0},"
+        }
+      ],
+      "path": "vigia_integration_bridge.py",
+      "sha256_after": null,
+      "sha256_before": "face7455b43a4ef5fd42e155bfda0a4ddc5d920659894a06a0cf451c18799521"
+    }
+  ],
+  "migration_plans": [
+    {
+      "canonical": "abductive_reasoner_v2.py",
+      "git_commands": [
+        "# Paso 1: Preservar historia de abductive_reasoner_v2.py en abductive_reasoner.py",
+        "git mv abductive_reasoner_v2.py abductive_reasoner.py",
+        "# Paso 2: Eliminar legacy (contenido ya consolidado en abductive_reasoner.py)",
+        "git rm abductive_reasoner.py",
+        "# Paso 3: Actualizar imports en todos los archivos",
+        "grep -rl 'abductive_reasoner_v2' . | xargs sed -i 's/abductive_reasoner_v2/abductive_reasoner/g'",
+        "# Paso 4: Commit at\u00f3mico",
+        "git add -A && git commit -m 'refactor: consolidar abductive_reasoner.py + abductive_reasoner_v2.py \u2192 abductive_reasoner.py'"
+      ],
+      "importers_of_legacy": [
+        "sift_orchestrator.py"
+      ],
+      "importers_of_v2": [],
+      "legacy": "abductive_reasoner.py",
+      "legacy_lines": 266,
+      "migration_steps": [
+        "1. Verificar que abductive_reasoner_v2.py incluye todas las correcciones de seguridad de abductive_reasoner.py",
+        "2. Ejecutar test suite contra abductive_reasoner_v2.py en aislamiento",
+        "3. Agregar shim de compatibilidad en abductive_reasoner.py:    'from abductive_reasoner_v2 import *  # compatibility shim \u2014 eliminar en v2.0'",
+        "4. Ejecutar git commands listados en este plan",
+        "5. Verificar: python3 -c \"from abductive_reasoner import *; print('OK')\"",
+        "6. Eliminar shim de compatibilidad"
+      ],
+      "status": "plan_ready",
+      "strategy": "MERGE_V2_INTO_LEGACY: Solo el legacy tiene importadores. Mergear mejoras de v2 al legacy y eliminar v2.",
+      "target_name": "abductive_reasoner.py",
+      "v2_lines": 1452
+    },
+    {
+      "canonical": "geopolitical_v2.py",
+      "git_commands": [
+        "# Paso 1: Preservar historia de geopolitical_v2.py en geopolitical.py",
+        "git mv geopolitical_v2.py geopolitical.py",
+        "# Paso 2: Eliminar legacy (contenido ya consolidado en geopolitical.py)",
+        "git rm geopolitical.py",
+        "# Paso 3: Actualizar imports en todos los archivos",
+        "grep -rl 'geopolitical_v2' . | xargs sed -i 's/geopolitical_v2/geopolitical/g'",
+        "# Paso 4: Commit at\u00f3mico",
+        "git add -A && git commit -m 'refactor: consolidar geopolitical.py + geopolitical_v2.py \u2192 geopolitical.py'"
+      ],
+      "importers_of_legacy": [
+        "vigia_core.py"
+      ],
+      "importers_of_v2": [],
+      "legacy": "geopolitical.py",
+      "legacy_lines": 324,
+      "migration_steps": [
+        "1. Verificar que geopolitical_v2.py incluye todas las correcciones de seguridad de geopolitical.py",
+        "2. Ejecutar test suite contra geopolitical_v2.py en aislamiento",
+        "3. Agregar shim de compatibilidad en geopolitical.py:    'from geopolitical_v2 import *  # compatibility shim \u2014 eliminar en v2.0'",
+        "4. Ejecutar git commands listados en este plan",
+        "5. Verificar: python3 -c \"from geopolitical import *; print('OK')\"",
+        "6. Eliminar shim de compatibilidad"
+      ],
+      "status": "plan_ready",
+      "strategy": "MERGE_V2_INTO_LEGACY: Solo el legacy tiene importadores. Mergear mejoras de v2 al legacy y eliminar v2.",
+      "target_name": "geopolitical.py",
+      "v2_lines": 275
+    },
+    {
+      "canonical": "llm_backend_v2.py",
+      "git_commands": [
+        "# Paso 1: Preservar historia de llm_backend_v2.py en llm_backend.py",
+        "git mv llm_backend_v2.py llm_backend.py",
+        "# Paso 2: Eliminar legacy (contenido ya consolidado en llm_backend.py)",
+        "git rm llm_backend.py",
+        "# Paso 3: Actualizar imports en todos los archivos",
+        "grep -rl 'llm_backend_v2' . | xargs sed -i 's/llm_backend_v2/llm_backend/g'",
+        "# Paso 4: Commit at\u00f3mico",
+        "git add -A && git commit -m 'refactor: consolidar llm_backend.py + llm_backend_v2.py \u2192 llm_backend.py'"
+      ],
+      "importers_of_legacy": [
+        "config.py",
+        "vigia_core.py",
+        "vigia_planner.py",
+        "vigia_planner_GIT.py",
+        "vigia_sift_bridge.py",
+        "vigia_sift_bridge_final.py"
+      ],
+      "importers_of_v2": [],
+      "legacy": "llm_backend.py",
+      "legacy_lines": 161,
+      "migration_steps": [
+        "1. Verificar que llm_backend_v2.py incluye todas las correcciones de seguridad de llm_backend.py",
+        "2. Ejecutar test suite contra llm_backend_v2.py en aislamiento",
+        "3. Agregar shim de compatibilidad en llm_backend.py:    'from llm_backend_v2 import *  # compatibility shim \u2014 eliminar en v2.0'",
+        "4. Ejecutar git commands listados en este plan",
+        "5. Verificar: python3 -c \"from llm_backend import *; print('OK')\"",
+        "6. Eliminar shim de compatibilidad"
+      ],
+      "status": "plan_ready",
+      "strategy": "MERGE_V2_INTO_LEGACY: Solo el legacy tiene importadores. Mergear mejoras de v2 al legacy y eliminar v2.",
+      "target_name": "llm_backend.py",
+      "v2_lines": 161
+    },
+    {
+      "canonical": "report_exporter_v2.py",
+      "git_commands": [
+        "# Paso 1: Preservar historia de report_exporter_v2.py en report_exporter.py",
+        "git mv report_exporter_v2.py report_exporter.py",
+        "# Paso 2: Eliminar legacy (contenido ya consolidado en report_exporter.py)",
+        "git rm report_exporter.py",
+        "# Paso 3: Actualizar imports en todos los archivos",
+        "grep -rl 'report_exporter_v2' . | xargs sed -i 's/report_exporter_v2/report_exporter/g'",
+        "# Paso 4: Commit at\u00f3mico",
+        "git add -A && git commit -m 'refactor: consolidar report_exporter.py + report_exporter_v2.py \u2192 report_exporter.py'"
+      ],
+      "importers_of_legacy": [],
+      "importers_of_v2": [],
+      "legacy": "report_exporter.py",
+      "legacy_lines": 246,
+      "migration_steps": [
+        "1. Verificar que report_exporter_v2.py incluye todas las correcciones de seguridad de report_exporter.py",
+        "2. Ejecutar test suite contra report_exporter_v2.py en aislamiento",
+        "3. Agregar shim de compatibilidad en report_exporter.py:    'from report_exporter_v2 import *  # compatibility shim \u2014 eliminar en v2.0'",
+        "4. Ejecutar git commands listados en este plan",
+        "5. Verificar: python3 -c \"from report_exporter import *; print('OK')\"",
+        "6. Eliminar shim de compatibilidad"
+      ],
+      "status": "plan_ready",
+      "strategy": "MANUAL_REVIEW: Ambos tienen importadores o la situaci\u00f3n es ambigua. Revisar manualmente antes de consolidar.",
+      "target_name": "report_exporter.py",
+      "v2_lines": 246
+    },
+    {
+      "canonical": "risk_bounded_layer_v2.py",
+      "git_commands": [
+        "# Paso 1: Preservar historia de risk_bounded_layer_v2.py en risk_bounded_layer.py",
+        "git mv risk_bounded_layer_v2.py risk_bounded_layer.py",
+        "# Paso 2: Eliminar legacy (contenido ya consolidado en risk_bounded_layer.py)",
+        "git rm risk_bounded_layer.py",
+        "# Paso 3: Actualizar imports en todos los archivos",
+        "grep -rl 'risk_bounded_layer_v2' . | xargs sed -i 's/risk_bounded_layer_v2/risk_bounded_layer/g'",
+        "# Paso 4: Commit at\u00f3mico",
+        "git add -A && git commit -m 'refactor: consolidar risk_bounded_layer.py + risk_bounded_layer_v2.py \u2192 risk_bounded_layer.py'"
+      ],
+      "importers_of_legacy": [
+        "audit_action.py",
+        "pipeline.py",
+        "test_ebs_v1_integration.py",
+        "vigia_ci_validate.py",
+        "vigia_core.py",
+        "vigia_namespace_shim.py"
+      ],
+      "importers_of_v2": [],
+      "legacy": "risk_bounded_layer.py",
+      "legacy_lines": 1,
+      "migration_steps": [
+        "1. Verificar que risk_bounded_layer_v2.py incluye todas las correcciones de seguridad de risk_bounded_layer.py",
+        "2. Ejecutar test suite contra risk_bounded_layer_v2.py en aislamiento",
+        "3. Agregar shim de compatibilidad en risk_bounded_layer.py:    'from risk_bounded_layer_v2 import *  # compatibility shim \u2014 eliminar en v2.0'",
+        "4. Ejecutar git commands listados en este plan",
+        "5. Verificar: python3 -c \"from risk_bounded_layer import *; print('OK')\"",
+        "6. Eliminar shim de compatibilidad"
+      ],
+      "status": "plan_ready",
+      "strategy": "MERGE_V2_INTO_LEGACY: Solo el legacy tiene importadores. Mergear mejoras de v2 al legacy y eliminar v2.",
+      "target_name": "risk_bounded_layer.py",
+      "v2_lines": 218
+    },
+    {
+      "canonical": "semiotic_detector_v2.py",
+      "git_commands": [
+        "# Paso 1: Preservar historia de semiotic_detector_v2.py en semiotic_detector.py",
+        "git mv semiotic_detector_v2.py semiotic_detector.py",
+        "# Paso 2: Eliminar legacy (contenido ya consolidado en semiotic_detector.py)",
+        "git rm semiotic_detector.py",
+        "# Paso 3: Actualizar imports en todos los archivos",
+        "grep -rl 'semiotic_detector_v2' . | xargs sed -i 's/semiotic_detector_v2/semiotic_detector/g'",
+        "# Paso 4: Commit at\u00f3mico",
+        "git add -A && git commit -m 'refactor: consolidar semiotic_detector.py + semiotic_detector_v2.py \u2192 semiotic_detector.py'"
+      ],
+      "importers_of_legacy": [],
+      "importers_of_v2": [
+        "evaluate_detector.py",
+        "generate_calibration.py",
+        "generate_execution_log.py",
+        "run_pipeline.py",
+        "test_adversarial_suite.py",
+        "test_red_team.py",
+        "vigia_case_adapter.py",
+        "vigia_namespace_shim.py"
+      ],
+      "legacy": "semiotic_detector.py",
+      "legacy_lines": 508,
+      "migration_steps": [
+        "1. Verificar que semiotic_detector_v2.py incluye todas las correcciones de seguridad de semiotic_detector.py",
+        "2. Ejecutar test suite contra semiotic_detector_v2.py en aislamiento",
+        "3. Agregar shim de compatibilidad en semiotic_detector.py:    'from semiotic_detector_v2 import *  # compatibility shim \u2014 eliminar en v2.0'",
+        "4. Ejecutar git commands listados en este plan",
+        "5. Verificar: python3 -c \"from semiotic_detector import *; print('OK')\"",
+        "6. Eliminar shim de compatibilidad"
+      ],
+      "status": "plan_ready",
+      "strategy": "CONSOLIDE_V2_AS_CANONICAL: v2 tiene m\u00e1s l\u00edneas y tiene importadores activos. Renombrar v2 como el nombre can\u00f3nico (sin sufijo), actualizar importadores del legacy.",
+      "target_name": "semiotic_detector.py",
+      "v2_lines": 689
+    }
+  ],
+  "operations": [
+    "P0A",
+    "P0B",
+    "P0C",
+    "P1",
+    "P2"
+  ],
+  "repo_root": "/mnt/project",
+  "summary": {
+    "dangling_imports_found": 0,
+    "dry_run": true,
+    "files_touched": 4,
+    "migration_plans_generated": 6,
+    "total_changes_applied": 0,
+    "total_changes_planned": 7,
+    "total_errors": 0
+  },
+  "timestamp": "2026-05-14T22:53:54.347715Z",
+  "vigia_refactor_version": "1.0.0"
+}
