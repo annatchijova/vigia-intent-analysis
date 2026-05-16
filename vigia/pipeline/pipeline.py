@@ -598,6 +598,38 @@ class VigiaPipeline:
             intervention = self._optimizer.recommend(current_state)
             logger.info("[Pipeline] Intervención: %s", intervention.get("message", "N/A"))
 
+        # ── CAIE: Cross-Artifact Incongruence Engine ─────────────────────────
+        # Detecta fracturas entre artefactos antes del sellado.
+        self._last_caie_result = None
+        try:
+            from vigia.core.forensic_adapter import ForensicAdapter
+            from vigia.tools.caie import cross_artifact_analysis
+            context = ForensicAdapter.build_context(filtered_signals, results={})
+            if context.caie_artifacts:
+                caie_input = [
+                    {
+                        "source_tool": a.source_tool,
+                        "evidence_type": a.evidence_type,
+                        "raw_score": a.raw_score,
+                        "description": a.description,
+                        "metadata": a.metadata,
+                        "base_trust": getattr(a, 'base_trust', 1.0),
+                    }
+                    for a in context.caie_artifacts
+                ]
+                caie_result = cross_artifact_analysis(caie_input)
+                self._last_caie_result = caie_result
+                logger.info(
+                    "[Pipeline] CAIE: verdict=%s composite=%.4f fractures=%d",
+                    caie_result.get('verdict'),
+                    caie_result.get('composite_score', 0.0),
+                    caie_result.get('fractures_detected', 0),
+                )
+            else:
+                logger.info("[Pipeline] CAIE: no artifacts to analyze")
+        except Exception as _caie_exc:
+            logger.warning("[Pipeline] CAIE failed (non-blocking): %s", _caie_exc)
+
         # ── SELLADO CONJUNTO — Daubert: AbductiveResult + LikelihoodResult ──
         system_state = SystemState(
             lambda_drift=(
