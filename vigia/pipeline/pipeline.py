@@ -632,10 +632,30 @@ class VigiaPipeline:
             abduction_trace=abduction,
         )
 
+        # Preparar CAIE analysis si está disponible
+        caie_analysis = None
+        if hasattr(self, '_last_caie_result') and self._last_caie_result:
+            caie_analysis = {
+                "verdict": self._last_caie_result.get("verdict"),
+                "composite_score": self._last_caie_result.get("composite_score"),
+                "fractures_detected": self._last_caie_result.get("fractures_detected", 0),
+                "golden_rules_triggered": self._last_caie_result.get("golden_rules_triggered", 0),
+                "key_fractures": [
+                    {
+                        "type": f.get("type"),
+                        "severity": f.get("severity"),
+                        "artifact_a": f.get("artifact_a", "")[:100],
+                        "artifact_b": f.get("artifact_b", "")[:100],
+                    }
+                    for f in self._last_caie_result.get("fractures", [])[:5]
+                ],
+            }
+
         sealed_dict = BundleBuilder.seal(
             bundle,
             engine_attestation_hash=self._engine_attestation_hash,
             ecl_hash=self._ecl_hash,
+            caie_analysis=caie_analysis,
         )
 
         verify_ok, verify_msg = BundleBuilder.quick_verify(sealed_dict)
