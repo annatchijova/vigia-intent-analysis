@@ -193,7 +193,7 @@ def _check_graph_hash(bundle: Dict) -> Tuple[bool, str]:
     stored = bundle.get("integrity", {}).get("graph_hash", "")
     if not stored:
         return False, "graph_hash ausente en integrity"
-    graph_for_hash = {k: v for k, v in graph.items() if k != "graph_hash"}
+    graph_for_hash = {k: v for k, v in graph.items() if k not in ("graph_hash", "generated_at")}
     recomputed = _sha256_dict(graph_for_hash)
     if recomputed != stored:
         return False, f"graph_hash NO coincide: recomputed={recomputed[:16]}... stored={stored[:16]}..."
@@ -205,7 +205,8 @@ def _check_policy_hash(bundle: Dict) -> Tuple[bool, str]:
     stored = bundle.get("integrity", {}).get("policy_hash", "")
     if not stored:
         return False, "policy_hash ausente en integrity"
-    recomputed = _sha256_dict(policy)
+    policy_for_hash = {k: v for k, v in policy.items() if k != "created_at"}
+    recomputed = _sha256_dict(policy_for_hash)
     if recomputed != stored:
         return False, f"policy_hash NO coincide: {recomputed[:16]}... != {stored[:16]}..."
     return True, "policy_hash integro"
