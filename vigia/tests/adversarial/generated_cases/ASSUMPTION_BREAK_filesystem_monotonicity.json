@@ -1,0 +1,37 @@
+{
+  "case_id": "ASSUMPTION_BREAK_filesystem_monotonicity",
+  "description": "Breaks assumption: MFT/USN son monot\u00f3nicos y no manipulables user-space",
+  "breaks": [
+    "filesystem_monotonicity"
+  ],
+  "propagated_breaks": [
+    "golden_rule_soundness",
+    "filesystem_monotonicity"
+  ],
+  "artifacts": [
+    {
+      "source_tool": "fs_scan",
+      "evidence_type": "mft_entry",
+      "raw_score": 0.5,
+      "metadata": {
+        "mft_entry_number": 100,
+        "timestamp": "2026-05-18T10:00:00Z"
+      }
+    },
+    {
+      "source_tool": "fs_scan",
+      "evidence_type": "mft_entry",
+      "raw_score": 0.5,
+      "metadata": {
+        "mft_entry_number": 99,
+        "timestamp": "2026-05-18T10:05:00Z"
+      }
+    }
+  ],
+  "expected_behavior": {
+    "detectable": true,
+    "graceful_degradation": true,
+    "should_alert_operator": true
+  },
+  "criticality_score": 0.13692946058091285
+}

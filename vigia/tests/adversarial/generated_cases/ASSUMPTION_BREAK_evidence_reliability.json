@@ -1,0 +1,26 @@
+{
+  "case_id": "ASSUMPTION_BREAK_evidence_reliability",
+  "description": "Breaks assumption: La confianza en la evidencia es funci\u00f3n solo de spoofability",
+  "breaks": [
+    "evidence_reliability"
+  ],
+  "propagated_breaks": [
+    "daubert_defensibility",
+    "evidence_reliability",
+    "structural_malice"
+  ],
+  "artifacts": [
+    {
+      "source_tool": "test",
+      "evidence_type": "log_entry",
+      "raw_score": 0.5,
+      "description": "Violates evidence_reliability"
+    }
+  ],
+  "expected_behavior": {
+    "detectable": false,
+    "graceful_degradation": true,
+    "should_alert_operator": false
+  },
+  "criticality_score": 0.20746887966804978
+}

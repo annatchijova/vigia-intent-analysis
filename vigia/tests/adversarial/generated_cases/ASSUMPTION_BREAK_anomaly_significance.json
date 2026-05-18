@@ -1,0 +1,24 @@
+{
+  "case_id": "ASSUMPTION_BREAK_anomaly_significance",
+  "description": "Breaks assumption: Las anomal\u00edas detectadas son indicadores de malicia, no de ruido",
+  "breaks": [
+    "anomaly_significance"
+  ],
+  "propagated_breaks": [
+    "anomaly_significance"
+  ],
+  "artifacts": [
+    {
+      "source_tool": "test",
+      "evidence_type": "log_entry",
+      "raw_score": 0.5,
+      "description": "Violates anomaly_significance"
+    }
+  ],
+  "expected_behavior": {
+    "detectable": false,
+    "graceful_degradation": true,
+    "should_alert_operator": false
+  },
+  "criticality_score": 0.05394190871369294
+}

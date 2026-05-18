@@ -1,0 +1,59 @@
+{
+  "case_id": "ASSUMPTION_BREAK_memory_ground_truth_AND_filesystem_monotonicity",
+  "description": "Breaks: memory_ground_truth + filesystem_monotonicity",
+  "breaks": [
+    "filesystem_monotonicity",
+    "memory_ground_truth"
+  ],
+  "propagated_breaks": [
+    "filesystem_monotonicity",
+    "golden_rule_soundness",
+    "memory_ground_truth",
+    "daubert_defensibility",
+    "evidence_reliability",
+    "structural_malice"
+  ],
+  "artifacts": [
+    {
+      "source_tool": "memory_dump",
+      "evidence_type": "memory_process",
+      "raw_score": 0.1,
+      "metadata": {
+        "sampling_interval": 60,
+        "event_time": "2026-05-18T10:00:00Z"
+      }
+    },
+    {
+      "source_tool": "log",
+      "evidence_type": "log_entry",
+      "raw_score": 0.9,
+      "metadata": {
+        "event_time": "2026-05-18T10:00:30Z"
+      }
+    },
+    {
+      "source_tool": "fs_scan",
+      "evidence_type": "mft_entry",
+      "raw_score": 0.5,
+      "metadata": {
+        "mft_entry_number": 100,
+        "timestamp": "2026-05-18T10:00:00Z"
+      }
+    },
+    {
+      "source_tool": "fs_scan",
+      "evidence_type": "mft_entry",
+      "raw_score": 0.5,
+      "metadata": {
+        "mft_entry_number": 99,
+        "timestamp": "2026-05-18T10:05:00Z"
+      }
+    }
+  ],
+  "expected_behavior": {
+    "detectable": true,
+    "graceful_degradation": true,
+    "should_alert_operator": true
+  },
+  "criticality_score": 0.41493775933609955
+}

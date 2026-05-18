@@ -1,0 +1,53 @@
+{
+  "case_id": "ASSUMPTION_BREAK_pipeline_integrity_AND_memory_ground_truth",
+  "description": "Breaks: pipeline_integrity + memory_ground_truth",
+  "breaks": [
+    "pipeline_integrity",
+    "memory_ground_truth"
+  ],
+  "propagated_breaks": [
+    "anomaly_significance",
+    "coverage_validity",
+    "absence_meaning",
+    "golden_rule_soundness",
+    "pipeline_integrity",
+    "memory_ground_truth",
+    "daubert_defensibility",
+    "evidence_reliability",
+    "structural_malice"
+  ],
+  "artifacts": [
+    {
+      "source_tool": "sensor",
+      "evidence_type": "memory_process",
+      "raw_score": 0.9,
+      "metadata": {
+        "pipeline_hash": "compromised",
+        "provenance_trust": 0.1
+      }
+    },
+    {
+      "source_tool": "memory_dump",
+      "evidence_type": "memory_process",
+      "raw_score": 0.1,
+      "metadata": {
+        "sampling_interval": 60,
+        "event_time": "2026-05-18T10:00:00Z"
+      }
+    },
+    {
+      "source_tool": "log",
+      "evidence_type": "log_entry",
+      "raw_score": 0.9,
+      "metadata": {
+        "event_time": "2026-05-18T10:00:30Z"
+      }
+    }
+  ],
+  "expected_behavior": {
+    "detectable": false,
+    "graceful_degradation": true,
+    "should_alert_operator": false
+  },
+  "criticality_score": 0.6099585062240663
+}

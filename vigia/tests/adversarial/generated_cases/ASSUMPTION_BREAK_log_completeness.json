@@ -1,0 +1,25 @@
+{
+  "case_id": "ASSUMPTION_BREAK_log_completeness",
+  "description": "Breaks assumption: Los logs son eventos completos, no muestreados",
+  "breaks": [
+    "log_completeness"
+  ],
+  "propagated_breaks": [
+    "log_completeness",
+    "absence_meaning"
+  ],
+  "artifacts": [
+    {
+      "source_tool": "test",
+      "evidence_type": "log_entry",
+      "raw_score": 0.5,
+      "description": "Violates log_completeness"
+    }
+  ],
+  "expected_behavior": {
+    "detectable": false,
+    "graceful_degradation": true,
+    "should_alert_operator": false
+  },
+  "criticality_score": 0.12448132780082986
+}

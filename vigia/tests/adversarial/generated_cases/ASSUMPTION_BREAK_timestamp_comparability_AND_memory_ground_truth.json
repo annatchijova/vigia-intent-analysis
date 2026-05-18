@@ -1,0 +1,60 @@
+{
+  "case_id": "ASSUMPTION_BREAK_timestamp_comparability_AND_memory_ground_truth",
+  "description": "Breaks: timestamp_comparability + memory_ground_truth",
+  "breaks": [
+    "timestamp_comparability",
+    "memory_ground_truth"
+  ],
+  "propagated_breaks": [
+    "anomaly_significance",
+    "timestamp_comparability",
+    "golden_rule_soundness",
+    "memory_ground_truth",
+    "causal_ordering",
+    "daubert_defensibility",
+    "evidence_reliability",
+    "structural_malice"
+  ],
+  "artifacts": [
+    {
+      "source_tool": "log_a",
+      "evidence_type": "log_entry",
+      "raw_score": 0.7,
+      "metadata": {
+        "timestamp": "2026-05-18T10:00:00Z"
+      }
+    },
+    {
+      "source_tool": "log_b",
+      "evidence_type": "log_entry",
+      "raw_score": 0.7,
+      "metadata": {
+        "timestamp": "2026-05-18T09:55:00Z",
+        "timezone": "UTC-5"
+      }
+    },
+    {
+      "source_tool": "memory_dump",
+      "evidence_type": "memory_process",
+      "raw_score": 0.1,
+      "metadata": {
+        "sampling_interval": 60,
+        "event_time": "2026-05-18T10:00:00Z"
+      }
+    },
+    {
+      "source_tool": "log",
+      "evidence_type": "log_entry",
+      "raw_score": 0.9,
+      "metadata": {
+        "event_time": "2026-05-18T10:00:30Z"
+      }
+    }
+  ],
+  "expected_behavior": {
+    "detectable": false,
+    "graceful_degradation": true,
+    "should_alert_operator": false
+  },
+  "criticality_score": 0.5518672199170125
+}

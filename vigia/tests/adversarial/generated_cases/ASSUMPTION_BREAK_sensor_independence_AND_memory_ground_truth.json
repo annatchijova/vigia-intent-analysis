@@ -1,0 +1,61 @@
+{
+  "case_id": "ASSUMPTION_BREAK_sensor_independence_AND_memory_ground_truth",
+  "description": "Breaks: sensor_independence + memory_ground_truth",
+  "breaks": [
+    "memory_ground_truth",
+    "sensor_independence"
+  ],
+  "propagated_breaks": [
+    "anomaly_significance",
+    "coverage_validity",
+    "absence_meaning",
+    "noisy_or_validity",
+    "golden_rule_soundness",
+    "memory_ground_truth",
+    "sensor_independence",
+    "daubert_defensibility",
+    "evidence_reliability",
+    "structural_malice"
+  ],
+  "artifacts": [
+    {
+      "source_tool": "edr_1",
+      "evidence_type": "memory_process",
+      "raw_score": 0.8,
+      "metadata": {
+        "sensor_fingerprint": "same_sensor"
+      }
+    },
+    {
+      "source_tool": "edr_2",
+      "evidence_type": "memory_process",
+      "raw_score": 0.8,
+      "metadata": {
+        "sensor_fingerprint": "same_sensor"
+      }
+    },
+    {
+      "source_tool": "memory_dump",
+      "evidence_type": "memory_process",
+      "raw_score": 0.1,
+      "metadata": {
+        "sampling_interval": 60,
+        "event_time": "2026-05-18T10:00:00Z"
+      }
+    },
+    {
+      "source_tool": "log",
+      "evidence_type": "log_entry",
+      "raw_score": 0.9,
+      "metadata": {
+        "event_time": "2026-05-18T10:00:30Z"
+      }
+    }
+  ],
+  "expected_behavior": {
+    "detectable": true,
+    "graceful_degradation": true,
+    "should_alert_operator": true
+  },
+  "criticality_score": 0.6473029045643153
+}

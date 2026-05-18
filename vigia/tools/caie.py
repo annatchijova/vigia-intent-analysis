@@ -103,6 +103,8 @@ from vigia.tools.mitre_mapping import (
     EVIDENCE_TYPE_TO_TTP,
 )
 
+from vigia.collapse_decision import CollapseDecisionLayer, CollapseContext, CollapseVerdict
+
 
 # ============================================================================
 # DETERMINISTIC PRECISION PROTOCOL (Qwen P0 + Red Team P0_CRITICO Directiva 4)
@@ -1250,6 +1252,52 @@ class CrossArtifactIncongruenceEngine:
         # If structural says NOISE but probabilistic says MALICE, use probabilistic.
         _VERDICT_RANK = {"NOISE": 0, "SUSPICION": 1, "MALICE": 2}
         verdict = max(structural_verdict, probabilistic_verdict, key=lambda v: _VERDICT_RANK[v])
+        # ================================================================
+        # COLLAPSE DECISION LAYER - Política bajo colapso de supuestos
+        # ================================================================
+        broken_assumptions = set()
+        for f in filtered_fractures:
+            ft = f.fracture_type
+            if "SENSOR" in ft or "independence" in ft.lower():
+                broken_assumptions.add("sensor_independence")
+            if "PIPELINE" in ft or "integrity" in ft.lower():
+                broken_assumptions.add("pipeline_integrity")
+            if "TIMESTAMP" in ft or "temporal" in ft.lower():
+                broken_assumptions.add("timestamp_comparability")
+        
+        try:
+            from vigia.collapse_decision import CollapseDecisionLayer, CollapseContext, CollapseVerdict
+            cdl = CollapseDecisionLayer()
+            
+            # Calcular coverage_ratio aproximado
+            total_expected_layers = ["memory", "process", "auth", "filesystem", "network", "kernel"]
+            observed_layers = set()
+            for a in self._artifacts:
+                layer = a.metadata.get("layer", a.evidence_type)
+                observed_layers.add(layer)
+            coverage_ratio = len(observed_layers) / len(total_expected_layers) if total_expected_layers else 0.5
+            
+            ctx = CollapseContext(
+                broken_assumptions=broken_assumptions,
+                coverage_ratio=coverage_ratio,
+                base_score=composite,
+                has_structural_malice=(structural_verdict == "MALICE"),
+                independent_sources=independent_sources,
+            )
+            cdl_verdict = cdl.resolve(ctx)
+            cdl_explanation = cdl.explain(ctx, cdl_verdict)
+            
+            if cdl_verdict == CollapseVerdict.INCONCLUSIVE:
+                verdict = "INCONCLUSIVE"
+                structural_verdict = "INCONCLUSIVE"
+                daubert_note += f" CDL: {cdl_explanation}"
+            elif cdl_verdict == CollapseVerdict.SUSPICION and verdict == "MALICE":
+                verdict = "SUSPICION"
+                daubert_note += f" CDL: {cdl_explanation}"
+        except Exception as e:
+            # CDL falló silenciosamente
+            pass
+        
 
         # Peirce chain
         top_adjusted = sorted(

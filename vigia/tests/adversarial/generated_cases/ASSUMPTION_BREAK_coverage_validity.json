@@ -1,0 +1,26 @@
+{
+  "case_id": "ASSUMPTION_BREAK_coverage_validity",
+  "description": "Breaks assumption: La cobertura observada es representativa del espacio de ataque",
+  "breaks": [
+    "coverage_validity"
+  ],
+  "propagated_breaks": [
+    "anomaly_significance",
+    "coverage_validity",
+    "absence_meaning"
+  ],
+  "artifacts": [
+    {
+      "source_tool": "test",
+      "evidence_type": "log_entry",
+      "raw_score": 0.5,
+      "description": "Violates coverage_validity"
+    }
+  ],
+  "expected_behavior": {
+    "detectable": false,
+    "graceful_degradation": true,
+    "should_alert_operator": false
+  },
+  "criticality_score": 0.18257261410788383
+}

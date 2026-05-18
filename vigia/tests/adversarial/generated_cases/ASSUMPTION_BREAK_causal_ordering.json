@@ -1,0 +1,28 @@
+{
+  "case_id": "ASSUMPTION_BREAK_causal_ordering",
+  "description": "Breaks assumption: El orden temporal de eventos refleja causalidad real",
+  "breaks": [
+    "causal_ordering"
+  ],
+  "propagated_breaks": [
+    "anomaly_significance",
+    "golden_rule_soundness",
+    "causal_ordering",
+    "daubert_defensibility",
+    "structural_malice"
+  ],
+  "artifacts": [
+    {
+      "source_tool": "test",
+      "evidence_type": "log_entry",
+      "raw_score": 0.5,
+      "description": "Violates causal_ordering"
+    }
+  ],
+  "expected_behavior": {
+    "detectable": false,
+    "graceful_degradation": true,
+    "should_alert_operator": false
+  },
+  "criticality_score": 0.34854771784232363
+}

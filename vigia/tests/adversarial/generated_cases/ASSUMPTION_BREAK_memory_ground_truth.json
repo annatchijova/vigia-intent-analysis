@@ -1,0 +1,39 @@
+{
+  "case_id": "ASSUMPTION_BREAK_memory_ground_truth",
+  "description": "Breaks assumption: Memory artifacts reflejan el estado real del sistema en el momento",
+  "breaks": [
+    "memory_ground_truth"
+  ],
+  "propagated_breaks": [
+    "golden_rule_soundness",
+    "memory_ground_truth",
+    "daubert_defensibility",
+    "evidence_reliability",
+    "structural_malice"
+  ],
+  "artifacts": [
+    {
+      "source_tool": "memory_dump",
+      "evidence_type": "memory_process",
+      "raw_score": 0.1,
+      "metadata": {
+        "sampling_interval": 60,
+        "event_time": "2026-05-18T10:00:00Z"
+      }
+    },
+    {
+      "source_tool": "log",
+      "evidence_type": "log_entry",
+      "raw_score": 0.9,
+      "metadata": {
+        "event_time": "2026-05-18T10:00:30Z"
+      }
+    }
+  ],
+  "expected_behavior": {
+    "detectable": false,
+    "graceful_degradation": true,
+    "should_alert_operator": false
+  },
+  "criticality_score": 0.34854771784232363
+}

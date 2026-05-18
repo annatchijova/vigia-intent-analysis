@@ -1,0 +1,33 @@
+{
+  "case_id": "ASSUMPTION_BREAK_pipeline_integrity",
+  "description": "Breaks assumption: La cadena de adquisici\u00f3n no est\u00e1 comprometida",
+  "breaks": [
+    "pipeline_integrity"
+  ],
+  "propagated_breaks": [
+    "anomaly_significance",
+    "coverage_validity",
+    "absence_meaning",
+    "pipeline_integrity",
+    "daubert_defensibility",
+    "evidence_reliability",
+    "structural_malice"
+  ],
+  "artifacts": [
+    {
+      "source_tool": "sensor",
+      "evidence_type": "memory_process",
+      "raw_score": 0.9,
+      "metadata": {
+        "pipeline_hash": "compromised",
+        "provenance_trust": 0.1
+      }
+    }
+  ],
+  "expected_behavior": {
+    "detectable": false,
+    "graceful_degradation": true,
+    "should_alert_operator": false
+  },
+  "criticality_score": 0.46887966804979253
+}

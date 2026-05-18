@@ -1,0 +1,46 @@
+{
+  "case_id": "ASSUMPTION_BREAK_filesystem_monotonicity_AND_log_completeness",
+  "description": "Breaks: filesystem_monotonicity + log_completeness",
+  "breaks": [
+    "log_completeness",
+    "filesystem_monotonicity"
+  ],
+  "propagated_breaks": [
+    "log_completeness",
+    "golden_rule_soundness",
+    "filesystem_monotonicity",
+    "absence_meaning"
+  ],
+  "artifacts": [
+    {
+      "source_tool": "fs_scan",
+      "evidence_type": "mft_entry",
+      "raw_score": 0.5,
+      "metadata": {
+        "mft_entry_number": 100,
+        "timestamp": "2026-05-18T10:00:00Z"
+      }
+    },
+    {
+      "source_tool": "fs_scan",
+      "evidence_type": "mft_entry",
+      "raw_score": 0.5,
+      "metadata": {
+        "mft_entry_number": 99,
+        "timestamp": "2026-05-18T10:05:00Z"
+      }
+    },
+    {
+      "source_tool": "test",
+      "evidence_type": "log_entry",
+      "raw_score": 0.5,
+      "description": "Violates log_completeness"
+    }
+  ],
+  "expected_behavior": {
+    "detectable": true,
+    "graceful_degradation": true,
+    "should_alert_operator": true
+  },
+  "criticality_score": 0.2614107883817427
+}

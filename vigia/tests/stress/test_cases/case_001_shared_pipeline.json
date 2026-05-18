@@ -1,0 +1,29 @@
+{
+  "case_id": "STRESS_001_SHARED_PIPELINE_DECEPTION",
+  "description": "Multiple artifacts from same sensor - CAIE groups by (source_tool, evidence_type)",
+  "artifacts": [
+    {
+      "source_tool": "edr_sensor",
+      "evidence_type": "memory_process",
+      "raw_score": 0.85,
+      "description": "Process spawn detected"
+    },
+    {
+      "source_tool": "edr_sensor",
+      "evidence_type": "lsass_session",
+      "raw_score": 0.80,
+      "description": "Login success"
+    },
+    {
+      "source_tool": "edr_sensor",
+      "evidence_type": "log_entry",
+      "raw_score": 0.75,
+      "description": "Exfiltration detected"
+    }
+  ],
+  "expected": {
+    "max_independent_sources": 3,
+    "probabilistic_score_max": 0.9,
+    "note": "CAIE v2.0 groups by (source_tool, evidence_type) - 3 different evidence_types = 3 groups"
+  }
+}

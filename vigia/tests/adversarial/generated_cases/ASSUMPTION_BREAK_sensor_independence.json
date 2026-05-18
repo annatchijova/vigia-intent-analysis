@@ -1,0 +1,38 @@
+{
+  "case_id": "ASSUMPTION_BREAK_sensor_independence",
+  "description": "Breaks assumption: Diferentes sensores producen evidencia independiente",
+  "breaks": [
+    "sensor_independence"
+  ],
+  "propagated_breaks": [
+    "anomaly_significance",
+    "coverage_validity",
+    "absence_meaning",
+    "noisy_or_validity",
+    "sensor_independence"
+  ],
+  "artifacts": [
+    {
+      "source_tool": "edr_1",
+      "evidence_type": "memory_process",
+      "raw_score": 0.8,
+      "metadata": {
+        "sensor_fingerprint": "same_sensor"
+      }
+    },
+    {
+      "source_tool": "edr_2",
+      "evidence_type": "memory_process",
+      "raw_score": 0.8,
+      "metadata": {
+        "sensor_fingerprint": "same_sensor"
+      }
+    }
+  ],
+  "expected_behavior": {
+    "detectable": true,
+    "graceful_degradation": true,
+    "should_alert_operator": true
+  },
+  "criticality_score": 0.2987551867219917
+}
