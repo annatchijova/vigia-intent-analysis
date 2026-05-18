@@ -75,10 +75,10 @@ async def _run_tool(tool_name: str, kwargs: dict) -> dict:
     # Map tool names to their module locations
     TOOL_MAP = {
         "calculate_shannon_entropy": (
-            "vigia_sift_bridge", "calculate_shannon_entropy"
+            "vigia.vigia_sift_bridge", "calculate_shannon_entropy"
         ),
         "generate_forensic_hash": (
-            "vigia_sift_bridge", "generate_forensic_hash"
+            "vigia.vigia_sift_bridge", "generate_forensic_hash"
         ),
         "audit_document_integrity": (
             "vigia.tools.document_integrity", "audit_document_integrity"
