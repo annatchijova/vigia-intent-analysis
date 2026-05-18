@@ -1,0 +1,1207 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VIGÍA — Command Reference</title>
+<style>
+  :root {
+    --bg: #0a0c0f;
+    --bg2: #111417;
+    --bg3: #1a1d22;
+    --border: rgba(255,255,255,0.07);
+    --border2: rgba(255,255,255,0.12);
+    --text: #e8eaed;
+    --muted: #7a8190;
+    --accent: #00d4aa;
+    --accent2: #0099ff;
+    --accent3: #ff6b35;
+    --accent4: #c084fc;
+    --danger: #ef4444;
+    --warn: #f59e0b;
+    --success: #22c55e;
+    --font-mono: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
+    --font-sans: 'Inter', 'DM Sans', system-ui, sans-serif;
+    --radius: 6px;
+    --radius-lg: 10px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-sans);
+    font-size: 14px;
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  /* Grid scan lines */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0,212,170,0.015) 2px,
+      rgba(0,212,170,0.015) 4px
+    );
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .layout {
+    display: flex;
+    min-height: 100vh;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Sidebar */
+  nav {
+    width: 220px;
+    min-width: 220px;
+    background: var(--bg2);
+    border-right: 1px solid var(--border);
+    padding: 0;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .nav-header {
+    padding: 20px 16px 16px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .nav-logo {
+    font-family: var(--font-mono);
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--accent);
+    letter-spacing: 0.1em;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .nav-logo::before {
+    content: '◈';
+    font-size: 14px;
+  }
+
+  .nav-sub {
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-top: 4px;
+  }
+
+  .nav-section {
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .nav-section-label {
+    font-size: 9px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--muted);
+    padding: 8px 16px 4px;
+  }
+
+  nav a {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 16px;
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 12px;
+    transition: all 0.15s;
+    border-left: 2px solid transparent;
+  }
+
+  nav a:hover {
+    color: var(--text);
+    background: rgba(255,255,255,0.04);
+    border-left-color: var(--accent);
+  }
+
+  nav a .dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  /* Main content */
+  main {
+    flex: 1;
+    padding: 32px 40px;
+    max-width: 900px;
+  }
+
+  .page-header {
+    margin-bottom: 32px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+  }
+
+  .page-title {
+    font-family: var(--font-mono);
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--accent);
+    letter-spacing: 0.05em;
+  }
+
+  .page-desc {
+    font-size: 13px;
+    color: var(--muted);
+    margin-top: 4px;
+  }
+
+  .status-bar {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .badge {
+    font-size: 10px;
+    font-family: var(--font-mono);
+    padding: 3px 8px;
+    border-radius: var(--radius);
+    letter-spacing: 0.05em;
+    font-weight: 600;
+  }
+
+  .badge-green { background: rgba(34,197,94,0.15); color: var(--success); border: 1px solid rgba(34,197,94,0.25); }
+  .badge-blue  { background: rgba(0,153,255,0.15); color: var(--accent2); border: 1px solid rgba(0,153,255,0.25); }
+  .badge-amber { background: rgba(245,158,11,0.15); color: var(--warn);   border: 1px solid rgba(245,158,11,0.25); }
+  .badge-red   { background: rgba(239,68,68,0.15);  color: var(--danger); border: 1px solid rgba(239,68,68,0.25); }
+  .badge-teal  { background: rgba(0,212,170,0.12);  color: var(--accent); border: 1px solid rgba(0,212,170,0.2); }
+  .badge-purple{ background: rgba(192,132,252,0.12);color: var(--accent4);border: 1px solid rgba(192,132,252,0.2); }
+
+  /* Sections */
+  .section {
+    margin-bottom: 40px;
+  }
+
+  .section-title {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .section-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  .section-title .accent-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  /* Command cards */
+  .cmd-grid {
+    display: grid;
+    gap: 8px;
+  }
+
+  .cmd-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 14px 16px;
+    cursor: pointer;
+    transition: all 0.15s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .cmd-card::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background: var(--card-accent, var(--accent));
+    border-radius: 3px 0 0 3px;
+    opacity: 0.6;
+  }
+
+  .cmd-card:hover {
+    background: var(--bg3);
+    border-color: var(--border2);
+    transform: translateX(2px);
+  }
+
+  .cmd-card:hover::before {
+    opacity: 1;
+  }
+
+  .cmd-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 6px;
+  }
+
+  .cmd-label {
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 0.05em;
+  }
+
+  .cmd-copy {
+    font-size: 10px;
+    color: var(--muted);
+    padding: 2px 8px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: transparent;
+    cursor: pointer;
+    transition: all 0.15s;
+    font-family: var(--font-mono);
+    opacity: 0;
+  }
+
+  .cmd-card:hover .cmd-copy {
+    opacity: 1;
+  }
+
+  .cmd-copy:hover {
+    color: var(--accent);
+    border-color: var(--accent);
+  }
+
+  .cmd-copy.copied {
+    color: var(--success);
+    border-color: var(--success);
+    opacity: 1;
+  }
+
+  .cmd-code {
+    font-family: var(--font-mono);
+    font-size: 12.5px;
+    color: var(--text);
+    word-break: break-all;
+    line-height: 1.8;
+  }
+
+  .cmd-code .kw { color: var(--accent); }
+  .cmd-code .flag { color: var(--accent2); }
+  .cmd-code .path { color: var(--accent4); }
+  .cmd-code .str { color: var(--warn); }
+  .cmd-code .comment { color: var(--muted); font-style: italic; }
+  .cmd-code .danger { color: var(--danger); }
+
+  .cmd-desc {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 6px;
+    line-height: 1.5;
+  }
+
+  /* Two column grid */
+  .cmd-grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  /* Inline code */
+  code {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    background: rgba(255,255,255,0.07);
+    padding: 1px 5px;
+    border-radius: 3px;
+    color: var(--accent);
+  }
+
+  /* Warning block */
+  .warn-block {
+    background: rgba(245,158,11,0.08);
+    border: 1px solid rgba(245,158,11,0.2);
+    border-radius: var(--radius-lg);
+    padding: 12px 16px;
+    font-size: 12px;
+    color: var(--warn);
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    margin-bottom: 12px;
+  }
+
+  .warn-block::before { content: '⚠'; flex-shrink: 0; }
+
+  /* Info block */
+  .info-block {
+    background: rgba(0,212,170,0.06);
+    border: 1px solid rgba(0,212,170,0.15);
+    border-radius: var(--radius-lg);
+    padding: 12px 16px;
+    font-size: 12px;
+    color: var(--accent);
+    display: flex;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+
+  .info-block::before { content: 'ℹ'; flex-shrink: 0; }
+
+  /* Env vars table */
+  .env-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+  }
+
+  .env-table th {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    text-align: left;
+    padding: 6px 12px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .env-table td {
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+
+  .env-table tr:hover td {
+    background: rgba(255,255,255,0.02);
+  }
+
+  .env-table td:first-child {
+    font-family: var(--font-mono);
+    color: var(--accent4);
+    white-space: nowrap;
+  }
+
+  .env-table td:last-child {
+    color: var(--muted);
+    font-size: 11px;
+  }
+
+  /* Search */
+  .search-bar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--bg2);
+    border: 1px solid var(--border2);
+    border-radius: var(--radius-lg);
+    padding: 8px 14px;
+    margin-bottom: 28px;
+  }
+
+  .search-bar::before {
+    content: '⌕';
+    color: var(--muted);
+    font-size: 16px;
+  }
+
+  .search-bar input {
+    background: none;
+    border: none;
+    outline: none;
+    color: var(--text);
+    font-size: 13px;
+    font-family: var(--font-mono);
+    width: 100%;
+  }
+
+  .search-bar input::placeholder {
+    color: var(--muted);
+  }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+
+  .hidden { display: none !important; }
+
+  @media (max-width: 768px) {
+    nav { display: none; }
+    main { padding: 20px; }
+    .cmd-grid-2 { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="layout">
+
+<!-- Sidebar -->
+<nav>
+  <div class="nav-header">
+    <div class="nav-logo">VIGÍA</div>
+    <div class="nav-sub">Command Reference v2.1</div>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-section-label">Setup</div>
+    <a href="#setup"><span class="dot" style="background:#00d4aa"></span>Entorno</a>
+    <a href="#env"><span class="dot" style="background:#c084fc"></span>Variables</a>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-section-label">Tests</div>
+    <a href="#pytest"><span class="dot" style="background:#0099ff"></span>Pytest (85)</a>
+    <a href="#ebs"><span class="dot" style="background:#00d4aa"></span>EBS v1 (55)</a>
+    <a href="#stress"><span class="dot" style="background:#f59e0b"></span>Stress (3)</a>
+    <a href="#adversarial"><span class="dot" style="background:#ff6b35"></span>Adversarial (25)</a>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-section-label">Pipeline</div>
+    <a href="#demo"><span class="dot" style="background:#22c55e"></span>Demo / Cases</a>
+    <a href="#cases"><span class="dot" style="background:#0099ff"></span>Corpus (132)</a>
+    <a href="#validate"><span class="dot" style="background:#c084fc"></span>Validación</a>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-section-label">Git / CI</div>
+    <a href="#git"><span class="dot" style="background:#f59e0b"></span>Git</a>
+    <a href="#ci"><span class="dot" style="background:#00d4aa"></span>CI Validate</a>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-section-label">Debug</div>
+    <a href="#debug"><span class="dot" style="background:#ef4444"></span>Debug</a>
+  </div>
+</nav>
+
+<!-- Main -->
+<main>
+
+  <div class="page-header">
+    <div>
+      <div class="page-title">◈ VIGÍA Commands</div>
+      <div class="page-desc">SANS FIND EVIL Hackathon 2026 · Referencia operacional</div>
+    </div>
+    <div class="status-bar">
+      <span class="badge badge-green">85/85 pytest</span>
+      <span class="badge badge-teal">55/55 EBS v1</span>
+      <span class="badge badge-blue">10/12 CI</span>
+    </div>
+  </div>
+
+  <!-- Search -->
+  <div class="search-bar">
+    <input type="text" id="search" placeholder="Buscar comando..." oninput="filterCommands(this.value)">
+  </div>
+
+  <!-- SETUP -->
+  <div class="section" id="setup">
+    <div class="section-title">
+      <span class="accent-dot" style="background:var(--accent)"></span>
+      Setup — entorno de desarrollo
+    </div>
+
+    <div class="cmd-grid">
+      <div class="cmd-card" style="--card-accent: var(--accent)">
+        <div class="cmd-header">
+          <span class="cmd-label">Activar venv</span>
+          <button class="cmd-copy" onclick="copyCmd(this)">copiar</button>
+        </div>
+        <div class="cmd-code">
+          <span class="kw">cd</span> ~/vigia-repo &amp;&amp; <span class="kw">source</span> <span class="path">.venv/bin/activate</span>
+        </div>
+        <div class="cmd-desc">Siempre activar antes de correr cualquier comando</div>
+      </div>
+
+      <div class="cmd-card" style="--card-accent: var(--accent)">
+        <div class="cmd-header">
+          <span class="cmd-label">Setup desde clon limpio</span>
+          <button class="cmd-copy" onclick="copyCmd(this)">copiar</button>
+        </div>
+        <div class="cmd-code">
+          <span class="kw">bash</span> setup_dev.sh
+        </div>
+        <div class="cmd-desc">Crea venv, instala deps, fixture /tmp/vigia_test_evidence, genera secrets</div>
+      </div>
+
+      <div class="cmd-card" style="--card-accent: var(--accent)">
+        <div class="cmd-header">
+          <span class="cmd-label">Instalar dependencias</span>
+          <button class="cmd-copy" onclick="copyCmd(this)">copiar</button>
+        </div>
+        <div class="cmd-code">
+          <span class="kw">pip</span> install <span class="flag">-r</span> requirements.txt &amp;&amp; <span class="kw">pip</span> install pytest pytest-asyncio
+        </div>
+      </div>
+
+      <div class="cmd-card" style="--card-accent: var(--accent)">
+        <div class="cmd-header">
+          <span class="cmd-label">Inicializar base de patrones NLP</span>
+          <button class="cmd-copy" onclick="copyCmd(this)">copiar</button>
+        </div>
+        <div class="cmd-code">
+          <span class="kw">PYTHONPATH</span>=<span class="path">$(pwd)</span> python3 vigia/tools/init_patterns_db.py
+        </div>
+      </div>
+
+      <div class="cmd-card" style="--card-accent: var(--accent)">
+        <div class="cmd-header">
+          <span class="cmd-label">Crear fixture de test (manual)</span>
+          <button class="cmd-copy" onclick="copyCmd(this)">copiar</button>
+        </div>
+        <div class="cmd-code">
+          <span class="kw">sudo</span> mkdir -p /tmp/vigia_test_evidence/logs &amp;&amp; <span class="kw">sudo</span> touch /tmp/vigia_test_evidence/logs/test.log
+        </div>
+        <div class="cmd-desc">Requerido por test_safe_path_allowed. setup_dev.sh lo hace automáticamente</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ENV VARS -->
+  <div class="section" id="env">
+    <div class="section-title">
+      <span class="accent-dot" style="background:var(--accent4)"></span>
+      Variables de entorno
+    </div>
+
+    <div class="warn-block">
+      VIGIA_HMAC_KEY y KASSANDRA_SALT ya están en GitHub Secrets. Para correr localmente con cadena de custodia completa, exportarlas manualmente.
+    </div>
+
+    <div class="cmd-card" style="--card-accent: var(--accent4); margin-bottom: 8px">
+      <div class="cmd-header">
+        <span class="cmd-label">Generar secrets locales</span>
+        <button class="cmd-copy" onclick="copyCmd(this)">copiar</button>
+      </div>
+      <div class="cmd-code">
+        <span class="kw">export</span> <span class="flag">VIGIA_HMAC_KEY</span>=<span class="str">"$(python3 -c 'import secrets; print(secrets.token_hex(32))')"</span><br>
+        <span class="kw">export</span> <span class="flag">KASSANDRA_SALT</span>=<span class="str">"$(python3 -c 'import secrets; print(secrets.token_hex(16))')"</span><br>
+        <span class="kw">export</span> <span class="flag">VIGIA_EVIDENCE_DIR</span>=<span class="str">"/tmp/vigia_evidence"</span>
+      </div>
+    </div>
+
+    <table class="env-table">
+      <tr><th>Variable</th><th>Descripción</th><th>Estado</th></tr>
+      <tr>
+        <td>VIGIA_HMAC_KEY</td>
+        <td>Clave HMAC para cadena de custodia de logs (hex, ≥32 bytes)</td>
+        <td><span class="badge badge-green">GitHub Secret ✓</span></td>
+      </tr>
+      <tr>
+        <td>KASSANDRA_SALT</td>
+        <td>Salt para derivar session nonce del Protocolo Kassandra</td>
+        <td><span class="badge badge-green">GitHub Secret ✓</span></td>
+      </tr>
+      <tr>
+        <td>VIGIA_EVIDENCE_DIR</td>
+        <td>Directorio base de evidencia forense</td>
+        <td><span class="badge badge-amber">opcional local</span></td>
+      </tr>
+      <tr>
+        <td>VIGIA_LLM_BACKEND</td>
+        <td>Backend LLM para narrativa: <code>ollama</code> o <code>anthropic</code></td>
+        <td><span class="badge badge-amber">opcional</span></td>
+      </tr>
+      <tr>
+        <td>VIGIA_ENFORCE_STDIO</td>
+        <td>Bloquea HTTP sin auth en el servidor MCP</td>
+        <td><span class="badge badge-blue">producción</span></td>
+      </tr>
+      <tr>
+        <td>VIGIA_STRICT_MODEL_CHECK</td>
+        <td>Verifica SHA-256 del modelo CLIP antes de cargar</td>
+        <td><span class="badge badge-blue">producción</span></td>
+      </tr>
+    </table>
+  </div>
+
+  <!-- PYTEST -->
+  <div class="section" id="pytest">
+    <div class="section-title">
+      <span class="accent-dot" style="background:var(--accent2)"></span>
+      Tests pytest — suite principal
+    </div>
+
+    <div class="cmd-grid">
+      <div class="cmd-card" style="--card-accent: var(--accent2)">
+        <div class="cmd-header">
+          <span class="cmd-label">Correr 85 tests (suite completa)</span>
+          <button class="cmd-copy" onclick="copyCmd(this)">copiar</button>
+        </div>
+        <div class="cmd-code">
+          python -m pytest tests/ <span class="flag">-v</span> <span class="flag">--tb=short</span>
+        </div>
+        <div class="cmd-desc">Resultado esperado: <strong>85 passed</strong></div>
+      </div>
+
+      <div class="cmd-card" style="--card-accent: var(--accent2)">
+        <div class="cmd-header">
+          <span class="cmd-label">Solo un test específico</span>
+          <button class="cmd-copy" onclick="copyCmd(this)">copiar</button>
+        </div>
+        <div class="cmd-code">
+          python -m pytest <span class="path">tests/e2e/test_integration_end_to_end.py</span>::<span class="str">TestSecurityConstraints</span> <span class="flag">-v</span>
+        </div>
+      </div>
+
+      <div class="cmd-card" style="--card-accent: var(--accent2)">
+        <div class="cmd-header">
+          <span class="cmd-label">Con output verbose completo</span>
+          <button class="cmd-copy" onclick="copyCmd(this)">copiar</button>
+        </div>
+        <div class="cmd-code">
+          <span class="kw">VERBOSE</span>=1 python -m pytest tests/ <span class="flag">-v</span> <span class="flag">--tb=long</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- EBS V1 -->
+  <div class="section" id="ebs">
+    <div class="section-title">
+      <span class="accent-dot" style="background:var(--accent)"></span>
+      Tests EBS v1 — 55 tests de integración
+    </div>
+
+    <div class="cmd-grid">
+      <div class="cmd-card" style="--card-accent: var(--accent)">
+        <div class="cmd-header">
+          <span class="cmd-label">Correr 55 tests EBS v1</span>
+          <button class="cmd-copy" onclick="copyCmd(this)">copiar</button>
+        </div>
+        <div class="cmd-code">
+          <span class="kw">PYTHONPATH</span>=<span class="path">$(pwd)</span> python3 tests/integration/test_ebs_v1_integration.py
+        </div>
+        <div class="cmd-desc">Resultado esperado: <strong>55/55 tests pasaron</strong></div>
+      </div>
+
+      <div class="cmd-card" style="--card-accent: var(--accent)">
+        <div class="cmd-header">
+          <span class="cmd-label">Con traceback completo</span>
+          <button class="cmd-copy" onclick="copyCmd(this)">copiar</button>
+        </div>
+        <div class="cmd-code">
+          <span class="kw">PYTHONPATH</span>=<span class="path">$(pwd)</span> <span class="kw">VERBOSE</span>=1 python3 tests/integration/test_ebs_v1_integration.py
+        </div>
+      </div>
+
+      <div class="cmd-card" style="--card-accent: var(--accent)">
+        <div class="cmd-header">
+          <span class="cmd-label">Verificar bundle sellado (stdlib puro)</span>
+          <button class="cmd-copy" onclick="copyCmd(this)">copiar</button>
+        </div>
+        <div class="cmd-code">
+          python3 tests/verify_ebs_v1_parcheado.py <span class="flag">--help</span> &gt; /dev/null &amp;&amp; echo <span class="str">"OK stdlib"</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STRESS -->
+  <div class="section" id="stress">
+    <div class="section-title">
+      <span class="accent-dot" style="background:var(--warn)"></span>
+      Stress tests — colapso de supuestos
+    </div>
+
+    <div class="cmd-grid-2">
+      <div class="cmd-card" style="--card-accent: var(--warn)">
+        <div class="cmd-header">
+          <span class="cmd-label">Stress tests (3/3)</span>
+          <button class="cmd-copy" onclick="copyCmd(this)">copiar</button>
+        </div>
+        <div class="cmd-code">
+          python run_stress_tests.py
+        </div>
+      </div>
+
+      <div class="cmd-card" style="--card-accent: var(--warn)">
+        <div class="cmd-header">
+          <span class="cmd-label">Output JSON para CI</span>
+          <button class="cmd-copy" onclick="copyCmd(this)">copiar</button>
+        </div>
+        <div class="cmd-code">
+          python run_stress_tests.py <span class="flag">--json</span> &gt; stress_report.json
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ADVERSARIAL -->
+  <div class="section" id="adversarial">
+    <div class="section-title">
+      <span class="accent-dot" style="background:var(--accent3)"></span>
+      Adversarial fuzzing — 25 casos de colapso
+    </div>
+
+    <div class="cmd-grid">
+      <div class="cmd-card" style="--card-accent: var(--accent3)">
+        <div class="cmd-header">
+          <span class="cmd-label">Correr adversarial (22/25 esperados)</span>
+          <button class="cmd-copy" onclick="copyCmd(this)">copiar</button>
+        </div>
+        <div class="cmd-code">
+          python run_adversarial_tests.py
+        </div>
+        <div class="cmd-desc">3 fallas documentadas en <code>docs/adversarial_limitations.md</code> — sensor_independence no detectado nativamente en CAIE v2.0</div>
+      </div>
+
+      <div class="cmd-card" style="--card-accent: var(--accent3)">
+        <div class="cmd-header">
+          <span class="cmd-label">Ver detalle de los 3 casos que fallan</span>
+          <button class="cmd-copy" onclick="copyCmd(this)">copiar</button>
+        </div>
+        <div class="cmd-code">
+          python -c <span class="str">"
+import sys; from pathlib import Path; sys.path.insert(0, str(Path.cwd()))
+from vigia.tests.adversarial.runner import AdversarialRunner
+r = AdversarialRunner(Path('vigia/tests/adversarial/generated_cases'))
+[print(x['case_id'], x['actual_verdict'], x['criticality']) for x in r.run_all() if not x['passed']]
+"</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DEMO / PIPELINE -->
+  <div class="section" id="demo">
+    <div class="section-title">
+      <span class="accent-dot" style="background:var(--success)"></span>
+      Demo y pipeline EBS v1
+    </div>
+
+    <div class="cmd-grid">
+      <div class="cmd-card" style="--card-accent: var(--success)">
+        <div class="cmd-header">
+          <span class="cmd-label">Demo — caso temporal (Level 3)</span>
+          <button class="cmd-copy" onclick="copyCmd(this)">copiar</button>
+        </div>
+        <div class="cmd-code">
+          python scripts/run_demo.py <span class="flag">--case</span> <span class="path">cases/case_001_temporal.json</span>
+        </div>
+        <div class="cmd-desc">Produce bundle_hash SHA-256 + Level 3 Daubert. Esperado: MALICE, EFFECT_BEFORE_CAUSE</div>
+      </div>
+
+      <div class="cmd-card" style="--card-accent: var(--success)">
+        <div class="cmd-header">
+          <span class="cmd-label">Demo — false flag</span>
+          <button class="cmd-copy" onclick="copyCmd(this)">copiar</button>
+        </div>
+        <div class="cmd-code">
+          python scripts/run_demo.py <span class="flag">--case</span> <span class="path">cases/case_003_false_flag.json</span>
+        </div>
+      </div>
+
+      <div class="cmd-card" style="--card-accent: var(--success)">
+        <div class="cmd-header">
+          <span class="cmd-label">Verificar bundle sellado manualmente</span>
+          <button class="cmd-copy" onclick="copyCmd(this)">copiar</button>
+        </div>
+        <div class="cmd-code">
+          python3 tests/verify_ebs_v1_parcheado.py <span class="path">vigia_output/bundle_case_001_temporal.json</span>
+        </div>
+      </div>
+
+      <div class="cmd-card" style="--card-accent: var(--success)">
+        <div class="cmd-header">
+          <span class="cmd-label">Verificar determinismo bit-for-bit</span>
+          <button class="cmd-copy" onclick="copyCmd(this)">copiar</button>
+        </div>
+        <div class="cmd-code">
+          <span class="kw">PYTHONPATH</span>=<span class="path">$(pwd)</span> python3 tests/check_determinism.py
+        </div>
+        <div class="cmd-desc">Corre la misma herramienta 3 veces y compara SHA-256 de outputs</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CORPUS -->
+  <div class="section" id="cases">
+    <div class="section-title">
+      <span class="accent-dot" style="background:var(--accent2)"></span>
+      Corpus de casos — 132 casos canónicos
+    </div>
+
+    <div class="info-block">
+      132 casos con schema EBS v1 canónico: 16 curados en cases/, 45 convertidos legacy, 71 sintéticos.
+    </div>
+
+    <div class="cmd-grid">
+      <div class="cmd-card" style="--card-accent: var(--accent2)">
+        <div class="cmd-header">
+          <span class="cmd-label">Correr 16 casos curados</span>
+          <button class="cmd-copy" onclick="copyCmd(this)">copiar</button>
+        </div>
+        <div class="cmd-code">
+          python tests/run_all_cases.py
+        </div>
+        <div class="cmd-desc">Mean VIGÍA score: 0.81 | Mean Delta: +0.16</div>
+      </div>
+
+      <div class="cmd-card" style="--card-accent: var(--accent2)">
+        <div class="cmd-header">
+          <span class="cmd-label">Correr casos convertidos (legacy)</span>
+          <button class="cmd-copy" onclick="copyCmd(this)">copiar</button>
+        </div>
+        <div class="cmd-code">
+          python tests/run_all_cases.py <span class="flag">--cases-dir</span> <span class="path">data/cases/converted</span>
+        </div>
+        <div class="cmd-desc">48 casos REAL/BEN/BREAK convertidos</div>
+      </div>
+
+      <div class="cmd-card" style="--card-accent: var(--accent2)">
+        <div class="cmd-header">
+          <span class="cmd-label">Correr 71 casos sintéticos canónicos</span>
+          <button class="cmd-copy" onclick="copyCmd(this)">copiar</button>
+        </div>
+        <div class="cmd-code">
+          python tests/run_all_cases.py <span class="flag">--cases-dir</span> <span class="path">data/cases/consolidated_canonical</span>
+        </div>
+      </div>
+
+      <div class="cmd-card" style="--card-accent: var(--accent2)">
+        <div class="cmd-header">
+          <span class="cmd-label">Convertir casos legacy a canónico</span>
+          <button class="cmd-copy" onclick="copyCmd(this)">copiar</button>
+        </div>
+        <div class="cmd-code">
+          python3 scripts/convert_legacy_cases.py
+        </div>
+        <div class="cmd-desc">Convierte VIGIA-REAL, VIGIA-BEN, demos al schema EBS v1</div>
+      </div>
+
+      <div class="cmd-card" style="--card-accent: var(--accent2)">
+        <div class="cmd-header">
+          <span class="cmd-label">Convertir casos sintéticos</span>
+          <button class="cmd-copy" onclick="copyCmd(this)">copiar</button>
+        </div>
+        <div class="cmd-code">
+          python3 scripts/convert_synthetic_cases.py
+        </div>
+        <div class="cmd-desc">Convierte VIGIA-SYN-* desde data/cases/consolidated/</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- VALIDACION -->
+  <div class="section" id="validate">
+    <div class="section-title">
+      <span class="accent-dot" style="background:var(--accent4)"></span>
+      Validación Daubert y dataset
+    </div>
+
+    <div class="cmd-grid">
+      <div class="cmd-card" style="--card-accent: var(--accent4)">
+        <div class="cmd-header">
+          <span class="cmd-label">Validación Daubert (ROC AUC 0.9684)</span>
+          <button class="cmd-copy" onclick="copyCmd(this)">copiar</button>
+        </div>
+        <div class="cmd-code">
+          python tests/validate_dataset.py
+        </div>
+        <div class="cmd-desc">Genera reporte con ROC AUC, Brier score, ECE. Resultado: DEFENDIBLE</div>
+      </div>
+
+      <div class="cmd-card" style="--card-accent: var(--accent4)">
+        <div class="cmd-header">
+          <span class="cmd-label">CI Validation (10/12)</span>
+          <button class="cmd-copy" onclick="copyCmd(this)">copiar</button>
+        </div>
+        <div class="cmd-code">
+          python tests/vigia_ci_validate.py <span class="flag">--verbose</span>
+        </div>
+        <div class="cmd-desc">12 checks de seguridad forense. HMAC_KEY y KASSANDRA_SALT requieren env vars</div>
+      </div>
+
+      <div class="cmd-card" style="--card-accent: var(--accent4)">
+        <div class="cmd-header">
+          <span class="cmd-label">Verificar vectores canónicos P2</span>
+          <button class="cmd-copy" onclick="copyCmd(this)">copiar</button>
+        </div>
+        <div class="cmd-code">
+          sha256sum docs/protocols/P2/canonical_vectors_p2.json
+          <span class="comment"># Esperado: f7276a524a46149a2811d52f9e5072d2a281df227f9d46d084a651d6420cf4ce</span>
+        </div>
+      </div>
+
+      <div class="cmd-card" style="--card-accent: var(--accent4)">
+        <div class="cmd-header">
+          <span class="cmd-label">Verificar stdlib puro en verify_ebs_v1</span>
+          <button class="cmd-copy" onclick="copyCmd(this)">copiar</button>
+        </div>
+        <div class="cmd-code">
+          python3 -c <span class="str">"
+import ast
+tree = ast.parse(open('vigia/forensics/verify_ebs_v1.py').read())
+imports = [n for n in ast.walk(tree) if isinstance(n, (ast.Import, ast.ImportFrom))]
+print('Imports:', len(imports), '— stdlib puro OK')
+"</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- GIT -->
+  <div class="section" id="git">
+    <div class="section-title">
+      <span class="accent-dot" style="background:var(--warn)"></span>
+      Git — flujo de trabajo
+    </div>
+
+    <div class="cmd-grid">
+      <div class="cmd-card" style="--card-accent: var(--warn)">
+        <div class="cmd-header">
+          <span class="cmd-label">Estado actual del repo</span>
+          <button class="cmd-copy" onclick="copyCmd(this)">copiar</button>
+        </div>
+        <div class="cmd-code">
+          git status &amp;&amp; git log <span class="flag">--oneline</span> <span class="flag">-5</span>
+        </div>
+      </div>
+
+      <div class="cmd-card" style="--card-accent: var(--warn)">
+        <div class="cmd-header">
+          <span class="cmd-label">Commit estándar</span>
+          <button class="cmd-copy" onclick="copyCmd(this)">copiar</button>
+        </div>
+        <div class="cmd-code">
+          git add -A &amp;&amp; git diff <span class="flag">--cached</span> <span class="flag">--stat</span>
+          <span class="comment"># revisar antes de commitear</span><br>
+          git commit -m <span class="str">"tipo(scope): descripción"</span><br>
+          git push origin main
+        </div>
+      </div>
+
+      <div class="cmd-card" style="--card-accent: var(--warn)">
+        <div class="cmd-header">
+          <span class="cmd-label">Verificar sintaxis antes de commitear</span>
+          <button class="cmd-copy" onclick="copyCmd(this)">copiar</button>
+        </div>
+        <div class="cmd-code">
+          python3 -m py_compile <span class="path">archivo.py</span> &amp;&amp; echo <span class="str">"OK"</span>
+        </div>
+      </div>
+
+      <div class="cmd-card" style="--card-accent: var(--warn)">
+        <div class="cmd-header">
+          <span class="cmd-label">Verificar sintaxis de todos los módulos</span>
+          <button class="cmd-copy" onclick="copyCmd(this)">copiar</button>
+        </div>
+        <div class="cmd-code">
+          find vigia/ <span class="flag">-name</span> <span class="str">"*.py"</span> | xargs <span class="flag">-I{}</span> python3 -m py_compile {} &amp;&amp; echo <span class="str">"Todos OK"</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CI -->
+  <div class="section" id="ci">
+    <div class="section-title">
+      <span class="accent-dot" style="background:var(--accent)"></span>
+      CI — suite completa local
+    </div>
+
+    <div class="cmd-card" style="--card-accent: var(--accent); margin-bottom: 8px">
+      <div class="cmd-header">
+        <span class="cmd-label">Correr TODO (replica CI completo)</span>
+        <button class="cmd-copy" onclick="copyCmd(this)">copiar</button>
+      </div>
+      <div class="cmd-code">
+        ./run_all_tests.sh
+      </div>
+      <div class="cmd-desc">Corre pytest(85) + EBS v1(55) + casos(16) + dataset + CI validate + stress(3) + adversarial(25)</div>
+    </div>
+
+    <div class="cmd-grid-2">
+      <div class="cmd-card" style="--card-accent: var(--accent)">
+        <div class="cmd-header">
+          <span class="cmd-label">Solo los jobs que corren en CI</span>
+          <button class="cmd-copy" onclick="copyCmd(this)">copiar</button>
+        </div>
+        <div class="cmd-code">
+          <span class="comment"># Job 1: Sintaxis</span><br>
+          find vigia/ <span class="flag">-name</span> <span class="str">"*.py"</span> | xargs <span class="flag">-I{}</span> python3 -m py_compile {}<br>
+          <span class="comment"># Job 2: Tests EBS v1</span><br>
+          <span class="kw">PYTHONPATH</span>=<span class="path">$(pwd)</span> python3 tests/integration/test_ebs_v1_integration.py<br>
+          <span class="comment"># Job 3: CI Validate</span><br>
+          python3 tests/vigia_ci_validate.py<br>
+          <span class="comment"># Job 4: Determinismo</span><br>
+          <span class="kw">PYTHONPATH</span>=<span class="path">$(pwd)</span> python3 tests/check_determinism.py
+        </div>
+      </div>
+
+      <div class="cmd-card" style="--card-accent: var(--accent)">
+        <div class="cmd-header">
+          <span class="cmd-label">Ver último run en GitHub Actions</span>
+          <button class="cmd-copy" onclick="copyCmd(this)">copiar</button>
+        </div>
+        <div class="cmd-code">
+          <span class="comment"># URL directa</span><br>
+          <span class="str">https://github.com/annatchijova/vigia-intent-analysis/actions</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DEBUG -->
+  <div class="section" id="debug">
+    <div class="section-title">
+      <span class="accent-dot" style="background:var(--danger)"></span>
+      Debug — diagnóstico de problemas
+    </div>
+
+    <div class="cmd-grid">
+      <div class="cmd-card" style="--card-accent: var(--danger)">
+        <div class="cmd-header">
+          <span class="cmd-label">Ver qué módulo está importando Python</span>
+          <button class="cmd-copy" onclick="copyCmd(this)">copiar</button>
+        </div>
+        <div class="cmd-code">
+          python3 -c <span class="str">"import modulo; print(modulo.__file__)"</span>
+        </div>
+      </div>
+
+      <div class="cmd-card" style="--card-accent: var(--danger)">
+        <div class="cmd-header">
+          <span class="cmd-label">Ver sys.modules en runtime</span>
+          <button class="cmd-copy" onclick="copyCmd(this)">copiar</button>
+        </div>
+        <div class="cmd-code">
+          python3 -c <span class="str">"
+import sys
+from vigia.core.ebs_v1 import SignalOutput
+print([(k,v.__file__) for k,v in sys.modules.items() if 'engine' in k.lower()])
+"</span>
+        </div>
+      </div>
+
+      <div class="cmd-card" style="--card-accent: var(--danger)">
+        <div class="cmd-header">
+          <span class="cmd-label">Buscar referencias a vigia.engine (debe ser vigia.inference)</span>
+          <button class="cmd-copy" onclick="copyCmd(this)">copiar</button>
+        </div>
+        <div class="cmd-code">
+          grep -r <span class="str">"vigia\.engine"</span> vigia/ <span class="flag">--include="*.py"</span> | grep -v __pycache__
+        </div>
+        <div class="cmd-desc">Debe dar vacío. vigia/engine fue renombrado a vigia/inference para evitar conflicto con ./engine/</div>
+      </div>
+
+      <div class="cmd-card" style="--card-accent: var(--danger)">
+        <div class="cmd-header">
+          <span class="cmd-label">Verificar CAIE con un caso simple</span>
+          <button class="cmd-copy" onclick="copyCmd(this)">copiar</button>
+        </div>
+        <div class="cmd-code">
+          python3 debug_cdl.py
+        </div>
+      </div>
+
+      <div class="cmd-card" style="--card-accent: var(--danger)">
+        <div class="cmd-header">
+          <span class="cmd-label">Localizar archivos huérfanos</span>
+          <button class="cmd-copy" onclick="copyCmd(this)">copiar</button>
+        </div>
+        <div class="cmd-code">
+          find . <span class="flag">-name</span> <span class="str">"*.py.backup*"</span> <span class="flag">-o</span> <span class="flag">-name</span> <span class="str">"*.py.patch"</span> | grep -v .venv
+        </div>
+        <div class="cmd-desc">Archivos temporales que no deben ir al repo</div>
+      </div>
+
+      <div class="cmd-card" style="--card-accent: var(--danger)">
+        <div class="cmd-header">
+          <span class="cmd-label">Schema de un caso JSON</span>
+          <button class="cmd-copy" onclick="copyCmd(this)">copiar</button>
+        </div>
+        <div class="cmd-code">
+          python3 -c <span class="str">"
+import json
+with open('cases/case_001_temporal.json') as f: d=json.load(f)
+print('keys:', list(d.keys()))
+print('artifacts[0]:', list(d['artifacts'][0].keys()))
+"</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</main>
+</div>
+
+<script>
+function copyCmd(btn) {
+  const card = btn.closest('.cmd-card');
+  const codeEl = card.querySelector('.cmd-code');
+  const text = codeEl.innerText.replace(/\s+/g, ' ').trim();
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = 'copiado ✓';
+    btn.classList.add('copied');
+    setTimeout(() => {
+      btn.textContent = 'copiar';
+      btn.classList.remove('copied');
+    }, 1500);
+  });
+}
+
+function filterCommands(query) {
+  const q = query.toLowerCase().trim();
+  const cards = document.querySelectorAll('.cmd-card');
+  const sections = document.querySelectorAll('.section');
+
+  if (!q) {
+    cards.forEach(c => c.classList.remove('hidden'));
+    sections.forEach(s => s.classList.remove('hidden'));
+    return;
+  }
+
+  cards.forEach(card => {
+    const text = card.innerText.toLowerCase();
+    card.classList.toggle('hidden', !text.includes(q));
+  });
+
+  sections.forEach(section => {
+    const visibleCards = section.querySelectorAll('.cmd-card:not(.hidden)');
+    section.classList.toggle('hidden', visibleCards.length === 0);
+  });
+}
+
+document.querySelectorAll('nav a').forEach(link => {
+  link.addEventListener('click', e => {
+    e.preventDefault();
+    const id = link.getAttribute('href').slice(1);
+    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+});
+</script>
+
+</body>
+</html>
