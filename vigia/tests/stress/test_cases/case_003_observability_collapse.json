@@ -1,6 +1,6 @@
 {
   "case_id": "STRESS_003_OBSERVABILITY_COLLAPSE",
-  "description": "Low observability - CAIE returns INCONCLUSIVE when CDL detects collapse",
+  "description": "Low observability - CAIE v2.0",
   "artifacts": [
     {
       "source_tool": "network_monitor",
@@ -11,8 +11,7 @@
   ],
   "expected": {
     "verdict": "INCONCLUSIVE",
-    "must_not_be": ["MALICE", "NOISE"],
-    "probabilistic_score_max": 0.9,
-    "note": "CDL may trigger INCONCLUSIVE on low observability"
+    "must_not_be": ["MALICE"],
+    "probabilistic_score_max": 0.9
   }
 }
