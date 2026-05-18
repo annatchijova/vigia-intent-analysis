@@ -52,7 +52,7 @@ jobs:
           PYTHONPATH=${{ github.workspace }} python3 vigia/tools/init_patterns_db.py
       - name: Tests EBS v1 integración (55 tests)
         run: |
-          PYTHONPATH=${{ github.workspace }} python3 tests/test_ebs_v1_integration.py
+          PYTHONPATH=${{ github.workspace }} python3 tests/integration/test_ebs_v1_integration.py
         timeout-minutes: 15
       - name: Tests integración end-to-end
         run: |
