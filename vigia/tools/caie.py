@@ -1095,6 +1095,49 @@ class CrossArtifactIncongruenceEngine:
                     ),
                 )
 
+        # Rule 9: NARRATIVE_POISONING_DETECTED
+        # Textual artifacts claiming benignity while technical evidence
+        # contradicts them. This is prompt injection / narrative poisoning
+        # designed to manipulate downstream analysis. (VIGIA_BREAK_009)
+        _BENIGNITY_KEYWORDS = frozenset({
+            "benign", "confirmed benign", "false positive",
+            "approved", "not suspicious", "no threat",
+        })
+        narrative_artifacts = [
+            a for a in self._artifacts
+            if a.evidence_type in ("log_entry", "text", "report")
+            and any(kw in a.description.lower() for kw in _BENIGNITY_KEYWORDS)
+        ]
+        technical_contradictory = [
+            a for a in self._artifacts
+            if a.evidence_type in ("network_artifact", "memory_process",
+                                   "kernel_structure", "usn_journal",
+                                   "lsass_session", "hmac_audit_log",
+                                   "dns_record", "ip_geolocation")
+            and a.raw_score > _dround(0.7, _DETERMINISTIC_INTERNAL_PREC)
+        ]
+        if narrative_artifacts and technical_contradictory:
+            for nar in narrative_artifacts:
+                for tech in technical_contradictory:
+                    self._fractures.append(Fracture(
+                        artifact_a=f"Narrative: {nar.description[:60]}",
+                        artifact_b=f"Technical: {tech.description[:60]}",
+                        fracture_type="NARRATIVE_POISONING_DETECTED",
+                        severity=_dround(0.85, _DETERMINISTIC_INTERNAL_PREC),
+                        interpretation=(
+                            "Unverified textual claim of benignity contradicts "
+                            "high-confidence technical evidence of malicious activity. "
+                            "This is narrative poisoning: an adversarial attempt to "
+                            "inject false reassurance into the evidence stream. "
+                            "Peirce Secondness: the text asserts absence, the technical "
+                            "data asserts presence. One of them is a lie; in DFIR, "
+                            "unverified narrative claims are the lie by default. "
+                            "T1565.001 — Data Manipulation: Stored Data."
+                        ),
+                        spoofability_delta=_dround(0.60 - 0.20, _DETERMINISTIC_INTERNAL_PREC),
+                        ttp_id="T1565.001",
+                    ))
+
         return self._fractures
 
     # ------------------------------------------------------------------
@@ -1209,6 +1252,7 @@ class CrossArtifactIncongruenceEngine:
             "DOCUMENT_FORGERY",
             "NETWORK_VS_HOST",
             "MFT_ENTRY_ANOMALY",
+            "NARRATIVE_POISONING_DETECTED",
         })
 
         has_golden_rule = any(f.fracture_type in _GOLDEN_RULE_TYPES for f in filtered_fractures)

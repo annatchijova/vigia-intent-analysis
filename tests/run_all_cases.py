@@ -47,38 +47,53 @@ def main():
     results = []
     for cf in case_files:
         with open(cf, encoding="utf-8") as f:
-            case = json.load(f)
-        result = _vigia_score(case)
-        naive = _naive_score(case.get("artifacts", []))
-        expected = case.get("expected_verdict", "?")
-        match = result["verdict"] == expected
-        results.append({
-            "case_id": case.get("case_id", cf.stem),
-            "name": case.get("name", cf.stem)[:45],
-            "vigia_verdict": result["verdict"],
-            "vigia_score": result["score"],
-            "naive_score": naive,
-            "expected": expected,
-            "pass": match,
-        })
+            raw = json.load(f)
+        
+        # Handle batch files (list of cases) vs single case (dict)
+        if isinstance(raw, list):
+            cases_to_process = raw
+        else:
+            cases_to_process = [raw]
+        
+        for idx, case in enumerate(cases_to_process):
+            result = _vigia_score(case)
+            naive = _naive_score(case.get("artifacts", []))
+            expected = case.get("expected_verdict", "?")
+            match = result["verdict"] == expected
+            results.append({
+                "case_id": case.get("case_id", f"{cf.stem}_{idx}"),
+                "name": case.get("name", cf.stem)[:45],
+                "vigia_verdict": result["verdict"],
+                "vigia_score": result["score"],
+                "naive_score": naive,
+                "expected": expected,
+                "pass": match,
+            })
 
-        vc = _verdict_color(result["verdict"])
-        status = f"{GRN}{RST}" if match else f"{RED}{RST}"
-        print(f"  {status} [{cf.stem}]")
-        print(f"      VIGÍA  → {vc}{result['verdict']:10s}{RST} score={result['score']:.4f}  conf={result['confidence']:.2%}")
-        print(f"      Naive  → score={naive:.4f}")
-        print(f"      Delta  : {result['score'] - naive:+.4f}  |  Expected: {expected}")
-        if result.get("hard_temporal_gate"):
-            print(f"      {RED}HARD GATE: EFFECT_BEFORE_CAUSE{RST}")
-        print()
+            vc = _verdict_color(result["verdict"])
+            status = f"{GRN}{RST}" if match else f"{RED}{RST}"
+            print(f"  {status} [{cf.stem}]")
+            print(f"      VIGÍA  → {vc}{result['verdict']:10s}{RST} score={result['score']:.4f}  conf={result['confidence']:.2%}")
+            print(f"      Naive  → score={naive:.4f}")
+            print(f"      Delta  : {result['score'] - naive:+.4f}  |  Expected: {expected}")
+            if result.get("hard_temporal_gate"):
+                print(f"      {RED}HARD GATE: EFFECT_BEFORE_CAUSE{RST}")
+            print()
 
     passed = sum(1 for r in results if r["pass"])
     total = len(results)
+    fails = [r for r in results if not r["pass"]]
     print(f"{'─' * 72}")
     print(f"  Results: {GRN}{passed}/{total} PASS{RST}", end="")
     if passed < total:
         print(f"  {RED}{total-passed} FAIL{RST}", end="")
     print()
+
+    if fails:
+        print(f"\n  {RED}FAILED CASES:{RST}")
+        for r in fails:
+            delta = r["vigia_score"] - r["naive_score"]
+            print(f"    - {r['case_id']}: VIGIA={r['vigia_verdict']} (exp={r['expected']}) score={r['vigia_score']:.4f} delta={delta:+.4f}")
 
     mean_vigia = sum(r["vigia_score"] for r in results) / len(results)
     mean_naive = sum(r["naive_score"] for r in results) / len(results)

@@ -103,7 +103,7 @@ from typing import Dict, List, Set, Tuple
 # ============================================================================
 
 CRITICAL_FILES = [
-    "vigia_sift_bridge.py",
+    "vigia/vigia_sift_bridge.py",
     "vigia/core/graph_stability.py",
     "vigia/tools/abductive_intent_engine.py",
     "vigia/tools/visible_variables.py",
@@ -250,7 +250,7 @@ class VIGIACIValidator:
     # ------------------------------------------------------------------
     def check_nonce_determinista(self) -> None:
         """Verifica que el bridge use nonce determinista (no uuid)."""
-        content = self._load_file("vigia_sift_bridge.py")
+        content = self._load_file("vigia/vigia_sift_bridge.py")
         if not content:
             self._add_result("NONCE_DETERMINISTA", False, "vigia_sift_bridge.py no encontrado.")
             return
@@ -334,7 +334,7 @@ class VIGIACIValidator:
     # ------------------------------------------------------------------
     def check_i2_invariance(self) -> None:
         """Verifica que exista verificación de stdlib integrity."""
-        content = self._load_file("vigia_sift_bridge.py")
+        content = self._load_file("vigia/vigia_sift_bridge.py")
         if not content:
             self._add_result("I2_INVARIANCE_CHECK", False, "vigia_sift_bridge.py no encontrado.")
             return
@@ -360,7 +360,7 @@ class VIGIACIValidator:
         entry_points = [
             ("vigia/tools/eml_symbolic.py", "analyze_symbolic_regression"),
             ("vigia/tools/eml_gci.py", "analyze_gci"),
-            ("vigia_sift_bridge.py", "reason_with_llm"),
+            ("vigia/vigia_sift_bridge.py", "reason_with_llm"),
         ]
         missing = []
         for fname, func in entry_points:
