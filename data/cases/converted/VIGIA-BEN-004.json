@@ -1,0 +1,80 @@
+{
+  "case_id": "VIGIA-BEN-004",
+  "name": "El Script Perfecto — Ansible No Humano",
+  "description": "Script de despliegue ejecuta 47 comandos sin errores, sin reintentos, con timing exacto. Es generado por Ansible Tower con playbook aprobado por change management.",
+  "artifacts": [
+    {
+      "artifact_id": "ART-001",
+      "evidence_type": "log_entry",
+      "source_tool": "legacy_converter",
+      "timestamp": "2026-04-10T10:00:00Z",
+      "raw_score": 0.7,
+      "prior_trust": 0.7,
+      "provenance_chain": [
+        "sha256:legacy_ART-001"
+      ],
+      "description": "ansible-playbook deploy_production.yml --check --diff | 47 tasks executed | 0 failures | 0 changed (dry run) | 2024-06-10 02:00:00 UTC | User: ansible_svc | SSH key: ansible@tower.company.com",
+      "metadata": {
+        "original_type": "bash_history",
+        "peirce_layer": "FIRSTNESS",
+        "forensic_anomalies": [
+          "Ejecución perfecta sin errores humanos",
+          "Timing exacto entre comandos (automatización)"
+        ],
+        "content_preview": "ansible-playbook deploy_production.yml --check --diff | 47 tasks executed | 0 failures | 0 changed ("
+      }
+    },
+    {
+      "artifact_id": "ART-002",
+      "evidence_type": "file_timestamp",
+      "source_tool": "legacy_converter",
+      "timestamp": "2026-04-10T10:00:00Z",
+      "raw_score": 0.85,
+      "prior_trust": 0.7,
+      "provenance_chain": [
+        "sha256:legacy_ART-002"
+      ],
+      "description": "Playbook: deploy_production.yml | Git commit: a1b2c3d | Approved by: change_advisory_board #2024-06-05 | Jira ticket: CHG-0042 | Reviewer: senior_dev_lead | Signed off: 2024-06-07",
+      "metadata": {
+        "original_type": "file_metadata",
+        "peirce_layer": "SECONDNESS",
+        "forensic_anomalies": [
+          "Cambio aprobado por board formal",
+          "Playbook versionado en Git con firma"
+        ],
+        "content_preview": "Playbook: deploy_production.yml | Git commit: a1b2c3d | Approved by: change_advisory_board #2024-06-"
+      }
+    },
+    {
+      "artifact_id": "ART-003",
+      "evidence_type": "memory_process",
+      "source_tool": "legacy_converter",
+      "timestamp": "2026-04-10T10:00:00Z",
+      "raw_score": 0.95,
+      "prior_trust": 0.7,
+      "provenance_chain": [
+        "sha256:legacy_ART-003"
+      ],
+      "description": "Parent: ansible-tower.service (PID 1234) | Child: ssh ansible_svc@target | Ansible facts gathered: 2024-06-10 02:00:01 | No interactive shell | No TTY allocated",
+      "metadata": {
+        "original_type": "process_list",
+        "peirce_layer": "THIRDNESS",
+        "forensic_anomalies": [
+          "Proceso sin TTY (automatización, no interactivo)",
+          "Parent es servicio de Ansible Tower"
+        ],
+        "content_preview": "Parent: ansible-tower.service (PID 1234) | Child: ssh ansible_svc@target | Ansible facts gathered: 2"
+      }
+    }
+  ],
+  "temporal_violations": [],
+  "expected_verdict": "NOISE",
+  "expected_confidence": 90,
+  "expected_mitre_ttps": [],
+  "metadata": {
+    "converted_from": "legacy_v1",
+    "original_verdict": "NOISE",
+    "abstention_risk": "bajo",
+    "carnegie_pattern": null
+  }
+}

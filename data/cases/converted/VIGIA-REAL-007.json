@@ -1,0 +1,84 @@
+{
+  "case_id": "VIGIA-REAL-007",
+  "name": "Digital Corpora Nitroba Harassment",
+  "description": "La profesora de Química Lily Tuckrige de Nitroba State University recibió emails de acoso. El tráfico de red capturado (~60MB pcap) reveló que el perpetrador usó Gmail webmail desde una IP interna de dormitorio estudiantil, enviando cookies en plaintext sobre HTTP.",
+  "artifacts": [
+    {
+      "artifact_id": "ART-001",
+      "evidence_type": "log_entry",
+      "source_tool": "legacy_converter",
+      "timestamp": "2026-04-10T10:00:00Z",
+      "raw_score": 0.7,
+      "prior_trust": 0.7,
+      "provenance_chain": [
+        "sha256:legacy_ART-001"
+      ],
+      "description": "PCAP ~60MB | IP origen externa: 140.247.62.34 (dormitorio estudiantil) | IP interna NAT: 192.168.15.4 | MAC address: 00:17:f2:e2:c0:ce (dispositivo Apple) | User Agent: Internet Explorer 6 en Windows ",
+      "metadata": {
+        "original_type": "network_flow",
+        "peirce_layer": "FIRSTNESS",
+        "forensic_anomalies": [
+          "Tráfico Gmail con cookies enviadas en plaintext sobre HTTP",
+          "Uso de servicio willselfdestruct.com para enviar email anónimo de acoso"
+        ],
+        "content_preview": "PCAP ~60MB | IP origen externa: 140.247.62.34 (dormitorio estudiantil) | IP interna NAT: 192.168.15."
+      }
+    },
+    {
+      "artifact_id": "ART-002",
+      "evidence_type": "log_entry",
+      "source_tool": "legacy_converter",
+      "timestamp": "2026-04-10T10:00:00Z",
+      "raw_score": 0.85,
+      "prior_trust": 0.7,
+      "provenance_chain": [
+        "sha256:legacy_ART-002"
+      ],
+      "description": "Email #1: badguy@hotmail.com | Fecha: Julio 13 | Email #2: willselfdestruct.com | Mensaje: 'you can't find us and you can't hide from us. Stop teaching. Start running.' | Cuenta identificada: jcoach@g",
+      "metadata": {
+        "original_type": "email_header",
+        "peirce_layer": "SECONDNESS",
+        "forensic_anomalies": [
+          "Mensaje de amenaza explícita enviado a través de servicio de autodestrucción",
+          "La cuenta Gmail jcoach@gmail.com fue identificada mediante cookies en plaintext en el pcap"
+        ],
+        "content_preview": "Email #1: badguy@hotmail.com | Fecha: Julio 13 | Email #2: willselfdestruct.com | Mensaje: 'you can'"
+      }
+    },
+    {
+      "artifact_id": "ART-003",
+      "evidence_type": "file_timestamp",
+      "source_tool": "legacy_converter",
+      "timestamp": "2026-04-10T10:00:00Z",
+      "raw_score": 0.85,
+      "prior_trust": 0.7,
+      "provenance_chain": [
+        "sha256:legacy_ART-003"
+      ],
+      "description": "Setup de red: Tres mujeres comparten dormitorio (Alice, Barbara, Candice) | Wi-Fi router sin password instalado por amigo | Ethernet provisto por universidad | Roster de estudiantes: Chemistry 109 dis",
+      "metadata": {
+        "original_type": "file_metadata",
+        "peirce_layer": "SECONDNESS",
+        "forensic_anomalies": [
+          "Router WiFi sin contraseña permite acceso anónimo y no rastreable",
+          "La combinación de Ethernet universitario + WiFi no seguro complica la atribución"
+        ],
+        "content_preview": "Setup de red: Tres mujeres comparten dormitorio (Alice, Barbara, Candice) | Wi-Fi router sin passwor"
+      }
+    }
+  ],
+  "temporal_violations": [],
+  "expected_verdict": "MALICE",
+  "expected_confidence": 91,
+  "expected_mitre_ttps": [
+    "T1566.001",
+    "T1585.001",
+    "T1071.001"
+  ],
+  "metadata": {
+    "converted_from": "legacy_v1",
+    "original_verdict": "MALICE",
+    "abstention_risk": "medio",
+    "carnegie_pattern": null
+  }
+}

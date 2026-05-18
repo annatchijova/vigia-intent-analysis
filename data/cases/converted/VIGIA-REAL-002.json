@@ -1,0 +1,128 @@
+{
+  "case_id": "VIGIA-REAL-002",
+  "name": "NIST Data Leakage Case (Sr. Informant)",
+  "description": "El Sr. Informant, gerente de desarrollo tecnológico en la empresa OOO, recibió una oferta de un conspirador para filtrar información confidencial sobre nuevas tecnologías. Utilizó email, Google Drive, USB y CD-R para exfiltrar datos mientras aplicaba técnicas anti-forenses.",
+  "artifacts": [
+    {
+      "artifact_id": "ART-001",
+      "evidence_type": "log_entry",
+      "source_tool": "legacy_converter",
+      "timestamp": "2026-04-10T10:00:00Z",
+      "raw_score": 0.7,
+      "prior_trust": 0.7,
+      "provenance_chain": [
+        "sha256:legacy_ART-001"
+      ],
+      "description": "Event ID 4624 (Logon) - 2015-03-23 16:00:22 Eastern Time+DST | Event ID 4647 (Logoff) - 2015-03-23 17:02:53 | Event ID 4608 (Startup) - 2015-03-24 09:21:29 | Event ID 1100 (Shutdown) - 2015-03-24 17:0",
+      "metadata": {
+        "original_type": "auth_log",
+        "peirce_layer": "FIRSTNESS",
+        "forensic_anomalies": [
+          "Actividad de logon fuera del horario permitido (16:00 es el límite según política)",
+          "Patrón de logoff rápido el 24 de marzo tras actividad de exfiltración"
+        ],
+        "content_preview": "Event ID 4624 (Logon) - 2015-03-23 16:00:22 Eastern Time+DST | Event ID 4647 (Logoff) - 2015-03-23 1"
+      }
+    },
+    {
+      "artifact_id": "ART-002",
+      "evidence_type": "log_entry",
+      "source_tool": "legacy_converter",
+      "timestamp": "2026-04-10T10:00:00Z",
+      "raw_score": 0.85,
+      "prior_trust": 0.7,
+      "provenance_chain": [
+        "sha256:legacy_ART-002"
+      ],
+      "description": "From: spy.conspirator@nist.gov | To: jaman.informant@nist.gov | Subject: (important request) | Body: conformal But, I need a more data. Do your best. | Fecha: 2015-03-23 | Follow-up: Subject 'Last req",
+      "metadata": {
+        "original_type": "email_header",
+        "peirce_layer": "SECONDNESS",
+        "forensic_anomalies": [
+          "Emails de un dominio externo (nist.gov) solicitando datos confidenciales",
+          "Lenguaje conspirativo ('conformal', 'I need more data')"
+        ],
+        "content_preview": "From: spy.conspirator@nist.gov | To: jaman.informant@nist.gov | Subject: (important request) | Body:"
+      }
+    },
+    {
+      "artifact_id": "ART-003",
+      "evidence_type": "file_timestamp",
+      "source_tool": "legacy_converter",
+      "timestamp": "2026-04-10T10:00:00Z",
+      "raw_score": 0.85,
+      "prior_trust": 0.7,
+      "provenance_chain": [
+        "sha256:legacy_ART-003"
+      ],
+      "description": "Archivos confidenciales encontrados: [secret_project]_pricing_decision.docx, [secret_project]_final_meeting.pptx | Acción: Renombrados cambiando extensiones (.docx a .mp3, .pptx a .jpg) | Timestamp re",
+      "metadata": {
+        "original_type": "file_metadata",
+        "peirce_layer": "SECONDNESS",
+        "forensic_anomalies": [
+          "Cambio deliberado de extensiones para ocultar el contenido real",
+          "Los archivos son confidenciales según la política de la empresa"
+        ],
+        "content_preview": "Archivos confidenciales encontrados: [secret_project]_pricing_decision.docx, [secret_project]_final_"
+      }
+    },
+    {
+      "artifact_id": "ART-004",
+      "evidence_type": "log_entry",
+      "source_tool": "legacy_converter",
+      "timestamp": "2026-04-10T10:00:00Z",
+      "raw_score": 0.95,
+      "prior_trust": 0.7,
+      "provenance_chain": [
+        "sha256:legacy_ART-004"
+      ],
+      "description": "Google Drive instalado y logueado con aman.informat.personall@gmail.com | Archivos subidos a Google Drive y compartidos | Email enviado: 'Login is below.' | CCleaner y Eraser instalados posteriormente",
+      "metadata": {
+        "original_type": "bash_history",
+        "peirce_layer": "THIRDNESS",
+        "forensic_anomalies": [
+          "Uso de cuenta personal de Gmail para exfiltrar datos corporativos",
+          "Instalación de herramientas anti-forenses (CCleaner, Eraser) después de la exfiltración"
+        ],
+        "content_preview": "Google Drive instalado y logueado con aman.informat.personall@gmail.com | Archivos subidos a Google "
+      }
+    },
+    {
+      "artifact_id": "ART-005",
+      "evidence_type": "log_entry",
+      "source_tool": "legacy_converter",
+      "timestamp": "2026-04-10T10:00:00Z",
+      "raw_score": 0.85,
+      "prior_trust": 0.7,
+      "provenance_chain": [
+        "sha256:legacy_ART-005"
+      ],
+      "description": "Conexión a unidad de red: \\\\10.11.11.128\\secured_drive | Directorios recorridos en búsqueda de archivos | Archivos copiados desde red a Desktop\\$ data | Desconexión de unidad de red | Network drive IP",
+      "metadata": {
+        "original_type": "network_flow",
+        "peirce_layer": "SECONDNESS",
+        "forensic_anomalies": [
+          "Acceso a unidad de red segura seguido de copia local de archivos",
+          "La desconexión inmediata después de copiar archivos indica patrón de recolección selectiva"
+        ],
+        "content_preview": "Conexión a unidad de red: \\\\10.11.11.128\\secured_drive | Directorios recorridos en búsqueda de archi"
+      }
+    }
+  ],
+  "temporal_violations": [],
+  "expected_verdict": "MALICE",
+  "expected_confidence": 93,
+  "expected_mitre_ttps": [
+    "T1048",
+    "T1567",
+    "T1078",
+    "T1070",
+    "T1564"
+  ],
+  "metadata": {
+    "converted_from": "legacy_v1",
+    "original_verdict": "MALICE",
+    "abstention_risk": "bajo",
+    "carnegie_pattern": "Evasion Accountability"
+  }
+}

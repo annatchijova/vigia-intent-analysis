@@ -1,0 +1,80 @@
+{
+  "case_id": "VIGIA-BEN-012",
+  "name": "El Kernel Thread Huérfano — Proceso Legítimo del SO",
+  "description": "Proceso kworker/0:1H aparece sin parent en pslist. Es un kernel worker thread de Linux, normal en sistemas con I/O intensivo, documentado en kernel.org y presente en todas las distribuciones.",
+  "artifacts": [
+    {
+      "artifact_id": "ART-001",
+      "evidence_type": "memory_process",
+      "source_tool": "legacy_converter",
+      "timestamp": "2026-04-10T10:00:00Z",
+      "raw_score": 0.7,
+      "prior_trust": 0.7,
+      "provenance_chain": [
+        "sha256:legacy_ART-001"
+      ],
+      "description": "PID: 7 | Name: kworker/0:1H | PPID: 2 (kthreadd) | User: root | CPU: 0.0% | MEM: 0.0% | Start: boot time | pslist shows NO parent (expected for kernel threads)",
+      "metadata": {
+        "original_type": "process_list",
+        "peirce_layer": "FIRSTNESS",
+        "forensic_anomalies": [
+          "Proceso sin parent visible en pslist",
+          "Nombre no descriptivo (kworker)"
+        ],
+        "content_preview": "PID: 7 | Name: kworker/0:1H | PPID: 2 (kthreadd) | User: root | CPU: 0.0% | MEM: 0.0% | Start: boot "
+      }
+    },
+    {
+      "artifact_id": "ART-002",
+      "evidence_type": "memory_process",
+      "source_tool": "legacy_converter",
+      "timestamp": "2026-04-10T10:00:00Z",
+      "raw_score": 0.85,
+      "prior_trust": 0.7,
+      "provenance_chain": [
+        "sha256:legacy_ART-002"
+      ],
+      "description": "Parent in kernel space: kthreadd (PID 2) | All kernel threads children of kthreadd | /proc/7/status: PPid: 2 | /proc/7/comm: kworker/0:1H | Kernel doc: 'Workqueue mechanism for deferred work'",
+      "metadata": {
+        "original_type": "process_list",
+        "peirce_layer": "SECONDNESS",
+        "forensic_anomalies": [
+          "Parent existe en espacio de kernel (no visible en pslist de usuario)",
+          "Documentación oficial del kernel confirma propósito"
+        ],
+        "content_preview": "Parent in kernel space: kthreadd (PID 2) | All kernel threads children of kthreadd | /proc/7/status:"
+      }
+    },
+    {
+      "artifact_id": "ART-003",
+      "evidence_type": "log_entry",
+      "source_tool": "legacy_converter",
+      "timestamp": "2026-04-10T10:00:00Z",
+      "raw_score": 0.95,
+      "prior_trust": 0.7,
+      "provenance_chain": [
+        "sha256:legacy_ART-003"
+      ],
+      "description": "System: Ubuntu 22.04 LTS | Kernel: 5.15.0-generic | Uptime: 45 days | 12 other kworker threads present | No anomalous network connections | No file descriptors to suspicious files",
+      "metadata": {
+        "original_type": "bash_history",
+        "peirce_layer": "THIRDNESS",
+        "forensic_anomalies": [
+          "Múltiples kworker threads presentes (normal)",
+          "Sin conexiones de red ni archivos sospechosos"
+        ],
+        "content_preview": "System: Ubuntu 22.04 LTS | Kernel: 5.15.0-generic | Uptime: 45 days | 12 other kworker threads prese"
+      }
+    }
+  ],
+  "temporal_violations": [],
+  "expected_verdict": "NOISE",
+  "expected_confidence": 93,
+  "expected_mitre_ttps": [],
+  "metadata": {
+    "converted_from": "legacy_v1",
+    "original_verdict": "NOISE",
+    "abstention_risk": "bajo",
+    "carnegie_pattern": null
+  }
+}

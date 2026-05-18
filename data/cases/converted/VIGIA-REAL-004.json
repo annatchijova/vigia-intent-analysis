@@ -1,0 +1,107 @@
+{
+  "case_id": "VIGIA-REAL-004",
+  "name": "Ali Hadi SysInternals Malware Case",
+  "description": "Un usuario descargó lo que creía era el SysInternals Suite pero era un malware downloader. El sistema se volvió lento y no responsivo tras la ejecución. El malware modificó el archivo hosts, descargó un payload secundario y lo instaló como servicio Windows falso.",
+  "artifacts": [
+    {
+      "artifact_id": "ART-001",
+      "evidence_type": "file_timestamp",
+      "source_tool": "legacy_converter",
+      "timestamp": "2026-04-10T10:00:00Z",
+      "raw_score": 0.7,
+      "prior_trust": 0.7,
+      "provenance_chain": [
+        "sha256:legacy_ART-001"
+      ],
+      "description": "Archivo: C:\\Users\\Public\\Downloads\\SysInternals.exe | Hash VT: 72e6d1728a546c2f3ee32c063ed09fa6ba8c46ac33b0dd2e354087c1ad26ef48 | Info versión falsificada: CompanyName='SysInternals, Inc.', FileDescri",
+      "metadata": {
+        "original_type": "file_metadata",
+        "peirce_layer": "FIRSTNESS",
+        "forensic_anomalies": [
+          "El ejecutable tiene información de versión que imita a SysInternals (Microsoft) pero no es legítimo",
+          "Presencia de APIs de descarga de archivos (URLDownloadToFileA) indica downloader"
+        ],
+        "content_preview": "Archivo: C:\\Users\\Public\\Downloads\\SysInternals.exe | Hash VT: 72e6d1728a546c2f3ee32c063ed09fa6ba8c4"
+      }
+    },
+    {
+      "artifact_id": "ART-002",
+      "evidence_type": "file_timestamp",
+      "source_tool": "legacy_converter",
+      "timestamp": "2026-04-10T10:00:00Z",
+      "raw_score": 0.85,
+      "prior_trust": 0.7,
+      "provenance_chain": [
+        "sha256:legacy_ART-002"
+      ],
+      "description": "Timeline UTC: 2022-11-15 21:16:08 - IEUser logon | 21:17:03 - PowerShell modifica Defender y hosts file | 21:18:40 - Descarga de SysInternals.exe vía MSEdge | 21:19:00 - Doble-click SysInternals.exe |",
+      "metadata": {
+        "original_type": "timestamp",
+        "peirce_layer": "SECONDNESS",
+        "forensic_anomalies": [
+          "Secuencia de eventos comprimida en 3 minutos: descarga → ejecución → descarga secundaria → instalación de servicio",
+          "La descarga desde malware430.com ocurre 17 segundos después de la ejecución"
+        ],
+        "content_preview": "Timeline UTC: 2022-11-15 21:16:08 - IEUser logon | 21:17:03 - PowerShell modifica Defender y hosts f"
+      }
+    },
+    {
+      "artifact_id": "ART-003",
+      "evidence_type": "log_entry",
+      "source_tool": "legacy_converter",
+      "timestamp": "2026-04-10T10:00:00Z",
+      "raw_score": 0.85,
+      "prior_trust": 0.7,
+      "provenance_chain": [
+        "sha256:legacy_ART-003"
+      ],
+      "description": "Strings del ejecutable: 'c:\\Windows\\vmtoolsIO.exe' | 'c:\\Windows\\' | '/C c:\\Windows\\vmtoolsIO.exe -install && net start VMwareIOHelperService && sc config VMwareIOHelperService start= auto' | Hosts mo",
+      "metadata": {
+        "original_type": "bash_history",
+        "peirce_layer": "SECONDNESS",
+        "forensic_anomalies": [
+          "El malware instala un servicio con nombre similar a VMware para pasar desapercibido",
+          "Modificación del archivo hosts para redirigir dominios legítimos a IPs internas"
+        ],
+        "content_preview": "Strings del ejecutable: 'c:\\Windows\\vmtoolsIO.exe' | 'c:\\Windows\\' | '/C c:\\Windows\\vmtoolsIO.exe -i"
+      }
+    },
+    {
+      "artifact_id": "ART-004",
+      "evidence_type": "registry_key",
+      "source_tool": "legacy_converter",
+      "timestamp": "2026-04-10T10:00:00Z",
+      "raw_score": 0.95,
+      "prior_trust": 0.7,
+      "provenance_chain": [
+        "sha256:legacy_ART-004"
+      ],
+      "description": "Servicio malicioso instalado: Name='VMwareIOHelperService', Executable='c:\\Windows\\vmtoolsIO.exe', StartType=auto | USN Journal: Creación y eliminación de SysInternals.exe | Prefetch eliminados: *.pf ",
+      "metadata": {
+        "original_type": "registry",
+        "peirce_layer": "THIRDNESS",
+        "forensic_anomalies": [
+          "Servicio con nombre que imita a VMware para evadir detección",
+          "Eliminación de archivos prefetch como técnica anti-forense"
+        ],
+        "content_preview": "Servicio malicioso instalado: Name='VMwareIOHelperService', Executable='c:\\Windows\\vmtoolsIO.exe', S"
+      }
+    }
+  ],
+  "temporal_violations": [],
+  "expected_verdict": "MALICE",
+  "expected_confidence": 92,
+  "expected_mitre_ttps": [
+    "T1204.002",
+    "T1543.003",
+    "T1562.001",
+    "T1070.004",
+    "T1199"
+  ],
+  "metadata": {
+    "converted_from": "legacy_v1",
+    "original_verdict": "MALICE",
+    "abstention_risk": "bajo",
+    "carnegie_pattern": "Masquerading Legitimacy"
+  }
+}

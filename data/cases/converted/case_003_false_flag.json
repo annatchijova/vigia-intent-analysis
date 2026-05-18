@@ -1,0 +1,84 @@
+{
+  "case_id": "case_003_false_flag",
+  "name": "False Flag — Cultural Attribution Mismatch",
+  "description": "High cultural markers pointing to Russian origin (Cyrillic filenames, timezone, keyboard layout) combined with near-zero technical evidence. Classic false flag pattern detected by CAIE fracture rule FALSE_FLAG_PATTERN.",
+  "artifacts": [
+    {
+      "artifact_id": "cultural_001",
+      "evidence_type": "cultural_marker",
+      "source_tool": "infer_intent",
+      "timestamp": "2026-04-10T12:00:00Z",
+      "raw_score": 0.85,
+      "prior_trust": 0.3,
+      "provenance_chain": [
+        "sha256:cultural_chain_001"
+      ],
+      "description": "Cyrillic filename: 'отчет_финансы.docx'. Keyboard layout: RU. Timezone: UTC+3. Variable names in Russian comments.",
+      "metadata": {
+        "cyrillic_filenames": 3,
+        "keyboard_layout_detected": "RU",
+        "timezone_offset": "+03:00",
+        "language_confidence": 0.91
+      }
+    },
+    {
+      "artifact_id": "technical_001",
+      "evidence_type": "memory_process",
+      "source_tool": "list_processes",
+      "timestamp": "2026-04-10T12:00:10Z",
+      "raw_score": 0.05,
+      "prior_trust": 0.95,
+      "provenance_chain": [
+        "sha256:mem_chain_001",
+        "sha256:mem_chain_002"
+      ],
+      "description": "Memory: No process injection. No kernel anomalies. Clean system state.",
+      "metadata": {
+        "injections_detected": 0,
+        "kernel_anomalies": 0,
+        "suspicious_handles": 0
+      }
+    },
+    {
+      "artifact_id": "technical_002",
+      "evidence_type": "lsass_session",
+      "source_tool": "list_processes",
+      "timestamp": "2026-04-10T12:00:12Z",
+      "raw_score": 0.08,
+      "prior_trust": 0.95,
+      "provenance_chain": [
+        "sha256:lsass_chain_001"
+      ],
+      "description": "LSASS: No credential dumping. Normal session count.",
+      "metadata": {
+        "sessions": 2,
+        "anomalies": 0
+      }
+    }
+  ],
+  "temporal_violations": [],
+  "caie_fractures": [
+    {
+      "fracture_type": "FALSE_FLAG_PATTERN",
+      "severity": 0.82,
+      "artifact_a": "Cultural markers (avg=0.85)",
+      "artifact_b": "Technical evidence (avg=0.065)",
+      "mitre_ttp": "T1585",
+      "interpretation": "HIGH cultural attribution with NEAR-ZERO technical evidence. Consistent with planted identity markers. Real APT operators leave technical traces. This actor only left flags."
+    }
+  ],
+  "expected_verdict": "MALICE",
+  "expected_confidence": 0.75,
+  "expected_mitre_ttps": [
+    "T1585",
+    "T1036.005"
+  ],
+  "peirce_chain": {
+    "firstness": "Cyrillic filenames, RU keyboard, UTC+3 timezone all present",
+    "secondness": "Memory, LSASS, kernel — ALL clean despite claimed sophisticated attacker",
+    "thirdness": "Cultural markers were planted. Real attacker is not Russian."
+  },
+  "demo_command": "python run_vigia_case.py cases/case_003_false_flag.json",
+  "demo_quote": "Naive sees low-confidence indicators and says NOISE. VIGÍA detects a FALSE_FLAG_PATTERN fracture: the cultural markers were deliberately planted. Planting evidence IS the malicious act. The attacker is not Russian — but there IS an attacker.",
+  "notes": "FALSE_FLAG_PATTERN con severity=0.82 confirma actividad maliciosa deliberada (plantación de identidad). El veredicto MALICE es correcto: hubo un agente actuando. La atribución al actor real requiere investigación adicional. Demo key: Naive score=0.33 (NOISE), VIGÍA score=0.75 (MALICE) — VIGÍA detecta la intención detrás de los marcadores plantados."
+}

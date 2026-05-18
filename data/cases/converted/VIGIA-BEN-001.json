@@ -1,0 +1,80 @@
+{
+  "case_id": "VIGIA-BEN-001",
+  "name": "El Administrador de Moscú — Layout Legítimo",
+  "description": "Logs de servidor muestran comandos con caracteres cirílicos en teclado latino. El administrador asignado es Dmitri Volkov, empleado remoto en Moscú, con teclado ЙЦУКЕН configurado por política de IT.",
+  "artifacts": [
+    {
+      "artifact_id": "ART-001",
+      "evidence_type": "log_entry",
+      "source_tool": "legacy_converter",
+      "timestamp": "2026-04-10T10:00:00Z",
+      "raw_score": 0.7,
+      "prior_trust": 0.7,
+      "provenance_chain": [
+        "sha256:legacy_ART-001"
+      ],
+      "description": "[dmitri.volkov@server ~]$ ghbdtn (привет) | [dmitri.volkov@server ~]$ ls -la /var/log | [dmitri.volkov@server ~]$ cnfnbz.py (статья.py)",
+      "metadata": {
+        "original_type": "bash_history",
+        "peirce_layer": "FIRSTNESS",
+        "forensic_anomalies": [
+          "Caracteres cirílicos tipeados con layout latino",
+          "Patrón consistente con teclado ruso nativo"
+        ],
+        "content_preview": "[dmitri.volkov@server ~]$ ghbdtn (привет) | [dmitri.volkov@server ~]$ ls -la /var/log | [dmitri.volk"
+      }
+    },
+    {
+      "artifact_id": "ART-002",
+      "evidence_type": "log_entry",
+      "source_tool": "legacy_converter",
+      "timestamp": "2026-04-10T10:00:00Z",
+      "raw_score": 0.85,
+      "prior_trust": 0.7,
+      "provenance_chain": [
+        "sha256:legacy_ART-002"
+      ],
+      "description": "User dmitri.volkov from IP 185.XXX.XXX.XXX (Moscow ISP) | GeoIP: RU | Timezone: Europe/Moscow | Login consistente con horario laboral local (09:00-18:00 MSK)",
+      "metadata": {
+        "original_type": "auth_log",
+        "peirce_layer": "SECONDNESS",
+        "forensic_anomalies": [
+          "IP geolocalizada en Rusia",
+          "Horario de login coincide con jornada laboral rusa"
+        ],
+        "content_preview": "User dmitri.volkov from IP 185.XXX.XXX.XXX (Moscow ISP) | GeoIP: RU | Timezone: Europe/Moscow | Logi"
+      }
+    },
+    {
+      "artifact_id": "ART-003",
+      "evidence_type": "file_timestamp",
+      "source_tool": "legacy_converter",
+      "timestamp": "2026-04-10T10:00:00Z",
+      "raw_score": 0.95,
+      "prior_trust": 0.7,
+      "provenance_chain": [
+        "sha256:legacy_ART-003"
+      ],
+      "description": "HR record: Dmitri Volkov, Senior SysAdmin, hired 2023-03-15 | Contract: Remote from Moscow | Hardware provisioned: Lenovo with RU keyboard | VPN access: Moscow endpoint",
+      "metadata": {
+        "original_type": "file_metadata",
+        "peirce_layer": "THIRDNESS",
+        "forensic_anomalies": [
+          "Documentación de empleado verificable en HR",
+          "Hardware con teclado ruso registrado"
+        ],
+        "content_preview": "HR record: Dmitri Volkov, Senior SysAdmin, hired 2023-03-15 | Contract: Remote from Moscow | Hardwar"
+      }
+    }
+  ],
+  "temporal_violations": [],
+  "expected_verdict": "NOISE",
+  "expected_confidence": 85,
+  "expected_mitre_ttps": [],
+  "metadata": {
+    "converted_from": "legacy_v1",
+    "original_verdict": "NOISE",
+    "abstention_risk": "bajo",
+    "carnegie_pattern": null
+  }
+}

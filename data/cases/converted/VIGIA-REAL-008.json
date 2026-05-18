@@ -1,0 +1,106 @@
+{
+  "case_id": "VIGIA-REAL-008",
+  "name": "Volatility Cridex Banking Trojan",
+  "description": "Volcado de memoria cridex.vmem de una máquina Windows XP SP2 infectada con el troyano bancario Cridex (Feodo/Bugat, predecesor de Dridex). El malware inyecta código en explorer.exe y comunica con servidores C&C para robar credenciales bancarias.",
+  "artifacts": [
+    {
+      "artifact_id": "ART-001",
+      "evidence_type": "memory_process",
+      "source_tool": "legacy_converter",
+      "timestamp": "2026-04-10T10:00:00Z",
+      "raw_score": 0.7,
+      "prior_trust": 0.7,
+      "provenance_chain": [
+        "sha256:legacy_ART-001"
+      ],
+      "description": "PID 1640: reader_sl.exe | Parent: explorer.exe (PID 1484) | Anomalía: Proceso oculto de pslist pero visible en psscan/psxview | explorer.exe (PID 1464) parent no aparece en pslist | Segundo proceso wu",
+      "metadata": {
+        "original_type": "process_list",
+        "peirce_layer": "FIRSTNESS",
+        "forensic_anomalies": [
+          "reader_sl.exe oculto de la lista estándar de procesos (discrepancia psxview)",
+          "Parent process ID de explorer.exe (1464) no aparece en pslist/psscan indica process hollowing"
+        ],
+        "content_preview": "PID 1640: reader_sl.exe | Parent: explorer.exe (PID 1484) | Anomalía: Proceso oculto de pslist pero "
+      }
+    },
+    {
+      "artifact_id": "ART-002",
+      "evidence_type": "memory_process",
+      "source_tool": "legacy_converter",
+      "timestamp": "2026-04-10T10:00:00Z",
+      "raw_score": 0.85,
+      "prior_trust": 0.7,
+      "provenance_chain": [
+        "sha256:legacy_ART-002"
+      ],
+      "description": "IPs C&C identificadas: 41.168.5.140:8080/zb/v_01_a/in/ | 125.19.103.198 | 188.40.0.138 | 190.81.107.70 | 85.214.204.32 | 210.56.23.100 | 211.44.250.173 | Mutexes: 746bbf3569adEncrypt, _SHuassist.mtx, ",
+      "metadata": {
+        "original_type": "memory_string",
+        "peirce_layer": "SECONDNESS",
+        "forensic_anomalies": [
+          "Múltiples conexiones salientes a IPs en países de alto riesgo",
+          "Mutex '746bbf3569adEncrypt' indica actividad criptográfica maliciosa"
+        ],
+        "content_preview": "IPs C&C identificadas: 41.168.5.140:8080/zb/v_01_a/in/ | 125.19.103.198 | 188.40.0.138 | 190.81.107."
+      }
+    },
+    {
+      "artifact_id": "ART-003",
+      "evidence_type": "log_entry",
+      "source_tool": "legacy_converter",
+      "timestamp": "2026-04-10T10:00:00Z",
+      "raw_score": 0.95,
+      "prior_trust": 0.7,
+      "provenance_chain": [
+        "sha256:legacy_ART-003"
+      ],
+      "description": "Conexiones C&C activas desde explorer.exe (proceso inyectado) | VAD strings muestran lista de instituciones financieras objetivo | Web injection code: Fragmentos HTML de páginas bancarias | Búsqueda d",
+      "metadata": {
+        "original_type": "network_flow",
+        "peirce_layer": "THIRDNESS",
+        "forensic_anomalies": [
+          "Código de inyección web en memoria de explorer.exe para páginas bancarias",
+          "Strings de credenciales encontradas en memoria del proceso inyectado"
+        ],
+        "content_preview": "Conexiones C&C activas desde explorer.exe (proceso inyectado) | VAD strings muestran lista de instit"
+      }
+    },
+    {
+      "artifact_id": "ART-004",
+      "evidence_type": "file_timestamp",
+      "source_tool": "legacy_converter",
+      "timestamp": "2026-04-10T10:00:00Z",
+      "raw_score": 0.85,
+      "prior_trust": 0.7,
+      "provenance_chain": [
+        "sha256:legacy_ART-004"
+      ],
+      "description": "reader_sl.exe simula ser Adobe Reader Speed Launcher | Inyección de código detectada vía malfind en explorer.exe | Múltiples DLLs inyectadas | El proceso legítimo reader_sl.exe de Adobe tiene comporta",
+      "metadata": {
+        "original_type": "file_metadata",
+        "peirce_layer": "SECONDNESS",
+        "forensic_anomalies": [
+          "Masquerading: el malware usa nombre de proceso legítimo de Adobe",
+          "Inyección de código en explorer.exe detectada por malfind"
+        ],
+        "content_preview": "reader_sl.exe simula ser Adobe Reader Speed Launcher | Inyección de código detectada vía malfind en "
+      }
+    }
+  ],
+  "temporal_violations": [],
+  "expected_verdict": "MALICE",
+  "expected_confidence": 93,
+  "expected_mitre_ttps": [
+    "T1055",
+    "T1557",
+    "T1071.001",
+    "T1003"
+  ],
+  "metadata": {
+    "converted_from": "legacy_v1",
+    "original_verdict": "MALICE",
+    "abstention_risk": "bajo",
+    "carnegie_pattern": "Hidden Process Masquerading"
+  }
+}

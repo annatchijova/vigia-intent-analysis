@@ -1,0 +1,80 @@
+{
+  "case_id": "VIGIA-BEN-009",
+  "name": "El Legacy con 777 — Requerimiento Técnico Documentado",
+  "description": "Directorio /var/lib/legacy_app tiene permisos 777. Es requerimiento técnico de aplicación de 1998 que no soporta ACLs modernas, documentado en deuda técnica y con plan de migración aprobado.",
+  "artifacts": [
+    {
+      "artifact_id": "ART-001",
+      "evidence_type": "log_entry",
+      "source_tool": "legacy_converter",
+      "timestamp": "2026-04-10T10:00:00Z",
+      "raw_score": 0.7,
+      "prior_trust": 0.7,
+      "provenance_chain": [
+        "sha256:legacy_ART-001"
+      ],
+      "description": "ls -ld /var/lib/legacy_app | drwxrwxrwx 3 root root 4096 2020-01-01 /var/lib/legacy_app | chmod 777 /var/lib/legacy_app (last run: 2020-01-01 by migration_team)",
+      "metadata": {
+        "original_type": "bash_history",
+        "peirce_layer": "FIRSTNESS",
+        "forensic_anomalies": [
+          "Permisos 777 en directorio de sistema",
+          "Último cambio hace 4 años (no reciente)"
+        ],
+        "content_preview": "ls -ld /var/lib/legacy_app | drwxrwxrwx 3 root root 4096 2020-01-01 /var/lib/legacy_app | chmod 777 "
+      }
+    },
+    {
+      "artifact_id": "ART-002",
+      "evidence_type": "file_timestamp",
+      "source_tool": "legacy_converter",
+      "timestamp": "2026-04-10T10:00:00Z",
+      "raw_score": 0.85,
+      "prior_trust": 0.7,
+      "provenance_chain": [
+        "sha256:legacy_ART-002"
+      ],
+      "description": "Technical debt ticket: TD-2019-042 | 'legacy_app v1.2 requires 777 for multi-user write access. No ACL support. Migration to modern_app planned for 2025-Q2.' | Approved by: CTO, Security Lead | Risk a",
+      "metadata": {
+        "original_type": "file_metadata",
+        "peirce_layer": "SECONDNESS",
+        "forensic_anomalies": [
+          "Deuda técnica documentada y aceptada",
+          "Plan de migración con fecha definida"
+        ],
+        "content_preview": "Technical debt ticket: TD-2019-042 | 'legacy_app v1.2 requires 777 for multi-user write access. No A"
+      }
+    },
+    {
+      "artifact_id": "ART-003",
+      "evidence_type": "memory_process",
+      "source_tool": "legacy_converter",
+      "timestamp": "2026-04-10T10:00:00Z",
+      "raw_score": 0.95,
+      "prior_trust": 0.7,
+      "provenance_chain": [
+        "sha256:legacy_ART-003"
+      ],
+      "description": "Application: legacy_app (PID 3344, started 2020-01-02) | User: legacy_svc | No network access | No sudo | Read-only DB connection | Logs: only internal errors, no external connections",
+      "metadata": {
+        "original_type": "process_list",
+        "peirce_layer": "THIRDNESS",
+        "forensic_anomalies": [
+          "Aplicación antigua sin acceso de red",
+          "Sin privilegios elevados ni conexiones externas"
+        ],
+        "content_preview": "Application: legacy_app (PID 3344, started 2020-01-02) | User: legacy_svc | No network access | No s"
+      }
+    }
+  ],
+  "temporal_violations": [],
+  "expected_verdict": "NOISE",
+  "expected_confidence": 84,
+  "expected_mitre_ttps": [],
+  "metadata": {
+    "converted_from": "legacy_v1",
+    "original_verdict": "NOISE",
+    "abstention_risk": "medio",
+    "carnegie_pattern": null
+  }
+}

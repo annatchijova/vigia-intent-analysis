@@ -1,0 +1,108 @@
+{
+  "case_id": "VIGIA-REAL-003",
+  "name": "Ali Hadi Web Server Compromise",
+  "description": "El servidor web de una empresa con Windows Server 2008 Standard y XAMPP fue comprometido a través de SQL injection en DVWA. El atacante desplegó webshells PHP, creó cuentas de usuario y configuró acceso RDP desde la subred interna.",
+  "artifacts": [
+    {
+      "artifact_id": "ART-001",
+      "evidence_type": "log_entry",
+      "source_tool": "legacy_converter",
+      "timestamp": "2026-04-10T10:00:00Z",
+      "raw_score": 0.7,
+      "prior_trust": 0.7,
+      "provenance_chain": [
+        "sha256:legacy_ART-001"
+      ],
+      "description": "Apache access.log | IP atacante: 192.168.56.102 | User-Agent: sqlmap/1.* (herramienta automatizada) | Requests: GET /dvwa/vulnerabilities/sqli/?id=1 AND 1=1 UNION SELECT... | Otro User-Agent: IceWease",
+      "metadata": {
+        "original_type": "network_flow",
+        "peirce_layer": "FIRSTNESS",
+        "forensic_anomalies": [
+          "Presencia de User-Agent de sqlmap indicando ataque de SQL injection automatizado",
+          "La IP 192.168.56.102 es típica de máquinas virtuales Kali Linux en VirtualBox"
+        ],
+        "content_preview": "Apache access.log | IP atacante: 192.168.56.102 | User-Agent: sqlmap/1.* (herramienta automatizada) "
+      }
+    },
+    {
+      "artifact_id": "ART-002",
+      "evidence_type": "log_entry",
+      "source_tool": "legacy_converter",
+      "timestamp": "2026-04-10T10:00:00Z",
+      "raw_score": 0.85,
+      "prior_trust": 0.7,
+      "provenance_chain": [
+        "sha256:legacy_ART-002"
+      ],
+      "description": "Comandos ejecutados via webshell/cmd.exe: net user user1 user1 /add | net localgroup 'Remote Desktop Users' user1 /add | netsh advfirewall firewall add rule name='Remote Desktop' dir=in action=allow p",
+      "metadata": {
+        "original_type": "bash_history",
+        "peirce_layer": "SECONDNESS",
+        "forensic_anomalies": [
+          "Creación simultánea de dos cuentas de usuario no autorizadas (user1 y hacker)",
+          "Modificación del firewall para permitir RDP desde subred específica del atacante"
+        ],
+        "content_preview": "Comandos ejecutados via webshell/cmd.exe: net user user1 user1 /add | net localgroup 'Remote Desktop"
+      }
+    },
+    {
+      "artifact_id": "ART-003",
+      "evidence_type": "memory_process",
+      "source_tool": "legacy_converter",
+      "timestamp": "2026-04-10T10:00:00Z",
+      "raw_score": 0.85,
+      "prior_trust": 0.7,
+      "provenance_chain": [
+        "sha256:legacy_ART-003"
+      ],
+      "description": "httpd.exe PID 2796 y PID 2880 (Apache HTTP Server) | Memory strings muestran trazas de comandos ejecutados | Archivos temporales: tmpukudk.php, tmpbiwuc.php (droppers PHP) | Volatility profile: Win200",
+      "metadata": {
+        "original_type": "process_list",
+        "peirce_layer": "SECONDNESS",
+        "forensic_anomalies": [
+          "Procesos httpd.exe contienen strings de comandos de sistema en memoria",
+          "Archivos PHP temporales con nombres aleatorios indican webshells dropeados"
+        ],
+        "content_preview": "httpd.exe PID 2796 y PID 2880 (Apache HTTP Server) | Memory strings muestran trazas de comandos ejec"
+      }
+    },
+    {
+      "artifact_id": "ART-004",
+      "evidence_type": "file_timestamp",
+      "source_tool": "legacy_converter",
+      "timestamp": "2026-04-10T10:00:00Z",
+      "raw_score": 0.85,
+      "prior_trust": 0.7,
+      "provenance_chain": [
+        "sha256:legacy_ART-004"
+      ],
+      "description": "SAM Registry Hive: Usuarios creados simultáneamente - user1 [SID 1005] y hacker [SID 1006] | MFT entries de tmpukudk y tmpbiwuc | Archivo webshells.zip contiene shells incluyendo C99 | Timestamp creac",
+      "metadata": {
+        "original_type": "file_metadata",
+        "peirce_layer": "SECONDNESS",
+        "forensic_anomalies": [
+          "Dos usuarios nuevos con SIDs consecutivos creados en el mismo timestamp",
+          "Presencia de C99 shell en archivo webshells.zip"
+        ],
+        "content_preview": "SAM Registry Hive: Usuarios creados simultáneamente - user1 [SID 1005] y hacker [SID 1006] | MFT ent"
+      }
+    }
+  ],
+  "temporal_violations": [],
+  "expected_verdict": "MALICE",
+  "expected_confidence": 94,
+  "expected_mitre_ttps": [
+    "T1190",
+    "T1059",
+    "T1136.001",
+    "T1021.001",
+    "T1505.003",
+    "T1070"
+  ],
+  "metadata": {
+    "converted_from": "legacy_v1",
+    "original_verdict": "MALICE",
+    "abstention_risk": "bajo",
+    "carnegie_pattern": null
+  }
+}

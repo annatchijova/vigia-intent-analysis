@@ -1,0 +1,80 @@
+{
+  "case_id": "VIGIA-BEN-013",
+  "name": "La Política de Retención — Borrado Programado",
+  "description": "Script rm -rf /var/log/app/*.log ejecutado diariamente. Es la política de retención de logs de la aplicación, definida en GDPR compliance document, con retención de 30 días y aprobación de DPO.",
+  "artifacts": [
+    {
+      "artifact_id": "ART-001",
+      "evidence_type": "log_entry",
+      "source_tool": "legacy_converter",
+      "timestamp": "2026-04-10T10:00:00Z",
+      "raw_score": 0.7,
+      "prior_trust": 0.7,
+      "provenance_chain": [
+        "sha256:legacy_ART-001"
+      ],
+      "description": "00 02 * * * /usr/local/bin/cleanup_logs.sh --retention=30 --path=/var/log/app | crontab -l shows entry from 2023-05-20 | User: log_admin | Script signed by: dpo@company.com",
+      "metadata": {
+        "original_type": "bash_history",
+        "peirce_layer": "FIRSTNESS",
+        "forensic_anomalies": [
+          "Borrado masivo de logs con rm -rf",
+          "Ejecución automatizada diaria"
+        ],
+        "content_preview": "00 02 * * * /usr/local/bin/cleanup_logs.sh --retention=30 --path=/var/log/app | crontab -l shows ent"
+      }
+    },
+    {
+      "artifact_id": "ART-002",
+      "evidence_type": "file_timestamp",
+      "source_tool": "legacy_converter",
+      "timestamp": "2026-04-10T10:00:00Z",
+      "raw_score": 0.85,
+      "prior_trust": 0.7,
+      "provenance_chain": [
+        "sha256:legacy_ART-002"
+      ],
+      "description": "GDPR compliance doc v3.2, section 4.3: 'Application logs retained for 30 days maximum. Automated deletion after retention period.' | Approved by: DPO | Legal review: 2023-04-15 | Audit: PASSED 2024-Q1",
+      "metadata": {
+        "original_type": "file_metadata",
+        "peirce_layer": "SECONDNESS",
+        "forensic_anomalies": [
+          "Política de retención documentada en compliance",
+          "Aprobada por DPO y auditada"
+        ],
+        "content_preview": "GDPR compliance doc v3.2, section 4.3: 'Application logs retained for 30 days maximum. Automated del"
+      }
+    },
+    {
+      "artifact_id": "ART-003",
+      "evidence_type": "log_entry",
+      "source_tool": "legacy_converter",
+      "timestamp": "2026-04-10T10:00:00Z",
+      "raw_score": 0.95,
+      "prior_trust": 0.7,
+      "provenance_chain": [
+        "sha256:legacy_ART-003"
+      ],
+      "description": "cleanup_logs.sh content: find /var/log/app -name '*.log' -mtime +30 -delete | Logs to syslog: 'Deleted 45 files older than 30 days' | No deletion of files < 30 days | No deletion of audit logs (/var/l",
+      "metadata": {
+        "original_type": "bash_history",
+        "peirce_layer": "THIRDNESS",
+        "forensic_anomalies": [
+          "Script solo borra archivos > 30 días",
+          "Audit logs excluidos de borrado"
+        ],
+        "content_preview": "cleanup_logs.sh content: find /var/log/app -name '*.log' -mtime +30 -delete | Logs to syslog: 'Delet"
+      }
+    }
+  ],
+  "temporal_violations": [],
+  "expected_verdict": "NOISE",
+  "expected_confidence": 85,
+  "expected_mitre_ttps": [],
+  "metadata": {
+    "converted_from": "legacy_v1",
+    "original_verdict": "NOISE",
+    "abstention_risk": "bajo",
+    "carnegie_pattern": null
+  }
+}

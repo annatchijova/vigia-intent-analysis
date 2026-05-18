@@ -1,0 +1,80 @@
+{
+  "case_id": "VIGIA-BEN-007",
+  "name": "El PDF de RRHH — Descarga Legítima",
+  "description": "Archivo 'salaries_2024_confidential.pdf' aparece en Desktop de empleado. Es la guía de compensación anual distribuida por RRHH a todos los managers, con email de distribución y lista de destinatarios.",
+  "artifacts": [
+    {
+      "artifact_id": "ART-001",
+      "evidence_type": "file_timestamp",
+      "source_tool": "legacy_converter",
+      "timestamp": "2026-04-10T10:00:00Z",
+      "raw_score": 0.7,
+      "prior_trust": 0.7,
+      "provenance_chain": [
+        "sha256:legacy_ART-001"
+      ],
+      "description": "File: salaries_2024_confidential.pdf | Owner: juan.manager | Location: ~/Desktop | Created: 2024-01-10 10:00 | Source: email attachment from hr@company.com | Size: 2.3MB | Encrypted: No",
+      "metadata": {
+        "original_type": "file_metadata",
+        "peirce_layer": "FIRSTNESS",
+        "forensic_anomalies": [
+          "Archivo confidencial en Desktop sin encriptación",
+          "Descargado desde email corporativo"
+        ],
+        "content_preview": "File: salaries_2024_confidential.pdf | Owner: juan.manager | Location: ~/Desktop | Created: 2024-01-"
+      }
+    },
+    {
+      "artifact_id": "ART-002",
+      "evidence_type": "log_entry",
+      "source_tool": "legacy_converter",
+      "timestamp": "2026-04-10T10:00:00Z",
+      "raw_score": 0.85,
+      "prior_trust": 0.7,
+      "provenance_chain": [
+        "sha256:legacy_ART-002"
+      ],
+      "description": "From: hr@company.com | To: managers@company.com (distribution list, 45 recipients) | Subject: 'Guía de Compensación 2024 — Uso interno' | Date: 2024-01-10 09:55 | DKIM: PASS | SPF: PASS",
+      "metadata": {
+        "original_type": "email_header",
+        "peirce_layer": "SECONDNESS",
+        "forensic_anomalies": [
+          "Email de RRHH a lista de distribución amplia",
+          "Asunto indica uso interno restricto"
+        ],
+        "content_preview": "From: hr@company.com | To: managers@company.com (distribution list, 45 recipients) | Subject: 'Guía "
+      }
+    },
+    {
+      "artifact_id": "ART-003",
+      "evidence_type": "file_timestamp",
+      "source_tool": "legacy_converter",
+      "timestamp": "2026-04-10T10:00:00Z",
+      "raw_score": 0.95,
+      "prior_trust": 0.7,
+      "provenance_chain": [
+        "sha256:legacy_ART-003"
+      ],
+      "description": "HR policy HR-2023-044: 'Guía de compensación se distribuye anualmente a managers via email. No imprimir. No reenviar.' | Acknowledgment signed by juan.manager: 2024-01-10 10:05 | Training completion: ",
+      "metadata": {
+        "original_type": "file_metadata",
+        "peirce_layer": "THIRDNESS",
+        "forensic_anomalies": [
+          "Política de RRHH que autoriza la distribución",
+          "Acknowledgment firmado por el receptor"
+        ],
+        "content_preview": "HR policy HR-2023-044: 'Guía de compensación se distribuye anualmente a managers via email. No impri"
+      }
+    }
+  ],
+  "temporal_violations": [],
+  "expected_verdict": "NOISE",
+  "expected_confidence": 86,
+  "expected_mitre_ttps": [],
+  "metadata": {
+    "converted_from": "legacy_v1",
+    "original_verdict": "NOISE",
+    "abstention_risk": "bajo",
+    "carnegie_pattern": null
+  }
+}

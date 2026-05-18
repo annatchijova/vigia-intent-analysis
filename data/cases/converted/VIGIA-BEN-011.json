@@ -1,0 +1,80 @@
+{
+  "case_id": "VIGIA-BEN-011",
+  "name": "El USB de IT — Actualización de Drivers",
+  "description": "USB conectado a máquina de finanzas. Es el técnico de IT actualizando drivers de impresora fiscal, con ticket de soporte, autorización del manager, y checklist de procedimiento.",
+  "artifacts": [
+    {
+      "artifact_id": "ART-001",
+      "evidence_type": "log_entry",
+      "source_tool": "legacy_converter",
+      "timestamp": "2026-04-10T10:00:00Z",
+      "raw_score": 0.7,
+      "prior_trust": 0.7,
+      "provenance_chain": [
+        "sha256:legacy_ART-001"
+      ],
+      "description": "USB inserted: SanDisk Cruzer, S/N 4C530001230512345678 | Time: 2024-04-20 14:30 | User: it.technician (badge: IT-204) | Escorted by: finance.manager | Location: Finance Dept, Desk 12",
+      "metadata": {
+        "original_type": "auth_log",
+        "peirce_layer": "FIRSTNESS",
+        "forensic_anomalies": [
+          "USB conectado a máquina de departamento financiero",
+          "Técnico de IT con acceso físico a área restringida"
+        ],
+        "content_preview": "USB inserted: SanDisk Cruzer, S/N 4C530001230512345678 | Time: 2024-04-20 14:30 | User: it.technicia"
+      }
+    },
+    {
+      "artifact_id": "ART-002",
+      "evidence_type": "file_timestamp",
+      "source_tool": "legacy_converter",
+      "timestamp": "2026-04-10T10:00:00Z",
+      "raw_score": 0.85,
+      "prior_trust": 0.7,
+      "provenance_chain": [
+        "sha256:legacy_ART-002"
+      ],
+      "description": "IT ticket SUP-2024-1120: 'Printer fiscal HP LaserJet no imprime. Requiere driver update v3.2.1 desde USB (no hay red en máquina por política).' | Approved by: finance.manager | SLA: 4 hours | Technici",
+      "metadata": {
+        "original_type": "file_metadata",
+        "peirce_layer": "SECONDNESS",
+        "forensic_anomalies": [
+          "Ticket de soporte con aprobación de manager de área",
+          "Máquina sin red (air-gapped por política)"
+        ],
+        "content_preview": "IT ticket SUP-2024-1120: 'Printer fiscal HP LaserJet no imprime. Requiere driver update v3.2.1 desde"
+      }
+    },
+    {
+      "artifact_id": "ART-003",
+      "evidence_type": "log_entry",
+      "source_tool": "legacy_converter",
+      "timestamp": "2026-04-10T10:00:00Z",
+      "raw_score": 0.95,
+      "prior_trust": 0.7,
+      "provenance_chain": [
+        "sha256:legacy_ART-003"
+      ],
+      "description": "lsusb | grep SanDisk | dmesg | tail -20 | mount /dev/sdb1 /mnt/usb | cp /mnt/usb/drivers/hp_lj_fiscal_321.exe /tmp/ | ./hp_lj_fiscal_321.exe /silent | umount /mnt/usb | dmesg | tail -5",
+      "metadata": {
+        "original_type": "bash_history",
+        "peirce_layer": "THIRDNESS",
+        "forensic_anomalies": [
+          "Comandos de montaje y ejecución desde USB",
+          "Instalador silencioso de driver"
+        ],
+        "content_preview": "lsusb | grep SanDisk | dmesg | tail -20 | mount /dev/sdb1 /mnt/usb | cp /mnt/usb/drivers/hp_lj_fisca"
+      }
+    }
+  ],
+  "temporal_violations": [],
+  "expected_verdict": "NOISE",
+  "expected_confidence": 89,
+  "expected_mitre_ttps": [],
+  "metadata": {
+    "converted_from": "legacy_v1",
+    "original_verdict": "NOISE",
+    "abstention_risk": "bajo",
+    "carnegie_pattern": null
+  }
+}

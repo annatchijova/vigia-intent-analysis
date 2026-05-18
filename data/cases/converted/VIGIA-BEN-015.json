@@ -1,0 +1,80 @@
+{
+  "case_id": "VIGIA-BEN-015",
+  "name": "El Snapshot Restaurado — Timestamps Idénticos",
+  "description": "100 archivos en /data muestran timestamp idéntico de modificación. Es restauración de snapshot de VM después de incidente de hardware, documentado en ticket de infraestructura, con afectación de 47 usuarios.",
+  "artifacts": [
+    {
+      "artifact_id": "ART-001",
+      "evidence_type": "file_timestamp",
+      "source_tool": "legacy_converter",
+      "timestamp": "2026-04-10T10:00:00Z",
+      "raw_score": 0.7,
+      "prior_trust": 0.7,
+      "provenance_chain": [
+        "sha256:legacy_ART-001"
+      ],
+      "description": "ls -l /data | 100 files with identical mtime: 2024-05-10 03:47:22 | atime varies | ctime identical | All files from same snapshot",
+      "metadata": {
+        "original_type": "file_metadata",
+        "peirce_layer": "FIRSTNESS",
+        "forensic_anomalies": [
+          "100 archivos con timestamp de modificación idéntico",
+          "ctime y mtime coinciden exactamente"
+        ],
+        "content_preview": "ls -l /data | 100 files with identical mtime: 2024-05-10 03:47:22 | atime varies | ctime identical |"
+      }
+    },
+    {
+      "artifact_id": "ART-002",
+      "evidence_type": "log_entry",
+      "source_tool": "legacy_converter",
+      "timestamp": "2026-04-10T10:00:00Z",
+      "raw_score": 0.85,
+      "prior_trust": 0.7,
+      "provenance_chain": [
+        "sha256:legacy_ART-002"
+      ],
+      "description": "Infrastructure ticket INF-2024-0551: 'Hardware failure on VM host node-07. 47 VMs affected. Restored from backup snapshot 2024-05-09-23:00.' | Technician: infra_team | Approval: VP Infrastructure | Do",
+      "metadata": {
+        "original_type": "bash_history",
+        "peirce_layer": "SECONDNESS",
+        "forensic_anomalies": [
+          "Ticket de incidente de infraestructura con 47 VMs afectadas",
+          "Restauración desde snapshot aprobada por VP"
+        ],
+        "content_preview": "Infrastructure ticket INF-2024-0551: 'Hardware failure on VM host node-07. 47 VMs affected. Restored"
+      }
+    },
+    {
+      "artifact_id": "ART-003",
+      "evidence_type": "file_timestamp",
+      "source_tool": "legacy_converter",
+      "timestamp": "2026-04-10T10:00:00Z",
+      "raw_score": 0.95,
+      "prior_trust": 0.7,
+      "provenance_chain": [
+        "sha256:legacy_ART-003"
+      ],
+      "description": "Backup system: Veeam | Snapshot: 2024-05-09-23:00 | Restore point: 2024-05-10-03:47 (completion time) | 47 VMs restored simultaneously | All show identical mtime for restored files | atime reflects po",
+      "metadata": {
+        "original_type": "file_metadata",
+        "peirce_layer": "THIRDNESS",
+        "forensic_anomalies": [
+          "47 VMs restauradas simultáneamente",
+          "Sistema de backup Veeam con logs de restauración"
+        ],
+        "content_preview": "Backup system: Veeam | Snapshot: 2024-05-09-23:00 | Restore point: 2024-05-10-03:47 (completion time"
+      }
+    }
+  ],
+  "temporal_violations": [],
+  "expected_verdict": "NOISE",
+  "expected_confidence": 91,
+  "expected_mitre_ttps": [],
+  "metadata": {
+    "converted_from": "legacy_v1",
+    "original_verdict": "NOISE",
+    "abstention_risk": "bajo",
+    "carnegie_pattern": null
+  }
+}

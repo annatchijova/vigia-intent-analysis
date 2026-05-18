@@ -1,0 +1,80 @@
+{
+  "case_id": "VIGIA-BEN-006",
+  "name": "El Mantenimiento de Sudo — Admin de Turno",
+  "description": "Logs muestran 12 ejecuciones de sudo en 2 horas. Es el mantenimiento mensual del servidor de base de datos, programado en calendario compartido, con ticket de change approval.",
+  "artifacts": [
+    {
+      "artifact_id": "ART-001",
+      "evidence_type": "log_entry",
+      "source_tool": "legacy_converter",
+      "timestamp": "2026-04-10T10:00:00Z",
+      "raw_score": 0.7,
+      "prior_trust": 0.7,
+      "provenance_chain": [
+        "sha256:legacy_ART-001"
+      ],
+      "description": "sudo systemctl restart postgresql | sudo apt update | sudo apt upgrade -y | sudo reboot | User: admin.carlos | Time: 2024-02-15 01:00-03:00 UTC | 12 sudo commands total",
+      "metadata": {
+        "original_type": "bash_history",
+        "peirce_layer": "FIRSTNESS",
+        "forensic_anomalies": [
+          "Múltiples ejecuciones de sudo en horario nocturno",
+          "Comandos de sistema críticos (restart, upgrade, reboot)"
+        ],
+        "content_preview": "sudo systemctl restart postgresql | sudo apt update | sudo apt upgrade -y | sudo reboot | User: admi"
+      }
+    },
+    {
+      "artifact_id": "ART-002",
+      "evidence_type": "log_entry",
+      "source_tool": "legacy_converter",
+      "timestamp": "2026-04-10T10:00:00Z",
+      "raw_score": 0.85,
+      "prior_trust": 0.7,
+      "provenance_chain": [
+        "sha256:legacy_ART-002"
+      ],
+      "description": "Calendar event: 'DB Server Maintenance — Carlos Rodriguez' | Date: 2024-02-15 01:00 UTC | Attendees: dba_team, security_oncall | Change ticket: CHG-0038 | Approved by: CTO | VPN from: admin.carlos hom",
+      "metadata": {
+        "original_type": "auth_log",
+        "peirce_layer": "SECONDNESS",
+        "forensic_anomalies": [
+          "Acceso desde IP residencial registrada",
+          "Mantenimiento programado en calendario corporativo"
+        ],
+        "content_preview": "Calendar event: 'DB Server Maintenance — Carlos Rodriguez' | Date: 2024-02-15 01:00 UTC | Attendees:"
+      }
+    },
+    {
+      "artifact_id": "ART-003",
+      "evidence_type": "file_timestamp",
+      "source_tool": "legacy_converter",
+      "timestamp": "2026-04-10T10:00:00Z",
+      "raw_score": 0.95,
+      "prior_trust": 0.7,
+      "provenance_chain": [
+        "sha256:legacy_ART-003"
+      ],
+      "description": "Post-maintenance report: Carlos Rodriguez | 'PostgreSQL updated to 15.4, kernel patched, reboot completed. Downtime: 45 min. Next maintenance: 2024-03-15.' | Signed off by DBA lead",
+      "metadata": {
+        "original_type": "file_metadata",
+        "peirce_layer": "THIRDNESS",
+        "forensic_anomalies": [
+          "Reporte post-mantenimiento con detalles técnicos",
+          "Firma del DBA lead como verificación"
+        ],
+        "content_preview": "Post-maintenance report: Carlos Rodriguez | 'PostgreSQL updated to 15.4, kernel patched, reboot comp"
+      }
+    }
+  ],
+  "temporal_violations": [],
+  "expected_verdict": "NOISE",
+  "expected_confidence": 87,
+  "expected_mitre_ttps": [],
+  "metadata": {
+    "converted_from": "legacy_v1",
+    "original_verdict": "NOISE",
+    "abstention_risk": "bajo",
+    "carnegie_pattern": null
+  }
+}

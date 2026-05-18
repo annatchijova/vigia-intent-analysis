@@ -1,0 +1,80 @@
+{
+  "case_id": "VIGIA-BEN-014",
+  "name": "El Periodista Autorizado — Uso Legítimo de Tor",
+  "description": "Máquina de periodista de investigación conecta a Tor. Tiene autorización escrita del editor, política de protección de fuentes aprobada por legal, y el tráfico es solo a .onion de whistleblower platform.",
+  "artifacts": [
+    {
+      "artifact_id": "ART-001",
+      "evidence_type": "log_entry",
+      "source_tool": "legacy_converter",
+      "timestamp": "2026-04-10T10:00:00Z",
+      "raw_score": 0.7,
+      "prior_trust": 0.7,
+      "provenance_chain": [
+        "sha256:legacy_ART-001"
+      ],
+      "description": "Tor connection established: 10.0.2.15:9050 → Tor guard node | Process: tor (PID 4455) | User: journalist | Destination: .onion address (whistleblower-platform.onion) | No other destinations",
+      "metadata": {
+        "original_type": "network_flow",
+        "peirce_layer": "FIRSTNESS",
+        "forensic_anomalies": [
+          "Conexión a red Tor desde máquina corporativa",
+          "Tráfico a dominio .onion"
+        ],
+        "content_preview": "Tor connection established: 10.0.2.15:9050 → Tor guard node | Process: tor (PID 4455) | User: journa"
+      }
+    },
+    {
+      "artifact_id": "ART-002",
+      "evidence_type": "file_timestamp",
+      "source_tool": "legacy_converter",
+      "timestamp": "2026-04-10T10:00:00Z",
+      "raw_score": 0.85,
+      "prior_trust": 0.7,
+      "provenance_chain": [
+        "sha256:legacy_ART-002"
+      ],
+      "description": "Authorization memo: 'Journalist Ana Martinez authorized for Tor access for source protection. Valid: 2024-01-01 to 2024-12-31. Approved by: Editor-in-Chief, Legal Counsel.' | Policy: JOURNALIST-ETHICS",
+      "metadata": {
+        "original_type": "file_metadata",
+        "peirce_layer": "SECONDNESS",
+        "forensic_anomalies": [
+          "Autorización escrita para uso de Tor",
+          "Firmada por editor y legal"
+        ],
+        "content_preview": "Authorization memo: 'Journalist Ana Martinez authorized for Tor access for source protection. Valid:"
+      }
+    },
+    {
+      "artifact_id": "ART-003",
+      "evidence_type": "log_entry",
+      "source_tool": "legacy_converter",
+      "timestamp": "2026-04-10T10:00:00Z",
+      "raw_score": 0.95,
+      "prior_trust": 0.7,
+      "provenance_chain": [
+        "sha256:legacy_ART-003"
+      ],
+      "description": "Traffic analysis: 100% to whistleblower-platform.onion | No financial sites | No C&C IPs | No file transfers > 1MB | Session duration: 45 min (consistent with interview) | No repeat connections to sam",
+      "metadata": {
+        "original_type": "network_flow",
+        "peirce_layer": "THIRDNESS",
+        "forensic_anomalies": [
+          "Tráfico restringido a un solo dominio .onion",
+          "Sin transferencias masivas ni conexiones repetidas"
+        ],
+        "content_preview": "Traffic analysis: 100% to whistleblower-platform.onion | No financial sites | No C&C IPs | No file t"
+      }
+    }
+  ],
+  "temporal_violations": [],
+  "expected_verdict": "SUSPICION",
+  "expected_confidence": 75,
+  "expected_mitre_ttps": [],
+  "metadata": {
+    "converted_from": "legacy_v1",
+    "original_verdict": "ABSTAIN",
+    "abstention_risk": "alto",
+    "carnegie_pattern": null
+  }
+}

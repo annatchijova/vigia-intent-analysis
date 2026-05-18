@@ -1,0 +1,85 @@
+{
+  "case_id": "VIGIA-REAL-005",
+  "name": "Ali Hadi Encrypt Them All Case",
+  "description": "Jane ha estado usando múltiples métodos de encriptación para ocultar comunicación: un archivo README encriptado con AES en Documents, un volumen BitLocker nombrado R2D2, y un archivo keys en Downloads encriptado con GPG/PGP de clave pública/privada.",
+  "artifacts": [
+    {
+      "artifact_id": "ART-001",
+      "evidence_type": "file_timestamp",
+      "source_tool": "legacy_converter",
+      "timestamp": "2026-04-10T10:00:00Z",
+      "raw_score": 0.7,
+      "prior_trust": 0.7,
+      "provenance_chain": [
+        "sha256:legacy_ART-001"
+      ],
+      "description": "Archivo README en directorio Documents del usuario | Estado: Encriptado con AES | Sin contraseña disponible | Posible versión sin encriptar en caché del sistema | Archivo keys en directorio Downloads ",
+      "metadata": {
+        "original_type": "file_metadata",
+        "peirce_layer": "FIRSTNESS",
+        "forensic_anomalies": [
+          "Uso de encriptación AES para ocultar un archivo de comunicación en Documents",
+          "Uso simultáneo de encriptación asimétrica GPG para otro mensaje"
+        ],
+        "content_preview": "Archivo README en directorio Documents del usuario | Estado: Encriptado con AES | Sin contraseña dis"
+      }
+    },
+    {
+      "artifact_id": "ART-002",
+      "evidence_type": "file_timestamp",
+      "source_tool": "legacy_converter",
+      "timestamp": "2026-04-10T10:00:00Z",
+      "raw_score": 0.85,
+      "prior_trust": 0.7,
+      "provenance_chain": [
+        "sha256:legacy_ART-002"
+      ],
+      "description": "Volumen BitLocker: Nombre='R2D2' | Estado: Encriptación completa de disco activa | Recovery key posiblemente almacenada en AD, USB o archivo de respaldo | Tipo: Full disk encryption",
+      "metadata": {
+        "original_type": "file_metadata",
+        "peirce_layer": "SECONDNESS",
+        "forensic_anomalies": [
+          "Volumen con nombre no estándar (R2D2) en lugar de etiqueta descriptiva",
+          "BitLocker aplicado a volumen específico sugiere intención de ocultar contenido"
+        ],
+        "content_preview": "Volumen BitLocker: Nombre='R2D2' | Estado: Encriptación completa de disco activa | Recovery key posi"
+      }
+    },
+    {
+      "artifact_id": "ART-003",
+      "evidence_type": "memory_process",
+      "source_tool": "legacy_converter",
+      "timestamp": "2026-04-10T10:00:00Z",
+      "raw_score": 0.95,
+      "prior_trust": 0.7,
+      "provenance_chain": [
+        "sha256:legacy_ART-003"
+      ],
+      "description": "GPG/PGP keys en perfil de usuario | Comunicación encriptada asimétrica con parte desconocida | Archivo 'keys' contiene mensaje para desencriptar | Posible par de claves privadas recuperables de la ima",
+      "metadata": {
+        "original_type": "process_list",
+        "peirce_layer": "THIRDNESS",
+        "forensic_anomalies": [
+          "Uso de encriptación asimétrica para comunicación secreta indica coordinación previa",
+          "Múltiples métodos criptográficos aplicados sugieren capas de protección deliberadas"
+        ],
+        "content_preview": "GPG/PGP keys en perfil de usuario | Comunicación encriptada asimétrica con parte desconocida | Archi"
+      }
+    }
+  ],
+  "temporal_violations": [],
+  "expected_verdict": "SUSPICION",
+  "expected_confidence": 88,
+  "expected_mitre_ttps": [
+    "T1027",
+    "T1486",
+    "T1565",
+    "T1564"
+  ],
+  "metadata": {
+    "converted_from": "legacy_v1",
+    "original_verdict": "SUSPICION",
+    "abstention_risk": "medio",
+    "carnegie_pattern": "Concealment"
+  }
+}

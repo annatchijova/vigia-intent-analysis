@@ -1,0 +1,128 @@
+{
+  "case_id": "VIGIA-REAL-001",
+  "name": "NIST Hacking Case (Greg Schardt / Mr. Evil)",
+  "description": "El 09/20/04, una notebook Dell CPi serial VLQLW fue encontrada abandonada con una tarjeta PCMCIA wireless y antena 802.11b casera. El sospechoso Greg Schardt alias Mr. Evil realizaba war driving cerca de hotspots WiFi públicos para interceptar tráfico y robar credenciales.",
+  "artifacts": [
+    {
+      "artifact_id": "ART-001",
+      "evidence_type": "registry_key",
+      "source_tool": "legacy_converter",
+      "timestamp": "2026-04-10T10:00:00Z",
+      "raw_score": 0.85,
+      "prior_trust": 0.7,
+      "provenance_chain": [
+        "sha256:legacy_ART-001"
+      ],
+      "description": "HKLM\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\RegisteredOwner = Greg Schardt | HKLM\\SYSTEM\\ControlSet001\\Control\\ComputerName\\ComputerName = N-1A9ODN6ZXK4LQ | HKLM\\SOFTWARE\\Microsoft\\Windows NT\\Cu",
+      "metadata": {
+        "original_type": "registry",
+        "peirce_layer": "SECONDNESS",
+        "forensic_anomalies": [
+          "El nombre de usuario por defecto es Mr. Evil, indicativo de alias de atacante",
+          "El registered owner coincide con el sospechoso identificado"
+        ],
+        "content_preview": "HKLM\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\RegisteredOwner = Greg Schardt | HKLM\\SYSTEM\\Contr"
+      }
+    },
+    {
+      "artifact_id": "ART-002",
+      "evidence_type": "log_entry",
+      "source_tool": "legacy_converter",
+      "timestamp": "2026-04-10T10:00:00Z",
+      "raw_score": 0.7,
+      "prior_trust": 0.7,
+      "provenance_chain": [
+        "sha256:legacy_ART-002"
+      ],
+      "description": "Archivo pcap interceptado en C:\\Documents and Settings\\Mr. Evil\\interception | Víctima: Windows CE Pocket PC | Sites accedidos: login.passport.com, mobile.msn.com, MSN Hotmail | Captura realizada con ",
+      "metadata": {
+        "original_type": "network_flow",
+        "peirce_layer": "FIRSTNESS",
+        "forensic_anomalies": [
+          "Archivo pcap con tráfico interceptado de dispositivos de terceros",
+          "La víctima usaba Windows CE Pocket PC en hotspot público"
+        ],
+        "content_preview": "Archivo pcap interceptado en C:\\Documents and Settings\\Mr. Evil\\interception | Víctima: Windows CE P"
+      }
+    },
+    {
+      "artifact_id": "ART-003",
+      "evidence_type": "log_entry",
+      "source_tool": "legacy_converter",
+      "timestamp": "2026-04-10T10:00:00Z",
+      "raw_score": 0.95,
+      "prior_trust": 0.7,
+      "provenance_chain": [
+        "sha256:legacy_ART-003"
+      ],
+      "description": "Canales IRC accedidos: #Chataholics.UnderNet, #CyberCafe.UnderNet, #Elite.Hackers.UnderNet, #evilfork.EFnet, #ISO-WAREZ.EFnet, #thedarktower.AfterNET | Usuario IRC: Mini Me, Nick: Mr, Alt: mrevilrulez",
+      "metadata": {
+        "original_type": "bash_history",
+        "peirce_layer": "THIRDNESS",
+        "forensic_anomalies": [
+          "Presencia en canales de hacking (#Elite.Hackers.UnderNet, #evilfork.EFnet)",
+          "El nickname mrevilrulez coincide con el email mrevilrulez@yahoo.com"
+        ],
+        "content_preview": "Canales IRC accedidos: #Chataholics.UnderNet, #CyberCafe.UnderNet, #Elite.Hackers.UnderNet, #evilfor"
+      }
+    },
+    {
+      "artifact_id": "ART-004",
+      "evidence_type": "file_timestamp",
+      "source_tool": "legacy_converter",
+      "timestamp": "2026-04-10T10:00:00Z",
+      "raw_score": 0.85,
+      "prior_trust": 0.7,
+      "provenance_chain": [
+        "sha256:legacy_ART-004"
+      ],
+      "description": "Archivos en Recycle Bin: Dc1.exe (lalsetup250.exe - Look@LAN installer), Dc2.exe (netstumblerinstaller_0_4_0.exe), Dc3.exe (WinPcap_3_01_a.exe), Dc4.exe (ethereal-setup-0.10.6.exe) | Hash MD5 imagen: ",
+      "metadata": {
+        "original_type": "file_metadata",
+        "peirce_layer": "SECONDNESS",
+        "forensic_anomalies": [
+          "Presencia de ejecutables de herramientas de hacking en Recycle Bin sin haber sido eliminados permanentemente",
+          "NetStumbler es herramienta específica para war driving"
+        ],
+        "content_preview": "Archivos en Recycle Bin: Dc1.exe (lalsetup250.exe - Look@LAN installer), Dc2.exe (netstumblerinstall"
+      }
+    },
+    {
+      "artifact_id": "ART-005",
+      "evidence_type": "log_entry",
+      "source_tool": "legacy_converter",
+      "timestamp": "2026-04-10T10:00:00Z",
+      "raw_score": 0.85,
+      "prior_trust": 0.7,
+      "provenance_chain": [
+        "sha256:legacy_ART-005"
+      ],
+      "description": "SMTP: whoknowsme@sbcglobal.net | Email principal: mrevilrulez@yahoo.com | NNTP: Configurado para 5+ newsgroups | Programas: Outlook Express, mIRC",
+      "metadata": {
+        "original_type": "email_header",
+        "peirce_layer": "SECONDNESS",
+        "forensic_anomalies": [
+          "Dirección SMTP diferente del email principal (posible evasión)",
+          "Uso de newsgroups para comunicación alternativa"
+        ],
+        "content_preview": "SMTP: whoknowsme@sbcglobal.net | Email principal: mrevilrulez@yahoo.com | NNTP: Configurado para 5+ "
+      }
+    }
+  ],
+  "temporal_violations": [],
+  "expected_verdict": "MALICE",
+  "expected_confidence": 95,
+  "expected_mitre_ttps": [
+    "T1040",
+    "T1552",
+    "T1567",
+    "T1071",
+    "T1018"
+  ],
+  "metadata": {
+    "converted_from": "legacy_v1",
+    "original_verdict": "MALICE",
+    "abstention_risk": "bajo",
+    "carnegie_pattern": null
+  }
+}

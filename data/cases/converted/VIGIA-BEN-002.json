@@ -1,0 +1,80 @@
+{
+  "case_id": "VIGIA-BEN-002",
+  "name": "El Backup de las 3AM — Cron Legítimo",
+  "description": "El sistema muestra transferencia masiva de datos a las 3:15 AM. Es el backup automatizado diario configurado por el DBA hace 2 años, documentado en runbook y aprobado por auditoría.",
+  "artifacts": [
+    {
+      "artifact_id": "ART-001",
+      "evidence_type": "log_entry",
+      "source_tool": "legacy_converter",
+      "timestamp": "2026-04-10T10:00:00Z",
+      "raw_score": 0.7,
+      "prior_trust": 0.7,
+      "provenance_chain": [
+        "sha256:legacy_ART-001"
+      ],
+      "description": "00 03 * * * /usr/local/bin/backup_db.sh --full --encrypt --destination=s3://company-backups/ | crontab -l shows entry from 2023-01-10 | Last modified by: dba_admin (sudo)",
+      "metadata": {
+        "original_type": "bash_history",
+        "peirce_layer": "FIRSTNESS",
+        "forensic_anomalies": [
+          "Transferencia masiva de datos a las 3AM",
+          "Script de backup con acceso a S3"
+        ],
+        "content_preview": "00 03 * * * /usr/local/bin/backup_db.sh --full --encrypt --destination=s3://company-backups/ | cront"
+      }
+    },
+    {
+      "artifact_id": "ART-002",
+      "evidence_type": "file_timestamp",
+      "source_tool": "legacy_converter",
+      "timestamp": "2026-04-10T10:00:00Z",
+      "raw_score": 0.85,
+      "prior_trust": 0.7,
+      "provenance_chain": [
+        "sha256:legacy_ART-002"
+      ],
+      "description": "/etc/cron.d/backup_db: created 2023-01-10 by dba_admin | runbook_v2.4.pdf page 47: 'Daily encrypted backup to S3 at 03:00 UTC' | Auditoría 2024-Q3: PASSED",
+      "metadata": {
+        "original_type": "file_metadata",
+        "peirce_layer": "SECONDNESS",
+        "forensic_anomalies": [
+          "Cron job antiguo con privilegios elevados",
+          "Destino externo (S3) para datos corporativos"
+        ],
+        "content_preview": "/etc/cron.d/backup_db: created 2023-01-10 by dba_admin | runbook_v2.4.pdf page 47: 'Daily encrypted "
+      }
+    },
+    {
+      "artifact_id": "ART-003",
+      "evidence_type": "log_entry",
+      "source_tool": "legacy_converter",
+      "timestamp": "2026-04-10T10:00:00Z",
+      "raw_score": 0.95,
+      "prior_trust": 0.7,
+      "provenance_chain": [
+        "sha256:legacy_ART-003"
+      ],
+      "description": "S3 bucket: company-backups-prod | IAM role: BackupServiceRole | Encryption: AES-256-SSE | Access logs: consistent daily pattern since 2023-01-10 | No anomalous IPs",
+      "metadata": {
+        "original_type": "network_flow",
+        "peirce_layer": "THIRDNESS",
+        "forensic_anomalies": [
+          "Tráfico saliente a cloud storage",
+          "Uso de IAM role de servicio (no credenciales personales)"
+        ],
+        "content_preview": "S3 bucket: company-backups-prod | IAM role: BackupServiceRole | Encryption: AES-256-SSE | Access log"
+      }
+    }
+  ],
+  "temporal_violations": [],
+  "expected_verdict": "NOISE",
+  "expected_confidence": 88,
+  "expected_mitre_ttps": [],
+  "metadata": {
+    "converted_from": "legacy_v1",
+    "original_verdict": "NOISE",
+    "abstention_risk": "bajo",
+    "carnegie_pattern": null
+  }
+}

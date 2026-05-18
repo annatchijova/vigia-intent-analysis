@@ -1,0 +1,106 @@
+{
+  "case_id": "VIGIA-REAL-010",
+  "name": "DFRWS 2011 Android Espionage",
+  "description": "Caso dual: Donald Norby robó documentos confidenciales de SwiftLogic Inc. y fue encontrado muerto. Negociaba la venta de documentos del producto Palomino con Mr. E. El teléfono de Yob Taog fue comprometido con malware que exfiltraba PDFs.",
+  "artifacts": [
+    {
+      "artifact_id": "ART-001",
+      "evidence_type": "log_entry",
+      "source_tool": "legacy_converter",
+      "timestamp": "2026-04-10T10:00:00Z",
+      "raw_score": 0.7,
+      "prior_trust": 0.7,
+      "provenance_chain": [
+        "sha256:legacy_ART-001"
+      ],
+      "description": "SMS/Malware C&C: Norby organizó instalación de malware en teléfono de Taog | Negociaciones con Mr. E sobre precio de documentos | Mensajes del malware confirmando exfiltración de archivos | Email/SMS:",
+      "metadata": {
+        "original_type": "email_header",
+        "peirce_layer": "FIRSTNESS",
+        "forensic_anomalies": [
+          "SMS del malware confirmando exfiltración periódica de PDFs",
+          "Negociación de venta de propiedad intelectual vía SMS/email"
+        ],
+        "content_preview": "SMS/Malware C&C: Norby organizó instalación de malware en teléfono de Taog | Negociaciones con Mr. E"
+      }
+    },
+    {
+      "artifact_id": "ART-002",
+      "evidence_type": "log_entry",
+      "source_tool": "legacy_converter",
+      "timestamp": "2026-04-10T10:00:00Z",
+      "raw_score": 0.85,
+      "prior_trust": 0.7,
+      "provenance_chain": [
+        "sha256:legacy_ART-002"
+      ],
+      "description": "HTML Cache: Página con acceso a servidor remoto IP 50.56.29.109 | Malware code: Referencias hardcodeadas a servidor de exfiltración | Download logs: Descargas sistemáticas de documentos confidenciales",
+      "metadata": {
+        "original_type": "network_flow",
+        "peirce_layer": "SECONDNESS",
+        "forensic_anomalies": [
+          "Referencia hardcodeada a servidor externo 50.56.29.109 en código de malware",
+          "Descargas sistemáticas de PDFs confidenciales a intervalos regulares"
+        ],
+        "content_preview": "HTML Cache: Página con acceso a servidor remoto IP 50.56.29.109 | Malware code: Referencias hardcode"
+      }
+    },
+    {
+      "artifact_id": "ART-003",
+      "evidence_type": "file_timestamp",
+      "source_tool": "legacy_converter",
+      "timestamp": "2026-04-10T10:00:00Z",
+      "raw_score": 0.85,
+      "prior_trust": 0.7,
+      "provenance_chain": [
+        "sha256:legacy_ART-003"
+      ],
+      "description": "Archivos PDF confidenciales de SwiftLogic en tarjeta SD | Producto: Palomino | EXIF metadata de fotos: Motorola Droid | Browser history: Búsquedas sobre empleados de SwiftLogic (reconocimiento previo)",
+      "metadata": {
+        "original_type": "file_metadata",
+        "peirce_layer": "SECONDNESS",
+        "forensic_anomalies": [
+          "Documentos confidenciales de competidor en tarjeta SD del teléfono",
+          "Historial de búsqueda sobre empleados de la empresa víctima indica reconocimiento previo"
+        ],
+        "content_preview": "Archivos PDF confidenciales de SwiftLogic en tarjeta SD | Producto: Palomino | EXIF metadata de foto"
+      }
+    },
+    {
+      "artifact_id": "ART-004",
+      "evidence_type": "log_entry",
+      "source_tool": "legacy_converter",
+      "timestamp": "2026-04-10T10:00:00Z",
+      "raw_score": 0.95,
+      "prior_trust": 0.7,
+      "provenance_chain": [
+        "sha256:legacy_ART-004"
+      ],
+      "description": "Contact Records: Vínculos entre Norby, Mr. E, y Yob Taog | Negociaciones: Precio inicial ofrecido, Norby pidió más, envió muestra | Muerte: Donald Norby encontrado con disparo, potencial conexión a gr",
+      "metadata": {
+        "original_type": "email_header",
+        "peirce_layer": "THIRDNESS",
+        "forensic_anomalies": [
+          "Patrón de negociación de espionaje industrial con intento de renegociación",
+          "Muerte del sospechoso en circunstancias violentas tras intentar subir el precio"
+        ],
+        "content_preview": "Contact Records: Vínculos entre Norby, Mr. E, y Yob Taog | Negociaciones: Precio inicial ofrecido, N"
+      }
+    }
+  ],
+  "temporal_violations": [],
+  "expected_verdict": "MALICE",
+  "expected_confidence": 90,
+  "expected_mitre_ttps": [
+    "T1456",
+    "T1533",
+    "T1567",
+    "T1589"
+  ],
+  "metadata": {
+    "converted_from": "legacy_v1",
+    "original_verdict": "MALICE",
+    "abstention_risk": "medio",
+    "carnegie_pattern": null
+  }
+}

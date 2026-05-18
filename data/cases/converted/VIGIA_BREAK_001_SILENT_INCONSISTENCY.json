@@ -1,0 +1,91 @@
+{
+  "case_id": "VIGIA_BREAK_001_SILENT_INCONSISTENCY",
+  "name": "VIGIA_BREAK_001_SILENT_INCONSISTENCY",
+  "description": "Un único artefacto con timezone inconsistente en evento crítico",
+  "artifacts": [
+    {
+      "artifact_id": "ART-001",
+      "evidence_type": "log_entry",
+      "source_tool": "legacy_converter",
+      "timestamp": "2026-04-10T10:00:00Z",
+      "raw_score": 0.75,
+      "prior_trust": 0.7,
+      "provenance_chain": [
+        "sha256:legacy_1"
+      ],
+      "description": "SSH login 10:00 UTC+3",
+      "metadata": {
+        "original_type": "auth.log",
+        "peirce_layer": "SECONDNESS",
+        "forensic_anomalies": [],
+        "content_preview": "SSH login 10:00 UTC+3"
+      }
+    },
+    {
+      "artifact_id": "ART-002",
+      "evidence_type": "log_entry",
+      "source_tool": "legacy_converter",
+      "timestamp": "2026-04-10T10:00:00Z",
+      "raw_score": 0.75,
+      "prior_trust": 0.7,
+      "provenance_chain": [
+        "sha256:legacy_2"
+      ],
+      "description": "connection 10:00 UTC+3",
+      "metadata": {
+        "original_type": "netflow",
+        "peirce_layer": "SECONDNESS",
+        "forensic_anomalies": [],
+        "content_preview": "connection 10:00 UTC+3"
+      }
+    },
+    {
+      "artifact_id": "ART-003",
+      "evidence_type": "log_entry",
+      "source_tool": "legacy_converter",
+      "timestamp": "2026-04-10T10:00:00Z",
+      "raw_score": 0.75,
+      "prior_trust": 0.7,
+      "provenance_chain": [
+        "sha256:legacy_3"
+      ],
+      "description": "command execution 10:00 UTC+3",
+      "metadata": {
+        "original_type": "audit",
+        "peirce_layer": "SECONDNESS",
+        "forensic_anomalies": [],
+        "content_preview": "command execution 10:00 UTC+3"
+      }
+    },
+    {
+      "artifact_id": "ART-004",
+      "evidence_type": "log_entry",
+      "source_tool": "legacy_converter",
+      "timestamp": "2026-04-10T10:00:00Z",
+      "raw_score": 0.75,
+      "prior_trust": 0.7,
+      "provenance_chain": [
+        "sha256:legacy_4"
+      ],
+      "description": "file accessed 10:00 UTC+2",
+      "metadata": {
+        "original_type": "filesystem",
+        "peirce_layer": "SECONDNESS",
+        "forensic_anomalies": [],
+        "content_preview": "file accessed 10:00 UTC+2"
+      }
+    }
+  ],
+  "temporal_violations": [],
+  "expected_verdict": "SUSPICION",
+  "expected_confidence": 0.75,
+  "expected_mitre_ttps": [
+    "T1070.006"
+  ],
+  "metadata": {
+    "converted_from": "legacy_v1",
+    "original_verdict": "SUSPICION",
+    "abstention_risk": "bajo",
+    "carnegie_pattern": ""
+  }
+}
