@@ -17,8 +17,8 @@ from vigia.core.ebs_v1 import (
     SignalOutput, EvidenceEdge, EvidenceGraph,
     DecisionTrace, ForensicBundle, PolicySpec
 )
-from vigia.engine.likelihood_engine import LikelihoodEngine
-from vigia.engine.risk_bounded_layer import RiskBoundedDecisionLayer
+from vigia.inference.likelihood_engine import LikelihoodEngine
+from vigia.inference.risk_bounded_layer import RiskBoundedDecisionLayer
 from vigia.tools.geopolitical import GeopoliticalIntentEngine, APT_PROFILES
 
 

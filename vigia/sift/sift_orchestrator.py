@@ -22,7 +22,7 @@ from typing import Any, Dict, List, Optional, Tuple
 from vigia.core.chain_of_custody import ChainOfCustody
 from vigia.core.ebs_v1 import SignalOutput
 from vigia.core.path_guard import PathGuard, SecurityException
-from vigia.engine.abductive_reasoner import AbductiveReasoner
+from vigia.inference.abductive_reasoner import AbductiveReasoner
 
 # SIFT motores originales
 from vigia.sift._math_utils import (
@@ -72,19 +72,19 @@ try:
 except ImportError:
     SignalMapper = None  # type: ignore
 try:
-    from vigia.engine.metabolic_profiler import MetabolicProfiler, MetabolicAnalysisResult
+    from vigia.inference.metabolic_profiler import MetabolicProfiler, MetabolicAnalysisResult
 except ImportError:
     MetabolicProfiler = None  # type: ignore
 try:
-    from vigia.engine.cross_artifact_resonance import CrossArtifactResonance, ResonanceResult
+    from vigia.inference.cross_artifact_resonance import CrossArtifactResonance, ResonanceResult
 except ImportError:
     CrossArtifactResonance = None  # type: ignore
 try:
-    from vigia.engine.behavioral_fingerprint import BehavioralFingerprint, BehavioralFingerprintResult
+    from vigia.inference.behavioral_fingerprint import BehavioralFingerprint, BehavioralFingerprintResult
 except ImportError:
     BehavioralFingerprint = None  # type: ignore
 try:
-    from vigia.engine.case_pattern_library import CasePatternLibrary, CasePatternResult
+    from vigia.inference.case_pattern_library import CasePatternLibrary, CasePatternResult
 except ImportError:
     CasePatternLibrary = None  # type: ignore
 try:

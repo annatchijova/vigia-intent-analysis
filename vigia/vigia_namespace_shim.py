@@ -92,7 +92,7 @@ _ORDERED_IMPORTS: list[tuple[str, str]] = [
     # Sin este alias, si el módulo se carga por namespace antes de que el path flat
     # esté disponible, el import `from visible_variables import` falla silenciosamente.
     ("vigia.visible_variables", "visible_variables"),
-    ("vigia.engine.abductive_intent_engine", "abductive_intent_engine"),
+    ("vigia.inference.abductive_intent_engine", "abductive_intent_engine"),
 
     # Core
     ("vigia.core.signal_contract",     "signal_contract"),

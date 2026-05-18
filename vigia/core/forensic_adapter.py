@@ -34,7 +34,7 @@ except ImportError:
         base_trust: float = 1.0
 
 try:
-    from vigia.engine.abductive_reasoner_v2 import (
+    from vigia.inference.abductive_reasoner_v2 import (
         ArtifactRecord, EvidenceLayer, OntologicalLevel, CausalLink,
         LAYER_EPISTEMIC_WEIGHT
     )
