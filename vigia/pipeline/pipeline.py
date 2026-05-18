@@ -41,6 +41,7 @@ import logging
 import os
 import subprocess
 import sys
+import asyncio
 import tempfile
 from typing import Any, Dict, List, Optional
 
@@ -604,7 +605,7 @@ class VigiaPipeline:
         try:
             from vigia.core.forensic_adapter import ForensicAdapter
             from vigia.tools.caie import cross_artifact_analysis
-            context = ForensicAdapter.build_context(filtered_signals, results={})
+            context = ForensicAdapter.build_context(filtered_signals, raw_results={})
             if context.caie_artifacts:
                 caie_input = [
                     {
@@ -617,7 +618,7 @@ class VigiaPipeline:
                     }
                     for a in context.caie_artifacts
                 ]
-                caie_result = cross_artifact_analysis(caie_input)
+                caie_result = asyncio.run(cross_artifact_analysis(caie_input))
                 self._last_caie_result = caie_result
                 logger.info(
                     "[Pipeline] CAIE: verdict=%s composite=%.4f fractures=%d",

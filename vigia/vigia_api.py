@@ -34,8 +34,8 @@ def _run_pipeline(case_path: Path) -> dict:
     import time, subprocess as _sub, tempfile as _tmp
     # Scorer forense (mismo que run_vigia_case.py)
     from vigia_scorer import _vigia_score, _normalize_case
-    from pipeline.vigia_integration_bridge import CaseAdapter, normalize_case_schema, validate_case_schema
-    from pipeline.pipeline import VigiaPipeline
+    from vigia.pipeline.vigia_integration_bridge import CaseAdapter, normalize_case_schema, validate_case_schema
+    from vigia.pipeline.pipeline import VigiaPipeline
 
     with open(case_path) as f:
         case = json.load(f)

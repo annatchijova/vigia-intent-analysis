@@ -10,7 +10,7 @@ from pathlib import Path
 
 def _normalize_case(c):
     try:
-        from pipeline.vigia_integration_bridge import normalize_case_schema
+        from vigia.pipeline.vigia_integration_bridge import normalize_case_schema
         return normalize_case_schema(c)
     except Exception:
         return c

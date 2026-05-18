@@ -13,6 +13,7 @@ Resiliencia: cada motor en try/except — un stub no rompe el pipeline.
 from __future__ import annotations
 
 import json
+import asyncio
 import logging
 from fractions import Fraction
 from pathlib import Path
@@ -574,7 +575,7 @@ class SIFTOrchestrator:
         caie_result = None
         try:
             from vigia.core.forensic_adapter import ForensicAdapter
-            context = ForensicAdapter.build_context(all_signals, results)
+            context = ForensicAdapter.build_context(all_signals, raw_results=results)
             if context.caie_artifacts:
                 caie_input = [
                     {
@@ -588,7 +589,7 @@ class SIFTOrchestrator:
                     for a in context.caie_artifacts
                 ]
                 from vigia.tools.caie import cross_artifact_analysis
-                caie_result = cross_artifact_analysis(caie_input)
+                caie_result = asyncio.run(cross_artifact_analysis(caie_input))
                 results["caie"] = caie_result
                 logger.info("CAIE executed: %s | composite=%s | fractures=%s",
                            caie_result.get('verdict'),
@@ -603,7 +604,7 @@ class SIFTOrchestrator:
         abduction_v2 = None
         try:
             from vigia.core.forensic_adapter import ForensicAdapter
-            context = ForensicAdapter.build_context(all_signals, results)
+            context = ForensicAdapter.build_context(all_signals, raw_results=results)
             if context.abductive_records and context.causal_links:
                 abduction_v2 = {
                     "status": "READY",

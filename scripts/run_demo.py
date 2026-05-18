@@ -215,7 +215,7 @@ def run_case(
         → ForensicBundle → BundleBuilder.seal() → Merkle chain
         → C3 NarrativeAuditor → verify_ebs_v1.py → reporte ENFSI
     """
-    from pipeline.vigia_integration_bridge import VigiaIntegrationEngine  # type: ignore  # type: ignore
+    from vigia.pipeline.vigia_integration_bridge import VigiaIntegrationEngine  # type: ignore  # type: ignore
 
     # Buscar baselines_yaml para Level 3
     baselines_yaml = _find_baselines_yaml()
@@ -348,7 +348,7 @@ Ejemplos:
 
     # Verificar que el bridge está disponible
     try:
-        import pipeline.vigia_integration_bridge as vigia_integration_bridge  # type: ignore  # type: ignore  # noqa: F401
+        import vigia.pipeline.vigia_integration_bridge as vigia_integration_bridge  # type: ignore  # type: ignore  # noqa: F401
     except ImportError as e:
         print(f"\n  ERROR CRÍTICO: vigia_integration_bridge no importable: {e}")
         print(f"  sys.path[0:3]: {sys.path[:3]}")

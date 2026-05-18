@@ -100,7 +100,7 @@ else:
 
 # Contrato de señales
 _signal_mod, _signal_name = _try_imports(
-    ["signal_contract", "signal_contract__2_"], ["SignalOutput"]
+    ["vigia.tools.signal_contract", "vigia.core.signal_contract", "signal_contract", "signal_contract__2_"], ["SignalOutput"]
 )
 if _signal_mod is not None:
     SignalOutput = getattr(_signal_mod, "SignalOutput")
@@ -672,6 +672,7 @@ def compute_ecl_hash(baselines_path: Optional[str] = None) -> str:
         baselines_path,
         os.path.join(_HERE, "baselines_institucionales.yaml"),
         os.path.join(_HERE, "..", "baselines_institucionales.yaml"),
+        os.path.join(_HERE, "..", "..", "baselines_institucionales.yaml"),
     ]
     for path in paths_to_try:
         if path and os.path.isfile(path):
