@@ -596,18 +596,17 @@ class CrossArtifactIncongruenceEngine:
 
         # Group artifacts by evidence type category
         cultural = [a for a in self._artifacts if a.evidence_type in
-                    ("cultural_marker", "ip_geolocation", "user_agent", "default", "default")]
+                    ("cultural_marker", "ip_geolocation", "user_agent")]
         technical = [a for a in self._artifacts if a.evidence_type in
                      ("memory_process", "lsass_session", "kernel_structure",
-                      "usn_journal", "hmac_audit_log", "file_timestamp", "unknown", "file_timestamp", "unknown")]
+                      "usn_journal", "hmac_audit_log")]
         logs = [a for a in self._artifacts if a.evidence_type == "log_entry"]
         documents = [a for a in self._artifacts if a.evidence_type in
                      ("document_visual", "document_geometry")]
         cryptographic = [a for a in self._artifacts if a.evidence_type in
                          ("cryptographic_hash", "digital_signature")]
         network_logs = [a for a in self._artifacts if a.evidence_type in
-                        ("log_entry", "dns_record", "network_artifact") or 
-                        ("network" in a.description.lower() if a.description else False)]
+                        ("log_entry", "dns_record") and "network" in a.description.lower()]
         host_logs = [a for a in self._artifacts if a.evidence_type in
                      ("log_entry", "memory_process") and "socket" in str(a.metadata).lower()]
 
@@ -714,116 +713,102 @@ class CrossArtifactIncongruenceEngine:
         # GOLDEN FORENSIC RULES — P4 Expansion
         # ===================================================================
 
-        # Rule 5a: LOW_COUNT_HIGH_SCORE_ANOMALY
-        # Detecta cuando hay pocos artifacts TODOS con scores altos — indica manipulación
-        # No se activa si hay evidencia mixta (algún artifact con score < 0.2)
-        if len(self._artifacts) <= 3 and len(self._artifacts) >= 1:
-            max_score = max(a.raw_score for a in self._artifacts)
-            min_score = min(a.raw_score for a in self._artifacts)
-            # Solo activar si todos los artifacts tienen score significativo (>0.2)
-            # y al menos uno es muy alto (>0.5)
-            if max_score > 0.5 and min_score > 0.2:
-                self._fractures.append(Fracture(
-                    artifact_a=f"High score artifact (score={max_score:.2f})",
-                    artifact_b=f"Only {len(self._artifacts)} artifacts total, all scores > 0.2",
-                    fracture_type="LOW_COUNT_ANOMALY",
-                    severity=0.6,
-                    interpretation="Few artifacts all showing significant scores indicates targeted manipulation.",
-                    spoofability_delta=_dround(0.7 - 0.15, _DETERMINISTIC_INTERNAL_PREC),
-                    ttp_id="T1565",
-                ))
-
-        # Rule 5a: LOW_COUNT_HIGH_SCORE_ANOMALY
-        if len(self._artifacts) <= 3 and len(self._artifacts) >= 1:
-            max_score = max(a.raw_score for a in self._artifacts)
-            if max_score > 0.5:
-                self._fractures.append(Fracture(
-                    artifact_a=f"High score artifact (score={max_score:.2f})",
-                    artifact_b=f"Only {len(self._artifacts)} artifacts total",
-                    fracture_type="LOW_COUNT_ANOMALY",
-                    severity=0.6,
-                    interpretation="Few artifacts with one showing high score indicates targeted manipulation.",
-                    spoofability_delta=_dround(0.7 - 0.15, _DETERMINISTIC_INTERNAL_PREC),
-                    ttp_id="T1565",
-                ))
-
-        # Rule 5b: FILE_TIMESTAMP_INCONSISTENCY
-        # Detecta cuando timestamps de archivos son inconsistentes con el contexto
-        timestamps = [a for a in self._artifacts if a.evidence_type == "file_timestamp"]
-        if timestamps and len(timestamps) >= 2:
-            scores = [a.raw_score for a in timestamps]
-            avg_ts = _dround(_dsum(scores) / len(scores), _DETERMINISTIC_INTERNAL_PREC)
-            if avg_ts > 0.7:
-                self._fractures.append(Fracture(
-                    artifact_a=f"File timestamps (avg={avg_ts:.2f})",
-                    artifact_b="Temporal context mismatch",
-                    fracture_type="TIMESTAMP_FRACTURE",
-                    severity=0.75,
-                    interpretation=(
-                        "Multiple file timestamps show suspicious patterns. "
-                        "High scores indicate temporal anomalies or timestomping."
-                    ),
-                    spoofability_delta=_dround(0.85 - 0.20, _DETERMINISTIC_INTERNAL_PREC),
-                    ttp_id="T1070.006",
-                ))
-
-        # Rule 5b: FILE_TIMESTAMP_INCONSISTENCY
-        timestamps = [a for a in self._artifacts if a.evidence_type == "file_timestamp"]
-        if timestamps and len(timestamps) >= 2:
-            scores = [a.raw_score for a in timestamps]
-            avg_ts = _dround(_dsum(scores) / len(scores), _DETERMINISTIC_INTERNAL_PREC)
-            if avg_ts > 0.7:
-                self._fractures.append(Fracture(
-                    artifact_a=f"File timestamps (avg={avg_ts:.2f})",
-                    artifact_b="Temporal context mismatch",
-                    fracture_type="TIMESTAMP_FRACTURE",
-                    severity=0.75,
-                    interpretation="Multiple file timestamps show suspicious patterns.",
-                    spoofability_delta=_dround(0.85 - 0.20, _DETERMINISTIC_INTERNAL_PREC),
-                    ttp_id="T1070.006",
-                ))
-
         # Rule 6: TEMPORAL_CAUSALITY_VIOLATION (TCV)
-        # Effect-before-cause: Any activity timestamp < Process creation timestamp
-        # FIX: Buscar network_log_time en CUALQUIER artifact, no solo en "network"
-        network_artifacts = [a for a in self._artifacts 
-                            if a.metadata.get("network_log_time") or a.metadata.get("file_write_time")]
-        process_artifacts = [a for a in self._artifacts 
-                            if a.evidence_type == "memory_process" 
-                            or a.metadata.get("process_creation_time")]
+        # Effect-before-cause: Network log timestamp < Process creation timestamp
+        network_artifacts = [a for a in self._artifacts if "network" in a.description.lower()]
+        process_artifacts = [a for a in self._artifacts if a.evidence_type == "memory_process"]
+
+        def _parse_ts_tcv(ts_str: object, artifact_tool: str, field: str) -> "datetime | None":
+            """
+            Robust ISO 8601 timestamp parser for TCV rule.
+
+            Handles:
+            - 'Z' suffix (UTC) → '+00:00'
+            - Naive timestamps (no offset) → assumes UTC, logs assumption
+            - None or empty string → returns None, logs missing field
+            - Unparseable formats → returns None, logs format error
+
+            Rationale (Grok P0 audit): silent continue on parse failure
+            hides data quality problems. In Daubert context, unparseable
+            timestamps should be auditable, not invisible.
+            """
+            if not ts_str or not isinstance(ts_str, str) or not ts_str.strip():
+                audit_logger.log_info(
+                    event_type="TCV_TIMESTAMP_MISSING",
+                    tool="CrossArtifactIncongruenceEngine",
+                    message=(
+                        f"TCV rule: {field} is missing or empty for "
+                        f"artifact from {artifact_tool!r}. "
+                        "Cannot evaluate temporal causality for this pair."
+                    ),
+                )
+                return None
+            # Normalize Z suffix
+            normalized = ts_str.strip().replace('Z', '+00:00')
+            try:
+                return datetime.fromisoformat(normalized)
+            except ValueError:
+                pass
+            # Try naive timestamp (no offset) — assume UTC, log the assumption
+            try:
+                dt = datetime.fromisoformat(ts_str.strip())
+                audit_logger.log_info(
+                    event_type="TCV_TIMESTAMP_NAIVE_ASSUMED_UTC",
+                    tool="CrossArtifactIncongruenceEngine",
+                    message=(
+                        f"TCV rule: {field}={ts_str!r} from {artifact_tool!r} "
+                        "has no timezone offset. Assumed UTC for comparison. "
+                        "This assumption affects TCV accuracy if the system "
+                        "clock was in a non-UTC timezone."
+                    ),
+                )
+                from datetime import timezone as _tz
+                return dt.replace(tzinfo=_tz.utc)
+            except (ValueError, TypeError):
+                pass
+            audit_logger.log_info(
+                event_type="TCV_TIMESTAMP_UNPARSEABLE",
+                tool="CrossArtifactIncongruenceEngine",
+                message=(
+                    f"TCV rule: {field}={ts_str!r} from {artifact_tool!r} "
+                    "could not be parsed as ISO 8601. "
+                    "Temporal causality check skipped for this artifact pair. "
+                    "Expected formats: YYYY-MM-DDTHH:MM:SS[.ffffff][Z|+HH:MM]"
+                ),
+            )
+            return None
 
         for net in network_artifacts:
-            net_time_str = net.metadata.get("network_log_time") or net.metadata.get("file_write_time") or net.timestamp
+            net_time_str = net.metadata.get("network_log_time") or net.timestamp
+            net_time = _parse_ts_tcv(net_time_str, net.source_tool, "network_log_time")
+            if net_time is None:
+                continue
+
             for proc in process_artifacts:
                 proc_time_str = proc.metadata.get("process_creation_time") or proc.timestamp
+                proc_time = _parse_ts_tcv(proc_time_str, proc.source_tool, "process_creation_time")
+                if proc_time is None:
+                    continue
 
-                try:
-                    # Parse timestamps (ISO format expected)
-                    from datetime import datetime
-                    net_time = datetime.fromisoformat(net_time_str.replace('Z', '+00:00'))
-                    proc_time = datetime.fromisoformat(proc_time_str.replace('Z', '+00:00'))
-
-                    # VIOLATION: Network activity before process existed
-                    if net_time < proc_time:
-                        time_delta = (proc_time - net_time).total_seconds()
-                        self._fractures.append(Fracture(
-                            artifact_a=f"Network log @ {net_time.isoformat()}",
-                            artifact_b=f"Process created @ {proc_time.isoformat()}",
-                            fracture_type="TEMPORAL_CAUSALITY_VIOLATION",
-                            severity=1.0,  # MAXIMUM SEVERITY
-                            interpretation=(
-                                f"TEMPORAL CAUSALITY VIOLATION: Network activity detected "
-                                f"{time_delta:.0f} seconds BEFORE the originating process "
-                                "was created. This is structurally impossible without "
-                                "log fabrication or timestamp manipulation. "
-                                "Peirce Secondness: The causal chain is broken, proving "
-                                "the evidence was planted retroactively."
-                            ),
-                            spoofability_delta=0.95,  # Logs are trivially spoofable
-                            ttp_id="T1070.006",  # Timestomp
-                        ))
-                except (ValueError, TypeError):
-                    continue  # Skip if timestamps unparseable
+                # VIOLATION: Network activity before process existed
+                if net_time < proc_time:
+                    time_delta = (proc_time - net_time).total_seconds()
+                    self._fractures.append(Fracture(
+                        artifact_a=f"Network log @ {net_time.isoformat()}",
+                        artifact_b=f"Process created @ {proc_time.isoformat()}",
+                        fracture_type="TEMPORAL_CAUSALITY_VIOLATION",
+                        severity=1.0,  # MAXIMUM SEVERITY
+                        interpretation=(
+                            f"TEMPORAL CAUSALITY VIOLATION: Network activity detected "
+                            f"{time_delta:.0f} seconds BEFORE the originating process "
+                            "was created. This is structurally impossible without "
+                            "log fabrication or timestamp manipulation. "
+                            "Peirce Secondness: The causal chain is broken, proving "
+                            "the evidence was planted retroactively."
+                        ),
+                        spoofability_delta=0.95,  # Logs are trivially spoofable
+                        ttp_id="T1070.006",  # Timestomp
+                    ))
 
         # Rule 7: NETWORK_VS_HOST
         # Firewall claims outbound traffic but host shows no open sockets
@@ -866,26 +851,66 @@ class CrossArtifactIncongruenceEngine:
                 ))
 
         # Rule 8: CRYPTOGRAPHIC_INCONSISTENCY
-        # File claims to be signed but hash doesn't match known-good database
+        # File claims to be signed but hash doesn't match known-good database.
+        # IMPORTANT (DeepSeek P0 audit): hash mismatch alone does NOT prove spoofed
+        # identity. Legitimate causes include: different version, hotfix, internal
+        # build, signed-but-updated binary, or vendor catalog not updated.
+        # Full trust-chain validation requires: signer validation, catalog validation,
+        # timestamp authority, cert chain, and revocation check.
+        # WITHOUT trust-chain: severity=0.6, NOT a Golden Rule (SUSPICION, not MALICE).
+        # WITH confirmed trust-chain failure: severity=0.9, qualifies as Golden Rule.
         for crypto in cryptographic:
             if crypto.metadata.get("signature_mismatch") or crypto.metadata.get("hash_mismatch"):
                 claimed_identity = crypto.metadata.get("claimed_identity", "unknown")
                 actual_hash = crypto.metadata.get("actual_hash", "unknown")
                 expected_hash = crypto.metadata.get("expected_hash", "unknown")
 
+                # Check whether a full trust-chain validation was performed
+                trust_chain_validated = crypto.metadata.get("trust_chain_validated", False)
+                signer_validated = crypto.metadata.get("signer_validated", False)
+                cert_revoked = crypto.metadata.get("cert_revoked", False)
+                catalog_validated = crypto.metadata.get("catalog_validated", False)
+
+                full_trust_chain = trust_chain_validated and signer_validated and catalog_validated
+
+                if full_trust_chain or cert_revoked:
+                    # Full validation confirms the inconsistency is not explained by
+                    # version differences or legitimate patch. This IS a Golden Rule.
+                    severity = 0.9
+                    fracture_type = "CRYPTOGRAPHIC_INCONSISTENCY"
+                    interpretation = (
+                        "CONFIRMED SPOOFED IDENTITY: File presents cryptographic credentials "
+                        f"claiming to be '{claimed_identity}', hash verification fails "
+                        "AND full trust-chain validation confirms the inconsistency is not "
+                        "attributable to version differences or legitimate patches. "
+                        "Trust chain: signer=" + ("FAIL" if not signer_validated else "FAIL-REVOKED" if cert_revoked else "OK") + ", "
+                        "catalog=" + ("OK" if catalog_validated else "NOT_CHECKED") + ". "
+                        "Peirce Secondness: The sign (hash) does not match the object "
+                        "(file content), and no legitimate explanation survives full chain validation."
+                    )
+                    # This qualifies as a Golden Rule — mark it via ttp_id and severity
+                else:
+                    # Trust-chain NOT validated — cannot rule out version/patch/build.
+                    # Downgrade to SUSPICION. Must be reviewed by analyst.
+                    severity = 0.6
+                    fracture_type = "CRYPTOGRAPHIC_INCONSISTENCY_UNVERIFIED"
+                    interpretation = (
+                        f"HASH MISMATCH (trust-chain NOT validated): File presents "
+                        f"credentials as '{claimed_identity}' but hash does not match "
+                        "known-good database. CANNOT confirm spoofed identity without "
+                        "signer validation, catalog check, and revocation status. "
+                        "Possible causes: different version, hotfix, internal build, "
+                        "signed-but-updated binary. "
+                        "Action required: run full trust-chain validation before escalating "
+                        "to Golden Rule. Set trust_chain_validated=True in artifact metadata."
+                    )
+
                 self._fractures.append(Fracture(
                     artifact_a=f"File claims identity: {claimed_identity}",
                     artifact_b=f"Hash mismatch: {actual_hash[:16]}... != {expected_hash[:16]}...",
-                    fracture_type="CRYPTOGRAPHIC_INCONSISTENCY",
-                    severity=0.9,
-                    interpretation=(
-                        "SPOOFED IDENTITY: File presents cryptographic credentials "
-                        f"claiming to be '{claimed_identity}', but hash verification "
-                        "against VIGIA_PHONETIC_HASH database fails. This is "
-                        "evidence of binary substitution or certificate theft. "
-                        "Peirce Secondness: The sign (hash) does not match the "
-                        "object (file content), revealing a masquerade attack."
-                    ),
+                    fracture_type=fracture_type,
+                    severity=severity,
+                    interpretation=interpretation,
                     spoofability_delta=0.05,  # Cryptographic hashes are hard to spoof
                     ttp_id="T1036",  # Masquerading
                 ))
@@ -947,33 +972,31 @@ class CrossArtifactIncongruenceEngine:
                 curr = mft_sorted[i]
                 prev_entry = int(prev.metadata.get("mft_entry_number", 0))
                 curr_entry = int(curr.metadata.get("mft_entry_number", 0))
-                try:
-                    from datetime import datetime as _dt
-                    prev_ts = _dt.fromisoformat(prev.timestamp.replace("Z", "+00:00"))
-                    curr_ts = _dt.fromisoformat(curr.timestamp.replace("Z", "+00:00"))
-                    # MFT entry# creció pero timestamp retrocedió = anomalía
-                    if curr_entry > prev_entry and curr_ts < prev_ts:
-                        delta_seconds = (prev_ts - curr_ts).total_seconds()
-                        self._fractures.append(Fracture(
-                            artifact_a=f"MFT#{curr_entry} timestamp={curr_ts.isoformat()}",
-                            artifact_b=f"MFT#{prev_entry} timestamp={prev_ts.isoformat()} (anterior)",
-                            fracture_type="MFT_ENTRY_ANOMALY",
-                            severity=0.90,
-                            interpretation=(
-                                f"MFT MONOTONICITY VIOLATION: Entry #{curr_entry} "
-                                f"was allocated AFTER #{prev_entry} (NTFS sequential allocation) "
-                                f"but carries a timestamp {delta_seconds:.0f}s OLDER. "
-                                "The NTFS driver never assigns entry numbers retroactively. "
-                                "This fracture is structurally impossible without timestamp "
-                                "manipulation after allocation. "
-                                "Peirce Secondness: The MFT# sequence is the ground truth; "
-                                "the timestamp is the lie."
-                            ),
-                            spoofability_delta=_dround(0.70 - 0.05, _DETERMINISTIC_INTERNAL_PREC),
-                            ttp_id="T1070.006",  # Indicator Removal: Timestomp
-                        ))
-                except (ValueError, TypeError):
+                prev_ts = _parse_ts_tcv(prev.timestamp, prev.source_tool, f"mft#{prev_entry}.timestamp")
+                curr_ts = _parse_ts_tcv(curr.timestamp, curr.source_tool, f"mft#{curr_entry}.timestamp")
+                if prev_ts is None or curr_ts is None:
                     continue
+                # MFT entry# creció pero timestamp retrocedió = anomalía
+                if curr_entry > prev_entry and curr_ts < prev_ts:
+                    delta_seconds = (prev_ts - curr_ts).total_seconds()
+                    self._fractures.append(Fracture(
+                        artifact_a=f"MFT#{curr_entry} timestamp={curr_ts.isoformat()}",
+                        artifact_b=f"MFT#{prev_entry} timestamp={prev_ts.isoformat()} (anterior)",
+                        fracture_type="MFT_ENTRY_ANOMALY",
+                        severity=0.90,
+                        interpretation=(
+                            f"MFT MONOTONICITY VIOLATION: Entry #{curr_entry} "
+                            f"was allocated AFTER #{prev_entry} (NTFS sequential allocation) "
+                            f"but carries a timestamp {delta_seconds:.0f}s OLDER. "
+                            "The NTFS driver never assigns entry numbers retroactively. "
+                            "This fracture is structurally impossible without timestamp "
+                            "manipulation after allocation. "
+                            "Peirce Secondness: The MFT# sequence is the ground truth; "
+                            "the timestamp is the lie."
+                        ),
+                        spoofability_delta=_dround(0.70 - 0.05, _DETERMINISTIC_INTERNAL_PREC),
+                        ttp_id="T1070.006",  # Indicator Removal: Timestomp
+                    ))
 
         # Rule 11: USN_JOURNAL_GAP
         # Si $LogFile muestra actividad pero $UsnJrnl no tiene registro
@@ -1011,26 +1034,64 @@ class CrossArtifactIncongruenceEngine:
                 ttp_id="T1070.004",  # Indicator Removal: File Deletion
             ))
 
-        # Also detect implicit USN gaps from LogFile claims without USN corroboration
+        # Implicit USN gap: LogFile claims but no USN journal artifacts present.
+        # CRITICAL DISTINCTION (DeepSeek P0 audit):
+        #   - ABSENT   : acquisition was complete and USN was explicitly not found
+        #                (usn_explicitly_absent=True in any artifact metadata)
+        #   - UNAVAILABLE: USN was not included in acquisition scope
+        #                  (acquisition_complete=False OR usn_scope=False in metadata)
+        #   - DEFAULT  : insufficient evidence to classify — do NOT fire fracture.
+        #
+        # Rationale: partial acquisitions, truncated journals, and incomplete imaging
+        # are common in field work. Treating UNAVAILABLE as DELETED is judicially
+        # dangerous — it asserts journal clearing when the real cause is acquisition
+        # scope. Only fire when the operator has EXPLICITLY confirmed the acquisition
+        # included USN scope and the journal is not present.
         has_usn = any(a.evidence_type == "usn_journal" for a in self._artifacts)
         if logfile_claims and not has_usn:
-            # LogFile tiene eventos pero no hay ningún artefacto USN Journal
-            self._fractures.append(Fracture(
-                artifact_a=f"$LogFile: {len(logfile_claims)} events recorded",
-                artifact_b="$UsnJrnl: ABSENT — no USN journal artifacts present",
-                fracture_type="USN_JOURNAL_GAP",
-                severity=0.85,
-                interpretation=(
-                    f"IMPLICIT USN GAP: {len(logfile_claims)} $LogFile events exist "
-                    "but no $UsnJrnl artifacts were provided or found. "
-                    "In a clean system, both journals record the same filesystem events. "
-                    "Complete absence of USN data while LogFile shows activity "
-                    "is consistent with deliberate journal clearing. "
-                    "Peirce Eco Silence: The journal that should speak is silent."
-                ),
-                spoofability_delta=_dround(0.85 - 0.10, _DETERMINISTIC_INTERNAL_PREC),
-                ttp_id="T1070.004",
-            ))
+            # Check whether any artifact carries explicit acquisition metadata
+            usn_explicitly_absent = any(
+                a.metadata.get("usn_explicitly_absent") is True
+                for a in self._artifacts
+            )
+            acquisition_complete = any(
+                a.metadata.get("acquisition_complete") is True
+                and a.metadata.get("usn_scope") is True
+                for a in self._artifacts
+            )
+
+            if usn_explicitly_absent or acquisition_complete:
+                # Only fire when there is explicit confirmation that USN was in scope
+                self._fractures.append(Fracture(
+                    artifact_a=f"$LogFile: {len(logfile_claims)} events recorded",
+                    artifact_b="$UsnJrnl: EXPLICITLY ABSENT (acquisition confirmed complete + USN in scope)",
+                    fracture_type="USN_JOURNAL_GAP",
+                    severity=0.75,  # Reduced from 0.85: implicit gap is less certain than explicit gap
+                    interpretation=(
+                        f"CONFIRMED USN GAP: {len(logfile_claims)} $LogFile events exist "
+                        "and acquisition metadata confirms USN journal was in scope. "
+                        "Absence under confirmed acquisition scope is consistent with "
+                        "deliberate journal clearing (requires Ring-0/Admin: "
+                        "'fsutil usn deletejournal'). "
+                        "Peirce Eco Silence: The journal that should speak is silent. "
+                        "NOTE: Distinguish from UNAVAILABLE (acquisition scope unknown)."
+                    ),
+                    spoofability_delta=_dround(0.85 - 0.10, _DETERMINISTIC_INTERNAL_PREC),
+                    ttp_id="T1070.004",
+                ))
+            else:
+                # Acquisition scope unknown — log as informational, do NOT generate fracture
+                audit_logger.log_info(
+                    event_type="USN_JOURNAL_SCOPE_UNKNOWN",
+                    tool="CrossArtifactIncongruenceEngine",
+                    message=(
+                        f"$LogFile has {len(logfile_claims)} events but no USN artifacts present. "
+                        "Acquisition scope unknown — cannot distinguish ABSENT from UNAVAILABLE. "
+                        "To enable USN_JOURNAL_GAP detection, set "
+                        "acquisition_complete=True and usn_scope=True in artifact metadata "
+                        "when acquisition confirmed that USN journal was in acquisition scope."
+                    ),
+                )
 
         return self._fractures
 
@@ -1113,7 +1174,11 @@ class CrossArtifactIncongruenceEngine:
             confidence_penalty = _LOW_SOURCE_PENALTY
             composite = _dround(composite * (1.0 - confidence_penalty), _DETERMINISTIC_INTERNAL_PREC)
 
-        # P1: DETERMINISTIC fracture bonus
+        # P1: DETERMINISTIC fracture deduplication
+        # Dedup key: (fracture_type, artifact_a, artifact_b)
+        # Note: semantic duplicates with different interpretations are deduplicated
+        # architecturally here. Rule authors must ensure fracture_type + artifacts
+        # form a unique key per logical finding.
         seen_fractures = set()
         filtered_fractures = []
         for f in fractures:
@@ -1126,32 +1191,65 @@ class CrossArtifactIncongruenceEngine:
                 seen_fractures.add(key)
                 filtered_fractures.append(f)
 
-        if filtered_fractures:
-            # DETERMINISTIC: Use math.fsum for precise summation
+        # GOLDEN RULES — structural verdict override.
+        # These are NOT probabilistic increments. A causal impossibility does not
+        # add probability mass — it is a different epistemic category entirely.
+        # (DeepSeek P0 audit: mixing structural inference with probabilistic score
+        # contaminates the composite and violates Daubert reasoning integrity.)
+        # CRYPTOGRAPHIC_INCONSISTENCY only qualifies if trust-chain was validated
+        # (unverified version uses fracture_type CRYPTOGRAPHIC_INCONSISTENCY_UNVERIFIED).
+        _GOLDEN_RULE_TYPES = frozenset({
+            "TEMPORAL_CAUSALITY_VIOLATION",
+            "CRYPTOGRAPHIC_INCONSISTENCY",  # only fires when trust_chain_validated=True
+        })
+        _STRUCTURAL_MALICE_TYPES = frozenset({
+            "LOG_VS_MEMORY",
+            "DOCUMENT_FORGERY",
+            "NETWORK_VS_HOST",
+            "MFT_ENTRY_ANOMALY",
+        })
+
+        has_golden_rule = any(f.fracture_type in _GOLDEN_RULE_TYPES for f in filtered_fractures)
+        has_structural_malice = any(f.fracture_type in _STRUCTURAL_MALICE_TYPES for f in filtered_fractures)
+
+        # Fracture bonus: only applied to NON-golden-rule fractures.
+        # Rationale: Golden Rules already force MALICE via structural_verdict.
+        # Adding a bonus on top of a forced verdict would double-weight the same
+        # finding and inflate composite_score in a way that is not reproducible
+        # across different ordering of rule evaluation.
+        non_structural_fractures = [
+            f for f in filtered_fractures
+            if f.fracture_type not in _GOLDEN_RULE_TYPES
+            and f.fracture_type not in _STRUCTURAL_MALICE_TYPES
+        ]
+        fracture_bonus = 0.0
+        if non_structural_fractures:
             bonus_terms = [
-                _dround(getattr(f, 'severity', 0.0) * getattr(f, 'spoofability_delta', 0.5) * 0.05, _DETERMINISTIC_INTERNAL_PREC)
-                for f in filtered_fractures
+                _dround(
+                    getattr(f, 'severity', 0.0) * getattr(f, 'spoofability_delta', 0.5) * 0.05,
+                    _DETERMINISTIC_INTERNAL_PREC
+                )
+                for f in non_structural_fractures
             ]
             bonus = _dsum(bonus_terms)
             fracture_bonus = _dround(min(bonus, 0.2), _DETERMINISTIC_INTERNAL_PREC)
             composite = _dround(min(composite + fracture_bonus, 0.99), _DETERMINISTIC_INTERNAL_PREC)
 
-        # Verdict thresholds
-        # P4: Golden Rules force MALICE regardless of score
-        has_golden_rule = any(
-            f.fracture_type in ("TEMPORAL_CAUSALITY_VIOLATION", "CRYPTOGRAPHIC_INCONSISTENCY")
-            for f in filtered_fractures
-        )
-
-        if has_golden_rule or composite >= 0.5 or any(
-            f.fracture_type in ("LOG_VS_MEMORY", "DOCUMENT_FORGERY", "NETWORK_VS_HOST", "TIMESTAMP_FRACTURE", "FALSE_FLAG_PATTERN")
-            for f in filtered_fractures
-        ):
-            verdict = "MALICE"
-        elif composite >= 0.2 or filtered_fractures:
-            verdict = "SUSPICION"
+        # Verdict: structural_verdict takes precedence over probabilistic_score.
+        # Two separate fields exposed in output for Daubert traceability.
+        if has_golden_rule or has_structural_malice:
+            structural_verdict = "MALICE"
+        elif filtered_fractures:
+            structural_verdict = "SUSPICION"
         else:
-            verdict = "NOISE"
+            structural_verdict = "NOISE"
+
+        probabilistic_verdict = "MALICE" if composite >= 0.5 else "SUSPICION" if composite >= 0.2 else "NOISE"
+
+        # Final verdict: structural dominates. If structural says MALICE, it's MALICE.
+        # If structural says NOISE but probabilistic says MALICE, use probabilistic.
+        _VERDICT_RANK = {"NOISE": 0, "SUSPICION": 1, "MALICE": 2}
+        verdict = max(structural_verdict, probabilistic_verdict, key=lambda v: _VERDICT_RANK[v])
 
         # Peirce chain
         top_adjusted = sorted(
@@ -1172,10 +1270,9 @@ class CrossArtifactIncongruenceEngine:
         )
 
         # Golden Rules summary for Peirce Thirdness
-        golden_rules = [f for f in filtered_fractures 
-                       if f.fracture_type in ("TEMPORAL_CAUSALITY_VIOLATION", 
-                                              "NETWORK_VS_HOST", 
-                                              "CRYPTOGRAPHIC_INCONSISTENCY")]
+        # Uses _GOLDEN_RULE_TYPES (defined above in verdict block).
+        golden_rules = [f for f in filtered_fractures
+                        if f.fracture_type in _GOLDEN_RULE_TYPES]
 
         peirce_chain = {
             "firstness": (
@@ -1257,6 +1354,17 @@ class CrossArtifactIncongruenceEngine:
         result = {
             "status": "OK",
             "verdict": verdict,
+            # EPISTEMOLOGICAL SEPARATION (DeepSeek P0 audit):
+            # structural_verdict: derived from causal impossibilities (Golden Rules)
+            #                     and structural fractures (LOG_VS_MEMORY, etc.)
+            #                     These are NOT probabilistic — they are categorical.
+            # probabilistic_score / probabilistic_verdict: derived from Noisy-OR
+            #                     fusion of adjusted evidence scores.
+            # Both are exposed for Daubert traceability. The final verdict is the
+            # maximum of the two, with structural taking precedence.
+            "structural_verdict": structural_verdict,
+            "probabilistic_verdict": probabilistic_verdict,
+            "probabilistic_score": _dround(composite, _DETERMINISTIC_OUTPUT_PREC),
             "_determinism_protocol": "P0-v2.0-DECIMAL-6-4",
             "integrity_check": {
                 "math_engine": "decimal.Decimal",
@@ -1266,6 +1374,7 @@ class CrossArtifactIncongruenceEngine:
                 "alerts": [],
             },
             "composite_score": _dround(composite, _DETERMINISTIC_OUTPUT_PREC),
+            "fracture_bonus_applied": _dround(fracture_bonus, _DETERMINISTIC_OUTPUT_PREC),
             "artifacts_evaluated": len(self._artifacts),
             "independent_sources": independent_sources,
             "confidence_penalty_applied": confidence_penalty > 0,
@@ -1282,6 +1391,8 @@ class CrossArtifactIncongruenceEngine:
                     "interpretation": f.interpretation,
                     "spoofability_delta": _dround(f.spoofability_delta, _DETERMINISTIC_OUTPUT_PREC),
                     "mitre_ttp": f.ttp_id or _SIGNAL_TO_ATTACK.get(f.fracture_type),
+                    "is_golden_rule": f.fracture_type in _GOLDEN_RULE_TYPES,
+                    "is_structural": f.fracture_type in _STRUCTURAL_MALICE_TYPES,
                 }
                 for f in filtered_fractures
             ],
@@ -1292,12 +1403,12 @@ class CrossArtifactIncongruenceEngine:
             "timestamp": _utcnow(),
             "vigia_verdict": (
                 f"[VIGIA_CAIE]: {verdict}. "
-                f"Composite={_dround(composite, 4):.4f} from {len(self._artifacts)} artifacts "
+                f"Structural={structural_verdict} Probabilistic={probabilistic_verdict} "
+                f"(composite={_dround(composite, 4):.4f}) from {len(self._artifacts)} artifacts "
                 f"({independent_sources} independent). "
                 f"{len(filtered_fractures)} fracture(s), {len(golden_rules)} Golden Rule(s). "
                 f"{daubert_note[:80]}"
             ),
-            "_determinism_protocol": f"P0-v2.0 (internal={_DETERMINISTIC_INTERNAL_PREC}, output={_DETERMINISTIC_OUTPUT_PREC})",
         }
 
         # v2.0: chain_of_custody metadata
@@ -1335,11 +1446,20 @@ class CrossArtifactIncongruenceEngine:
         return _caie_hmac_sign_canonical(canonical)
 
     def reset(self) -> None:
-        """Clear all artifacts and fractures for a new evaluation cycle."""
-        self._artifacts.clear()
-        self._fractures.clear()
-        self._temporal_index.clear()
-        self._network_index.clear()
+        """
+        Clear all artifacts and fractures for a new evaluation cycle.
+
+        FORENSIC ISOLATION (Grok P0 audit):
+        Reinitializes with fresh objects rather than .clear() to guarantee
+        zero state leakage between evaluations. CPython's dict.clear() and
+        list.clear() release element references but retain the internal
+        over-allocated buffer. For a forensic tool, 'clean' means no shared
+        state — not just dereferenced elements.
+        """
+        self._artifacts = []
+        self._fractures = []
+        self._temporal_index = {}
+        self._network_index = {}
 
 
 # ---------------------------------------------------------------------------
