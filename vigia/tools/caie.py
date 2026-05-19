@@ -158,6 +158,11 @@ def _dsum(values: list[float]) -> float:
         float: Sum as Python float, rounded to _DETERMINISTIC_INTERNAL_PREC.
     """
     acc = _D_ZERO
+    if not values:
+        # P2 fix (Kimi 2026-05-19): guard explícito para lista vacía.
+        # _dsum([]) / n explotaría si alguien refactoriza los guards
+        # en detect_fractures. Defensa en profundidad.
+        return 0.0
     for v in values:
         # Defensive: non-finite inputs silently zeroed (mirrors CAIE Artifact validation)
         if isinstance(v, (int, float)) and math.isfinite(v):
@@ -427,15 +432,26 @@ def _caie_hmac_sign_canonical(canonical: str) -> str:
     NIGHTFALL P0-2: resuelve la clave sin acceder a audit_logger._hmac_key.
     NIGHTFALL P0-3: caller debe pasar JSON serializado con ensure_ascii=True.
 
-    La clave se destruye del scope local al retornar.
+    P2 fix (Kimi 2026-05-19): si la clave vino de VIGIA_HMAC_KEY en os.environ,
+    se elimina del entorno inmediatamente después de leerla.
+    del key solo borra la referencia local — la variable de entorno persistía
+    visible para procesos hijos y dumps. os.environ.pop() reduce la superficie
+    de exposición. No elimina residuos en memoria del proceso (eso requiere
+    secure_memzero, fuera de scope stdlib), pero cierra el vector más simple.
+    LIMITACIÓN: si el proceso fue forkado antes de esta llamada, el env ya
+    fue heredado. Usar VIGIA_HMAC_KEY_FILE en producción cuando sea posible.
+
+    La clave se destruye del scope local en finally.
     """
     import hmac as _hmac_local
     key: bytes = b""
+    env_key_used = False
     try:
         key_hex = os.environ.get("VIGIA_HMAC_KEY", "").strip()
         if key_hex:
             try:
                 key = bytes.fromhex(key_hex)
+                env_key_used = True
             except ValueError:
                 pass
         if not key:
@@ -447,6 +463,9 @@ def _caie_hmac_sign_canonical(canonical: str) -> str:
                     pass
         if not key or len(key) < 32:
             return ""
+        # P2: destruir la variable de entorno si fue la fuente de la clave
+        if env_key_used:
+            os.environ.pop("VIGIA_HMAC_KEY", None)
         return _hmac_local.new(key, canonical.encode("utf-8"), "sha256").hexdigest()
     finally:
         del key
@@ -615,8 +634,8 @@ class CrossArtifactIncongruenceEngine:
         # Rule 1: Cultural bait with no technical corroboration
         if cultural and technical:
             # DETERMINISTIC: Use math.fsum for precise summation
-            avg_cultural = _dround(_dsum([a.raw_score for a in cultural]) / len(cultural), _DETERMINISTIC_INTERNAL_PREC)
-            avg_technical = _dround(_dsum([a.raw_score for a in technical]) / len(technical), _DETERMINISTIC_INTERNAL_PREC)
+            avg_cultural = _dround(_dsum([a.raw_score for a in cultural]) / max(1, len(cultural)), _DETERMINISTIC_INTERNAL_PREC)
+            avg_technical = _dround(_dsum([a.raw_score for a in technical]) / max(1, len(technical)), _DETERMINISTIC_INTERNAL_PREC)
 
             if avg_cultural > 0.5 and avg_technical < 0.2:
                 self._fractures.append(Fracture(
@@ -716,8 +735,30 @@ class CrossArtifactIncongruenceEngine:
         # ===================================================================
 
         # Rule 6: TEMPORAL_CAUSALITY_VIOLATION (TCV)
-        # Effect-before-cause: Network log timestamp < Process creation timestamp
-        network_artifacts = [a for a in self._artifacts if "network" in a.description.lower()]
+        # Effect-before-cause: Any log/timestamp artifact precedes the process that
+        # supposedly caused it.
+        #
+        # BUG FIX (session 2026-05-18): El filtro original usaba
+        #   "network" in a.description.lower()
+        # Esto descartaba silenciosamente artefactos válidos como windows_event_log
+        # y file_timestamp que tienen network_log_time en metadata pero no la
+        # palabra "network" en la descripción. Resultado observado: golden_rules_triggered=0
+        # en casos con violación causal de -5s (DLL antes que el proceso).
+        #
+        # Fix: cualquier artefacto que tenga network_log_time en metadata califica
+        # como "evento previo". El campo network_log_time es el contrato semántico
+        # correcto, no la descripción en texto libre.
+        #
+        # Rationale Daubert: un filtro sobre texto libre no es reproducible —
+        # depende de cómo el operador redactó la descripción. Un filtro sobre
+        # un campo estructurado del metadata sí lo es.
+        network_artifacts = [
+            a for a in self._artifacts
+            if (
+                a.metadata.get("network_log_time")  # campo estructurado (correcto)
+                or "network" in a.description.lower()  # compatibilidad backward
+            )
+        ]
         process_artifacts = [a for a in self._artifacts if a.evidence_type == "memory_process"]
 
         def _parse_ts_tcv(ts_str: object, artifact_tool: str, field: str) -> "datetime | None":
@@ -1095,18 +1136,37 @@ class CrossArtifactIncongruenceEngine:
                     ),
                 )
 
-        # Rule 9: NARRATIVE_POISONING_DETECTED
-        # Textual artifacts claiming benignity while technical evidence
-        # contradicts them. This is prompt injection / narrative poisoning
-        # designed to manipulate downstream analysis. (VIGIA_BREAK_009)
+        # Rule 9: NARRATIVE_POISONING_DETECTED (VIGIA_BREAK_009)
+        # Artefactos textuales que afirman benignidad mientras evidencia técnica
+        # de alta confianza los contradice. Diseñado para detectar prompt injection
+        # / narrative poisoning: un atacante que inyecta un reporte falso diciendo
+        # "todo OK" mientras hay malware en memoria activo.
+        # Fracture_type incluida en _STRUCTURAL_MALICE_TYPES → fuerza MALICE.
+        # ttp_id=T1565.001 (Data Manipulation: Stored Data)
+        # P2 fix (Kimi 2026-05-19): normalización agresiva antes del match.
+        # El check original (a.description.lower()) no resistía obfuscación básica:
+        # "b3nign", "b.e.n.i.g.n", "ben-ign" no matcheaban.
+        # La función quita separadores comunes y dígitos inyectados antes de
+        # comparar. No es fuzzy matching completo (eso requiere NLP), pero
+        # cierra las evasiones triviales documentadas en VIGIA_BREAK_009.
+        # LIMITACIÓN: evasiones sofisticadas (homoglifos, n-gramas) requieren
+        # el pipeline de normalización de adversarial_mutation_suite.py.
+        def _normalize_benignity_text(text: str) -> str:
+            lowered = text.lower()
+            for sep in (".", "-", " ", "_"):
+                lowered = lowered.replace(sep, "")
+            import re as _re
+            lowered = _re.sub(r"\d", "", lowered)
+            return lowered
+
         _BENIGNITY_KEYWORDS = frozenset({
-            "benign", "confirmed benign", "false positive",
-            "approved", "not suspicious", "no threat",
+            "benign", "confirmedbenign", "falsepositive",
+            "approved", "notsuspicious", "nothreat",
         })
         narrative_artifacts = [
             a for a in self._artifacts
             if a.evidence_type in ("log_entry", "text", "report")
-            and any(kw in a.description.lower() for kw in _BENIGNITY_KEYWORDS)
+            and any(kw in _normalize_benignity_text(a.description) for kw in _BENIGNITY_KEYWORDS)
         ]
         technical_contradictory = [
             a for a in self._artifacts
@@ -1192,9 +1252,14 @@ class CrossArtifactIncongruenceEngine:
         for scores in grouped.values():
             prod_d = _D_ONE
             for s in scores:
-                # Decimal(str(x)): conversion via string evita imprecision
-                # de la conversion directa float->Decimal
-                s_d = decimal.Decimal(str(_dround(s, _DETERMINISTIC_INTERNAL_PREC)))
+                # P3 fix (Kimi 2026-05-19): Decimal(str(s)) directo.
+                # El patrón anterior era Decimal(str(_dround(s, 6))):
+                # float → round → str → Decimal. El redondeo intermedio
+                # es redundante porque Decimal(str(x)) ya es determinista
+                # para valores en [0,1] con precisión float64. El doble
+                # redondeo no añade determinismo pero sí acumula error de
+                # conversión. La precisión final la controla _dround al final.
+                s_d = decimal.Decimal(str(s))
                 prod_d = prod_d * (_D_ONE - s_d)
             group_score = _dround(float(_D_ONE - prod_d), _DETERMINISTIC_INTERNAL_PREC)
             group_scores.append(group_score)
@@ -1204,7 +1269,7 @@ class CrossArtifactIncongruenceEngine:
         if group_scores:
             prod_d = _D_ONE
             for g in group_scores:
-                g_d = decimal.Decimal(str(_dround(g, _DETERMINISTIC_INTERNAL_PREC)))
+                g_d = decimal.Decimal(str(g))
                 prod_d = prod_d * (_D_ONE - g_d)
             composite = _dround(float(_D_ONE - prod_d), _DETERMINISTIC_INTERNAL_PREC)
         else:
@@ -1296,8 +1361,33 @@ class CrossArtifactIncongruenceEngine:
         # If structural says NOISE but probabilistic says MALICE, use probabilistic.
         _VERDICT_RANK = {"NOISE": 0, "SUSPICION": 1, "MALICE": 2}
         verdict = max(structural_verdict, probabilistic_verdict, key=lambda v: _VERDICT_RANK[v])
+
+        # ----------------------------------------------------------------
+        # Daubert admissibility note — DEFINIDA ANTES del bloque CDL.
+        # P0 fix (Kimi 2026-05-19): el bloque CDL usa daubert_note +=
+        # pero la variable se definía 20 líneas después → NameError.
+        # Movida aquí para que CDL pueda concatenar sin excepción.
+        # ----------------------------------------------------------------
+        irrefutable_count = sum(
+            1 for a in self._artifacts
+            if a.profile.spoofability <= 0.20
+        )
+        daubert_note = (
+            f"Daubert: {irrefutable_count}/{len(self._artifacts)} "
+            f"artifacts structurally irrefutable (spoofability ≤ 0.20). "
+            + (
+                "Anchored in hard evidence. Admissible."
+                if irrefutable_count >= 1
+                else "WARNING: No irrefutable anchor. Weak under cross-examination."
+            )
+        )
+
         # ================================================================
-        # COLLAPSE DECISION LAYER - Política bajo colapso de supuestos
+        # COLLAPSE DECISION LAYER — Política bajo colapso de supuestos.
+        # Si el atacante rompe la independencia de sensores o la integridad
+        # del pipeline, el CDL lo detecta y puede downgrade el veredicto a
+        # INCONCLUSIVE antes de exponerlo. Sin CDL, el motor emitiría
+        # veredictos firmes sobre evidencia comprometida. (Kimi P0 audit)
         # ================================================================
         broken_assumptions = set()
         for f in filtered_fractures:
@@ -1308,19 +1398,18 @@ class CrossArtifactIncongruenceEngine:
                 broken_assumptions.add("pipeline_integrity")
             if "TIMESTAMP" in ft or "temporal" in ft.lower():
                 broken_assumptions.add("timestamp_comparability")
-        
+
         try:
-            from vigia.collapse_decision import CollapseDecisionLayer, CollapseContext, CollapseVerdict
             cdl = CollapseDecisionLayer()
-            
-            # Calcular coverage_ratio aproximado
+
+            # Calcular coverage_ratio aproximado basado en capas observadas
             total_expected_layers = ["memory", "process", "auth", "filesystem", "network", "kernel"]
             observed_layers = set()
             for a in self._artifacts:
                 layer = a.metadata.get("layer", a.evidence_type)
                 observed_layers.add(layer)
             coverage_ratio = len(observed_layers) / len(total_expected_layers) if total_expected_layers else 0.5
-            
+
             ctx = CollapseContext(
                 broken_assumptions=broken_assumptions,
                 coverage_ratio=coverage_ratio,
@@ -1330,7 +1419,7 @@ class CrossArtifactIncongruenceEngine:
             )
             cdl_verdict = cdl.resolve(ctx)
             cdl_explanation = cdl.explain(ctx, cdl_verdict)
-            
+
             if cdl_verdict == CollapseVerdict.INCONCLUSIVE:
                 verdict = "INCONCLUSIVE"
                 structural_verdict = "INCONCLUSIVE"
@@ -1338,10 +1427,11 @@ class CrossArtifactIncongruenceEngine:
             elif cdl_verdict == CollapseVerdict.SUSPICION and verdict == "MALICE":
                 verdict = "SUSPICION"
                 daubert_note += f" CDL: {cdl_explanation}"
-        except Exception as e:
-            # CDL falló silenciosamente
+        except Exception:
+            # CDL no disponible — continuar sin colapso metacognitivo.
+            # Falla silenciosa deliberada: el CDL es una capa adicional de
+            # protección, no un requisito para el veredicto base.
             pass
-        
 
         # Peirce chain
         top_adjusted = sorted(
@@ -1390,21 +1480,6 @@ class CrossArtifactIncongruenceEngine:
                 + (f" Golden Rule triggered: {golden_rules[0].fracture_type}." if golden_rules else "")
             ),
         }
-
-        # Daubert admissibility note
-        irrefutable_count = sum(
-            1 for a in self._artifacts
-            if a.profile.spoofability <= 0.20
-        )
-        daubert_note = (
-            f"Daubert: {irrefutable_count}/{len(self._artifacts)} "
-            f"artifacts structurally irrefutable (spoofability ≤ 0.20). "
-            + (
-                "Anchored in hard evidence. Admissible."
-                if irrefutable_count >= 1
-                else "WARNING: No irrefutable anchor. Weak under cross-examination."
-            )
-        )
 
         # MITRE ATT&CK mapping (using centralized mitre_mapping.py)
         mitre_ttps = set()
@@ -1741,6 +1816,42 @@ def verify_determinism_cross_arch() -> bool:
         assert result1["ttp_confidences"][ttp] == result2["ttp_confidences"][ttp], (
             f"TTP {ttp} confidence non-deterministic"
         )
+
+    # P3 fix (Kimi 2026-05-19): verificación estructural completa.
+    # Un smoke test que solo verifica composite_score no es suficiente para
+    # Daubert: la narrativa forense completa (Peirce, Daubert, MITRE, HMAC)
+    # debe ser reproducible bit-a-bit para que un perito pueda re-ejecutar
+    # el análisis y obtener exactamente el mismo output.
+    assert result1["verdict"] == result2["verdict"], (
+        f"Verdict non-deterministic: {result1['verdict']} != {result2['verdict']}"
+    )
+    assert result1["structural_verdict"] == result2["structural_verdict"], (
+        f"Structural verdict non-deterministic: "
+        f"{result1['structural_verdict']} != {result2['structural_verdict']}"
+    )
+    assert result1["probabilistic_score"] == result2["probabilistic_score"], (
+        f"Probabilistic score non-deterministic: "
+        f"{result1['probabilistic_score']} != {result2['probabilistic_score']}"
+    )
+    assert result1["daubert_note"] == result2["daubert_note"], (
+        f"Daubert note non-deterministic"
+    )
+    assert result1["peirce_chain"]["firstness"] == result2["peirce_chain"]["firstness"], (
+        f"Peirce firstness non-deterministic"
+    )
+    assert result1["peirce_chain"]["secondness"] == result2["peirce_chain"]["secondness"], (
+        f"Peirce secondness non-deterministic"
+    )
+    assert result1["peirce_chain"]["thirdness"] == result2["peirce_chain"]["thirdness"], (
+        f"Peirce thirdness non-deterministic"
+    )
+    assert result1["mitre_ttps"] == result2["mitre_ttps"], (
+        f"MITRE TTPs non-deterministic: {result1['mitre_ttps']} != {result2['mitre_ttps']}"
+    )
+    assert result1.get("_operation_hmac") == result2.get("_operation_hmac"), (
+        f"HMAC non-deterministic — canonical serialization drift detected. "
+        f"Verify sort_keys=True, separators=(',', ':'), ensure_ascii=True."
+    )
 
     print(" CAIE Determinism Protocol P0: VERIFIED")
     print(f"   Composite Score: {result1['composite_score']}")
