@@ -1,0 +1,61 @@
+{
+  "_consolidation": {
+    "consolidated_at": "2026-04-28T05:51:15.348869+00:00",
+    "parser_version": "1.0",
+    "schema_version": "1.0",
+    "source_file": "vigia_forensic_cases.json"
+  },
+  "abstention_risk": "medio",
+  "artifacts": [
+    {
+      "artifact_id": "ART-001",
+      "content": "PCAP ~60MB | IP origen externa: 140.247.62.34 (dormitorio estudiantil) | IP interna NAT: 192.168.15.4 | MAC address: 00:17:f2:e2:c0:ce (dispositivo Apple) | User Agent: Internet Explorer 6 en Windows XP SP2 | Servicio usado: willselfdestruct.com",
+      "forensic_anomalies": [
+        "Tráfico Gmail con cookies enviadas en plaintext sobre HTTP",
+        "Uso de servicio willselfdestruct.com para enviar email anónimo de acoso"
+      ],
+      "peirce_layer": "FIRSTNESS",
+      "type": "network_flow"
+    },
+    {
+      "artifact_id": "ART-002",
+      "content": "Email #1: badguy@hotmail.com | Fecha: Julio 13 | Email #2: willselfdestruct.com | Mensaje: 'you can't find us and you can't hide from us. Stop teaching. Start running.' | Cuenta identificada: jcoach@gmail.com → Johnny Coach (estudiante Chem 109)",
+      "forensic_anomalies": [
+        "Mensaje de amenaza explícita enviado a través de servicio de autodestrucción",
+        "La cuenta Gmail jcoach@gmail.com fue identificada mediante cookies en plaintext en el pcap"
+      ],
+      "peirce_layer": "SECONDNESS",
+      "type": "email_header"
+    },
+    {
+      "artifact_id": "ART-003",
+      "content": "Setup de red: Tres mujeres comparten dormitorio (Alice, Barbara, Candice) | Wi-Fi router sin password instalado por amigo | Ethernet provisto por universidad | Roster de estudiantes: Chemistry 109 disponible",
+      "forensic_anomalies": [
+        "Router WiFi sin contraseña permite acceso anónimo y no rastreable",
+        "La combinación de Ethernet universitario + WiFi no seguro complica la atribución"
+      ],
+      "peirce_layer": "SECONDNESS",
+      "type": "file_metadata"
+    }
+  ],
+  "carnegie_pattern_expected": null,
+  "case_id": "VIGIA-REAL-007",
+  "case_name": "Digital Corpora Nitroba Harassment",
+  "confidence_expected": 91,
+  "description": "La profesora de Química Lily Tuckrige de Nitroba State University recibió emails de acoso. El tráfico de red capturado (~60MB pcap) reveló que el perpetrador usó Gmail webmail desde una IP interna de dormitorio estudiantil, enviando cookies en plaintext sobre HTTP.",
+  "devil_advocate": "La red WiFi sin contraseña significa que cualquiera pudo haber usado la conexión y el email de Johnny Coach",
+  "expected_mitre_ttps": [
+    "T1566.001",
+    "T1585.001",
+    "T1071.001"
+  ],
+  "expected_verdict": "MALICE",
+  "peirce_expected": {
+    "firstness": "Emails amenazantes enviados desde servicio anónimo con cookies de Gmail expuestas en tráfico HTTP",
+    "secondness": "El análisis de pcap correlaciona la IP interna 192.168.15.4 con la cuenta jcoach@gmail.com de Johnny Coach",
+    "thirdness": "Johnny Coach, estudiante de Chemistry 109, envió emails de acoso a la profesora utilizando servicios anónimos y Gmail, siendo identificado mediante análisis de tráfico de red"
+  },
+  "source_dataset": "Digital Corpora - Nitroba University Harassment Scenario",
+  "source_origin": "public_dataset",
+  "source_url": "https://digitalcorpora.org/corpora/scenarios/nitroba-university-harassment-scenario/"
+}

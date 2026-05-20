@@ -1,0 +1,84 @@
+{
+  "_consolidation": {
+    "consolidated_at": "2026-04-28T05:51:15.348772+00:00",
+    "parser_version": "1.0",
+    "schema_version": "1.0",
+    "source_file": "vigia_forensic_cases.json"
+  },
+  "abstention_risk": "bajo",
+  "artifacts": [
+    {
+      "artifact_id": "ART-001",
+      "content": "HKLM\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\RegisteredOwner = Greg Schardt | HKLM\\SYSTEM\\ControlSet001\\Control\\ComputerName\\ComputerName = N-1A9ODN6ZXK4LQ | HKLM\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Winlogon\\DefaultUserName = Mr. Evil",
+      "forensic_anomalies": [
+        "El nombre de usuario por defecto es Mr. Evil, indicativo de alias de atacante",
+        "El registered owner coincide con el sospechoso identificado"
+      ],
+      "peirce_layer": "SECONDNESS",
+      "type": "registry"
+    },
+    {
+      "artifact_id": "ART-002",
+      "content": "Archivo pcap interceptado en C:\\Documents and Settings\\Mr. Evil\\interception | Víctima: Windows CE Pocket PC | Sites accedidos: login.passport.com, mobile.msn.com, MSN Hotmail | Captura realizada con Ethereal",
+      "forensic_anomalies": [
+        "Archivo pcap con tráfico interceptado de dispositivos de terceros",
+        "La víctima usaba Windows CE Pocket PC en hotspot público"
+      ],
+      "peirce_layer": "FIRSTNESS",
+      "type": "network_flow"
+    },
+    {
+      "artifact_id": "ART-003",
+      "content": "Canales IRC accedidos: #Chataholics.UnderNet, #CyberCafe.UnderNet, #Elite.Hackers.UnderNet, #evilfork.EFnet, #ISO-WAREZ.EFnet, #thedarktower.AfterNET | Usuario IRC: Mini Me, Nick: Mr, Alt: mrevilrulez",
+      "forensic_anomalies": [
+        "Presencia en canales de hacking (#Elite.Hackers.UnderNet, #evilfork.EFnet)",
+        "El nickname mrevilrulez coincide con el email mrevilrulez@yahoo.com"
+      ],
+      "peirce_layer": "THIRDNESS",
+      "type": "bash_history"
+    },
+    {
+      "artifact_id": "ART-004",
+      "content": "Archivos en Recycle Bin: Dc1.exe (lalsetup250.exe - Look@LAN installer), Dc2.exe (netstumblerinstaller_0_4_0.exe), Dc3.exe (WinPcap_3_01_a.exe), Dc4.exe (ethereal-setup-0.10.6.exe) | Hash MD5 imagen: aee4fcd9301c03b3b054623ca261959a",
+      "forensic_anomalies": [
+        "Presencia de ejecutables de herramientas de hacking en Recycle Bin sin haber sido eliminados permanentemente",
+        "NetStumbler es herramienta específica para war driving"
+      ],
+      "peirce_layer": "SECONDNESS",
+      "type": "file_metadata"
+    },
+    {
+      "artifact_id": "ART-005",
+      "content": "SMTP: whoknowsme@sbcglobal.net | Email principal: mrevilrulez@yahoo.com | NNTP: Configurado para 5+ newsgroups | Programas: Outlook Express, mIRC",
+      "forensic_anomalies": [
+        "Dirección SMTP diferente del email principal (posible evasión)",
+        "Uso de newsgroups para comunicación alternativa"
+      ],
+      "peirce_layer": "SECONDNESS",
+      "type": "email_header"
+    }
+  ],
+  "carnegie_pattern_expected": null,
+  "case_id": "VIGIA-REAL-001",
+  "case_name": "NIST Hacking Case (Greg Schardt / Mr. Evil)",
+  "confidence_expected": 95,
+  "description": "El 09/20/04, una notebook Dell CPi serial VLQLW fue encontrada abandonada con una tarjeta PCMCIA wireless y antena 802.11b casera. El sospechoso Greg Schardt alias Mr. Evil realizaba war driving cerca de hotspots WiFi públicos para interceptar tráfico y robar credenciales.",
+  "devil_advocate": "Greg Schardt es un profesional de seguridad legítimo que analiza redes como parte de su trabajo de pentesting",
+  "expected_mitre_ttps": [
+    "T1040",
+    "T1552",
+    "T1567",
+    "T1071",
+    "T1018"
+  ],
+  "expected_verdict": "MALICE",
+  "intention_detected": "Hacking para pentesting y robo de credenciales financieras",
+  "peirce_expected": {
+    "firstness": "Presencia de múltiples herramientas de hacking wireless y capturas de red en un laptop",
+    "secondness": "Los registros vinculan el equipo a Greg Schardt quien usa el alias Mr. Evil, y se encuentran capturas de tráfico de terceras personas",
+    "thirdness": "El sospechoso realiza war driving sistemático cerca de hotspots WiFi para interceptar comunicaciones y robar credenciales financieras"
+  },
+  "source_dataset": "NIST CFReDS - Hacking Case",
+  "source_origin": "public_dataset",
+  "source_url": "https://cfreds.nist.gov/all/NIST/HackingCase"
+}

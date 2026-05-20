@@ -472,17 +472,29 @@ def _vigia_score(case: dict) -> dict:
         verdict    = "SUSPICION"
         confidence = _dround(min(0.75, fracture_malice_boost + 0.3), 2)
         reason     = f"Cadena de custodia rota + {len(fractures)} fracture(s) activas — manipulación deliberada"
-    elif final_score > 0.75:
+    # -----------------------------------------------------------------------
+    # Umbrales recalibrados para escala P2 (patch 2026-05-19)
+    # La fórmula P2 (raw × (1-spoofability) × weight × trust) produce scores
+    # en rango [0, ~0.54] sin fractures CAIE, vs [0, ~0.99] de la fórmula
+    # anterior. Con umbrales originales (0.75/0.55/0.25), MALICE era
+    # matemáticamente imposible sin fractures — falso negativo garantizado.
+    # Umbrales nuevos calibrados sobre distribución real de casos EBS v1:
+    #   MALICE     : > 0.35  (composite alto + fractures o evidencia fuerte)
+    #   SUSPICION  : > 0.18  (señal estructural sin umbral de certeza)
+    #   UNKNOWN    : > 0.08  (anomalía débil — requiere análisis humano)
+    #   NOISE      : <= 0.08 (sin señal forense relevante)
+    # -----------------------------------------------------------------------
+    elif final_score > 0.35:
         verdict    = "MALICE"
-        confidence = _dround(final_score, 2)
-        reason     = f"Intent score {final_score:.4f} excede umbral MALICE"
-    elif final_score > 0.55:
+        confidence = _dround(min(0.95, final_score * 2.0), 2)
+        reason     = f"Intent score {final_score:.4f} excede umbral MALICE (escala P2)"
+    elif final_score > 0.18:
         verdict    = "SUSPICION"
-        confidence = _dround(final_score, 2)
+        confidence = _dround(final_score * 2.0, 2)
         reason     = f"Señal significativa con soporte estructural (score={final_score:.4f})"
-    elif final_score > 0.25:
+    elif final_score > 0.08:
         verdict    = "UNKNOWN"
-        confidence = _dround(final_score * 0.5, 2)
+        confidence = _dround(final_score * 2.0, 2)
         reason     = f"Anomalía sin suficiente soporte estructural (score={final_score:.4f})"
     else:
         verdict    = "NOISE"

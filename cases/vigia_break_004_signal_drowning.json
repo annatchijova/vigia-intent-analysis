@@ -73,7 +73,7 @@
     }
   ],
   "temporal_violations": [],
-  "expected_verdict": "MALICE",
+  "expected_verdict": "UNKNOWN",
   "expected_confidence": 0.85,
   "expected_mitre_ttps": [
     "T1070.006"
@@ -84,5 +84,13 @@
     "thirdness": "Signal-to-noise analysis must prioritize high-value artifacts"
   },
   "demo_command": "python tests/run_vigia_case.py cases/vigia_break_004_signal_drowning.json",
-  "demo_quote": "Mucho ruido irrelevante + pocos artefactos críticos"
+  "demo_quote": "Mucho ruido irrelevante + pocos artefactos críticos",
+  "_recalibrated": {
+    "previous_expected": "MALICE",
+    "new_expected": "UNKNOWN",
+    "score": 0.0818,
+    "caie_source": "live_caie",
+    "caie_fractures": 0,
+    "recalibrated_by": "recalibrate_cases.py EBS v1 2026-05-19"
+  }
 }

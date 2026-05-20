@@ -1,0 +1,73 @@
+{
+  "_consolidation": {
+    "consolidated_at": "2026-04-28T05:51:15.348832+00:00",
+    "parser_version": "1.0",
+    "schema_version": "1.0",
+    "source_file": "vigia_forensic_cases.json"
+  },
+  "abstention_risk": "bajo",
+  "artifacts": [
+    {
+      "artifact_id": "ART-001",
+      "content": "Archivo: C:\\Users\\Public\\Downloads\\SysInternals.exe | Hash VT: 72e6d1728a546c2f3ee32c063ed09fa6ba8c46ac33b0dd2e354087c1ad26ef48 | Info versión falsificada: CompanyName='SysInternals, Inc.', FileDescription='SysInternals Suite Downloader', FileVersion='2.0.0.1' | APIs: URLDownloadToFileA, InternetOpenUrlA, ShellExecuteA",
+      "forensic_anomalies": [
+        "El ejecutable tiene información de versión que imita a SysInternals (Microsoft) pero no es legítimo",
+        "Presencia de APIs de descarga de archivos (URLDownloadToFileA) indica downloader"
+      ],
+      "peirce_layer": "FIRSTNESS",
+      "type": "file_metadata"
+    },
+    {
+      "artifact_id": "ART-002",
+      "content": "Timeline UTC: 2022-11-15 21:16:08 - IEUser logon | 21:17:03 - PowerShell modifica Defender y hosts file | 21:18:40 - Descarga de SysInternals.exe vía MSEdge | 21:19:00 - Doble-click SysInternals.exe | 21:19:17 - Descarga de http://www.malware430.com/html/VMwareUpdate.exe | 21:19:22 - vmtoolsIO.exe instalado como servicio",
+      "forensic_anomalies": [
+        "Secuencia de eventos comprimida en 3 minutos: descarga → ejecución → descarga secundaria → instalación de servicio",
+        "La descarga desde malware430.com ocurre 17 segundos después de la ejecución"
+      ],
+      "peirce_layer": "SECONDNESS",
+      "type": "timestamp"
+    },
+    {
+      "artifact_id": "ART-003",
+      "content": "Strings del ejecutable: 'c:\\Windows\\vmtoolsIO.exe' | 'c:\\Windows\\' | '/C c:\\Windows\\vmtoolsIO.exe -install && net start VMwareIOHelperService && sc config VMwareIOHelperService start= auto' | Hosts modificado: sysinternals.com y malware430.com redirigidos a 192.168.x.x",
+      "forensic_anomalies": [
+        "El malware instala un servicio con nombre similar a VMware para pasar desapercibido",
+        "Modificación del archivo hosts para redirigir dominios legítimos a IPs internas"
+      ],
+      "peirce_layer": "SECONDNESS",
+      "type": "bash_history"
+    },
+    {
+      "artifact_id": "ART-004",
+      "content": "Servicio malicioso instalado: Name='VMwareIOHelperService', Executable='c:\\Windows\\vmtoolsIO.exe', StartType=auto | USN Journal: Creación y eliminación de SysInternals.exe | Prefetch eliminados: *.pf borrados (anti-forensics) | BAM/DAM: SysInternals.exe y conhost.exe ejecutados",
+      "forensic_anomalies": [
+        "Servicio con nombre que imita a VMware para evadir detección",
+        "Eliminación de archivos prefetch como técnica anti-forense"
+      ],
+      "peirce_layer": "THIRDNESS",
+      "type": "registry"
+    }
+  ],
+  "carnegie_pattern_expected": "Masquerading Legitimacy",
+  "case_id": "VIGIA-REAL-004",
+  "case_name": "Ali Hadi SysInternals Malware Case",
+  "confidence_expected": 92,
+  "description": "Un usuario descargó lo que creía era el SysInternals Suite pero era un malware downloader. El sistema se volvió lento y no responsivo tras la ejecución. El malware modificó el archivo hosts, descargó un payload secundario y lo instaló como servicio Windows falso.",
+  "devil_advocate": "VMwareIOHelperService es un componente legítimo de VMware Tools que se instaló automáticamente",
+  "expected_mitre_ttps": [
+    "T1204.002",
+    "T1543.003",
+    "T1562.001",
+    "T1070.004",
+    "T1199"
+  ],
+  "expected_verdict": "MALICE",
+  "peirce_expected": {
+    "firstness": "Ejecutable descargado con nombre similar a SysInternals que instala servicio falso de VMware",
+    "secondness": "El timeline muestra secuencia de infección rápida con modificación de hosts, descarga de payload secundario y eliminación de evidencia",
+    "thirdness": "El atacante utilizó masquerading (nombre de herramienta legítima) para engañar al usuario, instalar persistencia vía servicio falso y evadir detección"
+  },
+  "source_dataset": "Ali Hadi Challenge #7 - SysInternals Case",
+  "source_origin": "public_dataset",
+  "source_url": "https://www.binary-zone.com/2023/03/27/challenge-7-sysinternals-case/"
+}

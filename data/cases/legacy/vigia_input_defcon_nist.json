@@ -1,0 +1,69 @@
+[
+  {
+    "artifact_id": "A_DEFCON_001",
+    "category": "auth",
+    "name": "privilege_escalation_attempts",
+    "value": {
+      "user": "postgres",
+      "target_user": "root",
+      "command": "/bin/bash",
+      "attempts_count": 10,
+      "time_window_seconds": 37,
+      "source": "/var/log/auth.log",
+      "dataset": "Defcon DFIR CTF 2019"
+    },
+    "observed_at": "2019-03-23T11:26:07Z"
+  },
+  {
+    "artifact_id": "A_NIST_002",
+    "category": "auth",
+    "name": "lateral_movement_auth",
+    "value": {
+      "user": "Mr. Evil",
+      "logon_type": 2,
+      "source_ip": "192.168.1.111",
+      "workstation": "N-1A9ODN6ZXK4LQ",
+      "event_id": 528,
+      "logon_count_total": 15,
+      "registry_rid": "0x3EB",
+      "dataset": "NIST CFReDS Hacking Case"
+    },
+    "observed_at": "2004-08-27T15:44:52Z"
+  },
+  {
+    "artifact_id": "A_NIST_003",
+    "category": "network",
+    "name": "beaconing_pattern",
+    "value": {
+      "alert_signature": "ET TROJAN Likely CnC Beacon (suspected MS Passport/auth token exfil)",
+      "sid": "2002895",
+      "source_ip": "192.168.254.2",
+      "dest_ip": "207.68.174.248",
+      "dest_port": 80,
+      "user_agent": "Mozilla/4.0 (compatible; MSIE 4.01; Windows CE; PPC; 240x320)",
+      "device_type": "Windows CE (Pocket PC) - Version 4.20",
+      "suspicious_cookie": "MSPAuth=5vuMneQNFDh0sFVrAbKrt*q6edOGfSSmKzi3lT1CIh6FdbNqQyPyqubrB97DYRuoTwoA5kp1iTd3eTZ3TUiZ45LQ$$",
+      "protocol": "TCP",
+      "dataset": "NIST CFReDS Hacking Case (interception.pcap)"
+    },
+    "observed_at": "2004-08-27T15:36:35Z"
+  },
+  {
+    "artifact_id": "A_NIST_004",
+    "category": "temporal",
+    "name": "timestamp_uniformity",
+    "value": {
+      "registry_key": "HKLM\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion",
+      "value_name": "InstallDate",
+      "hex_value": "0x41252e3b",
+      "decoded_gmt": "2004-08-19T22:48:27Z",
+      "decoded_local": "2004-08-19T17:48:27-05:00",
+      "evidence_acquisition_date": "2004-09-20",
+      "days_between_install_and_abandonment": 32,
+      "source_image": "SCHARDT.001",
+      "md5_image": "aee4fcd9301c03b3b054623ca261959a",
+      "dataset": "NIST CFReDS Hacking Case"
+    },
+    "observed_at": "2004-08-19T22:48:27Z"
+  }
+]

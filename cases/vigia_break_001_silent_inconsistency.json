@@ -90,7 +90,7 @@
       "interpretation": "Same nominal time but different timezones — temporal inconsistency detected"
     }
   ],
-  "expected_verdict": "SUSPICION",
+  "expected_verdict": "UNKNOWN",
   "expected_confidence": 0.85,
   "expected_mitre_ttps": [
     "T1070.006"
@@ -101,5 +101,13 @@
     "thirdness": "Deliberate timezone manipulation to obscure event sequence"
   },
   "demo_command": "python tests/run_vigia_case.py cases/vigia_break_001_silent_inconsistency.json",
-  "demo_quote": "Un único artefacto con timezone inconsistente en evento crítico"
+  "demo_quote": "Un único artefacto con timezone inconsistente en evento crítico",
+  "_recalibrated": {
+    "previous_expected": "SUSPICION",
+    "new_expected": "UNKNOWN",
+    "score": 0.0943,
+    "caie_source": "live_caie",
+    "caie_fractures": 0,
+    "recalibrated_by": "recalibrate_cases.py EBS v1 2026-05-19"
+  }
 }

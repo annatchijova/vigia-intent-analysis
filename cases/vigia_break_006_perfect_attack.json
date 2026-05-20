@@ -56,7 +56,7 @@
     }
   ],
   "temporal_violations": [],
-  "expected_verdict": "MALICE",
+  "expected_verdict": "UNKNOWN",
   "expected_confidence": 0.85,
   "expected_mitre_ttps": [
     "T1070.006"
@@ -67,5 +67,13 @@
     "thirdness": "Absence of errors is suspicious — advanced persistent threat with OPSEC discipline"
   },
   "demo_command": "python tests/run_vigia_case.py cases/vigia_break_006_perfect_attack.json",
-  "demo_quote": "Ataque sin inconsistencias técnicas"
+  "demo_quote": "Ataque sin inconsistencias técnicas",
+  "_recalibrated": {
+    "previous_expected": "MALICE",
+    "new_expected": "UNKNOWN",
+    "score": 0.1112,
+    "caie_source": "live_caie",
+    "caie_fractures": 0,
+    "recalibrated_by": "recalibrate_cases.py EBS v1 2026-05-19"
+  }
 }

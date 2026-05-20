@@ -1,0 +1,72 @@
+{
+  "_consolidation": {
+    "consolidated_at": "2026-04-28T05:51:15.348892+00:00",
+    "parser_version": "1.0",
+    "schema_version": "1.0",
+    "source_file": "vigia_forensic_cases.json"
+  },
+  "abstention_risk": "medio",
+  "artifacts": [
+    {
+      "artifact_id": "ART-001",
+      "content": "SMS/Malware C&C: Norby organizó instalación de malware en teléfono de Taog | Negociaciones con Mr. E sobre precio de documentos | Mensajes del malware confirmando exfiltración de archivos | Email/SMS: Norby pidiendo pago más alto y enviando muestras",
+      "forensic_anomalies": [
+        "SMS del malware confirmando exfiltración periódica de PDFs",
+        "Negociación de venta de propiedad intelectual vía SMS/email"
+      ],
+      "peirce_layer": "FIRSTNESS",
+      "type": "email_header"
+    },
+    {
+      "artifact_id": "ART-002",
+      "content": "HTML Cache: Página con acceso a servidor remoto IP 50.56.29.109 | Malware code: Referencias hardcodeadas a servidor de exfiltración | Download logs: Descargas sistemáticas de documentos confidenciales PDF",
+      "forensic_anomalies": [
+        "Referencia hardcodeada a servidor externo 50.56.29.109 en código de malware",
+        "Descargas sistemáticas de PDFs confidenciales a intervalos regulares"
+      ],
+      "peirce_layer": "SECONDNESS",
+      "type": "network_flow"
+    },
+    {
+      "artifact_id": "ART-003",
+      "content": "Archivos PDF confidenciales de SwiftLogic en tarjeta SD | Producto: Palomino | EXIF metadata de fotos: Motorola Droid | Browser history: Búsquedas sobre empleados de SwiftLogic (reconocimiento previo)",
+      "forensic_anomalies": [
+        "Documentos confidenciales de competidor en tarjeta SD del teléfono",
+        "Historial de búsqueda sobre empleados de la empresa víctima indica reconocimiento previo"
+      ],
+      "peirce_layer": "SECONDNESS",
+      "type": "file_metadata"
+    },
+    {
+      "artifact_id": "ART-004",
+      "content": "Contact Records: Vínculos entre Norby, Mr. E, y Yob Taog | Negociaciones: Precio inicial ofrecido, Norby pidió más, envió muestra | Muerte: Donald Norby encontrado con disparo, potencial conexión a grupo criminal KRYPTIX",
+      "forensic_anomalies": [
+        "Patrón de negociación de espionaje industrial con intento de renegociación",
+        "Muerte del sospechoso en circunstancias violentas tras intentar subir el precio"
+      ],
+      "peirce_layer": "THIRDNESS",
+      "type": "email_header"
+    }
+  ],
+  "carnegie_pattern_expected": null,
+  "case_id": "VIGIA-REAL-010",
+  "case_name": "DFRWS 2011 Android Espionage",
+  "confidence_expected": 90,
+  "description": "Caso dual: Donald Norby robó documentos confidenciales de SwiftLogic Inc. y fue encontrado muerto. Negociaba la venta de documentos del producto Palomino con Mr. E. El teléfono de Yob Taog fue comprometido con malware que exfiltraba PDFs.",
+  "devil_advocate": "Los documentos fueron descargados legítimamente para análisis competitivo autorizado y el malware fue instalado por otra persona",
+  "expected_mitre_ttps": [
+    "T1456",
+    "T1533",
+    "T1567",
+    "T1589"
+  ],
+  "expected_verdict": "MALICE",
+  "peirce_expected": {
+    "firstness": "SMS de malware exfiltrando PDFs, documentos confidenciales en tarjeta SD, búsquedas de reconocimiento",
+    "secondness": "El malware fue instalado por Norby en el teléfono de Taog sin su conocimiento; las negociaciones con Mr. E muestran intento de venta",
+    "thirdness": "Norby condujo una operación de espionaje industrial robando documentos de SwiftLogic, usando malware móvil para exfiltración, y fue asesinado durante la negociación"
+  },
+  "source_dataset": "DFRWS 2011 Forensic Challenge - Android",
+  "source_origin": "public_dataset",
+  "source_url": "https://github.com/dfrws/dfrws2011-challenge"
+}
