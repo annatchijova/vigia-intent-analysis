@@ -103,7 +103,7 @@ LIMITACIONES CONOCIDAS (roadmap v2.1):
 
 Licencia: Apache 2.0
 Repositorio: https://github.com/annatchijova/vigia-intent-analysis
-Autora principal: Annia Tchijova — VIGÍA Collective
+Autora principal: Anna Tchijova — VIGÍA Collective
 Auditoría colectiva: Kimi/Moonshot, DeepSeek, Gemini, Qwen, ChatGPT
 Versión: 1.2 — 19 de mayo de 2026
 Audiencia: SANS FIND EVIL Hackathon 2026 / SIFT Workstation
@@ -690,7 +690,7 @@ class FalseStructureMutator:
         vacía que engaña a detectores de anomalías basados en distribución.
         Es un ataque a la validez estadística del modelo de normalidad.
 
-    TÉCNICA (Fix 6, Annia Tchijova, 2026-05-18):
+    TÉCNICA (Fix 6, Anna Tchijova, 2026-05-18):
         Construye un modelo bigram determinista del texto original y genera
         texto de la misma longitud usando esos bigrams como transiciones.
         El resultado tiene distribución de bigrams similar al original
@@ -815,7 +815,7 @@ class TieBreakMutator:
         Reemplaza exactamente `tie_fraction` de los caracteres por `fill_value`,
         forzando empates masivos en la distribución de valores ordinales.
 
-        CORRECCIÓN Fix 5 (Annia Tchijova, 2026-05-18):
+        CORRECCIÓN Fix 5 (Anna Tchijova, 2026-05-18):
         La versión anterior usaba:
             positions = sorted(set(r % n for r in rng))[:n_ties]
         lo que producía cardinalidad efectiva < n_ties debido a colisiones

@@ -54,7 +54,7 @@ LIMITACIONES CONOCIDAS (scope v1.0):
 
 Licencia: Apache 2.0
 Repositorio: https://github.com/annatchijova/vigia-intent-analysis
-Autora principal: Annia Tchijova
+Autora principal: Anna Tchijova
 Diseño e implementación base: Kimi (Moonshot AI)
 Ajustes de seguridad e integración: Claude (Anthropic)
 Versión: 1.1 — 19 de mayo de 2026
@@ -222,7 +222,7 @@ class AssumptionTracker:
                 f"AssumptionTracker: constraint_id '{constraint.constraint_id}' "
                 f"ya registrado. Los IDs deben ser únicos."
             )
-        # Fix P2 (Annia Tchijova, 2026-05-18):
+        # Fix P2 (Anna Tchijova, 2026-05-18):
         # Validar que los supuestos declarados sean conocidos.
         # Warning, no error — permite extender SYSTEM_ASSUMPTIONS sin romper código.
         unknown_assumptions = [

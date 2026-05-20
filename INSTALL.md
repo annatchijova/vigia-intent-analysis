@@ -198,23 +198,75 @@ nano vigia/tools/vision_audit.py
 # Contenido: from vigia.forensics.vision_audit import vision_intent_audit
 ```
 
-**`PermissionError: /var/lib/vigia`**
-Verificar que `.env` tiene `VIGIA_EVIDENCE_DIR` apuntando a un directorio
-local, no a `/var/lib/vigia/evidence`. Puede haber duplicados en el `.env`
-si se editó varias veces — limpiar con:
+
+---
+
+## 11. Levantar la API REST (para OpenWebUI y Claude Code)
+
+VIGÍA expone una API REST en `vigia_api.py` que permite integración con
+OpenWebUI, Claude Code, y cualquier cliente HTTP.
+
+### Puerto por defecto
+
 ```bash
-python3 -c "
-lines = open('.env').readlines()
-seen = {}
-result = []
-for line in lines:
-    key = line.split('=')[0].strip()
-    if key.startswith('#') or '=' not in line:
-        result.append(line)
-    elif key not in seen:
-        seen[key] = True
-        result.append(line)
-open('.env', 'w').writelines(result)
-print('OK')
-"
+export $(grep -v '^#' .env | xargs)
+python3 vigia_api.py
+# Levanta en http://0.0.0.0:8000
 ```
+
+### Cambiar el puerto
+
+Si el puerto 8000 está ocupado (por ejemplo, OpenWebUI corre en 8080 y
+necesitás evitar conflictos), usar las variables de entorno:
+
+```bash
+VIGIA_PORT=8001 python3 vigia_api.py
+# O también:
+VIGIA_HOST=127.0.0.1 VIGIA_PORT=8001 python3 vigia_api.py
+```
+
+O agregarlo al `.env`:
+```
+VIGIA_PORT=8001
+VIGIA_HOST=127.0.0.1
+```
+
+### Integración con OpenWebUI
+
+OpenWebUI permite conectar modelos externos via "OpenAI-compatible API".
+
+1. Levantá VIGÍA primero: `python3 vigia_api.py`
+2. En OpenWebUI → **Settings → Connections → OpenAI API**
+3. URL: `http://127.0.0.1:8000` (o el puerto que hayas configurado)
+4. API Key: cualquier string (VIGÍA no valida key en modo desarrollo)
+
+> **Nota para instalaciones con OpenWebUI en puerto no estándar:**
+> OpenWebUI instalado via `pipx` corre por defecto en el puerto que se
+> le pase al comando `open-webui serve --port XXXX`. Si tu instalación
+> corre en 8080, VIGÍA no compite — son servicios distintos en puertos
+> distintos. Solo asegurate de apuntar OpenWebUI a la URL correcta de
+> la API de VIGÍA.
+
+### Verificar que la API responde
+
+```bash
+curl http://127.0.0.1:8000/health
+# Respuesta esperada: {"status":"ok"}
+```
+
+---
+
+## 12. Integración con Claude Code
+
+Claude Code puede llamar a VIGÍA directamente como herramienta MCP.
+Ver `docs/claude_code_integration.md` para la configuración completa.
+
+Inicio rápido:
+```bash
+# En una terminal: levantar VIGÍA
+python3 vigia_api.py
+
+# En otra terminal: Claude Code apunta a http://127.0.0.1:8000
+claude mcp add vigia http://127.0.0.1:8000
+```
+
