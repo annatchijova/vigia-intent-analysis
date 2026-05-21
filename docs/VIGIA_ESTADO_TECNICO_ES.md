@@ -887,7 +887,7 @@ Los umbrales operacionales del sistema (LR thresholds, P2 abstention zone, spoof
 
 ### 18.3 Media Prioridad
 
-10. **VIGIA_STORY.md**: Annia lo escribe, Claude puede asistir solo con edición
+10. **VIGIA_STORY.md**: Anna lo escribe, Claude puede asistir solo con edición
 11. **Configuración GitHub Actions**: `ci_gate.py` → workflows YAML
 12. **Documentación DAUBERT_JUDICIAL.md**: completar sección de casos de prueba
 

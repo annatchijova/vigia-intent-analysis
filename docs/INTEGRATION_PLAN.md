@@ -310,7 +310,7 @@ Agregar secciones:
 3. **Abductive Intent Engine**: Explicar diferencia entre ML (inducción) y nuestro motor (abducción)
 4. **PICERL-I Mapping**: Cómo VIGÍA se integra con SANS framework
 
-### Hito 3.2: Génesis de VIGIA_STORY.md (Para Annia)
+### Hito 3.2: Génesis de VIGIA_STORY.md (Para Anna)
 
 Este archivo es tuyo. Estructura sugerida:
 - **Origen**: "El IR occidental se queda en reacción (Segundidad). VIGÍA propone Terceridad."
@@ -356,7 +356,7 @@ Si no → salida estructurada YAML/JSON (determinista puro).
 - Actualización `DAUBERT_JUDICIAL.md`
 
 ### Documentación
-- `VIGIA_STORY.md` (bilingual: es/en) — Annia escribe
+- `VIGIA_STORY.md` (bilingual: es/en) — Anna escribe
 - `README_SANS_HACKATHON.md` — Pitch para Rob T. Lee
 - Ejemplo completo: caso_002_log_fabrication → PICERL-I → Intención
 
@@ -390,7 +390,7 @@ Kimi propone:
 | Que Rob T. Lee diga "Esto no es IR" | Énfasis explícito en PICERL mapping + comparación con NIST |
 | CHC solver = demasiado complejo | Usar Ockham + MITRE como proxy |
 | Nivel 2 de 等保2.0 sin TPM real | Abstracción HMAC-based, documentar como "fallback open source" |
-| Annia quiere VIGIA_STORY.md y no empieza | Entregarle outline y ella va editando |
+| Anna quiere VIGIA_STORY.md y no empieza | Entregarle outline y ella va editando |
 | Ollama no está disponible | Todo debe funcionar sin él |
 
 ---

@@ -8,7 +8,7 @@ Candidato a integración en SANS SIFT Workstation.
 
 Licencia: Apache 2.0
 Repositorio: https://github.com/annatchijova/vigia-intent-analysis
-Autora principal: Annia Tchijova
+Autora principal: Anna Tchijova
 
 DESCRIPCIÓN:
     Scorer forense standalone. Implementa el pipeline de puntuación de

@@ -1,6 +1,6 @@
 # Abductive Forensics and Deterministic Entropy: A Formally Verified Framework for APT Attribution Under the Daubert Standard
 
-**Annia Tchijova**  
+**Anna Tchijova**  
 Independent Researcher, SANS FIND EVIL Hackathon 2026  
 `anna.tchijova@gmail.com` · GitHub: `annatchijova/vigia-intent-analysis`
 

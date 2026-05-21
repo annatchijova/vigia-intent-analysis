@@ -202,7 +202,7 @@ Todos ya están mapeados.
 
 ---
 
-## Para VIGIA_STORY.md (Narrativa de Annia)
+## Para VIGIA_STORY.md (Narrativa de Anna)
 
 ### Párrafo sobre H_SE_001
 
