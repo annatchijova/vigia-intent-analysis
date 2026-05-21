@@ -1198,6 +1198,27 @@ class CrossArtifactIncongruenceEngine:
                         ttp_id="T1565.001",
                     ))
 
+        # ===================================================================
+        # PRE-CALCULATED FRACTURE INGESTION (Canonical Cases)
+        # If artifacts carry pre-declared fractures in metadata, ingest them
+        # as fallback when auto-detection finds nothing.
+        # ===================================================================
+        for a in self._artifacts:
+            pre_fractures = a.metadata.get("caie_fractures_predeclared", [])
+            if not pre_fractures:
+                pre_fractures = a.metadata.get("caie_fractures", [])
+            for pf in pre_fractures:
+                if isinstance(pf, dict) and pf.get("type"):
+                    self._fractures.append(Fracture(
+                        artifact_a=a.description[:60],
+                        artifact_b="Pre-declared in canonical case",
+                        fracture_type=pf["type"],
+                        severity=float(pf.get("severity", 0.8)),
+                        interpretation=pf.get("description", "Pre-calculated fracture from case definition"),
+                        spoofability_delta=float(pf.get("spoofability_delta", 0.5)),
+                        ttp_id=pf.get("mitre_ttp"),
+                    ))
+
         return self._fractures
 
     # ------------------------------------------------------------------

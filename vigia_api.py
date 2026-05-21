@@ -1,4 +1,18 @@
 #!/usr/bin/env python3
+# Copyright 2026 Anna Tchijova
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 """
 VIGÍA API — FastAPI wrapper para OpenWebUI.
 Expone el pipeline real (run_vigia_full.py + vigia_ask.sh) como endpoints REST.
@@ -95,6 +109,131 @@ def _run_narrative(case_path: Path) -> str:
 @app.get("/health")
 def health():
     return {"status": "VIGÍA operativo", "repo": str(REPO)}
+
+
+# ---------------------------------------------------------------------------
+# Shim OpenAI-compatible — requerido por OpenWebUI
+# OpenWebUI espera /v1/models y /v1/chat/completions.
+# Estos endpoints traducen el protocolo de chat al pipeline forense VIGÍA.
+# ---------------------------------------------------------------------------
+
+@app.get("/v1/models")
+def list_models():
+    """OpenWebUI llama esto al conectar para descubrir modelos disponibles."""
+    return {
+        "object": "list",
+        "data": [
+            {
+                "id":       "vigia-forensic",
+                "object":   "model",
+                "owned_by": "vigia",
+                "created":  1716000000,
+            }
+        ],
+    }
+
+
+class ChatMessage(BaseModel):
+    role: str
+    content: str
+
+class ChatRequest(BaseModel):
+    model: str = "vigia-forensic"
+    messages: list
+    stream: bool = False
+
+
+@app.post("/v1/chat/completions")
+def chat_completions(req: ChatRequest):
+    """
+    Endpoint OpenAI-compatible para OpenWebUI.
+
+    El último mensaje del usuario se interpreta como:
+    - Si contiene JSON válido con campo 'artifacts': se analiza como caso forense.
+    - En cualquier otro caso: se responde con instrucciones de uso.
+    """
+    import time
+
+    # Extraer el último mensaje del usuario
+    user_messages = [m for m in req.messages if (
+        (isinstance(m, dict) and m.get("role") == "user") or
+        (hasattr(m, "role") and m.role == "user")
+    )]
+    if not user_messages:
+        content = "No se recibió mensaje de usuario."
+    else:
+        last = user_messages[-1]
+        text = last.get("content", "") if isinstance(last, dict) else last.content
+
+        # Intentar parsear como caso forense JSON
+        try:
+            case_data = json.loads(text)
+            if "artifacts" in case_data:
+                tf = tempfile.NamedTemporaryFile(suffix=".json", delete=False, mode="w")
+                json.dump(case_data, tf)
+                tf.close()
+                try:
+                    result = _run_pipeline(Path(tf.name))
+                    try:
+                        narrative = _run_narrative(Path(tf.name))
+                    except Exception:
+                        narrative = ""
+                    verdict  = result.get("verdict", "UNKNOWN")
+                    score    = result.get("score", 0.0)
+                    conf     = result.get("confidence", 0.0)
+                    reason   = result.get("reason", "")
+                    bh       = result.get("bundle_hash", "N/A")
+                    verify   = result.get("verify", "N/A")
+                    ms       = result.get("pipeline_ms", 0)
+                    content  = (
+                        f"**VIGÍA — Análisis Forense**\n\n"
+                        f"**Veredicto:** {verdict}\n"
+                        f"**Score:** {score:.4f} | **Confianza:** {conf:.2f}\n"
+                        f"**Razón:** {reason}\n"
+                        f"**Bundle hash:** `{bh}`\n"
+                        f"**Verificación EBS:** {verify}\n"
+                        f"**Pipeline:** {ms}ms\n"
+                    )
+                    if narrative:
+                        content += f"\n**Análisis Peirciano:**\n{narrative}"
+                except Exception as e:
+                    content = f"Error en pipeline forense: {e}"
+                finally:
+                    try:
+                        os.unlink(tf.name)
+                    except Exception:
+                        pass
+            else:
+                content = (
+                    "VIGÍA recibió JSON sin campo `artifacts`. "
+                    "Enviá un caso forense con estructura `{\"artifacts\": [...]}` "
+                    "o usá `/analyze/path` con el nombre de un caso existente."
+                )
+        except (json.JSONDecodeError, ValueError):
+            content = (
+                "**VIGÍA Forensic Intelligence API**\n\n"
+                "Para analizar un caso, enviá el JSON del caso completo como mensaje.\n\n"
+                "O usá los endpoints directos:\n"
+                "- `POST /analyze/path` — caso existente por nombre\n"
+                "- `POST /analyze/json` — caso como JSON en el body\n"
+                "- `GET /cases` — listar casos disponibles\n"
+                "- `GET /health` — estado del sistema"
+            )
+
+    return {
+        "id":      f"vigia-{int(time.time())}",
+        "object":  "chat.completion",
+        "created": int(time.time()),
+        "model":   req.model,
+        "choices": [
+            {
+                "index":         0,
+                "message":       {"role": "assistant", "content": content},
+                "finish_reason": "stop",
+            }
+        ],
+        "usage": {"prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0},
+    }
 
 
 @app.get("/cases")

@@ -4,7 +4,7 @@
 >
 > Today, lying in a log or faking an attack is free. VIGÍA charges that price by evaluating the logical fractures in the lie.
 
-**SANS FIND EVIL Hackathon 2026** | Author: Anna Tchijova | Architects: VIGÍA AI Collective (Gemini, Claude, Kimi) | License: MIT
+**SANS FIND EVIL Hackathon 2026** | Author: Anna Tchijova | Architects: VIGÍA AI Collective (Gemini, Claude, Kimi) | License: Apache 2.0
 
 ---
 
@@ -336,7 +336,7 @@ vigia-sift/
 
 ## License
 
-MIT License. See LICENSE.
+Apache 2.0 License. See LICENSE.
 
 This project was created for the SANS FIND EVIL Hackathon 2026. The novel contribution is the intentionality analysis framework (Phase 2 tools) built on top of the existing SIFT forensic stack, grounded in Peircean semiotics and Eco's theory of overinterpretation.
 
