@@ -322,6 +322,21 @@ Non-negotiable EBS v1 invariants:
 
 ---
 
+## Academic Documentation
+
+VIGÍA ships with peer-reviewed academic documentation for all 193 Python modules,
+generated via Moonshot Kimi K2.6 Batch API and audited by the VIGÍA AI Collective.
+Each document covers the module in four languages — English, Spanish, Russian, and
+Chinese — and includes a technical glossary and a Scientific Note that grounds
+Peircean semiotics, Eco's overcodification theory, and Grice's maxims as
+deterministic, falsifiable computational constructs rather than theoretical
+abstractions. All documentation is Daubert-compliant: every claim maps to a
+specific code path, a known error rate, and a reproducible test vector.
+
+Browse the full corpus: [`docs/academic/ACADEMIC_DOCS_MASTER_INDEX_EN.md`](docs/academic/ACADEMIC_DOCS_MASTER_INDEX_EN.md)
+
+---
+
 ## Known Limitations
 
 The calibration corpus is currently synthetic (bootstrap v1). Operational thresholds are pending validation with real forensic data. See `known_limitations.md` for the complete inventory of edge cases and design decisions.
@@ -352,6 +367,20 @@ vigia-intent-analysis/
 ├── cases/              — 186 cases in JSON format
 └── docker-compose.yml
 ```
+
+---
+
+## Command Reference
+
+VIGÍA includes an interactive HTML command reference covering all 173 available
+investigation commands, organized by phase and tool. Open it locally in any browser:
+
+```bash
+open docs/vigia_commands.html        # macOS
+xdg-open docs/vigia_commands.html   # Linux
+```
+
+Or browse it directly in the repository at [`docs/vigia_commands.html`](docs/vigia_commands.html).
 
 ---
 
