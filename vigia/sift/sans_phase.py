@@ -227,8 +227,7 @@ if __name__ == "__main__":
     assert "SANS" in line
     assert "Identification" in line
     assert "2/6" in line
-    print(f"✓ One-liner generado:
-   {line}")
+    print(f"✓ One-liner generado: {line}")
 
     # Test 3: Tracker
     t = SANSPhaseTracker("IR-TEST")
