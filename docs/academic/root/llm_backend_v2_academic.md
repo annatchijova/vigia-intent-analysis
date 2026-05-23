@@ -1,0 +1,307 @@
+<!--
+VIGIA Academic Documentation
+Module: 2bb62251
+Batch ID: vigia-doc-0104-2bb62251
+Generated: 2026-05-20T14:56:47.867206+00:00
+-->
+
+---
+doc_hash: 2bb62251
+module: vigia/llm_backend_v2.py
+languages: [EN, ES, RU, ZH]
+generated_by: moonshot-kimi-k2.6-batch-api
+license: Apache-2.0
+---
+
+### ENGLISH
+
+What Is This Module?
+This module is a forensic analysis controller. It decides which cognitive tasks an AI model is allowed to perform, and switches to deterministic (rule-based) tools when the AI is not trusted for that level. It treats AI backends like laboratory instruments with known precision limits: you do not ask a balance to measure fluorescence. The system uses integer-graded capability levels, ensuring every decision is discrete, auditable, and reproducible.
+
+Key Concepts table:
+| Concept | Description | Scientific Role |
+|---|---|---|
+| Capability Level (Integer) | Discrete rank N. A backend at level N handles tasks ≤ N exactly. No interpolation, no probabilistic rounding. | Deterministic access control |
+| Firstness (Description) | Raw observation and data collection. Any backend can report what is present. | Phenomenological recording |
+| Secondness (Anomaly) | Detection of logical fractures/deviations using deterministic tools, optionally narrated by LLM. | Quality control / deviation flagging |
+| Thirdness (Abduction) | Causal hypothesis generation. Falls back to symbolic engine if backend lacks CAUSAL_REASONING. | Inference and theory formation |
+| Devil's Advocate (Refutation) | Automated stress-testing of conclusions using the Gorgias deterministic engine. Never uses LLM to avoid circular reasoning. | Falsification protocol |
+
+Functions table:
+| Function | Capability Required | Fallback Mechanism |
+|---|---|---|
+| analyze_firstness() | FIRSTNESS_ONLY (Level 1) | None; any backend permitted |
+| analyze_secondness() | ANOMALY_DETECTION (Level 2) | Deterministic anomaly detector + optional LLM narration |
+| analyze_thirdness() | CAUSAL_REASONING (Level 3) | Symbolic reasoning engine (integer-rules, no statistical sampling) |
+| generate_devil_advocate() | FULL_SEMIOTIC (Level 4) | Gorgias deterministic refutation engine; LLM explicitly excluded |
+
+Constants/Config table:
+| Constant | Type | Purpose |
+|---|---|---|
+| MAX_CAPABILITY | Integer ceiling | Hard upper bound of the capability lattice |
+| FIRSTNESS_ONLY | Integer level = 1 | Baseline descriptive tasks |
+| ANOMALY_DETECTION | Integer level = 2 | Fracture detection in evidence |
+| CAUSAL_REASONING | Integer level = 3 | Causal inference required |
+| FULL_SEMIOTIC | Integer level = 4 | Complete semiotic cycle including refutation |
+| BACKENDS | Registry | Catalog of available backends with verified integer levels |
+
+Glossary:
+- **BackendCapability**: A totally ordered set of integer ranks. Think of it as a microscope's magnification scale: discrete steps, no intermediate "half-steps".
+- **Degradación elegante (Graceful Degradation)**: When a high-level request hits a lower-level backend, the system does not fail; it switches to a deterministic fallback with identical input-output contracts.
+- **Deterministic Fallback**: A non-probabilistic procedure yielding the exact same result on every repetition with the same evidence.
+- **Gorgias**: A deterministic refutation engine named after the pre-Socratic philosopher. It operates by strict logical contradiction, not by language generation.
+- **LLM (Large Language Model)**: A statistical text synthesis system. The module treats it as an unreliable witness whose testimony must be cross-checked by deterministic means.
+- **Peircean Semiosis**: Charles Sanders Peirce's theory of signs. Firstness = possibility/quality; Secondness = actual existence/relation; Thirdness = law/mediation.
+- **Symbolic Engine**: A reasoning system operating on explicit integer arithmetic and formal rules, producing identical conclusions from identical premises.
+
+Scientific Note:
+【Scientific Note】
+Terms such as Firstness, Secondness, Thirdness, and the interpretive frameworks of Peirce, Eco, and Grice are not esoteric or mystical constructs. They are epistemological categories, analogous to the operating modes of a multi-sensor laboratory suite. Firstness is raw sensor voltage (qualitative signal). Secondness is the threshold comparator that flags a deviation from baseline (anomaly detection). Thirdness is the inference algorithm that explains why the deviation occurred (causal model). Grice's cooperative maxims and Eco's limits of interpretation function like calibration protocols: they specify under what conditions a reading counts as valid evidence. When this module assigns an integer capability level, it performs the same function as setting a sensor's gain range—deterministic, discrete, and reproducible.
+
+License line.
+
+### ESPAÑOL
+
+What Is This Module? -> ¿Qué es este módulo?
+Es un controlador forense de análisis. Decide qué tareas cognitivas puede realizar un modelo de IA y conmuta a herramientas deterministas cuando la IA no es confiable para ese nivel. Trata los backends de IA como instrumentos de laboratorio con límites de precisión conocidos. Utiliza niveles de capacidad enteros, garantizando que cada decisión sea discreta, auditable y reproducible.
+
+Key concepts:
+| Concepto | Descripción | Rol científico |
+|---|---|---|
+| Nivel de Capacidad (Entero) | Rango discreto N. Un backend en nivel N ejecuta tareas ≤ N exactamente. Sin interpolación ni redondeo probabilístico. | Control de acceso determinista |
+| Firstness (Descripción) | Observación cruda y recolección de datos. Cualquier backend puede reportar qué está presente. | Registro fenomenológico |
+| Secondness (Anomalía) | Detección de rupturas lógicas mediante herramientas deterministas, narración opcional por LLM. | Control de calidad / marcado de desviaciones |
+| Thirdness (Abducción) | Generación de hipótesis causales. Recurre al motor simbólico si el backend carece de CAUSAL_REASONING. | Inferencia y formación de teorías |
+| Devil's Advocate (Refutación) | Prueba de estrés automatizada de conclusiones mediante el motor determinista Gorgias. Nunca usa LLM. | Protocolo de falsificación |
+
+Functions:
+| Función | Capacidad Requerida | Mecanismo de Fallback |
+|---|---|---|
+| analyze_firstness() | FIRSTNESS_ONLY (Nivel 1) | Ninguno; cualquier backend permitido |
+| analyze_secondness() | ANOMALY_DETECTION (Nivel 2) | Detector determinista + narración LLM opcional |
+| analyze_thirdness() | CAUSAL_REASONING (Nivel 3) | Motor simbólico (reglas enteras, sin muestreo estadístico) |
+| generate_devil_advocate() | FULL_SEMIOTIC (Nivel 4) | Motor de refutación Gorgias; LLM excluido explícitamente |
+
+Constants: similar.
+
+Glossary:
+- **BackendCapability**: Conjunto totalmente ordenado de rangos enteros. Análogo a la escala de aumento de un microscopio: pasos discretos, sin "medios pasos".
+- **Degradación elegante**: Cuando una solicitud de alto nivel alcanza un backend de menor nivel, el sistema no falla; conmuta a un fallback determinista con contratos idénticos de entrada-salida.
+- **Fallback determinista**: Procedimiento no probabilístico que produce exactamente el mismo resultado en cada repetición con la misma evidencia.
+- **Gorgias**: Motor determinista de refutación nombrado por el filósofo presocrático. Opera por contradicción lógica estricta, no por generación de lenguaje.
+- **LLM (Large Language Model)**: Sistema estadístico de síntesis de texto. El módulo lo trata como un testigo no confiable cuyo testimonio debe ser contrastado por medios deterministas.
+- **Semiosis peirceana**: Teoría de los signos de Charles Sanders Peirce. Firstness = posibilidad/cualidad; Secondness = existencia actual/relación; Thirdness = ley/medición.
+- **Motor simbólico**: Sistema de razonamiento que opera sobre aritmética entera explícita y reglas formales, produciendo conclusiones idénticas a partir de premisas idénticas.
+
+Scientific Note:
+【Nota Científica】
+Términos como Firstness, Secondness, Thirdness y los marcos interpretativos de Peirce, Eco y Grice no son construcciones esotéricas o místicas. Son categorías epistemológicas, análogas a los modos de operación de un conjunto de sensores de laboratorio. Firstness es el voltaje crudo del sensor (señal cualitativa). Secondness es el comparador de umbrales que marca una desviación respecto a la línea base (detección de anomalías). Thirdness es el algoritmo de inferencia que explica por qué ocurrió la desviación (modelo causal). Los máximas cooperativas de Grice y los límites interpretativos de Eco funcionan como protocolos de calibración: especifican bajo qué condiciones una lectura cuenta como evidencia válida. Cuando este módulo asigna un nivel de capacidad entero, realiza la misma función que ajustar el rango de ganancia de un sensor: determinista, discreto y reproducible.
+
+License line.
+
+### РУССКИЙ
+
+What Is This Module? -> Что это за модуль?
+Это следственный аналитический контроллер. Он определяет, какие когнитивные задачи разрешено выполнять модели ИИ, и переключается на детерминированные (правиловые) инструменты, когда ИИ не заслуживает доверия на данном уровне. Система рассматривает ИИ-бэкенды как лабораторные приборы с известными пределами точности: не требуют от весов измерения флуоресценции. Используются целочисленные уровни возможностей, гарантирующие дискретность, аудируемость и воспроизводимость каждого решения.
+
+Key concepts:
+| Понятие | Описание | Научная роль |
+|---|---|---|
+| Уровень возможности (Целое число) | Дискретный ранг N. Бэкенд уровня N точно выполняет задачи ≤ N. Без интерполяции и вероятностного округления. | Детерминированное управление доступом |
+| Firstness (Описание) | Наблюдение и сбор данных. Любой бэкенд может сообщить о наличии объектов. | Феноменологическая регистрация |
+| Secondness (Аномалия) | Обнаружение логических разрывов детерминированными средствами, с опциональным LLM-описанием. | Контроль качества / маркировка отклонений |
+| Thirdness (Абдукция) | Генерация причинных гипотез. Переход к символьному движку при отсутствии CAUSAL_REASONING. | Инференс и формирование теорий |
+| Devil's Advocate (Опровержение) | Автоматизированное нагрузочное тестирование выводов детерминированным движком Gorgias. LLM никогда не используется. | Протокол фальсификации |
+
+Functions:
+| Функция | Требуемый уровень | Резервный механизм |
+|---|---|---|
+| analyze_firstness() | FIRSTNESS_ONLY (Уровень 1) | Отсутствует; любой бэкенд допустим |
+| analyze_secondness() | ANOMALY_DETECTION (Уровень 2) | Детерминированный детектор + опциональное LLM-описание |
+| analyze_thirdness() | CAUSAL_REASONING (Уровень 3) | Символьный движок (целочисленные правила, без статистической выборки) |
+| generate_devil_advocate() | FULL_SEMIOTIC (Уровень 4) | Детерминированный движок опровержения Gorgias; LLM явно исключён |
+
+Constants:
+| Константа | Тип | Назначение |
+|---|---|---|
+| MAX_CAPABILITY | Целочисленный потолок | Жёсткая верхняя граница решётки возможностей |
+| FIRSTNESS_ONLY | Целое = 1 | Базовые описательные задачи |
+| ANOMALY_DETECTION | Целое = 2 | Обнаружение разрывов в доказательствах |
+| CAUSAL_REASONING | Целое = 3 | Требуется причинный вывод |
+| FULL_SEMIOTIC | Целое = 4 | Полный семиотический цикл с опровержением |
+| BACKENDS | Реестр | Каталог доступных бэкендов с верифицированными целочисленными уровнями |
+
+Glossary:
+- **BackendCapability**: Строго упорядоченное множество целочисленных рангов. Аналог шкалы увеличения микроскопа: дискретные ступени, без «полуступеней».
+- **Degradación elegante (Грациозная деградация)**: При запросе высокого уровня к бэкенду низкого уровня система не отказывает, а переключается на детерминированный резерв с идентичными контрактами ввода-вывода.
+- **Детерминированный резерв**: Невероятностная процедура, дающая точно тот же результат при каждом повторении с одними и теми же доказательствами.
+- **Gorgias**: Детерминированный движок опровержения, названный в честь философа-пресократика. Работает через строгую логическую противоречивость, а не через генерацию текста.
+- **LLM (Large Language Model)**: Статистическая система синтеза текста. Модуль рассматривает её как ненадёжного свидетеля, показания которого должны быть перепроверены детерминированными средствами.
+- **Семиозис Пирса**: Теория знаков Чарльза Сандерса Пирса. Firstness = возможность/качество; Secondness = актуальное существование/отношение; Thirdness = закон/посредничество.
+- **Символьный движок**: Система рассуждений, работающая на явной целочисленной арифметике и формальных правилах, выдающая идентичные выводы из идентичных посылок.
+
+Scientific Note:
+【Научное Примечание】
+Термины Firstness, Secondness, Thirdness, а также интерпретативные рамки Пирса, Эко и Грайса не являются эзотерическими или мистическими конструктами. Это эпистемологические категории, аналогичные режимам работы лабораторного мультисенсорного комплекса. Firstness — это сырые напряжения датчика (качественный сигнал). Secondness — это пороговый компаратор, фиксирующий отклонение от базовой линии (обнаружение аномалии). Thirdness — это алгоритм вывода, объясняющий, почему произошло отклонение (причинная модель). Кооперативные максимы Грайса и пределы интерпретации Эко функционируют как протоколы калибровки: они задают условия, при которых показание считается допустимым доказательством. Когда данный модуль присваивает целочисленный уровень возможности, он выполняет ту же функцию, что и установка диапазона усиления датчика — детерминированную, дискретную и воспроизводимую.
+
+License line.
+
+### 中文
+
+What Is This Module? -> 本模块是什么？
+本模块是一个取证分析控制器。它决定允许人工智能模型执行哪些认知任务，并在人工智能不足以胜任该层级时切换至确定性（基于规则的）工具。它将人工智能后端视为具有已知精度限制的实验室仪器：不会要求天平测量荧光。系统采用整数分级的能力层级，确保每一项决策都是离散的、可审计的、可复现的。
+
+Key concepts tables. Must use 取证工件 (forensic artifact) and 逻辑断裂 (logical fracture/break) somewhere appropriate. Also 艾柯, 格赖斯.
+
+| 概念 | 描述 | 科学作用 |
+|---|---|---|
+| 能力层级（整数） | 离散等级 N。处于等级 N 的后端可精确执行 ≤ N 的任务。不存在插值或概率舍入。 | 确定性访问控制 |
+| 第一性（描述） | 原始观察与数据采集。任何后端均可报告存在何种取证工件。 | 现象学记录 |
+| 第二性（异常） | 使用确定性工具检测逻辑断裂，可由大语言模型进行可选叙述。 | 质量控制 / 偏差标记 |
+| 第三性（溯因） | 因果假设生成。若后端不具备因果推理能力，则回退至符号引擎。 | 推论与理论建构 |
+| 魔鬼代言人（反驳） | 使用 Gorgias 确定性引擎自动对结论进行压力测试。绝对不使用大语言模型。 | 证伪协议 |
+
+Functions:
+| 函数 | 所需能力 | 回退机制 |
+|---|---|---|
+| analyze_firstness() | FIRSTNESS_ONLY（等级 1） | 无；允许任何后端 |
+| analyze_secondness() | ANOMALY_DETECTION（等级 2） | 确定性异常检测器 + 可选大语言模型叙述 |
+| analyze_thirdness() | CAUSAL_REASONING（等级 3） | 符号推理引擎（整数规则，无统计采样） |
+| generate_devil_advocate() | FULL_SEMIOTIC（等级 4） | Gorgias 确定性反驳引擎；明确排除大语言模型 |
+
+Constants:
+| 常量 | 类型 | 用途 |
+|---|---|---|
+| MAX_CAPABILITY | 整数上限 | 能力格子的硬上限 |
+| FIRSTNESS_ONLY | 整数 = 1 | 基线描述性任务 |
+| ANOMALY_DETECTION | 整数 = 2 | 证据中逻辑断裂的检测 |
+| CAUSAL_REASONING | 整数 = 3 | 需要因果推断 |
+| FULL_SEMIOTIC | 整数 = 4 | 包含反驳的完整符号学循环 |
+| BACKENDS | 注册表 | 可用后端的目录，附经验证的整数等级 |
+
+Glossary:
+- **BackendCapability（后端能力）**：严格递增的整数等级集合。类似于显微镜的放大倍数标尺：离散档位，不存在“半档”。
+- **优雅降级（Degradación elegante）**：当高层级请求遭遇低层级后端时，系统不会崩溃，而是切换至具有相同输入-输出契约的确定性回退方案。
+- **确定性回退（Deterministic Fallback）**：非概率性程序，在相同证据下每次重复均产生完全一致的结果。
+- **Gorgias**：以智者学派哲学家高尔吉亚命名的确定性反驳引擎。它通过严格的逻辑矛盾运作，而非语言生成。
+- **大语言模型（LLM）**：统计性文本合成系统。本模块将其视为不可靠的证人，其证词必须经过确定性手段交叉核验。
+- **皮尔斯符号过程（Peircean Semiosis）**：查尔斯·桑德斯·皮尔斯的符号学理论。第一性 = 可能性/质；第二性 = 实际存在/关系；第三性 = 法则/中介。
+- **符号引擎（Symbolic Engine）**：基于显式整数算术与形式规则运作的推理系统，从相同前提出发产生相同结论。
+
+Scientific Note:
+【科学说明】
+第一性、第二性、第三性，以及皮尔斯、艾柯与格赖斯的诠释框架，并非神秘主义或玄学构造。它们是认识论范畴，类似于多传感器实验室套件的运行模式。第一性相当于传感器的原始电压（定性信号）；第二性相当于阈值比较器，用于标记相对于基线的偏离（异常检测）；第三性相当于解释偏离为何发生的推理算法（因果模型）。格赖斯的合作准则与艾柯的诠释限度则充当校准协议：它们规定了何种读数可被计为有效证据。当本模块分配一个整数能力等级时，它所执行的功能与设定传感器增益范围完全相同——是确定性的、离散的、可复现的。
+
+License line.
+
+Double-check Chinese terms:
+- 艾柯 (Eco) - used in scientific note.
+- 格赖斯 (Grice) - used in scientific note.
+- 取证工件 (forensic artifact) - used in firstness row: "任何后端均可报告存在何种取证工件" - yes.
+- 逻辑断裂 - used in secondness row: "使用确定性工具检测逻辑断裂" - yes.
+
+Double-check no floating-point explanations: I used "integer arithmetic", "discrete steps", "no interpolation", "no probabilistic rounding". I should avoid mentioning floats. Good.
+
+Double-check deterministic integer arithmetic emphasis: In tables and text I mention integer levels, discrete ranks. Good.
+
+Double-check academic tone: Yes.
+
+Double-check scientific note uses sensor analogy: Yes, raw voltage, threshold comparator, inference algorithm, calibration protocols.
+
+Double-check license line included in all sections? The user said "License line: ...". Probably at the very end of the document, or in each section? The requirement says "License line: ''" I think putting it at the end of each language section or once at the end. To be safe and thorough, I'll include it at the end of each section, or perhaps once globally. Given it's a legal notice, once at the very end is fine, but per section is also fine. I'll include it at the bottom of each section to be safe, as a footer. Actually, to be concise and not repetitive, I'll put it once at the very end. But the instruction says "Each section must include: ..." no, it says "Each section must include: - 'What Is This Module?' ... - Key concepts ... - Glossary ... - Scientific Note". It didn't explicitly say license line per section, just "License line: ...". I'll include it once at the bottom.
+
+Wait, I need to make sure I don't use Python syntax. The user is a non-Python scientist. I should refer to functions as procedures/operations, not Python code. I can mention the names but explain them as operations. The tables list the function names but in a scientific context.
+
+Also need to mention the module path somewhere? Probably in a header. The user gave MODULE PATH: vigia/llm_backend_v2.py. I can mention it as the document identifier.
+
+Let's assemble.
+
+One concern: The user said "You NEVER use floating-point math explanations for deterministic systems." I should ensure I don't say things like "probabilistic rounding errors" in a way that implies floating point. But my text says "no interpolation, no probabilistic rounding" which is fine. Actually "probabilistic rounding" might sound like float, but it's okay. Better to say "no fractional levels".
+
+Also, the user said "emphasize deterministic integer arithmetic where applicable". I should explicitly mention that capability levels are integers and the symbolic engine uses integer arithmetic. I have that.
+
+Let's refine the English text to be more polished.
+
+ENGLISH:
+**Module Identifier:** `vigia/llm_backend_v2.py`
+
+### What Is This Module?
+This module is a forensic analysis controller. It functions like a laboratory protocol manager for artificial intelligence: it assigns each AI backend a discrete integer capability level and strictly prohibits the AI from performing tasks above that level. If a requested analysis exceeds the backend’s certified level, the module does not crash or guess; it reroutes the task to a deterministic, rule-based subsystem that yields exactly the same output every time it receives the same evidence. The guiding principle is integer-graded competence: you do not ask a spectrophotometer to perform mass spectrometry, and you do not ask a descriptive model to perform causal inference without deterministic safeguards.
+
+Key Concepts:
+Table 1: Semiotic-Operational Modes
+| Mode | Plain-Language Definition | Forensic Function |
+|---|---|---|
+| Firstness (Description) | Pure observation. Recording what is present without interpretation. | Baseline evidence logging; all backends may perform this. |
+| Secondness (Anomaly) | Detection of deviation. Uses deterministic tools to locate logical fractures in evidence, optionally wrapped in LLM narration. | Quality assurance and deviation flagging. |
+| Thirdness (Abduction) | Causal explanation. Hypothesis generation about *why* a deviation occurred; falls back to a symbolic engine if the backend lacks causal reasoning certification. | Theory formation and inferential modeling. |
+| Devil’s Advocate (Refutation) | Systematic stress-testing of conclusions. Always executed by the deterministic Gorgias engine; LLMs are explicitly barred to prevent circular reasoning. | Falsification and adversarial verification. |
+
+Table 2: Capability Lattice (Strictly Integer-Ordered)
+| Constant / Level | Integer Value | Scientific Purpose |
+|---|---|---|
+| FIRSTNESS_ONLY | 1 | Permits phenomenological description only. |
+| ANOMALY_DETECTION | 2 | Permits integer-based anomaly scanning on forensic artifacts. |
+| CAUSAL_REASONING | 3 | Permits structured causal inference; triggers symbolic fallback if unavailable. |
+| FULL_SEMIOTIC | 4 | Authorizes the complete cycle, including mandatory deterministic refutation. |
+| MAX_CAPABILITY | 4 (ceiling) | Hard upper bound of the discrete capability lattice. No intermediate values exist. |
+
+Table 3: Core Operations
+| Operation | Required Level | Deterministic Fallback |
+|---|---|---|
+| analyze_firstness() | ≥ 1 | None required. |
+| analyze_secondness() | ≥ 2 | Deterministic anomaly detector; LLM may narrate but cannot alter integer flags. |
+| analyze_thirdness() | ≥ 3 | Symbolic engine using integer arithmetic and formal rules; no statistical sampling. |
+| generate_devil_advocate() | ≥ 4 | Gorgias refutation engine only. LLM excluded by architectural axiom. |
+
+Glossary:
+- **BackendCapability**: A totally ordered lattice of integer ranks. Analogous to a microscope’s discrete magnification settings: level 2 is strictly greater than level 1, and no fractional level (e.g., 1.5) is defined.
+- **Deterministic Fallback**: A procedure governed by exact integer arithmetic and fixed logical rules. Re-running the same operation on identical evidence produces bit-identical results; there is no randomness, no temperature parameter, and no confidence interval.
+- **Gorgias Engine**: A deterministic contradiction-detection system named for the pre-Socratic philosopher. It refutes propositions through strict logical form, not through natural-language generation.
+- **Graceful Degradation**: The module’s protocol for handling capability mismatch. Instead of failure, the task descends to the highest available deterministic subsystem that satisfies the input-output contract.
+- **LLM (Large Language Model)**: A statistical text-synthesis system. Within this module, it is treated as an instrument with uncalibrated variance: useful for narration, but never trusted for anomaly arbitration, causal proof, or refutation.
+- **Peircean Semiosis**: The theory of signs by Charles Sanders Peirce. Firstness = qualitative possibility; Secondness = brute factual encounter; Thirdness = mediating law or habit.
+- **Symbolic Engine**: A reasoning subsystem that manipulates explicit symbols via integer operations and formal inference rules. It is the mathematical equivalent of a mechanical balance: it yields the same reading under the same load, indefinitely.
+
+【Scientific Note】
+Terminology drawn from Charles Sanders Peirce, Umberto Eco, and H. Paul Grice is sometimes mistaken for metaphysical speculation. It is not. These are epistemological instrument classes, directly analogous to a multiplexed sensor array in an analytical laboratory. **Firstness** is raw sensor voltage: a qualitative signal that something is present. **Secondness** is the threshold comparator that registers a deviation from baseline—an anomaly detection circuit with hard integer triggers. **Thirdness** is the inference firmware that reconstructs why the deviation occurred, i.e., a causal model. Eco’s limits of interpretation and Grice’s conversational maxims operate as calibration protocols: they define the boundary conditions under which a sensor reading is admitted as valid evidence. Assigning an integer capability level to a backend is therefore identical to setting a gain range on a lock-in amplifier: the action is deterministic, discrete, and reproducible across laboratories.
+
+
+
+Wait, the user said include the license line. I should include it at the end of the whole doc or per section. I'll include it at the end of the whole doc, but maybe also note it applies to all. Actually, to be safe, I'll put it at the end of each language section or as a footer. Given the structure, I'll add it once after all four sections. But the user explicitly listed it as requirement 5. I'll put it once at the bottom.
+
+Now for ESPAÑOL. Ensure terms: degradación elegante, etc.
+
+ESPAÑOL:
+**Identificador del módulo:** `vigia/llm_backend_v2.py`
+
+### ¿Qué es este módulo?
+Este módulo es un controlador forense de análisis. Funciona como un gestor de protocolos de laboratorio para la inteligencia artificial: asigna a cada backend de IA un nivel de capacidad entero y discreto, y prohíbe estrictamente que la IA ejecute tareas superiores a dicho nivel. Si un análisis solicitado excede el nivel certificado del backend, el módulo no colapsa ni conjetura; deriva la tarea hacia un subsistema determinista basado en reglas que produce exactamente la misma salida cada vez que recibe la misma evidencia. El principio rector es la competencia graduada por enteros: no se le pide a un espectrofotómetro que realice espectrometría de masas, ni se le pide a un modelo descriptivo que infiera causalmente sin salvaguardas deterministas.
+
+Conceptos clave:
+Tabla 1: Modos Semiótico-Operacionales
+| Modo | Definición en lenguaje llano | Función forense |
+|---|---|---|
+| Firstness (Descripción) | Observación pura. Registro de lo presente sin interpretación. | Registro basal de evidencia; todos los backends pueden realizarlo. |
+| Secondness (Anomalía) | Detección de desviación. Usa herramientas deterministas para localizar rupturas lógicas en la evidencia, opcionalmente narradas por un LLM. | Garantía de calidad y marcado de desviaciones. |
+| Thirdness (Abducción) | Explicación causal. Generación de hipótesis sobre *por qué* ocurrió una desviación; recurre a un motor simbólico si el backend carece de certificación de razonamiento causal. | Formación de teorías y modelado inferencial. |
+| Devil's Advocate (Refutación) | Prueba de tensión sistemática de conclusiones. Ejecutada siempre por el motor determinista Gorgias; los LLM están explícitamente vetados para evitar razonamiento circular. | Falsificación y verificación adversarial. |
+
+Tabla 2: Retícula de Capacidades (Orden Entero Estricto)
+| Constante / Nivel | Valor Entero | Propósito científico |
+|---|---|---|
+| FIRSTNESS_ONLY | 1 | Permite únicamente descripción fenomenológica. |
+| ANOMALY_DETECTION | 2 | Permite escaneo de anomalías basado en enteros sobre artefactos forenses. |
+| CAUSAL_REASONING | 3 | Permite inferencia causal estructurada; activa fallback simbólico si no está disponible. |
+| FULL_SEMIOTIC | 4 | Autoriza el ciclo completo, incluida la refutación determinista obligatoria. |
+| MAX_CAPABILITY | 4 (techo) | Cota superior dura de la retícula discreta de capacidades. No existen valores intermedios. |
+
+Tabla 3: Operaciones Principales
+| Operación | Nivel Requerido | Fallback Determinista |
+|---|---|---|
+| analyze_firstness() | ≥ 1 | No se requiere. |
+| analyze_secondness() | ≥ 2 | Detector determinista de anomalías; el LLM puede narrar pero no alterar banderas enteras. |
+| analyze_thirdness() | ≥ 3 | Motor simbólico usando aritmética entera y reglas formales; sin muestreo estadístico. |
+| generate_devil
+---
+*Licensed under the Apache License, Version 2.0. Copyright 2026 Anna Tchijova.*

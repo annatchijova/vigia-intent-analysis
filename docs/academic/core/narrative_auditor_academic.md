@@ -1,0 +1,334 @@
+<!--
+VIGIA Academic Documentation
+Module: 4d89a448
+Batch ID: vigia-doc-0064-4d89a448
+Generated: 2026-05-20T14:56:47.858273+00:00
+-->
+
+---
+doc_hash: 4d89a448
+module: vigia/core/narrative_auditor.py
+languages: [EN, ES, RU, ZH]
+generated_by: moonshot-kimi-k2.6-batch-api
+license: Apache-2.0
+---
+
+ENGLISH:
+- What Is This Module?
+  This module acts as an independent verification stage in a multi-agent forensic pipeline. It examines a generated narrative (a sequential text output from an AI generator) for signs of manipulation, injection, or logical inconsistency before the narrative is permanently sealed as a forensic artifact. It does not create content; it only inspects. It implements the C3 protocol: one agent generates (Claude), a second agent audits (NarrativeAuditor), and a human serves as witness. This separation of duties ensures that a single point of compromise cannot corrupt both generation and validation.
+
+- Key Concepts Table:
+  | Concept | Description | Scientific Role |
+  |---|---|---|
+  | C3 Multi-Agent Validation | A three-stage pipeline: Generator → Validator → Witness. | Eliminates single-point failure through process separation. |
+  | Narrative Injection | Malicious insertion of misleading or harmful content into an AI-generated text stream. | Threat vector detected by semantic and syntactic invariants. |
+  | Deterministic Integer Arithmetic | All scoring, thresholding, and classification use exact integer operations without rounding or approximation. | Guarantees reproducible, bit-identical audit results across executions. |
+  | OWASP LLM 2025 Taxonomy | A standardized classification of large language model vulnerabilities. | Pattern-matching reference for known attack signatures. |
+  | Qwen P0 Invariants | Deterministic protocol rules (from the Qwen P0 standard) that must never be violated during audit. | Fixed logical constraints enforced via integer-state checks. |
+  | Separation of Processes | The auditor runs in an isolated logical space from the generator. | Prevents an attacker from simultaneously compromising both roles. |
+
+  Maybe another table for Classes/Functions in plain terms:
+  | Component | Plain-Language Function |
+  |---|---|
+  | NarrativeAuditor | The independent inspector that reads the narrative line-by-line. |
+  | ThreatDetected | A record indicating which line contains a problem and what kind. |
+  | NarrativeAuditResult | The final certificate stating whether the narrative is clean or contaminated. |
+  | audit_narrative_before_seal() | The procedural checkpoint called immediately before finalizing evidence. |
+  | audit() | The core review operation that applies detection patterns to the text. |
+  | to_dict() | Converts the audit certificate into a standardized data record for archiving. |
+
+- Glossary:
+  - **C3 Protocol**: A tripartite validation architecture (Creator, Checker, Witness) used in high-assurance forensic systems.
+  - **Narrative**: In this context, a sequential list of text statements produced by an AI system during an investigation.
+  - **Sealing**: The irreversible act of finalizing a forensic artifact so it becomes court-admissible evidence.
+  - **Threat Pattern**: A recognizable signature of attack, defined by the OWASP LLM 2025 taxonomy, Gemini "Lethal" cases, or Carnegie patterns.
+  - **Deterministic Integer Arithmetic**: Mathematical operations using whole numbers only, ensuring every audit produces the exact same result given the same input.
+  - **Injection**: The unauthorized insertion of content into a data stream.
+  - **Forensic Artifact**: A digital object preserved with integrity guarantees for investigative or legal purposes. (Use 取证工件 in Chinese).
+
+- Scientific Note:
+  【Scientific Note】
+  The terminology of Peirce, Eco, and Grice refers to formal semiotic frameworks—not mysticism. Charles Sanders Peirce’s theory of signs, Umberto Eco’s codes of interpretation, and H. Paul Grice’s conversational maxims operate like optical sensors tuned to specific wavelengths: they are categorical detection filters. Just as a spectrometer identifies a chemical by its exact emission lines, these frameworks identify semantic anomalies by their exact logical signatures. When the auditor flags a "violation of the cooperative principle" or an "unintended interpretant," it is performing a deterministic, integer-based state classification—not invoking supernatural forces. The auditor is a semiotic sensor; the narrative is its specimen.
+
+ESPAÑOL:
+- What Is This Module? -> "¿Qué es este módulo?"
+  Actúa como una etapa de verificación independiente en una canalización forense multiagente. Examina una narrativa generada (una secuencia de texto producida por un generador de IA) en busca de signos de manipulación, inyección o inconsistencia lógica antes de que la narrativa se selle permanentemente como artefacto forense. No crea contenido; solo inspecciona. Implementa el protocolo C3: un agente genera (Claude), un segundo agente audita (NarrativeAuditor) y un humano actúa como testigo. Esta separación de funciones asegura que un único punto de compromiso no corrompa tanto la generación como la validación.
+
+- Key concepts table:
+  | Concepto | Descripción | Rol científico |
+  |---|---|---|
+  | Validación multiagente C3 | Canalización de tres etapas: Generador → Validador → Testigo. | Elimina el fallo de punto único mediante separación de procesos. |
+  | Inyección narrativa | Inserción maliciosa de contenido engañoso o dañino en un flujo de texto generado por IA. | Vector de amenaza detectado por invariantes semánticas y sintácticas. |
+  | Aritmética entera determinista | Todas las puntuaciones, umbrales y clasificaciones usan operaciones exactas con números enteros, sin redondeo. | Garantiza resultados de auditoría reproducibles y bit-a-bit idénticos. |
+  | Taxonomía OWASP LLM 2025 | Clasificación estandarizada de vulnerabilidades en modelos de lenguaje grandes. | Referencia de coincidencia de patrones para firmas de ataque conocidas. |
+  | Invariantes Qwen P0 | Reglas de protocolo deterministas (estándar Qwen P0) que nunca deben violarse. | Restricciones lógicas fijas aplicadas mediante verificaciones de estado enteras. |
+  | Separación de procesos | El auditor se ejecuta en un espacio lógico aislado del generador. | Impide que un atacante comprometa ambos roles simultáneamente. |
+
+  Component table:
+  | Componente | Función en lenguaje sencillo |
+  |---|---|
+  | NarrativeAuditor | El inspector independiente que lee la narrativa línea por línea. |
+  | ThreatDetected | Un registro que indica qué línea contiene un problema y de qué tipo. |
+  | NarrativeAuditResult | El certificado final que indica si la narrativa está limpia o contaminada. |
+  | audit_narrative_before_seal() | El punto de control procesal que se invoca justo antes de finalizar la evidencia. |
+  | audit() | La operación central de revisión que aplica patrones de detección al texto. |
+  | to_dict() | Convierte el certificado de auditoría en un registro de datos estandarizado para archivar. |
+
+- Glossary:
+  - **Protocolo C3**: Arquitectura de validación tripartita (Creador, Verificador, Testigo) usada en sistemas forenses de alta confianza.
+  - **Narrativa**: En este contexto, una lista secuencial de declaraciones de texto producidas por un sistema de IA durante una investigación.
+  - **Sellado**: El acto irreversible de finalizar un artefacto forense para que se convierta en evidencia admisible en tribunal.
+  - **Patrón de amenaza**: Una firma reconocible de ataque, definida por la taxonomía OWASP LLM 2025, los casos "Lethal" de Gemini o los patrones Carnegie.
+  - **Aritmética entera determinista**: Operaciones matemáticas usando solo números enteros, asegurando que cada auditoría produce exactamente el mismo resultado ante la misma entrada.
+  - **Inyección**: La inserción no autorizada de contenido en un flujo de datos.
+  - **Artefacto forense**: Objeto digital preservado con garantías de integridad para fines investigativos o legales.
+
+- Scientific Note:
+  【Nota Científica】
+  La terminología de Peirce, Eco y Grice se refiere a marcos semióticos formales, no a misticismo. La teoría de los signos de Charles Sanders Peirce, los códigos de interpretación de Umberto Eco y los máximas conversacionales de H. Paul Grice funcionan como sensores ópticos sintonizados a longitudes de onda específicas: son filtros de detección categóricos. Así como un espectrómetro identifica un químico por sus líneas de emisión exactas, estos marcos identifican anomalías semánticas por sus firmas lógicas exactas. Cuando el auditor señala una "violación del principio cooperativo" o un "interpretante no intencionado", está realizando una clasificación de estado determinista basada en enteros, no invocando fuerzas sobrenaturales. El auditor es un sensor semiótico; la narrativa es su espécimen.
+
+РУССКИЙ:
+- What Is This Module? -> "Что представляет собой этот модуль?"
+  Этот модуль действует как независимая стадия верификации в многоагентной судебной конвейерной системе. Он проверяет сгенерированный нарратив (последовательный текстовый выход ИИ-генератора) на признаки манипуляции, инъекции или логической непротиворечивости до того, как нарратив будет окончательно запечатан в качестве судебного артефакта. Он не создаёт контент; он только инспектирует. Реализуется протокол C3: один агент генерирует (Claude), второй агент аудитирует (NarrativeAuditor), а человек выступает свидетелем. Такое разделение обязанностей гарантирует, что единая точка компрометации не сможет одновременно скомпрометировать и генерацию, и валидацию.
+
+- Key concepts table:
+  | Концепция | Описание | Научная роль |
+  |---|---|---|
+  | Многоагентная валидация C3 | Трёхстадийный конвейер: Генератор → Валидатор → Свидетель. | Устранение единой точки отказа посредством разделения процессов. |
+  | Нарративная инъекция | Вредоносная вставка вводящего в заблуждение или опасного контента в поток текста, сгенерированного ИИ. | Вектор угрозы, обнаруживаемый семантическими и синтаксическими инвариантами. |
+  | Детерминированная целочисленная арифметика | Все оценки, пороги и классификации выполняются точными операциями с целыми числами без округления. | Гарантирует воспроизводимые, битово-идентичные результаты аудита при повторных запусках. |
+  | Таксономия OWASP LLM 2025 | Стандартизированная классификация уязвимостей больших языковых моделей. | Эталон сопоставления с известными сигнатурами атак. |
+  | Инварианты Qwen P0 | Детерминированные правила протокола (стандарт Qwen P0), которые никогда не должны нарушаться. | Фиксированные логические ограничения, применяемые через проверки целочисленных состояний. |
+  | Разделение процессов | Аудитор выполняется в изолированном логическом пространстве, отдельном от генератора. | Препятствует одновременному компрометированию обеих ролей злоумышленником. |
+
+  Component table:
+  | Компонент | Функция на доступном языке |
+  |---|---|
+  | NarrativeAuditor | Независимый инспектор, читающий нарратив построчно. |
+  | ThreatDetected | Запись, указывающая, какая строка содержит проблему и какого рода. |
+  | NarrativeAuditResult | Итоговый сертификат, подтверждающий, что нарратив чист или скомпрометирован. |
+  | audit_narrative_before_seal() | Процедурная контрольная точка, вызываемая непосредственно перед финализацией доказательства. |
+  | audit() | Основная операция проверки, применяющая шаблоны обнаружения к тексту. |
+  | to_dict() | Преобразует аудиторский сертификат в стандартизированную запись данных для архивирования. |
+
+- Glossary:
+  - **Протокол C3**: Трёхчастная архитектура валидации (Создатель, Проверяющий, Свидетель), применяемая в высоконадёжных судебных системах.
+  - **Нарратив**: В данном контексте — последовательный список текстовых утверждений, произведённых ИИ-системой в ходе расследования.
+  - **Запечатывание**: Безвозвратное завершение формирования судебного артефакта для признания его допустимым доказательством в суде.
+  - **Шаблон угрозы**: Узнаваемая сигнатура атаки, определённая таксономией OWASP LLM 2025, кейсами Gemini «Lethal» или паттернами Carnegie.
+  - **Детерминированная целочисленная арифметика**: Математические операции исключительно с целыми числами, обеспечивающие получение абсолютно идентичного результата при каждом аудите при одном и том же входе.
+  - **Инъекция**: Несанкционированная вставка контента в поток данных.
+  - **Судебный артефакт**: Цифровой объект, сохранённый с гарантиями целостности для следственных или юридических целей.
+
+- Scientific Note:
+  【Научное примечание】
+  Терминология Пирса, Эко и Грайса отсылает к формальным семиотическим рамкам, а не к мистицизму. Теория знаков Чарльза Сандерса Пирса, коды интерпретации Умберто Эко и разговорные максимы Герберта Пола Грайса работают как оптические датчики, настроенные на определённые длины волн: это категориальные фильтры обнаружения. Подобно тому как спектрометр идентифицирует химическое вещество по его точным линиям излучения, эти рамки выявляют семантические аномалии по их точным логическим сигнатурам. Когда аудитор отмечает «нарушение кооперативного принципа» или «непреднамеренный интерпретант», он выполняет детерминированную классификацию состояния на основе целых чисел, а не вызывает сверхъестественные силы. Аудитор — это семиотический датчик; нарратив — его образец.
+
+中文:
+- What Is This Module? -> "本模块是什么？"
+  本模块是多智能体取证流程中的独立验证环节。它对生成的叙事（由AI生成器产出的顺序文本流）进行检查，在将其永久封存为取证工件之前，发现操纵、注入或逻辑不一致的迹象。它不生成内容，只执行审查。它实现了C3协议：一个智能体生成（Claude），第二个智能体审计（NarrativeAuditor），人类作为见证人。这种职责分离确保单一受损点无法同时破坏生成与验证。
+
+- Key concepts table:
+  | 概念 | 说明 | 科学作用 |
+  |---|---|---|
+  | C3多智能体验证 | 三阶段流程：生成器 → 验证器 → 见证人。 | 通过流程隔离消除单点故障。 |
+  | 叙事注入 | 在AI生成的文本流中恶意插入误导性或有害内容。 | 通过语义与句法不变量检测的威胁向量。 |
+  | 确定性整数运算 | 所有评分、阈值判定与分类均使用精确的整数操作，无舍入或近似。 | 保证每次执行在相同输入下产生比特级一致的审计结果。 |
+  | OWASP LLM 2025分类法 | 大语言模型漏洞的标准化分类体系。 | 针对已知攻击特征的模式匹配基准。 |
+  | Qwen P0不变量 | 源自Qwen P0标准的确定性协议规则，审计中绝不可违背。 | 通过整数状态检查强制执行的固定逻辑约束。 |
+  | 流程隔离 | 审计器在独立于生成器的逻辑空间中运行。 | 阻止攻击者同时破坏两个角色。 |
+
+  Component table:
+  | 组件 | 通俗功能说明 |
+  |---|---|
+  | NarrativeAuditor | 独立检查器，逐行审阅叙事内容。 |
+  | ThreatDetected | 记录指出哪一行存在问题及其类型。 |
+  | NarrativeAuditResult | 最终证书，声明叙事是洁净还是已被污染。 |
+  | audit_narrative_before_seal() | 在证据最终定稿之前立即调用的程序检查点。 |
+  | audit() | 核心审查操作，将检测模式应用于文本。 |
+  | to_dict() | 将审计证书转换为标准化的数据记录以归档。 |
+
+- Glossary:
+  - **C3协议**：高可信取证系统中使用的三方验证架构（创建者、检查者、见证人）。
+  - **叙事**：此处指调查过程中AI系统产生的一系列顺序文本陈述。
+  - **封存**：将取证工件最终定稿的不可逆行为，使其成为可在法庭采纳的证据。
+  - **威胁模式**：可识别的攻击特征，由OWASP LLM 2025分类法、Gemini“Lethal”案例或Carnegie模式定义。
+  - **确定性整数运算**：仅使用整数的数学运算，确保同一输入下每次审计产生完全相同的结果。
+  - **注入**：向数据流中未经授权插入内容。
+  - **取证工件**：以完整性保证保存的数字对象，用于调查或法律目的。
+
+- Scientific Note:
+  【科学说明】
+  皮尔斯、艾柯与格赖斯的术语指向形式符号学框架，而非神秘主义。查尔斯·桑德斯·皮尔斯的符号学理论、翁贝托·艾柯的诠释代码以及赫伯特·保罗·格赖斯的会话准则，其运作方式类似于调谐至特定波长的光学传感器：它们是范畴化检测滤波器。正如光谱仪通过精确的发射谱线识别化学物质，这些框架通过精确的逻辑特征识别语义异常。当审计器标记“合作原则违例”或“非意图阐释项”时，它执行的是基于整数的确定性状态分类，而非召唤超自然力量。审计器是一枚符号学传感器；叙事即其待检样本。
+
+License line at the end: ""
+
+Also need to mention the module path discrepancy? The user says MODULE PATH: vigia/core/narrative_auditor.py but MODULE DOCSTRING: vigia/security/narrative_auditor.py. I should probably note this in a metadata/header section but since it's documentation for scientists, maybe mention the canonical path and note the docstring reference. Or just present it as `vigia/core/narrative_auditor.py` and maybe add a note. I'll add a small note in the intro/header.
+
+Wait, the user says "Generate the complete academic document now. Be thorough but concise." So I should output a single Markdown document with all 4 languages.
+
+Let's organize:
+
+```markdown
+# Module Documentation: `vigia/core/narrative_auditor.py`
+
+> **System Path:** `vigia/core/narrative_auditor.py`  
+> **Docstring Reference:** `vigia/security/narrative_auditor.py`  
+> **Title:** Narrative Injection Auditor — C3 Multi-Agent Validation  
+> **Authors:** Kimi (Moonshot AI) — Forensic Systems Specialist; Claude (Anthropic) — Systems Integration Engineer  
+> 
+
+---
+
+## ENGLISH
+
+### What Is This Module?
+...
+
+### Key Concepts
+...
+
+### Glossary
+...
+
+### 【Scientific Note】
+...
+
+---
+
+## ESPAÑOL
+...
+
+---
+
+## РУССКИЙ
+...
+
+---
+
+## 中文
+...
+
+---
+
+
+```
+
+Actually, the license should appear in each section or at least once. The requirement says "License line: ..." I'll put it at the very bottom, and maybe in the header.
+
+Need to ensure no floating-point math explanations. I must avoid saying things like "probability scores between 0.0 and 1.0". Instead, use integer severity levels, integer counts, exact thresholds.
+
+The module seems to audit text. The scientific note requires Peirce/Eco/Grice. In Chinese: 皮尔斯 (Peirce is standard), 艾柯 (Eco), 格赖斯 (Grice). I must use 逻辑断裂 (not 裂缝) somewhere? The user said "逻辑断裂 (not 裂缝)". I haven't used 裂缝 yet, but I should ensure if I talk about logical breaks, I use 逻辑断裂. Let me check if there's a natural place. The prompt mentions "逻辑断裂 (not 裂缝)" specifically. I should probably include it in the Chinese section, maybe in the glossary or key concepts as the preferred term for logical fracture/break. Let me incorporate it.
+
+In the Chinese section, under Key Concepts or Glossary:
+- 逻辑断裂: 叙事中违反既定推理链的精确断裂点。 (instead of 裂缝).
+
+Also "取证工件" instead of "制品". I used 取证工件. Good.
+
+Need to make sure the scientific note uses the sensor analogy explicitly.
+
+Double check: "艾柯 (not Eco), 格赖斯 (not Grice), 取证工件 (not 制品), 逻辑断裂 (not 裂缝)". I have 艾柯, 格赖斯, 取证工件. I need to use 逻辑断裂 explicitly. I'll add it to the Chinese glossary or table.
+
+Let's refine the Chinese text to ensure natural academic tone.
+
+Chinese scientific note: "皮尔斯" is standard for Peirce. Good. "翁贝托·艾柯". Good. "赫伯特·保罗·格赖斯" or just "格赖斯". Good.
+
+Check РУССКИЙ: "Пирс" (Peirce), "Эко" (Eco), "Грайс" (Grice). Good.
+
+Check ESPAÑOL: "Peirce", "Eco", "Grice". Good.
+
+Check ENGLISH: "Peirce", "Eco", "Grice". Good.
+
+I need to ensure deterministic integer arithmetic emphasis. In the tables and notes, I should explicitly mention that scores are integers, counts are integers, and no floating-point approximations are used.
+
+For example, in the audit() function description: "The audit process enumerates threats using exact integer counts. Severity is classified into integer tiers (e.g., 1, 2, 3) rather than continuous scores. All threshold comparisons are performed with strict integer equality or ordering, ensuring deterministic, reproducible verdicts."
+
+I should probably mention that `to_dict()` produces a serialization of these integer states.
+
+Now, what about the cut-off text in the prompt? "Si hay threats CRITICAL" and "Args: narrative: Lista de líneas de narrativa investigation_id: ID de la". I don't have full info, so I'll describe them generally based on standard practices and the partial info. The prompt says "Generate documentation for the following Python module" and gives partial code/docstring. I should document what is provided and note that full implementation details follow the C3 protocol. Since the audience doesn't know Python, exact function signatures are less important than the conceptual role.
+
+Let's assemble the final document. I'll make sure it's clean Markdown.
+
+One concern: The user wants "Key concepts with tables". I should probably have two tables: one for architectural concepts, one for the module components (classes/functions). That covers it well.
+
+Also "threats CRITICAL" — in the English section, under the function description, I can say: "If any threats are classified at the CRITICAL integer severity tier, the audit result blocks the sealing operation." This is deterministic.
+
+Let's write it out.
+
+Header:
+```
+# Narrative Injection Auditor — C3 Multi-Agent Validation
+**Module Path:** `vigia/core/narrative_auditor.py`  
+**Docstring Registry:** `vigia/security/narrative_auditor.py`  
+**Authors:** Kimi (Moonshot AI), Forensic Systems Specialist; Claude (Anthropic), Systems Integration Engineer  
+
+```
+
+Then ENGLISH.
+
+ENGLISH content:
+
+### What Is This Module?
+This module serves as an **independent verification layer** within a multi-agent forensic pipeline. Its sole purpose is to inspect a machine-generated narrative—a sequential text stream produced by an AI agent—for evidence of tampering, content injection, or logical fracture before that narrative is permanently sealed as a forensic artifact.
+
+The module does not generate, paraphrase, or modify content. It validates. It enforces the **C3 protocol**: one agent generates the narrative (Claude), a second agent audits it (the NarrativeAuditor), and a human operator serves as the final witness. By separating these processes, the system ensures that an attacker capable of compromising the narrative generator cannot simultaneously compromise the auditor.
+
+All judgments inside the auditor rely on **deterministic integer arithmetic**: threat counts, severity tiers, and pass/fail thresholds are computed using exact whole-number operations, never floating-point approximations. This guarantees bit-identical results across every execution.
+
+### Key Concepts
+
+| Concept | Description | Scientific Role |
+|---|---|---|
+| **C3 Multi-Agent Validation** | A three-stage pipeline: Generator → Validator → Witness. | Eliminates single-point failure through strict process separation. |
+| **Narrative Injection** | The unauthorized insertion of misleading, adversarial, or harmful content into an AI-generated text stream. | Threat vector detected via semantic and syntactic invariants. |
+| **Deterministic Integer Arithmetic** | All scoring, tallying, and threshold evaluations use exact integer operations without rounding. | Ensures reproducible, bit-identical audit verdicts across runs. |
+| **OWASP LLM 2025 Taxonomy** | A standardized catalog of vulnerabilities specific to large language models. | Reference pattern library for recognized attack signatures. |
+| **Qwen P0 Invariants** | Deterministic protocol rules (from the Qwen P0 standard) that must remain unviolated during audit. | Fixed logical constraints enforced through integer-state checks. |
+| **Separation of Processes** | The auditor executes in a logically isolated space from the generator. | Prevents a single attacker from controlling both roles at once. |
+| **Logical Fracture** | A precise break in the chain of reasoning within the narrative. | Indicates potential manipulation or inconsistent argumentation. |
+
+| Module Component | Plain-Language Function |
+|---|---|
+| **NarrativeAuditor** | The independent inspector that reads the narrative line-by-line and applies detection rules. |
+| **ThreatDetected** | A structured record indicating which line carries a problem and its integer severity class. |
+| **NarrativeAuditResult** | The final certificate stating whether the narrative is clean, contains warnings, or is contaminated. |
+| **audit_narrative_before_seal()** | The procedural checkpoint invoked immediately before the narrative is finalized as evidence. |
+| **audit()** | The core review operation that applies the pattern taxonomy to every line of text. |
+| **to_dict()** | Converts the audit certificate into a standardized, archivable data record. |
+
+### Glossary
+- **C3 Protocol**: A tripartite validation architecture (Creator, Checker, Witness) used in high-assurance forensic systems.
+- **Narrative**: In this context, a sequential list of text statements produced by an AI system during an investigation.
+- **Sealing**: The irreversible act of finalizing a forensic artifact so it becomes court-admissible evidence.
+- **Threat Pattern**: A recognizable signature of attack, defined by the OWASP LLM 2025 taxonomy, Gemini "Lethal" cases, or Carnegie patterns.
+- **Deterministic Integer Arithmetic**: Mathematical operations using whole numbers only, ensuring every audit produces the exact same integer-based result given the same input.
+- **Injection**: The unauthorized insertion of content into a data stream.
+- **Forensic Artifact**: A digital object preserved with integrity guarantees for investigative or legal purposes.
+- **Logical Fracture**: A deterministic rupture in the inferential structure of the narrative, flagged when integer-state checks reveal broken premises.
+
+### 【Scientific Note】
+> **Semiotics as Sensor Architecture**
+> 
+> The terminology of Peirce, Eco, and Grice refers to formal semiotic frameworks—not mysticism. Charles Sanders Peirce’s theory of signs, Umberto Eco’s codes of interpretation, and H. Paul Grice’s conversational maxims operate like optical sensors tuned to specific wavelengths: they are categorical detection filters. Just as a spectrometer identifies a chemical by its exact emission lines, these frameworks identify semantic anomalies by their exact logical signatures. When the auditor flags a "violation of the cooperative principle" or an "unintended interpretant," it is performing a deterministic, integer-based state classification—not invoking supernatural forces. The auditor is a semiotic sensor; the narrative is its specimen.
+
+---
+
+Then ESPAÑOL.
+
+ESPAÑOL content:
+
+### ¿Qué es este módulo?
+Este módulo funciona como una **capa de verificación independiente** dentro de una canalización forense multiagente. Su único propósito es inspeccionar una narrativa generada por máquina—un flujo secuencial de texto producido por un agente de IA—en busca de evidencia de alteración, inyección de contenido o **fractura lógica** antes de que dicha narrativa se selle permanentemente como artefacto forense.
+
+El módulo no genera, parafrasea ni modifica contenido. Valida. Aplica el **protocolo C3**: un agente genera la narrativa (Claude), un segundo agente la audita (NarrativeAuditor) y un operador humano actúa como testigo final. Al separar estos procesos, el sistema asegura que un atacante capaz de comprometer el generador no pueda comprometer simultáneamente al auditor.
+
+Todos los juicios internos del auditor se basan en **aritmética entera determinista**: los recuentos de amenazas, los niveles de severidad y los umbrales de aprobación/rechazo se computan con operaciones exactas de números enteros, nunca con aproximaciones de coma flotante. Esto garantiza resultados bit-a-bit idénticos en cada ejecución.
+
+### Conceptos clave
+
+| Concepto | Descripción | Rol científico |
+|---|---|---|
+| **Validación multiagente C3** | Canalización de tres etapas: Generador → Validador → Testigo. | Elimina el fallo de punto único mediante separación estricta de procesos. |
+| **Inyección narrativa** | Inserción no autorizada de contenido engañoso, adversarial o dañino en un flujo de texto gener
+---
+*Licensed under the Apache License, Version 2.0. Copyright 2026 Anna Tchijova.*

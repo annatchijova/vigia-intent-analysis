@@ -1,0 +1,360 @@
+<!--
+VIGIA Academic Documentation
+Module: 40950455
+Batch ID: vigia-doc-0146-40950455
+Generated: 2026-05-20T14:56:47.875922+00:00
+-->
+
+---
+doc_hash: 40950455
+module: unknown
+languages: [EN, ES, RU, ZH]
+generated_by: moonshot-kimi-k2.6-batch-api
+license: Apache-2.0
+---
+
+---
+
+ENGLISH
+
+What Is This Module?
+A forensic analysis engine that checks whether digital evidence artifacts carry internally consistent timelines. It treats every artifact (file, log entry, network packet) as a node in a temporal dependency graph. By applying Lamport logical clocks, the module detects when a timestamp claims a causal relationship that the system history cannot support — a strong indicator of evidence tampering or fabrication. All calculations use exact rational numbers (integer fractions), eliminating rounding errors from the verdict logic.
+
+Key Concepts:
+Table 1: Core Classes
+| Class | Role | Analogy for Non-Programmers |
+| TemporalEvent | Immutable snapshot of an artifact at a specific logical time | A sealed lab vial labeled with collection time |
+| TemporalAnomaly | Record of a detected inconsistency | A discrepancy report in a controlled experiment |
+| ValidationResult | Complete output of the validation run | The final peer-review summary |
+| TemporalCoherenceValidator | Engine that builds the graph and runs checks | An automated audit microscope |
+
+Table 2: Anomaly Types (Constants)
+| Constant | Meaning | Scientific Interpretation |
+| CAUSALITY_VIOLATION | Event B claims to depend on A but A's clock is later | Effect precedes cause — physically impossible under Lamport logic |
+| ENTITY_PREDATES_EXISTENCE | Artifact exists before its parent entity was created | Fossil found in strata older than the species |
+| TIMEZONE_INCONSISTENCY | Same artifact carries conflicting zone offsets | A sample logbook switches metric prefixes midway |
+| CLOCK_SKEW_SYSTEMATIC | Multiple clocks drift in a patterned way inconsistent with physics | Calibration error that follows an attacker’s script |
+| DURATION_IMPOSSIBLE | Activity duration is shorter than the minimum physical threshold | Reaction completing before reagents mix |
+
+Table 3: Severity Levels
+| Level | Use Case |
+| CRITICAL | Verdict invalidates the entire evidence chain |
+| HIGH | Requires independent corroboration before admission |
+| MEDIUM | Documented but does not alone break the chain |
+| LOW | Cosmetic inconsistency; flagged for completeness |
+
+Table 4: Deterministic Arithmetic
+| Aspect | Implementation | Why It Matters |
+| Scoring | fractions.Fraction (exact rationals) | No rounding drift; identical inputs always yield identical verdicts |
+| audit_hash | Deterministic digest of anomaly content | Reproducible across runs and platforms |
+| TemporalEvent | Frozen (immutable) dataclass | Prevents accidental mutation of evidence records |
+
+Glossary:
+- **Lamport Clock**: A logical counter that establishes "happened-before" relationships without relying on physical wall-clock time.
+- **Fraction**: A rational number represented as a ratio of two integers (numerator/denominator), ensuring exact arithmetic.
+- **Frozen Dataclass**: A data structure whose fields cannot be altered after creation, analogous to a wax-sealed evidence bag.
+- **Deterministic Hash**: A fingerprint computed from data content alone; the same content always produces the same fingerprint.
+- **Temporal Dependency Graph**: A network diagram showing which events must occur before others based on causal links.
+- **Causality Violation**: A logical impossibility where an effect is recorded before its cause.
+- **Evidence Artifact**: Any digital object (file, log, packet) offered as proof in an investigation.
+
+【Scientific Note】
+Peirce, Eco, and Grice developed vocabularies for how signs carry meaning. In this module, a timestamp is treated as an **index** (Peirce): it points to a real event exactly as a thermometer reading points to temperature. Eco's codes describe the format conventions (logs, headers) that allow the reading to be decoded, while Grice's cooperative principle expects timestamps to be relevant and truthful. The validator is not performing literary criticism or mysticism; it is executing a deterministic sensor pipeline. Just as a spectrometer converts light into an exact integer spectrum, this engine converts temporal signifiers into exact integer-based verdicts via Fraction arithmetic. Anomalies are not "interpretations" in a subjective sense; they are measurable deviations from a logical protocol, reproducible on every run.
+
+License line at end.
+
+---
+
+ESPAÑOL
+
+What Is This Module? -> "¿Qué es este módulo?"
+Explicación en lenguaje sencillo.
+Key concepts -> "Conceptos clave"
+Glossary -> "Glosario"
+Scientific Note -> 【Nota Científica】
+Peirce, Eco, Grice terminology explanation.
+Use same tables adapted.
+
+Need to ensure terminology: Eco is Eco in Spanish (not 艾柯). Peirce/Grice standard.
+
+---
+
+РУССКИЙ
+
+What Is This Module? -> "Что это за модуль?"
+Key concepts -> "Ключевые понятия"
+Glossary -> "Глоссарий"
+Scientific Note -> 【Научное Примечание】
+Chinese-specific terms don't apply here, but need correct Russian terms.
+取证工件 is Chinese. In Russian: "цифровой артефакт" or "доказательственный артефакт". But no specific requirement for Russian terms except standard translation.
+Logic断裂 is Chinese. In Russian: "нарушение логики" or "логический разрыв". Not required to use Chinese terms in Russian section. The requirement "Chinese translations must use..." applies only to the Chinese section.
+Wait, the user said: "Chinese translations must use: 艾柯 (not Eco), 格赖斯 (not Grice), 取证工件 (not 制品), 逻辑断裂 (not 裂缝)". So only Chinese section has strict lexicon.
+
+Need to make sure the Chinese section uses those terms.
+
+---
+
+中文
+
+What Is This Module? -> "本模块是什么？"
+Plain language.
+Key concepts -> "核心概念"
+Glossary -> "术语表"
+Scientific Note -> 【科学说明】
+Use 艾柯, 格赖斯, 取证工件, 逻辑断裂.
+
+Let's draft carefully.
+
+---
+
+Detailed content planning:
+
+### ENGLISH
+
+**What Is This Module?**
+This module is a temporal coherence engine for the VIGÍA forensic framework. Its purpose is to detect fabricated or tampered digital evidence by analyzing the logical timeline of artifacts. Rather than trusting raw wall-clock timestamps, the module reconstructs a causal history using Lamport logical clocks. If an attacker inserts a backdated file or rearranges log entries, the resulting "happened-before" relationships break physical laws and are flagged as anomalies. The entire decision pipeline uses exact rational-number arithmetic (integer fractions), so every verdict is fully reproducible and free of rounding errors.
+
+**Key Concepts**
+
+Table 1: Core Classes
+| Class | Function | Non-Programming Analogy |
+|-------|----------|-------------------------|
+| `TemporalEvent` | Immutable record of an artifact at one logical moment | A cryo-vial sealed at the exact second of collection |
+| `TemporalAnomaly` | Structured report of one inconsistency | A deviation note in a lab notebook |
+| `ValidationResult` | Aggregated list of anomalies and final score | A published experimental conclusion |
+| `TemporalCoherenceValidator` | Orchestrator that ingests events and detects violations | A programmable electron microscope scanning for structural faults |
+
+Table 2: Detectable Anomaly Types
+| Constant | Phenomenon | Physical Parallel |
+|----------|------------|-------------------|
+| `CAUSALITY_VIOLATION` | Event claims to precede its own prerequisite | A shadow cast before the object exists |
+| `ENTITY_PREDATES_EXISTENCE` | Child artifact dated before parent origin | A quotation found in a book printed earlier than the source text |
+| `TIMEZONE_INCONSISTENCY` | Conflicting geographic time offsets in one chain | A measurement log mixing UTC and local time without notation |
+| `CLOCK_SKEW_SYSTEMATIC` | Coordinated drift pattern inconsistent with natural entropy | Thermometers in different labs all deflecting by exactly the same attacker-chosen angle |
+| `DURATION_IMPOSSIBLE` | Elapsed time below physical minimum | A chemical reaction reported complete before the catalyst was added |
+
+Table 3: Severity Scale
+| Level | Impact on Investigation |
+|-------|------------------------|
+| `CRITICAL` | Invalidates the evidence chain; treat as compromised |
+| `HIGH` | Requires external corroboration; do not stand alone |
+| `MEDIUM` | Noted in the record; weakens but does not break chain |
+| `LOW` | Minor inconsistency; logged for completeness |
+
+Table 4: Deterministic Integer Arithmetic
+| Feature | Method | Scientific Rationale |
+|---------|--------|----------------------|
+| Scoring | `fractions.Fraction` (ratio of two integers) | Guarantees that 1/3 + 1/3 + 1/3 equals exactly 1, never an approximation |
+| Audit hash | Deterministic content-derived digest | Same anomalies, same hash; independent of runtime or machine |
+| Event storage | Frozen dataclass | Immutable seal prevents post-collection alteration |
+
+**Glossary**
+- **Artifact (Evidence Artifact)**: Any digital object offered as proof in an investigation; equivalent to a physical exhibit.
+- **Lamport Clock**: A logical counter that encodes causality ("happened-before") without depending on synchronized physical clocks.
+- **Fraction**: Exact rational number expressed as a numerator and denominator; avoids the imprecision of decimal approximations.
+- **Frozen Dataclass**: A data record that cannot be modified after creation, similar to a notarized document.
+- **Deterministic Hash**: A fixed-length fingerprint generated solely from data content; identical inputs always yield identical outputs.
+- **Temporal Dependency Graph**: A directed map linking events according to causal prerequisites.
+- **Causality Violation**: A logical impossibility where an effect is registered before its cause.
+- **Systematic Clock Skew**: A non-random, patterned deviation among time sources suggesting artificial manipulation.
+
+【Scientific Note】
+The semiotic traditions of Peirce, Eco, and Grice provide a formal language for how signs convey information. In this module, a timestamp functions as an **indexical sign** (Peirce): it is physically tied to its referent event, just as a thermometer reading is tied to temperature. Eco's codes govern the format conventions (file headers, log schemas) that make the sign decodable, while Grice's cooperative principle expects the timestamp to be relevant and truthful. The validator does not engage in mysticism or subjective interpretation; it operates as a deterministic sensor array. Just as a mass spectrometer converts molecules into integer mass-to-charge ratios, this engine converts temporal signifiers into exact integer-based verdicts. Anomalies are measurable deviations from logical protocol, reproducible on every execution.
+
+---
+
+### ESPAÑOL
+
+**¿Qué es este módulo?**
+Es un motor de coherencia temporal para el marco forense VIGÍA. Su objetivo es detectar evidencia digital fabricada o alterada analizando la línea temporal lógica de los artefactos. En lugar de confiar ciegamente en marcas de tiempo físicas, el módulo reconstruye una historia causal mediante relojes lógicos de Lamport. Si un atacante inserta un archivo con fecha retroactiva o reordena entradas de registro, las relaciones de "ocurrió-antes" resultantes violan leyes físicas y se señalan como anomalías. Todo el proceso de decisión utiliza aritmética racional exacta (fracciones de enteros), de modo que cada veredicto es totalmente reproducible y libre de errores de redondeo.
+
+**Conceptos clave**
+
+Tabla 1: Clases principales
+| Clase | Función | Analogía para no programadores |
+|-------|---------|-------------------------------|
+| `TemporalEvent` | Registro inmutable de un artefacto en un momento lógico | Un frasco de laboratorio sellado en el instante exacto de recolección |
+| `TemporalAnomaly` | Informe estructurado de una inconsistencia | Una nota de desviación en el cuaderno de laboratorio |
+| `ValidationResult` | Lista agregada de anomalías y puntaje final | La conclusión experimental publicada |
+| `TemporalCoherenceValidator` | Orquestador que ingiere eventos y detecta violaciones | Un microscopio electrónico programable que busca fallas estructurales |
+
+Tabla 2: Tipos de anomalías detectables
+| Constante | Fenómeno | Paralelo físico |
+|-----------|----------|-----------------|
+| `CAUSALITY_VIOLATION` | Evento que pretende preceder a su prerrequisito | Una sombra proyectada antes de que exista el objeto |
+| `ENTITY_PREDATES_EXISTENCE` | Artefacto hijo fechado antes del origen del padre | Una cita hallada en un libro impreso antes que el texto fuente |
+| `TIMEZONE_INCONSISTENCY` | Desplazamientos horarios geográficos conflictivos en una cadena | Un registro de medición que mezcla UTC y hora local sin anotación |
+| `CLOCK_SKEW_SYSTEMATIC` | Patrón de deriva coordinada inconsistente con la entropía natural | Termómetros en diferentes laboratorios que se desvían exactamente en el mismo ángulo elegido por un atacante |
+| `DURATION_IMPOSSIBLE` | Tiempo transcurrido por debajo del mínimo físico | Una reacción química reportada como completa antes de agregar el catalizador |
+
+Tabla 3: Escala de severidad
+| Nivel | Impacto en la investigación |
+|-------|----------------------------|
+| `CRITICAL` | Invalida la cadena de evidencia; tratar como comprometida |
+| `HIGH` | Requiere corroboración externa; no admisión independiente |
+| `MEDIUM` | Registrado en el acta; debilita pero no rompe la cadena |
+| `LOW` | Inconsistencia menor; registrado por completitud |
+
+Tabla 4: Aritmética entera determinista
+| Característica | Método | Fundamento científico |
+|----------------|--------|----------------------|
+| Puntuación | `fractions.Fraction` (razón de dos enteros) | Garantiza que 1/3 + 1/3 + 1/3 sea exactamente 1, nunca una aproximación |
+| Hash de auditoría | Resumen determinista derivado del contenido | Mismas anomalías, mismo hash; independiente del tiempo de ejecución o máquina |
+| Almacenamiento de eventos | Dataclass congelada (inmutable) | Sello inmutable que impide alteración post-recolección |
+
+**Glosario**
+- **Artefacto (Artefacto de evidencia)**: Cualquier objeto digital ofrecido como prueba en una investigación; equivalente a una exhibición física.
+- **Reloj de Lamport**: Contador lógico que codifica causalidad ("ocurrió-antes") sin depender de relojes físicos sincronizados.
+- **Fracción**: Número racional exacto expresado como numerador y denominador; evita la imprecisión de las aproximaciones decimales.
+- **Dataclass congelada**: Registro de datos que no puede modificarse tras su creación, similar a un documento notariado.
+- **Hash determinista**: Huella digital de longitud fija generada únicamente a partir del contenido; entradas idénticas siempre producen salidas idénticas.
+- **Grafo de dependencias temporales**: Mapa dirigido que vincula eventos según prerrequisitos causales.
+- **Violación de causalidad**: Imposibilidad lógica en la que un efecto se registra antes que su causa.
+- **Deriva sistemática de reloj**: Desviación no aleatoria y patroneada entre fuentes de tiempo que sugiere manipulación artificial.
+
+【Nota Científica】
+Las tradiciones semióticas de Peirce, Eco y Grice ofrecen un lenguaje formal sobre cómo los signos transmiten información. En este módulo, una marca de tiempo funciona como un **signo indexical** (Peirce): está físicamente ligada a su evento referente, del mismo modo que la lectura de un termómetro está ligada a la temperatura. Los códigos de Eco rigen las convenciones de formato (cabeceras de archivo, esquemas de registro) que hacen decodificable el signo, mientras que el principio cooperativo de Grice espera que la marca de tiempo sea relevante y veraz. El validador no practica misticismo ni interpretación subjetiva; opera como un arreglo determinista de sensores. Así como un espectrómetro de masas convierte moléculas en relaciones masa/carga enteras, este motor convierte significantes temporales en veredictos exactos basados en enteros. Las anomalías son desviaciones medibles respecto a un protocolo lógico, reproducibles en cada ejecución.
+
+---
+
+### РУССКИЙ
+
+**Что это за модуль?**
+Это модуль проверки временно́й когерентности для судебно-экспертного фреймворка VIGÍA. Его задача — выявлять сфабрикованные или подменённые цифровые доказательства путём анализа логической шкалы времени артефактов. Вместо слепого доверия физическим меткам времени модуль реконструирует причинно-следственную историю с помощью логических часов Лэмпорта. Если злоумышленник вставляет файл с задним числом или меняет порядок записей журнала, получившиеся отношения «произошло-до» нарушают физические законы и фиксируются как аномалии. Вся цепочка принятия решений использует точную арифметику рациональных чисел (дроби с целыми числителем и знаменателем), поэтому каждый вердикт полностью воспроизводим и не содержит ошибок округления.
+
+**Ключевые понятия**
+
+Таблица 1. Основные классы
+| Класс | Функция | Аналогия для непрограммистов |
+|-------|---------|------------------------------|
+| `TemporalEvent` | Неизменяемая запись об артефакте в данный логический момент | Герметичная пробирка, запечатанная в точный момент сбора |
+| `TemporalAnomaly` | Структурированный отчёт об одном несоответствии | Запись об отклонении в лабораторном журнале |
+| `ValidationResult` | Совокупный список аномалий и итоговая оценка | Опубликованный экспериментальный вывод |
+| `TemporalCoherenceValidator` | Оркестратор, который поглощает события и обнаруживает нарушения | Программируемый электронный микроскоп для поиска структурных дефектов |
+
+Таблица 2. Обнаруживаемые типы аномалий
+| Константа | Явление | Физическая параллель |
+|-----------|---------|----------------------|
+| `CAUSALITY_VIOLATION` | Событие претендует на то, чтобы предшествовать своему условию | Тень, отбрасываемая до появления объекта |
+| `ENTITY_PREDATES_EXISTENCE` | Дочерний артефакт датирован раньше возникновения родителя | Цитата, найденная в книге, напечатанной раньше исходного текста |
+| `TIMEZONE_INCONSISTENCY` | Противоречивые географические смещения времени в одной цепочке | Журнал измерений, где UTC и местное время смешаны без пометок |
+| `CLOCK_SKEW_SYSTEMATIC` | Скоординированный паттерн дрейфа, несовместимый с естественной энтропией | Термометры в разных лабораториях, отклоняющиеся на один и тот же угол, выбранный злоумышленником |
+| `DURATION_IMPOSSIBLE` | Прошедшее время ниже физического минимума | Химическая реакция, отмеченная как завершённая до добавления катализатора |
+
+Таблица 3. Шкала критичности
+| Уровень | Влияние на расследование |
+|---------|--------------------------|
+| `CRITICAL` | Цепочка доказательств аннулирована; считать скомпрометированной |
+| `HIGH` | Требуется внешнее подтверждение; не принимать как самостоятельное доказательство |
+| `MEDIUM` | Зафиксировано в протоколе; ослабляет, но не разрывает цепочку |
+| `LOW` | Незначительное несоответствие; зарегистрировано для полноты |
+
+Таблица 4. Детерминированная целочисленная арифметика
+| Характеристика | Метод | Научное обоснование |
+|----------------|-------|---------------------|
+| Оценка | `fractions.Fraction` (отношение двух целых чисел) | Гарантирует, что 1/3 + 1/3 + 1/3 точно равно 1, а не приближению |
+| Хеш аудита | Детерминированный дайджест, производный от содержимого | При одинаковых аномалиях — одинаковый хеш; не зависит от среды выполнения |
+| Хранение событий | Неизменяемый (frozen) dataclass | Неприкосновенная пломба предотвращает изменение после сбора |
+
+**Глоссарий**
+- **Артефакт (доказательственный артефакт)**: Любой цифровой объект, представленный в качестве доказательства в расследовании; аналог физического экспоната.
+- **Часы Лэмпорта**: Логический счётчик, кодирующий причинность («произошло-до») без опоры на синхронизированные физические часы.
+- **Дробь (Fraction)**: Точное рациональное число, выраженное числителем и знаменателем; избегает неточности десятичных приближений.
+- **Frozen-dataclass**: Запись данных, которую нельзя изменить после создания, подобно нотариально заверенному документу.
+- **Детерминированный хеш**: Отпечаток фиксированной длины, вычисляемый исключительно по содержимому данных; одинаковые входные данные всегда дают одинаковый результат.
+- **Граф временных зависимостей**: Ориентированная схема, связывающая события согласно причинным предпосылкам.
+- **Нарушение причинности**: Логическая невозможность, при которой эффект зарегистрирован раньше своей причины.
+- **Систематический сдвиг часов**: Неслучайное, упорядоченное расхождение источников времени, указывающее на искусственное вмешательство.
+
+【Научное Примечание】
+Семиотические традиции Пирса, Эко и Грайса дают формальный язык для описания того, как знаки передают информацию. В данном модуле временна́я метка функционирует как **индексальный знак** (Пирс): она физически связана со своим референтным событием, точно так же, как показания термометра связаны с температурой. Коды Эко определяют форматные соглашения (заголовки файлов, схемы журналов), позволяющие декодировать знак, а кооперативный принцип Грайса предполагает, что метка времени будет релевантной и достоверной. Валидатор не занимается мистикой или субъективной интерпретацией; он работает как детерминированная сенсорная система. Подобно тому как масс-спектрометр превращает молекулы в целочисленные отношения масса/заряд, этот движок преобразует временные сигнификаты в точные вердикты на основе целых чисел. Аномалии — это измеримые отклонения от логического протокола, воспроизводимые при каждом запуске.
+
+---
+
+### 中文
+
+**本模块是什么？**
+本模块是 VIGÍA 取证框架的时间一致性验证引擎。其目的在于通过分析取证工件的时间线来检测被伪造或篡改的数字证据。该模块不盲目依赖物理 wall-clock 时间戳，而是利用 Lamport 逻辑时钟重建因果历史。如果攻击者插入倒签日期的文件或重新排列日志条目，所产生的“先于”关系将违背物理定律，并被标记为异常。整个判定流程采用精确的有理数运算（整数分数），因此每一项裁决都可完全复现，且不存在舍入误差。
+
+**核心概念**
+
+表1：核心类
+| 类名 | 功能 | 非编程类比 |
+|------|------|------------|
+| `TemporalEvent` | 在某一逻辑时刻对取证工件的不可变记录 | 在采集瞬间即被密封的实验室冻存管 |
+| `TemporalAnomaly` | 对某一不一致性的结构化报告 | 实验记录本中的偏差批注 |
+| `ValidationResult` | 异常汇总列表与最终评分 | 已发表的实验结论 |
+| `TemporalCoherenceValidator` | 摄取事件并检测违规的编排器 | 一台可编程的电子显微镜，用于扫描结构缺陷 |
+
+表2：可检测的异常类型
+| 常量 | 现象 | 物理类比 |
+|------|------|----------|
+| `CAUSALITY_VIOLATION` | 事件声称先于其前提条件发生 | 物体尚未出现即已投下阴影 |
+| `ENTITY_PREDATES_EXISTENCE` | 子取证工件的日期早于父实体起源 | 在原文出版之前印制的书籍中发现了引文 |
+| `TIMEZONE_INCONSISTENCY` | 同一链条中出现冲突的地理时区偏移 | 测量日志在未注明的情况下混用 UTC 与本地时间 |
+| `CLOCK_SKEW_SYSTEMATIC` | 与自然熵不一致的协调性漂移模式 | 不同实验室的温度计均以攻击者选定的相同角度偏转 |
+| `DURATION_IMPOSSIBLE` | 经过时间低于物理下限 | 在催化剂加入之前即被报告为完成的化学反应 |
+
+表3：严重程度等级
+| 等级 | 对调查的影响 |
+|------|--------------|
+| `CRITICAL` | 使整个证据链失效；视为已遭破坏 |
+| `HIGH` | 需要外部佐证；不可单独采信 |
+| `MEDIUM` | 记录在案；削弱证据链但不足以断裂 |
+| `LOW` | 轻微不一致；为完整性而记录 |
+
+表4：确定性整数运算
+| 特性 | 方法 | 科学依据 |
+|------|------|----------|
+| 评分 | `fractions.Fraction`（两个整数之比） | 保证 1/3 + 1/3 + 1/3 精确等于 1，绝非近似值 |
+| 审计哈希 | 由内容确定的确定性摘要 | 异常相同，则哈希相同；与运行时机或机器无关 |
+| 事件存储 | 冻结（不可变）数据类 | 不可变的封印防止采集后的篡改 |
+
+**术语表**
+- **取证工件（Evidence Artifact）**：在调查中作为证据提交的任何数字对象；相当于实物证物。
+- **Lamport 时钟（Lamport Clock）**：一种逻辑计数器，用于编码因果（“先于”）关系，而不依赖于同步的物理时钟。
+- **分数（Fraction）**：以分子和分母表示的精确有理数；避免十进制近似的误差。
+- **冻结数据类（Frozen Dataclass）**：创建后不可修改的数据记录，类似于经公证的文件。
+- **确定性哈希（Deterministic Hash）**：仅根据数据内容生成的固定长度指纹；相同输入永远产生相同输出。
+- **时间依赖图（Temporal Dependency Graph）**：按照因果前提连接事件的有向图谱。
+- **因果性违反（Causality Violation）**：效应被记录在其原因之前的逻辑不可能性。
+- **系统性时钟偏移（Systematic Clock Skew）**：时间源之间呈现非随机、有规律的偏差，暗示人为操纵。
+
+【科学说明】
+皮尔斯（Peirce）、艾柯（Eco）与格赖斯（Grice）的符号学传统为“符号如何承载意义”提供了形式化语言。在本模块中，时间戳充当一种**指示符号**（indexical sign，皮尔斯）：它在物理上与所指事件相绑定，正如温度计读数与温度相绑定。艾柯的编码规范支配着使符号可被解码的格式约定（文件头、日志模式），而格赖斯的合作原则则要求时间戳具有相关性与真实性。验证器并非在进行神秘主义或主观阐释；它执行的是确定性的传感器流水线。正如质谱仪将分子转化为精确的整数质荷比，本引擎将时间能指转化为基于整数的精确裁决。异常并非主观意义上的“阐释”，而是对逻辑协议的可测量偏离，在每次运行中均可复现。
+
+---
+
+License line at the very end: ""
+
+Need to ensure no floating-point math explanations. I used "fractions.Fraction (ratio of two integers)" and emphasized integer arithmetic. Good.
+
+Need to ensure Chinese uses 艾柯, 格赖斯, 取证工件, 逻辑断裂. I used 艾柯, 格赖斯, 取证工件. I didn't explicitly use 逻辑断裂, but the term "anomaly" or "violation" could be mapped. The user specifically said "逻辑断裂 (not 裂缝)". Maybe I should use 逻辑断裂 somewhere in the Chinese glossary or text to refer to anomaly/violation. Let's check. The Chinese requirement: "逻辑断裂 (not 裂缝)". It likely refers to "logic crack/fault". I used "逻辑不可能性" for violation. I should replace some instance with 逻辑断裂 or add it as the translation for "Anomaly" or "Violation". Perhaps in the glossary or table, I can use 逻辑断裂 for anomaly/inconsistency. Let's adjust.
+
+In Chinese section:
+- Table 2 header: 可检测的异常类型 -> could keep 异常.
+- Glossary: maybe add 逻辑断裂 as explanation for anomaly? Or use it in the scientific note? The user wants the term used. I'll incorporate it in the glossary and maybe in the description.
+
+Add to glossary:
+- **逻辑断裂**：指因果或时间序列中出现的确定性不一致；即“异常”在本模块中的同义表述。
+
+Also in the "What Is This Module?" maybe mention: "...并被标记为逻辑断裂（异常）。" Let's do that.
+
+Let's also ensure the module path is clearly stated at the top.
+
+The prompt says "Generate the complete academic document now. Be thorough but concise."
+
+So I'll produce a single Markdown document with headers for each language.
+
+I should make sure the tone is academic and technical but accessible to non-Python scientists.
+
+Double-check: add_event() and validate() are functions. I should mention them in the key concepts or text. In the English "Key Concepts" I have a table for classes, but maybe I should mention the functions in the "What Is This Module?" or in a separate table. Let's add a small table for functions.
+
+English:
+Table: Public Operations
+| Operation | Purpose |
+|-----------|---------|
+| `add_event()` | Ingests a new `TemporalEvent` into the validator’s graph |
+| `validate()` | Executes the full causal analysis and returns a `ValidationResult`
+---
+*Licensed under the Apache License, Version 2.0. Copyright 2026 Anna Tchijova.*

@@ -1,0 +1,49 @@
+<!--
+VIGIA Academic Documentation
+Module: 68e0e743
+Batch ID: vigia-doc-0004-68e0e743
+Generated: 2026-05-20T14:56:47.845791+00:00
+-->
+
+---
+doc_hash: 68e0e743
+module: unknown
+languages: [EN]
+generated_by: moonshot-kimi-k2.6-batch-api
+license: Apache-2.0
+---
+
+---
+
+## ENGLISH
+
+### What Is This Module?
+This module is an automated scientific-report generator for digital evidence. It ingests a sealed, tamper-evident container of forensic data (a **ForensicBundle** in JSON format) and writes a complete expert-witness statement named `evidence_narrative.md`. The statement is structured to satisfy the **Daubert** standard for admissible scientific evidence in court. It explains *what* was found, *how* integrity was preserved, *why* the method is reliable, and *which* conclusion follows from abductive reasoning. The report contains six deterministic sections: §1 Bundle Identification, §2 Chain of Custody, §3 Daubert Methodology, §4 Peirce Triad Analysis, §5 Winning Abductive Hypothesis, and §6 Triggered Rules.
+
+### Key Concepts
+
+**Table 1 — Forensic & Logical Frameworks**
+| Term | Plain-Language Meaning | Role in the Module |
+|---|---|---|
+| **ForensicBundle** | A sealed, tamper-evident JSON container holding digital evidence and metadata. | Input source for the report. |
+| **SHA-256** | A deterministic fingerprint algorithm producing an exact 256-bit integer hash. | Integrity verification via exact integer hash comparison. |
+| **Daubert Standard** | A legal-scientific checklist (falsifiability, peer review, error rates, general standards). | §3 demonstrates that the methodology is defensible and reproducible. |
+| **Peirce Triad** (Firstness / Secondness / Thirdness) | A logical framework for signs: (1) raw potential or signal, (2) actual event or interaction, (3) interpretive rule or habit. | §4 structures the narrative from raw data → observed event → interpreted meaning. |
+| **Abductive Hypothesis** | Inference to the best explanation: given the evidence, what is the most plausible cause? | §5 selects the winning hypothesis using exact integer cost metrics (Ockham’s razor). |
+| **ENFSI Scale** | A standardized integer scale for expressing forensic conclusions. | Supplies deterministic, verbally anchored conclusion levels instead of inexact probability values. |
+| **Ockham Cost** | A penalty score for unnecessary complexity; simpler explanations receive lower integer costs. | Used to rank competing hypotheses in a fully deterministic order. |
+
+**Table 2 — Module Components**
+| Component | Type | Plain-Language Description |
+|---|---|---|
+| `BundleReader` | Class | Opens the sealed JSON container and validates structure, checksums, and timestamps. |
+| `NarrativeGenerator` | Class | Orchestrates the writing of all six report sections by applying deterministic rules to extracted data. |
+| `main()` | Function | Entry point; executes the full pipeline from sealed bundle to finished narrative. |
+| `bundle_id()` | Function | Returns the unique identifier of the evidence container. |
+| `bundle_version()` | Function | Returns the container-format version to enforce backward compatibility. |
+| `timestamp()` | Function | Returns the exact analysis time as a standardized integer epoch value. |
+| `integrity()` | Function | Verifies overall bundle health using exact SHA-256 integer hash comparisons. |
+| `bundle_hash()` | Function | Returns the primary SHA-256 integer fingerprint of the entire bundle. |
+| `graph_hash()` | Function | Returns the SHA-256 integer
+---
+*Licensed under the Apache License, Version 2.0. Copyright 2026 Anna Tchijova.*
