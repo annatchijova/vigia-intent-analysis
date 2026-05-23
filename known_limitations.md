@@ -156,7 +156,87 @@ module is missing.
 
 ---
 
-## Summary
+---
+
+## L-009 — NETWORK_VS_HOST as Categorical MALICE (Post-Hackathon)
+
+**Description:** `NETWORK_VS_HOST` fracture currently triggers categorical
+structural MALICE via `_STRUCTURAL_MALICE_TYPES`. A firewall/host discrepancy
+has legitimate causes: stale rules, race conditions, split-tunnel VPN, host
+telemetry lag, NAT state persistence, hypervisor forwarding, WFP desync,
+EDR packet capture delay.
+
+**Current behavior:** Any NETWORK_VS_HOST fracture forces MALICE regardless
+of corroboration.
+
+**Recommended (post-hackathon):** Downgrade to high suspicion unless
+corroborated by a second independent fracture (e.g. memory evidence of
+a rootkit hooking network APIs).
+
+**Status:** Deferred — accepted as conservative false-positive risk for
+hackathon. A forensic analyst reviewing the output will have full audit
+trail to override.
+
+---
+
+## L-010 — TIMESTAMP_PRECISION_ANOMALY Severity Overconfident (Post-Hackathon)
+
+**Description:** Trailing zeros detection uses `trailing >= 5` with
+`severity=0.95`. Modern systems can produce repeated zero-precision
+timestamps legitimately: API normalization, filesystem export truncation,
+EDR serialization, SIEM ingestion normalization, cloud sync layers.
+
+**Current behavior:** 5+ trailing zeros → severity 0.95 fracture.
+
+**Recommended (post-hackathon):** Require corroboration (pattern across
+multiple artifacts + mismatch between raw NTFS and exported values).
+Reduce standalone severity to 0.45–0.65.
+
+**Status:** Deferred — conservative by design for hackathon. Documented
+as known overconfidence.
+
+---
+
+## Future Work (Post-Hackathon Roadmap)
+
+The following architectural improvements were identified during external
+AI audit (ChatGPT, May 2026) and are deferred to post-hackathon development.
+They do not affect the current system's Daubert compliance for the
+SANS FIND EVIL 2026 submission.
+
+**FW-001 — Evidence Provenance Trust Weighting**
+Currently evidence is weighted by spoofability. Future versions should
+also weight by `collection_integrity`, `sensor_integrity`,
+`transport_integrity`, and `pipeline_integrity`. Low-spoofability evidence
+from a compromised sensor is worthless — this distinction is not yet modeled.
+
+**FW-002 — Sensor Dependency Graph**
+The Noisy-OR composite score assumes conditional independence between
+sources. In practice, Sysmon, Defender, EDR, and SIEM may all derive
+from the same ETW event. Future versions should model `sensor_origin`
+and `telemetry_dependency` to apply covariance penalties and avoid
+amplifying duplicated telemetry.
+
+**FW-003 — Provenance Chain Validation**
+`provenance_chain` field is captured but not cryptographically validated.
+Future versions should implement chain continuity verification (hash
+continuity, signer continuity, acquisition origin validation) to prevent
+forged artifact injection.
+
+**FW-004 — Benign/Break Case Integration in Canonical Corpus**
+Currently `data/cases/benign/` (15 cases) and `data/cases/converted/
+VIGIA_BREAK_*` (10 cases) exist but are not integrated into the canonical
+evaluation corpus. Integration required for empirically validated error
+rates (Daubert FW-001 compliance).
+
+**FW-005 — Carnegie Dual-Use Detector (Carnegie Module)**
+`vigia/core/carnegie_education_detector.py` is experimental and excluded
+from the hackathon submission. This module inverts Carnegie persuasion
+techniques as DFIR detectors — a key differentiator for v2.
+
+---
+
+## Updated Summary
 
 | ID | Case | VIGÍA Output | Expected | Type |
 |----|------|-------------|----------|------|
@@ -168,3 +248,6 @@ module is missing.
 | L-006 | BREAK_001 | MALICE | UNKNOWN | Design decision |
 | L-007 | corpus bias | — | — | Technical debt / Daubert |
 | L-008 | hash doc names | — | — | Presentation debt |
+| L-009 | NETWORK_VS_HOST | MALICE | SUSPICION | Post-hackathon |
+| L-010 | trailing zeros | 0.95 severity | 0.55 severity | Post-hackathon |
+| FW-001..005 | — | — | — | Future roadmap |
