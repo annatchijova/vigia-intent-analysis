@@ -1,0 +1,94 @@
+{
+  "case_id": "case_099_troyano_emocional",
+  "name": "El Troyano Emocional",
+  "description": "Mail de RRHH: 'Debido al fallecimiento de colega, recolectamos fondos. Ver PDF adjunto'. El empleado no existe en base de datos. SPF/DKIM fallan. PDF contiene JavaScript que roba tokens de sesión de navegador. 12 hosts comprometidos.",
+  "artifacts": [
+    {
+      "artifact_id": "a099_01",
+      "evidence_type": "memory_process",
+      "source_tool": "sift_mail_gateway",
+      "timestamp": "2026-01-21T11:30:15Z",
+      "raw_score": 0.92,
+      "prior_trust": 0.3,
+      "provenance_chain": [
+        "sha256:a099mail01"
+      ],
+      "description": "Mail desde hr@corp.com: 'Condolencias - Fondo para familia de Juan Pérez'. SPF: fail. DKIM: fail.",
+      "metadata": {
+        "subject": "Condolencias - Fondo para familia de Juan Pérez",
+        "sender": "hr@corp.com",
+        "spf_result": "fail",
+        "dkim_result": "fail",
+        "has_attachment": true,
+        "eco_taboo": true,
+        "process_creation_time": "2026-04-19T21:56:00Z"
+      }
+    },
+    {
+      "artifact_id": "a099_02",
+      "evidence_type": "memory_process",
+      "source_tool": "sift_file_audit",
+      "timestamp": "2026-01-21T11:32:40Z",
+      "raw_score": 0.92,
+      "prior_trust": 0.7,
+      "provenance_chain": [
+        "sha256:a099pdf02"
+      ],
+      "description": "PDF adjunto: JavaScript embebido que accede a cookies de sesión (session_id, auth_token, csrf) y envía a dominio externo.",
+      "metadata": {
+        "filename": "donaciones.pdf",
+        "javascript": true,
+        "target_cookies": [
+          "session_id",
+          "auth_token",
+          "csrf"
+        ],
+        "callback_domain": "family-support[.]org",
+        "exploit_used": "CVE-2023-21608"
+      }
+    },
+    {
+      "artifact_id": "a099_03",
+      "evidence_type": "dns_record",
+      "source_tool": "sift_pcap",
+      "timestamp": "2026-01-21T12:00:00Z",
+      "raw_score": 0.85,
+      "prior_trust": 0.5,
+      "provenance_chain": [
+        "sha256:a099dns03"
+      ],
+      "description": "Conexión HTTPS a family-support[.]org desde 12 hosts internos en 30 minutos tras apertura masiva del PDF.",
+      "metadata": {
+        "domain": "family-support[.]org",
+        "connections": 12,
+        "time_window": "30m",
+        "payload_size_avg": 2048,
+        "network_log_time": "2026-04-19T22:01:00Z"
+      }
+    },
+    {
+      "artifact_id": "a099_04",
+      "evidence_type": "memory_process",
+      "source_tool": "sift_syslog",
+      "timestamp": "2026-01-21T11:45:00Z",
+      "raw_score": 0.93,
+      "prior_trust": 0.35,
+      "provenance_chain": [
+        "sha256:a099rrhh04"
+      ],
+      "description": "Verificación: RRHH real no envió mail. 'Juan Pérez' no existe en base de datos de personal activo.",
+      "metadata": {
+        "hr_system_query": "Juan Pérez",
+        "employee_status": "NOT_FOUND",
+        "hr_sent_mail": false
+      }
+    }
+  ],
+  "expected_verdict": "MALICE",
+  "peirce_chain": {
+    "firstness": "Mail de condolencias con PDF de donaciones desde RRHH.",
+    "secondness": "Empleado no existe. SPF/DKIM fallan. PDF roba tokens. 12 hosts comprometidos.",
+    "thirdness": "Hábito de usar tabú social (muerte) para anular protocolo de desconfianza técnica."
+  },
+  "notes": "Eco: el signo de la muerte es la barrera semántica definitiva."
+}

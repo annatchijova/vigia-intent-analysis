@@ -1,0 +1,95 @@
+{
+  "case_id": "case_106_mimesis_error_administrativo",
+  "name": "La Mimesis del Error Administrativo",
+  "description": "Factura PDF con 'falla de impresión' que cubre CBU/IBAN. Remitente envía número de cuenta 'corregido' por mail informal. Cuenta no existe en base de proveedores validados. Hash del PDF original muestra CBU legítimo visible.",
+  "artifacts": [
+    {
+      "artifact_id": "a106_01",
+      "evidence_type": "file_hash",
+      "source_tool": "sift_document",
+      "timestamp": "2026-01-23T16:30:10Z",
+      "raw_score": 0.72,
+      "prior_trust": 0.6,
+      "provenance_chain": [
+        "sha256:a106pdf01"
+      ],
+      "description": "Factura PDF: área de CBU/IBAN cubierta por rectángulo negro. Metadata dice 'Print Error'. Hash difiere del PDF original enviado 2 días antes.",
+      "metadata": {
+        "filename": "factura_106.pdf",
+        "covered_field": "CBU/IBAN",
+        "cover_type": "black_rectangle",
+        "print_error_claimed": true,
+        "hash_mismatch_with_original": true,
+        "digital_perfection_detected": true
+      }
+    },
+    {
+      "artifact_id": "a106_02",
+      "evidence_type": "cultural_marker",
+      "source_tool": "sift_mail_gateway",
+      "timestamp": "2026-01-23T16:32:45Z",
+      "raw_score": 0.9,
+      "prior_trust": 0.3,
+      "provenance_chain": [
+        "sha256:a106mail02"
+      ],
+      "description": "Mail de seguimiento: 'Uy, salió mal el PDF, te paso el CBU por acá para que no te trabes con el pago'.",
+      "metadata": {
+        "sender": "proveedor@example.com",
+        "channel": "email (informal)",
+        "account_number_in_body": true,
+        "digital_perfection_detected": true
+      }
+    },
+    {
+      "artifact_id": "a106_03",
+      "evidence_type": "dns_record",
+      "source_tool": "sift_pcap",
+      "timestamp": "2026-01-23T16:32:45Z",
+      "raw_score": 0.88,
+      "prior_trust": 0.5,
+      "provenance_chain": [
+        "sha256:a106acc03"
+      ],
+      "description": "Número de cuenta 'corregido' no existe en base de datos de proveedores validados. Primera aparición en sistema.",
+      "metadata": {
+        "account_number": "2850590940090418135201",
+        "validation_result": "NOT_FOUND",
+        "first_seen": "2026-01-23T16:32:45Z"
+      }
+    },
+    {
+      "artifact_id": "a106_04",
+      "evidence_type": "memory_process",
+      "source_tool": "sift_file_audit",
+      "timestamp": "2026-01-21T16:30:00Z",
+      "raw_score": 0.05,
+      "prior_trust": 0.65,
+      "provenance_chain": [
+        "sha256:a106orig04"
+      ],
+      "description": "Hash del PDF original (enviado 2 días antes) muestra CBU/IBAN legítimo visible. La versión 'con error' tiene hash diferente.",
+      "metadata": {
+        "original_pdf_date": "2026-01-21",
+        "cbu_visible_in_original": true,
+        "hash_changed": true,
+        "field_changed": "CBU/IBAN",
+        "digital_perfection_detected": true
+      }
+    }
+  ],
+  "caie_fractures": [
+    {
+      "type": "DOCUMENTARY_SABOTAGE",
+      "severity": 0.94,
+      "description": "Error de impresión es signo fabricado para forzar uso de canal no auditable con cuenta fraudulenta."
+    }
+  ],
+  "expected_verdict": "MALICE",
+  "peirce_chain": {
+    "firstness": "PDF con 'falla de impresión' cubriendo datos bancarios.",
+    "secondness": "Cuenta 'corregida' no existe en base validada. Hash del PDF cambió. Canal informal usado para dato crítico.",
+    "thirdness": "Hábito de sabotaje de integridad documental usando 'error' fabricado para desviar pago."
+  },
+  "notes": "Grice: violación de máximo de manera (canal informal para información crítica)."
+}

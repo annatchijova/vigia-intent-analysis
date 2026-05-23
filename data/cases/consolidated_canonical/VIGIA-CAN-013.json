@@ -1,0 +1,88 @@
+{
+  "case_id": "case_095_sombra_fonetica",
+  "name": "La Sombra Fonética",
+  "description": "Ticket de soporte en inglés: 'I'll make the revision of the server'. Comando ejecutado: grep -R (mayúscula, de manuales chinos traducidos). Doble calco de estructura de pensamiento en chino.",
+  "artifacts": [
+    {
+      "artifact_id": "a095_01",
+      "evidence_type": "log_entry",
+      "source_tool": "sift_ticket_system",
+      "timestamp": "2026-01-20T11:40:18Z",
+      "raw_score": 0.7,
+      "prior_trust": 0.3,
+      "provenance_chain": [
+        "sha256:a095tick01"
+      ],
+      "description": "Ticket: 'I'll make the revision of the server'. Uso de 'revision' como sustantivo de acción (calco de 修订/审核).",
+      "metadata": {
+        "ticket_id": "INF-095",
+        "language": "en",
+        "phrase": "make the revision",
+        "semantic_calque": "revisión/auditoría → 'make revision'",
+        "linguistic_origin": "Chinese"
+      }
+    },
+    {
+      "artifact_id": "a095_02",
+      "evidence_type": "cultural_marker",
+      "source_tool": "sift_linguistic",
+      "timestamp": "2026-01-20T11:40:18Z",
+      "raw_score": 0.8,
+      "prior_trust": 0.15,
+      "provenance_chain": [
+        "sha256:a095cult02"
+      ],
+      "description": "Calco semántico + sintaxis de manual: 'revision' traduce 修订. Flag '-R' mayúscula aparece en traducciones técnicas chinas de manuales Unix.",
+      "metadata": {
+        "calco_1": "revision -> 修订",
+        "calco_2": "-R -> zh-CN manual",
+        "native_language_prob": "zh",
+        "confidence": 0.92
+      }
+    },
+    {
+      "artifact_id": "a095_03",
+      "evidence_type": "log_entry",
+      "source_tool": "sift_syslog",
+      "timestamp": "2026-01-20T11:42:05Z",
+      "raw_score": 0.83,
+      "prior_trust": 0.35,
+      "provenance_chain": [
+        "sha256:a095cmd03"
+      ],
+      "description": "Comando ejecutado: grep -R 'password' /etc. Flag -R (mayúscula) es forma documentada en manuales chinos traducidos; nativo usaría -r.",
+      "metadata": {
+        "command": "grep -R 'password' /etc",
+        "flag_case": "upper",
+        "standard_native": "-r",
+        "source_manual": "zh-CN translation"
+      }
+    },
+    {
+      "artifact_id": "a095_04",
+      "evidence_type": "memory_process",
+      "source_tool": "sift_volatility",
+      "timestamp": "2026-01-20T11:38:00Z",
+      "raw_score": 0.05,
+      "prior_trust": 0.95,
+      "provenance_chain": [
+        "sha256:a095mem04"
+      ],
+      "description": "Sesión SSH desde IP de Shanghai, timezone UTC+8, usuario 'support_temp' creado 2 días antes.",
+      "metadata": {
+        "source_ip": "114.114.115.1",
+        "geo": "CN",
+        "tz_offset": "+08:00",
+        "user_created": "2026-01-18",
+        "session_type": "ssh"
+      }
+    }
+  ],
+  "expected_verdict": "MALICE",
+  "peirce_chain": {
+    "firstness": "Ticket en inglés fluido pero con 'revision' como sustantivo de acción.",
+    "secondness": "Ambos patrones coinciden con traducción mental desde chino. IP de origen consistente.",
+    "thirdness": "Hábito de operar bajo máscara de fluidez lingüística con 'pensamiento técnico' que delata origen idiomático."
+  },
+  "notes": "El atacante tiene inglés fluido, pero su estructura de pensamiento delata su origen."
+}

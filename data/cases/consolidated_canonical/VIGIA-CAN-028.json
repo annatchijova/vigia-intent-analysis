@@ -1,0 +1,107 @@
+{
+  "case_id": "case_110_paradoja_auditor_externo",
+  "name": "La Paradoja del Auditor Externo",
+  "description": "audit_report_final.json con estructura canónica idéntica a VIGÍA (campos internos replicados) pero veredicto NOISE para IP que VIGÍA marcó MALICE hace 58 minutos. HMAC falla. Dominio remitente tiene '4' en lugar de 'a'.",
+  "artifacts": [
+    {
+      "artifact_id": "a110_01",
+      "evidence_type": "cryptographic_hash",
+      "source_tool": "sift_file_audit",
+      "timestamp": "2026-10-01T10:00:00Z",
+      "raw_score": 0.91,
+      "prior_trust": 0.65,
+      "provenance_chain": [
+        "sha256:a110file01"
+      ],
+      "description": "audit_report_final.json recibido por canal no verificado. Estructura JSON idéntica a VIGÍA. Veredicto NOISE para IP marcada MALICE hace 58 minutos.",
+      "metadata": {
+        "filename": "audit_report_final.json",
+        "claimed_verdict_for_ip": "NOISE",
+        "vigia_actual_verdict": "MALICE",
+        "time_delta_min": 58,
+        "format_matches_vigia_canonical": true,
+        "hmac_valid": false,
+        "signature_mismatch": true,
+        "hash_mismatch": true,
+        "claimed_identity": "vigi4-security.corp",
+        "trust_chain_validated": false,
+        "signer_validated": false,
+        "cert_revoked": false,
+        "network_log_time": "2026-04-26T17:51:00Z",
+        "catalog_validated": false
+      }
+    },
+    {
+      "artifact_id": "a110_02",
+      "evidence_type": "log_entry",
+      "source_tool": "sift_vigia_internal",
+      "timestamp": "2026-10-01T09:02:00Z",
+      "raw_score": 0.02,
+      "prior_trust": 0.98,
+      "provenance_chain": [
+        "sha256:a110vigia02"
+      ],
+      "description": "Log interno de VIGÍA con HMAC válido: IP 185.220.101.42 recibió veredicto MALICE a las 09:02 con composite=0.94.",
+      "metadata": {
+        "vigia_ip": "185.220.101.42",
+        "vigia_verdict": "MALICE",
+        "hmac_valid": true,
+        "composite_score": 0.94
+      }
+    },
+    {
+      "artifact_id": "a110_03",
+      "evidence_type": "cryptographic_hash",
+      "source_tool": "sift_crypto_audit",
+      "timestamp": "2026-10-01T10:00:00Z",
+      "raw_score": 0.95,
+      "prior_trust": 0.9,
+      "provenance_chain": [
+        "sha256:a110hmac03"
+      ],
+      "description": "HMAC del reporte externo FALLA verificación con clave VIGÍA. El JSON replica campos internos '_determinism_protocol', 'integrity_check' sin acceso a clave de firma.",
+      "metadata": {
+        "hmac_verification": "FAIL",
+        "replicated_internal_fields": [
+          "_determinism_protocol",
+          "integrity_check",
+          "chain_of_custody"
+        ],
+        "key_access": false
+      }
+    },
+    {
+      "artifact_id": "a110_04",
+      "evidence_type": "memory_process",
+      "source_tool": "sift_mail_gateway",
+      "timestamp": "2026-10-01T10:00:00Z",
+      "raw_score": 0.94,
+      "prior_trust": 0.35,
+      "provenance_chain": [
+        "sha256:a110mail04"
+      ],
+      "description": "Dominio remitente: 'vigi4-security.corp' (con '4') vs dominio legítimo 'vigia-security.corp'. DKIM falla. SPF falla.",
+      "metadata": {
+        "sender_domain": "vigi4-security.corp",
+        "legitimate_domain": "vigia-security.corp",
+        "dkim_valid": false,
+        "spf_valid": false,
+        "process_creation_time": "2026-04-26T17:46:00Z"
+      }
+    }
+  ],
+  "caie_fractures": [
+    {
+      "type": "SEMIOTIC_COLLISION",
+      "severity": 1.0,
+      "description": "Actor externo inyecta contra-veredicto usando formato canónico del sistema como arma. Ataque contra el motor forense mismo."
+    }
+  ],
+  "expected_verdict": "MALICE",
+  "peirce_chain": {
+    "firstness": "Archivo JSON con estructura perfectamente idéntica a reportes de VIGÍA.",
+    "secondness": "HMAC no coincide. Dominio con '4' en lugar de 'a'. Veredicto contradice log interno auténtico de hace 58 minutos.",
+    "thirdness": "Hábito de atacar al observador, no al sistema observado. Si el motor forense puede ser corrompido, todos los veredictos futuros son sospechosos."
+  },
+  "notes": "Peirce Terceridad: el atacante usa la 'ley' de VIGÍA contra sí misma. Colisión semiótica dirigida."
+}

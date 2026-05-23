@@ -1,0 +1,86 @@
+{
+  "case_id": "case_088_calco_semantico",
+  "name": "El Calco Semántico del Intruso",
+  "description": "Ticket interno en inglés usa 'state of the country' como calco de 'стране' (área/lado en ruso) en empresa de servicios eléctricos. El error delata estructura de pensamiento en idioma nativo.",
+  "artifacts": [
+    {
+      "artifact_id": "a088_01",
+      "evidence_type": "log_entry",
+      "source_tool": "sift_ticket_system",
+      "timestamp": "2026-01-17T15:20:10Z",
+      "raw_score": 0.78,
+      "prior_trust": 0.3,
+      "provenance_chain": [
+        "sha256:a088tick01"
+      ],
+      "description": "Ticket: 'I need to check the state of the country'. Contexto: servidor de empresa de servicios eléctricos.",
+      "metadata": {
+        "ticket_id": "INF-088",
+        "context": "server_maintenance",
+        "phrase": "state of the country",
+        "intended_meaning": "check the grid area/section"
+      }
+    },
+    {
+      "artifact_id": "a088_02",
+      "evidence_type": "cultural_marker",
+      "source_tool": "sift_linguistic",
+      "timestamp": "2026-01-17T15:20:10Z",
+      "raw_score": 0.82,
+      "prior_trust": 0.15,
+      "provenance_chain": [
+        "sha256:a088cult02"
+      ],
+      "description": "Calco semántico: 'state of the country' traduce directamente 'стране' que en ruso informal significa 'área/sector'. Error de traducción literal.",
+      "metadata": {
+        "calco_source": "стране",
+        "intended_meaning": "area/section",
+        "actual_phrase": "state of the country",
+        "linguistic_origin": "Russian",
+        "confidence": 0.91
+      }
+    },
+    {
+      "artifact_id": "a088_03",
+      "evidence_type": "memory_process",
+      "source_tool": "sift_volatility",
+      "timestamp": "2026-01-17T15:18:05Z",
+      "raw_score": 0.06,
+      "prior_trust": 0.95,
+      "provenance_chain": [
+        "sha256:a088mem03"
+      ],
+      "description": "Sesión RDP desde IP geolocada en Moscú con timezone UTC+3, usuario 'field_tech'.",
+      "metadata": {
+        "source_ip": "194.58.112.7",
+        "geo": "RU",
+        "timezone_offset": "+03:00",
+        "session_start": "2026-01-17T15:00:00Z"
+      }
+    },
+    {
+      "artifact_id": "a088_04",
+      "evidence_type": "log_entry",
+      "source_tool": "sift_syslog",
+      "timestamp": "2026-01-17T15:22:00Z",
+      "raw_score": 0.6,
+      "prior_trust": 0.35,
+      "provenance_chain": [
+        "sha256:a088cmd04"
+      ],
+      "description": "Comando ejecutado: 'Get-StateOfCountry -ServerId NY-42'. Cmdlet inexistente en repositorio oficial; cargado desde módulo desconocido.",
+      "metadata": {
+        "command": "Get-StateOfCountry",
+        "module_source": "unknown",
+        "execution_policy": "bypass"
+      }
+    }
+  ],
+  "expected_verdict": "MALICE",
+  "peirce_chain": {
+    "firstness": "Ticket en inglés fluido pero con frase semánticamente desubicada para contexto técnico-geográfico.",
+    "secondness": "'State of the country' no tiene sentido para servidor eléctrico. Coincide con traducción literal del ruso.",
+    "thirdness": "Hábito de traducción mental directa que delata estructura de pensamiento en idioma nativo bajo estrés operacional."
+  },
+  "notes": "Detección de calco lingüístico subyacente: el atacante opera bajo máscara de fluidez en idioma no nativo."
+}

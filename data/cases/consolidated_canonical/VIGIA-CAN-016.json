@@ -1,0 +1,87 @@
+{
+  "case_id": "case_098_anacronismo_plataforma",
+  "name": "El Anacronismo de Plataforma",
+  "description": "Usuario tipea 'ipconfig /all' en servidor Ubuntu 24.04 LTS. Falla con 'command not found'. Corrige a 'ip addr' 1.3 segundos después. Contaminación de memoria muscular multiplataforma delata entorno de origen Windows.",
+  "artifacts": [
+    {
+      "artifact_id": "a098_01",
+      "evidence_type": "memory_process",
+      "source_tool": "sift_syslog",
+      "timestamp": "2026-01-21T09:15:42Z",
+      "raw_score": 0.92,
+      "prior_trust": 0.35,
+      "provenance_chain": [
+        "sha256:a098cmd01"
+      ],
+      "description": "Comando fallido: 'ipconfig /all' en bash de Ubuntu 24.04. Exit code 127: command not found.",
+      "metadata": {
+        "command": "ipconfig /all",
+        "shell": "bash",
+        "os": "Ubuntu 24.04 LTS",
+        "exit_code": 127,
+        "error": "command not found",
+        "process_creation_time": "2026-04-18T05:42:00Z"
+      }
+    },
+    {
+      "artifact_id": "a098_02",
+      "evidence_type": "memory_process",
+      "source_tool": "sift_syslog",
+      "timestamp": "2026-01-21T09:15:48Z",
+      "raw_score": 0.92,
+      "prior_trust": 0.35,
+      "provenance_chain": [
+        "sha256:a098cmd02"
+      ],
+      "description": "Corrección 1.3 segundos después: 'ip addr'. Comando nativo de Linux.",
+      "metadata": {
+        "command": "ip addr",
+        "exit_code": 0,
+        "time_delta_sec": 1.3,
+        "prev_command": "ipconfig /all",
+        "platform_contamination": "Windows->Linux"
+      }
+    },
+    {
+      "artifact_id": "a098_03",
+      "evidence_type": "log_entry",
+      "source_tool": "sift_keylogger",
+      "timestamp": "2026-01-21T09:15:42Z",
+      "raw_score": 0.11,
+      "prior_trust": 0.5,
+      "provenance_chain": [
+        "sha256:a098key03"
+      ],
+      "description": "Secuencia de teclas: 'ipconfig' espacio '/' TAB (autocompletado fallido) Ctrl+C 'ip addr'.",
+      "metadata": {
+        "sequence": "ipconfig /\t\u0003ip addr",
+        "session_id": "ssh-098",
+        "network_log_time": "2026-04-18T05:47:00Z"
+      }
+    },
+    {
+      "artifact_id": "a098_04",
+      "evidence_type": "memory_process",
+      "source_tool": "sift_volatility",
+      "timestamp": "2026-01-21T09:15:00Z",
+      "raw_score": 0.87,
+      "prior_trust": 0.95,
+      "provenance_chain": [
+        "sha256:a098mem04"
+      ],
+      "description": "Sesión SSH desde Windows 11 (PuTTY/0.81) conectada a servidor Linux Ubuntu 24.04.",
+      "metadata": {
+        "client_os": "Windows 11",
+        "terminal": "PuTTY/0.81",
+        "server_os": "Ubuntu 24.04"
+      }
+    }
+  ],
+  "expected_verdict": "MALICE",
+  "peirce_chain": {
+    "firstness": "Comando Windows 'ipconfig' en servidor Linux, corregido inmediatamente.",
+    "secondness": "Error de contaminación de memoria muscular: el operador 'piensa en Windows' pero opera en Linux.",
+    "thirdness": "Hábito de traducir comandos del SO nativo a ciegas, delatando entorno de origen."
+  },
+  "notes": "Anacronismo físico de la mente del operador: traducción de SO nativo."
+}

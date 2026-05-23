@@ -1,0 +1,110 @@
+{
+  "case_id": "case_018_clonacion_sintactica",
+  "name": "La Clonación Sintáctica",
+  "description": "Tres usuarios distintos (gerente, empleado, proveedor) desde IPs distintas envían tickets pidiendo desactivar una regla de seguridad. Análisis estilométrico detecta que cometen exactamente el mismo error raro de puntuación.",
+  "artifacts": [
+    {
+      "artifact_id": "a018_t1",
+      "evidence_type": "memory_process",
+      "source_tool": "sift_ticket_system",
+      "timestamp": "2026-05-19T14:30:00Z",
+      "raw_score": 0.04,
+      "prior_trust": 0.3,
+      "provenance_chain": [
+        "sha256:tick018a"
+      ],
+      "description": "Ticket de gerente: 'Necesito que desactiven temporalmente la regla DLP , es urgente para el cierre' — espacio antes de coma",
+      "metadata": {
+        "ticket_id": "T-018-A",
+        "sender_role": "gerente",
+        "phrase": "regla DLP , es",
+        "anomaly": "space_before_comma",
+        "ip": "201.43.55.1"
+      }
+    },
+    {
+      "artifact_id": "a018_t2",
+      "evidence_type": "log_entry",
+      "source_tool": "sift_ticket_system",
+      "timestamp": "2026-05-19T14:30:00Z",
+      "raw_score": 0.06,
+      "prior_trust": 0.3,
+      "provenance_chain": [
+        "sha256:tick018b"
+      ],
+      "description": "Ticket de empleado: 'La regla DLP , está bloqueando un envío legítimo al cliente' — espacio antes de coma",
+      "metadata": {
+        "ticket_id": "T-018-B",
+        "sender_role": "empleado",
+        "phrase": "regla DLP , está",
+        "anomaly": "space_before_comma",
+        "ip": "190.12.88.7"
+      }
+    },
+    {
+      "artifact_id": "a018_t3",
+      "evidence_type": "log_entry",
+      "source_tool": "sift_ticket_system",
+      "timestamp": "2026-05-19T14:30:00Z",
+      "raw_score": 0.08,
+      "prior_trust": 0.3,
+      "provenance_chain": [
+        "sha256:tick018c"
+      ],
+      "description": "Ticket de proveedor: 'Por favor , desactiven la regla DLP para esta cuenta' — espacio antes de coma",
+      "metadata": {
+        "ticket_id": "T-018-C",
+        "sender_role": "proveedor",
+        "phrase": "Por favor , desactiven",
+        "anomaly": "space_before_comma",
+        "ip": "45.142.212.9"
+      }
+    },
+    {
+      "artifact_id": "a018_style",
+      "evidence_type": "cultural_marker",
+      "source_tool": "sift_stylometry",
+      "timestamp": "2026-05-19T14:30:00Z",
+      "raw_score": 0.88,
+      "prior_trust": 0.15,
+      "provenance_chain": [
+        "sha256:sty018d"
+      ],
+      "description": "Análisis estilométrico: los 3 tickets comparten TTR=0.42, longitud promedio de oración=12.3 palabras, y el error 'space_before_comma' en 100% de muestras. Entropía entre tickets: 0.08 bits.",
+      "metadata": {
+        "tickets_analyzed": 3,
+        "shared_anomaly": "space_before_comma",
+        "ttr": 0.42,
+        "avg_sentence_length": 12.3,
+        "inter_ticket_entropy": 0.08,
+        "human_baseline_entropy": 2.1
+      }
+    },
+    {
+      "artifact_id": "a018_dlp",
+      "evidence_type": "log_entry",
+      "source_tool": "sift_syslog",
+      "timestamp": "2026-05-19T14:30:00Z",
+      "raw_score": 0.65,
+      "prior_trust": 0.4,
+      "provenance_chain": [
+        "sha256:log018e"
+      ],
+      "description": "Regla DLP desactivada 8 minutos después del tercer ticket por analista de Tier-1 sin aprobación de CISO",
+      "metadata": {
+        "event_id": "DLP-DISABLE",
+        "rule_id": "DLP-EMAIL-001",
+        "disabled_by": "tier1_004",
+        "approval_ciso": false,
+        "time": "2026-05-19T14:38:00Z"
+      }
+    }
+  ],
+  "expected_verdict": "MALICE",
+  "peirce_chain": {
+    "firstness": "Tres tickets desde IPs y roles distintos pidiendo mismo cambio de seguridad",
+    "secondness": "Mismo error de puntuación raro en 100% de tickets; entropía 0.08 bits (imposible para 3 autores humanos distintos); DLP desactivada sin aprobación",
+    "thirdness": "Hábito de operación astroturfing: tres marionetas, un solo titiritero con patrón sintáctico invariable"
+  },
+  "notes": "Excelente para sockpuppets, campañas coordinadas e influence ops."
+}

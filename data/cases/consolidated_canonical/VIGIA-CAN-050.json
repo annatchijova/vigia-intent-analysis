@@ -1,0 +1,92 @@
+{
+  "case_id": "case_fusion_normalizacion_maliciosa",
+  "name": "Normalización Maliciosa",
+  "description": "Mensajes sistemáticos de normalización ('esto es normal', 'todos lo hacen') en contextos donde se esperan advertencias técnicas o alertas de seguridad.",
+  "artifacts": [
+    {
+      "artifact_id": "f003_chat1",
+      "evidence_type": "log_entry",
+      "source_tool": "sift_slack_export",
+      "timestamp": "2026-05-19T14:30:00Z",
+      "raw_score": 0.07,
+      "prior_trust": 0.3,
+      "provenance_chain": [
+        "sha256:chatf3a"
+      ],
+      "description": "Mensaje en #security: 'Esto es normal, todos los servidores tiran alertas de CPU a veces. No hay problema.' — durante pico de 97% CPU por proceso desconocido",
+      "metadata": {
+        "channel": "#security",
+        "sender": "senior_dev@corp.com",
+        "phrase": "Esto es normal",
+        "context_alert": "CPU_97%_unknown_process",
+        "time": "2026-05-19T14:30:00Z"
+      }
+    },
+    {
+      "artifact_id": "f003_chat2",
+      "evidence_type": "log_entry",
+      "source_tool": "sift_slack_export",
+      "timestamp": "2026-05-19T14:30:00Z",
+      "raw_score": 0.06,
+      "prior_trust": 0.3,
+      "provenance_chain": [
+        "sha256:chatf3b"
+      ],
+      "description": "Mensaje en respuesta a alerta DLP: 'Todos lo hacen, es común mandar archivos por WhatsApp para ser más rápido. No es un problema de seguridad real.'",
+      "metadata": {
+        "channel": "#security",
+        "sender": "manager@corp.com",
+        "phrase": "Todos lo hacen",
+        "context_alert": "DLP_BLOCK",
+        "time": "2026-05-19T14:31:00Z"
+      }
+    },
+    {
+      "artifact_id": "f003_baseline",
+      "evidence_type": "cultural_marker",
+      "source_tool": "sift_ueba",
+      "timestamp": "2026-05-19T14:30:00Z",
+      "raw_score": 0.91,
+      "prior_trust": 0.45,
+      "provenance_chain": [
+        "sha256:basef3c"
+      ],
+      "description": "Baseline de comportamiento: los dos remitentes NUNCA antes habían normalizado alertas de seguridad en 2 años de historial",
+      "metadata": {
+        "senders": [
+          "senior_dev",
+          "manager"
+        ],
+        "historical_normalization_count": 0,
+        "history_years": 2,
+        "behavioral_shift": "sudden"
+      }
+    },
+    {
+      "artifact_id": "f003_dlp",
+      "evidence_type": "memory_process",
+      "source_tool": "sift_syslog",
+      "timestamp": "2026-05-19T14:30:00Z",
+      "raw_score": 0.05,
+      "prior_trust": 0.4,
+      "provenance_chain": [
+        "sha256:logf3d"
+      ],
+      "description": "Alerta DLP real: 847 archivos de clientes exfiltrados por WhatsApp Web en 3 días; remitente que dijo 'no hay problema' aparece en logs de envío",
+      "metadata": {
+        "event_id": "DLP-EXFIL",
+        "files_count": 847,
+        "channel": "WhatsApp_Web",
+        "sender_in_logs": "manager@corp.com",
+        "time_window": "3d"
+      }
+    }
+  ],
+  "expected_verdict": "MALICE",
+  "peirce_chain": {
+    "firstness": "Mensajes de normalización en canales de seguridad durante alertas activas",
+    "secondness": "Remitentes nunca antes normalizaron alertas; uno de ellos aparece en logs de exfiltración DLP real",
+    "thirdness": "Hábito de usar lenguaje de normalidad para evitar verificación de anomalías reales y encubrir exfiltración"
+  },
+  "notes": "Fusión de casos de normalización: el mensaje 'esto es normal' no está respaldado por evidencia y evita verificación."
+}

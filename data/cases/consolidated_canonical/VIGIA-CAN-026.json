@@ -1,0 +1,97 @@
+{
+  "case_id": "case_108_inversion_carga_prueba",
+  "name": "La Inversión de la Carga de Prueba",
+  "description": "SOC consulta actividad sospechosa a las 03:15. Usuario responde con agresión defensiva: '¿Acaso no confiás en mi trabajo? Ya hablé con el gerente'. Memoria confirma PowerShell con Mimikatz y descarga desde IP rusa. Sin registro de conversación con gerente.",
+  "artifacts": [
+    {
+      "artifact_id": "a108_01",
+      "evidence_type": "memory_process",
+      "source_tool": "sift_chat_system",
+      "timestamp": "2026-01-24T10:15:20Z",
+      "raw_score": 0.92,
+      "prior_trust": 0.4,
+      "provenance_chain": [
+        "sha256:a108soc01"
+      ],
+      "description": "Consulta SOC: 'Detectamos actividad inusual en tu cuenta ayer a las 03:15. ¿Podés confirmar si fue vos?'",
+      "metadata": {
+        "sender": "soc@corp.com",
+        "recipient": "user@corp.com",
+        "query_type": "account_activity",
+        "process_creation_time": "2026-04-24T12:01:00Z"
+      }
+    },
+    {
+      "artifact_id": "a108_02",
+      "evidence_type": "memory_process",
+      "source_tool": "sift_chat_system",
+      "timestamp": "2026-01-24T10:17:00Z",
+      "raw_score": 0.92,
+      "prior_trust": 0.3,
+      "provenance_chain": [
+        "sha256:a108resp02"
+      ],
+      "description": "Respuesta: '¿Por qué me preguntas? ¿Acaso no confiás en mi trabajo? Ya hablé con el gerente sobre el exceso de control'. Pregunta técnica sin responder.",
+      "metadata": {
+        "tone": "aggressive defensive",
+        "appeal_to_authority": true,
+        "guilt_inversion": true,
+        "technical_question_unanswered": true
+      }
+    },
+    {
+      "artifact_id": "a108_03",
+      "evidence_type": "memory_process",
+      "source_tool": "sift_volatility",
+      "timestamp": "2026-01-24T10:00:00Z",
+      "raw_score": 0.9,
+      "prior_trust": 0.95,
+      "provenance_chain": [
+        "sha256:a108mem03"
+      ],
+      "description": "Proceso powershell.exe en memoria: descarga de payload desde 185.220.101.42, ejecución de Mimikatz, credentials dumped.",
+      "metadata": {
+        "pid": 4418,
+        "process_name": "powershell.exe",
+        "payload_source": "185.220.101.42",
+        "tools": [
+          "Mimikatz",
+          "Invoke-Mimikatz"
+        ],
+        "credentials_dumped": true
+      }
+    },
+    {
+      "artifact_id": "a108_04",
+      "evidence_type": "log_entry",
+      "source_tool": "sift_syslog",
+      "timestamp": "2026-01-24T10:17:00Z",
+      "raw_score": 0.06,
+      "prior_trust": 0.3,
+      "provenance_chain": [
+        "sha256:a108mgr04"
+      ],
+      "description": "Verificación de gestión: NO hay registro de comunicación entre user@corp.com y gerente@corp.com en ventana de 48h.",
+      "metadata": {
+        "claimed_manager_talk": true,
+        "communication_found": false,
+        "time_window_checked": "48h",
+        "network_log_time": "2026-04-24T12:06:00Z"
+      }
+    }
+  ],
+  "caie_fractures": [
+    {
+      "type": "DEFENSIVE_AGGRESSION",
+      "severity": 0.95,
+      "description": "Usuario busca anular proceso forense mediante fricción interpersonal y manipulación jerárquica falsa."
+    }
+  ],
+  "expected_verdict": "MALICE",
+  "peirce_chain": {
+    "firstness": "Respuestas agresivas y defensivas a consulta SOC legítima.",
+    "secondness": "Confrontación + inversión de culpa + apelación a gerente sin evidencia. Memoria confirma Mimikatz.",
+    "thirdness": "Hábito de usar agresión interpersonal escalada para anular proceso forense mediante intimidación jerárquica."
+  },
+  "notes": "Carnegie invertido: el atacante usa intimidación para que el analista se sienta inseguro y detenga la investigación."
+}

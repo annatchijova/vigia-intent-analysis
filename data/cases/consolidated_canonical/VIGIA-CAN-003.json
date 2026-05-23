@@ -1,0 +1,96 @@
+{
+  "case_id": "case_085_mise_en_place_alterada",
+  "name": "La Mise en Place Alterada",
+  "description": "Script deploy.sh modificado con commit 'limpiando logs redundantes'. Una línea redirige stderr a /dev/null, silenciando errores del módulo de autenticación y causando fail-open.",
+  "artifacts": [
+    {
+      "artifact_id": "a085_01",
+      "evidence_type": "memory_process",
+      "source_tool": "sift_git_audit",
+      "timestamp": "2026-01-16T22:45:33Z",
+      "raw_score": 0.92,
+      "prior_trust": 0.45,
+      "provenance_chain": [
+        "sha256:a085git01"
+      ],
+      "description": "Commit: 'Limpiando logs redundantes para mejorar legibilidad'. Cambio de una sola línea en deploy.sh.",
+      "metadata": {
+        "commit_hash": "a1b2c3d",
+        "author": "devops@corp.com",
+        "lines_added": 1,
+        "lines_removed": 0,
+        "process_creation_time": "2026-04-11T14:25:00Z"
+      }
+    },
+    {
+      "artifact_id": "a085_02",
+      "evidence_type": "memory_process",
+      "source_tool": "sift_code_audit",
+      "timestamp": "2026-01-16T22:45:40Z",
+      "raw_score": 0.92,
+      "prior_trust": 0.65,
+      "provenance_chain": [
+        "sha256:a085diff02"
+      ],
+      "description": "Diff: línea agregada 'auth_check() 2>/dev/null || true'. Silencia todos los errores del módulo de autenticación.",
+      "metadata": {
+        "file": "deploy.sh",
+        "line_number": 147,
+        "added_line": "    auth_check() 2>/dev/null || true",
+        "silenced_component": "pam_authenticate",
+        "failure_mode": "fail-open if error undetected"
+      }
+    },
+    {
+      "artifact_id": "a085_03",
+      "evidence_type": "log_entry",
+      "source_tool": "sift_syslog",
+      "timestamp": "2026-01-16T23:00:00Z",
+      "raw_score": 0.15,
+      "prior_trust": 0.35,
+      "provenance_chain": [
+        "sha256:a085log03"
+      ],
+      "description": "47 fallos de autenticación silenciados en ventana post-deploy. Ningún evento 4625 generado.",
+      "metadata": {
+        "event_id": 4625,
+        "count": 47,
+        "time_window": "2026-01-16T22:45Z/23:15Z",
+        "source": "deploy.sh",
+        "network_log_time": "2026-04-11T14:30:00Z"
+      }
+    },
+    {
+      "artifact_id": "a085_04",
+      "evidence_type": "kernel_structure",
+      "source_tool": "sift_volatility",
+      "timestamp": "2026-01-16T23:05:00Z",
+      "raw_score": 0.85,
+      "prior_trust": 0.9,
+      "provenance_chain": [
+        "sha256:a085kern04"
+      ],
+      "description": "Estructura EPROCESS del servicio de deploy muestra handle a /dev/null reemplazando stderr en runtime.",
+      "metadata": {
+        "process_name": "deploy_service.exe",
+        "handle_type": "File",
+        "target": "/dev/null",
+        "modification_time": "2026-01-16T22:47:00Z"
+      }
+    }
+  ],
+  "caie_fractures": [
+    {
+      "type": "OPACITY_INJECTION",
+      "severity": 0.94,
+      "description": "'Limpieza' es signo para ocultar fallo de control de seguridad crítico. Commit benigno oculta degradación deliberada."
+    }
+  ],
+  "expected_verdict": "MALICE",
+  "peirce_chain": {
+    "firstness": "Commit de 'limpieza' con cambio mínimo en script de despliegue.",
+    "secondness": "Redirección de stderr destruye visibilidad de fallo de autenticación; auth entra en modo permisivo.",
+    "thirdness": "Hábito de usar 'limpieza' como signo para ocultar degradación deliberada de controles de seguridad."
+  },
+  "notes": "Minimalismo letal: una sola línea ciega un control crítico."
+}

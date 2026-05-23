@@ -1,0 +1,98 @@
+{
+  "case_id": "case_112_sincronizacion_panico_semantico",
+  "name": "La Sincronización del Pánico Semántico",
+  "description": "20 tickets en 90 segundos desde cuentas distintas: 'No puedo entrar al mail', '¿Nos hackearon?'. O365 confirma acceso normal en todas. 18/20 tickets comparten patrón de puntuación idéntico. Ransomware activo en servidor de archivos simultáneamente.",
+  "artifacts": [
+    {
+      "artifact_id": "a112_01",
+      "evidence_type": "log_entry",
+      "source_tool": "sift_ticket_system",
+      "timestamp": "2026-01-25T11:30:00Z",
+      "raw_score": 0.8,
+      "prior_trust": 0.3,
+      "provenance_chain": [
+        "sha256:a112tick01"
+      ],
+      "description": "20 tickets en ventana de 90 segundos desde cuentas distintas. Frases comunes: 'No puedo entrar al mail', '¿Nos hackearon?'",
+      "metadata": {
+        "ticket_count": 20,
+        "time_window_sec": 90,
+        "common_phrases": [
+          "No puedo entrar al mail",
+          "¿Nos hackearon?"
+        ],
+        "senders_unique": true
+      }
+    },
+    {
+      "artifact_id": "a112_02",
+      "evidence_type": "log_entry",
+      "source_tool": "sift_o365_audit",
+      "timestamp": "2026-01-25T11:32:15Z",
+      "raw_score": 0.65,
+      "prior_trust": 0.45,
+      "provenance_chain": [
+        "sha256:a112o365_02"
+      ],
+      "description": "O365 logs: 20 cuentas reportantes tienen login exitoso en última hora. Cero intentos fallidos. Cero bloqueos.",
+      "metadata": {
+        "accounts_checked": 20,
+        "failed_logins": 0,
+        "successful_logins": 20,
+        "account_lockouts": 0
+      }
+    },
+    {
+      "artifact_id": "a112_03",
+      "evidence_type": "cultural_marker",
+      "source_tool": "sift_linguistic",
+      "timestamp": "2026-01-25T11:35:00Z",
+      "raw_score": 0.91,
+      "prior_trust": 0.15,
+      "provenance_chain": [
+        "sha256:a112sty03"
+      ],
+      "description": "Análisis estilométrico: 18/20 tickets comparten patrón de puntuación idéntico (espacio antes de signo de interrogación). Entropía entre tickets: 0.12 bits.",
+      "metadata": {
+        "tickets_analyzed": 20,
+        "pattern_match_count": 18,
+        "pattern": "space_before_question_mark",
+        "inter_ticket_entropy": 0.12,
+        "bot_likelihood": 0.94
+      }
+    },
+    {
+      "artifact_id": "a112_04",
+      "evidence_type": "memory_process",
+      "source_tool": "sift_volatility",
+      "timestamp": "2026-01-25T11:30:00Z",
+      "raw_score": 0.05,
+      "prior_trust": 0.95,
+      "provenance_chain": [
+        "sha256:a112mem04"
+      ],
+      "description": "Durante ventana de pánico semántico: ransomware.exe activo en servidor de archivos. 1247 archivos cifrados.",
+      "metadata": {
+        "pid": 1844,
+        "process_name": "ransomware.exe",
+        "activity": "file_encryption",
+        "files_encrypted": 1247,
+        "start_time": "2026-01-25T11:30:00Z"
+      }
+    }
+  ],
+  "caie_fractures": [
+    {
+      "type": "COGNITIVE_DOS",
+      "severity": 0.97,
+      "description": "Flujo coordinado de reportes falsos busca paralizar triaje del SOC durante ataque real."
+    }
+  ],
+  "expected_verdict": "MALICE",
+  "peirce_chain": {
+    "firstness": "20 tickets de pánico coordinados en 90 segundos.",
+    "secondness": "O365 confirma acceso normal. 18/20 tickets con patrón idéntico. Ransomware activo en background.",
+    "thirdness": "Hábito de usar Cognitive DoS para paralizar capacidad de triaje del SOC durante ataque real."
+  },
+  "notes": "Cognitive DoS: el flujo coordinado busca paralizar la capacidad de triaje."
+}

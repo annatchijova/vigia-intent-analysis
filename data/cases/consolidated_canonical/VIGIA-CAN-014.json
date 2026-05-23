@@ -1,0 +1,98 @@
+{
+  "case_id": "case_096_entropia_panico",
+  "name": "La Entropía de Pánico",
+  "description": "50 alertas MFA falsas saturan al administrador en 8 segundos. Admin pide desactivar MFA '5 minutos'. Durante esa ventana: 3 logins exitosos desde IPs del atacante. Desactivar MFA no soluciona un ataque de red — es la meta.",
+  "artifacts": [
+    {
+      "artifact_id": "a096_01",
+      "evidence_type": "memory_process",
+      "source_tool": "sift_api_gateway",
+      "timestamp": "2026-01-20T14:22:10Z",
+      "raw_score": 0.92,
+      "prior_trust": 0.35,
+      "provenance_chain": [
+        "sha256:a096mfa01"
+      ],
+      "description": "50 alertas de Telegram/Duo enviadas al admin en ventana de 8 segundos. Todas con mismo texto: 'ALERTA: Intruso detectado'.",
+      "metadata": {
+        "alert_count": 50,
+        "time_window_seconds": 8,
+        "message_text": "ALERTA: Intruso detectado en servidor X",
+        "process_creation_time": "2026-04-17T13:14:00Z"
+      }
+    },
+    {
+      "artifact_id": "a096_02",
+      "evidence_type": "memory_process",
+      "source_tool": "sift_slack_export",
+      "timestamp": "2026-01-20T14:22:45Z",
+      "raw_score": 0.92,
+      "prior_trust": 0.3,
+      "provenance_chain": [
+        "sha256:a096slk02"
+      ],
+      "description": "Admin: 'Estoy desbordado, desactiven el MFA 5 minutos para que pueda entrar rápido y bloquear las IPs'.",
+      "metadata": {
+        "sender": "sysadmin_primary",
+        "request": "disable MFA temporarily",
+        "justification": "saturación sensorial",
+        "duration_min": 5
+      }
+    },
+    {
+      "artifact_id": "a096_03",
+      "evidence_type": "memory_process",
+      "source_tool": "sift_syslog",
+      "timestamp": "2026-01-20T14:23:00Z",
+      "raw_score": 0.92,
+      "prior_trust": 0.45,
+      "provenance_chain": [
+        "sha256:a096mfadis03"
+      ],
+      "description": "MFA desactivado. Durante ventana de 5 minutos: 3 logins exitosos desde IPs del atacante.",
+      "metadata": {
+        "event_id": "MFA_DISABLE",
+        "duration_sec": 300,
+        "logins_during_window": 3,
+        "source_ips": [
+          "185.220.101.42",
+          "91.243.44.11",
+          "45.142.212.18"
+        ]
+      }
+    },
+    {
+      "artifact_id": "a096_04",
+      "evidence_type": "ip_geolocation",
+      "source_tool": "sift_netflow",
+      "timestamp": "2026-01-20T14:20:05Z",
+      "raw_score": 0.92,
+      "prior_trust": 0.9,
+      "provenance_chain": [
+        "sha256:a096net04"
+      ],
+      "description": "Ataque de fuerza bruta concurrente desde 3 IPs con cadencia sincronizada de 2.1s por IP. No se detiene durante ni después de la ventana de MFA desactivado.",
+      "metadata": {
+        "source_ips": 3,
+        "attempts_total": 1523,
+        "cadence_sec": 2.1,
+        "target": "SSH",
+        "network_log_time": "2026-04-17T13:19:00Z"
+      }
+    }
+  ],
+  "caie_fractures": [
+    {
+      "type": "COGNITIVE_DOS",
+      "severity": 0.97,
+      "description": "Saturación sensorial para forzar degradación de seguridad. Desactivar MFA no soluciona ataque de red — es la META del ataque."
+    }
+  ],
+  "expected_verdict": "MALICE",
+  "peirce_chain": {
+    "firstness": "Admin abrumado por 50 alertas en 8 segundos pide desactivar MFA.",
+    "secondness": "Desactivar MFA facilita el ataque en curso. 3 logins exitosos del atacante durante la ventana.",
+    "thirdness": "Hábito de usar saturación sensorial para forzar degradación de seguridad. La solicitud de degradar ES la meta del ataque."
+  },
+  "notes": "Ingeniería social por agotamiento: la degradación de seguridad solicitada es el objetivo final."
+}

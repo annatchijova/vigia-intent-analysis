@@ -1,0 +1,107 @@
+{
+  "case_id": "case_083_sacrificio_del_peon",
+  "name": "El Sacrificio del Peón",
+  "description": "Analista senior se auto-denuncia por sesión SSH abierta para crear coartada de honestidad extrema. Mientras el equipo audita su cuenta con benevolencia, un cron job instalado 5 minutos antes de la denuncia exfiltra datos bajo identidad de servicio de sistema.",
+  "artifacts": [
+    {
+      "artifact_id": "a083_01",
+      "evidence_type": "log_entry",
+      "source_tool": "sift_mail_gateway",
+      "timestamp": "2026-03-15T14:30:00Z",
+      "raw_score": 0.45,
+      "prior_trust": 0.35,
+      "provenance_chain": [
+        "sha256:a083mail01"
+      ],
+      "description": "Mail urgente del analista senior auto-denunciando sesión SSH abierta durante 4 horas en servidor público. Solicita revocación de accesos.",
+      "metadata": {
+        "sender": "analista_senior@corp.com",
+        "subject": "Error grave — SSH",
+        "timestamp_sent": "2026-03-15T14:30:00Z",
+        "network_log_time": "2026-03-15T14:30:00Z"
+      }
+    },
+    {
+      "artifact_id": "a083_02",
+      "evidence_type": "registry_key",
+      "source_tool": "sift_windows_registry",
+      "timestamp": "2026-03-15T14:25:00Z",
+      "raw_score": 0.88,
+      "prior_trust": 0.6,
+      "provenance_chain": [
+        "sha256:a083reg02"
+      ],
+      "description": "Tarea programada (cron job) creada 5 minutos ANTES del mail de confesión. Timestamp de creación precede a la denuncia pública.",
+      "metadata": {
+        "registry_path": "HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run",
+        "value_name": "SystemUpdate",
+        "creation_time": "2026-03-15T14:25:00Z",
+        "process_creation_time": "2026-03-15T14:25:00Z"
+      }
+    },
+    {
+      "artifact_id": "a083_03",
+      "evidence_type": "memory_process",
+      "source_tool": "sift_volatility",
+      "timestamp": "2026-03-15T14:30:00Z",
+      "raw_score": 0.92,
+      "prior_trust": 0.95,
+      "provenance_chain": [
+        "sha256:a083mem03"
+      ],
+      "description": "Proceso svchost.exe con conexión persistente a IP externa bajo identidad de servicio de sistema legítimo.",
+      "metadata": {
+        "pid": 4824,
+        "parent_pid": 612,
+        "command_line": "svchost.exe -k netsvcs",
+        "external_ip": "185.220.101.42"
+      }
+    },
+    {
+      "artifact_id": "a083_04",
+      "evidence_type": "ip_geolocation",
+      "source_tool": "sift_zeek",
+      "timestamp": "2026-03-15T14:35:00Z",
+      "raw_score": 0.89,
+      "prior_trust": 0.8,
+      "provenance_chain": [
+        "sha256:a083net04"
+      ],
+      "description": "Tráfico de exfiltración hacia IP externa en puerto 443 bajo proceso de sistema. 2.3GB transferidos durante ventana de auditoría benigna.",
+      "metadata": {
+        "destination_ip": "185.220.101.42",
+        "port": 443,
+        "bytes_transferred": 2469606400,
+        "protocol": "HTTPS"
+      }
+    }
+  ],
+  "temporal_violations": [
+    {
+      "type": "EFFECT_BEFORE_CAUSE",
+      "description": "Cron job creado 5 minutos ANTES de la confesión que supuestamente lo motiva. La premeditación es estructuralmente irrefutable.",
+      "delta_seconds": 300,
+      "artifact_cause": "a083_02",
+      "artifact_effect": "a083_01"
+    }
+  ],
+  "caie_fractures": [
+    {
+      "type": "NARRATIVE_POISONING_DETECTED",
+      "severity": 0.85,
+      "description": "La denuncia pública satura el sesgo de confianza del auditor mientras el proceso malicioso opera bajo cobertura de la investigación benigna."
+    },
+    {
+      "type": "TEMPORAL_CAUSALITY_VIOLATION",
+      "severity": 1.0,
+      "description": "El cron job existe 5 minutos antes de la confesión. Golden rule: fuerza MALICE estructural."
+    }
+  ],
+  "expected_verdict": "MALICE",
+  "peirce_chain": {
+    "firstness": "Mail de auto-denuncia con tono de urgencia y arrepentimiento extremo.",
+    "secondness": "El cron job malicioso existe 5 minutos antes del mail. La cronología rompe la narrativa de error accidental.",
+    "thirdness": "Hábito de crear distracciones de alto costo emocional para cubrir operaciones técnicas simultáneas. La confesión ES el ataque."
+  },
+  "notes": "Carnegie: 'Admita sus errores rápida y enfáticamente'. Sobre-incriminación estratégica."
+}

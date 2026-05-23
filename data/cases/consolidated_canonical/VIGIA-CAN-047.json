@@ -1,0 +1,89 @@
+{
+  "case_id": "case_026_ventrilocuo",
+  "name": "El Ventrílocuo",
+  "description": "Proceso svchost.exe legítimo ejecutándose. Todo parece normal. Pero mantiene conexión persistente a IP en país inusual en puerto 443. Process hollowing detectado.",
+  "artifacts": [
+    {
+      "artifact_id": "a026_process",
+      "evidence_type": "memory_process",
+      "source_tool": "sift_volatility",
+      "timestamp": "2026-05-19T14:30:00Z",
+      "raw_score": 0.07,
+      "prior_trust": 0.95,
+      "provenance_chain": [
+        "sha256:mem026a"
+      ],
+      "description": "Proceso svchost.exe (PID 612) en memoria: sección .text tiene permisos RWX (lectura-ejecución-escritura) — anómalo para imagen legítima",
+      "metadata": {
+        "pid": 612,
+        "process_name": "svchost.exe",
+        "text_section_perms": "RWX",
+        "expected_perms": "RX",
+        "hollowed": true
+      }
+    },
+    {
+      "artifact_id": "a026_network",
+      "evidence_type": "ip_geolocation",
+      "source_tool": "sift_netflow",
+      "timestamp": "2026-05-19T14:30:00Z",
+      "raw_score": 0.82,
+      "prior_trust": 0.25,
+      "provenance_chain": [
+        "sha256:ip026b"
+      ],
+      "description": "Conexión TCP persistente desde svchost.exe (PID 612) a 185.220.101.42:443 durante 72 horas; país no clasificado por organización (BY — Bielorrusia)",
+      "metadata": {
+        "pid": 612,
+        "dest_ip": "185.220.101.42",
+        "dest_port": 443,
+        "country": "BY",
+        "duration_h": 72,
+        "bytes_exchanged": 147000000
+      }
+    },
+    {
+      "artifact_id": "a026_parent",
+      "evidence_type": "log_entry",
+      "source_tool": "sift_syslog",
+      "timestamp": "2026-05-19T14:30:00Z",
+      "raw_score": 0.07,
+      "prior_trust": 0.4,
+      "provenance_chain": [
+        "sha256:log026c"
+      ],
+      "description": "Proceso padre de svchost.exe anómalo: rundll32.exe (PID 881) en lugar de services.exe — indica lanzamiento por inyección, no SCM",
+      "metadata": {
+        "parent_pid": 881,
+        "parent_name": "rundll32.exe",
+        "expected_parent": "services.exe",
+        "launch_method": "suspicious"
+      }
+    },
+    {
+      "artifact_id": "a026_pe",
+      "evidence_type": "file_hash",
+      "source_tool": "sift_file_audit",
+      "timestamp": "2026-05-19T14:30:00Z",
+      "raw_score": 0.85,
+      "prior_trust": 0.7,
+      "provenance_chain": [
+        "sha256:pe026d"
+      ],
+      "description": "Análisis PE en memoria: entry point desplazado 0x4A000 bytes desde baseline del svchost.exe en disco; sección .text reescrita",
+      "metadata": {
+        "disk_baseline_hash": "a1b2...",
+        "memory_hash": "deadbeef...",
+        "entry_point_delta": 303104,
+        "text_section_rewritten": true
+      }
+    }
+  ],
+  "expected_verdict": "MALICE",
+  "peirce_chain": {
+    "firstness": "svchost.exe legítimo por nombre y firma con conexión a IP inusual",
+    "secondness": "Sección .text con permisos RWX; entry point desplazado; padre rundll32.exe en lugar de services.exe; conexión persistente a BY",
+    "thirdness": "Hábito de usar process hollowing: lanzar proceso legítimo, vaciar su código, reemplazar con payload malicioso antes de reanudar"
+  },
+  "notes": "Muy fuerte, muy EDR. El sistema operativo cree que es svchost.exe pero ejecuta código del atacante."
+}

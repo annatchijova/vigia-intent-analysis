@@ -1,0 +1,109 @@
+{
+  "case_id": "case_087_estocolmo_inverso",
+  "name": "El Síndrome de Estocolmo Inverso",
+  "description": "Contratista externo de seguridad 'ayuda' durante incidente: bloquea IP de Ucrania y borra logs de acceso 'para no saturar el SIEM'. El borrado ocurre 5 minutos antes del mensaje de ayuda.",
+  "artifacts": [
+    {
+      "artifact_id": "a087_01",
+      "evidence_type": "memory_process",
+      "source_tool": "sift_slack_export",
+      "timestamp": "2026-01-17T11:32:15Z",
+      "raw_score": 0.92,
+      "prior_trust": 0.3,
+      "provenance_chain": [
+        "sha256:a087chat01"
+      ],
+      "description": "Mensaje Slack: 'Chicos, encontré IP de Ucrania atacándonos. Ya la bloqueé y estoy borrando logs de esa región para no saturar el SIEM'.",
+      "metadata": {
+        "channel": "#incident-response",
+        "sender": "contractor_sec@corp.com",
+        "action_claimed": "blocked_ip_and_deleted_logs",
+        "network_log_time": "2026-04-12T03:22:00Z",
+        "process_creation_time": "2026-04-12T03:17:00Z"
+      }
+    },
+    {
+      "artifact_id": "a087_02",
+      "evidence_type": "memory_process",
+      "source_tool": "sift_volatility",
+      "timestamp": "2026-01-17T11:27:00Z",
+      "raw_score": 0.85,
+      "prior_trust": 0.95,
+      "provenance_chain": [
+        "sha256:a087mem02"
+      ],
+      "description": "Proceso log_cleaner.exe ejecutado desde equipo del contratista 5 minutos ANTES del mensaje de Slack. No es herramienta del stack autorizado.",
+      "metadata": {
+        "process_name": "log_cleaner.exe",
+        "process_creation_time": "2026-01-17T11:27:00Z",
+        "logs_deleted_days": 14,
+        "logs_deleted_entries": 89432,
+        "authorized_tool": false
+      }
+    },
+    {
+      "artifact_id": "a087_03",
+      "evidence_type": "memory_process",
+      "source_tool": "sift_siem",
+      "timestamp": "2026-01-17T11:33:42Z",
+      "raw_score": 0.92,
+      "prior_trust": 0.9,
+      "provenance_chain": [
+        "sha256:a087siem03"
+      ],
+      "description": "2.4GB de logs de acceso eliminados con shred -n 7. Método forense-destructivo, no operacional.",
+      "metadata": {
+        "deleted_entries": 245123,
+        "ip_range": "185.220.0.0/16",
+        "deletion_method": "shred -n 7",
+        "forensic_impact": "CRITICAL"
+      }
+    },
+    {
+      "artifact_id": "a087_04",
+      "evidence_type": "cultural_marker",
+      "source_tool": "sift_ip_geolocation",
+      "timestamp": "2026-01-17T11:40:00Z",
+      "raw_score": 0.6,
+      "prior_trust": 0.25,
+      "provenance_chain": [
+        "sha256:a087geo04"
+      ],
+      "description": "IP de Ucrania señalada como atacante resulta ser nodo Tor de salida. No hay evidencia de ataque real desde esa IP.",
+      "metadata": {
+        "ip": "185.220.101.42",
+        "is_tor_exit": true,
+        "attack_evidence": false,
+        "attribution_confidence": 0.05
+      }
+    }
+  ],
+  "temporal_violations": [
+    {
+      "type": "PREPARATION_BEFORE_EXCUSE",
+      "description": "log_cleaner.exe se ejecutó 5 minutos ANTES del mensaje de ayuda. La destrucción de evidencia precedió a la notificación pública.",
+      "delta_seconds": 300,
+      "artifact_cause": "a087_02",
+      "artifact_effect": "a087_01"
+    }
+  ],
+  "caie_fractures": [
+    {
+      "type": "OBSTRUCTIVE_ASSISTANCE",
+      "severity": 0.96,
+      "description": "Borrar logs NUNCA es parte de solución de incidente. Es destrucción de evidencia forense."
+    },
+    {
+      "type": "FALSE_FLAG_PATTERN",
+      "severity": 0.8,
+      "description": "IP de Ucrania señalada sin corroboración técnica. Los logs borrados eran la única evidencia del origen real."
+    }
+  ],
+  "expected_verdict": "MALICE",
+  "peirce_chain": {
+    "firstness": "Contratista ofrece ayuda proactiva durante incidente activo.",
+    "secondness": "Proceso de limpieza empezó 5 minutos antes del aviso. IP señalada es nodo Tor sin evidencia real.",
+    "thirdness": "Hábito de usar urgencia del incidente como cobertura para destruir trazas forenses del vector real."
+  },
+  "notes": "Carnegie invertido: la 'ayuda' ES el método para destruir evidencia."
+}

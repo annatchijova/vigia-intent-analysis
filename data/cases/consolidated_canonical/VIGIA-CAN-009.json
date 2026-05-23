@@ -1,0 +1,94 @@
+{
+  "case_id": "case_091_disonancia_motivo_noble",
+  "name": "La Disonancia del Motivo Noble",
+  "description": "Mensaje Slack: 'Vi tu contraseña en post-it de cámara, la borré para protegerte. Te la paso por link'. No hay post-it en ningún frame de la grabación. El link es dominio de phishing registrado 6 horas antes.",
+  "artifacts": [
+    {
+      "artifact_id": "a091_01",
+      "evidence_type": "memory_process",
+      "source_tool": "sift_slack_export",
+      "timestamp": "2026-01-18T10:22:45Z",
+      "raw_score": 0.92,
+      "prior_trust": 0.3,
+      "provenance_chain": [
+        "sha256:a091slk01"
+      ],
+      "description": "DM Slack: 'Che, vi que dejaste tu contraseña en un post-it en la cámara de reunión. La anoté y la borré de la captura... [link]'.",
+      "metadata": {
+        "sender": "compañero@corp.com",
+        "recipient": "victima@corp.com",
+        "has_link": true,
+        "link_domain": "corp-password-reset[.]com",
+        "carnegie_appeal": "salvarte de sanción",
+        "process_creation_time": "2026-04-14T16:03:00Z"
+      }
+    },
+    {
+      "artifact_id": "a091_02",
+      "evidence_type": "memory_process",
+      "source_tool": "sift_vision_ocr",
+      "timestamp": "2026-01-18T10:25:12Z",
+      "raw_score": 0.92,
+      "prior_trust": 0.6,
+      "provenance_chain": [
+        "sha256:a091vid02"
+      ],
+      "description": "Revisión de grabación de cámara de reunión: NO hay post-it visible en ninguno de los 1247 frames analizados.",
+      "metadata": {
+        "camera_id": "CONF-01",
+        "frames_reviewed": 1247,
+        "postit_detected": false
+      }
+    },
+    {
+      "artifact_id": "a091_03",
+      "evidence_type": "dns_record",
+      "source_tool": "sift_pcap",
+      "timestamp": "2026-01-18T10:22:45Z",
+      "raw_score": 0.92,
+      "prior_trust": 0.5,
+      "provenance_chain": [
+        "sha256:a091dns03"
+      ],
+      "description": "Dominio del link registrado 6 horas antes del mensaje. Hosting en bulletproof, certificado Let's Encrypt.",
+      "metadata": {
+        "domain": "corp-password-reset[.]com",
+        "creation_date": "2026-01-18T04:00Z",
+        "hosting": "bulletproof",
+        "network_log_time": "2026-04-14T16:08:00Z"
+      }
+    },
+    {
+      "artifact_id": "a091_04",
+      "evidence_type": "memory_process",
+      "source_tool": "sift_volatility",
+      "timestamp": "2026-01-18T10:28:00Z",
+      "raw_score": 0.95,
+      "prior_trust": 0.95,
+      "provenance_chain": [
+        "sha256:a091mem04"
+      ],
+      "description": "Proceso del 'compañero' con sesión de navegador autenticada en panel de administración de phishing.",
+      "metadata": {
+        "pid": 5512,
+        "browser": "chrome.exe",
+        "tab_title": "Corp Password Reset - Admin",
+        "phishing_panel": true
+      }
+    }
+  ],
+  "caie_fractures": [
+    {
+      "type": "VULNERABILITY_SOCIAL",
+      "severity": 0.95,
+      "description": "Motivo noble (protección) es envoltorio de phishing interno. Falsa solidaridad para inducir click en link malicioso."
+    }
+  ],
+  "expected_verdict": "MALICE",
+  "peirce_chain": {
+    "firstness": "Mensaje de falsa solidaridad con link de 'ayuda'.",
+    "secondness": "No hay post-it en cámara. Link es dominio de phishing registrado 6 horas antes. Remitente tiene panel admin activo.",
+    "thirdness": "Hábito de usar vulnerabilidad social y reciprocidad para inducir acción de riesgo bajo máscara de protección."
+  },
+  "notes": "Carnegie: 'Haga que la otra persona se sienta feliz de hacer lo que usted sugiere'."
+}

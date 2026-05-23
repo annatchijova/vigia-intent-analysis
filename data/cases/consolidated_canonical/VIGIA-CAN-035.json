@@ -1,0 +1,90 @@
+{
+  "case_id": "case_009_vacio_quirurgico",
+  "name": "El Vacío Quirúrgico",
+  "description": "Archivo de 2KB en /tmp borrado con shred -n 7 -z -u (grado militar, 7 pasadas). Asimetría entre tamaño (2KB) y esfuerzo de destrucción (DoD 5220.22-M). La sobre-destrucción indica encubrimiento de contenido crítico.",
+  "artifacts": [
+    {
+      "artifact_id": "a009_01",
+      "evidence_type": "memory_process",
+      "source_tool": "sift_auditd",
+      "timestamp": "2026-01-16T16:30:25Z",
+      "raw_score": 0.92,
+      "prior_trust": 0.92,
+      "provenance_chain": [
+        "sha256:a009aud01"
+      ],
+      "description": "Comando: shred -n 7 -z -u /tmp/nota.txt. Método DoD 5220.22-M (7 pasadas). Archivo: 2048 bytes.",
+      "metadata": {
+        "command": "shred -n 7 -z -u /tmp/nota.txt",
+        "file_size_bytes": 2048,
+        "deletion_method": "DoD 5220.22-M (7 passes)",
+        "normal_method": "rm or trash bin",
+        "asymmetry": "cannon to kill mosquito"
+      }
+    },
+    {
+      "artifact_id": "a009_02",
+      "evidence_type": "memory_process",
+      "source_tool": "sift_sleuthkit",
+      "timestamp": "2026-01-16T16:30:00Z",
+      "raw_score": 0.92,
+      "prior_trust": 0.7,
+      "provenance_chain": [
+        "sha256:a009ts02"
+      ],
+      "description": "Entrada de directorio borrada. Inodo reasignado. No hay recuperación posible post-shred. El MFT confirma la sobreescritura.",
+      "metadata": {
+        "file_path": "/tmp/nota.txt",
+        "inode_reallocated": true,
+        "recovery_possible": false,
+        "mft_overwrite_confirmed": true
+      }
+    },
+    {
+      "artifact_id": "a009_03",
+      "evidence_type": "memory_process",
+      "source_tool": "sift_volatility",
+      "timestamp": "2026-01-16T16:30:25Z",
+      "raw_score": 0.95,
+      "prior_trust": 0.95,
+      "provenance_chain": [
+        "sha256:a009mem03"
+      ],
+      "description": "Proceso shred en memoria con handle al archivo. Historial bash previo: acceso a archivo de credenciales 40 minutos antes.",
+      "metadata": {
+        "pid": 7213,
+        "process_name": "shred",
+        "bash_history_prev": [
+          "cat /etc/shadow",
+          "cat /tmp/nota.txt"
+        ],
+        "time_between_access_and_delete_min": 40
+      }
+    },
+    {
+      "artifact_id": "a009_04",
+      "evidence_type": "log_entry",
+      "source_tool": "sift_syslog",
+      "timestamp": "2026-01-16T15:50:00Z",
+      "raw_score": 0.07,
+      "prior_trust": 0.4,
+      "provenance_chain": [
+        "sha256:a009log04"
+      ],
+      "description": "Acceso a /tmp/nota.txt 40 minutos antes de la destrucción. Sesión SSH desde IP no reconocida.",
+      "metadata": {
+        "access_time": "2026-01-16T15:50:25Z",
+        "source_ip": "203.0.113.88",
+        "operation": "read",
+        "session_type": "ssh"
+      }
+    }
+  ],
+  "expected_verdict": "MALICE",
+  "peirce_chain": {
+    "firstness": "Archivo borrado de carpeta temporal.",
+    "secondness": "shred -n 7 para archivo de 2KB. Asimetría desproporcionada entre tamaño y esfuerzo de destrucción.",
+    "thirdness": "Hábito de eliminar trazas de actividad con herramientas forense-destructivas. La sobre-destrucción es la huella."
+  },
+  "notes": "Eco: Silencio Significativo. La ausencia es la huella más sucia. La asimetría grita encubrimiento."
+}

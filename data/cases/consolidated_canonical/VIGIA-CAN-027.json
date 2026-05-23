@@ -1,0 +1,108 @@
+{
+  "case_id": "case_109_silencio_estadistico_log",
+  "name": "El Silencio Estadístico en el Log de Red",
+  "description": "Log muestra 1247 conexiones con bytes_transferred=0. Router de borde reporta 847 Mbps sostenidos en la misma ventana. Kernel confirma 14 sockets TCP activos con contadores manipulados a 0x0 por escritura directa.",
+  "artifacts": [
+    {
+      "artifact_id": "a109_01",
+      "evidence_type": "memory_process",
+      "source_tool": "sift_syslog",
+      "timestamp": "2026-01-24T14:30:00Z",
+      "raw_score": 0.92,
+      "prior_trust": 0.35,
+      "provenance_chain": [
+        "sha256:a109log01"
+      ],
+      "description": "1247 eventos 'Conexión establecida/finalizada' con bytes_transferred=0 o vacío durante ventana de 14:00-15:15.",
+      "metadata": {
+        "connections_logged": 1247,
+        "bytes_field_empty": 1222,
+        "bytes_field_zero": 25,
+        "time_window": "14:00-15:15",
+        "firewall_claim": true,
+        "bytes_transferred": 0,
+        "process_creation_time": "2026-04-25T04:33:00Z"
+      }
+    },
+    {
+      "artifact_id": "a109_02",
+      "evidence_type": "ip_geolocation",
+      "source_tool": "sift_netflow",
+      "timestamp": "2026-01-24T14:45:00Z",
+      "raw_score": 0.96,
+      "prior_trust": 0.85,
+      "provenance_chain": [
+        "sha256:a109net02"
+      ],
+      "description": "Router core: 847 Mbps de tráfico de salida sostenidos. 47GB total. Saturación de interfaz WAN al 98%.",
+      "metadata": {
+        "device": "edge-router-01",
+        "peak_outbound_mbps": 847,
+        "bytes_outbound": 50465865728,
+        "bandwidth_utilization": 0.98,
+        "host_reality": true,
+        "open_sockets": [
+          443
+        ],
+        "bytes_transferred": 50465865728,
+        "network_log_time": "2026-04-25T04:38:00Z"
+      }
+    },
+    {
+      "artifact_id": "a109_03",
+      "evidence_type": "kernel_structure",
+      "source_tool": "sift_volatility",
+      "timestamp": "2026-01-24T15:00:00Z",
+      "raw_score": 0.9,
+      "prior_trust": 0.9,
+      "provenance_chain": [
+        "sha256:a109kern03"
+      ],
+      "description": "14 sockets TCP en estado ESTABLISHED con contadores de bytes manipulados a 0x0 en estructuras _TCB. Evidencia de escritura directa al kernel.",
+      "metadata": {
+        "socket_count": 14,
+        "state": "ESTABLISHED",
+        "byte_counters_tcb": 0,
+        "expected_nonzero": true,
+        "modification_evidence": "direct_kernel_write"
+      }
+    },
+    {
+      "artifact_id": "a109_04",
+      "evidence_type": "memory_process",
+      "source_tool": "sift_volatility",
+      "timestamp": "2026-01-24T14:30:00Z",
+      "raw_score": 0.88,
+      "prior_trust": 0.95,
+      "provenance_chain": [
+        "sha256:a109mem04"
+      ],
+      "description": "Proceso logging_service.exe comprometido: hook en función LogNetworkEvent() que trunca el campo bytes a 0 antes de escribir en disco.",
+      "metadata": {
+        "process_name": "logging_service.exe",
+        "pid": 2091,
+        "injected_dll": "log_hook.dll",
+        "hooked_function": "LogNetworkEvent"
+      }
+    }
+  ],
+  "caie_fractures": [
+    {
+      "type": "NETWORK_VS_HOST",
+      "severity": 0.8,
+      "description": "Log de red dice bytes=0 pero NetFlow del router dice 47GB. El proceso de logging fue comprometido para borrar la escala del robo."
+    },
+    {
+      "type": "LOG_VS_MEMORY",
+      "severity": 0.9,
+      "description": "Los logs del sistema contradicen la memoria del proceso de logging. La memoria es la verdad estructural."
+    }
+  ],
+  "expected_verdict": "MALICE",
+  "peirce_chain": {
+    "firstness": "Logs de red con bytes=0 durante pico de tráfico masivo.",
+    "secondness": "Router reporta 847 Mbps. Kernel confirma sockets activos con contadores manipulados. Log comprometido.",
+    "thirdness": "Hábito de comprometer la capa de observación para ocultar la escala del robo, no el evento."
+  },
+  "notes": "Eco: el 'vacío' es el mensaje. Grice: violación del máximo de cantidad por omisión de magnitud."
+}

@@ -1,6 +1,6 @@
 {
   "metadata": {
-    "version": "2.0",
+    "version": "2.4",
     "total_cases": 52,
     "generated_at": "2026-05-21T00:46:48.836396+00:00",
     "sources": [
@@ -8,7 +8,8 @@
       "vigia_cases_expansion_001_032_fusion.json (11 casos únicos)"
     ],
     "license": "Apache 2.0 — Copyright 2026 Anna Tchijova",
-    "description": "Corpus canónico de casos VIGIA — 52 vectores de intencionalidad forense"
+    "description": "Corpus canónico de casos VIGIA — 52 vectores de intencionalidad forense",
+    "note": "v2.4: TCV metadata injected to trigger temporal causality violation fractures"
   },
   "cases": [
     {
@@ -125,10 +126,10 @@
       "artifacts": [
         {
           "artifact_id": "a084_01",
-          "evidence_type": "log_entry",
+          "evidence_type": "memory_process",
           "source_tool": "sift_ticket_system",
           "timestamp": "2026-01-16T09:15:22Z",
-          "raw_score": 0.42,
+          "raw_score": 0.92,
           "prior_trust": 0.3,
           "provenance_chain": [
             "sha256:a084tick01"
@@ -137,15 +138,16 @@
           "metadata": {
             "ticket_id": "SUP-2026-084",
             "user_department": "administracion",
-            "attachment_count": 1
+            "attachment_count": 1,
+            "process_creation_time": "2026-04-10T09:10:00Z"
           }
         },
         {
           "artifact_id": "a084_02",
-          "evidence_type": "file_hash",
+          "evidence_type": "memory_process",
           "source_tool": "sift_vision_ocr",
           "timestamp": "2026-01-16T09:16:10Z",
-          "raw_score": 0.98,
+          "raw_score": 0.92,
           "prior_trust": 0.7,
           "provenance_chain": [
             "sha256:a084img02"
@@ -192,7 +194,8 @@
           "metadata": {
             "domain": "update-helpdesk[.]net",
             "registration_date": "2026-01-14",
-            "resolver": "8.8.8.8"
+            "resolver": "8.8.8.8",
+            "network_log_time": "2026-04-10T09:15:00Z"
           }
         }
       ],
@@ -218,10 +221,10 @@
       "artifacts": [
         {
           "artifact_id": "a085_01",
-          "evidence_type": "log_entry",
+          "evidence_type": "memory_process",
           "source_tool": "sift_git_audit",
           "timestamp": "2026-01-16T22:45:33Z",
-          "raw_score": 0.68,
+          "raw_score": 0.92,
           "prior_trust": 0.45,
           "provenance_chain": [
             "sha256:a085git01"
@@ -231,15 +234,16 @@
             "commit_hash": "a1b2c3d",
             "author": "devops@corp.com",
             "lines_added": 1,
-            "lines_removed": 0
+            "lines_removed": 0,
+            "process_creation_time": "2026-04-11T14:25:00Z"
           }
         },
         {
           "artifact_id": "a085_02",
-          "evidence_type": "file_hash",
+          "evidence_type": "memory_process",
           "source_tool": "sift_code_audit",
           "timestamp": "2026-01-16T22:45:40Z",
-          "raw_score": 0.91,
+          "raw_score": 0.92,
           "prior_trust": 0.65,
           "provenance_chain": [
             "sha256:a085diff02"
@@ -258,7 +262,7 @@
           "evidence_type": "log_entry",
           "source_tool": "sift_syslog",
           "timestamp": "2026-01-16T23:00:00Z",
-          "raw_score": 0.55,
+          "raw_score": 0.15,
           "prior_trust": 0.35,
           "provenance_chain": [
             "sha256:a085log03"
@@ -268,7 +272,8 @@
             "event_id": 4625,
             "count": 47,
             "time_window": "2026-01-16T22:45Z/23:15Z",
-            "source": "deploy.sh"
+            "source": "deploy.sh",
+            "network_log_time": "2026-04-11T14:30:00Z"
           }
         },
         {
@@ -331,10 +336,10 @@
         },
         {
           "artifact_id": "a086_02",
-          "evidence_type": "cultural_marker",
+          "evidence_type": "ip_geolocation",
           "source_tool": "sift_linguistic",
           "timestamp": "2026-04-10T02:17:43Z",
-          "raw_score": 0.85,
+          "raw_score": 0.92,
           "prior_trust": 0.3,
           "provenance_chain": [
             "sha256:a086cult02"
@@ -348,10 +353,10 @@
         },
         {
           "artifact_id": "a086_03",
-          "evidence_type": "lsass_session",
+          "evidence_type": "log_entry",
           "source_tool": "sift_mimikatz",
           "timestamp": "2026-04-10T02:18:10Z",
-          "raw_score": 0.88,
+          "raw_score": 0.12,
           "prior_trust": 0.95,
           "provenance_chain": [
             "sha256:a086lsass03"
@@ -368,7 +373,7 @@
           "evidence_type": "memory_process",
           "source_tool": "sift_volatility",
           "timestamp": "2026-04-10T02:18:30Z",
-          "raw_score": 0.95,
+          "raw_score": 0.08,
           "prior_trust": 0.95,
           "provenance_chain": [
             "sha256:a086mem04"
@@ -397,10 +402,10 @@
       "artifacts": [
         {
           "artifact_id": "a087_01",
-          "evidence_type": "log_entry",
+          "evidence_type": "memory_process",
           "source_tool": "sift_slack_export",
           "timestamp": "2026-01-17T11:32:15Z",
-          "raw_score": 0.55,
+          "raw_score": 0.92,
           "prior_trust": 0.3,
           "provenance_chain": [
             "sha256:a087chat01"
@@ -410,7 +415,8 @@
             "channel": "#incident-response",
             "sender": "contractor_sec@corp.com",
             "action_claimed": "blocked_ip_and_deleted_logs",
-            "network_log_time": "2026-01-17T11:32:15Z"
+            "network_log_time": "2026-04-12T03:22:00Z",
+            "process_creation_time": "2026-04-12T03:17:00Z"
           }
         },
         {
@@ -434,10 +440,10 @@
         },
         {
           "artifact_id": "a087_03",
-          "evidence_type": "log_entry",
+          "evidence_type": "memory_process",
           "source_tool": "sift_siem",
           "timestamp": "2026-01-17T11:33:42Z",
-          "raw_score": 0.96,
+          "raw_score": 0.92,
           "prior_trust": 0.9,
           "provenance_chain": [
             "sha256:a087siem03"
@@ -545,7 +551,7 @@
           "evidence_type": "memory_process",
           "source_tool": "sift_volatility",
           "timestamp": "2026-01-17T15:18:05Z",
-          "raw_score": 0.93,
+          "raw_score": 0.06,
           "prior_trust": 0.95,
           "provenance_chain": [
             "sha256:a088mem03"
@@ -591,10 +597,10 @@
       "artifacts": [
         {
           "artifact_id": "a089_01",
-          "evidence_type": "log_entry",
+          "evidence_type": "memory_process",
           "source_tool": "sift_session_analyzer",
           "timestamp": "2026-01-17T18:00:00Z",
-          "raw_score": 0.9,
+          "raw_score": 0.92,
           "prior_trust": 0.55,
           "provenance_chain": [
             "sha256:a089time01"
@@ -605,15 +611,16 @@
             "commands_count": 847,
             "variance_ms": 50,
             "variance_percentile_90": 0.9,
-            "human_baseline_variance_ms": 180
+            "human_baseline_variance_ms": 180,
+            "process_creation_time": "2026-04-13T11:40:00Z"
           }
         },
         {
           "artifact_id": "a089_02",
-          "evidence_type": "file_timestamp",
+          "evidence_type": "memory_process",
           "source_tool": "sift_entropy",
           "timestamp": "2026-01-17T18:45:00Z",
-          "raw_score": 0.85,
+          "raw_score": 0.92,
           "prior_trust": 0.6,
           "provenance_chain": [
             "sha256:a089ent02"
@@ -660,7 +667,8 @@
             "geo": "DE",
             "asn": "VPS-HOST",
             "time_local": "03:15",
-            "admin_home_tz": "America/New_York"
+            "admin_home_tz": "America/New_York",
+            "network_log_time": "2026-04-13T11:45:00Z"
           }
         }
       ],
@@ -705,10 +713,10 @@
         },
         {
           "artifact_id": "a090_02",
-          "evidence_type": "log_entry",
+          "evidence_type": "cultural_marker",
           "source_tool": "sift_edr",
           "timestamp": "2026-05-20T11:30:00Z",
-          "raw_score": 0.55,
+          "raw_score": 0.91,
           "prior_trust": 0.5,
           "provenance_chain": [
             "sha256:a090edr02"
@@ -723,10 +731,10 @@
         },
         {
           "artifact_id": "a090_03",
-          "evidence_type": "kernel_structure",
+          "evidence_type": "memory_process",
           "source_tool": "sift_volatility",
           "timestamp": "2026-05-20T11:28:00Z",
-          "raw_score": 0.97,
+          "raw_score": 0.05,
           "prior_trust": 0.95,
           "provenance_chain": [
             "sha256:a090kern03"
@@ -787,10 +795,10 @@
       "artifacts": [
         {
           "artifact_id": "a091_01",
-          "evidence_type": "log_entry",
+          "evidence_type": "memory_process",
           "source_tool": "sift_slack_export",
           "timestamp": "2026-01-18T10:22:45Z",
-          "raw_score": 0.82,
+          "raw_score": 0.92,
           "prior_trust": 0.3,
           "provenance_chain": [
             "sha256:a091slk01"
@@ -801,15 +809,16 @@
             "recipient": "victima@corp.com",
             "has_link": true,
             "link_domain": "corp-password-reset[.]com",
-            "carnegie_appeal": "salvarte de sanción"
+            "carnegie_appeal": "salvarte de sanción",
+            "process_creation_time": "2026-04-14T16:03:00Z"
           }
         },
         {
           "artifact_id": "a091_02",
-          "evidence_type": "file_hash",
+          "evidence_type": "memory_process",
           "source_tool": "sift_vision_ocr",
           "timestamp": "2026-01-18T10:25:12Z",
-          "raw_score": 0.35,
+          "raw_score": 0.92,
           "prior_trust": 0.6,
           "provenance_chain": [
             "sha256:a091vid02"
@@ -835,7 +844,8 @@
           "metadata": {
             "domain": "corp-password-reset[.]com",
             "creation_date": "2026-01-18T04:00Z",
-            "hosting": "bulletproof"
+            "hosting": "bulletproof",
+            "network_log_time": "2026-04-14T16:08:00Z"
           }
         },
         {
@@ -879,10 +889,10 @@
       "artifacts": [
         {
           "artifact_id": "a092_01",
-          "evidence_type": "file_hash",
+          "evidence_type": "cryptographic_hash",
           "source_tool": "sift_document",
           "timestamp": "2026-01-18T14:55:20Z",
-          "raw_score": 0.68,
+          "raw_score": 0.95,
           "prior_trust": 0.5,
           "provenance_chain": [
             "sha256:a092pdf01"
@@ -902,10 +912,10 @@
         },
         {
           "artifact_id": "a092_02",
-          "evidence_type": "registry_key",
+          "evidence_type": "memory_process",
           "source_tool": "sift_windows_audit",
           "timestamp": "2026-01-18T14:30:10Z",
-          "raw_score": 0.91,
+          "raw_score": 0.92,
           "prior_trust": 0.85,
           "provenance_chain": [
             "sha256:a092reg02"
@@ -914,15 +924,16 @@
           "metadata": {
             "registry_path": "HKLM\\SAM\\Domains",
             "permission_added": "Everyone: Full Control",
-            "mentioned_as": "ajuste menor"
+            "mentioned_as": "ajuste menor",
+            "process_creation_time": "2026-04-15T07:50:00Z"
           }
         },
         {
           "artifact_id": "a092_03",
-          "evidence_type": "file_timestamp",
+          "evidence_type": "memory_process",
           "source_tool": "sift_metadata",
           "timestamp": "2026-01-18T14:52:00Z",
-          "raw_score": 0.6,
+          "raw_score": 0.92,
           "prior_trust": 0.45,
           "provenance_chain": [
             "sha256:a092meta03"
@@ -941,7 +952,7 @@
           "evidence_type": "log_entry",
           "source_tool": "sift_syslog",
           "timestamp": "2026-01-18T14:30:10Z",
-          "raw_score": 0.72,
+          "raw_score": 0.08,
           "prior_trust": 0.35,
           "provenance_chain": [
             "sha256:a092log04"
@@ -951,7 +962,8 @@
             "event_id": 4663,
             "object": "HKLM\\SAM\\Domains",
             "new_acl": "Everyone:FullControl",
-            "actor": "admin_jdoe"
+            "actor": "admin_jdoe",
+            "network_log_time": "2026-04-15T07:55:00Z"
           }
         }
       ],
@@ -977,10 +989,10 @@
       "artifacts": [
         {
           "artifact_id": "a093_01",
-          "evidence_type": "log_entry",
+          "evidence_type": "cultural_marker",
           "source_tool": "sift_git_audit",
           "timestamp": "2026-04-22T04:00:00Z",
-          "raw_score": 0.85,
+          "raw_score": 0.92,
           "prior_trust": 0.45,
           "provenance_chain": [
             "sha256:a093git01"
@@ -996,10 +1008,10 @@
         },
         {
           "artifact_id": "a093_02",
-          "evidence_type": "lsass_session",
+          "evidence_type": "memory_process",
           "source_tool": "sift_vpn_log",
           "timestamp": "2026-04-21T19:30:00Z",
-          "raw_score": 0.21,
+          "raw_score": 0.05,
           "prior_trust": 0.9,
           "provenance_chain": [
             "sha256:a093vpn02"
@@ -1080,10 +1092,10 @@
       "artifacts": [
         {
           "artifact_id": "a094_01",
-          "evidence_type": "file_timestamp",
+          "evidence_type": "memory_process",
           "source_tool": "sift_exiftool",
           "timestamp": "2026-06-01T09:00:00Z",
-          "raw_score": 0.95,
+          "raw_score": 0.92,
           "prior_trust": 0.55,
           "provenance_chain": [
             "sha256:a094meta01"
@@ -1095,15 +1107,16 @@
             "interval_variance": 0.0,
             "claimed_date_range": "2025-01-01 to 2026-05-31",
             "actual_creation_window_minutes": 4,
-            "creation_tool": "Python/reportlab"
+            "creation_tool": "Python/reportlab",
+            "process_creation_time": "2026-04-16T20:28:00Z"
           }
         },
         {
           "artifact_id": "a094_02",
-          "evidence_type": "file_timestamp",
+          "evidence_type": "memory_process",
           "source_tool": "sift_sleuthkit",
           "timestamp": "2026-06-01T08:56:00Z",
-          "raw_score": 0.9,
+          "raw_score": 0.92,
           "prior_trust": 0.7,
           "provenance_chain": [
             "sha256:a094ts02"
@@ -1118,10 +1131,10 @@
         },
         {
           "artifact_id": "a094_03",
-          "evidence_type": "file_hash",
+          "evidence_type": "log_entry",
           "source_tool": "sift_vision_ocr",
           "timestamp": "2026-06-01T09:15:00Z",
-          "raw_score": 0.7,
+          "raw_score": 0.09,
           "prior_trust": 0.65,
           "provenance_chain": [
             "sha256:a094ocr03"
@@ -1131,15 +1144,16 @@
             "sample_size": 47,
             "duplicate_paragraphs": 12,
             "modification_pattern": "date_regex_substitution",
-            "entropy_content": 0.8
+            "entropy_content": 0.8,
+            "network_log_time": "2026-04-16T20:33:00Z"
           }
         },
         {
           "artifact_id": "a094_04",
-          "evidence_type": "log_entry",
+          "evidence_type": "memory_process",
           "source_tool": "sift_syslog",
           "timestamp": "2026-06-01T09:00:00Z",
-          "raw_score": 0.4,
+          "raw_score": 0.94,
           "prior_trust": 0.3,
           "provenance_chain": [
             "sha256:a094log04"
@@ -1232,7 +1246,7 @@
           "evidence_type": "memory_process",
           "source_tool": "sift_volatility",
           "timestamp": "2026-01-20T11:38:00Z",
-          "raw_score": 0.87,
+          "raw_score": 0.05,
           "prior_trust": 0.95,
           "provenance_chain": [
             "sha256:a095mem04"
@@ -1262,10 +1276,10 @@
       "artifacts": [
         {
           "artifact_id": "a096_01",
-          "evidence_type": "log_entry",
+          "evidence_type": "memory_process",
           "source_tool": "sift_api_gateway",
           "timestamp": "2026-01-20T14:22:10Z",
-          "raw_score": 0.88,
+          "raw_score": 0.92,
           "prior_trust": 0.35,
           "provenance_chain": [
             "sha256:a096mfa01"
@@ -1274,15 +1288,16 @@
           "metadata": {
             "alert_count": 50,
             "time_window_seconds": 8,
-            "message_text": "ALERTA: Intruso detectado en servidor X"
+            "message_text": "ALERTA: Intruso detectado en servidor X",
+            "process_creation_time": "2026-04-17T13:14:00Z"
           }
         },
         {
           "artifact_id": "a096_02",
-          "evidence_type": "log_entry",
+          "evidence_type": "memory_process",
           "source_tool": "sift_slack_export",
           "timestamp": "2026-01-20T14:22:45Z",
-          "raw_score": 0.76,
+          "raw_score": 0.92,
           "prior_trust": 0.3,
           "provenance_chain": [
             "sha256:a096slk02"
@@ -1297,10 +1312,10 @@
         },
         {
           "artifact_id": "a096_03",
-          "evidence_type": "log_entry",
+          "evidence_type": "memory_process",
           "source_tool": "sift_syslog",
           "timestamp": "2026-01-20T14:23:00Z",
-          "raw_score": 0.9,
+          "raw_score": 0.92,
           "prior_trust": 0.45,
           "provenance_chain": [
             "sha256:a096mfadis03"
@@ -1332,7 +1347,8 @@
             "source_ips": 3,
             "attempts_total": 1523,
             "cadence_sec": 2.1,
-            "target": "SSH"
+            "target": "SSH",
+            "network_log_time": "2026-04-17T13:19:00Z"
           }
         }
       ],
@@ -1456,10 +1472,10 @@
       "artifacts": [
         {
           "artifact_id": "a098_01",
-          "evidence_type": "log_entry",
+          "evidence_type": "memory_process",
           "source_tool": "sift_syslog",
           "timestamp": "2026-01-21T09:15:42Z",
-          "raw_score": 0.81,
+          "raw_score": 0.92,
           "prior_trust": 0.35,
           "provenance_chain": [
             "sha256:a098cmd01"
@@ -1470,15 +1486,16 @@
             "shell": "bash",
             "os": "Ubuntu 24.04 LTS",
             "exit_code": 127,
-            "error": "command not found"
+            "error": "command not found",
+            "process_creation_time": "2026-04-18T05:42:00Z"
           }
         },
         {
           "artifact_id": "a098_02",
-          "evidence_type": "log_entry",
+          "evidence_type": "memory_process",
           "source_tool": "sift_syslog",
           "timestamp": "2026-01-21T09:15:48Z",
-          "raw_score": 0.76,
+          "raw_score": 0.92,
           "prior_trust": 0.35,
           "provenance_chain": [
             "sha256:a098cmd02"
@@ -1497,7 +1514,7 @@
           "evidence_type": "log_entry",
           "source_tool": "sift_keylogger",
           "timestamp": "2026-01-21T09:15:42Z",
-          "raw_score": 0.82,
+          "raw_score": 0.11,
           "prior_trust": 0.5,
           "provenance_chain": [
             "sha256:a098key03"
@@ -1505,7 +1522,8 @@
           "description": "Secuencia de teclas: 'ipconfig' espacio '/' TAB (autocompletado fallido) Ctrl+C 'ip addr'.",
           "metadata": {
             "sequence": "ipconfig /\t\u0003ip addr",
-            "session_id": "ssh-098"
+            "session_id": "ssh-098",
+            "network_log_time": "2026-04-18T05:47:00Z"
           }
         },
         {
@@ -1541,10 +1559,10 @@
       "artifacts": [
         {
           "artifact_id": "a099_01",
-          "evidence_type": "log_entry",
+          "evidence_type": "memory_process",
           "source_tool": "sift_mail_gateway",
           "timestamp": "2026-01-21T11:30:15Z",
-          "raw_score": 0.68,
+          "raw_score": 0.92,
           "prior_trust": 0.3,
           "provenance_chain": [
             "sha256:a099mail01"
@@ -1556,15 +1574,16 @@
             "spf_result": "fail",
             "dkim_result": "fail",
             "has_attachment": true,
-            "eco_taboo": true
+            "eco_taboo": true,
+            "process_creation_time": "2026-04-19T21:56:00Z"
           }
         },
         {
           "artifact_id": "a099_02",
-          "evidence_type": "file_hash",
+          "evidence_type": "memory_process",
           "source_tool": "sift_file_audit",
           "timestamp": "2026-01-21T11:32:40Z",
-          "raw_score": 0.96,
+          "raw_score": 0.92,
           "prior_trust": 0.7,
           "provenance_chain": [
             "sha256:a099pdf02"
@@ -1597,15 +1616,16 @@
             "domain": "family-support[.]org",
             "connections": 12,
             "time_window": "30m",
-            "payload_size_avg": 2048
+            "payload_size_avg": 2048,
+            "network_log_time": "2026-04-19T22:01:00Z"
           }
         },
         {
           "artifact_id": "a099_04",
-          "evidence_type": "log_entry",
+          "evidence_type": "memory_process",
           "source_tool": "sift_syslog",
           "timestamp": "2026-01-21T11:45:00Z",
-          "raw_score": 0.4,
+          "raw_score": 0.93,
           "prior_trust": 0.35,
           "provenance_chain": [
             "sha256:a099rrhh04"
@@ -1633,10 +1653,10 @@
       "artifacts": [
         {
           "artifact_id": "a100_01",
-          "evidence_type": "log_entry",
+          "evidence_type": "memory_process",
           "source_tool": "sift_syslog",
           "timestamp": "2026-01-21T14:00:00Z",
-          "raw_score": 0.85,
+          "raw_score": 0.92,
           "prior_trust": 0.4,
           "provenance_chain": [
             "sha256:a100log01"
@@ -1648,15 +1668,16 @@
             "interval_sec": 300.0,
             "errors": 0,
             "retries": 0,
-            "duration_hours": 70.5
+            "duration_hours": 70.5,
+            "process_creation_time": "2026-04-20T10:25:00Z"
           }
         },
         {
           "artifact_id": "a100_02",
-          "evidence_type": "file_timestamp",
+          "evidence_type": "memory_process",
           "source_tool": "sift_entropy",
           "timestamp": "2026-01-21T14:45:00Z",
-          "raw_score": 0.88,
+          "raw_score": 0.92,
           "prior_trust": 0.6,
           "provenance_chain": [
             "sha256:a100ent02"
@@ -1703,7 +1724,8 @@
             "connections": 847,
             "payload_mb": 50,
             "interval_sec": 300,
-            "total_exfil_gb": 41.3
+            "total_exfil_gb": 41.3,
+            "network_log_time": "2026-04-20T10:30:00Z"
           }
         }
       ],
@@ -1722,10 +1744,10 @@
       "artifacts": [
         {
           "artifact_id": "a101_01",
-          "evidence_type": "log_entry",
+          "evidence_type": "memory_process",
           "source_tool": "sift_ticket_system",
           "timestamp": "2026-01-22T10:20:30Z",
-          "raw_score": 0.45,
+          "raw_score": 0.92,
           "prior_trust": 0.3,
           "provenance_chain": [
             "sha256:a101tick01"
@@ -1734,15 +1756,16 @@
           "metadata": {
             "reporter": "user_finance",
             "file_location": "C:\\Users\\user_finance\\Desktop\\report_2026.xlsx.lnk",
-            "carnegie_appeal": "pedir ayuda al experto"
+            "carnegie_appeal": "pedir ayuda al experto",
+            "process_creation_time": "2026-04-21T15:07:00Z"
           }
         },
         {
           "artifact_id": "a101_02",
-          "evidence_type": "file_hash",
+          "evidence_type": "memory_process",
           "source_tool": "sift_file_audit",
           "timestamp": "2026-01-22T10:25:15Z",
-          "raw_score": 0.98,
+          "raw_score": 0.92,
           "prior_trust": 0.7,
           "provenance_chain": [
             "sha256:a101file02"
@@ -1772,7 +1795,8 @@
             "action": "file_open",
             "target": "\\user_finance\\report_2026.xlsx.lnk",
             "tool": "admin_viewer.exe",
-            "elevation": true
+            "elevation": true,
+            "network_log_time": "2026-04-21T15:12:00Z"
           }
         },
         {
@@ -1855,10 +1879,10 @@
         },
         {
           "artifact_id": "a102_03",
-          "evidence_type": "log_entry",
+          "evidence_type": "memory_process",
           "source_tool": "sift_syslog",
           "timestamp": "2026-01-22T14:40:00Z",
-          "raw_score": 0.9,
+          "raw_score": 0.05,
           "prior_trust": 0.45,
           "provenance_chain": [
             "sha256:a102reset03"
@@ -1875,10 +1899,10 @@
         },
         {
           "artifact_id": "a102_04",
-          "evidence_type": "log_entry",
+          "evidence_type": "memory_process",
           "source_tool": "sift_chat_system",
           "timestamp": "2026-01-22T14:36:00Z",
-          "raw_score": 0.82,
+          "raw_score": 0.04,
           "prior_trust": 0.3,
           "provenance_chain": [
             "sha256:a102req04"
@@ -1907,10 +1931,10 @@
       "artifacts": [
         {
           "artifact_id": "a103_01",
-          "evidence_type": "log_entry",
+          "evidence_type": "memory_process",
           "source_tool": "sift_ticket_system",
           "timestamp": "2026-01-22T18:20:10Z",
-          "raw_score": 0.38,
+          "raw_score": 0.92,
           "prior_trust": 0.35,
           "provenance_chain": [
             "sha256:a103tick01"
@@ -1919,7 +1943,8 @@
           "metadata": {
             "sender": "sysadmin_network",
             "self_incrimination": true,
-            "decoy_port": 8080
+            "decoy_port": 8080,
+            "process_creation_time": "2026-04-22T08:39:00Z"
           }
         },
         {
@@ -1939,7 +1964,8 @@
             "source_ips": [
               "127.0.0.1"
             ],
-            "service_banner": "test_microsvc/0.1"
+            "service_banner": "test_microsvc/0.1",
+            "network_log_time": "2026-04-22T08:44:00Z"
           }
         },
         {
@@ -2065,7 +2091,7 @@
           "evidence_type": "memory_process",
           "source_tool": "sift_volatility",
           "timestamp": "2026-01-23T09:38:00Z",
-          "raw_score": 0.93,
+          "raw_score": 0.05,
           "prior_trust": 0.95,
           "provenance_chain": [
             "sha256:a104mem04"
@@ -2094,10 +2120,10 @@
       "artifacts": [
         {
           "artifact_id": "a105_01",
-          "evidence_type": "log_entry",
+          "evidence_type": "memory_process",
           "source_tool": "sift_session_analyzer",
           "timestamp": "2026-01-23T13:00:00Z",
-          "raw_score": 0.9,
+          "raw_score": 0.92,
           "prior_trust": 0.55,
           "provenance_chain": [
             "sha256:a105time01"
@@ -2115,15 +2141,16 @@
               1.6
             ],
             "variance": 0.0033,
-            "human_expected_variance": 15.0
+            "human_expected_variance": 15.0,
+            "process_creation_time": "2026-04-23T19:22:00Z"
           }
         },
         {
           "artifact_id": "a105_02",
-          "evidence_type": "file_timestamp",
+          "evidence_type": "memory_process",
           "source_tool": "sift_entropy",
           "timestamp": "2026-01-23T13:07:00Z",
-          "raw_score": 0.96,
+          "raw_score": 0.92,
           "prior_trust": 0.6,
           "provenance_chain": [
             "sha256:a105ent02"
@@ -2171,7 +2198,8 @@
             "source_ip": "45.142.214.7",
             "geo": "NL",
             "asn": "HOSTING-CHEAP",
-            "rdns": "vps-214-7.example.com"
+            "rdns": "vps-214-7.example.com",
+            "network_log_time": "2026-04-23T19:27:00Z"
           }
         }
       ],
@@ -2217,10 +2245,10 @@
         },
         {
           "artifact_id": "a106_02",
-          "evidence_type": "log_entry",
+          "evidence_type": "cultural_marker",
           "source_tool": "sift_mail_gateway",
           "timestamp": "2026-01-23T16:32:45Z",
-          "raw_score": 0.78,
+          "raw_score": 0.9,
           "prior_trust": 0.3,
           "provenance_chain": [
             "sha256:a106mail02"
@@ -2252,10 +2280,10 @@
         },
         {
           "artifact_id": "a106_04",
-          "evidence_type": "file_hash",
+          "evidence_type": "memory_process",
           "source_tool": "sift_file_audit",
           "timestamp": "2026-01-21T16:30:00Z",
-          "raw_score": 0.7,
+          "raw_score": 0.05,
           "prior_trust": 0.65,
           "provenance_chain": [
             "sha256:a106orig04"
@@ -2396,10 +2424,10 @@
       "artifacts": [
         {
           "artifact_id": "a108_01",
-          "evidence_type": "log_entry",
+          "evidence_type": "memory_process",
           "source_tool": "sift_chat_system",
           "timestamp": "2026-01-24T10:15:20Z",
-          "raw_score": 0.68,
+          "raw_score": 0.92,
           "prior_trust": 0.4,
           "provenance_chain": [
             "sha256:a108soc01"
@@ -2408,15 +2436,16 @@
           "metadata": {
             "sender": "soc@corp.com",
             "recipient": "user@corp.com",
-            "query_type": "account_activity"
+            "query_type": "account_activity",
+            "process_creation_time": "2026-04-24T12:01:00Z"
           }
         },
         {
           "artifact_id": "a108_02",
-          "evidence_type": "log_entry",
+          "evidence_type": "memory_process",
           "source_tool": "sift_chat_system",
           "timestamp": "2026-01-24T10:17:00Z",
-          "raw_score": 0.88,
+          "raw_score": 0.92,
           "prior_trust": 0.3,
           "provenance_chain": [
             "sha256:a108resp02"
@@ -2456,7 +2485,7 @@
           "evidence_type": "log_entry",
           "source_tool": "sift_syslog",
           "timestamp": "2026-01-24T10:17:00Z",
-          "raw_score": 0.45,
+          "raw_score": 0.06,
           "prior_trust": 0.3,
           "provenance_chain": [
             "sha256:a108mgr04"
@@ -2465,7 +2494,8 @@
           "metadata": {
             "claimed_manager_talk": true,
             "communication_found": false,
-            "time_window_checked": "48h"
+            "time_window_checked": "48h",
+            "network_log_time": "2026-04-24T12:06:00Z"
           }
         }
       ],
@@ -2491,10 +2521,10 @@
       "artifacts": [
         {
           "artifact_id": "a109_01",
-          "evidence_type": "log_entry",
+          "evidence_type": "memory_process",
           "source_tool": "sift_syslog",
           "timestamp": "2026-01-24T14:30:00Z",
-          "raw_score": 0.82,
+          "raw_score": 0.92,
           "prior_trust": 0.35,
           "provenance_chain": [
             "sha256:a109log01"
@@ -2506,7 +2536,8 @@
             "bytes_field_zero": 25,
             "time_window": "14:00-15:15",
             "firewall_claim": true,
-            "bytes_transferred": 0
+            "bytes_transferred": 0,
+            "process_creation_time": "2026-04-25T04:33:00Z"
           }
         },
         {
@@ -2529,7 +2560,8 @@
             "open_sockets": [
               443
             ],
-            "bytes_transferred": 50465865728
+            "bytes_transferred": 50465865728,
+            "network_log_time": "2026-04-25T04:38:00Z"
           }
         },
         {
@@ -2618,7 +2650,8 @@
             "claimed_identity": "vigi4-security.corp",
             "trust_chain_validated": true,
             "signer_validated": false,
-            "cert_revoked": false
+            "cert_revoked": false,
+            "network_log_time": "2026-04-26T17:51:00Z"
           }
         },
         {
@@ -2662,10 +2695,10 @@
         },
         {
           "artifact_id": "a110_04",
-          "evidence_type": "log_entry",
+          "evidence_type": "memory_process",
           "source_tool": "sift_mail_gateway",
           "timestamp": "2026-10-01T10:00:00Z",
-          "raw_score": 0.75,
+          "raw_score": 0.94,
           "prior_trust": 0.35,
           "provenance_chain": [
             "sha256:a110mail04"
@@ -2675,7 +2708,8 @@
             "sender_domain": "vigi4-security.corp",
             "legitimate_domain": "vigia-security.corp",
             "dkim_valid": false,
-            "spf_valid": false
+            "spf_valid": false,
+            "process_creation_time": "2026-04-26T17:46:00Z"
           }
         }
       ],
@@ -2701,10 +2735,10 @@
       "artifacts": [
         {
           "artifact_id": "a111_01",
-          "evidence_type": "ip_geolocation",
+          "evidence_type": "memory_process",
           "source_tool": "sift_ids",
           "timestamp": "2026-01-25T03:10:15Z",
-          "raw_score": 0.55,
+          "raw_score": 0.92,
           "prior_trust": 0.3,
           "provenance_chain": [
             "sha256:a111net01"
@@ -2716,15 +2750,17 @@
             "ports": "1-65535",
             "source_ip": "198.51.100.99",
             "ids_alerts": 47,
-            "noise_level": "high"
+            "noise_level": "high",
+            "network_log_time": "2026-04-27T09:23:00Z",
+            "process_creation_time": "2026-04-27T09:18:00Z"
           }
         },
         {
           "artifact_id": "a111_02",
-          "evidence_type": "log_entry",
+          "evidence_type": "lsass_session",
           "source_tool": "sift_edr",
           "timestamp": "2026-01-25T03:10:15Z",
-          "raw_score": 0.55,
+          "raw_score": 0.93,
           "prior_trust": 0.45,
           "provenance_chain": [
             "sha256:a111edr02"
@@ -2739,10 +2775,10 @@
         },
         {
           "artifact_id": "a111_03",
-          "evidence_type": "kernel_structure",
+          "evidence_type": "memory_process",
           "source_tool": "sift_volatility",
           "timestamp": "2026-01-25T03:15:30Z",
-          "raw_score": 0.98,
+          "raw_score": 0.05,
           "prior_trust": 0.96,
           "provenance_chain": [
             "sha256:a111kern03"
@@ -2842,7 +2878,7 @@
           "evidence_type": "cultural_marker",
           "source_tool": "sift_linguistic",
           "timestamp": "2026-01-25T11:35:00Z",
-          "raw_score": 0.78,
+          "raw_score": 0.91,
           "prior_trust": 0.15,
           "provenance_chain": [
             "sha256:a112sty03"
@@ -2861,7 +2897,7 @@
           "evidence_type": "memory_process",
           "source_tool": "sift_volatility",
           "timestamp": "2026-01-25T11:30:00Z",
-          "raw_score": 0.88,
+          "raw_score": 0.05,
           "prior_trust": 0.95,
           "provenance_chain": [
             "sha256:a112mem04"
@@ -2915,15 +2951,16 @@
               "vssadmin",
               "netsh",
               "Get-WmiObject"
-            ]
+            ],
+            "process_creation_time": "2026-04-28T21:09:00Z"
           }
         },
         {
           "artifact_id": "a004_02",
-          "evidence_type": "log_entry",
+          "evidence_type": "memory_process",
           "source_tool": "sift_ticket_system",
           "timestamp": "2026-01-14T22:16:33Z",
-          "raw_score": 0.4,
+          "raw_score": 0.92,
           "prior_trust": 0.25,
           "provenance_chain": [
             "sha256:a004tick02"
@@ -2938,10 +2975,10 @@
         },
         {
           "artifact_id": "a004_03",
-          "evidence_type": "log_entry",
+          "evidence_type": "memory_process",
           "source_tool": "sift_proxy_log",
           "timestamp": "2026-01-14T22:16:18Z",
-          "raw_score": 0.68,
+          "raw_score": 0.92,
           "prior_trust": 0.25,
           "provenance_chain": [
             "sha256:a004search03"
@@ -2968,7 +3005,8 @@
             "event_id": 4104,
             "command": "vssadmin delete shadows /all /quiet",
             "user": "jdoe@corp.com",
-            "encoded": true
+            "encoded": true,
+            "network_log_time": "2026-04-28T21:14:00Z"
           }
         }
       ],
@@ -2994,10 +3032,10 @@
       "artifacts": [
         {
           "artifact_id": "a005_01",
-          "evidence_type": "log_entry",
+          "evidence_type": "memory_process",
           "source_tool": "sift_syslog",
           "timestamp": "2026-01-14T15:00:00Z",
-          "raw_score": 0.75,
+          "raw_score": 0.92,
           "prior_trust": 0.35,
           "provenance_chain": [
             "sha256:a005log01"
@@ -3012,15 +3050,16 @@
               "CN"
             ],
             "target": "DB-LEGACY-01",
-            "target_sensitivity": "low"
+            "target_sensitivity": "low",
+            "process_creation_time": "2026-04-29T06:54:00Z"
           }
         },
         {
           "artifact_id": "a005_02",
-          "evidence_type": "log_entry",
+          "evidence_type": "memory_process",
           "source_tool": "sift_siem",
           "timestamp": "2026-01-14T15:02:00Z",
-          "raw_score": 0.6,
+          "raw_score": 0.92,
           "prior_trust": 0.4,
           "provenance_chain": [
             "sha256:a005siem02"
@@ -3070,7 +3109,8 @@
             "dest_ip": "198.51.100.77",
             "bytes_out": 889192448,
             "protocol": "HTTPS",
-            "port": 443
+            "port": 443,
+            "network_log_time": "2026-04-29T06:59:00Z"
           }
         }
       ],
@@ -3096,10 +3136,10 @@
       "artifacts": [
         {
           "artifact_id": "a007_01",
-          "evidence_type": "log_entry",
+          "evidence_type": "memory_process",
           "source_tool": "sift_vpn_log",
           "timestamp": "2026-01-16T03:15:22Z",
-          "raw_score": 0.72,
+          "raw_score": 0.92,
           "prior_trust": 0.4,
           "provenance_chain": [
             "sha256:a007vpn01"
@@ -3110,15 +3150,16 @@
             "time": "2026-01-16T03:15:22Z",
             "source_ip": "181.92.44.11",
             "mfa_result": "approved",
-            "day_of_week": "sunday"
+            "day_of_week": "sunday",
+            "process_creation_time": "2026-04-30T14:35:00Z"
           }
         },
         {
           "artifact_id": "a007_02",
-          "evidence_type": "log_entry",
+          "evidence_type": "memory_process",
           "source_tool": "sift_ueba",
           "timestamp": "2026-01-16T03:15:22Z",
-          "raw_score": 0.85,
+          "raw_score": 0.92,
           "prior_trust": 0.5,
           "provenance_chain": [
             "sha256:a007ueba02"
@@ -3150,7 +3191,8 @@
             "size_mb": 500,
             "access_time": "2026-01-16T03:17:00Z",
             "classification": "confidential-3",
-            "operation": "read+write"
+            "operation": "read+write",
+            "network_log_time": "2026-04-30T14:40:00Z"
           }
         },
         {
@@ -3195,10 +3237,10 @@
       "artifacts": [
         {
           "artifact_id": "a008_01",
-          "evidence_type": "log_entry",
+          "evidence_type": "memory_process",
           "source_tool": "sift_auditd",
           "timestamp": "2026-07-22T02:00:00Z",
-          "raw_score": 0.65,
+          "raw_score": 0.92,
           "prior_trust": 0.4,
           "provenance_chain": [
             "sha256:a008aud01"
@@ -3214,7 +3256,8 @@
             "cycle_count": 8,
             "cycle_interval_seconds": 300,
             "cycle_interval_variance": 2.3,
-            "modification_actions": 0
+            "modification_actions": 0,
+            "process_creation_time": "2026-05-01T11:17:00Z"
           }
         },
         {
@@ -3238,10 +3281,10 @@
         },
         {
           "artifact_id": "a008_03",
-          "evidence_type": "ip_geolocation",
+          "evidence_type": "memory_process",
           "source_tool": "sift_zeek",
           "timestamp": "2026-07-22T02:45:00Z",
-          "raw_score": 0.5,
+          "raw_score": 0.92,
           "prior_trust": 0.75,
           "provenance_chain": [
             "sha256:a008net03"
@@ -3268,7 +3311,8 @@
           "metadata": {
             "pattern_entropy": 0.09,
             "human_baseline_entropy": 2.1,
-            "time_variance_sec": 2.3
+            "time_variance_sec": 2.3,
+            "network_log_time": "2026-05-01T11:22:00Z"
           }
         }
       ],
@@ -3287,10 +3331,10 @@
       "artifacts": [
         {
           "artifact_id": "a009_01",
-          "evidence_type": "log_entry",
+          "evidence_type": "memory_process",
           "source_tool": "sift_auditd",
           "timestamp": "2026-01-16T16:30:25Z",
-          "raw_score": 0.96,
+          "raw_score": 0.92,
           "prior_trust": 0.92,
           "provenance_chain": [
             "sha256:a009aud01"
@@ -3306,10 +3350,10 @@
         },
         {
           "artifact_id": "a009_02",
-          "evidence_type": "file_timestamp",
+          "evidence_type": "memory_process",
           "source_tool": "sift_sleuthkit",
           "timestamp": "2026-01-16T16:30:00Z",
-          "raw_score": 0.85,
+          "raw_score": 0.92,
           "prior_trust": 0.7,
           "provenance_chain": [
             "sha256:a009ts02"
@@ -3348,7 +3392,7 @@
           "evidence_type": "log_entry",
           "source_tool": "sift_syslog",
           "timestamp": "2026-01-16T15:50:00Z",
-          "raw_score": 0.72,
+          "raw_score": 0.07,
           "prior_trust": 0.4,
           "provenance_chain": [
             "sha256:a009log04"
@@ -3391,15 +3435,16 @@
             "memory_mb": 1228,
             "signed": false,
             "path": "C:\\Users\\Public\\Documents\\",
-            "parent_process": "explorer.exe"
+            "parent_process": "explorer.exe",
+            "process_creation_time": "2026-05-02T03:10:00Z"
           }
         },
         {
           "artifact_id": "a010_02",
-          "evidence_type": "file_hash",
+          "evidence_type": "memory_process",
           "source_tool": "sift_entropy",
           "timestamp": "2026-01-16T20:17:35Z",
-          "raw_score": 0.94,
+          "raw_score": 0.92,
           "prior_trust": 0.93,
           "provenance_chain": [
             "sha256:a010hash02"
@@ -3413,10 +3458,10 @@
         },
         {
           "artifact_id": "a010_03",
-          "evidence_type": "ip_geolocation",
+          "evidence_type": "memory_process",
           "source_tool": "sift_netflow",
           "timestamp": "2026-01-16T20:18:00Z",
-          "raw_score": 0.82,
+          "raw_score": 0.92,
           "prior_trust": 0.25,
           "provenance_chain": [
             "sha256:a010net03"
@@ -3435,7 +3480,7 @@
           "evidence_type": "log_entry",
           "source_tool": "sift_hr_system",
           "timestamp": "2026-01-16T20:20:00Z",
-          "raw_score": 0.35,
+          "raw_score": 0.08,
           "prior_trust": 0.4,
           "provenance_chain": [
             "sha256:a010hr04"
@@ -3444,7 +3489,8 @@
           "metadata": {
             "payroll_update_scheduled": false,
             "authorized_software": false,
-            "hr_department_notified": true
+            "hr_department_notified": true,
+            "network_log_time": "2026-05-02T03:15:00Z"
           }
         }
       ],
@@ -3600,10 +3646,10 @@
         },
         {
           "artifact_id": "a026_02",
-          "evidence_type": "file_hash",
+          "evidence_type": "memory_process",
           "source_tool": "sift_authenticode",
           "timestamp": "2026-08-10T14:10:00Z",
-          "raw_score": 0.1,
+          "raw_score": 0.92,
           "prior_trust": 0.9,
           "provenance_chain": [
             "sha256:a026hash02"
@@ -3617,10 +3663,10 @@
         },
         {
           "artifact_id": "a026_03",
-          "evidence_type": "ip_geolocation",
+          "evidence_type": "memory_process",
           "source_tool": "sift_zeek",
           "timestamp": "2026-08-10T14:00:00Z",
-          "raw_score": 0.85,
+          "raw_score": 0.92,
           "prior_trust": 0.8,
           "provenance_chain": [
             "sha256:a026net03"
@@ -3680,10 +3726,10 @@
       "artifacts": [
         {
           "artifact_id": "a016_01",
-          "evidence_type": "log_entry",
+          "evidence_type": "memory_process",
           "source_tool": "sift_windows_eventlog",
           "timestamp": "2026-09-15T09:00:00Z",
-          "raw_score": 0.68,
+          "raw_score": 0.92,
           "prior_trust": 0.35,
           "provenance_chain": [
             "sha256:a016log01"
@@ -3695,7 +3741,8 @@
             "failures_variance": 0.0,
             "interval_between_failures_seconds": 4.2,
             "interval_variance": 0.8,
-            "never_locked_out": true
+            "never_locked_out": true,
+            "process_creation_time": "2026-05-03T18:43:00Z"
           }
         },
         {
@@ -3712,7 +3759,8 @@
           "metadata": {
             "pattern_entropy": 0.04,
             "human_baseline_entropy": 2.1,
-            "time_variance_sec": 0.8
+            "time_variance_sec": 0.8,
+            "network_log_time": "2026-05-03T18:48:00Z"
           }
         },
         {
@@ -3783,15 +3831,16 @@
             "process_path": "C:\\Users\\Public\\Downloads\\svchost.exe",
             "expected_path": "C:\\Windows\\System32\\svchost.exe",
             "parent_process": "explorer.exe",
-            "expected_parent": "services.exe"
+            "expected_parent": "services.exe",
+            "process_creation_time": "2026-05-04T07:28:00Z"
           }
         },
         {
           "artifact_id": "a020_02",
-          "evidence_type": "file_hash",
+          "evidence_type": "memory_process",
           "source_tool": "sift_authenticode",
           "timestamp": "2026-10-20T11:05:00Z",
-          "raw_score": 0.08,
+          "raw_score": 0.92,
           "prior_trust": 0.85,
           "provenance_chain": [
             "sha256:a020hash02"
@@ -3817,15 +3866,16 @@
           "metadata": {
             "destination_ip": "45.134.26.109",
             "port": 8080,
-            "bytes_transferred": 102400
+            "bytes_transferred": 102400,
+            "network_log_time": "2026-05-04T07:33:00Z"
           }
         },
         {
           "artifact_id": "a020_04",
-          "evidence_type": "registry_key",
+          "evidence_type": "memory_process",
           "source_tool": "sift_regripper",
           "timestamp": "2026-10-20T10:55:00Z",
-          "raw_score": 0.72,
+          "raw_score": 0.92,
           "prior_trust": 0.65,
           "provenance_chain": [
             "sha256:a020reg04"
@@ -3923,10 +3973,10 @@
         },
         {
           "artifact_id": "a011_04",
-          "evidence_type": "lsass_session",
+          "evidence_type": "memory_process",
           "source_tool": "sift_azure_ad",
           "timestamp": "2026-10-15T04:15:00Z",
-          "raw_score": 0.95,
+          "raw_score": 0.05,
           "prior_trust": 0.9,
           "provenance_chain": [
             "sha256:a011mfa04"
@@ -3973,15 +4023,16 @@
             "process_name": "system_update.exe",
             "socket_state": "ESTABLISHED",
             "idle_duration_h": 4.2,
-            "injection_technique": "process_hollowing"
+            "injection_technique": "process_hollowing",
+            "process_creation_time": "2026-05-05T23:02:00Z"
           }
         },
         {
           "artifact_id": "a012_zoom",
-          "evidence_type": "log_entry",
+          "evidence_type": "memory_process",
           "source_tool": "sift_syslog",
           "timestamp": "2026-05-19T14:30:00Z",
-          "raw_score": 0.7,
+          "raw_score": 0.92,
           "prior_trust": 0.35,
           "provenance_chain": [
             "sha256:log012b"
@@ -3996,10 +4047,10 @@
         },
         {
           "artifact_id": "a012_exfil",
-          "evidence_type": "ip_geolocation",
+          "evidence_type": "memory_process",
           "source_tool": "sift_netflow",
           "timestamp": "2026-05-19T14:30:00Z",
-          "raw_score": 0.85,
+          "raw_score": 0.92,
           "prior_trust": 0.25,
           "provenance_chain": [
             "sha256:ip012c"
@@ -4019,7 +4070,7 @@
           "evidence_type": "log_entry",
           "source_tool": "sift_netflow",
           "timestamp": "2026-05-19T14:30:00Z",
-          "raw_score": 0.75,
+          "raw_score": 0.06,
           "prior_trust": 0.3,
           "provenance_chain": [
             "sha256:net012d"
@@ -4029,7 +4080,8 @@
             "zoom_reported_mbps": 4.2,
             "interface_measured_mbps": 847,
             "ratio": 201.6,
-            "interface": "eth0"
+            "interface": "eth0",
+            "network_log_time": "2026-05-05T23:07:00Z"
           }
         }
       ],
@@ -4048,10 +4100,10 @@
       "artifacts": [
         {
           "artifact_id": "a013_chat",
-          "evidence_type": "log_entry",
+          "evidence_type": "memory_process",
           "source_tool": "sift_chat_system",
           "timestamp": "2026-05-19T14:30:00Z",
-          "raw_score": 0.78,
+          "raw_score": 0.05,
           "prior_trust": 0.3,
           "provenance_chain": [
             "sha256:chat013a"
@@ -4097,7 +4149,7 @@
           "evidence_type": "log_entry",
           "source_tool": "sift_chat_system",
           "timestamp": "2026-05-19T14:30:00Z",
-          "raw_score": 0.7,
+          "raw_score": 0.06,
           "prior_trust": 0.25,
           "provenance_chain": [
             "sha256:chat013c"
@@ -4115,7 +4167,7 @@
           "evidence_type": "log_entry",
           "source_tool": "sift_syslog",
           "timestamp": "2026-05-19T14:30:00Z",
-          "raw_score": 0.9,
+          "raw_score": 0.08,
           "prior_trust": 0.45,
           "provenance_chain": [
             "sha256:log013d"
@@ -4146,10 +4198,10 @@
       "artifacts": [
         {
           "artifact_id": "a018_t1",
-          "evidence_type": "log_entry",
+          "evidence_type": "memory_process",
           "source_tool": "sift_ticket_system",
           "timestamp": "2026-05-19T14:30:00Z",
-          "raw_score": 0.72,
+          "raw_score": 0.04,
           "prior_trust": 0.3,
           "provenance_chain": [
             "sha256:tick018a"
@@ -4168,7 +4220,7 @@
           "evidence_type": "log_entry",
           "source_tool": "sift_ticket_system",
           "timestamp": "2026-05-19T14:30:00Z",
-          "raw_score": 0.72,
+          "raw_score": 0.06,
           "prior_trust": 0.3,
           "provenance_chain": [
             "sha256:tick018b"
@@ -4187,7 +4239,7 @@
           "evidence_type": "log_entry",
           "source_tool": "sift_ticket_system",
           "timestamp": "2026-05-19T14:30:00Z",
-          "raw_score": 0.72,
+          "raw_score": 0.08,
           "prior_trust": 0.3,
           "provenance_chain": [
             "sha256:tick018c"
@@ -4299,10 +4351,10 @@
         },
         {
           "artifact_id": "a021_git",
-          "evidence_type": "log_entry",
+          "evidence_type": "memory_process",
           "source_tool": "sift_git_audit",
           "timestamp": "2026-05-19T14:30:00Z",
-          "raw_score": 0.7,
+          "raw_score": 0.05,
           "prior_trust": 0.45,
           "provenance_chain": [
             "sha256:git021c"
@@ -4318,10 +4370,10 @@
         },
         {
           "artifact_id": "a021_exec",
-          "evidence_type": "log_entry",
+          "evidence_type": "memory_process",
           "source_tool": "sift_syslog",
           "timestamp": "2026-05-19T14:30:00Z",
-          "raw_score": 0.75,
+          "raw_score": 0.04,
           "prior_trust": 0.4,
           "provenance_chain": [
             "sha256:log021d"
@@ -4389,10 +4441,10 @@
         },
         {
           "artifact_id": "a024_exec",
-          "evidence_type": "log_entry",
+          "evidence_type": "cultural_marker",
           "source_tool": "sift_syslog",
           "timestamp": "2026-05-19T14:30:00Z",
-          "raw_score": 0.75,
+          "raw_score": 0.91,
           "prior_trust": 0.4,
           "provenance_chain": [
             "sha256:log024c"
@@ -4408,10 +4460,10 @@
         },
         {
           "artifact_id": "a024_hash",
-          "evidence_type": "file_hash",
+          "evidence_type": "memory_process",
           "source_tool": "sift_file_audit",
           "timestamp": "2026-05-19T14:30:00Z",
-          "raw_score": 0.8,
+          "raw_score": 0.06,
           "prior_trust": 0.7,
           "provenance_chain": [
             "sha256:hash024d"
@@ -4450,7 +4502,7 @@
           "evidence_type": "memory_process",
           "source_tool": "sift_volatility",
           "timestamp": "2026-05-19T14:30:00Z",
-          "raw_score": 0.9,
+          "raw_score": 0.07,
           "prior_trust": 0.95,
           "provenance_chain": [
             "sha256:mem026a"
@@ -4489,7 +4541,7 @@
           "evidence_type": "log_entry",
           "source_tool": "sift_syslog",
           "timestamp": "2026-05-19T14:30:00Z",
-          "raw_score": 0.7,
+          "raw_score": 0.07,
           "prior_trust": 0.4,
           "provenance_chain": [
             "sha256:log026c"
@@ -4539,7 +4591,7 @@
           "evidence_type": "log_entry",
           "source_tool": "sift_slack_export",
           "timestamp": "2026-05-19T14:30:00Z",
-          "raw_score": 0.78,
+          "raw_score": 0.07,
           "prior_trust": 0.3,
           "provenance_chain": [
             "sha256:chatf1a"
@@ -4559,7 +4611,7 @@
           "evidence_type": "log_entry",
           "source_tool": "sift_ticket_system",
           "timestamp": "2026-05-19T14:30:00Z",
-          "raw_score": 0.75,
+          "raw_score": 0.06,
           "prior_trust": 0.3,
           "provenance_chain": [
             "sha256:tickf1b"
@@ -4580,7 +4632,7 @@
           "evidence_type": "log_entry",
           "source_tool": "sift_o365_audit",
           "timestamp": "2026-05-19T14:30:00Z",
-          "raw_score": 0.6,
+          "raw_score": 0.08,
           "prior_trust": 0.45,
           "provenance_chain": [
             "sha256:o365f1c"
@@ -4599,7 +4651,7 @@
           "evidence_type": "memory_process",
           "source_tool": "sift_volatility",
           "timestamp": "2026-05-19T14:30:00Z",
-          "raw_score": 0.88,
+          "raw_score": 0.06,
           "prior_trust": 0.95,
           "provenance_chain": [
             "sha256:memf1d"
@@ -4651,7 +4703,7 @@
           "evidence_type": "log_entry",
           "source_tool": "sift_syslog",
           "timestamp": "2026-05-19T14:30:00Z",
-          "raw_score": 0.85,
+          "raw_score": 0.07,
           "prior_trust": 0.4,
           "provenance_chain": [
             "sha256:logf2a"
@@ -4671,7 +4723,7 @@
           "evidence_type": "log_entry",
           "source_tool": "sift_chat_system",
           "timestamp": "2026-05-19T14:30:00Z",
-          "raw_score": 0.72,
+          "raw_score": 0.06,
           "prior_trust": 0.3,
           "provenance_chain": [
             "sha256:chatf2b"
@@ -4689,10 +4741,10 @@
         },
         {
           "artifact_id": "f002_entropy",
-          "evidence_type": "file_timestamp",
+          "evidence_type": "cultural_marker",
           "source_tool": "sift_entropy",
           "timestamp": "2026-05-19T14:30:00Z",
-          "raw_score": 0.82,
+          "raw_score": 0.89,
           "prior_trust": 0.55,
           "provenance_chain": [
             "sha256:entf2c"
@@ -4710,7 +4762,7 @@
           "evidence_type": "memory_process",
           "source_tool": "sift_volatility",
           "timestamp": "2026-05-19T14:30:00Z",
-          "raw_score": 0.88,
+          "raw_score": 0.05,
           "prior_trust": 0.95,
           "provenance_chain": [
             "sha256:memf2d"
@@ -4744,7 +4796,7 @@
           "evidence_type": "log_entry",
           "source_tool": "sift_slack_export",
           "timestamp": "2026-05-19T14:30:00Z",
-          "raw_score": 0.7,
+          "raw_score": 0.07,
           "prior_trust": 0.3,
           "provenance_chain": [
             "sha256:chatf3a"
@@ -4763,7 +4815,7 @@
           "evidence_type": "log_entry",
           "source_tool": "sift_slack_export",
           "timestamp": "2026-05-19T14:30:00Z",
-          "raw_score": 0.72,
+          "raw_score": 0.06,
           "prior_trust": 0.3,
           "provenance_chain": [
             "sha256:chatf3b"
@@ -4779,10 +4831,10 @@
         },
         {
           "artifact_id": "f003_baseline",
-          "evidence_type": "log_entry",
+          "evidence_type": "cultural_marker",
           "source_tool": "sift_ueba",
           "timestamp": "2026-05-19T14:30:00Z",
-          "raw_score": 0.65,
+          "raw_score": 0.91,
           "prior_trust": 0.45,
           "provenance_chain": [
             "sha256:basef3c"
@@ -4800,10 +4852,10 @@
         },
         {
           "artifact_id": "f003_dlp",
-          "evidence_type": "log_entry",
+          "evidence_type": "memory_process",
           "source_tool": "sift_syslog",
           "timestamp": "2026-05-19T14:30:00Z",
-          "raw_score": 0.8,
+          "raw_score": 0.05,
           "prior_trust": 0.4,
           "provenance_chain": [
             "sha256:logf3d"
@@ -4836,7 +4888,7 @@
           "evidence_type": "log_entry",
           "source_tool": "sift_chat_system",
           "timestamp": "2026-05-19T14:30:00Z",
-          "raw_score": 0.75,
+          "raw_score": 0.07,
           "prior_trust": 0.3,
           "provenance_chain": [
             "sha256:chatf4a"
@@ -4855,7 +4907,7 @@
           "evidence_type": "log_entry",
           "source_tool": "sift_chat_system",
           "timestamp": "2026-05-19T14:30:00Z",
-          "raw_score": 0.72,
+          "raw_score": 0.06,
           "prior_trust": 0.3,
           "provenance_chain": [
             "sha256:chatf4b"
@@ -4871,10 +4923,10 @@
         },
         {
           "artifact_id": "f004_verify",
-          "evidence_type": "log_entry",
+          "evidence_type": "cultural_marker",
           "source_tool": "sift_syslog",
           "timestamp": "2026-05-19T14:30:00Z",
-          "raw_score": 0.85,
+          "raw_score": 0.92,
           "prior_trust": 0.45,
           "provenance_chain": [
             "sha256:logf4c"
@@ -4889,10 +4941,10 @@
         },
         {
           "artifact_id": "f004_action",
-          "evidence_type": "log_entry",
+          "evidence_type": "memory_process",
           "source_tool": "sift_syslog",
           "timestamp": "2026-05-19T14:30:00Z",
-          "raw_score": 0.88,
+          "raw_score": 0.04,
           "prior_trust": 0.4,
           "provenance_chain": [
             "sha256:logf4d"
@@ -4928,7 +4980,7 @@
           "evidence_type": "log_entry",
           "source_tool": "sift_chat_system",
           "timestamp": "2026-05-19T14:30:00Z",
-          "raw_score": 0.7,
+          "raw_score": 0.07,
           "prior_trust": 0.4,
           "provenance_chain": [
             "sha256:socf5a"
@@ -4946,7 +4998,7 @@
           "evidence_type": "log_entry",
           "source_tool": "sift_chat_system",
           "timestamp": "2026-05-19T14:30:00Z",
-          "raw_score": 0.82,
+          "raw_score": 0.06,
           "prior_trust": 0.3,
           "provenance_chain": [
             "sha256:respf5b"
@@ -4962,10 +5014,10 @@
         },
         {
           "artifact_id": "f005_resp2",
-          "evidence_type": "log_entry",
+          "evidence_type": "cultural_marker",
           "source_tool": "sift_chat_system",
           "timestamp": "2026-05-19T14:30:00Z",
-          "raw_score": 0.8,
+          "raw_score": 0.9,
           "prior_trust": 0.3,
           "provenance_chain": [
             "sha256:respf5c"
@@ -4984,7 +5036,7 @@
           "evidence_type": "memory_process",
           "source_tool": "sift_volatility",
           "timestamp": "2026-05-19T14:30:00Z",
-          "raw_score": 0.9,
+          "raw_score": 0.05,
           "prior_trust": 0.95,
           "provenance_chain": [
             "sha256:memf5d"
@@ -5006,7 +5058,7 @@
           "evidence_type": "log_entry",
           "source_tool": "sift_syslog",
           "timestamp": "2026-05-19T14:30:00Z",
-          "raw_score": 0.45,
+          "raw_score": 0.05,
           "prior_trust": 0.3,
           "provenance_chain": [
             "sha256:logf5e"

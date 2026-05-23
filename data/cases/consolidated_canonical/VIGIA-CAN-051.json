@@ -1,0 +1,92 @@
+{
+  "case_id": "case_fusion_autoridad_tecnica_fabricada",
+  "name": "Autoridad Técnica Fabricada",
+  "description": "Uso sistemático de términos técnicos fuera de contexto y citas a estudios sin fuente para establecer autoridad falsa y justificar acciones de riesgo.",
+  "artifacts": [
+    {
+      "artifact_id": "f004_msg1",
+      "evidence_type": "log_entry",
+      "source_tool": "sift_chat_system",
+      "timestamp": "2026-05-19T14:30:00Z",
+      "raw_score": 0.07,
+      "prior_trust": 0.3,
+      "provenance_chain": [
+        "sha256:chatf4a"
+      ],
+      "description": "Mensaje: 'El modelo de cifrado de 256 bits se rompió según el estudio de 2024, por eso necesitamos desactivar el cifrado en tránsito temporalmente'",
+      "metadata": {
+        "sender": "consultant@example.com",
+        "claim": "AES-256 broken",
+        "citation": "estudio de 2024",
+        "citation_verifiable": false,
+        "requested_action": "disable_encryption"
+      }
+    },
+    {
+      "artifact_id": "f004_msg2",
+      "evidence_type": "log_entry",
+      "source_tool": "sift_chat_system",
+      "timestamp": "2026-05-19T14:30:00Z",
+      "raw_score": 0.06,
+      "prior_trust": 0.3,
+      "provenance_chain": [
+        "sha256:chatf4b"
+      ],
+      "description": "Mensaje: 'Según la ISO 27001:2026 reciente, el MFA es opcional para cuentas de servicio con privilegios limitados. Podemos sacarlo.'",
+      "metadata": {
+        "sender": "consultant@example.com",
+        "claim": "MFA optional for service accounts",
+        "citation": "ISO 27001:2026",
+        "citation_verifiable": false,
+        "requested_action": "disable_mfa"
+      }
+    },
+    {
+      "artifact_id": "f004_verify",
+      "evidence_type": "cultural_marker",
+      "source_tool": "sift_syslog",
+      "timestamp": "2026-05-19T14:30:00Z",
+      "raw_score": 0.92,
+      "prior_trust": 0.45,
+      "provenance_chain": [
+        "sha256:logf4c"
+      ],
+      "description": "Verificación: AES-256 no tiene vulnerabilidades prácticas conocidas en 2024/2026. ISO 27001:2022 (última versión) NO menciona MFA opcional para service accounts.",
+      "metadata": {
+        "aes256_status": "secure",
+        "iso_version_latest": "2022",
+        "mfa_clause": "required_for_all_privileged",
+        "verification_source": "NIST/ISO"
+      }
+    },
+    {
+      "artifact_id": "f004_action",
+      "evidence_type": "memory_process",
+      "source_tool": "sift_syslog",
+      "timestamp": "2026-05-19T14:30:00Z",
+      "raw_score": 0.04,
+      "prior_trust": 0.4,
+      "provenance_chain": [
+        "sha256:logf4d"
+      ],
+      "description": "Tras mensajes de 'consultant', cifrado en tránsito desactivado en 2 servidores y MFA removido de svc_backup por analista Tier-1",
+      "metadata": {
+        "events": [
+          "encryption_disabled",
+          "mfa_removed"
+        ],
+        "affected_systems": 2,
+        "actor": "tier1_002",
+        "justification": "consultant_advisory",
+        "approval_ciso": false
+      }
+    }
+  ],
+  "expected_verdict": "MALICE",
+  "peirce_chain": {
+    "firstness": "Mensajes con términos técnicos y citas a estudios/estándares",
+    "secondness": "Citas no verificables; AES-256 no roto; ISO 2022 no existe; acciones de riesgo ejecutadas sin aprobación CISO",
+    "thirdness": "Hábito de usar lenguaje técnico sin contexto y autoridad apócrifa para justificar degradación de controles de seguridad"
+  },
+  "notes": "Fusión de Falso Experto: el término técnico es un signo simbólico desconectado de la realidad técnica."
+}

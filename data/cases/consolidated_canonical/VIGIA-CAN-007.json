@@ -1,0 +1,97 @@
+{
+  "case_id": "case_089_huella_perfeccion",
+  "name": "La Huella de la Perfección",
+  "description": "Sesión de administración remota de 45 minutos con 847 comandos. Varianza entre keystrokes de 0.05s en 90% de muestras. Entropía temporal 0.12 bits. Imposible para operador humano.",
+  "artifacts": [
+    {
+      "artifact_id": "a089_01",
+      "evidence_type": "memory_process",
+      "source_tool": "sift_session_analyzer",
+      "timestamp": "2026-01-17T18:00:00Z",
+      "raw_score": 0.92,
+      "prior_trust": 0.55,
+      "provenance_chain": [
+        "sha256:a089time01"
+      ],
+      "description": "Sesión RDP 45 minutos: 847 comandos, varianza entre keystrokes = 0.050s en 90% de muestras. Baseline humano: >180ms.",
+      "metadata": {
+        "session_duration_sec": 2700,
+        "commands_count": 847,
+        "variance_ms": 50,
+        "variance_percentile_90": 0.9,
+        "human_baseline_variance_ms": 180,
+        "process_creation_time": "2026-04-13T11:40:00Z"
+      }
+    },
+    {
+      "artifact_id": "a089_02",
+      "evidence_type": "memory_process",
+      "source_tool": "sift_entropy",
+      "timestamp": "2026-01-17T18:45:00Z",
+      "raw_score": 0.92,
+      "prior_trust": 0.6,
+      "provenance_chain": [
+        "sha256:a089ent02"
+      ],
+      "description": "Entropía temporal de la sesión: 0.12 bits. Humano esperado: >2.5 bits para sesión de análisis real.",
+      "metadata": {
+        "shannon_entropy": 0.12,
+        "expected_human_entropy": 2.8,
+        "sample_size": 847,
+        "metric": "inter_keystroke_interval"
+      }
+    },
+    {
+      "artifact_id": "a089_03",
+      "evidence_type": "memory_process",
+      "source_tool": "sift_volatility",
+      "timestamp": "2026-01-17T18:20:00Z",
+      "raw_score": 0.95,
+      "prior_trust": 0.95,
+      "provenance_chain": [
+        "sha256:a089mem03"
+      ],
+      "description": "Proceso mstsc.exe sin evidencia de interacción GUI. Cero bitmap changes, cero operaciones de clipboard durante sesión 'activa'.",
+      "metadata": {
+        "pid": 4412,
+        "gui_events": 0,
+        "clipboard_ops": 0,
+        "bitmap_updates": 0
+      }
+    },
+    {
+      "artifact_id": "a089_04",
+      "evidence_type": "ip_geolocation",
+      "source_tool": "sift_netflow",
+      "timestamp": "2026-01-17T18:00:00Z",
+      "raw_score": 0.4,
+      "prior_trust": 0.2,
+      "provenance_chain": [
+        "sha256:a089ip04"
+      ],
+      "description": "Origen de sesión: IP de VPS en Frankfurt, ASN de hosting barato. Inconsistente con horario laboral del admin legítimo (03:15 hora local NY).",
+      "metadata": {
+        "source_ip": "45.142.212.18",
+        "geo": "DE",
+        "asn": "VPS-HOST",
+        "time_local": "03:15",
+        "admin_home_tz": "America/New_York",
+        "network_log_time": "2026-04-13T11:45:00Z"
+      }
+    }
+  ],
+  "caie_fractures": [
+    {
+      "type": "TEMPORAL_ENTROPY_NULL",
+      "severity": 0.96,
+      "description": "Patrón de ejecución incompatible con carga cognitiva de tareas. Automatización detectada."
+    }
+  ],
+  "expected_verdict": "MALICE",
+  "peirce_chain": {
+    "firstness": "Sesión de 45 minutos con tiempos entre comandos perfectamente uniformes.",
+    "secondness": "Varianza 0.05s es ley de máquina. Entropía 0.12 bits incompatible con análisis humano real.",
+    "thirdness": "Hábito de automatización que intenta simular ritmo humano pero falla en entropía cognitiva."
+  },
+  "notes": "Matemáticamente irrefutable: los humanos no piensan con cronómetro."
+}

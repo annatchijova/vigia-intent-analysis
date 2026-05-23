@@ -1,0 +1,101 @@
+{
+  "case_id": "case_007_insomnio_tactico",
+  "name": "El Insomnio Táctico",
+  "description": "finance_user con baseline de 847 días de actividad estrictamente 08:30-18:00 L-V se loguea a las 03:15 AM de un domingo. Accede a archivo Excel de 500MB clasificado como confidencial-3. Proceso excel.exe escribe archivo upload.tmp de 500MB.",
+  "artifacts": [
+    {
+      "artifact_id": "a007_01",
+      "evidence_type": "memory_process",
+      "source_tool": "sift_vpn_log",
+      "timestamp": "2026-01-16T03:15:22Z",
+      "raw_score": 0.92,
+      "prior_trust": 0.4,
+      "provenance_chain": [
+        "sha256:a007vpn01"
+      ],
+      "description": "Login VPN exitoso a las 03:15 AM de domingo. Credenciales correctas. MFA aprobado.",
+      "metadata": {
+        "user": "finance_user",
+        "time": "2026-01-16T03:15:22Z",
+        "source_ip": "181.92.44.11",
+        "mfa_result": "approved",
+        "day_of_week": "sunday",
+        "process_creation_time": "2026-04-30T14:35:00Z"
+      }
+    },
+    {
+      "artifact_id": "a007_02",
+      "evidence_type": "memory_process",
+      "source_tool": "sift_ueba",
+      "timestamp": "2026-01-16T03:15:22Z",
+      "raw_score": 0.92,
+      "prior_trust": 0.5,
+      "provenance_chain": [
+        "sha256:a007ueba02"
+      ],
+      "description": "Baseline histórico: finance_user nunca había logueado fuera de 08:30-18:00 L-V en 847 días. Desviación de 6.2 sigma.",
+      "metadata": {
+        "historical_login_times": [
+          "08:30-09:00",
+          "17:00-18:00"
+        ],
+        "days_history": 847,
+        "sigma_deviation": 6.2,
+        "baseline_type": "circadian"
+      }
+    },
+    {
+      "artifact_id": "a007_03",
+      "evidence_type": "file_timestamp",
+      "source_tool": "sift_file_audit",
+      "timestamp": "2026-01-16T03:17:00Z",
+      "raw_score": 0.8,
+      "prior_trust": 0.55,
+      "provenance_chain": [
+        "sha256:a007file03"
+      ],
+      "description": "Acceso a 'Q2_Financials_Forecast.xlsx' (500MB), clasificación confidencial-3, a las 03:17 AM.",
+      "metadata": {
+        "file": "Q2_Financials_Forecast.xlsx",
+        "size_mb": 500,
+        "access_time": "2026-01-16T03:17:00Z",
+        "classification": "confidential-3",
+        "operation": "read+write",
+        "network_log_time": "2026-04-30T14:40:00Z"
+      }
+    },
+    {
+      "artifact_id": "a007_04",
+      "evidence_type": "memory_process",
+      "source_tool": "sift_volatility",
+      "timestamp": "2026-01-16T03:17:00Z",
+      "raw_score": 0.95,
+      "prior_trust": 0.95,
+      "provenance_chain": [
+        "sha256:a007mem04"
+      ],
+      "description": "excel.exe en memoria con archivo mapeado y handle de escritura a \\Temp\\upload.tmp de 500MB.",
+      "metadata": {
+        "pid": 5521,
+        "process_name": "excel.exe",
+        "mapped_file": "Q2_Financials_Forecast.xlsx",
+        "temp_write": "\\Temp\\upload.tmp",
+        "temp_size": 524288000
+      }
+    }
+  ],
+  "caie_fractures": [
+    {
+      "type": "CIRCADIAN_VIOLATION",
+      "severity": 0.91,
+      "description": "Ruptura de baseline circadiano de 6.2 sigma con acceso a archivo confidencial de 500MB."
+    }
+  ],
+  "expected_verdict": "MALICE",
+  "peirce_chain": {
+    "firstness": "Login VPN legítimo a las 03:15 AM de domingo con credenciales correctas.",
+    "secondness": "Baseline de 847 días nunca mostró actividad fuera de horario. Acceso a 500MB confidencial a las 03:17.",
+    "thirdness": "Hábito de usar credenciales válidas en contexto temporal que rompe el patrón biológico del usuario real."
+  },
+  "notes": "Primeridad válida (login correcto) pero Segundidad rota (contexto temporal imposible para este usuario)."
+}

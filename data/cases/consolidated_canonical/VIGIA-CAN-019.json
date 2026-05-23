@@ -1,0 +1,97 @@
+{
+  "case_id": "case_101_denunciante_humo",
+  "name": "El Denunciante de Humo",
+  "description": "Usuario reporta 'archivos raros en mi carpeta'. El archivo adjunto es un LNK malicioso que explota CVE-2024-XXXX al ser abierto por el visor del administrador. El denunciante es el vector.",
+  "artifacts": [
+    {
+      "artifact_id": "a101_01",
+      "evidence_type": "memory_process",
+      "source_tool": "sift_ticket_system",
+      "timestamp": "2026-01-22T10:20:30Z",
+      "raw_score": 0.92,
+      "prior_trust": 0.3,
+      "provenance_chain": [
+        "sha256:a101tick01"
+      ],
+      "description": "Ticket: 'Creo que me hackearon, veo archivos raros en mi carpeta'. Adjunta archivo para revisión.",
+      "metadata": {
+        "reporter": "user_finance",
+        "file_location": "C:\\Users\\user_finance\\Desktop\\report_2026.xlsx.lnk",
+        "carnegie_appeal": "pedir ayuda al experto",
+        "process_creation_time": "2026-04-21T15:07:00Z"
+      }
+    },
+    {
+      "artifact_id": "a101_02",
+      "evidence_type": "memory_process",
+      "source_tool": "sift_file_audit",
+      "timestamp": "2026-01-22T10:25:15Z",
+      "raw_score": 0.92,
+      "prior_trust": 0.7,
+      "provenance_chain": [
+        "sha256:a101file02"
+      ],
+      "description": "Archivo 'raro': LNK con magic bytes de PDF y exploit CVE-2024-XXXX en stream comprimido. Se activa al ser abierto por visor con privilegios.",
+      "metadata": {
+        "file_type": ".lnk (Windows shortcut)",
+        "magic": "PDF",
+        "embedded_exploit": "CVE-2024-XXXX",
+        "trigger_condition": "opened_by_admin_viewer",
+        "payload": "privilege escalation"
+      }
+    },
+    {
+      "artifact_id": "a101_03",
+      "evidence_type": "log_entry",
+      "source_tool": "sift_syslog",
+      "timestamp": "2026-01-22T10:28:00Z",
+      "raw_score": 0.8,
+      "prior_trust": 0.4,
+      "provenance_chain": [
+        "sha256:a101log03"
+      ],
+      "description": "Admin (domain\\admin_sec) abre archivo desde share usando visor interno privilegiado.",
+      "metadata": {
+        "actor": "domain\\admin_sec",
+        "action": "file_open",
+        "target": "\\user_finance\\report_2026.xlsx.lnk",
+        "tool": "admin_viewer.exe",
+        "elevation": true,
+        "network_log_time": "2026-04-21T15:12:00Z"
+      }
+    },
+    {
+      "artifact_id": "a101_04",
+      "evidence_type": "memory_process",
+      "source_tool": "sift_volatility",
+      "timestamp": "2026-01-22T10:28:02Z",
+      "raw_score": 0.92,
+      "prior_trust": 0.95,
+      "provenance_chain": [
+        "sha256:a101mem04"
+      ],
+      "description": "Shellcode inyectado en admin_viewer.exe 2 segundos tras apertura. Reverse shell establecida a 185.220.101.42:4444.",
+      "metadata": {
+        "pid": 3312,
+        "parent": "admin_viewer.exe",
+        "injected_at": "2026-01-22T10:28:02Z",
+        "reverse_shell_ip": "185.220.101.42",
+        "port": 4444
+      }
+    }
+  ],
+  "caie_fractures": [
+    {
+      "type": "TRAP_REPORTING",
+      "severity": 0.98,
+      "description": "Denunciante es vector. La denuncia es el disparador para elevar privilegios via personal de seguridad."
+    }
+  ],
+  "expected_verdict": "MALICE",
+  "peirce_chain": {
+    "firstness": "Reporte legítimo de usuario preocupado.",
+    "secondness": "El 'archivo raro' es exploit que se activa al ser abierto por admin. Denunciante es el vector.",
+    "thirdness": "Hábito de inversión de roles: la denuncia ES el ataque. El denunciante actúa como disparador."
+  },
+  "notes": "Trap reporting: el sistema de seguridad se convierte en el vector de ataque."
+}

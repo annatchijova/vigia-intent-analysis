@@ -1,0 +1,112 @@
+{
+  "case_id": "case_fusion_panico_coordinado",
+  "name": "Pánico Coordinado — Cognitive DoS",
+  "description": "Durante incidente real de red, múltiples cuentas envían mensajes coordinados de pánico ('¿tú también lo viste?', '¿Nos hackearon?') que no tienen correlato técnico. Objetivo: saturar capacidad de triaje del SOC.",
+  "artifacts": [
+    {
+      "artifact_id": "f001_chat",
+      "evidence_type": "log_entry",
+      "source_tool": "sift_slack_export",
+      "timestamp": "2026-05-19T14:30:00Z",
+      "raw_score": 0.07,
+      "prior_trust": 0.3,
+      "provenance_chain": [
+        "sha256:chatf1a"
+      ],
+      "description": "17 mensajes en #general en ventana de 90 segundos: '¿tú también lo viste?', 'cómo es posible que no lo sabías', 'yo ya sabía que algo andaba mal'",
+      "metadata": {
+        "platform": "Slack",
+        "channel": "#general",
+        "message_count": 17,
+        "time_window_sec": 90,
+        "phrases_unique": 3,
+        "senders_unique": 14
+      }
+    },
+    {
+      "artifact_id": "f001_tickets",
+      "evidence_type": "log_entry",
+      "source_tool": "sift_ticket_system",
+      "timestamp": "2026-05-19T14:30:00Z",
+      "raw_score": 0.06,
+      "prior_trust": 0.3,
+      "provenance_chain": [
+        "sha256:tickf1b"
+      ],
+      "description": "12 tickets de soporte simultáneos desde cuentas distintas: 'No puedo entrar al mail', 'El servidor está caído', '¿Nos hackearon?'",
+      "metadata": {
+        "ticket_count": 12,
+        "time_window_sec": 120,
+        "common_phrases": [
+          "No puedo entrar al mail",
+          "¿Nos hackearon?"
+        ],
+        "senders_unique": true
+      }
+    },
+    {
+      "artifact_id": "f001_o365",
+      "evidence_type": "log_entry",
+      "source_tool": "sift_o365_audit",
+      "timestamp": "2026-05-19T14:30:00Z",
+      "raw_score": 0.08,
+      "prior_trust": 0.45,
+      "provenance_chain": [
+        "sha256:o365f1c"
+      ],
+      "description": "Logs de O365: 11 de 12 cuentas reportantes tienen login exitoso en última hora, sin intentos fallidos. 1 cuenta no existe en AD.",
+      "metadata": {
+        "accounts_checked": 12,
+        "failed_logins": 0,
+        "successful_logins": 11,
+        "nonexistent_accounts": 1,
+        "time_window": "1h"
+      }
+    },
+    {
+      "artifact_id": "f001_real",
+      "evidence_type": "memory_process",
+      "source_tool": "sift_volatility",
+      "timestamp": "2026-05-19T14:30:00Z",
+      "raw_score": 0.06,
+      "prior_trust": 0.95,
+      "provenance_chain": [
+        "sha256:memf1d"
+      ],
+      "description": "Durante ventana de pánico semántico, proceso cobalt_strike.beacon activo en servidor de archivos ejecutando reconocimiento lateral",
+      "metadata": {
+        "pid": 2144,
+        "process_name": "explorer.exe (hollowed)",
+        "beacon_type": "cobalt_strike",
+        "activity": "lateral_movement",
+        "start_time": "2026-05-19T14:30:00Z"
+      }
+    },
+    {
+      "artifact_id": "f001_stylometry",
+      "evidence_type": "cultural_marker",
+      "source_tool": "sift_linguistic",
+      "timestamp": "2026-05-19T14:30:00Z",
+      "raw_score": 0.8,
+      "prior_trust": 0.15,
+      "provenance_chain": [
+        "sha256:styf1e"
+      ],
+      "description": "Análisis estilométrico: 15 de 17 mensajes de Slack comparten entropía de 0.11 bits y patrón de puntuación idéntico (espacio antes de signo de interrogación)",
+      "metadata": {
+        "messages_analyzed": 17,
+        "pattern_match_count": 15,
+        "inter_message_entropy": 0.11,
+        "pattern": "space_before_question_mark",
+        "bot_likelihood": 0.94
+      }
+    }
+  ],
+  "expected_verdict": "MALICE",
+  "peirce_chain": {
+    "firstness": "Múltiples mensajes y tickets de pánico coordinados durante incidente real",
+    "secondness": "O365 confirma acceso normal; 1 cuenta no existe; entropía 0.11 bits entre mensajes; beacon de Cobalt Strike activo en background",
+    "thirdness": "Hábito de usar ataque de denegación de servicio cognitivo para paralizar triaje del SOC mientras ataque real progresa"
+  },
+  "notes": "Cognitive DoS: el flujo coordinado de reportes falsos busca paralizar la capacidad de triaje durante un ataque real."
+}

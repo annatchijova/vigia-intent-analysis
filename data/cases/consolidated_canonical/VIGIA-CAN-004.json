@@ -1,0 +1,85 @@
+{
+  "case_id": "case_086_doble_salto_layout",
+  "name": "El Doble Salto de Layout",
+  "description": "Secuencia en bash history: 'кщще' (root en teclado ruso ЙЦУКЕН), borrado inmediato, luego 'sudo'. La corrección en 800ms delata operador consciente de OPSEC pero traicionado por memoria muscular.",
+  "artifacts": [
+    {
+      "artifact_id": "a086_01",
+      "evidence_type": "log_entry",
+      "source_tool": "sift_keylogger",
+      "timestamp": "2026-04-10T02:17:43Z",
+      "raw_score": 0.92,
+      "prior_trust": 0.5,
+      "provenance_chain": [
+        "sha256:a086key01"
+      ],
+      "description": "Secuencia de keystrokes: кщще [backspace×4] sudo [enter]. La cadena кщще es 'root' escrito con layout ruso ЙЦУКЕН activo.",
+      "metadata": {
+        "raw_sequence": "кщще\b\b\b\bsudo",
+        "layout_slip": "кщще",
+        "transliteration": "root",
+        "layout_detected": "ЙЦУКЕН",
+        "correction_time_ms": 800
+      }
+    },
+    {
+      "artifact_id": "a086_02",
+      "evidence_type": "ip_geolocation",
+      "source_tool": "sift_linguistic",
+      "timestamp": "2026-04-10T02:17:43Z",
+      "raw_score": 0.92,
+      "prior_trust": 0.3,
+      "provenance_chain": [
+        "sha256:a086cult02"
+      ],
+      "description": "Análisis fonético confirma que кщще es el resultado exacto de escribir 'root' con layout ruso. Atribución regional: RU/CIS.",
+      "metadata": {
+        "matched_pattern": "кщще -> root",
+        "attribution_region": "RU/CIS",
+        "confidence": 0.98
+      }
+    },
+    {
+      "artifact_id": "a086_03",
+      "evidence_type": "log_entry",
+      "source_tool": "sift_mimikatz",
+      "timestamp": "2026-04-10T02:18:10Z",
+      "raw_score": 0.12,
+      "prior_trust": 0.95,
+      "provenance_chain": [
+        "sha256:a086lsass03"
+      ],
+      "description": "Sesión de root autenticada 27 segundos después del keyboard slip. El atacante logró escalada de privilegios.",
+      "metadata": {
+        "session_user": "root",
+        "auth_method": "password",
+        "session_start": "2026-04-10T02:18:10Z"
+      }
+    },
+    {
+      "artifact_id": "a086_04",
+      "evidence_type": "memory_process",
+      "source_tool": "sift_volatility",
+      "timestamp": "2026-04-10T02:18:30Z",
+      "raw_score": 0.08,
+      "prior_trust": 0.95,
+      "provenance_chain": [
+        "sha256:a086mem04"
+      ],
+      "description": "Historial bash en memoria: 'sudo systemctl restart sshd' ejecutado 120ms después de la cadena borrada.",
+      "metadata": {
+        "pid": 1847,
+        "bash_line": "sudo systemctl restart sshd",
+        "prev_erased": "кщще",
+        "time_delta_ms": 120
+      }
+    }
+  ],
+  "expected_verdict": "MALICE",
+  "peirce_chain": {
+    "firstness": "Cadena de caracteres sin sentido 'кщще' en bash history.",
+    "secondness": "кщще es 'root' en teclado ruso. La corrección en 800ms indica operador consciente de OPSEC traicionado por memoria muscular.",
+    "thirdness": "Hábito de operador nativo ruso de usar 'root' directamente. El desliz destruye la coartada de identidad."
+  },
+  "notes": "Index físico de Peirce: el orden de teclas traiciona la mente. Alta atribución lingüística."
+}

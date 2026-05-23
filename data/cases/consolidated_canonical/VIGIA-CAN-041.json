@@ -1,0 +1,99 @@
+{
+  "case_id": "case_011_traicion_puntuacion",
+  "name": "La Traición de la Puntuación",
+  "description": "Mail urgente desde cuenta CEO comprometida pidiendo transferencia de $250,000. El CEO real siempre usa 1 espacio post-punto y nunca usa punto final en mensajes cortos. Este mail tiene 2 espacios post-punto y punto final en mensaje de 9 palabras. DKIM válido (cuenta comprometida). Login previo desde nodo Tor a las 04:15.",
+  "artifacts": [
+    {
+      "artifact_id": "a011_01",
+      "evidence_type": "log_entry",
+      "source_tool": "sift_mail_gateway",
+      "timestamp": "2026-10-15T10:30:00Z",
+      "raw_score": 0.7,
+      "prior_trust": 0.45,
+      "provenance_chain": [
+        "sha256:a011base01"
+      ],
+      "description": "Baseline estilométrico del CEO: 847 mails. Un espacio post-punto (100%). Sin punto final en mensajes <20 palabras (94%).",
+      "metadata": {
+        "mails_analyzed": 847,
+        "spaces_after_period": 1,
+        "no_final_period_short_msg": 0.94,
+        "baseline_confidence": 0.98
+      }
+    },
+    {
+      "artifact_id": "a011_02",
+      "evidence_type": "log_entry",
+      "source_tool": "sift_mail_gateway",
+      "timestamp": "2026-10-15T10:30:00Z",
+      "raw_score": 0.82,
+      "prior_trust": 0.35,
+      "provenance_chain": [
+        "sha256:a011mail02"
+      ],
+      "description": "Mail sospechoso: 'Transferí urgentemente a este proveedor.  El pago es crítico.' — 2 espacios post-punto, punto final, mensaje de 9 palabras.",
+      "metadata": {
+        "sender": "ceo@corp.com",
+        "recipient": "cfo@corp.com",
+        "spaces_after_period": 2,
+        "final_period": true,
+        "word_count": 9,
+        "amount_requested_usd": 250000,
+        "dkim_valid": true
+      }
+    },
+    {
+      "artifact_id": "a011_03",
+      "evidence_type": "cultural_marker",
+      "source_tool": "sift_stylometry",
+      "timestamp": "2026-10-15T10:35:00Z",
+      "raw_score": 0.88,
+      "prior_trust": 0.2,
+      "provenance_chain": [
+        "sha256:a011sty03"
+      ],
+      "description": "Análisis estilométrico: desviación de 4.3 sigma en espaciado post-punto y uso de punto final. TTR y longitud de oración dentro de baseline.",
+      "metadata": {
+        "deviation_sigma": 4.3,
+        "features_anomalous": [
+          "spaces_after_period",
+          "final_period_usage"
+        ],
+        "features_normal": [
+          "ttr",
+          "sentence_length"
+        ],
+        "confidence": 0.91
+      }
+    },
+    {
+      "artifact_id": "a011_04",
+      "evidence_type": "memory_process",
+      "source_tool": "sift_azure_ad",
+      "timestamp": "2026-10-15T04:15:00Z",
+      "raw_score": 0.05,
+      "prior_trust": 0.9,
+      "provenance_chain": [
+        "sha256:a011mfa04"
+      ],
+      "description": "Login en cuenta CEO a las 04:15 desde 185.220.101.50 (nodo Tor). Sesión duró 8 minutos. CEO tiene historial exclusivo de logins desde Argentina y España.",
+      "metadata": {
+        "session_user": "ceo@corp.com",
+        "source_ip": "185.220.101.50",
+        "is_tor_exit": true,
+        "session_duration_min": 8,
+        "historical_geos": [
+          "AR",
+          "ES"
+        ]
+      }
+    }
+  ],
+  "expected_verdict": "MALICE",
+  "peirce_chain": {
+    "firstness": "Mail urgente desde cuenta CEO con DKIM válido pidiendo transferencia.",
+    "secondness": "2 espacios post-punto + punto final en mensaje corto = 4.3 sigma de desviación. Login previo desde Tor.",
+    "thirdness": "Hábito de no poder robar la huella estilométrica junto con la contraseña. Las manos tienen su propia identidad."
+  },
+  "notes": "El atacante puede robar la contraseña, no la memoria muscular de las manos al tipear."
+}

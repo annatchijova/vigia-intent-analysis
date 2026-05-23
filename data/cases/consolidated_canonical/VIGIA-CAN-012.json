@@ -1,0 +1,96 @@
+{
+  "case_id": "case_094_agujero_negro_burocratico",
+  "name": "El Agujero Negro Burocrático",
+  "description": "Ante auditoría por fuga de datos, responsable entrega 200 PDFs de 'Reportes de Integridad históricos'. Metadatos de creación con diferencia exacta de 1.2 segundos entre archivos. Todos los ctime agrupados en ventana de 4 minutos.",
+  "artifacts": [
+    {
+      "artifact_id": "a094_01",
+      "evidence_type": "memory_process",
+      "source_tool": "sift_exiftool",
+      "timestamp": "2026-06-01T09:00:00Z",
+      "raw_score": 0.92,
+      "prior_trust": 0.55,
+      "provenance_chain": [
+        "sha256:a094meta01"
+      ],
+      "description": "200 PDFs con metadatos de creación separados exactamente 1.2 segundos entre sí. Varianza del intervalo: 0.0s. Físicamente imposible para gestión humana.",
+      "metadata": {
+        "file_count": 200,
+        "interval_seconds": 1.2,
+        "interval_variance": 0.0,
+        "claimed_date_range": "2025-01-01 to 2026-05-31",
+        "actual_creation_window_minutes": 4,
+        "creation_tool": "Python/reportlab",
+        "process_creation_time": "2026-04-16T20:28:00Z"
+      }
+    },
+    {
+      "artifact_id": "a094_02",
+      "evidence_type": "memory_process",
+      "source_tool": "sift_sleuthkit",
+      "timestamp": "2026-06-01T08:56:00Z",
+      "raw_score": 0.92,
+      "prior_trust": 0.7,
+      "provenance_chain": [
+        "sha256:a094ts02"
+      ],
+      "description": "ctime de todos los 200 PDFs agrupado en ventana de 4 minutos (08:56-09:00). Los mtime reclaman fechas entre enero 2025 y mayo 2026.",
+      "metadata": {
+        "ctime_window_start": "2026-06-01T08:56:00Z",
+        "ctime_window_end": "2026-06-01T09:00:00Z",
+        "mtime_claimed_range_start": "2025-01-01T00:00:00Z",
+        "mtime_claimed_range_end": "2026-05-31T23:59:00Z"
+      }
+    },
+    {
+      "artifact_id": "a094_03",
+      "evidence_type": "log_entry",
+      "source_tool": "sift_vision_ocr",
+      "timestamp": "2026-06-01T09:15:00Z",
+      "raw_score": 0.09,
+      "prior_trust": 0.65,
+      "provenance_chain": [
+        "sha256:a094ocr03"
+      ],
+      "description": "OCR de muestra aleatoria: 47 PDFs contienen párrafos idénticos con solo fechas modificadas por regex. Entropía de contenido: 0.8 bits.",
+      "metadata": {
+        "sample_size": 47,
+        "duplicate_paragraphs": 12,
+        "modification_pattern": "date_regex_substitution",
+        "entropy_content": 0.8,
+        "network_log_time": "2026-04-16T20:33:00Z"
+      }
+    },
+    {
+      "artifact_id": "a094_04",
+      "evidence_type": "memory_process",
+      "source_tool": "sift_syslog",
+      "timestamp": "2026-06-01T09:00:00Z",
+      "raw_score": 0.94,
+      "prior_trust": 0.3,
+      "provenance_chain": [
+        "sha256:a094log04"
+      ],
+      "description": "200 PDFs atribuidos a 'Auditoría Interna' pero ningún usuario del departamento tiene actividad de LibreOffice/Word en logs de la ventana.",
+      "metadata": {
+        "claimed_author": "Auditoría Interna",
+        "software_activity": "none",
+        "department": "internal_audit"
+      }
+    }
+  ],
+  "caie_fractures": [
+    {
+      "type": "DOCUMENTARY_FABRICATION",
+      "severity": 0.99,
+      "description": "200 documentos con delta temporal exacto de 1.2s: firma inequívoca de script de generación masiva. Golden rule."
+    }
+  ],
+  "expected_verdict": "MALICE",
+  "peirce_chain": {
+    "firstness": "200 PDFs de cumplimiento entregados ante auditoría.",
+    "secondness": "ctime en ventana de 4 minutos. Intervalo exacto de 1.2s. Contenido generado por regex. Sin actividad de software de autoría.",
+    "thirdness": "Hábito de fabricar evidencia de cumplimiento masiva justo antes de auditoría. La 'Fábrica de Consistencia' es el arma."
+  },
+  "notes": "Grice: violación del máximo de cantidad — provee información masiva para ocultar falta de evidencia real."
+}

@@ -1,0 +1,98 @@
+{
+  "case_id": "case_013_estocolmo_inverso",
+  "name": "El Síndrome de Estocolmo Inverso",
+  "description": "Usuario contacta soporte técnico para reset de contraseña de administrador. Es excesivamente amable, provee todos los datos técnicos antes de que se los pidan, usa jerga perfecta del analista y elogia al operador.",
+  "artifacts": [
+    {
+      "artifact_id": "a013_chat",
+      "evidence_type": "memory_process",
+      "source_tool": "sift_chat_system",
+      "timestamp": "2026-05-19T14:30:00Z",
+      "raw_score": 0.05,
+      "prior_trust": 0.3,
+      "provenance_chain": [
+        "sha256:chat013a"
+      ],
+      "description": "Chat con soporte: usuario inicia con 'Hola, necesito reset de password de admin para svc_backup. Sé que es delicado. Mi SID es S-1-5-21-...' antes de que operador pregunte",
+      "metadata": {
+        "platform": "ServiceNow",
+        "ticket_id": "SN-013",
+        "user_message_init": true,
+        "info_provided_unprompted": [
+          "SID",
+          "OU",
+          "last_password_change",
+          "manager_name"
+        ],
+        "politeness_score": 0.97
+      }
+    },
+    {
+      "artifact_id": "a013_jargon",
+      "evidence_type": "cultural_marker",
+      "source_tool": "sift_linguistic",
+      "timestamp": "2026-05-19T14:30:00Z",
+      "raw_score": 0.82,
+      "prior_trust": 0.15,
+      "provenance_chain": [
+        "sha256:cult013b"
+      ],
+      "description": "Uso de jerga interna exacta del analista: 'vamos a rotar el hash', 'necesito verificar el domain controller primario', '¿estás en el PDC o en el BDC?'",
+      "metadata": {
+        "phrases_matched": [
+          "rotar el hash",
+          "PDC",
+          "BDC",
+          "domain controller primario"
+        ],
+        "source": "internal_kb_tier2",
+        "match_confidence": 0.96
+      }
+    },
+    {
+      "artifact_id": "a013_flattery",
+      "evidence_type": "log_entry",
+      "source_tool": "sift_chat_system",
+      "timestamp": "2026-05-19T14:30:00Z",
+      "raw_score": 0.06,
+      "prior_trust": 0.25,
+      "provenance_chain": [
+        "sha256:chat013c"
+      ],
+      "description": "Mensajes de adulación: 'Vos sos el mejor del equipo, me atendiste la otra vez y me salvaste', 'Sé que puedo confiar en vos para esto'",
+      "metadata": {
+        "flattery_phrases": 3,
+        "reference_past_interaction": true,
+        "confidence_building": true,
+        "operator_id": "tier2_009"
+      }
+    },
+    {
+      "artifact_id": "a013_reset",
+      "evidence_type": "log_entry",
+      "source_tool": "sift_syslog",
+      "timestamp": "2026-05-19T14:30:00Z",
+      "raw_score": 0.08,
+      "prior_trust": 0.45,
+      "provenance_chain": [
+        "sha256:log013d"
+      ],
+      "description": "Reset de contraseña de svc_backup ejecutado por tier2_009 sin ticket de cambio aprobado ni verificación secundaria de identidad",
+      "metadata": {
+        "event_id": 4724,
+        "target_user": "svc_backup",
+        "reset_by": "tier2_009",
+        "change_ticket": null,
+        "secondary_verification": false,
+        "time": "2026-05-19T14:32:00Z"
+      }
+    }
+  ],
+  "expected_verdict": "MALICE",
+  "peirce_chain": {
+    "firstness": "Usuario amable y cooperativo que provee datos técnicos sin ser solicitado",
+    "secondness": "Jerga exacta del analista (96% match con KB interno); adulación; reset ejecutado sin controles de cambio",
+    "thirdness": "Hábito de usar exceso de docilidad y espejo lingüístico para bajar defensas del operador de soporte"
+  },
+  "notes": "Violación de la Máxima de Cantidad de Grice (más información de la requerida) + manipulación Carnegie. MUY VIGIA."
+}

@@ -1,0 +1,101 @@
+{
+  "case_id": "case_026_ventrilocuo_process_hollowing",
+  "name": "El Ventrílocuo — Process Hollowing",
+  "description": "svchost.exe (hash limpio, firma Microsoft válida) ejecutándose desde C:\\Users\\Public\\Downloads\\, parent cmd.exe, sección .text con permisos RWX, manteniendo 1GB exfiltrado a AS en Ucrania. Firewall reporta 0 bytes.",
+  "artifacts": [
+    {
+      "artifact_id": "a026_01",
+      "evidence_type": "memory_process",
+      "source_tool": "sift_volatility",
+      "timestamp": "2026-08-10T14:00:00Z",
+      "raw_score": 0.9,
+      "prior_trust": 0.95,
+      "provenance_chain": [
+        "sha256:a026mem01"
+      ],
+      "description": "svchost.exe (PID 3847): región RWX de 8MB con PE header en offset 0 no mapeada a archivo en disco. Parent: cmd.exe. Esperado: services.exe.",
+      "metadata": {
+        "process_name": "svchost.exe",
+        "pid": 3847,
+        "process_path": "C:\\Users\\Public\\Downloads\\svchost.exe",
+        "parent_process": "cmd.exe",
+        "expected_parent": "services.exe",
+        "rwx_region_mb": 8,
+        "disk_hash_clean": true
+      }
+    },
+    {
+      "artifact_id": "a026_02",
+      "evidence_type": "memory_process",
+      "source_tool": "sift_authenticode",
+      "timestamp": "2026-08-10T14:10:00Z",
+      "raw_score": 0.92,
+      "prior_trust": 0.9,
+      "provenance_chain": [
+        "sha256:a026hash02"
+      ],
+      "description": "Hash del svchost.exe en disco: coincide con Windows 2025 Build 26100. Firma Microsoft válida. El archivo en disco es limpio.",
+      "metadata": {
+        "known_good": true,
+        "digital_signature_valid": true,
+        "signer": "Microsoft Corporation"
+      }
+    },
+    {
+      "artifact_id": "a026_03",
+      "evidence_type": "memory_process",
+      "source_tool": "sift_zeek",
+      "timestamp": "2026-08-10T14:00:00Z",
+      "raw_score": 0.92,
+      "prior_trust": 0.8,
+      "provenance_chain": [
+        "sha256:a026net03"
+      ],
+      "description": "Conexión persistente a 185.62.58.207 (AS57169, Ucrania). 1GB exfiltrado. Firewall reporta 0 bytes. TLS cert mismatch.",
+      "metadata": {
+        "destination_ip": "185.62.58.207",
+        "destination_asn": "AS57169",
+        "port": 443,
+        "bytes_transferred": 1073741824,
+        "firewall_logged_bytes": 0,
+        "tls_cert_mismatch": true
+      }
+    },
+    {
+      "artifact_id": "a026_04",
+      "evidence_type": "registry_key",
+      "source_tool": "sift_regripper",
+      "timestamp": "2026-08-10T10:55:00Z",
+      "raw_score": 0.72,
+      "prior_trust": 0.65,
+      "provenance_chain": [
+        "sha256:a026reg04"
+      ],
+      "description": "Run key apuntando a C:\\Users\\Public\\Downloads\\svchost.exe para persistencia.",
+      "metadata": {
+        "registry_path": "HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run",
+        "value_name": "WindowsUpdate",
+        "value_data": "C:\\Users\\Public\\Downloads\\svchost.exe"
+      }
+    }
+  ],
+  "caie_fractures": [
+    {
+      "type": "LOG_VS_MEMORY",
+      "severity": 0.9,
+      "description": "Hash dice NOISE (archivo limpio) pero memoria dice MALICE (ruta anómala, parent incorrecto, RWX)."
+    },
+    {
+      "type": "NETWORK_VS_HOST",
+      "severity": 0.8,
+      "description": "Firewall registra 0 bytes pero Zeek confirma 1GB. El proceso hollowed hookea APIs de red."
+    }
+  ],
+  "expected_verdict": "MALICE",
+  "peirce_chain": {
+    "firstness": "svchost.exe con hash limpio y firma Microsoft válida — invisible al antivirus.",
+    "secondness": "Ejecutándose desde Downloads, parent cmd.exe, RWX en .text, 1GB exfiltrado que firewall no ve.",
+    "thirdness": "Hábito de robar la identidad del proceso del sistema. El AV protege el nombre; CAIE protege contra la memoria."
+  },
+  "notes": "El sistema operativo cree que es svchost.exe pero ejecuta código del atacante."
+}

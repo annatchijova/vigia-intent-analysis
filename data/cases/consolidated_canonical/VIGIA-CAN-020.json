@@ -1,0 +1,90 @@
+{
+  "case_id": "case_102_espejo_soporte",
+  "name": "El Espejo del Soporte",
+  "description": "Atacante interactúa con técnico copiando muletillas exactas del KB interno ('Entiendo su frustración', 'Estamos trabajando en ello') con 94% de match. Solicita reset de contraseña de CFO sin MFA ni aprobación.",
+  "artifacts": [
+    {
+      "artifact_id": "a102_01",
+      "evidence_type": "log_entry",
+      "source_tool": "sift_chat_system",
+      "timestamp": "2026-01-22T14:35:20Z",
+      "raw_score": 0.78,
+      "prior_trust": 0.3,
+      "provenance_chain": [
+        "sha256:a102chat01"
+      ],
+      "description": "Chat de soporte: atacante usa frases idénticas al técnico en 5 oportunidades. 'Entiendo su frustración', 'Estamos trabajando en ello'.",
+      "metadata": {
+        "platform": "Zendesk",
+        "mirrored_phrases": [
+          "Entiendo su frustración",
+          "Estamos trabajando en ello"
+        ],
+        "mirror_count": 5
+      }
+    },
+    {
+      "artifact_id": "a102_02",
+      "evidence_type": "cultural_marker",
+      "source_tool": "sift_linguistic",
+      "timestamp": "2026-01-22T14:38:00Z",
+      "raw_score": 0.86,
+      "prior_trust": 0.15,
+      "provenance_chain": [
+        "sha256:a102cult02"
+      ],
+      "description": "Análisis NLP: usuario replica sintaxis del operador con 94% de coincidencia con KB interno. Latencia de respuesta: 180ms (pre-cargado).",
+      "metadata": {
+        "style_match_score": 0.94,
+        "source_phrases": "internal_kb",
+        "technician_id": "tier2_009",
+        "response_latency_ms": 180
+      }
+    },
+    {
+      "artifact_id": "a102_03",
+      "evidence_type": "memory_process",
+      "source_tool": "sift_syslog",
+      "timestamp": "2026-01-22T14:40:00Z",
+      "raw_score": 0.05,
+      "prior_trust": 0.45,
+      "provenance_chain": [
+        "sha256:a102reset03"
+      ],
+      "description": "Reset de contraseña de CFO ejecutado por Tier-2 sin ticket de cambio aprobado ni verificación secundaria de identidad.",
+      "metadata": {
+        "event_id": 4724,
+        "target_user": "cfo@corp.com",
+        "reset_by": "tier2_009",
+        "change_ticket": null,
+        "secondary_verification": false,
+        "mfa_bypass": true
+      }
+    },
+    {
+      "artifact_id": "a102_04",
+      "evidence_type": "memory_process",
+      "source_tool": "sift_chat_system",
+      "timestamp": "2026-01-22T14:36:00Z",
+      "raw_score": 0.04,
+      "prior_trust": 0.3,
+      "provenance_chain": [
+        "sha256:a102req04"
+      ],
+      "description": "Solicitud: 'Necesito reset de contraseña de emergencia para cuenta de CFO — urgente para cierre fiscal'.",
+      "metadata": {
+        "request_type": "password_reset",
+        "target_account": "cfo@corp.com",
+        "urgency": "critical",
+        "justification": "cierre fiscal"
+      }
+    }
+  ],
+  "expected_verdict": "MALICE",
+  "peirce_chain": {
+    "firstness": "Usuario colaborativo en chat con frases familiares.",
+    "secondness": "94% match con KB interno. Reset de CFO sin controles. Respuesta en 180ms (pre-cargado).",
+    "thirdness": "Hábito de usar 'lenguaje de la casa' para anular alerta del operador mediante falsa pertenencia."
+  },
+  "notes": "Carnegie: el efecto espejo (mirroring) para generar falsa sensación de confianza inmediata."
+}

@@ -1,0 +1,90 @@
+{
+  "case_id": "case_016_auto_gaslighting_sistema",
+  "name": "Auto-Gaslighting del Sistema",
+  "description": "Usuario falla exactamente 2 veces la contraseña antes de acertar durante 47 días consecutivos (nunca llega al límite de 3). Varianza de 0.8s. Entropía del patrón: 0.04 bits. El día del ataque real, la supresión de alertas creada por este baseline permite el brute force.",
+  "artifacts": [
+    {
+      "artifact_id": "a016_01",
+      "evidence_type": "memory_process",
+      "source_tool": "sift_windows_eventlog",
+      "timestamp": "2026-09-15T09:00:00Z",
+      "raw_score": 0.92,
+      "prior_trust": 0.35,
+      "provenance_chain": [
+        "sha256:a016log01"
+      ],
+      "description": "47 días consecutivos: exactamente 2 fallos Event 4625 + 1 éxito Event 4624. Varianza de tiempo entre intentos: 0.8s. Nunca alcanza el límite de 3.",
+      "metadata": {
+        "pattern_days_observed": 47,
+        "failures_per_day": 2.0,
+        "failures_variance": 0.0,
+        "interval_between_failures_seconds": 4.2,
+        "interval_variance": 0.8,
+        "never_locked_out": true,
+        "process_creation_time": "2026-05-03T18:43:00Z"
+      }
+    },
+    {
+      "artifact_id": "a016_02",
+      "evidence_type": "file_timestamp",
+      "source_tool": "sift_entropy",
+      "timestamp": "2026-09-15T09:00:00Z",
+      "raw_score": 0.82,
+      "prior_trust": 0.55,
+      "provenance_chain": [
+        "sha256:a016ent02"
+      ],
+      "description": "Entropía del patrón de fallo: 0.04 bits. Humano esperado: >2.0 bits. Varianza de 0.8s es firma de automatización.",
+      "metadata": {
+        "pattern_entropy": 0.04,
+        "human_baseline_entropy": 2.1,
+        "time_variance_sec": 0.8,
+        "network_log_time": "2026-05-03T18:48:00Z"
+      }
+    },
+    {
+      "artifact_id": "a016_03",
+      "evidence_type": "lsass_session",
+      "source_tool": "sift_windows_eventlog",
+      "timestamp": "2026-09-15T10:30:00Z",
+      "raw_score": 0.95,
+      "prior_trust": 0.9,
+      "provenance_chain": [
+        "sha256:a016lsass03"
+      ],
+      "description": "Día del ataque: 847 intentos fallidos en 3 minutos desde IP diferente. Alerta suprimida porque el usuario tenía 'historial de fallos frecuentes'.",
+      "metadata": {
+        "attack_attempts": 847,
+        "attack_duration_seconds": 180,
+        "source_ip": "198.51.100.88",
+        "alert_suppressed": true,
+        "alert_suppression_reason": "user_has_frequent_failures_baseline"
+      }
+    },
+    {
+      "artifact_id": "a016_04",
+      "evidence_type": "memory_process",
+      "source_tool": "sift_volatility",
+      "timestamp": "2026-09-15T09:01:00Z",
+      "raw_score": 0.88,
+      "prior_trust": 0.95,
+      "provenance_chain": [
+        "sha256:a016mem04"
+      ],
+      "description": "Proceso automatizado en memoria ejecutando patrón 2 fallos + pausa + 1 éxito. Cadencia de 0.8s exactos.",
+      "metadata": {
+        "tool": "custom_bruteforce",
+        "pattern": "2_fail_1_success",
+        "evasion": "lockout_avoidance",
+        "cadence_sec": 0.8
+      }
+    }
+  ],
+  "expected_verdict": "MALICE",
+  "peirce_chain": {
+    "firstness": "Usuario con historial de 2 fallos diarios de contraseña — patrón clasificado como ruido normal.",
+    "secondness": "Exactamente 2 fallos durante 47 días con varianza 0.8s. Entropía 0.04 bits.",
+    "thirdness": "Hábito de envenenar el modelo de normalidad antes del ataque real. El baseline fabricado inutilizó la detección semanas antes."
+  },
+  "notes": "Baseline poisoning: el atacante construyó el espacio donde operar semanas antes del evento."
+}

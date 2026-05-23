@@ -1,0 +1,101 @@
+{
+  "case_id": "case_090_anacronismo_herramienta",
+  "name": "El Anacronismo de la Herramienta",
+  "description": "PsExec v1.94 (2014) detectado en servidor Windows 2025. Herramienta ruidosa que genera 12 alertas EDR. Análisis de memoria revela rootkit kernel con SSDT hooks instalado 2 minutos antes. El psexec es el señuelo.",
+  "artifacts": [
+    {
+      "artifact_id": "a090_01",
+      "evidence_type": "file_hash",
+      "source_tool": "sift_file_audit",
+      "timestamp": "2026-05-20T11:30:00Z",
+      "raw_score": 0.65,
+      "prior_trust": 0.35,
+      "provenance_chain": [
+        "sha256:a090file01"
+      ],
+      "description": "Binario psexec.exe versión 1.94 (hash conocido, firmado 2014) detectado en C:\\Temp. Herramienta ruidosa detectable por cualquier EDR moderno.",
+      "metadata": {
+        "filename": "psexec.exe",
+        "version": "1.94",
+        "sign_date": "2014-03-12",
+        "path": "C:\\Temp",
+        "os_version": "Windows Server 2025"
+      }
+    },
+    {
+      "artifact_id": "a090_02",
+      "evidence_type": "cultural_marker",
+      "source_tool": "sift_edr",
+      "timestamp": "2026-05-20T11:30:00Z",
+      "raw_score": 0.91,
+      "prior_trust": 0.5,
+      "provenance_chain": [
+        "sha256:a090edr02"
+      ],
+      "description": "EDR generó 12 alertas de 'Herramienta de administración remota obsoleta'. Marcado como FP por analista Tier-1.",
+      "metadata": {
+        "edr_product": "CrowdStrike",
+        "alert_count": 12,
+        "disposition": "false_positive",
+        "analyst": "tier1_001"
+      }
+    },
+    {
+      "artifact_id": "a090_03",
+      "evidence_type": "memory_process",
+      "source_tool": "sift_volatility",
+      "timestamp": "2026-05-20T11:28:00Z",
+      "raw_score": 0.05,
+      "prior_trust": 0.95,
+      "provenance_chain": [
+        "sha256:a090kern03"
+      ],
+      "description": "Driver kernel no firmado cargado 2 minutos ANTES del psexec. 12 hooks en SSDT. Requiere conocimiento avanzado de C++ y Ring-0.",
+      "metadata": {
+        "driver_name": "nvsmartmax.sys",
+        "load_time": "2026-05-20T11:28:00Z",
+        "ssdt_hooks": 12,
+        "signed": false,
+        "legitimate_vendor": false
+      }
+    },
+    {
+      "artifact_id": "a090_04",
+      "evidence_type": "dns_record",
+      "source_tool": "sift_pcap",
+      "timestamp": "2026-05-20T11:29:00Z",
+      "raw_score": 0.82,
+      "prior_trust": 0.5,
+      "provenance_chain": [
+        "sha256:a090dns04"
+      ],
+      "description": "Tráfico C2 cifrado en puerto 8443 iniciado 1 minuto antes del ruido de psexec. Firewall reporta 0 bytes para este puerto.",
+      "metadata": {
+        "destination_ip": "91.243.44.11",
+        "port": 8443,
+        "bytes_transferred": 524288,
+        "firewall_claim": true,
+        "firewall_logged_bytes": 0
+      }
+    }
+  ],
+  "caie_fractures": [
+    {
+      "type": "VERDICT_CONFLICT",
+      "severity": 0.7,
+      "description": "EDR clasifica psexec como ruido (low severity) mientras kernel revela persistencia de nivel APT."
+    },
+    {
+      "type": "NETWORK_VS_HOST",
+      "severity": 0.8,
+      "description": "Firewall reporta 0 bytes en puerto 8443 pero rootkit kernel exfiltra 512KB. El driver hookea syscalls de red."
+    }
+  ],
+  "expected_verdict": "MALICE",
+  "peirce_chain": {
+    "firstness": "PsExec v1.94 genera alertas EDR obvias en Windows 2025.",
+    "secondness": "Herramienta ruidosa contradice presencia de rootkit kernel sofisticado instalado 2 minutos antes.",
+    "thirdness": "Hábito de usar señuelos de baja sofisticación para que el analista cierre el ticket como script-kiddie y no profundice."
+  },
+  "notes": "El ruidoso es el señuelo. El silencioso es el verdadero ataque."
+}

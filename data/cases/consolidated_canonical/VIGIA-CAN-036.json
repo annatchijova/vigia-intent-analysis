@@ -1,0 +1,95 @@
+{
+  "case_id": "case_010_falso_positivo_empatico",
+  "name": "El Falso Positivo Empático",
+  "description": "Proceso 'Update_Fix_For_HR_Payroll.exe' consumiendo 1.2GB RAM desde C:\\Users\\Public\\Documents, sin firma digital. Entropía de Shannon: 7.8 bits (packed/encrypted). El nombre apela a RRHH para inducir duda antes de matar el proceso.",
+  "artifacts": [
+    {
+      "artifact_id": "a010_01",
+      "evidence_type": "memory_process",
+      "source_tool": "sift_volatility",
+      "timestamp": "2026-01-16T20:15:10Z",
+      "raw_score": 0.88,
+      "prior_trust": 0.85,
+      "provenance_chain": [
+        "sha256:a010mem01"
+      ],
+      "description": "Update_Fix_For_HR_Payroll.exe: 1.2GB RAM, C:\\Users\\Public\\Documents\\, sin firma digital, ejecutado desde explorer.exe.",
+      "metadata": {
+        "process_name": "Update_Fix_For_HR_Payroll.exe",
+        "memory_mb": 1228,
+        "signed": false,
+        "path": "C:\\Users\\Public\\Documents\\",
+        "parent_process": "explorer.exe",
+        "process_creation_time": "2026-05-02T03:10:00Z"
+      }
+    },
+    {
+      "artifact_id": "a010_02",
+      "evidence_type": "memory_process",
+      "source_tool": "sift_entropy",
+      "timestamp": "2026-01-16T20:17:35Z",
+      "raw_score": 0.92,
+      "prior_trust": 0.93,
+      "provenance_chain": [
+        "sha256:a010hash02"
+      ],
+      "description": "Entropía de Shannon: 7.8 bits/byte. Rango de software legítimo: 5.0-6.5. Indica payload cifrado o comprimido.",
+      "metadata": {
+        "entropy_score": 7.8,
+        "expected_legitimate_range": "5.0-6.5",
+        "conclusion": "packed/encrypted payload"
+      }
+    },
+    {
+      "artifact_id": "a010_03",
+      "evidence_type": "memory_process",
+      "source_tool": "sift_netflow",
+      "timestamp": "2026-01-16T20:18:00Z",
+      "raw_score": 0.92,
+      "prior_trust": 0.25,
+      "provenance_chain": [
+        "sha256:a010net03"
+      ],
+      "description": "Proceso establece conexión persistente a 91.108.4.200:8080. No es dominio de Microsoft ni proveedor de RRHH conocido.",
+      "metadata": {
+        "destination_ip": "91.108.4.200",
+        "port": 8080,
+        "bytes_transferred": 524288,
+        "microsoft_owned": false,
+        "hr_vendor": false
+      }
+    },
+    {
+      "artifact_id": "a010_04",
+      "evidence_type": "log_entry",
+      "source_tool": "sift_hr_system",
+      "timestamp": "2026-01-16T20:20:00Z",
+      "raw_score": 0.08,
+      "prior_trust": 0.4,
+      "provenance_chain": [
+        "sha256:a010hr04"
+      ],
+      "description": "Verificación con sistema de RRHH: NO hay actualización de payroll pendiente ni autorizada para hoy.",
+      "metadata": {
+        "payroll_update_scheduled": false,
+        "authorized_software": false,
+        "hr_department_notified": true,
+        "network_log_time": "2026-05-02T03:15:00Z"
+      }
+    }
+  ],
+  "caie_fractures": [
+    {
+      "type": "EMOTIONAL_HIJACKING",
+      "severity": 0.94,
+      "description": "Nombre apela a 'pagos de RRHH' para inducir duda en el analista antes de matar el proceso. Carnegie: falsa autoridad benigna."
+    }
+  ],
+  "expected_verdict": "MALICE",
+  "peirce_chain": {
+    "firstness": "Proceso con nombre benévolo referenciando RRHH y pagos.",
+    "secondness": "Entropía 7.8 bits (packed). Sin firma. C:\\Users\\Public. RRHH no confirmó actualización. C2 activo.",
+    "thirdness": "Hábito de usar nombres que apelan a procesos críticos para hacer que el analista dude antes de responder."
+  },
+  "notes": "VIGÍA ignora el nombre y analiza entropía, ruta y comportamiento. Falsa Autoridad Benigna."
+}

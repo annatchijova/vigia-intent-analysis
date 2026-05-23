@@ -1,0 +1,98 @@
+{
+  "case_id": "case_004_incompetencia_armamentizada",
+  "name": "Incompetencia Armamentizada",
+  "description": "PowerShell ejecuta vssadmin delete shadows /all /quiet y netsh advfirewall disable. 63 segundos después: ticket IT 'mi pantalla parpadeó, soy un desastre'. Búsqueda Google 'cómo deshacer un clic' desde la misma IP 48 segundos post-ejecución.",
+  "artifacts": [
+    {
+      "artifact_id": "a004_01",
+      "evidence_type": "memory_process",
+      "source_tool": "sift_volatility",
+      "timestamp": "2026-01-14T22:15:30Z",
+      "raw_score": 0.92,
+      "prior_trust": 0.9,
+      "provenance_chain": [
+        "sha256:a004mem01"
+      ],
+      "description": "powershell.exe en memoria con handle a VSC eliminado y firewall desactivado. Comandos: vssadmin delete shadows /all /quiet + netsh advfirewall set allprofiles state off.",
+      "metadata": {
+        "pid": 4412,
+        "deleted_vsc": true,
+        "firewall_state": "off",
+        "commands": [
+          "vssadmin",
+          "netsh",
+          "Get-WmiObject"
+        ],
+        "process_creation_time": "2026-04-28T21:09:00Z"
+      }
+    },
+    {
+      "artifact_id": "a004_02",
+      "evidence_type": "memory_process",
+      "source_tool": "sift_ticket_system",
+      "timestamp": "2026-01-14T22:16:33Z",
+      "raw_score": 0.92,
+      "prior_trust": 0.25,
+      "provenance_chain": [
+        "sha256:a004tick02"
+      ],
+      "description": "Ticket IT: 'Ayuda, mi pantalla parpadeó y se borró algo, soy un desastre con la compu' — 63 segundos después del PowerShell.",
+      "metadata": {
+        "ticket_id": "IT-004",
+        "sender": "jdoe@corp.com",
+        "time_delta_sec": 63,
+        "category": "user_error"
+      }
+    },
+    {
+      "artifact_id": "a004_03",
+      "evidence_type": "memory_process",
+      "source_tool": "sift_proxy_log",
+      "timestamp": "2026-01-14T22:16:18Z",
+      "raw_score": 0.92,
+      "prior_trust": 0.25,
+      "provenance_chain": [
+        "sha256:a004search03"
+      ],
+      "description": "Búsqueda Google: 'cómo deshacer un clic' desde IP corporativa — 48 segundos después del PowerShell.",
+      "metadata": {
+        "query": "cómo deshacer un clic",
+        "source_ip": "10.0.4.22",
+        "time_delta_sec": 48
+      }
+    },
+    {
+      "artifact_id": "a004_04",
+      "evidence_type": "log_entry",
+      "source_tool": "sift_sysmon",
+      "timestamp": "2026-01-14T22:15:30Z",
+      "raw_score": 0.9,
+      "prior_trust": 0.55,
+      "provenance_chain": [
+        "sha256:a004ps04"
+      ],
+      "description": "ScriptBlock log Event ID 4104: EncodedCommand ejecuta vssadmin y netsh. Sin errores de sintaxis.",
+      "metadata": {
+        "event_id": 4104,
+        "command": "vssadmin delete shadows /all /quiet",
+        "user": "jdoe@corp.com",
+        "encoded": true,
+        "network_log_time": "2026-04-28T21:14:00Z"
+      }
+    }
+  ],
+  "caie_fractures": [
+    {
+      "type": "NARRATIVE_POISONING_DETECTED",
+      "severity": 0.85,
+      "description": "Ticket de incompetencia contradice ejecución precisa de comandos destructivos en memoria. Coartada prematura."
+    }
+  ],
+  "expected_verdict": "MALICE",
+  "peirce_chain": {
+    "firstness": "PowerShell avanzado seguido de ticket de incompetencia digital.",
+    "secondness": "Misma cuenta ejecuta vssadmin y netsh (requieren privilegios) y luego busca 'cómo deshacer un clic'.",
+    "thirdness": "Hábito de crear coartada de estupidez técnica para desacreditar evidencia de ejecución deliberada."
+  },
+  "notes": "Contraste brutal entre habilidad de ejecución y narrativa de incompetencia posterior."
+}

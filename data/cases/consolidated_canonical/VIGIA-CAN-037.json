@@ -1,0 +1,109 @@
+{
+  "case_id": "case_024_paracaidista_timestomping",
+  "name": "El Paracaidista — Timestomping Forense",
+  "description": "system_updater.elf con mtime/atime/crtime copiados de binarios legítimos de 2022. Pero ctime: hace 3 horas. MFT entry #147823 asignado después del #147822 (que es de 2026) pero lleva timestamp de 2022. 7 ceros en sub-segundos firman la herramienta de timestomping.",
+  "artifacts": [
+    {
+      "artifact_id": "a024_01",
+      "evidence_type": "file_timestamp",
+      "source_tool": "sift_sleuthkit",
+      "timestamp": "2026-07-01T15:00:00Z",
+      "raw_score": 0.88,
+      "prior_trust": 0.7,
+      "provenance_chain": [
+        "sha256:a024ts01"
+      ],
+      "description": "system_updater.elf: mtime=2022-03-15T10:00:00Z (idéntico a /usr/bin/ls). ctime=2026-07-01T12:00:00Z (3 horas antes). 7 ceros en sub-segundos.",
+      "metadata": {
+        "file_path": "/usr/bin/system_updater.elf",
+        "mtime": "2022-03-15T10:00:00Z",
+        "atime": "2022-03-15T10:00:00Z",
+        "crtime": "2022-03-15T10:00:00Z",
+        "ctime": "2026-07-01T12:00:00Z",
+        "sub_second_zeros": 7,
+        "timestamp_raw": "2022-03-15T10:00:00.0000000Z",
+        "timestamp_precision_anomaly": true,
+        "usn_journal_gap": true,
+        "window_start": "2026-07-01T12:00:00Z",
+        "window_end": "2026-07-01T15:00:00Z",
+        "logfile_event": true,
+        "usn_explicitly_absent": true,
+        "acquisition_complete": true,
+        "usn_scope": true
+      }
+    },
+    {
+      "artifact_id": "a024_02",
+      "evidence_type": "mft_entry",
+      "source_tool": "sift_mft_parser",
+      "timestamp": "2026-07-01T15:15:00Z",
+      "raw_score": 0.9,
+      "prior_trust": 0.9,
+      "provenance_chain": [
+        "sha256:a024mft02"
+      ],
+      "description": "MFT entry #147823 asignado después del #147822 (timestamps de 2026) pero lleva mtime de 2022. Violación de monotonicidad.",
+      "metadata": {
+        "mft_entry_number": 147823,
+        "mft_entry_timestamp": "2022-03-15T10:00:00Z",
+        "prev_mft_entry_number": 147822,
+        "prev_mft_entry_timestamp": "2026-07-01T11:58:00Z",
+        "prev_mft_timestamp": "2026-07-01T11:58:00Z"
+      }
+    },
+    {
+      "artifact_id": "a024_03",
+      "evidence_type": "file_hash",
+      "source_tool": "sift_sha256",
+      "timestamp": "2026-07-01T15:05:00Z",
+      "raw_score": 0.92,
+      "prior_trust": 0.85,
+      "provenance_chain": [
+        "sha256:a024hash03"
+      ],
+      "description": "Hash SHA-256 no presente en ninguna base de binarios conocidos de la distribución. No es archivo del sistema.",
+      "metadata": {
+        "file_hash_sha256": "cafebabe1234567890abcdef1234567890abcdef1234567890abcdef12345678",
+        "known_good": false,
+        "os_package_match": false
+      }
+    },
+    {
+      "artifact_id": "a024_04",
+      "evidence_type": "memory_process",
+      "source_tool": "sift_volatility",
+      "timestamp": "2026-07-01T15:10:00Z",
+      "raw_score": 0.87,
+      "prior_trust": 0.95,
+      "provenance_chain": [
+        "sha256:a024mem04"
+      ],
+      "description": "system_updater en memoria con región RWX de 4MB no respaldada por archivo en disco. Reverse shell activa.",
+      "metadata": {
+        "process_name": "system_updater",
+        "rwx_region_mb": 4,
+        "process_creation_time": "2026-07-01T12:05:00Z",
+        "reverse_shell_ip": "185.220.101.42"
+      }
+    }
+  ],
+  "caie_fractures": [
+    {
+      "type": "MFT_ENTRY_ANOMALY",
+      "severity": 0.9,
+      "description": "MFT#147823 asignado DESPUÉS del #147822 pero lleva timestamp 4 años más antiguo. Violación de monotonicidad NTFS."
+    },
+    {
+      "type": "TIMESTAMP_PRECISION_ANOMALY",
+      "severity": 0.95,
+      "description": "7 ceros en sub-segundos del mtime. Firma inequívoca de herramienta Timestomp/SetMACE."
+    }
+  ],
+  "expected_verdict": "MALICE",
+  "peirce_chain": {
+    "firstness": "Binario con timestamps idénticos a archivos legítimos del sistema de 2022.",
+    "secondness": "ctime reciente. MFT entry posterior a entries de 2026. 7 ceros en sub-segundos.",
+    "thirdness": "Hábito de copiar timestamps de binarios legítimos para camuflarse. El ctime y MFT son las capas que no puede falsificar desde userspace."
+  },
+  "notes": "Dos golden rules independientes: MFT_ENTRY_ANOMALY + TIMESTAMP_PRECISION_ANOMALY."
+}

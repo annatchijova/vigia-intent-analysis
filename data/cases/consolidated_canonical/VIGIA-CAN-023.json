@@ -1,0 +1,105 @@
+{
+  "case_id": "case_105_disonancia_ritmo_procesamiento",
+  "name": "La Disonancia del Ritmo de Procesamiento",
+  "description": "Sesión ejecuta tareas cognitivamente diversas (análisis de logs, búsqueda, edición de configs) con intervalos de 1.5, 1.5, 1.6s. Varianza 0.0033s — incompatible con carga cognitiva variable. Buffer de comandos pre-cargado en heap.",
+  "artifacts": [
+    {
+      "artifact_id": "a105_01",
+      "evidence_type": "memory_process",
+      "source_tool": "sift_session_analyzer",
+      "timestamp": "2026-01-23T13:00:00Z",
+      "raw_score": 0.92,
+      "prior_trust": 0.55,
+      "provenance_chain": [
+        "sha256:a105time01"
+      ],
+      "description": "Tareas de distinta complejidad con intervalos: 1.500s, 1.500s, 1.600s. Varianza 0.0033s. Humano esperado: >15s.",
+      "metadata": {
+        "task_types": [
+          "log_analysis",
+          "file_search",
+          "config_edit"
+        ],
+        "intervals_sec": [
+          1.5,
+          1.5,
+          1.6
+        ],
+        "variance": 0.0033,
+        "human_expected_variance": 15.0,
+        "process_creation_time": "2026-04-23T19:22:00Z"
+      }
+    },
+    {
+      "artifact_id": "a105_02",
+      "evidence_type": "memory_process",
+      "source_tool": "sift_entropy",
+      "timestamp": "2026-01-23T13:07:00Z",
+      "raw_score": 0.92,
+      "prior_trust": 0.6,
+      "provenance_chain": [
+        "sha256:a105ent02"
+      ],
+      "description": "Entropía de tiempos de respuesta: 0.05 bits. Humano esperado para tareas mixtas: >2.3 bits.",
+      "metadata": {
+        "shannon_entropy": 0.05,
+        "expected_human": 2.3,
+        "task_complexity_variance": "high"
+      }
+    },
+    {
+      "artifact_id": "a105_03",
+      "evidence_type": "memory_process",
+      "source_tool": "sift_volatility",
+      "timestamp": "2026-01-23T13:00:00Z",
+      "raw_score": 0.95,
+      "prior_trust": 0.95,
+      "provenance_chain": [
+        "sha256:a105mem03"
+      ],
+      "description": "Buffer de comandos pre-cargado en heap del proceso de sesión remota. No hay evidencia de interacción GUI interactiva.",
+      "metadata": {
+        "pid": 5521,
+        "heap_buffers": [
+          "grep -R error /var/log",
+          "find /etc -name '*.conf'",
+          "sed -i 's/old/new/g' file"
+        ],
+        "interactive_evidence": false
+      }
+    },
+    {
+      "artifact_id": "a105_04",
+      "evidence_type": "ip_geolocation",
+      "source_tool": "sift_netflow",
+      "timestamp": "2026-01-23T13:00:00Z",
+      "raw_score": 0.45,
+      "prior_trust": 0.2,
+      "provenance_chain": [
+        "sha256:a105ip04"
+      ],
+      "description": "Origen de sesión: IP de datacenter en Amsterdam, ASN de hosting barato.",
+      "metadata": {
+        "source_ip": "45.142.214.7",
+        "geo": "NL",
+        "asn": "HOSTING-CHEAP",
+        "rdns": "vps-214-7.example.com",
+        "network_log_time": "2026-04-23T19:27:00Z"
+      }
+    }
+  ],
+  "caie_fractures": [
+    {
+      "type": "TEMPORAL_ENTROPY_NULL",
+      "severity": 0.96,
+      "description": "Patrón de ejecución incompatible con carga cognitiva de tareas. Automatización detectada."
+    }
+  ],
+  "expected_verdict": "MALICE",
+  "peirce_chain": {
+    "firstness": "Tareas de distinta complejidad ejecutadas con intervalos casi idénticos.",
+    "secondness": "Varianza 0.0033s incompatible con carga cognitiva variable. Buffer pre-cargado en memoria.",
+    "thirdness": "Hábito de automatización que simula ser humana pero carece de entropía cognitiva propia del análisis real."
+  },
+  "notes": "Peirce Terceridad: la ley del azar no genera varianza tan estable. Es ley de máquina simulando humano."
+}

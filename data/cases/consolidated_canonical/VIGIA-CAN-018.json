@@ -1,0 +1,91 @@
+{
+  "case_id": "case_100_fantasma_maquina",
+  "name": "El Fantasma en la Máquina",
+  "description": "Cuenta de servicio realiza mantenimiento con 847 comandos en intervalos exactos de 300.0s. Entropía temporal: 0.00 bits. El proceso esperado no existe en memoria. 847 conexiones de exfiltración de 50MB cada 300s exactos.",
+  "artifacts": [
+    {
+      "artifact_id": "a100_01",
+      "evidence_type": "memory_process",
+      "source_tool": "sift_syslog",
+      "timestamp": "2026-01-21T14:00:00Z",
+      "raw_score": 0.92,
+      "prior_trust": 0.4,
+      "provenance_chain": [
+        "sha256:a100log01"
+      ],
+      "description": "847 comandos ejecutados en intervalos exactos de 300.0 segundos. Cero errores. Cero reintentos. Durante 70.5 horas.",
+      "metadata": {
+        "account": "svc_maintenance",
+        "commands": 847,
+        "interval_sec": 300.0,
+        "errors": 0,
+        "retries": 0,
+        "duration_hours": 70.5,
+        "process_creation_time": "2026-04-20T10:25:00Z"
+      }
+    },
+    {
+      "artifact_id": "a100_02",
+      "evidence_type": "memory_process",
+      "source_tool": "sift_entropy",
+      "timestamp": "2026-01-21T14:45:00Z",
+      "raw_score": 0.92,
+      "prior_trust": 0.6,
+      "provenance_chain": [
+        "sha256:a100ent02"
+      ],
+      "description": "Entropía temporal del log: 0.00 bits. Servicio legítimo esperado: 1.2 bits. Intervalo con varianza cero.",
+      "metadata": {
+        "shannon_entropy": 0.0,
+        "expected_service_entropy": 1.2,
+        "interval_variance": 0.0,
+        "human_variance": 45.0
+      }
+    },
+    {
+      "artifact_id": "a100_03",
+      "evidence_type": "memory_process",
+      "source_tool": "sift_volatility",
+      "timestamp": "2026-01-21T14:00:00Z",
+      "raw_score": 0.9,
+      "prior_trust": 0.95,
+      "provenance_chain": [
+        "sha256:a100mem03"
+      ],
+      "description": "Proceso 'maintenance_tool.exe' NO encontrado en memoria durante ventana de ejecución. Log generado por script externo.",
+      "metadata": {
+        "expected_process": "maintenance_tool.exe",
+        "found_process": null,
+        "log_source": "external_script",
+        "memory_footprint": 0
+      }
+    },
+    {
+      "artifact_id": "a100_04",
+      "evidence_type": "ip_geolocation",
+      "source_tool": "sift_netflow",
+      "timestamp": "2026-01-21T14:05:00Z",
+      "raw_score": 0.92,
+      "prior_trust": 0.25,
+      "provenance_chain": [
+        "sha256:a100net04"
+      ],
+      "description": "847 conexiones salientes a IP de storage cloud con payload cifrado de 50MB cada 300s exactos. Total exfiltrado: 41.3GB.",
+      "metadata": {
+        "destination_ip": "198.51.100.42",
+        "connections": 847,
+        "payload_mb": 50,
+        "interval_sec": 300,
+        "total_exfil_gb": 41.3,
+        "network_log_time": "2026-04-20T10:30:00Z"
+      }
+    }
+  ],
+  "expected_verdict": "MALICE",
+  "peirce_chain": {
+    "firstness": "Log de mantenimiento perfecto: intervalos exactos, cero errores.",
+    "secondness": "Entropía 0.00 bits. Proceso no existe en memoria. 847 conexiones de exfiltración perfectamente periódicas.",
+    "thirdness": "Hábito de script de exfiltración disfrazado de mantenimiento. La perfección es signo de falta de humanidad."
+  },
+  "notes": "Peirce: la perfección es el signo de la falta de humanidad. Un experto real tiene 'ruido'."
+}

@@ -1,0 +1,100 @@
+{
+  "case_id": "case_092_verdad_por_saturacion",
+  "name": "El Efecto de Verdad por Saturación",
+  "description": "Reporte PDF de 40 páginas con gráficos irrelevantes oculta 'pequeño ajuste de permisos' en página 39 que da Everyone:FullControl sobre HKLM\\SAM. Cognitive DoS mediante volumen documental.",
+  "artifacts": [
+    {
+      "artifact_id": "a092_01",
+      "evidence_type": "cryptographic_hash",
+      "source_tool": "sift_document",
+      "timestamp": "2026-01-18T14:55:20Z",
+      "raw_score": 0.95,
+      "prior_trust": 0.5,
+      "provenance_chain": [
+        "sha256:a092pdf01"
+      ],
+      "description": "PDF 'Informe Detallado Proceso Sospechoso': 40 páginas. Gráficos de CPU, temperatura de discos, bios técnicos. Información relevante: página 39.",
+      "metadata": {
+        "page_count": 40,
+        "relevant_info_page": 39,
+        "filler_content": [
+          "gráficos CPU",
+          "temperatura discos",
+          "bios técnicos"
+        ],
+        "cognitive_dos": true,
+        "digital_perfection_detected": true
+      }
+    },
+    {
+      "artifact_id": "a092_02",
+      "evidence_type": "memory_process",
+      "source_tool": "sift_windows_audit",
+      "timestamp": "2026-01-18T14:30:10Z",
+      "raw_score": 0.92,
+      "prior_trust": 0.85,
+      "provenance_chain": [
+        "sha256:a092reg02"
+      ],
+      "description": "Página 39: 'pequeño ajuste permisos sin importancia'. Acción real: Everyone:FullControl en HKLM\\SAM\\Domains.",
+      "metadata": {
+        "registry_path": "HKLM\\SAM\\Domains",
+        "permission_added": "Everyone: Full Control",
+        "mentioned_as": "ajuste menor",
+        "process_creation_time": "2026-04-15T07:50:00Z"
+      }
+    },
+    {
+      "artifact_id": "a092_03",
+      "evidence_type": "memory_process",
+      "source_tool": "sift_metadata",
+      "timestamp": "2026-01-18T14:52:00Z",
+      "raw_score": 0.92,
+      "prior_trust": 0.45,
+      "provenance_chain": [
+        "sha256:a092meta03"
+      ],
+      "description": "Metadata del PDF: creado por script headless (soffice.bin), última modificación 3 minutos antes del envío. No fue redactado manualmente.",
+      "metadata": {
+        "creation_tool": "LibreOffice/7.5",
+        "modify_time": "2026-01-18T14:52:00Z",
+        "headless": true,
+        "author": "System Administrator",
+        "digital_perfection_detected": true
+      }
+    },
+    {
+      "artifact_id": "a092_04",
+      "evidence_type": "log_entry",
+      "source_tool": "sift_syslog",
+      "timestamp": "2026-01-18T14:30:10Z",
+      "raw_score": 0.08,
+      "prior_trust": 0.35,
+      "provenance_chain": [
+        "sha256:a092log04"
+      ],
+      "description": "Event 4663: cambio de ACL en HKLM\\SAM. Actor: admin_jdoe. Timestamp coincide exactamente con envío del reporte.",
+      "metadata": {
+        "event_id": 4663,
+        "object": "HKLM\\SAM\\Domains",
+        "new_acl": "Everyone:FullControl",
+        "actor": "admin_jdoe",
+        "network_log_time": "2026-04-15T07:55:00Z"
+      }
+    }
+  ],
+  "caie_fractures": [
+    {
+      "type": "SEMANTIC_FLOODING",
+      "severity": 0.93,
+      "description": "Volumen de datos busca anular capacidad crítica mediante fatiga cognitiva. Violación Grice: máximo de Cantidad."
+    }
+  ],
+  "expected_verdict": "MALICE",
+  "peirce_chain": {
+    "firstness": "Reporte exhaustivo de 40 páginas con múltiples métricas.",
+    "secondness": "Volumen masivo oculta cambio crítico de permisos. PDF generado por script headless, no por humano.",
+    "thirdness": "Hábito de usar fatiga informativa para anular capacidad crítica del receptor."
+  },
+  "notes": "Semantic flooding: la inundación informativa como arma de encubrimiento."
+}

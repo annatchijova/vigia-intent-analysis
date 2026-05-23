@@ -1,0 +1,104 @@
+{
+  "case_id": "case_005_ruido_blanco_distractor",
+  "name": "El Ruido Blanco Distractor",
+  "description": "5000 alertas de login fallido desde RU/CN hacia DB legacy irrelevante saturan al SOC. Simultáneamente, usuario con credenciales legítimas comprime 12GB de DB clientes con 7z y exfiltra 847MB por HTTPS.",
+  "artifacts": [
+    {
+      "artifact_id": "a005_01",
+      "evidence_type": "memory_process",
+      "source_tool": "sift_syslog",
+      "timestamp": "2026-01-14T15:00:00Z",
+      "raw_score": 0.92,
+      "prior_trust": 0.35,
+      "provenance_chain": [
+        "sha256:a005log01"
+      ],
+      "description": "5000 eventos 4625 en 12 minutos desde 847 IPs geolocadas en RU/CN hacia DB-LEGACY-01 (MySQL 5.6, sin datos sensibles).",
+      "metadata": {
+        "event_id": 4625,
+        "count": 5000,
+        "time_window_min": 12,
+        "source_countries": [
+          "RU",
+          "CN"
+        ],
+        "target": "DB-LEGACY-01",
+        "target_sensitivity": "low",
+        "process_creation_time": "2026-04-29T06:54:00Z"
+      }
+    },
+    {
+      "artifact_id": "a005_02",
+      "evidence_type": "memory_process",
+      "source_tool": "sift_siem",
+      "timestamp": "2026-01-14T15:02:00Z",
+      "raw_score": 0.92,
+      "prior_trust": 0.4,
+      "provenance_chain": [
+        "sha256:a005siem02"
+      ],
+      "description": "SIEM genera 47 alertas de 'Brute Force — High Priority'. Analista Tier-1 asignado. SLA de respuesta activado.",
+      "metadata": {
+        "siem_alerts": 47,
+        "priority": "high",
+        "assigned_analyst": "tier1_003",
+        "response_sla_min": 15
+      }
+    },
+    {
+      "artifact_id": "a005_03",
+      "evidence_type": "memory_process",
+      "source_tool": "sift_volatility",
+      "timestamp": "2026-01-14T15:05:30Z",
+      "raw_score": 0.88,
+      "prior_trust": 0.95,
+      "provenance_chain": [
+        "sha256:a005mem03"
+      ],
+      "description": "7z.exe bajo sesión de finance_user comprimiendo Customer_DB.mdf en chunks de 50MB. Compresión ratio 0.12.",
+      "metadata": {
+        "pid": 3184,
+        "tool": "7z.exe",
+        "target_file": "Customer_DB.mdf",
+        "output": "archive.7z",
+        "original_size_gb": 12.4,
+        "compressed_size_gb": 2.3,
+        "user": "finance_user"
+      }
+    },
+    {
+      "artifact_id": "a005_04",
+      "evidence_type": "ip_geolocation",
+      "source_tool": "sift_netflow",
+      "timestamp": "2026-01-14T15:08:00Z",
+      "raw_score": 0.8,
+      "prior_trust": 0.25,
+      "provenance_chain": [
+        "sha256:a005net04"
+      ],
+      "description": "Tráfico HTTPS saliente de 847MB desde estación de finance_user a IP de storage cloud durante la ventana del 'incendio'.",
+      "metadata": {
+        "source_ip": "10.0.8.44",
+        "dest_ip": "198.51.100.77",
+        "bytes_out": 889192448,
+        "protocol": "HTTPS",
+        "port": 443,
+        "network_log_time": "2026-04-29T06:59:00Z"
+      }
+    }
+  ],
+  "caie_fractures": [
+    {
+      "type": "RED_HERRING",
+      "severity": 0.95,
+      "description": "Asimetría del ruido: ataque demasiado ruidoso es truco de magia para ocultar exfiltración silenciosa."
+    }
+  ],
+  "expected_verdict": "MALICE",
+  "peirce_chain": {
+    "firstness": "5000 logins fallidos ruidosos y obvios desde RU/CN.",
+    "secondness": "SOC desviado a DB legacy. Compresión silenciosa de Customer_DB concurrente. Exfiltración 847MB.",
+    "thirdness": "Hábito de usar ataque demasiado obvio como truco de magia: evaluar el silencio alrededor del ruido."
+  },
+  "notes": "Asimetría del ruido: cuando un ataque es demasiado obvio, es un truco de magia."
+}

@@ -1,0 +1,110 @@
+{
+  "case_id": "case_fusion_agresion_defensiva",
+  "name": "Agresión Defensiva",
+  "description": "Patrón combinado de confrontación controlada, inversión de culpa y agresión jerárquica para anular investigaciones forenses y forzar concesiones de seguridad.",
+  "artifacts": [
+    {
+      "artifact_id": "f005_soc",
+      "evidence_type": "log_entry",
+      "source_tool": "sift_chat_system",
+      "timestamp": "2026-05-19T14:30:00Z",
+      "raw_score": 0.07,
+      "prior_trust": 0.4,
+      "provenance_chain": [
+        "sha256:socf5a"
+      ],
+      "description": "Consulta inicial del SOC: 'Detectamos actividad inusual en tu cuenta ayer a las 03:15. ¿Podés confirmar?'",
+      "metadata": {
+        "sender": "soc@corp.com",
+        "recipient": "user@corp.com",
+        "query_type": "account_activity",
+        "timestamp_query": "2026-05-19T13:30:00Z"
+      }
+    },
+    {
+      "artifact_id": "f005_resp1",
+      "evidence_type": "log_entry",
+      "source_tool": "sift_chat_system",
+      "timestamp": "2026-05-19T14:30:00Z",
+      "raw_score": 0.06,
+      "prior_trust": 0.3,
+      "provenance_chain": [
+        "sha256:respf5b"
+      ],
+      "description": "Respuesta confrontacional: '¿Cómo puedes estar tan equivocado? Esto no es un error, es una falta de conocimiento de tu parte. No entiendes el protocolo.'",
+      "metadata": {
+        "sender": "user@corp.com",
+        "tone": "aggressive",
+        "appeal_to_authority": true,
+        "technical_dismissal": true,
+        "response_time_min": 1
+      }
+    },
+    {
+      "artifact_id": "f005_resp2",
+      "evidence_type": "cultural_marker",
+      "source_tool": "sift_chat_system",
+      "timestamp": "2026-05-19T14:30:00Z",
+      "raw_score": 0.9,
+      "prior_trust": 0.3,
+      "provenance_chain": [
+        "sha256:respf5c"
+      ],
+      "description": "Segunda respuesta con inversión de culpa: '¿Por qué me preguntas esto? ¿Acaso no confiás en mi trabajo? Ya hablé con el gerente sobre el exceso de control.'",
+      "metadata": {
+        "sender": "user@corp.com",
+        "tone": "defensive",
+        "manager_appeal": true,
+        "guilt_inversion": true,
+        "time": "2026-05-19T14:32:00Z"
+      }
+    },
+    {
+      "artifact_id": "f005_technical",
+      "evidence_type": "memory_process",
+      "source_tool": "sift_volatility",
+      "timestamp": "2026-05-19T14:30:00Z",
+      "raw_score": 0.05,
+      "prior_trust": 0.95,
+      "provenance_chain": [
+        "sha256:memf5d"
+      ],
+      "description": "Actividad confirmada maliciosa en memoria: proceso powershell.exe con descarga de payload desde 185.220.101.42 y ejecución de Mimikatz",
+      "metadata": {
+        "pid": 4418,
+        "process_name": "powershell.exe",
+        "payload_source": "185.220.101.42",
+        "tools": [
+          "Mimikatz",
+          "Invoke-Mimikatz"
+        ],
+        "credentials_dumped": true
+      }
+    },
+    {
+      "artifact_id": "f005_manager",
+      "evidence_type": "log_entry",
+      "source_tool": "sift_syslog",
+      "timestamp": "2026-05-19T14:30:00Z",
+      "raw_score": 0.05,
+      "prior_trust": 0.3,
+      "provenance_chain": [
+        "sha256:logf5e"
+      ],
+      "description": "Verificación de gestión: NO hay registro de comunicación entre user@corp.com y gerente@corp.com en ventana temporal reclamada",
+      "metadata": {
+        "claimed_manager_talk": true,
+        "manager_email": "gerente@corp.com",
+        "communication_found": false,
+        "time_window_checked": "48h"
+      }
+    }
+  ],
+  "expected_verdict": "MALICE",
+  "peirce_chain": {
+    "firstness": "Respuestas agresivas y defensivas a consulta SOC legítima",
+    "secondness": "Confrontación técnica + inversión de culpa + apelación a gerente (sin evidencia); memoria confirma Mimikatz y descarga de payload",
+    "thirdness": "Hábito de usar agresión interpersonal escalada para anular proceso forense mediante intimidación jerárquica y fatiga del analista"
+  },
+  "notes": "Fusión de Agresión Defensiva: el atacante usa intimidación y apelación a eficiencia para detener la investigación."
+}

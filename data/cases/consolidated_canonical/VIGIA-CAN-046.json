@@ -1,0 +1,96 @@
+{
+  "case_id": "case_024_paracaidista",
+  "name": "El Paracaidista",
+  "description": "Binario system_updater.elf con crtime/mtime/atime idénticos a archivos legítimos de /usr/bin, pero ctime (cambio de inodo) de hace 3 horas — timestomping detectado.",
+  "artifacts": [
+    {
+      "artifact_id": "a024_stat",
+      "evidence_type": "file_timestamp",
+      "source_tool": "sift_file_audit",
+      "timestamp": "2026-05-19T14:30:00Z",
+      "raw_score": 0.92,
+      "prior_trust": 0.7,
+      "provenance_chain": [
+        "sha256:stat024a"
+      ],
+      "description": "Stat del binario: mtime=2024-03-15T10:00:00Z, atime=2024-03-15T10:00:00Z, crtime=2024-03-15T10:00:00Z (idénticos a /usr/bin/ls). ctime=2026-05-19T11:30:00Z (3h antes de detección)",
+      "metadata": {
+        "filename": "system_updater.elf",
+        "mtime": "2024-03-15T10:00:00Z",
+        "atime": "2024-03-15T10:00:00Z",
+        "crtime": "2024-03-15T10:00:00Z",
+        "ctime": "2026-05-19T11:30:00Z",
+        "reference_file": "/usr/bin/ls"
+      }
+    },
+    {
+      "artifact_id": "a024_inode",
+      "evidence_type": "file_timestamp",
+      "source_tool": "sift_file_audit",
+      "timestamp": "2026-05-19T14:30:00Z",
+      "raw_score": 0.88,
+      "prior_trust": 0.65,
+      "provenance_chain": [
+        "sha256:ino024b"
+      ],
+      "description": "Número de inodo del archivo: 8473321 — asignado recientemente en tabla de inodos, inconsistente con timestamp de 'antigüedad'",
+      "metadata": {
+        "inode": 8473321,
+        "inode_allocation_time": "2026-05-19T11:30:00Z",
+        "filesystem": "ext4",
+        "max_inode": 12500000
+      }
+    },
+    {
+      "artifact_id": "a024_exec",
+      "evidence_type": "cultural_marker",
+      "source_tool": "sift_syslog",
+      "timestamp": "2026-05-19T14:30:00Z",
+      "raw_score": 0.91,
+      "prior_trust": 0.4,
+      "provenance_chain": [
+        "sha256:log024c"
+      ],
+      "description": "Binario system_updater.elf ejecutado con privilegios root a las 11:35:00Z; establece conexión reverse shell",
+      "metadata": {
+        "event_id": 1,
+        "process": "system_updater.elf",
+        "user": "root",
+        "start_time": "2026-05-19T11:35:00Z",
+        "reverse_shell_ip": "185.220.101.42"
+      }
+    },
+    {
+      "artifact_id": "a024_hash",
+      "evidence_type": "memory_process",
+      "source_tool": "sift_file_audit",
+      "timestamp": "2026-05-19T14:30:00Z",
+      "raw_score": 0.06,
+      "prior_trust": 0.7,
+      "provenance_chain": [
+        "sha256:hash024d"
+      ],
+      "description": "Hash del binario no coincide con ningún paquete del repositorio oficial; entropía alta (7.8 bits) indicativo de código compilado custom",
+      "metadata": {
+        "sha256": "deadbeef...",
+        "repo_match": false,
+        "entropy": 7.8,
+        "file_type": "ELF 64-bit LSB executable"
+      }
+    }
+  ],
+  "expected_verdict": "MALICE",
+  "caie_fractures": [
+    {
+      "type": "TEMPORAL_CAUSALITY_VIOLATION",
+      "severity": 0.9,
+      "description": "ctime reciente contradice mtime/atime/crtime antiguos: imposible sin timestomping"
+    }
+  ],
+  "peirce_chain": {
+    "firstness": "Binario con timestamps idénticos a archivos legítimos del sistema",
+    "secondness": "ctime reciente delata modificación de metadatos; inodo asignado recientemente; hash no coincide con repositorio oficial",
+    "thirdness": "Hábito de usar timestomping para camuflarse en línea temporal del sistema operativo, olvidando que ctime es inmutable en user-space"
+  },
+  "notes": "Timestomping forense clásico: el atacante copió fechas de archivo legítimo pero olvidó alterar ctime."
+}

@@ -1,0 +1,87 @@
+{
+  "case_id": "case_104_error_layout_comentario",
+  "name": "El Error de Layout en el Comentario",
+  "description": "Script de producción tiene comentario: '# TODO: arreglar el script cnfnbz.py'. La palabra 'cnfnbz' es 'статья' (artículo) escrito con layout ruso activo. Commit desde máquina con locale ru_RU y timezone Europe/Moscow.",
+  "artifacts": [
+    {
+      "artifact_id": "a104_01",
+      "evidence_type": "file_hash",
+      "source_tool": "sift_code_audit",
+      "timestamp": "2026-01-23T09:40:25Z",
+      "raw_score": 0.88,
+      "prior_trust": 0.65,
+      "provenance_chain": [
+        "sha256:a104code01"
+      ],
+      "description": "Comentario en script de producción: '# TODO: arreglar el script cnfnbz.py'. Palabra sin sentido en español ni inglés.",
+      "metadata": {
+        "file": "maintain_db.py",
+        "line": 42,
+        "comment_text": "# TODO: arreglar el script cnfnbz.py",
+        "commit_author": "devops@corp.com"
+      }
+    },
+    {
+      "artifact_id": "a104_02",
+      "evidence_type": "cultural_marker",
+      "source_tool": "sift_linguistic",
+      "timestamp": "2026-01-23T09:40:25Z",
+      "raw_score": 0.92,
+      "prior_trust": 0.15,
+      "provenance_chain": [
+        "sha256:a104cult02"
+      ],
+      "description": "Keyboard slip: 'cnfnbz' mapea exactamente a 'статья' (artículo) en layout ruso ЙЦУКЕН activo. Confianza: 1.0.",
+      "metadata": {
+        "typed": "cnfnbz",
+        "layout": "ru_RU",
+        "intended_russian": "статья",
+        "meaning_ru": "artículo/reporte",
+        "keyboard_mapping_confidence": 1.0
+      }
+    },
+    {
+      "artifact_id": "a104_03",
+      "evidence_type": "log_entry",
+      "source_tool": "sift_git_audit",
+      "timestamp": "2026-01-23T09:38:10Z",
+      "raw_score": 0.76,
+      "prior_trust": 0.45,
+      "provenance_chain": [
+        "sha256:a104git03"
+      ],
+      "description": "Commit realizado desde máquina con git config locale ru_RU.UTF-8, timezone Europe/Moscow.",
+      "metadata": {
+        "commit_hash": "f3e4a5b",
+        "git_config_locale": "ru_RU.UTF-8",
+        "git_config_timezone": "Europe/Moscow",
+        "author_email": "devops@corp.com"
+      }
+    },
+    {
+      "artifact_id": "a104_04",
+      "evidence_type": "memory_process",
+      "source_tool": "sift_volatility",
+      "timestamp": "2026-01-23T09:38:00Z",
+      "raw_score": 0.05,
+      "prior_trust": 0.95,
+      "provenance_chain": [
+        "sha256:a104mem04"
+      ],
+      "description": "Sesión de desarrollo desde IP geolocada en San Petersburgo con teclado físico configurado en ruso.",
+      "metadata": {
+        "source_ip": "185.4.65.12",
+        "geo": "RU",
+        "keyboard_layout": "ru_RU",
+        "session_type": "ssh"
+      }
+    }
+  ],
+  "expected_verdict": "MALICE",
+  "peirce_chain": {
+    "firstness": "Comentario de código con palabra aparentemente sin sentido: 'cnfnbz'.",
+    "secondness": "'cnfnbz' es 'статья' en layout ruso. Commit desde máquina con locale ru_RU. Sesión desde IP rusa.",
+    "thirdness": "Hábito de atacante que escribe comentarios de 'desarrollador' pero su memoria muscular lo traiciona en texto no ejecutable."
+  },
+  "notes": "Peirce Index: la cadena 'cnfnbz' delata la configuración de hardware nativa del operador."
+}

@@ -1,0 +1,103 @@
+{
+  "case_id": "case_093_deepfake_estilo",
+  "name": "El Deepfake de Estilo",
+  "description": "15 commits imitan el estilo del Arquitecto Jefe (espaciado, errores gramaticales, TTR) con precisión estadística de 0.97, superior a la varianza humana biológica (0.82). Subidos vía API key genérica a las 4AM mientras el arquitecto estaba desconectado.",
+  "artifacts": [
+    {
+      "artifact_id": "a093_01",
+      "evidence_type": "cultural_marker",
+      "source_tool": "sift_git_audit",
+      "timestamp": "2026-04-22T04:00:00Z",
+      "raw_score": 0.92,
+      "prior_trust": 0.45,
+      "provenance_chain": [
+        "sha256:a093git01"
+      ],
+      "description": "15 commits subidos vía API key genérica 'ci-token-legacy' a las 4AM. Autor: arch_chief@corp.com.",
+      "metadata": {
+        "commit_count": 15,
+        "api_key_used": "ci-token-legacy",
+        "commit_author": "arch_chief@corp.com",
+        "push_method": "api_key",
+        "commit_time": "2026-04-22T04:00:00Z"
+      }
+    },
+    {
+      "artifact_id": "a093_02",
+      "evidence_type": "memory_process",
+      "source_tool": "sift_vpn_log",
+      "timestamp": "2026-04-21T19:30:00Z",
+      "raw_score": 0.05,
+      "prior_trust": 0.9,
+      "provenance_chain": [
+        "sha256:a093vpn02"
+      ],
+      "description": "Arquitecto Jefe desconectado desde las 19:30 del día anterior. No hay sesión entre 19:30 y las 4AM.",
+      "metadata": {
+        "session_user": "arch_chief@corp.com",
+        "session_end": "2026-04-21T19:30:00Z",
+        "reconnect_time": null
+      }
+    },
+    {
+      "artifact_id": "a093_03",
+      "evidence_type": "file_hash",
+      "source_tool": "sift_stylometry",
+      "timestamp": "2026-04-22T08:00:00Z",
+      "raw_score": 0.82,
+      "prior_trust": 0.5,
+      "provenance_chain": [
+        "sha256:a093sty03"
+      ],
+      "description": "Análisis estilométrico: TTR similarity 0.992, errores gramaticales replicados ('recieve', 'seperate'). Coincidencia supera varianza biológica humana (0.82 baseline).",
+      "metadata": {
+        "ttr_similarity": 0.992,
+        "human_baseline_variance": 0.82,
+        "ai_generation_probability": 0.94,
+        "comment_typos": [
+          "recieve",
+          "seperate"
+        ],
+        "style_entropy": 0.03,
+        "human_baseline_entropy": 0.62
+      }
+    },
+    {
+      "artifact_id": "a093_04",
+      "evidence_type": "file_hash",
+      "source_tool": "sift_code_integrity",
+      "timestamp": "2026-04-22T08:30:00Z",
+      "raw_score": 0.82,
+      "prior_trust": 0.85,
+      "provenance_chain": [
+        "sha256:a093hash04"
+      ],
+      "description": "Uno de los 15 commits introduce backdoor en módulo de autenticación. Hash mismatch con código revisado en PR anterior. Cambio ofuscado dentro de 847 líneas de refactoring legítimo.",
+      "metadata": {
+        "file_path": "src/auth/session_manager.py",
+        "hash_mismatch": true,
+        "signature_mismatch": true,
+        "claimed_identity": "refactoring commit"
+      }
+    }
+  ],
+  "caie_fractures": [
+    {
+      "type": "LOG_VS_MEMORY",
+      "severity": 0.9,
+      "description": "Commits reclaman autoría del arquitecto pero LSASS confirma sesión cerrada 8.5 horas previas. Imposibilidad estructural."
+    },
+    {
+      "type": "CRYPTOGRAPHIC_INCONSISTENCY_UNVERIFIED",
+      "severity": 0.6,
+      "description": "Hash del módulo de autenticación no coincide con revisado en PR. Requiere validación de trust-chain para elevar a Golden Rule."
+    }
+  ],
+  "expected_verdict": "MALICE",
+  "peirce_chain": {
+    "firstness": "Commits con estilo idéntico al arquitecto jefe subidos en plena madrugada.",
+    "secondness": "Arquitecto desconectado. API key genérica. Coincidencia estilométrica supera varianza biológica humana.",
+    "thirdness": "Hábito de usar IA para fabricar código que 'parezca' legítimo. La consistencia perfecta ES la firma del impostor."
+  },
+  "notes": "La consistencia estadística suprahumana es el indicador de fabricación algorítmica."
+}

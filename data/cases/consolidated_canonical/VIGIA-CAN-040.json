@@ -1,0 +1,94 @@
+{
+  "case_id": "case_020_mimetismo_topografico",
+  "name": "El Mimetismo Topográfico",
+  "description": "svchost.exe con hash limpio y firma Microsoft válida. Antivirus silencioso. Pero ejecutándose desde C:\\Users\\Public\\Downloads con parent explorer.exe. Mantiene conexión C2 a 45.134.26.109:8080. Un binario legítimo en lugar ilegítimo.",
+  "artifacts": [
+    {
+      "artifact_id": "a020_01",
+      "evidence_type": "memory_process",
+      "source_tool": "sift_volatility",
+      "timestamp": "2026-10-20T11:00:00Z",
+      "raw_score": 0.85,
+      "prior_trust": 0.95,
+      "provenance_chain": [
+        "sha256:a020mem01"
+      ],
+      "description": "svchost.exe PID 5124 desde C:\\Users\\Public\\Downloads\\. Parent: explorer.exe. Esperado: services.exe desde System32.",
+      "metadata": {
+        "pid": 5124,
+        "process_name": "svchost.exe",
+        "process_path": "C:\\Users\\Public\\Downloads\\svchost.exe",
+        "expected_path": "C:\\Windows\\System32\\svchost.exe",
+        "parent_process": "explorer.exe",
+        "expected_parent": "services.exe",
+        "process_creation_time": "2026-05-04T07:28:00Z"
+      }
+    },
+    {
+      "artifact_id": "a020_02",
+      "evidence_type": "memory_process",
+      "source_tool": "sift_authenticode",
+      "timestamp": "2026-10-20T11:05:00Z",
+      "raw_score": 0.92,
+      "prior_trust": 0.85,
+      "provenance_chain": [
+        "sha256:a020hash02"
+      ],
+      "description": "Hash del svchost.exe en Downloads: coincide con Windows 2025. Firma Microsoft válida. El atacante copió el binario limpio a ubicación anómala.",
+      "metadata": {
+        "known_good": true,
+        "digital_signature_valid": true,
+        "signer": "Microsoft Corporation"
+      }
+    },
+    {
+      "artifact_id": "a020_03",
+      "evidence_type": "ip_geolocation",
+      "source_tool": "sift_zeek",
+      "timestamp": "2026-10-20T11:02:00Z",
+      "raw_score": 0.8,
+      "prior_trust": 0.8,
+      "provenance_chain": [
+        "sha256:a020net03"
+      ],
+      "description": "svchost.exe desde Downloads mantiene conexión a 45.134.26.109:8080. El svchost legítimo de System32 no tiene conexiones activas.",
+      "metadata": {
+        "destination_ip": "45.134.26.109",
+        "port": 8080,
+        "bytes_transferred": 102400,
+        "network_log_time": "2026-05-04T07:33:00Z"
+      }
+    },
+    {
+      "artifact_id": "a020_04",
+      "evidence_type": "memory_process",
+      "source_tool": "sift_regripper",
+      "timestamp": "2026-10-20T10:55:00Z",
+      "raw_score": 0.92,
+      "prior_trust": 0.65,
+      "provenance_chain": [
+        "sha256:a020reg04"
+      ],
+      "description": "Run key 'WindowsUpdate' apuntando a C:\\Users\\Public\\Downloads\\svchost.exe para persistencia.",
+      "metadata": {
+        "registry_path": "HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run",
+        "value_name": "WindowsUpdate",
+        "value_data": "C:\\Users\\Public\\Downloads\\svchost.exe"
+      }
+    }
+  ],
+  "caie_fractures": [
+    {
+      "type": "LOG_VS_MEMORY",
+      "severity": 0.9,
+      "description": "Hash NOISE (limpio) pero comportamiento MALICE (ruta anómala, parent incorrecto, C2 activo)."
+    }
+  ],
+  "expected_verdict": "MALICE",
+  "peirce_chain": {
+    "firstness": "svchost.exe con hash limpio y firma Microsoft — invisible al antivirus.",
+    "secondness": "Ejecutándose desde Downloads con parent explorer.exe. Binario legítimo en lugar ilegítimo.",
+    "thirdness": "Hábito de robar la identidad del sistema usando el propio binario legítimo como disfraz."
+  },
+  "notes": "Un policía verdadero no se viste de policía dentro de una guarida criminal."
+}

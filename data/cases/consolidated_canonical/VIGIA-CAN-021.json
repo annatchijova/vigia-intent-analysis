@@ -1,0 +1,102 @@
+{
+  "case_id": "case_103_cebo_vulnerabilidad_autoinfligida",
+  "name": "El Cebo de la Vulnerabilidad Autoinfligida",
+  "description": "Admin reporta puerto 8080 abierto 'por error'. SOC se enfoca ahí. Credencial de servicio svc_backup inicia movimiento lateral a 4 servidores AD concurrentemente. Sesión LSASS de svc_backup precede al reporte.",
+  "artifacts": [
+    {
+      "artifact_id": "a103_01",
+      "evidence_type": "memory_process",
+      "source_tool": "sift_ticket_system",
+      "timestamp": "2026-01-22T18:20:10Z",
+      "raw_score": 0.92,
+      "prior_trust": 0.35,
+      "provenance_chain": [
+        "sha256:a103tick01"
+      ],
+      "description": "Email: 'Dejé puerto 8080 abierto por error probando microservicio. Soy un desastre'. Reporte voluntario de negligencia menor.",
+      "metadata": {
+        "sender": "sysadmin_network",
+        "self_incrimination": true,
+        "decoy_port": 8080,
+        "process_creation_time": "2026-04-22T08:39:00Z"
+      }
+    },
+    {
+      "artifact_id": "a103_02",
+      "evidence_type": "ip_geolocation",
+      "source_tool": "sift_netflow",
+      "timestamp": "2026-01-22T18:20:10Z",
+      "raw_score": 0.55,
+      "prior_trust": 0.4,
+      "provenance_chain": [
+        "sha256:a103net02"
+      ],
+      "description": "Puerto 8080 abierto pero solo 3 conexiones de prueba locales en 48h. Vector real no es este puerto.",
+      "metadata": {
+        "port": 8080,
+        "connections_48h": 3,
+        "source_ips": [
+          "127.0.0.1"
+        ],
+        "service_banner": "test_microsvc/0.1",
+        "network_log_time": "2026-04-22T08:44:00Z"
+      }
+    },
+    {
+      "artifact_id": "a103_03",
+      "evidence_type": "memory_process",
+      "source_tool": "sift_volatility",
+      "timestamp": "2026-01-22T18:22:15Z",
+      "raw_score": 0.94,
+      "prior_trust": 0.95,
+      "provenance_chain": [
+        "sha256:a103mem03"
+      ],
+      "description": "wmiexec.py usando credencial 'svc_backup' conectando a DC01, DC02, FS01, SQL01 simultáneamente.",
+      "metadata": {
+        "tool": "wmiexec.py",
+        "credential": "svc_backup",
+        "targets": [
+          "DC01",
+          "DC02",
+          "FS01",
+          "SQL01"
+        ],
+        "bytes_transferred": 2458624000
+      }
+    },
+    {
+      "artifact_id": "a103_04",
+      "evidence_type": "lsass_session",
+      "source_tool": "sift_mimikatz",
+      "timestamp": "2026-01-22T18:18:00Z",
+      "raw_score": 0.85,
+      "prior_trust": 0.85,
+      "provenance_chain": [
+        "sha256:a103lsass04"
+      ],
+      "description": "Sesión LSASS para svc_backup creada 2 minutos ANTES del reporte voluntario. No hay registro de login interactivo.",
+      "metadata": {
+        "session_id": "0x9b2a",
+        "username": "svc_backup",
+        "auth_type": "NTLM",
+        "source_ip": "10.0.8.15",
+        "creation_time": "2026-01-22T18:18:00Z"
+      }
+    }
+  ],
+  "caie_fractures": [
+    {
+      "type": "STRATEGIC_OVERINCRIMINATION",
+      "severity": 0.98,
+      "description": "Reporte voluntario de negligencia menor para desviar mirada del SOC hacia zona controlada."
+    }
+  ],
+  "expected_verdict": "MALICE",
+  "peirce_chain": {
+    "firstness": "Auto-denuncia de error de política (puerto abierto).",
+    "secondness": "Puerto 8080 es señuelo. svc_backup hace movimiento lateral. Sesión LSASS precede al reporte.",
+    "thirdness": "Hábito de sobre-incriminación estratégica para desviar mirada del equipo de respuesta hacia zona controlada."
+  },
+  "notes": "Carnegie: 'Admita sus errores rápida y enfáticamente' — el error es el señuelo."
+}

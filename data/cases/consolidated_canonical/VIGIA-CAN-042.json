@@ -1,0 +1,91 @@
+{
+  "case_id": "case_012_camuflaje_simbiotico",
+  "name": "El Camuflaje Simbiótico",
+  "description": "Proceso oculto en memoria no hace tráfico de red durante horas. Cuando usuario abre Zoom/Teams para videollamada, en ese milisegundo empieza a exfiltrar GB dentro del ruido legítimo del video.",
+  "artifacts": [
+    {
+      "artifact_id": "a012_hidden",
+      "evidence_type": "memory_process",
+      "source_tool": "sift_volatility",
+      "timestamp": "2026-05-19T14:30:00Z",
+      "raw_score": 0.9,
+      "prior_trust": 0.95,
+      "provenance_chain": [
+        "sha256:mem012a"
+      ],
+      "description": "Proceso oculto en memoria (sin entrada en lista de procesos userland) con handle a socket TCP en estado ESTABLISHED pero sin actividad durante 4.2 horas",
+      "metadata": {
+        "pid_hidden": true,
+        "process_name": "system_update.exe",
+        "socket_state": "ESTABLISHED",
+        "idle_duration_h": 4.2,
+        "injection_technique": "process_hollowing",
+        "process_creation_time": "2026-05-05T23:02:00Z"
+      }
+    },
+    {
+      "artifact_id": "a012_zoom",
+      "evidence_type": "memory_process",
+      "source_tool": "sift_syslog",
+      "timestamp": "2026-05-19T14:30:00Z",
+      "raw_score": 0.92,
+      "prior_trust": 0.35,
+      "provenance_chain": [
+        "sha256:log012b"
+      ],
+      "description": "Usuario abre zoom.exe a las 14:32:15.000; log de inicio de videollamada con participante externo",
+      "metadata": {
+        "process": "zoom.exe",
+        "start_time": "2026-05-19T14:32:15.000Z",
+        "meeting_id": "847-555-0123",
+        "participant_count": 3
+      }
+    },
+    {
+      "artifact_id": "a012_exfil",
+      "evidence_type": "memory_process",
+      "source_tool": "sift_netflow",
+      "timestamp": "2026-05-19T14:30:00Z",
+      "raw_score": 0.92,
+      "prior_trust": 0.25,
+      "provenance_chain": [
+        "sha256:ip012c"
+      ],
+      "description": "Pico de tráfico saliente de 2.3GB en 180 segundos iniciado exactamente en 14:32:15.120 (120ms después de Zoom) hacia IP de CDN sospechosa",
+      "metadata": {
+        "start_time": "2026-05-19T14:32:15.120Z",
+        "bytes_out": 2469606195,
+        "duration_sec": 180,
+        "dest_ip": "151.101.65.42",
+        "port": 443,
+        "correlation_with_zoom_ms": 120
+      }
+    },
+    {
+      "artifact_id": "a012_bandwidth",
+      "evidence_type": "log_entry",
+      "source_tool": "sift_netflow",
+      "timestamp": "2026-05-19T14:30:00Z",
+      "raw_score": 0.06,
+      "prior_trust": 0.3,
+      "provenance_chain": [
+        "sha256:net012d"
+      ],
+      "description": "Zoom reporta uso de banda ancha de 4.2Mbps (video HD); tráfico total medido en interfaz es 847Mbps — discrepancia de 200:1",
+      "metadata": {
+        "zoom_reported_mbps": 4.2,
+        "interface_measured_mbps": 847,
+        "ratio": 201.6,
+        "interface": "eth0",
+        "network_log_time": "2026-05-05T23:07:00Z"
+      }
+    }
+  ],
+  "expected_verdict": "MALICE",
+  "peirce_chain": {
+    "firstness": "Proceso oculto inactivo durante horas; Zoom abierto; pico de tráfico masivo",
+    "secondness": "Exfiltración inicia 120ms después de Zoom; tráfico total 200× mayor que lo reportado por Zoom; proceso oculto inyectado",
+    "thirdness": "Hábito de usar aplicación legítima como gatillo contextual para esconder exfiltración dentro de ruido esperado"
+  },
+  "notes": "Mímesis biológica aplicada al código: el malware espera al hospedero legítimo para camuflarse."
+}
