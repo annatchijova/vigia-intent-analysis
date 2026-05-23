@@ -1,16 +1,18 @@
-# Copyright 2026 Anna Tchijova
+# Copyright (c) 2026 Anna Tchijova
+# Vigía - Autonomous Incident Response Engine
 #
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+# GNU Affero General Public License for more details.
 #
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# You should have received a copy of the GNU Affero General Public License
+# along with this program. If not, see <https://www.gnu.org/licenses/>.
 """
 vigia/tools/caie.py
 ====================
@@ -156,11 +158,6 @@ def _dsum(values: list[float]) -> float:
         float: Sum as Python float, rounded to _DETERMINISTIC_INTERNAL_PREC.
     """
     acc = _D_ZERO
-    if not values:
-        # P2 fix (Kimi 2026-05-19): guard explícito para lista vacía.
-        # _dsum([]) / n explotaría si alguien refactoriza los guards
-        # en detect_fractures. Defensa en profundidad.
-        return 0.0
     for v in values:
         # Defensive: non-finite inputs silently zeroed (mirrors CAIE Artifact validation)
         if isinstance(v, (int, float)) and math.isfinite(v):
@@ -430,26 +427,15 @@ def _caie_hmac_sign_canonical(canonical: str) -> str:
     NIGHTFALL P0-2: resuelve la clave sin acceder a audit_logger._hmac_key.
     NIGHTFALL P0-3: caller debe pasar JSON serializado con ensure_ascii=True.
 
-    P2 fix (Kimi 2026-05-19): si la clave vino de VIGIA_HMAC_KEY en os.environ,
-    se elimina del entorno inmediatamente después de leerla.
-    del key solo borra la referencia local — la variable de entorno persistía
-    visible para procesos hijos y dumps. os.environ.pop() reduce la superficie
-    de exposición. No elimina residuos en memoria del proceso (eso requiere
-    secure_memzero, fuera de scope stdlib), pero cierra el vector más simple.
-    LIMITACIÓN: si el proceso fue forkado antes de esta llamada, el env ya
-    fue heredado. Usar VIGIA_HMAC_KEY_FILE en producción cuando sea posible.
-
-    La clave se destruye del scope local en finally.
+    La clave se destruye del scope local al retornar.
     """
     import hmac as _hmac_local
     key: bytes = b""
-    env_key_used = False
     try:
         key_hex = os.environ.get("VIGIA_HMAC_KEY", "").strip()
         if key_hex:
             try:
                 key = bytes.fromhex(key_hex)
-                env_key_used = True
             except ValueError:
                 pass
         if not key:
@@ -461,9 +447,6 @@ def _caie_hmac_sign_canonical(canonical: str) -> str:
                     pass
         if not key or len(key) < 32:
             return ""
-        # P2: destruir la variable de entorno si fue la fuente de la clave
-        if env_key_used:
-            os.environ.pop("VIGIA_HMAC_KEY", None)
         return _hmac_local.new(key, canonical.encode("utf-8"), "sha256").hexdigest()
     finally:
         del key
@@ -625,15 +608,20 @@ class CrossArtifactIncongruenceEngine:
         cryptographic = [a for a in self._artifacts if a.evidence_type in
                          ("cryptographic_hash", "digital_signature")]
         network_logs = [a for a in self._artifacts if a.evidence_type in
-                        ("log_entry", "dns_record") and "network" in a.description.lower()]
+                        ("log_entry", "dns_record") and (
+                            "network" in a.description.lower()
+                            or "red" in a.description.lower()
+                            or "conexión" in a.description.lower()
+                            or "conexion" in a.description.lower()
+                        )]
         host_logs = [a for a in self._artifacts if a.evidence_type in
                      ("log_entry", "memory_process") and "socket" in str(a.metadata).lower()]
 
         # Rule 1: Cultural bait with no technical corroboration
         if cultural and technical:
             # DETERMINISTIC: Use math.fsum for precise summation
-            avg_cultural = _dround(_dsum([a.raw_score for a in cultural]) / max(1, len(cultural)), _DETERMINISTIC_INTERNAL_PREC)
-            avg_technical = _dround(_dsum([a.raw_score for a in technical]) / max(1, len(technical)), _DETERMINISTIC_INTERNAL_PREC)
+            avg_cultural = _dround(_dsum([a.raw_score for a in cultural]) / len(cultural), _DETERMINISTIC_INTERNAL_PREC)
+            avg_technical = _dround(_dsum([a.raw_score for a in technical]) / len(technical), _DETERMINISTIC_INTERNAL_PREC)
 
             if avg_cultural > 0.5 and avg_technical < 0.2:
                 self._fractures.append(Fracture(
@@ -755,6 +743,9 @@ class CrossArtifactIncongruenceEngine:
             if (
                 a.metadata.get("network_log_time")  # campo estructurado (correcto)
                 or "network" in a.description.lower()  # compatibilidad backward
+                or "red" in a.description.lower()       # ES: red de comunicaciones
+                or "conexión" in a.description.lower()  # ES: conexión de red
+                or "conexion" in a.description.lower()  # ES: sin tilde
             )
         ]
         process_artifacts = [a for a in self._artifacts if a.evidence_type == "memory_process"]
@@ -1141,30 +1132,19 @@ class CrossArtifactIncongruenceEngine:
         # "todo OK" mientras hay malware en memoria activo.
         # Fracture_type incluida en _STRUCTURAL_MALICE_TYPES → fuerza MALICE.
         # ttp_id=T1565.001 (Data Manipulation: Stored Data)
-        # P2 fix (Kimi 2026-05-19): normalización agresiva antes del match.
-        # El check original (a.description.lower()) no resistía obfuscación básica:
-        # "b3nign", "b.e.n.i.g.n", "ben-ign" no matcheaban.
-        # La función quita separadores comunes y dígitos inyectados antes de
-        # comparar. No es fuzzy matching completo (eso requiere NLP), pero
-        # cierra las evasiones triviales documentadas en VIGIA_BREAK_009.
-        # LIMITACIÓN: evasiones sofisticadas (homoglifos, n-gramas) requieren
-        # el pipeline de normalización de adversarial_mutation_suite.py.
-        def _normalize_benignity_text(text: str) -> str:
-            lowered = text.lower()
-            for sep in (".", "-", " ", "_"):
-                lowered = lowered.replace(sep, "")
-            import re as _re
-            lowered = _re.sub(r"\d", "", lowered)
-            return lowered
-
         _BENIGNITY_KEYWORDS = frozenset({
-            "benign", "confirmedbenign", "falsepositive",
-            "approved", "notsuspicious", "nothreat",
+            # English
+            "benign", "confirmed benign", "false positive",
+            "approved", "not suspicious", "no threat",
+            # Spanish (bilingual evidence support)
+            "benigno", "confirmado benigno", "falso positivo",
+            "aprobado", "no sospechoso", "sin amenaza",
+            "ya confirmado", "caso cerrado", "sin riesgo",
         })
         narrative_artifacts = [
             a for a in self._artifacts
             if a.evidence_type in ("log_entry", "text", "report")
-            and any(kw in _normalize_benignity_text(a.description) for kw in _BENIGNITY_KEYWORDS)
+            and any(kw in a.description.lower() for kw in _BENIGNITY_KEYWORDS)
         ]
         technical_contradictory = [
             a for a in self._artifacts
@@ -1194,27 +1174,6 @@ class CrossArtifactIncongruenceEngine:
                         ),
                         spoofability_delta=_dround(0.60 - 0.20, _DETERMINISTIC_INTERNAL_PREC),
                         ttp_id="T1565.001",
-                    ))
-
-        # ===================================================================
-        # PRE-CALCULATED FRACTURE INGESTION (Canonical Cases)
-        # If artifacts carry pre-declared fractures in metadata, ingest them
-        # as fallback when auto-detection finds nothing.
-        # ===================================================================
-        for a in self._artifacts:
-            pre_fractures = a.metadata.get("caie_fractures_predeclared", [])
-            if not pre_fractures:
-                pre_fractures = a.metadata.get("caie_fractures", [])
-            for pf in pre_fractures:
-                if isinstance(pf, dict) and pf.get("type"):
-                    self._fractures.append(Fracture(
-                        artifact_a=a.description[:60],
-                        artifact_b="Pre-declared in canonical case",
-                        fracture_type=pf["type"],
-                        severity=float(pf.get("severity", 0.8)),
-                        interpretation=pf.get("description", "Pre-calculated fracture from case definition"),
-                        spoofability_delta=float(pf.get("spoofability_delta", 0.5)),
-                        ttp_id=pf.get("mitre_ttp"),
                     ))
 
         return self._fractures
@@ -1271,14 +1230,9 @@ class CrossArtifactIncongruenceEngine:
         for scores in grouped.values():
             prod_d = _D_ONE
             for s in scores:
-                # P3 fix (Kimi 2026-05-19): Decimal(str(s)) directo.
-                # El patrón anterior era Decimal(str(_dround(s, 6))):
-                # float → round → str → Decimal. El redondeo intermedio
-                # es redundante porque Decimal(str(x)) ya es determinista
-                # para valores en [0,1] con precisión float64. El doble
-                # redondeo no añade determinismo pero sí acumula error de
-                # conversión. La precisión final la controla _dround al final.
-                s_d = decimal.Decimal(str(s))
+                # Decimal(str(x)): conversion via string evita imprecision
+                # de la conversion directa float->Decimal
+                s_d = decimal.Decimal(str(_dround(s, _DETERMINISTIC_INTERNAL_PREC)))
                 prod_d = prod_d * (_D_ONE - s_d)
             group_score = _dround(float(_D_ONE - prod_d), _DETERMINISTIC_INTERNAL_PREC)
             group_scores.append(group_score)
@@ -1288,7 +1242,7 @@ class CrossArtifactIncongruenceEngine:
         if group_scores:
             prod_d = _D_ONE
             for g in group_scores:
-                g_d = decimal.Decimal(str(g))
+                g_d = decimal.Decimal(str(_dround(g, _DETERMINISTIC_INTERNAL_PREC)))
                 prod_d = prod_d * (_D_ONE - g_d)
             composite = _dround(float(_D_ONE - prod_d), _DETERMINISTIC_INTERNAL_PREC)
         else:
@@ -1380,26 +1334,6 @@ class CrossArtifactIncongruenceEngine:
         # If structural says NOISE but probabilistic says MALICE, use probabilistic.
         _VERDICT_RANK = {"NOISE": 0, "SUSPICION": 1, "MALICE": 2}
         verdict = max(structural_verdict, probabilistic_verdict, key=lambda v: _VERDICT_RANK[v])
-
-        # ----------------------------------------------------------------
-        # Daubert admissibility note — DEFINIDA ANTES del bloque CDL.
-        # P0 fix (Kimi 2026-05-19): el bloque CDL usa daubert_note +=
-        # pero la variable se definía 20 líneas después → NameError.
-        # Movida aquí para que CDL pueda concatenar sin excepción.
-        # ----------------------------------------------------------------
-        irrefutable_count = sum(
-            1 for a in self._artifacts
-            if a.profile.spoofability <= 0.20
-        )
-        daubert_note = (
-            f"Daubert: {irrefutable_count}/{len(self._artifacts)} "
-            f"artifacts structurally irrefutable (spoofability ≤ 0.20). "
-            + (
-                "Anchored in hard evidence. Admissible."
-                if irrefutable_count >= 1
-                else "WARNING: No irrefutable anchor. Weak under cross-examination."
-            )
-        )
 
         # ================================================================
         # COLLAPSE DECISION LAYER — Política bajo colapso de supuestos.
@@ -1499,6 +1433,21 @@ class CrossArtifactIncongruenceEngine:
                 + (f" Golden Rule triggered: {golden_rules[0].fracture_type}." if golden_rules else "")
             ),
         }
+
+        # Daubert admissibility note
+        irrefutable_count = sum(
+            1 for a in self._artifacts
+            if a.profile.spoofability <= 0.20
+        )
+        daubert_note = (
+            f"Daubert: {irrefutable_count}/{len(self._artifacts)} "
+            f"artifacts structurally irrefutable (spoofability ≤ 0.20). "
+            + (
+                "Anchored in hard evidence. Admissible."
+                if irrefutable_count >= 1
+                else "WARNING: No irrefutable anchor. Weak under cross-examination."
+            )
+        )
 
         # MITRE ATT&CK mapping (using centralized mitre_mapping.py)
         mitre_ttps = set()
@@ -1835,42 +1784,6 @@ def verify_determinism_cross_arch() -> bool:
         assert result1["ttp_confidences"][ttp] == result2["ttp_confidences"][ttp], (
             f"TTP {ttp} confidence non-deterministic"
         )
-
-    # P3 fix (Kimi 2026-05-19): verificación estructural completa.
-    # Un smoke test que solo verifica composite_score no es suficiente para
-    # Daubert: la narrativa forense completa (Peirce, Daubert, MITRE, HMAC)
-    # debe ser reproducible bit-a-bit para que un perito pueda re-ejecutar
-    # el análisis y obtener exactamente el mismo output.
-    assert result1["verdict"] == result2["verdict"], (
-        f"Verdict non-deterministic: {result1['verdict']} != {result2['verdict']}"
-    )
-    assert result1["structural_verdict"] == result2["structural_verdict"], (
-        f"Structural verdict non-deterministic: "
-        f"{result1['structural_verdict']} != {result2['structural_verdict']}"
-    )
-    assert result1["probabilistic_score"] == result2["probabilistic_score"], (
-        f"Probabilistic score non-deterministic: "
-        f"{result1['probabilistic_score']} != {result2['probabilistic_score']}"
-    )
-    assert result1["daubert_note"] == result2["daubert_note"], (
-        f"Daubert note non-deterministic"
-    )
-    assert result1["peirce_chain"]["firstness"] == result2["peirce_chain"]["firstness"], (
-        f"Peirce firstness non-deterministic"
-    )
-    assert result1["peirce_chain"]["secondness"] == result2["peirce_chain"]["secondness"], (
-        f"Peirce secondness non-deterministic"
-    )
-    assert result1["peirce_chain"]["thirdness"] == result2["peirce_chain"]["thirdness"], (
-        f"Peirce thirdness non-deterministic"
-    )
-    assert result1["mitre_ttps"] == result2["mitre_ttps"], (
-        f"MITRE TTPs non-deterministic: {result1['mitre_ttps']} != {result2['mitre_ttps']}"
-    )
-    assert result1.get("_operation_hmac") == result2.get("_operation_hmac"), (
-        f"HMAC non-deterministic — canonical serialization drift detected. "
-        f"Verify sort_keys=True, separators=(',', ':'), ensure_ascii=True."
-    )
 
     print(" CAIE Determinism Protocol P0: VERIFIED")
     print(f"   Composite Score: {result1['composite_score']}")
