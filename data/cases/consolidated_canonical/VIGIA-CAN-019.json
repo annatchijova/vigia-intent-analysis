@@ -1,7 +1,7 @@
 {
   "case_id": "case_101_denunciante_humo",
-  "name": "El Denunciante de Humo",
-  "description": "Usuario reporta 'archivos raros en mi carpeta'. El archivo adjunto es un LNK malicioso que explota CVE-2024-XXXX al ser abierto por el visor del administrador. El denunciante es el vector.",
+  "name": "The Smoke Informant",
+  "description": "User reports 'strange files in my folder'. The attached file is a malicious LNK that exploits CVE-2024-XXXX when opened by the administrator's viewer. The informant is the attack vector.",
   "artifacts": [
     {
       "artifact_id": "a101_01",
@@ -13,7 +13,7 @@
       "provenance_chain": [
         "sha256:a101tick01"
       ],
-      "description": "Ticket: 'Creo que me hackearon, veo archivos raros en mi carpeta'. Adjunta archivo para revisión.",
+      "description": "Ticket: 'I think I was hacked, I see strange files in my folder'. Attaches file for review.",
       "metadata": {
         "reporter": "user_finance",
         "file_location": "C:\\Users\\user_finance\\Desktop\\report_2026.xlsx.lnk",
@@ -31,7 +31,7 @@
       "provenance_chain": [
         "sha256:a101file02"
       ],
-      "description": "Archivo 'raro': LNK con magic bytes de PDF y exploit CVE-2024-XXXX en stream comprimido. Se activa al ser abierto por visor con privilegios.",
+      "description": "Strange file: LNK with PDF magic bytes and CVE-2024-XXXX exploit in compressed stream. Activates when opened by a privileged viewer.",
       "metadata": {
         "file_type": ".lnk (Windows shortcut)",
         "magic": "PDF",
@@ -50,7 +50,7 @@
       "provenance_chain": [
         "sha256:a101log03"
       ],
-      "description": "Admin (domain\\admin_sec) abre archivo desde share usando visor interno privilegiado.",
+      "description": "Admin (domain\\admin_sec) opens file from share using privileged internal viewer.",
       "metadata": {
         "actor": "domain\\admin_sec",
         "action": "file_open",
@@ -70,7 +70,7 @@
       "provenance_chain": [
         "sha256:a101mem04"
       ],
-      "description": "Shellcode inyectado en admin_viewer.exe 2 segundos tras apertura. Reverse shell establecida a 185.220.101.42:4444.",
+      "description": "Shellcode injected into admin_viewer.exe 2 seconds after opening. Reverse shell established to 185.220.101.42:4444.",
       "metadata": {
         "pid": 3312,
         "parent": "admin_viewer.exe",
@@ -84,14 +84,14 @@
     {
       "type": "TRAP_REPORTING",
       "severity": 0.98,
-      "description": "Denunciante es vector. La denuncia es el disparador para elevar privilegios via personal de seguridad."
+      "description": "Informant is the vector. The report is the trigger to escalate privileges via security personnel."
     }
   ],
   "expected_verdict": "MALICE",
   "peirce_chain": {
-    "firstness": "Reporte legítimo de usuario preocupado.",
-    "secondness": "El 'archivo raro' es exploit que se activa al ser abierto por admin. Denunciante es el vector.",
-    "thirdness": "Hábito de inversión de roles: la denuncia ES el ataque. El denunciante actúa como disparador."
+    "firstness": "Legitimate-looking report from a concerned user.",
+    "secondness": "The 'strange file' is an exploit that activates when opened by admin. Informant is the vector.",
+    "thirdness": "Habit of role inversion: the report IS the attack. The informant acts as the trigger."
   },
-  "notes": "Trap reporting: el sistema de seguridad se convierte en el vector de ataque."
+  "notes": "Trap reporting: the security system becomes the attack vector."
 }

@@ -1,7 +1,7 @@
 {
   "case_id": "case_084_cebo_falso_layman",
-  "name": "El Cebo del Falso Layman",
-  "description": "Usuario de 'administración' envía ticket de soporte simulando incompetencia digital. La captura adjunta muestra exploit dirty pipe a medio ejecutar. Probabilidad nula de llegar accidentalmente a ese estado.",
+  "name": "The False Layman Lure",
+  "description": "An 'admin' user submits a support ticket simulating digital incompetence. The attached screenshot shows a dirty pipe exploit half-executed. Zero probability of reaching that state accidentally.",
   "artifacts": [
     {
       "artifact_id": "a084_01",
@@ -13,7 +13,7 @@
       "provenance_chain": [
         "sha256:a084tick01"
       ],
-      "description": "Ticket: 'No sé qué toqué, pantalla negra con letras verdes, no entro al Excel'.",
+      "description": "Ticket: 'I don't know what I touched, black screen with green text, can't open Excel'.",
       "metadata": {
         "ticket_id": "SUP-2026-084",
         "user_department": "administracion",
@@ -31,7 +31,7 @@
       "provenance_chain": [
         "sha256:a084img02"
       ],
-      "description": "Captura adjunta: terminal Linux con CVE-2022-0847 (dirty pipe) a medio ejecutar. Barra de progreso visible al 45%.",
+      "description": "Attached screenshot: Linux terminal with CVE-2022-0847 (dirty pipe) half-executed. Progress bar visible at 45%.",
       "metadata": {
         "filename": "screenshot.png",
         "ocr_text": "[sudo] password for admin: ██████ 45%",
@@ -49,7 +49,7 @@
       "provenance_chain": [
         "sha256:a084mem03"
       ],
-      "description": "Historial bash en memoria: wget exploit.sh && chmod +x && ./exploit.sh.",
+      "description": "Bash history in memory: wget exploit.sh && chmod +x && ./exploit.sh.",
       "metadata": {
         "pid": 3101,
         "bash_history": [
@@ -69,7 +69,7 @@
       "provenance_chain": [
         "sha256:a084dns04"
       ],
-      "description": "Resolución DNS a dominio registrado 2 días antes del ticket de soporte.",
+      "description": "DNS resolution to a domain registered 2 days before the support ticket.",
       "metadata": {
         "domain": "update-helpdesk[.]net",
         "registration_date": "2026-01-14",
@@ -82,14 +82,14 @@
     {
       "type": "COMPETENCE_THEATER",
       "severity": 0.99,
-      "description": "Probabilidad nula de que usuario no-técnico llegue accidentalmente a estado de ejecución de exploit de kernel."
+      "description": "Zero probability that a non-technical user accidentally reaches a kernel exploit execution state."
     }
   ],
   "expected_verdict": "MALICE",
   "peirce_chain": {
-    "firstness": "Ticket de usuario no técnico con captura de terminal Linux.",
-    "secondness": "Usuario 'no técnico' no puede llegar accidentalmente a estado de ejecución de exploit kernel.",
-    "thirdness": "Hábito de usar incompetencia simulada para inducir acción privilegiada del técnico de soporte."
+    "firstness": "Non-technical user ticket with a Linux terminal screenshot.",
+    "secondness": "A 'non-technical' user cannot accidentally reach a kernel exploit execution state.",
+    "thirdness": "Habit of using simulated incompetence to induce privileged action from the support technician."
   },
-  "notes": "Teatro forense: la ley del azar no genera exploits de kernel por 'tocar cualquier cosa'."
+  "notes": "Forensic theater: the law of chance does not generate kernel exploits from 'clicking around'."
 }

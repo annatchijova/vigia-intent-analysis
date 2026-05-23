@@ -1,7 +1,7 @@
 {
   "case_id": "case_008_paranoia_perimetro",
-  "name": "La Paranoia del Perímetro",
-  "description": "Usuario entra al sistema y ejecuta ciclos de whoami/netstat/w/ps aux cada 300s exactos durante 40 minutos (8 ciclos). Sin modificaciones ni exfiltración. La hipervigilancia periódica delata consciencia de culpa de actor infiltrado.",
+  "name": "The Perimeter Paranoia",
+  "description": "User logs into the system and executes whoami/netstat/w/ps aux cycles every exactly 300s for 40 minutes (8 cycles). No modifications or exfiltration. The periodic hypervigilance reveals a guilty-conscience infiltrated actor.",
   "artifacts": [
     {
       "artifact_id": "a008_01",
@@ -13,7 +13,7 @@
       "provenance_chain": [
         "sha256:a008aud01"
       ],
-      "description": "8 ciclos en 40 minutos: whoami → netstat -an → w → ps aux|grep root. Intervalo exacto de 300s. Varianza: 2.3s.",
+      "description": "8 cycles in 40 minutes: whoami → netstat -an → w → ps aux|grep root. Exact 300s interval. Variance: 2.3s.",
       "metadata": {
         "command_cycle": [
           "whoami",
@@ -38,7 +38,7 @@
       "provenance_chain": [
         "sha256:a008lsass02"
       ],
-      "description": "Sesión SSH desde IP Tor (198.51.100.42, nodo de salida confirmado). Usuario 'backup_agent'. Sin logins SSH previos en 180 días.",
+      "description": "SSH session from Tor IP (198.51.100.42, confirmed exit node). User 'backup_agent'. No previous SSH logins in 180 days.",
       "metadata": {
         "session_user": "backup_agent",
         "source_ip": "198.51.100.42",
@@ -57,7 +57,7 @@
       "provenance_chain": [
         "sha256:a008net03"
       ],
-      "description": "Al minuto 45, conexión a servidor de base de datos interno (10.0.5.20). Duración: 8 segundos. Transferencia: 2KB.",
+      "description": "At minute 45, connection to internal database server (10.0.5.20). Duration: 8 seconds. Transfer: 2KB.",
       "metadata": {
         "destination_ip": "10.0.5.20",
         "destination_role": "database_server",
@@ -75,7 +75,7 @@
       "provenance_chain": [
         "sha256:a008ent04"
       ],
-      "description": "Entropía del ciclo de reconocimiento: 0.09 bits. Humano esperado: >2.0 bits para reconocimiento no planificado.",
+      "description": "Reconnaissance cycle entropy: 0.09 bits. Expected for a human: >2.0 bits for unplanned reconnaissance.",
       "metadata": {
         "pattern_entropy": 0.09,
         "human_baseline_entropy": 2.1,
@@ -86,9 +86,9 @@
   ],
   "expected_verdict": "SUSPICION",
   "peirce_chain": {
-    "firstness": "Ciclos de reconocimiento básicos repetidos en intervalos regulares.",
-    "secondness": "8 ciclos en 40 minutos con intervalo de exactamente 300s desde nodo Tor. Ningún usuario legítimo audita su entorno cada 5 minutos.",
-    "thirdness": "Hábito del actor infiltrado de verificar continuamente si ha sido detectado antes de proceder."
+    "firstness": "Basic reconnaissance cycles repeated at regular intervals.",
+    "secondness": "8 cycles in 40 minutes with exactly 300s interval from a Tor node. No legitimate user audits their environment every 5 minutes.",
+    "thirdness": "Habit of the infiltrated actor continuously checking if they have been detected before proceeding."
   },
-  "notes": "Veredicto SUSPICION: actividad ambigua, no definitiva. La hipervigilancia es la firma del intruso consciente de su ilegalidad."
+  "notes": "Verdict SUSPICION: ambiguous, not definitive activity. Hypervigilance is the signature of an actor aware of their illegality."
 }

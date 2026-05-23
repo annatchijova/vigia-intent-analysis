@@ -1,7 +1,7 @@
 {
   "case_id": "case_021_motin_comillas",
-  "name": "El Motín Silencioso de las Comillas",
-  "description": "Script PowerShell de IT de EEUU tiene comentarios en inglés perfecto pero usa comillas angulares « » y non-breaking spaces típicos de teclados cirílicos/europeos.",
+  "name": "The Silent Mutiny of the Quote Marks",
+  "description": "PowerShell script from a US IT department has perfect English comments but uses angle quotes « » and non-breaking spaces typical of Cyrillic/European keyboards.",
   "artifacts": [
     {
       "artifact_id": "a021_script",
@@ -13,7 +13,7 @@
       "provenance_chain": [
         "sha256:file021a"
       ],
-      "description": "Script PowerShell 'Update-GPO.ps1' con comentarios en inglés perfecto pero comillas angulares « » en strings y non-breaking spaces (U+00A0) entre palabras",
+      "description": "PowerShell script 'Update-GPO.ps1' with perfect English comments but angle quotes « » in strings and non-breaking spaces (U+00A0) between words.",
       "metadata": {
         "filename": "Update-GPO.ps1",
         "language": "en",
@@ -35,7 +35,7 @@
       "provenance_chain": [
         "sha256:cult021b"
       ],
-      "description": "Detección de locale leakage: comillas angulares «» son característicos de teclados rusos (Windows ru-RU layout); NBSP entre palabras indica input method cirílico",
+      "description": "Locale leakage detection: angle quotes «» are characteristic of Russian keyboards (Windows ru-RU layout); NBSP between words indicates a Cyrillic input method.",
       "metadata": {
         "locale_detected": "ru_RU",
         "evidence": [
@@ -56,7 +56,7 @@
       "provenance_chain": [
         "sha256:git021c"
       ],
-      "description": "Commit del script realizado desde máquina con git config user.name='Admin' pero timezone Europe/Moscow y core.autocrlf=false",
+      "description": "Script commit from a machine with git config user.name='Admin' but timezone Europe/Moscow and core.autocrlf=false.",
       "metadata": {
         "commit_hash": "b2c3d4e",
         "git_timezone": "Europe/Moscow",
@@ -75,7 +75,7 @@
       "provenance_chain": [
         "sha256:log021d"
       ],
-      "description": "Ejecución del script con parámetro -EncodedCommand que descarga payload desde dominio .ru; firmado digitalmente con certificado autofirmado 'Microsoft Windows'",
+      "description": "Script execution with -EncodedCommand parameter that downloads a payload from a .ru domain; digitally signed with a self-signed certificate 'Microsoft Windows'.",
       "metadata": {
         "execution_policy": "bypass",
         "encoded_command": true,
@@ -87,9 +87,9 @@
   ],
   "expected_verdict": "MALICE",
   "peirce_chain": {
-    "firstness": "Script en inglés perfecto con comillas angulares y NBSP",
-    "secondness": "Comillas «» y NBSP son fingerprint de teclado/input method cirílico; timezone Moscow; dominio .ru en callback",
-    "thirdness": "Hábito de operador que escribe inglés fluido pero con 'manos' configuradas para idioma diferente, delatando origen idiomático"
+    "firstness": "Script in perfect English with angle quotes and NBSP.",
+    "secondness": "«» quotes and NBSP are a fingerprint of a Cyrillic keyboard/input method; Moscow timezone; .ru domain in callback.",
+    "thirdness": "Habit of an operator who writes fluent English but with 'hands' configured for a different language, revealing idiomatic origin."
   },
-  "notes": "Atribución fina: el inglés es perfecto, pero las manos que lo escribieron estaban en un teclado configurado para otro idioma."
+  "notes": "Fine attribution: the English is perfect, but the hands that wrote it were on a keyboard configured for another language."
 }

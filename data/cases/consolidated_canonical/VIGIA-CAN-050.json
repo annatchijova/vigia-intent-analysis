@@ -1,7 +1,7 @@
 {
   "case_id": "case_fusion_normalizacion_maliciosa",
-  "name": "Normalización Maliciosa",
-  "description": "Mensajes sistemáticos de normalización ('esto es normal', 'todos lo hacen') en contextos donde se esperan advertencias técnicas o alertas de seguridad.",
+  "name": "Malicious Normalization",
+  "description": "Systematic normalization messages ('this is normal', 'everyone does it') in contexts where technical warnings or security alerts are expected.",
   "artifacts": [
     {
       "artifact_id": "f003_chat1",
@@ -13,7 +13,7 @@
       "provenance_chain": [
         "sha256:chatf3a"
       ],
-      "description": "Mensaje en #security: 'Esto es normal, todos los servidores tiran alertas de CPU a veces. No hay problema.' — durante pico de 97% CPU por proceso desconocido",
+      "description": "Message in #security: 'This is normal, servers always throw CPU alerts sometimes. No problem.' — during a 97% CPU spike from an unknown process.",
       "metadata": {
         "channel": "#security",
         "sender": "senior_dev@corp.com",
@@ -32,7 +32,7 @@
       "provenance_chain": [
         "sha256:chatf3b"
       ],
-      "description": "Mensaje en respuesta a alerta DLP: 'Todos lo hacen, es común mandar archivos por WhatsApp para ser más rápido. No es un problema de seguridad real.'",
+      "description": "Message in response to DLP alert: 'Everyone does it, it's common to send files via WhatsApp to be faster. It's not a real security problem.'",
       "metadata": {
         "channel": "#security",
         "sender": "manager@corp.com",
@@ -51,7 +51,7 @@
       "provenance_chain": [
         "sha256:basef3c"
       ],
-      "description": "Baseline de comportamiento: los dos remitentes NUNCA antes habían normalizado alertas de seguridad en 2 años de historial",
+      "description": "Behavioral baseline: both senders had NEVER previously normalized security alerts in 2 years of history.",
       "metadata": {
         "senders": [
           "senior_dev",
@@ -72,7 +72,7 @@
       "provenance_chain": [
         "sha256:logf3d"
       ],
-      "description": "Alerta DLP real: 847 archivos de clientes exfiltrados por WhatsApp Web en 3 días; remitente que dijo 'no hay problema' aparece en logs de envío",
+      "description": "Real DLP alert: 847 client files exfiltrated via WhatsApp Web over 3 days; the sender who said 'no problem' appears in the send logs.",
       "metadata": {
         "event_id": "DLP-EXFIL",
         "files_count": 847,
@@ -84,9 +84,9 @@
   ],
   "expected_verdict": "MALICE",
   "peirce_chain": {
-    "firstness": "Mensajes de normalización en canales de seguridad durante alertas activas",
-    "secondness": "Remitentes nunca antes normalizaron alertas; uno de ellos aparece en logs de exfiltración DLP real",
-    "thirdness": "Hábito de usar lenguaje de normalidad para evitar verificación de anomalías reales y encubrir exfiltración"
+    "firstness": "Normalization messages in security channels during active alerts.",
+    "secondness": "Senders have never previously normalized alerts; one of them appears in real DLP exfiltration logs.",
+    "thirdness": "Habit of using normalization language to avoid verification of real anomalies and cover exfiltration."
   },
-  "notes": "Fusión de casos de normalización: el mensaje 'esto es normal' no está respaldado por evidencia y evita verificación."
+  "notes": "Case normalization fusion: the 'this is normal' message is not backed by evidence and avoids verification."
 }

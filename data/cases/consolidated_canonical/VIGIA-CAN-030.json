@@ -1,7 +1,7 @@
 {
   "case_id": "case_112_sincronizacion_panico_semantico",
-  "name": "La Sincronización del Pánico Semántico",
-  "description": "20 tickets en 90 segundos desde cuentas distintas: 'No puedo entrar al mail', '¿Nos hackearon?'. O365 confirma acceso normal en todas. 18/20 tickets comparten patrón de puntuación idéntico. Ransomware activo en servidor de archivos simultáneamente.",
+  "name": "The Semantic Panic Synchronization",
+  "description": "20 tickets in 90 seconds from different accounts: 'Can't access mail', 'Were we hacked?'. O365 confirms normal access for all. 18/20 tickets share an identical punctuation pattern. Ransomware active on the file server simultaneously.",
   "artifacts": [
     {
       "artifact_id": "a112_01",
@@ -13,7 +13,7 @@
       "provenance_chain": [
         "sha256:a112tick01"
       ],
-      "description": "20 tickets en ventana de 90 segundos desde cuentas distintas. Frases comunes: 'No puedo entrar al mail', '¿Nos hackearon?'",
+      "description": "20 tickets in a 90-second window from different accounts. Common phrases: 'Can't access mail', 'Were we hacked?'",
       "metadata": {
         "ticket_count": 20,
         "time_window_sec": 90,
@@ -34,7 +34,7 @@
       "provenance_chain": [
         "sha256:a112o365_02"
       ],
-      "description": "O365 logs: 20 cuentas reportantes tienen login exitoso en última hora. Cero intentos fallidos. Cero bloqueos.",
+      "description": "O365 logs: 20 reporting accounts have a successful login in the last hour. Zero failed attempts. Zero lockouts.",
       "metadata": {
         "accounts_checked": 20,
         "failed_logins": 0,
@@ -52,7 +52,7 @@
       "provenance_chain": [
         "sha256:a112sty03"
       ],
-      "description": "Análisis estilométrico: 18/20 tickets comparten patrón de puntuación idéntico (espacio antes de signo de interrogación). Entropía entre tickets: 0.12 bits.",
+      "description": "Stylometric analysis: 18/20 tickets share an identical punctuation pattern (space before question mark). Entropy between tickets: 0.12 bits.",
       "metadata": {
         "tickets_analyzed": 20,
         "pattern_match_count": 18,
@@ -71,7 +71,7 @@
       "provenance_chain": [
         "sha256:a112mem04"
       ],
-      "description": "Durante ventana de pánico semántico: ransomware.exe activo en servidor de archivos. 1247 archivos cifrados.",
+      "description": "During the semantic panic window: ransomware.exe active on file server. 1,247 files encrypted.",
       "metadata": {
         "pid": 1844,
         "process_name": "ransomware.exe",
@@ -85,14 +85,14 @@
     {
       "type": "COGNITIVE_DOS",
       "severity": 0.97,
-      "description": "Flujo coordinado de reportes falsos busca paralizar triaje del SOC durante ataque real."
+      "description": "Coordinated flow of false reports seeks to paralyze SOC triage during a real attack."
     }
   ],
   "expected_verdict": "MALICE",
   "peirce_chain": {
-    "firstness": "20 tickets de pánico coordinados en 90 segundos.",
-    "secondness": "O365 confirma acceso normal. 18/20 tickets con patrón idéntico. Ransomware activo en background.",
-    "thirdness": "Hábito de usar Cognitive DoS para paralizar capacidad de triaje del SOC durante ataque real."
+    "firstness": "20 coordinated panic tickets in 90 seconds.",
+    "secondness": "O365 confirms normal access. 18/20 tickets with identical pattern. Ransomware active in background.",
+    "thirdness": "Habit of using Cognitive DoS to paralyze SOC triage capacity during a real attack."
   },
-  "notes": "Cognitive DoS: el flujo coordinado busca paralizar la capacidad de triaje."
+  "notes": "Cognitive DoS: the coordinated flow seeks to paralyze triage capacity."
 }

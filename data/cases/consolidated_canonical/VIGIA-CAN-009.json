@@ -1,7 +1,7 @@
 {
   "case_id": "case_091_disonancia_motivo_noble",
-  "name": "La Disonancia del Motivo Noble",
-  "description": "Mensaje Slack: 'Vi tu contraseña en post-it de cámara, la borré para protegerte. Te la paso por link'. No hay post-it en ningún frame de la grabación. El link es dominio de phishing registrado 6 horas antes.",
+  "name": "The Noble Motive Dissonance",
+  "description": "Slack message: 'I saw your password on a post-it in the camera, I deleted it to protect you. Here's a link to reset it'. No post-it in any frame of the recording. The link is a phishing domain registered 6 hours earlier.",
   "artifacts": [
     {
       "artifact_id": "a091_01",
@@ -13,7 +13,7 @@
       "provenance_chain": [
         "sha256:a091slk01"
       ],
-      "description": "DM Slack: 'Che, vi que dejaste tu contraseña en un post-it en la cámara de reunión. La anoté y la borré de la captura... [link]'.",
+      "description": "Slack DM: 'Hey, I saw you left your password on a post-it in the meeting room camera. I wrote it down and deleted it from the capture... [link]'.",
       "metadata": {
         "sender": "compañero@corp.com",
         "recipient": "victima@corp.com",
@@ -33,7 +33,7 @@
       "provenance_chain": [
         "sha256:a091vid02"
       ],
-      "description": "Revisión de grabación de cámara de reunión: NO hay post-it visible en ninguno de los 1247 frames analizados.",
+      "description": "Review of meeting room camera recording: NO post-it visible in any of the 1,247 analyzed frames.",
       "metadata": {
         "camera_id": "CONF-01",
         "frames_reviewed": 1247,
@@ -50,7 +50,7 @@
       "provenance_chain": [
         "sha256:a091dns03"
       ],
-      "description": "Dominio del link registrado 6 horas antes del mensaje. Hosting en bulletproof, certificado Let's Encrypt.",
+      "description": "Link domain registered 6 hours before the message. Bulletproof hosting, Let's Encrypt certificate.",
       "metadata": {
         "domain": "corp-password-reset[.]com",
         "creation_date": "2026-01-18T04:00Z",
@@ -68,7 +68,7 @@
       "provenance_chain": [
         "sha256:a091mem04"
       ],
-      "description": "Proceso del 'compañero' con sesión de navegador autenticada en panel de administración de phishing.",
+      "description": "Colleague's browser process with authenticated session on the phishing admin panel.",
       "metadata": {
         "pid": 5512,
         "browser": "chrome.exe",
@@ -81,14 +81,14 @@
     {
       "type": "VULNERABILITY_SOCIAL",
       "severity": 0.95,
-      "description": "Motivo noble (protección) es envoltorio de phishing interno. Falsa solidaridad para inducir click en link malicioso."
+      "description": "Noble motive (protection) is a wrapper for internal phishing. False solidarity to induce click on malicious link."
     }
   ],
   "expected_verdict": "MALICE",
   "peirce_chain": {
-    "firstness": "Mensaje de falsa solidaridad con link de 'ayuda'.",
-    "secondness": "No hay post-it en cámara. Link es dominio de phishing registrado 6 horas antes. Remitente tiene panel admin activo.",
-    "thirdness": "Hábito de usar vulnerabilidad social y reciprocidad para inducir acción de riesgo bajo máscara de protección."
+    "firstness": "False solidarity message with a 'help' link.",
+    "secondness": "No post-it visible on camera. Link is a phishing domain registered 6 hours before. Sender has an active admin panel.",
+    "thirdness": "Habit of using social vulnerability and reciprocity to induce risky action under the guise of protection."
   },
-  "notes": "Carnegie: 'Haga que la otra persona se sienta feliz de hacer lo que usted sugiere'."
+  "notes": "Carnegie: 'Make the other person happy to do what you suggest'."
 }

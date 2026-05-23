@@ -1,7 +1,7 @@
 {
   "case_id": "case_089_huella_perfeccion",
-  "name": "La Huella de la Perfección",
-  "description": "Sesión de administración remota de 45 minutos con 847 comandos. Varianza entre keystrokes de 0.05s en 90% de muestras. Entropía temporal 0.12 bits. Imposible para operador humano.",
+  "name": "The Footprint of Perfection",
+  "description": "45-minute remote admin session with 847 commands. Keystroke variance of 0.05s in 90% of samples. Temporal entropy: 0.12 bits. Impossible for a human operator.",
   "artifacts": [
     {
       "artifact_id": "a089_01",
@@ -13,7 +13,7 @@
       "provenance_chain": [
         "sha256:a089time01"
       ],
-      "description": "Sesión RDP 45 minutos: 847 comandos, varianza entre keystrokes = 0.050s en 90% de muestras. Baseline humano: >180ms.",
+      "description": "45-minute RDP session: 847 commands, keystroke variance = 0.050s in 90% of samples. Human baseline: >180ms.",
       "metadata": {
         "session_duration_sec": 2700,
         "commands_count": 847,
@@ -33,7 +33,7 @@
       "provenance_chain": [
         "sha256:a089ent02"
       ],
-      "description": "Entropía temporal de la sesión: 0.12 bits. Humano esperado: >2.5 bits para sesión de análisis real.",
+      "description": "Session temporal entropy: 0.12 bits. Expected for a human: >2.5 bits for a real analysis session.",
       "metadata": {
         "shannon_entropy": 0.12,
         "expected_human_entropy": 2.8,
@@ -51,7 +51,7 @@
       "provenance_chain": [
         "sha256:a089mem03"
       ],
-      "description": "Proceso mstsc.exe sin evidencia de interacción GUI. Cero bitmap changes, cero operaciones de clipboard durante sesión 'activa'.",
+      "description": "mstsc.exe process with no evidence of GUI interaction. Zero bitmap changes, zero clipboard operations during 'active' session.",
       "metadata": {
         "pid": 4412,
         "gui_events": 0,
@@ -69,7 +69,7 @@
       "provenance_chain": [
         "sha256:a089ip04"
       ],
-      "description": "Origen de sesión: IP de VPS en Frankfurt, ASN de hosting barato. Inconsistente con horario laboral del admin legítimo (03:15 hora local NY).",
+      "description": "Session origin: VPS IP in Frankfurt, cheap hosting ASN. Inconsistent with legitimate admin's work hours (03:15 local NY time).",
       "metadata": {
         "source_ip": "45.142.212.18",
         "geo": "DE",
@@ -84,14 +84,14 @@
     {
       "type": "TEMPORAL_ENTROPY_NULL",
       "severity": 0.96,
-      "description": "Patrón de ejecución incompatible con carga cognitiva de tareas. Automatización detectada."
+      "description": "Execution pattern incompatible with task cognitive load. Automation detected."
     }
   ],
   "expected_verdict": "MALICE",
   "peirce_chain": {
-    "firstness": "Sesión de 45 minutos con tiempos entre comandos perfectamente uniformes.",
-    "secondness": "Varianza 0.05s es ley de máquina. Entropía 0.12 bits incompatible con análisis humano real.",
-    "thirdness": "Hábito de automatización que intenta simular ritmo humano pero falla en entropía cognitiva."
+    "firstness": "45-minute session with perfectly uniform inter-command timings.",
+    "secondness": "0.05s variance is a machine's law. 0.12 bits entropy is incompatible with real human analysis.",
+    "thirdness": "Habit of automation that attempts to simulate human rhythm but fails at cognitive entropy."
   },
-  "notes": "Matemáticamente irrefutable: los humanos no piensan con cronómetro."
+  "notes": "Mathematically irrefutable: humans do not think with a stopwatch."
 }

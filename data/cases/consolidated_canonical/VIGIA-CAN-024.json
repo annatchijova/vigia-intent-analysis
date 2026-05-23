@@ -1,7 +1,7 @@
 {
   "case_id": "case_106_mimesis_error_administrativo",
-  "name": "La Mimesis del Error Administrativo",
-  "description": "Factura PDF con 'falla de impresión' que cubre CBU/IBAN. Remitente envía número de cuenta 'corregido' por mail informal. Cuenta no existe en base de proveedores validados. Hash del PDF original muestra CBU legítimo visible.",
+  "name": "The Administrative Error Mimicry",
+  "description": "PDF invoice with a 'printing error' covering the CBU/IBAN. Sender sends the 'corrected' account number via informal email. The account does not exist in the validated supplier database. Hash of the original PDF shows a visible legitimate CBU.",
   "artifacts": [
     {
       "artifact_id": "a106_01",
@@ -13,7 +13,7 @@
       "provenance_chain": [
         "sha256:a106pdf01"
       ],
-      "description": "Factura PDF: área de CBU/IBAN cubierta por rectángulo negro. Metadata dice 'Print Error'. Hash difiere del PDF original enviado 2 días antes.",
+      "description": "PDF invoice: CBU/IBAN area covered by a black rectangle. Metadata says 'Print Error'. Hash differs from the original PDF sent 2 days earlier.",
       "metadata": {
         "filename": "factura_106.pdf",
         "covered_field": "CBU/IBAN",
@@ -33,7 +33,7 @@
       "provenance_chain": [
         "sha256:a106mail02"
       ],
-      "description": "Mail de seguimiento: 'Uy, salió mal el PDF, te paso el CBU por acá para que no te trabes con el pago'.",
+      "description": "Follow-up email: 'Oops, the PDF came out wrong, sending the CBU here so you're not blocked on the payment'.",
       "metadata": {
         "sender": "proveedor@example.com",
         "channel": "email (informal)",
@@ -51,7 +51,7 @@
       "provenance_chain": [
         "sha256:a106acc03"
       ],
-      "description": "Número de cuenta 'corregido' no existe en base de datos de proveedores validados. Primera aparición en sistema.",
+      "description": "'Corrected' account number does not exist in the validated supplier database. First appearance in the system.",
       "metadata": {
         "account_number": "2850590940090418135201",
         "validation_result": "NOT_FOUND",
@@ -68,7 +68,7 @@
       "provenance_chain": [
         "sha256:a106orig04"
       ],
-      "description": "Hash del PDF original (enviado 2 días antes) muestra CBU/IBAN legítimo visible. La versión 'con error' tiene hash diferente.",
+      "description": "Hash of the original PDF (sent 2 days earlier) shows a visible legitimate CBU/IBAN. The 'error' version has a different hash.",
       "metadata": {
         "original_pdf_date": "2026-01-21",
         "cbu_visible_in_original": true,
@@ -82,14 +82,14 @@
     {
       "type": "DOCUMENTARY_SABOTAGE",
       "severity": 0.94,
-      "description": "Error de impresión es signo fabricado para forzar uso de canal no auditable con cuenta fraudulenta."
+      "description": "Printing error is a fabricated sign to force use of a non-auditable channel with a fraudulent account."
     }
   ],
   "expected_verdict": "MALICE",
   "peirce_chain": {
-    "firstness": "PDF con 'falla de impresión' cubriendo datos bancarios.",
-    "secondness": "Cuenta 'corregida' no existe en base validada. Hash del PDF cambió. Canal informal usado para dato crítico.",
-    "thirdness": "Hábito de sabotaje de integridad documental usando 'error' fabricado para desviar pago."
+    "firstness": "PDF with a 'printing error' covering banking details.",
+    "secondness": "'Corrected' account does not exist in validated database. PDF hash changed. Informal channel used for critical data.",
+    "thirdness": "Habit of sabotaging document integrity using a fabricated 'error' to divert payment."
   },
-  "notes": "Grice: violación de máximo de manera (canal informal para información crítica)."
+  "notes": "Grice: Manner maxim violation (informal channel for critical information)."
 }

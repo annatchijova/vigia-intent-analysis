@@ -1,7 +1,7 @@
 {
   "case_id": "case_007_insomnio_tactico",
-  "name": "El Insomnio Táctico",
-  "description": "finance_user con baseline de 847 días de actividad estrictamente 08:30-18:00 L-V se loguea a las 03:15 AM de un domingo. Accede a archivo Excel de 500MB clasificado como confidencial-3. Proceso excel.exe escribe archivo upload.tmp de 500MB.",
+  "name": "The Tactical Insomnia",
+  "description": "finance_user with an 847-day baseline of strictly 08:30-18:00 Mon-Fri activity logs in at 03:15 AM on a Sunday. Accesses a 500MB file classified confidential-3. Process excel.exe writes a 500MB upload.tmp file.",
   "artifacts": [
     {
       "artifact_id": "a007_01",
@@ -13,7 +13,7 @@
       "provenance_chain": [
         "sha256:a007vpn01"
       ],
-      "description": "Login VPN exitoso a las 03:15 AM de domingo. Credenciales correctas. MFA aprobado.",
+      "description": "Successful VPN login at 03:15 AM on Sunday. Correct credentials. MFA approved.",
       "metadata": {
         "user": "finance_user",
         "time": "2026-01-16T03:15:22Z",
@@ -33,7 +33,7 @@
       "provenance_chain": [
         "sha256:a007ueba02"
       ],
-      "description": "Baseline histórico: finance_user nunca había logueado fuera de 08:30-18:00 L-V en 847 días. Desviación de 6.2 sigma.",
+      "description": "Historical baseline: finance_user had never logged in outside 08:30-18:00 Mon-Fri in 847 days. 6.2 sigma deviation.",
       "metadata": {
         "historical_login_times": [
           "08:30-09:00",
@@ -54,7 +54,7 @@
       "provenance_chain": [
         "sha256:a007file03"
       ],
-      "description": "Acceso a 'Q2_Financials_Forecast.xlsx' (500MB), clasificación confidencial-3, a las 03:17 AM.",
+      "description": "Access to 'Q2_Financials_Forecast.xlsx' (500MB), confidential-3 classification, at 03:17 AM.",
       "metadata": {
         "file": "Q2_Financials_Forecast.xlsx",
         "size_mb": 500,
@@ -74,7 +74,7 @@
       "provenance_chain": [
         "sha256:a007mem04"
       ],
-      "description": "excel.exe en memoria con archivo mapeado y handle de escritura a \\Temp\\upload.tmp de 500MB.",
+      "description": "excel.exe in memory with mapped file and write handle to \\Temp\\upload.tmp of 500MB.",
       "metadata": {
         "pid": 5521,
         "process_name": "excel.exe",
@@ -88,14 +88,14 @@
     {
       "type": "CIRCADIAN_VIOLATION",
       "severity": 0.91,
-      "description": "Ruptura de baseline circadiano de 6.2 sigma con acceso a archivo confidencial de 500MB."
+      "description": "6.2 sigma circadian baseline breach with access to a 500MB confidential file."
     }
   ],
   "expected_verdict": "MALICE",
   "peirce_chain": {
-    "firstness": "Login VPN legítimo a las 03:15 AM de domingo con credenciales correctas.",
-    "secondness": "Baseline de 847 días nunca mostró actividad fuera de horario. Acceso a 500MB confidencial a las 03:17.",
-    "thirdness": "Hábito de usar credenciales válidas en contexto temporal que rompe el patrón biológico del usuario real."
+    "firstness": "Legitimate VPN login at 03:15 AM on Sunday with correct credentials.",
+    "secondness": "847-day baseline never showed out-of-hours activity. Access to 500MB confidential file at 03:17.",
+    "thirdness": "Habit of using valid credentials in a temporal context that breaks the real user's biological pattern."
   },
-  "notes": "Primeridad válida (login correcto) pero Segundidad rota (contexto temporal imposible para este usuario)."
+  "notes": "Valid Firstness (correct login) but broken Secondness (temporally impossible context for this user)."
 }

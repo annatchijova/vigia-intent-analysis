@@ -1,7 +1,7 @@
 {
   "case_id": "case_111_falso_rastro_incompetencia",
-  "name": "El Falso Rastro de Incompetencia Senior",
-  "description": "Escaneo nmap ruidoso (SYN flood, 65535 puertos) genera 47 alertas EDR clasificadas como baja severidad. Análisis de memoria revela driver C++ con SSDT hooks y proceso hollowed con C2 activo. El nmap es teatro.",
+  "name": "The False Senior Incompetence Trail",
+  "description": "Noisy nmap scan (SYN flood, 65535 ports) generates 47 EDR alerts classified as low severity. Memory analysis reveals a C++ driver with SSDT hooks and a hollowed process with active C2. The nmap is theater.",
   "artifacts": [
     {
       "artifact_id": "a111_01",
@@ -13,7 +13,7 @@
       "provenance_chain": [
         "sha256:a111net01"
       ],
-      "description": "Escaneo nmap ruidoso: SYN scan de puertos 1-65535 desde IP externa. Trivialmente detectable.",
+      "description": "Noisy nmap scan: SYN scan of ports 1-65535 from external IP. Trivially detectable.",
       "metadata": {
         "tool_detected": "nmap",
         "scan_type": "SYN",
@@ -35,7 +35,7 @@
       "provenance_chain": [
         "sha256:a111edr02"
       ],
-      "description": "EDR clasifica nmap como 'Reconnaissance — Low Severity'. Cola Tier-1, SLA 48h. Sin respuesta automática.",
+      "description": "EDR classifies nmap as 'Reconnaissance — Low Severity'. Tier-1 queue, 48h SLA. No automated response.",
       "metadata": {
         "edr_severity": "low",
         "queue": "tier1_backlog",
@@ -53,7 +53,7 @@
       "provenance_chain": [
         "sha256:a111kern03"
       ],
-      "description": "Driver kernel personalizado: C++ con SSDT hooks, ocultación de procesos, memory injection. Compilado 2026-04-15.",
+      "description": "Custom kernel driver: C++ with SSDT hooks, process hiding, memory injection. Compiled 2026-04-15.",
       "metadata": {
         "driver_name": "sysmon_helper.sys",
         "language": "C++",
@@ -75,7 +75,7 @@
       "provenance_chain": [
         "sha256:a111mem04"
       ],
-      "description": "Proceso oculto (SSDT hook). Conexión persistente a 185.220.101.42:443. No visible en tasklist ni procmon.",
+      "description": "Hidden process (SSDT hook). Persistent connection to 185.220.101.42:443. Not visible in tasklist or procmon.",
       "metadata": {
         "pid_hidden": true,
         "tcp_connection": "185.220.101.42:443",
@@ -88,14 +88,14 @@
     {
       "type": "COMPETENCE_STRATIFICATION",
       "severity": 0.98,
-      "description": "Rastro ruidoso es señuelo. Baja calidad superficial contradice alta calidad profunda."
+      "description": "Noisy trail is a decoy. Superficial low quality contradicts deep high quality."
     }
   ],
   "expected_verdict": "MALICE",
   "peirce_chain": {
-    "firstness": "Escaneo nmap ruidoso y trivial de detectar.",
-    "secondness": "EDR ignora nmap como baja severidad. Kernel revela driver C++ con SSDT hooks y proceso oculto con C2.",
-    "thirdness": "Hábito de usar rastro ruidoso de 'aficionado' como máscara para operación de alta persistencia."
+    "firstness": "Noisy and trivially detectable nmap scan.",
+    "secondness": "EDR ignores nmap as low severity. Kernel reveals C++ driver with SSDT hooks and hidden process with C2.",
+    "thirdness": "Habit of using a noisy 'amateur' trail as a mask for a high-persistence operation."
   },
-  "notes": "El atacante quiere que el analista piense 'script-kiddie' y deje de buscar."
+  "notes": "The attacker wants the analyst to think 'script-kiddie' and stop searching."
 }

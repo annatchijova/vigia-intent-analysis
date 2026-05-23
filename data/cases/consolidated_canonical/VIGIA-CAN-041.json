@@ -1,7 +1,7 @@
 {
   "case_id": "case_011_traicion_puntuacion",
-  "name": "La Traición de la Puntuación",
-  "description": "Mail urgente desde cuenta CEO comprometida pidiendo transferencia de $250,000. El CEO real siempre usa 1 espacio post-punto y nunca usa punto final en mensajes cortos. Este mail tiene 2 espacios post-punto y punto final en mensaje de 9 palabras. DKIM válido (cuenta comprometida). Login previo desde nodo Tor a las 04:15.",
+  "name": "The Punctuation Betrayal",
+  "description": "Urgent email from compromised CEO account requesting a $250,000 transfer. The real CEO always uses 1 space after a period and never uses a period at the end of short messages. This email has 2 spaces after a period and a period at the end of a 9-word message. DKIM valid (compromised account). Previous login from a Tor node at 04:15.",
   "artifacts": [
     {
       "artifact_id": "a011_01",
@@ -13,7 +13,7 @@
       "provenance_chain": [
         "sha256:a011base01"
       ],
-      "description": "Baseline estilométrico del CEO: 847 mails. Un espacio post-punto (100%). Sin punto final en mensajes <20 palabras (94%).",
+      "description": "CEO stylometric baseline: 847 emails. One space after period (100%). No period at end of messages <20 words (94%).",
       "metadata": {
         "mails_analyzed": 847,
         "spaces_after_period": 1,
@@ -31,7 +31,7 @@
       "provenance_chain": [
         "sha256:a011mail02"
       ],
-      "description": "Mail sospechoso: 'Transferí urgentemente a este proveedor.  El pago es crítico.' — 2 espacios post-punto, punto final, mensaje de 9 palabras.",
+      "description": "Suspicious email: 'Transfer urgently to this vendor.  The payment is critical.' — 2 spaces after period, period at end, 9-word message.",
       "metadata": {
         "sender": "ceo@corp.com",
         "recipient": "cfo@corp.com",
@@ -52,7 +52,7 @@
       "provenance_chain": [
         "sha256:a011sty03"
       ],
-      "description": "Análisis estilométrico: desviación de 4.3 sigma en espaciado post-punto y uso de punto final. TTR y longitud de oración dentro de baseline.",
+      "description": "Stylometric analysis: 4.3 sigma deviation in post-period spacing and period usage. TTR and sentence length within baseline.",
       "metadata": {
         "deviation_sigma": 4.3,
         "features_anomalous": [
@@ -76,7 +76,7 @@
       "provenance_chain": [
         "sha256:a011mfa04"
       ],
-      "description": "Login en cuenta CEO a las 04:15 desde 185.220.101.50 (nodo Tor). Sesión duró 8 minutos. CEO tiene historial exclusivo de logins desde Argentina y España.",
+      "description": "Login to CEO account at 04:15 from 185.220.101.50 (Tor node). Session lasted 8 minutes. CEO has an exclusive login history from Argentina and Spain.",
       "metadata": {
         "session_user": "ceo@corp.com",
         "source_ip": "185.220.101.50",
@@ -91,9 +91,9 @@
   ],
   "expected_verdict": "MALICE",
   "peirce_chain": {
-    "firstness": "Mail urgente desde cuenta CEO con DKIM válido pidiendo transferencia.",
-    "secondness": "2 espacios post-punto + punto final en mensaje corto = 4.3 sigma de desviación. Login previo desde Tor.",
-    "thirdness": "Hábito de no poder robar la huella estilométrica junto con la contraseña. Las manos tienen su propia identidad."
+    "firstness": "Urgent email from CEO account with valid DKIM requesting a transfer.",
+    "secondness": "2 spaces after period + period at end of short message = 4.3 sigma deviation. Previous Tor login.",
+    "thirdness": "Habit of being unable to steal the stylometric fingerprint along with the password. Hands have their own identity."
   },
-  "notes": "El atacante puede robar la contraseña, no la memoria muscular de las manos al tipear."
+  "notes": "The attacker can steal the password, not the muscle memory of typing hands."
 }

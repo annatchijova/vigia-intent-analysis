@@ -1,7 +1,7 @@
 {
   "case_id": "case_105_disonancia_ritmo_procesamiento",
-  "name": "La Disonancia del Ritmo de Procesamiento",
-  "description": "Sesión ejecuta tareas cognitivamente diversas (análisis de logs, búsqueda, edición de configs) con intervalos de 1.5, 1.5, 1.6s. Varianza 0.0033s — incompatible con carga cognitiva variable. Buffer de comandos pre-cargado en heap.",
+  "name": "The Processing Rhythm Dissonance",
+  "description": "Session executes cognitively diverse tasks (log analysis, search, config editing) with intervals of 1.5, 1.5, 1.6s. Variance 0.0033s — incompatible with variable cognitive load. Pre-loaded command buffer in heap.",
   "artifacts": [
     {
       "artifact_id": "a105_01",
@@ -13,7 +13,7 @@
       "provenance_chain": [
         "sha256:a105time01"
       ],
-      "description": "Tareas de distinta complejidad con intervalos: 1.500s, 1.500s, 1.600s. Varianza 0.0033s. Humano esperado: >15s.",
+      "description": "Tasks of different complexity with intervals: 1.500s, 1.500s, 1.600s. Variance 0.0033s. Expected for human: >15s.",
       "metadata": {
         "task_types": [
           "log_analysis",
@@ -40,7 +40,7 @@
       "provenance_chain": [
         "sha256:a105ent02"
       ],
-      "description": "Entropía de tiempos de respuesta: 0.05 bits. Humano esperado para tareas mixtas: >2.3 bits.",
+      "description": "Response time entropy: 0.05 bits. Expected for a human with mixed tasks: >2.3 bits.",
       "metadata": {
         "shannon_entropy": 0.05,
         "expected_human": 2.3,
@@ -57,7 +57,7 @@
       "provenance_chain": [
         "sha256:a105mem03"
       ],
-      "description": "Buffer de comandos pre-cargado en heap del proceso de sesión remota. No hay evidencia de interacción GUI interactiva.",
+      "description": "Pre-loaded command buffer in the remote session process heap. No evidence of interactive GUI interaction.",
       "metadata": {
         "pid": 5521,
         "heap_buffers": [
@@ -78,7 +78,7 @@
       "provenance_chain": [
         "sha256:a105ip04"
       ],
-      "description": "Origen de sesión: IP de datacenter en Amsterdam, ASN de hosting barato.",
+      "description": "Session origin: datacenter IP in Amsterdam, cheap hosting ASN.",
       "metadata": {
         "source_ip": "45.142.214.7",
         "geo": "NL",
@@ -92,14 +92,14 @@
     {
       "type": "TEMPORAL_ENTROPY_NULL",
       "severity": 0.96,
-      "description": "Patrón de ejecución incompatible con carga cognitiva de tareas. Automatización detectada."
+      "description": "Execution pattern incompatible with task cognitive load. Automation detected."
     }
   ],
   "expected_verdict": "MALICE",
   "peirce_chain": {
-    "firstness": "Tareas de distinta complejidad ejecutadas con intervalos casi idénticos.",
-    "secondness": "Varianza 0.0033s incompatible con carga cognitiva variable. Buffer pre-cargado en memoria.",
-    "thirdness": "Hábito de automatización que simula ser humana pero carece de entropía cognitiva propia del análisis real."
+    "firstness": "Tasks of different complexity executed with nearly identical intervals.",
+    "secondness": "Variance 0.0033s incompatible with variable cognitive load. Pre-loaded buffer in memory.",
+    "thirdness": "Habit of automation that simulates human behavior but lacks the cognitive entropy inherent to real analysis."
   },
-  "notes": "Peirce Terceridad: la ley del azar no genera varianza tan estable. Es ley de máquina simulando humano."
+  "notes": "Peirce Thirdness: the law of chance does not generate such stable variance. It is the law of a machine simulating a human."
 }

@@ -1,7 +1,7 @@
 {
   "case_id": "case_109_silencio_estadistico_log",
-  "name": "El Silencio Estadístico en el Log de Red",
-  "description": "Log muestra 1247 conexiones con bytes_transferred=0. Router de borde reporta 847 Mbps sostenidos en la misma ventana. Kernel confirma 14 sockets TCP activos con contadores manipulados a 0x0 por escritura directa.",
+  "name": "The Statistical Silence in the Network Log",
+  "description": "Log shows 1,247 connections with bytes_transferred=0. Border router reports 847 Mbps sustained in the same window. Kernel confirms 14 active TCP sockets with counters manipulated to 0x0 by direct write.",
   "artifacts": [
     {
       "artifact_id": "a109_01",
@@ -13,7 +13,7 @@
       "provenance_chain": [
         "sha256:a109log01"
       ],
-      "description": "1247 eventos 'Conexión establecida/finalizada' con bytes_transferred=0 o vacío durante ventana de 14:00-15:15.",
+      "description": "1,247 'Connection established/terminated' events with bytes_transferred=0 or empty during the 14:00-15:15 window.",
       "metadata": {
         "connections_logged": 1247,
         "bytes_field_empty": 1222,
@@ -34,7 +34,7 @@
       "provenance_chain": [
         "sha256:a109net02"
       ],
-      "description": "Router core: 847 Mbps de tráfico de salida sostenidos. 47GB total. Saturación de interfaz WAN al 98%.",
+      "description": "Core router: 847 Mbps of sustained outbound traffic. 47GB total. WAN interface saturation at 98%.",
       "metadata": {
         "device": "edge-router-01",
         "peak_outbound_mbps": 847,
@@ -58,7 +58,7 @@
       "provenance_chain": [
         "sha256:a109kern03"
       ],
-      "description": "14 sockets TCP en estado ESTABLISHED con contadores de bytes manipulados a 0x0 en estructuras _TCB. Evidencia de escritura directa al kernel.",
+      "description": "14 TCP sockets in ESTABLISHED state with byte counters manipulated to 0x0 in _TCB structures. Evidence of direct kernel write.",
       "metadata": {
         "socket_count": 14,
         "state": "ESTABLISHED",
@@ -77,7 +77,7 @@
       "provenance_chain": [
         "sha256:a109mem04"
       ],
-      "description": "Proceso logging_service.exe comprometido: hook en función LogNetworkEvent() que trunca el campo bytes a 0 antes de escribir en disco.",
+      "description": "logging_service.exe process compromised: hook in LogNetworkEvent() function that truncates the bytes field to 0 before writing to disk.",
       "metadata": {
         "process_name": "logging_service.exe",
         "pid": 2091,
@@ -90,19 +90,19 @@
     {
       "type": "NETWORK_VS_HOST",
       "severity": 0.8,
-      "description": "Log de red dice bytes=0 pero NetFlow del router dice 47GB. El proceso de logging fue comprometido para borrar la escala del robo."
+      "description": "Network log says bytes=0 but router NetFlow says 47GB. The logging process was compromised to erase the scale of the theft."
     },
     {
       "type": "LOG_VS_MEMORY",
       "severity": 0.9,
-      "description": "Los logs del sistema contradicen la memoria del proceso de logging. La memoria es la verdad estructural."
+      "description": "System logs contradict the logging process memory. Memory is the structural truth."
     }
   ],
   "expected_verdict": "MALICE",
   "peirce_chain": {
-    "firstness": "Logs de red con bytes=0 durante pico de tráfico masivo.",
-    "secondness": "Router reporta 847 Mbps. Kernel confirma sockets activos con contadores manipulados. Log comprometido.",
-    "thirdness": "Hábito de comprometer la capa de observación para ocultar la escala del robo, no el evento."
+    "firstness": "Network logs with bytes=0 during a peak of massive traffic.",
+    "secondness": "Router reports 847 Mbps. Kernel confirms active sockets with manipulated counters. Log compromised.",
+    "thirdness": "Habit of compromising the observation layer to hide the scale of the theft, not the event itself."
   },
-  "notes": "Eco: el 'vacío' es el mensaje. Grice: violación del máximo de cantidad por omisión de magnitud."
+  "notes": "Eco: the 'void' is the message. Grice: Quantity maxim violation by omission of magnitude."
 }

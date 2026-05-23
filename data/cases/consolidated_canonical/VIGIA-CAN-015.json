@@ -1,7 +1,7 @@
 {
   "case_id": "case_097_falsa_misericordia",
-  "name": "La Falsa Misericordia",
-  "description": "Analista: 'Te salvé la vida, cerré tu sesión abierta'. Webshell instalada 10 segundos ANTES del mensaje. La sesión supuestamente cerrada sigue activa en memoria. 3 conexiones POST al webshell desde IP del analista.",
+  "name": "The False Mercy",
+  "description": "Analyst: 'I saved your life, I closed your open session'. Webshell installed 10 seconds BEFORE the message. The supposedly closed session is still active in memory. 3 POST connections to the webshell from the analyst's IP.",
   "artifacts": [
     {
       "artifact_id": "a097_01",
@@ -13,7 +13,7 @@
       "provenance_chain": [
         "sha256:a097slk01"
       ],
-      "description": "DM: 'Che, te salvé la vida. Vi sesión abierta y la cerré yo para que no te sancionen. No digas nada'.",
+      "description": "DM: 'Hey, I saved your life. I saw your open session and closed it myself so you don't get disciplined. Don't say anything'.",
       "metadata": {
         "sender": "analyst_sec@corp.com",
         "recipient": "dev@corp.com",
@@ -31,7 +31,7 @@
       "provenance_chain": [
         "sha256:a097file02"
       ],
-      "description": "Webshell PHP creada en /var/www/html/uploads/ 10 segundos ANTES del mensaje de 'ayuda'.",
+      "description": "PHP webshell created in /var/www/html/uploads/ 10 seconds BEFORE the 'help' message.",
       "metadata": {
         "filename": "webshell.php",
         "path": "/var/www/html/uploads/",
@@ -51,7 +51,7 @@
       "provenance_chain": [
         "sha256:a097mem03"
       ],
-      "description": "Sesión del 'compañero' (dev@corp.com) aún activa 5 minutos después del supuesto cierre. No hay evento de logout.",
+      "description": "Colleague's session (dev@corp.com) still active 5 minutes after the alleged closure. No logout event.",
       "metadata": {
         "username": "dev@corp.com",
         "supposed_close_time": "2026-01-20T16:45:30Z",
@@ -69,7 +69,7 @@
       "provenance_chain": [
         "sha256:a097log04"
       ],
-      "description": "3 conexiones POST a webshell.php desde IP del analyst_sec en 2 minutos tras el mensaje de 'cierre'.",
+      "description": "3 POST connections to webshell.php from analyst_sec IP within 2 minutes of the 'closure' message.",
       "metadata": {
         "target_file": "/uploads/webshell.php",
         "method": "POST",
@@ -90,9 +90,9 @@
   ],
   "expected_verdict": "MALICE",
   "peirce_chain": {
-    "firstness": "Mensaje de falsa solidaridad: 'cerré tu sesión para salvarte'.",
-    "secondness": "Webshell creada 10s antes del mensaje. Sesión nunca fue cerrada. Conexiones POST desde IP del 'salvador'.",
-    "thirdness": "Hábito de usar reciprocidad social para encubrir implantación de persistencia."
+    "firstness": "False solidarity message: 'I closed your session to save you'.",
+    "secondness": "Webshell created 10s before the message. Session never closed. POST connections from the 'savior's' IP.",
+    "thirdness": "Habit of using social reciprocity to cover persistence implantation."
   },
-  "notes": "El motivo noble es una barrera contra la sospecha. Carnegie: 'Sea caluroso en su aprobación'."
+  "notes": "The noble motive is a barrier against suspicion. Carnegie: 'Be warm in your approval'."
 }

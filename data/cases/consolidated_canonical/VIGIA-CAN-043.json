@@ -1,7 +1,7 @@
 {
   "case_id": "case_013_estocolmo_inverso",
-  "name": "El Síndrome de Estocolmo Inverso",
-  "description": "Usuario contacta soporte técnico para reset de contraseña de administrador. Es excesivamente amable, provee todos los datos técnicos antes de que se los pidan, usa jerga perfecta del analista y elogia al operador.",
+  "name": "The Inverted Stockholm Syndrome",
+  "description": "User contacts technical support for an admin password reset. Excessively polite, provides all technical details before being asked, uses the analyst's exact jargon, and praises the operator.",
   "artifacts": [
     {
       "artifact_id": "a013_chat",
@@ -13,7 +13,7 @@
       "provenance_chain": [
         "sha256:chat013a"
       ],
-      "description": "Chat con soporte: usuario inicia con 'Hola, necesito reset de password de admin para svc_backup. Sé que es delicado. Mi SID es S-1-5-21-...' antes de que operador pregunte",
+      "description": "Support chat: user starts with 'Hi, I need an admin password reset for svc_backup. I know it's delicate. My SID is S-1-5-21-...' before the operator asks.",
       "metadata": {
         "platform": "ServiceNow",
         "ticket_id": "SN-013",
@@ -37,7 +37,7 @@
       "provenance_chain": [
         "sha256:cult013b"
       ],
-      "description": "Uso de jerga interna exacta del analista: 'vamos a rotar el hash', 'necesito verificar el domain controller primario', '¿estás en el PDC o en el BDC?'",
+      "description": "Use of exact internal analyst jargon: 'let's rotate the hash', 'I need to verify the primary domain controller', 'are you on the PDC or the BDC?'",
       "metadata": {
         "phrases_matched": [
           "rotar el hash",
@@ -59,7 +59,7 @@
       "provenance_chain": [
         "sha256:chat013c"
       ],
-      "description": "Mensajes de adulación: 'Vos sos el mejor del equipo, me atendiste la otra vez y me salvaste', 'Sé que puedo confiar en vos para esto'",
+      "description": "Flattery messages: 'You're the best on the team, you helped me last time and saved me', 'I know I can trust you with this'.",
       "metadata": {
         "flattery_phrases": 3,
         "reference_past_interaction": true,
@@ -77,7 +77,7 @@
       "provenance_chain": [
         "sha256:log013d"
       ],
-      "description": "Reset de contraseña de svc_backup ejecutado por tier2_009 sin ticket de cambio aprobado ni verificación secundaria de identidad",
+      "description": "svc_backup password reset executed by tier2_009 without an approved change ticket or secondary identity verification.",
       "metadata": {
         "event_id": 4724,
         "target_user": "svc_backup",
@@ -90,9 +90,9 @@
   ],
   "expected_verdict": "MALICE",
   "peirce_chain": {
-    "firstness": "Usuario amable y cooperativo que provee datos técnicos sin ser solicitado",
-    "secondness": "Jerga exacta del analista (96% match con KB interno); adulación; reset ejecutado sin controles de cambio",
-    "thirdness": "Hábito de usar exceso de docilidad y espejo lingüístico para bajar defensas del operador de soporte"
+    "firstness": "Friendly and cooperative user who provides technical data without being asked.",
+    "secondness": "Exact analyst jargon (96% match with internal KB); flattery; reset executed without change controls.",
+    "thirdness": "Habit of using excessive docility and linguistic mirroring to lower the support operator's defenses."
   },
-  "notes": "Violación de la Máxima de Cantidad de Grice (más información de la requerida) + manipulación Carnegie. MUY VIGIA."
+  "notes": "Grice Quantity maxim violation (more information than required) + Carnegie manipulation. VERY VIGÍA."
 }

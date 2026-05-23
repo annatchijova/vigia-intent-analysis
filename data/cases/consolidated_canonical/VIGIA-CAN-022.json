@@ -1,7 +1,7 @@
 {
   "case_id": "case_104_error_layout_comentario",
-  "name": "El Error de Layout en el Comentario",
-  "description": "Script de producción tiene comentario: '# TODO: arreglar el script cnfnbz.py'. La palabra 'cnfnbz' es 'статья' (artículo) escrito con layout ruso activo. Commit desde máquina con locale ru_RU y timezone Europe/Moscow.",
+  "name": "The Comment Layout Error",
+  "description": "Production script has a comment: '# TODO: fix the cnfnbz.py script'. The word 'cnfnbz' is 'статья' (article) typed with active Russian layout. Commit from a machine with locale ru_RU and timezone Europe/Moscow.",
   "artifacts": [
     {
       "artifact_id": "a104_01",
@@ -13,7 +13,7 @@
       "provenance_chain": [
         "sha256:a104code01"
       ],
-      "description": "Comentario en script de producción: '# TODO: arreglar el script cnfnbz.py'. Palabra sin sentido en español ni inglés.",
+      "description": "Comment in production script: '# TODO: fix the cnfnbz.py script'. Meaningless word in Spanish or English.",
       "metadata": {
         "file": "maintain_db.py",
         "line": 42,
@@ -31,7 +31,7 @@
       "provenance_chain": [
         "sha256:a104cult02"
       ],
-      "description": "Keyboard slip: 'cnfnbz' mapea exactamente a 'статья' (artículo) en layout ruso ЙЦУКЕН activo. Confianza: 1.0.",
+      "description": "Keyboard slip: 'cnfnbz' maps exactly to 'статья' (article) in active Russian ЙЦУКЕН layout. Confidence: 1.0.",
       "metadata": {
         "typed": "cnfnbz",
         "layout": "ru_RU",
@@ -50,7 +50,7 @@
       "provenance_chain": [
         "sha256:a104git03"
       ],
-      "description": "Commit realizado desde máquina con git config locale ru_RU.UTF-8, timezone Europe/Moscow.",
+      "description": "Commit made from a machine with git config locale ru_RU.UTF-8, timezone Europe/Moscow.",
       "metadata": {
         "commit_hash": "f3e4a5b",
         "git_config_locale": "ru_RU.UTF-8",
@@ -68,7 +68,7 @@
       "provenance_chain": [
         "sha256:a104mem04"
       ],
-      "description": "Sesión de desarrollo desde IP geolocada en San Petersburgo con teclado físico configurado en ruso.",
+      "description": "Development session from IP geolocated in St. Petersburg with a physical keyboard configured in Russian.",
       "metadata": {
         "source_ip": "185.4.65.12",
         "geo": "RU",
@@ -79,9 +79,9 @@
   ],
   "expected_verdict": "MALICE",
   "peirce_chain": {
-    "firstness": "Comentario de código con palabra aparentemente sin sentido: 'cnfnbz'.",
-    "secondness": "'cnfnbz' es 'статья' en layout ruso. Commit desde máquina con locale ru_RU. Sesión desde IP rusa.",
-    "thirdness": "Hábito de atacante que escribe comentarios de 'desarrollador' pero su memoria muscular lo traiciona en texto no ejecutable."
+    "firstness": "Code comment with an apparently meaningless word: 'cnfnbz'.",
+    "secondness": "'cnfnbz' is 'статья' in Russian layout. Commit from a machine with locale ru_RU. Session from a Russian IP.",
+    "thirdness": "Habit of an attacker writing 'developer' comments while muscle memory betrays them in non-executable text."
   },
-  "notes": "Peirce Index: la cadena 'cnfnbz' delata la configuración de hardware nativa del operador."
+  "notes": "Peirce Index: the string 'cnfnbz' reveals the operator's native hardware configuration."
 }

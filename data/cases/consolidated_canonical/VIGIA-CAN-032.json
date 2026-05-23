@@ -1,7 +1,7 @@
 {
   "case_id": "case_005_ruido_blanco_distractor",
-  "name": "El Ruido Blanco Distractor",
-  "description": "5000 alertas de login fallido desde RU/CN hacia DB legacy irrelevante saturan al SOC. Simultáneamente, usuario con credenciales legítimas comprime 12GB de DB clientes con 7z y exfiltra 847MB por HTTPS.",
+  "name": "The Distractor White Noise",
+  "description": "5,000 failed login alerts from RU/CN toward an irrelevant legacy DB saturate the SOC. Simultaneously, a user with legitimate credentials compresses 12GB of the customer DB with 7z and exfiltrates 847MB over HTTPS.",
   "artifacts": [
     {
       "artifact_id": "a005_01",
@@ -13,7 +13,7 @@
       "provenance_chain": [
         "sha256:a005log01"
       ],
-      "description": "5000 eventos 4625 en 12 minutos desde 847 IPs geolocadas en RU/CN hacia DB-LEGACY-01 (MySQL 5.6, sin datos sensibles).",
+      "description": "5,000 Event 4625 in 12 minutes from 847 IPs geolocated in RU/CN toward DB-LEGACY-01 (MySQL 5.6, no sensitive data).",
       "metadata": {
         "event_id": 4625,
         "count": 5000,
@@ -37,7 +37,7 @@
       "provenance_chain": [
         "sha256:a005siem02"
       ],
-      "description": "SIEM genera 47 alertas de 'Brute Force — High Priority'. Analista Tier-1 asignado. SLA de respuesta activado.",
+      "description": "SIEM generates 47 'Brute Force — High Priority' alerts. Tier-1 analyst assigned. Response SLA activated.",
       "metadata": {
         "siem_alerts": 47,
         "priority": "high",
@@ -55,7 +55,7 @@
       "provenance_chain": [
         "sha256:a005mem03"
       ],
-      "description": "7z.exe bajo sesión de finance_user comprimiendo Customer_DB.mdf en chunks de 50MB. Compresión ratio 0.12.",
+      "description": "7z.exe under finance_user session compressing Customer_DB.mdf in 50MB chunks. Compression ratio 0.12.",
       "metadata": {
         "pid": 3184,
         "tool": "7z.exe",
@@ -76,7 +76,7 @@
       "provenance_chain": [
         "sha256:a005net04"
       ],
-      "description": "Tráfico HTTPS saliente de 847MB desde estación de finance_user a IP de storage cloud durante la ventana del 'incendio'.",
+      "description": "847MB HTTPS outbound traffic from finance_user workstation to a cloud storage IP during the 'fire' window.",
       "metadata": {
         "source_ip": "10.0.8.44",
         "dest_ip": "198.51.100.77",
@@ -91,14 +91,14 @@
     {
       "type": "RED_HERRING",
       "severity": 0.95,
-      "description": "Asimetría del ruido: ataque demasiado ruidoso es truco de magia para ocultar exfiltración silenciosa."
+      "description": "Noise asymmetry: overly noisy attack is a magic trick to hide silent exfiltration."
     }
   ],
   "expected_verdict": "MALICE",
   "peirce_chain": {
-    "firstness": "5000 logins fallidos ruidosos y obvios desde RU/CN.",
-    "secondness": "SOC desviado a DB legacy. Compresión silenciosa de Customer_DB concurrente. Exfiltración 847MB.",
-    "thirdness": "Hábito de usar ataque demasiado obvio como truco de magia: evaluar el silencio alrededor del ruido."
+    "firstness": "5,000 noisy and obvious failed logins from RU/CN.",
+    "secondness": "SOC diverted to legacy DB. Silent concurrent compression of Customer_DB. 847MB exfiltration.",
+    "thirdness": "Habit of using an overly obvious attack as a magic trick: evaluate the silence around the noise."
   },
-  "notes": "Asimetría del ruido: cuando un ataque es demasiado obvio, es un truco de magia."
+  "notes": "Noise asymmetry: when an attack is too obvious, it's a magic trick."
 }

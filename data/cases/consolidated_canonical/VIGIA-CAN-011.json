@@ -1,7 +1,7 @@
 {
   "case_id": "case_093_deepfake_estilo",
-  "name": "El Deepfake de Estilo",
-  "description": "15 commits imitan el estilo del Arquitecto Jefe (espaciado, errores gramaticales, TTR) con precisión estadística de 0.97, superior a la varianza humana biológica (0.82). Subidos vía API key genérica a las 4AM mientras el arquitecto estaba desconectado.",
+  "name": "The Style Deepfake",
+  "description": "15 commits imitate the Chief Architect's style (spacing, grammatical errors, TTR) with a statistical precision of 0.97, exceeding human biological variance (0.82). Uploaded via generic API key at 4AM while the architect was offline.",
   "artifacts": [
     {
       "artifact_id": "a093_01",
@@ -13,7 +13,7 @@
       "provenance_chain": [
         "sha256:a093git01"
       ],
-      "description": "15 commits subidos vía API key genérica 'ci-token-legacy' a las 4AM. Autor: arch_chief@corp.com.",
+      "description": "15 commits uploaded via generic API key 'ci-token-legacy' at 4AM. Author: arch_chief@corp.com.",
       "metadata": {
         "commit_count": 15,
         "api_key_used": "ci-token-legacy",
@@ -32,7 +32,7 @@
       "provenance_chain": [
         "sha256:a093vpn02"
       ],
-      "description": "Arquitecto Jefe desconectado desde las 19:30 del día anterior. No hay sesión entre 19:30 y las 4AM.",
+      "description": "Chief Architect offline since 19:30 the previous day. No session between 19:30 and 4AM.",
       "metadata": {
         "session_user": "arch_chief@corp.com",
         "session_end": "2026-04-21T19:30:00Z",
@@ -49,7 +49,7 @@
       "provenance_chain": [
         "sha256:a093sty03"
       ],
-      "description": "Análisis estilométrico: TTR similarity 0.992, errores gramaticales replicados ('recieve', 'seperate'). Coincidencia supera varianza biológica humana (0.82 baseline).",
+      "description": "Stylometric analysis: TTR similarity 0.992, grammatical errors replicated ('recieve', 'seperate'). Match exceeds human biological variance (0.82 baseline).",
       "metadata": {
         "ttr_similarity": 0.992,
         "human_baseline_variance": 0.82,
@@ -72,7 +72,7 @@
       "provenance_chain": [
         "sha256:a093hash04"
       ],
-      "description": "Uno de los 15 commits introduce backdoor en módulo de autenticación. Hash mismatch con código revisado en PR anterior. Cambio ofuscado dentro de 847 líneas de refactoring legítimo.",
+      "description": "One of the 15 commits introduces a backdoor in the authentication module. Hash mismatch with code reviewed in previous PR. Change obfuscated within 847 lines of legitimate refactoring.",
       "metadata": {
         "file_path": "src/auth/session_manager.py",
         "hash_mismatch": true,
@@ -85,19 +85,19 @@
     {
       "type": "LOG_VS_MEMORY",
       "severity": 0.9,
-      "description": "Commits reclaman autoría del arquitecto pero LSASS confirma sesión cerrada 8.5 horas previas. Imposibilidad estructural."
+      "description": "Commits claim authorship of the architect but LSASS confirms session closed 8.5 hours prior. Structural impossibility."
     },
     {
       "type": "CRYPTOGRAPHIC_INCONSISTENCY_UNVERIFIED",
       "severity": 0.6,
-      "description": "Hash del módulo de autenticación no coincide con revisado en PR. Requiere validación de trust-chain para elevar a Golden Rule."
+      "description": "Authentication module hash does not match the one reviewed in the PR. Requires trust-chain validation to elevate to Golden Rule."
     }
   ],
   "expected_verdict": "MALICE",
   "peirce_chain": {
-    "firstness": "Commits con estilo idéntico al arquitecto jefe subidos en plena madrugada.",
-    "secondness": "Arquitecto desconectado. API key genérica. Coincidencia estilométrica supera varianza biológica humana.",
-    "thirdness": "Hábito de usar IA para fabricar código que 'parezca' legítimo. La consistencia perfecta ES la firma del impostor."
+    "firstness": "Commits with identical style to the chief architect uploaded in the early hours.",
+    "secondness": "Architect offline. Generic API key. Stylometric match exceeds human biological variance.",
+    "thirdness": "Habit of using AI to fabricate code that 'looks' legitimate. Perfect consistency IS the impostor's signature."
   },
-  "notes": "La consistencia estadística suprahumana es el indicador de fabricación algorítmica."
+  "notes": "Superhuman statistical consistency is the indicator of algorithmic fabrication."
 }

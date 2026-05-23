@@ -1,7 +1,7 @@
 {
   "case_id": "case_096_entropia_panico",
-  "name": "La Entropía de Pánico",
-  "description": "50 alertas MFA falsas saturan al administrador en 8 segundos. Admin pide desactivar MFA '5 minutos'. Durante esa ventana: 3 logins exitosos desde IPs del atacante. Desactivar MFA no soluciona un ataque de red — es la meta.",
+  "name": "The Panic Entropy",
+  "description": "50 fake MFA alerts saturate the administrator in 8 seconds. Admin requests to disable MFA for '5 minutes'. During that window: 3 successful logins from attacker IPs. Disabling MFA does not solve a network attack — it is the goal.",
   "artifacts": [
     {
       "artifact_id": "a096_01",
@@ -13,7 +13,7 @@
       "provenance_chain": [
         "sha256:a096mfa01"
       ],
-      "description": "50 alertas de Telegram/Duo enviadas al admin en ventana de 8 segundos. Todas con mismo texto: 'ALERTA: Intruso detectado'.",
+      "description": "50 Telegram/Duo alerts sent to admin in an 8-second window. All with the same text: 'ALERT: Intruder detected'.",
       "metadata": {
         "alert_count": 50,
         "time_window_seconds": 8,
@@ -31,7 +31,7 @@
       "provenance_chain": [
         "sha256:a096slk02"
       ],
-      "description": "Admin: 'Estoy desbordado, desactiven el MFA 5 minutos para que pueda entrar rápido y bloquear las IPs'.",
+      "description": "Admin: 'I'm overwhelmed, disable MFA for 5 minutes so I can quickly get in and block the IPs'.",
       "metadata": {
         "sender": "sysadmin_primary",
         "request": "disable MFA temporarily",
@@ -49,7 +49,7 @@
       "provenance_chain": [
         "sha256:a096mfadis03"
       ],
-      "description": "MFA desactivado. Durante ventana de 5 minutos: 3 logins exitosos desde IPs del atacante.",
+      "description": "MFA disabled. During the 5-minute window: 3 successful logins from attacker IPs.",
       "metadata": {
         "event_id": "MFA_DISABLE",
         "duration_sec": 300,
@@ -71,7 +71,7 @@
       "provenance_chain": [
         "sha256:a096net04"
       ],
-      "description": "Ataque de fuerza bruta concurrente desde 3 IPs con cadencia sincronizada de 2.1s por IP. No se detiene durante ni después de la ventana de MFA desactivado.",
+      "description": "Concurrent brute-force attack from 3 IPs with synchronized cadence of 2.1s per IP. Does not stop during or after the MFA-disabled window.",
       "metadata": {
         "source_ips": 3,
         "attempts_total": 1523,
@@ -85,14 +85,14 @@
     {
       "type": "COGNITIVE_DOS",
       "severity": 0.97,
-      "description": "Saturación sensorial para forzar degradación de seguridad. Desactivar MFA no soluciona ataque de red — es la META del ataque."
+      "description": "Sensory saturation to force security degradation. Disabling MFA does not solve a network attack — it IS the attack GOAL."
     }
   ],
   "expected_verdict": "MALICE",
   "peirce_chain": {
-    "firstness": "Admin abrumado por 50 alertas en 8 segundos pide desactivar MFA.",
-    "secondness": "Desactivar MFA facilita el ataque en curso. 3 logins exitosos del atacante durante la ventana.",
-    "thirdness": "Hábito de usar saturación sensorial para forzar degradación de seguridad. La solicitud de degradar ES la meta del ataque."
+    "firstness": "Admin overwhelmed by 50 alerts in 8 seconds asks to disable MFA.",
+    "secondness": "Disabling MFA facilitates the ongoing attack. 3 successful attacker logins during the window.",
+    "thirdness": "Habit of using sensory saturation to force security degradation. The degradation request IS the attack goal."
   },
-  "notes": "Ingeniería social por agotamiento: la degradación de seguridad solicitada es el objetivo final."
+  "notes": "Social engineering through exhaustion: the requested security degradation is the ultimate objective."
 }

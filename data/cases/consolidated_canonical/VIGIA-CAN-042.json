@@ -1,7 +1,7 @@
 {
   "case_id": "case_012_camuflaje_simbiotico",
-  "name": "El Camuflaje Simbiótico",
-  "description": "Proceso oculto en memoria no hace tráfico de red durante horas. Cuando usuario abre Zoom/Teams para videollamada, en ese milisegundo empieza a exfiltrar GB dentro del ruido legítimo del video.",
+  "name": "The Symbiotic Camouflage",
+  "description": "Hidden process in memory makes no network traffic for hours. When the user opens Zoom/Teams for a video call, in that very millisecond it begins exfiltrating GB within the legitimate video noise.",
   "artifacts": [
     {
       "artifact_id": "a012_hidden",
@@ -13,7 +13,7 @@
       "provenance_chain": [
         "sha256:mem012a"
       ],
-      "description": "Proceso oculto en memoria (sin entrada en lista de procesos userland) con handle a socket TCP en estado ESTABLISHED pero sin actividad durante 4.2 horas",
+      "description": "Hidden process in memory (no entry in userland process list) with handle to a TCP socket in ESTABLISHED state but no activity for 4.2 hours.",
       "metadata": {
         "pid_hidden": true,
         "process_name": "system_update.exe",
@@ -33,7 +33,7 @@
       "provenance_chain": [
         "sha256:log012b"
       ],
-      "description": "Usuario abre zoom.exe a las 14:32:15.000; log de inicio de videollamada con participante externo",
+      "description": "User opens zoom.exe at 14:32:15.000; video call start log with external participant.",
       "metadata": {
         "process": "zoom.exe",
         "start_time": "2026-05-19T14:32:15.000Z",
@@ -51,7 +51,7 @@
       "provenance_chain": [
         "sha256:ip012c"
       ],
-      "description": "Pico de tráfico saliente de 2.3GB en 180 segundos iniciado exactamente en 14:32:15.120 (120ms después de Zoom) hacia IP de CDN sospechosa",
+      "description": "Outbound traffic spike of 2.3GB in 180 seconds initiated exactly at 14:32:15.120 (120ms after Zoom) toward a suspicious CDN IP.",
       "metadata": {
         "start_time": "2026-05-19T14:32:15.120Z",
         "bytes_out": 2469606195,
@@ -71,7 +71,7 @@
       "provenance_chain": [
         "sha256:net012d"
       ],
-      "description": "Zoom reporta uso de banda ancha de 4.2Mbps (video HD); tráfico total medido en interfaz es 847Mbps — discrepancia de 200:1",
+      "description": "Zoom reports 4.2Mbps bandwidth usage (HD video); total traffic measured at the interface is 847Mbps — 200:1 discrepancy.",
       "metadata": {
         "zoom_reported_mbps": 4.2,
         "interface_measured_mbps": 847,
@@ -83,9 +83,9 @@
   ],
   "expected_verdict": "MALICE",
   "peirce_chain": {
-    "firstness": "Proceso oculto inactivo durante horas; Zoom abierto; pico de tráfico masivo",
-    "secondness": "Exfiltración inicia 120ms después de Zoom; tráfico total 200× mayor que lo reportado por Zoom; proceso oculto inyectado",
-    "thirdness": "Hábito de usar aplicación legítima como gatillo contextual para esconder exfiltración dentro de ruido esperado"
+    "firstness": "Hidden process inactive for hours; Zoom opened; massive traffic spike.",
+    "secondness": "Exfiltration starts 120ms after Zoom; total traffic 200× greater than reported by Zoom; injected hidden process.",
+    "thirdness": "Habit of using a legitimate application as a contextual trigger to hide exfiltration within expected noise."
   },
-  "notes": "Mímesis biológica aplicada al código: el malware espera al hospedero legítimo para camuflarse."
+  "notes": "Biological mimicry applied to code: the malware waits for the legitimate host to camouflage itself."
 }

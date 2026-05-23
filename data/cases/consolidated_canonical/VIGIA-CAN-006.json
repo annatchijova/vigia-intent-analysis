@@ -1,7 +1,7 @@
 {
   "case_id": "case_088_calco_semantico",
-  "name": "El Calco Semántico del Intruso",
-  "description": "Ticket interno en inglés usa 'state of the country' como calco de 'стране' (área/lado en ruso) en empresa de servicios eléctricos. El error delata estructura de pensamiento en idioma nativo.",
+  "name": "The Intruder's Semantic Calque",
+  "description": "Internal ticket in English uses 'state of the country' as a calque of 'стране' (area/side in Russian) in an electric utility company. The error reveals a native-language thought structure.",
   "artifacts": [
     {
       "artifact_id": "a088_01",
@@ -13,7 +13,7 @@
       "provenance_chain": [
         "sha256:a088tick01"
       ],
-      "description": "Ticket: 'I need to check the state of the country'. Contexto: servidor de empresa de servicios eléctricos.",
+      "description": "Ticket: 'I need to check the state of the country'. Context: electric utility server.",
       "metadata": {
         "ticket_id": "INF-088",
         "context": "server_maintenance",
@@ -31,7 +31,7 @@
       "provenance_chain": [
         "sha256:a088cult02"
       ],
-      "description": "Calco semántico: 'state of the country' traduce directamente 'стране' que en ruso informal significa 'área/sector'. Error de traducción literal.",
+      "description": "Semantic calque: 'state of the country' directly translates 'стране', which in informal Russian means 'area/sector'. Literal translation error.",
       "metadata": {
         "calco_source": "стране",
         "intended_meaning": "area/section",
@@ -50,7 +50,7 @@
       "provenance_chain": [
         "sha256:a088mem03"
       ],
-      "description": "Sesión RDP desde IP geolocada en Moscú con timezone UTC+3, usuario 'field_tech'.",
+      "description": "RDP session from IP geolocated in Moscow, timezone UTC+3, user 'field_tech'.",
       "metadata": {
         "source_ip": "194.58.112.7",
         "geo": "RU",
@@ -68,7 +68,7 @@
       "provenance_chain": [
         "sha256:a088cmd04"
       ],
-      "description": "Comando ejecutado: 'Get-StateOfCountry -ServerId NY-42'. Cmdlet inexistente en repositorio oficial; cargado desde módulo desconocido.",
+      "description": "Command executed: 'Get-StateOfCountry -ServerId NY-42'. Cmdlet does not exist in the official repository; loaded from an unknown module.",
       "metadata": {
         "command": "Get-StateOfCountry",
         "module_source": "unknown",
@@ -78,9 +78,9 @@
   ],
   "expected_verdict": "MALICE",
   "peirce_chain": {
-    "firstness": "Ticket en inglés fluido pero con frase semánticamente desubicada para contexto técnico-geográfico.",
-    "secondness": "'State of the country' no tiene sentido para servidor eléctrico. Coincide con traducción literal del ruso.",
-    "thirdness": "Hábito de traducción mental directa que delata estructura de pensamiento en idioma nativo bajo estrés operacional."
+    "firstness": "Ticket in fluent English but with a semantically misplaced phrase for a technical-geographic context.",
+    "secondness": "'State of the country' makes no sense for an electric utility server. Matches a literal translation from Russian.",
+    "thirdness": "Habit of direct mental translation that reveals native-language thought structure under operational stress."
   },
-  "notes": "Detección de calco lingüístico subyacente: el atacante opera bajo máscara de fluidez en idioma no nativo."
+  "notes": "Detection of underlying linguistic calque: the attacker operates under a mask of fluency in a non-native language."
 }

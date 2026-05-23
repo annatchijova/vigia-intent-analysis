@@ -1,7 +1,7 @@
 {
   "case_id": "case_099_troyano_emocional",
-  "name": "El Troyano Emocional",
-  "description": "Mail de RRHH: 'Debido al fallecimiento de colega, recolectamos fondos. Ver PDF adjunto'. El empleado no existe en base de datos. SPF/DKIM fallan. PDF contiene JavaScript que roba tokens de sesión de navegador. 12 hosts comprometidos.",
+  "name": "The Emotional Trojan",
+  "description": "HR email: 'Due to the passing of a colleague, we are collecting funds. See attached PDF'. The employee does not exist in the database. SPF/DKIM fail. PDF contains JavaScript that steals browser session tokens. 12 hosts compromised.",
   "artifacts": [
     {
       "artifact_id": "a099_01",
@@ -13,7 +13,7 @@
       "provenance_chain": [
         "sha256:a099mail01"
       ],
-      "description": "Mail desde hr@corp.com: 'Condolencias - Fondo para familia de Juan Pérez'. SPF: fail. DKIM: fail.",
+      "description": "Email from hr@corp.com: 'Condolences - Fund for Juan Pérez's family'. SPF: fail. DKIM: fail.",
       "metadata": {
         "subject": "Condolencias - Fondo para familia de Juan Pérez",
         "sender": "hr@corp.com",
@@ -34,7 +34,7 @@
       "provenance_chain": [
         "sha256:a099pdf02"
       ],
-      "description": "PDF adjunto: JavaScript embebido que accede a cookies de sesión (session_id, auth_token, csrf) y envía a dominio externo.",
+      "description": "Attached PDF: embedded JavaScript that accesses session cookies (session_id, auth_token, csrf) and sends them to an external domain.",
       "metadata": {
         "filename": "donaciones.pdf",
         "javascript": true,
@@ -57,7 +57,7 @@
       "provenance_chain": [
         "sha256:a099dns03"
       ],
-      "description": "Conexión HTTPS a family-support[.]org desde 12 hosts internos en 30 minutos tras apertura masiva del PDF.",
+      "description": "HTTPS connection to family-support[.]org from 12 internal hosts within 30 minutes of mass PDF opening.",
       "metadata": {
         "domain": "family-support[.]org",
         "connections": 12,
@@ -76,7 +76,7 @@
       "provenance_chain": [
         "sha256:a099rrhh04"
       ],
-      "description": "Verificación: RRHH real no envió mail. 'Juan Pérez' no existe en base de datos de personal activo.",
+      "description": "Verification: real HR did not send the email. 'Juan Pérez' does not exist in the active personnel database.",
       "metadata": {
         "hr_system_query": "Juan Pérez",
         "employee_status": "NOT_FOUND",
@@ -86,9 +86,9 @@
   ],
   "expected_verdict": "MALICE",
   "peirce_chain": {
-    "firstness": "Mail de condolencias con PDF de donaciones desde RRHH.",
-    "secondness": "Empleado no existe. SPF/DKIM fallan. PDF roba tokens. 12 hosts comprometidos.",
-    "thirdness": "Hábito de usar tabú social (muerte) para anular protocolo de desconfianza técnica."
+    "firstness": "Condolence email with donation PDF from HR.",
+    "secondness": "Employee does not exist. SPF/DKIM fail. PDF steals tokens. 12 hosts compromised.",
+    "thirdness": "Habit of using social taboo (death) to nullify technical distrust protocols."
   },
-  "notes": "Eco: el signo de la muerte es la barrera semántica definitiva."
+  "notes": "Eco: the sign of death is the ultimate semantic barrier."
 }

@@ -1,7 +1,7 @@
 {
   "case_id": "case_108_inversion_carga_prueba",
-  "name": "La Inversión de la Carga de Prueba",
-  "description": "SOC consulta actividad sospechosa a las 03:15. Usuario responde con agresión defensiva: '¿Acaso no confiás en mi trabajo? Ya hablé con el gerente'. Memoria confirma PowerShell con Mimikatz y descarga desde IP rusa. Sin registro de conversación con gerente.",
+  "name": "The Burden of Proof Inversion",
+  "description": "SOC inquires about suspicious activity at 03:15. User responds with defensive aggression: 'Don't you trust my work? I already talked to the manager'. Memory confirms PowerShell with Mimikatz and download from a Russian IP. No record of manager conversation.",
   "artifacts": [
     {
       "artifact_id": "a108_01",
@@ -13,7 +13,7 @@
       "provenance_chain": [
         "sha256:a108soc01"
       ],
-      "description": "Consulta SOC: 'Detectamos actividad inusual en tu cuenta ayer a las 03:15. ¿Podés confirmar si fue vos?'",
+      "description": "SOC inquiry: 'We detected unusual activity on your account yesterday at 03:15. Can you confirm if it was you?'",
       "metadata": {
         "sender": "soc@corp.com",
         "recipient": "user@corp.com",
@@ -31,7 +31,7 @@
       "provenance_chain": [
         "sha256:a108resp02"
       ],
-      "description": "Respuesta: '¿Por qué me preguntas? ¿Acaso no confiás en mi trabajo? Ya hablé con el gerente sobre el exceso de control'. Pregunta técnica sin responder.",
+      "description": "Response: 'Why are you asking me? Don't you trust my work? I already spoke with the manager about the excessive monitoring'. Technical question unanswered.",
       "metadata": {
         "tone": "aggressive defensive",
         "appeal_to_authority": true,
@@ -49,7 +49,7 @@
       "provenance_chain": [
         "sha256:a108mem03"
       ],
-      "description": "Proceso powershell.exe en memoria: descarga de payload desde 185.220.101.42, ejecución de Mimikatz, credentials dumped.",
+      "description": "powershell.exe process in memory: downloading payload from 185.220.101.42, executing Mimikatz, credentials dumped.",
       "metadata": {
         "pid": 4418,
         "process_name": "powershell.exe",
@@ -71,7 +71,7 @@
       "provenance_chain": [
         "sha256:a108mgr04"
       ],
-      "description": "Verificación de gestión: NO hay registro de comunicación entre user@corp.com y gerente@corp.com en ventana de 48h.",
+      "description": "Management verification: NO communication record between user@corp.com and manager@corp.com in the 48h window.",
       "metadata": {
         "claimed_manager_talk": true,
         "communication_found": false,
@@ -84,14 +84,14 @@
     {
       "type": "DEFENSIVE_AGGRESSION",
       "severity": 0.95,
-      "description": "Usuario busca anular proceso forense mediante fricción interpersonal y manipulación jerárquica falsa."
+      "description": "User seeks to nullify forensic process through interpersonal friction and false hierarchical manipulation."
     }
   ],
   "expected_verdict": "MALICE",
   "peirce_chain": {
-    "firstness": "Respuestas agresivas y defensivas a consulta SOC legítima.",
-    "secondness": "Confrontación + inversión de culpa + apelación a gerente sin evidencia. Memoria confirma Mimikatz.",
-    "thirdness": "Hábito de usar agresión interpersonal escalada para anular proceso forense mediante intimidación jerárquica."
+    "firstness": "Aggressive and defensive responses to a legitimate SOC inquiry.",
+    "secondness": "Confrontation + blame inversion + managerial appeal without evidence. Memory confirms Mimikatz.",
+    "thirdness": "Habit of using escalated interpersonal aggression to nullify the forensic process through hierarchical intimidation."
   },
-  "notes": "Carnegie invertido: el atacante usa intimidación para que el analista se sienta inseguro y detenga la investigación."
+  "notes": "Inverted Carnegie: the attacker uses intimidation so the analyst feels insecure and stops the investigation."
 }

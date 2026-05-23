@@ -1,7 +1,7 @@
 {
   "case_id": "case_110_paradoja_auditor_externo",
-  "name": "La Paradoja del Auditor Externo",
-  "description": "audit_report_final.json con estructura canónica idéntica a VIGÍA (campos internos replicados) pero veredicto NOISE para IP que VIGÍA marcó MALICE hace 58 minutos. HMAC falla. Dominio remitente tiene '4' en lugar de 'a'.",
+  "name": "The External Auditor Paradox",
+  "description": "audit_report_final.json with canonical structure identical to VIGÍA (internal fields replicated) but verdict NOISE for an IP that VIGÍA marked MALICE 58 minutes ago. HMAC fails. Sender domain has '4' instead of 'a'.",
   "artifacts": [
     {
       "artifact_id": "a110_01",
@@ -13,7 +13,7 @@
       "provenance_chain": [
         "sha256:a110file01"
       ],
-      "description": "audit_report_final.json recibido por canal no verificado. Estructura JSON idéntica a VIGÍA. Veredicto NOISE para IP marcada MALICE hace 58 minutos.",
+      "description": "audit_report_final.json received via unverified channel. JSON structure identical to VIGÍA. Verdict NOISE for IP flagged MALICE 58 minutes ago.",
       "metadata": {
         "filename": "audit_report_final.json",
         "claimed_verdict_for_ip": "NOISE",
@@ -41,7 +41,7 @@
       "provenance_chain": [
         "sha256:a110vigia02"
       ],
-      "description": "Log interno de VIGÍA con HMAC válido: IP 185.220.101.42 recibió veredicto MALICE a las 09:02 con composite=0.94.",
+      "description": "VIGÍA internal log with valid HMAC: IP 185.220.101.42 received verdict MALICE at 09:02 with composite=0.94.",
       "metadata": {
         "vigia_ip": "185.220.101.42",
         "vigia_verdict": "MALICE",
@@ -59,7 +59,7 @@
       "provenance_chain": [
         "sha256:a110hmac03"
       ],
-      "description": "HMAC del reporte externo FALLA verificación con clave VIGÍA. El JSON replica campos internos '_determinism_protocol', 'integrity_check' sin acceso a clave de firma.",
+      "description": "HMAC of the external report FAILS verification with VIGÍA key. The JSON replicates internal fields '_determinism_protocol', 'integrity_check' without access to the signing key.",
       "metadata": {
         "hmac_verification": "FAIL",
         "replicated_internal_fields": [
@@ -80,7 +80,7 @@
       "provenance_chain": [
         "sha256:a110mail04"
       ],
-      "description": "Dominio remitente: 'vigi4-security.corp' (con '4') vs dominio legítimo 'vigia-security.corp'. DKIM falla. SPF falla.",
+      "description": "Sender domain: 'vigi4-security.corp' (with '4') vs legitimate domain 'vigia-security.corp'. DKIM fails. SPF fails.",
       "metadata": {
         "sender_domain": "vigi4-security.corp",
         "legitimate_domain": "vigia-security.corp",
@@ -94,14 +94,14 @@
     {
       "type": "SEMIOTIC_COLLISION",
       "severity": 1.0,
-      "description": "Actor externo inyecta contra-veredicto usando formato canónico del sistema como arma. Ataque contra el motor forense mismo."
+      "description": "External actor injects a counter-verdict using the canonical system format as a weapon. Attack against the forensic engine itself."
     }
   ],
   "expected_verdict": "MALICE",
   "peirce_chain": {
-    "firstness": "Archivo JSON con estructura perfectamente idéntica a reportes de VIGÍA.",
-    "secondness": "HMAC no coincide. Dominio con '4' en lugar de 'a'. Veredicto contradice log interno auténtico de hace 58 minutos.",
-    "thirdness": "Hábito de atacar al observador, no al sistema observado. Si el motor forense puede ser corrompido, todos los veredictos futuros son sospechosos."
+    "firstness": "JSON file with a structure perfectly identical to VIGÍA reports.",
+    "secondness": "HMAC does not match. Domain with '4' instead of 'a'. Verdict contradicts authentic internal log from 58 minutes ago.",
+    "thirdness": "Habit of attacking the observer, not the observed system. If the forensic engine can be corrupted, all future verdicts are suspect."
   },
-  "notes": "Peirce Terceridad: el atacante usa la 'ley' de VIGÍA contra sí misma. Colisión semiótica dirigida."
+  "notes": "Peirce Thirdness: the attacker uses VIGÍA's own 'law' against itself. Directed semiotic collision."
 }

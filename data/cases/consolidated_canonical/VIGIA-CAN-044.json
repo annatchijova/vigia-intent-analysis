@@ -1,7 +1,7 @@
 {
   "case_id": "case_018_clonacion_sintactica",
-  "name": "La Clonación Sintáctica",
-  "description": "Tres usuarios distintos (gerente, empleado, proveedor) desde IPs distintas envían tickets pidiendo desactivar una regla de seguridad. Análisis estilométrico detecta que cometen exactamente el mismo error raro de puntuación.",
+  "name": "The Syntactic Cloning",
+  "description": "Three different users (manager, employee, vendor) from different IPs send tickets requesting a security rule to be disabled. Stylometric analysis detects they all make the exact same rare punctuation error.",
   "artifacts": [
     {
       "artifact_id": "a018_t1",
@@ -13,7 +13,7 @@
       "provenance_chain": [
         "sha256:tick018a"
       ],
-      "description": "Ticket de gerente: 'Necesito que desactiven temporalmente la regla DLP , es urgente para el cierre' — espacio antes de coma",
+      "description": "Manager ticket: 'I need you to temporarily disable the DLP rule , it's urgent for fiscal close' — space before comma.",
       "metadata": {
         "ticket_id": "T-018-A",
         "sender_role": "gerente",
@@ -32,7 +32,7 @@
       "provenance_chain": [
         "sha256:tick018b"
       ],
-      "description": "Ticket de empleado: 'La regla DLP , está bloqueando un envío legítimo al cliente' — espacio antes de coma",
+      "description": "Employee ticket: 'The DLP rule , is blocking a legitimate client shipment' — space before comma.",
       "metadata": {
         "ticket_id": "T-018-B",
         "sender_role": "empleado",
@@ -51,7 +51,7 @@
       "provenance_chain": [
         "sha256:tick018c"
       ],
-      "description": "Ticket de proveedor: 'Por favor , desactiven la regla DLP para esta cuenta' — espacio antes de coma",
+      "description": "Vendor ticket: 'Please , disable the DLP rule for this account' — space before comma.",
       "metadata": {
         "ticket_id": "T-018-C",
         "sender_role": "proveedor",
@@ -70,7 +70,7 @@
       "provenance_chain": [
         "sha256:sty018d"
       ],
-      "description": "Análisis estilométrico: los 3 tickets comparten TTR=0.42, longitud promedio de oración=12.3 palabras, y el error 'space_before_comma' en 100% de muestras. Entropía entre tickets: 0.08 bits.",
+      "description": "Stylometric analysis: all 3 tickets share TTR=0.42, average sentence length=12.3 words, and the 'space_before_comma' error in 100% of samples. Entropy between tickets: 0.08 bits.",
       "metadata": {
         "tickets_analyzed": 3,
         "shared_anomaly": "space_before_comma",
@@ -90,7 +90,7 @@
       "provenance_chain": [
         "sha256:log018e"
       ],
-      "description": "Regla DLP desactivada 8 minutos después del tercer ticket por analista de Tier-1 sin aprobación de CISO",
+      "description": "DLP rule disabled 8 minutes after the third ticket by a Tier-1 analyst without CISO approval.",
       "metadata": {
         "event_id": "DLP-DISABLE",
         "rule_id": "DLP-EMAIL-001",
@@ -102,9 +102,9 @@
   ],
   "expected_verdict": "MALICE",
   "peirce_chain": {
-    "firstness": "Tres tickets desde IPs y roles distintos pidiendo mismo cambio de seguridad",
-    "secondness": "Mismo error de puntuación raro en 100% de tickets; entropía 0.08 bits (imposible para 3 autores humanos distintos); DLP desactivada sin aprobación",
-    "thirdness": "Hábito de operación astroturfing: tres marionetas, un solo titiritero con patrón sintáctico invariable"
+    "firstness": "Three tickets from different IPs and roles requesting the same security change.",
+    "secondness": "Same rare punctuation error in 100% of tickets; entropy 0.08 bits (impossible for 3 distinct human authors); DLP disabled without approval.",
+    "thirdness": "Habit of astroturfing operation: three puppets, one puppeteer with an invariable syntactic pattern."
   },
-  "notes": "Excelente para sockpuppets, campañas coordinadas e influence ops."
+  "notes": "Excellent for sockpuppets, coordinated campaigns, and influence ops."
 }

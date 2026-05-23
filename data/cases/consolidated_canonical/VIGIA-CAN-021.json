@@ -1,7 +1,7 @@
 {
   "case_id": "case_103_cebo_vulnerabilidad_autoinfligida",
-  "name": "El Cebo de la Vulnerabilidad Autoinfligida",
-  "description": "Admin reporta puerto 8080 abierto 'por error'. SOC se enfoca ahí. Credencial de servicio svc_backup inicia movimiento lateral a 4 servidores AD concurrentemente. Sesión LSASS de svc_backup precede al reporte.",
+  "name": "The Self-Inflicted Vulnerability Lure",
+  "description": "Admin self-reports accidentally open port 8080. SOC focuses there. Service credential svc_backup initiates lateral movement to 4 AD servers concurrently. svc_backup LSASS session precedes the report.",
   "artifacts": [
     {
       "artifact_id": "a103_01",
@@ -13,7 +13,7 @@
       "provenance_chain": [
         "sha256:a103tick01"
       ],
-      "description": "Email: 'Dejé puerto 8080 abierto por error probando microservicio. Soy un desastre'. Reporte voluntario de negligencia menor.",
+      "description": "Email: 'I accidentally left port 8080 open while testing a microservice. I'm hopeless'. Voluntary self-report of minor negligence.",
       "metadata": {
         "sender": "sysadmin_network",
         "self_incrimination": true,
@@ -31,7 +31,7 @@
       "provenance_chain": [
         "sha256:a103net02"
       ],
-      "description": "Puerto 8080 abierto pero solo 3 conexiones de prueba locales en 48h. Vector real no es este puerto.",
+      "description": "Port 8080 open but only 3 local test connections in 48h. Real vector is not this port.",
       "metadata": {
         "port": 8080,
         "connections_48h": 3,
@@ -52,7 +52,7 @@
       "provenance_chain": [
         "sha256:a103mem03"
       ],
-      "description": "wmiexec.py usando credencial 'svc_backup' conectando a DC01, DC02, FS01, SQL01 simultáneamente.",
+      "description": "wmiexec.py using credential 'svc_backup' connecting to DC01, DC02, FS01, SQL01 simultaneously.",
       "metadata": {
         "tool": "wmiexec.py",
         "credential": "svc_backup",
@@ -75,7 +75,7 @@
       "provenance_chain": [
         "sha256:a103lsass04"
       ],
-      "description": "Sesión LSASS para svc_backup creada 2 minutos ANTES del reporte voluntario. No hay registro de login interactivo.",
+      "description": "LSASS session for svc_backup created 2 minutes BEFORE the voluntary report. No interactive login record.",
       "metadata": {
         "session_id": "0x9b2a",
         "username": "svc_backup",
@@ -89,14 +89,14 @@
     {
       "type": "STRATEGIC_OVERINCRIMINATION",
       "severity": 0.98,
-      "description": "Reporte voluntario de negligencia menor para desviar mirada del SOC hacia zona controlada."
+      "description": "Voluntary report of minor negligence to divert SOC attention toward a controlled zone."
     }
   ],
   "expected_verdict": "MALICE",
   "peirce_chain": {
-    "firstness": "Auto-denuncia de error de política (puerto abierto).",
-    "secondness": "Puerto 8080 es señuelo. svc_backup hace movimiento lateral. Sesión LSASS precede al reporte.",
-    "thirdness": "Hábito de sobre-incriminación estratégica para desviar mirada del equipo de respuesta hacia zona controlada."
+    "firstness": "Self-report of a policy error (open port).",
+    "secondness": "Port 8080 is the decoy. svc_backup performs lateral movement. LSASS session precedes the report.",
+    "thirdness": "Habit of strategic over-incrimination to divert the response team's attention toward a controlled zone."
   },
-  "notes": "Carnegie: 'Admita sus errores rápida y enfáticamente' — el error es el señuelo."
+  "notes": "Carnegie: 'Admit your mistakes quickly and emphatically' — the mistake is the decoy."
 }

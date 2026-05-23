@@ -1,7 +1,7 @@
 {
   "case_id": "case_085_mise_en_place_alterada",
-  "name": "La Mise en Place Alterada",
-  "description": "Script deploy.sh modificado con commit 'limpiando logs redundantes'. Una línea redirige stderr a /dev/null, silenciando errores del módulo de autenticación y causando fail-open.",
+  "name": "The Altered Mise en Place",
+  "description": "deploy.sh script modified with commit 'cleaning up redundant logs'. A single line redirects stderr to /dev/null, silencing authentication module errors and causing fail-open.",
   "artifacts": [
     {
       "artifact_id": "a085_01",
@@ -13,7 +13,7 @@
       "provenance_chain": [
         "sha256:a085git01"
       ],
-      "description": "Commit: 'Limpiando logs redundantes para mejorar legibilidad'. Cambio de una sola línea en deploy.sh.",
+      "description": "Commit: 'Cleaning up redundant logs for readability'. Single-line change in deploy.sh.",
       "metadata": {
         "commit_hash": "a1b2c3d",
         "author": "devops@corp.com",
@@ -32,7 +32,7 @@
       "provenance_chain": [
         "sha256:a085diff02"
       ],
-      "description": "Diff: línea agregada 'auth_check() 2>/dev/null || true'. Silencia todos los errores del módulo de autenticación.",
+      "description": "Diff: added line 'auth_check() 2>/dev/null || true'. Silences all authentication module errors.",
       "metadata": {
         "file": "deploy.sh",
         "line_number": 147,
@@ -51,7 +51,7 @@
       "provenance_chain": [
         "sha256:a085log03"
       ],
-      "description": "47 fallos de autenticación silenciados en ventana post-deploy. Ningún evento 4625 generado.",
+      "description": "47 authentication failures silenced in the post-deploy window. Zero Event 4625 generated.",
       "metadata": {
         "event_id": 4625,
         "count": 47,
@@ -70,7 +70,7 @@
       "provenance_chain": [
         "sha256:a085kern04"
       ],
-      "description": "Estructura EPROCESS del servicio de deploy muestra handle a /dev/null reemplazando stderr en runtime.",
+      "description": "EPROCESS structure of the deploy service shows a handle to /dev/null replacing stderr at runtime.",
       "metadata": {
         "process_name": "deploy_service.exe",
         "handle_type": "File",
@@ -83,14 +83,14 @@
     {
       "type": "OPACITY_INJECTION",
       "severity": 0.94,
-      "description": "'Limpieza' es signo para ocultar fallo de control de seguridad crítico. Commit benigno oculta degradación deliberada."
+      "description": "'Cleanup' is a sign to conceal critical security control failure. Benign-looking commit hides deliberate degradation."
     }
   ],
   "expected_verdict": "MALICE",
   "peirce_chain": {
-    "firstness": "Commit de 'limpieza' con cambio mínimo en script de despliegue.",
-    "secondness": "Redirección de stderr destruye visibilidad de fallo de autenticación; auth entra en modo permisivo.",
-    "thirdness": "Hábito de usar 'limpieza' como signo para ocultar degradación deliberada de controles de seguridad."
+    "firstness": "Commit labeled 'cleanup' with a minimal change to a deployment script.",
+    "secondness": "stderr redirection destroys authentication failure visibility; auth enters permissive mode.",
+    "thirdness": "Habit of using 'cleanup' as a sign to conceal deliberate degradation of security controls."
   },
-  "notes": "Minimalismo letal: una sola línea ciega un control crítico."
+  "notes": "Lethal minimalism: a single line blinds a critical control."
 }

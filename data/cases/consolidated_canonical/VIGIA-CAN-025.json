@@ -1,7 +1,7 @@
 {
   "case_id": "case_107_anacronismo_firma_digital",
-  "name": "El Anacronismo de la Firma Digital",
-  "description": "GPO firmado con certificado SHA-1 que la empresa prohibió hace 4 años. Certificado revocado en 2022 pero aún presente en store local del DC. CRL no verificada. Admin legítimo no tendría acceso a infraestructura obsoleta.",
+  "name": "The Digital Signature Anachronism",
+  "description": "GPO signed with a SHA-1 certificate banned by the company 4 years ago. Certificate revoked in 2022 but still present in the DC's local store. CRL not verified. A legitimate admin would not have access to obsolete infrastructure.",
   "artifacts": [
     {
       "artifact_id": "a107_01",
@@ -13,7 +13,7 @@
       "provenance_chain": [
         "sha256:a107gpo01"
       ],
-      "description": "GPO 'Security_Baseline_2026' firmado digitalmente con algoritmo SHA-1. Política corporativa lo prohíbe desde 2022.",
+      "description": "GPO 'Security_Baseline_2026' digitally signed with SHA-1 algorithm. Corporate policy prohibits it since 2022.",
       "metadata": {
         "gpo_name": "Security_Baseline_2026",
         "signature_algorithm": "SHA-1",
@@ -38,7 +38,7 @@
       "provenance_chain": [
         "sha256:a107pol02"
       ],
-      "description": "Política corporativa SEC-POL-2022-003: SHA-1 prohibido para firma de código y GPO desde 2022-03-01.",
+      "description": "Corporate policy SEC-POL-2022-003: SHA-1 prohibited for code signing and GPOs since 2022-03-01.",
       "metadata": {
         "policy_id": "SEC-POL-2022-003",
         "effective_date": "2022-03-01",
@@ -59,7 +59,7 @@
       "provenance_chain": [
         "sha256:a107cert03"
       ],
-      "description": "Certificado SHA-1 revocado en 2022 pero aún en TrustedPublishers store local del DC. CRL online no verificada.",
+      "description": "SHA-1 certificate revoked in 2022 but still in TrustedPublishers local store on the DC. Online CRL not verified.",
       "metadata": {
         "cert_thumbprint": "a1b2c3d4",
         "algorithm": "SHA-1",
@@ -78,7 +78,7 @@
       "provenance_chain": [
         "sha256:a107mem04"
       ],
-      "description": "lsass.exe en DC con handle al certificado SHA-1 legacy cargado durante aplicación de GPO.",
+      "description": "lsass.exe on DC with handle to legacy SHA-1 certificate loaded during GPO application.",
       "metadata": {
         "pid": 612,
         "process_name": "lsass.exe",
@@ -91,14 +91,14 @@
     {
       "type": "CRYPTOGRAPHIC_ANACHRONISM",
       "severity": 0.92,
-      "description": "Uso de algoritmo obsoleto sugiere reutilización de infraestructura de ataque antigua o persistencia latente de larga data."
+      "description": "Use of obsolete algorithm suggests reuse of old attack infrastructure or long-standing latent persistence."
     }
   ],
   "expected_verdict": "MALICE",
   "peirce_chain": {
-    "firstness": "GPO firmado con SHA-1 prohibido hace 4 años.",
-    "secondness": "Certificado revocado en 2022 aún en store local. Política activa lo prohíbe. CRL no verificada.",
-    "thirdness": "Hábito de reutilizar infraestructura de ataque antigua o persistencia latente de larga data en la organización."
+    "firstness": "GPO signed with SHA-1 banned 4 years ago.",
+    "secondness": "Certificate revoked in 2022 still in local store. Active policy prohibits it. CRL not verified.",
+    "thirdness": "Habit of reusing old attack infrastructure or long-standing latent persistence in the organization."
   },
-  "notes": "Eco: el signo de autoridad es un anacronismo. Admin legítimo no tendría acceso ni motivo para usar SHA-1."
+  "notes": "Eco: the sign of authority is an anachronism. A legitimate admin would have no access to or reason to use SHA-1."
 }

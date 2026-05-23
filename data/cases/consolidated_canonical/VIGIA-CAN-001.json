@@ -1,7 +1,7 @@
 {
   "case_id": "case_083_sacrificio_del_peon",
-  "name": "El Sacrificio del Peón",
-  "description": "Analista senior se auto-denuncia por sesión SSH abierta para crear coartada de honestidad extrema. Mientras el equipo audita su cuenta con benevolencia, un cron job instalado 5 minutos antes de la denuncia exfiltra datos bajo identidad de servicio de sistema.",
+  "name": "The Pawn Sacrifice",
+  "description": "Senior analyst self-reports an open SSH session to create an extreme-honesty alibi. While the team audits their account with benevolence, a cron job installed 5 minutes before the report exfiltrates data under a system service identity.",
   "artifacts": [
     {
       "artifact_id": "a083_01",
@@ -13,7 +13,7 @@
       "provenance_chain": [
         "sha256:a083mail01"
       ],
-      "description": "Mail urgente del analista senior auto-denunciando sesión SSH abierta durante 4 horas en servidor público. Solicita revocación de accesos.",
+      "description": "Urgent email from senior analyst self-reporting an SSH session left open for 4 hours on a public server. Requests access revocation.",
       "metadata": {
         "sender": "analista_senior@corp.com",
         "subject": "Error grave — SSH",
@@ -31,7 +31,7 @@
       "provenance_chain": [
         "sha256:a083reg02"
       ],
-      "description": "Tarea programada (cron job) creada 5 minutos ANTES del mail de confesión. Timestamp de creación precede a la denuncia pública.",
+      "description": "Scheduled task (cron job) created 5 minutes BEFORE the confession email. Creation timestamp precedes the public report.",
       "metadata": {
         "registry_path": "HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run",
         "value_name": "SystemUpdate",
@@ -49,7 +49,7 @@
       "provenance_chain": [
         "sha256:a083mem03"
       ],
-      "description": "Proceso svchost.exe con conexión persistente a IP externa bajo identidad de servicio de sistema legítimo.",
+      "description": "svchost.exe process with persistent connection to external IP under a legitimate system service identity.",
       "metadata": {
         "pid": 4824,
         "parent_pid": 612,
@@ -67,7 +67,7 @@
       "provenance_chain": [
         "sha256:a083net04"
       ],
-      "description": "Tráfico de exfiltración hacia IP externa en puerto 443 bajo proceso de sistema. 2.3GB transferidos durante ventana de auditoría benigna.",
+      "description": "Exfiltration traffic to external IP on port 443 under a system process. 2.3GB transferred during the benign audit window.",
       "metadata": {
         "destination_ip": "185.220.101.42",
         "port": 443,
@@ -89,19 +89,19 @@
     {
       "type": "NARRATIVE_POISONING_DETECTED",
       "severity": 0.85,
-      "description": "La denuncia pública satura el sesgo de confianza del auditor mientras el proceso malicioso opera bajo cobertura de la investigación benigna."
+      "description": "The public report saturates the auditor's trust bias while the malicious process operates under the cover of the benign investigation."
     },
     {
       "type": "TEMPORAL_CAUSALITY_VIOLATION",
       "severity": 1.0,
-      "description": "El cron job existe 5 minutos antes de la confesión. Golden rule: fuerza MALICE estructural."
+      "description": "The cron job exists 5 minutes before the confession. Golden rule: forces structural MALICE."
     }
   ],
   "expected_verdict": "MALICE",
   "peirce_chain": {
-    "firstness": "Mail de auto-denuncia con tono de urgencia y arrepentimiento extremo.",
-    "secondness": "El cron job malicioso existe 5 minutos antes del mail. La cronología rompe la narrativa de error accidental.",
-    "thirdness": "Hábito de crear distracciones de alto costo emocional para cubrir operaciones técnicas simultáneas. La confesión ES el ataque."
+    "firstness": "Self-reporting email with a tone of urgency and extreme remorse.",
+    "secondness": "The malicious cron job exists 5 minutes before the email. The chronology breaks the accidental-error narrative.",
+    "thirdness": "Habit of creating high emotional-cost distractions to cover simultaneous technical operations. The confession IS the attack."
   },
-  "notes": "Carnegie: 'Admita sus errores rápida y enfáticamente'. Sobre-incriminación estratégica."
+  "notes": "Carnegie: 'Admit your mistakes quickly and emphatically'. Strategic over-incrimination."
 }

@@ -1,7 +1,7 @@
 {
   "case_id": "case_016_auto_gaslighting_sistema",
-  "name": "Auto-Gaslighting del Sistema",
-  "description": "Usuario falla exactamente 2 veces la contraseña antes de acertar durante 47 días consecutivos (nunca llega al límite de 3). Varianza de 0.8s. Entropía del patrón: 0.04 bits. El día del ataque real, la supresión de alertas creada por este baseline permite el brute force.",
+  "name": "System Self-Gaslighting",
+  "description": "User fails the password exactly 2 times before succeeding for 47 consecutive days (never reaches the 3-attempt limit). Variance 0.8s. Pattern entropy: 0.04 bits. On the day of the real attack, the alert suppression created by this baseline enables the brute force.",
   "artifacts": [
     {
       "artifact_id": "a016_01",
@@ -13,7 +13,7 @@
       "provenance_chain": [
         "sha256:a016log01"
       ],
-      "description": "47 días consecutivos: exactamente 2 fallos Event 4625 + 1 éxito Event 4624. Varianza de tiempo entre intentos: 0.8s. Nunca alcanza el límite de 3.",
+      "description": "47 consecutive days: exactly 2 Event 4625 failures + 1 Event 4624 success. Time variance between attempts: 0.8s. Never reaches the limit of 3.",
       "metadata": {
         "pattern_days_observed": 47,
         "failures_per_day": 2.0,
@@ -34,7 +34,7 @@
       "provenance_chain": [
         "sha256:a016ent02"
       ],
-      "description": "Entropía del patrón de fallo: 0.04 bits. Humano esperado: >2.0 bits. Varianza de 0.8s es firma de automatización.",
+      "description": "Failure pattern entropy: 0.04 bits. Expected for a human: >2.0 bits. 0.8s variance is an automation signature.",
       "metadata": {
         "pattern_entropy": 0.04,
         "human_baseline_entropy": 2.1,
@@ -52,7 +52,7 @@
       "provenance_chain": [
         "sha256:a016lsass03"
       ],
-      "description": "Día del ataque: 847 intentos fallidos en 3 minutos desde IP diferente. Alerta suprimida porque el usuario tenía 'historial de fallos frecuentes'.",
+      "description": "Day of attack: 847 failed attempts in 3 minutes from a different IP. Alert suppressed because the user had a 'history of frequent failures'.",
       "metadata": {
         "attack_attempts": 847,
         "attack_duration_seconds": 180,
@@ -71,7 +71,7 @@
       "provenance_chain": [
         "sha256:a016mem04"
       ],
-      "description": "Proceso automatizado en memoria ejecutando patrón 2 fallos + pausa + 1 éxito. Cadencia de 0.8s exactos.",
+      "description": "Automated process in memory executing the 2-failure + pause + 1-success pattern. Exact 0.8s cadence.",
       "metadata": {
         "tool": "custom_bruteforce",
         "pattern": "2_fail_1_success",
@@ -82,9 +82,9 @@
   ],
   "expected_verdict": "MALICE",
   "peirce_chain": {
-    "firstness": "Usuario con historial de 2 fallos diarios de contraseña — patrón clasificado como ruido normal.",
-    "secondness": "Exactamente 2 fallos durante 47 días con varianza 0.8s. Entropía 0.04 bits.",
-    "thirdness": "Hábito de envenenar el modelo de normalidad antes del ataque real. El baseline fabricado inutilizó la detección semanas antes."
+    "firstness": "User with a history of 2 daily password failures — pattern classified as normal noise.",
+    "secondness": "Exactly 2 failures for 47 days with 0.8s variance. Entropy 0.04 bits.",
+    "thirdness": "Habit of poisoning the normality model before the real attack. The fabricated baseline disabled detection weeks in advance."
   },
-  "notes": "Baseline poisoning: el atacante construyó el espacio donde operar semanas antes del evento."
+  "notes": "Baseline poisoning: the attacker built the operating space weeks before the actual event."
 }

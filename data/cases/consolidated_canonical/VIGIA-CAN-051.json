@@ -1,7 +1,7 @@
 {
   "case_id": "case_fusion_autoridad_tecnica_fabricada",
-  "name": "Autoridad Técnica Fabricada",
-  "description": "Uso sistemático de términos técnicos fuera de contexto y citas a estudios sin fuente para establecer autoridad falsa y justificar acciones de riesgo.",
+  "name": "Fabricated Technical Authority",
+  "description": "Systematic use of out-of-context technical terms and citations to unsourced studies to establish false authority and justify risky actions.",
   "artifacts": [
     {
       "artifact_id": "f004_msg1",
@@ -13,7 +13,7 @@
       "provenance_chain": [
         "sha256:chatf4a"
       ],
-      "description": "Mensaje: 'El modelo de cifrado de 256 bits se rompió según el estudio de 2024, por eso necesitamos desactivar el cifrado en tránsito temporalmente'",
+      "description": "Message: 'The 256-bit encryption model was broken according to a 2024 study, that's why we need to temporarily disable encryption in transit'.",
       "metadata": {
         "sender": "consultant@example.com",
         "claim": "AES-256 broken",
@@ -32,7 +32,7 @@
       "provenance_chain": [
         "sha256:chatf4b"
       ],
-      "description": "Mensaje: 'Según la ISO 27001:2026 reciente, el MFA es opcional para cuentas de servicio con privilegios limitados. Podemos sacarlo.'",
+      "description": "Message: 'According to the recent ISO 27001:2026, MFA is optional for service accounts with limited privileges. We can remove it.'",
       "metadata": {
         "sender": "consultant@example.com",
         "claim": "MFA optional for service accounts",
@@ -51,7 +51,7 @@
       "provenance_chain": [
         "sha256:logf4c"
       ],
-      "description": "Verificación: AES-256 no tiene vulnerabilidades prácticas conocidas en 2024/2026. ISO 27001:2022 (última versión) NO menciona MFA opcional para service accounts.",
+      "description": "Verification: AES-256 has no known practical vulnerabilities in 2024/2026. ISO 27001:2022 (latest version) does NOT mention optional MFA for service accounts.",
       "metadata": {
         "aes256_status": "secure",
         "iso_version_latest": "2022",
@@ -69,7 +69,7 @@
       "provenance_chain": [
         "sha256:logf4d"
       ],
-      "description": "Tras mensajes de 'consultant', cifrado en tránsito desactivado en 2 servidores y MFA removido de svc_backup por analista Tier-1",
+      "description": "After 'consultant' messages, encryption in transit disabled on 2 servers and MFA removed from svc_backup by Tier-1 analyst.",
       "metadata": {
         "events": [
           "encryption_disabled",
@@ -84,9 +84,9 @@
   ],
   "expected_verdict": "MALICE",
   "peirce_chain": {
-    "firstness": "Mensajes con términos técnicos y citas a estudios/estándares",
-    "secondness": "Citas no verificables; AES-256 no roto; ISO 2022 no existe; acciones de riesgo ejecutadas sin aprobación CISO",
-    "thirdness": "Hábito de usar lenguaje técnico sin contexto y autoridad apócrifa para justificar degradación de controles de seguridad"
+    "firstness": "Messages with technical terms and citations to studies/standards.",
+    "secondness": "Non-verifiable citations; AES-256 not broken; ISO 2022 does not exist; risky actions executed without CISO approval.",
+    "thirdness": "Habit of using out-of-context technical language and apocryphal authority to justify degradation of security controls."
   },
-  "notes": "Fusión de Falso Experto: el término técnico es un signo simbólico desconectado de la realidad técnica."
+  "notes": "False Expert fusion: the technical term is a symbolic sign disconnected from technical reality."
 }

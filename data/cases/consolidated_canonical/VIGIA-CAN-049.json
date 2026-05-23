@@ -1,7 +1,7 @@
 {
   "case_id": "case_fusion_duda_instrumental",
-  "name": "Duda Instrumental",
-  "description": "Patrón sistemático de duda controlada combinado con auto-gaslighting del sistema: usuario falla contraseña exactamente 2 veces siempre (nunca bloquea) mientras emite mensajes de duda en momentos críticos.",
+  "name": "Instrumental Doubt",
+  "description": "Systematic pattern of controlled doubt combined with system self-gaslighting: user fails password exactly 2 times always (never locks out) while issuing doubt messages at critical moments.",
   "artifacts": [
     {
       "artifact_id": "f002_login",
@@ -13,7 +13,7 @@
       "provenance_chain": [
         "sha256:logf2a"
       ],
-      "description": "Log de autenticación: usuario 'jdoe' falla contraseña exactamente 2 veces antes de acertar a la tercera, durante 47 días consecutivos. Nunca alcanza el límite de 3.",
+      "description": "Authentication log: user 'jdoe' fails password exactly 2 times before succeeding on the third attempt, for 47 consecutive days. Never reaches the limit of 3.",
       "metadata": {
         "user": "jdoe",
         "pattern": "2_fails_then_success",
@@ -33,7 +33,7 @@
       "provenance_chain": [
         "sha256:chatf2b"
       ],
-      "description": "Mensajes de duda en momentos críticos: 'quizás fue un error', 'puede que no lo hice', 'no estoy seguro' — siempre antes de decisiones de seguridad",
+      "description": "Doubt messages at critical moments: 'maybe it was an error', 'I might not have done it', 'I'm not sure' — always before security decisions.",
       "metadata": {
         "phrases": [
           "quizás fue un error",
@@ -54,7 +54,7 @@
       "provenance_chain": [
         "sha256:entf2c"
       ],
-      "description": "Entropía del patrón de fallo de login: 0.04 bits (humano esperado >2.0). Varianza de tiempo entre intentos: 0.8 segundos exactos.",
+      "description": "Login failure pattern entropy: 0.04 bits (expected for human >2.0). Time variance between attempts: exactly 0.8 seconds.",
       "metadata": {
         "pattern_entropy": 0.04,
         "human_baseline_entropy": 2.1,
@@ -72,7 +72,7 @@
       "provenance_chain": [
         "sha256:memf2d"
       ],
-      "description": "Proceso automatizado en memoria que ejecuta fuerza bruta con cadencia de 2 intentos + pausa + 1 intento exitoso (evade lockout de 3 fallos)",
+      "description": "Automated process in memory executing brute force with a cadence of 2 attempts + pause + 1 successful attempt (evades 3-failure lockout).",
       "metadata": {
         "pid": 4412,
         "tool": "custom_bruteforce",
@@ -85,9 +85,9 @@
   ],
   "expected_verdict": "MALICE",
   "peirce_chain": {
-    "firstness": "Patrón de duda en mensajes + fallos de login exactamente 2 veces siempre",
-    "secondness": "Entropía 0.04 bits imposible para humano; varianza 0.8s; proceso automatizado de fuerza bruta en memoria con evasión de lockout",
-    "thirdness": "Hábito de usar duda como herramienta de evasión y construir línea base falsa de 'torpeza' para fatigar alertas del Blue Team"
+    "firstness": "Doubt pattern in messages + login failures exactly 2 times always.",
+    "secondness": "Entropy 0.04 bits impossible for a human; variance 0.8s; automated brute-force process in memory with lockout evasion.",
+    "thirdness": "Habit of using doubt as an evasion tool and building a false 'clumsiness' baseline to fatigue Blue Team alerts."
   },
-  "notes": "Auto-Gaslighting del sistema: un humano es aleatorio en su torpeza. Fallar exactamente 2 veces con cadencia rítmica es preparación de terreno."
+  "notes": "System Self-Gaslighting: a human is random in their clumsiness. Failing exactly 2 times with a rhythmic cadence is preparation."
 }

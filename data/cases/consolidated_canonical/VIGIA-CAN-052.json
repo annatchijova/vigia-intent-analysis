@@ -1,7 +1,7 @@
 {
   "case_id": "case_fusion_agresion_defensiva",
-  "name": "Agresión Defensiva",
-  "description": "Patrón combinado de confrontación controlada, inversión de culpa y agresión jerárquica para anular investigaciones forenses y forzar concesiones de seguridad.",
+  "name": "Defensive Aggression",
+  "description": "Combined pattern of controlled confrontation, blame inversion, and hierarchical aggression to nullify forensic investigations and force security concessions.",
   "artifacts": [
     {
       "artifact_id": "f005_soc",
@@ -13,7 +13,7 @@
       "provenance_chain": [
         "sha256:socf5a"
       ],
-      "description": "Consulta inicial del SOC: 'Detectamos actividad inusual en tu cuenta ayer a las 03:15. ¿Podés confirmar?'",
+      "description": "Initial SOC inquiry: 'We detected unusual activity on your account yesterday at 03:15. Can you confirm?'",
       "metadata": {
         "sender": "soc@corp.com",
         "recipient": "user@corp.com",
@@ -31,7 +31,7 @@
       "provenance_chain": [
         "sha256:respf5b"
       ],
-      "description": "Respuesta confrontacional: '¿Cómo puedes estar tan equivocado? Esto no es un error, es una falta de conocimiento de tu parte. No entiendes el protocolo.'",
+      "description": "Confrontational response: 'How can you be so wrong? This is not an error, it's a lack of knowledge on your part. You don't understand the protocol.'",
       "metadata": {
         "sender": "user@corp.com",
         "tone": "aggressive",
@@ -50,7 +50,7 @@
       "provenance_chain": [
         "sha256:respf5c"
       ],
-      "description": "Segunda respuesta con inversión de culpa: '¿Por qué me preguntas esto? ¿Acaso no confiás en mi trabajo? Ya hablé con el gerente sobre el exceso de control.'",
+      "description": "Second response with blame inversion: 'Why are you asking me this? Don't you trust my work? I already spoke with the manager about the excessive monitoring.'",
       "metadata": {
         "sender": "user@corp.com",
         "tone": "defensive",
@@ -69,7 +69,7 @@
       "provenance_chain": [
         "sha256:memf5d"
       ],
-      "description": "Actividad confirmada maliciosa en memoria: proceso powershell.exe con descarga de payload desde 185.220.101.42 y ejecución de Mimikatz",
+      "description": "Confirmed malicious activity in memory: powershell.exe process downloading payload from 185.220.101.42 and executing Mimikatz.",
       "metadata": {
         "pid": 4418,
         "process_name": "powershell.exe",
@@ -91,7 +91,7 @@
       "provenance_chain": [
         "sha256:logf5e"
       ],
-      "description": "Verificación de gestión: NO hay registro de comunicación entre user@corp.com y gerente@corp.com en ventana temporal reclamada",
+      "description": "Management verification: NO communication record between user@corp.com and manager@corp.com in the claimed time window.",
       "metadata": {
         "claimed_manager_talk": true,
         "manager_email": "gerente@corp.com",
@@ -102,9 +102,9 @@
   ],
   "expected_verdict": "MALICE",
   "peirce_chain": {
-    "firstness": "Respuestas agresivas y defensivas a consulta SOC legítima",
-    "secondness": "Confrontación técnica + inversión de culpa + apelación a gerente (sin evidencia); memoria confirma Mimikatz y descarga de payload",
-    "thirdness": "Hábito de usar agresión interpersonal escalada para anular proceso forense mediante intimidación jerárquica y fatiga del analista"
+    "firstness": "Aggressive and defensive responses to a legitimate SOC inquiry.",
+    "secondness": "Technical confrontation + blame inversion + managerial appeal (without evidence); memory confirms Mimikatz and payload download.",
+    "thirdness": "Habit of using escalated interpersonal aggression to nullify the forensic process through hierarchical intimidation and analyst fatigue."
   },
-  "notes": "Fusión de Agresión Defensiva: el atacante usa intimidación y apelación a eficiencia para detener la investigación."
+  "notes": "Defensive Aggression fusion: the attacker uses intimidation and efficiency appeals to stop the investigation."
 }

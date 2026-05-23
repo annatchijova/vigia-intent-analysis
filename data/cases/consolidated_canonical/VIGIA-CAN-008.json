@@ -1,7 +1,7 @@
 {
   "case_id": "case_090_anacronismo_herramienta",
-  "name": "El Anacronismo de la Herramienta",
-  "description": "PsExec v1.94 (2014) detectado en servidor Windows 2025. Herramienta ruidosa que genera 12 alertas EDR. Análisis de memoria revela rootkit kernel con SSDT hooks instalado 2 minutos antes. El psexec es el señuelo.",
+  "name": "The Tool Anachronism",
+  "description": "PsExec v1.94 (2014) detected on a Windows 2025 server. A noisy tool that generates 12 EDR alerts. Memory analysis reveals a kernel rootkit with SSDT hooks installed 2 minutes earlier. The psexec is the decoy.",
   "artifacts": [
     {
       "artifact_id": "a090_01",
@@ -13,7 +13,7 @@
       "provenance_chain": [
         "sha256:a090file01"
       ],
-      "description": "Binario psexec.exe versión 1.94 (hash conocido, firmado 2014) detectado en C:\\Temp. Herramienta ruidosa detectable por cualquier EDR moderno.",
+      "description": "psexec.exe binary version 1.94 (known hash, signed 2014) detected in C:\\Temp. Noisy tool detectable by any modern EDR.",
       "metadata": {
         "filename": "psexec.exe",
         "version": "1.94",
@@ -32,7 +32,7 @@
       "provenance_chain": [
         "sha256:a090edr02"
       ],
-      "description": "EDR generó 12 alertas de 'Herramienta de administración remota obsoleta'. Marcado como FP por analista Tier-1.",
+      "description": "EDR generated 12 'Obsolete remote administration tool' alerts. Marked as FP by Tier-1 analyst.",
       "metadata": {
         "edr_product": "CrowdStrike",
         "alert_count": 12,
@@ -50,7 +50,7 @@
       "provenance_chain": [
         "sha256:a090kern03"
       ],
-      "description": "Driver kernel no firmado cargado 2 minutos ANTES del psexec. 12 hooks en SSDT. Requiere conocimiento avanzado de C++ y Ring-0.",
+      "description": "Unsigned kernel driver loaded 2 minutes BEFORE psexec. 12 SSDT hooks. Requires advanced C++ and Ring-0 knowledge.",
       "metadata": {
         "driver_name": "nvsmartmax.sys",
         "load_time": "2026-05-20T11:28:00Z",
@@ -69,7 +69,7 @@
       "provenance_chain": [
         "sha256:a090dns04"
       ],
-      "description": "Tráfico C2 cifrado en puerto 8443 iniciado 1 minuto antes del ruido de psexec. Firewall reporta 0 bytes para este puerto.",
+      "description": "Encrypted C2 traffic on port 8443 initiated 1 minute before the psexec noise. Firewall reports 0 bytes for this port.",
       "metadata": {
         "destination_ip": "91.243.44.11",
         "port": 8443,
@@ -83,19 +83,19 @@
     {
       "type": "VERDICT_CONFLICT",
       "severity": 0.7,
-      "description": "EDR clasifica psexec como ruido (low severity) mientras kernel revela persistencia de nivel APT."
+      "description": "EDR classifies psexec as noise (low severity) while kernel reveals APT-level persistence."
     },
     {
       "type": "NETWORK_VS_HOST",
       "severity": 0.8,
-      "description": "Firewall reporta 0 bytes en puerto 8443 pero rootkit kernel exfiltra 512KB. El driver hookea syscalls de red."
+      "description": "Firewall reports 0 bytes on port 8443 but kernel rootkit exfiltrates 512KB. The driver hooks network syscalls."
     }
   ],
   "expected_verdict": "MALICE",
   "peirce_chain": {
-    "firstness": "PsExec v1.94 genera alertas EDR obvias en Windows 2025.",
-    "secondness": "Herramienta ruidosa contradice presencia de rootkit kernel sofisticado instalado 2 minutos antes.",
-    "thirdness": "Hábito de usar señuelos de baja sofisticación para que el analista cierre el ticket como script-kiddie y no profundice."
+    "firstness": "PsExec v1.94 generates obvious EDR alerts on Windows 2025.",
+    "secondness": "Noisy tool contradicts the presence of a sophisticated kernel rootkit installed 2 minutes earlier.",
+    "thirdness": "Habit of using low-sophistication decoys so the analyst closes the ticket as a script-kiddie case and does not dig deeper."
   },
-  "notes": "El ruidoso es el señuelo. El silencioso es el verdadero ataque."
+  "notes": "The noisy tool is the decoy. The silent one is the real attack."
 }

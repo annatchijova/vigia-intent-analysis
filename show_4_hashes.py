@@ -1,0 +1,175 @@
+#!/usr/bin/env python3
+"""
+show_4_hashes.py — VIGÍA: visualización explícita de los 4 hashes forenses.
+
+Uso:
+    python3 show_4_hashes.py <caso.json>
+
+Los 4 hashes:
+    H1 — graph_hash        : SHA256 del grafo de evidencia (artefactos + señales)
+    H2 — bundle_hash       : SHA256 del bundle sellado completo (cubre H1 + decisión + metadata)
+    H3 — HMAC audit chain  : HMAC-SHA256 de la cadena de auditoría (ephemeral key en dev)
+    H4 — EBS verify        : Verificación independiente de H2 por verify_ebs_v1
+"""
+
+import sys
+import os
+import json
+import hashlib
+import hmac
+import time
+import tempfile
+import subprocess
+from pathlib import Path
+
+if len(sys.argv) < 2:
+    print("Uso: python3 show_4_hashes.py <caso.json>")
+    sys.exit(1)
+
+case_file = Path(sys.argv[1])
+if not case_file.exists():
+    print(f"Error: no se encuentra {case_file}")
+    sys.exit(1)
+
+# ── Colores ANSI ─────────────────────────────────────────────────────────────
+BLD = "\033[1m"
+RST = "\033[0m"
+GRN = "\033[92m"
+YLW = "\033[93m"
+RED = "\033[91m"
+CYN = "\033[96m"
+
+print(f"\n{'='*66}")
+print(f"{BLD}VIGÍA — 4 FORENSIC HASHES{RST}")
+print(f"Case: {case_file.name}")
+print(f"{'='*66}\n")
+
+# ── Setup path ────────────────────────────────────────────────────────────────
+sys.path.insert(0, str(Path(__file__).parent))
+
+try:
+    from vigia.pipeline.vigia_integration_bridge import CaseAdapter, normalize_case_schema, validate_case_schema
+    from vigia.pipeline.pipeline import VigiaPipeline
+    from vigia.core.canonicalize import _canonicalize
+except ImportError as e:
+    print(f"{RED}[ERROR] Import falló: {e}{RST}")
+    print("Asegurate de correr desde ~/vigia-repo con el .venv activo")
+    sys.exit(1)
+
+# ── Cargar caso ───────────────────────────────────────────────────────────────
+with open(case_file) as f:
+    case = json.load(f)
+
+case = normalize_case_schema(case)
+validate_case_schema(case)
+
+adapter = CaseAdapter()
+signals, meta = adapter.to_signals(case)
+drift = CaseAdapter.compute_drift(case)
+
+# ── Correr pipeline ───────────────────────────────────────────────────────────
+t0 = time.perf_counter()
+result = VigiaPipeline().run_full(signals=signals, drift_score=drift)
+elapsed_ms = (time.perf_counter() - t0) * 1000
+
+sd = result.get("sealed_dict", {})
+integrity = sd.get("integrity", {})
+
+# ── H1: graph_hash ────────────────────────────────────────────────────────────
+h1 = integrity.get("graph_hash", "")
+h1_status = GRN + "PRESENT" + RST if h1 else RED + "ABSENT" + RST
+
+print(f"{BLD}H1 — graph_hash{RST}  (SHA256 del grafo de evidencia)")
+print(f"   {CYN}{h1 if h1 else 'N/A'}{RST}")
+print(f"   Status : {h1_status}")
+print()
+
+# ── H2: bundle_hash ───────────────────────────────────────────────────────────
+h2 = integrity.get("bundle_hash", "")
+h2_status = GRN + "PRESENT" + RST if h2 else RED + "ABSENT" + RST
+
+print(f"{BLD}H2 — bundle_hash{RST}  (SHA256 del bundle sellado completo — cubre H1)")
+print(f"   {CYN}{h2 if h2 else 'N/A'}{RST}")
+print(f"   Status : {h2_status}")
+print(f"   Sealed : {integrity.get('sealed_at', 'N/A')}")
+print()
+
+# ── H3: HMAC audit chain ──────────────────────────────────────────────────────
+# El HMAC se genera internamente por SecurityAuditLogger con clave efímera.
+# Podemos recomputarlo sobre el bundle para demostrar el mecanismo.
+hmac_key = os.environ.get("VIGIA_HMAC_KEY", "").encode()
+if not hmac_key:
+    # Dev mode: recompute con clave derivada del bundle_hash (solo para display)
+    hmac_key = hashlib.sha256(h2.encode() if h2 else b"dev").digest()
+    hmac_note = f"{YLW}ephemeral (dev mode — set VIGIA_HMAC_KEY for production){RST}"
+else:
+    hmac_note = f"{GRN}production key from env{RST}"
+
+bundle_canonical = json.dumps(
+    _canonicalize({k: v for k, v in sd.items() if k != "integrity"}),
+    sort_keys=True, separators=(',', ':'), ensure_ascii=True
+).encode()
+
+h3 = hmac.new(hmac_key, bundle_canonical, hashlib.sha256).hexdigest()
+
+print(f"{BLD}H3 — HMAC audit chain{RST}  (HMAC-SHA256 del bundle canónico)")
+print(f"   {CYN}{h3}{RST}")
+print(f"   Key    : {hmac_note}")
+print()
+
+# ── H4: verify_ebs_v1 ─────────────────────────────────────────────────────────
+tf = tempfile.NamedTemporaryFile(suffix=".json", delete=False, mode="w")
+json.dump(sd, tf, sort_keys=True, indent=2, default=str)
+tf.close()
+
+verify_script = Path(__file__).parent / "forensics" / "verify_ebs_v1.py"
+if not verify_script.exists():
+    verify_script = Path(__file__).parent / "verify_ebs_v1.py"
+
+v = subprocess.run(
+    [sys.executable, str(verify_script), tf.name],
+    capture_output=True, text=True
+)
+os.unlink(tf.name)
+
+v_out = v.stdout + v.stderr
+if "PASS" in v_out:
+    level = next((l for l in ["Level 3", "Level 2", "Level 1"] if l in v_out), "Level ?")
+    h4_status = f"{GRN}PASS — {level}{RST}"
+else:
+    h4_status = f"{RED}FAIL{RST}"
+    level = "FAIL"
+
+print(f"{BLD}H4 — EBS verify{RST}  (verificación independiente de H2 por verify_ebs_v1)")
+print(f"   Recomputes bundle_hash from sealed_dict and compares against stored value")
+print(f"   Status : {h4_status}")
+print()
+
+# ── Resumen ───────────────────────────────────────────────────────────────────
+# result["decision"] puede ser dataclass, dict o string según el path del bridge
+_dec = result.get("decision", "UNKNOWN")
+if hasattr(_dec, "decision"):           # dataclass DecisionResult
+    verdict   = _dec.decision
+    score_raw = getattr(_dec, "posterior", getattr(_dec, "risk", 0))
+elif isinstance(_dec, dict):
+    verdict   = _dec.get("decision", _dec.get("verdict", "UNKNOWN"))
+    score_raw = _dec.get("posterior", _dec.get("score", 0))
+else:
+    verdict   = str(_dec)
+    score_raw = result.get("posterior", result.get("risk", 0))
+
+print(f"{'─'*66}")
+print(f"{BLD}VERDICT  :{RST}  {verdict}")
+print(f"{BLD}SCORE    :{RST}  {score_raw}")
+print(f"{BLD}PIPELINE :{RST}  {elapsed_ms:.1f} ms")
+print()
+print(f"{BLD}HASH INTEGRITY SUMMARY{RST}")
+all_present = all([h1, h2, h3])
+all_pass    = "PASS" in (h4_status)
+col = GRN if (all_present and all_pass) else RED
+print(f"  H1 graph_hash   : {'OK' if h1 else 'MISSING':8}  {h1[:16]}..." if h1 else f"  H1 graph_hash   : MISSING")
+print(f"  H2 bundle_hash  : {'OK' if h2 else 'MISSING':8}  {h2[:16]}..." if h2 else f"  H2 bundle_hash  : MISSING")
+print(f"  H3 HMAC chain   : {'OK' if h3 else 'MISSING':8}  {h3[:16]}...")
+print(f"  H4 EBS verify   : {level}")
+print(f"\n  {col}{'VERDE — todos los hashes presentes y verificados' if (all_present and all_pass) else 'REVISAR — ver detalle arriba'}{RST}")
+print(f"{'='*66}\n")

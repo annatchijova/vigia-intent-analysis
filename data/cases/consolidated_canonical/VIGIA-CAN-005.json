@@ -1,7 +1,7 @@
 {
   "case_id": "case_087_estocolmo_inverso",
-  "name": "El Síndrome de Estocolmo Inverso",
-  "description": "Contratista externo de seguridad 'ayuda' durante incidente: bloquea IP de Ucrania y borra logs de acceso 'para no saturar el SIEM'. El borrado ocurre 5 minutos antes del mensaje de ayuda.",
+  "name": "The Inverted Stockholm Syndrome",
+  "description": "External security contractor 'helps' during an incident: blocks a Ukrainian IP and deletes access logs 'to avoid saturating the SIEM'. The deletion occurs 5 minutes before the help message.",
   "artifacts": [
     {
       "artifact_id": "a087_01",
@@ -13,7 +13,7 @@
       "provenance_chain": [
         "sha256:a087chat01"
       ],
-      "description": "Mensaje Slack: 'Chicos, encontré IP de Ucrania atacándonos. Ya la bloqueé y estoy borrando logs de esa región para no saturar el SIEM'.",
+      "description": "Slack message: 'Guys, found a Ukrainian IP attacking us. Already blocked it and deleting logs from that region to avoid saturating the SIEM'.",
       "metadata": {
         "channel": "#incident-response",
         "sender": "contractor_sec@corp.com",
@@ -32,7 +32,7 @@
       "provenance_chain": [
         "sha256:a087mem02"
       ],
-      "description": "Proceso log_cleaner.exe ejecutado desde equipo del contratista 5 minutos ANTES del mensaje de Slack. No es herramienta del stack autorizado.",
+      "description": "log_cleaner.exe process executed from contractor's machine 5 minutes BEFORE the Slack message. Not an authorized stack tool.",
       "metadata": {
         "process_name": "log_cleaner.exe",
         "process_creation_time": "2026-01-17T11:27:00Z",
@@ -51,7 +51,7 @@
       "provenance_chain": [
         "sha256:a087siem03"
       ],
-      "description": "2.4GB de logs de acceso eliminados con shred -n 7. Método forense-destructivo, no operacional.",
+      "description": "2.4GB of access logs deleted with shred -n 7. Forensic-destructive method, not operational.",
       "metadata": {
         "deleted_entries": 245123,
         "ip_range": "185.220.0.0/16",
@@ -69,7 +69,7 @@
       "provenance_chain": [
         "sha256:a087geo04"
       ],
-      "description": "IP de Ucrania señalada como atacante resulta ser nodo Tor de salida. No hay evidencia de ataque real desde esa IP.",
+      "description": "Ukrainian IP flagged as attacker turns out to be a Tor exit node. No evidence of real attack from that IP.",
       "metadata": {
         "ip": "185.220.101.42",
         "is_tor_exit": true,
@@ -91,19 +91,19 @@
     {
       "type": "OBSTRUCTIVE_ASSISTANCE",
       "severity": 0.96,
-      "description": "Borrar logs NUNCA es parte de solución de incidente. Es destrucción de evidencia forense."
+      "description": "Deleting logs is NEVER part of an incident response solution. It is destruction of forensic evidence."
     },
     {
       "type": "FALSE_FLAG_PATTERN",
       "severity": 0.8,
-      "description": "IP de Ucrania señalada sin corroboración técnica. Los logs borrados eran la única evidencia del origen real."
+      "description": "Ukrainian IP flagged without technical corroboration. The deleted logs were the only evidence of the real origin."
     }
   ],
   "expected_verdict": "MALICE",
   "peirce_chain": {
-    "firstness": "Contratista ofrece ayuda proactiva durante incidente activo.",
-    "secondness": "Proceso de limpieza empezó 5 minutos antes del aviso. IP señalada es nodo Tor sin evidencia real.",
-    "thirdness": "Hábito de usar urgencia del incidente como cobertura para destruir trazas forenses del vector real."
+    "firstness": "Contractor proactively offers help during an active incident.",
+    "secondness": "Cleanup process started 5 minutes before the Slack message. The flagged IP is a Tor node with no real evidence.",
+    "thirdness": "Habit of using incident urgency as cover to destroy forensic traces of the real attack vector."
   },
-  "notes": "Carnegie invertido: la 'ayuda' ES el método para destruir evidencia."
+  "notes": "Inverted Carnegie: the 'help' IS the method to destroy evidence."
 }
