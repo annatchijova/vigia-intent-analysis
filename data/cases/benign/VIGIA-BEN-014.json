@@ -1,12 +1,12 @@
 {
-  "abstention_risk": "alto",
+  "abstention_risk": "high",
   "artifacts": [
     {
       "artifact_id": "ART-001",
       "content": "Tor connection established: 10.0.2.15:9050 → Tor guard node | Process: tor (PID 4455) | User: journalist | Destination: .onion address (whistleblower-platform.onion) | No other destinations",
       "forensic_anomalies": [
-        "Conexión a red Tor desde máquina corporativa",
-        "Tráfico a dominio .onion"
+        "Tor network connection from corporate machine",
+        "Traffic to .onion domain"
       ],
       "peirce_layer": "FIRSTNESS",
       "type": "network_flow"
@@ -15,8 +15,8 @@
       "artifact_id": "ART-002",
       "content": "Authorization memo: 'Journalist Ana Martinez authorized for Tor access for source protection. Valid: 2024-01-01 to 2024-12-31. Approved by: Editor-in-Chief, Legal Counsel.' | Policy: JOURNALIST-ETHICS-2023",
       "forensic_anomalies": [
-        "Autorización escrita para uso de Tor",
-        "Firmada por editor y legal"
+        "Written authorization for Tor use",
+        "Signed by editor and legal counsel"
       ],
       "peirce_layer": "SECONDNESS",
       "type": "file_metadata"
@@ -25,8 +25,8 @@
       "artifact_id": "ART-003",
       "content": "Traffic analysis: 100% to whistleblower-platform.onion | No financial sites | No C&C IPs | No file transfers > 1MB | Session duration: 45 min (consistent with interview) | No repeat connections to same source",
       "forensic_anomalies": [
-        "Tráfico restringido a un solo dominio .onion",
-        "Sin transferencias masivas ni conexiones repetidas"
+        "Traffic restricted to a single .onion domain",
+        "No mass transfers or repeat connections"
       ],
       "peirce_layer": "THIRDNESS",
       "type": "network_flow"
@@ -34,18 +34,18 @@
   ],
   "carnegie_pattern_expected": null,
   "case_id": "VIGIA-BEN-014",
-  "case_name": "El Periodista Autorizado — Uso Legítimo de Tor",
+  "case_name": "The Authorized Journalist — Legitimate Tor Use",
   "confidence_expected": 75,
-  "description": "Máquina de periodista de investigación conecta a Tor. Tiene autorización escrita del editor, política de protección de fuentes aprobada por legal, y el tráfico es solo a .onion de whistleblower platform.",
-  "devil_advocate": "La periodista es un insider que usa la autorización de Tor para exfiltrar documentos confidenciales a competidores a través de la plataforma de whistleblowing",
-  "devil_refutation": "La hipótesis de exfiltración no explica por qué no hay transferencias masivas, por qué el tráfico es solo a un dominio, ni por qué las sesiones son cortas y no repetidas. Sin embargo, VIGÍA no tiene visibilidad del contenido de la comunicación.",
+  "description": "Investigative journalist's machine connects to Tor. Has written authorization from editor, legally approved source protection policy, and traffic goes only to whistleblower platform .onion.",
+  "devil_advocate": "The journalist is an insider using the Tor authorization to exfiltrate confidential documents to competitors through the whistleblowing platform",
+  "devil_refutation": "The exfiltration hypothesis does not explain why there are no mass transfers, why traffic goes only to one domain, or why sessions are short and non-repetitive. However, VIGÍA has no visibility into the content of the communication.",
   "expected_mitre_ttps": [],
   "expected_verdict": "ABSTAIN",
   "peirce_expected": {
-    "firstness": "Conexión a Tor y dominio .onion desde máquina corporativa",
-    "secondness": "El usuario tiene autorización escrita del editor y legal. El tráfico es 100% a una plataforma de whistleblowing, sin desviaciones. No hay exfiltración ni C&C.",
-    "thirdness": "Es uso legítimo de herramienta de protección de fuentes por periodista autorizado. La política editorial lo permite. Sin embargo, VIGÍA no puede verificar completamente la intención del periodista ni el contenido de la comunicación."
+    "firstness": "Tor connection and .onion domain from corporate machine",
+    "secondness": "The user has written authorization from editor and legal counsel. Traffic is 100% to a whistleblowing platform, with no deviations. No exfiltration or C&C.",
+    "thirdness": "This is legitimate use of a source protection tool by an authorized journalist. Editorial policy permits it. However, VIGÍA cannot fully verify the journalist's intent or the content of the communication."
   },
   "source_origin": "synthetic_validation",
-  "why_not_malice": "La actividad tiene autorización formal y el patrón de tráfico es consistente con el propósito declarado. PERO VIGÍA no puede verificar el contenido de la comunicación cifrada, por lo que opta por ABSTAIN con nota de contexto legal."
+  "why_not_malice": "The activity has formal authorization and the traffic pattern is consistent with the stated purpose. HOWEVER, VIGÍA cannot verify the content of the encrypted communication, so it opts for ABSTAIN with a legal context note."
 }

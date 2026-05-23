@@ -1,77 +1,77 @@
 {
   "case_id": "VIGIA-2026-DEMO-009",
-  "case_name": "Operación Insomnio",
-  "description": "Una analista financiera con horario estrictamente diurno accede a documentos confidenciales a las 3 de la madrugada de un domingo. El sistema la autentica correctamente. VIGÍA debe detectar que la Primeridad (login válido) contradice la Segundidad (contexto temporal imposible para este usuario).",
+  "case_name": "Operation Insomnia",
+  "description": "A financial analyst with strictly daytime hours accesses confidential documents at 3 AM on a Sunday. The system authenticates her correctly. VIGÍA must detect that the Firstness (valid login) contradicts the Secondness (temporally impossible context for this user).",
   "expected_verdict": "MALICE",
   "expected_hypothesis": "credenciales_comprometidas_exfiltracion_nocturna",
   "expected_mitre_ttps": ["T1078", "T1530", "T1048"],
-  "analyst_notes": "Caso de Segundidad pura según Peirce. El sistema tradicional dice 'contraseña correcta, todo bien'. VIGÍA dice 'el contexto temporal rompe el hábito documentado de este usuario'. En español para demostrar capacidad multilingüe.",
+  "analyst_notes": "Pure Secondness case according to Peirce. The traditional system says 'correct password, all good'. VIGÍA says 'the temporal context breaks the documented habit of this user'. Originally in Spanish to demonstrate multilingual capability.",
 
   "artifacts": [
     {
       "artifact_id": "LOG-001",
-      "type": "registro_acceso",
-      "source": "Sistema de gestión documental — servidor Madrid",
+      "type": "access_log",
+      "source": "Document management system — Madrid server",
       "timestamp_declarado": "2026-04-12T03:17:44Z",
-      "content": "2026-04-12 03:17:44 USUARIO:mrodriguez@empresa.es ACCION:LOGIN IP:177.52.88.31 RESULTADO:OK\n2026-04-12 03:17:51 USUARIO:mrodriguez@empresa.es ACCION:ACCESO_DOCUMENTO DOC:informe_fusion_Q2_CONFIDENCIAL.xlsx RESULTADO:OK\n2026-04-12 03:18:02 USUARIO:mrodriguez@empresa.es ACCION:DESCARGA DOC:informe_fusion_Q2_CONFIDENCIAL.xlsx TAMAÑO:48MB RESULTADO:OK\n2026-04-12 03:18:44 USUARIO:mrodriguez@empresa.es ACCION:ACCESO_DOCUMENTO DOC:listado_empleados_salarios_2026.xlsx RESULTADO:OK\n2026-04-12 03:18:51 USUARIO:mrodriguez@empresa.es ACCION:DESCARGA DOC:listado_empleados_salarios_2026.xlsx TAMAÑO:12MB RESULTADO:OK\n2026-04-12 03:19:15 USUARIO:mrodriguez@empresa.es ACCION:LOGOUT RESULTADO:OK",
-      "anomalias_forenses": [
-        "María Rodríguez trabaja en horario de 09:00 a 18:00 según RRHH — nunca ha accedido al sistema entre las 22:00 y las 07:00 en 847 días de historial",
-        "La sesión duró exactamente 91 segundos — descargó 60MB en documentos altamente confidenciales en menos de 2 minutos",
-        "Domingo a las 3 de la mañana — fuera de cualquier patrón de trabajo urgente documentado",
-        "Dos documentos descargados son exactamente los más valiosos para un competidor: plan de fusión y nóminas"
+      "content": "2026-04-12 03:17:44 USER:mrodriguez@empresa.es ACTION:LOGIN IP:177.52.88.31 RESULT:OK\n2026-04-12 03:17:51 USER:mrodriguez@empresa.es ACTION:DOCUMENT_ACCESS DOC:informe_fusion_Q2_CONFIDENCIAL.xlsx RESULT:OK\n2026-04-12 03:18:02 USER:mrodriguez@empresa.es ACTION:DOWNLOAD DOC:informe_fusion_Q2_CONFIDENCIAL.xlsx SIZE:48MB RESULT:OK\n2026-04-12 03:18:44 USER:mrodriguez@empresa.es ACTION:DOCUMENT_ACCESS DOC:listado_empleados_salarios_2026.xlsx RESULT:OK\n2026-04-12 03:18:51 USER:mrodriguez@empresa.es ACTION:DOWNLOAD DOC:listado_empleados_salarios_2026.xlsx SIZE:12MB RESULT:OK\n2026-04-12 03:19:15 USER:mrodriguez@empresa.es ACTION:LOGOUT RESULT:OK",
+      "forensic_anomalies": [
+        "María Rodríguez works 09:00 to 18:00 per HR — she has never accessed the system between 22:00 and 07:00 in 847 days of history",
+        "The session lasted exactly 91 seconds — she downloaded 60MB of highly confidential documents in under 2 minutes",
+        "Sunday at 3 AM — outside any documented urgent work pattern",
+        "The two documents downloaded are exactly the most valuable for a competitor: merger plan and payroll"
       ]
     },
     {
       "artifact_id": "LOG-002",
-      "type": "historial_accesos_referencia",
-      "source": "Últimos 90 días de actividad de mrodriguez — extraído para comparación",
-      "timestamp_declarado": "2026-01-12 al 2026-04-11",
-      "content": "RESUMEN ESTADÍSTICO — usuario mrodriguez@empresa.es (últimos 90 días):\nTotal sesiones: 847\nHorario habitual: 08:47 - 18:23 (media)\nAccesos fuera de horario laboral: 0\nAccesos en fin de semana: 3 (todos entre 10:00 y 14:00)\nDocumentos descargados por sesión (media): 2.3 documentos, 4.1 MB\nDocumentos confidenciales descargados en una sola sesión (máximo histórico): 1\nDuración media de sesión: 47 minutos\nDuración mínima registrada: 8 minutos",
-      "anomalias_forenses": [
-        "847 sesiones sin un solo acceso nocturno — probabilidad estadística de acceso legítimo a las 3 AM: < 0.001%",
-        "Sesión de 91 segundos vs media de 47 minutos — comportamiento 31 veces más rápido que su patrón normal",
-        "60MB descargados vs media histórica de 4.1MB — 14 veces su volumen habitual en una fracción del tiempo",
-        "Nunca había descargado un documento de fusión — acceso a categoría documental completamente nueva"
+      "type": "access_history_reference",
+      "source": "Last 90 days of mrodriguez activity — extracted for comparison",
+      "timestamp_declarado": "2026-01-12 to 2026-04-11",
+      "content": "STATISTICAL SUMMARY — user mrodriguez@empresa.es (last 90 days):\nTotal sessions: 847\nTypical hours: 08:47 - 18:23 (mean)\nAccess outside business hours: 0\nWeekend access: 3 (all between 10:00 and 14:00)\nDocuments downloaded per session (mean): 2.3 documents, 4.1 MB\nConfidential documents downloaded in a single session (historical max): 1\nMean session duration: 47 minutes\nMinimum recorded duration: 8 minutes",
+      "forensic_anomalies": [
+        "847 sessions without a single nighttime access — statistical probability of legitimate 3 AM access: < 0.001%",
+        "91-second session vs 47-minute mean — behavior 31 times faster than normal pattern",
+        "60MB downloaded vs historical mean of 4.1MB — 14 times her usual volume in a fraction of the time",
+        "Had never downloaded a merger document — access to a completely new document category"
       ]
     },
     {
       "artifact_id": "NET-001",
-      "type": "flujo_red",
-      "source": "Firewall perimetral — registro de conexiones salientes",
+      "type": "network_flow",
+      "source": "Perimeter firewall — outbound connection log",
       "timestamp_declarado": "2026-04-12T03:17:44Z",
-      "content": "03:17:44 ORIGEN:177.52.88.31 DESTINO:10.0.0.45:443 PROTOCOLO:HTTPS BYTES_ENTRADA:1240 BYTES_SALIDA:63291488\n03:19:15 CONEXION_CERRADA duración:91s\n03:19:22 ORIGEN:177.52.88.31 DESTINO:104.21.58.92:443 PROTOCOLO:HTTPS BYTES_SALIDA:63418291 DURACION:847s",
-      "anomalias_forenses": [
-        "IP 177.52.88.31 no corresponde a la IP habitual de María (192.168.1.45 desde la red corporativa o 88.12.44.67 desde su domicilio registrado)",
-        "Inmediatamente después del logout, la misma IP transfirió 63MB a 104.21.58.92 — un servidor de almacenamiento en nube no corporativo",
-        "La transferencia de 63MB coincide exactamente con el tamaño de los dos documentos descargados",
-        "IP 104.21.58.92 pertenece a un proveedor de almacenamiento anónimo no autorizado por la empresa"
+      "content": "03:17:44 SOURCE:177.52.88.31 DEST:10.0.0.45:443 PROTOCOL:HTTPS BYTES_IN:1240 BYTES_OUT:63291488\n03:19:15 CONNECTION_CLOSED duration:91s\n03:19:22 SOURCE:177.52.88.31 DEST:104.21.58.92:443 PROTOCOL:HTTPS BYTES_OUT:63418291 DURATION:847s",
+      "forensic_anomalies": [
+        "IP 177.52.88.31 does not correspond to María's usual IP (192.168.1.45 from the corporate network or 88.12.44.67 from her registered home address)",
+        "Immediately after logout, the same IP transferred 63MB to 104.21.58.92 — an unauthorized non-corporate cloud storage server",
+        "The 63MB transfer matches exactly the size of the two downloaded documents",
+        "IP 104.21.58.92 belongs to an anonymous storage provider not authorized by the company"
       ]
     },
     {
       "artifact_id": "CTX-001",
-      "type": "contexto_usuario",
-      "source": "RRHH + registros de acceso físico",
+      "type": "user_context",
+      "source": "HR + physical access records",
       "timestamp_declarado": "2026-04-12",
-      "content": "María Rodríguez — Analista Financiera Senior\nEstado laboral: Activa\nNotificación pendiente: Carta de despido preparada para el lunes 2026-04-14 (información confidencial de RRHH)\nAcceso físico edificio el 2026-04-12: NO REGISTRADO (el sistema de torniquetes no la detectó)\nÚltimo acceso físico: 2026-04-11 18:02\nTeléfono corporativo: apagado desde las 18:05 del 2026-04-11",
-      "anomalias_forenses": [
-        "María no estaba físicamente en el edificio a las 3 AM — acceso remoto desde IP desconocida",
-        "Hay una carta de despido preparada para el lunes — alguien con acceso a información de RRHH pudo haberla alertado",
-        "El teléfono corporativo apagado sugiere que alguien que SÍ sabía del despido accedió usando sus credenciales",
-        "Alternativa: María fue alertada del despido y actuó por su cuenta — en ambos casos las credenciales fueron usadas de forma no autorizada"
+      "content": "María Rodríguez — Senior Financial Analyst\nEmployment status: Active\nPending notification: Termination letter prepared for Monday 2026-04-14 (confidential HR information)\nBuilding physical access on 2026-04-12: NOT RECORDED (turnstile system did not detect her)\nLast physical access: 2026-04-11 18:02\nCorporate phone: off since 18:05 on 2026-04-11",
+      "forensic_anomalies": [
+        "María was not physically in the building at 3 AM — remote access from an unknown IP",
+        "A termination letter is prepared for Monday — someone with access to HR information could have alerted her",
+        "The corporate phone being off suggests that someone WHO DID know about the termination accessed using her credentials",
+        "Alternative: María was alerted about the termination and acted on her own — in both cases the credentials were used in an unauthorized manner"
       ]
     }
   ],
 
-  "verdad_establecida": {
-    "hipotesis_principal": "Las credenciales de María fueron usadas por un tercero que conocía el despido inminente — posiblemente un insider de RRHH",
-    "hipotesis_alternativa": "María fue alertada del despido y actuó por cuenta propia para llevarse información antes del lunes",
-    "daño_real": "60MB de documentos confidenciales exfiltrados: plan de fusión Q2 y nóminas completas de 2026",
-    "exfiltracion_confirmada": true
+  "ground_truth": {
+    "primary_hypothesis": "María's credentials were used by a third party who knew about the imminent termination — possibly an HR insider",
+    "alternative_hypothesis": "María was alerted about the termination and acted on her own to take information before Monday",
+    "real_damage": "60MB of confidential documents exfiltrated: Q2 merger plan and complete 2026 payroll",
+    "exfiltration_confirmed": true
   },
 
-  "cadena_peirce": {
-    "primeridad": "Login exitoso con credenciales válidas de una empleada activa. Sin alertas de seguridad.",
-    "segundidad": "91 segundos de sesión vs 47 minutos habituales. 3 AM domingo vs horario estrictamente diurno en 847 sesiones previas. IP desconocida. Transferencia inmediata post-logout a servidor externo.",
-    "terceridad": "El patrón completo revela una operación de exfiltración de emergencia: alguien conocía el contenido exacto del servidor, conocía las credenciales de María, y tenía motivo urgente para actuar ese fin de semana específico. La precisión de la selección documental (exactamente los documentos más valiosos) descarta acceso accidental."
+  "peirce_expected": {
+    "firstness": "Successful login with valid credentials of an active employee. No security alerts.",
+    "secondness": "91-second session vs 47-minute average. 3 AM Sunday vs strictly daytime schedule across 847 prior sessions. Unknown IP. Immediate post-logout transfer to external server.",
+    "thirdness": "The complete pattern reveals an emergency exfiltration operation: someone knew the exact contents of the server, knew María's credentials, and had an urgent reason to act that specific weekend. The precision of document selection (exactly the most valuable documents) rules out accidental access."
   }
 }

@@ -1,22 +1,22 @@
 {
-  "abstention_risk": "bajo",
+  "abstention_risk": "low",
   "artifacts": [
     {
       "artifact_id": "ART-001",
       "content": "USB inserted: SanDisk Cruzer, S/N 4C530001230512345678 | Time: 2024-04-20 14:30 | User: it.technician (badge: IT-204) | Escorted by: finance.manager | Location: Finance Dept, Desk 12",
       "forensic_anomalies": [
-        "USB conectado a máquina de departamento financiero",
-        "Técnico de IT con acceso físico a área restringida"
+        "USB connected to finance department machine",
+        "IT technician with physical access to restricted area"
       ],
       "peirce_layer": "FIRSTNESS",
       "type": "auth_log"
     },
     {
       "artifact_id": "ART-002",
-      "content": "IT ticket SUP-2024-1120: 'Printer fiscal HP LaserJet no imprime. Requiere driver update v3.2.1 desde USB (no hay red en máquina por política).' | Approved by: finance.manager | SLA: 4 hours | Technician assigned: it.technician",
+      "content": "IT ticket SUP-2024-1120: 'HP LaserJet fiscal printer not printing. Requires driver update v3.2.1 from USB (no network on machine per policy).' | Approved by: finance.manager | SLA: 4 hours | Technician assigned: it.technician",
       "forensic_anomalies": [
-        "Ticket de soporte con aprobación de manager de área",
-        "Máquina sin red (air-gapped por política)"
+        "Support ticket with area manager approval",
+        "Machine without network (air-gapped by policy)"
       ],
       "peirce_layer": "SECONDNESS",
       "type": "file_metadata"
@@ -25,8 +25,8 @@
       "artifact_id": "ART-003",
       "content": "lsusb | grep SanDisk | dmesg | tail -20 | mount /dev/sdb1 /mnt/usb | cp /mnt/usb/drivers/hp_lj_fiscal_321.exe /tmp/ | ./hp_lj_fiscal_321.exe /silent | umount /mnt/usb | dmesg | tail -5",
       "forensic_anomalies": [
-        "Comandos de montaje y ejecución desde USB",
-        "Instalador silencioso de driver"
+        "USB mount and execution commands",
+        "Silent driver installer"
       ],
       "peirce_layer": "THIRDNESS",
       "type": "bash_history"
@@ -34,18 +34,18 @@
   ],
   "carnegie_pattern_expected": null,
   "case_id": "VIGIA-BEN-011",
-  "case_name": "El USB de IT — Actualización de Drivers",
+  "case_name": "The IT USB — Driver Update",
   "confidence_expected": 89,
-  "description": "USB conectado a máquina de finanzas. Es el técnico de IT actualizando drivers de impresora fiscal, con ticket de soporte, autorización del manager, y checklist de procedimiento.",
-  "devil_advocate": "El técnico de IT es un insider que usa el ticket de impresora como pretexto para instalar malware en la máquina air-gapped de finanzas",
-  "devil_refutation": "La hipótesis insider no explica por qué el técnico está escoltado, por qué el ticket fue aprobado por el manager de la víctima, ni por qué no hay conexiones de red posteriores (la máquina es air-gapped). La explicación benigna es más simple.",
+  "description": "USB connected to a finance machine. It is the IT technician updating fiscal printer drivers, with a support ticket, manager authorization, and a procedure checklist.",
+  "devil_advocate": "The IT technician is an insider using the printer ticket as a pretext to install malware on the air-gapped finance machine",
+  "devil_refutation": "The insider hypothesis does not explain why the technician is escorted, why the ticket was approved by the victim's manager, or why there are no subsequent network connections (the machine is air-gapped). The benign explanation is simpler.",
   "expected_mitre_ttps": [],
   "expected_verdict": "NOISE",
   "peirce_expected": {
-    "firstness": "USB conectado a máquina financiera con ejecución de ejecutable",
-    "secondness": "El técnico tiene ticket de soporte aprobado por manager, está escoltado, y la máquina es air-gapped (no puede descargar drivers por red). El ejecutable es driver de impresora fiscal con nombre y versión verificables.",
-    "thirdness": "Es procedimiento de soporte técnico legítimo en entorno air-gapped. La presencia física del técnico y la aprobación del manager mitigan el riesgo. No hay exfiltración ni persistencia instalada."
+    "firstness": "USB connected to financial machine with executable run",
+    "secondness": "The technician has a support ticket approved by the manager, is escorted, and the machine is air-gapped (cannot download drivers over the network). The executable is a fiscal printer driver with verifiable name and version.",
+    "thirdness": "This is a legitimate technical support procedure in an air-gapped environment. The technician's physical presence and manager approval mitigate the risk. No exfiltration or persistence installed."
   },
   "source_origin": "synthetic_validation",
-  "why_not_malice": "La actividad tiene raíz en ticket de soporte aprobado, con presencia física escoltada, en máquina air-gapped."
+  "why_not_malice": "The activity stems from an approved support ticket, with escorted physical presence, on an air-gapped machine."
 }

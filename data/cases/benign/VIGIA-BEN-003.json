@@ -1,32 +1,32 @@
 {
-  "abstention_risk": "medio",
+  "abstention_risk": "medium",
   "artifacts": [
     {
       "artifact_id": "ART-001",
-      "content": "[dev_junior]: 'Chicos, soy un desastre, borré la tabla customers sin WHERE en el DELETE. Ayuda por favor. Estoy en llamada con el DBA para recovery.'",
+      "content": "[dev_junior]: 'Guys, I'm a disaster, I deleted the customers table without a WHERE in the DELETE. Help please. I'm on a call with the DBA for recovery.'",
       "forensic_anomalies": [
-        "Lenguaje de incompetencia en canal público",
-        "Admisión de error grave sin solicitud de cubrirlo"
+        "Language of incompetence in public channel",
+        "Admission of serious error without request to cover it up"
       ],
       "peirce_layer": "FIRSTNESS",
       "type": "slack_message"
     },
     {
       "artifact_id": "ART-002",
-      "content": "mysql> DELETE FROM customers; (sin WHERE) | mysql> SHOW TABLES; (pánico) | mysql> CALL recovery_procedure(); | 2024-01-15 14:23:05 | User: dev_junior | Session duration: 3 min (pánico, no exfiltración)",
+      "content": "mysql> DELETE FROM customers; (no WHERE) | mysql> SHOW TABLES; (panic) | mysql> CALL recovery_procedure(); | 2024-01-15 14:23:05 | User: dev_junior | Session duration: 3 min (panic, not exfiltration)",
       "forensic_anomalies": [
-        "Comando destructivo ejecutado",
-        "Intento inmediato de recuperación (no de ocultamiento)"
+        "Destructive command executed",
+        "Immediate recovery attempt (not concealment attempt)"
       ],
       "peirce_layer": "SECONDNESS",
       "type": "bash_history"
     },
     {
       "artifact_id": "ART-003",
-      "content": "HR record: dev_junior, hired 2023-12-01 | Training status: DB basics incomplete | Supervisor: 'Es su primer mes, le di acceso de lectura pero olvidé restringir DROP' | Incident report filed by supervisor at 14:30",
+      "content": "HR record: dev_junior, hired 2023-12-01 | Training status: DB basics incomplete | Supervisor: 'It is his first month, I gave him read access but forgot to restrict DROP' | Incident report filed by supervisor at 14:30",
       "forensic_anomalies": [
-        "Empleado junior con permisos excesivos",
-        "Supervisor asume responsabilidad del error de configuración"
+        "Junior employee with excessive permissions",
+        "Supervisor assumes responsibility for configuration error"
       ],
       "peirce_layer": "THIRDNESS",
       "type": "auth_log"
@@ -34,18 +34,18 @@
   ],
   "carnegie_pattern_expected": null,
   "case_id": "VIGIA-BEN-003",
-  "case_name": "El Desastre Real — Incompetencia No Armada",
+  "case_name": "The Real Disaster — Unarmed Incompetence",
   "confidence_expected": 82,
-  "description": "Usuario junior envía ticket: 'Soy un desastre, borré la tabla de clientes sin querer'. Análisis muestra que realmente ejecutó DROP TABLE sin WHERE, el log de recuperación está activo, y el supervisor confirmó que es su primer mes.",
-  "devil_advocate": "El junior es un insider que finge torpeza para destruir datos y luego pide 'recovery' para ganar acceso extendido al sistema",
-  "devil_refutation": "La hipótesis insider no explica por qué destruyó datos sin backup previo, por qué el supervisor asume la culpa, ni por qué no hay exfiltración. Un atacante real no destruiría sin robar primero.",
+  "description": "Junior user submits ticket: 'I'm a disaster, I accidentally deleted the customers table'. Analysis shows they actually executed DELETE without WHERE, the recovery log is active, and the supervisor confirmed it is their first month.",
+  "devil_advocate": "The junior employee is an insider faking clumsiness to destroy data and then requesting 'recovery' to gain extended system access",
+  "devil_refutation": "The insider hypothesis does not explain why data was destroyed without a prior backup, why the supervisor assumes blame, or why there is no exfiltration. A real attacker would not destroy without stealing first.",
   "expected_mitre_ttps": [],
   "expected_verdict": "NOISE",
   "peirce_expected": {
-    "firstness": "Mensaje de incompetencia y comando destructivo ejecutado",
-    "secondness": "El usuario no oculta el error; busca ayuda inmediatamente y activa recovery. No hay exfiltración, no hay anti-forense, no hay escalada.",
-    "thirdness": "Es un error humano real de un empleado junior con permisos mal configurados. La 'incompetencia' no es armada porque no hay segunda acción hostil que la aproveche."
+    "firstness": "Message of incompetence and destructive command executed",
+    "secondness": "The user does not conceal the error; seeks help immediately and initiates recovery. No exfiltration, no anti-forensics, no escalation.",
+    "thirdness": "This is a real human error by a junior employee with misconfigured permissions. The 'incompetence' is not weaponized because there is no second hostile action to exploit it."
   },
   "source_origin": "synthetic_validation",
-  "why_not_malice": "La secuencia es error→pánico→ayuda, no error→ocultamiento→exfiltración. No hay vector de ataque aprovechado."
+  "why_not_malice": "The sequence is error→panic→help, not error→concealment→exfiltration. No attack vector was exploited."
 }

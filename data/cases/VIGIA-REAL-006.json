@@ -5,66 +5,66 @@
     "schema_version": "1.0",
     "source_file": "vigia_forensic_cases.json"
   },
-  "abstention_risk": "bajo",
+  "abstention_risk": "low",
   "artifacts": [
     {
       "artifact_id": "ART-001",
-      "content": "Email #1: From: alison@m57.biz | To: jean@m57.biz | Date: 2008-07-19 16:39:57 PDT | Subject: background checks | Return-Path: simsong@xy.dreamhostps.com [SPOOFED] | Reply-To: alison@m57.biz (legítimo) | Nota: 'por favor no incluyas el texto de este email en tu respuesta'",
+      "content": "Email #1: From: alison@m57.biz | To: jean@m57.biz | Date: 2008-07-19 16:39:57 PDT | Subject: background checks | Return-Path: simsong@xy.dreamhostps.com [SPOOFED] | Reply-To: alison@m57.biz (legitimate) | Note: 'please do not include the text of this email in your reply'",
       "forensic_anomalies": [
-        "Return-Path real (simsong@xy.dreamhostps.com) no coincide con el From (alison@m57.biz)",
-        "La nota de 'no incluyas el texto' es altamente sospechosa como intento de destruir evidencia"
+        "Actual Return-Path (simsong@xy.dreamhostps.com) does not match the From address (alison@m57.biz)",
+        "The note 'do not include the text' is highly suspicious as an attempt to destroy evidence"
       ],
       "peirce_layer": "FIRSTNESS",
       "type": "email_header"
     },
     {
       "artifact_id": "ART-002",
-      "content": "Email #2: From: alison@m57.biz | To: jean@m57.biz | Date: 2008-07-19 18:22:45 PDT | Subject: Please send me the information now | Return-Path: simsong@xy.dreamhostps.com [SPOOFED] | Reply-To: tuckergorge@gmail.com [MALICIOSO - CAMBIADO desde email #1]",
+      "content": "Email #2: From: alison@m57.biz | To: jean@m57.biz | Date: 2008-07-19 18:22:45 PDT | Subject: Please send me the information now | Return-Path: simsong@xy.dreamhostps.com [SPOOFED] | Reply-To: tuckergorge@gmail.com [MALICIOUS - CHANGED from email #1]",
       "forensic_anomalies": [
-        "El Reply-To cambió de alison@m57.biz a tuckergorge@gmail.com entre emails consecutivos",
-        "El mismo Return-Path spoofeado indica campaña coordinada de phishing",
-        "CAMBIO DE REPLY-TO entre emails consecutivos es la firma definitiva del ataque de spoofing"
+        "Reply-To changed from alison@m57.biz to tuckergorge@gmail.com between consecutive emails",
+        "The same spoofed Return-Path indicates a coordinated phishing campaign",
+        "REPLY-TO CHANGE between consecutive emails is the definitive signature of the spoofing attack"
       ],
       "peirce_layer": "SECONDNESS",
       "type": "email_header"
     },
     {
       "artifact_id": "ART-003",
-      "content": "Archivo: m57biz.xls | Ubicación: Desktop de Jean (C:/Documents and Settings/Jean/Desktop/) | Fecha creación: 07/20/2008 1:28:03 AM GMT | Encriptado: No | Contenido: Nombres, posiciones, salarios ($1,009,000 total) y SSNs de 8 empleados | Sector inicial: 5,160,295",
+      "content": "File: m57biz.xls | Location: Jean's Desktop (C:/Documents and Settings/Jean/Desktop/) | Creation date: 07/20/2008 1:28:03 AM GMT | Encrypted: No | Content: Names, positions, salaries ($1,009,000 total) and SSNs of 8 employees | Initial sector: 5,160,295",
       "forensic_anomalies": [
-        "Archivo con SSNs y salarios almacenado sin encriptar en Desktop",
-        "El archivo fue creado minutos antes de ser enviado al Reply-To malicioso"
+        "File with SSNs and salaries stored unencrypted on Desktop",
+        "The file was created minutes before being sent to the malicious Reply-To"
       ],
       "peirce_layer": "FIRSTNESS",
       "type": "file_metadata"
     },
     {
       "artifact_id": "ART-004",
-      "content": "Respuesta de Alison a Jean: 'What's a sure thing?' (16:50:20 PDT) | Email de exfiltración: Jean → tuckergorge@gmail.com con adjunto M57biz.xls (18:28:45 PDT) | Email #3 del atacante: 'Thanks!' (22:03:40 PDT)",
+      "content": "Alison's reply to Jean: 'What's a sure thing?' (16:50:20 PDT) | Exfiltration email: Jean → tuckergorge@gmail.com with attachment M57biz.xls (18:28:45 PDT) | Attacker's email #3: 'Thanks!' (22:03:40 PDT)",
       "forensic_anomalies": [
-        "La confusión de Alison demuestra que ella no envió el email original",
-        "El timing de 6 horas entre primer email y confirmación del atacante muestra ventana de ataque comprimida"
+        "Alison's confusion proves she did not send the original email",
+        "The 6-hour window between first email and attacker's confirmation shows a compressed attack window"
       ],
       "peirce_layer": "SECONDNESS",
       "type": "bash_history"
     },
     {
       "artifact_id": "ART-005",
-      "content": "Binarios de sistema eliminados: ipconfig.exe, net.exe | AIM6 instalado con toolbar bundles sospechosos | Archivos HTML cached: rcstatus.htm, InstallStatus[1].htm (prompts falsos de Microsoft) | Artefactos de Remote Assistance en directorios Windows Help",
+      "content": "Deleted system binaries: ipconfig.exe, net.exe | AIM6 installed with suspicious toolbar bundles | Cached HTML files: rcstatus.htm, InstallStatus[1].htm (fake Microsoft prompts) | Remote Assistance artifacts in Windows Help directories",
       "forensic_anomalies": [
-        "Eliminación de binarios del sistema es indicador de anti-forense o compromiso previo",
-        "Presencia de HTML con prompts falsos de Microsoft sugiere técnicas de ingeniería social adicionales"
+        "Deletion of system binaries is an indicator of anti-forensics or prior compromise",
+        "Presence of HTML with fake Microsoft prompts suggests additional social engineering techniques"
       ],
       "peirce_layer": "THIRDNESS",
       "type": "process_list"
     }
   ],
-  "carnegie_pattern_expected": "Noble motive appeal (falsa urgencia de cliente)",
+  "carnegie_pattern_expected": "Noble motive appeal (false client urgency)",
   "case_id": "VIGIA-REAL-006",
   "case_name": "Digital Corpora M57-Jean Spear-Phishing",
   "confidence_expected": 91,
-  "description": "La CFO Jean Jones de M57.Biz recibió emails spoofeados aparentemente de la presidenta Alison solicitando una hoja de cálculo con datos confidenciales de empleados. El atacante manipuló el Reply-To para exfiltrar los datos a tuckergorge@gmail.com. Jean actuó de buena fe pero el ataque resultó en exfiltración de documentos confidenciales.",
-  "devil_advocate": "Jean actuó de buena fe siguiendo procedimiento estándar de atención al cliente; el email parecía legítimo y venía de su superior jerárquico",
+  "description": "CFO Jean Jones of M57.Biz received spoofed emails apparently from president Alison requesting a spreadsheet with confidential employee data. The attacker manipulated the Reply-To to exfiltrate the data to tuckergorge@gmail.com. Jean acted in good faith but the attack resulted in exfiltration of confidential documents.",
+  "devil_advocate": "Jean acted in good faith following standard client service procedure; the email appeared legitimate and came from her direct superior",
   "expected_mitre_ttps": [
     "T1566.002",
     "T1567.001",
@@ -73,9 +73,9 @@
   ],
   "expected_verdict": "MALICE",
   "peirce_expected": {
-    "firstness": "Email aparentemente de presidenta solicitando datos confidenciales; Return-Path spoofeado a simsong@xy.dreamhostps.com",
-    "secondness": "Reply-To cambia de alison@m57.biz (legítimo) a tuckergorge@gmail.com (malicioso) entre emails consecutivos; Alison genuinamente confundida por la respuesta de Jean",
-    "thirdness": "Atacante realizó spear-phishing con spoofing de identidad jerárquica para inducir exfiltración de datos financieros y personales de empleados"
+    "firstness": "Email apparently from president requesting confidential data; Return-Path spoofed to simsong@xy.dreamhostps.com",
+    "secondness": "Reply-To changes from alison@m57.biz (legitimate) to tuckergorge@gmail.com (malicious) between consecutive emails; Alison genuinely confused by Jean's reply",
+    "thirdness": "Attacker performed spear-phishing with hierarchical identity spoofing to induce exfiltration of employees' financial and personal data"
   },
   "source_dataset": "Digital Corpora - M57-Jean Scenario",
   "source_origin": "public_dataset",

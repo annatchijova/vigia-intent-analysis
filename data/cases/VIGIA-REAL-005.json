@@ -5,34 +5,34 @@
     "schema_version": "1.0",
     "source_file": "vigia_forensic_cases.json"
   },
-  "abstention_risk": "medio",
+  "abstention_risk": "medium",
   "artifacts": [
     {
       "artifact_id": "ART-001",
-      "content": "Archivo README en directorio Documents del usuario | Estado: Encriptado con AES | Sin contraseña disponible | Posible versión sin encriptar en caché del sistema | Archivo keys en directorio Downloads | Estado: Encriptado con clave Pública/Privada GPG/PGP",
+      "content": "README file in user's Documents directory | Status: Encrypted with AES | No password available | Possible unencrypted version in system cache | keys file in Downloads directory | Status: Encrypted with GPG/PGP Public/Private key",
       "forensic_anomalies": [
-        "Uso de encriptación AES para ocultar un archivo de comunicación en Documents",
-        "Uso simultáneo de encriptación asimétrica GPG para otro mensaje"
+        "Use of AES encryption to conceal a communication file in Documents",
+        "Simultaneous use of asymmetric GPG encryption for another message"
       ],
       "peirce_layer": "FIRSTNESS",
       "type": "file_metadata"
     },
     {
       "artifact_id": "ART-002",
-      "content": "Volumen BitLocker: Nombre='R2D2' | Estado: Encriptación completa de disco activa | Recovery key posiblemente almacenada en AD, USB o archivo de respaldo | Tipo: Full disk encryption",
+      "content": "BitLocker volume: Name='R2D2' | Status: Full disk encryption active | Recovery key possibly stored in AD, USB, or backup file | Type: Full disk encryption",
       "forensic_anomalies": [
-        "Volumen con nombre no estándar (R2D2) en lugar de etiqueta descriptiva",
-        "BitLocker aplicado a volumen específico sugiere intención de ocultar contenido"
+        "Volume with non-standard name (R2D2) instead of a descriptive label",
+        "BitLocker applied to a specific volume suggests intent to conceal content"
       ],
       "peirce_layer": "SECONDNESS",
       "type": "file_metadata"
     },
     {
       "artifact_id": "ART-003",
-      "content": "GPG/PGP keys en perfil de usuario | Comunicación encriptada asimétrica con parte desconocida | Archivo 'keys' contiene mensaje para desencriptar | Posible par de claves privadas recuperables de la imagen",
+      "content": "GPG/PGP keys in user profile | Asymmetric encrypted communication with unknown party | 'keys' file contains message to decrypt | Possible private key pairs recoverable from the image",
       "forensic_anomalies": [
-        "Uso de encriptación asimétrica para comunicación secreta indica coordinación previa",
-        "Múltiples métodos criptográficos aplicados sugieren capas de protección deliberadas"
+        "Use of asymmetric encryption for secret communication indicates prior coordination",
+        "Multiple cryptographic methods applied suggest deliberate layers of protection"
       ],
       "peirce_layer": "THIRDNESS",
       "type": "process_list"
@@ -42,8 +42,8 @@
   "case_id": "VIGIA-REAL-005",
   "case_name": "Ali Hadi Encrypt Them All Case",
   "confidence_expected": 88,
-  "description": "Jane ha estado usando múltiples métodos de encriptación para ocultar comunicación: un archivo README encriptado con AES en Documents, un volumen BitLocker nombrado R2D2, y un archivo keys en Downloads encriptado con GPG/PGP de clave pública/privada.",
-  "devil_advocate": "Jane es profesional de seguridad que aplica buenas prácticas de protección de datos personales y la empresa no tiene política contra el cifrado",
+  "description": "Jane has been using multiple encryption methods to conceal communication: an AES-encrypted README file in Documents, a BitLocker volume named R2D2, and a keys file in Downloads encrypted with GPG/PGP public/private key.",
+  "devil_advocate": "Jane is a security professional applying good personal data protection practices and the company has no policy against encryption",
   "expected_mitre_ttps": [
     "T1027",
     "T1486",
@@ -52,9 +52,9 @@
   ],
   "expected_verdict": "SUSPICION",
   "peirce_expected": {
-    "firstness": "Múltiples archivos encriptados con diferentes métodos criptográficos (AES, BitLocker, GPG)",
-    "secondness": "La combinación de capas de encriptación y el nombre R2D2 para el volumen BitLocker indican intento sistemático de ocultar información",
-    "thirdness": "Jane ha estado comunicándose secretamente usando múltiples métodos de encriptación para evadir monitoreo, posiblemente filtrando información confidencial"
+    "firstness": "Multiple files encrypted with different cryptographic methods (AES, BitLocker, GPG)",
+    "secondness": "The combination of encryption layers and the name R2D2 for the BitLocker volume indicate a systematic attempt to conceal information",
+    "thirdness": "Jane has been secretly communicating using multiple encryption methods to evade monitoring, possibly leaking confidential information"
   },
   "source_dataset": "Ali Hadi Challenge #9 - Encrypt Them All Case",
   "source_origin": "public_dataset",
