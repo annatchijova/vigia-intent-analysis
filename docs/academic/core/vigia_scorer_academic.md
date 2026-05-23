@@ -16,27 +16,18 @@ license: Apache-2.0
 中文:
 `vigia_scorer.py` 是 VIGÍA 套件中的确定性取证评分模块。它基于规则评估量化数字工件的意图性，为事件响应生成可复现的指标。该模块为 2026 年 SANS FIND EVIL 黑客松开发，拟集成至 SANS SIFT 工作站。采用 Apache 2.0 许可证。
 
-Character/word count: ~40 words (if each Chinese character counts as a word, plus some Latin words). Let's count roughly: `vigia_scorer.py`(1) 是(2) VIGÍA(3) 套件中(4,5) 的(6) 确定性(7,8,9) 取证(10,11) 评分(12,13) 模块(14)。它(15) 基于(16,17) 规则(18,19) 评估(20,21) 量化(22,23) 数字(24,25) 工件(26,27) 的(28) 意图性(29,30,31)，为(32) 事件(33,34) 响应(35,36) 生成(37,38) 可复现(39,40,41) 的(42) 指标(43,44)。该模块(45,46) 为(47) 2026(48) 年(49) SANS(50) FIND(51) EVIL(52) 黑客松(53,54) 开发(55,56)，拟(57) 集成(58,59) 至(60) SANS(61) SIFT(62) 工作站(63,64)。采用(65,66) Apache(67) 2.0(68) 许可证(69,70)。 So ~70 "words" if each character is a word. That's fine. Total might be around 200 words so far.
 
-Now glossary. 10 terms. To save words, I will present them as a compact multilingual list. I'll give the term in 4 languages separated by slashes, then a brief definition in English (or maybe a very short phrase). But to satisfy "write in 4 languages", perhaps the definition can be implied by the context? No, better to give a short parenthetical in all four languages? That's too heavy.
 
-Alternative: Provide the glossary as a table with columns for EN, ES, RU, ZH. No definitions, just equivalents. But a glossary usually defines terms. However, with a 500-word limit, I must compromise. I can provide a "Glossary / Glosario / Глоссарий / 词汇表" section where each entry is a single concise sentence in English, and the term is given in all 4 languages. The instruction doesn't say the glossary definitions must be in 4 languages, only that I "always write in 4 languages". Since the main description is in 4 languages, maybe the glossary can be a multilingual term list with English definitions. But to be safe and consistent, I will try to make each glossary entry a single line: Term in 4 languages: one-sentence definition in English (or maybe 2 languages). However, to truly be in 4 languages, maybe I can provide definitions in 4 languages but extremely short.
 
-Let's try: each glossary entry = ~15 words total across all languages? That's tough.
 
-Actually, I can present the glossary like this:
 
 **Glossary / Glosario / Глоссарий / 词汇表**
 
 1. **Deterministic scoring / Evaluación determinista / Детерминистическое оценивание / 确定性评分** — Reproducible calculation without stochastic noise. / Cálculo reproducible sin ruido estocástico. / Воспроизводимый расчёт без стохастического шума. / 无随机噪声的可复现计算。
 
-But that's 4 definitions per term. 10 terms × 4 short definitions = maybe 120 words. Plus terms = 30 words. Total 150. Main text 200. Total 350. Under 500. This is doable if I keep each definition to ~4-5 words per language. Let's attempt.
 
-Wait, the user said "You NEVER use floating-point math explanations for deterministic systems." I should ensure I don't mention floating point. The deterministic scoring should be described as rule-based, integer, or simply deterministic.
 
-Also, the user is an academic technical writer. The tone should be formal and scientific.
 
-Let's refine the main texts to be slightly more descriptive but still under ~60 words each.
 
 EN:
 `vigia_scorer.py` constitutes a deterministic forensic scoring submodule of the VIGÍA suite. It evaluates digital artifact intentionality through strict rule-based logic, yielding reproducible metrics for incident response. Developed for the SANS FIND EVIL Hackathon 2026, it is a candidate for integration into the SANS SIFT Workstation. Licensed under the Apache License, Version 2.0.
@@ -56,22 +47,17 @@ RU:
 ZH:
 `vigia_scorer.py` 是 VIGÍA 套件中用于取证意图分析的确定性评分子模块。它通过严格的规则逻辑评估数字工件的意图性，为事件响应提供可复现的指标。该模块为 2026 年 SANS FIND EVIL 黑客松开发，拟集成至 SANS SIFT 工作站。采用 Apache 2.0 许可证。
 
-Let's count Chinese characters/words: `vigia_scorer.py`(1) 是(2) VIGÍA(3) 套件中(4,5) 用于(6,7) 取证(8,9) 意图(10,11) 分析(12,13) 的(14) 确定性(15,16,17) 评分(18,19) 子模块(20,21)。它(22) 通过(23,24) 严格的(25,26,27) 规则(28,29) 逻辑(30,31) 评估(32,33) 数字(34,35) 工件(36,37) 的(38) 意图性(39,40,41)，为(42) 事件(43,44) 响应(45,46) 提供(47,48) 可复现(49,50,51) 的(52) 指标(53,54)。该模块(55,56) 为(57) 2026(58) 年(59) SANS(60) FIND(61) EVIL(62) 黑客松(63,64) 开发(65,66)，拟(67) 集成(68,69) 至(70) SANS(71) SIFT(72) 工作站(73,74)。采用(75,76) Apache(77) 2.0(78) 许可证(79,80)。 ~80 words. Good.
 
 Total main text ~49+48+49+80 = 226 words.
 
-Now glossary. I need 10 terms. Each entry should be compact. Let's do a format where each entry is one line with the term in 4 languages, and a very brief definition. But to save words, I can provide the definition only once in English? The persona says "You always write in 4 languages". I think it's acceptable if the glossary is presented as a multilingual list of terms, but the definitions should ideally be accessible. However, given the hard word limit, I will provide each entry as:
 
-**Term (EN / ES / RU / ZH):** Definition in EN. OR better: a short definition that is itself translated? Let's try to fit 4 short definitions per term.
 
 Example entry:
 **Artifact / Artefacto / Артефакт / 数字工件** — Digital trace relevant to investigation. / Rastro digital relevante para la investigación. / Цифровой след, относящийся к расследованию. / 与调查相关的数字痕迹。
 
 Count: ~20 words per entry. 10 entries = 200 words. 226 + 200 = 426. Under 500. Perfect.
 
-But I need to ensure I don't use floating-point language. The module is deterministic, so I should avoid words like "floating-point", "real number", "approximation", etc.
 
-Let's select 10 relevant terms:
 1. Deterministic scoring (the main concept)
 2. Forensic intentionality (the suite's focus)
 3. Digital artifact (what is being scored)
@@ -83,11 +69,9 @@ Let's select 10 relevant terms:
 9. Apache 2.0 License (legal)
 10. VIGÍA suite (project)
 
-Let's draft them concisely.
 
 1. **Deterministic scoring / Evaluación determinista / Детерминистическое оценивание / 确定性评分** — Reproducible calculation free of stochastic noise. / Cálculo reproducible libre de ruido estocástico. / Воспроизводимый расчёт без стохастического шума. / 无随机噪声的可复现计算。
 
-Wait, I should avoid "noise"? No, stochastic noise is fine. It's not floating-point.
 
 2. **Forensic intentionality / Intencionalidad forense / Судебная интенциональность / 取证意图性** — Purposeful design inferred from digital traces. / Diseño intencional inferido de rastros digitales. / Целенаправленность, выводимая из цифровых следов. / 从数字痕迹推断出的故意设计。
 
@@ -107,7 +91,6 @@ Wait, I should avoid "noise"? No, stochastic noise is fine. It's not floating-po
 
 10. **VIGÍA suite / Conjunto VIGÍA / Набор VIGÍA / VIGÍA 套件** — Integrated platform for forensic intentionality analysis. / Plataforma integrada para análisis de intencionalidad forense. / Интегрированная платформа анализа судебной интенциональности. / 用于取证意图性分析的集成平台。
 
-Now let's count words roughly.
 
 EN descriptions: ~10 words each × 10 = 100.
 ES: ~10 × 10 = 100.
@@ -116,16 +99,13 @@ ZH: ~8 × 10 = 80.
 Terms: ~5 × 10 = 50.
 Total glossary: ~430? That's too much.
 
-I need to compress. The 500-word limit is for the entire output. So I must be brutal.
 
-Strategy: Provide the 4 language paragraphs (approx. 220 words). Then for the glossary, use a very compact format: just the 4-language term and a single 4-5 word definition in English only, or perhaps a bilingual definition. But the persona says 4 languages. However, maybe I can list the terms in 4 languages and not give a long definition, but rather a short one in English, and that will suffice because the main text is in 4 languages. Or I can give a definition in 4 languages but extremely short (3-4 words each). Let's see:
 
 Example:
 **Artifact / Artefacto / Артефакт / 工件** — Investigative digital trace. / Rastro digital investigativo. / След для расследования. / 调查用数字痕迹。
 
 That's 4 languages. ~12 words per entry. ×10 = 120. + 220 = 340. Under 500. Good.
 
-Let's try to write 10 entries like that.
 
 Terms:
 1. Deterministic scoring / Puntuación determinista / Детерминистическая оценка / 确定性评分 — Reproducible, non-stochastic calculation. / Cálculo reproducible no estocástico. / Воспроизводимый нестохастический расчёт. / 可复现的非随机计算。
@@ -139,7 +119,6 @@ Terms:
 9. Apache 2.0 License / Licencia Apache 2.0 / Лицензия Apache 2.0 / Apache 2.0 许可证 — Permissive open-source copyright. / Copyright de código abierto permisivo. / Разрешительная лицензия открытого ПО. / 宽松的开源版权许可。
 10. VIGÍA suite / Conjunto VIGÍA / Набор VIGÍA / VIGÍA 套件 — Forensic intentionality analysis platform. / Plataforma de análisis de intencionalidad forense. / Платформа анализа судебной интенциональности. / 取证意图性分析平台。
 
-Now let's count total words.
 
 Main text EN: 49
 Main text ES: 48
@@ -152,7 +131,6 @@ Each entry has terms (~4 words) + 4 definitions (~4 words each = 16 words) = ~20
 10 entries = ~200 words.
 Total = ~426 words.
 
-I need to make sure Chinese word count is not inflated. In many word counters, Chinese characters count as words. Let's count characters for the Chinese paragraph carefully:
 `vigia_scorer.py` (1) 是(2) VIGÍA(3) 套件中(4,5) 用于(6,7) 取证(8,9) 意图(10,11) 分析(12,13) 的(14) 确定性(15,16,17) 评分(18,19) 子模块(20,21)。它(22) 通过(23,24) 严格的(25,26,27) 规则(28,29) 逻辑(30,31) 评估(32,33) 数字(34,35) 工件(36,37) 的(38) 意图性(39,40,41)，为(42) 事件(43,44) 响应(45,46) 提供(47,48) 可复现(49,50,51) 的(52) 指标(53,54)。该模块(55,56) 为(57) 2026(58) 年(59) SANS(60) FIND(61) EVIL(62) 黑客松(63,64) 开发(65,66)，拟(67) 集成(68,69) 至(70) SANS(71) SIFT(72) 工作站(73,74)。采用(75,76) Apache(77) 2.0(78) 许可证(79,80)。
 So 80 "words". That's okay.
 
@@ -169,7 +147,6 @@ SANS 取证 Linux 发行版 = 6 words? SANS(1) 取证(2) Linux(3) 发行版(4,5)
 取证意图性分析平台 = 9 characters.
 
 So Chinese glossary definitions average maybe 8 characters. English ~5 words. Spanish ~5. Russian ~4. Terms ~4.
-Total per entry: 5+5+4+8 + 4 terms = ~26. ×10 = 260. + 226 = 486. That's close to 500 but under. Let's see if we can trim.
 
 Maybe reduce main text slightly.
 
@@ -189,7 +166,6 @@ Count characters:
 
 Total main: 48+47+44+71 = 210.
 
-Now glossary. Let's try to compress entries to ~20 words total each.
 
 1. **Deterministic scoring / Puntuación determinista / Детерминистическое оценивание / 确定性评分** — Reproducible non-stochastic calculation. / Cálculo no estocástico reproducible. / Воспроизводимый нестохастический расчёт. / 可复现的非随机计算。
 Words: EN 3, ES 4, RU 3, ZH 8. Terms 4. Total ~22.
@@ -224,8 +200,6 @@ EN 2, ES 5, RU 3, ZH 7. Total ~17.
 Total glossary word estimate: 22+22+25+17+18+19+22+18+20+17 = 220.
 Total document: 210 + 220 = 430. Under 500. Perfect.
 
-I should ensure no floating-point references. "Reproducible non-stochastic calculation" is fine. No mention of floats.
 
-I should also include a "Scientific Note" perhaps? The prompt says "You include glossaries and scientific notes." So I should add a brief scientific note. But word count is tight. I can add a very short scientific note in one place, maybe after the descriptions or integrated. For example, a single line: **Scientific note / Nota científica / Научное примечание / 科学注释** — Deterministic systems require exact integer logic rather than approximate representations. But that might be too close to floating-point? Actually, the user said NEVER use floating
 ---
 *Licensed under the Apache License, Version 2.0. Copyright 2026 Anna Tchijova.*

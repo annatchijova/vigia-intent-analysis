@@ -53,14 +53,11 @@ ESPAÑOL:
 - Important: 艾柯 (not Eco), 格赖斯 (not Grice), 取证工件 (not 制品), 逻辑断裂 (not 裂缝)
 - Glossary: 单例模式 (Singleton), 环境变量, Pydantic, 数据类 (Dataclass), SIFT取证工作站, 确定性整数运算
 - Scientific Note: 皮尔斯、艾柯、格赖斯. 传感器类比. 不是神秘主义.
-  - Use 取证工件 if relevant... how? Maybe mention that misconfiguration creates a "逻辑断裂" in the forensic artifact chain? Actually the user said "Chinese translations must use: ... 取证工件 (not 制品), 逻辑断裂 (not 裂缝)". I need to incorporate these terms naturally. Perhaps in the scientific note or glossary.
   - 取证工件: Forensic artifact. Could say the configuration values are themselves 取证工件 in the digital forensics chain.
   - 逻辑断裂: Logical break/fracture. Could say validation prevents 逻辑断裂 in the chain of evidence.
 - License line
 
-Wait, the user says "You NEVER use floating-point math explanations for deterministic systems." So when explaining validation or resolution, I must not say "converts string to float" or use floating point examples. Emphasize integer arithmetic, string matching, exact discrete values.
 
-Let me refine the content to ensure the Peirce/Eco/Grice note makes sense for a config module. The note should explain that terminology borrowed from semiotics (Peirce's signs, Eco's interpretive frames, Grice's cooperative maxims) is used in VIGÍA not as metaphysical concepts but as precise information-theory models—just as a sensor transforms physical stimuli into discrete digital integers.
 
 Sensor analogy details:
 - Physical phenomenon → Sensor (Peircean representamen/sign)
@@ -72,11 +69,8 @@ This fits perfectly. The note must be boxed with 【科学说明】/【Scientifi
 
 Tables should be clean Markdown.
 
-Let me check if I need to include LLMBackend. The module docstring mentions it but this is config.py. It might be an error in the prompt's extracted docstring. I should mention it briefly as a class whose parameters are controlled by this configuration module, but focus on VigiaConfig.
 
-Actually, looking at the prompt again: "CLASSES: - LLMBackend... The backend is chosen from CONFIG.llm_backend... - VigiaConfig: All VIGÍA runtime settings..."
 
-So LLMBackend is documented elsewhere but its selection is governed by CONFIG. I'll mention this relationship.
 
 Structure:
 - ENGLISH section
@@ -86,7 +80,6 @@ Structure:
 
 Each starts with a header.
 
-Let me draft the English section fully to use as a template.
 
 **ENGLISH**
 
@@ -215,7 +208,6 @@ Glossary:
 - 数据类 (Dataclass)
 - SIFT取证工作站
 - 确定性整数运算
-- 取证工件 (Forensic artifact: digital evidence object in the investigation chain. I need to define it to use the required term.)
 - 逻辑断裂 (Logical fracture: a break in the chain of reasoning or evidence custody)
 
 Scientific Note:
@@ -227,9 +219,7 @@ Scientific Note:
 - 格赖斯的合作原则。
 - Mention 取证工件: the validated config parameters themselves become 取证工件 in the pipeline, and misconfiguration would cause a 逻辑断裂.
 
-Wait, the prompt says "Chinese translations must use: 艾柯 (not Eco), 格赖斯 (not Grice), 取证工件 (not 制品), 逻辑断裂 (not 裂缝)". So I must ensure these four terms appear in the Chinese section. I should probably include them in the glossary and/or the scientific note.
 
-Let me refine the Chinese scientific note to explicitly use these:
 
 【科学说明】
 VIGÍA 偶尔会使用源自查尔斯·桑德斯·皮尔斯 (Charles Sanders Peirce)、翁贝托·艾柯 (Umberto Eco) 以及 H. P. 格赖斯 (H. P. Grice) 的术语。这不是神秘主义，而是披着符号学外衣的严格信息论。请考虑**传感器类比**：
@@ -243,11 +233,8 @@ VIGÍA 偶尔会使用源自查尔斯·桑德斯·皮尔斯 (Charles Sanders Pei
 
 That uses all required terms.
 
-Now let me ensure no floating-point explanations. I should avoid saying things like "converts string to float" or "decimal precision". Instead emphasize "exact string comparison", "integer arithmetic", "categorical matching".
 
-Also, the user mentioned "LLMBackend" in the classes. In the English "What Is This Module", I mentioned it briefly as an analytical instrument. That's fine.
 
-Let me double-check the docstring content to ensure I didn't miss anything:
 - All os.getenv() calls replaced with CONFIG singleton.
 - Pydantic V2 used when available; falls back to dataclasses + manual validation.
 - Works without pydantic (SIFT environments).
@@ -255,11 +242,9 @@ Let me double-check the docstring content to ensure I didn't miss anything:
 - LLMBackend: thin async wrapper over Anthropic or Ollama APIs (backend chosen from CONFIG.llm_backend)
 - VigiaConfig: runtime settings from env vars. Setting env var overrides default.
 
-I should mention the override mechanism in the tables.
 
 Also, need to make sure the constant `_PYDANTIC_AVAILABLE` is mentioned. It's an internal flag. In the glossary, maybe mention it as a capability probe.
 
-Let me revise the tables slightly to include:
 - Environment Variable Override
 - _PYDANTIC_AVAILABLE flag
 
@@ -274,15 +259,10 @@ For ENGLISH table:
 
 Similarly for other languages.
 
-Now, I need to ensure the tone is academic, technical, suitable for scientists who don't know Python. So avoid Python-specific jargon without explanation. Explain "dataclass" simply.
 
-Let me write out the full response. I'll use clear headers.
 
-One concern: The user wants "thorough but concise". I'll aim for comprehensive but not overly verbose sections.
 
-Also, the requirement: "You NEVER use floating-point math explanations for deterministic systems." I must check every sentence to ensure I don't accidentally mention floating point as a good thing. I should mention it only to say it's avoided.
 
-Let's construct the final text.
 
 ENGLISH Section:
 

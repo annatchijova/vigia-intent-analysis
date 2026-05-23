@@ -73,29 +73,19 @@ ESPAÑOL:
   - JSON 可序列化 (JSON-serializable) | 可表示为文本且无需执行代码的数据格式。
 - License.
 
-Need to make sure I don't use floating-point math explanations. The module mentions timestamps but I should frame timestamp handling as integer epoch or deterministic integer operations.
 
-Also, the user said "You NEVER use floating-point math explanations for deterministic systems." So I must ensure I don't explain anything with floating point.
 
-I should also include the module path at the top of the document.
 
-Let's structure the markdown.
 
-I will put all four languages sequentially.
 
 Make sure the Chinese uses the specified terms:
 - 艾柯 (Eco)
 - 格赖斯 (Grice)
 - 取证工件 (not 制品)
-- 逻辑断裂 (not 裂缝) — I used 逻辑断裂 for CAIE Fracture. Good.
 
-In the Chinese section, I should probably also mention Peirce as 皮尔士 (standard translation) or just keep Peirce? The instruction specifically said "艾柯 (not Eco), 格赖斯 (not Grice)", implying those must be Chinese. For Peirce, the standard is 皮尔士 or 皮尔斯. I'll use 皮尔士.
 
-Let's double-check the cut-off docstring content to ensure I don't hallucinate too much, but I can infer reasonable defaults. The user wants documentation for the module. Some things are cut off but I have enough.
 
-I need to be thorough but concise. Use tables.
 
-Let's draft the tables carefully.
 
 ENGLISH Table 1: Core Concepts
 | Concept | Plain-Language Definition | Deterministic Integer Role |
@@ -132,7 +122,6 @@ Componentes principales.
 核心概念.
 主要组件.
 
-Now the Scientific Note box format. The user wants a box: 【科学说明】/【Scientific Note】. I'll make it a blockquote or a distinct markdown block with the title.
 
 Example:
 > **【Scientific Note】**  
@@ -142,21 +131,13 @@ In Chinese:
 > **【科学说明】**  
 > 皮尔士的溯因、艾柯的诠释循环、格赖斯的准则并非神秘主义。 ...
 
-I should ensure the sensor analogy is clear: a thermometer/sensor converts a physical phenomenon into an integer reading; these philosophical concepts are converted into integer flags.
 
-License line must be exactly: "" at the end of each section? Or once at the end? The user says "License line". I'll put it at the end of each language section to be safe, or at the very end of the document. Given the structure, probably at the end of each section is clearer, but it might be repetitive. However, the requirement says "Each section must include: ..." and separately "License line: ...". I'll put it at the bottom of the document, maybe once, or in each section. To be thorough and since it's a single document with 4 sections, I'll append it to each section or put a final license footer. Let's put it at the very bottom of the document once. Actually, to ensure compliance with "Each section must include...", the license is not listed in the bullet points of section contents, it's a global requirement. I'll put it once at the end of the document. But to be safe and clear, I'll include it at the end of every language section. No, that would clutter. Let me re-read: "5. License line: ''" It's a global requirement for the output. I'll place it once at the very end.
 
-Wait, the user says "Each section must include: - 'What Is This Module?' ... - Key concepts ... - A glossary ... - A 【科学说明】... box". The license is separate. I'll put it once at the end.
 
-Now, let's think about deterministic integer arithmetic mentions. The module tracks timestamps. I should mention that timestamps are handled as integer epoch values, and all status transitions are integer-based.
 
-The docstring mentions "colectivo VIGÍA, 2026-05-18" etc. I should include origin info in the "What Is This Module?" or a separate provenance note.
 
-Let's write it out.
 
-Make sure to not use floating-point math explanations. So, avoid saying "precision", "rounding errors" might be borderline but it's okay to say "no rounding errors" as a contrast to floating point? The user said "Do NOT use floating-point math explanations — emphasize deterministic integer arithmetic where applicable". So I should not explain things *using* floating point math. Saying "no rounding errors" is referencing floating point but in a negative way. Better to say "exact whole-number states" or "exact integer states". I'll avoid mentioning rounding errors.
 
-Let's craft carefully.
 
 ENGLISH "What Is This Module?":
 This module, `integrity_constraints.py`, is the circuit breaker for forensic reasoning inside VIGÍA. When the system detects a temporal collapse—such as a `TEMPORAL_PARADOX` or a `TEMPORAL_CAUSALITY_VIOLATION`—this module ensures that every downstream hypothesis which relied on the shattered assumption is immediately invalidated. It is analogous to a building inspector who, upon discovering a fatal crack in a foundation, evacuates every apartment above it.
@@ -199,7 +180,6 @@ ESPAÑOL:
 > **【科学说明】**  
 > 皮尔士（Peirce）的溯因、艾柯（Eco）的诠释框架、格赖斯（Grice）的语用准则有时被误认为哲学神秘主义。在 VIGÍA 中，这些概念充当形式化传感器。正如数字温度计将热能转换为整数读数（例如 298 K），系统也将符号学与推理关系转换为确定性整数状态。它们是测量一致性的仪器，而非秘传教义。
 
-Wait, I need to make sure the Chinese uses 艾柯 (not Eco) and 格赖斯 (not Grice). I used them in parentheses. The instruction says "Chinese translations must use: 艾柯 (not Eco), 格赖斯 (not Grice)". So in Chinese text, I should write 艾柯 and 格赖斯, and maybe not use the Latin names at all, or use them minimally. I'll write 艾柯 and 格赖斯 as the primary terms.
 
 Revised Chinese note:
 > **【科学说明】**  
@@ -265,23 +245,14 @@ ESPAÑOL Glossary:
 | **JSON 可序列化** | 仅由字符串、整数与集合构成的数据表示形式，可安全存储或传输，无需执行代码。 |
 | **SYSTEM_ASSUMPTIONS** | 默认追踪器配置中，被形式化为第一类完整性约束的内置隐式假设集合。 |
 
-Wait, the user said "取证工件 (not 制品)". I used 取证工件. Good.
 "逻辑断裂 (not 裂缝)". I used 逻辑断裂. Good.
 
-Now, let's assemble everything. I need to be careful with formatting. Use Markdown headers.
 
-The user wants "complete academic document". I'll provide a clean markdown document.
 
-One thing: The user mentioned "deterministic integer arithmetic where applicable". I should make sure to sprinkle this in the description of functions/classes. E.g., evaluate_all evaluates against artifact lists using integer identifiers; to_dict serializes integer states; invalidate_assumption uses integer state transitions.
 
-Also, the origin story: "Módulo propuesto por el debate ChatGPT/Claude (colectivo VIGÍA, 2026-05-18) e implementado por Kimi (Moonshot AI). Integrado con ajustes de seguridad por Claude (Anthropic)." I should include this in the "What Is This Module?" or a separate provenance line. I'll include it as a small provenance note under the What Is section for each language.
 
-Let's refine the text to be truly academic and accessible to non-Pythonists. Avoid Python jargon like "class", "function", "method" in the plain language sections, or explain them. But since they are in the tables as components, it's fine to label them. The audience are scientists who don't know Python, so I should explain what a "module" is briefly: a software component.
 
-Actually, the requirement says "Target audience: scientists and researchers who do NOT know Python". So in the text, I should avoid assuming they know what a Python class is. However, the requirement also asks to document the Python module with its classes and functions. The way to reconcile is to present the classes/functions as "components" or "parts" of the instrument, with plain language.
 
-Let's make sure the "What Is This Module?" is completely Python-free.
 
-I will now
 ---
 *Licensed under the Apache License, Version 2.0. Copyright 2026 Anna Tchijova.*

@@ -21,7 +21,6 @@ ENGLISH:
   - Hash chaining: Each new entry incorporates the hash of the previous entry, creating a dependency chain. If any historical entry is altered, the mathematical linkage breaks.
   - Deterministic integer hashing: All digest values are computed via exact integer arithmetic (bitwise logic, modular addition) over finite fields. No floating-point operations are used; identical inputs always yield identical outputs.
   - root_hash: A concise fingerprint of the entire ledger's current state. Like a balance sheet total that reflects every prior transaction.
-  - verify(): A complete audit procedure that recomputes the chain of integer hashes from genesis to the present block and confirms zero logical断裂... wait, in English the user didn't specify a term for logical断裂, but in Chinese they did. For English, I should use "logical discontinuity" or "structural break". But the note about 逻辑断裂 is specifically for Chinese? The user said "Chinese translations must use: ... 逻辑断裂 (not 裂缝)". So I should use "logical断裂" in Chinese, but in English I can use "logical discontinuity" or similar. Actually, the user requirement is specifically about Chinese translations. I'll ensure Chinese uses those terms.
 
 Table of Classes/Functions:
 | Component | Role | Deterministic Guarantee |
@@ -67,7 +66,6 @@ Scientific Note:
 > 【Nota Científica】
 > La terminología de Peirce, Eco y Grice a veces se confunde con especulación metafísica. No lo es. Estos marcos funcionan exactamente como sensores físicos: la semiótica de Peirce traduce relaciones de signos en tríadas mensurables (signo-objeto-interpretante); la teoría de Eco sobre la producción de signos proporciona el protocolo para detectar 取证工件 (artefactos de evidencia) fabricados o anómalos; y los máximas de Grice operacionalizan las expectativas de intercambio cooperativo de información. Así como un espectrómetro convierte la luz en un espectro eléctrico sin invocar misticismo, estos modelos convierten la comunicación probatoria en categorías formales y comprobables. Son instrumentos epistemológicos, no doctrinas ocultistas.
 
-Wait, in Spanish I should probably keep the Chinese terms? No, the note can mention the concepts. The user wants the specific Chinese terms only for Chinese translations. But since the scientific note is about Peirce/Eco/Grice, in the Spanish note I can refer to the artifacts concept but don't need to force Chinese characters. However, to be safe and consistent, I can mention that in forensic semiotics these are termed 取证工件 in the formal literature, but that might confuse the Spanish reader. Better to translate naturally: "artefactos de evidencia". The requirement about Chinese terms is specifically for the Chinese section. I will ensure the Chinese section uses them.
 
 РУССКИЙ:
 - What Is This Module?: Что представляет собой этот модуль?
@@ -107,17 +105,12 @@ Scientific Note:
 > 【科学说明】
 > 皮尔斯、艾柯与格赖斯的术语有时被误认为玄学思辨。事实并非如此。这些理论框架的运作方式与物理传感器完全相同：皮尔斯的符号学将符号关系转译为可测量的三元组（符号-客体-解释项）；艾柯的符号生产理论为检测伪造或异常的取证工件提供了协议；而格赖斯的准则将合作性信息交换的预期予以可操作化。正如光谱仪将光转换为电信号频谱而无需诉诸神秘主义，这些模型将证据性交流转化为形式化、可检验的范畴。它们是认识论工具，而非神秘教义。
 
-Wait, I need to make sure the Chinese note uses the exact required terms:
 - 艾柯 (Eco) - used
 - 格赖斯 (Grice) - used
 - 取证工件 (artifacts) - used
-- 逻辑断裂 (not 裂缝) - I should include this somewhere. Maybe in key concepts or glossary, or in the note. The user said "逻辑断裂 (not 裂缝)". I should use it in the Chinese text when describing what verify() detects or chain breaks. I used "断裂" in the key concept description. Let me ensure it's "逻辑断裂" specifically. In the verify() description: "发现任何逻辑断裂". Good.
 
-Now I need to format everything nicely in Markdown.
 
-The user wants "thorough but concise". So I should avoid excessive verbosity but cover all requirements.
 
-Let me structure the Markdown:
 
 # Module Documentation: `vigia/pipeline/security_evidence_registry.py`
 
@@ -157,7 +150,6 @@ Then similar for other languages.
 
 At the very end, the 
 
-Wait, should the license line be in each language section or once at the end? The user said "License line: ''" I think putting it at the very end of the document once is fine, but to be safe, maybe at the end of each section or once globally. I'll put it once at the bottom, perhaps repeated in each language? No, that's redundant. But the requirement says "Include License line". I'll include it once at the end. Or maybe under each language section? That might be too much. I'll put a final section "License / Licencia / Лицензия / 许可协议" with the line. Actually, the user said "License line". I can add it as a footer to the whole document. Let me put it at the very bottom. But to be thorough, I can include it in each language's section header as a sub-note? No. I'll do:
 
 ---
 
@@ -165,11 +157,9 @@ Wait, should the license line be in each language section or once at the end? Th
 
 Simple.
 
-Now let me review the Chinese terms again to ensure compliance:
 - 艾柯: yes, in note.
 - 格赖斯: yes, in note.
 - 取证工件: yes, in note.
-- 逻辑断裂: yes, in key concepts table or verify description. I'll make sure it's in the Chinese text explicitly. I can add a table row or glossary entry.
 
 In Chinese section:
 Table:
@@ -188,17 +178,13 @@ Glossary should include 逻辑断裂:
 
 Now the scientific note for Chinese must be 【科学说明】.
 English: 【Scientific Note】
-Spanish: 【Nota Científica】 or keep 【Scientific Note】? The user said "A 【科学说明】/【Scientific Note】 box". So I can use the respective language's bracketed title or keep them consistent. I'll use:
 - EN: 【Scientific Note】
 - ES: 【Nota Científica】
 - RU: 【Научное Примечание】
 - ZH: 【科学说明】
 
-Now, about not using floating-point math explanations. I need to make sure I don't say things like "hash is a large decimal number" in a way that implies floating point. I should emphasize they are integers, fixed-length bit strings, exact arithmetic. I'll use phrasing like "finite field arithmetic", "bitwise logic", "modular addition", "exact integer representation".
 
-Also, I should ensure the module path is clearly stated at the top.
 
-Let me draft the full text carefully.
 
 ---
 

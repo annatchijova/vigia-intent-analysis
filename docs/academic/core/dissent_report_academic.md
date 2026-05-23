@@ -112,37 +112,24 @@ ESPAÑOL:
   - Consensus Evasion -> 共识规避
   - Sensor Analogy -> 传感器类比
 - Scientific Note:
-  - 皮尔斯（Peirce）的溯因、艾柯（Eco）的符号学阈值、格赖斯（Grice）的合作原则与会话含义等术语有时被视为玄学。在本模块中，这些概念被操作化为工程约束。请将每个软件模块视为独立的物理仪器，使用不同技术测量同一事件：皮尔斯的溯因是从异常传感器读数中生成假设；艾柯的符号学阈值是噪声基底，低于该基底的信号被视为仪器误差；格赖斯的准则确保每个传感器报告最大相关信息的通信协议。发表异议的模块并非“不配合”——它是一台光谱仪，报告了其他摄像机无法观测到的峰值。压制这种异议不是统计修正，而是方法论上的逻辑断裂。 (Wait, user said 逻辑断裂 (not 裂缝) — I used 逻辑断裂 here, good.)
 
-Wait, I need to ensure I don't use floating-point math explanations. Emphasize deterministic integer arithmetic. The module uses fractions.Fraction. I should explain that we use exact rational arithmetic, not floating-point approximations.
 
-Also, the user said "You NEVER use floating-point math explanations for deterministic systems." So I must avoid saying things like "unlike floating point which is approximate..." or explaining how floating point works. Instead, I should just state that the system uses exact integer-based rational arithmetic (Fraction) and truncated integer conversion for display, ensuring bit-for-bit reproducibility.
 
-I need to make sure the Chinese section uses the specified terms:
-- 艾柯 (not Eco) — I'll use 艾柯 and maybe mention Eco in parens first time?
 - 格赖斯 (not Grice) — same
 - 取证工件 (not 制品) — use 取证工件 for artifacts
 - 逻辑断裂 (not 裂缝) — use 逻辑断裂
 
-Check if "artifact" appears in the text. In the English text I wrote "artifact" in consensus evasion. In Chinese, I should translate that as 取证工件. Actually, "取证工件" means forensic artifact. The module deals with forensic detection, so when referring to digital artifacts, use 取证工件.
 
-Let's refine the Chinese scientific note to ensure it flows and uses required terms.
 
 Chinese scientific note draft:
 【科学说明】
 皮尔斯（Peirce）的溯因推理、艾柯的符号学阈值，以及格赖斯的合作原则与含义理论，有时被误认为神秘主义或玄学话语。在本模块中，这些概念被严格操作化为工程约束。请使用传感器类比：将每个检测模块视为实验室中独立的物理仪器——皮尔斯式的溯因是从异常传感器读数中生成最佳假设；艾柯的符号学阈值即为噪声基底，低于该基底的信号被归类为仪器误差而非现象；格赖斯的量准则与关系准则则构成仪器间通信协议，确保每台传感器报告最大相关数据而不冗余。当单一模块发出异议信号时，它并非“不合作”，而是一台光谱仪探测到了其他成像设备无法感知的峰值。在取证科学中，以“多数共识”压制此类信号不是统计修正，而是方法论上的逻辑断裂。
 
-Good. Uses 艾柯, 格赖斯, 逻辑断裂. Need to check if "artifact" needs 取证工件. The scientific note doesn't mention artifact, but maybe in the main text I should ensure if I mention digital artifacts I use 取证工件.
 
-Let's check the main text for "artifact". In English: "Consensus Evasion: An attack strategy designed to make a malicious artifact appear benign..." In Chinese translation of glossary: "共识规避：一种攻击策略，旨在使恶意取证工件表现为良性..." Yes, use 取证工件.
 
-Now, structure. The user wants "complete academic document". I should organize it clearly with headers.
 
-I should include the license line exactly: ""
 
-I need to be thorough but concise.
 
-Let's outline the full document:
 
 ---
 
@@ -242,13 +229,10 @@ Let's outline the full document:
 
 ---
 
-Now, let me double-check the requirement about not using floating-point math explanations. This means I should not explain what floating-point is, why it's bad, or compare the system to floating-point. I should only describe the deterministic integer/fraction system on its own terms.
 
 For example, bad: "Unlike floating-point numbers, which are approximate..." Good: "All scoring uses Python's fractions.Fraction class, representing values as exact integer ratios (e.g., 1/100) to guarantee bitwise reproducibility." This avoids explaining floating point and focuses on deterministic integer arithmetic.
 
-Also, the user said "emphasize deterministic integer arithmetic where applicable". So in display functions, note that conversion to percentage uses integer truncation (int()), which is a deterministic operation on exact rational values, yielding reproducible integer output.
 
-Let's write the content.
 
 ENGLISH:
 
