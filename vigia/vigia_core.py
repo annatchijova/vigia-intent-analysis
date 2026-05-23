@@ -75,10 +75,10 @@ class VigiaCore:
                     "attribution_uncertainty": round(1.0 - attribution_confidence, 2),
                     "confidence_floor_applied": adjusted_conf == MIN_CONFIDENCE,
                     "uncertainty_note": (
-                        f"Atribución a {attributed_actor} tiene baja confianza "
-                        f"({attribution_confidence:.2f}). La señal geopolítica se "
-                        f"mantiene con confianza reducida (piso={MIN_CONFIDENCE}). "
-                        f"Un false flag real suele comenzar con atribución incierta."
+                        f"Attribution to {attributed_actor} has low confidence "
+                        f"({attribution_confidence:.2f}). The geopolitical signal is "
+                        f"maintained with reduced confidence (floor={MIN_CONFIDENCE}). "
+                        f"A real false flag typically begins with uncertain attribution."
                     )
                 }
             )

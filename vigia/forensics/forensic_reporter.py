@@ -267,8 +267,8 @@ class VigiaForensicReporter:
         elements.append(Spacer(1, 0.5*inch))
         elements.append(Paragraph("VIGÍA FORENSIC SYSTEMS", s['VigiaTitle']))
         elements.append(Paragraph(
-            "Análisis de Lingüística Forense Adversaria<br/>"
-            "Semiótica Peirce · Estándar Daubert · Determinismo Computacional",
+            "Adversarial Forensic Linguistics Analysis<br/>"
+            "Peirce Semiotics · Daubert Standard · Computational Determinism",
             s['PeirceSubtitle']
         ))
         elements.append(Spacer(1, 0.3*inch))
@@ -279,17 +279,17 @@ class VigiaForensicReporter:
         analyst = case_info.get('analyst', 'VIGÍA Automated System')
         
         summary_text = f"""
-        <b>CASO:</b> {case_number}<br/>
-        <b>DOCUMENTO ANALIZADO:</b> {verdict.document_id}<br/>
-        <b>EMISOR DECLARADO:</b> {verdict.emitter_id} ({verdict.emitter_type})<br/>
-        <b>IDIOMA DETECTADO:</b> {verdict.language.upper()}<br/>
-        <b>ANALISTA:</b> {analyst}<br/>
-        <b>FECHA DE ANÁLISIS:</b> {verdict.timestamp}<br/>
+        <b>CASE:</b> {case_number}<br/>
+        <b>ANALYZED DOCUMENT:</b> {verdict.document_id}<br/>
+        <b>DECLARED EMITTER:</b> {verdict.emitter_id} ({verdict.emitter_type})<br/>
+        <b>DETECTED LANGUAGE:</b> {verdict.language.upper()}<br/>
+        <b>ANALYST:</b> {analyst}<br/>
+        <b>ANALYSIS DATE:</b> {verdict.timestamp}<br/>
         <br/>
-        <b>METODOLOGÍA:</b> Análisis computacional determinista de cuatro capas 
-        (SDA-NR, CLI, ACP, ROI) sobre baseline institucional calibrado. 
-        Multiplicador de Certeza Pericial (MCP) calculado mediante agregación 
-        no-lineal de desviaciones estándar (σ) normalizadas.
+        <b>METHODOLOGY:</b> Deterministic four-layer computational analysis
+        (SDA-NR, CLI, ACP, ROI) over calibrated institutional baseline.
+        Forensic Certainty Multiplier (MCP) calculated via non-linear aggregation
+        of normalized standard deviations (σ).
         """
         
         elements.append(Paragraph(summary_text, s['ExecutiveSummary']))
@@ -302,7 +302,7 @@ class VigiaForensicReporter:
             'FABRICADO': 'VerdictCritical',
         }.get(verdict.final_verdict, 'VerdictSuspicious')
         
-        elements.append(Paragraph(f"VEREDICTO: {verdict.final_verdict}", s[verdict_style]))
+        elements.append(Paragraph(f"VERDICT: {verdict.final_verdict}", s[verdict_style]))
         elements.append(Spacer(1, 0.1*inch))
         
         # MCP destacado
@@ -311,12 +311,12 @@ class VigiaForensicReporter:
                    colors.HexColor('#b71c1c')
         
         mcp_data = [[
-            Paragraph(f"<b>MCP</b><br/>Multiplicador de<br/>Certeza Pericial", s['TechnicalBody']),
+            Paragraph(f"<b>MCP</b><br/>Forensic<br/>Certainty Multiplier", s['TechnicalBody']),
             Paragraph(f"<b>{verdict.mcp:.2f}x</b>", ParagraphStyle(
                 name='MCPBig', parent=s['Heading1'], fontSize=36, 
                 textColor=mcp_color, alignment=TA_CENTER
             )),
-            Paragraph(f"<b>CONFIANZA</b><br/>{verdict.confidence:.1%}", s['TechnicalBody']),
+            Paragraph(f"<b>CONFIDENCE</b><br/>{verdict.confidence:.1%}", s['TechnicalBody']),
         ]]
         
         mcp_table = Table(mcp_data, colWidths=[2*inch, 2*inch, 2*inch])
@@ -332,7 +332,7 @@ class VigiaForensicReporter:
         
         # Fracturas detectadas (resumen)
         if verdict.fracturas:
-            frac_text = "<b>FRACTURAS DE TERCERIDAD DETECTADAS:</b><br/>" + "<br/>".join(
+            frac_text = "<b>DETECTED THIRDNESS FRACTURES:</b><br/>" + "<br/>".join(
                 f"• {f}" for f in verdict.fracturas
             )
             elements.append(Paragraph(frac_text, s['TechnicalBody']))
@@ -344,9 +344,9 @@ class VigiaForensicReporter:
         elements = []
         s = self.styles.styles
         
-        elements.append(Paragraph("CUERPO TÉCNICO PERICIAL", s['Heading1']))
+        elements.append(Paragraph("TECHNICAL FORENSIC BODY", s['Heading1']))
         elements.append(Paragraph(
-            "Análisis de las Cuatro Capas de Disonancia Estilográfica",
+            "Analysis of the Four Stylographic Dissonance Layers",
             s['PeirceSubtitle']
         ))
         elements.append(Spacer(1, 0.2*inch))
@@ -407,9 +407,9 @@ class VigiaForensicReporter:
         
         # Desglose MCP
         elements.append(Spacer(1, 0.3*inch))
-        elements.append(Paragraph("DESGLOSE DEL MULTIPLICADOR MCP", s['Heading3']))
-        
-        mcp_data = [["CAPA", "CONTRIBUCIÓN", "σ MÁXIMO", "ESTADO"]]
+        elements.append(Paragraph("MCP MULTIPLIER BREAKDOWN", s['Heading3']))
+
+        mcp_data = [["LAYER", "CONTRIBUTION", "σ MAXIMUM", "STATUS"]]
         capas = [
             ("SDA-NR", verdict.mcp_breakdown.get('sda_nr', 0), verdict.sda_nr.get('sigma_max', 0)),
             ("CLI", verdict.mcp_breakdown.get('cli', 0), max(abs(verdict.cli.get('z_exclusion', 0)), abs(verdict.cli.get('z_certainty', 0)))),
@@ -418,7 +418,7 @@ class VigiaForensicReporter:
         ]
         
         for nombre, contrib, sigma in capas:
-            estado = "CRÍTICA" if sigma > 2.5 else "ADVERTENCIA" if sigma > 1.96 else "NORMAL"
+            estado = "CRITICAL" if sigma > 2.5 else "WARNING" if sigma > 1.96 else "NORMAL"
             color = '#b71c1c' if sigma > 2.5 else '#f57c00' if sigma > 1.96 else '#2e7d32'
             mcp_data.append([
                 nombre,
@@ -463,7 +463,7 @@ class VigiaForensicReporter:
                      colors.HexColor('#2e7d32')
         
         header_text = f"""
-        <font color='#1a237e'><b>CAPA {numero}: {nombre}</b></font>
+        <font color='#1a237e'><b>LAYER {numero}: {nombre}</b></font>
         <font color='{sigma_color.hexval()}'>&nbsp;&nbsp;[σ = {sigma_val:.2f}]</font><br/>
         <i>{titulo}</i>
         """
@@ -475,9 +475,9 @@ class VigiaForensicReporter:
         
         # Interpretación Peirce
         peirce_text = f"""
-        <b>Firstness (Signo):</b> {firstness}<br/>
-        <b>Secondness (Colisión):</b> {secondness}<br/>
-        <b>Thirdness (Hábito):</b> {thirdness}
+        <b>Firstness (Sign):</b> {firstness}<br/>
+        <b>Secondness (Collision):</b> {secondness}<br/>
+        <b>Thirdness (Habit):</b> {thirdness}
         """
         elements.append(Paragraph(peirce_text, s['PeirceInterpretation']))
         elements.append(Spacer(1, 0.15*inch))
@@ -489,58 +489,57 @@ class VigiaForensicReporter:
         elements = []
         s = self.styles.styles
         
-        elements.append(Paragraph("CADENA DE CUSTODIA DIGITAL", s['Heading1']))
+        elements.append(Paragraph("DIGITAL CHAIN OF CUSTODY", s['Heading1']))
         
         # Hash y metadata técnica
         doc_hash = hashlib.sha256(f"{verdict.document_id}{verdict.timestamp}".encode()).hexdigest()
         
         custody_text = f"""
-        DOCUMENTO ID: {verdict.document_id}
-        HASH SHA-256: {doc_hash}
+        DOCUMENT ID: {verdict.document_id}
+        SHA-256 HASH: {doc_hash}
         TIMESTAMP: {verdict.timestamp}
-        DB FORENSE: {self.db_path or 'vigia_forensic.db'}
+        FORENSIC DB: {self.db_path or 'vigia_forensic.db'}
         QUERY: SELECT * FROM document_history WHERE document_hash LIKE '{verdict.document_id}%';
-        
-        INTEGRIDAD: Este reporte es determinístico y reproducible.
-        Mismo documento + mismo baseline = mismo veredicto (bit-exact).
+
+        INTEGRITY: This report is deterministic and reproducible.
+        Same document + same baseline = same verdict (bit-exact).
         """
         elements.append(Paragraph(custody_text, s['CustodyChain']))
         elements.append(Spacer(1, 0.2*inch))
         
         # Declaración de Metodología Daubert
-        elements.append(Paragraph("DECLARACIÓN DE METODOLOGÍA", s['Heading2']))
-        
+        elements.append(Paragraph("METHODOLOGY STATEMENT", s['Heading2']))
+
         methodology_text = """
-        <b>1. Base Científica:</b> Este análisis se fundamenta en la Lingüística 
-        Forense Computacional, disciplina que aplica métodos estadísticos y 
-        computacionales a evidencia lingüística. Los algoritmos empleados 
-        (entropía de Shannon, análisis de frecuencia distributiva, z-scores) 
-        son estándar en procesamiento de lenguaje natural forense.<br/><br/>
-        
-        <b>2. Determinismo:</b> El sistema es completamente determinista. Para 
-        un documento dado y un baseline institucional específico, el output 
-        es idéntico en cada ejecución (reproducibilidad bit-exact). No emplea 
-        modelos de lenguaje probabilísticos ni redes neuronales.<br/><br/>
-        
-        <b>3. Baselines Calibrados:</b> Los perfiles institucionales fueron 
-        derivados de corpus forenses documentados (resoluciones judiciales, 
-        reportes policiales, campañas de phishing confirmadas) con n>1000 
-        documentos por categoría.<br/><br/>
-        
-        <b>4. Marco Semiótico:</b> La interpretación sigue la tricotomía de 
-        Charles Sanders Peirce: Firstness (signo como cualidad), Secondness 
-        (colisión signo-objeto), Thirdness (ley/hábito interpretativo).<br/><br/>
-        
-        <b>5. Estándar Daubert:</b> Esta metodología satisface los criterios 
-        Daubert para admisibilidad de evidencia científica: testabilidad, 
-        revisión por pares (literatura forense), tasa de error conocida 
-        (σ-based), y aceptación general en la comunidad científica 
-        (lingüística forense computacional).<br/><br/>
-        
-        <b>6. Limitaciones:</b> El análisis requiere texto suficiente 
-        (>100 palabras) y baseline institucional relevante. No determina 
-        intencionalidad humana directamente, sino inconsistencias 
-        estilográficas indicativas de fabricación.
+        <b>1. Scientific Basis:</b> This analysis is grounded in Computational
+        Forensic Linguistics, a discipline that applies statistical and
+        computational methods to linguistic evidence. The algorithms employed
+        (Shannon entropy, distributive frequency analysis, z-scores)
+        are standard in forensic natural language processing.<br/><br/>
+
+        <b>2. Determinism:</b> The system is fully deterministic. For a given
+        document and a specific institutional baseline, the output is identical
+        on every execution (bit-exact reproducibility). It does not employ
+        probabilistic language models or neural networks.<br/><br/>
+
+        <b>3. Calibrated Baselines:</b> Institutional profiles were derived
+        from documented forensic corpora (judicial rulings, police reports,
+        confirmed phishing campaigns) with n>1000 documents per category.<br/><br/>
+
+        <b>4. Semiotic Framework:</b> Interpretation follows the trichotomy of
+        Charles Sanders Peirce: Firstness (sign as quality), Secondness
+        (sign-object collision), Thirdness (interpretive law/habit).<br/><br/>
+
+        <b>5. Daubert Standard:</b> This methodology satisfies the Daubert
+        criteria for admissibility of scientific evidence: testability,
+        peer review (forensic literature), known error rate
+        (σ-based), and general acceptance in the scientific community
+        (computational forensic linguistics).<br/><br/>
+
+        <b>6. Limitations:</b> The analysis requires sufficient text
+        (>100 words) and a relevant institutional baseline. It does not
+        determine human intentionality directly, but rather stylographic
+        inconsistencies indicative of fabrication.
         """
         
         elements.append(Paragraph(methodology_text, s['Methodology']))
@@ -548,7 +547,7 @@ class VigiaForensicReporter:
         # Firma
         elements.append(Spacer(1, 0.5*inch))
         elements.append(Paragraph(
-            "— FIN DEL REPORTE PERICIAL —<br/>"
+            "— END OF FORENSIC REPORT —<br/>"
             "VIGÍA Forensic Systems · Colectivo AI · SANS Hackathon 2026",
             ParagraphStyle(name='Footer', parent=s['Normal'], 
                           alignment=TA_CENTER, fontSize=8, textColor=colors.grey)
@@ -561,29 +560,29 @@ class VigiaForensicReporter:
     # =========================================================================
     
     def _firstness_sda(self, sda: Dict) -> str:
-        return (f"Texto con ratio N/V={sda.get('nv_ratio', 0):.2f}, "
-                f"nominalización={sda.get('nominalization', 0):.2%}, "
-                f"densidad preposicional={sda.get('prep_density', 0):.2%}. "
-                f"Entropía sintáctica medida en bits por token.")
-    
+        return (f"Text with N/V ratio={sda.get('nv_ratio', 0):.2f}, "
+                f"nominalization={sda.get('nominalization', 0):.2%}, "
+                f"prepositional density={sda.get('prep_density', 0):.2%}. "
+                f"Syntactic entropy measured in bits per token.")
+
     def _secondness_sda(self, sda: Dict) -> str:
         z_nv = sda.get('z_nv', 0)
         z_nom = sda.get('z_nom', 0)
-        return (f"Desviación σ del baseline institucional: "
+        return (f"σ deviation from institutional baseline: "
                 f"N/V z={z_nv:.2f}, Nom z={z_nom:.2f}. "
-                f"Colisión {'crítica' if sda.get('is_inconsistent') else 'dentro de parámetros'}.")
-    
+                f"Collision {'critical' if sda.get('is_inconsistent') else 'within parameters'}.")
+
     def _thirdness_sda(self, sda: Dict) -> str:
         if sda.get('is_inconsistent'):
-            return ("Hábito del adversario: evasión de estructura nominal "
-                   "típica de documentos oficiales, posible intento de "
-                   "simulación de espontaneidad o urgencia.")
-        return ("Hábito institucional: conservación de estructura "
-               "nominalizadora característica del registro formal.")
+            return ("Adversary habit: evasion of nominal structure "
+                   "typical of official documents, possible attempt to "
+                   "simulate spontaneity or urgency.")
+        return ("Institutional habit: preservation of nominalizing structure "
+               "characteristic of formal register.")
     
     def _tabla_sda(self, sda: Dict) -> Table:
         data = [
-            ["MÉTRICA", "VALOR", "BASELINE μ", "DESVIACIÓN σ"],
+            ["METRIC", "VALUE", "BASELINE μ", "DEVIATION σ"],
             ["N/V Ratio", f"{sda.get('nv_ratio', 0):.2f}", 
              f"{sda.get('baseline_nv', 'N/A')}", f"{sda.get('z_nv', 0):.2f}"],
             ["Nominalización", f"{sda.get('nominalization', 0):.2%}", 
@@ -593,92 +592,92 @@ class VigiaForensicReporter:
         return self._styled_table(data)
     
     def _firstness_cli(self, cli: Dict) -> str:
-        return (f"Densidad de marcadores: exclusión={cli.get('exclusion_density', 0):.3f}, "
-                f"certeza={cli.get('certainty_density', 0):.3f}, "
-                f"distanciamiento={cli.get('distancing_density', 0):.3f}.")
-    
+        return (f"Marker density: exclusion={cli.get('exclusion_density', 0):.3f}, "
+                f"certainty={cli.get('certainty_density', 0):.3f}, "
+                f"distancing={cli.get('distancing_density', 0):.3f}.")
+
     def _secondness_cli(self, cli: Dict) -> str:
         stress = cli.get('cognitive_stress_index', 0)
-        return (f"Índice de estrés cognitivo compuesto: {stress:.2f}. "
-                f"Z-scores: exclusión={cli.get('z_exclusion', 0):.2f}, "
-                f"certeza={cli.get('z_certainty', 0):.2f}.")
-    
+        return (f"Composite cognitive stress index: {stress:.2f}. "
+                f"Z-scores: exclusion={cli.get('z_exclusion', 0):.2f}, "
+                f"certainty={cli.get('z_certainty', 0):.2f}.")
+
     def _thirdness_cli(self, cli: Dict) -> str:
         if cli.get('is_fabrication_indicator'):
-            return ("Hábito del adversario: uso de cuantificadores absolutos "
-                   "(sobrecompensación), marcadores de exclusión (reducción de "
-                   "riesgo), y distanciamiento (evasión de compromiso). "
-                   "Patrón típico de invención de hechos.")
-        return ("Hábito institucional: uso medido de certidumbre, "
-               "ausencia de distanciamiento, precisión factual.")
+            return ("Adversary habit: use of absolute quantifiers "
+                   "(overcompensation), exclusion markers (risk reduction), "
+                   "and distancing (commitment evasion). "
+                   "Typical pattern of fact invention.")
+        return ("Institutional habit: measured use of certainty, "
+               "absence of distancing, factual precision.")
     
     def _tabla_cli(self, cli: Dict) -> Table:
         data = [
-            ["MARCADOR", "DENSIDAD", "BASELINE μ", "DESVIACIÓN σ"],
-            ["Exclusión", f"{cli.get('exclusion_density', 0):.4f}", 
+            ["MARKER", "DENSITY", "BASELINE μ", "DEVIATION σ"],
+            ["Exclusion", f"{cli.get('exclusion_density', 0):.4f}",
              f"{cli.get('baseline_excl', 'N/A')}", f"{cli.get('z_exclusion', 0):.2f}"],
-            ["Certeza Absoluta", f"{cli.get('certainty_density', 0):.4f}", 
+            ["Absolute Certainty", f"{cli.get('certainty_density', 0):.4f}",
              f"{cli.get('baseline_cert', 'N/A')}", f"{cli.get('z_certainty', 0):.2f}"],
-            ["Distanciamiento", f"{cli.get('distancing_density', 0):.4f}", "—", "—"],
+            ["Distancing", f"{cli.get('distancing_density', 0):.4f}", "—", "—"],
         ]
         return self._styled_table(data)
     
     def _firstness_acp(self, acp: Dict) -> str:
-        return (f"Huella estilométrica: TTR={acp.get('current_ttr', 0):.3f}, "
-                f"baseline histórico μ={acp.get('baseline_ttr_mean', 0):.3f}. "
-                f"Documentos en baseline: {acp.get('baseline_documents', 0)}.")
-    
+        return (f"Stylometric fingerprint: TTR={acp.get('current_ttr', 0):.3f}, "
+                f"historical baseline μ={acp.get('baseline_ttr_mean', 0):.3f}. "
+                f"Baseline documents: {acp.get('baseline_documents', 0)}.")
+
     def _secondness_acp(self, acp: Dict) -> str:
         z_ttr = acp.get('zscore_ttr', 0)
         z_lex = acp.get('zscore_lex_entropy', 0)
-        return (f"Desviación de huella autorial: TTR z={z_ttr:.2f}, "
-                f"entropía z={z_lex:.2f}. "
-                f"{'Suplantación sospechada' if acp.get('is_identity_spoofing') else 'Consistente con emisor'}.")
-    
+        return (f"Authorial fingerprint deviation: TTR z={z_ttr:.2f}, "
+                f"entropy z={z_lex:.2f}. "
+                f"{'Impersonation suspected' if acp.get('is_identity_spoofing') else 'Consistent with emitter'}.")
+
     def _thirdness_acp(self, acp: Dict) -> str:
         if acp.get('is_identity_spoofing'):
-            return ("Hábito del adversario: inconsistencia en riqueza léxica "
-                   "y complejidad sintáctica respecto al emisor declarado. "
-                   "Indicativo de impersonación o documento forjado.")
-        return ("Hábito institucional: consistencia estilométrica con "
-               "historial documental del emisor verificado.")
+            return ("Adversary habit: inconsistency in lexical richness "
+                   "and syntactic complexity relative to the declared emitter. "
+                   "Indicative of impersonation or forged document.")
+        return ("Institutional habit: stylometric consistency with "
+               "documentary history of the verified emitter.")
     
     def _tabla_acp(self, acp: Dict) -> Table:
         data = [
-            ["MÉTRICA", "ACTUAL", "BASELINE μ", "DESVIACIÓN σ"],
-            ["TTR (Content Words)", f"{acp.get('current_ttr', 0):.4f}", 
+            ["METRIC", "CURRENT", "BASELINE μ", "DEVIATION σ"],
+            ["TTR (Content Words)", f"{acp.get('current_ttr', 0):.4f}",
              f"{acp.get('baseline_ttr_mean', 0):.4f}", f"{acp.get('zscore_ttr', 0):.2f}"],
-            ["Entropía Léxica", f"{acp.get('current_lex_entropy', 0):.2f}", 
+            ["Lexical Entropy", f"{acp.get('current_lex_entropy', 0):.2f}",
              f"{acp.get('baseline_entropy_mean', 'N/A')}", f"{acp.get('zscore_lex_entropy', 0):.2f}"],
-            ["Docs en Baseline", str(acp.get('baseline_documents', 0)), "—", "—"],
+            ["Baseline Docs", str(acp.get('baseline_documents', 0)), "—", "—"],
         ]
         return self._styled_table(data)
     
     def _firstness_roi(self, roi: Dict) -> str:
-        return (f"Complejidad léxica: Fog={roi.get('gunning_fog', 0):.1f}, "
+        return (f"Lexical complexity: Fog={roi.get('gunning_fog', 0):.1f}, "
                 f"Flesch={roi.get('flesch_score', 0):.1f}. "
-                f"Densidad informativa={roi.get('information_density', 0):.2%}, "
-                f"redundancia={roi.get('redundancy_ratio', 0):.2%}.")
-    
+                f"Information density={roi.get('information_density', 0):.2%}, "
+                f"redundancy={roi.get('redundancy_ratio', 0):.2%}.")
+
     def _secondness_roi(self, roi: Dict) -> str:
         z_fog = roi.get('z_fog', 0)
         z_info = roi.get('z_info_density', 0)
-        return (f"Desviación de legibilidad institucional: "
-                f"Fog z={z_fog:.2f}, densidad z={z_info:.2f}. "
-                f"Tipo: {roi.get('obfuscation_type', 'NONE')}.")
-    
+        return (f"Deviation from institutional readability: "
+                f"Fog z={z_fog:.2f}, density z={z_info:.2f}. "
+                f"Type: {roi.get('obfuscation_type', 'NONE')}.")
+
     def _thirdness_roi(self, roi: Dict) -> str:
         if roi.get('is_obfuscation_attack'):
-            return ("Hábito del adversario: uso de complejidad léxica "
-                   "innecesaria (oscuridad deliberada) o, inversamente, "
-                   "simplificación sospechosa con alta redundancia. "
-                   "Táctica de ocultación de vacío argumentativo.")
-        return ("Hábito institucional: complejidad proporcional al contenido, "
-               "densidad informativa adecuada, mínima redundancia.")
+            return ("Adversary habit: use of unnecessary lexical complexity "
+                   "(deliberate obscurity) or, conversely, "
+                   "suspicious simplification with high redundancy. "
+                   "Tactic for concealing argumentative emptiness.")
+        return ("Institutional habit: complexity proportional to content, "
+               "adequate information density, minimal redundancy.")
     
     def _tabla_roi(self, roi: Dict) -> Table:
         data = [
-            ["MÉTRICA", "VALOR", "BASELINE μ", "DESVIACIÓN σ"],
+            ["METRIC", "VALUE", "BASELINE μ", "DEVIATION σ"],
             ["Gunning Fog", f"{roi.get('gunning_fog', 0):.1f}", 
              f"{roi.get('baseline_fog', 'N/A')}", f"{roi.get('z_fog', 0):.2f}"],
             ["Flesch Ease", f"{roi.get('flesch_score', 0):.1f}", "—", "—"],
@@ -712,16 +711,16 @@ class VigiaForensicReporter:
         # Header
         canvas.setFont('Helvetica-Bold', 8)
         canvas.setFillColor(colors.HexColor('#1a237e'))
-        canvas.drawString(72, letter[1] - 36, "VIGÍA FORENSIC SYSTEMS · REPORTE PERICIAL")
+        canvas.drawString(72, letter[1] - 36, "VIGÍA FORENSIC SYSTEMS · FORENSIC REPORT")
         canvas.setFont('Helvetica', 8)
         canvas.setFillColor(colors.grey)
-        canvas.drawRightString(letter[0] - 72, letter[1] - 36, "CONFIDENCIAL · SANS HACKATHON 2026")
-        
+        canvas.drawRightString(letter[0] - 72, letter[1] - 36, "CONFIDENTIAL · SANS HACKATHON 2026")
+
         # Footer
         canvas.setFont('Helvetica', 8)
         canvas.setFillColor(colors.grey)
-        canvas.drawString(72, 36, f"Página {doc.page}")
-        canvas.drawRightString(letter[0] - 72, 36, "Semiótica Peirce · Estándar Daubert")
+        canvas.drawString(72, 36, f"Page {doc.page}")
+        canvas.drawRightString(letter[0] - 72, 36, "Peirce Semiotics · Daubert Standard")
         
         canvas.restoreState()
 
@@ -761,7 +760,7 @@ def generate_forensic_pdf(
 # ============================================================================
 
 if __name__ == "__main__":
-    print("VIGÍA Forensic Reporter — Generador de Reportes Peirce-Daubert")
+    print("VIGÍA Forensic Reporter — Peirce-Daubert Report Generator")
     print("=" * 70)
     
     # Crear verdict de prueba
@@ -803,10 +802,10 @@ if __name__ == "__main__":
         final_verdict="FABRICADO",
         confidence=0.8375,
         fracturas=[
-            "SDA-NR: σ=3.2 (Nominalización críticamente baja)",
-            "CLI: Estrés cognitivo 4.2 (Invención probable)",
-            "ACP: z=2.9 (Suplantación de identidad)",
-            "ROI: Deficit de densidad informativa",
+            "SDA-NR: σ=3.2 (Critically low nominalization)",
+            "CLI: Cognitive stress 4.2 (Probable invention)",
+            "ACP: z=2.9 (Identity impersonation)",
+            "ROI: Information density deficit",
         ],
         timestamp="2026-04-19T03:03:00Z",
     )
@@ -824,6 +823,6 @@ if __name__ == "__main__":
         }
     )
     
-    print(f"Reporte generado: {path}")
-    print(f"Tamaño: {os.path.getsize(path)} bytes")
+    print(f"Report generated: {path}")
+    print(f"Size: {os.path.getsize(path)} bytes")
     print("=" * 70)
