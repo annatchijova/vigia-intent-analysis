@@ -1,15 +1,15 @@
 #!/usr/bin/env python3
 """
-show_4_hashes.py — VIGÍA: visualización explícita de los 4 hashes forenses.
+show_4_hashes.py — VIGÍA: explicit display of the 4 forensic hashes.
 
 Uso:
     python3 show_4_hashes.py <caso.json>
 
 Los 4 hashes:
-    H1 — graph_hash        : SHA256 del grafo de evidencia (artefactos + señales)
+    H1 — graph_hash        : SHA256 of the evidence graph (artifacts + signals)
     H2 — bundle_hash       : SHA256 del bundle sellado completo (cubre H1 + decisión + metadata)
     H3 — HMAC audit chain  : HMAC-SHA256 de la cadena de auditoría (ephemeral key en dev)
-    H4 — EBS verify        : Verificación independiente de H2 por verify_ebs_v1
+    H4 — EBS verify        : Independent verification of H2 by verify_ebs_v1
 """
 
 import sys
@@ -79,7 +79,7 @@ integrity = sd.get("integrity", {})
 h1 = integrity.get("graph_hash", "")
 h1_status = GRN + "PRESENT" + RST if h1 else RED + "ABSENT" + RST
 
-print(f"{BLD}H1 — graph_hash{RST}  (SHA256 del grafo de evidencia)")
+print(f"{BLD}H1 — graph_hash{RST}  (SHA256 of the evidence graph)")
 print(f"   {CYN}{h1 if h1 else 'N/A'}{RST}")
 print(f"   Status : {h1_status}")
 print()
@@ -96,7 +96,7 @@ print()
 
 # ── H3: HMAC audit chain ──────────────────────────────────────────────────────
 # El HMAC se genera internamente por SecurityAuditLogger con clave efímera.
-# Podemos recomputarlo sobre el bundle para demostrar el mecanismo.
+# We can recompute it over the bundle to demonstrate the mechanism.
 hmac_key = os.environ.get("VIGIA_HMAC_KEY", "").encode()
 if not hmac_key:
     # Dev mode: recompute con clave derivada del bundle_hash (solo para display)
@@ -112,7 +112,7 @@ bundle_canonical = json.dumps(
 
 h3 = hmac.new(hmac_key, bundle_canonical, hashlib.sha256).hexdigest()
 
-print(f"{BLD}H3 — HMAC audit chain{RST}  (HMAC-SHA256 del bundle canónico)")
+print(f"{BLD}H3 — HMAC audit chain{RST}  (HMAC-SHA256 of the canonical bundle)")
 print(f"   {CYN}{h3}{RST}")
 print(f"   Key    : {hmac_note}")
 print()
@@ -140,7 +140,7 @@ else:
     h4_status = f"{RED}FAIL{RST}"
     level = "FAIL"
 
-print(f"{BLD}H4 — EBS verify{RST}  (verificación independiente de H2 por verify_ebs_v1)")
+print(f"{BLD}H4 — EBS verify{RST}  (independent verification of H2 by verify_ebs_v1)")
 print(f"   Recomputes bundle_hash from sealed_dict and compares against stored value")
 print(f"   Status : {h4_status}")
 print()
@@ -215,5 +215,5 @@ print(f"  H1 graph_hash   : {'OK' if h1 else 'MISSING':8}  {h1[:16]}..." if h1 e
 print(f"  H2 bundle_hash  : {'OK' if h2 else 'MISSING':8}  {h2[:16]}..." if h2 else f"  H2 bundle_hash  : MISSING")
 print(f"  H3 HMAC chain   : {'OK' if h3 else 'MISSING':8}  {h3[:16]}...")
 print(f"  H4 EBS verify   : {level}")
-print(f"\n  {col}{'VERDE — todos los hashes presentes y verificados' if (all_present and all_pass) else 'REVISAR — ver detalle arriba'}{RST}")
+print(f"\n  {col}{'GREEN — all hashes present and verified' if (all_present and all_pass) else 'REVIEW — see details above'}{RST}")
 print(f"{'='*66}\n")
