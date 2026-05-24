@@ -513,6 +513,11 @@ class CaseAdapter:
                 art_meta = _sanitize_artifact_paths(art_meta)
                 for k, v in art_meta.items():
                     if isinstance(v, (str, int, float, bool, type(None))):
+                        # Store under the bare key so CAIE rules can find it directly
+                        # (e.g. sub_second_zeros, mft_entry_number).
+                        # Also keep the artifact_<key> alias for backward compatibility
+                        # with any callers that already depend on the prefixed form.
+                        metadata[k] = v
                         metadata[f"artifact_{k}"] = v
 
             # Importación local defensiva — puede no tener signal_contract

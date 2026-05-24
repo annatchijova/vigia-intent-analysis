@@ -145,6 +145,22 @@ print(f"   Recomputes bundle_hash from sealed_dict and compares against stored v
 print(f"   Status : {h4_status}")
 print()
 
+# ── CAIE fractures ───────────────────────────────────────────────────────────
+# Fractures live at sealed_dict → caie_analysis → key_fractures.
+# (The raw CAIE result uses the key "fractures"; the pipeline copies up to 5
+#  of them into key_fractures.  "fracture_details" does not exist.)
+caie_analysis = sd.get("caie_analysis") or {}
+fractures = caie_analysis.get("key_fractures", [])
+if fractures:
+    print(f"{BLD}CAIE FRACTURES  ({caie_analysis.get('verdict','?')} · "
+          f"score={caie_analysis.get('composite_score','?')} · "
+          f"golden={caie_analysis.get('golden_rules_triggered',0)}){RST}")
+    for f in fractures:
+        sev = f.get("severity", 0)
+        col = RED if sev >= 0.9 else YLW if sev >= 0.7 else GRN
+        print(f"  {col}[{f.get('type','?')}]{RST}  severity={sev}")
+    print()
+
 # ── Resumen ───────────────────────────────────────────────────────────────────
 # result["decision"] puede ser dataclass, dict o string según el path del bridge
 _dec = result.get("decision", "UNKNOWN")

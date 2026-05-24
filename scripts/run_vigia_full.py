@@ -11,11 +11,22 @@ if len(sys.argv) < 2:
 
 case_file = sys.argv[1]
 
+# Repo root = parent of the scripts/ directory this file lives in.
+# Must be on sys.path so `vigia.pipeline.*` and `vigia.tools.*` are importable
+# in this process AND in any subprocess we spawn.
+_REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+if _REPO_ROOT not in sys.path:
+    sys.path.insert(0, _REPO_ROOT)
+
+# Pass repo root to the subprocess via PYTHONPATH so that
+# vigia_integration_bridge resolves `vigia.tools.caie` (not the stub root caie.py).
+_env = os.environ.copy()
+_env["PYTHONPATH"] = _REPO_ROOT + (os.pathsep + _env["PYTHONPATH"] if "PYTHONPATH" in _env else "")
+
 # 1. Razonamiento forense
-subprocess.run([sys.executable, "tests/run_vigia_case.py", case_file])
+subprocess.run([sys.executable, "tests/run_vigia_case.py", case_file], env=_env)
 
 # 2. Bundle hash + verificación
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 try:
     from vigia.pipeline.vigia_integration_bridge import CaseAdapter, normalize_case_schema, validate_case_schema
     from vigia.pipeline.pipeline import VigiaPipeline
