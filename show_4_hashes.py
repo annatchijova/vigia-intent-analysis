@@ -162,9 +162,16 @@ if fractures:
     print()
 
 # ── Resumen ───────────────────────────────────────────────────────────────────
-# result["decision"] puede ser dataclass, dict o string según el path del bridge
+# Forensic verdict priority:
+#   1. caie_analysis["gate_verdict"]  — structural hard gate override (pre-seal)
+#   2. caie_analysis["verdict"]       — CAIE probabilistic verdict
+#   3. decision_trace.decision        — governance layer (ACCEPT/REJECT/ABSTAIN)
+forensic_verdict = caie_analysis.get("gate_verdict") or caie_analysis.get("verdict")
 _dec = result.get("decision", "UNKNOWN")
-if hasattr(_dec, "decision"):           # dataclass DecisionResult
+if forensic_verdict:
+    verdict = forensic_verdict
+    score_raw = caie_analysis.get("composite_score", 0)
+elif hasattr(_dec, "decision"):         # dataclass DecisionTrace
     verdict   = _dec.decision
     score_raw = getattr(_dec, "posterior", getattr(_dec, "risk", 0))
 elif isinstance(_dec, dict):

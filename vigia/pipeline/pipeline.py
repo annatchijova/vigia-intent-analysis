@@ -670,9 +670,11 @@ class VigiaPipeline:
         if hasattr(self, '_last_caie_result') and self._last_caie_result:
             caie_analysis = {
                 "verdict": self._last_caie_result.get("verdict"),
+                "structural_verdict": self._last_caie_result.get("structural_verdict"),
                 "composite_score": self._last_caie_result.get("composite_score"),
                 "fractures_detected": self._last_caie_result.get("fractures_detected", 0),
                 "golden_rules_triggered": self._last_caie_result.get("golden_rules_triggered", 0),
+                "fractures": self._last_caie_result.get("fractures", []),
                 "key_fractures": [
                     {
                         "type": f.get("type"),
@@ -683,6 +685,42 @@ class VigiaPipeline:
                     for f in self._last_caie_result.get("fractures", [])[:5]
                 ],
             }
+
+        # ── CAIE structural hard gate (runs BEFORE sealing so the override is
+        # covered by bundle_hash — caie_analysis is part of bundle_payload) ──
+        # Rationale: causal impossibilities and tool-signature fractures are a
+        # different epistemic category from probabilistic evidence — they are
+        # not subject to Bayesian updating.
+        _STRUCTURAL_VETO_TYPES = frozenset({
+            # Golden Rules — causal impossibilities (always override)
+            "TEMPORAL_CAUSALITY_VIOLATION",
+            "CRYPTOGRAPHIC_INCONSISTENCY",        # only when trust_chain_validated=True
+            # Structural fractures that force MALICE
+            "LOG_VS_MEMORY",
+            "DOCUMENT_FORGERY",
+            "NETWORK_VS_HOST",
+            "MFT_ENTRY_ANOMALY",
+            "NARRATIVE_POISONING_DETECTED",
+            "TIMESTAMP_PRECISION_ANOMALY",
+            "USN_JOURNAL_GAP",
+            # EXCLUDED: CRYPTOGRAPHIC_INCONSISTENCY_UNVERIFIED (severity=0.6, verdict=SUSPICION)
+        })
+        if caie_analysis is not None:
+            _golden_triggered = caie_analysis.get("golden_rules_triggered", 0)
+            _all_fractures = caie_analysis.get("fractures", [])
+            _veto_fractures = [f for f in _all_fractures if f.get("type") in _STRUCTURAL_VETO_TYPES]
+            if _golden_triggered > 0 or len(_veto_fractures) > 0:
+                _pre_verdict = caie_analysis.get("verdict")
+                _veto_type = _veto_fractures[0]["type"] if _veto_fractures else "golden_rule"
+                caie_analysis["gate_verdict"] = "MALICE"
+                caie_analysis["gate_override_reason"] = (
+                    f"CAIE structural veto: {_veto_type} detected. Pre-override: {_pre_verdict}."
+                )
+                logger.warning(
+                    "[Pipeline] CAIE structural hard gate triggered: verdict overridden "
+                    "%s → MALICE (%s)",
+                    _pre_verdict, caie_analysis["gate_override_reason"],
+                )
 
         sealed_dict = BundleBuilder.seal(
             bundle,
@@ -724,37 +762,6 @@ class VigiaPipeline:
 
         self._last_bundle = bundle
         self._last_sealed_dict = sealed_dict
-
-        # ── CAIE structural hard gate ─────────────────────────────────────────
-        # If CAIE detected a structural impossibility (golden rule or hard veto
-        # fracture), override the Bayesian verdict.  Rationale: causal
-        # impossibilities are a different epistemic category from probabilistic
-        # evidence — they are not subject to Bayesian updating.
-        _caie = sealed_dict.get("caie_analysis", {})
-        _structural = _caie.get("structural_verdict")
-        _golden_triggered = _caie.get("golden_rules_triggered", 0)
-        _fractures = _caie.get("fractures", [])
-        _STRUCTURAL_VETO_TYPES = frozenset({
-            "EFFECT_BEFORE_CAUSE", "HASH_MISMATCH_WITH_INTACT_METADATA",
-            "TIMESTAMP_SEQUENCE_VIOLATION", "CRYPTOGRAPHIC_INCONSISTENCY_VERIFIED",
-        })
-        _veto_fractures = [f for f in _fractures if f.get("type") in _STRUCTURAL_VETO_TYPES]
-
-        if _structural == "MALICE" and (_golden_triggered > 0 or len(_veto_fractures) > 0):
-            _bayesian_verdict = sealed_dict.get("verdict")
-            sealed_dict["bayesian_verdict_pre_override"] = _bayesian_verdict
-            sealed_dict["verdict"] = "MALICE"
-            sealed_dict["override_reason"] = (
-                f"CAIE structural veto: "
-                f"{_veto_fractures[0]['type'] if _veto_fractures else 'golden_rule'} detected. "
-                f"Bayesian {_bayesian_verdict} overridden."
-            )
-            logger.warning(
-                "[Pipeline] CAIE structural hard gate triggered: verdict overridden "
-                "%s → MALICE (%s)",
-                _bayesian_verdict,
-                sealed_dict["override_reason"],
-            )
 
         logger.info(
             "[Pipeline] Bundle sellado: %s | %s | decision=%s [%s]",
