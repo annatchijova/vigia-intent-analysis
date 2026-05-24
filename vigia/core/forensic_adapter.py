@@ -131,10 +131,14 @@ def _sha256(data: str) -> str:
 class ForensicAdapter:
     @staticmethod
     def signal_to_caie_artifact(sig: SignalOutput) -> CAIEArtifact:
-        art_type = str(sig.metadata.get("artifact_type", "unknown")).lower()
-        evidence_type = _EVIDENCE_MAP.get(art_type, "log_entry")
+        art_type = str(sig.metadata.get("evidence_type", "unknown")).lower()
+        # If art_type is already a canonical CAIE evidence type (e.g. file_timestamp,
+        # memory_process) it won't appear as a key in _EVIDENCE_MAP, which maps legacy
+        # labels (e.g. "mft" → "file_timestamp").  Fall back to art_type itself so that
+        # signals already carrying canonical types pass through unchanged.
+        evidence_type = _EVIDENCE_MAP.get(art_type, art_type)
         z = float(getattr(sig, 'z_score', 0.0))
-        raw_score = max(0.0, min(1.0, round(z / 4.0, 6)))
+        raw_score = float(sig.value)
         desc = str(sig.metadata.get("description", sig.value or f"Signal from {sig.tool_name}"))[:500]
         meta = dict(sig.metadata) if sig.metadata else {}
         meta["z_score_original"] = sig.z_score
