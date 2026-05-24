@@ -257,6 +257,31 @@ _MAX_ARTIFACTS: Final[int] = 1000
 _MIN_INDEPENDENT_SOURCES: Final[int] = 3
 _LOW_SOURCE_PENALTY: Final[float] = 0.20  # Reduce score by 20% if < 3 sources
 
+# ---------------------------------------------------------------------------
+# NIST SP 800-86 / RFC 3227 — Acquisition metadata validation
+#
+# Campos requeridos en Artifact.metadata para cadena de custodia Daubert.
+# Su ausencia NO rechaza el artefacto — degrada base_trust de forma auditada.
+#
+# Niveles de degradación (aditivos, aplicados en __post_init__):
+#   CRITICAL (cada campo faltante): -0.15  → evidencia sin procedencia
+#   WARNING  (cada campo faltante): -0.05  → degradación menor
+#
+# Referencia: NIST SP 800-86 §4.3, RFC 3227 §2.1, Daubert v. Merrell Dow
+# ---------------------------------------------------------------------------
+_ACQ_CRITICAL_FIELDS: Final[tuple[str, ...]] = (
+    "acquisition_tool",        # herramienta física (FTK Imager, dd, Axiom, etc.)
+    "acquisition_hash",        # SHA-256 del artefacto crudo en adquisición
+    "acquisition_timestamp",   # ISO-8601 con timezone
+)
+_ACQ_WARNING_FIELDS: Final[tuple[str, ...]] = (
+    "examiner_id",             # identidad del perito adquiriente
+    "write_blocker_used",      # bool — crítico para admisibilidad en juicio
+)
+_ACQ_TRUST_PENALTY_CRITICAL: Final[float] = 0.15   # por campo crítico ausente
+_ACQ_TRUST_PENALTY_WARNING: Final[float]  = 0.05   # por campo warning ausente
+_ACQ_TRUST_FLOOR: Final[float] = 0.10              # base_trust mínimo post-degradación
+
 
 # ---------------------------------------------------------------------------
 # MITRE ATT&CK TTP Mapping — NOW IMPORTED from mitre_mapping.py
@@ -353,6 +378,69 @@ class Artifact:
                 # Single link = potential break
                 self.base_trust, _ = trust_decay.apply_decay(self.base_trust, break_severity=0.5)
                 self.base_trust = _dround(self.base_trust, _DETERMINISTIC_INTERNAL_PREC)
+
+        # ---------------------------------------------------------------------------
+        # NIST SP 800-86 / RFC 3227 — Acquisition metadata validation
+        #
+        # Valida que el artefacto cargue metadatos mínimos de adquisición forense.
+        # Ausencia de campos críticos degrada base_trust y genera entrada de auditoría.
+        # NO rechaza el artefacto — permite análisis degradado con registro completo.
+        #
+        # Conforme a Daubert: toda degradación es falsifiable, documentada, reproducible.
+        # ---------------------------------------------------------------------------
+        _meta = self.metadata or {}
+        _missing_critical = [f for f in _ACQ_CRITICAL_FIELDS if not _meta.get(f)]
+        _missing_warning  = [f for f in _ACQ_WARNING_FIELDS  if not _meta.get(f)]
+
+        if _missing_critical:
+            _penalty = _dround(
+                len(_missing_critical) * _ACQ_TRUST_PENALTY_CRITICAL,
+                _DETERMINISTIC_INTERNAL_PREC,
+            )
+            self.base_trust = _dround(
+                max(_ACQ_TRUST_FLOOR, self.base_trust - _penalty),
+                _DETERMINISTIC_INTERNAL_PREC,
+            )
+            audit_logger.log_block(
+                event_type="ACQUISITION_METADATA_MISSING_CRITICAL",
+                tool=f"CAIE.Artifact[{self.source_tool}]",
+                input_preview=(
+                    f"evidence_type={self.evidence_type} "
+                    f"missing={_missing_critical}"
+                ),
+                reason=(
+                    f"Artefacto sin metadatos de adquisición críticos "
+                    f"(NIST SP 800-86 §4.3 / RFC 3227 §2.1). "
+                    f"Campos ausentes: {_missing_critical}. "
+                    f"base_trust degradado en {_penalty} → {self.base_trust}. "
+                    f"Evidencia puede ser INADMISIBLE bajo estándar Daubert "
+                    f"sin documentación de cadena de custodia completa."
+                ),
+            )
+
+        if _missing_warning:
+            _penalty_w = _dround(
+                len(_missing_warning) * _ACQ_TRUST_PENALTY_WARNING,
+                _DETERMINISTIC_INTERNAL_PREC,
+            )
+            self.base_trust = _dround(
+                max(_ACQ_TRUST_FLOOR, self.base_trust - _penalty_w),
+                _DETERMINISTIC_INTERNAL_PREC,
+            )
+            audit_logger.log_block(
+                event_type="ACQUISITION_METADATA_MISSING_WARNING",
+                tool=f"CAIE.Artifact[{self.source_tool}]",
+                input_preview=(
+                    f"evidence_type={self.evidence_type} "
+                    f"missing={_missing_warning}"
+                ),
+                reason=(
+                    f"Artefacto sin metadatos de adquisición recomendados. "
+                    f"Campos ausentes: {_missing_warning}. "
+                    f"base_trust degradado en {_penalty_w} → {self.base_trust}. "
+                    f"Referencia: NIST SP 800-86 §4.3."
+                ),
+            )
 
     @property
     def profile(self) -> EvidenceProfile:
