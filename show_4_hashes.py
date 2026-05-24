@@ -163,23 +163,44 @@ if fractures:
 
 # ── Resumen ───────────────────────────────────────────────────────────────────
 # Forensic verdict priority:
-#   1. caie_analysis["gate_verdict"]  — structural hard gate override (pre-seal)
-#   2. caie_analysis["verdict"]       — CAIE probabilistic verdict
-#   3. decision_trace.decision        — governance layer (ACCEPT/REJECT/ABSTAIN)
-forensic_verdict = caie_analysis.get("gate_verdict") or caie_analysis.get("verdict")
+#   1. caie_analysis["gate_verdict"]   — structural impossibility (always wins)
+#   2. posterior >= 0.95 → "MALICE"    — Bayesian near-certainty
+#   3. caie_analysis["verdict"]        — CAIE probabilistic
+#   4. decision_trace.decision         — governance fallback (ACCEPT/REJECT/ABSTAIN)
+_dt = sd.get("decision_trace")
+_posterior = float(getattr(_dt, "posterior", 0) if hasattr(_dt, "posterior")
+             else (_dt or {}).get("posterior", 0))
+_caie = sd.get("caie_analysis", {})
+
+if _caie.get("gate_verdict"):
+    forensic_verdict = _caie["gate_verdict"]
+    verdict_source = "CAIE structural gate"
+elif _posterior >= 0.95:
+    forensic_verdict = "MALICE"
+    verdict_source = f"Bayesian posterior={_posterior:.4f}"
+elif _caie.get("verdict"):
+    forensic_verdict = _caie["verdict"]
+    verdict_source = "CAIE probabilistic"
+else:
+    forensic_verdict = None
+    verdict_source = "governance"
+
 _dec = result.get("decision", "UNKNOWN")
 if forensic_verdict:
     verdict = forensic_verdict
-    score_raw = caie_analysis.get("composite_score", 0)
+    score_raw = _posterior if _posterior else _caie.get("composite_score", 0)
 elif hasattr(_dec, "decision"):         # dataclass DecisionTrace
     verdict   = _dec.decision
     score_raw = getattr(_dec, "posterior", getattr(_dec, "risk", 0))
+    verdict_source = "governance"
 elif isinstance(_dec, dict):
     verdict   = _dec.get("decision", _dec.get("verdict", "UNKNOWN"))
     score_raw = _dec.get("posterior", _dec.get("score", 0))
+    verdict_source = "governance"
 else:
     verdict   = str(_dec)
     score_raw = result.get("posterior", result.get("risk", 0))
+    verdict_source = "governance"
 
 print(f"{'─'*66}")
 print(f"{BLD}VERDICT  :{RST}  {verdict}")

@@ -1,6 +1,6 @@
 {
   "case_id": "case_026_ventrilocuo_process_hollowing",
-  "name": "The Ventriloquist — Process Hollowing",
+  "name": "The Ventriloquist \u2014 Process Hollowing",
   "description": "svchost.exe (clean hash, valid Microsoft signature) running from C:\\Users\\Public\\Downloads\\, parent cmd.exe, .text section with RWX permissions, exfiltrating 1GB to an AS in Ukraine. Firewall reports 0 bytes.",
   "artifacts": [
     {
@@ -21,7 +21,12 @@
         "parent_process": "cmd.exe",
         "expected_parent": "services.exe",
         "rwx_region_mb": 8,
-        "disk_hash_clean": true
+        "disk_hash_clean": true,
+        "acquisition_tool": "vigia-test-fixture/1.0",
+        "acquisition_hash": "fixture_synthetic_not_real_evidence",
+        "acquisition_timestamp": "2026-01-01T00:00:00Z",
+        "examiner_id": "test_fixture",
+        "write_blocker_used": true
       }
     },
     {
@@ -38,7 +43,12 @@
       "metadata": {
         "known_good": true,
         "digital_signature_valid": true,
-        "signer": "Microsoft Corporation"
+        "signer": "Microsoft Corporation",
+        "acquisition_tool": "vigia-test-fixture/1.0",
+        "acquisition_hash": "fixture_synthetic_not_real_evidence",
+        "acquisition_timestamp": "2026-01-01T00:00:00Z",
+        "examiner_id": "test_fixture",
+        "write_blocker_used": true
       }
     },
     {
@@ -58,7 +68,12 @@
         "port": 443,
         "bytes_transferred": 1073741824,
         "firewall_logged_bytes": 0,
-        "tls_cert_mismatch": true
+        "tls_cert_mismatch": true,
+        "acquisition_tool": "vigia-test-fixture/1.0",
+        "acquisition_hash": "fixture_synthetic_not_real_evidence",
+        "acquisition_timestamp": "2026-01-01T00:00:00Z",
+        "examiner_id": "test_fixture",
+        "write_blocker_used": true
       }
     },
     {
@@ -75,7 +90,12 @@
       "metadata": {
         "registry_path": "HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run",
         "value_name": "WindowsUpdate",
-        "value_data": "C:\\Users\\Public\\Downloads\\svchost.exe"
+        "value_data": "C:\\Users\\Public\\Downloads\\svchost.exe",
+        "acquisition_tool": "vigia-test-fixture/1.0",
+        "acquisition_hash": "fixture_synthetic_not_real_evidence",
+        "acquisition_timestamp": "2026-01-01T00:00:00Z",
+        "examiner_id": "test_fixture",
+        "write_blocker_used": true
       }
     }
   ],
@@ -93,7 +113,7 @@
   ],
   "expected_verdict": "MALICE",
   "peirce_chain": {
-    "firstness": "svchost.exe with clean hash and valid Microsoft signature — invisible to antivirus.",
+    "firstness": "svchost.exe with clean hash and valid Microsoft signature \u2014 invisible to antivirus.",
     "secondness": "Running from Downloads, parent cmd.exe, RWX on .text, 1GB exfiltrated that firewall does not see.",
     "thirdness": "Habit of stealing a system process's identity. AV protects the name; CAIE protects against memory."
   },
