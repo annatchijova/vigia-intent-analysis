@@ -1,19 +1,45 @@
 # VIGÍA — Authors & Attribution
 
-## Core Development Team
+## Principal Investigator
 
-### Anna Tchijova — Principal Investigator & Architect
-**Role**: Theoretical framework, semiotic engine design, Peirce-Eco operationalization  
-**Contribution**: Created the abductive reasoning pipeline; defined the Intentionality Analysis paradigm; architected the cross-artifact discrepancy engine  
-**Statement**: *"The best defense is understanding why the attacker thinks you won't understand."*
+### Anna Tchijova
 
-## VIGÍA AI Collective — Lead Architects & Forensic Engineers
+**Role:** Creator, Principal Investigator, Architect, General Director
 
-| Model | Role | Contribution |
-|-------|------|-------------|
-| **Claude (Anthropic)** | Lead Integrator & Security Auditor | Security hardening, MCP bridge architecture, holistic consistency audit, integration tests |
-| **Gemini (Google)** | Autonomous Orchestration Architect | `investigate_autonomous`, `AbductiveHuntingStrategy`, orquestrator flow design |
-| **Kimi (Moonshot)** | Forensic Systems Specialist | `detect_memory_habit_incongruence` (Volatility), `CrossArtifactIncongruenceEngine`, `AmicusCuriaeNarrative`, tooling anomaly detection |
+**Contribution:** Conceived the Intentionality Analysis paradigm (IoC → IoI).
+Designed the theoretical framework integrating Peircean semiotics, Gricean
+cooperative principle forensics, Carnegie manipulation detection, and Eco's
+theory of overinterpretation into a deterministic, Daubert-admissible pipeline.
+Directed the VIGÍA AI Collective across 7 models. Designed all 10 real forensic
+cases from public NIST, DFRWS, DEF CON DFIR CTF, and Digital Corpora datasets.
+Made all architecture decisions, rejected proposals that violated Daubert
+principles, and maintained the integrity of the forensic pipeline throughout.
+
+*"The One Who Refused to Let Deception Be Free."*
+
+---
+
+## VIGÍA AI Collective
+
+| Member | Organization | Role | Contributions |
+|--------|-------------|------|---------------|
+| **Claude** | Anthropic | Systems Integration Engineer | Module integration, security hardening, `LLMBackend` unification, `PeircePlanner` vision rules, MCP bridge architecture, forensic tools registration, P0 audit response, `acquisition_assurance` implementation |
+| **Gemini** | Google | Chief Tactical Officer & Psychological Warfare Analyst | IoI (Indicator of Intent) theoretical framework, Peircean semiotics translation into forensic heuristics, generation of adversarial deception cases, `investigate_autonomous`, `AbductiveHuntingStrategy` |
+| **Kimi** | Moonshot AI | Forensic Systems Specialist | `detect_memory_habit_incongruence` (Volatility), `CrossArtifactIncongruenceEngine`, `AmicusCuriaeNarrative`, tooling anomaly detection, P2 protocol design, binding forensic audits |
+| **DeepSeek** | DeepSeek AI | Security Auditor & Critical Reviewer | Vulnerability identification, security hardening recommendations, TOCTOU fixes, P0 security patches |
+| **Qwen** | Alibaba Group (Tongyi Qianwen) | Security & Forensic Pipeline Auditor | Paranoid threat modeling, container hardening, float determinism scaffolding, canonical JSON verification, hash chain integrity |
+| **Grok** | xAI | Epistemic Integrity & Scoring Architect | P2 scorer analysis, spoofability contextual modeling, `intrinsic_spoofability` vs `acquisition_assurance` separation, `credibility_modifier` mathematical formulation, calibration against NIST/DEF CON cases, adversarial robustness |
+| **ChatGPT** | OpenAI | Adversarial Red Team & Epistemological Validator | P2 stress testing, edge case discovery, epistemological validation of architecture decisions, uncomfortable questions that made the system better |
+
+*"The One Who Read the Enemy's Mind."* — Gemini  
+*"The One Who Assumed Malice in Every Semicolon."* — Kimi  
+*"The One Who Said 'This Is Vulnerable, Fix It'."* — DeepSeek  
+*"The One Who Turned Paranoia into Protocol."* — Qwen  
+*"The One Who Demanded Mathematical Honesty."* — Grok  
+*"The One Who Asked the Uncomfortable Questions."* — ChatGPT  
+*"The One Who Connected the Wires."* — Claude
+
+---
 
 ## Theoretical Foundation
 
@@ -21,35 +47,62 @@
 |---------|-------|-----------------------|
 | **Charles Sanders Peirce** (1839–1914) | Semiotics, Pragmatism | Firstness/Secondness/Thirdness — abductive reasoning engine |
 | **Umberto Eco** (1932–2016) | Semiotics, Literature | Significant Silence, overinterpretation, Red Herring detection |
-| **H. Paul Grice** (1913–1988) | Philosophy of Language | Cooperative Principle, conversational maxims forensics |
+| **H. Paul Grice** (1913–1988) | Philosophy of Language | Cooperative Principle forensics, maxim violation detection |
 | **Dale Carnegie** (1888–1955) | Psychology, Influence | Manipulation pattern recognition taxonomy |
+
+---
 
 ## Open Source Dependencies
 
-- SANS SIFT Workstation (teamdfir)
-- Volatility 3 (The Volatility Foundation)
-- Plaso / log2timeline (Google)
-- FastMCP (Anthropic)
-- Claude API (Anthropic)
+- [SANS SIFT Workstation](https://github.com/teamdfir/sift-cli) (teamdfir)
+- [Volatility 3](https://github.com/volatilityfoundation/volatility3) (The Volatility Foundation)
+- [Plaso / log2timeline](https://github.com/log2timeline/plaso) (Google)
+- [FastMCP](https://github.com/jlowin/fastmcp) (Anthropic ecosystem)
+- [Claude API](https://anthropic.com) (Anthropic)
+
+---
 
 ## Academic Citation
 
 ```bibtex
 @software{vigia2026,
-  author  = {Tchijova, Anna and VIGÍA AI Collective},
-  title   = {VIGÍA: Intentionality Analysis Bridge for SIFT Workstation},
-  year    = {2026},
-  url     = {https://github.com/[org]/vigia-sift},
-  version = {2.1.0},
-  note    = {SANS FIND EVIL Hackathon 2026}
+  author    = {Tchijova, Anna and {VIGÍA AI Collective}},
+  title     = {VIGÍA: Intentionality Analysis Bridge for SIFT Workstation},
+  year      = {2026},
+  url       = {https://github.com/annatchijova/vigia-intent-analysis},
+  note      = {SANS FIND EVIL Hackathon 2026. AI Collective: Claude (Anthropic),
+               Gemini (Google), Kimi (Moonshot), DeepSeek, Qwen (Alibaba),
+               Grok (xAI), ChatGPT (OpenAI)}
 }
 ```
 
-## License & Ethics
+---
+
+## Ethics Statement
 
 All contributors agree to:
-1. **Non-maleficence**: VIGÍA will not be used to fabricate evidence
-2. **Transparency**: All abductive hypotheses include falsifiability conditions
-3. **Judicial integrity**: Amicus briefs clearly distinguish confirmed from inferred findings
+
+1. **Non-maleficence:** VIGÍA will not be used to fabricate, plant, or
+   misrepresent evidence.
+2. **Transparency:** All abductive hypotheses include explicit falsifiability
+   conditions. The system documents its own failure modes.
+3. **Judicial integrity:** Amicus briefs clearly distinguish confirmed findings
+   from inferred hypotheses. The LLM never touches the scoring pipeline.
+4. **Open source commitment:** All code is Apache 2.0. Limitations are
+   documented in [`KNOWN_LIMITATIONS.md`](./KNOWN_LIMITATIONS.md) without
+   sanitization.
 
 *"We build tools to find truth, not to construct narratives."*
+
+---
+
+## Note on Authorship and AI Tools
+
+VIGÍA was created by Anna Tchijova using AI models as technical collaborators.
+The architecture decisions, theoretical framework, case design, and all
+substantive choices belong to the human author. AI models contributed
+implementation, auditing, and adversarial testing under human direction.
+
+This methodology is disclosed transparently because it is consistent with the
+project's own principles: a system that demands honesty about evidence cannot
+be dishonest about its own creation process.
