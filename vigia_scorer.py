@@ -493,7 +493,16 @@ def _vigia_score(case: dict) -> dict:
     #   NOISE      : <= 0.08 (sin señal forense relevante)
     # -----------------------------------------------------------------------
     elif final_score > 0.33:
-        verdict    = "MALICE"
+        # Gate de corroboración: MALICE requiere convergencia de evidencia heterogénea.
+        # Principio Daubert: una sola clase de evidencia técnica, sin importar
+        # su raw_score, no justifica inferencia de intención maliciosa.
+        # Requisito: n_artifacts >= 4 OR n_unique_types >= 3.
+        _n_arts   = len(artifacts)
+        _n_types  = len(set(a.get("evidence_type", "") for a in artifacts))
+        if _n_arts >= 4 or _n_types >= 3:
+            verdict = "MALICE"
+        else:
+            verdict = "SUSPICION"
         confidence = _dround(min(0.95, final_score * 2.0), 2)
         reason     = f"Intent score {final_score:.4f} excede umbral MALICE (escala P2+acq_assurance, umbral=0.33)"
     elif final_score > 0.18:
