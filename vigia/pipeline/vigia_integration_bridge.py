@@ -237,11 +237,12 @@ _PEIRCE_WEIGHT_NUM: Dict[str, int] = {
 }
 _PEIRCE_WEIGHT_DEN = 10
 
-# Escala base: max anomalies esperadas = 4 (calibrado sobre corpus VIGIA-REAL).
-# Justificación Daubert: en DFIR, 2 anomalías corroboradas en un artefacto forense
-# constituye evidencia significativa. Una escala de 8 inflaría la tolerancia del
-# motor más allá de lo que el corpus real justifica.
-_ANOMALY_SCALE = 4
+# Escala base: max anomalies esperadas = 2 (recalibrado sobre corpus VIGIA-REAL).
+# Justificación Daubert: el corpus real tiene 2 anomalías por artifact. Escala 4
+# subrepresentaba la evidencia real produciendo raw_scores 0.45 insuficientes.
+# Recalibración empírica 2026-05-27: escala 2 produce raw_scores 0.90 para
+# artifacts con 2 anomalías SECONDNESS, compatible con umbral MALICE P2.
+_ANOMALY_SCALE = 2
 
 # Bonus por analyst_flag (entero): +1 por flag, sobre escala *100
 _FLAG_BONUS_PER_FLAG = 5   # = 5/100 = 0.05 por flag

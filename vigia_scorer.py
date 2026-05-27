@@ -207,6 +207,7 @@ def _vigia_score(case: dict) -> dict:
         caie_fractures_source indica si se usó CAIE vivo ("live_caie") o
         fractures pre-calculadas del JSON ("json_fallback").
     """
+    case       = _normalize_case(case)
     artifacts  = case.get("artifacts", [])
     violations = case.get("temporal_violations", [])
     provenance = case.get("provenance_analysis", {})
@@ -288,16 +289,23 @@ def _vigia_score(case: dict) -> dict:
         temp_factor = _compute_temporal_factor(violations, a.get("artifact_id", ""))
         effective   = _dround(prov_trust * epc_factor * temp_factor, _DETERMINISTIC_OUTPUT_PREC)
 
-        # P2: fórmula CAIE unificada con EvidenceProfile
+        # P2 + acquisition_assurance: fórmula CAIE con spoofability contextual
+        # Instancia Artifact para obtener effective_spoofability que incorpora
+        # los gates G1-G4 de adquisición forense (decisión colectiva VIGÍA).
+        # Fallback conservador si CAIE no disponible.
         try:
-            from vigia.tools.caie import EVIDENCE_PROFILES
+            from vigia.tools.caie import EVIDENCE_PROFILES, Artifact as _CaieArtifact
             profile = EVIDENCE_PROFILES.get(a.get("evidence_type"))
-            if profile:
-                spoofability = profile.spoofability
-                weight       = profile.base_weight
-            else:
-                spoofability = 0.50   # fallback conservador — ver LIMITACIONES
-                weight       = 0.20
+            weight  = profile.base_weight if profile else 0.20
+            # Instanciar Artifact para calcular effective_spoofability con gates
+            _filtered = {
+                k: v for k, v in a.items()
+                if k in {"source_tool", "evidence_type", "raw_score",
+                         "description", "metadata", "provenance_chain",
+                         "base_trust", "timestamp"}
+            }
+            _caie_art    = _CaieArtifact(**_filtered)
+            spoofability = _caie_art.effective_spoofability
         except Exception:
             spoofability = 0.50
             weight       = 0.20

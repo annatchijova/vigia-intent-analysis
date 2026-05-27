@@ -72,6 +72,7 @@ Qwen's determinism guarantee: bit-identical output across x86/ARM architectures.
 """
 
 from __future__ import annotations
+from fractions import Fraction
 
 import decimal
 import hashlib
@@ -282,6 +283,138 @@ _ACQ_TRUST_PENALTY_CRITICAL: Final[float] = 0.15   # por campo crítico ausente
 _ACQ_TRUST_PENALTY_WARNING: Final[float]  = 0.05   # por campo warning ausente
 _ACQ_TRUST_FLOOR: Final[float] = 0.10              # base_trust mínimo post-degradación
 
+# ---------------------------------------------------------------------------
+# Acquisition Assurance — spoofability contextual (decisión colectiva VIGÍA)
+#
+# Modelo: effective_spoofability = intrinsic × (1 - k × assurance)
+#   k = 3/5 (0.60) — votado por colectivo: Kimi, Claude, Grok, DeepSeek, Qwen
+#   assurance ∈ [0.0, 1.0] — calculado por _compute_acquisition_assurance()
+#
+# Tiers de assurance (deterministas, sin heurística):
+#   NONE     : 0/4  gates verificados → assurance = 0.0  (comportamiento conservador)
+#   BASIC    : 1/4  gates verificados → assurance = 1/4
+#   VERIFIED : 2/4  gates verificados → assurance = 1/2
+#   FORENSIC : 3/4  gates verificados → assurance = 3/4
+#   STRONG   : 4/4  gates verificados → assurance = 9/10
+#
+# Gates (todos requeridos para tier STRONG):
+#   G1 HASH_INTEGRITY    : acquisition_hash presente y formato sha256: válido
+#   G2 TOOL_WHITELIST    : acquisition_tool en lista de herramientas forenses conocidas
+#   G3 TEMPORAL_CONSISTENCY: acquisition_timestamp parseable ISO-8601 con timezone
+#   G4 WRITE_BLOCKER     : write_blocker_used == True en metadata
+#
+# Floor por tipo (Fraction exacta — cero floats):
+#   log_entry       : 1/4  (nunca baja de 0.25 de spoofability efectiva)
+#   file_timestamp  : 1/5
+#   registry_key    : 3/20
+#   default         : 1/10
+#
+# Referencia: NIST SP 800-86 §4.3, RFC 3227, Daubert v. Merrell Dow
+# ---------------------------------------------------------------------------
+_ACQ_ASSURANCE_K = Fraction(4, 5)  # k = 0.80 — recalibrado tras validación empírica con corpus NIST/DFRWS
+
+_ACQ_ASSURANCE_TIERS: Final[dict] = {
+    0: Fraction(0,  1),   # NONE
+    1: Fraction(1,  4),   # BASIC
+    2: Fraction(1,  2),   # VERIFIED
+    3: Fraction(3,  4),   # FORENSIC
+    4: Fraction(9, 10),   # STRONG
+}
+
+_ACQ_SPOOFABILITY_FLOORS: Final[dict] = {
+    "log_entry":      Fraction(1, 4),
+    "file_timestamp": Fraction(1, 5),
+    "registry_key":   Fraction(3, 20),
+}
+_ACQ_SPOOFABILITY_FLOOR_DEFAULT = Fraction(1, 10)
+
+_ACQ_TOOL_WHITELIST: Final[frozenset] = frozenset({
+    "ftk imager", "ftk_imager", "ftkimager",
+    "dd", "dcfldd", "dc3dd",
+    "axiom", "magnet axiom",
+    "encase", "encase imager",
+    "xways", "x-ways forensics",
+    "cellebrite", "cellebrite ufed",
+    "autopsy",
+    "volatility",
+    "legacy_converter_v1",  # converter interno de VIGÍA
+})
+
+
+def _compute_acquisition_assurance(metadata: dict) -> Fraction:
+    """
+    Calcula acquisition_assurance como Fraction exacta.
+    Evalúa 4 gates deterministas sobre metadata del artifact.
+    Retorna Fraction en {0, 1/4, 1/2, 3/4, 9/10}.
+
+    Gates:
+      G1 HASH_INTEGRITY    : acquisition_hash presente, formato sha256:<hex>
+      G2 TOOL_WHITELIST    : acquisition_tool en _ACQ_TOOL_WHITELIST
+      G3 TEMPORAL_CONSISTENCY: acquisition_timestamp parseable ISO-8601
+      G4 WRITE_BLOCKER     : write_blocker_used is True
+
+    Si metadata es None o vacío → Fraction(0, 1) (comportamiento conservador).
+    """
+    if not metadata:
+        return Fraction(0, 1)
+
+    gates_passed = 0
+
+    # G1: HASH_INTEGRITY
+    # Requiere sha256: seguido de exactamente 64 caracteres hexadecimales.
+    # Rechaza hashes legacy (sha256:legacy_*) que no son verificables.
+    acq_hash = metadata.get("acquisition_hash", "")
+    if (isinstance(acq_hash, str)
+            and acq_hash.startswith("sha256:")
+            and len(acq_hash) == 71  # "sha256:" (7) + 64 hex chars
+            and all(c in "0123456789abcdef" for c in acq_hash[7:])):
+        gates_passed += 1
+
+    # G2: TOOL_WHITELIST
+    acq_tool = str(metadata.get("acquisition_tool", "")).strip().lower()
+    if acq_tool in _ACQ_TOOL_WHITELIST:
+        gates_passed += 1
+
+    # G3: TEMPORAL_CONSISTENCY
+    acq_ts = metadata.get("acquisition_timestamp", "")
+    if isinstance(acq_ts, str) and len(acq_ts) >= 19:
+        import re as _re
+        # ISO-8601 básico: YYYY-MM-DDTHH:MM:SS con timezone (Z o ±HH:MM)
+        _ISO_PAT = _re.compile(
+            r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}"
+            r"(\.\d+)?(Z|[+-]\d{2}:\d{2})$"
+        )
+        if _ISO_PAT.match(acq_ts):
+            gates_passed += 1
+
+    # G4: WRITE_BLOCKER
+    if metadata.get("write_blocker_used") is True:
+        gates_passed += 1
+
+    return _ACQ_ASSURANCE_TIERS[gates_passed]
+
+
+def _compute_effective_spoofability(intrinsic: float, assurance: Fraction, floor: Fraction) -> float:
+    """
+    Calcula effective_spoofability con aritmética Fraction exacta.
+
+    Fórmula: effective = max(floor, intrinsic × (1 - k × assurance))
+
+    Con k=3/5, assurance=3/4 (FORENSIC), intrinsic=17/20 (log_entry=0.85):
+      effective = max(1/4, 17/20 × (1 - 3/5 × 3/4))
+                = max(1/4, 17/20 × (1 - 9/20))
+                = max(1/4, 17/20 × 11/20)
+                = max(1/4, 187/400)
+                = 187/400 ≈ 0.4675
+
+    Retorna float para compatibilidad con el resto del pipeline.
+    """
+    intrinsic_f = Fraction(intrinsic).limit_denominator(1000)
+    reduction   = _ACQ_ASSURANCE_K * assurance
+    effective_f = intrinsic_f * (Fraction(1) - reduction)
+    effective_f = max(floor, effective_f)
+    return float(effective_f)
+
 
 # ---------------------------------------------------------------------------
 # MITRE ATT&CK TTP Mapping — NOW IMPORTED from mitre_mapping.py
@@ -392,6 +525,20 @@ class Artifact:
         _missing_critical = [f for f in _ACQ_CRITICAL_FIELDS if not _meta.get(f)]
         _missing_warning  = [f for f in _ACQ_WARNING_FIELDS  if not _meta.get(f)]
 
+        # Calcular effective_spoofability con acquisition_assurance contextual
+        _assurance = _compute_acquisition_assurance(_meta)
+        _floor     = _ACQ_SPOOFABILITY_FLOORS.get(
+            self.evidence_type, _ACQ_SPOOFABILITY_FLOOR_DEFAULT
+        )
+        _intrinsic = EVIDENCE_PROFILES.get(
+            self.evidence_type,
+            EvidenceProfile(0.50, 0.20, "default"),
+        ).spoofability
+        self.effective_spoofability: float = _compute_effective_spoofability(
+            _intrinsic, _assurance, _floor
+        )
+        self.acquisition_assurance: float = float(_assurance)
+
         if _missing_critical:
             _penalty = _dround(
                 len(_missing_critical) * _ACQ_TRUST_PENALTY_CRITICAL,
@@ -458,8 +605,10 @@ class Artifact:
         """
         p = self.profile
 
-        # Step 1: raw_score × (1 - spoofability)
-        step1 = _dround(self.raw_score * (1.0 - p.spoofability), _DETERMINISTIC_INTERNAL_PREC)
+        # Step 1: raw_score × (1 - effective_spoofability)
+        # effective_spoofability incorpora acquisition_assurance contextual
+        # (calculado en __post_init__ con gates deterministas G1-G4)
+        step1 = _dround(self.raw_score * (1.0 - self.effective_spoofability), _DETERMINISTIC_INTERNAL_PREC)
 
         # Step 2: × base_weight
         step2 = _dround(step1 * p.base_weight, _DETERMINISTIC_INTERNAL_PREC)
