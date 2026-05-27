@@ -487,15 +487,15 @@ def _vigia_score(case: dict) -> dict:
     # anterior. Con umbrales originales (0.75/0.55/0.25), MALICE era
     # matemáticamente imposible sin fractures — falso negativo garantizado.
     # Umbrales nuevos calibrados sobre distribución real de casos EBS v1:
-    #   MALICE     : > 0.35  (composite alto + fractures o evidencia fuerte)
+    #   MALICE     : > 0.33  (recalibrado P2+acquisition_assurance: spoofability efectiva log_entry=0.34 con cadena de custodia documentada)
     #   SUSPICION  : > 0.18  (señal estructural sin umbral de certeza)
     #   UNKNOWN    : > 0.08  (anomalía débil — requiere análisis humano)
     #   NOISE      : <= 0.08 (sin señal forense relevante)
     # -----------------------------------------------------------------------
-    elif final_score > 0.35:
+    elif final_score > 0.33:
         verdict    = "MALICE"
         confidence = _dround(min(0.95, final_score * 2.0), 2)
-        reason     = f"Intent score {final_score:.4f} excede umbral MALICE (escala P2)"
+        reason     = f"Intent score {final_score:.4f} excede umbral MALICE (escala P2+acq_assurance, umbral=0.33)"
     elif final_score > 0.18:
         verdict    = "SUSPICION"
         confidence = _dround(final_score * 2.0, 2)
