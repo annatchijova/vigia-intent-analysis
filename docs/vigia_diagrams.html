@@ -1,0 +1,897 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VIGÍA — Architecture & Mathematical Framework</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,300;0,400;0,600;1,400&family=IBM+Plex+Sans:wght@300;400;600;700&display=swap');
+
+  :root {
+    --bg:        #0a0c0f;
+    --bg2:       #0f1218;
+    --bg3:       #151a22;
+    --border:    #1e2733;
+    --border2:   #2a3444;
+    --accent:    #00e5ff;
+    --accent2:   #ff6b35;
+    --accent3:   #7fff7f;
+    --accent4:   #ffcc00;
+    --warn:      #ff4444;
+    --text:      #c8d8e8;
+    --text2:     #7a9ab8;
+    --text3:     #4a6a88;
+    --mono:      'IBM Plex Mono', monospace;
+    --sans:      'IBM Plex Sans', sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    font-size: 13px;
+    line-height: 1.6;
+    padding: 40px 32px;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+
+  /* ── HEADER ── */
+  .header {
+    border-left: 3px solid var(--accent);
+    padding: 0 0 0 20px;
+    margin-bottom: 48px;
+  }
+  .header h1 {
+    font-family: var(--mono);
+    font-size: 28px;
+    font-weight: 600;
+    color: var(--accent);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+  .header .sub {
+    color: var(--text2);
+    font-size: 12px;
+    font-family: var(--mono);
+    margin-top: 6px;
+  }
+  .header .tagline {
+    color: var(--text);
+    font-size: 14px;
+    margin-top: 10px;
+    font-style: italic;
+  }
+
+  /* ── SECTION TITLES ── */
+  .section-title {
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text3);
+    margin: 48px 0 20px 0;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+  .section-title span { color: var(--accent); }
+
+  /* ── ARCHITECTURE DIAGRAM ── */
+  .arch-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2px;
+  }
+
+  .arch-block {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    padding: 16px 20px;
+    position: relative;
+  }
+  .arch-block.sift    { border-left: 3px solid var(--accent4); }
+  .arch-block.mcp     { border-left: 3px solid var(--accent); }
+  .arch-block.layer   { border-left: 3px solid var(--border2); margin-left: 32px; background: var(--bg3); }
+  .arch-block.bridge  { border-left: 3px solid var(--accent2); margin-left: 32px; background: var(--bg3); }
+  .arch-block.llm     { border-left: 3px solid var(--accent3); }
+  .arch-block.output  { border-left: 3px solid var(--accent2); }
+  .arch-block.caution { border-left: 3px solid var(--warn); margin-left: 32px; background: var(--bg3); }
+
+  .arch-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .arch-label.yellow  { color: var(--accent4); }
+  .arch-label.cyan    { color: var(--accent); }
+  .arch-label.orange  { color: var(--accent2); }
+  .arch-label.green   { color: var(--accent3); }
+  .arch-label.red     { color: var(--warn); }
+  .arch-label.gray    { color: var(--text3); }
+
+  .arch-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 8px;
+  }
+  .arch-desc {
+    font-size: 12px;
+    color: var(--text2);
+    font-family: var(--mono);
+  }
+
+  .tools-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 8px;
+    margin-top: 10px;
+  }
+  .tool-chip {
+    background: var(--bg);
+    border: 1px solid var(--border2);
+    padding: 6px 10px;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text2);
+  }
+  .tool-chip .tool-name { color: var(--text); font-weight: 600; }
+  .tool-chip .tool-desc { color: var(--text3); font-size: 10px; }
+
+  .arrow {
+    text-align: center;
+    padding: 4px 0;
+    color: var(--text3);
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 0.1em;
+  }
+
+  .invariant-box {
+    background: #1a0a0a;
+    border: 1px solid var(--warn);
+    border-left: 3px solid var(--warn);
+    padding: 10px 16px;
+    margin-top: 10px;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: #ff9999;
+  }
+  .invariant-box strong { color: var(--warn); }
+
+  /* ── LAYER TABLE ── */
+  .layers-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: var(--mono);
+    font-size: 12px;
+    margin-top: 12px;
+  }
+  .layers-table th {
+    text-align: left;
+    padding: 8px 12px;
+    background: var(--bg3);
+    color: var(--text3);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    border-bottom: 1px solid var(--border);
+  }
+  .layers-table td {
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+  .layers-table tr:hover td { background: var(--bg3); }
+  .layer-num { color: var(--accent); font-weight: 600; }
+  .layer-file { color: var(--accent2); }
+  .layer-rule { color: var(--text2); }
+
+  /* ── MATH SECTION ── */
+  .math-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(520px, 1fr));
+    gap: 16px;
+  }
+
+  .math-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-top: 2px solid var(--accent);
+    padding: 20px;
+  }
+  .math-card.orange { border-top-color: var(--accent2); }
+  .math-card.green  { border-top-color: var(--accent3); }
+  .math-card.yellow { border-top-color: var(--accent4); }
+  .math-card.red    { border-top-color: var(--warn); }
+
+  .math-card h3 {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-bottom: 14px;
+  }
+  .math-card h3 .num {
+    display: inline-block;
+    width: 22px;
+    height: 22px;
+    line-height: 22px;
+    text-align: center;
+    background: var(--accent);
+    color: var(--bg);
+    font-weight: 700;
+    font-size: 10px;
+    margin-right: 8px;
+    vertical-align: middle;
+  }
+  .math-card.orange h3 .num { background: var(--accent2); }
+  .math-card.green  h3 .num { background: var(--accent3); color: #000; }
+  .math-card.yellow h3 .num { background: var(--accent4); color: #000; }
+  .math-card.red    h3 .num { background: var(--warn); }
+
+  .formula {
+    background: var(--bg);
+    border: 1px solid var(--border2);
+    padding: 10px 14px;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--accent3);
+    margin: 8px 0;
+    white-space: pre;
+    overflow-x: auto;
+    line-height: 1.8;
+  }
+  .formula .comment { color: var(--text3); }
+  .formula .var     { color: var(--accent); }
+  .formula .op      { color: var(--accent2); }
+  .formula .const   { color: var(--accent4); }
+
+  .math-note {
+    font-size: 11px;
+    color: var(--text2);
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid var(--border);
+    font-family: var(--mono);
+    line-height: 1.7;
+  }
+  .math-note .hi { color: var(--text); }
+
+  /* ── VERDICT TABLE ── */
+  .verdict-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: var(--mono);
+    font-size: 11px;
+    margin-top: 12px;
+  }
+  .verdict-table th {
+    text-align: left;
+    padding: 7px 10px;
+    background: var(--bg3);
+    color: var(--text3);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    border-bottom: 1px solid var(--border);
+  }
+  .verdict-table td {
+    padding: 7px 10px;
+    border-bottom: 1px solid var(--border);
+  }
+  .v-malice-h  { color: var(--warn); font-weight: 600; }
+  .v-malice-m  { color: #ff8855; font-weight: 600; }
+  .v-benign-h  { color: var(--accent3); font-weight: 600; }
+  .v-benign-m  { color: #88cc88; font-weight: 600; }
+  .v-abstain   { color: var(--accent4); font-weight: 600; }
+  .v-escalate  { color: #cc88ff; font-weight: 600; }
+  .v-degraded  { color: var(--text3); font-weight: 600; }
+  .v-contradict { color: var(--accent2); font-weight: 600; }
+  .v-cond      { color: var(--text2); }
+
+  /* ── ENFSI SCALE ── */
+  .enfsi-bar {
+    display: flex;
+    gap: 2px;
+    margin: 12px 0;
+    height: 28px;
+  }
+  .enfsi-seg {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--mono);
+    font-size: 9px;
+    font-weight: 600;
+    color: var(--bg);
+    flex: 1;
+    white-space: nowrap;
+    padding: 0 4px;
+  }
+  .e1 { background: #4a7c8a; flex: 0.8; }
+  .e2 { background: #5a9c7a; flex: 1; }
+  .e3 { background: #8ab84a; flex: 1.2; }
+  .e4 { background: #c8a020; flex: 1.5; }
+  .e5 { background: #e05020; flex: 2; }
+  .enfsi-labels {
+    display: flex;
+    gap: 2px;
+    font-family: var(--mono);
+    font-size: 9px;
+    color: var(--text3);
+  }
+  .enfsi-labels div { flex: 1; text-align: center; padding: 3px 0; }
+
+  /* ── PIPELINE FLOW ── */
+  .pipeline {
+    display: flex;
+    align-items: stretch;
+    gap: 0;
+    margin: 16px 0;
+    overflow-x: auto;
+  }
+  .pipe-step {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-right: none;
+    padding: 14px 16px;
+    min-width: 130px;
+    position: relative;
+  }
+  .pipe-step:last-child { border-right: 1px solid var(--border); }
+  .pipe-step::after {
+    content: '▶';
+    position: absolute;
+    right: -12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text3);
+    font-size: 11px;
+    z-index: 2;
+    background: var(--bg);
+    padding: 2px;
+  }
+  .pipe-step:last-child::after { display: none; }
+  .pipe-num {
+    font-family: var(--mono);
+    font-size: 9px;
+    color: var(--text3);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 4px;
+  }
+  .pipe-name {
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--accent);
+    margin-bottom: 4px;
+  }
+  .pipe-file {
+    font-family: var(--mono);
+    font-size: 9px;
+    color: var(--accent2);
+  }
+
+  /* ── P2 HASH ── */
+  .hash-box {
+    background: var(--bg);
+    border: 1px solid var(--accent);
+    padding: 12px 16px;
+    font-family: var(--mono);
+    font-size: 11px;
+    margin-top: 12px;
+    word-break: break-all;
+  }
+  .hash-label { color: var(--text3); font-size: 10px; margin-bottom: 4px; }
+  .hash-val { color: var(--accent3); }
+
+  /* ── FOOTER ── */
+  .footer {
+    margin-top: 56px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text3);
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  @media (max-width: 900px) {
+    .math-grid { grid-template-columns: 1fr; }
+    .pipeline  { flex-direction: column; }
+    .pipe-step { border-right: 1px solid var(--border); border-bottom: none; }
+    .pipe-step::after { right: 50%; top: auto; bottom: -12px; transform: translateX(50%) rotate(90deg); }
+  }
+
+  @media print {
+    body { background: white; color: black; padding: 20px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ════════════════ HEADER ════════════════ -->
+<div class="header">
+  <h1>VIGÍA — Architecture &amp; Mathematical Framework</h1>
+  <div class="sub">SANS FIND EVIL Hackathon 2026 · github.com/annatchijova/vigia-intent-analysis · Apache 2.0</div>
+  <div class="tagline">"Making deception computationally expensive for the attacker."</div>
+</div>
+
+<!-- ════════════════ SECTION 1: SYSTEM ARCHITECTURE ════════════════ -->
+<div class="section-title"><span>§1</span> — System Architecture: From Evidence to Intent</div>
+
+<div class="arch-grid">
+
+  <!-- SIFT -->
+  <div class="arch-block sift">
+    <div class="arch-label yellow">Input Layer</div>
+    <div class="arch-title">SIFT Workstation</div>
+    <div class="arch-desc">mount_evidence → hash_chain → analyze_artifacts → export ForensicBundle(JSON + SHA-256)</div>
+    <div class="tools-grid" style="margin-top:10px;">
+      <div class="tool-chip"><div class="tool-name">Memory dumps</div><div class="tool-desc">.raw / .vmem — Volatility3</div></div>
+      <div class="tool-chip"><div class="tool-name">Disk images</div><div class="tool-desc">.E01 / .dd — MFT + USN</div></div>
+      <div class="tool-chip"><div class="tool-name">Event logs</div><div class="tool-desc">.evtx — Windows EVTX</div></div>
+      <div class="tool-chip"><div class="tool-name">Network captures</div><div class="tool-desc">.pcap — Zeek / Suricata</div></div>
+      <div class="tool-chip"><div class="tool-name">Registry hives</div><div class="tool-desc">SYSTEM / SAM / NTUSER</div></div>
+      <div class="tool-chip"><div class="tool-name">Prefetch / Amcache</div><div class="tool-desc">execution evidence</div></div>
+    </div>
+  </div>
+
+  <div class="arrow">│<br>▼  ForensicBundle (JSON + SHA-256 sealed)</div>
+
+  <!-- MCP SERVER -->
+  <div class="arch-block mcp">
+    <div class="arch-label cyan">Core Engine</div>
+    <div class="arch-title">VIGÍA MCP Server — vigia_sift_bridge.py</div>
+    <div class="arch-desc">21 MCP tools · Zero-trust DAG isolation · Deterministic Fraction arithmetic · Daubert-compliant output</div>
+  </div>
+
+  <!-- LAYERS -->
+  <div class="arch-block layer">
+    <div class="arch-label gray">Layer 0 — ebs_v1.py</div>
+    <div class="arch-desc">Data contracts · SignalOutput · ForensicBundle schema · Immutable field definitions · No business logic</div>
+  </div>
+  <div class="arch-block layer">
+    <div class="arch-label gray">Layer 1 — External Signals</div>
+    <div class="arch-desc">SIFT tool outputs · CLI/SDA/GCI adapters · signal_adapter.py · Raw evidence ingestion</div>
+  </div>
+  <div class="arch-block layer">
+    <div class="arch-label gray">Layer 2 — Inference Engine</div>
+    <div class="arch-desc">likelihood_engine.py · KDE + Ledoit-Wolf covariance · graph_stability.py · Bootstrap stability selection</div>
+  </div>
+  <div class="arch-block layer">
+    <div class="arch-label gray">Layer 3 — Risk Governance</div>
+    <div class="arch-desc">risk_bounded_layer.py · r = (1-P)·(1+λD)·(1+γ(1-S))·(1+ω(1-I)) · Decimal prec=28 · PolicySpec sealed</div>
+  </div>
+  <div class="arch-block layer">
+    <div class="arch-label gray">Layer 4 — Audit</div>
+    <div class="arch-desc">audit_action.py · Diff engine · Optimizer · PolicyEngine · decision_layer.py · dissent_report.py</div>
+  </div>
+  <div class="arch-block layer">
+    <div class="arch-label gray">Layer 5 — Verification</div>
+    <div class="arch-desc">verify_ebs_v1.py · stdlib only · no VIGÍA imports · independent bundle verification · SHA-256 check</div>
+  </div>
+
+  <!-- CAIE -->
+  <div class="arch-block bridge">
+    <div class="arch-label orange">Cross-Artifact Engine — caie.py</div>
+    <div class="arch-desc">USN_JOURNAL_GAP · TIMESTAMP_PRECISION_ANOMALY · CRYPTOGRAPHIC_INCONSISTENCY · STAGING_ARTIFACT_PRESENCE<br>
+    Golden Rule: EFFECT_BEFORE_CAUSE → MALICE categorical (confidence=0.95, no override)</div>
+  </div>
+
+  <!-- PHASE 1/2 -->
+  <div class="arch-block bridge" style="border-left-color: var(--accent)">
+    <div class="arch-label cyan">Phase 1 — Chain of Custody (9 tools)</div>
+    <div class="tools-grid">
+      <div class="tool-chip"><div class="tool-name">mount_sift_evidence</div><div class="tool-desc">forensic image mount</div></div>
+      <div class="tool-chip"><div class="tool-name">generate_forensic_hash</div><div class="tool-desc">SHA-256 chain</div></div>
+      <div class="tool-chip"><div class="tool-name">read_evidence</div><div class="tool-desc">single-pass I/O + hash</div></div>
+      <div class="tool-chip"><div class="tool-name">list_files</div><div class="tool-desc">filesystem perimeter</div></div>
+      <div class="tool-chip"><div class="tool-name">search_pattern</div><div class="tool-desc">pure Python search</div></div>
+      <div class="tool-chip"><div class="tool-name">list_processes</div><div class="tool-desc">persistence detect.</div></div>
+      <div class="tool-chip"><div class="tool-name">audit_network</div><div class="tool-desc">exfil channel map</div></div>
+      <div class="tool-chip"><div class="tool-name">calculate_shannon_entropy</div><div class="tool-desc">payload/cipher detect.</div></div>
+      <div class="tool-chip"><div class="tool-name">audit_image_metadata</div><div class="tool-desc">GPS + timestamp</div></div>
+    </div>
+  </div>
+
+  <div class="arch-block bridge" style="border-left-color: var(--accent2)">
+    <div class="arch-label orange">Phase 2 — Intentionality Analysis (12 tools)</div>
+    <div class="tools-grid">
+      <div class="tool-chip"><div class="tool-name">analyze_stylometry</div><div class="tool-desc">astroturfing detect.</div></div>
+      <div class="tool-chip"><div class="tool-name">calculate_human_entropy</div><div class="tool-desc">bot vs. human</div></div>
+      <div class="tool-chip"><div class="tool-name">detect_human_jitter</div><div class="tool-desc">sleep(2) signature</div></div>
+      <div class="tool-chip"><div class="tool-name">infer_intent</div><div class="tool-desc">Peirce + Carnegie</div></div>
+      <div class="tool-chip"><div class="tool-name">audit_grice_maxims</div><div class="tool-desc">linguistic deception</div></div>
+      <div class="tool-chip"><div class="tool-name">detect_eco_overinterpretation</div><div class="tool-desc">planted evidence</div></div>
+      <div class="tool-chip"><div class="tool-name">detect_habit_incongruence</div><div class="tool-desc">LotL detection</div></div>
+      <div class="tool-chip"><div class="tool-name">activate_honey_token</div><div class="tool-desc">active exfil trap</div></div>
+      <div class="tool-chip"><div class="tool-name">reason_with_llm</div><div class="tool-desc">novel case abduction</div></div>
+      <div class="tool-chip"><div class="tool-name">validate_and_correct_analysis</div><div class="tool-desc">Peircean fallacy check</div></div>
+      <div class="tool-chip"><div class="tool-name">reload_phonetic_dict</div><div class="tool-desc">hot-reload dict.</div></div>
+      <div class="tool-chip"><div class="tool-name">get_phonetic_dict_stats</div><div class="tool-desc">dictionary diagnostics</div></div>
+    </div>
+  </div>
+
+  <!-- INVARIANT -->
+  <div class="arch-block caution">
+    <div class="arch-label red">Hard Invariant — Daubert Requirement</div>
+    <div class="invariant-box">
+      <strong>THE LLM IS OUTSIDE THE MATHEMATICAL DECISION LOOP.</strong><br>
+      Claude Code / Ollama receives only the sealed ForensicBundle.<br>
+      It cannot alter scores, weights, or verdicts.<br>
+      It can only translate the sealed result into a judicial narrative.<br>
+      Violation of this invariant constitutes fabrication of evidence.
+    </div>
+  </div>
+
+  <div class="arrow">│<br>▼  Sealed ForensicBundle (SHA-256: bundle_hash)</div>
+
+  <!-- LLM -->
+  <div class="arch-block llm">
+    <div class="arch-label green">Narrative Layer — External LLM</div>
+    <div class="arch-title">Peirce Planner — Claude Code / Ollama</div>
+    <div class="arch-desc">peirceplanner_bounded.py · AbductiveHuntingStrategy · Firstness → Secondness → Thirdness<br>
+    Tool selection: value / (cost × spoofability) · FALLBACK_TOOLS on failure · self-correction loop</div>
+  </div>
+
+  <div class="arrow">│<br>▼</div>
+
+  <!-- OUTPUT -->
+  <div class="arch-block output">
+    <div class="arch-label orange">Output</div>
+    <div class="arch-title">Amicus Curiae Judicial Narrative</div>
+    <div class="arch-desc">Confirmed findings vs. inferred hypotheses — explicitly separated · Falsifiability conditions for each hypothesis<br>
+    MITRE ATT&amp;CK TTP mapping · Daubert admissibility statement · Reproducible: same input → same SHA-256 bundle_hash</div>
+  </div>
+
+</div>
+
+<!-- ════════════════ SECTION 2: EBS PIPELINE ════════════════ -->
+<div class="section-title"><span>§2</span> — EBS v1 Processing Pipeline</div>
+
+<div class="pipeline">
+  <div class="pipe-step">
+    <div class="pipe-num">Step 1</div>
+    <div class="pipe-name">Signal Ingestion</div>
+    <div class="pipe-file">signal_adapter.py<br>ebs_v1.py</div>
+  </div>
+  <div class="pipe-step">
+    <div class="pipe-num">Step 2</div>
+    <div class="pipe-name">Normalization</div>
+    <div class="pipe-file">normalization_layer.py<br>z = (v - μ) / MAD</div>
+  </div>
+  <div class="pipe-step">
+    <div class="pipe-num">Step 3</div>
+    <div class="pipe-name">Artifact Reliability</div>
+    <div class="pipe-file">_math_utils.py<br>γ × (1 - spoof)</div>
+  </div>
+  <div class="pipe-step">
+    <div class="pipe-num">Step 4</div>
+    <div class="pipe-name">Noisy-OR Fusion</div>
+    <div class="pipe-file">_math_utils.py<br>caie.py</div>
+  </div>
+  <div class="pipe-step">
+    <div class="pipe-num">Step 5</div>
+    <div class="pipe-name">Likelihood Ratio</div>
+    <div class="pipe-file">likelihood_engine.py<br>likelihood_ratio.py</div>
+  </div>
+  <div class="pipe-step">
+    <div class="pipe-num">Step 6</div>
+    <div class="pipe-name">CCS Gate</div>
+    <div class="pipe-file">causal_closure.py<br>CCS &gt; ½ or ABSTAIN</div>
+  </div>
+  <div class="pipe-step">
+    <div class="pipe-num">Step 7</div>
+    <div class="pipe-name">Risk Governance</div>
+    <div class="pipe-file">risk_bounded_layer.py<br>r = (1-P)·…</div>
+  </div>
+  <div class="pipe-step">
+    <div class="pipe-num">Step 8</div>
+    <div class="pipe-name">Quadripartite Verdict</div>
+    <div class="pipe-file">quadripartite.py<br>8 states</div>
+  </div>
+  <div class="pipe-step">
+    <div class="pipe-num">Step 9</div>
+    <div class="pipe-name">Bundle Seal</div>
+    <div class="pipe-file">bundle_builder.py<br>SHA-256 seal</div>
+  </div>
+</div>
+
+<!-- LAYER ISOLATION TABLE -->
+<div class="section-title"><span>§3</span> — Zero-Trust Layer Isolation (DAG — no upward imports)</div>
+
+<table class="layers-table">
+  <thead>
+    <tr><th>Layer</th><th>Module</th><th>Responsibility</th><th>Import Rule</th></tr>
+  </thead>
+  <tbody>
+    <tr><td class="layer-num">L0</td><td class="layer-file">ebs_v1.py</td><td class="layer-rule">Data contracts, SignalOutput, ForensicBundle schema</td><td>No imports from VIGÍA</td></tr>
+    <tr><td class="layer-num">L1</td><td class="layer-file">signal_adapter.py</td><td class="layer-rule">Raw evidence ingestion, SIFT tool adapters</td><td>→ L0 only</td></tr>
+    <tr><td class="layer-num">L2</td><td class="layer-file">likelihood_engine.py · graph_stability.py</td><td class="layer-rule">KDE inference, Ledoit-Wolf covariance, bootstrap stability</td><td>→ L0, L1</td></tr>
+    <tr><td class="layer-num">L3</td><td class="layer-file">risk_bounded_layer.py</td><td class="layer-rule">r-formula governance, ε-bounded decision</td><td>→ L0–L2</td></tr>
+    <tr><td class="layer-num">L4</td><td class="layer-file">audit_action.py · decision_layer.py</td><td class="layer-rule">Policy diff, optimizer, dissent escalation</td><td>→ L0–L3</td></tr>
+    <tr><td class="layer-num">L5</td><td class="layer-file">verify_ebs_v1.py</td><td class="layer-rule">Independent bundle verification — stdlib only</td><td>No VIGÍA imports</td></tr>
+  </tbody>
+</table>
+
+<!-- ════════════════ SECTION 4: MATHEMATICS ════════════════ -->
+<div class="section-title"><span>§4</span> — Mathematical Framework (Complete)</div>
+
+<div class="math-grid">
+
+  <!-- 1. NORMALIZATION -->
+  <div class="math-card">
+    <h3><span class="num">1</span> Signal Normalization</h3>
+    <div class="formula"><span class="comment"># Standard path</span>
+<span class="var">z</span> = (<span class="var">value</span> - <span class="var">baseline_mean</span>) / <span class="var">MAD</span>
+
+<span class="comment"># Pre-normalized path (already z-score — do NOT recalculate)</span>
+<span class="var">z</span> = <span class="var">value</span>   <span class="comment"># is_pre_normalized=True</span></div>
+    <div class="math-note">MAD = Median Absolute Deviation (robust against outliers).<br>
+    <span class="hi">is_pre_normalized</span> flag prevents double-normalization on signals that are already z-scores (e.g. from external calibrated tools).</div>
+  </div>
+
+  <!-- 2. NOISY-OR -->
+  <div class="math-card">
+    <h3><span class="num">2</span> Noisy-OR Fusion (CAIE)</h3>
+    <div class="formula"><span class="comment"># Within-source fusion (dependent evidence)</span>
+<span class="var">group_score</span> = <span class="const">1</span> - ∏(<span class="const">1</span> - <span class="var">score_i</span>)
+
+<span class="comment"># Cross-source fusion (independent sources)</span>
+<span class="var">composite</span>   = <span class="const">1</span> - ∏(<span class="const">1</span> - <span class="var">group_j</span>)
+
+<span class="comment"># Penalty: fewer than 3 independent sources</span>
+<span class="var">composite</span>  *= <span class="const">0.80</span>   <span class="comment"># -20% if n_sources &lt; 3</span></div>
+    <div class="math-note">Noisy-OR models "at least one signal is genuine" without assuming mutual exclusivity.<br>
+    The 20% penalty penalizes thin evidence bases — a Daubert guard against single-source overconfidence.</div>
+  </div>
+
+  <!-- 3. LIKELIHOOD RATIO -->
+  <div class="math-card orange">
+    <h3><span class="num">3</span> Likelihood Ratio (ENFSI-calibrated)</h3>
+    <div class="formula"><span class="var">z_clipped</span>       = clip(<span class="var">z</span>, <span class="op">-3.0</span>, <span class="op">3.0</span>)
+<span class="var">log_lr_i</span>        = (<span class="var">z_clipped</span>²) / <span class="const">2</span>
+<span class="var">mean_corr</span>       = mean(|<span class="var">corr[i,j]</span>|, i≠j)
+<span class="var">combined_log_lr</span> = Σ <span class="var">log_lr_i</span> × (<span class="const">1</span> - <span class="var">mean_corr</span>)
+<span class="var">LR</span>              = exp(<span class="var">combined_log_lr</span>)
+<span class="var">P_fabrication</span>   = <span class="var">LR</span> / (<span class="const">1</span> + <span class="var">LR</span>)   <span class="comment"># prior = 0.5</span></div>
+    <div class="math-note">Correlation penalty <span class="hi">(1 - mean_corr)</span> prevents amplification of duplicated telemetry (Sysmon + Defender + EDR often share ETW origin).<br><br>
+    <strong>ENFSI evidence strength scale:</strong></div>
+    <div class="enfsi-bar">
+      <div class="enfsi-seg e1">LR &lt; 10</div>
+      <div class="enfsi-seg e2">10–100</div>
+      <div class="enfsi-seg e3">100–1K</div>
+      <div class="enfsi-seg e4">1K–10K</div>
+      <div class="enfsi-seg e5">≥ 10,000</div>
+    </div>
+    <div class="enfsi-labels">
+      <div>weak</div><div>moderate</div><div>strong</div><div>very strong</div><div>extreme</div>
+    </div>
+  </div>
+
+  <!-- 4. TRUST DECAY -->
+  <div class="math-card">
+    <h3><span class="num">4</span> Trust Decay — Broken Chain</h3>
+    <div class="formula"><span class="var">trust_effective</span> = <span class="var">base_trust</span> × exp(<span class="op">-λ</span> × <span class="var">break_severity</span>)
+
+<span class="comment"># exp() via precomputed Decimal table — no FPU</span>
+<span class="comment"># deterministic across x86 / ARM / WASM</span></div>
+    <div class="math-note">Chain-of-custody breaks are not binary failures — they degrade trust proportionally.<br>
+    <span class="hi">break_severity ∈ [0,1]</span>: 0 = intact, 1 = unrecoverable.<br>
+    No floating-point processor involved: table-based exp() guarantees bit-identical results.</div>
+  </div>
+
+  <!-- 5. BAYESIAN UPDATE -->
+  <div class="math-card green">
+    <h3><span class="num">5</span> Bayesian Update — Temporal Neighborhood</h3>
+    <div class="formula"><span class="var">likelihood</span> = <span class="var">mean_neighbor_trust</span>
+             - (<span class="var">contamination_ratio</span> × <span class="const">0.5</span>
+             +  <span class="var">suspicious_ratio</span>    × <span class="const">0.2</span>)
+
+<span class="var">marginal</span>  = <span class="var">likelihood</span> × <span class="var">prior</span>
+             + (<span class="const">1</span> - <span class="var">likelihood</span>) × (<span class="const">1</span> - <span class="var">prior</span>)
+
+<span class="var">posterior</span> = clip(<span class="var">likelihood</span> × <span class="var">prior</span> / <span class="var">marginal</span>, <span class="const">0.0</span>, <span class="const">1.0</span>)</div>
+    <div class="math-note">Temporally adjacent events update each other's credibility.<br>
+    A single suspicious event propagates distrust to its temporal neighborhood, weighted by contamination density.</div>
+  </div>
+
+  <!-- 6. FINAL SCORE -->
+  <div class="math-card yellow">
+    <h3><span class="num">6</span> Final Intent Score (vigia_scorer.py)</h3>
+    <div class="formula"><span class="var">raw_intent_score</span> = clip(
+  <span class="var">composite</span> + <span class="var">fracture_malice_boost</span>
+             - <span class="var">fracture_credibility_penalty</span>,
+  <span class="const">0.0</span>, <span class="const">0.99</span>)
+
+<span class="var">support_score</span>    = clip(log(<span class="const">1</span> + <span class="var">n_artifacts</span>) / log(<span class="const">5</span>), <span class="const">0.0</span>, <span class="const">1.0</span>)
+
+<span class="var">final_score</span>      = <span class="var">raw_intent_score</span> × (<span class="const">0.9</span> + <span class="const">0.1</span> × <span class="var">support_score</span>)
+
+<span class="comment"># Hard gate: thin evidence high score → clamp</span>
+if <span class="var">n_artifacts</span> &lt; <span class="const">2</span> and <span class="var">final_score</span> &gt; <span class="const">0.65</span>:
+    <span class="var">final_score</span> = <span class="const">0.65</span></div>
+    <div class="math-note"><span class="hi">support_score</span> implements logarithmic diminishing returns on evidence quantity (log base 5 — saturation at 5 artifacts).<br>
+    Hard gate prevents a single high-weight signal from forcing a verdict without corroboration — Daubert requirement.</div>
+  </div>
+
+  <!-- 7. RISK FUNCTION -->
+  <div class="math-card red">
+    <h3><span class="num">7</span> Risk Function (RiskBoundedDecisionLayer)</h3>
+    <div class="formula"><span class="var">r</span> = (<span class="const">1</span>-<span class="var">P</span>) · (<span class="const">1</span>+<span class="var">λ</span><span class="var">D</span>) · (<span class="const">1</span>+<span class="var">γ</span>(<span class="const">1</span>-<span class="var">S</span>)) · (<span class="const">1</span>+<span class="var">ω</span>(<span class="const">1</span>-<span class="var">I</span>))
+
+<span class="var">P</span> = P(authenticity | evidence)  <span class="comment">∈ [0,1]  1.0 = genuine</span>
+<span class="var">D</span> = drift_score                  <span class="comment">∈ [0,1]</span>
+<span class="var">S</span> = graph_stability              <span class="comment">∈ [0,1]</span>
+<span class="var">I</span> = consistency_score            <span class="comment">∈ [0,1]</span>
+<span class="var">λ</span>, <span class="var">γ</span>, <span class="var">ω</span> = adaptive params        <span class="comment">always &gt; 0</span>
+
+<span class="comment"># Decision (ε-bounded):</span>
+<span class="var">r</span> ≤ <span class="var">ε_accept</span>        → ACCEPT  (ACCEPT_POSTERIOR)
+<span class="var">r</span> ≥ <span class="const">1</span> - <span class="var">ε_reject</span>   → REJECT  (REJECT_POSTERIOR)
+otherwise           → ABSTAIN (see §4.7 subtypes)
+
+<span class="comment"># ε defaults: ε_accept = ε_reject = 0.05</span>
+<span class="comment"># All thresholds read from sealed PolicySpec — none hardcoded</span></div>
+    <div class="math-note"><span class="hi">Decimal prec=28, ROUND_HALF_EVEN</span> throughout. Inputs clamped before any multiplication.<br>
+    λ, γ, ω are adaptive (see §4.11). ε_accept and ε_reject are policy parameters, not constants.</div>
+  </div>
+
+  <!-- 8. CAUSAL CLOSURE -->
+  <div class="math-card">
+    <h3><span class="num">8</span> Causal Closure Score (CCS Gate)</h3>
+    <div class="formula"><span class="var">CCS</span> = Σ(weights of CONSISTENT evidence)
+    / Σ(weights of ALL evidence)
+    <span class="comment">∈ ℚ ∩ [0,1]   — exact Fraction, no floats</span>
+
+<span class="var">CCS</span> &gt; <span class="const">1/2</span>  → causal chain admissible → verdict possible
+<span class="var">CCS</span> ≤ <span class="const">1/2</span>  → chain BROKEN → ABSTAIN (hard veto)</span></div>
+    <div class="math-note">The CCS gate is a hard veto: a majority of evidence must be mutually consistent before any verdict is issued.<br>
+    <span class="hi">Fraction arithmetic</span>: the threshold 1/2 is exact, no floating-point approximation possible.</div>
+  </div>
+
+  <!-- 9. EFFECTIVE CONFIDENCE -->
+  <div class="math-card green">
+    <h3><span class="num">9</span> Effective Confidence (Stability-Adjusted)</h3>
+    <div class="formula"><span class="var">effective_confidence</span> = <span class="var">confidence</span> × (<span class="const">1/2</span> + <span class="var">stability</span> × <span class="const">1/2</span>)
+
+<span class="comment"># All in Fraction — exact rational arithmetic</span>
+<span class="comment"># stability ∈ [0,1] from graph_stability bootstrap</span></div>
+    <div class="math-note">A verdict won by narrow margin (low stability) carries lower effective confidence even if the raw score is identical.<br>
+    This prevents overconfident verdicts from unstable evidence graphs — critical for Daubert cross-examination.</div>
+  </div>
+
+  <!-- 10. QUADRIPARTITE VERDICT -->
+  <div class="math-card orange">
+    <h3><span class="num">10</span> Quadripartite Verdict — 8 States</h3>
+    <table class="verdict-table">
+      <thead><tr><th>State</th><th>Condition</th></tr></thead>
+      <tbody>
+        <tr><td class="v-degraded">ABSTAIN_DEGRADED</td><td class="v-cond">DEGRADED_MODE active (always first — system fault)</td></tr>
+        <tr><td class="v-escalate">ESCALATE</td><td class="v-cond">dissent escalation_required by audit engine</td></tr>
+        <tr><td class="v-contradict">ABSTAIN_CONTRADICTION</td><td class="v-cond">raw == ABSTAIN + oscillation detected</td></tr>
+        <tr><td class="v-abstain">ABSTAIN_INSUFFICIENT</td><td class="v-cond">effective_confidence &lt; 3/5</td></tr>
+        <tr><td class="v-malice-h">MALICE_HIGH</td><td class="v-cond">MALICE + eff_conf ≥ 4/5</td></tr>
+        <tr><td class="v-malice-m">MALICE_MEDIUM</td><td class="v-cond">MALICE + eff_conf ∈ [3/5, 4/5)</td></tr>
+        <tr><td class="v-benign-h">BENIGN_HIGH</td><td class="v-cond">BENIGN + eff_conf ≥ 4/5</td></tr>
+        <tr><td class="v-benign-m">BENIGN_MEDIUM</td><td class="v-cond">BENIGN + eff_conf ∈ [3/5, 4/5)</td></tr>
+      </tbody>
+    </table>
+    <div class="math-note" style="margin-top:10px;">
+      <span class="hi">audit_hash</span> = SHA-256(state ‖ raw_verdict ‖ confidence ‖ stability ‖ integrity ‖ adversarial ‖ dissent, sort_keys=True)<br>
+      BENIGN + adversarial_penalty cleared → +5% bonus to effective_confidence.
+    </div>
+  </div>
+
+  <!-- 11. META-CALIBRATION -->
+  <div class="math-card">
+    <h3><span class="num">11</span> Meta-Calibration (Adaptive — no opaque ML)</h3>
+    <div class="formula"><span class="comment"># Parameter updates per evaluation cycle</span>
+<span class="var">λ_t</span> = <span class="var">λ_{t-1}</span> × (<span class="const">1</span> + <span class="const">0.5</span>×<span class="var">fn_rate</span> - <span class="const">0.5</span>×<span class="var">fp_rate</span>)
+<span class="var">γ_t</span> = <span class="var">γ_{t-1}</span> × (<span class="const">1</span> + <span class="var">fp_rate</span>  - <span class="const">0.5</span>×<span class="var">fn_rate</span>)
+<span class="var">ε_t</span> = <span class="var">ε_{t-1}</span> × (<span class="const">1</span> + <span class="var">abst_rate</span> - <span class="var">target_abst_rate</span>)
+
+<span class="comment"># PD stabilization (discrete)</span>
+<span class="var">velocity_t</span> = <span class="var">momentum</span> × <span class="var">velocity_{t-1}</span>
+            + (<span class="const">1</span>-<span class="var">momentum</span>) × <span class="var">delta_t</span>
+if |<span class="var">delta_t</span>| &gt; <span class="var">τ</span>:
+    <span class="var">theta</span> = <span class="var">prev_theta</span> + <span class="var">damping</span> × <span class="var">delta_t</span>
+<span class="var">theta</span> = <span class="var">theta</span> - <span class="const">0.1</span> × <span class="var">velocity_t</span>
+
+<span class="comment"># Absolute bounds (Daubert — auditable, stable)</span>
+<span class="var">λ</span> ∈ [<span class="const">0.1</span>, <span class="const">15.0</span>],  <span class="var">γ</span> ∈ [<span class="const">0.1</span>, <span class="const">15.0</span>],  <span class="var">ε</span> ∈ [<span class="const">0.005</span>, <span class="const">0.30</span>]</div>
+    <div class="math-note">Parameters adapt to observed FP/FN rates without opaque gradient descent.<br>
+    PD stabilization prevents runaway oscillation. Bounded ranges ensure Daubert auditability — no parameter can drift to an inadmissible extreme.</div>
+  </div>
+
+  <!-- 12. P2 PROTOCOL -->
+  <div class="math-card yellow">
+    <h3><span class="num">12</span> Protocol P2 — Complexity Metrics</h3>
+    <div class="formula"><span class="comment"># Permutation Entropy (order m)</span>
+<span class="var">H_PE</span>   = -Σ P(π) × log₂(P(π))
+<span class="var">H_norm</span> = <span class="var">H_PE</span> / log₂(m!)
+
+<span class="comment"># Entropy Rate (over symbol pairs)</span>
+<span class="var">H_rate</span> = -Σ P(t) × log₂(P(t))
+<span class="var">token</span>  = (<span class="var">uint32_a</span> &lt;&lt; <span class="const">32</span>) | <span class="var">uint32_b</span>   <span class="comment"># bijection, no collisions</span>
+
+<span class="comment"># Canonical cross-platform quantization</span>
+<span class="var">d</span>      = Decimal(str(<span class="var">value</span>))
+<span class="var">result</span> = float(<span class="var">d</span>.quantize(Decimal(<span class="const">'1.000000'</span>),
+                rounding=ROUND_HALF_EVEN))
+<span class="comment"># NOT round() — delegates to libc, non-deterministic cross-platform</span></div>
+    <div class="hash-box">
+      <div class="hash-label">SHA-256 P2 Canonical Vectors (v2.8 — 22 vectors)</div>
+      <div class="hash-val">f7276a524a46149a2811d52f9e5072d2a281df227f9d46d084a651d6420cf4ce</div>
+    </div>
+    <div class="math-note" style="margin-top:10px;">Any correct implementation must produce bit-identical outputs for all 22 canonical vectors.<br>
+    This is the determinism guarantee required for Daubert reproducibility.</div>
+  </div>
+
+</div>
+
+<!-- ════════════════ SECTION 5: VERDICT THRESHOLDS ════════════════ -->
+<div class="section-title"><span>§5</span> — Verdict Thresholds (Calibrated 2026-05-19, Protocol P2)</div>
+
+<div class="arch-block" style="border-left: 3px solid var(--warn);">
+  <div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(280px,1fr)); gap: 12px; margin-top: 8px;">
+
+    <div>
+      <div class="arch-label red" style="margin-bottom:8px;">Hard Gates (Categorical — no override)</div>
+      <div class="formula" style="font-size:11px;"><span class="comment"># Structural impossibility</span>
+EFFECT_BEFORE_CAUSE → MALICE_CATEGORICAL
+  confidence = <span class="const">0.95</span>
+
+<span class="comment"># Inadmissible evidence (Daubert)</span>
+provenance_collapsed + no_fractures → NOISE</div>
+    </div>
+
+    <div>
+      <div class="arch-label cyan" style="margin-bottom:8px;">Probabilistic Thresholds</div>
+      <div class="formula" style="font-size:11px;"><span class="var">final_score</span> &gt; <span class="const">0.35</span> → MALICE
+  confidence = min(<span class="const">0.95</span>, score × <span class="const">2</span>)
+
+<span class="var">final_score</span> &gt; <span class="const">0.18</span> → SUSPICION
+  confidence = score × <span class="const">2</span>
+
+<span class="var">final_score</span> &gt; <span class="const">0.08</span> → UNKNOWN
+  confidence = score × <span class="const">2</span>
+
+<span class="var">final_score</span> ≤ <span class="const">0.08</span> → NOISE
+  confidence = <span class="const">1</span> - score</div>
+    </div>
+
+    <div>
+      <div class="arch-label green" style="margin-bottom:8px;">Intermediate SUSPICION Path</div>
+      <div class="formula" style="font-size:11px;"><span class="comment"># When fractures present but score low</span>
+mean_effective &lt; <span class="const">0.15</span>
+  + fractures_active
+  → SUSPICION (signal without proof)
+
+<span class="comment"># Reasoning: attacker may have suppressed</span>
+<span class="comment"># primary evidence (Eco: significant silence)</span></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ════════════════ FOOTER ════════════════ -->
+<div class="footer">
+  <div>VIGÍA — Forensic Intentionality Analysis Suite · SANS FIND EVIL Hackathon 2026</div>
+  <div>Anna Tchijova + VIGÍA AI Collective (Claude, Kimi, Gemini, DeepSeek, Qwen, ChatGPT)</div>
+  <div>github.com/annatchijova/vigia-intent-analysis · Apache 2.0</div>
+</div>
+
+</body>
+</html>
