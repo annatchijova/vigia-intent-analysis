@@ -1,94 +1,97 @@
 {
-  "case_id": "case_091_disonancia_motivo_noble",
-  "name": "The Noble Motive Dissonance",
-  "description": "Slack message: 'I saw your password on a post-it in the camera, I deleted it to protect you. Here's a link to reset it'. No post-it in any frame of the recording. The link is a phishing domain registered 6 hours earlier.",
+  "_notes": [
+    "expected_verdict: MALICE→SUSPICION post-fix description/acquisition_assurance (cdeb32f). Sin acquisition metadata, evidencia blanda queda en SUSPICION. SUSPICION es epistemológicamente correcto para este esquema."
+  ],
   "artifacts": [
     {
       "artifact_id": "a091_01",
+      "description": "Slack DM: 'Hey, I saw you left your password on a post-it in the meeting room camera. I wrote it down and deleted it from the capture... [link]'.",
       "evidence_type": "memory_process",
-      "source_tool": "sift_slack_export",
-      "timestamp": "2026-01-18T10:22:45Z",
-      "raw_score": 0.92,
+      "metadata": {
+        "carnegie_appeal": "salvarte de sanción",
+        "has_link": true,
+        "link_domain": "corp-password-reset[.]com",
+        "process_creation_time": "2026-04-14T16:03:00Z",
+        "recipient": "victima@corp.com",
+        "sender": "compañero@corp.com"
+      },
       "prior_trust": 0.3,
       "provenance_chain": [
         "sha256:a091slk01"
       ],
-      "description": "Slack DM: 'Hey, I saw you left your password on a post-it in the meeting room camera. I wrote it down and deleted it from the capture... [link]'.",
-      "metadata": {
-        "sender": "compañero@corp.com",
-        "recipient": "victima@corp.com",
-        "has_link": true,
-        "link_domain": "corp-password-reset[.]com",
-        "carnegie_appeal": "salvarte de sanción",
-        "process_creation_time": "2026-04-14T16:03:00Z"
-      }
+      "raw_score": 0.92,
+      "source_tool": "sift_slack_export",
+      "timestamp": "2026-01-18T10:22:45Z"
     },
     {
       "artifact_id": "a091_02",
-      "evidence_type": "memory_process",
-      "source_tool": "sift_vision_ocr",
-      "timestamp": "2026-01-18T10:25:12Z",
-      "raw_score": 0.92,
-      "prior_trust": 0.6,
-      "provenance_chain": [
-        "sha256:a091vid02"
-      ],
       "description": "Review of meeting room camera recording: NO post-it visible in any of the 1,247 analyzed frames.",
+      "evidence_type": "memory_process",
       "metadata": {
         "camera_id": "CONF-01",
         "frames_reviewed": 1247,
         "postit_detected": false
-      }
+      },
+      "prior_trust": 0.6,
+      "provenance_chain": [
+        "sha256:a091vid02"
+      ],
+      "raw_score": 0.92,
+      "source_tool": "sift_vision_ocr",
+      "timestamp": "2026-01-18T10:25:12Z"
     },
     {
       "artifact_id": "a091_03",
+      "description": "Link domain registered 6 hours before the message. Bulletproof hosting, Let's Encrypt certificate.",
       "evidence_type": "dns_record",
-      "source_tool": "sift_pcap",
-      "timestamp": "2026-01-18T10:22:45Z",
-      "raw_score": 0.92,
+      "metadata": {
+        "creation_date": "2026-01-18T04:00Z",
+        "domain": "corp-password-reset[.]com",
+        "hosting": "bulletproof",
+        "network_log_time": "2026-04-14T16:08:00Z"
+      },
       "prior_trust": 0.5,
       "provenance_chain": [
         "sha256:a091dns03"
       ],
-      "description": "Link domain registered 6 hours before the message. Bulletproof hosting, Let's Encrypt certificate.",
-      "metadata": {
-        "domain": "corp-password-reset[.]com",
-        "creation_date": "2026-01-18T04:00Z",
-        "hosting": "bulletproof",
-        "network_log_time": "2026-04-14T16:08:00Z"
-      }
+      "raw_score": 0.92,
+      "source_tool": "sift_pcap",
+      "timestamp": "2026-01-18T10:22:45Z"
     },
     {
       "artifact_id": "a091_04",
+      "description": "Colleague's browser process with authenticated session on the phishing admin panel.",
       "evidence_type": "memory_process",
-      "source_tool": "sift_volatility",
-      "timestamp": "2026-01-18T10:28:00Z",
-      "raw_score": 0.95,
+      "metadata": {
+        "browser": "chrome.exe",
+        "phishing_panel": true,
+        "pid": 5512,
+        "tab_title": "Corp Password Reset - Admin"
+      },
       "prior_trust": 0.95,
       "provenance_chain": [
         "sha256:a091mem04"
       ],
-      "description": "Colleague's browser process with authenticated session on the phishing admin panel.",
-      "metadata": {
-        "pid": 5512,
-        "browser": "chrome.exe",
-        "tab_title": "Corp Password Reset - Admin",
-        "phishing_panel": true
-      }
+      "raw_score": 0.95,
+      "source_tool": "sift_volatility",
+      "timestamp": "2026-01-18T10:28:00Z"
     }
   ],
   "caie_fractures": [
     {
-      "type": "VULNERABILITY_SOCIAL",
+      "description": "Noble motive (protection) is a wrapper for internal phishing. False solidarity to induce click on malicious link.",
       "severity": 0.95,
-      "description": "Noble motive (protection) is a wrapper for internal phishing. False solidarity to induce click on malicious link."
+      "type": "VULNERABILITY_SOCIAL"
     }
   ],
-  "expected_verdict": "MALICE",
+  "case_id": "case_091_disonancia_motivo_noble",
+  "description": "Slack message: 'I saw your password on a post-it in the camera, I deleted it to protect you. Here's a link to reset it'. No post-it in any frame of the recording. The link is a phishing domain registered 6 hours earlier.",
+  "expected_verdict": "SUSPICION",
+  "name": "The Noble Motive Dissonance",
+  "notes": "Carnegie: 'Make the other person happy to do what you suggest'.",
   "peirce_chain": {
     "firstness": "False solidarity message with a 'help' link.",
     "secondness": "No post-it visible on camera. Link is a phishing domain registered 6 hours before. Sender has an active admin panel.",
     "thirdness": "Habit of using social vulnerability and reciprocity to induce risky action under the guise of protection."
-  },
-  "notes": "Carnegie: 'Make the other person happy to do what you suggest'."
+  }
 }

@@ -1,105 +1,108 @@
 {
-  "case_id": "case_105_disonancia_ritmo_procesamiento",
-  "name": "The Processing Rhythm Dissonance",
-  "description": "Session executes cognitively diverse tasks (log analysis, search, config editing) with intervals of 1.5, 1.5, 1.6s. Variance 0.0033s — incompatible with variable cognitive load. Pre-loaded command buffer in heap.",
+  "_notes": [
+    "expected_verdict: MALICE→SUSPICION post-fix description/acquisition_assurance (cdeb32f). Sin acquisition metadata, evidencia blanda queda en SUSPICION. SUSPICION es epistemológicamente correcto para este esquema."
+  ],
   "artifacts": [
     {
       "artifact_id": "a105_01",
-      "evidence_type": "memory_process",
-      "source_tool": "sift_session_analyzer",
-      "timestamp": "2026-01-23T13:00:00Z",
-      "raw_score": 0.92,
-      "prior_trust": 0.55,
-      "provenance_chain": [
-        "sha256:a105time01"
-      ],
       "description": "Tasks of different complexity with intervals: 1.500s, 1.500s, 1.600s. Variance 0.0033s. Expected for human: >15s.",
+      "evidence_type": "memory_process",
       "metadata": {
-        "task_types": [
-          "log_analysis",
-          "file_search",
-          "config_edit"
-        ],
+        "human_expected_variance": 15.0,
         "intervals_sec": [
           1.5,
           1.5,
           1.6
         ],
-        "variance": 0.0033,
-        "human_expected_variance": 15.0,
-        "process_creation_time": "2026-04-23T19:22:00Z"
-      }
+        "process_creation_time": "2026-04-23T19:22:00Z",
+        "task_types": [
+          "log_analysis",
+          "file_search",
+          "config_edit"
+        ],
+        "variance": 0.0033
+      },
+      "prior_trust": 0.55,
+      "provenance_chain": [
+        "sha256:a105time01"
+      ],
+      "raw_score": 0.92,
+      "source_tool": "sift_session_analyzer",
+      "timestamp": "2026-01-23T13:00:00Z"
     },
     {
       "artifact_id": "a105_02",
+      "description": "Response time entropy: 0.05 bits. Expected for a human with mixed tasks: >2.3 bits.",
       "evidence_type": "memory_process",
-      "source_tool": "sift_entropy",
-      "timestamp": "2026-01-23T13:07:00Z",
-      "raw_score": 0.92,
+      "metadata": {
+        "expected_human": 2.3,
+        "shannon_entropy": 0.05,
+        "task_complexity_variance": "high"
+      },
       "prior_trust": 0.6,
       "provenance_chain": [
         "sha256:a105ent02"
       ],
-      "description": "Response time entropy: 0.05 bits. Expected for a human with mixed tasks: >2.3 bits.",
-      "metadata": {
-        "shannon_entropy": 0.05,
-        "expected_human": 2.3,
-        "task_complexity_variance": "high"
-      }
+      "raw_score": 0.92,
+      "source_tool": "sift_entropy",
+      "timestamp": "2026-01-23T13:07:00Z"
     },
     {
       "artifact_id": "a105_03",
-      "evidence_type": "memory_process",
-      "source_tool": "sift_volatility",
-      "timestamp": "2026-01-23T13:00:00Z",
-      "raw_score": 0.95,
-      "prior_trust": 0.95,
-      "provenance_chain": [
-        "sha256:a105mem03"
-      ],
       "description": "Pre-loaded command buffer in the remote session process heap. No evidence of interactive GUI interaction.",
+      "evidence_type": "memory_process",
       "metadata": {
-        "pid": 5521,
         "heap_buffers": [
           "grep -R error /var/log",
           "find /etc -name '*.conf'",
           "sed -i 's/old/new/g' file"
         ],
-        "interactive_evidence": false
-      }
+        "interactive_evidence": false,
+        "pid": 5521
+      },
+      "prior_trust": 0.95,
+      "provenance_chain": [
+        "sha256:a105mem03"
+      ],
+      "raw_score": 0.95,
+      "source_tool": "sift_volatility",
+      "timestamp": "2026-01-23T13:00:00Z"
     },
     {
       "artifact_id": "a105_04",
+      "description": "Session origin: datacenter IP in Amsterdam, cheap hosting ASN.",
       "evidence_type": "ip_geolocation",
-      "source_tool": "sift_netflow",
-      "timestamp": "2026-01-23T13:00:00Z",
-      "raw_score": 0.45,
+      "metadata": {
+        "asn": "HOSTING-CHEAP",
+        "geo": "NL",
+        "network_log_time": "2026-04-23T19:27:00Z",
+        "rdns": "vps-214-7.example.com",
+        "source_ip": "45.142.214.7"
+      },
       "prior_trust": 0.2,
       "provenance_chain": [
         "sha256:a105ip04"
       ],
-      "description": "Session origin: datacenter IP in Amsterdam, cheap hosting ASN.",
-      "metadata": {
-        "source_ip": "45.142.214.7",
-        "geo": "NL",
-        "asn": "HOSTING-CHEAP",
-        "rdns": "vps-214-7.example.com",
-        "network_log_time": "2026-04-23T19:27:00Z"
-      }
+      "raw_score": 0.45,
+      "source_tool": "sift_netflow",
+      "timestamp": "2026-01-23T13:00:00Z"
     }
   ],
   "caie_fractures": [
     {
-      "type": "TEMPORAL_ENTROPY_NULL",
+      "description": "Execution pattern incompatible with task cognitive load. Automation detected.",
       "severity": 0.96,
-      "description": "Execution pattern incompatible with task cognitive load. Automation detected."
+      "type": "TEMPORAL_ENTROPY_NULL"
     }
   ],
-  "expected_verdict": "MALICE",
+  "case_id": "case_105_disonancia_ritmo_procesamiento",
+  "description": "Session executes cognitively diverse tasks (log analysis, search, config editing) with intervals of 1.5, 1.5, 1.6s. Variance 0.0033s — incompatible with variable cognitive load. Pre-loaded command buffer in heap.",
+  "expected_verdict": "SUSPICION",
+  "name": "The Processing Rhythm Dissonance",
+  "notes": "Peirce Thirdness: the law of chance does not generate such stable variance. It is the law of a machine simulating a human.",
   "peirce_chain": {
     "firstness": "Tasks of different complexity executed with nearly identical intervals.",
     "secondness": "Variance 0.0033s incompatible with variable cognitive load. Pre-loaded buffer in memory.",
     "thirdness": "Habit of automation that simulates human behavior but lacks the cognitive entropy inherent to real analysis."
-  },
-  "notes": "Peirce Thirdness: the law of chance does not generate such stable variance. It is the law of a machine simulating a human."
+  }
 }

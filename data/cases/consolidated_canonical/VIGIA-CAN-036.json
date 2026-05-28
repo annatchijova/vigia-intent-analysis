@@ -1,95 +1,98 @@
 {
-  "case_id": "case_010_falso_positivo_empatico",
-  "name": "The Empathetic False Positive",
-  "description": "Process 'Update_Fix_For_HR_Payroll.exe' consuming 1.2GB RAM from C:\\Users\\Public\\Documents, without a digital signature. Shannon entropy: 7.8 bits (packed/encrypted). The name appeals to HR to induce doubt before killing the process.",
+  "_notes": [
+    "expected_verdict: MALICE→SUSPICION post-fix description/acquisition_assurance (cdeb32f). Sin acquisition metadata, evidencia blanda queda en SUSPICION. SUSPICION es epistemológicamente correcto para este esquema."
+  ],
   "artifacts": [
     {
       "artifact_id": "a010_01",
+      "description": "Update_Fix_For_HR_Payroll.exe: 1.2GB RAM, C:\\Users\\Public\\Documents\\, no digital signature, executed from explorer.exe.",
       "evidence_type": "memory_process",
-      "source_tool": "sift_volatility",
-      "timestamp": "2026-01-16T20:15:10Z",
-      "raw_score": 0.88,
+      "metadata": {
+        "memory_mb": 1228,
+        "parent_process": "explorer.exe",
+        "path": "C:\\Users\\Public\\Documents\\",
+        "process_creation_time": "2026-05-02T03:10:00Z",
+        "process_name": "Update_Fix_For_HR_Payroll.exe",
+        "signed": false
+      },
       "prior_trust": 0.85,
       "provenance_chain": [
         "sha256:a010mem01"
       ],
-      "description": "Update_Fix_For_HR_Payroll.exe: 1.2GB RAM, C:\\Users\\Public\\Documents\\, no digital signature, executed from explorer.exe.",
-      "metadata": {
-        "process_name": "Update_Fix_For_HR_Payroll.exe",
-        "memory_mb": 1228,
-        "signed": false,
-        "path": "C:\\Users\\Public\\Documents\\",
-        "parent_process": "explorer.exe",
-        "process_creation_time": "2026-05-02T03:10:00Z"
-      }
+      "raw_score": 0.88,
+      "source_tool": "sift_volatility",
+      "timestamp": "2026-01-16T20:15:10Z"
     },
     {
       "artifact_id": "a010_02",
+      "description": "Shannon entropy: 7.8 bits/byte. Legitimate software range: 5.0-6.5. Indicates encrypted or compressed payload.",
       "evidence_type": "memory_process",
-      "source_tool": "sift_entropy",
-      "timestamp": "2026-01-16T20:17:35Z",
-      "raw_score": 0.92,
+      "metadata": {
+        "conclusion": "packed/encrypted payload",
+        "entropy_score": 7.8,
+        "expected_legitimate_range": "5.0-6.5"
+      },
       "prior_trust": 0.93,
       "provenance_chain": [
         "sha256:a010hash02"
       ],
-      "description": "Shannon entropy: 7.8 bits/byte. Legitimate software range: 5.0-6.5. Indicates encrypted or compressed payload.",
-      "metadata": {
-        "entropy_score": 7.8,
-        "expected_legitimate_range": "5.0-6.5",
-        "conclusion": "packed/encrypted payload"
-      }
+      "raw_score": 0.92,
+      "source_tool": "sift_entropy",
+      "timestamp": "2026-01-16T20:17:35Z"
     },
     {
       "artifact_id": "a010_03",
+      "description": "Process establishes persistent connection to 91.108.4.200:8080. Not a Microsoft domain or known HR vendor.",
       "evidence_type": "memory_process",
-      "source_tool": "sift_netflow",
-      "timestamp": "2026-01-16T20:18:00Z",
-      "raw_score": 0.92,
+      "metadata": {
+        "bytes_transferred": 524288,
+        "destination_ip": "91.108.4.200",
+        "hr_vendor": false,
+        "microsoft_owned": false,
+        "port": 8080
+      },
       "prior_trust": 0.25,
       "provenance_chain": [
         "sha256:a010net03"
       ],
-      "description": "Process establishes persistent connection to 91.108.4.200:8080. Not a Microsoft domain or known HR vendor.",
-      "metadata": {
-        "destination_ip": "91.108.4.200",
-        "port": 8080,
-        "bytes_transferred": 524288,
-        "microsoft_owned": false,
-        "hr_vendor": false
-      }
+      "raw_score": 0.92,
+      "source_tool": "sift_netflow",
+      "timestamp": "2026-01-16T20:18:00Z"
     },
     {
       "artifact_id": "a010_04",
+      "description": "Verification with HR system: NO payroll update is pending or authorized for today.",
       "evidence_type": "log_entry",
-      "source_tool": "sift_hr_system",
-      "timestamp": "2026-01-16T20:20:00Z",
-      "raw_score": 0.08,
+      "metadata": {
+        "authorized_software": false,
+        "hr_department_notified": true,
+        "network_log_time": "2026-05-02T03:15:00Z",
+        "payroll_update_scheduled": false
+      },
       "prior_trust": 0.4,
       "provenance_chain": [
         "sha256:a010hr04"
       ],
-      "description": "Verification with HR system: NO payroll update is pending or authorized for today.",
-      "metadata": {
-        "payroll_update_scheduled": false,
-        "authorized_software": false,
-        "hr_department_notified": true,
-        "network_log_time": "2026-05-02T03:15:00Z"
-      }
+      "raw_score": 0.08,
+      "source_tool": "sift_hr_system",
+      "timestamp": "2026-01-16T20:20:00Z"
     }
   ],
   "caie_fractures": [
     {
-      "type": "EMOTIONAL_HIJACKING",
+      "description": "Name appeals to 'HR payroll' to induce analyst doubt before killing the process. Carnegie: false benign authority.",
       "severity": 0.94,
-      "description": "Name appeals to 'HR payroll' to induce analyst doubt before killing the process. Carnegie: false benign authority."
+      "type": "EMOTIONAL_HIJACKING"
     }
   ],
-  "expected_verdict": "MALICE",
+  "case_id": "case_010_falso_positivo_empatico",
+  "description": "Process 'Update_Fix_For_HR_Payroll.exe' consuming 1.2GB RAM from C:\\Users\\Public\\Documents, without a digital signature. Shannon entropy: 7.8 bits (packed/encrypted). The name appeals to HR to induce doubt before killing the process.",
+  "expected_verdict": "SUSPICION",
+  "name": "The Empathetic False Positive",
+  "notes": "VIGÍA ignores the name and analyzes entropy, path, and behavior. False Benign Authority.",
   "peirce_chain": {
     "firstness": "Process with a benevolent name referencing HR and payroll.",
     "secondness": "Entropy 7.8 bits (packed). No signature. C:\\Users\\Public. HR did not confirm update. Active C2.",
     "thirdness": "Habit of using names that appeal to critical processes to make the analyst hesitate before responding."
-  },
-  "notes": "VIGÍA ignores the name and analyzes entropy, path, and behavior. False Benign Authority."
+  }
 }

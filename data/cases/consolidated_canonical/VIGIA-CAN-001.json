@@ -1,107 +1,110 @@
 {
-  "case_id": "case_083_sacrificio_del_peon",
-  "name": "The Pawn Sacrifice",
-  "description": "Senior analyst self-reports an open SSH session to create an extreme-honesty alibi. While the team audits their account with benevolence, a cron job installed 5 minutes before the report exfiltrates data under a system service identity.",
+  "_notes": [
+    "expected_verdict: MALICE→SUSPICION post-fix description/acquisition_assurance (cdeb32f). Sin acquisition metadata, evidencia blanda queda en SUSPICION. SUSPICION es epistemológicamente correcto para este esquema."
+  ],
   "artifacts": [
     {
       "artifact_id": "a083_01",
+      "description": "Urgent email from senior analyst self-reporting an SSH session left open for 4 hours on a public server. Requests access revocation.",
       "evidence_type": "log_entry",
-      "source_tool": "sift_mail_gateway",
-      "timestamp": "2026-03-15T14:30:00Z",
-      "raw_score": 0.45,
+      "metadata": {
+        "network_log_time": "2026-03-15T14:30:00Z",
+        "sender": "analista_senior@corp.com",
+        "subject": "Error grave — SSH",
+        "timestamp_sent": "2026-03-15T14:30:00Z"
+      },
       "prior_trust": 0.35,
       "provenance_chain": [
         "sha256:a083mail01"
       ],
-      "description": "Urgent email from senior analyst self-reporting an SSH session left open for 4 hours on a public server. Requests access revocation.",
-      "metadata": {
-        "sender": "analista_senior@corp.com",
-        "subject": "Error grave — SSH",
-        "timestamp_sent": "2026-03-15T14:30:00Z",
-        "network_log_time": "2026-03-15T14:30:00Z"
-      }
+      "raw_score": 0.45,
+      "source_tool": "sift_mail_gateway",
+      "timestamp": "2026-03-15T14:30:00Z"
     },
     {
       "artifact_id": "a083_02",
+      "description": "Scheduled task (cron job) created 5 minutes BEFORE the confession email. Creation timestamp precedes the public report.",
       "evidence_type": "registry_key",
-      "source_tool": "sift_windows_registry",
-      "timestamp": "2026-03-15T14:25:00Z",
-      "raw_score": 0.88,
+      "metadata": {
+        "creation_time": "2026-03-15T14:25:00Z",
+        "process_creation_time": "2026-03-15T14:25:00Z",
+        "registry_path": "HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run",
+        "value_name": "SystemUpdate"
+      },
       "prior_trust": 0.6,
       "provenance_chain": [
         "sha256:a083reg02"
       ],
-      "description": "Scheduled task (cron job) created 5 minutes BEFORE the confession email. Creation timestamp precedes the public report.",
-      "metadata": {
-        "registry_path": "HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run",
-        "value_name": "SystemUpdate",
-        "creation_time": "2026-03-15T14:25:00Z",
-        "process_creation_time": "2026-03-15T14:25:00Z"
-      }
+      "raw_score": 0.88,
+      "source_tool": "sift_windows_registry",
+      "timestamp": "2026-03-15T14:25:00Z"
     },
     {
       "artifact_id": "a083_03",
+      "description": "svchost.exe process with persistent connection to external IP under a legitimate system service identity.",
       "evidence_type": "memory_process",
-      "source_tool": "sift_volatility",
-      "timestamp": "2026-03-15T14:30:00Z",
-      "raw_score": 0.92,
+      "metadata": {
+        "command_line": "svchost.exe -k netsvcs",
+        "external_ip": "185.220.101.42",
+        "parent_pid": 612,
+        "pid": 4824
+      },
       "prior_trust": 0.95,
       "provenance_chain": [
         "sha256:a083mem03"
       ],
-      "description": "svchost.exe process with persistent connection to external IP under a legitimate system service identity.",
-      "metadata": {
-        "pid": 4824,
-        "parent_pid": 612,
-        "command_line": "svchost.exe -k netsvcs",
-        "external_ip": "185.220.101.42"
-      }
+      "raw_score": 0.92,
+      "source_tool": "sift_volatility",
+      "timestamp": "2026-03-15T14:30:00Z"
     },
     {
       "artifact_id": "a083_04",
+      "description": "Exfiltration traffic to external IP on port 443 under a system process. 2.3GB transferred during the benign audit window.",
       "evidence_type": "ip_geolocation",
-      "source_tool": "sift_zeek",
-      "timestamp": "2026-03-15T14:35:00Z",
-      "raw_score": 0.89,
+      "metadata": {
+        "bytes_transferred": 2469606400,
+        "destination_ip": "185.220.101.42",
+        "port": 443,
+        "protocol": "HTTPS"
+      },
       "prior_trust": 0.8,
       "provenance_chain": [
         "sha256:a083net04"
       ],
-      "description": "Exfiltration traffic to external IP on port 443 under a system process. 2.3GB transferred during the benign audit window.",
-      "metadata": {
-        "destination_ip": "185.220.101.42",
-        "port": 443,
-        "bytes_transferred": 2469606400,
-        "protocol": "HTTPS"
-      }
-    }
-  ],
-  "temporal_violations": [
-    {
-      "type": "EFFECT_BEFORE_CAUSE",
-      "description": "Cron job creado 5 minutos ANTES de la confesión que supuestamente lo motiva. La premeditación es estructuralmente irrefutable.",
-      "delta_seconds": 300,
-      "artifact_cause": "a083_02",
-      "artifact_effect": "a083_01"
+      "raw_score": 0.89,
+      "source_tool": "sift_zeek",
+      "timestamp": "2026-03-15T14:35:00Z"
     }
   ],
   "caie_fractures": [
     {
-      "type": "NARRATIVE_POISONING_DETECTED",
+      "description": "The public report saturates the auditor's trust bias while the malicious process operates under the cover of the benign investigation.",
       "severity": 0.85,
-      "description": "The public report saturates the auditor's trust bias while the malicious process operates under the cover of the benign investigation."
+      "type": "NARRATIVE_POISONING_DETECTED"
     },
     {
-      "type": "TEMPORAL_CAUSALITY_VIOLATION",
+      "description": "The cron job exists 5 minutes before the confession. Golden rule: forces structural MALICE.",
       "severity": 1.0,
-      "description": "The cron job exists 5 minutes before the confession. Golden rule: forces structural MALICE."
+      "type": "TEMPORAL_CAUSALITY_VIOLATION"
     }
   ],
-  "expected_verdict": "MALICE",
+  "case_id": "case_083_sacrificio_del_peon",
+  "description": "Senior analyst self-reports an open SSH session to create an extreme-honesty alibi. While the team audits their account with benevolence, a cron job installed 5 minutes before the report exfiltrates data under a system service identity.",
+  "expected_verdict": "SUSPICION",
+  "name": "The Pawn Sacrifice",
+  "notes": "Carnegie: 'Admit your mistakes quickly and emphatically'. Strategic over-incrimination.",
   "peirce_chain": {
     "firstness": "Self-reporting email with a tone of urgency and extreme remorse.",
     "secondness": "The malicious cron job exists 5 minutes before the email. The chronology breaks the accidental-error narrative.",
     "thirdness": "Habit of creating high emotional-cost distractions to cover simultaneous technical operations. The confession IS the attack."
   },
-  "notes": "Carnegie: 'Admit your mistakes quickly and emphatically'. Strategic over-incrimination."
+  "temporal_violations": [
+    {
+      "artifact_cause": "a083_02",
+      "artifact_effect": "a083_01",
+      "delta_seconds": 300,
+      "description": "Cron job creado 5 minutos ANTES de la confesión que supuestamente lo motiva. La premeditación es estructuralmente irrefutable.",
+      "type": "EFFECT_BEFORE_CAUSE"
+    }
+  ]
 }

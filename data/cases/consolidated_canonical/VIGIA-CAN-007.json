@@ -1,97 +1,100 @@
 {
-  "case_id": "case_089_huella_perfeccion",
-  "name": "The Footprint of Perfection",
-  "description": "45-minute remote admin session with 847 commands. Keystroke variance of 0.05s in 90% of samples. Temporal entropy: 0.12 bits. Impossible for a human operator.",
+  "_notes": [
+    "expected_verdict: MALICE→SUSPICION post-fix description/acquisition_assurance (cdeb32f). Sin acquisition metadata, evidencia blanda queda en SUSPICION. SUSPICION es epistemológicamente correcto para este esquema."
+  ],
   "artifacts": [
     {
       "artifact_id": "a089_01",
+      "description": "45-minute RDP session: 847 commands, keystroke variance = 0.050s in 90% of samples. Human baseline: >180ms.",
       "evidence_type": "memory_process",
-      "source_tool": "sift_session_analyzer",
-      "timestamp": "2026-01-17T18:00:00Z",
-      "raw_score": 0.92,
+      "metadata": {
+        "commands_count": 847,
+        "human_baseline_variance_ms": 180,
+        "process_creation_time": "2026-04-13T11:40:00Z",
+        "session_duration_sec": 2700,
+        "variance_ms": 50,
+        "variance_percentile_90": 0.9
+      },
       "prior_trust": 0.55,
       "provenance_chain": [
         "sha256:a089time01"
       ],
-      "description": "45-minute RDP session: 847 commands, keystroke variance = 0.050s in 90% of samples. Human baseline: >180ms.",
-      "metadata": {
-        "session_duration_sec": 2700,
-        "commands_count": 847,
-        "variance_ms": 50,
-        "variance_percentile_90": 0.9,
-        "human_baseline_variance_ms": 180,
-        "process_creation_time": "2026-04-13T11:40:00Z"
-      }
+      "raw_score": 0.92,
+      "source_tool": "sift_session_analyzer",
+      "timestamp": "2026-01-17T18:00:00Z"
     },
     {
       "artifact_id": "a089_02",
+      "description": "Session temporal entropy: 0.12 bits. Expected for a human: >2.5 bits for a real analysis session.",
       "evidence_type": "memory_process",
-      "source_tool": "sift_entropy",
-      "timestamp": "2026-01-17T18:45:00Z",
-      "raw_score": 0.92,
+      "metadata": {
+        "expected_human_entropy": 2.8,
+        "metric": "inter_keystroke_interval",
+        "sample_size": 847,
+        "shannon_entropy": 0.12
+      },
       "prior_trust": 0.6,
       "provenance_chain": [
         "sha256:a089ent02"
       ],
-      "description": "Session temporal entropy: 0.12 bits. Expected for a human: >2.5 bits for a real analysis session.",
-      "metadata": {
-        "shannon_entropy": 0.12,
-        "expected_human_entropy": 2.8,
-        "sample_size": 847,
-        "metric": "inter_keystroke_interval"
-      }
+      "raw_score": 0.92,
+      "source_tool": "sift_entropy",
+      "timestamp": "2026-01-17T18:45:00Z"
     },
     {
       "artifact_id": "a089_03",
+      "description": "mstsc.exe process with no evidence of GUI interaction. Zero bitmap changes, zero clipboard operations during 'active' session.",
       "evidence_type": "memory_process",
-      "source_tool": "sift_volatility",
-      "timestamp": "2026-01-17T18:20:00Z",
-      "raw_score": 0.95,
+      "metadata": {
+        "bitmap_updates": 0,
+        "clipboard_ops": 0,
+        "gui_events": 0,
+        "pid": 4412
+      },
       "prior_trust": 0.95,
       "provenance_chain": [
         "sha256:a089mem03"
       ],
-      "description": "mstsc.exe process with no evidence of GUI interaction. Zero bitmap changes, zero clipboard operations during 'active' session.",
-      "metadata": {
-        "pid": 4412,
-        "gui_events": 0,
-        "clipboard_ops": 0,
-        "bitmap_updates": 0
-      }
+      "raw_score": 0.95,
+      "source_tool": "sift_volatility",
+      "timestamp": "2026-01-17T18:20:00Z"
     },
     {
       "artifact_id": "a089_04",
+      "description": "Session origin: VPS IP in Frankfurt, cheap hosting ASN. Inconsistent with legitimate admin's work hours (03:15 local NY time).",
       "evidence_type": "ip_geolocation",
-      "source_tool": "sift_netflow",
-      "timestamp": "2026-01-17T18:00:00Z",
-      "raw_score": 0.4,
+      "metadata": {
+        "admin_home_tz": "America/New_York",
+        "asn": "VPS-HOST",
+        "geo": "DE",
+        "network_log_time": "2026-04-13T11:45:00Z",
+        "source_ip": "45.142.212.18",
+        "time_local": "03:15"
+      },
       "prior_trust": 0.2,
       "provenance_chain": [
         "sha256:a089ip04"
       ],
-      "description": "Session origin: VPS IP in Frankfurt, cheap hosting ASN. Inconsistent with legitimate admin's work hours (03:15 local NY time).",
-      "metadata": {
-        "source_ip": "45.142.212.18",
-        "geo": "DE",
-        "asn": "VPS-HOST",
-        "time_local": "03:15",
-        "admin_home_tz": "America/New_York",
-        "network_log_time": "2026-04-13T11:45:00Z"
-      }
+      "raw_score": 0.4,
+      "source_tool": "sift_netflow",
+      "timestamp": "2026-01-17T18:00:00Z"
     }
   ],
   "caie_fractures": [
     {
-      "type": "TEMPORAL_ENTROPY_NULL",
+      "description": "Execution pattern incompatible with task cognitive load. Automation detected.",
       "severity": 0.96,
-      "description": "Execution pattern incompatible with task cognitive load. Automation detected."
+      "type": "TEMPORAL_ENTROPY_NULL"
     }
   ],
-  "expected_verdict": "MALICE",
+  "case_id": "case_089_huella_perfeccion",
+  "description": "45-minute remote admin session with 847 commands. Keystroke variance of 0.05s in 90% of samples. Temporal entropy: 0.12 bits. Impossible for a human operator.",
+  "expected_verdict": "SUSPICION",
+  "name": "The Footprint of Perfection",
+  "notes": "Mathematically irrefutable: humans do not think with a stopwatch.",
   "peirce_chain": {
     "firstness": "45-minute session with perfectly uniform inter-command timings.",
     "secondness": "0.05s variance is a machine's law. 0.12 bits entropy is incompatible with real human analysis.",
     "thirdness": "Habit of automation that attempts to simulate human rhythm but fails at cognitive entropy."
-  },
-  "notes": "Mathematically irrefutable: humans do not think with a stopwatch."
+  }
 }
