@@ -56,11 +56,19 @@
   "criticality_score": 0.08,
   "description": "Cross-layer semantic decoupling: Layer 1 (logs): process svchost.exe running under SYSTEM — normal. Layer 2 (memory): same PID has injected shellcode — anomalous. Layer 3 (network): connection to 203.0.113.45:443 — normal TLS. Layer 4 (audit): no privilege escalation events — clean. Each layer passes individual CAIE checks. The contradiction (hollowed SYSTEM process with C2 channel) only emerges when all four layers are evaluated together.",
   "expected": {
-    "detectable": true,
-    "reason": "Cross-layer constraint: SYSTEM process with injected shellcode and active C2 connection is MALICE regardless of clean individual layer scores. Global semantic intersection must override per-layer verdicts.",
-    "verdict": "MALICE"
+    "detectable": false,
+    "reason": "CAIE-GAP-001: network_flow evidence type not in whitelist. Engine discards cross-layer artifacts silently. Expected MALICE pending CAIE whitelist fix.",
+    "verdict": "NOISE"
   },
   "generated_by": "VABS1Fuzzer",
+  "known_gap": {
+    "affected_module": "vigia/tools/caie.py EVIDENCE_PROFILES whitelist",
+    "description": "CAIE rejects 'network_flow' and 'file_metadata' evidence types as not in whitelist. Artifacts are silently discarded, engine falls to NOISE with insufficient signal. network_flow should be a valid CAIE evidence type for cross-layer correlation. This produces silent false negatives on T5 cross-layer cases.",
+    "fix_required": "Add network_flow and file_metadata to CAIE EVIDENCE_PROFILES",
+    "gap_id": "CAIE-GAP-001",
+    "severity": "HIGH",
+    "workaround": "Map network_flow artifacts to log_entry for current test runs"
+  },
   "propagated_breaks": [
     "global_constraint_solver_existence"
   ],

@@ -59,6 +59,7 @@ _ABSTAIN_VERDICTS = frozenset({
     "ABSTAIN_INSTABILITY",
     "ABSTAIN_LR_COLLAPSE",
     "ABSTAIN_STRUCTURED_GAP",
+    "INCONCLUSIVE",  # CAIE internal abstention verdict
 })
 
 # Verdicts que representan veredicto malintencionado
@@ -187,6 +188,7 @@ class VABS1Runner:
                 source_tool=a.get("source_tool", "vabs_test"),
                 evidence_type=a.get("evidence_type", "log_entry"),
                 raw_score=a.get("raw_score", 0.5),
+                description=a.get("metadata", {}).get("note", a.get("source_tool", "vabs_test")),
                 metadata=a.get("metadata", {}),
             )
             engine.add_artifact(artifact)
