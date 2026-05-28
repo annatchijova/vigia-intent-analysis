@@ -304,6 +304,7 @@ def _vigia_score(case: dict) -> dict:
                          "description", "metadata", "provenance_chain",
                          "base_trust", "timestamp"}
             }
+            _filtered.setdefault("description", str(a.get("content", ""))[:200] or "legacy_artifact")
             _caie_art    = _CaieArtifact(**_filtered)
             spoofability = _caie_art.effective_spoofability
         except Exception:
