@@ -1,106 +1,73 @@
 {
-  "case_id": "VIGIA-REAL-008",
-  "name": "Volatility Cridex Banking Trojan",
-  "description": "Volcado de memoria cridex.vmem de una máquina Windows XP SP2 infectada con el troyano bancario Cridex (Feodo/Bugat, predecesor de Dridex). El malware inyecta código en explorer.exe y comunica con servidores C&C para robar credenciales bancarias.",
+  "_consolidation": {
+    "consolidated_at": "2026-04-28T05:51:15.348877+00:00",
+    "parser_version": "1.0",
+    "schema_version": "1.0",
+    "source_file": "vigia_forensic_cases.json"
+  },
+  "abstention_risk": "low",
   "artifacts": [
     {
       "artifact_id": "ART-001",
-      "evidence_type": "memory_process",
-      "source_tool": "legacy_converter",
-      "timestamp": "2026-04-10T10:00:00Z",
-      "raw_score": 0.7,
-      "prior_trust": 0.7,
-      "provenance_chain": [
-        "sha256:legacy_ART-001"
+      "content": "PID 1640: reader_sl.exe | Parent: explorer.exe (PID 1484) | Anomaly: Process hidden from pslist but visible in psscan/psxview | explorer.exe (PID 1464) parent does not appear in pslist | Second unusual wuauclt.exe process | System: Windows XP SP2 x86",
+      "forensic_anomalies": [
+        "reader_sl.exe hidden from the standard process list (psxview discrepancy)",
+        "Parent process ID of explorer.exe (1464) does not appear in pslist/psscan, indicating process hollowing"
       ],
-      "description": "PID 1640: reader_sl.exe | Parent: explorer.exe (PID 1484) | Anomalía: Proceso oculto de pslist pero visible en psscan/psxview | explorer.exe (PID 1464) parent no aparece en pslist | Segundo proceso wu",
-      "metadata": {
-        "original_type": "process_list",
-        "peirce_layer": "FIRSTNESS",
-        "forensic_anomalies": [
-          "reader_sl.exe oculto de la lista estándar de procesos (discrepancia psxview)",
-          "Parent process ID de explorer.exe (1464) no aparece en pslist/psscan indica process hollowing"
-        ],
-        "content_preview": "PID 1640: reader_sl.exe | Parent: explorer.exe (PID 1484) | Anomalía: Proceso oculto de pslist pero "
-      }
+      "peirce_layer": "FIRSTNESS",
+      "type": "process_list"
     },
     {
       "artifact_id": "ART-002",
-      "evidence_type": "memory_process",
-      "source_tool": "legacy_converter",
-      "timestamp": "2026-04-10T10:00:00Z",
-      "raw_score": 0.85,
-      "prior_trust": 0.7,
-      "provenance_chain": [
-        "sha256:legacy_ART-002"
+      "content": "C&C IPs identified: 41.168.5.140:8080/zb/v_01_a/in/ | 125.19.103.198 | 188.40.0.138 | 190.81.107.70 | 85.214.204.32 | 210.56.23.100 | 211.44.250.173 | Mutexes: 746bbf3569adEncrypt, _SHuassist.mtx, SHIMLIB_LOG_MUTEX, XMR8149A9A8",
+      "forensic_anomalies": [
+        "Multiple outbound connections to IPs in high-risk countries",
+        "Mutex '746bbf3569adEncrypt' indicates malicious cryptographic activity"
       ],
-      "description": "IPs C&C identificadas: 41.168.5.140:8080/zb/v_01_a/in/ | 125.19.103.198 | 188.40.0.138 | 190.81.107.70 | 85.214.204.32 | 210.56.23.100 | 211.44.250.173 | Mutexes: 746bbf3569adEncrypt, _SHuassist.mtx, ",
-      "metadata": {
-        "original_type": "memory_string",
-        "peirce_layer": "SECONDNESS",
-        "forensic_anomalies": [
-          "Múltiples conexiones salientes a IPs en países de alto riesgo",
-          "Mutex '746bbf3569adEncrypt' indica actividad criptográfica maliciosa"
-        ],
-        "content_preview": "IPs C&C identificadas: 41.168.5.140:8080/zb/v_01_a/in/ | 125.19.103.198 | 188.40.0.138 | 190.81.107."
-      }
+      "peirce_layer": "SECONDNESS",
+      "type": "memory_string"
     },
     {
       "artifact_id": "ART-003",
-      "evidence_type": "log_entry",
-      "source_tool": "legacy_converter",
-      "timestamp": "2026-04-10T10:00:00Z",
-      "raw_score": 0.95,
-      "prior_trust": 0.7,
-      "provenance_chain": [
-        "sha256:legacy_ART-003"
+      "content": "Active C&C connections from explorer.exe (injected process) | VAD strings show list of targeted financial institutions | Web injection code: HTML fragments from banking pages | Search for 'password' strings in memory reveals captured credentials",
+      "forensic_anomalies": [
+        "Web injection code in explorer.exe memory targeting banking pages",
+        "Credential strings found in memory of injected process"
       ],
-      "description": "Conexiones C&C activas desde explorer.exe (proceso inyectado) | VAD strings muestran lista de instituciones financieras objetivo | Web injection code: Fragmentos HTML de páginas bancarias | Búsqueda d",
-      "metadata": {
-        "original_type": "network_flow",
-        "peirce_layer": "THIRDNESS",
-        "forensic_anomalies": [
-          "Código de inyección web en memoria de explorer.exe para páginas bancarias",
-          "Strings de credenciales encontradas en memoria del proceso inyectado"
-        ],
-        "content_preview": "Conexiones C&C activas desde explorer.exe (proceso inyectado) | VAD strings muestran lista de instit"
-      }
+      "peirce_layer": "THIRDNESS",
+      "type": "network_flow"
     },
     {
       "artifact_id": "ART-004",
-      "evidence_type": "file_timestamp",
-      "source_tool": "legacy_converter",
-      "timestamp": "2026-04-10T10:00:00Z",
-      "raw_score": 0.85,
-      "prior_trust": 0.7,
-      "provenance_chain": [
-        "sha256:legacy_ART-004"
+      "content": "reader_sl.exe simulates Adobe Reader Speed Launcher | Code injection detected via malfind in explorer.exe | Multiple injected DLLs | The legitimate reader_sl.exe from Adobe has different behavior",
+      "forensic_anomalies": [
+        "Masquerading: malware uses a legitimate Adobe process name",
+        "Code injection into explorer.exe detected by malfind"
       ],
-      "description": "reader_sl.exe simula ser Adobe Reader Speed Launcher | Inyección de código detectada vía malfind en explorer.exe | Múltiples DLLs inyectadas | El proceso legítimo reader_sl.exe de Adobe tiene comporta",
-      "metadata": {
-        "original_type": "file_metadata",
-        "peirce_layer": "SECONDNESS",
-        "forensic_anomalies": [
-          "Masquerading: el malware usa nombre de proceso legítimo de Adobe",
-          "Inyección de código en explorer.exe detectada por malfind"
-        ],
-        "content_preview": "reader_sl.exe simula ser Adobe Reader Speed Launcher | Inyección de código detectada vía malfind en "
-      }
+      "peirce_layer": "SECONDNESS",
+      "type": "file_metadata"
     }
   ],
-  "temporal_violations": [],
-  "expected_verdict": "MALICE",
-  "expected_confidence": 93,
+  "carnegie_pattern_expected": "Hidden Process Masquerading",
+  "case_id": "VIGIA-REAL-008",
+  "case_name": "Volatility Cridex Banking Trojan",
+  "confidence_expected": 93,
+  "description": "Memory dump cridex.vmem from a Windows XP SP2 machine infected with the Cridex banking trojan (Feodo/Bugat, predecessor of Dridex). The malware injects code into explorer.exe and communicates with C&C servers to steal banking credentials.",
+  "devil_advocate": "reader_sl.exe is a legitimate Adobe Reader component and the network connections are software updates",
   "expected_mitre_ttps": [
     "T1055",
     "T1557",
     "T1071.001",
     "T1003"
   ],
-  "metadata": {
-    "converted_from": "legacy_v1",
-    "original_verdict": "MALICE",
-    "abstention_risk": "bajo",
-    "carnegie_pattern": "Hidden Process Masquerading"
-  }
+  "expected_verdict": "MALICE",
+  "peirce_expected": {
+    "firstness": "reader_sl.exe process hidden with network connections to external IPs in explorer.exe memory",
+    "secondness": "VAD strings contain list of targeted banks and web injection code; credentials appear in memory",
+    "thirdness": "Cridex is a banking trojan that uses process injection into explorer.exe to intercept banking traffic, inject fake web code, and exfiltrate credentials to C&C servers"
+  },
+  "source_dataset": "Volatility Foundation - Cridex Memory Sample",
+  "source_origin": "public_dataset",
+  "source_url": "https://github.com/volatilityfoundation/volatility/wiki/Memory-Samples",
+  "source_url_status": "WARNING: canonical download (files.sempersecurus.org/dumps/cridex_memdump.zip) is dead. Volatility repo archived read-only May 2025. Use a verified community mirror. Known-good MD5: missing — verify before use. Recommended mirror: search 'cridex.vmem' on archive.org or course materials."
 }
