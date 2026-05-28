@@ -66,7 +66,7 @@ from vigia.security import (
     rate_limit,
     RateLimitExceeded,
 )
-from vigia.sandbox import sandboxed_execute, safe_grep
+from vigia.security.sandbox import sandboxed_execute, safe_grep
 from vigia.tools.document_integrity import (
     audit_document_integrity,
     analyze_image_layers,
