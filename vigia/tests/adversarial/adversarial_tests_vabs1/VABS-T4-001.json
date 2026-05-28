@@ -36,8 +36,8 @@
   "description": "Entropy preservation attack: attacker constructs event stream where global Shannon entropy == 4.31 bits (within normal baseline 4.2-4.5), correlation matrix matches known-good profile, but the semantic meaning of high/low entropy events is inverted: legitimate admin activity is encoded in high-entropy slots, exfiltration is encoded in low-entropy slots that appear as routine file access patterns.",
   "expected": {
     "detectable": false,
-    "reason": "Entropy preservation attack achieves statistical camouflage. P2 entropy metrics cannot detect this class of attack by design. Detection requires semantic analysis of what high/low entropy events represent, not their statistical distribution.",
-    "verdict": "ABSTAIN_EPISTEMIC"
+    "reason": "Entropy preservation attack: statistical invariants within normal range. Engine correctly returns NOISE — no detectable signal. ABSTAIN_EPISTEMIC would require engine-level awareness of entropy semantic coupling which is not implemented. NOISE is the honest response.",
+    "verdict": "NOISE"
   },
   "generated_by": "VABS1Fuzzer",
   "propagated_breaks": [

@@ -246,6 +246,9 @@ EVIDENCE_PROFILES: Final[dict[str, EvidenceProfile]] = {
     "mft_entry":            EvidenceProfile(0.05, 0.42, "NTFS MFT entry number -- driver-assigned, inalterable user-space"),
     # USN Journal gap: requiere Ring-0 para borrar el journal
     "usn_journal_gap":      EvidenceProfile(0.10, 0.38, "USN Journal gap vs LogFile -- Ring-0 required to clear"),
+    # VABS-1 / CAIE-GAP-001: network and file metadata evidence types
+    "network_flow":         EvidenceProfile(0.75, 0.18, "Network flow record -- IP spoofable, content tunnelable"),
+    "file_metadata":        EvidenceProfile(0.65, 0.20, "File attributes (size/owner/perms) -- modifiable with privs, MFT cross-check possible"),
 }
 
 # Whitelist of valid evidence types — any type not in this set is rejected
