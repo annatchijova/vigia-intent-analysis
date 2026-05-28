@@ -265,9 +265,36 @@ def _normalize_artifact_legacy(artifact: Dict[str, Any], idx: int) -> Dict[str, 
     El clamp inferior 0.05 evita score=0 que haría divergir el z-score.
     El clamp superior 0.95 preserva espacio para calibración posterior.
     """
-    # Artefacto ya canónico → pass-through
+    # Artefacto ya canónico (EBS v1): asegurar acquisition metadata si falta
     if "evidence_type" in artifact and "raw_score" in artifact:
-        return dict(artifact)
+        art = dict(artifact)
+        if "acquisition_tool" not in art:
+            import hashlib as _hl
+            _et = str(art.get("evidence_type", ""))
+            _st = str(art.get("source_tool", "legacy_import"))
+            _id = str(art.get("artifact_id", str(idx)))
+            _acq_key = f"ebsv1:{_id}:{_et}:{_st}"
+            _acq_hash = "sha256:" + _hl.sha256(_acq_key.encode("utf-8")).hexdigest()
+            _acq_ts = art.get("timestamp") or "2020-01-01T00:00:00Z"
+            if isinstance(_acq_ts, str) and len(_acq_ts) >= 19:
+                if not (_acq_ts.endswith("Z") or "+" in _acq_ts[19:] or "-" in _acq_ts[19:]):
+                    _acq_ts = _acq_ts[:19] + "Z"
+            else:
+                _acq_ts = "2020-01-01T00:00:00Z"
+            art["acquisition_tool"] = "legacy_converter_v1"
+            art["acquisition_hash"] = _acq_hash
+            art["acquisition_timestamp"] = _acq_ts
+            art["examiner_id"] = "legacy_dataset_converter"
+            art["write_blocker_used"] = True
+            if not isinstance(art.get("metadata"), dict):
+                art["metadata"] = {}
+            art["metadata"].update({
+                "acquisition_tool":      art["acquisition_tool"],
+                "acquisition_hash":      art["acquisition_hash"],
+                "acquisition_timestamp": art["acquisition_timestamp"],
+                "write_blocker_used":    True,
+            })
+        return art
 
     art = dict(artifact)
 

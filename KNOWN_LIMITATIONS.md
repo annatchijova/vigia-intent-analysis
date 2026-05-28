@@ -423,3 +423,31 @@ evidence exists but cannot discriminate between hypotheses.
 
 **Forensic justification:** Inflating ABSTAIN with null-signal cases degrades
 ABSTAIN-OH as a metric and weakens the epistemic gate's interpretability.
+
+---
+
+## L-014 — Soft Evidence Convergence Without Cross-Type Fractures
+
+**Affects:** `BREAK_003` (cultural true positive), `BREAK_008` (ambiguous), `BREAK_010` (overperfect)
+**Status:** Real limitation
+
+**Description:** Cases where adversarial patterns are encoded exclusively in
+soft evidence types (log_entry/network_flow, spoofability 0.75-0.85) without
+the multi-type artifact combinations required by CAIE fracture rules.
+
+CAIE fracture detection requires specific type co-occurrence:
+- LOG_VS_MEMORY: log_entry + memory_process artifacts required
+- CULTURAL_VS_TECHNICAL: cultural_marker + technical artifacts required
+
+Converted break cases with homogeneous soft evidence produce 0 CAIE fractures.
+Without fracture bonuses, Noisy-OR composite stays at 0.09-0.12 (UNKNOWN range).
+
+**Root cause:** Absence of adversarial intent prior layer. VIGÍA P2 evaluates
+"how strong is the evidence" but not "how compatible is the pattern with
+adversarial behavior." This is a design gap for a future Intent Amplifier Layer.
+
+**CAIE Gap:** BREAK_003 should trigger CULTURAL_VS_TECHNICAL fracture (cultural
+markers + C2 coherence), BREAK_010 should trigger OVERPERFECT_CONSISTENCY
+fracture. Neither pattern is implemented in current CAIE rule set.
+
+**Roadmap:** Intent Amplifier Layer as explicit module over CAIE score.
