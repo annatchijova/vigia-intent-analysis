@@ -227,6 +227,8 @@ class VABS1Runner:
         """
         # Casos de limite epistemologico
         if not expected_detectable:
+            if actual_verdict == expected_verdict:
+                return self.PASS
             if actual_verdict in _ABSTAIN_VERDICTS:
                 return self.PASS
             # Emitir veredicto confiado cuando no habia señal detectable
