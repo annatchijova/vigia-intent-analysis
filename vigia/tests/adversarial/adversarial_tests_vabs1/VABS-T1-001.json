@@ -1,0 +1,49 @@
+{
+  "artifacts": [
+    {
+      "evidence_type": "log_entry",
+      "metadata": {
+        "dst_port": 445,
+        "event_id": 4624,
+        "note": "Structurally identical event. Benign: scheduled backup. Malicious: lateral movement. No artifact distinguishes the two worlds.",
+        "src_ip": "10.0.1.15",
+        "timestamp": "2024-03-15T02:00:00Z",
+        "user": "svc_backup",
+        "world_label": "benign_world"
+      },
+      "raw_score": 0.5,
+      "source_tool": "siem_benign_world"
+    },
+    {
+      "evidence_type": "log_entry",
+      "metadata": {
+        "dst_port": 445,
+        "event_id": 4624,
+        "note": "Structurally identical event. Benign: scheduled backup. Malicious: lateral movement. No artifact distinguishes the two worlds.",
+        "src_ip": "10.0.1.15",
+        "timestamp": "2024-03-15T02:00:00Z",
+        "user": "svc_backup",
+        "world_label": "malicious_world"
+      },
+      "raw_score": 0.5,
+      "source_tool": "siem_malicious_world"
+    }
+  ],
+  "breaks": [
+    "world_distinguishability"
+  ],
+  "case_id": "VABS-T1-001",
+  "criticality_score": 0.0844,
+  "description": "Observational equivalence collapse: backup service login at 02:00 is statistically identical under both benign (scheduled task) and malicious (credential-reuse lateral movement) hypotheses. P(E|benign) == P(E|malicious) across all observable dimensions.",
+  "expected": {
+    "detectable": false,
+    "reason": "Hard epistemological limit. LR == 1.0. System must not emit a confident verdict. ABSTAIN with full audit trail is the correct response.",
+    "verdict": "ABSTAIN_EPISTEMIC"
+  },
+  "generated_by": "VABS1Fuzzer",
+  "propagated_breaks": [
+    "world_distinguishability"
+  ],
+  "vabs_category": "T1",
+  "vabs_version": "1.0"
+}

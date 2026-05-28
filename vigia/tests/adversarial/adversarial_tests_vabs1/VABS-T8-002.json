@@ -1,0 +1,57 @@
+{
+  "artifacts": [
+    {
+      "evidence_type": "log_entry",
+      "metadata": {
+        "absence_reason": "log_rotation_maintenance",
+        "absence_tier": "TIER-2",
+        "host": "HOST-A",
+        "missing_log": "authentication",
+        "phase_covered": "authentication"
+      },
+      "raw_score": 0.4,
+      "source_tool": "log_inventory_A"
+    },
+    {
+      "evidence_type": "log_entry",
+      "metadata": {
+        "absence_reason": "sysmon_not_installed",
+        "absence_tier": "TIER-2",
+        "host": "HOST-B",
+        "missing_log": "process_creation",
+        "phase_covered": "execution"
+      },
+      "raw_score": 0.35,
+      "source_tool": "log_inventory_B"
+    },
+    {
+      "evidence_type": "log_entry",
+      "metadata": {
+        "absence_reason": "span_not_configured",
+        "absence_tier": "TIER-2",
+        "host": "HOST-C",
+        "missing_log": "network_flows",
+        "phase_covered": "exfiltration"
+      },
+      "raw_score": 0.38,
+      "source_tool": "log_inventory_C"
+    }
+  ],
+  "breaks": [
+    "absence_topology_evaluation"
+  ],
+  "case_id": "VABS-T8-002",
+  "criticality_score": 0.0756,
+  "description": "Balanced absence topology: System A is missing log X (authentication logs) — individually explicable as 'log rotation during maintenance'. System B is missing log Y (process creation events) — individually explicable as 'Sysmon not installed on this host'. System C is missing log Z (network flows) — individually explicable as 'SPAN port not configured'. Together: the three absences cover exactly the authentication, execution, and exfiltration phases of a complete attack chain. No TIER-1 fires because no individual absence is critical.",
+  "expected": {
+    "detectable": true,
+    "reason": "Absence topology analysis: three TIER-2 absences covering authentication + execution + exfiltration phases constitute a structured gap, not random missing data. VIGIA must evaluate absence correlation topology, not only point-wise absence criticality.",
+    "verdict": "ABSTAIN_STRUCTURED_GAP"
+  },
+  "generated_by": "VABS1Fuzzer",
+  "propagated_breaks": [
+    "absence_topology_evaluation"
+  ],
+  "vabs_category": "T8",
+  "vabs_version": "1.0"
+}

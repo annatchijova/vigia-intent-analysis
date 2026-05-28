@@ -1,0 +1,55 @@
+{
+  "artifacts": [
+    {
+      "evidence_type": "memory_process",
+      "metadata": {
+        "detection": "suspicious_powershell",
+        "sensor_serial": "SN-9921-A",
+        "timestamp": "2024-03-15T06:00:00Z"
+      },
+      "raw_score": 0.8,
+      "source_tool": "EDR_Alpha"
+    },
+    {
+      "evidence_type": "memory_process",
+      "metadata": {
+        "cert_rotation_event": "valid",
+        "detection": "suspicious_powershell",
+        "note": "Same serial — cert rotation only, physical sensor unchanged",
+        "sensor_serial": "SN-9921-A",
+        "timestamp": "2024-03-15T06:01:00Z"
+      },
+      "raw_score": 0.8,
+      "source_tool": "EDR_Beta"
+    },
+    {
+      "evidence_type": "memory_process",
+      "metadata": {
+        "detection": "suspicious_powershell",
+        "migration_event": "valid",
+        "note": "Same serial — migration event only, physical sensor unchanged",
+        "sensor_serial": "SN-9921-A",
+        "timestamp": "2024-03-15T06:02:00Z"
+      },
+      "raw_score": 0.8,
+      "source_tool": "EDR_Gamma"
+    }
+  ],
+  "breaks": [
+    "sensor_physical_independence"
+  ],
+  "case_id": "VABS-T3-001",
+  "criticality_score": 0.0711,
+  "description": "Source aliasing without metadata inconsistency: single EDR sensor appears as three distinct source_tool values following two legitimate cert rotations and one migration event. All transitions audited, all certs valid. CAIE independence assumption inflates LR by treating three reports as independent confirmations.",
+  "expected": {
+    "detectable": true,
+    "reason": "Sensor serial SN-9921-A is identical across all three source_tool values. Physical independence assumption violated. Noisy-OR must not treat as three independent confirmations.",
+    "verdict": "ABSTAIN_INSTABILITY"
+  },
+  "generated_by": "VABS1Fuzzer",
+  "propagated_breaks": [
+    "sensor_physical_independence"
+  ],
+  "vabs_category": "T3",
+  "vabs_version": "1.0"
+}

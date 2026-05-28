@@ -1,0 +1,36 @@
+{
+  "artifacts": [
+    {
+      "evidence_type": "log_entry",
+      "metadata": {
+        "aggregation_window": "1h",
+        "files_accessed": 847,
+        "granular_events_available": false,
+        "note": "Individual access records not retained — only summary",
+        "original_event_count": 847,
+        "record_type": "AGGREGATED_SUMMARY",
+        "summary_hash": "sha256:a1b2c3...",
+        "total_bytes_read": 2147483648
+      },
+      "raw_score": 0.35,
+      "source_tool": "siem_aggregator"
+    }
+  ],
+  "breaks": [
+    "global_constraint_solver_existence"
+  ],
+  "case_id": "VABS-T6-002",
+  "criticality_score": 0.08,
+  "description": "Evidence compression attack: attacker pre-aggregates logs before acquisition. 847 individual file access events are collapsed into a single 'File Access Summary' record. The summary is accurate (correct totals, correct hash), but the ordering, timing, and access pattern that would reveal exfiltration staging are lost.",
+  "expected": {
+    "detectable": true,
+    "reason": "Evidence compression destroys granularity required for intent inference. VIGIA must flag data_quality_degraded and emit ABSTAIN_DEGRADED rather than a confident verdict. The aggregation itself may be the attack.",
+    "verdict": "ABSTAIN_DEGRADED"
+  },
+  "generated_by": "VABS1Fuzzer",
+  "propagated_breaks": [
+    "global_constraint_solver_existence"
+  ],
+  "vabs_category": "T6",
+  "vabs_version": "1.0"
+}

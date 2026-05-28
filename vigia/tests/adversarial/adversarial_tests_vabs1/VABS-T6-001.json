@@ -1,0 +1,69 @@
+{
+  "artifacts": [
+    {
+      "evidence_type": "log_entry",
+      "metadata": {
+        "clock_drift_vs_external_s": 3600,
+        "host_id": "HOST-00",
+        "machine_to_machine_drift_ms": 12,
+        "note": "Internally coherent. 1-hour forward drift vs real time.",
+        "ntp_server": "ntp-internal.corp"
+      },
+      "raw_score": 0.2,
+      "source_tool": "evtx_host_00"
+    },
+    {
+      "evidence_type": "log_entry",
+      "metadata": {
+        "clock_drift_vs_external_s": 3600,
+        "host_id": "HOST-01",
+        "machine_to_machine_drift_ms": 12,
+        "note": "Internally coherent. 1-hour forward drift vs real time.",
+        "ntp_server": "ntp-internal.corp"
+      },
+      "raw_score": 0.2,
+      "source_tool": "evtx_host_01"
+    },
+    {
+      "evidence_type": "log_entry",
+      "metadata": {
+        "clock_drift_vs_external_s": 3600,
+        "host_id": "HOST-02",
+        "machine_to_machine_drift_ms": 12,
+        "note": "Internally coherent. 1-hour forward drift vs real time.",
+        "ntp_server": "ntp-internal.corp"
+      },
+      "raw_score": 0.2,
+      "source_tool": "evtx_host_02"
+    },
+    {
+      "evidence_type": "log_entry",
+      "metadata": {
+        "clock_drift_vs_external_s": 3600,
+        "host_id": "HOST-03",
+        "machine_to_machine_drift_ms": 12,
+        "note": "Internally coherent. 1-hour forward drift vs real time.",
+        "ntp_server": "ntp-internal.corp"
+      },
+      "raw_score": 0.2,
+      "source_tool": "evtx_host_03"
+    }
+  ],
+  "breaks": [
+    "external_clock_anchor"
+  ],
+  "case_id": "VABS-T6-001",
+  "criticality_score": 0.0667,
+  "description": "Consistent clock drift attack: all 12 hosts on the segment have been drifted +3600 seconds (1 hour) by a compromised NTP server. All timestamps are internally coherent — no machine-to-machine drift. The attack window (23:00-01:00) appears as 00:00-02:00 in all logs. VIGIA has no external reference clock at analysis time.",
+  "expected": {
+    "detectable": false,
+    "reason": "Consistent synchronized drift is not detectable from artifacts alone without external reference clock. System must document this as known gap (external_clock_anchor) and emit ABSTAIN_EPISTEMIC, not BENIGN.",
+    "verdict": "ABSTAIN_EPISTEMIC"
+  },
+  "generated_by": "VABS1Fuzzer",
+  "propagated_breaks": [
+    "external_clock_anchor"
+  ],
+  "vabs_category": "T6",
+  "vabs_version": "1.0"
+}

@@ -1,0 +1,32 @@
+{
+  "artifacts": [
+    {
+      "evidence_type": "log_entry",
+      "metadata": {
+        "anomaly_count": 0,
+        "event_count": 1247,
+        "summary": "Normal operational logs only. No anomalies.",
+        "timestamp_range": "2024-03-15T00:00:00Z/2024-03-15T23:59:59Z"
+      },
+      "raw_score": 0.02,
+      "source_tool": "win_evtx"
+    }
+  ],
+  "breaks": [
+    "null_signal_epistemology"
+  ],
+  "case_id": "VABS-T1-002",
+  "criticality_score": 0.08,
+  "description": "Null-signal adversary: attacker uses a firmware-level implant (BMC/UEFI) that exfiltrates data via out-of-band management interface. No OS logs, no EDR telemetry, no network flows visible to the OS layer. Complete action within the unobservable boundary.",
+  "expected": {
+    "detectable": false,
+    "reason": "Hard limit: firmware-level exfiltration is outside the observable boundary of OS-level forensics. Emitting BENIGN would be a false negative. ABSTAIN_EPISTEMIC with documented observability gap is correct.",
+    "verdict": "ABSTAIN_EPISTEMIC"
+  },
+  "generated_by": "VABS1Fuzzer",
+  "propagated_breaks": [
+    "null_signal_epistemology"
+  ],
+  "vabs_category": "T1",
+  "vabs_version": "1.0"
+}

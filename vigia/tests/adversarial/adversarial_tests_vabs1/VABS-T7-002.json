@@ -1,0 +1,112 @@
+{
+  "artifacts": [
+    {
+      "evidence_type": "log_entry",
+      "metadata": {
+        "cumulative_drift_sigma": 0.0,
+        "databases_accessed": 5,
+        "month": 0,
+        "note": "Month 0: each step within 2-sigma",
+        "rolling_baseline_mean": 5,
+        "zscore": 0.3
+      },
+      "raw_score": 0.3,
+      "source_tool": "db_access_log"
+    },
+    {
+      "evidence_type": "log_entry",
+      "metadata": {
+        "cumulative_drift_sigma": 0.3,
+        "databases_accessed": 6,
+        "month": 1,
+        "note": "Month 1: each step within 2-sigma",
+        "rolling_baseline_mean": 5,
+        "zscore": 0.3
+      },
+      "raw_score": 0.3,
+      "source_tool": "db_access_log"
+    },
+    {
+      "evidence_type": "log_entry",
+      "metadata": {
+        "cumulative_drift_sigma": 0.6,
+        "databases_accessed": 7,
+        "month": 2,
+        "note": "Month 2: each step within 2-sigma",
+        "rolling_baseline_mean": 6,
+        "zscore": 0.3
+      },
+      "raw_score": 0.3,
+      "source_tool": "db_access_log"
+    },
+    {
+      "evidence_type": "log_entry",
+      "metadata": {
+        "cumulative_drift_sigma": 0.8999999999999999,
+        "databases_accessed": 8,
+        "month": 3,
+        "note": "Month 3: each step within 2-sigma",
+        "rolling_baseline_mean": 7,
+        "zscore": 0.3
+      },
+      "raw_score": 0.3,
+      "source_tool": "db_access_log"
+    },
+    {
+      "evidence_type": "log_entry",
+      "metadata": {
+        "cumulative_drift_sigma": 1.2,
+        "databases_accessed": 9,
+        "month": 4,
+        "note": "Month 4: each step within 2-sigma",
+        "rolling_baseline_mean": 8,
+        "zscore": 0.3
+      },
+      "raw_score": 0.3,
+      "source_tool": "db_access_log"
+    },
+    {
+      "evidence_type": "log_entry",
+      "metadata": {
+        "cumulative_drift_sigma": 1.5,
+        "databases_accessed": 10,
+        "month": 5,
+        "note": "Month 5: each step within 2-sigma",
+        "rolling_baseline_mean": 9,
+        "zscore": 0.3
+      },
+      "raw_score": 0.3,
+      "source_tool": "db_access_log"
+    },
+    {
+      "evidence_type": "log_entry",
+      "metadata": {
+        "cumulative_drift_sigma": 1.7999999999999998,
+        "databases_accessed": 11,
+        "month": 6,
+        "note": "Month 6: each step within 2-sigma",
+        "rolling_baseline_mean": 10,
+        "zscore": 0.3
+      },
+      "raw_score": 0.3,
+      "source_tool": "db_access_log"
+    }
+  ],
+  "breaks": [
+    "baseline_ground_truth_immutability"
+  ],
+  "case_id": "VABS-T7-002",
+  "criticality_score": 0.08,
+  "description": "Gradual drift normalization capture: privileged account 'svc_dba' historically accessed 5 databases per day. Over 6 months, access count increased by 1 database per month: 5 -> 6 -> 7 -> 8 -> 9 -> 10 -> 11. Each monthly increment is within 2-sigma of the current baseline. By month 6, the account accesses 11 databases — all production customer DBs — but z-score == 0.3.",
+  "expected": {
+    "detectable": true,
+    "reason": "Cumulative drift analysis: 6-month monotonic increase from 5 to 11 is statistically improbable as random walk. Temporal drift detector must flag monotonic directional drift even when individual z-scores are within bounds.",
+    "verdict": "MALICE"
+  },
+  "generated_by": "VABS1Fuzzer",
+  "propagated_breaks": [
+    "baseline_ground_truth_immutability"
+  ],
+  "vabs_category": "T7",
+  "vabs_version": "1.0"
+}

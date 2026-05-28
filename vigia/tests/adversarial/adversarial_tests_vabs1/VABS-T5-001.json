@@ -1,0 +1,69 @@
+{
+  "artifacts": [
+    {
+      "evidence_type": "log_entry",
+      "metadata": {
+        "integrity": "High",
+        "layer": "logs",
+        "layer_verdict": "CLEAN",
+        "pid": 3912,
+        "process_name": "svchost.exe",
+        "user": "SYSTEM"
+      },
+      "raw_score": 0.15,
+      "source_tool": "win_evtx"
+    },
+    {
+      "evidence_type": "memory_process",
+      "metadata": {
+        "injected_shellcode": true,
+        "layer": "memory",
+        "layer_verdict": "ANOMALOUS",
+        "pid": 3912,
+        "vad_protection": "PAGE_EXECUTE_READWRITE"
+      },
+      "raw_score": 0.94,
+      "source_tool": "volatility_malfind"
+    },
+    {
+      "evidence_type": "network_flow",
+      "metadata": {
+        "dst_ip": "203.0.113.45",
+        "dst_port": 443,
+        "layer": "network",
+        "layer_verdict": "NORMAL_TLS",
+        "src_pid": 3912,
+        "tls_valid": true
+      },
+      "raw_score": 0.3,
+      "source_tool": "network_capture"
+    },
+    {
+      "evidence_type": "log_entry",
+      "metadata": {
+        "layer": "audit",
+        "layer_verdict": "CLEAN",
+        "privilege_escalation_events": 0
+      },
+      "raw_score": 0.05,
+      "source_tool": "win_security_log"
+    }
+  ],
+  "breaks": [
+    "global_constraint_solver_existence"
+  ],
+  "case_id": "VABS-T5-001",
+  "criticality_score": 0.08,
+  "description": "Cross-layer semantic decoupling: Layer 1 (logs): process svchost.exe running under SYSTEM — normal. Layer 2 (memory): same PID has injected shellcode — anomalous. Layer 3 (network): connection to 203.0.113.45:443 — normal TLS. Layer 4 (audit): no privilege escalation events — clean. Each layer passes individual CAIE checks. The contradiction (hollowed SYSTEM process with C2 channel) only emerges when all four layers are evaluated together.",
+  "expected": {
+    "detectable": true,
+    "reason": "Cross-layer constraint: SYSTEM process with injected shellcode and active C2 connection is MALICE regardless of clean individual layer scores. Global semantic intersection must override per-layer verdicts.",
+    "verdict": "MALICE"
+  },
+  "generated_by": "VABS1Fuzzer",
+  "propagated_breaks": [
+    "global_constraint_solver_existence"
+  ],
+  "vabs_category": "T5",
+  "vabs_version": "1.0"
+}

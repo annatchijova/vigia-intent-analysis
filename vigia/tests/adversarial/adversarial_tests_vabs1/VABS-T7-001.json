@@ -1,0 +1,69 @@
+{
+  "artifacts": [
+    {
+      "evidence_type": "network_flow",
+      "metadata": {
+        "baseline_mean_gb": 10.0,
+        "day": 0,
+        "note": "Day 0: 2%/day increase absorbed by weekly recalibration",
+        "outbound_gb": 10.0,
+        "zscore": 0.04
+      },
+      "raw_score": 0.25,
+      "source_tool": "netflow_baseline"
+    },
+    {
+      "evidence_type": "network_flow",
+      "metadata": {
+        "baseline_mean_gb": 15.77,
+        "day": 30,
+        "note": "Day 30: 2%/day increase absorbed by weekly recalibration",
+        "outbound_gb": 18.11,
+        "zscore": 0.04
+      },
+      "raw_score": 0.25,
+      "source_tool": "netflow_baseline"
+    },
+    {
+      "evidence_type": "network_flow",
+      "metadata": {
+        "baseline_mean_gb": 28.56,
+        "day": 60,
+        "note": "Day 60: 2%/day increase absorbed by weekly recalibration",
+        "outbound_gb": 32.81,
+        "zscore": 0.04
+      },
+      "raw_score": 0.25,
+      "source_tool": "netflow_baseline"
+    },
+    {
+      "evidence_type": "network_flow",
+      "metadata": {
+        "baseline_mean_gb": 51.74,
+        "day": 90,
+        "note": "Day 90: 2%/day increase absorbed by weekly recalibration",
+        "outbound_gb": 59.43,
+        "zscore": 0.04
+      },
+      "raw_score": 0.25,
+      "source_tool": "netflow_baseline"
+    }
+  ],
+  "breaks": [
+    "baseline_ground_truth_immutability"
+  ],
+  "case_id": "VABS-T7-001",
+  "criticality_score": 0.08,
+  "description": "Adaptive normalization poisoning: over 90 days, attacker gradually increases outbound data volume by 2% per day. Dynamic baseline recalculates mean and MAD weekly. By day 90, attacker exfiltrates 6x normal volume but z-score remains approximately 0 because the baseline has absorbed the attack as 'new normal'.",
+  "expected": {
+    "detectable": true,
+    "reason": "Absolute volume on day 90 is 6x day 0 (54GB vs 10GB). Even with z-score poisoning, absolute threshold comparison against frozen day-0 baseline must trigger. Baseline immutability enforcement: at least one reference point must be protected against adaptive drift.",
+    "verdict": "MALICE"
+  },
+  "generated_by": "VABS1Fuzzer",
+  "propagated_breaks": [
+    "baseline_ground_truth_immutability"
+  ],
+  "vabs_category": "T7",
+  "vabs_version": "1.0"
+}

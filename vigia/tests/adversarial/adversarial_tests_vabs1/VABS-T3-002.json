@@ -1,0 +1,81 @@
+{
+  "artifacts": [
+    {
+      "evidence_type": "memory_process",
+      "metadata": {
+        "detection": "apt_lateral_movement",
+        "physical_host": "HOST-00",
+        "ruleset_version": "v4.2.1-build-2024q1",
+        "timestamp": "2024-03-15T06:00:00.000Z",
+        "vendor": "ACME_EDR"
+      },
+      "raw_score": 0.82,
+      "source_tool": "edr_node_00"
+    },
+    {
+      "evidence_type": "memory_process",
+      "metadata": {
+        "detection": "apt_lateral_movement",
+        "physical_host": "HOST-01",
+        "ruleset_version": "v4.2.1-build-2024q1",
+        "timestamp": "2024-03-15T06:00:00.020Z",
+        "vendor": "ACME_EDR"
+      },
+      "raw_score": 0.82,
+      "source_tool": "edr_node_01"
+    },
+    {
+      "evidence_type": "memory_process",
+      "metadata": {
+        "detection": "apt_lateral_movement",
+        "physical_host": "HOST-02",
+        "ruleset_version": "v4.2.1-build-2024q1",
+        "timestamp": "2024-03-15T06:00:00.040Z",
+        "vendor": "ACME_EDR"
+      },
+      "raw_score": 0.82,
+      "source_tool": "edr_node_02"
+    },
+    {
+      "evidence_type": "memory_process",
+      "metadata": {
+        "detection": "apt_lateral_movement",
+        "physical_host": "HOST-03",
+        "ruleset_version": "v4.2.1-build-2024q1",
+        "timestamp": "2024-03-15T06:00:00.060Z",
+        "vendor": "ACME_EDR"
+      },
+      "raw_score": 0.82,
+      "source_tool": "edr_node_03"
+    },
+    {
+      "evidence_type": "memory_process",
+      "metadata": {
+        "detection": "apt_lateral_movement",
+        "physical_host": "HOST-04",
+        "ruleset_version": "v4.2.1-build-2024q1",
+        "timestamp": "2024-03-15T06:00:00.080Z",
+        "vendor": "ACME_EDR"
+      },
+      "raw_score": 0.82,
+      "source_tool": "edr_node_04"
+    }
+  ],
+  "breaks": [
+    "shared_upstream_model_detection"
+  ],
+  "case_id": "VABS-T3-002",
+  "criticality_score": 0.0756,
+  "description": "Shared latent model correlation: five physically distinct EDR agents all report the same detection within a 100ms window. Investigation reveals all agents share detection ruleset v4.2.1 from the same vendor. The correlation is logical, not physical — the ruleset itself may be the attack vector.",
+  "expected": {
+    "detectable": true,
+    "reason": "All five detections share identical ruleset_version and vendor. Temporal clustering (100ms window) with shared ruleset indicates logical rather than independent physical detection. Noisy-OR independence assumption violated.",
+    "verdict": "ABSTAIN_INSTABILITY"
+  },
+  "generated_by": "VABS1Fuzzer",
+  "propagated_breaks": [
+    "shared_upstream_model_detection"
+  ],
+  "vabs_category": "T3",
+  "vabs_version": "1.0"
+}

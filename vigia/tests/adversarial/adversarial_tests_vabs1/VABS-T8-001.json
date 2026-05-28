@@ -1,0 +1,54 @@
+{
+  "artifacts": [
+    {
+      "evidence_type": "log_entry",
+      "metadata": {
+        "anomaly_count": 0,
+        "event_count": 3421,
+        "scale": "micro",
+        "scale_verdict": "CONSISTENT"
+      },
+      "raw_score": 0.2,
+      "source_tool": "siem_micro"
+    },
+    {
+      "evidence_type": "log_entry",
+      "metadata": {
+        "anomalous_sessions": 0,
+        "scale": "meso",
+        "scale_verdict": "CONSISTENT",
+        "session_count": 47
+      },
+      "raw_score": 0.22,
+      "source_tool": "siem_meso"
+    },
+    {
+      "evidence_type": "log_entry",
+      "metadata": {
+        "cross_scale_note": "Micro sessions, when mapped to meso sequences, cover every customer record. This is only visible as a macro-level pattern — no individual micro or meso event is anomalous.",
+        "scale": "macro",
+        "scale_verdict": "CONSISTENT",
+        "weekly_behavior": "within_role_profile"
+      },
+      "raw_score": 0.18,
+      "source_tool": "siem_macro"
+    }
+  ],
+  "breaks": [
+    "cross_scale_consistency_mapping"
+  ],
+  "case_id": "VABS-T8-001",
+  "criticality_score": 0.0756,
+  "description": "Scale-invariant consistency trap: Micro-scale (individual events): all events consistent — file reads, network connections, process spawns are individually normal. Meso-scale (sessions, 1-hour windows): all sessions consistent — each hour's activity matches usage profile. Macro-scale (daily/weekly): overall behavior consistent with privileged sysadmin role. Cross-scale contradiction: the micro-events aggregate into meso-sessions that are internally consistent but whose combination across sessions implies complete exfiltration of the customer database — only visible when micro->meso->macro mapping is evaluated.",
+  "expected": {
+    "detectable": false,
+    "reason": "Cross-scale constraint solver required but not yet implemented. Known gap: cross_scale_consistency_mapping. VIGIA must document this gap rather than emit a confident verdict.",
+    "verdict": "ABSTAIN_EPISTEMIC"
+  },
+  "generated_by": "VABS1Fuzzer",
+  "propagated_breaks": [
+    "cross_scale_consistency_mapping"
+  ],
+  "vabs_category": "T8",
+  "vabs_version": "1.0"
+}

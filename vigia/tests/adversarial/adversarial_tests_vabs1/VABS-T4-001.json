@@ -1,0 +1,48 @@
+{
+  "artifacts": [
+    {
+      "evidence_type": "log_entry",
+      "metadata": {
+        "correlation_matrix_delta": 0.003,
+        "distribution_ks_pvalue": 0.61,
+        "entropy_baseline_range": [
+          4.2,
+          4.5
+        ],
+        "global_shannon_entropy": 4.31,
+        "note": "All statistical invariants within normal range"
+      },
+      "raw_score": 0.48,
+      "source_tool": "siem_aggregated"
+    },
+    {
+      "evidence_type": "file_metadata",
+      "metadata": {
+        "access_pattern": "sequential_read",
+        "entropy_contribution": "low",
+        "file_count": 847,
+        "note": "2GB exfiltration disguised as sequential read — occupies low-entropy encoding slot, statistically indistinguishable from backup job",
+        "total_bytes": 2147483648
+      },
+      "raw_score": 0.45,
+      "source_tool": "file_access_monitor"
+    }
+  ],
+  "breaks": [
+    "entropy_semantic_coupling"
+  ],
+  "case_id": "VABS-T4-001",
+  "criticality_score": 0.0756,
+  "description": "Entropy preservation attack: attacker constructs event stream where global Shannon entropy == 4.31 bits (within normal baseline 4.2-4.5), correlation matrix matches known-good profile, but the semantic meaning of high/low entropy events is inverted: legitimate admin activity is encoded in high-entropy slots, exfiltration is encoded in low-entropy slots that appear as routine file access patterns.",
+  "expected": {
+    "detectable": false,
+    "reason": "Entropy preservation attack achieves statistical camouflage. P2 entropy metrics cannot detect this class of attack by design. Detection requires semantic analysis of what high/low entropy events represent, not their statistical distribution.",
+    "verdict": "ABSTAIN_EPISTEMIC"
+  },
+  "generated_by": "VABS1Fuzzer",
+  "propagated_breaks": [
+    "entropy_semantic_coupling"
+  ],
+  "vabs_category": "T4",
+  "vabs_version": "1.0"
+}

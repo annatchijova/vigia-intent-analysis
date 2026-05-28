@@ -1,0 +1,45 @@
+{
+  "artifacts": [
+    {
+      "evidence_type": "memory_process",
+      "metadata": {
+        "note": "INVERTED: lsass.exe should be child of wininit.exe (pid=408), not parent of services.exe",
+        "parent_name": "services.exe",
+        "parent_pid": 676,
+        "pid": 512,
+        "process_name": "lsass.exe"
+      },
+      "raw_score": 0.88,
+      "source_tool": "volatility_pstree"
+    },
+    {
+      "evidence_type": "memory_process",
+      "metadata": {
+        "note": "INVERTED: services.exe normally spawned by wininit.exe, not by lsass.exe",
+        "parent_name": "lsass.exe",
+        "parent_pid": 512,
+        "pid": 676,
+        "process_name": "services.exe"
+      },
+      "raw_score": 0.88,
+      "source_tool": "volatility_pstree"
+    }
+  ],
+  "breaks": [
+    "node_identity_invariance"
+  ],
+  "case_id": "VABS-T2-001",
+  "criticality_score": 0.0756,
+  "description": "Causal graph relabeling: attacker injects process tree where lsass.exe (pid=512) appears as the parent of services.exe (pid=676). Normal Windows invariant is inverted (services.exe spawns lsass.exe). Statistical graph structure is identical; semantic meaning is wrong.",
+  "expected": {
+    "detectable": true,
+    "reason": "Windows process hierarchy invariant violated: lsass.exe is never the parent of services.exe. CAIE PROCESS_HIERARCHY_ANOMALY must fire.",
+    "verdict": "MALICE"
+  },
+  "generated_by": "VABS1Fuzzer",
+  "propagated_breaks": [
+    "node_identity_invariance"
+  ],
+  "vabs_category": "T2",
+  "vabs_version": "1.0"
+}

@@ -1,0 +1,65 @@
+{
+  "artifacts": [
+    {
+      "evidence_type": "log_entry",
+      "metadata": {
+        "feature": "outbound_bytes_per_hour",
+        "lr_benign": 0.9,
+        "lr_malicious": 0.89,
+        "note": "Engineered to near-equilibrium LR"
+      },
+      "raw_score": 0.5,
+      "source_tool": "sensor_net_flow"
+    },
+    {
+      "evidence_type": "log_entry",
+      "metadata": {
+        "feature": "failed_logins_per_day",
+        "lr_benign": 0.91,
+        "lr_malicious": 0.9,
+        "note": "Engineered to near-equilibrium LR"
+      },
+      "raw_score": 0.51,
+      "source_tool": "sensor_login_freq"
+    },
+    {
+      "evidence_type": "log_entry",
+      "metadata": {
+        "feature": "sensitive_file_access_count",
+        "lr_benign": 0.89,
+        "lr_malicious": 0.88,
+        "note": "Engineered to near-equilibrium LR"
+      },
+      "raw_score": 0.49,
+      "source_tool": "sensor_file_access"
+    },
+    {
+      "evidence_type": "log_entry",
+      "metadata": {
+        "feature": "unusual_process_spawn_rate",
+        "lr_benign": 0.92,
+        "lr_malicious": 0.91,
+        "note": "Engineered to near-equilibrium LR"
+      },
+      "raw_score": 0.5,
+      "source_tool": "sensor_process"
+    }
+  ],
+  "breaks": [
+    "lr_discriminative_power"
+  ],
+  "case_id": "VABS-T4-002",
+  "criticality_score": 0.08,
+  "description": "Adversarial equilibrium trap: attacker reverse-engineers VIGIA's LR model and crafts evidence where every feature has P(feature|malicious) between 0.88 and 0.91 and P(feature|benign) between 0.89 and 0.92. LR for each feature hovers near 1.0. Posterior never updates away from prior. Goal: make forensic analysis computationally infeasible.",
+  "expected": {
+    "detectable": false,
+    "reason": "All LR values within [0.97, 1.03] range. Posterior cannot update beyond prior. ABSTAIN_LR_COLLAPSE with documented equilibrium is correct. This is a denial-of-forensic-analysis attack.",
+    "verdict": "ABSTAIN_LR_COLLAPSE"
+  },
+  "generated_by": "VABS1Fuzzer",
+  "propagated_breaks": [
+    "lr_discriminative_power"
+  ],
+  "vabs_category": "T4",
+  "vabs_version": "1.0"
+}
