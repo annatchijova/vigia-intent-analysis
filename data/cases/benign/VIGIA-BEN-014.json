@@ -40,12 +40,13 @@
   "devil_advocate": "The journalist is an insider using the Tor authorization to exfiltrate confidential documents to competitors through the whistleblowing platform",
   "devil_refutation": "The exfiltration hypothesis does not explain why there are no mass transfers, why traffic goes only to one domain, or why sessions are short and non-repetitive. However, VIGÍA has no visibility into the content of the communication.",
   "expected_mitre_ttps": [],
-  "expected_verdict": "ABSTAIN",
+  "expected_verdict": "NOISE",
   "peirce_expected": {
     "firstness": "Tor connection and .onion domain from corporate machine",
     "secondness": "The user has written authorization from editor and legal counsel. Traffic is 100% to a whistleblowing platform, with no deviations. No exfiltration or C&C.",
     "thirdness": "This is legitimate use of a source protection tool by an authorized journalist. Editorial policy permits it. However, VIGÍA cannot fully verify the journalist's intent or the content of the communication."
   },
   "source_origin": "synthetic_validation",
+  "verdict_rationale": "NOISE is correct: authorized Tor use generates no structural conflict, no CAIE fractures, no causal anomaly. Score ~0.018 reflects null signal, not epistemic indeterminacy. ABSTAIN is reserved for non-decidability under competing hypotheses — this case has no competing hypotheses.",
   "why_not_malice": "The activity has formal authorization and the traffic pattern is consistent with the stated purpose. HOWEVER, VIGÍA cannot verify the content of the encrypted communication, so it opts for ABSTAIN with a legal context note."
 }

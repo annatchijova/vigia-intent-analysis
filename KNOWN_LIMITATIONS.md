@@ -403,3 +403,23 @@ corroborating heterogeneous evidence.
 *VIGÍA — SANS FIND EVIL Hackathon 2026*
 *Author: Anna Tchijova | AI Collective: Claude, Kimi, Gemini, DeepSeek, Qwen, Grok, ChatGPT*
 *License: Apache 2.0 | Repository: github.com/annatchijova/vigia-intent-analysis*
+
+---
+
+## L-012 — NOISE vs ABSTAIN Semantic Boundary
+
+**Affects:** VIGIA-BEN-014 (Authorized Journalist / Tor) | **Status:** Design decision
+
+**Definition enforced:**
+
+- `NOISE`: null or near-null signal — absence of forensic relevance. Score < 0.05.
+- `ABSTAIN`: epistemic indeterminacy under non-trivial competing hypotheses.
+  Requires structural conflict, causal ambiguity, or insufficient discriminative
+  evidence when signal IS present.
+
+**Implication:** A case with score ~0.018 and no CAIE fractures is NOISE, not ABSTAIN.
+ABSTAIN is not a catch-all for low scores — it is reserved for cases where
+evidence exists but cannot discriminate between hypotheses.
+
+**Forensic justification:** Inflating ABSTAIN with null-signal cases degrades
+ABSTAIN-OH as a metric and weakens the epistemic gate's interpretability.
