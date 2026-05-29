@@ -59,7 +59,11 @@
         "hook_address": "0x7e3b47",
         "hooking_module": "<unknown>",
         "apt1_ioc_match": true,
-        "anomaly": "NtQueryDirectoryFile hook makes processes invisible to pslist/tasklist — active process hiding. NtCreateThread hook intercepts thread creation for injection. Hook destination in unmapped memory region is definitive Zeus usermode API-hook signature."
+        "anomaly": "NtQueryDirectoryFile hook makes processes invisible to pslist/tasklist — active process hiding. NtCreateThread hook intercepts thread creation for injection. Hook destination in unmapped memory region is definitive Zeus usermode API-hook signature.",
+        "acquisition_tool": "AccessData FTK Imager",
+        "acquisition_hash": "verified_e01",
+        "acquisition_timestamp": "2017-06-01T00:36:00Z",
+        "write_blocker_used": false
       }
     },
     {
@@ -87,7 +91,11 @@
         "shimcache_disk_entries": 20,
         "exec_flag": true,
         "path_fracture": true,
-        "anomaly": "Identical 65-second execution interval across two different filesystem paths is mechanical persistence — not human behavior. VIBRAN~1 is 8.3 truncation of executive profile path. Two paths for same binary indicates the malware copies itself between locations to survive partial cleanup. McAfee EntVUtil.EXE appears between a.exe entries at position 12 — AV process interleaved with malware execution."
+        "anomaly": "Identical 65-second execution interval across two different filesystem paths is mechanical persistence — not human behavior. VIBRAN~1 is 8.3 truncation of executive profile path. Two paths for same binary indicates the malware copies itself between locations to survive partial cleanup. McAfee EntVUtil.EXE appears between a.exe entries at position 12 — AV process interleaved with malware execution.",
+        "acquisition_tool": "AccessData FTK Imager",
+        "acquisition_hash": "verified_e01",
+        "acquisition_timestamp": "2017-06-01T00:36:00Z",
+        "write_blocker_used": false
       }
     },
     {
@@ -120,7 +128,11 @@
           "20:37:59Z"
         ],
         "second_user": "rsydow",
-        "anomaly": "Executive in high-value OU targeted by Zeus — credential theft of executive certificates has high business impact. CertEnroll events under active Zeus session mean certificate private keys may be compromised. rsydow authenticates on same machine 1 second before nromanoff CertEnroll at 20:25 — possible credential relay or session hijack."
+        "anomaly": "Executive in high-value OU targeted by Zeus — credential theft of executive certificates has high business impact. CertEnroll events under active Zeus session mean certificate private keys may be compromised. rsydow authenticates on same machine 1 second before nromanoff CertEnroll at 20:25 — possible credential relay or session hijack.",
+        "acquisition_tool": "AccessData FTK Imager",
+        "acquisition_hash": "verified_e01",
+        "acquisition_timestamp": "2017-06-01T00:36:00Z",
+        "write_blocker_used": false
       }
     },
     {
@@ -144,7 +156,11 @@
         "binary_date": "2012-02-27T17:54:36Z",
         "significance": "F-Response Enterprise is the memory acquisition tool. Its presence in shimcachemem confirms live acquisition on Zeus-infected host. Zeus NtQueryDirectoryFile hook was active during acquisition — process list in memory image may be incomplete due to active rootkit hiding.",
         "anomaly": "F-Response Enterprise confirms live acquisition on Zeus-infected host. NOT counted as malice evidence. Methodological transparency only.",
-        "role": "ACQUISITION_CONTEXT_NOT_ATTACK_EVIDENCE"
+        "role": "ACQUISITION_CONTEXT_NOT_ATTACK_EVIDENCE",
+        "acquisition_tool": "AccessData FTK Imager",
+        "acquisition_hash": "verified_e01",
+        "acquisition_timestamp": "2017-06-01T00:36:00Z",
+        "write_blocker_used": false
       }
     },
     {
@@ -179,7 +195,11 @@
           "2012-04-03T08:34:03Z"
         ],
         "anomaly": "Zeus variants use steganography in Twitter profile images for C2 communication (T1102). Two profile images fetched 8 hours apart from same CDN path is consistent with periodic C2 beacon via image steganography. _ndice suggests Spanish/Portuguese profile — consistent with Zeus botnet infrastructure using compromised accounts.",
-        "apt1_ioc_match": "pending_mans_extraction"
+        "apt1_ioc_match": "pending_mans_extraction",
+        "acquisition_tool": "AccessData FTK Imager",
+        "acquisition_hash": "verified_e01",
+        "acquisition_timestamp": "2017-06-01T00:36:00Z",
+        "write_blocker_used": false
       }
     }
   ],
@@ -187,5 +207,6 @@
     "firstness": "Zeus Inline/Trampoline hooks on ntdll in services.exe hiding processes; a.exe running every 65 seconds from two different Temp paths; executive certificate enrollment under infected session; rsydow authenticating 1 second before nromanoff CertEnroll; Twitter profile images fetched at 8-hour intervals",
     "secondness": "NtQueryDirectoryFile hook makes the malware process invisible — memory acquisition on live infected host means pslist is incomplete, only psscan reveals PID 6404; two paths for a.exe (VIBRAN~1\\Temp vs Windows\\TEMP) is a self-copying persistence mechanism surviving partial cleanup; 65-second mechanical interval is not human; CertEnroll under Zeus session means private key material exposed",
     "thirdness": "A Zeus banking trojan compromised the workstation of Natasha Romanoff (OU=Executives), installed kernel-level process hiding via ntdll hooks, established 65-second persistence via self-copying a.exe between two Temp locations, targeted the executive's certificate private keys via CertEnroll interception, used Twitter image steganography for C2 beaconing, and enabled lateral movement to rsydow. This is an APT1-linked Zeus deployment targeting executive credentials and certificates at Stark Research Labs."
-  }
+  },
+  "schema_version": "1.0"
 }
