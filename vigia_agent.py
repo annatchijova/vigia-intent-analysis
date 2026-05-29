@@ -73,11 +73,19 @@ def _to_frac(value: Any) -> Fraction:
     if isinstance(value, float):
         # Usar str() para evitar imprecisión binaria de float * entero
         # Fraction("0.1") == Fraction(1, 10) exacto; int(0.1 * 1e6) no lo es
+        # WARNING: float upstream es bug P2 — módulo origen debe usar Fraction
+        logger.warning(
+            "_to_frac: float recibido %r — el módulo upstream debe usar Fraction. "
+            "Convirtiendo via str() por compatibilidad. Bug P2 upstream.",
+            value
+        )
         if value != value:  # NaN check
+            logger.error("_to_frac: NaN recibido — retornando Fraction(0,1)")
             return Fraction(0, 1)
         try:
             return Fraction(str(value))
-        except (ValueError, OverflowError):
+        except (ValueError, OverflowError) as e:
+            logger.error("_to_frac: Fraction(str(%r)) falló: %s — retornando Fraction(0,1)", value, e)
             return Fraction(0, 1)
     if isinstance(value, str):
         stripped = value.strip()
