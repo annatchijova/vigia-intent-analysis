@@ -686,7 +686,7 @@ class VIGIAAgent:
                 z_frac = _to_frac_z(s)
                 conf_frac = _to_frac(s.get("confidence", 0))
                 narrative_parts.append(
-                    f"  [{s.get('tool', '?')}] z={float(z_frac):.3f} "
+                    f"  [{s.get('description', s.get('tool_name', '?'))}] z={float(z_frac):.3f} "
                     f"conf={float(conf_frac):.2f} — {str(s.get('value', ''))[:80]}"
                 )
             narrative_parts.append("")

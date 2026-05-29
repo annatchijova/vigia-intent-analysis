@@ -175,7 +175,7 @@ class MemoryAnalysisResult:
         return SignalOutput(
             tool_name=TOOL_NAME, value=float(z) / Z_CLIP_MAX if Z_CLIP_MAX > 0 else 0.0,
             z_score=float(z), confidence=float(conf),
-            metadata={
+            description=f"Memory findings: {len(self.findings)} anomalies", metadata={
                 "dump_sha256": self.dump_sha256, "process_count": len(self.processes),
                 "finding_count": len(self.findings),
                 "critical_count": len([f for f in self.findings if f.severity >= Fraction(9, 10)]),

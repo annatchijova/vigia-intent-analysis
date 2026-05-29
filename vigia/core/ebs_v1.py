@@ -102,6 +102,8 @@ if _USE_PYDANTIC:
         z_score: float
         confidence: float = Field(default=1.0, ge=0.0, le=1.0)
         metadata: Optional[Dict[str, Any]] = None
+        description: Optional[str] = None
+        description: Optional[str] = None
 
         @field_validator("z_score")
         @classmethod
@@ -125,6 +127,7 @@ else:
         signal_id: str = dc_field(default_factory=_new_uuid)
         confidence: float = 1.0
         metadata: Optional[Dict[str, Any]] = None
+        description: Optional[str] = None
 
         def __post_init__(self) -> None:
             self.z_score = max(-Z_CLIP_MAX, min(Z_CLIP_MAX, float(self.z_score)))
