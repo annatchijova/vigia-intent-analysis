@@ -1,0 +1,176 @@
+{
+  "case_id": "VIGIA-REAL-ROCBA",
+  "case_name": "Endpoint Compromise Investigation — fredr workstation (2020-11-16)",
+  "description": "User 'fredr', Windows 10 x64 build 19041 (20H2), hostname unknown. IP 192.168.1.5. Memory dump 2020-11-16 02:32:38 UTC (18 GB raw). MRC.exe (VB6, 32-bit, no-ASLR) launched from D:\\Tools\\ 83 seconds before dump. DLL LoadTime timestamps all zeroed (epochs 1600-1718) — temporal impossibility. SearchApp.exe (PID 8312) has 4 PAGE_EXECUTE_READWRITE regions — possible injected shellcode. SearchFilterHost (PID 24920) has ESTABLISHED TCP connection to 52.113.194.132:443 (Microsoft Azure) — unusual for indexing subprocess. Multiple cloud sync processes active: OneDrive, iCloud, Google Drive, Slack — exfiltration surface.",
+  "expected_verdict": "MALICE",
+  "schema_version": "1.0",
+  "acquisition": {
+    "memory_tool": "Unknown (MRC.exe from D:\\Tools\\ — VB6 application)",
+    "memory_acquire_date": "2020-11-16T02:32:38Z",
+    "source_dataset": "SANS FIND EVIL Hackathon 2026",
+    "note": "MRC.exe initiated 83 seconds before dump timestamp. Tool identity unconfirmed — VB6, no-ASLR, from non-standard path."
+  },
+  "subject": {
+    "username": "fredr",
+    "hostname": "unknown",
+    "ip": "192.168.1.5",
+    "os": "Windows 10 x64 build 19041",
+    "profile": "C:\\Users\\fredr\\"
+  },
+  "artifacts": [
+    {
+      "artifact_id": "ART-001",
+      "evidence_type": "memory_process",
+      "source_tool": "Volatility3/dlllist+pstree",
+      "description": "MRC.exe (PID 29440) launched from D:\\Tools\\MRC.exe at 2020-11-16 02:31:15 UTC — 83 seconds before memory acquisition at 02:32:38. Written in Visual Basic 6 (MSVBVM60.DLL). 32-bit process on 64-bit system (Wow64=True). Base address 0x400000 — compiled without ASLR. CRITICAL: all DLL LoadTime timestamps are temporally impossible — values range from 1600-12-01 to 1718-02-19 (FILETIME epoch zeroing or deliberate timestomping). Parent: explorer.exe (PID 7464) — user-launched. Non-standard tool path D:\\Tools\\ with no signed provenance.",
+      "raw_score": 0.82,
+      "prior_trust": 0.78,
+      "provenance_chain": [
+        "Volatility 3 v2.28.0 — windows.pslist / pstree / netscan / cmdline / malfind / dlllist",
+        "VIGÍA convert_raw_to_ebs v1.0"
+      ],
+      "acquisition_tool": "volatility3 dlllist",
+      "acquisition_hash": "sha256:130b25aa9b1cf7cb2da2b4be3df9f3982f0d75d180666ad015d09fbc0c1e0702",
+      "acquisition_timestamp": "2020-11-16T02:32:38Z",
+      "write_blocker_used": false,
+      "examiner_id": "SANS_HACKATHON_2026",
+      "timestamp": "2020-11-16T02:31:15Z",
+      "metadata": {
+        "pid": 29440,
+        "ppid": 7464,
+        "parent_name": "explorer.exe",
+        "image_path": "D:\\Tools\\MRC.exe",
+        "is_wow64": true,
+        "base_address": "0x400000",
+        "runtime_key_dll": "MSVBVM60.DLL",
+        "aslr_enabled": false,
+        "process_start_utc": "2020-11-16T02:31:15Z",
+        "dump_timestamp_utc": "2020-11-16T02:32:38Z",
+        "seconds_before_dump": 83,
+        "dll_loadtime_anomaly": "ALL LoadTime values in range 1600-1718 (impossible — FILETIME zeroing or timestomping)",
+        "acquisition_tool": "volatility3 dlllist",
+        "acquisition_hash": "sha256:130b25aa9b1cf7cb2da2b4be3df9f3982f0d75d180666ad015d09fbc0c1e0702",
+        "acquisition_timestamp": "2020-11-16T02:32:38Z",
+        "write_blocker_used": false
+      }
+    },
+    {
+      "artifact_id": "ART-002",
+      "evidence_type": "memory_process",
+      "source_tool": "Volatility3/malfind",
+      "description": "SearchApp.exe (PID 8312) has 4 PAGE_EXECUTE_READWRITE memory regions not backed by files on disk. Region 0x255fe730000: contains trampolining shellcode pattern — 'MOV RAX, addr; JMP RAX' (48 B8 xx xx xx xx; 48 FF E0) followed by INT3 padding. This is a classic position-independent shellcode stub used for code injection. SearchApp.exe is the Windows Search UWP process — code injection here provides access to the search stack shared with SearchFilterHost. No corresponding malfind hit on SearchFilterHost (PID 24920) but TCP ESTABLISHED to 52.113.194.132:443 observed — consistent with injected code using SearchApp as staging and SearchFilterHost as the C2 channel.",
+      "raw_score": 0.85,
+      "prior_trust": 0.8,
+      "provenance_chain": [
+        "Volatility 3 v2.28.0 — windows.pslist / pstree / netscan / cmdline / malfind / dlllist",
+        "VIGÍA convert_raw_to_ebs v1.0"
+      ],
+      "acquisition_tool": "volatility3 malfind",
+      "acquisition_hash": "sha256:91b55088fff3241334380e64fe6a81ded023f214f630bebcc3f60dcac56e0a29",
+      "acquisition_timestamp": "2020-11-16T02:32:38Z",
+      "write_blocker_used": false,
+      "examiner_id": "SANS_HACKATHON_2026",
+      "timestamp": "2020-11-16T02:32:38Z",
+      "metadata": {
+        "pid": 8312,
+        "process_name": "SearchApp.exe",
+        "malfind_regions": 4,
+        "key_pattern": "MOV RAX, addr; JMP RAX (trampolining shellcode)",
+        "protection": "PAGE_EXECUTE_READWRITE",
+        "related_pid": 24920,
+        "related_process": "SearchFilterHost",
+        "acquisition_tool": "volatility3 malfind",
+        "acquisition_hash": "sha256:91b55088fff3241334380e64fe6a81ded023f214f630bebcc3f60dcac56e0a29",
+        "acquisition_timestamp": "2020-11-16T02:32:38Z",
+        "write_blocker_used": false
+      }
+    },
+    {
+      "artifact_id": "ART-003",
+      "evidence_type": "network_flow",
+      "source_tool": "Volatility3/netscan",
+      "description": "SearchFilterHost.exe (PID 24920) has TCP ESTABLISHED connection to 52.113.194.132:443. SearchFilterHost is a Windows Search subprocess (child of SearchIndexer) — it processes search filter handlers for indexed content. This process does NOT initiate external network connections under normal operation. 52.113.194.132 resolves to Microsoft Azure — consistent with C2 using cloud infrastructure for traffic blending (living-off-the-cloud / TA0011). Connection timestamp: 2020-11-16 02:33:38 UTC — 60 seconds after memory dump, suggesting the connection was active during acquisition.",
+      "raw_score": 0.78,
+      "prior_trust": 0.75,
+      "provenance_chain": [
+        "Volatility 3 v2.28.0 — windows.pslist / pstree / netscan / cmdline / malfind / dlllist",
+        "VIGÍA convert_raw_to_ebs v1.0"
+      ],
+      "acquisition_tool": "volatility3 netscan",
+      "acquisition_hash": "sha256:8266c96ce13fa8b9a19268b27ba06da9da73cda033aad0e130d3888fd3440377",
+      "acquisition_timestamp": "2020-11-16T02:32:38Z",
+      "write_blocker_used": false,
+      "examiner_id": "SANS_HACKATHON_2026",
+      "timestamp": "2020-11-16T02:33:38Z",
+      "metadata": {
+        "pid": 24920,
+        "process": "SearchFilterHost",
+        "local_ip": "192.168.1.5",
+        "local_port": 61867,
+        "remote_ip": "52.113.194.132",
+        "remote_port": 443,
+        "state": "ESTABLISHED",
+        "remote_asn": "Microsoft Azure",
+        "normal_behavior": "No external connections expected",
+        "ttp": "TA0011 — C2 via cloud infrastructure blending",
+        "acquisition_tool": "volatility3 netscan",
+        "acquisition_hash": "sha256:8266c96ce13fa8b9a19268b27ba06da9da73cda033aad0e130d3888fd3440377",
+        "acquisition_timestamp": "2020-11-16T02:32:38Z",
+        "write_blocker_used": false
+      }
+    },
+    {
+      "artifact_id": "ART-004",
+      "evidence_type": "network_flow",
+      "source_tool": "Volatility3/netscan",
+      "description": "Five cloud sync processes active with established/recent connections: OneDrive (PID 9648) to 13.107.136.9:443, Google Drive Sync (PID 8432) to 172.217.x.x:443, iCloudDrive (PID 13260) to 17.248.138.x:443, iCloudPhotos (PID 12532) multiple connections to Apple CDN, Slack (PID 1152) active with child processes. Combination of OneDrive + Google Drive + iCloud + Slack active simultaneously on a potentially compromised host represents a high-surface exfiltration environment. Devil's advocate: all are legitimate applications with autostart.",
+      "raw_score": 0.55,
+      "prior_trust": 0.65,
+      "provenance_chain": [
+        "Volatility 3 v2.28.0 — windows.pslist / pstree / netscan / cmdline / malfind / dlllist",
+        "VIGÍA convert_raw_to_ebs v1.0"
+      ],
+      "acquisition_tool": "volatility3 netscan",
+      "acquisition_hash": "sha256:a6038c17ab7461408657408d5836f75d46fdd1e1e96de44692c004504e5e923c",
+      "acquisition_timestamp": "2020-11-16T02:32:38Z",
+      "write_blocker_used": false,
+      "examiner_id": "SANS_HACKATHON_2026",
+      "timestamp": "2020-11-16T02:32:38Z",
+      "metadata": {
+        "cloud_processes": [
+          "OneDrive",
+          "googledrivesync",
+          "iCloudDrive",
+          "iCloudPhotos",
+          "Slack"
+        ],
+        "exfil_surface": "HIGH — 5 cloud sync services active",
+        "acquisition_tool": "volatility3 netscan",
+        "acquisition_hash": "sha256:a6038c17ab7461408657408d5836f75d46fdd1e1e96de44692c004504e5e923c",
+        "acquisition_timestamp": "2020-11-16T02:32:38Z",
+        "write_blocker_used": false
+      }
+    }
+  ],
+  "forensic_anomalies": [
+    "MRC.exe VB6 32-bit no-ASLR launched 83s before dump from non-standard D:\\Tools\\",
+    "ALL DLL LoadTime timestamps for MRC.exe are temporally impossible (1600-1718 range)",
+    "SearchApp.exe: 4 PAGE_EXECUTE_READWRITE regions with trampolining shellcode pattern",
+    "SearchFilterHost ESTABLISHED to Microsoft Azure — abnormal for indexing subprocess",
+    "5 cloud sync services simultaneously active — high exfiltration surface"
+  ],
+  "devil_advocate": [
+    "MRC.exe may be a legitimate DFIR memory acquisition tool (VB6 era tools are common in forensics)",
+    "DLL LoadTime zeroing is documented behavior in some acquisition tools",
+    "SearchFilterHost to Microsoft Azure may be legitimate Windows telemetry",
+    "SearchApp.exe JIT/ASLR memory regions can produce false positives in malfind",
+    "All cloud services have legitimate autostart configuration"
+  ],
+  "limitations": [
+    "MRC.exe binary not extracted — cannot hash or submit to VirusTotal",
+    "No disk image available — cannot verify MRC.exe provenance or D:\\Tools\\ contents",
+    "SearchFilterHost DLL list incomplete (4 lines) — module enumeration failed",
+    "No registry or event log analysis — no logon events or persistence keys examined",
+    "User identity 'fredr' not confirmed — no domain context available"
+  ]
+}

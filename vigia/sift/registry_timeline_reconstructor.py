@@ -10,6 +10,7 @@ FIXES APLICADOS (TANDA SEGURIDAD P0):
 """
 
 from __future__ import annotations
+import os
 
 import hashlib
 import logging
