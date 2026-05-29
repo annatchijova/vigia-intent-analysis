@@ -341,6 +341,7 @@ _ACQ_TOOL_WHITELIST: Final[frozenset] = frozenset({
     "autopsy",
     "volatility",
     "legacy_converter_v1",  # converter interno de VIGÍA
+    "f-response", "f-response enterprise", "f-response-ent",  # F-Response Enterprise live acquisition
 })
 
 
