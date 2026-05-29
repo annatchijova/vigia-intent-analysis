@@ -919,7 +919,7 @@ def _build_orchestrator_kwargs(evidence_path: Path, params: Dict) -> Dict:
     else:
         # Archivo único — detectar tipo por extensión
         suffix = evidence_path.suffix.lower()
-        if suffix == ".raw":
+        if suffix in (".raw", ".img", ".mem", ".dmp"):
             kwargs["memory_path"] = str(evidence_path)
         elif suffix in (".e01", ".E01"):
             kwargs["disk_path"] = str(evidence_path)
