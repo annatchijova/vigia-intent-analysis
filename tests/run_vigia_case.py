@@ -22,7 +22,7 @@ from pathlib import Path
 
 # Normalizador de schema legacy → EBS v1 (casos REAL y demo avanzados)
 try:
-    import sys; sys.path.insert(0, "vigia/pipeline"); from vigia_integration_bridge import normalize_case_schema as _normalize_case
+    import sys; sys.path.insert(0, "."); sys.path.insert(0, "vigia/pipeline"); from vigia_integration_bridge import normalize_case_schema as _normalize_case
 except ImportError:
     def _normalize_case(c):  # type: ignore[misc]
         return c  # fallback no-op: el caso se procesa como viene
