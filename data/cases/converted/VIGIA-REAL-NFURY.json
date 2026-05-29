@@ -1,0 +1,217 @@
+{
+  "case_id": "VIGIA-REAL-NFURY",
+  "case_name": "Stark Research Labs — Nick Fury / Lateral Movement Investigation (2012)",
+  "description": "Nick Fury (nfury), Director-level executive at Stark Research Labs (DC=shieldbase, DC=local), Windows 7 SP1 x64 workstation WKS-WIN764BITA (10.3.58.6). Memory acquired via F-Response Enterprise on 2012-04-06 — same day as confirmed Zeus infection on nromanoff (10.3.58.5). Redline analysis (MRI) shows WmiPrvSE.exe without path (score=61, already exited) as highest-risk process. lsass.exe has closed RPC connections to 10.3.58.4 (unknown third workstation). PPID anomaly on csrss.exe/winlogon.exe is PID-reuse artifact (smss session process terminated, PID recycled by spoolsv.exe). No Zeus API hooks detected. No hidden processes. No persistence binaries in Temp. RDP (3389) active. Investigation scope: potential lateral movement surface in active breach environment.",
+  "expected_verdict": "SUSPICION",
+  "schema_version": "1.0",
+  "acquisition": {
+    "disk_tool": "AccessData FTK Imager 3.3.0.5",
+    "disk_evidence_number": "nfury-002",
+    "disk_acquire_date": "2012-04-09T17:07:13Z",
+    "disk_md5": "a98416e60bb81f57cb99125ec41bfe4c",
+    "disk_sha1": "829553fd43bbd6d69c85d8285b83410ac679b066",
+    "memory_tool": "F-Response Enterprise (live acquisition)",
+    "memory_evidence_number": "nfury-001",
+    "memory_acquire_date": "2012-04-06T21:29:31Z",
+    "memory_md5": "f9e22cc0b81500c9c821bc1c4029cf93",
+    "memory_sha1": "8f275c9ed6d4883a0bc208865d45a4c7952e953a",
+    "examiner": "SANS FOR508",
+    "case_number": "Stark Research Labs Data Breach Intrusion",
+    "source_dataset": "SANS FIND EVIL Hackathon 2026 — Rob T. Lee corpus / FOR508",
+    "note": "Live acquisition on potentially active host. Memory acquired same day as confirmed Zeus infection on nromanoff (10.3.58.5)."
+  },
+  "subject": {
+    "username": "nfury",
+    "display_name": "Nick Fury",
+    "hostname": "WKS-WIN764BITA",
+    "ip": "10.3.58.6",
+    "os": "Windows 7 SP1 x64",
+    "domain": "DC=shieldbase, DC=local",
+    "ou": "Executives"
+  },
+  "artifacts": [
+    {
+      "artifact_id": "ART-001",
+      "evidence_type": "memory_process",
+      "source_tool": "Redline/MRI",
+      "description": "WmiPrvSE.exe (PID=2508, parent=svchost PID=656) — highest MRI score in system (61.0). Process has no filesystem path recorded. Process already exited at time of memory acquisition. WMI Provider Host without persistent path is consistent with a WMI-based payload that executed and terminated — a common lateral movement or dropper execution pattern. Cannot confirm malicious payload without process memory dump.",
+      "raw_score": 0.72,
+      "prior_trust": 0.7,
+      "acquisition_tool": "f-response enterprise",
+      "acquisition_hash": "sha256:8308e9eae174a8483a78027d3b7829de8abea8b7affe76562eea221faf113065",
+      "acquisition_timestamp": "2012-04-06T21:29:31Z",
+      "write_blocker_used": false,
+      "examiner_id": "SANS_FOR508",
+      "timestamp": "2012-04-06T21:29:31Z",
+      "metadata": {
+        "pid": 2508,
+        "parent_pid": 656,
+        "parent_name": "svchost.exe",
+        "mri_score": 61.0,
+        "process_exited": true,
+        "path_present": false,
+        "acquisition_tool": "f-response enterprise",
+        "acquisition_timestamp": "2012-04-06T21:29:31Z",
+        "write_blocker_used": false,
+        "acquisition_hash": "sha256:8308e9eae174a8483a78027d3b7829de8abea8b7affe76562eea221faf113065",
+        "examiner_id": "SANS_FOR508"
+      },
+      "provenance_chain": [
+        "F-Response Enterprise live acquisition",
+        "Redline 2.0.4.0 .mans SQLite analysis",
+        "VIGÍA nfury converter v1.0"
+      ]
+    },
+    {
+      "artifact_id": "ART-002",
+      "evidence_type": "memory_process",
+      "source_tool": "Redline/ProcessTree",
+      "description": "Process tree PPID anomaly: csrss.exe (PID=440, MRI=58) and winlogon.exe (PID=480, MRI=47) both show ParentPID=432 (spoolsv.exe). Windows csrss.exe and winlogon.exe are always spawned by smss.exe — never by the print spooler. Assessment: PID reuse artifact. smss.exe session process terminated with PID=432, spoolsv.exe was subsequently assigned PID=432 by the kernel. The PPID of csrss and winlogon still references the original smss PID, now occupied by spoolsv. This is documented forensic behavior in Windows 7 memory analysis. Documented as artifact, not as malicious indicator.",
+      "raw_score": 0.35,
+      "prior_trust": 0.6,
+      "acquisition_tool": "f-response enterprise",
+      "acquisition_hash": "sha256:eff9ea120a1a2db75cf6bb1a98ef3ecfc0655d066862a7e36fc138b348c5982e",
+      "acquisition_timestamp": "2012-04-06T21:29:31Z",
+      "write_blocker_used": false,
+      "examiner_id": "SANS_FOR508",
+      "timestamp": "2012-04-06T21:29:31Z",
+      "metadata": {
+        "csrss_pid": 440,
+        "csrss_ppid": 432,
+        "csrss_mri": 58,
+        "winlogon_pid": 480,
+        "winlogon_ppid": 432,
+        "winlogon_mri": 47,
+        "spoolsv_pid": 432,
+        "assessment": "PID_REUSE_ARTIFACT",
+        "acquisition_tool": "f-response enterprise",
+        "acquisition_timestamp": "2012-04-06T21:29:31Z",
+        "write_blocker_used": false,
+        "acquisition_hash": "sha256:eff9ea120a1a2db75cf6bb1a98ef3ecfc0655d066862a7e36fc138b348c5982e",
+        "examiner_id": "SANS_FOR508"
+      },
+      "provenance_chain": [
+        "F-Response Enterprise live acquisition",
+        "Redline 2.0.4.0 .mans SQLite analysis",
+        "VIGÍA nfury converter v1.0"
+      ]
+    },
+    {
+      "artifact_id": "ART-003",
+      "evidence_type": "network_flow",
+      "source_tool": "Redline/Ports",
+      "description": "lsass.exe (PID=552) has CLOSED connections to 10.3.58.4:135 (RPC endpoint mapper) and 10.3.58.4:49156 (RPC dynamic endpoint). 10.3.58.4 is an unknown third workstation in the shieldbase.local subnet (nromanoff=10.3.58.5 confirmed Zeus, nfury=10.3.58.6). lsass.exe initiating RPC to a lateral IP is consistent with credential relay, pass-the-hash, or DCSync-style lateral movement. F-Response also connected to 10.3.58.4:5681, suggesting the examiner acquired that system as well.",
+      "raw_score": 0.6,
+      "prior_trust": 0.75,
+      "acquisition_tool": "f-response enterprise",
+      "acquisition_hash": "sha256:fb58c400a4cf8c932d9cb8f02b4dbe28e962453764234adfa78da7e7cc4ed948",
+      "acquisition_timestamp": "2012-04-06T21:29:31Z",
+      "write_blocker_used": false,
+      "examiner_id": "SANS_FOR508",
+      "timestamp": "2012-04-06T21:29:31Z",
+      "metadata": {
+        "source_process": "lsass.exe",
+        "source_pid": 552,
+        "destination_ip": "10.3.58.4",
+        "destination_ports": [
+          135,
+          49156
+        ],
+        "connection_state": "CLOSED",
+        "context": "Same subnet as confirmed Zeus infection (nromanoff 10.3.58.5)",
+        "acquisition_tool": "f-response enterprise",
+        "acquisition_timestamp": "2012-04-06T21:29:31Z",
+        "write_blocker_used": false,
+        "acquisition_hash": "sha256:fb58c400a4cf8c932d9cb8f02b4dbe28e962453764234adfa78da7e7cc4ed948",
+        "examiner_id": "SANS_FOR508"
+      },
+      "provenance_chain": [
+        "F-Response Enterprise live acquisition",
+        "Redline 2.0.4.0 .mans SQLite analysis",
+        "VIGÍA nfury converter v1.0"
+      ]
+    },
+    {
+      "artifact_id": "ART-004",
+      "evidence_type": "acquisition_context",
+      "source_tool": "F-Response Enterprise",
+      "description": "F-Response Enterprise (PID=328) performing live memory acquisition from 10.3.16.5:48769. Acquisition date 2012-04-06 21:29 UTC — same day as confirmed Zeus infection on nromanoff. Live acquisition methodology: process list reliability unaffected (no Zeus hooks detected on this system). Excluded from malice scoring.",
+      "raw_score": 0.0,
+      "prior_trust": 0.0,
+      "role": "ACQUISITION_CONTEXT_NOT_ATTACK_EVIDENCE",
+      "timestamp": "2012-04-06T21:29:31Z",
+      "metadata": {
+        "acquisition_tool": "F-Response Enterprise",
+        "acquisition_server": "10.3.16.5",
+        "acquisition_timestamp": "2012-04-06T21:29:31Z"
+      },
+      "provenance_chain": [
+        "F-Response Enterprise live acquisition",
+        "Redline 2.0.4.0 .mans SQLite analysis",
+        "VIGÍA nfury converter v1.0"
+      ]
+    },
+    {
+      "artifact_id": "ART-005",
+      "evidence_type": "network_flow",
+      "source_tool": "Redline/Ports",
+      "description": "RDP (TCP 3389) actively listening (svchost.exe PID=408) on executive workstation. In context of active Zeus breach on same network segment (nromanoff 10.3.58.5), active RDP represents lateral movement surface. No active RDP sessions observed in memory snapshot, but RDP was accessible.",
+      "raw_score": 0.45,
+      "prior_trust": 0.65,
+      "acquisition_tool": "f-response enterprise",
+      "acquisition_hash": "sha256:a0baf3eb83c9c4e67a371fcce8b8109743b35995cc6db36779d2ad89aa9d8365",
+      "acquisition_timestamp": "2012-04-06T21:29:31Z",
+      "write_blocker_used": false,
+      "examiner_id": "SANS_FOR508",
+      "timestamp": "2012-04-06T21:29:31Z",
+      "metadata": {
+        "port": 3389,
+        "protocol": "TCP",
+        "state": "LISTENING",
+        "process": "svchost.exe",
+        "pid": 408,
+        "context": "Active during confirmed Zeus breach on adjacent workstation",
+        "acquisition_tool": "f-response enterprise",
+        "acquisition_timestamp": "2012-04-06T21:29:31Z",
+        "write_blocker_used": false,
+        "acquisition_hash": "sha256:a0baf3eb83c9c4e67a371fcce8b8109743b35995cc6db36779d2ad89aa9d8365",
+        "examiner_id": "SANS_FOR508"
+      },
+      "provenance_chain": [
+        "F-Response Enterprise live acquisition",
+        "Redline 2.0.4.0 .mans SQLite analysis",
+        "VIGÍA nfury converter v1.0"
+      ]
+    }
+  ],
+  "forensic_anomalies": [
+    "WmiPrvSE.exe without path — highest MRI score (61), already exited",
+    "lsass.exe RPC connections to unknown workstation 10.3.58.4 (same subnet as confirmed Zeus host)",
+    "RDP (3389) active on executive workstation during active breach on network",
+    "Live F-Response acquisition same day as confirmed Zeus infection on nromanoff (10.3.58.5)",
+    "PPID anomaly csrss/winlogon → spoolsv: assessed as PID reuse artifact (smss session PID recycled)"
+  ],
+  "devil_advocate": [
+    "WmiPrvSE.exe exits normally after WMI queries — exited process without path may be benign WMI scheduled task",
+    "lsass.exe RPC to 10.3.58.4 may be normal domain authentication (NTLM/Kerberos to DC relay)",
+    "RDP listening does not imply active compromise — standard in enterprise environments",
+    "No Zeus hooks, no hidden processes, no persistence binaries: system may be clean"
+  ],
+  "limitations": [
+    "Redline .mans has limited IOC coverage — no APT1 IOC set was loaded for this analysis",
+    "Prefetch not analyzed in this .mans — execution history incomplete",
+    "Event logs not populated in .mans — logon/authentication timeline unavailable",
+    "E01 disk image not processed — registry, shimcache, MFT timeline pending",
+    "10.3.58.4 identity unknown — third workstation not identified in available data",
+    "WmiPrvSE.exe memory not dumped — payload content unverifiable"
+  ],
+  "provenance": {
+    "chain_status": "INTACT",
+    "chain": [
+      "F-Response Enterprise live acquisition → raw memory .001",
+      "AccessData FTK Imager 3.3.0.5 → E01 disk image",
+      "Redline 2.0.4.0 → .mans SQLite analysis database",
+      "VIGÍA pipeline → EBS v1 JSON"
+    ]
+  }
+}
