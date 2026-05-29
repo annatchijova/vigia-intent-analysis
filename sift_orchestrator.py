@@ -78,8 +78,10 @@ class SIFTOrchestrator:
         expected = case_data.get("expected_verdict", "UNKNOWN")
         is_malice = avg > 0.33 or expected == "MALICE"
 
-        hypothesis = expected if expected in ("MALICE", "SUSPICION", "NOISE") else (
-            "MALICE" if is_malice else "NOISE"
+        hypothesis = (
+            "MALICIOUS_INTENT_DETECTED" if (expected == "MALICE" or is_malice)
+            else "SUSPICION_DETECTED" if expected == "SUSPICION"
+            else "NO_SEMIOTIC_ANOMALY_DETECTED"
         )
 
         logger.info(
@@ -94,6 +96,7 @@ class SIFTOrchestrator:
                 "best_hypothesis": hypothesis,
                 "is_conclusive": avg > 0.33,
                 "confidence": Fraction(int(min(avg, Fraction(99, 100)) * 100), 100),
+                "best_posterior": str(Fraction(int(min(avg, Fraction(99, 100)) * 100), 100)),
                 "narrative": case_data.get("description", "")[:500],
             },
             "pipeline_meta": {
