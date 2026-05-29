@@ -96,7 +96,7 @@ class SIFTOrchestrator:
             })
         avg = (sum(float(s["z_score"]) for s in signals) / len(signals)) if signals else 0.0
         expected = case_data.get("expected_verdict", "UNKNOWN")
-        is_malice = avg > 0.33 or expected == "MALICE"
+        is_malice = avg > 2.0 or expected == "MALICE"
         hypothesis = (
             "MALICIOUS_INTENT_DETECTED" if (expected == "MALICE" or is_malice)
             else "SUSPICION_DETECTED" if expected == "SUSPICION"
@@ -131,7 +131,7 @@ class SIFTOrchestrator:
             signals.append({
                 "source": "vol3.windows.info",
                 "evidence_type": "memory_os_profile",
-                "z_score": Fraction(1, 10),
+                "z_score": Fraction(5, 10),
                 "confidence": Fraction(9, 10),
                 "description": "Windows OS profile identified from memory image",
                 "detail": info["stdout"][:300],
@@ -152,7 +152,7 @@ class SIFTOrchestrator:
                 signals.append({
                     "source": "vol3.windows.pslist",
                     "evidence_type": "memory_process",
-                    "z_score": Fraction(7, 10),
+                    "z_score": Fraction(28, 10),
                     "confidence": Fraction(75, 100),
                     "description": f"{len(suspicious)} living-off-the-land processes detected",
                     "detail": "\n".join(suspicious[:10]),
@@ -176,7 +176,7 @@ class SIFTOrchestrator:
                 signals.append({
                     "source": "vol3.windows.netscan",
                     "evidence_type": "network_flow",
-                    "z_score": Fraction(8, 10),
+                    "z_score": Fraction(18, 10),
                     "confidence": Fraction(8, 10),
                     "description": f"{len(external)} established connections to external IPs",
                     "detail": "\n".join(external[:10]),
@@ -196,7 +196,7 @@ class SIFTOrchestrator:
                 signals.append({
                     "source": "vol3.windows.malfind",
                     "evidence_type": "memory_process",
-                    "z_score": Fraction(9, 10),
+                    "z_score": Fraction(35, 10),
                     "confidence": Fraction(85, 100),
                     "description": f"Potential code injection in {len(procs)} process(es): {', '.join(list(procs)[:5])}",
                 })
@@ -211,7 +211,7 @@ class SIFTOrchestrator:
             "signals": signals,
             "abduction": {
                 "best_hypothesis": "MALICIOUS_INTENT_DETECTED" if is_malice else "SUSPICION_DETECTED",
-                "is_conclusive": avg > 0.5,
+                "is_conclusive": avg > 1.5,
                 "confidence": Fraction(int(min(avg * 100, 99)), 100),
                 "best_posterior": str(Fraction(int(min(avg * 100, 99)), 100)),
                 "narrative": (

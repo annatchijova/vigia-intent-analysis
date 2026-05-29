@@ -103,6 +103,20 @@ def _to_frac(value: Any) -> Fraction:
                 return Fraction(0, 1)
     if value is None:
         return Fraction(0, 1)
+    if isinstance(value, dict) and value.get("__fraction__") is True:
+        # Deserializar Fraction serializada por el JSON encoder de VIGÍA.
+        # Formato canónico: {"__fraction__": True, "num": N, "den": D}
+        # Inverso exacto del encoder en línea ~115.
+        try:
+            num = int(value["num"])
+            den = int(value["den"])
+            if den == 0:
+                logger.error("_to_frac: den=0 en __fraction__ dict — retornando Fraction(0,1)")
+                return Fraction(0, 1)
+            return Fraction(num, den)
+        except (KeyError, TypeError, ValueError) as e:
+            logger.error("_to_frac: error deserializando __fraction__ dict %r: %s", value, e)
+            return Fraction(0, 1)
     raise TypeError(f"_to_frac: tipo no convertible a Fraction: {type(value)!r} — {value!r}")
 
 
