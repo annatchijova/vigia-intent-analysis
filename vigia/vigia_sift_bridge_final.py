@@ -26,6 +26,7 @@ import json
 import math
 import os
 import re
+import uuid
 # subprocess REMOVED (P2-11 fix) — all calls migrated to sandboxed_execute
 import sys
 from collections import Counter
@@ -317,7 +318,7 @@ def _word_search(term: str, text: str) -> bool:
 # Override: VIGIA_SYSTEM_PROMPT_PATH env var
 _SYSTEM_PROMPT_PATH_DEFAULT = os.path.join(
     os.path.dirname(os.path.abspath(__file__)),
-    "vigia", "data", "system_prompt_peirce.md",
+    "data", "system_prompt_peirce.md",
 )
 
 # SHA-256 of the canonical prompt. Update after editing the prompt file:
