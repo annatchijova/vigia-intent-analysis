@@ -1,0 +1,111 @@
+{
+  "case_id": "VIGIA-REAL-SRL-AV",
+  "case_name": "SRL-2018 Antivirus Server — Memory Forensics",
+  "description": "SRL-2018 compromised enterprise network. AV server memory dump (9 GB, 2018-09-07). Evidence SHA-256: from AV-001_bundle.json. Two cmd.exe processes: PID 2476 (child of 1396, 2018-08-21 01:41:51 UTC — nocturnal operation) and PID 7704 (child of 5984, 2018-08-30 17:38:59 UTC). 29 processes with PAGE_EXECUTE_READWRITE — framework-level code injection consistent with admin server (31 processes). Same post-exploitation framework across both servers. AV server compromise enables attacker to disable/evade endpoint protection before deploying additional payloads across the domain.",
+  "expected_verdict": "MALICE",
+  "schema_version": "1.0",
+  "artifacts": [
+    {
+      "artifact_id": "ART-001",
+      "evidence_type": "memory_process",
+      "source_tool": "Volatility3/pslist",
+      "description": "cmd.exe PID 2476 (parent PID 1396) launched 2018-08-21 01:41:51 UTC. 1:41 AM execution timestamp is consistent with APT nocturnal operations — attackers operating during off-hours to avoid detection. cmd.exe PID 7704 (parent PID 5984) launched 2018-08-30 17:38:59 UTC — second cmd.exe 9 days later, same network, suggests persistent access over weeks.",
+      "raw_score": 0.84,
+      "prior_trust": 0.82,
+      "provenance_chain": [
+        "Memory acquisition SRL-2018 (2018-09-07)",
+        "Volatility3 2.28.0 via VIGÍA vol3 adapter",
+        "vigia_agent.py AV-001"
+      ],
+      "timestamp": "2018-09-07T00:00:00Z",
+      "metadata": {
+        "acquisition_tool": "memory_acquisition_SRL2018",
+        "acquisition_hash": "sha256:d46310ed50dbdcb99052627088d52d998a59bf23ec18c5b05d3235136f64c424",
+        "acquisition_timestamp": "2018-09-07T00:00:00Z",
+        "write_blocker_used": false,
+        "examiner_id": "SANS_HACKATHON_2026",
+        "pid_2476_start": "2018-08-21T01:41:51Z",
+        "pid_7704_start": "2018-08-30T17:38:59Z",
+        "nocturnal_operation": true
+      }
+    },
+    {
+      "artifact_id": "ART-002",
+      "evidence_type": "memory_process",
+      "source_tool": "Volatility3/malfind",
+      "description": "29 processes with PAGE_EXECUTE_READWRITE memory regions not backed by files. Scale consistent with admin server (31 processes same framework). AV server targeted specifically to disable endpoint protection before lateral movement and payload deployment across the domain.",
+      "raw_score": 0.91,
+      "prior_trust": 0.85,
+      "provenance_chain": [
+        "Memory acquisition SRL-2018 (2018-09-07)",
+        "Volatility3 2.28.0 via VIGÍA vol3 adapter",
+        "vigia_agent.py AV-001"
+      ],
+      "timestamp": "2018-09-07T00:00:00Z",
+      "metadata": {
+        "acquisition_tool": "memory_acquisition_SRL2018",
+        "acquisition_hash": "sha256:d46310ed50dbdcb99052627088d52d998a59bf23ec18c5b05d3235136f64c424",
+        "acquisition_timestamp": "2018-09-07T00:00:00Z",
+        "write_blocker_used": false,
+        "examiner_id": "SANS_HACKATHON_2026",
+        "injected_process_count": 29,
+        "admin_server_count": 31,
+        "framework_consistent": true
+      }
+    },
+    {
+      "artifact_id": "ART-003",
+      "evidence_type": "memory_os_profile",
+      "source_tool": "Volatility3/windows.info",
+      "description": "Windows x64. Kernel base 0xf80001a06000 — different machine from admin server.",
+      "raw_score": 0.1,
+      "prior_trust": 0.9,
+      "provenance_chain": [
+        "Memory acquisition SRL-2018 (2018-09-07)",
+        "Volatility3 2.28.0 via VIGÍA vol3 adapter",
+        "vigia_agent.py AV-001"
+      ],
+      "timestamp": "2018-09-07T00:00:00Z",
+      "metadata": {
+        "acquisition_tool": "memory_acquisition_SRL2018",
+        "acquisition_hash": "sha256:d46310ed50dbdcb99052627088d52d998a59bf23ec18c5b05d3235136f64c424",
+        "acquisition_timestamp": "2018-09-07T00:00:00Z",
+        "write_blocker_used": false,
+        "examiner_id": "SANS_HACKATHON_2026",
+        "kernel_base": "0xf80001a06000",
+        "is_64bit": true
+      }
+    },
+    {
+      "artifact_id": "ART-004",
+      "evidence_type": "network_flow",
+      "source_tool": "Volatility3/netscan",
+      "description": "Active network connections on AV server at time of acquisition. AV server with established connections consistent with enterprise environment. AV server compromise implies attacker has visibility into endpoint protection telemetry across the domain — all other hosts potentially exposed.",
+      "raw_score": 0.72,
+      "prior_trust": 0.75,
+      "provenance_chain": [
+        "Memory acquisition SRL-2018 (2018-09-07)",
+        "Volatility3 2.28.0 via VIGÍA vol3 adapter",
+        "vigia_agent.py AV-001"
+      ],
+      "timestamp": "2018-09-07T00:00:00Z",
+      "metadata": {
+        "acquisition_tool": "memory_acquisition_SRL2018",
+        "acquisition_hash": "sha256:d46310ed50dbdcb99052627088d52d998a59bf23ec18c5b05d3235136f64c424",
+        "acquisition_timestamp": "2018-09-07T00:00:00Z",
+        "write_blocker_used": false,
+        "examiner_id": "SANS_HACKATHON_2026"
+      }
+    }
+  ],
+  "forensic_anomalies": [
+    "cmd.exe at 01:41 AM UTC — nocturnal operation, APT timing signature",
+    "29 processes with PAGE_EXECUTE_READWRITE — same framework as admin server (31 procs)",
+    "AV server compromise enables domain-wide payload deployment without endpoint detection",
+    "Persistent access: cmd.exe spawns 9 days apart (Aug 21 and Aug 30)"
+  ],
+  "devil_advocate": [
+    "cmd.exe at 1 AM could be legitimate scheduled maintenance task",
+    "PAGE_EXECUTE_READWRITE is a common false positive for AV software itself (heuristic engines)"
+  ]
+}
