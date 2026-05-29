@@ -901,6 +901,9 @@ def _build_orchestrator_kwargs(evidence_path: Path, params: Dict) -> Dict:
         for pattern, key in [
             ("*.evtx", "event_stream"),
             ("*.raw", "memory_path"),
+            ("*.img", "memory_path"),
+            ("*.mem", "memory_path"),
+            ("*.dmp", "memory_path"),
             ("*.E01", "disk_path"),
             ("*.e01", "disk_path"),
             ("*.log", "log_path"),

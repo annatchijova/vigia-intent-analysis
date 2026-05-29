@@ -38,7 +38,12 @@ class SIFTOrchestrator:
                 return self._error_result(str(e))
 
         memory_path = kwargs.get("memory_path")
+        # Si el scanner de directorios devolvió una lista, tomar el primer elemento
+        if isinstance(memory_path, list):
+            memory_path = memory_path[0] if memory_path else None
         disk_path = kwargs.get("disk_path")
+        if isinstance(disk_path, list):
+            disk_path = disk_path[0] if disk_path else None
 
         # Evidencia de memoria sin disco → vol3 local, no necesita rip.pl
         if memory_path and not disk_path:

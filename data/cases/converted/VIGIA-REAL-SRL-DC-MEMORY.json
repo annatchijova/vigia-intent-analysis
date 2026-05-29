@@ -1,0 +1,98 @@
+{
+  "case_id": "VIGIA-REAL-SRL-DC-MEMORY",
+  "case_name": "SRL-2018 Domain Controller — Memory Analysis",
+  "description": "SRL-2018 compromised enterprise network. Domain Controller (172.16.4.4) memory dump (5 GB, 2018-09-07). Evidence SHA-256: 29da4caf98856751dd2f271bf833a0d53aa7c43025d2b99cb33c7e8d3655321f. DC serving Kerberos (88), LDAP (389), Global Catalog (3268). Host 172.16.4.6 has active ESTABLISHED connections to LDAP and GC — consistent with legitimate domain queries OR with a compromised host performing LDAP reconnaissance / DCSync preparation. lsass injection pending malfind analysis. NOTE: DC memory alone is forensically NOISE — lsass clean, normal DC ports. Compromise visible only via cross-artifact analysis with admin server (VIGIA-REAL-SRL-ADMIN). This is correct calibration: VIGÍA does not over-classify clean memory evidence.",
+  "expected_verdict": "UNKNOWN",
+  "schema_version": "1.0",
+  "artifacts": [
+    {
+      "artifact_id": "ART-001",
+      "evidence_type": "network_flow",
+      "source_tool": "Volatility3/netscan",
+      "description": "DC (172.16.4.4) serving LDAP port 389 and Global Catalog port 3268 to 172.16.4.6 (ESTABLISHED). Kerberos port 88 active via lsass PID 660. 172.16.4.6 is an unidentified internal host with multiple simultaneous LDAP and GC connections — ambiguous without process context on 172.16.4.6.",
+      "raw_score": 0.58,
+      "prior_trust": 0.72,
+      "provenance_chain": [
+        "Memory acquisition SRL-2018 (2018-09-07)",
+        "Volatility3 2.28.0/netscan",
+        "vigia_agent.py DC-001"
+      ],
+      "timestamp": "2018-09-07T00:00:00Z",
+      "metadata": {
+        "acquisition_tool": "memory_acquisition_SRL2018",
+        "acquisition_hash": "sha256:29da4caf98856751dd2f271bf833a0d53aa7c43025d2b99cb33c7e8d3655321f",
+        "acquisition_timestamp": "2018-09-07T00:00:00Z",
+        "write_blocker_used": false,
+        "examiner_id": "SANS_HACKATHON_2026",
+        "dc_ip": "172.16.4.4",
+        "querying_host": "172.16.4.6",
+        "active_ports": [
+          88,
+          389,
+          3268
+        ],
+        "lsass_pid": 660
+      }
+    },
+    {
+      "artifact_id": "ART-002",
+      "evidence_type": "memory_process",
+      "source_tool": "Volatility3/malfind",
+      "description": "lsass.exe (PID 660) malfind analysis COMPLETE: CLEAN. No PAGE_EXECUTE_READWRITE regions in lsass. No evidence of direct credential dumping via memory injection (Mimikatz/procdump). DC was not targeted with in-memory credential extraction at time of acquisition. Lateral movement to DC may have occurred via network protocols (DCSync, Pass-the-Hash) from compromised admin server rather than direct DC attack.",
+      "raw_score": 0.45,
+      "prior_trust": 0.75,
+      "provenance_chain": [
+        "Memory acquisition SRL-2018 (2018-09-07)",
+        "Volatility3 2.28.0/netscan",
+        "vigia_agent.py DC-001"
+      ],
+      "timestamp": "2018-09-07T00:00:00Z",
+      "metadata": {
+        "acquisition_tool": "memory_acquisition_SRL2018",
+        "acquisition_hash": "sha256:29da4caf98856751dd2f271bf833a0d53aa7c43025d2b99cb33c7e8d3655321f",
+        "acquisition_timestamp": "2018-09-07T00:00:00Z",
+        "write_blocker_used": false,
+        "examiner_id": "SANS_HACKATHON_2026",
+        "target_pid": 660,
+        "target_process": "lsass.exe",
+        "analysis_status": "PENDING_MALFIND"
+      }
+    },
+    {
+      "artifact_id": "ART-003",
+      "evidence_type": "log_entry",
+      "source_tool": "Volatility3/windows.info",
+      "description": "Windows x64 Domain Controller. Vol3 profile identified successfully.",
+      "raw_score": 0.1,
+      "prior_trust": 0.9,
+      "provenance_chain": [
+        "Memory acquisition SRL-2018 (2018-09-07)",
+        "Volatility3 2.28.0/netscan",
+        "vigia_agent.py DC-001"
+      ],
+      "timestamp": "2018-09-07T00:00:00Z",
+      "metadata": {
+        "acquisition_tool": "memory_acquisition_SRL2018",
+        "acquisition_hash": "sha256:29da4caf98856751dd2f271bf833a0d53aa7c43025d2b99cb33c7e8d3655321f",
+        "acquisition_timestamp": "2018-09-07T00:00:00Z",
+        "write_blocker_used": false,
+        "examiner_id": "SANS_HACKATHON_2026"
+      }
+    }
+  ],
+  "devil_advocate": [
+    "LDAP/GC connections from 172.16.4.6 are consistent with normal domain authentication",
+    "No confirmed credential dumping or process injection detected in available analysis",
+    "DC processes (lsass, svchost) are at expected PIDs with expected port bindings"
+  ],
+  "limitations": [
+    "lsass CLEAN — no memory injection detected, credential theft via alternative vector",
+    "172.16.4.6 identity requires cross-artifact analysis with admin server memory",
+    "pslist unavailable from vol3 on this DC image — Windows version symbol gap"
+  ],
+  "forensic_anomalies": [
+    "172.16.4.6 has ESTABLISHED LDAP (389) and Global Catalog (3268) connections to DC",
+    "lsass CLEAN — confirms attack vector was lateral movement via network, not direct injection",
+    "Admin server (ADMIN-001) has 31 injected processes — likely source of DCSync/PTH to DC"
+  ]
+}

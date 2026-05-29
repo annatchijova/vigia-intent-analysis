@@ -1,0 +1,115 @@
+{
+  "case_id": "VIGIA-REAL-SRL-ADMIN",
+  "case_name": "SRL-2018 Admin Server — Memory Forensics",
+  "description": "SRL-2018 compromised enterprise network. Admin server memory dump (5 GB, 2018-09-07). Volatility3 analysis reveals: 2 PowerShell processes (PIDs 1160, 11008) both spawned from PID 6252 — classic C2 process tree. Evidence SHA-256: d58343cb4e4a06ecc56012c8e25760b297594bf4695303527a5cbb2331726891. Malfind: 31 processes with PAGE_EXECUTE_READWRITE regions — widespread code injection. Consistent with post-exploitation framework (Cobalt Strike / Meterpreter) active in memory.",
+  "expected_verdict": "MALICE",
+  "schema_version": "1.0",
+  "acquisition": {
+    "memory_tool": "Unknown (SRL-2018 dataset)",
+    "memory_acquire_date": "2018-09-07",
+    "source_dataset": "SANS Find Evil! 2026 — SRL-2018 Compromised Enterprise Network",
+    "md5_file": "base-admin-memory.md5"
+  },
+  "artifacts": [
+    {
+      "artifact_id": "ART-001",
+      "evidence_type": "memory_process",
+      "source_tool": "Volatility3/pslist",
+      "description": "2 PowerShell processes (PIDs 1160, 11008) both children of PID 6252. PID 1160 started 2018-07-29T12:59:22Z, PID 11008 started 2018-08-13T17:23:27Z. Same parent spawning multiple PowerShell instances over weeks is consistent with persistent C2 beacon or lateral movement tooling.",
+      "raw_score": 0.88,
+      "prior_trust": 0.8,
+      "provenance_chain": [
+        "Memory acquisition SRL-2018 (2018-09-07)",
+        "Volatility3 2.28.0 via VIGÍA vol3 adapter",
+        "vigia_agent.py ADMIN-001"
+      ],
+      "timestamp": "2018-09-07T00:00:00Z",
+      "metadata": {
+        "acquisition_tool": "memory_acquisition_SRL2018",
+        "acquisition_hash": "sha256:d58343cb4e4a06ecc56012c8e25760b297594bf4695303527a5cbb2331726891",
+        "acquisition_timestamp": "2018-09-07T00:00:00Z",
+        "write_blocker_used": false,
+        "examiner_id": "SANS_HACKATHON_2026",
+        "pid_1160_start": "2018-07-29T12:59:22Z",
+        "pid_11008_start": "2018-08-13T17:23:27Z",
+        "common_parent_pid": 6252
+      }
+    },
+    {
+      "artifact_id": "ART-002",
+      "evidence_type": "memory_process",
+      "source_tool": "Volatility3/malfind",
+      "description": "31 processes with PAGE_EXECUTE_READWRITE memory regions not backed by files on disk. Scale of injection (31 processes) is consistent with a framework-level injector such as Cobalt Strike, Meterpreter, or similar post-exploitation tool performing reflective DLL injection across the process tree.",
+      "raw_score": 0.93,
+      "prior_trust": 0.85,
+      "provenance_chain": [
+        "Memory acquisition SRL-2018 (2018-09-07)",
+        "Volatility3 2.28.0 via VIGÍA vol3 adapter",
+        "vigia_agent.py ADMIN-001"
+      ],
+      "timestamp": "2018-09-07T00:00:00Z",
+      "metadata": {
+        "acquisition_tool": "memory_acquisition_SRL2018",
+        "acquisition_hash": "sha256:d58343cb4e4a06ecc56012c8e25760b297594bf4695303527a5cbb2331726891",
+        "acquisition_timestamp": "2018-09-07T00:00:00Z",
+        "write_blocker_used": false,
+        "examiner_id": "SANS_HACKATHON_2026",
+        "injected_process_count": 31,
+        "page_protection": "PAGE_EXECUTE_READWRITE"
+      }
+    },
+    {
+      "artifact_id": "ART-003",
+      "evidence_type": "memory_os_profile",
+      "source_tool": "Volatility3/windows.info",
+      "description": "Windows x64 system. Kernel base 0xf8032461e000, DTB 0x1aa000.",
+      "raw_score": 0.1,
+      "prior_trust": 0.9,
+      "provenance_chain": [
+        "Memory acquisition SRL-2018 (2018-09-07)",
+        "Volatility3 2.28.0 via VIGÍA vol3 adapter",
+        "vigia_agent.py ADMIN-001"
+      ],
+      "timestamp": "2018-09-07T00:00:00Z",
+      "metadata": {
+        "acquisition_tool": "memory_acquisition_SRL2018",
+        "acquisition_hash": "sha256:d58343cb4e4a06ecc56012c8e25760b297594bf4695303527a5cbb2331726891",
+        "acquisition_timestamp": "2018-09-07T00:00:00Z",
+        "write_blocker_used": false,
+        "examiner_id": "SANS_HACKATHON_2026",
+        "kernel_base": "0xf8032461e000",
+        "is_64bit": true
+      }
+    },
+    {
+      "artifact_id": "ART-004",
+      "evidence_type": "network_flow",
+      "source_tool": "Volatility3/netscan",
+      "description": "Network connections active at time of acquisition. Admin server with active connections to internal domain infrastructure consistent with post-exploitation lateral movement.",
+      "raw_score": 0.65,
+      "prior_trust": 0.7,
+      "provenance_chain": [
+        "Memory acquisition SRL-2018 (2018-09-07)",
+        "Volatility3 2.28.0 via VIGÍA vol3 adapter",
+        "vigia_agent.py ADMIN-001"
+      ],
+      "timestamp": "2018-09-07T00:00:00Z",
+      "metadata": {
+        "acquisition_tool": "memory_acquisition_SRL2018",
+        "acquisition_hash": "sha256:d58343cb4e4a06ecc56012c8e25760b297594bf4695303527a5cbb2331726891",
+        "acquisition_timestamp": "2018-09-07T00:00:00Z",
+        "write_blocker_used": false,
+        "examiner_id": "SANS_HACKATHON_2026"
+      }
+    }
+  ],
+  "forensic_anomalies": [
+    "2 PowerShell processes from same parent (PID 6252) — persistent C2 process tree",
+    "31 processes with PAGE_EXECUTE_READWRITE — framework-level reflective injection",
+    "PowerShell span dates: July-August 2018, dump September 2018 — weeks of persistence"
+  ],
+  "devil_advocate": [
+    "PowerShell is commonly used for legitimate admin tasks — parent PID could be a scheduled task runner",
+    "PAGE_EXECUTE_READWRITE is a common malfind false positive for JIT-compiled code (.NET, Java)"
+  ]
+}
