@@ -1,54 +1,59 @@
 """
-vigia_scorer.py — Scorer forense de VIGÍA
-==========================================
+vigia_scorer.py — VIGÍA Forensic Intent Scorer
+===============================================
 
-Parte del proyecto VIGÍA — Forensic Intentionality Analysis Suite.
-Desarrollado para el SANS FIND EVIL Hackathon 2026.
-Candidato a integración en SANS SIFT Workstation.
+Part of the VIGÍA project — Forensic Intentionality Analysis Suite.
+Developed for the SANS FIND EVIL Hackathon 2026.
+Candidate for integration into SANS SIFT Workstation.
 
-Licencia: Apache 2.0
-Repositorio: https://github.com/annatchijova/vigia-intent-analysis
-Autora principal: Anna Tchijova
+License: Apache 2.0
+Repository: https://github.com/annatchijova/vigia-intent-analysis
+Principal author: Anna Tchijova
 
-DESCRIPCIÓN:
-    Scorer forense standalone. Implementa el pipeline de puntuación de
-    intención maliciosa: TrustFusion → CorrelationDecay → CAIE → Decision.
-    No requiere que el paquete vigia esté instalado — funciona en modo
-    demo standalone con fallback seguro a parámetros conservadores.
+DESCRIPTION:
+    Standalone forensic scorer. Implements the malicious intent scoring
+    pipeline: TrustFusion → CorrelationDecay → CAIE → Decision → Quadripartite.
+    Does not require the vigia package to be installed — runs in standalone
+    demo mode with safe fallback to conservative parameters.
 
-FILOSOFÍA FORENSE:
-    Tres pilares: Peircean Thirdness (inferencia abductiva), Navaja de Ockham
-    (selección de hipótesis), admisibilidad Daubert. Todo output es
-    determinista, bit-a-bit reproducible, y auditable por un perito.
+FORENSIC PHILOSOPHY:
+    Three pillars: Peircean Thirdness (abductive inference), Occam's Razor
+    (hypothesis selection), Daubert admissibility. All output is deterministic,
+    bit-for-bit reproducible, and auditable by an expert witness.
 
-HISTORIAL DE PATCHES:
-    B1     : CAIE vivo — fractures recalculadas desde artifacts, no desde JSON
-    B2     : source_counts indexa por evidence_type (misma clave que la búsqueda)
-    B3     : isolation_penalty / n_boost eran dead code — eliminados
-    B4     : diversity_bonus multiplicativo, no aditivo — evita saturación de score
-    P2     : adjusted_score unificado con fórmula CAIE (EvidenceProfile) — Kimi 2026-05-19
-    P4     : MALICIOUS_FRACTURE_TYPES saneado — eliminados 3 fantasmas,
-             agregado FALSE_FLAG_PATTERN que CAIE sí genera — Kimi 2026-05-19
-    P5     : Determinismo P0 — decimal.Decimal + _dround/_dsum — Kimi 2026-05-19
-    P6     : Finite Math Shield — float('inf')/NaN en raw_score → 0.0 — Kimi 2026-05-19
-    P1-K   : CRYPTOGRAPHIC_INCONSISTENCY_UNVERIFIED agregado a CREDIBILITY_REDUCING_TYPES
-             — era invisible para el scorer — Kimi 2026-05-19
+PATCH HISTORY:
+    B1     : Live CAIE — fractures recomputed from artifacts, not from JSON
+    B2     : source_counts indexed by evidence_type (same key as lookup)
+    B3     : isolation_penalty / n_boost were dead code — removed
+    B4     : diversity_bonus multiplicative, not additive — avoids score saturation
+    P2     : adjusted_score unified with CAIE formula (EvidenceProfile) — Kimi 2026-05-19
+    P4     : MALICIOUS_FRACTURE_TYPES sanitised — removed 3 phantom types,
+             added FALSE_FLAG_PATTERN which CAIE does generate — Kimi 2026-05-19
+    P5     : Determinism P0 — decimal.Decimal + _dround/_dsum — Kimi 2026-05-19
+    P6     : Finite Math Shield — float('inf')/NaN in raw_score → 0.0 — Kimi 2026-05-19
+    P1-K   : CRYPTOGRAPHIC_INCONSISTENCY_UNVERIFIED added to CREDIBILITY_REDUCING_TYPES
+             — was invisible to the scorer — Kimi 2026-05-19
+    Q1     : Quadripartite bridge — connects simple 4-state scorer to the full
+             8-state cascade via QuadripartiteClassifier — 2026-05-31
 
-LIMITACIONES CONOCIDAS:
-    - EvidenceProfile fallback (spoofability=0.50, weight=0.20) es conservador
-      pero no calibrado. La calibración real requiere corpus forense etiquetado.
-      Ver fit_calibration.py y run_calibration.py.
-    - La propagación de invalidación de supuestos (ATMS) tiene profundidad 1.
-      A invalida B, B invalida C no se propaga automáticamente.
-      Ver integrity_constraints.py — roadmap v2.0.
-    - El scorer no persiste estado entre ejecuciones. Cada llamada es independiente.
-    - CAIE en modo live requiere instalación del paquete vigia. En modo standalone
-      usa fractures pre-calculadas del JSON (caie_fractures_source: "json_fallback").
-      El bundle documenta qué modo se usó.
-    - _dround() garantiza determinismo cross-platform para output a 4 decimales.
-      Testeado en x86-64 y ARM64 Linux (CPython 3.12). Pendiente: macOS, Windows.
-    - Los coeficientes de boost (0.45) y penalty (0.25) son heurísticos, no
-      calibrados sobre corpus real. Roadmap: calibración bayesiana.
+KNOWN LIMITATIONS:
+    - EvidenceProfile fallback (spoofability=0.50, weight=0.20) is conservative
+      but not calibrated. Real calibration requires a labelled forensic corpus.
+      See fit_calibration.py and run_calibration.py.
+    - Assumption invalidation propagation (ATMS) has depth 1.
+      A invalidates B, B invalidates C does not propagate automatically.
+      See integrity_constraints.py — roadmap v2.0.
+    - The scorer does not persist state between executions. Each call is independent.
+    - Live CAIE requires the vigia package to be installed. In standalone mode
+      it uses pre-computed fractures from the JSON (caie_fractures_source: "json_fallback").
+      The bundle documents which mode was used.
+    - _dround() guarantees cross-platform determinism for output at 4 decimal places.
+      Tested on x86-64 and ARM64 Linux (CPython 3.12). Pending: macOS, Windows.
+    - Boost (0.45) and penalty (0.25) coefficients are heuristic, not
+      calibrated on a real corpus. Roadmap: Bayesian calibration.
+    - Quadripartite bridge uses mean_effective_trust as stability proxy.
+      The full graph_stability engine is not invoked here to keep the scorer
+      self-contained. For production use, wire graph_stability directly.
 """
 from __future__ import annotations
 
@@ -56,13 +61,14 @@ import decimal
 import json
 import math
 import sys
+from fractions import Fraction
 from pathlib import Path
 
 # ---------------------------------------------------------------------------
-# P5: Determinismo P0 — mismo protocolo que CAIE
-# decimal.Decimal con prec=28 y ROUND_HALF_EVEN elimina la divergencia del
-# bit 52 de la mantisa que round() nativo puede producir en arquitecturas
-# con diferente orden de evaluación de expresiones flotantes (x86 vs ARM).
+# P5: Determinism P0 — same protocol as CAIE
+# decimal.Decimal with prec=28 and ROUND_HALF_EVEN eliminates bit-52 mantissa
+# divergence that native round() can produce on architectures with different
+# floating-point evaluation order (x86 vs ARM).
 # ---------------------------------------------------------------------------
 _DETERMINISTIC_INTERNAL_PREC = 6
 _DETERMINISTIC_OUTPUT_PREC   = 4
@@ -76,9 +82,9 @@ _D_ONE  = decimal.Decimal("1")
 
 def _dround(value, precision: int = _DETERMINISTIC_INTERNAL_PREC) -> float:
     """
-    Redondeo determinístico P0.
-    Finite Math Shield integrado: retorna 0.0 para inf, -inf, NaN.
-    Garantiza mismo resultado en x86-64 y ARM64 para precision <= 15.
+    Deterministic rounding — P0.
+    Finite Math Shield integrated: returns 0.0 for inf, -inf, NaN.
+    Guarantees identical result on x86-64 and ARM64 for precision <= 15.
     """
     if not isinstance(value, (int, float)) or not math.isfinite(value):
         return 0.0
@@ -87,8 +93,8 @@ def _dround(value, precision: int = _DETERMINISTIC_INTERNAL_PREC) -> float:
 
 def _dsum(values) -> float:
     """
-    Suma con acumulador decimal.Decimal para evitar drift de punto flotante.
-    Acepta cualquier iterable de int/float. Valores no finitos se descartan.
+    Sum with decimal.Decimal accumulator to avoid floating-point drift.
+    Accepts any iterable of int/float. Non-finite values are discarded.
     """
     acc = _D_ZERO
     for v in values:
@@ -98,8 +104,8 @@ def _dsum(values) -> float:
 
 
 # ---------------------------------------------------------------------------
-# Constantes ANSI — definidas inline, no importadas de módulo externo.
-# Permite que este archivo sea standalone sin dependencias del paquete vigia.
+# ANSI constants — defined inline, not imported from external module.
+# Allows this file to be standalone without vigia package dependencies.
 # ---------------------------------------------------------------------------
 RED = "\033[91m"
 YEL = "\033[93m"
@@ -109,11 +115,43 @@ PUR = "\033[95m"
 BLD = "\033[1m"
 RST = "\033[0m"
 
+# ---------------------------------------------------------------------------
+# Q1: Quadripartite bridge — optional import, degrades gracefully.
+# Connects the simple 4-state scorer to the full 8-state cascade.
+# ---------------------------------------------------------------------------
+try:
+    from quadripartite import QuadripartiteClassifier as _QuadClassifier
+    _QUAD_AVAILABLE = True
+except ImportError:
+    _QUAD_AVAILABLE = False
+
+# Vocabulary mapping: scorer 4-state → quadripartite raw_verdict.
+# SUSPICION maps to ABSTAIN because the signal exists but does not reach
+# the forensic action threshold. QuadripartiteClassifier will resolve it
+# as ABSTAIN_INSUFFICIENT, which is semantically correct.
+_VERDICT_TO_RAW: dict[str, str] = {
+    "MALICE":    "MALICE",
+    "SUSPICION": "ABSTAIN",
+    "NOISE":     "BENIGN",
+    "UNKNOWN":   "ABSTAIN",
+}
+
+_ABSTAIN_REASONS: dict[str, str] = {
+    "SUSPICION": (
+        "Significant signal below MALICE threshold — "
+        "corroboration required before forensic action."
+    ),
+    "UNKNOWN": (
+        "Insufficient structural support — "
+        "more evidence required."
+    ),
+}
+
 
 def _normalize_case(c):
     """
-    Normaliza un caso al schema canónico de VIGÍA.
-    Fallback transparente si el bridge no está disponible (modo standalone).
+    Normalises a case to the canonical VIGÍA schema.
+    Transparent fallback if the bridge is not available (standalone mode).
     """
     try:
         from vigia.pipeline.vigia_integration_bridge import normalize_case_schema
@@ -124,8 +162,8 @@ def _normalize_case(c):
 
 def _verdict_color(verdict) -> str:
     """
-    Retorna código ANSI para el veredicto.
-    Acepta str o Enum (compatibilidad con CollapseDecisionLayer).
+    Returns ANSI code for the verdict.
+    Accepts str or Enum (compatibility with CollapseDecisionLayer).
     """
     v_str = verdict.value if hasattr(verdict, "value") else str(verdict)
     return {
@@ -138,15 +176,15 @@ def _verdict_color(verdict) -> str:
 
 def _compute_temporal_factor(violations: list[dict], artifact_id: str) -> float:
     """
-    Factor de penalización temporal por artefacto.
-    Inline — no depende del paquete vigia. Permite ejecución en demo standalone.
+    Temporal penalty factor per artifact.
+    Inline — does not depend on the vigia package. Allows standalone demo execution.
 
-    Pesos por tipo de violación (severidad forense):
-      EFFECT_BEFORE_CAUSE    : violación de ley física — peso máximo (1.0)
-      TOO_FAST               : velocidad físicamente imposible — peso alto (0.7)
-      STATISTICAL_UNIFORMITY : distribución artificial — peso medio (0.6)
-      IDENTICAL_TIMESTAMP    : colisión de timestamp — peso medio-bajo (0.5)
-      CLOCK_SKEW             : ruido de sincronización — peso bajo (0.4)
+    Weights by violation type (forensic severity):
+      EFFECT_BEFORE_CAUSE    : physical law violation — maximum weight (1.0)
+      TOO_FAST               : physically impossible speed — high weight (0.7)
+      STATISTICAL_UNIFORMITY : artificial distribution — medium weight (0.6)
+      IDENTICAL_TIMESTAMP    : timestamp collision — medium-low weight (0.5)
+      CLOCK_SKEW             : synchronisation noise — low weight (0.4)
     """
     weights = {
         "EFFECT_BEFORE_CAUSE":    1.0,
@@ -168,11 +206,11 @@ def _compute_temporal_factor(violations: list[dict], artifact_id: str) -> float:
 
 def _naive_score(artifacts: list[dict]) -> float:
     """
-    Baseline ingenuo: promedio de raw_scores sin ajuste de trust ni correlación.
-    Usado como referencia para detectar divergencia con el pipeline completo.
+    Naive baseline: average of raw_scores without trust adjustment or correlation.
+    Used as a reference to detect divergence from the full pipeline.
 
-    P5: _dsum/_dround para determinismo P0.
-    P6: Finite Math Shield — raw_score no finito → 0.0.
+    P5: _dsum/_dround for P0 determinism.
+    P6: Finite Math Shield — non-finite raw_score → 0.0.
     """
     if not artifacts:
         return 0.0
@@ -186,26 +224,94 @@ def _naive_score(artifacts: list[dict]) -> float:
     return _dround(_dsum(scores) / len(scores), _DETERMINISTIC_OUTPUT_PREC)
 
 
+def _apply_quadripartite(
+    verdict:    str,
+    confidence: float,
+    stability:  float,
+    fractures:  list,
+) -> dict:
+    """
+    Q1: Wraps QuadripartiteClassifier.classify() around the simple scorer output.
+
+    Uses mean_effective_trust as stability proxy — the graph_stability engine
+    is not invoked here to keep the scorer self-contained. For production use,
+    wire graph_stability directly.
+
+    Returns a dict with the full render_for_report output so the caller never
+    has to import quadripartite directly.
+
+    Degrades gracefully if quadripartite is unavailable (returns stub).
+    """
+    if not _QUAD_AVAILABLE:
+        return {
+            "verdict_state":   "UNAVAILABLE",
+            "action_required": "quadripartite module not found",
+            "analyst_summary": "",
+            "confidence_pct":  round(confidence * 100),
+        }
+
+    raw_verdict    = _VERDICT_TO_RAW.get(verdict, "ABSTAIN")
+    abstain_reason = _ABSTAIN_REASONS.get(verdict)
+
+    # Convert floats to Fraction for deterministic arithmetic.
+    # Clamp to [0, 1] before converting to avoid Fraction overflow on
+    # floating-point noise (e.g. 1.0000000000000002).
+    conf_frac = Fraction(min(1, max(0, round(confidence, 4)))).limit_denominator(10000)
+    stab_frac = Fraction(min(1, max(0, round(stability,  4)))).limit_denominator(10000)
+
+    # Degraded flag: active fractures AND very low confidence → degraded mode.
+    has_active_fractures = isinstance(fractures, list) and len(fractures) > 0
+    integrity_level = (
+        "DEGRADED_MODE"
+        if (has_active_fractures and conf_frac < Fraction(3, 10))
+        else "FULL_INTEGRITY"
+    )
+
+    try:
+        classifier = _QuadClassifier()
+        qv = classifier.classify(
+            raw_verdict=raw_verdict,
+            confidence=conf_frac,
+            stability=stab_frac,
+            integrity_level=integrity_level,
+            dissent_info={},
+            abstain_reason=abstain_reason,
+            pivot_signals=[],
+            investigation_roadmap=[],
+            adversarial_penalty=False,
+        )
+        # render_for_report produces the canonical structured dict.
+        return classifier.render_for_report(qv)
+    except Exception as exc:
+        # Never let the quadripartite crash the main scoring path.
+        return {
+            "verdict_state":   "QUADRIPARTITE_ERROR",
+            "action_required": f"classification failed: {exc}",
+            "analyst_summary": "",
+            "confidence_pct":  round(confidence * 100),
+        }
+
+
 def _vigia_score(case: dict) -> dict:
     """
-    Pipeline VIGÍA de puntuación de intención maliciosa.
+    VIGÍA malicious intent scoring pipeline.
 
-    Implementa: TrustFusion → CorrelationDecay → CAIE → Decision.
+    Implements: TrustFusion → CorrelationDecay → CAIE → Decision → Quadripartite.
 
     Args:
-        case: dict con schema ForensicBundle. Campos esperados:
-            artifacts            : list[dict] — artefactos forenses
-            temporal_violations  : list[dict] — violaciones temporales
-            provenance_analysis  : dict       — análisis de cadena de custodia
-            caie_fractures       : list[dict] — fractures pre-calculadas (fallback JSON)
-            peirce_chain         : dict       — cadena abductiva Peircean
-            expected_verdict     : str        — veredicto esperado (para evaluación)
+        case: dict with ForensicBundle schema. Expected fields:
+            artifacts            : list[dict] — forensic artifacts
+            temporal_violations  : list[dict] — temporal violations
+            provenance_analysis  : dict       — chain-of-custody analysis
+            caie_fractures       : list[dict] — pre-computed fractures (JSON fallback)
+            peirce_chain         : dict       — Peircean abductive chain
+            expected_verdict     : str        — expected verdict (for evaluation)
 
     Returns:
-        dict JSON-serializable con veredicto, score, confianza, y trazabilidad
-        completa para declaración pericial bajo estándar Daubert.
-        caie_fractures_source indica si se usó CAIE vivo ("live_caie") o
-        fractures pre-calculadas del JSON ("json_fallback").
+        JSON-serialisable dict with verdict, score, confidence, and full
+        traceability for expert witness testimony under the Daubert standard.
+        caie_fractures_source indicates whether live CAIE ("live_caie") or
+        pre-computed JSON fractures ("json_fallback") were used.
     """
     case       = _normalize_case(case)
     artifacts  = case.get("artifacts", [])
@@ -216,11 +322,11 @@ def _vigia_score(case: dict) -> dict:
         return {"verdict": "ERROR", "score": 0.0, "confidence": 0.0, "fractures": []}
 
     # -----------------------------------------------------------------------
-    # B1: Recalcular fractures con CAIE vivo
-    # El bug original leía fractures del JSON pre-calculado, lo que hacía que
-    # reglas nuevas de CAIE no se aplicaran. Caso 009 (NARRATIVE_POISONING)
-    # fallaba por esto — la fractura existía en CAIE pero no en el JSON viejo.
-    # Fallback al JSON si CAIE no está disponible (modo standalone).
+    # B1: Live CAIE — recompute fractures from artifacts
+    # The original bug read fractures from the pre-computed JSON, so new CAIE
+    # rules were never applied. Case 009 (NARRATIVE_POISONING) failed because
+    # the fracture existed in CAIE but not in the stale JSON.
+    # Falls back to the JSON if CAIE is not available (standalone mode).
     # -----------------------------------------------------------------------
     fractures    = []
     _caie_source = "json_fallback"
@@ -236,7 +342,7 @@ def _vigia_score(case: dict) -> dict:
             try:
                 engine.add_artifact(CaieArtifact(**filtered))
             except Exception:
-                continue  # artifact con schema inválido — skip, no romper pipeline
+                continue  # artifact with invalid schema — skip, do not break pipeline
         raw_fractures = engine.detect_fractures()
         fractures = [
             {
@@ -255,21 +361,21 @@ def _vigia_score(case: dict) -> dict:
         _caie_source = "json_fallback"
 
     # -----------------------------------------------------------------------
-    # Paso 1: effective_trust por artefacto
+    # Step 1: effective_trust per artifact
     #
     # effective_trust = prior_trust × epc_factor × temporal_factor
-    #   prior_trust    : confianza a priori del artefacto
-    #   epc_factor     : penalización por cadena de custodia rota o larga
-    #   temporal_factor: penalización por violaciones temporales del artefacto
+    #   prior_trust    : artifact prior confidence
+    #   epc_factor     : penalty for broken or long chain of custody
+    #   temporal_factor: penalty for temporal violations on this artifact
     #
-    # P2: adjusted_score con fórmula CAIE unificada:
+    # P2: adjusted_score with unified CAIE formula:
     #   adjusted = raw_score × (1 − spoofability) × weight × effective_trust
-    #   spoofability y weight se leen de EvidenceProfile (CAIE).
-    #   Fallback conservador si CAIE no está disponible: spoofability=0.50, weight=0.20.
-    #   LIMITACIÓN: fallback no calibrado. Ver fit_calibration.py.
+    #   spoofability and weight are read from EvidenceProfile (CAIE).
+    #   Conservative fallback if CAIE is unavailable: spoofability=0.50, weight=0.20.
+    #   LIMITATION: fallback is not calibrated. See fit_calibration.py.
     #
-    # P6: Finite Math Shield — raw_score=inf/NaN → 0.0, no contamina el veredicto.
-    # P5: _dround en todos los valores intermedios.
+    # P6: Finite Math Shield — raw_score=inf/NaN → 0.0, does not contaminate verdict.
+    # P5: _dround on all intermediate values.
     # -----------------------------------------------------------------------
     effective_trusts = []
     for a in artifacts:
@@ -289,15 +395,14 @@ def _vigia_score(case: dict) -> dict:
         temp_factor = _compute_temporal_factor(violations, a.get("artifact_id", ""))
         effective   = _dround(prov_trust * epc_factor * temp_factor, _DETERMINISTIC_OUTPUT_PREC)
 
-        # P2 + acquisition_assurance: fórmula CAIE con spoofability contextual
-        # Instancia Artifact para obtener effective_spoofability que incorpora
-        # los gates G1-G4 de adquisición forense (decisión colectiva VIGÍA).
-        # Fallback conservador si CAIE no disponible.
+        # P2 + acquisition_assurance: CAIE formula with contextual spoofability.
+        # Instantiates Artifact to obtain effective_spoofability, which incorporates
+        # forensic acquisition gates G1-G4 (collective VIGÍA decision).
+        # Conservative fallback if CAIE is not available.
         try:
             from vigia.tools.caie import EVIDENCE_PROFILES, Artifact as _CaieArtifact
             profile = EVIDENCE_PROFILES.get(a.get("evidence_type"))
             weight  = profile.base_weight if profile else 0.20
-            # Instanciar Artifact para calcular effective_spoofability con gates
             _filtered = {
                 k: v for k, v in a.items()
                 if k in {"source_tool", "evidence_type", "raw_score",
@@ -321,20 +426,20 @@ def _vigia_score(case: dict) -> dict:
             "raw_score":       raw_score,
             "effective_trust": effective,
             "adjusted_score":  adjusted,
-            "spoofability":    spoofability,   # trazable en peritaje
-            "weight":          weight,          # trazable en peritaje
+            "spoofability":    spoofability,   # traceable in expert testimony
+            "weight":          weight,         # traceable in expert testimony
         })
 
     # -----------------------------------------------------------------------
-    # Paso 2: Correlation decay
+    # Step 2: Correlation decay
     #
-    # Penaliza artefactos del mismo tipo de evidencia (redundancia → menor
-    # información nueva). Bonifica diversidad de tipos (señal multi-fuente).
+    # Penalises artifacts of the same evidence type (redundancy → less new
+    # information). Bonuses diversity of types (multi-source signal).
     #
-    # B2: source_counts indexa por evidence_type — misma clave que la búsqueda.
-    #     Bug original: indexaba por acquisition_record, penalización nunca aplicaba.
-    # B4: diversity_bonus multiplicativo antes del recorte.
-    #     Bug original: aditivo, podía saturar el score sin evidencia suficiente.
+    # B2: source_counts indexed by evidence_type — same key as the lookup.
+    #     Original bug: indexed by acquisition_record, penalty never applied.
+    # B4: diversity_bonus multiplicative before clamping.
+    #     Original bug: additive, could saturate the score without enough evidence.
     # -----------------------------------------------------------------------
     source_counts: dict[str, int] = {}
     for a in artifacts:
@@ -363,27 +468,27 @@ def _vigia_score(case: dict) -> dict:
         composite = min(0.99, composite)
 
     # -----------------------------------------------------------------------
-    # Paso 3: CAIE fracture analysis
+    # Step 3: CAIE fracture analysis
     #
-    # DISTINCIÓN CRÍTICA (Daubert):
-    #   Fractures de PLANTACIÓN DELIBERADA → elevan score de intención maliciosa.
-    #     Semántica: "alguien actuó para engañar" → evidencia de agente deliberado.
-    #   Fractures de INCONSISTENCIA INTERNA → reducen credibilidad de evidencia.
-    #     Semántica: "la evidencia no es coherente" → score baja.
+    # CRITICAL DISTINCTION (Daubert):
+    #   DELIBERATE PLANTING fractures → raise malicious intent score.
+    #     Semantics: "someone acted to deceive" → evidence of a deliberate agent.
+    #   INTERNAL INCONSISTENCY fractures → reduce evidence credibility.
+    #     Semantics: "evidence is incoherent" → score decreases.
     #
-    # P4: MALICIOUS_FRACTURE_TYPES saneado — solo tipos que CAIE v2.0 genera.
-    #   Eliminados (fantasmas — no existen en CAIE v2.0):
+    # P4: MALICIOUS_FRACTURE_TYPES sanitised — only types CAIE v2.0 generates.
+    #   Removed (phantoms — do not exist in CAIE v2.0):
     #     STATISTICAL_UNIFORMITY, LIVE_RESPONSE_VS_DISK, CLOUD_VS_ONPREM
-    #   Agregados:
-    #     FALSE_FLAG_PATTERN (era el gran ausente — CAIE lo genera, scorer lo ignoraba),
+    #   Added:
+    #     FALSE_FLAG_PATTERN (was the major gap — CAIE generates it, scorer ignored it),
     #     NETWORK_VS_HOST, DOCUMENT_FORGERY, MFT_ENTRY_ANOMALY,
     #     USN_JOURNAL_GAP, NARRATIVE_POISONING_DETECTED
     #
-    # NOTA: STATISTICAL_UNIFORMITY de violations temporales (motor temporal, no CAIE)
-    #   se procesa más abajo — es señal válida de automatización deliberada.
+    # NOTE: STATISTICAL_UNIFORMITY from temporal violations (temporal engine, not CAIE)
+    #   is processed below — it is a valid deliberate-automation signal.
     #
-    # LIMITACIÓN: coeficientes boost=0.45 y penalty=0.25 son heurísticos.
-    #   Roadmap: calibración bayesiana sobre dataset de casos etiquetados.
+    # LIMITATION: boost=0.45 and penalty=0.25 coefficients are heuristic.
+    #   Roadmap: Bayesian calibration on labelled case dataset.
     # -----------------------------------------------------------------------
     fracture_malice_boost        = 0.0
     fracture_credibility_penalty = 0.0
@@ -401,12 +506,12 @@ def _vigia_score(case: dict) -> dict:
     CREDIBILITY_REDUCING_TYPES = {
         "VERDICT_CONFLICT",
         "METADATA_CONCEALMENT",
-        # P1 fix (Kimi 2026-05-19): CRYPTOGRAPHIC_INCONSISTENCY_UNVERIFIED era invisible
-        # para el scorer — pasaba sin penalización ni boost. CAIE lo genera cuando hay
-        # hash mismatch pero el trust-chain NO fue validado (severity=0.6).
-        # No puede ser MALICIOUS (no hay confirmación de spoofing), pero sí reduce
-        # credibilidad: hay evidencia de discrepancia criptográfica no explicada.
-        # fracture_credibility_penalty += sev * 0.25 lo captura correctamente.
+        # P1-K fix (Kimi 2026-05-19): CRYPTOGRAPHIC_INCONSISTENCY_UNVERIFIED was
+        # invisible to the scorer — passed without penalty or boost. CAIE generates
+        # it when there is a hash mismatch but the trust-chain was NOT validated
+        # (severity=0.6). Cannot be MALICIOUS (no spoofing confirmation), but does
+        # reduce credibility: there is unexplained cryptographic discrepancy.
+        # fracture_credibility_penalty += sev * 0.25 captures this correctly.
         "CRYPTOGRAPHIC_INCONSISTENCY_UNVERIFIED",
     }
 
@@ -421,29 +526,40 @@ def _vigia_score(case: dict) -> dict:
     fracture_malice_boost        = min(0.5,  fracture_malice_boost)
     fracture_credibility_penalty = min(0.35, fracture_credibility_penalty)
 
-    # STATISTICAL_UNIFORMITY del motor temporal (no de CAIE) — señal válida
+    # STATISTICAL_UNIFORMITY from the temporal engine (not CAIE) — valid signal
     for v in violations:
         if v.get("type") == "STATISTICAL_UNIFORMITY":
             fracture_malice_boost += v.get("severity", 0) * 0.35
 
     fracture_malice_boost = min(0.5, fracture_malice_boost)
 
-    # Hard gate: violación de ley física — override incondicional a MALICE
+    # Hard gate: physical law violation — unconditional MALICE override
     hard_temporal = any(
         v.get("type") == "EFFECT_BEFORE_CAUSE" and v.get("severity", 0) >= 0.9
         for v in violations
     )
 
     # -----------------------------------------------------------------------
-    # Paso 4: Decisión
+    # Step 4: Decision
     #
     # final_score = raw_intent_score × (0.9 + 0.1 × support_score)
-    # support_score penaliza casos con muy pocos artefactos (evidencia escasa).
-    # Compuerta explícita: un único artefacto no puede superar score 0.65.
+    # support_score penalises cases with very few artifacts (scarce evidence).
+    # Explicit gate: a single artifact cannot exceed score 0.65.
     #
-    # B3: isolation_penalty y n_boost eran dead code — existían pero nunca se
-    #     aplicaban al final_score. Eliminados para evitar confusión.
-    # P5: _dround en raw_intent_score y final_score.
+    # B3: isolation_penalty and n_boost were dead code — existed but were never
+    #     applied to final_score. Removed to avoid confusion.
+    # P5: _dround on raw_intent_score and final_score.
+    #
+    # Recalibrated thresholds for P2 scale (patch 2026-05-19):
+    # The P2 formula (raw × (1-spoofability) × weight × trust) produces scores
+    # in range [0, ~0.54] without CAIE fractures, vs [0, ~0.99] with the old
+    # formula. With original thresholds (0.75/0.55/0.25), MALICE was
+    # mathematically impossible without fractures — guaranteed false negative.
+    # New thresholds calibrated on real EBS v1 case distribution:
+    #   MALICE    : > 0.33 (P2 + acquisition_assurance recalibration)
+    #   SUSPICION : > 0.18 (structural signal without certainty threshold)
+    #   UNKNOWN   : > 0.08 (weak anomaly — requires human analysis)
+    #   NOISE     : <= 0.08 (no relevant forensic signal)
     # -----------------------------------------------------------------------
     raw_intent_score = _dround(
         max(0.0, min(0.99, composite + fracture_malice_boost - fracture_credibility_penalty)),
@@ -459,8 +575,8 @@ def _vigia_score(case: dict) -> dict:
         _DETERMINISTIC_OUTPUT_PREC,
     )
 
-    # Provenance colapsada sin fractures → NOISE (inadmisible bajo Daubert)
-    # Provenance colapsada CON fractures → posible plantación → SUSPICION
+    # Collapsed provenance without fractures → NOISE (inadmissible under Daubert)
+    # Collapsed provenance WITH fractures → possible planting → SUSPICION
     provenance_collapsed = (
         mean_effective < 0.01
         and not fractures
@@ -476,50 +592,43 @@ def _vigia_score(case: dict) -> dict:
     elif provenance_collapsed:
         verdict    = "NOISE"
         confidence = _dround(1.0 - mean_effective, 2)
-        reason     = "Provenance chain collapsed, sin fractures activas — inadmissible under Daubert"
+        reason     = "Provenance chain collapsed, no active fractures — inadmissible under Daubert"
     elif mean_effective < 0.15 and fractures:
         verdict    = "SUSPICION"
         confidence = _dround(min(0.75, fracture_malice_boost + 0.3), 2)
-        reason     = f"Cadena de custodia rota + {len(fractures)} fracture(s) activas — manipulación deliberada"
-    # -----------------------------------------------------------------------
-    # Umbrales recalibrados para escala P2 (patch 2026-05-19)
-    # La fórmula P2 (raw × (1-spoofability) × weight × trust) produce scores
-    # en rango [0, ~0.54] sin fractures CAIE, vs [0, ~0.99] de la fórmula
-    # anterior. Con umbrales originales (0.75/0.55/0.25), MALICE era
-    # matemáticamente imposible sin fractures — falso negativo garantizado.
-    # Umbrales nuevos calibrados sobre distribución real de casos EBS v1:
-    #   MALICE     : > 0.33  (recalibrado P2+acquisition_assurance: spoofability efectiva log_entry=0.34 con cadena de custodia documentada)
-    #   SUSPICION  : > 0.18  (señal estructural sin umbral de certeza)
-    #   UNKNOWN    : > 0.08  (anomalía débil — requiere análisis humano)
-    #   NOISE      : <= 0.08 (sin señal forense relevante)
-    # -----------------------------------------------------------------------
+        reason     = f"Broken chain of custody + {len(fractures)} active fracture(s) — deliberate manipulation"
     elif final_score > 0.33:
-        # Gate de corroboración: MALICE requiere convergencia de evidencia heterogénea.
-        # Principio Daubert: una sola clase de evidencia técnica, sin importar
-        # su raw_score, no justifica inferencia de intención maliciosa.
-        # Requisito: n_artifacts >= 4 OR n_unique_types >= 3.
-        _n_arts   = len(artifacts)
-        _n_types  = len(set(a.get("evidence_type", "") for a in artifacts))
+        # Corroboration gate: MALICE requires convergence of heterogeneous evidence.
+        # Daubert principle: a single class of technical evidence, regardless of
+        # its raw_score, does not justify an inference of malicious intent.
+        # Requirement: n_artifacts >= 4 OR n_unique_types >= 3.
+        _n_arts  = len(artifacts)
+        _n_types = len(set(a.get("evidence_type", "") for a in artifacts))
         if _n_arts >= 4 or _n_types >= 3:
             verdict = "MALICE"
         else:
             verdict = "SUSPICION"
         confidence = _dround(min(0.95, final_score * 2.0), 2)
-        reason     = f"Intent score {final_score:.4f} excede umbral MALICE (escala P2+acq_assurance, umbral=0.33)"
+        reason     = f"Intent score {final_score:.4f} exceeds MALICE threshold (P2+acq_assurance scale, threshold=0.33)"
     elif final_score > 0.18:
         verdict    = "SUSPICION"
         confidence = _dround(final_score * 2.0, 2)
-        reason     = f"Señal significativa con soporte estructural (score={final_score:.4f})"
+        reason     = f"Significant signal with structural support (score={final_score:.4f})"
     elif final_score > 0.08:
         verdict    = "UNKNOWN"
         confidence = _dround(final_score * 2.0, 2)
-        reason     = f"Anomalía sin suficiente soporte estructural (score={final_score:.4f})"
+        reason     = f"Anomaly without sufficient structural support (score={final_score:.4f})"
     else:
         verdict    = "NOISE"
         confidence = _dround(1.0 - final_score, 2)
-        reason     = f"Sin evidencia suficiente de intención maliciosa (score={final_score:.4f})"
+        reason     = f"Insufficient evidence of malicious intent (score={final_score:.4f})"
 
-    return {
+    # -----------------------------------------------------------------------
+    # Step 5: Quadripartite 8-state cascade (Q1)
+    # Non-destructive: base verdict field is unchanged.
+    # Adds "quadripartite_state" with the full render_for_report output.
+    # -----------------------------------------------------------------------
+    base_result = {
         "verdict":                      verdict,
         "score":                        final_score,
         "confidence":                   confidence,
@@ -537,3 +646,12 @@ def _vigia_score(case: dict) -> dict:
         "peirce_chain":                 case.get("peirce_chain", {}),
         "expected_verdict":             case.get("expected_verdict", "UNKNOWN"),
     }
+
+    base_result["quadripartite_state"] = _apply_quadripartite(
+        verdict=verdict,
+        confidence=confidence,
+        stability=mean_effective,
+        fractures=fractures,
+    )
+
+    return base_result
