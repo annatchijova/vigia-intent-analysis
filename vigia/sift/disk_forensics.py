@@ -15,6 +15,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import logging
 from dataclasses import dataclass, field
 from fractions import Fraction
 from pathlib import Path
@@ -23,6 +24,8 @@ from typing import Any, Dict, List, Optional, Tuple
 from vigia.core.ebs_v1 import SignalOutput, Z_CLIP_MAX
 from vigia.core.chain_of_custody import ChainOfCustody
 from vigia.sift._math_utils import _parse_iso_timestamp
+
+logger = logging.getLogger(__name__)
 
 TOOL_NAME = "MFT_ANALYZER"
 
@@ -84,6 +87,21 @@ class MFTTimelineAnalyzer:
         mft_hash = hashlib.sha256(mft_bytes).hexdigest()
         if chain:
             chain.acquire(mft_bytes[:4096], "MFT_ANALYST", timestamp_utc, notes=f"MFT: {mft_hash[:16]}")
+
+        # FIX P1 (Kimi/2026-06): determinar "ahora" desde timestamp_utc del caso — no time.time().
+        # time.time() es no-determinista: dos corridas del mismo caso dan resultados distintos.
+        # FIX P2 (Kimi post-patch): capturar ValueError si timestamp_utc es inválido — no crashear.
+        try:
+            self._analysis_epoch: int = _parse_iso_timestamp(timestamp_utc)
+        except (ValueError, TypeError, OverflowError) as _ts_err:
+            logger.warning(
+                "[MFT] timestamp_utc inválido %r (%s) — fallback 2025-01-01T00:00:00Z",
+                timestamp_utc, _ts_err
+            )
+            self._analysis_epoch = 1735689600
+        if self._analysis_epoch == 0:
+            # Fallback: timestamp_utc es el default "1970-01-01T00:00:00Z" — usar conservador
+            self._analysis_epoch = 1735689600  # 2025-01-01T00:00:00Z
 
         entries = self._parse(json.loads(parsed_json or "{}").get("entries", []))
         sorted_entries = sorted(entries, key=lambda e: e.record_number)
@@ -157,7 +175,10 @@ class MFTTimelineAnalyzer:
         # Un atacante que usa timestomping tools suele poner timestamps exactos (00:00:00)
         # La entropía de los últimos dígitos debería ser alta en datos reales
         all_ts = list(entry.si_times) + list(entry.fn_times)
-        last_digits = "".join(t[-2:] for t in all_ts if len(t) >= 2)
+        # FIX P2 (Kimi): extraer solo dígitos para evitar incluir 'Z', 'T', '-' en la entropía
+        last_digits = "".join(
+            ch for t in all_ts for ch in t[-4:] if ch.isdigit()
+        )
         if last_digits:
             from vigia.sift._math_utils import _entropy_shannon
             entropy = _entropy_shannon(last_digits)
@@ -165,10 +186,16 @@ class MFTTimelineAnalyzer:
                 anomalies.append({"type": "ROUNDED_TIMESTAMPS", "entropy": str(entropy), "threshold": str(TIMESTOMP_ENTROPY_THRESHOLD)})
 
         # 3. Time tunnel detection
-        import time
-        now = int(time.time())  # FIX P2: Timestamp real del análisis
+        # FIX P1 (Kimi/2026-06): usar self._analysis_epoch (seteado por analyze()) — no time.time()
+        now = getattr(self, "_analysis_epoch", 1735689600)  # 2025-01-01 como fallback seguro
         for ts_str in all_ts:
-            ts = _parse_iso_timestamp(ts_str)
+            # FIX P1 (Kimi post-patch): ValueError de _parse_iso_timestamp no catcheado crashaba
+            # el pipeline entero si un timestamp MFT estaba corrupto. Ahora se skipea con log.
+            try:
+                ts = _parse_iso_timestamp(ts_str)
+            except (ValueError, TypeError, OverflowError):
+                logger.debug("[MFT] Timestamp inválido ignorado en time_tunnel: %r", ts_str)
+                continue
             if ts > now + TIME_TUNNEL_FUTURE_DAYS * 86400:
                 anomalies.append({"type": "FUTURE_TIMESTAMP", "timestamp": ts_str, "seconds_ahead": ts - now})
             if ts > 0 and ts < now - TIME_TUNNEL_PAST_DAYS * 86400:

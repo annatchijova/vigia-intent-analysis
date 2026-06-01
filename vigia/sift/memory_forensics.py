@@ -34,11 +34,23 @@ TOOL_NAME = "MEMORY_FORENSICS"
 ARTIFACT_RELIABILITY = Fraction(95, 100)
 
 # --- ALLOWLIST DE DIRECTORIOS PERMITIDOS (configurable) ---
-ALLOWED_BASE_PATHS = [
-    Path("/var/vigia/dumps"),
-    Path("/tmp/vigia"),
-    Path("/home/vigia/cases"),
-]
+# FIX P1 (Kimi/2026-06): ALLOWED_BASE_PATHS configurable — no hardcodeado.
+# Leer de VIGIA_ALLOWED_DUMP_PATHS (paths separados por ":") o usar defaults.
+# Esto permite que VIGÍA funcione en /opt/vigia, SIFT, Kali, o cualquier entorno.
+def _load_allowed_base_paths() -> list:
+    env_val = os.environ.get("VIGIA_ALLOWED_DUMP_PATHS", "")
+    if env_val.strip():
+            return [Path(p.strip()) for p in env_val.split(os.pathsep) if p.strip()]  # FIX P3 (Kimi): pathsep portable
+    return [
+        Path("/var/vigia/dumps"),
+        Path("/tmp/vigia"),
+        Path("/home/vigia/cases"),
+        # SIFT default evidence paths
+        Path("/cases"),
+        Path("/evidence"),
+    ]
+
+ALLOWED_BASE_PATHS = _load_allowed_base_paths()
 
 _SYSTEM_PROCESS_PARENTS: Dict[str, frozenset] = {
     "services.exe": frozenset({"wininit.exe"}),

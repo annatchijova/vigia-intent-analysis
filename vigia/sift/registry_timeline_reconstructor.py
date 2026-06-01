@@ -30,12 +30,21 @@ logger = logging.getLogger(__name__)
 TOOL_NAME = "REGISTRY_RTR"
 ARTIFACT_RELIABILITY = Fraction(85, 100)
 
-# --- ALLOWLIST DE DIRECTORIOS PERMITIDOS ---
-ALLOWED_BASE_PATHS = [
-    Path("/var/vigia/registry"),
-    Path("/tmp/vigia"),
-    Path("/home/vigia/cases"),
-]
+# FIX P1 (Kimi/2026-06): ALLOWED_BASE_PATHS configurable — no hardcodeado.
+# Leer de VIGIA_ALLOWED_REGISTRY_PATHS (paths separados por ":") o usar defaults.
+def _load_allowed_registry_paths() -> list:
+    env_val = os.environ.get("VIGIA_ALLOWED_REGISTRY_PATHS", "")
+    if env_val.strip():
+            return [Path(p.strip()) for p in env_val.split(os.pathsep) if p.strip()]  # FIX P3 (Kimi): pathsep portable
+    return [
+        Path("/var/vigia/registry"),
+        Path("/tmp/vigia"),
+        Path("/home/vigia/cases"),
+        Path("/cases"),
+        Path("/evidence"),
+    ]
+
+ALLOWED_BASE_PATHS = _load_allowed_registry_paths()
 
 _PERSISTENCE_KEYS = {
     r"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run": "T1547.001",
@@ -222,9 +231,11 @@ class PersistenceDetector:
                 parts = line.split(" -> ", 1)
                 if len(parts) == 2:
                     vname, vdata = parts[0].strip(), parts[1].strip()
-                    # FIX ReDoS: Limitar vdata a 500 chars antes de regex
-                    vdata_trunc = vdata[:500]
-                    matched = [p.pattern for p in _SUSPICIOUS_RUN_PATTERNS if p.search(vdata_trunc)]
+                    # FIX P2 (Kimi post-patch-v2): cap a 10KB — balance entre
+                    # evasión-por-padding (500 chars era insuficiente) y DoS-por-CPU.
+                    # 10KB cubre cualquier payload real; líneas RegRipper > 10KB = anomalía en sí.
+                    vdata_safe = vdata[:10240]
+                    matched = [p.pattern for p in _SUSPICIOUS_RUN_PATTERNS if p.search(vdata_safe)]
                     sev = _SEVERITY_MAP.get(len(matched), Fraction(90, 100)) if matched else Fraction(0)
                     if sev > 0:
                         findings.append(PersistenceFinding(
@@ -286,7 +297,8 @@ class USBHistoryAnalyzer:
     def _extract(self, block: str, pattern: str) -> str:
         # FIX ReDoS: Limitar block a 2000 chars y usar regex con límite
         block_trunc = block[:2000]
-        m = re.search(rf"(?:{pattern})\s*:?\s*(.+?)(?:\n|$)", block_trunc, re.I)
+        # FIX P2 (Kimi post-patch): [^\n]{1,200} evita backtracking de .+? y limita longitud
+        m = re.search(rf"(?:{pattern})\s*:?\s*([^\n]{{1,200}})", block_trunc, re.I)
         return m.group(1).strip() if m else ""
 
 

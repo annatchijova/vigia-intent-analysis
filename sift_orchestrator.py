@@ -77,46 +77,91 @@ class SIFTOrchestrator:
             "pipeline_meta": {"error": msg},
         }
 
+    @staticmethod
+    def _frac(val: Any, default: str = "0") -> Fraction:
+        """
+        FIX P1 (Kimi/2026-06-v2): Rechazar float explícitamente — TypeError.
+        P0-compliant: nunca float en la cadena de scoring.
+        Callers deben pasar str(json_value) antes de llamar a _frac.
+        """
+        if val is None:
+            return Fraction(default)
+        if isinstance(val, Fraction):
+            return val
+        if isinstance(val, int):
+            return Fraction(val, 1)
+        if isinstance(val, float):
+            # P0 HARD REJECTION — float no permitido en scoring.
+            # Si este raise llega a producirse, es un bug en el caller.
+            # En producción, los callers deben hacer str(json_val) antes.
+            raise TypeError(
+                f"[P0] Float rechazado en scoring: {val!r}. "
+                f"El caller debe convertir a str antes: _frac(str({val!r}))"
+            )
+        if isinstance(val, str):
+            stripped = val.strip()
+            if not stripped or stripped.lower() in ("nan", "inf", "-inf", "+inf"):
+                return Fraction(default)
+            try:
+                return Fraction(stripped)
+            except (ValueError, ZeroDivisionError):
+                return Fraction(default)
+        raise TypeError(f"_frac: tipo no convertible: {type(val)!r}")
+
     def _analyze_ebs_json(self, json_path: str) -> Dict[str, Any]:
         case_data = json.loads(Path(json_path).read_text(encoding="utf-8"))
         case_id = case_data.get("case_id", self.case_id)
         artifacts = case_data.get("artifacts", [])
         signals = []
         for art in artifacts:
-            raw_score = float(art.get("raw_score", 0.0))
-            prior_trust = float(art.get("prior_trust", 0.5))
-            effective = raw_score * prior_trust
+            # FIX P1-v2: str() explícito antes de _frac — JSON devuelve float nativo
+            # str(0.75) = "0.75" → Fraction(3,4) exacto; str(0.1) = "0.1" → Fraction(1,10) exacto
+            raw_score   = self._frac(str(art.get("raw_score",  "0")), "0")
+            prior_trust = self._frac(str(art.get("prior_trust", "1/2")), "1/2")
+            effective   = raw_score * prior_trust  # Fraction × Fraction — exacto
             signals.append({
                 "artifact_id": art.get("artifact_id", "?"),
                 "evidence_type": art.get("evidence_type", "unknown"),
-                "z_score": Fraction(int(effective * 1000), 1000),
-                "confidence": Fraction(int(prior_trust * 1000), 1000),
+                "z_score":    effective,    # Fraction — P0-safe
+                "confidence": prior_trust,  # Fraction — P0-safe
                 "description": art.get("description", "")[:200],
                 "source": art.get("source_tool", "unknown"),
             })
-        avg = (sum(float(s["z_score"]) for s in signals) / len(signals)) if signals else 0.0
-        expected = case_data.get("expected_verdict", "UNKNOWN")
-        is_malice = avg > 2.0 or expected == "MALICE"
+        # FIX P2: avg en Fraction — sin float()
+        if signals:
+            n   = Fraction(len(signals), 1)
+            avg = sum(self._frac(s["z_score"]) for s in signals) / n
+        else:
+            avg = Fraction(0, 1)
+        expected   = case_data.get("expected_verdict", "UNKNOWN")
+        is_malice  = avg > Fraction(2, 1) or expected == "MALICE"
         hypothesis = (
             "MALICIOUS_INTENT_DETECTED" if (expected == "MALICE" or is_malice)
             else "SUSPICION_DETECTED" if expected == "SUSPICION"
             else "NO_SEMIOTIC_ANOMALY_DETECTED"
         )
-        logger.info("[SIFT_SHIM] EBS v1 adapter: case=%s artifacts=%d avg=%.4f hyp=%s",
-                    case_id, len(artifacts), avg, hypothesis)
+        logger.info("[SIFT_SHIM] EBS v1 adapter: case=%s artifacts=%d avg=%s hyp=%s",
+                    case_id, len(artifacts), str(avg), hypothesis)
+        # FIX P2 (Kimi post-patch/2026-06): usar avg_clamped directamente — sin int() truncamiento.
+        # int(Fraction(1,3)*100) = 33, pero el valor real es 33.333... → pérdida de precisión.
+        # Fraction ya está simplificada automáticamente — no necesita conversión.
+        # FIX P2 (Kimi post-patch-v2): normalizar confidence al rango [0,1]
+        # avg puede ser > 1 si raw_score*prior_trust son z-scores. Z_CLIP_MAX = 5.
+        _Z_MAX = Fraction(5, 1)  # consistente con ebs_v1.Z_CLIP_MAX
+        confidence_f = min(avg / _Z_MAX, Fraction(99, 100))
         return {
             "case_id": case_id, "signals": signals,
             "abduction": {
                 "best_hypothesis": hypothesis,
-                "is_conclusive": avg > 0.33,
-                "confidence": Fraction(int(min(avg, Fraction(99, 100)) * 100), 100),
-                "best_posterior": str(Fraction(int(min(avg, Fraction(99, 100)) * 100), 100)),
+                "is_conclusive": avg > Fraction(33, 100),
+                "confidence": confidence_f,
+                "best_posterior": str(confidence_f),
                 "narrative": case_data.get("description", "")[:500],
             },
             "pipeline_meta": {
                 "source": "ebs_v1_json_adapter",
                 "artifact_count": len(artifacts),
-                "avg_score": avg,
+                "avg_score": str(avg),   # Fraction serializada como string
                 "expected_verdict": expected,
             },
         }
@@ -201,23 +246,32 @@ class SIFTOrchestrator:
                     "description": f"Potential code injection in {len(procs)} process(es): {', '.join(list(procs)[:5])}",
                 })
 
-        # ── Síntesis ──────────────────────────────────────────────────────
-        avg = (sum(float(s["z_score"]) for s in signals) / len(signals)) if signals else 0.0
-        is_malice = avg > 0.33
-        logger.info("[VOL3] Memory analysis complete: %d signals, avg_score=%.3f", len(signals), avg)
+        # FIX P2: avg en Fraction — sin float(s["z_score"])
+        if signals:
+            n_sig = Fraction(len(signals), 1)
+            avg   = sum(self._frac(s["z_score"]) for s in signals) / n_sig
+        else:
+            avg = Fraction(0, 1)
+        is_malice = avg > Fraction(33, 100)
+        logger.info("[VOL3] Memory analysis complete: %d signals, avg_score=%s", len(signals), str(avg))
+        # Confidence: clampear y calcular en Fraction
+        # FIX P2 (Kimi post-patch-v2): normalizar confidence [0,1] con Z_CLIP_MAX=5
+        _Z_MAX_VOL = Fraction(5, 1)
+        conf_vol3 = min(avg / _Z_MAX_VOL, Fraction(99, 100))
 
         return {
             "case_id": self.case_id,
             "signals": signals,
             "abduction": {
                 "best_hypothesis": "MALICIOUS_INTENT_DETECTED" if is_malice else "SUSPICION_DETECTED",
-                "is_conclusive": avg > 1.5,
-                "confidence": Fraction(int(min(avg * 100, 99)), 100),
-                "best_posterior": str(Fraction(int(min(avg * 100, 99)), 100)),
+                # FIX P2: Fraction puro — sin float
+                "is_conclusive": avg > Fraction(3, 2),
+                "confidence": conf_vol3,
+                "best_posterior": str(conf_vol3),
                 "narrative": (
                     f"Volatility3 memory analysis: {len(signals)} signals from "
                     f"{Path(memory_path).name}. "
-                    f"Average intentionality score: {avg:.3f}. "
+                    f"Average intentionality score: {avg.numerator}/{avg.denominator}. "
                     f"{'Malicious activity indicated.' if is_malice else 'Suspicious activity — requires human review.'}"
                 ),
             },

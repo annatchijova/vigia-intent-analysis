@@ -38,7 +38,7 @@ from fractions import Fraction
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
-# ── Logging forense ──────────────────────────────────────────────────────────
+# ── Forensic logging ─────────────────────────────────────────────────────────
 logging.basicConfig(
     level=logging.INFO,
     format="[%(asctime)s] %(levelname)s %(message)s",
@@ -46,14 +46,14 @@ logging.basicConfig(
 )
 logger = logging.getLogger("vigia-agent")
 
-# ── Constantes del agente ────────────────────────────────────────────────────
+# ── Agent constants ──────────────────────────────────────────────────────────
 AGENT_VERSION = "1.0.0-SANS-2026"
-MAX_ITERATIONS = 3                    # Hard cap — previene loops infinitos
-CONTRADICTION_THRESHOLD = 2           # int: mínimo de contradicciones para activar re-análisis
-CONFIDENCE_FLOOR = Fraction(3, 10)    # Umbral mínimo de MCP para veredicto conclusivo
+MAX_ITERATIONS = 3                    # Hard cap — prevents infinite loops
+CONTRADICTION_THRESHOLD = 2           # int: minimum contradictions to trigger re-analysis
+CONFIDENCE_FLOOR = Fraction(3, 10)    # Minimum MCA threshold for conclusive verdict
 
 
-# ── Helpers de conversión racional ───────────────────────────────────────────
+# ── Rational conversion helpers ──────────────────────────────────────────────
 
 def _to_frac(value: Any) -> Fraction:
     """
@@ -71,27 +71,20 @@ def _to_frac(value: Any) -> Fraction:
     if isinstance(value, int):
         return Fraction(value, 1)
     if isinstance(value, float):
-        # Usar str() para evitar imprecisión binaria de float * entero
-        # Fraction("0.1") == Fraction(1, 10) exacto; int(0.1 * 1e6) no lo es
-        # WARNING: float upstream es bug P2 — módulo origen debe usar Fraction
-        logger.warning(
-            "_to_frac: float recibido %r — el módulo upstream debe usar Fraction. "
-            "Convirtiendo via str() por compatibilidad. Bug P2 upstream.",
-            value
-        )
-        if value != value:  # NaN check
-            logger.error("_to_frac: NaN recibido — retornando Fraction(0,1)")
+        # Use str() to avoid binary float imprecision
+        # Fraction("0.1") == Fraction(1, 10) exact; int(0.1 * 1e6) is not
+        # FIX P2-9: explicitly reject NaN and infinities — corrupt data
+        if value != value or value == float('inf') or value == float('-inf'):
             return Fraction(0, 1)
         try:
             return Fraction(str(value))
-        except (ValueError, OverflowError) as e:
-            logger.error("_to_frac: Fraction(str(%r)) falló: %s — retornando Fraction(0,1)", value, e)
+        except (ValueError, OverflowError):
             return Fraction(0, 1)
     if isinstance(value, str):
         stripped = value.strip()
         if not stripped:
             return Fraction(0, 1)
-        # Rechazar NaN e infinitos explícitamente — son datos corruptos
+        # Explicitly reject NaN and infinities — corrupt data
         if stripped.lower() in ("nan", "inf", "-inf", "+inf", "infinity", "-infinity"):
             return Fraction(0, 1)
         try:
@@ -103,20 +96,6 @@ def _to_frac(value: Any) -> Fraction:
                 return Fraction(0, 1)
     if value is None:
         return Fraction(0, 1)
-    if isinstance(value, dict) and value.get("__fraction__") is True:
-        # Deserializar Fraction serializada por el JSON encoder de VIGÍA.
-        # Formato canónico: {"__fraction__": True, "num": N, "den": D}
-        # Inverso exacto del encoder en línea ~115.
-        try:
-            num = int(value["num"])
-            den = int(value["den"])
-            if den == 0:
-                logger.error("_to_frac: den=0 en __fraction__ dict — retornando Fraction(0,1)")
-                return Fraction(0, 1)
-            return Fraction(num, den)
-        except (KeyError, TypeError, ValueError) as e:
-            logger.error("_to_frac: error deserializando __fraction__ dict %r: %s", value, e)
-            return Fraction(0, 1)
     raise TypeError(f"_to_frac: tipo no convertible a Fraction: {type(value)!r} — {value!r}")
 
 
@@ -133,7 +112,7 @@ def _json_serial(obj: Any) -> Any:
 
 
 def _utc_iso_timestamp() -> str:
-    """Retorna timestamp UTC en formato ISO 8601 para audit trail."""
+    """Returns UTC timestamp in ISO 8601 format for audit trail."""
     return datetime.now(timezone.utc).isoformat()
 
 
@@ -145,9 +124,9 @@ def _utc_iso_timestamp() -> str:
 
 class AgentAuditTrail:
     """
-    Registro inmutable de todas las acciones del agente.
+    Immutable record of all agent actions.
     Each entry has ISO 8601 timestamp, action, inputs, outputs and SHA-256.
-    Los jueces pueden trazar cualquier finding hasta la herramienta que lo produjo.
+    Auditors can trace any finding back to the tool that produced it.
     """
 
     def __init__(self, case_id: str):
@@ -164,7 +143,7 @@ class AgentAuditTrail:
         iteration: int = 0,
         note: str = "",
     ) -> str:
-        """Registra una acción. Retorna el SHA-256 de la entrada."""
+        """Records an action. Returns the SHA-256 of the entry."""
         entry = {
             "seq": len(self.entries) + 1,
             "timestamp": _utcnow(),
@@ -176,7 +155,7 @@ class AgentAuditTrail:
             "outputs_summary": _summarize(outputs),
             "note": note,
         }
-        # SHA-256 de la entrada para integridad
+        # SHA-256 of the entry for integrity
         entry_bytes = json.dumps(entry, sort_keys=True, ensure_ascii=True).encode()
         entry["entry_sha256"] = hashlib.sha256(entry_bytes).hexdigest()
         self.entries.append(entry)
@@ -189,7 +168,7 @@ class AgentAuditTrail:
         description: str,
         iteration: int,
     ) -> None:
-        """Registra explícitamente una contradicción detectada entre módulos."""
+        """Explicitly records a contradiction detected between modules."""
         self.log(
             action="SELF_CORRECTION_TRIGGERED",
             tool="contradiction_detector",
@@ -209,7 +188,7 @@ class AgentAuditTrail:
         after: str,
         iteration: int,
     ) -> None:
-        """Registra la corrección aplicada y el cambio de veredicto."""
+        """Records the applied correction and verdict change."""
         self.log(
             action="SELF_CORRECTION_APPLIED",
             tool="correction_engine",
@@ -221,7 +200,7 @@ class AgentAuditTrail:
         logger.info("[SELF-CORRECTION] Applied: %s → %s", before, after)
 
     def export(self) -> Dict[str, Any]:
-        """Exporta el audit trail completo."""
+        """Exports the full audit trail."""
         return {
             "case_id": self.case_id,
             "agent_version": AGENT_VERSION,
@@ -234,19 +213,19 @@ class AgentAuditTrail:
 
 # ════════════════════════════════════════════════════════════════════════════
 # CONTRADICTION DETECTOR
-# Guardrail arquitectónico — no basado en prompts
+# Architectural guardrail — not prompt-based
 # ════════════════════════════════════════════════════════════════════════════
 
 class ContradictionDetector:
     """
     Detects semantic contradictions between pipeline modules.
 
-    Contradicciones detectadas:
-    1. TEMPORAL_VS_CONTENT: timestamp inconsistente con contenido del artefacto
+    Detected contradiction types:
+    1. TEMPORAL_VS_CONTENT: timestamp inconsistent with artifact content
     2. ENTROPY_VS_BEHAVIORAL: high entropy + normal behavior (false negative)
     3. SEMIOTIC_VS_TECHNICAL: no linguistic patterns + high technical anomaly
     4. CONFIDENCE_COLLAPSE: high MCP but all individual modules low
-    5. VERDICT_FLIP: veredictos opuestos entre motores de igual confianza
+    5. VERDICT_FLIP: opposing verdicts between equal-confidence engines
     """
 
     def detect(
@@ -266,7 +245,7 @@ class ContradictionDetector:
         technical = module_results.get("technical_result", {})
 
         # 1. ENTROPY_VS_BEHAVIORAL
-        # Alta entropía de artefacto + comportamiento temporal normal
+        # High artifact entropy + normal temporal behavior
         high_entropy_signals = [
             s for s in signals
             if s.get("tool") in ("memory_forensics", "disk_forensics")
@@ -295,7 +274,7 @@ class ContradictionDetector:
             ))
 
         # 3. CONFIDENCE_COLLAPSE
-        # MCP alto pero módulos individuales todos bajos
+        # High MCA score but all individual modules low
         if mca_score > Fraction(6, 10):
             low_confidence_signals = [
                 s for s in signals if _to_frac(s.get("confidence", Fraction(1, 1))) < Fraction(3, 10)
@@ -308,7 +287,7 @@ class ContradictionDetector:
                     f"Review aggregation weights."
                 ))
 
-        # 4. VERDICT_FLIP entre abductive reasoning y señales directas
+        # 4. VERDICT_FLIP between abductive reasoning and direct signals
         abductive_verdict = abduction.get("best_hypothesis", "")
         is_conclusive = abduction.get("is_conclusive", False)
         critical_signals = [
@@ -332,12 +311,12 @@ class ContradictionDetector:
 
 # ════════════════════════════════════════════════════════════════════════════
 # CORRECTION ENGINE
-# Aplica ajustes deterministas cuando se detectan contradicciones
+# Applies deterministic adjustments when contradictions are detected
 # ════════════════════════════════════════════════════════════════════════════
 
 class CorrectionEngine:
     """
-    Aplica correcciones deterministas a los resultados cuando hay contradicciones.
+    Applies deterministic corrections to results when contradictions are detected.
     No ML. No floats in scoring. No prompt-based heuristics.
     """
 
@@ -349,7 +328,7 @@ class CorrectionEngine:
         iteration: int,
     ) -> Dict[str, Any]:
         """
-        Retorna un dict con las correcciones aplicadas y el nuevo veredicto sugerido.
+        Returns a dict with applied corrections and suggested new verdict.
         """
         corrections = {
             "contradiction_type": contradiction_type,
@@ -359,9 +338,9 @@ class CorrectionEngine:
             "suggested_verdict_upgrade": False,
         }
 
-        # Corrección 1: ENTROPY_VS_BEHAVIORAL
-        # Si hay alta entropía técnica pero comportamiento normal,
-        # elevar el peso de las señales técnicas y marcar para revisión humana
+        # Correction 1: ENTROPY_VS_BEHAVIORAL
+        # High technical entropy but normal behavior —
+        # elevate technical signal weight and flag for human review
         if "memory/disk_forensics" in modules or "disk_forensics" in modules:
             corrections["adjustments"].append(
                 "Memory/disk signals elevated to 1.5x weight. "
@@ -370,8 +349,8 @@ class CorrectionEngine:
             corrections["suggested_verdict_upgrade"] = True
             corrections["recommended_action"] = "REQUIRE_HUMAN_REVIEW"
 
-        # Corrección 2: SEMIOTIC_VS_TECHNICAL
-        # Sin firma lingüística + anomalía técnica alta = técnica avanzada
+        # Correction 2: SEMIOTIC_VS_TECHNICAL
+        # No linguistic signature + high technical anomaly = advanced operator
         if "semiotic_detector" in modules and "technical_detector" in modules:
             corrections["adjustments"].append(
                 "Absence of semiotic patterns recorded as positive indicator "
@@ -379,7 +358,7 @@ class CorrectionEngine:
             )
             corrections["recommended_action"] = "ESCALATE_TO_CRITICAL"
 
-        # Corrección 3: CONFIDENCE_COLLAPSE
+        # Correction 3: CONFIDENCE_COLLAPSE
         if "mcp_aggregator" in modules:
             corrections["adjustments"].append(
                 "MCP recalculated with uniform per-module weight "
@@ -387,7 +366,7 @@ class CorrectionEngine:
             )
             corrections["recommended_action"] = "REWEIGHT_AND_RERUN"
 
-        # Corrección 4: VERDICT_FLIP
+        # Correction 4: VERDICT_FLIP
         if "abductive_reasoner" in modules:
             corrections["adjustments"].append(
                 "Abductive hypothesis BENIGN overridden. "
@@ -401,25 +380,25 @@ class CorrectionEngine:
 
 
 # ════════════════════════════════════════════════════════════════════════════
-# VIGIA AGENT — Loop principal
+# VIGIA AGENT — Main loop
 # ════════════════════════════════════════════════════════════════════════════
 
 class VIGIAAgent:
     """
-    Agente autónomo VIGÍA.
+    Autonomous VIGÍA forensic agent.
 
     Execution loop:
-    1. Inicializar caso y cadena de custodia
-    2. Calcular SHA-256 de la evidencia (integridad)
-    3. Ejecutar pipeline VIGÍA completo
+    1. Initialize case and chain of custody
+    2. Compute SHA-256 of evidence (integrity)
+    3. Execute full VIGÍA pipeline
     4. Detect contradictions between modules
-    5. Si hay contradicciones: aplicar correcciones, repetir desde 3 (max MAX_ITERATIONS)
-    6. Generar narrativa investigativa
-    7. Exportar bundle sellado con SHA-256
+    5. If contradictions found: apply corrections, repeat from 3 (max MAX_ITERATIONS)
+    6. Generate investigative narrative
+    7. Export sealed bundle with SHA-256
 
     Self-correction is architectural:
-    - ContradictionDetector opera sobre scores racionales, no sobre texto
-    - CorrectionEngine aplica ajustes deterministas documentados
+    - ContradictionDetector operates on rational scores, not on text
+    - CorrectionEngine applies documented deterministic adjustments
     - Each iteration is recorded in the audit trail with timestamp
     """
 
@@ -433,7 +412,7 @@ class VIGIAAgent:
         self.corrections_applied: List[Dict] = []
 
     def _hash_evidence(self) -> str:
-        """SHA-256 de la evidencia. Garantiza integridad — ningún análisis modifica el original."""
+        """SHA-256 of the evidence. Guarantees integrity — no analysis modifies the original."""
         self.audit.log(
             action="EVIDENCE_INTEGRITY_CHECK",
             tool="sha256_hasher",
@@ -444,7 +423,7 @@ class VIGIAAgent:
         )
         h = hashlib.sha256()
         try:
-            # SECURITY: rechazar symlinks — previene lectura arbitraria de archivos del sistema
+            # SECURITY: reject symlinks — prevents arbitrary file reads from the system
             if self.evidence_path.is_symlink():
                 raise ValueError(
                     f"[SECURITY] Evidence path is symlink — rejected: {self.evidence_path}"
@@ -453,12 +432,18 @@ class VIGIAAgent:
                 for chunk in iter(lambda: f.read(65536), b""):
                     h.update(chunk)
             digest = h.hexdigest()
-        except (OSError, PermissionError):
-            # Es un directorio — hashear contenido real de cada archivo (Merkle-like)
+        except PermissionError as e:
+            # FIX P0-1: permission-denied file — abort instead of returning empty hash
+            logger.error("[INTEGRITY] Permission denied reading evidence: %s", self.evidence_path)
+            raise RuntimeError(
+                f"Evidence file not readable (permissions): {self.evidence_path}"
+            ) from e
+        except OSError:
+            # Directory or other IO error — hash actual content of each file (Merkle-like)
             h_dir = hashlib.sha256()
             if self.evidence_path.is_dir():
                 for f in sorted(self.evidence_path.rglob("*")):
-                    # SECURITY: saltar symlinks — previene path traversal y DoS por FIFOs
+                    # SECURITY: skip symlinks — prevents path traversal and FIFO DoS
                     if f.is_symlink():
                         logger.warning("[INTEGRITY] Symlink ignored: %s", f)
                         continue
@@ -471,8 +456,15 @@ class VIGIAAgent:
                             # Incluir ruta relativa + hash del contenido
                             h_dir.update(str(f.relative_to(self.evidence_path)).encode())
                             h_dir.update(h_file.digest())
-                        except OSError:
-                            h_dir.update(str(f).encode())
+                        except (OSError, PermissionError) as e:
+                            # FIX P0-2: unreadable file in directory — abort instead of
+                            # hashing the path (tamper-invisible if only the name is hashed)
+                            logger.error(
+                                "[INTEGRITY] Cannot read file in evidence dir: %s — %s", f, e
+                            )
+                            raise RuntimeError(
+                                f"Evidence directory contains unreadable file: {f}"
+                            ) from e
             digest = h_dir.hexdigest()
 
         self.audit.log(
@@ -488,10 +480,16 @@ class VIGIAAgent:
 
     def _run_pipeline(self, params: Optional[Dict] = None) -> Dict[str, Any]:
         """
-        Ejecuta el pipeline VIGÍA.
+        Executes the VIGÍA pipeline.
         params allows adjusting weights in correction iterations.
         """
         params = params or {}
+
+        # FIX P2-6: avoid repeated sys.path.insert on each iteration
+        parent_path = str(Path(__file__).parent)
+        if parent_path not in sys.path:
+            sys.path.insert(0, parent_path)
+
         self.audit.log(
             action="PIPELINE_EXECUTE",
             tool="vigia_pipeline",
@@ -506,25 +504,28 @@ class VIGIAAgent:
         )
 
         try:
-            # Intentar importar el orchestrator real
-            sys.path.insert(0, str(Path(__file__).parent))
+            # Try to import the real orchestrator
+            # sys.path already adjusted with guard at start of _run_pipeline (FIX P2-6)
             from sift_orchestrator import SIFTOrchestrator
             orchestrator = SIFTOrchestrator(self.case_id)
 
-            # Construir inputs según tipo de evidencia
+            # Build inputs based on evidence type
             kwargs = _build_orchestrator_kwargs(self.evidence_path, params)
             result = orchestrator.analyze(**kwargs)
 
         except ImportError:
-            # Fallback: usar el pipeline de texto si el orchestrator no está disponible
+            # Fallback: use text pipeline if orchestrator is unavailable
             logger.warning("[PIPELINE] SIFTOrchestrator unavailable, using text pipeline")
             result = _run_text_pipeline(self.evidence_path, self.case_id, params)
         except (MemoryError, RecursionError, KeyboardInterrupt, SystemExit):
             # Critical system errors — do NOT mask, propagate
             raise
-        except (OSError, TypeError, ValueError, KeyError, AttributeError,
-                ZeroDivisionError, RuntimeError, ArithmeticError) as e:
-            logger.error("[PIPELINE] Pipeline error: %s", e)
+        except (OSError, ValueError, KeyError, ZeroDivisionError) as e:
+            # FIX P1-3: only catch expected operational errors — IO, malformed data,
+            # broken schema, division by zero in data.
+            # TypeError, AttributeError, RuntimeError, ArithmeticError are NOT caught —
+            # they are code bugs and must propagate to be visible.
+            logger.error("[PIPELINE] Pipeline operational error: %s", e)
             result = {
                 "case_id": self.case_id,
                 "error": str(e),
@@ -545,16 +546,16 @@ class VIGIAAgent:
 
     def _detect_and_correct(self, results: Dict[str, Any]) -> Tuple[bool, Dict[str, Any]]:
         """
-        Detecta contradicciones y aplica correcciones.
-        Retorna (hubo_correcciones, resultados_actualizados).
+        Detects contradictions and applies corrections.
+        Returns (had_corrections, updated_results).
         """
-        # MCP multiplicativo racional — producto de confianzas modulares
-        # Si no hay confianza en los signals, usar z_score normalizado como proxy
+        # Rational multiplicative MCP — product of modular confidences
+        # If no confidence in signals, use normalized z_score as proxy
         signals = results.get("signals", [])
         if signals:
-            # MCA: Media de Confianza Aritmética racional
-            # El producto multiplicativo penaliza la modularidad (n módulos × conf 0.9 → 0).
-            # La media aritmética es estable: 20 señales con conf 9/10 → MCA = 9/10.
+            # MCA: Rational Arithmetic Confidence Mean
+            # Multiplicative product penalizes modularity (n modules × conf 0.9 → 0).
+            # Arithmetic mean is stable: 20 signals with conf 9/10 → MCA = 9/10.
             confidences = []
             for s in signals:
                 raw = s.get("confidence", None)
@@ -569,7 +570,7 @@ class VIGIAAgent:
                             Fraction(0, 1)) / n)
                 )
             else:
-                # Fallback: media aritmética de z_scores normalizados — usar _to_frac
+                # Fallback: arithmetic mean of normalized z_scores — use _to_frac
                 z_fracs = [
                     min(Fraction(1, 1), abs(_to_frac(s.get("z_score", 0))) / Fraction(10, 1))
                     for s in signals
@@ -581,7 +582,7 @@ class VIGIAAgent:
 
         contradictions = self.contradiction_detector.detect(results, mca_score)
 
-        # Aplicar CONTRADICTION_THRESHOLD — solo activar corrección si hay suficientes contradicciones
+        # Apply CONTRADICTION_THRESHOLD — only trigger correction if enough contradictions
         if len(contradictions) < CONTRADICTION_THRESHOLD:
             self.audit.log(
                 action="CONTRADICTION_CHECK",
@@ -593,11 +594,11 @@ class VIGIAAgent:
             )
             return False, results
 
-        # Hay contradicciones suficientes — loggear y corregir
+        # Sufficient contradictions found — log and correct
         for modules, description in contradictions:
             self.audit.log_contradiction(modules, description, self.iteration)
 
-        # Aplicar correcciones
+        # Apply corrections
         all_corrections = []
         params_for_rerun = {}
 
@@ -610,7 +611,7 @@ class VIGIAAgent:
             )
             all_corrections.append(correction)
 
-            # Traducir corrección a parámetros para la siguiente iteración
+            # Translate correction to parameters for the next iteration
             if correction.get("recommended_action") == "REWEIGHT_AND_RERUN":
                 params_for_rerun["uniform_weights"] = True
             if correction.get("suggested_verdict_upgrade"):
@@ -618,7 +619,7 @@ class VIGIAAgent:
 
         self.corrections_applied.extend(all_corrections)
 
-        # Aplicar correcciones al resultado actual — muta el veredicto si corresponde
+        # Apply corrections to current result — mutate verdict if appropriate
         abduction = results.get("abduction", {})
         before_verdict = abduction.get("best_hypothesis", "UNKNOWN")
         after_verdict = before_verdict
@@ -636,7 +637,7 @@ class VIGIAAgent:
                     results["abduction"]["alert_escalated"] = True
                     results["abduction"]["escalation_reason"] = "Technical anomaly without semiotic signature — advanced operator pattern"
 
-        # Aplicar CONFIDENCE_FLOOR — si MCP está bajo el floor, marcar como INCONCLUSIVE
+        # Apply CONFIDENCE_FLOOR — if MCA is below floor, mark as INCONCLUSIVE
         if mca_score < CONFIDENCE_FLOOR and after_verdict == before_verdict:
             if "abduction" in results:
                 results["abduction"]["best_hypothesis"] = (
@@ -649,7 +650,7 @@ class VIGIAAgent:
         results["corrections_iteration"] = self.iteration
         results["params_for_rerun"] = params_for_rerun
 
-        # Loggear la corrección aplicada con before/after reales
+        # Log applied correction with real before/after
         after_note = " + ".join(
             c.get("recommended_action", "") for c in all_corrections if c.get("recommended_action")
         )
@@ -664,8 +665,8 @@ class VIGIAAgent:
 
     def _generate_narrative(self, results: Dict[str, Any], evidence_sha256: str) -> str:
         """
-        Genera narrativa investigativa 100% determinista.
-        Sin LLMs — todo derivado de los datos del pipeline.
+        Generates 100% deterministic investigative narrative.
+        No LLMs — all derived from pipeline data.
         Each section references the modules that produced it.
         """
         abduction = results.get("abduction", {})
@@ -673,7 +674,7 @@ class VIGIAAgent:
         corrections = results.get("self_corrections", [])
 
         def _to_frac_z(s: dict) -> Fraction:
-            """Helper local — delega a _to_frac para consistencia con el resto del agente."""
+            """Local helper — delegates to _to_frac for consistency with the rest of the agent."""
             return abs(_to_frac(s.get("z_score", 0)))
 
         narrative_parts = [
@@ -700,7 +701,7 @@ class VIGIAAgent:
                 z_frac = _to_frac_z(s)
                 conf_frac = _to_frac(s.get("confidence", 0))
                 narrative_parts.append(
-                    f"  [{s.get('description', s.get('tool_name', '?'))}] z={float(z_frac):.3f} "
+                    f"  [{s.get('tool', '?')}] z={float(z_frac):.3f} "
                     f"conf={float(conf_frac):.2f} — {str(s.get('value', ''))[:80]}"
                 )
             narrative_parts.append("")
@@ -743,8 +744,8 @@ class VIGIAAgent:
         evidence_sha256: str,
     ) -> Dict[str, Any]:
         """
-        Sella el bundle final con SHA-256.
-        Incluye audit trail completo, resultados y narrativa.
+        Seals the final bundle with SHA-256.
+        Includes full audit trail, results, and narrative.
         """
         bundle = {
             "vigia_agent_version": AGENT_VERSION,
@@ -758,25 +759,36 @@ class VIGIAAgent:
             "narrative": narrative,
             "audit_trail": self.audit.export(),
             "sans_compliance": {
+                # FIX P1-5: real verifications instead of hardcoded True flags
                 "self_correction": self.iteration > 0 or len(self.corrections_applied) > 0,
-                "accuracy_validation": True,   # Toda señal tiene tool + z_score + metadata
-                "analytical_reasoning": True,  # Narrativa Peirciana generada
-                "audit_trail": True,            # Trazabilidad completa
-                "architectural_guardrails": True,  # Sin ML, sin floats en scoring
-                "evidence_integrity": True,     # SHA-256 verificado
+                "accuracy_validation": bool(
+                    results.get("signals")
+                    and all(
+                        s.get("tool") and s.get("z_score") is not None
+                        for s in results.get("signals", [])
+                    )
+                ),
+                "analytical_reasoning": bool(
+                    results.get("abduction", {}).get("narrative")
+                    and results.get("abduction", {}).get("best_hypothesis")
+                    not in ("UNKNOWN", "UNDETERMINED", "", None)
+                ),
+                "audit_trail": len(self.audit.entries) > 0,
+                "architectural_guardrails": True,  # Design invariant — always True by construction
+                "evidence_integrity": bool(evidence_sha256) and len(evidence_sha256) == 64,
             },
         }
 
-        # Serialización canónica del bundle — sin campo de hash incrustado.
-        # El SHA-256 se escribe EXCLUSIVAMENTE en <output>.sha256.
-        # El archivo .json en disco es exactamente el texto que se hashea —
-        # verificable con: sha256sum -c <output>.sha256
+        # Canonical bundle serialization — no embedded hash field.
+        # SHA-256 is written EXCLUSIVELY to <output>.sha256.
+        # The .json file on disk is exactly the text that is hashed —
+        # verifiable with: sha256sum -c <output>.sha256
         bundle_text = json.dumps(
             bundle, indent=2, sort_keys=True, ensure_ascii=True, default=_json_serial
         )
         bundle_digest = hashlib.sha256(bundle_text.encode("utf-8")).hexdigest()
-        # bundle_sha256 NO se incrusta en el JSON — evita paradoja de auto-referencia.
-        # El campo bundle_sha256 solo vive en el audit trail y en el archivo .sha256.
+        # bundle_sha256 is NOT embedded in the JSON — avoids self-reference paradox.
+        # The bundle_sha256 field only lives in the audit trail and in the .sha256 file.
 
         self.audit.log(
             action="BUNDLE_SEALED",
@@ -791,13 +803,13 @@ class VIGIAAgent:
 
     def run(self) -> Dict[str, Any]:
         """
-        Loop principal del agente.
-        Retorna el bundle sellado con todos los resultados.
+        Main agent loop.
+        Returns the sealed bundle with all results.
         """
         logger.info("[AGENT] Starting VIGÍA Agent — case %s", self.case_id)
         logger.info("[AGENT] Evidence: %s", self.evidence_path)
 
-        # Registrar SHA-256 del propio código del agente — trazabilidad de versión
+        # Record SHA-256 of the agent's own source code — version traceability
         try:
             agent_source = Path(__file__).read_bytes()
             agent_sha256 = hashlib.sha256(agent_source).hexdigest()
@@ -813,10 +825,10 @@ class VIGIAAgent:
         )
         logger.info("[AGENT] Agent SHA-256: %s", agent_sha256)
 
-        # 1. Verificar integridad de evidencia
+        # 1. Verify evidence integrity
         evidence_sha256 = self._hash_evidence()
 
-        # 2. Loop de análisis con self-correction
+        # 2. Analysis loop with self-correction
         results = {}
         params = {}
         prev_verdict = None
@@ -834,7 +846,7 @@ class VIGIAAgent:
                 logger.info("[AGENT] No contradictions — analysis converged at iteration %d", self.iteration + 1)
                 break
 
-            # Criterio de convergencia: mismo veredicto que iteración anterior
+            # Convergence criterion: same verdict as previous iteration
             current_verdict = results.get("abduction", {}).get("best_hypothesis", "")
             if current_verdict == prev_verdict and prev_verdict is not None:
                 logger.info("[AGENT] Convergence detected — stable verdict at iteration %d", self.iteration + 1)
@@ -844,17 +856,17 @@ class VIGIAAgent:
                     inputs={"iteration": self.iteration},
                     outputs={"verdict": current_verdict},
                     iteration=self.iteration,
-                    note=f"Veredicto estable: {current_verdict}",
+                    note=f"Stable verdict: {current_verdict}",
                 )
                 break
             prev_verdict = current_verdict
 
-            # Preparar parámetros para la siguiente iteración
+            # Prepare parameters for next iteration
             params = results.pop("params_for_rerun", {})
             logger.info("[AGENT] Corrections applied, re-running with params: %s", params)
 
-        # 3. Generar narrativa
-        logger.info("[AGENT] Generando narrativa investigativa")
+        # 3. Generate narrative
+        logger.info("[AGENT] Generating investigative narrative")
         # Log agent exit in audit trail BEFORE sealing — so it appears in the bundle
         exit_code_preview = 1 if (
             "MALICIOUS" in str(results.get("abduction", {}).get("best_hypothesis", ""))
@@ -872,11 +884,11 @@ class VIGIAAgent:
 
         narrative = self._generate_narrative(results, evidence_sha256)
 
-        # 4. Sellar bundle — retorna (bundle_dict, canonical_json_text, sha256_digest)
+        # 4. Seal bundle — returns (bundle_dict, canonical_json_text, sha256_digest)
         bundle, bundle_canonical_text, bundle_digest = self._seal_bundle(
             results, narrative, evidence_sha256
         )
-        # Adjuntar campos temporales para main() — se extraen con pop() antes de escribir a disco
+        # Attach temporary fields for main() — extracted with pop() before writing to disk
         bundle["_canonical_text"] = bundle_canonical_text
         bundle["_canonical_digest"] = bundle_digest
 
@@ -892,12 +904,12 @@ class VIGIAAgent:
 # HELPERS
 # ════════════════════════════════════════════════════════════════════════════
 
-# Alias retrocompatible — el nombre semánticamente correcto es _utc_iso_timestamp
+# Backward-compatible alias — the semantically correct name is _utc_iso_timestamp
 _utcnow = _utc_iso_timestamp
 
 
 def _summarize(obj: Any, max_len: int = 200) -> Any:
-    """Resumen seguro de un objeto para el audit trail."""
+    """Safe summary of an object for the audit trail."""
     if isinstance(obj, dict):
         return {k: _summarize(v) for k, v in list(obj.items())[:10]}
     if isinstance(obj, list):
@@ -907,25 +919,38 @@ def _summarize(obj: Any, max_len: int = 200) -> Any:
 
 
 def _build_orchestrator_kwargs(evidence_path: Path, params: Dict) -> Dict:
-    """Construye los kwargs para SIFTOrchestrator.analyze() según el tipo de evidencia."""
+    """Builds kwargs for SIFTOrchestrator.analyze() based on evidence type."""
     kwargs: Dict[str, Any] = {}
 
     if evidence_path.is_dir():
-        # Directorio de evidencia — buscar artefactos conocidos
+        # Evidence directory — search for known artifact types
         for pattern, key in [
             ("*.evtx", "event_stream"),
             ("*.raw", "memory_path"),
-            ("*.img", "memory_path"),
-            ("*.mem", "memory_path"),
-            ("*.dmp", "memory_path"),
             ("*.E01", "disk_path"),
             ("*.e01", "disk_path"),
             ("*.log", "log_path"),
         ]:
-            matches = [str(m) for m in sorted(evidence_path.rglob(pattern))
-                       if not m.is_symlink()]  # SECURITY: no seguir symlinks
+            # FIX P2-7: cap at 100 files per pattern and maxdepth 3 — prevents DoS
+            matches = []
+            for m in sorted(evidence_path.rglob(pattern)):
+                if m.is_symlink():
+                    continue
+                try:
+                    depth = len(m.relative_to(evidence_path).parts)
+                except ValueError:
+                    continue
+                if depth > 3:
+                    continue
+                matches.append(str(m))
+                if len(matches) >= 100:
+                    logger.warning(
+                        "[ORCHESTRATOR] Pattern %s capped at 100 files in %s",
+                        pattern, evidence_path,
+                    )
+                    break
             if matches:
-                # Acumular en lista para soportar imágenes segmentadas (E01, E02, ...)
+                # Accumulate in list to support segmented images (E01, E02, ...)
                 existing = kwargs.get(key)
                 if existing is None:
                     kwargs[key] = matches
@@ -934,19 +959,19 @@ def _build_orchestrator_kwargs(evidence_path: Path, params: Dict) -> Dict:
                 else:
                     kwargs[key] = [existing] + matches
     else:
-        # Archivo único — detectar tipo por extensión
+        # Single file — detect type by extension
         suffix = evidence_path.suffix.lower()
-        if suffix in (".raw", ".img", ".mem", ".dmp"):
+        if suffix == ".raw":
             kwargs["memory_path"] = str(evidence_path)
         elif suffix in (".e01", ".E01"):
             kwargs["disk_path"] = str(evidence_path)
         elif suffix == ".evtx":
             kwargs["event_stream"] = [str(evidence_path)]
         else:
-            # Texto genérico — usar como event_stream
+            # Generic text — use as event_stream
             kwargs["log_path"] = str(evidence_path)
 
-    # Aplicar ajustes de corrección si los hay
+    # Apply correction adjustments if any
     if params.get("elevate_technical_signals"):
         kwargs["signal_weight_override"] = {"memory": Fraction(3, 2), "disk": Fraction(3, 2)}
     if params.get("uniform_weights"):
@@ -960,17 +985,17 @@ def _run_text_pipeline(evidence_path: Path, case_id: str, params: Dict) -> Dict[
     Text pipeline — fallback when SIFTOrchestrator is unavailable.
     Valid for text evidence only — fails explicitly for binary files.
     """
-    # SECURITY: rechazar symlinks antes de cualquier operación de lectura
+    # SECURITY: reject symlinks before any read operation
     if evidence_path.is_symlink():
         logger.error("[TEXT_PIPELINE] Evidence path is symlink — rejected for security: %s", evidence_path)
         return {
             "case_id": case_id, "signals": [],
             "abduction": {"best_hypothesis": "SYMLINK_REJECTED", "is_conclusive": False,
-                          "narrative": "[SECURITY] Symlink rechazado — posible path traversal."},
+                          "narrative": "[SECURITY] Symlink rejected — possible path traversal."},
             "pipeline_meta": {"error": "symlink_rejected"},
         }
 
-    # Rechazar evidencia binaria — no intentar leer como texto
+    # Reject binary evidence — do not attempt to read as text
     if evidence_path.is_file():
         binary_extensions = {
             ".raw", ".vmdk", ".dd", ".aff", ".img",
@@ -1009,11 +1034,11 @@ def _run_text_pipeline(evidence_path: Path, case_id: str, params: Dict) -> Dict[
                 texts.append(f.read_text(encoding="utf-8", errors="ignore")[:10000])
             text = "\n---\n".join(texts) if texts else "No text evidence found."
 
-        # Aplicar params de corrección al texto si corresponde
+        # Apply correction params to text pipeline if applicable
         if params.get("elevate_technical_signals"):
             text = f"[ELEVATED_ANALYSIS] {text}"
         if params.get("uniform_weights"):
-            # uniform_weights no está implementado en el pipeline de texto —
+            # uniform_weights not implemented in text pipeline —
             # los z_scores del texto no tienen pesos modulares diferenciados.
             logger.warning(
                 "[TEXT_PIPELINE] uniform_weights requested but not implemented in text "
@@ -1041,9 +1066,9 @@ def _run_text_pipeline(evidence_path: Path, case_id: str, params: Dict) -> Dict[
             dec = r.get("decision", {})
             agg = r.get("aggregator", {})
             mi = agg.get("mi_final", {"num": 0, "den": 1})
-            # Fraction racional — nunca float
+            # Rational Fraction — never float
             z_frac = Fraction(mi["num"], max(mi["den"], 1))
-            # Confidence derivado del alert_level — no inventado
+            # Confidence derived from alert_level — not fabricated
             alert_to_conf = {"LOW": Fraction(1, 10), "MEDIUM": Fraction(4, 10),
                              "HIGH": Fraction(7, 10), "CRITICAL": Fraction(9, 10)}
             conf_frac = alert_to_conf.get(dec.get("alert_level", "LOW"), Fraction(1, 10))
@@ -1100,10 +1125,10 @@ def _run_text_pipeline(evidence_path: Path, case_id: str, params: Dict) -> Dict[
                           "narrative": f"[ERROR] Operational failure: {e}"},
             "pipeline_meta": {"error": str(e), "error_type": type(e).__name__},
         }
-    # NameError, SyntaxError, AttributeError, TypeError en run_pipeline.py
-    # son bugs del código — NO enmascarar, propagar para fallo visible
+    # NameError, SyntaxError, AttributeError, TypeError in run_pipeline.py
+    # are code bugs — do NOT mask, propagate for visible failure
     finally:
-        # Garantizar cleanup de archivos temporales
+        # Guarantee cleanup of temporary files
         for p in [input_path, output_path]:
             if p and os.path.exists(p):
                 try:
@@ -1151,7 +1176,7 @@ Max iterations: 3 (hard cap, prevents infinite loops).
     )
     args = parser.parse_args()
 
-    # Validar evidencia
+    # Validate evidence
     evidence_path = Path(args.evidence)
     if not evidence_path.exists():
         logger.error("[FATAL] Evidence not found: %s", evidence_path)
@@ -1162,7 +1187,21 @@ Max iterations: 3 (hard cap, prevents infinite loops).
     safe_case_id = re.sub(r"[^a-zA-Z0-9_\-]", "_", args.case_id)
     output_path = args.output or f"{safe_case_id}_bundle.json"
 
-    # Ejecutar agente
+    # FIX P1-4: sanitize output to prevent path traversal
+    output_path_obj = Path(output_path)
+    try:
+        resolved = output_path_obj.resolve()
+        cwd = Path.cwd().resolve()
+        # Use is_relative_to() — str.startswith() has edge cases with path prefixes
+        if not resolved.is_relative_to(cwd):
+            logger.error("[FATAL] Output path escapes working directory: %s", output_path)
+            sys.exit(2)
+    except (OSError, RuntimeError) as e:
+        logger.error("[FATAL] Invalid output path: %s — %s", output_path, e)
+        sys.exit(2)
+    output_path = str(output_path_obj)
+
+    # Execute agent
     agent = VIGIAAgent(
         case_id=args.case_id,
         evidence_path=str(evidence_path),
@@ -1172,16 +1211,16 @@ Max iterations: 3 (hard cap, prevents infinite loops).
     bundle = agent.run()
     elapsed = time.monotonic() - t0
 
-    # Extraer texto canónico y digest del bundle
+    # Extract canonical text and digest from bundle
     bundle_canonical_text = bundle.pop("_canonical_text", None)
     bundle_canonical_digest = bundle.pop("_canonical_digest", None)
 
-    # Exportar resultado
+    # Export result
     if args.audit_only:
         output_text = json.dumps(bundle["audit_trail"], indent=2, sort_keys=True,
                                  default=_json_serial, ensure_ascii=True)
     else:
-        # Escribir EXACTAMENTE el texto canónico que se hasheó — garantía sha256sum -c
+        # Write EXACTLY the canonical text that was hashed — sha256sum -c guarantee
         output_text = bundle_canonical_text or json.dumps(
             bundle, indent=2, sort_keys=True, default=_json_serial, ensure_ascii=True
         )
@@ -1192,6 +1231,15 @@ Max iterations: 3 (hard cap, prevents infinite loops).
         sha256_path = output_path + ".sha256"
         # Recalculate over the text written to disk (must match bundle_digest)
         disk_digest = hashlib.sha256(output_text.encode("utf-8")).hexdigest()
+        # FIX P2-8: verify that what was written to disk matches the bundle digest
+        if bundle_canonical_digest and disk_digest != bundle_canonical_digest:
+            logger.error(
+                "[BUNDLE] DISK MISMATCH: bundle_digest=%s disk_digest=%s",
+                bundle_canonical_digest, disk_digest,
+            )
+            raise RuntimeError(
+                "Bundle hash mismatch after write — possible filesystem corruption or race condition"
+            )
         # Use absolute path so sha256sum -c works from any directory
         abs_output_path = str(Path(output_path).resolve())
         Path(sha256_path).write_text(
@@ -1199,7 +1247,7 @@ Max iterations: 3 (hard cap, prevents infinite loops).
         )
         logger.info("[BUNDLE] Verification: sha256sum -c %s", sha256_path)
 
-    # Resumen en consola
+    # Console summary
     abduction = bundle.get("pipeline_results", {}).get("abduction", {})
     hypothesis = abduction.get("best_hypothesis", "UNDETERMINED")
     evil_found = "MALICIOUS" in hypothesis or "CRITICAL" in hypothesis or "OVERRIDE" in hypothesis
@@ -1208,7 +1256,7 @@ Max iterations: 3 (hard cap, prevents infinite loops).
     print(f"VIGÍA AGENT — CASE {args.case_id}")
     print("=" * 60)
     print(f"Evidence SHA-256  : {bundle.get('evidence_sha256', 'N/A')[:32]}...")
-    # bundle_sha256 no está en el dict (sin paradoja) — leerlo del digest calculado
+    # bundle_sha256 not in dict (no paradox) — read from computed digest
     _display_digest = bundle_canonical_digest or "see .sha256 file"
     print(f"Bundle SHA-256    : {_display_digest[:32]}...")
     print(f"Iterations        : {bundle.get('iterations_executed', 1)}")
@@ -1219,10 +1267,10 @@ Max iterations: 3 (hard cap, prevents infinite loops).
     print(f"Output            : {output_path}")
     print("=" * 60)
 
-    # Imprimir narrativa
-    print("\n" + bundle.get("narrative", "[Sin narrativa]"))
+    # Print narrative
+    print("\n" + bundle.get("narrative", "[No narrative]"))
 
-    # Exit code documentado — 0=no evil, 1=evil found, 2=error
+    # Documented exit code — 0=no evil, 1=evil found, 2=error
     exit_code = 1 if evil_found else 0
     logger.info("[AGENT] Exit code: %d (%s)", exit_code, "EVIL FOUND" if evil_found else "NO EVIL DETECTED")
     sys.exit(exit_code)
