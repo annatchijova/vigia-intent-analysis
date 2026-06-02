@@ -967,6 +967,9 @@ def _build_orchestrator_kwargs(evidence_path: Path, params: Dict) -> Dict:
             kwargs["disk_path"] = str(evidence_path)
         elif suffix == ".evtx":
             kwargs["event_stream"] = [str(evidence_path)]
+        elif suffix in (".img", ".vmem", ".mem", ".dmp"):
+            # Raw memory image — route to vol3 adapter
+            kwargs["memory_path"] = str(evidence_path)
         else:
             # Generic text — use as event_stream
             kwargs["log_path"] = str(evidence_path)

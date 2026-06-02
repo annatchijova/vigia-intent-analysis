@@ -45,6 +45,18 @@ class SIFTOrchestrator:
         if isinstance(disk_path, list):
             disk_path = disk_path[0] if disk_path else None
 
+        # Auto-detección de memoria por extensión si el caller no pasó memory_path
+        # explícitamente (compatibilidad con agentes que usan evidence_path/evidence).
+        if not memory_path and not disk_path:
+            for _k in ("evidence_path", "evidence", "log_path"):
+                _v = kwargs.get(_k)
+                if _v:
+                    _p = Path(str(_v[0] if isinstance(_v, list) else _v))
+                    if _p.suffix.lower() in (".img", ".vmem", ".raw", ".mem", ".dmp"):
+                        memory_path = str(_p)
+                        logger.info("[SIFT_SHIM] Auto-detected memory image via kwarg '%s': %s", _k, memory_path)
+                        break
+
         # Evidencia de memoria sin disco → vol3 local, no necesita rip.pl
         if memory_path and not disk_path:
             logger.info("[SIFT_SHIM] Memory-only evidence → vol3 local adapter")
