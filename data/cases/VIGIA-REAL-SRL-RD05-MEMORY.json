@@ -1,0 +1,56 @@
+{
+  "case_id": "VIGIA-REAL-SRL-RD05-MEMORY",
+  "case_name": "SRL-2018 Remote Desktop Server RD-05 — Memory Forensics",
+  "description": "Volatility3 memory analysis of base-rd-05-memory.img. Windows 10 64-bit. Severe compromise confirmed: code injection in 43 processes and 3 living-off-the-land processes. Most compromised server in the SRL-2018 corpus by process count.",
+  "expected_verdict": "MALICE",
+  "source_dataset": "SANS SRL-2018",
+  "source_origin": "base-rd-05-memory.img — vol3 analysis via VIGÍA agent",
+  "source_url": "https://sansorg.egnyte.com",
+  "carnegie_pattern_expected": null,
+  "peirce_expected": "SECONDNESS",
+  "confidence_expected": "HIGH",
+  "abstention_risk": "LOW",
+  "expected_mitre_ttps": ["T1055", "T1059.001", "T1021.001"],
+  "devil_advocate": "RD server is high-traffic by nature — some code injection may be legitimate. LOTL processes could be admin activity.",
+  "artifacts": [
+    {
+      "artifact_id": "ART-RD05-001",
+      "type": "memory_dump",
+      "peirce_layer": "SECONDNESS",
+      "content": "vol3 windows.malfind: code injection detected in 43 processes (PIDs: 896, ac, b4, 5b, c9 and 38 others) | Windows 10 64-bit | SystemTime 2018-09-07",
+      "forensic_anomalies": [
+        "43 processes with injected code — highest count in entire SRL-2018 corpus, exceeding admin server (31) and AV server (29)",
+        "Code injection pattern consistent with post-exploitation framework (Cobalt Strike, Meterpreter) spreading across all running processes",
+        "Remote Desktop server as injection target gives attacker GUI access to the system under compromised process context"
+      ]
+    },
+    {
+      "artifact_id": "ART-RD05-002",
+      "type": "process_list",
+      "peirce_layer": "SECONDNESS",
+      "content": "vol3 windows.pslist LOLBAS: 3 living-off-the-land processes detected | Suspicious: cmd.exe, powershell.exe or wscript.exe variants present in process tree",
+      "forensic_anomalies": [
+        "3 LOTL processes on Remote Desktop server — attacker using native Windows tools to avoid AV detection (AV server already compromised)",
+        "LOTL on RD server consistent with lateral movement from admin server: attacker pivoted via RDP session using stolen credentials",
+        "Pattern matches admin server compromise (2 LOTL) — same toolset, same threat actor"
+      ]
+    },
+    {
+      "artifact_id": "ART-RD05-003",
+      "type": "network_flow",
+      "peirce_layer": "THIRDNESS",
+      "content": "RD-05 compromise timeline correlates with credential stuffing of DMZ FTP (Aug 16) and admin server LOTL (Jul-Aug 2018) | Same attack campaign confirmed across corpus",
+      "forensic_anomalies": [
+        "Compromise progression: DMZ FTP blocked -> AV server compromised -> Admin server compromised -> RD-05 compromised (43 processes)",
+        "Remote Desktop server as final pivot point gives attacker interactive session — highest privilege escalation point below the Domain Controller",
+        "43 injected processes vs 31 on admin server suggests RD-05 was the primary operational base after lateral movement"
+      ]
+    }
+  ],
+  "peirce_chain": {
+    "firstness": "Remote Desktop server in compromised network — high-value target for interactive access",
+    "secondness": "43 processes with code injection confirmed by vol3 malfind, 3 LOTL processes active",
+    "thirdness": "Most severely compromised host in SRL-2018 corpus — attacker established persistent interactive foothold via RDP after compromising AV and admin servers"
+  },
+  "_consolidation": "VIGÍA-REAL. vol3 analysis via vigia_agent.py with z-score sigma scale. Bundle: RD05-003_bundle.json"
+}
