@@ -700,9 +700,12 @@ class VIGIAAgent:
             for s in top_signals:
                 z_frac = _to_frac_z(s)
                 conf_frac = _to_frac(s.get("confidence", 0))
+                _label = (s.get('description') or s.get('source')
+                          or s.get('tool') or '?')
+                _detail = s.get('detail') or s.get('value') or ''
                 narrative_parts.append(
-                    f"  [{s.get('tool', '?')}] z={float(z_frac):.3f} "
-                    f"conf={float(conf_frac):.2f} — {str(s.get('value', ''))[:80]}"
+                    f"  [{_label[:70]}] z={float(z_frac):.3f} "
+                    f"conf={float(conf_frac):.2f} — {str(_detail)[:80]}"
                 )
             narrative_parts.append("")
 
