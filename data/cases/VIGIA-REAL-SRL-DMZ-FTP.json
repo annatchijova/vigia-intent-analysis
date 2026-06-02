@@ -1,0 +1,79 @@
+{
+  "case_id": "VIGIA-REAL-SRL-DMZ-FTP",
+  "case_name": "SRL-2018 DMZ FTP Server — External Attack Perimeter",
+  "description": "IIS 8.5 FTP server in DMZ (172.16.10.12). External attackers attempted malware upload and conducted coordinated credential stuffing using valid domain usernames. Server also served as DFIR response infrastructure. Attack blocked at perimeter — internal compromise used different vector.",
+  "expected_verdict": "MALICE",
+  "source_dataset": "SANS SRL-2018",
+  "source_origin": "NIST/SANS FOR508 corpus — dmz-ftp-cdrive.E01",
+  "source_url": "https://sansorg.egnyte.com",
+  "carnegie_pattern_expected": null,
+  "peirce_expected": "THIRDNESS",
+  "confidence_expected": "HIGH",
+  "abstention_risk": "LOW",
+  "expected_mitre_ttps": ["T1071.002", "T1110.003", "T1190", "T1078.002"],
+  "devil_advocate": "FTP server is DFIR infrastructure — legitimate tools present. Malware upload attempts were blocked and no successful compromise confirmed at this host.",
+  "artifacts": [
+    {
+      "artifact_id": "ART-DMZ-001",
+      "type": "network_flow",
+      "peirce_layer": "SECONDNESS",
+      "content": "2018-07-30 10:54:14 197.248.26.30 STOR /Photo.scr 550 Authorization+rules+denied+the+access | 2018-07-30 16:12:34 117.204.242.121 STOR /Photo.scr 550 Authorization+rules+denied+the+access | Two distinct IPs attempting identical malware upload via anonymous FTP",
+      "forensic_anomalies": [
+        "Two geographically distinct IPs (Kenya 197.248.26.30, India 117.204.242.121) attempted to upload the same file Photo.scr — Windows screensaver executable used as malware vector",
+        "Coordinated identical attack from separate IPs indicates organized threat actor, not opportunistic scanner",
+        "Upload blocked by IIS authorization rules — attacker probing for misconfigured anonymous write access"
+      ]
+    },
+    {
+      "artifact_id": "ART-DMZ-002",
+      "type": "log_entry",
+      "peirce_layer": "THIRDNESS",
+      "content": "2018-08-16: credential stuffing with valid domain usernames — USER nromanoff (218.22.253.37/CN), USER nromanoff@stark-research-labs.com (121.49.106.6/CN), USER tdungan@stark-research-labs.com (60.174.118.80/CN), USER administrator@stark-research-labs.com (200.58.160.67/BO), USER administrator (222.161.229.55/CN) — all 530 failed | 5.6MB log on Aug 16 vs avg 20KB/day",
+      "forensic_anomalies": [
+        "Attacker used exact internal domain usernames (nromanoff, tdungan) — requires prior OSINT or credential leak from the organization",
+        "Same usernames appear in NROMANOFF and TDUNGAN workstation cases — confirms these are real domain accounts targeted specifically",
+        "8+ coordinated IPs across China and Bolivia in same 3-hour window — botnet or distributed attack infrastructure",
+        "Aug 16 FTP log is 280x larger than average daily log — anomalous spike indicating coordinated attack campaign"
+      ]
+    },
+    {
+      "artifact_id": "ART-DMZ-003",
+      "type": "file_metadata",
+      "peirce_layer": "SECONDNESS",
+      "content": "srl-ftp/: Mnemosyne.sys (WinPmem memory acquisition driver) | fresponse-agent.msi (F-Response remote forensic acquisition) | sub-win-x64_base-hunt_5682_3262.exe (F-Response agent for base-hunt server) | srl-ftp/Users/rsydow-f/nxlog-4.0.3689-x64.msi | srl-ftp/Users/nfury/Asgard/",
+      "forensic_anomalies": [
+        "Mnemosyne.sys and F-Response present — server was DFIR distribution point, explaining memory dump acquisition across SRL-2018 corpus",
+        "Agent filename sub-win-x64_base-hunt_5682_3262.exe links this server directly to base-hunt memory acquisition",
+        "rsydow-f (forensic analyst account) and nfury (incident responder) have personal directories — confirms DFIR team used this server during response"
+      ]
+    },
+    {
+      "artifact_id": "ART-DMZ-004",
+      "type": "registry",
+      "peirce_layer": "FIRSTNESS",
+      "content": "Users present: Administrator, rsydow, rsydow-a | rsydow account hierarchy: rsydow (standard), rsydow-a (domain admin), rsydow-f (forensics) | Domain: stark-research-labs.com | rsydow-a confirmed as Domain Admin in BASE-DC registry hives",
+      "forensic_anomalies": [
+        "Domain admin account rsydow-a present on DMZ-facing server — violates network segmentation principles, creates attack bridge between DMZ and internal AD",
+        "Same rsydow-a account found in DC registry as Domain Admins member — if DMZ server compromised, domain admin credentials exposed",
+        "Three-tier account structure (standard/admin/forensic) for same user suggests security-conscious organization but segmentation not enforced at DMZ boundary"
+      ]
+    },
+    {
+      "artifact_id": "ART-DMZ-005",
+      "type": "network_flow",
+      "peirce_layer": "THIRDNESS",
+      "content": "Multi-stage attack timeline: May 2018 server deployed | Jul 30 anonymous enumeration + Photo.scr upload attempt | Aug 16 credential stuffing peak with domain usernames | Scanning IPs: 184.105.247.194 (Shodan/ISC), 141.212.122.48 (U Michigan) | Geographic distribution: CN, KE, IN, BO, FR",
+      "forensic_anomalies": [
+        "Attack progression from anonymous enumeration to targeted credential stuffing indicates attacker learned usernames between July and August 2018",
+        "Shodan and University of Michigan IPs confirm server was publicly indexed and scanned — high exposure in DMZ without proper access controls",
+        "Geographic diversity of attacking IPs (5 countries) with coordinated username knowledge suggests threat intelligence sharing or single actor with distributed infrastructure"
+      ]
+    }
+  ],
+  "peirce_chain": {
+    "firstness": "DMZ FTP server with domain admin credentials present — structural vulnerability creating implicit trust bridge",
+    "secondness": "Concrete attacks: Photo.scr malware upload blocked, credential stuffing with exact domain usernames from multiple IPs",
+    "thirdness": "Attack pattern (enumeration -> malware upload attempt -> credential stuffing with specific usernames) demonstrates persistent, intelligence-driven threat actor targeting shieldbase.lan / stark-research-labs.com"
+  },
+  "_consolidation": "VIGÍA-REAL. Extracted from dmz-ftp-cdrive.E01 via ewfmount+NTFS mount in SANS SIFT. IIS FTP logs analyzed directly from Windows/System32/winevt and inetpub/logs/LogFiles/FTPSVC2/. Chain of custody maintained."
+}
