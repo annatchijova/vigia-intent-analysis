@@ -26,7 +26,7 @@ from run_vigia_case import _vigia_score, _naive_score, _verdict_color
 def main():
     import argparse
     parser = argparse.ArgumentParser()
-    parser.add_argument("--cases-dir", default="cases", help="Directorio con JSON de casos")
+    parser.add_argument("--cases-dir", default="data/cases", help="Directorio con JSON de casos")
     args = parser.parse_args()
 
     cases_dir = Path(args.cases_dir)
