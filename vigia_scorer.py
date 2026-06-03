@@ -120,10 +120,16 @@ RST = "\033[0m"
 # Connects the simple 4-state scorer to the full 8-state cascade.
 # ---------------------------------------------------------------------------
 try:
-    from quadripartite import QuadripartiteClassifier as _QuadClassifier
+    from vigia.verdict.quadripartite import QuadripartiteClassifier as _QuadClassifier
     _QUAD_AVAILABLE = True
 except ImportError:
-    _QUAD_AVAILABLE = False
+    try:
+        import sys as _sys_q, os as _os_q
+        _sys_q.path.insert(0, _os_q.path.join(_os_q.path.dirname(_os_q.path.abspath(__file__)), "vigia", "verdict"))
+        from quadripartite import QuadripartiteClassifier as _QuadClassifier
+        _QUAD_AVAILABLE = True
+    except ImportError:
+        _QUAD_AVAILABLE = False
 
 # Vocabulary mapping: scorer 4-state → quadripartite raw_verdict.
 # SUSPICION maps to ABSTAIN because the signal exists but does not reach
