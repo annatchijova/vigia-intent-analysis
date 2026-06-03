@@ -1,0 +1,272 @@
+<!--
+VIGIA Academic Documentation
+Module: 8c5d9283
+Batch ID: vigia-doc-0001-8c5d9283
+Generated: 2026-05-20T14:56:47.845109+00:00
+-->
+
+### ENGLISH
+#### What Is This Module?
+...
+#### Key Concepts
+Table 1: Core Entities
+| Term | Scientific Meaning | Role in Investigation |
+|---|---|---|
+| EvidenceProfile | ... | ... |
+| Artifact | ... | ... |
+| Fracture | ... | ... |
+| CrossArtifactIncongruenceEngine | ... | ... |
+| Deterministic Noisy-OR | ... | ... |
+
+Table 2: Scoring Parameters (Deterministic Integer Arithmetic)
+| Parameter | Domain | Description |
+|---|---|---|
+| raw_score | Integer (0–1000) | ... |
+| spoofability | Integer (0–1000) | ... represented as rational ... |
+| weight | Integer | ... |
+| base_trust | Integer | ... |
+
+#### Glossary
+...
+
+#### 【Scientific Note】Peirce, Eco, Grice: Semiotics as Sensor Fusion
+...
+
+### ESPAÑOL
+#### ¿Qué es este módulo?
+...
+#### Conceptos Clave
+...
+#### Glosario
+...
+#### 【Nota Científica】Peirce, Eco, Grice: Semiótica como fusión de sensores
+...
+
+### РУССКИЙ
+#### Что представляет собой этот модуль?
+...
+#### Ключевые понятия
+...
+#### Глоссарий
+...
+#### 【Научное примечание】Пирс, Эко, Грайс: семиотика как слияние сенсоров
+...
+
+### 中文
+#### 什么是本模块？
+...
+#### 核心概念
+...
+#### 术语表
+...
+#### 【科学说明】皮尔士、艾柯、格赖斯：符号学即传感器融合
+...
+
+Need to ensure Chinese terms:
+- 艾柯 (Eco)
+- 格赖斯 (Grice)
+- 取证工件 (Artifact)
+- 逻辑断裂 (Fracture)
+- Maybe 证据轮廓 (EvidenceProfile)
+- 跨取证工件不协调引擎 (Cross-Artifact Incongruence Engine)
+
+Also need license line at end or in each section? User said "License line: ''" Probably once at the very end of the document is fine, or in each section. To be safe, put it at the end of the document. But maybe each section? The requirement says "include" — could be global. I'll put it once at the end, clearly marked.
+
+Need to emphasize deterministic integer arithmetic. No floating-point. Explain that values are scaled integers (e.g., thousandths) and arithmetic is exact rational.
+
+Let's draft the content in detail.
+
+**What Is This Module? (EN)**
+The Cross-Artifact Incongruence Engine (CAIE) is a deterministic forensic inference system. It treats digital evidence as physical sensor readings. Different tools (sensors) produce readings (artifacts) about a computer system. CAIE checks whether these readings agree or contradict. When contradictions—called Fractures—appear, the engine applies a deterministic scoring model to measure the total trustworthiness of the evidence bundle. Because the system uses only integer arithmetic and rational scaling, it yields bitwise-identical results on any processor architecture, eliminating a common source of non-reproducibility in digital forensics.
+
+**Key Concepts EN**
+Table 1: Entities
+| Term | Scientific Meaning | Investigative Role |
+|---|---|---|
+| EvidenceProfile | A calibrated metadata descriptor that classifies an evidence type by its resistance to forgery (spoofability) and its structural importance (weight). | Allows the scientist to pre-calibrate sensor reliability before viewing data. |
+| Artifact | A single forensic datum produced by a VIGIA tool, bundled with its source identity, raw score, and profile. | The basic unit of observation, analogous to a single sensor measurement. |
+| Fracture | A logical discrepancy between two artifacts that ought to be consistent, such as a network log claiming remote access while volatile memory shows no corresponding process. | Signals a possible anti-forensic manipulation or misconfiguration. |
+| CrossArtifactIncongruenceEngine (CAIE) | The central controller that ingests artifacts, detects fractures via Golden Forensic Rules, and fuses findings into a final verdict. | Equivalent to a laboratory instrument that auto-correlates readings from multiple instruments. |
+| Golden Forensic Rules | Immutable cross-artifact integrity constraints (e.g., LOG_VS_MEMORY). | Function as physical conservation laws: if one measurement is true, the other must follow. |
+
+Table 2: Deterministic Scoring Model (Integer Arithmetic)
+| Symbol | Type / Scale | Definition |
+|---|---|---|
+| raw_score | Integer (0–1000) | Initial suspicion level reported by the source tool, scaled to avoid decimals. |
+| spoofability | Integer (0–1000) | Estimated ease of forging this evidence type (0 = impossible; 1000 = trivial). |
+| weight | Integer (1–n) | Structural importance assigned by the investigator. |
+| base_trust | Integer (0–1000) | Calibration constant for the source tool's historical accuracy. |
+| adjusted_score | Integer (computed) | Deterministic product: `raw_score × (1000 − spoofability) × weight × base_trust` followed by fixed scaling division. Exact on every CPU. |
+
+**Glossary EN**
+- **Determinism**: The property that a calculation produces exactly the same bit pattern on every execution and every hardware platform, provided the inputs are identical. Achieved here by banning floating-point operations and using integer rational arithmetic.
+- **Spoofability**: The empirical probability (expressed as an integer per mille) that a given evidence type can be fabricated by an attacker without leaving traces.
+- **Volatile Memory Artifact**: Evidence extracted from RAM. Low spoofability because live system compromise is required to forge.
+- **Noisy-OR Fusion**: A probabilistic model for combining independent sources of evidence. The deterministic implementation uses integer logarithm approximations or precomputed rational tables to avoid floating-point.
+- **Anti-Forensics**: Deliberate actions taken by an adversary to corrupt, hide, or falsify digital evidence.
+- **Golden Forensic Rules**: Axiomatic consistency requirements that hold across all valid system states. Violations imply data tampering or tool error.
+
+**Scientific Note EN**
+> 【Scientific Note】— Peirce, Eco, Grice: Semiotics as Sensor Fusion
+> The terminology of semiotics is sometimes mistaken for literary mysticism. It is not. Charles Sanders Peirce founded the logic of signs: a sign is anything that stands for something else (like a sensor voltage standing for temperature). Umberto Eco formalized how codes map signals to meaning, exactly as a calibration table maps raw ADC counts to engineering units. H. P. Grice described the cooperative maxims that allow communication to function—analogous to the interoperability protocols that allow sensors to report data a receiver can parse. A Fracture is simply a sign-system failure: the smoke sensor says "fire" while the thermal sensor says "ambient." CAIE treats these philosophical tools as engineering constraints, ensuring that forensic interpretation remains a deterministic physical science, not an interpretive art.
+
+Now do the same for other languages.
+
+**ESPAÑOL**
+- What: El Motor de Incongruencia Trans-Artefacto (CAIE) es un sistema forense de inferencia determinista...
+- Terms: PerfilDeEvidencia, Artefacto, Fractura, Motor...
+- Note: Peirce, Eco, Grice. "Analogía del sensor." "Un signo es cualquier cosa que representa otra..."
+- Glossary: Determinismo, Spoofabilidad/Falsificabilidad, Artefacto de Memoria Volátil, Fusión Noisy-OR, Anti-Forense, Reglas Doradas.
+- Chinese terms must be exact.
+
+**РУССКИЙ**
+- What: Межартефактный Движок Несоответствий (CAIE) — это детерминистская судебно-экспертная система вывода...
+- Terms: ПрофильДоказательства, Артефакт, Разлом/Трещина? Wait, the user says "逻辑断裂" in Chinese. In Russian, "Разлом" or "Несоответствие". The module uses "Fracture" which is "Разлом" or "Трещина". But "логический разрыв" maybe. Let's use "Разлом" as the class name equivalent, but explain it as логическое несоответствие. The prompt doesn't specify Russian term constraints beyond the Chinese ones. I can use standard translations. But to be safe and academic: "Разлом (логический разрыв)".
+- Note: Пирс, Эко, Грайс. Аналогия с сенсором/датчиком. "Знак — это всё, что замещает другой объект...".
+- Glossary: Детерминизм, Спуфабельность/Подделываемость, Артефакт оперативной памяти, Детерминистская модель Noisy-OR, Антифорензика, Золотые судебные правила.
+
+**中文**
+- What: 跨取证工件不协调引擎（CAIE）是一套确定性数字取证推理系统...
+- Terms: 证据轮廓 (EvidenceProfile), 取证工件 (Artifact), 逻辑断裂 (Fracture), 跨取证工件不协调引擎 (CAIE), 黄金取证规则 (Golden Forensic Rules).
+- Scoring table: 原始评分 (raw_score), 可伪造性 (spoofability), 权重 (weight), 基础可信度 (base_trust), 修正评分 (adjusted_score). Formula described with integers, maybe mention 千分比 (per mille).
+- Glossary: 确定性 (determinism), 可伪造性 (spoofability), 易失性内存取证工件, 确定性Noisy-OR融合, 反取证, 黄金取证规则.
+- Note: 【科学说明】皮尔士、艾柯、格赖斯：符号学即传感器融合. Use 艾柯, 格赖斯. Explain sign = sensor reading. Code = calibration protocol. Cooperative maxims = data exchange protocol. 逻辑断裂 = sensor conflict.
+
+License line at the end.
+
+Make sure NOT to explain floating point. Instead say "integer rational arithmetic", "scaled fixed-point", "exact bitwise reproducibility".
+
+Also mention the functions/classes in plain language within the tables or text. The user wants documentation for the module, so describing the classes and functions conceptually is important, even if not code.
+
+Let's refine the English text to be concise.
+
+---
+
+**ENGLISH**
+
+### What Is This Module?
+The Cross-Artifact Incongruence Engine (CAIE) is a deterministic forensic inference instrument. It operates like a correlation laboratory for digital evidence: multiple forensic tools act as independent sensors, each emitting an **Artifact** (a measurement). CAIE registers each artifact’s origin, calibrates its trustworthiness through an **EvidenceProfile**, and searches for **Fractures**—logical contradictions between artifacts that should agree. The engine then fuses all valid artifacts into a final verdict using exact integer arithmetic, guaranteeing that two scientists running the same data on different computers receive bitwise-identical results.
+
+### Key Concepts
+
+**Table 1. Core Entities**
+| Term | Scientific Meaning | Role in Investigation |
+|---|---|---|
+| **EvidenceProfile** | A calibrated descriptor that encodes an evidence type’s resistance to fabrication (*spoofability*) and its structural priority (*weight*). | Pre-calibrates sensor reliability before data ingestion. |
+| **Artifact** | A single forensic measurement produced by a VIGIA tool, packaged with its source identity, raw score, and profile. | The atomic observation, analogous to a single sensor reading. |
+| **Fracture** | A logical discrepancy between two artifacts expected to be consistent (e.g., logs report a remote login while RAM contains no corresponding process object). | Indicates anti-forensic tampering, tool error, or undocumented system behavior. |
+| **CrossArtifactIncongruenceEngine (CAIE)** | The central controller that ingests artifacts, detects fractures via Golden Forensic Rules, and fuses findings into a verdict. | Correlates multi-instrument readings into a unified laboratory report. |
+| **Golden Forensic Rules** | Immutable integrity constraints that define how distinct evidence types must relate across a valid system state. | Function as conservation laws: a violation proves at least one measurement is inauthentic. |
+
+**Table 2. Deterministic Scoring Parameters (Integer Arithmetic)**
+| Parameter | Domain | Scientific Definition |
+|---|---|---|
+| `raw_score` | Integer (0–1000) | Initial suspicion level from the source tool, expressed in thousandths to avoid fractions. |
+| `spoofability` | Integer (0–1000) | Ease of forging this evidence type (0 = structurally impossible; 1000 = trivially spoofed). |
+| `weight` | Positive integer | Structural importance assigned by the investigator or policy. |
+| `base_trust` | Integer (0–1000) | Calibration constant for the source tool’s historical accuracy. |
+| `adjusted_score` | Computed integer | Exact rational product: `raw_score × (1000 − spoofability) × weight × base_trust`, followed by fixed scaling. Identical on every CPU architecture. |
+
+### Glossary
+- **Determinism**: The property that a computation yields the exact same bit pattern on every execution and every hardware platform, given identical inputs. Enforced here by eliminating floating-point operations and using scaled integer rational arithmetic.
+- **Spoofability**: The empirical likelihood (expressed as integer per mille) that an attacker can fabricate an evidence type without detectable residue.
+- **Volatile Memory Artifact**: Evidence extracted from live RAM. Intrinsically low spoofability because fabrication requires active kernel compromise.
+- **Noisy-OR Fusion (Deterministic)**: A probabilistic evidence-fusion model implemented via integer logarithms or precomputed rational tables, combining independent artifact scores without floating-point uncertainty.
+- **Anti-Forensics**: Deliberate adversarial actions to alter, conceal, or falsify digital evidence.
+- **Golden Forensic Rules**: Axiomatic cross-artifact consistency requirements. A violation denotes an invalid system state or tampered data.
+
+### 【Scientific Note】Peirce, Eco, Grice: Semiotics as Sensor Fusion
+> The semiotic vocabulary of CAIE is occasionally mistaken for literary mysticism. It is rigorous analytical philosophy applied to engineering. **Charles Sanders Peirce** defined the logic of signs: a sign is anything that stands for something else—just as a voltage reading stands for temperature. **Umberto Eco** formalized the codes that map raw signals to meaning, precisely as a calibration curve maps ADC counts to physical units. **H. P. Grice** articulated the cooperative maxims that make communication possible—analogous to the data-link protocols that allow sensors to transmit parseable measurements. A **Fracture** is therefore nothing more than a sign-system malfunction: the smoke detector asserts “fire” while the thermal detector asserts “ambient.” CAIE treats these frameworks as deterministic engineering constraints, ensuring forensic interpretation remains a reproducible physical science.
+
+---
+
+**ESPAÑOL**
+
+### ¿Qué es este módulo?
+El Motor de Incongruencia Trans-Artefacto (CAIE, por sus siglas en inglés) es un instrumento forense de inferencia determinista. Funciona como un laboratorio de correlación para evidencia digital: múltiples herramientas forenses actúan como sensores independientes que emiten un **Artefacto** (una medición). CAIE registra el origen de cada artefacto, calibra su confiabilidad mediante un **Perfil de Evidencia**, y busca **Fracturas**—contradicciones lógicas entre artefactos que deberían concordar. El motor fusiona todos los artefactos válidos en un veredicto final usando aritmética entera exacta, garantizando que dos científicos que analicen los mismos datos en computadoras distintas obtengan resultados idénticos bit a bit.
+
+### Conceptos Clave
+
+**Tabla 1. Entidades Fundamentales**
+| Término | Significado Científico | Rol en la Investigación |
+|---|---|---|
+| **Perfil de Evidencia** (*EvidenceProfile*) | Descriptor calibrado que codifica la resistencia al montaje (*falsificabilidad*) de un tipo de evidencia y su prioridad estructural (*peso*). | Pre-calibra la confiabilidad del sensor antes de la ingestión de datos. |
+| **Artefacto** (*Artifact*) | Medición forense individual producida por una herramienta VIGIA, empaquetada con su identidad de origen, puntuación bruta y perfil. | Observación atómica, análoga a una única lectura de sensor. |
+| **Fractura** (*Fracture*) | Discrepancia lógica entre dos artefactos que se espera sean consistentes (p. ej., los registros indican un inicio de sesión remoto mientras la RAM no contiene el proceso correspondiente). | Indica manipulación anti-forense, error de herramienta o comportamiento del sistema no documentado. |
+| **Motor CAIE** (*CrossArtifactIncongruenceEngine*) | Controlador central que ingiere artefactos, detecta fracturas mediante las Reglas Doradas Forenses y fusiona los hallazgos en un veredicto. | Correlaciona lecturas multi-instrumento en un informe de laboratorio unificado. |
+| **Reglas Doradas Forenses** | Restricciones inmutables de integridad que definen cómo deben relacionarse distintos tipos de evidencia en un estado válido del sistema. | Funcionan como leyes de conservación: una violación demuestra que al menos una medición es inauténtica. |
+
+**Tabla 2. Parámetros del Modelo de Puntuación Determinista (Aritmética Entera)**
+| Parámetro | Dominio | Definición Científica |
+|---|---|---|
+| `raw_score` | Entero (0–1000) | Nivel inicial de sospecha reportado por la herramienta origen, expresado en milésimas para evitar fracciones. |
+| `spoofability` | Entero (0–1000) | Facilidad de falsificar este tipo de evidencia (0 = estructuralmente imposible; 1000 = trivialmente suplantable). |
+| `weight` | Entero positivo | Importancia estructural asignada por el investigador o la política institucional. |
+| `base_trust` | Entero (0–1000) | Constante de calibración para la precisión histórica de la herramienta origen. |
+| `adjusted_score` | Entero calculado | Producto racional exacto: `raw_score × (1000 − spoofability) × weight × base_trust`, con escalamiento fijo. Idéntico en toda arquitectura de CPU. |
+
+### Glosario
+- **Determinismo**: Propiedad por la cual un cálculo produce exactamente el mismo patrón de bits en cada ejecución y en cada plataforma de hardware, dados insumos idénticos. Aquí se impone eliminando operaciones de coma flotante y usando aritmética racional de enteros escalados.
+- **Falsificabilidad / Spoofability**: Probabilidad empírica (expresada como entero por mil) de que un atacante fabrique un tipo de evidencia sin dejar residuos detectables.
+- **Artefacto de Memoria Volátil**: Evidencia extraída de la RAM viva. Intrínsecamente de baja falsificabilidad porque su montaje requiere compromiso activo del núcleo del sistema.
+- **Fusión Noisy-OR (Determinista)**: Modelo probabilístico de fusión de evidencia implementado mediante logaritmos enteros o tablas racionales precomputadas, combinando puntuaciones independientes sin incertidumbre de coma flotante.
+- **Anti-Forense**: Acciones adversariales deliberadas para alterar, ocultar o falsificar evidencia digital.
+- **Reglas Doradas Forenses**: Requisitos axiomáticos de consistencia entre artefactos. Una violación denota un estado de sistema inválido o datos manipulados.
+
+### 【Nota Científica】Peirce, Eco, Grice: La semiótica como fusión de sensores
+> El vocabulario semiótico de CAIE es ocasionalmente confundido con misticismo literario. Es filosofía analítica rigurosa aplicada a la ingeniería. **Charles Sanders Peirce** definió la lógica de los signos: un signo es todo aquello que representa otra cosa—exactamente como un voltaje representa temperatura. **Umberto Eco** formalizó los códigos que mapean señales brutas a significado, precisamente como una curva de calibración mapea cuentas de ADC a unidades físicas. **H. P. Grice** articuló los máximas cooperativas que hacen posible la comunicación—análogos a los protocolos de enlace de datos que permiten a los sensores transmitir mediciones analizables. Una **Fractura** no es, por tanto, más que un fallo del sistema de signos: el detector de humo afirma “fuego” mientras el detector térmico afirma “ambiente”. CAIE trata estos marcos teóricos como restricciones de ingeniería deterministas, asegurando que la interpretación forense permanezca como ciencia física reproducible.
+
+---
+
+**РУССКИЙ**
+
+### Что представляет собой этот модуль?
+Межартефактный Движок Несоответствий (CAIE) — это детерминистский судебно-экспертный инструмент для логического вывода. Он работает как корреляционная лаборатория для цифровых доказательств: множественные судебные инструменты выступают в роли независимых датчиков, каждый из которых генерирует **Артефакт** (измерение). CAIE регистрирует происхождение каждого артефакта, калибрует его достоверность посредством **Профиля Доказательства** и обнаруживает **Разломы** — логические противоречия между артефактами, которые должны согласовываться. Затем движок объединяет все валидные артефакты в итоговое заключение с помощью точной целочисленной арифметики, гарантируя, что два эксперта, обработав одни и те же данные на разных компьютерах, получат идентичные результаты побитово.
+
+### Ключевые понятия
+
+**Таблица 1. Основные сущности**
+| Термин | Научное значение | Роль в расследовании |
+|---|---|---|
+| **Профиль Доказательства** (*EvidenceProfile*) | Калиброванный дескриптор, кодирующий сопротивляемость типа доказательства подделке (*спуфабельность*) и его структурный приоритет (*вес*). | Предварительная калибровка надёжности датчика до поступления данных. |
+| **Артефакт** (*Artifact*) | Отдельное судебное измерение, произведённое инструментом VIGIA, включающее идентификатор источника, сырой балл и профиль. | Атомарное наблюдение, аналогичное единичному показанию датчика. |
+| **Разлом** (*Fracture*) | Логическое несоответствие между двумя артефактами, которые по условиям должны быть согласованы (например, журналы фиксируют удалённый вход, а ОЗУ не содержит соответствующего процесса). | Сигнал антифорензичной подделки, ошибки инструмента или недокументированного поведения системы. |
+| **Движок CAIE** (*CrossArtifactIncongruenceEngine*) | Центральный контроллер, поглощающий артефакты, выявляющий разломы по Золотым Судебным Правилам и объединяющий находки в вердикт. | Коррелирует многоприборные измерения в единый лабораторный отчёт. |
+| **Золотые Судебные Правила** | Неизменные ограничения целостности, определяющие, как различные типы доказательств должны взаимосвязоваться в валидном состоянии системы. | Функционируют как законы сохранения: нарушение доказывает, что хотя бы одно измерение неаутентично. |
+
+**Таблица 2. Параметры детерминистической модели оценки (целочисленная арифметика)**
+| Параметр | Домен | Научное определение |
+|---|---|---|
+| `raw_score` | Целое (0–1000) | Начальный уровень подозрительности от исходного инструмента, выраженный в промилле для исключения дробей. |
+| `spoofability` | Целое (0–1000) | Лёгкость подделки данного типа доказательства (0 = структурно невозможно; 1000 = тривиально поддельно). |
+| `weight` | Положительное целое | Структурная значимость, назначенная исследователем или политикой. |
+| `base_trust` | Целое (0–1000) | Калибровочная константа исторической точности исходного инструмента. |
+| `adjusted_score` | Вычисляемое целое | Точное рациональное произведение: `raw_score × (1000 − spoofability) × weight × base_trust` с последующим фиксированным масштабированием. Идентично на любой архитектуре ЦПУ. |
+
+### Глоссарий
+- **Детерминизм**: Свойство вычисления, при котором оно порождает абсолютно идентичный битовый паттерн при каждом запуске и на любой аппаратной платформе при одинаковых входных данных. Здесь обеспечивается отказом от операций с плавающей точкой и использованием масштабированной целочисленной рациональной арифметики.
+- **Спуфабельность / Подделываемость**: Эмпирическая вероятность (выраженная целым числом в промилле) того, что злоумышленник сможет сфабриковать тип доказательства без обнаружимых следов.
+- **Артефакт Оперативной Памяти**: Доказательство, извлечённое из ОЗУ. Имеет принципиально низкую спуфабельность, поскольку подделка требует активного компрометации ядра системы.
+- **Детерминистское слияние Noisy-OR**: Вероятностная модель объединения доказательств, реализованная через целочисленные логарифмы или предвычисленные рациональные таблицы, исключающая неопределённость операций с плавающей точкой.
+- **Антифорензика**: Преднамеренные действия противника по изменению, сокрытию или фальсификации цифровых доказательств.
+- **Золотые Судебные Правила**: Аксиоматические требования межартефактной согласованности. Нарушение означает невалидное состояние системы или подмену данных.
+
+### 【Научное примечание】Пирс, Эко, Грайс: семиотика как слияние сенсоров
+> Семиотическая терминология CAIE иногда ошибочно принимается за литературный мистицизм. Это строгая аналитическая философия, применённая к инженерии. **Чарлз Сандерс Пирс** заложил логику знаков: знак — это всё, что замещает другой объект — точно так же, как напряжение замещает температуру. **Умберто Эко** формализовал коды, отображающие сырые сигналы в значение, в точности как калибровочная кривая отображает отсчёты АЦП в физические единицы. **Г. П. Грайс** сформулировал кооперативные максимы, делающие коммуникацию возможной — аналогично протоколам канального уровня, позволяющим датчикам передавать измерения, пригодные для разбора. **Разлом** есть не что иное, как отказ знаковой системы: дымовой датчик утверждает «пожар», тогда как тепловой датчик утверждает «норма». CAIE рассматривает эти теоретические рамки как детерминистские инженерные ограничения, гарантируя, что судебная интерпретация остаётся воспроизводимой физической наукой.
+
+---
+
+**中文**
+
+### 什么是本模块？
+跨取证工件不协调引擎（CAIE）是一套确定性数字取证推理系统。它如同数字证据的关联实验室：多个取证工具充当独立传感器，各自产生一个**取证工件**（即测量值）。CAIE记录每个工件的来源，通过**证据轮廓**校准其可信度，并搜寻**逻辑断裂**——即本应一致的工件之间出现的逻辑矛盾。随后，引擎利用精确的整数运算将所有有效工件融合为最终裁决，确保两名科学家在不同计算机上运行同一数据时，获得逐位完全相同的结果。
+
+### 核心概念
+
+**表1. 核心实体**
+| 术语 | 科学含义 | 调查作用 |
+|---|---|---|
+| **证据轮廓** (*EvidenceProfile*) | 编码某类证据抗伪造能力（可伪造性）与结构优先级（权重）的校准描述符。 | 在数据摄入前预先校准传感器的可靠性。 |
+| **取证工件** (*Artifact*) | 由VIGIA
+---
+*Licensed under the Apache License, Version 2.0. Copyright 2026 Anna Tchijova.*

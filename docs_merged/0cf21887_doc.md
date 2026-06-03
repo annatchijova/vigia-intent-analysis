@@ -1,0 +1,47 @@
+<!--
+VIGIA Academic Documentation
+Module: 0cf21887
+Batch ID: vigia-doc-0120-0cf21887
+Generated: 2026-05-20T14:56:47.870468+00:00
+-->
+
+---
+
+## ENGLISH
+
+### What Is This Module?
+This module is the central intake and normalization engine for the VIGÍA forensic analysis framework. Its sole purpose is to gather digital forensic cases from heterogeneous origins—narrative Markdown files, structured JSON dumps from AI agents, and legacy JSON repositories—and convert them into a single, strictly validated canonical format.
+
+Think of it as a universal translator and quality-control gate: whatever language or shape the raw evidence arrives in, this engine ensures it leaves as a standardized, machine-readable case record with deterministic identifiers. It operates entirely on **deterministic integer arithmetic** for indexing and validation counters; no probabilistic floating-point thresholds are used to decide whether a record is accepted.
+
+### Key Concepts
+
+| Concept | Plain-Language Definition | Role in the Pipeline |
+|---|---|---|
+| Canonical Format (VIGÍA v1.0) | A fixed, universal template that every case must fit into, like a standard laboratory form. | Guarantees that downstream analytical tools can read every case without ambiguity. |
+| Canonical ID | A deterministic integer-based identifier assigned to each case. | Ensures exact, reproducible referencing across the entire dataset. |
+| Markdown Narrative | Human-readable text files describing synthetic forensic scenarios. | Source material written by analysts; the parser extracts structured data from prose. |
+| Structured JSON | Machine-generated files (e.g., from Kimi Agent) with pre-labeled fields. | Directly mapped into the canonical format after validation. |
+| Legacy JSON | Pre-existing case files stored in `data/cases/`. | Ingested and re-validated to maintain uniformity with new records. |
+| Forensic Artifact | A discrete piece of digital evidence (log entry, file hash, memory dump excerpt). | The atomic unit of evidence within a case. |
+| Peirce Layer | A classification of signs (Firstness, Secondness, Thirdness) describing how an artifact carries meaning. | Provides a semiotic scaffold for anomaly detection. |
+| Devil's Advocate | A pre-computed counter-argument template challenging the expected verdict. | Stress-tests the case against cognitive bias. |
+| Abstention Risk | A deterministic flag indicating whether the case lacks sufficient evidence for a verdict. | Prevents over-conclusion. |
+| Index File (`_index.json`) | A master lookup table listing every consolidated case by its canonical ID. | Enables O(1) retrieval without scanning the entire archive. |
+
+### Glossary
+
+- **Canonical Format** — The authoritative, single version of a case record. All fields are mandatory and typed.
+- **Deterministic Integer Arithmetic** — Calculations performed with whole numbers where the same input always yields exactly the same output, free from rounding errors inherent to floating-point representations.
+- **Forensic Artifact** — Any digital object or trace relevant to an investigation (e.g., network packet, registry key).
+- **Legacy Data** — Previously collected information that may use older schema versions.
+- **Markdown** — A lightweight markup language for formatting plain text.
+- **Normalization** — The process of converting diverse inputs into a common, standard structure.
+- **Semiotics** — The study of signs and symbols; here, used to model how forensic evidence signifies malicious activity.
+- **Synthetic Case** — A fictional but realistic scenario generated for training or testing.
+- **VERDICT_RE / SIGNALS_RE / CARNEGIE_RE / PEIRCE_RE / GRICE_RE** — Deterministic regular-expression patterns (text-matching rules) used to extract specific fields from raw text without numerical approximation.
+
+> 【Scientific Note】
+> The terminology of Peirce (Firstness, Secondness, Thirdness), Umberto Eco, and Grice is sometimes mistaken for metaphysical speculation. In VIGÍA, these terms function as **sensor ontologies**—conceptual calibrations analogous to how a spectrometer assigns peaks
+---
+*Licensed under the Apache License, Version 2.0. Copyright 2026 Anna Tchijova.*

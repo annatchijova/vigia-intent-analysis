@@ -1,0 +1,52 @@
+<!--
+VIGIA Academic Documentation
+Module: ed735669
+Batch ID: vigia-doc-0191-ed735669
+Generated: 2026-05-20T14:56:47.885871+00:00
+-->
+
+---
+
+## ENGLISH
+
+### What Is This Module?
+The file `vigia_api.py` is a **digital control panel** that connects an external chat interface (OpenWebUI) to the VIGÍA forensic analysis engine. Scientists can think of it as a **universal translator** between a conversational front-end and a deterministic back-end laboratory instrument. It receives instructions in a structured web format (JSON), routes them to the correct forensic pipeline (`run_vigia_full.py` + `vigia_ask.sh`), and returns exact, reproducible reports. No knowledge of Python is required to operate it.
+
+A critical built-in behavior is **message routing**: the system inspects the last user message. If that message contains valid JSON, the module does not treat it as casual chat; instead, it automatically triggers one of three forensic actions—listing available cases, analyzing a case by its file path, or analyzing raw case data embedded in the message itself.
+
+### Key Concepts
+
+| Concept | Plain-Language Definition | Role in VIGÍA |
+|---|---|---|
+| **REST API** | A standardized set of rules allowing separate computers to exchange data over web addresses. | Enables OpenWebUI to communicate securely with the forensic engine. |
+| **Endpoint** | A specific “service window” on the server, where each window performs exactly one task. | `health`, `list_models`, `chat_completions`, `list_cases`, `analyze_by_path`, and `analyze_by_json` are the exposed windows. |
+| **JSON** | A structured text notation using braces and labeled fields, readable by both humans and machines. | Carries case definitions, chat payloads, and analysis parameters without ambiguity. |
+| **Intent Router** | The module’s logic that reads the final user message; if valid JSON is detected, it activates specialized forensic tools rather than generic conversation. | Automatically dispatches requests to `list_cases`, `analyze_by_path`, or `analyze_by_json`. |
+| **Forensic Pipeline** | The complete sequence of tools that transforms raw evidence into a structured final report. | `run_vigia_full.py` performs the analysis; `vigia_ask.sh` handles expert queries. |
+| **Deterministic Integer Arithmetic** | Computations using whole numbers that always yield the exact same output under identical inputs, with no statistical guessing. | Case identifiers, categorical indices, and symbolic state transitions rely on exact integer logic, never on floating-point approximations. |
+| **OpenWebUI** | A web-based chat front-end compatible with OpenAI-style APIs. | The visual interface scientists use to ask questions; VIGÍA API translates those questions into commands the engine understands. |
+
+### Glossary of Technical Terms
+
+- **CasePayload**: The complete bundle of forensic data (取证工件) transmitted for analysis.
+- **CasePath**: A text string specifying the location of a case file relative to the repository root (e.g., `data/cases/VIGIA-REAL-001.json`).
+- **ChatMessage**: A single conversational unit containing a role (user or system) and its textual content.
+- **ChatRequest**: The full message package received from OpenWebUI, including conversation history and model identifier.
+- **REPO**: The constant storing the absolute filesystem path to the VIGÍA evidence repository; all relative paths resolve against this root.
+- **list_cases()**: Returns an inventory of available forensic cases, organized by category.
+- **analyze_by_path()**: Executes VIGÍA analysis on a case identified by its relative repository path.
+- **analyze_by_json()**: Executes VIGÍA analysis on a case supplied directly as raw JSON in the request body.
+- **HTTP Status Code**: A three-digit numeric code indicating the outcome of a request (e.g., 200 for success, 404 for missing resource).
+
+### 【Scientific Note】Semiotics Is a Sensor, Not Mysticism
+
+> The terminology of **Peirce** (sign–object–interpretant triads), **Eco** (codes and interpretive constraints), and **Grice** (conversational maxims) is sometimes mistaken for metaphysical speculation. It is not. These frameworks function as **deterministic symbolic sensors**. Just as a mass spectrometer decomposes a chemical sample into discrete mass-to-charge ratios (integer indices), Peirce’s semiotics decomposes communicative acts into discrete logical relations. Eco’s codes operate like calibration matrices that map ambiguous surface signals onto exact categorical slots. Grice’s maxims act as noise-reduction filters, stripping out logical violations (**逻辑断裂**) to recover the intended signal. All of these operations rely on **exact, rule-based integer arithmetic** over symbolic states, not on floating-point probability or esoteric intuition. Treat them as formal laboratory instruments.
+
+---
+
+## ESPAÑOL
+
+### ¿Qué es este módulo?
+El archivo `vigia_api.py` es un **panel de control digital** que conecta una interfaz de chat externa (OpenWebUI)
+---
+*Licensed under the Apache License, Version 2.0. Copyright 2026 Anna Tchijova.*
