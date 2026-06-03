@@ -1,0 +1,253 @@
+{
+  "analysis_timestamp": "2026-06-03T05:32:24.767702+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "RD03-001",
+    "end_time": "2026-06-03T05:32:24.767707+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "RD03-001",
+        "entry_sha256": "c0e94aa95a30726725acd437e59273e7448d2eeb60b5f1104dd3ea8051b0a2af",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "RD03-001"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: 4eeafb3bfb155486...",
+        "outputs_summary": {
+          "agent_sha256": "4eeafb3bfb155486142942ad7a2c8678676f86ffd5d076882459354d820591f6",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-06-03T05:30:03.214496+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "RD03-001",
+        "entry_sha256": "8a784e7389a0842e4534906e1878ae510144a9d910f8cb9313f14fc251f711ec",
+        "inputs_summary": {
+          "path": "data/raw/srl2018/rd-03-memory/base-rd-03-memory.img"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-06-03T05:30:03.214574+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "RD03-001",
+        "entry_sha256": "bbbd2b93949db64ec7440e5c7e8cd8010c6c8f9e16ce28231a75f1aa0595de7c",
+        "inputs_summary": {
+          "path": "data/raw/srl2018/rd-03-memory/base-rd-03-memory.img"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: b145a4429b81fe41...",
+        "outputs_summary": {
+          "sha256": "b145a4429b81fe413c04c29983f73cec4c413a36b2852c195ddd4a624c12482b"
+        },
+        "seq": 3,
+        "timestamp": "2026-06-03T05:30:07.168474+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "RD03-001",
+        "entry_sha256": "9b12afa641a27db10d3ded5f548ac75369b05b7eadd5a3e98aa903bd4e35491e",
+        "inputs_summary": {
+          "evidence": "data/raw/srl2018/rd-03-memory/base-rd-03-memory.img",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-06-03T05:30:07.168668+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "RD03-001",
+        "entry_sha256": "b2db0ca075fb009f0824162c42d4f1b499991dbe7b52218f0e0a8439bcf5ef66",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 3 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+            "best_posterior": "34/75",
+            "confidence": "34/75",
+            "is_conclusive": "True",
+            "narrative": "Volatility3 memory analysis: 3 signals from base-rd-03-memory.img. Average intentionality score: 34/15. Malicious activity indicated."
+          },
+          "case_id": "RD03-001",
+          "pipeline_meta": {
+            "avg_score": "34/15",
+            "memory_path": "data/raw/srl2018/rd-03-memory/base-rd-03-memory.img",
+            "signal_count": "3",
+            "source": "vol3_memory_adapter",
+            "vol3_binary": "/home/labestiadevigia/vigia-repo/.venv/bin/vol"
+          },
+          "signals": [
+            {
+              "confidence": "9/10",
+              "description": "Windows OS profile identified from memory image",
+              "detail": "Volatility 3 Framework 2.28.0\n\nVariable\tValue\n\nKernel Base\t0xf80353e16000\nDTB\t0x1aa000\nSymbols\tfile:///home/labestiadevigia/vigia-repo/.venv/lib/python3.12/site-packages/volatility3/symbols/windows/nt...",
+              "evidence_type": "memory_os_profile",
+              "source": "vol3.windows.info",
+              "z_score": "1/2"
+            },
+            {
+              "confidence": "3/4",
+              "description": "1 living-off-the-land processes detected",
+              "detail": "2696\t8380\tpowershell.exe\t0xae8f35da7580\t9\t-\t2\tFalse\t2018-08-17 13:54:10.000000 UTC\tN/A\tDisabled",
+              "evidence_type": "memory_process",
+              "source": "vol3.windows.pslist",
+              "z_score": "14/5"
+            },
+            {
+              "confidence": "17/20",
+              "description": "Potential code injection in 7 process(es): 8824, 4688, __, 00, 8120",
+              "evidence_type": "memory_process",
+              "source": "vol3.windows.malfind",
+              "z_score": "7/2"
+            }
+          ]
+        },
+        "seq": 5,
+        "timestamp": "2026-06-03T05:32:24.767363+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "RD03-001",
+        "entry_sha256": "a9fafecacce292619a288e55f57c758b0091286ec072f58d912cd0a695d84ca1",
+        "inputs_summary": {
+          "n_signals": "3"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-06-03T05:32:24.767508+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "RD03-001",
+        "entry_sha256": "57aefa4a95112724cc5cb1220062119a702b6e35c276940692cc244b911737ba",
+        "inputs_summary": {
+          "verdict": "MALICIOUS_INTENT_DETECTED"
+        },
+        "iteration": 0,
+        "note": "Exit code 1 \u2014 analysis complete.",
+        "outputs_summary": {
+          "exit_code": "1"
+        },
+        "seq": 7,
+        "timestamp": "2026-06-03T05:32:24.767617+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-06-03T05:30:03.214223+00:00",
+    "total_entries": 7
+  },
+  "case_id": "RD03-001",
+  "evidence_path": "data/raw/srl2018/rd-03-memory/base-rd-03-memory.img",
+  "evidence_sha256": "b145a4429b81fe413c04c29983f73cec4c413a36b2852c195ddd4a624c12482b",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE RD03-001 ===\nEvidence: data/raw/srl2018/rd-03-memory/base-rd-03-memory.img\nEvidence SHA-256: b145a4429b81fe413c04c29983f73cec4c413a36b2852c195ddd4a624c12482b\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 34/75\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\nVolatility3 memory analysis: 3 signals from base-rd-03-memory.img. Average intentionality score: 34/15. Malicious activity indicated.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Potential code injection in 7 process(es): 8824, 4688, __, 00, 8120] z=3.500 conf=0.85 \u2014 \n  [1 living-off-the-land processes detected] z=2.800 conf=0.75 \u2014 2696\t8380\tpowershell.exe\t0xae8f35da7580\t9\t-\t2\tFalse\t2018-08-17 13:54:10.000000 U\n  [Windows OS profile identified from memory image] z=0.500 conf=0.90 \u2014 Volatility 3 Framework 2.28.0\n\nVariable\tValue\n\nKernel Base\t0xf80353e16000\nDTB\t0x\n\n--- FINAL ALERT LEVEL ---\nHIGH \u2014 Significant anomalies detected. Priority forensic review recommended.\n\nCritical signals (z>3): 1\nHigh signals (2<z<=3): 1\nTotal signals analyzed: 3",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+      "best_posterior": "34/75",
+      "confidence": {
+        "__fraction__": true,
+        "den": 75,
+        "num": 34
+      },
+      "is_conclusive": true,
+      "narrative": "Volatility3 memory analysis: 3 signals from base-rd-03-memory.img. Average intentionality score: 34/15. Malicious activity indicated."
+    },
+    "case_id": "RD03-001",
+    "pipeline_meta": {
+      "avg_score": {
+        "__fraction__": true,
+        "den": 15,
+        "num": 34
+      },
+      "memory_path": "data/raw/srl2018/rd-03-memory/base-rd-03-memory.img",
+      "signal_count": 3,
+      "source": "vol3_memory_adapter",
+      "vol3_binary": "/home/labestiadevigia/vigia-repo/.venv/bin/vol"
+    },
+    "signals": [
+      {
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 9
+        },
+        "description": "Windows OS profile identified from memory image",
+        "detail": "Volatility 3 Framework 2.28.0\n\nVariable\tValue\n\nKernel Base\t0xf80353e16000\nDTB\t0x1aa000\nSymbols\tfile:///home/labestiadevigia/vigia-repo/.venv/lib/python3.12/site-packages/volatility3/symbols/windows/ntkrnlmp.pdb/72037CCACC96492D8CB366CAC90CE2BE-1.json.xz\nIs64Bit\tTrue\nIsPAE\tFalse\nlayer_name\t0 WindowsI",
+        "evidence_type": "memory_os_profile",
+        "source": "vol3.windows.info",
+        "z_score": {
+          "__fraction__": true,
+          "den": 2,
+          "num": 1
+        }
+      },
+      {
+        "confidence": {
+          "__fraction__": true,
+          "den": 4,
+          "num": 3
+        },
+        "description": "1 living-off-the-land processes detected",
+        "detail": "2696\t8380\tpowershell.exe\t0xae8f35da7580\t9\t-\t2\tFalse\t2018-08-17 13:54:10.000000 UTC\tN/A\tDisabled",
+        "evidence_type": "memory_process",
+        "source": "vol3.windows.pslist",
+        "z_score": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 14
+        }
+      },
+      {
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 17
+        },
+        "description": "Potential code injection in 7 process(es): 8824, 4688, __, 00, 8120",
+        "evidence_type": "memory_process",
+        "source": "vol3.windows.malfind",
+        "z_score": {
+          "__fraction__": true,
+          "den": 2,
+          "num": 7
+        }
+      }
+    ]
+  },
+  "sans_compliance": {
+    "accuracy_validation": false,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}

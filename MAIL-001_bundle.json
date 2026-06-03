@@ -1,0 +1,255 @@
+{
+  "analysis_timestamp": "2026-06-03T05:30:03.156571+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "MAIL-001",
+    "end_time": "2026-06-03T05:30:03.156579+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "MAIL-001",
+        "entry_sha256": "4800ddc086d31992f9363ca34b5a9894ba13c1693cb98bed6b03171a8c5ef973",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "MAIL-001"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: 4eeafb3bfb155486...",
+        "outputs_summary": {
+          "agent_sha256": "4eeafb3bfb155486142942ad7a2c8678676f86ffd5d076882459354d820591f6",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-06-03T05:18:39.219616+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "MAIL-001",
+        "entry_sha256": "d6d4b1fa288fc99d768733db0e37dcf78d6952ebb51650f1a181bbc30eb6989f",
+        "inputs_summary": {
+          "path": "data/raw/srl2018/mail-memory/base-mail-memory.img"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-06-03T05:18:39.219700+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "MAIL-001",
+        "entry_sha256": "641da35f2e6cfa8839f8e9f61e1dad08bd02b5c214ef2ea1a286fdfeb9973546",
+        "inputs_summary": {
+          "path": "data/raw/srl2018/mail-memory/base-mail-memory.img"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: c6e11fbb62d3c401...",
+        "outputs_summary": {
+          "sha256": "c6e11fbb62d3c401121723f88c4c477a6c0571253860f46b3c8e2312f06d9743"
+        },
+        "seq": 3,
+        "timestamp": "2026-06-03T05:18:58.359772+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "MAIL-001",
+        "entry_sha256": "70679cadeb76b1902af19acab19ed40f97f8b67c4f3c2937e952c23fda234950",
+        "inputs_summary": {
+          "evidence": "data/raw/srl2018/mail-memory/base-mail-memory.img",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-06-03T05:18:58.360003+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "MAIL-001",
+        "entry_sha256": "3642069c83d9e364260cdccbdf2654e702a4c309e9c3787a23969b6d061501d4",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 3 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+            "best_posterior": "17/50",
+            "confidence": "17/50",
+            "is_conclusive": "True",
+            "narrative": "Volatility3 memory analysis: 3 signals from base-mail-memory.img. Average intentionality score: 17/10. Malicious activity indicated."
+          },
+          "case_id": "MAIL-001",
+          "pipeline_meta": {
+            "avg_score": "17/10",
+            "memory_path": "data/raw/srl2018/mail-memory/base-mail-memory.img",
+            "signal_count": "3",
+            "source": "vol3_memory_adapter",
+            "vol3_binary": "/home/labestiadevigia/vigia-repo/.venv/bin/vol"
+          },
+          "signals": [
+            {
+              "confidence": "9/10",
+              "description": "Windows OS profile identified from memory image",
+              "detail": "Volatility 3 Framework 2.28.0\n\nVariable\tValue\n\nKernel Base\t0xf803eec04000\nDTB\t0x1aa000\nSymbols\tfile:///home/labestiadevigia/vigia-repo/.venv/lib/python3.12/site-packages/volatility3/symbols/windows/nt...",
+              "evidence_type": "memory_os_profile",
+              "source": "vol3.windows.info",
+              "z_score": "1/2"
+            },
+            {
+              "confidence": "3/4",
+              "description": "2 living-off-the-land processes detected",
+              "detail": "15116\t15896\trundll32.exe\t0x94054a602080\t1\t-\t0\tTrue\t2018-08-31 19:47:10.000000 UTC\tN/A\tDisabled\n5144\t6644\tpowershell.exe\t0x940549f66080\t26\t-\t2\tFalse\t2018-09-05 12:05:44.000000 UTC\tN/A\tDisabled",
+              "evidence_type": "memory_process",
+              "source": "vol3.windows.pslist",
+              "z_score": "14/5"
+            },
+            {
+              "confidence": "4/5",
+              "description": "233 established connections to external IPs",
+              "detail": "0x8a4a02a65570\tTCPv6\t::1\t30734\t::1\t64337\tESTABLISHED\t4104\tw3wp.exe\t2018-09-04 04:10:16.000000 UTC\n0x8a4a02aec270\tTCPv6\t::1\t55366\t::1\t890\tESTABLISHED\t4668\tnoderunner.exe\t2018-09-05 15:46:26.000000 UTC\n...",
+              "evidence_type": "network_flow",
+              "source": "vol3.windows.netscan",
+              "z_score": "9/5"
+            }
+          ]
+        },
+        "seq": 5,
+        "timestamp": "2026-06-03T05:30:03.156158+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "MAIL-001",
+        "entry_sha256": "21ca8d2ef754fb76ea28bec6a880516b1baf864a3e1f81215d2c663bbe888a10",
+        "inputs_summary": {
+          "n_signals": "3"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-06-03T05:30:03.156345+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "MAIL-001",
+        "entry_sha256": "444a2c611af82a04a336aa4e829307cb50fd741f9420ea98c282c15c4abe7ebd",
+        "inputs_summary": {
+          "verdict": "MALICIOUS_INTENT_DETECTED"
+        },
+        "iteration": 0,
+        "note": "Exit code 1 \u2014 analysis complete.",
+        "outputs_summary": {
+          "exit_code": "1"
+        },
+        "seq": 7,
+        "timestamp": "2026-06-03T05:30:03.156471+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-06-03T05:18:39.219293+00:00",
+    "total_entries": 7
+  },
+  "case_id": "MAIL-001",
+  "evidence_path": "data/raw/srl2018/mail-memory/base-mail-memory.img",
+  "evidence_sha256": "c6e11fbb62d3c401121723f88c4c477a6c0571253860f46b3c8e2312f06d9743",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE MAIL-001 ===\nEvidence: data/raw/srl2018/mail-memory/base-mail-memory.img\nEvidence SHA-256: c6e11fbb62d3c401121723f88c4c477a6c0571253860f46b3c8e2312f06d9743\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 17/50\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\nVolatility3 memory analysis: 3 signals from base-mail-memory.img. Average intentionality score: 17/10. Malicious activity indicated.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [2 living-off-the-land processes detected] z=2.800 conf=0.75 \u2014 15116\t15896\trundll32.exe\t0x94054a602080\t1\t-\t0\tTrue\t2018-08-31 19:47:10.000000 UT\n  [233 established connections to external IPs] z=1.800 conf=0.80 \u2014 0x8a4a02a65570\tTCPv6\t::1\t30734\t::1\t64337\tESTABLISHED\t4104\tw3wp.exe\t2018-09-04 04\n  [Windows OS profile identified from memory image] z=0.500 conf=0.90 \u2014 Volatility 3 Framework 2.28.0\n\nVariable\tValue\n\nKernel Base\t0xf803eec04000\nDTB\t0x\n\n--- FINAL ALERT LEVEL ---\nMEDIUM \u2014 Moderate anomalies. Additional investigation recommended.\n\nCritical signals (z>3): 0\nHigh signals (2<z<=3): 1\nTotal signals analyzed: 3",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+      "best_posterior": "17/50",
+      "confidence": {
+        "__fraction__": true,
+        "den": 50,
+        "num": 17
+      },
+      "is_conclusive": true,
+      "narrative": "Volatility3 memory analysis: 3 signals from base-mail-memory.img. Average intentionality score: 17/10. Malicious activity indicated."
+    },
+    "case_id": "MAIL-001",
+    "pipeline_meta": {
+      "avg_score": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 17
+      },
+      "memory_path": "data/raw/srl2018/mail-memory/base-mail-memory.img",
+      "signal_count": 3,
+      "source": "vol3_memory_adapter",
+      "vol3_binary": "/home/labestiadevigia/vigia-repo/.venv/bin/vol"
+    },
+    "signals": [
+      {
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 9
+        },
+        "description": "Windows OS profile identified from memory image",
+        "detail": "Volatility 3 Framework 2.28.0\n\nVariable\tValue\n\nKernel Base\t0xf803eec04000\nDTB\t0x1aa000\nSymbols\tfile:///home/labestiadevigia/vigia-repo/.venv/lib/python3.12/site-packages/volatility3/symbols/windows/ntkrnlmp.pdb/15ED740875664EA9A20CF831ACE952F1-1.json.xz\nIs64Bit\tTrue\nIsPAE\tFalse\nlayer_name\t0 WindowsI",
+        "evidence_type": "memory_os_profile",
+        "source": "vol3.windows.info",
+        "z_score": {
+          "__fraction__": true,
+          "den": 2,
+          "num": 1
+        }
+      },
+      {
+        "confidence": {
+          "__fraction__": true,
+          "den": 4,
+          "num": 3
+        },
+        "description": "2 living-off-the-land processes detected",
+        "detail": "15116\t15896\trundll32.exe\t0x94054a602080\t1\t-\t0\tTrue\t2018-08-31 19:47:10.000000 UTC\tN/A\tDisabled\n5144\t6644\tpowershell.exe\t0x940549f66080\t26\t-\t2\tFalse\t2018-09-05 12:05:44.000000 UTC\tN/A\tDisabled",
+        "evidence_type": "memory_process",
+        "source": "vol3.windows.pslist",
+        "z_score": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 14
+        }
+      },
+      {
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 4
+        },
+        "description": "233 established connections to external IPs",
+        "detail": "0x8a4a02a65570\tTCPv6\t::1\t30734\t::1\t64337\tESTABLISHED\t4104\tw3wp.exe\t2018-09-04 04:10:16.000000 UTC\n0x8a4a02aec270\tTCPv6\t::1\t55366\t::1\t890\tESTABLISHED\t4668\tnoderunner.exe\t2018-09-05 15:46:26.000000 UTC\n0x940548c95a40\tTCPv6\t::1\t444\t::1\t55995\tESTABLISHED\t4\tSystem\t2018-09-05 15:52:58.000000 UTC\n0x940548c97010\tTCPv6\t::1\t64337\t::1\t6827\tESTABLISHED\t4776\tmsexchangerepl\t2018-08-30 21:29:43.000000 UTC\n0x940549b4c510\tTCPv6\t::1\t890\t::1\t6525\tESTABLISHED\t4008\tMicrosoft.Exch\t2018-08-30 21:28:24.000000 UTC\n0x940549e11d00\tTCPv6\t::1\t11904\t::1\t890\tESTABLISHED\t3544\tMicrosoft.Exch\t2018-08-30 22:32:29.000000 UTC\n0x940549e510e0\tTCPv6\t::1\t444\t::1\t55893\tESTABLISHED\t4\tSystem\t2018-09-05 15:51:42.000000 UTC\n0x940549e6b5b0\tTCPv6\t::1\t54402\t::1\t444\tESTABLISHED\t4104\tw3wp.exe\t2018-09-05 15:36:09.000000 UTC\n0x940549ea9d00\tTCPv6\t::1\t64337\t::1\t55889\tESTABLISHED\t4776\tmsexchangerepl\t2018-09-05 15:51:38.000000 UTC\n0x940549eba010\tTCPv6\t::1\t890\t::1\t57166\tESTABLISHED\t4008\tMicrosoft.Exch\t2018-09-05 05:56:05.000000 UTC",
+        "evidence_type": "network_flow",
+        "source": "vol3.windows.netscan",
+        "z_score": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 9
+        }
+      }
+    ]
+  },
+  "sans_compliance": {
+    "accuracy_validation": false,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}

@@ -1,0 +1,229 @@
+{
+  "analysis_timestamp": "2026-06-03T05:32:51.386476+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "WKSTN02-001",
+    "end_time": "2026-06-03T05:32:51.386481+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "WKSTN02-001",
+        "entry_sha256": "0a4e167d458d51da40a57e680d27843899851ffe732c5b3e10f0de441d48319a",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "WKSTN02-001"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: 4eeafb3bfb155486...",
+        "outputs_summary": {
+          "agent_sha256": "4eeafb3bfb155486142942ad7a2c8678676f86ffd5d076882459354d820591f6",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-06-03T05:32:24.820950+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "WKSTN02-001",
+        "entry_sha256": "240d4f99f46b92b014dbf7eee4fbe9bace9484e72e30dcdb0603bc9ef3412de3",
+        "inputs_summary": {
+          "path": "data/raw/srl2018/wkstn-02-memory/base-wkstn-02-memory.img"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-06-03T05:32:24.821038+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "WKSTN02-001",
+        "entry_sha256": "30d04b9364473654afc03bb976d87bcbdc0f55cfd0d4e0476e1c423b8bd22128",
+        "inputs_summary": {
+          "path": "data/raw/srl2018/wkstn-02-memory/base-wkstn-02-memory.img"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: 796608dce6f92053...",
+        "outputs_summary": {
+          "sha256": "796608dce6f92053f32f84a1c92c20cdf5cd9dd76f7ef5be8df6ffb4ec67a21a"
+        },
+        "seq": 3,
+        "timestamp": "2026-06-03T05:32:28.710380+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "WKSTN02-001",
+        "entry_sha256": "8f5e000084d6501cc74fd7742b9807886c212d76a25cb9ba7861a6bf09ab54e4",
+        "inputs_summary": {
+          "evidence": "data/raw/srl2018/wkstn-02-memory/base-wkstn-02-memory.img",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-06-03T05:32:28.710601+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "WKSTN02-001",
+        "entry_sha256": "adf82fe191384051bfc29309731a82fd7c1eb81bc46d2e9d864dfdc1cb38fd99",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 2 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "SUSPICION_DETECTED",
+            "best_posterior": "3/50",
+            "confidence": "3/50",
+            "is_conclusive": "False",
+            "narrative": "Volatility3 memory analysis: 2 signals from base-wkstn-02-memory.img. Average intentionality score: 3/10. Suspicious activity \u2014 requires human review."
+          },
+          "case_id": "WKSTN02-001",
+          "pipeline_meta": {
+            "avg_score": "3/10",
+            "memory_path": "data/raw/srl2018/wkstn-02-memory/base-wkstn-02-memory.img",
+            "signal_count": "2",
+            "source": "vol3_memory_adapter",
+            "vol3_binary": "/home/labestiadevigia/vigia-repo/.venv/bin/vol"
+          },
+          "signals": [
+            {
+              "confidence": "9/10",
+              "description": "Windows OS profile identified from memory image",
+              "detail": "Volatility 3 Framework 2.28.0\n\nVariable\tValue\n\nKernel Base\t0xf801d0a06000\nDTB\t0x1aa000\nSymbols\tfile:///home/labestiadevigia/vigia-repo/.venv/lib/python3.12/site-packages/volatility3/symbols/windows/nt...",
+              "evidence_type": "memory_os_profile",
+              "source": "vol3.windows.info",
+              "z_score": "1/2"
+            },
+            {
+              "confidence": "3/5",
+              "description": "Process list analyzed \u2014 no obvious LOLBAS processes",
+              "evidence_type": "memory_process",
+              "source": "vol3.windows.pslist",
+              "z_score": "1/10"
+            }
+          ]
+        },
+        "seq": 5,
+        "timestamp": "2026-06-03T05:32:51.386118+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "WKSTN02-001",
+        "entry_sha256": "af72ee51b40f36330ff7818e4f1707b6bced65461ad2bfb9aa479419b1dfe0c6",
+        "inputs_summary": {
+          "n_signals": "2"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-06-03T05:32:51.386279+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "WKSTN02-001",
+        "entry_sha256": "85b9500e719610a10b951dfcf9ad211306a56153ed7e5956b4700bddf188a882",
+        "inputs_summary": {
+          "verdict": "SUSPICION_DETECTED"
+        },
+        "iteration": 0,
+        "note": "Exit code 0 \u2014 analysis complete.",
+        "outputs_summary": {
+          "exit_code": "0"
+        },
+        "seq": 7,
+        "timestamp": "2026-06-03T05:32:51.386396+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-06-03T05:32:24.820634+00:00",
+    "total_entries": 7
+  },
+  "case_id": "WKSTN02-001",
+  "evidence_path": "data/raw/srl2018/wkstn-02-memory/base-wkstn-02-memory.img",
+  "evidence_sha256": "796608dce6f92053f32f84a1c92c20cdf5cd9dd76f7ef5be8df6ffb4ec67a21a",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE WKSTN02-001 ===\nEvidence: data/raw/srl2018/wkstn-02-memory/base-wkstn-02-memory.img\nEvidence SHA-256: 796608dce6f92053f32f84a1c92c20cdf5cd9dd76f7ef5be8df6ffb4ec67a21a\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: SUSPICION_DETECTED\nPosterior confidence: 3/50\nConclusive: NO \u2014 requires human review\n\n--- PEIRCEAN NARRATIVE ---\nVolatility3 memory analysis: 2 signals from base-wkstn-02-memory.img. Average intentionality score: 3/10. Suspicious activity \u2014 requires human review.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Windows OS profile identified from memory image] z=0.500 conf=0.90 \u2014 Volatility 3 Framework 2.28.0\n\nVariable\tValue\n\nKernel Base\t0xf801d0a06000\nDTB\t0x\n  [Process list analyzed \u2014 no obvious LOLBAS processes] z=0.100 conf=0.60 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW \u2014 No significant anomalies detected in this iteration.\n\nCritical signals (z>3): 0\nHigh signals (2<z<=3): 0\nTotal signals analyzed: 2",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "SUSPICION_DETECTED",
+      "best_posterior": "3/50",
+      "confidence": {
+        "__fraction__": true,
+        "den": 50,
+        "num": 3
+      },
+      "is_conclusive": false,
+      "narrative": "Volatility3 memory analysis: 2 signals from base-wkstn-02-memory.img. Average intentionality score: 3/10. Suspicious activity \u2014 requires human review."
+    },
+    "case_id": "WKSTN02-001",
+    "pipeline_meta": {
+      "avg_score": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 3
+      },
+      "memory_path": "data/raw/srl2018/wkstn-02-memory/base-wkstn-02-memory.img",
+      "signal_count": 2,
+      "source": "vol3_memory_adapter",
+      "vol3_binary": "/home/labestiadevigia/vigia-repo/.venv/bin/vol"
+    },
+    "signals": [
+      {
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 9
+        },
+        "description": "Windows OS profile identified from memory image",
+        "detail": "Volatility 3 Framework 2.28.0\n\nVariable\tValue\n\nKernel Base\t0xf801d0a06000\nDTB\t0x1aa000\nSymbols\tfile:///home/labestiadevigia/vigia-repo/.venv/lib/python3.12/site-packages/volatility3/symbols/windows/ntkrnlmp.pdb/31C51B7D1C2545A88F69E13FC73E6894-1.json.xz\nIs64Bit\tTrue\nIsPAE\tFalse\nlayer_name\t0 WindowsI",
+        "evidence_type": "memory_os_profile",
+        "source": "vol3.windows.info",
+        "z_score": {
+          "__fraction__": true,
+          "den": 2,
+          "num": 1
+        }
+      },
+      {
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 3
+        },
+        "description": "Process list analyzed \u2014 no obvious LOLBAS processes",
+        "evidence_type": "memory_process",
+        "source": "vol3.windows.pslist",
+        "z_score": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 1
+        }
+      }
+    ]
+  },
+  "sans_compliance": {
+    "accuracy_validation": false,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}

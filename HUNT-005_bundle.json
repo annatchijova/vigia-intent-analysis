@@ -1,0 +1,229 @@
+{
+  "analysis_timestamp": "2026-06-02T23:04:48.067031+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "HUNT-005",
+    "end_time": "2026-06-02T23:04:48.067036+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "HUNT-005",
+        "entry_sha256": "f85bf86e77832e3a6cdb66fbd1443531f87c8d038df30528dcccb30cac5d2f6f",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "HUNT-005"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: 4eeafb3bfb155486...",
+        "outputs_summary": {
+          "agent_sha256": "4eeafb3bfb155486142942ad7a2c8678676f86ffd5d076882459354d820591f6",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-06-02T23:04:34.595338+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "HUNT-005",
+        "entry_sha256": "132896051c93b67e8e0d56f6fbd70b59dad99a0a5979e8585e256c032c748481",
+        "inputs_summary": {
+          "path": "data/raw/srl2018/hunt-memory/base-hunt-memory.img"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-06-02T23:04:34.595466+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "HUNT-005",
+        "entry_sha256": "1a8cae693f0e3110f45b477ec033ffa699f3796d6b51e407c8a6d4608c8779d7",
+        "inputs_summary": {
+          "path": "data/raw/srl2018/hunt-memory/base-hunt-memory.img"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: c2d9a3b50cacb020...",
+        "outputs_summary": {
+          "sha256": "c2d9a3b50cacb0206f6e21b58dd7a2cf5d98f72e20f92c4954bea1294b7c8544"
+        },
+        "seq": 3,
+        "timestamp": "2026-06-02T23:04:39.386223+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "HUNT-005",
+        "entry_sha256": "a78599d878363dccba6f7c0ac156220e75296cc6132efe844822c46ea3bf4e5c",
+        "inputs_summary": {
+          "evidence": "data/raw/srl2018/hunt-memory/base-hunt-memory.img",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-06-02T23:04:39.386441+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "HUNT-005",
+        "entry_sha256": "da8fd96fdd73254852a48d294b1e192c1d3ebaeaadba0098c8f53f0f5fb8a52c",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 2 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "SUSPICION_DETECTED",
+            "best_posterior": "3/50",
+            "confidence": "3/50",
+            "is_conclusive": "False",
+            "narrative": "Volatility3 memory analysis: 2 signals from base-hunt-memory.img. Average intentionality score: 3/10. Suspicious activity \u2014 requires human review."
+          },
+          "case_id": "HUNT-005",
+          "pipeline_meta": {
+            "avg_score": "3/10",
+            "memory_path": "data/raw/srl2018/hunt-memory/base-hunt-memory.img",
+            "signal_count": "2",
+            "source": "vol3_memory_adapter",
+            "vol3_binary": "/home/labestiadevigia/vigia-repo/.venv/bin/vol"
+          },
+          "signals": [
+            {
+              "confidence": "9/10",
+              "description": "Windows OS profile identified from memory image",
+              "detail": "Volatility 3 Framework 2.28.0\n\nVariable\tValue\n\nKernel Base\t0xf80211a05000\nDTB\t0x1aa000\nSymbols\tfile:///home/labestiadevigia/vigia-repo/.venv/lib/python3.12/site-packages/volatility3/symbols/windows/nt...",
+              "evidence_type": "memory_os_profile",
+              "source": "vol3.windows.info",
+              "z_score": "1/2"
+            },
+            {
+              "confidence": "3/5",
+              "description": "Process list analyzed \u2014 no obvious LOLBAS processes",
+              "evidence_type": "memory_process",
+              "source": "vol3.windows.pslist",
+              "z_score": "1/10"
+            }
+          ]
+        },
+        "seq": 5,
+        "timestamp": "2026-06-02T23:04:48.066679+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "HUNT-005",
+        "entry_sha256": "55137b5ae96439010ae6544d56608bced694360070fabc95875af8d977eab275",
+        "inputs_summary": {
+          "n_signals": "2"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-06-02T23:04:48.066813+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "HUNT-005",
+        "entry_sha256": "9842873ea84aeb0c774a25f7c6ce4f55a5871de06fe99c8d2b9452fbd1051d17",
+        "inputs_summary": {
+          "verdict": "SUSPICION_DETECTED"
+        },
+        "iteration": 0,
+        "note": "Exit code 0 \u2014 analysis complete.",
+        "outputs_summary": {
+          "exit_code": "0"
+        },
+        "seq": 7,
+        "timestamp": "2026-06-02T23:04:48.066914+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-06-02T23:04:34.595086+00:00",
+    "total_entries": 7
+  },
+  "case_id": "HUNT-005",
+  "evidence_path": "data/raw/srl2018/hunt-memory/base-hunt-memory.img",
+  "evidence_sha256": "c2d9a3b50cacb0206f6e21b58dd7a2cf5d98f72e20f92c4954bea1294b7c8544",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE HUNT-005 ===\nEvidence: data/raw/srl2018/hunt-memory/base-hunt-memory.img\nEvidence SHA-256: c2d9a3b50cacb0206f6e21b58dd7a2cf5d98f72e20f92c4954bea1294b7c8544\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: SUSPICION_DETECTED\nPosterior confidence: 3/50\nConclusive: NO \u2014 requires human review\n\n--- PEIRCEAN NARRATIVE ---\nVolatility3 memory analysis: 2 signals from base-hunt-memory.img. Average intentionality score: 3/10. Suspicious activity \u2014 requires human review.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Windows OS profile identified from memory image] z=0.500 conf=0.90 \u2014 Volatility 3 Framework 2.28.0\n\nVariable\tValue\n\nKernel Base\t0xf80211a05000\nDTB\t0x\n  [Process list analyzed \u2014 no obvious LOLBAS processes] z=0.100 conf=0.60 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW \u2014 No significant anomalies detected in this iteration.\n\nCritical signals (z>3): 0\nHigh signals (2<z<=3): 0\nTotal signals analyzed: 2",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "SUSPICION_DETECTED",
+      "best_posterior": "3/50",
+      "confidence": {
+        "__fraction__": true,
+        "den": 50,
+        "num": 3
+      },
+      "is_conclusive": false,
+      "narrative": "Volatility3 memory analysis: 2 signals from base-hunt-memory.img. Average intentionality score: 3/10. Suspicious activity \u2014 requires human review."
+    },
+    "case_id": "HUNT-005",
+    "pipeline_meta": {
+      "avg_score": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 3
+      },
+      "memory_path": "data/raw/srl2018/hunt-memory/base-hunt-memory.img",
+      "signal_count": 2,
+      "source": "vol3_memory_adapter",
+      "vol3_binary": "/home/labestiadevigia/vigia-repo/.venv/bin/vol"
+    },
+    "signals": [
+      {
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 9
+        },
+        "description": "Windows OS profile identified from memory image",
+        "detail": "Volatility 3 Framework 2.28.0\n\nVariable\tValue\n\nKernel Base\t0xf80211a05000\nDTB\t0x1aa000\nSymbols\tfile:///home/labestiadevigia/vigia-repo/.venv/lib/python3.12/site-packages/volatility3/symbols/windows/ntkrnlmp.pdb/5C8022400BD646309404511561035399-1.json.xz\nIs64Bit\tTrue\nIsPAE\tFalse\nlayer_name\t0 WindowsI",
+        "evidence_type": "memory_os_profile",
+        "source": "vol3.windows.info",
+        "z_score": {
+          "__fraction__": true,
+          "den": 2,
+          "num": 1
+        }
+      },
+      {
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 3
+        },
+        "description": "Process list analyzed \u2014 no obvious LOLBAS processes",
+        "evidence_type": "memory_process",
+        "source": "vol3.windows.pslist",
+        "z_score": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 1
+        }
+      }
+    ]
+  },
+  "sans_compliance": {
+    "accuracy_validation": false,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}
