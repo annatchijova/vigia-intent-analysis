@@ -105,6 +105,17 @@ def run_case(case_path: str) -> None:
         print(f"    Secondness : {pc.get('secondness', '')}")
         print(f"    Thirdness  : {pc.get('thirdness', '')}")
 
+    qs = result.get("quadripartite_state", {})
+    vs = qs.get("verdict_state", "")
+    if vs and vs not in ("UNAVAILABLE", "QUADRIPARTITE_ERROR"):
+        print(f"\n  QUADRIPARTITE 8-STATE:")
+        print(f"    State   : {qs.get('display_label', vs)}")
+        print(f"    Action  : {qs.get('action_required', '?')}")
+        print(f"    Conf    : {qs.get('confidence_pct', '?')}%  |  Stability: {qs.get('stability_pct', '?')}%")
+        summary = str(qs.get('analyst_summary', '')).strip()
+        if summary:
+            print(f"    Summary : {summary[:120]}")
+
     expected = result["expected_verdict"]
     actual = result["verdict"]
     match = actual == expected
