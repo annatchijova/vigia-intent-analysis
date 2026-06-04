@@ -2,7 +2,7 @@
 VIGÍA — Intentionality Analysis Bridge for SIFT Workstation
 ============================================================
 Author      : Anna Tchijova
-License     : MIT
+License     : Apache 2.0
 
 Theoretical foundation:
   - Charles S. Peirce (Semiotics / Abductive reasoning)
