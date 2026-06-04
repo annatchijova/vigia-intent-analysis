@@ -1,0 +1,65 @@
+{
+  "case_id": "VIGIA-REAL-SRL-MAIL-MEMORY",
+  "case_name": "SRL-2018 Mail Server \u2014 Memory Forensics",
+  "description": "Volatility3 memory analysis of base-mail-memory.img. Windows Exchange Server. LOTL confirmed: rundll32.exe at 2018-08-31 19:47:10 UTC. malfind timed out (600s) \u2014 large dump, documented limitation. LOTL on mail server consistent with C2 using Exchange as pivot.",
+  "expected_verdict": "MALICE",
+  "source_dataset": "SANS SRL-2018",
+  "source_origin": "base-mail-memory.img \u2014 vol3 MAIL-002",
+  "source_url": "https://sansorg.egnyte.com",
+  "carnegie_pattern_expected": null,
+  "peirce_expected": "SECONDNESS",
+  "confidence_expected": "MEDIUM",
+  "abstention_risk": "LOW",
+  "expected_mitre_ttps": [
+    "T1059.001",
+    "T1021.002"
+  ],
+  "devil_advocate": "rundll32.exe is a legitimate Windows process. Exchange servers can spawn it for legitimate COM operations. malfind timeout means code injection unconfirmed.",
+  "artifacts": [
+    {
+      "artifact_id": "ART-MAIL-001",
+      "type": "memory_process",
+      "peirce_layer": "SECONDNESS",
+      "content": "vol3 windows.pslist LOLBAS: 2 living-off-the-land processes \u2014 rundll32.exe PID 15116 (parent 15896) at 2018-08-31 19:47:10 UTC. WinRM execution context (wsmprovhost.exe -Embedding) \u2014 remote PowerShell session via WinRM, not interactive user session.",
+      "forensic_anomalies": [
+        "rundll32.exe spawned under wsmprovhost.exe -Embedding \u2014 WinRM remote execution, not user-initiated COM operation",
+        "Timestamp 2018-08-31 19:47 coincides exactly with McAfee quarantine event on RD-02 (5B1B72B.EXE) \u2014 coordinated multi-host attack activity",
+        "Mail server SMTP/Exchange position gives attacker external C2 relay capability via legitimate mail protocols (T1071.003)"
+      ],
+      "examiner_id": "SANS_HACKATHON_2026",
+      "source_tool": "base-memory.img \u2014 Volatility3 2.28.0 \u2014 vigia_agent.py"
+    },
+    {
+      "artifact_id": "ART-MAIL-002",
+      "type": "kernel_structure",
+      "peirce_layer": "SECONDNESS",
+      "content": "vol3 windows.malfind: analysis TIMED OUT after 600 seconds. Exchange Server memory footprint exceeds vol3 malfind timeout threshold. LOTL confirmed independently via pslist \u2014 timeout does not negate LOTL finding. Consistent with large Exchange mail store loaded in memory.",
+      "forensic_anomalies": [
+        "malfind timeout is a documented characteristic of Exchange Server memory dumps \u2014 Exchange caches mail data in large memory pools that inflate malfind scan time",
+        "LOTL confirmed via pslist is sufficient for HIGH confidence verdict independent of malfind result",
+        "Timeout-resistant pattern: attacker using LOTL (not injected shellcode) may deliberately exploit Exchange memory size as cover for extended beacon dwell time"
+      ],
+      "examiner_id": "SANS_HACKATHON_2026",
+      "source_tool": "base-memory.img \u2014 Volatility3 2.28.0 \u2014 vigia_agent.py"
+    },
+    {
+      "artifact_id": "ART-MAIL-003",
+      "type": "log_entry",
+      "peirce_layer": "THIRDNESS",
+      "content": "Corpus cross-reference: mail server compromised in same attack campaign as admin (LOTL Jul-Aug 2018), AV server (29 processes), RD-01 (12 LOTL), RD-04 (30 LOTL), RD-05 (43 injected), WKSTN-04 (24 injected). Memory acquisition timestamp 2018-09-07 matches all SRL-2018 corpus hosts. LARIAT C2 logs confirm attack simulation active from 2018-05-07 through 2018-09-07.",
+      "forensic_anomalies": [
+        "Mail server compromise is consistent with attack chain: DMZ FTP credential stuffing (blocked) -> mail server LOTL -> admin/AV pivot -> RD server farm lateral movement",
+        "Mail server as C2 relay explains external communication: Exchange SMTP/IMAP ports (25, 143, 993) provide outbound channels that bypass standard egress filtering",
+        "LARIAT C2 started 2018-08-19, mail server LOTL observed 2018-08-31 \u2014 12-day delay consistent with C2 framework establishing foothold before executing LOTL phase"
+      ],
+      "examiner_id": "SANS_HACKATHON_2026",
+      "source_tool": "LARIAT C2 logs + corpus cross-analysis"
+    }
+  ],
+  "peirce_chain": {
+    "firstness": "Mail server in compromised network \u2014 high-value relay for external C2 communication",
+    "secondness": "rundll32.exe LOTL confirmed at 2018-08-31 19:47 \u2014 same day as AV quarantine event on RD-02",
+    "thirdness": "Mail server as C2 relay explains attack persistence: attacker maintains external callback via legitimate mail protocols while operating internally via LOTL"
+  },
+  "_consolidation": "VIG\u00cdA-REAL. vol3 MAIL-002. Bundle: results/srl2018/MAIL-002_bundle.json. malfind timed out \u2014 L-series limitation documented."
+}

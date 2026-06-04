@@ -226,6 +226,21 @@ _LEGACY_TYPE_TO_EVIDENCE: Dict[str, str] = {
     "registro_acceso":            "log_entry",
     "historial_accesos_referencia": "log_entry",
     "contexto_usuario":           "log_entry",
+    # Identity mappings — canonical names used directly as 'type' in EBS v1 cases
+    "memory_process":               "memory_process",
+    "kernel_structure":             "kernel_structure",
+    "log_entry":                    "log_entry",
+    "file_metadata":                "file_metadata",
+    "file_timestamp":               "file_timestamp",
+    "registry_key":                 "registry_key",
+    "mft_entry":                    "mft_entry",
+    "prefetch":                     "prefetch",
+    "usn_journal":                  "usn_journal",
+    "usn_journal_gap":              "usn_journal_gap",
+    "lsass_session":                "lsass_session",
+    "cultural_marker":              "cultural_marker",
+    "digital_signature":            "digital_signature",
+    "memory_dump":                  "kernel_structure",
 }
 
 # Mapeo: peirce_layer → multiplicador de score (numerador/denominador, enteros)
