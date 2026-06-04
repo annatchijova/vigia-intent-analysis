@@ -1021,9 +1021,14 @@ class VigiaPipeline:
             return None
 
         try:
-            return self._call_ollama(b, backend)
+            if backend == "gemini":
+                return self._call_gemini(b)
+            elif backend == "claude":
+                return self._call_claude(b)
+            else:
+                return self._call_ollama(b, backend)
         except Exception as e:
-            logger.warning("[Pipeline] Error al llamar Ollama: %s", e)
+            logger.warning("[Pipeline] Error al llamar %s: %s", backend, e)
             return None
 
     def _call_ollama(self, bundle: ForensicBundle, model: str) -> str:
@@ -1033,32 +1038,8 @@ class VigiaPipeline:
         El prompt incluye el bundle comprimido (no el JSON completo —
         demasiado largo para contexto de LLM).
         """
-        dt = bundle.decision_trace
-        graph = bundle.evidence_graph
-
-        # Resumen comprimido para el LLM — no el bundle completo
-        summary = {
-            "decision": dt.decision,
-            "posterior": round(dt.posterior, 4),
-            "risk": round(dt.risk, 4),
-            "drift": round(dt.drift_score, 4),
-            "graph_stability": round(dt.graph_stability, 4),
-            "n_stable_edges": len(graph.edges),
-            "lambda": round(dt.lambda_drift, 3),
-            "gamma": round(dt.gamma_stability, 3),
-            "contributions": dt.signal_contributions or [],
-        }
-
-        prompt = (
-            "Sos un experto en análisis forense digital. "
-            "Tu tarea es generar un reporte técnico conciso en español rioplatense "
-            "basado en el siguiente resultado de análisis forense. "
-            "El análisis fue realizado por VIGÍA, un sistema determinístico. "
-            "NO modifiques los números. Usá el vocabulario de ENFSI. "
-            "Formato: párrafos cortos, sin emojis, tono pericial.\n\n"
-            f"RESULTADO:\n{json.dumps(summary, sort_keys=True, ensure_ascii=False, indent=2)}\n\n"
-            "Generá el reporte:"
-        )
+        summary = self._build_narrative_summary(bundle)
+        prompt = self._build_enfsi_prompt(summary)
 
         # Llamada a Ollama via subprocess (no requiere SDK)
         cmd = [
@@ -1078,6 +1059,79 @@ class VigiaPipeline:
             raise RuntimeError(f"Ollama error: {proc.stderr[:200]}")
 
         return proc.stdout.strip()
+
+    def _build_narrative_summary(self, bundle: "ForensicBundle") -> dict:
+        """Compressed bundle summary for LLM narrative — never the full bundle."""
+        dt = bundle.decision_trace
+        graph = bundle.evidence_graph
+        return {
+            "decision": dt.decision,
+            "posterior": round(dt.posterior, 4),
+            "risk": round(dt.risk, 4),
+            "drift": round(dt.drift_score, 4),
+            "graph_stability": round(dt.graph_stability, 4),
+            "n_stable_edges": len(graph.edges),
+            "lambda": round(dt.lambda_drift, 3),
+            "gamma": round(dt.gamma_stability, 3),
+            "contributions": dt.signal_contributions or [],
+        }
+
+    def _build_enfsi_prompt(self, summary: dict) -> str:
+        """ENFSI-style forensic narrative prompt shared by all LLM backends."""
+        return (
+            "Sos un experto en análisis forense digital. "
+            "Tu tarea es generar un reporte técnico conciso en español rioplatense "
+            "basado en el siguiente resultado de análisis forense. "
+            "El análisis fue realizado por VIGÍA, un sistema determinístico. "
+            "NO modifiques los números. Usá el vocabulario de ENFSI. "
+            "Formato: párrafos cortos, sin emojis, tono pericial.\n\n"
+            f"RESULTADO:\n{json.dumps(summary, sort_keys=True, ensure_ascii=False, indent=2)}\n\n"
+            "Generá el reporte:"
+        )
+
+    def _call_gemini(self, bundle: "ForensicBundle") -> str:
+        """Narrative via Gemini API. Requires GEMINI_API_KEY env var."""
+        import os
+        import httpx
+        api_key = os.environ.get("GEMINI_API_KEY")
+        if not api_key:
+            raise RuntimeError(
+                "GEMINI_API_KEY not set — export GEMINI_API_KEY=<key>"
+            )
+        summary = self._build_narrative_summary(bundle)
+        prompt = self._build_enfsi_prompt(summary)
+        resp = httpx.post(
+            "https://generativelanguage.googleapis.com/v1beta/models/"
+            f"gemini-2.5-flash:generateContent?key={api_key}",
+            json={"contents": [{"parts": [{"text": prompt}]}]},
+            timeout=60,
+        )
+        resp.raise_for_status()
+        return resp.json()["candidates"][0]["content"]["parts"][0]["text"].strip()
+
+    def _call_claude(self, bundle: "ForensicBundle") -> str:
+        """Narrative via Anthropic API. Requires ANTHROPIC_API_KEY env var."""
+        import os
+        try:
+            import anthropic
+        except ImportError:
+            raise RuntimeError(
+                "anthropic SDK not installed — pip install anthropic"
+            )
+        api_key = os.environ.get("ANTHROPIC_API_KEY")
+        if not api_key:
+            raise RuntimeError(
+                "ANTHROPIC_API_KEY not set — export ANTHROPIC_API_KEY=<key>"
+            )
+        client = anthropic.Anthropic(api_key=api_key)
+        summary = self._build_narrative_summary(bundle)
+        prompt = self._build_enfsi_prompt(summary)
+        msg = client.messages.create(
+            model="claude-sonnet-4-20250514",
+            max_tokens=1024,
+            messages=[{"role": "user", "content": prompt}],
+        )
+        return msg.content[0].text.strip()
 
     # ------------------------------------------------------------------
     # Verificación externa (delega a verify_ebs_v1.py)
@@ -1179,6 +1233,7 @@ def run_vigia(
     calibration_path: Optional[str] = None,
     covariance_path: Optional[str] = None,
     ollama_model: Optional[str] = None,
+    llm_backend: Optional[str] = None,
     output_path: Optional[str] = None,
 ) -> Dict[str, Any]:
     """
@@ -1190,7 +1245,10 @@ def run_vigia(
         drift_score : PSI drift score ∈ [0, 1]
         calibration_path: path a modelos KDE calibrados (.pkl)
         covariance_path : path a covarianza Ledoit-Wolf (.pkl)
-        ollama_model    : nombre del modelo Ollama para narrativa
+        ollama_model    : nombre del modelo Ollama para narrativa (legacy)
+        llm_backend     : backend LLM para narrativa — "gemini", "claude",
+                          o nombre de modelo Ollama. Tiene precedencia sobre
+                          ollama_model si ambos están definidos.
         output_path     : si se provee, guarda el bundle en disco
 
     Returns:
@@ -1301,9 +1359,10 @@ def run_vigia(
     # Generar narrativa DESPUÉS del sellado — post-procesador externo
     # El LLM recibe el bundle ya cerrado, no modifica nada
     narrative = None
-    if ollama_model:
+    _active_backend = llm_backend or ollama_model
+    if _active_backend:
         try:
-            narrative = pipeline.generate_narrative(bundle, model=ollama_model)
+            narrative = pipeline.generate_narrative(bundle, model=_active_backend)
         except Exception as e:
             logger.warning("[run_vigia] Narrativa no generada: %s", e)
 
@@ -1372,7 +1431,16 @@ def main() -> int:
     )
     parser.add_argument(
         "--ollama", default=None,
-        help="Modelo Ollama para narrativa (ej: llama3.2)",
+        help="Modelo Ollama para narrativa (ej: llama3.2) — legacy, prefer --llm",
+    )
+    parser.add_argument(
+        "--llm", default=None,
+        help=(
+            "Backend LLM para narrativa ENFSI post-veredicto. "
+            "Valores: 'gemini' (requiere GEMINI_API_KEY), "
+            "'claude' (requiere ANTHROPIC_API_KEY), "
+            "o nombre de modelo Ollama local (ej: gemma3:27b)."
+        ),
     )
 
     args = parser.parse_args()
@@ -1391,6 +1459,7 @@ def main() -> int:
         calibration_path=args.calibration,
         covariance_path=args.covariance,
         ollama_model=args.ollama,
+        llm_backend=args.llm,
         output_path=args.output,
     )
 
