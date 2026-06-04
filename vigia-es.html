@@ -1,0 +1,788 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VIGÍA — Semántica Forense de la Intención</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900&family=IBM+Plex+Mono:wght@300;400;500;600&family=Hanken+Grotesk:wght@300;400;500;600;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+<style>
+  :root{
+    --ink:#0a0b0f;
+    --ink-2:#0e1016;
+    --ink-3:#13161f;
+    --ink-4:#1a1e29;
+    --bone:#e9e4d6;
+    --bone-dim:#9a978a;
+    --bone-faint:#5d5c54;
+    --signal:#e9a23b;       /* ámbar del vigía */
+    --verify:#3fd0c9;       /* teal genuino */
+    --malice:#ff5d52;
+    --abstain:#5b9dff;
+    --line:rgba(233,228,214,.10);
+    --line-2:rgba(233,228,214,.06);
+    --serif:'Fraunces',Georgia,serif;
+    --mono:'IBM Plex Mono',ui-monospace,monospace;
+    --sans:'Hanken Grotesk',system-ui,sans-serif;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    background:var(--ink);
+    color:var(--bone);
+    font-family:var(--sans);
+    font-weight:300;
+    line-height:1.6;
+    overflow-x:hidden;
+    -webkit-font-smoothing:antialiased;
+  }
+  body::before{
+    content:"";position:fixed;inset:0;z-index:9999;pointer-events:none;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.4'/%3E%3C/svg%3E");
+    opacity:.035;mix-blend-mode:overlay;
+  }
+  body::after{
+    content:"";position:fixed;inset:0;z-index:9998;pointer-events:none;
+    background:repeating-linear-gradient(0deg,rgba(0,0,0,0) 0,rgba(0,0,0,0) 2px,rgba(0,0,0,.13) 3px);
+    opacity:.4;
+  }
+  ::selection{background:var(--signal);color:var(--ink)}
+
+  .mono{font-family:var(--mono)}
+  .eyebrow{
+    font-family:var(--mono);font-size:.7rem;letter-spacing:.32em;text-transform:uppercase;
+    color:var(--signal);font-weight:500;
+  }
+  h1,h2,h3{font-family:var(--serif);font-weight:400;line-height:1.04;letter-spacing:-.02em}
+  .katex{font-size:1.05em}
+  .katex .mord,.katex .mbin,.katex .mrel,.katex .mopen,.katex .mclose,.katex .mop{color:var(--bone)}
+
+  .wrap{max-width:1180px;margin:0 auto;padding:0 32px}
+  section{position:relative}
+  .pad{padding:clamp(80px,11vw,170px) 0}
+  .divider{height:1px;background:var(--line);margin:0 32px}
+
+  nav{
+    position:fixed;top:0;left:0;right:0;z-index:1000;
+    display:flex;align-items:center;justify-content:space-between;
+    padding:18px 32px;
+    background:linear-gradient(180deg,rgba(10,11,15,.92),rgba(10,11,15,0));
+    backdrop-filter:blur(6px);
+    transition:background .3s;
+  }
+  nav.solid{background:rgba(10,11,15,.94);border-bottom:1px solid var(--line);backdrop-filter:blur(12px)}
+  .brand{display:flex;align-items:center;gap:11px;font-family:var(--mono);font-weight:500;letter-spacing:.18em;font-size:.92rem}
+  .reticle{width:18px;height:18px;position:relative;flex:none}
+  .reticle::before,.reticle::after{content:"";position:absolute;background:var(--signal)}
+  .reticle::before{left:50%;top:0;bottom:0;width:1px;transform:translateX(-.5px)}
+  .reticle::after{top:50%;left:0;right:0;height:1px;transform:translateY(-.5px)}
+  .reticle span{position:absolute;inset:3px;border:1px solid var(--signal);border-radius:50%;animation:spin 9s linear infinite}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .navlinks{display:flex;gap:26px;font-family:var(--mono);font-size:.72rem;letter-spacing:.12em;text-transform:uppercase}
+  .navlinks a{color:var(--bone-dim);text-decoration:none;transition:color .2s}
+  .navlinks a:hover{color:var(--bone)}
+  @media(max-width:820px){.navlinks{display:none}}
+
+  #hero{height:100vh;min-height:680px;display:flex;align-items:center;overflow:hidden}
+  #radar{position:absolute;inset:0;width:100%;height:100%;z-index:0}
+  .hero-vig{position:absolute;inset:0;z-index:1;pointer-events:none;
+    background:radial-gradient(ellipse 80% 60% at 50% 45%,transparent 30%,var(--ink) 92%)}
+  .hero-inner{position:relative;z-index:2;width:100%}
+  .hero-tag{display:flex;gap:18px;align-items:center;margin-bottom:30px;flex-wrap:wrap}
+  .hero-tag .dot{width:7px;height:7px;border-radius:50%;background:var(--verify);box-shadow:0 0 12px var(--verify);animation:pulse 2.4s ease-in-out infinite}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+  h1.title{font-size:clamp(4.2rem,16vw,12rem);letter-spacing:-.04em;line-height:.82;font-weight:300}
+  h1.title em{font-style:italic;font-weight:500;color:var(--signal)}
+  .hero-lede{font-family:var(--serif);font-size:clamp(1.3rem,2.6vw,2rem);font-weight:300;max-width:760px;margin-top:34px;line-height:1.3;color:var(--bone)}
+  .hero-lede b{color:var(--signal);font-weight:500;font-style:italic}
+  .hero-meta{display:flex;gap:40px;margin-top:46px;flex-wrap:wrap;font-family:var(--mono);font-size:.78rem;color:var(--bone-dim)}
+  .hero-meta b{display:block;color:var(--bone);font-size:1.5rem;font-weight:400;letter-spacing:.02em}
+  .scrollcue{position:absolute;bottom:28px;left:50%;transform:translateX(-50%);z-index:3;font-family:var(--mono);font-size:.64rem;letter-spacing:.3em;text-transform:uppercase;color:var(--bone-faint);text-align:center}
+  .scrollcue .ln{display:block;width:1px;height:34px;background:linear-gradient(var(--signal),transparent);margin:10px auto 0;animation:drop 2s ease-in-out infinite}
+  @keyframes drop{0%{opacity:0;transform:scaleY(0);transform-origin:top}50%{opacity:1;transform:scaleY(1)}100%{opacity:0;transform:scaleY(1) translateY(8px)}}
+
+  .rev{opacity:0;transform:translateY(28px);transition:opacity .9s cubic-bezier(.16,1,.3,1),transform .9s cubic-bezier(.16,1,.3,1)}
+  .rev.in{opacity:1;transform:none}
+  .rev.d1{transition-delay:.08s}.rev.d2{transition-delay:.16s}.rev.d3{transition-delay:.24s}.rev.d4{transition-delay:.32s}
+
+  .shead{max-width:780px;margin-bottom:64px}
+  .shead h2{font-size:clamp(2.4rem,5vw,4rem);margin:18px 0}
+  .shead p{font-size:1.18rem;color:var(--bone-dim);font-weight:300;line-height:1.55}
+  .idx{font-family:var(--mono);font-size:.72rem;color:var(--bone-faint);letter-spacing:.2em}
+
+  .shift{display:grid;grid-template-columns:1fr 1fr;gap:0;border:1px solid var(--line);border-radius:4px;overflow:hidden}
+  @media(max-width:760px){.shift{grid-template-columns:1fr}}
+  .shift>div{padding:48px 44px}
+  .shift .old{background:var(--ink-2);border-right:1px solid var(--line)}
+  .shift .new{background:linear-gradient(135deg,rgba(233,162,59,.08),transparent)}
+  @media(max-width:760px){.shift .old{border-right:none;border-bottom:1px solid var(--line)}}
+  .shift h3{font-size:1.9rem;margin:14px 0 18px}
+  .shift .old h3{color:var(--bone-dim)}
+  .shift .new h3{color:var(--signal)}
+  .shift .q{font-family:var(--mono);font-size:.95rem;letter-spacing:.04em;padding:9px 0;border-top:1px solid var(--line-2);color:var(--bone-dim)}
+  .shift .new .q{color:var(--bone)}
+  .strike{text-decoration:line-through;text-decoration-color:var(--malice);text-decoration-thickness:2px;opacity:.6}
+  .cui{margin-top:30px;font-family:var(--serif);font-style:italic;font-size:1.5rem;color:var(--signal);text-align:center}
+  .cui small{display:block;font-family:var(--mono);font-style:normal;font-size:.7rem;letter-spacing:.2em;color:var(--bone-faint);margin-top:8px;text-transform:uppercase}
+
+  .grid4{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;background:var(--line);border:1px solid var(--line);border-radius:4px;overflow:hidden}
+  @media(max-width:760px){.grid4{grid-template-columns:1fr}}
+  .fcard{background:var(--ink-2);padding:38px 36px;transition:background .35s;position:relative}
+  .fcard:hover{background:var(--ink-3)}
+  .fcard .who{font-family:var(--mono);font-size:.72rem;letter-spacing:.18em;color:var(--signal);text-transform:uppercase}
+  .fcard h3{font-size:1.6rem;margin:12px 0 6px}
+  .fcard .yr{font-family:var(--mono);font-size:.72rem;color:var(--bone-faint);margin-bottom:18px}
+  .fcard p{color:var(--bone-dim);font-size:1rem}
+  .fcard .vig{margin-top:20px;padding-top:18px;border-top:1px solid var(--line-2);font-size:.92rem;color:var(--bone)}
+  .fcard .vig b{color:var(--verify);font-weight:500}
+
+  .triwrap{display:grid;grid-template-columns:1.1fr .9fr;gap:48px;align-items:center;margin-top:60px}
+  @media(max-width:820px){.triwrap{grid-template-columns:1fr}}
+  .tri svg{width:100%;height:auto;overflow:visible}
+  .tri text{font-family:var(--mono);fill:var(--bone)}
+  .tri .node{cursor:pointer}
+  .tri .node circle{transition:r .25s,fill .25s}
+  .tri .node:hover circle{fill:var(--signal)}
+  .triinfo h3{font-size:1.7rem;margin-bottom:10px;color:var(--signal)}
+  .triinfo p{color:var(--bone-dim);min-height:5.6em}
+
+  .lab{border:1px solid var(--line);border-radius:6px;background:var(--ink-2);overflow:hidden;margin-bottom:40px}
+  .lab-head{padding:24px 30px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:8px;background:var(--ink-3)}
+  .lab-head h3{font-size:1.4rem}
+  .lab-head .tag{font-family:var(--mono);font-size:.68rem;letter-spacing:.18em;color:var(--bone-faint);text-transform:uppercase}
+  .lab-body{padding:30px}
+  .lab-grid{display:grid;grid-template-columns:1fr 1fr;gap:36px}
+  @media(max-width:820px){.lab-grid{grid-template-columns:1fr}}
+  .formula{background:var(--ink);border:1px solid var(--line-2);border-radius:5px;padding:22px 24px;margin:6px 0 22px;overflow-x:auto}
+  .formula .cap{font-family:var(--mono);font-size:.68rem;color:var(--bone-faint);letter-spacing:.12em;text-transform:uppercase;margin-bottom:12px}
+  .note{font-size:.92rem;color:var(--bone-dim);margin-top:4px}
+
+  .ctrl{margin-bottom:20px}
+  .ctrl .row{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:7px}
+  .ctrl label{font-family:var(--mono);font-size:.82rem;color:var(--bone);letter-spacing:.03em}
+  .ctrl label small{color:var(--bone-faint);font-size:.72rem;display:block;letter-spacing:0}
+  .ctrl .val{font-family:var(--mono);font-size:.95rem;color:var(--signal);font-weight:500}
+  input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:3px;background:var(--ink-4);border-radius:3px;outline:none}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:15px;height:15px;border-radius:50%;background:var(--signal);cursor:pointer;box-shadow:0 0 0 4px rgba(233,162,59,.16);transition:box-shadow .2s}
+  input[type=range]::-webkit-slider-thumb:hover{box-shadow:0 0 0 7px rgba(233,162,59,.2)}
+  input[type=range]::-moz-range-thumb{width:15px;height:15px;border:none;border-radius:50%;background:var(--signal);cursor:pointer}
+
+  .readout{background:var(--ink);border:1px solid var(--line);border-radius:5px;padding:26px;height:100%;display:flex;flex-direction:column;justify-content:center}
+  .bignum{font-family:var(--mono);font-size:3.2rem;font-weight:300;letter-spacing:-.02em;line-height:1}
+  .verdictbadge{display:inline-flex;align-items:center;gap:10px;font-family:var(--mono);font-weight:500;letter-spacing:.14em;text-transform:uppercase;font-size:1.05rem;padding:11px 18px;border-radius:4px;border:1px solid;margin-top:18px;transition:all .35s}
+  .reason{font-family:var(--mono);font-size:.82rem;color:var(--bone-dim);margin-top:14px;letter-spacing:.04em}
+
+  .meter{position:relative;height:14px;border-radius:8px;margin:24px 0 6px;background:linear-gradient(90deg,var(--verify) 0%,var(--verify) 5%,var(--abstain) 16%,var(--abstain) 84%,var(--malice) 95%,var(--malice) 100%);opacity:.55}
+  .meter .zone{position:absolute;top:-22px;font-family:var(--mono);font-size:.6rem;letter-spacing:.1em;color:var(--bone-faint);text-transform:uppercase}
+  .meter-track{position:relative;height:46px;margin-top:4px}
+  .needle{position:absolute;top:0;width:2px;height:30px;background:var(--bone);box-shadow:0 0 8px var(--bone);transition:left .25s cubic-bezier(.16,1,.3,1)}
+  .needle::after{content:"";position:absolute;top:30px;left:50%;transform:translateX(-50%);border:5px solid transparent;border-top-color:var(--bone)}
+  .gatemark{position:absolute;top:0;width:1px;height:24px;background:var(--bone-faint)}
+
+  .enfsi{display:flex;border:1px solid var(--line);border-radius:5px;overflow:hidden;margin-top:8px}
+  .enfsi div{flex:1;text-align:center;padding:12px 4px;font-family:var(--mono);font-size:.62rem;letter-spacing:.06em;text-transform:uppercase;color:var(--bone-faint);border-right:1px solid var(--line-2);transition:all .3s}
+  .enfsi div:last-child{border-right:none}
+  .enfsi div.on{background:var(--signal);color:var(--ink);font-weight:600}
+
+  .src{display:flex;align-items:center;gap:14px;padding:13px 16px;border:1px solid var(--line);border-radius:5px;margin-bottom:10px;cursor:pointer;transition:all .25s;background:var(--ink)}
+  .src.on{border-color:var(--verify);background:rgba(63,208,201,.06)}
+  .src .sw{width:34px;height:19px;border-radius:12px;background:var(--ink-4);position:relative;flex:none;transition:background .25s}
+  .src.on .sw{background:var(--verify)}
+  .src .sw::after{content:"";position:absolute;top:2px;left:2px;width:15px;height:15px;border-radius:50%;background:var(--bone);transition:left .25s}
+  .src.on .sw::after{left:17px;background:var(--ink)}
+  .src .name{font-family:var(--mono);font-size:.85rem;flex:1}
+  .src .name small{display:block;color:var(--bone-faint);font-size:.7rem}
+  .src .sc{font-family:var(--mono);font-size:.9rem;color:var(--signal)}
+  .penalty{font-family:var(--mono);font-size:.78rem;padding:10px 14px;border-radius:4px;margin-top:14px;background:rgba(255,93,82,.08);border:1px solid rgba(255,93,82,.3);color:var(--malice);opacity:0;transition:opacity .3s}
+  .penalty.show{opacity:1}
+
+  .ladder{display:flex;flex-direction:column;gap:0;border:1px solid var(--line);border-radius:5px;overflow:hidden}
+  .rung{padding:13px 18px;border-bottom:1px solid var(--line-2);display:flex;justify-content:space-between;align-items:center;font-family:var(--mono);font-size:.82rem;color:var(--bone-faint);transition:all .3s;background:var(--ink)}
+  .rung:last-child{border-bottom:none}
+  .rung .cond{color:var(--bone-dim);font-size:.72rem}
+  .rung.active{background:var(--ink-4);color:var(--bone);padding-left:24px}
+  .rung.active .cond{color:var(--signal)}
+  .rung .st{font-weight:500;letter-spacing:.08em}
+
+  .det{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line);border-radius:4px;overflow:hidden}
+  @media(max-width:760px){.det{grid-template-columns:1fr}}
+  .det>div{background:var(--ink-2);padding:34px 30px}
+  .det h3{font-size:1.3rem;margin-bottom:12px}
+  .det p{color:var(--bone-dim);font-size:.95rem}
+  .det .hash{font-family:var(--mono);font-size:.66rem;color:var(--verify);word-break:break-all;margin-top:16px;padding:12px;background:var(--ink);border-radius:4px;border:1px solid var(--line-2);line-height:1.5}
+  .compare{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:18px}
+  .compare div{font-family:var(--mono);font-size:.82rem;padding:14px;border-radius:4px;border:1px solid var(--line-2)}
+  .compare .bad{color:var(--malice);background:rgba(255,93,82,.05)}
+  .compare .good{color:var(--verify);background:rgba(63,208,201,.05)}
+
+  .pipe{display:flex;gap:0;flex-wrap:wrap;border:1px solid var(--line);border-radius:5px;overflow:hidden}
+  .pstep{flex:1;min-width:150px;padding:26px 22px;border-right:1px solid var(--line-2);position:relative;transition:background .3s}
+  .pstep:last-child{border-right:none}
+  .pstep:hover{background:var(--ink-3)}
+  .pstep .n{font-family:var(--mono);font-size:.7rem;color:var(--signal);letter-spacing:.1em}
+  .pstep h4{font-family:var(--serif);font-size:1.15rem;font-weight:400;margin:8px 0 6px}
+  .pstep p{font-size:.82rem;color:var(--bone-dim)}
+
+  #close{text-align:center;background:radial-gradient(ellipse 90% 70% at 50% 0%,rgba(233,162,59,.06),transparent 70%)}
+  #close h2{font-size:clamp(2.6rem,7vw,6rem);line-height:.95;margin-bottom:30px}
+  #close h2 em{font-style:italic;color:var(--signal)}
+  .countbox{font-family:var(--mono);font-size:clamp(3rem,12vw,9rem);font-weight:300;letter-spacing:-.03em;color:var(--bone);line-height:1}
+  .countbox small{display:block;font-size:.8rem;letter-spacing:.3em;color:var(--bone-faint);text-transform:uppercase;margin-top:14px;font-weight:400}
+
+  footer{padding:60px 0 80px;border-top:1px solid var(--line);text-align:center;font-family:var(--mono);font-size:.72rem;color:var(--bone-faint);letter-spacing:.06em}
+  footer .reticle{display:inline-block;margin-bottom:18px}
+</style>
+</head>
+<body>
+
+<nav id="nav">
+  <div class="brand"><span class="reticle"><span></span></span>VIGÍA</div>
+  <div class="navlinks">
+    <a href="#shift">Paradigma</a>
+    <a href="#found">Fundamentos</a>
+    <a href="#math">Matemática</a>
+    <a href="#trust">Admisibilidad</a>
+    <a href="#pipe">Pipeline</a>
+  </div>
+</nav>
+
+<!-- ============ HERO ============ -->
+<section id="hero">
+  <canvas id="radar"></canvas>
+  <div class="hero-vig"></div>
+  <div class="hero-inner wrap">
+    <div class="hero-tag rev in">
+      <span class="dot"></span>
+      <span class="eyebrow">Semántica Forense de la Intención · Protocolo P2</span>
+    </div>
+    <h1 class="title rev in d1">VIG<em>Í</em>A</h1>
+    <p class="hero-lede rev in d2">Un motor forense que no pregunta <span class="strike">qué&nbsp;pasó</span>.<br>Pregunta <b>por qué — y a quién beneficia.</b></p>
+    <div class="hero-meta rev in d3">
+      <div><b id="lc-hero">0</b>líneas de análisis puro</div>
+      <div><b>22</b>vectores canónicos, de punta a punta</div>
+      <div><b>0</b>modelos opacos · totalmente determinista</div>
+    </div>
+  </div>
+  <div class="scrollcue">Desplazá para interrogar<span class="ln"></span></div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ============ PARADIGMA ============ -->
+<section id="shift" class="pad"><div class="wrap">
+  <div class="shead rev">
+    <span class="idx">01 — EL GIRO PARADIGMÁTICO</span>
+    <h2>La forense clásica reconstruye hechos. VIGÍA reconstruye el <em style="font-family:var(--serif);font-style:italic;color:var(--signal)">móvil</em>.</h2>
+    <p>Una línea de tiempo te dice que un archivo se borró a las 03:14. No te puede decir si fue higiene de rutina, pánico, o una coartada plantada. VIGÍA trata cada artefacto como un <em>signo</em> — y lee la intención a la que apunta.</p>
+  </div>
+  <div class="shift rev d1">
+    <div class="old">
+      <span class="eyebrow" style="color:var(--bone-faint)">DFIR convencional</span>
+      <h3>Qué pasó</h3>
+      <div class="q">› ¿Qué bytes cambiaron?</div>
+      <div class="q">› ¿Cuándo se lanzó el proceso?</div>
+      <div class="q">› ¿Cuál es la cadena de custodia?</div>
+      <div class="q">› Reconstruir la línea de tiempo.</div>
+    </div>
+    <div class="new">
+      <span class="eyebrow">VIGÍA · Indicador de Intención</span>
+      <h3>Por qué, y a quién beneficia</h3>
+      <div class="q">› ¿Qué <em>busca afirmar</em> este artefacto?</div>
+      <div class="q">› ¿Qué máxima de Grice se está violando?</div>
+      <div class="q">› ¿El efecto precede a su propia causa?</div>
+      <div class="q">› <em>Cui bono</em> — ¿a quién favorece esta lectura?</div>
+    </div>
+  </div>
+  <div class="cui rev d2">“cui bono?”<small>La pregunta más antigua de la forense, ahora formalizada</small></div>
+</div></section>
+
+<div class="divider"></div>
+
+<!-- ============ FUNDAMENTOS ============ -->
+<section id="found" class="pad"><div class="wrap">
+  <div class="shead rev">
+    <span class="idx">02 — FUNDAMENTOS EPISTEMOLÓGICOS</span>
+    <h2>No heurísticas. Una teoría del significado.</h2>
+    <p>VIGÍA se apoya en cuatro siglos de trabajo sobre cómo los signos portan intención — y en las disciplinas que mantienen la interpretación honesta. Cada regla de scoring se remonta a una epistemología publicada, no a una corazonada.</p>
+  </div>
+
+  <div class="grid4 rev d1">
+    <div class="fcard">
+      <span class="who">Charles Sanders Peirce</span>
+      <h3>Semiosis triádica y abducción</h3>
+      <div class="yr">Semiótica · c. 1903</div>
+      <p>Un signo nunca es solo una cosa — es una relación entre un <em>representamen</em>, su <em>objeto</em>, y el <em>interpretante</em> que produce. La inferencia a la mejor explicación (abducción) es como saltamos de la huella a la causa.</p>
+      <div class="vig">VIGÍA trata cada artefacto como representamen y ejecuta <b>cierre abductivo</b> hacia la intención más parsimoniosa.</div>
+    </div>
+    <div class="fcard">
+      <span class="who">Umberto Eco</span>
+      <h3>Los límites de la interpretación</h3>
+      <div class="yr">Sobreinterpretación · 1990</div>
+      <p>Un texto restringe sus lecturas. El “lector paranoico” encuentra conspiración en todo; Eco insiste en que el objeto se resiste. Leer malicia en mero ruido es, en sí mismo, un error.</p>
+      <div class="vig">El <b>veredicto NOISE</b> y el veto de cierre causal son el freno de Eco — VIGÍA se niega a sobreinterpretar.</div>
+    </div>
+    <div class="fcard">
+      <span class="who">H. P. Grice</span>
+      <h3>Las máximas cooperativas</h3>
+      <div class="yr">Lógica y conversación · 1975</div>
+      <p>La comunicación supone Cantidad, Cualidad, Relación, Manera. Una violación <em>encubierta</em> de Cualidad es la estructura exacta de una mentira; una transgresión abierta es ironía. El patrón de violación es señal.</p>
+      <div class="vig">Los perfiles de violación de máximas alimentan directamente las features de <b>Indicador de Intención</b> de VIGÍA.</div>
+    </div>
+    <div class="fcard">
+      <span class="who">ENFSI · Daubert</span>
+      <h3>Admisible por construcción</h3>
+      <div class="yr">Estándares forenses · 2015 / 1993</div>
+      <p>La evidencia debe ser comprobable, tener una tasa de error conocida, y reportar su fuerza como un <em>ratio de verosimilitud</em> — no como un veredicto disfrazado de certeza. Los tribunales rechazan las cajas negras.</p>
+      <div class="vig">Cada score aterriza en la <b>escala verbal ENFSI</b>; cada decisión pasa la checklist de Daubert.</div>
+    </div>
+  </div>
+
+  <div class="triwrap rev d2">
+    <div class="tri">
+      <svg viewBox="0 0 460 360" role="img" aria-label="Triángulo semiótico de Peirce">
+        <line x1="80" y1="300" x2="230" y2="60" stroke="rgba(233,228,214,.18)" stroke-width="1"/>
+        <line x1="230" y1="60" x2="380" y2="300" stroke="rgba(233,228,214,.18)" stroke-width="1"/>
+        <line x1="80" y1="300" x2="380" y2="300" stroke="rgba(233,228,214,.18)" stroke-width="1" stroke-dasharray="4 5"/>
+        <g class="node" data-k="sign">
+          <circle cx="230" cy="60" r="13" fill="var(--signal)"/>
+          <text x="230" y="36" text-anchor="middle" font-size="13">SIGNO</text>
+          <text x="230" y="92" text-anchor="middle" font-size="9" fill="var(--bone-dim)">el artefacto</text>
+        </g>
+        <g class="node" data-k="object">
+          <circle cx="80" cy="300" r="13" fill="var(--verify)"/>
+          <text x="80" y="332" text-anchor="middle" font-size="13">OBJETO</text>
+          <text x="80" y="346" text-anchor="middle" font-size="9" fill="var(--bone-dim)">la intención</text>
+        </g>
+        <g class="node" data-k="interp">
+          <circle cx="380" cy="300" r="13" fill="var(--abstain)"/>
+          <text x="380" y="332" text-anchor="middle" font-size="13">INTERPRETANTE</text>
+          <text x="380" y="346" text-anchor="middle" font-size="9" fill="var(--bone-dim)">la lectura de VIGÍA</text>
+        </g>
+      </svg>
+    </div>
+    <div class="triinfo">
+      <h3 id="tri-h">La unidad de evidencia es un signo</h3>
+      <p id="tri-p">Pasá el cursor por un vértice. La intuición de Peirce: el significado es irreduciblemente triple. Un log borrado (signo) apunta a un acto de ocultamiento (objeto) solo a través de una interpretación disciplinada (interpretante). VIGÍA hace explícito ese tercer término — auditable y falsable — para que la lectura misma pueda interrogarse.</p>
+    </div>
+  </div>
+</div></section>
+
+<div class="divider"></div>
+
+<!-- ============ MATEMÁTICA ============ -->
+<section id="math" class="pad"><div class="wrap">
+  <div class="shead rev">
+    <span class="idx">03 — LA MATEMÁTICA · EN VIVO</span>
+    <h2>No leas las ecuaciones. <em style="font-family:var(--serif);font-style:italic;color:var(--signal)">Operalas</em>.</h2>
+    <p>Cada fórmula de abajo es la regla de decisión real del Protocolo P2, corriendo en tu navegador. Movés los controles y ves al motor razonar. Esto es lo que se siente “auditable”.</p>
+  </div>
+
+  <!-- 3a Noisy-OR -->
+  <div class="lab rev d1">
+    <div class="lab-head"><h3>Fusión de evidencia — Noisy-OR (CAIE)</h3><span class="tag">§2 · evidencia independiente</span></div>
+    <div class="lab-body">
+      <div class="formula">
+        <div class="cap">compuesto sobre fuentes independientes</div>
+        <div id="f-noisyor"></div>
+      </div>
+      <div class="lab-grid">
+        <div>
+          <p class="note" style="margin-bottom:16px">Activá fuentes independientes. Noisy-OR nunca deja que la evidencia débil cancele la fuerte — la acumula. Pero menos de tres fuentes independientes dispara una penalización del 20% en la confianza: la corroboración no es opcional.</p>
+          <div id="src-list"></div>
+          <div class="penalty" id="penalty">⚠ &lt; 3 fuentes independientes — compuesto penalizado ×0,80</div>
+        </div>
+        <div class="readout">
+          <span class="tag" style="color:var(--bone-faint)">EVIDENCIA DE INTENCIÓN · COMPUESTA</span>
+          <div class="bignum" id="or-out" style="color:var(--signal)">0,000</div>
+          <p class="note" id="or-detail" style="margin-top:12px"></p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3b Likelihood ratio -->
+  <div class="lab rev">
+    <div class="lab-head"><h3>Ratio de verosimilitud → Fuerza ENFSI</h3><span class="tag">§3 · peso forense de la evidencia</span></div>
+    <div class="lab-body">
+      <div class="formula">
+        <div class="cap">log-verosimilitud descontada por correlación</div>
+        <div id="f-lr"></div>
+      </div>
+      <div class="lab-grid">
+        <div>
+          <div class="ctrl"><div class="row"><label>z&#8321; — desvío de señal<small>recortado a ±3σ</small></label><span class="val" id="z1v">2,5</span></div><input type="range" id="z1" min="0" max="5" step="0.1" value="2.5"></div>
+          <div class="ctrl"><div class="row"><label>z&#8322; — desvío de señal</label><span class="val" id="z2v">1,8</span></div><input type="range" id="z2" min="0" max="5" step="0.1" value="1.8"></div>
+          <div class="ctrl"><div class="row"><label>z&#8323; — desvío de señal</label><span class="val" id="z3v">3,2</span></div><input type="range" id="z3" min="0" max="5" step="0.1" value="3.2"></div>
+          <div class="ctrl"><div class="row"><label>media |ρ| — correlación entre señales<small>descuenta evidencia no independiente</small></label><span class="val" id="rhov">0,20</span></div><input type="range" id="rho" min="0" max="0.95" step="0.01" value="0.20"></div>
+        </div>
+        <div class="readout">
+          <span class="tag" style="color:var(--bone-faint)">RATIO DE VEROSIMILITUD (FABRICACIÓN)</span>
+          <div class="bignum" id="lr-out" style="color:var(--signal)">—</div>
+          <p class="note" id="lr-pfab" style="margin-top:10px"></p>
+          <span class="tag" style="color:var(--bone-faint);margin-top:20px;display:block">ESCALA VERBAL ENFSI</span>
+          <div class="enfsi" id="enfsi">
+            <div data-b="0">Débil<br>&lt;10</div>
+            <div data-b="1">Moderado<br>10–100</div>
+            <div data-b="2">Fuerte<br>10²–10³</div>
+            <div data-b="3">Muy fuerte<br>10³–10⁴</div>
+            <div data-b="4">Extremo<br>≥10⁴</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3c Capa de riesgo -->
+  <div class="lab rev" style="border-color:rgba(233,162,59,.3)">
+    <div class="lab-head" style="background:linear-gradient(135deg,rgba(233,162,59,.1),var(--ink-3))"><h3>★ Capa de Decisión Acotada por Riesgo</h3><span class="tag">§7 · el corazón del motor</span></div>
+    <div class="lab-body">
+      <div class="formula">
+        <div class="cap">funcional de riesgo · toda la aritmética en decimal, ROUND_HALF_EVEN</div>
+        <div id="f-risk"></div>
+      </div>
+      <div class="lab-grid">
+        <div>
+          <div class="ctrl"><div class="row"><label>P — posterior de autenticidad<small>1,0 = la evidencia es genuina</small></label><span class="val" id="Pv">0,50</span></div><input type="range" id="P" min="0" max="1" step="0.01" value="0.5"></div>
+          <div class="ctrl"><div class="row"><label>D — score de deriva<small>cambio distribucional</small></label><span class="val" id="Dv">0,10</span></div><input type="range" id="D" min="0" max="1" step="0.01" value="0.1"></div>
+          <div class="ctrl"><div class="row"><label>S — estabilidad del grafo</label><span class="val" id="Sv">0,90</span></div><input type="range" id="S" min="0" max="1" step="0.01" value="0.9"></div>
+          <div class="ctrl"><div class="row"><label>I — consistencia abductiva</label><span class="val" id="Iv">0,70</span></div><input type="range" id="I" min="0" max="1" step="0.01" value="0.7"></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-top:8px">
+            <div class="ctrl"><div class="row"><label>λ</label><span class="val" id="lamv">1,0</span></div><input type="range" id="lam" min="0.1" max="15" step="0.1" value="1"></div>
+            <div class="ctrl"><div class="row"><label>γ</label><span class="val" id="gamv">1,0</span></div><input type="range" id="gam" min="0.1" max="15" step="0.1" value="1"></div>
+            <div class="ctrl"><div class="row"><label>ω</label><span class="val" id="omv">1,0</span></div><input type="range" id="om" min="0.1" max="15" step="0.1" value="1"></div>
+          </div>
+        </div>
+        <div class="readout">
+          <span class="tag" style="color:var(--bone-faint)">RIESGO  r</span>
+          <div class="bignum" id="risk-out">0,000</div>
+          <div class="meter-track">
+            <div class="meter">
+              <span class="zone" style="left:0">aceptar</span>
+              <span class="zone" style="left:50%;transform:translateX(-50%)">abstener</span>
+              <span class="zone" style="right:0">rechazar</span>
+            </div>
+            <div class="gatemark" id="gate-a" style="left:5%"></div>
+            <div class="gatemark" id="gate-r" style="left:95%"></div>
+            <div class="needle" id="needle" style="left:0%"></div>
+          </div>
+          <div class="verdictbadge" id="risk-badge">—</div>
+          <div class="reason" id="risk-reason"></div>
+        </div>
+      </div>
+      <p class="note" style="margin-top:24px;border-top:1px solid var(--line-2);padding-top:18px">
+        <b style="color:var(--abstain)">ABSTAIN es un resultado de primera clase.</b> Donde la deriva, la inestabilidad o la inconsistencia dominan, el motor se niega a condenar — y nombra el <em>porqué</em> (<span class="mono">ABSTAIN_DRIFT</span>, <span class="mono">ABSTAIN_INSTABILITY</span>, <span class="mono">ABSTAIN_INTENTION</span>, <span class="mono">ABSTAIN_ZONE</span>). Los umbrales ε se leen de un PolicySpec sellado — nunca hardcodeados en la ruta de decisión.
+      </p>
+    </div>
+  </div>
+
+  <!-- 3d Cascada de veredicto -->
+  <div class="lab rev">
+    <div class="lab-head"><h3>Veredicto Cuatripartito — Cascada de 8 estados</h3><span class="tag">§6 + §10 · resolución ordenada</span></div>
+    <div class="lab-body">
+      <div class="lab-grid">
+        <div>
+          <div class="ctrl"><div class="row"><label>final_score<small>§6 score de intención crudo</small></label><span class="val" id="fsv">0,42</span></div><input type="range" id="fs" min="0" max="1" step="0.01" value="0.42"></div>
+          <div class="ctrl"><div class="row"><label>estabilidad<small>escala la confianza efectiva</small></label><span class="val" id="stv">0,85</span></div><input type="range" id="st" min="0" max="1" step="0.01" value="0.85"></div>
+          <div style="margin-top:18px;display:flex;flex-direction:column;gap:10px">
+            <div class="src" data-flag="effect"><div class="sw"></div><div class="name">EFFECT_BEFORE_CAUSE<small>compuerta dura — causalidad violada</small></div></div>
+            <div class="src" data-flag="degraded"><div class="sw"></div><div class="name">DEGRADED_MODE<small>integridad del motor comprometida</small></div></div>
+            <div class="src" data-flag="escalate"><div class="sw"></div><div class="name">dissent · escalation_required<small>colectivo de revisión dividido</small></div></div>
+          </div>
+          <div class="formula" style="margin-top:22px"><div class="cap">§6 veredicto base · §9 confianza efectiva</div><div id="f-verdict"></div></div>
+        </div>
+        <div>
+          <span class="tag" style="color:var(--bone-faint);display:block;margin-bottom:12px">TRAZA DE RESOLUCIÓN — gana la primera coincidencia</span>
+          <div class="ladder" id="ladder">
+            <div class="rung" data-st="ABSTAIN_DEGRADED"><span class="st">ABSTAIN_DEGRADED</span><span class="cond">degraded_mode</span></div>
+            <div class="rung" data-st="ESCALATE"><span class="st">ESCALATE</span><span class="cond">disenso requerido</span></div>
+            <div class="rung" data-st="MALICE_HIGH"><span class="st">MALICE_HIGH</span><span class="cond">malice · ef≥0,8</span></div>
+            <div class="rung" data-st="MALICE_MEDIUM"><span class="st">MALICE_MEDIUM</span><span class="cond">malice · 0,6–0,8</span></div>
+            <div class="rung" data-st="ABSTAIN_INSUFFICIENT"><span class="st">ABSTAIN_INSUFFICIENT</span><span class="cond">confianza&lt;0,6</span></div>
+            <div class="rung" data-st="BENIGN_HIGH"><span class="st">BENIGN_HIGH</span><span class="cond">benigno · ef≥0,8</span></div>
+            <div class="rung" data-st="BENIGN_MEDIUM"><span class="st">BENIGN_MEDIUM</span><span class="cond">benigno · 0,6–0,8</span></div>
+            <div class="rung" data-st="ABSTAIN_ZONE"><span class="st">ABSTAIN_ZONE</span><span class="cond">incertidumbre honesta</span></div>
+          </div>
+          <div class="readout" style="margin-top:16px;padding:18px">
+            <span class="tag" style="color:var(--bone-faint)">BASE · §6</span>
+            <div class="mono" id="base-v" style="font-size:1.1rem;margin:4px 0 12px;color:var(--bone)">—</div>
+            <span class="tag" style="color:var(--bone-faint)">ESTADO RESUELTO</span>
+            <div class="verdictbadge" id="cascade-badge" style="margin-top:8px">—</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div></section>
+
+<div class="divider"></div>
+
+<!-- ============ ADMISIBILIDAD ============ -->
+<section id="trust" class="pad"><div class="wrap">
+  <div class="shead rev">
+    <span class="idx">04 — DETERMINISMO Y ADMISIBILIDAD</span>
+    <h2>La misma entrada da el mismo byte, en toda máquina, para siempre.</h2>
+    <p>Un instrumento forense que da respuestas distintas en x86 y ARM no es evidencia — es una opinión. VIGÍA se niega por completo a la unidad de punto flotante. La reproducibilidad no es una feature; es el punto entero.</p>
+  </div>
+  <div class="det rev d1">
+    <div>
+      <span class="eyebrow">Decimal, no float</span>
+      <h3>Sin FPU. Sin deriva.</h3>
+      <p>Toda la aritmética corre en <span class="mono">decimal.Decimal</span> con precisión 28 y redondeo bancario. El <span class="mono">round()</span> nativo delega en libc y puede discrepar entre plataformas — por eso está prohibido en la ruta de decisión.</p>
+      <div class="compare">
+        <div class="bad">round(2.675,2)<br>→ 2,67 / 2,68 ⚠</div>
+        <div class="good">Decimal quantize<br>→ 2,68 ✓ siempre</div>
+      </div>
+    </div>
+    <div>
+      <span class="eyebrow">Sellado y hasheado</span>
+      <h3>Cada veredicto va firmado.</h3>
+      <p>Estado, veredicto crudo, confianza, estabilidad, integridad, flags adversariales y disenso se pliegan en un único hash canónico con claves ordenadas. Cambiá cualquier entrada y la huella cambia. A prueba de manipulación por diseño.</p>
+      <div class="hash">audit_hash = SHA-256(<br>&nbsp;&nbsp;state ‖ verdict ‖ confidence ‖<br>&nbsp;&nbsp;stability ‖ integrity ‖<br>&nbsp;&nbsp;adversarial ‖ dissent )</div>
+    </div>
+    <div>
+      <span class="eyebrow">Vectores canónicos</span>
+      <h3>22 vectores. Una verdad.</h3>
+      <p>La suite canónica completa se ancla a un único SHA-256. El agente corre los 22 de punta a punta contra un backend Python puro y uno NumPy — y deben coincidir, bit a bit.</p>
+      <div class="hash">Set canónico P2:<br>f7276a524a46149a2811d52f<br>9e5072d2a281df227f9d46d0<br>84a651d6420cf4ce</div>
+    </div>
+  </div>
+</div></section>
+
+<div class="divider"></div>
+
+<!-- ============ PIPELINE ============ -->
+<section id="pipe" class="pad"><div class="wrap">
+  <div class="shead rev">
+    <span class="idx">05 — DE PUNTA A PUNTA</span>
+    <h2>Una pasada autónoma, de la huella al veredicto.</h2>
+    <p>El planificador ingiere artefactos crudos y emite un veredicto firmado, conforme a STIX 2.1, con mapeos MITRE ATT&CK — sin humano en el loop, y sin un solo umbral hardcodeado.</p>
+  </div>
+  <div class="pipe rev d1">
+    <div class="pstep"><div class="n">01</div><h4>Normalizar</h4><p>z-scores sobre baselines MAD robustos; las señales pre-normalizadas pasan intactas.</p></div>
+    <div class="pstep"><div class="n">02</div><h4>Fusionar</h4><p>Noisy-OR dentro y entre fuentes; se aplica la penalización por corroboración.</p></div>
+    <div class="pstep"><div class="n">03</div><h4>Pesar</h4><p>Ratio de verosimilitud descontado por correlación sobre la escala ENFSI.</p></div>
+    <div class="pstep"><div class="n">04</div><h4>Cerrar</h4><p>Causal Closure Score en fracciones exactas; CCS ≤ ½ veta hacia ABSTAIN.</p></div>
+    <div class="pstep"><div class="n">05</div><h4>Acotar</h4><p>El funcional de riesgo resuelve ACCEPT / ABSTAIN / REJECT contra ε sellado.</p></div>
+    <div class="pstep"><div class="n">06</div><h4>Firmar</h4><p>Veredicto de 8 estados, ajustado por confianza efectiva, sellado con SHA-256 → STIX 2.1.</p></div>
+  </div>
+  <p class="note rev d2" style="margin-top:30px;text-align:center">Auto-calibrado entre corridas — <span class="mono">λ, γ, ε</span> se adaptan a las tasas observadas de falsos positivos/negativos, acotados a rangos defendibles bajo Daubert. Sin ML opaco en ninguna parte de la cadena.</p>
+</div></section>
+
+<div class="divider"></div>
+
+<!-- ============ CIERRE ============ -->
+<section id="close" class="pad"><div class="wrap">
+  <div class="rev"><span class="eyebrow">por qué VIGÍA es diferente</span></div>
+  <h2 class="rev d1">Se puede<br><em>interrogar.</em></h2>
+  <p class="hero-lede rev d2" style="margin:0 auto 60px;text-align:center">Los detectores de caja negra te dan un score y te piden confianza. VIGÍA te da un veredicto, la teoría que lo sostiene, la aritmética que lo produjo, y un hash que prueba que nadie lo tocó en el camino de salida.</p>
+  <div class="countbox rev d3" id="lc-final">0<small>líneas de código puro — cada una de ellas auditable</small></div>
+</div></section>
+
+<footer>
+  <span class="reticle"><span></span></span>
+  <div>VIGÍA FORENSIC SUITE · PROTOCOLO P2 · ESQUEMA v2.8</div>
+  <div style="margin-top:8px;color:var(--bone-faint)">Anclado en Peirce · Eco · Grice · ENFSI · Daubert — no en la confianza ciega.</div>
+</footer>
+
+<script defer>
+document.addEventListener('DOMContentLoaded',function(){
+  const LOC='es-AR';
+  const nav=document.getElementById('nav');
+  addEventListener('scroll',()=>nav.classList.toggle('solid',scrollY>40));
+
+  const io=new IntersectionObserver((es)=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target);}}),{threshold:.14});
+  document.querySelectorAll('.rev:not(.in)').forEach(el=>io.observe(el));
+
+  function K(id,tex){try{katex.render(tex,document.getElementById(id),{throwOnError:false,displayMode:true});}catch(e){}}
+  function renderMath(){
+    K('f-noisyor','C \\;=\\; 1-\\prod_{j}\\bigl(1-g_j\\bigr),\\qquad g_j=1-\\prod_{i}\\bigl(1-s_i\\bigr)');
+    K('f-lr','\\ell_i=\\tfrac{1}{2}\\,\\mathrm{clip}(z_i,\\pm3)^2,\\quad \\Lambda=\\exp\\!\\Big(\\textstyle\\sum_i \\ell_i\\,(1-\\overline{|\\rho|})\\Big),\\quad P_{\\text{fab}}=\\tfrac{\\Lambda}{1+\\Lambda}');
+    K('f-risk','r=(1-P)\\,(1+\\lambda D)\\,(1+\\gamma(1-S))\\,(1+\\omega(1-I))');
+    K('f-verdict','c_{\\text{ef}} = c\\,\\bigl(\\tfrac12+\\tfrac12\\,\\text{estabilidad}\\bigr)');
+  }
+  if(window.katex){renderMath();}else{let t=setInterval(()=>{if(window.katex){clearInterval(t);renderMath();}},60);}
+
+  /* ---------- radar ---------- */
+  const cv=document.getElementById('radar'),cx=cv.getContext('2d');
+  let W,H,nodes=[],sweep=0;
+  function resize(){W=cv.width=cv.offsetWidth*devicePixelRatio;H=cv.height=cv.offsetHeight*devicePixelRatio;
+    nodes=[];const n=Math.min(46,Math.floor(W*H/90000));
+    for(let i=0;i<n;i++)nodes.push({x:Math.random()*W,y:Math.random()*H,r:Math.random()*1.6+.6,flag:Math.random()<.16,ph:Math.random()*6.28});}
+  resize();addEventListener('resize',resize);
+  function draw(){
+    cx.clearRect(0,0,W,H);
+    const cxp=W*.5,cyp=H*.46,maxR=Math.hypot(W,H)*.5;
+    const a0=sweep,a1=sweep+0.5;
+    cx.save();cx.translate(cxp,cyp);
+    cx.beginPath();cx.moveTo(0,0);cx.arc(0,0,maxR,a0,a1);cx.closePath();
+    cx.fillStyle='rgba(233,162,59,0.05)';cx.fill();
+    cx.beginPath();cx.moveTo(0,0);cx.lineTo(Math.cos(a1)*maxR,Math.sin(a1)*maxR);
+    cx.strokeStyle='rgba(233,162,59,0.22)';cx.lineWidth=1*devicePixelRatio;cx.stroke();
+    cx.restore();
+    cx.strokeStyle='rgba(233,228,214,0.04)';cx.lineWidth=devicePixelRatio;
+    for(let r=maxR*.25;r<maxR;r+=maxR*.25){cx.beginPath();cx.arc(cxp,cyp,r,0,6.2832);cx.stroke();}
+    const t=performance.now()*.001;
+    nodes.forEach(nd=>{
+      let ang=Math.atan2(nd.y-cyp,nd.x-cxp);if(ang<0)ang+=6.2832;
+      let sw=sweep%6.2832;
+      let near=Math.abs(((ang-sw+6.2832)%6.2832));
+      let lit=near<0.5;
+      let baseA=0.18+Math.sin(t+nd.ph)*.08;
+      if(nd.flag){
+        cx.fillStyle=lit?`rgba(233,162,59,${0.5+0.5*(1-near/0.5)})`:`rgba(233,162,59,${baseA})`;
+        if(lit){cx.beginPath();cx.arc(nd.x,nd.y,nd.r*4,0,6.2832);cx.fillStyle=`rgba(233,162,59,${0.12*(1-near/0.5)})`;cx.fill();cx.fillStyle=`rgba(233,162,59,0.9)`;}
+      }else{
+        cx.fillStyle=lit?`rgba(63,208,201,${0.4+0.4*(1-near/0.5)})`:`rgba(233,228,214,${baseA})`;
+      }
+      cx.beginPath();cx.arc(nd.x,nd.y,nd.r,0,6.2832);cx.fill();
+    });
+    sweep+=0.006;
+    requestAnimationFrame(draw);
+  }
+  draw();
+
+  /* ---------- contadores ---------- */
+  const TARGET=118838;
+  function countUp(el,dur){let s=null;function f(ts){if(!s)s=ts;let p=Math.min((ts-s)/dur,1);p=1-Math.pow(1-p,3);el.textContent=Math.floor(p*TARGET).toLocaleString(LOC);if(p<1)requestAnimationFrame(f);}requestAnimationFrame(f);}
+  countUp(document.getElementById('lc-hero'),2200);
+  const finalC=document.getElementById('lc-final');
+  const io2=new IntersectionObserver((es)=>es.forEach(e=>{if(e.isIntersecting){countUp(finalC,1800);io2.unobserve(e.target);}}),{threshold:.4});
+  io2.observe(finalC.parentElement);
+
+  /* ---------- triángulo semiótico ---------- */
+  const triData={
+    sign:['El signo · representamen','Todo artefacto es un representamen — un log borrado, un timestamp, un giro de frase. Por sí solo no afirma nada. Es la huella visible que está en lugar de algo que no es.'],
+    object:['El objeto · la intención','A lo que el signo realmente apunta: ocultamiento, fabricación, coacción, o inocencia. El objeto nunca se observa directamente — solo se infiere. Esto es lo que VIGÍA está hecho para recuperar.'],
+    interp:['El interpretante · la lectura','La inferencia disciplinada que une signo con objeto. VIGÍA hace ese tercer término explícito, puntuado y hasheable — para que la lectura misma pueda subir al estrado y ser cuestionada.']
+  };
+  const triH=document.getElementById('tri-h'),triP=document.getElementById('tri-p');
+  document.querySelectorAll('.tri .node').forEach(n=>{
+    n.addEventListener('mouseenter',()=>{const d=triData[n.dataset.k];triH.textContent=d[0];triP.textContent=d[1];});
+  });
+
+  /* ---------- Noisy-OR ---------- */
+  const sources=[
+    {n:'Fractura de procedencia',d:'cadena de custodia rota',s:0.62,on:true},
+    {n:'Violación de máxima',d:'transgresión de Cualidad (Grice)',s:0.48,on:true},
+    {n:'Anomalía temporal',d:'proximidad efecto-antes-de-causa',s:0.71,on:true},
+    {n:'Auditoría visual (CLIP)',d:'discordancia semántica',s:0.40,on:false},
+    {n:'Fonético/homóglifo',d:'firma de evasión OPSEC',s:0.55,on:false}
+  ];
+  const list=document.getElementById('src-list');
+  function fmt3(x){return x.toFixed(3).replace('.',',');}
+  sources.forEach((src)=>{
+    const el=document.createElement('div');el.className='src'+(src.on?' on':'');
+    el.innerHTML=`<div class="sw"></div><div class="name">${src.n}<small>${src.d}</small></div><div class="sc">${src.s.toFixed(2).replace('.',',')}</div>`;
+    el.addEventListener('click',()=>{src.on=!src.on;el.classList.toggle('on',src.on);noisyOr();});
+    list.appendChild(el);
+  });
+  function noisyOr(){
+    const active=sources.filter(s=>s.on);
+    let prod=1;active.forEach(s=>prod*=(1-s.s));
+    let comp=1-prod;
+    const pen=active.length<3;
+    if(pen)comp*=0.80;
+    document.getElementById('or-out').textContent=fmt3(comp);
+    document.getElementById('or-detail').textContent=`${active.length} fuente${active.length!==1?'s':''} fusionada${active.length!==1?'s':''} · ${pen?'penalización activa':'corroboración alcanzada'}`;
+    document.getElementById('penalty').classList.toggle('show',pen);
+  }
+  noisyOr();
+
+  /* ---------- Ratio de verosimilitud ---------- */
+  const zEls=['z1','z2','z3'],enfsiDivs=document.querySelectorAll('#enfsi div');
+  function bind(id,fn){document.getElementById(id).addEventListener('input',fn);}
+  function lr(){
+    const rho=+document.getElementById('rho').value;
+    document.getElementById('rhov').textContent=rho.toFixed(2).replace('.',',');
+    let sum=0;
+    zEls.forEach(id=>{let z=+document.getElementById(id).value;document.getElementById(id+'v').textContent=z.toFixed(1).replace('.',',');let zc=Math.max(-3,Math.min(3,z));sum+=zc*zc/2;});
+    const comb=sum*(1-rho);
+    const L=Math.exp(comb);
+    const pfab=L/(1+L);
+    const out=document.getElementById('lr-out');
+    out.textContent = L>=1e4 ? L.toExponential(1).replace('.',',') : (L>=100?Math.round(L).toLocaleString(LOC):L.toFixed(1).replace('.',','));
+    document.getElementById('lr-pfab').textContent=`P(fabricación) = ${pfab.toFixed(4).replace('.',',')}`;
+    let band = L<10?0 : L<100?1 : L<1000?2 : L<10000?3 : 4;
+    enfsiDivs.forEach(d=>d.classList.toggle('on',+d.dataset.b===band));
+  }
+  ['z1','z2','z3','rho'].forEach(id=>bind(id,lr));lr();
+
+  /* ---------- Capa de riesgo ---------- */
+  const rIds=['P','D','S','I','lam','gam','om'];
+  function risk(){
+    const P=+document.getElementById('P').value,D=+document.getElementById('D').value,
+          S=+document.getElementById('S').value,I=+document.getElementById('I').value,
+          lam=+document.getElementById('lam').value,gam=+document.getElementById('gam').value,om=+document.getElementById('om').value;
+    document.getElementById('Pv').textContent=P.toFixed(2).replace('.',',');
+    document.getElementById('Dv').textContent=D.toFixed(2).replace('.',',');
+    document.getElementById('Sv').textContent=S.toFixed(2).replace('.',',');
+    document.getElementById('Iv').textContent=I.toFixed(2).replace('.',',');
+    document.getElementById('lamv').textContent=lam.toFixed(1).replace('.',',');
+    document.getElementById('gamv').textContent=gam.toFixed(1).replace('.',',');
+    document.getElementById('omv').textContent=om.toFixed(1).replace('.',',');
+    const fD=lam*D, fS=gam*(1-S), fI=om*(1-I);
+    const r=(1-P)*(1+fD)*(1+fS)*(1+fI);
+    const eps=0.05;
+    document.getElementById('risk-out').textContent=fmt3(r);
+    let pos=Math.max(0,Math.min(1, r))*100;
+    document.getElementById('needle').style.left=pos+'%';
+    const badge=document.getElementById('risk-badge'),reason=document.getElementById('risk-reason');
+    let state,reasonTxt,color;
+    if(r<=eps){state='ACCEPT';reasonTxt='razón: ACCEPT_POSTERIOR — la evidencia se lee como genuina';color='var(--verify)';}
+    else if(r>=1-eps){state='REJECT';reasonTxt='razón: REJECT_POSTERIOR — fabricación fuertemente indicada';color='var(--malice)';}
+    else{
+      state='ABSTAIN';color='var(--abstain)';
+      const m=Math.max(fD,fS,fI);
+      if(m===fD&&D>0.2)reasonTxt='razón: ABSTAIN_DRIFT — la deriva domina el riesgo';
+      else if(m===fS&&S<0.8)reasonTxt='razón: ABSTAIN_INSTABILITY — estabilidad del grafo muy baja';
+      else if(I<0.5)reasonTxt='razón: ABSTAIN_INTENTION — consistencia abductiva insuficiente';
+      else reasonTxt='razón: ABSTAIN_ZONE — sin causa dominante · incertidumbre honesta';
+    }
+    badge.textContent=state;badge.style.color=color;badge.style.borderColor=color;
+    badge.style.background = state==='ACCEPT'?'rgba(63,208,201,.1)':state==='REJECT'?'rgba(255,93,82,.1)':'rgba(91,157,255,.1)';
+    reason.textContent=reasonTxt;
+  }
+  rIds.forEach(id=>bind(id,risk));risk();
+
+  /* ---------- Cascada de veredicto ---------- */
+  const flags={effect:false,degraded:false,escalate:false};
+  document.querySelectorAll('[data-flag]').forEach(el=>{
+    el.addEventListener('click',()=>{const f=el.dataset.flag;flags[f]=!flags[f];el.classList.toggle('on',flags[f]);cascade();});
+  });
+  function cascade(){
+    const fs=+document.getElementById('fs').value, st=+document.getElementById('st').value;
+    document.getElementById('fsv').textContent=fs.toFixed(2).replace('.',',');
+    document.getElementById('stv').textContent=st.toFixed(2).replace('.',',');
+    let base,conf;
+    if(flags.effect){base='MALICE';conf=0.95;}
+    else if(fs>0.35){base='MALICE';conf=Math.min(0.95,fs*2);}
+    else if(fs>0.18){base='SUSPICION';conf=fs*2;}
+    else if(fs>0.08){base='UNKNOWN';conf=fs*2;}
+    else {base='NOISE';conf=1-fs;}
+    let raw = (base==='MALICE')?'MALICE' : (base==='NOISE')?'BENIGN' : 'ABSTAIN';
+    const effConf = conf*(0.5+0.5*st);
+    document.getElementById('base-v').textContent=`${base} · conf ${conf.toFixed(2).replace('.',',')} → ef ${effConf.toFixed(2).replace('.',',')}`;
+    let resolved;
+    if(flags.degraded)resolved='ABSTAIN_DEGRADED';
+    else if(flags.escalate)resolved='ESCALATE';
+    else if(raw==='MALICE'&&effConf>=0.8)resolved='MALICE_HIGH';
+    else if(raw==='MALICE'&&effConf>=0.6)resolved='MALICE_MEDIUM';
+    else if(effConf<0.6)resolved='ABSTAIN_INSUFFICIENT'; // fix: use effConf (not conf) — cascade must be consistent with attenuation model
+    else if(raw==='BENIGN'&&effConf>=0.8)resolved='BENIGN_HIGH';
+    else if(raw==='BENIGN'&&effConf>=0.6)resolved='BENIGN_MEDIUM';
+    else resolved='ABSTAIN_ZONE';
+    document.querySelectorAll('#ladder .rung').forEach(r=>r.classList.toggle('active',r.dataset.st===resolved));
+    const cb=document.getElementById('cascade-badge');
+    cb.textContent=resolved;
+    let col = resolved.startsWith('MALICE')?'var(--malice)':resolved.startsWith('BENIGN')?'var(--verify)':resolved==='ESCALATE'?'var(--signal)':'var(--abstain)';
+    cb.style.color=col;cb.style.borderColor=col;
+    cb.style.background = resolved.startsWith('MALICE')?'rgba(255,93,82,.1)':resolved.startsWith('BENIGN')?'rgba(63,208,201,.1)':resolved==='ESCALATE'?'rgba(233,162,59,.1)':'rgba(91,157,255,.1)';
+  }
+  bind('fs',cascade);bind('st',cascade);cascade();
+});
+</script>
+</body>
+</html>
