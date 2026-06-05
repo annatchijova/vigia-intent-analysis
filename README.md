@@ -642,3 +642,17 @@ Copyright (c) 2026 Anna Tchijova and the VIGÍA AI Collective.
 
 *"The question is not what happened, but why did someone make it happen —
 and who benefits from that interpretation?"* — VIGÍA
+
+---
+
+## Live analysis results
+
+Cases run via Claude + VIGÍA MCP (June 2026):
+
+**VIGIA-REAL-005 — Encrypt Them All** (false-positive gate)
+> Verdict: `SUSPICION` — PASS. Concealment capability confirmed, malicious purpose not established. Null hypothesis not rejected.
+
+**VIGIA-REAL-007 — Nitroba Harassment** (network attribution)
+> Verdict: `MALICE` — 91% confidence. Gmail session cookie extracted from plaintext HTTP provides direct identity binding.
+
+**Accuracy note:** Scores above reflect LLM-assisted mode (Claude via MCP). In fallback mode (no LLM, scorer-only), VIGIA-REAL-007 returns `SUSPICION` due to conservative spoofability defaults — the scorer requires fractures or raw scores from live SIFT analysis to reach MALICE without semantic reasoning. Fallback mode accuracy should be reported separately. See `KNOWN_LIMITATIONS.md`.
