@@ -1,0 +1,89 @@
+{
+  "case_id": "VIGIA-FP-003",
+  "case_name": "The Admin Post-it",
+  "description": "Finance user writes their password on a post-it visible on a conference room camera. A colleague sees it, sends it via internal chat, the user changes it. No credential abuse occurs.",
+  "abstention_risk": "medium",
+  "expected_verdict": "BENIGN",
+  "carnegie_pattern_expected": null,
+  "confidence_expected": 70,
+  "artifacts": [
+    {
+      "artifact_id": "fp003_01",
+      "evidence_type": "log_entry",
+      "source_tool": "sift_slack_export",
+      "timestamp": "2026-06-15T11:30:00Z",
+      "raw_score": 0.72,
+      "prior_trust": 0.3,
+      "provenance_chain": [
+        "sha256:fp003slk01"
+      ],
+      "description": "DM: 'Hey, saw your password on the post-it, sending it so you can change it'",
+      "metadata": {
+        "sender": "colleague@corp.com",
+        "recipient": "finance@corp.com",
+        "has_credential": true,
+        "action_taken": "password_changed"
+      }
+    },
+    {
+      "artifact_id": "fp003_02",
+      "evidence_type": "log_entry",
+      "source_tool": "sift_azure_ad",
+      "timestamp": "2026-06-15T11:35:00Z",
+      "raw_score": 0.05,
+      "prior_trust": 0.9,
+      "provenance_chain": [
+        "sha256:fp003aad02"
+      ],
+      "description": "Password change recorded 5 minutes after the message",
+      "metadata": {
+        "user": "finance@corp.com",
+        "change_time": "2026-06-15T11:35:00Z",
+        "initiated_by": "self"
+      }
+    },
+    {
+      "artifact_id": "fp003_03",
+      "evidence_type": "memory_process",
+      "source_tool": "sift_vision_ocr",
+      "timestamp": "2026-06-15T11:25:00Z",
+      "raw_score": 0.92,
+      "prior_trust": 0.6,
+      "provenance_chain": [
+        "sha256:fp003ocr03"
+      ],
+      "description": "Camera CONF-01: post-it visible on monitor with written password",
+      "metadata": {
+        "camera_id": "CONF-01",
+        "postit_detected": true,
+        "password_visible": true
+      }
+    }
+  ],
+  "temporal_violations": [],
+  "caie_fractures": [
+    {
+      "fracture_type": "CREDENTIAL_SHARING",
+      "severity": 0.2,
+      "interpretation": "Credential shared via non-secure channel, but with immediate remediation intent and actual change.",
+      "artifact_a": "fp003_01",
+      "artifact_b": "fp003_02"
+    }
+  ],
+  "peirce_expected": {
+    "firstness": "Credential shared via internal chat",
+    "secondness": "Colleague notifies for remediation, user changes password within 5 minutes, no unauthorised access follows",
+    "thirdness": "Habit of a responsible colleague, not a credential abuse pattern"
+  },
+  "devil_advocate": "Credential sharing via chat is malicious in any other context. Without knowing it was for remediation, this is MALICE.",
+  "source_dataset": "VIGÍA Synthetic Corpus — False Positive Suite",
+  "source_origin": "synthetic_vigia_collective",
+  "notes": "False positive test: credential sharing is malicious in any other context. Social context transforms the interpretation.",
+  "_consolidation": {
+    "consolidated_at": "2026-06-05T04:27:39.816083+00:00",
+    "parser_version": "2.4",
+    "schema_version": "1.1",
+    "source_file": "VIGIA_FP_FN_AMB.json",
+    "source_origin": "synthetic_vigia_collective"
+  }
+}

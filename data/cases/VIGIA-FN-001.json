@@ -1,0 +1,93 @@
+{
+  "case_id": "VIGIA-FN-001",
+  "case_name": "The Silent Ghost",
+  "description": "Attacker using stolen credentials from a marketing employee. Logs in during business hours (09:30), uses common tools (PowerShell, RDP, SMB), browses client files, compresses 500MB and uploads to personal Google Drive. No errors, no anomalous tools, no timestomping. The real employee was on vacation.",
+  "abstention_risk": "high",
+  "expected_verdict": "MALICE",
+  "carnegie_pattern_expected": null,
+  "confidence_expected": 82,
+  "artifacts": [
+    {
+      "artifact_id": "fn001_01",
+      "evidence_type": "log_entry",
+      "source_tool": "sift_azure_ad",
+      "timestamp": "2026-06-15T09:30:00Z",
+      "raw_score": 0.05,
+      "prior_trust": 0.9,
+      "provenance_chain": [
+        "sha256:fn001aad01"
+      ],
+      "description": "Successful login by marketing_user",
+      "metadata": {
+        "user": "marketing_user@corp.com",
+        "source_ip": "190.12.88.7",
+        "mfa": "approved",
+        "location": "Buenos Aires"
+      }
+    },
+    {
+      "artifact_id": "fn001_02",
+      "evidence_type": "memory_process",
+      "source_tool": "sift_netflow",
+      "timestamp": "2026-06-15T14:00:00Z",
+      "raw_score": 0.15,
+      "prior_trust": 0.2,
+      "provenance_chain": [
+        "sha256:fn001net02"
+      ],
+      "description": "Google Drive connection with 500MB uploaded from marketing_user workstation",
+      "metadata": {
+        "source_ip": "10.0.4.22",
+        "dest_ip": "142.250.185.78",
+        "bytes": 524288000,
+        "tool": "rclone",
+        "user": "marketing_user"
+      }
+    },
+    {
+      "artifact_id": "fn001_03",
+      "evidence_type": "log_entry",
+      "source_tool": "sift_hr_system",
+      "timestamp": "2026-06-14T00:00:00Z",
+      "raw_score": 0.08,
+      "prior_trust": 0.95,
+      "provenance_chain": [
+        "sha256:fn001hr03"
+      ],
+      "description": "marketing_user registered vacation from 2026-06-15 to 2026-06-30",
+      "metadata": {
+        "user": "marketing_user",
+        "pto_start": "2026-06-15",
+        "pto_end": "2026-06-30",
+        "approved_by": "manager_marketing"
+      }
+    }
+  ],
+  "temporal_violations": [],
+  "caie_fractures": [
+    {
+      "fracture_type": "TEMPORAL_IDENTITY_VIOLATION",
+      "severity": 0.95,
+      "interpretation": "User logged in during business hours but registered on vacation. Identity is in two places simultaneously.",
+      "artifact_a": "fn001_01",
+      "artifact_b": "fn001_03",
+      "ttp_id": "T1078"
+    }
+  ],
+  "peirce_expected": {
+    "firstness": "Normal login, common tools, business hours — everything appears legitimate",
+    "secondness": "User is on vacation per HR. Cannot be in the office and on vacation simultaneously. Absence of technical errors does not eliminate the identity contradiction",
+    "thirdness": "Attacker habit of using stolen credentials perfectly, leaving no technical errors. Perfection is the anomaly when the identity is compromised"
+  },
+  "devil_advocate": "There are no technical errors. Everything looks completely normal. The login, tools, and timing are all legitimate.",
+  "source_dataset": "VIGÍA Synthetic Corpus — False Negative Suite",
+  "source_origin": "synthetic_vigia_collective",
+  "notes": "False negative test: no technical errors. Everything is 'normal'. The only anomaly is the user's absence (HR). If VIGÍA does not consult non-technical systems (HR), it will return BENIGN/ABSTAIN.",
+  "_consolidation": {
+    "consolidated_at": "2026-06-05T04:27:39.816083+00:00",
+    "parser_version": "2.4",
+    "schema_version": "1.1",
+    "source_file": "VIGIA_FP_FN_AMB.json",
+    "source_origin": "synthetic_vigia_collective"
+  }
+}
