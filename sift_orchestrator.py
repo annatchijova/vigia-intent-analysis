@@ -66,12 +66,38 @@ class SIFTOrchestrator:
                 logger.error("[SIFT_SHIM] vol3 memory analysis failed: %s", e)
                 return self._error_result(str(e))
 
-        # Disco o mixto → intentar orchestrator real (requiere SIFT+rip.pl)
+        # Disk or mixed → real orchestrator via run_full_analysis
         try:
             sys.path.insert(0, str(Path(__file__).parent))
             from vigia.sift.sift_orchestrator import SIFTOrchestrator as _Real
             real = _Real(self.case_id)
-            return real.analyze(**kwargs)
+
+            # Map shim kwargs → run_full_analysis parameters
+            run_kwargs: Dict[str, Any] = {}
+            if kwargs.get("memory_path"):
+                run_kwargs["memory_dump_path"] = kwargs["memory_path"]
+            es = kwargs.get("event_stream")
+            if es:
+                run_kwargs["event_logs"] = es if isinstance(es, list) else [es]
+            lp = kwargs.get("log_path")
+            if lp and not str(lp).endswith(".json"):
+                run_kwargs["event_logs"] = lp if isinstance(lp, list) else [lp]
+            if kwargs.get("network_flows"):
+                run_kwargs["network_flows"] = kwargs["network_flows"]
+
+            # disk_path (E01) has no direct mapping — requires prior mounting
+            # and artifact extraction (ewfmount + registry hive extraction)
+            if kwargs.get("disk_path") and not run_kwargs:
+                logger.warning(
+                    "[SIFT_SHIM] E01 requires prior mounting. "
+                    "Mount with ewfmount, extract hives, then pass artifacts directly."
+                )
+                return self._error_result(
+                    "E01 disk image requires prior artifact extraction. "
+                    "Mount with ewfmount and pass registry_hives/event_logs explicitly."
+                )
+
+            return real.run_full_analysis(**run_kwargs)
         except Exception as e:
             logger.error("[SIFT_SHIM] Real orchestrator failed: %s", e)
             return self._error_result(str(e))

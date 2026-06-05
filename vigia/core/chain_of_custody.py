@@ -57,6 +57,24 @@ class ChainOfCustody:
         self.records.append(record)
         return record
 
+    def acquire(
+        self,
+        data: bytes,
+        actor: str = "vigia_system",
+        timestamp: str = "",
+    ) -> None:
+        """Compatibility shim: records raw-data acquisition into custody chain.
+        Called by SIFT modules as chain.acquire(bytes, actor, timestamp).
+        """
+        import hashlib
+        artifact_hash = hashlib.sha256(data).hexdigest()
+        self.add_record(
+            operation="ACQUIRE",
+            actor=actor,
+            artifact_hash=artifact_hash,
+            metadata={"data_size": len(data), "timestamp_utc": timestamp},
+        )
+
     def hash_file(self, path: str) -> str:
         """Calcula SHA-256 de un archivo."""
         h = hashlib.sha256()

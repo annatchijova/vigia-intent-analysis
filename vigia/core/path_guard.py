@@ -47,6 +47,7 @@ class PathGuard:
             Path("/var/vigia"),
             Path("/tmp/vigia"),
             Path("/home/vigia/cases"),
+            Path.home() / "vigia-repo" / "evidence",
         ]
 
     def validate(self, path_str: str, for_read: bool = True) -> PathValidationResult:
