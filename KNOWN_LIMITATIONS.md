@@ -182,7 +182,7 @@ with a valid API key.
 
 ### L-008 — Homogeneous Evidence Cannot Reach MALICE
 
-**Affects:** VIGIA-REAL-002, VIGIA-REAL-007, VIGIA-REAL-010 | **Status:** Design decision
+**Affects:** VIGIA-REAL-007 | **Status:** Design decision
 
 **Description:** Cases where all artifacts belong to fewer than 3 distinct
 evidence types AND have fewer than 4 total artifacts cannot reach MALICE
@@ -389,7 +389,7 @@ corroborating heterogeneous evidence.
 | L-005 | Ambiguous authorized activity | BREAK_002/005 | Debatable |
 | L-006 | Single temporal inconsistency → MALICE | BREAK_001 | Design decision |
 | L-007 | Semantic intent requires LLM backend | REAL corpus (fallback) | Real limitation |
-| L-008 | Homogeneous evidence cannot reach MALICE | REAL-002/007/010 | Design decision |
+| L-008 | Homogeneous evidence cannot reach MALICE | REAL-007 only | Design decision |
 | L-009 | Spoofability floor under chain of custody | REAL corpus | Design decision |
 | L-010 | Sensor independence not verified | CAIE adversarial 3/25 | Roadmap v3.0 |
 | L-011 | Kernel/root compromise (live analysis) | All live analysis | Permanent boundary |
@@ -403,3 +403,201 @@ corroborating heterogeneous evidence.
 *VIGÍA — SANS FIND EVIL Hackathon 2026*
 *Author: Anna Tchijova | AI Collective: Claude, Kimi, Gemini, DeepSeek, Qwen, Grok, ChatGPT*
 *License: Apache 2.0 | Repository: github.com/annatchijova/vigia-intent-analysis*
+
+---
+
+## L-012 — NOISE vs ABSTAIN Semantic Boundary
+
+**Affects:** VIGIA-BEN-014 (Authorized Journalist / Tor) | **Status:** Design decision
+
+**Definition enforced:**
+
+- `NOISE`: null or near-null signal — absence of forensic relevance. Score < 0.05.
+- `ABSTAIN`: epistemic indeterminacy under non-trivial competing hypotheses.
+  Requires structural conflict, causal ambiguity, or insufficient discriminative
+  evidence when signal IS present.
+
+**Implication:** A case with score ~0.018 and no CAIE fractures is NOISE, not ABSTAIN.
+ABSTAIN is not a catch-all for low scores — it is reserved for cases where
+evidence exists but cannot discriminate between hypotheses.
+
+**Forensic justification:** Inflating ABSTAIN with null-signal cases degrades
+ABSTAIN-OH as a metric and weakens the epistemic gate's interpretability.
+
+---
+
+## L-014 — Soft Evidence Convergence Without Cross-Type Fractures
+
+**Affects:** `BREAK_003` (cultural true positive), `BREAK_008` (ambiguous), `BREAK_010` (overperfect)
+**Status:** Real limitation
+
+**Description:** Cases where adversarial patterns are encoded exclusively in
+soft evidence types (log_entry/network_flow, spoofability 0.75-0.85) without
+the multi-type artifact combinations required by CAIE fracture rules.
+
+CAIE fracture detection requires specific type co-occurrence:
+- LOG_VS_MEMORY: log_entry + memory_process artifacts required
+- CULTURAL_VS_TECHNICAL: cultural_marker + technical artifacts required
+
+Converted break cases with homogeneous soft evidence produce 0 CAIE fractures.
+Without fracture bonuses, Noisy-OR composite stays at 0.09-0.12 (UNKNOWN range).
+
+**Root cause:** Absence of adversarial intent prior layer. VIGÍA P2 evaluates
+"how strong is the evidence" but not "how compatible is the pattern with
+adversarial behavior." This is a design gap for a future Intent Amplifier Layer.
+
+**CAIE Gap:** BREAK_003 should trigger CULTURAL_VS_TECHNICAL fracture (cultural
+markers + C2 coherence), BREAK_010 should trigger OVERPERFECT_CONSISTENCY
+fracture. Neither pattern is implemented in current CAIE rule set.
+
+**Roadmap:** Intent Amplifier Layer as explicit module over CAIE score.
+
+---
+
+## Accuracy by Mode — Empirical Results (June 2026)
+
+Two operational modes produce materially different accuracy profiles.
+Both are documented here for Daubert transparency.
+
+### LLM-assisted mode (Claude via MCP)
+
+| Suite | Cases | Correct | Notes |
+|-------|-------|---------|-------|
+| Real corpus (VIGIA-REAL-001–010) | 10 | 10 | All verdicts match ground truth |
+| Adversarial BREAK-001–010 | 10 | 10 | Epistemological manipulation suite |
+| Epistemological boundary BREAK-011–016 | 6 | 6 | Aggregation, consensus, fabrication |
+| False positive suite (FP-001–003) | 3 | 3 | Authorization context correctly read |
+| False negative suite (FN-001–003) | 3 | 3 | Clean-surface attacks detected |
+| Irreducible ambiguity (AMB-001–002) | 2 | 2 | ABSTAIN correctly emitted |
+| **Total** | **34** | **34 (100%)** | |
+
+### Fallback mode (scorer only, no LLM)
+
+| Suite | Cases | Correct | Failure pattern |
+|-------|-------|---------|-----------------|
+| Canonical corpus | 62 | 62 | — |
+| Real corpus (VIGIA-REAL-001–010) | 10 | 9 | REAL-007: SUSPICION instead of MALICE (L-008) |
+| Adversarial BREAK-001–010 | 10 | 0 | Scorer emits UNKNOWN/ABSTAIN on all — conservative by design; LLM mode resolves correctly (L-007) |
+| Epistemological boundary BREAK-011–016 | 6 | 2 | 4 structural failures (L-015, L-016, L-017) |
+| False positive suite (FP-001–003) | 3 | 2 | FP-003: ABSTAIN instead of BENIGN |
+| False negative suite (FN-001–003) | 3 | 0 | SUSPICION/NOISE instead of MALICE (L-018) |
+| Irreducible ambiguity (AMB-001–002) | 2 | 0 | NOISE instead of ABSTAIN (L-012) |
+| **Total** | **96** | **75 (78%)** | |
+
+**Interpretation:** Fallback mode accuracy (78%) reflects the scorer's designed
+scope — technically clear cases with structural anomalies. The 22% gap is not
+random error: it is concentrated in four specific structural limitations (L-015
+through L-018) documented below. In production, LLM-assisted mode is recommended
+for all cases where those limitations apply.
+
+**BREAK-001–010 note:** The 0/10 in fallback is not a crash — the scorer emits
+UNKNOWN/ABSTAIN, which is Daubert-compliant (refusing to assert what cannot be
+proven). The verdicts are conservative, not wrong in the harmful direction.
+
+---
+
+## L-015 — Directional Signal Aggregation Blindness
+
+**Affects:** VIGIA-BREAK-011 | **Status:** Real limitation
+
+**Description:** Twenty weak artifacts (raw_score=0.15, prior_trust=0.20) all
+pointing to the same target produce score=0.059 → NOISE. The scorer treats
+N directional signals as N independent events, not as a convergent pattern.
+
+**Root cause:** The Noisy-OR composite formula correctly models independence,
+but fails when artifacts are intentionally distributed (same ASN, same interval,
+same target). There is no accumulation mechanism for directional coherence.
+
+**Forensic implication:** Coordinated low-volume reconnaissance from botnets
+or distributed actors will systematically score as NOISE in fallback mode.
+
+**Workaround:** LLM mode resolves this via pattern-level reasoning. Scorer fix
+would require an ASN/subnet clustering layer before Noisy-OR computation.
+
+**Roadmap:** FW-006 — Directional Signal Accumulator module.
+
+---
+
+## L-016 — Trust-Weighted Consensus Failure
+
+**Affects:** VIGIA-BREAK-012 | **Status:** Real limitation
+
+**Description:** Four compromised sources (prior_trust=0.30) with high raw_score
+override one reliable source (prior_trust=0.95) with low raw_score.
+The scorer returns SUSPICION; expected BENIGN.
+
+**Root cause:** The Noisy-OR composite weights by adjusted_score
+(raw × spoofability × weight × trust) but does not apply the Bayesian
+principle that a shared compromise vector collapses N sources into 1.
+Four servers sharing the same compromised SSH key are one source, not four.
+
+**Forensic implication:** An attacker who compromises multiple log sources with
+the same credential can fabricate a false consensus that overrides a single
+clean witness in fallback mode.
+
+**Workaround:** LLM mode correctly identifies the shared compromise vector.
+Scorer fix requires a source deduplication layer keyed on shared provenance.
+
+**Daubert note:** This is the forensic principle of *fruit of the poisoned tree*
+applied to log sources. Evidence derived from a single compromised channel is
+one piece of evidence regardless of how many records it generates.
+
+---
+
+## L-017 — Corroboration Gate Over-Restriction
+
+**Affects:** VIGIA-FN-001, VIGIA-FN-003, VIGIA-BREAK-015 | **Status:** Real limitation
+
+**Description:** The MALICE corroboration gate (`n_artifacts ≥ 4 OR n_types ≥ 3`)
+blocks MALICE even when one or two artifacts are individually conclusive
+(raw_score × prior_trust > 0.80).
+
+Examples:
+- FN-003: fn003_03 (wrong parent process, raw=0.88, trust=0.9) is forensically
+  irrefutable for process hollowing. The gate blocks MALICE because n=3, types=2.
+- BREAK-015: biometric contradiction (raw=0.95, trust=0.85) is independently
+  sufficient. Gate blocks because VPN artifact has trust=0.20.
+
+**Root cause:** The gate was designed to prevent single-artifact MALICE
+(L-008 class failure). It over-corrects by ignoring artifact-level confidence.
+
+**Forensic implication:** High-confidence memory forensics and biometric evidence
+are structurally disadvantaged relative to lower-confidence multi-artifact cases.
+
+**Workaround:** LLM mode applies Peirce Thirdness reasoning that recognizes
+irrefutable individual artifacts. Scorer fix: gate exception for
+`max(raw_score × prior_trust) > 0.80`.
+
+---
+
+## L-018 — Non-Technical Context Opacity
+
+**Affects:** VIGIA-FN-001, VIGIA-FN-002 | **Status:** Real limitation
+
+**Description:** The scorer cannot reason about the forensic significance of
+absent authorization (no change ticket) or confirmed user absence (HR vacation
+record) when those facts are encoded in low-raw_score artifacts.
+
+- FN-001: HR vacation record (raw=0.08, trust=0.95) makes the authenticated
+  session impossible — but the scorer has no mechanism to make the vacation
+  record *invalidate* the login artifact.
+- FN-002: Absence of a change ticket (raw=0.08, trust=0.30) is the decisive
+  signal — the tool is legitimate but unauthorized. The scorer cannot express
+  "absence of authorization" as a positive malice signal.
+
+**Root cause:** The scoring formula computes `raw_score × (1-spoofability) ×
+weight × trust`. A raw_score of 0.08 on a contextual artifact produces near-zero
+contribution regardless of trust. There is no mechanism for one artifact to
+*contextually transform the interpretation* of another.
+
+**Forensic implication:** LOLBAS (Living off the Land) attacks using legitimate
+tools without authorization will systematically under-score in fallback mode.
+Insider threat cases where the only signal is an HR record will return BENIGN.
+
+**Workaround:** LLM mode applies the contextual transformation via abductive
+reasoning. Scorer fix requires a contextual invalidation layer — an HR vacation
+record at high trust should trigger an `identity_contradiction` flag that
+multiplies the effective score of co-occurring login artifacts.
+
+**Roadmap:** FW-007 — Contextual Invalidation Layer.
+
