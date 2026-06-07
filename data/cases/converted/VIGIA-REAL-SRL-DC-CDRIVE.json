@@ -1,0 +1,229 @@
+{
+  "case_id": "VIGIA-REAL-SRL-DC-CDRIVE",
+  "case_name": "SRL-2018 Domain Controller (BASE-DC) \u2014 Disk Forensics",
+  "description": "SRL-2018 compromised enterprise network. Domain Controller BASE-DC (shieldbase.lan) disk image (12 GB E01, Windows Server 2016). Registry and shimcache analysis reveals: unknown executable subject_srv.exe in C:\\windows\\ (2018-04-10), ntdsutil.exe execution for NTDS.dit credential dump (2018-04-25), Windows Kits 10 + WinDbg installed on DC (2018-04-11), SYSVOL GPO script deployed to all domain machines (2018-05-14), Autorunsc.exe executed for persistence verification (2018-08-15). Dual NIC: 10.10.4.4 (internal) + 172.16.4.4 (DMZ segment). PowerShell ScriptBlock logging enabled via GPO; 114MB PS operational log. WinRM 43MB. Security.evtx 235MB + 9 rolling archives of 251MB. McAfee Agent present; no detection recorded.",
+  "expected_verdict": "MALICE",
+  "schema_version": "1.0",
+  "acquisition": {
+    "disk_tool": "ewfmount + ntfs-3g (read-only)",
+    "disk_acquire_date": "2018-09-05",
+    "source_dataset": "SANS Find Evil! 2026 \u2014 SRL-2018 Compromised Enterprise Network",
+    "image_file": "base-dc-cdrive.E01",
+    "sha256_file": "base-dc-cdrive.sha256",
+    "note": "Write blocker not used; ntfs-3g mounted with -o ro,noatime. SHA-256 computed post-acquisition from E01. CAIE trust degradation applies per NIST SP 800-86 \u00a74.3."
+  },
+  "artifacts": [
+    {
+      "artifact_id": "ART-001",
+      "evidence_type": "shimcache",
+      "source_tool": "regipy/ShimCachePlugin + manual analysis",
+      "description": "subject_srv.exe found in AppCompatCache (shimcache) at C:\\windows\\subject_srv.exe, last modified 2018-04-10T19:29:48Z. Appears twice in shimcache (two cache slots), indicating the binary was executed. No such component exists in any standard Windows Server 2016 installation. Location in C:\\windows\\ (lowercase) mimics system directory. Not catalogued by McAfee. Consistent with a backdoor or RAT installed as a persistent service prior to the main attack phase.",
+      "raw_score": 0.95,
+      "prior_trust": 0.85,
+      "provenance_chain": [
+        "Disk acquisition SRL-2018 E01 (base-dc-cdrive.E01)",
+        "ewfmount + ntfs-3g read-only mount",
+        "regipy RegistryHive + ShimCachePlugin",
+        "VIGIA-REAL-SRL-DC-CDRIVE analysis 2026-06-07"
+      ],
+      "timestamp": "2018-04-10T19:29:48Z",
+      "metadata": {
+        "acquisition_tool": "ewfmount_ntfs3g_readonly",
+        "acquisition_hash": "sha256:e2b9cf0cb6759fd079f45fa903d80bde602160ff969c969c6f0cd704965b31b1",
+        "acquisition_timestamp": "2018-09-05T00:00:00Z",
+        "write_blocker_used": false,
+        "examiner_id": "SANS_HACKATHON_2026",
+        "binary_path": "C:\\windows\\subject_srv.exe",
+        "shimcache_slots": 2,
+        "first_seen": "2018-04-10T19:29:48Z",
+        "av_detection": "none (McAfee Agent present)"
+      }
+    },
+    {
+      "artifact_id": "ART-002",
+      "evidence_type": "shimcache",
+      "source_tool": "regipy/ShimCachePlugin",
+      "description": "ntdsutil.exe executed on BASE-DC on 2018-04-25T20:01:52Z per shimcache entry. ntdsutil is a native Windows tool used for Active Directory database maintenance but is routinely abused to extract NTDS.dit (the AD credential store containing password hashes for all domain accounts in shieldbase.lan). Execution on the DC itself by the Administrator account context implies full domain credential compromise. This artifact alone satisfies the threshold for MALICE under the Indicator of Intent framework: deliberate extraction of the domain credential store has no legitimate routine-maintenance justification on a production DC.",
+      "raw_score": 0.97,
+      "prior_trust": 0.9,
+      "provenance_chain": [
+        "Disk acquisition SRL-2018 E01 (base-dc-cdrive.E01)",
+        "ewfmount + ntfs-3g read-only mount",
+        "regipy RegistryHive + ShimCachePlugin",
+        "VIGIA-REAL-SRL-DC-CDRIVE analysis 2026-06-07"
+      ],
+      "timestamp": "2018-04-25T20:01:52Z",
+      "metadata": {
+        "acquisition_tool": "ewfmount_ntfs3g_readonly",
+        "acquisition_hash": "sha256:e2b9cf0cb6759fd079f45fa903d80bde602160ff969c969c6f0cd704965b31b1",
+        "acquisition_timestamp": "2018-09-05T00:00:00Z",
+        "write_blocker_used": false,
+        "examiner_id": "SANS_HACKATHON_2026",
+        "tool": "C:\\Windows\\system32\\ntdsutil.exe",
+        "impact": "full domain credential dump (shieldbase.lan)",
+        "mitre_technique": "T1003.003"
+      }
+    },
+    {
+      "artifact_id": "ART-003",
+      "evidence_type": "registry_hive",
+      "source_tool": "regipy manual traversal (SYSTEM hive ControlSet001)",
+      "description": "BASE-DC has two active network interfaces: 10.10.4.4/255.255.0.0 (internal corporate LAN) and 172.16.4.4/255.255.255.0 (secondary segment, consistent with DMZ based on SRL-2018 network topology). A Domain Controller with a direct interface into the DMZ violates network segmentation principles and constitutes a pivot point between the DMZ and the internal AD infrastructure. Cross-referencing with VIGIA-REAL-SRL-DMZ-FTP: the DMZ-FTP server operated in the 172.16.x.x range, placing BASE-DC as a direct routing hop between the compromised FTP server and the domain credential store.",
+      "raw_score": 0.82,
+      "prior_trust": 0.8,
+      "provenance_chain": [
+        "Disk acquisition SRL-2018 E01 (base-dc-cdrive.E01)",
+        "ewfmount + ntfs-3g read-only mount",
+        "regipy step-by-step subkey traversal (ControlSet001\\Services\\Tcpip\\Parameters\\Interfaces)",
+        "VIGIA-REAL-SRL-DC-CDRIVE analysis 2026-06-07"
+      ],
+      "timestamp": "2018-04-25T00:00:00Z",
+      "metadata": {
+        "acquisition_tool": "ewfmount_ntfs3g_readonly",
+        "acquisition_hash": "sha256:e2b9cf0cb6759fd079f45fa903d80bde602160ff969c969c6f0cd704965b31b1",
+        "acquisition_timestamp": "2018-09-05T00:00:00Z",
+        "write_blocker_used": false,
+        "examiner_id": "SANS_HACKATHON_2026",
+        "interface_internal": "10.10.4.4/255.255.0.0",
+        "interface_dmz": "172.16.4.4/255.255.255.0",
+        "domain": "shieldbase.lan",
+        "cross_case_ref": "VIGIA-REAL-SRL-DMZ-FTP"
+      }
+    },
+    {
+      "artifact_id": "ART-004",
+      "evidence_type": "shimcache",
+      "source_tool": "regipy/ShimCachePlugin",
+      "description": "Windows Driver Kit (WDK) 10.0.17134.0, WinDbg (x86/x64/arm/arm64), and gflags.exe installed on BASE-DC between 2018-04-11 and 2018-04-12, one day after subject_srv.exe appeared. wdksetup.exe was downloaded directly to C:\\Users\\Administrator\\Downloads\\wdksetup.exe and executed. WinDbg is a kernel-mode debugger. Installing kernel debugging tools on a production Domain Controller has no legitimate operational justification; this is consistent with attacker-controlled development or rootkit/driver preparation activity. gflags.exe enables kernel heap debug flags, further supporting low-level system manipulation intent.",
+      "raw_score": 0.85,
+      "prior_trust": 0.75,
+      "provenance_chain": [
+        "Disk acquisition SRL-2018 E01 (base-dc-cdrive.E01)",
+        "ewfmount + ntfs-3g read-only mount",
+        "regipy RegistryHive + ShimCachePlugin",
+        "VIGIA-REAL-SRL-DC-CDRIVE analysis 2026-06-07"
+      ],
+      "timestamp": "2018-04-11T09:08:06Z",
+      "metadata": {
+        "acquisition_tool": "ewfmount_ntfs3g_readonly",
+        "acquisition_hash": "sha256:e2b9cf0cb6759fd079f45fa903d80bde602160ff969c969c6f0cd704965b31b1",
+        "acquisition_timestamp": "2018-09-05T00:00:00Z",
+        "write_blocker_used": false,
+        "examiner_id": "SANS_HACKATHON_2026",
+        "tools_installed": ["WinDbg x64", "WinDbg x86", "WinDbg arm", "WinDbg arm64", "gflags.exe", "WDK 10.0.17134.0"],
+        "download_path": "C:\\Users\\Administrator\\Downloads\\wdksetup.exe",
+        "install_date": "2018-04-11"
+      }
+    },
+    {
+      "artifact_id": "ART-005",
+      "evidence_type": "event_log",
+      "source_tool": "EVTX file analysis (file size/presence)",
+      "description": "Three converging indicators of PowerShell abuse: (1) PowerShell ScriptBlock logging and Module logging enabled via GPO (EnableScriptBlockLogging=1, EnableModuleLogging=1, EnableTranscripting=1) per SOFTWARE hive; (2) Microsoft-Windows-PowerShell%4Operational.evtx weighs 27MB, indicating extensive PS execution; (3) Windows PowerShell.evtx weighs 114MB, the legacy PS log capturing all pipeline executions. Combined with subject_srv.exe and ntdsutil.exe, this volume of PS activity is consistent with post-exploitation framework usage (Empire, PowerSploit, or custom loaders) operating throughout the compromise period July\u2013September 2018.",
+      "raw_score": 0.88,
+      "prior_trust": 0.82,
+      "provenance_chain": [
+        "Disk acquisition SRL-2018 E01 (base-dc-cdrive.E01)",
+        "ewfmount + ntfs-3g read-only mount",
+        "find + cp EVTX extraction from Windows\\System32\\winevt\\Logs",
+        "RegRipper pslogging plugin on SOFTWARE hive",
+        "VIGIA-REAL-SRL-DC-CDRIVE analysis 2026-06-07"
+      ],
+      "timestamp": "2018-07-13T00:00:00Z",
+      "metadata": {
+        "acquisition_tool": "ewfmount_ntfs3g_readonly",
+        "acquisition_hash": "sha256:e2b9cf0cb6759fd079f45fa903d80bde602160ff969c969c6f0cd704965b31b1",
+        "acquisition_timestamp": "2018-09-05T00:00:00Z",
+        "write_blocker_used": false,
+        "examiner_id": "SANS_HACKATHON_2026",
+        "ps_operational_size_mb": 27,
+        "ps_legacy_size_mb": 114,
+        "scriptblock_logging": true,
+        "module_logging": true,
+        "transcription_enabled": true,
+        "execution_policy": "RemoteSigned"
+      }
+    },
+    {
+      "artifact_id": "ART-006",
+      "evidence_type": "event_log",
+      "source_tool": "EVTX file analysis (file size/presence)",
+      "description": "Microsoft-Windows-WinRM%4Operational.evtx weighs 43MB on BASE-DC. WinRM (Windows Remote Management) is the transport layer for PowerShell remoting, allowing remote command execution across the domain. A 43MB WinRM operational log on a DC indicates sustained remote management sessions over an extended period, consistent with lateral movement using Invoke-Command, Enter-PSSession, or framework-level WinRM channels. Cross-correlating with the 114MB PowerShell log: the volume of both logs in the same time window (July\u2013September 2018) strongly suggests a coordinated remote-execution campaign.",
+      "raw_score": 0.86,
+      "prior_trust": 0.8,
+      "provenance_chain": [
+        "Disk acquisition SRL-2018 E01 (base-dc-cdrive.E01)",
+        "ewfmount + ntfs-3g read-only mount",
+        "find + cp EVTX extraction",
+        "VIGIA-REAL-SRL-DC-CDRIVE analysis 2026-06-07"
+      ],
+      "timestamp": "2018-07-13T00:00:00Z",
+      "metadata": {
+        "acquisition_tool": "ewfmount_ntfs3g_readonly",
+        "acquisition_hash": "sha256:e2b9cf0cb6759fd079f45fa903d80bde602160ff969c969c6f0cd704965b31b1",
+        "acquisition_timestamp": "2018-09-05T00:00:00Z",
+        "write_blocker_used": false,
+        "examiner_id": "SANS_HACKATHON_2026",
+        "winrm_log_size_mb": 43,
+        "wmi_log_size_mb": 9.1,
+        "rdp_core_log_size_mb": 2.1
+      }
+    },
+    {
+      "artifact_id": "ART-007",
+      "evidence_type": "event_log",
+      "source_tool": "EVTX file analysis (file size/presence)",
+      "description": "Security.evtx weighs 235MB. Nine rolling Security log archives (Archive-Security-2018-07-13 through 2018-09-04) each weigh 251MB (the maximum log rotation size), covering July 13 through September 4, 2018. Total Security log volume: approximately 2.5GB of authentication and authorization events. This volume is consistent with automated credential stuffing, pass-the-hash lateral movement, and kerberoasting operations consuming authentication infrastructure over the full two-month compromise window.",
+      "raw_score": 0.79,
+      "prior_trust": 0.78,
+      "provenance_chain": [
+        "Disk acquisition SRL-2018 E01 (base-dc-cdrive.E01)",
+        "ewfmount + ntfs-3g read-only mount",
+        "find + cp EVTX extraction",
+        "VIGIA-REAL-SRL-DC-CDRIVE analysis 2026-06-07"
+      ],
+      "timestamp": "2018-07-13T11:31:58Z",
+      "metadata": {
+        "acquisition_tool": "ewfmount_ntfs3g_readonly",
+        "acquisition_hash": "sha256:e2b9cf0cb6759fd079f45fa903d80bde602160ff969c969c6f0cd704965b31b1",
+        "acquisition_timestamp": "2018-09-05T00:00:00Z",
+        "write_blocker_used": false,
+        "examiner_id": "SANS_HACKATHON_2026",
+        "security_evtx_size_mb": 235,
+        "archive_count": 9,
+        "archive_size_mb_each": 251,
+        "log_window_start": "2018-07-13T11:31:58Z",
+        "log_window_end": "2018-09-04T12:58:48Z",
+        "total_security_log_gb": 2.5
+      }
+    },
+    {
+      "artifact_id": "ART-008",
+      "evidence_type": "shimcache",
+      "source_tool": "regipy/ShimCachePlugin",
+      "description": "Two additional post-compromise artifacts: (1) Autorunsc.exe executed on 2018-08-15T17:10:22Z from C:\\Windows\\Autorunsc.exe. Autorunsc (Sysinternals) enumerates all autostart locations. Placed directly in C:\\Windows\\ (not Program Files), execution mid-attack window is consistent with attacker verifying persistence mechanisms are still active. (2) GPO startup script \\\\shieldbase.lan\\sysvol\\shieldbase.lan\\Policies\\{31B2F340-016D-11D2-945F-00C04FB984F9}\\Machine\\Scripts\\Startup\\InstallOffice365.bat executed 2018-05-14T02:57:59Z. A BAT script deployed via domain GPO to all machines is a high-impact lateral movement vector; the GUID {31B2F340} corresponds to the Default Domain Policy, meaning the script ran on every domain-joined machine at startup.",
+      "raw_score": 0.83,
+      "prior_trust": 0.78,
+      "provenance_chain": [
+        "Disk acquisition SRL-2018 E01 (base-dc-cdrive.E01)",
+        "ewfmount + ntfs-3g read-only mount",
+        "regipy RegistryHive + ShimCachePlugin",
+        "VIGIA-REAL-SRL-DC-CDRIVE analysis 2026-06-07"
+      ],
+      "timestamp": "2018-08-15T17:10:22Z",
+      "metadata": {
+        "acquisition_tool": "ewfmount_ntfs3g_readonly",
+        "acquisition_hash": "sha256:e2b9cf0cb6759fd079f45fa903d80bde602160ff969c969c6f0cd704965b31b1",
+        "acquisition_timestamp": "2018-09-05T00:00:00Z",
+        "write_blocker_used": false,
+        "examiner_id": "SANS_HACKATHON_2026",
+        "autorunsc_path": "C:\\Windows\\Autorunsc.exe",
+        "autorunsc_date": "2018-08-15T17:10:22Z",
+        "gpo_script": "\\\\shieldbase.lan\\sysvol\\shieldbase.lan\\Policies\\{31B2F340-016D-11D2-945F-00C04FB984F9}\\Machine\\Scripts\\Startup\\InstallOffice365.bat",
+        "gpo_guid": "{31B2F340-016D-11D2-945F-00C04FB984F9}",
+        "gpo_scope": "Default Domain Policy (all domain machines)",
+        "gpo_date": "2018-05-14T02:57:59Z"
+      }
+    }
+  ]
+}
