@@ -66,13 +66,6 @@ ESPAÑOL:
   - 包装器 = 不改变内部 mechanics 的情况下改变对象接口的保护层
 - Note: 【科学说明】皮尔斯、艾柯与格赖斯的术语常被误认为哲学神秘主义。在本系统中，这些名称仅仅是确定性信号处理阶段的标签——无异于以发明者命名一条温度补偿曲线。皮尔斯的溯因推理对应“根据异常传感器读数生成假设”；艾柯的诠释边界对应“传感器量程的边界条件”；格赖斯的准则对应“噪声过滤启发式”。该模块并不“思考”意义。它对取证工件应用整数算术规则，通过完全机械化且可审计的流水线产生逻辑一致的输出。
 
-Wait, the user said "Chinese translations must use: 艾柯 (not Eco), 格赖斯 (not Grice), 取证工件 (not 制品), 逻辑断裂 (not 裂缝)". So I must ensure 取证工件 is used instead of 制品/artifact where appropriate, and 逻辑断裂 instead of 裂缝. But the module description doesn't necessarily mention cracks. It mentions signals, reasoning, etc. I'll use 取证工件 in the glossary and explanation. 逻辑断裂 maybe in the context of explaining veto? "Logical fractures/breaks". I'll make sure to use it.
-
-Also, the user said "Do NOT use floating-point math explanations — emphasize deterministic integer arithmetic where applicable". So in tables and text, I should mention that CCS and vetoes operate on integers, thresholds are integers, no floating point approximations.
-
-One more thing: The module path is vigia/inference/abductive_reasoner.py but docstring says vigia/engine/abductive_reasoner.py. I should note this discrepancy as a documentation drift, perhaps in a metadata block? Since the user included this as MODULE PATH vs MODULE DOCSTRING. I should mention it.
-
-Let me structure the document:
 
 ```markdown
 # Module Documentation: `vigia/inference/abductive_reasoner.py`
@@ -159,9 +152,6 @@ Let me structure the document:
 
 ```
 
-Need to ensure conciseness but thoroughness. I'll write solid paragraphs but not overly verbose.
-
-Let me refine the scientific note for each language to ensure the sensor analogy is clear.
 
 EN Scientific Note:
 > 【Scientific Note】Terms drawn from Peirce, Eco, and Grice are sometimes perceived as philosophical mysticism. Within this system they are strictly mnemonic labels for deterministic signal-processing stages—no more mystical than calling a temperature-correction function “Newton.” **Peirce** names the stage that generates candidate hypotheses from anomalous sensor readings. **Eco** names the boundary-condition check that rejects readings falling outside the calibrated sensor range. **Grice** names the noise-filtering heuristics that discard physically implausible signals before they enter the arithmetic core. The module does not interpret meaning; it applies deterministic integer-arithmetic rules to forensic artifacts, producing an auditable, reproducible trace.
@@ -171,24 +161,6 @@ ES Nota Científica:
 
 RU Научное примечание:
 > 【Научное примечание】Термины, заимствованные у Пирса, Эко и Грайса, иногда воспринимаются как философский мистицизм. В данной системе они являются строго мнемоническими метками для детерминированных этапов обработки сигналов... **Пирс** — этап генерации гипотез по аномальным показаниям датчика. **Эко** — проверка граничных условий, отбраковывающая показания за пределами калиброванного диапазона. **Грайс** — эвристические алгоритмы фильтрации шума, отсеивающие физически неправдоподобные сигналы. Модуль не интерпретирует смысл; он применяет детерминированные правила целочисленной арифметики к цифровым артефактам...
-
-ZH 科学说明:
-> 【科学说明】皮尔斯、艾柯与格赖斯的术语有时被误认为哲学神秘主义。在本系统中，它们仅仅是确定性信号处理阶段的助记标签——并不比将温度补偿函数称为“牛顿”更具神秘色彩。**皮尔斯**命名根据异常传感器读数生成候选假设的阶段；**艾柯**命名边界条件检查，用于剔除超出传感器标定量程的读数；**格赖斯**命名噪声过滤启发式，用于在信号进入算术核心前丢弃物理上不可成立的信号。该模块并不诠释意义；它对取证工件应用确定性整数算术规则，生成可审计、可复现的轨迹。
-
-Wait, in Chinese, "forensic artifacts" should be 取证工件. Good.
-
-Now, I need to make sure I don't use floating-point explanations. So for CCS: "Calculated exclusively via deterministic integer arithmetic (addition, threshold comparison, and summation over ℤ). No fractional weights or rounding operations are employed."
-
-Also, the user mentioned "逻辑断裂 (not 裂缝)". I should find a place to use 逻辑断裂. Maybe in the Veto explanation: if there's a logical break/fracture in the hypothesis, it's vetoed. Or in the Grice filtering stage: detects logical断裂 in signal coherence. Let me incorporate it naturally.
-
-In Chinese Key Concepts table:
-| 否决机制 (Veto) | 当假设违反已知物理约束或出现**逻辑断裂**时执行的硬拒绝门控。 | 质量控制过滤器，防止不可能的解释进入下游。 |
-
-Good.
-
-Also, "制品" should be avoided in favor of "取证工件". I'll ensure that.
-
-Now, let me write out the full content carefully.
 
 ### ENGLISH
 
