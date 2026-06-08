@@ -9,7 +9,7 @@
   "artifacts": [
     {
       "artifact_id": "ART-001",
-      "content": "PCAP ~60MB | External source IP: 140.247.62.34 (student dormitory) | Internal NAT IP: 192.168.15.4 | MAC address: 00:17:f2:e2:c0:ce (Apple device) | User Agent: Internet Explorer 6 on Windows XP SP2 | Service used: willselfdestruct.com",
+      "content": "PCAP ~60MB | External source IP: 140.247.62.34 (student dormitory) | Internal NAT IP: 192.168.15.4 | MAC address: 00:17:f2:e2:c0:ce (Apple device) | User Agent: Firefox 2.0.0.16 / Mac OS X (dominante), Safari 3.1.2 / Mac OS X, iTunes (Mac) | Service used: willselfdestruct.com",
       "forensic_anomalies": [
         "Gmail traffic with cookies sent in plaintext over HTTP",
         "Use of willselfdestruct.com service to send anonymous harassment email"
@@ -19,10 +19,10 @@
     },
     {
       "artifact_id": "ART-002",
-      "content": "Email #1: badguy@hotmail.com | Date: July 13 | Email #2: willselfdestruct.com | Message: 'you can't find us and you can't hide from us. Stop teaching. Start running.' | Identified account: jcoach@gmail.com → Johnny Coach (Chem 109 student)",
+      "content": "Email #2: willselfdestruct.com | Message: 'you can't find us and you can't hide from us. Stop teaching. Start running.' | Identified account: jcoachj@gmail.com → Johnny Coach (Chem 109 student)",
       "forensic_anomalies": [
         "Explicit threat message sent through self-destructing service",
-        "Gmail account jcoach@gmail.com was identified via plaintext cookies in the pcap"
+        "Gmail account jcoachj@gmail.com was identified via plaintext cookies in the pcap"
       ],
       "peirce_layer": "SECONDNESS",
       "type": "email_header"
@@ -52,7 +52,7 @@
   "expected_verdict": "MALICE",
   "peirce_expected": {
     "firstness": "Threatening emails sent from anonymous service with Gmail cookies exposed in HTTP traffic",
-    "secondness": "pcap analysis correlates internal IP 192.168.15.4 with Johnny Coach's jcoach@gmail.com account",
+    "secondness": "pcap analysis correlates internal IP 192.168.15.4 with Johnny Coach's jcoachj@gmail.com account",
     "thirdness": "Johnny Coach, a Chemistry 109 student, sent harassment emails to the professor using anonymous services and Gmail, identified through network traffic analysis"
   },
   "source_dataset": "Digital Corpora - Nitroba University Harassment Scenario",
