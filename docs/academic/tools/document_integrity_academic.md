@@ -5,14 +5,6 @@ Batch ID: vigia-doc-0155-c61c815b
 Generated: 2026-05-20T14:56:47.877943+00:00
 -->
 
----
-doc_hash: c61c815b
-module: vigia/tools/document_integrity.py
-languages: [ZH]
-generated_by: moonshot-kimi-k2.6-batch-api
-license: Apache-2.0
----
-
 中文:
 `vigia/tools/document_integrity.py` 模块为复合文档检验提供确定性取证工具。该模块对 PDF 与 DOCX 容器执行多层结构审计，以检测内容嫁接、元数据不连续及对象流篡改，满足第041号案例（《科学怪人文档》）与视觉分析架构之需求。核心工具 `audit_document_integrity` 生成可复现、可逐位验证的完整性报告，不依赖概率近似。
 
@@ -234,7 +226,6 @@ Entry 8: Unauthorized internal architecture change. / Cambio no autorizado de ar
 EN: 5. ES: 6. RU: 3. ZH: 8. Labels ~8. Total ~22.
 
 Entry 9: Visual-to-forensic automated workflow. / Flujo automatizado visual a forense. / Автоматизированный рабочий процесс визуальной судебной экспертизы. / 视觉到取证的自动化工作流。
-Wait, Russian is long. Let's shorten: Автоматизированный визуально-судебный процесс. (3 words) / 视觉取证自动流程 (5 characters). Let's use:
 Automated visual-to-forensic workflow. / Flujo automatizado visual a forense. / Автоматизированный визуально-судебный процесс. / 视觉取证自动工作流。
 EN: 4. ES: 5. RU: 3. ZH: 6. Labels ~8. Total ~20.
 

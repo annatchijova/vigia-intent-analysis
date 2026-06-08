@@ -5,14 +5,6 @@ Batch ID: vigia-doc-0062-987f4f2e
 Generated: 2026-05-20T14:56:47.857823+00:00
 -->
 
----
-doc_hash: 987f4f2e
-module: vigia/core/llm_backend.py
-languages: [EN, ES, RU, ZH]
-generated_by: moonshot-kimi-k2.6-batch-api
-license: Apache-2.0
----
-
 ENGLISH:
 - Title: `vigia/core/llm_backend.py` — Unified LLM Backend with Capability-Based Graceful Degradation
 - What Is This Module? Explain it's a control layer that routes forensic analysis tasks to the right engine based on discrete capability levels. If a neural model fails or lacks a capability, the system falls back to deterministic integer-symbolic methods. No black-box guessing.
@@ -86,8 +78,6 @@ Structure:
 4. 中文
    - ... similar
 5. License line
-
-Let me draft the content carefully.
 
 ENGLISH Draft:
 

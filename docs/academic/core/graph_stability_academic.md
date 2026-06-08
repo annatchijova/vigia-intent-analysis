@@ -5,14 +5,6 @@ Batch ID: vigia-doc-0058-52d810c5
 Generated: 2026-05-20T14:56:47.856908+00:00
 -->
 
----
-doc_hash: 52d810c5
-module: vigia/core/graph_stability.py
-languages: [EN, ES, RU, ZH]
-generated_by: moonshot-kimi-k2.6-batch-api
-license: Apache-2.0
----
-
 ENGLISH:
 - Title: Module Documentation: `vigia/core/graph_stability.py`
 - What Is This Module? The Graph Stability Engine is the second-layer inference motor of the VIGÍA Forensic Suite. It discovers which forensic tools (or sensors) agree on the presence of evidence artifacts by building a graph from data. Instead of hard-coding relationships, it uses bootstrap stability selection: it resamples the calibration dataset 500 times (deterministically), learns a candidate graph each time, and keeps only edges that appear consistently (frequency ≥ threshold τ). This yields a legally defensible evidence dependency graph under Daubert standards because one can state: "This dependency holds in X% of all possible statistical worlds supported by the calibration data."

@@ -5,14 +5,6 @@ Batch ID: vigia-doc-0078-65cc09c3
 Generated: 2026-05-20T14:56:47.861298+00:00
 -->
 
----
-doc_hash: 65cc09c3
-module: vigia/core/signal_quality_gate.py
-languages: [EN, ES, RU, ZH]
-generated_by: moonshot-kimi-k2.6-batch-api
-license: Apache-2.0
----
-
 ENGLISH:
 - Title: Module Documentation: `vigia/core/signal_quality_gate.py`
 - What Is This Module?: It's a quality control layer for a digital forensics system called VIGÍA. Before the system declares something "guilty" (ACCEPT), this gate checks if the evidence signals are strong enough. It applies semiotics and culinary metaphors but operates deterministically.
@@ -107,8 +99,6 @@ ESPAÑOL:
   本模块使用查尔斯·桑德斯·皮尔斯（初性/三性）、艾柯与格赖斯的术语。这并非神秘主义。在传感器工程中，单一原始电压读数（初性）并不构成经过验证的探测事件（三性）。传感器阵列必须至少包含一个信噪比高于校准阈值的换能器，系统才能断言正向告警。这些符号学术语只是认识论层面的简写，代表每位仪器物理学家都在使用的验证阶段：原始采集 → 噪声过滤 → 经确认的测量。
 - License.
 
-Wait, the user said "Chinese translations must use: 艾柯 (not Eco), 格赖斯 (not Grice), 取证工件 (not 制品), 逻辑断裂 (not 裂缝)". I need to make sure I incorporate 取证工件 and 逻辑断裂 somewhere. The module doesn't explicitly mention "artifacts" or "fractures". But I can perhaps mention in the key concepts or glossary. Maybe under "取证工件" define it as the digital evidence items being evaluated. Or in the description of checks, mention that identical z-scores may indicate cloned 取证工件. And for 逻辑断裂, maybe mention that lack of tool diversity creates a 逻辑断裂 in the chain of evidence. Let me weave these in naturally.
-
 Let's re-read the prompt: "Chinese translations must use: 艾柯 (not Eco), 格赖斯 (not Grice), 取证工件 (not 制品), 逻辑断裂 (not 裂缝)". It doesn't say they must be used in every section, just that when translated, those terms must be used. So I should ensure they appear correctly.
 
 For 逻辑断裂: Perhaps in the scientific note or key concepts: "如果所有信号来自同一工具，则构成逻辑断裂" (If all signals come from the same tool, it constitutes a logical break). Or in the glossary. Let's add a glossary entry for "逻辑断裂" or use it in the Independence check description.
@@ -183,8 +173,6 @@ Table 3: Core Components
 
 The module uses terminology borrowed from Charles Sanders Peirce (Firstness, Thirdness), Umberto Eco, and H. P. Grice. This is **NOT mysticism**. In sensor engineering, a single raw voltage reading (Firstness) does not constitute a validated detection event (Thirdness). A sensor array must contain at least one transducer with a signal-to-noise ratio above a calibrated threshold before the system asserts a positive alarm. The semiotic labels are merely epistemological shorthand for verification stages that every instrumentation physicist already uses: raw acquisition → noise filtering → validated measurement.
 
-
-
 ---
 
 ## ESPAÑOL
@@ -236,8 +224,6 @@ Table 3: Componentes Principales
 ### 【Nota Científica】
 
 El módulo usa términos de Charles Sanders Peirce (Firstness, Thirdness), Umberto Eco y H. P. Grice. **NO es misticismo**. En ingeniería de sensores, una sola lectura de voltaje crudo (Firstness) no constituye un evento de detección validado (Thirdness). Una matriz de sensores debe contener al menos un transductor con relación señal/ruido por encima de un umbral calibrado antes de que el sistema asiente una alarma positiva. Las etiquetas semióticas son solo abreviaturas epistemológicas de etapas de verificación que todo físico de instrumentación ya utiliza: adquisición cruda → filtrado de ruido → medición validada.
-
-
 
 ---
 
@@ -291,8 +277,6 @@ Table 3: Основные Компоненты
 
 Модуль использует терминологию Чарльза Сандерса Пирса (Firstness, Thirdness), Умберто Эко и Г. П. Грайса. Это **НЕ мистицизм**. В сенсорной инженерии одиночное сырое показание напряжения (Firstness) не составляет подтверждённого события обнаружения (Thirdness). Сенсорная матрица должна содержать хотя бы один преобразователь с отношением сигнал/шум выше калиброванного порога, прежде чем система выдаст положительную тревогу. Семиотические метки — лишь эпистемологические сокращения для стадий верификации, которые и без того использует каждый инженер-физик: сырой сбор данных → фильтрация шума → валидированное измерение.
 
-
-
 ---
 
 ## 中文
@@ -345,11 +329,7 @@ Table 3: 核心组件
 
 本模块使用查尔斯·桑德斯·皮尔斯（初性/三性）、艾柯与格赖斯的术语。这**并非神秘主义**。在传感器工程中，单一原始电压读数（初性）并不构成经过验证的探测事件（三性）。传感器阵列必须至少包含一个信噪比高于校准阈值的换能器，系统才能断言正向告警。这些符号学术语只是认识论层面的简写，代表每位仪器物理学家都在使用的验证阶段：原始采集 → 噪声过滤 → 经确认的测量。若所有信号源自同一工具，则形成**逻辑断裂**，无法建立有效的证据链；而重复的取证工件亦无法增强证明力。
 
-
-
 ---
-
-Wait, I need to make sure I used 取证工件 and 逻辑断裂 in Chinese. I added 逻辑断裂 in the scientific note, and 取证工件 in the table and glossary. Good.
 
 I also need to ensure I don't use floating-point math explanations. I used "exact integer boundary" for Z_STRONG. I should make sure I don't say "floating point comparison" or anything. The phrase "z ≥ 2.0" contains a decimal, but I can frame it as a threshold value. To be safe, maybe write "z ≥ 2" or keep "z ≥ 2.0" but don't explain it as float. I'll use "z ≥ 2.0" as it's in the source, but I won't explain float internals. Actually, to be even safer and comply with "emphasize deterministic integer arithmetic where applicable", I can note that the threshold is treated as an exact integer boundary (2), even if the underlying score is rational. I'll phrase it carefully.
 
@@ -358,8 +338,6 @@ Also, the user said "You NEVER use floating-point math explanations for determin
 Let's refine the ENGLISH table for Z_STRONG to say "Exact integer threshold; deterministic classifier" rather than "Exact integer boundary". Since z-scores can be 2.0, it's a threshold. I'll say "Exact deterministic threshold; signals must meet or exceed the integer boundary of 2". That emphasizes integer arithmetic.
 
 Similarly for other languages.
-
-Let me check the Chinese: "z ≥ 2.0" — I can write "z ≥ 2" to avoid decimal, but the source says 2.0. I'll keep it as "z ≥ 2.0" in the check description but not discuss float. Or write "强度值 ≥ 2". Let's write "z-score ≥ 2" to avoid any decimal connotation. But the user specifically mentioned z >= 2.0 in the prompt. It's safer to mention the value as given, but not explain its float representation. I'll use "z ≥ 2.0" in the tables to match source, but no float explanation.
 
 Now, the scientific note: Need to mention Peirce/Eco/Grice. I have Peirce in all, Eco/Grice in EN, but need Eco and Grice explicitly in all languages.
 

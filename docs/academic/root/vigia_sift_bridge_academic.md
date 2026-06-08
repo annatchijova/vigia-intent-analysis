@@ -5,14 +5,6 @@ Batch ID: vigia-doc-0189-ff8f60eb
 Generated: 2026-05-20T14:56:47.885419+00:00
 -->
 
----
-doc_hash: ff8f60eb
-module: vigia/vigia_sift_bridge.py
-languages: [EN, ES, RU, ZH]
-generated_by: moonshot-kimi-k2.6-batch-api
-license: Apache-2.0
----
-
 ENGLISH:
 - What Is This Module?: VIGÍA is an intentionality analysis bridge for the SIFT digital forensics workstation. It does not reconstruct files; it reconstructs purpose. It treats digital evidence as a semiotic system (signs, symbols, and communication acts) and applies abductive reasoning (Peirce), cooperative principle analysis (Grice), and overinterpretation detection (Eco) to determine why an action was performed, not merely what occurred. It also includes protective guardrails (LLMShield, integrity checks) to prevent automated analysis from being manipulated by injected instructions. All safety boundaries are enforced via exact integer arithmetic—there are no statistical approximations or floating-point thresholds.
 - Key Concepts Table:
@@ -107,8 +99,6 @@ Need to be careful: The user said "逻辑断裂 (not 裂缝)". The module has "_
 Also for Chinese: 艾柯 (Eco), 格赖斯 (Grice). Good.
 
 License line at the end: ""
-
-The user wants the complete academic document now. I should structure it cleanly with headers.
 
 Let's make sure the Russian uses appropriate transliterations:
 - Пирс (Peirce)

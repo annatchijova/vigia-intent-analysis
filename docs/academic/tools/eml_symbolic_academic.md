@@ -5,14 +5,6 @@ Batch ID: vigia-doc-0157-3c4283bf
 Generated: 2026-05-20T14:56:47.878421+00:00
 -->
 
----
-doc_hash: 3c4283bf
-module: vigia/tools/eml_symbolic.py
-languages: [EN, ES, RU, ZH]
-generated_by: moonshot-kimi-k2.6-batch-api
-license: Apache-2.0
----
-
 English:
 
 **What Is This Module?**
@@ -105,7 +97,6 @@ One more thing: The user says "be thorough but concise". My tables are concise. 
 
 I need to make sure the output is Markdown formatted.
 
-Let me verify the Russian names:
 - Charles Sanders Peirce -> Чарльз Сандерс Пирс
 - Umberto Eco -> Умберто Эко
 - H.P. Grice -> Герберт Пол Грайс (H. Paul Grice). Yes, "Герберт Пол Грайс" or "Грайс". I used that.
@@ -125,6 +116,5 @@ Check Chinese:
 
 Double-check: Did I mention "logical break" in English glossary? Yes, to justify the Chinese term.
 
-Wait, the user says "Chinese translations must use: ... 逻辑断裂 (not 裂缝)". This implies that somewhere in the module/documentation, there is a concept of "fracture/gap" that should be translated as
 ---
 *Licensed under the Apache License, Version 2.0. Copyright 2026 Anna Tchijova.*

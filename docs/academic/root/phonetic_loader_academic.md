@@ -1,11 +1,3 @@
----
-doc_hash: 08182f1b
-module: vigia/phonetic_loader.py
-languages: [EN, ES, RU, ZH]
-generated_by: moonshot-kimi-k2.6-batch-api
-license: Apache-2.0
----
-
 ## ENGLISH
 
 `vigia/phonetic_loader.py` constitutes a core deterministic ingestion subsystem within the VIGÍA forensic phonetic analysis framework. Its primary forensic purpose is to eliminate non-deterministic variability during the loading phase of phonetic dictionary resources. In forensic speech science, the integrity of phoneme-to-grapheme mappings directly conditions the reliability of downstream transcription, speaker identification, and phonetic comparison pipelines. By consolidating fragmented source pathways into a single canonical ingestion route, the module ensures that every forensic examination initiates from an identical, validated, and auditable lexical substrate. This design satisfies the reproducibility prerequisites mandated by the Daubert standard for scientific evidence under Federal Rules of Evidence 702, as well as the data-integrity requirements specified in Chinese national standard GB/T 29360-2012 concerning electronic data forensic inspection.

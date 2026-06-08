@@ -5,14 +5,6 @@ Batch ID: vigia-doc-0074-b32a18e2
 Generated: 2026-05-20T14:56:47.860448+00:00
 -->
 
----
-doc_hash: b32a18e2
-module: vigia/core/semiotic_detector_v2.py
-languages: [EN, ES, RU, ZH]
-generated_by: moonshot-kimi-k2.6-batch-api
-license: Apache-2.0
----
-
 ## ENGLISH
 ### What Is This Module?
 ...
@@ -44,10 +36,7 @@ license: Apache-2.0
 
 ---
 
-
 ```
-
-Wait, the requirement says "You NEVER use floating-point math explanations for deterministic systems." So in the Deterministic Integer Arithmetic section, I must not say "avoids floating point errors" in a way that explains floating point. I should say "uses integer rational arithmetic exclusively via the `Fraction` class, ensuring absolute reproducibility." I must not describe floating point mechanics.
 
 Also, the user said "do NOT use floating-point math explanations — emphasize deterministic integer arithmetic where applicable". So I should phrase everything positively around integer/rational.
 

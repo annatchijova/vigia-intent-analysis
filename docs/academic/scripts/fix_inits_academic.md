@@ -5,14 +5,6 @@ Batch ID: vigia-doc-0014-9f525516
 Generated: 2026-05-20T14:56:47.847815+00:00
 -->
 
----
-doc_hash: 9f525516
-module: scripts/fix_inits.py
-languages: [EN, ES, RU, ZH]
-generated_by: moonshot-kimi-k2.6-batch-api
-license: Apache-2.0
----
-
 English:
 `scripts/fix_inits.py` is a forensic support module within the VIGIA framework. At 927 bytes, it constitutes a compact deterministic utility designed to restore package-level initialization markers in Python directory structures. In digital forensic science, integrity of the toolset environment is paramount; this script ensures that all software components remain discoverable and loadable by verifying the presence of required directory initialization tokens. Its operation is strictly Boolean and file-system-bound, producing reproducible outcomes without stochastic processes. Scientific note: The module’s determinism guarantees that repeated executions against an invariant disk image yield identical filesystem states, preserving audit reliability.
 
@@ -50,8 +42,6 @@ Terms relevant:
 But defining each in 4 languages would blow word count. I need to be clever. The user said "You always write in 4 languages". So the glossary should probably be presented in 4 languages. But with a 500-word total limit, I need extreme brevity.
 
 Alternative approach: The "description" could be a single paragraph repeated in 4 languages. Then the glossary is one table with 4 columns: Term (EN / ES / RU / ZH) and Definition (EN / ES / RU / ZH). But tables don't always render well. I'll do a compact list.
-
-Wait, maybe I can make the glossary also quadrilingual by having 10 items, each item being a term with its 3 translations and a short definition in English only? That might violate the spirit but saves words. However, the user explicitly said "You always write in 4 languages". So everything should be in 4 languages.
 
 Perhaps the best way is to write 4 very short paragraphs (approx 50 words each) and then a glossary where each entry is about 10 words * 4 languages = 40 words per entry. 10 entries = 400 words. That would exceed 500.
 
@@ -177,7 +167,6 @@ EN: An unchanging condition of a system across repeated observations.
 ES: Condición inmutable de un sistema a través de observaciones repetidas.
 RU: Неизменное состояние системы при повторных наблюдениях.
 ZH: 系统在重复观测中保持不变的Condition。
-Wait, "Condition" should be Chinese. "状态" (state/condition). Let's fix.
 ZH: 系统在重复观测中保持不变的状态。
 ~17 words.
 
@@ -289,7 +278,6 @@ ZH: 系统在重复观测中保持不变的状态。 (9)
 Total: ~34 words.
 
 Glossary total: ~41+42+35+36+34+36+34+37+36+34 = 365 words.
-Wait, that plus 247 = 612 words. That's over 500.
 
 I need to cut down. The word count limit is strict: under 500 words total.
 

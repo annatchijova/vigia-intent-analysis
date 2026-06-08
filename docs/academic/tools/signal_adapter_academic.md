@@ -5,14 +5,6 @@ Batch ID: vigia-doc-0171-6725056c
 Generated: 2026-05-20T14:56:47.881613+00:00
 -->
 
----
-doc_hash: 6725056c
-module: vigia/tools/signal_adapter.py
-languages: [EN, ES, RU, ZH]
-generated_by: moonshot-kimi-k2.6-batch-api
-license: Apache-2.0
----
-
 ENGLISH:
 - Title: `vigia/tools/signal_adapter.py` — Signal Adapter Module
 - What Is This Module?: A translation layer. The forensic engine produces reports in many different internal formats (legacy dictionaries). The likelihood engine expects a single, uniform signal format. This module acts like a protocol converter or rosetta stone: it reads the heterogeneous forensic verdicts, extracts the scientifically relevant measurements (signals), wraps them into a standardized container (SignalOutput), and preserves full traceability to the original data. It does not alter the legacy engine.
@@ -42,8 +34,6 @@ Note: The docstring mentions "z-scores" and values like float. I must not descri
 - Scientific Note:
   【Scientific Note】
   This module references semiotic concepts derived from Peirce (theory of signs), 艾柯 (code and interpretative systems), and 格赖斯 (pragmatic implicature). These are not mysticism. They function exactly like physical sensors: where a thermocouple transduces temperature into voltage, Peircean indices transduce stylistic anomalies into interpretable deviations; where a spectrometer maps wavelength to intensity, Eco's coding frames map textual features to categorical states; and where a pressure sensor outputs a calibrated digital reading, Gricean maxims generate deterministic thresholds for cooperative discourse. The adapter itself is a transducer: it converts heterogeneous semiotic outputs into a uniform measurement space without loss of logical integrity.
-
-Wait, the user specified for the Chinese translation to use 艾柯 and 格赖斯, but in English and Spanish I should use Eco and Grice. In Russian, probably Эко and Грайс. The scientific note in each language should mention the names appropriately. In English: Peirce, Eco, Grice. In Spanish: Peirce, Eco, Grice. In Russian: Пирс, Эко, Грайс. In Chinese: 皮尔斯, 艾柯, 格赖斯.
 
 Also Chinese specific terms:
 - 取证工件 (forensic artifact)
@@ -129,8 +119,6 @@ Rather than altering the proven, court-tested ForensicEngine, this adapter extra
 ### 【Scientific Note】
 References to **Peirce** (semiotic indices), **Eco** (coding and interpretative frames), and **Grice** (pragmatic implicature and cooperative maxims) appear throughout the broader VIGIA framework. These constructs are **not mysticism**. They operate exactly like physical sensors: a Peircean *index* transduces a stylistic anomaly into a deterministic deviation reading, just as a thermocouple transduces heat into voltage; an Eco coding frame categorizes textual features into discrete states, just as a spectrometer maps wavelengths to intensity bins; and Gricean thresholds generate deterministic cut-offs for cooperative discourse, just as a pressure sensor emits a calibrated digital signal when a threshold is crossed. This adapter performs an analogous transduction: it converts heterogeneous semiotic outputs into a uniform, deterministic measurement space without introducing logical fractures.
 
-
-
 ---
 
 ## ESPAÑOL
@@ -167,8 +155,6 @@ En lugar de modificar el ForensicEngine probado y validado para tribunales, este
 ### 【Nota Científica】
 Las referencias a **Peirce** (índices semióticos), **Eco** (marcos de codificación e interpretación) y **Grice** (implicatura pragmática y máximas cooperativas) aparecen a lo largo del marco general VIGIA. Estos constructos **no son misticismo**. Operan exactamente como sensores físicos: un *índice* peirceano transduce una anomalía estilística en una lectura determinística de desviación, igual que un termopar transduce el calor en voltaje; un marco de codificación ecoliano categoriza rasgos textuales en estados discretos, igual que un espectrógrafo mapea longitudes de onda a intervalos de intensidad; y los umbrales griceanos generan cortes determinísticos para el discurso cooperativo, igual que un sensor de presión emite una señal digital calibrada al cruzar un umbral. Este adaptador realiza una transducción análoga: convierte salidas semióticas heterogéneas en un espacio de medición uniforme y determinista sin introducir fracturas lógicas.
 
-
-
 ---
 
 ## РУССКИЙ
@@ -204,8 +190,6 @@ Las referencias a **Peirce** (índices semióticos), **Eco** (marcos de codifica
 
 ### 【Научное примечание】
 Ссылки на **Пирса** (семиотические индексы), **Эко** (кодировочные и интерпретационные рамки) и **Грайса** (прагматическая импликатура и кооперативные максимы) встречаются в обширной рамке VIGIA. Эти конструкты — **не мистицизм**. Они работают точно так же, как физические датчики: пирсовский *индекс* трансдуцирует стилистическую аномалию в детерминистическое отклонение, точно так же, как термопара трансдуцирует тепло в напряжение; эковская кодировочная рама категоризирует текстовые признаки в дискретные состояния, точно так же, как спектрограф отображает длины волн на интервалы интенсивности; а грайсовские пороги генерируют детерминистические отсечки для кооперативного дискурса, точно так же, как датчик давления выдаёт калиброванный цифровой сигнал при пересечении порога. Этот адаптер выполняет аналогичную трансдукцию: он преобразует гетерогенные семиотические выходы в единое детерминистическое пространство измерений, не внося логических разрывов.
-
-
 
 ---
 

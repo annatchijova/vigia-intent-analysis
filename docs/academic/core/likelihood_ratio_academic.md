@@ -5,14 +5,6 @@ Batch ID: vigia-doc-0061-0b473fc1
 Generated: 2026-05-20T14:56:47.857613+00:00
 -->
 
----
-doc_hash: 0b473fc1
-module: vigia/core/likelihood_ratio.py
-languages: [EN, ES, RU, ZH]
-generated_by: moonshot-kimi-k2.6-batch-api
-license: Apache-2.0
----
-
 ENGLISH:
 - Title: VIGÍA Likelihood Engine — Core Bayesian Inference Module
 - What Is This Module?: It's the deterministic brain of VIGÍA. Takes signals from forensic tools, measures how much they deviate from known authentic patterns, and outputs a calibrated probability that a piece of content was fabricated. Think of it as a digital caliper: it measures distance from "normal" using exact arithmetic, applies correction for redundant measurements, and writes an unalterable measurement log.
@@ -108,8 +100,6 @@ ESPAÑOL:
   | SHA-256 | 记录序列化的确定性 256 位整数指纹。 | 完整性校验；任何篡改都会改变指纹。 |
   | ENFSI 陈述 | 标准化的法庭科学结论格式。 | 概率的最终 verbal 表达。 |
 
-Wait, the user said Chinese translations must use: 艾柯 (not Eco), 格赖斯 (not Grice), 取证工件 (not 制品), 逻辑断裂 (not 裂缝). I need to incorporate these. In the scientific note, I should mention 艾柯 and 格赖斯. Also, maybe the module deals with "逻辑断裂"? The module doesn't explicitly mention logical breaks, but I should ensure I don't use 制品 or 裂缝. Use 取证工件. Maybe in the pipeline or explanation, use 取证工件 for artifact. For "逻辑断裂", maybe I can mention it in the glossary or note as a concept that the engine detects? Or just ensure if I mention "break" I use 逻辑断裂. The user specifically listed these as mandatory translations. I should probably include them in the glossary or key concepts. Since the module deals with fabrication detection, "逻辑断裂" could be a concept describing inconsistency in signals. I'll add it to the key concepts or glossary to satisfy the requirement.
-
 Chinese Glossary:
   - **确定性 (Deterministic)**: 系统不含随机性。相同输入永远产生相同输出，如同机械天平。
   - **贝叶斯推断 (Bayesian Inference)**: 随着新证据到来更新假设概率的逻辑框架。它是计数与重新加权，而非猜测。
@@ -155,8 +145,6 @@ Maybe brief descriptions of classes/functions in a table. The user asked for doc
 
 Then at the very end of each section, the license line.
 
-Wait, the requirement says "Each section must include: - 'What Is This Module?' (plain language explanation) - Key concepts with tables - A glossary of technical terms - A 【科学说明】/【Scientific Note】 box". It doesn't explicitly say each section must include the license, but the overall requirement says "License line: ...". I'll include it at the end of each section to be safe, or at least once at the end of the document. I'll put it at the end of every section because it's safer.
-
 Let's refine the content to be thorough but concise.
 
 ENGLISH details:
@@ -199,8 +187,6 @@ ENGLISH details:
 **【Scientific Note】**
 VIGÍA occasionally employs terminology drawn from the semiotics of Peirce, Eco, and Grice to describe how forensic tools interpret signs. This is not mysticism. Imagine a laboratory sensor array: Peirce’s “icon” behaves like a photocell that reacts to shape; Eco’s “code” behaves like a calibration table converting raw voltage into temperature; Grice’s “maxim” behaves like an integrity alarm triggered when a thermocouple violates expected transmission protocol. These terms provide a compact taxonomy for *sensor-like interpretive behavior*. The `LikelihoodEngine` itself performs only deterministic integer and combinatorial arithmetic on those sensor readings; it does not invoke any language model, nor does it traffic in vague hermeneutics.
 
-
-
 ESPAÑOL details:
 Similar structure. Ensure terms are correct.
 
@@ -241,8 +227,6 @@ Similar structure. Ensure terms are correct.
 
 **【Nota Científica】**
 VIGÍA emplea ocasionalmente terminología de la semiótica de Peirce, Eco y Grice para describir cómo las herramientas forenses interpretan signos. Esto no es misticismo. Imagine un arreglo de sensores de laboratorio: el “icono” de Peirce se comporta como una fotocélula que reacciona a la forma; el “código” de Eco se comporta como una tabla de calibración que convierte voltaje crudo en temperatura; la “máxima” de Grice se comporta como una alarma de integridad que se activa cuando un termopar viola el protocolo de transmisión esperado. Estos términos proporcionan una taxonomía compacta para el *comportamiento interpretativo tipo sensor*. El `LikelihoodEngine` solo realiza aritmética determinista entera y combinatoria sobre esas lecturas de sensores; no invoca ningún modelo de lenguaje ni incurre en hermenéutica vaga.
-
-
 
 РУССКИЙ details:
 

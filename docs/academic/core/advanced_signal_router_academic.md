@@ -5,14 +5,6 @@ Batch ID: vigia-doc-0037-09c233b0
 Generated: 2026-05-20T14:56:47.852514+00:00
 -->
 
----
-doc_hash: 09c233b0
-module: vigia/core/advanced_signal_router.py
-languages: [EN, ES, RU, ZH]
-generated_by: moonshot-kimi-k2.6-batch-api
-license: Apache-2.0
----
-
 ENGLISH:
 - What Is This Module?
   - A central dispatch system (like a mail sorting room) that takes incoming digital forensic evidence (called "signals") and sends them to the correct laboratory station (analysis pipeline) based on the evidence type (artifact type). No manual sorting needed. It ensures memory samples go to the memory lab, registry items to the registry lab, etc. It avoids floating-point rounding errors by using exact integer-based arithmetic (Fraction or string) for all numeric metadata.
@@ -210,8 +202,6 @@ Structure:
 ...
 
 ---
-
-
 
 I should mention the import fix somewhere. Maybe in the EN/ES/RU/ZH sections under a note about maintenance / version control. But the prompt lists it as module details. I can include it as a "Maintenance Note" or within Key Concepts. Since the audience are scientists who don't know Python, an import path change is irrelevant to them, but it's part of the module metadata. I can mention it in a technical note: "For reference: in this revision, internal data structures reference `vigia.models.signal_output`." But for non-programmers, this is meaningless. However, the user asked to generate documentation for the module, so including it as a version control note is appropriate. I'll add a small note: "Internal reference update: the output model has been relocated to `vigia.models.signal_output` to maintain architectural consistency." Keep it simple.
 

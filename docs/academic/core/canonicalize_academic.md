@@ -1,11 +1,3 @@
----
-doc_hash: 69393490
-module: vigia/core/canonicalize.py
-languages: [EN, ES, RU]
-generated_by: moonshot-kimi-k2.6-batch-api
-license: Apache-2.0
----
-
 ## ENGLISH
 
 `vigia/core/canonicalize.py` constitutes the sole authoritative implementation of the VIGÍA Canonical Schema v1, serving as the deterministic serialization gateway through which all evidentiary data structures must pass prior to cryptographic commitment. Within the VIGÍA forensic architecture, this module occupies a critical position in the chain of custody: it transforms semantically equivalent yet representationally divergent Python objects into a single, unambiguous byte sequence. By collapsing representational variance—whether arising from dictionary insertion order, integer encoding width, Unicode normalization form, or host platform endianness—the module ensures that the input to the SHA-256 hash function is bitwise identical across every subsystem, time of execution, and hardware architecture. Only independent verifier implementations, which are required to re-create the schema from first principles to avoid circular trust assumptions, are exempt from direct importation of this routine.

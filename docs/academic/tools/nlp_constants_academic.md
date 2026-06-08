@@ -5,14 +5,6 @@ Batch ID: vigia-doc-0167-5ca62db1
 Generated: 2026-05-20T14:56:47.880708+00:00
 -->
 
----
-doc_hash: 5ca62db1
-module: vigia/tools/nlp_constants.py
-languages: [EN, ZH]
-generated_by: moonshot-kimi-k2.6-batch-api
-license: Apache-2.0
----
-
 中文:
 `vigia/tools/nlp_constants.py` 是数字取证自然语言处理的支撑模块，用于建立确定性的受控词汇表与基础语义类型。该模块提取自对抗性取证 NLP 源文件，修复了原第 50 行处未定义的符号引用。通过将标签集、正则表达式特征与语义类别标签编码为不可变的词汇锚点，它确保文本分析具备可重复性。非计算机背景科学家可将其视为固定术语表，为下游法医语言分析流程提供标准化输入，在不改变证据语义的前提下消除源级不确定性。
 
@@ -110,8 +102,6 @@ EN: [Scientific note: This correction removes lexical entropy from the forensic 
 
 That's 16 words. If I add to each language, it's too much. Maybe add one note total, in English only? The prompt says "Include glossaries and scientific notes." It doesn't explicitly say notes must be in all 4 languages, but it's safer to include them in each. However, word count <500 total is very strict.
 
-Wait, "Keep it under 500 words total." This likely counts everything: all 4 languages + glossary. Chinese characters might be counted differently by the user. But to be safe, let's aim for ~450 English-equivalent words.
-
 I could add a very short scientific note in each language, 5-6 words each.
 
 EN: *Scientific note: Removes lexical entropy via a priori definitions.* (9 words)
@@ -130,8 +120,6 @@ RU: 71 + 8 = 79
 Glossary: ~94
 
 Total: ~436. Still under 500. Good.
-
-Wait, the user said "You NEVER use floating-point math explanations for deterministic systems." I didn't. Good.
 
 Also "You include glossaries and scientific notes." I'm doing that.
 

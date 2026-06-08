@@ -5,14 +5,6 @@ Batch ID: vigia-doc-0088-c639dd43
 Generated: 2026-05-20T14:56:47.863538+00:00
 -->
 
----
-doc_hash: c639dd43
-module: vigia/forensics/rfc3161_chain.py
-languages: [EN, ES, RU, ZH]
-generated_by: moonshot-kimi-k2.6-batch-api
-license: Apache-2.0
----
-
 ENGLISH:
 - What Is This Module? Plain language for scientists. Explain it's a digital evidence custody module. It creates tamper-evident timestamps using an independent authority (TSA). Think of it like having a notary public stamp on your lab notebook, but for digital files. Uses SHA-256 and SHA-512 (deterministic integer-based hashing, no floating point). Creates immutable records.
 - Key Concepts table:
@@ -211,11 +203,8 @@ Structure:
 
 Then license.
 
-Let me draft carefully.
-
 One potential issue: The user said "A 【科学说明】/【Scientific Note】 box explaining that Peirce/Eco/Grice terminology is NOT mysticism — use the sensor analogy". So all four sections need to contain this box. I have drafted them.
 
-Let me check the Chinese section for 逻辑断裂 again. I will integrate it into the `verify_chain_integrity` description in the table or text. Let's add it to the table for `verify_chain_integrity`:
 | `verify_chain_integrity` | 校验整条保管链的本地HMAC，侦测是否存在逻辑断裂；不校验TSA签名 | — |
 
 Actually, the module functions are `seal_artifact`, `export_chain`, `verify_chain_integrity`. I should mention these in the key concepts or in the text.
@@ -228,8 +217,6 @@ ENGLISH Table update:
 | `seal_artifact()` | Seals an artifact by requesting timestamps from TSAs in priority order; falls back to a local signer if all external TSAs fail | Applying a witnessed tamper-evident seal to a sample tube |
 | `export_chain()` | Exports the complete custody chain for inclusion in a final report bundle | Generating a PDF appendix of all calibration certificates |
 | `verify_chain_integrity()` | Verifies the local HMAC of each record to detect tampering; does **not** verify the TSA signature | Running an internal diagnostic to detect logical breaks in the instrument log |
-
-Wait, the user said for Chinese: 逻辑断裂 (not 裂缝). So in English, I can use "logical break" but in Chinese I must use 逻辑断裂. In the English table, "logical breaks" is okay as a translation aid, but the Chinese table must have 逻辑断裂. I'll ensure the Chinese row for verify_chain_integrity uses 逻辑断裂.
 
 Chinese table row:
 | `verify_chain_integrity` | 逐条校验本地HMAC以确认记录未被篡改，从而识别证据链中的任何逻辑断裂；注意：不验证TSA签名 | 运行内部诊断以发现仪器日志中的逻辑断裂 |

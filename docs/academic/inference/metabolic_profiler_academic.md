@@ -5,14 +5,6 @@ Batch ID: vigia-doc-0102-8bc0d526
 Generated: 2026-05-20T14:56:47.866726+00:00
 -->
 
----
-doc_hash: 8bc0d526
-module: vigia/inference/metabolic_profiler.py
-languages: [EN, ES, RU, ZH]
-generated_by: moonshot-kimi-k2.6-batch-api
-license: Apache-2.0
----
-
 ENGLISH:
 - What Is This Module? MetabolicProfiler is a deterministic forensic analyzer that treats the computer system as an organism. It measures the "pulse" of events—how often things happen, when the system sleeps, and how predictable its behavior is. It detects anomalies (deviations) without using floating-point approximations internally.
 - Key Concepts Table:
@@ -329,8 +321,6 @@ The terminology borrowed from C. S. Peirce, Umberto Eco, and H. P. Grice is not 
 
 Deterministic Arithmetic Guarantee
 All internal evidence dictionaries store numeric values as `Fraction` or `str`. Every intermediate calculation—frequency, entropy, and reliability—uses integer rational arithmetic. Conversion to floating-point occurs only inside the `SignalOutput` constructor, and solely because the external API mandates that representation. Until that final boundary, the pipeline is entirely deterministic.
-
-
 
 ESPAÑOL:
 

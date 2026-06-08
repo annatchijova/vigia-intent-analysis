@@ -5,14 +5,6 @@ Batch ID: vigia-doc-0113-232e96c6
 Generated: 2026-05-20T14:56:47.869000+00:00
 -->
 
----
-doc_hash: 232e96c6
-module: vigia/pipeline/report_exporter.py
-languages: [EN, ES, RU, ZH]
-generated_by: moonshot-kimi-k2.6-batch-api
-license: Apache-2.0
----
-
 ENGLISH:
 The `vigia/pipeline/report_exporter.py` module serves as the terminal serialization layer of the VIGIA forensic pipeline. It ingests structured evidentiary artifacts and renders them into standardized, human-readable report formats (e.g., PDF, HTML). Operating deterministically, it guarantees bit-wise reproducibility of outputs for peer review and chain-of-custody documentation. At 8191 bytes, this lightweight support module encapsulates format-agnostic logic, decoupling presentation from analytical cores.
 
@@ -54,8 +46,6 @@ Better: Since the descriptive paragraphs are already in 4 languages, maybe the g
 Alternative: The user said "Generate a brief academic description (4 languages: EN, ES, RU, 中文) for this VIGIA support module." and "Include a 10-term glossary."
 
 I think the best approach is to provide a compact glossary section where each entry has the term in all 4 languages and a single definition (maybe in English) or 4 short definitions. But to keep under 500 words, I need to be very clever.
-
-Wait, "Keep it under 500 words total." This is extremely tight. Maybe I should write very short paragraphs and a table-like glossary? But tables aren't typical word count reducers.
 
 Perhaps the user counts "words" loosely. But I should try to strictly follow.
 
@@ -99,8 +89,6 @@ Another approach: Since the text is short, I can provide a glossary table with 4
 
 I think I will provide the glossary as a list where each item is structured like:
 > **Serialization layer / Capa de serialización / Слой сериализации / 序列化层** — Final stage that converts internal data structures into persistent, transmittable formats. / Etapa final que convierte estructuras internas en formatos persistentes. / Финальная стадия преобразования внутренних структур в постоянные форматы. / 将内部数据结构转换为持久化、可传输格式的最终阶段。
-
-Wait, that's 4 definitions per term. 10 terms * 4 definitions * ~10 words = 400 words. Plus 237 = 637. Over limit.
 
 I need to compress. Maybe the glossary is just the terms and one-line definitions, and I provide it in all 4 languages but extremely terse.
 

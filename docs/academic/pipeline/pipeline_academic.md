@@ -5,14 +5,6 @@ Batch ID: vigia-doc-0111-efe5a51e
 Generated: 2026-05-20T14:56:47.868566+00:00
 -->
 
----
-doc_hash: efe5a51e
-module: vigia/pipeline/pipeline.py
-languages: [EN, ES, RU, ZH]
-generated_by: moonshot-kimi-k2.6-batch-api
-license: Apache-2.0
----
-
 ### ENGLISH
 #### What Is This Module?
 Plain language for non-programmers. Explain it's the central orchestrator of a digital forensics pipeline that processes evidence signals through 5 watertight layers (Zero-Trust). It takes raw forensic tool outputs, runs deterministic statistical inference (without LLMs making decisions), calculates bounded risk, produces an immutable sealed bundle (ForensicBundle), and can verify it later.
@@ -184,10 +176,6 @@ Table 3: 流水线中的符号学算子
 【科学说明】
 皮尔斯、艾柯与格赖斯的术语常被误认为文学神秘主义或哲学玄思。事实并非如此。这些术语描述的是信息传输的形式层级，与物理传感器阵列完全类比。以实验室温度计为例：**第一性** 是热敏电阻两端的原始电压——一种尚未被解释的质性。**第二性** 是电压越过比较器阈值的蛮荒事实；*某件事发生了*。**第三性** 则是完整的中介框架：校准曲线（在艾柯意义上即共享的**代码**）以及设备会真实且相关地报告的预设（格赖斯的合作原则）。当 VIGÍA 文档提到“第二性 + 第三性”时，指的是从原始信号检测到经过验证、可传播的取证知识的跃迁。本模块将这些层级视为确定性的处理地层，而非玄学概念。
 
-
-
-Wait, I need to make sure I don't use floating-point math explanations. I should avoid saying things like "floating-point precision" or "IEEE 754". I emphasized deterministic integer arithmetic. For the risk formula, I said "deterministic integer formula computed on rational inputs". That's okay. For bootstrap B=500, I called it an integer replication count. Good.
-
 Also, the requirement says "Do NOT use floating-point math explanations — emphasize deterministic integer arithmetic where applicable". I have done that.
 
 Need to ensure Chinese translations use the specified terms:
@@ -213,8 +201,6 @@ English: "Secondness + Thirdness" — yes.
 Chinese: "第二性 + 第三性" — yes.
 
 License line: I will place it at the very end of the document, once. The user asked for "License line: ''" It might be safer to put it at the end of each section? But that would be repetitive. Usually a single license footer is standard. I'll put it once at the bottom. Actually, to be absolutely compliant with "Each section must include: ..." vs the license line being a separate bullet, I think putting it once is fine, but I'll put it at the end of every section to be extra safe? No, that's overkill and not "concise". I'll put it once at the bottom.
-
-Wait, the user says "Each section must include: - 'What Is This Module?' ... - Key concepts with tables - A glossary ... - A 【科学说明】..." and separately "License line: ...". I'll include the license line once after all four sections.
 
 Also, I should include the module path prominently. I'll put it at the top as a header.
 

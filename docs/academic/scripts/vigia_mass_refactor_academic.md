@@ -6,14 +6,6 @@ Generated: 2026-05-20T14:56:47.849810+00:00
 -->
 
 ---
-doc_hash: 637ecdc6
-module: scripts/vigia_mass_refactor.py
-languages: [EN, ES, RU, ZH]
-generated_by: moonshot-kimi-k2.6-batch-api
-license: Apache-2.0
----
-
----
 
 ### ENGLISH
 
@@ -54,8 +46,6 @@ This module is an industrial-grade batch refacturing engine for the VIGÍA Foren
 
 > 【Scientific Note】
 > This module occasionally employs terminology derived from the semiotic frameworks of **Charles Sanders Peirce**, **Umberto Eco**, and **H. Paul Grice**—for example, when discussing how identifiers acquire meaning through context, how imports establish "relevance" between modules, or how a namespace collision represents a breakdown in shared convention. This is **not** mysticism or literary criticism. It is best understood as a **sensor-calibration protocol**: just as a spectrometer must be told which wavelengths correspond to which substances, a forensic software system must be told which symbols correspond to which evidence chains. Peirce's triadic model, Eco's codes, and Grice's cooperative principles are formal descriptions of how signs (IDs, imports, seals) map to real-world referents (evidence bundles, audit events). When a collision occurs, the sensor misreads the sample; the refactor acts as recalibration.
-
-
 
 ---
 
@@ -167,8 +157,6 @@ This module is an industrial-scale batch refacturing engine for the VIGÍA Foren
 > 【Scientific Note】
 > This module occasionally employs terminology derived from the semiotic frameworks of **Charles Sanders Peirce**, **Umberto Eco**, and **H. Paul Grice**—for example, when discussing how identifiers acquire meaning through context, how imports establish "relevance" between modules, or how a namespace collision represents a breakdown in shared convention. This is **not** mysticism or literary criticism. It is best understood as a **sensor-calibration protocol**: just as a spectrometer must be told which wavelengths correspond to which substances, a forensic software system must be told which symbols correspond to which evidence chains. Peirce's triadic model, Eco's codes, and Grice's cooperative principles are formal descriptions of how signs (IDs, imports, seals) map to real-world referents (evidence bundles, audit events). When a collision occurs, the sensor misreads the sample; the refactor acts as recalibration.
 
-
-
 ---
 
 ### ESPAÑOL
@@ -212,8 +200,6 @@ Este módulo es un motor de refactorización masiva a escala industrial para la 
 
 > 【Nota Científica】
 > Este módulo emplea ocasionalmente terminología derivada de los marcos semióticos de **Charles Sanders Peirce**, **Umberto Eco** y **H. Paul Grice**—por ejemplo, al discutir cómo los identificadores adquieren significado mediante el contexto, cómo los imports establecen «relevancia» entre módulos, o cómo una colisión de espacio de nombres representa una ruptura en la convención compartida. Esto **no** es misticismo ni crítica literaria. Se comprende mejor como un **protocolo de calibración de sensores**: así como a un espectrómetro se le debe indicar qué longitudes de onda corresponden a qué sustancias, a un sistema forense informático se le debe indicar qué símbolos corresponden a qué cadenas de evidencia. El modelo triádico de Peirce, los códigos de Eco y los principios cooperativos de Grice son descripciones formales de cómo los signos (IDs, imports, sellos) se mapean a referentes del mundo real (paquetes de evidencia, eventos de auditoría). Cuando ocurre una colisión, el sensor lee mal la muestra; el refactor actúa como una recalibración.
-
-
 
 ---
 

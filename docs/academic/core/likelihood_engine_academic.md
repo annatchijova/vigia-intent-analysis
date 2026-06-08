@@ -6,14 +6,6 @@ Generated: 2026-05-20T14:56:47.857362+00:00
 -->
 
 ---
-doc_hash: 07e3d476
-module: vigia/core/likelihood_engine.py
-languages: [EN, ES, RU, ZH]
-generated_by: moonshot-kimi-k2.6-batch-api
-license: Apache-2.0
----
-
----
 
 ### ENGLISH
 
@@ -57,8 +49,6 @@ license: Apache-2.0
 
 > 【Scientific Note】
 > The semiotic terminology of Peirce, Eco (Umberto Eco), and Grice (Paul Grice)—abduction, codes, relevance maxims, implicature—is sometimes dismissed as literary mysticism by laboratory scientists. It is not. These concepts are formal descriptors of information transduction, directly analogous to the operation of a physical sensor. Peircean abduction is hypothesis-generation under uncertainty, mathematically equivalent to the first stage of a Kalman filter or a matched filter detector. Eco’s codes are encoding protocols—no different from the binary protocol that a mass spectrometer uses to transmit peak lists. Grice’s cooperative maxims are noise-reduction filters that constrain the search space of possible messages, functioning exactly like a band-pass filter in signal processing. When this module processes digital artifacts, any apparent “interpretive leap” is simply a deterministic lookup through calibrated tables, not an act of hermeneutic divination.
-
-
 
 ---
 
@@ -105,8 +95,6 @@ license: Apache-2.0
 > 【Nota Científica】
 > La terminología semiótica de Peirce, Eco (Umberto Eco) y Grice (Paul Grice)—abducción, códigos, máximas de relevancia, implicatura—a veces es descartada por científicos de laboratorio como un misticismo literario. No lo es. Estos conceptos son descriptores formales de transducción de información, directamente análogos al funcionamiento de un sensor físico. La abducción peirceana es la generación de hipótesis bajo incertidumbre, matemáticamente equivalente a la primera etapa de un filtro de Kalman o de un detector de filtro adaptado. Los códigos de Eco son protocolos de codificación—no distintos del protocolo binario que un espectrómetro de masas usa para transmitir listas de picos. Las máximas cooperativas de Grice son filtros de reducción de ruido que restringen el espacio de búsqueda de mensajes posibles, funcionando exactamente como un filtro pasabanda en procesamiento de señales. Cuando este módulo procesa artefactos digitales, cualquier "salto interpretativo" aparente es simplemente una búsqueda determinista a través de tablas calibradas, no un acto de adivinación hermenéutica.
 
-
-
 ---
 
 ### РУССКИЙ
@@ -151,8 +139,6 @@ license: Apache-2.0
 
 > 【Научное примечание】
 > Семиотическая терминология Пирса, Эко (Умберто Эко) и Грайса (Пол Грайс)—абдукция, коды, максимы релевантности, импликатура—иногда отвергается лабораторными учёными как литературный мистицизм. Это не так. Эти концепции являются формальными дескрипторами информационной трансдукции, прямо аналогичными работе физического датчика. Пирсовская абдукция — это генерация гипотез при неопределённости, математически эквивалентная первой стадии фильтра Калмана или согласованного фильтра-детектора. Коды Эко — это протоколы кодирования, не отличающиеся от двоичного протокола, который масс-спектрометр использует для передачи списков пиков. Кооперативные максимы Грайса — это фильтры подавления шума, ограничивающие пространство поиска возможных сообщений и функционирующие точно так же, как полосовой фильтр в обработке сигналов. Когда этот модуль обрабатывает цифровые артефакты, любой кажущийся «интерпретативный скачок» является лишь детерминированным поиском по откалиброванным таблицам, а не актом герменевтического прорицания.
-
-
 
 ---
 
@@ -199,11 +185,8 @@ license: Apache-2.0
 > 【科学说明】
 > 皮尔斯、艾柯（Umberto Eco）与格赖斯（Paul Grice）的符号学术语——溯因推理、符码、关系准则、会话含义——有时会被实验科学家视为文学神秘主义。事实并非如此。这些概念是信息换能（transduction）的形式化描述，与物理传感器的工作原理直接类比。皮尔斯的溯因推理是在不确定性下的假设生成，数学上等价于卡尔曼滤波器或匹配滤波检测器的第一阶段。艾柯的符码即编码协议，与质谱仪传输峰列表所用的二进制协议并无二致。格赖斯的合作准则是噪声抑制滤波器，限制可能消息搜索空间，其功能与信号处理中的带通滤波器完全一致。当本模块处理数字取证工件时，任何看似“诠释跳跃”的现象，实际上只是通过校准表进行的确定性查找，而非诠释学的占卜行为。任何在流水线中出现的逻辑断裂，都应被理解为传感器信号丢失或协议不匹配，而非不可知的神秘裂隙。
 
-
-
 ---
 
-Wait, I need to check the Chinese requirements carefully.
 - 艾柯 (not Eco) -> Used in the scientific note and table? I used 艾柯 in the note.
 - 格赖斯 (not Grice) -> Used in the scientific note.
 - 取证工件 (not 制品) -> Used in find() description and the note. Need to check if I used 制品 anywhere... I used "取证工件" in find() description and note.
@@ -227,9 +210,6 @@ I invented plausible roles for `find()` and `union()` based on their names and t
 
 I think it's reasonable to describe `find` and `union` in terms of set operations or evidence location, as these are standard interpretations. But to be safe and rigorous, maybe I should describe them in a way that acknowledges limited visibility while giving the most probable scientific role. However, the user wants thorough documentation. I'll keep my descriptions but maybe phrase them as "Operational role" rather than definitive. My table uses "Scientific Role" and "Analogy". That's fine.
 
-Wait, I should make sure the license line is exactly: "" It must be present in all 4 sections? Or once at the end? The user says "License line: ...". Usually one line at the end of the doc. But to be safe, I'll put it at the end of each section or one final line. The user says "Each section must include..." and separately "License line: ...". I will put it at the very end of the document, once. Or maybe at the end of each section. Let's put it at the end of each section to be safe, or at least once globally. The user requirement says "License line: ''" It doesn't specify per section or global. I'll put it at the bottom of each language section to ensure compliance with "Each section must include..." implicitly? Actually, the list of requirements for each section is specific (What Is This, Key concepts, Glossary, Scientific Note). The license is a separate requirement. I'll add it once at the very end. That should be fine.
-
-Let me review the Chinese section for terminology again:
 - 艾柯: yes, in note.
 - 格赖斯: yes, in note.
 - 取证工件: yes, in find() row and note.

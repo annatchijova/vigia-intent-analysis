@@ -6,14 +6,6 @@ Generated: 2026-05-20T14:56:47.878155+00:00
 -->
 
 ---
-doc_hash: e21ddd66
-module: vigia/tools/eml_gci.py
-languages: [EN, ES, RU, ZH]
-generated_by: moonshot-kimi-k2.6-batch-api
-license: Apache-2.0
----
-
----
 
 ## ENGLISH
 
@@ -32,8 +24,6 @@ license: Apache-2.0
 ### 【Scientific Note】
 
 ...
-
-
 
 ---
 
@@ -55,8 +45,6 @@ license: Apache-2.0
 
 ...
 
-
-
 ---
 
 ## РУССКИЙ
@@ -77,8 +65,6 @@ license: Apache-2.0
 
 ...
 
-
-
 ---
 
 ## 中文
@@ -98,7 +84,6 @@ license: Apache-2.0
 ### 【科学说明】
 
 ...
-
 
 ```
 
@@ -167,8 +152,6 @@ Glossary:
 【Scientific Note】
 Semiotic terminology invoked elsewhere in the VIGIA framework—deriving from Peirce, Eco, and Grice—is an analytical instrumentation suite, not mysticism. Treat these terms as sensors: a spectrometer does not “believe” in light; it registers specific wavelengths. Likewise, these conceptual sensors register classes of logical relations within evidence. The GCI Engine itself is built upon deterministic integer arithmetic: exact counts of epoch seconds and exact median deviations. This design guarantees that every measurement is reproducible and free from the uncertainty introduced by floating-point representations.
 
-
-
 **ESPAÑOL details:**
 
 ¿Qué es este módulo?
@@ -207,8 +190,6 @@ Glosario:
 
 【Nota Científica】
 La terminología semiótica invocada en el marco VIGIA —derivada de Peirce, Eco y Grice— constituye un arsenal de instrumentación analítica, no misticismo. Considere estos términos como sensores: un espectrómetro no «cree» en la luz, sino que registra longitudes de onda específicas. De igual modo, estos sensores conceptuales registran clases de relaciones lógicas dentro de la evidencia. El Motor GCI se construye sobre aritmética entera determinista: conteos exactos de segundos-epoch y desviaciones medianas exactas. Este diseño garantiza que cada medición sea reproducible y libre de la incertidumbre introducida por las representaciones de coma flotante.
-
-
 
 **РУССКИЙ details:**
 

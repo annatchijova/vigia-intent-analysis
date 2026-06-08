@@ -5,14 +5,6 @@ Batch ID: vigia-doc-0154-2f6f63bf
 Generated: 2026-05-20T14:56:47.877733+00:00
 -->
 
----
-doc_hash: 2f6f63bf
-module: vigia/tools/cross_artifact_resonance.py
-languages: [EN, ES, RU, ZH]
-generated_by: moonshot-kimi-k2.6-batch-api
-license: Apache-2.0
----
-
 ENGLISH:
 - Title: Cross-Artifact Resonance Analyzer (`vigia/tools/cross_artifact_resonance.py`)
 - What Is This Module? This is a forensic analysis module that treats digital evidence (emails, PDFs) as "witness statements." It extracts claims (who, what, when) from each piece of evidence and checks if they tell the same story. If one email claims an event happened in Q4 2024 but the attached PDF references Q1 2025, the module flags a semantic inconsistency. It uses deterministic integer arithmetic to compare timestamps and categorical codes, avoiding probabilistic floating-point approximations.
@@ -79,12 +71,14 @@ ESPAÑOL:
   - 语义连贯性
   - 确定性整数运算
   - 取证工件 (forensic artifact) - user explicitly said use 取证工件 (not 制品)
+  - 时间不一致 / 时序错配 (temporal mismatch). User said not 裂缝, but didn't specify for mismatch. Use 时序错配 or 时间错配. Actually user specified 逻辑断裂 (not 裂缝) — I should avoid 裂缝, but mismatch is 错配/不一致. I can use 时序不一致.
 - Scientific Note: 【科学说明】. Need to mention 皮尔斯 (Peirce), 艾柯 (Eco - specified), 格赖斯 (Grice - specified). Sensor analogy: 传感器/探测器. Terminology is formal models. Not mysticism (神秘主义). Use deterministic filters.
-
 
 Also need to ensure I don't use floating-point explanations. Emphasize deterministic integer arithmetic. The module compares timestamps as integers (Unix epoch), topic IDs as integers, etc. No probability scores from floats. This is important.
 
+ This should appear once at the end of the document, or per section? The user says "Include license line". Probably at the very end.
 
+I should be thorough but concise. I'll make four main sections. Let's draft them.
 
 ---
 
@@ -218,21 +212,27 @@ El marco emplea terminología derivada de **Peirce** (semiótica: la lógica de 
 #### 【科学说明】
 本框架使用的术语源自**皮尔斯**（符号学：符号的逻辑）、**艾柯**（文化编码与超编码）与**格赖斯**（会话准则：对真实性、相关性与清晰性的期望）。这些术语并非神秘主义构造，而是形式化的、确定性的交际模型。请将它们理解为实验室仪器：皮尔斯提供了解码符号的语法（谁发送了什么），艾柯提供了范畴分类体系（事件属于哪个领域），格赖斯则提供了使欺骗可检测的逻辑公理（为何一项不相关或自相矛盾的陈述是异常的）。当两份取证工件产生不兼容的读数时，模块记录的是**传感器 discrepancy**——而非超自然直觉——并将其标记以供调查人员复核。所有比较均通过确定性整数运算完成，而非概率评分。这里的任何语义不一致都表现为**逻辑断裂**，是可重复检测的客观现象，而非文本解读上的神秘感应。
 
-
 Also need to check: "逻辑断裂 (not 裂缝)". I used 逻辑断裂 in the note. I didn't use 裂缝. Good.
 
+Double check: "取证工件 (not 制品)". I used 取证工件 throughout. Good.
 
+Double check: "艾柯 (not Eco)". Used 艾柯. Good.
 
 "格赖斯 (not Grice)". Used 格赖斯. Good.
 
+License line at the end: ""
 
+Need to ensure I don't use floating-point math explanations. I emphasized deterministic integer arithmetic.
 
+Need to make sure the audience is scientists who do not know Python. I avoided Python syntax and explained classes as concepts.
 
+The user said "Generate the complete academic document now. Be thorough but concise." I should make sure it's not too short. The tables and glossary make it thorough.
 
+One thing: the prompt says "Detecta: - Temporal mismatches (email habla de Q4 2024," and cuts off. I incorporated temporal mismatches.
 
+I should check if I need to include the author VIGÍA Collective. The prompt mentions Author: VIGÍA Collective. I can mention it in the intro or not? The user also specified a specific license line to use. Since the user gave a specific license line, I will use that. I don't necessarily need to mention VIGÍA Collective if it conflicts, but the docstring says Author: VIGÍA Collective. The user explicitly asks for "License line: ''" So I'll put that at the end. I can mention the module was authored by VIGÍA Collective in the text, but the copyright line is as specified.
 
-
-
+I should ensure the scientific note uses the sensor analogy explicitly. In my draft, I said "Think of them as laboratory instruments" / "Piense en ellos como instrumentos de laboratorio" / "Воспринимайте их как лабораторные приборы" / "请将它们理解为实验室仪器". And I mention sensor discrepancy. That seems solid.
 
 - 跨取证工件共振分析器 - good.
 - 本模块是什么？ - good.
@@ -242,6 +242,7 @@ Also need to check: "逻辑断裂 (not 裂缝)". I used 逻辑断裂 in the note
 - Unix 时间戳 - acceptable technical term.
 - 固定类别分类码 - good.
 - 时序错配 - good (instead of temporal mismatch with 裂缝).
+- 传感器 discrepancy - I left "discrepancy" in English pinyin? No, I wrote "传感器 discrepancy". That's bad. I should translate it fully. Let's fix: "记录的是**传感器读数差异**". Or "**传感器间的系统性偏差**". Let's use **传感器差异**.
 - 逻辑断裂 - included.
 - 非概率评分 - good.
 
@@ -249,14 +250,19 @@ Also need to check: "逻辑断裂 (not 裂缝)". I used 逻辑断裂 in the note
 
 Also check the English scientific note: "sensor discrepancy" is fine.
 
+Check Russian: "расхождение датчиков" is fine.
 
+Check Spanish: "discrepancia entre sensores" is fine.
 
+I should make sure the note mentions Peirce/Eco/Grice are NOT mysticism. I explicitly say "not mystical constructs" / "no son constructos místicos" / "не являются мистическими конструктами" / "并非神秘主义构造". Good.
 
+I should also ensure I mention deterministic integer arithmetic in the note or body. I did.
 
 One final check: The user wants "A 【科学说明】/【Scientific Note】 box explaining that Peirce/Eco/Grice terminology is NOT mysticism — use the sensor analogy". The heading should be exactly that? Or should it be 【Scientific Note】 in English, etc.? The user wrote "A 【科学说明】/【Scientific Note】 box". I can use 【Scientific Note】 in EN, 【Nota Científica】 in ES, 【Научное примечание】 in RU, and 【科学说明】 in ZH. That satisfies the bilingual bracket style.
 
+I will assemble the final output. I'll make sure the license line is at the very end, separate from the language sections, or perhaps included in each? The user says "License line: ...". Usually one at the end is sufficient. I'll put it at the end.
 
-
+For the EN table, maybe add a row for `CrossArtifactResonanceAnalyzer` class? The prompt lists classes. I should probably mention the analyzer itself in the concepts table.
 
 Revised Key Concepts table (EN):
 
@@ -272,17 +278,25 @@ Revised Key Concepts table (EN):
 
 Similarly for other languages.
 
+Also, the function `analyze()`: I should mention it conceptually, e.g., "The analysis protocol (analyze) accepts a collection of artifacts...".
 
 Add a small section "Analysis Protocol" or include in "What Is This Module?" I think the table and glossary are enough, but to be thorough, I can mention it in the plain language explanation.
 
+Let's refine the EN "What Is This Module?":
 "...The module accepts a collection of artifacts—each labeled by type, such as email or PDF—and executes a comparison protocol (`analyze`). It cross-references these assertions..."
 
+Since the audience doesn't know Python, I shouldn't use backticks or code formatting heavily. I'll just say "the analysis protocol".
 
+Actually, to be safe and clean, I'll avoid code backticks in the plain text except for the module path at the top.
 
 Alright, let's write the final document.
 
+I'll structure it with clear headings.
 
+One last thing: The user says "You always write in 4 languages: ENGLISH, ESPAÑOL, РУССКИЙ, 中文." So the document should contain all four.
 
+I will not add a preamble or conclusion beyond the required sections.
 
+Let's produce the final
 ---
 *Licensed under the Apache License, Version 2.0. Copyright 2026 Anna Tchijova.*

@@ -5,14 +5,6 @@ Batch ID: vigia-doc-0054-ab0b295d
 Generated: 2026-05-20T14:56:47.856061+00:00
 -->
 
----
-doc_hash: ab0b295d
-module: vigia/core/forensic_adapter.py
-languages: [EN, ES, RU, ZH]
-generated_by: moonshot-kimi-k2.6-batch-api
-license: Apache-2.0
----
-
 ENGLISH:
 - What Is This Module?: vigia/core/forensic_adapter.py acts as a central translation hub. It converts raw digital forensic signals (SignalOutput) into structured objects compatible with the CAIE (Context-Aware Information Extraction) framework and the AbductiveReasonerV2 engine. Think of it as a laboratory sample preparator: it takes unprocessed traces from disks, memory, or network traffic and labels, stratifies, and catalogs them into evidence layers with deterministic integer-based weights. No probabilistic floating-point guessing is used; every classification relies on exact integer arithmetic.
 - Key Concepts table:

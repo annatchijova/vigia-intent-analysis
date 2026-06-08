@@ -5,14 +5,6 @@ Batch ID: vigia-doc-0172-26dcd8ee
 Generated: 2026-05-20T14:56:47.881842+00:00
 -->
 
----
-doc_hash: 26dcd8ee
-module: vigia/tools/signal_contract.py
-languages: [EN, ES, RU, ZH]
-generated_by: moonshot-kimi-k2.6-batch-api
-license: Apache-2.0
----
-
 ENGLISH:
 - What Is This Module?: A standardized envelope (contract) that every forensic instrument in the VIGÍA system must use to report its findings. It guarantees that the LikelihoodEngine—the system's inference core—receives data in a single, predictable format. Without this contract, the chain of custody from evidence to statistical inference breaks, making conclusions inadmissible under Daubert standards. It is a deterministic, integer-arithmetic gateway between raw digital artifacts and probabilistic reasoning.
 - Key Concepts table:

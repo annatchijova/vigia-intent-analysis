@@ -5,14 +5,6 @@ Batch ID: vigia-doc-0011-a05271e7
 Generated: 2026-05-20T14:56:47.847170+00:00
 -->
 
----
-doc_hash: a05271e7
-module: scripts/convert_md_cases.py
-languages: [EN, ES, RU, ZH]
-generated_by: moonshot-kimi-k2.6-batch-api
-license: Apache-2.0
----
-
 ENGLISH:
 - Title: Module Documentation: `scripts/convert_md_cases.py`
 - What Is This Module?: A deterministic text-processing pipeline that transforms human-readable forensic case narratives (written in Markdown) into a structured, machine-readable JSON canon (the VIGÍA format). Think of it as a digital lathe that cuts unstructured evidence notes into standardized, countable, and indexable blocks—without using any probabilistic or floating-point operations. Every operation is exact integer-based string matching and deterministic record assembly.
@@ -52,11 +44,7 @@ ESPAÑOL:
 
 Need to ensure no floating-point math explanations. Emphasize deterministic integer arithmetic. The module uses regex and integer counters, so I can mention that string positions are tracked via integer indices and counts are exact integers.
 
-Let me organize the output. I'll put all four languages in one markdown document, clearly separated.
-
 Actually, looking at the prompt: "Format: Markdown with 4 language sections". So one document with four major sections.
-
-Let me structure:
 
 # Module Documentation: `scripts/convert_md_cases.py`
 
@@ -80,8 +68,6 @@ Table 2: Semiotic & Logical Layers
 | Grice Maxims | `GRICE_RE` | Communicative expectation rules; detects logical fractures in testimony. |
 | Signals | `SIGNALS_RE` / `signals_to_artifacts()` | Converts raw observational text into structured 取证工件 (forensic artifacts). |
 
-Wait, in English I should probably not use the Chinese term 取证工件. Use "forensic artifacts".
-
 Table 3: Deterministic Configuration Constants
 | Constant | Purpose |
 |---|---|
@@ -101,10 +87,8 @@ They are deterministic classifiers, not mysticism. They operate via exact intege
 
 ### License
 
-
 Then repeat structure for other languages.
 
-Let me think about the Chinese section carefully:
 - Peirce = 皮尔斯 (standard translation)
 - Eco = 艾柯 (required)
 - Grice = 格赖斯 (required)
@@ -122,8 +106,6 @@ Now, about "detect_type()" and "consolidate()" - I need to infer what they do ba
 I should describe them generically based on their names in the context: consolidate() likely aggregates multiple parsed cases into the final index and canonical files. detect_type() likely classifies the case or signals into a taxonomy. I'll describe them cautiously without making up too much, but enough to be useful.
 
 For the deterministic integer arithmetic emphasis: I should note that regex engines operate on discrete finite automata, string indices are integers, counts are integers, and JSON serialization preserves exact discrete structures. No floating-point measurements or probabilistic inference.
-
-Let me draft the content carefully.
 
 ENGLISH SECTION:
 
@@ -186,7 +168,6 @@ Table 3: Configuration & Integer-Arithmetic Guarantees
 
 **License**
 
-
 ---
 
 ESPAÑOL SECTION:
@@ -242,15 +223,12 @@ Table: Sensores Semióticos
 
 **Licencia**
 
-
 ---
 
 РУССКИЙ SECTION:
 
 **Что представляет собой этот модуль?**
 Это детерминированный текстовый рефайнери. Он преобразует неструктурированные судебно-экспертные описания дел, написанные в Markdown, в канонический формат JSON системы VIGÍA. Представьте цифровой токарный станок, работающий по точным целочисленным координатам: он читает исходный Markdown, находит каждый заголовок дела (`#### Caso NNN: "Nombre" – Subtítulo`) с помощью дискретных маркеров позиций индексов, разрезает текст на записи, извлекает семантические поля и собирает структурированные файлы доказательств. Никаких вероятностных догадок, никаких приближений с плавающей точкой. Каждый разрез точен; каждый счёт целочисленнен.
-
-Wait, I need to make sure I don't use floating-point explanations. I should say "нет никакой арифметики с плавающей точкой" or just avoid mentioning it positively. The requirement is "do NOT use floating-point math explanations". So I can mention that we avoid it.
 
 **Ключевые концепции**
 Table 1:
@@ -298,7 +276,6 @@ Table 2:
 > Все три работают через точное целочисленное сопоставление и переходы конечных состояний. Их вывод бинарен или категориален, но никогда не вероятностен.
 
 **Лицензия**
-
 
 ---
 
@@ -363,7 +340,6 @@ Table 2:
 
 **许可证**
 
-
 ---
 
 Now let me review against constraints:
@@ -374,8 +350,6 @@ Now let me review against constraints:
 5. License line included in each section? The requirement says "License line: ...". I should include it in each language section or at least once. To be safe, I'll include it at the end of each section.
 6. Do NOT use floating-point math explanations — I emphasized deterministic integer arithmetic and avoided explaining any float operations. I explicitly said no floating-point noise/approximations.
 
-Wait, the requirement says "emphasize deterministic integer arithmetic where applicable". I did that in the What Is sections and in the Glossary.
-
 One thing: I used "logical fractures" in English and "fracturas lógicas" in Spanish, but in Chinese I used 逻辑断裂 as required. In Russian I used "логические разрывы". That's fine; the constraint is specifically for Chinese.
 
 Also, the user said "You NEVER use floating-point math explanations for deterministic systems." I should double-check I didn't accidentally use any. I mention "no floating-point approximations" which is negative usage, but is that an "explanation"? It's a statement of absence. I think that's fine and actually encouraged by the prompt ("emphasize deterministic integer arithmetic"). I don't explain how floating-point works.
@@ -383,8 +357,6 @@ Also, the user said "You NEVER use floating-point math explanations for determin
 The module path and docstring are referenced. I included the path in the title.
 
 I should make sure the tables are formatted nicely in Markdown.
-
-Let me also check that I covered all functions and constants.
 
 Functions:
 - parse_md_file() — yes

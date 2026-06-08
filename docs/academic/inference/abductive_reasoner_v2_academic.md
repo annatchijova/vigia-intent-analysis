@@ -5,14 +5,6 @@ Batch ID: vigia-doc-0097-8fa48c2f
 Generated: 2026-05-20T14:56:47.865558+00:00
 -->
 
----
-doc_hash: 8fa48c2f
-module: vigia/inference/abductive_reasoner_v2.py
-languages: [EN, ES, RU, ZH]
-generated_by: moonshot-kimi-k2.6-batch-api
-license: Apache-2.0
----
-
 ENGLISH:
 - Title: Module Documentation: `vigia/inference/abductive_reasoner_v2.py`
 - What Is This Module?: Explain it's a deterministic inference engine for digital forensics. It implements abductive reasoning using Peircean semiotics, Eco's significant silence, and Gricean implicature, but in a rigid mathematical framework using exact fractions (rational numbers) to ensure reproducibility and court admissibility (Daubert standard). It prevents "judicial hallucination" through hard veto conditions.
@@ -121,8 +113,6 @@ The terminology of Peirce, Eco, and Grice is not mysticism; it is formal epistem
 - Eco's "Significant Silence" is equivalent to distinguishing a sensor's null return ("zero") from an absence of measurement ("no data"). A broken wire is not the same as a zero reading; the module treats missing links as structurally informative events, not as empty cells.
 - Gricean implicature functions like protocol logic for dropped sensor packets: if a signal is expected under hypothesis H but absent, the module records an implicature that counts against H through exact integer arithmetic.
 There are no séances, no hermeneutic circles, and no Bayesian priors requiring subjective belief. The system is a deterministic finite-state machine whose transitions are governed by exact rational fractions. The philosophical labels are merely historical names for operations that any reproducible measurement device must perform.
-
-
 
 ---
 

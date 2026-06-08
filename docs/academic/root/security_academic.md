@@ -5,14 +5,6 @@ Batch ID: vigia-doc-0128-8797b679
 Generated: 2026-05-20T14:56:47.872117+00:00
 -->
 
----
-doc_hash: 8797b679
-module: vigia/security.py
-languages: [EN, ES, RU, ZH]
-generated_by: moonshot-kimi-k2.6-batch-api
-license: Apache-2.0
----
-
 ENGLISH:
 `vigia/security.py` acts as a deterministic namespace shim within the VIGIA forensic framework. It redirects security-related capabilities from the project root into a unified access layer, ensuring consistent provenance tracking and non-repudiable module invocation. Scientists interact with a single, auditable entry point rather than scattered subsystems.
 
@@ -123,8 +115,6 @@ Words: ~26.
 Words: ~27.
 
 5. **EN:** *Provenance* — Documented origin and custody history of digital evidence. **ES:** *Procedencia* — Origen documentado e historial de custodia de evidencia digital. **RU:** *Происхождение данных* — Документированный источник и история хранения цифровых доказательств. **CN:** *溯源* — 数字证据的 documented 来源与保管历史。
-
-Wait, "documented" in Chinese should be 已记录的 or just 记录. Let's use: **CN:** *溯源* — 数字证据的已记录来源与保管历史。 (6 words)
 
 Words: ~24.
 
@@ -402,7 +392,6 @@ EN: Minimal redirection layer preserving interface compatibility. (7)
 ES: Capa mínima de redirección que preserva compatibilidad. (7)
 RU: Минимальный слой перенаправления, сохраняющий совместимость. (6)
 CN: 保持接口兼容性的最小重定向层。 (9 chars? Actually 12 chars.)
-Wait, counting Chinese characters as words:
 保持接口兼容性的最小重定向层 = 12 characters.
 Total entry 1: 7+7+6+12 = 32.
 

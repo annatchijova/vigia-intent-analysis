@@ -5,14 +5,6 @@ Batch ID: vigia-doc-0089-19bc56e9
 Generated: 2026-05-20T14:56:47.863756+00:00
 -->
 
----
-doc_hash: 19bc56e9
-module: vigia/forensics/temporal_forensics.py
-languages: [EN, ES, RU, ZH]
-generated_by: moonshot-kimi-k2.6-batch-api
-license: Apache-2.0
----
-
 ### ENGLISH
 #### What Is This Module?
 #### Key Concepts (with tables)
@@ -274,7 +266,5 @@ Structure:
 
 ---
 
-
-Wait, should the license be in each section? I'll put it at the very end of the doc once. The prompt says "License line: ...
 ---
 *Licensed under the Apache License, Version 2.0. Copyright 2026 Anna Tchijova.*

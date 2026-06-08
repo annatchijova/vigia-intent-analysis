@@ -5,14 +5,6 @@ Batch ID: vigia-doc-0031-9cf0944e
 Generated: 2026-05-20T14:56:47.851259+00:00
 -->
 
----
-doc_hash: 9cf0944e
-module: vigia/abductive_intent_engine.py
-languages: [EN, ES, RU, ZH]
-generated_by: moonshot-kimi-k2.6-batch-api
-license: Apache-2.0
----
-
 ENGLISH:
 - What Is This Module?: It's an abductive inference engine that analyzes digital forensic artifacts (raw data points) to determine attacker intent. It uses Peircean semiotics and Ockham's Razor. It ranks hypotheses by "cost" (integer count of unobserved assumptions) and picks the deterministic winner. Same input always yields same output. Designed for Daubert-standard forensic admissibility (auditability, explicit logic, no hidden conditionals).
 - Key Concepts Table:
@@ -216,7 +208,6 @@ Now I need to ensure the Chinese section uses 艾柯, 格赖斯, 取证工件, �
 
 Also, do not use floating-point math explanations. I must make sure I don't mention floats at all except to say they are prohibited. I should emphasize integer arithmetic.
 
-Let me check the prompt again for any missing details.
 - "MOTOR DE INFERENCIA ABDUCTIVA CON OCKHAM'S RAZOR" -> I should include this as the module title.
 - The docstring says HITO 2.1. I should mention this.
 - The classes are Artifact, AbductiveHypothesis, AbductiveResult, AbductiveIntentEngine. I described them.
@@ -243,8 +234,6 @@ Possible structure:
 ...
 
 Then License line.
-
-Wait, the user wants "What Is This Module?" as a section title. I'll use that exact string translated.
 
 ENGLISH: "What Is This Module?"
 ESPAÑOL: "¿Qué es este módulo?" or "¿Qué Es Este Módulo?"

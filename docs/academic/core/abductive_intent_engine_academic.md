@@ -5,14 +5,6 @@ Batch ID: vigia-doc-0036-f14e91cc
 Generated: 2026-05-20T14:56:47.852299+00:00
 -->
 
----
-doc_hash: f14e91cc
-module: vigia/core/abductive_intent_engine.py
-languages: [EN, ES, RU, ZH]
-generated_by: moonshot-kimi-k2.6-batch-api
-license: Apache-2.0
----
-
 ENGLISH:
 - What Is This Module?
   This module is the abductive inference engine of the VIGÍA system. It functions like a digital forensic microscope that takes a chain of raw evidence artifacts (files, logs, timestamps) and reasons backward to propose the most probable attacker habit or intent. Instead of guessing, it compares competing explanatory hypotheses using a deterministic scoring rule based on Ockham's Razor: the explanation requiring the fewest unobserved assumptions wins. All calculations use integer arithmetic, ensuring that the same evidence always produces the same conclusion.
@@ -212,8 +204,6 @@ ENGLISH details:
   | infer_habit() | The measurement protocol: ingests an artifact chain, scores all candidate hypotheses, and returns the deterministic best fit. | Standard operating procedure for model selection |
   | to_dict() / to_json() | Serialization procedures that export the engine's state or results into human-readable, audit-friendly record formats. | Data export functions generating lab notebooks or instrument logs |
 
-Wait, the user listed `to_dict()` three times and `to_json()` once. Maybe each class has its own `to_dict()`. I can generalize: "Serialization exports (to_dict, to_json)".
-
 - Glossary should include terms like:
   - Abduction
   - Ockham's Razor
@@ -363,8 +353,6 @@ Maybe a brief intro? The user said "Generate the complete academic document". I'
 ...
 
 ---
-
-
 
 ---
 

@@ -5,14 +5,6 @@ Batch ID: vigia-doc-0066-6d01ab83
 Generated: 2026-05-20T14:56:47.858673+00:00
 -->
 
----
-doc_hash: 6d01ab83
-module: vigia/core/normalization_layer.py
-languages: [EN, ES, RU, ZH]
-generated_by: moonshot-kimi-k2.6-batch-api
-license: Apache-2.0
----
-
 ENGLISH:
 - Title: Normalization Layer — VIGÍA Core
 - What Is This Module? Explain it as a central translator/standardization lab. All forensic tools send signals in different "languages" (probabilistic formats). This layer converts them into a single, deterministic scale so scientists can compare them without knowing Python. Use Decimal (exact arithmetic) instead of float (approximate).
@@ -79,10 +71,6 @@ ESPAÑOL:
   - Chain of custody: 监管链
 - Scientific Note: 皮尔士、艾柯与格赖斯的术语并非神秘主义。用传感器类比。
 
-Wait, the user said "逻辑断裂 (not 裂缝)". Where would that fit? Probably in the glossary or key concepts, maybe explaining what a logical fracture is in the context of forensic artifacts. I should make sure to include "逻辑断裂" somewhere, perhaps as a term related to CAIE or spoofability. Maybe in the glossary: "Logical fracture / 逻辑断裂 — a deterministic indicator of structural inconsistency within a forensic artifact, analogous to a sensor reading that violates expected physical continuity."
-
-Let me plan the content for each language carefully.
-
 General technical details to convey:
 - The module acts as a mandatory gateway (pasarela).
 - It unifies different probabilistic "dialects" from upstream modules into one exact representation.
@@ -98,8 +86,6 @@ I must NOT explain floating-point math. So instead of saying "float is bad becau
 The scientific note about Peirce/Eco/Grice: The module docstring mentions "Semiótico". This refers to Charles Sanders Peirce (logic, semiotics), Umberto Eco (semiotics), and H.P. Grice (pragmatics, implicature). The note should say: these are analytical frameworks for how signs convey meaning. In VIGÍA, a "semiotic signal" is treated like a sensor output that encodes information via a known protocol. Just as a mass spectrometer outputs voltage that represents molecular weight, a semiotic module outputs a Fraction that represents an interpretive state. The normalization layer converts these heterogeneous sensor outputs into a common exact scale. It is engineering, not mysticism.
 
 Now, writing the actual markdown. I'll make it thorough but concise. Each language section will be clearly marked.
-
-Let me draft the ENGLISH section:
 
 ## ENGLISH
 
@@ -146,8 +132,6 @@ The Normalization Layer is that central metrology laboratory. It is a **mandator
 > 
 > The upstream "Semiotic" module borrows concepts from Charles Sanders Peirce (logic of signs), Umberto Eco (codes of interpretation), and H. P. Grice (pragmatic implicature). In VIGÍA, these names function as **sensor-taxonomy labels**, not philosophical incantations. A "semiotic signal" is analogous to the voltage output from a spectrophotometer: it is a structured reading that must be decoded through a known analytical protocol. Peirce’s categories describe *states of information entropy*; Eco’s codes describe *encoding schemas*; Grice’s maxims describe *expected coherence constraints*. The NormalizationLayer treats these heterogeneous sensor outputs—semiotic, geopolitical, or CAIE—exactly as a data-acquisition system treats thermocouple versus photodiode outputs: it converts them into one exact, deterministic scale (Decimal) before any scientific comparison occurs. There is no hermeneutic mystery here—only reproducible metrology.
 
-
-
 ---
 
 ESPAÑOL:
@@ -193,8 +177,6 @@ La Capa de Normalización es ese laboratorio central de metrología. Es una **pa
 > 
 > El módulo "Semiótico" aguas arriba toma prestados conceptos de Charles Sanders Peirce (lógica de los signos), Umberto Eco (códigos de interpretación) y H. P. Grice (implicatura pragmática). En VIGÍA, estos nombres operan como **etiquetas taxonómicas de sensores**, no como invocaciones filosóficas. Una "señal semiótica" es análoga a la tensión de salida de un espectrofotómetro: es una lectura estructurada que debe decodificarse mediante un protocolo analítico conocido. Las categorías de Peirce describen *estados de entropía informativa*; los códigos de Eco describen *esquemas de codificación*; los máximas de Grice describen *restricciones de coherencia esperadas*. La Capa de Normalización trata estas salidas heterogéneas—semióticas, geopolíticas o CAIE—exactamente como un sistema de adquisición de datos trata las salidas de un termopar versus un fotodiodo: las convierte a una escala exacta y determinista (Decimal) antes de cualquier comparación científica. Aquí no hay misterio hermenéutico, solo metrología reproducible.
 
-
-
 ---
 
 РУССКИЙ:
@@ -239,8 +221,6 @@ La Capa de Normalización es ese laboratorio central de metrología. Es una **pa
 > **Почему терминология Пирса, Эко и Грайса — это инженерия, а не мистика.**
 > 
 > Вышестоящий «семиотический» модуль заимствует концепции у Чарльза Сандерса Пирса (логика знаков), Умберто Эко (коды интерпретации) и Г. П. Грайса (прагматическая импликатура). В VIGÍA эти имена функционируют как **таксономические метки сенсоров**, а не как философские заклинания. «Семиотический сигнал» аналогичен выходному напряжению спектрофотометра: это структурированное показание, которое должно быть декодировано по известному аналитическому протоколу. Категории Пирса описывают *состояния информационной энтропии*; коды Эко описывают *схемы кодирования*; максимы Грайса описывают *ожидаемые ограничения когерентности*. Слой нормализации обращается с этими гетерогенными выходами—семиотическими, геополитическими или CAIE—точно так же, как система сбора данных обращается с выходами термопары и фотодиода: он преобразует их в одну точную, детерминированную шкалу (Decimal) до любого научного сравнения. Здесь нет герменевтической тайны—только воспроизводимая метрология.
-
-
 
 ---
 

@@ -6,14 +6,6 @@ Generated: 2026-05-20T14:56:47.861777+00:00
 -->
 
 ---
-doc_hash: 6599e8ef
-module: vigia/core/trust_levels.py
-languages: [EN, ES, RU, ZH]
-generated_by: moonshot-kimi-k2.6-batch-api
-license: Apache-2.0
----
-
----
 
 ENGLISH:
 
@@ -66,8 +58,6 @@ Glossary:
 - **可信根 (Trusted Root)**: The foundational cryptographic key or measurement from which all trust in a system is derived.
 - **动态关联感知 (Dynamic Correlation Perception)**: The systematic detection of patterns across multiple discrete events in time.
 
-
-
 ---
 
 ESPAÑOL:
@@ -95,8 +85,6 @@ Glossary -> Glosario
 - **TCM**: Módulo de Criptografía Confiable, estándar de hardware chino análogo al TPM.
 - **可信根 (Raíz de Confianza)**: Clave o medición criptográfica fundacional de la que se deriva toda la confianza en un sistema.
 - **动态关联感知 (Percepción de Correlación Dinámica)**: Detección sistemática de patrones a través de múltiples eventos discretos en el tiempo.
-
-
 
 ---
 
@@ -215,7 +203,6 @@ ES:
 
 RU:
 - Примерность (Первичность?), Секундарность (Вторичность?), Терцерность (Третичность).
-Wait, standard Russian translations for Peirce's categories:
 - Firstness: Первичность or Первоначальность.
 - Secondness: Вторичность.
 - Thirdness: Третичность or Терциарность.
@@ -226,7 +213,6 @@ Better:
 - Третичность (Thirdness) — correlation network.
 But the prompt uses "Terceridad". In Russian academic texts, Peirce's terms are sometimes kept in transliteration or translated. To avoid confusion, I can say:
 "Терцерность (Третичность) Пирса" or use "Третьеобразие" (rare). Actually, standard Russian philosophical translation for Thirdness is "Третичность" or "Третьеобразие". But since the prompt says "Terceridad", I'll use "Терцерность (Третичность) Пирса" to link to the module's terminology.
-Wait, in my draft I wrote "Примерность" which is definitely wrong. Let's correct:
 - Первичность (Firstness) = raw voltage.
 - Вторичность (Secondness) = threshold crossing.
 - Терцерность / Третичность (Thirdness) = sensor fusion.
@@ -264,7 +250,6 @@ Structure:
 ### Glossary
 ...
 
-
 ## ESPAÑOL
 ### ¿Qué es este módulo?
 ...
@@ -276,7 +261,6 @@ Structure:
 ...
 ### Glosario
 ...
-
 
 ## РУССКИЙ
 ### Что представляет собой этот модуль?
@@ -290,7 +274,6 @@ Structure:
 ### Глоссарий
 ...
 
-
 ## 中文
 ### 本模块是什么？
 ...
@@ -302,9 +285,6 @@ Structure:
 ...
 ### 术语表
 ...
-
-
-Wait, the prompt says "You always write in 4 languages: ENGLISH, ESPAÑOL, РУССКИЙ, 中文." So the four sections should be present. I'll use top-level headers for each language.
 
 I should also ensure that I mention the deterministic integer arithmetic in the context of HMAC-SHA256. HMAC-SHA256 produces a byte string, which can be represented as a large integer. The hash chain uses these integer values. So it's appropriate.
 
@@ -368,8 +348,6 @@ ESPAÑOL:
 - "Chain hash" -> 链式哈希.
 - "取证工件" used.
 - "逻辑断裂" used.
-
-Let me write the final output carefully.
 
 I need to be thorough but concise. The four-language structure will be lengthy. I should avoid excessive verbosity while covering all requirements.
 

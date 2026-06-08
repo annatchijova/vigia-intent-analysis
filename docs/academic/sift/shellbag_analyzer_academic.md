@@ -6,14 +6,6 @@ Generated: 2026-05-20T14:56:47.874857+00:00
 -->
 
 ---
-doc_hash: c477932e
-module: vigia/sift/shellbag_analyzer.py
-languages: [EN, ES]
-generated_by: moonshot-kimi-k2.6-batch-api
-license: Apache-2.0
----
-
----
 
 ## ENGLISH
 

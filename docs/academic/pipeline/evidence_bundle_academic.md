@@ -5,14 +5,6 @@ Batch ID: vigia-doc-0110-3e34d629
 Generated: 2026-05-20T14:56:47.868311+00:00
 -->
 
----
-doc_hash: 3e34d629
-module: vigia/pipeline/evidence_bundle.py
-languages: [ZH]
-generated_by: moonshot-kimi-k2.6-batch-api
-license: Apache-2.0
----
-
 中文:
 `vigia/pipeline/evidence_bundle.py` 是 VIGIA 数字取证框架中的管道支撑模块。它将数字物证、密码学哈希值与元数据聚合为统一的证据包。该模块通过生成确定性的只读容器，确保证据链的完整性。它在处理图中作为无状态转换运行，输出经校验的包对象，且不修改原始数据。模块专为可重现的自动化取证工作流设计。
 
@@ -143,8 +135,6 @@ Total descriptions: 51+56+54+49 = 210 words.
 
 Glossary: ~130 words.
 Grand total: ~340 words. Well under 500.
-
-Wait, does "бессостоятельное преобразование" make sense in Russian? The standard term for stateless is "безсостоятельное" or "не сохраняющее состояние". "Безсостоятельное" is a bit unusual; better "не имеющее состояния" or "безсостоянительное". Actually in IT Russian, "stateless" is often "не сохраняющий состояние" or "безсостояние". "Безсостоятельное" means insolvent/bankrupt. I must avoid that. Correction: "преобразование без сохранения состояния". Let's adjust.
 
 RU revised:
 `vigia/pipeline/evidence_bundle.py` — вспомогательный модуль конвейера цифровой криминалистики VIGIA. Объединяет цифровые артефакты, криптографические хеши и метаданные в детерминированный пакет доказательств. Как преобразование без сохранения состояния, генерирует контейнер только для чтения без изменения исходных данных, обеспечивая сохранность цепочки хранения. Научное примечание: детерминированная сериализация исключает изменчивые временные метки, гарантируя побитовую воспроизводимость.

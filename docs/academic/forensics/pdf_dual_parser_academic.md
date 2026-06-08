@@ -5,14 +5,6 @@ Batch ID: vigia-doc-0086-815ea136
 Generated: 2026-05-20T14:56:47.863089+00:00
 -->
 
----
-doc_hash: 815ea136
-module: vigia/forensics/pdf_dual_parser.py
-languages: [EN, ES, RU, ZH]
-generated_by: moonshot-kimi-k2.6-batch-api
-license: Apache-2.0
----
-
 ### ENGLISH
 
 **What Is This Module?**
@@ -233,12 +225,7 @@ Structure:
 
 ---
 
-
 ```
-
-Wait, the prompt says "Generate the complete academic document now." I should ensure the license line is included exactly as requested. I'll put it at the very end.
-
-Let me carefully translate the components table and concepts into all four languages, paying attention to terminology.
 
 ### ESPAÑOL Translations:
 

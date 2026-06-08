@@ -5,14 +5,6 @@ Batch ID: vigia-doc-0028-e7859153
 Generated: 2026-05-20T14:56:47.850642+00:00
 -->
 
----
-doc_hash: e7859153
-module: vigia/abduction/hypothesis_lineage.py
-languages: [EN, ES, RU, ZH]
-generated_by: moonshot-kimi-k2.6-batch-api
-license: Apache-2.0
----
-
 ### ENGLISH
 **What Is This Module?**
 This module is the "family tree" of hypotheses during VIGÍA's abductive cycle. In digital forensics, an analyst must see not only the final verdict but also the landscape of alternatives: what evidence, if found or missing, would pivot the conclusion elsewhere. This module records every considered hypothesis, tracks the signals that could change the outcome, and produces an immutable lineage report suitable for Daubert-standard traceability. It ensures reproducibility by using exact fractional costs and deterministic hashing over the entire trace.
@@ -142,16 +134,12 @@ I should check the Chinese terms again:
 - 格赖斯 (not Grice) -> used
 - 取证工件 (not 制品) -> used in PivotSignal description (我将入室盗窃...潜在指纹 作为类比，但“取证工件”这个词需要在术语表或正文中出现。让我确保使用它。我可以在术语表或正文中用“取证工件”来描述证据。目前PivotSignal行里用了“潜在指纹”，但也许我应该在某个地方明确使用“取证工件”。让我修改PivotSignal的描述或增加一处。实际上，在中文里“取证工件”应该用来翻译artifact。我可以在术语表或某个地方提到“取证工件”作为证据的同义词。或者把PivotSignal那一行的描述改成包含“取证工件”。)
 
-Wait, requirement 4 says: "Chinese translations must use: 艾柯 (not Eco), 格赖斯 (not Grice), 取证工件 (not 制品), 逻辑断裂 (not 裂缝)"
-
 So I need to make sure these specific terms appear in the Chinese text.
 - 艾柯: used in Scientific Note.
 - 格赖斯: used in Scientific Note.
 - 取证工件: need to use somewhere. Perhaps in the glossary or in the PivotSignal description. Let's add it to the description of PivotSignal: "一种具有判别性的取证工件（PivotSignal），其存在或缺失会改变最优假设。" Or in the table. Let me adjust the table: "其存在或缺失会改变裁决的取证工件" -> but PivotSignal is a signal, not exactly an artifact... but the user specifically wants 取证工件 used. Perhaps in the general text or glossary. I'll add a sentence in the "What Is This Module?" or glossary. Actually, the module deals with evidence. I can say in the plain language explanation: "...追踪可能改变结果的取证工件与信号..." Let's do that. Or in the glossary entry for PivotSignal: "一种关键取证工件". That satisfies the requirement.
 
 - 逻辑断裂 (not 裂缝): need to use somewhere. Where? The docstring mentions "逻辑断裂"? Not explicitly. But maybe I can mention it in the scientific note or explanation as "逻辑断裂" when describing what the module prevents, or in the context of abduction. Actually, abduction often deals with filling logical gaps. I can say in the Chinese section: "该模块帮助识别逻辑断裂，即哪些证据缺失会导致假设不成立。" That would naturally use the term.
-
-Let me revise the Chinese section to ensure all four terms appear.
 
 Chinese revisions:
 - In "What Is This Module?": 该模块记录每一个被考虑的假设，追踪可能改变结果的信号与**取证工件**，并生成一份不可篡改的谱系报告... 它帮助分析人员识别**逻辑断裂**——即哪些证据的缺失会逆转当前结论。
@@ -235,8 +223,6 @@ One more thing: The user said "Be thorough but concise." So I should not be over
 Let's write the final output.
 
 I'll place the license line once at the bottom, as it is universal. Or should it be in each section? The requirement says "License line: ''" It doesn't explicitly say per section, but since it says "Each section must include..." and then separately lists the license line, I think putting it once at the end is fine. However, to be safe and compliant, I'll put it at the end of the document, maybe under a universal heading. Actually, looking at the requirements: "5. License line: ''" It's a global requirement. I'll include it at the very bottom.
-
-Wait, requirement 3 says "Each section must include: ..." and lists 4 items. The license line is requirement 5. So it's separate. I'll include it once at the bottom.
 
 Let's draft the full text now.
 

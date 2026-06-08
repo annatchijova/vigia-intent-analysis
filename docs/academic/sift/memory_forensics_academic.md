@@ -5,14 +5,6 @@ Batch ID: vigia-doc-0135-f44d4660
 Generated: 2026-05-20T14:56:47.873637+00:00
 -->
 
----
-doc_hash: f44d4660
-module: vigia/sift/memory_forensics.py
-languages: [EN]
-generated_by: moonshot-kimi-k2.6-batch-api
-license: Apache-2.0
----
-
 ### ENGLISH
 
 #### What Is This Module?
@@ -115,8 +107,6 @@ Within each language section, subheaders:
 Then repeat for ESPAÑOL, РУССКИЙ, 中文.
 
 At the end, license line.
-
-Wait, the user wants "Each section must include: 'What Is This Module?' (plain language explanation), Key concepts with tables, A glossary, A Scientific Note box". So each language section must have these four things. I will structure accordingly.
 
 Let's draft ENGLISH first.
 

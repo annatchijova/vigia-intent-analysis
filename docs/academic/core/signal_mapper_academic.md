@@ -5,14 +5,6 @@ Batch ID: vigia-doc-0077-7ed37665
 Generated: 2026-05-20T14:56:47.861093+00:00
 -->
 
----
-doc_hash: 7ed37665
-module: vigia/core/signal_mapper.py
-languages: [EN]
-generated_by: moonshot-kimi-k2.6-batch-api
-license: Apache-2.0
----
-
 # ENGLISH
 ## What Is This Module?
 ...
@@ -29,8 +21,6 @@ license: Apache-2.0
 ## 本模块是什么？
 ...
 Then license line at the very end.
-
-Wait, the prompt says: "Each section must include: ..." meaning each language section must include those subsections.
 
 Let's plan content:
 

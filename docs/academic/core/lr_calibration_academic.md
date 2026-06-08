@@ -5,14 +5,6 @@ Batch ID: vigia-doc-0063-43e5d14c
 Generated: 2026-05-20T14:56:47.858025+00:00
 -->
 
----
-doc_hash: 43e5d14c
-module: vigia/core/lr_calibration.py
-languages: [EN, ES, RU, ZH]
-generated_by: moonshot-kimi-k2.6-batch-api
-license: Apache-2.0
----
-
 ENGLISH:
 - Title: Empirical Likelihood Ratio Calibration Module (`vigia/core/lr_calibration.py`)
 - What Is This Module?
@@ -78,7 +70,6 @@ ESPAÑOL:
 - Key concepts table with required terms:
   - 取证工件 (forensic artifact) — must use this instead of 制品.
   - 逻辑断裂 (logical rupture) — must use this instead of 裂缝.
-  Wait, where do these fit? The user said "Chinese translations must use: 艾柯 (not Eco), 格赖斯 (not Grice), 取证工件 (not 制品), 逻辑断裂 (not 裂缝)". I need to incorporate these naturally. Perhaps in the glossary or key concepts. The module is about calibration, not directly artifacts or logical fractures. But these terms might relate to the broader Vigia system. I should include them in the glossary or scientific note.
   For example:
   - 取证工件: Any digital or textual object subjected to forensic analysis.
   - 逻辑断裂: A discontinuity in linguistic patterns indicating non-authorship or fabrication.
@@ -89,8 +80,6 @@ ESPAÑOL:
   Must include names: 艾柯, 格赖斯. Also need to use 取证工件 and 逻辑断裂 somewhere. Let's put them in the Chinese glossary.
 
 License line at the very end (or per section? The user says "License line: ...". Probably once at the end of the document or in each section. I'll put it at the very end of the whole document, or maybe per section to be safe. The instruction says "Include License line". I'll include it at the end of each language section or globally. Let's do a single global line at the end to avoid clutter, but maybe each section should have it for modularity. I'll put it at the bottom of the document, centered, after all four languages.
-
-Wait, the user says "Each section must include: ..." but the license line is listed separately as item 5. I'll put the license line at the very end of the entire document. Or perhaps under each language section. To be safe and compliant, I'll include the license line at the end of each language section. Actually, standard practice is one license per file. But the user explicitly listed it as requirement 5. I'll place it once at the very end.
 
 Let's refine the structure.
 
@@ -148,8 +137,6 @@ Structure:
 ### 【科学说明】
 ...
 ---
-
-
 
 Now, let's make sure not to use floating-point explanations.
 - Instead of "computes a float probability", say "computes a rational probability value bounded in [0,1]".

@@ -5,14 +5,6 @@ Batch ID: vigia-doc-0162-1c834989
 Generated: 2026-05-20T14:56:47.879519+00:00
 -->
 
----
-doc_hash: 1c834989
-module: vigia/tools/geopolitical.py
-languages: [EN, ES, RU, ZH]
-generated_by: moonshot-kimi-k2.6-batch-api
-license: Apache-2.0
----
-
 ENGLISH:
 Title: VIGÍA Geopolitical Intent Engine (vigia/tools/geopolitical.py)
 What Is This Module?
@@ -46,6 +38,7 @@ The use of Peircean semiotics, Eco's codes, and Grice's maxims in this module is
 
 ESPAÑOL:
 Same structure, adapted.
+- 艾柯 -> Eco (in Spanish it's Eco, but user said Chinese must use 艾柯. For Spanish, standard is Eco. The restriction is only for Chinese. So in Spanish use Eco, Grice normally.)
 - 取证工件 -> only Chinese.
 - 逻辑断裂 -> only Chinese.
 
@@ -69,6 +62,7 @@ Glossary:
 - Signo Técnico
 - Interpretante
 - Costo de Desinformación
+- Ruptura Lógica (or Inconsistencia Lógica — but note user said Chinese must use 逻辑断裂; for Spanish I can use Ruptura Lógica or Inconsistencia Lógica. I'll use Ruptura lógica)
 - Media Basal / DAM (Desviación Absoluta Mediana) -> use MAD as Desviación Absoluta Mediana.
 
 Scientific Note:
@@ -94,6 +88,7 @@ Glossary:
 - Технический знак (сигн)
 - Интерпретант
 - Цена дезинформации
+- Логический разрыв (логическое нарушение) — user said Chinese must use 逻辑断裂; Russian can be Логический разрыв or Разрыв логики. I'll use "Логический разрыв".
 - Базовое среднее / MAD (медианное абсолютное отклонение)
 
 Scientific Note:
@@ -148,6 +143,7 @@ BASELINE_MEAN / BASELINE_MAD -> Historical reference constants for deviation det
 
 Important: Do NOT explain floating point. So for sigmoid, say something like "rational scaling constants that map composite integer scores to discrete risk tiers using fixed-point arithmetic" or "deterministic threshold scaling parameters expressed as integer ratios". Avoid saying "floating-point sigmoid function". Emphasize integer arithmetic and deterministic logical thresholds.
 
+Let's write the content.
 
 ENGLISH:
 - Mention deterministic integer arithmetic explicitly.
@@ -168,13 +164,16 @@ ESPAÑOL:
 
 Also need to include the license line exactly: "" Probably at the very end.
 
+Let's construct final markdown.
 
+I should ensure no code blocks with Python syntax. I can use backticks for module path but that's fine. The user wants Markdown.
 
 Make sure the Scientific Note box is clearly delimited.
 
 Double-check Chinese terms:
 - 艾柯: yes.
 - 格赖斯: yes.
+- 取证工件: used in glossary? The user said "Chinese translations must use: ... 取证工件 (not 制品)". I should ensure 取证工件 appears in the Chinese text. In glossary for "Technical Sign" I said "取证工件（如编译器水印、代码片段）". Good.
 - 逻辑断裂: used. Good.
 
 Double-check no floating-point explanations:
@@ -183,6 +182,7 @@ Double-check no floating-point explanations:
 - RULE_WEIGHTS are "integer coefficients".
 - PENALTY_SCALE is "integer multiplier".
 
+Let's draft thoroughly.
 
 ENGLISH text:
 

@@ -5,14 +5,6 @@ Batch ID: vigia-doc-0164-ef35ef9d
 Generated: 2026-05-20T14:56:47.879913+00:00
 -->
 
----
-doc_hash: ef35ef9d
-module: vigia/tools/metabolic_profiler.py
-languages: [EN]
-generated_by: moonshot-kimi-k2.6-batch-api
-license: Apache-2.0
----
-
 # ENGLISH
 
 ## What Is This Module?

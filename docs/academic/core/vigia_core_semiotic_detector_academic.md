@@ -5,14 +5,6 @@ Batch ID: vigia-doc-0082-5dac09b1
 Generated: 2026-05-20T14:56:47.862216+00:00
 -->
 
----
-doc_hash: 5dac09b1
-module: vigia/core/vigia_core_semiotic_detector.py
-languages: [EN, ES, RU, ZH]
-generated_by: moonshot-kimi-k2.6-batch-api
-license: Apache-2.0
----
-
 ENGLISH:
 - What Is This Module?: It is a deterministic forensic analysis engine that inspects digital artifacts for structural and communicative anomalies. It maps semiotic principles (Peirce, Eco, Grice) onto integer-based pattern signatures. Instead of probabilistic or floating-point inference, it uses exact integer arithmetic to classify signs, detect logical fractures, and measure adherence to cooperative principles within data streams. Target audience explanation: think of it as a digital microscope that reads evidence not as raw bytes but as structured messages.
 - Key Concepts Table:
@@ -24,8 +16,6 @@ ENGLISH:
   - Sign Classification (Peircean): Mapping byte patterns to icon/index/symbol categories via integer feature vectors.
   - Code Validation (Eco): Checking whether observed patterns conform to expected coding schemes using exact matching.
   - Maxim Violation (Grice): Detecting breaches of quantity, quality, relation, or manner in structured data by integer metric thresholds.
-
-Wait, I need to be careful. The user said "Do NOT use floating-point math explanations for deterministic systems." So I should emphasize that the system avoids floating point entirely and uses integer math.
 
 Glossary:
 - Artifact (取证工件): Digital evidence item.
@@ -301,10 +291,6 @@ I will structure the doc:
 
 ---
 
-
-
-Wait, should the license be in every section or just once? The user said "License line: ''" It's safest to put it once at the bottom. Or maybe under each section? Usually once at the bottom. I'll put it at the bottom. But to be safe and follow "Each section must include: ... License line"? No, the user said "Each section must include: 1. What Is This Module? ... 4. A 【科学说明】/【Scientific Note】 box ... 5. License line". Wait, looking back:
-
 "3. Each section must include:
    - "What Is This Module?" (plain language explanation)
    - Key concepts with tables
@@ -365,6 +351,5 @@ I will keep it as is.
 
 Let's finalize.
 
-Wait, I need to check if I should include `SemioticDetector
 ---
 *Licensed under the Apache License, Version 2.0. Copyright 2026 Anna Tchijova.*

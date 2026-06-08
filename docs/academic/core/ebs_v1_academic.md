@@ -5,14 +5,6 @@ Batch ID: vigia-doc-0048-bb8bfa2d
 Generated: 2026-05-20T14:56:47.854843+00:00
 -->
 
----
-doc_hash: bb8bfa2d
-module: vigia/core/ebs_v1.py
-languages: [EN, ES, RU, ZH]
-generated_by: moonshot-kimi-k2.6-batch-api
-license: Apache-2.0
----
-
 ENGLISH:
 - Title: Evidence Bundle Specification v1.0 (EBS v1) — Core Data Schema
 - What Is This Module?: A formal data contract that defines what forensic information looks like before any analysis, narrative, or cryptographic sealing is applied. Think of it as the "common language" that different instruments use to record their readings in a single, tamper-evident container. It is Layer 0: raw, immutable facts.
@@ -73,14 +65,10 @@ The module path is vigia/core/ebs_v1.py but docstring says vigia/models/ebs_v1.p
 
 Need to include all classes/functions mentioned in a cohesive way, but as concepts, not code.
 
-Let me structure the output:
-
 # Evidence Bundle Specification v1.0 — Data Schema Documentation
 `vigia/core/ebs_v1.py` | `vigia/models/ebs_v1.py`
 
 Then sections for each language.
-
-Wait, the user wants 4 language sections. Probably separate them clearly with headers.
 
 Let's draft the content fully.
 

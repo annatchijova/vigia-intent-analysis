@@ -5,14 +5,6 @@ Batch ID: vigia-doc-0070-2fcd8826
 Generated: 2026-05-20T14:56:47.859583+00:00
 -->
 
----
-doc_hash: 2fcd8826
-module: vigia/core/pipeline.py
-languages: [EN, ES, RU, ZH]
-generated_by: moonshot-kimi-k2.6-batch-api
-license: Apache-2.0
----
-
 English:
 - "What Is This Module?" plain language. Good.
 - Key concepts table: I should format it nicely.
@@ -183,10 +175,6 @@ Now check the Scientific Note boxes again. Must have the box syntax. I'll use bl
 Example for English:
 > **【Scientific Note】**
 > Terminology borrowed from Peirce, Eco (艾柯), and Grice (格赖斯) ...
-
-Wait, in English section, should I write Eco (艾柯) and Grice (格赖斯)? The user says "Chinese translations must use...". It might be nice to include the Chinese characters in the English note as a cross-reference, or maybe not necessary. The user specifically asks for the Chinese translations to use those terms. To be safe and consistent, I can mention in the English note: "Eco (艾柯) and Grice (格赖斯)" to show the mapping. But it's an English section. However, the requirement says "Chinese translations must use...", implying in the 中文 section. But adding the characters in the note could be helpful. I'll include them in all notes to reinforce that these are the exact terms.
-
-Wait, the user says: "4. Chinese translations must use: 艾柯 (not Eco), 格赖斯 (not Grice), 取证工件 (not 制品), 逻辑断裂 (not 裂缝)". So strictly, only Chinese section needs it. But putting them in the scientific note across languages as a parenthetical could be good for consistency. I'll do it.
 
 Double-check: "NEVER use floating-point math explanations for deterministic systems." I have said "No floating-point approximations", "Exact rational", "Integer threshold". This satisfies.
 

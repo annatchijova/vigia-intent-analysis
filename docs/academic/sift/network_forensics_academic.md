@@ -5,14 +5,6 @@ Batch ID: vigia-doc-0137-b9ce7db8
 Generated: 2026-05-20T14:56:47.874055+00:00
 -->
 
----
-doc_hash: b9ce7db8
-module: vigia/sift/network_forensics.py
-languages: [EN, ES, RU, ZH]
-generated_by: moonshot-kimi-k2.6-batch-api
-license: Apache-2.0
----
-
 ### ENGLISH
 #### What Is This Module?
 Plain language explanation for scientists. It's a deterministic network forensics engine that analyzes network flows to detect beaconing (C2 communication), exfiltration, and anomalies using integer-arithmetic signal processing and semiotics-inspired classification (Peirce/Eco/Grice concepts). It treats network traffic as semiotic signals.
@@ -246,7 +238,6 @@ Este módulo emplea ocasionalmente conceptos de la semiótica: la teoría de los
 
 License line at the end:
 
-
 Need to make sure Chinese terms are correct:
 - 艾柯 (Eco) - used.
 - 格赖斯 (Grice) - used.
@@ -269,8 +260,6 @@ Need to ensure no floating-point math explanations. For example, I shouldn't say
 Check the prompt: "You NEVER use floating-point math explanations for deterministic systems." So I must not explain the deterministic system by referencing floats. I should just describe the integer/rational arithmetic on its own terms. I think my text is okay, but let me double-check.
 
 In English: "Deterministic Integer Arithmetic: Calculation using exact rational numbers... rather than approximate decimal floats" — this contrasts with floats. Is that allowed? The instruction says "NEVER use floating-point math explanations for deterministic systems." This could mean: don't explain the system using floating-point math (e.g., "we use floats but then round"). But contrasting with floats to highlight determinism might be borderline. However, the prompt also says "emphasize deterministic integer arithmetic where applicable". To be safe, I should remove direct references to floats and just emphasize the deterministic integer/rational aspect positively. I will rephrase to avoid mentioning floating-point as the explanation. Instead: "Calculation performed exclusively with exact rational numbers represented as pairs of integers (numerator and denominator), ensuring perfect reproducibility across all platforms." No mention of floats.
-
-Let me revise all sections to remove any reliance on float explanations. I should not say "instead of floats". Just say "exact rational arithmetic using integer numerators and denominators".
 
 Also, for CV: Coefficient of Variation is usually a float. But here it's using Fraction. I should explain it as "the ratio of two integer-derived moments, stored as an exact rational number". Good.
 

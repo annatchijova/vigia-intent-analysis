@@ -6,14 +6,6 @@ Generated: 2026-05-20T14:56:47.875502+00:00
 -->
 
 ---
-doc_hash: 74d4c0cc
-module: vigia/sift/usb_device_tracker.py
-languages: [EN, ES, RU, ZH]
-generated_by: moonshot-kimi-k2.6-batch-api
-license: Apache-2.0
----
-
----
 
 ### ENGLISH
 
@@ -183,7 +175,6 @@ license: Apache-2.0
 
 ---
 
-Wait, I need to check the Chinese requirements again:
 - 艾柯 (not Eco) -> I used 艾柯.
 - 格赖斯 (not Grice) -> I used 格赖斯.
 - 取证工件 (not 制品) -> I haven't used this term yet in the Chinese section. I should make sure to use it instead of 制品/工件 where appropriate. The glossary has "证据字典", but "artifact" is usually a forensic artifact. The constant is ARTIFACT_RELIABILITY. In the table I translated ARTIFACT_RELIABILITY as 数据源的质量置信等级, but maybe I should mention 取证工件 somewhere. Let's integrate "取证工件" into the glossary or the key concepts. The constant `ARTIFACT_RELIABILITY` refers to the reliability of the artifact. In Chinese digital forensics, "artifact" is often translated as "取证工件" or "证据工件". I should use 取证工件 in the glossary for "Artifact" or in the description of ARTIFACT_RELIABILITY.

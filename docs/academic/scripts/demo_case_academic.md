@@ -5,14 +5,6 @@ Batch ID: vigia-doc-0002-1e1dcf92
 Generated: 2026-05-20T14:56:47.845378+00:00
 -->
 
----
-doc_hash: 1e1dcf92
-module: cases/demo_case.py
-languages: [EN, ES, RU, ZH]
-generated_by: moonshot-kimi-k2.6-batch-api
-license: Apache-2.0
----
-
 ENGLISH:
 - What Is This Module?: Explain it's a demonstration controller script for the VIGÍA Forensic Suite. It orchestrates the processing of a digital evidence case file (JSON) through an integration engine, producing a cryptographically verifiable bundle and a human-readable report. It acts like a laboratory robot that takes a case folder and runs a predetermined pipeline without human intervention. No Python knowledge needed to understand its role.
 - Key Concepts table:
@@ -140,8 +132,6 @@ ESPAÑOL:
   - **命令行参数**: 启动程序时传入的文本指令（例如 `--input`）。
   - **逻辑断裂**: 在符号系统中，数据模式与其所表征的系统状态之间出现的解释性断裂；溯因推理的作用即在于通过确定性整数排序的假设来弥合此类断裂。
   - **取证工件**: 在数字取证过程中生成、采集或输出的任何结构化对象或数据单元（如证据包、报告、日志）。 (Using 取证工件 instead of 制品).
-
-  Wait, the user specifically said "Chinese translations must use: 艾柯 (not Eco), 格赖斯 (not Grice), 取证工件 (not 制品), 逻辑断裂 (not 裂缝)". So I must ensure these appear. I'll include 艾柯 and 格赖斯 in the scientific note and/or glossary. 取证工件 should replace any instance of "制品" or general "artifact" translation. 逻辑断裂 should replace any instance of "裂缝" or be used for "gap/break".
 
 - Scientific Note box:
   **【科学说明】**

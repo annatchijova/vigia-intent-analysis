@@ -1,11 +1,3 @@
----
-doc_hash: 845ea393
-module: vigia/sandbox.py
-languages: [EN, ES, RU]
-generated_by: moonshot-kimi-k2.6-batch-api
-license: Apache-2.0
----
-
 ## ENGLISH
 
 ### 1. Module Purpose and Architectural Positioning

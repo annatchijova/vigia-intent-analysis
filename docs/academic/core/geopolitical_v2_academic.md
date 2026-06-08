@@ -1,11 +1,3 @@
----
-doc_hash: 3aa7e98b
-module: vigia/core/geopolitical_v2.py
-languages: [EN, ES, RU]
-generated_by: moonshot-kimi-k2.6-batch-api
-license: Apache-2.0
----
-
 ## ENGLISH
 
 **Module Designation:** `vigia/core/geopolitical_v2.py`  

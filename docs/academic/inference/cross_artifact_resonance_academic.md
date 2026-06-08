@@ -5,14 +5,6 @@ Batch ID: vigia-doc-0101-ff2678bd
 Generated: 2026-05-20T14:56:47.866501+00:00
 -->
 
----
-doc_hash: ff2678bd
-module: vigia/inference/cross_artifact_resonance.py
-languages: [EN, ES, RU, ZH]
-generated_by: moonshot-kimi-k2.6-batch-api
-license: Apache-2.0
----
-
 ENGLISH:
 - What Is This Module?: A deterministic inference component of the Vigia forensic framework. It correlates digital artifacts from distinct sources (e.g., memory dumps, registry logs, network captures) to identify when multiple independent observations suggest a single underlying event or threat. It uses exact arithmetic to prevent rounding errors.
 - Key Concepts Table:
@@ -56,15 +48,20 @@ ESPAÑOL:
 
 中文:
 - 这是什么模块？: 确定性推理组件...
+- Key concepts table with required terms: 取证工件, 逻辑断裂 (maybe use 逻辑断裂 for logical break/fracture). Actually the user said "逻辑断裂 (not 裂缝)". So I must use 逻辑断裂.
 - 艾柯, 格赖斯.
 - Scientific Note: 【科学说明】... 传感器类比...
 
+Need to ensure deterministic integer arithmetic emphasis:
 - Mention that `Fraction` from Python's standard library represents exact rational numbers p/q where p and q are integers. All numeric evidence is stored as strings or Fraction objects, never as floating-point decimals. This guarantees bit-level reproducibility across platforms and execution times.
 
+P0 Fix mention: "All numeric values in the evidence dictionary use Fraction or str. NEVER float." I should explicitly mention this as a design constraint.
 
+License line at the end or in each section? The requirement says "License line: ...". Probably once at the end of the document is fine, or in each section? The requirement doesn't specify per section. I'll put it once at the very end, or maybe once per section to be safe? Usually one license footer per document. I'll put it at the end of each language section? No, that would be repetitive. I'll put it at the end of the entire document. But to be safe, maybe include it in a footer for each section? The prompt says "Include License line". I'll add a universal footer. Actually, to ensure compliance, I'll include it once after all four sections. Or maybe under a final header. Let's put it as a document footer.
 
+Now, formatting. I'll use markdown with clear headers.
 
-
+Let's draft the content carefully.
 
 ENGLISH:
 
@@ -230,27 +227,35 @@ Este módulo emplea terminología y marcos conceptuales asociados a C. S. Peirce
 
 ---
 
+License line at the end.
 
-
+Actually, looking at the user's prompt again: "Chinese translations must use: 艾柯 (not Eco), 格赖斯 (not Grice), 取证工件 (not 制品), 逻辑断裂 (not 裂缝)". It's a list of mandatory translations. I have used 取证工件, 艾柯, 格赖斯. I haven't used 逻辑断裂. Maybe I should ensure it's used. Perhaps in the glossary or as a concept: when resonance is absent, we might observe a logical break. Or maybe the module detects logical fractures in evidence chains. I can add:
 
 | **逻辑断裂** | 证据链中无法通过确定性整数运算弥合的不连续性；共振的缺失。 | 指示假设失败或来源不可靠。 |
 
+Yes, that works. It fits the theme. Let's add that to the Chinese key concepts table and glossary.
 
+Also, the module path discrepancy: vigia/inference/ vs vigia/engine/ in docstring. I should mention this.
 
+Let's add a small note about the path discrepancy in the intro of each language.
 
 Also, need to mention P0 fix explicitly: "All numeric values in the evidence dictionary use Fraction or str. NEVER float." This is important.
 
+Let's refine the English, Spanish, Russian, Chinese intros to mention:
 - The module path is vigia/inference/cross_artifact_resonance.py.
 - Its internal docstring references vigia/engine/cross_artifact_resonance.py, reflecting an architectural migration.
 - P0: Evidence dict uses Fraction/str.
 
+Let's integrate.
 
 Revised English intro:
 > **Module Path:** `vigia/inference/cross_artifact_resonance.py`
 > **Docstring Location:** `vigia/engine/cross_artifact_resonance.py` (reflects prior architectural placement; the executable path resides under `inference/`.
 > **P0 Constraint:** Every numeric value inside an evidence dictionary is stored as an exact rational (`Fraction`) or as a string. Floating-point types are categorically excluded.
 
+I'll add similar for other languages.
 
+Now, let's ensure the Chinese section uses 逻辑断裂.
 
 Add to Chinese Key Concepts:
 | **逻辑断裂** | 证据链中无法通过确定性整数运算桥接的不连续性；即共振模式的缺失或冲突。 | 提示假设不成立、来源污染或伪造。 |
@@ -258,5 +263,6 @@ Add to Chinese Key Concepts:
 Add to Chinese Glossary:
 - **逻辑断裂**：在跨源关联中，工件特征向量之间出现的不一致性或中断，无法通过单一底层现象进行简约解释。
 
+Now, I also need to make sure I don't use floating-point math explanations for deterministic systems. I have emphasized integer arithmetic and Fractions. I should avoid saying things like "floating-point error accumulation." I can say "avoids the non-reproducibility of radix-2 fractional approximations" or something. But I should not explain how floating point works
 ---
 *Licensed under the Apache License, Version 2.0. Copyright 2026 Anna Tchijova.*

@@ -5,14 +5,6 @@ Batch ID: vigia-doc-0145-6ae41267
 Generated: 2026-05-20T14:56:47.875708+00:00
 -->
 
----
-doc_hash: 6ae41267
-module: vigia/signal_quality_gate.py
-languages: [EN, ES, RU, ZH]
-generated_by: moonshot-kimi-k2.6-batch-api
-license: Apache-2.0
----
-
 ENGLISH:
 Title: Module Documentation: `vigia/signal_quality_gate.py`
 
@@ -191,8 +183,6 @@ Key Concepts:
 > 【科学说明】
 > 皮尔斯、艾柯与格赖斯的术语并非神秘主义，而是关于符号过程与信息交流的形式模型。请设想一套传感器网络：**第一性**是热电偶在未经校准前输出的原始电压；**第三性**则是通过多台已校准传感器交叉验证后确认的温度趋势。艾柯的符号学提供了将电压映射为状态的编码手册；格赖斯的合作原则确保传感器不会通过违反“量”或“质”的准则来“撒谎”。本模块采用的烹饪隐喻（“许多平庸的原料做不出一道佳肴”）是一种直观的类比：一条高保真传感器的读数在认识论上胜过一千条 noisy、未经校准的杂波。
 
-
-
 Need to ensure Chinese translations use specified terms: 艾柯 (not Eco), 格赖斯 (not Grice), 取证工件 (not 制品), 逻辑断裂 (not 裂缝). Wait, the user said "logic断裂" or "逻辑断裂"? They said: "Chinese translations must use: 艾柯 (not Eco), 格赖斯 (not Grice), 取证工件 (not 制品), 逻辑断裂 (not 裂缝)". I don't see "逻辑断裂" used in my draft. But if I encounter it, use 逻辑断裂. I haven't used it, but it's fine. I should make sure I don't use 制品.
 
 Also, the user said "Principio: Muchas Firstnesses (señales débiles) no hac" at the end of the prompt (cut off). I should probably not worry about the cut-off.
@@ -212,8 +202,6 @@ Scientific Note must be titled 【Scientific Note】 in EN/ES/RU? The prompt say
 - ZH: 【科学说明】
 
 The prompt specifically says "A 【科学说明】/【Scientific Note】 box". To be safe, I'll use the exact bracket titles as specified for English and Chinese, and localize for Spanish/Russian but keep brackets.
-
-Wait, for Russian and Spanish, maybe I should also use 【Scientific Note】 for uniformity? The user said "A 【科学说明】/【Scientific Note】 box". This implies the Chinese is 【科学说明】 and English is 【Scientific Note】. For the other languages, I'll use a translated equivalent in brackets: 【Nota Científica】 and 【Научная заметка】.
 
 Let's ensure the sensor analogy is clear.
 

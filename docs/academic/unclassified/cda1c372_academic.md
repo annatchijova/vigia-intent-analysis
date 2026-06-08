@@ -1,0 +1,181 @@
+<!--
+VIGIA Academic Documentation
+Module: cda1c372
+Batch ID: vigia-doc-0124-cda1c372
+Generated: 2026-05-20T14:56:47.871197+00:00
+-->
+
+中文:
+该模块对否定压力测试报告中的结构性退化指标进行排序。通过将模型置信度的绝对变化与裁决偏移的二元标志进行加权组合，计算严重性指数，生成影响评分，从而对五个最严重的语义回归进行确定性分级，优先识别在对抗性否定条件下破坏分类器完整性的语言模式。
+Let's count: 该(1)模块(2)对(3)否定(4)压力(5)测试(6)报告(7)中的(8)结构性(9)退化(10)指标(11)进行(12)排序(13)。通过(14)将(15)模型(16)置信度(17)的(18)绝对(19)变化(20)与(21)裁决(22)偏移(23)的(24)二元(25)标志(26)进行(27)加权(28)组合(29)，计算(30)严重性(31)指数(32)，生成(33)影响(34)评分(35)，从而(36)对(37)五个(38)最严重(39)的(40)语义(41)回归(42)进行(43)确定性(44)分级(45)，优先(46)识别(47)在(48)对抗性(49)否定(50)条件(51)下(52)破坏(53)分类器(54)完整性(55)的(56)语言(57)模式(58)。= 58 "words" (characters are counted individually in Chinese word count usually, but sometimes each character is a word. I'll treat each character/term as a word. 58 is fine.)
+
+Glossary terms:
+1. Adversarial ... Linguistic (1) stressor (2) designed (3) to (4) invert (5) classifier (6) logic. (7)
+
+Usually, in these prompts, the glossary is a single block with terms and definitions, maybe with translations. But with 500 words total, having 4 separate glossaries is impossible. I will create a single consolidated glossary where each entry lists the term in 4 languages separated by slashes, then the definition in English (or maybe a fused definition). But the user wants 4 languages... Maybe I can provide the glossary in English only? No, the instruction says "You always write in 4 languages". So glossary entries should probably be in 4 languages or at least the terms should be identifiable.
+
+Alternative: Provide a table-like glossary text where each line is short.
+
+Actually, I think the best approach is to have a **Glossary** section with 10 entries. Each entry: Term (EN / ES / RU / 中文) — Definition. But definition in which language? Maybe 4 short definitions? That would be too long. Perhaps the definition can be a single multilingual phrase? No, that's messy.
+
+Maybe the user accepts that the glossary is presented in the 4 languages by having 4 separate mini-glossaries? But 500 words total makes that impossible.
+
+Let's calculate more carefully.
+
+If I do:
+
+**ENGLISH** [text ~45 words]
+**ESPAÑOL** [text ~50 words]
+**РУССКИЙ** [text ~48 words]
+**中文** [text ~40 words]
+**Glossary** [10 entries, each ~15 words = 150 words]
+Total ~330 words. That fits well under 500.
+
+I need to make the descriptions even shorter.
+
+EN:
+Structural damage classifier for adversarial-negation test reports. The module synthesizes a severity index from the absolute change in model confidence and a binary verdict-shift indicator. Weighted linear composition produces a deterministic impact score, isolating the five most critical semantic regressions. Output prioritizes linguistic patterns that degrade classifier integrity under controlled stress.
+
+Count:
+Structural(1) damage(2) classifier(3) for(4) adversarial-negation(5) test(6) reports.(7) The(8) module(9) synthesizes(10) a(11) severity(12) index(13) from(14) the(15) absolute(16) change(17) in(18) model(19) confidence(20) and(21) a(22) binary(23) verdict-shift(24) indicator.(25) Weighted(26) linear(27) composition(28) produces(29) a(30) deterministic(31) impact(32) score,(33) isolating(34) the(35) five(36) most(37) critical(38) semantic(39) regressions.(40) Output(41) prioritizes(42) linguistic(43) patterns(44) that(45) degrade(46) classifier(47) integrity(48) under(49) controlled(50) stress.(51) = 51 words.
+
+ES:
+Clasificador de daños estructurales para reportes de prueba de negación adversaria. El módulo sintetiza un índice de severidad a partir de la variación absoluta de confianza del modelo y un indicador binario de cambio de veredicto. La composición lineal ponderada genera una puntuación de impacto determinista, aislando las cinco regresiones semánticas más críticas. La salida prioriza patrones lingüísticos que degradan la integridad del clasificador bajo estrés controlado.
+
+Count:
+Clasificador(1) de(2) daños(3) estructurales(4) para(5) reportes(6) de(7) prueba(8) de(9) negación(10) adversaria.(11) El(12) módulo(13) sintetiza(14) un(15) índice(16) de(17) severidad(18) a(19) partir(20) de(21) la(22) variación(23) absoluta(24) de(25) confianza(26) del(27) modelo(28) y(29) un(30) indicador(31) binario(32) de(33) cambio(34) de(35) veredicto.(36) La(37) composición(38) lineal(39) ponderada(40) genera(41) una(42) puntuación(43) de(44) impacto(45) determinista,(46) aislando(47) las(48) cinco(49) regresiones(50) semánticas(51) más(52) críticas.(53) La(54) salida(55) prioriza(56) patrones(57) lingüísticos(58) que(59) degradan(60) la(61) integridad(62) del(63) clasificador(64) bajo(65) estrés(66) controlado.(67) = 67 words.
+
+RU:
+Классификатор структурных повреждений для отчётов стресс-тестирования адверсариальным отрицанием. Модуль синтезирует индекс тяжести из абсолютного изменения уверенности модели и бинарного индикатора сдвига вердикта. Взвешенная линейная композиция формирует детерминированную оценку воздействия, выделяя пять наиболее критических семантических регрессий. Выходные данные ранжируют языковые паттерны, разрушающие целостность классификатора при контролируемом стрессе.
+
+Count:
+Классификатор(1) структурных(2) повреждений(3) для(4) отчётов(5) стресс-тестирования(6) адверсариальным(7) отрицанием.(8) Модуль(9) синтезирует(10) индекс(11) тяжести(12) из(13) абсолютного(14) изменения(15) уверенности(16) модели(17) и(18) бинарного(19) индикатора(20) сдвига(21) вердикта.(22) Взвешенная(23) линейная(24) композиция(25) формирует(26) детерминированную(27) оценку(28) воздействия,(29) выделяя(30) пять(31) наиболее(32) критических(33) семантических(34) регрессий.(35) Выходные(36) данные(37) ранжируют(38) языковые(39) паттерны,(40) разрушающие(41) целостность(42) классификатора(43) при(44) контролируемом(45) стрессе.(46) = 46 words.
+
+中文:
+对抗性否定测试报告的结构性损伤分类器。该模块根据模型置信度的绝对变化与裁决偏移二元指示器合成严重性指数，通过加权线性组合产生确定性影响评分，筛选出五个最关键的语义回归。输出结果对受控压力下破坏分类器完整性的语言模式进行优先级排序。
+
+Count:
+对抗性(1)否定(2)测试(3)报告(4)的(5)结构性(6)损伤(7)分类器(8)。该(9)模块(10)根据(11)模型(12)置信度(13)的(14)绝对(15)变化(16)与(17)裁决(18)偏移(19)二元(20)指示器(21)合成(22)严重性(23)指数(24)，通过(25)加权(26)线性(27)组合(28)产生(29)确定性(30)影响(31)评分(32)，筛选出(33)五个(34)最(35)关键(36)的(37)语义(38)回归(39)。输出(40)结果(41)对(42)受控(43)压力(44)下(45)破坏(46)分类器(47)完整性(48)的(49)语言(50)模式(51)进行(52)优先级(53)排序(54)。= 54 words.
+
+Total description words: 51 + 67 + 46 + 54 = 218 words.
+
+Glossary: Need 10 terms. Let's make each entry concise.
+
+Example:
+**Adversarial negation / Negación adversaria / Адверсариальное отрицание / 对抗性否定** — Controlled linguistic inversion intended to trigger misclassification. (11 words)
+But if I do this for 10 terms, that's 110 words + term words. Let's say ~150 words.
+
+Total ~370. Under 500.
+
+However, the user said "Include a 10-term glossary." and "You always write in 4 languages". So the glossary should have terms in 4 languages. The definitions can be in English only? Or should definitions also be in 4 languages? The instruction says "You always write in 4 languages". This likely means all content. But a glossary with 4 definitions per term would be huge. Perhaps the glossary entries are just the terms in 4 languages with a single short definition that is universally understandable? Or maybe I can give the definition in 4 languages in sequence? That would be 4x the words.
+
+Given the severe word limit, I think the best interpretation is that the document contains 4 language sections, and the glossary is a section that includes the 4 language terms and definitions perhaps in English or perhaps each definition is 4-lingual compressed. But that's not feasible.
+
+Let's look at the total count. If each glossary entry is:
+- EN term
+- ES term
+- RU term
+- ZH term
+- EN definition (5 words)
+- ES definition (5 words)
+- RU definition (5 words)
+- ZH definition (5 words)
+That's ~40 words per entry. 10 entries = 400 words. Already over 500.
+
+So I must compress. I will provide the glossary as a single list where each item contains the four terms separated by slashes, followed by one definition in English (or a fused definition). But to satisfy "write in 4 languages", I can provide 4 glossaries, one per language, but each with only the terms and definitions in that language. However, that duplicates the concept 4 times.
+
+Actually, maybe the user wants the whole output to be a multilingual document, where each section is in a different language, and the glossary is a multilingual glossary (terms in 4 languages). I think providing terms in 4 languages with a single English definition is acceptable if the rest of the document is in 4 languages. But to be safer, I can provide a very short definition in English and then note that it applies across languages. Or maybe provide the definition in 4 languages but using very short phrases.
+
+Another idea: The glossary can be a list of 10 items, each item is a bullet. The bullet contains the 4 terms and then a definition that is written in a compact multilingual way? No, that's ugly.
+
+I think the most pragmatic approach is to have a glossary section with entries like:
+
+1. **Adversarial negation** | *Negación adversaria* | Адверсариальное отрицание | 对抗性否定 — Controlled input inversion provoking misclassification.
+
+This uses the 4 languages for the term and a single definition. Since the rest of the document is fully in 4 languages, this should satisfy the spirit.
+
+But the user said "You always write in 4 languages: ENGLISH, ESPAÑOL, РУССКИЙ, 中文." This applies to everything I write. The glossary is part of what I write. So definitions should ideally be in 4 languages too. But word limit!
+
+Maybe I can write the glossary in a way that each entry has 4 one-word definitions? No.
+
+Let's reconsider the word limit. Perhaps "under 500 words total" means per language block? But it says "total". However, 500 words for 4 languages + glossary is extremely tight for an academic description. Maybe the user wants brevity but allows some flexibility. Still, I should try to respect it.
+
+What if I make the glossary definitions very short (3-4 words) and include all 4 languages? Example:
+
+1. **Adversarial negation / Negación adversaria / Адверсариальное отрицание / 对抗性否定** — Inversión controlada de entrada que provoca error de clasificación / Controlled input inversion provoking misclassification / Контролируемое инвертирование входных данных, вызывающее ошибку классификации / 诱发误分类的受控输入反转.
+
+That's long.
+
+Alternative: Provide 4 separate mini-glossaries, one after each language section. Each mini-glossary has 10 terms with 3-word definitions. That would be 4 * 10 * (3+2) = 200 words for definitions + terms. Too much.
+
+Maybe the glossary is just 10 terms total, presented in 4 languages by grouping. For example:
+
+**Glossary / Glosario / Глоссарий / 词汇表**
+- **Adversarial negation / Negación adversaria / Адверсариальное отрицание / 对抗性否定**: Controlled linguistic inversion designed to force misclassification.
+...
+
+If I keep each definition to ~8 words, each entry is ~12 words. 10 entries = 120 words. Plus section headers.
+
+Total words: 218 (desc) + 120 (gloss) + headers (5*4=20) = ~358. Perfect.
+
+I need to make sure definitions are not using floating-point math. They are just conceptual.
+
+Let's draft 10 terms carefully to be relevant to the module.
+
+Terms:
+1. **Adversarial negation** / **Negación adversaria** / **Адверсариальное отрицание** / **对抗性否定** — Linguistic inversion designed to force classifier error.
+2. **Binary verdict shift** / **Cambio binario de veredicto** / **Бинарный сдвиг вердикта** / **裁决二元偏移** — Discrete indicator of categorical output reversal.
+3. **Classifier integrity** / **Integridad del clasificador** / **Целостность классификатора** / **分类器完整性** — Consistency of model decisions under stress.
+4. **Deterministic triage** / **Triage determinista** / **Детерминированное ранжирование** / **确定性分级** — Reproducible prioritization without stochastic variance.
+5. **Impact score** / **Puntuación de impacto** / **Оценка воздействия** / **影响评分** — Composite severity metric for regression ranking.
+6. **Model confidence delta** / **Delta de confianza del modelo** / **Дельта уверенности модели** / **模型置信度变化量** — Absolute deviation in predictive certainty.
+7. **Negation stress test** / **Prueba de estrés por negación** / **Стресс-тест отрицания** / **否定压力测试** — Diagnostic probing via adversarial negation.
+8. **Semantic regression** / **Regresión semántica** / **Семантическая регрессия** / **语义回归** — Performance degradation on meaning-based tasks.
+9. **Structural damage** / **Daño estructural** / **Структурный ущерб** / **结构性损伤** — System-level failure in model reasoning architecture.
+10. **Weighted linear composition** / **Composición lineal ponderada** / **Взвешенная линейная композиция** / **加权线性组合** — Aggregation of factors by fixed coefficients.
+
+Now let's count words for each entry.
+1. Linguistic(1) inversion(2) designed(3) to(4) force(5) classifier(6) error.(7) -> 7 words.
+2. Discrete(1) indicator(2) of(3) categorical(4) output(5) reversal.(6) -> 6 words.
+3. Consistency(1) of(2) model(3) decisions(4) under(5) stress.(6) -> 6 words.
+4. Reproducible(1) prioritization(2) without(3) stochastic(4) variance.(5) -> 5 words.
+5. Composite(1) severity(2) metric(3) for(4) regression(5) ranking.(6) -> 6 words.
+6. Absolute(1) deviation(2) in(3) predictive(4) certainty.(5) -> 5 words.
+7. Diagnostic(1) probing(2) via(3) adversarial(4) negation.(5) -> 5 words.
+8. Performance(1) degradation(2) on(3) meaning-based(4) tasks.(5) -> 5 words.
+9. System-level(1) failure(2) in(3) model(4) reasoning(5) architecture.(6) -> 6 words.
+10. Aggregation(1) of(2) factors(3) by(4) fixed(5) coefficients.(6) -> 6 words.
+
+Total def words: ~57.
+Terms: let's count roughly. Each entry has 4 terms, average 3 words each = 12 words per entry. 10 entries = 120 term words.
+Total glossary: ~177 words.
+
+Total overall: 218 + 177 = 395. Plus headers: maybe 20. Total ~415. Under 500. Great.
+
+To save words, I can embed the scientific note within each language block. For example, add one sentence to each description.
+
+EN addition: *Scientific note: The deterministic scoring schema excludes probabilistic thresholds, ensuring reproducible triage across experimental runs.* (15 words)
+
+ES addition: *Nota científica: El esquema de puntuación determinista excluye umbrales probabilísticos, garantizando un triage reproducible entre ejecuciones experimentales.* (16 words)
+
+RU addition: *Научное примечание: Детерминированная схема оценки исключает вероятностные пороги, обеспечивая воспроизводимое ранжирование между экспериментальными запусками.* (15 words)
+
+中文 addition: *科学注：确定性评分模式排除概率阈值，确保跨实验运行的可复现分级。* (15 characters/words)
+
+These are about 15 words each = 60 words.
+
+Now total: 395 + 60 = 455. Plus headers. Might hit ~480. Still under 500 if I'm careful.
+
+EN section:
+Structural damage classifier for adversarial-negation test reports. The module synthesizes a severity index from the absolute change in model confidence and a binary verdict-shift indicator. Weighted linear composition produces a deterministic impact score, isolating the five most critical semantic regressions. Output prioritizes linguistic patterns that degrade classifier integrity under controlled stress. *Scientific note: The deterministic scoring schema excludes probabilistic thresholds, ensuring reproducible triage across experimental runs.*
+
+Word count:
+Structural(1) damage(2) classifier(3) for(4) adversarial-negation(5) test(6) reports.(7) The(8) module(9) synthesizes(10) a(11) severity(12) index(13) from(14) the(15) absolute(16) change(17) in(18) model(19) confidence(20) and(21) a(22) binary(23) verdict-shift(24) indicator.(25) Weighted(26) linear(27) composition(28) produces(29) a(30) deterministic(31) impact(32) score,(33) isolating(34) the(35) five(36) most(37) critical(38) semantic(39) regressions.(40) Output(41) prioritizes(42) linguistic(43) patterns(44) that(45) degrade(46) classifier(47) integrity(48) under(49) controlled(50) stress.(51) Scientific(52) note:(53) The(54) deterministic(55) scoring(56) schema(57) excludes(58) probabilistic(59) thresholds,(60) ensuring(61) reproducible(62) triage(63) across(64) experimental(65) runs.(66) = 66 words.
+
+ES section:
+Clasificador de daños estructurales para reportes de prueba de negación adversaria. El módulo sintetiza un índice de severidad a partir de la variación absoluta de confianza del modelo y un indicador binario de cambio de veredicto. La composición lineal ponderada genera una puntuación de impacto determinista, aislando las cinco regresiones semánticas más críticas. La salida prioriza patrones lingüísticos que degradan la integridad del clasificador bajo estrés controlado. *Nota científica: El esquema de puntuación determinista excluye umbrales probabilísticos, garantizando un triage reproducible entre ejecuciones experimentales.*
+
+Count:
+Clasificador(1) de(2) daños(3) estructurales(4) para(5) reportes(6) de(7) prueba(8) de(9) negación(10) adversaria.(11) El(12) módulo(13) sintetiza(14) un(15) índice(16) de(17) severidad(18) a(19) partir(20) de(21) la(22) variación(23) absoluta(24) de(25) confianza(26) del(27) modelo(28) y(29) un(30) indicador(31) binario(32) de(33) cambio(34) de(35) veredicto.(36) La(37) composición(38) lineal(39) ponderada(40) genera(41)
+---
+*Licensed under the Apache License, Version 2.0. Copyright 2026 Anna Tchijova.*

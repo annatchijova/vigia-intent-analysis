@@ -5,14 +5,6 @@ Batch ID: vigia-doc-0104-2bb62251
 Generated: 2026-05-20T14:56:47.867206+00:00
 -->
 
----
-doc_hash: 2bb62251
-module: vigia/llm_backend_v2.py
-languages: [EN, ES, RU, ZH]
-generated_by: moonshot-kimi-k2.6-batch-api
-license: Apache-2.0
----
-
 ### ENGLISH
 
 What Is This Module?
@@ -210,8 +202,6 @@ Double-check scientific note uses sensor analogy: Yes, raw voltage, threshold co
 
 Double-check license line included in all sections? The user said "License line: ...". Probably at the very end of the document, or in each section? The requirement says "License line: ''" I think putting it at the end of each language section or once at the end. To be safe and thorough, I'll include it at the end of each section, or perhaps once globally. Given it's a legal notice, once at the very end is fine, but per section is also fine. I'll include it at the bottom of each section to be safe, as a footer. Actually, to be concise and not repetitive, I'll put it once at the very end. But the instruction says "Each section must include: ..." no, it says "Each section must include: - 'What Is This Module?' ... - Key concepts ... - Glossary ... - Scientific Note". It didn't explicitly say license line per section, just "License line: ...". I'll include it once at the bottom.
 
-Wait, I need to make sure I don't use Python syntax. The user is a non-Python scientist. I should refer to functions as procedures/operations, not Python code. I can mention the names but explain them as operations. The tables list the function names but in a scientific context.
-
 Also need to mention the module path somewhere? Probably in a header. The user gave MODULE PATH: vigia/llm_backend_v2.py. I can mention it as the document identifier.
 
 Let's assemble.
@@ -265,10 +255,6 @@ Glossary:
 
 【Scientific Note】
 Terminology drawn from Charles Sanders Peirce, Umberto Eco, and H. Paul Grice is sometimes mistaken for metaphysical speculation. It is not. These are epistemological instrument classes, directly analogous to a multiplexed sensor array in an analytical laboratory. **Firstness** is raw sensor voltage: a qualitative signal that something is present. **Secondness** is the threshold comparator that registers a deviation from baseline—an anomaly detection circuit with hard integer triggers. **Thirdness** is the inference firmware that reconstructs why the deviation occurred, i.e., a causal model. Eco’s limits of interpretation and Grice’s conversational maxims operate as calibration protocols: they define the boundary conditions under which a sensor reading is admitted as valid evidence. Assigning an integer capability level to a backend is therefore identical to setting a gain range on a lock-in amplifier: the action is deterministic, discrete, and reproducible across laboratories.
-
-
-
-Wait, the user said include the license line. I should include it at the end of the whole doc or per section. I'll include it at the end of the whole doc, but maybe also note it applies to all. Actually, to be safe, I'll put it at the end of each language section or as a footer. Given the structure, I'll add it once after all four sections. But the user explicitly listed it as requirement 5. I'll put it once at the bottom.
 
 Now for ESPAÑOL. Ensure terms: degradación elegante, etc.
 

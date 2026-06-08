@@ -6,14 +6,6 @@ Generated: 2026-05-20T14:56:47.874302+00:00
 -->
 
 ---
-doc_hash: 6c431d0b
-module: vigia/sift/prefetch_analyzer.py
-languages: [EN]
-generated_by: moonshot-kimi-k2.6-batch-api
-license: Apache-2.0
----
-
----
 
 ## ENGLISH
 

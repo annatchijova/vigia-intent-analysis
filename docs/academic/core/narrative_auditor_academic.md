@@ -5,14 +5,6 @@ Batch ID: vigia-doc-0064-4d89a448
 Generated: 2026-05-20T14:56:47.858273+00:00
 -->
 
----
-doc_hash: 4d89a448
-module: vigia/core/narrative_auditor.py
-languages: [EN, ES, RU, ZH]
-generated_by: moonshot-kimi-k2.6-batch-api
-license: Apache-2.0
----
-
 ENGLISH:
 - What Is This Module?
   This module acts as an independent verification stage in a multi-agent forensic pipeline. It examines a generated narrative (a sequential text output from an AI generator) for signs of manipulation, injection, or logical inconsistency before the narrative is permanently sealed as a forensic artifact. It does not create content; it only inspects. It implements the C3 protocol: one agent generates (Claude), a second agent audits (NarrativeAuditor), and a human serves as witness. This separation of duties ensures that a single point of compromise cannot corrupt both generation and validation.
@@ -161,9 +153,11 @@ ESPAÑOL:
   【科学说明】
   皮尔斯、艾柯与格赖斯的术语指向形式符号学框架，而非神秘主义。查尔斯·桑德斯·皮尔斯的符号学理论、翁贝托·艾柯的诠释代码以及赫伯特·保罗·格赖斯的会话准则，其运作方式类似于调谐至特定波长的光学传感器：它们是范畴化检测滤波器。正如光谱仪通过精确的发射谱线识别化学物质，这些框架通过精确的逻辑特征识别语义异常。当审计器标记“合作原则违例”或“非意图阐释项”时，它执行的是基于整数的确定性状态分类，而非召唤超自然力量。审计器是一枚符号学传感器；叙事即其待检样本。
 
+License line at the end: ""
 
+Also need to mention the module path discrepancy? The user says MODULE PATH: vigia/core/narrative_auditor.py but MODULE DOCSTRING: vigia/security/narrative_auditor.py. I should probably note this in a metadata/header section but since it's documentation for scientists, maybe mention the canonical path and note the docstring reference. Or just present it as `vigia/core/narrative_auditor.py` and maybe add a note. I'll add a small note in the intro/header.
 
-
+Let's organize:
 
 ```markdown
 # Module Documentation: `vigia/core/narrative_auditor.py`
@@ -207,34 +201,48 @@ ESPAÑOL:
 
 ---
 
-
 ```
 
+Actually, the license should appear in each section or at least once. The requirement says "License line: ..." I'll put it at the very bottom, and maybe in the header.
 
+Need to ensure no floating-point math explanations. I must avoid saying things like "probability scores between 0.0 and 1.0". Instead, use integer severity levels, integer counts, exact thresholds.
 
+The module seems to audit text. The scientific note requires Peirce/Eco/Grice. In Chinese: 皮尔斯 (Peirce is standard), 艾柯 (Eco), 格赖斯 (Grice). I must use 逻辑断裂 (not 裂缝) somewhere? The user said "逻辑断裂 (not 裂缝)". I haven't used 裂缝 yet, but I should ensure if I talk about logical breaks, I use 逻辑断裂. Let me check if there's a natural place. The prompt mentions "逻辑断裂 (not 裂缝)" specifically. I should probably include it in the Chinese section, maybe in the glossary or key concepts as the preferred term for logical fracture/break. Let me incorporate it.
 
 In the Chinese section, under Key Concepts or Glossary:
 - 逻辑断裂: 叙事中违反既定推理链的精确断裂点。 (instead of 裂缝).
 
 Also "取证工件" instead of "制品". I used 取证工件. Good.
 
+Need to make sure the scientific note uses the sensor analogy explicitly.
 
+Double check: "艾柯 (not Eco), 格赖斯 (not Grice), 取证工件 (not 制品), 逻辑断裂 (not 裂缝)". I have 艾柯, 格赖斯, 取证工件. I need to use 逻辑断裂 explicitly. I'll add it to the Chinese glossary or table.
 
+Let's refine the Chinese text to ensure natural academic tone.
 
 Chinese scientific note: "皮尔斯" is standard for Peirce. Good. "翁贝托·艾柯". Good. "赫伯特·保罗·格赖斯" or just "格赖斯". Good.
 
+Check РУССКИЙ: "Пирс" (Peirce), "Эко" (Eco), "Грайс" (Grice). Good.
 
+Check ESPAÑOL: "Peirce", "Eco", "Grice". Good.
 
+Check ENGLISH: "Peirce", "Eco", "Grice". Good.
 
+I need to ensure deterministic integer arithmetic emphasis. In the tables and notes, I should explicitly mention that scores are integers, counts are integers, and no floating-point approximations are used.
 
 For example, in the audit() function description: "The audit process enumerates threats using exact integer counts. Severity is classified into integer tiers (e.g., 1, 2, 3) rather than continuous scores. All threshold comparisons are performed with strict integer equality or ordering, ensuring deterministic, reproducible verdicts."
 
+I should probably mention that `to_dict()` produces a serialization of these integer states.
 
+Now, what about the cut-off text in the prompt? "Si hay threats CRITICAL" and "Args: narrative: Lista de líneas de narrativa investigation_id: ID de la". I don't have full info, so I'll describe them generally based on standard practices and the partial info. The prompt says "Generate documentation for the following Python module" and gives partial code/docstring. I should document what is provided and note that full implementation details follow the C3 protocol. Since the audience doesn't know Python, exact function signatures are less important than the conceptual role.
 
+Let's assemble the final document. I'll make sure it's clean Markdown.
 
+One concern: The user wants "Key concepts with tables". I should probably have two tables: one for architectural concepts, one for the module components (classes/functions). That covers it well.
 
 Also "threats CRITICAL" — in the English section, under the function description, I can say: "If any threats are classified at the CRITICAL integer severity tier, the audit result blocks the sealing operation." This is deterministic.
 
+Let's write it out.
 
 Header:
 ```

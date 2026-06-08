@@ -5,14 +5,6 @@ Batch ID: vigia-doc-0013-bd9cee0e
 Generated: 2026-05-20T14:56:47.847581+00:00
 -->
 
----
-doc_hash: bd9cee0e
-module: scripts/export_patterns.py
-languages: [ZH]
-generated_by: moonshot-kimi-k2.6-batch-api
-license: Apache-2.0
----
-
 中文:
 "VIGIA取证框架中的轻量级辅助模块 `scripts/export_patterns.py`（481字节）。其确定性功能是将提取的数字证物——如行为特征、文件结构标记或内存模式——序列化为标准化、可移植的外部格式。该过程支持可重复的下游分析，并可在无需了解底层环境实现细节的情况下实现跨平台证据共享。"
 
@@ -92,8 +84,6 @@ Terms:
    RU: Вычислительный процесс, дающий идентичные результаты при идентичных начальных условиях.
    中文: 在相同初始状态下始终产生相同输出的计算过程。
 
-Wait, the user wants the description in 4 languages, but does the glossary also need to be in 4 languages? Usually, yes, since the whole document is quadrilingual. But the constraint is 500 words total. If I do each glossary term in 4 languages, that will explode the word count.
-
 Alternative: The user said "Generate a brief academic description (4 languages: EN, ES, RU, 中文) for this VIGIA support module. Keep it under 500 words total. Include a 10-term glossary."
 
 This likely means the description text is in 4 languages, and the glossary is included (maybe monolingual or with terms in all 4). To fit under 500 words, I must be extremely compact. I could present the glossary as a table or list where each entry gives the term in 4 languages and one concise definition (maybe in English only, or a combined format). However, for a scientist reading in one language, having the term in their language matters most.
@@ -103,7 +93,6 @@ Actually, I can structure it like:
 
 Better: Provide the glossary definitions in English only (or extremely short multilingual labels) to save words, since the main description is already in 4 languages. But the prompt doesn't explicitly say the glossary must be in 4 languages. It says "You always write in 4 languages". That implies everything should be available in 4 languages. But 500 words total is very strict.
 
-Let me calculate: 500 words total.
 If I have 4 description paragraphs (~60 words each) = 240 words.
 Remaining 260 words for 10 glossary terms = 26 words per term. That's feasible if each term is defined once in English, but labeled in 4 languages? Or defined in all 4 languages? 26 words per term across 4 languages is ~6-7 words per language. That's too short for a definition.
 
@@ -215,8 +204,6 @@ EN: ...implementation-level internals. *Scientific note:* Output consistency der
 ES: ...detalles de implementación. *Nota científica:* La consistencia del resultado deriva exclusivamente de estados de entrada fijos y de la lógica de extracción.
 RU: ...деталями реализации. *Научное примечание:* Согласованность выходных данных определяется исключительно фиксированными входными состояниями и логикой извлечения.
 中文: ...底层实现细节。*科学注释：*输出一致性完全取决于固定输入状态与提取逻辑，而非运行时近似。
-
-Wait, "not from runtime approximation" might hint at floating-point? Better to avoid any mention of approximation. Just say "depends solely on input state and extraction rules."
 
 EN add: *Scientific note:* Output fidelity depends solely on input state and predefined extraction rules.
 ES add: *Nota científica:* La fidelidad del resultado depende únicamente del estado de entrada y de las reglas predefinidas.

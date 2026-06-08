@@ -5,14 +5,6 @@ Batch ID: vigia-doc-0032-5fba2910
 Generated: 2026-05-20T14:56:47.851472+00:00
 -->
 
----
-doc_hash: 5fba2910
-module: vigia/action/vigia_mitigation_planner.py
-languages: [EN, ES, RU, ZH]
-generated_by: moonshot-kimi-k2.6-batch-api
-license: Apache-2.0
----
-
 ENGLISH:
 - What Is This Module?: A surgical mitigation planner for digital forensics. It translates abductive hypotheses (winning hypothesis) into concrete, approved-only Linux system commands. Think of it as a surgical robot that only operates after the lead surgeon (operator) confirms the incision map.
 - Key concepts table: Classes, Functions, Constants described in plain language.
@@ -36,11 +28,7 @@ ESPAÑOL:
 - 模块路径, 许可以及版权声明.
 - Note: 【科学说明】 box. 皮尔士 (Peirce), 艾柯 (Eco), 格赖斯 (Grice). Use sensor analogy: 传感器原始信号(raw voltage) -> 解释层(assign meaning) -> 行动阈值(threshold rules).
 
-Wait, the user said "You NEVER use floating-point math explanations for deterministic systems." So I must avoid explaining hashes or HMAC with floating point concepts, and instead emphasize integer arithmetic. HMAC-SHA256 operates on integer bitwise operations. Platform check is string equality, not floating point comparison. plan_hash is computed over integer representations.
-
 Also, need to include the license line exactly: ""
-
-Let me construct the Markdown.
 
 First, a header block with module path.
 Then ENGLISH section.
@@ -50,15 +38,12 @@ Then 中文.
 
 Each section should be clearly delimited.
 
-Let me draft content for each:
-
 --- ENGLISH ---
 
 ## ENGLISH
 
 **Module:** `vigia/action/vigia_mitigation_planner.py`  
 **Layer:** Capa 4 — Action / Execution  
-
 
 ### What Is This Module?
 This module is the surgical execution layer of the VIGÍA Forensic Suite. Its sole purpose is to transform a validated, winning abductive hypothesis into a concrete, step-by-step system-level mitigation plan for Linux platforms. Imagine a robotic surgical suite: the module prepares every instrument trajectory (commands such as `kill`, `iptables`, `userdel`), but the scalpel never moves until the lead operator explicitly approves each action. No command contains empty placeholders; if a value is unknown, the module inserts a forensic acquisition directive so the operator must resolve the gap before proceeding. The system is strictly deterministic—every decision, hash, and platform check relies on exact integer arithmetic and bitwise operations, never on floating-point approximations.
@@ -130,10 +115,6 @@ Terms:
 - Sensor analogy: Signo (Peirce), Interpretante (Eco), Máxima cooperativa (Grice).
 
 Note: In Spanish, Eco is Eco, but in Chinese must be 艾柯. The user specifically asked for Chinese translations to use 艾柯, not Eco. So in Chinese I must use 艾柯. In other languages, standard names are fine.
-
-Wait, the requirement says: "Chinese translations must use: 艾柯 (not Eco), 格赖斯 (not Grice), 取证工件 (not 制品), 逻辑断裂 (not 裂缝)". So only Chinese has strict naming. Other languages can use standard transliterations.
-
-Let me draft Spanish carefully.
 
 ### ESPAÑOL
 
@@ -209,8 +190,6 @@ Terms:
 - Судебно-медицинский артефакт (取证工件) - but in Russian maybe "судебный артефакт" or "цифровой артефакт". I'll use "артефакт цифровой криминалистики" or just "артефакт".
 - Логический разрыв (逻辑断裂) - logical fracture.
 - Sensor analogy: Знак (Пирс), Интерпретант (Эко), Кооперативный максим (Грайс).
-
-Wait, the user requirement for Chinese is specific: 艾柯, 格赖斯, etc. For Russian, standard transliteration is fine: Пирс, Эко, Грайс.
 
 Let's draft.
 

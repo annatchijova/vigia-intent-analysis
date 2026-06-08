@@ -6,14 +6,6 @@ Generated: 2026-05-20T14:56:47.849380+00:00
 -->
 
 ---
-doc_hash: d4e678b5
-module: scripts/run_demo.py
-languages: [EN]
-generated_by: moonshot-kimi-k2.6-batch-api
-license: Apache-2.0
----
-
----
 
 # ENGLISH
 

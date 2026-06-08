@@ -5,14 +5,6 @@ Batch ID: vigia-doc-0125-2042863e
 Generated: 2026-05-20T14:56:47.871425+00:00
 -->
 
----
-doc_hash: 2042863e
-module: vigia/security/sandbox.py
-languages: [EN, ES, RU, ZH]
-generated_by: moonshot-kimi-k2.6-batch-api
-license: Apache-2.0
----
-
 ENGLISH:
 - Title: VIGÍA Security Sandbox Module (`vigia/security/sandbox.py`)
 - What Is This Module?: A deterministic containment layer that transforms unrestricted subprocess execution into a bounded, measurable, and reproducible operation. It prevents the P0 vulnerability (unlimited resource consumption and path traversal) by enforcing strict integer-based caps on memory, CPU time, directory depth, and output size. Designed for digital forensic pipelines where reproducibility and evidence integrity are paramount.
@@ -46,9 +38,6 @@ ENGLISH:
 
 - License line at the end of document or each section? The user says "License line: ''" Probably once at the very end, or in each section? Usually once is enough, but to be safe maybe at the end of the whole document. Or perhaps in each section's header/footer? The requirement says "Include" — I'll put it at the bottom of each language section to be thorough, or at least once prominently. Actually, putting it once at the very end is cleaner. But "Each section must include..." doesn't list the license. The requirement #5 is separate. I'll put it at the bottom of the document.
 
-Wait, requirement #3 says "Each section must include: ..." and lists four bullets. Requirement #5 is global. I'll include the license once at the end.
-
-Now ESPAÑOL:
 - Title: Módulo Sandbox de Seguridad VIGÍA (`vigia/security/sandbox.py`)
 - What Is This Module? -> "¿Qué es este módulo?"
   Same content: capa de contención determinística...

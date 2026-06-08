@@ -5,14 +5,6 @@ Batch ID: vigia-doc-0134-c0b86e2d
 Generated: 2026-05-20T14:56:47.873415+00:00
 -->
 
----
-doc_hash: c0b86e2d
-module: vigia/sift/ioc_manager.py
-languages: [EN, ES, RU, ZH]
-generated_by: moonshot-kimi-k2.6-batch-api
-license: Apache-2.0
----
-
 ENGLISH:
 What Is This Module?
 This module is the Indicators of Compromise (IOC) Engine. It functions as a deterministic correlator between forensic discoveries (artifacts extracted from digital media) and a curated database of known threat indicators. In scientific terms, it acts like a reference library cross-check: every fingerprint (hash), filename, registry key, network address, or adversary technique discovered during analysis is compared against a catalog of previously identified malicious patterns. When a correspondence is found, the module produces a structured match result that can be propagated downstream for alerting or reporting.
@@ -82,7 +74,6 @@ Need to make sure I don't use floating-point math explanations. Emphasize determ
 
 Also, the audience doesn't know Python. So when mentioning Fraction, explain it as exact rational number representation (ratio of two integers). Don't explain it as a Python class unless necessary, and if so, explain in plain language.
 
-Let me check if I missed anything:
 - Module path: vigia/sift/ioc_manager.py. Should be at top.
 - Functions: to_signal(), match_against_findings(), enrich_signal(). Need to mention these.
 - Classes: IOCRecord, IOCMatchResult, IOCManager.
@@ -132,8 +123,6 @@ Scientific Note:
 > 【Scientific Note】
 > In interdisciplinary literature, the semiotic frameworks of **Charles Sanders Peirce** (abductive inference), **Umberto Eco** (sign theory), and **H. Paul Grice** (implicature and cooperative communication) are occasionally dismissed as metaphysical. In forensic engineering, they are rigorous analytical tools. Consider an IOC match: it is not a mystical portent but a **sensor measurement**. Just as a thermocouple produces a voltage that deterministically maps to temperature through physical law, an IOCRecord maps a recovered artifact to a threat class through exact logical rules. The "sign" is simply a structured correlation between a physical state and a symbolic representation. This module operationalizes that principle by enforcing **deterministic integer arithmetic** and exact symbolic matching. There is no ambiguity, no rounding, and no interpretive divination—only reproducible, mechanistic inference.
 
-
-
 ESPAÑOL draft:
 ## ESPAÑOL
 ### ¿Qué es este módulo?
@@ -166,8 +155,6 @@ Glosario:
 Nota Científica:
 > 【Nota Científica】
 > En la literatura interdisciplinaria, los marcos semióticos de **Charles Sanders Peirce** (inferencia abductiva), **Umberto Eco** (teoría del signo) y **H. Paul Grice** (implicatura y comunicación cooperativa) se descartan ocasionalmente como metafísicos. En ingeniería forense son herramientas analíticas rigurosas. Considere una coincidencia de IOC: no es un presagio místico, sino una **medición de sensor**. Así como un termopar produce un voltaje que se asigna de manera determinista a la temperatura mediante leyes físicas, un IOCRecord asigna un artefacto recuperado a una clase de amenaza mediante reglas lógicas exactas. El "signo" es simplemente una correlación estructurada entre un estado físico y una representación simbólica. Este modulo operacionaliza ese principio imponiendo **aritmética entera determinista** y coincidencia simbólica exacta. No hay ambigüedad, redondeo ni adivinación interpretativa—solo inferencia mecanicista reproducible.
-
-
 
 РУССКИЙ draft:
 ## РУССКИЙ
@@ -209,8 +196,6 @@ Nota Científica:
 Научное примечание:
 > 【Научное примечание】
 > В междисциплинарной литературе семиотические концепции **Чарльза Сандерса Пирса** (абдуктивное умозаключение), **Умберто Эко** (теория знака) и **Герберта Пола Грайса** (импликатура и кооперативная коммуникация) иногда отвергаются как метафизические. В судебной инженерии они являются строгими аналитическими инструментами. Рассмотрите совпадение IOC: это не мистическое предзнаменование, а **показание датчика**. Подобно тому как термопара генерирует напряжение, которое детерминированно соответствует температуре согласно физическим законам, IOCRecord соотносит извлечённый артефакт с классом угрозы посредством точных логических правил. «Знак» — это просто структурированная корреляция между физическим состоянием и символическим представлением. Данный модуль опериционализирует этот принцип, применяя **детерминированную целочисленную арифметику** и точное символьное сопоставление. Нет неоднозначности, округления или интерпретативного пророчества — только воспроизводимый механистический вывод.
-
-
 
 中文 draft:
 ## 中文

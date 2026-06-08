@@ -5,14 +5,6 @@ Batch ID: vigia-doc-0168-7a688cdd
 Generated: 2026-05-20T14:56:47.880966+00:00
 -->
 
----
-doc_hash: 7a688cdd
-module: vigia/tools/pattern_detector.py
-languages: [EN, ES, RU, ZH]
-generated_by: moonshot-kimi-k2.6-batch-api
-license: Apache-2.0
----
-
 ENGLISH:
 - What Is This Module?: A deterministic forensic engine that scans textual artifacts for adversarial semiotic patterns. It uses regular expressions and abductive logic (rule-based inference) rather than machine learning or statistics. It operates on integer arithmetic for reproducibility. Part of VIGÍA pipeline.
 - Key Concepts Table:
@@ -47,11 +39,13 @@ ESPAÑOL:
 
 中文:
 - What Is This Module? -> "本模块是什么？"
+- Key terms: 语义摩擦 (semiotic friction?), wait, user said "逻辑断裂" (not 裂缝) but that's for "logical fracture/break". The module uses "semiotic frictions". In Chinese, semiotic friction is 符号摩擦 or 语义摩擦. But the user specifically mandated: 艾柯, 格赖斯, 取证工件, 逻辑断裂. Wait, "逻辑断裂" is specified as "not 裂缝". The module mentions "fricciones semióticas" / "semiotic frictions". Should I translate friction as 摩擦 or use 逻辑断裂? The user said "逻辑断裂 (not 裂缝)". But "逻辑断裂" means logical break/fracture, which is somewhat different from friction. However, in the context of semiotics, "friction" might be rendered as 断裂? Or perhaps the user wants "逻辑断裂" used somewhere. Let me re-read: "Chinese translations must use: 艾柯 (not Eco), 格赖斯 (not Grice), 取证工件 (not 制品), 逻辑断裂 (not 裂缝)". This likely means when referring to the concept of semiotic frictions or logical breaks in the text, use 逻辑断裂 instead of 裂缝. Or perhaps they want 逻辑断裂 as the translation for some concept in the module. I should probably use 逻辑断裂 in the context of describing the mismatches detected. Actually, "friction" in semiotics could be translated as 摩擦, but the user explicitly listed 逻辑断裂. Maybe they consider "semiotic friction" as a type of logical断裂. I'll use 逻辑断裂 where appropriate to describe the detected pattern type, perhaps translating "semiotic frictions" as "语义摩擦 / 逻辑断裂". Or I can use 逻辑断裂 as the glossary term for the mismatch. To be safe, I'll make sure these four terms appear correctly: 艾柯 (Umberto Eco), 格赖斯 (Grice), 取证工件 (forensic artifact, not 制品), and 逻辑断裂 (instead of 裂缝 for fractures/breaks).
 - Key terms: 符号对抗模式 (adversarial semiotic patterns), 逻辑断裂 (semiotic friction / logical fracture), 溯因逻辑 (abductive logic), 取证工件 (textual artifact), 确定性整数评分 (deterministic integer scoring), 正则规则 (regex pattern), RiskB 校正 (RiskB adjustment).
 - Glossary: 对抗符号学, 模式匹配 (PatternMatch), 符号模式检测器 (SemioticPatternDetector), 案例库 (Corpus), 标准模式, VIGÍA 流水线.
 - Scientific Note -> 【科学说明】
 - Sensor analogy: 传感器/光谱仪.
 
+Now, let's construct the tables carefully.
 
 For English:
 | Concept | Plain-Language Definition | Role in Forensic Analysis |
@@ -94,7 +88,7 @@ For Chinese:
 | 正则规则 | 匹配精确字符序列的符号化搜索模板。 | 在不依赖统计猜测的前提下完成基础检测。 |
 | RiskB 校正 | 反馈至风险预算引擎的校准整数修正值。 | 根据文本证据微调整体威胁评估。 |
 
-
+Now the glossary for each.
 
 English Glossary:
 - **Adversarial Semiotics**: The discipline of analyzing deceptive or concealed signs within digital objects.
@@ -156,8 +150,7 @@ Chinese:
 > 【科学说明】
 > 皮尔士（溯因推理）、艾柯（符号学理论）与格赖斯（合作原则）等术语常被误解为哲学神秘主义。事实并非如此。它们均为形式化、可数学操作的框架，类似于光谱仪内部的校准逻辑。光谱仪并非在“猜测”某种化学物质；而是将观测到的吸收谱线与一个以整数索引的确定性特征库进行比对。当本模块对某一模式进行“溯因”时，它执行的同样是确定性映射：观测到的文本符号 → 已知的对抗性特征。皮尔士提供了推理架构，艾柯定义了符号失配库，格赖斯则提供了用以衡量偏差的基准通信协议。它们是仪器的“光学系统”与“固件”，而非咒语。
 
-
-
+Also, user said: "Chinese translations must use: 艾柯 (not Eco), 格赖斯 (not Grice), 取证工件 (not 制品), 逻辑断裂 (not 裂缝)". I have used 艾柯 and 格赖斯 in the note. I need to ensure 取证工件 is used in the Chinese section instead of any other term for artifact. And 逻辑断裂 instead of 裂缝 or other similar term.
 
 In Chinese "What Is This Module?":
 本模块是一个确定性取证引擎，用于扫描**取证工件**（文本形式的日志、配置、脚本等）中的对抗性符号模式。它不依赖机器学习或统计学方法，仅通过正则规则与溯因逻辑（基于规则的推理）进行检测。所有风险评分均采用**确定性整数运算**，确保完全可复现。该模块是 VIGÍA 流水线的一个组件，依据 SANS_FIND_EVIL_2026 标准（v1.0）运行，其规则库源自 110 余个合成与真实取证案例。
@@ -187,14 +180,15 @@ Scientific Note Chinese:
 > 【科学说明】
 > 皮尔士（Charles Sanders Peirce，溯因推理）、艾柯（符号学理论）与格赖斯（合作原则）等术语常被误解为哲学神秘主义。事实并非如此。它们均为形式化、可数学操作的框架，类似于光谱仪内部的校准逻辑。光谱仪并非在“猜测”某种化学物质；而是将观测到的吸收谱线与一个以整数索引的确定性特征库进行比对。当本模块对某一模式进行“溯因”时，它执行的同样是确定性映射：观测到的文本符号 → 已知的对抗性特征。皮尔士提供了推理架构，艾柯定义了符号失配库，格赖斯则提供了用以衡量偏差的基准通信协议。它们是仪器的“光学系统”与“固件”，而非咒语。
 
-
 Also need to make sure I don't use floating-point explanations. I explicitly mention deterministic integer arithmetic and no floating-point.
 
+License line at the end: ""
 
+I should also include the module path and docstring path discrepancy as a metadata note? The user gave MODULE PATH: vigia/tools/pattern_detector.py and MODULE DOCSTRING: vigia/core/pattern_detector.py. That's an inconsistency. As an academic writer, I could mention the canonical path and note the docstring origin. But maybe it's better not to confuse non-Python scientists with this discrepancy. I'll mention the module path clearly and perhaps note the docstring reference.
 
+Actually, the user wants documentation for the module. I can put the path in a header or metadata block. Scientists might appreciate knowing where it lives in the codebase. I'll include a small metadata block.
 
-
-
+I'll present:
 
 For each language:
 ## ENGLISH
@@ -210,7 +204,7 @@ Table...
 
 Then repeat for other languages.
 
-
+Let's double-check all requirements:
 1. Target audience: scientists/researchers who do NOT know Python -> Yes, plain language, no "instantiate the class" but rather "the engine" or "the detector component".
 2. Format: Markdown with 4 language sections -> Yes.
 3. Each section includes:
@@ -218,18 +212,22 @@ Then repeat for other languages.
    - Key concepts with tables -> Yes.
    - Glossary -> Yes.
    - 【科学说明】/【Scientific Note】 box -> Yes.
+4. Chinese translations: 艾柯, 格赖斯, 取证工件, 逻辑断裂 -> Need to verify all present.
    - 艾柯: in note.
    - 格赖斯: in note.
+   - 取证工件: in What Is This Module? and glossary? I'll put in text.
    - 逻辑断裂: in table.
 5. License line at the end.
 6. NO floating-point math explanations. Emphasize deterministic integer arithmetic. -> Yes.
 
+I should ensure the Chinese section doesn't use 制品 or 裂缝. I'll use 取证工件 and 逻辑断裂.
 
+One more thing: The module has functions: detect_semiotic_frictions, analyze_text, analyze_artifact, get_stats. And classes: PatternMatch, SemioticPatternDetector. I should describe them in the "What Is This Module?" section in plain language.
 
 English:
 - The module exposes two data structures and four operations. `PatternMatch` is the detection record. `SemioticPatternDetector` is the core engine. `analyze_text` examines a raw string. `analyze_artifact` performs full scoring on a file-like object. `detect_semiotic_frictions` is the high-level entry point for the VIGÍA pipeline, returning RiskB adjustments. `get_stats` reports corpus coverage metrics.
 
-
+I need to be careful not to be too code-heavy. Use bullet points with plain language.
 
 **ENGLISH — What Is This Module?**
 `vigia/tools/pattern_detector.py` is a deterministic forensic engine designed to examine textual artifacts—such as system logs, configuration files, and scripts—for hidden adversarial patterns. It does not employ machine learning, statistical modeling, or any probabilistic reasoning. Instead, it relies on exact symbolic search rules (regular expressions) and abductive logic: a rule-based inference method that selects the best available explanation for an observed textual anomaly.

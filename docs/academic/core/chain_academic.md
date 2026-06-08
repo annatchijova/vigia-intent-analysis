@@ -1,11 +1,3 @@
----
-doc_hash: 13b5b838
-module: vigia/core/chain.py
-languages: [EN, ES, RU]
-generated_by: moonshot-kimi-k2.6-batch-api
-license: Apache-2.0
----
-
 ## ENGLISH
 
 **Evidence Bundle Specification (EBS) v1.0 — Layer 0 Immutable Data Contract**

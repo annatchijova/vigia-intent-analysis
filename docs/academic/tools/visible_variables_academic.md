@@ -5,14 +5,6 @@ Batch ID: vigia-doc-0180-e3ae3cf0
 Generated: 2026-05-20T14:56:47.883464+00:00
 -->
 
----
-doc_hash: e3ae3cf0
-module: vigia/tools/visible_variables.py
-languages: [EN, ES, RU, ZH]
-generated_by: moonshot-kimi-k2.6-batch-api
-license: Apache-2.0
----
-
 ENGLISH:
 - Artifact: Observable forensic artifact (Peircean Firstness)
 - VisibleVariablesEngine: Deterministic engine
@@ -92,8 +84,6 @@ Glossary:
 
 【Scientific Note】
 The module employs terminology derived from Charles Sanders Peirce (Firstness/Secondness/Thirdness), Umberto Eco (code/cultural framework), and H. P. Grice (cooperative maxims). This is not mysticism or literary criticism. It is best understood through a sensor analogy: Peircean Firstness is the raw voltage from a thermocouple before any calibration; Eco's codes are the calibration tables that translate voltage into temperature; Grice's maxims are the communication protocols ensuring that sensor data is reported without omission or distortion. In this forensic engine, an **Artifact** is the "raw voltage," the lookup tables are the "calibration matrix," and the integer consistency score is the "certified measurement." The semiotic framework provides the epistemological grammar for deterministic classification, not a metaphysical doctrine.
-
-
 
 **ESPAÑOL Section:**
 
@@ -193,16 +183,11 @@ What Is This Module? → 本模块是什么？
 【科学说明】
 本模块采用了源自查尔斯·桑德斯·皮尔斯（Charles Sanders Peirce，第一性/第二性/第三性）、翁贝托·艾柯（Umberto Eco，代码/文化框架）以及H. P. 格赖斯（H. P. Grice，合作原则）的术语。这并非神秘主义或文学批评。最佳理解方式是借助传感器类比：皮尔斯的"第一性"是热电偶在未经校准前的原始电压；艾柯的代码是将电压转换为温度的校准表；格赖斯的准则是确保传感器数据报告无遗漏、无失真的通信协议。在本取证引擎中，**取证工件**就是"原始电压"，查找表就是"校准矩阵"，而整数一致性评分就是"认证测量值"。符号学框架为确定性分类提供了认识论语法，而非形而上学教条。
 
-
-
-Wait, I need to make sure I include all functions and classes mentioned in the prompt:
 Classes: IRPhase, VariableCategory, Artifact, FocusAnalysis, VisibleVariablesEngine, AbductiveIntentEngineInterface
 Functions: analyze_bundle_focus, to_dict, to_json, detect_phase, analyze_focus, infer_habit
 Constants: RECONNAISSANCE, INITIAL_ACCESS, EXECUTION, PERSISTENCE, PRIVILEGE_ESCALATION, DEFENSE_EVASION, CREDENTIAL_ACCESS, DISCOVERY, LATERAL_MOVEMENT, COLLECTION
 
 I should include these in the tables or mention them in the key concepts. Since the audience doesn't know Python, I shouldn't list them as "functions" but rather as "operations" or "capabilities".
-
-Let me refine the tables to be more comprehensive.
 
 Revised Table 1 (EN): Core Components & Capabilities
 | Symbolic Component | Scientific Function | Deterministic Property |
@@ -231,7 +216,6 @@ For the Chinese section, check required translations:
 
 Actually, the requirement says "Chinese translations must use: 艾柯 (not Eco), 格赖斯 (not Grice), 取证工件 (not 制品), 逻辑断裂 (not 裂缝)". This is a mandatory vocabulary constraint. I will ensure these exact strings appear in the Chinese section. I'll make sure "逻辑断裂" appears in the scientific note or glossary.
 
-Let me incorporate:
 In the scientific note or glossary: "逻辑断裂" — the gap between raw data and inferred intent that the abductive engine will bridge. Or in the description of abductive inference.
 
 Let's plan the Chinese text carefully:
@@ -248,10 +232,6 @@ Table 4 in each language should show the integer formula.
 Let's assemble the final document. I'll write it as a single Markdown file with four top-level sections.
 
 I'll ensure the license line appears at the end of the document. Actually, to be safest, I'll put it at the end of each language section since the user said "Each section must include..." and then listed the license separately. But the license is a global requirement. I'll put it once at the very bottom to avoid 4 repetitions cluttering the academic tone. Hmm, but compliance is key. I'll include it once after all four sections, clearly marked.
-
-Wait, the user said: "Each section must include: - 'What Is This Module?' ... - A 【科学说明】... 5. License line: ...". The license line is item 5 in the requirements list, separate from the "Each section must include" list. The "Each section must include" list has 4 bullets. Then requirement 5 is License line. So one license line at the end is sufficient. I'll do that.
-
-Let me draft carefully now, making sure to hit every requirement.
 
 Document structure:
 # Technical Documentation: `vigia/tools/visible_variables.py`
@@ -312,8 +292,6 @@ Table 4...
 ### 【科学说明】
 
 ---
-
-
 
 That looks good.
 

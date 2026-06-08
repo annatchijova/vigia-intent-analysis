@@ -5,14 +5,6 @@ Batch ID: vigia-doc-0090-b00e30d6
 Generated: 2026-05-20T14:56:47.864008+00:00
 -->
 
----
-doc_hash: b00e30d6
-module: vigia/forensics/temporal_forensics_redteam.py
-languages: [EN, ES, RU, ZH]
-generated_by: moonshot-kimi-k2.6-batch-api
-license: Apache-2.0
----
-
 ENGLISH:
 - What Is This Module?: VIGÍA Temporal Forensics & Anachronism Detection (Layer P7). A forensic instrument that treats documents as time-capsules. It detects if a document was written in a different era than claimed by analyzing lexical, grammatical, technological, and semantic markers. Uses deterministic integer arithmetic for all scoring and dating calculations — no probabilistic floating-point approximations.
 - Key concepts table:
@@ -117,7 +109,6 @@ ESPAÑOL:
   【科学说明】
   本模块采用查尔斯·桑德斯·皮尔士（Charles Sanders Peirce）的符号学、艾柯（Umberto Eco）的解释码理论以及格赖斯（H.P. Grice）的会话合作原则。这些术语并非神秘主义或文学修辞，而是形式化的「传感器架构」。皮尔士的符号学为引擎提供了像标（icon）、指示符（index）、象征符（symbol）的分类体系，用作特征提取滤波器；艾柯的代码理论相当于文化解码的校准矩阵；格赖斯的准则则充当完整性校验——类似于数据传输中的奇偶校验——确保所言内容在时间上与其在特定时代可能被赋予的含义保持一致。请将它们视为光谱仪的衍射光栅或色谱柱：是产生确定性、可测量输出的理论脚手架。
 
-Wait, I need to check the Chinese terms:
 - 艾柯 (not Eco) — used 艾柯
 - 格赖斯 (not Grice) — used 格赖斯
 - 取证工件 (not 制品) — used 取证工件
@@ -130,8 +121,6 @@ Now, I need to make sure I don't use floating-point math explanations. I should 
 Also, the module path is vigia/forensics/temporal_forensics_redteam.py but the docstring says vigia/tools/vigia_temporal_forensics.py. I should mention both? The user says "MODULE PATH" and "MODULE DOCSTRING". I'll mention the primary path and note the docstring origin.
 
 The document should be thorough but concise. I'll make sure each section follows the same structure.
-
-Let me also include a small note on the classes and functions in plain language, perhaps integrated into the "What Is This Module?" or as a separate subsection. The requirements say each section must include "What Is This Module?" and key concepts with tables. It doesn't explicitly say I need a separate subsection for classes/functions, but since the target audience doesn't know Python, describing the functionality in plain language within the concept table and glossary is appropriate. I could add a "Core Components" plain-language description.
 
 Actually, to be thorough, I should describe what the classes and functions do in plain language. Maybe as bullet points under "What Is This Module?" or as a separate table. Let's add a "Core Components" table.
 
@@ -174,7 +163,6 @@ Then repeat for other languages.
 
 At the very end, the license line.
 
-Let me double-check Chinese requirements:
 - 艾柯 (Eco) — check
 - 格赖斯 (Grice) — check
 - 取证工件 (artifact) — check
@@ -200,8 +188,6 @@ Docstring Origin: vigia/tools/vigia_temporal_forensics.py
 Then start sections.
 
 I will ensure the tone is academic, technical, but accessible.
-
-Let me write it out fully now.
 
 ENGLISH:
 **What Is This Module?**

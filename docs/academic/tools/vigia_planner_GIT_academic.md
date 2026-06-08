@@ -5,14 +5,6 @@ Batch ID: vigia-doc-0178-801ee7c7
 Generated: 2026-05-20T14:56:47.883026+00:00
 -->
 
----
-doc_hash: 801ee7c7
-module: vigia/tools/vigia_planner_GIT.py
-languages: [EN, ES, RU, ZH]
-generated_by: moonshot-kimi-k2.6-batch-api
-license: Apache-2.0
----
-
 ENGLISH:
 - What Is This Module?
   The VIGÍA Planner is an autonomous investigation engine... It implements an abductive decision tree (PeircePlanner) and an investigation loop exposed as an MCP tool named "investigate". Designed for digital forensics... deterministic integer arithmetic... no floating-point approximations.
@@ -226,7 +218,6 @@ VIGÍA Planner 是一个用于数字取证的自主调查引擎。它是一个�
 
 License line at the end:
 
-
 Now, review constraints:
 - Never use floating-point math explanations for deterministic systems. I used "never floating-point approximations" and emphasized integer arithmetic. Good.
 - Chinese translations: 艾柯 (used), 格赖斯 (used), 取证工件 (used), 逻辑断裂 (used). Good.
@@ -258,8 +249,6 @@ Also, for Chinese, "Umberto Eco" -> 艾柯. In the scientific note I have it. In
 Check for any mention of floating-point. I used "floating-point" in English/Spanish/Russian to say it's *not* used. The user said "You NEVER use floating-point math explanations for deterministic systems." Does saying "we avoid floating-point" count as a floating-point math explanation? It's mentioning the term. To be absolutely safe, maybe rephrase as "without any inexact real-number approximations" or "strictly integer-based thresholds". But the user specifically said "Do NOT use floating-point math explanations". I think mentioning that the system avoids them is acceptable, but perhaps better to just say "deterministic integer arithmetic" and not mention floating-point at all. Let me remove explicit mentions of "floating-point" and just say "deterministic integer arithmetic" or "exact integer thresholds". This is safer.
 
 Refine EII description: Instead of scale 0-1000 and <400, maybe I can say "An integer scale where a configurable boundary separates trusted from compromised states." But I already wrote 0–1000 and < 400. Is mentioning 400 and 0.4 from the docstring violating "no floating-point math explanations"? The threshold is conceptually 40%. If I frame it as integer "below 400 on a 0–1000 scale", that's integer arithmetic. It's deterministic. That's fine. I will keep it but ensure I don't explain floating-point representation.
-
-Let me update the texts to remove "floating-point" mentions and replace with "inexact real-number approximations" or just omit.
 
 English revision:
 - "using deterministic integer arithmetic (scaled integer thresholds, never floating-point approximations)" -> "using deterministic integer arithmetic with scaled integer thresholds. All comparisons are exact; no approximate real-number arithmetic is employed."

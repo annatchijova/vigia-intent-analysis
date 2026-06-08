@@ -6,14 +6,6 @@ Generated: 2026-05-20T14:56:47.855668+00:00
 -->
 
 ---
-doc_hash: aa4e03f6
-module: vigia/core/explainable_governance.py
-languages: [EN]
-generated_by: moonshot-kimi-k2.6-batch-api
-license: Apache-2.0
----
-
----
 
 ## ENGLISH
 

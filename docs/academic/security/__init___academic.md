@@ -1,11 +1,3 @@
----
-doc_hash: e1094ebf
-module: vigia/security/__init__.py
-languages: [EN, ES, RU, ZH]
-generated_by: moonshot-kimi-k2.6-batch-api
-license: Apache-2.0
----
-
 ## ENGLISH
 
 The `scripts/fix_security_init.py` module constitutes a deterministic, priority-zero (P0) deployment patch within the VIGÍA forensic framework. Designed for execution exclusively from the project root directory, this script rectifies critical security deviations identified by automated static and dynamic analysis pipelines. Its operational mandate spans three distinct hardening domains: (1) the activation of the Context-Aware Integrity Evaluator (CAIE) through the injection of a parametric `trust_decay` model into the security initialisation layer; (2) the restoration of forensic database connectivity for the adversarial natural language processing (NLP) pipeline via the installation of a minimal interface stub; and (3) the enforcement of strict runtime boundaries within the core execution controller. Every transformation applied by the module is engineered to be bitwise reproducible, thereby preserving the cryptographic chain-of-custody required for forensic admissibility and cross-institutional verification.

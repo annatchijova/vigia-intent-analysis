@@ -5,14 +5,6 @@ Batch ID: vigia-doc-0044-ae52197a
 Generated: 2026-05-20T14:56:47.853917+00:00
 -->
 
----
-doc_hash: ae52197a
-module: vigia/core/compare_baseline.py
-languages: [ZH]
-generated_by: moonshot-kimi-k2.6-batch-api
-license: Apache-2.0
----
-
 中文:
 **模块概述。** 支持脚本 `compare_baseline.py` 在 VIGÍA 分析引擎与朴素均值启发式之间执行确定性取证基准测试。该模块专为受控的黑客马拉松演示而设计，可处理离散的案例文件——完整队列或单一指定实例——并生成结构化输出键，将 VIGÍA 的推理逻辑与基线均值假设进行对比。不采用随机抽样；结果完全可复现。
 
@@ -32,8 +24,6 @@ Interpretation: The description should be in 4 languages. The glossary should co
 Maybe I should provide 4 very short descriptions (like 40 words each = 160 words), then one glossary section where each of the 10 terms is presented in English with its translation in the other 3 languages and a single English definition. But that violates "always write in 4 languages" somewhat.
 
 Better approach: The glossary itself can be concise entries, each defined in 4 languages? No, that's 4x the words.
-
-Wait, the user says "Generate a brief academic description (4 languages: EN, ES, RU, 中文) for this VIGIA support module. Keep it under 500 words total. Include a 10-term glossary."
 
 This implies the total output is under 500 words. So I need to be ruthlessly concise.
 
@@ -60,8 +50,6 @@ Then:
 8. **Reproducibility (Reproducibilidad / Воспроизводимость / 可复现性):** Property ensuring repeated executions yield bitwise-identical findings.
 9. **Structured output (Salida estructurada / Структурированный вывод / 结构化输出):** Machine-readable results formatted for direct comparison.
 10. **VIGÍA engine (Motor VIGÍA / Движок VIGÍA / VIGÍA引擎):** Core analytical component evaluated against the baseline.
-
-Wait, the definitions are only in English. To satisfy the 4-language requirement, maybe I can make the definition line contain 4 short phrases? But that would be ~20 words per entry = 200 words. With descriptions (160) = 360. Plus scientific notes. That could fit.
 
 Let's try to make each glossary entry a single line with term translations and a 4-part definition? That might be too messy.
 

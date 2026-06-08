@@ -5,22 +5,12 @@ Batch ID: vigia-doc-0050-3c7b4268
 Generated: 2026-05-20T14:56:47.855244+00:00
 -->
 
----
-doc_hash: 3c7b4268
-module: vigia/core/evidence_aggregator.py
-languages: [EN, ES, RU, ZH]
-generated_by: moonshot-kimi-k2.6-batch-api
-license: Apache-2.0
----
-
 ENGLISH:
 - Title: MODULE DOCUMENTATION: `vigia/core/evidence_aggregator.py`
 - What Is This Module?: Plain language. It's a deterministic calculator that combines multiple independent indicators of suspicious activity into a single bounded score. No randomness, no rounding errors.
 - Key Concepts Table: Maybe 2 tables. One for inputs (MI_base, synergy, sequence, ALPHA), one for operations (complement-product, Fraction arithmetic, MAX_CAP).
 - Glossary: FSV, MI (Mutual Information or Mass Indicator?), Synergy, Sequence, ALPHA, Complement-Product, Deterministic Integer Arithmetic, Peirce, Eco, Grice. Need to define them simply.
 - Scientific Note: 【Scientific Note】Peirce/Eco/Grice terminology... Think of it like a sensor array: a thermometer, a motion detector, and a chemical strip each detect different aspects of the same event. Semiotics is the theory of how signs (like sensor readings) convey meaning. Not mysticism.
-
-Wait, the module docstring mentions "señales semióticas" and the user specifically asks for Peirce/Eco/Grice terminology explanation. So I should mention these as semiotic frameworks.
 
 ESPANOL:
 - ¿Qué es este módulo?
@@ -41,7 +31,6 @@ CHINESE:
 - 【科学说明】
 Terms: 皮尔斯 (Peirce), 艾柯 (Eco), 格赖斯 (Grice). 取证工件. 逻辑断裂.
 
-Let me think about the formula and how to explain it without floating point.
 The formula is: MI_final = 1 - (1 - MI_base) * (1 - synergy*ALPHA) * (1 - sequence*ALPHA)
 This is bounded probabilistic composition using the complement product. Each term (1 - x) represents the "uncertainty" or "remaining doubt". Multiplying them gives combined remaining doubt. 1 minus that gives combined confidence.
 ALPHA is Fraction(1,2) by default, so it's exact rational arithmetic. No floating point.

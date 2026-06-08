@@ -5,14 +5,6 @@ Batch ID: vigia-doc-0041-9ae17aea
 Generated: 2026-05-20T14:56:47.853267+00:00
 -->
 
----
-doc_hash: 9ae17aea
-module: vigia/core/carnegie_education_detector.py
-languages: [EN]
-generated_by: moonshot-kimi-k2.6-batch-api
-license: Apache-2.0
----
-
 ## ENGLISH
 
 ### What Is This Module?

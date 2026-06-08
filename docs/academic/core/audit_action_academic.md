@@ -5,14 +5,6 @@ Batch ID: vigia-doc-0038-48ab3a10
 Generated: 2026-05-20T14:56:47.852728+00:00
 -->
 
----
-doc_hash: 48ab3a10
-module: vigia/core/audit_action.py
-languages: [EN, ES, RU, ZH]
-generated_by: moonshot-kimi-k2.6-batch-api
-license: Apache-2.0
----
-
 ENGLISH:
 - Title: Audit and Action — VIGÍA Forensic Suite EBS v1
 - Module Path: vigia/core/audit_action.py (with references to vigia/audit/evidence_graph_diff.py and vigia/action/safe_action_executor.py as component origins)
@@ -189,8 +181,6 @@ The document should be Markdown.
 
 I will structure it with clear headers for each language. To avoid repetition of the module path in every language header, I'll put it under each language's title.
 
-Let me refine the content.
-
 ENGLISH:
 - Under "Architecture & Isolation": Layer 4 — Audit and Action. Isolation Rule: reads from models/, engine/, governance/. No downward writes. No LLM calls. Invariant I4: No implicit effects.
 
@@ -207,7 +197,6 @@ Now let's write the final output. I'll make sure it's thorough but concise. The 
 
 I should include the tables as requested. I should include the glossary. I should include the scientific note box with the sensor analogy and mention Peirce/Eco/Grice.
 
-Let me double-check the Chinese terms:
 - 艾柯: used in scientific note.
 - 格赖斯: used in scientific note.
 - 取证工件: I'll add a glossary entry or use in text. Let's add to Chinese glossary: **取证工件**: 经正式校验、具备完整哈希链的数字化记录单元，如策略校验单、图差异快照与行动回执。 And maybe in English: **Forensic Artifact**: A digitally signed, hash-chained record unit such as a policy receipt, graph-diff snapshot, or action record. (I will include this in all glossaries to be consistent).

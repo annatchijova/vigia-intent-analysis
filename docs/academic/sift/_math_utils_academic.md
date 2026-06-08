@@ -5,14 +5,6 @@ Batch ID: vigia-doc-0129-91f2a764
 Generated: 2026-05-20T14:56:47.872334+00:00
 -->
 
----
-doc_hash: 91f2a764
-module: vigia/sift/_math_utils.py
-languages: [EN]
-generated_by: moonshot-kimi-k2.6-batch-api
-license: Apache-2.0
----
-
 ### ENGLISH
 
 #### What Is This Module?
@@ -57,7 +49,6 @@ A deterministic arithmetic engine... scientists don't need Python.
 > **【Scientific Note】** The module employs terminology derived from Charles Sanders Peirce (sign-object-interpretant), Umberto Eco (coding/overcoding), and H. Paul Grice (conversational maxims). In this forensic context, these terms are **operational analogues to sensor calibration parameters**, not metaphysical concepts. A Peircean "interpretant" corresponds to the measurable effect a trace has on the scoring function; an Eco-style "code" is the formal likelihood mapping between a source state and its evidentiary output; a Gricean "maxim" is a binding constraint on how signals may be combined without logical fracture. Think of them as formal rules for fusing readings from a heterogeneous sensor array.
 
 #### License
-
 
 ---
 
@@ -147,8 +138,6 @@ Scientific Note:
 > - A **Gricean maxim** is a hard constraint on signal combination; violating it produces a detectable **logical fracture** in the evidence stream, analogous to a sensor array returning incompatible readings from overlapping fields of view.
 > Researchers should view these labels as formal names for fusion rules, comparable to calibration matrices in multi-sensor data assimilation.
 
-
-
 ---
 
 **ESPAÑOL Draft:**
@@ -211,7 +200,6 @@ Scientific Note -> 【Nota Científica】
 
 License -> Licencia
 
-
 ---
 
 **РУССКИЙ Draft:**
@@ -273,7 +261,6 @@ Scientific Note -> 【Научное примечание】
 > Исследователи должны воспринимать эти термины как формальные названия правил слияния, сопоставимые с калибровочными матрицами в мультисенсорной ассимиляции данных.
 
 License -> Лицензия
-
 
 ---
 

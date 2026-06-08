@@ -5,14 +5,6 @@ Batch ID: vigia-doc-0185-7d593d40
 Generated: 2026-05-20T14:56:47.884598+00:00
 -->
 
----
-doc_hash: 7d593d40
-module: vigia/vigia_command_center.py
-languages: [EN, ES, RU, ZH]
-generated_by: moonshot-kimi-k2.6-batch-api
-license: Apache-2.0
----
-
 ENGLISH:
 - Title: VIGÍA Forensic Suite — Command Center (`vigia/vigia_command_center.py`)
 - What Is This Module?: Explain it's a real-time terminal dashboard (Textual User Interface) for digital forensic analysts. It watches a stream of evidence records (JSON Lines) and displays the "health" of an automated reasoning process. It shows which hypotheses are currently winning, how chaotic the network evidence is (entropy), hardware status, anomalies, chain of custody integrity, and decision tallies. Think of it as the control panel of a scientific instrument.
@@ -131,8 +123,6 @@ ENGLISH draft:
 ### 【Scientific Note】
 This module incorporates conceptual frameworks derived from Charles Sanders Peirce (abductive reasoning), Umberto Eco (semiotic over-interpretation limits), and H. P. Grice (cooperative communication maxims). These names are not invoked as mysticism or humanistic ornament. They function precisely like the labeled sensors on a mass spectrometer: **Peirce** provides the *inference trigger*—the abductive mechanism that generates hypotheses from surprising observations; **Eco** defines the *measurement range*—the semiotic boundary beyond which the system refuses to hallucinate meaning; and **Grice** acts as a *noise filter*—a set of cooperative constraints that suppress irrelevant chatter between subsystems. A chemist does not reject a spectrometer because its optics rely on quantum mechanical models; likewise, these philosophical components are operationalized as strict, testable boundary conditions on automated reasoning.
 
-
-
 ---
 
 ESPAÑOL draft:
@@ -171,8 +161,6 @@ ESPAÑOL draft:
 ### 【Nota Científica】
 Este módulo incorpora marcos conceptuales derivados de Charles Sanders Peirce (razonamiento abdutivo), Umberto Eco (límites de la sobre-interpretación semiótica) y H. P. Grice (máximas de comunicación cooperativa). Estos nombres no se invocan como misticismo ni ornamento humanístico. Funcionan exactamente como los sensores etiquetados en un espectrómetro de masas: **Peirce** provee el *disparador de inferencia*—el mecanismo abdutivo que genera hipótesis a partir de observaciones sorprendentes; **Eco** define el *rango de medición*—el límite semiótico más allá del cual el sistema se niega a alucinar significado; y **Grice** actúa como un *filtro de ruido*—un conjunto de restricciones cooperativas que suprimen la charla irrelevante entre subsistemas. Un químico no rechaza un espectrómetro porque sus ópticas se basen en modelos mecánicos cuánticos; asimismo, estos componentes filosóficos están operacionalizados como condiciones de frontera estrictas y comprobables sobre el razonamiento automatizado.
 
-
-
 ---
 
 РУССКИЙ draft:
@@ -210,8 +198,6 @@ Este módulo incorpora marcos conceptuales derivados de Charles Sanders Peirce (
 
 ### 【Научное примечание】
 Этот модуль включает концептуальные рамки, основанные на Чарльзе Сандерсе Пирсе (абдуктивное рассуждение), Умберто Эко (пределы семиотической переинтерпретации) и Г. П. Грайсе (максимы кооперативного общения). Эти имена привлекаются не как мистицизм или гуманитарное украшение. Они функционируют точно так же, как калиброванные датчики на масс-спектрометре: **Пирс** обеспечивает *триггер вывода*—абдуктивный механизм генерации гипотез из неожиданных наблюдений; **Эко** определяет *диапазон измерения*—семиотическую границу, за которой система отказывается галлюцинировать смысл; а **Грайс** выступает *шумовым фильтром*—набором кооперативных ограничений, подавляющих нерелевантный обмен между подсистемами. Химик не отказывается от спектрометра потому, что его оптика опирается на квантовомеханические модели; аналогично, эти философские компоненты операционализированы как строгие, проверяемые граничные условия автоматизированного рассуждения.
-
-
 
 ---
 

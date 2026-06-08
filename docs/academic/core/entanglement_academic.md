@@ -5,14 +5,6 @@ Batch ID: vigia-doc-0049-e4d00825
 Generated: 2026-05-20T14:56:47.855039+00:00
 -->
 
----
-doc_hash: e4d00825
-module: vigia/core/entanglement.py
-languages: [EN, ES, RU, ZH]
-generated_by: moonshot-kimi-k2.6-batch-api
-license: Apache-2.0
----
-
 ENGLISH:
 - What Is This Module? This module is the sixth-layer detection engine (Capa P6) of the VIGÍA forensic platform. It treats document collections as physical evidence batches. Instead of reading for meaning, it measures "linguistic entanglement" — the invisible threads that tie supposedly unrelated documents to a single forgery factory. It operates like a forensic mass spectrometer: it does not interpret intent directly; it counts exact structural overlaps (deterministic integer arithmetic) to determine whether documents share a common origin.
 - Key Concepts Table:
@@ -122,8 +114,6 @@ Let's structure the Markdown:
 ## Module Specification: `vigia/core/entanglement.py`
 
 Then the four sections.
-
-Wait, the user wants 4 language sections. I can use headings like ## ENGLISH, ## ESPAÑOL, etc. Or separate by horizontal rules. I'll use level 2 headings for each language.
 
 Let's refine the tables to be clear and concise.
 

@@ -5,14 +5,6 @@ Batch ID: vigia-doc-0159-1dbdaea0
 Generated: 2026-05-20T14:56:47.878870+00:00
 -->
 
----
-doc_hash: 1dbdaea0
-module: vigia/tools/entropy_locality.py
-languages: [EN, ES, RU, ZH]
-generated_by: moonshot-kimi-k2.6-batch-api
-license: Apache-2.0
----
-
 ENGLISH:
 - Title: Entropy Locality Analyzer (`vigia/tools/entropy_locality.py`)
 - What Is This Module?: Explain it's a digital forensics tool that maps WHERE high entropy occurs in a file, not just the average. Like an X-ray showing dense objects inside luggage.
@@ -114,17 +106,11 @@ ESPAÑOL:
   本模块偶尔借用皮尔斯（Peirce）符号学三元组、艾柯（Eco）编码理论以及格赖斯（Grice）语用学准则的概念框架。这些术语并非神秘主义咒语。它们的功能与校准后的传感器完全一致：皮尔斯的范畴用于检测符号与对象之间的形式关系；艾柯的编码用于识别分层编码结构；格赖斯的准则用于侦测"逻辑断裂"——即预期通信结构遭到违反的位置。传感器不会"相信"它所测量的对象，它只记录形式偏差。因此，这些术语借用的本质是形式化观测算子，而非诠释学的神秘主义。
 -  (Keep in English as per requirement, or translate? The requirement says "License line: ''" So I'll keep it exactly like that in all sections.)
 
-Wait, the user said "Chinese translations must use: 艾柯 (not Eco), 格赖斯 (not Grice), 取证工件 (not 制品), 逻辑断裂 (not 裂缝)". I've incorporated these.
-
 Also, the user said "You NEVER use floating-point math explanations for deterministic systems." and "Do NOT use floating-point math explanations — emphasize deterministic integer arithmetic where applicable". So in the English and other sections, when explaining entropy calculation, I must not say "uses floating point logarithms". I should say it uses integer histograms and deterministic counting.
-
-Let me make sure the documentation is thorough but concise. I'll create a main header, then four sections.
 
 One thing: The module docstring mentions Peirce/Eco/Grice? Actually the provided docstring doesn't explicitly mention them, but the requirement says: "A 【科学说明】/【Scientific Note】 box explaining that Peirce/Eco/Grice terminology is NOT mysticism — use the sensor analogy". So I should assume the module or the broader VIGÍA framework uses these terms.
 
 Also, the module mentions "Steganografía (entropía" in the classes list but it's cut off. I'll infer it means steganography patterns in entropy.
-
-Let me draft the full text.
 
 English Section:
 
@@ -178,8 +164,6 @@ This module is a digital forensics instrument. It examines a file not as a singl
 
 ### 【Scientific Note】
 This module occasionally references conceptual frameworks associated with **Peirce** (semiotic triads), **Eco** (coding theory), and **Grice** (pragmatic maxims). These terms are not mystical incantations. They function exactly like a calibrated sensor: Peirce’s categories detect sign-to-object relationships, Eco’s codes detect layered encoding schemes, and Grice’s maxims detect **logical fractures** where expected communication structure is violated. A sensor does not “believe” in what it measures; it registers formal deviations. Likewise, these terminological borrowings are formal observational operators, not hermeneutic mysticism.
-
-
 
 ---
 
@@ -236,8 +220,6 @@ Este módulo es un instrumento de forense digital. Examina un archivo no como un
 ### 【Nota Científica】
 Este módulo hace referencia ocasional a marcos conceptuales asociados con **Peirce** (tríadas semióticas), **Eco** (teoría de los códigos) y **Grice** (máximas pragmáticas). Estos términos no son invocaciones místicas. Funcionan exactamente como un sensor calibrado: las categorías de Peirce detectan relaciones signo-objeto, los códigos de Eco detectan esquemas de codificación en capas, y las máximas de Grice detectan **rupturas lógicas** donde la estructura comunicativa esperada es violada. Un sensor no «cree» en lo que mide; registra desviaciones formales. Así, estos préstamos terminológicos son operadores observacionales formales, no misticismo hermenéutico.
 
-
-
 ---
 
 РУССКИЙ Section:
@@ -292,8 +274,6 @@ Este módulo hace referencia ocasional a marcos conceptuales asociados con **Pei
 
 ### 【Научное примечание】
 В модуле иногда используются концепции, связанные с **Пирсом** (семиотические триады), **Эко** (теория кодов) и **Грайсом** (прагматические максимы). Эти термины не являются мистическими формулами. Они работают точно так же, как калиброванный датчик: категории Пирса выявляют отношения знак–объект, коды Эко обнаруживают многоуровневые схемы кодирования, а максимы Грайса фиксируют **логические разрывы**, где нарушается ожидаемая коммуникативная структура. Датчик не «верит» в то, что измеряет; он регистрирует формальные отклонения. Таким образом, эти заимствованные термины — это формальные наблюдательные операторы, а не герменевтический мистицизм.
-
-
 
 ---
 

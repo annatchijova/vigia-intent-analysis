@@ -5,14 +5,6 @@ Batch ID: vigia-doc-0081-9e2e4cde
 Generated: 2026-05-20T14:56:47.861995+00:00
 -->
 
----
-doc_hash: 9e2e4cde
-module: vigia/core/vigia_core_forensic_technical_detector.py
-languages: [EN, ES, RU]
-generated_by: moonshot-kimi-k2.6-batch-api
-license: Apache-2.0
----
-
 ### ENGLISH
 
 #### What Is This Module?
@@ -29,6 +21,7 @@ Concepts:
 - Synergy Scoring
 - Display Float (z_score)
 
+Let's make a table with columns: Concept | Description | Scientific Relevance.
 
 Also perhaps a table for Constants:
 Constant | Internal Type | Purpose
@@ -73,11 +66,15 @@ Mirror content.
 - "What Is This Module?" -> "¿Qué es este módulo?"
 - Deterministic sensor analogy.
 - Use terms: Detector Técnico Forense, Artefacto forense, Fracción (aritmética de enteros), Expresión regular (regex), TTPs, Invariante.
+- Scientific Note -> 【Nota Científica】or keep 【Scientific Note】? User says "A 【科学说明】/【Scientific Note】 box". So for English use 【Scientific Note】, for Spanish maybe 【Nota Científica】, for Russian 【Научное Примечание】, for Chinese 【科学说明】. The user explicitly said "A 【科学说明】/【Scientific Note】 box". I'll use the appropriate language title but keep the spirit.
 
 Chinese specific terms:
 - 取证工件 (forensic artifact)
+- 逻辑断裂 (logical fracture? maybe "logic gap"? Actually the user said "逻辑断裂 (not 裂缝)". I need to use it somewhere. Maybe in glossary or scientific note? The module description doesn't mention裂缝, but I should ensure if I refer to "gap" or "fracture" I use 逻辑断裂. Perhaps in the note about semiotics not being mysticism? Not sure. Maybe in glossary: "逻辑断裂" can be used for "logical break/fault". Since the user specifically required it, I must include it somewhere naturally. Maybe in the glossary as "逻辑断裂 (Logical Rupture): 当技术信号与语义上下文之间出现确定性断层时的状态。" Or in the scientific note. Let's find a way.
 
+Also: 艾柯 (Umberto Eco), 格赖斯 (Grice). Peirce is 皮尔斯 (but not specified; I can use 皮尔斯 or Charles Sanders Peirce). Use 皮尔士? Standard Chinese is 皮尔斯 or 皮尔士. I'll use C·S·皮尔士 or 皮尔斯.
 
+Let's draft Chinese carefully.
 
 ### РУССКИЙ
 
@@ -88,9 +85,11 @@ Mirror.
 
 ### Overall Formatting
 
+Use Markdown headers. Since the user wants 4 language sections, I can use top-level headers for each language, or second-level. I'll use top-level headers like `# ENGLISH`, `# ESPAÑOL`, `# РУССКИЙ`, `# 中文`.
 
 Under each, subheaders: `## What Is This Module?`, `## Key Concepts`, `## Glossary`, `## 【Scientific Note】/【...】`.
 
+Let's write content.
 
 First, let's think about the constants and how to describe them without floating point.
 
@@ -104,11 +103,15 @@ All stored as integers or strings, manipulated via Fraction for ratios.
 
 Function analyze(): accepts forensic artifact text, applies regex rules, counts matches, computes integer-based score using Fraction, returns dict with `z_score` (converted to float only for display) and other fields like `co_occurrence_map`, `trace_log`, `deterministic_hash`.
 
+The user wrote "Returns dict con: z_score: float (display only — I7) co" which is cut off. I can reasonably infer fields: `co_occurrence` or `confidence`. I'll mention it returns a structured result dictionary including the display z_score and integer-ratio internals.
 
+I must not invent too much beyond what is given, but since it's truncated, I need to fill in with plausible deterministic forensic detector features consistent with the description. I will describe the output dictionary entries generically but accurately.
 
+Specifically, the doc says "Returns dict con: z_score: float (display only — I7) co". Likely `co_occurrence` or `component_scores`. I'll mention that the dictionary contains the z_score (display-only decimal) and the integer-ratio components from which it is derived.
 
 Now, the note about no floating-point math: "Emphasize deterministic integer arithmetic where applicable." So when explaining scoring, say: "The scoring engine uses Python's `Fraction` class, which stores each value as a pair of integers (numerator, denominator). All additions, multiplications, and comparisons occur in integer arithmetic. The resulting rational number is only converted to a decimal string at the final output boundary."
 
+Let's draft each section in detail.
 
 ---
 
@@ -321,15 +324,15 @@ En el módulo complementario `SemioticDetectorV2`, se emplea terminología deriv
 
 ---
 
-
-
 ---
 
+Check constraints:
 
 - 4 languages: yes.
 - What Is This Module?: yes.
 - Key concepts with tables: yes.
 - Glossary: yes.
+- Scientific Note box: yes, using sensor analogy. In Chinese used 艾柯, 格赖斯, 取证工件, 逻辑断裂. Wait, I used 逻辑断裂 in glossary. Good.
 - License line included exactly.
 - No floating-point math explanations. Emphasized deterministic integer arithmetic / Fraction. I used "integer-ratio arithmetic" / "razones enteras" / "целочисленных отношений" / "整数比算术". I explicitly said z_score is float display only and internal is integer fraction. This meets requirement.
 - Module path: included at top of each section.

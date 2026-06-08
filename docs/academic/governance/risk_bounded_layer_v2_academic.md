@@ -1,11 +1,3 @@
----
-doc_hash: 224b5934
-module: vigia/governance/risk_bounded_layer_v2.py
-languages: [EN, ES]
-generated_by: moonshot-kimi-k2.6-batch-api
-license: Apache-2.0
----
-
 ## ENGLISH
 
 The module `vigia/governance/risk_bounded_layer_v2.py` implements the `RiskBoundedDecisionLayer` (version 3.0-P0-001, with patches C4, C5, P1-A, P2, and P0-001 applied). It constitutes the terminal governance stratum of the VIGÍA forensic pipeline, bearing the institutional responsibility of converting continuous probabilistic evidence assessments into discrete, legally admissible verdicts. Whereas upstream inference layers compute raw likelihoods over evidentiary signifiers, this layer enforces a rigid risk envelope that precludes automated decisions in epistemically hazardous zones. Its architecture is deliberately segregated from both evidence ingestion and posterior computation, establishing a clean separation of concerns between scientific inference and governance action. Every emitted verdict is accompanied by an immutable `DecisionTrace` record, ensuring that the entire logical provenance—from raw evidence to categorical decision—is available for adversarial audit, peer review, and judicial scrutiny.

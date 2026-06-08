@@ -1,11 +1,3 @@
----
-doc_hash: 741696a1
-module: vigia/security/security.py
-languages: [EN, ES, RU, ZH]
-generated_by: moonshot-kimi-k2.6-batch-api
-license: Apache-2.0
----
-
 ## ENGLISH
 
 **Module Identifier:** `vigia/security/security.py`  

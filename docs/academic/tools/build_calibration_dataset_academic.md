@@ -1,11 +1,3 @@
----
-doc_hash: af02e6b5
-module: vigia/tools/build_calibration_dataset.py
-languages: [EN]
-generated_by: moonshot-kimi-k2.6-batch-api
-license: Apache-2.0
----
-
 ## ENGLISH
 
 The module `vigia/tools/build_calibration_dataset.py` constitutes a foundational data-engineering component of the VIGÍA forensic analysis architecture, purpose-built to assemble, validate, and serialize the labeled evidentiary corpus required for the calibration of downstream classification pipelines. Within the epistemological framework of digital forensics, a discriminative classifier yields raw scores that do not, by themselves, constitute statistically valid posterior probabilities. To satisfy the evidentiary reliability criteria articulated in the Daubert standard—particularly the requirement that scientific testimony pertain to a technique with a known and reproducible error rate—these scores must be transformed via a dedicated calibration stage. This module executes the antecedent data-construction pipeline, producing the calibration dataset $\mathcal{D}_{\text{cal}}$ that enables `fit_calibration.py` to learn a mapping from uncalibrated outputs to well-calibrated probability estimates. Its design is strictly confined to deterministic symbolic and discrete operations; it performs no floating-point optimization, no stochastic gradient descent, and no numerical convergence routines, thereby insulating the forensic chain of custody from sources of algorithmic non-determinism.

@@ -5,14 +5,6 @@ Batch ID: vigia-doc-0169-f8c579f2
 Generated: 2026-05-20T14:56:47.881203+00:00
 -->
 
----
-doc_hash: f8c579f2
-module: vigia/tools/picerl_mapping.py
-languages: [EN, ES, RU]
-generated_by: moonshot-kimi-k2.6-batch-api
-license: Apache-2.0
----
-
 ENGLISH:
 - What Is This Module?: This document describes the forensic mapping module `vigia/tools/picerl_mapping.py`. It translates digital artifacts from Incident Response (IR) phases into structured attacker-intent hypotheses within the PICERL-I (Preparation, Identification, Containment, Eradication, Recovery, Lessons Learned — Intent) framework. It replaces opaque guessing with deterministic lookup tables and mandatory falsifiability fields, ensuring every conclusion can be audited, reproduced, and challenged in a court of law under the Daubert standard.
 - Key Concepts:
@@ -35,8 +27,6 @@ Tables:
 | IR Phase | PICERL Phase | Rationale (example) |
 |----------|--------------|---------------------|
 | FOCUS_ANALYSIS (example) | IDENTIFICATION | Analyzed focal artifacts indicate ongoing intrusion |
-
-Wait, the prompt says map_focus_analysis_to_intent translates IR Phase → IntentHypothesis. And PICERLMapper maps IR Phase → PICERL-I using tables. The constants listed are MITRE tactics (RECONNAISSANCE, etc.), not IR phases. I need to reconcile.
 
 The module seems to map IR phases to PICERL phases and also to IntentHypothesis (which includes an intent_type like RECONNAISSANCE, etc.). The constants are the intent types or PICERL subcategories. I'll present them as auditable symbolic constants used in the mapping tables.
 

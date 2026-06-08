@@ -5,14 +5,6 @@ Batch ID: vigia-doc-0035-83a57d82
 Generated: 2026-05-20T14:56:47.852099+00:00
 -->
 
----
-doc_hash: 83a57d82
-module: vigia/config.py
-languages: [EN, ES, RU, ZH]
-generated_by: moonshot-kimi-k2.6-batch-api
-license: Apache-2.0
----
-
 ENGLISH:
 - Title: Module Documentation: `vigia/config.py`
 - What Is This Module?: A central registry that reads operating-system environment variables and converts them into validated, deterministic settings. Like a laboratory protocol that translates raw instrument readings into standardized units before any experiment begins.
@@ -53,11 +45,10 @@ ESPAÑOL:
 - Important: 艾柯 (not Eco), 格赖斯 (not Grice), 取证工件 (not 制品), 逻辑断裂 (not 裂缝)
 - Glossary: 单例模式 (Singleton), 环境变量, Pydantic, 数据类 (Dataclass), SIFT取证工作站, 确定性整数运算
 - Scientific Note: 皮尔斯、艾柯、格赖斯. 传感器类比. 不是神秘主义.
+  - Use 取证工件 if relevant... how? Maybe mention that misconfiguration creates a "逻辑断裂" in the forensic artifact chain? Actually the user said "Chinese translations must use: ... 取证工件 (not 制品), 逻辑断裂 (not 裂缝)". I need to incorporate these terms naturally. Perhaps in the scientific note or glossary.
   - 取证工件: Forensic artifact. Could say the configuration values are themselves 取证工件 in the digital forensics chain.
   - 逻辑断裂: Logical break/fracture. Could say validation prevents 逻辑断裂 in the chain of evidence.
 - License line
-
-
 
 Sensor analogy details:
 - Physical phenomenon → Sensor (Peircean representamen/sign)
@@ -69,8 +60,9 @@ This fits perfectly. The note must be boxed with 【科学说明】/【Scientifi
 
 Tables should be clean Markdown.
 
+Actually, looking at the prompt again: "CLASSES: - LLMBackend... The backend is chosen from CONFIG.llm_backend... - VigiaConfig: All VIGÍA runtime settings..."
 
-
+So LLMBackend is documented elsewhere but its selection is governed by CONFIG. I'll mention this relationship.
 
 Structure:
 - ENGLISH section
@@ -79,7 +71,6 @@ Structure:
 - 中文 section
 
 Each starts with a header.
-
 
 **ENGLISH**
 
@@ -120,8 +111,6 @@ VIGÍA occasionally employs terminology inspired by Charles Sanders **Peirce**, 
 In `vigia/config.py`, an environment variable is the raw stimulus. The module acts as the ADC and calibration protocol: it transforms text into validated, discrete settings (integers or categorical strings) and communicates them unambiguously to the rest of the forensic pipeline. The use of semiotic vocabulary underscores that **meaning is constructed through deterministic, verifiable rules**—not through metaphysical speculation.
 
 ---
-
-
 
 Now ESPAÑOL. Need to translate accurately.
 
@@ -208,6 +197,7 @@ Glossary:
 - 数据类 (Dataclass)
 - SIFT取证工作站
 - 确定性整数运算
+- 取证工件 (Forensic artifact: digital evidence object in the investigation chain. I need to define it to use the required term.)
 - 逻辑断裂 (Logical fracture: a break in the chain of reasoning or evidence custody)
 
 Scientific Note:
@@ -218,8 +208,6 @@ Scientific Note:
 - 艾柯的百科全书式模型。
 - 格赖斯的合作原则。
 - Mention 取证工件: the validated config parameters themselves become 取证工件 in the pipeline, and misconfiguration would cause a 逻辑断裂.
-
-
 
 【科学说明】
 VIGÍA 偶尔会使用源自查尔斯·桑德斯·皮尔斯 (Charles Sanders Peirce)、翁贝托·艾柯 (Umberto Eco) 以及 H. P. 格赖斯 (H. P. Grice) 的术语。这不是神秘主义，而是披着符号学外衣的严格信息论。请考虑**传感器类比**：
@@ -233,7 +221,9 @@ VIGÍA 偶尔会使用源自查尔斯·桑德斯·皮尔斯 (Charles Sanders Pei
 
 That uses all required terms.
 
+Now let me ensure no floating-point explanations. I should avoid saying things like "converts string to float" or "decimal precision". Instead emphasize "exact string comparison", "integer arithmetic", "categorical matching".
 
+Also, the user mentioned "LLMBackend" in the classes. In the English "What Is This Module", I mentioned it briefly as an analytical instrument. That's fine.
 
 - All os.getenv() calls replaced with CONFIG singleton.
 - Pydantic V2 used when available; falls back to dataclasses + manual validation.
@@ -242,6 +232,7 @@ That uses all required terms.
 - LLMBackend: thin async wrapper over Anthropic or Ollama APIs (backend chosen from CONFIG.llm_backend)
 - VigiaConfig: runtime settings from env vars. Setting env var overrides default.
 
+I should mention the override mechanism in the tables.
 
 Also, need to make sure the constant `_PYDANTIC_AVAILABLE` is mentioned. It's an internal flag. In the glossary, maybe mention it as a capability probe.
 
@@ -259,10 +250,13 @@ For ENGLISH table:
 
 Similarly for other languages.
 
+Now, I need to ensure the tone is academic, technical, suitable for scientists who don't know Python. So avoid Python-specific jargon without explanation. Explain "dataclass" simply.
 
+One concern: The user wants "thorough but concise". I'll aim for comprehensive but not overly verbose sections.
 
+Also, the requirement: "You NEVER use floating-point math explanations for deterministic systems." I must check every sentence to ensure I don't accidentally mention floating point as a good thing. I should mention it only to say it's avoided.
 
-
+Let's construct the final text.
 
 ENGLISH Section:
 
@@ -306,8 +300,6 @@ In `vigia/config.py`, an environment variable is the raw stimulus. The module ac
 
 ---
 
-
-
 ESPAÑOL Section:
 
 # ESPAÑOL
@@ -349,8 +341,6 @@ VIGÍA emplea ocasionalmente terminología inspirada en Charles Sanders **Peirce
 En `vigia/config.py`, una variable de entorno es el estímulo bruto. El módulo actúa como el convertidor y el protocolo de calibración: transforma texto en ajustes discretos validados (enteros o cadenas categóricas) y los comunica sin ambigüedad al resto de la tubería forense. El uso de vocabulario semiótico subraya que **el significado se construye mediante reglas deterministas y verificables**—no mediante especulación metafísica.
 
 ---
-
-
 
 РУССКИЙ Section:
 

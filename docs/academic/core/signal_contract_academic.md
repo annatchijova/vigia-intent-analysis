@@ -5,14 +5,6 @@ Batch ID: vigia-doc-0076-d91bf435
 Generated: 2026-05-20T14:56:47.860883+00:00
 -->
 
----
-doc_hash: d91bf435
-module: vigia/core/signal_contract.py
-languages: [ZH]
-generated_by: moonshot-kimi-k2.6-batch-api
-license: Apache-2.0
----
-
 中文:
 `vigia/core/signal_contract.py` 模块是 VIGIA 取证流水线中的极简支撑接口。该模块仅 179 字节，定义了确定性模式（deterministic schema），规范检验组件间事件通知的交换方式。其不包含处理逻辑，而是通过规定强制字段与符号数据类型，建立不可变的契约结构，确保采集、分析与报告单元之间的可追溯无损通信。作为互操作性的参照锚点，它保证跨异构取证设备的信号解析不存在计算歧义。
 
@@ -86,8 +78,6 @@ ES (45 words):
 
 RU (48 words):
 Модуль `vigia/core/signal_contract.py` — это 179-байтовый поддерживающий интерфейс forensic-конвейера VIGIA. Он задаёт детерминированную схему обмена событийными уведомлениями между компонентами экспертизы, устанавливая обязательные поля и символьные типы данных для обеспечения прослеживаемой, без-loss интероперабельности без логики обработки.
-
-Wait, "без-loss" is mixed. "без потерь".
 
 RU continued:
 ...обеспечения прослеживаемой интероперабельности без потерь, исключая логику обработки. (40 words)
@@ -280,8 +270,6 @@ Now format nicely. Use headers for languages. Then a Glossary section. In the gl
 
 **1. Signal Contract / Contrato de señal / Контракт сигнала / 信号契约**  
 EN: Formal message-exchange interface. ES: Interfaz formal de intercambio. RU: Формальный интерфейс обмена. ZH: 正式消息交换接口。
-
-Wait, does this meet "You always write in 4 languages"? Yes, the content is present in all 4 languages.
 
 Let's double-check the constraint: "You NEVER use floating-point math explanations for deterministic systems." I am avoiding floating-point math entirely; I'm stating that no floating-point types are used. That's compliant.
 

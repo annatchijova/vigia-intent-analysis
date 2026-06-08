@@ -1,11 +1,3 @@
----
-doc_hash: a409595e
-module: vigia/tools/vigia_case_adapter.py
-languages: [EN, ES, RU]
-generated_by: moonshot-kimi-k2.6-batch-api
-license: Apache-2.0
----
-
 ## ENGLISH
 
 The `vigia/tools/vigia_case_adapter.py` module constitutes a critical deterministic mediation layer within the VIGÍA forensic analysis framework, specifically engineered to normalize, ensemble, and adapt per-artifact statistical scores into case-admissible evidentiary metrics. Version 6 of this module implements the *Opcion B Weighted Domain Ensemble* algorithm, a mathematically exact scoring methodology designed to satisfy reproducibility mandates under the Daubert standard for scientific testimony, while simultaneously conforming to GB/T digital forensic national standards and MLPS 2.0 data-processing security requirements. Operating as the evidentiary gateway between low-level artifact extraction and high-level case synthesis, the adapter ensures that every quantitative transition remains auditable, bit-exact, and legally defensible.

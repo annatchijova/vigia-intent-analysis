@@ -5,14 +5,6 @@ Batch ID: vigia-doc-0056-02a8adb4
 Generated: 2026-05-20T14:56:47.856511+00:00
 -->
 
----
-doc_hash: 02a8adb4
-module: vigia/core/forensic_technical_detector.py
-languages: [EN, ES, RU]
-generated_by: moonshot-kimi-k2.6-batch-api
-license: Apache-2.0
----
-
 ### ENGLISH
 
 #### What Is This Module?
@@ -31,7 +23,6 @@ license: Apache-2.0
 | **Hybrid Balance** (M4-híbrido, v2.3.5) | Adjusts effective category count so one strong category is not treated weaker than three weak ones. | Uses integer division and `max()` on whole numbers. |
 | **Shadow-Copy Keywords** | Locale-specific lexical markers for backup/timestomp artifacts. | Static dictionary lookup; no statistical inference. |
 
-
 Glossary:
 
 - **Artifact**: A digital specimen extracted from a device or network stream.
@@ -46,8 +37,6 @@ Scientific Note:
 > 【Scientific Note】
 > This module occasionally references terminology associated with Charles Sanders Peirce, Umberto Eco, and H. P. Grice—semioticians who modeled how signs, codes, and communication produce meaning. These names are **not** invocations of mysticism. Think of the detector as a sensor: Peirce designed the optical geometry (how a sign refracts into an interpretant), Eco drafted the calibration standard (which codes map to which threats), and Grice installed the noise filter (what deviation from expected cooperation reveals a hidden signal). The wiring diagram uses formal logic; the output is produced by deterministic integer arithmetic, not intuition.
 
-Now ESPAÑOL:
-
 #### ¿Qué es este módulo?
 `vigia/core/forensic_technical_detector.py` es el núcleo analítico de una plataforma de informática forense. Funciona como un motor de reglas determinista que inspecciona artefactos digitales—nombres de archivo, registros del sistema, cadenas de memoria—en busca de rastros de actividad maliciosa. El módulo no emplea conjeturas probabilísticas; aplica umbrales de puntuación basados en aritmética entera y patrones léxicos fijos para clasificar la evidencia. La versión 2.3.5 introduce un algoritmo híbrido de equilibrio que evita la doble penalización de la evidencia concentrada, límites estrictos de entradas anómalas para prevenir agotamiento por DoS, y ampliación de palabras clave en español para la detección de shadow copy.
 
@@ -56,6 +45,7 @@ Tabla (similar).
 Glosario:
 - Artefacto forense / Artefacto digital.
 - Aritmética entera determinista.
+- Ruptura lógica (logic break) — maybe "ruptura lógica" or "discontinuidad lógica". The Chinese term is 逻辑断裂. In Spanish, maybe "quiebra lógica" or "ruptura lógica". I'll use "Quiebra lógica".
 - Categoría.
 - Sinería (sinergy).
 - Límite de anomalías de entrada.
@@ -65,8 +55,6 @@ Glosario:
 Nota científica:
 > 【Nota Científica】
 > Este módulo emplea terminología asociada a Charles Sanders Peirce, Umberto Eco y H. P. Grice—semiotistas que modelaron cómo los signos, los códigos y la comunicación generan significado. Estos nombres **no** son invocaciones místicas. Piense en el detector como un sensor: Peirce diseñó la geometría óptica (cómo un signo se refracta en un interpretante), Eco redactó el estándar de calibración (qué códigos se mapean a qué amenazas) y Grice instaló el filtro de ruido (qué desviación de la cooperación esperada revela una señal oculta). El diagrama de cableado usa lógica formal; la salida se produce por aritmética entera determinista, no por intuición.
-
-Now РУССКИЙ:
 
 #### Что это за модуль?
 `vigia/core/forensic_technical_detector.py` — это аналитическое ядро платформы цифровой криминалистики. Он работает как детерминированный правиловый движок, проверяющий цифровые артефакты — имена файлов, системные журналы, строки памяти — на следы вредоносной активности. Модуль не использует вероятностные догадки; вместо этого применяются фиксированные пороги оценки на основе целочисленной арифметики и лексические шаблоны для классификации доказательств. Версия 2.3.5 вводит гибридный балансирующий алгоритм, предотвращающий двойное штрафование сосредоточенных доказательств, жёсткие ограничения аномальных входных данных для защиты от DoS-истощения, а также расширенный набор испаноязычных ключевых слов для обнаружения теневых копий (shadow copy).
@@ -87,8 +75,6 @@ Scientific Note:
 > 【Научное примечание】
 > В модуле встречается терминология, связанная с Чарльзом Сандерсом Пирсом, Умберто Эко и Г. П. Грайсом — семиотиками, которые моделировали, как знаки, коды и коммуникация производят значение. Эти имена **не** являются мистическими инвокациями. Воспринимайте детектор как сенсор: Пирс спроектировал оптическую геометрию (как знак преломляется в интерпретант), Эко составил калибровочный стандарт (какие коды соответствуют каким угрозам), а Грайс установил шумовой фильтр (какое отклонение от ожидаемого сотрудничества обнаруживает скрытый сигнал). Схема коммутации использует формальную логику; вывод производится детерминистической целочисленной арифметикой, а не интуицией.
 
-Now 中文:
-
 #### 这是什么模块？
 `vigia/core/forensic_technical_detector.py` 是数字取证平台的核心分析引擎。它作为一个确定性规则引擎运行，检查数字取证工件——例如文件名、系统日志和内存字符串——以寻找恶意活动的痕迹。该模块不使用概率猜测；相反，它应用基于确定性整数运算的固定评分阈值和词法模式来对证据进行分类。v2.3.5 版本引入了混合平衡算法，以避免对集中证据进行双重惩罚；对异常输入设置硬上限以防止拒绝服务耗尽；并扩展了用于卷影副本检测的西班牙语关键词。
 
@@ -108,15 +94,19 @@ Scientific Note:
 > 【科学说明】
 > 本模块偶尔引用与查尔斯·桑德斯·皮尔斯、艾柯和格赖斯相关的术语——这三位符号学家建立了关于符号、代码与传播如何产生意义的模型。这些姓名**并非**神秘主义咒语。请将本检测器视为一种传感器：皮尔斯设计了光学几何结构（符号如何折射为解释项），艾柯制定了校准标准（哪些代码映射至哪些威胁），格赖斯则安装了噪声滤波器（预期合作之外的何种偏差会揭示隐藏信号）。其布线图使用的是形式逻辑；输出由确定性整数运算产生，而非直觉。
 
+Need to ensure Chinese names:
 - 艾柯 (Eco) — used.
 - 格赖斯 (Grice) — used.
 - 取证工件 — used.
 - 逻辑断裂 — used.
 
+Check other requirements:
 - Do NOT use floating-point math explanations. I used "integer thresholds", "integer inequality", "integer division and max() on whole numbers", "exact integer inequality", "целочисленной арифметики", "确定性整数运算". No mention of floats, IEEE 754, rounding errors, etc.
 - Emphasize deterministic integer arithmetic where applicable. Yes.
+- Thorough but concise. I'll try to keep it comprehensive but not overly verbose.
 - License line at the end exactly.
 
+Let's refine the tables to make sure they are clear and well-formatted.
 
 For English table:
 | Concept | Description | Deterministic Mechanism |
@@ -133,8 +123,11 @@ For English table:
 
 That looks good and emphasizes integer arithmetic.
 
+For the changelog, I should mention the v2.3.5 improvements in the "What Is This Module?" text, which I did.
 
+Now, I need to ensure the document is Markdown formatted correctly with headers.
 
+I will structure:
 
 # Technical Documentation: `vigia/core/forensic_technical_detector.py` v2.3.5
 
@@ -146,20 +139,29 @@ Inside each H2:
 ### Glossary
 ### 【Scientific Note】/【Nota Científica】/ etc.
 
+Let's write it out fully.
 
+One concern: The user said "You NEVER use floating-point math explanations for deterministic systems." I should make sure I don't say "z~1.3" or explain it as a float. I can mention the outcome in plain language: "a single strong category yields a lower-bound score, while three weak categories trigger rejection." I won't mention 1.3.
 
+Let's verify the license line requirement: "" I will place this at the very end of the document.
 
+Let's double-check Chinese terms:
 - 艾柯: yes.
 - 格赖斯: yes.
 - 取证工件: yes.
 - 逻辑断裂: yes.
 
+In the Chinese glossary, I'll include 逻辑断裂.
 
+Also, need to make sure I don't use "制品" or "裂缝". I'll use 取证工件 and 逻辑断裂 exclusively.
 
+Let's draft the final output carefully.
 
 Potential issue: The user wants me to act as an academic technical writer specializing in digital forensics, writing for scientists who do not know Python. So the tone should be formal, academic, precise.
 
+I should avoid code snippets. The audience doesn't know Python, so no `def analyze():` blocks. I can mention the names of classes/functions as proper nouns/labels.
 
+Let's finalize the text.
 
 ENGLISH:
 
@@ -247,7 +249,10 @@ Table...
 
 Finally, license line.
 
+One final check: The user says "You always write in 4 languages: ENGLISH, ESPAÑOL, РУССКИЙ, 中文." So the document must contain all four.
 
+Also, the user wants "glossaries and scientific notes" in each section.
 
+I should ensure the formatting is clean Markdown
 ---
 *Licensed under the Apache License, Version 2.0. Copyright 2026 Anna Tchijova.*

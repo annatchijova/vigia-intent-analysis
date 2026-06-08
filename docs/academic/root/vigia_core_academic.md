@@ -1,11 +1,3 @@
----
-doc_hash: 0642d009
-module: vigia/vigia_core.py
-languages: [EN]
-generated_by: moonshot-kimi-k2.6-batch-api
-license: Apache-2.0
----
-
 ## ENGLISH
 
 **Module:** `vigia/vigia_core.py` — Forensic Semiotic Inference Core

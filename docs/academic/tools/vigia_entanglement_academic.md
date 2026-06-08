@@ -1,11 +1,3 @@
----
-doc_hash: 870bfb4a
-module: vigia/tools/vigia_entanglement.py
-languages: [EN, ES, RU, ZH]
-generated_by: moonshot-kimi-k2.6-batch-api
-license: Apache-2.0
----
-
 ## ENGLISH
 
 `vigia/tools/vigia_entanglement.py` functions as a compatibility stub—also termed a semantic shim—within the VIGÍA digital forensics framework. Its architectural purpose is to preserve backward compatibility across evolving module topologies while maintaining strict referential integrity. Rather than implementing operational logic, this module re-exports the `EntanglementEngine` class from the canonical source file `entanglement.py`, located at the repository root. By acting as a transparent namespace proxy, the stub resolves a deferred import dependency—commonly referred to as a lazy import—originating in `temporal_forensics_redteam.py`, thereby preventing code duplication and eliminating the risk of semantic divergence between parallel implementations. In forensic software engineering, such divergence constitutes an uncontrolled source of systemic error; the stub eliminates this risk by ensuring that a single canonical implementation remains the sole source of truth.

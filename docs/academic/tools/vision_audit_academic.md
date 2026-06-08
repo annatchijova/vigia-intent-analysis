@@ -1,11 +1,3 @@
----
-doc_hash: c12c7450
-module: vigia/tools/vision_audit.py
-languages: [EN, ES, RU, ZH]
-generated_by: moonshot-kimi-k2.6-batch-api
-license: Apache-2.0
----
-
 ## ENGLISH
 
 The VIGÍA Forensic Platform relies on deterministic, auditable subsystems to ensure that computer vision (CV) pipelines applied to digital evidence produce scientifically defensible and legally admissible results. The module `vigia/tools/vision_audit.py` constitutes the reference implementation of a forensic audit primitive responsible for the cryptographic attestation of visual evidence integrity before, during, and after automated analytic processing. Its primary function is to establish a non-repudiable chain of custody for image and video datastreams by means of bit-exact cryptographic hashing, temporal ledgering, and parameter-bound verification, thereby satisfying admissibility requirements under the Daubert standard for scientific evidence (Daubert v. Merrell Dow Pharmaceuticals, Inc., 509 U.S. 579). The module operates as a deterministic closure within the broader VIGÍA ecosystem, consuming raw or containerized visual evidence and emitting a self-contained audit artifact that binds every decoded frame, every processing parameter, and every temporal index to an immutable cryptographic structure.

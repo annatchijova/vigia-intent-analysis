@@ -5,14 +5,6 @@ Batch ID: vigia-doc-0019-5be37470
 Generated: 2026-05-20T14:56:47.848835+00:00
 -->
 
----
-doc_hash: 5be37470
-module: scripts/pre_release_check.py
-languages: [EN, ES, RU, ZH]
-generated_by: moonshot-kimi-k2.6-batch-api
-license: Apache-2.0
----
-
 ENGLISH:
 - Heading: ENGLISH
 - What Is This Module? Plain language: A robotic proofreader that scans the VIGÍA Forensic Suite codebase before release. It reads source files as abstract syntax trees (AST) to catch forbidden imports, architectural violations, and non-deterministic numeric pathways that could corrupt forensic hashes. It acts as a gatekeeper in CI/CD pipelines.

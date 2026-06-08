@@ -5,14 +5,6 @@ Batch ID: vigia-doc-0042-79fddb64
 Generated: 2026-05-20T14:56:47.853470+00:00
 -->
 
----
-doc_hash: 79fddb64
-module: vigia/core/causal_closure.py
-languages: [EN, ES, RU, ZH]
-generated_by: moonshot-kimi-k2.6-batch-api
-license: Apache-2.0
----
-
 ### ENGLISH
 - Heading
 - What Is This Module?
@@ -207,8 +199,6 @@ The docstring says: "Cualquier dimensión no disponible se sustituye por Fracti"
 **Tone Check:**
 Academic, technical, but accessible to non-Python scientists. Avoid words like "class", "function", "import", "immutable" in a programming sense? The prompt says they do NOT know Python. So I should describe CausalClosureResult as an "immutable output container/record" rather than a Python class. And describe compute_causal_closure as a "procedure/core algorithm".
 
-Wait, the prompt says "CLASSES: - CausalClosureResult... FUNCTIONS: - compute_causal_closure...". I need to document them but in a way scientists understand. I can say "Data Structure" or "Output Record" for the class, and "Algorithm/Operation" for the function.
-
 **Refining the structure within each language:**
 
 #### ENGLISH
@@ -238,7 +228,6 @@ Similar.
 #### 中文
 Similar.
 
-Wait, the user asked for each section to include:
 - "What Is This Module?" (plain language explanation)
 - Key concepts with tables
 - A glossary of technical terms
@@ -246,15 +235,12 @@ Wait, the user asked for each section to include:
 
 It doesn't explicitly say I need to detail the classes/functions separately in tables, but since it's documentation for a module, I should cover them. I can integrate them into "Key Concepts" or a dedicated "Module Components" table. I'll add a "Module Components" table to each section.
 
-Let me make sure the Chinese section uses the required terms correctly throughout.
 - 艾柯: in the table and note. ✓
 - 格赖斯: in the table and note. ✓
 - 取证工件: in glossary and text. ✓
 - 逻辑断裂: used. ✓
 
 Also, I need to ensure the Scientific Note specifically mentions the sensor analogy and explicitly denies mysticism.
-
-Let me double-check the Chinese for Peirce. Standard translation is 皮尔斯. I'll use 皮尔斯.
 
 Now, let me consider the requirement: "You NEVER use floating-point math explanations for deterministic systems."
 I must be careful not to explain anything using floating point. I should emphasize integer arithmetic. When explaining display_pct, I say it uses integer truncation. I do not mention floating point except to say it is NOT used.
@@ -308,12 +294,7 @@ Let's construct the final response.
 
 ---
 
-
 ```
-
-Wait, should the license be in all four languages? The requirement says "License line: ''" It's a specific line. I'll put it once at the bottom. That's standard.
-
-Let me write out the ENGLISH text carefully.
 
 **ENGLISH:**
 

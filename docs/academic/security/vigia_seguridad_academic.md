@@ -5,14 +5,6 @@ Batch ID: vigia-doc-0127-61a43ef6
 Generated: 2026-05-20T14:56:47.871873+00:00
 -->
 
----
-doc_hash: 61a43ef6
-module: vigia/security/vigia_seguridad.py
-languages: [ZH]
-generated_by: moonshot-kimi-k2.6-batch-api
-license: Apache-2.0
----
-
 中文:
 `vigia/security/vigia_seguridad.py` 模块（内部代号“Cocinero”）是 VIGÍA 取证架构的确定性安全内核。它集中四项防御原语：(1) ASCII 净化，对不可信输入强制执行 7 位字符边界以消除不可打印控制序列；(2) 路径沙箱，将文件系统遍历限制在枚举的允许目录内；(3) 提示注入防护，通过词汇归一化在发送至语言模型接口前中和对抗性子串；(4) 子进程白名单，仅允许执行经密码学验证的二进制文件。科学注释：所有验证逻辑基于精确集合成员关系与离散语法规则，确保运行时无随机性的可复现行为。访问控制决策不涉及浮点估算。
 

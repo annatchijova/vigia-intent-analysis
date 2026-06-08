@@ -5,14 +5,6 @@ Batch ID: vigia-doc-0100-7b4e076e
 Generated: 2026-05-20T14:56:47.866285+00:00
 -->
 
----
-doc_hash: 7b4e076e
-module: vigia/inference/check_determinism.py
-languages: [EN, ES, RU, ZH]
-generated_by: moonshot-kimi-k2.6-batch-api
-license: Apache-2.0
----
-
 ENGLISH:
 Add to table or glossary: `_BRIDGE_CANDIDATES` -> Maybe in glossary since it's an internal constant.
 **Bridge Candidates**: Provisional intermediate tools under evaluation for stability before being granted full status in the deterministic pipeline.
@@ -60,8 +52,6 @@ Structure:
 ### 【Scientific Note】
 ...
 
-
-
 ---
 
 ## ESPAÑOL
@@ -78,8 +68,6 @@ Structure:
 ### 【Nota Científica】
 ...
 
-
-
 ---
 
 ## РУССКИЙ
@@ -95,8 +83,6 @@ Structure:
 
 ### 【Научное Примечание】
 ...
-
-
 
 ---
 
@@ -116,11 +102,8 @@ Structure:
 ### 【科学说明】
 ...
 
-
-
 ---
 
-Let me double check the Chinese terms again.
 - 艾柯: used in scientific note. Yes.
 - 格赖斯: used in scientific note. Yes.
 - 取证工件: used in glossary and text. Yes.
@@ -131,8 +114,6 @@ Also, the user says "Do NOT use floating-point math explanations — emphasize d
 One final check on the scientific note sensor analogy. I used the word "witness" for sensor. That's a good analogy. I explicitly said they are formal abstractions, not mysticism. Good.
 
 I should ensure I don't use any Python code examples, since the audience doesn't know Python. The user said "Generate documentation for the following Python module... for scientists who do NOT know Python". I will not include code blocks or Python syntax beyond the module path.
-
-Let me refine the ENGLISH scientific note to make sure it's punchy and clear.
 
 "VIGIA borrows terminology from semiotics—Charles Sanders Peirce, Umberto Eco, and H.P. Grice—to describe information structures. These terms are formal abstractions, not mysticism. Consider the sensor analogy: in engineering, we call a physical sensor a 'witness' to an event even though it lacks consciousness; it simply records data. Likewise, Peirce's sign, Eco's code, and Grice's maxims are analytical lenses for classifying how digital evidence carries meaning. They provide a rigorous logical framework; they do not invoke supernatural agency. When this module checks for determinism, it is ensuring that the 'sensor' (the analytical tool) records the same 'testimony' (the report) every time under identical conditions."
 

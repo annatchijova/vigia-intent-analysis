@@ -5,14 +5,6 @@ Batch ID: vigia-doc-0130-d909325d
 Generated: 2026-05-20T14:56:47.872545+00:00
 -->
 
----
-doc_hash: d909325d
-module: vigia/sift/amcache_shimcache.py
-languages: [EN, ES, RU, ZH]
-generated_by: moonshot-kimi-k2.6-batch-api
-license: Apache-2.0
----
-
 ENGLISH:
 # ENGLISH
 
@@ -212,8 +204,6 @@ User wants documentation for the module. I have mentioned:
 - ShimcacheRecord -> ShimCache 记录 / Registro ShimCache / Запись ShimCache / ShimCache Record
 - AmcacheAnalysisResult -> I didn't explicitly name it. Should I? The module includes classes. In the key concepts table, I can add rows for the classes.
 
-Let me revise tables to explicitly mention the classes and functions.
-
 Add rows:
 
 | **AmcacheRecord** | A data class representing one extracted entry from the Amcache.hve artifact. | Encapsulates program path, SHA1, and execution timestamps as deterministic fields. |
@@ -231,8 +221,6 @@ Also mention constants:
 - BLACKLISTED_PROGRAMS: Constant dataset of known-bad signatures.
 
 I will integrate these into the table or glossary.
-
-Let me update all four language tables accordingly.
 
 English Table update:
 Add rows for the classes/functions/constants.
@@ -310,10 +298,7 @@ Structure:
 ...
 ---
 
-
 Actually, the license line is required. I'll put it at the very bottom. And maybe in each section? I'll put it once at the bottom. It's safer to put it once but clearly.
-
-Wait, user said "License line: ''" It's a single line. I'll place it at the end.
 
 Need to ensure the scientific note box is clearly marked with 【Scientific Note】/【科学说明】etc.
 

@@ -5,14 +5,6 @@ Batch ID: vigia-doc-0055-2f970571
 Generated: 2026-05-20T14:56:47.856273+00:00
 -->
 
----
-doc_hash: 2f970571
-module: vigia/core/forensic_db.py
-languages: [EN, ES, RU, ZH]
-generated_by: moonshot-kimi-k2.6-batch-api
-license: Apache-2.0
----
-
 ### ENGLISH
 
 **What Is This Module?**

@@ -5,14 +5,6 @@ Batch ID: vigia-doc-0045-06e4330c
 Generated: 2026-05-20T14:56:47.854193+00:00
 -->
 
----
-doc_hash: 06e4330c
-module: vigia/core/config_sentinel.py
-languages: [EN, ES, RU, ZH]
-generated_by: moonshot-kimi-k2.6-batch-api
-license: Apache-2.0
----
-
 ENGLISH:
 - Title: Module Documentation: vigia/core/config_sentinel.py
 - What Is This Module? Explain it as a forensic instrument that seals the configuration of a digital observation system (VIGÍA). Like a tamper-evident seal on a sample container. It takes a snapshot of system settings at the start, checks between analysis phases, and finalizes. Uses SHA-256 (deterministic integer arithmetic on bit strings) — no floating point. Produces an audit trail.
@@ -66,15 +58,12 @@ Need to make sure no floating-point explanations. Emphasize deterministic intege
 
 Tables should be clean Markdown.
 
-Let me draft the Chinese section carefully with mandated terms:
 - 艾柯 (Umberto Eco)
 - 格赖斯 (H.P. Grice)
 - 取证工件 (forensic artifact, instead of 制品)
 - 逻辑断裂 (logical fracture/break, instead of 裂缝)
 
 Also, the license line must be exactly: ""
-
-Let me structure the document:
 
 ---
 
@@ -176,8 +165,6 @@ Let me structure the document:
 
 ---
 
-
-
 ---
 
 Now, let me flesh out the content carefully.
@@ -230,8 +217,6 @@ Glossary (English):
 - **SANS Analyst**: A digital forensics professional certified by the SANS Institute, trained to verify integrity seals and audit trails.
 - **Logic Fracture / 逻辑断裂**: A discontinuity in the inferential chain of evidence processing. Prevented by maintaining unbroken integer hash continuity across checkpoints.
 
-Wait, 逻辑断裂 is for Chinese. In English I can say "logical break/fracture". But the user said Chinese must use 逻辑断裂 (not 裂缝). In English/Russian/Spanish I can use whatever is appropriate, but the Chinese note is strict.
-
 For the Scientific Note, I need to make sure it's consistent across languages.
 
 English version:
@@ -240,8 +225,6 @@ English version:
 > - **Eco’s codes** act as calibration tables: they translate raw bit patterns into forensic categories using deterministic rules, exactly as a spectrometer translates wavelength integers into chemical element IDs.
 > - **Grice’s maxims** serve as quality-control protocols for the sensor array: they ensure that emitted data is truthful (Quality), relevant (Relation), and sufficiently detailed (Quantity).
 > This module (`config_sentinel`) is the physical instrument layer that grounds those abstractions. By sealing configuration with SHA-256 deterministic integer arithmetic—never floating-point approximations—it supplies the exact, reproducible sensor readings upon which any higher-order semiotic interpretation must rest. Without this grounding, semiotic analysis would suffer from **逻辑断裂** (logical discontinuity) between evidence and inference.
-
-Wait, I need to check if I should include 逻辑断裂 in the English note or keep it Chinese-only. The user said "Chinese translations must use: ... 逻辑断裂 (not 裂缝)". So in the Chinese section, I must use 逻辑断裂. In other languages, I can use equivalent terms. But I can mention it parenthetically if I want. I'll keep the English note as "logical discontinuity".
 
 ESPAÑOL version of note:
 > 【Nota Científica】En el marco general de VIGÍA, la terminología derivada de Charles Sanders Peirce (semiótica), Umberto Eco (códigos de interpretación) y H. P. Grice (máximas cooperativas) a veces se lee erróneamente como metafísica o mística. No lo es. Estos conceptos funcionan como una **analogía de sensor** para la medición determinista:
@@ -264,11 +247,8 @@ ESPAÑOL version of note:
 > - **格赖斯的准则**相当于传感器阵列的质量控制协议：确保输出数据真实（质准则）、相关（关系准则）且足够详尽（量准则）。
 > 本模块（`config_sentinel`）正是将这些抽象理论加以落地的物理仪器层。它通过 SHA-256 确定性整数运算——绝不使用浮点近似——对配置进行封存，从而为任何高阶符号学解释提供精确、可复现的传感器读数。若缺乏此确定性基础，符号学分析将在证据与推理之间产生**逻辑断裂**，导致取证工件失效。
 
-Wait, I need to check: "取证工件" should appear in the Chinese glossary or text. I'll make sure to use it in the Chinese Component Reference for ConfigAuditTrail: "作为主要取证工件供外部审查". Also maybe in the glossary.
-
 Also, the user said "Do NOT use floating-point math explanations — emphasize deterministic integer arithmetic where applicable". So in the hash explanation, emphasize integer bitwise operations.
 
-Let me refine the Chinese terms:
 - 取证工件 (forensic artifact) - used in glossary and/or component table.
 - 逻辑断裂 (logical break/fracture) - used in scientific note.
 
@@ -277,10 +257,6 @@ Now let me draft the full document carefully.
 One more thing: The module path is `vigia/core/config_sentinel.py`. I should mention this as the module identifier but not focus on it as code.
 
 Also, for the functions, the user listed them with Python syntax (to_report_dict(), initialize(), etc.). Since the audience doesn't know Python, I should present them as procedures or actions, but keep the names as labels for traceability. I can write them as `initialize()` but explain them as steps.
-
-Let me make sure the tables are aligned and formatted nicely.
-
-Let me write out the full text now.
 
 Structure check:
 - ENGLISH
@@ -298,8 +274,6 @@ Structure check:
   - Same structure
 
 Then License.
-
-Let me craft the "What Is This Module?" for each language carefully.
 
 ENGLISH:
 This module is the **Immutable Configuration Guardian** for the VIGÍA digital forensics platform. Its purpose is to guarantee that the analytical environment does not change while evidence is being processed. Imagine a sealed laboratory glovebox: before an experiment begins, a technician photographs every dial setting. During the experiment, no one may turn a dial without triggering an alarm. At the end, the photograph and the alarm log are locked inside a tamper-evident envelope.
