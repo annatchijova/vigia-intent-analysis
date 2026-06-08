@@ -90,7 +90,7 @@ class TrustedRoot:
         recomputed_hash = hashlib.sha256(
             self.trusted_root_id.encode() + self.created_at.encode()
         ).hexdigest()
-        return recomputed_hash == self.root_hash
+        return hmac.compare_digest(recomputed_hash, self.root_hash)
 
 
 @dataclass
@@ -153,7 +153,7 @@ class AuditLog:
             sort_keys=True
         )
         recomputed_hash = hashlib.sha256(record_str.encode()).hexdigest()
-        return recomputed_hash == self.log_chain_hash
+        return hmac.compare_digest(recomputed_hash, self.log_chain_hash)
     
     def to_dict(self) -> Dict[str, Any]:
         return {
@@ -272,8 +272,14 @@ class TrustLevelVerifier:
         data_hash = hashlib.sha256(data_str.encode()).hexdigest()
         
         # Computar HMAC (determinístico, simulando TPM)
+        if self.trusted_root is None:
+            raise RuntimeError(
+                "TrustLevelVerifier requires a trusted_root with a valid HMAC key. "
+                "A None trusted_root would use a publicly-known fallback key, which "
+                "renders all integrity guarantees invalid in a forensic context."
+            )
         hmac_sig = hmac.new(
-            self.trusted_root.hmac_key if self.trusted_root else b"default_key",
+            self.trusted_root.hmac_key,
             data_str.encode(),
             hashlib.sha256
         ).hexdigest()
@@ -384,8 +390,14 @@ class TrustLevelVerifier:
                 (data_str + checkpoint.value).encode()
             ).hexdigest()
             
+            if self.trusted_root is None:
+                raise RuntimeError(
+                    "TrustLevelVerifier requires a trusted_root with a valid HMAC key. "
+                    "A None trusted_root would use a publicly-known fallback key, which "
+                    "renders all integrity guarantees invalid in a forensic context."
+                )
             hmac_sig = hmac.new(
-                self.trusted_root.hmac_key if self.trusted_root else b"default_key",
+                self.trusted_root.hmac_key,
                 component_hash.encode(),
                 hashlib.sha256
             ).hexdigest()
@@ -460,6 +472,12 @@ class TrustLevelVerifier:
         correlations = self._analyze_event_correlations_deterministic()
         
         # Crear registro de correlación
+        if self.trusted_root is None:
+            raise RuntimeError(
+                "TrustLevelVerifier requires a trusted_root with a valid HMAC key. "
+                "A None trusted_root would use a publicly-known fallback key, which "
+                "renders all integrity guarantees invalid in a forensic context."
+            )
         correlation_record = VerificationRecord(
             checkpoint=VerificationCheckpoint.ANALYSIS_COMPLETE,
             timestamp=self._now_iso(),
@@ -468,7 +486,7 @@ class TrustLevelVerifier:
                 json.dumps(correlations, sort_keys=True).encode()
             ).hexdigest(),
             verification_hmac=hmac.new(
-                self.trusted_root.hmac_key if self.trusted_root else b"default_key",
+                self.trusted_root.hmac_key,
                 json.dumps(correlations).encode(),
                 hashlib.sha256
             ).hexdigest(),

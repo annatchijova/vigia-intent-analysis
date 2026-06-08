@@ -59,6 +59,7 @@ from __future__ import annotations
 
 import decimal
 import json
+import logging
 import math
 import sys
 from fractions import Fraction
@@ -362,7 +363,8 @@ def _vigia_score(case: dict) -> dict:
             for f in raw_fractures
         ]
         _caie_source = "live_caie"
-    except Exception:
+    except Exception as e:
+        logging.warning("CAIE failed, using json_fallback: %s", e)
         fractures    = case.get("caie_fractures", [])
         _caie_source = "json_fallback"
 
