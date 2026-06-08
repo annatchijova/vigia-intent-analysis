@@ -1,0 +1,111 @@
+{
+  "case_id": "VIGIA-REAL-SRL-RD05-MEMORY",
+  "name": "SRL-2018 Remote Desktop Server RD-05 — Memory Forensics",
+  "description": "Volatility3 memory analysis of base-rd-05-memory.img. Windows 10 64-bit. Severe compromise confirmed: code injection in 43 processes and 3 living-off-the-land processes. Most compromised server in the SRL-2018 corpus by process count.",
+  "artifacts": [
+    {
+      "artifact_id": "ART-RD05-001",
+      "evidence_type": "memory_process",
+      "source_tool": "legacy_converter",
+      "timestamp": "2026-04-10T10:00:00Z",
+      "raw_score": 0.85,
+      "prior_trust": 0.85,
+      "provenance_chain": [
+        "sha256:legacy_ART-RD05-001"
+      ],
+      "acquisition_tool": "legacy_converter_v1",
+      "acquisition_hash": "sha256:legacy_ART-RD05-001",
+      "acquisition_timestamp": "2026-04-10T10:00:00Z",
+      "description": "vol3 windows.malfind: code injection detected in 43 processes (PIDs: 896, ac, b4, 5b, c9 and 38 others) | Windows 10 64-bit | SystemTime 2018-09-07",
+      "metadata": {
+        "original_type": "memory_dump",
+        "peirce_layer": "SECONDNESS",
+        "forensic_anomalies": [
+          "43 processes with injected code — highest count in entire SRL-2018 corpus, exceeding admin server (31) and AV server (29)",
+          "Code injection pattern consistent with post-exploitation framework (Cobalt Strike, Meterpreter) spreading across all running processes",
+          "Remote Desktop server as injection target gives attacker GUI access to the system under compromised process context"
+        ],
+        "content_preview": "vol3 windows.malfind: code injection detected in 43 processes (PIDs: 896, ac, b4, 5b, c9 and 38 othe",
+        "acquisition_tool": "legacy_converter_v1",
+        "acquisition_hash": "sha256:legacy_ART-RD05-001",
+        "acquisition_timestamp": "2026-04-10T10:00:00Z",
+        "write_blocker_used": true,
+        "examiner_id": "legacy_converter"
+      }
+    },
+    {
+      "artifact_id": "ART-RD05-002",
+      "evidence_type": "memory_process",
+      "source_tool": "legacy_converter",
+      "timestamp": "2026-04-10T10:00:00Z",
+      "raw_score": 0.85,
+      "prior_trust": 0.85,
+      "provenance_chain": [
+        "sha256:legacy_ART-RD05-002"
+      ],
+      "acquisition_tool": "legacy_converter_v1",
+      "acquisition_hash": "sha256:legacy_ART-RD05-002",
+      "acquisition_timestamp": "2026-04-10T10:00:00Z",
+      "description": "vol3 windows.pslist LOLBAS: 3 living-off-the-land processes detected | Suspicious: cmd.exe, powershell.exe or wscript.exe variants present in process tree",
+      "metadata": {
+        "original_type": "process_list",
+        "peirce_layer": "SECONDNESS",
+        "forensic_anomalies": [
+          "3 LOTL processes on Remote Desktop server — attacker using native Windows tools to avoid AV detection (AV server already compromised)",
+          "LOTL on RD server consistent with lateral movement from admin server: attacker pivoted via RDP session using stolen credentials",
+          "Pattern matches admin server compromise (2 LOTL) — same toolset, same threat actor"
+        ],
+        "content_preview": "vol3 windows.pslist LOLBAS: 3 living-off-the-land processes detected | Suspicious: cmd.exe, powershe",
+        "acquisition_tool": "legacy_converter_v1",
+        "acquisition_hash": "sha256:legacy_ART-RD05-002",
+        "acquisition_timestamp": "2026-04-10T10:00:00Z",
+        "write_blocker_used": true,
+        "examiner_id": "legacy_converter"
+      }
+    },
+    {
+      "artifact_id": "ART-RD05-003",
+      "evidence_type": "log_entry",
+      "source_tool": "legacy_converter",
+      "timestamp": "2026-04-10T10:00:00Z",
+      "raw_score": 0.95,
+      "prior_trust": 0.9,
+      "provenance_chain": [
+        "sha256:legacy_ART-RD05-003"
+      ],
+      "acquisition_tool": "legacy_converter_v1",
+      "acquisition_hash": "sha256:legacy_ART-RD05-003",
+      "acquisition_timestamp": "2026-04-10T10:00:00Z",
+      "description": "RD-05 compromise timeline correlates with credential stuffing of DMZ FTP (Aug 16) and admin server LOTL (Jul-Aug 2018) | Same attack campaign confirmed across corpus",
+      "metadata": {
+        "original_type": "network_flow",
+        "peirce_layer": "THIRDNESS",
+        "forensic_anomalies": [
+          "Compromise progression: DMZ FTP blocked -> AV server compromised -> Admin server compromised -> RD-05 compromised (43 processes)",
+          "Remote Desktop server as final pivot point gives attacker interactive session — highest privilege escalation point below the Domain Controller",
+          "43 injected processes vs 31 on admin server suggests RD-05 was the primary operational base after lateral movement"
+        ],
+        "content_preview": "RD-05 compromise timeline correlates with credential stuffing of DMZ FTP (Aug 16) and admin server L",
+        "acquisition_tool": "legacy_converter_v1",
+        "acquisition_hash": "sha256:legacy_ART-RD05-003",
+        "acquisition_timestamp": "2026-04-10T10:00:00Z",
+        "write_blocker_used": true,
+        "examiner_id": "legacy_converter"
+      }
+    }
+  ],
+  "temporal_violations": [],
+  "expected_verdict": "MALICE",
+  "expected_confidence": "HIGH",
+  "expected_mitre_ttps": [
+    "T1055",
+    "T1059.001",
+    "T1021.001"
+  ],
+  "metadata": {
+    "converted_from": "legacy_v1",
+    "original_verdict": "MALICE",
+    "abstention_risk": "LOW",
+    "carnegie_pattern": null
+  }
+}

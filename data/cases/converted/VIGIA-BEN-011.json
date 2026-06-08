@@ -1,27 +1,35 @@
 {
   "case_id": "VIGIA-BEN-011",
-  "name": "El USB de IT — Actualización de Drivers",
-  "description": "USB conectado a máquina de finanzas. Es el técnico de IT actualizando drivers de impresora fiscal, con ticket de soporte, autorización del manager, y checklist de procedimiento.",
+  "name": "The IT USB — Driver Update",
+  "description": "USB connected to a finance machine. It is the IT technician updating fiscal printer drivers, with a support ticket, manager authorization, and a procedure checklist.",
   "artifacts": [
     {
       "artifact_id": "ART-001",
       "evidence_type": "log_entry",
       "source_tool": "legacy_converter",
       "timestamp": "2026-04-10T10:00:00Z",
-      "raw_score": 0.7,
-      "prior_trust": 0.7,
+      "raw_score": 0.175,
+      "prior_trust": 0.3,
       "provenance_chain": [
         "sha256:legacy_ART-001"
       ],
+      "acquisition_tool": "legacy_converter_v1",
+      "acquisition_hash": "sha256:legacy_ART-001",
+      "acquisition_timestamp": "2026-04-10T10:00:00Z",
       "description": "USB inserted: SanDisk Cruzer, S/N 4C530001230512345678 | Time: 2024-04-20 14:30 | User: it.technician (badge: IT-204) | Escorted by: finance.manager | Location: Finance Dept, Desk 12",
       "metadata": {
         "original_type": "auth_log",
         "peirce_layer": "FIRSTNESS",
         "forensic_anomalies": [
-          "USB conectado a máquina de departamento financiero",
-          "Técnico de IT con acceso físico a área restringida"
+          "USB connected to finance department machine",
+          "IT technician with physical access to restricted area"
         ],
-        "content_preview": "USB inserted: SanDisk Cruzer, S/N 4C530001230512345678 | Time: 2024-04-20 14:30 | User: it.technicia"
+        "content_preview": "USB inserted: SanDisk Cruzer, S/N 4C530001230512345678 | Time: 2024-04-20 14:30 | User: it.technicia",
+        "acquisition_tool": "legacy_converter_v1",
+        "acquisition_hash": "sha256:legacy_ART-001",
+        "acquisition_timestamp": "2026-04-10T10:00:00Z",
+        "write_blocker_used": true,
+        "examiner_id": "legacy_converter"
       }
     },
     {
@@ -29,20 +37,28 @@
       "evidence_type": "file_timestamp",
       "source_tool": "legacy_converter",
       "timestamp": "2026-04-10T10:00:00Z",
-      "raw_score": 0.85,
-      "prior_trust": 0.7,
+      "raw_score": 0.2125,
+      "prior_trust": 0.3,
       "provenance_chain": [
         "sha256:legacy_ART-002"
       ],
-      "description": "IT ticket SUP-2024-1120: 'Printer fiscal HP LaserJet no imprime. Requiere driver update v3.2.1 desde USB (no hay red en máquina por política).' | Approved by: finance.manager | SLA: 4 hours | Technici",
+      "acquisition_tool": "legacy_converter_v1",
+      "acquisition_hash": "sha256:legacy_ART-002",
+      "acquisition_timestamp": "2026-04-10T10:00:00Z",
+      "description": "IT ticket SUP-2024-1120: 'HP LaserJet fiscal printer not printing. Requires driver update v3.2.1 from USB (no network on machine per policy).' | Approved by: finance.manager | SLA: 4 hours | Technicia",
       "metadata": {
         "original_type": "file_metadata",
         "peirce_layer": "SECONDNESS",
         "forensic_anomalies": [
-          "Ticket de soporte con aprobación de manager de área",
-          "Máquina sin red (air-gapped por política)"
+          "Support ticket with area manager approval",
+          "Machine without network (air-gapped by policy)"
         ],
-        "content_preview": "IT ticket SUP-2024-1120: 'Printer fiscal HP LaserJet no imprime. Requiere driver update v3.2.1 desde"
+        "content_preview": "IT ticket SUP-2024-1120: 'HP LaserJet fiscal printer not printing. Requires driver update v3.2.1 fro",
+        "acquisition_tool": "legacy_converter_v1",
+        "acquisition_hash": "sha256:legacy_ART-002",
+        "acquisition_timestamp": "2026-04-10T10:00:00Z",
+        "write_blocker_used": true,
+        "examiner_id": "legacy_converter"
       }
     },
     {
@@ -50,20 +66,28 @@
       "evidence_type": "log_entry",
       "source_tool": "legacy_converter",
       "timestamp": "2026-04-10T10:00:00Z",
-      "raw_score": 0.95,
-      "prior_trust": 0.7,
+      "raw_score": 0.2375,
+      "prior_trust": 0.3,
       "provenance_chain": [
         "sha256:legacy_ART-003"
       ],
+      "acquisition_tool": "legacy_converter_v1",
+      "acquisition_hash": "sha256:legacy_ART-003",
+      "acquisition_timestamp": "2026-04-10T10:00:00Z",
       "description": "lsusb | grep SanDisk | dmesg | tail -20 | mount /dev/sdb1 /mnt/usb | cp /mnt/usb/drivers/hp_lj_fiscal_321.exe /tmp/ | ./hp_lj_fiscal_321.exe /silent | umount /mnt/usb | dmesg | tail -5",
       "metadata": {
         "original_type": "bash_history",
         "peirce_layer": "THIRDNESS",
         "forensic_anomalies": [
-          "Comandos de montaje y ejecución desde USB",
-          "Instalador silencioso de driver"
+          "USB mount and execution commands",
+          "Silent driver installer"
         ],
-        "content_preview": "lsusb | grep SanDisk | dmesg | tail -20 | mount /dev/sdb1 /mnt/usb | cp /mnt/usb/drivers/hp_lj_fisca"
+        "content_preview": "lsusb | grep SanDisk | dmesg | tail -20 | mount /dev/sdb1 /mnt/usb | cp /mnt/usb/drivers/hp_lj_fisca",
+        "acquisition_tool": "legacy_converter_v1",
+        "acquisition_hash": "sha256:legacy_ART-003",
+        "acquisition_timestamp": "2026-04-10T10:00:00Z",
+        "write_blocker_used": true,
+        "examiner_id": "legacy_converter"
       }
     }
   ],
@@ -74,7 +98,7 @@
   "metadata": {
     "converted_from": "legacy_v1",
     "original_verdict": "NOISE",
-    "abstention_risk": "bajo",
+    "abstention_risk": "low",
     "carnegie_pattern": null
   }
 }

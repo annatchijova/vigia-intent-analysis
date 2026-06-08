@@ -1,7 +1,7 @@
 {
   "case_id": "VIGIA-REAL-005",
   "name": "Ali Hadi Encrypt Them All Case",
-  "description": "Jane ha estado usando múltiples métodos de encriptación para ocultar comunicación: un archivo README encriptado con AES en Documents, un volumen BitLocker nombrado R2D2, y un archivo keys en Downloads encriptado con GPG/PGP de clave pública/privada.",
+  "description": "Jane has been using multiple encryption methods to conceal communication: an AES-encrypted README file in Documents, a BitLocker volume named R2D2, and a keys file in Downloads encrypted with GPG/PGP public/private key.",
   "artifacts": [
     {
       "artifact_id": "ART-001",
@@ -13,15 +13,23 @@
       "provenance_chain": [
         "sha256:legacy_ART-001"
       ],
-      "description": "Archivo README en directorio Documents del usuario | Estado: Encriptado con AES | Sin contraseña disponible | Posible versión sin encriptar en caché del sistema | Archivo keys en directorio Downloads ",
+      "acquisition_tool": "legacy_converter_v1",
+      "acquisition_hash": "sha256:legacy_ART-001",
+      "acquisition_timestamp": "2026-04-10T10:00:00Z",
+      "description": "README file in user's Documents directory | Status: Encrypted with AES | No password available | Possible unencrypted version in system cache | keys file in Downloads directory | Status: Encrypted wit",
       "metadata": {
         "original_type": "file_metadata",
         "peirce_layer": "FIRSTNESS",
         "forensic_anomalies": [
-          "Uso de encriptación AES para ocultar un archivo de comunicación en Documents",
-          "Uso simultáneo de encriptación asimétrica GPG para otro mensaje"
+          "Use of AES encryption to conceal a communication file in Documents",
+          "Simultaneous use of asymmetric GPG encryption for another message"
         ],
-        "content_preview": "Archivo README en directorio Documents del usuario | Estado: Encriptado con AES | Sin contraseña dis"
+        "content_preview": "README file in user's Documents directory | Status: Encrypted with AES | No password available | Pos",
+        "acquisition_tool": "legacy_converter_v1",
+        "acquisition_hash": "sha256:legacy_ART-001",
+        "acquisition_timestamp": "2026-04-10T10:00:00Z",
+        "write_blocker_used": true,
+        "examiner_id": "legacy_converter"
       }
     },
     {
@@ -30,19 +38,27 @@
       "source_tool": "legacy_converter",
       "timestamp": "2026-04-10T10:00:00Z",
       "raw_score": 0.85,
-      "prior_trust": 0.7,
+      "prior_trust": 0.85,
       "provenance_chain": [
         "sha256:legacy_ART-002"
       ],
-      "description": "Volumen BitLocker: Nombre='R2D2' | Estado: Encriptación completa de disco activa | Recovery key posiblemente almacenada en AD, USB o archivo de respaldo | Tipo: Full disk encryption",
+      "acquisition_tool": "legacy_converter_v1",
+      "acquisition_hash": "sha256:legacy_ART-002",
+      "acquisition_timestamp": "2026-04-10T10:00:00Z",
+      "description": "BitLocker volume: Name='R2D2' | Status: Full disk encryption active | Recovery key possibly stored in AD, USB, or backup file | Type: Full disk encryption",
       "metadata": {
         "original_type": "file_metadata",
         "peirce_layer": "SECONDNESS",
         "forensic_anomalies": [
-          "Volumen con nombre no estándar (R2D2) en lugar de etiqueta descriptiva",
-          "BitLocker aplicado a volumen específico sugiere intención de ocultar contenido"
+          "Volume with non-standard name (R2D2) instead of a descriptive label",
+          "BitLocker applied to a specific volume suggests intent to conceal content"
         ],
-        "content_preview": "Volumen BitLocker: Nombre='R2D2' | Estado: Encriptación completa de disco activa | Recovery key posi"
+        "content_preview": "BitLocker volume: Name='R2D2' | Status: Full disk encryption active | Recovery key possibly stored i",
+        "acquisition_tool": "legacy_converter_v1",
+        "acquisition_hash": "sha256:legacy_ART-002",
+        "acquisition_timestamp": "2026-04-10T10:00:00Z",
+        "write_blocker_used": true,
+        "examiner_id": "legacy_converter"
       }
     },
     {
@@ -51,19 +67,27 @@
       "source_tool": "legacy_converter",
       "timestamp": "2026-04-10T10:00:00Z",
       "raw_score": 0.95,
-      "prior_trust": 0.7,
+      "prior_trust": 0.9,
       "provenance_chain": [
         "sha256:legacy_ART-003"
       ],
-      "description": "GPG/PGP keys en perfil de usuario | Comunicación encriptada asimétrica con parte desconocida | Archivo 'keys' contiene mensaje para desencriptar | Posible par de claves privadas recuperables de la ima",
+      "acquisition_tool": "legacy_converter_v1",
+      "acquisition_hash": "sha256:legacy_ART-003",
+      "acquisition_timestamp": "2026-04-10T10:00:00Z",
+      "description": "GPG/PGP keys in user profile | Asymmetric encrypted communication with unknown party | 'keys' file contains message to decrypt | Possible private key pairs recoverable from the image",
       "metadata": {
         "original_type": "process_list",
         "peirce_layer": "THIRDNESS",
         "forensic_anomalies": [
-          "Uso de encriptación asimétrica para comunicación secreta indica coordinación previa",
-          "Múltiples métodos criptográficos aplicados sugieren capas de protección deliberadas"
+          "Use of asymmetric encryption for secret communication indicates prior coordination",
+          "Multiple cryptographic methods applied suggest deliberate layers of protection"
         ],
-        "content_preview": "GPG/PGP keys en perfil de usuario | Comunicación encriptada asimétrica con parte desconocida | Archi"
+        "content_preview": "GPG/PGP keys in user profile | Asymmetric encrypted communication with unknown party | 'keys' file c",
+        "acquisition_tool": "legacy_converter_v1",
+        "acquisition_hash": "sha256:legacy_ART-003",
+        "acquisition_timestamp": "2026-04-10T10:00:00Z",
+        "write_blocker_used": true,
+        "examiner_id": "legacy_converter"
       }
     }
   ],
@@ -79,7 +103,7 @@
   "metadata": {
     "converted_from": "legacy_v1",
     "original_verdict": "SUSPICION",
-    "abstention_risk": "medio",
+    "abstention_risk": "medium",
     "carnegie_pattern": "Concealment"
   }
 }

@@ -1,27 +1,35 @@
 {
   "case_id": "VIGIA-BEN-003",
-  "name": "El Desastre Real — Incompetencia No Armada",
-  "description": "Usuario junior envía ticket: 'Soy un desastre, borré la tabla de clientes sin querer'. Análisis muestra que realmente ejecutó DROP TABLE sin WHERE, el log de recuperación está activo, y el supervisor confirmó que es su primer mes.",
+  "name": "The Real Disaster — Unarmed Incompetence",
+  "description": "Junior user submits ticket: 'I'm a disaster, I accidentally deleted the customers table'. Analysis shows they actually executed DELETE without WHERE, the recovery log is active, and the supervisor confirmed it is their first month.",
   "artifacts": [
     {
       "artifact_id": "ART-001",
       "evidence_type": "log_entry",
       "source_tool": "legacy_converter",
       "timestamp": "2026-04-10T10:00:00Z",
-      "raw_score": 0.7,
-      "prior_trust": 0.7,
+      "raw_score": 0.175,
+      "prior_trust": 0.3,
       "provenance_chain": [
         "sha256:legacy_ART-001"
       ],
-      "description": "[dev_junior]: 'Chicos, soy un desastre, borré la tabla customers sin WHERE en el DELETE. Ayuda por favor. Estoy en llamada con el DBA para recovery.'",
+      "acquisition_tool": "legacy_converter_v1",
+      "acquisition_hash": "sha256:legacy_ART-001",
+      "acquisition_timestamp": "2026-04-10T10:00:00Z",
+      "description": "[dev_junior]: 'Guys, I'm a disaster, I deleted the customers table without a WHERE in the DELETE. Help please. I'm on a call with the DBA for recovery.'",
       "metadata": {
         "original_type": "slack_message",
         "peirce_layer": "FIRSTNESS",
         "forensic_anomalies": [
-          "Lenguaje de incompetencia en canal público",
-          "Admisión de error grave sin solicitud de cubrirlo"
+          "Language of incompetence in public channel",
+          "Admission of serious error without request to cover it up"
         ],
-        "content_preview": "[dev_junior]: 'Chicos, soy un desastre, borré la tabla customers sin WHERE en el DELETE. Ayuda por f"
+        "content_preview": "[dev_junior]: 'Guys, I'm a disaster, I deleted the customers table without a WHERE in the DELETE. He",
+        "acquisition_tool": "legacy_converter_v1",
+        "acquisition_hash": "sha256:legacy_ART-001",
+        "acquisition_timestamp": "2026-04-10T10:00:00Z",
+        "write_blocker_used": true,
+        "examiner_id": "legacy_converter"
       }
     },
     {
@@ -29,20 +37,28 @@
       "evidence_type": "log_entry",
       "source_tool": "legacy_converter",
       "timestamp": "2026-04-10T10:00:00Z",
-      "raw_score": 0.85,
-      "prior_trust": 0.7,
+      "raw_score": 0.2125,
+      "prior_trust": 0.3,
       "provenance_chain": [
         "sha256:legacy_ART-002"
       ],
-      "description": "mysql> DELETE FROM customers; (sin WHERE) | mysql> SHOW TABLES; (pánico) | mysql> CALL recovery_procedure(); | 2024-01-15 14:23:05 | User: dev_junior | Session duration: 3 min (pánico, no exfiltración",
+      "acquisition_tool": "legacy_converter_v1",
+      "acquisition_hash": "sha256:legacy_ART-002",
+      "acquisition_timestamp": "2026-04-10T10:00:00Z",
+      "description": "mysql> DELETE FROM customers; (no WHERE) | mysql> SHOW TABLES; (panic) | mysql> CALL recovery_procedure(); | 2024-01-15 14:23:05 | User: dev_junior | Session duration: 3 min (panic, not exfiltration)",
       "metadata": {
         "original_type": "bash_history",
         "peirce_layer": "SECONDNESS",
         "forensic_anomalies": [
-          "Comando destructivo ejecutado",
-          "Intento inmediato de recuperación (no de ocultamiento)"
+          "Destructive command executed",
+          "Immediate recovery attempt (not concealment attempt)"
         ],
-        "content_preview": "mysql> DELETE FROM customers; (sin WHERE) | mysql> SHOW TABLES; (pánico) | mysql> CALL recovery_proc"
+        "content_preview": "mysql> DELETE FROM customers; (no WHERE) | mysql> SHOW TABLES; (panic) | mysql> CALL recovery_proced",
+        "acquisition_tool": "legacy_converter_v1",
+        "acquisition_hash": "sha256:legacy_ART-002",
+        "acquisition_timestamp": "2026-04-10T10:00:00Z",
+        "write_blocker_used": true,
+        "examiner_id": "legacy_converter"
       }
     },
     {
@@ -50,20 +66,28 @@
       "evidence_type": "log_entry",
       "source_tool": "legacy_converter",
       "timestamp": "2026-04-10T10:00:00Z",
-      "raw_score": 0.95,
-      "prior_trust": 0.7,
+      "raw_score": 0.2375,
+      "prior_trust": 0.3,
       "provenance_chain": [
         "sha256:legacy_ART-003"
       ],
-      "description": "HR record: dev_junior, hired 2023-12-01 | Training status: DB basics incomplete | Supervisor: 'Es su primer mes, le di acceso de lectura pero olvidé restringir DROP' | Incident report filed by supervi",
+      "acquisition_tool": "legacy_converter_v1",
+      "acquisition_hash": "sha256:legacy_ART-003",
+      "acquisition_timestamp": "2026-04-10T10:00:00Z",
+      "description": "HR record: dev_junior, hired 2023-12-01 | Training status: DB basics incomplete | Supervisor: 'It is his first month, I gave him read access but forgot to restrict DROP' | Incident report filed by sup",
       "metadata": {
         "original_type": "auth_log",
         "peirce_layer": "THIRDNESS",
         "forensic_anomalies": [
-          "Empleado junior con permisos excesivos",
-          "Supervisor asume responsabilidad del error de configuración"
+          "Junior employee with excessive permissions",
+          "Supervisor assumes responsibility for configuration error"
         ],
-        "content_preview": "HR record: dev_junior, hired 2023-12-01 | Training status: DB basics incomplete | Supervisor: 'Es su"
+        "content_preview": "HR record: dev_junior, hired 2023-12-01 | Training status: DB basics incomplete | Supervisor: 'It is",
+        "acquisition_tool": "legacy_converter_v1",
+        "acquisition_hash": "sha256:legacy_ART-003",
+        "acquisition_timestamp": "2026-04-10T10:00:00Z",
+        "write_blocker_used": true,
+        "examiner_id": "legacy_converter"
       }
     }
   ],
@@ -74,7 +98,7 @@
   "metadata": {
     "converted_from": "legacy_v1",
     "original_verdict": "NOISE",
-    "abstention_risk": "medio",
+    "abstention_risk": "medium",
     "carnegie_pattern": null
   }
 }

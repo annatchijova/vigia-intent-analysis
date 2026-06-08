@@ -1,27 +1,35 @@
 {
   "case_id": "VIGIA-BEN-014",
-  "name": "El Periodista Autorizado — Uso Legítimo de Tor",
-  "description": "Máquina de periodista de investigación conecta a Tor. Tiene autorización escrita del editor, política de protección de fuentes aprobada por legal, y el tráfico es solo a .onion de whistleblower platform.",
+  "name": "The Authorized Journalist — Legitimate Tor Use",
+  "description": "Investigative journalist's machine connects to Tor. Has written authorization from editor, legally approved source protection policy, and traffic goes only to whistleblower platform .onion.",
   "artifacts": [
     {
       "artifact_id": "ART-001",
       "evidence_type": "log_entry",
       "source_tool": "legacy_converter",
       "timestamp": "2026-04-10T10:00:00Z",
-      "raw_score": 0.7,
-      "prior_trust": 0.7,
+      "raw_score": 0.175,
+      "prior_trust": 0.3,
       "provenance_chain": [
         "sha256:legacy_ART-001"
       ],
+      "acquisition_tool": "legacy_converter_v1",
+      "acquisition_hash": "sha256:legacy_ART-001",
+      "acquisition_timestamp": "2026-04-10T10:00:00Z",
       "description": "Tor connection established: 10.0.2.15:9050 → Tor guard node | Process: tor (PID 4455) | User: journalist | Destination: .onion address (whistleblower-platform.onion) | No other destinations",
       "metadata": {
         "original_type": "network_flow",
         "peirce_layer": "FIRSTNESS",
         "forensic_anomalies": [
-          "Conexión a red Tor desde máquina corporativa",
-          "Tráfico a dominio .onion"
+          "Tor network connection from corporate machine",
+          "Traffic to .onion domain"
         ],
-        "content_preview": "Tor connection established: 10.0.2.15:9050 → Tor guard node | Process: tor (PID 4455) | User: journa"
+        "content_preview": "Tor connection established: 10.0.2.15:9050 → Tor guard node | Process: tor (PID 4455) | User: journa",
+        "acquisition_tool": "legacy_converter_v1",
+        "acquisition_hash": "sha256:legacy_ART-001",
+        "acquisition_timestamp": "2026-04-10T10:00:00Z",
+        "write_blocker_used": true,
+        "examiner_id": "legacy_converter"
       }
     },
     {
@@ -29,20 +37,28 @@
       "evidence_type": "file_timestamp",
       "source_tool": "legacy_converter",
       "timestamp": "2026-04-10T10:00:00Z",
-      "raw_score": 0.85,
-      "prior_trust": 0.7,
+      "raw_score": 0.2125,
+      "prior_trust": 0.3,
       "provenance_chain": [
         "sha256:legacy_ART-002"
       ],
+      "acquisition_tool": "legacy_converter_v1",
+      "acquisition_hash": "sha256:legacy_ART-002",
+      "acquisition_timestamp": "2026-04-10T10:00:00Z",
       "description": "Authorization memo: 'Journalist Ana Martinez authorized for Tor access for source protection. Valid: 2024-01-01 to 2024-12-31. Approved by: Editor-in-Chief, Legal Counsel.' | Policy: JOURNALIST-ETHICS",
       "metadata": {
         "original_type": "file_metadata",
         "peirce_layer": "SECONDNESS",
         "forensic_anomalies": [
-          "Autorización escrita para uso de Tor",
-          "Firmada por editor y legal"
+          "Written authorization for Tor use",
+          "Signed by editor and legal counsel"
         ],
-        "content_preview": "Authorization memo: 'Journalist Ana Martinez authorized for Tor access for source protection. Valid:"
+        "content_preview": "Authorization memo: 'Journalist Ana Martinez authorized for Tor access for source protection. Valid:",
+        "acquisition_tool": "legacy_converter_v1",
+        "acquisition_hash": "sha256:legacy_ART-002",
+        "acquisition_timestamp": "2026-04-10T10:00:00Z",
+        "write_blocker_used": true,
+        "examiner_id": "legacy_converter"
       }
     },
     {
@@ -50,31 +66,39 @@
       "evidence_type": "log_entry",
       "source_tool": "legacy_converter",
       "timestamp": "2026-04-10T10:00:00Z",
-      "raw_score": 0.95,
-      "prior_trust": 0.7,
+      "raw_score": 0.2375,
+      "prior_trust": 0.3,
       "provenance_chain": [
         "sha256:legacy_ART-003"
       ],
+      "acquisition_tool": "legacy_converter_v1",
+      "acquisition_hash": "sha256:legacy_ART-003",
+      "acquisition_timestamp": "2026-04-10T10:00:00Z",
       "description": "Traffic analysis: 100% to whistleblower-platform.onion | No financial sites | No C&C IPs | No file transfers > 1MB | Session duration: 45 min (consistent with interview) | No repeat connections to sam",
       "metadata": {
         "original_type": "network_flow",
         "peirce_layer": "THIRDNESS",
         "forensic_anomalies": [
-          "Tráfico restringido a un solo dominio .onion",
-          "Sin transferencias masivas ni conexiones repetidas"
+          "Traffic restricted to a single .onion domain",
+          "No mass transfers or repeat connections"
         ],
-        "content_preview": "Traffic analysis: 100% to whistleblower-platform.onion | No financial sites | No C&C IPs | No file t"
+        "content_preview": "Traffic analysis: 100% to whistleblower-platform.onion | No financial sites | No C&C IPs | No file t",
+        "acquisition_tool": "legacy_converter_v1",
+        "acquisition_hash": "sha256:legacy_ART-003",
+        "acquisition_timestamp": "2026-04-10T10:00:00Z",
+        "write_blocker_used": true,
+        "examiner_id": "legacy_converter"
       }
     }
   ],
   "temporal_violations": [],
-  "expected_verdict": "SUSPICION",
+  "expected_verdict": "NOISE",
   "expected_confidence": 75,
   "expected_mitre_ttps": [],
   "metadata": {
     "converted_from": "legacy_v1",
-    "original_verdict": "ABSTAIN",
-    "abstention_risk": "alto",
+    "original_verdict": "NOISE",
+    "abstention_risk": "high",
     "carnegie_pattern": null
   }
 }

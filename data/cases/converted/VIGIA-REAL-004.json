@@ -1,7 +1,7 @@
 {
   "case_id": "VIGIA-REAL-004",
   "name": "Ali Hadi SysInternals Malware Case",
-  "description": "Un usuario descargó lo que creía era el SysInternals Suite pero era un malware downloader. El sistema se volvió lento y no responsivo tras la ejecución. El malware modificó el archivo hosts, descargó un payload secundario y lo instaló como servicio Windows falso.",
+  "description": "A user downloaded what they believed was the SysInternals Suite but was actually a malware downloader. The system became slow and unresponsive after execution. The malware modified the hosts file, downloaded a secondary payload, and installed it as a fake Windows service.",
   "artifacts": [
     {
       "artifact_id": "ART-001",
@@ -13,15 +13,23 @@
       "provenance_chain": [
         "sha256:legacy_ART-001"
       ],
-      "description": "Archivo: C:\\Users\\Public\\Downloads\\SysInternals.exe | Hash VT: 72e6d1728a546c2f3ee32c063ed09fa6ba8c46ac33b0dd2e354087c1ad26ef48 | Info versión falsificada: CompanyName='SysInternals, Inc.', FileDescri",
+      "acquisition_tool": "legacy_converter_v1",
+      "acquisition_hash": "sha256:legacy_ART-001",
+      "acquisition_timestamp": "2026-04-10T10:00:00Z",
+      "description": "File: C:\\Users\\Public\\Downloads\\SysInternals.exe | VT hash: 72e6d1728a546c2f3ee32c063ed09fa6ba8c46ac33b0dd2e354087c1ad26ef48 | Spoofed version info: CompanyName='SysInternals, Inc.', FileDescription='",
       "metadata": {
         "original_type": "file_metadata",
         "peirce_layer": "FIRSTNESS",
         "forensic_anomalies": [
-          "El ejecutable tiene información de versión que imita a SysInternals (Microsoft) pero no es legítimo",
-          "Presencia de APIs de descarga de archivos (URLDownloadToFileA) indica downloader"
+          "The executable has version information mimicking SysInternals (Microsoft) but is not legitimate",
+          "Presence of file download APIs (URLDownloadToFileA) indicates a downloader"
         ],
-        "content_preview": "Archivo: C:\\Users\\Public\\Downloads\\SysInternals.exe | Hash VT: 72e6d1728a546c2f3ee32c063ed09fa6ba8c4"
+        "content_preview": "File: C:\\Users\\Public\\Downloads\\SysInternals.exe | VT hash: 72e6d1728a546c2f3ee32c063ed09fa6ba8c46ac",
+        "acquisition_tool": "legacy_converter_v1",
+        "acquisition_hash": "sha256:legacy_ART-001",
+        "acquisition_timestamp": "2026-04-10T10:00:00Z",
+        "write_blocker_used": true,
+        "examiner_id": "legacy_converter"
       }
     },
     {
@@ -30,19 +38,27 @@
       "source_tool": "legacy_converter",
       "timestamp": "2026-04-10T10:00:00Z",
       "raw_score": 0.85,
-      "prior_trust": 0.7,
+      "prior_trust": 0.85,
       "provenance_chain": [
         "sha256:legacy_ART-002"
       ],
-      "description": "Timeline UTC: 2022-11-15 21:16:08 - IEUser logon | 21:17:03 - PowerShell modifica Defender y hosts file | 21:18:40 - Descarga de SysInternals.exe vía MSEdge | 21:19:00 - Doble-click SysInternals.exe |",
+      "acquisition_tool": "legacy_converter_v1",
+      "acquisition_hash": "sha256:legacy_ART-002",
+      "acquisition_timestamp": "2026-04-10T10:00:00Z",
+      "description": "UTC Timeline: 2022-11-15 21:16:08 - IEUser logon | 21:17:03 - PowerShell modifies Defender and hosts file | 21:18:40 - SysInternals.exe download via MSEdge | 21:19:00 - Double-click SysInternals.exe |",
       "metadata": {
         "original_type": "timestamp",
         "peirce_layer": "SECONDNESS",
         "forensic_anomalies": [
-          "Secuencia de eventos comprimida en 3 minutos: descarga → ejecución → descarga secundaria → instalación de servicio",
-          "La descarga desde malware430.com ocurre 17 segundos después de la ejecución"
+          "Compressed event sequence in 3 minutes: download → execution → secondary download → service installation",
+          "Download from malware430.com occurs 17 seconds after execution"
         ],
-        "content_preview": "Timeline UTC: 2022-11-15 21:16:08 - IEUser logon | 21:17:03 - PowerShell modifica Defender y hosts f"
+        "content_preview": "UTC Timeline: 2022-11-15 21:16:08 - IEUser logon | 21:17:03 - PowerShell modifies Defender and hosts",
+        "acquisition_tool": "legacy_converter_v1",
+        "acquisition_hash": "sha256:legacy_ART-002",
+        "acquisition_timestamp": "2026-04-10T10:00:00Z",
+        "write_blocker_used": true,
+        "examiner_id": "legacy_converter"
       }
     },
     {
@@ -51,19 +67,27 @@
       "source_tool": "legacy_converter",
       "timestamp": "2026-04-10T10:00:00Z",
       "raw_score": 0.85,
-      "prior_trust": 0.7,
+      "prior_trust": 0.85,
       "provenance_chain": [
         "sha256:legacy_ART-003"
       ],
-      "description": "Strings del ejecutable: 'c:\\Windows\\vmtoolsIO.exe' | 'c:\\Windows\\' | '/C c:\\Windows\\vmtoolsIO.exe -install && net start VMwareIOHelperService && sc config VMwareIOHelperService start= auto' | Hosts mo",
+      "acquisition_tool": "legacy_converter_v1",
+      "acquisition_hash": "sha256:legacy_ART-003",
+      "acquisition_timestamp": "2026-04-10T10:00:00Z",
+      "description": "Executable strings: 'c:\\Windows\\vmtoolsIO.exe' | 'c:\\Windows\\' | '/C c:\\Windows\\vmtoolsIO.exe -install && net start VMwareIOHelperService && sc config VMwareIOHelperService start= auto' | Hosts modifi",
       "metadata": {
         "original_type": "bash_history",
         "peirce_layer": "SECONDNESS",
         "forensic_anomalies": [
-          "El malware instala un servicio con nombre similar a VMware para pasar desapercibido",
-          "Modificación del archivo hosts para redirigir dominios legítimos a IPs internas"
+          "The malware installs a service with a VMware-like name to avoid detection",
+          "Modification of the hosts file to redirect legitimate domains to internal IPs"
         ],
-        "content_preview": "Strings del ejecutable: 'c:\\Windows\\vmtoolsIO.exe' | 'c:\\Windows\\' | '/C c:\\Windows\\vmtoolsIO.exe -i"
+        "content_preview": "Executable strings: 'c:\\Windows\\vmtoolsIO.exe' | 'c:\\Windows\\' | '/C c:\\Windows\\vmtoolsIO.exe -insta",
+        "acquisition_tool": "legacy_converter_v1",
+        "acquisition_hash": "sha256:legacy_ART-003",
+        "acquisition_timestamp": "2026-04-10T10:00:00Z",
+        "write_blocker_used": true,
+        "examiner_id": "legacy_converter"
       }
     },
     {
@@ -72,19 +96,27 @@
       "source_tool": "legacy_converter",
       "timestamp": "2026-04-10T10:00:00Z",
       "raw_score": 0.95,
-      "prior_trust": 0.7,
+      "prior_trust": 0.9,
       "provenance_chain": [
         "sha256:legacy_ART-004"
       ],
-      "description": "Servicio malicioso instalado: Name='VMwareIOHelperService', Executable='c:\\Windows\\vmtoolsIO.exe', StartType=auto | USN Journal: Creación y eliminación de SysInternals.exe | Prefetch eliminados: *.pf ",
+      "acquisition_tool": "legacy_converter_v1",
+      "acquisition_hash": "sha256:legacy_ART-004",
+      "acquisition_timestamp": "2026-04-10T10:00:00Z",
+      "description": "Malicious service installed: Name='VMwareIOHelperService', Executable='c:\\Windows\\vmtoolsIO.exe', StartType=auto | USN Journal: Creation and deletion of SysInternals.exe | Deleted prefetch: *.pf remov",
       "metadata": {
         "original_type": "registry",
         "peirce_layer": "THIRDNESS",
         "forensic_anomalies": [
-          "Servicio con nombre que imita a VMware para evadir detección",
-          "Eliminación de archivos prefetch como técnica anti-forense"
+          "Service name mimicking VMware to evade detection",
+          "Deletion of prefetch files as an anti-forensic technique"
         ],
-        "content_preview": "Servicio malicioso instalado: Name='VMwareIOHelperService', Executable='c:\\Windows\\vmtoolsIO.exe', S"
+        "content_preview": "Malicious service installed: Name='VMwareIOHelperService', Executable='c:\\Windows\\vmtoolsIO.exe', St",
+        "acquisition_tool": "legacy_converter_v1",
+        "acquisition_hash": "sha256:legacy_ART-004",
+        "acquisition_timestamp": "2026-04-10T10:00:00Z",
+        "write_blocker_used": true,
+        "examiner_id": "legacy_converter"
       }
     }
   ],
@@ -101,7 +133,7 @@
   "metadata": {
     "converted_from": "legacy_v1",
     "original_verdict": "MALICE",
-    "abstention_risk": "bajo",
+    "abstention_risk": "low",
     "carnegie_pattern": "Masquerading Legitimacy"
   }
 }

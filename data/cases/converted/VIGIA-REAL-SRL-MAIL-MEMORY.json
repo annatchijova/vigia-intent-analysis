@@ -1,0 +1,110 @@
+{
+  "case_id": "VIGIA-REAL-SRL-MAIL-MEMORY",
+  "name": "SRL-2018 Mail Server — Memory Forensics",
+  "description": "Volatility3 memory analysis of base-mail-memory.img. Windows Exchange Server. LOTL confirmed: rundll32.exe at 2018-08-31 19:47:10 UTC. malfind timed out (600s) — large dump, documented limitation. LOTL on mail server consistent with C2 using Exchange as pivot.",
+  "artifacts": [
+    {
+      "artifact_id": "ART-MAIL-001",
+      "evidence_type": "memory_process",
+      "source_tool": "legacy_converter",
+      "timestamp": "2026-04-10T10:00:00Z",
+      "raw_score": 0.85,
+      "prior_trust": 0.85,
+      "provenance_chain": [
+        "sha256:legacy_ART-MAIL-001"
+      ],
+      "acquisition_tool": "legacy_converter_v1",
+      "acquisition_hash": "sha256:legacy_ART-MAIL-001",
+      "acquisition_timestamp": "2026-04-10T10:00:00Z",
+      "description": "vol3 windows.pslist LOLBAS: 2 living-off-the-land processes — rundll32.exe PID 15116 (parent 15896) at 2018-08-31 19:47:10 UTC. WinRM execution context (wsmprovhost.exe -Embedding) — remote PowerShell",
+      "metadata": {
+        "original_type": "memory_process",
+        "peirce_layer": "SECONDNESS",
+        "forensic_anomalies": [
+          "rundll32.exe spawned under wsmprovhost.exe -Embedding — WinRM remote execution, not user-initiated COM operation",
+          "Timestamp 2018-08-31 19:47 coincides exactly with McAfee quarantine event on RD-02 (5B1B72B.EXE) — coordinated multi-host attack activity",
+          "Mail server SMTP/Exchange position gives attacker external C2 relay capability via legitimate mail protocols (T1071.003)"
+        ],
+        "content_preview": "vol3 windows.pslist LOLBAS: 2 living-off-the-land processes — rundll32.exe PID 15116 (parent 15896) ",
+        "acquisition_tool": "legacy_converter_v1",
+        "acquisition_hash": "sha256:legacy_ART-MAIL-001",
+        "acquisition_timestamp": "2026-04-10T10:00:00Z",
+        "write_blocker_used": true,
+        "examiner_id": "legacy_converter"
+      }
+    },
+    {
+      "artifact_id": "ART-MAIL-002",
+      "evidence_type": "log_entry",
+      "source_tool": "legacy_converter",
+      "timestamp": "2026-04-10T10:00:00Z",
+      "raw_score": 0.85,
+      "prior_trust": 0.85,
+      "provenance_chain": [
+        "sha256:legacy_ART-MAIL-002"
+      ],
+      "acquisition_tool": "legacy_converter_v1",
+      "acquisition_hash": "sha256:legacy_ART-MAIL-002",
+      "acquisition_timestamp": "2026-04-10T10:00:00Z",
+      "description": "vol3 windows.malfind: analysis TIMED OUT after 600 seconds. Exchange Server memory footprint exceeds vol3 malfind timeout threshold. LOTL confirmed independently via pslist — timeout does not negate L",
+      "metadata": {
+        "original_type": "kernel_structure",
+        "peirce_layer": "SECONDNESS",
+        "forensic_anomalies": [
+          "malfind timeout is a documented characteristic of Exchange Server memory dumps — Exchange caches mail data in large memory pools that inflate malfind scan time",
+          "LOTL confirmed via pslist is sufficient for HIGH confidence verdict independent of malfind result",
+          "Timeout-resistant pattern: attacker using LOTL (not injected shellcode) may deliberately exploit Exchange memory size as cover for extended beacon dwell time"
+        ],
+        "content_preview": "vol3 windows.malfind: analysis TIMED OUT after 600 seconds. Exchange Server memory footprint exceeds",
+        "acquisition_tool": "legacy_converter_v1",
+        "acquisition_hash": "sha256:legacy_ART-MAIL-002",
+        "acquisition_timestamp": "2026-04-10T10:00:00Z",
+        "write_blocker_used": true,
+        "examiner_id": "legacy_converter"
+      }
+    },
+    {
+      "artifact_id": "ART-MAIL-003",
+      "evidence_type": "log_entry",
+      "source_tool": "legacy_converter",
+      "timestamp": "2026-04-10T10:00:00Z",
+      "raw_score": 0.95,
+      "prior_trust": 0.9,
+      "provenance_chain": [
+        "sha256:legacy_ART-MAIL-003"
+      ],
+      "acquisition_tool": "legacy_converter_v1",
+      "acquisition_hash": "sha256:legacy_ART-MAIL-003",
+      "acquisition_timestamp": "2026-04-10T10:00:00Z",
+      "description": "Corpus cross-reference: mail server compromised in same attack campaign as admin (LOTL Jul-Aug 2018), AV server (29 processes), RD-01 (12 LOTL), RD-04 (30 LOTL), RD-05 (43 injected), WKSTN-04 (24 inje",
+      "metadata": {
+        "original_type": "log_entry",
+        "peirce_layer": "THIRDNESS",
+        "forensic_anomalies": [
+          "Mail server compromise is consistent with attack chain: DMZ FTP credential stuffing (blocked) -> mail server LOTL -> admin/AV pivot -> RD server farm lateral movement",
+          "Mail server as C2 relay explains external communication: Exchange SMTP/IMAP ports (25, 143, 993) provide outbound channels that bypass standard egress filtering",
+          "LARIAT C2 started 2018-08-19, mail server LOTL observed 2018-08-31 — 12-day delay consistent with C2 framework establishing foothold before executing LOTL phase"
+        ],
+        "content_preview": "Corpus cross-reference: mail server compromised in same attack campaign as admin (LOTL Jul-Aug 2018)",
+        "acquisition_tool": "legacy_converter_v1",
+        "acquisition_hash": "sha256:legacy_ART-MAIL-003",
+        "acquisition_timestamp": "2026-04-10T10:00:00Z",
+        "write_blocker_used": true,
+        "examiner_id": "legacy_converter"
+      }
+    }
+  ],
+  "temporal_violations": [],
+  "expected_verdict": "MALICE",
+  "expected_confidence": "MEDIUM",
+  "expected_mitre_ttps": [
+    "T1059.001",
+    "T1021.002"
+  ],
+  "metadata": {
+    "converted_from": "legacy_v1",
+    "original_verdict": "MALICE",
+    "abstention_risk": "LOW",
+    "carnegie_pattern": null
+  }
+}

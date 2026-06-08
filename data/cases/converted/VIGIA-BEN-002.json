@@ -8,11 +8,14 @@
       "evidence_type": "log_entry",
       "source_tool": "legacy_converter",
       "timestamp": "2026-04-10T10:00:00Z",
-      "raw_score": 0.7,
-      "prior_trust": 0.7,
+      "raw_score": 0.175,
+      "prior_trust": 0.3,
       "provenance_chain": [
         "sha256:legacy_ART-001"
       ],
+      "acquisition_tool": "legacy_converter_v1",
+      "acquisition_hash": "sha256:legacy_ART-001",
+      "acquisition_timestamp": "2026-04-10T10:00:00Z",
       "description": "00 03 * * * /usr/local/bin/backup_db.sh --full --encrypt --destination=s3://company-backups/ | crontab -l shows entry from 2023-01-10 | Last modified by: dba_admin (sudo)",
       "metadata": {
         "original_type": "bash_history",
@@ -21,7 +24,12 @@
           "Transferencia masiva de datos a las 3AM",
           "Script de backup con acceso a S3"
         ],
-        "content_preview": "00 03 * * * /usr/local/bin/backup_db.sh --full --encrypt --destination=s3://company-backups/ | cront"
+        "content_preview": "00 03 * * * /usr/local/bin/backup_db.sh --full --encrypt --destination=s3://company-backups/ | cront",
+        "acquisition_tool": "legacy_converter_v1",
+        "acquisition_hash": "sha256:legacy_ART-001",
+        "acquisition_timestamp": "2026-04-10T10:00:00Z",
+        "write_blocker_used": true,
+        "examiner_id": "legacy_converter"
       }
     },
     {
@@ -29,11 +37,14 @@
       "evidence_type": "file_timestamp",
       "source_tool": "legacy_converter",
       "timestamp": "2026-04-10T10:00:00Z",
-      "raw_score": 0.85,
-      "prior_trust": 0.7,
+      "raw_score": 0.2125,
+      "prior_trust": 0.3,
       "provenance_chain": [
         "sha256:legacy_ART-002"
       ],
+      "acquisition_tool": "legacy_converter_v1",
+      "acquisition_hash": "sha256:legacy_ART-002",
+      "acquisition_timestamp": "2026-04-10T10:00:00Z",
       "description": "/etc/cron.d/backup_db: created 2023-01-10 by dba_admin | runbook_v2.4.pdf page 47: 'Daily encrypted backup to S3 at 03:00 UTC' | Auditoría 2024-Q3: PASSED",
       "metadata": {
         "original_type": "file_metadata",
@@ -42,7 +53,12 @@
           "Cron job antiguo con privilegios elevados",
           "Destino externo (S3) para datos corporativos"
         ],
-        "content_preview": "/etc/cron.d/backup_db: created 2023-01-10 by dba_admin | runbook_v2.4.pdf page 47: 'Daily encrypted "
+        "content_preview": "/etc/cron.d/backup_db: created 2023-01-10 by dba_admin | runbook_v2.4.pdf page 47: 'Daily encrypted ",
+        "acquisition_tool": "legacy_converter_v1",
+        "acquisition_hash": "sha256:legacy_ART-002",
+        "acquisition_timestamp": "2026-04-10T10:00:00Z",
+        "write_blocker_used": true,
+        "examiner_id": "legacy_converter"
       }
     },
     {
@@ -50,11 +66,14 @@
       "evidence_type": "log_entry",
       "source_tool": "legacy_converter",
       "timestamp": "2026-04-10T10:00:00Z",
-      "raw_score": 0.95,
-      "prior_trust": 0.7,
+      "raw_score": 0.2375,
+      "prior_trust": 0.3,
       "provenance_chain": [
         "sha256:legacy_ART-003"
       ],
+      "acquisition_tool": "legacy_converter_v1",
+      "acquisition_hash": "sha256:legacy_ART-003",
+      "acquisition_timestamp": "2026-04-10T10:00:00Z",
       "description": "S3 bucket: company-backups-prod | IAM role: BackupServiceRole | Encryption: AES-256-SSE | Access logs: consistent daily pattern since 2023-01-10 | No anomalous IPs",
       "metadata": {
         "original_type": "network_flow",
@@ -63,7 +82,12 @@
           "Tráfico saliente a cloud storage",
           "Uso de IAM role de servicio (no credenciales personales)"
         ],
-        "content_preview": "S3 bucket: company-backups-prod | IAM role: BackupServiceRole | Encryption: AES-256-SSE | Access log"
+        "content_preview": "S3 bucket: company-backups-prod | IAM role: BackupServiceRole | Encryption: AES-256-SSE | Access log",
+        "acquisition_tool": "legacy_converter_v1",
+        "acquisition_hash": "sha256:legacy_ART-003",
+        "acquisition_timestamp": "2026-04-10T10:00:00Z",
+        "write_blocker_used": true,
+        "examiner_id": "legacy_converter"
       }
     }
   ],

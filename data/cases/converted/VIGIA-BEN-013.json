@@ -8,11 +8,14 @@
       "evidence_type": "log_entry",
       "source_tool": "legacy_converter",
       "timestamp": "2026-04-10T10:00:00Z",
-      "raw_score": 0.7,
-      "prior_trust": 0.7,
+      "raw_score": 0.175,
+      "prior_trust": 0.3,
       "provenance_chain": [
         "sha256:legacy_ART-001"
       ],
+      "acquisition_tool": "legacy_converter_v1",
+      "acquisition_hash": "sha256:legacy_ART-001",
+      "acquisition_timestamp": "2026-04-10T10:00:00Z",
       "description": "00 02 * * * /usr/local/bin/cleanup_logs.sh --retention=30 --path=/var/log/app | crontab -l shows entry from 2023-05-20 | User: log_admin | Script signed by: dpo@company.com",
       "metadata": {
         "original_type": "bash_history",
@@ -21,7 +24,12 @@
           "Borrado masivo de logs con rm -rf",
           "Ejecución automatizada diaria"
         ],
-        "content_preview": "00 02 * * * /usr/local/bin/cleanup_logs.sh --retention=30 --path=/var/log/app | crontab -l shows ent"
+        "content_preview": "00 02 * * * /usr/local/bin/cleanup_logs.sh --retention=30 --path=/var/log/app | crontab -l shows ent",
+        "acquisition_tool": "legacy_converter_v1",
+        "acquisition_hash": "sha256:legacy_ART-001",
+        "acquisition_timestamp": "2026-04-10T10:00:00Z",
+        "write_blocker_used": true,
+        "examiner_id": "legacy_converter"
       }
     },
     {
@@ -29,11 +37,14 @@
       "evidence_type": "file_timestamp",
       "source_tool": "legacy_converter",
       "timestamp": "2026-04-10T10:00:00Z",
-      "raw_score": 0.85,
-      "prior_trust": 0.7,
+      "raw_score": 0.2125,
+      "prior_trust": 0.3,
       "provenance_chain": [
         "sha256:legacy_ART-002"
       ],
+      "acquisition_tool": "legacy_converter_v1",
+      "acquisition_hash": "sha256:legacy_ART-002",
+      "acquisition_timestamp": "2026-04-10T10:00:00Z",
       "description": "GDPR compliance doc v3.2, section 4.3: 'Application logs retained for 30 days maximum. Automated deletion after retention period.' | Approved by: DPO | Legal review: 2023-04-15 | Audit: PASSED 2024-Q1",
       "metadata": {
         "original_type": "file_metadata",
@@ -42,7 +53,12 @@
           "Política de retención documentada en compliance",
           "Aprobada por DPO y auditada"
         ],
-        "content_preview": "GDPR compliance doc v3.2, section 4.3: 'Application logs retained for 30 days maximum. Automated del"
+        "content_preview": "GDPR compliance doc v3.2, section 4.3: 'Application logs retained for 30 days maximum. Automated del",
+        "acquisition_tool": "legacy_converter_v1",
+        "acquisition_hash": "sha256:legacy_ART-002",
+        "acquisition_timestamp": "2026-04-10T10:00:00Z",
+        "write_blocker_used": true,
+        "examiner_id": "legacy_converter"
       }
     },
     {
@@ -50,11 +66,14 @@
       "evidence_type": "log_entry",
       "source_tool": "legacy_converter",
       "timestamp": "2026-04-10T10:00:00Z",
-      "raw_score": 0.95,
-      "prior_trust": 0.7,
+      "raw_score": 0.2375,
+      "prior_trust": 0.3,
       "provenance_chain": [
         "sha256:legacy_ART-003"
       ],
+      "acquisition_tool": "legacy_converter_v1",
+      "acquisition_hash": "sha256:legacy_ART-003",
+      "acquisition_timestamp": "2026-04-10T10:00:00Z",
       "description": "cleanup_logs.sh content: find /var/log/app -name '*.log' -mtime +30 -delete | Logs to syslog: 'Deleted 45 files older than 30 days' | No deletion of files < 30 days | No deletion of audit logs (/var/l",
       "metadata": {
         "original_type": "bash_history",
@@ -63,7 +82,12 @@
           "Script solo borra archivos > 30 días",
           "Audit logs excluidos de borrado"
         ],
-        "content_preview": "cleanup_logs.sh content: find /var/log/app -name '*.log' -mtime +30 -delete | Logs to syslog: 'Delet"
+        "content_preview": "cleanup_logs.sh content: find /var/log/app -name '*.log' -mtime +30 -delete | Logs to syslog: 'Delet",
+        "acquisition_tool": "legacy_converter_v1",
+        "acquisition_hash": "sha256:legacy_ART-003",
+        "acquisition_timestamp": "2026-04-10T10:00:00Z",
+        "write_blocker_used": true,
+        "examiner_id": "legacy_converter"
       }
     }
   ],

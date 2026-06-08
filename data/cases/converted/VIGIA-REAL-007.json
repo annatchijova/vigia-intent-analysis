@@ -1,7 +1,7 @@
 {
   "case_id": "VIGIA-REAL-007",
   "name": "Digital Corpora Nitroba Harassment",
-  "description": "La profesora de Química Lily Tuckrige de Nitroba State University recibió emails de acoso. El tráfico de red capturado (~60MB pcap) reveló que el perpetrador usó Gmail webmail desde una IP interna de dormitorio estudiantil, enviando cookies en plaintext sobre HTTP.",
+  "description": "Chemistry professor Lily Tuckrige at Nitroba State University received harassment emails. The captured network traffic (~60MB pcap) revealed the perpetrator used Gmail webmail from an internal dormitory IP address, sending cookies in plaintext over HTTP.",
   "artifacts": [
     {
       "artifact_id": "ART-001",
@@ -13,15 +13,23 @@
       "provenance_chain": [
         "sha256:legacy_ART-001"
       ],
-      "description": "PCAP ~60MB | IP origen externa: 140.247.62.34 (dormitorio estudiantil) | IP interna NAT: 192.168.15.4 | MAC address: 00:17:f2:e2:c0:ce (dispositivo Apple) | User Agent: Internet Explorer 6 en Windows ",
+      "acquisition_tool": "legacy_converter_v1",
+      "acquisition_hash": "sha256:legacy_ART-001",
+      "acquisition_timestamp": "2026-04-10T10:00:00Z",
+      "description": "PCAP ~60MB | External source IP: 140.247.62.34 (student dormitory) | Internal NAT IP: 192.168.15.4 | MAC address: 00:17:f2:e2:c0:ce (Apple device) | User Agent: Internet Explorer 6 on Windows XP SP2 |",
       "metadata": {
         "original_type": "network_flow",
         "peirce_layer": "FIRSTNESS",
         "forensic_anomalies": [
-          "Tráfico Gmail con cookies enviadas en plaintext sobre HTTP",
-          "Uso de servicio willselfdestruct.com para enviar email anónimo de acoso"
+          "Gmail traffic with cookies sent in plaintext over HTTP",
+          "Use of willselfdestruct.com service to send anonymous harassment email"
         ],
-        "content_preview": "PCAP ~60MB | IP origen externa: 140.247.62.34 (dormitorio estudiantil) | IP interna NAT: 192.168.15."
+        "content_preview": "PCAP ~60MB | External source IP: 140.247.62.34 (student dormitory) | Internal NAT IP: 192.168.15.4 |",
+        "acquisition_tool": "legacy_converter_v1",
+        "acquisition_hash": "sha256:legacy_ART-001",
+        "acquisition_timestamp": "2026-04-10T10:00:00Z",
+        "write_blocker_used": true,
+        "examiner_id": "legacy_converter"
       }
     },
     {
@@ -30,19 +38,27 @@
       "source_tool": "legacy_converter",
       "timestamp": "2026-04-10T10:00:00Z",
       "raw_score": 0.85,
-      "prior_trust": 0.7,
+      "prior_trust": 0.85,
       "provenance_chain": [
         "sha256:legacy_ART-002"
       ],
-      "description": "Email #1: badguy@hotmail.com | Fecha: Julio 13 | Email #2: willselfdestruct.com | Mensaje: 'you can't find us and you can't hide from us. Stop teaching. Start running.' | Cuenta identificada: jcoach@g",
+      "acquisition_tool": "legacy_converter_v1",
+      "acquisition_hash": "sha256:legacy_ART-002",
+      "acquisition_timestamp": "2026-04-10T10:00:00Z",
+      "description": "Email #1: badguy@hotmail.com | Date: July 13 | Email #2: willselfdestruct.com | Message: 'you can't find us and you can't hide from us. Stop teaching. Start running.' | Identified account: jcoach@gmai",
       "metadata": {
         "original_type": "email_header",
         "peirce_layer": "SECONDNESS",
         "forensic_anomalies": [
-          "Mensaje de amenaza explícita enviado a través de servicio de autodestrucción",
-          "La cuenta Gmail jcoach@gmail.com fue identificada mediante cookies en plaintext en el pcap"
+          "Explicit threat message sent through self-destructing service",
+          "Gmail account jcoach@gmail.com was identified via plaintext cookies in the pcap"
         ],
-        "content_preview": "Email #1: badguy@hotmail.com | Fecha: Julio 13 | Email #2: willselfdestruct.com | Mensaje: 'you can'"
+        "content_preview": "Email #1: badguy@hotmail.com | Date: July 13 | Email #2: willselfdestruct.com | Message: 'you can't ",
+        "acquisition_tool": "legacy_converter_v1",
+        "acquisition_hash": "sha256:legacy_ART-002",
+        "acquisition_timestamp": "2026-04-10T10:00:00Z",
+        "write_blocker_used": true,
+        "examiner_id": "legacy_converter"
       }
     },
     {
@@ -51,19 +67,27 @@
       "source_tool": "legacy_converter",
       "timestamp": "2026-04-10T10:00:00Z",
       "raw_score": 0.85,
-      "prior_trust": 0.7,
+      "prior_trust": 0.85,
       "provenance_chain": [
         "sha256:legacy_ART-003"
       ],
-      "description": "Setup de red: Tres mujeres comparten dormitorio (Alice, Barbara, Candice) | Wi-Fi router sin password instalado por amigo | Ethernet provisto por universidad | Roster de estudiantes: Chemistry 109 dis",
+      "acquisition_tool": "legacy_converter_v1",
+      "acquisition_hash": "sha256:legacy_ART-003",
+      "acquisition_timestamp": "2026-04-10T10:00:00Z",
+      "description": "Network setup: Three women share a dormitory (Alice, Barbara, Candice) | Password-less WiFi router installed by a friend | Ethernet provided by university | Student roster: Chemistry 109 available",
       "metadata": {
         "original_type": "file_metadata",
         "peirce_layer": "SECONDNESS",
         "forensic_anomalies": [
-          "Router WiFi sin contraseña permite acceso anónimo y no rastreable",
-          "La combinación de Ethernet universitario + WiFi no seguro complica la atribución"
+          "Password-less WiFi router allows anonymous and untraceable access",
+          "Combination of university Ethernet + unsecured WiFi complicates attribution"
         ],
-        "content_preview": "Setup de red: Tres mujeres comparten dormitorio (Alice, Barbara, Candice) | Wi-Fi router sin passwor"
+        "content_preview": "Network setup: Three women share a dormitory (Alice, Barbara, Candice) | Password-less WiFi router i",
+        "acquisition_tool": "legacy_converter_v1",
+        "acquisition_hash": "sha256:legacy_ART-003",
+        "acquisition_timestamp": "2026-04-10T10:00:00Z",
+        "write_blocker_used": true,
+        "examiner_id": "legacy_converter"
       }
     }
   ],
@@ -78,7 +102,7 @@
   "metadata": {
     "converted_from": "legacy_v1",
     "original_verdict": "MALICE",
-    "abstention_risk": "medio",
+    "abstention_risk": "medium",
     "carnegie_pattern": null
   }
 }

@@ -8,11 +8,14 @@
       "evidence_type": "memory_process",
       "source_tool": "legacy_converter",
       "timestamp": "2026-04-10T10:00:00Z",
-      "raw_score": 0.7,
-      "prior_trust": 0.7,
+      "raw_score": 0.175,
+      "prior_trust": 0.3,
       "provenance_chain": [
         "sha256:legacy_ART-001"
       ],
+      "acquisition_tool": "legacy_converter_v1",
+      "acquisition_hash": "sha256:legacy_ART-001",
+      "acquisition_timestamp": "2026-04-10T10:00:00Z",
       "description": "PID: 7 | Name: kworker/0:1H | PPID: 2 (kthreadd) | User: root | CPU: 0.0% | MEM: 0.0% | Start: boot time | pslist shows NO parent (expected for kernel threads)",
       "metadata": {
         "original_type": "process_list",
@@ -21,7 +24,12 @@
           "Proceso sin parent visible en pslist",
           "Nombre no descriptivo (kworker)"
         ],
-        "content_preview": "PID: 7 | Name: kworker/0:1H | PPID: 2 (kthreadd) | User: root | CPU: 0.0% | MEM: 0.0% | Start: boot "
+        "content_preview": "PID: 7 | Name: kworker/0:1H | PPID: 2 (kthreadd) | User: root | CPU: 0.0% | MEM: 0.0% | Start: boot ",
+        "acquisition_tool": "legacy_converter_v1",
+        "acquisition_hash": "sha256:legacy_ART-001",
+        "acquisition_timestamp": "2026-04-10T10:00:00Z",
+        "write_blocker_used": true,
+        "examiner_id": "legacy_converter"
       }
     },
     {
@@ -29,11 +37,14 @@
       "evidence_type": "memory_process",
       "source_tool": "legacy_converter",
       "timestamp": "2026-04-10T10:00:00Z",
-      "raw_score": 0.85,
-      "prior_trust": 0.7,
+      "raw_score": 0.2125,
+      "prior_trust": 0.3,
       "provenance_chain": [
         "sha256:legacy_ART-002"
       ],
+      "acquisition_tool": "legacy_converter_v1",
+      "acquisition_hash": "sha256:legacy_ART-002",
+      "acquisition_timestamp": "2026-04-10T10:00:00Z",
       "description": "Parent in kernel space: kthreadd (PID 2) | All kernel threads children of kthreadd | /proc/7/status: PPid: 2 | /proc/7/comm: kworker/0:1H | Kernel doc: 'Workqueue mechanism for deferred work'",
       "metadata": {
         "original_type": "process_list",
@@ -42,7 +53,12 @@
           "Parent existe en espacio de kernel (no visible en pslist de usuario)",
           "Documentación oficial del kernel confirma propósito"
         ],
-        "content_preview": "Parent in kernel space: kthreadd (PID 2) | All kernel threads children of kthreadd | /proc/7/status:"
+        "content_preview": "Parent in kernel space: kthreadd (PID 2) | All kernel threads children of kthreadd | /proc/7/status:",
+        "acquisition_tool": "legacy_converter_v1",
+        "acquisition_hash": "sha256:legacy_ART-002",
+        "acquisition_timestamp": "2026-04-10T10:00:00Z",
+        "write_blocker_used": true,
+        "examiner_id": "legacy_converter"
       }
     },
     {
@@ -50,11 +66,14 @@
       "evidence_type": "log_entry",
       "source_tool": "legacy_converter",
       "timestamp": "2026-04-10T10:00:00Z",
-      "raw_score": 0.95,
-      "prior_trust": 0.7,
+      "raw_score": 0.2375,
+      "prior_trust": 0.3,
       "provenance_chain": [
         "sha256:legacy_ART-003"
       ],
+      "acquisition_tool": "legacy_converter_v1",
+      "acquisition_hash": "sha256:legacy_ART-003",
+      "acquisition_timestamp": "2026-04-10T10:00:00Z",
       "description": "System: Ubuntu 22.04 LTS | Kernel: 5.15.0-generic | Uptime: 45 days | 12 other kworker threads present | No anomalous network connections | No file descriptors to suspicious files",
       "metadata": {
         "original_type": "bash_history",
@@ -63,7 +82,12 @@
           "Múltiples kworker threads presentes (normal)",
           "Sin conexiones de red ni archivos sospechosos"
         ],
-        "content_preview": "System: Ubuntu 22.04 LTS | Kernel: 5.15.0-generic | Uptime: 45 days | 12 other kworker threads prese"
+        "content_preview": "System: Ubuntu 22.04 LTS | Kernel: 5.15.0-generic | Uptime: 45 days | 12 other kworker threads prese",
+        "acquisition_tool": "legacy_converter_v1",
+        "acquisition_hash": "sha256:legacy_ART-003",
+        "acquisition_timestamp": "2026-04-10T10:00:00Z",
+        "write_blocker_used": true,
+        "examiner_id": "legacy_converter"
       }
     }
   ],

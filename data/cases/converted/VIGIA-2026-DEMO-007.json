@@ -1,7 +1,7 @@
 {
   "case_id": "VIGIA-2026-DEMO-007",
-  "name": "Operación Reloj Roto",
-  "description": "Un administrador de sistemas modificó manualmente los logs de acceso para ocultar su presencia en el servidor la noche anterior a la desaparición de datos confidenciales. VIGÍA debe detectar las inconsistencias temporales y la evidencia de edición manual.",
+  "name": "Operation Broken Clock",
+  "description": "A systems administrator manually modified access logs to conceal his presence on the server the night before confidential data disappeared. VIGÍA must detect the temporal inconsistencies and evidence of manual editing.",
   "artifacts": [
     {
       "artifact_id": "LOG-001",
@@ -9,21 +9,29 @@
       "source_tool": "legacy_converter",
       "timestamp": "2026-04-10T10:00:00Z",
       "raw_score": 0.85,
-      "prior_trust": 0.7,
+      "prior_trust": 0.85,
       "provenance_chain": [
         "sha256:legacy_LOG-001"
       ],
+      "acquisition_tool": "legacy_converter_v1",
+      "acquisition_hash": "sha256:legacy_LOG-001",
+      "acquisition_timestamp": "2026-04-10T10:00:00Z",
       "description": "Apr 10 08:45:12 fileserver sshd[1201]: Accepted publickey for sysadmin from 10.0.0.15 port 44231\nApr 10 08:45:13 fileserver sshd[1201]: pam_unix(sshd:session): session opened for user sysadmin\nApr 10 ",
       "metadata": {
         "original_type": "auth_log",
         "peirce_layer": "SECONDNESS",
         "forensic_anomalies": [
-          "El archivo fue modificado a las 23:47 del 10 de abril según el inode del filesystem — horas después de la última entrada registrada",
-          "Las entradas de las 08:45 y 17:30 tienen precisión de segundos pero el kernel log muestra gaps de microsegundos inconsistentes con logging real",
-          "Faltan las entradas habituales de sudo y cron que aparecen en todos los demás días del mes",
-          "El PID 2891 de las 17:30 es numéricamente anterior al PID 2934 registrado a las 16:15 en otro log — los PIDs no pueden decrecer"
+          "The file was modified at 23:47 on April 10 according to the filesystem inode — hours after the last recorded entry",
+          "The 08:45 and 17:30 entries have second-level precision but the kernel log shows microsecond gaps inconsistent with real logging",
+          "The usual sudo and cron entries that appear on every other day of the month are missing",
+          "PID 2891 at 17:30 is numerically lower than PID 2934 recorded at 16:15 in another log — PIDs cannot decrease"
         ],
-        "content_preview": "Apr 10 08:45:12 fileserver sshd[1201]: Accepted publickey for sysadmin from 10.0.0.15 port 44231\nApr"
+        "content_preview": "Apr 10 08:45:12 fileserver sshd[1201]: Accepted publickey for sysadmin from 10.0.0.15 port 44231\nApr",
+        "acquisition_tool": "legacy_converter_v1",
+        "acquisition_hash": "sha256:legacy_LOG-001",
+        "acquisition_timestamp": "2026-04-10T10:00:00Z",
+        "write_blocker_used": true,
+        "examiner_id": "legacy_converter"
       }
     },
     {
@@ -32,21 +40,29 @@
       "source_tool": "legacy_converter",
       "timestamp": "2026-04-10T10:00:00Z",
       "raw_score": 0.85,
-      "prior_trust": 0.7,
+      "prior_trust": 0.85,
       "provenance_chain": [
         "sha256:legacy_LOG-002"
       ],
+      "acquisition_tool": "legacy_converter_v1",
+      "acquisition_hash": "sha256:legacy_LOG-002",
+      "acquisition_timestamp": "2026-04-10T10:00:00Z",
       "description": "{'file': '/var/log/auth.log', 'size': 48291, 'inode_modify_time': '2026-04-10T23:47:33Z', 'last_access': '2026-04-10T23:47:33Z', 'permissions': '0640', 'owner': 'syslog', 'group': 'adm', 'editor_signa",
       "metadata": {
         "original_type": "filesystem_metadata",
         "peirce_layer": "SECONDNESS",
         "forensic_anomalies": [
-          "inode mtime 23:47 — el log fue tocado casi 6 horas después de la última entrada registrada (17:38)",
-          "La firma de VIM en el slack space del archivo confirma edición manual con editor de texto — los logs de sistema NUNCA se editan con vim",
-          "access time == modify time — indica que el atacante no leyó el archivo antes de modificarlo, lo sobreescribió directamente",
-          "El owner es 'syslog' pero vim requiere permisos elevados para escribir — el editor fue ejecutado como root"
+          "inode mtime 23:47 — the log was touched nearly 6 hours after the last recorded entry (17:38)",
+          "VIM signature in file slack space confirms manual editing with a text editor — system logs are NEVER edited with vim",
+          "access time == modify time — indicates the attacker did not read the file before modifying it, directly overwrote it",
+          "Owner is 'syslog' but vim requires elevated permissions to write — the editor was run as root"
         ],
-        "content_preview": "{'file': '/var/log/auth.log', 'size': 48291, 'inode_modify_time': '2026-04-10T23:47:33Z', 'last_acce"
+        "content_preview": "{'file': '/var/log/auth.log', 'size': 48291, 'inode_modify_time': '2026-04-10T23:47:33Z', 'last_acce",
+        "acquisition_tool": "legacy_converter_v1",
+        "acquisition_hash": "sha256:legacy_LOG-002",
+        "acquisition_timestamp": "2026-04-10T10:00:00Z",
+        "write_blocker_used": true,
+        "examiner_id": "legacy_converter"
       }
     },
     {
@@ -55,21 +71,29 @@
       "source_tool": "legacy_converter",
       "timestamp": "2026-04-10T10:00:00Z",
       "raw_score": 0.85,
-      "prior_trust": 0.7,
+      "prior_trust": 0.85,
       "provenance_chain": [
         "sha256:legacy_LOG-003"
       ],
+      "acquisition_tool": "legacy_converter_v1",
+      "acquisition_hash": "sha256:legacy_LOG-003",
+      "acquisition_timestamp": "2026-04-10T10:00:00Z",
       "description": "23:41:07 10.0.0.15 -> 10.0.0.42:22 SYN [ESTABLISHED] bytes=0\n23:41:08 10.0.0.15 -> 10.0.0.42:22 [SSH_HANDSHAKE] bytes=4821\n23:41:09 10.0.0.15 -> 10.0.0.42:22 [DATA] bytes=284930\n23:41:44 10.0.0.15 -> ",
       "metadata": {
         "original_type": "network_flow",
         "peirce_layer": "SECONDNESS",
         "forensic_anomalies": [
-          "Dos conexiones SSH a las 23:41 y 23:47 que NO aparecen en auth.log — son exactamente las sesiones borradas",
-          "Primera sesión (23:41): 2.1MB transferidos en 84 segundos — consistente con exfiltración de base de datos de RRHH",
-          "Segunda sesión (23:47): solo 64 bytes en 17 segundos — tiempo suficiente para ejecutar vim y guardar el log modificado",
-          "10.0.0.15 es la IP de la workstation de Carlos M., administrador de sistemas con acceso nocturno autorizado"
+          "Two SSH connections at 23:41 and 23:47 that do NOT appear in auth.log — these are exactly the deleted sessions",
+          "First session (23:41): 2.1MB transferred in 84 seconds — consistent with HR database exfiltration",
+          "Second session (23:47): only 64 bytes in 17 seconds — enough time to run vim and save the modified log",
+          "10.0.0.15 is the workstation IP of Carlos M., a systems administrator with authorized overnight access"
         ],
-        "content_preview": "23:41:07 10.0.0.15 -> 10.0.0.42:22 SYN [ESTABLISHED] bytes=0\n23:41:08 10.0.0.15 -> 10.0.0.42:22 [SSH"
+        "content_preview": "23:41:07 10.0.0.15 -> 10.0.0.42:22 SYN [ESTABLISHED] bytes=0\n23:41:08 10.0.0.15 -> 10.0.0.42:22 [SSH",
+        "acquisition_tool": "legacy_converter_v1",
+        "acquisition_hash": "sha256:legacy_LOG-003",
+        "acquisition_timestamp": "2026-04-10T10:00:00Z",
+        "write_blocker_used": true,
+        "examiner_id": "legacy_converter"
       }
     },
     {
@@ -78,21 +102,29 @@
       "source_tool": "legacy_converter",
       "timestamp": "2026-04-10T10:00:00Z",
       "raw_score": 0.85,
-      "prior_trust": 0.7,
+      "prior_trust": 0.85,
       "provenance_chain": [
         "sha256:legacy_META-001"
       ],
+      "acquisition_tool": "legacy_converter_v1",
+      "acquisition_hash": "sha256:legacy_META-001",
+      "acquisition_timestamp": "2026-04-10T10:00:00Z",
       "description": "type=SYSCALL msg=audit(1744331275.441:8821): arch=c000003e syscall=2 success=yes exit=3 a0=7f4a1b2c3d40 a1=0 a2=1b6 a3=0 items=1 ppid=4891 pid=4892 auid=1001 uid=0 gid=0 euid=0 egid=0 tty=pts1 ses=847",
       "metadata": {
         "original_type": "file_access_audit",
         "peirce_layer": "SECONDNESS",
         "forensic_anomalies": [
-          "pg_dump ejecutado a las 23:41:15 — coincide exactamente con el inicio de la primera sesión SSH en NetFlow",
-          "auid=1001 es el UID de sysadmin ejecutando como root (uid=0) — escalada de privilegios",
-          "La base de datos rrhh_empleados.db contiene datos de 847 empleados incluyendo salarios y datos bancarios",
-          "Este acceso no tiene ticket de cambio asociado en el sistema ITSM — operación no autorizada"
+          "pg_dump executed at 23:41:15 — matches exactly the start of the first SSH session in NetFlow",
+          "auid=1001 is the sysadmin UID executing as root (uid=0) — privilege escalation",
+          "The rrhh_empleados.db database contains data for 847 employees including salaries and banking data",
+          "This access has no associated change ticket in the ITSM system — unauthorized operation"
         ],
-        "content_preview": "type=SYSCALL msg=audit(1744331275.441:8821): arch=c000003e syscall=2 success=yes exit=3 a0=7f4a1b2c3"
+        "content_preview": "type=SYSCALL msg=audit(1744331275.441:8821): arch=c000003e syscall=2 success=yes exit=3 a0=7f4a1b2c3",
+        "acquisition_tool": "legacy_converter_v1",
+        "acquisition_hash": "sha256:legacy_META-001",
+        "acquisition_timestamp": "2026-04-10T10:00:00Z",
+        "write_blocker_used": true,
+        "examiner_id": "legacy_converter"
       }
     }
   ],

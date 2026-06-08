@@ -1,0 +1,111 @@
+{
+  "case_id": "VIGIA-REAL-SRL-WKSTN04-MEMORY",
+  "name": "SRL-2018 Workstation 04 — Memory Forensics (Only Compromised Endpoint)",
+  "description": "Volatility3 memory analysis. 2 LOTL + code injection in 24 processes. The only compromised workstation in the SRL-2018 corpus out of 6 analyzed. Memory acquired 2018-09-06 — one day before final corpus snapshot. Late-stage endpoint compromise, possibly the attack's final objective.",
+  "artifacts": [
+    {
+      "artifact_id": "ART-WKSTN04-001",
+      "evidence_type": "memory_process",
+      "source_tool": "legacy_converter",
+      "timestamp": "2026-04-10T10:00:00Z",
+      "raw_score": 0.85,
+      "prior_trust": 0.85,
+      "provenance_chain": [
+        "sha256:legacy_ART-WKSTN04-001"
+      ],
+      "acquisition_tool": "legacy_converter_v1",
+      "acquisition_hash": "sha256:legacy_ART-WKSTN04-001",
+      "acquisition_timestamp": "2026-04-10T10:00:00Z",
+      "description": "vol3 windows.pslist LOLBAS: 2 living-off-the-land processes. cmd.exe or powershell.exe variants present. Memory acquisition 2018-09-06 — one day before final corpus snapshot.",
+      "metadata": {
+        "original_type": "memory_process",
+        "peirce_layer": "SECONDNESS",
+        "forensic_anomalies": [
+          "2 LOTL on workstation with 24 injected processes: attacker operating quietly — data collection or credential harvesting mode, not active lateral movement",
+          "Acquisition date 2018-09-06 (one day before final snapshot) suggests this was a late-stage compromise — attacker reached endpoint objective after months of server operations",
+          "LOTL on workstation vs servers: workstation LOTL is more targeted — server LOTL is infrastructure, workstation LOTL indicates specific user data or credential objective"
+        ],
+        "content_preview": "vol3 windows.pslist LOLBAS: 2 living-off-the-land processes. cmd.exe or powershell.exe variants pres",
+        "acquisition_tool": "legacy_converter_v1",
+        "acquisition_hash": "sha256:legacy_ART-WKSTN04-001",
+        "acquisition_timestamp": "2026-04-10T10:00:00Z",
+        "write_blocker_used": true,
+        "examiner_id": "legacy_converter"
+      }
+    },
+    {
+      "artifact_id": "ART-WKSTN04-002",
+      "evidence_type": "log_entry",
+      "source_tool": "legacy_converter",
+      "timestamp": "2026-04-10T10:00:00Z",
+      "raw_score": 0.85,
+      "prior_trust": 0.85,
+      "provenance_chain": [
+        "sha256:legacy_ART-WKSTN04-002"
+      ],
+      "acquisition_tool": "legacy_converter_v1",
+      "acquisition_hash": "sha256:legacy_ART-WKSTN04-002",
+      "acquisition_timestamp": "2026-04-10T10:00:00Z",
+      "description": "vol3 windows.malfind: code injection in 24 processes (PIDs: 0f, 02, 0c, 68, c5 and 19 others). Highest injection count among all workstations (5/6 workstations clean). Windows 10 Enterprise, 2018-09-0",
+      "metadata": {
+        "original_type": "kernel_structure",
+        "peirce_layer": "SECONDNESS",
+        "forensic_anomalies": [
+          "24 injected processes on a workstation far exceeds any legitimate security software footprint — most EDR agents inject into 2-5 processes",
+          "Only 1 of 6 analyzed workstations compromised — targeted compromise, not broad endpoint spray. Attacker had specific knowledge of this workstation's value",
+          "Injection count (24) is disproportionate to LOTL count (2) — attacker deployed full payload with broad persistence but operated quietly (2 active LOTL only)"
+        ],
+        "content_preview": "vol3 windows.malfind: code injection in 24 processes (PIDs: 0f, 02, 0c, 68, c5 and 19 others). Highe",
+        "acquisition_tool": "legacy_converter_v1",
+        "acquisition_hash": "sha256:legacy_ART-WKSTN04-002",
+        "acquisition_timestamp": "2026-04-10T10:00:00Z",
+        "write_blocker_used": true,
+        "examiner_id": "legacy_converter"
+      }
+    },
+    {
+      "artifact_id": "ART-WKSTN04-003",
+      "evidence_type": "log_entry",
+      "source_tool": "legacy_converter",
+      "timestamp": "2026-04-10T10:00:00Z",
+      "raw_score": 0.95,
+      "prior_trust": 0.9,
+      "provenance_chain": [
+        "sha256:legacy_ART-WKSTN04-003"
+      ],
+      "acquisition_tool": "legacy_converter_v1",
+      "acquisition_hash": "sha256:legacy_ART-WKSTN04-003",
+      "acquisition_timestamp": "2026-04-10T10:00:00Z",
+      "description": "WKSTN04 as final attack objective: lateral movement from RD-04 (primary C2 pivot) to WKSTN04 via RDP using legitimate domain credentials. Workstation connectivity to corporate data (file shares, email",
+      "metadata": {
+        "original_type": "network_flow",
+        "peirce_layer": "THIRDNESS",
+        "forensic_anomalies": [
+          "Workstation targeted after months of server-side operations (July-September 2018): suggests attacker was building toward endpoint access as a final objective, not opportunistic",
+          "RDP lateral movement from RD-04 to WKSTN04 using rsydow-a or cbarton-a credentials (both found on RD-02) — domain admin credentials used for final pivot to user endpoint",
+          "24 injections + quiet LOTL: attacker in data collection mode on workstation — exfiltration or credential harvesting occurring silently while maintaining low network noise"
+        ],
+        "content_preview": "WKSTN04 as final attack objective: lateral movement from RD-04 (primary C2 pivot) to WKSTN04 via RDP",
+        "acquisition_tool": "legacy_converter_v1",
+        "acquisition_hash": "sha256:legacy_ART-WKSTN04-003",
+        "acquisition_timestamp": "2026-04-10T10:00:00Z",
+        "write_blocker_used": true,
+        "examiner_id": "legacy_converter"
+      }
+    }
+  ],
+  "temporal_violations": [],
+  "expected_verdict": "MALICE",
+  "expected_confidence": "HIGH",
+  "expected_mitre_ttps": [
+    "T1055",
+    "T1059.001",
+    "T1078"
+  ],
+  "metadata": {
+    "converted_from": "legacy_v1",
+    "original_verdict": "MALICE",
+    "abstention_risk": "LOW",
+    "carnegie_pattern": null
+  }
+}

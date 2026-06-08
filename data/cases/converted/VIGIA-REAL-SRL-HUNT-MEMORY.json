@@ -1,0 +1,104 @@
+{
+  "case_id": "VIGIA-REAL-SRL-HUNT-MEMORY",
+  "name": "SRL-2018 Hunt Server — Memory Forensics (DFIR Infrastructure)",
+  "description": "Volatility3 memory analysis of base-hunt-memory.img. Windows 10 64-bit. No malicious activity detected. Server confirmed as DFIR response infrastructure — used by incident response team during investigation of SRL-2018 compromise.",
+  "artifacts": [
+    {
+      "artifact_id": "ART-HUNT-001",
+      "evidence_type": "memory_process",
+      "source_tool": "legacy_converter",
+      "timestamp": "2026-04-10T10:00:00Z",
+      "raw_score": 0.7,
+      "prior_trust": 0.7,
+      "provenance_chain": [
+        "sha256:legacy_ART-HUNT-001"
+      ],
+      "acquisition_tool": "legacy_converter_v1",
+      "acquisition_hash": "sha256:legacy_ART-HUNT-001",
+      "acquisition_timestamp": "2026-04-10T10:00:00Z",
+      "description": "vol3 windows.info: Windows 10 64-bit, SystemTime 2018-09-07 01:03:57 UTC | vol3 windows.pslist: no LOLBAS processes detected | vol3 windows.malfind: no code injection | 2 signals total, avg z-score 0.",
+      "metadata": {
+        "original_type": "memory_dump",
+        "peirce_layer": "FIRSTNESS",
+        "forensic_anomalies": [
+          "No malicious processes, no code injection, no LOTL activity — consistent with clean DFIR workstation",
+          "Memory captured at same timestamp as other SRL-2018 systems (2018-09-07) — part of coordinated acquisition by incident response team"
+        ],
+        "content_preview": "vol3 windows.info: Windows 10 64-bit, SystemTime 2018-09-07 01:03:57 UTC | vol3 windows.pslist: no L",
+        "acquisition_tool": "legacy_converter_v1",
+        "acquisition_hash": "sha256:legacy_ART-HUNT-001",
+        "acquisition_timestamp": "2026-04-10T10:00:00Z",
+        "write_blocker_used": true,
+        "examiner_id": "legacy_converter"
+      }
+    },
+    {
+      "artifact_id": "ART-HUNT-002",
+      "evidence_type": "file_timestamp",
+      "source_tool": "legacy_converter",
+      "timestamp": "2026-04-10T10:00:00Z",
+      "raw_score": 0.85,
+      "prior_trust": 0.85,
+      "provenance_chain": [
+        "sha256:legacy_ART-HUNT-002"
+      ],
+      "acquisition_tool": "legacy_converter_v1",
+      "acquisition_hash": "sha256:legacy_ART-HUNT-002",
+      "acquisition_timestamp": "2026-04-10T10:00:00Z",
+      "description": "F-Response agent sub-win-x64_base-hunt_5682_3262.exe found on DMZ FTP server srl-ftp directory | Agent specifically generated for base-hunt server (hostname in filename) | nfury/Asgard directory on DM",
+      "metadata": {
+        "original_type": "file_metadata",
+        "peirce_layer": "SECONDNESS",
+        "forensic_anomalies": [
+          "F-Response agent filename encodes destination hostname — standard F-Response deployment practice for remote memory acquisition",
+          "DFIR analyst nfury used Asgard directory on DMZ FTP for toolset — confirms legitimate forensic workflow"
+        ],
+        "content_preview": "F-Response agent sub-win-x64_base-hunt_5682_3262.exe found on DMZ FTP server srl-ftp directory | Age",
+        "acquisition_tool": "legacy_converter_v1",
+        "acquisition_hash": "sha256:legacy_ART-HUNT-002",
+        "acquisition_timestamp": "2026-04-10T10:00:00Z",
+        "write_blocker_used": true,
+        "examiner_id": "legacy_converter"
+      }
+    },
+    {
+      "artifact_id": "ART-HUNT-003",
+      "evidence_type": "log_entry",
+      "source_tool": "legacy_converter",
+      "timestamp": "2026-04-10T10:00:00Z",
+      "raw_score": 0.95,
+      "prior_trust": 0.9,
+      "provenance_chain": [
+        "sha256:legacy_ART-HUNT-003"
+      ],
+      "acquisition_tool": "legacy_converter_v1",
+      "acquisition_hash": "sha256:legacy_ART-HUNT-003",
+      "acquisition_timestamp": "2026-04-10T10:00:00Z",
+      "description": "Hunt server role: threat hunting platform for detecting lateral movement across shieldbase.lan | Accessed DMZ FTP to retrieve DFIR tools | Connected to compromised systems for memory acquisition via F",
+      "metadata": {
+        "original_type": "network_flow",
+        "peirce_layer": "THIRDNESS",
+        "forensic_anomalies": [
+          "Network connectivity to other SRL-2018 servers expected for forensic acquisition workflow — not indicative of lateral movement",
+          "Absence of malicious indicators while having broad network access confirms effective operational security of DFIR team"
+        ],
+        "content_preview": "Hunt server role: threat hunting platform for detecting lateral movement across shieldbase.lan | Acc",
+        "acquisition_tool": "legacy_converter_v1",
+        "acquisition_hash": "sha256:legacy_ART-HUNT-003",
+        "acquisition_timestamp": "2026-04-10T10:00:00Z",
+        "write_blocker_used": true,
+        "examiner_id": "legacy_converter"
+      }
+    }
+  ],
+  "temporal_violations": [],
+  "expected_verdict": "MALICE",
+  "expected_confidence": "MEDIUM",
+  "expected_mitre_ttps": [],
+  "metadata": {
+    "converted_from": "legacy_v1",
+    "original_verdict": "MALICE",
+    "abstention_risk": "MEDIUM",
+    "carnegie_pattern": null
+  }
+}

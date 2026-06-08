@@ -1,0 +1,139 @@
+{
+  "case_id": "VIGIA-REAL-SRL-RD06-MEMORY",
+  "name": "SRL-2018 Remote Desktop Server RD-06 — Memory Forensics",
+  "description": "Volatility3 memory analysis. 0 LOTL processes + code injection in 4 processes. Minimal compromise — payload deployed but no active C2 at acquisition time. Likely a propagation target at the periphery of the attack.",
+  "artifacts": [
+    {
+      "artifact_id": "ART-RD06-001",
+      "evidence_type": "log_entry",
+      "source_tool": "legacy_converter",
+      "timestamp": "2026-04-10T10:00:00Z",
+      "raw_score": 0.85,
+      "prior_trust": 0.85,
+      "provenance_chain": [
+        "sha256:legacy_ART-RD06-001"
+      ],
+      "acquisition_tool": "legacy_converter_v1",
+      "acquisition_hash": "sha256:legacy_ART-RD06-001",
+      "acquisition_timestamp": "2026-04-10T10:00:00Z",
+      "description": "vol3 windows.malfind: code injection in 4 processes (PIDs: 3996, 112, 400, 00). PAGE_EXECUTE_READWRITE regions. Windows 10 Enterprise. No LOTL processes detected via pslist — payload dormant or beacon",
+      "metadata": {
+        "original_type": "kernel_structure",
+        "peirce_layer": "SECONDNESS",
+        "forensic_anomalies": [
+          "4 injected processes with PAGE_EXECUTE_READWRITE — same shellcode signature as all other compromised SRL-2018 hosts",
+          "Absence of active LOTL despite 4 injections: beacon may be in long sleep (hours/days) at 2018-09-07 acquisition time, or active LOTL terminated between infection and snapshot",
+          "Low injection count (4) vs other RD servers (12-43) positions RD-06 as peripheral propagation target — attacker allocated minimal resources to this host"
+        ],
+        "content_preview": "vol3 windows.malfind: code injection in 4 processes (PIDs: 3996, 112, 400, 00). PAGE_EXECUTE_READWRI",
+        "acquisition_tool": "legacy_converter_v1",
+        "acquisition_hash": "sha256:legacy_ART-RD06-001",
+        "acquisition_timestamp": "2026-04-10T10:00:00Z",
+        "write_blocker_used": true,
+        "examiner_id": "legacy_converter"
+      }
+    },
+    {
+      "artifact_id": "ART-RD06-002",
+      "evidence_type": "memory_process",
+      "source_tool": "legacy_converter",
+      "timestamp": "2026-04-10T10:00:00Z",
+      "raw_score": 0.85,
+      "prior_trust": 0.85,
+      "provenance_chain": [
+        "sha256:legacy_ART-RD06-002"
+      ],
+      "acquisition_tool": "legacy_converter_v1",
+      "acquisition_hash": "sha256:legacy_ART-RD06-002",
+      "acquisition_timestamp": "2026-04-10T10:00:00Z",
+      "description": "vol3 windows.pslist: 0 living-off-the-land processes at acquisition time. Process list analyzed — no active cmd.exe, powershell.exe, rundll32.exe, or other LOLBAS anomalies in running state. Injected ",
+      "metadata": {
+        "original_type": "memory_process",
+        "peirce_layer": "SECONDNESS",
+        "forensic_anomalies": [
+          "Injected payload (4 processes confirmed by malfind) is dormant — shellcode present but beacon not calling out at acquisition time",
+          "Dormant payload is a deliberate attacker OpSec choice: reduced network noise while maintaining persistence for future activation",
+          "0 LOTL with 4 injections is the lowest activity signature in the compromised RD server set — consistent with attacker treating RD-06 as a reserve/fallback pivot"
+        ],
+        "content_preview": "vol3 windows.pslist: 0 living-off-the-land processes at acquisition time. Process list analyzed — no",
+        "acquisition_tool": "legacy_converter_v1",
+        "acquisition_hash": "sha256:legacy_ART-RD06-002",
+        "acquisition_timestamp": "2026-04-10T10:00:00Z",
+        "write_blocker_used": true,
+        "examiner_id": "legacy_converter"
+      }
+    },
+    {
+      "artifact_id": "ART-RD06-003",
+      "evidence_type": "log_entry",
+      "source_tool": "legacy_converter",
+      "timestamp": "2026-04-10T10:00:00Z",
+      "raw_score": 0.95,
+      "prior_trust": 0.9,
+      "provenance_chain": [
+        "sha256:legacy_ART-RD06-003"
+      ],
+      "acquisition_tool": "legacy_converter_v1",
+      "acquisition_hash": "sha256:legacy_ART-RD06-003",
+      "acquisition_timestamp": "2026-04-10T10:00:00Z",
+      "description": "vol3 windows.netscan: no established external connections at acquisition. Internal network connectivity expected via RDP (3389) and SMB (445) from RD-04 (primary pivot). Absence of external C2 connect",
+      "metadata": {
+        "original_type": "network_flow",
+        "peirce_layer": "THIRDNESS",
+        "forensic_anomalies": [
+          "No external connections despite confirmed code injection: attacker deployed payload but has not yet activated external C2 on this host",
+          "Dormant + no external connections + 4 injections: classic sleeper compromise — attacker pre-positioned on RD-06 for future use if primary pivots (RD-04, RD-01) are detected",
+          "RD-06 dormant state increases forensic difficulty: standard network-based detection (IDS/IPS) would not alert on this host despite confirmed compromise"
+        ],
+        "content_preview": "vol3 windows.netscan: no established external connections at acquisition. Internal network connectiv",
+        "acquisition_tool": "legacy_converter_v1",
+        "acquisition_hash": "sha256:legacy_ART-RD06-003",
+        "acquisition_timestamp": "2026-04-10T10:00:00Z",
+        "write_blocker_used": true,
+        "examiner_id": "legacy_converter"
+      }
+    },
+    {
+      "artifact_id": "ART-RD06-004",
+      "evidence_type": "log_entry",
+      "source_tool": "legacy_converter",
+      "timestamp": "2026-04-10T10:00:00Z",
+      "raw_score": 0.95,
+      "prior_trust": 0.9,
+      "provenance_chain": [
+        "sha256:legacy_ART-RD06-004"
+      ],
+      "acquisition_tool": "legacy_converter_v1",
+      "acquisition_hash": "sha256:legacy_ART-RD06-004",
+      "acquisition_timestamp": "2026-04-10T10:00:00Z",
+      "description": "Corpus context: RD-06 is 5th of 5 compromised RD servers. Compromise chain: admin -> AV -> RD-04 (hub) -> RD-01, RD-03, RD-05, RD-06 (propagated). LARIAT C2 logs confirm systematic RD server sweep fro",
+      "metadata": {
+        "original_type": "log_entry",
+        "peirce_layer": "THIRDNESS",
+        "forensic_anomalies": [
+          "5/6 RD servers systematically compromised confirms deliberate sweep, not random propagation — attacker enumerated all available RD servers from hub",
+          "RD-06 last in infection sequence: attacker priorities were RD-01 (12 LOTL) and RD-04 (30 LOTL) first, spreading to RD-06 as final redundancy",
+          "Even dormant compromise provides attacker with persistence: if primary C2 pivots are cleaned, dormant RD-06 payload can be reactivated without re-exploitation"
+        ],
+        "content_preview": "Corpus context: RD-06 is 5th of 5 compromised RD servers. Compromise chain: admin -> AV -> RD-04 (hu",
+        "acquisition_tool": "legacy_converter_v1",
+        "acquisition_hash": "sha256:legacy_ART-RD06-004",
+        "acquisition_timestamp": "2026-04-10T10:00:00Z",
+        "write_blocker_used": true,
+        "examiner_id": "legacy_converter"
+      }
+    }
+  ],
+  "temporal_violations": [],
+  "expected_verdict": "MALICE",
+  "expected_confidence": "HIGH",
+  "expected_mitre_ttps": [
+    "T1055"
+  ],
+  "metadata": {
+    "converted_from": "legacy_v1",
+    "original_verdict": "MALICE",
+    "abstention_risk": "LOW",
+    "carnegie_pattern": null
+  }
+}

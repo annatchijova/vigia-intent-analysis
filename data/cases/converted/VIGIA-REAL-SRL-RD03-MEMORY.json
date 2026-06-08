@@ -1,0 +1,110 @@
+{
+  "case_id": "VIGIA-REAL-SRL-RD03-MEMORY",
+  "name": "SRL-2018 Remote Desktop Server RD-03 — Memory Forensics",
+  "description": "Volatility3 memory analysis. 1 LOTL process + code injection in 7 processes. Lightest compromise among RD servers. Code injection present but minimal active C2 activity — possible earlier stage of infection or cleanup in progress.",
+  "artifacts": [
+    {
+      "artifact_id": "ART-RD03-001",
+      "evidence_type": "memory_process",
+      "source_tool": "legacy_converter",
+      "timestamp": "2026-04-10T10:00:00Z",
+      "raw_score": 0.85,
+      "prior_trust": 0.85,
+      "provenance_chain": [
+        "sha256:legacy_ART-RD03-001"
+      ],
+      "acquisition_tool": "legacy_converter_v1",
+      "acquisition_hash": "sha256:legacy_ART-RD03-001",
+      "acquisition_timestamp": "2026-04-10T10:00:00Z",
+      "description": "vol3 windows.pslist LOLBAS: 1 living-off-the-land process detected. Minimal active LOTL compared to other compromised RD servers (RD-01: 12, RD-04: 30). Single LOTL instance with 7 injected processes ",
+      "metadata": {
+        "original_type": "memory_process",
+        "peirce_layer": "SECONDNESS",
+        "forensic_anomalies": [
+          "Single LOTL with 7 injected processes: payload deployed but C2 beacon in low-activity or sleep mode at acquisition time",
+          "Asymmetric ratio (1 LOTL : 7 injections) suggests attacker injected payload broadly then reduced active LOTL to minimize detection surface",
+          "Pattern consistent with staged compromise: initial injection phase (7 processes) followed by operational security reduction to 1 active beacon"
+        ],
+        "content_preview": "vol3 windows.pslist LOLBAS: 1 living-off-the-land process detected. Minimal active LOTL compared to ",
+        "acquisition_tool": "legacy_converter_v1",
+        "acquisition_hash": "sha256:legacy_ART-RD03-001",
+        "acquisition_timestamp": "2026-04-10T10:00:00Z",
+        "write_blocker_used": true,
+        "examiner_id": "legacy_converter"
+      }
+    },
+    {
+      "artifact_id": "ART-RD03-002",
+      "evidence_type": "log_entry",
+      "source_tool": "legacy_converter",
+      "timestamp": "2026-04-10T10:00:00Z",
+      "raw_score": 0.85,
+      "prior_trust": 0.85,
+      "provenance_chain": [
+        "sha256:legacy_ART-RD03-002"
+      ],
+      "acquisition_tool": "legacy_converter_v1",
+      "acquisition_hash": "sha256:legacy_ART-RD03-002",
+      "acquisition_timestamp": "2026-04-10T10:00:00Z",
+      "description": "vol3 windows.malfind: code injection in 7 processes (PIDs: 8824, 4688, __, 00, 8120 and others). PAGE_EXECUTE_READWRITE regions. Memory acquisition 2018-09-07.",
+      "metadata": {
+        "original_type": "kernel_structure",
+        "peirce_layer": "SECONDNESS",
+        "forensic_anomalies": [
+          "Code injection in 7 processes with same +RWX memory signature as other corpus hosts — identical attacker toolkit confirms same campaign",
+          "7 injected processes without full LOTL activity: payload established persistence before reducing operational footprint",
+          "First active injection detected 2018-08-17 (from rsydow-a Documents folder timestamps on RD-02) — RD-03 infected approximately same period"
+        ],
+        "content_preview": "vol3 windows.malfind: code injection in 7 processes (PIDs: 8824, 4688, __, 00, 8120 and others). PAG",
+        "acquisition_tool": "legacy_converter_v1",
+        "acquisition_hash": "sha256:legacy_ART-RD03-002",
+        "acquisition_timestamp": "2026-04-10T10:00:00Z",
+        "write_blocker_used": true,
+        "examiner_id": "legacy_converter"
+      }
+    },
+    {
+      "artifact_id": "ART-RD03-003",
+      "evidence_type": "log_entry",
+      "source_tool": "legacy_converter",
+      "timestamp": "2026-04-10T10:00:00Z",
+      "raw_score": 0.95,
+      "prior_trust": 0.9,
+      "provenance_chain": [
+        "sha256:legacy_ART-RD03-003"
+      ],
+      "acquisition_tool": "legacy_converter_v1",
+      "acquisition_hash": "sha256:legacy_ART-RD03-003",
+      "acquisition_timestamp": "2026-04-10T10:00:00Z",
+      "description": "RD-03 in attack chain as propagation target with reduced operational presence. 5 of 6 RD servers compromised (RD-01, RD-03, RD-04, RD-05, RD-06 — only RD-02 memory clean). Systematic compromise of ent",
+      "metadata": {
+        "original_type": "log_entry",
+        "peirce_layer": "THIRDNESS",
+        "forensic_anomalies": [
+          "5/6 RD servers compromised — systematic sweep, not opportunistic. Attacker used RD-04 as hub to compromise all available RD servers",
+          "RD-03 low LOTL count (1) vs RD-04 (30) positions it as peripheral node — attacker allocated C2 resources proportionally to server value",
+          "Corpus correlation: all 5 compromised RD servers show identical injection signature, confirming single attacker operating from LARIAT C2 framework on RD-04"
+        ],
+        "content_preview": "RD-03 in attack chain as propagation target with reduced operational presence. 5 of 6 RD servers com",
+        "acquisition_tool": "legacy_converter_v1",
+        "acquisition_hash": "sha256:legacy_ART-RD03-003",
+        "acquisition_timestamp": "2026-04-10T10:00:00Z",
+        "write_blocker_used": true,
+        "examiner_id": "legacy_converter"
+      }
+    }
+  ],
+  "temporal_violations": [],
+  "expected_verdict": "MALICE",
+  "expected_confidence": "HIGH",
+  "expected_mitre_ttps": [
+    "T1055",
+    "T1059.001"
+  ],
+  "metadata": {
+    "converted_from": "legacy_v1",
+    "original_verdict": "MALICE",
+    "abstention_risk": "LOW",
+    "carnegie_pattern": null
+  }
+}

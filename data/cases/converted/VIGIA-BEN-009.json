@@ -8,11 +8,14 @@
       "evidence_type": "log_entry",
       "source_tool": "legacy_converter",
       "timestamp": "2026-04-10T10:00:00Z",
-      "raw_score": 0.7,
-      "prior_trust": 0.7,
+      "raw_score": 0.175,
+      "prior_trust": 0.3,
       "provenance_chain": [
         "sha256:legacy_ART-001"
       ],
+      "acquisition_tool": "legacy_converter_v1",
+      "acquisition_hash": "sha256:legacy_ART-001",
+      "acquisition_timestamp": "2026-04-10T10:00:00Z",
       "description": "ls -ld /var/lib/legacy_app | drwxrwxrwx 3 root root 4096 2020-01-01 /var/lib/legacy_app | chmod 777 /var/lib/legacy_app (last run: 2020-01-01 by migration_team)",
       "metadata": {
         "original_type": "bash_history",
@@ -21,7 +24,12 @@
           "Permisos 777 en directorio de sistema",
           "Último cambio hace 4 años (no reciente)"
         ],
-        "content_preview": "ls -ld /var/lib/legacy_app | drwxrwxrwx 3 root root 4096 2020-01-01 /var/lib/legacy_app | chmod 777 "
+        "content_preview": "ls -ld /var/lib/legacy_app | drwxrwxrwx 3 root root 4096 2020-01-01 /var/lib/legacy_app | chmod 777 ",
+        "acquisition_tool": "legacy_converter_v1",
+        "acquisition_hash": "sha256:legacy_ART-001",
+        "acquisition_timestamp": "2026-04-10T10:00:00Z",
+        "write_blocker_used": true,
+        "examiner_id": "legacy_converter"
       }
     },
     {
@@ -29,11 +37,14 @@
       "evidence_type": "file_timestamp",
       "source_tool": "legacy_converter",
       "timestamp": "2026-04-10T10:00:00Z",
-      "raw_score": 0.85,
-      "prior_trust": 0.7,
+      "raw_score": 0.2125,
+      "prior_trust": 0.3,
       "provenance_chain": [
         "sha256:legacy_ART-002"
       ],
+      "acquisition_tool": "legacy_converter_v1",
+      "acquisition_hash": "sha256:legacy_ART-002",
+      "acquisition_timestamp": "2026-04-10T10:00:00Z",
       "description": "Technical debt ticket: TD-2019-042 | 'legacy_app v1.2 requires 777 for multi-user write access. No ACL support. Migration to modern_app planned for 2025-Q2.' | Approved by: CTO, Security Lead | Risk a",
       "metadata": {
         "original_type": "file_metadata",
@@ -42,7 +53,12 @@
           "Deuda técnica documentada y aceptada",
           "Plan de migración con fecha definida"
         ],
-        "content_preview": "Technical debt ticket: TD-2019-042 | 'legacy_app v1.2 requires 777 for multi-user write access. No A"
+        "content_preview": "Technical debt ticket: TD-2019-042 | 'legacy_app v1.2 requires 777 for multi-user write access. No A",
+        "acquisition_tool": "legacy_converter_v1",
+        "acquisition_hash": "sha256:legacy_ART-002",
+        "acquisition_timestamp": "2026-04-10T10:00:00Z",
+        "write_blocker_used": true,
+        "examiner_id": "legacy_converter"
       }
     },
     {
@@ -50,11 +66,14 @@
       "evidence_type": "memory_process",
       "source_tool": "legacy_converter",
       "timestamp": "2026-04-10T10:00:00Z",
-      "raw_score": 0.95,
-      "prior_trust": 0.7,
+      "raw_score": 0.2375,
+      "prior_trust": 0.3,
       "provenance_chain": [
         "sha256:legacy_ART-003"
       ],
+      "acquisition_tool": "legacy_converter_v1",
+      "acquisition_hash": "sha256:legacy_ART-003",
+      "acquisition_timestamp": "2026-04-10T10:00:00Z",
       "description": "Application: legacy_app (PID 3344, started 2020-01-02) | User: legacy_svc | No network access | No sudo | Read-only DB connection | Logs: only internal errors, no external connections",
       "metadata": {
         "original_type": "process_list",
@@ -63,7 +82,12 @@
           "Aplicación antigua sin acceso de red",
           "Sin privilegios elevados ni conexiones externas"
         ],
-        "content_preview": "Application: legacy_app (PID 3344, started 2020-01-02) | User: legacy_svc | No network access | No s"
+        "content_preview": "Application: legacy_app (PID 3344, started 2020-01-02) | User: legacy_svc | No network access | No s",
+        "acquisition_tool": "legacy_converter_v1",
+        "acquisition_hash": "sha256:legacy_ART-003",
+        "acquisition_timestamp": "2026-04-10T10:00:00Z",
+        "write_blocker_used": true,
+        "examiner_id": "legacy_converter"
       }
     }
   ],

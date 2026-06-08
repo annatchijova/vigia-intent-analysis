@@ -1,27 +1,35 @@
 {
   "case_id": "VIGIA-BEN-015",
-  "name": "El Snapshot Restaurado — Timestamps Idénticos",
-  "description": "100 archivos en /data muestran timestamp idéntico de modificación. Es restauración de snapshot de VM después de incidente de hardware, documentado en ticket de infraestructura, con afectación de 47 usuarios.",
+  "name": "The Restored Snapshot — Identical Timestamps",
+  "description": "100 files in /data show identical modification timestamp. It is a VM snapshot restoration after a hardware incident, documented in an infrastructure ticket, affecting 47 users.",
   "artifacts": [
     {
       "artifact_id": "ART-001",
       "evidence_type": "file_timestamp",
       "source_tool": "legacy_converter",
       "timestamp": "2026-04-10T10:00:00Z",
-      "raw_score": 0.7,
-      "prior_trust": 0.7,
+      "raw_score": 0.175,
+      "prior_trust": 0.3,
       "provenance_chain": [
         "sha256:legacy_ART-001"
       ],
+      "acquisition_tool": "legacy_converter_v1",
+      "acquisition_hash": "sha256:legacy_ART-001",
+      "acquisition_timestamp": "2026-04-10T10:00:00Z",
       "description": "ls -l /data | 100 files with identical mtime: 2024-05-10 03:47:22 | atime varies | ctime identical | All files from same snapshot",
       "metadata": {
         "original_type": "file_metadata",
         "peirce_layer": "FIRSTNESS",
         "forensic_anomalies": [
-          "100 archivos con timestamp de modificación idéntico",
-          "ctime y mtime coinciden exactamente"
+          "100 files with identical modification timestamp",
+          "ctime and mtime match exactly"
         ],
-        "content_preview": "ls -l /data | 100 files with identical mtime: 2024-05-10 03:47:22 | atime varies | ctime identical |"
+        "content_preview": "ls -l /data | 100 files with identical mtime: 2024-05-10 03:47:22 | atime varies | ctime identical |",
+        "acquisition_tool": "legacy_converter_v1",
+        "acquisition_hash": "sha256:legacy_ART-001",
+        "acquisition_timestamp": "2026-04-10T10:00:00Z",
+        "write_blocker_used": true,
+        "examiner_id": "legacy_converter"
       }
     },
     {
@@ -29,20 +37,28 @@
       "evidence_type": "log_entry",
       "source_tool": "legacy_converter",
       "timestamp": "2026-04-10T10:00:00Z",
-      "raw_score": 0.85,
-      "prior_trust": 0.7,
+      "raw_score": 0.2125,
+      "prior_trust": 0.3,
       "provenance_chain": [
         "sha256:legacy_ART-002"
       ],
+      "acquisition_tool": "legacy_converter_v1",
+      "acquisition_hash": "sha256:legacy_ART-002",
+      "acquisition_timestamp": "2026-04-10T10:00:00Z",
       "description": "Infrastructure ticket INF-2024-0551: 'Hardware failure on VM host node-07. 47 VMs affected. Restored from backup snapshot 2024-05-09-23:00.' | Technician: infra_team | Approval: VP Infrastructure | Do",
       "metadata": {
         "original_type": "bash_history",
         "peirce_layer": "SECONDNESS",
         "forensic_anomalies": [
-          "Ticket de incidente de infraestructura con 47 VMs afectadas",
-          "Restauración desde snapshot aprobada por VP"
+          "Infrastructure incident ticket with 47 affected VMs",
+          "Snapshot restoration approved by VP"
         ],
-        "content_preview": "Infrastructure ticket INF-2024-0551: 'Hardware failure on VM host node-07. 47 VMs affected. Restored"
+        "content_preview": "Infrastructure ticket INF-2024-0551: 'Hardware failure on VM host node-07. 47 VMs affected. Restored",
+        "acquisition_tool": "legacy_converter_v1",
+        "acquisition_hash": "sha256:legacy_ART-002",
+        "acquisition_timestamp": "2026-04-10T10:00:00Z",
+        "write_blocker_used": true,
+        "examiner_id": "legacy_converter"
       }
     },
     {
@@ -50,20 +66,28 @@
       "evidence_type": "file_timestamp",
       "source_tool": "legacy_converter",
       "timestamp": "2026-04-10T10:00:00Z",
-      "raw_score": 0.95,
-      "prior_trust": 0.7,
+      "raw_score": 0.2375,
+      "prior_trust": 0.3,
       "provenance_chain": [
         "sha256:legacy_ART-003"
       ],
+      "acquisition_tool": "legacy_converter_v1",
+      "acquisition_hash": "sha256:legacy_ART-003",
+      "acquisition_timestamp": "2026-04-10T10:00:00Z",
       "description": "Backup system: Veeam | Snapshot: 2024-05-09-23:00 | Restore point: 2024-05-10-03:47 (completion time) | 47 VMs restored simultaneously | All show identical mtime for restored files | atime reflects po",
       "metadata": {
         "original_type": "file_metadata",
         "peirce_layer": "THIRDNESS",
         "forensic_anomalies": [
-          "47 VMs restauradas simultáneamente",
-          "Sistema de backup Veeam con logs de restauración"
+          "47 VMs restored simultaneously",
+          "Veeam backup system with restoration logs"
         ],
-        "content_preview": "Backup system: Veeam | Snapshot: 2024-05-09-23:00 | Restore point: 2024-05-10-03:47 (completion time"
+        "content_preview": "Backup system: Veeam | Snapshot: 2024-05-09-23:00 | Restore point: 2024-05-10-03:47 (completion time",
+        "acquisition_tool": "legacy_converter_v1",
+        "acquisition_hash": "sha256:legacy_ART-003",
+        "acquisition_timestamp": "2026-04-10T10:00:00Z",
+        "write_blocker_used": true,
+        "examiner_id": "legacy_converter"
       }
     }
   ],
@@ -74,7 +98,7 @@
   "metadata": {
     "converted_from": "legacy_v1",
     "original_verdict": "NOISE",
-    "abstention_risk": "bajo",
+    "abstention_risk": "low",
     "carnegie_pattern": null
   }
 }

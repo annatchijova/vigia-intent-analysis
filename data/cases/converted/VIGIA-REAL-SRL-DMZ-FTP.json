@@ -1,0 +1,173 @@
+{
+  "case_id": "VIGIA-REAL-SRL-DMZ-FTP",
+  "name": "SRL-2018 DMZ FTP Server — External Attack Perimeter",
+  "description": "IIS 8.5 FTP server in DMZ (172.16.10.12). External attackers attempted malware upload and conducted coordinated credential stuffing using valid domain usernames. Server also served as DFIR response infrastructure. Attack blocked at perimeter — internal compromise used different vector.",
+  "artifacts": [
+    {
+      "artifact_id": "ART-DMZ-001",
+      "evidence_type": "log_entry",
+      "source_tool": "legacy_converter",
+      "timestamp": "2026-04-10T10:00:00Z",
+      "raw_score": 0.85,
+      "prior_trust": 0.85,
+      "provenance_chain": [
+        "sha256:legacy_ART-DMZ-001"
+      ],
+      "acquisition_tool": "legacy_converter_v1",
+      "acquisition_hash": "sha256:legacy_ART-DMZ-001",
+      "acquisition_timestamp": "2026-04-10T10:00:00Z",
+      "description": "2018-07-30 10:54:14 197.248.26.30 STOR /Photo.scr 550 Authorization+rules+denied+the+access | 2018-07-30 16:12:34 117.204.242.121 STOR /Photo.scr 550 Authorization+rules+denied+the+access | Two distin",
+      "metadata": {
+        "original_type": "network_flow",
+        "peirce_layer": "SECONDNESS",
+        "forensic_anomalies": [
+          "Two geographically distinct IPs (Kenya 197.248.26.30, India 117.204.242.121) attempted to upload the same file Photo.scr — Windows screensaver executable used as malware vector",
+          "Coordinated identical attack from separate IPs indicates organized threat actor, not opportunistic scanner",
+          "Upload blocked by IIS authorization rules — attacker probing for misconfigured anonymous write access"
+        ],
+        "content_preview": "2018-07-30 10:54:14 197.248.26.30 STOR /Photo.scr 550 Authorization+rules+denied+the+access | 2018-0",
+        "acquisition_tool": "legacy_converter_v1",
+        "acquisition_hash": "sha256:legacy_ART-DMZ-001",
+        "acquisition_timestamp": "2026-04-10T10:00:00Z",
+        "write_blocker_used": true,
+        "examiner_id": "legacy_converter"
+      }
+    },
+    {
+      "artifact_id": "ART-DMZ-002",
+      "evidence_type": "log_entry",
+      "source_tool": "legacy_converter",
+      "timestamp": "2026-04-10T10:00:00Z",
+      "raw_score": 0.95,
+      "prior_trust": 0.9,
+      "provenance_chain": [
+        "sha256:legacy_ART-DMZ-002"
+      ],
+      "acquisition_tool": "legacy_converter_v1",
+      "acquisition_hash": "sha256:legacy_ART-DMZ-002",
+      "acquisition_timestamp": "2026-04-10T10:00:00Z",
+      "description": "2018-08-16: credential stuffing with valid domain usernames — USER nromanoff (218.22.253.37/CN), USER nromanoff@stark-research-labs.com (121.49.106.6/CN), USER tdungan@stark-research-labs.com (60.174.",
+      "metadata": {
+        "original_type": "log_entry",
+        "peirce_layer": "THIRDNESS",
+        "forensic_anomalies": [
+          "Attacker used exact internal domain usernames (nromanoff, tdungan) — requires prior OSINT or credential leak from the organization",
+          "Same usernames appear in NROMANOFF and TDUNGAN workstation cases — confirms these are real domain accounts targeted specifically",
+          "8+ coordinated IPs across China and Bolivia in same 3-hour window — botnet or distributed attack infrastructure",
+          "Aug 16 FTP log is 280x larger than average daily log — anomalous spike indicating coordinated attack campaign"
+        ],
+        "content_preview": "2018-08-16: credential stuffing with valid domain usernames — USER nromanoff (218.22.253.37/CN), USE",
+        "acquisition_tool": "legacy_converter_v1",
+        "acquisition_hash": "sha256:legacy_ART-DMZ-002",
+        "acquisition_timestamp": "2026-04-10T10:00:00Z",
+        "write_blocker_used": true,
+        "examiner_id": "legacy_converter"
+      }
+    },
+    {
+      "artifact_id": "ART-DMZ-003",
+      "evidence_type": "file_timestamp",
+      "source_tool": "legacy_converter",
+      "timestamp": "2026-04-10T10:00:00Z",
+      "raw_score": 0.85,
+      "prior_trust": 0.85,
+      "provenance_chain": [
+        "sha256:legacy_ART-DMZ-003"
+      ],
+      "acquisition_tool": "legacy_converter_v1",
+      "acquisition_hash": "sha256:legacy_ART-DMZ-003",
+      "acquisition_timestamp": "2026-04-10T10:00:00Z",
+      "description": "srl-ftp/: Mnemosyne.sys (WinPmem memory acquisition driver) | fresponse-agent.msi (F-Response remote forensic acquisition) | sub-win-x64_base-hunt_5682_3262.exe (F-Response agent for base-hunt server)",
+      "metadata": {
+        "original_type": "file_metadata",
+        "peirce_layer": "SECONDNESS",
+        "forensic_anomalies": [
+          "Mnemosyne.sys and F-Response present — server was DFIR distribution point, explaining memory dump acquisition across SRL-2018 corpus",
+          "Agent filename sub-win-x64_base-hunt_5682_3262.exe links this server directly to base-hunt memory acquisition",
+          "rsydow-f (forensic analyst account) and nfury (incident responder) have personal directories — confirms DFIR team used this server during response"
+        ],
+        "content_preview": "srl-ftp/: Mnemosyne.sys (WinPmem memory acquisition driver) | fresponse-agent.msi (F-Response remote",
+        "acquisition_tool": "legacy_converter_v1",
+        "acquisition_hash": "sha256:legacy_ART-DMZ-003",
+        "acquisition_timestamp": "2026-04-10T10:00:00Z",
+        "write_blocker_used": true,
+        "examiner_id": "legacy_converter"
+      }
+    },
+    {
+      "artifact_id": "ART-DMZ-004",
+      "evidence_type": "registry_key",
+      "source_tool": "legacy_converter",
+      "timestamp": "2026-04-10T10:00:00Z",
+      "raw_score": 0.7,
+      "prior_trust": 0.7,
+      "provenance_chain": [
+        "sha256:legacy_ART-DMZ-004"
+      ],
+      "acquisition_tool": "legacy_converter_v1",
+      "acquisition_hash": "sha256:legacy_ART-DMZ-004",
+      "acquisition_timestamp": "2026-04-10T10:00:00Z",
+      "description": "Users present: Administrator, rsydow, rsydow-a | rsydow account hierarchy: rsydow (standard), rsydow-a (domain admin), rsydow-f (forensics) | Domain: stark-research-labs.com | rsydow-a confirmed as Do",
+      "metadata": {
+        "original_type": "registry",
+        "peirce_layer": "FIRSTNESS",
+        "forensic_anomalies": [
+          "Domain admin account rsydow-a present on DMZ-facing server — violates network segmentation principles, creates attack bridge between DMZ and internal AD",
+          "Same rsydow-a account found in DC registry as Domain Admins member — if DMZ server compromised, domain admin credentials exposed",
+          "Three-tier account structure (standard/admin/forensic) for same user suggests security-conscious organization but segmentation not enforced at DMZ boundary"
+        ],
+        "content_preview": "Users present: Administrator, rsydow, rsydow-a | rsydow account hierarchy: rsydow (standard), rsydow",
+        "acquisition_tool": "legacy_converter_v1",
+        "acquisition_hash": "sha256:legacy_ART-DMZ-004",
+        "acquisition_timestamp": "2026-04-10T10:00:00Z",
+        "write_blocker_used": true,
+        "examiner_id": "legacy_converter"
+      }
+    },
+    {
+      "artifact_id": "ART-DMZ-005",
+      "evidence_type": "log_entry",
+      "source_tool": "legacy_converter",
+      "timestamp": "2026-04-10T10:00:00Z",
+      "raw_score": 0.95,
+      "prior_trust": 0.9,
+      "provenance_chain": [
+        "sha256:legacy_ART-DMZ-005"
+      ],
+      "acquisition_tool": "legacy_converter_v1",
+      "acquisition_hash": "sha256:legacy_ART-DMZ-005",
+      "acquisition_timestamp": "2026-04-10T10:00:00Z",
+      "description": "Multi-stage attack timeline: May 2018 server deployed | Jul 30 anonymous enumeration + Photo.scr upload attempt | Aug 16 credential stuffing peak with domain usernames | Scanning IPs: 184.105.247.194 ",
+      "metadata": {
+        "original_type": "network_flow",
+        "peirce_layer": "THIRDNESS",
+        "forensic_anomalies": [
+          "Attack progression from anonymous enumeration to targeted credential stuffing indicates attacker learned usernames between July and August 2018",
+          "Shodan and University of Michigan IPs confirm server was publicly indexed and scanned — high exposure in DMZ without proper access controls",
+          "Geographic diversity of attacking IPs (5 countries) with coordinated username knowledge suggests threat intelligence sharing or single actor with distributed infrastructure"
+        ],
+        "content_preview": "Multi-stage attack timeline: May 2018 server deployed | Jul 30 anonymous enumeration + Photo.scr upl",
+        "acquisition_tool": "legacy_converter_v1",
+        "acquisition_hash": "sha256:legacy_ART-DMZ-005",
+        "acquisition_timestamp": "2026-04-10T10:00:00Z",
+        "write_blocker_used": true,
+        "examiner_id": "legacy_converter"
+      }
+    }
+  ],
+  "temporal_violations": [],
+  "expected_verdict": "MALICE",
+  "expected_confidence": "HIGH",
+  "expected_mitre_ttps": [
+    "T1071.002",
+    "T1110.003",
+    "T1190",
+    "T1078.002"
+  ],
+  "metadata": {
+    "converted_from": "legacy_v1",
+    "original_verdict": "MALICE",
+    "abstention_risk": "LOW",
+    "carnegie_pattern": null
+  }
+}

@@ -1,7 +1,7 @@
 {
   "case_id": "VIGIA-REAL-006",
   "name": "Digital Corpora M57-Jean Spear-Phishing",
-  "description": "La CFO Jean Jones de M57.Biz recibió emails spoofeados aparentemente de la presidenta Alison solicitando una hoja de cálculo con datos confidenciales de empleados. El atacante manipuló el Reply-To para exfiltrar los datos a tuckergorge@gmail.com. Jean actuó de buena fe pero el ataque resultó en exfiltración de documentos confidenciales.",
+  "description": "CFO Jean Jones of M57.Biz received spoofed emails apparently from president Alison requesting a spreadsheet with confidential employee data. The attacker manipulated the Reply-To to exfiltrate the data to tuckergorge@gmail.com. Jean acted in good faith but the attack resulted in exfiltration of confidential documents.",
   "artifacts": [
     {
       "artifact_id": "ART-001",
@@ -13,15 +13,23 @@
       "provenance_chain": [
         "sha256:legacy_ART-001"
       ],
-      "description": "Email #1: From: alison@m57.biz | To: jean@m57.biz | Date: 2008-07-19 16:39:57 PDT | Subject: background checks | Return-Path: simsong@xy.dreamhostps.com [SPOOFED] | Reply-To: alison@m57.biz (legítimo)",
+      "acquisition_tool": "legacy_converter_v1",
+      "acquisition_hash": "sha256:legacy_ART-001",
+      "acquisition_timestamp": "2026-04-10T10:00:00Z",
+      "description": "Email #1: From: alison@m57.biz | To: jean@m57.biz | Date: 2008-07-19 16:39:57 PDT | Subject: background checks | Return-Path: simsong@xy.dreamhostps.com [SPOOFED] | Reply-To: alison@m57.biz (legitimat",
       "metadata": {
         "original_type": "email_header",
         "peirce_layer": "FIRSTNESS",
         "forensic_anomalies": [
-          "Return-Path real (simsong@xy.dreamhostps.com) no coincide con el From (alison@m57.biz)",
-          "La nota de 'no incluyas el texto' es altamente sospechosa como intento de destruir evidencia"
+          "Actual Return-Path (simsong@xy.dreamhostps.com) does not match the From address (alison@m57.biz)",
+          "The note 'do not include the text' is highly suspicious as an attempt to destroy evidence"
         ],
-        "content_preview": "Email #1: From: alison@m57.biz | To: jean@m57.biz | Date: 2008-07-19 16:39:57 PDT | Subject: backgro"
+        "content_preview": "Email #1: From: alison@m57.biz | To: jean@m57.biz | Date: 2008-07-19 16:39:57 PDT | Subject: backgro",
+        "acquisition_tool": "legacy_converter_v1",
+        "acquisition_hash": "sha256:legacy_ART-001",
+        "acquisition_timestamp": "2026-04-10T10:00:00Z",
+        "write_blocker_used": true,
+        "examiner_id": "legacy_converter"
       }
     },
     {
@@ -30,20 +38,28 @@
       "source_tool": "legacy_converter",
       "timestamp": "2026-04-10T10:00:00Z",
       "raw_score": 0.85,
-      "prior_trust": 0.7,
+      "prior_trust": 0.85,
       "provenance_chain": [
         "sha256:legacy_ART-002"
       ],
+      "acquisition_tool": "legacy_converter_v1",
+      "acquisition_hash": "sha256:legacy_ART-002",
+      "acquisition_timestamp": "2026-04-10T10:00:00Z",
       "description": "Email #2: From: alison@m57.biz | To: jean@m57.biz | Date: 2008-07-19 18:22:45 PDT | Subject: Please send me the information now | Return-Path: simsong@xy.dreamhostps.com [SPOOFED] | Reply-To: tuckergo",
       "metadata": {
         "original_type": "email_header",
         "peirce_layer": "SECONDNESS",
         "forensic_anomalies": [
-          "El Reply-To cambió de alison@m57.biz a tuckergorge@gmail.com entre emails consecutivos",
-          "El mismo Return-Path spoofeado indica campaña coordinada de phishing",
-          "CAMBIO DE REPLY-TO entre emails consecutivos es la firma definitiva del ataque de spoofing"
+          "Reply-To changed from alison@m57.biz to tuckergorge@gmail.com between consecutive emails",
+          "The same spoofed Return-Path indicates a coordinated phishing campaign",
+          "REPLY-TO CHANGE between consecutive emails is the definitive signature of the spoofing attack"
         ],
-        "content_preview": "Email #2: From: alison@m57.biz | To: jean@m57.biz | Date: 2008-07-19 18:22:45 PDT | Subject: Please "
+        "content_preview": "Email #2: From: alison@m57.biz | To: jean@m57.biz | Date: 2008-07-19 18:22:45 PDT | Subject: Please ",
+        "acquisition_tool": "legacy_converter_v1",
+        "acquisition_hash": "sha256:legacy_ART-002",
+        "acquisition_timestamp": "2026-04-10T10:00:00Z",
+        "write_blocker_used": true,
+        "examiner_id": "legacy_converter"
       }
     },
     {
@@ -56,15 +72,23 @@
       "provenance_chain": [
         "sha256:legacy_ART-003"
       ],
-      "description": "Archivo: m57biz.xls | Ubicación: Desktop de Jean (C:/Documents and Settings/Jean/Desktop/) | Fecha creación: 07/20/2008 1:28:03 AM GMT | Encriptado: No | Contenido: Nombres, posiciones, salarios ($1,0",
+      "acquisition_tool": "legacy_converter_v1",
+      "acquisition_hash": "sha256:legacy_ART-003",
+      "acquisition_timestamp": "2026-04-10T10:00:00Z",
+      "description": "File: m57biz.xls | Location: Jean's Desktop (C:/Documents and Settings/Jean/Desktop/) | Creation date: 07/20/2008 1:28:03 AM GMT | Encrypted: No | Content: Names, positions, salaries ($1,009,000 total",
       "metadata": {
         "original_type": "file_metadata",
         "peirce_layer": "FIRSTNESS",
         "forensic_anomalies": [
-          "Archivo con SSNs y salarios almacenado sin encriptar en Desktop",
-          "El archivo fue creado minutos antes de ser enviado al Reply-To malicioso"
+          "File with SSNs and salaries stored unencrypted on Desktop",
+          "The file was created minutes before being sent to the malicious Reply-To"
         ],
-        "content_preview": "Archivo: m57biz.xls | Ubicación: Desktop de Jean (C:/Documents and Settings/Jean/Desktop/) | Fecha c"
+        "content_preview": "File: m57biz.xls | Location: Jean's Desktop (C:/Documents and Settings/Jean/Desktop/) | Creation dat",
+        "acquisition_tool": "legacy_converter_v1",
+        "acquisition_hash": "sha256:legacy_ART-003",
+        "acquisition_timestamp": "2026-04-10T10:00:00Z",
+        "write_blocker_used": true,
+        "examiner_id": "legacy_converter"
       }
     },
     {
@@ -73,19 +97,27 @@
       "source_tool": "legacy_converter",
       "timestamp": "2026-04-10T10:00:00Z",
       "raw_score": 0.85,
-      "prior_trust": 0.7,
+      "prior_trust": 0.85,
       "provenance_chain": [
         "sha256:legacy_ART-004"
       ],
-      "description": "Respuesta de Alison a Jean: 'What's a sure thing?' (16:50:20 PDT) | Email de exfiltración: Jean → tuckergorge@gmail.com con adjunto M57biz.xls (18:28:45 PDT) | Email #3 del atacante: 'Thanks!' (22:03:",
+      "acquisition_tool": "legacy_converter_v1",
+      "acquisition_hash": "sha256:legacy_ART-004",
+      "acquisition_timestamp": "2026-04-10T10:00:00Z",
+      "description": "Alison's reply to Jean: 'What's a sure thing?' (16:50:20 PDT) | Exfiltration email: Jean → tuckergorge@gmail.com with attachment M57biz.xls (18:28:45 PDT) | Attacker's email #3: 'Thanks!' (22:03:40 PD",
       "metadata": {
         "original_type": "bash_history",
         "peirce_layer": "SECONDNESS",
         "forensic_anomalies": [
-          "La confusión de Alison demuestra que ella no envió el email original",
-          "El timing de 6 horas entre primer email y confirmación del atacante muestra ventana de ataque comprimida"
+          "Alison's confusion proves she did not send the original email",
+          "The 6-hour window between first email and attacker's confirmation shows a compressed attack window"
         ],
-        "content_preview": "Respuesta de Alison a Jean: 'What's a sure thing?' (16:50:20 PDT) | Email de exfiltración: Jean → tu"
+        "content_preview": "Alison's reply to Jean: 'What's a sure thing?' (16:50:20 PDT) | Exfiltration email: Jean → tuckergor",
+        "acquisition_tool": "legacy_converter_v1",
+        "acquisition_hash": "sha256:legacy_ART-004",
+        "acquisition_timestamp": "2026-04-10T10:00:00Z",
+        "write_blocker_used": true,
+        "examiner_id": "legacy_converter"
       }
     },
     {
@@ -94,19 +126,27 @@
       "source_tool": "legacy_converter",
       "timestamp": "2026-04-10T10:00:00Z",
       "raw_score": 0.95,
-      "prior_trust": 0.7,
+      "prior_trust": 0.9,
       "provenance_chain": [
         "sha256:legacy_ART-005"
       ],
-      "description": "Binarios de sistema eliminados: ipconfig.exe, net.exe | AIM6 instalado con toolbar bundles sospechosos | Archivos HTML cached: rcstatus.htm, InstallStatus[1].htm (prompts falsos de Microsoft) | Artefa",
+      "acquisition_tool": "legacy_converter_v1",
+      "acquisition_hash": "sha256:legacy_ART-005",
+      "acquisition_timestamp": "2026-04-10T10:00:00Z",
+      "description": "Deleted system binaries: ipconfig.exe, net.exe | AIM6 installed with suspicious toolbar bundles | Cached HTML files: rcstatus.htm, InstallStatus[1].htm (fake Microsoft prompts) | Remote Assistance art",
       "metadata": {
         "original_type": "process_list",
         "peirce_layer": "THIRDNESS",
         "forensic_anomalies": [
-          "Eliminación de binarios del sistema es indicador de anti-forense o compromiso previo",
-          "Presencia de HTML con prompts falsos de Microsoft sugiere técnicas de ingeniería social adicionales"
+          "Deletion of system binaries is an indicator of anti-forensics or prior compromise",
+          "Presence of HTML with fake Microsoft prompts suggests additional social engineering techniques"
         ],
-        "content_preview": "Binarios de sistema eliminados: ipconfig.exe, net.exe | AIM6 instalado con toolbar bundles sospechos"
+        "content_preview": "Deleted system binaries: ipconfig.exe, net.exe | AIM6 installed with suspicious toolbar bundles | Ca",
+        "acquisition_tool": "legacy_converter_v1",
+        "acquisition_hash": "sha256:legacy_ART-005",
+        "acquisition_timestamp": "2026-04-10T10:00:00Z",
+        "write_blocker_used": true,
+        "examiner_id": "legacy_converter"
       }
     }
   ],
@@ -122,7 +162,7 @@
   "metadata": {
     "converted_from": "legacy_v1",
     "original_verdict": "MALICE",
-    "abstention_risk": "bajo",
-    "carnegie_pattern": "Noble motive appeal (falsa urgencia de cliente)"
+    "abstention_risk": "low",
+    "carnegie_pattern": "Noble motive appeal (false client urgency)"
   }
 }

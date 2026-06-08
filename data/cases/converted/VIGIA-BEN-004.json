@@ -8,11 +8,14 @@
       "evidence_type": "log_entry",
       "source_tool": "legacy_converter",
       "timestamp": "2026-04-10T10:00:00Z",
-      "raw_score": 0.7,
-      "prior_trust": 0.7,
+      "raw_score": 0.175,
+      "prior_trust": 0.3,
       "provenance_chain": [
         "sha256:legacy_ART-001"
       ],
+      "acquisition_tool": "legacy_converter_v1",
+      "acquisition_hash": "sha256:legacy_ART-001",
+      "acquisition_timestamp": "2026-04-10T10:00:00Z",
       "description": "ansible-playbook deploy_production.yml --check --diff | 47 tasks executed | 0 failures | 0 changed (dry run) | 2024-06-10 02:00:00 UTC | User: ansible_svc | SSH key: ansible@tower.company.com",
       "metadata": {
         "original_type": "bash_history",
@@ -21,7 +24,12 @@
           "Ejecución perfecta sin errores humanos",
           "Timing exacto entre comandos (automatización)"
         ],
-        "content_preview": "ansible-playbook deploy_production.yml --check --diff | 47 tasks executed | 0 failures | 0 changed ("
+        "content_preview": "ansible-playbook deploy_production.yml --check --diff | 47 tasks executed | 0 failures | 0 changed (",
+        "acquisition_tool": "legacy_converter_v1",
+        "acquisition_hash": "sha256:legacy_ART-001",
+        "acquisition_timestamp": "2026-04-10T10:00:00Z",
+        "write_blocker_used": true,
+        "examiner_id": "legacy_converter"
       }
     },
     {
@@ -29,11 +37,14 @@
       "evidence_type": "file_timestamp",
       "source_tool": "legacy_converter",
       "timestamp": "2026-04-10T10:00:00Z",
-      "raw_score": 0.85,
-      "prior_trust": 0.7,
+      "raw_score": 0.2125,
+      "prior_trust": 0.3,
       "provenance_chain": [
         "sha256:legacy_ART-002"
       ],
+      "acquisition_tool": "legacy_converter_v1",
+      "acquisition_hash": "sha256:legacy_ART-002",
+      "acquisition_timestamp": "2026-04-10T10:00:00Z",
       "description": "Playbook: deploy_production.yml | Git commit: a1b2c3d | Approved by: change_advisory_board #2024-06-05 | Jira ticket: CHG-0042 | Reviewer: senior_dev_lead | Signed off: 2024-06-07",
       "metadata": {
         "original_type": "file_metadata",
@@ -42,7 +53,12 @@
           "Cambio aprobado por board formal",
           "Playbook versionado en Git con firma"
         ],
-        "content_preview": "Playbook: deploy_production.yml | Git commit: a1b2c3d | Approved by: change_advisory_board #2024-06-"
+        "content_preview": "Playbook: deploy_production.yml | Git commit: a1b2c3d | Approved by: change_advisory_board #2024-06-",
+        "acquisition_tool": "legacy_converter_v1",
+        "acquisition_hash": "sha256:legacy_ART-002",
+        "acquisition_timestamp": "2026-04-10T10:00:00Z",
+        "write_blocker_used": true,
+        "examiner_id": "legacy_converter"
       }
     },
     {
@@ -50,11 +66,14 @@
       "evidence_type": "memory_process",
       "source_tool": "legacy_converter",
       "timestamp": "2026-04-10T10:00:00Z",
-      "raw_score": 0.95,
-      "prior_trust": 0.7,
+      "raw_score": 0.2375,
+      "prior_trust": 0.3,
       "provenance_chain": [
         "sha256:legacy_ART-003"
       ],
+      "acquisition_tool": "legacy_converter_v1",
+      "acquisition_hash": "sha256:legacy_ART-003",
+      "acquisition_timestamp": "2026-04-10T10:00:00Z",
       "description": "Parent: ansible-tower.service (PID 1234) | Child: ssh ansible_svc@target | Ansible facts gathered: 2024-06-10 02:00:01 | No interactive shell | No TTY allocated",
       "metadata": {
         "original_type": "process_list",
@@ -63,7 +82,12 @@
           "Proceso sin TTY (automatización, no interactivo)",
           "Parent es servicio de Ansible Tower"
         ],
-        "content_preview": "Parent: ansible-tower.service (PID 1234) | Child: ssh ansible_svc@target | Ansible facts gathered: 2"
+        "content_preview": "Parent: ansible-tower.service (PID 1234) | Child: ssh ansible_svc@target | Ansible facts gathered: 2",
+        "acquisition_tool": "legacy_converter_v1",
+        "acquisition_hash": "sha256:legacy_ART-003",
+        "acquisition_timestamp": "2026-04-10T10:00:00Z",
+        "write_blocker_used": true,
+        "examiner_id": "legacy_converter"
       }
     }
   ],

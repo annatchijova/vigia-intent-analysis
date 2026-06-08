@@ -1,0 +1,112 @@
+{
+  "case_id": "VIGIA-REAL-SRL-RD04-MEMORY",
+  "name": "SRL-2018 Remote Desktop Server RD-04 — Memory Forensics (Primary C2 Pivot)",
+  "description": "Volatility3 memory analysis. 30 LOTL processes + code injection in 33 processes. The most operationally active compromised host in SRL-2018 corpus. 30 simultaneous LOTL processes is the signature of an active C2 framework with multiple concurrent beacons. Primary attacker pivot post-lateral-movement.",
+  "artifacts": [
+    {
+      "artifact_id": "ART-RD04-001",
+      "evidence_type": "memory_process",
+      "source_tool": "legacy_converter",
+      "timestamp": "2026-04-10T10:00:00Z",
+      "raw_score": 0.85,
+      "prior_trust": 0.85,
+      "provenance_chain": [
+        "sha256:legacy_ART-RD04-001"
+      ],
+      "acquisition_tool": "legacy_converter_v1",
+      "acquisition_hash": "sha256:legacy_ART-RD04-001",
+      "acquisition_timestamp": "2026-04-10T10:00:00Z",
+      "description": "vol3 windows.pslist LOLBAS: 30 living-off-the-land processes detected simultaneously. Highest LOTL count in entire SRL-2018 corpus. Cobalt Strike beacon pattern: multiple short-lived rundll32.exe inst",
+      "metadata": {
+        "original_type": "process_list",
+        "peirce_layer": "SECONDNESS",
+        "forensic_anomalies": [
+          "30 simultaneous LOTL processes is 15x the maximum expected for legitimate admin activity — no legitimate use case produces this count",
+          "Pattern matches Cobalt Strike beacon with sleep jitter spawning multiple rundll32.exe shellcode hosts in rotation — each short-lived process executes one C2 task then exits",
+          "Highest LOTL count in corpus (RD04: 30 > RD01: 12 > ADMIN: 2 > WKSTN04: 2) identifies RD-04 as primary operational C2 base"
+        ],
+        "content_preview": "vol3 windows.pslist LOLBAS: 30 living-off-the-land processes detected simultaneously. Highest LOTL c",
+        "acquisition_tool": "legacy_converter_v1",
+        "acquisition_hash": "sha256:legacy_ART-RD04-001",
+        "acquisition_timestamp": "2026-04-10T10:00:00Z",
+        "write_blocker_used": true,
+        "examiner_id": "legacy_converter"
+      }
+    },
+    {
+      "artifact_id": "ART-RD04-002",
+      "evidence_type": "memory_process",
+      "source_tool": "legacy_converter",
+      "timestamp": "2026-04-10T10:00:00Z",
+      "raw_score": 0.85,
+      "prior_trust": 0.85,
+      "provenance_chain": [
+        "sha256:legacy_ART-RD04-002"
+      ],
+      "acquisition_tool": "legacy_converter_v1",
+      "acquisition_hash": "sha256:legacy_ART-RD04-002",
+      "acquisition_timestamp": "2026-04-10T10:00:00Z",
+      "description": "vol3 windows.malfind: code injection in 33 processes (PIDs: 8b, 4896, ac, 10, a4 and 28 others). 33 injected processes — the broadest injection footprint among all servers except RD-05.",
+      "metadata": {
+        "original_type": "memory_dump",
+        "peirce_layer": "SECONDNESS",
+        "forensic_anomalies": [
+          "33 injected processes with 30 active LOTL indicates nearly every LOLBAS process is a shellcode container — systematic framework deployment, not selective targeting",
+          "Breadth of injection (33 processes) suggests the attacker established redundant persistence to survive process termination by defenders",
+          "Combined LOTL (30) + injection (33) count indicates RD-04 was the attacker's primary working environment for extended operations"
+        ],
+        "content_preview": "vol3 windows.malfind: code injection in 33 processes (PIDs: 8b, 4896, ac, 10, a4 and 28 others). 33 ",
+        "acquisition_tool": "legacy_converter_v1",
+        "acquisition_hash": "sha256:legacy_ART-RD04-002",
+        "acquisition_timestamp": "2026-04-10T10:00:00Z",
+        "write_blocker_used": true,
+        "examiner_id": "legacy_converter"
+      }
+    },
+    {
+      "artifact_id": "ART-RD04-003",
+      "evidence_type": "log_entry",
+      "source_tool": "legacy_converter",
+      "timestamp": "2026-04-10T10:00:00Z",
+      "raw_score": 0.95,
+      "prior_trust": 0.9,
+      "provenance_chain": [
+        "sha256:legacy_ART-RD04-003"
+      ],
+      "acquisition_tool": "legacy_converter_v1",
+      "acquisition_hash": "sha256:legacy_ART-RD04-003",
+      "acquisition_timestamp": "2026-04-10T10:00:00Z",
+      "description": "RD-04 as C2 pivot: 30 active beacon processes at acquisition time indicates continuous external communication. Attack timeline: admin compromised (Jul 2018) -> AV disabled -> RD-04 established as prim",
+      "metadata": {
+        "original_type": "network_flow",
+        "peirce_layer": "THIRDNESS",
+        "forensic_anomalies": [
+          "Primary C2 pivot identification changes incident narrative: the attacker operated primarily from RD-04, not the admin server",
+          "30 concurrent beacons provides high resilience against partial cleanup — killing some processes does not disrupt C2 continuity",
+          "RD-04 connectivity to all RD servers and WKSTN via RDP explains the uniform injection pattern across the corpus"
+        ],
+        "content_preview": "RD-04 as C2 pivot: 30 active beacon processes at acquisition time indicates continuous external comm",
+        "acquisition_tool": "legacy_converter_v1",
+        "acquisition_hash": "sha256:legacy_ART-RD04-003",
+        "acquisition_timestamp": "2026-04-10T10:00:00Z",
+        "write_blocker_used": true,
+        "examiner_id": "legacy_converter"
+      }
+    }
+  ],
+  "temporal_violations": [],
+  "expected_verdict": "MALICE",
+  "expected_confidence": "HIGH",
+  "expected_mitre_ttps": [
+    "T1055",
+    "T1059.001",
+    "T1021.001",
+    "T1071"
+  ],
+  "metadata": {
+    "converted_from": "legacy_v1",
+    "original_verdict": "MALICE",
+    "abstention_risk": "LOW",
+    "carnegie_pattern": null
+  }
+}

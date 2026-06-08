@@ -1,27 +1,35 @@
 {
   "case_id": "VIGIA-BEN-005",
-  "name": "El Teclado Nuevo — Login Fallido Inocente",
-  "description": "Usuario con teclado mecánico nuevo (switches diferentes) comete 3 errores de tipeo antes de acertar la contraseña. El patrón es: error, corrección rápida, login exitoso, actividad normal de 8 horas.",
+  "name": "The New Keyboard — Innocent Failed Login",
+  "description": "User with a new mechanical keyboard (different switches) makes 3 typing errors before entering the correct password. The pattern is: error, quick correction, successful login, normal 8-hour activity.",
   "artifacts": [
     {
       "artifact_id": "ART-001",
       "evidence_type": "log_entry",
       "source_tool": "legacy_converter",
       "timestamp": "2026-04-10T10:00:00Z",
-      "raw_score": 0.7,
-      "prior_trust": 0.7,
+      "raw_score": 0.175,
+      "prior_trust": 0.3,
       "provenance_chain": [
         "sha256:legacy_ART-001"
       ],
-      "description": "2024-03-10 09:05:12 | user: maria.garcia | login attempt 1: FAILED (password mismatch) | 09:05:18 | attempt 2: FAILED | 09:05:25 | attempt 3: SUCCESS | Source IP: 10.0.1.45 (oficina principal)",
+      "acquisition_tool": "legacy_converter_v1",
+      "acquisition_hash": "sha256:legacy_ART-001",
+      "acquisition_timestamp": "2026-04-10T10:00:00Z",
+      "description": "2024-03-10 09:05:12 | user: maria.garcia | login attempt 1: FAILED (password mismatch) | 09:05:18 | attempt 2: FAILED | 09:05:25 | attempt 3: SUCCESS | Source IP: 10.0.1.45 (main office)",
       "metadata": {
         "original_type": "auth_log",
         "peirce_layer": "FIRSTNESS",
         "forensic_anomalies": [
-          "Múltiples intentos fallidos seguidos de éxito",
-          "Timing entre intentos: 6s, 7s (humano, no automatizado)"
+          "Multiple failed attempts followed by success",
+          "Timing between attempts: 6s, 7s (human, not automated)"
         ],
-        "content_preview": "2024-03-10 09:05:12 | user: maria.garcia | login attempt 1: FAILED (password mismatch) | 09:05:18 | "
+        "content_preview": "2024-03-10 09:05:12 | user: maria.garcia | login attempt 1: FAILED (password mismatch) | 09:05:18 | ",
+        "acquisition_tool": "legacy_converter_v1",
+        "acquisition_hash": "sha256:legacy_ART-001",
+        "acquisition_timestamp": "2026-04-10T10:00:00Z",
+        "write_blocker_used": true,
+        "examiner_id": "legacy_converter"
       }
     },
     {
@@ -29,20 +37,28 @@
       "evidence_type": "log_entry",
       "source_tool": "legacy_converter",
       "timestamp": "2026-04-10T10:00:00Z",
-      "raw_score": 0.85,
-      "prior_trust": 0.7,
+      "raw_score": 0.2125,
+      "prior_trust": 0.3,
       "provenance_chain": [
         "sha256:legacy_ART-002"
       ],
+      "acquisition_tool": "legacy_converter_v1",
+      "acquisition_hash": "sha256:legacy_ART-002",
+      "acquisition_timestamp": "2026-04-10T10:00:00Z",
       "description": "09:05-17:30 | Normal work pattern: Outlook, Excel, Teams, internal sites | No sudo | No external access | No file transfers | Keystroke dynamics: high variance, consistent with new mechanical keyboard",
       "metadata": {
         "original_type": "bash_history",
         "peirce_layer": "SECONDNESS",
         "forensic_anomalies": [
-          "Patrón de trabajo normal de 8 horas",
-          "Sin actividad anómala post-login"
+          "Normal 8-hour work pattern",
+          "No anomalous activity post-login"
         ],
-        "content_preview": "09:05-17:30 | Normal work pattern: Outlook, Excel, Teams, internal sites | No sudo | No external acc"
+        "content_preview": "09:05-17:30 | Normal work pattern: Outlook, Excel, Teams, internal sites | No sudo | No external acc",
+        "acquisition_tool": "legacy_converter_v1",
+        "acquisition_hash": "sha256:legacy_ART-002",
+        "acquisition_timestamp": "2026-04-10T10:00:00Z",
+        "write_blocker_used": true,
+        "examiner_id": "legacy_converter"
       }
     },
     {
@@ -50,20 +66,28 @@
       "evidence_type": "file_timestamp",
       "source_tool": "legacy_converter",
       "timestamp": "2026-04-10T10:00:00Z",
-      "raw_score": 0.95,
-      "prior_trust": 0.7,
+      "raw_score": 0.2375,
+      "prior_trust": 0.3,
       "provenance_chain": [
         "sha256:legacy_ART-003"
       ],
-      "description": "IT ticket IT-4492: 'Maria Garcia solicita teclado mecánico Keychron K2' | Approved: 2024-03-05 | Delivered: 2024-03-08 | Asset tag: KB-2024-044 | Photo of old membrane keyboard in recycling bin",
+      "acquisition_tool": "legacy_converter_v1",
+      "acquisition_hash": "sha256:legacy_ART-003",
+      "acquisition_timestamp": "2026-04-10T10:00:00Z",
+      "description": "IT ticket IT-4492: 'Maria Garcia requests Keychron K2 mechanical keyboard' | Approved: 2024-03-05 | Delivered: 2024-03-08 | Asset tag: KB-2024-044 | Photo of old membrane keyboard in recycling bin",
       "metadata": {
         "original_type": "file_metadata",
         "peirce_layer": "THIRDNESS",
         "forensic_anomalies": [
-          "Ticket de IT verificable para cambio de hardware",
-          "Fotografía del teclado viejo descartado"
+          "Verifiable IT ticket for hardware change",
+          "Photograph of discarded old keyboard"
         ],
-        "content_preview": "IT ticket IT-4492: 'Maria Garcia solicita teclado mecánico Keychron K2' | Approved: 2024-03-05 | Del"
+        "content_preview": "IT ticket IT-4492: 'Maria Garcia requests Keychron K2 mechanical keyboard' | Approved: 2024-03-05 | ",
+        "acquisition_tool": "legacy_converter_v1",
+        "acquisition_hash": "sha256:legacy_ART-003",
+        "acquisition_timestamp": "2026-04-10T10:00:00Z",
+        "write_blocker_used": true,
+        "examiner_id": "legacy_converter"
       }
     }
   ],
@@ -74,7 +98,7 @@
   "metadata": {
     "converted_from": "legacy_v1",
     "original_verdict": "NOISE",
-    "abstention_risk": "bajo",
+    "abstention_risk": "low",
     "carnegie_pattern": null
   }
 }

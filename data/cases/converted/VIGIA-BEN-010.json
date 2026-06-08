@@ -1,27 +1,35 @@
 {
   "case_id": "VIGIA-BEN-010",
-  "name": "El Jefe con Deadline Real — Urgencia Legítima",
-  "description": "Email del CEO con 'URGENTE: necesito el reporte para la junta de inversores en 2 horas'. Es real: la junta está en calendario, el reporte fue solicitado hace una semana, y el CEO nunca usa palabra 'urgente' excepto en contextos de junta.",
+  "name": "The Boss with a Real Deadline — Legitimate Urgency",
+  "description": "Email from CEO with 'URGENT: I need the report for the investor board meeting in 2 hours'. It is real: the meeting is on the calendar, the report was requested a week ago, and the CEO only uses the word 'urgent' in board meeting contexts.",
   "artifacts": [
     {
       "artifact_id": "ART-001",
       "evidence_type": "log_entry",
       "source_tool": "legacy_converter",
       "timestamp": "2026-04-10T10:00:00Z",
-      "raw_score": 0.7,
-      "prior_trust": 0.7,
+      "raw_score": 0.175,
+      "prior_trust": 0.3,
       "provenance_chain": [
         "sha256:legacy_ART-001"
       ],
-      "description": "From: ceo@company.com | To: cfo@company.com | Subject: URGENTE: Reporte financiero Q4 para junta de inversores | Date: 2024-03-15 08:00 | DKIM: PASS | SPF: PASS | Reply-To: ceo@company.com",
+      "acquisition_tool": "legacy_converter_v1",
+      "acquisition_hash": "sha256:legacy_ART-001",
+      "acquisition_timestamp": "2026-04-10T10:00:00Z",
+      "description": "From: ceo@company.com | To: cfo@company.com | Subject: URGENT: Q4 Financial Report for investor board meeting | Date: 2024-03-15 08:00 | DKIM: PASS | SPF: PASS | Reply-To: ceo@company.com",
       "metadata": {
         "original_type": "email_header",
         "peirce_layer": "FIRSTNESS",
         "forensic_anomalies": [
-          "Uso de palabra URGENTE en asunto",
-          "Solicitud de documento confidencial con deadline corto"
+          "Use of word URGENT in subject line",
+          "Request for confidential document with short deadline"
         ],
-        "content_preview": "From: ceo@company.com | To: cfo@company.com | Subject: URGENTE: Reporte financiero Q4 para junta de "
+        "content_preview": "From: ceo@company.com | To: cfo@company.com | Subject: URGENT: Q4 Financial Report for investor boar",
+        "acquisition_tool": "legacy_converter_v1",
+        "acquisition_hash": "sha256:legacy_ART-001",
+        "acquisition_timestamp": "2026-04-10T10:00:00Z",
+        "write_blocker_used": true,
+        "examiner_id": "legacy_converter"
       }
     },
     {
@@ -29,20 +37,28 @@
       "evidence_type": "log_entry",
       "source_tool": "legacy_converter",
       "timestamp": "2026-04-10T10:00:00Z",
-      "raw_score": 0.85,
-      "prior_trust": 0.7,
+      "raw_score": 0.2125,
+      "prior_trust": 0.3,
       "provenance_chain": [
         "sha256:legacy_ART-002"
       ],
-      "description": "Calendar event: 'Junta de Inversores — Presentación Q4' | Date: 2024-03-15 10:00 | Location: Sala A | Attendees: board_members, cfo, ceo | Created: 2024-02-01 by executive_assistant",
+      "acquisition_tool": "legacy_converter_v1",
+      "acquisition_hash": "sha256:legacy_ART-002",
+      "acquisition_timestamp": "2026-04-10T10:00:00Z",
+      "description": "Calendar event: 'Investor Board Meeting — Q4 Presentation' | Date: 2024-03-15 10:00 | Location: Room A | Attendees: board_members, cfo, ceo | Created: 2024-02-01 by executive_assistant",
       "metadata": {
         "original_type": "email_header",
         "peirce_layer": "SECONDNESS",
         "forensic_anomalies": [
-          "Junta real en calendario corporativo",
-          "Creada con 6 semanas de anticipación"
+          "Real meeting in corporate calendar",
+          "Created 6 weeks in advance"
         ],
-        "content_preview": "Calendar event: 'Junta de Inversores — Presentación Q4' | Date: 2024-03-15 10:00 | Location: Sala A "
+        "content_preview": "Calendar event: 'Investor Board Meeting — Q4 Presentation' | Date: 2024-03-15 10:00 | Location: Room",
+        "acquisition_tool": "legacy_converter_v1",
+        "acquisition_hash": "sha256:legacy_ART-002",
+        "acquisition_timestamp": "2026-04-10T10:00:00Z",
+        "write_blocker_used": true,
+        "examiner_id": "legacy_converter"
       }
     },
     {
@@ -50,20 +66,28 @@
       "evidence_type": "log_entry",
       "source_tool": "legacy_converter",
       "timestamp": "2026-04-10T10:00:00Z",
-      "raw_score": 0.95,
-      "prior_trust": 0.7,
+      "raw_score": 0.2375,
+      "prior_trust": 0.3,
       "provenance_chain": [
         "sha256:legacy_ART-003"
       ],
-      "description": "Email thread: 2024-03-08 | ceo→cfo: 'Por favor prepara reporte Q4 para junta del 15' | cfo→ceo: 'OK, lo tendré para el 12' | 2024-03-12 | cfo→ceo: 'Adjunto borrador' | 2024-03-14 | ceo→cfo: 'Necesito ",
+      "acquisition_tool": "legacy_converter_v1",
+      "acquisition_hash": "sha256:legacy_ART-003",
+      "acquisition_timestamp": "2026-04-10T10:00:00Z",
+      "description": "Email thread: 2024-03-08 | ceo→cfo: 'Please prepare Q4 report for board meeting on the 15th' | cfo→ceo: 'OK, I'll have it by the 12th' | 2024-03-12 | cfo→ceo: 'Draft attached' | 2024-03-14 | ceo→cfo: ",
       "metadata": {
         "original_type": "email_header",
         "peirce_layer": "THIRDNESS",
         "forensic_anomalies": [
-          "Secuencia de emails previos con contexto completo",
-          "Deadline incumplido por CFO (12→15) justifica urgencia"
+          "Prior email thread with complete context",
+          "CFO-missed deadline (12th→15th) justifies urgency"
         ],
-        "content_preview": "Email thread: 2024-03-08 | ceo→cfo: 'Por favor prepara reporte Q4 para junta del 15' | cfo→ceo: 'OK,"
+        "content_preview": "Email thread: 2024-03-08 | ceo→cfo: 'Please prepare Q4 report for board meeting on the 15th' | cfo→c",
+        "acquisition_tool": "legacy_converter_v1",
+        "acquisition_hash": "sha256:legacy_ART-003",
+        "acquisition_timestamp": "2026-04-10T10:00:00Z",
+        "write_blocker_used": true,
+        "examiner_id": "legacy_converter"
       }
     }
   ],
@@ -74,7 +98,7 @@
   "metadata": {
     "converted_from": "legacy_v1",
     "original_verdict": "NOISE",
-    "abstention_risk": "bajo",
+    "abstention_risk": "low",
     "carnegie_pattern": null
   }
 }

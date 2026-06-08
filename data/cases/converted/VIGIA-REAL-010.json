@@ -1,7 +1,7 @@
 {
   "case_id": "VIGIA-REAL-010",
   "name": "DFRWS 2011 Android Espionage",
-  "description": "Caso dual: Donald Norby robó documentos confidenciales de SwiftLogic Inc. y fue encontrado muerto. Negociaba la venta de documentos del producto Palomino con Mr. E. El teléfono de Yob Taog fue comprometido con malware que exfiltraba PDFs.",
+  "description": "Dual case: Donald Norby stole confidential documents from SwiftLogic Inc. and was found dead. He was negotiating the sale of Palomino product documents with Mr. E. Yob Taog's phone was compromised with malware that exfiltrated PDFs.",
   "artifacts": [
     {
       "artifact_id": "ART-001",
@@ -13,15 +13,23 @@
       "provenance_chain": [
         "sha256:legacy_ART-001"
       ],
-      "description": "SMS/Malware C&C: Norby organizó instalación de malware en teléfono de Taog | Negociaciones con Mr. E sobre precio de documentos | Mensajes del malware confirmando exfiltración de archivos | Email/SMS:",
+      "acquisition_tool": "legacy_converter_v1",
+      "acquisition_hash": "sha256:legacy_ART-001",
+      "acquisition_timestamp": "2026-04-10T10:00:00Z",
+      "description": "SMS/Malware C&C: Norby arranged installation of malware on Taog's phone | Negotiations with Mr. E about document pricing | Malware messages confirming file exfiltration | Email/SMS: Norby requesting h",
       "metadata": {
         "original_type": "email_header",
         "peirce_layer": "FIRSTNESS",
         "forensic_anomalies": [
-          "SMS del malware confirmando exfiltración periódica de PDFs",
-          "Negociación de venta de propiedad intelectual vía SMS/email"
+          "SMS from malware confirming periodic exfiltration of PDFs",
+          "Negotiation of intellectual property sale via SMS/email"
         ],
-        "content_preview": "SMS/Malware C&C: Norby organizó instalación de malware en teléfono de Taog | Negociaciones con Mr. E"
+        "content_preview": "SMS/Malware C&C: Norby arranged installation of malware on Taog's phone | Negotiations with Mr. E ab",
+        "acquisition_tool": "legacy_converter_v1",
+        "acquisition_hash": "sha256:legacy_ART-001",
+        "acquisition_timestamp": "2026-04-10T10:00:00Z",
+        "write_blocker_used": true,
+        "examiner_id": "legacy_converter"
       }
     },
     {
@@ -30,19 +38,27 @@
       "source_tool": "legacy_converter",
       "timestamp": "2026-04-10T10:00:00Z",
       "raw_score": 0.85,
-      "prior_trust": 0.7,
+      "prior_trust": 0.85,
       "provenance_chain": [
         "sha256:legacy_ART-002"
       ],
-      "description": "HTML Cache: Página con acceso a servidor remoto IP 50.56.29.109 | Malware code: Referencias hardcodeadas a servidor de exfiltración | Download logs: Descargas sistemáticas de documentos confidenciales",
+      "acquisition_tool": "legacy_converter_v1",
+      "acquisition_hash": "sha256:legacy_ART-002",
+      "acquisition_timestamp": "2026-04-10T10:00:00Z",
+      "description": "HTML Cache: Page with access to remote server IP 50.56.29.109 | Malware code: Hardcoded references to exfiltration server | Download logs: Systematic downloads of confidential PDF documents",
       "metadata": {
         "original_type": "network_flow",
         "peirce_layer": "SECONDNESS",
         "forensic_anomalies": [
-          "Referencia hardcodeada a servidor externo 50.56.29.109 en código de malware",
-          "Descargas sistemáticas de PDFs confidenciales a intervalos regulares"
+          "Hardcoded reference to external server 50.56.29.109 in malware code",
+          "Systematic downloads of confidential PDFs at regular intervals"
         ],
-        "content_preview": "HTML Cache: Página con acceso a servidor remoto IP 50.56.29.109 | Malware code: Referencias hardcode"
+        "content_preview": "HTML Cache: Page with access to remote server IP 50.56.29.109 | Malware code: Hardcoded references t",
+        "acquisition_tool": "legacy_converter_v1",
+        "acquisition_hash": "sha256:legacy_ART-002",
+        "acquisition_timestamp": "2026-04-10T10:00:00Z",
+        "write_blocker_used": true,
+        "examiner_id": "legacy_converter"
       }
     },
     {
@@ -51,19 +67,27 @@
       "source_tool": "legacy_converter",
       "timestamp": "2026-04-10T10:00:00Z",
       "raw_score": 0.85,
-      "prior_trust": 0.7,
+      "prior_trust": 0.85,
       "provenance_chain": [
         "sha256:legacy_ART-003"
       ],
-      "description": "Archivos PDF confidenciales de SwiftLogic en tarjeta SD | Producto: Palomino | EXIF metadata de fotos: Motorola Droid | Browser history: Búsquedas sobre empleados de SwiftLogic (reconocimiento previo)",
+      "acquisition_tool": "legacy_converter_v1",
+      "acquisition_hash": "sha256:legacy_ART-003",
+      "acquisition_timestamp": "2026-04-10T10:00:00Z",
+      "description": "Confidential SwiftLogic PDF files on SD card | Product: Palomino | Photo EXIF metadata: Motorola Droid | Browser history: Searches on SwiftLogic employees (prior reconnaissance)",
       "metadata": {
         "original_type": "file_metadata",
         "peirce_layer": "SECONDNESS",
         "forensic_anomalies": [
-          "Documentos confidenciales de competidor en tarjeta SD del teléfono",
-          "Historial de búsqueda sobre empleados de la empresa víctima indica reconocimiento previo"
+          "Confidential competitor documents on phone SD card",
+          "Search history on target company employees indicates prior reconnaissance"
         ],
-        "content_preview": "Archivos PDF confidenciales de SwiftLogic en tarjeta SD | Producto: Palomino | EXIF metadata de foto"
+        "content_preview": "Confidential SwiftLogic PDF files on SD card | Product: Palomino | Photo EXIF metadata: Motorola Dro",
+        "acquisition_tool": "legacy_converter_v1",
+        "acquisition_hash": "sha256:legacy_ART-003",
+        "acquisition_timestamp": "2026-04-10T10:00:00Z",
+        "write_blocker_used": true,
+        "examiner_id": "legacy_converter"
       }
     },
     {
@@ -72,19 +96,27 @@
       "source_tool": "legacy_converter",
       "timestamp": "2026-04-10T10:00:00Z",
       "raw_score": 0.95,
-      "prior_trust": 0.7,
+      "prior_trust": 0.9,
       "provenance_chain": [
         "sha256:legacy_ART-004"
       ],
-      "description": "Contact Records: Vínculos entre Norby, Mr. E, y Yob Taog | Negociaciones: Precio inicial ofrecido, Norby pidió más, envió muestra | Muerte: Donald Norby encontrado con disparo, potencial conexión a gr",
+      "acquisition_tool": "legacy_converter_v1",
+      "acquisition_hash": "sha256:legacy_ART-004",
+      "acquisition_timestamp": "2026-04-10T10:00:00Z",
+      "description": "Contact Records: Links between Norby, Mr. E, and Yob Taog | Negotiations: Initial price offered, Norby asked for more, sent sample | Death: Donald Norby found shot, potential connection to criminal gr",
       "metadata": {
         "original_type": "email_header",
         "peirce_layer": "THIRDNESS",
         "forensic_anomalies": [
-          "Patrón de negociación de espionaje industrial con intento de renegociación",
-          "Muerte del sospechoso en circunstancias violentas tras intentar subir el precio"
+          "Industrial espionage negotiation pattern with renegotiation attempt",
+          "Suspect's death under violent circumstances after attempting to raise the price"
         ],
-        "content_preview": "Contact Records: Vínculos entre Norby, Mr. E, y Yob Taog | Negociaciones: Precio inicial ofrecido, N"
+        "content_preview": "Contact Records: Links between Norby, Mr. E, and Yob Taog | Negotiations: Initial price offered, Nor",
+        "acquisition_tool": "legacy_converter_v1",
+        "acquisition_hash": "sha256:legacy_ART-004",
+        "acquisition_timestamp": "2026-04-10T10:00:00Z",
+        "write_blocker_used": true,
+        "examiner_id": "legacy_converter"
       }
     }
   ],
@@ -100,7 +132,7 @@
   "metadata": {
     "converted_from": "legacy_v1",
     "original_verdict": "MALICE",
-    "abstention_risk": "medio",
+    "abstention_risk": "medium",
     "carnegie_pattern": null
   }
 }
