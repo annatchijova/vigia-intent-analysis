@@ -39,7 +39,7 @@ from typing import Dict, List, Optional, Any, Tuple
 from types import MappingProxyType  # tablas maestras inmutables (Daubert)
 
 # Importar desde módulos P0 existentes
-from visible_variables_P0 import VariableCategory, IRPhase
+from vigia.tools.visible_variables import VariableCategory, IRPhase
 
 
 # ============================================================================

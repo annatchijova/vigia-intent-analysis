@@ -1,7 +1,6 @@
 # License, or (at your option) any later version.
 
-\"\"\"vigia.tools — Herramientas MCP individuales.\"\"\"
-"""
+"""vigia.tools — Herramientas MCP individuales."""
 
 files = {
     "vigia/security/__init__.py": SECURITY_INIT,

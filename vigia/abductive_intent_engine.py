@@ -38,7 +38,7 @@ from enum import Enum
 from typing import Dict, List, Optional, Any, Tuple
 
 # Importar desde módulos P0 existentes
-from visible_variables_P0 import VariableCategory, IRPhase
+from vigia.tools.visible_variables import VariableCategory, IRPhase
 
 
 # ============================================================================

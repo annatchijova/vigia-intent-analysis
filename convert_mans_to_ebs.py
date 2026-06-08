@@ -115,7 +115,8 @@ def build_ebs(data: dict, mans_path: str, case_id: str) -> dict:
             "source_tool": "Redline/MRI",
             "description": (
                 f"{top['name']} (PID={top['pid']}) MRI score={top['mri']}. "
-                f"{'No filesystem path — process may have exited.' if not top['path'] else f'Path: {top[\"path\"]}'} "
+                + (f"Path: {top['path']}" if top['path'] else "No filesystem path — process may have exited.")
+                + " "
                 + (" ".join(data["anomalies"]) if data["anomalies"] else "")
             ),
             "raw_score": round(raw, 2),
