@@ -1475,7 +1475,7 @@ class CrossArtifactIncongruenceEngine:
                 # de la conversion directa float->Decimal
                 s_d = decimal.Decimal(str(_dround(s, _DETERMINISTIC_INTERNAL_PREC)))
                 prod_d = prod_d * (_D_ONE - s_d)
-            group_score = _dround(_D_ONE - prod_d, _DETERMINISTIC_INTERNAL_PREC)
+            group_score = _dround(float(_D_ONE - prod_d), _DETERMINISTIC_INTERNAL_PREC)
             group_scores.append(group_score)
 
         # Across-group fusion (independent sources): 1 - ∏(1 - g)
@@ -1485,7 +1485,7 @@ class CrossArtifactIncongruenceEngine:
             for g in group_scores:
                 g_d = decimal.Decimal(str(_dround(g, _DETERMINISTIC_INTERNAL_PREC)))
                 prod_d = prod_d * (_D_ONE - g_d)
-            composite = _dround(_D_ONE - prod_d, _DETERMINISTIC_INTERNAL_PREC)
+            composite = _dround(float(_D_ONE - prod_d), _DETERMINISTIC_INTERNAL_PREC)
         else:
             composite = 0.0
 
@@ -1621,51 +1621,9 @@ class CrossArtifactIncongruenceEngine:
             elif cdl_verdict == CollapseVerdict.SUSPICION and verdict == "MALICE":
                 verdict = "SUSPICION"
                 daubert_note += f" CDL: {cdl_explanation}"
-            elif cdl_verdict == CollapseVerdict.NOISE and verdict in ("MALICE", "SUSPICION"):
-                verdict = "NOISE"
-                daubert_note += f" CDL: {cdl_explanation}"
-            elif cdl_verdict == CollapseVerdict.NOISE and verdict in ("MALICE", "SUSPICION"):
-                verdict = "NOISE"
-                daubert_note += f" CDL: {cdl_explanation}"
-            elif cdl_verdict == CollapseVerdict.SUSPICION and verdict == "MALICE":
-                verdict = "SUSPICION"
-                daubert_note += f" CDL: {cdl_explanation}"
-            elif cdl_verdict == CollapseVerdict.NOISE and verdict in ("MALICE", "SUSPICION"):
-                verdict = "NOISE"
-                daubert_note += f" CDL: {cdl_explanation}"
-            elif cdl_verdict == CollapseVerdict.NOISE and verdict in ("MALICE", "SUSPICION"):
-                verdict = "NOISE"
-                daubert_note += f" CDL: {cdl_explanation}"
-            elif cdl_verdict == CollapseVerdict.SUSPICION and verdict == "MALICE":
-                verdict = "SUSPICION"
-                daubert_note += f" CDL: {cdl_explanation}"
-            elif cdl_verdict == CollapseVerdict.NOISE and verdict in ("MALICE", "SUSPICION"):
-                verdict = "NOISE"
-                daubert_note += f" CDL: {cdl_explanation}"
-            elif cdl_verdict == CollapseVerdict.NOISE and verdict in ("MALICE", "SUSPICION"):
-                verdict = "NOISE"
-                daubert_note += f" CDL: {cdl_explanation}"
-            elif cdl_verdict == CollapseVerdict.SUSPICION and verdict == "MALICE":
-                verdict = "SUSPICION"
-                daubert_note += f" CDL: {cdl_explanation}"
-            elif cdl_verdict == CollapseVerdict.NOISE and verdict in ("MALICE", "SUSPICION"):
-                verdict = "NOISE"
-                daubert_note += f" CDL: {cdl_explanation}"
-            elif cdl_verdict == CollapseVerdict.NOISE and verdict in ("MALICE", "SUSPICION"):
-                verdict = "NOISE"
-                daubert_note += f" CDL: {cdl_explanation}"
-            elif cdl_verdict == CollapseVerdict.SUSPICION and verdict == "MALICE":
-                verdict = "SUSPICION"
-                daubert_note += f" CDL: {cdl_explanation}"
-            elif cdl_verdict == CollapseVerdict.NOISE and verdict in ("MALICE", "SUSPICION"):
-                verdict = "NOISE"
-                daubert_note += f" CDL: {cdl_explanation}"
-            elif cdl_verdict == CollapseVerdict.NOISE and verdict in ("MALICE", "SUSPICION"):
-                verdict = "NOISE"
-                daubert_note += f" CDL: {cdl_explanation}"
-            # Falla silenciosa deliberada: el CDL es una capa adicional de
-            # protección, no un requisito para el veredicto base.
-            pass
+        except Exception as exc:
+            import logging
+            logging.getLogger("caie").error("CDL evaluation failed: %s", exc)
 
         # Peirce chain
         top_adjusted = sorted(
