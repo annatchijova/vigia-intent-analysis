@@ -168,6 +168,15 @@ class CaseSchemaError(ValueError):
 _REQUIRED_CASE_FIELDS = {"case_id", "artifacts"}
 _REQUIRED_ARTIFACT_FIELDS = {"artifact_id", "evidence_type", "raw_score"}
 
+def _validate_raw_score(raw: Any, idx: int) -> None:
+    """Validate raw_score is in [0.0, 1.0]."""
+    try:
+        val = float(raw)
+    except (TypeError, ValueError):
+        raise CaseSchemaError(f"raw_score[{idx}] must be numeric, got {type(raw).__name__}: {raw}")
+    if not (0.0 <= val <= 1.0):
+        raise CaseSchemaError(f"raw_score[{idx}] must be in [0.0, 1.0], got {val}")
+
 
 # Campos que VIGÍA calcula internamente — no pueden ser inyectados desde el JSON
 _RESERVED_CASE_FIELDS = {
@@ -192,6 +201,9 @@ def _sanitize_case_input(case: Dict[str, Any]) -> Dict[str, Any]:
             "del caso y descartados (posible inyección — H15): %s",
             sorted(injected),
         )
+        # Mark case as potentially tampered for downstream consumers
+        case["_tampering_detected"] = True
+        case["_tampered_fields"] = sorted(injected)
     return {k: v for k, v in case.items() if k not in _RESERVED_CASE_FIELDS}
 
 

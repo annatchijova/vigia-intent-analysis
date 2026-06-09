@@ -249,7 +249,11 @@ def _vigia_score(case: dict) -> dict:
             for f in raw_fractures
         ]
         _caie_source = "live_caie"
-    except Exception:
+    except Exception as exc:
+        import logging
+        logging.getLogger("vigia_scorer").warning(
+            "CAIE evaluation failed: %s — falling back to JSON fractures", exc
+        )
         fractures    = case.get("caie_fractures", [])
         _caie_source = "json_fallback"
 
@@ -470,7 +474,8 @@ def _vigia_score(case: dict) -> dict:
         reason     = "Provenance chain collapsed, sin fractures activas — inadmissible under Daubert"
     elif mean_effective < 0.15 and fractures:
         verdict    = "SUSPICION"
-        confidence = _dround(min(0.75, fracture_malice_boost + 0.3), 2)
+        # NOTE: Thresholds 0.75/0.55 are intentional for vigia_scorer standalone mode.
+        # CAIE uses 0.5/0.2 for probabilistic verdict. See KNOWN_LIMITATIONS.md L-XXX.
         reason     = f"Cadena de custodia rota + {len(fractures)} fracture(s) activas — manipulación deliberada"
     elif final_score > 0.75:
         verdict    = "MALICE"

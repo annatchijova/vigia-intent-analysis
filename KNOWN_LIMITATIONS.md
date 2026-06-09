@@ -601,3 +601,17 @@ multiplies the effective score of co-occurring login artifacts.
 
 **Roadmap:** FW-007 — Contextual Invalidation Layer.
 
+
+## L-XXX: Bundle Save TOCTOU Race (SEC-04)
+
+**Status**: Documented, fix scheduled post-hackathon  
+**Severity**: P0  
+**File**: `vigia/core/bundle_builder.py`
+
+The bundle hash is computed from in-memory content, not from disk. Between `f.write()` and hash computation, the file can be swapped via symlink attack or concurrent writer. No `fsync()`, `O_NOFOLLOW`, or atomic rename is used.
+
+**Impact**: Chain-of-custody break under Daubert. In a courtroom scenario, opposing counsel could argue the bundle was tampered with after write.
+
+**Mitigation**: Bundle is sealed with HMAC-SHA256 (H3) using `VIGIA_HMAC_KEY`. Without the key, tampering is detectable. However, the HMAC itself is computed from the same in-memory content, so a TOCTOU at write time affects both H2 and H3.
+
+**Fix**: Atomic write with `tempfile.mkstemp()` → `fsync()` → `os.replace()`. Hash computed from disk after fsync. See Claude Code audit report 2026-06-09.

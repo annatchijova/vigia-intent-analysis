@@ -849,7 +849,14 @@ def _get_plan_hmac_key() -> tuple:
                 import os as _os2
                 return _os2.urandom(32), False
             else:
-                return open(key_file, "rb").read(), True
+                if os.path.islink(key_file):
+                    raise RuntimeError(f"HMAC key file is a symlink: {key_file}")
+                fd = os.open(key_file, os.O_RDONLY | os.O_NOFOLLOW)
+                try:
+                    key_data = os.read(fd, 64)
+                finally:
+                    os.close(fd)
+                return key_data, True
         except OSError:
             pass
     import sys as _sys_hmac

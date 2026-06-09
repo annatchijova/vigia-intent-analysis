@@ -32,7 +32,7 @@ REPO = Path(os.environ.get("VIGIA_REPO", Path(__file__).parent))
 sys.path.insert(0, str(REPO))
 
 app = FastAPI(title="VIGÍA Forensic Intelligence API", version="1.0")
-app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
+app.add_middleware(CORSMiddleware, allow_origins=["https://your-openwebui-domain.com"], allow_methods=["*"], allow_headers=["*"])
 
 
 class CasePayload(BaseModel):
@@ -197,7 +197,7 @@ def chat_completions(req: ChatRequest):
                     if narrative:
                         content += f"\n**Análisis Peirciano:**\n{narrative}"
                 except Exception as e:
-                    content = f"Error en pipeline forense: {e}"
+                    content = "Error interno en pipeline forense. Contacte al administrador."
                 finally:
                     try:
                         os.unlink(tf.name)
