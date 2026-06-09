@@ -48,9 +48,9 @@ class CollapseDecisionLayer:
         # Sin colapso
         if ctx.has_structural_malice:
             return CollapseVerdict.MALICE
-        if ctx.base_score > 0.5:
+        if ctx.base_score >= 0.5:
             return CollapseVerdict.MALICE
-        if ctx.base_score > 0.2:
+        if ctx.base_score >= 0.2:
             return CollapseVerdict.SUSPICION
         return CollapseVerdict.NOISE
     
