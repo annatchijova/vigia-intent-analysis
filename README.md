@@ -31,7 +31,7 @@
 | Live demo / step-by-step | [`INSTALL.md`](./INSTALL.md) |
 | Feature description | [Overview](#the-paradigm-shift-from-ioc-to-ioi) |
 | Architecture diagram | [`docs/vigia_diagrams.html`](./docs/vigia_diagrams.html) |
-| Command reference | [`docs/vigia_commands.html`](./docs/vigia_commands.html) |
+| Command reference | [`vigia_commands_en.html`](./vigia_commands_en.html) |
 | Known limitations | [`KNOWN_LIMITATIONS.md`](./KNOWN_LIMITATIONS.md) |
 | Security policy | [`SECURITY.md`](./SECURITY.md) |
 | Authors | [`AUTHORS.md`](./AUTHORS.md) |
@@ -234,7 +234,7 @@ cd vigia-intent-analysis
 pip install -r requirements.txt --break-system-packages
 ```
 
-> **Terminal command reference:** [`docs/vigia_commands.html`](./docs/vigia_commands.html)
+> **Terminal command reference:** [`vigia_commands_en.html`](./vigia_commands_en.html)
 > — full list of CLI commands, flags, and output formats. Open in any browser.
 > If you prefer to read VIGÍA's capabilities before running anything, start here.
 
@@ -249,7 +249,7 @@ export VIGIA_HMAC_KEY="your-hmac-key"                     # bundle integrity
 ```
 
 **Full installation guide:** [`INSTALL.md`](./INSTALL.md)  
-**Command reference:** [`docs/vigia_commands.html`](./docs/vigia_commands.html)
+**Command reference:** [`vigia_commands_en.html`](./vigia_commands_en.html)
 
 ---
 
@@ -593,7 +593,7 @@ vigia-intent-analysis/
 │
 ├── docs/
 │   ├── vigia_diagrams.html          ← Interactive architecture diagrams
-│   ├── vigia_commands.html          ← Command reference with examples
+│   ├── vigia_commands_en.html       ← English command reference for judges
 │   ├── VIGIA_TECHNICAL_STATE_EN.md  ← Technical state (English)
 │   ├── VIGIA_ESTADO_TECNICO_ES.md   ← Technical state (Spanish)
 │   ├── protocols/P2/                ← Protocol P2 canonical vectors + SHA-256
@@ -656,3 +656,11 @@ Cases run via Claude + VIGÍA MCP (June 2026):
 > Verdict: `MALICE` — 91% confidence. Gmail session cookie extracted from plaintext HTTP provides direct identity binding.
 
 **Accuracy note:** Scores above reflect LLM-assisted mode (Claude via MCP). In fallback mode (no LLM, scorer-only), VIGIA-REAL-007 returns `SUSPICION` due to conservative spoofability defaults — the scorer requires fractures or raw scores from live SIFT analysis to reach MALICE without semantic reasoning. Fallback mode accuracy should be reported separately. See `KNOWN_LIMITATIONS.md`.
+
+## Case JSON Validator
+
+`validate_case.py` validates any VIGÍA case file against the EBS v1 schema before running it through the pipeline. Checks for required fields (`case_id`, `expected_verdict`, `artifacts`), valid `evidence_type` values against the CAIE whitelist, minimum `acquisition_hash` length (64 hex chars), and `examiner_id` presence. Exits with code 0 if valid, 1 with a detailed error report if not. Use before committing new cases to the corpus.
+
+```bash
+python validate_case.py data/cases/VIGIA-REAL-001.json
+```
