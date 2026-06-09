@@ -30,6 +30,12 @@ except ImportError:
     def _normalize_case(c):  # type: ignore[misc]
         return c  # fallback no-op: el caso se procesa como viene
 
+try:
+    from vigia.core.bundle_builder import build_bundle as _build_bundle
+    _HAS_BUNDLE_BUILDER = True
+except (ImportError, Exception):
+    _HAS_BUNDLE_BUILDER = False
+
 # Colores ANSI para terminal
 RED = "\033[91m"
 YEL = "\033[93m"
@@ -38,6 +44,61 @@ BLU = "\033[94m"
 CYA = "\033[96m"
 RST = "\033[0m"
 BLD = "\033[1m"
+
+
+def _display_4_hashes(sealed: dict) -> None:
+    """Muestra los 4 hashes forenses del bundle sellado."""
+    integrity = sealed.get("integrity", {})
+    h1 = integrity.get("graph_hash", "")
+    h2 = integrity.get("bundle_hash", "")
+
+    # H3: HMAC-SHA256 sobre el bundle canónico (sin integrity block)
+    try:
+        from vigia.core.bundle_builder import _canonicalize
+        bundle_payload = {k: v for k, v in sealed.items() if k != "integrity"}
+        canonical_bytes = json.dumps(
+            _canonicalize(bundle_payload),
+            sort_keys=True, separators=(",", ":"), ensure_ascii=True,
+        ).encode("utf-8")
+    except ImportError:
+        bundle_payload = {k: v for k, v in sealed.items() if k != "integrity"}
+        canonical_bytes = json.dumps(
+            bundle_payload, sort_keys=True, ensure_ascii=True, default=str,
+        ).encode("utf-8")
+
+    hmac_key_env = os.environ.get("VIGIA_HMAC_KEY", "").encode()
+    if not hmac_key_env:
+        hmac_key_env = hashlib.sha256(h2.encode() if h2 else b"dev").digest()
+        h3_note = f"{YEL}ephemeral (dev — set VIGIA_HMAC_KEY for production){RST}"
+    else:
+        h3_note = f"{GRN}production key{RST}"
+    h3 = hmac.new(hmac_key_env, canonical_bytes, hashlib.sha256).hexdigest()
+
+    # H4: quick_verify interno
+    try:
+        from vigia.core.bundle_builder import BundleBuilder as _BB
+        h4_ok, h4_msg = _BB.quick_verify(sealed)
+        h4_status = f"{GRN}PASS — {h4_msg}{RST}" if h4_ok else f"{RED}FAIL — {h4_msg}{RST}"
+    except Exception as exc:
+        h4_status = f"{YEL}N/A ({exc}){RST}"
+
+    print(f"\n  {BLD}FORENSIC BUNDLE — 4 HASHES{RST}")
+    print(f"  {'─' * 60}")
+    if h1:
+        print(f"  {BLD}H1{RST} graph_hash")
+        print(f"     {CYA}{h1}{RST}")
+    else:
+        print(f"  {BLD}H1{RST} graph_hash    {RED}ABSENT{RST}")
+    if h2:
+        print(f"  {BLD}H2{RST} bundle_hash")
+        print(f"     {CYA}{h2}{RST}")
+    else:
+        print(f"  {BLD}H2{RST} bundle_hash   {RED}ABSENT{RST}")
+    print(f"  {BLD}H3{RST} HMAC audit chain ({h3_note})")
+    print(f"     {CYA}{h3}{RST}")
+    print(f"  {BLD}H4{RST} EBS verify     {h4_status}")
+    print(f"  {'─' * 60}")
+    print(f"  Sealed at : {integrity.get('sealed_at', 'N/A')}")
 
 
 # Funciones de scoring importadas desde vigia_scorer.py (versión canónica con todos los fixes)
@@ -130,23 +191,15 @@ def run_case(case_path: str) -> None:
         bar = "█" * int(et["effective_trust"] * 20)
         print(f"    {et['artifact_id'][:30]:30s} {bar:<20s} {et['effective_trust']:.4f}")
 
-    # ------------------------------------------------------------------
-    # Bundle integrity hashes
-    # ------------------------------------------------------------------
-    case_id = case.get("case_id", "")
-    bundle_path = Path(__file__).parent.parent / "vigia_output" / f"bundle_{case_id}.json"
-    if bundle_path.exists():
-        raw = bundle_path.read_bytes()
-        hmac_key = os.environ.get("VIGIA_HMAC_KEY", "vigia-integrity-key").encode()
-        h_sha256 = hashlib.sha256(raw).hexdigest()
-        h_md5    = hashlib.md5(raw).hexdigest()
-        h_sha1   = hashlib.sha1(raw).hexdigest()
-        h_hmac   = hmac.new(hmac_key, raw, hashlib.sha256).hexdigest()
-        print(f"  {CYA}Bundle: {bundle_path.name}{RST}")
-        print(f"    SHA-256 : {h_sha256}")
-        print(f"    MD5     : {h_md5}")
-        print(f"    SHA-1   : {h_sha1}")
-        print(f"    HMAC    : {h_hmac}")
+    # ── Bundle sealing — 4 hashes forenses ───────────────────────────────────
+    if _HAS_BUNDLE_BUILDER:
+        try:
+            _sealed = _build_bundle(case, result)
+            _display_4_hashes(_sealed)
+        except Exception as _bundle_exc:
+            print(f"\n  {YEL}[BUNDLE] Sealing falló: {_bundle_exc}{RST}")
+    else:
+        print(f"\n  {YEL}[BUNDLE] bundle_builder no disponible — corriendo en modo standalone{RST}")
 
     print(f"\n{'=' * 62}\n")
 

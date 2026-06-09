@@ -349,3 +349,128 @@ class BundleBuilder:
             return hashlib.sha256(combined).hexdigest()
         except Exception:
             return ""
+
+
+# ---------------------------------------------------------------------------
+# build_bundle — convenience wrapper para demo runner y test suite
+#
+# Construye un ForensicBundle desde el resultado de _vigia_score() y lo sella
+# con BundleBuilder.seal(). Sin dependencia de VigiaPipeline.
+#
+# Mapeo forense → EBS DecisionVerdict:
+#   MALICE    → REJECT
+#   SUSPICION → ABSTAIN
+#   NOISE     → ACCEPT
+#   UNKNOWN   → ABSTAIN
+#
+# El veredicto forense original se preserva en caie_analysis.verdict.
+# ---------------------------------------------------------------------------
+
+def build_bundle(case: Dict[str, Any], scorer_result: Dict[str, Any]) -> Dict[str, Any]:
+    """
+    Sella un ForensicBundle desde el resultado directo de _vigia_score().
+
+    Permite a run_vigia_case.py mostrar los 4 hashes forenses sin pasar
+    por VigiaPipeline completo. Equivalente forense al sellado del agente.
+
+    Args:
+        case          : dict del caso VIGÍA (schema legacy o EBS v1)
+        scorer_result : dict retornado por _vigia_score(case)
+
+    Returns:
+        sealed_dict : bundle sellado listo para verify_ebs_v1.py y SIFT
+    """
+    from vigia.core.ebs_v1 import (
+        EvidenceEdge, EvidenceGraph,
+        DecisionTrace, SystemState,
+        ForensicBundle, AbductionTrace,
+        make_default_policy,
+    )
+
+    # ── EvidenceGraph desde effective_trusts ─────────────────────────────────
+    effective_trusts = scorer_result.get("effective_trusts") or []
+    nodes = [et["artifact_id"] for et in effective_trusts]
+    if not nodes:
+        nodes = [
+            a.get("id", a.get("artifact_id", f"artifact_{i}"))
+            for i, a in enumerate(case.get("artifacts", []))
+        ]
+    if not nodes:
+        nodes = ["no_artifacts"]
+
+    mean_trust = float(scorer_result.get("mean_effective_trust") or 0.5)
+    edges = []
+    for i in range(len(nodes) - 1):
+        et_i = effective_trusts[i] if i < len(effective_trusts) else {}
+        trust_i = float(et_i.get("effective_trust", mean_trust))
+        edges.append(EvidenceEdge(
+            source=nodes[i],
+            target=nodes[i + 1],
+            stability=trust_i,
+            weight_mean=trust_i,
+        ))
+
+    graph = EvidenceGraph(nodes=nodes, edges=edges)
+
+    # ── DecisionTrace: mapeo veredicto forense → EBS DecisionVerdict ─────────
+    _VERDICT_MAP = {
+        "MALICE":    "REJECT",
+        "SUSPICION": "ABSTAIN",
+        "NOISE":     "ACCEPT",
+        "UNKNOWN":   "ABSTAIN",
+    }
+    raw_verdict = scorer_result.get("verdict", "UNKNOWN")
+    decision_verdict = _VERDICT_MAP.get(raw_verdict, "ABSTAIN")
+    score      = float(scorer_result.get("score", 0.0) or 0.0)
+    confidence = float(scorer_result.get("confidence", 0.0) or 0.0)
+    confidence = min(1.0, max(0.0, confidence))
+
+    decision_trace = DecisionTrace(
+        decision=decision_verdict,
+        posterior=confidence,
+        risk=score,
+        reason_code=f"VIGIA_SCORER:{raw_verdict}",
+    )
+
+    # ── PolicySpec y SystemState ──────────────────────────────────────────────
+    policy = make_default_policy()
+    state  = SystemState(
+        drift_score=0.0,
+        graph_stability_global=mean_trust,
+    )
+
+    # ── AbductionTrace desde peirce_chain (opcional) ──────────────────────────
+    peirce = scorer_result.get("peirce_chain") or {}
+    abduction_trace = None
+    if peirce:
+        abduction_trace = AbductionTrace(
+            peirce_firstness=peirce.get("firstness", ""),
+            peirce_secondness=peirce.get("secondness", ""),
+            peirce_thirdness=peirce.get("thirdness", ""),
+            inference_mode="STANDALONE_SCORER",
+        )
+
+    # ── Construir bundle ──────────────────────────────────────────────────────
+    bundle = ForensicBundle(
+        evidence_graph=graph,
+        decision_trace=decision_trace,
+        policy_spec=policy,
+        system_state=state,
+        abduction_trace=abduction_trace,
+    )
+
+    # ── caie_analysis: veredicto forense completo para el bundle ──────────────
+    caie_payload: Dict[str, Any] = {
+        "verdict":               raw_verdict,
+        "composite_score":       score,
+        "confidence":            confidence,
+        "caie_fractures":        int(scorer_result.get("caie_fractures", 0) or 0),
+        "caie_fractures_source": scorer_result.get("caie_fractures_source", "standalone"),
+        "hard_temporal_gate":    bool(scorer_result.get("hard_temporal_gate", False)),
+        "peirce_chain":          peirce,
+        "quadripartite_state":   scorer_result.get("quadripartite_state") or {},
+        "reason":                scorer_result.get("reason", ""),
+        "case_id":               case.get("case_id", case.get("name", "UNKNOWN")),
+    }
+
+    return BundleBuilder.seal(bundle, caie_analysis=caie_payload)
