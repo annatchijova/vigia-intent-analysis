@@ -227,8 +227,8 @@
     </div>
     <div class="card" style="--ca:var(--accent)">
       <div class="ch"><span class="cl">Show 4-hash sealed bundle</span><button class="cp" onclick="cp(this)">copy</button></div>
-      <div class="cc"><span class="kw">PYTHONPATH</span>=<span class="pa">$(pwd)</span> python3 show_4_hashes.py <span class="pa">vigia_output/bundle_case_001_temporal.json</span></div>
-      <div class="cd">SHA-256 + MD5 + SHA-1 + HMAC — forensic bundle sealing demo. Run case first to generate bundle.</div>
+      <div class="cc"><span class="kw">PYTHONPATH</span>=<span class="pa">$(pwd)</span> python3 show_4_hashes.py <span class="pa">data/cases/VIGIA-REAL-001.json</span></div>
+      <div class="cd">H1 graph_hash · H2 bundle_hash · H3 HMAC chain · H4 EBS verify — takes a case JSON directly.</div>
     </div>
   </div>
 </div>
@@ -271,7 +271,7 @@
     <div class="card" style="--ca:var(--real)">
       <div class="ch"><span class="cl">Single REAL case</span><button class="cp" onclick="cp(this)">copy</button></div>
       <div class="cc">python tests/run_vigia_case.py <span class="pa">data/cases/VIGIA-REAL-001.json</span></div>
-      <div class="cd">REAL-001: Greg Schardt / Mr. Evil — war-driving credential theft. Expected: <strong>MALICE 93%</strong></div>
+      <div class="cd">REAL-001: Greg Schardt / Mr. Evil — war-driving credential theft. Expected: <strong>MALICE 93%</strong><br>Replace <code>001</code> with any case number — always 3 digits: 001, 002, ..., 010</div>
     </div>
   </div>
   <table>
