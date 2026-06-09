@@ -1,25 +1,25 @@
 # vigia/verdict/quadripartite.py
 """
-Sistema de Veredicto Cuatripartito
+Quadripartite Verdict System
 =====================================
-Reemplaza el sistema binario MALICE/BENIGN/ABSTAIN con
-un sistema de 8 estados que captura confianza y causa.
+Replaces the binary MALICE/BENIGN/ABSTAIN system with
+an 8-state system that captures confidence and causation.
 
-Por qué importa:
-- Un sistema que raramente dice "no sé" está sobreconfiado
-- Un MALICE con 51% de confianza NO es lo mismo que uno con 95%
-- Para Daubert, la distinción es crítica
-- Para el analista SANS, la acción a tomar depende del nivel
+Why it matters:
+- A system that rarely says "I don't know" is overconfident
+- A MALICE at 51% confidence is NOT the same as one at 95%
+- For Daubert, the distinction is critical
+- For the SANS analyst, the action to take depends on the level
 
-Los 8 estados:
-  MALICE_HIGH      → Presentable en tribunal, acción inmediata
-  MALICE_MEDIUM    → Requiere corroboración antes de acción
-  BENIGN_HIGH      → Cerrar el caso
-  BENIGN_MEDIUM    → Monitorear, no cerrar
-  ABSTAIN_CONTRADICTION → PeircePlanner osciló — evidencia contradictoria
-  ABSTAIN_INSUFFICIENT  → Señales insuficientes — más evidencia requerida
-  ABSTAIN_DEGRADED      → Sistema en modo degradado — no confiable
-  ESCALATE         → Especialista dijo MALICE cuando mayoría dijo BENIGN
+The 8 states:
+  MALICE_HIGH      → Presentable in court, immediate action
+  MALICE_MEDIUM    → Requires corroboration before action
+  BENIGN_HIGH      → Close the case
+  BENIGN_MEDIUM    → Monitor, do not close
+  ABSTAIN_CONTRADICTION → PeircePlanner oscillated — contradictory evidence
+  ABSTAIN_INSUFFICIENT  → Insufficient signals — more evidence required
+  ABSTAIN_DEGRADED      → System in degraded mode — unreliable
+  ESCALATE         → Specialist said MALICE when majority said BENIGN
 """
 
 from __future__ import annotations
@@ -33,18 +33,18 @@ from typing import Optional
 
 
 # ---------------------------------------------------------------------------
-# Los 8 estados del veredicto
+# The 8 verdict states
 # ---------------------------------------------------------------------------
 
 class VerdictState(Enum):
     """
-    Sistema cuatripartito expandido a 8 estados.
+    Quadripartite system expanded to 8 states.
 
-    Nomenclatura:
-    - _HIGH:   Confianza > 80%  — acción directa
-    - _MEDIUM: Confianza 60-80% — requiere corroboración
-    - ABSTAIN_*: Razón específica de abstención
-    - ESCALATE: Requiere revisión humana inmediata
+    Naming:
+    - _HIGH:   Confidence > 80%  — direct action
+    - _MEDIUM: Confidence 60-80% — requires corroboration
+    - ABSTAIN_*: Specific abstention reason
+    - ESCALATE: Requires immediate human review
     """
     MALICE_HIGH              = "MALICE_HIGH"
     MALICE_MEDIUM            = "MALICE_MEDIUM"
@@ -57,7 +57,7 @@ class VerdictState(Enum):
 
 
 class ActionRequired(Enum):
-    """Acción que el analista SANS debe tomar."""
+    """Action the SANS analyst must take."""
     IMMEDIATE_CONTAINMENT    = "IMMEDIATE_CONTAINMENT"
     CORROBORATE_THEN_ACT     = "CORROBORATE_THEN_ACT"
     CLOSE_CASE               = "CLOSE_CASE"
@@ -68,109 +68,109 @@ class ActionRequired(Enum):
 
 
 # ---------------------------------------------------------------------------
-# Configuración de cada estado
+# Configuration for each state
 # ---------------------------------------------------------------------------
 
 @dataclass(frozen=True)
 class VerdictStateConfig:
-    """Configuración y semántica de cada estado del veredicto."""
+    """Configuration and semantics for each verdict state."""
     state:            VerdictState
     display_label:    str
     action:           ActionRequired
-    color_code:       str      # Para el reporte visual
-    daubert_note:     str      # Nota específica para admisibilidad
-    confidence_range: str      # Rango de confianza esperado
+    color_code:       str      # For the visual report
+    daubert_note:     str      # Admissibility-specific note
+    confidence_range: str      # Expected confidence range
 
 
 VERDICT_STATE_CONFIGS: dict[VerdictState, VerdictStateConfig] = {
     VerdictState.MALICE_HIGH: VerdictStateConfig(
         state=VerdictState.MALICE_HIGH,
-        display_label="🔴 MALICE — ALTA CONFIANZA",
+        display_label="🔴 MALICE — HIGH CONFIDENCE",
         action=ActionRequired.IMMEDIATE_CONTAINMENT,
         color_code="#FF0000",
         daubert_note=(
-            "Veredicto con confianza >80%. Trazabilidad completa disponible. "
-            "Hipótesis alternativas evaluadas y descartadas con razón documentada."
+            "Verdict with >80% confidence. Full traceability available. "
+            "Alternative hypotheses evaluated and discarded with documented reasoning."
         ),
         confidence_range=">80%",
     ),
     VerdictState.MALICE_MEDIUM: VerdictStateConfig(
         state=VerdictState.MALICE_MEDIUM,
-        display_label="🟠 MALICE — CONFIANZA MEDIA",
+        display_label="🟠 MALICE — MEDIUM CONFIDENCE",
         action=ActionRequired.CORROBORATE_THEN_ACT,
         color_code="#FF8C00",
         daubert_note=(
-            "Veredicto con confianza 60-80%. Señales pivot identificadas. "
-            "Requiere evidencia adicional antes de uso en tribunal."
+            "Verdict with 60-80% confidence. Pivot signals identified. "
+            "Requires additional evidence before court submission."
         ),
         confidence_range="60-80%",
     ),
     VerdictState.BENIGN_HIGH: VerdictStateConfig(
         state=VerdictState.BENIGN_HIGH,
-        display_label="🟢 BENIGN — ALTA CONFIANZA",
+        display_label="🟢 BENIGN — HIGH CONFIDENCE",
         action=ActionRequired.CLOSE_CASE,
         color_code="#008000",
         daubert_note=(
-            "Evidencia de malicia descartada con >80% de confianza. "
-            "Penalización adversarial aplicada — hipótesis benigna no es "
-            "artificialmente simple."
+            "Malice evidence discarded with >80% confidence. "
+            "Adversarial penalty applied — benign hypothesis is not "
+            "artificially simple."
         ),
         confidence_range=">80%",
     ),
     VerdictState.BENIGN_MEDIUM: VerdictStateConfig(
         state=VerdictState.BENIGN_MEDIUM,
-        display_label="🟡 BENIGN — CONFIANZA MEDIA",
+        display_label="🟡 BENIGN — MEDIUM CONFIDENCE",
         action=ActionRequired.MONITOR_30_DAYS,
         color_code="#FFD700",
         daubert_note=(
-            "Hipótesis benigna lidera pero con margen reducido. "
-            "Roadmap de investigación disponible para señales pivot."
+            "Benign hypothesis leads but with reduced margin. "
+            "Investigation roadmap available for pivot signals."
         ),
         confidence_range="60-80%",
     ),
     VerdictState.ABSTAIN_CONTRADICTION: VerdictStateConfig(
         state=VerdictState.ABSTAIN_CONTRADICTION,
-        display_label="⚫ ABSTAIN — EVIDENCIA CONTRADICTORIA",
+        display_label="⚫ ABSTAIN — CONTRADICTORY EVIDENCE",
         action=ActionRequired.GATHER_MORE_EVIDENCE,
         color_code="#808080",
         daubert_note=(
-            "El ciclo abductivo detectó oscilación A→B→A entre hipótesis. "
-            "La evidencia disponible es insuficiente para resolver la contradicción. "
-            "Estado epistemológicamente honesto — no es fallo del sistema."
+            "The abductive cycle detected A→B→A oscillation between hypotheses. "
+            "Available evidence is insufficient to resolve the contradiction. "
+            "Epistemologically honest state — not a system failure."
         ),
         confidence_range="N/A",
     ),
     VerdictState.ABSTAIN_INSUFFICIENT: VerdictStateConfig(
         state=VerdictState.ABSTAIN_INSUFFICIENT,
-        display_label="⚫ ABSTAIN — EVIDENCIA INSUFICIENTE",
+        display_label="⚫ ABSTAIN — INSUFFICIENT EVIDENCE",
         action=ActionRequired.GATHER_MORE_EVIDENCE,
         color_code="#A9A9A9",
         daubert_note=(
-            "Señales activas insuficientes para discriminar entre hipótesis. "
-            "Señales pivot identificadas — recolectar y reingresar al sistema."
+            "Insufficient active signals to discriminate between hypotheses. "
+            "Pivot signals identified — collect and re-enter into the system."
         ),
         confidence_range="<60%",
     ),
     VerdictState.ABSTAIN_DEGRADED: VerdictStateConfig(
         state=VerdictState.ABSTAIN_DEGRADED,
-        display_label="🟤 ABSTAIN — SISTEMA DEGRADADO",
+        display_label="🟤 ABSTAIN — DEGRADED SYSTEM",
         action=ActionRequired.RERUN_FULL_CAPABILITIES,
         color_code="#8B4513",
         daubert_note=(
-            "Módulos críticos estaban desactivados durante el análisis. "
-            "Veredicto no confiable. Reejecutar con sistema en FULL_INTEGRITY."
+            "Critical modules were disabled during analysis. "
+            "Verdict is unreliable. Re-run with system in FULL_INTEGRITY mode."
         ),
         confidence_range="N/A",
     ),
     VerdictState.ESCALATE: VerdictStateConfig(
         state=VerdictState.ESCALATE,
-        display_label="🚨 ESCALATE — REVISIÓN HUMANA REQUERIDA",
+        display_label="🚨 ESCALATE — HUMAN REVIEW REQUIRED",
         action=ActionRequired.HUMAN_REVIEW_REQUIRED,
         color_code="#800080",
         daubert_note=(
-            "Módulo especialista disintió de la mayoría con alta confianza. "
-            "El disenso es de módulo 'hard-to-evade' — difícil de evadir "
-            "por un adversario. Requiere revisión de analista senior."
+            "Specialist module dissented from the majority with high confidence. "
+            "Dissent is from a 'hard-to-evade' module — difficult for an adversary "
+            "to bypass. Requires senior analyst review."
         ),
         confidence_range="Variable",
     ),
@@ -178,22 +178,22 @@ VERDICT_STATE_CONFIGS: dict[VerdictState, VerdictStateConfig] = {
 
 
 # ---------------------------------------------------------------------------
-# Modelos del veredicto
+# Verdict models
 # ---------------------------------------------------------------------------
 
 @dataclass(frozen=True)
 class QuadripartiteVerdict:
     """
-    Veredicto cuatripartito completo.
-    Inmutable — el veredicto es un hecho forense.
+    Complete quadripartite verdict.
+    Immutable — the verdict is a forensic fact.
     """
     state:               VerdictState
     config:              VerdictStateConfig
-    raw_verdict:         str          # "MALICE" o "BENIGN" pre-clasificación
-    confidence:          Fraction     # Confianza del veredicto
-    stability:           Fraction     # Estabilidad del veredicto (del HLT)
-    adversarial_penalty: bool         # Si se aplicó penalización Ockham
-    dissent_present:     bool         # Si hubo disenso de especialista
+    raw_verdict:         str          # "MALICE" or "BENIGN" pre-classification
+    confidence:          Fraction     # Verdict confidence
+    stability:           Fraction     # Verdict stability (from HLT)
+    adversarial_penalty: bool         # Whether Ockham penalty was applied
+    dissent_present:     bool         # Whether specialist dissent occurred
     dissent_module:      Optional[str]
     integrity_level:     str          # "FULL_INTEGRITY", "DEGRADED", etc.
     abstain_reason:      Optional[str]
@@ -203,26 +203,26 @@ class QuadripartiteVerdict:
 
 
 # ---------------------------------------------------------------------------
-# Clasificador principal
+# Main classifier
 # ---------------------------------------------------------------------------
 
 class QuadripartiteClassifier:
     """
-    Clasifica el output del pipeline en uno de los 8 estados.
+    Classifies pipeline output into one of the 8 states.
 
-    Recibe:
+    Receives:
     - raw_verdict: "MALICE" | "BENIGN" | "ABSTAIN"
-    - confidence: Fraction del motor de decisión
-    - stability: Fraction del HLT
-    - integrity_level: str del ConfigAuditMonitor
-    - dissent_info: dict del DisssentReport
-    - abstain_reason: str si raw_verdict == "ABSTAIN"
+    - confidence: Fraction from the decision engine
+    - stability: Fraction from the HLT
+    - integrity_level: str from ConfigAuditMonitor
+    - dissent_info: dict from DisssentReport
+    - abstain_reason: str if raw_verdict == "ABSTAIN"
 
-    Emite:
-    - QuadripartiteVerdict con estado, acción y metadata completa
+    Emits:
+    - QuadripartiteVerdict with state, action, and complete metadata
     """
 
-    # Umbrales de confianza como Fraction
+    # Confidence thresholds as Fraction
     HIGH_CONFIDENCE_THRESHOLD:   Fraction = Fraction(4, 5)    # 80%
     MEDIUM_CONFIDENCE_THRESHOLD: Fraction = Fraction(3, 5)    # 60%
 
@@ -239,21 +239,21 @@ class QuadripartiteClassifier:
         adversarial_penalty: bool = False,
     ) -> QuadripartiteVerdict:
         """
-        Clasifica el veredicto en uno de los 8 estados.
+        Classifies the verdict into one of the 8 states.
 
-        La clasificación es determinista — mismo input, mismo output.
-        El orden de los checks importa:
-        1. Integridad del sistema primero (DEGRADED)
-        2. Disenso de especialista (ESCALATE)
-        3. ABSTAIN con razón
-        4. MALICE/BENIGN por nivel de confianza
+        Classification is deterministic — same input, same output.
+        The order of checks matters:
+        1. System integrity first (DEGRADED)
+        2. Specialist dissent (ESCALATE)
+        3. ABSTAIN with reason
+        4. MALICE/BENIGN by confidence level
         """
         pivot_signals          = tuple(pivot_signals or [])
         investigation_roadmap  = tuple(investigation_roadmap or [])
         dissent_info           = dissent_info or {}
 
         # ------------------------------------------------------------------
-        # Check 1: Sistema degradado → siempre ABSTAIN_DEGRADED
+        # Check 1: Degraded system → always ABSTAIN_DEGRADED
         # ------------------------------------------------------------------
         if integrity_level in ("INTEGRITY_COMPROMISED", "DEGRADED_MODE"):
             state = VerdictState.ABSTAIN_DEGRADED
@@ -266,15 +266,15 @@ class QuadripartiteClassifier:
                 dissent_info=dissent_info,
                 integrity_level=integrity_level,
                 abstain_reason=(
-                    f"Sistema en {integrity_level}. "
-                    f"Veredicto no confiable sin capacidades completas."
+                    f"System in {integrity_level}. "
+                    f"Verdict unreliable without full capabilities."
                 ),
                 pivot_signals=pivot_signals,
                 roadmap=investigation_roadmap,
             )
 
         # ------------------------------------------------------------------
-        # Check 2: Disenso de especialista → ESCALATE
+        # Check 2: Specialist dissent → ESCALATE
         # ------------------------------------------------------------------
         if dissent_info.get("escalation_required", False):
             state = VerdictState.ESCALATE
@@ -292,7 +292,7 @@ class QuadripartiteClassifier:
             )
 
         # ------------------------------------------------------------------
-        # Check 3: ABSTAIN con razón específica
+        # Check 3: ABSTAIN with specific reason
         # ------------------------------------------------------------------
         if raw_verdict == "ABSTAIN":
             if abstain_reason and "OSCIL" in abstain_reason.upper():
@@ -316,7 +316,7 @@ class QuadripartiteClassifier:
             )
 
         # ------------------------------------------------------------------
-        # Check 4: Confianza muy baja → ABSTAIN_INSUFFICIENT
+        # Check 4: Very low confidence → ABSTAIN_INSUFFICIENT
         # ------------------------------------------------------------------
         if confidence < self.MEDIUM_CONFIDENCE_THRESHOLD:
             return self._build_verdict(
@@ -328,18 +328,18 @@ class QuadripartiteClassifier:
                 dissent_info=dissent_info,
                 integrity_level=integrity_level,
                 abstain_reason=(
-                    f"Confianza {int(confidence * 100)}% menor al umbral "
-                    f"mínimo de {int(self.MEDIUM_CONFIDENCE_THRESHOLD * 100)}%."
+                    f"Confidence {int(confidence * 100)}% below minimum "
+                    f"threshold of {int(self.MEDIUM_CONFIDENCE_THRESHOLD * 100)}%."
                 ),
                 pivot_signals=pivot_signals,
                 roadmap=investigation_roadmap,
             )
 
         # ------------------------------------------------------------------
-        # Check 5: MALICE por nivel de confianza
+        # Check 5: MALICE by confidence level
         # ------------------------------------------------------------------
         if raw_verdict == "MALICE":
-            # Penalizar si la estabilidad es baja — el margen es pequeño
+            # Penalize if stability is low — margin is small
             effective_confidence = self._adjust_for_stability(
                 confidence, stability
             )
@@ -363,15 +363,15 @@ class QuadripartiteClassifier:
             )
 
         # ------------------------------------------------------------------
-        # Check 6: BENIGN por nivel de confianza
+        # Check 6: BENIGN by confidence level
         # ------------------------------------------------------------------
         if raw_verdict == "BENIGN":
             effective_confidence = self._adjust_for_stability(
                 confidence, stability
             )
 
-            # BENIGN con penalización adversarial activa es más confiable —
-            # el sistema verificó que la simplicidad no es artificial
+            # BENIGN with active adversarial penalty is more reliable —
+            # the system verified that simplicity is not artificial
             if adversarial_penalty:
                 effective_confidence = min(
                     Fraction(1),
@@ -396,7 +396,7 @@ class QuadripartiteClassifier:
                 roadmap=investigation_roadmap,
             )
 
-        # Fallback — nunca debería llegar aquí
+        # Fallback — should never reach here
         return self._build_verdict(
             state=VerdictState.ABSTAIN_INSUFFICIENT,
             raw_verdict=raw_verdict,
@@ -405,7 +405,7 @@ class QuadripartiteClassifier:
             adversarial_penalty=adversarial_penalty,
             dissent_info=dissent_info,
             integrity_level=integrity_level,
-            abstain_reason=f"Veredicto raw no reconocido: '{raw_verdict}'",
+            abstain_reason=f"Unrecognized raw verdict: '{raw_verdict}'",
             pivot_signals=pivot_signals,
             roadmap=investigation_roadmap,
         )
@@ -414,13 +414,13 @@ class QuadripartiteClassifier:
         self, confidence: Fraction, stability: Fraction
     ) -> Fraction:
         """
-        Ajusta la confianza por la estabilidad del veredicto.
+        Adjusts confidence by verdict stability.
 
-        Un veredicto ganado por margen pequeño tiene confianza efectiva
-        menor que uno ganado por margen amplio.
+        A verdict won by a small margin has lower effective confidence
+        than one won by a wide margin.
 
         effective = confidence × (0.5 + stability × 0.5)
-        Todo en Fraction.
+        All in Fraction.
         """
         stability_factor = Fraction(1, 2) + stability * Fraction(1, 2)
         return confidence * stability_factor
@@ -474,8 +474,8 @@ class QuadripartiteClassifier:
 
     def render_for_report(self, verdict: QuadripartiteVerdict) -> dict:
         """
-        Renderiza el veredicto para el reporte forense.
-        Formato estructurado — consumible por OpenWebUI y exporters.
+        Renders the verdict for the forensic report.
+        Structured format — consumable by OpenWebUI and exporters.
         """
         conf_pct      = int(verdict.confidence * 100)
         stability_pct = int(verdict.stability * 100)
@@ -499,53 +499,53 @@ class QuadripartiteClassifier:
         }
 
     def _build_analyst_summary(self, verdict: QuadripartiteVerdict) -> str:
-        """Resumen ejecutivo en lenguaje natural para el analista SANS."""
+        """Executive summary in natural language for the SANS analyst."""
         conf_pct = int(verdict.confidence * 100)
 
         summaries = {
             VerdictState.MALICE_HIGH: (
-                f"VIGÍA determina con {conf_pct}% de confianza que esta "
-                f"evidencia indica actividad maliciosa. "
-                f"{'Penalización adversarial aplicada — la hipótesis benigna fue evaluada y descartada.' if verdict.adversarial_penalty else ''} "
-                f"Acción recomendada: contención inmediata."
+                f"VIGÍA determines with {conf_pct}% confidence that this "
+                f"evidence indicates malicious activity. "
+                f"{'Adversarial penalty applied — the benign hypothesis was evaluated and discarded.' if verdict.adversarial_penalty else ''} "
+                f"Recommended action: immediate containment."
             ),
             VerdictState.MALICE_MEDIUM: (
-                f"Indicadores de malicia con {conf_pct}% de confianza. "
-                f"Margen sobre hipótesis alternativa es reducido. "
-                f"Buscar señales pivot antes de acción: "
-                f"{', '.join(verdict.pivot_signals[:2]) if verdict.pivot_signals else 'ver roadmap'}."
+                f"Malice indicators with {conf_pct}% confidence. "
+                f"Margin over alternative hypothesis is narrow. "
+                f"Seek pivot signals before action: "
+                f"{', '.join(verdict.pivot_signals[:2]) if verdict.pivot_signals else 'see roadmap'}."
             ),
             VerdictState.BENIGN_HIGH: (
-                f"Actividad benigna con {conf_pct}% de confianza. "
-                f"{'Penalización adversarial evaluada — la explicación benigna no es artificialmente simple.' if verdict.adversarial_penalty else ''} "
-                f"Caso puede cerrarse."
+                f"Benign activity with {conf_pct}% confidence. "
+                f"{'Adversarial penalty evaluated — the benign explanation is not artificially simple.' if verdict.adversarial_penalty else ''} "
+                f"Case may be closed."
             ),
             VerdictState.BENIGN_MEDIUM: (
-                f"Actividad probablemente benigna ({conf_pct}%) pero con "
-                f"hipótesis alternativas dentro del margen. "
-                f"Monitorear 30 días. Señales pivot: "
-                f"{', '.join(verdict.pivot_signals[:2]) if verdict.pivot_signals else 'ver roadmap'}."
+                f"Probably benign activity ({conf_pct}%) but with "
+                f"alternative hypotheses within margin. "
+                f"Monitor for 30 days. Pivot signals: "
+                f"{', '.join(verdict.pivot_signals[:2]) if verdict.pivot_signals else 'see roadmap'}."
             ),
             VerdictState.ABSTAIN_CONTRADICTION: (
-                "El sistema detectó evidencia contradictoria — hipótesis A y B "
-                "son igualmente válidas con la evidencia disponible. "
-                "Recolectar evidencia adicional. Este es el comportamiento correcto "
-                "ante ambigüedad forense real."
+                "The system detected contradictory evidence — hypotheses A and B "
+                "are equally valid with the available evidence. "
+                "Collect additional evidence. This is the correct behavior "
+                "in the face of genuine forensic ambiguity."
             ),
             VerdictState.ABSTAIN_INSUFFICIENT: (
-                f"Señales insuficientes para veredicto confiable (confianza: {conf_pct}%). "
-                f"Ver roadmap de investigación para señales específicas a buscar."
+                f"Insufficient signals for a reliable verdict (confidence: {conf_pct}%). "
+                f"See investigation roadmap for specific signals to pursue."
             ),
             VerdictState.ABSTAIN_DEGRADED: (
-                f"⚠️ ANÁLISIS NO CONFIABLE: Sistema operó en {verdict.integrity_level}. "
-                f"Reejecutar con todos los módulos activos."
+                f"⚠️ UNRELIABLE ANALYSIS: System operated in {verdict.integrity_level}. "
+                f"Re-run with all modules active."
             ),
             VerdictState.ESCALATE: (
-                f"⚠️ ESCALACIÓN REQUERIDA: El módulo especialista "
-                f"'{verdict.dissent_module}' disiente de la mayoría. "
-                f"Este módulo es difícil de evadir por adversarios. "
-                f"Revisión de analista senior requerida."
+                f"⚠️ ESCALATION REQUIRED: Specialist module "
+                f"'{verdict.dissent_module}' dissents from the majority. "
+                f"This module is difficult for adversaries to evade. "
+                f"Senior analyst review required."
             ),
         }
 
-        return summaries.get(verdict.state, "Veredicto generado. Ver detalles.")
+        return summaries.get(verdict.state, "Verdict generated. See details.")

@@ -14,8 +14,11 @@ SANS FIND EVIL Hackathon 2026
 from __future__ import annotations
 
 import argparse
+import hashlib
+import hmac
 import json
 import math
+import os
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
@@ -126,6 +129,24 @@ def run_case(case_path: str) -> None:
     for et in result["effective_trusts"]:
         bar = "█" * int(et["effective_trust"] * 20)
         print(f"    {et['artifact_id'][:30]:30s} {bar:<20s} {et['effective_trust']:.4f}")
+
+    # ------------------------------------------------------------------
+    # Bundle integrity hashes
+    # ------------------------------------------------------------------
+    case_id = case.get("case_id", "")
+    bundle_path = Path(__file__).parent.parent / "vigia_output" / f"bundle_{case_id}.json"
+    if bundle_path.exists():
+        raw = bundle_path.read_bytes()
+        hmac_key = os.environ.get("VIGIA_HMAC_KEY", "vigia-integrity-key").encode()
+        h_sha256 = hashlib.sha256(raw).hexdigest()
+        h_md5    = hashlib.md5(raw).hexdigest()
+        h_sha1   = hashlib.sha1(raw).hexdigest()
+        h_hmac   = hmac.new(hmac_key, raw, hashlib.sha256).hexdigest()
+        print(f"  {CYA}Bundle: {bundle_path.name}{RST}")
+        print(f"    SHA-256 : {h_sha256}")
+        print(f"    MD5     : {h_md5}")
+        print(f"    SHA-1   : {h_sha1}")
+        print(f"    HMAC    : {h_hmac}")
 
     print(f"\n{'=' * 62}\n")
 
