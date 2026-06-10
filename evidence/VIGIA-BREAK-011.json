@@ -1,0 +1,432 @@
+{
+  "case_id": "VIGIA-BREAK-011",
+  "case_name": "Death by Abstain",
+  "description": "20 weak evidence items, none crossing the formal threshold individually, all pointing to the same target. A human expert concludes SUSPICION. VIGÍA might get trapped in ABSTAIN because no individual piece reaches the confidence threshold.",
+  "abstention_risk": "high",
+  "expected_verdict": "SUSPICION",
+  "carnegie_pattern_expected": null,
+  "confidence_expected": 65,
+  "artifacts": [
+    {
+      "artifact_id": "b011_01",
+      "evidence_type": "log_entry",
+      "source_tool": "sift_firewall",
+      "timestamp": "2026-06-15T00:30:00Z",
+      "raw_score": 0.15,
+      "prior_trust": 0.2,
+      "provenance_chain": [
+        "sha256:b011fw01"
+      ],
+      "description": "SYN packet to port 443 from IP 185.220.101.1",
+      "metadata": {
+        "source_ip": "185.220.101.1",
+        "port": 443,
+        "action": "SYN",
+        "bytes": 0
+      }
+    },
+    {
+      "artifact_id": "b011_02",
+      "evidence_type": "log_entry",
+      "source_tool": "sift_firewall",
+      "timestamp": "2026-06-15T01:00:00Z",
+      "raw_score": 0.15,
+      "prior_trust": 0.2,
+      "provenance_chain": [
+        "sha256:b011fw02"
+      ],
+      "description": "SYN packet to port 443 from IP 185.220.101.2",
+      "metadata": {
+        "source_ip": "185.220.101.2",
+        "port": 443,
+        "action": "SYN",
+        "bytes": 0
+      }
+    },
+    {
+      "artifact_id": "b011_03",
+      "evidence_type": "log_entry",
+      "source_tool": "sift_firewall",
+      "timestamp": "2026-06-15T01:30:00Z",
+      "raw_score": 0.15,
+      "prior_trust": 0.2,
+      "provenance_chain": [
+        "sha256:b011fw03"
+      ],
+      "description": "SYN packet to port 443 from IP 185.220.101.3",
+      "metadata": {
+        "source_ip": "185.220.101.3",
+        "port": 443,
+        "action": "SYN",
+        "bytes": 0
+      }
+    },
+    {
+      "artifact_id": "b011_04",
+      "evidence_type": "log_entry",
+      "source_tool": "sift_firewall",
+      "timestamp": "2026-06-15T02:00:00Z",
+      "raw_score": 0.15,
+      "prior_trust": 0.2,
+      "provenance_chain": [
+        "sha256:b011fw04"
+      ],
+      "description": "SYN packet to port 443 from IP 185.220.101.4",
+      "metadata": {
+        "source_ip": "185.220.101.4",
+        "port": 443,
+        "action": "SYN",
+        "bytes": 0
+      }
+    },
+    {
+      "artifact_id": "b011_05",
+      "evidence_type": "log_entry",
+      "source_tool": "sift_firewall",
+      "timestamp": "2026-06-15T02:30:00Z",
+      "raw_score": 0.15,
+      "prior_trust": 0.2,
+      "provenance_chain": [
+        "sha256:b011fw05"
+      ],
+      "description": "SYN packet to port 443 from IP 185.220.101.5",
+      "metadata": {
+        "source_ip": "185.220.101.5",
+        "port": 443,
+        "action": "SYN",
+        "bytes": 0
+      }
+    },
+    {
+      "artifact_id": "b011_06",
+      "evidence_type": "log_entry",
+      "source_tool": "sift_firewall",
+      "timestamp": "2026-06-15T03:00:00Z",
+      "raw_score": 0.15,
+      "prior_trust": 0.2,
+      "provenance_chain": [
+        "sha256:b011fw06"
+      ],
+      "description": "SYN packet to port 443 from IP 185.220.101.6",
+      "metadata": {
+        "source_ip": "185.220.101.6",
+        "port": 443,
+        "action": "SYN",
+        "bytes": 0
+      }
+    },
+    {
+      "artifact_id": "b011_07",
+      "evidence_type": "log_entry",
+      "source_tool": "sift_firewall",
+      "timestamp": "2026-06-15T03:30:00Z",
+      "raw_score": 0.15,
+      "prior_trust": 0.2,
+      "provenance_chain": [
+        "sha256:b011fw07"
+      ],
+      "description": "SYN packet to port 443 from IP 185.220.101.7",
+      "metadata": {
+        "source_ip": "185.220.101.7",
+        "port": 443,
+        "action": "SYN",
+        "bytes": 0
+      }
+    },
+    {
+      "artifact_id": "b011_08",
+      "evidence_type": "log_entry",
+      "source_tool": "sift_firewall",
+      "timestamp": "2026-06-15T04:00:00Z",
+      "raw_score": 0.15,
+      "prior_trust": 0.2,
+      "provenance_chain": [
+        "sha256:b011fw08"
+      ],
+      "description": "SYN packet to port 443 from IP 185.220.101.8",
+      "metadata": {
+        "source_ip": "185.220.101.8",
+        "port": 443,
+        "action": "SYN",
+        "bytes": 0
+      }
+    },
+    {
+      "artifact_id": "b011_09",
+      "evidence_type": "log_entry",
+      "source_tool": "sift_firewall",
+      "timestamp": "2026-06-15T04:30:00Z",
+      "raw_score": 0.15,
+      "prior_trust": 0.2,
+      "provenance_chain": [
+        "sha256:b011fw09"
+      ],
+      "description": "SYN packet to port 443 from IP 185.220.101.9",
+      "metadata": {
+        "source_ip": "185.220.101.9",
+        "port": 443,
+        "action": "SYN",
+        "bytes": 0
+      }
+    },
+    {
+      "artifact_id": "b011_10",
+      "evidence_type": "log_entry",
+      "source_tool": "sift_firewall",
+      "timestamp": "2026-06-15T05:00:00Z",
+      "raw_score": 0.15,
+      "prior_trust": 0.2,
+      "provenance_chain": [
+        "sha256:b011fw10"
+      ],
+      "description": "SYN packet to port 443 from IP 185.220.101.10",
+      "metadata": {
+        "source_ip": "185.220.101.10",
+        "port": 443,
+        "action": "SYN",
+        "bytes": 0
+      }
+    },
+    {
+      "artifact_id": "b011_11",
+      "evidence_type": "log_entry",
+      "source_tool": "sift_firewall",
+      "timestamp": "2026-06-15T05:30:00Z",
+      "raw_score": 0.15,
+      "prior_trust": 0.2,
+      "provenance_chain": [
+        "sha256:b011fw11"
+      ],
+      "description": "SYN packet to port 443 from IP 185.220.101.11",
+      "metadata": {
+        "source_ip": "185.220.101.11",
+        "port": 443,
+        "action": "SYN",
+        "bytes": 0
+      }
+    },
+    {
+      "artifact_id": "b011_12",
+      "evidence_type": "log_entry",
+      "source_tool": "sift_firewall",
+      "timestamp": "2026-06-15T06:00:00Z",
+      "raw_score": 0.15,
+      "prior_trust": 0.2,
+      "provenance_chain": [
+        "sha256:b011fw12"
+      ],
+      "description": "SYN packet to port 443 from IP 185.220.101.12",
+      "metadata": {
+        "source_ip": "185.220.101.12",
+        "port": 443,
+        "action": "SYN",
+        "bytes": 0
+      }
+    },
+    {
+      "artifact_id": "b011_13",
+      "evidence_type": "log_entry",
+      "source_tool": "sift_firewall",
+      "timestamp": "2026-06-15T06:30:00Z",
+      "raw_score": 0.15,
+      "prior_trust": 0.2,
+      "provenance_chain": [
+        "sha256:b011fw13"
+      ],
+      "description": "SYN packet to port 443 from IP 185.220.101.13",
+      "metadata": {
+        "source_ip": "185.220.101.13",
+        "port": 443,
+        "action": "SYN",
+        "bytes": 0
+      }
+    },
+    {
+      "artifact_id": "b011_14",
+      "evidence_type": "log_entry",
+      "source_tool": "sift_firewall",
+      "timestamp": "2026-06-15T07:00:00Z",
+      "raw_score": 0.15,
+      "prior_trust": 0.2,
+      "provenance_chain": [
+        "sha256:b011fw14"
+      ],
+      "description": "SYN packet to port 443 from IP 185.220.101.14",
+      "metadata": {
+        "source_ip": "185.220.101.14",
+        "port": 443,
+        "action": "SYN",
+        "bytes": 0
+      }
+    },
+    {
+      "artifact_id": "b011_15",
+      "evidence_type": "log_entry",
+      "source_tool": "sift_firewall",
+      "timestamp": "2026-06-15T07:30:00Z",
+      "raw_score": 0.15,
+      "prior_trust": 0.2,
+      "provenance_chain": [
+        "sha256:b011fw15"
+      ],
+      "description": "SYN packet to port 443 from IP 185.220.101.15",
+      "metadata": {
+        "source_ip": "185.220.101.15",
+        "port": 443,
+        "action": "SYN",
+        "bytes": 0
+      }
+    },
+    {
+      "artifact_id": "b011_16",
+      "evidence_type": "log_entry",
+      "source_tool": "sift_firewall",
+      "timestamp": "2026-06-15T08:00:00Z",
+      "raw_score": 0.15,
+      "prior_trust": 0.2,
+      "provenance_chain": [
+        "sha256:b011fw16"
+      ],
+      "description": "SYN packet to port 443 from IP 185.220.101.16",
+      "metadata": {
+        "source_ip": "185.220.101.16",
+        "port": 443,
+        "action": "SYN",
+        "bytes": 0
+      }
+    },
+    {
+      "artifact_id": "b011_17",
+      "evidence_type": "log_entry",
+      "source_tool": "sift_firewall",
+      "timestamp": "2026-06-15T08:30:00Z",
+      "raw_score": 0.15,
+      "prior_trust": 0.2,
+      "provenance_chain": [
+        "sha256:b011fw17"
+      ],
+      "description": "SYN packet to port 443 from IP 185.220.101.17",
+      "metadata": {
+        "source_ip": "185.220.101.17",
+        "port": 443,
+        "action": "SYN",
+        "bytes": 0
+      }
+    },
+    {
+      "artifact_id": "b011_18",
+      "evidence_type": "log_entry",
+      "source_tool": "sift_firewall",
+      "timestamp": "2026-06-15T09:00:00Z",
+      "raw_score": 0.15,
+      "prior_trust": 0.2,
+      "provenance_chain": [
+        "sha256:b011fw18"
+      ],
+      "description": "SYN packet to port 443 from IP 185.220.101.18",
+      "metadata": {
+        "source_ip": "185.220.101.18",
+        "port": 443,
+        "action": "SYN",
+        "bytes": 0
+      }
+    },
+    {
+      "artifact_id": "b011_19",
+      "evidence_type": "log_entry",
+      "source_tool": "sift_firewall",
+      "timestamp": "2026-06-15T09:30:00Z",
+      "raw_score": 0.15,
+      "prior_trust": 0.2,
+      "provenance_chain": [
+        "sha256:b011fw19"
+      ],
+      "description": "SYN packet to port 443 from IP 185.220.101.19",
+      "metadata": {
+        "source_ip": "185.220.101.19",
+        "port": 443,
+        "action": "SYN",
+        "bytes": 0
+      }
+    },
+    {
+      "artifact_id": "b011_20",
+      "evidence_type": "log_entry",
+      "source_tool": "sift_firewall",
+      "timestamp": "2026-06-15T10:00:00Z",
+      "raw_score": 0.15,
+      "prior_trust": 0.2,
+      "provenance_chain": [
+        "sha256:b011fw20"
+      ],
+      "description": "SYN packet to port 443 from IP 185.220.101.20",
+      "metadata": {
+        "source_ip": "185.220.101.20",
+        "port": 443,
+        "action": "SYN",
+        "bytes": 0
+      }
+    },
+    {
+      "artifact_id": "b011_meta",
+      "evidence_type": "ip_geolocation",
+      "source_tool": "sift_zeek",
+      "timestamp": "2026-06-15T01:35:00Z",
+      "raw_score": 0.92,
+      "prior_trust": 0.25,
+      "provenance_chain": [
+        "sha256:b011meta21"
+      ],
+      "description": "All 20 IPs belong to the same bulletproof hosting ASN (AS14061, DigitalOcean). Timestamps are spaced exactly 300 seconds apart over 10 hours. No SYN resulted in a completed handshake.",
+      "metadata": {
+        "asn": "AS14061",
+        "asn_name": "DigitalOcean",
+        "interval_seconds": 300,
+        "interval_variance": 0.0,
+        "total_attempts": 20,
+        "successful_handshakes": 0,
+        "pattern": "reconnaissance_scan"
+      }
+    }
+  ],
+  "temporal_violations": [
+    {
+      "type": "PERFECT_REGULARITY",
+      "description": "Exact 300-second interval between all attempts, variance 0.0. Impossible for a human operator.",
+      "severity": 0.9,
+      "delta_seconds": 300,
+      "cause": {
+        "artifact_id": "b011_01"
+      },
+      "effect": {
+        "artifact_id": "b011_20"
+      }
+    }
+  ],
+  "caie_fractures": [
+    {
+      "fracture_type": "SYNTHETIC_PATTERN",
+      "severity": 0.95,
+      "interpretation": "20 individually weak pieces form a systematic pattern when analysed collectively. Machine-precision regularity betrays automation.",
+      "artifact_a": "b011_01",
+      "artifact_b": "b011_meta",
+      "ttp_id": "T1595.001"
+    }
+  ],
+  "peirce_expected": {
+    "firstness": "20 individual SYN packets, each with low raw_score and prior_trust",
+    "secondness": "Exact 300-second interval, same bulletproof ASN, 0 completed handshakes. No individual piece is conclusive but the aggregate pattern is coordinated reconnaissance",
+    "thirdness": "Attacker habit of distributing reconnaissance across many small IPs to evade per-threshold detection. The sum of weak evidence exceeds the certainty threshold"
+  },
+  "devil_advocate": "Each individual SYN packet is explainable as routine internet noise — port scanners hit every IP on the internet constantly. No single event crosses any formal threshold.",
+  "source_dataset": "VIGÍA Synthetic Corpus — Epistemological Boundary Suite",
+  "source_origin": "synthetic_vigia_collective",
+  "notes": "Epistemological boundary test: can VIGÍA aggregate weak evidence pointing to the same target? ABSTAIN because no single item crosses threshold = failure of formal over-caution.",
+  "_consolidation": {
+    "consolidated_at": "2026-06-05T04:27:39.816083+00:00",
+    "parser_version": "2.4",
+    "schema_version": "1.1",
+    "source_file": "VIGIA_BREAK_011_016.json",
+    "source_origin": "synthetic_vigia_collective"
+  }
+}

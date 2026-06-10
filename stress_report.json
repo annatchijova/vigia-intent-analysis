@@ -1,0 +1,64 @@
+Running VIGIA Stress Tests...
+Target: Break the Assumptions (independence, observability, causality, sensor trust)
+
+{
+  "timestamp": "2026-06-09T14:22:29.017653",
+  "metrics": {
+    "false_confidence_inflation": {
+      "inflated_cases": [],
+      "count": 0
+    },
+    "benign_overtrust": {
+      "overtrust_cases": [],
+      "count": 0
+    },
+    "collapse_handling": {
+      "collapse_cases": [
+        {
+          "case_id": "STRESS_003_OBSERVABILITY_COLLAPSE",
+          "verdict": "INCONCLUSIVE",
+          "passed": true,
+          "failures": []
+        },
+        {
+          "case_id": "STRESS_010_PERFECT_STEALTH_COLLAPSE",
+          "verdict": null,
+          "passed": true,
+          "failures": []
+        }
+      ],
+      "passed": 2
+    },
+    "overall": {
+      "total": 3,
+      "passed": 3,
+      "failed": 0
+    }
+  },
+  "results": [
+    {
+      "case_id": "STRESS_001_SHARED_PIPELINE_DECEPTION",
+      "passed": true,
+      "failures": [],
+      "warnings": [],
+      "actual_verdict": "NOISE",
+      "actual_score": 0.1866
+    },
+    {
+      "case_id": "STRESS_003_OBSERVABILITY_COLLAPSE",
+      "passed": true,
+      "failures": [],
+      "warnings": [],
+      "actual_verdict": "INCONCLUSIVE",
+      "actual_score": 0.0069
+    },
+    {
+      "case_id": "STRESS_010_PERFECT_STEALTH_COLLAPSE",
+      "passed": true,
+      "failures": [],
+      "warnings": [],
+      "actual_verdict": null,
+      "actual_score": null
+    }
+  ]
+}

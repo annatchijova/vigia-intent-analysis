@@ -1,0 +1,89 @@
+{
+  "case_id": "VIGIA-AMB-001",
+  "case_name": "The Anonymous Informant",
+  "description": "Anonymous email alleges 'the finance manager is stealing data'. Manager denies. Logs show access to confidential files, but also show the manager had authorisation. No exfiltration detected. Could be: (1) real theft, (2) employee error, (3) false accusation by a third party.",
+  "abstention_risk": "high",
+  "expected_verdict": "ABSTAIN",
+  "carnegie_pattern_expected": null,
+  "confidence_expected": 50,
+  "artifacts": [
+    {
+      "artifact_id": "amb001_01",
+      "evidence_type": "log_entry",
+      "source_tool": "sift_mail_gateway",
+      "timestamp": "2026-06-15T09:00:00Z",
+      "raw_score": 0.05,
+      "prior_trust": 0.2,
+      "provenance_chain": [
+        "sha256:amb001mail01"
+      ],
+      "description": "Anonymous email: 'The finance manager is stealing data'",
+      "metadata": {
+        "source": "anonymous@protonmail.com",
+        "spf_pass": false,
+        "dkim_pass": false
+      }
+    },
+    {
+      "artifact_id": "amb001_02",
+      "evidence_type": "log_entry",
+      "source_tool": "sift_file_audit",
+      "timestamp": "2026-06-14T15:30:00Z",
+      "raw_score": 0.45,
+      "prior_trust": 0.6,
+      "provenance_chain": [
+        "sha256:amb001file02"
+      ],
+      "description": "Finance manager accessed confidential client files",
+      "metadata": {
+        "user": "finance_manager",
+        "files": 12,
+        "authorized": true,
+        "authorization_document": "AUTH-2026-001"
+      }
+    },
+    {
+      "artifact_id": "amb001_03",
+      "evidence_type": "ip_geolocation",
+      "source_tool": "sift_netflow",
+      "timestamp": "2026-06-14T15:30:00Z",
+      "raw_score": 0.05,
+      "prior_trust": 0.3,
+      "provenance_chain": [
+        "sha256:amb001net03"
+      ],
+      "description": "No exfiltration detected from finance manager workstation",
+      "metadata": {
+        "source_ip": "10.0.8.15",
+        "bytes_outbound": 0,
+        "external_connections": 0
+      }
+    }
+  ],
+  "temporal_violations": [],
+  "caie_fractures": [
+    {
+      "fracture_type": "INSUFFICIENT_EVIDENCE",
+      "severity": 0.7,
+      "interpretation": "Unverifiable anonymous accusation, authorised access, no exfiltration. Three equally plausible hypotheses.",
+      "artifact_a": "amb001_01",
+      "artifact_b": "amb001_02"
+    }
+  ],
+  "peirce_expected": {
+    "firstness": "Anonymous tip alleging data theft",
+    "secondness": "Access to confidential files but with documented authorisation. No exfiltration detected. No evidence of abuse",
+    "thirdness": "No detectable habit. The tip may be true, false, or a misunderstanding. Evidence is genuinely insufficient to conclude"
+  },
+  "devil_advocate": "An anonymous tip plus access to confidential files could indicate real theft that was well-concealed.",
+  "source_dataset": "VIGÍA Synthetic Corpus — Irreducible Ambiguity Suite",
+  "source_origin": "synthetic_vigia_collective",
+  "notes": "Calibration test: VIGÍA must resist artificial resolution of genuine ambiguity. Forcing MALICE or BENIGN here would be an epistemological error.",
+  "_consolidation": {
+    "consolidated_at": "2026-06-05T04:27:39.816083+00:00",
+    "parser_version": "2.4",
+    "schema_version": "1.1",
+    "source_file": "VIGIA_FP_FN_AMB.json",
+    "source_origin": "synthetic_vigia_collective"
+  }
+}

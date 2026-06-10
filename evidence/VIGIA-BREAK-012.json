@@ -1,0 +1,153 @@
+{
+  "case_id": "VIGIA-BREAK-012",
+  "case_name": "Consensus Trap",
+  "description": "Five 'independent' sources report the same event. Four are compromised. One is legitimate but in the minority. Majority wins in aggregative logic. VIGÍA must weight by channel reliability, not source count.",
+  "abstention_risk": "medium",
+  "expected_verdict": "BENIGN",
+  "carnegie_pattern_expected": null,
+  "confidence_expected": 80,
+  "artifacts": [
+    {
+      "artifact_id": "b012_01",
+      "evidence_type": "log_entry",
+      "source_tool": "sift_syslog",
+      "timestamp": "2026-06-15T03:00:00Z",
+      "raw_score": 0.82,
+      "prior_trust": 0.3,
+      "provenance_chain": [
+        "sha256:b012sys01"
+      ],
+      "description": "Server WEB-01: 'user jdoe executed rm -rf / at 03:00'",
+      "metadata": {
+        "server": "WEB-01",
+        "event": "rm -rf /",
+        "user": "jdoe",
+        "ssh_key": "compromised_key_A"
+      }
+    },
+    {
+      "artifact_id": "b012_02",
+      "evidence_type": "log_entry",
+      "source_tool": "sift_syslog",
+      "timestamp": "2026-06-15T03:00:00Z",
+      "raw_score": 0.82,
+      "prior_trust": 0.3,
+      "provenance_chain": [
+        "sha256:b012sys02"
+      ],
+      "description": "Server WEB-02: 'user jdoe executed rm -rf / at 03:00'",
+      "metadata": {
+        "server": "WEB-02",
+        "event": "rm -rf /",
+        "user": "jdoe",
+        "ssh_key": "compromised_key_A"
+      }
+    },
+    {
+      "artifact_id": "b012_03",
+      "evidence_type": "log_entry",
+      "source_tool": "sift_syslog",
+      "timestamp": "2026-06-15T03:00:00Z",
+      "raw_score": 0.82,
+      "prior_trust": 0.3,
+      "provenance_chain": [
+        "sha256:b012sys03"
+      ],
+      "description": "Server WEB-03: 'user jdoe executed rm -rf / at 03:00'",
+      "metadata": {
+        "server": "WEB-03",
+        "event": "rm -rf /",
+        "user": "jdoe",
+        "ssh_key": "compromised_key_A"
+      }
+    },
+    {
+      "artifact_id": "b012_04",
+      "evidence_type": "log_entry",
+      "source_tool": "sift_syslog",
+      "timestamp": "2026-06-15T03:00:00Z",
+      "raw_score": 0.82,
+      "prior_trust": 0.3,
+      "provenance_chain": [
+        "sha256:b012sys04"
+      ],
+      "description": "Server WEB-04: 'user jdoe executed rm -rf / at 03:00'",
+      "metadata": {
+        "server": "WEB-04",
+        "event": "rm -rf /",
+        "user": "jdoe",
+        "ssh_key": "compromised_key_A"
+      }
+    },
+    {
+      "artifact_id": "b012_05",
+      "evidence_type": "log_entry",
+      "source_tool": "sift_syslog",
+      "timestamp": "2026-06-15T03:05:00Z",
+      "raw_score": 0.05,
+      "prior_trust": 0.95,
+      "provenance_chain": [
+        "sha256:b012sys05"
+      ],
+      "description": "Server AIRGAPPED-01 (no network): 'user jdoe executed ls -la at 03:05'",
+      "metadata": {
+        "server": "AIRGAPPED-01",
+        "event": "ls -la",
+        "user": "jdoe",
+        "network_status": "disconnected",
+        "last_sync": "2026-06-10T00:00:00Z"
+      }
+    },
+    {
+      "artifact_id": "b012_meta",
+      "evidence_type": "memory_process",
+      "source_tool": "sift_crypto_audit",
+      "timestamp": "2026-06-15T03:00:00Z",
+      "raw_score": 0.92,
+      "prior_trust": 0.85,
+      "provenance_chain": [
+        "sha256:b012meta06"
+      ],
+      "description": "SSH key analysis: WEB-01 through WEB-04 share the same compromised SSH key (fingerprint: a1b2c3d4). AIRGAPPED-01 uses a different key (fingerprint: e5f6g7h8).",
+      "metadata": {
+        "shared_key_servers": [
+          "WEB-01",
+          "WEB-02",
+          "WEB-03",
+          "WEB-04"
+        ],
+        "shared_key_fingerprint": "a1b2c3d4",
+        "isolated_server": "AIRGAPPED-01",
+        "isolated_key_fingerprint": "e5f6g7h8",
+        "key_compromise_evidence": "found_in_dark_web_leak_2026-05"
+      }
+    }
+  ],
+  "temporal_violations": [],
+  "caie_fractures": [
+    {
+      "fracture_type": "CONSENSUS_FALLACY",
+      "severity": 0.9,
+      "interpretation": "4/5 sources agree but share the same compromise vector (same SSH key). The minority (1/5) has higher reliability but lower count.",
+      "artifact_a": "b012_meta",
+      "artifact_b": "b012_05",
+      "ttp_id": "T1195"
+    }
+  ],
+  "peirce_expected": {
+    "firstness": "5 logs report jdoe activity. 4/5 agree on 'rm -rf /'. 1/5 says 'ls -la'",
+    "secondness": "The 4 that agree share a compromised SSH key. The 1 dissenter is air-gapped with a different key. The majority is compromised; the minority is trustworthy",
+    "thirdness": "Attacker habit of compromising multiple servers with the same key and fabricating consistent evidence. Channel reliability outweighs source count"
+  },
+  "devil_advocate": "Four out of five independent sources report the same event — majority consensus should prevail.",
+  "source_dataset": "VIGÍA Synthetic Corpus — Epistemological Boundary Suite",
+  "source_origin": "synthetic_vigia_collective",
+  "notes": "Epistemological boundary test: does VIGÍA vote by majority or weight by channel reliability? Voting 4/5 = MALICE is a false positive. The air-gapped source with prior_trust 0.95 must prevail over 4 compromised sources with prior_trust 0.30.",
+  "_consolidation": {
+    "consolidated_at": "2026-06-05T04:27:39.816083+00:00",
+    "parser_version": "2.4",
+    "schema_version": "1.1",
+    "source_file": "VIGIA_BREAK_011_016.json",
+    "source_origin": "synthetic_vigia_collective"
+  }
+}

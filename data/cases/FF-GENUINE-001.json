@@ -1,0 +1,66 @@
+{
+  "case_id": "FF-GENUINE-001",
+  "name": "Genuine False Flag — Real Attack with Contradictory Attribution",
+  "description": "A real compromise: process hollowing and LSASS credential dumping confirmed in memory (hard-to-fake structural evidence). On top of the real attack, the operator planted suspiciously pristine Russian-language strings whose profile contradicts the actual TTPs and OPSEC. This is what a real false flag looks like: the malicious event is PRESENT, and the attribution is engineered to misdirect. MALICE is correct here — and it belongs to the framer, not to any Russian-speaker.",
+  "audit_note": "Finding H-02. Positive counterpart of FP-CULTURAL-CLEAN-001. With the current rule (which requires LOW technical for FALSE_FLAG_PATTERN) this genuine false flag is NOT detected. After the fix, detection must be based on attribution/technical-profile mismatch, not on the absence of technical evidence.",
+  "artifacts": [
+    {
+      "artifact_id": "tech_real_001",
+      "evidence_type": "memory_process",
+      "source_tool": "list_processes",
+      "timestamp": "2026-04-10T03:14:00Z",
+      "raw_score": 0.88,
+      "prior_trust": 0.95,
+      "provenance_chain": ["sha256:mem_real_001", "sha256:mem_real_002"],
+      "description": "Process hollowing in svchost.exe confirmed (T1055.012). Reflective DLL injection. Structural, hard-to-fake evidence of a real intrusion.",
+      "metadata": {"injections_detected": 2, "kernel_anomalies": 1, "technique": "T1055.012"}
+    },
+    {
+      "artifact_id": "tech_real_002",
+      "evidence_type": "lsass_session",
+      "source_tool": "list_processes",
+      "timestamp": "2026-04-10T03:15:10Z",
+      "raw_score": 0.84,
+      "prior_trust": 0.95,
+      "provenance_chain": ["sha256:lsass_real_001"],
+      "description": "LSASS credential dumping detected (T1003.001). Active compromise, not a clean system.",
+      "metadata": {"sessions": 7, "anomalies": 3, "technique": "T1003.001"}
+    },
+    {
+      "artifact_id": "cultural_planted_001",
+      "evidence_type": "cultural_marker",
+      "source_tool": "infer_intent",
+      "timestamp": "2026-04-10T03:16:00Z",
+      "raw_score": 0.90,
+      "prior_trust": 0.3,
+      "provenance_chain": ["sha256:cultural_planted_001"],
+      "description": "Suspiciously pristine Russian-language strings injected into the dropper, inconsistent with the actor's actual toolchain and OPSEC. Attribution markers contradict the observed technical TTP profile.",
+      "metadata": {
+        "cyrillic_strings": 12,
+        "attribution_consistency_with_ttps": "LOW",
+        "placement": "too_clean",
+        "mismatch_with_technical_profile": true
+      }
+    }
+  ],
+  "temporal_violations": [],
+  "caie_fractures": [
+    {
+      "fracture_type": "FALSE_FLAG_ATTRIBUTION_MISMATCH",
+      "severity": 0.85,
+      "artifact_a": "Real attack TTPs (T1055.012 + T1003.001, avg ~0.86)",
+      "artifact_b": "Planted attribution markers (avg 0.90, consistency LOW)",
+      "mitre_ttp": "T1036.005",
+      "interpretation": "A real intrusion is present, but the attribution markers are too clean and contradict the actor's actual TTP profile. The malice is the deliberate misdirection. Proposed rule: false flag requires a corroborated malicious event AND attribution inconsistent with it — not the mere absence of technical evidence."
+    }
+  ],
+  "expected_verdict": "MALICE",
+  "expected_confidence": 0.8,
+  "expected_mitre_ttps": ["T1036.005", "T1055.012", "T1003.001"],
+  "peirce_chain": {
+    "firstness": "Russian strings present alongside confirmed injection and credential dumping.",
+    "secondness": "The attribution profile contradicts the technical TTPs; the markers are too clean for the OPSEC observed.",
+    "thirdness": "The real attacker staged the attribution to misdirect blame. The deception is the malicious act."
+  },
+  "demo_quote": "The real false flag has the attack present. The malice belongs to the planter, not to the language of the flag."
+}
