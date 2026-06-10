@@ -1,15 +1,15 @@
 """
-vigia/governance/trust_levels.py — REFACTORIZACIÓN P0
+vigia/governance/trust_levels_p0.py — P0 REFACTORING
 
-CAMBIOS REALIZADOS:
-  P0-2: Actualizado docstrings para ser EXPLÍCITO que es Simulación Open Source
-        de hardware confiable chino (等保2.0 Nivel 1-4)
-        usando HMAC-SHA256 como ancla de integridad en lugar de TPM físico.
+CHANGES MADE:
+  P0-2: Updated docstrings to be EXPLICIT that this is an Open Source Simulation
+        of Chinese trusted hardware principles (等保2.0 Levels 1-4)
+        using HMAC-SHA256 as integrity anchor instead of physical TPM.
 
-TRANSPARENCIA DAUBERT:
-  - Documentado que NO es TPM real, sino emulación por software
-  - HMAC-SHA256 es el ancla de integridad (determinístico)
-  - Nivel 4 implementa Terceridad (correlación dinámica de eventos)
+DAUBERT TRANSPARENCY:
+  - Documented that this is NOT real TPM, but software emulation
+  - HMAC-SHA256 is the integrity anchor (deterministic)
+  - Level 4 implements Thirdness (dynamic event correlation)
 ────────────────────────────────────────────────────────────────────────────
 """
 from __future__ import annotations
@@ -32,23 +32,23 @@ logger = logging.getLogger(__name__)
 
 class TrustLevel(int, Enum):
     """
-    Niveles de verificación confiable (等保2.0).
+    Trusted verification levels (等保2.0).
     
-    NOTA P0-2: Esta es una SIMULACIÓN EN SOFTWARE de los principios de
-    hardware confiable definidos por China en 等保2.0 (Classified Protection 2.0).
+    NOTE P0-2: This is a SOFTWARE SIMULATION of the principles of
+    trusted hardware defined by China in 等保2.0 (Classified Protection 2.0).
     
-    Hardware real usaría TPM/TCM chip. Aquí usamos HMAC-SHA256 como ancla
-    de integridad determinística en código abierto.
+    Real hardware would use TPM/TCM chip. Here we use HMAC-SHA256 as a
+    deterministic integrity anchor in open source code.
     """
     
-    LEVEL_1 = 1  # Boot verification + alarma (HMAC básico)
-    LEVEL_2 = 2  # LEVEL_1 + auditoría centralizada
-    LEVEL_3 = 3  # LEVEL_2 + verificación dinámica en checkpoints
-    LEVEL_4 = 4  # LEVEL_3 + correlación dinámica (Peirce Terceridad)
+    LEVEL_1 = 1  # Boot verification + alarm (basic HMAC)
+    LEVEL_2 = 2  # LEVEL_1 + centralized audit
+    LEVEL_3 = 3  # LEVEL_2 + dynamic checkpoint verification
+    LEVEL_4 = 4  # LEVEL_3 + dynamic correlation (Peirce Thirdness)
 
 
 class VerificationCheckpoint(str, Enum):
-    """Puntos clave de ejecución donde ocurre verificación (Nivel 3+)."""
+    """Key execution points where verification occurs (Level 3+)."""
     
     BOOT_START = "boot_start"
     BOOT_VERIFY_KERNEL = "boot_verify_kernel"
@@ -65,43 +65,43 @@ class VerificationCheckpoint(str, Enum):
 
 
 # ============================================================================
-# MODELOS DE DATOS
+# DATA MODELS
 # ============================================================================
 
 @dataclass
 class TrustedRoot:
     """
-    Raíz de confianza (可信根).
+    Root of trust (可信根).
     
-    NOTA P0-2: Este es un SIMULADOR de TPM/TCM en software abierto.
-    En hardware real (china): TCM chip con medidas criptográficas.
-    Aquí: clave HMAC-SHA256 como ancla de integridad determinística.
+    NOTE P0-2: This is a SIMULATOR of TPM/TCM in open source software.
+    In real hardware (China): TCM chip with cryptographic measurements.
+    Here: HMAC-SHA256 key as deterministic integrity anchor.
     
-    GARANTÍA DAUBERT: HMAC es determinístico, reproducible, sin aleatoriedad.
+    DAUBERT GUARANTEE: HMAC is deterministic, reproducible, no randomness.
     """
     
     trusted_root_id: str
-    hmac_key: bytes  # 256 bits, simulando TPM key
+    hmac_key: bytes  # 256 bits, simulating TPM key
     created_at: str
     root_hash: str
     
     def verify_integrity(self) -> bool:
-        """Verifica que la raíz de confianza no ha sido modificada."""
+        """Verifies that the root of trust has not been modified."""
         recomputed_hash = hashlib.sha256(
             self.trusted_root_id.encode() + self.created_at.encode()
         ).hexdigest()
-        return recomputed_hash == self.root_hash
+        return hmac.compare_digest(recomputed_hash, self.root_hash)
 
 
 @dataclass
 class VerificationRecord:
-    """Registro de una verificación en un checkpoint."""
+    """Record of a verification at a checkpoint."""
     
     checkpoint: VerificationCheckpoint
     timestamp: str
     verified_component: str
-    verified_hash: str  # SHA-256 determinístico
-    verification_hmac: str  # HMAC-SHA256 determinístico
+    verified_hash: str  # SHA-256 deterministic
+    verification_hmac: str  # HMAC-SHA256 deterministic
     status: str  # "OK", "WARNING", "FAILURE"
     details: str = ""
     
@@ -120,11 +120,11 @@ class VerificationRecord:
 @dataclass
 class AuditLog:
     """
-    Log de auditoría centralizado (安全管理中心).
+    Centralized audit log (安全管理中心).
     
-    NOTA P0-2: Simulación de Centro de Gestión de Seguridad chino.
-    En 等保2.0 Nivel 2: todos los registros se envían a un centro centralizado.
-    Aquí: log encadenado con SHA-256 (verificación de integridad).
+    NOTE P0-2: Simulation of Chinese Security Management Center.
+    In 等保2.0 Level 2: all records are sent to a centralized center.
+    Here: chained log with SHA-256 (integrity verification).
     """
     
     audit_id: str
@@ -134,12 +134,12 @@ class AuditLog:
     log_chain_hash: str = ""
     
     def add_record(self, record: VerificationRecord) -> None:
-        """Agrega un registro y actualiza el hash de cadena."""
+        """Adds a record and updates the chain hash."""
         self.records.append(record)
         self._update_chain_hash()
     
     def _update_chain_hash(self) -> None:
-        """Actualiza el hash encadenado (determinístico)."""
+        """Updates the chained hash (deterministic)."""
         record_str = json.dumps(
             [r.to_dict() for r in self.records],
             sort_keys=True
@@ -147,13 +147,13 @@ class AuditLog:
         self.log_chain_hash = hashlib.sha256(record_str.encode()).hexdigest()
     
     def verify_integrity(self) -> bool:
-        """Verifica que el log no ha sido modificado (determinístico)."""
+        """Verifies that the log has not been modified (deterministic)."""
         record_str = json.dumps(
             [r.to_dict() for r in self.records],
             sort_keys=True
         )
         recomputed_hash = hashlib.sha256(record_str.encode()).hexdigest()
-        return recomputed_hash == self.log_chain_hash
+        return hmac.compare_digest(recomputed_hash, self.log_chain_hash)
     
     def to_dict(self) -> Dict[str, Any]:
         return {
@@ -169,12 +169,12 @@ class AuditLog:
 @dataclass
 class DynamicCorrelationEvent:
     """
-    Evento para análisis de correlación dinámica (Nivel 4).
+    Event for dynamic correlation analysis (Level 4).
     
-    NOTA P0-2: Implementación de 动态关联感知 (Percepción de Correlación Dinámica)
-    de 等保2.0 Nivel 4.
+    NOTE P0-2: Implementation of 动态关联感知 (Dynamic Correlation Perception)
+    from 等保2.0 Level 4.
     
-    En Peirce: Primeridad (evento) → Segundidad (relación) → Terceridad (patrón).
+    In Peirce: Firstness (event) → Secondness (relation) → Thirdness (pattern).
     """
     
     event_id: str
@@ -193,7 +193,7 @@ class DynamicCorrelationEvent:
 
 @dataclass
 class VerificationResult:
-    """Resultado de una verificación a nivel específico."""
+    """Result of a verification at a specific level."""
     
     trust_level: TrustLevel
     status: str  # "PASS", "FAIL", "WARNING"
@@ -217,16 +217,16 @@ class VerificationResult:
 
 class TrustLevelVerifier:
     """
-    Motor de verificación con 4 niveles (等保2.0).
+    Verification engine with 4 levels (等保2.0).
     
-    NOTA P0-2: SIMULACIÓN EN SOFTWARE de principios de hardware confiable chino.
+    NOTE P0-2: SOFTWARE SIMULATION of Chinese trusted hardware principles.
     
-    Nivel 1: Hash HMAC básico (simulando TCM chip)
-    Nivel 2: + Log centralizado (simulando 安全管理中心)
-    Nivel 3: + Checkpoints dinámicos (simulando 动态可信验证)
-    Nivel 4: + Correlación de eventos (Peirce Terceridad)
+    Level 1: Basic HMAC hash (simulating TCM chip)
+    Level 2: + Centralized log (simulating 安全管理中心)
+    Level 3: + Dynamic checkpoints (simulating 动态可信验证)
+    Level 4: + Event correlation (Peirce Thirdness)
     
-    GARANTÍA DAUBERT: Todo es determinístico (SHA256, HMAC). Sin aleatoriedad.
+    DAUBERT GUARANTEE: Everything is deterministic (SHA256, HMAC). No randomness.
     """
     
     def __init__(
@@ -236,8 +236,8 @@ class TrustLevelVerifier:
     ):
         """
         Args:
-            trusted_root: Raíz de confianza (simulando TPM)
-            verbose: Logging detallado
+            trusted_root: Root of trust (simulating TPM)
+            verbose: Detailed logging
         """
         self.trusted_root = trusted_root
         self.verbose = verbose
@@ -249,7 +249,7 @@ class TrustLevelVerifier:
             logger.info(f"[TrustLevelVerifier] {msg}")
     
     # ========================================================================
-    # NIVEL 1: Verificación Básica + Alarma
+    # LEVEL 1: Basic Verification + Alarm
     # ========================================================================
     
     def verify_level_1(
@@ -258,27 +258,34 @@ class TrustLevelVerifier:
         expected_hash: Optional[str] = None,
     ) -> VerificationResult:
         """
-        NIVEL 1 (等保2.0): Verificación básica en boot + alarma.
+        LEVEL 1 (等保2.0): Basic boot verification + alarm.
         
-        P0-2: Simulación de TCM boot verification (determinístico, no hardware).
-        Usa HMAC-SHA256 como ancla de integridad.
+        P0-2: Simulation of TCM boot verification (deterministic, not hardware).
+        Uses HMAC-SHA256 as integrity anchor.
         """
-        self._log("NIVEL 1: Boot verification (simulado en software con HMAC-SHA256)")
+        self._log("LEVEL 1: Boot verification (simulated in software with HMAC-SHA256)")
         
         records = []
         
-        # Computar hash (determinístico)
+        # Compute hash (deterministic)
         data_str = json.dumps(data, sort_keys=True)
         data_hash = hashlib.sha256(data_str.encode()).hexdigest()
         
-        # Computar HMAC (determinístico, simulando TPM)
+        # Compute HMAC (deterministic, simulating TPM)
+        if self.trusted_root is None:
+            raise RuntimeError(
+                "TrustLevelVerifier requires a trusted_root with a valid HMAC key. "
+                "A None trusted_root would use a publicly-known fallback key, which "
+                "renders all integrity guarantees invalid in a forensic context. "
+                "See audit finding H-08."
+            )
         hmac_sig = hmac.new(
-            self.trusted_root.hmac_key if self.trusted_root else b"default_key",
+            self.trusted_root.hmac_key,
             data_str.encode(),
             hashlib.sha256
         ).hexdigest()
         
-        # Registro de verificación
+        # Verification record
         record = VerificationRecord(
             checkpoint=VerificationCheckpoint.BOOT_START,
             timestamp=self._now_iso(),
@@ -286,12 +293,12 @@ class TrustLevelVerifier:
             verified_hash=data_hash,
             verification_hmac=hmac_sig,
             status="OK" if expected_hash is None or data_hash == expected_hash else "FAILURE",
-            details=f"Hash: {data_hash[:16]}... (determinístico)",
+            details=f"Hash: {data_hash[:16]}... (deterministic)",
         )
         records.append(record)
         
         status = record.status
-        message = f"NIVEL 1: {status} — Verificación de integridad mediante HMAC-SHA256"
+        message = f"LEVEL 1: {status} — Integrity verification via HMAC-SHA256"
         
         self._log(message)
         
@@ -303,7 +310,7 @@ class TrustLevelVerifier:
         )
     
     # ========================================================================
-    # NIVEL 2: + Auditoría Centralizada (安全管理中心)
+    # LEVEL 2: + Centralized Audit (安全管理中心)
     # ========================================================================
     
     def verify_level_2(
@@ -312,31 +319,31 @@ class TrustLevelVerifier:
         previous_result: Optional[VerificationResult] = None,
     ) -> VerificationResult:
         """
-        NIVEL 2 (等保2.0): Nivel 1 + auditoría centralizada.
+        LEVEL 2 (等保2.0): Level 1 + centralized audit.
         
-        P0-2: Simulación de Centro de Gestión de Seguridad chino (安全管理中心).
+        P0-2: Simulation of Chinese Security Management Center (安全管理中心).
         """
-        self._log("NIVEL 2: Auditoría centralizada (simulada en software)")
+        self._log("LEVEL 2: Centralized audit (simulated in software)")
         
-        # Primero, Nivel 1
+        # First, Level 1
         level_1_result = self.verify_level_1(data)
         
-        # Crear log de auditoría centralizado
+        # Create centralized audit log
         audit_log = AuditLog(
             audit_id=f"AUDIT-{self._now_iso().replace(':', '').replace('-', '')[:14]}",
             trust_level=TrustLevel.LEVEL_2,
             created_at=self._now_iso(),
         )
         
-        # Agregar registros de Nivel 1
+        # Add Level 1 records
         for record in level_1_result.records:
             audit_log.add_record(record)
         
         self.audit_log = audit_log
         
         message = (
-            f"NIVEL 2: OK — Centro de Gestión de Seguridad (simulado) con "
-            f"{len(audit_log.records)} registros encadenados por SHA-256"
+            f"LEVEL 2: OK — Security Management Center (simulated) with "
+            f"{len(audit_log.records)} records chained by SHA-256"
         )
         
         self._log(message)
@@ -350,7 +357,7 @@ class TrustLevelVerifier:
         )
     
     # ========================================================================
-    # NIVEL 3: + Verificación Dinámica en Checkpoints
+    # LEVEL 3: + Dynamic Checkpoint Verification
     # ========================================================================
     
     def verify_level_3(
@@ -359,16 +366,16 @@ class TrustLevelVerifier:
         checkpoints: Optional[List[VerificationCheckpoint]] = None,
     ) -> VerificationResult:
         """
-        NIVEL 3 (等保2.0): Nivel 2 + verificación dinámica (动态可信验证).
+        LEVEL 3 (等保2.0): Level 2 + dynamic verification (动态可信验证).
         
-        P0-2: Simulación de checkpoints dinámicos en ejecución.
+        P0-2: Simulation of dynamic checkpoints in execution.
         """
-        self._log("NIVEL 3: Verificación dinámica en checkpoints (simulada)")
+        self._log("LEVEL 3: Dynamic verification at checkpoints (simulated)")
         
-        # Nivel 2 primero
+        # Level 2 first
         level_2_result = self.verify_level_2(data)
         
-        # Checkpoints estándar
+        # Standard checkpoints
         if checkpoints is None:
             checkpoints = [
                 VerificationCheckpoint.ANALYSIS_INIT,
@@ -377,15 +384,22 @@ class TrustLevelVerifier:
                 VerificationCheckpoint.ANALYSIS_COMPLETE,
             ]
         
-        # Crear registros de verificación en cada checkpoint
+        # Create verification records at each checkpoint
         for checkpoint in checkpoints:
             data_str = json.dumps(data, sort_keys=True)
             component_hash = hashlib.sha256(
                 (data_str + checkpoint.value).encode()
             ).hexdigest()
             
+            if self.trusted_root is None:
+                raise RuntimeError(
+                    "TrustLevelVerifier requires a trusted_root with a valid HMAC key. "
+                    "A None trusted_root would use a publicly-known fallback key, which "
+                    "renders all integrity guarantees invalid in a forensic context. "
+                    "See audit finding H-08."
+                )
             hmac_sig = hmac.new(
-                self.trusted_root.hmac_key if self.trusted_root else b"default_key",
+                self.trusted_root.hmac_key,
                 component_hash.encode(),
                 hashlib.sha256
             ).hexdigest()
@@ -397,7 +411,7 @@ class TrustLevelVerifier:
                 verified_hash=component_hash,
                 verification_hmac=hmac_sig,
                 status="OK",
-                details=f"Verificación en checkpoint {checkpoint.value}",
+                details=f"Verification at checkpoint {checkpoint.value}",
             )
             
             level_2_result.records.append(record)
@@ -405,8 +419,8 @@ class TrustLevelVerifier:
                 self.audit_log.add_record(record)
         
         message = (
-            f"NIVEL 3: OK — Verificación dinámica completada en "
-            f"{len(checkpoints)} checkpoints (determinística)"
+            f"LEVEL 3: OK — Dynamic verification completed at "
+            f"{len(checkpoints)} checkpoints (deterministic)"
         )
         
         self._log(message)
@@ -420,7 +434,7 @@ class TrustLevelVerifier:
         )
     
     # ========================================================================
-    # NIVEL 4: + Correlación Dinámica (动态关联感知 — Peirce Terceridad)
+    # LEVEL 4: + Dynamic Correlation (动态关联感知 — Peirce Thirdness)
     # ========================================================================
     
     def verify_level_4(
@@ -429,21 +443,21 @@ class TrustLevelVerifier:
         events: Optional[List[Dict[str, Any]]] = None,
     ) -> VerificationResult:
         """
-        NIVEL 4 (等保2.0): Nivel 3 + correlación dinámica (动态关联感知).
+        LEVEL 4 (等保2.0): Level 3 + dynamic correlation (动态关联感知).
         
-        P0-2: Este es el nivel donde emerge Terceridad (Peirce):
-        - Primeridad: eventos crudos
-        - Segundidad: relaciones observadas
-        - Terceridad: LEY/PATRÓN que explica por qué existen esas relaciones
+        P0-2: This is the level where Thirdness emerges (Peirce):
+        - Firstness: raw events
+        - Secondness: observed relations
+        - Thirdness: LAW/PATTERN that explains why those relations exist
         
-        GARANTÍA DAUBERT: Análisis de correlación es determinístico (basado en conteos).
+        DAUBERT GUARANTEE: Correlation analysis is deterministic (based on counts).
         """
-        self._log("NIVEL 4: Correlación dinámica — Terceridad operacionalizada")
+        self._log("LEVEL 4: Dynamic correlation — Operationalized Thirdness")
         
-        # Nivel 3 primero
+        # Level 3 first
         level_3_result = self.verify_level_3(data)
         
-        # Parsear eventos (Primeridad)
+        # Parse events (Firstness)
         if events is None:
             events = []
         
@@ -456,10 +470,17 @@ class TrustLevelVerifier:
             )
             self.dynamic_events.append(event)
         
-        # Análisis de correlación (Segundidad → Terceridad, determinístico)
+        # Correlation analysis (Secondness → Thirdness, deterministic)
         correlations = self._analyze_event_correlations_deterministic()
         
-        # Crear registro de correlación
+        # Create correlation record
+        if self.trusted_root is None:
+            raise RuntimeError(
+                "TrustLevelVerifier requires a trusted_root with a valid HMAC key. "
+                "A None trusted_root would use a publicly-known fallback key, which "
+                "renders all integrity guarantees invalid in a forensic context. "
+                "See audit finding H-08."
+            )
         correlation_record = VerificationRecord(
             checkpoint=VerificationCheckpoint.ANALYSIS_COMPLETE,
             timestamp=self._now_iso(),
@@ -468,12 +489,12 @@ class TrustLevelVerifier:
                 json.dumps(correlations, sort_keys=True).encode()
             ).hexdigest(),
             verification_hmac=hmac.new(
-                self.trusted_root.hmac_key if self.trusted_root else b"default_key",
+                self.trusted_root.hmac_key,
                 json.dumps(correlations).encode(),
                 hashlib.sha256
             ).hexdigest(),
             status="OK",
-            details=f"Correlación dinámica: {len(correlations.get('patterns', []))} patrones",
+            details=f"Dynamic correlation: {len(correlations.get('patterns', []))} patterns",
         )
         
         level_3_result.records.append(correlation_record)
@@ -481,8 +502,8 @@ class TrustLevelVerifier:
             self.audit_log.add_record(correlation_record)
         
         message = (
-            f"NIVEL 4: OK — Terceridad inferida de {len(self.dynamic_events)} eventos. "
-            f"Correlación dinámica determinística completada."
+            f"LEVEL 4: OK — Thirdness inferred from {len(self.dynamic_events)} events. "
+            f"Dynamic deterministic correlation completed."
         )
         
         self._log(message)
@@ -496,35 +517,35 @@ class TrustLevelVerifier:
         )
     
     # ========================================================================
-    # UTILIDADES
+    # UTILITIES
     # ========================================================================
     
     def _now_iso(self) -> str:
-        """ISO 8601 timestamp (determinístico)."""
+        """ISO 8601 timestamp (deterministic)."""
         import datetime
         return datetime.datetime.now(datetime.timezone.utc).isoformat()
     
     def _analyze_event_correlations_deterministic(self) -> Dict[str, Any]:
-        """Análisis determinístico de correlaciones (basado en conteos)."""
+        """Deterministic correlation analysis (based on counts)."""
         if len(self.dynamic_events) < 2:
             return {"patterns": [], "correlation_strength": 0}
         
-        # Agrupar eventos por tipo (determinístico)
+        # Group events by type (deterministic)
         events_by_type = {}
         for event in self.dynamic_events:
             if event.event_type not in events_by_type:
                 events_by_type[event.event_type] = []
             events_by_type[event.event_type].append(event)
         
-        # Detectar patrones (determinístico: conteos simples)
+        # Detect patterns (deterministic: simple counts)
         patterns = []
         for event_type, events_list in events_by_type.items():
             if len(events_list) > 1:
                 correlation_strength = len(events_list) / len(self.dynamic_events)
                 patterns.append({
-                    "pattern": f"Múltiples eventos de tipo {event_type}",
+                    "pattern": f"Multiple events of type {event_type}",
                     "count": len(events_list),
-                    "correlation_strength": int(correlation_strength * 100),  # Entero
+                    "correlation_strength": int(correlation_strength * 100),  # Integer
                 })
         
         return {
@@ -542,7 +563,7 @@ class TrustLevelVerifier:
         trust_level: TrustLevel = TrustLevel.LEVEL_2,
         events: Optional[List[Dict[str, Any]]] = None,
     ) -> VerificationResult:
-        """API unificada: verifica en el nivel especificado."""
+        """Unified API: verifies at the specified level."""
         if trust_level == TrustLevel.LEVEL_1:
             return self.verify_level_1(data)
         elif trust_level == TrustLevel.LEVEL_2:
@@ -552,11 +573,11 @@ class TrustLevelVerifier:
         elif trust_level == TrustLevel.LEVEL_4:
             return self.verify_level_4(data, events)
         else:
-            raise ValueError(f"Trust level desconocido: {trust_level}")
+            raise ValueError(f"Unknown trust level: {trust_level}")
 
 
 def create_trusted_root(trusted_root_id: str = "VIGIA-TR-001") -> TrustedRoot:
-    """Crea nueva raíz de confianza (simulando TPM)."""
+    """Creates new root of trust (simulating TPM)."""
     import secrets
     
     hmac_key = secrets.token_bytes(32)
@@ -576,31 +597,31 @@ def create_trusted_root(trusted_root_id: str = "VIGIA-TR-001") -> TrustedRoot:
 if __name__ == "__main__":
     # Demo
     print("=" * 80)
-    print("TrustLevelVerifier — REFACTORIZACIÓN P0 (等保2.0 en Software)")
+    print("TrustLevelVerifier — P0 REFACTORING (等保2.0 in Software)")
     print("=" * 80)
     
     tr = create_trusted_root()
     verifier = TrustLevelVerifier(trusted_root=tr, verbose=True)
     
-    test_data = {"bundle_id": "case_002_demo", "analysis": "Determinístico"}
+    test_data = {"bundle_id": "case_002_demo", "analysis": "Deterministic"}
     
-    print("\n[NIVEL 1]")
+    print("\n[LEVEL 1]")
     result1 = verifier.verify(test_data, TrustLevel.LEVEL_1)
-    print(f"Resultado: {result1.status} — {result1.message}")
+    print(f"Result: {result1.status} — {result1.message}")
     
-    print("\n[NIVEL 2]")
+    print("\n[LEVEL 2]")
     result2 = verifier.verify(test_data, TrustLevel.LEVEL_2)
-    print(f"Resultado: {result2.status} — Auditoría: {result2.audit_log.audit_id}")
+    print(f"Result: {result2.status} — Audit: {result2.audit_log.audit_id}")
     
-    print("\n[NIVEL 3]")
+    print("\n[LEVEL 3]")
     result3 = verifier.verify(test_data, TrustLevel.LEVEL_3)
-    print(f"Resultado: {result3.status} — Checkpoints: {len(result3.records)}")
+    print(f"Result: {result3.status} — Checkpoints: {len(result3.records)}")
     
-    print("\n[NIVEL 4]")
+    print("\n[LEVEL 4]")
     events = [
         {"type": "verification"}, {"type": "verification"}, {"type": "correlation"}
     ]
     result4 = verifier.verify(test_data, TrustLevel.LEVEL_4, events)
-    print(f"Resultado: {result4.status} — {result4.message}")
+    print(f"Result: {result4.status} — {result4.message}")
     
     print("\n" + "=" * 80)
