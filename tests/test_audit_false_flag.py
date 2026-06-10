@@ -1,43 +1,32 @@
 """
 tests/test_audit_false_flag.py
 ==============================
-Red-team audit — Finding H-02: FALSE_FLAG_PATTERN and false attribution.
+Red-team audit — Hallazgo H-02: FALSE_FLAG_PATTERN y falsa atribución.
 
-DESIGN DECISION (not an implementation bug):
-    False attribution IS malicious. Planting flags to blame a third party is a
-    deliberate, deceptive act. But the malice belongs to the PLANTER, not to
-    whoever writes in Russian. Russian is spoken in many places; a machine with
-    Cyrillic/UTC+3 configuration is not, by itself, evidence of anything.
+ACTUALIZACIÓN post-run 2026-06-10:
+    test_clean_foreign_machine_is_not_malice dio XPASS pero por el motivo
+    EQUIVOCADO: los fixtures sin metadatos de adquisición (acquisition_tool,
+    acquisition_hash, etc.) activaron las penalizaciones NIST SP 800-86 §4.3,
+    degradando base_trust hasta el piso. Con trust destrozado, el score no
+    llegó a 0.33 aunque la fractura se generó.
 
-    The current CAIE rule fires FALSE_FLAG_PATTERN on:
-        avg_cultural > 0.5  AND  avg_technical < 0.2
-    i.e., it infers "planted" from the ABSENCE of technical evidence.
-    This is doubly wrong:
+    test_clean_foreign_machine_does_not_trigger_false_flag_rule sigue XFAIL:
+    FALSE_FLAG_PATTERN SÍ está en los fractures del engine. La regla está rota.
 
-      (1) It marks as MALICE a foreign user with a clean machine
-          (no attack occurred; the markers are their native configuration).
-      (2) It FAILS to detect the REAL false flag, which has HIGH technical
-          evidence (the attack DID occur) with attribution that is too
-          convenient or contradictory relative to the technical profile.
+    Si corremos los casos reales (que sí tienen metadata completa), el trust
+    no se degrada y la fractura + boost (0.82 * 0.45 = 0.369) lleva a MALICE.
 
-    A genuine false flag = (real malicious event) AND (attribution that
-    contradicts the technical profile of that event). The fracture is in the
-    MISMATCH, not in the language.
+    SOLUCIÓN: fixtures con acquisition_metadata mínima y válida.
+    El test ahora prueba la REGLA, no el sistema de penalización de custodia.
 
-THESE TESTS:
-    - test_clean_foreign_machine_is_not_malice:
-        Clean Russian machine, no attack → NEVER MALICE. This is the test that
-        proves to a panel that VIGÍA does not accuse someone for writing in Russian.
-        xfail until the rule fix (currently fires MALICE).
+CONTEXTO:
+    Falsa atribución ES malicia. La malicia es del que PLANTA, no del idioma.
+    Un usuario ruso con la máquina limpia no es un false flag.
 
-    - test_genuine_false_flag_is_malice:
-        Real attack (high technical) + contradictory attribution → MALICE.
-        xfail until the fix (the current rule requires LOW technical, so it
-        misses the genuine false flag).
-
-When you apply the rule fix, these transition from xfail to XPASS. That is the
-indicator that the fix is correct. At that point, change strict=False to
-strict=True to make them a hard guard.
+    La regla actual dispara: avg_cultural > 0.5 AND avg_technical < 0.2
+    Lo correcto:
+      - sin ataque real + cultural → NOISE/UNKNOWN (nunca MALICE)
+      - ataque real + manipulación positiva → FALSE_FLAG_PATTERN → MALICE
 """
 from __future__ import annotations
 
@@ -45,15 +34,24 @@ import pytest
 
 caie = pytest.importorskip(
     "vigia.tools.caie",
-    reason="vigia.tools.caie not importable in this environment (run with PYTHONPATH=$(pwd))",
+    reason="vigia.tools.caie no importable (correr con PYTHONPATH=$(pwd))",
 )
 CrossArtifactIncongruenceEngine = caie.CrossArtifactIncongruenceEngine
 Artifact = caie.Artifact
 
+# ---------------------------------------------------------------------------
+# Metadata de adquisición mínima — fixtures honestos
+# Sin esto el sistema NIST SP 800-86 degrada base_trust y enmascara el bug.
+# ---------------------------------------------------------------------------
 
-# ---------------------------------------------------------------------------
-# Helpers
-# ---------------------------------------------------------------------------
+_ACQ_META = {
+    "acquisition_tool": "FTK Imager 4.7",
+    "acquisition_hash": "sha256:" + "a" * 64,
+    "acquisition_timestamp": "2026-04-10T08:00:00Z",
+    "examiner_id": "EXA-TEST-001",
+    "write_blocker_used": True,
+}
+
 
 def _engine_with(artifacts: list[Artifact]) -> CrossArtifactIncongruenceEngine:
     engine = CrossArtifactIncongruenceEngine()
@@ -67,15 +65,11 @@ def _fracture_types(engine: CrossArtifactIncongruenceEngine) -> set[str]:
 
 
 # ---------------------------------------------------------------------------
-# Evidence fixtures
+# Fixture: máquina rusa limpia, sin incidente, metadata completa
 # ---------------------------------------------------------------------------
 
 def _clean_russian_machine() -> list[Artifact]:
-    """
-    A Russian developer from Torzhok. Cyrillic filenames, RU keyboard, UTC+3
-    timezone. The system is spotless: no injection, no dumping, healthy kernel.
-    NO incident occurred.
-    """
+    meta = dict(_ACQ_META)
     return [
         Artifact(
             source_tool="infer_intent",
@@ -83,142 +77,160 @@ def _clean_russian_machine() -> list[Artifact]:
             raw_score=0.85,
             description=(
                 "Cyrillic filenames ('отчет_финансы.docx'), keyboard layout RU, "
-                "timezone UTC+3, comments in Russian. Native configuration."
+                "timezone UTC+3. Native configuration. Normal creation dates."
             ),
             metadata={
+                **meta,
                 "cyrillic_filenames": 3,
                 "keyboard_layout_detected": "RU",
                 "timezone_offset": "+03:00",
                 "language_confidence": 0.91,
+                "organic_user_files": True,
+                "normal_creation_dates": True,
+                "timestomp_detected": False,
+                "backdating_detected": False,
+                "mft_inconsistency": False,
+                "suspiciously_obvious": False,
+                "concentrated_in_single_file": False,
             },
-            provenance_chain=["sha256:cultural_chain_001"],
+            provenance_chain=["sha256:" + "c" * 64],
             base_trust=0.3,
         ),
         Artifact(
             source_tool="list_processes",
             evidence_type="memory_process",
             raw_score=0.05,
-            description="Memory: no process injection, no kernel anomalies, clean state.",
-            metadata={"injections_detected": 0, "kernel_anomalies": 0, "suspicious_handles": 0},
-            provenance_chain=["sha256:mem_chain_001", "sha256:mem_chain_002"],
+            description="Memory: no injection, no kernel anomalies, clean state.",
+            metadata={**meta, "injections_detected": 0, "kernel_anomalies": 0},
+            provenance_chain=["sha256:" + "m" * 64],
             base_trust=0.95,
         ),
         Artifact(
             source_tool="list_processes",
             evidence_type="lsass_session",
             raw_score=0.08,
-            description="LSASS: no credential dumping. Normal session count.",
-            metadata={"sessions": 2, "anomalies": 0},
-            provenance_chain=["sha256:lsass_chain_001"],
+            description="LSASS: no credential dumping. Normal sessions.",
+            metadata={**meta, "sessions": 2, "anomalies": 0},
+            provenance_chain=["sha256:" + "l" * 64],
             base_trust=0.95,
         ),
     ]
 
 
+# ---------------------------------------------------------------------------
+# Fixture: false flag genuino — ataque real + timestomp probado
+# ---------------------------------------------------------------------------
+
 def _genuine_false_flag() -> list[Artifact]:
-    """
-    REAL false flag: an attack occurred (injection + credential dumping,
-    HIGH technical evidence that is hard to fake) and, on top of that, someone
-    left Russian markers that are too neat, whose profile contradicts the
-    observed technical TTPs. The malice is in the attribution/technical mismatch.
-    """
+    meta = dict(_ACQ_META)
     return [
         Artifact(
-            source_tool="list_processes",
+            source_tool="memory_forensics",
             evidence_type="memory_process",
             raw_score=0.88,
-            description=(
-                "Process hollowing in svchost.exe confirmed in memory. "
-                "Reflective DLL injection. Hard-to-fake structural evidence."
-            ),
-            metadata={"injections_detected": 2, "kernel_anomalies": 1, "technique": "T1055.012"},
-            provenance_chain=["sha256:mem_real_001", "sha256:mem_real_002"],
+            description="Process hollowing in svchost.exe confirmed. APT-level tooling.",
+            metadata={**meta, "injections_detected": 2, "kernel_anomalies": 1, "technique": "T1055.012"},
+            provenance_chain=["sha256:" + "M" * 64],
             base_trust=0.95,
         ),
         Artifact(
             source_tool="list_processes",
             evidence_type="lsass_session",
             raw_score=0.84,
-            description="LSASS credential dumping detected (T1003.001). Active compromise.",
-            metadata={"sessions": 7, "anomalies": 3, "technique": "T1003.001"},
-            provenance_chain=["sha256:lsass_real_001"],
+            description="LSASS credential dumping detected (T1003.001).",
+            metadata={**meta, "sessions": 7, "anomalies": 3, "credential_dumping_detected": True},
+            provenance_chain=["sha256:" + "L" * 64],
+            base_trust=0.95,
+        ),
+        Artifact(
+            source_tool="analyze_mft",
+            evidence_type="mft_entry",
+            raw_score=0.9,
+            description=(
+                "Cyrillic files have MFT timestamps predating volume creation "
+                "(2023-06-01 vs volume 2024-01-15). $SI modified after $FN. Planted."
+            ),
+            metadata={
+                **meta,
+                "timestomp_detected": True,
+                "backdating_detected": True,
+                "mft_inconsistency": True,
+                "mft_si_modified_after_fn": True,
+                "volume_creation_time": "2024-01-15T00:00:00Z",
+                "file_creation_time": "2023-06-01T00:00:00Z",
+                "mft_entry_number": 1234,
+            },
+            provenance_chain=["sha256:" + "F" * 64],
             base_trust=0.95,
         ),
         Artifact(
             source_tool="infer_intent",
             evidence_type="cultural_marker",
-            raw_score=0.90,
+            raw_score=0.80,
             description=(
-                "Suspiciously pristine Russian-language strings injected into the "
-                "dropper, inconsistent with the actor's actual toolchain and OPSEC. "
-                "Attribution markers contradict the technical TTP profile."
+                "Cyrillic markers concentrated in single dropped file, "
+                "no compilation history. Inconsistent with actor OPSEC."
             ),
             metadata={
-                "cyrillic_strings": 12,
-                "attribution_consistency_with_ttps": "LOW",
-                "placement": "too_clean",
+                **meta,
+                "cyrillic_filenames": 3,
+                "keyboard_layout_detected": "RU",
+                "concentrated_in_single_file": True,
+                "no_compilation_history": True,
+                "suspiciously_obvious": True,
             },
-            provenance_chain=["sha256:cultural_real_001"],
+            provenance_chain=["sha256:" + "C" * 64],
             base_trust=0.3,
         ),
     ]
 
 
 # ---------------------------------------------------------------------------
-# H-02 (1): absence must not accuse
+# Tests H-02 (1): máquina limpia nunca MALICE
 # ---------------------------------------------------------------------------
 
-@pytest.mark.xfail(
-    reason="H-02: the current rule fires FALSE_FLAG_PATTERN on cultural-high + "
-           "technical-low. A clean foreign machine must NOT be MALICE. "
-           "Transitions to XPASS when the rule requires a real malicious event.",
-    strict=False,
-)
 def test_clean_foreign_machine_is_not_malice():
     engine = _engine_with(_clean_russian_machine())
     result = engine.evaluate()
     verdict = result.get("verdict", "UNKNOWN")
-
     assert verdict != "MALICE", (
-        "A clean Russian machine (no incident) was classified as MALICE. "
-        "That is wrongful accusation by language/origin. Expected: NOISE/UNKNOWN. "
-        f"Got: {verdict}."
+        "Maquina rusa limpia (metadata completa, sin incidente) → MALICE. "
+        f"Obtenido: {verdict}."
     )
 
 
 @pytest.mark.xfail(
-    reason="H-02: same — the false flag pattern must not activate solely on "
-           "absence of technical evidence.",
+    reason="H-02: FALSE_FLAG_PATTERN activa sobre ausencia tecnica. Debe requerir manipulacion positiva.",
     strict=False,
 )
 def test_clean_foreign_machine_does_not_trigger_false_flag_rule():
     engine = _engine_with(_clean_russian_machine())
     types = _fracture_types(engine)
-
     assert "FALSE_FLAG_PATTERN" not in types, (
-        "FALSE_FLAG_PATTERN fired on a clean machine with foreign configuration. "
-        "Absence of technical evidence is NOT evidence of planting. "
-        f"Fractures detected: {sorted(types)}."
+        f"FALSE_FLAG_PATTERN activo sobre maquina limpia. Fracturas: {sorted(types)}."
     )
 
 
 # ---------------------------------------------------------------------------
-# H-02 (2): the genuine false flag MUST be detected
+# Tests H-02 (2): false flag genuino SÍ detectado
 # ---------------------------------------------------------------------------
 
-@pytest.mark.xfail(
-    reason="H-02: the current rule requires LOW technical, so it FAILS to detect "
-           "the real false flag (which has HIGH technical). Transitions to XPASS "
-           "when detection is based on attribution/technical-profile mismatch.",
-    strict=False,
-)
 def test_genuine_false_flag_is_malice():
     engine = _engine_with(_genuine_false_flag())
     result = engine.evaluate()
     verdict = result.get("verdict", "UNKNOWN")
-
     assert verdict in ("MALICE", "SUSPICION"), (
-        "A genuine false flag (real attack + contradictory attribution) was not "
-        "flagged. The malice of the planter must be detected. "
-        f"Got: {verdict}."
+        f"False flag genuino (ataque real + timestomp) no detectado. Obtenido: {verdict}."
+    )
+
+
+@pytest.mark.xfail(
+    reason="H-02: la regla exige tecnica BAJA, no detecta false flag con tecnica ALTA.",
+    strict=False,
+)
+def test_genuine_false_flag_triggers_pattern():
+    engine = _engine_with(_genuine_false_flag())
+    types = _fracture_types(engine)
+    assert "FALSE_FLAG_PATTERN" in types, (
+        f"FALSE_FLAG_PATTERN no activo sobre false flag genuino. Fracturas: {sorted(types)}."
     )

@@ -521,6 +521,7 @@ def _vigia_score(case: dict) -> dict:
         # reduce credibility: there is unexplained cryptographic discrepancy.
         # fracture_credibility_penalty += sev * 0.25 captures this correctly.
         "CRYPTOGRAPHIC_INCONSISTENCY_UNVERIFIED",
+        "ATTRIBUTION_INCONSISTENCY",
     }
 
     for f in fractures:

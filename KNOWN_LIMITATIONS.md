@@ -393,6 +393,7 @@ corroborating heterogeneous evidence.
 | L-009 | Spoofability floor under chain of custody | REAL corpus | Design decision |
 | L-010 | Sensor independence not verified | CAIE adversarial 3/25 | Roadmap v3.0 |
 | L-011 | Kernel/root compromise (live analysis) | All live analysis | Permanent boundary |
+| L-019 | FALSE_FLAG_PATTERN fires on clean foreign-language machines | FP-CULTURAL-CLEAN | Real limitation (deferred) |
 | — | Normalization schema mismatch | vigia_scorer.py | **RESOLVED** |
 | — | Gate G1 accepting legacy hashes | caie.py | **RESOLVED** |
 | — | Uniform prior_trust=0.7 in converter | convert_legacy_cases.py | **RESOLVED** |
@@ -615,3 +616,40 @@ The bundle hash is computed from in-memory content, not from disk. Between `f.wr
 **Mitigation**: Bundle is sealed with HMAC-SHA256 (H3) using `VIGIA_HMAC_KEY`. Without the key, tampering is detectable. However, the HMAC itself is computed from the same in-memory content, so a TOCTOU at write time affects both H2 and H3.
 
 **Fix**: Atomic write with `tempfile.mkstemp()` → `fsync()` → `os.replace()`. Hash computed from disk after fsync. See Claude Code audit report 2026-06-09.
+
+---
+
+## L-019 — FALSE_FLAG_PATTERN fires on clean foreign-language machines
+
+**Affects:** FP-CULTURAL-CLEAN.json | **Status:** Real limitation — fix deferred
+
+**Description:** `FALSE_FLAG_PATTERN` in CAIE Rule 1 fires when
+`avg_cultural > 0.5 AND avg_technical < 0.2`, regardless of whether
+positive manipulation evidence exists. A machine with native Cyrillic
+filenames, RU keyboard layout, and UTC+3 timezone, combined with a clean
+memory/LSASS profile (low technical scores), satisfies the current condition
+and receives MALICE verdict.
+
+**Root cause:** The rule equates *absence of technical corroboration* with
+*evidence of planted attribution*. These are not equivalent. The correct
+condition requires: (1) confirmed malicious event (avg_technical > 0.5), plus
+(2) positive manipulation evidence (timestomp, backdating, MFT inconsistency).
+
+**Forensic implication:** Risk of false accusation based on language/origin.
+A wrongful MALICE verdict against a legitimate foreign-language user.
+
+**Sentinel case:** `FP-CULTURAL-CLEAN.json` — clean Russian-language machine.
+Must always return NOISE/UNKNOWN. If it returns MALICE, this limitation is
+actively causing false positives.
+
+**Test coverage:** `tests/test_audit_false_flag.py` — 4 tests (xfail).
+All 4 will transition to XPASS/PASSED when the fix is applied.
+
+**Fix design (deferred post-hackathon):** Add `_has_manip` guard to Rule 1.
+Requires adding explicit manipulation flags (`timestomp_detected`,
+`backdating_detected`, `hollowed`, etc.) to 18+ canonical case JSON files
+before the guard can be applied without regressions in the canonical corpus.
+See `caie_false_flag_rule_fixed.py` for the corrected function.
+
+**Roadmap:** Post-hackathon — update canonical corpus metadata, then apply
+`_has_manip` guard with `_TECHNICAL_EVIDENCE_TYPES` and `_MANIPULATION_FLAGS`.

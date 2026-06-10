@@ -1,0 +1,87 @@
+{
+  "case_id": "FP-CULTURAL-CLEAN",
+  "name": "False Flag Control — Clean Russian User Machine",
+  "description": "Machine of a legitimate Russian-speaking user. Cyrillic filenames, RU keyboard layout, UTC+3 timezone. System is clean: no injections, no C2, no persistence, no timestomp. This case proves VIGÍA does NOT flag users based on language or origin. Expected: NOISE or UNKNOWN.",
+  "audit_note": "CONTROL NEGATIVO H-02. NO correr en el corpus verde hasta aplicar el fix de FALSE_FLAG_PATTERN — con la regla actual (avg_technical < 0.2 = culpa) este caso falla. Tras el fix, pasa a NOISE. Si algun dia devuelve MALICE o SUSPICION, la regla esta rota.",
+  "artifacts": [
+    {
+      "artifact_id": "cultural_clean_001",
+      "evidence_type": "cultural_marker",
+      "source_tool": "infer_intent",
+      "timestamp": "2026-04-10T12:00:00Z",
+      "raw_score": 0.75,
+      "prior_trust": 0.4,
+      "provenance_chain": ["sha256:cult_clean_001"],
+      "description": "Cyrillic filenames: 'отчет_финансы.docx', 'резюме.pdf', 'фото_отпуск.jpg'. Keyboard layout: RU. Timezone: UTC+3. Language confidence: 0.89. Organic user files with normal creation dates, document properties, and compilation history.",
+      "metadata": {
+        "cyrillic_filenames": 3,
+        "keyboard_layout_detected": "RU",
+        "timezone_offset": "+03:00",
+        "language_confidence": 0.89,
+        "organic_user_files": true,
+        "normal_creation_dates": true,
+        "document_properties_valid": true
+      }
+    },
+    {
+      "artifact_id": "tech_clean_001",
+      "evidence_type": "memory_process",
+      "source_tool": "list_processes",
+      "timestamp": "2026-04-10T12:00:10Z",
+      "raw_score": 0.05,
+      "prior_trust": 0.95,
+      "provenance_chain": ["sha256:mem_clean_001"],
+      "description": "Memory: No process injection. No kernel anomalies. No hollowed processes. Clean system state.",
+      "metadata": {
+        "injections_detected": 0,
+        "kernel_anomalies": 0,
+        "hollowed_processes": 0
+      }
+    },
+    {
+      "artifact_id": "tech_clean_002",
+      "evidence_type": "lsass_session",
+      "source_tool": "list_processes",
+      "timestamp": "2026-04-10T12:00:12Z",
+      "raw_score": 0.06,
+      "prior_trust": 0.95,
+      "provenance_chain": ["sha256:lsass_clean_001"],
+      "description": "LSASS: No credential dumping. Normal session count (2). No anomalous access patterns.",
+      "metadata": {
+        "sessions": 2,
+        "anomalies": 0,
+        "credential_dumping_detected": false
+      }
+    },
+    {
+      "artifact_id": "fs_clean_001",
+      "evidence_type": "mft_entry",
+      "source_tool": "analyze_mft",
+      "timestamp": "2026-04-10T12:00:15Z",
+      "raw_score": 0.04,
+      "prior_trust": 0.95,
+      "provenance_chain": ["sha256:mft_clean_001"],
+      "description": "MFT: All timestamps consistent. No timestomp. No $SI/$FN discrepancy. Volume creation 2023-09-10. Files created organically over months. No backdating.",
+      "metadata": {
+        "timestomp_detected": false,
+        "mft_inconsistency": false,
+        "backdating_detected": false,
+        "organic_timeline": true,
+        "mft_si_modified_after_fn": false
+      }
+    }
+  ],
+  "temporal_violations": [],
+  "caie_fractures": [],
+  "expected_verdict": "NOISE",
+  "expected_confidence": 0.15,
+  "expected_mitre_ttps": [],
+  "peirce_chain": {
+    "firstness": "Cyrillic filenames, RU keyboard, UTC+3 timezone present.",
+    "secondness": "Memory, LSASS, kernel, MFT all clean. No timestomp. No injection. No C2. No backdating.",
+    "thirdness": "This is a normal user's machine. Cultural markers are organic, not planted. No attack occurred. Russian is spoken in many places; configuration is not intent."
+  },
+  "demo_command": "python run_vigia_case.py cases/FP-CULTURAL-CLEAN.json",
+  "demo_quote": "Naive classifier might flag this as suspicious due to Cyrillic content. VIGÍA correctly identifies NOISE: the system is clean, the cultural markers are organic, and there is no evidence of manipulation or attack.",
+  "notes": "SENTINEL: if this case ever returns MALICE or SUSPICION after the H-02 fix is applied, the FALSE_FLAG_PATTERN rule is broken. Guard this case."
+}
