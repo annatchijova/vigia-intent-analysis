@@ -1,0 +1,297 @@
+{
+  "analysis_timestamp": "2026-06-10T19:19:20.390986+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "VIGIA-REAL-SRL-DMZ-FTP",
+    "end_time": "2026-06-10T19:19:20.390989+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "VIGIA-REAL-SRL-DMZ-FTP",
+        "entry_sha256": "63692fd8978a4eccdc9f7c99897bda9ab25f6e50de8b41e6258b86f8b422533f",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "VIGIA-REAL-SRL-DMZ-FTP"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: 4eeafb3bfb155486...",
+        "outputs_summary": {
+          "agent_sha256": "4eeafb3bfb155486142942ad7a2c8678676f86ffd5d076882459354d820591f6",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-06-10T19:19:20.387743+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-REAL-SRL-DMZ-FTP",
+        "entry_sha256": "3d7153f392bc5e5e4ec8a5e6968e6979865d79b22a081b7f86434b82fa7dc8ad",
+        "inputs_summary": {
+          "path": "data/cases/converted/VIGIA-REAL-SRL-DMZ-FTP.json"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-06-10T19:19:20.387816+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-REAL-SRL-DMZ-FTP",
+        "entry_sha256": "04e5a952ec4f80a119639e01d585c5bc7167874e65f0f89c3d3692e4e4f10cbb",
+        "inputs_summary": {
+          "path": "data/cases/converted/VIGIA-REAL-SRL-DMZ-FTP.json"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: 10a0feba75d7bec0...",
+        "outputs_summary": {
+          "sha256": "10a0feba75d7bec06ee8c4345cba63b0ec4a73d8b4da1ee06e5087cb209d8ce9"
+        },
+        "seq": 3,
+        "timestamp": "2026-06-10T19:19:20.388397+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "VIGIA-REAL-SRL-DMZ-FTP",
+        "entry_sha256": "3e863f875933c41c5a32f59877ecf6614bd12f12e933ab1572153428220edf6c",
+        "inputs_summary": {
+          "evidence": "data/cases/converted/VIGIA-REAL-SRL-DMZ-FTP.json",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-06-10T19:19:20.388504+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "VIGIA-REAL-SRL-DMZ-FTP",
+        "entry_sha256": "2a584619927d43f99b54b362597ccfd59e6ae5d882dfa4a51c1806e10fd498ee",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 5 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+            "best_posterior": "729/5000",
+            "confidence": "729/5000",
+            "is_conclusive": "True",
+            "narrative": "IIS 8.5 FTP server in DMZ (172.16.10.12). External attackers attempted malware upload and conducted coordinated credential stuffing using valid domain usernames. Server also served as DFIR response in..."
+          },
+          "case_id": "VIGIA-REAL-SRL-DMZ-FTP",
+          "pipeline_meta": {
+            "artifact_count": "5",
+            "avg_score": "729/1000",
+            "expected_verdict": "MALICE",
+            "source": "ebs_v1_json_adapter"
+          },
+          "signals": [
+            {
+              "artifact_id": "ART-DMZ-001",
+              "confidence": "17/20",
+              "description": "2018-07-30 10:54:14 197.248.26.30 STOR /Photo.scr 550 Authorization+rules+denied+the+access | 2018-07-30 16:12:34 117.204.242.121 STOR /Photo.scr 550 Authorization+rules+denied+the+access | Two distin",
+              "evidence_type": "log_entry",
+              "source": "legacy_converter",
+              "z_score": "289/400"
+            },
+            {
+              "artifact_id": "ART-DMZ-002",
+              "confidence": "9/10",
+              "description": "2018-08-16: credential stuffing with valid domain usernames \u2014 USER nromanoff (218.22.253.37/CN), USER nromanoff@stark-research-labs.com (121.49.106.6/CN), USER tdungan@stark-research-labs.com (60.174.",
+              "evidence_type": "log_entry",
+              "source": "legacy_converter",
+              "z_score": "171/200"
+            },
+            {
+              "artifact_id": "ART-DMZ-003",
+              "confidence": "17/20",
+              "description": "srl-ftp/: Mnemosyne.sys (WinPmem memory acquisition driver) | fresponse-agent.msi (F-Response remote forensic acquisition) | sub-win-x64_base-hunt_5682_3262.exe (F-Response agent for base-hunt server)",
+              "evidence_type": "file_timestamp",
+              "source": "legacy_converter",
+              "z_score": "289/400"
+            },
+            {
+              "artifact_id": "ART-DMZ-004",
+              "confidence": "7/10",
+              "description": "Users present: Administrator, rsydow, rsydow-a | rsydow account hierarchy: rsydow (standard), rsydow-a (domain admin), rsydow-f (forensics) | Domain: stark-research-labs.com | rsydow-a confirmed as Do",
+              "evidence_type": "registry_key",
+              "source": "legacy_converter",
+              "z_score": "49/100"
+            },
+            {
+              "artifact_id": "ART-DMZ-005",
+              "confidence": "9/10",
+              "description": "Multi-stage attack timeline: May 2018 server deployed | Jul 30 anonymous enumeration + Photo.scr upload attempt | Aug 16 credential stuffing peak with domain usernames | Scanning IPs: 184.105.247.194 ",
+              "evidence_type": "log_entry",
+              "source": "legacy_converter",
+              "z_score": "171/200"
+            }
+          ]
+        },
+        "seq": 5,
+        "timestamp": "2026-06-10T19:19:20.390654+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "VIGIA-REAL-SRL-DMZ-FTP",
+        "entry_sha256": "34564b3e47bc800a5a5cd9b4a6e553a2647a2af08e13af0e3e78dc091991f5e8",
+        "inputs_summary": {
+          "n_signals": "5"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-06-10T19:19:20.390812+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "VIGIA-REAL-SRL-DMZ-FTP",
+        "entry_sha256": "04e8ac4dbc2f5f086b1952f690032e246a4623601628f7466ee06144fcf6b8af",
+        "inputs_summary": {
+          "verdict": "MALICIOUS_INTENT_DETECTED"
+        },
+        "iteration": 0,
+        "note": "Exit code 1 \u2014 analysis complete.",
+        "outputs_summary": {
+          "exit_code": "1"
+        },
+        "seq": 7,
+        "timestamp": "2026-06-10T19:19:20.390902+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-06-10T19:19:20.387528+00:00",
+    "total_entries": 7
+  },
+  "case_id": "VIGIA-REAL-SRL-DMZ-FTP",
+  "evidence_path": "data/cases/converted/VIGIA-REAL-SRL-DMZ-FTP.json",
+  "evidence_sha256": "10a0feba75d7bec06ee8c4345cba63b0ec4a73d8b4da1ee06e5087cb209d8ce9",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-REAL-SRL-DMZ-FTP ===\nEvidence: data/cases/converted/VIGIA-REAL-SRL-DMZ-FTP.json\nEvidence SHA-256: 10a0feba75d7bec06ee8c4345cba63b0ec4a73d8b4da1ee06e5087cb209d8ce9\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 729/5000\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\nIIS 8.5 FTP server in DMZ (172.16.10.12). External attackers attempted malware upload and conducted coordinated credential stuffing using valid domain usernames. Server also served as DFIR response infrastructure. Attack blocked at perimeter \u2014 internal compromise used different vector.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [2018-08-16: credential stuffing with valid domain usernames \u2014 USER nro] z=0.855 conf=0.90 \u2014 \n  [Multi-stage attack timeline: May 2018 server deployed | Jul 30 anonymo] z=0.855 conf=0.90 \u2014 \n  [2018-07-30 10:54:14 197.248.26.30 STOR /Photo.scr 550 Authorization+ru] z=0.723 conf=0.85 \u2014 \n  [srl-ftp/: Mnemosyne.sys (WinPmem memory acquisition driver) | frespons] z=0.723 conf=0.85 \u2014 \n  [Users present: Administrator, rsydow, rsydow-a | rsydow account hierar] z=0.490 conf=0.70 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW \u2014 No significant anomalies detected in this iteration.\n\nCritical signals (z>3): 0\nHigh signals (2<z<=3): 0\nTotal signals analyzed: 5",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+      "best_posterior": "729/5000",
+      "confidence": {
+        "__fraction__": true,
+        "den": 5000,
+        "num": 729
+      },
+      "is_conclusive": true,
+      "narrative": "IIS 8.5 FTP server in DMZ (172.16.10.12). External attackers attempted malware upload and conducted coordinated credential stuffing using valid domain usernames. Server also served as DFIR response infrastructure. Attack blocked at perimeter \u2014 internal compromise used different vector."
+    },
+    "case_id": "VIGIA-REAL-SRL-DMZ-FTP",
+    "pipeline_meta": {
+      "artifact_count": 5,
+      "avg_score": "729/1000",
+      "expected_verdict": "MALICE",
+      "source": "ebs_v1_json_adapter"
+    },
+    "signals": [
+      {
+        "artifact_id": "ART-DMZ-001",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 17
+        },
+        "description": "2018-07-30 10:54:14 197.248.26.30 STOR /Photo.scr 550 Authorization+rules+denied+the+access | 2018-07-30 16:12:34 117.204.242.121 STOR /Photo.scr 550 Authorization+rules+denied+the+access | Two distin",
+        "evidence_type": "log_entry",
+        "source": "legacy_converter",
+        "z_score": {
+          "__fraction__": true,
+          "den": 400,
+          "num": 289
+        }
+      },
+      {
+        "artifact_id": "ART-DMZ-002",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 9
+        },
+        "description": "2018-08-16: credential stuffing with valid domain usernames \u2014 USER nromanoff (218.22.253.37/CN), USER nromanoff@stark-research-labs.com (121.49.106.6/CN), USER tdungan@stark-research-labs.com (60.174.",
+        "evidence_type": "log_entry",
+        "source": "legacy_converter",
+        "z_score": {
+          "__fraction__": true,
+          "den": 200,
+          "num": 171
+        }
+      },
+      {
+        "artifact_id": "ART-DMZ-003",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 17
+        },
+        "description": "srl-ftp/: Mnemosyne.sys (WinPmem memory acquisition driver) | fresponse-agent.msi (F-Response remote forensic acquisition) | sub-win-x64_base-hunt_5682_3262.exe (F-Response agent for base-hunt server)",
+        "evidence_type": "file_timestamp",
+        "source": "legacy_converter",
+        "z_score": {
+          "__fraction__": true,
+          "den": 400,
+          "num": 289
+        }
+      },
+      {
+        "artifact_id": "ART-DMZ-004",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 7
+        },
+        "description": "Users present: Administrator, rsydow, rsydow-a | rsydow account hierarchy: rsydow (standard), rsydow-a (domain admin), rsydow-f (forensics) | Domain: stark-research-labs.com | rsydow-a confirmed as Do",
+        "evidence_type": "registry_key",
+        "source": "legacy_converter",
+        "z_score": {
+          "__fraction__": true,
+          "den": 100,
+          "num": 49
+        }
+      },
+      {
+        "artifact_id": "ART-DMZ-005",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 9
+        },
+        "description": "Multi-stage attack timeline: May 2018 server deployed | Jul 30 anonymous enumeration + Photo.scr upload attempt | Aug 16 credential stuffing peak with domain usernames | Scanning IPs: 184.105.247.194 ",
+        "evidence_type": "log_entry",
+        "source": "legacy_converter",
+        "z_score": {
+          "__fraction__": true,
+          "den": 200,
+          "num": 171
+        }
+      }
+    ]
+  },
+  "sans_compliance": {
+    "accuracy_validation": false,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}

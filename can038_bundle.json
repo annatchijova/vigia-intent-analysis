@@ -1,0 +1,273 @@
+{
+  "analysis_timestamp": "2026-06-10T19:03:51.472285+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "VIGIA-CAN-038",
+    "end_time": "2026-06-10T19:03:51.472288+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "VIGIA-CAN-038",
+        "entry_sha256": "f73030a058d8c67e306e7f01344671edefbec083f0bd3b381886f8be860bed65",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "VIGIA-CAN-038"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: 4eeafb3bfb155486...",
+        "outputs_summary": {
+          "agent_sha256": "4eeafb3bfb155486142942ad7a2c8678676f86ffd5d076882459354d820591f6",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-06-10T19:03:51.469453+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-CAN-038",
+        "entry_sha256": "a0c15d4a325e0640b4558ed84517c4503046b0537d76862c9a7c181cd203fa3b",
+        "inputs_summary": {
+          "path": "data/cases/consolidated_canonical/VIGIA-CAN-038.json"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-06-10T19:03:51.469530+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-CAN-038",
+        "entry_sha256": "09bc90ef51c69dfa3430760e1c973b69e3052183f2244c29d3798ecd1c68d00c",
+        "inputs_summary": {
+          "path": "data/cases/consolidated_canonical/VIGIA-CAN-038.json"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: 6b3e9f734f522d58...",
+        "outputs_summary": {
+          "sha256": "6b3e9f734f522d5824348b011b69ca0ecdbd5ca0f5829365f27844ef5483ee98"
+        },
+        "seq": 3,
+        "timestamp": "2026-06-10T19:03:51.469611+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "VIGIA-CAN-038",
+        "entry_sha256": "bd4d476d5311c6272ccedf539c5cf3417c5b14ace73fdcc9b32aa3e20fda528b",
+        "inputs_summary": {
+          "evidence": "data/cases/consolidated_canonical/VIGIA-CAN-038.json",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-06-10T19:03:51.469700+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "VIGIA-CAN-038",
+        "entry_sha256": "ca6bc1998c2366512e7732684b7f1e85de4120db116c0b9a5e4eb57e409e70fc",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 4 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+            "best_posterior": "2887/20000",
+            "confidence": "2887/20000",
+            "is_conclusive": "True",
+            "narrative": "svchost.exe (clean hash, valid Microsoft signature) running from C:\\Users\\Public\\Downloads\\, parent cmd.exe, .text section with RWX permissions, exfiltrating 1GB to an AS in Ukraine. Firewall reports ..."
+          },
+          "case_id": "case_026_ventrilocuo_process_hollowing",
+          "pipeline_meta": {
+            "artifact_count": "4",
+            "avg_score": "2887/4000",
+            "expected_verdict": "MALICE",
+            "source": "ebs_v1_json_adapter"
+          },
+          "signals": [
+            {
+              "artifact_id": "a026_01",
+              "confidence": "19/20",
+              "description": "svchost.exe (PID 3847): 8MB RWX region with PE header at offset 0 not mapped to a file on disk. Parent: cmd.exe. Expected: services.exe.",
+              "evidence_type": "memory_process",
+              "source": "sift_volatility",
+              "z_score": "171/200"
+            },
+            {
+              "artifact_id": "a026_02",
+              "confidence": "9/10",
+              "description": "svchost.exe hash on disk: matches Windows 2025 Build 26100. Valid Microsoft signature. The file on disk is clean.",
+              "evidence_type": "memory_process",
+              "source": "sift_authenticode",
+              "z_score": "207/250"
+            },
+            {
+              "artifact_id": "a026_03",
+              "confidence": "4/5",
+              "description": "Persistent connection to 185.62.58.207 (AS57169, Ukraine). 1GB exfiltrated. Firewall reports 0 bytes. TLS cert mismatch.",
+              "evidence_type": "memory_process",
+              "source": "sift_zeek",
+              "z_score": "92/125"
+            },
+            {
+              "artifact_id": "a026_04",
+              "confidence": "13/20",
+              "description": "Run key pointing to C:\\Users\\Public\\Downloads\\svchost.exe for persistence.",
+              "evidence_type": "registry_key",
+              "source": "sift_regripper",
+              "z_score": "117/250"
+            }
+          ]
+        },
+        "seq": 5,
+        "timestamp": "2026-06-10T19:03:51.471968+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "VIGIA-CAN-038",
+        "entry_sha256": "ab09a21a1cd270b87c291ac22780f0f872cdeb1438517c298b8b83b2e361e675",
+        "inputs_summary": {
+          "n_signals": "4"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-06-10T19:03:51.472072+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "VIGIA-CAN-038",
+        "entry_sha256": "764802fc4917fd2becdaa2294e5177e69327668ac696ade0316e8ce5db49f2d6",
+        "inputs_summary": {
+          "verdict": "MALICIOUS_INTENT_DETECTED"
+        },
+        "iteration": 0,
+        "note": "Exit code 1 \u2014 analysis complete.",
+        "outputs_summary": {
+          "exit_code": "1"
+        },
+        "seq": 7,
+        "timestamp": "2026-06-10T19:03:51.472210+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-06-10T19:03:51.469220+00:00",
+    "total_entries": 7
+  },
+  "case_id": "VIGIA-CAN-038",
+  "evidence_path": "data/cases/consolidated_canonical/VIGIA-CAN-038.json",
+  "evidence_sha256": "6b3e9f734f522d5824348b011b69ca0ecdbd5ca0f5829365f27844ef5483ee98",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-CAN-038 ===\nEvidence: data/cases/consolidated_canonical/VIGIA-CAN-038.json\nEvidence SHA-256: 6b3e9f734f522d5824348b011b69ca0ecdbd5ca0f5829365f27844ef5483ee98\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 2887/20000\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\nsvchost.exe (clean hash, valid Microsoft signature) running from C:\\Users\\Public\\Downloads\\, parent cmd.exe, .text section with RWX permissions, exfiltrating 1GB to an AS in Ukraine. Firewall reports 0 bytes.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [svchost.exe (PID 3847): 8MB RWX region with PE header at offset 0 not ] z=0.855 conf=0.95 \u2014 \n  [svchost.exe hash on disk: matches Windows 2025 Build 26100. Valid Micr] z=0.828 conf=0.90 \u2014 \n  [Persistent connection to 185.62.58.207 (AS57169, Ukraine). 1GB exfiltr] z=0.736 conf=0.80 \u2014 \n  [Run key pointing to C:\\Users\\Public\\Downloads\\svchost.exe for persiste] z=0.468 conf=0.65 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW \u2014 No significant anomalies detected in this iteration.\n\nCritical signals (z>3): 0\nHigh signals (2<z<=3): 0\nTotal signals analyzed: 4",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+      "best_posterior": "2887/20000",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20000,
+        "num": 2887
+      },
+      "is_conclusive": true,
+      "narrative": "svchost.exe (clean hash, valid Microsoft signature) running from C:\\Users\\Public\\Downloads\\, parent cmd.exe, .text section with RWX permissions, exfiltrating 1GB to an AS in Ukraine. Firewall reports 0 bytes."
+    },
+    "case_id": "case_026_ventrilocuo_process_hollowing",
+    "pipeline_meta": {
+      "artifact_count": 4,
+      "avg_score": "2887/4000",
+      "expected_verdict": "MALICE",
+      "source": "ebs_v1_json_adapter"
+    },
+    "signals": [
+      {
+        "artifact_id": "a026_01",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 19
+        },
+        "description": "svchost.exe (PID 3847): 8MB RWX region with PE header at offset 0 not mapped to a file on disk. Parent: cmd.exe. Expected: services.exe.",
+        "evidence_type": "memory_process",
+        "source": "sift_volatility",
+        "z_score": {
+          "__fraction__": true,
+          "den": 200,
+          "num": 171
+        }
+      },
+      {
+        "artifact_id": "a026_02",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 9
+        },
+        "description": "svchost.exe hash on disk: matches Windows 2025 Build 26100. Valid Microsoft signature. The file on disk is clean.",
+        "evidence_type": "memory_process",
+        "source": "sift_authenticode",
+        "z_score": {
+          "__fraction__": true,
+          "den": 250,
+          "num": 207
+        }
+      },
+      {
+        "artifact_id": "a026_03",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 4
+        },
+        "description": "Persistent connection to 185.62.58.207 (AS57169, Ukraine). 1GB exfiltrated. Firewall reports 0 bytes. TLS cert mismatch.",
+        "evidence_type": "memory_process",
+        "source": "sift_zeek",
+        "z_score": {
+          "__fraction__": true,
+          "den": 125,
+          "num": 92
+        }
+      },
+      {
+        "artifact_id": "a026_04",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 13
+        },
+        "description": "Run key pointing to C:\\Users\\Public\\Downloads\\svchost.exe for persistence.",
+        "evidence_type": "registry_key",
+        "source": "sift_regripper",
+        "z_score": {
+          "__fraction__": true,
+          "den": 250,
+          "num": 117
+        }
+      }
+    ]
+  },
+  "sans_compliance": {
+    "accuracy_validation": false,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}

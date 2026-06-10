@@ -1,0 +1,227 @@
+{
+  "actions": [],
+  "bundle_id": "8c8e1125-af8d-4c4d-9f80-a11f0f282d0a",
+  "bundle_version": "1.0",
+  "caie_analysis": {
+    "caie_fractures": 0,
+    "caie_fractures_source": "live_caie",
+    "case_id": "VIGIA-REAL-SRL-DMZ-FTP",
+    "composite_score": 0.3346,
+    "confidence": 0.67,
+    "hard_temporal_gate": false,
+    "mcp_analysis": {
+      "caie_structural": {
+        "composite_score": 0.0282,
+        "note": "Single legacy_converter source \u2014 high spoofability penalty applied correctly",
+        "verdict": "NOISE"
+      },
+      "eco_overinterpretation": {
+        "obvious_ratio": 0.38,
+        "verdict": "NORMAL_DISTRIBUTION"
+      },
+      "grice_maxims": {
+        "probability_deception": 0.3,
+        "verdict": "SUSPICION"
+      },
+      "shannon_entropy": {
+        "global_entropy": 5.0964,
+        "verdict": "SUSPICION"
+      },
+      "stylometry": {
+        "probability_same_entity": 0.99,
+        "signals": 4,
+        "verdict": "MALICE"
+      },
+      "trust_fusion": {
+        "composite_trust": 1.0,
+        "daubert_admissible": true,
+        "error_rate": 0.0459
+      }
+    },
+    "peirce_chain": {},
+    "quadripartite_state": {
+      "abstain_reason": null,
+      "action_required": "CORROBORATE_THEN_ACT",
+      "adversarial_penalty_applied": false,
+      "analyst_summary": "Malice indicators with 61% confidence. Margin over alternative hypothesis is narrow. Seek pivot signals before action: see roadmap.",
+      "audit_hash": "a3a39f1a6cf7303b5ec72f682e183c8f1f07b3e18310b24dd45f808225e51969",
+      "confidence_pct": 61,
+      "daubert_note": "Verdict with 60-80% confidence. Pivot signals identified. Requires additional evidence before court submission.",
+      "display_label": "\ud83d\udfe0 MALICE \u2014 MEDIUM CONFIDENCE",
+      "dissent_module": null,
+      "dissent_present": false,
+      "integrity_level": "FULL_INTEGRITY",
+      "investigation_roadmap": [],
+      "pivot_signals": [],
+      "stability_pct": 84,
+      "verdict_state": "MALICE_MEDIUM"
+    },
+    "r3_calibration_note": "EBS decision=ABSTAIN reflects R3 coherence (risk in ABSTAIN zone). Forensic verdict remains MALICE per VIG\u00cdA scorer. Quadripartite state: CORROBORATE_THEN_ACT.",
+    "reason": "Intent score 0.3346 exceeds MALICE threshold (P2+acq_assurance scale, threshold=0.33)",
+    "verdict": "MALICE"
+  },
+  "config_attestation": {
+    "caie_enabled": true,
+    "caie_verdict": "MALICE",
+    "canonical_version": "1.0.0",
+    "config_hash": "74400c4e1e96deb97a94bb33b3fd214fca16d8336e3375d6eff3f1b696d09e2c",
+    "deviation_from_canonical": false,
+    "modified_params": [],
+    "vigia_version": "1.0"
+  },
+  "decision_trace": {
+    "abstain_reason": "",
+    "components_used": 0,
+    "consistency_score": 1.0,
+    "decision": "ABSTAIN",
+    "drift_score": 0.0,
+    "epsilon_used": 0.05,
+    "gamma_stability": 2.0,
+    "graph_stability": 1.0,
+    "lambda_drift": 2.0,
+    "log_lr": 0.0,
+    "lr": 0.0,
+    "omega_intention": 1.0,
+    "posterior": 0.67,
+    "reason_code": "VIGIA_SCORER:MALICE:R3_CALIBRATED",
+    "risk": 0.3346,
+    "signal_contributions": null
+  },
+  "evidence_graph": {
+    "bootstrap_rounds": 500,
+    "edges": [
+      {
+        "confidence_interval": [
+          0.0,
+          1.0
+        ],
+        "dependency_type": "statistical_dependency",
+        "source": "ART-DMZ-001",
+        "stability": 0.85,
+        "target": "ART-DMZ-002",
+        "weight_mean": 0.85
+      },
+      {
+        "confidence_interval": [
+          0.0,
+          1.0
+        ],
+        "dependency_type": "statistical_dependency",
+        "source": "ART-DMZ-002",
+        "stability": 0.9,
+        "target": "ART-DMZ-003",
+        "weight_mean": 0.9
+      },
+      {
+        "confidence_interval": [
+          0.0,
+          1.0
+        ],
+        "dependency_type": "statistical_dependency",
+        "source": "ART-DMZ-003",
+        "stability": 0.85,
+        "target": "ART-DMZ-004",
+        "weight_mean": 0.85
+      },
+      {
+        "confidence_interval": [
+          0.0,
+          1.0
+        ],
+        "dependency_type": "statistical_dependency",
+        "source": "ART-DMZ-004",
+        "stability": 0.7,
+        "target": "ART-DMZ-005",
+        "weight_mean": 0.7
+      }
+    ],
+    "generated_at": "2026-06-10T19:28:16.852711+00:00",
+    "graph_hash": "beea81aad79408cec53c976857200936f6831741eeb345201c873118a0c1671f",
+    "nodes": [
+      "ART-DMZ-001",
+      "ART-DMZ-002",
+      "ART-DMZ-003",
+      "ART-DMZ-004",
+      "ART-DMZ-005"
+    ],
+    "stability_threshold": 0.85
+  },
+  "integrity": {
+    "bundle_hash": "58e9c6248ceb6a4637e00b2abe39b1308daa74775b06ef36789036f6e159fc3a",
+    "decision_hash": "f6ca86c484537e0ac280fea3abd689c305d62cab67665179c598e3570e799058",
+    "ecl_hash": "",
+    "engine_attestation_hash": "e50a38489c5672a9d158eb4b8e2f34a2bfd52c5eaaba541a96c1415f2e192e6b",
+    "graph_hash": "beea81aad79408cec53c976857200936f6831741eeb345201c873118a0c1671f",
+    "policy_hash": "03d292f33eef1e4a2f355fe83299bdb8e72124c710f79ab4626d85a3998e9567",
+    "sealed_at": "2026-06-10T19:28:16.860828+00:00"
+  },
+  "policy_spec": {
+    "created_at": "2026-06-10T19:28:16.852748+00:00",
+    "description": "Politica VIGIA por defecto \u2014 SANS FIND EVIL 2026",
+    "epsilon_accept": 0.05,
+    "epsilon_reject": 0.05,
+    "gamma_stability_init": 2.0,
+    "lambda_drift_init": 2.0,
+    "rules": [
+      {
+        "allowed_roles": [
+          "system",
+          "analyst"
+        ],
+        "description": "Limite de cambio en probabilidad posterior",
+        "max_delta": 0.1,
+        "requires_approval": false,
+        "variable": "posterior"
+      },
+      {
+        "allowed_roles": [
+          "system"
+        ],
+        "description": "Limite de correccion de drift",
+        "max_delta": 0.15,
+        "requires_approval": false,
+        "variable": "drift"
+      },
+      {
+        "allowed_roles": [
+          "system"
+        ],
+        "description": "Cambios en estabilidad del grafo requieren aprobacion",
+        "max_delta": 0.05,
+        "requires_approval": true,
+        "variable": "graph_stability"
+      },
+      {
+        "allowed_roles": [
+          "system"
+        ],
+        "description": "Ajuste adaptativo de sensibilidad al drift",
+        "max_delta": 1.0,
+        "requires_approval": false,
+        "variable": "lambda_drift"
+      },
+      {
+        "allowed_roles": [
+          "system"
+        ],
+        "description": "Ajuste adaptativo de sensibilidad estructural",
+        "max_delta": 1.0,
+        "requires_approval": false,
+        "variable": "gamma_stability"
+      }
+    ],
+    "version": "1.0"
+  },
+  "system_state": {
+    "calibration_model_hash": "",
+    "drift_score": 0.0,
+    "engine_version": "vigia-ebs-v1.0",
+    "epsilon_accept": 0.05,
+    "epsilon_reject": 0.05,
+    "gamma_stability": 2.0,
+    "graph_stability_global": 0.84,
+    "lambda_drift": 2.0,
+    "timestamp": "2026-06-10T19:28:16.852755+00:00"
+  },
+  "timestamp": "2026-06-10T19:28:16.852773+00:00"
+}
