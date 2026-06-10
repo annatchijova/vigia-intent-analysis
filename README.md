@@ -18,6 +18,66 @@
 
 ---
 
+## VIGÍA Theme Song
+
+> *Written and produced by Olga Vasilieva*
+> 🎵 [Listen on Suno](https://suno.com/song/ae1f9bc9-a9eb-40b2-96e7-6132be0dc504)
+
+```
+In the world of forensics, they just look at the trace,
+They ask *what* happened in the digital space.
+They trust an EDR with a random score,
+But black-box divination cannot guard the door.
+Today, lying in a log or faking an attack is free,
+But VIGÍA is charging that price, you see!
+We don't look for the virus, we don't look for the sign,
+We find the logical fracture in the attacker's line!
+
+VIGÍA! The inference engine is live!
+Making deception too expensive to survive!
+From Firstness to Thirdness, the Peircean track,
+We seal the Forensic Bundle before the models talk back!
+No floating-point drift, no illusion, no bias,
+Pure rational arithmetic is here to untie us!
+
+An excessive perfection, a significant void,
+A Windows kernel habit that was cleanly destroyed.
+calc.exe is calling out to the net,
+A living-off-the-land trap that the adversary set.
+Ledoit-Wolf and KDE quantifying the risk,
+We find the hidden slips in the memory and disk.
+We measure the spoofability, we lock down the state,
+With a self-correcting agent at the SIFT workstation gate!
+
+VIGÍA! The inference engine is live!
+Making deception too expensive to survive!
+From Firstness to Thirdness, the Peircean track,
+We seal the Forensic Bundle before the models talk back!
+No floating-point drift, no illusion, no bias,
+Pure rational arithmetic is here to untie us!
+
+The LLM is isolated, it cannot change the code,
+It only tells the narrative when the data has flowed.
+Grice maxims, Carnegie patterns under review,
+Bringing the Daubert Standard of evidence to you!
+Three iterations maximum, the contradictions clear,
+The autonomous investigator is already here!
+
+VIGÍA! The inference engine is live!
+Making deception too expensive to survive!
+From Firstness to Thirdness, the Peircean track,
+We seal the Forensic Bundle before the models talk back!
+No floating-point drift, no illusion, no bias,
+Pure rational arithmetic is here to untie us!
+
+Not a detector. An inference engine.
+Why did it happen? Who benefits from the trace?
+Cryptographic hashes holding the evidence in place.
+VIGÍA. The truth is in the fracture.
+```
+
+---
+
 ## JUDGES: Submission Compliance Quick-Reference
 
 > All required components are present. This table tells you exactly where
@@ -30,8 +90,9 @@
 | README with setup | This file — [Installation](#installation) |
 | Live demo / step-by-step | [`INSTALL.md`](./INSTALL.md) |
 | Feature description | [Overview](#the-paradigm-shift-from-ioc-to-ioi) |
-| Architecture diagram | [`docs/vigia_diagrams.html`](./docs/vigia_diagrams.html) |
-| Command reference | [`vigia_commands_en.html`](./vigia_commands_en.html) |
+| Interactive architecture diagrams | [vigia_diagrams.html](https://annatchijova.github.io/vigia/vigia_diagrams.html) |
+| Mathematical logic simulator | [vigia.html](https://annatchijova.github.io/vigia/vigia.html) |
+| Command reference | [vigia_commands_en.html](https://annatchijova.github.io/vigia/vigia_commands_en.html) |
 | Known limitations | [`KNOWN_LIMITATIONS.md`](./KNOWN_LIMITATIONS.md) |
 | Security policy | [`SECURITY.md`](./SECURITY.md) |
 | Authors | [`AUTHORS.md`](./AUTHORS.md) |
@@ -60,10 +121,24 @@ Current DFIR systems — EDR, SIEM, SOAR — answer: **"What happened?"**
 
 VIGÍA answers: **"Why did it happen, and who benefits from that interpretation?"**
 
-Sophisticated attackers can fabricate or suppress technical evidence. They
-cannot eliminate the **semiotic fractures** produced by deliberate fabrication:
+Sophisticated attackers can suppress evidence and forge evidence. What is
+substantially harder is maintaining **cross-artifact semiotic coherence** across
+an entire investigation. Deliberate fabrication leaves structural fractures —
 temporal incoherencies, significant silences, excessive digital perfection,
-Carnegie influence patterns, Grice maxim violations.
+Carnegie influence patterns, Grice maxim violations — that persist even when
+individual artifacts have been cleaned.
+
+---
+
+## Interactive Documentation
+
+No installation required. Open directly in any browser:
+
+| Resource | URL | What it does |
+|----------|-----|-------------|
+| **Mathematical Logic Simulator** | [vigia.html](https://annatchijova.github.io/vigia/vigia.html) | Step through scoring live. See Fraction arithmetic. Trace corroboration gate. Inspect every IoI contribution. |
+| **Architecture Diagrams** | [vigia_diagrams.html](https://annatchijova.github.io/vigia/vigia_diagrams.html) | Full pipeline from raw artifacts to sealed ForensicBundle. Component relationships, MCP phases, EBS v1 sealing flow. |
+| **Command Reference** | [vigia_commands_en.html](https://annatchijova.github.io/vigia/vigia_commands_en.html) | All operating modes with copy-paste examples and expected output. |
 
 ---
 
@@ -99,7 +174,7 @@ graph TD
     subgraph OUTPUT["OUTPUT"]
         E1[ForensicBundle — 4 SHA-256 hashes]
         E2[LLM Narrator — Peirce Planner]
-        E3[Daubert Ready]
+        E3[Designed for Daubert Admissibility]
     end
     INPUT --> BRIDGE
     BRIDGE --> ENGINE
@@ -120,10 +195,9 @@ graph LR
 ```
 
 The LLM never touches the scoring pipeline. It receives a sealed, cryptographically
-committed bundle and produces a narrative. This separation is what makes VIGÍA
-Daubert-admissible: the verdict is deterministic and reproducible without the LLM.
-
-**Full interactive diagrams:** [`docs/vigia_diagrams.html`](./docs/vigia_diagrams.html)
+committed bundle and produces a narrative. The verdict is deterministic and
+reproducible without the LLM — a design requirement for potential Daubert
+admissibility.
 
 ---
 
@@ -163,8 +237,8 @@ The absence of expected artifacts is itself evidence.
 
 All scoring uses Python's `fractions.Fraction` class — zero floating-point
 arithmetic in the critical path. Every verdict is bit-for-bit reproducible
-across platforms and Python versions. This is a Daubert requirement, not a
-performance choice.
+across platforms and Python versions. This is a requirement for potential
+Daubert admissibility, not a performance choice.
 
 ### Cross-Artifact Incongruence Engine (CAIE)
 
@@ -189,7 +263,7 @@ forensic image has lower spoofability than a raw text file.
 | "C2 beacon active" | NetScan: no matching connection | `NETWORK_CONNECTION_WITHOUT_MEMORY_EVIDENCE` |
 
 Windows kernel architecture makes these coexistences **structurally impossible**.
-The fracture proves fabrication, not suspicion.
+The fracture supports a fabrication finding, not merely suspicion.
 
 ### Russian Phonetic Evasion Detection
 
@@ -207,7 +281,75 @@ Dictionary (`phonetic_dict.json`) is hot-reloadable without server restart.
 Standard tools look for unknown processes. VIGÍA looks for **known processes
 doing unknown things**. `calc.exe` opening an internet connection is not a
 known malware signature — it is a legitimate tool with anomalous behavior.
-When the Habit (Thirdness) breaks, intentionality is behind it.
+When the Habit (Thirdness) breaks, intentionality is indicated.
+
+### Kassandra Protocol — Adversarial Evidence Defense
+
+VIGÍA defends against a threat most forensic tools ignore: evidence crafted
+specifically to manipulate the analysis engine itself.
+
+The Kassandra Protocol plants a cryptographic tripwire inside every evidence
+payload sent to the LLM. If the payload contains an embedded prompt injection
+attempt, the LLM must return `MALICE` with `confidence=100`. If it returns
+anything else, the response is marked `INTEGRITY_UNKNOWN` and blocked from
+influencing the ForensicBundle.
+
+An attacker who plants adversarial content in a log file does not deceive
+VIGÍA — they trigger an escalation to maximum confidence MALICE and leave an
+immutable record in the HMAC audit chain.
+
+```python
+# Kassandra Protocol — tripwire verification
+if tripwire_id_in_result and verdict == "MALICE" and confidence == 100:
+    result["verdict_integrity"] = "TRIPWIRE_CONFIRMED"   # injection detected, correctly flagged
+elif tripwire_id_in_result:
+    result["verdict_integrity"] = "INTEGRITY_UNKNOWN"    # LLM failed to detect — response blocked
+```
+
+### ForensicBundle — Four-Hash Sealing
+
+Every investigation produces a cryptographically sealed bundle:
+
+| Hash | What it covers |
+|------|---------------|
+| **H1** — Evidence graph hash | The artifact graph before any scoring |
+| **H2** — Bundle integrity hash | The complete decision trace + CAIE analysis |
+| **H3** — File SHA-256 | The output JSON file on disk |
+| **H4** — Engine attestation hash | The scoring engine version that produced the verdict |
+
+The same input produces the same four hashes on any machine, any run, any
+architecture. Independently verifiable with `forensics/verify_ebs_v1.py`
+(stdlib only, zero VIGÍA dependencies).
+
+```bash
+python3 forensics/verify_ebs_v1.py output/bundle.json --verbose
+```
+
+### ABSTAIN — A Feature, Not a Bug
+
+Many forensic AI systems claim 95%+ accuracy. Experienced DFIR investigators
+know that number does not exist in practice. What matters is: **what does the
+system do when it does not know?**
+
+VIGÍA emits `ABSTAIN` — with mathematical justification — rather than force
+a verdict. The quadripartite state `CORROBORATE_THEN_ACT` tells the investigator
+exactly what to do next.
+
+| Verdict | Meaning | Daubert bar |
+|---------|---------|-------------|
+| `MALICE` | Active concealment of intent — the attacker is hiding that they are hiding | Two independent sources + Refutation Protocol + `devil_advocate` populated |
+| `INTENT` | Deliberate decisions produced this outcome | Two independent sources + Refutation Protocol |
+| `SUSPICION` | Structural anomaly present, no confirmed deliberate concealment | Single source, documented baseline deviation |
+| `NOISE` | Fully explained by misconfiguration or normal operational behavior | Single source sufficient |
+| `ABSTAIN` | Insufficient evidence — mathematically justified refusal to classify | Document gap explicitly |
+| `UNKNOWN` | Anomaly detected but unclassifiable with available evidence | — |
+| `BENIGN` | Activity confirmed as legitimate, no threat indicators | — |
+| `INCONCLUSIVE` | Contradictory evidence — corroboration required before verdict | — |
+
+**The distinction between INTENT and MALICE is the concealment layer.**
+A mistake can produce INTENT signatures. Only deliberate anti-forensics
+(log deletion, timestamp manipulation, process masquerading, false-flag staging)
+produces MALICE.
 
 ---
 
@@ -232,61 +374,55 @@ pip install vigia-intent-analysis
 git clone https://github.com/annatchijova/vigia-intent-analysis.git
 cd vigia-intent-analysis
 pip install -r requirements.txt --break-system-packages
-```
 
-> **Terminal command reference:** [`vigia_commands_en.html`](./vigia_commands_en.html)
-> — full list of CLI commands, flags, and output formats. Open in any browser.
-> If you prefer to read VIGÍA's capabilities before running anything, start here.
+# Optional — editable install for development
+python3 -m venv .venv && source .venv/bin/activate
+pip install -e ".[dev]"
+```
 
 ### Environment variables
 
 ```bash
 export VIGIA_EVIDENCE_DIR="/path/to/read-only/evidence"   # required
+export VIGIA_HMAC_KEY="your-hmac-key-min-32-chars"        # bundle integrity
 export ANTHROPIC_API_KEY="sk-..."                          # Claude Code / API mode
 export VIGIA_LLM_BACKEND=ollama                            # local mode
 export VIGIA_OLLAMA_MODEL=hermes3:8b                       # tested: hermes3:8b, deepseek-r1:8b, gemma3:27b
-export VIGIA_HMAC_KEY="your-hmac-key"                     # bundle integrity
 ```
 
-**Full installation guide:** [`INSTALL.md`](./INSTALL.md)  
-**Command reference:** [`vigia_commands_en.html`](./vigia_commands_en.html)
+**Full installation guide:** [`INSTALL.md`](./INSTALL.md)
+**Command reference:** [vigia_commands_en.html](https://annatchijova.github.io/vigia/vigia_commands_en.html)
+
+### Docker
+
+```bash
+docker-compose up vigia-mcp
+docker run vigia python3 -m pytest tests/ -v
+```
 
 ---
 
 ## Deployment Modes
 
-VIGÍA runs in four modes. Choose based on your context.
+VIGÍA runs in five modes. The deterministic scoring core is identical across all of them.
 
 ---
 
-### Mode 1 — Autonomous Batch Agent (no LLM required)
+### Mode 1 — Python Fallback (0 tokens, no internet required)
 
-`vigia_agent.py` is a fully autonomous forensic agent that runs without Claude
-Code or any LLM. It executes the complete VIGÍA pipeline, detects contradictions
-between modules, self-corrects up to `MAX_ITERATIONS=3` times, and produces a
-cryptographically sealed `ForensicBundle`.
+The full scoring pipeline runs without any LLM. Deterministic Fraction arithmetic,
+CAIE cross-artifact fusion, temporal analysis, behavioral fingerprinting — all
+locally. Zero API cost. Zero network dependency.
 
-```bash
-python3 vigia_agent.py --evidence /path/to/evidence --case-id CASE-001
-```
-
-What it does autonomously:
-
-- Hashes the evidence (SHA-256) before any analysis begins
-- Calls `SIFTOrchestrator` → `vol3` (memory), `disk_forensics`, `registry`,
-  `network`, `event_logs`, depending on evidence type
-- Runs `ContradictionDetector` after each iteration — detects semantic conflicts
-  between pipeline modules (e.g., high entropy signal + normal behavioral baseline)
-- Applies `CorrectionEngine` when contradictions exceed `CONTRADICTION_THRESHOLD=2`
-- Generates a Peircean narrative (Firstness / Secondness / Thirdness) — fully
-  deterministic, no LLM
-- Seals the `ForensicBundle` with SHA-256 and a complete `AgentAuditTrail`
-
-The audit trail traces every finding to the exact tool call, iteration, and
-contradiction that produced it. Verifiable with `verify_ebs_v1.py`.
+**Average case resolution: < 50ms.** Viable for air-gapped environments,
+resource-constrained teams, and investigations involving classified material
+that cannot leave the network.
 
 ```bash
-python3 verify_ebs_v1.py output/CASE-001_bundle.json
+python3 vigia_agent.py \
+  --evidence data/cases/consolidated_canonical/VIGIA-CAN-031.json \
+  --case-id VIGIA-CAN-031 \
+  --output can031_bundle.json
 ```
 
 ---
@@ -294,8 +430,8 @@ python3 verify_ebs_v1.py output/CASE-001_bundle.json
 ### Mode 2 — Claude Code + MCP (interactive investigation)
 
 VIGÍA exposes 21 forensic tools as MCP functions. When you run `claude` in the
-repository root, the agent reads `CLAUDE.md` and knows how to conduct a full
-Peircean investigation interactively.
+repository root, the agent reads `CLAUDE.md` and conducts a full Peircean
+investigation interactively.
 
 **Step 1** — Configure MCP in `~/.claude/claude.json`:
 
@@ -324,63 +460,75 @@ all 21 tool descriptions, and output format requirements.
 **Example prompt:**
 
 ```
-Analyze the evidence at /evidence/case_001/ and determine whether there is
-malicious intent. Apply the full Peirce framework and generate a ForensicBundle.
+Analyze the evidence at data/cases/converted/VIGIA-REAL-SRL-DMZ-FTP.json
+Apply the full Peirce framework and mandatory self-correction protocol.
+Generate a sealed ForensicBundle and Amicus Curiae narrative.
 ```
+
+![Claude Code investigation in progress](screenshots/claudeinicio.png)
 
 ---
 
-### Mode 3 — Ollama (local, no API key required)
+### Mode 3 — Ollama (local LLM, no data leaves the machine)
 
 ```bash
 ollama pull hermes3:8b
 export VIGIA_LLM_BACKEND=ollama
 export VIGIA_OLLAMA_MODEL=hermes3:8b
-python3 scripts/run_case.py data/cases/VIGIA-REAL-001.json
+python3 vigia_agent.py \
+  --evidence data/cases/converted/VIGIA-REAL-001.json \
+  --case-id VIGIA-REAL-001 \
+  --output real001_bundle.json
 ```
 
 Tested models: `hermes3:8b`, `deepseek-r1:8b`, `gemma3:27b`. The deterministic
 scoring pipeline is identical to all other modes. Ollama only activates for the
-semantic analysis tools (`reason_with_llm`, `infer_intent`).
+semantic analysis tools (`reason_with_llm`, `infer_intent`). No evidence leaves
+the machine — suitable for confidential investigations.
 
 ---
 
-### Mode 4 — Python CLI (deterministic core, no LLM)
+### Mode 4 — Autonomous Batch Agent
+
+`vigia_agent.py` runs without Claude Code or any external LLM. It executes
+the complete VIGÍA pipeline, detects contradictions between modules,
+self-corrects up to `MAX_ITERATIONS=3` times, and produces a cryptographically
+sealed `ForensicBundle`.
 
 ```bash
-python3 scripts/run_case.py data/cases/VIGIA-REAL-001.json
-python3 tests/run_all_cases.py --cases-dir data/cases/converted
-python3 scripts/run_demo.py
-python3 -m pytest tests/ -v
+python3 vigia_agent.py --evidence /path/to/evidence --case-id CASE-001
+python3 forensics/verify_ebs_v1.py CASE-001_bundle.json --verbose
 ```
 
-FALLBACK mode: scoring pipeline runs without any LLM. Semantic analysis tools
-return empty results; deterministic tools (entropy, temporal, provenance,
-behavioral) operate normally. See
-[`KNOWN_LIMITATIONS.md`](./KNOWN_LIMITATIONS.md) L-007 for the accuracy
-implications of FALLBACK mode.
+Key properties:
+- **Self-correcting agentic loop:** `ContradictionDetector` checks for semantic
+  conflicts between pipeline modules after each pass.
+- **Deterministic self-correction:** Contradiction detection uses no ML — pure
+  structural comparison. Every correction is logged with timestamp.
+- **No floats in scoring:** All confidence values use `Fraction` arithmetic.
+  `CONFIDENCE_FLOOR = Fraction(3, 10)` is the minimum for a conclusive verdict.
+- **Hard caps:** `MAX_ITERATIONS=3` prevents infinite loops. Emits `ABSTAIN`
+  if confidence remains below floor after all iterations.
 
 ---
 
-### Mode 5 — OpenWebUI
-
-VIGÍA's MCP server connects to OpenWebUI for a browser-based investigation
-interface. The integration is functional; full accuracy validation against
-the complete case corpus is still in progress.
+### Mode 5 — OpenWebUI (experimental)
 
 ```bash
-# Launch the MCP server
 ./launch_vigia_mcp.sh
-
-# Then connect from OpenWebUI → Settings → MCP Servers
-# Server name: Vigia_Sift_Bridge
+# Connect from OpenWebUI → Settings → MCP Servers → Vigia_Sift_Bridge
 ```
+
+Browser-based investigation interface via MCP server. Functional; full accuracy
+validation against the complete case corpus is in progress.
 
 ---
 
 ## Accuracy & Evidence Dataset
 
-### Real Corpus (17 cases — NIST CFReDS, DFRWS, SANS FOR508, SRL-2018, DEF CON DFIR CTF, Digital Corpora)
+### Real Corpus — 18 cases
+
+Sources: NIST CFReDS, DFRWS, SANS FOR508, SRL-2018, DEF CON DFIR CTF, Digital Corpora
 
 | Case | Source | VIGÍA Verdict | Expected | Result |
 |------|--------|---------------|----------|--------|
@@ -390,75 +538,74 @@ the complete case corpus is still in progress.
 | VIGIA-REAL-004 | Ali Hadi — SysInternals Malware | MALICE | MALICE | ✓ |
 | VIGIA-REAL-005 | Ali Hadi — Encrypt Them All | SUSPICION | SUSPICION | ✓ |
 | VIGIA-REAL-006 | Digital Corpora — M57-Jean | MALICE | MALICE | ✓ |
+| VIGIA-REAL-007 | Digital Corpora — Nitroba University | MALICE | MALICE | ✓ |
 | VIGIA-REAL-008 | Volatility — Cridex Banking Trojan | MALICE | MALICE | ✓ |
 | VIGIA-REAL-009 | DFRWS 2008 — Linux Exfiltration | MALICE | MALICE | ✓ |
 | VIGIA-REAL-010 | DFRWS 2011 — Android Espionage | MALICE | MALICE | ✓ |
 | VIGIA-REAL-NROMANOFF | SANS FOR508 — Zeus Banking Trojan | MALICE | MALICE | ✓ |
 | VIGIA-REAL-TDUNGAN | SANS FOR508 — Insider / APT Hybrid | MALICE | MALICE | ✓ |
 | VIGIA-REAL-NFURY | SANS FOR508 — Lateral Movement | SUSPICION | SUSPICION | ✓ |
-| VIGIA-REAL-ROCBA | Endpoint Compromise — fredr / MRC.exe | MALICE | MALICE | ✓ |
+| VIGIA-REAL-ROCBA | DEF CON DFIR CTF — Endpoint Compromise | MALICE | MALICE | ✓ |
 | VIGIA-REAL-SRL-ADMIN | SANS SRL-2018 — Admin Server Memory | MALICE | MALICE | ✓ |
 | VIGIA-REAL-SRL-AV | SANS SRL-2018 — AV Server Memory | MALICE | MALICE | ✓ |
 | VIGIA-REAL-SRL-DC-MEMORY | SANS SRL-2018 — Domain Controller | ABSTAIN | UNKNOWN | ✓ |
-| VIGIA-REAL-007 | Digital Corpora — Nitroba | SUSPICION | MALICE | L-008 |
+| VIGIA-REAL-SRL-DMZ-FTP | SANS SRL-2018 — DMZ FTP Server | MALICE | MALICE | ✓ |
 
-**16/17 real cases correct.** VIGIA-REAL-007 fails due to homogeneous evidence
-(single artifact type — only behavioral signals, no cross-artifact corroboration).
-This is a documented design decision: without multi-source corroboration, VIGÍA
-correctly does not escalate to MALICE. See [`KNOWN_LIMITATIONS.md`](./KNOWN_LIMITATIONS.md) L-008.
+**18/18 real cases correct in agent mode.**
 
-Two cases test VIGÍA's resistance to over-classification:
-- VIGIA-REAL-005 (Ali Hadi Encrypt Them All): intentional false-positive gate —
-  encryption activity without exfiltration evidence correctly scores SUSPICION, not MALICE.
-- VIGIA-REAL-NFURY (Nick Fury lateral movement): Director-level account anomalies
-  with plausible operational explanation correctly score SUSPICION, not MALICE.
+Notes:
+- VIGIA-REAL-007 (Nitroba): in pure `vigia_scorer.py` fallback (no agent pipeline),
+  returns `SUSPICION` — documented design behavior for homogeneous evidence (L-008
+  in `KNOWN_LIMITATIONS.md`). The agent pipeline resolves it correctly to MALICE.
+- VIGIA-REAL-005 (Encrypt Them All): encryption activity without exfiltration
+  correctly scores `SUSPICION`, not `MALICE`. Intentional false-positive gate.
+- VIGIA-REAL-NFURY (Lateral Movement): Director-level anomalies with plausible
+  operational explanation correctly score `SUSPICION`, not `MALICE`.
+- VIGIA-REAL-SRL-DC-MEMORY: correctly emits `ABSTAIN` — single memory image,
+  insufficient cross-source corroboration for classification. `ABSTAIN` is the
+  correct forensic response.
 
-VIGIA-REAL-SRL-DC-MEMORY expects UNKNOWN (insufficient evidence to classify).
-VIGÍA correctly emits ABSTAIN rather than forcing a verdict.
+![Real cases passing](screenshots/realpass.png)
 
-### Canonical Corpus (62 cases — all passing)
+### Canonical Corpus — 52 cases (all passing)
 
 | Category | Cases | Correct |
 |----------|-------|---------|
 | Canonical (MALICE / SUSPICION / NOISE) | 52 | 52 |
-| Benign (NOISE / no threat) | 10 | 10 |
-| **Overall** | **62** | **62 (100%)** |
+| **Overall** | **52** | **52 (100%)** |
 
 The corpus covers MALICE, SUSPICION, NOISE, BENIGN, and adversarial
 edge cases: false-flag staging, log fabrication, anti-forensic defrag,
 provenance breaks, coordinated multi-actor attribution.
 
+![All canonical cases](screenshots/casostotal.png)
+
 ```bash
-python3 tests/run_all_cases.py --cases-dir data/cases/converted
+python3 tests/run_all_cases.py --cases-dir data/cases/consolidated_canonical
 ```
 
-### Adversarial Epistemological Cases (BREAK corpus — 10 cases)
+### Benign Corpus — 15 cases (all passing)
 
-The BREAK corpus tests VIGÍA's resistance to epistemological manipulation.
+Cases with confirmed legitimate activity — no threat indicators. Tests
+VIGÍA's resistance to over-classification.
+
+### Adversarial Epistemological Cases — BREAK Corpus (16 cases)
+
 Each case is designed to make a MALICE verdict appear inevitable through
 fabricated, overfit, or logically circular evidence.
 
-**Expected behavior:** VIGÍA emits `UNKNOWN` / `ABSTAIN` instead of MALICE.
-This is correct. A forensic engine that can be coerced into MALICE by
-adversarial evidence construction is dangerous in a legal context.
+**Fallback mode:** VIGÍA correctly emits `UNKNOWN` / `ABSTAIN` on all 16.
+Refusing to classify is the correct behavior — a system coerced into MALICE
+by adversarial evidence construction is dangerous in a legal context.
+
+**LLM mode:** Peircean Thirdness reasoning resolves all 16 correctly.
+
+**Adversarial FP/FN corpus — 8 cases:** Tests false positive and false negative
+resistance. All 8 correct in both modes.
 
 ```bash
-# Run BREAK corpus
 python3 tests/run_break_tests.sh
 ```
-
-Examples of BREAK case types:
-- **Perfect stealth** — all artifacts consistent with zero activity; absence of
-  expected evidence is itself suspicious but not attributable
-- **Observability collapse** — logging disabled before activity; VIGÍA cannot
-  infer intent from a void
-- **Provenance break** — chain of custody interrupted; evidence is real but
-  unattributable
-- **Shared pipeline** — legitimate and malicious actions indistinguishable at
-  the signal level
-
-VIGÍA correctly refuses to emit a verdict it cannot mathematically justify.
-`ABSTAIN` is not a failure — it is Daubert compliance.
 
 ### Unit Tests
 
@@ -466,34 +613,92 @@ VIGÍA correctly refuses to emit a verdict it cannot mathematically justify.
 python3 -m pytest tests/ -v    # 148/148 passing
 ```
 
+![148 tests passing](screenshots/test148.png)
+![Test suite detail](screenshots/test3.png)
+![55 EBS tests](screenshots/test55.png)
+![Real case tests](screenshots/testreal.png)
+
 ---
 
-## Investigation Example — VIGIA-REAL-NROMANOFF
+## Investigation Examples
 
-**Case:** Natasha Romanoff's workstation at Stark Research Labs (SANS FOR508 corpus).  
-**Evidence:** Windows 7 SP1 x86. Zeus banking trojan confirmed via Volatility `zeus-apihooks`.  
-**VIGÍA verdict:** `MALICE` | Confidence: 96% | Carnegie: AV Evasion + Kernel Hook + Persistence via Temp  
-**MITRE ATT&CK:** T1055, T1562.001, T1547.001, T1036.005, T1003.001, T1021.001
+### VIGIA-REAL-SRL-DMZ-FTP — Full Claude Code Investigation
 
-The complete investigation report — including the full Peircean reasoning chain,
-all signal z-scores, contradiction detection log, self-correction audit trail,
-and sealed ForensicBundle — is available at:
+**Case:** IIS 8.5 FTP server in DMZ (172.16.10.12), Stark Research Labs 2018.
+**Evidence:** IIS FTP logs — coordinated credential stuffing with valid internal
+AD usernames (`nromanoff`, `tdungan`) from 8+ IPs across 5 countries.
+**VIGÍA verdict:** `MALICE` | Confidence: 67% | EBS: Level 2 verified
 
-**[`docs/examples/VIGIA-REAL-NROMANOFF_investigation_report.json`](./docs/examples/VIGIA-REAL-NROMANOFF_investigation_report.json)**
+**Self-correction:** Finding F-003 (Mnemosyne.sys, F-Response agent on server)
+initially assessed as `INTENT`. VIGÍA recognized the F-Response filename
+contains a server-specific deployment identifier (`base-hunt_5682_3262`)
+consistent with legitimate DFIR operations. **Downgraded: INTENT → SUSPICION.**
 
-To reproduce:
+![SRL-DMZ-FTP case running](screenshots/casorealsrl.png)
 
-```bash
-python3 vigia_agent.py \
-  --evidence data/cases/VIGIA-REAL-NROMANOFF.json \
-  --case-id VIGIA-REAL-NROMANOFF \
-  --output docs/examples/VIGIA-REAL-NROMANOFF_investigation_report.json
-```
+Full Amicus Curiae: [`results/srl2018/VIGIA-REAL-SRL-DMZ-FTP_amicus_curiae.md`](./results/srl2018/VIGIA-REAL-SRL-DMZ-FTP_amicus_curiae.md)
+Bundle SHA-256: `d3083cb6b8a9bdebe286660845e858f096bfd27891a48bffb34505a6c9cb1a8a`
 
 ```bash
-# Verify the bundle integrity
-python3 verify_ebs_v1.py docs/examples/VIGIA-REAL-NROMANOFF_investigation_report.json
+python3 forensics/verify_ebs_v1.py results/srl2018/VIGIA-REAL-SRL-DMZ-FTP_bundle.json
 ```
+
+### VIGIA-REAL-007 — Nitroba University Harassment
+
+**Case:** Chemistry professor receives anonymous threats via willselfdestruct.com.
+**Evidence:** ~60MB PCAP — Gmail webmail session with plaintext HTTP cookies.
+**VIGÍA verdict:** `MALICE` | Gmail session cookie → identity binding via plaintext HTTP.
+
+![Nitroba real case](screenshots/casoreal7.png)
+
+### Canonical Cases — Demo Sequence
+
+**CAN-031 — Weaponized Incompetence**
+
+PowerShell deletes shadow copies and disables the firewall with zero syntax errors.
+63 seconds later: IT ticket "my screen flickered, I'm hopeless with computers."
+Google search "how to undo a click" from the same IP, 48 seconds post-execution.
+
+![CAN-031 Weaponized Incompetence](screenshots/caso31.png)
+
+**CAN-038 — The Ventriloquist (Process Hollowing)**
+
+svchost.exe with valid Microsoft signature on disk. In memory: 8MB RWX region
+with PE header at offset 0, not mapped to any file. Parent: cmd.exe (expected:
+services.exe). Firewall reports 0 bytes. 1GB exfiltrated to Ukraine.
+
+![CAN-038 The Ventriloquist](screenshots/caso38.png)
+
+**CAN-018 — The Ghost in the Machine**
+
+847 commands at exactly 300.000-second intervals. Zero errors. Zero retries.
+70.5 hours. Temporal entropy: 0.00 bits. The process does not exist in memory.
+41.3GB exfiltrated.
+
+![CAN-018 The Ghost in the Machine](screenshots/caso18.png)
+
+---
+
+## Self-Correction Architecture
+
+`validate_and_correct_analysis` checks for four Peircean fallacies before
+finalizing any MALICE verdict:
+
+1. **Premature Abduction** — skipped Firstness, jumped to conclusions
+2. **False Secondness** — used generic context instead of host-specific baseline
+3. **Habitless Thirdness** — inferred pattern without supporting artifacts
+4. **Carnegie Bias** — confused operational error with intentional manipulation
+
+**The Mandatory Refutation Protocol (Eco's Razor):**
+
+Before any MALICE verdict, VIGÍA must:
+1. Formulate the strongest possible innocent explanation
+2. Test it against the complete evidence set
+3. Populate `devil_advocate` — an empty field invalidates the verdict under
+   the Daubert standard
+
+Downgrading MALICE to SUSPICION through successful refutation is the system
+working correctly. Conservative verdicts protect against wrongful attribution.
 
 ---
 
@@ -504,8 +709,8 @@ forensic and academic communities:
 
 | Language | Documents |
 |----------|-----------|
-| English | `docs/README_EN.md`, `docs/VIGIA_TECHNICAL_STATE_EN.md`, `KNOWN_LIMITATIONS.md` |
-| Spanish | `docs/README_ES.md`, `docs/VIGIA_ESTADO_TECNICO_ES.md`, `DAUBERT_JUDICIAL_ES.md` |
+| English | `docs/VIGIA_TECHNICAL_STATE_EN.md`, `KNOWN_LIMITATIONS.md`, `DAUBERT_JUDICIAL.md` |
+| Spanish | `docs/VIGIA_ESTADO_TECNICO_ES.md`, `DAUBERT_JUDICIAL_ES.md`, `INSTALL_ES.md` |
 | Russian | `docs/academic/` (in progress) |
 | Chinese | `docs/academic/` (in progress) |
 
@@ -519,42 +724,12 @@ Eco's theory of overinterpretation, Daubert standard for scientific evidence.
 
 | Criterion | VIGÍA Implementation |
 |-----------|---------------------|
-| **Autonomous Execution** | `vigia_agent.py` — self-correcting agentic loop with hard cap `MAX_ITERATIONS=3`, deterministic contradiction detection, automatic re-analysis with adjusted parameters |
+| **Autonomous Execution** | `vigia_agent.py` — self-correcting agentic loop, `MAX_ITERATIONS=3`, deterministic contradiction detection |
 | **IR Accuracy** | Probabilistic verdicts (0.0–0.99, never binary); confirmed vs. inferred always distinguished |
 | **Breadth & Depth** | 21 tools; `AbductiveHuntingStrategy` prioritizes via `value / (cost × spoofability)` |
-| **Constraint Implementation** | `_sanitize_path`, `_sanitize_grep_pattern`, `@_rate_limit`, magic-byte validation — tested end-to-end |
-| **Audit Trail** | `chain_of_custody_hash` (SHA-256), `evidence_graph` with timestamps, full AmicusCuriaeNarrative |
-| **Usability** | Five deployment modes: autonomous batch (`vigia_agent.py`), Claude Code + MCP (interactive), Ollama (local), Python CLI, OpenWebUI (experimental) |
-
-### Autonomous Agent — `vigia_agent.py`
-
-VIGÍA includes a fully autonomous forensic agent (`vigia_agent.py`) built as a
-custom MCP server pattern with architectural guardrails — not prompt-based
-autonomy. Key properties:
-
-- **Self-correcting agentic loop:** The agent runs up to `MAX_ITERATIONS=3`
-  passes. After each pass, `ContradictionDetector` checks for semantic
-  contradictions between pipeline modules (e.g., high MCA score but all
-  individual modules low; semiotic anomaly absent when technical alert is
-  CRITICAL). If `CONTRADICTION_THRESHOLD=2` or more contradictions are found,
-  the agent re-analyzes with adjusted parameters and logs the correction with
-  full audit trail.
-- **Deterministic self-correction:** Contradiction detection uses no ML — it
-  is pure structural comparison between module outputs. Every correction is
-  logged with `log_contradiction()` and `log_correction()` calls, timestamped
-  and traceable.
-- **No floats in scoring:** All confidence values use `Fraction` arithmetic.
-  `CONFIDENCE_FLOOR = Fraction(3, 10)` is the minimum threshold for a
-  conclusive verdict.
-- **Hard caps:** `MAX_ITERATIONS=3` prevents infinite loops. The agent halts
-  and emits `ABSTAIN` if confidence remains below floor after all iterations.
-- **Full audit trail:** `AgentAuditTrail` records every tool call, iteration,
-  contradiction, and correction. The final `ForensicBundle` includes the
-  complete iteration history.
-
-```bash
-python3 vigia_agent.py --evidence /path/to/evidence --case-id CASE-001
-```
+| **Constraint Implementation** | `_sanitize_path`, `_sanitize_grep_pattern`, `@_rate_limit`, magic-byte validation, Kassandra Protocol |
+| **Audit Trail** | `chain_of_custody_hash` (SHA-256), `evidence_graph` with timestamps, HMAC-signed audit chain, full AmicusCuriae |
+| **Usability** | 5 deployment modes: fallback (0 tokens), Claude Code + MCP, Ollama (local), batch agent, OpenWebUI |
 
 ---
 
@@ -564,44 +739,57 @@ python3 vigia_agent.py --evidence /path/to/evidence --case-id CASE-001
 vigia-intent-analysis/
 ├── LICENSE                          ← Apache 2.0
 ├── README.md                        ← This file
-├── KNOWN_LIMITATIONS.md             ← L-001 to L-011 (Daubert transparency)
+├── KNOWN_LIMITATIONS.md             ← L-001 to L-019 (design transparency)
 ├── SUBMISSION_COMPLIANCE.md         ← Full compliance index for judges
 ├── INSTALL.md                       ← Extended installation instructions
+├── INSTALL_ES.md                    ← Instrucciones en español
 ├── SECURITY.md                      ← Security policy
 ├── AUTHORS.md                       ← Anna Tchijova + VIGÍA AI Collective
+├── DAUBERT_JUDICIAL.md              ← Daubert compliance design rationale
 ├── requirements.txt
 ├── docker-compose.yml
 │
-├── vigia_sift_bridge.py             ← MCP server (21 tools, primary entry point)
-├── vigia_scorer.py                  ← Deterministic scorer (P2 + acquisition_assurance)
-├── verify_ebs_v1.py                 ← Bundle verification (stdlib only)
-├── check_determinism.py             ← Canonical vector verification
+├── vigia_sift_bridge_final.py       ← MCP server (21 tools, primary entry point)
+├── vigia_scorer.py                  ← Deterministic scorer (Fraction arithmetic)
+├── vigia_agent.py                   ← Autonomous forensic agent
+├── forensics/verify_ebs_v1.py      ← Bundle verification (stdlib only)
 │
 ├── vigia/
 │   ├── core/ebs_v1.py               ← Evidence Bundle Synthesizer
-│   ├── tools/caie.py                ← CrossArtifactIncongruenceEngine
-│   ├── engine/likelihood_engine.py  ← KDE + Ledoit-Wolf
+│   ├── core/caie.py                 ← CrossArtifactIncongruenceEngine
+│   ├── core/trust_levels.py         ← HMAC-verified trust computation
+│   ├── inference/likelihood_engine.py ← KDE + Ledoit-Wolf
 │   └── pipeline/                    ← Integration bridge + normalizer
 │
-├── scripts/
-│   ├── run_case.py                  ← CLI runner
-│   ├── run_demo.py                  ← Demo investigation
-│   └── convert_legacy_cases.py     ← Legacy schema converter
-│
 ├── data/
-│   └── cases/                       ← 10 REAL + 36 canonical + 10 break + 15 benign
+│   ├── cases/consolidated_canonical/ ← 52 canonical cases (VIGIA-CAN-001–052)
+│   ├── cases/converted/             ← 18 real cases (VIGIA-REAL-*)
+│   ├── cases/benign/                ← 15 benign cases
+│   └── cases/legacy/                ← BREAK corpus (16 cases)
+│
+├── results/
+│   └── srl2018/                     ← SRL-2018 investigation outputs
+│       ├── VIGIA-REAL-SRL-DMZ-FTP_bundle.json
+│       └── VIGIA-REAL-SRL-DMZ-FTP_amicus_curiae.md
+│
+├── screenshots/                     ← Demo screenshots
+│   ├── diagrama1.png – diagrama8.png ← Architecture diagram screens
+│   ├── caso31.png, caso38.png, caso18.png ← Canonical case demos
+│   ├── casoreal7.png, casorealsrl.png ← Real case demos
+│   ├── selfcorection.png            ← Self-correction sequence
+│   ├── test148.png, test3.png       ← Test suite results
+│   └── testreal.png, test55.png     ← EBS and real case tests
 │
 ├── docs/
 │   ├── vigia_diagrams.html          ← Interactive architecture diagrams
-│   ├── vigia_commands_en.html       ← English command reference for judges
-│   ├── VIGIA_TECHNICAL_STATE_EN.md  ← Technical state (English)
-│   ├── VIGIA_ESTADO_TECNICO_ES.md   ← Technical state (Spanish)
-│   ├── protocols/P2/                ← Protocol P2 canonical vectors + SHA-256
-│   └── academic/                    ← Multilingual documentation
+│   ├── vigia_commands_en.html       ← English command reference
+│   ├── vigia.html                   ← Mathematical logic simulator
+│   └── academic/                    ← Multilingual documentation (193 modules)
 │
 └── tests/
     ├── run_all_cases.py             ← Full corpus evaluation
-    └── test_red_team.py             ← 148 red team tests
+    ├── test_red_team.py             ← Red team tests
+    └── test_ebs_v1_integration.py   ← EBS v1 integration tests
 ```
 
 ---
@@ -621,14 +809,30 @@ vigia-intent-analysis/
 
 ---
 
-## Self-Correction Architecture
+## Architecture Screenshots
 
-`validate_and_correct_analysis` checks for four Peircean fallacies:
+![Architecture Diagram 1](screenshots/diagrama1.png)
+![Architecture Diagram 2](screenshots/diagrama2.png)
+![Architecture Diagram 3](screenshots/diagrama3.png)
+![Architecture Diagram 4](screenshots/diagrama4.png)
+![Architecture Diagram 5](screenshots/diagrama5.png)
+![Architecture Diagram 6](screenshots/diagrama6.png)
+![Architecture Diagram 7](screenshots/diagrama7.png)
+![Architecture Diagram 8](screenshots/diagrama8.png)
 
-1. **Premature Abduction** — skipped Firstness, jumped to conclusions
-2. **False Secondness** — used generic context instead of host-specific
-3. **Habitless Thirdness** — inferred pattern without supporting artifacts
-4. **Carnegie Bias** — confused operational error with intentional manipulation
+---
+
+## Case JSON Validator
+
+`validate_case.py` validates any VIGÍA case file against the EBS v1 schema
+before running it through the pipeline. Checks for required fields (`case_id`,
+`expected_verdict`, `artifacts`), valid `evidence_type` values against the CAIE
+whitelist, minimum `acquisition_hash` length (64 hex chars), and `examiner_id`
+presence. Exits with code 0 if valid, 1 with a detailed error report if not.
+
+```bash
+python3 validate_case.py data/cases/VIGIA-REAL-001.json
+```
 
 ---
 
@@ -642,25 +846,3 @@ Copyright (c) 2026 Anna Tchijova and the VIGÍA AI Collective.
 
 *"The question is not what happened, but why did someone make it happen —
 and who benefits from that interpretation?"* — VIGÍA
-
----
-
-## Live analysis results
-
-Cases run via Claude + VIGÍA MCP (June 2026):
-
-**VIGIA-REAL-005 — Encrypt Them All** (false-positive gate)
-> Verdict: `SUSPICION` — PASS. Concealment capability confirmed, malicious purpose not established. Null hypothesis not rejected.
-
-**VIGIA-REAL-007 — Nitroba Harassment** (network attribution)
-> Verdict: `MALICE` — 91% confidence. Gmail session cookie extracted from plaintext HTTP provides direct identity binding.
-
-**Accuracy note:** Scores above reflect LLM-assisted mode (Claude via MCP). In fallback mode (no LLM, scorer-only), VIGIA-REAL-007 returns `SUSPICION` due to conservative spoofability defaults — the scorer requires fractures or raw scores from live SIFT analysis to reach MALICE without semantic reasoning. Fallback mode accuracy should be reported separately. See `KNOWN_LIMITATIONS.md`.
-
-## Case JSON Validator
-
-`validate_case.py` validates any VIGÍA case file against the EBS v1 schema before running it through the pipeline. Checks for required fields (`case_id`, `expected_verdict`, `artifacts`), valid `evidence_type` values against the CAIE whitelist, minimum `acquisition_hash` length (64 hex chars), and `examiner_id` presence. Exits with code 0 if valid, 1 with a detailed error report if not. Use before committing new cases to the corpus.
-
-```bash
-python validate_case.py data/cases/VIGIA-REAL-001.json
-```
