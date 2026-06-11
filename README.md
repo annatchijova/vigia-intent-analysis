@@ -617,6 +617,7 @@ python3 -m pytest tests/ -v    # 148/148 passing
 ![Test suite detail](screenshots/test3.png)
 ![55 EBS tests](screenshots/test55.png)
 ![Real case tests](screenshots/testreal.png)
+![Architecture Diagram 3](screenshots/diagrama3.png)
 
 ---
 
@@ -813,7 +814,6 @@ vigia-intent-analysis/
 
 ![Architecture Diagram 1](screenshots/diagrama1.png)
 ![Architecture Diagram 2](screenshots/diagrama2.png)
-![Architecture Diagram 3](screenshots/diagrama3.png)
 ![Architecture Diagram 4](screenshots/diagrama4.png)
 ![Architecture Diagram 5](screenshots/diagrama5.png)
 ![Architecture Diagram 6](screenshots/diagrama6.png)
