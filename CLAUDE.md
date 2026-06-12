@@ -410,3 +410,14 @@ At the end of every investigation, include in the final report:
       Note: Full token breakdown available at usage.anthropic.com
 
 This is required for audit trail completeness under SANS submission rules.
+
+## Audit Trail Requirement
+
+Every tool call MUST be logged to audit_trail with:
+- timestamp (ISO 8601, microsecond precision)
+- tool_name
+- arguments_hash (SHA-256 of sanitized arguments)
+- result_summary (truncated to 200 chars)
+
+The audit_trail is part of the sealed bundle. An investigation with no
+audit_trail entries is incomplete under Daubert chain-of-custody standards.

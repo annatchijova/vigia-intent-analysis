@@ -666,3 +666,17 @@ The amicus curiae at `results/srl2018/VIGIA-REAL-SRL-DMZ-FTP_amicus_curiae.md`
 provides the complete tool call table for the Claude Code investigation.  
 **Post-hackathon fix:** Wire the HMAC audit logger into the MCP tool execution
 pipeline for Mode 3.
+
+## L-021: Float Intermediates in Core Scoring Path
+
+**Status:** Known limitation, documented.
+**Impact:** `vigia_scorer.py` uses `float` for intermediate scoring values
+(effective_trust, adjusted_score, composite, final_score) via `_dround()`
+which returns `round(float(value), precision)`. The `Fraction` guarantee
+applies to the quadripartite classifier inputs (`conf_frac`, `stab_frac`,
+lines 266-267) and the canonical bundle posteriors, but not to the full
+scoring pipeline.
+**Correct claim:** "Fraction arithmetic in the verdict classifier and
+canonical bundle output; Decimal rounding for intermediate scores."
+**Post-hackathon fix:** Replace `_dround()` return type with `Decimal`
+throughout the scoring path.
