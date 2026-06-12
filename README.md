@@ -569,7 +569,7 @@ python3 -m pytest tests/ -v    # 156 passed, 8 xfailed
 **VIGIA verdict:** MALICE | Confidence: HIGH | Trust fusion: 1.0 | Daubert: ADMISSIBLE (error 8.12%)
 **Self-correction:** F-004 (802.11 monitor-mode WiFi captures) initially INTENT.
 VIGIA applied Daubert single-source standard. **Downgraded: INTENT -> SUSPICION.**
-14 MCP tool calls with timestamps in tool_execution_log inside the sealed bundle.
+16 tool calls (14 MCP + 2 self-correction events) with timestamps in tool_execution_log inside the sealed bundle.
 
 Full Amicus Curiae: [results/srl2018/VIGIA-REAL-VANKO_amicus_curiae.md](./results/srl2018/VIGIA-REAL-VANKO_amicus_curiae.md)
 
