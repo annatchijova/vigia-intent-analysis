@@ -653,3 +653,16 @@ See `caie_false_flag_rule_fixed.py` for the corrected function.
 
 **Roadmap:** Post-hackathon — update canonical corpus metadata, then apply
 `_has_manip` guard with `_TECHNICAL_EVIDENCE_TYPES` and `_MANIPULATION_FLAGS`.
+## L-020: Claude Code Mode Bundle Does Not Include Granular audit_trail
+
+**Status:** Known limitation, documented.  
+**Impact:** The ForensicBundle produced by Claude Code (Mode 3) contains integrity
+hashes and decision traces but no per-tool-call audit_trail array with timestamps.
+Fallback mode bundles (Mode 1) include full timestamped audit_trail entries.  
+**Mitigation:** For the primary demo case (VIGIA-REAL-SRL-DMZ-FTP), a fallback
+execution log with 6 timestamped events is available at:
+`results/srl2018/VIGIA-REAL-SRL-DMZ-FTP_execution.jsonl`  
+The amicus curiae at `results/srl2018/VIGIA-REAL-SRL-DMZ-FTP_amicus_curiae.md`
+provides the complete tool call table for the Claude Code investigation.  
+**Post-hackathon fix:** Wire the HMAC audit logger into the MCP tool execution
+pipeline for Mode 3.

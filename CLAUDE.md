@@ -398,3 +398,15 @@ it is not forensics. It is divination."*
 
 *Repository: github.com/annatchijova/vigia-intent-analysis*
 *License: Apache 2.0 | SANS FIND EVIL Hackathon 2026*
+
+## Token Usage Logging
+
+At the end of every investigation, include in the final report:
+
+    TOKEN USAGE (this session):
+      Input tokens:  [from usage.anthropic.com or API response headers]
+      Output tokens: [from usage.anthropic.com or API response headers]
+      Session ID:    [timestamp of SESSION_START]
+      Note: Full token breakdown available at usage.anthropic.com
+
+This is required for audit trail completeness under SANS submission rules.
