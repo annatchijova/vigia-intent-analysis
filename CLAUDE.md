@@ -438,3 +438,43 @@ for INTENT or MALICE, document the gate explicitly:
 Unlike LLM agents that emit incorrect verdicts and then revise them narratively,
 VIGÍA's self-correction occurs pre-emission: the mathematical gate intercepts
 incorrect candidates before they reach the ForensicBundle.
+
+## Tool Execution Log Format (Strict)
+
+Every entry in tool_execution_log MUST follow this exact schema:
+
+```json
+{
+  "seq": <integer>,
+  "event_id": "<uuid4>",
+  "timestamp": "<ISO8601 with microseconds>",
+  "mode": "claude_code",
+  "tool": "<tool_name>",
+  "target": "<what was analyzed>",
+  "result_summary": "<truncated to 120 chars>",
+  "input_hash": "<SHA-256 of sanitized arguments as JSON string>",
+  "prev_hash": "<SHA-256 of previous entry result_summary, or 'GENESIS' for seq=1>"
+}
+```
+
+The prev_hash chain makes the log tamper-evident: any modification to an earlier
+entry breaks all subsequent prev_hash values.
+
+## Self-Correction Event Schema
+
+When ContradictionDetector fires OR when a finding is downgraded by a gate,
+add a dedicated entry to tool_execution_log:
+
+```json
+{
+  "seq": <N>,
+  "event_id": "<uuid4>",
+  "timestamp": "<ISO8601>",
+  "mode": "claude_code",
+  "tool": "contradiction_detector",
+  "target": "<finding_id or module pair>",
+  "result_summary": "BEFORE: <verdict_before> | AFTER: <verdict_after> | REASON: <gate or rule>",
+  "input_hash": "<hash>",
+  "prev_hash": "<prev entry hash>"
+}
+```
