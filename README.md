@@ -290,6 +290,16 @@ Standard tools look for unknown processes. VIGÍA looks for **known processes
 doing unknown things**. `calc.exe` opening an internet connection is not a
 known malware signature — it is a legitimate tool with anomalous behavior.
 
+### Deterministic Self-Correction — ContradictionDetector
+
+`vigia_agent.py` contains a `ContradictionDetector` class that operates with zero LLM calls and zero floats. It uses `Fraction` arithmetic to detect semantic contradictions between pipeline modules:
+
+- High z-score (`> Fraction(5,2)`) with low MCA score (`< Fraction(6,10)`) → contradiction flagged
+- Confidence floor `Fraction(3,10)` — agent halts before emitting weak verdicts
+- `MAX_ITERATIONS=3`, `CONTRADICTION_THRESHOLD=2` — coded limits, not prompt suggestions
+
+The LLM bridge (`validate_and_correct_analysis`) is a separate, optional enrichment layer. The deterministic contradiction detection runs first and is independent of LLM availability.
+
 ### Kassandra Protocol — Adversarial Evidence Defense
 
 VIGÍA plants a cryptographic tripwire inside every evidence payload sent to the LLM.

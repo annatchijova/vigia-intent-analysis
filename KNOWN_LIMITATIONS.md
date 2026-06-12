@@ -680,3 +680,23 @@ scoring pipeline.
 canonical bundle output; Decimal rounding for intermediate scores."
 **Post-hackathon fix:** Replace `_dround()` return type with `Decimal`
 throughout the scoring path.
+
+## L-022: devil_advocate Validation Is Architectural in verify_ebs_v1.py, Prompt-Enforced in Claude Code Mode
+
+**Status:** Partially architectural.
+**Detail:** verify_ebs_v1.py R6_DEVIL_ADVOCATE check (added post-audit) validates that
+all MALICE/INTENT findings have devil_advocate populated in EBS-format bundles.
+For Claude Code mode bundles (free JSON format), the check is enforced via CLAUDE.md
+instructions — no code path prevents an agent from emitting MALICE with empty
+devil_advocate in that mode.
+**Post-hackathon fix:** Add a bundle schema validator that runs before Claude Code
+mode bundle serialization.
+
+## L-022: devil_advocate Validation Partially Architectural
+
+**Status:** Partially architectural — post-audit improvement.
+**Detail:** verify_ebs_v1.py R6_DEVIL_ADVOCATE check validates that all MALICE/INTENT
+findings have devil_advocate populated in EBS-format bundles (mode 1 fallback).
+For Claude Code mode bundles (free JSON format), enforcement is via CLAUDE.md
+instructions — no code path prevents emitting MALICE with empty devil_advocate.
+**Post-hackathon fix:** Schema validator before Claude Code mode bundle serialization.
