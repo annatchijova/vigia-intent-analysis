@@ -106,6 +106,12 @@ VIGÍA. The truth is in the fracture.
 scientific grounding in Peircean semiotics, Eco's overcodification theory,
 and Grice's maxims as deterministic, falsifiable computational constructs.
 
+https://annatchijova.github.io/vigia/vigia.html
+
+https://annatchijova.github.io/vigia/vigia_diagrams.html
+
+https://annatchijova.github.io/vigia/vigia_commands_en.html
+
 ---
 
 ## The Paradigm Shift: From IoC to IoI
