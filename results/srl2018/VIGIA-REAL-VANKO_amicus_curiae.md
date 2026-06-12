@@ -6,7 +6,7 @@ Investigator : VIGIA Autonomous Forensic Agent (Claude Code / Anthropic)
 Evidence     : data/cases/converted/VIGIA-REAL-VANKO.json
 Mode         : Claude Code + MCP (FALLBACK: reason_with_llm unavailable)
 SHA-256      : 01f388e319aeea9ac06022821f7b18f24baf96ac0ce9352d768513808fd129f1
-Timestamp    : 2026-06-12T19:42:51Z
+Timestamp    : 2026-06-12T23:45:30Z
 SANS Phase   : Phase 5 -- Lessons Learned (PICERL lifecycle complete)
 
 ACQUISITION INTEGRITY
@@ -112,7 +112,8 @@ Devil Advocate: FTP server could be IT-installed for legitimate sharing. Account
 Corroboration: ART-003 (transfer log) confirms active use. ART-007 (registry)
                confirms user presence during transfer.
 Self-Correct : Habit incongruence independently confirms MALICE (99%). Shannon
-               entropy 4.91 bits on ART-001 description (normal text range).
+               entropy 4.91/4.72 bits on ART-001/002 descriptions (normal text
+               range -- binary entropy not available from case metadata).
 
 Finding ID   : F-002
 Title        : Confirmed IP Exfiltration of Level 5-8 Classified Material
@@ -226,7 +227,7 @@ Self-Correct : REFUTATION GATE LOG -- F-004
 CONTRADICTION DETECTOR OUTPUT (Pre-Validation)
 ----------------------------------------------
 Run before   : validate_and_correct_analysis
-Timestamp    : 2026-06-12T19:42:40Z
+Timestamp    : 2026-06-12T23:45:20Z
 Contradictions found: 0
 
 Check 1: infer_intent NOISE vs detect_habit_incongruence MALICE
@@ -234,7 +235,7 @@ Check 1: infer_intent NOISE vs detect_habit_incongruence MALICE
   Reason: infer_intent analyzes message trajectories (communication patterns),
           not filesystem artifacts. NOISE reflects tool inapplicability.
 
-Check 2: CAIE composite=0.2379 vs trust_fusion composite=1.0
+Check 2: CAIE composite=0.2261 vs trust_fusion composite=1.0
   Result: NO_CONTRADICTION
   Reason: CAIE applies spoofability penalties to filesystem/log evidence. Trust
           fusion measures Bayesian mutual corroboration. Both consistent:
@@ -269,10 +270,10 @@ ART-007   | 0.8300 | 0.8300   | 0.8300    | NEUTRAL
 
 CAIE CROSS-ARTIFACT ANALYSIS
 -----------------------------
-Composite Score    : 0.2379
+Composite Score    : 0.2261
 Structural Verdict : NOISE
 Probabilistic Verd.: SUSPICION
-Independent Sources: 4
+Independent Sources: 6
 Fractures Detected : 0
 Golden Rules       : 0
 Determinism        : P0-v2.0-DECIMAL-6-4
@@ -341,19 +342,21 @@ Seq | Tool                        | Target                    | Result
   1 | generate_forensic_hash      | VIGIA-REAL-VANKO.json     | SHA-256: 01f388e3...
   2 | read_evidence               | VIGIA-REAL-VANKO.json     | 15674 bytes, hash verified
   3 | calculate_shannon_entropy   | ART-001 binary desc       | 4.91 bits, NOISE
-  4 | calculate_shannon_entropy   | ART-002 ftpd.ini desc     | 4.83 bits, NOISE
+  4 | calculate_shannon_entropy   | ART-002 ftpd.ini desc     | 4.72 bits, NOISE
   5 | detect_habit_incongruence   | smallftpd.exe             | 10 anomalies, MALICE
   6 | detect_human_jitter         | ART-007 timestamps        | CV=1.023, human confirmed
   7 | calculate_human_entropy     | ART-007 activity sequence  | 0% automation, human
   8 | audit_grice_maxims          | Actor deception patterns  | 1 violation, SUSPICION
-  9 | infer_intent                | Full trajectory            | 0 signals, NOISE
+  9 | infer_intent                | Full trajectory            | 2 signals, NOISE
  10 | detect_eco_overinterpretation| All 7 artifacts           | NORMAL, ratio=0.14
- 11 | cross_artifact_analysis     | All 7 artifacts           | composite=0.2379
+ 11 | cross_artifact_analysis     | All 7 artifacts           | composite=0.2261
  12 | trust_fusion_analysis       | All 7 artifacts           | composite=1.0, Daubert=YES
  13 | validate_and_correct_analysis| Full analysis             | ERROR (FALLBACK)
  14 | reason_with_llm             | Self-correction request   | ERROR (FALLBACK)
+ 15 | contradiction_detector      | Cross-tool consistency    | 0 contradictions (4 checks)
+ 16 | contradiction_detector      | F-004 Refutation Gate     | INTENT->SUSPICION (gate)
 
-Total tool calls: 14
+Total tool calls: 16 (14 MCP + 2 self-correction events)
 FALLBACK mode tools: 2 (documented limitation)
 
 MITRE ATT&CK MAPPING
@@ -383,7 +386,7 @@ KNOWN LIMITATIONS
 4. Grice maxims analysis limited applicability -- the actor's deception operates
    through naming and configuration choices (social engineering at the filesystem
    level), not through text communication.
-5. CAIE composite score (0.2379) is conservatively low due to spoofability
+5. CAIE composite score (0.2261) is conservatively low due to spoofability
    penalties on filesystem and log artifacts. The evidentiary strength lies in
    cross-correlation across independent sources, confirmed by trust fusion
    (composite=1.0).
@@ -393,9 +396,9 @@ KNOWN LIMITATIONS
    server -- the 4-day gap is an inferred cutout chain, not a confirmed one.
 8. Shannon entropy measured on artifact descriptions (text), not raw binaries.
    Binary entropy of smallftpd.exe not directly measurable from case metadata.
-9. infer_intent returned NOISE -- tool designed for message-based trajectory
-   analysis, not filesystem artifact forensics. Documented as tool applicability
-   boundary, not a contradiction with MALICE verdict.
+9. infer_intent returned NOISE with 2 low-weight signals -- tool designed for
+   message-based trajectory analysis, not filesystem artifact forensics.
+   Documented as tool applicability boundary, not a contradiction with MALICE.
 10. Additional evidence that would strengthen the case: network flow logs from
     Stark Enterprises firewall; ISP records for 173.73.166.249; Chinese university
     server access logs; USB device connection logs from the Surface 3; Dropbox/
@@ -404,7 +407,7 @@ KNOWN LIMITATIONS
 TOKEN USAGE (this session):
   Input tokens:  [Available at usage.anthropic.com]
   Output tokens: [Available at usage.anthropic.com]
-  Session ID:    2026-06-12T19:40:30Z
+  Session ID:    2026-06-12T23:43:29Z
   Note: Full token breakdown available at usage.anthropic.com
 
 ---

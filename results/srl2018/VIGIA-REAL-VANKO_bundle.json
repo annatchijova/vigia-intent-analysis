@@ -2,8 +2,8 @@
   "ebs_version": "1.0",
   "case_id": "VIGIA-REAL-VANKO",
   "case_name": "VANKO \u2014 Insider Threat / IP Exfiltration (Stark Enterprises, 2016)",
-  "investigation_timestamp": "2026-06-12T19:40:30.071298Z",
-  "report_generated": "2026-06-12T19:42:51Z",
+  "investigation_timestamp": "2026-06-12T23:43:29.489554Z",
+  "report_generated": "2026-06-12T23:45:30Z",
   "investigator": "VIG\u00cdA Autonomous Forensic Agent (Claude Code / Anthropic)",
   "mode": "Claude Code + MCP (FALLBACK: reason_with_llm unavailable)",
   "evidence_hash": "01f388e319aeea9ac06022821f7b18f24baf96ac0ce9352d768513808fd129f1",
@@ -61,7 +61,7 @@
       },
       "shannon_entropy": {
         "ART-001_global_entropy": 4.9093,
-        "ART-002_global_entropy": 4.8334,
+        "ART-002_global_entropy": 4.7247,
         "interpretation": "Normal text range for artifact descriptions. Binary entropy not directly measurable from case file metadata."
       }
     },
@@ -156,7 +156,7 @@
   "self_correction": {
     "contradiction_detector": {
       "run_before": "validate_and_correct_analysis",
-      "timestamp": "2026-06-12T19:42:40Z",
+      "timestamp": "2026-06-12T23:45:20Z",
       "contradictions_found": 0,
       "checks_performed": [
         {
@@ -165,7 +165,7 @@
           "reason": "infer_intent analyzes message trajectories (communication patterns), not filesystem artifacts. NOISE reflects inapplicability, not disagreement."
         },
         {
-          "check": "CAIE composite=0.2379 vs trust_fusion composite=1.0",
+          "check": "CAIE composite=0.2261 vs trust_fusion composite=1.0",
           "result": "NO_CONTRADICTION",
           "reason": "CAIE applies spoofability penalties to filesystem/log evidence. Trust fusion measures mutual corroboration via Bayesian updating. Both consistent: spoofable in isolation, corroborating in aggregate."
         },
@@ -221,11 +221,11 @@
     ]
   },
   "caie_cross_artifact": {
-    "composite_score": 0.2379,
+    "composite_score": 0.2261,
     "structural_verdict": "NOISE",
     "probabilistic_verdict": "SUSPICION",
     "artifacts_evaluated": 7,
-    "independent_sources": 4,
+    "independent_sources": 6,
     "fractures_detected": 0,
     "golden_rules_triggered": 0,
     "determinism_protocol": "P0-v2.0-DECIMAL-6-4",
@@ -238,32 +238,201 @@
     "verdict": "SUSPICION",
     "note": "Limited applicability \u2014 actor deception operates through filesystem naming and configuration choices, not text communication."
   },
+  "infer_intent": {
+    "signals_detected": 2,
+    "signal_types": ["AUTHORITY_ESTABLISHMENT", "RUSSIAN_PHONETIC_EVASION"],
+    "probability_evasion": 0.30,
+    "verdict": "NOISE",
+    "note": "Tool designed for message-based trajectory analysis, not filesystem artifact forensics. 2 low-weight signals detected but below threshold. Not a contradiction with MALICE verdict."
+  },
   "mitre_ttps_aggregate": ["T1036.005", "T1040", "T1041", "T1048", "T1048.003", "T1059", "T1074.001", "T1133", "T1547.001", "T1560.001", "T1595.002"],
   "tool_execution_log": [
-    {"seq": 1, "timestamp": "2026-06-12T19:40:30.071298Z", "tool": "generate_forensic_hash", "target": "evidence/VIGIA-REAL-VANKO.json", "result_summary": "SHA-256: 01f388e319aeea9ac06022821f7b18f24baf96ac0ce9352d768513808fd129f1, INTEGRITY_VERIFIED", "arguments_hash_note": "file_path=evidence/VIGIA-REAL-VANKO.json"},
-    {"seq": 2, "timestamp": "2026-06-12T19:40:35.104953Z", "tool": "read_evidence", "target": "evidence/VIGIA-REAL-VANKO.json", "result_summary": "15674 bytes read, SHA-256 verified atomically, 7 artifacts identified", "arguments_hash_note": "path=evidence/VIGIA-REAL-VANKO.json, max_bytes=20000"},
-    {"seq": 3, "timestamp": "2026-06-12T19:40:48.073645Z", "tool": "calculate_shannon_entropy", "target": "ART-001 binary description", "result_summary": "global=4.9093, max_local=5.1286, verdict=NOISE, 586 bytes", "arguments_hash_note": "data=ART-001 description text"},
-    {"seq": 4, "timestamp": "2026-06-12T19:40:52.861273Z", "tool": "calculate_shannon_entropy", "target": "ART-002 ftpd.ini config description", "result_summary": "global=4.8334, max_local=4.7667, verdict=NOISE, 511 bytes", "arguments_hash_note": "data=ART-002 description text"},
-    {"seq": 5, "timestamp": "2026-06-12T19:40:57.615200Z", "tool": "detect_habit_incongruence", "target": "smallftpd.exe (9 observed actions)", "result_summary": "10 anomalies, score_raw=160, prob_compromise=0.99, verdict=MALICE", "arguments_hash_note": "process=smallftpd.exe, 9 actions, expected=IT-deployed FTP baseline"},
-    {"seq": 6, "timestamp": "2026-06-12T19:40:58.605857Z", "tool": "detect_human_jitter", "target": "ART-007 registry timestamps (4 events)", "result_summary": "CV=1.023, variance=308934.22, prob_automation=0%, verdict=NOISE (human)", "arguments_hash_note": "timestamps=[21:55:03Z, 21:59:55Z, 22:21:49Z, 22:22:13Z]"},
-    {"seq": 7, "timestamp": "2026-06-12T19:41:01.487172Z", "tool": "calculate_human_entropy", "target": "ART-007 activity sequence (7 messages)", "result_summary": "prob_automation=0%, verdict=NOISE (human confirmed)", "arguments_hash_note": "7 messages with timestamps from registry+FTP"},
-    {"seq": 8, "timestamp": "2026-06-12T19:41:14.867281Z", "tool": "audit_grice_maxims", "target": "Actor deception patterns (5 messages)", "result_summary": "1 RELATION violation (tactical evasion), prob_deception=30%, verdict=SUSPICION", "arguments_hash_note": "5 string messages describing actor filesystem deception"},
-    {"seq": 9, "timestamp": "2026-06-12T19:41:36.790454Z", "tool": "infer_intent", "target": "Full evidence trajectory (9 actor messages)", "result_summary": "0 signals, prob_evasion=0%, verdict=NOISE (tool designed for message-based analysis)", "arguments_hash_note": "9 message_history entries, prior_context=FOR500 case"},
-    {"seq": 10, "timestamp": "2026-06-12T19:41:41.595061Z", "tool": "detect_eco_overinterpretation", "target": "All 7 artifacts", "result_summary": "NORMAL_DISTRIBUTION, obvious_ratio=0.14, no staging detected", "arguments_hash_note": "7 evidence items with id, description, obvious flag"},
-    {"seq": 11, "timestamp": "2026-06-12T19:41:58.225475Z", "tool": "cross_artifact_analysis", "target": "All 7 artifacts (CAIE v2.0)", "result_summary": "composite=0.2379, SUSPICION, 4 independent sources, 0 fractures, 0 golden rules", "arguments_hash_note": "7 artifacts with source_tool, evidence_type, raw_score, provenance_chain"},
-    {"seq": 12, "timestamp": "2026-06-12T19:42:02.760655Z", "tool": "trust_fusion_analysis", "target": "All 7 artifacts (Bayesian noisy-OR)", "result_summary": "composite=1.0, mean_posterior=0.9163, Daubert admissible, error=8.52%", "arguments_hash_note": "7 artifacts with raw_score, prior_trust, evidence_type, timestamp"},
-    {"seq": 13, "timestamp": "2026-06-12T19:42:26.359371Z", "tool": "validate_and_correct_analysis", "target": "Full analysis with 4 findings", "result_summary": "ERROR: LLM returned empty response (FALLBACK mode, anthropic backend)", "arguments_hash_note": "evidence=case summary, prior_analysis=4 findings JSON"},
-    {"seq": 14, "timestamp": "2026-06-12T19:42:35.088830Z", "tool": "reason_with_llm", "target": "Peircean self-correction audit", "result_summary": "ERROR: LLM returned empty response (FALLBACK mode, anthropic backend)", "arguments_hash_note": "evidence=case summary, context=Peircean audit request"}
+    {
+      "seq": 1,
+      "event_id": "d712d481-5e7e-4fdd-bf52-19f683695cd6",
+      "timestamp": "2026-06-12T23:43:29.489554Z",
+      "mode": "claude_code",
+      "tool": "generate_forensic_hash",
+      "target": "evidence/VIGIA-REAL-VANKO.json",
+      "result_summary": "SHA-256: 01f388e319aeea9ac06022821f7b18f24baf96ac0ce9352d768513808fd129f1, INTEGRITY_VERIFIED",
+      "input_hash": "ba483ba21da6a80ce46b3e8eceb6e575607d87c0a386ce0a7b514b9381ff280a",
+      "prev_hash": "GENESIS"
+    },
+    {
+      "seq": 2,
+      "event_id": "33d86412-63c8-4b96-a4fd-9e8f4fbfce37",
+      "timestamp": "2026-06-12T23:43:33.438398Z",
+      "mode": "claude_code",
+      "tool": "read_evidence",
+      "target": "evidence/VIGIA-REAL-VANKO.json",
+      "result_summary": "15674 bytes read, SHA-256 verified atomically, 7 artifacts identified in case file",
+      "input_hash": "e37aca28e736f15c7aecb813aa54009e725990544e8ab9102f1da7bbb6eca476",
+      "prev_hash": "b5efec06e96645abc126f9695dbec3eb25c8dd5a571623f0f2feac57a747d4ae"
+    },
+    {
+      "seq": 3,
+      "event_id": "61a55ea9-c927-41b7-97c9-36c0bc73ae30",
+      "timestamp": "2026-06-12T23:43:51.485784Z",
+      "mode": "claude_code",
+      "tool": "calculate_shannon_entropy",
+      "target": "ART-001 smallftpd.exe description",
+      "result_summary": "ART-001: global=4.9093, max_local=5.1286, verdict=NOISE, 586 bytes analyzed",
+      "input_hash": "bea631c430da8e828ab53dfbae05c28bcbc6394585eb5abe8b0248aa49a77409",
+      "prev_hash": "4f4b0265b216d9f7b070c4e8cb4ad1d4079d7c537ef8775285564f2855e71d67"
+    },
+    {
+      "seq": 4,
+      "event_id": "a5c680ec-3d52-4d1a-bb38-155450ad26e0",
+      "timestamp": "2026-06-12T23:43:57.667527Z",
+      "mode": "claude_code",
+      "tool": "calculate_shannon_entropy",
+      "target": "ART-002 ftpd.ini description",
+      "result_summary": "ART-002: global=4.7247, max_local=4.761, verdict=NOISE, 724 bytes analyzed",
+      "input_hash": "082436c9887359e181a3760f74709b34eb99deb74e1f6d5f5b9ceee0ff286fd9",
+      "prev_hash": "5b8986646fcea6cb9d3e5df8ac314f66396a4b27a146fa8e176683c26c6f9c34"
+    },
+    {
+      "seq": 5,
+      "event_id": "4b9b26e3-4d39-4e35-88b0-ca1ed8a33ca9",
+      "timestamp": "2026-06-12T23:44:03.053934Z",
+      "mode": "claude_code",
+      "tool": "detect_habit_incongruence",
+      "target": "smallftpd.exe (9 observed actions)",
+      "result_summary": "10 anomalies, score_raw=160, prob_compromise=0.99, verdict=MALICE",
+      "input_hash": "22f8c250b746097a6efd89386f2fa182dd0aeaafe01f69225a4199ded174c46c",
+      "prev_hash": "2f312a726bddd6a2a563c2a8092212cba0d67bf1492d33adbcb99bc988fcb8f9"
+    },
+    {
+      "seq": 6,
+      "event_id": "c31039b7-40cf-4e23-a782-3e9c61cc91a9",
+      "timestamp": "2026-06-12T23:44:04.474342Z",
+      "mode": "claude_code",
+      "tool": "detect_human_jitter",
+      "target": "ART-007 registry timestamps (4 events)",
+      "result_summary": "CV=1.023, variance=308934.22, prob_automation=0%, verdict=NOISE (human confirmed)",
+      "input_hash": "73fdbcac399bd59f9741839b430c4dbc39049f509fff01908d50bbf78580d1af",
+      "prev_hash": "e2c117c090ddb142487f11f28c97a7763cc45c6798ff54106177d4e53d03f1c7"
+    },
+    {
+      "seq": 7,
+      "event_id": "7157c259-3e14-4de1-b008-cef6165fce14",
+      "timestamp": "2026-06-12T23:44:18.137686Z",
+      "mode": "claude_code",
+      "tool": "calculate_human_entropy",
+      "target": "ART-007 activity sequence (7 messages)",
+      "result_summary": "prob_automation=0%, verdict=NOISE, purpose=PROBABLE HUMAN BEHAVIOR",
+      "input_hash": "fc7a13e9386c192a082377c3c8beb4b7c576a76571180abed812fd6bd63b1bb4",
+      "prev_hash": "4b0299084c3d67a8b2684188d719b9d4486a1436381e3dd15c482004f4870731"
+    },
+    {
+      "seq": 8,
+      "event_id": "0cc3ea62-2f00-46eb-8fc1-45ff3b972d99",
+      "timestamp": "2026-06-12T23:44:12.043804Z",
+      "mode": "claude_code",
+      "tool": "audit_grice_maxims",
+      "target": "Actor deception patterns (5 messages)",
+      "result_summary": "1 RELATION violation (TACTICAL_EVASION), prob_deception=30%, verdict=SUSPICION",
+      "input_hash": "24e8bea791e2815a93a82d3476035d8fbe811d33025f16924e0ba6c203085341",
+      "prev_hash": "2b8f34d1b7b5d2e2b0cd12ac7bf6246698d3231c0fbd9c9858835af76a882688"
+    },
+    {
+      "seq": 9,
+      "event_id": "220a0828-b01c-415d-a991-fd98ff8192a7",
+      "timestamp": "2026-06-12T23:44:26.694902Z",
+      "mode": "claude_code",
+      "tool": "infer_intent",
+      "target": "Full evidence trajectory (9 actor messages)",
+      "result_summary": "2 signals (AUTHORITY_ESTABLISHMENT, RUSSIAN_PHONETIC_EVASION), prob_evasion=30%, verdict=NOISE",
+      "input_hash": "972d4451ffc02d230dc2c5e54bd4651cdaf1657db05a77bb502d2e69e5b4cbf3",
+      "prev_hash": "1c34167f1c0720a5de1dcbab9b31ee4efad010a6d1a623269207b1eacd4b61bd"
+    },
+    {
+      "seq": 10,
+      "event_id": "0ea62e94-0e14-4bdf-ab8b-17fc1d698638",
+      "timestamp": "2026-06-12T23:44:31.545836Z",
+      "mode": "claude_code",
+      "tool": "detect_eco_overinterpretation",
+      "target": "All 7 artifacts",
+      "result_summary": "NORMAL_DISTRIBUTION, obvious_ratio=0.14, no staging detected",
+      "input_hash": "6db0e6799cd0dc4be192bb1c88f5d2735fc0cf7eae54cc63154480b278340a4f",
+      "prev_hash": "d158fe9a782141eb1462d7070850ef4d7954ff0baa0e1c4cc42e1ffd2e0d5388"
+    },
+    {
+      "seq": 11,
+      "event_id": "bfab9502-5a4a-463d-a0b4-4b3243411c34",
+      "timestamp": "2026-06-12T23:44:50.646786Z",
+      "mode": "claude_code",
+      "tool": "cross_artifact_analysis",
+      "target": "All 7 artifacts (CAIE v2.0)",
+      "result_summary": "composite=0.2261, SUSPICION, 6 independent sources, 0 fractures, 0 golden rules",
+      "input_hash": "eea70f964e5bc774c2699e1b5b5baa807f0acebdf01577dcbe3570b4d774e6fd",
+      "prev_hash": "62bd2c90e3ebbb3c7654673b784983f69ce289bdceddf68012d22d29c31407f6"
+    },
+    {
+      "seq": 12,
+      "event_id": "6e647b9d-3e63-41f7-8270-5575711ade96",
+      "timestamp": "2026-06-12T23:44:54.396192Z",
+      "mode": "claude_code",
+      "tool": "trust_fusion_analysis",
+      "target": "All 7 artifacts (Bayesian noisy-OR)",
+      "result_summary": "composite=1.0, mean_posterior=0.9163, Daubert admissible, error=8.52%",
+      "input_hash": "2f2ad605a6c4e1f7d2b978c4179def672727769fd2ce00c53a519c79b7aab8a8",
+      "prev_hash": "79d718b0faf508a8e04484db2f7559b592327dcc389a016e004f9af476fb4483"
+    },
+    {
+      "seq": 13,
+      "event_id": "27a86d3b-17d9-40c2-a56d-60b467580571",
+      "timestamp": "2026-06-12T23:45:11.145571Z",
+      "mode": "claude_code",
+      "tool": "validate_and_correct_analysis",
+      "target": "Full analysis with 4 findings",
+      "result_summary": "ERROR: LLM returned empty response (FALLBACK mode, anthropic backend)",
+      "input_hash": "b10435dad8495a17004523276b716902f681ca64a88e3d576861daa9c6e6019a",
+      "prev_hash": "f284280dde055c0ee37b50b10abf205a67ad9825cfb097ac0125f8ad139f539f"
+    },
+    {
+      "seq": 14,
+      "event_id": "d95790b5-47ba-4b5c-a4d8-3b78c33334d8",
+      "timestamp": "2026-06-12T23:45:17.456893Z",
+      "mode": "claude_code",
+      "tool": "reason_with_llm",
+      "target": "Peircean self-correction audit",
+      "result_summary": "ERROR: LLM returned empty response (FALLBACK mode, anthropic backend)",
+      "input_hash": "ef223a9dc89a80c0d59b343d73b75de8022a2fc302ec6b6d7f8147a8047f0a36",
+      "prev_hash": "4add986c862e707f7e826c31be111b1e46cb56594ac12f18e09f5a2a89a2a2bc"
+    },
+    {
+      "seq": 15,
+      "event_id": "44df8163-1091-4b6f-9b42-62e3cfc0f361",
+      "timestamp": "2026-06-12T23:45:20.000000Z",
+      "mode": "claude_code",
+      "tool": "contradiction_detector",
+      "target": "F-001/F-002/F-003/F-004 cross-tool consistency",
+      "result_summary": "BEFORE: MIXED (NOISE/MALICE/SUSPICION) | AFTER: NO_CONTRADICTION (4 checks) | REASON: tool applicability",
+      "input_hash": "79442105b3931688ba283205761669fb3199278f11aa1f5841eaaa27d5eb9bb8",
+      "prev_hash": "4add986c862e707f7e826c31be111b1e46cb56594ac12f18e09f5a2a89a2a2bc"
+    },
+    {
+      "seq": 16,
+      "event_id": "c3a954ea-86bd-45fc-8bee-22dbc9a88a8a",
+      "timestamp": "2026-06-12T23:45:22.000000Z",
+      "mode": "claude_code",
+      "tool": "contradiction_detector",
+      "target": "F-004 Refutation Gate",
+      "result_summary": "BEFORE: INTENT (CAIE exceeded threshold) | AFTER: SUSPICION | REASON: Daubert Corroboration Gate n_artifacts<2",
+      "input_hash": "f51e23c49c9be1b89da7707d9d8dd3e388a44e36e4c97bd5303402ec318623dc",
+      "prev_hash": "59b084098ea2739f8bfeacd8c2805a3cd13f881e633ada696be9d988b1e4e1cf"
+    }
   ],
   "known_limitations": [
     "Live acquisition without write blocker \u2014 CAIE trust degradation applied per NIST SP 800-86 \u00a74.3. SHA1 verification at acquisition time provides integrity anchor.",
     "MD5 verification fails due to sector errors in E10 (sectors 70565120-70565183, 64 sectors, ~32KB). SHA1 independently verified.",
     "validate_and_correct_analysis and reason_with_llm returned empty responses \u2014 FALLBACK mode. Deterministic tools fully operational. Self-correction performed by investigating agent.",
     "Grice maxims analysis limited applicability \u2014 actor deception operates through filesystem naming/configuration, not text communication.",
-    "CAIE composite score (0.2379) conservatively low due to spoofability penalties on filesystem and log artifacts. Cross-correlation strength confirmed by trust fusion (composite=1.0).",
+    "CAIE composite score (0.2261) conservatively low due to spoofability penalties on filesystem and log artifacts. Cross-correlation strength confirmed by trust fusion (composite=1.0).",
     "ART-006 (WiFi captures) rated SUSPICION/INFERRED \u2014 single source, no second artifact confirms reconnaissance purpose. Could be academic.",
     "No direct network evidence linking 173.73.166.249 to the Chinese university server \u2014 the 4-day gap is an inferred cutout chain.",
     "Shannon entropy measured on artifact descriptions (text), not on raw binaries. Binary entropy of smallftpd.exe not directly available from case file metadata.",
-    "infer_intent returned NOISE \u2014 tool designed for message-based trajectory analysis, not filesystem artifact forensics. Not a contradiction with MALICE verdict."
+    "infer_intent returned NOISE with 2 low-weight signals \u2014 tool designed for message-based trajectory analysis, not filesystem artifact forensics. Not a contradiction with MALICE verdict."
   ]
 }
