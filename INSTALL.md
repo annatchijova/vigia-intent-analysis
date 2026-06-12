@@ -1,20 +1,20 @@
-# VIGÍA — Guía de Instalación
+# VIGÍA — Installation Guide
 
-> Probada en Ubuntu 22.04 / Linux Mint con Python 3.12.
+> Tested on Ubuntu 22.04 / Linux Mint with Python 3.12.
 
 ---
 
-## Requisitos previos
+## Prerequisites
 
 ```bash
-python3 --version   # 3.10 o superior
+python3 --version   # 3.10 or higher
 pip3 --version
 openssl version
 ```
 
 ---
 
-## 1. Clonar el repositorio
+## 1. Clone the repository
 
 ```bash
 git clone https://github.com/annatchijova/vigia-intent-analysis.git
@@ -23,18 +23,19 @@ cd vigia-intent-analysis
 
 ---
 
-## 2. Actualizar setuptools antes de instalar
+## 2. Update setuptools before installing
 
 ```bash
 pip install --upgrade setuptools --break-system-packages
 ```
 
-> **Por qué:** Ubuntu 22.04 trae setuptools 68.x que no soporta el build backend
-> moderno. Sin este paso, `pip install -e .` falla con `BackendUnavailable`.
+> **Why:** Ubuntu 22.04 ships with setuptools 68.x which does not support the
+> modern build backend. Without this step, `pip install -e .` fails with
+> `BackendUnavailable`.
 
 ---
 
-## 3. Instalar VIGÍA en modo editable
+## 3. Install VIGÍA in editable mode
 
 ```bash
 pip install -e . --break-system-packages
@@ -42,21 +43,21 @@ pip install -e . --break-system-packages
 
 ---
 
-## 4. Crear los __init__.py de los subpaquetes
+## 4. Create subpackage __init__.py files
 
-Los subpaquetes `vigia/security/` y `vigia/forensics/` necesitan sus archivos
-`__init__.py` para que Python los reconozca. Corré este script desde la raíz:
+The `vigia/security/` and `vigia/forensics/` subpackages need their
+`__init__.py` files for Python to recognize them. Run this script from the root:
 
 ```bash
 python3 fix_inits.py
 ```
 
-> **Por qué:** La reorganización del repo dejó estos archivos pendientes de
-> generación automática. Es un paso conocido que se automatizará en v2.1.
+> **Why:** The repo reorganization left these files pending automatic generation.
+> This is a known step that will be automated in v2.1.
 
 ---
 
-## 5. Crear el directorio de evidencia
+## 5. Create the evidence directory
 
 ```bash
 mkdir -p evidence
@@ -64,7 +65,7 @@ mkdir -p evidence
 
 ---
 
-## 6. Copiar el system prompt al directorio de datos
+## 6. Copy the system prompt to the data directory
 
 ```bash
 mkdir -p vigia/data
@@ -74,57 +75,57 @@ chmod 640 vigia/data/system_prompt_peirce.md
 
 ---
 
-## 7. Configurar las variables de entorno
+## 7. Configure environment variables
 
 ```bash
 cp .env.example .env
 nano .env
 ```
 
-Completar obligatoriamente:
+Required fields:
 
 ```
-ANTHROPIC_API_KEY=sk-ant-...           # Obtener en console.anthropic.com
-VIGIA_HMAC_KEY=                        # Generar: openssl rand -hex 32
-KASSANDRA_SALT=                        # Generar: openssl rand -hex 16
-VIGIA_EVIDENCE_DIR=/ruta/a/tu/repo/evidence
-VIGIA_SYSTEM_PROMPT_PATH=/ruta/a/tu/repo/vigia/data/system_prompt_peirce.md
+ANTHROPIC_API_KEY=sk-ant-...           # Get it at console.anthropic.com
+VIGIA_HMAC_KEY=                        # Generate: openssl rand -hex 32
+KASSANDRA_SALT=                        # Generate: openssl rand -hex 16
+VIGIA_EVIDENCE_DIR=/path/to/your/repo/evidence
+VIGIA_SYSTEM_PROMPT_PATH=/path/to/your/repo/vigia/data/system_prompt_peirce.md
 VIGIA_LLM_BACKEND=anthropic
 ```
 
-> **Advertencia:** El valor de `VIGIA_EVIDENCE_DIR` en `.env.example` apunta
-> a `/var/lib/vigia/evidence` que requiere permisos de root. Reemplazarlo
-> siempre por un path dentro del directorio del repo para desarrollo.
+> **Warning:** The `VIGIA_EVIDENCE_DIR` value in `.env.example` points to
+> `/var/lib/vigia/evidence` which requires root permissions. Always replace it
+> with a path inside the repo directory for development.
 
 ---
 
-## 8. Verificar la instalación
+## 8. Verify the installation
 
 ```bash
 export $(grep -v '^#' .env | xargs)
 python3 -c "import vigia.security; print('OK')"
 ```
 
-Deberías ver:
+You should see:
 
 ```
 [VIGIA][SecurityAudit] WARNING: Using ephemeral HMAC key...
 OK
 ```
 
-Los warnings de permisos en `/var/log/vigia` son normales en desarrollo —
-el sistema cae automáticamente a un directorio temporal seguro.
+Permission warnings for `/var/log/vigia` are normal in development —
+the system automatically falls back to a safe temporary directory.
 
 ---
 
-## 9. Levantar el servidor MCP
+## 9. Start the MCP server
 
 ```bash
 export $(grep -v '^#' .env | xargs)
 python3 vigia/tools/vigia_sift_bridge.py
 ```
 
-Deberías ver el session token y el nonce prefix:
+You should see the session token and nonce prefix:
 
 ```
 [VIGIA] Session token: ...
@@ -133,41 +134,41 @@ Deberías ver el session token y el nonce prefix:
 
 ---
 
-## 10. Correr un caso de demo
+## 10. Run a demo case
 
 ```bash
 export $(grep -v '^#' .env | xargs)
 python3 run_case.py
 ```
 
-Los casos de demo están en `data/cases/`. El script `run_case.py` en la raíz
-apunta al caso activo — editarlo para cambiar de caso.
+Demo cases are in `data/cases/`. The `run_case.py` script in the root points
+to the active case — edit it to switch cases.
 
 ---
 
-## Warnings conocidos (no bloquean el sistema)
+## Known warnings (non-blocking)
 
-| Warning | Causa | Impacto |
+| Warning | Cause | Impact |
 |---|---|---|
-| `Cannot write to /var/log/vigia` | Sin permisos root | Ninguno — usa temp seguro |
-| `Using ephemeral HMAC key` | `VIGIA_HMAC_KEY` no configurada | Log chain no verificable entre reinicios |
-| `KASSANDRA_SALT not set` | Variable no configurada | Nonce predecible — solo en desarrollo |
-| `caie unavailable (trust_decay)` | Módulo en desarrollo | CAIE desactivado — resto funciona |
-| `adversarial_nlp unavailable` | `vigia.tools.forensic_db` pendiente | NLP desactivado — resto funciona |
-| `entanglement unavailable` | Módulo pendiente | Desactivado — resto funciona |
+| `Cannot write to /var/log/vigia` | No root permissions | None — uses safe temp directory |
+| `Using ephemeral HMAC key` | `VIGIA_HMAC_KEY` not set | Log chain not verifiable across restarts |
+| `KASSANDRA_SALT not set` | Variable not configured | Predictable nonce — development only |
+| `caie unavailable (trust_decay)` | Module under development | CAIE disabled — rest works |
+| `adversarial_nlp unavailable` | `vigia.tools.forensic_db` pending | NLP disabled — rest works |
+| `entanglement unavailable` | Module pending | Disabled — rest works |
 
 ---
 
-## Ollama (alternativa offline)
+## Ollama (offline alternative)
 
-Si preferís correr sin API key de Anthropic:
+If you prefer to run without an Anthropic API key:
 
 ```bash
-# Instalar Ollama: https://ollama.com
+# Install Ollama: https://ollama.com
 ollama pull llama3
 ```
 
-En `.env`:
+In `.env`:
 ```
 VIGIA_LLM_BACKEND=ollama
 VIGIA_OLLAMA_HOST=http://127.0.0.1:11434
@@ -176,97 +177,94 @@ VIGIA_OLLAMA_MODEL=llama3
 
 ---
 
-## Problemas conocidos
+## Known issues
 
 **`ModuleNotFoundError: No module named 'vigia.sandbox'`**
 ```bash
-# Crear shim de compatibilidad
+# Create compatibility shim
 nano vigia/sandbox.py
-# Contenido: from vigia.security.sandbox import sandboxed_execute, safe_grep
+# Contents: from vigia.security.sandbox import sandboxed_execute, safe_grep
 ```
 
 **`ModuleNotFoundError: No module named 'vigia.tools.document_integrity'`**
 ```bash
-# El archivo correcto está en vigia/forensics/ — crear shim:
+# The correct file is in vigia/forensics/ — create shim:
 nano vigia/tools/document_integrity.py
-# Contenido: from vigia.forensics.document_integrity import audit_document_integrity, analyze_image_layers, detect_document_geometry, ocr_semantic_validator
+# Contents: from vigia.forensics.document_integrity import audit_document_integrity, analyze_image_layers, detect_document_geometry, ocr_semantic_validator
 ```
 
 **`ModuleNotFoundError: No module named 'vigia.tools.vision_audit'`**
 ```bash
 nano vigia/tools/vision_audit.py
-# Contenido: from vigia.forensics.vision_audit import vision_intent_audit
+# Contents: from vigia.forensics.vision_audit import vision_intent_audit
 ```
-
 
 ---
 
-## 11. Levantar la API REST (para OpenWebUI y Claude Code)
+## 11. Start the REST API (for OpenWebUI and Claude Code)
 
-VIGÍA expone una API REST en `vigia_api.py` que permite integración con
-OpenWebUI, Claude Code, y cualquier cliente HTTP.
+VIGÍA exposes a REST API in `vigia_api.py` that allows integration with
+OpenWebUI, Claude Code, and any HTTP client.
 
-### Puerto por defecto
+### Default port
 
 ```bash
 export $(grep -v '^#' .env | xargs)
 python3 vigia_api.py
-# Levanta en http://0.0.0.0:8000
+# Starts at http://0.0.0.0:8000
 ```
 
-### Cambiar el puerto
+### Change the port
 
-Si el puerto 8000 está ocupado (por ejemplo, OpenWebUI corre en 8080 y
-necesitás evitar conflictos), usar las variables de entorno:
+If port 8000 is in use (for example, OpenWebUI runs on 8080 and you need
+to avoid conflicts), use environment variables:
 
 ```bash
 VIGIA_PORT=8001 python3 vigia_api.py
-# O también:
+# Or also:
 VIGIA_HOST=127.0.0.1 VIGIA_PORT=8001 python3 vigia_api.py
 ```
 
-O agregarlo al `.env`:
+Or add it to `.env`:
 ```
 VIGIA_PORT=8001
 VIGIA_HOST=127.0.0.1
 ```
 
-### Integración con OpenWebUI
+### OpenWebUI integration
 
-OpenWebUI permite conectar modelos externos via "OpenAI-compatible API".
+OpenWebUI allows connecting external models via "OpenAI-compatible API".
 
-1. Levantá VIGÍA primero: `python3 vigia_api.py`
-2. En OpenWebUI → **Settings → Connections → OpenAI API**
-3. URL: `http://127.0.0.1:8000` (o el puerto que hayas configurado)
-4. API Key: cualquier string (VIGÍA no valida key en modo desarrollo)
+1. Start VIGÍA first: `python3 vigia_api.py`
+2. In OpenWebUI → **Settings → Connections → OpenAI API**
+3. URL: `http://127.0.0.1:8000` (or whichever port you configured)
+4. API Key: any string (VIGÍA does not validate the key in development mode)
 
-> **Nota para instalaciones con OpenWebUI en puerto no estándar:**
-> OpenWebUI instalado via `pipx` corre por defecto en el puerto que se
-> le pase al comando `open-webui serve --port XXXX`. Si tu instalación
-> corre en 8080, VIGÍA no compite — son servicios distintos en puertos
-> distintos. Solo asegurate de apuntar OpenWebUI a la URL correcta de
-> la API de VIGÍA.
+> **Note for non-standard OpenWebUI port installations:**
+> OpenWebUI installed via `pipx` runs on the port passed to
+> `open-webui serve --port XXXX`. If your installation runs on 8080,
+> VIGÍA doesn't conflict — they are separate services on separate ports.
+> Just make sure to point OpenWebUI to the correct VIGÍA API URL.
 
-### Verificar que la API responde
+### Verify the API is responding
 
 ```bash
 curl http://127.0.0.1:8000/health
-# Respuesta esperada: {"status":"ok"}
+# Expected response: {"status":"ok"}
 ```
 
 ---
 
-## 12. Integración con Claude Code
+## 12. Claude Code integration
 
-Claude Code puede llamar a VIGÍA directamente como herramienta MCP.
-Ver `docs/claude_code_integration.md` para la configuración completa.
+Claude Code can call VIGÍA directly as an MCP tool.
+See `docs/claude_code_integration.md` for full configuration.
 
-Inicio rápido:
+Quick start:
 ```bash
-# En una terminal: levantar VIGÍA
+# In one terminal: start VIGÍA
 python3 vigia_api.py
 
-# En otra terminal: Claude Code apunta a http://127.0.0.1:8000
+# In another terminal: point Claude Code to http://127.0.0.1:8000
 claude mcp add vigia http://127.0.0.1:8000
 ```
-
