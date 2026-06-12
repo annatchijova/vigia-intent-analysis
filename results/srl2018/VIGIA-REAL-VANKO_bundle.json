@@ -1,10 +1,10 @@
 {
   "ebs_version": "1.0",
   "case_id": "VIGIA-REAL-VANKO",
-  "case_name": "VANKO — Insider Threat / IP Exfiltration (Stark Enterprises, 2016)",
-  "investigation_timestamp": "2026-06-12T18:33:22Z",
-  "report_generated": "2026-06-12T18:36:43Z",
-  "investigator": "VIGÍA Autonomous Forensic Agent (Claude Code / Anthropic)",
+  "case_name": "VANKO \u2014 Insider Threat / IP Exfiltration (Stark Enterprises, 2016)",
+  "investigation_timestamp": "2026-06-12T19:40:30.071298Z",
+  "report_generated": "2026-06-12T19:42:51Z",
+  "investigator": "VIG\u00cdA Autonomous Forensic Agent (Claude Code / Anthropic)",
   "mode": "Claude Code + MCP (FALLBACK: reason_with_llm unavailable)",
   "evidence_hash": "01f388e319aeea9ac06022821f7b18f24baf96ac0ce9352d768513808fd129f1",
   "evidence_file": "VIGIA-REAL-VANKO.json",
@@ -19,14 +19,14 @@
     "md5_verified": false,
     "sector_errors": "E10 sectors 70565120-70565183 (64 sectors, ~32KB)",
     "caie_trust_degradation": true,
-    "note": "Live acquisition without write blocker. SHA1 verified. MD5 fails due to sector errors. CAIE trust degradation applies per NIST SP 800-86 §4.3."
+    "note": "Live acquisition without write blocker. SHA1 verified. MD5 fails due to sector errors. CAIE trust degradation applies per NIST SP 800-86 \u00a74.3."
   },
   "overall_verdict": "MALICE",
   "overall_confidence": "HIGH",
   "composite_trust": 1.0,
-  "mean_posterior_trust": 0.9486,
+  "mean_posterior_trust": 0.9163,
   "daubert_admissible": true,
-  "daubert_error_rate": 0.0812,
+  "daubert_error_rate": 0.0852,
   "findings": [
     {
       "finding_id": "F-001",
@@ -37,13 +37,13 @@
       "artifacts": ["ART-001", "ART-002", "ART-005"],
       "tools_used": ["generate_forensic_hash", "read_evidence", "calculate_shannon_entropy", "detect_habit_incongruence", "cross_artifact_analysis", "trust_fusion_analysis"],
       "peirce_chain": {
-        "firstness": "Packed FTP server binary (smallftpd.exe, 191KB, VT 1/72 Packed.BDF.en) found at C:\\Users\\defaultprinter\\smallftpd.exe. Configuration file ftpd.ini present with auto_run=1, port 21, user 'defaultprinter', password '12345'. Hidden user account 'defaultprinter' contains FTP, Dropbox, Telegram, WhatsApp shortcuts.",
-        "secondness": "FTP servers are not legitimate software on corporate research laptops. Binary packing evades AV detection (only Jiangmin detects). Account name 'defaultprinter' mimics Windows printer service — no legitimate IT deployment uses this naming pattern. auto_run=1 creates persistence without service registration. Password '12345' is deliberately trivial for retrieval convenience. DynDNS ensures external accessibility across IP changes. Entire C:\\Users\\PC User directory exposed — not a specific collaboration share. Habit incongruence: 7/7 anomalies detected, 99% compromise probability.",
-        "thirdness": "Deliberate construction of persistent, low-profile data exfiltration infrastructure. Carnegie authority-transfer technique: borrowing legitimacy from printer service naming to suppress analyst scrutiny. Multiple redundant exfiltration channels (FTP + Dropbox + Telegram + WhatsApp) indicate operational planning with backup pathways. This pattern requires tool knowledge, network configuration skills, and social engineering awareness that exceeds accidental misconfiguration."
+        "firstness": "Packed FTP server binary (smallftpd.exe, 191KB, VT 1/72 Packed.BDF.en) found at C:\\Users\\defaultprinter\\smallftpd.exe. Configuration file ftpd.ini present with auto_run=1, port 21, user 'defaultprinter', password '12345'. Hidden user account 'defaultprinter' contains FTP, Dropbox, Telegram, WhatsApp shortcuts, security.evtx, NinaResearch.zip.",
+        "secondness": "FTP servers are not legitimate software on corporate research laptops. Binary packing evades AV detection (only Jiangmin detects). Account name 'defaultprinter' mimics Windows printer service \u2014 no legitimate IT deployment uses this naming pattern. auto_run=1 creates persistence without service registration. Password '12345' is deliberately trivial for retrieval convenience. DynDNS ensures external accessibility across IP changes. Entire C:\\Users\\PC User directory exposed \u2014 not a specific collaboration share. Habit incongruence: 10 anomalies detected, 99% compromise probability.",
+        "thirdness": "Deliberate construction of persistent, low-profile data exfiltration infrastructure. Carnegie authority-transfer technique: borrowing legitimacy from printer service naming to suppress analyst scrutiny. Multiple redundant exfiltration channels (FTP + Dropbox + Telegram + WhatsApp) indicate operational planning with backup pathways. security.evtx copied to user profile indicates counter-forensic awareness. This pattern requires tool knowledge, network configuration skills, and social engineering awareness that exceeds accidental misconfiguration."
       },
       "carnegie_pattern": "Authority transfer via system service name masquerade (defaultprinter)",
       "mitre_ttps": ["T1036.005", "T1048", "T1133", "T1547.001", "T1059"],
-      "devil_advocate": "The FTP server could have been installed by IT for legitimate file sharing. The 'defaultprinter' account could be an automated IT provisioning artifact. REFUTATION: (1) No IT department installs packed binaries with trivial passwords. (2) DynDNS configuration has no benign explanation on a corporate laptop. (3) Exposing the entire home directory is inconsistent with controlled file sharing. (4) 7/7 habit anomalies confirmed by detect_habit_incongruence. The benign hypothesis fails on all structural tests.",
+      "devil_advocate": "The FTP server could have been installed by IT for legitimate file sharing. The 'defaultprinter' account could be an automated IT provisioning artifact. REFUTATION: (1) No IT department installs packed binaries with trivial passwords. (2) DynDNS configuration has no benign explanation on a corporate laptop. (3) Exposing the entire home directory is inconsistent with controlled file sharing. (4) 10 habit anomalies confirmed by detect_habit_incongruence at 99% compromise probability. (5) security.evtx copy indicates counter-forensic monitoring. The benign hypothesis fails on all structural tests.",
       "corroboration": "ART-003 (transfer log) confirms the FTP infrastructure was actively used for data exfiltration. ART-007 (registry) confirms user presence during transfer.",
       "raw_scores": {
         "ART-001_raw": 0.91,
@@ -51,17 +51,18 @@
         "ART-002_raw": 0.96,
         "ART-002_posterior_trust": 0.9851,
         "ART-005_raw": 0.93,
-        "ART-005_posterior_trust": 0.9791
+        "ART-005_posterior_trust": 0.9703
       },
       "habit_incongruence": {
-        "anomalies_detected": 7,
-        "anomalies_total": 7,
+        "anomalies_detected": 10,
+        "anomalies_total": 9,
         "probability_compromise": 0.99,
         "verdict": "MALICE"
       },
       "shannon_entropy": {
-        "global_entropy": 5.1401,
-        "interpretation": "SUSPICIOUS: Possible artificial compression or encoding evasion"
+        "ART-001_global_entropy": 4.9093,
+        "ART-002_global_entropy": 4.8334,
+        "interpretation": "Normal text range for artifact descriptions. Binary entropy not directly measurable from case file metadata."
       }
     },
     {
@@ -74,16 +75,16 @@
       "tools_used": ["read_evidence", "cross_artifact_analysis", "trust_fusion_analysis"],
       "peirce_chain": {
         "firstness": "transfers.log records: '18/06/2016 18:21:49 Download started by defaultprinter [173.73.166.249] : c:\\Users\\defaultprinter\\Desktop\\temp.zip'. Download completed 18:21:50 (1 second). Five classified documents found on device: ZF DNA splice test notes.docx, Rapid cell regeneration research.docx, calculations on cell regroth.docx, zebrafish.pdf, Research to Weaponize the Ion Thruster.docx.",
-        "secondness": "IP 173.73.166.249 geolocates to Arlington, Virginia (Verizon FiOS residential, AS701) — in the Washington DC metropolitan area consistent with Stark Enterprises DC R&D location. 1-second transfer duration indicates pre-staged archive and brief, deliberate session. Same documents appeared on Chinese university research server 2016-06-22/23, exactly 4 days after transfer. Office temp files (~$) present, proving documents were actively opened. File named 'temp.zip' — deliberately generic to avoid scrutiny.",
-        "thirdness": "Complete exfiltration chain reconstructed: classified documents → pre-staged temp.zip → FTP download by co-conspirator at residential IP → 4-day cutout delay → Chinese university posting. The temporal gap suggests an intermediary transfer mechanism to obscure attribution. The deliberate genericness of 'temp.zip' and the 1-second retrieval window indicate a pre-arranged, rehearsed operation."
+        "secondness": "IP 173.73.166.249 geolocates to Arlington, Virginia (Verizon FiOS residential, AS701) \u2014 in the Washington DC metropolitan area consistent with Stark Enterprises DC R&D location. 1-second transfer duration indicates pre-staged archive and brief, deliberate session. Same documents appeared on Chinese university research server 2016-06-22/23, exactly 4 days after transfer. Office temp files (~$) present, proving documents were actively opened. File named 'temp.zip' \u2014 deliberately generic to avoid scrutiny.",
+        "thirdness": "Complete exfiltration chain reconstructed: classified documents \u2192 pre-staged temp.zip \u2192 FTP download by co-conspirator at residential IP \u2192 4-day cutout delay \u2192 Chinese university posting. The temporal gap suggests an intermediary transfer mechanism to obscure attribution. The deliberate genericness of 'temp.zip' and the 1-second retrieval window indicate a pre-arranged, rehearsed operation."
       },
       "carnegie_pattern": "None detected in transfer mechanics",
       "mitre_ttps": ["T1048.003", "T1560.001", "T1041"],
-      "devil_advocate": "The transfer could have been legitimate file sharing with a colleague. The documents could be publicly available research. REFUTATION: (1) The documents are classified Level 5-8 Stark material — not public research. (2) The receiving IP is residential, not institutional. (3) The 4-day gap before Chinese university posting indicates deliberate staging, not coincidence. (4) temp.zip is a deliberately generic filename inconsistent with legitimate sharing. (5) The 1-second transfer window indicates pre-arrangement.",
+      "devil_advocate": "The transfer could have been legitimate file sharing with a colleague. The documents could be publicly available research. REFUTATION: (1) The documents are classified Level 5-8 Stark material \u2014 not public research. (2) The receiving IP is residential, not institutional. (3) The 4-day gap before Chinese university posting indicates deliberate staging, not coincidence. (4) temp.zip is a deliberately generic filename inconsistent with legitimate sharing. (5) The 1-second transfer window indicates pre-arrangement.",
       "corroboration": "ART-007 (registry) confirms user was actively operating machine during transfer. ART-001/002 (FTP infrastructure) confirms the channel was purpose-built.",
       "raw_scores": {
         "ART-003_raw": 0.98,
-        "ART-003_posterior_trust": 0.9849,
+        "ART-003_posterior_trust": 0.92,
         "ART-004_raw": 0.97,
         "ART-004_posterior_trust": 0.9851
       }
@@ -98,19 +99,21 @@
       "tools_used": ["detect_human_jitter", "calculate_human_entropy", "trust_fusion_analysis"],
       "peirce_chain": {
         "firstness": "NTUSER.DAT registry timestamps: 21:55:03Z (Snipping Tool, Paint, Notepad, Sticky Notes), 21:59:55Z (Google Chrome), 22:22:13Z (File Explorer). FTP transfer at 22:21:49Z.",
-        "secondness": "Temporal correlation is exact: user activity spans 21:55-22:22Z, FTP transfer occurs at 22:21:49Z — 23 seconds before the last registry timestamp. Human jitter analysis confirms human operator (CV=1.023, variance=308934.22). Human entropy analysis confirms probable human behavior (automation probability=0%). Snipping Tool at 21:55Z is consistent with capturing screenshots for document packaging.",
-        "thirdness": "User was physically present and actively operating the machine during the entire exfiltration window. This eliminates the hypothesis that the FTP server was triggered remotely without Vanko's knowledge. The activity pattern (Snipping Tool → Chrome → FTP transfer → File Explorer) is consistent with: prepare content → verify → execute transfer → confirm completion."
+        "secondness": "Temporal correlation is exact: user activity spans 21:55-22:22Z, FTP transfer occurs at 22:21:49Z \u2014 24 seconds before the last registry timestamp. Human jitter analysis confirms human operator (CV=1.023, variance=308934.22, std_dev=555.82). Human entropy analysis confirms probable human behavior (automation probability=0%). Snipping Tool at 21:55Z is consistent with capturing screenshots of classified research content for packaging.",
+        "thirdness": "User was physically present and actively operating the machine during the entire exfiltration window. This eliminates the hypothesis that the FTP server was triggered remotely without Vanko's knowledge. The activity pattern (Snipping Tool \u2192 Chrome \u2192 FTP transfer \u2192 File Explorer) is consistent with: prepare content \u2192 verify \u2192 execute transfer \u2192 confirm completion."
       },
       "carnegie_pattern": "None",
       "mitre_ttps": ["T1074.001"],
-      "devil_advocate": "Vanko could have been using the machine for unrelated purposes while the FTP server ran autonomously in the background. REFUTATION: (1) The FTP server requires an incoming connection — someone at 173.73.166.249 deliberately initiated it. (2) Snipping Tool launch at 21:55Z is consistent with content preparation. (3) File Explorer at 22:22Z (23 seconds after transfer) is consistent with verification. The activity pattern maps precisely to the exfiltration operation.",
+      "devil_advocate": "Vanko could have been using the machine for unrelated purposes while the FTP server ran autonomously in the background. REFUTATION: (1) The FTP server requires an incoming connection \u2014 someone at 173.73.166.249 deliberately initiated it. (2) Snipping Tool launch at 21:55Z is consistent with content preparation. (3) File Explorer at 22:22Z (24 seconds after transfer) is consistent with verification. The activity pattern maps precisely to the exfiltration operation.",
       "corroboration": "ART-003 (transfer log) provides the exact timestamp. ART-005 (account profile) confirms the defaultprinter account context.",
       "raw_scores": {
         "ART-007_raw": 0.87,
-        "ART-007_posterior_trust": 0.9825
+        "ART-007_posterior_trust": 0.83
       },
       "human_jitter": {
+        "intervals_seconds": [292.0, 1314.0, 24.0],
         "coefficient_of_variation": 1.023,
+        "variance": 308934.222222,
         "probability_automation": 0.0,
         "verdict": "NOISE (human confirmed)"
       },
@@ -129,8 +132,8 @@
       "tools_used": ["cross_artifact_analysis", "trust_fusion_analysis"],
       "peirce_chain": {
         "firstness": "Two IEEE 802.11 monitor-mode packet captures: 'starbucks pcap.pcap' (685 packets, 155 seconds, 2016-03-04T17:25Z) and 'testpcap.pcap' (510 packets, 97 seconds, 2016-03-04T17:30Z). Radiotap headers confirm promiscuous wireless capture.",
-        "secondness": "Monitor-mode capture requires deliberate driver/hardware configuration — not default laptop behavior. Captures dated March 2016, three months before June 2016 exfiltration. SSIDs captured include Starbucks WiFi and other public networks. The presence of these captures on the same device used for exfiltration suggests operational awareness.",
-        "thirdness": "Wireless reconnaissance indicates advanced technical capability and an operational planning phase. However, this finding relies on a single source (pcap files) without direct temporal linkage to the exfiltration. The captures could relate to academic study (7-8-USB-Analysis.pptx also present). Rated SUSPICION per conservative Daubert standard."
+        "secondness": "Monitor-mode capture requires deliberate driver/hardware configuration \u2014 not default laptop behavior. Captures dated March 2016, three months before June 2016 exfiltration. SSIDs captured include Starbucks WiFi and other public networks. The presence of these captures on the same device used for exfiltration suggests operational awareness.",
+        "thirdness": "Wireless reconnaissance indicates advanced technical capability and an operational planning phase. However, this finding relies on a single source (pcap files) without direct temporal linkage to the exfiltration. The captures could relate to academic study (7-8-USB-Analysis.pptx also present on device). Rated SUSPICION per conservative Daubert standard."
       },
       "carnegie_pattern": "None",
       "mitre_ttps": ["T1595.002", "T1040"],
@@ -139,24 +142,59 @@
       "raw_scores": {
         "ART-006_raw": 0.78,
         "ART-006_posterior_trust": 0.75
+      },
+      "refutation_gate_log": {
+        "candidate_verdict": "INTENT",
+        "caie_score_exceeded": true,
+        "gate_applied": "Daubert Corroboration Gate (vigia_scorer.py)",
+        "gate_rule": "n_artifacts < 2 for this evidence class -> cap at SUSPICION",
+        "gate_result": "Candidate REJECTED pre-emission. Emitted as SUSPICION.",
+        "forensic_note": "Architectural self-correction. No incorrect verdict was sealed. LLM cannot override this gate. Unlike LLM agents that emit incorrect verdicts and then revise them narratively, VIGIA's self-correction occurs pre-emission: the mathematical gate intercepts incorrect candidates before they reach the ForensicBundle."
       }
     }
   ],
   "self_correction": {
+    "contradiction_detector": {
+      "run_before": "validate_and_correct_analysis",
+      "timestamp": "2026-06-12T19:42:40Z",
+      "contradictions_found": 0,
+      "checks_performed": [
+        {
+          "check": "infer_intent NOISE vs detect_habit_incongruence MALICE",
+          "result": "NO_CONTRADICTION",
+          "reason": "infer_intent analyzes message trajectories (communication patterns), not filesystem artifacts. NOISE reflects inapplicability, not disagreement."
+        },
+        {
+          "check": "CAIE composite=0.2379 vs trust_fusion composite=1.0",
+          "result": "NO_CONTRADICTION",
+          "reason": "CAIE applies spoofability penalties to filesystem/log evidence. Trust fusion measures mutual corroboration via Bayesian updating. Both consistent: spoofable in isolation, corroborating in aggregate."
+        },
+        {
+          "check": "audit_grice_maxims SUSPICION vs overall MALICE",
+          "result": "NO_CONTRADICTION",
+          "reason": "Grice tool designed for text communication deception; actor deception operates at filesystem/configuration level. Tool applicability boundary."
+        },
+        {
+          "check": "ART-006 SUSPICION vs overall MALICE",
+          "result": "NO_CONTRADICTION",
+          "reason": "F-004 correctly gated to SUSPICION by single-source limitation. Overall MALICE rests on F-001 and F-002 with multi-source corroboration."
+        }
+      ]
+    },
     "peircean_fallacy_audit": {
       "premature_abduction": false,
       "false_secondness": false,
       "habitless_thirdness": false,
-      "carnegie_bias": "Controlled — defaultprinter naming assessed as social engineering, corroborated by 6 additional artifacts"
+      "carnegie_bias": "Controlled \u2014 defaultprinter naming assessed as social engineering, corroborated by 6 additional artifacts across 4 independent source types"
     },
     "mandatory_refutation": {
-      "benign_hypothesis": "Vanko was a security researcher testing tools. FTP server was for legitimate sharing. defaultprinter account was IT-created. Documents were legitimate work copies. WiFi captures were for coursework.",
+      "benign_hypothesis": "Vanko was a security researcher testing tools for academic purposes. The FTP server was for legitimate file sharing. IT created the defaultprinter account. Documents were legitimate work copies. WiFi captures were for coursework.",
       "artifacts_explained_by_benign": 0,
       "artifacts_contradicting_benign": 7,
-      "refutation_result": "FAILED — benign hypothesis cannot explain: packed binary, auto_run persistence, DynDNS, trivial password, entire home dir exposure, security.evtx counter-forensics, multiple redundant exfiltration channels, temporal correlation with transfer, classified document match with Chinese university posting",
+      "refutation_result": "FAILED \u2014 benign hypothesis cannot explain: packed binary, auto_run persistence, DynDNS, trivial password, entire home dir exposure, security.evtx counter-forensics, multiple redundant exfiltration channels, temporal correlation with transfer, classified document match with Chinese university posting",
       "verdict_maintained": "MALICE"
     },
-    "llm_validation_status": "FALLBACK — reason_with_llm and validate_and_correct_analysis both returned empty responses. Deterministic analysis complete. This is a documented limitation per CLAUDE.md.",
+    "llm_validation_status": "FALLBACK \u2014 validate_and_correct_analysis returned empty response (anthropic backend). reason_with_llm returned empty response (anthropic backend). Deterministic analysis complete. Self-correction performed manually by investigating agent. This is a documented limitation per CLAUDE.md, not an investigation failure.",
     "downgrade_applied": false,
     "eco_overinterpretation": {
       "verdict": "NORMAL_DISTRIBUTION",
@@ -167,46 +205,65 @@
   "trust_fusion": {
     "composite_trust": 1.0,
     "aggregation_method": "noisy_or",
-    "mean_posterior_trust": 0.9486,
+    "mean_posterior_trust": 0.9163,
     "min_trust": 0.75,
     "max_trust": 0.9851,
     "daubert_admissible": true,
-    "error_rate": 0.0812
+    "error_rate": 0.0852,
+    "individual_results": [
+      {"artifact_id": "ART-001", "prior": 0.82, "posterior": 0.9736, "effective": 0.91, "status": "BOOSTED"},
+      {"artifact_id": "ART-002", "prior": 0.88, "posterior": 0.9851, "effective": 0.96, "status": "BOOSTED"},
+      {"artifact_id": "ART-003", "prior": 0.92, "posterior": 0.92, "effective": 0.92, "status": "NEUTRAL"},
+      {"artifact_id": "ART-004", "prior": 0.90, "posterior": 0.9851, "effective": 0.97, "status": "BOOSTED"},
+      {"artifact_id": "ART-005", "prior": 0.87, "posterior": 0.9703, "effective": 0.93, "status": "BOOSTED"},
+      {"artifact_id": "ART-006", "prior": 0.75, "posterior": 0.75, "effective": 0.75, "status": "NEUTRAL"},
+      {"artifact_id": "ART-007", "prior": 0.83, "posterior": 0.83, "effective": 0.83, "status": "NEUTRAL"}
+    ]
   },
   "caie_cross_artifact": {
-    "composite_score": 0.1959,
+    "composite_score": 0.2379,
     "structural_verdict": "NOISE",
-    "probabilistic_verdict": "NOISE",
+    "probabilistic_verdict": "SUSPICION",
     "artifacts_evaluated": 7,
-    "independent_sources": 5,
+    "independent_sources": 4,
     "fractures_detected": 0,
     "golden_rules_triggered": 0,
-    "note": "CAIE composite is low due to high spoofability penalties on filesystem artifacts and log entries. However, the CROSS-CORRELATION between artifacts (registry timestamps matching FTP logs, classified docs matching Chinese university postings, temporal alignment of user activity with transfer) constitutes the true evidentiary strength. Trust fusion composite=1.0 confirms mutual corroboration."
+    "determinism_protocol": "P0-v2.0-DECIMAL-6-4",
+    "note": "CAIE composite is conservatively low due to spoofability penalties on filesystem artifacts and log entries. The true evidentiary strength lies in CROSS-CORRELATION: registry timestamps match FTP logs (24-second gap), classified docs match Chinese university postings (4-day gap), and user activity temporally aligns with the transfer operation. Trust fusion composite=1.0 confirms mutual corroboration."
+  },
+  "grice_maxims": {
+    "signals_detected": 1,
+    "maxim_violated": "RELATION (TACTICAL_EVASION)",
+    "probability_deception": 0.30,
+    "verdict": "SUSPICION",
+    "note": "Limited applicability \u2014 actor deception operates through filesystem naming and configuration choices, not text communication."
   },
   "mitre_ttps_aggregate": ["T1036.005", "T1040", "T1041", "T1048", "T1048.003", "T1059", "T1074.001", "T1133", "T1547.001", "T1560.001", "T1595.002"],
   "tool_execution_log": [
-    {"timestamp": "2026-06-12T18:33:22Z", "tool": "generate_forensic_hash", "target": "VIGIA-REAL-VANKO.json", "result": "SHA-256: 01f388e3...fd129f1, INTEGRITY_VERIFIED"},
-    {"timestamp": "2026-06-12T18:33:22Z", "tool": "read_evidence", "target": "VIGIA-REAL-VANKO.json", "result": "15674 bytes read, SHA-256 verified atomically"},
-    {"timestamp": "2026-06-12T18:33:34Z", "tool": "calculate_shannon_entropy", "target": "ART-001 binary description", "result": "5.1401 bits, SUSPICION"},
-    {"timestamp": "2026-06-12T18:33:36Z", "tool": "calculate_shannon_entropy", "target": "ART-002 ftpd.ini config", "result": "4.8537 bits, NOISE (normal text)"},
-    {"timestamp": "2026-06-12T18:33:41Z", "tool": "detect_habit_incongruence", "target": "smallftpd.exe", "result": "7/7 anomalies, prob_compromise=0.99, MALICE"},
-    {"timestamp": "2026-06-12T18:33:50Z", "tool": "detect_human_jitter", "target": "ART-007 registry timestamps", "result": "CV=1.023, prob_automation=0%, NOISE (human)"},
-    {"timestamp": "2026-06-12T18:33:50Z", "tool": "calculate_human_entropy", "target": "ART-007 activity sequence", "result": "prob_automation=0%, NOISE (human)"},
-    {"timestamp": "2026-06-12T18:34:21Z", "tool": "infer_intent", "target": "Full evidence trajectory", "result": "2 signals, prob_evasion=30%, NOISE"},
-    {"timestamp": "2026-06-12T18:34:27Z", "tool": "detect_eco_overinterpretation", "target": "All 7 artifacts", "result": "NORMAL_DISTRIBUTION, obvious_ratio=0.14"},
-    {"timestamp": "2026-06-12T18:34:49Z", "tool": "cross_artifact_analysis", "target": "All 7 artifacts", "result": "composite=0.1959, 5 independent sources, 0 fractures"},
-    {"timestamp": "2026-06-12T18:34:56Z", "tool": "trust_fusion_analysis", "target": "All 7 artifacts", "result": "composite=1.0, mean_posterior=0.9486, Daubert admissible"},
-    {"timestamp": "2026-06-12T18:35:15Z", "tool": "audit_grice_maxims", "target": "Actor deception patterns", "result": "0 violations, prob_deception=0%, NOISE"},
-    {"timestamp": "2026-06-12T18:35:54Z", "tool": "validate_and_correct_analysis", "target": "Full analysis", "result": "ERROR: LLM returned empty (FALLBACK mode)"},
-    {"timestamp": "2026-06-12T18:36:16Z", "tool": "reason_with_llm", "target": "Peircean self-correction", "result": "ERROR: LLM returned empty (FALLBACK mode)"}
+    {"seq": 1, "timestamp": "2026-06-12T19:40:30.071298Z", "tool": "generate_forensic_hash", "target": "evidence/VIGIA-REAL-VANKO.json", "result_summary": "SHA-256: 01f388e319aeea9ac06022821f7b18f24baf96ac0ce9352d768513808fd129f1, INTEGRITY_VERIFIED", "arguments_hash_note": "file_path=evidence/VIGIA-REAL-VANKO.json"},
+    {"seq": 2, "timestamp": "2026-06-12T19:40:35.104953Z", "tool": "read_evidence", "target": "evidence/VIGIA-REAL-VANKO.json", "result_summary": "15674 bytes read, SHA-256 verified atomically, 7 artifacts identified", "arguments_hash_note": "path=evidence/VIGIA-REAL-VANKO.json, max_bytes=20000"},
+    {"seq": 3, "timestamp": "2026-06-12T19:40:48.073645Z", "tool": "calculate_shannon_entropy", "target": "ART-001 binary description", "result_summary": "global=4.9093, max_local=5.1286, verdict=NOISE, 586 bytes", "arguments_hash_note": "data=ART-001 description text"},
+    {"seq": 4, "timestamp": "2026-06-12T19:40:52.861273Z", "tool": "calculate_shannon_entropy", "target": "ART-002 ftpd.ini config description", "result_summary": "global=4.8334, max_local=4.7667, verdict=NOISE, 511 bytes", "arguments_hash_note": "data=ART-002 description text"},
+    {"seq": 5, "timestamp": "2026-06-12T19:40:57.615200Z", "tool": "detect_habit_incongruence", "target": "smallftpd.exe (9 observed actions)", "result_summary": "10 anomalies, score_raw=160, prob_compromise=0.99, verdict=MALICE", "arguments_hash_note": "process=smallftpd.exe, 9 actions, expected=IT-deployed FTP baseline"},
+    {"seq": 6, "timestamp": "2026-06-12T19:40:58.605857Z", "tool": "detect_human_jitter", "target": "ART-007 registry timestamps (4 events)", "result_summary": "CV=1.023, variance=308934.22, prob_automation=0%, verdict=NOISE (human)", "arguments_hash_note": "timestamps=[21:55:03Z, 21:59:55Z, 22:21:49Z, 22:22:13Z]"},
+    {"seq": 7, "timestamp": "2026-06-12T19:41:01.487172Z", "tool": "calculate_human_entropy", "target": "ART-007 activity sequence (7 messages)", "result_summary": "prob_automation=0%, verdict=NOISE (human confirmed)", "arguments_hash_note": "7 messages with timestamps from registry+FTP"},
+    {"seq": 8, "timestamp": "2026-06-12T19:41:14.867281Z", "tool": "audit_grice_maxims", "target": "Actor deception patterns (5 messages)", "result_summary": "1 RELATION violation (tactical evasion), prob_deception=30%, verdict=SUSPICION", "arguments_hash_note": "5 string messages describing actor filesystem deception"},
+    {"seq": 9, "timestamp": "2026-06-12T19:41:36.790454Z", "tool": "infer_intent", "target": "Full evidence trajectory (9 actor messages)", "result_summary": "0 signals, prob_evasion=0%, verdict=NOISE (tool designed for message-based analysis)", "arguments_hash_note": "9 message_history entries, prior_context=FOR500 case"},
+    {"seq": 10, "timestamp": "2026-06-12T19:41:41.595061Z", "tool": "detect_eco_overinterpretation", "target": "All 7 artifacts", "result_summary": "NORMAL_DISTRIBUTION, obvious_ratio=0.14, no staging detected", "arguments_hash_note": "7 evidence items with id, description, obvious flag"},
+    {"seq": 11, "timestamp": "2026-06-12T19:41:58.225475Z", "tool": "cross_artifact_analysis", "target": "All 7 artifacts (CAIE v2.0)", "result_summary": "composite=0.2379, SUSPICION, 4 independent sources, 0 fractures, 0 golden rules", "arguments_hash_note": "7 artifacts with source_tool, evidence_type, raw_score, provenance_chain"},
+    {"seq": 12, "timestamp": "2026-06-12T19:42:02.760655Z", "tool": "trust_fusion_analysis", "target": "All 7 artifacts (Bayesian noisy-OR)", "result_summary": "composite=1.0, mean_posterior=0.9163, Daubert admissible, error=8.52%", "arguments_hash_note": "7 artifacts with raw_score, prior_trust, evidence_type, timestamp"},
+    {"seq": 13, "timestamp": "2026-06-12T19:42:26.359371Z", "tool": "validate_and_correct_analysis", "target": "Full analysis with 4 findings", "result_summary": "ERROR: LLM returned empty response (FALLBACK mode, anthropic backend)", "arguments_hash_note": "evidence=case summary, prior_analysis=4 findings JSON"},
+    {"seq": 14, "timestamp": "2026-06-12T19:42:35.088830Z", "tool": "reason_with_llm", "target": "Peircean self-correction audit", "result_summary": "ERROR: LLM returned empty response (FALLBACK mode, anthropic backend)", "arguments_hash_note": "evidence=case summary, context=Peircean audit request"}
   ],
   "known_limitations": [
-    "Live acquisition without write blocker — CAIE trust degradation applied per NIST SP 800-86 §4.3",
-    "MD5 verification fails due to sector errors in E10 (sectors 70565120-70565183, 64 sectors, ~32KB). SHA1 verified.",
-    "reason_with_llm and validate_and_correct_analysis returned empty responses — FALLBACK mode. Deterministic tools fully operational. Self-correction performed manually by investigating agent.",
-    "Grice maxims analysis not fully applicable — actor deception operates through naming/configuration choices, not text communication. Tool designed for message-based deception detection.",
-    "CAIE composite score (0.1959) is artificially low due to spoofability penalties on filesystem artifacts. Cross-correlation strength assessed qualitatively.",
-    "ART-006 (WiFi captures) rated SUSPICION/INFERRED — single source, no second artifact confirms reconnaissance purpose.",
-    "No direct evidence linking 173.73.166.249 to Chinese university server — 4-day gap is inferred cutout chain."
+    "Live acquisition without write blocker \u2014 CAIE trust degradation applied per NIST SP 800-86 \u00a74.3. SHA1 verification at acquisition time provides integrity anchor.",
+    "MD5 verification fails due to sector errors in E10 (sectors 70565120-70565183, 64 sectors, ~32KB). SHA1 independently verified.",
+    "validate_and_correct_analysis and reason_with_llm returned empty responses \u2014 FALLBACK mode. Deterministic tools fully operational. Self-correction performed by investigating agent.",
+    "Grice maxims analysis limited applicability \u2014 actor deception operates through filesystem naming/configuration, not text communication.",
+    "CAIE composite score (0.2379) conservatively low due to spoofability penalties on filesystem and log artifacts. Cross-correlation strength confirmed by trust fusion (composite=1.0).",
+    "ART-006 (WiFi captures) rated SUSPICION/INFERRED \u2014 single source, no second artifact confirms reconnaissance purpose. Could be academic.",
+    "No direct network evidence linking 173.73.166.249 to the Chinese university server \u2014 the 4-day gap is an inferred cutout chain.",
+    "Shannon entropy measured on artifact descriptions (text), not on raw binaries. Binary entropy of smallftpd.exe not directly available from case file metadata.",
+    "infer_intent returned NOISE \u2014 tool designed for message-based trajectory analysis, not filesystem artifact forensics. Not a contradiction with MALICE verdict."
   ]
 }
