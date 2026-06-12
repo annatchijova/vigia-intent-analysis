@@ -553,22 +553,17 @@ python3 -m pytest tests/ -v    # 148/148 passing
 
 ## Investigation Examples
 
-### VIGIA-REAL-SRL-DMZ-FTP — Full Claude Code Investigation
+### VIGIA-REAL-VANKO — Full Claude Code Investigation (14 MCP Tool Calls)
+**Case:** Anthony Vanko, insider threat / IP exfiltration, Stark Enterprises DC R&D, 2016.
+**Evidence:** 7 artifacts — filesystem (5), network capture, registry hive. SANS FOR500 corpus.
+**VIGIA verdict:** MALICE | Confidence: HIGH | Trust fusion: 1.0 | Daubert: ADMISSIBLE (error 8.12%)
+**Self-correction:** F-004 (802.11 monitor-mode WiFi captures) initially INTENT.
+VIGIA applied Daubert single-source standard. **Downgraded: INTENT -> SUSPICION.**
+14 MCP tool calls with timestamps in tool_execution_log inside the sealed bundle.
 
-**Case:** IIS 8.5 FTP server in DMZ (172.16.10.12), Stark Research Labs 2018.
-**VIGÍA verdict:** `MALICE` | Confidence: 67% | EBS: Level 2 verified
+Full Amicus Curiae: [results/srl2018/VIGIA-REAL-VANKO_amicus_curiae.md](./results/srl2018/VIGIA-REAL-VANKO_amicus_curiae.md)
 
-**Self-correction:** F-003 (Mnemosyne.sys, F-Response agent) initially `INTENT`.
-VIGÍA recognized the F-Response filename as a legitimate DFIR deployment identifier.
-**Downgraded: INTENT → SUSPICION.**
-
-![SRL-DMZ-FTP case running](screenshots/casorealsrl.png)
-
-Full Amicus Curiae: [`results/srl2018/VIGIA-REAL-SRL-DMZ-FTP_amicus_curiae.md`](./results/srl2018/VIGIA-REAL-SRL-DMZ-FTP_amicus_curiae.md)
-
-```bash
-python3 forensics/verify_ebs_v1.py results/srl2018/VIGIA-REAL-SRL-DMZ-FTP_bundle.json
-```
+> The SRL-DMZ-FTP investigation remains in the repository. VANKO was added after audit feedback identified the need for structured tool_execution_log entries in the bundle.
 
 ### CAN-031 — Weaponized Incompetence
 
