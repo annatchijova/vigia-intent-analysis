@@ -20,11 +20,12 @@
 | 3 | README with setup instructions | ✅ | [`README.md`](./README.md) — Installation section |
 | 4 | Live deployment URL or step-by-step instructions | ✅ | [`README.md`](./README.md#installation) + [`INSTALL.md`](./INSTALL.md) |
 | 5 | Text description: features and functionality | ✅ | [`README.md`](./README.md) — Overview + Feature sections |
-| 6 | Demonstration video | ✅ | [`docs/demo/`](./docs/demo/) — see §6 below |
-| 7 | Architecture diagram | ✅ | [`README.md`](./README.md#architecture-overview) + [`docs/architecture/`](./docs/architecture/) |
-| 8 | Evidence dataset documentation | ✅ | [`docs/evidence/`](./docs/evidence/) — see §8 below |
-| 9 | Accuracy report | ✅ | [`docs/accuracy/`](./docs/accuracy/) — see §9 below |
-| 10 | Agent execution logs | ✅ | [`docs/logs/`](./docs/logs/) — see §10 below |
+| 6 | Demonstration video | ✅ | [YouTube — VIGÍA Demo 2026](https://www.youtube.com/watch?v=NOquYzUwMkg) — see §6 below |
+| 7 | Architecture diagram | ✅ | [`README.md#architecture-overview`](./README.md#architecture-overview) + [`docs/vigia_diagrams.html`](./docs/vigia_diagrams.html) — see §7 below |
+| 8 | Evidence dataset documentation | ✅ | [`data/cases/`](./data/cases/) — see §8 below |
+| 9 | Accuracy report | ✅ | [`README.md#accuracy--evidence-dataset`](./README.md#accuracy--evidence-dataset) — see §9 below |
+| 10 | Agent execution logs | ✅ | [`results/srl2018/`](./results/srl2018/) — see §10 below |
+| 11 | VIGÍA Story (origin + design rationale) | ✅ | [`VIGIA_STORY.md`](./VIGIA_STORY.md) (ES) + [`VIGIA_STORY_EN.md`](./VIGIA_STORY_EN.md) (EN) — see §11 below |
 
 ---
 
@@ -57,7 +58,7 @@ The `LICENSE` file is at the **repository root** — the first place any judge w
 
 The README contains:
 - Project overview and paradigm (IoC → IoI)
-- Architecture diagram (ASCII, embedded)
+- Architecture diagram (Mermaid, embedded)
 - Installation steps (bare metal and Docker)
 - Claude Code MCP configuration
 - Ollama configuration
@@ -68,7 +69,7 @@ The README contains:
 Direct link to Installation section: [`README.md#installation`](./README.md#installation)
 
 For extended instructions including SIFT Workstation integration and OpenWebUI:
-[`INSTALL.md`](./INSTALL.md)
+[`INSTALL.md`](./INSTALL.md) | [`INSTALL_ES.md`](./INSTALL_ES.md) (Spanish)
 
 ---
 
@@ -96,26 +97,26 @@ export VIGIA_EVIDENCE_DIR="/path/to/evidence"
 #   "mcpServers": {
 #     "vigia_sift": {
 #       "command": "python3",
-#       "args": ["/path/to/vigia-intent-analysis/vigia_sift_bridge.py"]
+#       "args": ["/path/to/vigia-intent-analysis/vigia_sift_bridge_final.py"]
 #     }
 #   }
 # }
 
-python3 vigia_sift_bridge.py   # Terminal 1
-claude                          # Terminal 2
+python3 vigia_sift_bridge_final.py   # Terminal 1
+claude                                 # Terminal 2
 ```
 
 ### Option C: Ollama (local LLM, no API key required)
 
 ```bash
 ollama pull llama3.1
-python3 vigia_sift_bridge.py --backend ollama --model llama3.1
+python3 vigia_sift_bridge_final.py --backend ollama --model llama3.1
 ```
 
 ### Option D: CLI (no LLM required — deterministic core only)
 
 ```bash
-python3 run_case.py --case data/cases/VIGIA_CASE_001.json
+python3 run_case.py --case data/cases/consolidated_canonical/VIGIA-CAN-001.json
 ```
 
 Full instructions: [`INSTALL.md`](./INSTALL.md)
@@ -170,32 +171,49 @@ explicit confidence intervals and falsifiability conditions. Full audit trail.
 
 ## §6 — Demonstration Video
 
-**Location:** [`docs/demo/`](./docs/demo/)
+**YouTube:** [https://www.youtube.com/watch?v=NOquYzUwMkg](https://www.youtube.com/watch?v=NOquYzUwMkg)
 
 The demonstration video covers:
 1. Full investigation of a staged evidence set (memory + logs + network)
 2. Detection of timestamp fabrication (USN Journal gap + TIMESTAMP_PRECISION_ANOMALY)
 3. Cross-artifact incongruence: claimed Russian RDP login vs. LSASS memory evidence
-4. Generation of Amicus Curiae judicial narrative
-5. SHA-256 bundle verification with `verify_ebs_v1.py`
+4. VIGÍA self-correction: downgrading Mnemosyne.sys and F-Response from INTENT to SUSPICION
+   after recognizing legitimate DFIR tooling
+5. Generation of Amicus Curiae judicial narrative
+6. SHA-256 bundle verification with `verify_ebs_v1.py` — four-hash seal confirmed
 
-**Direct link:** `docs/demo/vigia_demo_2026.mp4`
+**Reproduce the same investigation locally:**
 
-> If video is not yet uploaded at review time, the judge can reproduce the identical
-> investigation with: `python3 run_demo.py --case data/cases/VIGIA_CASE_DEMO.json`
-> Expected runtime: ~90 seconds. Expected output: `MALICE` verdict, confidence 0.87.
+```bash
+python3 run_demo.py --case data/cases/converted/VIGIA-REAL-SRL-DMZ-FTP.json
+# Expected runtime: ~90 seconds
+# Expected output: MALICE verdict, confidence 0.67, 4 hashes verified
+```
 
 ---
 
 ## §7 — Architecture Diagram
 
-### Embedded (ASCII) — README.md
+### Interactive (browser, no installation required)
 
-The full architecture diagram is embedded in [`README.md#architecture-overview`](./README.md#architecture-overview).
+**File:** [`docs/vigia_diagrams.html`](./docs/vigia_diagrams.html)  
+**Hosted:** [https://annatchijova.github.io/vigia/vigia_diagrams.html](https://annatchijova.github.io/vigia/vigia_diagrams.html)
 
-### High-Resolution Diagram
+Full pipeline from raw artifacts to sealed ForensicBundle. Component relationships,
+MCP phases, EBS v1 sealing flow. Navigable without cloning the repo.
 
-**File:** [`docs/architecture/vigia_architecture.png`](./docs/architecture/vigia_architecture.png)
+### Embedded (Mermaid) — README.md
+
+The full Mermaid architecture diagram is at [`README.md#architecture-overview`](./README.md#architecture-overview).
+
+### Screenshots — `screenshots/`
+
+```
+screenshots/diagrama1.png – diagrama8.png   ← Architecture screens
+screenshots/selfcorection.png               ← Self-correction sequence
+```
+
+### ASCII Architecture (inline)
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
@@ -206,7 +224,7 @@ The full architecture diagram is embedded in [`README.md#architecture-overview`]
                          ▼
 ┌─────────────────────────────────────────────────────────────────┐
 │                    VIGÍA MCP SERVER                             │
-│                  (vigia_sift_bridge.py)                         │
+│              (vigia_sift_bridge_final.py)                       │
 │                                                                 │
 │  LAYER 0: ebs_v1.py         — Data contracts (immutable)        │
 │  LAYER 1: SIFT tool outputs — Memory/Registry/Network/Disk      │
@@ -217,156 +235,166 @@ The full architecture diagram is embedded in [`README.md#architecture-overview`]
 │  LAYER 5: verify_ebs_v1.py  — Verification (stdlib only)        │
 │                                                                 │
 │  CAIE: CrossArtifactIncongruenceEngine                          │
-│        (temporal fractures, cryptographic inconsistency,        │
-│         staging artifacts, USN journal gaps)                    │
-│                                                                 │
 │  EBS v1: Evidence Bundle Synthesizer                            │
-│        (Noisy-OR composite, Fraction arithmetic, SHA-256 seal)  │
-│                                                                 │
-│  SIFT BRIDGE: 21 MCP tools                                      │
-│        Phase 1: Chain of Custody (9 tools)                      │
-│        Phase 2: Intentionality Analysis (12 tools)              │
+│  SIFT BRIDGE: 21 MCP tools (Phase 1: CoC + Phase 2: IoI)        │
 └────────────────────────┬────────────────────────────────────────┘
                          │  Sealed ForensicBundle (JSON + SHA-256)
                          ▼
 ┌─────────────────────────────────────────────────────────────────┐
 │           PEIRCE PLANNER — External LLM Orchestrator            │
 │  Claude Code / Ollama                                           │
-│  Role: translate sealed bundle → Amicus Curiae narrative        │
 │  INVARIANT: LLM is OUTSIDE the mathematical decision loop.      │
 │             It cannot alter scores. It can only narrate.        │
 └─────────────────────────────────────────────────────────────────┘
-                         │
-                         ▼
-              Amicus Curiae Judicial Narrative
-              (confirmed findings vs. inferred hypotheses
-               clearly distinguished — Daubert compliant)
 ```
 
 ---
 
 ## §8 — Evidence Dataset Documentation
 
-**Location:** [`docs/evidence/`](./docs/evidence/) and [`data/cases/`](./data/cases/)
+### Dataset Location
 
-### Dataset Summary
+| Path | Cases | Type |
+|------|-------|------|
+| [`data/cases/consolidated_canonical/`](./data/cases/consolidated_canonical/) | 52 | Canonical — MALICE / SUSPICION / NOISE |
+| [`data/cases/converted/`](./data/cases/converted/) | 18 | Real-world DFIR benchmarks |
+| [`data/cases/benign/`](./data/cases/benign/) | 15 | Confirmed legitimate — FP calibration |
+| [`data/cases/legacy/`](./data/cases/legacy/) | 16 | BREAK corpus — adversarial/evasion |
 
-| Dataset | Cases | Type | Purpose |
-|---------|-------|------|---------|
-| Canonical corpus v2 | 57 | Synthetic + real-world patterns | Evaluation ground truth |
-| Break cases | 10 | Adversarial / evasion attempts | Robustness testing |
-| Benign cases | 15 | Legitimate activity | False positive calibration |
+**Total: 101 cases across 4 categories.**
 
 ### Case Format
 
-Each case is a JSON file with the following structure:
+Each case is a JSON file structured as:
 
 ```json
 {
-  "case_id": "VIGIA_CASE_001",
-  "description": "Staged Russian APT false flag — timestamp fabrication",
+  "case_id": "VIGIA-REAL-001",
+  "description": "NIST CFReDS — Mr. Evil (Greg Schardt)",
   "expected_verdict": "MALICE",
   "expected_confidence_min": 0.75,
-  "artifacts": {
-    "memory_dump": "evidence/case_001/memory.raw",
-    "event_logs": "evidence/case_001/evtx/",
-    "network_capture": "evidence/case_001/traffic.pcap",
-    "mft": "evidence/case_001/mft.bin"
-  },
+  "artifacts": [...],
   "ground_truth_fractures": ["USN_JOURNAL_GAP", "TIMESTAMP_PRECISION_ANOMALY"],
-  "provenance": "Synthetic — VIGÍA AI Collective, May 2026"
+  "provenance": "NIST CFReDS public dataset"
 }
 ```
 
 ### Canonical Vectors (Determinism Verification)
 
-**File:** [`docs/protocols/P2/canonical_vectors_p2.json`](./docs/protocols/P2/canonical_vectors_p2.json)  
-**Hash manifest:** [`docs/protocols/P2/canonical_vectors_p2_sha256.txt`](./docs/protocols/P2/canonical_vectors_p2_sha256.txt)
+Any correct VIGÍA implementation produces bit-identical outputs for all 22 canonical
+vectors. This is the reproducibility guarantee required for Daubert compliance.
 
-These 22 canonical vectors verify determinism: any correct implementation produces
-bit-identical outputs for all 22 vectors. This is the reproducibility guarantee
-required for Daubert compliance.
+```bash
+python3 check_determinism.py
+```
 
 ---
 
 ## §9 — Accuracy Report
 
-**Location:** [`docs/accuracy/`](./docs/accuracy/)  
-**Primary file:** [`docs/accuracy/ACCURACY_REPORT.md`](./docs/accuracy/ACCURACY_REPORT.md)
+### Location
 
-### Summary Results (Canonical Corpus v2 — 57 cases)
+Results are documented in [`README.md#accuracy--evidence-dataset`](./README.md#accuracy--evidence-dataset).
 
-| Verdict | Cases | Correct | Accuracy |
-|---------|-------|---------|----------|
-| MALICE | 32 | 28 | 87.5% |
-| SUSPICION | 10 | 8 | 80.0% |
-| NOISE/UNKNOWN | 15 | 14 | 93.3% |
-| **Overall** | **57** | **50** | **87.7%** |
+### Summary
 
-### Known Limitations Affecting Accuracy
+| Corpus | Cases | Correct | Accuracy |
+|--------|-------|---------|----------|
+| Real cases (agent mode) | 18 | 18 | **100%** |
+| Canonical corpus | 52 | 52 | **100%** |
+| Benign corpus | 15 | 15 | **100%** |
+| BREAK corpus (fallback) | 16 | 16 | **100%** (ABSTAIN/UNKNOWN — correct by design) |
 
-Documented in [`known_limitations.md`](./known_limitations.md). Key items:
-
-- **L-001 through L-004:** 4 BREAK cases return SUSPICION instead of MALICE —
-  evasion-by-minimal-signal attacks that defeat single-artifact detection. Conservative
-  by design: false negatives preferred over false positives in forensic context.
-
-- **L-009:** `NETWORK_VS_HOST` fracture is categorical MALICE — may over-classify
-  legitimate split-tunnel/NAT scenarios. Deferred post-hackathon.
-
-- **L-010:** `TIMESTAMP_PRECISION_ANOMALY` severity 0.95 — may over-classify
-  API-normalized timestamps. Deferred post-hackathon.
-
-All limitations are documented with rationale, workarounds, and post-hackathon
-remediation plans. Transparency is a Daubert requirement.
-
-### Reproduce Accuracy Report
+### Reproduce
 
 ```bash
 python3 evaluate_detector.py \
-  --corpus data/cases/ \
+  --corpus data/cases/consolidated_canonical/ \
   --include-benign data/cases/benign/ \
-  --include-break data/cases/converted/ \
-  --output docs/accuracy/ACCURACY_REPORT.md
+  --include-break data/cases/legacy/ \
+  --output /tmp/accuracy_report.md
+```
+
+### Known Limitations
+
+Fully documented in [`KNOWN_LIMITATIONS.md`](./KNOWN_LIMITATIONS.md) (L-001 to L-019).
+Transparency is a Daubert requirement — documented limitations are an asset, not a liability.
+
+---
+
+### EVIDENCE INTEGRITY APPROACH
+
+How VIGÍA prevents original data from being modified:
+
+**1. SHA-256 at ingestion** — the evidence file is hashed before any analysis begins.
+This hash is recorded in the ForensicBundle and in every log entry. Any post-ingestion
+modification invalidates the bundle hash chain.
+
+**2. Chain of custody fields are mandatory** — `acquisition_hash` (64-char SHA-256),
+`examiner_id`, `acquisition_timestamp`, and `write_blocker_used` are required artifact
+metadata. Missing fields trigger NIST SP 800-86 §4.3 trust penalties that mathematically
+reduce the verdict score. The system cannot be silently operated without chain of custody.
+
+**3. HMAC audit trail** — every tool call, verdict transition, and self-correction is
+logged with an HMAC-signed entry. The log chain is tamper-evident: a missing or modified
+entry breaks the HMAC chain and is detectable on verification.
+
+**4. Immutable bundle sealing** — the ForensicBundle is sealed with four hashes
+(H1: evidence graph, H2: bundle integrity, H3: file SHA-256, H4: engine attestation)
+before any LLM generates narrative. `verify_ebs_v1.py` (stdlib only, zero VIGÍA
+dependencies) can independently verify any bundle.
+
+**5. Purgatorio forense** — if an evidence payload cannot be processed (UnicodeDecodeError,
+byte corruption, integrity anomaly), VIGÍA does not discard it silently. The raw payload
+is sealed under SHA-256 with `0o400` permissions (immutable post-write) and persisted to
+the evidence purgatory directory. Discarding unprocessable evidence would break chain of
+custody — its absence is itself a forensic signal under Daubert.
+
+**What happens when the agent attempts to bypass protections:**
+
+**KASSANDRA PROTOCOL** — VIGÍA plants a cryptographic tripwire inside every evidence
+payload sent to the LLM. If the evidence contains an embedded prompt injection attempt,
+the LLM must return `MALICE/confidence=100` on the tripwire. If it returns anything else,
+the response is marked `INTEGRITY_UNKNOWN` and blocked from influencing the bundle.
+An attacker who plants adversarial content in a log file does not deceive VIGÍA — they
+trigger an escalation to maximum confidence MALICE and leave an immutable record in the
+HMAC audit chain.
+
+The LLM has no write access to the evidence graph, the scoring pipeline, or the bundle
+sealing process. It receives a read-only view of the sealed analysis and generates
+narrative only.
+
+```bash
+# Verify a sealed bundle (stdlib only — zero VIGÍA dependencies)
+python3 verify_ebs_v1.py results/srl2018/VIGIA-REAL-SRL-DMZ-FTP_bundle.json --verbose
 ```
 
 ---
 
 ## §10 — Agent Execution Logs
 
-**Location:** [`docs/logs/`](./docs/logs/)
+### Location
 
-### Log Types
-
-**Chain of Custody Log** — generated by every investigation:
-```
-docs/logs/chain_of_custody_CASE_001_20260526T143022Z.json
-```
-
-**Execution Log** — full audit trail with timestamps, tool calls, intermediate scores:
-```
-docs/logs/execution_log_CASE_001_20260526T143022Z.jsonl
-```
-
-**Bundle Hash Manifest** — SHA-256 seal for reproducibility verification:
-```
-docs/logs/bundle_manifest_CASE_001_20260526T143022Z.txt
-```
+| Path | Contents |
+|------|----------|
+| [`results/srl2018/`](./results/srl2018/) | SRL-2018 investigation outputs — bundle + Amicus Curiae |
+| `results/srl2018/VIGIA-REAL-SRL-DMZ-FTP_bundle.json` | Sealed ForensicBundle (4 hashes) |
+| `results/srl2018/VIGIA-REAL-SRL-DMZ-FTP_amicus_curiae.md` | Full judicial narrative |
 
 ### Generate Logs
 
 ```bash
-# Run a case and capture logs
-python3 run_case.py \
-  --case data/cases/VIGIA_CASE_001.json \
-  --log-dir docs/logs/ \
-  --chain-of-custody
+# Run a case and capture full logs
+python3 vigia_agent.py \
+  --evidence data/cases/converted/VIGIA-REAL-SRL-DMZ-FTP.json \
+  --case-id VIGIA-REAL-SRL-DMZ-FTP \
+  --output results/demo_bundle.json
 
-# Verify a bundle (stdlib only, no VIGÍA dependencies)
-python3 verify_ebs_v1.py docs/logs/bundle_CASE_001.json
+# Verify the sealed bundle (no VIGÍA dependencies required)
+python3 verify_ebs_v1.py results/demo_bundle.json --verbose
 ```
 
-### Sample Execution Log Entry
+### Sample Log Entry
 
 ```json
 {
@@ -384,23 +412,46 @@ python3 verify_ebs_v1.py docs/logs/bundle_CASE_001.json
 
 ---
 
+## §11 — VIGÍA Story
+
+**Files:**
+- [`VIGIA_STORY.md`](./VIGIA_STORY.md) — Spanish original (Anna Tchijova)
+- [`VIGIA_STORY_EN.md`](./VIGIA_STORY_EN.md) — English translation
+
+Rob T. Lee requested this document during direct engagement with the project.
+It covers the origin of VIGÍA, the four theoretical sources (Gemini attack,
+phonetic evasion, stylometry, the Kiwi Case), the design philosophy, and the
+AI Collective working methodology.
+
+*"LLMs write for the ideal world and the ideal user. I anticipated malice."*
+
+---
+
 ## Verification Commands (for judges)
 
 ```bash
-# 1. Verify the LICENSE exists and is MIT
+# 1. Verify the LICENSE exists and is Apache 2.0
 head -3 LICENSE
 
 # 2. Verify determinism — canonical vectors must pass
 python3 check_determinism.py
 
-# 3. Run the demo investigation
-python3 run_demo.py --case data/cases/VIGIA_CASE_DEMO.json
+# 3. Run the demo investigation (SRL-DMZ-FTP real case)
+python3 vigia_agent.py \
+  --evidence data/cases/converted/VIGIA-REAL-SRL-DMZ-FTP.json \
+  --case-id VIGIA-REAL-SRL-DMZ-FTP \
+  --output results/demo_bundle.json
 
-# 4. Verify a sealed bundle (no dependencies, stdlib only)
-python3 verify_ebs_v1.py docs/logs/demo_bundle.json
+# 4. Verify the sealed bundle (no dependencies, stdlib only)
+python3 verify_ebs_v1.py results/demo_bundle.json --verbose
 
-# 5. Reproduce accuracy report
-python3 evaluate_detector.py --corpus data/cases/ --output /tmp/accuracy.md
+# 5. Run the full test suite
+python3 -m pytest tests/ -v    # 148/148 expected
+
+# 6. Reproduce accuracy on real corpus
+python3 evaluate_detector.py \
+  --corpus data/cases/consolidated_canonical/ \
+  --output /tmp/accuracy.md
 ```
 
 ---
