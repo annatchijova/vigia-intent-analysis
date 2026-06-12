@@ -361,6 +361,21 @@ def _check_ecl_binding(bundle: Dict) -> Tuple[bool, str]:
     return True, f"ECL anclado: {ecl[:16]}..."
 
 
+def _check_devil_advocate(bundle: Dict) -> Tuple[bool, str]:
+    """R6 — MALICE/INTENT findings must have devil_advocate populated (Daubert requirement)."""
+    findings = bundle.get("findings", [])
+    if not findings:
+        return True, "No findings field — fallback mode bundle, check not applicable"
+    violations = []
+    for f in findings:
+        if f.get("verdict", "") in ("MALICE", "INTENT"):
+            da = str(f.get("devil_advocate", "")).strip()
+            if not da or da in ("", "N/A", "null", "None"):
+                violations.append(f.get("finding_id", f.get("id", "UNKNOWN")))
+    if violations:
+        return False, f"Findings {violations} have MALICE/INTENT verdict but empty devil_advocate — Daubert invalidity"
+    return True, "All MALICE/INTENT findings have devil_advocate populated"
+
 # ---------------------------------------------------------------------------
 # Motor principal
 # ---------------------------------------------------------------------------
@@ -418,6 +433,8 @@ def verify_bundle(
 
     ok_ecl, msg_ecl = _check_ecl_binding(bundle)
     result.add("R5_ECL_BINDING", ok_ecl, msg_ecl, severity="WARNING" if not ok_ecl else "INFO")
+    ok_da, msg_da = _check_devil_advocate(bundle)
+    result.add("R6_DEVIL_ADVOCATE", ok_da, msg_da, severity="WARNING" if not ok_da else "INFO")
 
     # Determinar Level 3
     if not critical and hash_ok and ok_pc and ok_att and ok_ecl:
