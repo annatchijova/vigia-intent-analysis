@@ -421,3 +421,20 @@ Every tool call MUST be logged to audit_trail with:
 
 The audit_trail is part of the sealed bundle. An investigation with no
 audit_trail entries is incomplete under Daubert chain-of-custody standards.
+
+## Refutation Protocol Documentation Requirement
+
+In the Amicus Curiae, for every finding rated SUSPICION that was a candidate
+for INTENT or MALICE, document the gate explicitly:
+
+  REFUTATION GATE LOG — [Finding ID]
+    Candidate verdict : INTENT (CAIE score exceeded single-artifact threshold)
+    Gate applied      : Daubert Corroboration Gate (vigia_scorer.py)
+    Gate rule         : n_artifacts < 2 for this evidence class → cap SUSPICION
+    Gate result       : Candidate REJECTED pre-emission. Emitted as SUSPICION.
+    Forensic note     : Architectural self-correction. No incorrect verdict
+                        was sealed. LLM cannot override this gate.
+
+Unlike LLM agents that emit incorrect verdicts and then revise them narratively,
+VIGÍA's self-correction occurs pre-emission: the mathematical gate intercepts
+incorrect candidates before they reach the ForensicBundle.

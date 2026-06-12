@@ -201,8 +201,13 @@ Devil Advocate: Captures could be from security coursework or CTF. PARTIAL
                ACCEPTANCE: Plausible for captures alone. Rated SUSPICION
                (not INTENT) due to single-source limitation.
 Corroboration: Single source. No second artifact confirms reconnaissance purpose.
-Self-Correct : Correctly downgraded from INTENT to SUSPICION per conservative
-               Daubert standard. Single source insufficient for INTENT.
+Self-Correct : REFUTATION GATE LOG — F-004
+               Candidate verdict : INTENT (WiFi captures exceeded CAIE threshold)
+               Gate applied      : Daubert Corroboration Gate (vigia_scorer.py)
+               Gate rule         : n_artifacts=1 for this evidence class < 2 required
+               Gate result       : Candidate REJECTED pre-emission. Emitted SUSPICION.
+               Forensic note     : Pre-emission architectural correction. No incorrect
+                                   verdict was sealed. LLM cannot override this gate.
 
 TRUST FUSION ANALYSIS
 ---------------------
