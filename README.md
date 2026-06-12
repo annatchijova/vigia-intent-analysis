@@ -335,6 +335,8 @@ python3 forensics/verify_ebs_v1.py results/srl2018/VIGIA-REAL-SRL-DMZ-FTP_bundle
 ---
 
 ## Installation
+> **No API key required for evaluation:** Mode 1 (Python fallback, 0 tokens) and the browser simulator at https://annatchijova.github.io/vigia/vigia.html run without any API key, signup, or payment. Both are sufficient to evaluate the full scoring pipeline and reproduce all deterministic verdicts.
+
 
 ### Requirements
 
