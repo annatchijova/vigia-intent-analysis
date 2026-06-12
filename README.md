@@ -554,7 +554,7 @@ bash tests/run_break_tests.sh
 ### Unit Tests
 
 ```bash
-python3 -m pytest tests/ -v    # 148/148 passing
+python3 -m pytest tests/ -v    # 156 passed, 8 xfailed
 ```
 
 ![148 tests passing](screenshots/test148.png)
@@ -719,7 +719,7 @@ vigia-intent-analysis/
 │   ├── protocols/P2/                    ← P2 canonical vectors + SHA-256 manifest
 │   └── academic/                        ← 193 module docs (EN/ES/RU/ZH in progress)
 │
-├── tests/                               ← 148/148 passing
+├── tests/                               ← 156 passed, 8 xfailed
 │   ├── run_all_cases.py
 │   ├── test_red_team.py
 │   └── test_ebs_v1_integration.py
