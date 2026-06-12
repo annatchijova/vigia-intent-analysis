@@ -173,6 +173,8 @@ def process_case(
     mi_raw = agg.get("mi_final", {})
     mi_float = mi_raw.get("num", 0) / max(mi_raw.get("den", 1), 1)
     peirce_expected = case.get("peirce_expected", {})
+    if not isinstance(peirce_expected, dict):
+        peirce_expected = {}
 
     logger.log_abductive_hypothesis(
         hypothesis_id="H-001",
