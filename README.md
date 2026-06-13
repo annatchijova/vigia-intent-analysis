@@ -575,6 +575,16 @@ Full Amicus Curiae: [results/srl2018/VIGIA-REAL-VANKO_amicus_curiae.md](./result
 
 > The SRL-DMZ-FTP investigation remains in the repository. VANKO was added after audit feedback identified the need for structured tool_execution_log entries in the bundle.
 
+### VIGIA-REAL-NROMANOFF — Zeus Banking Trojan, Stark Research Labs 2012
+
+**Evidence:** 5 artifacts — memory hooks (Volatility zeus-apihooks), shimcache persistence, event logs, network cache. SANS FOR508 corpus.
+**VIGÍA verdict:** `MALICE` | Daubert: ADMISSIBLE (error rate 0.39%) | Chain integrity: VERIFIED 13/13
+**F-003 conservative rating:** `INTENT` (not MALICE) — rsydow authentication may be legitimate DFIR activity. Conservative Daubert standard applied.
+**F-004:** `SUSPICION` — Daubert Corroboration Gate applied (single-source network_flow).
+**Key finding:** Zeus Inline/Trampoline hooks on ntdll.dll in services.exe PID 676, hook destination 0x7e3b47 in unmapped memory — definitive rootkit signature.
+
+Full Amicus Curiae: [results/srl2018/VIGIA-REAL-NROMANOFF_amicus_curiae.md](./results/srl2018/VIGIA-REAL-NROMANOFF_amicus_curiae.md)
+
 ### CAN-031 — Weaponized Incompetence
 
 PowerShell deletes shadow copies and disables firewall with zero syntax errors.
