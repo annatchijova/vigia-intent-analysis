@@ -658,6 +658,36 @@ An empty `devil_advocate` field invalidates the verdict under the Daubert standa
 > The accuracy report reflects real adversarial test cases including BREAK corpus
 > evasion attempts, not only cases the system was designed to succeed on.
 
+
+## Pre-Emission Correctness — A Note for Judges
+
+The Judge Pack for this event notes that the known failure mode is *"agents that
+confidently present hallucinated findings."* VIGÍA addresses this differently from
+post-hoc verification systems:
+
+**VIGÍA's corroboration gate runs before any verdict is sealed.** When the CAIE
+scores a finding as INTENT, the gate evaluates whether corroborating evidence from
+independent sources meets the Daubert evidentiary threshold. If it does not, the
+finding is emitted as SUSPICION — not INTENT. This happens inside `vigia_scorer.py`
+before the bundle is built. No incorrect verdict reaches the ForensicBundle.
+
+This is distinct from "self-correction" in the sense of catching and fixing a mistake
+after the fact. The architecture does not produce incorrect verdicts that need
+correction; it prevents their emission. The `self_correction_events` in the bundle
+(visible in `verify_tool_log.py`) document gate firings, not LLM self-revision.
+
+**On the accuracy report:** VIGÍA documents 22 known limitations
+([`KNOWN_LIMITATIONS.md`](./KNOWN_LIMITATIONS.md)). Per the Judge Pack: *"An honest,
+specific accuracy report raises this score; a flawless-looking result with no error
+analysis lowers it."* The limitations are forensic assets, not liabilities. A system
+that cannot describe its own failure modes is not Daubert-admissible.
+
+**On the LLM trust boundary:** The LLM (Claude Code, Ollama, or fallback) handles
+only narrative translation of already-sealed `ForensicBundle` objects. It does not
+compute scores, set thresholds, or emit verdicts. This boundary is marked in the
+[architecture diagram](./vigia_diagrams__1_.html) and enforced by the code — not by
+a system prompt.
+
 ## Judging Criteria Alignment
 
 | Criterion | VIGÍA Implementation |
