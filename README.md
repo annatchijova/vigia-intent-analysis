@@ -1,5 +1,7 @@
 # VIGÍA — Intentionality Analysis Bridge for SIFT Workstation
 
+[🇪🇸 Versión en español](./README_ES.md)
+
 > *"Making deception computationally expensive for the attacker."*
 >
 > Today, lying in a log or faking an attack is free. VIGÍA charges that price
