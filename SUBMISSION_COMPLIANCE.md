@@ -26,6 +26,7 @@
 | 9 | Accuracy report | ✅ | [`README.md#accuracy--evidence-dataset`](./README.md#accuracy--evidence-dataset) — see §9 below |
 | 10 | Agent execution logs | ✅ | [`results/srl2018/`](./results/srl2018/) — see §10 below |
 | 11 | VIGÍA Story (origin + design rationale) | ✅ | [`VIGIA_STORY.md`](./VIGIA_STORY.md) (ES) + [`VIGIA_STORY_EN.md`](./VIGIA_STORY_EN.md) (EN) — see §11 below |
+| 12 | Interactive live simulator (EN + ES) | ✅ | [vigia.html (EN)](https://annatchijova.github.io/vigia/vigia.html) · [vigia-es.html (ES)](https://annatchijova.github.io/vigia/vigia-es.html) — see §12 below |
 
 ---
 
@@ -426,6 +427,28 @@ AI Collective working methodology.
 *"LLMs write for the ideal world and the ideal user. I anticipated malice."*
 
 ---
+
+---
+
+## §12 — Interactive Live Simulator
+
+No installation required. Any judge can open either link in a browser and
+interact with VIGÍA's scoring logic immediately.
+
+**English version:**
+[https://annatchijova.github.io/vigia/vigia.html](https://annatchijova.github.io/vigia/vigia.html)
+
+**Spanish version (for Spanish-speaking judges):**
+[https://annatchijova.github.io/vigia/vigia-es.html](https://annatchijova.github.io/vigia/vigia-es.html)
+
+The simulator demonstrates the complete VIGÍA pipeline interactively:
+- Abductive intent scoring with deterministic arithmetic
+- CAIE fracture detection (temporal, behavioral, cryptographic, semiotic)
+- Grice maxim audit, Eco overinterpretation, Carnegie manipulation detection
+- ForensicBundle sealing: 4-hash output (H1 graph · H2 bundle · H3 HMAC · H4 EBS)
+- Verdict logic: MALICE / SUSPICION / NOISE / ABSTAIN with confidence intervals
+
+Source files in repository: [`vigia.html`](./vigia.html) · [`vigia-es.html`](./vigia-es.html)
 
 ## Verification Commands (for judges)
 
