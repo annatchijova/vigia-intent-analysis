@@ -569,7 +569,7 @@ bash tests/run_break_tests.sh
 ### Unit Tests
 
 ```bash
-python3 -m pytest tests/ -v    # 161 passed, 8 xfailed
+python3 -m pytest tests/ -v    # 163 passed, 6 xfailed
 ```
 
 ![148 tests passing](screenshots/test148.png)
@@ -861,7 +861,7 @@ Temporal entropy: 0.00 bits.
 │   ├── protocols/P2/                    ← P2 canonical vectors + SHA-256 manifest
 │   └── academic/                        ← 193 module docs (EN/ES/RU/ZH in progress)
 │
-├── tests/                               ← 156 passed, 8 xfailed
+├── tests/                               ← 163 passed, 6 xfailed
 │   ├── run_all_cases.py
 │   ├── test_red_team.py
 │   └── test_ebs_v1_integration.py

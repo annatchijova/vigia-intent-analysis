@@ -393,7 +393,7 @@ corroborating heterogeneous evidence.
 | L-009 | Spoofability floor under chain of custody | REAL corpus | Design decision |
 | L-010 | Sensor independence not verified | CAIE adversarial 3/25 | Roadmap v3.0 |
 | L-011 | Kernel/root compromise (live analysis) | All live analysis | Permanent boundary |
-| L-019 | FALSE_FLAG_PATTERN fires on clean foreign-language machines | FP-CULTURAL-CLEAN | Real limitation (deferred) |
+| L-019 | FALSE_FLAG_PATTERN fires on clean foreign-language machines | FP-CULTURAL-CLEAN | **[RESOLVED]** |
 | — | Normalization schema mismatch | vigia_scorer.py | **RESOLVED** |
 | — | Gate G1 accepting legacy hashes | caie.py | **RESOLVED** |
 | — | Uniform prior_trust=0.7 in converter | convert_legacy_cases.py | **RESOLVED** |
@@ -621,7 +621,7 @@ The bundle hash is computed from in-memory content, not from disk. Between `f.wr
 
 ## L-019 — FALSE_FLAG_PATTERN fires on clean foreign-language machines
 
-**Affects:** FP-CULTURAL-CLEAN.json | **Status:** Real limitation — fix deferred
+**Affects:** FP-CULTURAL-CLEAN.json | **Status:** [RESOLVED]
 
 **Description:** `FALSE_FLAG_PATTERN` in CAIE Rule 1 fires when
 `avg_cultural > 0.5 AND avg_technical < 0.2`, regardless of whether

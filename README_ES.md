@@ -547,7 +547,7 @@ bash tests/run_break_tests.sh
 ### Tests Unitarios
 
 ```bash
-python3 -m pytest tests/ -v    # 161 passed, 8 xfailed
+python3 -m pytest tests/ -v    # 163 passed, 6 xfailed
 ```
 
 ![148 tests pasando](screenshots/test148.png)
@@ -838,7 +838,7 @@ vigia-intent-analysis/
 │   ├── protocols/P2/                    ← Vectores canónicos P2 + manifiesto SHA-256
 │   └── academic/                        ← Docs de 193 módulos (EN/ES/RU/ZH en progreso)
 │
-├── tests/                               ← 156 passed, 8 xfailed
+├── tests/                               ← 163 passed, 6 xfailed
 │   ├── run_all_cases.py
 │   ├── test_red_team.py
 │   └── test_ebs_v1_integration.py
