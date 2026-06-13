@@ -650,6 +650,14 @@ An empty `devil_advocate` field invalidates the verdict under the Daubert standa
 
 ---
 
+
+> **On accuracy claims:** VIGÍA does not claim zero hallucination. The system
+> documents 22 known limitations (L-001 through L-022 in `KNOWN_LIMITATIONS.md`)
+> because a forensic methodology that cannot describe its own failure modes is not
+> Daubert-admissible. Documented limitations are a forensic asset, not a liability.
+> The accuracy report reflects real adversarial test cases including BREAK corpus
+> evasion attempts, not only cases the system was designed to succeed on.
+
 ## Judging Criteria Alignment
 
 | Criterion | VIGÍA Implementation |
