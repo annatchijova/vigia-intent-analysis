@@ -95,6 +95,7 @@ VIGÍA. The truth is in the fracture.
 | **Video de demostración** | **[YouTube — VIGÍA Demo 2026](https://www.youtube.com/watch?v=NOquYzUwMkg)** |
 | Diagramas de arquitectura interactivos | [`docs/vigia_diagrams.html`](./docs/vigia_diagrams.html) — [alojado](https://annatchijova.github.io/vigia/vigia_diagrams.html) |
 | Simulador de lógica matemática | [`vigia.html`](./vigia.html) — [alojado](https://annatchijova.github.io/vigia/vigia.html) |
+| **Simulador ES** | [`vigia-es.html`](./vigia-es.html) — [alojado](https://annatchijova.github.io/vigia/vigia-es.html) |
 | Referencia de comandos | [`vigia_commands_en.html`](./vigia_commands_en.html) — [alojado](https://annatchijova.github.io/vigia/vigia_commands_en.html) |
 | Limitaciones conocidas | [`KNOWN_LIMITATIONS.md`](./KNOWN_LIMITATIONS.md) |
 | Política de seguridad | [`SECURITY.md`](./SECURITY.md) |
@@ -551,6 +552,7 @@ python3 -m pytest tests/ -v    # 163 passed, 6 xfailed
 ```
 
 ![148 tests pasando](screenshots/test148.png)
+*(screenshot de build anterior — conteo actual: 163)*
 
 
 
