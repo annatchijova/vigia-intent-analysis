@@ -581,6 +581,38 @@ python3 -m pytest tests/ -v    # 156 passed, 8 xfailed
 
 ![148 tests passing](screenshots/test148.png)
 
+
+
+The suite is organized by threat model:
+
+| Category | Tests | What it verifies |
+|---|---|---|
+| **Security bypass** (`test_bypass_vectors.py`) | 5 | Path traversal, bundle tamper detection, float→Fraction determinism, adversarial text isolation. Zero tokens, <1 second. |
+| **Red team / adversarial** (`test_red_team.py`, `test_adversarial_suite.py`) | 25+ payloads | 20 adversarial payloads against the full scoring pipeline; 5 targeted evasion attempts against known architectural weak points. |
+| **Decision gate audit** (`test_audit_*.py`) | 9 (4 xfailed) | Temporal anomaly gates, false flag detection, causal closure, corroboration gate source-diversity. xfailed = documented regressions with regression-preventing tests. |
+| **Pipeline determinism** (`test_order_sensitivity.py`) | 12 | Same evidence → same verdict regardless of processing order. |
+| **EBS bundle integrity** (`test_ebs_v1_integration.py`) | 20+ | Cryptographic seal, hash chain, tamper detection, AbductionTrace. |
+| **Anti-evasion / FRS** (`test_frs_ghost_in_the_shell_v2.py`) | 15+ | Fileless execution, timestomping, process hollowing, log wiping. |
+| **Real case pipeline** (`test_real_cases.py`, `test_canonical_cases.py`) | 18 real | SANS FOR508, SRL-2018, DEF CON CTF — expected vs actual verdict. |'''
+
+> **Operational independence:** If every LLM provider ceased to exist tomorrow,
+> VIGÍA would continue producing identical verdicts from the same evidence.
+> The scoring engine uses `fractions.Fraction` over Python stdlib — no cloud
+> services, no API keys, no network access. A design requirement for forensic
+> tools intended for long-term infrastructure and air-gapped deployments.'''
+
+If an evidence payload cannot be processed (UnicodeDecodeError, byte corruption,
+integrity anomaly), VIGÍA does not discard it silently. The raw payload is sealed
+under SHA-256 with `0o400` permissions (immutable post-write) and persisted to the
+evidence purgatory directory. Discarding unprocessable evidence would break chain
+of custody — its absence is itself a forensic signal under Daubert.
+
+Chain of custody fields (`acquisition_hash`, `examiner_id`, `write_blocker_used`)
+are mandatory. Missing fields trigger NIST SP 800-86 §4.3 trust penalties that
+mathematically reduce the verdict score. The system cannot be silently operated
+without chain of custody.
+
+
 ---
 
 ## Investigation Examples
