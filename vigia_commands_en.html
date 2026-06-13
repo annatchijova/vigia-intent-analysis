@@ -573,7 +573,40 @@ Expected output: MALICE verdict with a clear reasoning chain explaining the clea
 5. Summarize the results in terms appropriate for a court-appointed forensic expert
 
 Reference: KNOWN_LIMITATIONS.md documents all 18 known failure modes with limitation IDs for Daubert transparency. The fallback gap (78% overall) is concentrated in four specific documented limitations, not random error.</div>
+
+  <div class="pcard">
+    <div class="plabel">Prompt 5 — Full investigation with strict audit trail (VANKO / NROMANOFF pattern)<button class="cp" onclick="cpP(this)">copy</button></div>
+    <div class="ptext" id="p5">Conduct a full VIGÍA forensic investigation on data/cases/converted/VIGIA-REAL-VANKO.json
+
+Follow ALL protocols in CLAUDE.md including:
+1. Five SANS phases (Preparation, Identification, Containment, Eradication, Recovery, Lessons Learned)
+2. Strict tool_execution_log schema for every MCP tool call:
+   - seq, event_id (uuid4), timestamp with microseconds, mode: "claude_code"
+   - tool, target, result_summary (max 120 chars)
+   - input_hash (SHA-256 of sanitized arguments)
+   - prev_hash (GENESIS for seq=1, SHA-256 of previous result_summary for subsequent)
+3. ContradictionDetector and Refutation Gate events go in self_correction_events array (NOT in tool_execution_log)
+4. Refutation Gate Documentation for any SUSPICION finding that was a candidate for INTENT/MALICE
+
+Save sealed bundle to results/srl2018/VIGIA-REAL-VANKO_bundle.json and Amicus Curiae to results/srl2018/VIGIA-REAL-VANKO_amicus_curiae.md</div>
   </div>
+  <div class="pcard">
+    <div class="plabel">Prompt 6 — Verify sealed bundle (standalone, no MCP required)<button class="cp" onclick="cpP(this)">copy</button></div>
+    <div class="ptext" id="p6">Verify the sealed ForensicBundle for the VANKO case:
+
+python3 forensics/verify_ebs_v1.py results/srl2018/VIGIA-REAL-VANKO_bundle.json --verbose
+
+This runs 6 checks (R1–R6) using stdlib only — no VIGÍA installation required:
+- R1: Evidence graph hash (H1)
+- R2: Policy spec hash (H2)
+- R3: Bundle integrity hash (H3)
+- R4: Engine attestation hash (H4)
+- R5: ECL binding
+- R6: devil_advocate populated for all MALICE/INTENT findings (Daubert requirement)
+
+Expected output: Level 2 — Cryptographically valid. R6_DEVIL_ADVOCATE: OK.
+To verify the NROMANOFF case: replace VANKO with NROMANOFF in the path above.</div>
+  </div>  </div>
 </div>
 
 
