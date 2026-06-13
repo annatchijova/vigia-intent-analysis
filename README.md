@@ -546,7 +546,7 @@ bash tests/run_break_tests.sh
 ### Unit Tests
 
 ```bash
-python3 -m pytest tests/ -v    # 156 passed, 8 xfailed
+python3 -m pytest tests/ -v    # 161 passed, 8 xfailed
 ```
 
 ![148 tests passing](screenshots/test148.png)
