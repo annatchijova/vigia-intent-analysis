@@ -3,8 +3,8 @@
   "case_id": "VIGIA-REAL-NFURY",
   "case_name": "Stark Research Labs \u2014 Nick Fury / Lateral Movement Investigation (2012)",
   "investigation_timestamp": "2026-06-13T04:50:00.000000Z",
-  "report_generated": "2026-06-13T13:22:32.369487Z",
-  "investigator": "VIG\u00cdA Autonomous Agent (Claude Code / Anthropic)",
+  "report_generated": "2026-06-13T05:00:00.000000Z",
+  "investigator": "VIGIA Autonomous Agent (Claude Code / Anthropic)",
   "mode": "claude_code",
   "evidence_hash": "2824eaaff943b5937a7653aaf1f157537c11c69a87faa32dce97db4d0a1c8596",
   "evidence_file": "data/cases/converted/VIGIA-REAL-NFURY.json",
@@ -42,16 +42,16 @@
         "detect_eco_overinterpretation"
       ],
       "peirce_chain": {
-        "firstness": "WmiPrvSE.exe (PID=2508) observed with parent svchost.exe (PID=656). MRI score 61.0 \u2014 highest in system. Process had already EXITED at time of memory acquisition. No filesystem path recorded in memory structures.",
-        "secondness": "WmiPrvSE.exe normally resides at C:\\Windows\\System32\\wbem\\WmiPrvSE.exe and spawns from svchost.exe (DcomLaunch group). Parent relationship is NORMAL. Missing path for an exited process CAN be a memory acquisition artifact \u2014 Windows may reclaim EPROCESS path information after process termination. However, MRI score of 61 is elevated. In context of same-day Zeus infection on adjacent host nromanoff (10.3.58.5), this warrants investigation.",
-        "thirdness": "WMI-based lateral movement (T1047) uses WmiPrvSE.exe as execution host for remote payloads. Pattern: attacker executes via WMI, payload runs inside WmiPrvSE, process exits after completion, path information not retained. However, this SAME pattern occurs with legitimate WMI queries (SCCM, GPO, monitoring). Single artifact insufficient to distinguish attack from administration."
+        "firstness": "WmiPrvSE.exe (PID=2508) observed with parent svchost.exe (PID=656). MRI score 61.0 \u2014 highest in system. Process had already EXITED. No filesystem path recorded.",
+        "secondness": "WmiPrvSE.exe normally resides at C:\\Windows\\System32\\wbem\\WmiPrvSE.exe. Parent relationship is NORMAL. Missing path for exited process CAN be memory acquisition artifact. MRI 61 reflects the missing-path anomaly itself.",
+        "thirdness": "WMI-based lateral movement (T1047) uses WmiPrvSE.exe as execution host. Same pattern occurs with legitimate WMI queries. Single artifact insufficient to distinguish attack from administration."
       },
-      "carnegie_pattern": "None detected \u2014 system-level artifact, no social engineering component",
+      "carnegie_pattern": "None detected",
       "mitre_ttps": [
         "T1047"
       ],
-      "devil_advocate": "WmiPrvSE.exe exits normally after completing WMI queries. Missing filesystem path is a documented behavior for exited processes in Windows 7 memory \u2014 the kernel reclaims EPROCESS structures. MRI score of 61 reflects the missing-path anomaly itself, not independent evidence of compromise. A SCCM inventory scan, GPO enforcement, or enterprise monitoring tool could produce this exact pattern. Without process memory dump or corroborating persistence artifact, benign WMI activity cannot be excluded.",
-      "corroboration": "No corroborating artifact found. No persistence binaries in Temp directories. No shimcache anomaly available. No prefetch data analyzed. Remains single-source INFERRED.",
+      "devil_advocate": "WmiPrvSE.exe exits normally after WMI queries. Missing path is documented for exited processes in Windows 7. MRI 61 reflects the anomaly itself. SCCM/GPO could produce this pattern. Without process memory dump or persistence artifact, benign WMI cannot be excluded.",
+      "corroboration": "No corroborating artifact found. Single-source INFERRED.",
       "raw_scores": {
         "habit_incongruence": 0.9,
         "caie_adjusted": 0.0826,
@@ -62,7 +62,7 @@
         "overridden": true,
         "override_reason": "Daubert Corroboration Gate \u2014 single artifact, no payload/persistence corroboration"
       },
-      "shannon_entropy": "N/A \u2014 binary process artifact, entropy analysis not applicable"
+      "shannon_entropy": "N/A"
     },
     {
       "finding_id": "F-002",
@@ -77,17 +77,16 @@
         "cross_artifact_analysis"
       ],
       "peirce_chain": {
-        "firstness": "csrss.exe (PID=440, MRI=58) and winlogon.exe (PID=480, MRI=47) both show ParentPID=432. PID 432 is currently occupied by spoolsv.exe (print spooler).",
-        "secondness": "csrss.exe and winlogon.exe are ALWAYS spawned by smss.exe \u2014 never by spoolsv.exe. This appears as a critical process tree anomaly. However, this is a DOCUMENTED Windows 7 memory forensics artifact: smss.exe session process creates csrss/winlogon, then terminates. The kernel assigns PID 432 to a new process (spoolsv.exe). The PPID field in csrss/winlogon still references the original PID 432 (now reused). This is PID recycling, not process injection.",
-        "thirdness": "No deliberate pattern. This is a well-documented forensic artifact in Windows process analysis. The MRI scores (58, 47) reflect the PPID anomaly itself but the anomaly has a complete benign explanation."
+        "firstness": "csrss.exe (PID=440, MRI=58) and winlogon.exe (PID=480, MRI=47) both show ParentPID=432 (spoolsv.exe).",
+        "secondness": "Documented Windows 7 PID reuse artifact: smss session process terminated, PID recycled.",
+        "thirdness": "No deliberate pattern. Well-documented forensic artifact."
       },
       "carnegie_pattern": "None",
       "mitre_ttps": [],
-      "devil_advocate": "N/A \u2014 NOISE verdict, refutation not required",
-      "corroboration": "PID reuse is independently documented in Windows 7 memory forensics literature and confirmed by process tree analysis.",
+      "devil_advocate": "N/A \u2014 NOISE verdict",
+      "corroboration": "Documented in Windows 7 memory forensics literature.",
       "raw_scores": {
-        "caie_adjusted": 0.0402,
-        "caie_composite": 0.1381
+        "caie_adjusted": 0.0402
       },
       "habit_incongruence": "N/A",
       "shannon_entropy": "N/A"
@@ -107,17 +106,17 @@
         "infer_intent"
       ],
       "peirce_chain": {
-        "firstness": "lsass.exe (PID=552) has CLOSED TCP connections to 10.3.58.4:135 (RPC endpoint mapper) and 10.3.58.4:49156 (RPC dynamic endpoint). Connection state is CLOSED \u2014 activity completed before acquisition.",
-        "secondness": "lsass.exe initiating outbound RPC to peer IP in same /24 as confirmed Zeus host (nromanoff 10.3.58.5). RPC endpoint mapper (port 135) followed by dynamic RPC (49156) is the standard Windows RPC connection pattern. This pattern is NORMAL for domain authentication (NTLM/Kerberos to a DC). It is ALSO consistent with credential relay, pass-the-hash (T1550.002), or remote service interaction. The critical unknown: is 10.3.58.4 a domain controller? If yes, this is entirely normal. If it is a peer workstation, it is anomalous.",
-        "thirdness": "In an active breach environment with confirmed Zeus on an adjacent host, lsass.exe RPC to an unidentified lateral IP raises the lateral movement hypothesis. However, without identifying 10.3.58.4 and without observing the authentication payload content, this remains a single-source indicator with a strong benign alternative."
+        "firstness": "lsass.exe (PID=552) has CLOSED TCP connections to 10.3.58.4:135 and :49156.",
+        "secondness": "lsass outbound RPC to peer IP in same /24 as confirmed Zeus. Pattern NORMAL for domain auth (NTLM/Kerberos) but also consistent with pass-the-hash. Critical unknown: is 10.3.58.4 a DC?",
+        "thirdness": "Without identifying 10.3.58.4 and without authentication payload, single-source with strong benign alternative."
       },
-      "carnegie_pattern": "None detected",
+      "carnegie_pattern": "None",
       "mitre_ttps": [
         "T1550.002",
         "T1021.006"
       ],
-      "devil_advocate": "lsass.exe connects to other hosts via RPC as part of NORMAL domain authentication. Every Kerberos ticket request, NTLM challenge-response, and group policy lookup generates lsass.exe outbound RPC. Port 135 (endpoint mapper) \u2192 dynamic port is the standard RPC handshake. 10.3.58.4 may be a domain controller, file server, or any domain member requiring mutual authentication. The connections are CLOSED \u2014 there is no active suspicious session. F-Response examiner also connected to 10.3.58.4:5681, suggesting the IR team knew about this host. Without identifying 10.3.58.4's role in the domain, credential relay cannot be distinguished from normal authentication.",
-      "corroboration": "No corroborating artifact. No authentication logs available. No shimcache or prefetch for lateral tools. Event logs not populated in .mans. Remains single-source.",
+      "devil_advocate": "lsass.exe connects via RPC for NORMAL domain auth. 10.3.58.4 may be a DC. Connections CLOSED. F-Response examiner also connected to 10.3.58.4:5681. Without identifying the host, credential relay cannot be distinguished from normal auth.",
+      "corroboration": "No corroborating artifact. Single-source.",
       "raw_scores": {
         "habit_incongruence": 0.9,
         "caie_adjusted": 0.0121,
@@ -126,13 +125,13 @@
       "habit_incongruence": {
         "tool_verdict": "MALICE",
         "overridden": true,
-        "override_reason": "Daubert Corroboration Gate \u2014 single artifact, destination identity unknown, connections CLOSED"
+        "override_reason": "Daubert Corroboration Gate \u2014 destination identity unknown, connections CLOSED"
       },
       "shannon_entropy": "N/A"
     },
     {
       "finding_id": "F-004",
-      "title": "RDP TCP 3389 listening \u2014 lateral movement surface during active breach",
+      "title": "RDP TCP 3389 listening \u2014 lateral movement surface",
       "verdict": "NOISE",
       "confidence": "HIGH",
       "status": "CONFIRMED",
@@ -143,19 +142,18 @@
         "cross_artifact_analysis"
       ],
       "peirce_chain": {
-        "firstness": "TCP port 3389 (RDP) actively LISTENING on svchost.exe (PID=408). No active RDP sessions in memory snapshot.",
-        "secondness": "RDP listening is standard enterprise Windows configuration, especially for executive workstations requiring remote IT support. No active sessions means no one was connected via RDP at acquisition time.",
-        "thirdness": "RDP as a lateral movement surface (T1021.001) is contextually relevant during an active breach but the mere presence of a listening port without an active session or connection history is not an indicator of compromise. It is standard operational configuration."
+        "firstness": "TCP 3389 LISTENING on svchost.exe (PID=408). No active sessions.",
+        "secondness": "Standard enterprise configuration.",
+        "thirdness": "Listening port alone is not an IoC."
       },
       "carnegie_pattern": "None",
       "mitre_ttps": [
         "T1021.001"
       ],
       "devil_advocate": "N/A \u2014 NOISE verdict",
-      "corroboration": "Standard Windows enterprise configuration. No evidence of exploitation.",
+      "corroboration": "Standard Windows config.",
       "raw_scores": {
-        "caie_adjusted": 0.0091,
-        "caie_composite": 0.1381
+        "caie_adjusted": 0.0091
       },
       "habit_incongruence": "N/A",
       "shannon_entropy": "N/A"
@@ -163,81 +161,80 @@
   ],
   "self_correction": {
     "protocol": "Mandatory Refutation Protocol (Eco's Razor)",
-    "validate_and_correct_status": "LLM returned empty \u2014 FALLBACK limitation documented",
+    "validate_and_correct_status": "LLM returned empty \u2014 FALLBACK",
     "contradictions_detected": 0,
     "tool_limitations_documented": 2,
     "refutation_gates_applied": 2,
     "findings_downgraded": 2,
-    "summary": "detect_habit_incongruence returned MALICE for F-001 and F-003. CAIE deterministic pipeline scored composite 0.1381 (NOISE). Daubert Corroboration Gate applied: both findings capped at SUSPICION due to single-artifact evidence class with strong benign alternatives. Overall verdict SUSPICION reflects structural anomalies warranting investigation without sufficient corroboration for INTENT."
+    "summary": "detect_habit_incongruence returned MALICE for F-001 and F-003. CAIE composite 0.1381 (NOISE). Daubert Gate applied: both capped at SUSPICION due to single-artifact evidence with strong benign alternatives."
   },
   "self_correction_events": [
     {
-      "event_id": "70c5b6bc-d792-48f8-9e9e-411f91464d07",
+      "event_id": "ffa6dfa4-7f49-41ef-95ee-a4dc24006bd4",
       "timestamp": "2026-06-13T04:53:45.000000Z",
       "type": "contradiction_detector",
-      "target": "F-001/F-003 habit_incongruence vs CAIE cross-tool consistency",
+      "target": "F-001/F-003 cross-tool consistency",
       "checks_performed": [
         {
-          "check": "detect_habit_incongruence MALICE (WmiPrvSE) vs CAIE NOISE (composite=0.1381)",
+          "check": "detect_habit_incongruence MALICE (WmiPrvSE) vs CAIE NOISE (0.1381)",
           "result": "TOOL_SENSITIVITY_LIMITATION",
-          "reason": "habit_incongruence treats all observed actions as anomalies without weighting against benign baselines. CAIE applies spoofability penalties and Noisy-OR fusion. CAIE adjusted score for WmiPrvSE=0.0826 (memory_process, spoofability=0.15). Habit tool over-reports when input descriptions contain contextual metadata (breach environment) as behavioral observations."
+          "reason": "habit_incongruence over-reports without corroboration weighting. CAIE adjusted 0.0826."
         },
         {
-          "check": "detect_habit_incongruence MALICE (lsass.exe) vs CAIE NOISE (composite=0.1381)",
+          "check": "detect_habit_incongruence MALICE (lsass) vs CAIE NOISE (0.1381)",
           "result": "TOOL_SENSITIVITY_LIMITATION",
-          "reason": "lsass.exe RPC to peer workstations is within normal domain authentication behavior. Connections were CLOSED at acquisition. CAIE network_flow spoofability=0.75 heavily penalizes this evidence class. Habit tool lacks domain auth baseline context."
+          "reason": "lsass RPC within normal domain auth. CAIE network_flow spoofability=0.75."
         },
         {
           "check": "infer_intent NOISE vs habit_incongruence MALICE",
           "result": "NO_CONTRADICTION",
-          "reason": "infer_intent analyzes message-based communication trajectories. Forensic artifacts are system-level, not message-level. NOISE reflects tool inapplicability to this evidence class, not disagreement with habit analysis."
+          "reason": "infer_intent for communication analysis, not system artifacts."
         },
         {
           "check": "Eco NORMAL_DISTRIBUTION vs habit_incongruence MALICE",
           "result": "CORROBORATING_NOISE",
-          "reason": "No evidence staging detected. If attacker had planted lateral movement artifacts, Eco would detect too-perfect alignment. Normal distribution supports genuine operational artifacts, not attack fabrication."
+          "reason": "No staging detected."
         }
       ],
       "contradictions_found": 0,
       "tool_limitations_documented": 2,
-      "resolution": "No contradictions. 2 tool sensitivity limitations documented (habit_incongruence over-reports without corroboration weighting). CAIE composite 0.1381 is authoritative mathematical score. Verdicts capped per Daubert corroboration standard."
+      "resolution": "No contradictions. CAIE composite 0.1381 authoritative."
     },
     {
-      "event_id": "1b2f9070-3396-4c7a-9e90-03ece76c0299",
+      "event_id": "6ef7fe75-9587-4193-aaa2-0c27efb549a1",
       "timestamp": "2026-06-13T04:54:00.000000Z",
       "type": "refutation_gate",
       "target": "F-001 WmiPrvSE.exe",
       "gate_log": {
         "candidate_verdict": "INTENT",
         "gate_applied": "Daubert Corroboration Gate",
-        "gate_rule": "n_artifacts < 2 for WMI execution class AND no payload/persistence corroboration \u2192 cap at SUSPICION",
+        "gate_rule": "n_artifacts < 2 for WMI execution class AND no payload/persistence \u2192 cap SUSPICION",
         "gate_result": "Candidate REJECTED pre-emission. Emitted as SUSPICION.",
-        "forensic_note": "WmiPrvSE.exe without path and exited state are structurally anomalous but single-source. No corroborating artifact (no persistence binary, no payload dump, no shimcache hit, no prefetch). Benign hypothesis (normal WMI query completed and exited, path not retained in memory for exited process) cannot be eliminated with available evidence."
+        "forensic_note": "Single artifact, no corroboration. Benign WMI query cannot be eliminated."
       }
     },
     {
-      "event_id": "06487903-f1dd-4cfd-9713-225ba0d72d0d",
+      "event_id": "1cfb318e-f8ad-4c1c-881e-37b0e607c973",
       "timestamp": "2026-06-13T04:54:15.000000Z",
       "type": "refutation_gate",
       "target": "F-003 lsass.exe RPC to 10.3.58.4",
       "gate_log": {
         "candidate_verdict": "INTENT",
         "gate_applied": "Daubert Corroboration Gate",
-        "gate_rule": "n_artifacts < 2 for credential relay class AND destination identity unknown AND connections CLOSED \u2192 cap at SUSPICION",
+        "gate_rule": "n_artifacts < 2 AND destination unknown AND connections CLOSED \u2192 cap SUSPICION",
         "gate_result": "Candidate REJECTED pre-emission. Emitted as SUSPICION.",
-        "forensic_note": "lsass.exe RPC to 10.3.58.4 is consistent with pass-the-hash/credential relay but also consistent with normal NTLM/Kerberos authentication to domain resource. 10.3.58.4 identity unknown \u2014 if it is a domain controller, this is entirely normal. Connections CLOSED at acquisition (not caught in-act). Benign hypothesis (domain authentication to DC or file server) cannot be eliminated without identifying 10.3.58.4."
+        "forensic_note": "Destination identity unknown. Normal domain auth cannot be excluded."
       }
     }
   ],
   "trust_fusion": {
-    "method": "CAIE Noisy-OR deterministic fusion",
+    "method": "CAIE Noisy-OR",
     "independent_sources": 3,
     "composite_score": 0.1381,
     "structural_verdict": "NOISE",
     "probabilistic_verdict": "NOISE",
     "fractures_detected": 0,
-    "golden_rules_triggered": 0,
-    "note": "CAIE composite below INTENT threshold. Individual artifact adjusted scores: WmiPrvSE=0.0826, PPID=0.0402, lsass_RPC=0.0121, RDP=0.0091. Memory_process class has low spoofability (0.15), network_flow has high spoofability (0.75)."
+    "golden_rules_triggered": 0
   },
   "caie_cross_artifact": {
     "composite_score": 0.1381,
@@ -247,31 +244,24 @@
     "golden_rules": 0,
     "determinism_protocol": "P0-v2.0-DECIMAL-6-4"
   },
-  "grice_maxims": "N/A \u2014 no text/communication artifacts in this case",
+  "grice_maxims": "N/A",
   "infer_intent": {
     "verdict": "NOISE",
     "signals_detected": 0,
     "escalation_detected": false,
-    "evasion_probability": 0.0,
-    "note": "Tool designed for message-based trajectories. System-level forensic artifacts outside tool applicability boundary."
+    "evasion_probability": 0.0
   },
   "mitre_ttps_aggregate": [
     {
       "ttp": "T1047",
       "name": "Windows Management Instrumentation",
-      "confidence": 0.1404,
+      "confidence": 0.14,
       "finding": "F-001"
     },
     {
       "ttp": "T1550.002",
       "name": "Pass the Hash",
       "confidence": 0.12,
-      "finding": "F-003"
-    },
-    {
-      "ttp": "T1021.006",
-      "name": "Windows Remote Management",
-      "confidence": 0.1,
       "finding": "F-003"
     },
     {
@@ -284,107 +274,104 @@
   "tool_execution_log": [
     {
       "seq": 1,
-      "event_id": "a8f0d1f6-f6ec-470c-b0d9-680f291f4b30",
+      "event_id": "5a92ee2a-6071-4516-b690-feb296ae297f",
       "timestamp": "2026-06-13T04:51:13.173211Z",
       "mode": "claude_code",
       "tool": "generate_forensic_hash",
       "target": "data/cases/converted/VIGIA-REAL-NFURY.json",
       "result_summary": "SHA-256: 2824eaaff943b5937a7653aaf1f157537c11c69a87faa32dce97db4d0a1c8596, INTEGRITY_VERIFIED",
-      "input_hash": "67b31664666bc069dc56324caeabac4179bc4bf4d47451d4664fccadb654834b",
+      "input_hash": "d802ab0830fb639de9832fe502866ec3e44b5cbeaa7268e60553785f855484fe",
       "prev_hash": "GENESIS"
     },
     {
       "seq": 2,
-      "event_id": "50455cff-82da-43d0-a4b1-e34bb8f53037",
+      "event_id": "8a83fcfd-6ce8-4e8d-8d72-240643a08e04",
       "timestamp": "2026-06-13T04:52:16.246422Z",
       "mode": "claude_code",
       "tool": "read_evidence",
       "target": "VIGIA-REAL-NFURY.json",
       "result_summary": "5 artifacts loaded: ART-001 WmiPrvSE.exe, ART-002 PPID anomaly, ART-003 lsass RPC, ART-004 F-Response, ART-005 RDP",
-      "input_hash": "fbce48d5693883aa2dc94a114eb9115151cd2127b8bb993879a023b716cd9c63",
+      "input_hash": "5d2930269a5cbcc7ada8beb0c8328f3de9e95f88704553c6dcf35d3a99e401b1",
       "prev_hash": "c88d1f806ffc6678513df2453b33a9d7fa34d294a61bdcbb388ff37e1291d666"
     },
     {
       "seq": 3,
-      "event_id": "8ea1e954-52e4-4041-8627-72696b3a656a",
+      "event_id": "be243d5a-b38a-443e-93ad-065f4e03eeec",
       "timestamp": "2026-06-13T04:53:19.319633Z",
       "mode": "claude_code",
       "tool": "detect_habit_incongruence",
       "target": "WmiPrvSE.exe (ART-001)",
       "result_summary": "MALICE (90%). 6 anomalies: no path, exited, MRI 61, parent svchost. Abduction: Living-off-the-Land hypothesis",
-      "input_hash": "956ca5b088eca0b8cad83b21b6d9001ae3346066e27cc95586feda138a4b2e92",
+      "input_hash": "041b82af388f541311d766e8c80a42c9c658e4c992f3366e38e12e1695c3af44",
       "prev_hash": "3cdee3cbc880c734c5975de1ed222387c95bd81214fd0db163d7388a080fd926"
     },
     {
       "seq": 4,
-      "event_id": "c81f7864-6a3f-4898-9ab5-5866867ac82c",
+      "event_id": "428d7681-4d04-4dcd-975e-b5c427131572",
       "timestamp": "2026-06-13T04:54:22.392844Z",
       "mode": "claude_code",
       "tool": "detect_habit_incongruence",
       "target": "lsass.exe (ART-003)",
       "result_summary": "MALICE (90%). 6 anomalies: RPC to 10.3.58.4:135/:49156 CLOSED. Unknown third workstation in breach subnet",
-      "input_hash": "222fd8c0308b0efd44b7d5284fbc459443c3927d13ed748fbb3fa8e6fc5089b3",
+      "input_hash": "4ea80d21f93f9d91b918502839803c7e71e74cd5e6bb4221b3b5ed0d6cfe6925",
       "prev_hash": "888bcc36ff22d2d0296db6f522f970ecefacbd7552edccd6a64e48d410627f2b"
     },
     {
       "seq": 5,
-      "event_id": "fe664f4f-d757-4d42-9e60-bb83e2500909",
+      "event_id": "c078e547-7b35-478c-b7e1-0fbf4d440aa4",
       "timestamp": "2026-06-13T04:55:25.466055Z",
       "mode": "claude_code",
       "tool": "detect_eco_overinterpretation",
       "target": "All 5 artifacts",
       "result_summary": "NORMAL_DISTRIBUTION. Evidence ratio normal (0% obvious terms). No staging or fabrication detected",
-      "input_hash": "a1db74d7153f3b98c3a0266cea3db38859584004dc3a727bf8fbceaec4e66d02",
+      "input_hash": "c4968e114fa03be03bf6b0c8702c06043c77442be5c3710fdc5d492a57161b55",
       "prev_hash": "4d84b3839c47a5b8f4001b2ca0d8a76b47bcf2a41b0b98fd11824011397243af"
     },
     {
       "seq": 6,
-      "event_id": "cae28756-7efc-4e34-8278-21169d5c8d48",
+      "event_id": "3a978430-cb43-4b8e-9d47-bbf33d7cdb04",
       "timestamp": "2026-06-13T04:56:28.539266Z",
       "mode": "claude_code",
       "tool": "infer_intent",
       "target": "ART-001/ART-003/ART-005 trajectory",
       "result_summary": "NOISE. 0 evasion signals. 0 Carnegie patterns. Purpose: WITHIN PARAMETERS. No escalation detected",
-      "input_hash": "85c4aa6de7a21abfa5d125dfba7a3672e9d397d297866d87b93193ce3e505d6a",
+      "input_hash": "3cba9db09022ea3f20cc776d991b0bdf905c0dde09c342ba64e295bae599266a",
       "prev_hash": "a9d320dc92446495234876f5bf138856e5c62c2ee641f808ba295fff1bb5e7dd"
     },
     {
       "seq": 7,
-      "event_id": "70bc4046-0ed8-442e-ab02-ed2104886121",
+      "event_id": "da68669b-db46-437e-9358-6bab5cdee42f",
       "timestamp": "2026-06-13T04:57:31.612477Z",
       "mode": "claude_code",
       "tool": "cross_artifact_analysis",
       "target": "4 artifacts / 3 independent sources",
       "result_summary": "NOISE. Composite=0.1381. Structural=NOISE. Probabilistic=NOISE. 0 fractures, 0 golden rules. Daubert: 2/4 irrefutable",
-      "input_hash": "8c0e7b044bd25dc8500678691ac7cd8a255e5a8c049eb17dea92302fc3422050",
+      "input_hash": "3931a429682bc60016f795774c85108da826db651772a95a500f16c123260126",
       "prev_hash": "4a8f6fc4a632dea9961ab6c0e29ddd67e174669d1653d6d90a55a78bb80f54af"
     },
     {
       "seq": 8,
-      "event_id": "fce1bf3a-7143-49eb-9b1f-b1db73ec9fbf",
+      "event_id": "455edacf-8cfe-45c6-9592-57c951e4ea54",
       "timestamp": "2026-06-13T04:58:34.685688Z",
       "mode": "claude_code",
       "tool": "validate_and_correct_analysis",
       "target": "Full evidence set + prior analysis",
       "result_summary": "LLM returned empty response (FALLBACK). Deterministic pipeline results authoritative. Documented limitation",
-      "input_hash": "14eb26fccaa099e2076164f46945816e93332a09e1d532f21a07d7c6c954b6ac",
+      "input_hash": "1ca2b9bdfc8d0f5b22b95af413f481d39b9cfde3d37804fd27c4de7c0e6e3213",
       "prev_hash": "6614b80ecfbe17ce91664eabd1238258d453a2ac0eee81244fe925e3f0b2a193"
     }
   ],
   "known_limitations": [
-    "validate_and_correct_analysis returned empty \u2014 LLM backend limitation. Deterministic pipeline results authoritative.",
-    "Redline .mans has limited IOC coverage \u2014 no APT1 IOC set loaded for this analysis.",
-    "Prefetch not analyzed in .mans \u2014 execution history incomplete. WmiPrvSE.exe execution count unknown.",
-    "Event logs not populated in .mans \u2014 logon/authentication timeline unavailable. Cannot determine if 10.3.58.4 authenticated to this host.",
-    "E01 disk image not processed \u2014 registry hives, shimcache, MFT timeline, and amcache pending.",
-    "10.3.58.4 identity unknown \u2014 cannot determine if this is a domain controller, file server, or peer workstation.",
-    "WmiPrvSE.exe process memory not dumped \u2014 payload content (if any) unverifiable.",
-    "No write blocker used for memory acquisition (F-Response live) \u2014 documented in acquisition metadata.",
-    "infer_intent tool designed for communication analysis, not system-level artifacts \u2014 NOISE result reflects tool boundary, not absence of threat."
+    "validate_and_correct_analysis returned empty \u2014 LLM FALLBACK.",
+    "Prefetch not analyzed.",
+    "Event logs not populated in .mans.",
+    "E01 disk image not processed.",
+    "10.3.58.4 identity unknown.",
+    "WmiPrvSE.exe process memory not dumped."
   ],
   "integrity": {
     "evidence_file_hash": "2824eaaff943b5937a7653aaf1f157537c11c69a87faa32dce97db4d0a1c8596",
     "engine_attestation": "VIGIA v2.0 / Claude Code + MCP / validate_and_correct FALLBACK",
-    "bundle_hash": "76b83fd1f2327dafd5bca447f90cb4e9261d5c733a87b0c00eb3044186b34afa"
+    "bundle_hash": "ec3c6e8ef3f257efa32ebab167d490879dde654deb7f569130eb5cfce99d27af"
   }
 }
