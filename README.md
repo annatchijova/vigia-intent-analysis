@@ -211,36 +211,6 @@ admissibility.
 
 ---
 
-## Theoretical Foundation
-
-### Charles S. Peirce — Abductive Semiotics
-
-Every tool applies the triadic reasoning structure:
-
-- **Firstness** — What is the raw phenomenon? *(the sign itself)*
-- **Secondness** — Is this normal here? *(the sign in context)*
-- **Thirdness** — What habit does this reveal? *(the inferred law / intent)*
-
-### H. Paul Grice — Cooperative Principle Forensics
-
-Honest communication follows four maxims (Quality, Quantity, Relation, Manner).
-Deception violates at least one. VIGÍA measures **evaluative adjective density** —
-emotionally overloaded language is a manipulation signature.
-
-### Dale Carnegie — Manipulation Pattern Recognition
-
-Authority establishment · Flattery to system · Emotional appeal · Lesser-evil
-negotiation · False familiarity.
-
-### Umberto Eco — Significant Silence and Overinterpretation
-
-> *"The perfect conspiracy leaves no obvious traces. If there are too many,
-> someone planted them."*
-
-The absence of expected artifacts is itself evidence.
-
----
-
 ## Key Technical Differentiators
 
 ### Deterministic Scoring with `Fraction` Arithmetic
@@ -730,6 +700,36 @@ a system prompt.
 | **Constraint Implementation** | `_sanitize_path`, `@_rate_limit`, magic-byte validation, Kassandra Protocol |
 | **Audit Trail** | `chain_of_custody_hash` (SHA-256), HMAC-signed audit chain, full AmicusCuriae |
 | **Usability** | 5 modes: fallback (0 tokens), Claude Code + MCP, Ollama (local), batch agent, OpenWebUI |
+
+---
+
+## Theoretical Foundation
+
+### Charles S. Peirce — Abductive Semiotics
+
+Every tool applies the triadic reasoning structure:
+
+- **Firstness** — What is the raw phenomenon? *(the sign itself)*
+- **Secondness** — Is this normal here? *(the sign in context)*
+- **Thirdness** — What habit does this reveal? *(the inferred law / intent)*
+
+### H. Paul Grice — Cooperative Principle Forensics
+
+Honest communication follows four maxims (Quality, Quantity, Relation, Manner).
+Deception violates at least one. VIGÍA measures **evaluative adjective density** —
+emotionally overloaded language is a manipulation signature.
+
+### Dale Carnegie — Manipulation Pattern Recognition
+
+Authority establishment · Flattery to system · Emotional appeal · Lesser-evil
+negotiation · False familiarity.
+
+### Umberto Eco — Significant Silence and Overinterpretation
+
+> *"The perfect conspiracy leaves no obvious traces. If there are too many,
+> someone planted them."*
+
+The absence of expected artifacts is itself evidence.
 
 ---
 
