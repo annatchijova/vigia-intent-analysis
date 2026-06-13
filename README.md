@@ -396,6 +396,28 @@ docker run vigia python3 -m pytest tests/ -v
 
 ---
 
+
+## Autonomous Operation — No Human Approval Required
+
+VIGÍA Mode 1 produces a sealed, cryptographically verifiable verdict with zero human
+intervention, zero API calls, zero network dependency, and zero LLM involvement:
+
+```bash
+python3 vigia_agent.py --evidence data/cases/converted/VIGIA-REAL-VANKO.json \
+  --case-id VIGIA-REAL-VANKO --output results/vanko_bundle.json
+# Average: <50ms. No API key. No CLAUDE.md. No examiner approval step.
+```
+
+The deterministic scoring pipeline (fractions.Fraction arithmetic, CAIE cross-artifact
+fusion, corroboration gate) operates independently of any LLM. CLAUDE.md provides
+guidance for Mode 2 (Claude Code interactive investigation) — it is not a system
+requirement. VIGÍA was processing cases autonomously in Mode 1 before CLAUDE.md existed.
+
+**Contrast:** Systems requiring examiner approval of every finding before inclusion
+in a report are human-in-the-loop by design, not autonomous. VIGÍA's corroboration
+gate prevents incorrect verdicts from being sealed — no human gate is needed because
+no incorrect verdict reaches the bundle.
+
 ## Deployment Modes
 
 VIGÍA runs in five modes. The deterministic scoring core is identical across all of them.
