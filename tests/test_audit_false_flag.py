@@ -199,10 +199,6 @@ def test_clean_foreign_machine_is_not_malice():
     )
 
 
-@pytest.mark.xfail(
-    reason="H-02: FALSE_FLAG_PATTERN activa sobre ausencia tecnica. Debe requerir manipulacion positiva.",
-    strict=False,
-)
 def test_clean_foreign_machine_does_not_trigger_false_flag_rule():
     engine = _engine_with(_clean_russian_machine())
     types = _fracture_types(engine)
@@ -224,13 +220,9 @@ def test_genuine_false_flag_is_malice():
     )
 
 
-@pytest.mark.xfail(
-    reason="H-02: la regla exige tecnica BAJA, no detecta false flag con tecnica ALTA.",
-    strict=False,
-)
 def test_genuine_false_flag_triggers_pattern():
     engine = _engine_with(_genuine_false_flag())
     types = _fracture_types(engine)
-    assert "FALSE_FLAG_PATTERN" in types, (
-        f"FALSE_FLAG_PATTERN no activo sobre false flag genuino. Fracturas: {sorted(types)}."
+    assert "FALSE_FLAG_ATTRIBUTION_MISMATCH" in types, (
+        f"FALSE_FLAG_ATTRIBUTION_MISMATCH no activo sobre false flag genuino. Fracturas: {sorted(types)}."
     )

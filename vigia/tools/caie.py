@@ -858,13 +858,79 @@ class CrossArtifactIncongruenceEngine:
         host_logs = [a for a in self._artifacts if a.evidence_type in
                      ("log_entry", "memory_process") and "socket" in str(a.metadata).lower()]
 
-        # Rule 1: Cultural bait with no technical corroboration
+        # Rule 1: False flag detection (H-02 fix)
+        # Distinguishes two cases that share the same surface pattern
+        # (cultural_marker high + technical low):
+        #
+        #   CASE A — Foreign machine, native config, no incident:
+        #     cultural_marker has ONLY config fields (keyboard_layout_detected,
+        #     timezone_offset, cyrillic_filenames, language_confidence).
+        #     No forensic analysis was performed. This is FP-CULTURAL-CLEAN.
+        #     → DO NOT fire. Not a false flag — just a Russian developer's machine.
+        #
+        #   CASE B — Forensic case with cultural bait (original correct behavior):
+        #     cultural_marker has FORENSIC fields (deviation_sigma,
+        #     features_anomalous, attribution_consistency_with_ttps, etc.)
+        #     indicating active analysis detected manipulation evidence.
+        #     → Fire FALSE_FLAG_PATTERN (original Rule 1 behavior).
+        #
+        #   CASE C — Genuine false flag (real attack + attribution mismatch):
+        #     Real attack confirmed (avg_technical > 0.5) AND cultural markers
+        #     explicitly contradict the TTP profile (has_manip).
+        #     → Fire FALSE_FLAG_ATTRIBUTION_MISMATCH.
+        #
+        # Ref: L-019, Finding H-02, test_audit_false_flag.py
+        # Guard against false positives on clean foreign machines (H-02 / L-019).
+        # If the investigator explicitly documented that manipulation checks were
+        # performed and came back negative (timestomp_detected=False, etc.),
+        # the machine is confirmed clean — do NOT fire FALSE_FLAG_PATTERN.
+        # Cases WITHOUT these explicit False flags remain suspicious (original behavior).
         if cultural and technical:
             # DETERMINISTIC: Use math.fsum for precise summation
             avg_cultural = _dround(_dsum([a.raw_score for a in cultural]) / len(cultural), _DETERMINISTIC_INTERNAL_PREC)
             avg_technical = _dround(_dsum([a.raw_score for a in technical]) / len(technical), _DETERMINISTIC_INTERNAL_PREC)
 
-            if avg_cultural > 0.5 and avg_technical < 0.2:
+            # confirmed_clean: investigator explicitly verified no manipulation.
+            # Fires only when manipulation flags are EXPLICITLY set to False
+            # (not merely absent). FP-CULTURAL-CLEAN sets timestomp_detected=False, etc.
+            confirmed_clean = any(
+                a.metadata.get("timestomp_detected") is False
+                or a.metadata.get("backdating_detected") is False
+                or a.metadata.get("mft_inconsistency") is False
+                or a.metadata.get("suspiciously_obvious") is False
+                for a in cultural
+            )
+            # Has explicit manipulation evidence pointing to planted attribution
+            has_manip = any(
+                a.metadata.get("mismatch_with_technical_profile") is True
+                or a.metadata.get("attribution_consistency_with_ttps") == "LOW"
+                or a.metadata.get("timestomp_detected") is True
+                or a.metadata.get("backdating_detected") is True
+                or a.metadata.get("placement") == "too_clean"
+                for a in cultural
+            )
+
+            # Case C: genuine false flag — real attack + contradictory attribution
+            if avg_cultural > 0.5 and avg_technical > 0.5 and has_manip:
+                self._fractures.append(Fracture(
+                    artifact_a=f"Cultural markers (avg={avg_cultural:.2f}, attribution contradicts TTP profile)",
+                    artifact_b=f"Technical evidence (avg={avg_technical:.2f}, real attack confirmed)",
+                    fracture_type="FALSE_FLAG_ATTRIBUTION_MISMATCH",
+                    severity=0.85,
+                    interpretation=(
+                        "Real malicious event confirmed (high technical score) with "
+                        "cultural attribution markers that contradict the observed TTP "
+                        "profile. The markers were engineered to misdirect attribution. "
+                        "MALICE belongs to the planter, not to whoever writes in the "
+                        "indicated language. "
+                        "Peirce Thirdness: the HABIT is deliberate deception of origin. "
+                        "MITRE T1036.005 — Masquerading."
+                    ),
+                    spoofability_delta=_dround(0.90 - 0.15, _DETERMINISTIC_INTERNAL_PREC),
+                    ttp_id="T1036.005",
+                ))
+            # Case B: cultural bait, no confirmed-clean documentation — original behavior
+            elif avg_cultural > 0.5 and avg_technical < 0.2 and not confirmed_clean:
                 self._fractures.append(Fracture(
                     artifact_a=f"Cultural markers (avg={avg_cultural:.2f})",
                     artifact_b=f"Technical evidence (avg={avg_technical:.2f})",
@@ -872,12 +938,53 @@ class CrossArtifactIncongruenceEngine:
                     severity=0.8,
                     interpretation=(
                         "High cultural attribution markers with near-zero technical "
-                        "corroboration. Classic false-flag pattern: the cultural "
-                        "evidence was planted to mislead attribution. "
+                        "corroboration, confirmed by forensic analysis. Classic "
+                        "false-flag pattern: cultural evidence planted to mislead "
+                        "attribution. "
                         "Peirce Thirdness: the HABIT is to disguise origin, not to act."
                     ),
                     spoofability_delta=_dround(0.90 - 0.15, _DETERMINISTIC_INTERNAL_PREC),
-                    ttp_id="T1585.001",  # Establish Accounts: Social Media
+                    ttp_id="T1585.001",
+                ))
+            # Case A: native config only — no fracture fired (FP-CULTURAL-CLEAN)
+
+        # Rule 1b: Active manipulation evidence with confirmed real attack (H-02 variant)
+        # Covers false flag cases where the manipulation is proven by timestomping
+        # in MFT/filesystem artifacts — no cultural_marker artifact required.
+        # Ref: L-019, Finding H-02, _genuine_false_flag() in test_audit_false_flag.py
+        manipulation_artifacts = [
+            a for a in self._artifacts
+            if a.evidence_type in ("mft_entry", "file_timestamp", "usn_journal")
+            and (
+                a.metadata.get("timestomp_detected") is True
+                or a.metadata.get("backdating_detected") is True
+                or a.metadata.get("mft_inconsistency") is True
+                or a.metadata.get("mft_si_modified_after_fn") is True
+            )
+        ]
+        if manipulation_artifacts and technical:
+            avg_technical_1b = _dround(
+                _dsum([a.raw_score for a in technical]) / len(technical),
+                _DETERMINISTIC_INTERNAL_PREC
+            )
+            avg_manip = _dround(
+                _dsum([a.raw_score for a in manipulation_artifacts]) / len(manipulation_artifacts),
+                _DETERMINISTIC_INTERNAL_PREC
+            )
+            if avg_technical_1b > 0.5 and avg_manip > 0.5:
+                self._fractures.append(Fracture(
+                    artifact_a=f"Active manipulation evidence (avg={avg_manip:.2f}): timestomping/backdating confirmed",
+                    artifact_b=f"Technical evidence (avg={avg_technical_1b:.2f}, real attack confirmed)",
+                    fracture_type="FALSE_FLAG_ATTRIBUTION_MISMATCH",
+                    severity=0.85,
+                    interpretation=(
+                        "Real malicious event confirmed alongside active manipulation of "
+                        "attribution artifacts (MFT timestomping or backdating). "
+                        "MALICE belongs to the planter. "
+                        "MITRE T1070.006 — Indicator Removal: Timestomp."
+                    ),
+                    spoofability_delta=_dround(0.90 - 0.15, _DETERMINISTIC_INTERNAL_PREC),
+                    ttp_id="T1070.006",
                 ))
 
         # Rule 2: Log claims contradicted by memory

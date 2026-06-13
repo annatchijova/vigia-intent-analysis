@@ -1,124 +1,88 @@
 {
   "case_id": "case_003_false_flag",
-  "name": "False Flag — Planted Attribution Mismatch",
-  "description": "Sophisticated attack (process injection, encrypted C2, registry persistence) combined with overt, crude cultural markers (Cyrillic filenames, RU keyboard, UTC+3) that are inconsistent with the technical sophistication. Real APTs do not leave keyboard layouts and timezone offsets as breadcrumbs. The cultural markers were planted to frame a Russian actor. The malicious act is the framing, not the language.",
-  "audit_note": "H-02 fix: FALSE_FLAG_PATTERN ahora requiere ataque real + evidencia positiva de manipulacion (timestomp). SCENE_STAGING renombrado a MFT_ENTRY_ANOMALY (tipo registrado en MALICIOUS_FRACTURE_TYPES del scorer).",
+  "name": "False Flag — Real Attack with Contradictory Attribution",
+  "description": "A real compromise: process hollowing and credential dumping confirmed in memory (hard-to-fake structural evidence). On top of the real attack, the operator planted Cyrillic strings whose profile contradicts the actual TTPs and OPSEC — the cultural markers are too pristine and inconsistent with the actor's toolchain. CAIE fracture: FALSE_FLAG_ATTRIBUTION_MISMATCH. The malice belongs to the planter, not to any Russian-speaker.",
+  "audit_note": "Reconstructed post H-02 fix. Previous version (cultural-high + technical-low) was forensically equivalent to a clean foreign machine — indistinguishable without explicit manipulation evidence. This version has: (1) confirmed malicious event, (2) attribution markers contradicting the TTP profile. That is what a false flag looks like.",
   "artifacts": [
     {
-      "artifact_id": "tech_injection_001",
+      "artifact_id": "tech_real_001",
       "evidence_type": "memory_process",
-      "source_tool": "memory_forensics",
-      "timestamp": "2026-04-10T12:00:00Z",
+      "source_tool": "list_processes",
+      "timestamp": "2026-04-10T03:14:00Z",
       "raw_score": 0.88,
       "prior_trust": 0.95,
-      "provenance_chain": ["sha256:mem_chain_001"],
-      "description": "Process hollowing detected in svchost.exe. Shellcode injected via NtUnmapViewOfSection. Sophisticated anti-analysis: PEB walk, API hashing, no imports. Consistent with APT-level tooling.",
+      "provenance_chain": [
+        "sha256:mem_real_001",
+        "sha256:mem_real_002"
+      ],
+      "description": "Process hollowing in svchost.exe confirmed in memory (T1055.012). Reflective DLL injection detected. Hard-to-fake structural evidence of a real intrusion.",
       "metadata": {
-        "injection_technique": "process_hollowing",
-        "anti_analysis": true,
-        "api_hashing": true,
-        "apt_level": true
+        "injections_detected": 2,
+        "kernel_anomalies": 1,
+        "technique": "T1055.012"
       }
     },
     {
-      "artifact_id": "tech_c2_001",
-      "evidence_type": "log_entry",
-      "source_tool": "network_forensics",
-      "timestamp": "2026-04-10T12:00:05Z",
-      "raw_score": 0.85,
+      "artifact_id": "tech_real_002",
+      "evidence_type": "lsass_session",
+      "source_tool": "list_processes",
+      "timestamp": "2026-04-10T03:15:10Z",
+      "raw_score": 0.84,
       "prior_trust": 0.95,
-      "provenance_chain": ["sha256:net_chain_001"],
-      "description": "Encrypted beacon to 185.220.101.42:443. TLS 1.3 with custom JA3 fingerprint. Domain fronting via Azure CDN. 4-hour jitter. Professional C2 infrastructure.",
+      "provenance_chain": [
+        "sha256:lsass_real_001"
+      ],
+      "description": "LSASS credential dumping detected (T1003.001). Active compromise confirmed.",
       "metadata": {
-        "encrypted_beacon": true,
-        "domain_fronting": true,
-        "jitter_hours": 4,
-        "apt_infrastructure": true,
-        "network_log_time": "2026-04-10T12:00:05Z"
-      }
-    },
-    {
-      "artifact_id": "tech_persist_001",
-      "evidence_type": "registry_key",
-      "source_tool": "registry_hive",
-      "timestamp": "2026-04-10T12:00:03Z",
-      "raw_score": 0.82,
-      "prior_trust": 0.9,
-      "provenance_chain": ["sha256:reg_chain_001"],
-      "description": "Registry Run key with base64-encoded PowerShell. WMI event subscription for persistence. Dual-channel redundancy. Advanced persistence.",
-      "metadata": {
-        "run_key": true,
-        "wmi_subscription": true,
-        "dual_channel": true
+        "sessions": 7,
+        "anomalies": 3,
+        "technique": "T1003.001"
       }
     },
     {
       "artifact_id": "cultural_planted_001",
       "evidence_type": "cultural_marker",
       "source_tool": "infer_intent",
-      "timestamp": "2026-04-10T12:00:01Z",
-      "raw_score": 0.8,
+      "timestamp": "2026-04-10T03:16:00Z",
+      "raw_score": 0.90,
       "prior_trust": 0.3,
-      "provenance_chain": ["sha256:cult_chain_001"],
-      "description": "Cyrillic filename: 'отчет_финансы.docx'. Keyboard layout: RU. Timezone: UTC+3. Variable names in Russian comments. ALL markers concentrated in a single dropped file with no compilation history.",
+      "provenance_chain": [
+        "sha256:cultural_planted_001"
+      ],
+      "description": "Cyrillic strings injected into the dropper: suspiciously pristine, inconsistent with the actor's actual toolchain and OPSEC. Attribution markers contradict the observed technical TTP profile. Placement is too clean for a native speaker.",
       "metadata": {
         "cyrillic_filenames": 3,
         "keyboard_layout_detected": "RU",
         "timezone_offset": "+03:00",
         "language_confidence": 0.91,
-        "concentrated_in_single_file": true,
-        "no_compilation_history": true,
-        "suspiciously_obvious": true
-      }
-    },
-    {
-      "artifact_id": "fs_timestomp_001",
-      "evidence_type": "mft_entry",
-      "source_tool": "analyze_mft",
-      "timestamp": "2026-04-10T12:00:02Z",
-      "raw_score": 0.9,
-      "prior_trust": 0.95,
-      "provenance_chain": ["sha256:mft_chain_001"],
-      "description": "Cyrillic files have MFT timestamps predating volume creation (2023-06-01 vs volume 2024-01-15). $STANDARD_INFORMATION modified after $FILE_NAME. Consistent with timestomp (T1070.006). Files were planted and backdated.",
-      "metadata": {
-        "timestomp_detected": true,
-        "mft_inconsistency": true,
-        "backdating_detected": true,
-        "volume_creation_time": "2024-01-15T00:00:00Z",
-        "file_creation_time": "2023-06-01T00:00:00Z",
-        "mft_entry_number": 1234,
-        "mft_si_modified_after_fn": true
+        "attribution_consistency_with_ttps": "LOW",
+        "mismatch_with_technical_profile": true,
+        "placement": "too_clean"
       }
     }
   ],
   "temporal_violations": [],
   "caie_fractures": [
     {
-      "fracture_type": "FALSE_FLAG_PATTERN",
+      "fracture_type": "FALSE_FLAG_ATTRIBUTION_MISMATCH",
       "severity": 0.85,
-      "artifact_a": "Technical attack (avg=0.85) — sophisticated APT",
-      "artifact_b": "Cultural markers (avg=0.80) — crude, concentrated, timestomped",
-      "mitre_ttp": "T1585",
-      "interpretation": "Sophisticated attack with crude, planted cultural attribution. Real APTs do not leave keyboard layouts as breadcrumbs. The Cyrillic files were timestomped and backdated, proving manipulation. The attacker is not Russian — but there IS an attacker, and the framing IS the malicious act."
-    },
-    {
-      "fracture_type": "MFT_ENTRY_ANOMALY",
-      "severity": 0.9,
-      "artifact_a": "MFT metadata shows timestomp — $SI modified after $FN",
-      "artifact_b": "Cultural files claim 2023 origin but volume is 2024",
-      "mitre_ttp": "T1070.006",
-      "interpretation": "Direct evidence of scene manipulation: MFT $STANDARD_INFORMATION timestamps modified after $FILE_NAME — the classic timestomp signature. Files were planted and backdated to fabricate a false history."
+      "artifact_a": "Cultural markers (avg=0.90, attribution contradicts TTP profile)",
+      "artifact_b": "Technical evidence (avg=0.86, real attack confirmed)",
+      "mitre_ttp": "T1036.005",
+      "interpretation": "Real malicious event confirmed (process hollowing + credential dumping). Cultural attribution markers too pristine and inconsistent with observed OPSEC. The malice is the deliberate misdirection. MALICE belongs to the planter."
     }
   ],
   "expected_verdict": "MALICE",
-  "expected_confidence": 0.82,
-  "expected_mitre_ttps": ["T1585", "T1036.005", "T1070.006"],
+  "expected_confidence": 0.80,
+  "expected_mitre_ttps": [
+    "T1036.005",
+    "T1055.012",
+    "T1003.001"
+  ],
   "peirce_chain": {
-    "firstness": "Sophisticated process injection, encrypted C2, dual persistence. Real attack confirmed.",
-    "secondness": "Cyrillic files are timestomped (predating volume), keyboard layout is isolated artifact, no compilation history. These are PLANTED, not organic.",
-    "thirdness": "The attacker executed a real breach but planted Russian markers to misdirect attribution. The framing is deliberate and malicious."
+    "firstness": "Cyrillic strings present alongside confirmed process hollowing and credential dumping.",
+    "secondness": "The attribution profile contradicts the technical TTPs — the markers are too clean for the observed OPSEC.",
+    "thirdness": "The real attacker staged the attribution to misdirect blame. The deception is the malicious act. MALICE belongs to the planter, not to the language of the flag."
   },
-  "demo_command": "python run_vigia_case.py cases/case_003_false_flag.json",
-  "demo_quote": "Naive sees Cyrillic and says 'Russian hacker'. VIGÍA sees a sophisticated APT with timestomped, backdated cultural files and says: 'Someone planted these. The breach is real, the attribution is fake. Planting evidence IS the malicious act.'",
-  "notes": "FALSE_FLAG_PATTERN now requires: (1) confirmed malicious event (technical_score > 0.5), (2) positive evidence of manipulation (timestomp, registry inconsistency, etc.), AND (3) cultural/attribution markers that contradict the technical sophistication. Without (1) and (2), the pattern degrades to SUSPICION or UNKNOWN. SCENE_STAGING renamed to MFT_ENTRY_ANOMALY (registered type in scorer) — semantically identical, structurally sound."
+  "demo_quote": "A real false flag has the attack present. The malice belongs to the planter, not to whoever writes in Russian."
 }
