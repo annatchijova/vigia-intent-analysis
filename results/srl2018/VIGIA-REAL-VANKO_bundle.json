@@ -543,5 +543,6 @@
       "prev_hash": "59b084098ea2739f8bfeacd8c2805a3cd13f881e633ada696be9d988b1e4e1cf"
     }
   ],
-  "self_correction_events_note": "ContradictionDetector and Refutation Gate events are internal agent operations, not MCP tool calls. Separated from tool_execution_log to preserve hash chain integrity. The corroboration gate (F-004 INTENT->SUSPICION) is architecturally enforced in vigia_scorer.py:464-465, independent of this log."
+  "self_correction_events_note": "ContradictionDetector and Refutation Gate events are internal agent operations, not MCP tool calls. Separated from tool_execution_log to preserve hash chain integrity. The corroboration gate (F-004 INTENT->SUSPICION) is architecturally enforced in vigia_scorer.py:464-465, independent of this log.",
+  "tool_execution_log_note": "Sequence numbers reflect MCP call order as dispatched by the investigating agent. Wall-clock timestamps may be non-monotonic for seq=7/8 due to parallel tool execution (calculate_human_entropy and audit_grice_maxims were dispatched concurrently). Sequence order is authoritative; timestamp order is informational."
 }
