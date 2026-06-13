@@ -469,7 +469,7 @@ python3 vigia_agent.py \
 python3 verify_ebs_v1.py results/demo_bundle.json --verbose
 
 # 5. Run the full test suite
-python3 -m pytest tests/ -v    # 148/148 expected
+python3 -m pytest tests/ -v    # 163 passed, 6 xfailed
 
 # 6. Reproduce accuracy on real corpus
 python3 evaluate_detector.py \
