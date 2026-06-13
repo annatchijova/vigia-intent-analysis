@@ -573,6 +573,8 @@ VIGIA applied Daubert single-source standard. **Downgraded: INTENT -> SUSPICION.
 
 Full Amicus Curiae: [results/srl2018/VIGIA-REAL-VANKO_amicus_curiae.md](./results/srl2018/VIGIA-REAL-VANKO_amicus_curiae.md)
 
+**All Claude Code investigations:** [`results/srl2018/`](./results/srl2018/) — bundles, amicus curiae, and SHA-256 files for every case.
+
 > The SRL-DMZ-FTP investigation remains in the repository. VANKO was added after audit feedback identified the need for structured tool_execution_log entries in the bundle.
 
 ### VIGIA-REAL-NROMANOFF — Zeus Banking Trojan, Stark Research Labs 2012
