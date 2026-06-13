@@ -405,6 +405,8 @@ no incorrect verdict reaches the bundle.
 
 ## Deployment Modes
 
+> **Mode Architecture:** Mode 1 is the forensic core. Modes 2-5 are optional enrichment layers. Mode 2 (Claude Code) is implemented because the hackathon requires agentic framework integration, but the deterministic verdict is identical in all modes.
+
 VIGÍA runs in five modes. The deterministic scoring core is identical across all of them.
 
 ---
@@ -608,30 +610,6 @@ without chain of custody.
 
 ## Investigation Examples
 
-### VIGIA-REAL-VANKO — Full Claude Code Investigation (14 MCP Tool Calls)
-**Case:** Anthony Vanko, insider threat / IP exfiltration, Stark Enterprises DC R&D, 2016.
-**Evidence:** 7 artifacts — filesystem (5), network capture, registry hive. SANS FOR500 corpus.
-**VIGIA verdict:** MALICE | Confidence: HIGH | Trust fusion: 1.0 | Daubert: ADMISSIBLE (error 8.12%)
-**Self-correction:** F-004 (802.11 monitor-mode WiFi captures) initially INTENT.
-VIGIA applied Daubert single-source standard. **Downgraded: INTENT -> SUSPICION.**
-16 tool calls (14 MCP + 2 self-correction events) with timestamps in tool_execution_log inside the sealed bundle.
-
-Full Amicus Curiae: [results/srl2018/VIGIA-REAL-VANKO_amicus_curiae.md](./results/srl2018/VIGIA-REAL-VANKO_amicus_curiae.md)
-
-**All Claude Code investigations:** [`results/srl2018/`](./results/srl2018/) — bundles, amicus curiae, and SHA-256 files for every case.
-
-> The SRL-DMZ-FTP investigation remains in the repository. VANKO was added after audit feedback identified the need for structured tool_execution_log entries in the bundle.
-
-### VIGIA-REAL-NROMANOFF — Zeus Banking Trojan, Stark Research Labs 2012
-
-**Evidence:** 5 artifacts — memory hooks (Volatility zeus-apihooks), shimcache persistence, event logs, network cache. SANS FOR508 corpus.
-**VIGÍA verdict:** `MALICE` | Daubert: ADMISSIBLE (error rate 0.39%) | Chain integrity: VERIFIED 13/13
-**F-003 conservative rating:** `INTENT` (not MALICE) — rsydow authentication may be legitimate DFIR activity. Conservative Daubert standard applied.
-**F-004:** `SUSPICION` — Daubert Corroboration Gate applied (single-source network_flow).
-**Key finding:** Zeus Inline/Trampoline hooks on ntdll.dll in services.exe PID 676, hook destination 0x7e3b47 in unmapped memory — definitive rootkit signature.
-
-Full Amicus Curiae: [results/srl2018/VIGIA-REAL-NROMANOFF_amicus_curiae.md](./results/srl2018/VIGIA-REAL-NROMANOFF_amicus_curiae.md)
-
 ### VIGIA-REAL-NFURY — Pre-Emission Gate in Action (SUSPICION)
 
 **Case:** Nick Fury workstation, SANS FOR508, lateral movement investigation.
@@ -647,6 +625,32 @@ This is architectural self-correction: the gate intercepted incorrect candidates
 
 No cross-case correlation was requested. The agent formed the hypothesis independently from the evidence. Full amicus: [`results/srl2018/VIGIA-REAL-SRL-AV_amicus_curiae.md`](./results/srl2018/VIGIA-REAL-SRL-AV_amicus_curiae.md)
 
+### VIGIA-REAL-NROMANOFF — Zeus Banking Trojan, Stark Research Labs 2012
+
+**Evidence:** 5 artifacts — memory hooks (Volatility zeus-apihooks), shimcache persistence, event logs, network cache. SANS FOR508 corpus.
+**VIGÍA verdict:** `MALICE` | Daubert: ADMISSIBLE (error rate 0.39%) | Chain integrity: VERIFIED 13/13
+**F-003 conservative rating:** `INTENT` (not MALICE) — rsydow authentication may be legitimate DFIR activity. Conservative Daubert standard applied.
+**F-004:** `SUSPICION` — Daubert Corroboration Gate applied (single-source network_flow).
+**Key finding:** Zeus Inline/Trampoline hooks on ntdll.dll in services.exe PID 676, hook destination 0x7e3b47 in unmapped memory — definitive rootkit signature.
+
+Full Amicus Curiae: [results/srl2018/VIGIA-REAL-NROMANOFF_amicus_curiae.md](./results/srl2018/VIGIA-REAL-NROMANOFF_amicus_curiae.md)
+
+### VIGIA-REAL-VANKO — Claude Code Mode (Legacy, Optional)
+
+> **Note:** This case demonstrates Mode 2 (Claude Code + MCP). The deterministic verdict is identical to Mode 1. Mode 2 is implemented because the hackathon requires agentic framework integration, but the forensic core operates in Mode 1 with 0 tokens.
+**Case:** Anthony Vanko, insider threat / IP exfiltration, Stark Enterprises DC R&D, 2016.
+**Evidence:** 7 artifacts — filesystem (5), network capture, registry hive. SANS FOR500 corpus.
+**VIGIA verdict:** MALICE | Confidence: HIGH | Trust fusion: 1.0 | Daubert: ADMISSIBLE (error 8.12%)
+**Self-correction:** F-004 (802.11 monitor-mode WiFi captures) initially INTENT.
+VIGIA applied Daubert single-source standard. **Downgraded: INTENT -> SUSPICION.**
+16 tool calls (14 MCP + 2 self-correction events) with timestamps in tool_execution_log inside the sealed bundle.
+
+Full Amicus Curiae: [results/srl2018/VIGIA-REAL-VANKO_amicus_curiae.md](./results/srl2018/VIGIA-REAL-VANKO_amicus_curiae.md)
+
+**All Claude Code investigations:** [`results/srl2018/`](./results/srl2018/) — bundles, amicus curiae, and SHA-256 files for every case.
+
+> The SRL-DMZ-FTP investigation remains in the repository. VANKO was added after audit feedback identified the need for structured tool_execution_log entries in the bundle.
+
 ### CAN-031 — Weaponized Incompetence
 
 PowerShell deletes shadow copies and disables firewall with zero syntax errors.
@@ -660,15 +664,6 @@ svchost.exe with valid Microsoft signature on disk. In memory: 8MB RWX region,
 PE header at offset 0, not mapped to any file. Parent: cmd.exe (expected: services.exe).
 
 ![CAN-038](screenshots/caso38.png)
-
-### CAN-018 — The Ghost in the Machine
-
-847 commands at exactly 300.000-second intervals. Zero errors. Zero retries.
-Temporal entropy: 0.00 bits.
-
-![CAN-018](screenshots/caso18.png)
-
----
 
 ## Self-Correction Architecture
 
@@ -849,6 +844,13 @@ vigia-intent-analysis/
 ├── screenshots/                         ← Demo and test result screenshots
 │   ├── diagrama1.png – diagrama8.png
 │   ├── caso18.png, caso31.png, caso38.png
+
+### CAN-018 — The Ghost in the Machine
+
+847 commands at exactly 300.000-second intervals. Zero errors. Zero retries.
+Temporal entropy: 0.00 bits.
+
+![CAN-018](screenshots/caso18.png)
 │   ├── casoreal7.png, casorealsrl.png
 │   ├── selfcorection.png
 │   └── test148.png, test3.png, test55.png, testreal.png
