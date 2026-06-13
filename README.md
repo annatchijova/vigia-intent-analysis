@@ -611,6 +611,21 @@ Full Amicus Curiae: [results/srl2018/VIGIA-REAL-VANKO_amicus_curiae.md](./result
 
 Full Amicus Curiae: [results/srl2018/VIGIA-REAL-NROMANOFF_amicus_curiae.md](./results/srl2018/VIGIA-REAL-NROMANOFF_amicus_curiae.md)
 
+### VIGIA-REAL-NFURY — Pre-Emission Gate in Action (SUSPICION)
+
+**Case:** Nick Fury workstation, SANS FOR508, lateral movement investigation.
+**`detect_habit_incongruence` returned:** MALICE at 90% confidence on both WmiPrvSE.exe and lsass.exe.
+**VIGÍA verdict:** `SUSPICION` — Daubert Corroboration Gate rejected both findings pre-emission. Single-source artifacts. Benign explanations could not be excluded.
+
+This is architectural self-correction: the gate intercepted incorrect candidates before they reached the bundle. No incorrect verdict was ever sealed. Full amicus: [`results/srl2018/VIGIA-REAL-NFURY_amicus_curiae.md`](./results/srl2018/VIGIA-REAL-NFURY_amicus_curiae.md)
+
+### VIGIA-REAL-SRL-AV — Autonomous Cross-Case Correlation
+
+**Case:** AV server, SRL-2018. Memory forensics.
+**VIGÍA verdict:** `MALICE` — and identified autonomously that the attack framework matched VIGIA-REAL-SRL-ADMIN (31 vs 29 RWX processes, same reflective injection pattern). The tactical shift from PowerShell (admin server) to cmd.exe (AV server) was flagged as a concealment decision: AV products monitor PowerShell more aggressively.
+
+No cross-case correlation was requested. The agent formed the hypothesis independently from the evidence. Full amicus: [`results/srl2018/VIGIA-REAL-SRL-AV_amicus_curiae.md`](./results/srl2018/VIGIA-REAL-SRL-AV_amicus_curiae.md)
+
 ### CAN-031 — Weaponized Incompetence
 
 PowerShell deletes shadow copies and disables firewall with zero syntax errors.
