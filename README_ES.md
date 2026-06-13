@@ -490,6 +490,42 @@ tope duro previene bucles infinitos.
 
 ---
 
+### Flujo de Investigación en Dos Fases
+
+VIGÍA opera como un pipeline forense de dos fases:
+
+**Fase 1 — Triaje y Extracción de Señales (Agente, sin LLM)**
+
+El agente autónomo ingiere evidencia forense cruda y extrae señales
+sin inferencia LLM. Probado en imágenes de escala de producción:
+
+```bash
+python3 vigia_agent.py --evidence /evidence/case.E01 --case-id CASE-001
+python3 vigia_agent.py --evidence /evidence/memory.raw --case-id CASE-001
+```
+
+- `.raw` / `.vmem` → Volatility3 (pslist, netscan, malfind, windows.info)
+- `.E01` / disco → SIFT Workstation vía SIFTOrchestrator (RegRipper, evtx, MFT)
+- Salida: bundle JSON intermedio de señales para la Fase 2
+
+Este modo fue utilizado para procesar el corpus real (casos de hasta 16 GB disco /
+9 GB memoria) en hardware de consumo (ThinkPad T420, Linux Mint).
+
+**Fase 2 — Puntuación Determinista de Intencionalidad (CLI)**
+
+Toma el bundle JSON de la Fase 1 y aplica el pipeline matemático completo:
+
+```bash
+python3 scripts/run_case.py data/cases/CASE-001.json
+```
+
+- Toda la puntuación en `fractions.Fraction` — cero floats
+- Detección de incongruencia CAIE
+- ForensicBundle sellado (cadena de hashes H1–H4)
+- Opcional: narración LLM sobre bundle sellado (no altera el veredicto)
+
+---
+
 ## Precisión y Dataset de Evidencia
 
 ### Corpus Real — 18 casos

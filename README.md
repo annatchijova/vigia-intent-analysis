@@ -512,6 +512,42 @@ prevents infinite loops.
 
 ---
 
+### Two-Phase Investigation Workflow
+
+VIGÍA operates as a two-phase forensic pipeline:
+
+**Phase 1 — Triage & Signal Extraction (Agent, no LLM)**
+
+The autonomous agent ingests raw forensic evidence and extracts signals
+without LLM inference. Tested on production-scale images:
+
+```bash
+python3 vigia_agent.py --evidence /evidence/case.E01 --case-id CASE-001
+python3 vigia_agent.py --evidence /evidence/memory.raw --case-id CASE-001
+```
+
+- `.raw` / `.vmem` → Volatility3 (pslist, netscan, malfind, windows.info)
+- `.E01` / disk → SIFT Workstation via SIFTOrchestrator (RegRipper, evtx, MFT)
+- Output: intermediate JSON signal bundle for Phase 2
+
+This mode was used to process the real corpus (cases up to 16 GB disk /
+9 GB memory) on commodity hardware (ThinkPad T420, Linux Mint).
+
+**Phase 2 — Deterministic Intent Scoring (CLI)**
+
+Takes the Phase 1 JSON bundle and applies the full mathematical pipeline:
+
+```bash
+python3 scripts/run_case.py data/cases/CASE-001.json
+```
+
+- All scoring in `fractions.Fraction` — zero floats
+- CAIE incongruence detection
+- Sealed ForensicBundle (H1–H4 hash chain)
+- Optional: LLM narration on sealed bundle (does not alter verdict)
+
+---
+
 ## Accuracy & Evidence Dataset
 
 ### Real Corpus — 18 cases
