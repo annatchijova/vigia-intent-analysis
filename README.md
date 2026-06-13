@@ -272,6 +272,19 @@ known malware signature — it is a legitimate tool with anomalous behavior.
 
 The LLM bridge (`validate_and_correct_analysis`) is a separate, optional enrichment layer. The deterministic contradiction detection runs first and is independent of LLM availability.
 
+### Evidence Integrity — What Happens to Unprocessable Payloads
+
+If an evidence payload cannot be processed (UnicodeDecodeError, byte corruption,
+integrity anomaly), VIGÍA does not discard it silently. The raw payload is sealed
+under SHA-256 with `0o400` permissions (immutable post-write) and persisted to the
+evidence purgatory directory. Discarding unprocessable evidence would break chain
+of custody — its absence is itself a forensic signal under Daubert.
+
+Chain of custody fields (`acquisition_hash`, `examiner_id`, `write_blocker_used`)
+are mandatory. Missing fields trigger NIST SP 800-86 §4.3 trust penalties that
+mathematically reduce the verdict score. The system cannot be silently operated
+without chain of custody.
+
 ### Kassandra Protocol — Adversarial Evidence Defense
 
 VIGÍA plants a cryptographic tripwire inside every evidence payload sent to the LLM.
@@ -403,6 +416,12 @@ CAIE cross-artifact fusion, temporal analysis, behavioral fingerprinting — all
 locally. Zero API cost. Zero network dependency.
 
 **Average case resolution: < 50ms.** Viable for air-gapped environments.
+
+> **Operational independence:** If every LLM provider ceased to exist tomorrow,
+> VIGÍA would continue producing identical verdicts from the same evidence.
+> The scoring engine uses `fractions.Fraction` over Python stdlib — no cloud
+> services, no API keys, no network access. A design requirement for forensic
+> tools intended for long-term infrastructure and air-gapped deployments.
 
 ```bash
 python3 vigia_agent.py \
