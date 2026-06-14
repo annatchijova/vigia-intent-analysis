@@ -1,0 +1,220 @@
+{
+  "abduction_trace": {
+    "abort_reason": null,
+    "abort_triggered": false,
+    "anomalies_found": [],
+    "cluster_name": null,
+    "clustering_method": "heuristic_default",
+    "correlation_penalties_applied": false,
+    "dominant_signal": null,
+    "dominant_z_score": 0.0,
+    "execution_plan_rationale": [],
+    "inference_mode": "CLAUDE_CODE_MCP",
+    "peirce_firstness": "Laptop with wireless PCMCIA card, homemade 802.11b antenna, war driving tools (NetStumbler, WinPcap, Ethereal), intercepted third-party credentials, and hacking community aliases (Mr. Evil, mrevilrulez)",
+    "peirce_secondness": "Every artifact deviates from legitimate use: pcap captures third-party auth traffic at public hotspots, toolset is specifically for unauthorized WiFi network access, username is an explicit attacker alias, deleted tools show awareness of forensic discovery",
+    "peirce_thirdness": "Coordinated credential theft infrastructure: hardware (homemade antenna + PCMCIA), software (NetStumbler for discovery + Ethereal for capture + WinPcap for raw access), OPSEC (dual email identity, tool deletion), community (hacking IRC channels). This is a complete attack lifecycle built by a single actor with deliberate intent.",
+    "tools_available": [],
+    "tools_executed": [],
+    "tools_skipped": []
+  },
+  "actions": [],
+  "bundle_id": "3a932991-8fc8-4bc3-8b8c-0afd2dd71121",
+  "bundle_version": "1.0",
+  "caie_analysis": {
+    "caie_fractures": 0,
+    "caie_fractures_source": "live_caie",
+    "case_id": "VIGIA-REAL-001",
+    "composite_score": 0.345,
+    "confidence": 0.69,
+    "ebs_risk_mapping": "VIG\u00cdA score 0.345 (threshold 0.33 for MALICE) \u2192 EBS risk 0.96 (REJECT zone)",
+    "hard_temporal_gate": false,
+    "peirce_chain": {
+      "firstness": "Laptop with wireless PCMCIA card, homemade 802.11b antenna, war driving tools (NetStumbler, WinPcap, Ethereal), intercepted third-party credentials, and hacking community aliases (Mr. Evil, mrevilrulez)",
+      "secondness": "Every artifact deviates from legitimate use: pcap captures third-party auth traffic at public hotspots, toolset is specifically for unauthorized WiFi network access, username is an explicit attacker alias, deleted tools show awareness of forensic discovery",
+      "thirdness": "Coordinated credential theft infrastructure: hardware (homemade antenna + PCMCIA), software (NetStumbler for discovery + Ethereal for capture + WinPcap for raw access), OPSEC (dual email identity, tool deletion), community (hacking IRC channels). This is a complete attack lifecycle built by a single actor with deliberate intent."
+    },
+    "quadripartite_state": {
+      "abstain_reason": null,
+      "action_required": "CORROBORATE_THEN_ACT",
+      "adversarial_penalty_applied": false,
+      "analyst_summary": "Malice indicators with 63% confidence. Margin over alternative hypothesis is narrow. Seek pivot signals before action: see roadmap.",
+      "audit_hash": "7da5839466223034c1af908284fd15722589775596378be4664ee992188ffd48",
+      "confidence_pct": 63,
+      "daubert_note": "Verdict with 60-80% confidence. Pivot signals identified. Requires additional evidence before court submission.",
+      "display_label": "\ud83d\udfe0 MALICE \u2014 MEDIUM CONFIDENCE",
+      "dissent_module": null,
+      "dissent_present": false,
+      "integrity_level": "FULL_INTEGRITY",
+      "investigation_roadmap": [],
+      "pivot_signals": [],
+      "stability_pct": 83,
+      "verdict_state": "MALICE_MEDIUM"
+    },
+    "reason": "Intent score 0.3450 exceeds MALICE threshold (P2+acq_assurance scale, threshold=0.33)",
+    "verdict": "MALICE"
+  },
+  "config_attestation": {
+    "caie_enabled": true,
+    "caie_verdict": "MALICE",
+    "canonical_version": "1.0.0",
+    "config_hash": "74400c4e1e96deb97a94bb33b3fd214fca16d8336e3375d6eff3f1b696d09e2c",
+    "deviation_from_canonical": false,
+    "modified_params": [],
+    "vigia_version": "1.0"
+  },
+  "decision_trace": {
+    "abstain_reason": "",
+    "components_used": 0,
+    "consistency_score": 1.0,
+    "decision": "REJECT",
+    "drift_score": 0.0,
+    "epsilon_used": 0.05,
+    "gamma_stability": 2.0,
+    "graph_stability": 1.0,
+    "lambda_drift": 2.0,
+    "log_lr": 0.0,
+    "lr": 0.0,
+    "omega_intention": 1.0,
+    "posterior": 0.69,
+    "reason_code": "VIGIA_SCORER:MALICE",
+    "risk": 0.96,
+    "signal_contributions": null
+  },
+  "evidence_graph": {
+    "bootstrap_rounds": 500,
+    "edges": [
+      {
+        "confidence_interval": [
+          0.0,
+          1.0
+        ],
+        "dependency_type": "statistical_dependency",
+        "source": "ART-001",
+        "stability": 0.85,
+        "target": "ART-002",
+        "weight_mean": 0.85
+      },
+      {
+        "confidence_interval": [
+          0.0,
+          1.0
+        ],
+        "dependency_type": "statistical_dependency",
+        "source": "ART-002",
+        "stability": 0.7,
+        "target": "ART-003",
+        "weight_mean": 0.7
+      },
+      {
+        "confidence_interval": [
+          0.0,
+          1.0
+        ],
+        "dependency_type": "statistical_dependency",
+        "source": "ART-003",
+        "stability": 0.9,
+        "target": "ART-004",
+        "weight_mean": 0.9
+      },
+      {
+        "confidence_interval": [
+          0.0,
+          1.0
+        ],
+        "dependency_type": "statistical_dependency",
+        "source": "ART-004",
+        "stability": 0.85,
+        "target": "ART-005",
+        "weight_mean": 0.85
+      }
+    ],
+    "generated_at": "2026-06-14T01:27:51.023689+00:00",
+    "graph_hash": "4fc38b8c45a680146531d6459d59ab1c06247d22f910756b7962e9ec60b6d95a",
+    "nodes": [
+      "ART-001",
+      "ART-002",
+      "ART-003",
+      "ART-004",
+      "ART-005"
+    ],
+    "stability_threshold": 0.85
+  },
+  "integrity": {
+    "bundle_hash": "41fe6c6e5a4f6bfe50f85a8a6da1177982a86e04002ba2048ac306215a55023d",
+    "decision_hash": "55f183873e51be923f8c43acfc6dd315f70bb0465aae4086d1109b33a9b991c0",
+    "ecl_hash": "",
+    "engine_attestation_hash": "",
+    "graph_hash": "4fc38b8c45a680146531d6459d59ab1c06247d22f910756b7962e9ec60b6d95a",
+    "policy_hash": "03d292f33eef1e4a2f355fe83299bdb8e72124c710f79ab4626d85a3998e9567",
+    "sealed_at": "2026-06-14T01:27:51.024045+00:00"
+  },
+  "policy_spec": {
+    "created_at": "2026-06-14T01:27:51.023728+00:00",
+    "description": "Politica VIGIA por defecto \u2014 SANS FIND EVIL 2026",
+    "epsilon_accept": 0.05,
+    "epsilon_reject": 0.05,
+    "gamma_stability_init": 2.0,
+    "lambda_drift_init": 2.0,
+    "rules": [
+      {
+        "allowed_roles": [
+          "system",
+          "analyst"
+        ],
+        "description": "Limite de cambio en probabilidad posterior",
+        "max_delta": 0.1,
+        "requires_approval": false,
+        "variable": "posterior"
+      },
+      {
+        "allowed_roles": [
+          "system"
+        ],
+        "description": "Limite de correccion de drift",
+        "max_delta": 0.15,
+        "requires_approval": false,
+        "variable": "drift"
+      },
+      {
+        "allowed_roles": [
+          "system"
+        ],
+        "description": "Cambios en estabilidad del grafo requieren aprobacion",
+        "max_delta": 0.05,
+        "requires_approval": true,
+        "variable": "graph_stability"
+      },
+      {
+        "allowed_roles": [
+          "system"
+        ],
+        "description": "Ajuste adaptativo de sensibilidad al drift",
+        "max_delta": 1.0,
+        "requires_approval": false,
+        "variable": "lambda_drift"
+      },
+      {
+        "allowed_roles": [
+          "system"
+        ],
+        "description": "Ajuste adaptativo de sensibilidad estructural",
+        "max_delta": 1.0,
+        "requires_approval": false,
+        "variable": "gamma_stability"
+      }
+    ],
+    "version": "1.0"
+  },
+  "system_state": {
+    "calibration_model_hash": "",
+    "drift_score": 0.0,
+    "engine_version": "vigia-ebs-v1.0",
+    "epsilon_accept": 0.05,
+    "epsilon_reject": 0.05,
+    "gamma_stability": 2.0,
+    "graph_stability_global": 0.83,
+    "lambda_drift": 2.0,
+    "timestamp": "2026-06-14T01:27:51.023737+00:00"
+  },
+  "timestamp": "2026-06-14T01:27:51.023761+00:00"
+}

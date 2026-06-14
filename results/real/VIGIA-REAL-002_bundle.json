@@ -1,0 +1,220 @@
+{
+  "abduction_trace": {
+    "abort_reason": null,
+    "abort_triggered": false,
+    "anomalies_found": [],
+    "cluster_name": null,
+    "clustering_method": "heuristic_default",
+    "correlation_penalties_applied": false,
+    "dominant_signal": null,
+    "dominant_z_score": 0.0,
+    "execution_plan_rationale": [],
+    "inference_mode": "CLAUDE_CODE_MCP",
+    "peirce_firstness": "Corporate workstation with after-hours logon events, email exchange between spy.conspirator and jaman.informant requesting confidential data, confidential files renamed with false extensions (.docx->.mp3, .pptx->.jpg), Google Drive installed with personal Gmail for file upload, CCleaner and Eraser installed post-exfiltration, and secured network drive access with selective file copying.",
+    "peirce_secondness": "Multiple layers of deviation from legitimate corporate behavior: (1) after-hours access outside policy, (2) email correspondence with conspiratorial language requesting confidential data, (3) file extension masking is deliberate anti-forensic technique with zero legitimate use, (4) personal cloud storage on corporate machine for confidential files violates data handling policy, (5) anti-forensic tool installation immediately after exfiltration is a temporal concealment sequence.",
+    "peirce_thirdness": "Coordinated insider data exfiltration lifecycle: COLLECTION (secured drive access + selective file copying) -> STAGING (file extension masking to evade DLP) -> EXFILTRATION (personal Google Drive as C2 channel) -> CONCEALMENT (CCleaner + Eraser to destroy forensic traces). This four-phase pattern requires planning, tool acquisition, and awareness of forensic detection methods. The anti-forensic phase is the concealment layer that distinguishes INTENT from MALICE.",
+    "tools_available": [],
+    "tools_executed": [],
+    "tools_skipped": []
+  },
+  "actions": [],
+  "bundle_id": "df263778-765f-490c-8939-f2819c885d77",
+  "bundle_version": "1.0",
+  "caie_analysis": {
+    "caie_fractures": 0,
+    "caie_fractures_source": "live_caie",
+    "case_id": "VIGIA-REAL-002",
+    "composite_score": 0.2442,
+    "confidence": 0.49,
+    "hard_temporal_gate": false,
+    "mcp_tool_override": "CCleaner habit incongruence returned MALICE (85% compromise). Scorer SUSPICION at 0.2442 is conservative due to log_entry spoofability penalties. Analyst assessment: MALICE supported by anti-forensic concealment layer.",
+    "peirce_chain": {
+      "firstness": "Corporate workstation with after-hours logon events, email exchange between spy.conspirator and jaman.informant requesting confidential data, confidential files renamed with false extensions (.docx->.mp3, .pptx->.jpg), Google Drive installed with personal Gmail for file upload, CCleaner and Eraser installed post-exfiltration, and secured network drive access with selective file copying.",
+      "secondness": "Multiple layers of deviation from legitimate corporate behavior: (1) after-hours access outside policy, (2) email correspondence with conspiratorial language requesting confidential data, (3) file extension masking is deliberate anti-forensic technique with zero legitimate use, (4) personal cloud storage on corporate machine for confidential files violates data handling policy, (5) anti-forensic tool installation immediately after exfiltration is a temporal concealment sequence.",
+      "thirdness": "Coordinated insider data exfiltration lifecycle: COLLECTION (secured drive access + selective file copying) -> STAGING (file extension masking to evade DLP) -> EXFILTRATION (personal Google Drive as C2 channel) -> CONCEALMENT (CCleaner + Eraser to destroy forensic traces). This four-phase pattern requires planning, tool acquisition, and awareness of forensic detection methods. The anti-forensic phase is the concealment layer that distinguishes INTENT from MALICE."
+    },
+    "quadripartite_state": {
+      "abstain_reason": "Significant signal below MALICE threshold \u2014 corroboration required before forensic action.",
+      "action_required": "GATHER_MORE_EVIDENCE",
+      "adversarial_penalty_applied": false,
+      "analyst_summary": "Insufficient signals for a reliable verdict (confidence: 49%). See investigation roadmap for specific signals to pursue.",
+      "audit_hash": "eb159758d08a7c5b6c153e055f305ea4e5375374e73363db2aab34acbcbc472e",
+      "confidence_pct": 49,
+      "daubert_note": "Insufficient active signals to discriminate between hypotheses. Pivot signals identified \u2014 collect and re-enter into the system.",
+      "display_label": "\u26ab ABSTAIN \u2014 INSUFFICIENT EVIDENCE",
+      "dissent_module": null,
+      "dissent_present": false,
+      "integrity_level": "FULL_INTEGRITY",
+      "investigation_roadmap": [],
+      "pivot_signals": [],
+      "stability_pct": 83,
+      "verdict_state": "ABSTAIN_INSUFFICIENT"
+    },
+    "reason": "Significant signal with structural support (score=0.2442)",
+    "verdict": "SUSPICION"
+  },
+  "config_attestation": {
+    "caie_enabled": true,
+    "caie_verdict": "SUSPICION",
+    "canonical_version": "1.0.0",
+    "config_hash": "880d929dc8e30b9b5a7ebeb79aed3d1a89c0a92e90968724f28c91bb9c48cecc",
+    "deviation_from_canonical": false,
+    "modified_params": [],
+    "vigia_version": "1.0"
+  },
+  "decision_trace": {
+    "abstain_reason": "",
+    "components_used": 0,
+    "consistency_score": 1.0,
+    "decision": "ABSTAIN",
+    "drift_score": 0.0,
+    "epsilon_used": 0.05,
+    "gamma_stability": 2.0,
+    "graph_stability": 1.0,
+    "lambda_drift": 2.0,
+    "log_lr": 0.0,
+    "lr": 0.0,
+    "omega_intention": 1.0,
+    "posterior": 0.49,
+    "reason_code": "VIGIA_SCORER:SUSPICION",
+    "risk": 0.5,
+    "signal_contributions": null
+  },
+  "evidence_graph": {
+    "bootstrap_rounds": 500,
+    "edges": [
+      {
+        "confidence_interval": [
+          0.0,
+          1.0
+        ],
+        "dependency_type": "statistical_dependency",
+        "source": "ART-001",
+        "stability": 0.7,
+        "target": "ART-002",
+        "weight_mean": 0.7
+      },
+      {
+        "confidence_interval": [
+          0.0,
+          1.0
+        ],
+        "dependency_type": "statistical_dependency",
+        "source": "ART-002",
+        "stability": 0.85,
+        "target": "ART-003",
+        "weight_mean": 0.85
+      },
+      {
+        "confidence_interval": [
+          0.0,
+          1.0
+        ],
+        "dependency_type": "statistical_dependency",
+        "source": "ART-003",
+        "stability": 0.85,
+        "target": "ART-004",
+        "weight_mean": 0.85
+      },
+      {
+        "confidence_interval": [
+          0.0,
+          1.0
+        ],
+        "dependency_type": "statistical_dependency",
+        "source": "ART-004",
+        "stability": 0.9,
+        "target": "ART-005",
+        "weight_mean": 0.9
+      }
+    ],
+    "generated_at": "2026-06-14T01:34:38.150926+00:00",
+    "graph_hash": "145e2524bc50524d745ab9774ce25a85ef83995aea570d306d4eb3bbf199daec",
+    "nodes": [
+      "ART-001",
+      "ART-002",
+      "ART-003",
+      "ART-004",
+      "ART-005"
+    ],
+    "stability_threshold": 0.85
+  },
+  "integrity": {
+    "bundle_hash": "b67308bc6e79e9088746ee50b7c0dc8a61662933f93f5b51025dbd620dbbcac5",
+    "decision_hash": "f8085946f6a95973f9061910f0718f5ea335fbf6cdf3d65c7df7d867d4b003bf",
+    "ecl_hash": "",
+    "engine_attestation_hash": "",
+    "graph_hash": "145e2524bc50524d745ab9774ce25a85ef83995aea570d306d4eb3bbf199daec",
+    "policy_hash": "03d292f33eef1e4a2f355fe83299bdb8e72124c710f79ab4626d85a3998e9567",
+    "sealed_at": "2026-06-14T01:34:38.151285+00:00"
+  },
+  "policy_spec": {
+    "created_at": "2026-06-14T01:34:38.150967+00:00",
+    "description": "Politica VIGIA por defecto \u2014 SANS FIND EVIL 2026",
+    "epsilon_accept": 0.05,
+    "epsilon_reject": 0.05,
+    "gamma_stability_init": 2.0,
+    "lambda_drift_init": 2.0,
+    "rules": [
+      {
+        "allowed_roles": [
+          "system",
+          "analyst"
+        ],
+        "description": "Limite de cambio en probabilidad posterior",
+        "max_delta": 0.1,
+        "requires_approval": false,
+        "variable": "posterior"
+      },
+      {
+        "allowed_roles": [
+          "system"
+        ],
+        "description": "Limite de correccion de drift",
+        "max_delta": 0.15,
+        "requires_approval": false,
+        "variable": "drift"
+      },
+      {
+        "allowed_roles": [
+          "system"
+        ],
+        "description": "Cambios en estabilidad del grafo requieren aprobacion",
+        "max_delta": 0.05,
+        "requires_approval": true,
+        "variable": "graph_stability"
+      },
+      {
+        "allowed_roles": [
+          "system"
+        ],
+        "description": "Ajuste adaptativo de sensibilidad al drift",
+        "max_delta": 1.0,
+        "requires_approval": false,
+        "variable": "lambda_drift"
+      },
+      {
+        "allowed_roles": [
+          "system"
+        ],
+        "description": "Ajuste adaptativo de sensibilidad estructural",
+        "max_delta": 1.0,
+        "requires_approval": false,
+        "variable": "gamma_stability"
+      }
+    ],
+    "version": "1.0"
+  },
+  "system_state": {
+    "calibration_model_hash": "",
+    "drift_score": 0.0,
+    "engine_version": "vigia-ebs-v1.0",
+    "epsilon_accept": 0.05,
+    "epsilon_reject": 0.05,
+    "gamma_stability": 2.0,
+    "graph_stability_global": 0.83,
+    "lambda_drift": 2.0,
+    "timestamp": "2026-06-14T01:34:38.150976+00:00"
+  },
+  "timestamp": "2026-06-14T01:34:38.151000+00:00"
+}
