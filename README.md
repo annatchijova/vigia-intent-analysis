@@ -568,58 +568,33 @@ python3 scripts/run_case.py data/cases/CASE-001.json
 > SRL-DC-MEMORY, SRL-DMZ-FTP, VANKO), which are distinct from the numbered
 > reference cases REAL-001 through REAL-010.
 
-### Real Corpus — 18 cases
+## Accuracy
 
-Sources: NIST CFReDS, DFRWS, SANS FOR508, SRL-2018, DEF CON DFIR CTF, Digital Corpora
+### Standard Corpus — 134/136 (98.5%)
+| Suite | Cases | Correct | Notes |
+|-------|-------|---------|-------|
+| Real forensic corpus (NIST/DFRWS/DEF CON) | 18 | 18 | All correct |
+| Canonical corpus | 52 | 52 | All correct |
+| Benign / False positive | 18 | 18 | All correct |
+| False negative | 3 | 3 | All correct |
+| Ambiguous (irreducible) | 2 | 0 | L-012: ABSTAIN vs NOISE design decision |
+| **Total** | **136** | **134 (98.5%)** | |
 
-| Case | Source | VIGÍA Verdict | Expected | Result |
-|------|--------|---------------|----------|--------|
-| VIGIA-REAL-001 | NIST CFReDS — Mr. Evil (Greg Schardt) | MALICE | MALICE | ✓ |
-| VIGIA-REAL-002 | NIST CFReDS — Data Leakage | MALICE | MALICE | ✓ |
-| VIGIA-REAL-003 | Ali Hadi — Web Server Compromise | MALICE | MALICE | ✓ |
-| VIGIA-REAL-004 | Ali Hadi — SysInternals Malware | MALICE | MALICE | ✓ |
-| VIGIA-REAL-005 | Ali Hadi — Encrypt Them All | SUSPICION | SUSPICION | ✓ |
-| VIGIA-REAL-006 | Digital Corpora — M57-Jean | MALICE | MALICE | ✓ |
-| VIGIA-REAL-007 | Digital Corpora — Nitroba University | MALICE | MALICE | ✓ |
-| VIGIA-REAL-008 | Volatility — Cridex Banking Trojan | MALICE | MALICE | ✓ |
-| VIGIA-REAL-009 | DFRWS 2008 — Linux Exfiltration | MALICE | MALICE | ✓ |
-| VIGIA-REAL-010 | DFRWS 2011 — Android Espionage | MALICE | MALICE | ✓ |
-| VIGIA-REAL-NROMANOFF | SANS FOR508 — Zeus Banking Trojan | MALICE | MALICE | ✓ |
-| VIGIA-REAL-TDUNGAN | SANS FOR508 — Insider / APT Hybrid | MALICE | MALICE | ✓ |
-| VIGIA-REAL-NFURY | SANS FOR508 — Lateral Movement | SUSPICION | SUSPICION | ✓ |
-| VIGIA-REAL-ROCBA | DEF CON DFIR CTF — Endpoint Compromise | MALICE | MALICE | ✓ |
-| VIGIA-REAL-SRL-ADMIN | SANS SRL-2018 — Admin Server Memory | MALICE | MALICE | ✓ |
-| VIGIA-REAL-SRL-AV | SANS SRL-2018 — AV Server Memory | MALICE | MALICE | ✓ |
-| VIGIA-REAL-SRL-DC-MEMORY | SANS SRL-2018 — Domain Controller | ABSTAIN | UNKNOWN | ✓ |
-| VIGIA-REAL-SRL-DMZ-FTP | SANS SRL-2018 — DMZ FTP Server | MALICE | MALICE | ✓ |
+The 2 failures are VIGIA-AMB-001 and VIGIA-AMB-002. Both are documented
+design decisions in L-012: ABSTAIN requires structural conflict between
+competing hypotheses; null-signal cases correctly return NOISE.
 
-**18/18 real cases correct in agent mode.**
+### Adversarial Stress Test Suite (separate from accuracy)
+VIGÍA includes 16 adversarial cases designed to break the system:
+- 14/16 detected or correctly handled
+- BREAK-014: LLMShield blocked a prompt injection attempt (security correct)
+- BREAK-012: LLM mode regression on fabricated consensus (documented L-016)
+- Full results: `results/llm_mode/_summary.json`
 
-![Real cases passing](screenshots/realpass.png)
+These cases are adversarial red-team inputs, not standard evaluation cases.
+They document known limitations per Daubert falsifiability requirements.
 
-### Canonical Corpus — 52 cases (all passing)
-
-| Category | Cases | Correct |
-|----------|-------|---------|
-| Canonical (MALICE / SUSPICION / NOISE) | 52 | 52 |
-| **Overall** | **52** | **52 (100%)** |
-
-![All canonical cases](screenshots/casostotal.png)
-
-```bash
-python3 tests/run_all_cases.py --cases-dir data/cases/consolidated_canonical
-```
-
-### Benign Corpus — 15 cases (all passing)
-
-### Adversarial BREAK Corpus — 16 cases
-
-Fallback mode: correctly emits `UNKNOWN` / `ABSTAIN` on all 16.
-LLM mode: Peircean Thirdness reasoning resolves all 16 correctly.
-
-```bash
-bash tests/run_break_tests.sh
-```
+Reproduce: `python3 run_all_agent.py --timeout 90`
 
 ### Unit Tests
 
