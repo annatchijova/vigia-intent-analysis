@@ -1,0 +1,297 @@
+{
+  "analysis_timestamp": "2026-06-14T01:44:34.704505+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "VIGIA-REAL-NROMANOFF",
+    "end_time": "2026-06-14T01:44:34.704509+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "VIGIA-REAL-NROMANOFF",
+        "entry_sha256": "4512c2fab0477be076adbb1e7266e0086e1e1e1bf7ece5fb7eb202fa9025dbab",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "VIGIA-REAL-NROMANOFF"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: 4eeafb3bfb155486...",
+        "outputs_summary": {
+          "agent_sha256": "4eeafb3bfb155486142942ad7a2c8678676f86ffd5d076882459354d820591f6",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-06-14T01:44:34.701078+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-REAL-NROMANOFF",
+        "entry_sha256": "345b825ca113f9fdf73bf5066072a93335184a2d6a139563579e41b89636369e",
+        "inputs_summary": {
+          "path": "data/cases/converted/VIGIA-REAL-NROMANOFF.json"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-06-14T01:44:34.701152+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-REAL-NROMANOFF",
+        "entry_sha256": "032971f6429cd28f06d8a451363f5eccff825834aba94a01a317f400bc3b7428",
+        "inputs_summary": {
+          "path": "data/cases/converted/VIGIA-REAL-NROMANOFF.json"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: cdcaac23c1f4d232...",
+        "outputs_summary": {
+          "sha256": "cdcaac23c1f4d232c3a8fdea4827c61e7df3818e31a965509eeb8a6bde21ff48"
+        },
+        "seq": 3,
+        "timestamp": "2026-06-14T01:44:34.701726+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "VIGIA-REAL-NROMANOFF",
+        "entry_sha256": "f53457b7150ab068e68a1006d6cd9ae0b3bd3054b4e4a9b3fdfbd6a5740f845d",
+        "inputs_summary": {
+          "evidence": "data/cases/converted/VIGIA-REAL-NROMANOFF.json",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-06-14T01:44:34.701829+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "VIGIA-REAL-NROMANOFF",
+        "entry_sha256": "61d3685e50b75e2ce3863430c85bb01e5e3c7be9bf6c35e64a070f09966465e5",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 5 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+            "best_posterior": "6471/50000",
+            "confidence": "6471/50000",
+            "is_conclusive": "True",
+            "narrative": "Natasha Romanoff (nromanoff), Executive at Stark Research Labs (OU=Executives, DC=shieldbase DC=local), Windows 7 SP1 x86 workstation WKS-WIN732BITA. Zeus banking trojan confirmed by Volatility zeus-a..."
+          },
+          "case_id": "VIGIA-REAL-NROMANOFF",
+          "pipeline_meta": {
+            "artifact_count": "5",
+            "avg_score": "6471/10000",
+            "expected_verdict": "MALICE",
+            "source": "ebs_v1_json_adapter"
+          },
+          "signals": [
+            {
+              "artifact_id": "ART-001",
+              "confidence": "19/20",
+              "description": "Zeus banking trojan: Inline/Trampoline hooks on ntdll.dll!NtCreateThread (0x7c90d7d2 \u2192 JMP 0x7e3b47) and ntdll.dll!NtQueryDirectoryFile in services.exe PID 676. Hook destination 0x7e3b47 is in unknown",
+              "evidence_type": "memory_process",
+              "source": "Volatility/zeus-apihooks",
+              "z_score": "1843/2000"
+            },
+            {
+              "artifact_id": "ART-002",
+              "confidence": "93/100",
+              "description": "Persistence binary a.exe executed every 65 seconds from C:\\Users\\VIBRAN~1\\AppData\\Local\\Temp\\a.exe (shimcachemem: 29+ entries, 2012-04-06 20:25:30 to 20:52:56). Disk shimcache shows same binary at C:\\",
+              "evidence_type": "file_metadata",
+              "source": "Volatility/shimcachemem + AppCompatCache",
+              "z_score": "4371/5000"
+            },
+            {
+              "artifact_id": "ART-003",
+              "confidence": "9/10",
+              "description": "Group Policy Event 5017: CN=Natasha Romanoff OU=Executives DC=shieldbase DC=local \u2014 confirms executive target in high-value OU. CertEnroll Events 64/65 for nromanoff at 05:52 and 13:52 UTC \u2014 certifica",
+              "evidence_type": "log_entry",
+              "source": "Plaso/WinEVTX",
+              "z_score": "99/125"
+            },
+            {
+              "artifact_id": "ART-004",
+              "confidence": "0",
+              "description": "shimcachemem entry 20: f-response-ent.exe (2012-02-27 17:54:36) \u2014 F-Response Enterprise forensic acquisition tool present on victim machine. This is the tool used to acquire the memory image, meaning ",
+              "evidence_type": "acquisition_context",
+              "source": "Volatility/shimcachemem",
+              "z_score": "0"
+            },
+            {
+              "artifact_id": "ART-005",
+              "confidence": "41/50",
+              "description": "IE cache: Twitter profile images fetched from a0.twimg.com at 00:25 and 08:34 UTC \u2014 ~8 hours apart. Cache directory 201RVRNG contains _ndice_normal[1].jpg (762 bytes) and 336922595_normal[1].jpg (825 ",
+              "evidence_type": "network_flow",
+              "source": "Plaso/MSIE Cache",
+              "z_score": "3239/5000"
+            }
+          ]
+        },
+        "seq": 5,
+        "timestamp": "2026-06-14T01:44:34.704166+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "VIGIA-REAL-NROMANOFF",
+        "entry_sha256": "d18b9dd68a22bffda2dd7815f6386242f4c0c6ad400037bde00ccabaf73d1497",
+        "inputs_summary": {
+          "n_signals": "5"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-06-14T01:44:34.704327+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "VIGIA-REAL-NROMANOFF",
+        "entry_sha256": "b2ae1da70b58c2ea7431c2789949140cca5dbe2d62e100ac788432c6f2bb044e",
+        "inputs_summary": {
+          "verdict": "MALICIOUS_INTENT_DETECTED"
+        },
+        "iteration": 0,
+        "note": "Exit code 1 \u2014 analysis complete.",
+        "outputs_summary": {
+          "exit_code": "1"
+        },
+        "seq": 7,
+        "timestamp": "2026-06-14T01:44:34.704414+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-06-14T01:44:34.700870+00:00",
+    "total_entries": 7
+  },
+  "case_id": "VIGIA-REAL-NROMANOFF",
+  "evidence_path": "data/cases/converted/VIGIA-REAL-NROMANOFF.json",
+  "evidence_sha256": "cdcaac23c1f4d232c3a8fdea4827c61e7df3818e31a965509eeb8a6bde21ff48",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-REAL-NROMANOFF ===\nEvidence: data/cases/converted/VIGIA-REAL-NROMANOFF.json\nEvidence SHA-256: cdcaac23c1f4d232c3a8fdea4827c61e7df3818e31a965509eeb8a6bde21ff48\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 6471/50000\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\nNatasha Romanoff (nromanoff), Executive at Stark Research Labs (OU=Executives, DC=shieldbase DC=local), Windows 7 SP1 x86 workstation WKS-WIN732BITA. Zeus banking trojan confirmed by Volatility zeus-apihooks. Inline/Trampoline hooks on ntdll.dll!NtCreateThread and NtQueryDirectoryFile in services.exe (PID 676) redirect to unknown module at 0x7e3b47 \u2014 kernel-level process hiding. Persistence binary a.exe runs every 65 seconds from C:\\Users\\VIBRAN~1\\AppData\\Local\\Temp\\ (shimcachemem, 29+ entries) \n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Zeus banking trojan: Inline/Trampoline hooks on ntdll.dll!NtCreateThre] z=0.921 conf=0.95 \u2014 \n  [Persistence binary a.exe executed every 65 seconds from C:\\Users\\VIBRA] z=0.874 conf=0.93 \u2014 \n  [Group Policy Event 5017: CN=Natasha Romanoff OU=Executives DC=shieldba] z=0.792 conf=0.90 \u2014 \n  [IE cache: Twitter profile images fetched from a0.twimg.com at 00:25 an] z=0.648 conf=0.82 \u2014 \n  [shimcachemem entry 20: f-response-ent.exe (2012-02-27 17:54:36) \u2014 F-Re] z=0.000 conf=0.00 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW \u2014 No significant anomalies detected in this iteration.\n\nCritical signals (z>3): 0\nHigh signals (2<z<=3): 0\nTotal signals analyzed: 5",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+      "best_posterior": "6471/50000",
+      "confidence": {
+        "__fraction__": true,
+        "den": 50000,
+        "num": 6471
+      },
+      "is_conclusive": true,
+      "narrative": "Natasha Romanoff (nromanoff), Executive at Stark Research Labs (OU=Executives, DC=shieldbase DC=local), Windows 7 SP1 x86 workstation WKS-WIN732BITA. Zeus banking trojan confirmed by Volatility zeus-apihooks. Inline/Trampoline hooks on ntdll.dll!NtCreateThread and NtQueryDirectoryFile in services.exe (PID 676) redirect to unknown module at 0x7e3b47 \u2014 kernel-level process hiding. Persistence binary a.exe runs every 65 seconds from C:\\Users\\VIBRAN~1\\AppData\\Local\\Temp\\ (shimcachemem, 29+ entries) "
+    },
+    "case_id": "VIGIA-REAL-NROMANOFF",
+    "pipeline_meta": {
+      "artifact_count": 5,
+      "avg_score": "6471/10000",
+      "expected_verdict": "MALICE",
+      "source": "ebs_v1_json_adapter"
+    },
+    "signals": [
+      {
+        "artifact_id": "ART-001",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 19
+        },
+        "description": "Zeus banking trojan: Inline/Trampoline hooks on ntdll.dll!NtCreateThread (0x7c90d7d2 \u2192 JMP 0x7e3b47) and ntdll.dll!NtQueryDirectoryFile in services.exe PID 676. Hook destination 0x7e3b47 is in unknown",
+        "evidence_type": "memory_process",
+        "source": "Volatility/zeus-apihooks",
+        "z_score": {
+          "__fraction__": true,
+          "den": 2000,
+          "num": 1843
+        }
+      },
+      {
+        "artifact_id": "ART-002",
+        "confidence": {
+          "__fraction__": true,
+          "den": 100,
+          "num": 93
+        },
+        "description": "Persistence binary a.exe executed every 65 seconds from C:\\Users\\VIBRAN~1\\AppData\\Local\\Temp\\a.exe (shimcachemem: 29+ entries, 2012-04-06 20:25:30 to 20:52:56). Disk shimcache shows same binary at C:\\",
+        "evidence_type": "file_metadata",
+        "source": "Volatility/shimcachemem + AppCompatCache",
+        "z_score": {
+          "__fraction__": true,
+          "den": 5000,
+          "num": 4371
+        }
+      },
+      {
+        "artifact_id": "ART-003",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 9
+        },
+        "description": "Group Policy Event 5017: CN=Natasha Romanoff OU=Executives DC=shieldbase DC=local \u2014 confirms executive target in high-value OU. CertEnroll Events 64/65 for nromanoff at 05:52 and 13:52 UTC \u2014 certifica",
+        "evidence_type": "log_entry",
+        "source": "Plaso/WinEVTX",
+        "z_score": {
+          "__fraction__": true,
+          "den": 125,
+          "num": 99
+        }
+      },
+      {
+        "artifact_id": "ART-004",
+        "confidence": {
+          "__fraction__": true,
+          "den": 1,
+          "num": 0
+        },
+        "description": "shimcachemem entry 20: f-response-ent.exe (2012-02-27 17:54:36) \u2014 F-Response Enterprise forensic acquisition tool present on victim machine. This is the tool used to acquire the memory image, meaning ",
+        "evidence_type": "acquisition_context",
+        "source": "Volatility/shimcachemem",
+        "z_score": {
+          "__fraction__": true,
+          "den": 1,
+          "num": 0
+        }
+      },
+      {
+        "artifact_id": "ART-005",
+        "confidence": {
+          "__fraction__": true,
+          "den": 50,
+          "num": 41
+        },
+        "description": "IE cache: Twitter profile images fetched from a0.twimg.com at 00:25 and 08:34 UTC \u2014 ~8 hours apart. Cache directory 201RVRNG contains _ndice_normal[1].jpg (762 bytes) and 336922595_normal[1].jpg (825 ",
+        "evidence_type": "network_flow",
+        "source": "Plaso/MSIE Cache",
+        "z_score": {
+          "__fraction__": true,
+          "den": 5000,
+          "num": 3239
+        }
+      }
+    ]
+  },
+  "sans_compliance": {
+    "accuracy_validation": false,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}

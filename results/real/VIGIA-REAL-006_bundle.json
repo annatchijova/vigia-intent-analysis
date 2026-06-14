@@ -1,0 +1,297 @@
+{
+  "analysis_timestamp": "2026-06-14T01:44:34.375254+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "VIGIA-REAL-006",
+    "end_time": "2026-06-14T01:44:34.375258+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "VIGIA-REAL-006",
+        "entry_sha256": "8677379e2550d556f54aaadf7a4e225537e5c35f57f908b94983e893faf4072c",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "VIGIA-REAL-006"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: 4eeafb3bfb155486...",
+        "outputs_summary": {
+          "agent_sha256": "4eeafb3bfb155486142942ad7a2c8678676f86ffd5d076882459354d820591f6",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-06-14T01:44:34.371923+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-REAL-006",
+        "entry_sha256": "d3d33b1dd0f34e5012cc1ced2a96399a5f9f9f5eb0b66acc55fb3eea8cab26bb",
+        "inputs_summary": {
+          "path": "data/cases/converted/VIGIA-REAL-006.json"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-06-14T01:44:34.371998+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-REAL-006",
+        "entry_sha256": "91d9f4faadb58e688c3bda6467980b178d9c3740d270887c63bfbf42e4b6ec75",
+        "inputs_summary": {
+          "path": "data/cases/converted/VIGIA-REAL-006.json"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: 1a557ac7a79b2afc...",
+        "outputs_summary": {
+          "sha256": "1a557ac7a79b2afc2149d50c68f253016e818ecb6a3dbd7ca91edd9f476d006b"
+        },
+        "seq": 3,
+        "timestamp": "2026-06-14T01:44:34.372528+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "VIGIA-REAL-006",
+        "entry_sha256": "cbe5e479f0d1ce6eef9572de459b72fbe72e91551b01a9d8df2114e0c384175c",
+        "inputs_summary": {
+          "evidence": "data/cases/converted/VIGIA-REAL-006.json",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-06-14T01:44:34.372628+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "VIGIA-REAL-006",
+        "entry_sha256": "7302b02565e956827cebd4190385c1143b6bb6016efadd862afb60977fe9a459",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 5 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+            "best_posterior": "82/625",
+            "confidence": "82/625",
+            "is_conclusive": "True",
+            "narrative": "CFO Jean Jones of M57.Biz received spoofed emails apparently from president Alison requesting a spreadsheet with confidential employee data. The attacker manipulated the Reply-To to exfiltrate the dat..."
+          },
+          "case_id": "VIGIA-REAL-006",
+          "pipeline_meta": {
+            "artifact_count": "5",
+            "avg_score": "82/125",
+            "expected_verdict": "MALICE",
+            "source": "ebs_v1_json_adapter"
+          },
+          "signals": [
+            {
+              "artifact_id": "ART-001",
+              "confidence": "7/10",
+              "description": "Email #1: From: alison@m57.biz | To: jean@m57.biz | Date: 2008-07-19 16:39:57 PDT | Subject: background checks | Return-Path: simsong@xy.dreamhostps.com [SPOOFED] | Reply-To: alison@m57.biz (legitimat",
+              "evidence_type": "log_entry",
+              "source": "legacy_converter",
+              "z_score": "49/100"
+            },
+            {
+              "artifact_id": "ART-002",
+              "confidence": "17/20",
+              "description": "Email #2: From: alison@m57.biz | To: jean@m57.biz | Date: 2008-07-19 18:22:45 PDT | Subject: Please send me the information now | Return-Path: simsong@xy.dreamhostps.com [SPOOFED] | Reply-To: tuckergo",
+              "evidence_type": "log_entry",
+              "source": "legacy_converter",
+              "z_score": "289/400"
+            },
+            {
+              "artifact_id": "ART-003",
+              "confidence": "7/10",
+              "description": "File: m57biz.xls | Location: Jean's Desktop (C:/Documents and Settings/Jean/Desktop/) | Creation date: 07/20/2008 1:28:03 AM GMT | Encrypted: No | Content: Names, positions, salaries ($1,009,000 total",
+              "evidence_type": "file_timestamp",
+              "source": "legacy_converter",
+              "z_score": "49/100"
+            },
+            {
+              "artifact_id": "ART-004",
+              "confidence": "17/20",
+              "description": "Alison's reply to Jean: 'What's a sure thing?' (16:50:20 PDT) | Exfiltration email: Jean \u2192 tuckergorge@gmail.com with attachment M57biz.xls (18:28:45 PDT) | Attacker's email #3: 'Thanks!' (22:03:40 PD",
+              "evidence_type": "log_entry",
+              "source": "legacy_converter",
+              "z_score": "289/400"
+            },
+            {
+              "artifact_id": "ART-005",
+              "confidence": "9/10",
+              "description": "Deleted system binaries: ipconfig.exe, net.exe | AIM6 installed with suspicious toolbar bundles | Cached HTML files: rcstatus.htm, InstallStatus[1].htm (fake Microsoft prompts) | Remote Assistance art",
+              "evidence_type": "memory_process",
+              "source": "legacy_converter",
+              "z_score": "171/200"
+            }
+          ]
+        },
+        "seq": 5,
+        "timestamp": "2026-06-14T01:44:34.374926+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "VIGIA-REAL-006",
+        "entry_sha256": "82d7eae99b391367ff4d4b00a79ab69ae4ab03bdf8858c8910bd26a515be0cc4",
+        "inputs_summary": {
+          "n_signals": "5"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-06-14T01:44:34.375083+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "VIGIA-REAL-006",
+        "entry_sha256": "64e0fc761be3ac0181efedaf384f3f3360f3b86365aaf58838aacc8392af336a",
+        "inputs_summary": {
+          "verdict": "MALICIOUS_INTENT_DETECTED"
+        },
+        "iteration": 0,
+        "note": "Exit code 1 \u2014 analysis complete.",
+        "outputs_summary": {
+          "exit_code": "1"
+        },
+        "seq": 7,
+        "timestamp": "2026-06-14T01:44:34.375171+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-06-14T01:44:34.371720+00:00",
+    "total_entries": 7
+  },
+  "case_id": "VIGIA-REAL-006",
+  "evidence_path": "data/cases/converted/VIGIA-REAL-006.json",
+  "evidence_sha256": "1a557ac7a79b2afc2149d50c68f253016e818ecb6a3dbd7ca91edd9f476d006b",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-REAL-006 ===\nEvidence: data/cases/converted/VIGIA-REAL-006.json\nEvidence SHA-256: 1a557ac7a79b2afc2149d50c68f253016e818ecb6a3dbd7ca91edd9f476d006b\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 82/625\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\nCFO Jean Jones of M57.Biz received spoofed emails apparently from president Alison requesting a spreadsheet with confidential employee data. The attacker manipulated the Reply-To to exfiltrate the data to tuckergorge@gmail.com. Jean acted in good faith but the attack resulted in exfiltration of confidential documents.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Deleted system binaries: ipconfig.exe, net.exe | AIM6 installed with s] z=0.855 conf=0.90 \u2014 \n  [Email #2: From: alison@m57.biz | To: jean@m57.biz | Date: 2008-07-19 1] z=0.723 conf=0.85 \u2014 \n  [Alison's reply to Jean: 'What's a sure thing?' (16:50:20 PDT) | Exfilt] z=0.723 conf=0.85 \u2014 \n  [Email #1: From: alison@m57.biz | To: jean@m57.biz | Date: 2008-07-19 1] z=0.490 conf=0.70 \u2014 \n  [File: m57biz.xls | Location: Jean's Desktop (C:/Documents and Settings] z=0.490 conf=0.70 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW \u2014 No significant anomalies detected in this iteration.\n\nCritical signals (z>3): 0\nHigh signals (2<z<=3): 0\nTotal signals analyzed: 5",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+      "best_posterior": "82/625",
+      "confidence": {
+        "__fraction__": true,
+        "den": 625,
+        "num": 82
+      },
+      "is_conclusive": true,
+      "narrative": "CFO Jean Jones of M57.Biz received spoofed emails apparently from president Alison requesting a spreadsheet with confidential employee data. The attacker manipulated the Reply-To to exfiltrate the data to tuckergorge@gmail.com. Jean acted in good faith but the attack resulted in exfiltration of confidential documents."
+    },
+    "case_id": "VIGIA-REAL-006",
+    "pipeline_meta": {
+      "artifact_count": 5,
+      "avg_score": "82/125",
+      "expected_verdict": "MALICE",
+      "source": "ebs_v1_json_adapter"
+    },
+    "signals": [
+      {
+        "artifact_id": "ART-001",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 7
+        },
+        "description": "Email #1: From: alison@m57.biz | To: jean@m57.biz | Date: 2008-07-19 16:39:57 PDT | Subject: background checks | Return-Path: simsong@xy.dreamhostps.com [SPOOFED] | Reply-To: alison@m57.biz (legitimat",
+        "evidence_type": "log_entry",
+        "source": "legacy_converter",
+        "z_score": {
+          "__fraction__": true,
+          "den": 100,
+          "num": 49
+        }
+      },
+      {
+        "artifact_id": "ART-002",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 17
+        },
+        "description": "Email #2: From: alison@m57.biz | To: jean@m57.biz | Date: 2008-07-19 18:22:45 PDT | Subject: Please send me the information now | Return-Path: simsong@xy.dreamhostps.com [SPOOFED] | Reply-To: tuckergo",
+        "evidence_type": "log_entry",
+        "source": "legacy_converter",
+        "z_score": {
+          "__fraction__": true,
+          "den": 400,
+          "num": 289
+        }
+      },
+      {
+        "artifact_id": "ART-003",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 7
+        },
+        "description": "File: m57biz.xls | Location: Jean's Desktop (C:/Documents and Settings/Jean/Desktop/) | Creation date: 07/20/2008 1:28:03 AM GMT | Encrypted: No | Content: Names, positions, salaries ($1,009,000 total",
+        "evidence_type": "file_timestamp",
+        "source": "legacy_converter",
+        "z_score": {
+          "__fraction__": true,
+          "den": 100,
+          "num": 49
+        }
+      },
+      {
+        "artifact_id": "ART-004",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 17
+        },
+        "description": "Alison's reply to Jean: 'What's a sure thing?' (16:50:20 PDT) | Exfiltration email: Jean \u2192 tuckergorge@gmail.com with attachment M57biz.xls (18:28:45 PDT) | Attacker's email #3: 'Thanks!' (22:03:40 PD",
+        "evidence_type": "log_entry",
+        "source": "legacy_converter",
+        "z_score": {
+          "__fraction__": true,
+          "den": 400,
+          "num": 289
+        }
+      },
+      {
+        "artifact_id": "ART-005",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 9
+        },
+        "description": "Deleted system binaries: ipconfig.exe, net.exe | AIM6 installed with suspicious toolbar bundles | Cached HTML files: rcstatus.htm, InstallStatus[1].htm (fake Microsoft prompts) | Remote Assistance art",
+        "evidence_type": "memory_process",
+        "source": "legacy_converter",
+        "z_score": {
+          "__fraction__": true,
+          "den": 200,
+          "num": 171
+        }
+      }
+    ]
+  },
+  "sans_compliance": {
+    "accuracy_validation": false,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}

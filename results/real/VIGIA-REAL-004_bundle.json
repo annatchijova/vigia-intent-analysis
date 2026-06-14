@@ -1,0 +1,273 @@
+{
+  "analysis_timestamp": "2026-06-14T01:44:34.242390+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "VIGIA-REAL-004",
+    "end_time": "2026-06-14T01:44:34.242393+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "VIGIA-REAL-004",
+        "entry_sha256": "3e81bdc18c689fb564bc170de96766ec39041ddd219ebaf4119afea26929733f",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "VIGIA-REAL-004"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: 4eeafb3bfb155486...",
+        "outputs_summary": {
+          "agent_sha256": "4eeafb3bfb155486142942ad7a2c8678676f86ffd5d076882459354d820591f6",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-06-14T01:44:34.238983+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-REAL-004",
+        "entry_sha256": "2236412045da4a0c141a1d91dab3114abcff5722484e9f6fb1b1d6e1e4e29677",
+        "inputs_summary": {
+          "path": "data/cases/converted/VIGIA-REAL-004.json"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-06-14T01:44:34.239055+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-REAL-004",
+        "entry_sha256": "5debeba2efcf6dc507fab968a00fa8097248ac3d35e01eb31032acdfdd1a6af5",
+        "inputs_summary": {
+          "path": "data/cases/converted/VIGIA-REAL-004.json"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: 1cea60b7e5006852...",
+        "outputs_summary": {
+          "sha256": "1cea60b7e5006852249ea14acd6d3716fd2984bbdaf614852976b5d9edb760fc"
+        },
+        "seq": 3,
+        "timestamp": "2026-06-14T01:44:34.239587+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "VIGIA-REAL-004",
+        "entry_sha256": "a43e4c0a909fe9e2c0c3ff332467e4cdd8f2493dc57b4e0ab247a83c267b5cfa",
+        "inputs_summary": {
+          "evidence": "data/cases/converted/VIGIA-REAL-004.json",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-06-14T01:44:34.239692+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "VIGIA-REAL-004",
+        "entry_sha256": "400c27fe18382ddbafeb515f2df6638fa311aa20ca111c82f6e0683fd52ab621",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 4 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+            "best_posterior": "279/2000",
+            "confidence": "279/2000",
+            "is_conclusive": "True",
+            "narrative": "A user downloaded what they believed was the SysInternals Suite but was actually a malware downloader. The system became slow and unresponsive after execution. The malware modified the hosts file, dow..."
+          },
+          "case_id": "VIGIA-REAL-004",
+          "pipeline_meta": {
+            "artifact_count": "4",
+            "avg_score": "279/400",
+            "expected_verdict": "MALICE",
+            "source": "ebs_v1_json_adapter"
+          },
+          "signals": [
+            {
+              "artifact_id": "ART-001",
+              "confidence": "7/10",
+              "description": "File: C:\\Users\\Public\\Downloads\\SysInternals.exe | VT hash: 72e6d1728a546c2f3ee32c063ed09fa6ba8c46ac33b0dd2e354087c1ad26ef48 | Spoofed version info: CompanyName='SysInternals, Inc.', FileDescription='",
+              "evidence_type": "file_timestamp",
+              "source": "legacy_converter",
+              "z_score": "49/100"
+            },
+            {
+              "artifact_id": "ART-002",
+              "confidence": "17/20",
+              "description": "UTC Timeline: 2022-11-15 21:16:08 - IEUser logon | 21:17:03 - PowerShell modifies Defender and hosts file | 21:18:40 - SysInternals.exe download via MSEdge | 21:19:00 - Double-click SysInternals.exe |",
+              "evidence_type": "file_timestamp",
+              "source": "legacy_converter",
+              "z_score": "289/400"
+            },
+            {
+              "artifact_id": "ART-003",
+              "confidence": "17/20",
+              "description": "Executable strings: 'c:\\Windows\\vmtoolsIO.exe' | 'c:\\Windows\\' | '/C c:\\Windows\\vmtoolsIO.exe -install && net start VMwareIOHelperService && sc config VMwareIOHelperService start= auto' | Hosts modifi",
+              "evidence_type": "log_entry",
+              "source": "legacy_converter",
+              "z_score": "289/400"
+            },
+            {
+              "artifact_id": "ART-004",
+              "confidence": "9/10",
+              "description": "Malicious service installed: Name='VMwareIOHelperService', Executable='c:\\Windows\\vmtoolsIO.exe', StartType=auto | USN Journal: Creation and deletion of SysInternals.exe | Deleted prefetch: *.pf remov",
+              "evidence_type": "registry_key",
+              "source": "legacy_converter",
+              "z_score": "171/200"
+            }
+          ]
+        },
+        "seq": 5,
+        "timestamp": "2026-06-14T01:44:34.242069+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "VIGIA-REAL-004",
+        "entry_sha256": "b156bd3cfa2ce82c1f9d9f4e87de346730035390ee5e95f432287fcc3c20ab79",
+        "inputs_summary": {
+          "n_signals": "4"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-06-14T01:44:34.242178+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "VIGIA-REAL-004",
+        "entry_sha256": "73feea08b9e175510ed264e821da5bbae58b78e9c69b348f2b4afcdd998343a4",
+        "inputs_summary": {
+          "verdict": "MALICIOUS_INTENT_DETECTED"
+        },
+        "iteration": 0,
+        "note": "Exit code 1 \u2014 analysis complete.",
+        "outputs_summary": {
+          "exit_code": "1"
+        },
+        "seq": 7,
+        "timestamp": "2026-06-14T01:44:34.242314+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-06-14T01:44:34.238777+00:00",
+    "total_entries": 7
+  },
+  "case_id": "VIGIA-REAL-004",
+  "evidence_path": "data/cases/converted/VIGIA-REAL-004.json",
+  "evidence_sha256": "1cea60b7e5006852249ea14acd6d3716fd2984bbdaf614852976b5d9edb760fc",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-REAL-004 ===\nEvidence: data/cases/converted/VIGIA-REAL-004.json\nEvidence SHA-256: 1cea60b7e5006852249ea14acd6d3716fd2984bbdaf614852976b5d9edb760fc\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 279/2000\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\nA user downloaded what they believed was the SysInternals Suite but was actually a malware downloader. The system became slow and unresponsive after execution. The malware modified the hosts file, downloaded a secondary payload, and installed it as a fake Windows service.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Malicious service installed: Name='VMwareIOHelperService', Executable=] z=0.855 conf=0.90 \u2014 \n  [UTC Timeline: 2022-11-15 21:16:08 - IEUser logon | 21:17:03 - PowerShe] z=0.723 conf=0.85 \u2014 \n  [Executable strings: 'c:\\Windows\\vmtoolsIO.exe' | 'c:\\Windows\\' | '/C c] z=0.723 conf=0.85 \u2014 \n  [File: C:\\Users\\Public\\Downloads\\SysInternals.exe | VT hash: 72e6d1728a] z=0.490 conf=0.70 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW \u2014 No significant anomalies detected in this iteration.\n\nCritical signals (z>3): 0\nHigh signals (2<z<=3): 0\nTotal signals analyzed: 4",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+      "best_posterior": "279/2000",
+      "confidence": {
+        "__fraction__": true,
+        "den": 2000,
+        "num": 279
+      },
+      "is_conclusive": true,
+      "narrative": "A user downloaded what they believed was the SysInternals Suite but was actually a malware downloader. The system became slow and unresponsive after execution. The malware modified the hosts file, downloaded a secondary payload, and installed it as a fake Windows service."
+    },
+    "case_id": "VIGIA-REAL-004",
+    "pipeline_meta": {
+      "artifact_count": 4,
+      "avg_score": "279/400",
+      "expected_verdict": "MALICE",
+      "source": "ebs_v1_json_adapter"
+    },
+    "signals": [
+      {
+        "artifact_id": "ART-001",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 7
+        },
+        "description": "File: C:\\Users\\Public\\Downloads\\SysInternals.exe | VT hash: 72e6d1728a546c2f3ee32c063ed09fa6ba8c46ac33b0dd2e354087c1ad26ef48 | Spoofed version info: CompanyName='SysInternals, Inc.', FileDescription='",
+        "evidence_type": "file_timestamp",
+        "source": "legacy_converter",
+        "z_score": {
+          "__fraction__": true,
+          "den": 100,
+          "num": 49
+        }
+      },
+      {
+        "artifact_id": "ART-002",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 17
+        },
+        "description": "UTC Timeline: 2022-11-15 21:16:08 - IEUser logon | 21:17:03 - PowerShell modifies Defender and hosts file | 21:18:40 - SysInternals.exe download via MSEdge | 21:19:00 - Double-click SysInternals.exe |",
+        "evidence_type": "file_timestamp",
+        "source": "legacy_converter",
+        "z_score": {
+          "__fraction__": true,
+          "den": 400,
+          "num": 289
+        }
+      },
+      {
+        "artifact_id": "ART-003",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 17
+        },
+        "description": "Executable strings: 'c:\\Windows\\vmtoolsIO.exe' | 'c:\\Windows\\' | '/C c:\\Windows\\vmtoolsIO.exe -install && net start VMwareIOHelperService && sc config VMwareIOHelperService start= auto' | Hosts modifi",
+        "evidence_type": "log_entry",
+        "source": "legacy_converter",
+        "z_score": {
+          "__fraction__": true,
+          "den": 400,
+          "num": 289
+        }
+      },
+      {
+        "artifact_id": "ART-004",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 9
+        },
+        "description": "Malicious service installed: Name='VMwareIOHelperService', Executable='c:\\Windows\\vmtoolsIO.exe', StartType=auto | USN Journal: Creation and deletion of SysInternals.exe | Deleted prefetch: *.pf remov",
+        "evidence_type": "registry_key",
+        "source": "legacy_converter",
+        "z_score": {
+          "__fraction__": true,
+          "den": 200,
+          "num": 171
+        }
+      }
+    ]
+  },
+  "sans_compliance": {
+    "accuracy_validation": false,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}

@@ -1,0 +1,273 @@
+{
+  "analysis_timestamp": "2026-06-14T01:44:34.901636+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "VIGIA-REAL-ROCBA",
+    "end_time": "2026-06-14T01:44:34.901640+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "VIGIA-REAL-ROCBA",
+        "entry_sha256": "9d7b57c2d23176dfeccffefe0fae78bc84ad624db253ecef753cc09d83aac6bc",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "VIGIA-REAL-ROCBA"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: 4eeafb3bfb155486...",
+        "outputs_summary": {
+          "agent_sha256": "4eeafb3bfb155486142942ad7a2c8678676f86ffd5d076882459354d820591f6",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-06-14T01:44:34.898411+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-REAL-ROCBA",
+        "entry_sha256": "a9c5208b5749034d03f904cc199595149df63f5aa3c933b2d88afbc566715b38",
+        "inputs_summary": {
+          "path": "data/cases/converted/VIGIA-REAL-ROCBA.json"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-06-14T01:44:34.898502+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-REAL-ROCBA",
+        "entry_sha256": "e0ac31f26a6c4290565bd07bf0fa279330835e8c01ec31a2e3660178925924c1",
+        "inputs_summary": {
+          "path": "data/cases/converted/VIGIA-REAL-ROCBA.json"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: 214a4de606bb55e8...",
+        "outputs_summary": {
+          "sha256": "214a4de606bb55e87b9158dce30cd5568470ef058780091c885b48223cbc2d75"
+        },
+        "seq": 3,
+        "timestamp": "2026-06-14T01:44:34.899067+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "VIGIA-REAL-ROCBA",
+        "entry_sha256": "09076fe5d20af158f666d94415925bfdc28679ccd92a07a13b05c20efcbfba86",
+        "inputs_summary": {
+          "evidence": "data/cases/converted/VIGIA-REAL-ROCBA.json",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-06-14T01:44:34.899164+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "VIGIA-REAL-ROCBA",
+        "entry_sha256": "9f330339cf98c247a45c1c5045a6e9e771c01c44e9563124701211327505c217",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 4 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+            "best_posterior": "22621/200000",
+            "confidence": "22621/200000",
+            "is_conclusive": "True",
+            "narrative": "User 'fredr', Windows 10 x64 build 19041 (20H2), hostname unknown. IP 192.168.1.5. Memory dump 2020-11-16 02:32:38 UTC (18 GB raw). MRC.exe (VB6, 32-bit, no-ASLR) launched from D:\\Tools\\ 83 seconds be..."
+          },
+          "case_id": "VIGIA-REAL-ROCBA",
+          "pipeline_meta": {
+            "artifact_count": "4",
+            "avg_score": "22621/40000",
+            "expected_verdict": "MALICE",
+            "source": "ebs_v1_json_adapter"
+          },
+          "signals": [
+            {
+              "artifact_id": "ART-001",
+              "confidence": "39/50",
+              "description": "MRC.exe (PID 29440) launched from D:\\Tools\\MRC.exe at 2020-11-16 02:31:15 UTC \u2014 83 seconds before memory acquisition at 02:32:38. Written in Visual Basic 6 (MSVBVM60.DLL). 32-bit process on 64-bit sys",
+              "evidence_type": "memory_process",
+              "source": "Volatility3/dlllist+pstree",
+              "z_score": "1599/2500"
+            },
+            {
+              "artifact_id": "ART-002",
+              "confidence": "4/5",
+              "description": "SearchApp.exe (PID 8312) has 4 PAGE_EXECUTE_READWRITE memory regions not backed by files on disk. Region 0x255fe730000: contains trampolining shellcode pattern \u2014 'MOV RAX, addr; JMP RAX' (48 B8 xx xx ",
+              "evidence_type": "memory_process",
+              "source": "Volatility3/malfind",
+              "z_score": "17/25"
+            },
+            {
+              "artifact_id": "ART-003",
+              "confidence": "3/4",
+              "description": "SearchFilterHost.exe (PID 24920) has TCP ESTABLISHED connection to 52.113.194.132:443. SearchFilterHost is a Windows Search subprocess (child of SearchIndexer) \u2014 it processes search filter handlers fo",
+              "evidence_type": "network_flow",
+              "source": "Volatility3/netscan",
+              "z_score": "117/200"
+            },
+            {
+              "artifact_id": "ART-004",
+              "confidence": "13/20",
+              "description": "Five cloud sync processes active with established/recent connections: OneDrive (PID 9648) to 13.107.136.9:443, Google Drive Sync (PID 8432) to 172.217.x.x:443, iCloudDrive (PID 13260) to 17.248.138.x:",
+              "evidence_type": "network_flow",
+              "source": "Volatility3/netscan",
+              "z_score": "143/400"
+            }
+          ]
+        },
+        "seq": 5,
+        "timestamp": "2026-06-14T01:44:34.901303+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "VIGIA-REAL-ROCBA",
+        "entry_sha256": "1265af3e6c9095ad2ab15988940737e7145cfd86d5cc7dc54c08abe4059b5bf9",
+        "inputs_summary": {
+          "n_signals": "4"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-06-14T01:44:34.901413+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "VIGIA-REAL-ROCBA",
+        "entry_sha256": "5f2248fbb6cf8bdb675857cc9c07ec6034e7e387ffbdf2d530ec4090e29e5e9b",
+        "inputs_summary": {
+          "verdict": "MALICIOUS_INTENT_DETECTED"
+        },
+        "iteration": 0,
+        "note": "Exit code 1 \u2014 analysis complete.",
+        "outputs_summary": {
+          "exit_code": "1"
+        },
+        "seq": 7,
+        "timestamp": "2026-06-14T01:44:34.901558+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-06-14T01:44:34.898206+00:00",
+    "total_entries": 7
+  },
+  "case_id": "VIGIA-REAL-ROCBA",
+  "evidence_path": "data/cases/converted/VIGIA-REAL-ROCBA.json",
+  "evidence_sha256": "214a4de606bb55e87b9158dce30cd5568470ef058780091c885b48223cbc2d75",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-REAL-ROCBA ===\nEvidence: data/cases/converted/VIGIA-REAL-ROCBA.json\nEvidence SHA-256: 214a4de606bb55e87b9158dce30cd5568470ef058780091c885b48223cbc2d75\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 22621/200000\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\nUser 'fredr', Windows 10 x64 build 19041 (20H2), hostname unknown. IP 192.168.1.5. Memory dump 2020-11-16 02:32:38 UTC (18 GB raw). MRC.exe (VB6, 32-bit, no-ASLR) launched from D:\\Tools\\ 83 seconds before dump. DLL LoadTime timestamps all zeroed (epochs 1600-1718) \u2014 temporal impossibility. SearchApp.exe (PID 8312) has 4 PAGE_EXECUTE_READWRITE regions \u2014 possible injected shellcode. SearchFilterHost (PID 24920) has ESTABLISHED TCP connection to 52.113.194.132:443 (Microsoft Azure) \u2014 unusual for in\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [SearchApp.exe (PID 8312) has 4 PAGE_EXECUTE_READWRITE memory regions n] z=0.680 conf=0.80 \u2014 \n  [MRC.exe (PID 29440) launched from D:\\Tools\\MRC.exe at 2020-11-16 02:31] z=0.640 conf=0.78 \u2014 \n  [SearchFilterHost.exe (PID 24920) has TCP ESTABLISHED connection to 52.] z=0.585 conf=0.75 \u2014 \n  [Five cloud sync processes active with established/recent connections: ] z=0.357 conf=0.65 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW \u2014 No significant anomalies detected in this iteration.\n\nCritical signals (z>3): 0\nHigh signals (2<z<=3): 0\nTotal signals analyzed: 4",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+      "best_posterior": "22621/200000",
+      "confidence": {
+        "__fraction__": true,
+        "den": 200000,
+        "num": 22621
+      },
+      "is_conclusive": true,
+      "narrative": "User 'fredr', Windows 10 x64 build 19041 (20H2), hostname unknown. IP 192.168.1.5. Memory dump 2020-11-16 02:32:38 UTC (18 GB raw). MRC.exe (VB6, 32-bit, no-ASLR) launched from D:\\Tools\\ 83 seconds before dump. DLL LoadTime timestamps all zeroed (epochs 1600-1718) \u2014 temporal impossibility. SearchApp.exe (PID 8312) has 4 PAGE_EXECUTE_READWRITE regions \u2014 possible injected shellcode. SearchFilterHost (PID 24920) has ESTABLISHED TCP connection to 52.113.194.132:443 (Microsoft Azure) \u2014 unusual for in"
+    },
+    "case_id": "VIGIA-REAL-ROCBA",
+    "pipeline_meta": {
+      "artifact_count": 4,
+      "avg_score": "22621/40000",
+      "expected_verdict": "MALICE",
+      "source": "ebs_v1_json_adapter"
+    },
+    "signals": [
+      {
+        "artifact_id": "ART-001",
+        "confidence": {
+          "__fraction__": true,
+          "den": 50,
+          "num": 39
+        },
+        "description": "MRC.exe (PID 29440) launched from D:\\Tools\\MRC.exe at 2020-11-16 02:31:15 UTC \u2014 83 seconds before memory acquisition at 02:32:38. Written in Visual Basic 6 (MSVBVM60.DLL). 32-bit process on 64-bit sys",
+        "evidence_type": "memory_process",
+        "source": "Volatility3/dlllist+pstree",
+        "z_score": {
+          "__fraction__": true,
+          "den": 2500,
+          "num": 1599
+        }
+      },
+      {
+        "artifact_id": "ART-002",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 4
+        },
+        "description": "SearchApp.exe (PID 8312) has 4 PAGE_EXECUTE_READWRITE memory regions not backed by files on disk. Region 0x255fe730000: contains trampolining shellcode pattern \u2014 'MOV RAX, addr; JMP RAX' (48 B8 xx xx ",
+        "evidence_type": "memory_process",
+        "source": "Volatility3/malfind",
+        "z_score": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 17
+        }
+      },
+      {
+        "artifact_id": "ART-003",
+        "confidence": {
+          "__fraction__": true,
+          "den": 4,
+          "num": 3
+        },
+        "description": "SearchFilterHost.exe (PID 24920) has TCP ESTABLISHED connection to 52.113.194.132:443. SearchFilterHost is a Windows Search subprocess (child of SearchIndexer) \u2014 it processes search filter handlers fo",
+        "evidence_type": "network_flow",
+        "source": "Volatility3/netscan",
+        "z_score": {
+          "__fraction__": true,
+          "den": 200,
+          "num": 117
+        }
+      },
+      {
+        "artifact_id": "ART-004",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 13
+        },
+        "description": "Five cloud sync processes active with established/recent connections: OneDrive (PID 9648) to 13.107.136.9:443, Google Drive Sync (PID 8432) to 172.217.x.x:443, iCloudDrive (PID 13260) to 17.248.138.x:",
+        "evidence_type": "network_flow",
+        "source": "Volatility3/netscan",
+        "z_score": {
+          "__fraction__": true,
+          "den": 400,
+          "num": 143
+        }
+      }
+    ]
+  },
+  "sans_compliance": {
+    "accuracy_validation": false,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}

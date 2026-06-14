@@ -1,220 +1,297 @@
 {
-  "abduction_trace": {
-    "abort_reason": null,
-    "abort_triggered": false,
-    "anomalies_found": [],
-    "cluster_name": null,
-    "clustering_method": "heuristic_default",
-    "correlation_penalties_applied": false,
-    "dominant_signal": null,
-    "dominant_z_score": 0.0,
-    "execution_plan_rationale": [],
-    "inference_mode": "CLAUDE_CODE_MCP",
-    "peirce_firstness": "Corporate workstation with after-hours logon events, email exchange between spy.conspirator and jaman.informant requesting confidential data, confidential files renamed with false extensions (.docx->.mp3, .pptx->.jpg), Google Drive installed with personal Gmail for file upload, CCleaner and Eraser installed post-exfiltration, and secured network drive access with selective file copying.",
-    "peirce_secondness": "Multiple layers of deviation from legitimate corporate behavior: (1) after-hours access outside policy, (2) email correspondence with conspiratorial language requesting confidential data, (3) file extension masking is deliberate anti-forensic technique with zero legitimate use, (4) personal cloud storage on corporate machine for confidential files violates data handling policy, (5) anti-forensic tool installation immediately after exfiltration is a temporal concealment sequence.",
-    "peirce_thirdness": "Coordinated insider data exfiltration lifecycle: COLLECTION (secured drive access + selective file copying) -> STAGING (file extension masking to evade DLP) -> EXFILTRATION (personal Google Drive as C2 channel) -> CONCEALMENT (CCleaner + Eraser to destroy forensic traces). This four-phase pattern requires planning, tool acquisition, and awareness of forensic detection methods. The anti-forensic phase is the concealment layer that distinguishes INTENT from MALICE.",
-    "tools_available": [],
-    "tools_executed": [],
-    "tools_skipped": []
-  },
-  "actions": [],
-  "bundle_id": "df263778-765f-490c-8939-f2819c885d77",
-  "bundle_version": "1.0",
-  "caie_analysis": {
-    "caie_fractures": 0,
-    "caie_fractures_source": "live_caie",
+  "analysis_timestamp": "2026-06-14T01:44:34.106229+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
     "case_id": "VIGIA-REAL-002",
-    "composite_score": 0.2442,
-    "confidence": 0.49,
-    "hard_temporal_gate": false,
-    "mcp_tool_override": "CCleaner habit incongruence returned MALICE (85% compromise). Scorer SUSPICION at 0.2442 is conservative due to log_entry spoofability penalties. Analyst assessment: MALICE supported by anti-forensic concealment layer.",
-    "peirce_chain": {
-      "firstness": "Corporate workstation with after-hours logon events, email exchange between spy.conspirator and jaman.informant requesting confidential data, confidential files renamed with false extensions (.docx->.mp3, .pptx->.jpg), Google Drive installed with personal Gmail for file upload, CCleaner and Eraser installed post-exfiltration, and secured network drive access with selective file copying.",
-      "secondness": "Multiple layers of deviation from legitimate corporate behavior: (1) after-hours access outside policy, (2) email correspondence with conspiratorial language requesting confidential data, (3) file extension masking is deliberate anti-forensic technique with zero legitimate use, (4) personal cloud storage on corporate machine for confidential files violates data handling policy, (5) anti-forensic tool installation immediately after exfiltration is a temporal concealment sequence.",
-      "thirdness": "Coordinated insider data exfiltration lifecycle: COLLECTION (secured drive access + selective file copying) -> STAGING (file extension masking to evade DLP) -> EXFILTRATION (personal Google Drive as C2 channel) -> CONCEALMENT (CCleaner + Eraser to destroy forensic traces). This four-phase pattern requires planning, tool acquisition, and awareness of forensic detection methods. The anti-forensic phase is the concealment layer that distinguishes INTENT from MALICE."
-    },
-    "quadripartite_state": {
-      "abstain_reason": "Significant signal below MALICE threshold \u2014 corroboration required before forensic action.",
-      "action_required": "GATHER_MORE_EVIDENCE",
-      "adversarial_penalty_applied": false,
-      "analyst_summary": "Insufficient signals for a reliable verdict (confidence: 49%). See investigation roadmap for specific signals to pursue.",
-      "audit_hash": "eb159758d08a7c5b6c153e055f305ea4e5375374e73363db2aab34acbcbc472e",
-      "confidence_pct": 49,
-      "daubert_note": "Insufficient active signals to discriminate between hypotheses. Pivot signals identified \u2014 collect and re-enter into the system.",
-      "display_label": "\u26ab ABSTAIN \u2014 INSUFFICIENT EVIDENCE",
-      "dissent_module": null,
-      "dissent_present": false,
-      "integrity_level": "FULL_INTEGRITY",
-      "investigation_roadmap": [],
-      "pivot_signals": [],
-      "stability_pct": 83,
-      "verdict_state": "ABSTAIN_INSUFFICIENT"
-    },
-    "reason": "Significant signal with structural support (score=0.2442)",
-    "verdict": "SUSPICION"
-  },
-  "config_attestation": {
-    "caie_enabled": true,
-    "caie_verdict": "SUSPICION",
-    "canonical_version": "1.0.0",
-    "config_hash": "880d929dc8e30b9b5a7ebeb79aed3d1a89c0a92e90968724f28c91bb9c48cecc",
-    "deviation_from_canonical": false,
-    "modified_params": [],
-    "vigia_version": "1.0"
-  },
-  "decision_trace": {
-    "abstain_reason": "",
-    "components_used": 0,
-    "consistency_score": 1.0,
-    "decision": "ABSTAIN",
-    "drift_score": 0.0,
-    "epsilon_used": 0.05,
-    "gamma_stability": 2.0,
-    "graph_stability": 1.0,
-    "lambda_drift": 2.0,
-    "log_lr": 0.0,
-    "lr": 0.0,
-    "omega_intention": 1.0,
-    "posterior": 0.49,
-    "reason_code": "VIGIA_SCORER:SUSPICION",
-    "risk": 0.5,
-    "signal_contributions": null
-  },
-  "evidence_graph": {
-    "bootstrap_rounds": 500,
-    "edges": [
+    "end_time": "2026-06-14T01:44:34.106233+00:00",
+    "entries": [
       {
-        "confidence_interval": [
-          0.0,
-          1.0
-        ],
-        "dependency_type": "statistical_dependency",
-        "source": "ART-001",
-        "stability": 0.7,
-        "target": "ART-002",
-        "weight_mean": 0.7
+        "action": "AGENT_INITIALIZED",
+        "case_id": "VIGIA-REAL-002",
+        "entry_sha256": "d318268708b85c18dea3c6726c64c12b9ec593e021fa3df34e28108aca79adc2",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "VIGIA-REAL-002"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: 4eeafb3bfb155486...",
+        "outputs_summary": {
+          "agent_sha256": "4eeafb3bfb155486142942ad7a2c8678676f86ffd5d076882459354d820591f6",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-06-14T01:44:34.103125+00:00",
+        "tool": "vigia_agent"
       },
       {
-        "confidence_interval": [
-          0.0,
-          1.0
-        ],
-        "dependency_type": "statistical_dependency",
-        "source": "ART-002",
-        "stability": 0.85,
-        "target": "ART-003",
-        "weight_mean": 0.85
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-REAL-002",
+        "entry_sha256": "22aa83a0fa9bc028576dba56b7796b5629580b44793d8684e04f10211eadf27d",
+        "inputs_summary": {
+          "path": "data/cases/converted/VIGIA-REAL-002.json"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-06-14T01:44:34.103199+00:00",
+        "tool": "sha256_hasher"
       },
       {
-        "confidence_interval": [
-          0.0,
-          1.0
-        ],
-        "dependency_type": "statistical_dependency",
-        "source": "ART-003",
-        "stability": 0.85,
-        "target": "ART-004",
-        "weight_mean": 0.85
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-REAL-002",
+        "entry_sha256": "f6ce5713fe96703310933e42aa2f7ce1bacacb45e0b768cd935d278ec231aa8e",
+        "inputs_summary": {
+          "path": "data/cases/converted/VIGIA-REAL-002.json"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: 895604d2975874d5...",
+        "outputs_summary": {
+          "sha256": "895604d2975874d5f7b6099da063f4e00ea7becb443f74309dfa13494b4661a4"
+        },
+        "seq": 3,
+        "timestamp": "2026-06-14T01:44:34.103277+00:00",
+        "tool": "sha256_hasher"
       },
       {
-        "confidence_interval": [
-          0.0,
-          1.0
-        ],
-        "dependency_type": "statistical_dependency",
-        "source": "ART-004",
-        "stability": 0.9,
-        "target": "ART-005",
-        "weight_mean": 0.9
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "VIGIA-REAL-002",
+        "entry_sha256": "6fb7daf394f1a77bea8433f8223235ecdd6456692007212b8eb37faa0096b148",
+        "inputs_summary": {
+          "evidence": "data/cases/converted/VIGIA-REAL-002.json",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-06-14T01:44:34.103365+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "VIGIA-REAL-002",
+        "entry_sha256": "d9282faccc91a4e8961eff4c7012eb6e2d1bcf4b1acf563837047c3f739216fb",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 5 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+            "best_posterior": "281/2000",
+            "confidence": "281/2000",
+            "is_conclusive": "True",
+            "narrative": "Sr. Informant, a technology development manager at OOO company, received an offer from a conspirator to leak confidential information about new technologies. He used email, Google Drive, USB, and CD-R..."
+          },
+          "case_id": "VIGIA-REAL-002",
+          "pipeline_meta": {
+            "artifact_count": "5",
+            "avg_score": "281/400",
+            "expected_verdict": "MALICE",
+            "source": "ebs_v1_json_adapter"
+          },
+          "signals": [
+            {
+              "artifact_id": "ART-001",
+              "confidence": "7/10",
+              "description": "Event ID 4624 (Logon) - 2015-03-23 16:00:22 Eastern Time+DST | Event ID 4647 (Logoff) - 2015-03-23 17:02:53 | Event ID 4608 (Startup) - 2015-03-24 09:21:29 | Event ID 1100 (Shutdown) - 2015-03-24 17:0",
+              "evidence_type": "log_entry",
+              "source": "legacy_converter",
+              "z_score": "49/100"
+            },
+            {
+              "artifact_id": "ART-002",
+              "confidence": "17/20",
+              "description": "From: spy.conspirator@nist.gov | To: jaman.informant@nist.gov | Subject: (important request) | Body: conformal But, I need a more data. Do your best. | Date: 2015-03-23 | Follow-up: Subject 'Last requ",
+              "evidence_type": "log_entry",
+              "source": "legacy_converter",
+              "z_score": "289/400"
+            },
+            {
+              "artifact_id": "ART-003",
+              "confidence": "17/20",
+              "description": "Confidential files found: [secret_project]_pricing_decision.docx, [secret_project]_final_meeting.pptx | Action: Renamed with changed extensions (.docx to .mp3, .pptx to .jpg) | Rename timestamp: 2015-",
+              "evidence_type": "file_timestamp",
+              "source": "legacy_converter",
+              "z_score": "289/400"
+            },
+            {
+              "artifact_id": "ART-004",
+              "confidence": "9/10",
+              "description": "Google Drive installed and logged in with aman.informat.personall@gmail.com | Files uploaded to Google Drive and shared | Email sent: 'Login is below.' | CCleaner and Eraser installed afterwards",
+              "evidence_type": "log_entry",
+              "source": "legacy_converter",
+              "z_score": "171/200"
+            },
+            {
+              "artifact_id": "ART-005",
+              "confidence": "17/20",
+              "description": "Connection to network drive: \\\\10.11.11.128\\secured_drive | Directories traversed in search of files | Files copied from network to Desktop\\$ data | Network drive disconnected | Network drive IP: 10.1",
+              "evidence_type": "log_entry",
+              "source": "legacy_converter",
+              "z_score": "289/400"
+            }
+          ]
+        },
+        "seq": 5,
+        "timestamp": "2026-06-14T01:44:34.105686+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "VIGIA-REAL-002",
+        "entry_sha256": "329174c9dffffc6464bf001fab503026a7001c96204b457d4b6035551c89bbe2",
+        "inputs_summary": {
+          "n_signals": "5"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-06-14T01:44:34.105844+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "VIGIA-REAL-002",
+        "entry_sha256": "2dc8b81106adb507b1130cc3a7f8169c98d8e711759f9fabae4d5cb3369c4265",
+        "inputs_summary": {
+          "verdict": "MALICIOUS_INTENT_DETECTED"
+        },
+        "iteration": 0,
+        "note": "Exit code 1 \u2014 analysis complete.",
+        "outputs_summary": {
+          "exit_code": "1"
+        },
+        "seq": 7,
+        "timestamp": "2026-06-14T01:44:34.106142+00:00",
+        "tool": "vigia_agent"
       }
     ],
-    "generated_at": "2026-06-14T01:34:38.150926+00:00",
-    "graph_hash": "145e2524bc50524d745ab9774ce25a85ef83995aea570d306d4eb3bbf199daec",
-    "nodes": [
-      "ART-001",
-      "ART-002",
-      "ART-003",
-      "ART-004",
-      "ART-005"
-    ],
-    "stability_threshold": 0.85
+    "start_time": "2026-06-14T01:44:34.102917+00:00",
+    "total_entries": 7
   },
-  "integrity": {
-    "bundle_hash": "b67308bc6e79e9088746ee50b7c0dc8a61662933f93f5b51025dbd620dbbcac5",
-    "decision_hash": "f8085946f6a95973f9061910f0718f5ea335fbf6cdf3d65c7df7d867d4b003bf",
-    "ecl_hash": "",
-    "engine_attestation_hash": "",
-    "graph_hash": "145e2524bc50524d745ab9774ce25a85ef83995aea570d306d4eb3bbf199daec",
-    "policy_hash": "03d292f33eef1e4a2f355fe83299bdb8e72124c710f79ab4626d85a3998e9567",
-    "sealed_at": "2026-06-14T01:34:38.151285+00:00"
-  },
-  "policy_spec": {
-    "created_at": "2026-06-14T01:34:38.150967+00:00",
-    "description": "Politica VIGIA por defecto \u2014 SANS FIND EVIL 2026",
-    "epsilon_accept": 0.05,
-    "epsilon_reject": 0.05,
-    "gamma_stability_init": 2.0,
-    "lambda_drift_init": 2.0,
-    "rules": [
+  "case_id": "VIGIA-REAL-002",
+  "evidence_path": "data/cases/converted/VIGIA-REAL-002.json",
+  "evidence_sha256": "895604d2975874d5f7b6099da063f4e00ea7becb443f74309dfa13494b4661a4",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-REAL-002 ===\nEvidence: data/cases/converted/VIGIA-REAL-002.json\nEvidence SHA-256: 895604d2975874d5f7b6099da063f4e00ea7becb443f74309dfa13494b4661a4\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 281/2000\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\nSr. Informant, a technology development manager at OOO company, received an offer from a conspirator to leak confidential information about new technologies. He used email, Google Drive, USB, and CD-R to exfiltrate data while applying anti-forensic techniques.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Google Drive installed and logged in with aman.informat.personall@gmai] z=0.855 conf=0.90 \u2014 \n  [From: spy.conspirator@nist.gov | To: jaman.informant@nist.gov | Subjec] z=0.723 conf=0.85 \u2014 \n  [Confidential files found: [secret_project]_pricing_decision.docx, [sec] z=0.723 conf=0.85 \u2014 \n  [Connection to network drive: \\\\10.11.11.128\\secured_drive | Directorie] z=0.723 conf=0.85 \u2014 \n  [Event ID 4624 (Logon) - 2015-03-23 16:00:22 Eastern Time+DST | Event I] z=0.490 conf=0.70 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW \u2014 No significant anomalies detected in this iteration.\n\nCritical signals (z>3): 0\nHigh signals (2<z<=3): 0\nTotal signals analyzed: 5",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+      "best_posterior": "281/2000",
+      "confidence": {
+        "__fraction__": true,
+        "den": 2000,
+        "num": 281
+      },
+      "is_conclusive": true,
+      "narrative": "Sr. Informant, a technology development manager at OOO company, received an offer from a conspirator to leak confidential information about new technologies. He used email, Google Drive, USB, and CD-R to exfiltrate data while applying anti-forensic techniques."
+    },
+    "case_id": "VIGIA-REAL-002",
+    "pipeline_meta": {
+      "artifact_count": 5,
+      "avg_score": "281/400",
+      "expected_verdict": "MALICE",
+      "source": "ebs_v1_json_adapter"
+    },
+    "signals": [
       {
-        "allowed_roles": [
-          "system",
-          "analyst"
-        ],
-        "description": "Limite de cambio en probabilidad posterior",
-        "max_delta": 0.1,
-        "requires_approval": false,
-        "variable": "posterior"
+        "artifact_id": "ART-001",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 7
+        },
+        "description": "Event ID 4624 (Logon) - 2015-03-23 16:00:22 Eastern Time+DST | Event ID 4647 (Logoff) - 2015-03-23 17:02:53 | Event ID 4608 (Startup) - 2015-03-24 09:21:29 | Event ID 1100 (Shutdown) - 2015-03-24 17:0",
+        "evidence_type": "log_entry",
+        "source": "legacy_converter",
+        "z_score": {
+          "__fraction__": true,
+          "den": 100,
+          "num": 49
+        }
       },
       {
-        "allowed_roles": [
-          "system"
-        ],
-        "description": "Limite de correccion de drift",
-        "max_delta": 0.15,
-        "requires_approval": false,
-        "variable": "drift"
+        "artifact_id": "ART-002",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 17
+        },
+        "description": "From: spy.conspirator@nist.gov | To: jaman.informant@nist.gov | Subject: (important request) | Body: conformal But, I need a more data. Do your best. | Date: 2015-03-23 | Follow-up: Subject 'Last requ",
+        "evidence_type": "log_entry",
+        "source": "legacy_converter",
+        "z_score": {
+          "__fraction__": true,
+          "den": 400,
+          "num": 289
+        }
       },
       {
-        "allowed_roles": [
-          "system"
-        ],
-        "description": "Cambios en estabilidad del grafo requieren aprobacion",
-        "max_delta": 0.05,
-        "requires_approval": true,
-        "variable": "graph_stability"
+        "artifact_id": "ART-003",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 17
+        },
+        "description": "Confidential files found: [secret_project]_pricing_decision.docx, [secret_project]_final_meeting.pptx | Action: Renamed with changed extensions (.docx to .mp3, .pptx to .jpg) | Rename timestamp: 2015-",
+        "evidence_type": "file_timestamp",
+        "source": "legacy_converter",
+        "z_score": {
+          "__fraction__": true,
+          "den": 400,
+          "num": 289
+        }
       },
       {
-        "allowed_roles": [
-          "system"
-        ],
-        "description": "Ajuste adaptativo de sensibilidad al drift",
-        "max_delta": 1.0,
-        "requires_approval": false,
-        "variable": "lambda_drift"
+        "artifact_id": "ART-004",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 9
+        },
+        "description": "Google Drive installed and logged in with aman.informat.personall@gmail.com | Files uploaded to Google Drive and shared | Email sent: 'Login is below.' | CCleaner and Eraser installed afterwards",
+        "evidence_type": "log_entry",
+        "source": "legacy_converter",
+        "z_score": {
+          "__fraction__": true,
+          "den": 200,
+          "num": 171
+        }
       },
       {
-        "allowed_roles": [
-          "system"
-        ],
-        "description": "Ajuste adaptativo de sensibilidad estructural",
-        "max_delta": 1.0,
-        "requires_approval": false,
-        "variable": "gamma_stability"
+        "artifact_id": "ART-005",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 17
+        },
+        "description": "Connection to network drive: \\\\10.11.11.128\\secured_drive | Directories traversed in search of files | Files copied from network to Desktop\\$ data | Network drive disconnected | Network drive IP: 10.1",
+        "evidence_type": "log_entry",
+        "source": "legacy_converter",
+        "z_score": {
+          "__fraction__": true,
+          "den": 400,
+          "num": 289
+        }
       }
-    ],
-    "version": "1.0"
+    ]
   },
-  "system_state": {
-    "calibration_model_hash": "",
-    "drift_score": 0.0,
-    "engine_version": "vigia-ebs-v1.0",
-    "epsilon_accept": 0.05,
-    "epsilon_reject": 0.05,
-    "gamma_stability": 2.0,
-    "graph_stability_global": 0.83,
-    "lambda_drift": 2.0,
-    "timestamp": "2026-06-14T01:34:38.150976+00:00"
+  "sans_compliance": {
+    "accuracy_validation": false,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
   },
-  "timestamp": "2026-06-14T01:34:38.151000+00:00"
+  "self_corrections_applied": 0,
+  "vigia_agent_version": "1.0.0-SANS-2026"
 }
