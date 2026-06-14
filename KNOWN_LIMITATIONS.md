@@ -367,7 +367,7 @@ multiplies the effective score of co-occurring login artifacts.
 
 ### L-021 — Float Intermediates in Core Scoring Path
 
-**Affects:** `vigia_scorer.py` | **Status:** [RESOLVED]
+**Affects:** `vigia_scorer.py` | **Status:** [MITIGATED] — decision path representation-pure pending full Fraction conversion of intermediate scoring values. Transcendental functions (math.log, math.exp, 0.95**k) replaced with Fraction tables. Full Fraction conversion of composite/final_score: FW-008.
 
 **Description:** `vigia_scorer.py` uses `float` for intermediate scoring values
 (`effective_trust`, `adjusted_score`, `composite`, `final_score`) via `_dround()`
@@ -386,6 +386,13 @@ the scoring path.
 lookup tables (`_SUPPORT_SCORE_TABLE`, `_EXP_NEG2_TABLE`, `_EPC_FACTOR_TABLE`).
 Verdict thresholds converted to `Fraction(33,100)`, `Fraction(18,100)`,
 `Fraction(8,100)`. 58 tests passed, 0 regressions.
+
+**Mitigation applied 2026-06-14:** `math.log()`, `math.exp()`, and `0.95**k`
+replaced with precomputed Fraction lookup tables (`_SUPPORT_SCORE_TABLE`,
+`_EXP_NEG2_TABLE`, `_EPC_FACTOR_TABLE`). Verdict thresholds converted to
+Fraction constants. Platform-dependent ULP non-determinism eliminated.
+Formal boundary invariance testing (property tests, threshold fuzzing)
+remains as post-hackathon roadmap item FW-008.
 
 ---
 
@@ -711,7 +718,7 @@ proven). The verdicts are conservative, not wrong in the harmful direction.
 | L-018 | Non-technical context opacity | FN-001/002 | Real limitation |
 | L-019 | FALSE_FLAG_PATTERN on clean foreign-language machines | FP-CULTURAL-CLEAN | **RESOLVED** |
 | L-020 | Claude Code bundle lacks granular audit_trail | Mode 2 bundles | Known limitation |
-| L-021 | Float intermediates in scoring path | vigia_scorer.py | **RESOLVED** |
+| L-021 | Float intermediates in scoring path | vigia_scorer.py | **MITIGATED** |
 | L-022 | devil_advocate validation partially architectural | Mode 2 bundles | Post-audit improvement |
 | L-023 | Bundle save TOCTOU race (SEC-04) | bundle_builder.py | P0 — fix scheduled |
 | — | Normalization schema mismatch | vigia_scorer.py | **RESOLVED** |
