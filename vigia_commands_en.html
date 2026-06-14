@@ -490,6 +490,11 @@
       <div class="ch"><span class="cl">Verify MCP configuration</span><button class="cp" onclick="cp(this)">copy</button></div>
       <div class="cc">cat <span class="pa">.mcp.json.example</span></div>
     </div>
+    <div class="card" style="--ca:var(--accent)">
+      <div class="ch"><span class="cl">Batch agent — all 18 real cases in one run</span><button class="cp" onclick="cp(this)">copy</button></div>
+      <div class="cc"><span class="kw">cd</span> ~/vigia-repo<br><br><span class="kw">for</span> CASE <span class="kw">in</span> VIGIA-REAL-001 VIGIA-REAL-002 VIGIA-REAL-003 VIGIA-REAL-004 VIGIA-REAL-005 VIGIA-REAL-006 VIGIA-REAL-007 VIGIA-REAL-008 VIGIA-REAL-009 VIGIA-REAL-010 VIGIA-REAL-NROMANOFF VIGIA-REAL-TDUNGAN VIGIA-REAL-NFURY VIGIA-REAL-ROCBA VIGIA-REAL-SRL-ADMIN VIGIA-REAL-SRL-AV VIGIA-REAL-SRL-DC-MEMORY VIGIA-REAL-SRL-DMZ-FTP; <span class="kw">do</span><br>&nbsp;&nbsp;<span class="kw">echo</span> <span class="st">"=== $CASE ==="</span><br>&nbsp;&nbsp;python3 vigia_agent.py \<br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="fl">--evidence</span> <span class="pa">data/cases/converted/${CASE}.json</span> \<br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="fl">--case-id</span> <span class="st">$CASE</span> \<br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="fl">--output</span> <span class="pa">results/real/${CASE}_bundle.json</span><br>&nbsp;&nbsp;python3 forensics/verify_ebs_v1.py <span class="pa">results/real/${CASE}_bundle.json</span> <span class="fl">--verbose</span><br><span class="kw">done</span></div>
+      <div class="cd">Runs all 18 real forensic cases sequentially. Each case produces a sealed <code>ForensicBundle</code> + 4-hash verification. Results in <code>results/real/</code>.</div>
+    </div>
   </div>
 </div>
 

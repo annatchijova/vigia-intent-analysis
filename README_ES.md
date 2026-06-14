@@ -102,6 +102,7 @@ VIGÍA. The truth is in the fracture.
 | Autores | [`AUTHORS.md`](./AUTHORS.md) |
 | **Historia de origen** | **[`VIGIA_STORY_EN.md`](./VIGIA_STORY_EN.md) (EN) · [`VIGIA_STORY.md`](./VIGIA_STORY.md) (ES)** |
 | Índice de cumplimiento completo | [`SUBMISSION_COMPLIANCE.md`](./SUBMISSION_COMPLIANCE.md) |
+| **Prompts de investigación de casos reales** | **[`PROMPTS_REALCASES_CLAUDE.md`](./PROMPTS_REALCASES_CLAUDE.md)** — copiar y pegar en Claude Code para ejecutar investigaciones forenses completas en los 18 casos reales |
 
 **Documentación académica (193 módulos, 4 idiomas):**
 [`docs/academic/ACADEMIC_DOCS_MASTER_INDEX_EN.md`](./docs/academic/ACADEMIC_DOCS_MASTER_INDEX_EN.md)
