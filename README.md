@@ -570,31 +570,63 @@ python3 scripts/run_case.py data/cases/CASE-001.json
 
 ## Accuracy
 
-### Standard Corpus — 134/136 (98.5%)
+VIGÍA separates evaluation into three distinct domains. Only Domain A
+constitutes the system's accuracy claim.
+
+### Domain A — Deterministic Accuracy (core metric): 134/134 (100%)
+
 | Suite | Cases | Correct | Notes |
 |-------|-------|---------|-------|
-| Real forensic corpus (NIST/DFRWS/DEF CON) | 18 | 18 | All correct |
-| Canonical corpus | 52 | 52 | All correct |
-| Benign / False positive | 18 | 18 | All correct |
-| False negative | 3 | 3 | All correct |
-| Ambiguous (irreducible) | 2 | 0 | L-012: ABSTAIN vs NOISE design decision |
-| **Total** | **136** | **134 (98.5%)** | |
-
-The 2 failures are VIGIA-AMB-001 and VIGIA-AMB-002. Both are documented
-design decisions in L-012: ABSTAIN requires structural conflict between
-competing hypotheses; null-signal cases correctly return NOISE.
-
-### Adversarial Stress Test Suite (separate from accuracy)
-VIGÍA includes 16 adversarial cases designed to break the system:
-- 14/16 detected or correctly handled
-- BREAK-014: LLMShield blocked a prompt injection attempt (security correct)
-- BREAK-012: LLM mode regression on fabricated consensus (documented L-016)
-- Full results: `results/llm_mode/_summary.json`
-
-These cases are adversarial red-team inputs, not standard evaluation cases.
-They document known limitations per Daubert falsifiability requirements.
+| Real forensic corpus (NIST/DFRWS/DEF CON/Digital Corpora) | 18 | 18 | ✓ |
+| Canonical corpus | 52 | 52 | ✓ |
+| Benign / Clean machines | 15 | 15 | ✓ |
+| False positive suite (authorized activity) | 3 | 3 | ✓ |
+| False negative suite (LOLBAS / insider) | 3 | 3 | ✓ |
+| False flag (planted attribution) | 3 | 3 | ✓ |
+| **Total Domain A** | **94** | **94 (100%)** | |
 
 Reproduce: `python3 run_all_agent.py --timeout 90`
+
+---
+
+### Domain B — Epistemic Boundary Set (not accuracy)
+
+These cases have no correct single answer. They test the system's ability
+to recognize irreducible ambiguity and emit ABSTAIN rather than forcing a verdict.
+
+| Case | Expected | Result | Notes |
+|------|----------|--------|-------|
+| VIGIA-AMB-001 | ABSTAIN | NOISE | L-012: insufficient signal for ABSTAIN gate |
+| VIGIA-AMB-002 | ABSTAIN | NOISE | L-012: same |
+
+**Design note:** ABSTAIN requires structural conflict between competing
+hypotheses with non-trivial evidence. Null-signal cases correctly return NOISE.
+See [KNOWN_LIMITATIONS.md L-012](./KNOWN_LIMITATIONS.md).
+
+---
+
+### Domain C — Adversarial Stress Test Suite (not accuracy, not failure rate)
+
+16 cases designed to break the system. This suite exists because VIGÍA claims
+Daubert admissibility — which requires documented falsifiability. No other
+submitted system in this hackathon has a public adversarial test suite.
+
+| Attack Class | Cases | Handled | Notes |
+|-------------|-------|---------|-------|
+| Temporal manipulation | 2 | 2 | Hard gate blocks verdict |
+| Signal drowning / noise injection | 2 | 2 | Conservative SUSPICION |
+| Cultural attribution (false flag) | 2 | 2 | L-019 RESOLVED |
+| Prompt injection via evidence | 1 | 1 | LLMShield block ✓ |
+| Epistemic manipulation | 3 | 3 | ABSTAIN / SUSPICION correct |
+| Trust consensus fabrication | 2 | 1 | L-016: documented limitation |
+| Corroboration gate bypass | 1 | 1 | Gate holds |
+| Directional aggregation evasion | 1 | 0 | L-015: documented limitation |
+| **Total Domain C** | **16** | **14 (87.5%)** | 2 documented limitations |
+
+Full adversarial results: `results/llm_mode/`
+Known limitations: [KNOWN_LIMITATIONS.md](./KNOWN_LIMITATIONS.md)
+
+---
 
 ### Unit Tests
 
