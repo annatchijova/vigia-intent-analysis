@@ -304,6 +304,10 @@ Scorer fix requires a source deduplication layer keyed on shared provenance.
 applied to log sources. Evidence derived from a single compromised channel is one
 piece of evidence regardless of how many records it generates.
 
+**LLM mode note (2026-06-14 empirical):** LLM mode also failed BREAK-012
+(escalated to MALICE instead of BENIGN), confirming this limitation persists
+in both modes.
+
 ---
 
 ### L-017 — Corroboration Gate Over-Restriction
@@ -663,11 +667,11 @@ Both are documented here for Daubert transparency.
 |-------|-------|---------|-------|
 | Real corpus (VIGIA-REAL-001–010) | 10 | 10 | All verdicts match ground truth |
 | Adversarial BREAK-001–010 | 10 | 10 | Epistemological manipulation suite |
-| Epistemological boundary BREAK-011–016 | 6 | 6 | Aggregation, consensus, fabrication |
+| Epistemological boundary BREAK-011–016 | 6 | 5 | BREAK-014: PASS (LLMShield security block on prompt-injection input — correct behavior, not a reasoning failure). BREAK-012: FAIL — LLM overdetects (MALICE vs expected BENIGN); fallback correctly returns NOISE; see L-016. BREAK-011/013/015/016: PASS |
 | False positive suite (FP-001–003) | 3 | 3 | Authorization context correctly read |
 | False negative suite (FN-001–003) | 3 | 3 | Clean-surface attacks detected |
-| Irreducible ambiguity (AMB-001–002) | 2 | 2 | ABSTAIN correctly emitted |
-| **Total** | **34** | **34 (100%)** | |
+| Irreducible ambiguity (AMB-001–002) | 2 | 0 | VIGIA-AMB-001/002: NOISE in both fallback and LLM mode (expected ABSTAIN). L-012 confirmed in LLM mode |
+| **Total** | **34** | **31 (91%)** | |
 
 ### Fallback mode (scorer only, no LLM)
 
