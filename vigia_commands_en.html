@@ -201,8 +201,13 @@
       <div class="cd">Expected: <strong>163 passed, 6 xfailed</strong></div>
     </div>
     <div class="card" style="--ca:var(--a2)">
-      <div class="ch"><span class="cl">With shell script (includes env vars)</span><button class="cp" onclick="cp(this)">copy</button></div>
-      <div class="cc"><span class="kw">bash</span> run_all_tests.sh</div>
+      <div class="ch"><span class="cl">With shell script (includes env vars — requires manual path configuration)</span><button class="cp" onclick="cp(this)">copy</button></div>
+      <div class="cc">python3 <span class="fl">-m</span> pytest tests/ <span class="fl">-v</span> <span class="fl">--tb=short</span></div>
+    </div>
+    <div class="card" style="--ca:var(--a2)">
+      <div class="ch"><span class="cl">Run full case suite with agent (136 cases)</span><button class="cp" onclick="cp(this)">copy</button></div>
+      <div class="cc">python3 run_all_agent.py <span class="fl">--timeout</span> 90 2&gt;&amp;1 | tee results/agent_batch_run.log</div>
+      <div class="cd">Runs all 136 cases through vigia_agent.py (fallback mode). 134/136 pass. The 2 failures (VIGIA-AMB-001, VIGIA-AMB-002) are documented L-012 limitations (ABSTAIN vs NOISE semantic boundary in fallback mode).</div>
     </div>
     <div class="card" style="--ca:var(--a2)">
       <div class="ch"><span class="cl">Single file</span><button class="cp" onclick="cp(this)">copy</button></div>
