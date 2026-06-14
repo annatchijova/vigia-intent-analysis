@@ -732,13 +732,61 @@ PE header at offset 0, not mapped to any file. Parent: cmd.exe (expected: servic
 
 ## Self-Correction Architecture
 
-`validate_and_correct_analysis` checks for four Peircean fallacies before
-finalizing any MALICE verdict:
+`validate_and_correct_analysis` checks for four Peircean fallacies:
 
 1. **Premature Abduction** — skipped Firstness, jumped to conclusions
-2. **False Secondness** — used generic context instead of host-specific baseline
+2. **False Secondness** — used generic context instead of host-specific
 3. **Habitless Thirdness** — inferred pattern without supporting artifacts
 4. **Carnegie Bias** — confused operational error with intentional manipulation
+
+### Live Example — VIGIA-REAL-007 (Digital Corpora Nitroba Harassment)
+
+This is the first case run with LLM backend active. It demonstrates the critical
+architectural invariant: **the LLM is outside the decision loop**.
+
+| Stage | Tool | Output |
+|-------|------|--------|
+| 1. LLM analysis | `reason_with_llm` | MALICE at 0.91 (high confidence) |
+| 2. Fallacy audit | `validate_and_correct_analysis` | 4 Peircean fallacies detected |
+| 3. Self-correction | Gate applied | MALICE → INTENT at 0.74 |
+
+**Fallacies detected and why they matter:**
+
+- **CARNEGIE BIAS (F-001):** The analysis attributed forensic foreknowledge to the
+  actor based on use of `willselfdestruct.com`. No artifact establishes the actor
+  knew a PCAP would be collected. Foreknowledge was inferred, not evidenced.
+
+- **FALSE SECONDNESS (F-002):** The password-less WiFi router was treated as an
+  attribution-obfuscation vector. No artifact establishes which interface (WiFi vs.
+  Ethernet) was used for harassment traffic. The MAC was captured regardless.
+
+- **PREMATURE ABDUCTION (OVERALL):** MALICE requires active concealment-of-concealment
+  ("hiding that they are hiding"). Finding F-003 directly contradicts this: the Gmail
+  session cookie transmitted in plaintext HTTP is an **OPSEC failure**, not OPSEC
+  success. A sophisticated anti-forensic actor would not leak authenticated cookies
+  over HTTP while using an ephemeral email service.
+
+- **HABITLESS THIRDNESS (F-001):** Ephemeral service use does not reliably index an
+  anti-forensic campaign. It is consistent with privacy-conscious behavior absent
+  criminal intent.
+
+**Architectural significance:** The LLM (claude-sonnet-4-6) returned MALICE 0.91 — a
+confident, internally consistent analysis. The deterministic gate rejected it. The
+final verdict INTENT 0.74 is more conservative than both the LLM and the original
+dataset's `expected_verdict`. This is the system working correctly per Daubert:
+the burden of proof for MALICE is higher than for INTENT, and the evidence did not
+meet it.
+
+```bash
+# Reproduce this result
+python3 vigia_agent.py --evidence data/cases/converted/VIGIA-REAL-007.json --case-id VIGIA-REAL-007
+# Expected: final_verdict: INTENT, final_confidence: 0.74, self_correction_applied: true
+```
+
+> **Note:** Running without LLM backend (`--mode ollama-fallback`) returns SUSPICION
+> due to L-008 (homogeneous evidence). The INTENT verdict requires `reason_with_llm`
+> to surface the semantic fractures in the threat message. Both behaviors are
+> documented and expected.
 
 **The Mandatory Refutation Protocol (Eco's Razor):**
 

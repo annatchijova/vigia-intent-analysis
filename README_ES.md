@@ -717,13 +717,61 @@ Entropía temporal: 0.00 bits.
 
 ## Arquitectura de Auto-Corrección
 
-`validate_and_correct_analysis` verifica cuatro falacias Peircianas antes de
-finalizar cualquier veredicto MALICE:
+`validate_and_correct_analysis` verifica cuatro falacias Peircianas:
 
 1. **Abducción Prematura** — saltó Firstness, llegó a conclusiones directamente
 2. **Secondness Falso** — usó contexto genérico en lugar de línea base específica del host
 3. **Thirdness Sin Hábito** — infirió patrón sin artefactos de soporte
 4. **Sesgo Carnegie** — confundió error operacional con manipulación intencional
+
+### Ejemplo en Vivo — VIGIA-REAL-007 (Digital Corpora Nitroba — Acoso)
+
+Este es el primer caso ejecutado con el backend LLM activo. Demuestra el invariante
+arquitectónico crítico: **el LLM está fuera del bucle de decisión**.
+
+| Etapa | Herramienta | Resultado |
+|-------|-------------|-----------|
+| 1. Análisis LLM | `reason_with_llm` | MALICE con 0.91 (alta confianza) |
+| 2. Auditoría de falacias | `validate_and_correct_analysis` | 4 falacias Peircianas detectadas |
+| 3. Auto-corrección | Compuerta aplicada | MALICE → INTENT con 0.74 |
+
+**Falacias detectadas y por qué importan:**
+
+- **SESGO CARNEGIE (F-001):** El análisis atribuyó conocimiento forense previo al actor
+  basándose en el uso de `willselfdestruct.com`. Ningún artefacto establece que el actor
+  supiera que se capturaría un PCAP. El conocimiento previo fue inferido, no evidenciado.
+
+- **SECONDNESS FALSO (F-002):** El router WiFi sin contraseña fue tratado como un vector
+  de ofuscación de atribución. Ningún artefacto establece qué interfaz (WiFi vs. Ethernet)
+  se utilizó para el tráfico de acoso. La MAC fue capturada de todas formas.
+
+- **ABDUCCIÓN PREMATURA (GENERAL):** MALICE requiere ocultamiento activo del ocultamiento
+  ("esconder que están escondiendo"). El hallazgo F-003 contradice esto directamente: la
+  cookie de sesión de Gmail transmitida en HTTP plano es un **fallo de OPSEC**, no un
+  éxito. Un actor anti-forense sofisticado no filtraría cookies autenticadas por HTTP
+  mientras usa un servicio de correo efímero.
+
+- **THIRDNESS SIN HÁBITO (F-001):** El uso de servicios efímeros no indexa de forma
+  fiable una campaña anti-forense. Es consistente con comportamiento orientado a la
+  privacidad sin intención criminal.
+
+**Significado arquitectónico:** El LLM (claude-sonnet-4-6) devolvió MALICE 0.91 —
+un análisis confiado e internamente consistente. La compuerta determinista lo rechazó.
+El veredicto final INTENT 0.74 es más conservador que tanto el LLM como el
+`expected_verdict` del conjunto de datos original. Esto es el sistema funcionando
+correctamente según Daubert: la carga de la prueba para MALICE es más alta que para
+INTENT, y la evidencia no la cumplió.
+
+```bash
+# Reproducir este resultado
+python3 vigia_agent.py --evidence data/cases/converted/VIGIA-REAL-007.json --case-id VIGIA-REAL-007
+# Esperado: final_verdict: INTENT, final_confidence: 0.74, self_correction_applied: true
+```
+
+> **Nota:** Ejecutar sin backend LLM (`--mode ollama-fallback`) devuelve SUSPICION
+> debido a L-008 (evidencia homogénea). El veredicto INTENT requiere `reason_with_llm`
+> para detectar las fracturas semánticas en el mensaje de amenaza. Ambos comportamientos
+> están documentados y son esperados.
 
 **El Protocolo Obligatorio de Refutación (Navaja de Eco):**
 
