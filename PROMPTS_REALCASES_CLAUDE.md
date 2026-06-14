@@ -1,9 +1,9 @@
 PROMPTS REAL CASES
 
 
-**MODO AGENT**
+**MODO AGENT** **10 cases, 1 second**
 
-mkdir -p ~/vigia-repo/results/real
+```bash
 cd ~/vigia-repo
 
 for CASE in VIGIA-REAL-001 VIGIA-REAL-002 VIGIA-REAL-003 VIGIA-REAL-004 VIGIA-REAL-005 VIGIA-REAL-006 VIGIA-REAL-007 VIGIA-REAL-008 VIGIA-REAL-009 VIGIA-REAL-010 VIGIA-REAL-NROMANOFF VIGIA-REAL-TDUNGAN VIGIA-REAL-NFURY VIGIA-REAL-ROCBA VIGIA-REAL-SRL-ADMIN VIGIA-REAL-SRL-AV VIGIA-REAL-SRL-DC-MEMORY VIGIA-REAL-SRL-DMZ-FTP; do
@@ -12,8 +12,9 @@ for CASE in VIGIA-REAL-001 VIGIA-REAL-002 VIGIA-REAL-003 VIGIA-REAL-004 VIGIA-RE
     --evidence data/cases/converted/${CASE}.json \
     --case-id $CASE \
     --output results/real/${CASE}_bundle.json
-  python3 verify_ebs_v1.py results/real/${CASE}_bundle.json --verbose
+  python3 forensics/verify_ebs_v1.py results/real/${CASE}_bundle.json --verbose
 done
+```
 
 
 ---
