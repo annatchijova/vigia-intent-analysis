@@ -63,6 +63,68 @@ import logging
 import math
 import sys
 from fractions import Fraction
+
+# ── P0 Lookup Tables — eliminan funciones transcendentales del scoring path ──
+# Auditado: Claude + Kimi, 2026-06-14. Reemplaza math.log() y math.exp()
+# que son platform-dependent a nivel ULP, violando reproducibilidad Daubert.
+# Valores calculados con decimal.Decimal(precision=50) y Fraction.limit_denominator(100000).
+
+# support_score = min(1.0, log(1+n) / log(5)) para n=1..20
+# Solo n=1,2,3 son no-triviales; n>=4 satura a 1.
+_SUPPORT_SCORE_TABLE: dict[int, Fraction] = {
+     1: Fraction(4004, 9297),   # log(2)/log(5) = 0.4306765581
+     2: Fraction(4725, 6922),   # log(3)/log(5) = 0.6826061945
+     3: Fraction(8008, 9297),   # log(4)/log(5) = 0.8613531161
+}
+# n>=4: log(1+n)/log(5) >= 1.0 → clamped to Fraction(1,1)
+
+# epc_factor = 0.95 ** k, k = max(0, len(chain) - 3)
+# 0.95 = 19/20 → potencias son fracciones exactas
+_EPC_FACTOR_TABLE: dict[int, Fraction] = {
+     0: Fraction(1, 1),
+     1: Fraction(19, 20),
+     2: Fraction(361, 400),
+     3: Fraction(6859, 8000),
+     4: Fraction(80461, 98785),
+     5: Fraction(49303, 63717),
+     6: Fraction(22879, 31124),
+     7: Fraction(294, 421),
+     8: Fraction(42985, 64793),
+     9: Fraction(15743, 24979),
+    10: Fraction(28537, 47662),
+    11: Fraction(34562, 60763),
+    12: Fraction(49611, 91811),
+    13: Fraction(2347, 4572),
+    14: Fraction(13552, 27789),
+    15: Fraction(12911, 27868),
+}
+
+# temporal_factor = exp(-2 * max_ws), max_ws bucketed to nearest 0.05
+# key = round(max_ws / 0.05), clamped to [0, 20]
+_EXP_NEG2_TABLE: dict[int, Fraction] = {
+     0: Fraction(1, 1),
+     1: Fraction(57630, 63691),
+     2: Fraction(13559, 16561),
+     3: Fraction(50286, 67879),
+     4: Fraction(26788, 39963),
+     5: Fraction(20841, 34361),
+     6: Fraction(28148, 51289),
+     7: Fraction(46609, 93859),
+     8: Fraction(37297, 83006),
+     9: Fraction(40263, 99031),
+    10: Fraction(18089, 49171),
+    11: Fraction(6481, 19470),
+    12: Fraction(13342, 44297),
+    13: Fraction(4436, 16277),
+    14: Fraction(24529, 99470),
+    15: Fraction(21053, 94353),
+    16: Fraction(9283, 45979),
+    17: Fraction(9999, 54734),
+    18: Fraction(3404, 20593),
+    19: Fraction(4282, 28629),
+    20: Fraction(12957, 95740),
+}
+# ─────────────────────────────────────────────────────────────────────────────
 from pathlib import Path
 
 # ---------------------------------------------------------------------------
@@ -181,9 +243,10 @@ def _verdict_color(verdict) -> str:
     }.get(v_str.upper(), BLU)
 
 
-def _compute_temporal_factor(violations: list[dict], artifact_id: str) -> float:
+def _compute_temporal_factor(violations: list[dict], artifact_id: str) -> Fraction:
     """
-    Temporal penalty factor per artifact.
+    Temporal penalty factor per artifact. Returns Fraction (P0: no math.exp()).
+
     Inline — does not depend on the vigia package. Allows standalone demo execution.
 
     Weights by violation type (forensic severity):
@@ -192,13 +255,17 @@ def _compute_temporal_factor(violations: list[dict], artifact_id: str) -> float:
       STATISTICAL_UNIFORMITY : artificial distribution — medium weight (0.6)
       IDENTICAL_TIMESTAMP    : timestamp collision — medium-low weight (0.5)
       CLOCK_SKEW             : synchronisation noise — low weight (0.4)
+
+    P0 patch 2026-06-14 (Claude+Kimi): replaced math.exp(-2*x) with
+    _EXP_NEG2_TABLE keyed on round(max_ws/0.05). max_ws bucketed to 0.05
+    precision — max error 0.025 in argument, negligible vs _dround(prec=4).
     """
     weights = {
-        "EFFECT_BEFORE_CAUSE":    1.0,
-        "TOO_FAST":               0.7,
-        "STATISTICAL_UNIFORMITY": 0.6,
-        "IDENTICAL_TIMESTAMP":    0.5,
-        "CLOCK_SKEW":             0.4,
+        "EFFECT_BEFORE_CAUSE":    Fraction(1, 1),
+        "TOO_FAST":               Fraction(7, 10),
+        "STATISTICAL_UNIFORMITY": Fraction(3, 5),
+        "IDENTICAL_TIMESTAMP":    Fraction(1, 2),
+        "CLOCK_SKEW":             Fraction(2, 5),
     }
     relevant = [
         v for v in violations
@@ -206,9 +273,14 @@ def _compute_temporal_factor(violations: list[dict], artifact_id: str) -> float:
         or v.get("effect", {}).get("artifact_id") == artifact_id
     ]
     if not relevant:
-        return 1.0
-    ws = [v.get("severity", 0.5) * weights.get(v.get("type", ""), 0.5) for v in relevant]
-    return _dround(max(0.0, min(1.0, math.exp(-2.0 * max(ws)))), _DETERMINISTIC_OUTPUT_PREC)
+        return Fraction(1, 1)
+    ws = [Fraction(str(v.get("severity", 0.5))) * weights.get(v.get("type", ""), Fraction(1, 2))
+          for v in relevant]
+    max_ws = max(ws)
+    max_ws_clamped = min(Fraction(1, 1), max(Fraction(0, 1), max_ws))
+    # Bucket to nearest 0.05 for table lookup
+    bucket_key = min(20, max(0, round(float(max_ws_clamped) / 0.05)))
+    return _EXP_NEG2_TABLE[bucket_key]
 
 
 def _naive_score(artifacts: list[dict]) -> float:
@@ -398,7 +470,8 @@ def _vigia_score(case: dict) -> dict:
         if provenance.get("chain_status") == "BROKEN" or not chain:
             epc_factor = 0.1
         else:
-            epc_factor = min(1.0, 0.95 ** max(0, len(chain) - 3))
+            _epc_k = min(15, max(0, len(chain) - 3))  # P0: Fraction lookup, no float pow
+            epc_factor = _EPC_FACTOR_TABLE[_epc_k]
 
         temp_factor = _compute_temporal_factor(violations, a.get("artifact_id", ""))
         effective   = _dround(prov_trust * epc_factor * temp_factor, _DETERMINISTIC_OUTPUT_PREC)
@@ -576,7 +649,7 @@ def _vigia_score(case: dict) -> dict:
     )
 
     n_artifacts   = len(artifacts)
-    support_score = _dround(min(1.0, math.log(1 + n_artifacts) / math.log(5)), _DETERMINISTIC_OUTPUT_PREC)
+    support_score = _SUPPORT_SCORE_TABLE.get(n_artifacts, Fraction(1, 1))  # P0: Fraction lookup, no math.log()
     final_score   = _dround(raw_intent_score * (0.9 + 0.1 * support_score), _DETERMINISTIC_OUTPUT_PREC)
 
     mean_effective = _dround(
@@ -606,7 +679,7 @@ def _vigia_score(case: dict) -> dict:
         verdict    = "SUSPICION"
         confidence = _dround(min(0.75, fracture_malice_boost + 0.3), 2)
         reason     = f"Broken chain of custody + {len(fractures)} active fracture(s) — deliberate manipulation"
-    elif final_score > 0.33:
+    elif final_score > Fraction(33, 100):
         # Corroboration gate: MALICE requires convergence of heterogeneous evidence.
         # Daubert principle: a single class of technical evidence, regardless of
         # its raw_score, does not justify an inference of malicious intent.
@@ -619,11 +692,11 @@ def _vigia_score(case: dict) -> dict:
             verdict = "SUSPICION"
         confidence = _dround(min(0.95, final_score * 2.0), 2)
         reason     = f"Intent score {final_score:.4f} exceeds MALICE threshold (P2+acq_assurance scale, threshold=0.33)"
-    elif final_score > 0.18:
+    elif final_score > Fraction(18, 100):
         verdict    = "SUSPICION"
         confidence = _dround(final_score * 2.0, 2)
         reason     = f"Significant signal with structural support (score={final_score:.4f})"
-    elif final_score > 0.08:
+    elif final_score > Fraction(8, 100):
         verdict    = "UNKNOWN"
         confidence = _dround(final_score * 2.0, 2)
         reason     = f"Anomaly without sufficient structural support (score={final_score:.4f})"

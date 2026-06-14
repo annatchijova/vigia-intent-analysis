@@ -72,7 +72,7 @@ if _PYDANTIC_AVAILABLE:
         )
         anthropic_model: str = Field(
             default_factory=lambda: os.getenv(
-                "VIGIA_ANTHROPIC_MODEL", "claude-sonnet-4-20250514"
+                "VIGIA_ANTHROPIC_MODEL", "claude-opus-4-6"
             )
         )
         ollama_model: str = Field(
@@ -166,7 +166,7 @@ else:
         )
         anthropic_model: str = field(
             default_factory=lambda: os.getenv(
-                "VIGIA_ANTHROPIC_MODEL", "claude-sonnet-4-20250514"
+                "VIGIA_ANTHROPIC_MODEL", "claude-opus-4-6"
             )
         )
         ollama_model: str = field(

@@ -163,7 +163,8 @@ def _compute_temporal_factor(violations: list[dict], artifact_id: str) -> float:
     if not relevant:
         return 1.0
     ws = [v.get("severity", 0.5) * weights.get(v.get("type", ""), 0.5) for v in relevant]
-    return _dround(max(0.0, min(1.0, math.exp(-2.0 * max(ws)))), _DETERMINISTIC_OUTPUT_PREC)
+    _bucket = min(20, max(0, round(float(min(1.0, max(0.0, max(ws)))) / 0.05)))
+    return _EXP_NEG2_TABLE[_bucket]  # P0: no math.exp()
 
 
 def _naive_score(artifacts: list[dict]) -> float:
@@ -287,7 +288,8 @@ def _vigia_score(case: dict) -> dict:
         if provenance.get("chain_status") == "BROKEN" or not chain:
             epc_factor = 0.1
         else:
-            epc_factor = min(1.0, 0.95 ** max(0, len(chain) - 3))
+            _k = min(15, max(0, len(chain) - 3))
+            epc_factor = _EPC_FACTOR_TABLE[_k]  # P0: no float pow
 
         temp_factor = _compute_temporal_factor(violations, a.get("artifact_id", ""))
         effective   = _dround(prov_trust * epc_factor * temp_factor, _DETERMINISTIC_OUTPUT_PREC)
@@ -446,7 +448,7 @@ def _vigia_score(case: dict) -> dict:
     )
 
     n_artifacts   = len(artifacts)
-    support_score = _dround(min(1.0, math.log(1 + n_artifacts) / math.log(5)), _DETERMINISTIC_OUTPUT_PREC)
+    support_score = _SUPPORT_SCORE_TABLE.get(n_artifacts, Fraction(1, 1))  # P0: no math.log()
     final_score   = _dround(raw_intent_score * (0.9 + 0.1 * support_score), _DETERMINISTIC_OUTPUT_PREC)
 
     mean_effective = _dround(
@@ -461,8 +463,8 @@ def _vigia_score(case: dict) -> dict:
         and not fractures
     )
 
-    if n_artifacts < 2 and final_score > 0.65:
-        final_score = 0.65
+    if n_artifacts < 2 and final_score > Fraction(13, 20):
+        final_score = Fraction(13, 20)
 
     if hard_temporal:
         verdict    = "MALICE"
@@ -477,15 +479,15 @@ def _vigia_score(case: dict) -> dict:
         # NOTE: Thresholds 0.75/0.55 are intentional for vigia_scorer standalone mode.
         # CAIE uses 0.5/0.2 for probabilistic verdict. See KNOWN_LIMITATIONS.md L-XXX.
         reason     = f"Cadena de custodia rota + {len(fractures)} fracture(s) activas — manipulación deliberada"
-    elif final_score > 0.75:
+    elif final_score > Fraction(3, 4):
         verdict    = "MALICE"
         confidence = _dround(final_score, 2)
         reason     = f"Intent score {final_score:.4f} excede umbral MALICE"
-    elif final_score > 0.55:
+    elif final_score > Fraction(11, 20):
         verdict    = "SUSPICION"
         confidence = _dround(final_score, 2)
         reason     = f"Señal significativa con soporte estructural (score={final_score:.4f})"
-    elif final_score > 0.25:
+    elif final_score > Fraction(1, 4):
         verdict    = "UNKNOWN"
         confidence = _dround(final_score * 0.5, 2)
         reason     = f"Anomalía sin suficiente soporte estructural (score={final_score:.4f})"
