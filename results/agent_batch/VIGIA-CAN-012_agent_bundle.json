@@ -1,0 +1,273 @@
+{
+  "analysis_timestamp": "2026-06-14T19:05:42.780031+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "VIGIA-CAN-012",
+    "end_time": "2026-06-14T19:05:42.780034+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "VIGIA-CAN-012",
+        "entry_sha256": "c1f05adde7121a7d59072d665b8194558f8b6fbee7af0f86b58a743bd6ef5865",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "VIGIA-CAN-012"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: 4eeafb3bfb155486...",
+        "outputs_summary": {
+          "agent_sha256": "4eeafb3bfb155486142942ad7a2c8678676f86ffd5d076882459354d820591f6",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-06-14T19:05:42.777419+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-CAN-012",
+        "entry_sha256": "da548128d5987d37b4d35887b8e719e4b26816051ae84c9568cc99af5f69edf3",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-012.json"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-06-14T19:05:42.777497+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-CAN-012",
+        "entry_sha256": "6b779b1306e560dda56e39762c23ca32f1854aa42cb78b8cebc3ea3942946f85",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-012.json"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: a2379a8e5ee75958...",
+        "outputs_summary": {
+          "sha256": "a2379a8e5ee75958eee484aad09e979a76d393e5c95a8dcf7d54fedc02b45bbd"
+        },
+        "seq": 3,
+        "timestamp": "2026-06-14T19:05:42.777573+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "VIGIA-CAN-012",
+        "entry_sha256": "10fa607c0a4bb9a616817081e34981dc71afe56b24ca89e6e79db2bbba9b0ca3",
+        "inputs_summary": {
+          "evidence": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-012.json",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-06-14T19:05:42.777657+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "VIGIA-CAN-012",
+        "entry_sha256": "49649eef3c301e7f668001dda34bd5d33d474ed7bdfb7c9f8694a1952e9aabe1",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 4 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+            "best_posterior": "2981/40000",
+            "confidence": "2981/40000",
+            "is_conclusive": "True",
+            "narrative": "Facing a data breach audit, the responsible party delivers 200 PDFs of 'historical Integrity Reports'. Creation metadata shows an exact 1.2-second interval between files. All ctimes grouped in a 4-min..."
+          },
+          "case_id": "case_094_agujero_negro_burocratico",
+          "pipeline_meta": {
+            "artifact_count": "4",
+            "avg_score": "2981/8000",
+            "expected_verdict": "MALICE",
+            "source": "ebs_v1_json_adapter"
+          },
+          "signals": [
+            {
+              "artifact_id": "a094_01",
+              "confidence": "11/20",
+              "description": "200 PDFs with creation metadata exactly 1.2 seconds apart. Interval variance: 0.0s. Physically impossible for human management.",
+              "evidence_type": "memory_process",
+              "source": "sift_exiftool",
+              "z_score": "253/500"
+            },
+            {
+              "artifact_id": "a094_02",
+              "confidence": "7/10",
+              "description": "ctime of all 200 PDFs grouped in a 4-minute window (08:56-09:00). The mtimes claim dates between January 2025 and May 2026.",
+              "evidence_type": "memory_process",
+              "source": "sift_sleuthkit",
+              "z_score": "161/250"
+            },
+            {
+              "artifact_id": "a094_03",
+              "confidence": "13/20",
+              "description": "Random sample OCR: 47 PDFs contain identical paragraphs with only dates modified by regex. Content entropy: 0.8 bits.",
+              "evidence_type": "log_entry",
+              "source": "sift_vision_ocr",
+              "z_score": "117/2000"
+            },
+            {
+              "artifact_id": "a094_04",
+              "confidence": "3/10",
+              "description": "200 PDFs attributed to 'Internal Audit' but no user from the department has LibreOffice/Word activity in logs for that window.",
+              "evidence_type": "memory_process",
+              "source": "sift_syslog",
+              "z_score": "141/500"
+            }
+          ]
+        },
+        "seq": 5,
+        "timestamp": "2026-06-14T19:05:42.779731+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "VIGIA-CAN-012",
+        "entry_sha256": "7f79a9ec25b198675169803bd97c486a83c61d2229c4b63e0602765505184d6f",
+        "inputs_summary": {
+          "n_signals": "4"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-06-14T19:05:42.779827+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "VIGIA-CAN-012",
+        "entry_sha256": "7f3c6e23f475e3f83cefe26c4a7839a659b88f6af90ae06277d2817636fa22ff",
+        "inputs_summary": {
+          "verdict": "MALICIOUS_INTENT_DETECTED"
+        },
+        "iteration": 0,
+        "note": "Exit code 1 \u2014 analysis complete.",
+        "outputs_summary": {
+          "exit_code": "1"
+        },
+        "seq": 7,
+        "timestamp": "2026-06-14T19:05:42.779956+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-06-14T19:05:42.777222+00:00",
+    "total_entries": 7
+  },
+  "case_id": "VIGIA-CAN-012",
+  "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-012.json",
+  "evidence_sha256": "a2379a8e5ee75958eee484aad09e979a76d393e5c95a8dcf7d54fedc02b45bbd",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-CAN-012 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-012.json\nEvidence SHA-256: a2379a8e5ee75958eee484aad09e979a76d393e5c95a8dcf7d54fedc02b45bbd\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 2981/40000\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\nFacing a data breach audit, the responsible party delivers 200 PDFs of 'historical Integrity Reports'. Creation metadata shows an exact 1.2-second interval between files. All ctimes grouped in a 4-minute window.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [ctime of all 200 PDFs grouped in a 4-minute window (08:56-09:00). The ] z=0.644 conf=0.70 \u2014 \n  [200 PDFs with creation metadata exactly 1.2 seconds apart. Interval va] z=0.506 conf=0.55 \u2014 \n  [200 PDFs attributed to 'Internal Audit' but no user from the departmen] z=0.282 conf=0.30 \u2014 \n  [Random sample OCR: 47 PDFs contain identical paragraphs with only date] z=0.059 conf=0.65 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW \u2014 No significant anomalies detected in this iteration.\n\nCritical signals (z>3): 0\nHigh signals (2<z<=3): 0\nTotal signals analyzed: 4",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+      "best_posterior": "2981/40000",
+      "confidence": {
+        "__fraction__": true,
+        "den": 40000,
+        "num": 2981
+      },
+      "is_conclusive": true,
+      "narrative": "Facing a data breach audit, the responsible party delivers 200 PDFs of 'historical Integrity Reports'. Creation metadata shows an exact 1.2-second interval between files. All ctimes grouped in a 4-minute window."
+    },
+    "case_id": "case_094_agujero_negro_burocratico",
+    "pipeline_meta": {
+      "artifact_count": 4,
+      "avg_score": "2981/8000",
+      "expected_verdict": "MALICE",
+      "source": "ebs_v1_json_adapter"
+    },
+    "signals": [
+      {
+        "artifact_id": "a094_01",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 11
+        },
+        "description": "200 PDFs with creation metadata exactly 1.2 seconds apart. Interval variance: 0.0s. Physically impossible for human management.",
+        "evidence_type": "memory_process",
+        "source": "sift_exiftool",
+        "z_score": {
+          "__fraction__": true,
+          "den": 500,
+          "num": 253
+        }
+      },
+      {
+        "artifact_id": "a094_02",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 7
+        },
+        "description": "ctime of all 200 PDFs grouped in a 4-minute window (08:56-09:00). The mtimes claim dates between January 2025 and May 2026.",
+        "evidence_type": "memory_process",
+        "source": "sift_sleuthkit",
+        "z_score": {
+          "__fraction__": true,
+          "den": 250,
+          "num": 161
+        }
+      },
+      {
+        "artifact_id": "a094_03",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 13
+        },
+        "description": "Random sample OCR: 47 PDFs contain identical paragraphs with only dates modified by regex. Content entropy: 0.8 bits.",
+        "evidence_type": "log_entry",
+        "source": "sift_vision_ocr",
+        "z_score": {
+          "__fraction__": true,
+          "den": 2000,
+          "num": 117
+        }
+      },
+      {
+        "artifact_id": "a094_04",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 3
+        },
+        "description": "200 PDFs attributed to 'Internal Audit' but no user from the department has LibreOffice/Word activity in logs for that window.",
+        "evidence_type": "memory_process",
+        "source": "sift_syslog",
+        "z_score": {
+          "__fraction__": true,
+          "den": 500,
+          "num": 141
+        }
+      }
+    ]
+  },
+  "sans_compliance": {
+    "accuracy_validation": false,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}

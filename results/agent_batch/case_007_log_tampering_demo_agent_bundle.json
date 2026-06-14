@@ -1,0 +1,273 @@
+{
+  "analysis_timestamp": "2026-06-14T19:05:40.489805+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "case_007_log_tampering_demo",
+    "end_time": "2026-06-14T19:05:40.489809+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "case_007_log_tampering_demo",
+        "entry_sha256": "cfe9dfe982b382972ec524a51d4b4857e9cd47dbe000a62165afc93bec65dc0b",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "case_007_log_tampering_demo"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: 4eeafb3bfb155486...",
+        "outputs_summary": {
+          "agent_sha256": "4eeafb3bfb155486142942ad7a2c8678676f86ffd5d076882459354d820591f6",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-06-14T19:05:40.487233+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "case_007_log_tampering_demo",
+        "entry_sha256": "7943bc6dc26619f2499e246e6c199f3a6015d961c0e5491485374eae8a84e083",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/case_007_log_tampering_demo.json"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-06-14T19:05:40.487302+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "case_007_log_tampering_demo",
+        "entry_sha256": "4ed9acf801053626ac58127871aa4b38ab3e3824a2623a417bd33b90d4b4a14f",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/case_007_log_tampering_demo.json"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: e721de082b17c303...",
+        "outputs_summary": {
+          "sha256": "e721de082b17c3031aab5caa78f0777faa225d0e71ff32da0c99500b20676f81"
+        },
+        "seq": 3,
+        "timestamp": "2026-06-14T19:05:40.487377+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "case_007_log_tampering_demo",
+        "entry_sha256": "2e2dbf200328b2d86623d3b9f501961a954be2b5825df2d05ab4fa6d96444266",
+        "inputs_summary": {
+          "evidence": "/home/labestiadevigia/vigia-repo/data/cases/case_007_log_tampering_demo.json",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-06-14T19:05:40.487480+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "case_007_log_tampering_demo",
+        "entry_sha256": "c26275a5927a583d3c115223bf81cad2c9f5aaa5f6da3e60750993cf513f81b2",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 4 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+            "best_posterior": "0",
+            "confidence": "0",
+            "is_conclusive": "False",
+            "narrative": "A systems administrator manually modified access logs to conceal his presence on the server the night before confidential data disappeared. VIG\u00cdA must detect the temporal inconsistencies and evidence ..."
+          },
+          "case_id": "VIGIA-2026-DEMO-007",
+          "pipeline_meta": {
+            "artifact_count": "4",
+            "avg_score": "0",
+            "expected_verdict": "MALICE",
+            "source": "ebs_v1_json_adapter"
+          },
+          "signals": [
+            {
+              "artifact_id": "LOG-001",
+              "confidence": "1/2",
+              "description": "",
+              "evidence_type": "unknown",
+              "source": "unknown",
+              "z_score": "0"
+            },
+            {
+              "artifact_id": "LOG-002",
+              "confidence": "1/2",
+              "description": "",
+              "evidence_type": "unknown",
+              "source": "unknown",
+              "z_score": "0"
+            },
+            {
+              "artifact_id": "LOG-003",
+              "confidence": "1/2",
+              "description": "",
+              "evidence_type": "unknown",
+              "source": "unknown",
+              "z_score": "0"
+            },
+            {
+              "artifact_id": "META-001",
+              "confidence": "1/2",
+              "description": "",
+              "evidence_type": "unknown",
+              "source": "unknown",
+              "z_score": "0"
+            }
+          ]
+        },
+        "seq": 5,
+        "timestamp": "2026-06-14T19:05:40.489510+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "case_007_log_tampering_demo",
+        "entry_sha256": "31fee9ef06d66aad76083d42458e025ffa4e1bf7c38e38463709e64b1dd1ef9e",
+        "inputs_summary": {
+          "n_signals": "4"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-06-14T19:05:40.489605+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "case_007_log_tampering_demo",
+        "entry_sha256": "354a4449bbb8c1708f245048d73ea361dadc7173e8f0af1b032d770abeb5edba",
+        "inputs_summary": {
+          "verdict": "MALICIOUS_INTENT_DETECTED"
+        },
+        "iteration": 0,
+        "note": "Exit code 1 \u2014 analysis complete.",
+        "outputs_summary": {
+          "exit_code": "1"
+        },
+        "seq": 7,
+        "timestamp": "2026-06-14T19:05:40.489733+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-06-14T19:05:40.487041+00:00",
+    "total_entries": 7
+  },
+  "case_id": "case_007_log_tampering_demo",
+  "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/case_007_log_tampering_demo.json",
+  "evidence_sha256": "e721de082b17c3031aab5caa78f0777faa225d0e71ff32da0c99500b20676f81",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE case_007_log_tampering_demo ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/case_007_log_tampering_demo.json\nEvidence SHA-256: e721de082b17c3031aab5caa78f0777faa225d0e71ff32da0c99500b20676f81\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 0\nConclusive: NO \u2014 requires human review\n\n--- PEIRCEAN NARRATIVE ---\nA systems administrator manually modified access logs to conceal his presence on the server the night before confidential data disappeared. VIG\u00cdA must detect the temporal inconsistencies and evidence of manual editing.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [unknown] z=0.000 conf=0.50 \u2014 \n  [unknown] z=0.000 conf=0.50 \u2014 \n  [unknown] z=0.000 conf=0.50 \u2014 \n  [unknown] z=0.000 conf=0.50 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW \u2014 No significant anomalies detected in this iteration.\n\nCritical signals (z>3): 0\nHigh signals (2<z<=3): 0\nTotal signals analyzed: 4",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+      "best_posterior": "0",
+      "confidence": {
+        "__fraction__": true,
+        "den": 1,
+        "num": 0
+      },
+      "is_conclusive": false,
+      "narrative": "A systems administrator manually modified access logs to conceal his presence on the server the night before confidential data disappeared. VIG\u00cdA must detect the temporal inconsistencies and evidence of manual editing."
+    },
+    "case_id": "VIGIA-2026-DEMO-007",
+    "pipeline_meta": {
+      "artifact_count": 4,
+      "avg_score": "0",
+      "expected_verdict": "MALICE",
+      "source": "ebs_v1_json_adapter"
+    },
+    "signals": [
+      {
+        "artifact_id": "LOG-001",
+        "confidence": {
+          "__fraction__": true,
+          "den": 2,
+          "num": 1
+        },
+        "description": "",
+        "evidence_type": "unknown",
+        "source": "unknown",
+        "z_score": {
+          "__fraction__": true,
+          "den": 1,
+          "num": 0
+        }
+      },
+      {
+        "artifact_id": "LOG-002",
+        "confidence": {
+          "__fraction__": true,
+          "den": 2,
+          "num": 1
+        },
+        "description": "",
+        "evidence_type": "unknown",
+        "source": "unknown",
+        "z_score": {
+          "__fraction__": true,
+          "den": 1,
+          "num": 0
+        }
+      },
+      {
+        "artifact_id": "LOG-003",
+        "confidence": {
+          "__fraction__": true,
+          "den": 2,
+          "num": 1
+        },
+        "description": "",
+        "evidence_type": "unknown",
+        "source": "unknown",
+        "z_score": {
+          "__fraction__": true,
+          "den": 1,
+          "num": 0
+        }
+      },
+      {
+        "artifact_id": "META-001",
+        "confidence": {
+          "__fraction__": true,
+          "den": 2,
+          "num": 1
+        },
+        "description": "",
+        "evidence_type": "unknown",
+        "source": "unknown",
+        "z_score": {
+          "__fraction__": true,
+          "den": 1,
+          "num": 0
+        }
+      }
+    ]
+  },
+  "sans_compliance": {
+    "accuracy_validation": false,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}

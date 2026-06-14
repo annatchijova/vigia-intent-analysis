@@ -1,0 +1,225 @@
+{
+  "analysis_timestamp": "2026-06-14T19:05:40.361017+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "case_004_provenance_break",
+    "end_time": "2026-06-14T19:05:40.361020+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "case_004_provenance_break",
+        "entry_sha256": "d3a7f2394e70a47b8e2132c08e10021df5b4d90f0906d61adbc8af710ce1c76d",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "case_004_provenance_break"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: 4eeafb3bfb155486...",
+        "outputs_summary": {
+          "agent_sha256": "4eeafb3bfb155486142942ad7a2c8678676f86ffd5d076882459354d820591f6",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-06-14T19:05:40.358493+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "case_004_provenance_break",
+        "entry_sha256": "07cf8b9fa3160846ef808401981affae4b7a15ad0ba1561788c7f0175412d8a2",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/case_004_provenance_break.json"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-06-14T19:05:40.358564+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "case_004_provenance_break",
+        "entry_sha256": "d0d106cc7722c642606f6e85e2fecf074b1266c2f3e70971e8994cfec1cce934",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/case_004_provenance_break.json"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: 1312fcba6936eeda...",
+        "outputs_summary": {
+          "sha256": "1312fcba6936eeda2a84bebfda6aa8e89bfab9d644fd59d5d0980c85e84f840d"
+        },
+        "seq": 3,
+        "timestamp": "2026-06-14T19:05:40.358638+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "case_004_provenance_break",
+        "entry_sha256": "4f6ee02dad2c59f84c710332d721c43616db3a4e872ce15bb053ed05877832a9",
+        "inputs_summary": {
+          "evidence": "/home/labestiadevigia/vigia-repo/data/cases/case_004_provenance_break.json",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-06-14T19:05:40.358722+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "case_004_provenance_break",
+        "entry_sha256": "619c4d86584275085e49fcc1eea995407c1169d71503f5997131490c0b885f45",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 2 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "NO_SEMIOTIC_ANOMALY_DETECTED",
+            "best_posterior": "197/1250",
+            "confidence": "197/1250",
+            "is_conclusive": "True",
+            "narrative": "High-quality evidence with strong indicators \u2014 but the chain of custody has a missing ancestor. Trust collapses to near-zero. Traditional systems accept this. VIG\u00cdA rejects it."
+          },
+          "case_id": "case_004_provenance_break",
+          "pipeline_meta": {
+            "artifact_count": "2",
+            "avg_score": "197/250",
+            "expected_verdict": "NOISE",
+            "source": "ebs_v1_json_adapter"
+          },
+          "signals": [
+            {
+              "artifact_id": "disk_001",
+              "confidence": "9/10",
+              "description": "SHA-256 of suspicious binary: known malware hash match (VirusTotal: 47/70). BUT: no acquisition record. No chain from disk image to this file.",
+              "evidence_type": "file_hash",
+              "source": "generate_forensic_hash",
+              "z_score": "207/250"
+            },
+            {
+              "artifact_id": "disk_002",
+              "confidence": "17/20",
+              "description": "File creation timestamp matches known C2 beacon interval. Strong indicator \u2014 but provenance chain has single orphaned hash, no root.",
+              "evidence_type": "file_timestamp",
+              "source": "read_evidence",
+              "z_score": "187/250"
+            }
+          ]
+        },
+        "seq": 5,
+        "timestamp": "2026-06-14T19:05:40.360741+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "case_004_provenance_break",
+        "entry_sha256": "14c63c2b9fea29b53f3d4d86aa910ddce6b54066789292ff7793da953a18220b",
+        "inputs_summary": {
+          "n_signals": "2"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-06-14T19:05:40.360827+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "case_004_provenance_break",
+        "entry_sha256": "72837e3154352d365a129e6c7c8a07179f7443c8927bf9c04fe9c7fbf70c1ebe",
+        "inputs_summary": {
+          "verdict": "NO_SEMIOTIC_ANOMALY_DETECTED"
+        },
+        "iteration": 0,
+        "note": "Exit code 0 \u2014 analysis complete.",
+        "outputs_summary": {
+          "exit_code": "0"
+        },
+        "seq": 7,
+        "timestamp": "2026-06-14T19:05:40.360909+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-06-14T19:05:40.358295+00:00",
+    "total_entries": 7
+  },
+  "case_id": "case_004_provenance_break",
+  "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/case_004_provenance_break.json",
+  "evidence_sha256": "1312fcba6936eeda2a84bebfda6aa8e89bfab9d644fd59d5d0980c85e84f840d",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE case_004_provenance_break ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/case_004_provenance_break.json\nEvidence SHA-256: 1312fcba6936eeda2a84bebfda6aa8e89bfab9d644fd59d5d0980c85e84f840d\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: NO_SEMIOTIC_ANOMALY_DETECTED\nPosterior confidence: 197/1250\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\nHigh-quality evidence with strong indicators \u2014 but the chain of custody has a missing ancestor. Trust collapses to near-zero. Traditional systems accept this. VIG\u00cdA rejects it.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [SHA-256 of suspicious binary: known malware hash match (VirusTotal: 47] z=0.828 conf=0.90 \u2014 \n  [File creation timestamp matches known C2 beacon interval. Strong indic] z=0.748 conf=0.85 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW \u2014 No significant anomalies detected in this iteration.\n\nCritical signals (z>3): 0\nHigh signals (2<z<=3): 0\nTotal signals analyzed: 2",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "NO_SEMIOTIC_ANOMALY_DETECTED",
+      "best_posterior": "197/1250",
+      "confidence": {
+        "__fraction__": true,
+        "den": 1250,
+        "num": 197
+      },
+      "is_conclusive": true,
+      "narrative": "High-quality evidence with strong indicators \u2014 but the chain of custody has a missing ancestor. Trust collapses to near-zero. Traditional systems accept this. VIG\u00cdA rejects it."
+    },
+    "case_id": "case_004_provenance_break",
+    "pipeline_meta": {
+      "artifact_count": 2,
+      "avg_score": "197/250",
+      "expected_verdict": "NOISE",
+      "source": "ebs_v1_json_adapter"
+    },
+    "signals": [
+      {
+        "artifact_id": "disk_001",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 9
+        },
+        "description": "SHA-256 of suspicious binary: known malware hash match (VirusTotal: 47/70). BUT: no acquisition record. No chain from disk image to this file.",
+        "evidence_type": "file_hash",
+        "source": "generate_forensic_hash",
+        "z_score": {
+          "__fraction__": true,
+          "den": 250,
+          "num": 207
+        }
+      },
+      {
+        "artifact_id": "disk_002",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 17
+        },
+        "description": "File creation timestamp matches known C2 beacon interval. Strong indicator \u2014 but provenance chain has single orphaned hash, no root.",
+        "evidence_type": "file_timestamp",
+        "source": "read_evidence",
+        "z_score": {
+          "__fraction__": true,
+          "den": 250,
+          "num": 187
+        }
+      }
+    ]
+  },
+  "sans_compliance": {
+    "accuracy_validation": false,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}

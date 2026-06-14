@@ -1,0 +1,313 @@
+{
+  "analysis_timestamp": "2026-06-14T19:05:38.872396+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "VIGIA-BREAK-012",
+    "end_time": "2026-06-14T19:05:38.872399+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "VIGIA-BREAK-012",
+        "entry_sha256": "f96c190a99406306667eb85a26bbcf95444099d9b1acab0514af400cadc84689",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "VIGIA-BREAK-012"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: 4eeafb3bfb155486...",
+        "outputs_summary": {
+          "agent_sha256": "4eeafb3bfb155486142942ad7a2c8678676f86ffd5d076882459354d820591f6",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-06-14T19:05:38.869783+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-BREAK-012",
+        "entry_sha256": "71299486476a34b7c7611ad7facfd8fb05a903a585fcd96e275a419419dfdd7d",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-BREAK-012.json"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-06-14T19:05:38.869851+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-BREAK-012",
+        "entry_sha256": "02004a7cc4020ba2edc72892b88c218261e108b21f4dd2627732b1754ffa1d59",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-BREAK-012.json"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: 321c7b94f50c61f1...",
+        "outputs_summary": {
+          "sha256": "321c7b94f50c61f103ec3afbb423df05b629b6989f35cc7c75d64090437dea3b"
+        },
+        "seq": 3,
+        "timestamp": "2026-06-14T19:05:38.869929+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "VIGIA-BREAK-012",
+        "entry_sha256": "74858096b806b097fcf302774e96cc119612d8c67347e9b8f799f4273e82d32a",
+        "inputs_summary": {
+          "evidence": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-BREAK-012.json",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-06-14T19:05:38.870016+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "VIGIA-BREAK-012",
+        "entry_sha256": "bc4b12bda71426c2c5e12cefb0c50f7e6cd547b63c73ed4b9c16b78bd41fe076",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 6 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "NO_SEMIOTIC_ANOMALY_DETECTED",
+            "best_posterior": "1209/20000",
+            "confidence": "1209/20000",
+            "is_conclusive": "False",
+            "narrative": "Five 'independent' sources report the same event. Four are compromised. One is legitimate but in the minority. Majority wins in aggregative logic. VIG\u00cdA must weight by channel reliability, not source ..."
+          },
+          "case_id": "VIGIA-BREAK-012",
+          "pipeline_meta": {
+            "artifact_count": "6",
+            "avg_score": "1209/4000",
+            "expected_verdict": "BENIGN",
+            "source": "ebs_v1_json_adapter"
+          },
+          "signals": [
+            {
+              "artifact_id": "b012_01",
+              "confidence": "3/10",
+              "description": "Server WEB-01: 'user jdoe executed rm -rf / at 03:00'",
+              "evidence_type": "log_entry",
+              "source": "sift_syslog",
+              "z_score": "123/500"
+            },
+            {
+              "artifact_id": "b012_02",
+              "confidence": "3/10",
+              "description": "Server WEB-02: 'user jdoe executed rm -rf / at 03:00'",
+              "evidence_type": "log_entry",
+              "source": "sift_syslog",
+              "z_score": "123/500"
+            },
+            {
+              "artifact_id": "b012_03",
+              "confidence": "3/10",
+              "description": "Server WEB-03: 'user jdoe executed rm -rf / at 03:00'",
+              "evidence_type": "log_entry",
+              "source": "sift_syslog",
+              "z_score": "123/500"
+            },
+            {
+              "artifact_id": "b012_04",
+              "confidence": "3/10",
+              "description": "Server WEB-04: 'user jdoe executed rm -rf / at 03:00'",
+              "evidence_type": "log_entry",
+              "source": "sift_syslog",
+              "z_score": "123/500"
+            },
+            {
+              "artifact_id": "b012_05",
+              "confidence": "19/20",
+              "description": "Server AIRGAPPED-01 (no network): 'user jdoe executed ls -la at 03:05'",
+              "evidence_type": "log_entry",
+              "source": "sift_syslog",
+              "z_score": "19/400"
+            }
+          ]
+        },
+        "seq": 5,
+        "timestamp": "2026-06-14T19:05:38.872080+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "VIGIA-BREAK-012",
+        "entry_sha256": "e068bb792db66060aef75f8d58a750e9287f611c785929b77086e0f40143b312",
+        "inputs_summary": {
+          "n_signals": "6"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-06-14T19:05:38.872227+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "VIGIA-BREAK-012",
+        "entry_sha256": "7ed76758e3b77c7d43fb8772213fa9119f4e0ebfb862e01c82048a0e1029a5df",
+        "inputs_summary": {
+          "verdict": "NO_SEMIOTIC_ANOMALY_DETECTED"
+        },
+        "iteration": 0,
+        "note": "Exit code 0 \u2014 analysis complete.",
+        "outputs_summary": {
+          "exit_code": "0"
+        },
+        "seq": 7,
+        "timestamp": "2026-06-14T19:05:38.872311+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-06-14T19:05:38.869595+00:00",
+    "total_entries": 7
+  },
+  "case_id": "VIGIA-BREAK-012",
+  "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-BREAK-012.json",
+  "evidence_sha256": "321c7b94f50c61f103ec3afbb423df05b629b6989f35cc7c75d64090437dea3b",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-BREAK-012 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/VIGIA-BREAK-012.json\nEvidence SHA-256: 321c7b94f50c61f103ec3afbb423df05b629b6989f35cc7c75d64090437dea3b\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: NO_SEMIOTIC_ANOMALY_DETECTED\nPosterior confidence: 1209/20000\nConclusive: NO \u2014 requires human review\n\n--- PEIRCEAN NARRATIVE ---\nFive 'independent' sources report the same event. Four are compromised. One is legitimate but in the minority. Majority wins in aggregative logic. VIG\u00cdA must weight by channel reliability, not source count.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [SSH key analysis: WEB-01 through WEB-04 share the same compromised SSH] z=0.782 conf=0.85 \u2014 \n  [Server WEB-01: 'user jdoe executed rm -rf / at 03:00'] z=0.246 conf=0.30 \u2014 \n  [Server WEB-02: 'user jdoe executed rm -rf / at 03:00'] z=0.246 conf=0.30 \u2014 \n  [Server WEB-03: 'user jdoe executed rm -rf / at 03:00'] z=0.246 conf=0.30 \u2014 \n  [Server WEB-04: 'user jdoe executed rm -rf / at 03:00'] z=0.246 conf=0.30 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW \u2014 No significant anomalies detected in this iteration.\n\nCritical signals (z>3): 0\nHigh signals (2<z<=3): 0\nTotal signals analyzed: 6",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "NO_SEMIOTIC_ANOMALY_DETECTED",
+      "best_posterior": "1209/20000",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20000,
+        "num": 1209
+      },
+      "is_conclusive": false,
+      "narrative": "Five 'independent' sources report the same event. Four are compromised. One is legitimate but in the minority. Majority wins in aggregative logic. VIG\u00cdA must weight by channel reliability, not source count."
+    },
+    "case_id": "VIGIA-BREAK-012",
+    "pipeline_meta": {
+      "artifact_count": 6,
+      "avg_score": "1209/4000",
+      "expected_verdict": "BENIGN",
+      "source": "ebs_v1_json_adapter"
+    },
+    "signals": [
+      {
+        "artifact_id": "b012_01",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 3
+        },
+        "description": "Server WEB-01: 'user jdoe executed rm -rf / at 03:00'",
+        "evidence_type": "log_entry",
+        "source": "sift_syslog",
+        "z_score": {
+          "__fraction__": true,
+          "den": 500,
+          "num": 123
+        }
+      },
+      {
+        "artifact_id": "b012_02",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 3
+        },
+        "description": "Server WEB-02: 'user jdoe executed rm -rf / at 03:00'",
+        "evidence_type": "log_entry",
+        "source": "sift_syslog",
+        "z_score": {
+          "__fraction__": true,
+          "den": 500,
+          "num": 123
+        }
+      },
+      {
+        "artifact_id": "b012_03",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 3
+        },
+        "description": "Server WEB-03: 'user jdoe executed rm -rf / at 03:00'",
+        "evidence_type": "log_entry",
+        "source": "sift_syslog",
+        "z_score": {
+          "__fraction__": true,
+          "den": 500,
+          "num": 123
+        }
+      },
+      {
+        "artifact_id": "b012_04",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 3
+        },
+        "description": "Server WEB-04: 'user jdoe executed rm -rf / at 03:00'",
+        "evidence_type": "log_entry",
+        "source": "sift_syslog",
+        "z_score": {
+          "__fraction__": true,
+          "den": 500,
+          "num": 123
+        }
+      },
+      {
+        "artifact_id": "b012_05",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 19
+        },
+        "description": "Server AIRGAPPED-01 (no network): 'user jdoe executed ls -la at 03:05'",
+        "evidence_type": "log_entry",
+        "source": "sift_syslog",
+        "z_score": {
+          "__fraction__": true,
+          "den": 400,
+          "num": 19
+        }
+      },
+      {
+        "artifact_id": "b012_meta",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 17
+        },
+        "description": "SSH key analysis: WEB-01 through WEB-04 share the same compromised SSH key (fingerprint: a1b2c3d4). AIRGAPPED-01 uses a different key (fingerprint: e5f6g7h8).",
+        "evidence_type": "memory_process",
+        "source": "sift_crypto_audit",
+        "z_score": {
+          "__fraction__": true,
+          "den": 500,
+          "num": 391
+        }
+      }
+    ]
+  },
+  "sans_compliance": {
+    "accuracy_validation": false,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}

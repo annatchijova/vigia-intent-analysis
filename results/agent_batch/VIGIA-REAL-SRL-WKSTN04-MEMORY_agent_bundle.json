@@ -1,0 +1,249 @@
+{
+  "analysis_timestamp": "2026-06-14T19:05:40.146820+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "VIGIA-REAL-SRL-WKSTN04-MEMORY",
+    "end_time": "2026-06-14T19:05:40.146824+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "VIGIA-REAL-SRL-WKSTN04-MEMORY",
+        "entry_sha256": "7401d8fd96af60aa0f75eabee5077a539d3dff589e0e29f695f05b7879b354a6",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "VIGIA-REAL-SRL-WKSTN04-MEMORY"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: 4eeafb3bfb155486...",
+        "outputs_summary": {
+          "agent_sha256": "4eeafb3bfb155486142942ad7a2c8678676f86ffd5d076882459354d820591f6",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-06-14T19:05:40.144245+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-REAL-SRL-WKSTN04-MEMORY",
+        "entry_sha256": "f031593b8693594d64a2617e7e8b331a102a7bc0c3714079e67536baa88842b6",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-REAL-SRL-WKSTN04-MEMORY.json"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-06-14T19:05:40.144316+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-REAL-SRL-WKSTN04-MEMORY",
+        "entry_sha256": "61615b2842653f045527ae7f23afb6b70022debe61d8023e7783e400ec7bafaf",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-REAL-SRL-WKSTN04-MEMORY.json"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: 957ae6565db4803e...",
+        "outputs_summary": {
+          "sha256": "957ae6565db4803ed91cabd6c56a7838a9211676ec641a5e890f13f408c1d2ed"
+        },
+        "seq": 3,
+        "timestamp": "2026-06-14T19:05:40.144389+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "VIGIA-REAL-SRL-WKSTN04-MEMORY",
+        "entry_sha256": "c54091b37be7c79a0f8316c3fc5abb4a93a10ac7d5d543fc868e4f2de3b3c27a",
+        "inputs_summary": {
+          "evidence": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-REAL-SRL-WKSTN04-MEMORY.json",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-06-14T19:05:40.144479+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "VIGIA-REAL-SRL-WKSTN04-MEMORY",
+        "entry_sha256": "c607c114936575e95dd6e1f5e491fe506319485daad71ff34bc7e5450da61f14",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 3 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+            "best_posterior": "0",
+            "confidence": "0",
+            "is_conclusive": "False",
+            "narrative": "Volatility3 memory analysis. 2 LOTL + code injection in 24 processes. The only compromised workstation in the SRL-2018 corpus out of 6 analyzed. Memory acquired 2018-09-06 \u2014 one day before final corpu..."
+          },
+          "case_id": "VIGIA-REAL-SRL-WKSTN04-MEMORY",
+          "pipeline_meta": {
+            "artifact_count": "3",
+            "avg_score": "0",
+            "expected_verdict": "MALICE",
+            "source": "ebs_v1_json_adapter"
+          },
+          "signals": [
+            {
+              "artifact_id": "ART-WKSTN04-001",
+              "confidence": "1/2",
+              "description": "",
+              "evidence_type": "unknown",
+              "source": "base-memory.img \u2014 Volatility3 2.28.0 \u2014 vigia_agent.py",
+              "z_score": "0"
+            },
+            {
+              "artifact_id": "ART-WKSTN04-002",
+              "confidence": "1/2",
+              "description": "",
+              "evidence_type": "unknown",
+              "source": "base-memory.img \u2014 Volatility3 2.28.0 \u2014 vigia_agent.py",
+              "z_score": "0"
+            },
+            {
+              "artifact_id": "ART-WKSTN04-003",
+              "confidence": "1/2",
+              "description": "",
+              "evidence_type": "unknown",
+              "source": "Corpus cross-analysis \u2014 RD-02 PowerShell transcripts + vol3 multi-host comparison",
+              "z_score": "0"
+            }
+          ]
+        },
+        "seq": 5,
+        "timestamp": "2026-06-14T19:05:40.146535+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "VIGIA-REAL-SRL-WKSTN04-MEMORY",
+        "entry_sha256": "40d6b277c231e7a270384254e8a6aff67f39a912f6c8bdcb74238a8a663664f8",
+        "inputs_summary": {
+          "n_signals": "3"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-06-14T19:05:40.146624+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "VIGIA-REAL-SRL-WKSTN04-MEMORY",
+        "entry_sha256": "ef3ff08f6bef753165b1561ccd64d1a7ba58fbabc25399bde6b34f0a881c0ab6",
+        "inputs_summary": {
+          "verdict": "MALICIOUS_INTENT_DETECTED"
+        },
+        "iteration": 0,
+        "note": "Exit code 1 \u2014 analysis complete.",
+        "outputs_summary": {
+          "exit_code": "1"
+        },
+        "seq": 7,
+        "timestamp": "2026-06-14T19:05:40.146752+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-06-14T19:05:40.144046+00:00",
+    "total_entries": 7
+  },
+  "case_id": "VIGIA-REAL-SRL-WKSTN04-MEMORY",
+  "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-REAL-SRL-WKSTN04-MEMORY.json",
+  "evidence_sha256": "957ae6565db4803ed91cabd6c56a7838a9211676ec641a5e890f13f408c1d2ed",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-REAL-SRL-WKSTN04-MEMORY ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/VIGIA-REAL-SRL-WKSTN04-MEMORY.json\nEvidence SHA-256: 957ae6565db4803ed91cabd6c56a7838a9211676ec641a5e890f13f408c1d2ed\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 0\nConclusive: NO \u2014 requires human review\n\n--- PEIRCEAN NARRATIVE ---\nVolatility3 memory analysis. 2 LOTL + code injection in 24 processes. The only compromised workstation in the SRL-2018 corpus out of 6 analyzed. Memory acquired 2018-09-06 \u2014 one day before final corpus snapshot. Late-stage endpoint compromise, possibly the attack's final objective.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [base-memory.img \u2014 Volatility3 2.28.0 \u2014 vigia_agent.py] z=0.000 conf=0.50 \u2014 \n  [base-memory.img \u2014 Volatility3 2.28.0 \u2014 vigia_agent.py] z=0.000 conf=0.50 \u2014 \n  [Corpus cross-analysis \u2014 RD-02 PowerShell transcripts + vol3 multi-host] z=0.000 conf=0.50 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW \u2014 No significant anomalies detected in this iteration.\n\nCritical signals (z>3): 0\nHigh signals (2<z<=3): 0\nTotal signals analyzed: 3",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+      "best_posterior": "0",
+      "confidence": {
+        "__fraction__": true,
+        "den": 1,
+        "num": 0
+      },
+      "is_conclusive": false,
+      "narrative": "Volatility3 memory analysis. 2 LOTL + code injection in 24 processes. The only compromised workstation in the SRL-2018 corpus out of 6 analyzed. Memory acquired 2018-09-06 \u2014 one day before final corpus snapshot. Late-stage endpoint compromise, possibly the attack's final objective."
+    },
+    "case_id": "VIGIA-REAL-SRL-WKSTN04-MEMORY",
+    "pipeline_meta": {
+      "artifact_count": 3,
+      "avg_score": "0",
+      "expected_verdict": "MALICE",
+      "source": "ebs_v1_json_adapter"
+    },
+    "signals": [
+      {
+        "artifact_id": "ART-WKSTN04-001",
+        "confidence": {
+          "__fraction__": true,
+          "den": 2,
+          "num": 1
+        },
+        "description": "",
+        "evidence_type": "unknown",
+        "source": "base-memory.img \u2014 Volatility3 2.28.0 \u2014 vigia_agent.py",
+        "z_score": {
+          "__fraction__": true,
+          "den": 1,
+          "num": 0
+        }
+      },
+      {
+        "artifact_id": "ART-WKSTN04-002",
+        "confidence": {
+          "__fraction__": true,
+          "den": 2,
+          "num": 1
+        },
+        "description": "",
+        "evidence_type": "unknown",
+        "source": "base-memory.img \u2014 Volatility3 2.28.0 \u2014 vigia_agent.py",
+        "z_score": {
+          "__fraction__": true,
+          "den": 1,
+          "num": 0
+        }
+      },
+      {
+        "artifact_id": "ART-WKSTN04-003",
+        "confidence": {
+          "__fraction__": true,
+          "den": 2,
+          "num": 1
+        },
+        "description": "",
+        "evidence_type": "unknown",
+        "source": "Corpus cross-analysis \u2014 RD-02 PowerShell transcripts + vol3 multi-host comparison",
+        "z_score": {
+          "__fraction__": true,
+          "den": 1,
+          "num": 0
+        }
+      }
+    ]
+  },
+  "sans_compliance": {
+    "accuracy_validation": false,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}

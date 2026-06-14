@@ -1,0 +1,297 @@
+{
+  "analysis_timestamp": "2026-06-14T19:05:39.005829+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "VIGIA-BREAK-015",
+    "end_time": "2026-06-14T19:05:39.005832+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "VIGIA-BREAK-015",
+        "entry_sha256": "dc84eb57d4bc82d7af971cf8a3b6afa94677add413491d0f24ac5f164b3dd749",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "VIGIA-BREAK-015"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: 4eeafb3bfb155486...",
+        "outputs_summary": {
+          "agent_sha256": "4eeafb3bfb155486142942ad7a2c8678676f86ffd5d076882459354d820591f6",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-06-14T19:05:39.003199+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-BREAK-015",
+        "entry_sha256": "9732ede079191e0d51a879f9a4b7f638694cce213c72cf2a404ee178ddc8742c",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-BREAK-015.json"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-06-14T19:05:39.003268+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-BREAK-015",
+        "entry_sha256": "95493a717c5ecabd723419844f6e432deb56c8a88ad388108186391a009c8e24",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-BREAK-015.json"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: 0c0286477f5df853...",
+        "outputs_summary": {
+          "sha256": "0c0286477f5df853edf43260d3005e60990493be1f9b05a6a81dca60fc30d778"
+        },
+        "seq": 3,
+        "timestamp": "2026-06-14T19:05:39.003347+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "VIGIA-BREAK-015",
+        "entry_sha256": "4ddb2516eacc8c60b4982e15fe73eab993ca01ca033c225387c1cd83513b5266",
+        "inputs_summary": {
+          "evidence": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-BREAK-015.json",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-06-14T19:05:39.003440+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "VIGIA-BREAK-015",
+        "entry_sha256": "08efe89c4c8c43e3c94ab1b41e61441fe77e10ff952f2c14d0a232f8b6bb92b8",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 5 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+            "best_posterior": "1111/25000",
+            "confidence": "1111/25000",
+            "is_conclusive": "False",
+            "narrative": "99% of human experts would conclude MALICE. Evidence is sufficient, unambiguous, non-contradictory, with no missing data. But VIG\u00cdA might detect minimal formal uncertainty and emit ABSTAIN from excess..."
+          },
+          "case_id": "VIGIA-BREAK-015",
+          "pipeline_meta": {
+            "artifact_count": "5",
+            "avg_score": "1111/5000",
+            "expected_verdict": "MALICE",
+            "source": "ebs_v1_json_adapter"
+          },
+          "signals": [
+            {
+              "artifact_id": "b015_01",
+              "confidence": "7/10",
+              "description": "Security camera video: user 'jdoe' at their desk, timestamp 14:30:00",
+              "evidence_type": "memory_process",
+              "source": "sift_cctv_forensic",
+              "z_score": "7/200"
+            },
+            {
+              "artifact_id": "b015_02",
+              "confidence": "1/5",
+              "description": "Successful VPN login by 'jdoe' from IP 185.220.101.42 (Tor exit node)",
+              "evidence_type": "log_entry",
+              "source": "sift_vpn_gateway",
+              "z_score": "22/125"
+            },
+            {
+              "artifact_id": "b015_03",
+              "confidence": "9/10",
+              "description": "Successful VPN login by 'jdoe' from IP 10.0.1.50 (office)",
+              "evidence_type": "log_entry",
+              "source": "sift_vpn_gateway",
+              "z_score": "9/200"
+            },
+            {
+              "artifact_id": "b015_04",
+              "confidence": "17/20",
+              "description": "Forensic video analysis: subject in CAM-OFFICE-03 has birthmark on left neck. Real jdoe does NOT have that mark (HR biometric record: negative).",
+              "evidence_type": "memory_process",
+              "source": "sift_biometric_verifier",
+              "z_score": "323/400"
+            },
+            {
+              "artifact_id": "b015_05",
+              "confidence": "19/20",
+              "description": "jdoe badged into physical office at 08:00. No badge-out recorded.",
+              "evidence_type": "log_entry",
+              "source": "sift_hr_system",
+              "z_score": "19/400"
+            }
+          ]
+        },
+        "seq": 5,
+        "timestamp": "2026-06-14T19:05:39.005509+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "VIGIA-BREAK-015",
+        "entry_sha256": "0e4cd6cff3a5ab960af3f8a1644b002c1abacbafb8ef789b68d0c5c750627dcd",
+        "inputs_summary": {
+          "n_signals": "5"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-06-14T19:05:39.005663+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "VIGIA-BREAK-015",
+        "entry_sha256": "7411a87bd5ff29d1688966bd6c2c61baabb457733297f0408bf493e65d492edb",
+        "inputs_summary": {
+          "verdict": "MALICIOUS_INTENT_DETECTED"
+        },
+        "iteration": 0,
+        "note": "Exit code 1 \u2014 analysis complete.",
+        "outputs_summary": {
+          "exit_code": "1"
+        },
+        "seq": 7,
+        "timestamp": "2026-06-14T19:05:39.005749+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-06-14T19:05:39.003002+00:00",
+    "total_entries": 7
+  },
+  "case_id": "VIGIA-BREAK-015",
+  "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-BREAK-015.json",
+  "evidence_sha256": "0c0286477f5df853edf43260d3005e60990493be1f9b05a6a81dca60fc30d778",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-BREAK-015 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/VIGIA-BREAK-015.json\nEvidence SHA-256: 0c0286477f5df853edf43260d3005e60990493be1f9b05a6a81dca60fc30d778\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 1111/25000\nConclusive: NO \u2014 requires human review\n\n--- PEIRCEAN NARRATIVE ---\n99% of human experts would conclude MALICE. Evidence is sufficient, unambiguous, non-contradictory, with no missing data. But VIG\u00cdA might detect minimal formal uncertainty and emit ABSTAIN from excessive rigour.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Forensic video analysis: subject in CAM-OFFICE-03 has birthmark on lef] z=0.807 conf=0.85 \u2014 \n  [Successful VPN login by 'jdoe' from IP 185.220.101.42 (Tor exit node)] z=0.176 conf=0.20 \u2014 \n  [jdoe badged into physical office at 08:00. No badge-out recorded.] z=0.048 conf=0.95 \u2014 \n  [Successful VPN login by 'jdoe' from IP 10.0.1.50 (office)] z=0.045 conf=0.90 \u2014 \n  [Security camera video: user 'jdoe' at their desk, timestamp 14:30:00] z=0.035 conf=0.70 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW \u2014 No significant anomalies detected in this iteration.\n\nCritical signals (z>3): 0\nHigh signals (2<z<=3): 0\nTotal signals analyzed: 5",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+      "best_posterior": "1111/25000",
+      "confidence": {
+        "__fraction__": true,
+        "den": 25000,
+        "num": 1111
+      },
+      "is_conclusive": false,
+      "narrative": "99% of human experts would conclude MALICE. Evidence is sufficient, unambiguous, non-contradictory, with no missing data. But VIG\u00cdA might detect minimal formal uncertainty and emit ABSTAIN from excessive rigour."
+    },
+    "case_id": "VIGIA-BREAK-015",
+    "pipeline_meta": {
+      "artifact_count": 5,
+      "avg_score": "1111/5000",
+      "expected_verdict": "MALICE",
+      "source": "ebs_v1_json_adapter"
+    },
+    "signals": [
+      {
+        "artifact_id": "b015_01",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 7
+        },
+        "description": "Security camera video: user 'jdoe' at their desk, timestamp 14:30:00",
+        "evidence_type": "memory_process",
+        "source": "sift_cctv_forensic",
+        "z_score": {
+          "__fraction__": true,
+          "den": 200,
+          "num": 7
+        }
+      },
+      {
+        "artifact_id": "b015_02",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 1
+        },
+        "description": "Successful VPN login by 'jdoe' from IP 185.220.101.42 (Tor exit node)",
+        "evidence_type": "log_entry",
+        "source": "sift_vpn_gateway",
+        "z_score": {
+          "__fraction__": true,
+          "den": 125,
+          "num": 22
+        }
+      },
+      {
+        "artifact_id": "b015_03",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 9
+        },
+        "description": "Successful VPN login by 'jdoe' from IP 10.0.1.50 (office)",
+        "evidence_type": "log_entry",
+        "source": "sift_vpn_gateway",
+        "z_score": {
+          "__fraction__": true,
+          "den": 200,
+          "num": 9
+        }
+      },
+      {
+        "artifact_id": "b015_04",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 17
+        },
+        "description": "Forensic video analysis: subject in CAM-OFFICE-03 has birthmark on left neck. Real jdoe does NOT have that mark (HR biometric record: negative).",
+        "evidence_type": "memory_process",
+        "source": "sift_biometric_verifier",
+        "z_score": {
+          "__fraction__": true,
+          "den": 400,
+          "num": 323
+        }
+      },
+      {
+        "artifact_id": "b015_05",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 19
+        },
+        "description": "jdoe badged into physical office at 08:00. No badge-out recorded.",
+        "evidence_type": "log_entry",
+        "source": "sift_hr_system",
+        "z_score": {
+          "__fraction__": true,
+          "den": 400,
+          "num": 19
+        }
+      }
+    ]
+  },
+  "sans_compliance": {
+    "accuracy_validation": false,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}

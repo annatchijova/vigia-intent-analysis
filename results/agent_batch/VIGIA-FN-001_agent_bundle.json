@@ -1,0 +1,249 @@
+{
+  "analysis_timestamp": "2026-06-14T19:05:39.091434+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "VIGIA-FN-001",
+    "end_time": "2026-06-14T19:05:39.091437+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "VIGIA-FN-001",
+        "entry_sha256": "78f7c5caa05d7e4bbfbef4ced0543ea8f8f5d11ce195405cddb4def0d22750af",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "VIGIA-FN-001"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: 4eeafb3bfb155486...",
+        "outputs_summary": {
+          "agent_sha256": "4eeafb3bfb155486142942ad7a2c8678676f86ffd5d076882459354d820591f6",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-06-14T19:05:39.088865+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-FN-001",
+        "entry_sha256": "68bec02ca3602a67998fee753db53268394f6500339f954faa2913cabfa3b514",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-FN-001.json"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-06-14T19:05:39.088934+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-FN-001",
+        "entry_sha256": "45e9378808b4fdc857a29e674c123592df5f9927393e205996d4d6bf1d844e3f",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-FN-001.json"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: 001cd08c26e18324...",
+        "outputs_summary": {
+          "sha256": "001cd08c26e18324cbaae04211aabc44ee57f36bb09580397ecb16852ee2aad3"
+        },
+        "seq": 3,
+        "timestamp": "2026-06-14T19:05:39.089008+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "VIGIA-FN-001",
+        "entry_sha256": "f4f5bbe827bff4292fdc1bf5afa5985ecb3ae717504d726c42c03f29758eaa27",
+        "inputs_summary": {
+          "evidence": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-FN-001.json",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-06-14T19:05:39.089098+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "VIGIA-FN-001",
+        "entry_sha256": "29b791e006b3d4ccaabbf9db0d34bd736e48d87d2a61d67a0715166e441c68c2",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 3 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+            "best_posterior": "151/15000",
+            "confidence": "151/15000",
+            "is_conclusive": "False",
+            "narrative": "Attacker using stolen credentials from a marketing employee. Logs in during business hours (09:30), uses common tools (PowerShell, RDP, SMB), browses client files, compresses 500MB and uploads to pers..."
+          },
+          "case_id": "VIGIA-FN-001",
+          "pipeline_meta": {
+            "artifact_count": "3",
+            "avg_score": "151/3000",
+            "expected_verdict": "MALICE",
+            "source": "ebs_v1_json_adapter"
+          },
+          "signals": [
+            {
+              "artifact_id": "fn001_01",
+              "confidence": "9/10",
+              "description": "Successful login by marketing_user",
+              "evidence_type": "log_entry",
+              "source": "sift_azure_ad",
+              "z_score": "9/200"
+            },
+            {
+              "artifact_id": "fn001_02",
+              "confidence": "1/5",
+              "description": "Google Drive connection with 500MB uploaded from marketing_user workstation",
+              "evidence_type": "memory_process",
+              "source": "sift_netflow",
+              "z_score": "3/100"
+            },
+            {
+              "artifact_id": "fn001_03",
+              "confidence": "19/20",
+              "description": "marketing_user registered vacation from 2026-06-15 to 2026-06-30",
+              "evidence_type": "log_entry",
+              "source": "sift_hr_system",
+              "z_score": "19/250"
+            }
+          ]
+        },
+        "seq": 5,
+        "timestamp": "2026-06-14T19:05:39.091136+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "VIGIA-FN-001",
+        "entry_sha256": "3b1da8f4ee137070b749de22c656c4bac79ecf03feddedc7ee3115d90f08535b",
+        "inputs_summary": {
+          "n_signals": "3"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-06-14T19:05:39.091230+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "VIGIA-FN-001",
+        "entry_sha256": "a38f39b77ca3f9e2eaf71daa7396dfdeef92e33591516d24274150b0382f2638",
+        "inputs_summary": {
+          "verdict": "MALICIOUS_INTENT_DETECTED"
+        },
+        "iteration": 0,
+        "note": "Exit code 1 \u2014 analysis complete.",
+        "outputs_summary": {
+          "exit_code": "1"
+        },
+        "seq": 7,
+        "timestamp": "2026-06-14T19:05:39.091359+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-06-14T19:05:39.088679+00:00",
+    "total_entries": 7
+  },
+  "case_id": "VIGIA-FN-001",
+  "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-FN-001.json",
+  "evidence_sha256": "001cd08c26e18324cbaae04211aabc44ee57f36bb09580397ecb16852ee2aad3",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-FN-001 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/VIGIA-FN-001.json\nEvidence SHA-256: 001cd08c26e18324cbaae04211aabc44ee57f36bb09580397ecb16852ee2aad3\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 151/15000\nConclusive: NO \u2014 requires human review\n\n--- PEIRCEAN NARRATIVE ---\nAttacker using stolen credentials from a marketing employee. Logs in during business hours (09:30), uses common tools (PowerShell, RDP, SMB), browses client files, compresses 500MB and uploads to personal Google Drive. No errors, no anomalous tools, no timestomping. The real employee was on vacation.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [marketing_user registered vacation from 2026-06-15 to 2026-06-30] z=0.076 conf=0.95 \u2014 \n  [Successful login by marketing_user] z=0.045 conf=0.90 \u2014 \n  [Google Drive connection with 500MB uploaded from marketing_user workst] z=0.030 conf=0.20 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW \u2014 No significant anomalies detected in this iteration.\n\nCritical signals (z>3): 0\nHigh signals (2<z<=3): 0\nTotal signals analyzed: 3",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+      "best_posterior": "151/15000",
+      "confidence": {
+        "__fraction__": true,
+        "den": 15000,
+        "num": 151
+      },
+      "is_conclusive": false,
+      "narrative": "Attacker using stolen credentials from a marketing employee. Logs in during business hours (09:30), uses common tools (PowerShell, RDP, SMB), browses client files, compresses 500MB and uploads to personal Google Drive. No errors, no anomalous tools, no timestomping. The real employee was on vacation."
+    },
+    "case_id": "VIGIA-FN-001",
+    "pipeline_meta": {
+      "artifact_count": 3,
+      "avg_score": "151/3000",
+      "expected_verdict": "MALICE",
+      "source": "ebs_v1_json_adapter"
+    },
+    "signals": [
+      {
+        "artifact_id": "fn001_01",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 9
+        },
+        "description": "Successful login by marketing_user",
+        "evidence_type": "log_entry",
+        "source": "sift_azure_ad",
+        "z_score": {
+          "__fraction__": true,
+          "den": 200,
+          "num": 9
+        }
+      },
+      {
+        "artifact_id": "fn001_02",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 1
+        },
+        "description": "Google Drive connection with 500MB uploaded from marketing_user workstation",
+        "evidence_type": "memory_process",
+        "source": "sift_netflow",
+        "z_score": {
+          "__fraction__": true,
+          "den": 100,
+          "num": 3
+        }
+      },
+      {
+        "artifact_id": "fn001_03",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 19
+        },
+        "description": "marketing_user registered vacation from 2026-06-15 to 2026-06-30",
+        "evidence_type": "log_entry",
+        "source": "sift_hr_system",
+        "z_score": {
+          "__fraction__": true,
+          "den": 250,
+          "num": 19
+        }
+      }
+    ]
+  },
+  "sans_compliance": {
+    "accuracy_validation": false,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}

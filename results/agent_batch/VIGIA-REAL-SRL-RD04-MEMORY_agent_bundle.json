@@ -1,0 +1,249 @@
+{
+  "analysis_timestamp": "2026-06-14T19:05:40.013705+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "VIGIA-REAL-SRL-RD04-MEMORY",
+    "end_time": "2026-06-14T19:05:40.013708+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "VIGIA-REAL-SRL-RD04-MEMORY",
+        "entry_sha256": "7ed98189837b0df08046e482e045a4417f1a9f2ad1ee8b2a42e62c66a87fcb57",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "VIGIA-REAL-SRL-RD04-MEMORY"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: 4eeafb3bfb155486...",
+        "outputs_summary": {
+          "agent_sha256": "4eeafb3bfb155486142942ad7a2c8678676f86ffd5d076882459354d820591f6",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-06-14T19:05:40.011027+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-REAL-SRL-RD04-MEMORY",
+        "entry_sha256": "d7d816e9c8ff1a526b7554343078b354fa85590255b38b86b5dab64843a57075",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-REAL-SRL-RD04-MEMORY.json"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-06-14T19:05:40.011099+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-REAL-SRL-RD04-MEMORY",
+        "entry_sha256": "300aa5a36efebb2a6729489c97381f04b784eca1ae4c227ebb2e58a28e090160",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-REAL-SRL-RD04-MEMORY.json"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: 79bbf4832deebc9b...",
+        "outputs_summary": {
+          "sha256": "79bbf4832deebc9b5d92164a7bbdb88448a393a02189db56c3926d7500d8a300"
+        },
+        "seq": 3,
+        "timestamp": "2026-06-14T19:05:40.011176+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "VIGIA-REAL-SRL-RD04-MEMORY",
+        "entry_sha256": "f7f204b1b367118c0df7f4b10d895dfc9d594cf8f4d7793c85f06a4ff30df9e6",
+        "inputs_summary": {
+          "evidence": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-REAL-SRL-RD04-MEMORY.json",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-06-14T19:05:40.011259+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "VIGIA-REAL-SRL-RD04-MEMORY",
+        "entry_sha256": "976f03665bef01eb89e0132a4f21ab38cc889b61854042dda9fd31e731b271c2",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 3 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+            "best_posterior": "0",
+            "confidence": "0",
+            "is_conclusive": "False",
+            "narrative": "Volatility3 memory analysis. 30 LOTL processes + code injection in 33 processes. The most operationally active compromised host in SRL-2018 corpus. 30 simultaneous LOTL processes is the signature of a..."
+          },
+          "case_id": "VIGIA-REAL-SRL-RD04-MEMORY",
+          "pipeline_meta": {
+            "artifact_count": "3",
+            "avg_score": "0",
+            "expected_verdict": "MALICE",
+            "source": "ebs_v1_json_adapter"
+          },
+          "signals": [
+            {
+              "artifact_id": "ART-RD04-001",
+              "confidence": "1/2",
+              "description": "",
+              "evidence_type": "unknown",
+              "source": "unknown",
+              "z_score": "0"
+            },
+            {
+              "artifact_id": "ART-RD04-002",
+              "confidence": "1/2",
+              "description": "",
+              "evidence_type": "unknown",
+              "source": "unknown",
+              "z_score": "0"
+            },
+            {
+              "artifact_id": "ART-RD04-003",
+              "confidence": "1/2",
+              "description": "",
+              "evidence_type": "unknown",
+              "source": "unknown",
+              "z_score": "0"
+            }
+          ]
+        },
+        "seq": 5,
+        "timestamp": "2026-06-14T19:05:40.013403+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "VIGIA-REAL-SRL-RD04-MEMORY",
+        "entry_sha256": "b62314443a6b51cf3698f90317c70031bfb7ec2fbb84800e9826de2fb5836525",
+        "inputs_summary": {
+          "n_signals": "3"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-06-14T19:05:40.013502+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "VIGIA-REAL-SRL-RD04-MEMORY",
+        "entry_sha256": "4fd5742c9f056e30c5484585d19cd643c7c8452cc6dbfbcd82019e59abdc8f3c",
+        "inputs_summary": {
+          "verdict": "MALICIOUS_INTENT_DETECTED"
+        },
+        "iteration": 0,
+        "note": "Exit code 1 \u2014 analysis complete.",
+        "outputs_summary": {
+          "exit_code": "1"
+        },
+        "seq": 7,
+        "timestamp": "2026-06-14T19:05:40.013633+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-06-14T19:05:40.010812+00:00",
+    "total_entries": 7
+  },
+  "case_id": "VIGIA-REAL-SRL-RD04-MEMORY",
+  "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-REAL-SRL-RD04-MEMORY.json",
+  "evidence_sha256": "79bbf4832deebc9b5d92164a7bbdb88448a393a02189db56c3926d7500d8a300",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-REAL-SRL-RD04-MEMORY ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/VIGIA-REAL-SRL-RD04-MEMORY.json\nEvidence SHA-256: 79bbf4832deebc9b5d92164a7bbdb88448a393a02189db56c3926d7500d8a300\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 0\nConclusive: NO \u2014 requires human review\n\n--- PEIRCEAN NARRATIVE ---\nVolatility3 memory analysis. 30 LOTL processes + code injection in 33 processes. The most operationally active compromised host in SRL-2018 corpus. 30 simultaneous LOTL processes is the signature of an active C2 framework with multiple concurrent beacons. Primary attacker pivot post-lateral-movement.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [unknown] z=0.000 conf=0.50 \u2014 \n  [unknown] z=0.000 conf=0.50 \u2014 \n  [unknown] z=0.000 conf=0.50 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW \u2014 No significant anomalies detected in this iteration.\n\nCritical signals (z>3): 0\nHigh signals (2<z<=3): 0\nTotal signals analyzed: 3",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+      "best_posterior": "0",
+      "confidence": {
+        "__fraction__": true,
+        "den": 1,
+        "num": 0
+      },
+      "is_conclusive": false,
+      "narrative": "Volatility3 memory analysis. 30 LOTL processes + code injection in 33 processes. The most operationally active compromised host in SRL-2018 corpus. 30 simultaneous LOTL processes is the signature of an active C2 framework with multiple concurrent beacons. Primary attacker pivot post-lateral-movement."
+    },
+    "case_id": "VIGIA-REAL-SRL-RD04-MEMORY",
+    "pipeline_meta": {
+      "artifact_count": 3,
+      "avg_score": "0",
+      "expected_verdict": "MALICE",
+      "source": "ebs_v1_json_adapter"
+    },
+    "signals": [
+      {
+        "artifact_id": "ART-RD04-001",
+        "confidence": {
+          "__fraction__": true,
+          "den": 2,
+          "num": 1
+        },
+        "description": "",
+        "evidence_type": "unknown",
+        "source": "unknown",
+        "z_score": {
+          "__fraction__": true,
+          "den": 1,
+          "num": 0
+        }
+      },
+      {
+        "artifact_id": "ART-RD04-002",
+        "confidence": {
+          "__fraction__": true,
+          "den": 2,
+          "num": 1
+        },
+        "description": "",
+        "evidence_type": "unknown",
+        "source": "unknown",
+        "z_score": {
+          "__fraction__": true,
+          "den": 1,
+          "num": 0
+        }
+      },
+      {
+        "artifact_id": "ART-RD04-003",
+        "confidence": {
+          "__fraction__": true,
+          "den": 2,
+          "num": 1
+        },
+        "description": "",
+        "evidence_type": "unknown",
+        "source": "unknown",
+        "z_score": {
+          "__fraction__": true,
+          "den": 1,
+          "num": 0
+        }
+      }
+    ]
+  },
+  "sans_compliance": {
+    "accuracy_validation": false,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}

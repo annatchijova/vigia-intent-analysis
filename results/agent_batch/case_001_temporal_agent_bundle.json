@@ -1,0 +1,249 @@
+{
+  "analysis_timestamp": "2026-06-14T19:05:40.232493+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "case_001_temporal",
+    "end_time": "2026-06-14T19:05:40.232497+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "case_001_temporal",
+        "entry_sha256": "0c0deff6fd94c62bf1c286c4637df45f2f45aa69b1d1ce5e12f2e737ce4aee62",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "case_001_temporal"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: 4eeafb3bfb155486...",
+        "outputs_summary": {
+          "agent_sha256": "4eeafb3bfb155486142942ad7a2c8678676f86ffd5d076882459354d820591f6",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-06-14T19:05:40.229937+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "case_001_temporal",
+        "entry_sha256": "599f32f47d3cdf40428655f3a7ad40d1672ea51f96ed1b96af124213f5e8a2e3",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/case_001_temporal.json"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-06-14T19:05:40.230007+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "case_001_temporal",
+        "entry_sha256": "23488b4204be2e999443bb0213f70701f8db4733aa39659a95194b8e34c4534b",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/case_001_temporal.json"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: c8a208e5e3da0cde...",
+        "outputs_summary": {
+          "sha256": "c8a208e5e3da0cded8ad418558bc77d08982b4678e9a0b1b7fee53fc39b487f3"
+        },
+        "seq": 3,
+        "timestamp": "2026-06-14T19:05:40.230084+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "case_001_temporal",
+        "entry_sha256": "1de8460bdb22e45dbf197f0d50cc0b35b59d4d8f1838bb120fa8c1f0cf0baa7d",
+        "inputs_summary": {
+          "evidence": "/home/labestiadevigia/vigia-repo/data/cases/case_001_temporal.json",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-06-14T19:05:40.230171+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "case_001_temporal",
+        "entry_sha256": "d2e44161650d77d661adb7fec6076a4806b2872552327b77adef0e173dce9268",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 3 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+            "best_posterior": "7/60",
+            "confidence": "7/60",
+            "is_conclusive": "True",
+            "narrative": "File write occurs before the process that created it was spawned. Classic timestomp + process hollowing."
+          },
+          "case_id": "case_001_temporal",
+          "pipeline_meta": {
+            "artifact_count": "3",
+            "avg_score": "7/12",
+            "expected_verdict": "MALICE",
+            "source": "ebs_v1_json_adapter"
+          },
+          "signals": [
+            {
+              "artifact_id": "proc_001",
+              "confidence": "19/20",
+              "description": "Process svchost.exe (PID 4412) spawned at 10:00:05",
+              "evidence_type": "memory_process",
+              "source": "list_processes",
+              "z_score": "171/200"
+            },
+            {
+              "artifact_id": "file_001",
+              "confidence": "7/10",
+              "description": "C:\\Windows\\Temp\\payload.dll written at 10:00:00 \u2014 5s BEFORE PID 4412 existed",
+              "evidence_type": "file_timestamp",
+              "source": "read_evidence",
+              "z_score": "119/200"
+            },
+            {
+              "artifact_id": "log_001",
+              "confidence": "1/2",
+              "description": "EventLog 4663: File creation by PID 4412 at 10:00:02",
+              "evidence_type": "log_entry",
+              "source": "read_evidence",
+              "z_score": "3/10"
+            }
+          ]
+        },
+        "seq": 5,
+        "timestamp": "2026-06-14T19:05:40.232194+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "case_001_temporal",
+        "entry_sha256": "ceb6cbfdcd7caec083eef3561d0973948679f1a7d2a36ae451db107587cb91ce",
+        "inputs_summary": {
+          "n_signals": "3"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-06-14T19:05:40.232288+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "case_001_temporal",
+        "entry_sha256": "65585c58dc983783d1de7410a7efd8ee06ddfd5dceadd130f3e8344782bb128c",
+        "inputs_summary": {
+          "verdict": "MALICIOUS_INTENT_DETECTED"
+        },
+        "iteration": 0,
+        "note": "Exit code 1 \u2014 analysis complete.",
+        "outputs_summary": {
+          "exit_code": "1"
+        },
+        "seq": 7,
+        "timestamp": "2026-06-14T19:05:40.232416+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-06-14T19:05:40.229748+00:00",
+    "total_entries": 7
+  },
+  "case_id": "case_001_temporal",
+  "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/case_001_temporal.json",
+  "evidence_sha256": "c8a208e5e3da0cded8ad418558bc77d08982b4678e9a0b1b7fee53fc39b487f3",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE case_001_temporal ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/case_001_temporal.json\nEvidence SHA-256: c8a208e5e3da0cded8ad418558bc77d08982b4678e9a0b1b7fee53fc39b487f3\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 7/60\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\nFile write occurs before the process that created it was spawned. Classic timestomp + process hollowing.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Process svchost.exe (PID 4412) spawned at 10:00:05] z=0.855 conf=0.95 \u2014 \n  [C:\\Windows\\Temp\\payload.dll written at 10:00:00 \u2014 5s BEFORE PID 4412 e] z=0.595 conf=0.70 \u2014 \n  [EventLog 4663: File creation by PID 4412 at 10:00:02] z=0.300 conf=0.50 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW \u2014 No significant anomalies detected in this iteration.\n\nCritical signals (z>3): 0\nHigh signals (2<z<=3): 0\nTotal signals analyzed: 3",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+      "best_posterior": "7/60",
+      "confidence": {
+        "__fraction__": true,
+        "den": 60,
+        "num": 7
+      },
+      "is_conclusive": true,
+      "narrative": "File write occurs before the process that created it was spawned. Classic timestomp + process hollowing."
+    },
+    "case_id": "case_001_temporal",
+    "pipeline_meta": {
+      "artifact_count": 3,
+      "avg_score": "7/12",
+      "expected_verdict": "MALICE",
+      "source": "ebs_v1_json_adapter"
+    },
+    "signals": [
+      {
+        "artifact_id": "proc_001",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 19
+        },
+        "description": "Process svchost.exe (PID 4412) spawned at 10:00:05",
+        "evidence_type": "memory_process",
+        "source": "list_processes",
+        "z_score": {
+          "__fraction__": true,
+          "den": 200,
+          "num": 171
+        }
+      },
+      {
+        "artifact_id": "file_001",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 7
+        },
+        "description": "C:\\Windows\\Temp\\payload.dll written at 10:00:00 \u2014 5s BEFORE PID 4412 existed",
+        "evidence_type": "file_timestamp",
+        "source": "read_evidence",
+        "z_score": {
+          "__fraction__": true,
+          "den": 200,
+          "num": 119
+        }
+      },
+      {
+        "artifact_id": "log_001",
+        "confidence": {
+          "__fraction__": true,
+          "den": 2,
+          "num": 1
+        },
+        "description": "EventLog 4663: File creation by PID 4412 at 10:00:02",
+        "evidence_type": "log_entry",
+        "source": "read_evidence",
+        "z_score": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 3
+        }
+      }
+    ]
+  },
+  "sans_compliance": {
+    "accuracy_validation": false,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}

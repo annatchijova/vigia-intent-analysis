@@ -1,0 +1,273 @@
+{
+  "analysis_timestamp": "2026-06-14T19:05:44.386364+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "VIGIA-CAN-049",
+    "end_time": "2026-06-14T19:05:44.386367+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "VIGIA-CAN-049",
+        "entry_sha256": "2b8cd325e64b6b6d983a678f6fb14b7c9264b231afcd00dbcca835ba761f94d3",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "VIGIA-CAN-049"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: 4eeafb3bfb155486...",
+        "outputs_summary": {
+          "agent_sha256": "4eeafb3bfb155486142942ad7a2c8678676f86ffd5d076882459354d820591f6",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-06-14T19:05:44.383783+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-CAN-049",
+        "entry_sha256": "db1efc000cf1d897da593249b8cec8eae3bab877d7ab1283bfc782e6a969a751",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-049.json"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-06-14T19:05:44.383854+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-CAN-049",
+        "entry_sha256": "106ab3450236d1cc10099b1fd0c5d0c5616bdacee9decbd72dcd516fff03c743",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-049.json"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: 307ac296cda4a88e...",
+        "outputs_summary": {
+          "sha256": "307ac296cda4a88e4ef0c9561a497c3668df8d9acc90c49ec4758eb1cd4877cc"
+        },
+        "seq": 3,
+        "timestamp": "2026-06-14T19:05:44.383926+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "VIGIA-CAN-049",
+        "entry_sha256": "0755a27d03f0f63f18d34ec69cb25cbe3bcd12c7b3738e99abafcf1ccf6d16ce",
+        "inputs_summary": {
+          "evidence": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-049.json",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-06-14T19:05:44.384011+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "VIGIA-CAN-049",
+        "entry_sha256": "c0e8ea3cc5e56128f272ec04cf93eed8ab5f69ad1286c2c5b6713a5bcd8da2f7",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 4 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+            "best_posterior": "583/20000",
+            "confidence": "583/20000",
+            "is_conclusive": "False",
+            "narrative": "Systematic pattern of controlled doubt combined with system self-gaslighting: user fails password exactly 2 times always (never locks out) while issuing doubt messages at critical moments."
+          },
+          "case_id": "case_fusion_duda_instrumental",
+          "pipeline_meta": {
+            "artifact_count": "4",
+            "avg_score": "583/4000",
+            "expected_verdict": "MALICE",
+            "source": "ebs_v1_json_adapter"
+          },
+          "signals": [
+            {
+              "artifact_id": "f002_login",
+              "confidence": "2/5",
+              "description": "Authentication log: user 'jdoe' fails password exactly 2 times before succeeding on the third attempt, for 47 consecutive days. Never reaches the limit of 3.",
+              "evidence_type": "log_entry",
+              "source": "sift_syslog",
+              "z_score": "7/250"
+            },
+            {
+              "artifact_id": "f002_chat",
+              "confidence": "3/10",
+              "description": "Doubt messages at critical moments: 'maybe it was an error', 'I might not have done it', 'I'm not sure' \u2014 always before security decisions.",
+              "evidence_type": "log_entry",
+              "source": "sift_chat_system",
+              "z_score": "9/500"
+            },
+            {
+              "artifact_id": "f002_entropy",
+              "confidence": "11/20",
+              "description": "Login failure pattern entropy: 0.04 bits (expected for human >2.0). Time variance between attempts: exactly 0.8 seconds.",
+              "evidence_type": "cultural_marker",
+              "source": "sift_entropy",
+              "z_score": "979/2000"
+            },
+            {
+              "artifact_id": "f002_bruteforce",
+              "confidence": "19/20",
+              "description": "Automated process in memory executing brute force with a cadence of 2 attempts + pause + 1 successful attempt (evades 3-failure lockout).",
+              "evidence_type": "memory_process",
+              "source": "sift_volatility",
+              "z_score": "19/400"
+            }
+          ]
+        },
+        "seq": 5,
+        "timestamp": "2026-06-14T19:05:44.386061+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "VIGIA-CAN-049",
+        "entry_sha256": "dec541d305bc1bbc3d81c473b533cbce2feecde857c1faab59e2eb45f1904049",
+        "inputs_summary": {
+          "n_signals": "4"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-06-14T19:05:44.386156+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "VIGIA-CAN-049",
+        "entry_sha256": "681f2f0bd77a0fe1db13ddc8e3b5e6679fe007c717bfcefe128bc2b91aeed069",
+        "inputs_summary": {
+          "verdict": "MALICIOUS_INTENT_DETECTED"
+        },
+        "iteration": 0,
+        "note": "Exit code 1 \u2014 analysis complete.",
+        "outputs_summary": {
+          "exit_code": "1"
+        },
+        "seq": 7,
+        "timestamp": "2026-06-14T19:05:44.386287+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-06-14T19:05:44.383593+00:00",
+    "total_entries": 7
+  },
+  "case_id": "VIGIA-CAN-049",
+  "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-049.json",
+  "evidence_sha256": "307ac296cda4a88e4ef0c9561a497c3668df8d9acc90c49ec4758eb1cd4877cc",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-CAN-049 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-049.json\nEvidence SHA-256: 307ac296cda4a88e4ef0c9561a497c3668df8d9acc90c49ec4758eb1cd4877cc\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 583/20000\nConclusive: NO \u2014 requires human review\n\n--- PEIRCEAN NARRATIVE ---\nSystematic pattern of controlled doubt combined with system self-gaslighting: user fails password exactly 2 times always (never locks out) while issuing doubt messages at critical moments.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Login failure pattern entropy: 0.04 bits (expected for human >2.0). Ti] z=0.489 conf=0.55 \u2014 \n  [Automated process in memory executing brute force with a cadence of 2 ] z=0.048 conf=0.95 \u2014 \n  [Authentication log: user 'jdoe' fails password exactly 2 times before ] z=0.028 conf=0.40 \u2014 \n  [Doubt messages at critical moments: 'maybe it was an error', 'I might ] z=0.018 conf=0.30 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW \u2014 No significant anomalies detected in this iteration.\n\nCritical signals (z>3): 0\nHigh signals (2<z<=3): 0\nTotal signals analyzed: 4",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+      "best_posterior": "583/20000",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20000,
+        "num": 583
+      },
+      "is_conclusive": false,
+      "narrative": "Systematic pattern of controlled doubt combined with system self-gaslighting: user fails password exactly 2 times always (never locks out) while issuing doubt messages at critical moments."
+    },
+    "case_id": "case_fusion_duda_instrumental",
+    "pipeline_meta": {
+      "artifact_count": 4,
+      "avg_score": "583/4000",
+      "expected_verdict": "MALICE",
+      "source": "ebs_v1_json_adapter"
+    },
+    "signals": [
+      {
+        "artifact_id": "f002_login",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 2
+        },
+        "description": "Authentication log: user 'jdoe' fails password exactly 2 times before succeeding on the third attempt, for 47 consecutive days. Never reaches the limit of 3.",
+        "evidence_type": "log_entry",
+        "source": "sift_syslog",
+        "z_score": {
+          "__fraction__": true,
+          "den": 250,
+          "num": 7
+        }
+      },
+      {
+        "artifact_id": "f002_chat",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 3
+        },
+        "description": "Doubt messages at critical moments: 'maybe it was an error', 'I might not have done it', 'I'm not sure' \u2014 always before security decisions.",
+        "evidence_type": "log_entry",
+        "source": "sift_chat_system",
+        "z_score": {
+          "__fraction__": true,
+          "den": 500,
+          "num": 9
+        }
+      },
+      {
+        "artifact_id": "f002_entropy",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 11
+        },
+        "description": "Login failure pattern entropy: 0.04 bits (expected for human >2.0). Time variance between attempts: exactly 0.8 seconds.",
+        "evidence_type": "cultural_marker",
+        "source": "sift_entropy",
+        "z_score": {
+          "__fraction__": true,
+          "den": 2000,
+          "num": 979
+        }
+      },
+      {
+        "artifact_id": "f002_bruteforce",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 19
+        },
+        "description": "Automated process in memory executing brute force with a cadence of 2 attempts + pause + 1 successful attempt (evades 3-failure lockout).",
+        "evidence_type": "memory_process",
+        "source": "sift_volatility",
+        "z_score": {
+          "__fraction__": true,
+          "den": 400,
+          "num": 19
+        }
+      }
+    ]
+  },
+  "sans_compliance": {
+    "accuracy_validation": false,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}

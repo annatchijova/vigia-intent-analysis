@@ -1,0 +1,249 @@
+{
+  "analysis_timestamp": "2026-06-14T19:05:40.964151+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "VIGIA-BEN-005",
+    "end_time": "2026-06-14T19:05:40.964154+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "VIGIA-BEN-005",
+        "entry_sha256": "a2d17ed67ffa454a8299de44b892de3b6c7f68451d1992b2368088767ce61722",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "VIGIA-BEN-005"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: 4eeafb3bfb155486...",
+        "outputs_summary": {
+          "agent_sha256": "4eeafb3bfb155486142942ad7a2c8678676f86ffd5d076882459354d820591f6",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-06-14T19:05:40.961592+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-BEN-005",
+        "entry_sha256": "fd9ad05fa95a2552163017232f9138130db7620f98734397426320c45f9c2941",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-BEN-005.json"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-06-14T19:05:40.961662+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-BEN-005",
+        "entry_sha256": "45de5d828610afb2a7febc008d381293b78754cb16b9c822be715fb054bbeb11",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-BEN-005.json"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: d07ae86496823e15...",
+        "outputs_summary": {
+          "sha256": "d07ae86496823e1560c2f6c963d5e67f535ed9c68d4e512abbd543e83807025e"
+        },
+        "seq": 3,
+        "timestamp": "2026-06-14T19:05:40.961744+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "VIGIA-BEN-005",
+        "entry_sha256": "77a1fcc79d923a6506c8bbf6501cd901c852f4f46d142910a2006e9d9fb92400",
+        "inputs_summary": {
+          "evidence": "/home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-BEN-005.json",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-06-14T19:05:40.961827+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "VIGIA-BEN-005",
+        "entry_sha256": "5f33b7765c86ececb96cbe96cbd612936f4ffe4bf3e8eb620c04908e57a0fa7b",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 3 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "NO_SEMIOTIC_ANOMALY_DETECTED",
+            "best_posterior": "1/80",
+            "confidence": "1/80",
+            "is_conclusive": "False",
+            "narrative": "User with a new mechanical keyboard (different switches) makes 3 typing errors before entering the correct password. The pattern is: error, quick correction, successful login, normal 8-hour activity."
+          },
+          "case_id": "VIGIA-BEN-005",
+          "pipeline_meta": {
+            "artifact_count": "3",
+            "avg_score": "1/16",
+            "expected_verdict": "NOISE",
+            "source": "ebs_v1_json_adapter"
+          },
+          "signals": [
+            {
+              "artifact_id": "ART-001",
+              "confidence": "3/10",
+              "description": "2024-03-10 09:05:12 | user: maria.garcia | login attempt 1: FAILED (password mismatch) | 09:05:18 | attempt 2: FAILED | 09:05:25 | attempt 3: SUCCESS | Source IP: 10.0.1.45 (main office)",
+              "evidence_type": "log_entry",
+              "source": "legacy_converter",
+              "z_score": "21/400"
+            },
+            {
+              "artifact_id": "ART-002",
+              "confidence": "3/10",
+              "description": "09:05-17:30 | Normal work pattern: Outlook, Excel, Teams, internal sites | No sudo | No external access | No file transfers | Keystroke dynamics: high variance, consistent with new mechanical keyboard",
+              "evidence_type": "log_entry",
+              "source": "legacy_converter",
+              "z_score": "51/800"
+            },
+            {
+              "artifact_id": "ART-003",
+              "confidence": "3/10",
+              "description": "IT ticket IT-4492: 'Maria Garcia requests Keychron K2 mechanical keyboard' | Approved: 2024-03-05 | Delivered: 2024-03-08 | Asset tag: KB-2024-044 | Photo of old membrane keyboard in recycling bin",
+              "evidence_type": "file_timestamp",
+              "source": "legacy_converter",
+              "z_score": "57/800"
+            }
+          ]
+        },
+        "seq": 5,
+        "timestamp": "2026-06-14T19:05:40.963865+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "VIGIA-BEN-005",
+        "entry_sha256": "5e345f1fa1fcad8207cf0c60ccae3bcaa3d752d663fc40f29fe4ec44b6818ecf",
+        "inputs_summary": {
+          "n_signals": "3"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-06-14T19:05:40.963954+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "VIGIA-BEN-005",
+        "entry_sha256": "61936ce038183f1d5ab8c5cea499c22cc487bc6bd6358034afcd9832a9507add",
+        "inputs_summary": {
+          "verdict": "NO_SEMIOTIC_ANOMALY_DETECTED"
+        },
+        "iteration": 0,
+        "note": "Exit code 0 \u2014 analysis complete.",
+        "outputs_summary": {
+          "exit_code": "0"
+        },
+        "seq": 7,
+        "timestamp": "2026-06-14T19:05:40.964083+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-06-14T19:05:40.961389+00:00",
+    "total_entries": 7
+  },
+  "case_id": "VIGIA-BEN-005",
+  "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-BEN-005.json",
+  "evidence_sha256": "d07ae86496823e1560c2f6c963d5e67f535ed9c68d4e512abbd543e83807025e",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-BEN-005 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-BEN-005.json\nEvidence SHA-256: d07ae86496823e1560c2f6c963d5e67f535ed9c68d4e512abbd543e83807025e\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: NO_SEMIOTIC_ANOMALY_DETECTED\nPosterior confidence: 1/80\nConclusive: NO \u2014 requires human review\n\n--- PEIRCEAN NARRATIVE ---\nUser with a new mechanical keyboard (different switches) makes 3 typing errors before entering the correct password. The pattern is: error, quick correction, successful login, normal 8-hour activity.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [IT ticket IT-4492: 'Maria Garcia requests Keychron K2 mechanical keybo] z=0.071 conf=0.30 \u2014 \n  [09:05-17:30 | Normal work pattern: Outlook, Excel, Teams, internal sit] z=0.064 conf=0.30 \u2014 \n  [2024-03-10 09:05:12 | user: maria.garcia | login attempt 1: FAILED (pa] z=0.052 conf=0.30 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW \u2014 No significant anomalies detected in this iteration.\n\nCritical signals (z>3): 0\nHigh signals (2<z<=3): 0\nTotal signals analyzed: 3",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "NO_SEMIOTIC_ANOMALY_DETECTED",
+      "best_posterior": "1/80",
+      "confidence": {
+        "__fraction__": true,
+        "den": 80,
+        "num": 1
+      },
+      "is_conclusive": false,
+      "narrative": "User with a new mechanical keyboard (different switches) makes 3 typing errors before entering the correct password. The pattern is: error, quick correction, successful login, normal 8-hour activity."
+    },
+    "case_id": "VIGIA-BEN-005",
+    "pipeline_meta": {
+      "artifact_count": 3,
+      "avg_score": "1/16",
+      "expected_verdict": "NOISE",
+      "source": "ebs_v1_json_adapter"
+    },
+    "signals": [
+      {
+        "artifact_id": "ART-001",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 3
+        },
+        "description": "2024-03-10 09:05:12 | user: maria.garcia | login attempt 1: FAILED (password mismatch) | 09:05:18 | attempt 2: FAILED | 09:05:25 | attempt 3: SUCCESS | Source IP: 10.0.1.45 (main office)",
+        "evidence_type": "log_entry",
+        "source": "legacy_converter",
+        "z_score": {
+          "__fraction__": true,
+          "den": 400,
+          "num": 21
+        }
+      },
+      {
+        "artifact_id": "ART-002",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 3
+        },
+        "description": "09:05-17:30 | Normal work pattern: Outlook, Excel, Teams, internal sites | No sudo | No external access | No file transfers | Keystroke dynamics: high variance, consistent with new mechanical keyboard",
+        "evidence_type": "log_entry",
+        "source": "legacy_converter",
+        "z_score": {
+          "__fraction__": true,
+          "den": 800,
+          "num": 51
+        }
+      },
+      {
+        "artifact_id": "ART-003",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 3
+        },
+        "description": "IT ticket IT-4492: 'Maria Garcia requests Keychron K2 mechanical keyboard' | Approved: 2024-03-05 | Delivered: 2024-03-08 | Asset tag: KB-2024-044 | Photo of old membrane keyboard in recycling bin",
+        "evidence_type": "file_timestamp",
+        "source": "legacy_converter",
+        "z_score": {
+          "__fraction__": true,
+          "den": 800,
+          "num": 57
+        }
+      }
+    ]
+  },
+  "sans_compliance": {
+    "accuracy_validation": false,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}

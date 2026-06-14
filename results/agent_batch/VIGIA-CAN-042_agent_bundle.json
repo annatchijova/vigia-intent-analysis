@@ -1,0 +1,273 @@
+{
+  "analysis_timestamp": "2026-06-14T19:05:44.083732+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "VIGIA-CAN-042",
+    "end_time": "2026-06-14T19:05:44.083735+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "VIGIA-CAN-042",
+        "entry_sha256": "7fbcf7921f619976f1c2e35260364cdb5c30f9f4d9ad23d04463c6b0c4736740",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "VIGIA-CAN-042"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: 4eeafb3bfb155486...",
+        "outputs_summary": {
+          "agent_sha256": "4eeafb3bfb155486142942ad7a2c8678676f86ffd5d076882459354d820591f6",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-06-14T19:05:44.081132+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-CAN-042",
+        "entry_sha256": "c1495b16abfd5c119cd31c9128012cd2b2cba0cb6d1e275b5011938ff3cb3298",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-042.json"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-06-14T19:05:44.081201+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-CAN-042",
+        "entry_sha256": "46ad8095de18e243e30c37386277343d3fbebcf174fa5771384e69328470cad7",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-042.json"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: a10a06a0b6422b33...",
+        "outputs_summary": {
+          "sha256": "a10a06a0b6422b333bec8d068136f00e10ca30c7a913ad103fb21fba0deb652d"
+        },
+        "seq": 3,
+        "timestamp": "2026-06-14T19:05:44.081273+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "VIGIA-CAN-042",
+        "entry_sha256": "9a1a3f4aa80c93d572206b86391ddd673ee469625fc7cdffdaed9c2e102016a8",
+        "inputs_summary": {
+          "evidence": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-042.json",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-06-14T19:05:44.081357+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "VIGIA-CAN-042",
+        "entry_sha256": "ce717cd98ba001c38856009d9bebf991dd20bc9c2225c9eeac62e43820067995",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 4 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+            "best_posterior": "57/800",
+            "confidence": "57/800",
+            "is_conclusive": "True",
+            "narrative": "Hidden process in memory makes no network traffic for hours. When the user opens Zoom/Teams for a video call, in that very millisecond it begins exfiltrating GB within the legitimate video noise."
+          },
+          "case_id": "case_012_camuflaje_simbiotico",
+          "pipeline_meta": {
+            "artifact_count": "4",
+            "avg_score": "57/160",
+            "expected_verdict": "MALICE",
+            "source": "ebs_v1_json_adapter"
+          },
+          "signals": [
+            {
+              "artifact_id": "a012_hidden",
+              "confidence": "19/20",
+              "description": "Hidden process in memory (no entry in userland process list) with handle to a TCP socket in ESTABLISHED state but no activity for 4.2 hours.",
+              "evidence_type": "memory_process",
+              "source": "sift_volatility",
+              "z_score": "171/200"
+            },
+            {
+              "artifact_id": "a012_zoom",
+              "confidence": "7/20",
+              "description": "User opens zoom.exe at 14:32:15.000; video call start log with external participant.",
+              "evidence_type": "memory_process",
+              "source": "sift_syslog",
+              "z_score": "161/500"
+            },
+            {
+              "artifact_id": "a012_exfil",
+              "confidence": "1/4",
+              "description": "Outbound traffic spike of 2.3GB in 180 seconds initiated exactly at 14:32:15.120 (120ms after Zoom) toward a suspicious CDN IP.",
+              "evidence_type": "memory_process",
+              "source": "sift_netflow",
+              "z_score": "23/100"
+            },
+            {
+              "artifact_id": "a012_bandwidth",
+              "confidence": "3/10",
+              "description": "Zoom reports 4.2Mbps bandwidth usage (HD video); total traffic measured at the interface is 847Mbps \u2014 200:1 discrepancy.",
+              "evidence_type": "log_entry",
+              "source": "sift_netflow",
+              "z_score": "9/500"
+            }
+          ]
+        },
+        "seq": 5,
+        "timestamp": "2026-06-14T19:05:44.083417+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "VIGIA-CAN-042",
+        "entry_sha256": "dbf0f7953dbecbabe0421b8abb5b0b26d053efc880f853470ebd7a410ea5471b",
+        "inputs_summary": {
+          "n_signals": "4"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-06-14T19:05:44.083527+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "VIGIA-CAN-042",
+        "entry_sha256": "f2554c491e252aa878759af673d53aedc61712acf649cd7e6a34ffa9cef7a3b3",
+        "inputs_summary": {
+          "verdict": "MALICIOUS_INTENT_DETECTED"
+        },
+        "iteration": 0,
+        "note": "Exit code 1 \u2014 analysis complete.",
+        "outputs_summary": {
+          "exit_code": "1"
+        },
+        "seq": 7,
+        "timestamp": "2026-06-14T19:05:44.083657+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-06-14T19:05:44.080945+00:00",
+    "total_entries": 7
+  },
+  "case_id": "VIGIA-CAN-042",
+  "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-042.json",
+  "evidence_sha256": "a10a06a0b6422b333bec8d068136f00e10ca30c7a913ad103fb21fba0deb652d",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-CAN-042 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-042.json\nEvidence SHA-256: a10a06a0b6422b333bec8d068136f00e10ca30c7a913ad103fb21fba0deb652d\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 57/800\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\nHidden process in memory makes no network traffic for hours. When the user opens Zoom/Teams for a video call, in that very millisecond it begins exfiltrating GB within the legitimate video noise.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Hidden process in memory (no entry in userland process list) with hand] z=0.855 conf=0.95 \u2014 \n  [User opens zoom.exe at 14:32:15.000; video call start log with externa] z=0.322 conf=0.35 \u2014 \n  [Outbound traffic spike of 2.3GB in 180 seconds initiated exactly at 14] z=0.230 conf=0.25 \u2014 \n  [Zoom reports 4.2Mbps bandwidth usage (HD video); total traffic measure] z=0.018 conf=0.30 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW \u2014 No significant anomalies detected in this iteration.\n\nCritical signals (z>3): 0\nHigh signals (2<z<=3): 0\nTotal signals analyzed: 4",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+      "best_posterior": "57/800",
+      "confidence": {
+        "__fraction__": true,
+        "den": 800,
+        "num": 57
+      },
+      "is_conclusive": true,
+      "narrative": "Hidden process in memory makes no network traffic for hours. When the user opens Zoom/Teams for a video call, in that very millisecond it begins exfiltrating GB within the legitimate video noise."
+    },
+    "case_id": "case_012_camuflaje_simbiotico",
+    "pipeline_meta": {
+      "artifact_count": 4,
+      "avg_score": "57/160",
+      "expected_verdict": "MALICE",
+      "source": "ebs_v1_json_adapter"
+    },
+    "signals": [
+      {
+        "artifact_id": "a012_hidden",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 19
+        },
+        "description": "Hidden process in memory (no entry in userland process list) with handle to a TCP socket in ESTABLISHED state but no activity for 4.2 hours.",
+        "evidence_type": "memory_process",
+        "source": "sift_volatility",
+        "z_score": {
+          "__fraction__": true,
+          "den": 200,
+          "num": 171
+        }
+      },
+      {
+        "artifact_id": "a012_zoom",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 7
+        },
+        "description": "User opens zoom.exe at 14:32:15.000; video call start log with external participant.",
+        "evidence_type": "memory_process",
+        "source": "sift_syslog",
+        "z_score": {
+          "__fraction__": true,
+          "den": 500,
+          "num": 161
+        }
+      },
+      {
+        "artifact_id": "a012_exfil",
+        "confidence": {
+          "__fraction__": true,
+          "den": 4,
+          "num": 1
+        },
+        "description": "Outbound traffic spike of 2.3GB in 180 seconds initiated exactly at 14:32:15.120 (120ms after Zoom) toward a suspicious CDN IP.",
+        "evidence_type": "memory_process",
+        "source": "sift_netflow",
+        "z_score": {
+          "__fraction__": true,
+          "den": 100,
+          "num": 23
+        }
+      },
+      {
+        "artifact_id": "a012_bandwidth",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 3
+        },
+        "description": "Zoom reports 4.2Mbps bandwidth usage (HD video); total traffic measured at the interface is 847Mbps \u2014 200:1 discrepancy.",
+        "evidence_type": "log_entry",
+        "source": "sift_netflow",
+        "z_score": {
+          "__fraction__": true,
+          "den": 500,
+          "num": 9
+        }
+      }
+    ]
+  },
+  "sans_compliance": {
+    "accuracy_validation": false,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}

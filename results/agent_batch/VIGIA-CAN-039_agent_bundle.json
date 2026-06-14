@@ -1,0 +1,273 @@
+{
+  "analysis_timestamp": "2026-06-14T19:05:43.954075+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "VIGIA-CAN-039",
+    "end_time": "2026-06-14T19:05:43.954078+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "VIGIA-CAN-039",
+        "entry_sha256": "3d4a658f3508d4bc5434af3258e8ce40a5f4e6247267040607565f94bce8ae8a",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "VIGIA-CAN-039"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: 4eeafb3bfb155486...",
+        "outputs_summary": {
+          "agent_sha256": "4eeafb3bfb155486142942ad7a2c8678676f86ffd5d076882459354d820591f6",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-06-14T19:05:43.951456+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-CAN-039",
+        "entry_sha256": "4f9b2fbf32627a41fb2c1f4c2a92c426b336b42e3ef83d6ab95115410e713dc3",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-039.json"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-06-14T19:05:43.951527+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-CAN-039",
+        "entry_sha256": "c80b24359633da5cb91532c240333e28a7c188ed94200668232d71725058bdbc",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-039.json"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: c73252ebca7a3b31...",
+        "outputs_summary": {
+          "sha256": "c73252ebca7a3b31370698cc9f7a6d715e238e7929faeb812777b5da19f89bd6"
+        },
+        "seq": 3,
+        "timestamp": "2026-06-14T19:05:43.951601+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "VIGIA-CAN-039",
+        "entry_sha256": "2bf37a629e2764f1957e810533f8ec9d4014374c4c3abedb0b6938d8a2362e44",
+        "inputs_summary": {
+          "evidence": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-039.json",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-06-14T19:05:43.951683+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "VIGIA-CAN-039",
+        "entry_sha256": "8ee6e47856585c6446d89f0f16d0382acf16da821370fb941a5bb20ec5f2f06d",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 4 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+            "best_posterior": "77/625",
+            "confidence": "77/625",
+            "is_conclusive": "True",
+            "narrative": "User fails the password exactly 2 times before succeeding for 47 consecutive days (never reaches the 3-attempt limit). Variance 0.8s. Pattern entropy: 0.04 bits. On the day of the real attack, the ale..."
+          },
+          "case_id": "case_016_auto_gaslighting_sistema",
+          "pipeline_meta": {
+            "artifact_count": "4",
+            "avg_score": "77/125",
+            "expected_verdict": "MALICE",
+            "source": "ebs_v1_json_adapter"
+          },
+          "signals": [
+            {
+              "artifact_id": "a016_01",
+              "confidence": "7/20",
+              "description": "47 consecutive days: exactly 2 Event 4625 failures + 1 Event 4624 success. Time variance between attempts: 0.8s. Never reaches the limit of 3.",
+              "evidence_type": "memory_process",
+              "source": "sift_windows_eventlog",
+              "z_score": "161/500"
+            },
+            {
+              "artifact_id": "a016_02",
+              "confidence": "11/20",
+              "description": "Failure pattern entropy: 0.04 bits. Expected for a human: >2.0 bits. 0.8s variance is an automation signature.",
+              "evidence_type": "file_timestamp",
+              "source": "sift_entropy",
+              "z_score": "451/1000"
+            },
+            {
+              "artifact_id": "a016_03",
+              "confidence": "9/10",
+              "description": "Day of attack: 847 failed attempts in 3 minutes from a different IP. Alert suppressed because the user had a 'history of frequent failures'.",
+              "evidence_type": "lsass_session",
+              "source": "sift_windows_eventlog",
+              "z_score": "171/200"
+            },
+            {
+              "artifact_id": "a016_04",
+              "confidence": "19/20",
+              "description": "Automated process in memory executing the 2-failure + pause + 1-success pattern. Exact 0.8s cadence.",
+              "evidence_type": "memory_process",
+              "source": "sift_volatility",
+              "z_score": "209/250"
+            }
+          ]
+        },
+        "seq": 5,
+        "timestamp": "2026-06-14T19:05:43.953762+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "VIGIA-CAN-039",
+        "entry_sha256": "01e8d3e18fbf5180cad024afae611596c38792d8036967b1067a9cd4bdd6bb31",
+        "inputs_summary": {
+          "n_signals": "4"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-06-14T19:05:43.953868+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "VIGIA-CAN-039",
+        "entry_sha256": "695741ec2328381e809b55c31700b2151ac00aa6f9e93bb58bbcc71a1ef5f19b",
+        "inputs_summary": {
+          "verdict": "MALICIOUS_INTENT_DETECTED"
+        },
+        "iteration": 0,
+        "note": "Exit code 1 \u2014 analysis complete.",
+        "outputs_summary": {
+          "exit_code": "1"
+        },
+        "seq": 7,
+        "timestamp": "2026-06-14T19:05:43.954000+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-06-14T19:05:43.951258+00:00",
+    "total_entries": 7
+  },
+  "case_id": "VIGIA-CAN-039",
+  "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-039.json",
+  "evidence_sha256": "c73252ebca7a3b31370698cc9f7a6d715e238e7929faeb812777b5da19f89bd6",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-CAN-039 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-039.json\nEvidence SHA-256: c73252ebca7a3b31370698cc9f7a6d715e238e7929faeb812777b5da19f89bd6\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 77/625\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\nUser fails the password exactly 2 times before succeeding for 47 consecutive days (never reaches the 3-attempt limit). Variance 0.8s. Pattern entropy: 0.04 bits. On the day of the real attack, the alert suppression created by this baseline enables the brute force.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Day of attack: 847 failed attempts in 3 minutes from a different IP. A] z=0.855 conf=0.90 \u2014 \n  [Automated process in memory executing the 2-failure + pause + 1-succes] z=0.836 conf=0.95 \u2014 \n  [Failure pattern entropy: 0.04 bits. Expected for a human: >2.0 bits. 0] z=0.451 conf=0.55 \u2014 \n  [47 consecutive days: exactly 2 Event 4625 failures + 1 Event 4624 succ] z=0.322 conf=0.35 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW \u2014 No significant anomalies detected in this iteration.\n\nCritical signals (z>3): 0\nHigh signals (2<z<=3): 0\nTotal signals analyzed: 4",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+      "best_posterior": "77/625",
+      "confidence": {
+        "__fraction__": true,
+        "den": 625,
+        "num": 77
+      },
+      "is_conclusive": true,
+      "narrative": "User fails the password exactly 2 times before succeeding for 47 consecutive days (never reaches the 3-attempt limit). Variance 0.8s. Pattern entropy: 0.04 bits. On the day of the real attack, the alert suppression created by this baseline enables the brute force."
+    },
+    "case_id": "case_016_auto_gaslighting_sistema",
+    "pipeline_meta": {
+      "artifact_count": 4,
+      "avg_score": "77/125",
+      "expected_verdict": "MALICE",
+      "source": "ebs_v1_json_adapter"
+    },
+    "signals": [
+      {
+        "artifact_id": "a016_01",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 7
+        },
+        "description": "47 consecutive days: exactly 2 Event 4625 failures + 1 Event 4624 success. Time variance between attempts: 0.8s. Never reaches the limit of 3.",
+        "evidence_type": "memory_process",
+        "source": "sift_windows_eventlog",
+        "z_score": {
+          "__fraction__": true,
+          "den": 500,
+          "num": 161
+        }
+      },
+      {
+        "artifact_id": "a016_02",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 11
+        },
+        "description": "Failure pattern entropy: 0.04 bits. Expected for a human: >2.0 bits. 0.8s variance is an automation signature.",
+        "evidence_type": "file_timestamp",
+        "source": "sift_entropy",
+        "z_score": {
+          "__fraction__": true,
+          "den": 1000,
+          "num": 451
+        }
+      },
+      {
+        "artifact_id": "a016_03",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 9
+        },
+        "description": "Day of attack: 847 failed attempts in 3 minutes from a different IP. Alert suppressed because the user had a 'history of frequent failures'.",
+        "evidence_type": "lsass_session",
+        "source": "sift_windows_eventlog",
+        "z_score": {
+          "__fraction__": true,
+          "den": 200,
+          "num": 171
+        }
+      },
+      {
+        "artifact_id": "a016_04",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 19
+        },
+        "description": "Automated process in memory executing the 2-failure + pause + 1-success pattern. Exact 0.8s cadence.",
+        "evidence_type": "memory_process",
+        "source": "sift_volatility",
+        "z_score": {
+          "__fraction__": true,
+          "den": 250,
+          "num": 209
+        }
+      }
+    ]
+  },
+  "sans_compliance": {
+    "accuracy_validation": false,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}

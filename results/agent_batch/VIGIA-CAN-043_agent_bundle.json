@@ -1,0 +1,273 @@
+{
+  "analysis_timestamp": "2026-06-14T19:05:44.126926+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "VIGIA-CAN-043",
+    "end_time": "2026-06-14T19:05:44.126929+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "VIGIA-CAN-043",
+        "entry_sha256": "bba2041e289735aeb765ba9f4b488473ec422060fde3a21d58524f99a226875c",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "VIGIA-CAN-043"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: 4eeafb3bfb155486...",
+        "outputs_summary": {
+          "agent_sha256": "4eeafb3bfb155486142942ad7a2c8678676f86ffd5d076882459354d820591f6",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-06-14T19:05:44.124344+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-CAN-043",
+        "entry_sha256": "3de14fcfdc46b7bad600c2d811c326af97a119b3d4d92ad2b68ce00bba09a22b",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-043.json"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-06-14T19:05:44.124413+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-CAN-043",
+        "entry_sha256": "d4ee3290b2f16b8e1de27578daa4013718224f12dbda8e6e5cea2bc132d54c0d",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-043.json"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: da710feabee0afe9...",
+        "outputs_summary": {
+          "sha256": "da710feabee0afe9af1a151078e0407387a9f5562451292887c9e7fd3c9f3bab"
+        },
+        "seq": 3,
+        "timestamp": "2026-06-14T19:05:44.124496+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "VIGIA-CAN-043",
+        "entry_sha256": "55ad6bcba1814edfcf061af35d092151b7dd4636b9e52a5aea17795edb26b374",
+        "inputs_summary": {
+          "evidence": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-043.json",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-06-14T19:05:44.124584+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "VIGIA-CAN-043",
+        "entry_sha256": "515bf2dfdd1b6b0ec7e1268df4bfd33e6cbb81fa76cbe4cc4464ee73c40b6495",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 4 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+            "best_posterior": "189/20000",
+            "confidence": "189/20000",
+            "is_conclusive": "False",
+            "narrative": "User contacts technical support for an admin password reset. Excessively polite, provides all technical details before being asked, uses the analyst's exact jargon, and praises the operator."
+          },
+          "case_id": "case_013_estocolmo_inverso",
+          "pipeline_meta": {
+            "artifact_count": "4",
+            "avg_score": "189/4000",
+            "expected_verdict": "MALICE",
+            "source": "ebs_v1_json_adapter"
+          },
+          "signals": [
+            {
+              "artifact_id": "a013_chat",
+              "confidence": "3/10",
+              "description": "Support chat: user starts with 'Hi, I need an admin password reset for svc_backup. I know it's delicate. My SID is S-1-5-21-...' before the operator asks.",
+              "evidence_type": "memory_process",
+              "source": "sift_chat_system",
+              "z_score": "3/200"
+            },
+            {
+              "artifact_id": "a013_jargon",
+              "confidence": "3/20",
+              "description": "Use of exact internal analyst jargon: 'let's rotate the hash', 'I need to verify the primary domain controller', 'are you on the PDC or the BDC?'",
+              "evidence_type": "cultural_marker",
+              "source": "sift_linguistic",
+              "z_score": "123/1000"
+            },
+            {
+              "artifact_id": "a013_flattery",
+              "confidence": "1/4",
+              "description": "Flattery messages: 'You're the best on the team, you helped me last time and saved me', 'I know I can trust you with this'.",
+              "evidence_type": "log_entry",
+              "source": "sift_chat_system",
+              "z_score": "3/200"
+            },
+            {
+              "artifact_id": "a013_reset",
+              "confidence": "9/20",
+              "description": "svc_backup password reset executed by tier2_009 without an approved change ticket or secondary identity verification.",
+              "evidence_type": "log_entry",
+              "source": "sift_syslog",
+              "z_score": "9/250"
+            }
+          ]
+        },
+        "seq": 5,
+        "timestamp": "2026-06-14T19:05:44.126627+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "VIGIA-CAN-043",
+        "entry_sha256": "eb8aee7c1f800ec0bd34c6fb10b818309c3aa612a917daba0fafdb23ed180747",
+        "inputs_summary": {
+          "n_signals": "4"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-06-14T19:05:44.126722+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "VIGIA-CAN-043",
+        "entry_sha256": "dc55ba53f2de7567ea03a5badcdcae686617d74c92711179e6e12157d4840c20",
+        "inputs_summary": {
+          "verdict": "MALICIOUS_INTENT_DETECTED"
+        },
+        "iteration": 0,
+        "note": "Exit code 1 \u2014 analysis complete.",
+        "outputs_summary": {
+          "exit_code": "1"
+        },
+        "seq": 7,
+        "timestamp": "2026-06-14T19:05:44.126852+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-06-14T19:05:44.124155+00:00",
+    "total_entries": 7
+  },
+  "case_id": "VIGIA-CAN-043",
+  "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-043.json",
+  "evidence_sha256": "da710feabee0afe9af1a151078e0407387a9f5562451292887c9e7fd3c9f3bab",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-CAN-043 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-043.json\nEvidence SHA-256: da710feabee0afe9af1a151078e0407387a9f5562451292887c9e7fd3c9f3bab\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 189/20000\nConclusive: NO \u2014 requires human review\n\n--- PEIRCEAN NARRATIVE ---\nUser contacts technical support for an admin password reset. Excessively polite, provides all technical details before being asked, uses the analyst's exact jargon, and praises the operator.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Use of exact internal analyst jargon: 'let's rotate the hash', 'I need] z=0.123 conf=0.15 \u2014 \n  [svc_backup password reset executed by tier2_009 without an approved ch] z=0.036 conf=0.45 \u2014 \n  [Support chat: user starts with 'Hi, I need an admin password reset for] z=0.015 conf=0.30 \u2014 \n  [Flattery messages: 'You're the best on the team, you helped me last ti] z=0.015 conf=0.25 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW \u2014 No significant anomalies detected in this iteration.\n\nCritical signals (z>3): 0\nHigh signals (2<z<=3): 0\nTotal signals analyzed: 4",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+      "best_posterior": "189/20000",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20000,
+        "num": 189
+      },
+      "is_conclusive": false,
+      "narrative": "User contacts technical support for an admin password reset. Excessively polite, provides all technical details before being asked, uses the analyst's exact jargon, and praises the operator."
+    },
+    "case_id": "case_013_estocolmo_inverso",
+    "pipeline_meta": {
+      "artifact_count": 4,
+      "avg_score": "189/4000",
+      "expected_verdict": "MALICE",
+      "source": "ebs_v1_json_adapter"
+    },
+    "signals": [
+      {
+        "artifact_id": "a013_chat",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 3
+        },
+        "description": "Support chat: user starts with 'Hi, I need an admin password reset for svc_backup. I know it's delicate. My SID is S-1-5-21-...' before the operator asks.",
+        "evidence_type": "memory_process",
+        "source": "sift_chat_system",
+        "z_score": {
+          "__fraction__": true,
+          "den": 200,
+          "num": 3
+        }
+      },
+      {
+        "artifact_id": "a013_jargon",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 3
+        },
+        "description": "Use of exact internal analyst jargon: 'let's rotate the hash', 'I need to verify the primary domain controller', 'are you on the PDC or the BDC?'",
+        "evidence_type": "cultural_marker",
+        "source": "sift_linguistic",
+        "z_score": {
+          "__fraction__": true,
+          "den": 1000,
+          "num": 123
+        }
+      },
+      {
+        "artifact_id": "a013_flattery",
+        "confidence": {
+          "__fraction__": true,
+          "den": 4,
+          "num": 1
+        },
+        "description": "Flattery messages: 'You're the best on the team, you helped me last time and saved me', 'I know I can trust you with this'.",
+        "evidence_type": "log_entry",
+        "source": "sift_chat_system",
+        "z_score": {
+          "__fraction__": true,
+          "den": 200,
+          "num": 3
+        }
+      },
+      {
+        "artifact_id": "a013_reset",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 9
+        },
+        "description": "svc_backup password reset executed by tier2_009 without an approved change ticket or secondary identity verification.",
+        "evidence_type": "log_entry",
+        "source": "sift_syslog",
+        "z_score": {
+          "__fraction__": true,
+          "den": 250,
+          "num": 9
+        }
+      }
+    ]
+  },
+  "sans_compliance": {
+    "accuracy_validation": false,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}

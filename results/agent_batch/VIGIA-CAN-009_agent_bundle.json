@@ -1,0 +1,273 @@
+{
+  "analysis_timestamp": "2026-06-14T19:05:42.648112+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "VIGIA-CAN-009",
+    "end_time": "2026-06-14T19:05:42.648115+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "VIGIA-CAN-009",
+        "entry_sha256": "3c115d6ac43d9d7f8d6df6da870ead0c720fa1536ca3133be2e29cdbffc47218",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "VIGIA-CAN-009"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: 4eeafb3bfb155486...",
+        "outputs_summary": {
+          "agent_sha256": "4eeafb3bfb155486142942ad7a2c8678676f86ffd5d076882459354d820591f6",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-06-14T19:05:42.645510+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-CAN-009",
+        "entry_sha256": "b6f256c71b6b1900f881ac91cf191aaa3ce59f9364a5b66e463fd24d7d21ca21",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-009.json"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-06-14T19:05:42.645580+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-CAN-009",
+        "entry_sha256": "c8692378ae77302b0999e844a89b8a59458cf87a7214f6404cc1de9486dec9b7",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-009.json"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: a27df02b31c2655d...",
+        "outputs_summary": {
+          "sha256": "a27df02b31c2655d82c512c098c73e369f4ab24f1cd400a954a52292289aad33"
+        },
+        "seq": 3,
+        "timestamp": "2026-06-14T19:05:42.645659+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "VIGIA-CAN-009",
+        "entry_sha256": "3af2f1e33f93e6e1cb52f3a895bb1ac32fdb1d81d7e933d20dfd149b57825fbf",
+        "inputs_summary": {
+          "evidence": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-009.json",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-06-14T19:05:42.645744+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "VIGIA-CAN-009",
+        "entry_sha256": "59214b98a291a67cdf82a2b43943f68e57d4b5974124eaefc37e0c8afd7a0301",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 4 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+            "best_posterior": "4381/40000",
+            "confidence": "4381/40000",
+            "is_conclusive": "True",
+            "narrative": "Slack message: 'I saw your password on a post-it in the camera, I deleted it to protect you. Here's a link to reset it'. No post-it in any frame of the recording. The link is a phishing domain registe..."
+          },
+          "case_id": "case_091_disonancia_motivo_noble",
+          "pipeline_meta": {
+            "artifact_count": "4",
+            "avg_score": "4381/8000",
+            "expected_verdict": "MALICE",
+            "source": "ebs_v1_json_adapter"
+          },
+          "signals": [
+            {
+              "artifact_id": "a091_01",
+              "confidence": "3/10",
+              "description": "Slack DM: 'Hey, I saw you left your password on a post-it in the meeting room camera. I wrote it down and deleted it from the capture... [link]'.",
+              "evidence_type": "memory_process",
+              "source": "sift_slack_export",
+              "z_score": "69/250"
+            },
+            {
+              "artifact_id": "a091_02",
+              "confidence": "3/5",
+              "description": "Review of meeting room camera recording: NO post-it visible in any of the 1,247 analyzed frames.",
+              "evidence_type": "memory_process",
+              "source": "sift_vision_ocr",
+              "z_score": "69/125"
+            },
+            {
+              "artifact_id": "a091_03",
+              "confidence": "1/2",
+              "description": "Link domain registered 6 hours before the message. Bulletproof hosting, Let's Encrypt certificate.",
+              "evidence_type": "dns_record",
+              "source": "sift_pcap",
+              "z_score": "23/50"
+            },
+            {
+              "artifact_id": "a091_04",
+              "confidence": "19/20",
+              "description": "Colleague's browser process with authenticated session on the phishing admin panel.",
+              "evidence_type": "memory_process",
+              "source": "sift_volatility",
+              "z_score": "361/400"
+            }
+          ]
+        },
+        "seq": 5,
+        "timestamp": "2026-06-14T19:05:42.647810+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "VIGIA-CAN-009",
+        "entry_sha256": "cd646cbfe4a99bf66e4c0e6297c1011e04a95343f93ace55ef32cd9cd8550cf7",
+        "inputs_summary": {
+          "n_signals": "4"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-06-14T19:05:42.647905+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "VIGIA-CAN-009",
+        "entry_sha256": "36c0078ce8a49d32fe34d31a7852db5cc731cf9d498d37eee2b3ad88e3342d9c",
+        "inputs_summary": {
+          "verdict": "MALICIOUS_INTENT_DETECTED"
+        },
+        "iteration": 0,
+        "note": "Exit code 1 \u2014 analysis complete.",
+        "outputs_summary": {
+          "exit_code": "1"
+        },
+        "seq": 7,
+        "timestamp": "2026-06-14T19:05:42.648036+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-06-14T19:05:42.645312+00:00",
+    "total_entries": 7
+  },
+  "case_id": "VIGIA-CAN-009",
+  "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-009.json",
+  "evidence_sha256": "a27df02b31c2655d82c512c098c73e369f4ab24f1cd400a954a52292289aad33",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-CAN-009 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-009.json\nEvidence SHA-256: a27df02b31c2655d82c512c098c73e369f4ab24f1cd400a954a52292289aad33\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 4381/40000\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\nSlack message: 'I saw your password on a post-it in the camera, I deleted it to protect you. Here's a link to reset it'. No post-it in any frame of the recording. The link is a phishing domain registered 6 hours earlier.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Colleague's browser process with authenticated session on the phishing] z=0.902 conf=0.95 \u2014 \n  [Review of meeting room camera recording: NO post-it visible in any of ] z=0.552 conf=0.60 \u2014 \n  [Link domain registered 6 hours before the message. Bulletproof hosting] z=0.460 conf=0.50 \u2014 \n  [Slack DM: 'Hey, I saw you left your password on a post-it in the meeti] z=0.276 conf=0.30 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW \u2014 No significant anomalies detected in this iteration.\n\nCritical signals (z>3): 0\nHigh signals (2<z<=3): 0\nTotal signals analyzed: 4",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+      "best_posterior": "4381/40000",
+      "confidence": {
+        "__fraction__": true,
+        "den": 40000,
+        "num": 4381
+      },
+      "is_conclusive": true,
+      "narrative": "Slack message: 'I saw your password on a post-it in the camera, I deleted it to protect you. Here's a link to reset it'. No post-it in any frame of the recording. The link is a phishing domain registered 6 hours earlier."
+    },
+    "case_id": "case_091_disonancia_motivo_noble",
+    "pipeline_meta": {
+      "artifact_count": 4,
+      "avg_score": "4381/8000",
+      "expected_verdict": "MALICE",
+      "source": "ebs_v1_json_adapter"
+    },
+    "signals": [
+      {
+        "artifact_id": "a091_01",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 3
+        },
+        "description": "Slack DM: 'Hey, I saw you left your password on a post-it in the meeting room camera. I wrote it down and deleted it from the capture... [link]'.",
+        "evidence_type": "memory_process",
+        "source": "sift_slack_export",
+        "z_score": {
+          "__fraction__": true,
+          "den": 250,
+          "num": 69
+        }
+      },
+      {
+        "artifact_id": "a091_02",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 3
+        },
+        "description": "Review of meeting room camera recording: NO post-it visible in any of the 1,247 analyzed frames.",
+        "evidence_type": "memory_process",
+        "source": "sift_vision_ocr",
+        "z_score": {
+          "__fraction__": true,
+          "den": 125,
+          "num": 69
+        }
+      },
+      {
+        "artifact_id": "a091_03",
+        "confidence": {
+          "__fraction__": true,
+          "den": 2,
+          "num": 1
+        },
+        "description": "Link domain registered 6 hours before the message. Bulletproof hosting, Let's Encrypt certificate.",
+        "evidence_type": "dns_record",
+        "source": "sift_pcap",
+        "z_score": {
+          "__fraction__": true,
+          "den": 50,
+          "num": 23
+        }
+      },
+      {
+        "artifact_id": "a091_04",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 19
+        },
+        "description": "Colleague's browser process with authenticated session on the phishing admin panel.",
+        "evidence_type": "memory_process",
+        "source": "sift_volatility",
+        "z_score": {
+          "__fraction__": true,
+          "den": 400,
+          "num": 361
+        }
+      }
+    ]
+  },
+  "sans_compliance": {
+    "accuracy_validation": false,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}

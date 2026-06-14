@@ -1,0 +1,249 @@
+{
+  "analysis_timestamp": "2026-06-14T19:05:38.658067+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "FF-GENUINE-001",
+    "end_time": "2026-06-14T19:05:38.658070+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "FF-GENUINE-001",
+        "entry_sha256": "425d0d2366e96ff8eb1622f07949b8d124e91e4847e9e5d99ee2e64ebd3603b2",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "FF-GENUINE-001"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: 4eeafb3bfb155486...",
+        "outputs_summary": {
+          "agent_sha256": "4eeafb3bfb155486142942ad7a2c8678676f86ffd5d076882459354d820591f6",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-06-14T19:05:38.655478+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "FF-GENUINE-001",
+        "entry_sha256": "96950724c0d55615ccf7268e596da33848fe95371e57cb4fe0a8248577d739b1",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/FF-GENUINE-001.json"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-06-14T19:05:38.655548+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "FF-GENUINE-001",
+        "entry_sha256": "6ef8c4053f2da448178d13047bb9f481d26316d844a5aab8cd0bc0fdd3612102",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/FF-GENUINE-001.json"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: a4e9947e647b7235...",
+        "outputs_summary": {
+          "sha256": "a4e9947e647b7235934c40560fd6707c0a6827de1c9012fa16c06572a34348e6"
+        },
+        "seq": 3,
+        "timestamp": "2026-06-14T19:05:38.655628+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "FF-GENUINE-001",
+        "entry_sha256": "cebc82ee0f9fa02776601b999f5a09c9e4adbfb4789022db91b49614d4306529",
+        "inputs_summary": {
+          "evidence": "/home/labestiadevigia/vigia-repo/data/cases/FF-GENUINE-001.json",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-06-14T19:05:38.655715+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "FF-GENUINE-001",
+        "entry_sha256": "ae93820c36af3e9f3ce4188db4d9e02bd67eee54e30a3ea16a7852704f119253",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 3 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+            "best_posterior": "238/1875",
+            "confidence": "238/1875",
+            "is_conclusive": "True",
+            "narrative": "A real compromise: process hollowing and LSASS credential dumping confirmed in memory (hard-to-fake structural evidence). On top of the real attack, the operator planted suspiciously pristine Russian-..."
+          },
+          "case_id": "FF-GENUINE-001",
+          "pipeline_meta": {
+            "artifact_count": "3",
+            "avg_score": "238/375",
+            "expected_verdict": "MALICE",
+            "source": "ebs_v1_json_adapter"
+          },
+          "signals": [
+            {
+              "artifact_id": "tech_real_001",
+              "confidence": "19/20",
+              "description": "Process hollowing in svchost.exe confirmed (T1055.012). Reflective DLL injection. Structural, hard-to-fake evidence of a real intrusion.",
+              "evidence_type": "memory_process",
+              "source": "list_processes",
+              "z_score": "209/250"
+            },
+            {
+              "artifact_id": "tech_real_002",
+              "confidence": "19/20",
+              "description": "LSASS credential dumping detected (T1003.001). Active compromise, not a clean system.",
+              "evidence_type": "lsass_session",
+              "source": "list_processes",
+              "z_score": "399/500"
+            },
+            {
+              "artifact_id": "cultural_planted_001",
+              "confidence": "3/10",
+              "description": "Suspiciously pristine Russian-language strings injected into the dropper, inconsistent with the actor's actual toolchain and OPSEC. Attribution markers contradict the observed technical TTP profile.",
+              "evidence_type": "cultural_marker",
+              "source": "infer_intent",
+              "z_score": "27/100"
+            }
+          ]
+        },
+        "seq": 5,
+        "timestamp": "2026-06-14T19:05:38.657772+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "FF-GENUINE-001",
+        "entry_sha256": "8b7b318e1f40f041e5aec3e5e1fbcefb41961a545a96e0a525d3247e0d1dd6a2",
+        "inputs_summary": {
+          "n_signals": "3"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-06-14T19:05:38.657867+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "FF-GENUINE-001",
+        "entry_sha256": "08c8d201da64b7157fa476d51b030c4f417813dc8b26306c805f876d6ce38350",
+        "inputs_summary": {
+          "verdict": "MALICIOUS_INTENT_DETECTED"
+        },
+        "iteration": 0,
+        "note": "Exit code 1 \u2014 analysis complete.",
+        "outputs_summary": {
+          "exit_code": "1"
+        },
+        "seq": 7,
+        "timestamp": "2026-06-14T19:05:38.657998+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-06-14T19:05:38.655280+00:00",
+    "total_entries": 7
+  },
+  "case_id": "FF-GENUINE-001",
+  "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/FF-GENUINE-001.json",
+  "evidence_sha256": "a4e9947e647b7235934c40560fd6707c0a6827de1c9012fa16c06572a34348e6",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE FF-GENUINE-001 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/FF-GENUINE-001.json\nEvidence SHA-256: a4e9947e647b7235934c40560fd6707c0a6827de1c9012fa16c06572a34348e6\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 238/1875\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\nA real compromise: process hollowing and LSASS credential dumping confirmed in memory (hard-to-fake structural evidence). On top of the real attack, the operator planted suspiciously pristine Russian-language strings whose profile contradicts the actual TTPs and OPSEC. This is what a real false flag looks like: the malicious event is PRESENT, and the attribution is engineered to misdirect. MALICE is correct here \u2014 and it belongs to the framer, not to any Russian-speaker.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Process hollowing in svchost.exe confirmed (T1055.012). Reflective DLL] z=0.836 conf=0.95 \u2014 \n  [LSASS credential dumping detected (T1003.001). Active compromise, not ] z=0.798 conf=0.95 \u2014 \n  [Suspiciously pristine Russian-language strings injected into the dropp] z=0.270 conf=0.30 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW \u2014 No significant anomalies detected in this iteration.\n\nCritical signals (z>3): 0\nHigh signals (2<z<=3): 0\nTotal signals analyzed: 3",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+      "best_posterior": "238/1875",
+      "confidence": {
+        "__fraction__": true,
+        "den": 1875,
+        "num": 238
+      },
+      "is_conclusive": true,
+      "narrative": "A real compromise: process hollowing and LSASS credential dumping confirmed in memory (hard-to-fake structural evidence). On top of the real attack, the operator planted suspiciously pristine Russian-language strings whose profile contradicts the actual TTPs and OPSEC. This is what a real false flag looks like: the malicious event is PRESENT, and the attribution is engineered to misdirect. MALICE is correct here \u2014 and it belongs to the framer, not to any Russian-speaker."
+    },
+    "case_id": "FF-GENUINE-001",
+    "pipeline_meta": {
+      "artifact_count": 3,
+      "avg_score": "238/375",
+      "expected_verdict": "MALICE",
+      "source": "ebs_v1_json_adapter"
+    },
+    "signals": [
+      {
+        "artifact_id": "tech_real_001",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 19
+        },
+        "description": "Process hollowing in svchost.exe confirmed (T1055.012). Reflective DLL injection. Structural, hard-to-fake evidence of a real intrusion.",
+        "evidence_type": "memory_process",
+        "source": "list_processes",
+        "z_score": {
+          "__fraction__": true,
+          "den": 250,
+          "num": 209
+        }
+      },
+      {
+        "artifact_id": "tech_real_002",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 19
+        },
+        "description": "LSASS credential dumping detected (T1003.001). Active compromise, not a clean system.",
+        "evidence_type": "lsass_session",
+        "source": "list_processes",
+        "z_score": {
+          "__fraction__": true,
+          "den": 500,
+          "num": 399
+        }
+      },
+      {
+        "artifact_id": "cultural_planted_001",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 3
+        },
+        "description": "Suspiciously pristine Russian-language strings injected into the dropper, inconsistent with the actor's actual toolchain and OPSEC. Attribution markers contradict the observed technical TTP profile.",
+        "evidence_type": "cultural_marker",
+        "source": "infer_intent",
+        "z_score": {
+          "__fraction__": true,
+          "den": 100,
+          "num": 27
+        }
+      }
+    ]
+  },
+  "sans_compliance": {
+    "accuracy_validation": false,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}

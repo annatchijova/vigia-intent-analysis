@@ -1,0 +1,273 @@
+{
+  "analysis_timestamp": "2026-06-14T19:05:44.429480+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "VIGIA-CAN-050",
+    "end_time": "2026-06-14T19:05:44.429484+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "VIGIA-CAN-050",
+        "entry_sha256": "610d615e09a13c1f35f16e9f8ccdf25f1cbba8deab57a03286fa87fc706330e6",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "VIGIA-CAN-050"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: 4eeafb3bfb155486...",
+        "outputs_summary": {
+          "agent_sha256": "4eeafb3bfb155486142942ad7a2c8678676f86ffd5d076882459354d820591f6",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-06-14T19:05:44.426880+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-CAN-050",
+        "entry_sha256": "1bcda76f3352340562d5740e47d3c440d7a8265df4806c3c71c7b009ccc3904b",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-050.json"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-06-14T19:05:44.426950+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-CAN-050",
+        "entry_sha256": "8147f96301d23ae9a65144871b582d917cccf6faf9d3784f522e79d47454c3f9",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-050.json"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: d4611e37d493c89d...",
+        "outputs_summary": {
+          "sha256": "d4611e37d493c89d9046af714cc14e9c7c6a9703888795cd9c7ddadd14f11d84"
+        },
+        "seq": 3,
+        "timestamp": "2026-06-14T19:05:44.427026+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "VIGIA-CAN-050",
+        "entry_sha256": "ae1bf22f31a72f0639dba10af8838f679e2d9174a46c220e030b3c0f261174db",
+        "inputs_summary": {
+          "evidence": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-050.json",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-06-14T19:05:44.427111+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "VIGIA-CAN-050",
+        "entry_sha256": "ab21473b43d6efb4954e78bda87de8d8e3c87b0361431a27c992af878bcb79d4",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 4 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+            "best_posterior": "937/40000",
+            "confidence": "937/40000",
+            "is_conclusive": "False",
+            "narrative": "Systematic normalization messages ('this is normal', 'everyone does it') in contexts where technical warnings or security alerts are expected."
+          },
+          "case_id": "case_fusion_normalizacion_maliciosa",
+          "pipeline_meta": {
+            "artifact_count": "4",
+            "avg_score": "937/8000",
+            "expected_verdict": "MALICE",
+            "source": "ebs_v1_json_adapter"
+          },
+          "signals": [
+            {
+              "artifact_id": "f003_chat1",
+              "confidence": "3/10",
+              "description": "Message in #security: 'This is normal, servers always throw CPU alerts sometimes. No problem.' \u2014 during a 97% CPU spike from an unknown process.",
+              "evidence_type": "log_entry",
+              "source": "sift_slack_export",
+              "z_score": "21/1000"
+            },
+            {
+              "artifact_id": "f003_chat2",
+              "confidence": "3/10",
+              "description": "Message in response to DLP alert: 'Everyone does it, it's common to send files via WhatsApp to be faster. It's not a real security problem.'",
+              "evidence_type": "log_entry",
+              "source": "sift_slack_export",
+              "z_score": "9/500"
+            },
+            {
+              "artifact_id": "f003_baseline",
+              "confidence": "9/20",
+              "description": "Behavioral baseline: both senders had NEVER previously normalized security alerts in 2 years of history.",
+              "evidence_type": "cultural_marker",
+              "source": "sift_ueba",
+              "z_score": "819/2000"
+            },
+            {
+              "artifact_id": "f003_dlp",
+              "confidence": "2/5",
+              "description": "Real DLP alert: 847 client files exfiltrated via WhatsApp Web over 3 days; the sender who said 'no problem' appears in the send logs.",
+              "evidence_type": "memory_process",
+              "source": "sift_syslog",
+              "z_score": "1/50"
+            }
+          ]
+        },
+        "seq": 5,
+        "timestamp": "2026-06-14T19:05:44.429171+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "VIGIA-CAN-050",
+        "entry_sha256": "87132b5e02d00f6f099471637fcfb474678f98cb87675b314130520a699dc212",
+        "inputs_summary": {
+          "n_signals": "4"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-06-14T19:05:44.429268+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "VIGIA-CAN-050",
+        "entry_sha256": "2bdc40671f8bc6f43ab25ca2ef2aa1a408a4b463e7c100b02867b24beb6adf9e",
+        "inputs_summary": {
+          "verdict": "MALICIOUS_INTENT_DETECTED"
+        },
+        "iteration": 0,
+        "note": "Exit code 1 \u2014 analysis complete.",
+        "outputs_summary": {
+          "exit_code": "1"
+        },
+        "seq": 7,
+        "timestamp": "2026-06-14T19:05:44.429398+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-06-14T19:05:44.426694+00:00",
+    "total_entries": 7
+  },
+  "case_id": "VIGIA-CAN-050",
+  "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-050.json",
+  "evidence_sha256": "d4611e37d493c89d9046af714cc14e9c7c6a9703888795cd9c7ddadd14f11d84",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-CAN-050 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-050.json\nEvidence SHA-256: d4611e37d493c89d9046af714cc14e9c7c6a9703888795cd9c7ddadd14f11d84\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 937/40000\nConclusive: NO \u2014 requires human review\n\n--- PEIRCEAN NARRATIVE ---\nSystematic normalization messages ('this is normal', 'everyone does it') in contexts where technical warnings or security alerts are expected.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Behavioral baseline: both senders had NEVER previously normalized secu] z=0.409 conf=0.45 \u2014 \n  [Message in #security: 'This is normal, servers always throw CPU alerts] z=0.021 conf=0.30 \u2014 \n  [Real DLP alert: 847 client files exfiltrated via WhatsApp Web over 3 d] z=0.020 conf=0.40 \u2014 \n  [Message in response to DLP alert: 'Everyone does it, it's common to se] z=0.018 conf=0.30 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW \u2014 No significant anomalies detected in this iteration.\n\nCritical signals (z>3): 0\nHigh signals (2<z<=3): 0\nTotal signals analyzed: 4",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+      "best_posterior": "937/40000",
+      "confidence": {
+        "__fraction__": true,
+        "den": 40000,
+        "num": 937
+      },
+      "is_conclusive": false,
+      "narrative": "Systematic normalization messages ('this is normal', 'everyone does it') in contexts where technical warnings or security alerts are expected."
+    },
+    "case_id": "case_fusion_normalizacion_maliciosa",
+    "pipeline_meta": {
+      "artifact_count": 4,
+      "avg_score": "937/8000",
+      "expected_verdict": "MALICE",
+      "source": "ebs_v1_json_adapter"
+    },
+    "signals": [
+      {
+        "artifact_id": "f003_chat1",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 3
+        },
+        "description": "Message in #security: 'This is normal, servers always throw CPU alerts sometimes. No problem.' \u2014 during a 97% CPU spike from an unknown process.",
+        "evidence_type": "log_entry",
+        "source": "sift_slack_export",
+        "z_score": {
+          "__fraction__": true,
+          "den": 1000,
+          "num": 21
+        }
+      },
+      {
+        "artifact_id": "f003_chat2",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 3
+        },
+        "description": "Message in response to DLP alert: 'Everyone does it, it's common to send files via WhatsApp to be faster. It's not a real security problem.'",
+        "evidence_type": "log_entry",
+        "source": "sift_slack_export",
+        "z_score": {
+          "__fraction__": true,
+          "den": 500,
+          "num": 9
+        }
+      },
+      {
+        "artifact_id": "f003_baseline",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 9
+        },
+        "description": "Behavioral baseline: both senders had NEVER previously normalized security alerts in 2 years of history.",
+        "evidence_type": "cultural_marker",
+        "source": "sift_ueba",
+        "z_score": {
+          "__fraction__": true,
+          "den": 2000,
+          "num": 819
+        }
+      },
+      {
+        "artifact_id": "f003_dlp",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 2
+        },
+        "description": "Real DLP alert: 847 client files exfiltrated via WhatsApp Web over 3 days; the sender who said 'no problem' appears in the send logs.",
+        "evidence_type": "memory_process",
+        "source": "sift_syslog",
+        "z_score": {
+          "__fraction__": true,
+          "den": 50,
+          "num": 1
+        }
+      }
+    ]
+  },
+  "sans_compliance": {
+    "accuracy_validation": false,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}

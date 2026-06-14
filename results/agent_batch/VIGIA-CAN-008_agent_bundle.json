@@ -1,0 +1,273 @@
+{
+  "analysis_timestamp": "2026-06-14T19:05:42.604299+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "VIGIA-CAN-008",
+    "end_time": "2026-06-14T19:05:42.604302+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "VIGIA-CAN-008",
+        "entry_sha256": "33c58a740c030f1b593651c55a7e6c37bb8710c4811be2bb8462e252be3d184a",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "VIGIA-CAN-008"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: 4eeafb3bfb155486...",
+        "outputs_summary": {
+          "agent_sha256": "4eeafb3bfb155486142942ad7a2c8678676f86ffd5d076882459354d820591f6",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-06-14T19:05:42.601714+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-CAN-008",
+        "entry_sha256": "8c5b17044a1ec366f098df42f0ad5bd3aa93c1f055d75a388eaa9c94bebff176",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-008.json"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-06-14T19:05:42.601785+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-CAN-008",
+        "entry_sha256": "48d913a51f363e36ee02af2fcccda05aa68e9fd9a55e51f56095a7d7d2408466",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-008.json"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: d91e7ce1e0e4c16f...",
+        "outputs_summary": {
+          "sha256": "d91e7ce1e0e4c16fe4f40031995eae3c195a569202ae09c9cec239336c356339"
+        },
+        "seq": 3,
+        "timestamp": "2026-06-14T19:05:42.601857+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "VIGIA-CAN-008",
+        "entry_sha256": "4d30895d627d3f78d3538bad044dd1631e5fd794a995fe6c0527da28ff4214e7",
+        "inputs_summary": {
+          "evidence": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-008.json",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-06-14T19:05:42.601941+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "VIGIA-CAN-008",
+        "entry_sha256": "01e28c841c1b95319dba551082e16e29f437a62cec5ad19f213af287a74d85f0",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 4 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+            "best_posterior": "57/1000",
+            "confidence": "57/1000",
+            "is_conclusive": "False",
+            "narrative": "PsExec v1.94 (2014) detected on a Windows 2025 server. A noisy tool that generates 12 EDR alerts. Memory analysis reveals a kernel rootkit with SSDT hooks installed 2 minutes earlier. The psexec is th..."
+          },
+          "case_id": "case_090_anacronismo_herramienta",
+          "pipeline_meta": {
+            "artifact_count": "4",
+            "avg_score": "57/200",
+            "expected_verdict": "MALICE",
+            "source": "ebs_v1_json_adapter"
+          },
+          "signals": [
+            {
+              "artifact_id": "a090_01",
+              "confidence": "7/20",
+              "description": "psexec.exe binary version 1.94 (known hash, signed 2014) detected in C:\\Temp. Noisy tool detectable by any modern EDR.",
+              "evidence_type": "file_hash",
+              "source": "sift_file_audit",
+              "z_score": "91/400"
+            },
+            {
+              "artifact_id": "a090_02",
+              "confidence": "1/2",
+              "description": "EDR generated 12 'Obsolete remote administration tool' alerts. Marked as FP by Tier-1 analyst.",
+              "evidence_type": "cultural_marker",
+              "source": "sift_edr",
+              "z_score": "91/200"
+            },
+            {
+              "artifact_id": "a090_03",
+              "confidence": "19/20",
+              "description": "Unsigned kernel driver loaded 2 minutes BEFORE psexec. 12 SSDT hooks. Requires advanced C++ and Ring-0 knowledge.",
+              "evidence_type": "memory_process",
+              "source": "sift_volatility",
+              "z_score": "19/400"
+            },
+            {
+              "artifact_id": "a090_04",
+              "confidence": "1/2",
+              "description": "Encrypted C2 traffic on port 8443 initiated 1 minute before the psexec noise. Firewall reports 0 bytes for this port.",
+              "evidence_type": "dns_record",
+              "source": "sift_pcap",
+              "z_score": "41/100"
+            }
+          ]
+        },
+        "seq": 5,
+        "timestamp": "2026-06-14T19:05:42.603993+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "VIGIA-CAN-008",
+        "entry_sha256": "c0f16a9a40c0cc7331aa4cd77a5fd2382ed9140152f1ebe2f68ac785d3ab5003",
+        "inputs_summary": {
+          "n_signals": "4"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-06-14T19:05:42.604093+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "VIGIA-CAN-008",
+        "entry_sha256": "8516dd0b59ddefee5a835278c5c62d41262ab92e6126b24d8c2f6fa2d5b23e5d",
+        "inputs_summary": {
+          "verdict": "MALICIOUS_INTENT_DETECTED"
+        },
+        "iteration": 0,
+        "note": "Exit code 1 \u2014 analysis complete.",
+        "outputs_summary": {
+          "exit_code": "1"
+        },
+        "seq": 7,
+        "timestamp": "2026-06-14T19:05:42.604224+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-06-14T19:05:42.601517+00:00",
+    "total_entries": 7
+  },
+  "case_id": "VIGIA-CAN-008",
+  "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-008.json",
+  "evidence_sha256": "d91e7ce1e0e4c16fe4f40031995eae3c195a569202ae09c9cec239336c356339",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-CAN-008 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-008.json\nEvidence SHA-256: d91e7ce1e0e4c16fe4f40031995eae3c195a569202ae09c9cec239336c356339\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 57/1000\nConclusive: NO \u2014 requires human review\n\n--- PEIRCEAN NARRATIVE ---\nPsExec v1.94 (2014) detected on a Windows 2025 server. A noisy tool that generates 12 EDR alerts. Memory analysis reveals a kernel rootkit with SSDT hooks installed 2 minutes earlier. The psexec is the decoy.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [EDR generated 12 'Obsolete remote administration tool' alerts. Marked ] z=0.455 conf=0.50 \u2014 \n  [Encrypted C2 traffic on port 8443 initiated 1 minute before the psexec] z=0.410 conf=0.50 \u2014 \n  [psexec.exe binary version 1.94 (known hash, signed 2014) detected in C] z=0.228 conf=0.35 \u2014 \n  [Unsigned kernel driver loaded 2 minutes BEFORE psexec. 12 SSDT hooks. ] z=0.048 conf=0.95 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW \u2014 No significant anomalies detected in this iteration.\n\nCritical signals (z>3): 0\nHigh signals (2<z<=3): 0\nTotal signals analyzed: 4",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+      "best_posterior": "57/1000",
+      "confidence": {
+        "__fraction__": true,
+        "den": 1000,
+        "num": 57
+      },
+      "is_conclusive": false,
+      "narrative": "PsExec v1.94 (2014) detected on a Windows 2025 server. A noisy tool that generates 12 EDR alerts. Memory analysis reveals a kernel rootkit with SSDT hooks installed 2 minutes earlier. The psexec is the decoy."
+    },
+    "case_id": "case_090_anacronismo_herramienta",
+    "pipeline_meta": {
+      "artifact_count": 4,
+      "avg_score": "57/200",
+      "expected_verdict": "MALICE",
+      "source": "ebs_v1_json_adapter"
+    },
+    "signals": [
+      {
+        "artifact_id": "a090_01",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 7
+        },
+        "description": "psexec.exe binary version 1.94 (known hash, signed 2014) detected in C:\\Temp. Noisy tool detectable by any modern EDR.",
+        "evidence_type": "file_hash",
+        "source": "sift_file_audit",
+        "z_score": {
+          "__fraction__": true,
+          "den": 400,
+          "num": 91
+        }
+      },
+      {
+        "artifact_id": "a090_02",
+        "confidence": {
+          "__fraction__": true,
+          "den": 2,
+          "num": 1
+        },
+        "description": "EDR generated 12 'Obsolete remote administration tool' alerts. Marked as FP by Tier-1 analyst.",
+        "evidence_type": "cultural_marker",
+        "source": "sift_edr",
+        "z_score": {
+          "__fraction__": true,
+          "den": 200,
+          "num": 91
+        }
+      },
+      {
+        "artifact_id": "a090_03",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 19
+        },
+        "description": "Unsigned kernel driver loaded 2 minutes BEFORE psexec. 12 SSDT hooks. Requires advanced C++ and Ring-0 knowledge.",
+        "evidence_type": "memory_process",
+        "source": "sift_volatility",
+        "z_score": {
+          "__fraction__": true,
+          "den": 400,
+          "num": 19
+        }
+      },
+      {
+        "artifact_id": "a090_04",
+        "confidence": {
+          "__fraction__": true,
+          "den": 2,
+          "num": 1
+        },
+        "description": "Encrypted C2 traffic on port 8443 initiated 1 minute before the psexec noise. Firewall reports 0 bytes for this port.",
+        "evidence_type": "dns_record",
+        "source": "sift_pcap",
+        "z_score": {
+          "__fraction__": true,
+          "den": 100,
+          "num": 41
+        }
+      }
+    ]
+  },
+  "sans_compliance": {
+    "accuracy_validation": false,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}

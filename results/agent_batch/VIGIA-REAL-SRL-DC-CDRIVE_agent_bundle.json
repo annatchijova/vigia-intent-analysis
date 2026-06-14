@@ -1,0 +1,345 @@
+{
+  "analysis_timestamp": "2026-06-14T19:05:41.656063+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "VIGIA-REAL-SRL-DC-CDRIVE",
+    "end_time": "2026-06-14T19:05:41.656066+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "VIGIA-REAL-SRL-DC-CDRIVE",
+        "entry_sha256": "8b5dfc4ca9168bc028246ed6b07ce3f35f0e5ae45d038fba69aec31441af0547",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "VIGIA-REAL-SRL-DC-CDRIVE"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: 4eeafb3bfb155486...",
+        "outputs_summary": {
+          "agent_sha256": "4eeafb3bfb155486142942ad7a2c8678676f86ffd5d076882459354d820591f6",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-06-14T19:05:41.653374+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-REAL-SRL-DC-CDRIVE",
+        "entry_sha256": "6c280aaa8ae225a382de767f2502778d356c0a534e6ab56da2ccfe22a1d34434",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-REAL-SRL-DC-CDRIVE.json"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-06-14T19:05:41.653451+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-REAL-SRL-DC-CDRIVE",
+        "entry_sha256": "46c9a4f2c2ca3adc9393419f9287f72b9906c6f87cd7f00392c1d2dc06be4a07",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-REAL-SRL-DC-CDRIVE.json"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: 8585bcbf2ba0d324...",
+        "outputs_summary": {
+          "sha256": "8585bcbf2ba0d32490aba4d19109ecd67bad5039e029861939354174c091345e"
+        },
+        "seq": 3,
+        "timestamp": "2026-06-14T19:05:41.653539+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "VIGIA-REAL-SRL-DC-CDRIVE",
+        "entry_sha256": "7960710305db5c9ca91e1bd8a1d0d1ab5c67c981b656ab83172f943d8a2972a7",
+        "inputs_summary": {
+          "evidence": "/home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-REAL-SRL-DC-CDRIVE.json",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-06-14T19:05:41.653622+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "VIGIA-REAL-SRL-DC-CDRIVE",
+        "entry_sha256": "c5ecdbebe3346c6b56b0ae35136774005b4fce3aea2347184b58173a48298610",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 8 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+            "best_posterior": "7059/50000",
+            "confidence": "7059/50000",
+            "is_conclusive": "True",
+            "narrative": "SRL-2018 compromised enterprise network. Domain Controller BASE-DC (shieldbase.lan) disk image (12 GB E01, Windows Server 2016). Registry and shimcache analysis reveals: unknown executable subject_srv..."
+          },
+          "case_id": "VIGIA-REAL-SRL-DC-CDRIVE",
+          "pipeline_meta": {
+            "artifact_count": "8",
+            "avg_score": "7059/10000",
+            "expected_verdict": "MALICE",
+            "source": "ebs_v1_json_adapter"
+          },
+          "signals": [
+            {
+              "artifact_id": "ART-001",
+              "confidence": "17/20",
+              "description": "subject_srv.exe found in AppCompatCache (shimcache) at C:\\windows\\subject_srv.exe, last modified 2018-04-10T19:29:48Z. Appears twice in shimcache (two cache slots), indicating the binary was executed.",
+              "evidence_type": "shimcache",
+              "source": "regipy/ShimCachePlugin + manual analysis",
+              "z_score": "323/400"
+            },
+            {
+              "artifact_id": "ART-002",
+              "confidence": "9/10",
+              "description": "ntdsutil.exe executed on BASE-DC on 2018-04-25T20:01:52Z per shimcache entry. ntdsutil is a native Windows tool used for Active Directory database maintenance but is routinely abused to extract NTDS.d",
+              "evidence_type": "shimcache",
+              "source": "regipy/ShimCachePlugin",
+              "z_score": "873/1000"
+            },
+            {
+              "artifact_id": "ART-003",
+              "confidence": "4/5",
+              "description": "BASE-DC has two active network interfaces: 10.10.4.4/255.255.0.0 (internal corporate LAN) and 172.16.4.4/255.255.255.0 (secondary segment, consistent with DMZ based on SRL-2018 network topology). A Do",
+              "evidence_type": "registry_hive",
+              "source": "regipy manual traversal (SYSTEM hive ControlSet001)",
+              "z_score": "82/125"
+            },
+            {
+              "artifact_id": "ART-004",
+              "confidence": "3/4",
+              "description": "Windows Driver Kit (WDK) 10.0.17134.0, WinDbg (x86/x64/arm/arm64), and gflags.exe installed on BASE-DC between 2018-04-11 and 2018-04-12, one day after subject_srv.exe appeared. wdksetup.exe was downl",
+              "evidence_type": "shimcache",
+              "source": "regipy/ShimCachePlugin",
+              "z_score": "51/80"
+            },
+            {
+              "artifact_id": "ART-005",
+              "confidence": "41/50",
+              "description": "Three converging indicators of PowerShell abuse: (1) PowerShell ScriptBlock logging and Module logging enabled via GPO (EnableScriptBlockLogging=1, EnableModuleLogging=1, EnableTranscripting=1) per SO",
+              "evidence_type": "event_log",
+              "source": "EVTX file analysis (file size/presence)",
+              "z_score": "451/625"
+            }
+          ]
+        },
+        "seq": 5,
+        "timestamp": "2026-06-14T19:05:41.655723+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "VIGIA-REAL-SRL-DC-CDRIVE",
+        "entry_sha256": "21cffec2d53fd20c475a11d3178de4d0be5315ab0fd8bc3a74ec2a90c25ff8cd",
+        "inputs_summary": {
+          "n_signals": "8"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-06-14T19:05:41.655893+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "VIGIA-REAL-SRL-DC-CDRIVE",
+        "entry_sha256": "f7aef0daa284cca3a750fd9cb2c08cdcab19885f18e36f034ab4a200df2623d8",
+        "inputs_summary": {
+          "verdict": "MALICIOUS_INTENT_DETECTED"
+        },
+        "iteration": 0,
+        "note": "Exit code 1 \u2014 analysis complete.",
+        "outputs_summary": {
+          "exit_code": "1"
+        },
+        "seq": 7,
+        "timestamp": "2026-06-14T19:05:41.655975+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-06-14T19:05:41.653188+00:00",
+    "total_entries": 7
+  },
+  "case_id": "VIGIA-REAL-SRL-DC-CDRIVE",
+  "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-REAL-SRL-DC-CDRIVE.json",
+  "evidence_sha256": "8585bcbf2ba0d32490aba4d19109ecd67bad5039e029861939354174c091345e",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-REAL-SRL-DC-CDRIVE ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-REAL-SRL-DC-CDRIVE.json\nEvidence SHA-256: 8585bcbf2ba0d32490aba4d19109ecd67bad5039e029861939354174c091345e\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 7059/50000\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\nSRL-2018 compromised enterprise network. Domain Controller BASE-DC (shieldbase.lan) disk image (12 GB E01, Windows Server 2016). Registry and shimcache analysis reveals: unknown executable subject_srv.exe in C:\\windows\\ (2018-04-10), ntdsutil.exe execution for NTDS.dit credential dump (2018-04-25), Windows Kits 10 + WinDbg installed on DC (2018-04-11), SYSVOL GPO script deployed to all domain machines (2018-05-14), Autorunsc.exe executed for persistence verification (2018-08-15). Dual NIC: 10.10\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [ntdsutil.exe executed on BASE-DC on 2018-04-25T20:01:52Z per shimcache] z=0.873 conf=0.90 \u2014 \n  [subject_srv.exe found in AppCompatCache (shimcache) at C:\\windows\\subj] z=0.807 conf=0.85 \u2014 \n  [Three converging indicators of PowerShell abuse: (1) PowerShell Script] z=0.722 conf=0.82 \u2014 \n  [Microsoft-Windows-WinRM%4Operational.evtx weighs 43MB on BASE-DC. WinR] z=0.688 conf=0.80 \u2014 \n  [BASE-DC has two active network interfaces: 10.10.4.4/255.255.0.0 (inte] z=0.656 conf=0.80 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW \u2014 No significant anomalies detected in this iteration.\n\nCritical signals (z>3): 0\nHigh signals (2<z<=3): 0\nTotal signals analyzed: 8",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+      "best_posterior": "7059/50000",
+      "confidence": {
+        "__fraction__": true,
+        "den": 50000,
+        "num": 7059
+      },
+      "is_conclusive": true,
+      "narrative": "SRL-2018 compromised enterprise network. Domain Controller BASE-DC (shieldbase.lan) disk image (12 GB E01, Windows Server 2016). Registry and shimcache analysis reveals: unknown executable subject_srv.exe in C:\\windows\\ (2018-04-10), ntdsutil.exe execution for NTDS.dit credential dump (2018-04-25), Windows Kits 10 + WinDbg installed on DC (2018-04-11), SYSVOL GPO script deployed to all domain machines (2018-05-14), Autorunsc.exe executed for persistence verification (2018-08-15). Dual NIC: 10.10"
+    },
+    "case_id": "VIGIA-REAL-SRL-DC-CDRIVE",
+    "pipeline_meta": {
+      "artifact_count": 8,
+      "avg_score": "7059/10000",
+      "expected_verdict": "MALICE",
+      "source": "ebs_v1_json_adapter"
+    },
+    "signals": [
+      {
+        "artifact_id": "ART-001",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 17
+        },
+        "description": "subject_srv.exe found in AppCompatCache (shimcache) at C:\\windows\\subject_srv.exe, last modified 2018-04-10T19:29:48Z. Appears twice in shimcache (two cache slots), indicating the binary was executed.",
+        "evidence_type": "shimcache",
+        "source": "regipy/ShimCachePlugin + manual analysis",
+        "z_score": {
+          "__fraction__": true,
+          "den": 400,
+          "num": 323
+        }
+      },
+      {
+        "artifact_id": "ART-002",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 9
+        },
+        "description": "ntdsutil.exe executed on BASE-DC on 2018-04-25T20:01:52Z per shimcache entry. ntdsutil is a native Windows tool used for Active Directory database maintenance but is routinely abused to extract NTDS.d",
+        "evidence_type": "shimcache",
+        "source": "regipy/ShimCachePlugin",
+        "z_score": {
+          "__fraction__": true,
+          "den": 1000,
+          "num": 873
+        }
+      },
+      {
+        "artifact_id": "ART-003",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 4
+        },
+        "description": "BASE-DC has two active network interfaces: 10.10.4.4/255.255.0.0 (internal corporate LAN) and 172.16.4.4/255.255.255.0 (secondary segment, consistent with DMZ based on SRL-2018 network topology). A Do",
+        "evidence_type": "registry_hive",
+        "source": "regipy manual traversal (SYSTEM hive ControlSet001)",
+        "z_score": {
+          "__fraction__": true,
+          "den": 125,
+          "num": 82
+        }
+      },
+      {
+        "artifact_id": "ART-004",
+        "confidence": {
+          "__fraction__": true,
+          "den": 4,
+          "num": 3
+        },
+        "description": "Windows Driver Kit (WDK) 10.0.17134.0, WinDbg (x86/x64/arm/arm64), and gflags.exe installed on BASE-DC between 2018-04-11 and 2018-04-12, one day after subject_srv.exe appeared. wdksetup.exe was downl",
+        "evidence_type": "shimcache",
+        "source": "regipy/ShimCachePlugin",
+        "z_score": {
+          "__fraction__": true,
+          "den": 80,
+          "num": 51
+        }
+      },
+      {
+        "artifact_id": "ART-005",
+        "confidence": {
+          "__fraction__": true,
+          "den": 50,
+          "num": 41
+        },
+        "description": "Three converging indicators of PowerShell abuse: (1) PowerShell ScriptBlock logging and Module logging enabled via GPO (EnableScriptBlockLogging=1, EnableModuleLogging=1, EnableTranscripting=1) per SO",
+        "evidence_type": "event_log",
+        "source": "EVTX file analysis (file size/presence)",
+        "z_score": {
+          "__fraction__": true,
+          "den": 625,
+          "num": 451
+        }
+      },
+      {
+        "artifact_id": "ART-006",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 4
+        },
+        "description": "Microsoft-Windows-WinRM%4Operational.evtx weighs 43MB on BASE-DC. WinRM (Windows Remote Management) is the transport layer for PowerShell remoting, allowing remote command execution across the domain.",
+        "evidence_type": "event_log",
+        "source": "EVTX file analysis (file size/presence)",
+        "z_score": {
+          "__fraction__": true,
+          "den": 125,
+          "num": 86
+        }
+      },
+      {
+        "artifact_id": "ART-007",
+        "confidence": {
+          "__fraction__": true,
+          "den": 50,
+          "num": 39
+        },
+        "description": "Security.evtx weighs 235MB. Nine rolling Security log archives (Archive-Security-2018-07-13 through 2018-09-04) each weigh 251MB (the maximum log rotation size), covering July 13 through September 4, ",
+        "evidence_type": "event_log",
+        "source": "EVTX file analysis (file size/presence)",
+        "z_score": {
+          "__fraction__": true,
+          "den": 5000,
+          "num": 3081
+        }
+      },
+      {
+        "artifact_id": "ART-008",
+        "confidence": {
+          "__fraction__": true,
+          "den": 50,
+          "num": 39
+        },
+        "description": "Two additional post-compromise artifacts: (1) Autorunsc.exe executed on 2018-08-15T17:10:22Z from C:\\Windows\\Autorunsc.exe. Autorunsc (Sysinternals) enumerates all autostart locations. Placed directly",
+        "evidence_type": "shimcache",
+        "source": "regipy/ShimCachePlugin",
+        "z_score": {
+          "__fraction__": true,
+          "den": 5000,
+          "num": 3237
+        }
+      }
+    ]
+  },
+  "sans_compliance": {
+    "accuracy_validation": false,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}

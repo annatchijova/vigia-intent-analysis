@@ -1,0 +1,273 @@
+{
+  "analysis_timestamp": "2026-06-14T19:05:43.474591+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "VIGIA-CAN-028",
+    "end_time": "2026-06-14T19:05:43.474595+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "VIGIA-CAN-028",
+        "entry_sha256": "c58c479d9c767bcb2f47216c8c73f8a95349083a8360aacd7245b8c2a3be96ed",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "VIGIA-CAN-028"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: 4eeafb3bfb155486...",
+        "outputs_summary": {
+          "agent_sha256": "4eeafb3bfb155486142942ad7a2c8678676f86ffd5d076882459354d820591f6",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-06-14T19:05:43.471998+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-CAN-028",
+        "entry_sha256": "9b3919f7e1e2afe66ad0b60f6e6bb16852b923ab433c1cf3692cb8bb2edb02d9",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-028.json"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-06-14T19:05:43.472067+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-CAN-028",
+        "entry_sha256": "b3383a5bd466afe9a8ddf1bf1e24118f5e47d89834049376e5f73c17e67b84e3",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-028.json"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: a109dcf60d47fb6c...",
+        "outputs_summary": {
+          "sha256": "a109dcf60d47fb6c9a687e01804d5a596523c8cf067effbd8d90076e9a9903f0"
+        },
+        "seq": 3,
+        "timestamp": "2026-06-14T19:05:43.472141+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "VIGIA-CAN-028",
+        "entry_sha256": "38b5c081a2cc26afc657b538f1ac859f3755e0c3e5c7d1903dc342c1ff713d33",
+        "inputs_summary": {
+          "evidence": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-028.json",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-06-14T19:05:43.472223+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "VIGIA-CAN-028",
+        "entry_sha256": "a61e27daa0cdfeb71518507e75a1444fd26f1d5a867efc4d74684e42cb6a338c",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 4 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+            "best_posterior": "17951/200000",
+            "confidence": "17951/200000",
+            "is_conclusive": "True",
+            "narrative": "audit_report_final.json with canonical structure identical to VIG\u00cdA (internal fields replicated) but verdict NOISE for an IP that VIG\u00cdA marked MALICE 58 minutes ago. HMAC fails. Sender domain has '4' ..."
+          },
+          "case_id": "case_110_paradoja_auditor_externo",
+          "pipeline_meta": {
+            "artifact_count": "4",
+            "avg_score": "17951/40000",
+            "expected_verdict": "MALICE",
+            "source": "ebs_v1_json_adapter"
+          },
+          "signals": [
+            {
+              "artifact_id": "a110_01",
+              "confidence": "13/20",
+              "description": "audit_report_final.json received via unverified channel. JSON structure identical to VIG\u00cdA. Verdict NOISE for IP flagged MALICE 58 minutes ago.",
+              "evidence_type": "cryptographic_hash",
+              "source": "sift_file_audit",
+              "z_score": "1183/2000"
+            },
+            {
+              "artifact_id": "a110_02",
+              "confidence": "49/50",
+              "description": "VIG\u00cdA internal log with valid HMAC: IP 185.220.101.42 received verdict MALICE at 09:02 with composite=0.94.",
+              "evidence_type": "log_entry",
+              "source": "sift_vigia_internal",
+              "z_score": "49/2500"
+            },
+            {
+              "artifact_id": "a110_03",
+              "confidence": "9/10",
+              "description": "HMAC of the external report FAILS verification with VIG\u00cdA key. The JSON replicates internal fields '_determinism_protocol', 'integrity_check' without access to the signing key.",
+              "evidence_type": "cryptographic_hash",
+              "source": "sift_crypto_audit",
+              "z_score": "171/200"
+            },
+            {
+              "artifact_id": "a110_04",
+              "confidence": "7/20",
+              "description": "Sender domain: 'vigi4-security.corp' (with '4') vs legitimate domain 'vigia-security.corp'. DKIM fails. SPF fails.",
+              "evidence_type": "memory_process",
+              "source": "sift_mail_gateway",
+              "z_score": "329/1000"
+            }
+          ]
+        },
+        "seq": 5,
+        "timestamp": "2026-06-14T19:05:43.474273+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "VIGIA-CAN-028",
+        "entry_sha256": "2d91cd558fd4f9cda84b8e1cd25df1181fe0586c3614fa7bca30c2c82e281306",
+        "inputs_summary": {
+          "n_signals": "4"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-06-14T19:05:43.474377+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "VIGIA-CAN-028",
+        "entry_sha256": "eb189d94a52d39d6b49b29c387d9097b954dc2a7a2ce754bf69e4dc9b95e39d9",
+        "inputs_summary": {
+          "verdict": "MALICIOUS_INTENT_DETECTED"
+        },
+        "iteration": 0,
+        "note": "Exit code 1 \u2014 analysis complete.",
+        "outputs_summary": {
+          "exit_code": "1"
+        },
+        "seq": 7,
+        "timestamp": "2026-06-14T19:05:43.474514+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-06-14T19:05:43.471808+00:00",
+    "total_entries": 7
+  },
+  "case_id": "VIGIA-CAN-028",
+  "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-028.json",
+  "evidence_sha256": "a109dcf60d47fb6c9a687e01804d5a596523c8cf067effbd8d90076e9a9903f0",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-CAN-028 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-028.json\nEvidence SHA-256: a109dcf60d47fb6c9a687e01804d5a596523c8cf067effbd8d90076e9a9903f0\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 17951/200000\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\naudit_report_final.json with canonical structure identical to VIG\u00cdA (internal fields replicated) but verdict NOISE for an IP that VIG\u00cdA marked MALICE 58 minutes ago. HMAC fails. Sender domain has '4' instead of 'a'.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [HMAC of the external report FAILS verification with VIG\u00cdA key. The JSO] z=0.855 conf=0.90 \u2014 \n  [audit_report_final.json received via unverified channel. JSON structur] z=0.592 conf=0.65 \u2014 \n  [Sender domain: 'vigi4-security.corp' (with '4') vs legitimate domain '] z=0.329 conf=0.35 \u2014 \n  [VIG\u00cdA internal log with valid HMAC: IP 185.220.101.42 received verdict] z=0.020 conf=0.98 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW \u2014 No significant anomalies detected in this iteration.\n\nCritical signals (z>3): 0\nHigh signals (2<z<=3): 0\nTotal signals analyzed: 4",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+      "best_posterior": "17951/200000",
+      "confidence": {
+        "__fraction__": true,
+        "den": 200000,
+        "num": 17951
+      },
+      "is_conclusive": true,
+      "narrative": "audit_report_final.json with canonical structure identical to VIG\u00cdA (internal fields replicated) but verdict NOISE for an IP that VIG\u00cdA marked MALICE 58 minutes ago. HMAC fails. Sender domain has '4' instead of 'a'."
+    },
+    "case_id": "case_110_paradoja_auditor_externo",
+    "pipeline_meta": {
+      "artifact_count": 4,
+      "avg_score": "17951/40000",
+      "expected_verdict": "MALICE",
+      "source": "ebs_v1_json_adapter"
+    },
+    "signals": [
+      {
+        "artifact_id": "a110_01",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 13
+        },
+        "description": "audit_report_final.json received via unverified channel. JSON structure identical to VIG\u00cdA. Verdict NOISE for IP flagged MALICE 58 minutes ago.",
+        "evidence_type": "cryptographic_hash",
+        "source": "sift_file_audit",
+        "z_score": {
+          "__fraction__": true,
+          "den": 2000,
+          "num": 1183
+        }
+      },
+      {
+        "artifact_id": "a110_02",
+        "confidence": {
+          "__fraction__": true,
+          "den": 50,
+          "num": 49
+        },
+        "description": "VIG\u00cdA internal log with valid HMAC: IP 185.220.101.42 received verdict MALICE at 09:02 with composite=0.94.",
+        "evidence_type": "log_entry",
+        "source": "sift_vigia_internal",
+        "z_score": {
+          "__fraction__": true,
+          "den": 2500,
+          "num": 49
+        }
+      },
+      {
+        "artifact_id": "a110_03",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 9
+        },
+        "description": "HMAC of the external report FAILS verification with VIG\u00cdA key. The JSON replicates internal fields '_determinism_protocol', 'integrity_check' without access to the signing key.",
+        "evidence_type": "cryptographic_hash",
+        "source": "sift_crypto_audit",
+        "z_score": {
+          "__fraction__": true,
+          "den": 200,
+          "num": 171
+        }
+      },
+      {
+        "artifact_id": "a110_04",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 7
+        },
+        "description": "Sender domain: 'vigi4-security.corp' (with '4') vs legitimate domain 'vigia-security.corp'. DKIM fails. SPF fails.",
+        "evidence_type": "memory_process",
+        "source": "sift_mail_gateway",
+        "z_score": {
+          "__fraction__": true,
+          "den": 1000,
+          "num": 329
+        }
+      }
+    ]
+  },
+  "sans_compliance": {
+    "accuracy_validation": false,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}

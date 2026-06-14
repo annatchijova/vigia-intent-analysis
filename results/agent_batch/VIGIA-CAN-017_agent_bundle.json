@@ -1,0 +1,273 @@
+{
+  "analysis_timestamp": "2026-06-14T19:05:42.998180+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "VIGIA-CAN-017",
+    "end_time": "2026-06-14T19:05:42.998183+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "VIGIA-CAN-017",
+        "entry_sha256": "9311d3a30285fb14e0da3e95f9ad4f44dfb4bfe2cd44ebbe792577134f65e56f",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "VIGIA-CAN-017"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: 4eeafb3bfb155486...",
+        "outputs_summary": {
+          "agent_sha256": "4eeafb3bfb155486142942ad7a2c8678676f86ffd5d076882459354d820591f6",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-06-14T19:05:42.995609+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-CAN-017",
+        "entry_sha256": "95efe95940631a1003460ee0ad2697170d1d5f2494c7c865751c0822fdc82783",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-017.json"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-06-14T19:05:42.995679+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-CAN-017",
+        "entry_sha256": "f6afcc964e63191aeebee2aa872a2911b214710554714adeffef6fe0b9810d98",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-017.json"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: 37db58f024f76c69...",
+        "outputs_summary": {
+          "sha256": "37db58f024f76c69c0382b3592fb37b03fb3943654e0799e96f3d52e01b9e8e9"
+        },
+        "seq": 3,
+        "timestamp": "2026-06-14T19:05:42.995752+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "VIGIA-CAN-017",
+        "entry_sha256": "8404f5dee737bed80c374a272d0eddb975060ab4e47749f563479535d2dbf270",
+        "inputs_summary": {
+          "evidence": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-017.json",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-06-14T19:05:42.995833+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "VIGIA-CAN-017",
+        "entry_sha256": "a875b9dc7dd007bd0dcd7ba48e8729d6d4d9fc3b62ab19d4a1f66b4ff76fee94",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 4 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "SUSPICION_DETECTED",
+            "best_posterior": "3341/40000",
+            "confidence": "3341/40000",
+            "is_conclusive": "True",
+            "narrative": "HR email: 'Due to the passing of a colleague, we are collecting funds. See attached PDF'. The employee does not exist in the database. SPF/DKIM fail. PDF contains JavaScript that steals browser sessio..."
+          },
+          "case_id": "case_099_troyano_emocional",
+          "pipeline_meta": {
+            "artifact_count": "4",
+            "avg_score": "3341/8000",
+            "expected_verdict": "SUSPICION",
+            "source": "ebs_v1_json_adapter"
+          },
+          "signals": [
+            {
+              "artifact_id": "a099_01",
+              "confidence": "3/10",
+              "description": "Email from hr@corp.com: 'Condolences - Fund for Juan P\u00e9rez's family'. SPF: fail. DKIM: fail.",
+              "evidence_type": "memory_process",
+              "source": "sift_mail_gateway",
+              "z_score": "69/250"
+            },
+            {
+              "artifact_id": "a099_02",
+              "confidence": "7/10",
+              "description": "Attached PDF: embedded JavaScript that accesses session cookies (session_id, auth_token, csrf) and sends them to an external domain.",
+              "evidence_type": "memory_process",
+              "source": "sift_file_audit",
+              "z_score": "161/250"
+            },
+            {
+              "artifact_id": "a099_03",
+              "confidence": "1/2",
+              "description": "HTTPS connection to family-support[.]org from 12 internal hosts within 30 minutes of mass PDF opening.",
+              "evidence_type": "dns_record",
+              "source": "sift_pcap",
+              "z_score": "17/40"
+            },
+            {
+              "artifact_id": "a099_04",
+              "confidence": "7/20",
+              "description": "Verification: real HR did not send the email. 'Juan P\u00e9rez' does not exist in the active personnel database.",
+              "evidence_type": "memory_process",
+              "source": "sift_syslog",
+              "z_score": "651/2000"
+            }
+          ]
+        },
+        "seq": 5,
+        "timestamp": "2026-06-14T19:05:42.997878+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "VIGIA-CAN-017",
+        "entry_sha256": "276afc8ad28a120bbd3dfdca3a331a6e37995cc89c16b2263c297ca11399df54",
+        "inputs_summary": {
+          "n_signals": "4"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-06-14T19:05:42.997977+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "VIGIA-CAN-017",
+        "entry_sha256": "e251a1746cb8a9537ee9561b0de02d234d49c2925d70e4f9230eda5773ea1e65",
+        "inputs_summary": {
+          "verdict": "SUSPICION_DETECTED"
+        },
+        "iteration": 0,
+        "note": "Exit code 0 \u2014 analysis complete.",
+        "outputs_summary": {
+          "exit_code": "0"
+        },
+        "seq": 7,
+        "timestamp": "2026-06-14T19:05:42.998106+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-06-14T19:05:42.995412+00:00",
+    "total_entries": 7
+  },
+  "case_id": "VIGIA-CAN-017",
+  "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-017.json",
+  "evidence_sha256": "37db58f024f76c69c0382b3592fb37b03fb3943654e0799e96f3d52e01b9e8e9",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-CAN-017 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-017.json\nEvidence SHA-256: 37db58f024f76c69c0382b3592fb37b03fb3943654e0799e96f3d52e01b9e8e9\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: SUSPICION_DETECTED\nPosterior confidence: 3341/40000\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\nHR email: 'Due to the passing of a colleague, we are collecting funds. See attached PDF'. The employee does not exist in the database. SPF/DKIM fail. PDF contains JavaScript that steals browser session tokens. 12 hosts compromised.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Attached PDF: embedded JavaScript that accesses session cookies (sessi] z=0.644 conf=0.70 \u2014 \n  [HTTPS connection to family-support[.]org from 12 internal hosts within] z=0.425 conf=0.50 \u2014 \n  [Verification: real HR did not send the email. 'Juan P\u00e9rez' does not ex] z=0.326 conf=0.35 \u2014 \n  [Email from hr@corp.com: 'Condolences - Fund for Juan P\u00e9rez's family'. ] z=0.276 conf=0.30 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW \u2014 No significant anomalies detected in this iteration.\n\nCritical signals (z>3): 0\nHigh signals (2<z<=3): 0\nTotal signals analyzed: 4",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "SUSPICION_DETECTED",
+      "best_posterior": "3341/40000",
+      "confidence": {
+        "__fraction__": true,
+        "den": 40000,
+        "num": 3341
+      },
+      "is_conclusive": true,
+      "narrative": "HR email: 'Due to the passing of a colleague, we are collecting funds. See attached PDF'. The employee does not exist in the database. SPF/DKIM fail. PDF contains JavaScript that steals browser session tokens. 12 hosts compromised."
+    },
+    "case_id": "case_099_troyano_emocional",
+    "pipeline_meta": {
+      "artifact_count": 4,
+      "avg_score": "3341/8000",
+      "expected_verdict": "SUSPICION",
+      "source": "ebs_v1_json_adapter"
+    },
+    "signals": [
+      {
+        "artifact_id": "a099_01",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 3
+        },
+        "description": "Email from hr@corp.com: 'Condolences - Fund for Juan P\u00e9rez's family'. SPF: fail. DKIM: fail.",
+        "evidence_type": "memory_process",
+        "source": "sift_mail_gateway",
+        "z_score": {
+          "__fraction__": true,
+          "den": 250,
+          "num": 69
+        }
+      },
+      {
+        "artifact_id": "a099_02",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 7
+        },
+        "description": "Attached PDF: embedded JavaScript that accesses session cookies (session_id, auth_token, csrf) and sends them to an external domain.",
+        "evidence_type": "memory_process",
+        "source": "sift_file_audit",
+        "z_score": {
+          "__fraction__": true,
+          "den": 250,
+          "num": 161
+        }
+      },
+      {
+        "artifact_id": "a099_03",
+        "confidence": {
+          "__fraction__": true,
+          "den": 2,
+          "num": 1
+        },
+        "description": "HTTPS connection to family-support[.]org from 12 internal hosts within 30 minutes of mass PDF opening.",
+        "evidence_type": "dns_record",
+        "source": "sift_pcap",
+        "z_score": {
+          "__fraction__": true,
+          "den": 40,
+          "num": 17
+        }
+      },
+      {
+        "artifact_id": "a099_04",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 7
+        },
+        "description": "Verification: real HR did not send the email. 'Juan P\u00e9rez' does not exist in the active personnel database.",
+        "evidence_type": "memory_process",
+        "source": "sift_syslog",
+        "z_score": {
+          "__fraction__": true,
+          "den": 2000,
+          "num": 651
+        }
+      }
+    ]
+  },
+  "sans_compliance": {
+    "accuracy_validation": false,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}

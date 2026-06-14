@@ -1,0 +1,249 @@
+{
+  "analysis_timestamp": "2026-06-14T19:05:41.180163+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "VIGIA-BEN-010",
+    "end_time": "2026-06-14T19:05:41.180166+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "VIGIA-BEN-010",
+        "entry_sha256": "fbeceb44b2653059e7c14f784b4fbef84ec542918bf396206b3c2df05b2339be",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "VIGIA-BEN-010"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: 4eeafb3bfb155486...",
+        "outputs_summary": {
+          "agent_sha256": "4eeafb3bfb155486142942ad7a2c8678676f86ffd5d076882459354d820591f6",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-06-14T19:05:41.177611+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-BEN-010",
+        "entry_sha256": "ebca48d19987940b6e037d33a97a5702a7530001c40ef8d621d2cecf48f34e2c",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-BEN-010.json"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-06-14T19:05:41.177680+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-BEN-010",
+        "entry_sha256": "cc39aeda5130d3626dc60a075d02bd15798d572573fdddb47c3939686cd7b44d",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-BEN-010.json"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: 8b0842372ff313f3...",
+        "outputs_summary": {
+          "sha256": "8b0842372ff313f3e24e10beb721b4dd22827dd712471528d637933b3541a241"
+        },
+        "seq": 3,
+        "timestamp": "2026-06-14T19:05:41.177761+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "VIGIA-BEN-010",
+        "entry_sha256": "48aa3ca027763146d0aff5e7242c2f370ccd9edb53130b6a8d8ebabd26cf11b5",
+        "inputs_summary": {
+          "evidence": "/home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-BEN-010.json",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-06-14T19:05:41.177844+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "VIGIA-BEN-010",
+        "entry_sha256": "55a187c81d9be9a9619609cbcebed574b90c5cc69058544bdfe97016c81ddd7e",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 3 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "NO_SEMIOTIC_ANOMALY_DETECTED",
+            "best_posterior": "1/80",
+            "confidence": "1/80",
+            "is_conclusive": "False",
+            "narrative": "Email from CEO with 'URGENT: I need the report for the investor board meeting in 2 hours'. It is real: the meeting is on the calendar, the report was requested a week ago, and the CEO only uses the wo..."
+          },
+          "case_id": "VIGIA-BEN-010",
+          "pipeline_meta": {
+            "artifact_count": "3",
+            "avg_score": "1/16",
+            "expected_verdict": "NOISE",
+            "source": "ebs_v1_json_adapter"
+          },
+          "signals": [
+            {
+              "artifact_id": "ART-001",
+              "confidence": "3/10",
+              "description": "From: ceo@company.com | To: cfo@company.com | Subject: URGENT: Q4 Financial Report for investor board meeting | Date: 2024-03-15 08:00 | DKIM: PASS | SPF: PASS | Reply-To: ceo@company.com",
+              "evidence_type": "log_entry",
+              "source": "legacy_converter",
+              "z_score": "21/400"
+            },
+            {
+              "artifact_id": "ART-002",
+              "confidence": "3/10",
+              "description": "Calendar event: 'Investor Board Meeting \u2014 Q4 Presentation' | Date: 2024-03-15 10:00 | Location: Room A | Attendees: board_members, cfo, ceo | Created: 2024-02-01 by executive_assistant",
+              "evidence_type": "log_entry",
+              "source": "legacy_converter",
+              "z_score": "51/800"
+            },
+            {
+              "artifact_id": "ART-003",
+              "confidence": "3/10",
+              "description": "Email thread: 2024-03-08 | ceo\u2192cfo: 'Please prepare Q4 report for board meeting on the 15th' | cfo\u2192ceo: 'OK, I'll have it by the 12th' | 2024-03-12 | cfo\u2192ceo: 'Draft attached' | 2024-03-14 | ceo\u2192cfo: ",
+              "evidence_type": "log_entry",
+              "source": "legacy_converter",
+              "z_score": "57/800"
+            }
+          ]
+        },
+        "seq": 5,
+        "timestamp": "2026-06-14T19:05:41.179875+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "VIGIA-BEN-010",
+        "entry_sha256": "e9318723dceb9f264a825eeb1724a1387ff6d742b6a8633ac9225ee9f920f815",
+        "inputs_summary": {
+          "n_signals": "3"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-06-14T19:05:41.179965+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "VIGIA-BEN-010",
+        "entry_sha256": "373651543b7dee1ca70732ca5ce947035edab7b49fbc67a2f04ce480486eed9c",
+        "inputs_summary": {
+          "verdict": "NO_SEMIOTIC_ANOMALY_DETECTED"
+        },
+        "iteration": 0,
+        "note": "Exit code 0 \u2014 analysis complete.",
+        "outputs_summary": {
+          "exit_code": "0"
+        },
+        "seq": 7,
+        "timestamp": "2026-06-14T19:05:41.180094+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-06-14T19:05:41.177416+00:00",
+    "total_entries": 7
+  },
+  "case_id": "VIGIA-BEN-010",
+  "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-BEN-010.json",
+  "evidence_sha256": "8b0842372ff313f3e24e10beb721b4dd22827dd712471528d637933b3541a241",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-BEN-010 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-BEN-010.json\nEvidence SHA-256: 8b0842372ff313f3e24e10beb721b4dd22827dd712471528d637933b3541a241\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: NO_SEMIOTIC_ANOMALY_DETECTED\nPosterior confidence: 1/80\nConclusive: NO \u2014 requires human review\n\n--- PEIRCEAN NARRATIVE ---\nEmail from CEO with 'URGENT: I need the report for the investor board meeting in 2 hours'. It is real: the meeting is on the calendar, the report was requested a week ago, and the CEO only uses the word 'urgent' in board meeting contexts.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Email thread: 2024-03-08 | ceo\u2192cfo: 'Please prepare Q4 report for boar] z=0.071 conf=0.30 \u2014 \n  [Calendar event: 'Investor Board Meeting \u2014 Q4 Presentation' | Date: 202] z=0.064 conf=0.30 \u2014 \n  [From: ceo@company.com | To: cfo@company.com | Subject: URGENT: Q4 Fina] z=0.052 conf=0.30 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW \u2014 No significant anomalies detected in this iteration.\n\nCritical signals (z>3): 0\nHigh signals (2<z<=3): 0\nTotal signals analyzed: 3",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "NO_SEMIOTIC_ANOMALY_DETECTED",
+      "best_posterior": "1/80",
+      "confidence": {
+        "__fraction__": true,
+        "den": 80,
+        "num": 1
+      },
+      "is_conclusive": false,
+      "narrative": "Email from CEO with 'URGENT: I need the report for the investor board meeting in 2 hours'. It is real: the meeting is on the calendar, the report was requested a week ago, and the CEO only uses the word 'urgent' in board meeting contexts."
+    },
+    "case_id": "VIGIA-BEN-010",
+    "pipeline_meta": {
+      "artifact_count": 3,
+      "avg_score": "1/16",
+      "expected_verdict": "NOISE",
+      "source": "ebs_v1_json_adapter"
+    },
+    "signals": [
+      {
+        "artifact_id": "ART-001",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 3
+        },
+        "description": "From: ceo@company.com | To: cfo@company.com | Subject: URGENT: Q4 Financial Report for investor board meeting | Date: 2024-03-15 08:00 | DKIM: PASS | SPF: PASS | Reply-To: ceo@company.com",
+        "evidence_type": "log_entry",
+        "source": "legacy_converter",
+        "z_score": {
+          "__fraction__": true,
+          "den": 400,
+          "num": 21
+        }
+      },
+      {
+        "artifact_id": "ART-002",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 3
+        },
+        "description": "Calendar event: 'Investor Board Meeting \u2014 Q4 Presentation' | Date: 2024-03-15 10:00 | Location: Room A | Attendees: board_members, cfo, ceo | Created: 2024-02-01 by executive_assistant",
+        "evidence_type": "log_entry",
+        "source": "legacy_converter",
+        "z_score": {
+          "__fraction__": true,
+          "den": 800,
+          "num": 51
+        }
+      },
+      {
+        "artifact_id": "ART-003",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 3
+        },
+        "description": "Email thread: 2024-03-08 | ceo\u2192cfo: 'Please prepare Q4 report for board meeting on the 15th' | cfo\u2192ceo: 'OK, I'll have it by the 12th' | 2024-03-12 | cfo\u2192ceo: 'Draft attached' | 2024-03-14 | ceo\u2192cfo: ",
+        "evidence_type": "log_entry",
+        "source": "legacy_converter",
+        "z_score": {
+          "__fraction__": true,
+          "den": 800,
+          "num": 57
+        }
+      }
+    ]
+  },
+  "sans_compliance": {
+    "accuracy_validation": false,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}

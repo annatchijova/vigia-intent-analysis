@@ -1,0 +1,273 @@
+{
+  "analysis_timestamp": "2026-06-14T19:05:42.910962+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "VIGIA-CAN-015",
+    "end_time": "2026-06-14T19:05:42.910965+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "VIGIA-CAN-015",
+        "entry_sha256": "6ef5a0cb52394ab4180020f5302a4dc48f3d887ce4a5e4967d005db16e9cd8ea",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "VIGIA-CAN-015"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: 4eeafb3bfb155486...",
+        "outputs_summary": {
+          "agent_sha256": "4eeafb3bfb155486142942ad7a2c8678676f86ffd5d076882459354d820591f6",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-06-14T19:05:42.908384+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-CAN-015",
+        "entry_sha256": "a0c1c62ed4b5913306c381c68b5538cf0de9ae7df00842185ad6e8f61c8df9db",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-015.json"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-06-14T19:05:42.908460+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-CAN-015",
+        "entry_sha256": "c85aec06e905b121290a445d0b5c3e7cde563d8fbb2f57f804d0ec9bef28a452",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-015.json"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: 72e35b91d8ce9544...",
+        "outputs_summary": {
+          "sha256": "72e35b91d8ce95449d090e650946e91e5907a2b100c02183d8dafba4e03d13b0"
+        },
+        "seq": 3,
+        "timestamp": "2026-06-14T19:05:42.908534+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "VIGIA-CAN-015",
+        "entry_sha256": "111ee1039bba6d30c23299277a215400cadc727b2dc3600d3be3e509dd8594bd",
+        "inputs_summary": {
+          "evidence": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-015.json",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-06-14T19:05:42.908617+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "VIGIA-CAN-015",
+        "entry_sha256": "4a627f4d25713d711e82849d28eed77338b24fb68c7c339f9567b9a5a3918de9",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 4 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+            "best_posterior": "3919/40000",
+            "confidence": "3919/40000",
+            "is_conclusive": "True",
+            "narrative": "Analyst: 'I saved your life, I closed your open session'. Webshell installed 10 seconds BEFORE the message. The supposedly closed session is still active in memory. 3 POST connections to the webshell ..."
+          },
+          "case_id": "case_097_falsa_misericordia",
+          "pipeline_meta": {
+            "artifact_count": "4",
+            "avg_score": "3919/8000",
+            "expected_verdict": "MALICE",
+            "source": "ebs_v1_json_adapter"
+          },
+          "signals": [
+            {
+              "artifact_id": "a097_01",
+              "confidence": "3/10",
+              "description": "DM: 'Hey, I saved your life. I saw your open session and closed it myself so you don't get disciplined. Don't say anything'.",
+              "evidence_type": "log_entry",
+              "source": "sift_slack_export",
+              "z_score": "63/500"
+            },
+            {
+              "artifact_id": "a097_02",
+              "confidence": "7/10",
+              "description": "PHP webshell created in /var/www/html/uploads/ 10 seconds BEFORE the 'help' message.",
+              "evidence_type": "file_timestamp",
+              "source": "sift_file_audit",
+              "z_score": "679/1000"
+            },
+            {
+              "artifact_id": "a097_03",
+              "confidence": "19/20",
+              "description": "Colleague's session (dev@corp.com) still active 5 minutes after the alleged closure. No logout event.",
+              "evidence_type": "memory_process",
+              "source": "sift_volatility",
+              "z_score": "361/400"
+            },
+            {
+              "artifact_id": "a097_04",
+              "confidence": "7/20",
+              "description": "3 POST connections to webshell.php from analyst_sec IP within 2 minutes of the 'closure' message.",
+              "evidence_type": "log_entry",
+              "source": "sift_syslog",
+              "z_score": "63/250"
+            }
+          ]
+        },
+        "seq": 5,
+        "timestamp": "2026-06-14T19:05:42.910659+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "VIGIA-CAN-015",
+        "entry_sha256": "56fabc1aac1e161f01a26b3cea625eb22c7b8ae91226b80e5f8b8701e8d59f55",
+        "inputs_summary": {
+          "n_signals": "4"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-06-14T19:05:42.910757+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "VIGIA-CAN-015",
+        "entry_sha256": "c39764bb37e926c7583e02da6ecc7b8c7ced4764ea55236e380b749e22fd7c27",
+        "inputs_summary": {
+          "verdict": "MALICIOUS_INTENT_DETECTED"
+        },
+        "iteration": 0,
+        "note": "Exit code 1 \u2014 analysis complete.",
+        "outputs_summary": {
+          "exit_code": "1"
+        },
+        "seq": 7,
+        "timestamp": "2026-06-14T19:05:42.910888+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-06-14T19:05:42.908196+00:00",
+    "total_entries": 7
+  },
+  "case_id": "VIGIA-CAN-015",
+  "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-015.json",
+  "evidence_sha256": "72e35b91d8ce95449d090e650946e91e5907a2b100c02183d8dafba4e03d13b0",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-CAN-015 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-015.json\nEvidence SHA-256: 72e35b91d8ce95449d090e650946e91e5907a2b100c02183d8dafba4e03d13b0\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 3919/40000\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\nAnalyst: 'I saved your life, I closed your open session'. Webshell installed 10 seconds BEFORE the message. The supposedly closed session is still active in memory. 3 POST connections to the webshell from the analyst's IP.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Colleague's session (dev@corp.com) still active 5 minutes after the al] z=0.902 conf=0.95 \u2014 \n  [PHP webshell created in /var/www/html/uploads/ 10 seconds BEFORE the '] z=0.679 conf=0.70 \u2014 \n  [3 POST connections to webshell.php from analyst_sec IP within 2 minute] z=0.252 conf=0.35 \u2014 \n  [DM: 'Hey, I saved your life. I saw your open session and closed it mys] z=0.126 conf=0.30 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW \u2014 No significant anomalies detected in this iteration.\n\nCritical signals (z>3): 0\nHigh signals (2<z<=3): 0\nTotal signals analyzed: 4",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+      "best_posterior": "3919/40000",
+      "confidence": {
+        "__fraction__": true,
+        "den": 40000,
+        "num": 3919
+      },
+      "is_conclusive": true,
+      "narrative": "Analyst: 'I saved your life, I closed your open session'. Webshell installed 10 seconds BEFORE the message. The supposedly closed session is still active in memory. 3 POST connections to the webshell from the analyst's IP."
+    },
+    "case_id": "case_097_falsa_misericordia",
+    "pipeline_meta": {
+      "artifact_count": 4,
+      "avg_score": "3919/8000",
+      "expected_verdict": "MALICE",
+      "source": "ebs_v1_json_adapter"
+    },
+    "signals": [
+      {
+        "artifact_id": "a097_01",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 3
+        },
+        "description": "DM: 'Hey, I saved your life. I saw your open session and closed it myself so you don't get disciplined. Don't say anything'.",
+        "evidence_type": "log_entry",
+        "source": "sift_slack_export",
+        "z_score": {
+          "__fraction__": true,
+          "den": 500,
+          "num": 63
+        }
+      },
+      {
+        "artifact_id": "a097_02",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 7
+        },
+        "description": "PHP webshell created in /var/www/html/uploads/ 10 seconds BEFORE the 'help' message.",
+        "evidence_type": "file_timestamp",
+        "source": "sift_file_audit",
+        "z_score": {
+          "__fraction__": true,
+          "den": 1000,
+          "num": 679
+        }
+      },
+      {
+        "artifact_id": "a097_03",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 19
+        },
+        "description": "Colleague's session (dev@corp.com) still active 5 minutes after the alleged closure. No logout event.",
+        "evidence_type": "memory_process",
+        "source": "sift_volatility",
+        "z_score": {
+          "__fraction__": true,
+          "den": 400,
+          "num": 361
+        }
+      },
+      {
+        "artifact_id": "a097_04",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 7
+        },
+        "description": "3 POST connections to webshell.php from analyst_sec IP within 2 minutes of the 'closure' message.",
+        "evidence_type": "log_entry",
+        "source": "sift_syslog",
+        "z_score": {
+          "__fraction__": true,
+          "den": 250,
+          "num": 63
+        }
+      }
+    ]
+  },
+  "sans_compliance": {
+    "accuracy_validation": false,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}

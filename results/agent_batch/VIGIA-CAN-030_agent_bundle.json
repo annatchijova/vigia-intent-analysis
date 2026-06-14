@@ -1,0 +1,273 @@
+{
+  "analysis_timestamp": "2026-06-14T19:05:43.560570+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "VIGIA-CAN-030",
+    "end_time": "2026-06-14T19:05:43.560573+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "VIGIA-CAN-030",
+        "entry_sha256": "2259f1b7518da57f454af9fda3ec162abd45bb4fd24c8810dc8f328ab3f88146",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "VIGIA-CAN-030"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: 4eeafb3bfb155486...",
+        "outputs_summary": {
+          "agent_sha256": "4eeafb3bfb155486142942ad7a2c8678676f86ffd5d076882459354d820591f6",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-06-14T19:05:43.557969+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-CAN-030",
+        "entry_sha256": "dfa4edb316cbd704026da0cd536221c5f63ec58abd902121a7e8ea44f777dc50",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-030.json"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-06-14T19:05:43.558039+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-CAN-030",
+        "entry_sha256": "47b938651c6974dc17f88d09b7035db89dd851a2726e851d90b3937675fee149",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-030.json"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: 96206180875b8ad3...",
+        "outputs_summary": {
+          "sha256": "96206180875b8ad361d4c59cc23759de6aa798c96e3516aa5643312e77adc741"
+        },
+        "seq": 3,
+        "timestamp": "2026-06-14T19:05:43.558112+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "VIGIA-CAN-030",
+        "entry_sha256": "5cab675c3ebd65c6a070c6d29ad06556e00a5d7471284b128f53ce7c6db3dd92",
+        "inputs_summary": {
+          "evidence": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-030.json",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-06-14T19:05:43.558195+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "VIGIA-CAN-030",
+        "entry_sha256": "bdd1fdfe9a1f347f3623e81c29a45f969231dbcb2e7afc4ed1816255813612be",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 4 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+            "best_posterior": "1433/40000",
+            "confidence": "1433/40000",
+            "is_conclusive": "False",
+            "narrative": "20 tickets in 90 seconds from different accounts: 'Can't access mail', 'Were we hacked?'. O365 confirms normal access for all. 18/20 tickets share an identical punctuation pattern. Ransomware active o..."
+          },
+          "case_id": "case_112_sincronizacion_panico_semantico",
+          "pipeline_meta": {
+            "artifact_count": "4",
+            "avg_score": "1433/8000",
+            "expected_verdict": "MALICE",
+            "source": "ebs_v1_json_adapter"
+          },
+          "signals": [
+            {
+              "artifact_id": "a112_01",
+              "confidence": "3/10",
+              "description": "20 tickets in a 90-second window from different accounts. Common phrases: 'Can't access mail', 'Were we hacked?'",
+              "evidence_type": "log_entry",
+              "source": "sift_ticket_system",
+              "z_score": "6/25"
+            },
+            {
+              "artifact_id": "a112_02",
+              "confidence": "9/20",
+              "description": "O365 logs: 20 reporting accounts have a successful login in the last hour. Zero failed attempts. Zero lockouts.",
+              "evidence_type": "log_entry",
+              "source": "sift_o365_audit",
+              "z_score": "117/400"
+            },
+            {
+              "artifact_id": "a112_03",
+              "confidence": "3/20",
+              "description": "Stylometric analysis: 18/20 tickets share an identical punctuation pattern (space before question mark). Entropy between tickets: 0.12 bits.",
+              "evidence_type": "cultural_marker",
+              "source": "sift_linguistic",
+              "z_score": "273/2000"
+            },
+            {
+              "artifact_id": "a112_04",
+              "confidence": "19/20",
+              "description": "During the semantic panic window: ransomware.exe active on file server. 1,247 files encrypted.",
+              "evidence_type": "memory_process",
+              "source": "sift_volatility",
+              "z_score": "19/400"
+            }
+          ]
+        },
+        "seq": 5,
+        "timestamp": "2026-06-14T19:05:43.560259+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "VIGIA-CAN-030",
+        "entry_sha256": "37cf224c82197b14e6f4fddfeb1b7def81ea22659a985a09b6ddfadc106fd255",
+        "inputs_summary": {
+          "n_signals": "4"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-06-14T19:05:43.560354+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "VIGIA-CAN-030",
+        "entry_sha256": "e37987cda109068829df72e99eb18a490dd9f14593b6c697a4122ba5c5dd4359",
+        "inputs_summary": {
+          "verdict": "MALICIOUS_INTENT_DETECTED"
+        },
+        "iteration": 0,
+        "note": "Exit code 1 \u2014 analysis complete.",
+        "outputs_summary": {
+          "exit_code": "1"
+        },
+        "seq": 7,
+        "timestamp": "2026-06-14T19:05:43.560494+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-06-14T19:05:43.557781+00:00",
+    "total_entries": 7
+  },
+  "case_id": "VIGIA-CAN-030",
+  "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-030.json",
+  "evidence_sha256": "96206180875b8ad361d4c59cc23759de6aa798c96e3516aa5643312e77adc741",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-CAN-030 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-030.json\nEvidence SHA-256: 96206180875b8ad361d4c59cc23759de6aa798c96e3516aa5643312e77adc741\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 1433/40000\nConclusive: NO \u2014 requires human review\n\n--- PEIRCEAN NARRATIVE ---\n20 tickets in 90 seconds from different accounts: 'Can't access mail', 'Were we hacked?'. O365 confirms normal access for all. 18/20 tickets share an identical punctuation pattern. Ransomware active on the file server simultaneously.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [O365 logs: 20 reporting accounts have a successful login in the last h] z=0.292 conf=0.45 \u2014 \n  [20 tickets in a 90-second window from different accounts. Common phras] z=0.240 conf=0.30 \u2014 \n  [Stylometric analysis: 18/20 tickets share an identical punctuation pat] z=0.137 conf=0.15 \u2014 \n  [During the semantic panic window: ransomware.exe active on file server] z=0.048 conf=0.95 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW \u2014 No significant anomalies detected in this iteration.\n\nCritical signals (z>3): 0\nHigh signals (2<z<=3): 0\nTotal signals analyzed: 4",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+      "best_posterior": "1433/40000",
+      "confidence": {
+        "__fraction__": true,
+        "den": 40000,
+        "num": 1433
+      },
+      "is_conclusive": false,
+      "narrative": "20 tickets in 90 seconds from different accounts: 'Can't access mail', 'Were we hacked?'. O365 confirms normal access for all. 18/20 tickets share an identical punctuation pattern. Ransomware active on the file server simultaneously."
+    },
+    "case_id": "case_112_sincronizacion_panico_semantico",
+    "pipeline_meta": {
+      "artifact_count": 4,
+      "avg_score": "1433/8000",
+      "expected_verdict": "MALICE",
+      "source": "ebs_v1_json_adapter"
+    },
+    "signals": [
+      {
+        "artifact_id": "a112_01",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 3
+        },
+        "description": "20 tickets in a 90-second window from different accounts. Common phrases: 'Can't access mail', 'Were we hacked?'",
+        "evidence_type": "log_entry",
+        "source": "sift_ticket_system",
+        "z_score": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 6
+        }
+      },
+      {
+        "artifact_id": "a112_02",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 9
+        },
+        "description": "O365 logs: 20 reporting accounts have a successful login in the last hour. Zero failed attempts. Zero lockouts.",
+        "evidence_type": "log_entry",
+        "source": "sift_o365_audit",
+        "z_score": {
+          "__fraction__": true,
+          "den": 400,
+          "num": 117
+        }
+      },
+      {
+        "artifact_id": "a112_03",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 3
+        },
+        "description": "Stylometric analysis: 18/20 tickets share an identical punctuation pattern (space before question mark). Entropy between tickets: 0.12 bits.",
+        "evidence_type": "cultural_marker",
+        "source": "sift_linguistic",
+        "z_score": {
+          "__fraction__": true,
+          "den": 2000,
+          "num": 273
+        }
+      },
+      {
+        "artifact_id": "a112_04",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 19
+        },
+        "description": "During the semantic panic window: ransomware.exe active on file server. 1,247 files encrypted.",
+        "evidence_type": "memory_process",
+        "source": "sift_volatility",
+        "z_score": {
+          "__fraction__": true,
+          "den": 400,
+          "num": 19
+        }
+      }
+    ]
+  },
+  "sans_compliance": {
+    "accuracy_validation": false,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}

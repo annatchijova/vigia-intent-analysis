@@ -1,0 +1,273 @@
+{
+  "analysis_timestamp": "2026-06-14T19:05:42.691733+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "VIGIA-CAN-010",
+    "end_time": "2026-06-14T19:05:42.691737+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "VIGIA-CAN-010",
+        "entry_sha256": "1f878f441de56fd5baf47103d96c602a9f65a4120b666582bc808829ea16455b",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "VIGIA-CAN-010"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: 4eeafb3bfb155486...",
+        "outputs_summary": {
+          "agent_sha256": "4eeafb3bfb155486142942ad7a2c8678676f86ffd5d076882459354d820591f6",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-06-14T19:05:42.689130+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-CAN-010",
+        "entry_sha256": "776abbf780a534e1905a3145053f5f7136df9ce4973c56b9a8f55cbdea9a5704",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-010.json"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-06-14T19:05:42.689199+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-CAN-010",
+        "entry_sha256": "97b6132c62b95c1591235c2a1685521f5010fa1a1931b5e373bd059decc17745",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-010.json"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: c056ff13a6b2f0cb...",
+        "outputs_summary": {
+          "sha256": "c056ff13a6b2f0cb14764e30bde0557acffd3842d4cdc2c66efa03ecd1427f7c"
+        },
+        "seq": 3,
+        "timestamp": "2026-06-14T19:05:42.689273+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "VIGIA-CAN-010",
+        "entry_sha256": "6c70e78c73e87d97bc66227489f9868c292e2ce678c95e1726895ef41cdab10e",
+        "inputs_summary": {
+          "evidence": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-010.json",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-06-14T19:05:42.689357+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "VIGIA-CAN-010",
+        "entry_sha256": "2c65326e6e73d877fae08063e674ea8a81644d003aecc0f0e24b048e62d699c2",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 4 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+            "best_posterior": "1699/20000",
+            "confidence": "1699/20000",
+            "is_conclusive": "True",
+            "narrative": "40-page PDF report with irrelevant charts hides a 'minor permission adjustment' on page 39 that grants Everyone:FullControl over HKLM\\SAM. Cognitive DoS via documentary volume."
+          },
+          "case_id": "case_092_verdad_por_saturacion",
+          "pipeline_meta": {
+            "artifact_count": "4",
+            "avg_score": "1699/4000",
+            "expected_verdict": "MALICE",
+            "source": "ebs_v1_json_adapter"
+          },
+          "signals": [
+            {
+              "artifact_id": "a092_01",
+              "confidence": "1/2",
+              "description": "PDF 'Detailed Suspicious Process Report': 40 pages. CPU charts, disk temperatures, technical bios. Relevant information: page 39.",
+              "evidence_type": "cryptographic_hash",
+              "source": "sift_document",
+              "z_score": "19/40"
+            },
+            {
+              "artifact_id": "a092_02",
+              "confidence": "17/20",
+              "description": "Page 39: 'minor unimportant permission adjustment'. Actual action: Everyone:FullControl on HKLM\\SAM\\Domains.",
+              "evidence_type": "memory_process",
+              "source": "sift_windows_audit",
+              "z_score": "391/500"
+            },
+            {
+              "artifact_id": "a092_03",
+              "confidence": "9/20",
+              "description": "PDF metadata: created by headless script (soffice.bin), last modified 3 minutes before sending. Not manually authored.",
+              "evidence_type": "memory_process",
+              "source": "sift_metadata",
+              "z_score": "207/500"
+            },
+            {
+              "artifact_id": "a092_04",
+              "confidence": "7/20",
+              "description": "Event 4663: ACL change on HKLM\\SAM. Actor: admin_jdoe. Timestamp matches exactly with report submission.",
+              "evidence_type": "log_entry",
+              "source": "sift_syslog",
+              "z_score": "7/250"
+            }
+          ]
+        },
+        "seq": 5,
+        "timestamp": "2026-06-14T19:05:42.691418+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "VIGIA-CAN-010",
+        "entry_sha256": "48d3eeb617aade6fc2e8d5d731d760c56e8ee312b000890f9307dd6c8f712495",
+        "inputs_summary": {
+          "n_signals": "4"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-06-14T19:05:42.691526+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "VIGIA-CAN-010",
+        "entry_sha256": "21970f02cd367d13bb1baf4a4e62fae4fa698c7c263357a009ec9fcedbcafde4",
+        "inputs_summary": {
+          "verdict": "MALICIOUS_INTENT_DETECTED"
+        },
+        "iteration": 0,
+        "note": "Exit code 1 \u2014 analysis complete.",
+        "outputs_summary": {
+          "exit_code": "1"
+        },
+        "seq": 7,
+        "timestamp": "2026-06-14T19:05:42.691658+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-06-14T19:05:42.688939+00:00",
+    "total_entries": 7
+  },
+  "case_id": "VIGIA-CAN-010",
+  "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-010.json",
+  "evidence_sha256": "c056ff13a6b2f0cb14764e30bde0557acffd3842d4cdc2c66efa03ecd1427f7c",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-CAN-010 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-010.json\nEvidence SHA-256: c056ff13a6b2f0cb14764e30bde0557acffd3842d4cdc2c66efa03ecd1427f7c\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 1699/20000\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n40-page PDF report with irrelevant charts hides a 'minor permission adjustment' on page 39 that grants Everyone:FullControl over HKLM\\SAM. Cognitive DoS via documentary volume.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Page 39: 'minor unimportant permission adjustment'. Actual action: Eve] z=0.782 conf=0.85 \u2014 \n  [PDF 'Detailed Suspicious Process Report': 40 pages. CPU charts, disk t] z=0.475 conf=0.50 \u2014 \n  [PDF metadata: created by headless script (soffice.bin), last modified ] z=0.414 conf=0.45 \u2014 \n  [Event 4663: ACL change on HKLM\\SAM. Actor: admin_jdoe. Timestamp match] z=0.028 conf=0.35 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW \u2014 No significant anomalies detected in this iteration.\n\nCritical signals (z>3): 0\nHigh signals (2<z<=3): 0\nTotal signals analyzed: 4",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+      "best_posterior": "1699/20000",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20000,
+        "num": 1699
+      },
+      "is_conclusive": true,
+      "narrative": "40-page PDF report with irrelevant charts hides a 'minor permission adjustment' on page 39 that grants Everyone:FullControl over HKLM\\SAM. Cognitive DoS via documentary volume."
+    },
+    "case_id": "case_092_verdad_por_saturacion",
+    "pipeline_meta": {
+      "artifact_count": 4,
+      "avg_score": "1699/4000",
+      "expected_verdict": "MALICE",
+      "source": "ebs_v1_json_adapter"
+    },
+    "signals": [
+      {
+        "artifact_id": "a092_01",
+        "confidence": {
+          "__fraction__": true,
+          "den": 2,
+          "num": 1
+        },
+        "description": "PDF 'Detailed Suspicious Process Report': 40 pages. CPU charts, disk temperatures, technical bios. Relevant information: page 39.",
+        "evidence_type": "cryptographic_hash",
+        "source": "sift_document",
+        "z_score": {
+          "__fraction__": true,
+          "den": 40,
+          "num": 19
+        }
+      },
+      {
+        "artifact_id": "a092_02",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 17
+        },
+        "description": "Page 39: 'minor unimportant permission adjustment'. Actual action: Everyone:FullControl on HKLM\\SAM\\Domains.",
+        "evidence_type": "memory_process",
+        "source": "sift_windows_audit",
+        "z_score": {
+          "__fraction__": true,
+          "den": 500,
+          "num": 391
+        }
+      },
+      {
+        "artifact_id": "a092_03",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 9
+        },
+        "description": "PDF metadata: created by headless script (soffice.bin), last modified 3 minutes before sending. Not manually authored.",
+        "evidence_type": "memory_process",
+        "source": "sift_metadata",
+        "z_score": {
+          "__fraction__": true,
+          "den": 500,
+          "num": 207
+        }
+      },
+      {
+        "artifact_id": "a092_04",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 7
+        },
+        "description": "Event 4663: ACL change on HKLM\\SAM. Actor: admin_jdoe. Timestamp matches exactly with report submission.",
+        "evidence_type": "log_entry",
+        "source": "sift_syslog",
+        "z_score": {
+          "__fraction__": true,
+          "den": 250,
+          "num": 7
+        }
+      }
+    ]
+  },
+  "sans_compliance": {
+    "accuracy_validation": false,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}

@@ -1,0 +1,273 @@
+{
+  "analysis_timestamp": "2026-06-14T19:05:42.307809+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "VIGIA-CAN-002",
+    "end_time": "2026-06-14T19:05:42.307813+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "VIGIA-CAN-002",
+        "entry_sha256": "3e6da59c171d222fe4187fd32858c41ed8058c6464db066911ec8047e7648856",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "VIGIA-CAN-002"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: 4eeafb3bfb155486...",
+        "outputs_summary": {
+          "agent_sha256": "4eeafb3bfb155486142942ad7a2c8678676f86ffd5d076882459354d820591f6",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-06-14T19:05:42.305216+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-CAN-002",
+        "entry_sha256": "d9b4b6d4c71073dbb78635148a17978f13276dd47f7c67913a315c5f7c14324f",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-002.json"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-06-14T19:05:42.305285+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-CAN-002",
+        "entry_sha256": "327a08387e808a3ada64c7a6665c99e78d7618c80ada79b1f0723d9d82feac38",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-002.json"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: be0233c7d12f6554...",
+        "outputs_summary": {
+          "sha256": "be0233c7d12f6554cf0605000ad60c90aaccb1388e3e5945eb652f0e9f5bab8b"
+        },
+        "seq": 3,
+        "timestamp": "2026-06-14T19:05:42.305358+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "VIGIA-CAN-002",
+        "entry_sha256": "ae9bbeb2f6d4af2cf95d767fb1484177e0202475d368d76959e24ad94821cedb",
+        "inputs_summary": {
+          "evidence": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-002.json",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-06-14T19:05:42.305449+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "VIGIA-CAN-002",
+        "entry_sha256": "dbe9c20b3efb366134986a25643fa121c33cf1be880e99edb5e6da22c06f72dd",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 4 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+            "best_posterior": "83/800",
+            "confidence": "83/800",
+            "is_conclusive": "True",
+            "narrative": "An 'admin' user submits a support ticket simulating digital incompetence. The attached screenshot shows a dirty pipe exploit half-executed. Zero probability of reaching that state accidentally."
+          },
+          "case_id": "case_084_cebo_falso_layman",
+          "pipeline_meta": {
+            "artifact_count": "4",
+            "avg_score": "83/160",
+            "expected_verdict": "MALICE",
+            "source": "ebs_v1_json_adapter"
+          },
+          "signals": [
+            {
+              "artifact_id": "a084_01",
+              "confidence": "3/10",
+              "description": "Ticket: 'I don't know what I touched, black screen with green text, can't open Excel'.",
+              "evidence_type": "memory_process",
+              "source": "sift_ticket_system",
+              "z_score": "69/250"
+            },
+            {
+              "artifact_id": "a084_02",
+              "confidence": "7/10",
+              "description": "Attached screenshot: Linux terminal with CVE-2022-0847 (dirty pipe) half-executed. Progress bar visible at 45%.",
+              "evidence_type": "memory_process",
+              "source": "sift_vision_ocr",
+              "z_score": "161/250"
+            },
+            {
+              "artifact_id": "a084_03",
+              "confidence": "19/20",
+              "description": "Bash history in memory: wget exploit.sh && chmod +x && ./exploit.sh.",
+              "evidence_type": "memory_process",
+              "source": "sift_volatility",
+              "z_score": "171/200"
+            },
+            {
+              "artifact_id": "a084_04",
+              "confidence": "1/2",
+              "description": "DNS resolution to a domain registered 2 days before the support ticket.",
+              "evidence_type": "dns_record",
+              "source": "sift_pcap",
+              "z_score": "3/10"
+            }
+          ]
+        },
+        "seq": 5,
+        "timestamp": "2026-06-14T19:05:42.307501+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "VIGIA-CAN-002",
+        "entry_sha256": "35219a050b207e7c63d924b724ee68d7fe97938e189c847a12978fd3d3202aff",
+        "inputs_summary": {
+          "n_signals": "4"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-06-14T19:05:42.307606+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "VIGIA-CAN-002",
+        "entry_sha256": "67cd066bd0cc3cb4d849d740414334e0f28bbf146b2bb74bb405736ea3dff7b8",
+        "inputs_summary": {
+          "verdict": "MALICIOUS_INTENT_DETECTED"
+        },
+        "iteration": 0,
+        "note": "Exit code 1 \u2014 analysis complete.",
+        "outputs_summary": {
+          "exit_code": "1"
+        },
+        "seq": 7,
+        "timestamp": "2026-06-14T19:05:42.307736+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-06-14T19:05:42.305024+00:00",
+    "total_entries": 7
+  },
+  "case_id": "VIGIA-CAN-002",
+  "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-002.json",
+  "evidence_sha256": "be0233c7d12f6554cf0605000ad60c90aaccb1388e3e5945eb652f0e9f5bab8b",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-CAN-002 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-002.json\nEvidence SHA-256: be0233c7d12f6554cf0605000ad60c90aaccb1388e3e5945eb652f0e9f5bab8b\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 83/800\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\nAn 'admin' user submits a support ticket simulating digital incompetence. The attached screenshot shows a dirty pipe exploit half-executed. Zero probability of reaching that state accidentally.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Bash history in memory: wget exploit.sh && chmod +x && ./exploit.sh.] z=0.855 conf=0.95 \u2014 \n  [Attached screenshot: Linux terminal with CVE-2022-0847 (dirty pipe) ha] z=0.644 conf=0.70 \u2014 \n  [DNS resolution to a domain registered 2 days before the support ticket] z=0.300 conf=0.50 \u2014 \n  [Ticket: 'I don't know what I touched, black screen with green text, ca] z=0.276 conf=0.30 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW \u2014 No significant anomalies detected in this iteration.\n\nCritical signals (z>3): 0\nHigh signals (2<z<=3): 0\nTotal signals analyzed: 4",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+      "best_posterior": "83/800",
+      "confidence": {
+        "__fraction__": true,
+        "den": 800,
+        "num": 83
+      },
+      "is_conclusive": true,
+      "narrative": "An 'admin' user submits a support ticket simulating digital incompetence. The attached screenshot shows a dirty pipe exploit half-executed. Zero probability of reaching that state accidentally."
+    },
+    "case_id": "case_084_cebo_falso_layman",
+    "pipeline_meta": {
+      "artifact_count": 4,
+      "avg_score": "83/160",
+      "expected_verdict": "MALICE",
+      "source": "ebs_v1_json_adapter"
+    },
+    "signals": [
+      {
+        "artifact_id": "a084_01",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 3
+        },
+        "description": "Ticket: 'I don't know what I touched, black screen with green text, can't open Excel'.",
+        "evidence_type": "memory_process",
+        "source": "sift_ticket_system",
+        "z_score": {
+          "__fraction__": true,
+          "den": 250,
+          "num": 69
+        }
+      },
+      {
+        "artifact_id": "a084_02",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 7
+        },
+        "description": "Attached screenshot: Linux terminal with CVE-2022-0847 (dirty pipe) half-executed. Progress bar visible at 45%.",
+        "evidence_type": "memory_process",
+        "source": "sift_vision_ocr",
+        "z_score": {
+          "__fraction__": true,
+          "den": 250,
+          "num": 161
+        }
+      },
+      {
+        "artifact_id": "a084_03",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 19
+        },
+        "description": "Bash history in memory: wget exploit.sh && chmod +x && ./exploit.sh.",
+        "evidence_type": "memory_process",
+        "source": "sift_volatility",
+        "z_score": {
+          "__fraction__": true,
+          "den": 200,
+          "num": 171
+        }
+      },
+      {
+        "artifact_id": "a084_04",
+        "confidence": {
+          "__fraction__": true,
+          "den": 2,
+          "num": 1
+        },
+        "description": "DNS resolution to a domain registered 2 days before the support ticket.",
+        "evidence_type": "dns_record",
+        "source": "sift_pcap",
+        "z_score": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 3
+        }
+      }
+    ]
+  },
+  "sans_compliance": {
+    "accuracy_validation": false,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}

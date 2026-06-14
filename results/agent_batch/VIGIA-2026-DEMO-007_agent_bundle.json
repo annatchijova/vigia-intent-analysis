@@ -1,0 +1,273 @@
+{
+  "analysis_timestamp": "2026-06-14T19:05:40.661813+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "VIGIA-2026-DEMO-007",
+    "end_time": "2026-06-14T19:05:40.661816+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "VIGIA-2026-DEMO-007",
+        "entry_sha256": "e8249eb6a91b95f3c2649286ef42a4176c7dfaddb3abc763cfd7c575cd1191dd",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "VIGIA-2026-DEMO-007"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: 4eeafb3bfb155486...",
+        "outputs_summary": {
+          "agent_sha256": "4eeafb3bfb155486142942ad7a2c8678676f86ffd5d076882459354d820591f6",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-06-14T19:05:40.659214+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-2026-DEMO-007",
+        "entry_sha256": "afa4eb7b82c0f8f620d064e575d79c79cd1b6f086a701d423db543cc4a6d53a8",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-2026-DEMO-007.json"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-06-14T19:05:40.659284+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-2026-DEMO-007",
+        "entry_sha256": "b461b754aaa5222243c36dae48a79999c2087ec07ce566c1bb19cdcd5a1ed22e",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-2026-DEMO-007.json"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: d442b651764a3005...",
+        "outputs_summary": {
+          "sha256": "d442b651764a300550c5d30ce45027aec541138b84f9aab15d0f357a72f8d3e7"
+        },
+        "seq": 3,
+        "timestamp": "2026-06-14T19:05:40.659363+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "VIGIA-2026-DEMO-007",
+        "entry_sha256": "8a7e6330466b292e8a7224d2053d803c78edc493cdf025279eab6d9908b7dad7",
+        "inputs_summary": {
+          "evidence": "/home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-2026-DEMO-007.json",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-06-14T19:05:40.659456+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "VIGIA-2026-DEMO-007",
+        "entry_sha256": "23c4fadef0b1e32acc9aa7dbff382fc2bfe058ea29bb77cd91db98b0bf860778",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 4 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+            "best_posterior": "289/2000",
+            "confidence": "289/2000",
+            "is_conclusive": "True",
+            "narrative": "A systems administrator manually modified access logs to conceal his presence on the server the night before confidential data disappeared. VIG\u00cdA must detect the temporal inconsistencies and evidence ..."
+          },
+          "case_id": "VIGIA-2026-DEMO-007",
+          "pipeline_meta": {
+            "artifact_count": "4",
+            "avg_score": "289/400",
+            "expected_verdict": "MALICE",
+            "source": "ebs_v1_json_adapter"
+          },
+          "signals": [
+            {
+              "artifact_id": "LOG-001",
+              "confidence": "17/20",
+              "description": "Apr 10 08:45:12 fileserver sshd[1201]: Accepted publickey for sysadmin from 10.0.0.15 port 44231\nApr 10 08:45:13 fileserver sshd[1201]: pam_unix(sshd:session): session opened for user sysadmin\nApr 10 ",
+              "evidence_type": "log_entry",
+              "source": "legacy_converter",
+              "z_score": "289/400"
+            },
+            {
+              "artifact_id": "LOG-002",
+              "confidence": "17/20",
+              "description": "{'file': '/var/log/auth.log', 'size': 48291, 'inode_modify_time': '2026-04-10T23:47:33Z', 'last_access': '2026-04-10T23:47:33Z', 'permissions': '0640', 'owner': 'syslog', 'group': 'adm', 'editor_signa",
+              "evidence_type": "file_timestamp",
+              "source": "legacy_converter",
+              "z_score": "289/400"
+            },
+            {
+              "artifact_id": "LOG-003",
+              "confidence": "17/20",
+              "description": "23:41:07 10.0.0.15 -> 10.0.0.42:22 SYN [ESTABLISHED] bytes=0\n23:41:08 10.0.0.15 -> 10.0.0.42:22 [SSH_HANDSHAKE] bytes=4821\n23:41:09 10.0.0.15 -> 10.0.0.42:22 [DATA] bytes=284930\n23:41:44 10.0.0.15 -> ",
+              "evidence_type": "log_entry",
+              "source": "legacy_converter",
+              "z_score": "289/400"
+            },
+            {
+              "artifact_id": "META-001",
+              "confidence": "17/20",
+              "description": "type=SYSCALL msg=audit(1744331275.441:8821): arch=c000003e syscall=2 success=yes exit=3 a0=7f4a1b2c3d40 a1=0 a2=1b6 a3=0 items=1 ppid=4891 pid=4892 auid=1001 uid=0 gid=0 euid=0 egid=0 tty=pts1 ses=847",
+              "evidence_type": "file_timestamp",
+              "source": "legacy_converter",
+              "z_score": "289/400"
+            }
+          ]
+        },
+        "seq": 5,
+        "timestamp": "2026-06-14T19:05:40.661501+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "VIGIA-2026-DEMO-007",
+        "entry_sha256": "b9d006ae17d769aff6d84593bcb325f63965cd22926a5c213de3843810d260f1",
+        "inputs_summary": {
+          "n_signals": "4"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-06-14T19:05:40.661608+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "VIGIA-2026-DEMO-007",
+        "entry_sha256": "fd8d12a2499796d1632c07e51c50d06f8fa14d33b6f2e5c8c6803f259445829d",
+        "inputs_summary": {
+          "verdict": "MALICIOUS_INTENT_DETECTED"
+        },
+        "iteration": 0,
+        "note": "Exit code 1 \u2014 analysis complete.",
+        "outputs_summary": {
+          "exit_code": "1"
+        },
+        "seq": 7,
+        "timestamp": "2026-06-14T19:05:40.661739+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-06-14T19:05:40.659025+00:00",
+    "total_entries": 7
+  },
+  "case_id": "VIGIA-2026-DEMO-007",
+  "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-2026-DEMO-007.json",
+  "evidence_sha256": "d442b651764a300550c5d30ce45027aec541138b84f9aab15d0f357a72f8d3e7",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-2026-DEMO-007 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-2026-DEMO-007.json\nEvidence SHA-256: d442b651764a300550c5d30ce45027aec541138b84f9aab15d0f357a72f8d3e7\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 289/2000\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\nA systems administrator manually modified access logs to conceal his presence on the server the night before confidential data disappeared. VIG\u00cdA must detect the temporal inconsistencies and evidence of manual editing.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Apr 10 08:45:12 fileserver sshd[1201]: Accepted publickey for sysadmin] z=0.723 conf=0.85 \u2014 \n  [{'file': '/var/log/auth.log', 'size': 48291, 'inode_modify_time': '202] z=0.723 conf=0.85 \u2014 \n  [23:41:07 10.0.0.15 -> 10.0.0.42:22 SYN [ESTABLISHED] bytes=0\n23:41:08 ] z=0.723 conf=0.85 \u2014 \n  [type=SYSCALL msg=audit(1744331275.441:8821): arch=c000003e syscall=2 s] z=0.723 conf=0.85 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW \u2014 No significant anomalies detected in this iteration.\n\nCritical signals (z>3): 0\nHigh signals (2<z<=3): 0\nTotal signals analyzed: 4",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+      "best_posterior": "289/2000",
+      "confidence": {
+        "__fraction__": true,
+        "den": 2000,
+        "num": 289
+      },
+      "is_conclusive": true,
+      "narrative": "A systems administrator manually modified access logs to conceal his presence on the server the night before confidential data disappeared. VIG\u00cdA must detect the temporal inconsistencies and evidence of manual editing."
+    },
+    "case_id": "VIGIA-2026-DEMO-007",
+    "pipeline_meta": {
+      "artifact_count": 4,
+      "avg_score": "289/400",
+      "expected_verdict": "MALICE",
+      "source": "ebs_v1_json_adapter"
+    },
+    "signals": [
+      {
+        "artifact_id": "LOG-001",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 17
+        },
+        "description": "Apr 10 08:45:12 fileserver sshd[1201]: Accepted publickey for sysadmin from 10.0.0.15 port 44231\nApr 10 08:45:13 fileserver sshd[1201]: pam_unix(sshd:session): session opened for user sysadmin\nApr 10 ",
+        "evidence_type": "log_entry",
+        "source": "legacy_converter",
+        "z_score": {
+          "__fraction__": true,
+          "den": 400,
+          "num": 289
+        }
+      },
+      {
+        "artifact_id": "LOG-002",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 17
+        },
+        "description": "{'file': '/var/log/auth.log', 'size': 48291, 'inode_modify_time': '2026-04-10T23:47:33Z', 'last_access': '2026-04-10T23:47:33Z', 'permissions': '0640', 'owner': 'syslog', 'group': 'adm', 'editor_signa",
+        "evidence_type": "file_timestamp",
+        "source": "legacy_converter",
+        "z_score": {
+          "__fraction__": true,
+          "den": 400,
+          "num": 289
+        }
+      },
+      {
+        "artifact_id": "LOG-003",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 17
+        },
+        "description": "23:41:07 10.0.0.15 -> 10.0.0.42:22 SYN [ESTABLISHED] bytes=0\n23:41:08 10.0.0.15 -> 10.0.0.42:22 [SSH_HANDSHAKE] bytes=4821\n23:41:09 10.0.0.15 -> 10.0.0.42:22 [DATA] bytes=284930\n23:41:44 10.0.0.15 -> ",
+        "evidence_type": "log_entry",
+        "source": "legacy_converter",
+        "z_score": {
+          "__fraction__": true,
+          "den": 400,
+          "num": 289
+        }
+      },
+      {
+        "artifact_id": "META-001",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 17
+        },
+        "description": "type=SYSCALL msg=audit(1744331275.441:8821): arch=c000003e syscall=2 success=yes exit=3 a0=7f4a1b2c3d40 a1=0 a2=1b6 a3=0 items=1 ppid=4891 pid=4892 auid=1001 uid=0 gid=0 euid=0 egid=0 tty=pts1 ses=847",
+        "evidence_type": "file_timestamp",
+        "source": "legacy_converter",
+        "z_score": {
+          "__fraction__": true,
+          "den": 400,
+          "num": 289
+        }
+      }
+    ]
+  },
+  "sans_compliance": {
+    "accuracy_validation": false,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}

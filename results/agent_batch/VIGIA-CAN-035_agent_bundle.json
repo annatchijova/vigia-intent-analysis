@@ -1,0 +1,273 @@
+{
+  "analysis_timestamp": "2026-06-14T19:05:43.778458+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "VIGIA-CAN-035",
+    "end_time": "2026-06-14T19:05:43.778462+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "VIGIA-CAN-035",
+        "entry_sha256": "0bce7a3ce0ce015dbda76704a10549fd81a726625d443291ed17d473f18b2283",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "VIGIA-CAN-035"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: 4eeafb3bfb155486...",
+        "outputs_summary": {
+          "agent_sha256": "4eeafb3bfb155486142942ad7a2c8678676f86ffd5d076882459354d820591f6",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-06-14T19:05:43.775844+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-CAN-035",
+        "entry_sha256": "afe0ac7cb502a0f540188664f70004f42452bb363783876bdbc2be105fd11f2a",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-035.json"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-06-14T19:05:43.775913+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-CAN-035",
+        "entry_sha256": "5ffd0435a798fc9987ff23e8f14999ec98d2b3ef049e90631992eff7d8e4165b",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-035.json"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: 55a473ab769a86dd...",
+        "outputs_summary": {
+          "sha256": "55a473ab769a86dddb133cbf92758247a20c117ba4be7e9dddc0aa63b93a058a"
+        },
+        "seq": 3,
+        "timestamp": "2026-06-14T19:05:43.775986+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "VIGIA-CAN-035",
+        "entry_sha256": "f89e0d5b5f27fc09856770bcd29ff6a7ad4971ee4838eb92cb3073f8292880f6",
+        "inputs_summary": {
+          "evidence": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-035.json",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-06-14T19:05:43.776069+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "VIGIA-CAN-035",
+        "entry_sha256": "0e16ba628972d1bb18af72cf6f0c81cd7b75ccc8baee7d30a4b6d94af4cedcd7",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 4 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+            "best_posterior": "24209/200000",
+            "confidence": "24209/200000",
+            "is_conclusive": "True",
+            "narrative": "2KB file in /tmp deleted with shred -n 7 -z -u (military-grade, 7 passes). Asymmetry between size (2KB) and destruction effort (DoD 5220.22-M). Over-destruction indicates concealment of critical conte..."
+          },
+          "case_id": "case_009_vacio_quirurgico",
+          "pipeline_meta": {
+            "artifact_count": "4",
+            "avg_score": "24209/40000",
+            "expected_verdict": "MALICE",
+            "source": "ebs_v1_json_adapter"
+          },
+          "signals": [
+            {
+              "artifact_id": "a009_01",
+              "confidence": "23/25",
+              "description": "Command: shred -n 7 -z -u /tmp/nota.txt. DoD 5220.22-M method (7 passes). File: 2,048 bytes.",
+              "evidence_type": "memory_process",
+              "source": "sift_auditd",
+              "z_score": "529/625"
+            },
+            {
+              "artifact_id": "a009_02",
+              "confidence": "7/10",
+              "description": "Directory entry deleted. Inode reassigned. No recovery possible post-shred. MFT confirms overwriting.",
+              "evidence_type": "memory_process",
+              "source": "sift_sleuthkit",
+              "z_score": "161/250"
+            },
+            {
+              "artifact_id": "a009_03",
+              "confidence": "19/20",
+              "description": "shred process in memory with handle to the file. Previous bash history: access to a credentials file 40 minutes earlier.",
+              "evidence_type": "memory_process",
+              "source": "sift_volatility",
+              "z_score": "361/400"
+            },
+            {
+              "artifact_id": "a009_04",
+              "confidence": "2/5",
+              "description": "Access to /tmp/nota.txt 40 minutes before the destruction. SSH session from an unrecognized IP.",
+              "evidence_type": "log_entry",
+              "source": "sift_syslog",
+              "z_score": "7/250"
+            }
+          ]
+        },
+        "seq": 5,
+        "timestamp": "2026-06-14T19:05:43.778136+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "VIGIA-CAN-035",
+        "entry_sha256": "373ec664c8eca9b7dd78d21781773944abe6f3d562a0507d63563757fc462c20",
+        "inputs_summary": {
+          "n_signals": "4"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-06-14T19:05:43.778243+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "VIGIA-CAN-035",
+        "entry_sha256": "1bf04814841667437f805a046407c7d7db84f7c4107010d95acafd1ae5199abf",
+        "inputs_summary": {
+          "verdict": "MALICIOUS_INTENT_DETECTED"
+        },
+        "iteration": 0,
+        "note": "Exit code 1 \u2014 analysis complete.",
+        "outputs_summary": {
+          "exit_code": "1"
+        },
+        "seq": 7,
+        "timestamp": "2026-06-14T19:05:43.778376+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-06-14T19:05:43.775651+00:00",
+    "total_entries": 7
+  },
+  "case_id": "VIGIA-CAN-035",
+  "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-035.json",
+  "evidence_sha256": "55a473ab769a86dddb133cbf92758247a20c117ba4be7e9dddc0aa63b93a058a",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-CAN-035 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-035.json\nEvidence SHA-256: 55a473ab769a86dddb133cbf92758247a20c117ba4be7e9dddc0aa63b93a058a\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 24209/200000\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n2KB file in /tmp deleted with shred -n 7 -z -u (military-grade, 7 passes). Asymmetry between size (2KB) and destruction effort (DoD 5220.22-M). Over-destruction indicates concealment of critical content.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [shred process in memory with handle to the file. Previous bash history] z=0.902 conf=0.95 \u2014 \n  [Command: shred -n 7 -z -u /tmp/nota.txt. DoD 5220.22-M method (7 passe] z=0.846 conf=0.92 \u2014 \n  [Directory entry deleted. Inode reassigned. No recovery possible post-s] z=0.644 conf=0.70 \u2014 \n  [Access to /tmp/nota.txt 40 minutes before the destruction. SSH session] z=0.028 conf=0.40 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW \u2014 No significant anomalies detected in this iteration.\n\nCritical signals (z>3): 0\nHigh signals (2<z<=3): 0\nTotal signals analyzed: 4",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+      "best_posterior": "24209/200000",
+      "confidence": {
+        "__fraction__": true,
+        "den": 200000,
+        "num": 24209
+      },
+      "is_conclusive": true,
+      "narrative": "2KB file in /tmp deleted with shred -n 7 -z -u (military-grade, 7 passes). Asymmetry between size (2KB) and destruction effort (DoD 5220.22-M). Over-destruction indicates concealment of critical content."
+    },
+    "case_id": "case_009_vacio_quirurgico",
+    "pipeline_meta": {
+      "artifact_count": 4,
+      "avg_score": "24209/40000",
+      "expected_verdict": "MALICE",
+      "source": "ebs_v1_json_adapter"
+    },
+    "signals": [
+      {
+        "artifact_id": "a009_01",
+        "confidence": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 23
+        },
+        "description": "Command: shred -n 7 -z -u /tmp/nota.txt. DoD 5220.22-M method (7 passes). File: 2,048 bytes.",
+        "evidence_type": "memory_process",
+        "source": "sift_auditd",
+        "z_score": {
+          "__fraction__": true,
+          "den": 625,
+          "num": 529
+        }
+      },
+      {
+        "artifact_id": "a009_02",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 7
+        },
+        "description": "Directory entry deleted. Inode reassigned. No recovery possible post-shred. MFT confirms overwriting.",
+        "evidence_type": "memory_process",
+        "source": "sift_sleuthkit",
+        "z_score": {
+          "__fraction__": true,
+          "den": 250,
+          "num": 161
+        }
+      },
+      {
+        "artifact_id": "a009_03",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 19
+        },
+        "description": "shred process in memory with handle to the file. Previous bash history: access to a credentials file 40 minutes earlier.",
+        "evidence_type": "memory_process",
+        "source": "sift_volatility",
+        "z_score": {
+          "__fraction__": true,
+          "den": 400,
+          "num": 361
+        }
+      },
+      {
+        "artifact_id": "a009_04",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 2
+        },
+        "description": "Access to /tmp/nota.txt 40 minutes before the destruction. SSH session from an unrecognized IP.",
+        "evidence_type": "log_entry",
+        "source": "sift_syslog",
+        "z_score": {
+          "__fraction__": true,
+          "den": 250,
+          "num": 7
+        }
+      }
+    ]
+  },
+  "sans_compliance": {
+    "accuracy_validation": false,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}

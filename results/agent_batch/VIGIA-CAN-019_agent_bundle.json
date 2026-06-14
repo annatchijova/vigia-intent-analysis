@@ -1,0 +1,273 @@
+{
+  "analysis_timestamp": "2026-06-14T19:05:43.085279+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "VIGIA-CAN-019",
+    "end_time": "2026-06-14T19:05:43.085284+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "VIGIA-CAN-019",
+        "entry_sha256": "668f4996a091bdea166a4b6992eea3226376410995d90aba4092987b2b6ba57c",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "VIGIA-CAN-019"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: 4eeafb3bfb155486...",
+        "outputs_summary": {
+          "agent_sha256": "4eeafb3bfb155486142942ad7a2c8678676f86ffd5d076882459354d820591f6",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-06-14T19:05:43.082715+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-CAN-019",
+        "entry_sha256": "a9738f1158c35a168d93abcc481aaab94fcb7ba5105b4d1c1e510296ffd54afc",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-019.json"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-06-14T19:05:43.082784+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-CAN-019",
+        "entry_sha256": "b39b7fc91d6a59409a1e8259241d279ec0ecd7924bbb4e9b7c59b69cc3b9edab",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-019.json"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: b85cef4fda8d43f1...",
+        "outputs_summary": {
+          "sha256": "b85cef4fda8d43f177462574349690547ca8e58e34a9ecb0834b9d6a9854894a"
+        },
+        "seq": 3,
+        "timestamp": "2026-06-14T19:05:43.082857+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "VIGIA-CAN-019",
+        "entry_sha256": "d74b1643aeb398760062d5ce227d58b975ffe863eddeb14500e039056435095c",
+        "inputs_summary": {
+          "evidence": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-019.json",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-06-14T19:05:43.082939+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "VIGIA-CAN-019",
+        "entry_sha256": "d7b61ca66deef53eda944533ccd561eae606bee42fbc54e22b03a5795922e4c6",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 4 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+            "best_posterior": "1057/10000",
+            "confidence": "1057/10000",
+            "is_conclusive": "True",
+            "narrative": "User reports 'strange files in my folder'. The attached file is a malicious LNK that exploits CVE-2024-XXXX when opened by the administrator's viewer. The informant is the attack vector."
+          },
+          "case_id": "case_101_denunciante_humo",
+          "pipeline_meta": {
+            "artifact_count": "4",
+            "avg_score": "1057/2000",
+            "expected_verdict": "MALICE",
+            "source": "ebs_v1_json_adapter"
+          },
+          "signals": [
+            {
+              "artifact_id": "a101_01",
+              "confidence": "3/10",
+              "description": "Ticket: 'I think I was hacked, I see strange files in my folder'. Attaches file for review.",
+              "evidence_type": "memory_process",
+              "source": "sift_ticket_system",
+              "z_score": "69/250"
+            },
+            {
+              "artifact_id": "a101_02",
+              "confidence": "7/10",
+              "description": "Strange file: LNK with PDF magic bytes and CVE-2024-XXXX exploit in compressed stream. Activates when opened by a privileged viewer.",
+              "evidence_type": "memory_process",
+              "source": "sift_file_audit",
+              "z_score": "161/250"
+            },
+            {
+              "artifact_id": "a101_03",
+              "confidence": "2/5",
+              "description": "Admin (domain\\admin_sec) opens file from share using privileged internal viewer.",
+              "evidence_type": "log_entry",
+              "source": "sift_syslog",
+              "z_score": "8/25"
+            },
+            {
+              "artifact_id": "a101_04",
+              "confidence": "19/20",
+              "description": "Shellcode injected into admin_viewer.exe 2 seconds after opening. Reverse shell established to 185.220.101.42:4444.",
+              "evidence_type": "memory_process",
+              "source": "sift_volatility",
+              "z_score": "437/500"
+            }
+          ]
+        },
+        "seq": 5,
+        "timestamp": "2026-06-14T19:05:43.084982+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "VIGIA-CAN-019",
+        "entry_sha256": "8059299ea1945b26dd20cf56f2610991db3e6cf873f023e3f89cf58d0397c412",
+        "inputs_summary": {
+          "n_signals": "4"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-06-14T19:05:43.085077+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "VIGIA-CAN-019",
+        "entry_sha256": "34202ff32ab2ecb9d1273ebfbcde3ad66ffb4d5bb7d6bf15b9c3dffb7c9b8bfb",
+        "inputs_summary": {
+          "verdict": "MALICIOUS_INTENT_DETECTED"
+        },
+        "iteration": 0,
+        "note": "Exit code 1 \u2014 analysis complete.",
+        "outputs_summary": {
+          "exit_code": "1"
+        },
+        "seq": 7,
+        "timestamp": "2026-06-14T19:05:43.085206+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-06-14T19:05:43.082522+00:00",
+    "total_entries": 7
+  },
+  "case_id": "VIGIA-CAN-019",
+  "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-019.json",
+  "evidence_sha256": "b85cef4fda8d43f177462574349690547ca8e58e34a9ecb0834b9d6a9854894a",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-CAN-019 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-019.json\nEvidence SHA-256: b85cef4fda8d43f177462574349690547ca8e58e34a9ecb0834b9d6a9854894a\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 1057/10000\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\nUser reports 'strange files in my folder'. The attached file is a malicious LNK that exploits CVE-2024-XXXX when opened by the administrator's viewer. The informant is the attack vector.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Shellcode injected into admin_viewer.exe 2 seconds after opening. Reve] z=0.874 conf=0.95 \u2014 \n  [Strange file: LNK with PDF magic bytes and CVE-2024-XXXX exploit in co] z=0.644 conf=0.70 \u2014 \n  [Admin (domain\\admin_sec) opens file from share using privileged intern] z=0.320 conf=0.40 \u2014 \n  [Ticket: 'I think I was hacked, I see strange files in my folder'. Atta] z=0.276 conf=0.30 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW \u2014 No significant anomalies detected in this iteration.\n\nCritical signals (z>3): 0\nHigh signals (2<z<=3): 0\nTotal signals analyzed: 4",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+      "best_posterior": "1057/10000",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10000,
+        "num": 1057
+      },
+      "is_conclusive": true,
+      "narrative": "User reports 'strange files in my folder'. The attached file is a malicious LNK that exploits CVE-2024-XXXX when opened by the administrator's viewer. The informant is the attack vector."
+    },
+    "case_id": "case_101_denunciante_humo",
+    "pipeline_meta": {
+      "artifact_count": 4,
+      "avg_score": "1057/2000",
+      "expected_verdict": "MALICE",
+      "source": "ebs_v1_json_adapter"
+    },
+    "signals": [
+      {
+        "artifact_id": "a101_01",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 3
+        },
+        "description": "Ticket: 'I think I was hacked, I see strange files in my folder'. Attaches file for review.",
+        "evidence_type": "memory_process",
+        "source": "sift_ticket_system",
+        "z_score": {
+          "__fraction__": true,
+          "den": 250,
+          "num": 69
+        }
+      },
+      {
+        "artifact_id": "a101_02",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 7
+        },
+        "description": "Strange file: LNK with PDF magic bytes and CVE-2024-XXXX exploit in compressed stream. Activates when opened by a privileged viewer.",
+        "evidence_type": "memory_process",
+        "source": "sift_file_audit",
+        "z_score": {
+          "__fraction__": true,
+          "den": 250,
+          "num": 161
+        }
+      },
+      {
+        "artifact_id": "a101_03",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 2
+        },
+        "description": "Admin (domain\\admin_sec) opens file from share using privileged internal viewer.",
+        "evidence_type": "log_entry",
+        "source": "sift_syslog",
+        "z_score": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 8
+        }
+      },
+      {
+        "artifact_id": "a101_04",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 19
+        },
+        "description": "Shellcode injected into admin_viewer.exe 2 seconds after opening. Reverse shell established to 185.220.101.42:4444.",
+        "evidence_type": "memory_process",
+        "source": "sift_volatility",
+        "z_score": {
+          "__fraction__": true,
+          "den": 500,
+          "num": 437
+        }
+      }
+    ]
+  },
+  "sans_compliance": {
+    "accuracy_validation": false,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}

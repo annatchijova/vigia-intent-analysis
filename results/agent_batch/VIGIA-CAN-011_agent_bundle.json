@@ -1,0 +1,273 @@
+{
+  "analysis_timestamp": "2026-06-14T19:05:42.736012+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "VIGIA-CAN-011",
+    "end_time": "2026-06-14T19:05:42.736015+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "VIGIA-CAN-011",
+        "entry_sha256": "f4c9bf6589b75567817915a628ea70534543b636940971a327ed40756c726f38",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "VIGIA-CAN-011"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: 4eeafb3bfb155486...",
+        "outputs_summary": {
+          "agent_sha256": "4eeafb3bfb155486142942ad7a2c8678676f86ffd5d076882459354d820591f6",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-06-14T19:05:42.733388+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-CAN-011",
+        "entry_sha256": "294976d74cbe8d248e6228c3dbd951b4af4c42a2ed23f143fd4ad866153bdda2",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-011.json"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-06-14T19:05:42.733464+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-CAN-011",
+        "entry_sha256": "f7ad108cb4e8c0413852f4d5cc3c3c87057fd4b4876f29d94c7a345f03fcd66a",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-011.json"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: 36343093d985af40...",
+        "outputs_summary": {
+          "sha256": "36343093d985af404435be386d4b049f7a6c0816108ddf6ac4836e7ec77a3ae7"
+        },
+        "seq": 3,
+        "timestamp": "2026-06-14T19:05:42.733539+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "VIGIA-CAN-011",
+        "entry_sha256": "f230d84c5fea5e9f661a4adef5000f555581dc7eb79d207e4167b8467b497bbc",
+        "inputs_summary": {
+          "evidence": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-011.json",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-06-14T19:05:42.733622+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "VIGIA-CAN-011",
+        "entry_sha256": "8b889530937743f62336d30ef6fb03456b6e957954f1a84e1c12dc29066c7f4b",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 4 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+            "best_posterior": "783/10000",
+            "confidence": "783/10000",
+            "is_conclusive": "True",
+            "narrative": "15 commits imitate the Chief Architect's style (spacing, grammatical errors, TTR) with a statistical precision of 0.97, exceeding human biological variance (0.82). Uploaded via generic API key at 4AM ..."
+          },
+          "case_id": "case_093_deepfake_estilo",
+          "pipeline_meta": {
+            "artifact_count": "4",
+            "avg_score": "783/2000",
+            "expected_verdict": "MALICE",
+            "source": "ebs_v1_json_adapter"
+          },
+          "signals": [
+            {
+              "artifact_id": "a093_01",
+              "confidence": "9/20",
+              "description": "15 commits uploaded via generic API key 'ci-token-legacy' at 4AM. Author: arch_chief@corp.com.",
+              "evidence_type": "cultural_marker",
+              "source": "sift_git_audit",
+              "z_score": "207/500"
+            },
+            {
+              "artifact_id": "a093_02",
+              "confidence": "9/10",
+              "description": "Chief Architect offline since 19:30 the previous day. No session between 19:30 and 4AM.",
+              "evidence_type": "memory_process",
+              "source": "sift_vpn_log",
+              "z_score": "9/200"
+            },
+            {
+              "artifact_id": "a093_03",
+              "confidence": "1/2",
+              "description": "Stylometric analysis: TTR similarity 0.992, grammatical errors replicated ('recieve', 'seperate'). Match exceeds human biological variance (0.82 baseline).",
+              "evidence_type": "file_hash",
+              "source": "sift_stylometry",
+              "z_score": "41/100"
+            },
+            {
+              "artifact_id": "a093_04",
+              "confidence": "17/20",
+              "description": "One of the 15 commits introduces a backdoor in the authentication module. Hash mismatch with code reviewed in previous PR. Change obfuscated within 847 lines of legitimate refactoring.",
+              "evidence_type": "file_hash",
+              "source": "sift_code_integrity",
+              "z_score": "697/1000"
+            }
+          ]
+        },
+        "seq": 5,
+        "timestamp": "2026-06-14T19:05:42.735704+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "VIGIA-CAN-011",
+        "entry_sha256": "c5cef8b815454d8c75c270bb1df37203711ff615f08100be5c9bae74222ac8d3",
+        "inputs_summary": {
+          "n_signals": "4"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-06-14T19:05:42.735807+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "VIGIA-CAN-011",
+        "entry_sha256": "b694a384257bef4a6d541d1296af0ce48b59bc930fd0886716599383b244fb4a",
+        "inputs_summary": {
+          "verdict": "MALICIOUS_INTENT_DETECTED"
+        },
+        "iteration": 0,
+        "note": "Exit code 1 \u2014 analysis complete.",
+        "outputs_summary": {
+          "exit_code": "1"
+        },
+        "seq": 7,
+        "timestamp": "2026-06-14T19:05:42.735937+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-06-14T19:05:42.733197+00:00",
+    "total_entries": 7
+  },
+  "case_id": "VIGIA-CAN-011",
+  "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-011.json",
+  "evidence_sha256": "36343093d985af404435be386d4b049f7a6c0816108ddf6ac4836e7ec77a3ae7",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-CAN-011 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-011.json\nEvidence SHA-256: 36343093d985af404435be386d4b049f7a6c0816108ddf6ac4836e7ec77a3ae7\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 783/10000\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n15 commits imitate the Chief Architect's style (spacing, grammatical errors, TTR) with a statistical precision of 0.97, exceeding human biological variance (0.82). Uploaded via generic API key at 4AM while the architect was offline.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [One of the 15 commits introduces a backdoor in the authentication modu] z=0.697 conf=0.85 \u2014 \n  [15 commits uploaded via generic API key 'ci-token-legacy' at 4AM. Auth] z=0.414 conf=0.45 \u2014 \n  [Stylometric analysis: TTR similarity 0.992, grammatical errors replica] z=0.410 conf=0.50 \u2014 \n  [Chief Architect offline since 19:30 the previous day. No session betwe] z=0.045 conf=0.90 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW \u2014 No significant anomalies detected in this iteration.\n\nCritical signals (z>3): 0\nHigh signals (2<z<=3): 0\nTotal signals analyzed: 4",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+      "best_posterior": "783/10000",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10000,
+        "num": 783
+      },
+      "is_conclusive": true,
+      "narrative": "15 commits imitate the Chief Architect's style (spacing, grammatical errors, TTR) with a statistical precision of 0.97, exceeding human biological variance (0.82). Uploaded via generic API key at 4AM while the architect was offline."
+    },
+    "case_id": "case_093_deepfake_estilo",
+    "pipeline_meta": {
+      "artifact_count": 4,
+      "avg_score": "783/2000",
+      "expected_verdict": "MALICE",
+      "source": "ebs_v1_json_adapter"
+    },
+    "signals": [
+      {
+        "artifact_id": "a093_01",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 9
+        },
+        "description": "15 commits uploaded via generic API key 'ci-token-legacy' at 4AM. Author: arch_chief@corp.com.",
+        "evidence_type": "cultural_marker",
+        "source": "sift_git_audit",
+        "z_score": {
+          "__fraction__": true,
+          "den": 500,
+          "num": 207
+        }
+      },
+      {
+        "artifact_id": "a093_02",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 9
+        },
+        "description": "Chief Architect offline since 19:30 the previous day. No session between 19:30 and 4AM.",
+        "evidence_type": "memory_process",
+        "source": "sift_vpn_log",
+        "z_score": {
+          "__fraction__": true,
+          "den": 200,
+          "num": 9
+        }
+      },
+      {
+        "artifact_id": "a093_03",
+        "confidence": {
+          "__fraction__": true,
+          "den": 2,
+          "num": 1
+        },
+        "description": "Stylometric analysis: TTR similarity 0.992, grammatical errors replicated ('recieve', 'seperate'). Match exceeds human biological variance (0.82 baseline).",
+        "evidence_type": "file_hash",
+        "source": "sift_stylometry",
+        "z_score": {
+          "__fraction__": true,
+          "den": 100,
+          "num": 41
+        }
+      },
+      {
+        "artifact_id": "a093_04",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 17
+        },
+        "description": "One of the 15 commits introduces a backdoor in the authentication module. Hash mismatch with code reviewed in previous PR. Change obfuscated within 847 lines of legitimate refactoring.",
+        "evidence_type": "file_hash",
+        "source": "sift_code_integrity",
+        "z_score": {
+          "__fraction__": true,
+          "den": 1000,
+          "num": 697
+        }
+      }
+    ]
+  },
+  "sans_compliance": {
+    "accuracy_validation": false,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}

@@ -1,0 +1,249 @@
+{
+  "analysis_timestamp": "2026-06-14T19:05:39.177180+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "VIGIA-FN-003",
+    "end_time": "2026-06-14T19:05:39.177183+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "VIGIA-FN-003",
+        "entry_sha256": "4a01622b69627f3312822ef8112dcb8360c28c073576b83148573db4893bf2f3",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "VIGIA-FN-003"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: 4eeafb3bfb155486...",
+        "outputs_summary": {
+          "agent_sha256": "4eeafb3bfb155486142942ad7a2c8678676f86ffd5d076882459354d820591f6",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-06-14T19:05:39.174612+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-FN-003",
+        "entry_sha256": "0982744afb478b55e0178804d47aba25f4ea9c169a67fcf7b0151a6f7f171a3b",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-FN-003.json"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-06-14T19:05:39.174680+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-FN-003",
+        "entry_sha256": "063d4d2bac9faf1acbfc841784f50d34f7effe17181a2755c25a2333d455a229",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-FN-003.json"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: 212a5df934fb6697...",
+        "outputs_summary": {
+          "sha256": "212a5df934fb66975659566f4aacee86be15c9c2d1cd70424505cc1ebff3fc7a"
+        },
+        "seq": 3,
+        "timestamp": "2026-06-14T19:05:39.174754+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "VIGIA-FN-003",
+        "entry_sha256": "cb0eb6202b4988fd3561fa9d69c02d4105220a53ab61e302cecf732519b9d705",
+        "inputs_summary": {
+          "evidence": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-FN-003.json",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-06-14T19:05:39.174840+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "VIGIA-FN-003",
+        "entry_sha256": "9c51d4ded59ca6b4800ed59160f8ba7a8ba5453694d4adeea77d70803611e689",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 3 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+            "best_posterior": "1949/30000",
+            "confidence": "1949/30000",
+            "is_conclusive": "False",
+            "narrative": "Attacker performs process hollowing on svchost.exe. The on-disk binary is the legitimate Microsoft one, signed. Network connections are to AWS IPs (legitimate CDN). Exfiltration occurs inside TLS, ind..."
+          },
+          "case_id": "VIGIA-FN-003",
+          "pipeline_meta": {
+            "artifact_count": "3",
+            "avg_score": "1949/6000",
+            "expected_verdict": "MALICE",
+            "source": "ebs_v1_json_adapter"
+          },
+          "signals": [
+            {
+              "artifact_id": "fn003_01",
+              "confidence": "19/20",
+              "description": "svchost.exe PID 612 with RWX memory regions",
+              "evidence_type": "memory_process",
+              "source": "sift_volatility",
+              "z_score": "57/400"
+            },
+            {
+              "artifact_id": "fn003_02",
+              "confidence": "4/5",
+              "description": "Connection to 52.85.0.0/16 (AWS CloudFront) from svchost.exe",
+              "evidence_type": "ip_geolocation",
+              "source": "sift_netflow",
+              "z_score": "1/25"
+            },
+            {
+              "artifact_id": "fn003_03",
+              "confidence": "9/10",
+              "description": "Parent of svchost.exe PID 612: cmd.exe (PID 4412), not services.exe",
+              "evidence_type": "memory_process",
+              "source": "sift_parent_process",
+              "z_score": "99/125"
+            }
+          ]
+        },
+        "seq": 5,
+        "timestamp": "2026-06-14T19:05:39.176889+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "VIGIA-FN-003",
+        "entry_sha256": "faca320de8821a0b34e7085366e9cb3102ee2a2f086d9c8d23173e139650e596",
+        "inputs_summary": {
+          "n_signals": "3"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-06-14T19:05:39.176983+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "VIGIA-FN-003",
+        "entry_sha256": "afaaa259e323f1246ef0ad5510fffa4ba4a09d3fc8ceb8439f84ec840923a550",
+        "inputs_summary": {
+          "verdict": "MALICIOUS_INTENT_DETECTED"
+        },
+        "iteration": 0,
+        "note": "Exit code 1 \u2014 analysis complete.",
+        "outputs_summary": {
+          "exit_code": "1"
+        },
+        "seq": 7,
+        "timestamp": "2026-06-14T19:05:39.177111+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-06-14T19:05:39.174414+00:00",
+    "total_entries": 7
+  },
+  "case_id": "VIGIA-FN-003",
+  "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-FN-003.json",
+  "evidence_sha256": "212a5df934fb66975659566f4aacee86be15c9c2d1cd70424505cc1ebff3fc7a",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-FN-003 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/VIGIA-FN-003.json\nEvidence SHA-256: 212a5df934fb66975659566f4aacee86be15c9c2d1cd70424505cc1ebff3fc7a\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 1949/30000\nConclusive: NO \u2014 requires human review\n\n--- PEIRCEAN NARRATIVE ---\nAttacker performs process hollowing on svchost.exe. The on-disk binary is the legitimate Microsoft one, signed. Network connections are to AWS IPs (legitimate CDN). Exfiltration occurs inside TLS, indistinguishable from normal traffic.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Parent of svchost.exe PID 612: cmd.exe (PID 4412), not services.exe] z=0.792 conf=0.90 \u2014 \n  [svchost.exe PID 612 with RWX memory regions] z=0.142 conf=0.95 \u2014 \n  [Connection to 52.85.0.0/16 (AWS CloudFront) from svchost.exe] z=0.040 conf=0.80 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW \u2014 No significant anomalies detected in this iteration.\n\nCritical signals (z>3): 0\nHigh signals (2<z<=3): 0\nTotal signals analyzed: 3",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+      "best_posterior": "1949/30000",
+      "confidence": {
+        "__fraction__": true,
+        "den": 30000,
+        "num": 1949
+      },
+      "is_conclusive": false,
+      "narrative": "Attacker performs process hollowing on svchost.exe. The on-disk binary is the legitimate Microsoft one, signed. Network connections are to AWS IPs (legitimate CDN). Exfiltration occurs inside TLS, indistinguishable from normal traffic."
+    },
+    "case_id": "VIGIA-FN-003",
+    "pipeline_meta": {
+      "artifact_count": 3,
+      "avg_score": "1949/6000",
+      "expected_verdict": "MALICE",
+      "source": "ebs_v1_json_adapter"
+    },
+    "signals": [
+      {
+        "artifact_id": "fn003_01",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 19
+        },
+        "description": "svchost.exe PID 612 with RWX memory regions",
+        "evidence_type": "memory_process",
+        "source": "sift_volatility",
+        "z_score": {
+          "__fraction__": true,
+          "den": 400,
+          "num": 57
+        }
+      },
+      {
+        "artifact_id": "fn003_02",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 4
+        },
+        "description": "Connection to 52.85.0.0/16 (AWS CloudFront) from svchost.exe",
+        "evidence_type": "ip_geolocation",
+        "source": "sift_netflow",
+        "z_score": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 1
+        }
+      },
+      {
+        "artifact_id": "fn003_03",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 9
+        },
+        "description": "Parent of svchost.exe PID 612: cmd.exe (PID 4412), not services.exe",
+        "evidence_type": "memory_process",
+        "source": "sift_parent_process",
+        "z_score": {
+          "__fraction__": true,
+          "den": 125,
+          "num": 99
+        }
+      }
+    ]
+  },
+  "sans_compliance": {
+    "accuracy_validation": false,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}

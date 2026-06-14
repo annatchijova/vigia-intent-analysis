@@ -1,0 +1,273 @@
+{
+  "analysis_timestamp": "2026-06-14T19:05:43.431667+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "VIGIA-CAN-027",
+    "end_time": "2026-06-14T19:05:43.431670+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "VIGIA-CAN-027",
+        "entry_sha256": "15bfd3085e0ef54ee6b663fb25309cf40f5c6d32bb33273f556163d7582e6b6a",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "VIGIA-CAN-027"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: 4eeafb3bfb155486...",
+        "outputs_summary": {
+          "agent_sha256": "4eeafb3bfb155486142942ad7a2c8678676f86ffd5d076882459354d820591f6",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-06-14T19:05:43.429027+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-CAN-027",
+        "entry_sha256": "39136fdc4a801719c5d75e72f8aac2da319e5dce407d81e5f3cdf789ceb4091f",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-027.json"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-06-14T19:05:43.429096+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-CAN-027",
+        "entry_sha256": "311e6c4fc8bbbfc95e9fe9994283f8bc126e12f969d96cc85e8eadbb4f4ebf69",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-027.json"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: 07a45bcb10ef3e4f...",
+        "outputs_summary": {
+          "sha256": "07a45bcb10ef3e4fc3c5bcaf78aef926cdb1aa992f167cd4ba8d84e69cef735a"
+        },
+        "seq": 3,
+        "timestamp": "2026-06-14T19:05:43.429170+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "VIGIA-CAN-027",
+        "entry_sha256": "f098f4b5653031e3b6650d4e81b2c5b5663e7296acad07bc54e73150753c4ebb",
+        "inputs_summary": {
+          "evidence": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-027.json",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-06-14T19:05:43.429262+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "VIGIA-CAN-027",
+        "entry_sha256": "1c3b5460d5ccc7eb732a13d5027fe0f6fe878e1d1362e475ae3a3808b33eb41d",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 4 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+            "best_posterior": "87/625",
+            "confidence": "87/625",
+            "is_conclusive": "True",
+            "narrative": "Log shows 1,247 connections with bytes_transferred=0. Border router reports 847 Mbps sustained in the same window. Kernel confirms 14 active TCP sockets with counters manipulated to 0x0 by direct writ..."
+          },
+          "case_id": "case_109_silencio_estadistico_log",
+          "pipeline_meta": {
+            "artifact_count": "4",
+            "avg_score": "87/125",
+            "expected_verdict": "MALICE",
+            "source": "ebs_v1_json_adapter"
+          },
+          "signals": [
+            {
+              "artifact_id": "a109_01",
+              "confidence": "7/20",
+              "description": "1,247 'Connection established/terminated' events with bytes_transferred=0 or empty during the 14:00-15:15 window.",
+              "evidence_type": "memory_process",
+              "source": "sift_syslog",
+              "z_score": "161/500"
+            },
+            {
+              "artifact_id": "a109_02",
+              "confidence": "17/20",
+              "description": "Core router: 847 Mbps of sustained outbound traffic. 47GB total. WAN interface saturation at 98%.",
+              "evidence_type": "ip_geolocation",
+              "source": "sift_netflow",
+              "z_score": "102/125"
+            },
+            {
+              "artifact_id": "a109_03",
+              "confidence": "9/10",
+              "description": "14 TCP sockets in ESTABLISHED state with byte counters manipulated to 0x0 in _TCB structures. Evidence of direct kernel write.",
+              "evidence_type": "kernel_structure",
+              "source": "sift_volatility",
+              "z_score": "81/100"
+            },
+            {
+              "artifact_id": "a109_04",
+              "confidence": "19/20",
+              "description": "logging_service.exe process compromised: hook in LogNetworkEvent() function that truncates the bytes field to 0 before writing to disk.",
+              "evidence_type": "memory_process",
+              "source": "sift_volatility",
+              "z_score": "209/250"
+            }
+          ]
+        },
+        "seq": 5,
+        "timestamp": "2026-06-14T19:05:43.431345+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "VIGIA-CAN-027",
+        "entry_sha256": "135dc4ba2ce576fae1bc5049029e39bdc46d4ee32b59eec9202096891361e3e2",
+        "inputs_summary": {
+          "n_signals": "4"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-06-14T19:05:43.431459+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "VIGIA-CAN-027",
+        "entry_sha256": "80edc9cde78de62ba531cf82ed46ba0de7a81a15619bd8a280cd71b6798dd377",
+        "inputs_summary": {
+          "verdict": "MALICIOUS_INTENT_DETECTED"
+        },
+        "iteration": 0,
+        "note": "Exit code 1 \u2014 analysis complete.",
+        "outputs_summary": {
+          "exit_code": "1"
+        },
+        "seq": 7,
+        "timestamp": "2026-06-14T19:05:43.431592+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-06-14T19:05:43.428824+00:00",
+    "total_entries": 7
+  },
+  "case_id": "VIGIA-CAN-027",
+  "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-027.json",
+  "evidence_sha256": "07a45bcb10ef3e4fc3c5bcaf78aef926cdb1aa992f167cd4ba8d84e69cef735a",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-CAN-027 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-027.json\nEvidence SHA-256: 07a45bcb10ef3e4fc3c5bcaf78aef926cdb1aa992f167cd4ba8d84e69cef735a\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 87/625\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\nLog shows 1,247 connections with bytes_transferred=0. Border router reports 847 Mbps sustained in the same window. Kernel confirms 14 active TCP sockets with counters manipulated to 0x0 by direct write.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [logging_service.exe process compromised: hook in LogNetworkEvent() fun] z=0.836 conf=0.95 \u2014 \n  [Core router: 847 Mbps of sustained outbound traffic. 47GB total. WAN i] z=0.816 conf=0.85 \u2014 \n  [14 TCP sockets in ESTABLISHED state with byte counters manipulated to ] z=0.810 conf=0.90 \u2014 \n  [1,247 'Connection established/terminated' events with bytes_transferre] z=0.322 conf=0.35 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW \u2014 No significant anomalies detected in this iteration.\n\nCritical signals (z>3): 0\nHigh signals (2<z<=3): 0\nTotal signals analyzed: 4",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+      "best_posterior": "87/625",
+      "confidence": {
+        "__fraction__": true,
+        "den": 625,
+        "num": 87
+      },
+      "is_conclusive": true,
+      "narrative": "Log shows 1,247 connections with bytes_transferred=0. Border router reports 847 Mbps sustained in the same window. Kernel confirms 14 active TCP sockets with counters manipulated to 0x0 by direct write."
+    },
+    "case_id": "case_109_silencio_estadistico_log",
+    "pipeline_meta": {
+      "artifact_count": 4,
+      "avg_score": "87/125",
+      "expected_verdict": "MALICE",
+      "source": "ebs_v1_json_adapter"
+    },
+    "signals": [
+      {
+        "artifact_id": "a109_01",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 7
+        },
+        "description": "1,247 'Connection established/terminated' events with bytes_transferred=0 or empty during the 14:00-15:15 window.",
+        "evidence_type": "memory_process",
+        "source": "sift_syslog",
+        "z_score": {
+          "__fraction__": true,
+          "den": 500,
+          "num": 161
+        }
+      },
+      {
+        "artifact_id": "a109_02",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 17
+        },
+        "description": "Core router: 847 Mbps of sustained outbound traffic. 47GB total. WAN interface saturation at 98%.",
+        "evidence_type": "ip_geolocation",
+        "source": "sift_netflow",
+        "z_score": {
+          "__fraction__": true,
+          "den": 125,
+          "num": 102
+        }
+      },
+      {
+        "artifact_id": "a109_03",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 9
+        },
+        "description": "14 TCP sockets in ESTABLISHED state with byte counters manipulated to 0x0 in _TCB structures. Evidence of direct kernel write.",
+        "evidence_type": "kernel_structure",
+        "source": "sift_volatility",
+        "z_score": {
+          "__fraction__": true,
+          "den": 100,
+          "num": 81
+        }
+      },
+      {
+        "artifact_id": "a109_04",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 19
+        },
+        "description": "logging_service.exe process compromised: hook in LogNetworkEvent() function that truncates the bytes field to 0 before writing to disk.",
+        "evidence_type": "memory_process",
+        "source": "sift_volatility",
+        "z_score": {
+          "__fraction__": true,
+          "den": 250,
+          "num": 209
+        }
+      }
+    ]
+  },
+  "sans_compliance": {
+    "accuracy_validation": false,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}

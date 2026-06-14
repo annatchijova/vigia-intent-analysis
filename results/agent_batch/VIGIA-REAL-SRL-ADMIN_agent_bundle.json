@@ -1,0 +1,273 @@
+{
+  "analysis_timestamp": "2026-06-14T19:05:41.569783+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "VIGIA-REAL-SRL-ADMIN",
+    "end_time": "2026-06-14T19:05:41.569786+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "VIGIA-REAL-SRL-ADMIN",
+        "entry_sha256": "2a1c7198c26eaa0fbad969793422d4ddc044daf182ee4f39009c9390d14e5b1f",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "VIGIA-REAL-SRL-ADMIN"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: 4eeafb3bfb155486...",
+        "outputs_summary": {
+          "agent_sha256": "4eeafb3bfb155486142942ad7a2c8678676f86ffd5d076882459354d820591f6",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-06-14T19:05:41.567185+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-REAL-SRL-ADMIN",
+        "entry_sha256": "aab86c0ed9db77549f01291ae59f0fa94a3cfb1e0aa554cdf12db3d6a81d3a48",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-REAL-SRL-ADMIN.json"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-06-14T19:05:41.567254+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-REAL-SRL-ADMIN",
+        "entry_sha256": "87505a34c325a3acd975a3ce2411af63ebeb8658e16dc48c77f30744798b06b0",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-REAL-SRL-ADMIN.json"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: fedae5f24df916d0...",
+        "outputs_summary": {
+          "sha256": "fedae5f24df916d000d7de0f9d2bee98c983d8b7f47fca88455cb4e52c2fe152"
+        },
+        "seq": 3,
+        "timestamp": "2026-06-14T19:05:41.567333+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "VIGIA-REAL-SRL-ADMIN",
+        "entry_sha256": "d649494e6913aae7281bf270cf8e8a7e98cf78232710e0b984fcac82c8195082",
+        "inputs_summary": {
+          "evidence": "/home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-REAL-SRL-ADMIN.json",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-06-14T19:05:41.567417+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "VIGIA-REAL-SRL-ADMIN",
+        "entry_sha256": "aa0a79a4a2919e913ac40f55e5fa4697dd173a03e86c207593db4f54ec020c9a",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 4 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+            "best_posterior": "4079/40000",
+            "confidence": "4079/40000",
+            "is_conclusive": "True",
+            "narrative": "SRL-2018 compromised enterprise network. Admin server memory dump (5 GB, 2018-09-07). Volatility3 analysis reveals: 2 PowerShell processes (PIDs 1160, 11008) both spawned from PID 6252 \u2014 classic C2 pr..."
+          },
+          "case_id": "VIGIA-REAL-SRL-ADMIN",
+          "pipeline_meta": {
+            "artifact_count": "4",
+            "avg_score": "4079/8000",
+            "expected_verdict": "MALICE",
+            "source": "ebs_v1_json_adapter"
+          },
+          "signals": [
+            {
+              "artifact_id": "ART-001",
+              "confidence": "4/5",
+              "description": "2 PowerShell processes (PIDs 1160, 11008) both children of PID 6252. PID 1160 started 2018-07-29T12:59:22Z, PID 11008 started 2018-08-13T17:23:27Z. Same parent spawning multiple PowerShell instances o",
+              "evidence_type": "memory_process",
+              "source": "Volatility3/pslist",
+              "z_score": "88/125"
+            },
+            {
+              "artifact_id": "ART-002",
+              "confidence": "17/20",
+              "description": "31 processes with PAGE_EXECUTE_READWRITE memory regions not backed by files on disk. Scale of injection (31 processes) is consistent with a framework-level injector such as Cobalt Strike, Meterpreter,",
+              "evidence_type": "memory_process",
+              "source": "Volatility3/malfind",
+              "z_score": "1581/2000"
+            },
+            {
+              "artifact_id": "ART-003",
+              "confidence": "9/10",
+              "description": "Windows x64 system. Kernel base 0xf8032461e000, DTB 0x1aa000.",
+              "evidence_type": "memory_os_profile",
+              "source": "Volatility3/windows.info",
+              "z_score": "9/100"
+            },
+            {
+              "artifact_id": "ART-004",
+              "confidence": "7/10",
+              "description": "Network connections active at time of acquisition. Admin server with active connections to internal domain infrastructure consistent with post-exploitation lateral movement.",
+              "evidence_type": "network_flow",
+              "source": "Volatility3/netscan",
+              "z_score": "91/200"
+            }
+          ]
+        },
+        "seq": 5,
+        "timestamp": "2026-06-14T19:05:41.569474+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "VIGIA-REAL-SRL-ADMIN",
+        "entry_sha256": "0de24e384ab97ccb237227a957e3653ee0efd6f4e4d2c731d335bdde930816e8",
+        "inputs_summary": {
+          "n_signals": "4"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-06-14T19:05:41.569578+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "VIGIA-REAL-SRL-ADMIN",
+        "entry_sha256": "6f6ddf4b98ce9d10fbdb6dc4c8cdca217f08ed13eafc58e0f1506daf8ad3e3f3",
+        "inputs_summary": {
+          "verdict": "MALICIOUS_INTENT_DETECTED"
+        },
+        "iteration": 0,
+        "note": "Exit code 1 \u2014 analysis complete.",
+        "outputs_summary": {
+          "exit_code": "1"
+        },
+        "seq": 7,
+        "timestamp": "2026-06-14T19:05:41.569708+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-06-14T19:05:41.566996+00:00",
+    "total_entries": 7
+  },
+  "case_id": "VIGIA-REAL-SRL-ADMIN",
+  "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-REAL-SRL-ADMIN.json",
+  "evidence_sha256": "fedae5f24df916d000d7de0f9d2bee98c983d8b7f47fca88455cb4e52c2fe152",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-REAL-SRL-ADMIN ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-REAL-SRL-ADMIN.json\nEvidence SHA-256: fedae5f24df916d000d7de0f9d2bee98c983d8b7f47fca88455cb4e52c2fe152\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 4079/40000\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\nSRL-2018 compromised enterprise network. Admin server memory dump (5 GB, 2018-09-07). Volatility3 analysis reveals: 2 PowerShell processes (PIDs 1160, 11008) both spawned from PID 6252 \u2014 classic C2 process tree. Evidence SHA-256: d58343cb4e4a06ecc56012c8e25760b297594bf4695303527a5cbb2331726891. Malfind: 31 processes with PAGE_EXECUTE_READWRITE regions \u2014 widespread code injection. Consistent with post-exploitation framework (Cobalt Strike / Meterpreter) active in memory.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [31 processes with PAGE_EXECUTE_READWRITE memory regions not backed by ] z=0.790 conf=0.85 \u2014 \n  [2 PowerShell processes (PIDs 1160, 11008) both children of PID 6252. P] z=0.704 conf=0.80 \u2014 \n  [Network connections active at time of acquisition. Admin server with a] z=0.455 conf=0.70 \u2014 \n  [Windows x64 system. Kernel base 0xf8032461e000, DTB 0x1aa000.] z=0.090 conf=0.90 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW \u2014 No significant anomalies detected in this iteration.\n\nCritical signals (z>3): 0\nHigh signals (2<z<=3): 0\nTotal signals analyzed: 4",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+      "best_posterior": "4079/40000",
+      "confidence": {
+        "__fraction__": true,
+        "den": 40000,
+        "num": 4079
+      },
+      "is_conclusive": true,
+      "narrative": "SRL-2018 compromised enterprise network. Admin server memory dump (5 GB, 2018-09-07). Volatility3 analysis reveals: 2 PowerShell processes (PIDs 1160, 11008) both spawned from PID 6252 \u2014 classic C2 process tree. Evidence SHA-256: d58343cb4e4a06ecc56012c8e25760b297594bf4695303527a5cbb2331726891. Malfind: 31 processes with PAGE_EXECUTE_READWRITE regions \u2014 widespread code injection. Consistent with post-exploitation framework (Cobalt Strike / Meterpreter) active in memory."
+    },
+    "case_id": "VIGIA-REAL-SRL-ADMIN",
+    "pipeline_meta": {
+      "artifact_count": 4,
+      "avg_score": "4079/8000",
+      "expected_verdict": "MALICE",
+      "source": "ebs_v1_json_adapter"
+    },
+    "signals": [
+      {
+        "artifact_id": "ART-001",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 4
+        },
+        "description": "2 PowerShell processes (PIDs 1160, 11008) both children of PID 6252. PID 1160 started 2018-07-29T12:59:22Z, PID 11008 started 2018-08-13T17:23:27Z. Same parent spawning multiple PowerShell instances o",
+        "evidence_type": "memory_process",
+        "source": "Volatility3/pslist",
+        "z_score": {
+          "__fraction__": true,
+          "den": 125,
+          "num": 88
+        }
+      },
+      {
+        "artifact_id": "ART-002",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 17
+        },
+        "description": "31 processes with PAGE_EXECUTE_READWRITE memory regions not backed by files on disk. Scale of injection (31 processes) is consistent with a framework-level injector such as Cobalt Strike, Meterpreter,",
+        "evidence_type": "memory_process",
+        "source": "Volatility3/malfind",
+        "z_score": {
+          "__fraction__": true,
+          "den": 2000,
+          "num": 1581
+        }
+      },
+      {
+        "artifact_id": "ART-003",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 9
+        },
+        "description": "Windows x64 system. Kernel base 0xf8032461e000, DTB 0x1aa000.",
+        "evidence_type": "memory_os_profile",
+        "source": "Volatility3/windows.info",
+        "z_score": {
+          "__fraction__": true,
+          "den": 100,
+          "num": 9
+        }
+      },
+      {
+        "artifact_id": "ART-004",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 7
+        },
+        "description": "Network connections active at time of acquisition. Admin server with active connections to internal domain infrastructure consistent with post-exploitation lateral movement.",
+        "evidence_type": "network_flow",
+        "source": "Volatility3/netscan",
+        "z_score": {
+          "__fraction__": true,
+          "den": 200,
+          "num": 91
+        }
+      }
+    ]
+  },
+  "sans_compliance": {
+    "accuracy_validation": false,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}

@@ -1,0 +1,273 @@
+{
+  "analysis_timestamp": "2026-06-14T19:05:43.214905+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "VIGIA-CAN-022",
+    "end_time": "2026-06-14T19:05:43.214909+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "VIGIA-CAN-022",
+        "entry_sha256": "11c2fe67042cc42af193c40c987e5e5f6cb1524a2048378c6c4f58a8b618fe73",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "VIGIA-CAN-022"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: 4eeafb3bfb155486...",
+        "outputs_summary": {
+          "agent_sha256": "4eeafb3bfb155486142942ad7a2c8678676f86ffd5d076882459354d820591f6",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-06-14T19:05:43.212320+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-CAN-022",
+        "entry_sha256": "c889c0d6e6aef318228ba07081c024642f56f00af73622bf7b6c4f6062b0e3b9",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-022.json"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-06-14T19:05:43.212389+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-CAN-022",
+        "entry_sha256": "0eceb96c16e3f84f30cd5d688145a7b77f845e2209c32c06c91b0da92db9b95a",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-022.json"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: a1cda257c61f9b01...",
+        "outputs_summary": {
+          "sha256": "a1cda257c61f9b018d4fc8af5e3dede8436bd8c27fc328e4fa351180e3e1bd73"
+        },
+        "seq": 3,
+        "timestamp": "2026-06-14T19:05:43.212476+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "VIGIA-CAN-022",
+        "entry_sha256": "a94a3e3a4187ba55ef49ef3ab7856d2bbf4e5833cf95ff9e537b09b65cc3f253",
+        "inputs_summary": {
+          "evidence": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-022.json",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-06-14T19:05:43.212563+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "VIGIA-CAN-022",
+        "entry_sha256": "b86401f39742ec447f9a43e5bbd773da3ef2bc56fce0429d4852c0c676a91e45",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 4 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+            "best_posterior": "2199/40000",
+            "confidence": "2199/40000",
+            "is_conclusive": "False",
+            "narrative": "Production script has a comment: '# TODO: fix the cnfnbz.py script'. The word 'cnfnbz' is '\u0441\u0442\u0430\u0442\u044c\u044f' (article) typed with active Russian layout. Commit from a machine with locale ru_RU and timezone Euro..."
+          },
+          "case_id": "case_104_error_layout_comentario",
+          "pipeline_meta": {
+            "artifact_count": "4",
+            "avg_score": "2199/8000",
+            "expected_verdict": "MALICE",
+            "source": "ebs_v1_json_adapter"
+          },
+          "signals": [
+            {
+              "artifact_id": "a104_01",
+              "confidence": "13/20",
+              "description": "Comment in production script: '# TODO: fix the cnfnbz.py script'. Meaningless word in Spanish or English.",
+              "evidence_type": "file_hash",
+              "source": "sift_code_audit",
+              "z_score": "143/250"
+            },
+            {
+              "artifact_id": "a104_02",
+              "confidence": "3/20",
+              "description": "Keyboard slip: 'cnfnbz' maps exactly to '\u0441\u0442\u0430\u0442\u044c\u044f' (article) in active Russian \u0419\u0426\u0423\u041a\u0415\u041d layout. Confidence: 1.0.",
+              "evidence_type": "cultural_marker",
+              "source": "sift_linguistic",
+              "z_score": "69/500"
+            },
+            {
+              "artifact_id": "a104_03",
+              "confidence": "9/20",
+              "description": "Commit made from a machine with git config locale ru_RU.UTF-8, timezone Europe/Moscow.",
+              "evidence_type": "log_entry",
+              "source": "sift_git_audit",
+              "z_score": "171/500"
+            },
+            {
+              "artifact_id": "a104_04",
+              "confidence": "19/20",
+              "description": "Development session from IP geolocated in St. Petersburg with a physical keyboard configured in Russian.",
+              "evidence_type": "memory_process",
+              "source": "sift_volatility",
+              "z_score": "19/400"
+            }
+          ]
+        },
+        "seq": 5,
+        "timestamp": "2026-06-14T19:05:43.214606+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "VIGIA-CAN-022",
+        "entry_sha256": "69f25406fd55b91f84b76e1a85f18653b1b17c02df7e7ca17c11c4ac81d1b5bd",
+        "inputs_summary": {
+          "n_signals": "4"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-06-14T19:05:43.214702+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "VIGIA-CAN-022",
+        "entry_sha256": "4fed602b1223e02d84b15b3b242c8688670c602b9dffc022122324cf61476e8a",
+        "inputs_summary": {
+          "verdict": "MALICIOUS_INTENT_DETECTED"
+        },
+        "iteration": 0,
+        "note": "Exit code 1 \u2014 analysis complete.",
+        "outputs_summary": {
+          "exit_code": "1"
+        },
+        "seq": 7,
+        "timestamp": "2026-06-14T19:05:43.214831+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-06-14T19:05:43.212126+00:00",
+    "total_entries": 7
+  },
+  "case_id": "VIGIA-CAN-022",
+  "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-022.json",
+  "evidence_sha256": "a1cda257c61f9b018d4fc8af5e3dede8436bd8c27fc328e4fa351180e3e1bd73",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-CAN-022 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-022.json\nEvidence SHA-256: a1cda257c61f9b018d4fc8af5e3dede8436bd8c27fc328e4fa351180e3e1bd73\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 2199/40000\nConclusive: NO \u2014 requires human review\n\n--- PEIRCEAN NARRATIVE ---\nProduction script has a comment: '# TODO: fix the cnfnbz.py script'. The word 'cnfnbz' is '\u0441\u0442\u0430\u0442\u044c\u044f' (article) typed with active Russian layout. Commit from a machine with locale ru_RU and timezone Europe/Moscow.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Comment in production script: '# TODO: fix the cnfnbz.py script'. Mean] z=0.572 conf=0.65 \u2014 \n  [Commit made from a machine with git config locale ru_RU.UTF-8, timezon] z=0.342 conf=0.45 \u2014 \n  [Keyboard slip: 'cnfnbz' maps exactly to '\u0441\u0442\u0430\u0442\u044c\u044f' (article) in active R] z=0.138 conf=0.15 \u2014 \n  [Development session from IP geolocated in St. Petersburg with a physic] z=0.048 conf=0.95 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW \u2014 No significant anomalies detected in this iteration.\n\nCritical signals (z>3): 0\nHigh signals (2<z<=3): 0\nTotal signals analyzed: 4",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+      "best_posterior": "2199/40000",
+      "confidence": {
+        "__fraction__": true,
+        "den": 40000,
+        "num": 2199
+      },
+      "is_conclusive": false,
+      "narrative": "Production script has a comment: '# TODO: fix the cnfnbz.py script'. The word 'cnfnbz' is '\u0441\u0442\u0430\u0442\u044c\u044f' (article) typed with active Russian layout. Commit from a machine with locale ru_RU and timezone Europe/Moscow."
+    },
+    "case_id": "case_104_error_layout_comentario",
+    "pipeline_meta": {
+      "artifact_count": 4,
+      "avg_score": "2199/8000",
+      "expected_verdict": "MALICE",
+      "source": "ebs_v1_json_adapter"
+    },
+    "signals": [
+      {
+        "artifact_id": "a104_01",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 13
+        },
+        "description": "Comment in production script: '# TODO: fix the cnfnbz.py script'. Meaningless word in Spanish or English.",
+        "evidence_type": "file_hash",
+        "source": "sift_code_audit",
+        "z_score": {
+          "__fraction__": true,
+          "den": 250,
+          "num": 143
+        }
+      },
+      {
+        "artifact_id": "a104_02",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 3
+        },
+        "description": "Keyboard slip: 'cnfnbz' maps exactly to '\u0441\u0442\u0430\u0442\u044c\u044f' (article) in active Russian \u0419\u0426\u0423\u041a\u0415\u041d layout. Confidence: 1.0.",
+        "evidence_type": "cultural_marker",
+        "source": "sift_linguistic",
+        "z_score": {
+          "__fraction__": true,
+          "den": 500,
+          "num": 69
+        }
+      },
+      {
+        "artifact_id": "a104_03",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 9
+        },
+        "description": "Commit made from a machine with git config locale ru_RU.UTF-8, timezone Europe/Moscow.",
+        "evidence_type": "log_entry",
+        "source": "sift_git_audit",
+        "z_score": {
+          "__fraction__": true,
+          "den": 500,
+          "num": 171
+        }
+      },
+      {
+        "artifact_id": "a104_04",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 19
+        },
+        "description": "Development session from IP geolocated in St. Petersburg with a physical keyboard configured in Russian.",
+        "evidence_type": "memory_process",
+        "source": "sift_volatility",
+        "z_score": {
+          "__fraction__": true,
+          "den": 400,
+          "num": 19
+        }
+      }
+    ]
+  },
+  "sans_compliance": {
+    "accuracy_validation": false,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}

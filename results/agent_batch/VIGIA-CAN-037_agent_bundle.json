@@ -1,0 +1,273 @@
+{
+  "analysis_timestamp": "2026-06-14T19:05:43.865754+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "VIGIA-CAN-037",
+    "end_time": "2026-06-14T19:05:43.865758+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "VIGIA-CAN-037",
+        "entry_sha256": "691f9cfc1230ec5374e73cb2c8912c11c25b19d65091812ed111029a5cc0a8d1",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "VIGIA-CAN-037"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: 4eeafb3bfb155486...",
+        "outputs_summary": {
+          "agent_sha256": "4eeafb3bfb155486142942ad7a2c8678676f86ffd5d076882459354d820591f6",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-06-14T19:05:43.863149+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-CAN-037",
+        "entry_sha256": "6329c3237b608a411d343a1b9947bd88d89cfc418d71d4af16d697e4f8081f55",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-037.json"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-06-14T19:05:43.863219+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-CAN-037",
+        "entry_sha256": "a4ceeca3ef2b830fe8cb3baf38122cee95ab3337e0b275e58ce071acf6b6f28f",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-037.json"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: e3416971b7700d8b...",
+        "outputs_summary": {
+          "sha256": "e3416971b7700d8bf49d26b91c46d7e14233162bbf44c5d502fbee79814caea9"
+        },
+        "seq": 3,
+        "timestamp": "2026-06-14T19:05:43.863295+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "VIGIA-CAN-037",
+        "entry_sha256": "611504ef03a3f887553b9544037585f8280e1988b5cde79a47f43e0925a75521",
+        "inputs_summary": {
+          "evidence": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-037.json",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-06-14T19:05:43.863379+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "VIGIA-CAN-037",
+        "entry_sha256": "8940d2096c3f7f4cd4c280786b5340e1ea7d964aca7c2c9e4d088e30412f0fc2",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 4 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+            "best_posterior": "6069/40000",
+            "confidence": "6069/40000",
+            "is_conclusive": "True",
+            "narrative": "system_updater.elf with mtime/atime/crtime copied from legitimate 2022 binaries. But ctime: 3 hours ago. MFT entry #147823 assigned after #147822 (which is from 2026) but carries a 2022 timestamp. 7 z..."
+          },
+          "case_id": "case_024_paracaidista_timestomping",
+          "pipeline_meta": {
+            "artifact_count": "4",
+            "avg_score": "6069/8000",
+            "expected_verdict": "MALICE",
+            "source": "ebs_v1_json_adapter"
+          },
+          "signals": [
+            {
+              "artifact_id": "a024_01",
+              "confidence": "7/10",
+              "description": "system_updater.elf: mtime=2022-03-15T10:00:00Z (identical to /usr/bin/ls). ctime=2026-07-01T12:00:00Z (3 hours ago). 7 zeros in sub-seconds.",
+              "evidence_type": "file_timestamp",
+              "source": "sift_sleuthkit",
+              "z_score": "77/125"
+            },
+            {
+              "artifact_id": "a024_02",
+              "confidence": "9/10",
+              "description": "MFT entry #147823 assigned after #147822 (2026 timestamps) but carries a 2022 mtime. Monotonicity violation.",
+              "evidence_type": "mft_entry",
+              "source": "sift_mft_parser",
+              "z_score": "81/100"
+            },
+            {
+              "artifact_id": "a024_03",
+              "confidence": "17/20",
+              "description": "SHA-256 hash not present in any known binary database for the distribution. Not a system file.",
+              "evidence_type": "file_hash",
+              "source": "sift_sha256",
+              "z_score": "391/500"
+            },
+            {
+              "artifact_id": "a024_04",
+              "confidence": "19/20",
+              "description": "system_updater in memory with a 4MB RWX region not backed by a file on disk. Active reverse shell.",
+              "evidence_type": "memory_process",
+              "source": "sift_volatility",
+              "z_score": "1653/2000"
+            }
+          ]
+        },
+        "seq": 5,
+        "timestamp": "2026-06-14T19:05:43.865446+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "VIGIA-CAN-037",
+        "entry_sha256": "a60980327e849a8d8dc5313ad113c98b51d3e64cc577116567c278317b296349",
+        "inputs_summary": {
+          "n_signals": "4"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-06-14T19:05:43.865549+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "VIGIA-CAN-037",
+        "entry_sha256": "a84c0955ffad03b345ed3419c0e220a87131959f7ffd5b4f6e6cc28ffcd3e228",
+        "inputs_summary": {
+          "verdict": "MALICIOUS_INTENT_DETECTED"
+        },
+        "iteration": 0,
+        "note": "Exit code 1 \u2014 analysis complete.",
+        "outputs_summary": {
+          "exit_code": "1"
+        },
+        "seq": 7,
+        "timestamp": "2026-06-14T19:05:43.865679+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-06-14T19:05:43.862958+00:00",
+    "total_entries": 7
+  },
+  "case_id": "VIGIA-CAN-037",
+  "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-037.json",
+  "evidence_sha256": "e3416971b7700d8bf49d26b91c46d7e14233162bbf44c5d502fbee79814caea9",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-CAN-037 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-037.json\nEvidence SHA-256: e3416971b7700d8bf49d26b91c46d7e14233162bbf44c5d502fbee79814caea9\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 6069/40000\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\nsystem_updater.elf with mtime/atime/crtime copied from legitimate 2022 binaries. But ctime: 3 hours ago. MFT entry #147823 assigned after #147822 (which is from 2026) but carries a 2022 timestamp. 7 zeros in sub-seconds sign the timestomping tool.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [system_updater in memory with a 4MB RWX region not backed by a file on] z=0.827 conf=0.95 \u2014 \n  [MFT entry #147823 assigned after #147822 (2026 timestamps) but carries] z=0.810 conf=0.90 \u2014 \n  [SHA-256 hash not present in any known binary database for the distribu] z=0.782 conf=0.85 \u2014 \n  [system_updater.elf: mtime=2022-03-15T10:00:00Z (identical to /usr/bin/] z=0.616 conf=0.70 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW \u2014 No significant anomalies detected in this iteration.\n\nCritical signals (z>3): 0\nHigh signals (2<z<=3): 0\nTotal signals analyzed: 4",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+      "best_posterior": "6069/40000",
+      "confidence": {
+        "__fraction__": true,
+        "den": 40000,
+        "num": 6069
+      },
+      "is_conclusive": true,
+      "narrative": "system_updater.elf with mtime/atime/crtime copied from legitimate 2022 binaries. But ctime: 3 hours ago. MFT entry #147823 assigned after #147822 (which is from 2026) but carries a 2022 timestamp. 7 zeros in sub-seconds sign the timestomping tool."
+    },
+    "case_id": "case_024_paracaidista_timestomping",
+    "pipeline_meta": {
+      "artifact_count": 4,
+      "avg_score": "6069/8000",
+      "expected_verdict": "MALICE",
+      "source": "ebs_v1_json_adapter"
+    },
+    "signals": [
+      {
+        "artifact_id": "a024_01",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 7
+        },
+        "description": "system_updater.elf: mtime=2022-03-15T10:00:00Z (identical to /usr/bin/ls). ctime=2026-07-01T12:00:00Z (3 hours ago). 7 zeros in sub-seconds.",
+        "evidence_type": "file_timestamp",
+        "source": "sift_sleuthkit",
+        "z_score": {
+          "__fraction__": true,
+          "den": 125,
+          "num": 77
+        }
+      },
+      {
+        "artifact_id": "a024_02",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 9
+        },
+        "description": "MFT entry #147823 assigned after #147822 (2026 timestamps) but carries a 2022 mtime. Monotonicity violation.",
+        "evidence_type": "mft_entry",
+        "source": "sift_mft_parser",
+        "z_score": {
+          "__fraction__": true,
+          "den": 100,
+          "num": 81
+        }
+      },
+      {
+        "artifact_id": "a024_03",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 17
+        },
+        "description": "SHA-256 hash not present in any known binary database for the distribution. Not a system file.",
+        "evidence_type": "file_hash",
+        "source": "sift_sha256",
+        "z_score": {
+          "__fraction__": true,
+          "den": 500,
+          "num": 391
+        }
+      },
+      {
+        "artifact_id": "a024_04",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 19
+        },
+        "description": "system_updater in memory with a 4MB RWX region not backed by a file on disk. Active reverse shell.",
+        "evidence_type": "memory_process",
+        "source": "sift_volatility",
+        "z_score": {
+          "__fraction__": true,
+          "den": 2000,
+          "num": 1653
+        }
+      }
+    ]
+  },
+  "sans_compliance": {
+    "accuracy_validation": false,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}

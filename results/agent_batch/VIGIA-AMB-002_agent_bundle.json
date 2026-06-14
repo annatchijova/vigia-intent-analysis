@@ -1,0 +1,249 @@
+{
+  "analysis_timestamp": "2026-06-14T19:05:38.786641+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "VIGIA-AMB-002",
+    "end_time": "2026-06-14T19:05:38.786644+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "VIGIA-AMB-002",
+        "entry_sha256": "c237e2f159f1dd3e8190fc982c7c34c54c8ab134c517300927627101563bc35b",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "VIGIA-AMB-002"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: 4eeafb3bfb155486...",
+        "outputs_summary": {
+          "agent_sha256": "4eeafb3bfb155486142942ad7a2c8678676f86ffd5d076882459354d820591f6",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-06-14T19:05:38.784065+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-AMB-002",
+        "entry_sha256": "1a834b7c5a6e28910c34f8595e86aad3ed97ba905884e27221aef901bbd98bd4",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-AMB-002.json"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-06-14T19:05:38.784135+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-AMB-002",
+        "entry_sha256": "c108f881de22bf60af096efdc30029cd7eb403d080309e24d9668ef611d024b2",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-AMB-002.json"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: cfdfc738d9b5a5a7...",
+        "outputs_summary": {
+          "sha256": "cfdfc738d9b5a5a70b404952fa987c9f3b902057729c9381585695970dc00d80"
+        },
+        "seq": 3,
+        "timestamp": "2026-06-14T19:05:38.784210+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "VIGIA-AMB-002",
+        "entry_sha256": "ca38e307d059df44f1a4f738f058d12e8ceb3b0126cb74c26ba246d22d47e9dc",
+        "inputs_summary": {
+          "evidence": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-AMB-002.json",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-06-14T19:05:38.784296+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "VIGIA-AMB-002",
+        "entry_sha256": "f6c86c0cf2604617463ccc37c34d506506342c54bb6d127ca9a9c0f8d07c69ba",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 3 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "NO_SEMIOTIC_ANOMALY_DETECTED",
+            "best_posterior": "11/400",
+            "confidence": "11/400",
+            "is_conclusive": "False",
+            "narrative": "Tier-1 SOC analyst modifies a rule without a change ticket, citing 'human error'. The modification disables a critical alert. Could be: (1) genuine error, (2) insider sabotage, (3) negligence."
+          },
+          "case_id": "VIGIA-AMB-002",
+          "pipeline_meta": {
+            "artifact_count": "3",
+            "avg_score": "11/80",
+            "expected_verdict": "ABSTAIN",
+            "source": "ebs_v1_json_adapter"
+          },
+          "signals": [
+            {
+              "artifact_id": "amb002_01",
+              "confidence": "3/5",
+              "description": "Tier-1 analyst disabled DLP rule DLP-001",
+              "evidence_type": "log_entry",
+              "source": "sift_syslog",
+              "z_score": "33/100"
+            },
+            {
+              "artifact_id": "amb002_02",
+              "confidence": "7/10",
+              "description": "Analyst: 'Oops, accidentally touched a DLP rule. Already re-enabled it'",
+              "evidence_type": "log_entry",
+              "source": "sift_chat_system",
+              "z_score": "7/200"
+            },
+            {
+              "artifact_id": "amb002_03",
+              "confidence": "19/20",
+              "description": "No malicious processes on tier1_003 workstation",
+              "evidence_type": "memory_process",
+              "source": "sift_volatility",
+              "z_score": "19/400"
+            }
+          ]
+        },
+        "seq": 5,
+        "timestamp": "2026-06-14T19:05:38.786325+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "VIGIA-AMB-002",
+        "entry_sha256": "c086ac9c418b57baf9637b0419b0a7e6aa14cb708f97c766f460326af9a93cb4",
+        "inputs_summary": {
+          "n_signals": "3"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-06-14T19:05:38.786419+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "VIGIA-AMB-002",
+        "entry_sha256": "d8ae956c67fdb6fccaa91e9a4457289bdb3c85381d62cc042d086835bd9fa361",
+        "inputs_summary": {
+          "verdict": "NO_SEMIOTIC_ANOMALY_DETECTED"
+        },
+        "iteration": 0,
+        "note": "Exit code 0 \u2014 analysis complete.",
+        "outputs_summary": {
+          "exit_code": "0"
+        },
+        "seq": 7,
+        "timestamp": "2026-06-14T19:05:38.786571+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-06-14T19:05:38.783878+00:00",
+    "total_entries": 7
+  },
+  "case_id": "VIGIA-AMB-002",
+  "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-AMB-002.json",
+  "evidence_sha256": "cfdfc738d9b5a5a70b404952fa987c9f3b902057729c9381585695970dc00d80",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-AMB-002 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/VIGIA-AMB-002.json\nEvidence SHA-256: cfdfc738d9b5a5a70b404952fa987c9f3b902057729c9381585695970dc00d80\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: NO_SEMIOTIC_ANOMALY_DETECTED\nPosterior confidence: 11/400\nConclusive: NO \u2014 requires human review\n\n--- PEIRCEAN NARRATIVE ---\nTier-1 SOC analyst modifies a rule without a change ticket, citing 'human error'. The modification disables a critical alert. Could be: (1) genuine error, (2) insider sabotage, (3) negligence.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Tier-1 analyst disabled DLP rule DLP-001] z=0.330 conf=0.60 \u2014 \n  [No malicious processes on tier1_003 workstation] z=0.048 conf=0.95 \u2014 \n  [Analyst: 'Oops, accidentally touched a DLP rule. Already re-enabled it] z=0.035 conf=0.70 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW \u2014 No significant anomalies detected in this iteration.\n\nCritical signals (z>3): 0\nHigh signals (2<z<=3): 0\nTotal signals analyzed: 3",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "NO_SEMIOTIC_ANOMALY_DETECTED",
+      "best_posterior": "11/400",
+      "confidence": {
+        "__fraction__": true,
+        "den": 400,
+        "num": 11
+      },
+      "is_conclusive": false,
+      "narrative": "Tier-1 SOC analyst modifies a rule without a change ticket, citing 'human error'. The modification disables a critical alert. Could be: (1) genuine error, (2) insider sabotage, (3) negligence."
+    },
+    "case_id": "VIGIA-AMB-002",
+    "pipeline_meta": {
+      "artifact_count": 3,
+      "avg_score": "11/80",
+      "expected_verdict": "ABSTAIN",
+      "source": "ebs_v1_json_adapter"
+    },
+    "signals": [
+      {
+        "artifact_id": "amb002_01",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 3
+        },
+        "description": "Tier-1 analyst disabled DLP rule DLP-001",
+        "evidence_type": "log_entry",
+        "source": "sift_syslog",
+        "z_score": {
+          "__fraction__": true,
+          "den": 100,
+          "num": 33
+        }
+      },
+      {
+        "artifact_id": "amb002_02",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 7
+        },
+        "description": "Analyst: 'Oops, accidentally touched a DLP rule. Already re-enabled it'",
+        "evidence_type": "log_entry",
+        "source": "sift_chat_system",
+        "z_score": {
+          "__fraction__": true,
+          "den": 200,
+          "num": 7
+        }
+      },
+      {
+        "artifact_id": "amb002_03",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 19
+        },
+        "description": "No malicious processes on tier1_003 workstation",
+        "evidence_type": "memory_process",
+        "source": "sift_volatility",
+        "z_score": {
+          "__fraction__": true,
+          "den": 400,
+          "num": 19
+        }
+      }
+    ]
+  },
+  "sans_compliance": {
+    "accuracy_validation": false,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}

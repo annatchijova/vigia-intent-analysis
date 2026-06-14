@@ -1,0 +1,273 @@
+{
+  "analysis_timestamp": "2026-06-14T19:05:42.263913+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "VIGIA-CAN-001",
+    "end_time": "2026-06-14T19:05:42.263916+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "VIGIA-CAN-001",
+        "entry_sha256": "6e6f778430f7c4c9649d0fcaa8c32f1e5e1c72976f57b8708d92d9caafa24590",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "VIGIA-CAN-001"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: 4eeafb3bfb155486...",
+        "outputs_summary": {
+          "agent_sha256": "4eeafb3bfb155486142942ad7a2c8678676f86ffd5d076882459354d820591f6",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-06-14T19:05:42.261317+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-CAN-001",
+        "entry_sha256": "7a3eb9ce3eedb352a7da3b86d4e74c02691b1ebf44f9c821d74896c265c6cd77",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-001.json"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-06-14T19:05:42.261388+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-CAN-001",
+        "entry_sha256": "2c792e45bdf0f9cafaa8bc4da1882ba545630d2ec679a39092b9cadb577f2094",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-001.json"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: c579e2d8bca79302...",
+        "outputs_summary": {
+          "sha256": "c579e2d8bca79302d80db369959e816a3a0838cbcbd22c79e2e986846f62c0ba"
+        },
+        "seq": 3,
+        "timestamp": "2026-06-14T19:05:42.261471+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "VIGIA-CAN-001",
+        "entry_sha256": "da2f230df745071c4223f6b064ab6b948d9f0c2246daaec7256153b5eeb89288",
+        "inputs_summary": {
+          "evidence": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-001.json",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-06-14T19:05:42.261558+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "VIGIA-CAN-001",
+        "entry_sha256": "48d2df0a1686e51a8376631aaf1e8aafe623ac75ec425680d9150d016979f70f",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 4 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+            "best_posterior": "4543/40000",
+            "confidence": "4543/40000",
+            "is_conclusive": "True",
+            "narrative": "Senior analyst self-reports an open SSH session to create an extreme-honesty alibi. While the team audits their account with benevolence, a cron job installed 5 minutes before the report exfiltrates d..."
+          },
+          "case_id": "case_083_sacrificio_del_peon",
+          "pipeline_meta": {
+            "artifact_count": "4",
+            "avg_score": "4543/8000",
+            "expected_verdict": "MALICE",
+            "source": "ebs_v1_json_adapter"
+          },
+          "signals": [
+            {
+              "artifact_id": "a083_01",
+              "confidence": "7/20",
+              "description": "Urgent email from senior analyst self-reporting an SSH session left open for 4 hours on a public server. Requests access revocation.",
+              "evidence_type": "log_entry",
+              "source": "sift_mail_gateway",
+              "z_score": "63/400"
+            },
+            {
+              "artifact_id": "a083_02",
+              "confidence": "3/5",
+              "description": "Scheduled task (cron job) created 5 minutes BEFORE the confession email. Creation timestamp precedes the public report.",
+              "evidence_type": "registry_key",
+              "source": "sift_windows_registry",
+              "z_score": "66/125"
+            },
+            {
+              "artifact_id": "a083_03",
+              "confidence": "19/20",
+              "description": "svchost.exe process with persistent connection to external IP under a legitimate system service identity.",
+              "evidence_type": "memory_process",
+              "source": "sift_volatility",
+              "z_score": "437/500"
+            },
+            {
+              "artifact_id": "a083_04",
+              "confidence": "4/5",
+              "description": "Exfiltration traffic to external IP on port 443 under a system process. 2.3GB transferred during the benign audit window.",
+              "evidence_type": "ip_geolocation",
+              "source": "sift_zeek",
+              "z_score": "89/125"
+            }
+          ]
+        },
+        "seq": 5,
+        "timestamp": "2026-06-14T19:05:42.263598+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "VIGIA-CAN-001",
+        "entry_sha256": "c7ef0dca811aa27d3935577a391b70732cb0012ae7352a3538ae946934a1c2e6",
+        "inputs_summary": {
+          "n_signals": "4"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-06-14T19:05:42.263703+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "VIGIA-CAN-001",
+        "entry_sha256": "74e2a9d711d89be7f86d4062071b151c5abe764b0d4228af93f42fcae7903bab",
+        "inputs_summary": {
+          "verdict": "MALICIOUS_INTENT_DETECTED"
+        },
+        "iteration": 0,
+        "note": "Exit code 1 \u2014 analysis complete.",
+        "outputs_summary": {
+          "exit_code": "1"
+        },
+        "seq": 7,
+        "timestamp": "2026-06-14T19:05:42.263834+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-06-14T19:05:42.261122+00:00",
+    "total_entries": 7
+  },
+  "case_id": "VIGIA-CAN-001",
+  "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-001.json",
+  "evidence_sha256": "c579e2d8bca79302d80db369959e816a3a0838cbcbd22c79e2e986846f62c0ba",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-CAN-001 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-001.json\nEvidence SHA-256: c579e2d8bca79302d80db369959e816a3a0838cbcbd22c79e2e986846f62c0ba\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 4543/40000\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\nSenior analyst self-reports an open SSH session to create an extreme-honesty alibi. While the team audits their account with benevolence, a cron job installed 5 minutes before the report exfiltrates data under a system service identity.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [svchost.exe process with persistent connection to external IP under a ] z=0.874 conf=0.95 \u2014 \n  [Exfiltration traffic to external IP on port 443 under a system process] z=0.712 conf=0.80 \u2014 \n  [Scheduled task (cron job) created 5 minutes BEFORE the confession emai] z=0.528 conf=0.60 \u2014 \n  [Urgent email from senior analyst self-reporting an SSH session left op] z=0.158 conf=0.35 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW \u2014 No significant anomalies detected in this iteration.\n\nCritical signals (z>3): 0\nHigh signals (2<z<=3): 0\nTotal signals analyzed: 4",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+      "best_posterior": "4543/40000",
+      "confidence": {
+        "__fraction__": true,
+        "den": 40000,
+        "num": 4543
+      },
+      "is_conclusive": true,
+      "narrative": "Senior analyst self-reports an open SSH session to create an extreme-honesty alibi. While the team audits their account with benevolence, a cron job installed 5 minutes before the report exfiltrates data under a system service identity."
+    },
+    "case_id": "case_083_sacrificio_del_peon",
+    "pipeline_meta": {
+      "artifact_count": 4,
+      "avg_score": "4543/8000",
+      "expected_verdict": "MALICE",
+      "source": "ebs_v1_json_adapter"
+    },
+    "signals": [
+      {
+        "artifact_id": "a083_01",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 7
+        },
+        "description": "Urgent email from senior analyst self-reporting an SSH session left open for 4 hours on a public server. Requests access revocation.",
+        "evidence_type": "log_entry",
+        "source": "sift_mail_gateway",
+        "z_score": {
+          "__fraction__": true,
+          "den": 400,
+          "num": 63
+        }
+      },
+      {
+        "artifact_id": "a083_02",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 3
+        },
+        "description": "Scheduled task (cron job) created 5 minutes BEFORE the confession email. Creation timestamp precedes the public report.",
+        "evidence_type": "registry_key",
+        "source": "sift_windows_registry",
+        "z_score": {
+          "__fraction__": true,
+          "den": 125,
+          "num": 66
+        }
+      },
+      {
+        "artifact_id": "a083_03",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 19
+        },
+        "description": "svchost.exe process with persistent connection to external IP under a legitimate system service identity.",
+        "evidence_type": "memory_process",
+        "source": "sift_volatility",
+        "z_score": {
+          "__fraction__": true,
+          "den": 500,
+          "num": 437
+        }
+      },
+      {
+        "artifact_id": "a083_04",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 4
+        },
+        "description": "Exfiltration traffic to external IP on port 443 under a system process. 2.3GB transferred during the benign audit window.",
+        "evidence_type": "ip_geolocation",
+        "source": "sift_zeek",
+        "z_score": {
+          "__fraction__": true,
+          "den": 125,
+          "num": 89
+        }
+      }
+    ]
+  },
+  "sans_compliance": {
+    "accuracy_validation": false,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}

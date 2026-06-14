@@ -1,0 +1,273 @@
+{
+  "analysis_timestamp": "2026-06-14T19:05:43.734611+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "VIGIA-CAN-034",
+    "end_time": "2026-06-14T19:05:43.734614+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "VIGIA-CAN-034",
+        "entry_sha256": "a8bd18b1d9e55356fa3153c3682e332d3fef0a7c249c3edad093702cbca94807",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "VIGIA-CAN-034"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: 4eeafb3bfb155486...",
+        "outputs_summary": {
+          "agent_sha256": "4eeafb3bfb155486142942ad7a2c8678676f86ffd5d076882459354d820591f6",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-06-14T19:05:43.732008+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-CAN-034",
+        "entry_sha256": "e66f3a3f54015676d1f11643070130e0af29a93a3958dc14fcab9827faae402b",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-034.json"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-06-14T19:05:43.732078+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-CAN-034",
+        "entry_sha256": "b6ba9adfb243394177eefa84c3b2944e671ab07879c79fc8d10d0bc7e572a494",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-034.json"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: edb246121b1064d8...",
+        "outputs_summary": {
+          "sha256": "edb246121b1064d8c007013d96d3cd542cd3a087484479c3de348b6be384b7a6"
+        },
+        "seq": 3,
+        "timestamp": "2026-06-14T19:05:43.732151+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "VIGIA-CAN-034",
+        "entry_sha256": "2aea273759488dbe51affe62d5a6f40691cbf763247d016de3c815a732256741",
+        "inputs_summary": {
+          "evidence": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-034.json",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-06-14T19:05:43.732234+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "VIGIA-CAN-034",
+        "entry_sha256": "f2b430711c9749d9b23e12a32515f06eb5d53dc3a198ab6ffa38146ed91edfdc",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 4 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+            "best_posterior": "4309/40000",
+            "confidence": "4309/40000",
+            "is_conclusive": "True",
+            "narrative": "User logs into the system and executes whoami/netstat/w/ps aux cycles every exactly 300s for 40 minutes (8 cycles). No modifications or exfiltration. The periodic hypervigilance reveals a guilty-consc..."
+          },
+          "case_id": "case_008_paranoia_perimetro",
+          "pipeline_meta": {
+            "artifact_count": "4",
+            "avg_score": "4309/8000",
+            "expected_verdict": "MALICE",
+            "source": "ebs_v1_json_adapter"
+          },
+          "signals": [
+            {
+              "artifact_id": "a008_01",
+              "confidence": "2/5",
+              "description": "8 cycles in 40 minutes: whoami \u2192 netstat -an \u2192 w \u2192 ps aux|grep root. Exact 300s interval. Variance: 2.3s.",
+              "evidence_type": "memory_process",
+              "source": "sift_auditd",
+              "z_score": "46/125"
+            },
+            {
+              "artifact_id": "a008_02",
+              "confidence": "17/20",
+              "description": "SSH session from Tor IP (198.51.100.42, confirmed exit node). User 'backup_agent'. No previous SSH logins in 180 days.",
+              "evidence_type": "lsass_session",
+              "source": "sift_pam",
+              "z_score": "1377/2000"
+            },
+            {
+              "artifact_id": "a008_03",
+              "confidence": "3/4",
+              "description": "At minute 45, connection to internal database server (10.0.5.20). Duration: 8 seconds. Transfer: 2KB.",
+              "evidence_type": "memory_process",
+              "source": "sift_zeek",
+              "z_score": "69/100"
+            },
+            {
+              "artifact_id": "a008_04",
+              "confidence": "3/5",
+              "description": "Reconnaissance cycle entropy: 0.09 bits. Expected for a human: >2.0 bits for unplanned reconnaissance.",
+              "evidence_type": "file_timestamp",
+              "source": "sift_entropy",
+              "z_score": "51/125"
+            }
+          ]
+        },
+        "seq": 5,
+        "timestamp": "2026-06-14T19:05:43.734275+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "VIGIA-CAN-034",
+        "entry_sha256": "02f211e59211525955eb0ac4a6da85ff9f78871b3e22684778db7dea89625947",
+        "inputs_summary": {
+          "n_signals": "4"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-06-14T19:05:43.734383+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "VIGIA-CAN-034",
+        "entry_sha256": "fa4dd3e26b74ddf22617406c7186979c25186fbf63e5d6c7cde974f2e2ee7b42",
+        "inputs_summary": {
+          "verdict": "MALICIOUS_INTENT_DETECTED"
+        },
+        "iteration": 0,
+        "note": "Exit code 1 \u2014 analysis complete.",
+        "outputs_summary": {
+          "exit_code": "1"
+        },
+        "seq": 7,
+        "timestamp": "2026-06-14T19:05:43.734533+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-06-14T19:05:43.731816+00:00",
+    "total_entries": 7
+  },
+  "case_id": "VIGIA-CAN-034",
+  "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-034.json",
+  "evidence_sha256": "edb246121b1064d8c007013d96d3cd542cd3a087484479c3de348b6be384b7a6",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-CAN-034 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-034.json\nEvidence SHA-256: edb246121b1064d8c007013d96d3cd542cd3a087484479c3de348b6be384b7a6\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 4309/40000\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\nUser logs into the system and executes whoami/netstat/w/ps aux cycles every exactly 300s for 40 minutes (8 cycles). No modifications or exfiltration. The periodic hypervigilance reveals a guilty-conscience infiltrated actor.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [At minute 45, connection to internal database server (10.0.5.20). Dura] z=0.690 conf=0.75 \u2014 \n  [SSH session from Tor IP (198.51.100.42, confirmed exit node). User 'ba] z=0.689 conf=0.85 \u2014 \n  [Reconnaissance cycle entropy: 0.09 bits. Expected for a human: >2.0 bi] z=0.408 conf=0.60 \u2014 \n  [8 cycles in 40 minutes: whoami \u2192 netstat -an \u2192 w \u2192 ps aux|grep root. E] z=0.368 conf=0.40 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW \u2014 No significant anomalies detected in this iteration.\n\nCritical signals (z>3): 0\nHigh signals (2<z<=3): 0\nTotal signals analyzed: 4",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+      "best_posterior": "4309/40000",
+      "confidence": {
+        "__fraction__": true,
+        "den": 40000,
+        "num": 4309
+      },
+      "is_conclusive": true,
+      "narrative": "User logs into the system and executes whoami/netstat/w/ps aux cycles every exactly 300s for 40 minutes (8 cycles). No modifications or exfiltration. The periodic hypervigilance reveals a guilty-conscience infiltrated actor."
+    },
+    "case_id": "case_008_paranoia_perimetro",
+    "pipeline_meta": {
+      "artifact_count": 4,
+      "avg_score": "4309/8000",
+      "expected_verdict": "MALICE",
+      "source": "ebs_v1_json_adapter"
+    },
+    "signals": [
+      {
+        "artifact_id": "a008_01",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 2
+        },
+        "description": "8 cycles in 40 minutes: whoami \u2192 netstat -an \u2192 w \u2192 ps aux|grep root. Exact 300s interval. Variance: 2.3s.",
+        "evidence_type": "memory_process",
+        "source": "sift_auditd",
+        "z_score": {
+          "__fraction__": true,
+          "den": 125,
+          "num": 46
+        }
+      },
+      {
+        "artifact_id": "a008_02",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 17
+        },
+        "description": "SSH session from Tor IP (198.51.100.42, confirmed exit node). User 'backup_agent'. No previous SSH logins in 180 days.",
+        "evidence_type": "lsass_session",
+        "source": "sift_pam",
+        "z_score": {
+          "__fraction__": true,
+          "den": 2000,
+          "num": 1377
+        }
+      },
+      {
+        "artifact_id": "a008_03",
+        "confidence": {
+          "__fraction__": true,
+          "den": 4,
+          "num": 3
+        },
+        "description": "At minute 45, connection to internal database server (10.0.5.20). Duration: 8 seconds. Transfer: 2KB.",
+        "evidence_type": "memory_process",
+        "source": "sift_zeek",
+        "z_score": {
+          "__fraction__": true,
+          "den": 100,
+          "num": 69
+        }
+      },
+      {
+        "artifact_id": "a008_04",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 3
+        },
+        "description": "Reconnaissance cycle entropy: 0.09 bits. Expected for a human: >2.0 bits for unplanned reconnaissance.",
+        "evidence_type": "file_timestamp",
+        "source": "sift_entropy",
+        "z_score": {
+          "__fraction__": true,
+          "den": 125,
+          "num": 51
+        }
+      }
+    ]
+  },
+  "sans_compliance": {
+    "accuracy_validation": false,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}

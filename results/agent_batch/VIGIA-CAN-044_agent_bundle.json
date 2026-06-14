@@ -1,0 +1,297 @@
+{
+  "analysis_timestamp": "2026-06-14T19:05:44.170236+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "VIGIA-CAN-044",
+    "end_time": "2026-06-14T19:05:44.170239+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "VIGIA-CAN-044",
+        "entry_sha256": "aeecc08d160ba5238c4bd818aba1e909353f35ee162669d097577480018be9b3",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "VIGIA-CAN-044"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: 4eeafb3bfb155486...",
+        "outputs_summary": {
+          "agent_sha256": "4eeafb3bfb155486142942ad7a2c8678676f86ffd5d076882459354d820591f6",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-06-14T19:05:44.167621+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-CAN-044",
+        "entry_sha256": "db641a7d1e227ed80bdfd230b196fcecaa1d784eff0e282d6f6717e4b27dd6d6",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-044.json"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-06-14T19:05:44.167691+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-CAN-044",
+        "entry_sha256": "cec815d6fa8be8673a346ef399229db7fe6d05e113e547de4c446fc3fbfa2832",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-044.json"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: a61f17db3988bcd5...",
+        "outputs_summary": {
+          "sha256": "a61f17db3988bcd52ac37aeadf72fa31a11a65a81e3c42e1a3211902425b9989"
+        },
+        "seq": 3,
+        "timestamp": "2026-06-14T19:05:44.167768+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "VIGIA-CAN-044",
+        "entry_sha256": "33f394986a193ac9f9d7e8242331d58a5a10824783b118cb4539318f35a8f361",
+        "inputs_summary": {
+          "evidence": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-044.json",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-06-14T19:05:44.167851+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "VIGIA-CAN-044",
+        "entry_sha256": "a9de2d262003db482dff0876d895c1eba34ad15dea6724e5f4f2d982f6e2d979",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 5 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+            "best_posterior": "223/12500",
+            "confidence": "223/12500",
+            "is_conclusive": "False",
+            "narrative": "Three different users (manager, employee, vendor) from different IPs send tickets requesting a security rule to be disabled. Stylometric analysis detects they all make the exact same rare punctuation ..."
+          },
+          "case_id": "case_018_clonacion_sintactica",
+          "pipeline_meta": {
+            "artifact_count": "5",
+            "avg_score": "223/2500",
+            "expected_verdict": "MALICE",
+            "source": "ebs_v1_json_adapter"
+          },
+          "signals": [
+            {
+              "artifact_id": "a018_t1",
+              "confidence": "3/10",
+              "description": "Manager ticket: 'I need you to temporarily disable the DLP rule , it's urgent for fiscal close' \u2014 space before comma.",
+              "evidence_type": "memory_process",
+              "source": "sift_ticket_system",
+              "z_score": "3/250"
+            },
+            {
+              "artifact_id": "a018_t2",
+              "confidence": "3/10",
+              "description": "Employee ticket: 'The DLP rule , is blocking a legitimate client shipment' \u2014 space before comma.",
+              "evidence_type": "log_entry",
+              "source": "sift_ticket_system",
+              "z_score": "9/500"
+            },
+            {
+              "artifact_id": "a018_t3",
+              "confidence": "3/10",
+              "description": "Vendor ticket: 'Please , disable the DLP rule for this account' \u2014 space before comma.",
+              "evidence_type": "log_entry",
+              "source": "sift_ticket_system",
+              "z_score": "3/125"
+            },
+            {
+              "artifact_id": "a018_style",
+              "confidence": "3/20",
+              "description": "Stylometric analysis: all 3 tickets share TTR=0.42, average sentence length=12.3 words, and the 'space_before_comma' error in 100% of samples. Entropy between tickets: 0.08 bits.",
+              "evidence_type": "cultural_marker",
+              "source": "sift_stylometry",
+              "z_score": "33/250"
+            },
+            {
+              "artifact_id": "a018_dlp",
+              "confidence": "2/5",
+              "description": "DLP rule disabled 8 minutes after the third ticket by a Tier-1 analyst without CISO approval.",
+              "evidence_type": "log_entry",
+              "source": "sift_syslog",
+              "z_score": "13/50"
+            }
+          ]
+        },
+        "seq": 5,
+        "timestamp": "2026-06-14T19:05:44.169925+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "VIGIA-CAN-044",
+        "entry_sha256": "1a146fa36d886cbcaaabf331b9d5df9d72ec4dc143ac8dd50c4d1fb9bb5579d9",
+        "inputs_summary": {
+          "n_signals": "5"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-06-14T19:05:44.170070+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "VIGIA-CAN-044",
+        "entry_sha256": "33f393d4b6f47328f2038418f80463da4b06c3881a20f8d66c99399736d6885d",
+        "inputs_summary": {
+          "verdict": "MALICIOUS_INTENT_DETECTED"
+        },
+        "iteration": 0,
+        "note": "Exit code 1 \u2014 analysis complete.",
+        "outputs_summary": {
+          "exit_code": "1"
+        },
+        "seq": 7,
+        "timestamp": "2026-06-14T19:05:44.170154+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-06-14T19:05:44.167422+00:00",
+    "total_entries": 7
+  },
+  "case_id": "VIGIA-CAN-044",
+  "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-044.json",
+  "evidence_sha256": "a61f17db3988bcd52ac37aeadf72fa31a11a65a81e3c42e1a3211902425b9989",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-CAN-044 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-044.json\nEvidence SHA-256: a61f17db3988bcd52ac37aeadf72fa31a11a65a81e3c42e1a3211902425b9989\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 223/12500\nConclusive: NO \u2014 requires human review\n\n--- PEIRCEAN NARRATIVE ---\nThree different users (manager, employee, vendor) from different IPs send tickets requesting a security rule to be disabled. Stylometric analysis detects they all make the exact same rare punctuation error.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [DLP rule disabled 8 minutes after the third ticket by a Tier-1 analyst] z=0.260 conf=0.40 \u2014 \n  [Stylometric analysis: all 3 tickets share TTR=0.42, average sentence l] z=0.132 conf=0.15 \u2014 \n  [Vendor ticket: 'Please , disable the DLP rule for this account' \u2014 spac] z=0.024 conf=0.30 \u2014 \n  [Employee ticket: 'The DLP rule , is blocking a legitimate client shipm] z=0.018 conf=0.30 \u2014 \n  [Manager ticket: 'I need you to temporarily disable the DLP rule , it's] z=0.012 conf=0.30 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW \u2014 No significant anomalies detected in this iteration.\n\nCritical signals (z>3): 0\nHigh signals (2<z<=3): 0\nTotal signals analyzed: 5",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+      "best_posterior": "223/12500",
+      "confidence": {
+        "__fraction__": true,
+        "den": 12500,
+        "num": 223
+      },
+      "is_conclusive": false,
+      "narrative": "Three different users (manager, employee, vendor) from different IPs send tickets requesting a security rule to be disabled. Stylometric analysis detects they all make the exact same rare punctuation error."
+    },
+    "case_id": "case_018_clonacion_sintactica",
+    "pipeline_meta": {
+      "artifact_count": 5,
+      "avg_score": "223/2500",
+      "expected_verdict": "MALICE",
+      "source": "ebs_v1_json_adapter"
+    },
+    "signals": [
+      {
+        "artifact_id": "a018_t1",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 3
+        },
+        "description": "Manager ticket: 'I need you to temporarily disable the DLP rule , it's urgent for fiscal close' \u2014 space before comma.",
+        "evidence_type": "memory_process",
+        "source": "sift_ticket_system",
+        "z_score": {
+          "__fraction__": true,
+          "den": 250,
+          "num": 3
+        }
+      },
+      {
+        "artifact_id": "a018_t2",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 3
+        },
+        "description": "Employee ticket: 'The DLP rule , is blocking a legitimate client shipment' \u2014 space before comma.",
+        "evidence_type": "log_entry",
+        "source": "sift_ticket_system",
+        "z_score": {
+          "__fraction__": true,
+          "den": 500,
+          "num": 9
+        }
+      },
+      {
+        "artifact_id": "a018_t3",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 3
+        },
+        "description": "Vendor ticket: 'Please , disable the DLP rule for this account' \u2014 space before comma.",
+        "evidence_type": "log_entry",
+        "source": "sift_ticket_system",
+        "z_score": {
+          "__fraction__": true,
+          "den": 125,
+          "num": 3
+        }
+      },
+      {
+        "artifact_id": "a018_style",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 3
+        },
+        "description": "Stylometric analysis: all 3 tickets share TTR=0.42, average sentence length=12.3 words, and the 'space_before_comma' error in 100% of samples. Entropy between tickets: 0.08 bits.",
+        "evidence_type": "cultural_marker",
+        "source": "sift_stylometry",
+        "z_score": {
+          "__fraction__": true,
+          "den": 250,
+          "num": 33
+        }
+      },
+      {
+        "artifact_id": "a018_dlp",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 2
+        },
+        "description": "DLP rule disabled 8 minutes after the third ticket by a Tier-1 analyst without CISO approval.",
+        "evidence_type": "log_entry",
+        "source": "sift_syslog",
+        "z_score": {
+          "__fraction__": true,
+          "den": 50,
+          "num": 13
+        }
+      }
+    ]
+  },
+  "sans_compliance": {
+    "accuracy_validation": false,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}

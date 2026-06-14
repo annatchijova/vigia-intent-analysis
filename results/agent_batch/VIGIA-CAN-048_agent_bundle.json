@@ -1,0 +1,297 @@
+{
+  "analysis_timestamp": "2026-06-14T19:05:44.343658+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "VIGIA-CAN-048",
+    "end_time": "2026-06-14T19:05:44.343662+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "VIGIA-CAN-048",
+        "entry_sha256": "68e7dd39676a615583bcd30225f75b89be81da8de079b280307f826ac5a5cf1c",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "VIGIA-CAN-048"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: 4eeafb3bfb155486...",
+        "outputs_summary": {
+          "agent_sha256": "4eeafb3bfb155486142942ad7a2c8678676f86ffd5d076882459354d820591f6",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-06-14T19:05:44.341051+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-CAN-048",
+        "entry_sha256": "aea5223cf6584419c2987ed7fa5f0dc31e145dbeb29eb1e2726c5028afd73e00",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-048.json"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-06-14T19:05:44.341121+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-CAN-048",
+        "entry_sha256": "13ab9a7cccdc788418ab12236d19f2d0bb273074023d5428ad7a412a1d559752",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-048.json"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: 3472dc145db27bcc...",
+        "outputs_summary": {
+          "sha256": "3472dc145db27bcc5c48940d6242ab1cef36bce0a90a8fb6089bb7e5d8455c7f"
+        },
+        "seq": 3,
+        "timestamp": "2026-06-14T19:05:44.341199+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "VIGIA-CAN-048",
+        "entry_sha256": "8d218f359d59a9501399ce273637c8e6294684a23476393c9cbdd8d59e168688",
+        "inputs_summary": {
+          "evidence": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-048.json",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-06-14T19:05:44.341283+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "VIGIA-CAN-048",
+        "entry_sha256": "6342dd152b98fce1387338e8c896a89040fe9bac311441b65ff0533aeca1dab2",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 5 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+            "best_posterior": "63/6250",
+            "confidence": "63/6250",
+            "is_conclusive": "False",
+            "narrative": "During a real network incident, multiple accounts send coordinated panic messages ('did you see that too?', 'Were we hacked?') that have no technical correlate. Objective: saturate the SOC's triage ca..."
+          },
+          "case_id": "case_fusion_panico_coordinado",
+          "pipeline_meta": {
+            "artifact_count": "5",
+            "avg_score": "63/1250",
+            "expected_verdict": "MALICE",
+            "source": "ebs_v1_json_adapter"
+          },
+          "signals": [
+            {
+              "artifact_id": "f001_chat",
+              "confidence": "3/10",
+              "description": "17 messages in #general within a 90-second window: 'did you see that too?', 'how is it possible you didn't know', 'I already knew something was wrong'.",
+              "evidence_type": "log_entry",
+              "source": "sift_slack_export",
+              "z_score": "21/1000"
+            },
+            {
+              "artifact_id": "f001_tickets",
+              "confidence": "3/10",
+              "description": "12 simultaneous support tickets from different accounts: 'Can't access mail', 'Server is down', 'Were we hacked?'",
+              "evidence_type": "log_entry",
+              "source": "sift_ticket_system",
+              "z_score": "9/500"
+            },
+            {
+              "artifact_id": "f001_o365",
+              "confidence": "9/20",
+              "description": "O365 logs: 11 of 12 reporting accounts have a successful login in the last hour, no failed attempts. 1 account does not exist in AD.",
+              "evidence_type": "log_entry",
+              "source": "sift_o365_audit",
+              "z_score": "9/250"
+            },
+            {
+              "artifact_id": "f001_real",
+              "confidence": "19/20",
+              "description": "During the semantic panic window, process cobalt_strike.beacon active on the file server performing lateral reconnaissance.",
+              "evidence_type": "memory_process",
+              "source": "sift_volatility",
+              "z_score": "57/1000"
+            },
+            {
+              "artifact_id": "f001_stylometry",
+              "confidence": "3/20",
+              "description": "Stylometric analysis: 15 of 17 Slack messages share an entropy of 0.11 bits and identical punctuation pattern (space before question mark).",
+              "evidence_type": "cultural_marker",
+              "source": "sift_linguistic",
+              "z_score": "3/25"
+            }
+          ]
+        },
+        "seq": 5,
+        "timestamp": "2026-06-14T19:05:44.343340+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "VIGIA-CAN-048",
+        "entry_sha256": "91e4b864680e79c5975dd5296005f4e97c3161e21e001ba299a7270f25351d16",
+        "inputs_summary": {
+          "n_signals": "5"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-06-14T19:05:44.343494+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "VIGIA-CAN-048",
+        "entry_sha256": "de1c012c74b6e60ceb13b209ef2fd70b81a31e57a08908f24693865f73653c15",
+        "inputs_summary": {
+          "verdict": "MALICIOUS_INTENT_DETECTED"
+        },
+        "iteration": 0,
+        "note": "Exit code 1 \u2014 analysis complete.",
+        "outputs_summary": {
+          "exit_code": "1"
+        },
+        "seq": 7,
+        "timestamp": "2026-06-14T19:05:44.343581+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-06-14T19:05:44.340861+00:00",
+    "total_entries": 7
+  },
+  "case_id": "VIGIA-CAN-048",
+  "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-048.json",
+  "evidence_sha256": "3472dc145db27bcc5c48940d6242ab1cef36bce0a90a8fb6089bb7e5d8455c7f",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-CAN-048 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-048.json\nEvidence SHA-256: 3472dc145db27bcc5c48940d6242ab1cef36bce0a90a8fb6089bb7e5d8455c7f\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 63/6250\nConclusive: NO \u2014 requires human review\n\n--- PEIRCEAN NARRATIVE ---\nDuring a real network incident, multiple accounts send coordinated panic messages ('did you see that too?', 'Were we hacked?') that have no technical correlate. Objective: saturate the SOC's triage capacity.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Stylometric analysis: 15 of 17 Slack messages share an entropy of 0.11] z=0.120 conf=0.15 \u2014 \n  [During the semantic panic window, process cobalt_strike.beacon active ] z=0.057 conf=0.95 \u2014 \n  [O365 logs: 11 of 12 reporting accounts have a successful login in the ] z=0.036 conf=0.45 \u2014 \n  [17 messages in #general within a 90-second window: 'did you see that t] z=0.021 conf=0.30 \u2014 \n  [12 simultaneous support tickets from different accounts: 'Can't access] z=0.018 conf=0.30 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW \u2014 No significant anomalies detected in this iteration.\n\nCritical signals (z>3): 0\nHigh signals (2<z<=3): 0\nTotal signals analyzed: 5",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+      "best_posterior": "63/6250",
+      "confidence": {
+        "__fraction__": true,
+        "den": 6250,
+        "num": 63
+      },
+      "is_conclusive": false,
+      "narrative": "During a real network incident, multiple accounts send coordinated panic messages ('did you see that too?', 'Were we hacked?') that have no technical correlate. Objective: saturate the SOC's triage capacity."
+    },
+    "case_id": "case_fusion_panico_coordinado",
+    "pipeline_meta": {
+      "artifact_count": 5,
+      "avg_score": "63/1250",
+      "expected_verdict": "MALICE",
+      "source": "ebs_v1_json_adapter"
+    },
+    "signals": [
+      {
+        "artifact_id": "f001_chat",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 3
+        },
+        "description": "17 messages in #general within a 90-second window: 'did you see that too?', 'how is it possible you didn't know', 'I already knew something was wrong'.",
+        "evidence_type": "log_entry",
+        "source": "sift_slack_export",
+        "z_score": {
+          "__fraction__": true,
+          "den": 1000,
+          "num": 21
+        }
+      },
+      {
+        "artifact_id": "f001_tickets",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 3
+        },
+        "description": "12 simultaneous support tickets from different accounts: 'Can't access mail', 'Server is down', 'Were we hacked?'",
+        "evidence_type": "log_entry",
+        "source": "sift_ticket_system",
+        "z_score": {
+          "__fraction__": true,
+          "den": 500,
+          "num": 9
+        }
+      },
+      {
+        "artifact_id": "f001_o365",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 9
+        },
+        "description": "O365 logs: 11 of 12 reporting accounts have a successful login in the last hour, no failed attempts. 1 account does not exist in AD.",
+        "evidence_type": "log_entry",
+        "source": "sift_o365_audit",
+        "z_score": {
+          "__fraction__": true,
+          "den": 250,
+          "num": 9
+        }
+      },
+      {
+        "artifact_id": "f001_real",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 19
+        },
+        "description": "During the semantic panic window, process cobalt_strike.beacon active on the file server performing lateral reconnaissance.",
+        "evidence_type": "memory_process",
+        "source": "sift_volatility",
+        "z_score": {
+          "__fraction__": true,
+          "den": 1000,
+          "num": 57
+        }
+      },
+      {
+        "artifact_id": "f001_stylometry",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 3
+        },
+        "description": "Stylometric analysis: 15 of 17 Slack messages share an entropy of 0.11 bits and identical punctuation pattern (space before question mark).",
+        "evidence_type": "cultural_marker",
+        "source": "sift_linguistic",
+        "z_score": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 3
+        }
+      }
+    ]
+  },
+  "sans_compliance": {
+    "accuracy_validation": false,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}
