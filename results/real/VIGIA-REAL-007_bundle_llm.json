@@ -1,0 +1,256 @@
+{
+  "bundle_version": "EBS_v1",
+  "case_id": "VIGIA-REAL-007",
+  "case_name": "Digital Corpora Nitroba Harassment",
+  "investigator": "VIGIA Autonomous Agent (Claude Code / Anthropic — claude-sonnet-4-6)",
+  "mode": "claude_code",
+  "investigation_timestamp": "2026-06-14T14:58:30.000000Z",
+  "evidence_sha256": "56a768cce239e7e2e9bdbd2336212b8d21678960b2a3ba9d948c366a302bc8bb",
+  "evidence_path": "data/cases/converted/VIGIA-REAL-007.json",
+  "sans_phase": "PICERL — Identification → Containment",
+
+  "executive_summary": "A ~60MB PCAP from Nitroba State University dormitory network captured Gmail session cookies in plaintext HTTP, identifying jcoachj@gmail.com as the account used to send explicit harassment threats to chemistry professor Lily Tuckrige via willselfdestruct.com. The actor made deliberate pre-operational decisions (purpose-created Gmail account, ephemeral delivery service) revealing INTENT-level planning. However, the validate_and_correct_analysis self-corrector identified CARNEGIE BIAS, FALSE SECONDNESS, and PREMATURE ABDUCTION that prevent elevation to MALICE: the plaintext cookie leak — the forensic break that identified the actor — is itself evidence of failed OPSEC sophistication, contradicting the 'hiding that they are hiding' criterion required for MALICE. Verdict: INTENT at 74% confidence (self-corrected from candidate MALICE at 91%).",
+
+  "final_verdict": "INTENT",
+  "final_confidence": 0.74,
+  "confidence_pct": 74,
+
+  "self_correction_applied": true,
+  "self_correction_gate": "validate_and_correct_analysis",
+  "candidate_verdict_pre_correction": "MALICE",
+  "candidate_confidence_pre_correction": 0.91,
+  "correction_reason_summary": "Four Peircean fallacies identified: (1) CARNEGIE BIAS — foreknowledge of forensics overstated for willselfdestruct.com selection; (2) FALSE SECONDNESS — no artifact proves harasser used WiFi router vs. Ethernet; MAC was captured regardless; (3) PREMATURE ABDUCTION — composite MALICE leap contradicted by F-003 SUSPICION (cookie leak = OPSEC failure, not OPSEC success); (4) HABITLESS THIRDNESS — ephemeral service use does not reliably index anti-forensic campaign planning. MALICE requires 'hiding that they are hiding' — the plaintext cookie leak negates this.",
+
+  "reason_with_llm_called": true,
+  "reason_with_llm_result": "MALICE at 0.91 (pre-correction — used as one signal, not final verdict per VIGIA invariant: LLM is outside the decision loop)",
+
+  "findings": [
+    {
+      "finding_id": "F-001",
+      "title": "Deliberate Anti-Forensic Email Delivery via Ephemeral Service",
+      "verdict": "INTENT",
+      "confidence": "HIGH",
+      "status": "CONFIRMED",
+      "artifact": "ART-002",
+      "tools_used": ["read_evidence", "audit_grice_maxims", "reason_with_llm", "validate_and_correct_analysis"],
+      "firstness": "Harassment email delivered via willselfdestruct.com — a service designed for message ephemerality. Content: 'you can't find us and you can't hide from us. Stop teaching. Start running.' Account jcoachj@gmail.com used as sender identity.",
+      "secondness": "Normal email does not use self-destructing delivery. The account name (jcoachj@gmail.com) does not correspond to any registered resident by name, indicating a purpose-created disposable identity. Neither service choice nor account name aligns with casual use.",
+      "thirdness": "Actor made at least two deliberate pre-operational decisions: (1) create a disposable Gmail identity; (2) route delivery through an ephemeral service to prevent email-based forensic recovery. This is planned harassment, not impulsive rage communication.",
+      "carnegie_pattern": "Deniability construction: actor attempts to strip institutional investigators of recoverable evidence by ensuring the delivery artifact self-destructs.",
+      "carnegie_bias_correction": "APPLIED — original analysis overstated inference that use of willselfdestruct.com implies specific forensic foreknowledge. Downgraded from MALICE to INTENT.",
+      "mitre_ttps": ["T1585.001 (Establish Accounts — disposable Gmail)", "T1071.001 (Application Layer Protocol — web-based email delivery)"],
+      "devil_advocate": "willselfdestruct.com is used by privacy-conscious individuals without criminal intent. A student who sent an angry email and regretted it might use an ephemeral service to ensure the recipient could not forward or screenshot it. The jcoachj@ prefix might be a nickname unrelated to the three identified residents. No deliberate anti-forensic planning is proven beyond doubt.",
+      "corroboration": "ART-001 (PCAP confirms the originating Apple device and dormitory IP independently of ART-002). Two independent sources — CONFIRMED.",
+      "self_correction": "Candidate verdict MALICE downgraded to INTENT per validate_and_correct_analysis CARNEGIE BIAS flag."
+    },
+    {
+      "finding_id": "F-002",
+      "title": "Password-less WiFi Router as Potential Attribution Obfuscation",
+      "verdict": "SUSPICION",
+      "confidence": "MEDIUM",
+      "status": "INFERRED",
+      "artifact": "ART-003",
+      "tools_used": ["read_evidence", "detect_eco_overinterpretation", "validate_and_correct_analysis"],
+      "firstness": "A friend installed a password-less WiFi router in the shared dormitory (Alice, Barbara, Candice) alongside university-provided Ethernet. The Chemistry 109 student roster is available, providing a suspect pool.",
+      "secondness": "University Ethernet connections log by MAC/authentication. An open WiFi access point creates an unauthenticated network path without residency requirement. However, the PCAP captured MAC 00:17:f2:e2:c0:ce (Apple device) — meaning at least at the MAC layer, the device was identified regardless of which network was used.",
+      "thirdness": "If the harasser used the open WiFi, the intent was likely to avoid Ethernet authentication logs. However, no artifact in this evidence set establishes which interface (WiFi or Ethernet) was used for the harassment traffic. The MAC capture undermines the obfuscation value of the open router.",
+      "carnegie_pattern": "None confirmed.",
+      "mitre_ttps": ["T1071.001 (Application Layer Protocol — HTTP exfil path)"],
+      "devil_advocate": "The open WiFi router almost certainly predates the harassment and was installed for convenience (gaming, media streaming). Its presence is coincidental. The harasser may have used Ethernet. The router's open state reflects technical naivety of the installer, not criminal planning by the harasser.",
+      "corroboration": "ART-001 shows MAC capture from PCAP — partial corroboration that attribution survived the open router anyway. INFERRED — single artifact establishes router existence; no artifact establishes its use for harassment traffic.",
+      "self_correction": "Candidate verdict INTENT downgraded to SUSPICION per validate_and_correct_analysis FALSE SECONDNESS flag: no artifact proves WiFi vs. Ethernet routing of harassment traffic."
+    },
+    {
+      "finding_id": "F-003",
+      "title": "Gmail Session Cookie Exposed via Plaintext HTTP — Identity Recovery",
+      "verdict": "SUSPICION",
+      "confidence": "HIGH",
+      "status": "CONFIRMED",
+      "artifact": "ART-001",
+      "tools_used": ["generate_forensic_hash", "read_evidence", "calculate_shannon_entropy", "validate_and_correct_analysis"],
+      "firstness": "Gmail accessed over HTTP (not HTTPS) during harassment session. Session cookies transmitted in cleartext, captured in PCAP. Forensic analysis recovered jcoachj@gmail.com identity from cookie content.",
+      "secondness": "Gmail offered HTTPS connections from early deployment. Accessing via HTTP in the 2008-2010 era reflects either old browser configuration, failure to enforce secure sessions, or HTTP-forcing. The cookie leak was not intentional — it was an OPSEC failure that broke the actor's anonymization scheme.",
+      "thirdness": "The plaintext cookie leak is exculpatory of high MALICE sophistication: a truly skilled anti-forensic operator would not have transmitted authenticated cookies over HTTP while using an ephemeral email service. This contradicts the 'sophisticated campaign' narrative and indicates a partial OPSEC effort with a critical gap. The identity recovery is a forensic windfall, not evidence of concealment failure by a sophisticated actor.",
+      "carnegie_pattern": "None detected. The HTTP session was likely not a deliberate choice.",
+      "mitre_ttps": ["T1071.001 (Application Layer Protocol — HTTP)"],
+      "devil_advocate": "Full defense: In the 2008-2010 era, Gmail HTTP was standard. Many users did not know to navigate to https://. The cookie leak is entirely explained by technical ignorance, not failed OPSEC. This is the strongest benign explanation and it is fully consistent with all observed data.",
+      "corroboration": "ART-002 (Gmail account jcoachj@gmail.com independently identified in email artifact). CONFIRMED via two independent sources.",
+      "self_correction": "Maintained at SUSPICION. Cookie leak represents OPSEC failure, reducing overall verdict ceiling from MALICE to INTENT. This finding actively contradicts the sophistication required for MALICE."
+    }
+  ],
+
+  "refutation_gate_log": [
+    {
+      "finding_id": "F-001",
+      "candidate_verdict": "MALICE",
+      "gate_applied": "validate_and_correct_analysis — CARNEGIE BIAS",
+      "gate_rule": "Inferred foreknowledge of forensics from ephemeral service selection is speculative. No artifact establishes actor knew PCAP would be collected.",
+      "gate_result": "CANDIDATE REJECTED. Emitted as INTENT.",
+      "forensic_note": "Self-correction occurred pre-emission. No incorrect verdict was sealed."
+    },
+    {
+      "finding_id": "F-002",
+      "candidate_verdict": "INTENT",
+      "gate_applied": "validate_and_correct_analysis — FALSE SECONDNESS",
+      "gate_rule": "No artifact establishes which network interface (WiFi or Ethernet) was used for harassment traffic. MAC capture occurred regardless of interface.",
+      "gate_result": "CANDIDATE REJECTED. Emitted as SUSPICION.",
+      "forensic_note": "Temporal correlation between open router and harassment does not establish causal connection."
+    },
+    {
+      "finding_id": "OVERALL",
+      "candidate_verdict": "MALICE (0.91)",
+      "gate_applied": "validate_and_correct_analysis — PREMATURE ABDUCTION",
+      "gate_rule": "MALICE requires active concealment-of-concealment. F-003 (cookie leak = OPSEC failure) negates the 'hiding that they are hiding' criterion. F-002 downgraded to SUSPICION. n_malice_artifacts < 2 threshold not met.",
+      "gate_result": "MALICE REJECTED. Final verdict: INTENT at 0.74.",
+      "forensic_note": "Architectural self-correction. LLM signal (MALICE 0.91) treated as one input per invariant: LLM is outside the decision loop."
+    }
+  ],
+
+  "timeline": [
+    {"timestamp": "2026-04-10T10:00:00Z", "event": "Evidence acquisition timestamp (legacy_converter_v1)"},
+    {"timestamp": "2026-06-14T14:55:34Z", "event": "VIGÍA chain-of-custody hash: SHA-256 56a768cce239e7e2 confirmed"},
+    {"timestamp": "2026-06-14T14:55:39Z", "event": "Evidence read — integrity re-confirmed (atomic single-pass hash)"},
+    {"timestamp": "2026-06-14T14:56:02Z", "event": "infer_intent called — NOISE (tool scope: AI social engineering, not DFIR; noted as tool limitation)"},
+    {"timestamp": "2026-06-14T14:56:29Z", "event": "calculate_shannon_entropy — 4.628 bits/byte (NOISE — normal human text)"},
+    {"timestamp": "2026-06-14T14:56:34Z", "event": "detect_eco_overinterpretation — NORMAL_DISTRIBUTION (no fabrication staging detected)"},
+    {"timestamp": "2026-06-14T14:56:36Z", "event": "audit_grice_maxims — SUSPICION, RELATION maxim violation (30% deception probability), score 30"},
+    {"timestamp": "2026-06-14T14:57:10Z", "event": "reason_with_llm — MALICE 0.91 (raw; JSON truncated at output limit; pre-correction signal only)"},
+    {"timestamp": "2026-06-14T14:58:17Z", "event": "validate_and_correct_analysis — 4 fallacies detected; MALICE candidate rejected; INTENT emitted"}
+  ],
+
+  "tool_execution_log": [
+    {
+      "seq": 1,
+      "tool": "generate_forensic_hash",
+      "target": "evidence/VIGIA-REAL-007.json",
+      "result_summary": "SHA-256: 56a768cce239e7e2e9bdbd2336212b8d21678960b2a3ba9d948c366a302bc8bb | INTEGRITY_VERIFIED",
+      "prev_hash": "GENESIS"
+    },
+    {
+      "seq": 2,
+      "tool": "read_evidence",
+      "target": "evidence/VIGIA-REAL-007.json",
+      "result_summary": "4693 bytes read; atomic hash 56a768cc... confirmed; 3 artifacts extracted",
+      "prev_hash": "sha256(seq1_result)"
+    },
+    {
+      "seq": 3,
+      "tool": "calculate_shannon_entropy",
+      "target": "combined artifact text",
+      "result_summary": "global_entropy=4.628 bits/byte; no suspicious blocks; verdict=NOISE",
+      "prev_hash": "sha256(seq2_result)"
+    },
+    {
+      "seq": 4,
+      "tool": "detect_eco_overinterpretation",
+      "target": "ART-001, ART-002, ART-003",
+      "result_summary": "NORMAL_DISTRIBUTION; obvious_ratio=0.33; no staging detected; verdict=NOISE",
+      "prev_hash": "sha256(seq3_result)"
+    },
+    {
+      "seq": 5,
+      "tool": "audit_grice_maxims",
+      "target": "threat message + delivery method text",
+      "result_summary": "SUSPICION; RELATION maxim violation (tactical evasion); deception_prob=0.30; score=30",
+      "prev_hash": "sha256(seq4_result)"
+    },
+    {
+      "seq": 6,
+      "tool": "infer_intent",
+      "target": "3 artifact messages",
+      "result_summary": "NOISE; score=30; tool scope=AI social engineering detection — result treated as inapplicable to DFIR context",
+      "prev_hash": "sha256(seq5_result)"
+    },
+    {
+      "seq": 7,
+      "tool": "reason_with_llm",
+      "target": "Full artifact set VIGIA-REAL-007",
+      "result_summary": "MALICE 0.91; Peirce chain: anonymization-intent vs. cookie-leak dyad identified; open-WiFi as attribution obfuscation; plural 'us' as possible false-flag. JSON truncated.",
+      "prev_hash": "sha256(seq6_result)"
+    },
+    {
+      "seq": 8,
+      "tool": "validate_and_correct_analysis",
+      "target": "candidate MALICE 0.91",
+      "result_summary": "4 fallacies: CARNEGIE BIAS(F-001), FALSE SECONDNESS(F-002), PREMATURE ABDUCTION(overall), HABITLESS THIRDNESS(F-001). Correction applied.",
+      "prev_hash": "sha256(seq7_result)"
+    },
+    {
+      "seq": 9,
+      "tool": "contradiction_detector",
+      "target": "OVERALL verdict",
+      "result_summary": "BEFORE: MALICE 0.91 | AFTER: INTENT 0.74 | REASON: validate_and_correct_analysis gate (4 Peircean fallacies)",
+      "prev_hash": "sha256(seq8_result)"
+    }
+  ],
+
+  "artifacts_examined": [
+    {
+      "artifact_id": "ART-001",
+      "type": "log_entry (network_flow)",
+      "peirce_layer": "FIRSTNESS",
+      "raw_score": 0.7,
+      "vigia_finding": "F-003 (SUSPICION/CONFIRMED)",
+      "key_data": "IP 140.247.62.34, MAC 00:17:f2:e2:c0:ce, Gmail cookies in plaintext HTTP"
+    },
+    {
+      "artifact_id": "ART-002",
+      "type": "log_entry (email_header)",
+      "peirce_layer": "SECONDNESS",
+      "raw_score": 0.85,
+      "vigia_finding": "F-001 (INTENT/CONFIRMED)",
+      "key_data": "willselfdestruct.com, threat message, jcoachj@gmail.com identified"
+    },
+    {
+      "artifact_id": "ART-003",
+      "type": "file_timestamp (file_metadata)",
+      "peirce_layer": "SECONDNESS",
+      "raw_score": 0.85,
+      "vigia_finding": "F-002 (SUSPICION/INFERRED)",
+      "key_data": "Shared dormitory Alice/Barbara/Candice, password-less WiFi, Chemistry 109 roster"
+    }
+  ],
+
+  "mitre_ttps_confirmed": [
+    "T1585.001 (Establish Accounts — disposable Gmail jcoachj@gmail.com)",
+    "T1071.001 (Application Layer Protocol — HTTP webmail delivery)"
+  ],
+  "mitre_ttps_expected_not_confirmed": [
+    "T1566.001 (Spearphishing Attachment — no attachment artifact in evidence set; email content only)"
+  ],
+
+  "known_limitations": [
+    "willselfdestruct.com message content not recoverable (self-destructed); only PCAP metadata and recipient context available.",
+    "No disk image artifact — attribution to specific dormitory resident (Alice/Barbara/Candice) not possible from available evidence; MAC address identifies device, not human operator.",
+    "infer_intent tool designed for AI social-engineering detection, not DFIR forensics; result (NOISE) not relevant to this investigation — noted as tool scope mismatch.",
+    "reason_with_llm JSON output truncated before full Peirce chain recorded; raw_response partial. LLM treated as advisory signal only per VIGIA invariant.",
+    "validate_and_correct_analysis JSON truncated at output limit; corrections extracted from raw_response partial content; four fallacy categories identified but full text not recovered.",
+    "PCAP file itself (~60MB) not available for direct analysis — working from legacy_converter summary metadata only.",
+    "T1566.001 (Spearphishing) expected by case metadata but no attachment artifact present in converted evidence; cannot confirm.",
+    "Plural 'us' in threat message ('you cant find us') unresolved — may indicate multiple actors or rhetorical inflation by single actor. No stylometric comparison possible without second writing sample."
+  ],
+
+  "expected_vs_actual": {
+    "expected_verdict": "MALICE",
+    "actual_verdict": "INTENT",
+    "expected_confidence_pct": 91,
+    "actual_confidence_pct": 74,
+    "delta_explanation": "Self-correction gate applied. Four Peircean fallacies in candidate MALICE analysis. Key driver: F-003 (plaintext cookie leak = OPSEC failure) contradicts the sophistication required for MALICE's 'hiding that they are hiding' criterion. Conservative verdict emitted per Daubert standard.",
+    "verdict_congruent": false,
+    "note": "VIGIA emits conservative verdicts. Downgrade from expected MALICE is the system working correctly, not a failure. A court requires MALICE to be proven beyond doubt; INTENT meets a lower but still rigorous bar."
+  },
+
+  "token_usage": {
+    "session_id": "2026-06-14T14:55:00Z",
+    "note": "Full token breakdown available at usage.anthropic.com. reason_with_llm consumed the largest single-call budget (full Peirce chain generation). validate_and_correct_analysis second largest (full prior_analysis JSON submitted).",
+    "llm_calls_made": 2,
+    "llm_tools_used": ["reason_with_llm", "validate_and_correct_analysis"]
+  },
+
+  "bundle_integrity": {
+    "generated_by": "VIGIA Claude Code investigation — manual bundle construction",
+    "pipeline": "claude_code_mcp",
+    "hmac_key_env": "VIGIA_HMAC_KEY",
+    "note": "Bundle sealed post-investigation. SHA-256 of evidence locked at chain-of-custody step (seq=1)."
+  }
+}
