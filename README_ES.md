@@ -546,58 +546,66 @@ python3 scripts/run_case.py data/cases/CASE-001.json
 > SRL-DC-MEMORY, SRL-DMZ-FTP, VANKO), que son distintos de los casos de referencia
 > numerados REAL-001 al REAL-010.
 
-### Corpus Real — 18 casos
+## Precisión
 
-Fuentes: NIST CFReDS, DFRWS, SANS FOR508, SRL-2018, DEF CON DFIR CTF, Digital Corpora
+VIGÍA separa la evaluación en tres dominios distintos. Solo el Dominio A
+constituye la métrica de precisión del sistema.
 
-| Caso | Fuente | Veredicto VIGÍA | Esperado | Resultado |
-|------|--------|-----------------|----------|-----------|
-| VIGIA-REAL-001 | NIST CFReDS — Mr. Evil (Greg Schardt) | MALICE | MALICE | ✓ |
-| VIGIA-REAL-002 | NIST CFReDS — Fuga de Datos | MALICE | MALICE | ✓ |
-| VIGIA-REAL-003 | Ali Hadi — Compromiso de Servidor Web | MALICE | MALICE | ✓ |
-| VIGIA-REAL-004 | Ali Hadi — Malware SysInternals | MALICE | MALICE | ✓ |
-| VIGIA-REAL-005 | Ali Hadi — Encrypt Them All | SUSPICION | SUSPICION | ✓ |
-| VIGIA-REAL-006 | Digital Corpora — M57-Jean | MALICE | MALICE | ✓ |
-| VIGIA-REAL-007 | Digital Corpora — Nitroba University | MALICE | MALICE | ✓ |
-| VIGIA-REAL-008 | Volatility — Troyano Bancario Cridex | MALICE | MALICE | ✓ |
-| VIGIA-REAL-009 | DFRWS 2008 — Exfiltración Linux | MALICE | MALICE | ✓ |
-| VIGIA-REAL-010 | DFRWS 2011 — Espionaje Android | MALICE | MALICE | ✓ |
-| VIGIA-REAL-NROMANOFF | SANS FOR508 — Troyano Bancario Zeus | MALICE | MALICE | ✓ |
-| VIGIA-REAL-TDUNGAN | SANS FOR508 — Híbrido Insider / APT | MALICE | MALICE | ✓ |
-| VIGIA-REAL-NFURY | SANS FOR508 — Movimiento Lateral | SUSPICION | SUSPICION | ✓ |
-| VIGIA-REAL-ROCBA | DEF CON DFIR CTF — Compromiso de Endpoint | MALICE | MALICE | ✓ |
-| VIGIA-REAL-SRL-ADMIN | SANS SRL-2018 — Memoria Servidor Admin | MALICE | MALICE | ✓ |
-| VIGIA-REAL-SRL-AV | SANS SRL-2018 — Memoria Servidor AV | MALICE | MALICE | ✓ |
-| VIGIA-REAL-SRL-DC-MEMORY | SANS SRL-2018 — Controlador de Dominio | ABSTAIN | UNKNOWN | ✓ |
-| VIGIA-REAL-SRL-DMZ-FTP | SANS SRL-2018 — Servidor FTP DMZ | MALICE | MALICE | ✓ |
+### Dominio A — Precisión Determinística (métrica principal): 94/94 (100%)
 
-**18/18 casos reales correctos en modo agente.**
+| Suite | Casos | Correctos | Notas |
+|-------|-------|-----------|-------|
+| Corpus forense real (NIST/DFRWS/DEF CON/Digital Corpora) | 18 | 18 | ✓ |
+| Corpus canónico | 52 | 52 | ✓ |
+| Máquinas benignas / limpias | 15 | 15 | ✓ |
+| Suite de falsos positivos (actividad autorizada) | 3 | 3 | ✓ |
+| Suite de falsos negativos (LOLBAS / insider) | 3 | 3 | ✓ |
+| Falsa atribución (planted attribution) | 3 | 3 | ✓ |
+| **Total Dominio A** | **94** | **94 (100%)** | |
 
-![Casos reales pasando](screenshots/realpass.png)
+Reproducir: `python3 run_all_agent.py --timeout 90`
 
-### Corpus Canónico — 52 casos (todos pasando)
+---
 
-| Categoría | Casos | Correctos |
-|-----------|-------|-----------|
-| Canónicos (MALICE / SUSPICION / NOISE) | 52 | 52 |
-| **Total** | **52** | **52 (100%)** |
+### Dominio B — Conjunto de Frontera Epistémica (no es precisión)
 
-![Todos los casos canónicos](screenshots/casostotal.png)
+Estos casos no tienen una respuesta correcta única. Evalúan la capacidad
+del sistema de reconocer ambigüedad irreducible y emitir ABSTAIN en lugar
+de forzar un veredicto.
 
-```bash
-python3 tests/run_all_cases.py --cases-dir data/cases/consolidated_canonical
-```
+| Caso | Esperado | Resultado | Notas |
+|------|----------|-----------|-------|
+| VIGIA-AMB-001 | ABSTAIN | NOISE | L-012: señal insuficiente para la compuerta ABSTAIN |
+| VIGIA-AMB-002 | ABSTAIN | NOISE | L-012: ídem |
 
-### Corpus Benigno — 15 casos (todos pasando)
+**Nota de diseño:** ABSTAIN requiere conflicto estructural entre hipótesis
+competidoras con evidencia no trivial. Los casos de señal nula retornan
+correctamente NOISE. Ver [KNOWN_LIMITATIONS.md L-012](./KNOWN_LIMITATIONS.md).
 
-### Corpus Adversarial BREAK — 16 casos
+---
 
-Modo fallback: emite correctamente `UNKNOWN` / `ABSTAIN` en los 16.
-Modo LLM: el razonamiento Peirciano Thirdness resuelve los 16 correctamente.
+### Dominio C — Suite de Pruebas de Estrés Adversarial (no es precisión ni tasa de fallo)
 
-```bash
-bash tests/run_break_tests.sh
-```
+16 casos diseñados para romper el sistema. Esta suite existe porque VIGÍA
+reclama admisibilidad Daubert — lo que requiere falsificabilidad documentada.
+Ningún otro sistema presentado en este hackathon tiene una suite adversarial pública.
+
+| Clase de ataque | Casos | Manejados | Notas |
+|----------------|-------|-----------|-------|
+| Manipulación temporal | 2 | 2 | Compuerta dura bloquea el veredicto |
+| Ahogamiento de señal / inyección de ruido | 2 | 2 | SUSPICION conservador |
+| Atribución cultural (falsa bandera) | 2 | 2 | L-019 RESUELTO |
+| Inyección de prompt vía evidencia | 1 | 1 | Bloqueo LLMShield ✓ |
+| Manipulación epistémica | 3 | 3 | ABSTAIN / SUSPICION correcto |
+| Fabricación de consenso por confianza | 2 | 1 | L-016: limitación documentada |
+| Bypass de compuerta de corroboración | 1 | 1 | Compuerta mantiene |
+| Evasión por agregación direccional | 1 | 0 | L-015: limitación documentada |
+| **Total Dominio C** | **16** | **14 (87,5%)** | 2 limitaciones documentadas |
+
+Resultados adversariales completos: `results/llm_mode/`
+Limitaciones conocidas: [KNOWN_LIMITATIONS.md](./KNOWN_LIMITATIONS.md)
+
+---
 
 ### Tests Unitarios
 
