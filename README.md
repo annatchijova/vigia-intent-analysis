@@ -550,6 +550,23 @@ python3 scripts/run_case.py data/cases/CASE-001.json
 
 ## Accuracy & Evidence Dataset
 
+> **Dataset Availability**
+>
+> The original forensic images used during evaluation (memory dumps, E01 images,
+> PCAP collections, and related artifacts) are **not included in this repository**.
+> The complete corpus spans many GB and contains third-party forensic datasets
+> that cannot be redistributed.
+>
+> This repository includes the full agent implementation, deterministic scoring engine,
+> generated forensic bundles, agent-produced JSON outputs, final reports, and the
+> complete reproduction workflow.
+>
+> All JSON reports in `/results` were produced by VIGÍA during real end-to-end
+> executions — they are not manually authored examples. This applies in particular
+> to the named cases (NROMANOFF, TDUNGAN, NFURY, ROCBA, SRL-ADMIN, SRL-AV,
+> SRL-DC-MEMORY, SRL-DMZ-FTP, VANKO), which are distinct from the numbered
+> reference cases REAL-001 through REAL-010.
+
 ### Real Corpus — 18 cases
 
 Sources: NIST CFReDS, DFRWS, SANS FOR508, SRL-2018, DEF CON DFIR CTF, Digital Corpora

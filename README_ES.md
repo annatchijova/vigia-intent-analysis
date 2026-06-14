@@ -528,6 +528,23 @@ python3 scripts/run_case.py data/cases/CASE-001.json
 
 ## Precisión y Dataset de Evidencia
 
+> **Disponibilidad del Dataset**
+>
+> Las imágenes forenses originales utilizadas durante la evaluación (volcados de memoria,
+> imágenes E01, colecciones PCAP y artefactos relacionados) **no están incluidas en este
+> repositorio**. El corpus completo ocupa muchos GB y contiene datasets forenses de
+> terceros que no pueden redistribuirse.
+>
+> Este repositorio incluye la implementación completa del agente, el motor de puntuación
+> determinístico, los bundles forenses generados, los outputs JSON producidos por el agente,
+> los informes finales y el flujo de reproducción completo.
+>
+> Todos los reportes JSON en `/results` fueron producidos por VIGÍA durante ejecuciones
+> reales de extremo a extremo — no son ejemplos elaborados manualmente. Esto aplica en
+> particular a los casos con nombre (NROMANOFF, TDUNGAN, NFURY, ROCBA, SRL-ADMIN, SRL-AV,
+> SRL-DC-MEMORY, SRL-DMZ-FTP, VANKO), que son distintos de los casos de referencia
+> numerados REAL-001 al REAL-010.
+
 ### Corpus Real — 18 casos
 
 Fuentes: NIST CFReDS, DFRWS, SANS FOR508, SRL-2018, DEF CON DFIR CTF, Digital Corpora
