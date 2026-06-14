@@ -1,249 +1,179 @@
 {
-  "analysis_timestamp": "2026-06-14T01:57:04.412083+00:00",
-  "audit_trail": {
-    "agent_version": "1.0.0-SANS-2026",
-    "case_id": "VIGIA-REAL-007",
-    "end_time": "2026-06-14T01:57:04.412086+00:00",
-    "entries": [
+  "bundle_id": "70abd142-9a2b-4efb-85f2-8e7d64a84988",
+  "bundle_version": "1.0",
+  "timestamp": "2026-06-14T14:19:56.642880+00:00",
+  "evidence_graph": {
+    "nodes": [
+      "ART-001",
+      "ART-002",
+      "ART-003"
+    ],
+    "edges": [
       {
-        "action": "AGENT_INITIALIZED",
-        "case_id": "VIGIA-REAL-007",
-        "entry_sha256": "41f390337a4e85d1650eb2b54a3ba814d33f62a77956d35b386af205959e16cf",
-        "inputs_summary": {
-          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
-          "case_id": "VIGIA-REAL-007"
-        },
-        "iteration": 0,
-        "note": "Agent initialized \u2014 source SHA-256: 4eeafb3bfb155486...",
-        "outputs_summary": {
-          "agent_sha256": "4eeafb3bfb155486142942ad7a2c8678676f86ffd5d076882459354d820591f6",
-          "agent_version": "1.0.0-SANS-2026"
-        },
-        "seq": 1,
-        "timestamp": "2026-06-14T01:57:04.409475+00:00",
-        "tool": "vigia_agent"
+        "source": "ART-001",
+        "target": "ART-002",
+        "stability": 0.7,
+        "weight_mean": 0.7,
+        "confidence_interval": [
+          0.0,
+          1.0
+        ],
+        "dependency_type": "statistical_dependency"
       },
       {
-        "action": "EVIDENCE_INTEGRITY_CHECK",
-        "case_id": "VIGIA-REAL-007",
-        "entry_sha256": "926af48ff40b07af69c125d675e75347c1cb06f83d8bf2ae2f32ed6de8046303",
-        "inputs_summary": {
-          "path": "data/cases/converted/VIGIA-REAL-007.json"
-        },
-        "iteration": 0,
-        "note": "Computing SHA-256 of original evidence",
-        "outputs_summary": {},
-        "seq": 2,
-        "timestamp": "2026-06-14T01:57:04.409551+00:00",
-        "tool": "sha256_hasher"
-      },
-      {
-        "action": "EVIDENCE_INTEGRITY_CHECK",
-        "case_id": "VIGIA-REAL-007",
-        "entry_sha256": "20a39f776b479a4f58f84fe2a5108d1b94d5f4ce2221b358eca61fd24306528f",
-        "inputs_summary": {
-          "path": "data/cases/converted/VIGIA-REAL-007.json"
-        },
-        "iteration": 0,
-        "note": "Evidence verified: 56a768cce239e7e2...",
-        "outputs_summary": {
-          "sha256": "56a768cce239e7e2e9bdbd2336212b8d21678960b2a3ba9d948c366a302bc8bb"
-        },
-        "seq": 3,
-        "timestamp": "2026-06-14T01:57:04.409632+00:00",
-        "tool": "sha256_hasher"
-      },
-      {
-        "action": "PIPELINE_EXECUTE",
-        "case_id": "VIGIA-REAL-007",
-        "entry_sha256": "ee19988e5b0f6e6ff67dbf61072b5f7d6974bc9162c86e9b6aa9249021f0a31d",
-        "inputs_summary": {
-          "evidence": "data/cases/converted/VIGIA-REAL-007.json",
-          "iteration": "0",
-          "params": {}
-        },
-        "iteration": 0,
-        "note": "Executing pipeline \u2014 iteration 0",
-        "outputs_summary": {},
-        "seq": 4,
-        "timestamp": "2026-06-14T01:57:04.409724+00:00",
-        "tool": "vigia_pipeline"
-      },
-      {
-        "action": "PIPELINE_COMPLETE",
-        "case_id": "VIGIA-REAL-007",
-        "entry_sha256": "5dc91a57a83f2056a2c9234374d14cc3aed7666ebd45bd7d26e579637e7c9b9c",
-        "inputs_summary": {
-          "iteration": "0"
-        },
-        "iteration": 0,
-        "note": "Pipeline completed \u2014 3 signals",
-        "outputs_summary": {
-          "abduction": {
-            "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
-            "best_posterior": "129/1000",
-            "confidence": "129/1000",
-            "is_conclusive": "True",
-            "narrative": "Chemistry professor Lily Tuckrige at Nitroba State University received harassment emails. The captured network traffic (~60MB pcap) revealed the perpetrator used Gmail webmail from an internal dormito..."
-          },
-          "case_id": "VIGIA-REAL-007",
-          "pipeline_meta": {
-            "artifact_count": "3",
-            "avg_score": "129/200",
-            "expected_verdict": "MALICE",
-            "source": "ebs_v1_json_adapter"
-          },
-          "signals": [
-            {
-              "artifact_id": "ART-001",
-              "confidence": "7/10",
-              "description": "PCAP ~60MB | External source IP: 140.247.62.34 (student dormitory) | Internal NAT IP: 192.168.15.4 | MAC address: 00:17:f2:e2:c0:ce (Apple device) | User Agent: Firefox 2.0.0.16 / Mac OS X (dominante)",
-              "evidence_type": "log_entry",
-              "source": "legacy_converter",
-              "z_score": "49/100"
-            },
-            {
-              "artifact_id": "ART-002",
-              "confidence": "17/20",
-              "description": "Email #2: willselfdestruct.com | Message: 'you can't find us and you can't hide from us. Stop teaching. Start running.' | Identified account: jcoachj@gmai",
-              "evidence_type": "log_entry",
-              "source": "legacy_converter",
-              "z_score": "289/400"
-            },
-            {
-              "artifact_id": "ART-003",
-              "confidence": "17/20",
-              "description": "Network setup: Three women share a dormitory (Alice, Barbara, Candice) | Password-less WiFi router installed by a friend | Ethernet provided by university | Student roster: Chemistry 109 available",
-              "evidence_type": "file_timestamp",
-              "source": "legacy_converter",
-              "z_score": "289/400"
-            }
-          ]
-        },
-        "seq": 5,
-        "timestamp": "2026-06-14T01:57:04.411775+00:00",
-        "tool": "vigia_pipeline"
-      },
-      {
-        "action": "CONTRADICTION_CHECK",
-        "case_id": "VIGIA-REAL-007",
-        "entry_sha256": "b4decb6f7d50f820c58bca645fd7cc08bcb73ce4a15928c625270a01966f18e1",
-        "inputs_summary": {
-          "n_signals": "3"
-        },
-        "iteration": 0,
-        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
-        "outputs_summary": {
-          "contradictions_found": "0",
-          "threshold": "2"
-        },
-        "seq": 6,
-        "timestamp": "2026-06-14T01:57:04.411874+00:00",
-        "tool": "contradiction_detector"
-      },
-      {
-        "action": "AGENT_EXIT",
-        "case_id": "VIGIA-REAL-007",
-        "entry_sha256": "1c6013ac8c2363aa37a84bdf864303d5a1ce7d1757e0e1d0e4c6d2c2f1ff8142",
-        "inputs_summary": {
-          "verdict": "MALICIOUS_INTENT_DETECTED"
-        },
-        "iteration": 0,
-        "note": "Exit code 1 \u2014 analysis complete.",
-        "outputs_summary": {
-          "exit_code": "1"
-        },
-        "seq": 7,
-        "timestamp": "2026-06-14T01:57:04.412009+00:00",
-        "tool": "vigia_agent"
+        "source": "ART-002",
+        "target": "ART-003",
+        "stability": 0.85,
+        "weight_mean": 0.85,
+        "confidence_interval": [
+          0.0,
+          1.0
+        ],
+        "dependency_type": "statistical_dependency"
       }
     ],
-    "start_time": "2026-06-14T01:57:04.409258+00:00",
-    "total_entries": 7
+    "bootstrap_rounds": 500,
+    "stability_threshold": 0.85,
+    "graph_hash": "41bdb7e55b462fe6fe7e3d08e160f08c39fa957b8fe7ef7b077ae53c68225c1f",
+    "generated_at": "2026-06-14T14:19:56.642825+00:00"
   },
-  "case_id": "VIGIA-REAL-007",
-  "evidence_path": "data/cases/converted/VIGIA-REAL-007.json",
-  "evidence_sha256": "56a768cce239e7e2e9bdbd2336212b8d21678960b2a3ba9d948c366a302bc8bb",
-  "iterations_executed": 1,
-  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-REAL-007 ===\nEvidence: data/cases/converted/VIGIA-REAL-007.json\nEvidence SHA-256: 56a768cce239e7e2e9bdbd2336212b8d21678960b2a3ba9d948c366a302bc8bb\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 129/1000\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\nChemistry professor Lily Tuckrige at Nitroba State University received harassment emails. The captured network traffic (~60MB pcap) revealed the perpetrator used Gmail webmail from an internal dormitory IP address, sending cookies in plaintext over HTTP.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Email #2: willselfdestruct.com | Message: 'you can't find us and you c] z=0.723 conf=0.85 \u2014 \n  [Network setup: Three women share a dormitory (Alice, Barbara, Candice)] z=0.723 conf=0.85 \u2014 \n  [PCAP ~60MB | External source IP: 140.247.62.34 (student dormitory) | I] z=0.490 conf=0.70 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW \u2014 No significant anomalies detected in this iteration.\n\nCritical signals (z>3): 0\nHigh signals (2<z<=3): 0\nTotal signals analyzed: 3",
-  "pipeline_results": {
-    "abduction": {
-      "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
-      "best_posterior": "129/1000",
-      "confidence": {
-        "__fraction__": true,
-        "den": 1000,
-        "num": 129
-      },
-      "is_conclusive": true,
-      "narrative": "Chemistry professor Lily Tuckrige at Nitroba State University received harassment emails. The captured network traffic (~60MB pcap) revealed the perpetrator used Gmail webmail from an internal dormitory IP address, sending cookies in plaintext over HTTP."
-    },
-    "case_id": "VIGIA-REAL-007",
-    "pipeline_meta": {
-      "artifact_count": 3,
-      "avg_score": "129/200",
-      "expected_verdict": "MALICE",
-      "source": "ebs_v1_json_adapter"
-    },
-    "signals": [
+  "decision_trace": {
+    "decision": "REJECT",
+    "posterior": 0.78,
+    "risk": 0.96,
+    "log_lr": 0.0,
+    "lr": 0.0,
+    "drift_score": 0.0,
+    "graph_stability": 1.0,
+    "lambda_drift": 2.0,
+    "gamma_stability": 2.0,
+    "epsilon_used": 0.05,
+    "components_used": 0,
+    "signal_contributions": null,
+    "reason_code": "VIGIA_SCORER:MALICE",
+    "abstain_reason": "",
+    "omega_intention": 1.0,
+    "consistency_score": 1.0
+  },
+  "policy_spec": {
+    "version": "1.0",
+    "rules": [
       {
-        "artifact_id": "ART-001",
-        "confidence": {
-          "__fraction__": true,
-          "den": 10,
-          "num": 7
-        },
-        "description": "PCAP ~60MB | External source IP: 140.247.62.34 (student dormitory) | Internal NAT IP: 192.168.15.4 | MAC address: 00:17:f2:e2:c0:ce (Apple device) | User Agent: Firefox 2.0.0.16 / Mac OS X (dominante)",
-        "evidence_type": "log_entry",
-        "source": "legacy_converter",
-        "z_score": {
-          "__fraction__": true,
-          "den": 100,
-          "num": 49
-        }
+        "variable": "posterior",
+        "max_delta": 0.1,
+        "allowed_roles": [
+          "system",
+          "analyst"
+        ],
+        "requires_approval": false,
+        "description": "Limite de cambio en probabilidad posterior"
       },
       {
-        "artifact_id": "ART-002",
-        "confidence": {
-          "__fraction__": true,
-          "den": 20,
-          "num": 17
-        },
-        "description": "Email #2: willselfdestruct.com | Message: 'you can't find us and you can't hide from us. Stop teaching. Start running.' | Identified account: jcoachj@gmai",
-        "evidence_type": "log_entry",
-        "source": "legacy_converter",
-        "z_score": {
-          "__fraction__": true,
-          "den": 400,
-          "num": 289
-        }
+        "variable": "drift",
+        "max_delta": 0.15,
+        "allowed_roles": [
+          "system"
+        ],
+        "requires_approval": false,
+        "description": "Limite de correccion de drift"
       },
       {
-        "artifact_id": "ART-003",
-        "confidence": {
-          "__fraction__": true,
-          "den": 20,
-          "num": 17
-        },
-        "description": "Network setup: Three women share a dormitory (Alice, Barbara, Candice) | Password-less WiFi router installed by a friend | Ethernet provided by university | Student roster: Chemistry 109 available",
-        "evidence_type": "file_timestamp",
-        "source": "legacy_converter",
-        "z_score": {
-          "__fraction__": true,
-          "den": 400,
-          "num": 289
-        }
+        "variable": "graph_stability",
+        "max_delta": 0.05,
+        "allowed_roles": [
+          "system"
+        ],
+        "requires_approval": true,
+        "description": "Cambios en estabilidad del grafo requieren aprobacion"
+      },
+      {
+        "variable": "lambda_drift",
+        "max_delta": 1.0,
+        "allowed_roles": [
+          "system"
+        ],
+        "requires_approval": false,
+        "description": "Ajuste adaptativo de sensibilidad al drift"
+      },
+      {
+        "variable": "gamma_stability",
+        "max_delta": 1.0,
+        "allowed_roles": [
+          "system"
+        ],
+        "requires_approval": false,
+        "description": "Ajuste adaptativo de sensibilidad estructural"
       }
-    ]
+    ],
+    "epsilon_accept": 0.05,
+    "epsilon_reject": 0.05,
+    "lambda_drift_init": 2.0,
+    "gamma_stability_init": 2.0,
+    "description": "Politica VIGIA por defecto — SANS FIND EVIL 2026",
+    "created_at": "2026-06-14T14:19:56.642856+00:00"
   },
-  "sans_compliance": {
-    "accuracy_validation": false,
-    "analytical_reasoning": true,
-    "architectural_guardrails": true,
-    "audit_trail": true,
-    "evidence_integrity": true,
-    "self_correction": false
+  "actions": [],
+  "system_state": {
+    "lambda_drift": 2.0,
+    "gamma_stability": 2.0,
+    "epsilon_accept": 0.05,
+    "epsilon_reject": 0.05,
+    "drift_score": 0.0,
+    "graph_stability_global": 0.8,
+    "calibration_model_hash": "",
+    "engine_version": "vigia-ebs-v1.0",
+    "timestamp": "2026-06-14T14:19:56.642861+00:00"
   },
-  "self_corrections_applied": 0,
-  "vigia_agent_version": "1.0.0-SANS-2026"
+  "config_attestation": {
+    "vigia_version": "1.0",
+    "config_hash": "74400c4e1e96deb97a94bb33b3fd214fca16d8336e3375d6eff3f1b696d09e2c",
+    "deviation_from_canonical": false,
+    "modified_params": [],
+    "canonical_version": "1.0.0",
+    "caie_enabled": true,
+    "caie_verdict": "MALICE"
+  },
+  "abduction_trace": {
+    "tools_available": [],
+    "tools_executed": [],
+    "tools_skipped": [],
+    "dominant_signal": null,
+    "dominant_z_score": 0.0,
+    "cluster_name": null,
+    "anomalies_found": [],
+    "peirce_firstness": "PCAP captures HTTP sessions to willselfdestruct.com from MAC 00:17:f2:e2:c0:ce (Apple) at IP 192.168.15.4->NAT 140.247.62.34. Gmail cookies transmitted in plaintext.",
+    "peirce_secondness": "willselfdestruct.com used to send repeated explicit threats to university professor. 6/6 actions out-of-habit. Gmail HTTP session leaked jcoachj@gmail.com via cookie headers.",
+    "peirce_thirdness": "Selection of evidence-destroying platform = a priori knowledge of legal actionability. CAIE fracture: evidence destruction = active concealment of concealment = MALICE.",
+    "execution_plan_rationale": [],
+    "abort_reason": null,
+    "abort_triggered": false,
+    "inference_mode": "STANDALONE_SCORER",
+    "clustering_method": "heuristic_default",
+    "correlation_penalties_applied": false
+  },
+  "caie_analysis": {
+    "verdict": "MALICE",
+    "composite_score": 0.96,
+    "confidence": 0.78,
+    "caie_fractures": 0,
+    "caie_fractures_source": "live_caie",
+    "hard_temporal_gate": false,
+    "peirce_chain": {
+      "firstness": "PCAP captures HTTP sessions to willselfdestruct.com from MAC 00:17:f2:e2:c0:ce (Apple) at IP 192.168.15.4->NAT 140.247.62.34. Gmail cookies transmitted in plaintext.",
+      "secondness": "willselfdestruct.com used to send repeated explicit threats to university professor. 6/6 actions out-of-habit. Gmail HTTP session leaked jcoachj@gmail.com via cookie headers.",
+      "thirdness": "Selection of evidence-destroying platform = a priori knowledge of legal actionability. CAIE fracture: evidence destruction = active concealment of concealment = MALICE."
+    },
+    "quadripartite_state": {},
+    "reason": "Claude Code Peircean Analysis: willselfdestruct.com anti-forensic selection (2-source CONFIRMED) + Gmail cookie exposure + plural misdirection. Self-correction applied: overconfidence reduced 0.92->0.78.",
+    "case_id": "VIGIA-REAL-007"
+  },
+  "integrity": {
+    "bundle_hash": "5a4d517dc7f1c8bda05a2c9c0ebc72b87dfbf44fc8ee5656548cc5be4e874b71",
+    "graph_hash": "41bdb7e55b462fe6fe7e3d08e160f08c39fa957b8fe7ef7b077ae53c68225c1f",
+    "policy_hash": "03d292f33eef1e4a2f355fe83299bdb8e72124c710f79ab4626d85a3998e9567",
+    "decision_hash": "1c6756f75282515be4cc4cc056ad96988eea755857f8d0b4fa496235ac8ce864",
+    "engine_attestation_hash": "",
+    "ecl_hash": "",
+    "sealed_at": "2026-06-14T14:19:56.643121+00:00"
+  }
 }
