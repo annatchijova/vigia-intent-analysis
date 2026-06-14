@@ -1,229 +1,249 @@
 {
-  "bundle_id": "4d97873b-b9c8-4115-834f-732dc8fd5ff5",
-  "bundle_version": "1.0",
-  "timestamp": "2026-06-14T13:53:47.155968+00:00",
-  "evidence_graph": {
-    "nodes": [
-      "ART-001",
-      "ART-002",
-      "ART-003"
-    ],
-    "edges": [
+  "analysis_timestamp": "2026-06-14T01:57:04.258522+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "VIGIA-REAL-005",
+    "end_time": "2026-06-14T01:57:04.258526+00:00",
+    "entries": [
       {
-        "source": "ART-001",
-        "target": "ART-002",
-        "stability": 0.5,
-        "weight_mean": 0.5,
-        "confidence_interval": [
-          0.0,
-          1.0
-        ],
-        "dependency_type": "statistical_dependency"
+        "action": "AGENT_INITIALIZED",
+        "case_id": "VIGIA-REAL-005",
+        "entry_sha256": "22f5a35ae6bc2e4fd65a63696563e11b4ffe015f705a150708427548666bf493",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "VIGIA-REAL-005"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: 4eeafb3bfb155486...",
+        "outputs_summary": {
+          "agent_sha256": "4eeafb3bfb155486142942ad7a2c8678676f86ffd5d076882459354d820591f6",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-06-14T01:57:04.255489+00:00",
+        "tool": "vigia_agent"
       },
       {
-        "source": "ART-002",
-        "target": "ART-003",
-        "stability": 0.5,
-        "weight_mean": 0.5,
-        "confidence_interval": [
-          0.0,
-          1.0
-        ],
-        "dependency_type": "statistical_dependency"
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-REAL-005",
+        "entry_sha256": "b049ef92dca30f05ed58a8da51a091139c86825de463f34f5e5e1c4a530a285d",
+        "inputs_summary": {
+          "path": "data/cases/converted/VIGIA-REAL-005.json"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-06-14T01:57:04.255564+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-REAL-005",
+        "entry_sha256": "28b611c431f7a78ef6543830aa58600c62a12abc5e0206a42a22bf75dbe0df97",
+        "inputs_summary": {
+          "path": "data/cases/converted/VIGIA-REAL-005.json"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: 1661927cbb3b9e3a...",
+        "outputs_summary": {
+          "sha256": "1661927cbb3b9e3a7050e4753eccf64690869b05104c409937308975948fe3e5"
+        },
+        "seq": 3,
+        "timestamp": "2026-06-14T01:57:04.255644+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "VIGIA-REAL-005",
+        "entry_sha256": "245f47a19acc0fa7b432bec1dfb5362a592d11f4fbc6f8e8f4334f9145a517f3",
+        "inputs_summary": {
+          "evidence": "data/cases/converted/VIGIA-REAL-005.json",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-06-14T01:57:04.255733+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "VIGIA-REAL-005",
+        "entry_sha256": "3078698e29129cd4760c768ba78033947518dadfb226ea86cf62f0c37d53cbc6",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 3 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "SUSPICION_DETECTED",
+            "best_posterior": "827/6000",
+            "confidence": "827/6000",
+            "is_conclusive": "True",
+            "narrative": "Jane has been using multiple encryption methods to conceal communication: an AES-encrypted README file in Documents, a BitLocker volume named R2D2, and a keys file in Downloads encrypted with GPG/PGP ..."
+          },
+          "case_id": "VIGIA-REAL-005",
+          "pipeline_meta": {
+            "artifact_count": "3",
+            "avg_score": "827/1200",
+            "expected_verdict": "SUSPICION",
+            "source": "ebs_v1_json_adapter"
+          },
+          "signals": [
+            {
+              "artifact_id": "ART-001",
+              "confidence": "7/10",
+              "description": "README file in user's Documents directory | Status: Encrypted with AES | No password available | Possible unencrypted version in system cache | keys file in Downloads directory | Status: Encrypted wit",
+              "evidence_type": "file_timestamp",
+              "source": "legacy_converter",
+              "z_score": "49/100"
+            },
+            {
+              "artifact_id": "ART-002",
+              "confidence": "17/20",
+              "description": "BitLocker volume: Name='R2D2' | Status: Full disk encryption active | Recovery key possibly stored in AD, USB, or backup file | Type: Full disk encryption",
+              "evidence_type": "file_timestamp",
+              "source": "legacy_converter",
+              "z_score": "289/400"
+            },
+            {
+              "artifact_id": "ART-003",
+              "confidence": "9/10",
+              "description": "GPG/PGP keys in user profile | Asymmetric encrypted communication with unknown party | 'keys' file contains message to decrypt | Possible private key pairs recoverable from the image",
+              "evidence_type": "memory_process",
+              "source": "legacy_converter",
+              "z_score": "171/200"
+            }
+          ]
+        },
+        "seq": 5,
+        "timestamp": "2026-06-14T01:57:04.258204+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "VIGIA-REAL-005",
+        "entry_sha256": "17d192320344f213050a73134edf60dfce1db8b8bc2cdd864d591b1173c2d5a4",
+        "inputs_summary": {
+          "n_signals": "3"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-06-14T01:57:04.258303+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "VIGIA-REAL-005",
+        "entry_sha256": "fed76b118c3ccfcf2f16fc3eabcbfa710b9ac83425af03000b8e64272587fb5d",
+        "inputs_summary": {
+          "verdict": "SUSPICION_DETECTED"
+        },
+        "iteration": 0,
+        "note": "Exit code 0 \u2014 analysis complete.",
+        "outputs_summary": {
+          "exit_code": "0"
+        },
+        "seq": 7,
+        "timestamp": "2026-06-14T01:57:04.258448+00:00",
+        "tool": "vigia_agent"
       }
     ],
-    "bootstrap_rounds": 500,
-    "stability_threshold": 0.85,
-    "graph_hash": "88e4d8f4967c363b7cfd3b619efde2c9acea917cc32686a71b6984db7101bae3",
-    "generated_at": "2026-06-14T13:53:47.155908+00:00"
-  },
-  "decision_trace": {
-    "decision": "ABSTAIN",
-    "posterior": 0.14,
-    "risk": 0.5,
-    "log_lr": 0.0,
-    "lr": 0.0,
-    "drift_score": 0.0,
-    "graph_stability": 1.0,
-    "lambda_drift": 2.0,
-    "gamma_stability": 2.0,
-    "epsilon_used": 0.05,
-    "components_used": 0,
-    "signal_contributions": null,
-    "reason_code": "VIGIA_SCORER:SUSPICION",
-    "abstain_reason": "",
-    "omega_intention": 1.0,
-    "consistency_score": 1.0,
-    "verdict": "SUSPICION"
-  },
-  "policy_spec": {
-    "version": "1.0",
-    "rules": [
-      {
-        "variable": "posterior",
-        "max_delta": 0.1,
-        "allowed_roles": [
-          "system",
-          "analyst"
-        ],
-        "requires_approval": false,
-        "description": "Limite de cambio en probabilidad posterior"
-      },
-      {
-        "variable": "drift",
-        "max_delta": 0.15,
-        "allowed_roles": [
-          "system"
-        ],
-        "requires_approval": false,
-        "description": "Limite de correccion de drift"
-      },
-      {
-        "variable": "graph_stability",
-        "max_delta": 0.05,
-        "allowed_roles": [
-          "system"
-        ],
-        "requires_approval": true,
-        "description": "Cambios en estabilidad del grafo requieren aprobacion"
-      },
-      {
-        "variable": "lambda_drift",
-        "max_delta": 1.0,
-        "allowed_roles": [
-          "system"
-        ],
-        "requires_approval": false,
-        "description": "Ajuste adaptativo de sensibilidad al drift"
-      },
-      {
-        "variable": "gamma_stability",
-        "max_delta": 1.0,
-        "allowed_roles": [
-          "system"
-        ],
-        "requires_approval": false,
-        "description": "Ajuste adaptativo de sensibilidad estructural"
-      }
-    ],
-    "epsilon_accept": 0.05,
-    "epsilon_reject": 0.05,
-    "lambda_drift_init": 2.0,
-    "gamma_stability_init": 2.0,
-    "description": "Politica VIGIA por defecto \u2014 SANS FIND EVIL 2026",
-    "created_at": "2026-06-14T13:53:47.155941+00:00"
-  },
-  "actions": [],
-  "system_state": {
-    "lambda_drift": 2.0,
-    "gamma_stability": 2.0,
-    "epsilon_accept": 0.05,
-    "epsilon_reject": 0.05,
-    "drift_score": 0.0,
-    "graph_stability_global": 0.5,
-    "calibration_model_hash": "",
-    "engine_version": "vigia-ebs-v1.0",
-    "timestamp": "2026-06-14T13:53:47.155946+00:00"
-  },
-  "config_attestation": {
-    "vigia_version": "1.0",
-    "config_hash": "880d929dc8e30b9b5a7ebeb79aed3d1a89c0a92e90968724f28c91bb9c48cecc",
-    "deviation_from_canonical": false,
-    "modified_params": [],
-    "canonical_version": "1.0.0",
-    "caie_enabled": true,
-    "caie_verdict": "SUSPICION"
-  },
-  "abduction_trace": {
-    "peirce_firstness": "Three distinct cryptographic systems on single workstation: AES-encrypted README in Documents, BitLocker volume R2D2, GPG/PGP asymmetric keys for communication with unknown party.",
-    "peirce_secondness": "Standard users employ one encryption method. Triple-layer encryption across different locations is structurally anomalous. GPG keys for unknown party indicates prior coordination.",
-    "peirce_thirdness": "Concealment pattern detected but content unknown. Without decrypted content, privacy cannot be distinguished from malice.",
-    "inference_mode": "CLAUDE_CODE_MCP"
-  },
-  "caie_analysis": {
-    "caie_composite": 0.0266,
-    "caie_structural_verdict": "MALICE",
-    "caie_probabilistic_verdict": "NOISE",
-    "caie_fractures": 1,
-    "scorer_raw_score": 0.275,
-    "scorer_raw_verdict": "UNKNOWN",
-    "analyst_verdict": "SUSPICION",
-    "habit_incongruence_score": 0.9,
-    "carnegie_pattern": "Concealment",
-    "mitre_ttps": [
-      "T1027",
-      "T1486",
-      "T1565",
-      "T1564"
-    ]
-  },
-  "integrity": {
-    "graph_hash": "88e4d8f4967c363b7cfd3b619efde2c9acea917cc32686a71b6984db7101bae3",
-    "bundle_hash": "2511e82ef0dada9c04896396c0f20ca957ad4270f1ad7b0f0ae9d6edd5e2c808",
-    "policy_hash": "03d292f33eef1e4a2f355fe83299bdb8e72124c710f79ab4626d85a3998e9567"
+    "start_time": "2026-06-14T01:57:04.255279+00:00",
+    "total_entries": 7
   },
   "case_id": "VIGIA-REAL-005",
-  "devil_advocate": "Encryption is a constitutionally protected activity. BitLocker is a standard Windows feature. GPG is recommended by EFF and security professionals. Volume name R2D2 is consistent with personal naming. A journalist, whistleblower, or privacy advocate would exhibit this exact pattern. Without decrypted content showing criminal activity, three encryption methods equals three locks on a door. Scorer returns UNKNOWN (0.275) confirming insufficient support for MALICE. No anti-forensic artifacts detected.",
-  "tool_execution_log": [
-    {
-      "seq": 1,
-      "tool": "sha256sum",
-      "target": "VIGIA-REAL-005.json",
-      "result_summary": "H1=1661927cbb3b..."
+  "evidence_path": "data/cases/converted/VIGIA-REAL-005.json",
+  "evidence_sha256": "1661927cbb3b9e3a7050e4753eccf64690869b05104c409937308975948fe3e5",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-REAL-005 ===\nEvidence: data/cases/converted/VIGIA-REAL-005.json\nEvidence SHA-256: 1661927cbb3b9e3a7050e4753eccf64690869b05104c409937308975948fe3e5\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: SUSPICION_DETECTED\nPosterior confidence: 827/6000\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\nJane has been using multiple encryption methods to conceal communication: an AES-encrypted README file in Documents, a BitLocker volume named R2D2, and a keys file in Downloads encrypted with GPG/PGP public/private key.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [GPG/PGP keys in user profile | Asymmetric encrypted communication with] z=0.855 conf=0.90 \u2014 \n  [BitLocker volume: Name='R2D2' | Status: Full disk encryption active | ] z=0.723 conf=0.85 \u2014 \n  [README file in user's Documents directory | Status: Encrypted with AES] z=0.490 conf=0.70 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW \u2014 No significant anomalies detected in this iteration.\n\nCritical signals (z>3): 0\nHigh signals (2<z<=3): 0\nTotal signals analyzed: 3",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "SUSPICION_DETECTED",
+      "best_posterior": "827/6000",
+      "confidence": {
+        "__fraction__": true,
+        "den": 6000,
+        "num": 827
+      },
+      "is_conclusive": true,
+      "narrative": "Jane has been using multiple encryption methods to conceal communication: an AES-encrypted README file in Documents, a BitLocker volume named R2D2, and a keys file in Downloads encrypted with GPG/PGP public/private key."
     },
-    {
-      "seq": 2,
-      "tool": "vigia_scorer",
-      "target": "case_artifacts",
-      "result_summary": "UNKNOWN score=0.275 conf=14%"
+    "case_id": "VIGIA-REAL-005",
+    "pipeline_meta": {
+      "artifact_count": 3,
+      "avg_score": "827/1200",
+      "expected_verdict": "SUSPICION",
+      "source": "ebs_v1_json_adapter"
     },
-    {
-      "seq": 3,
-      "tool": "detect_habit_incongruence",
-      "target": "Jane_encryption_workflow",
-      "result_summary": "MALICE 90%"
-    },
-    {
-      "seq": 4,
-      "tool": "calculate_shannon_entropy",
-      "target": "descriptions",
-      "result_summary": "NOISE 4.47"
-    },
-    {
-      "seq": 5,
-      "tool": "detect_human_jitter",
-      "target": "timestamps",
-      "result_summary": "NOISE CV=0"
-    },
-    {
-      "seq": 6,
-      "tool": "cross_artifact_analysis",
-      "target": "3_artifacts",
-      "result_summary": "MALICE struct/NOISE prob=0.0266"
-    },
-    {
-      "seq": 7,
-      "tool": "detect_eco_overinterpretation",
-      "target": "evidence",
-      "result_summary": "NOISE"
-    },
-    {
-      "seq": 8,
-      "tool": "audit_grice_maxims",
-      "target": "messages",
-      "result_summary": "NOISE 0 violations"
-    },
-    {
-      "seq": 9,
-      "tool": "infer_intent",
-      "target": "artifacts",
-      "result_summary": "NOISE"
-    },
-    {
-      "seq": 10,
-      "tool": "validate_and_correct_analysis",
-      "target": "full_case",
-      "result_summary": "LLM empty"
-    }
-  ]
+    "signals": [
+      {
+        "artifact_id": "ART-001",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 7
+        },
+        "description": "README file in user's Documents directory | Status: Encrypted with AES | No password available | Possible unencrypted version in system cache | keys file in Downloads directory | Status: Encrypted wit",
+        "evidence_type": "file_timestamp",
+        "source": "legacy_converter",
+        "z_score": {
+          "__fraction__": true,
+          "den": 100,
+          "num": 49
+        }
+      },
+      {
+        "artifact_id": "ART-002",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 17
+        },
+        "description": "BitLocker volume: Name='R2D2' | Status: Full disk encryption active | Recovery key possibly stored in AD, USB, or backup file | Type: Full disk encryption",
+        "evidence_type": "file_timestamp",
+        "source": "legacy_converter",
+        "z_score": {
+          "__fraction__": true,
+          "den": 400,
+          "num": 289
+        }
+      },
+      {
+        "artifact_id": "ART-003",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 9
+        },
+        "description": "GPG/PGP keys in user profile | Asymmetric encrypted communication with unknown party | 'keys' file contains message to decrypt | Possible private key pairs recoverable from the image",
+        "evidence_type": "memory_process",
+        "source": "legacy_converter",
+        "z_score": {
+          "__fraction__": true,
+          "den": 200,
+          "num": 171
+        }
+      }
+    ]
+  },
+  "sans_compliance": {
+    "accuracy_validation": false,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "vigia_agent_version": "1.0.0-SANS-2026"
 }
