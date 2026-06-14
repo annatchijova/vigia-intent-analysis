@@ -573,17 +573,19 @@ python3 scripts/run_case.py data/cases/CASE-001.json
 VIGÍA separates evaluation into three distinct domains. Only Domain A
 constitutes the system's accuracy claim.
 
-### Domain A — Deterministic Accuracy (core metric): 134/134 (100%)
+### Domain A — Deterministic Accuracy (core metric): 117/117 (100%)
 
-| Suite | Cases | Correct | Notes |
-|-------|-------|---------|-------|
-| Real forensic corpus (NIST/DFRWS/DEF CON/Digital Corpora) | 18 | 18 | ✓ |
-| Canonical corpus | 52 | 52 | ✓ |
-| Benign / Clean machines | 15 | 15 | ✓ |
-| False positive suite (authorized activity) | 3 | 3 | ✓ |
-| False negative suite (LOLBAS / insider) | 3 | 3 | ✓ |
-| False flag (planted attribution) | 3 | 3 | ✓ |
-| **Total Domain A** | **94** | **94 (100%)** | |
+| Suite | Cases | Correct |
+|-------|-------|---------|
+| Real forensic corpus (NIST/DFRWS/DEF CON/SRL 2018) | 29 | 29 ✓ |
+| Canonical corpus (CAN-001–052) | 52 | 52 ✓ |
+| Legacy canonical cases | 10 | 10 ✓ |
+| Benign / Clean machines | 15 | 15 ✓ |
+| False positive suite | 3 | 3 ✓ |
+| False negative suite | 3 | 3 ✓ |
+| False flag (planted attribution) | 4 | 4 ✓ |
+| Demo corpus | 4 | 4 ✓ |
+| **Total Domain A** | **117** | **117 (100%)** |
 
 Reproduce: `python3 run_all_agent.py --timeout 90`
 

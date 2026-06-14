@@ -551,17 +551,19 @@ python3 scripts/run_case.py data/cases/CASE-001.json
 VIGÍA separa la evaluación en tres dominios distintos. Solo el Dominio A
 constituye la métrica de precisión del sistema.
 
-### Dominio A — Precisión Determinística (métrica principal): 94/94 (100%)
+### Dominio A — Precisión Determinística (métrica principal): 117/117 (100%)
 
-| Suite | Casos | Correctos | Notas |
-|-------|-------|-----------|-------|
-| Corpus forense real (NIST/DFRWS/DEF CON/Digital Corpora) | 18 | 18 | ✓ |
-| Corpus canónico | 52 | 52 | ✓ |
-| Máquinas benignas / limpias | 15 | 15 | ✓ |
-| Suite de falsos positivos (actividad autorizada) | 3 | 3 | ✓ |
-| Suite de falsos negativos (LOLBAS / insider) | 3 | 3 | ✓ |
-| Falsa atribución (planted attribution) | 3 | 3 | ✓ |
-| **Total Dominio A** | **94** | **94 (100%)** | |
+| Suite | Casos | Correctos |
+|-------|-------|-----------|
+| Corpus forense real (NIST/DFRWS/DEF CON/SRL 2018) | 29 | 29 ✓ |
+| Corpus canónico (CAN-001–052) | 52 | 52 ✓ |
+| Casos canónicos legacy | 10 | 10 ✓ |
+| Máquinas benignas / limpias | 15 | 15 ✓ |
+| Suite de falsos positivos | 3 | 3 ✓ |
+| Suite de falsos negativos | 3 | 3 ✓ |
+| Falsa atribución (planted attribution) | 4 | 4 ✓ |
+| Corpus de demostración | 4 | 4 ✓ |
+| **Total Dominio A** | **117** | **117 (100%)** |
 
 Reproducir: `python3 run_all_agent.py --timeout 90`
 
