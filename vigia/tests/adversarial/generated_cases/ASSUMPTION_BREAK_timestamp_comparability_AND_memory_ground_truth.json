@@ -2,18 +2,18 @@
   "case_id": "ASSUMPTION_BREAK_timestamp_comparability_AND_memory_ground_truth",
   "description": "Breaks: timestamp_comparability + memory_ground_truth",
   "breaks": [
-    "timestamp_comparability",
-    "memory_ground_truth"
+    "memory_ground_truth",
+    "timestamp_comparability"
   ],
   "propagated_breaks": [
-    "timestamp_comparability",
+    "golden_rule_soundness",
+    "daubert_defensibility",
     "causal_ordering",
     "memory_ground_truth",
-    "daubert_defensibility",
-    "anomaly_significance",
     "structural_malice",
-    "golden_rule_soundness",
-    "evidence_reliability"
+    "evidence_reliability",
+    "anomaly_significance",
+    "timestamp_comparability"
   ],
   "artifacts": [
     {

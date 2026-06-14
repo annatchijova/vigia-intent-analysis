@@ -1,0 +1,20 @@
+{
+  "bundle_version": "ebs_v1",
+  "case_id": "VIGIA-FP-001",
+  "investigation_mode": "llm_assisted",
+  "llm_backend": "anthropic",
+  "timestamp": "2026-06-14T19:26:07.389258+00:00",
+  "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-FP-001.json",
+  "evidence_sha256": "6a7ae14f46a5485168cd8ca837127ffda9f5aa98fb6cae25f41966595f255721",
+  "expected_verdict": "BENIGN",
+  "fallback_verdict": "NOISE",
+  "llm_verdict": "NOISE",
+  "verdict_changed": false,
+  "elapsed_seconds": 28.77,
+  "llm_raw": {
+    "raw_response": "```json\n{\n  \"verdict\": \"NOISE\",\n  \"confidence\": 0.88,\n  \"peirce_chain\": {\n    \"firstness\": {\n      \"description\": \"Initial qualitative impression: A full TCP SYN scan (nmap -sS -p-) across an entire /24 subnet is inherently aggressive-looking network activity. The raw_score of 0.82 reflects this \u2014 the tool signature alone triggers reconnaissance pattern detectors. There is an immediate felt quality of 'scanning activity' that cannot be ignored. However, there is also a simultaneous quality of normalcy \u2014 this is a sysadmin workstation, during business hours, from someone with legitimate elevated privileges.\",\n      \"qualisigns\": [\n        \"Aggressive scan signature (SYN scan, all ports, full subnet)\",\n        \"Execution from authorized admin workstation\",\n        \"Business hours timing \u2014 no attempt at concealment\",\n        \"Self-documented activity via ticketing system\"\n      ]\n    },\n    \"secondness\": {\n      \"description\": \"Brute dyadic facts and resistances encountered: The nmap execution (fp001_01) collides against detection rules, producing a high raw_score. However, this score must be contextualized against the actor's identity and behavior. The actor has 12 years of tenure, prior_trust=0.9, domain credentials, and elevated permissions \u2014 meaning this scan falls squarely within the operational envelope of the role. The self-created ticket (fp001_02, raw_score=0.05) is a contemporaneous artifact demonstrating procedural awareness \u2014 the admin documented the activity proactively, not retroactively. No other anomalous artifacts exist. There is no exfiltration, no lateral movement, no off-hours timing, no attempt to obscure origin, no unusual destination outside the managed range.\",\n      \"indices\": [\n        \"fp001_01: nmap scan \u2014 high tool-signature score but executed from legitimate admin context with appropriate privileges over own IP range\",\n        \"fp001_02: Self-created ticket \u2014 near-zero anomaly score, demonstrates transparency and procedural intent\",\n      ",
+    "error": "LLM did not return valid JSON.",
+    "llm_backend": "anthropic",
+    "timestamp": "2026-06-14T19:26:07.389216Z"
+  }
+}

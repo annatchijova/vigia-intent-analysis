@@ -1,0 +1,20 @@
+{
+  "bundle_version": "ebs_v1",
+  "case_id": "VIGIA-AMB-002",
+  "investigation_mode": "llm_assisted",
+  "llm_backend": "anthropic",
+  "timestamp": "2026-06-14T19:29:30.772785+00:00",
+  "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-AMB-002.json",
+  "evidence_sha256": "cfdfc738d9b5a5a70b404952fa987c9f3b902057729c9381585695970dc00d80",
+  "expected_verdict": "ABSTAIN",
+  "fallback_verdict": "NOISE",
+  "llm_verdict": "NOISE",
+  "verdict_changed": false,
+  "elapsed_seconds": 25.2,
+  "llm_raw": {
+    "raw_response": "```json\n{\n  \"verdict\": \"NOISE\",\n  \"confidence\": 0.55,\n  \"peirce_chain\": {\n    \"firstness\": {\n      \"description\": \"Initial qualitative impression: a Tier-1 SOC analyst disabled a critical DLP rule without a change ticket. The feeling is one of mild concern \u2014 disabling a critical alert is noteworthy, but the overall sensory gestalt is not alarming. The raw score of the disabling action (0.55) sits at the ambiguity threshold. The analyst's self-report and clean workstation memory produce feelings of normalcy. There is no visceral 'red flag' quality \u2014 just a faint unease about procedural lapse.\",\n      \"qualia\": \"Mild unease tempered by mundane explanation. The quality of the evidence feels accidental rather than purposeful.\"\n    },\n    \"secondness\": {\n      \"description\": \"Brute dyadic confrontations between facts: (1) amb002_01 shows the DLP rule WAS disabled \u2014 this is a factual, indexical event with moderate raw_score (0.55) and moderate prior_trust (0.6). (2) amb002_02 provides the analyst's immediate self-correction claim \u2014 'already re-enabled it' \u2014 with very low anomaly score (0.05) and higher trust (0.7). The verbal explanation reacts to and partially neutralizes the first artifact. (3) amb002_03 shows no malicious processes on the workstation, with near-zero anomaly (0.05) and very high trust (0.95). The resistance pattern: the disabling event pushes toward suspicion, but the re-enabling claim and clean memory forensics push back firmly. No corroborating evidence of exfiltration, lateral movement, or persistence mechanisms exists.\",\n      \"dyadic_confrontations\": [\n        \"DLP rule disabled (moderate concern) VS analyst self-report of accidental re-enablement (low concern)\",\n        \"No change ticket (procedural violation) VS no malicious process footprint (exculpatory)\",\n        \"Critical alert gap VS rapid self-correction narrative\"\n      ],\n      \"key_absence\": \"No evidence of data exfiltration during the window the DLP rule was disabled. No second actor. N",
+    "error": "LLM did not return valid JSON.",
+    "llm_backend": "anthropic",
+    "timestamp": "2026-06-14T19:29:30.772750Z"
+  }
+}

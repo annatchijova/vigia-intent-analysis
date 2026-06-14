@@ -1,0 +1,20 @@
+{
+  "bundle_version": "ebs_v1",
+  "case_id": "FP-CULTURAL-CLEAN-001",
+  "investigation_mode": "llm_assisted",
+  "llm_backend": "anthropic",
+  "timestamp": "2026-06-14T19:27:22.800062+00:00",
+  "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/FP-CULTURAL-CLEAN-001.json",
+  "evidence_sha256": "43561576ba3cdaadaa73314e5be54701213c4d4d0c5b57aa8280cf6d1d66a112",
+  "expected_verdict": "NOISE",
+  "fallback_verdict": "NOISE",
+  "llm_verdict": "NOISE",
+  "verdict_changed": false,
+  "elapsed_seconds": 25.68,
+  "llm_raw": {
+    "raw_response": "```json\n{\n  \"verdict\": \"NOISE\",\n  \"confidence\": 0.95,\n  \"peirce_chain\": {\n    \"firstness\": {\n      \"description\": \"Initial qualitative impression: cultural markers (Cyrillic filenames, RU keyboard, UTC+3 timezone, Russian comments) present a surface-level feeling of potential attribution planting. The raw_score of 0.85 on cultural markers triggers an aesthetic unease \u2014 a vague sense of 'this looks like something.' But Firstness is pure quality without context. The feeling of foreignness is not evidence of malice; it is merely the qualia of encountering a non-English developer environment.\",\n      \"key_observation\": \"Cultural markers exist as qualities. Their mere presence carries no inherent indexical or symbolic meaning regarding threat activity.\"\n    },\n    \"secondness\": {\n      \"description\": \"Brute factual confrontation: When cultural markers (artifact cultural_clean_001) are placed in dyadic opposition with technical state (artifacts technical_clean_001 and technical_clean_002), the resistance is entirely one-directional \u2014 toward benign. Memory is clean: no process injection, no kernel anomalies (raw_score=0.05, prior_trust=0.95). LSASS shows no credential dumping, normal session counts (raw_score=0.08, prior_trust=0.95). The cultural marker's low prior_trust (0.3) correctly reflects that cultural artifacts alone are weak indicators. The existential fact is: there is NO technical indicator of compromise. No C2 implant behavior, no lateral movement artifacts, no persistence mechanisms. The dyadic clash between 'looks potentially suspicious culturally' and 'system is demonstrably clean' resolves firmly toward clean baseline.\",\n      \"key_observation\": \"Zero technical corroboration for any malicious activity. Cultural markers exist in isolation with no indexical connection to any threat behavior. The absence of a malicious event cannot be interpreted as evidence of staging \u2014 that would be an unfalsifiable reasoning trap.\"\n    },\n    \"thirdness\": {\n      \"descripti",
+    "error": "LLM did not return valid JSON.",
+    "llm_backend": "anthropic",
+    "timestamp": "2026-06-14T19:27:22.800028Z"
+  }
+}

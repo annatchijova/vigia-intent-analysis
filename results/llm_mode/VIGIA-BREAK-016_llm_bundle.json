@@ -1,0 +1,20 @@
+{
+  "bundle_version": "ebs_v1",
+  "case_id": "VIGIA-BREAK-016",
+  "investigation_mode": "llm_assisted",
+  "llm_backend": "anthropic",
+  "timestamp": "2026-06-14T19:25:38.613796+00:00",
+  "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-BREAK-016.json",
+  "evidence_sha256": "88ed64d8b1ef4d8a6aa657098677295bab261dd050640b17d23be2ec527cef0d",
+  "expected_verdict": "MALICE",
+  "fallback_verdict": "MALICE",
+  "llm_verdict": "MALICE",
+  "verdict_changed": false,
+  "elapsed_seconds": 24.24,
+  "llm_raw": {
+    "raw_response": "```json\n{\n  \"verdict\": \"MALICE\",\n  \"confidence\": 0.94,\n  \"peirce_chain\": {\n    \"firstness\": {\n      \"description\": \"Immediate qualitative impressions before relational analysis.\",\n      \"observations\": [\n        \"Artifacts b016_01 and b016_02 present as near-identical, sterile backup logs \u2014 mechanically reassuring, almost too clean. Firstness impression: monotone normalcy.\",\n        \"Artifact b016_03 radiates casual warmth \u2014 an apologetic, human-sounding email. Firstness impression: social plausibility, friendliness, disarming tone.\",\n        \"Artifact b016_07 strikes with alarm: 847 logs deleted via rm -rf, a cleanup script in /tmp. Firstness impression: visceral danger signal, destructive action.\"\n      ]\n    },\n    \"secondness\": {\n      \"description\": \"Dyadic brute-fact collisions \u2014 where artifacts resist or contradict each other.\",\n      \"collisions\": [\n        {\n          \"pair\": [\"b016_01/b016_02\", \"b016_07\"],\n          \"analysis\": \"BACKUP_COMPLETE reports 847 files with 0 errors. But b016_07 reveals exactly 847 system logs were *deleted* in the same window. The backup count may represent the number of logs purged, not preserved. The backup logs serve as a manufactured alibi \u2014 a false normalcy artifact planted to explain away the disappearance of log data.\"\n        },\n        {\n          \"pair\": [\"b016_03\", \"b016_04\"],\n          \"analysis\": \"jdoe's friendly email frames the 02:15 reboot as an innocent troubleshooting action. But b016_04 shows the reboot was user-initiated at 02:15:00 \u2014 a precise, deliberate timestamp during off-hours. The email is a social engineering narrative designed to pre-empt suspicion.\"\n        },\n        {\n          \"pair\": [\"b016_04/b016_05\", \"b016_07\"],\n          \"analysis\": \"The 30-minute window between reboot (02:15) and recovery (02:45) is precisely the window in which 847 logs were deleted via a pre-staged script at /tmp/cleanup.sh. The reboot was not for recovery \u2014 it was to create a clean window for evidence destruction.\"\n     ",
+    "error": "LLM did not return valid JSON.",
+    "llm_backend": "anthropic",
+    "timestamp": "2026-06-14T19:25:38.613753Z"
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "bundle_version": "ebs_v1",
+  "case_id": "VIGIA-FN-001",
+  "investigation_mode": "llm_assisted",
+  "llm_backend": "anthropic",
+  "timestamp": "2026-06-14T19:27:49.827659+00:00",
+  "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-FN-001.json",
+  "evidence_sha256": "001cd08c26e18324cbaae04211aabc44ee57f36bb09580397ecb16852ee2aad3",
+  "expected_verdict": "MALICE",
+  "fallback_verdict": "MALICE",
+  "llm_verdict": "MALICE",
+  "verdict_changed": false,
+  "elapsed_seconds": 27.03,
+  "llm_raw": {
+    "raw_response": "```json\n{\n  \"case_id\": \"VIGIA-FN-001\",\n  \"session_nonce\": \"38209B07A4FBEB07\",\n  \"heartbeat_counter\": 9,\n  \"heartbeat_hash\": \"b8eefde37543f47e\",\n  \"verdict\": \"MALICE\",\n  \"confidence\": 0.94,\n  \"peirce_chain\": {\n    \"firstness\": {\n      \"description\": \"Initial qualia of each artifact taken in isolation \u2014 the raw phenomenological impression before relational analysis.\",\n      \"fn001_01\": \"A successful login during business hours (09:30) by a known marketing user. Taken alone, this is utterly unremarkable. Raw score 0.05 and prior trust 0.9 reflect this mundanity. The Firstness is normalcy \u2014 a feeling of routine.\",\n      \"fn001_02\": \"A 500MB upload to Google Drive from the marketing workstation. The raw score (0.15) is low but the prior trust is notably low (0.2), suggesting the system already flags large exfiltrations to personal cloud as atypical. The Firstness is a vague sense of volume \u2014 something large moving outward.\",\n      \"fn001_03\": \"A vacation record showing the employee is away from 2026-06-15 to 2026-06-30. Alone, this is administrative metadata. Raw score 0.08, high trust 0.95. The Firstness is absence \u2014 a person not present.\"\n    },\n    \"secondness\": {\n      \"description\": \"Dyadic brute-fact collisions \u2014 where artifacts resist each other and produce friction.\",\n      \"collision_1_login_vs_vacation\": \"fn001_01 collides with fn001_03: the employee logs in on 2026-06-14 (the day before vacation starts or potentially already in pre-vacation status), yet the HR record confirms they are registered as on leave starting 2026-06-15. The login timestamp in the integrity metadata is 2026-06-14T19:27Z, placing the activity on the eve of or during vacation. This is a factual contradiction \u2014 presence where absence is expected. The employee was described as 'on vacation' during the activity, meaning the login is by someone other than the credential owner.\",\n      \"collision_2_upload_vs_identity\": \"fn001_02 collides with the absent employee identity: a 500MB compressed da",
+    "error": "LLM did not return valid JSON.",
+    "llm_backend": "anthropic",
+    "timestamp": "2026-06-14T19:27:49.827617Z"
+  }
+}

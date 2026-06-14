@@ -1,0 +1,20 @@
+{
+  "bundle_version": "ebs_v1",
+  "case_id": "VIGIA-FP-003",
+  "investigation_mode": "llm_assisted",
+  "llm_backend": "anthropic",
+  "timestamp": "2026-06-14T19:26:57.115177+00:00",
+  "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-FP-003.json",
+  "evidence_sha256": "4f80a6e34ec2f3d6a79da9c6e555d73439ba9fbd5b9163a07fd1f23998497ce3",
+  "expected_verdict": "BENIGN",
+  "fallback_verdict": "NOISE",
+  "llm_verdict": "NOISE",
+  "verdict_changed": false,
+  "elapsed_seconds": 25.64,
+  "llm_raw": {
+    "raw_response": "```json\n{\n  \"verdict\": \"NOISE\",\n  \"confidence\": 0.92,\n  \"peirce_chain\": {\n    \"firstness\": {\n      \"description\": \"Immediate qualitative impressions from the raw evidence surface. A post-it with a password visible on camera (fp003_03, raw_score=0.92) creates an intense initial feeling of exposure/vulnerability. The DM message (fp003_01, raw_score=0.72) carries a surface-level quality of credential sharing \u2014 a secondhand alarm bell. The password change (fp003_02, raw_score=0.05) registers as mundane, almost invisible at the level of pure feeling. The dominant qualia: carelessness, not malice.\",\n      \"quality\": \"Unease from exposure, but tempered by cooperative/corrective tone in the message\"\n    },\n    \"secondness\": {\n      \"description\": \"Brute factual dyadic relations \u2014 what actually happened in causal sequence. FACT 1: User physically wrote password on post-it (poor hygiene, not adversarial). FACT 2: Colleague observed it on conference room camera \u2014 a passive, incidental observation, not active reconnaissance. FACT 3: Colleague sent the password via internal DM with explicit remediation intent ('sending it so you can change it'). FACT 4: Password was changed within 5 minutes \u2014 confirming the remediation loop closed rapidly. FACT 5: No credential abuse, no unauthorized access, no lateral movement, no exfiltration detected anywhere in the artifact chain. The causal chain is: negligence \u2192 detection by colleague \u2192 notification \u2192 remediation. Each dyadic link points away from adversarial intent.\",\n      \"brute_facts\": [\n        \"Password physically exposed by owner (negligence, not attack)\",\n        \"Colleague's message is explicitly corrective, not exploitative\",\n        \"5-minute password change confirms closed remediation loop\",\n        \"Zero evidence of credential abuse or unauthorized access\",\n        \"No third-party involvement, no external exfiltration vectors\"\n      ]\n    },\n    \"thirdness\": {\n      \"description\": \"Mediating interpretation \u2014 the law or habit t",
+    "error": "LLM did not return valid JSON.",
+    "llm_backend": "anthropic",
+    "timestamp": "2026-06-14T19:26:57.115136Z"
+  }
+}

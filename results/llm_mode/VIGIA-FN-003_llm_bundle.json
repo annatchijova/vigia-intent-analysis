@@ -1,0 +1,20 @@
+{
+  "bundle_version": "ebs_v1",
+  "case_id": "VIGIA-FN-003",
+  "investigation_mode": "llm_assisted",
+  "llm_backend": "anthropic",
+  "timestamp": "2026-06-14T19:28:39.990856+00:00",
+  "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-FN-003.json",
+  "evidence_sha256": "212a5df934fb66975659566f4aacee86be15c9c2d1cd70424505cc1ebff3fc7a",
+  "expected_verdict": "MALICE",
+  "fallback_verdict": "MALICE",
+  "llm_verdict": "MALICE",
+  "verdict_changed": false,
+  "elapsed_seconds": 23.63,
+  "llm_raw": {
+    "raw_response": "```json\n{\n  \"verdict\": \"MALICE\",\n  \"confidence\": 0.97,\n  \"session_nonce\": \"38209B07A4FBEB07\",\n  \"heartbeat_counter\": 11,\n  \"heartbeat_hash\": \"25cabd7442dc1bfd\",\n  \"peirce_chain\": {\n    \"firstness\": {\n      \"description\": \"Initial qualitative impressions of each artifact taken independently, before relational analysis.\",\n      \"fn003_01\": {\n        \"quality\": \"svchost.exe PID 612 contains RWX (Read-Write-Execute) memory regions. In isolation, this is a faint anomaly \u2014 some legitimate processes may briefly hold RWX pages during JIT or runtime unpacking. Raw score 0.15 reflects this ambiguity. The feeling is one of subtle wrongness: a signed, legitimate binary shouldn't typically maintain persistent RWX regions.\",\n        \"firstness_weight\": 0.25\n      },\n      \"fn003_02\": {\n        \"quality\": \"Network connections from svchost.exe to AWS CloudFront IPs (52.85.0.0/16). In pure Firstness, this is almost indistinguishable from normal CDN traffic. Raw score 0.05 \u2014 nearly invisible. The quality is one of banality, ordinariness. Alone, this signals nothing.\",\n        \"firstness_weight\": 0.05\n      },\n      \"fn003_03\": {\n        \"quality\": \"svchost.exe PID 612 was spawned by cmd.exe (PID 4412) rather than services.exe. This is immediately striking \u2014 a sharp qualitative alarm. svchost.exe instances are canonically children of services.exe. Raw score 0.88 captures the strong anomalous quality. The feeling is one of clear violation of expected system behavior.\",\n        \"firstness_weight\": 0.90\n      }\n    },\n    \"secondness\": {\n      \"description\": \"Dyadic brute-fact relations \u2014 how artifacts resist, oppose, or confirm each other in concrete factual interaction.\",\n      \"relation_fn003_03_vs_fn003_01\": {\n        \"analysis\": \"The illegitimate parent process (cmd.exe) EXPLAINS the RWX memory regions. Process hollowing requires: (1) creating a suspended process, (2) unmapping its original code, (3) writing new code into the process space with RWX permissions. cmd.exe spawning svch",
+    "error": "LLM did not return valid JSON.",
+    "llm_backend": "anthropic",
+    "timestamp": "2026-06-14T19:28:39.990817Z"
+  }
+}

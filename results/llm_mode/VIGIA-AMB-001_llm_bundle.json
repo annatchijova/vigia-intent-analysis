@@ -1,0 +1,20 @@
+{
+  "bundle_version": "ebs_v1",
+  "case_id": "VIGIA-AMB-001",
+  "investigation_mode": "llm_assisted",
+  "llm_backend": "anthropic",
+  "timestamp": "2026-06-14T19:29:05.572892+00:00",
+  "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-AMB-001.json",
+  "evidence_sha256": "b1a3fb0a292654d5ee7bf09b75434a8adadd077bde2863c0149a13fb1d755c86",
+  "expected_verdict": "ABSTAIN",
+  "fallback_verdict": "NOISE",
+  "llm_verdict": "NOISE",
+  "verdict_changed": false,
+  "elapsed_seconds": 25.58,
+  "llm_raw": {
+    "raw_response": "```json\n{\n  \"verdict\": \"NOISE\",\n  \"confidence\": 0.25,\n  \"peirce_chain\": {\n    \"firstness\": {\n      \"quality_of_feeling\": \"Ambiguity and epistemic uncertainty dominate. The anonymous accusation generates an initial unease (raw_score=0.05, very low signal strength). The file access artifact presents a moderate qualitative impression of potential concern (raw_score=0.45), but is immediately tempered by the fact that authorization existed. The absence of exfiltration (raw_score=0.05) brings a feeling of resolution/calm. The overall phenomenological texture is one of indeterminacy \u2014 none of the artifacts independently produce a strong semiotic impression of malice or even clear intent.\",\n      \"monadic_qualities\": [\n        \"Low-credibility anonymous tip (prior_trust=0.2)\",\n        \"Authorized access to sensitive files \u2014 routine or purposeful?\",\n        \"Clean exfiltration scan \u2014 absence of confirming evidence of theft\"\n      ]\n    },\n    \"secondness\": {\n      \"brute_facts_and_dyadic_relations\": \"The anonymous email (amb001_01) asserts data theft, but its low prior_trust (0.2) and raw_score (0.05) indicate near-zero evidentiary weight. The file access log (amb001_02) is a brute fact \u2014 the manager did access confidential files \u2014 but this fact collides with a counter-fact: the manager was authorized to do so, yielding no anomaly. The exfiltration scan (amb001_03) provides a negative result, meaning the causal chain from 'access' to 'theft' is broken. There is no dyadic resistance (Secondness) between observed behavior and expected behavior; the manager's actions fall within authorized norms.\",\n      \"collisions\": [\n        \"Accusation vs. Authorization: The allegation of theft is contradicted by legitimate access permissions.\",\n        \"Access vs. Exfiltration: File access occurred, but no data left the perimeter \u2014 the expected consequent of 'theft' is absent.\",\n        \"Anonymous source vs. Credibility: The accuser's anonymity and low trust score undermine the accusation ",
+    "error": "LLM did not return valid JSON.",
+    "llm_backend": "anthropic",
+    "timestamp": "2026-06-14T19:29:05.572848Z"
+  }
+}

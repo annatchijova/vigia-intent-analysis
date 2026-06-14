@@ -1,0 +1,20 @@
+{
+  "bundle_version": "ebs_v1",
+  "case_id": "VIGIA-FN-002",
+  "investigation_mode": "llm_assisted",
+  "llm_backend": "anthropic",
+  "timestamp": "2026-06-14T19:28:16.364546+00:00",
+  "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-FN-002.json",
+  "evidence_sha256": "b31538bc3f295e3b14b1c39b5092b10df0776a1df7e55bdc02ac5adec74bfc22",
+  "expected_verdict": "MALICE",
+  "fallback_verdict": "MALICE",
+  "llm_verdict": "MALICE",
+  "verdict_changed": false,
+  "elapsed_seconds": 26.54,
+  "llm_raw": {
+    "raw_response": "```json\n{\n  \"verdict\": \"MALICE\",\n  \"confidence\": 0.92,\n  \"peirce_chain\": {\n    \"firstness\": {\n      \"description\": \"Initial qualitative impressions of each artifact taken in isolation, prior to relational analysis.\",\n      \"observations\": [\n        \"fn002_01: Veeam agent process running with valid digital certificate. Qualisign is one of normalcy \u2014 legitimate software, signed binary, low raw_score (0.05). The feeling is 'nothing to see here.' This is precisely the quality that makes Living-off-the-Land (LOL) techniques dangerous: the Firstness is designed to evoke trust.\",\n        \"fn002_02: Encrypted traffic on port 443 to an external IP. In isolation, indistinguishable from legitimate cloud backup activity. The Firstness is bland, unremarkable \u2014 a quality of routine encrypted communication.\",\n        \"fn002_03: Absence of a change ticket for the Veeam installation. The qualitative feeling here is a faint dissonance \u2014 a gap where procedural documentation should exist. This is a negative qualisign: the quality of absence.\"\n      ]\n    },\n    \"secondness\": {\n      \"description\": \"Dyadic brute-fact relations \u2014 how artifacts resist, react against, and contradict each other and the environment.\",\n      \"observations\": [\n        \"fn002_01 vs. fn002_03: The legitimate signed binary COLLIDES with the absence of any change management record. In any governed IT environment, software installation on a server (10.0.8.44) requires authorization. The existence of the process without a ticket is a factual opposition \u2014 the tool is present but was never sanctioned. This is a genuine Secondness: the brute fact of unauthorized deployment.\",\n        \"fn002_02 vs. environment: The backup destination (198.51.100.77) is an external cloud instance. The existential question: is this IP part of the organization's sanctioned backup infrastructure? The prior_trust of 0.2 indicates it is NOT a known/trusted destination. Data is flowing outward to an untrusted endpoint \u2014 a brute-fact exfiltrati",
+    "error": "LLM did not return valid JSON.",
+    "llm_backend": "anthropic",
+    "timestamp": "2026-06-14T19:28:16.364503Z"
+  }
+}

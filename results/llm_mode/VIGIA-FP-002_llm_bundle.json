@@ -1,0 +1,20 @@
+{
+  "bundle_version": "ebs_v1",
+  "case_id": "VIGIA-FP-002",
+  "investigation_mode": "llm_assisted",
+  "llm_backend": "anthropic",
+  "timestamp": "2026-06-14T19:26:31.472782+00:00",
+  "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-FP-002.json",
+  "evidence_sha256": "64ad80a0d918b7944321098f54e72fa48d0bb10a5e658c1cd3c39fecfe1be330",
+  "expected_verdict": "BENIGN",
+  "fallback_verdict": "NOISE",
+  "llm_verdict": "NOISE",
+  "verdict_changed": false,
+  "elapsed_seconds": 24.08,
+  "llm_raw": {
+    "raw_response": "```json\n{\n  \"verdict\": \"NOISE\",\n  \"confidence\": 0.95,\n  \"peirce_chain\": {\n    \"firstness\": {\n      \"description\": \"Initial qualitative impression: a large data transfer (500GB) to an external IP address triggers an immediate visceral sense of potential exfiltration. The raw_score of 0.88 on fp002_01 reflects this gut-level alarm \u2014 large volume, external destination, overnight timing. There is a feeling of anomaly at the surface level.\",\n      \"qualisign\": \"High-volume external transfer evokes exfiltration archetype\",\n      \"raw_affect\": \"Moderate alarm from volume and external destination alone\"\n    },\n    \"secondness\": {\n      \"description\": \"Brute factual confrontation: The 500GB transfer to 198.51.100.77 is a concrete, measurable event (fp002_01). However, this fact collides directly with a second concrete fact \u2014 a documented Change Advisory Board approval (CAB-2026-0610, fp002_02) explicitly authorizing nightly backup to that exact IP address using rsync. The dyadic opposition resolves: the transfer event is fully accounted for by an approved, documented process. The tool (rsync) is a standard backup utility, not an exfiltration tool. The destination IP matches the approved cloud provider. The timing (overnight, 4 hours) is consistent with a scheduled backup window, not covert activity.\",\n      \"indexical_links\": [\n        \"fp002_01 external transfer IP 198.51.100.77 \u2194 fp002_02 CAB-approved destination IP 198.51.100.77 \u2014 exact match\",\n        \"fp002_01 rsync tool \u2194 standard backup utility, not exfiltration tooling\",\n        \"fp002_01 overnight 4-hour window \u2194 expected behavior for 500GB scheduled backup\",\n        \"fp002_02 CISO approval + Change Management documentation \u2194 institutional authorization chain intact\"\n      ],\n      \"resistance\": \"The high raw_score (0.88) on fp002_01 is entirely explained by the prior_trust=0.2 reflecting a context-unaware heuristic. Once correlated with fp002_02 (prior_trust=0.95), the anomaly dissolves.\"\n    },\n    \"thirdness\": {\n",
+    "error": "LLM did not return valid JSON.",
+    "llm_backend": "anthropic",
+    "timestamp": "2026-06-14T19:26:31.472745Z"
+  }
+}
