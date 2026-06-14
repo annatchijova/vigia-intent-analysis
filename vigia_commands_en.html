@@ -128,6 +128,9 @@
     <a href="#ci"><span class="dot" style="background:var(--accent)"></span>CI</a>
     <a href="#debug"><span class="dot" style="background:var(--danger)"></span>Debug</a>
   </div>
+  <div class="nsec"><div class="nsl">For Judges ★</div>
+    <a href="#judges"><span class="dot" style="background:var(--ok)"></span>Claim → Command</a>
+  </div>
 </nav>
 
 <main>
@@ -277,6 +280,16 @@
       <div class="ch"><span class="cl">Single REAL case</span><button class="cp" onclick="cp(this)">copy</button></div>
       <div class="cc">python tests/run_vigia_case.py <span class="pa">data/cases/VIGIA-REAL-001.json</span></div>
       <div class="cd">REAL-001: Greg Schardt / Mr. Evil — war-driving credential theft. Expected: <strong>MALICE 93%</strong><br>Replace <code>001</code> with any case number — always 3 digits: 001, 002, ..., 010</div>
+    </div>
+    <div class="card" style="--ca:var(--ok)">
+      <div class="ch"><span class="cl">REAL-008 CON LLM — Volatility Cridex Banking Trojan (verify sealed bundle)</span><button class="cp" onclick="cp(this)">copy</button></div>
+      <div class="cc">python3 forensics/verify_ebs_v1.py <span class="pa">results/real/VIGIA-REAL-008_bundle.json</span> <span class="fl">--verbose</span></div>
+      <div class="cd">MALICE 93% · posterior=0.998 · <code>reason_with_llm</code> called · EBS v1 <strong>Level 2 — Cryptographically valid</strong> · R6_DEVIL_ADVOCATE: OK · 4 findings CONFIRMED (DKOM masquerade, C2, banking web injection, malfind)</div>
+    </div>
+    <div class="card" style="--ca:var(--ok)">
+      <div class="ch"><span class="cl">REAL-008 CON LLM — 4-hash forensic integrity</span><button class="cp" onclick="cp(this)">copy</button></div>
+      <div class="cc">python3 show_4_hashes.py <span class="pa">data/cases/converted/VIGIA-REAL-008.json</span></div>
+      <div class="cd">H1 graph_hash: <code>94147b51c639cd0c…</code> · H2 bundle_hash: <code>125f7f06af5a4f56…</code> · H3 HMAC: <code>6addf5b7d99a11d9…</code> · H4 EBS verify: PASS Level 2 · VERDICT: MALICE · SCORE: 0.998042</div>
     </div>
   </div>
   <table>
@@ -736,6 +749,95 @@ Expected: all 16 cases resolve to correct verdict in LLM-assisted mode (100%).</
       <div class="cc">grep <span class="fl">-rn</span> <span class="st">"except Exception"</span> vigia/ | grep -v <span class="st">"#"</span></div>
       <div class="cd">Silent exceptions swallowing TypeErrors → false negatives. See KNOWN_LIMITATIONS.</div>
     </div>
+  </div>
+</div>
+
+<!-- FOR JUDGES -->
+<div class="sec" id="judges">
+  <div class="st"><span class="ad" style="background:var(--ok)"></span>For Judges — Claim → Command</div>
+  <div class="info">
+    This section exists solely to make evaluation easier. You do not need to learn any commands.
+    Every example below is a ready-to-run copy/paste shortcut that reproduces a specific result,
+    benchmark, case, or validation claim presented elsewhere in this project.
+    VIGÍA does not ask evaluators to trust reported results — every claim is reproducible locally.
+    If you only want to inspect the architecture, published cases, web simulators, or benchmark
+    reports, this section can be ignored entirely.
+  </div>
+
+  <div class="grid">
+
+    <div class="card" style="--ca:var(--ok)">
+      <div class="ch"><span class="cl">Claim: Domain A — 117/117 deterministic accuracy (no API key, no LLM)</span><button class="cp" onclick="cp(this)">copy</button></div>
+      <div class="cc">python3 run_all_agent.py <span class="fl">--timeout</span> 90</div>
+      <div class="cd">Expected output: <strong>117/117 PASS</strong>. Runs all cases through the deterministic fallback pipeline.</div>
+    </div>
+
+    <div class="card" style="--ca:var(--ok)">
+      <div class="ch"><span class="cl">Claim: 163 unit tests pass, 6 xfailed (documented regressions)</span><button class="cp" onclick="cp(this)">copy</button></div>
+      <div class="cc">python3 <span class="fl">-m</span> pytest tests/ <span class="fl">-v</span></div>
+      <div class="cd">Expected: <strong>163 passed, 6 xfailed</strong>. The 6 xfailed are regression-preventing tests for documented limitations — not crashes.</div>
+    </div>
+
+    <div class="card" style="--ca:var(--ok)">
+      <div class="ch"><span class="cl">Claim: bit-for-bit determinism — same input → same SHA-256 output</span><button class="cp" onclick="cp(this)">copy</button></div>
+      <div class="cc"><span class="kw">PYTHONPATH</span>=<span class="pa">$(pwd)</span> python3 tests/check_determinism.py</div>
+      <div class="cd">Runs same case 3×, compares SHA-256 of outputs. Expected: three identical hashes. Zero floats in scoring pipeline (Fraction arithmetic — Daubert P0).</div>
+    </div>
+
+    <div class="card" style="--ca:var(--ok)">
+      <div class="ch"><span class="cl">Claim: EBS v1 bundles are independently verifiable (stdlib only, zero VIGÍA deps)</span><button class="cp" onclick="cp(this)">copy</button></div>
+      <div class="cc">python3 forensics/verify_ebs_v1.py <span class="pa">results/real/VIGIA-REAL-001_bundle.json</span> <span class="fl">--verbose</span></div>
+      <div class="cd">Expected: <strong>PASS — Level 2 — Cryptographically valid</strong>. Verifier recomputes all hashes from scratch. Replace <code>REAL-001</code> with any case ID.</div>
+    </div>
+
+    <div class="card" style="--ca:var(--ok)">
+      <div class="ch"><span class="cl">Claim: four-hash forensic integrity on any case bundle</span><button class="cp" onclick="cp(this)">copy</button></div>
+      <div class="cc"><span class="kw">PYTHONPATH</span>=<span class="pa">$(pwd)</span> python3 show_4_hashes.py <span class="pa">data/cases/converted/VIGIA-REAL-008.json</span></div>
+      <div class="cd">H1 graph_hash · H2 bundle_hash · H3 HMAC audit chain · H4 EBS verify. Expected: all GREEN. Replace case path for any other case.</div>
+    </div>
+
+    <div class="card" style="--ca:var(--ok)">
+      <div class="ch"><span class="cl">Claim: any published case can be reproduced end-to-end from the case JSON</span><button class="cp" onclick="cp(this)">copy</button></div>
+      <div class="cc">python3 vigia_agent.py <span class="fl">--evidence</span> <span class="pa">data/cases/converted/VIGIA-REAL-001.json</span> <span class="fl">--case-id</span> <span class="st">VIGIA-REAL-001</span></div>
+      <div class="cd">Produces a sealed ForensicBundle with HMAC-signed audit trail. Replace path with any case JSON in <code>data/cases/converted/</code>.</div>
+    </div>
+
+    <div class="card" style="--ca:var(--ok)">
+      <div class="ch"><span class="cl">Claim: case JSON schema validation (EBS v1 — Daubert chain-of-custody fields)</span><button class="cp" onclick="cp(this)">copy</button></div>
+      <div class="cc">python3 validate_case.py <span class="pa">data/cases/converted/VIGIA-REAL-001.json</span></div>
+      <div class="cd">Checks required fields, valid <code>evidence_type</code> against CAIE whitelist, <code>acquisition_hash</code> ≥64 hex chars, <code>examiner_id</code> presence (NIST SP 800-86 §4.3).</div>
+    </div>
+
+    <div class="card" style="--ca:var(--ok)">
+      <div class="ch"><span class="cl">Claim: Domain C adversarial suite — 14/16 handled (2 documented limitations)</span><button class="cp" onclick="cp(this)">copy</button></div>
+      <div class="cc">python3 run_adversarial_tests.py</div>
+      <div class="cd">16 cases designed to break the system. 14/16 handled correctly. Failures: L-015 (directional aggregation evasion) and L-016 (trust consensus fabrication) — documented in KNOWN_LIMITATIONS.md.</div>
+    </div>
+
+    <div class="card" style="--ca:var(--ok)">
+      <div class="ch"><span class="cl">Claim: self-correction gate — LLM returned MALICE 0.91, gate corrected to INTENT 0.74 (REAL-007)</span><button class="cp" onclick="cp(this)">copy</button></div>
+      <div class="cc">python3 vigia_agent.py <span class="fl">--evidence</span> <span class="pa">data/cases/converted/VIGIA-REAL-007.json</span> <span class="fl">--case-id</span> <span class="st">VIGIA-REAL-007</span></div>
+      <div class="cd">Expected: <strong>final_verdict: INTENT · final_confidence: 0.74 · self_correction_applied: true</strong>. Sealed in bundle at <code>results/real/VIGIA-REAL-007_bundle_llm.json</code>.</div>
+    </div>
+
+    <div class="card" style="--ca:var(--ok)">
+      <div class="ch"><span class="cl">Claim: REAL-008 CON LLM — Cridex MALICE 93%, reason_with_llm called, EBS v1 Level 2</span><button class="cp" onclick="cp(this)">copy</button></div>
+      <div class="cc">python3 forensics/verify_ebs_v1.py <span class="pa">results/real/VIGIA-REAL-008_bundle.json</span> <span class="fl">--verbose</span></div>
+      <div class="cd">Expected: <strong>PASS — Level 2 — Cryptographically valid</strong> · <strong>R6_DEVIL_ADVOCATE: OK</strong>. Bundle includes <code>reason_with_llm_called: true</code>, <code>reason_with_llm_result: MALICE at 0.97</code>, <code>self_correction_applied: false</code> (correction_applied=false from validate_and_correct_analysis). Amicus Curiae: <code>results/real/VIGIA-REAL-008_amicus_curiae.md</code>.</div>
+    </div>
+
+    <div class="card" style="--ca:var(--ok)">
+      <div class="ch"><span class="cl">Claim: Daubert admissibility metrics — ROC AUC, Brier, ECE</span><button class="cp" onclick="cp(this)">copy</button></div>
+      <div class="cc">python3 tests/validate_dataset.py</div>
+      <div class="cd">Expected: ROC AUC=0.9684 · Brier=0.0866 · ECE=0.0825 · K-fold=0.9646±0.0183 · Verdict: <strong>DEFENDIBLE</strong>.</div>
+    </div>
+
+    <div class="card" style="--ca:var(--ok)">
+      <div class="ch"><span class="cl">Claim: 55 EBS v1 integration tests pass</span><button class="cp" onclick="cp(this)">copy</button></div>
+      <div class="cc"><span class="kw">PYTHONPATH</span>=<span class="pa">$(pwd)</span> python3 tests/integration/test_ebs_v1_integration.py</div>
+      <div class="cd">Expected: <strong>55/55 passed</strong>. Covers cryptographic seal, hash chain, tamper detection, AbductionTrace.</div>
+    </div>
+
   </div>
 </div>
 

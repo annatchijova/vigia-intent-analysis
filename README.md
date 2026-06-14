@@ -1025,6 +1025,162 @@ minimum `acquisition_hash` length (64 hex chars), `examiner_id` presence.
 
 ---
 
+## For Judges
+
+This page exists solely to make evaluation easier.
+
+You do not need to learn any commands. Every example below is a ready-to-run
+copy/paste shortcut that reproduces a specific result, benchmark, case, or
+validation claim presented elsewhere in this project.
+
+The goal is transparency and reproducibility, not CLI training.
+
+VIGÍA does not ask evaluators to trust reported results. Every benchmark,
+accuracy claim, determinism claim, validation result, and case outcome can
+be reproduced locally with the commands below.
+
+If you only want to inspect the architecture, published cases, web simulators,
+or benchmark reports, this section can be ignored entirely.
+
+---
+
+### Domain A — 117/117 deterministic accuracy
+
+**Claim:** 117 cases, 100% correct in fallback mode (no API key, no LLM).
+
+```bash
+python3 run_all_agent.py --timeout 90
+```
+
+Expected output: `117/117 PASS`
+
+---
+
+### Unit test suite — 163 passed, 6 xfailed
+
+**Claim:** 163 tests pass; 6 are `xfailed` (documented regressions with
+regression-preventing tests — see [`KNOWN_LIMITATIONS.md`](./KNOWN_LIMITATIONS.md)).
+
+```bash
+python3 -m pytest tests/ -v
+```
+
+Expected output: `163 passed, 6 xfailed`
+
+---
+
+### Deterministic outputs — same input → same SHA-256
+
+**Claim:** Identical evidence always produces a bit-for-bit identical bundle.
+Verified by running the same case three times and comparing SHA-256 hashes.
+
+```bash
+PYTHONPATH=$(pwd) python3 tests/check_determinism.py
+```
+
+Expected output: three matching hashes — determinism confirmed.
+
+---
+
+### EBS v1 cryptographic bundle verification
+
+**Claim:** Every sealed bundle is independently verifiable using stdlib Python only,
+no VIGÍA code required. The verifier recomputes all hashes from scratch.
+
+```bash
+python3 forensics/verify_ebs_v1.py results/real/VIGIA-REAL-001_bundle.json --verbose
+```
+
+Expected output: `PASS — Level 2 — Cryptographically valid` (or Level 3 if ECL present).
+
+---
+
+### Four-hash forensic integrity display
+
+**Claim:** Each bundle exposes four independently computable hashes covering the
+evidence graph, sealed bundle, HMAC audit chain, and independent EBS v1 verification.
+
+```bash
+python3 show_4_hashes.py data/cases/converted/VIGIA-REAL-008.json
+```
+
+Expected output: H1 graph\_hash, H2 bundle\_hash, H3 HMAC chain, H4 EBS verify — all GREEN.
+
+---
+
+### Single case reproduction
+
+**Claim:** Any published case can be reproduced end-to-end from the case JSON alone.
+
+```bash
+python3 vigia_agent.py --evidence data/cases/converted/VIGIA-REAL-001.json \
+  --case-id VIGIA-REAL-001
+```
+
+Replace `VIGIA-REAL-001` with any case ID from `data/cases/converted/`.
+Produces a sealed `ForensicBundle` with HMAC-signed audit trail.
+
+---
+
+### Adversarial suite — Domain C, 14/16 handled
+
+**Claim:** 16 cases designed to break the system; 14 handled correctly.
+The 2 failures are documented limitations (L-015, L-016).
+
+```bash
+python3 run_adversarial_tests.py
+```
+
+---
+
+### Self-correction gate — VIGIA-REAL-007 live example
+
+**Claim:** LLM returned MALICE 0.91; deterministic gate corrected to INTENT 0.74.
+`self_correction_applied: true` is sealed in the bundle.
+
+```bash
+python3 vigia_agent.py --evidence data/cases/converted/VIGIA-REAL-007.json \
+  --case-id VIGIA-REAL-007
+```
+
+Expected: `final_verdict: INTENT`, `final_confidence: 0.74`, `self_correction_applied: true`
+
+---
+
+### VIGIA-REAL-008 — Cridex banking trojan (CON LLM)
+
+**Claim:** Memory forensics on `cridex.vmem`. `reason_with_llm` called.
+MALICE 93%, posterior 0.998, EBS v1 Level 2 verified.
+Bundle and Amicus Curiae available at `results/real/VIGIA-REAL-008_bundle.json`.
+
+```bash
+python3 forensics/verify_ebs_v1.py results/real/VIGIA-REAL-008_bundle.json --verbose
+```
+
+Expected: `PASS — Level 2 — Cryptographically valid`, `R6_DEVIL_ADVOCATE: OK`
+
+```bash
+python3 show_4_hashes.py data/cases/converted/VIGIA-REAL-008.json
+```
+
+Expected:
+```
+H1 graph_hash  : 94147b51c639cd0c...  PRESENT
+H2 bundle_hash : 125f7f06af5a4f56...  PRESENT
+H3 HMAC chain  : 6addf5b7d99a11d9...  OK
+H4 EBS verify  : PASS — Level 2
+```
+
+---
+
+### Web simulator (no install required)
+
+**Claim:** Full scoring pipeline available in-browser. No API key, no signup.
+
+[https://annatchijova.github.io/vigia/vigia_commands_en.html](https://annatchijova.github.io/vigia/vigia_commands_en.html)
+
+---
+
 ## License
 
 Apache 2.0 License. See [`LICENSE`](./LICENSE).
