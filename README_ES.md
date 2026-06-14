@@ -1032,7 +1032,19 @@ por completo.
 python3 run_all_agent.py --timeout 90
 ```
 
-Salida esperada: `117/117 PASS`
+`run_all_agent.py` ejecuta los 136 casos en los tres dominios (A + B + C).
+Casos del Dominio A (métrica central): **117/117 PASS (100%)**
+
+Salida total esperada:
+```
+Results: 134/136 PASS  2 FAIL
+
+FAILED CASES:
+  VIGIA-AMB-001: agent=NOISE (exp=ABSTAIN)
+  VIGIA-AMB-002: agent=NOISE (exp=ABSTAIN)
+```
+
+Los 2 fallos son casos del Dominio B (límite epistémico, L-012), no regresiones del Dominio A.
 
 ---
 
@@ -1068,10 +1080,19 @@ Salida esperada: tres hashes idénticos — determinismo confirmado.
 stdlib de Python, sin código de VIGÍA. El verificador recalcula todos los hashes desde cero.
 
 ```bash
-python3 forensics/verify_ebs_v1.py results/real/VIGIA-REAL-001_bundle.json --verbose
+# Opción A — usar un bundle EBS v1 pre-committed (más rápido):
+python3 forensics/verify_ebs_v1.py results/srl2018/VIGIA-REAL-SRL-DMZ-FTP_bundle.json --verbose
+
+# Opción B — generar bundle EBS v1 inline y verificar en un paso:
+python3 show_4_hashes.py data/cases/converted/VIGIA-REAL-001.json
 ```
 
 Salida esperada: `PASS — Level 2 — Cryptographically valid` (o Level 3 si hay ECL presente).
+
+> **Nota:** Los bundles en `results/real/` fueron generados por `vigia_agent.py` (formato de auditoría del agente).
+> La verificación EBS v1 requiere bundles producidos por el pipeline determinista —
+> usá `show_4_hashes.py` para generar y verificar inline, o usá el bundle pre-committed
+> en `results/srl2018/`.
 
 ---
 
@@ -1104,8 +1125,15 @@ Produce un `ForensicBundle` sellado con cadena de auditoría firmada con HMAC.
 
 ### Suite adversarial — Dominio C, 14/16 manejados
 
-**Afirmación:** 16 casos diseñados para romper el sistema; 14 manejados correctamente.
-Los 2 fallos son limitaciones documentadas (L-015, L-016).
+**Afirmación:** Harness adversarial extendido — 25 casos en total (corpus BREAK del Dominio C + pruebas de estrés adicionales). 22/25 manejados correctamente. 3 fallos incluyen limitaciones documentadas (L-015, L-016) más un caso de sobreconfianza epistémica.
+
+Salida esperada:
+```
+Total cases: 25  |  Passed: 22  |  Failed: 3  |  HIGH RISK false confidence: 0
+```
+> 'Failed' = el sistema fue sobreconfiado bajo colapso de asunciones. Esto es el harness
+> funcionando correctamente — ver EPISTEMOLOGICAL NOTE en la salida. La tabla del Dominio C (16/14)
+> refleja solo el subconjunto del corpus BREAK.
 
 ```bash
 python3 run_adversarial_tests.py
