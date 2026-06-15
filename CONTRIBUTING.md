@@ -177,10 +177,6 @@ Key items still open for contribution:
 - **FW-008:** Full `Fraction` conversion of intermediate scoring values.
   Currently the verdict decision path is deterministic, but some intermediate
   float operations remain. Full rationalization is the target.
-- **L-019:** False flag rule logic in `caie.py`. The current implementation
-  may not correctly handle all genuine false flag cases. Any contribution
-  here requires careful reading of the false flag semantics documented in
-  `KNOWN_LIMITATIONS.md` — the failure mode is subtle.
 - **Domain expansion:** New case categories, especially IoT, cloud-native,
   and mobile forensics environments.
 - **Language coverage:** The NLP layer operates primarily on English-language

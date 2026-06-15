@@ -176,10 +176,6 @@ Elementos clave todavía abiertos para contribución:
   Actualmente el camino de decisión del veredicto es determinista, pero algunas
   operaciones intermedias de punto flotante permanecen. La racionalización completa
   es el objetivo.
-- **L-019:** Lógica de regla de bandera falsa en `caie.py`. La implementación actual
-  puede no manejar correctamente todos los casos genuinos de bandera falsa. Cualquier
-  contribución acá requiere lectura cuidadosa de la semántica de bandera falsa
-  documentada en `KNOWN_LIMITATIONS.md` — el modo de falla es sutil.
 - **Expansión de dominio:** Nuevas categorías de casos, especialmente entornos forenses
   de IoT, nativos de nube, y móviles.
 - **Cobertura de idiomas:** La capa de NLP opera principalmente sobre artefactos en
