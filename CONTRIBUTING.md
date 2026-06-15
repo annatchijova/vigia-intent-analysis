@@ -4,7 +4,91 @@
 **Author:** Anna Tchijova  
 **Last updated:** June 2026
 
-> Este documento también está disponible en español: [CONTRIBUYENDO.md](./CONTRIBUYENDO.md)
+---
+
+## Protocol P2 Compliance — Required Reading for Forks
+
+VIGÍA's mathematical core operates under **Protocol P2**, the deterministic
+entropy specification that governs all scoring reproducibility claims. If you
+are forking this repository, porting the entropy kernel to another language,
+or building a tool that claims VIGÍA compatibility, **you must read P2 before
+writing a single line of scoring code.**
+
+The full specification is at `docs/protocols/P2/SPEC.md`. The canonical
+vectors are at `canonical_vectors_p2.json`, accompanied by
+`canonical_vectors_p2.sha256`. The SHA-256 of the vectors file is normative:
+any modification — including whitespace — invalidates the fingerprint and the
+compatibility claim.
+
+### What P2 Governs
+
+P2 defines the reproducibility contract for: Shannon entropy, normalized
+entropy, entropy rate, Markov order-k conditional entropy, Lempel-Ziv
+complexity (LZ76 variant), permutation entropy, pair encoding, abstention
+thresholds, and adversarial rejection (NaN, Inf, denormals).
+
+P2 does **not** define: semantic interpretation of evidence, authorship
+attribution, intent inference, legal admissibility, or ontological claims
+about "authenticity." These are explicitly out of scope and documented as
+such in the spec's non-goals section.
+
+### Compliance Levels
+
+| Level | Who it's for | Claim permitted |
+|-------|-------------|-----------------|
+| **Strict** | Forensic audit, legal proceedings | `VIGÍA-compatible P2 (strict)` |
+| **Reference** | Production DFIR, research, cross-platform | `VIGÍA-compatible P2` |
+| **Accelerated** | Real-time, embedded, high-volume | `VIGÍA-accelerated` — **cannot claim P2 compatibility** |
+
+Strict compliance requires pure Python, sequential reduction, and
+`Decimal.quantize()` HALF_EVEN canonicalization. Reference compliance permits
+NumPy/CuPy with float64 accumulators. Accelerated permits float32 but forfeits
+the compatibility claim entirely — this is non-negotiable and documented in
+the spec's compliance levels section.
+
+### The Revocation Clause
+
+P2 §3 contains a revocation clause that applies to forks and derivative works.
+If your documentation, UI labels, CLI output, API field names, or any
+user-facing material uses any of the following phrases, **you automatically
+forfeit the right to claim P2 compatibility**, regardless of whether your
+vectors pass:
+
+- "AI detector" / "bot detector" / "human-vs-machine classifier"
+- "authenticity score" / "deception score" / "intent score" / "humanity index"
+
+These are ontological claims that P2's mathematical measurements cannot
+support. A high-entropy sequence is not "more human." A low-entropy sequence
+is not "more synthetic." If your tool needs to make those claims, it needs
+an independently validated decision layer above P2, and it cannot use VIGÍA's
+compatibility mark to do it.
+
+### Known Adversarial Gaps
+
+P2 documents 10 known gaps (GAP-01 through GAP-10) — adversarial scenarios
+not yet covered by canonical vectors. These include entropy inflation attacks,
+symbolic explosion via sub-ULP float perturbations, calibration drift,
+and LZ period aliasing on short sequences. Read §14 of the spec before
+claiming robustness properties. These gaps are append-only: once assigned,
+a GAP-NN identifier is never reused.
+
+### P2 Status
+
+P2 is currently **draft pre-freeze**. Target freeze date was 2026-06-15,
+aligned with the SANS FIND EVIL Hackathon submission. Freeze requires
+empirical validation of abstention thresholds (currently heuristic),
+cross-backend verification on 3+ runtimes, and formal chain-of-custody
+testing. Until freeze, thresholds are advisory. Any production deployment
+must document threshold provenance.
+
+P1 is frozen and immutable. P2 depends on P1. Validators must pass P1 first.
+
+### P3 Roadmap
+
+P2 is infrastructure, not a forensic system. The following capabilities are
+explicitly deferred to P3: formal discretization standard, score fusion and
+weighting, uncertainty propagation, calibration protocol, and Peircean
+inference closure. P2 measures. P3 will reason.
 
 ---
 
