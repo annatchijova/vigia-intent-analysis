@@ -74,15 +74,8 @@ de solo adición: una vez asignado, un identificador GAP-NN nunca se reutiliza.
 
 ### Estado de P2
 
-P2 está actualmente en **borrador pre-freeze**. La fecha objetivo de freeze fue
-2026-06-15, alineada con el envío al SANS FIND EVIL Hackathon. El freeze requiere
-validación empírica de los umbrales de abstención (actualmente heurísticos),
-verificación entre backends en 3+ runtimes, y testing formal de cadena de custodia.
-Hasta el freeze, los umbrales son orientativos. Cualquier despliegue en producción
-debe documentar la procedencia de los umbrales.
-
-P1 está congelado e inmutable. P2 depende de P1. Los validadores deben pasar P1
-primero.
+P2 está **congelado**. Los umbrales son normativos. P1 está congelado e inmutable.
+P2 depende de P1. Los validadores deben pasar P1 primero.
 
 ### Hoja de ruta P3
 

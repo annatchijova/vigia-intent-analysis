@@ -76,14 +76,8 @@ a GAP-NN identifier is never reused.
 
 ### P2 Status
 
-P2 is currently **draft pre-freeze**. Target freeze date was 2026-06-15,
-aligned with the SANS FIND EVIL Hackathon submission. Freeze requires
-empirical validation of abstention thresholds (currently heuristic),
-cross-backend verification on 3+ runtimes, and formal chain-of-custody
-testing. Until freeze, thresholds are advisory. Any production deployment
-must document threshold provenance.
-
-P1 is frozen and immutable. P2 depends on P1. Validators must pass P1 first.
+P2 is **frozen**. Thresholds are normative. P1 is frozen and immutable.
+P2 depends on P1. Validators must pass P1 first.
 
 ### P3 Roadmap
 
