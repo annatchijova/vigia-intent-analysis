@@ -14,40 +14,40 @@
 """
 vigia/models/ebs_v1.py
 ─────────────────────────────────────────────────────────────────────────────
-Evidence Bundle Specification v1.0 — Modelos de Datos PUROS
+Evidence Bundle Specification v1.0 — Pure Data Models
 
-ARQUITECTURA: Capa 0 — Datos y Contratos (INMUTABLE)
+ARCHITECTURE: Layer 0 — Data & Contracts (IMMUTABLE)
 
-REGLA ABSOLUTA: Este módulo es SOLO datos.
-    - Sin lógica de negocio
-    - Sin hashing
-    - Sin sellado
-    - Sin referencias a LLM, Ollama, backends de narrativa
-    - Sin imports de capas superiores
+ABSOLUTE RULE: This module contains DATA ONLY.
+    - No business logic
+    - No hashing
+    - No sealing
+    - No references to LLMs, Ollama, or narrative backends
+    - No imports from higher layers
 
-El sellado criptografico vive en forensics/bundle_builder.py.
-La narrativa LLM vive en pipeline.py como post-procesador externo.
+Cryptographic sealing lives in forensics/bundle_builder.py.
+LLM narrative lives in pipeline.py as an external post-processor.
 
-RAZON (auditores Gemini + DeepSeek):
-    Un bundle que se hashea a si mismo permite que un motor comprometido
-    selle su propia mentira. El sellado debe ser un proceso externo de
-    atestacion, independiente del modelo que produce los datos.
+RATIONALE (Gemini + DeepSeek auditors):
+    A bundle that hashes itself allows a compromised engine to seal its own
+    lie. Sealing must be an external attestation process, independent of the
+    inference engine that produced the data.
 
-    El SystemState es matematico puro. Contaminarlo con variables de
-    infraestructura no determinista (modelo LLM) hace el hash impugnable
-    ante Daubert: cambiar el modelo de narrativa no debe cambiar la prueba.
+    SystemState is pure mathematics. Contaminating it with non-deterministic
+    infrastructure variables (LLM model) makes the hash challengeable under
+    Daubert: changing the narrative model must not change the evidence.
 
-INVARIANTES:
-    I1 Determinismo:            mismo input -> mismo bundle
-    I2 Integridad encadenada:   bundle_hash cubre TODO el contenido
-    I3 Politica verificable:    policy_spec independiente del runtime
-    I4 Acciones explicitas:     sin efectos implicitos
-    I5 Decision explicable:     risk y posterior SIEMPRE presentes
+INVARIANTS:
+    I1 Determinism:          same input -> same bundle
+    I2 Chained integrity:    bundle_hash covers ALL content
+    I3 Verifiable policy:    policy_spec independent of runtime
+    I4 Explicit actions:     no implicit side effects
+    I5 Explainable decision: risk and posterior ALWAYS present
 
-COMPATIBILIDAD:
+COMPATIBILITY:
     Python 3.10+
-    Pydantic v2 preferido, fallback dataclasses stdlib
-    Sin dependencias externas en fallback
+    Pydantic v2 preferred, stdlib dataclasses fallback
+    No external dependencies in fallback path
 ─────────────────────────────────────────────────────────────────────────────
 """
 from __future__ import annotations
@@ -66,8 +66,8 @@ except ImportError:
 
 
 # ---------------------------------------------------------------------------
-# Constantes del estandar
-# NOTA: verify_ebs_v1.py las replica localmente — no las importa desde aqui.
+# Standard constants
+# NOTE: verify_ebs_v1.py replicates these locally — it does not import from here.
 # ---------------------------------------------------------------------------
 
 EBS_VERSION: str = "1.0"
@@ -92,9 +92,9 @@ def _new_uuid() -> str:
 if _USE_PYDANTIC:
     class SignalOutput(BaseModel):
         """
-        Output canonico de herramienta forense.
+        Canonical output of a forensic tool.
         z_score = (value - baseline_mean) / baseline_MAD
-        Calculado determinisiticamente. El LLM nunca participa.
+        Computed deterministically. The LLM never participates.
         """
         tool_name: str
         signal_id: str = Field(default_factory=_new_uuid)
@@ -102,7 +102,6 @@ if _USE_PYDANTIC:
         z_score: float
         confidence: float = Field(default=1.0, ge=0.0, le=1.0)
         metadata: Optional[Dict[str, Any]] = None
-        description: Optional[str] = None
         description: Optional[str] = None
 
         @field_validator("z_score")
@@ -138,15 +137,15 @@ else:
 
 
 # ===========================================================================
-# EvidenceEdge y EvidenceGraph
+# EvidenceEdge and EvidenceGraph
 # ===========================================================================
 
 if _USE_PYDANTIC:
     class EvidenceEdge(BaseModel):
         """
-        Arista del grafo de evidencia con estabilidad bootstrap.
-        pi_ij = freq(arista ij en B=500 remuestreos).
-        Interpretacion forense: relacion estadisticamente robusta, no correlacion puntual.
+        Evidence graph edge with bootstrap stability.
+        pi_ij = freq(edge ij across B=500 resampling rounds).
+        Forensic interpretation: statistically robust relationship, not a point correlation.
         """
         source: str
         target: str
@@ -163,9 +162,9 @@ if _USE_PYDANTIC:
 
     class EvidenceGraph(BaseModel):
         """
-        Grafo de dependencias entre senales forenses.
-        Producido por GraphStabilityEngine.
-        graph_hash asignado por bundle_builder.py externamente.
+        Dependency graph between forensic signals.
+        Produced by GraphStabilityEngine.
+        graph_hash is assigned externally by bundle_builder.py.
         """
         nodes: List[str]
         edges: List[EvidenceEdge]
@@ -176,16 +175,16 @@ if _USE_PYDANTIC:
 
         def global_stability(self) -> float:
             """
-            Estabilidad global PENALIZADA por fractura del grafo.
+            Global stability PENALIZED by graph fragmentation.
 
-            CORRECCION CRITICA (Gemini):
-            Si el grafo es un caos y queda solo una arista fuerte, el promedio
-            simple de esa arista reportaria 0.9, enganando al RiskBoundedLayer.
+            CRITICAL FIX (Gemini):
+            If the graph is fragmented and only one strong edge remains, a naive
+            mean would report 0.9, misleading the RiskBoundedLayer.
 
-            Formula correcta:
-                S = mean(pi_estable) * (n_aristas_estables / n_aristas_posibles)
+            Correct formula:
+                S = mean(pi_stable) * (n_stable_edges / n_possible_edges)
 
-            Si el grafo esta fracturado, S -> 0 -> riesgo explota -> ABSTAIN.
+            If the graph is fractured, S -> 0 -> risk explodes -> ABSTAIN.
             """
             n = len(self.nodes)
             if n == 0:
@@ -204,7 +203,7 @@ if _USE_PYDANTIC:
             return mean_pi * coverage
 
         def connected_components(self) -> List[List[str]]:
-            """Componentes conexas del grafo estable."""
+            """Connected components of the stable graph."""
             from collections import defaultdict
             adj: Dict[str, set] = defaultdict(set)
             for e in self.edges:
@@ -318,18 +317,18 @@ DecisionVerdict = Literal["ACCEPT", "REJECT", "ABSTAIN"]
 if _USE_PYDANTIC:
     class DecisionTrace(BaseModel):
         """
-        Resultado del RiskBoundedDecisionLayer.
-        Campos 100% matematicos. Sin referencias a LLM o infraestructura.
-        ABSTAIN es salida valida — indica zona de incertidumbre honesta.
+        Output of the RiskBoundedDecisionLayer.
+        All fields are 100% mathematical. No LLM or infrastructure references.
+        ABSTAIN is a valid output — it signals an honest uncertainty zone.
 
-        Campos de trazabilidad forense (H18):
-            reason_code    : código máquina del motivo de la decisión.
+        Forensic traceability fields (H18):
+            reason_code    : machine-readable decision reason code.
                              ACCEPT_POSTERIOR | REJECT_POSTERIOR |
                              ABSTAIN_DRIFT | ABSTAIN_INSTABILITY |
                              ABSTAIN_INTENTION | ABSTAIN_ZONE
-            abstain_reason : descripción humana cuando decision == ABSTAIN.
-            omega_intention: factor ω de consistencia de intención abductiva.
-                             Inyectado por AbductiveIntentEngine. [0,1]
+            abstain_reason : human-readable reason when decision == ABSTAIN.
+            omega_intention: omega factor for abductive intention consistency.
+                             Injected by AbductiveIntentEngine. [0,1]
         """
         decision: DecisionVerdict
         posterior: float = Field(ge=0.0, le=1.0)
@@ -343,10 +342,10 @@ if _USE_PYDANTIC:
         epsilon_used: float = 0.05
         components_used: int = 0
         signal_contributions: Optional[List[Dict[str, Any]]] = None
-        # H18: trazabilidad de causa de decisión
+        # H18: decision cause traceability
         reason_code: str = "UNKNOWN"
         abstain_reason: str = ""
-        # Integración soberana: factor omega de intención abductiva
+        # Sovereign integration: omega factor for abductive intention
         omega_intention: float = Field(default=1.0, ge=0.0, le=1.0)
         consistency_score: float = Field(default=1.0, ge=0.0, le=1.0)
 
@@ -368,10 +367,10 @@ else:
         epsilon_used: float = 0.05
         components_used: int = 0
         signal_contributions: Optional[List[Dict[str, Any]]] = None
-        # H18
+        # H18: decision cause traceability
         reason_code: str = "UNKNOWN"
         abstain_reason: str = ""
-        # Integración soberana
+        # Sovereign integration
         omega_intention: float = 1.0
         consistency_score: float = 1.0
 
@@ -380,7 +379,7 @@ else:
 
 
 # ===========================================================================
-# PolicyRule y PolicySpec
+# PolicyRule and PolicySpec
 # ===========================================================================
 
 if _USE_PYDANTIC:
@@ -456,7 +455,7 @@ else:
 
 if _USE_PYDANTIC:
     class ActionRecord(BaseModel):
-        """Intervencion ejecutada. Sin efectos implicitos (I4)."""
+        """Executed intervention. No implicit side effects (I4)."""
         action_id: str = Field(default_factory=_new_uuid)
         variable: str
         delta: float
@@ -498,18 +497,18 @@ else:
 
 
 # ===========================================================================
-# SystemState — PURIFICADO: solo parametros matematicos, sin LLM
+# SystemState — PURIFIED: mathematical parameters only, no LLM references
 # ===========================================================================
 
 if _USE_PYDANTIC:
     class SystemState(BaseModel):
         """
-        Estado matematico del sistema en el momento del sellado.
+        Mathematical state of the system at sealing time.
 
-        PURIFICADO (DeepSeek + Gemini):
-        Sin ollama_backend, sin claude_code, sin referencias a LLM.
-        Si cambia el modelo de narrativa, el hash del bundle NO debe cambiar.
-        La narrativa es post-procesador externo, no forma parte de la prueba.
+        PURIFIED (DeepSeek + Gemini):
+        No ollama_backend, no claude_code, no LLM references.
+        If the narrative model changes, the bundle hash MUST NOT change.
+        The narrative is an external post-processor — it is not part of the evidence.
         """
         lambda_drift: float = 2.0
         gamma_stability: float = 2.0
@@ -548,8 +547,8 @@ else:
 if _USE_PYDANTIC:
     class IntegrityBlock(BaseModel):
         """
-        Hashes SHA-256 encadenados.
-        Producido por bundle_builder.py — nunca por ForensicBundle.
+        Chained SHA-256 hashes.
+        Produced by bundle_builder.py — never by ForensicBundle itself.
         """
         bundle_hash: str = ""
         graph_hash: str = ""
@@ -578,54 +577,54 @@ else:
 
 
 # ===========================================================================
-# AbductionTrace — trazabilidad del razonamiento abductivo (PeircePlanner)
+# AbductionTrace — abductive reasoning traceability (PeircePlanner)
 # ===========================================================================
-# Este objeto registra el "por que" el sistema priorizo ciertas senales.
-# Es el rastro Semiotico: Firstness -> Secondness -> Thirdness.
-# Vive en ForensicBundle.abduction_trace para auditoria del perito.
+# Records *why* the system prioritized certain signals over others.
+# Semiotic trace: Firstness -> Secondness -> Thirdness.
+# Lives in ForensicBundle.abduction_trace for expert witness audit.
 # ===========================================================================
 
 if _USE_PYDANTIC:
     class AbductionTrace(BaseModel):
         """
-        Traza del razonamiento abductivo que fundamento la priorización de señales.
+        Trace of the abductive reasoning that grounded signal prioritization.
 
-        Peirce Semiotics aplicada a DFIR:
-            Firstness  — señal cruda observada (raw_signals_observed)
-            Secondness — anomalia detectada respecto al baseline (anomalies_found)
-            Thirdness  — hipotesis/ley del atacante que emerge de la correlacion
+        Peircean Semiotics applied to DFIR:
+            Firstness  — raw signal observed (raw_signals_observed)
+            Secondness — anomaly detected against baseline (anomalies_found)
+            Thirdness  — attacker hypothesis/law emerging from correlation
                          (hypothesis + execution_plan_rationale)
 
-        Este objeto responde a la pregunta del perito:
-            "¿Por qué el sistema priorizó ELA sobre CLIP?
-             ¿Por qué abortó las pericias pesadas?
-             ¿Qué señal desencadenó el REJECT?"
+        This object answers the expert witness question:
+            "Why did the system prioritize ELA over CLIP?
+             Why were heavy forensic tools aborted?
+             Which signal triggered the REJECT?"
 
-        REGLA: AbductionTrace es readonly post-sellado.
-        BundleBuilder lo incluye en el bundle_hash.
+        RULE: AbductionTrace is readonly after sealing.
+        BundleBuilder includes it in the bundle_hash.
         """
-        # Firstness: lo que estaba disponible
+        # Firstness: what was available
         tools_available: List[str] = Field(default_factory=list)
         tools_executed: List[str] = Field(default_factory=list)
         tools_skipped: List[str] = Field(default_factory=list)
 
-        # Secondness: que senales resultaron anomalas
+        # Secondness: which signals were anomalous
         dominant_signal: Optional[str] = None
         dominant_z_score: float = 0.0
         cluster_name: Optional[str] = None
         anomalies_found: List[Dict[str, Any]] = Field(default_factory=list)
 
-        # Thirdness: la hipotesis emergente
-        peirce_firstness: str = ""   # "Señal SDA con z=3.2 detectada"
-        peirce_secondness: str = ""  # "Anomalia respecto a baseline AUTHENTIC"
-        peirce_thirdness: str = ""   # "Patron consistente con fabricacion LLM"
+        # Thirdness: the emerging hypothesis
+        peirce_firstness: str = ""   # e.g. "SDA signal with z=3.2 detected"
+        peirce_secondness: str = ""  # e.g. "Anomaly vs AUTHENTIC baseline"
+        peirce_thirdness: str = ""   # e.g. "Pattern consistent with LLM fabrication"
 
-        # Razon de priorizacion del ResourceOptimizer
+        # ResourceOptimizer prioritization rationale
         execution_plan_rationale: List[Dict[str, Any]] = Field(default_factory=list)
         abort_reason: Optional[str] = None
         abort_triggered: bool = False
 
-        # Metadatos de trazabilidad
+        # Traceability metadata
         inference_mode: str = "FALLBACK"
         clustering_method: str = "heuristic_default"
         correlation_penalties_applied: bool = False
@@ -658,25 +657,25 @@ else:
 
 
 # ===========================================================================
-# ForensicBundle — ESTRUCTURA DE DATOS PURA
-# Sin seal(), sin hashing, sin quick_verify()
-# El sellado es responsabilidad exclusiva de forensics/bundle_builder.py
+# ForensicBundle — PURE DATA STRUCTURE
+# No seal(), no hashing, no quick_verify()
+# Sealing is the exclusive responsibility of forensics/bundle_builder.py
 # ===========================================================================
 
 class ForensicBundle:
     """
-    Artefacto EBS v1 — contenedor de datos puro.
+    EBS v1 artifact — pure data container.
 
-    REFACTORIZADO: Este objeto NO se sella a si mismo.
-    El sellado es ejecutado por forensics/bundle_builder.py como proceso
-    externo de atestacion. Esto garantiza que un motor comprometido no pueda
-    sellar su propia mentira.
+    REFACTORED: This object does NOT seal itself.
+    Sealing is performed by forensics/bundle_builder.py as an external
+    attestation process. This guarantees a compromised engine cannot seal
+    its own lie.
 
-    Flujo correcto:
-        bundle = ForensicBundle(...)          # datos puros
-        sealed_dict = BundleBuilder.seal(bundle)   # atestacion externa
+    Correct flow:
+        bundle = ForensicBundle(...)               # pure data
+        sealed_dict = BundleBuilder.seal(bundle)   # external attestation
         BundleBuilder.save(sealed_dict, path)
-        # => verify_ebs_v1.py path  (stdlib puro, sin imports de produccion)
+        # => verify_ebs_v1.py path  (stdlib only, no production imports)
     """
 
     VERSION = EBS_VERSION
@@ -698,18 +697,18 @@ class ForensicBundle:
         self.policy_spec: PolicySpec = policy_spec
         self.actions: List[ActionRecord] = actions or []
         self.system_state: SystemState = system_state or SystemState()
-        # abduction_trace: trazabilidad del razonamiento abductivo (PeircePlanner)
-        # Responde al perito: "por que se priorizaron estas senales"
+        # abduction_trace: traceability of abductive reasoning (PeircePlanner)
+        # Answers the expert witness: "why were these signals prioritized"
         self.abduction_trace: Optional[AbductionTrace] = abduction_trace
-        # integrity: asignado externamente por BundleBuilder.seal()
+        # integrity: assigned externally by BundleBuilder.seal()
         self.integrity: Optional[IntegrityBlock] = None
 
     def to_dict(self) -> Dict[str, Any]:
         """
-        Serializa el contenido del bundle (sin integrity — la agrega BundleBuilder).
+        Serialize bundle contents (without integrity — BundleBuilder appends it).
 
-        Incluye abduction_trace si esta presente: es parte del hash del bundle
-        y permite al auditor verificar el razonamiento abductivo completo.
+        Includes abduction_trace if present: it is part of the bundle_hash
+        and allows the auditor to verify the complete abductive reasoning.
         """
         d = {
             "bundle_id": self.bundle_id,
@@ -721,7 +720,7 @@ class ForensicBundle:
             "actions": [a.to_dict() for a in self.actions],
             "system_state": self.system_state.to_dict(),
         }
-        # abduction_trace es opcional — si existe, se incluye en el bundle_hash (I2)
+        # abduction_trace is optional — if present, it is included in bundle_hash (I2)
         if self.abduction_trace is not None:
             d["abduction_trace"] = self.abduction_trace.to_dict()
         return d
@@ -737,7 +736,7 @@ class ForensicBundle:
 
 
 # ===========================================================================
-# Factory
+# Factory helpers
 # ===========================================================================
 
 def make_default_policy(
@@ -748,39 +747,41 @@ def make_default_policy(
     rules = [
         PolicyRule(variable="posterior", max_delta=0.10,
                    allowed_roles=["system", "analyst"],
-                   description="Limite de cambio en probabilidad posterior"),
+                   description="Maximum allowed change in posterior probability"),
         PolicyRule(variable="drift", max_delta=0.15,
                    allowed_roles=["system"],
-                   description="Limite de correccion de drift"),
+                   description="Maximum allowed drift correction"),
         PolicyRule(variable="graph_stability", max_delta=0.05,
                    allowed_roles=["system"], requires_approval=True,
-                   description="Cambios en estabilidad del grafo requieren aprobacion"),
+                   description="Graph stability changes require explicit approval"),
         PolicyRule(variable="lambda_drift", max_delta=1.0,
                    allowed_roles=["system"],
-                   description="Ajuste adaptativo de sensibilidad al drift"),
+                   description="Adaptive drift sensitivity adjustment"),
         PolicyRule(variable="gamma_stability", max_delta=1.0,
                    allowed_roles=["system"],
-                   description="Ajuste adaptativo de sensibilidad estructural"),
+                   description="Adaptive structural sensitivity adjustment"),
     ]
     return PolicySpec(
         version="1.0", rules=rules,
         epsilon_accept=epsilon, epsilon_reject=epsilon,
         lambda_drift_init=lambda_drift, gamma_stability_init=gamma_stability,
-        description="Politica VIGIA por defecto — SANS FIND EVIL 2026",
+        description="VIGIA default policy — SANS FIND EVIL 2026",
     )
 
 def enfsi_label(lr: float) -> str:
     """
-    Convierte un Likelihood Ratio en una etiqueta verbal
-    según la escala ENFSI (European Network of Forensic Science Institutes).
-    
-    Escala:
-        LR < 10:        "weak"
-        10 <= LR < 100: "moderate"
-        100 <= LR < 1000: "moderately strong"
+    Convert a Likelihood Ratio to a verbal label
+    per the ENFSI scale (European Network of Forensic Science Institutes).
+
+    Scale:
+        LR == 0:            "inconclusive"
+        LR < 1:             "supports_H0"  (evidence favors authenticity)
+        1  <= LR < 2:       "weak"
+        2  <= LR < 10:      "limited"
+        10 <= LR < 100:     "moderate"
+        100 <= LR < 1000:   "moderately strong"
         1000 <= LR < 10000: "strong"
-        LR >= 10000:    "very strong"
-        LR == 0:        "inconclusive"
+        LR >= 10000:        "very strong"
     """
     if lr == 0:
         return "inconclusive"
