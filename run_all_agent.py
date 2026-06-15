@@ -187,7 +187,8 @@ def main():
             results.append({"case_id": case_id, "expected": expected, "got": "TIMEOUT", "pass": False, "elapsed": args.timeout})
         except Exception as e:
             print(f"  {RED}ERROR: {e}{RST}")
-            results.append({"case_id": case_id, "expected": expected, "got": "ERROR", "pass": False, "elapsed": 0})
+            elapsed = time.time() - t0
+            results.append({"case_id": case_id, "expected": expected, "got": "ERROR", "pass": False, "elapsed": round(elapsed, 1)})
 
     # ── Resumen ───────────────────────────────────────────────────────────────
     total_elapsed = time.time() - start_total
@@ -205,7 +206,16 @@ def main():
 
     # Guardar resumen
     summary_path = OUTPUT_DIR / "_batch_summary.json"
-    summary_path.write_text(json.dumps({"results": results, "passed": passed, "total": len(results)}, indent=2))
+    import datetime
+    summary = {
+        "generated_at": datetime.datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "total_elapsed_s": round(total_elapsed, 1),
+        "avg_elapsed_s": round(total_elapsed / max(len(results), 1), 1),
+        "passed": passed,
+        "total": len(results),
+        "results": results,
+    }
+    summary_path.write_text(json.dumps(summary, indent=2))
     print(f"  Resumen guardado en: {summary_path}")
 
 
