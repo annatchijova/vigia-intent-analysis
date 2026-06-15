@@ -14,6 +14,33 @@ openssl version
 
 ---
 
+## Instalación desde GitHub (sin clonar)
+
+Si solo querés instalar el paquete sin clonar el repositorio completo:
+
+```bash
+pip install git+https://github.com/annatchijova/vigia-intent-analysis.git
+```
+
+### Verificar instalación
+
+```bash
+python3 -c "import vigia; print('OK — vigia instalado')"
+```
+
+### Para ejecutar tests, instalar extras dev
+
+```bash
+pip install "git+https://github.com/annatchijova/vigia-intent-analysis.git#egg=vigia-forensic[dev]"
+python3 -m pytest tests/ -v --tb=short
+```
+
+> **Nota:** Para desarrollo activo o para usar las funciones completas del sistema
+> (servidor MCP, variables de entorno, directorio de evidencia), se recomienda
+> clonar el repositorio y seguir los pasos 1–12 a continuación.
+
+---
+
 ## 1. Clonar el repositorio
 
 ```bash
