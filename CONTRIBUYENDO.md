@@ -6,6 +6,93 @@
 
 ---
 
+## Cumplimiento del Protocolo P2 — Lectura obligatoria para forks
+
+El núcleo matemático de VIGÍA opera bajo el **Protocolo P2**, la especificación
+determinista de entropía que rige todas las afirmaciones de reproducibilidad de
+scoring. Si estás haciendo un fork de este repositorio, portando el kernel de
+entropía a otro lenguaje, o construyendo una herramienta que reclame compatibilidad
+con VIGÍA, **debés leer P2 antes de escribir una sola línea de código de scoring**.
+
+La especificación completa está en `docs/protocols/P2/SPEC.md`. Los vectores
+canónicos están en `canonical_vectors_p2.json`, acompañados de
+`canonical_vectors_p2.sha256`. El SHA-256 del archivo de vectores es normativo:
+cualquier modificación — incluyendo espacios en blanco — invalida la huella digital
+y el reclamo de compatibilidad.
+
+### Qué rige P2
+
+P2 define el contrato de reproducibilidad para: entropía de Shannon, entropía
+normalizada, tasa de entropía, entropía condicional de Markov de orden k, complejidad
+de Lempel-Ziv (variante LZ76), entropía de permutación, codificación de pares,
+umbrales de abstención, y rechazo adversarial (NaN, Inf, denormales).
+
+P2 **no** define: interpretación semántica de evidencia, atribución de autoría,
+inferencia de intención, admisibilidad legal, ni afirmaciones ontológicas sobre
+"autenticidad". Estos están explícitamente fuera del alcance y documentados como tal
+en la sección de no-objetivos de la especificación.
+
+### Niveles de cumplimiento
+
+| Nivel | Para quién es | Afirmación permitida |
+|-------|---------------|----------------------|
+| **Strict** | Auditoría forense, procedimientos legales | `VIGÍA-compatible P2 (strict)` |
+| **Reference** | DFIR de producción, investigación, multiplataforma | `VIGÍA-compatible P2` |
+| **Accelerated** | Tiempo real, embebido, alto volumen | `VIGÍA-accelerated` — **no puede reclamar compatibilidad P2** |
+
+El cumplimiento Strict requiere Python puro, reducción secuencial, y canonicalización
+`Decimal.quantize()` HALF_EVEN. El cumplimiento Reference permite NumPy/CuPy con
+acumuladores float64. Accelerated permite float32 pero pierde el reclamo de
+compatibilidad por completo — esto es no negociable y está documentado en la sección
+de niveles de cumplimiento de la especificación.
+
+### La cláusula de revocación
+
+P2 §3 contiene una cláusula de revocación que aplica a forks y obras derivadas.
+Si tu documentación, etiquetas de UI, salida de CLI, nombres de campos de API, o
+cualquier material dirigido al usuario usa alguna de las siguientes frases, perdés
+automáticamente el derecho a reclamar compatibilidad P2, independientemente de si
+tus vectores pasan:
+
+- `"AI detector"` / `"bot detector"` / `"human-vs-machine classifier"`
+- `"authenticity score"` / `"deception score"` / `"intent score"` / `"humanity index"`
+
+Estas son afirmaciones ontológicas que las mediciones matemáticas de P2 no pueden
+sostener. Una secuencia de alta entropía no es "más humana". Una secuencia de baja
+entropía no es "más sintética". Si tu herramienta necesita hacer esas afirmaciones,
+necesita una capa de decisión validada independientemente por encima de P2, y no
+puede usar la marca de compatibilidad de VIGÍA para hacerlo.
+
+### Brechas adversariales conocidas
+
+P2 documenta 10 brechas conocidas (GAP-01 a GAP-10) — escenarios adversariales
+que todavía no están cubiertos por vectores canónicos. Estos incluyen ataques de
+inflación de entropía, explosión simbólica vía perturbaciones de punto flotante
+sub-ULP, deriva de calibración, y aliasing de período LZ en secuencias cortas. Leé
+§14 de la especificación antes de reclamar propiedades de robustez. Estas brechas son
+de solo adición: una vez asignado, un identificador GAP-NN nunca se reutiliza.
+
+### Estado de P2
+
+P2 está actualmente en **borrador pre-freeze**. La fecha objetivo de freeze fue
+2026-06-15, alineada con el envío al SANS FIND EVIL Hackathon. El freeze requiere
+validación empírica de los umbrales de abstención (actualmente heurísticos),
+verificación entre backends en 3+ runtimes, y testing formal de cadena de custodia.
+Hasta el freeze, los umbrales son orientativos. Cualquier despliegue en producción
+debe documentar la procedencia de los umbrales.
+
+P1 está congelado e inmutable. P2 depende de P1. Los validadores deben pasar P1
+primero.
+
+### Hoja de ruta P3
+
+P2 es infraestructura, no un sistema forense. Las siguientes capacidades están
+explícitamente diferidas a P3: estándar formal de discretización, fusión y ponderación
+de scores, propagación de incertidumbre, protocolo de calibración, y cierre de
+inferencia Peirciana. P2 mide. P3 razonará.
+
+---
+
 ## Una nota de la autora
 
 Quiero ser directa sobre algo antes que nada: **VIGÍA no es perfecto, y lo sé.**
