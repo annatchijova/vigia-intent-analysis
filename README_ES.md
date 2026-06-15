@@ -336,6 +336,25 @@ Node 18+ (para el modo Claude Code MCP)
 pip install vigia-intent-analysis
 ```
 
+### pip install desde GitHub
+
+```bash
+pip install git+https://github.com/annatchijova/vigia-intent-analysis.git
+```
+
+Verificar instalación:
+
+```bash
+python3 -c "import vigia; print('OK — vigia instalado')"
+```
+
+Para ejecutar tests, instalar extras dev:
+
+```bash
+pip install "git+https://github.com/annatchijova/vigia-intent-analysis.git#egg=vigia-forensic[dev]"
+python3 -m pytest tests/ -v --tb=short
+```
+
 ### Desde el código fuente
 
 ```bash
