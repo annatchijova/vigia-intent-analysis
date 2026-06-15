@@ -689,6 +689,35 @@ silenciosamente sin cadena de custodia.
 
 ---
 
+## Alucinación Documentada — BREAK-012 (Trampa de Consenso)
+
+El Judge Pack de SANS Find Evil establece:
+> *"Las alucinaciones que el equipo detectó y documentó cuentan A FAVOR."*
+> *"Un equipo cuyo reporte dice 'aquí es donde nuestro agente falla y aquí está
+> la alucinación que detectamos en pruebas' está demostrando exactamente la
+> disciplina que requiere el DFIR autónomo."*
+
+VIGÍA tiene un caso documentado:
+
+- **Agente sin LLM:** BENIGN (correcto — 4 fuentes comparten una clave SSH
+  comprometida; la fuente minoritaria air-gapped con prior_trust=0.95 prevalece)
+- **Agente + Claude (asistido por LLM):** MALICE (incorrecto — el LLM fue capturado
+  por la narrativa de 4 fuentes corroborantes, ignoró la confiabilidad del canal)
+- **verdict_changed: true** — registrado en el bundle sellado con SHA-256,
+  timestamp y audit_trail completo. No es una afirmación. Es un hecho criptográfico.
+
+Los bundles completos están en:
+- `results/llm_mode/VIGIA-BREAK-012_llm_bundle.json`
+- `results/agent_batch/VIGIA-BREAK-012_agent_bundle.json`
+
+Las 22 limitaciones documentadas están en [`KNOWN_LIMITATIONS.md`](./KNOWN_LIMITATIONS.md).
+
+Cada hallazgo en VIGÍA traza hasta la ejecución específica de herramienta que lo
+produjo via `audit_trail[].entry_sha256`. Esto no es una demo que parece impecable.
+Es una que es forensicamente auditable.
+
+---
+
 ## Ejemplos de Investigación
 
 ### VIGIA-REAL-VANKO — Investigación Completa con Claude Code (14 llamadas MCP)
