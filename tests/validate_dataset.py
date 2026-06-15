@@ -312,7 +312,7 @@ def _build_baseline(samples: List[Dict]) -> Dict[str, Dict[str, float]]:
     """Median + MAD sobre clase AUTHENTIC solamente."""
     auth = [s for s in samples if s["ground_truth"] == "AUTHENTIC"]
     if not auth:
-        raise ValueError("Sin muestras AUTHENTIC.")
+        raise ValueError("No AUTHENTIC samples found.")
     def _stats(vals):
         med = statistics.median(vals)
         mad = statistics.median([abs(v - med) for v in vals])
@@ -367,7 +367,7 @@ def validate_dataset(
             with open(dataset_path, "r", encoding="utf-8") as f:
                 samples = [json.loads(line) for line in f if line.strip()]
         else:
-            print("[VIGIA] Generando bootstrap sintético v2...")
+            print("[VIGIA] Generating synthetic bootstrap v2...")
             samples = generate_bootstrap_dataset()
 
     hashes = [s.get("hash", s["id"]) for s in samples]
@@ -389,7 +389,7 @@ def validate_dataset(
     )
     mean_corr = abs(mean_corr_override if mean_corr_override is not None else corr)
     correction = max(0.0, 1.0 - mean_corr)
-    print(f"[VIGIA] Correlación SDA–CLI (AUTHENTIC): r={corr:.4f}")
+    print(f"[VIGIA] SDA–CLI Correlation (AUTHENTIC): r={corr:.4f}")
 
     # Calibrador — entrenado con z-scores de _score_sample (misma función)
     calibrator = None
@@ -405,9 +405,9 @@ def validate_dataset(
             calibrator.fit(auth_z, fab_z)
             cal_meta = {"used": True, "backend": calibrator.meta.get("backend", "?"),
                         "n_auth": len(auth_z), "n_fab": len(fab_z)}
-            print(f"[VIGIA] Calibrador: {cal_meta['backend']}")
+            print(f"[VIGIA] Calibrator: {cal_meta['backend']}")
         except Exception as e:
-            print(f"[VIGIA_WARN] Calibración desactivada: {e}")
+            print(f"[VIGIA_WARN] Calibration disabled: {e}")
 
     # Scoring unificado
     gt_binary = [1 if s["ground_truth"] in ("FABRICATED", "ADVERSARIAL") else 0
@@ -481,7 +481,7 @@ def validate_dataset(
     # Diagnóstico
     issues, strengths = [], []
     for cond, msg in [
-        (auc >= 0.85,       f"ROC AUC={auc:.4f} — discriminación USABLE para peritaje"),
+        (auc >= 0.85,       f"ROC AUC={auc:.4f} — discrimination USABLE for expert testimony"),
         (auc >= 0.70,       f"ROC AUC={auc:.4f} — aceptable (target >0.85)"),
     ]:
         if cond: strengths.append(msg); break
@@ -489,46 +489,46 @@ def validate_dataset(
         issues.append(f"ROC AUC={auc:.4f} — DÉBIL")
 
     if brier <= 0.15:
-        strengths.append(f"Brier={brier:.4f} — calibración BUENA")
+        strengths.append(f"Brier={brier:.4f} — calibration GOOD")
     elif brier <= 0.25:
         issues.append(f"Brier={brier:.4f} — aceptable (target <0.15)")
     else:
-        issues.append(f"Brier={brier:.4f} — calibración insuficiente")
+        issues.append(f"Brier={brier:.4f} — insufficient calibration")
 
     if ece_val <= 0.10:
-        strengths.append(f"ECE={ece_val:.4f} — probabilidades honestas")
+        strengths.append(f"ECE={ece_val:.4f} — honest probabilities")
     else:
-        issues.append(f"ECE={ece_val:.4f} — probabilidades no calibradas (target <0.10)")
+        issues.append(f"ECE={ece_val:.4f} — uncalibrated probabilities (target <0.10)")
 
     if cm_opt["fpr"] <= 0.15:
         strengths.append(f"FPR={cm_opt['fpr']:.4f} @ threshold óptimo — aceptable")
     else:
-        issues.append(f"FPR={cm_opt['fpr']:.4f} — falsos positivos altos")
+        issues.append(f"FPR={cm_opt['fpr']:.4f} — high false positive rate")
 
     if cm_opt["fnr"] <= 0.20:
-        strengths.append(f"FNR={cm_opt['fnr']:.4f} — buena detección de fabricación")
+        strengths.append(f"FNR={cm_opt['fnr']:.4f} — good fabrication detection")
     else:
-        issues.append(f"FNR={cm_opt['fnr']:.4f} — se pierden casos fabricados")
+        issues.append(f"FNR={cm_opt['fnr']:.4f} — fabricated cases missed")
 
     if abs(auc - kfold_mean) <= 0.05:
-        strengths.append(f"K-fold AUC={kfold_mean:.4f}±{kfold_std:.4f} — sin overfitting")
+        strengths.append(f"K-fold AUC={kfold_mean:.4f}±{kfold_std:.4f} — no overfitting")
     else:
-        issues.append(f"K-fold AUC={kfold_mean:.4f}±{kfold_std:.4f} — posible overfitting")
+        issues.append(f"K-fold AUC={kfold_mean:.4f}±{kfold_std:.4f} — possible overfitting")
 
     if mean_corr <= 0.30:
-        strengths.append(f"Correlación SDA-CLI={mean_corr:.4f} — señales independientes")
+        strengths.append(f"Correlación SDA-CLI={mean_corr:.4f} — independent signals")
     elif mean_corr <= 0.60:
-        issues.append(f"Correlación SDA-CLI={mean_corr:.4f} — penalización leve")
+        issues.append(f"Correlación SDA-CLI={mean_corr:.4f} — minor penalty")
     else:
-        issues.append(f"Correlación SDA-CLI={mean_corr:.4f} — correction_factor OBLIGATORIO")
+        issues.append(f"Correlación SDA-CLI={mean_corr:.4f} — correction_factor REQUIRED")
 
     n_crit = len(critical)
     if n_crit > 0 and gci_true_nlp_normal >= n_crit * 0.7:
-        strengths.append("Caso crítico Daubert validado: GCI independiente de NLP")
+        strengths.append("Daubert critical case validated: GCI independent of NLP")
     elif n_crit > 0:
-        issues.append("Caso crítico Daubert: señales potencialmente acopladas")
+        issues.append("Daubert critical case: potentially coupled signals")
 
-    status = "DEFENDIBLE" if len(issues) == 0 else ("ACEPTABLE" if len(issues) <= 2 else "REQUIERE_CALIBRACION")
+    status = "DEFENSIBLE" if len(issues) == 0 else ("ACEPTABLE" if len(issues) <= 2 else "REQUIRES_CALIBRATION")
 
     return {
         "validation_timestamp": _utcnow(),
@@ -575,40 +575,40 @@ def main() -> None:
         Path(out).parent.mkdir(parents=True, exist_ok=True)
         with open(out, "w", encoding="utf-8") as f:
             for s in samples: f.write(json.dumps(s, ensure_ascii=False) + "\n")
-        print(f"[VIGIA] Dataset v2: {out} ({len(samples)} muestras)")
+        print(f"[VIGIA] Dataset v2: {out} ({len(samples)} samples)")
         return
 
     report = validate_dataset(dataset_path=args.dataset,
                                use_calibration=not args.no_calibration)
 
     print("\n" + "=" * 72)
-    print("VIGÍA — REPORTE DE VALIDACIÓN DAUBERT  (v2)")
+    print("VIGÍA — DAUBERT VALIDATION REPORT  (v2)")
     print("=" * 72)
     d = report["dataset"]
-    print(f"Dataset: {d['total']} muestras | {d['balance']}")
+    print(f"Dataset: {d['total']} samples | {d['balance']}")
     m = report["metrics"]
-    print(f"\nMÉTRICAS:")
+    print(f"\nMETRICS:")
     print(f"  ROC AUC    : {m['roc_auc']}  IC95%=[{m['roc_auc_ci_95'][0]}, {m['roc_auc_ci_95'][1]}]")
     print(f"  Brier Score: {m['brier_score']}  ECE={m['ece']}")
     print(f"  K-fold AUC : {m['kfold_auc_mean']} ± {m['kfold_auc_std']}")
     co = report["threshold_optimal"]
     c5 = report["threshold_05"]
-    print(f"\nTHRESHOLD ÓPTIMO (t={co['threshold']}, J={co['youden_j']:.4f}): "
+    print(f"\nOPTIMAL THRESHOLD (t={co['threshold']}, J={co['youden_j']:.4f}): "
           f"TPR={co['tpr']} FPR={co['fpr']} FNR={co['fnr']}")
     print(f"THRESHOLD 0.5: TPR={c5['tpr']} FPR={c5['fpr']} FNR={c5['fnr']}")
     cr = report["correlation"]
-    print(f"\nCORRELACIÓN SDA–CLI: r={cr['sda_cli_r']}  "
+    print(f"\nSDA–CLI CORRELATION: r={cr['sda_cli_r']}  "
           f"correction_factor={cr['correction_factor']}")
     cc = report["critical_cases"]
-    print(f"\nCASO CRÍTICO DAUBERT: {cc['total']} muestras | "
+    print(f"\nDAUBERT CRITICAL CASE: {cc['total']} samples | "
           f"GCI_True+NLP_Normal={cc['gci_true_nlp_normal']} | "
-          + (" INDEPENDENCIA" if cc["independence_validated"] else " VERIFICAR"))
-    print(f"\nPOR CLASE:")
+          + (" INDEPENDENCE" if cc["independence_validated"] else " VERIFY"))
+    print(f"\nBY CLASS:")
     for cls, v in report["per_class"].items():
         print(f"  {cls:<15} mean_post={v['mean_posterior']:.4f}  "
               f"acc@opt={v['acc_at_optimal']:.4f}  n={v['count']}")
     diag = report["diagnosis"]
-    print(f"\nDIAGNÓSTICO: {diag['status']}")
+    print(f"\nDIAGNOSIS: {diag['status']}")
     for s in diag["strengths"]: print(f"  + {s}")
     for i in diag["issues"]:    print(f"  - {i}")
     print("=" * 72)
@@ -616,7 +616,7 @@ def main() -> None:
     if args.output:
         with open(args.output, "w", encoding="utf-8") as f:
             json.dump(report, f, ensure_ascii=False, indent=2)
-        print(f"\n[VIGIA] Reporte: {args.output}")
+        print(f"\n[VIGIA] Report: {args.output}")
 
 
 if __name__ == "__main__":
