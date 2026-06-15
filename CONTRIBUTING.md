@@ -4,6 +4,8 @@
 **Author:** Anna Tchijova  
 **Last updated:** June 2026
 
+> Esta guía también está disponible en español: [CONTRIBUYENDO.md](CONTRIBUYENDO.md)
+
 ---
 
 ## Protocol P2 Compliance — Required Reading for Forks
