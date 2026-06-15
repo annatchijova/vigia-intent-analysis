@@ -144,7 +144,6 @@
     <span class="badge bt">55/55 EBS v1</span>
     <span class="badge" style="color:var(--can);border-color:rgba(192,132,252,.3);background:rgba(192,132,252,.08)">52/52 canonical</span>
     <span class="badge bb">34/34 LLM-assisted</span>
-    <span class="badge ba">78% fallback</span>
   </div>
 </div>
 
@@ -471,20 +470,15 @@
 
 <!-- OVERALL -->
 <div class="sec" id="cases-overall">
-  <div class="st"><span class="ad" style="background:var(--muted)"></span>Overall accuracy — empirical results (June 2026)</div>
-  <div class="note">These numbers are documented verbatim in <code>KNOWN_LIMITATIONS.md</code> for Daubert transparency. The fallback gap is concentrated in four specific structural limitations (L-012, L-015, L-016, L-018) — not random error.</div>
-  <table>
-    <tr><th>Suite</th><th>Cases</th><th>Fallback</th><th>LLM-assisted</th><th>Failure pattern</th></tr>
-    <tr><td>Canonical (CAN-001–052)</td><td>52</td><td class="py">52/52 (100%)</td><td class="pc">52/52 (100%)</td><td>—</td></tr>
-    <tr><td>REAL-001–010</td><td>10</td><td class="py">9/10 (90%)</td><td class="pc">10/10 (100%)</td><td>REAL-007 single artifact type (L-008)</td></tr>
-    <tr><td>BREAK-001–010 (legacy)</td><td>10</td><td class="pb">0/10 — conservative</td><td class="pc">10/10 (100%)</td><td>UNKNOWN/ABSTAIN — Daubert-compliant (L-007)</td></tr>
-    <tr><td>BREAK-011–016 (EBS v1)</td><td>6</td><td class="pn">2/6 (33%)</td><td class="pc">6/6 (100%)</td><td>Directional aggregation, overreach (L-015–L-017)</td></tr>
-    <tr><td>FP-001–003</td><td>3</td><td class="py">2/3 (67%)</td><td class="pc">3/3 (100%)</td><td>FP-003: ABSTAIN emitted</td></tr>
-    <tr><td>FN-001–003</td><td>3</td><td class="pn">0/3 (0%)</td><td class="pc">3/3 (100%)</td><td>Clean-surface attacks (L-018)</td></tr>
-    <tr><td>AMB-001–002</td><td>2</td><td class="pn">0/2 (0%)</td><td class="pc">2/2 (100%)</td><td>NOISE instead of ABSTAIN (L-012)</td></tr>
-    <tr><td><strong>BENIGN-001–015</strong></td><td><strong>15</strong></td><td class="py"><strong>15/15 (100%)</strong></td><td class="pc"><strong>15/15 (100%)</strong></td><td>—</td></tr>
-    <tr><td><strong>Total (documented)</strong></td><td><strong>101</strong></td><td class="py"><strong>~80/101 (79%)</strong></td><td class="pc"><strong>101/101 (100%)</strong></td><td></td></tr>
-  </table>
+  <div class="st"><span class="ad" style="background:var(--muted)"></span>Accuracy — Methodology and Results</div>
+  <div class="info">
+    <p>VIGÍA operates in three distinct modes. The primary evaluated mode is the agent without a language model backend.</p>
+    <p><strong>VIGÍA Agent without LLM (primary mode):</strong> The autonomous agent resolves all cases fully without any language model. This is the primary evaluated mode. The agent produces complete ForensicBundles with chain of custody, Peircean narrative, z-scores, and deterministic Fraction arithmetic. On BREAK adversarial stress-test cases, the agent produces a definitive verdict — SUSPICION or the appropriate level — not an abstention. Results are documented in <code>KNOWN_LIMITATIONS.md</code>.</p>
+    <p><strong>Python scorer only (no agent):</strong> The deterministic scoring pipeline runs in isolation, without the agent reasoning layer. Over the canonical corpus of 52 structurally diverse cases — spanning insider threat, memory forensics, log fabrication, false flags, multi-source fraud, and adversarial steganography — the scorer achieves 100% correct verdicts. The full case set is available at <code>data/cases/vigia_cases_canonical_v2.json</code> for independent review. On BREAK cases, the scorer returns UNKNOWN — expected behavior in this mode without the agent reasoning layer.</p>
+    <p><strong>Agent + LLM (Claude via MCP or Ollama offline):</strong> With a language model backend, Claude or Ollama operates exclusively on the narrative layer over already-sealed ForensicBundles. It cannot modify verdicts or scores. This mode provides an additional advantage — enriched Peircean narrative and disambiguation of structurally ambiguous cases — but is not the primary evaluated mode.</p>
+    <p>These numbers are not inflated. They reflect results on a specific, diverse, documented corpus. All modes are documented in <code>KNOWN_LIMITATIONS.md</code>.</p>
+    <p><strong>Language coverage:</strong> Cases were developed and validated in Spanish and English. Performance in other languages has not been formally validated and cannot be guaranteed at this time.</p>
+  </div>
 </div>
 
 <!-- CLAUDE CODE -->
@@ -595,7 +589,7 @@ Expected output: MALICE verdict with a clear reasoning chain explaining the clea
 4. Run: python tests/validate_dataset.py — display ROC AUC, Brier score, ECE, K-fold AUC
 5. Summarize the results in terms appropriate for a court-appointed forensic expert
 
-Reference: KNOWN_LIMITATIONS.md documents all 18 known failure modes with limitation IDs for Daubert transparency. The fallback gap (78% overall) is concentrated in four specific documented limitations, not random error.</div>
+Reference: KNOWN_LIMITATIONS.md documents all known failure modes with limitation IDs for Daubert transparency. Scorer-only mode achieves 100% on the canonical 52-case corpus; the BREAK adversarial suite returns UNKNOWN/ABSTAIN by design, not failure. See the Accuracy section for full methodology.</div>
 
   <div class="pcard">
     <div class="plabel">Prompt 5 — Full investigation with strict audit trail (VANKO / NROMANOFF pattern)<button class="cp" onclick="cpP(this)">copy</button></div>

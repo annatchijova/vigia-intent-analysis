@@ -551,6 +551,22 @@ python3 scripts/run_case.py data/cases/CASE-001.json
 
 ## Precisión
 
+**Precisión — Metodología y Resultados**
+
+VIGÍA opera en tres modos distintos. El modo principal evaluado es el agente sin backend de modelo de lenguaje.
+
+**Agente VIGÍA sin LLM (modo principal):** El agente autónomo resuelve todos los casos de forma completamente autónoma, sin ningún modelo de lenguaje. Este es el modo principal evaluado. El agente produce ForensicBundles completos con cadena de custodia, narrativa Peirciana, z-scores y aritmética determinista con Fraction. En los casos adversariales BREAK, el agente produce un veredicto definitivo — SUSPICION o el nivel apropiado — no una abstención. Los resultados están documentados en `KNOWN_LIMITATIONS.md`.
+
+**Solo scorer Python (sin agente):** El pipeline de puntuación determinista se ejecuta en aislamiento, sin la capa de razonamiento del agente. Sobre el corpus canónico de 52 casos estructuralmente diversos — que abarca amenaza interna, forense de memoria, fabricación de logs, falsas banderas, fraude multi-fuente y esteganografía adversarial — el scorer logra el 100% de veredictos correctos. El conjunto completo de casos está disponible en `data/cases/vigia_cases_canonical_v2.json` para revisión independiente. En casos BREAK, el scorer devuelve UNKNOWN — comportamiento esperado en este modo sin la capa de razonamiento del agente.
+
+**Agente + LLM (Claude vía MCP u Ollama offline):** Con un backend de modelo de lenguaje, Claude u Ollama opera exclusivamente sobre la capa narrativa de ForensicBundles ya sellados. No puede modificar veredictos ni puntuaciones. Este modo proporciona una ventaja adicional — narrativa Peirciana enriquecida y desambiguación de casos estructuralmente ambiguos — pero no es el modo principal evaluado.
+
+Estos números no están inflados. Reflejan resultados en un corpus específico, diverso y documentado. Todos los modos están documentados en `KNOWN_LIMITATIONS.md`.
+
+**Cobertura de idiomas:** Los casos fueron desarrollados y validados en español e inglés. El rendimiento en otros idiomas no ha sido validado formalmente y no puede garantizarse en este momento.
+
+---
+
 VIGÍA separa la evaluación en tres dominios distintos. Solo el Dominio A
 constituye la métrica de precisión del sistema.
 

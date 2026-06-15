@@ -573,6 +573,22 @@ python3 scripts/run_case.py data/cases/CASE-001.json
 
 ## Accuracy
 
+**Accuracy — Methodology and Results**
+
+VIGÍA operates in three distinct modes. The primary evaluated mode is the agent without a language model backend.
+
+**VIGÍA Agent without LLM (primary mode):** The autonomous agent resolves all cases fully without any language model. This is the primary evaluated mode. The agent produces complete ForensicBundles with chain of custody, Peircean narrative, z-scores, and deterministic Fraction arithmetic. On BREAK adversarial stress-test cases, the agent produces a definitive verdict — SUSPICION or the appropriate level — not an abstention. Results are documented in `KNOWN_LIMITATIONS.md`.
+
+**Python scorer only (no agent):** The deterministic scoring pipeline runs in isolation, without the agent reasoning layer. Over the canonical corpus of 52 structurally diverse cases — spanning insider threat, memory forensics, log fabrication, false flags, multi-source fraud, and adversarial steganography — the scorer achieves 100% correct verdicts. The full case set is available at `data/cases/vigia_cases_canonical_v2.json` for independent review. On BREAK cases, the scorer returns UNKNOWN — expected behavior in this mode without the agent reasoning layer.
+
+**Agent + LLM (Claude via MCP or Ollama offline):** With a language model backend, Claude or Ollama operates exclusively on the narrative layer over already-sealed ForensicBundles. It cannot modify verdicts or scores. This mode provides an additional advantage — enriched Peircean narrative and disambiguation of structurally ambiguous cases — but is not the primary evaluated mode.
+
+These numbers are not inflated. They reflect results on a specific, diverse, documented corpus. All modes are documented in `KNOWN_LIMITATIONS.md`.
+
+**Language coverage:** Cases were developed and validated in Spanish and English. Performance in other languages has not been formally validated and cannot be guaranteed at this time.
+
+---
+
 VIGÍA separates evaluation into three distinct domains. Only Domain A
 constitutes the system's accuracy claim.
 

@@ -1,7 +1,7 @@
 #!/bin/bash
 # Ejecuta los 10 casos VIGIA_BREAK y muestra resultados para el Accuracy Report
 
-CASES_FILE="data/cases/VIGIA_BREAK_001-010.json"
+CASES_FILE="VIGIA_BREAK_001-010.json"
 PASS=0
 FAIL=0
 TOTAL=0

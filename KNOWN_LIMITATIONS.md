@@ -735,3 +735,21 @@ proven). The verdicts are conservative, not wrong in the harmful direction.
 *VIGÍA — SANS FIND EVIL Hackathon 2026*
 *Author: Anna Tchijova | AI Collective: Claude, Kimi, Gemini, DeepSeek, Qwen, Grok, ChatGPT*
 *License: Apache 2.0 | Repository: github.com/annatchijova/vigia-intent-analysis*
+
+---
+
+## L-019b — Agent Runtime Bundles vs. Canonical EBS v1 Schema
+
+**Affects:** `forensics/verify_ebs_v1.py` on `vigia_agent.py` output  
+**Status:** By design — not a bug
+
+`vigia_agent.py` produces runtime agent bundles with SHA-256 chain of custody
+(Evidence SHA-256 → Bundle SHA-256). These are NOT the same as canonical EBS v1
+bundles (`AV-001_bundle.json`, `ADMIN-001_bundle.json`), which have the full
+structured schema (`bundle_version`, `evidence_graph`, `decision_trace`, etc.).
+
+`forensics/verify_ebs_v1.py` validates the canonical EBS v1 schema only.
+For agent bundles, use the SHA-256 verification printed by the agent:
+  `sha256sum -c results/real/${CASE}_bundle.json.sha256`
+
+**Impact:** Zero — verdicts, z-scores, and chain of custody are unaffected.
