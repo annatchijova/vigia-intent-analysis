@@ -4,6 +4,8 @@
 **Author:** Anna Tchijova  
 **Last updated:** June 2026
 
+> Este documento también está disponible en español: [CONTRIBUYENDO.md](./CONTRIBUYENDO.md)
+
 ---
 
 ## A Note From the Author
