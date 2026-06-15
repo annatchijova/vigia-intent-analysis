@@ -336,6 +336,25 @@ Node 18+ (para el modo Claude Code MCP)
 pip install vigia-intent-analysis
 ```
 
+### pip install desde GitHub
+
+```bash
+pip install git+https://github.com/annatchijova/vigia-intent-analysis.git
+```
+
+Verificar instalación:
+
+```bash
+python3 -c "import vigia; print('OK — vigia instalado')"
+```
+
+Para ejecutar tests, instalar extras dev:
+
+```bash
+pip install "git+https://github.com/annatchijova/vigia-intent-analysis.git#egg=vigia-forensic[dev]"
+python3 -m pytest tests/ -v --tb=short
+```
+
 ### Desde el código fuente
 
 ```bash
@@ -667,6 +686,35 @@ Los campos de cadena de custodia (`acquisition_hash`, `examiner_id`, `write_bloc
 son obligatorios. Los campos faltantes activan penalizaciones de confianza NIST SP 800-86
 §4.3 que reducen matemáticamente la puntuación del veredicto. El sistema no puede operarse
 silenciosamente sin cadena de custodia.
+
+---
+
+## Alucinación Documentada — BREAK-012 (Trampa de Consenso)
+
+El Judge Pack de SANS Find Evil establece:
+> *"Las alucinaciones que el equipo detectó y documentó cuentan A FAVOR."*
+> *"Un equipo cuyo reporte dice 'aquí es donde nuestro agente falla y aquí está
+> la alucinación que detectamos en pruebas' está demostrando exactamente la
+> disciplina que requiere el DFIR autónomo."*
+
+VIGÍA tiene un caso documentado:
+
+- **Agente sin LLM:** BENIGN (correcto — 4 fuentes comparten una clave SSH
+  comprometida; la fuente minoritaria air-gapped con prior_trust=0.95 prevalece)
+- **Agente + Claude (asistido por LLM):** MALICE (incorrecto — el LLM fue capturado
+  por la narrativa de 4 fuentes corroborantes, ignoró la confiabilidad del canal)
+- **verdict_changed: true** — registrado en el bundle sellado con SHA-256,
+  timestamp y audit_trail completo. No es una afirmación. Es un hecho criptográfico.
+
+Los bundles completos están en:
+- `results/llm_mode/VIGIA-BREAK-012_llm_bundle.json`
+- `results/agent_batch/VIGIA-BREAK-012_agent_bundle.json`
+
+Las 22 limitaciones documentadas están en [`KNOWN_LIMITATIONS.md`](./KNOWN_LIMITATIONS.md).
+
+Cada hallazgo en VIGÍA traza hasta la ejecución específica de herramienta que lo
+produjo via `audit_trail[].entry_sha256`. Esto no es una demo que parece impecable.
+Es una que es forensicamente auditable.
 
 ---
 

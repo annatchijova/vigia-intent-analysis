@@ -350,6 +350,25 @@ Node 18+ (for Claude Code MCP mode)
 pip install vigia-intent-analysis
 ```
 
+### pip install from GitHub
+
+```bash
+pip install git+https://github.com/annatchijova/vigia-intent-analysis.git
+```
+
+Verify installation:
+
+```bash
+python3 -c "import vigia; print('OK — vigia installed')"
+```
+
+To run tests, install dev extras:
+
+```bash
+pip install "git+https://github.com/annatchijova/vigia-intent-analysis.git#egg=vigia-forensic[dev]"
+python3 -m pytest tests/ -v --tb=short
+```
+
 ### From source
 
 ```bash
@@ -689,6 +708,35 @@ are mandatory. Missing fields trigger NIST SP 800-86 §4.3 trust penalties that
 mathematically reduce the verdict score. The system cannot be silently operated
 without chain of custody.
 
+
+---
+
+## Documented Hallucination — BREAK-012 (Consensus Trap)
+
+The SANS Find Evil Judge Pack states:
+> *"Hallucinations the team caught and documented count FOR them."*
+> *"A team whose report says 'here is where our agent fails and here is
+> the hallucination we caught in testing' is demonstrating exactly the
+> discipline autonomous DFIR requires."*
+
+VIGÍA has one documented case:
+
+- **Agent without LLM:** BENIGN (correct — 4 sources share a compromised
+  SSH key; the air-gapped minority source with prior_trust=0.95 prevails)
+- **Agent + Claude (LLM-assisted):** MALICE (incorrect — LLM was captured
+  by the narrative of 4 corroborating sources, ignored channel reliability)
+- **verdict_changed: true** — recorded in the sealed bundle with SHA-256,
+  timestamp, and full audit_trail. Not a claim. A cryptographic fact.
+
+The full bundles are at:
+- `results/llm_mode/VIGIA-BREAK-012_llm_bundle.json`
+- `results/agent_batch/VIGIA-BREAK-012_agent_bundle.json`
+
+All 22 documented limitations are in [`KNOWN_LIMITATIONS.md`](./KNOWN_LIMITATIONS.md).
+
+Every finding in VIGÍA traces to the specific tool execution that produced
+it via `audit_trail[].entry_sha256`. This is not a flawless-looking demo.
+It is a forensically auditable one.
 
 ---
 
