@@ -1083,24 +1083,23 @@ Salida esperada: tres hashes idénticos — determinismo confirmado.
 stdlib de Python, sin código de VIGÍA. El verificador recalcula todos los hashes desde cero.
 
 ```bash
-# Opción A — usar un bundle EBS v1 pre-committed (más rápido):
-python3 forensics/verify_ebs_v1.py results/srl2018/VIGIA-REAL-SRL-DMZ-FTP_bundle.json --verbose
+# Cridex banking trojan (forense de memoria — investigación Claude Code)
+python3 forensics/verify_ebs_v1.py results/real/VIGIA-REAL-008_bundle.json --verbose
 
-# Opción B — generar bundle EBS v1 inline y verificar en un paso:
-python3 show_4_hashes.py data/cases/converted/VIGIA-REAL-001.json
+# SRL-DMZ-FTP (pipeline determinista)
+python3 forensics/verify_ebs_v1.py results/srl2018/VIGIA-REAL-SRL-DMZ-FTP_bundle.json --verbose
 ```
 
-Salida esperada:
+Salida esperada (ambos):
 ```
 Resultado   : PASS
 Conformidad : Level 2 — Cryptographically valid
 Checks      : 8/9 OK
 ```
 
-> **Nota:** Los bundles en `results/real/` fueron generados por `vigia_agent.py` (formato de auditoría del agente).
-> La verificación EBS v1 requiere bundles producidos por el pipeline determinista —
-> usá `show_4_hashes.py` para generar y verificar inline, o usá el bundle pre-committed
-> en `results/srl2018/`.
+> **Nota:** `R5_ECL_BINDING: WARN` (ECL ausente) es el resultado esperado en ambos bundles — Level 3
+> requiere anclaje de cadena externo, documentado como feature futura. El WARN no afecta
+> la integridad del veredicto.
 
 ---
 

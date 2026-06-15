@@ -769,7 +769,7 @@ Expected: all 16 cases resolve to correct verdict in LLM-assisted mode (100%).</
     <div class="card" style="--ca:var(--ok)">
       <div class="ch"><span class="cl">Claim: Domain A — 117/117 deterministic accuracy (no API key, no LLM)</span><button class="cp" onclick="cp(this)">copy</button></div>
       <div class="cc">python3 run_all_agent.py <span class="fl">--timeout</span> 90</div>
-      <div class="cd">Expected output: <strong>117/117 PASS</strong>. Runs all cases through the deterministic fallback pipeline.</div>
+      <div class="cd">Runs all 136 cases (Domain A + B + C combined). Expected: <strong>134/136 PASS  2 FAIL</strong> — the 2 failures are Domain B epistemic boundary cases (AMB-001/002, L-012). Domain A core metric: <strong>117/117 PASS — 100%</strong>.</div>
     </div>
 
     <div class="card" style="--ca:var(--ok)">
@@ -785,9 +785,15 @@ Expected: all 16 cases resolve to correct verdict in LLM-assisted mode (100%).</
     </div>
 
     <div class="card" style="--ca:var(--ok)">
-      <div class="ch"><span class="cl">Claim: EBS v1 bundles are independently verifiable (stdlib only, zero VIGÍA deps)</span><button class="cp" onclick="cp(this)">copy</button></div>
-      <div class="cc">python3 forensics/verify_ebs_v1.py <span class="pa">results/real/VIGIA-REAL-001_bundle.json</span> <span class="fl">--verbose</span></div>
-      <div class="cd">Expected: <strong>PASS — Level 2 — Cryptographically valid</strong>. Verifier recomputes all hashes from scratch. Replace <code>REAL-001</code> with any case ID.</div>
+      <div class="ch"><span class="cl">Claim: EBS v1 bundles are independently verifiable (stdlib only, zero VIGÍA deps) — Cridex banking trojan</span><button class="cp" onclick="cp(this)">copy</button></div>
+      <div class="cc">python3 forensics/verify_ebs_v1.py <span class="pa">results/real/VIGIA-REAL-008_bundle.json</span> <span class="fl">--verbose</span></div>
+      <div class="cd">Expected: <strong>PASS — Level 2 — Cryptographically valid · Checks: 8/9 OK</strong>. Memory forensics case, Claude Code investigation. <code>R5_ECL_BINDING: WARN</code> is expected — Level 3 requires external chain anchoring (future feature). Does not affect verdict integrity.</div>
+    </div>
+
+    <div class="card" style="--ca:var(--ok)">
+      <div class="ch"><span class="cl">Claim: EBS v1 bundles are independently verifiable (stdlib only, zero VIGÍA deps) — SRL-DMZ-FTP</span><button class="cp" onclick="cp(this)">copy</button></div>
+      <div class="cc">python3 forensics/verify_ebs_v1.py <span class="pa">results/srl2018/VIGIA-REAL-SRL-DMZ-FTP_bundle.json</span> <span class="fl">--verbose</span></div>
+      <div class="cd">Expected: <strong>PASS — Level 2 — Cryptographically valid · Checks: 8/9 OK</strong>. Deterministic pipeline bundle. Same <code>R5_ECL_BINDING: WARN</code> — same reason. Two independently committed bundles, two verifiable PASS results.</div>
     </div>
 
     <div class="card" style="--ca:var(--ok)">
@@ -809,9 +815,9 @@ Expected: all 16 cases resolve to correct verdict in LLM-assisted mode (100%).</
     </div>
 
     <div class="card" style="--ca:var(--ok)">
-      <div class="ch"><span class="cl">Claim: Domain C adversarial suite — 14/16 handled (2 documented limitations)</span><button class="cp" onclick="cp(this)">copy</button></div>
+      <div class="ch"><span class="cl">Claim: Domain C adversarial suite — 22/25 handled (3 documented limitations)</span><button class="cp" onclick="cp(this)">copy</button></div>
       <div class="cc">python3 run_adversarial_tests.py</div>
-      <div class="cd">16 cases designed to break the system. 14/16 handled correctly. Failures: L-015 (directional aggregation evasion) and L-016 (trust consensus fabrication) — documented in KNOWN_LIMITATIONS.md.</div>
+      <div class="cd">Extended 25-case harness designed to break the system. Expected: <strong>Total: 25 · Passed: 22 · Failed: 3</strong>. Failures documented in KNOWN_LIMITATIONS.md.</div>
     </div>
 
     <div class="card" style="--ca:var(--ok)">
