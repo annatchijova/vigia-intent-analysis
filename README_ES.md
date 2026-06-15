@@ -473,8 +473,11 @@ Modelos probados: `hermes3:8b`, `deepseek-r1:8b`, `gemma3:27b`.
 ```bash
 python3 vigia_agent.py --evidence data/cases/converted/VIGIA-REAL-SRL-DMZ-FTP.json \
   --case-id VIGIA-REAL-SRL-DMZ-FTP --output results/demo_bundle.json
-python3 forensics/verify_ebs_v1.py results/demo_bundle.json --verbose
+python3 forensics/verify_ebs_v1.py results/srl2018/VIGIA-REAL-SRL-DMZ-FTP_bundle.json --verbose
 ```
+
+> **Nota:** `vigia_agent.py` produce un bundle de auditoría (registro de auditoría firmado con HMAC).
+> La verificación criptográfica EBS v1 aplica a bundles del pipeline — ver `results/srl2018/` y `results/llm_mode/`.
 
 Propiedades clave: bucle auto-correctivo (`MAX_ITERATIONS=3`), detección determinista
 de contradicciones, sin flotantes en puntuación (`CONFIDENCE_FLOOR = Fraction(3, 10)`),
@@ -1032,19 +1035,19 @@ por completo.
 python3 run_all_agent.py --timeout 90
 ```
 
-`run_all_agent.py` ejecuta los 136 casos en los tres dominios (A + B + C).
-Casos del Dominio A (métrica central): **117/117 PASS (100%)**
+`run_all_agent.py` ejecuta los 136 casos (Dominio A + B + C combinados).
 
-Salida total esperada:
+Salida esperada:
 ```
 Results: 134/136 PASS  2 FAIL
 
 FAILED CASES:
-  VIGIA-AMB-001: agent=NOISE (exp=ABSTAIN)
-  VIGIA-AMB-002: agent=NOISE (exp=ABSTAIN)
-```
 
-Los 2 fallos son casos del Dominio B (límite epistémico, L-012), no regresiones del Dominio A.
+VIGIA-AMB-001: agent=NOISE (exp=ABSTAIN)  [Domain B — L-012]
+VIGIA-AMB-002: agent=NOISE (exp=ABSTAIN)  [Domain B — L-012]
+
+Domain A (core metric): **117/117 PASS — 100%**
+```
 
 ---
 
@@ -1087,7 +1090,12 @@ python3 forensics/verify_ebs_v1.py results/srl2018/VIGIA-REAL-SRL-DMZ-FTP_bundle
 python3 show_4_hashes.py data/cases/converted/VIGIA-REAL-001.json
 ```
 
-Salida esperada: `PASS — Level 2 — Cryptographically valid` (o Level 3 si hay ECL presente).
+Salida esperada:
+```
+Resultado   : PASS
+Conformidad : Level 2 — Cryptographically valid
+Checks      : 8/9 OK
+```
 
 > **Nota:** Los bundles en `results/real/` fueron generados por `vigia_agent.py` (formato de auditoría del agente).
 > La verificación EBS v1 requiere bundles producidos por el pipeline determinista —
