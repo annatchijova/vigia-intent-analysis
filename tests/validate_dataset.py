@@ -486,7 +486,7 @@ def validate_dataset(
     ]:
         if cond: strengths.append(msg); break
     else:
-        issues.append(f"ROC AUC={auc:.4f} — DÉBIL")
+        issues.append(f"ROC AUC={auc:.4f} — WEAK")
 
     if brier <= 0.15:
         strengths.append(f"Brier={brier:.4f} — calibration GOOD")

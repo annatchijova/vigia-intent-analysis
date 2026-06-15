@@ -317,17 +317,17 @@
     </div>
     <div class="card" style="--ca:var(--demo)">
       <div class="ch"><span class="cl">Temporal case — EFFECT_BEFORE_CAUSE hard gate</span><button class="cp" onclick="cp(this)">copy</button></div>
-      <div class="cc">python tests/run_vigia_case.py <span class="pa">cases/case_001_temporal.json</span></div>
+      <div class="cc">python tests/run_vigia_case.py <span class="pa">case_001_temporal.json</span></div>
       <div class="cd">Expected: <strong>MALICE · hard gate triggered</strong> — file written before the process that created it existed</div>
     </div>
     <div class="card" style="--ca:var(--demo)">
       <div class="ch"><span class="cl">False flag — covert attribution</span><button class="cp" onclick="cp(this)">copy</button></div>
-      <div class="cc">python tests/run_vigia_case.py <span class="pa">cases/case_003_false_flag.json</span></div>
+      <div class="cc">python tests/run_vigia_case.py <span class="pa">case_003_false_flag.json</span></div>
       <div class="cd">Expected: <strong>MALICE 84%</strong> — FALSE_FLAG_PATTERN fracture</div>
     </div>
     <div class="card" style="--ca:var(--demo)">
       <div class="ch"><span class="cl">Provenance break — inadmissible under Daubert</span><button class="cp" onclick="cp(this)">copy</button></div>
-      <div class="cc">python tests/run_vigia_case.py <span class="pa">cases/case_004_provenance_break.json</span></div>
+      <div class="cc">python tests/run_vigia_case.py <span class="pa">case_004_provenance_break.json</span></div>
       <div class="cd">Expected: <strong>NOISE 97%</strong> — 47/70 VirusTotal detections but no chain of custody → inadmissible</div>
     </div>
     <div class="card" style="--ca:var(--demo)">
@@ -511,7 +511,7 @@
     <div class="card" style="--ca:var(--accent)">
       <div class="ch"><span class="cl">Batch agent — all 18 real cases in one run</span><button class="cp" onclick="cp(this)">copy</button></div>
       <div class="cc"><span class="kw">cd</span> ~/vigia-repo<br><br><span class="kw">for</span> CASE <span class="kw">in</span> VIGIA-REAL-001 VIGIA-REAL-002 VIGIA-REAL-003 VIGIA-REAL-004 VIGIA-REAL-005 VIGIA-REAL-006 VIGIA-REAL-007 VIGIA-REAL-008 VIGIA-REAL-009 VIGIA-REAL-010 VIGIA-REAL-NROMANOFF VIGIA-REAL-TDUNGAN VIGIA-REAL-NFURY VIGIA-REAL-ROCBA VIGIA-REAL-SRL-ADMIN VIGIA-REAL-SRL-AV VIGIA-REAL-SRL-DC-MEMORY VIGIA-REAL-SRL-DMZ-FTP; <span class="kw">do</span><br>&nbsp;&nbsp;<span class="kw">echo</span> <span class="st">"=== $CASE ==="</span><br>&nbsp;&nbsp;python3 vigia_agent.py \<br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="fl">--evidence</span> <span class="pa">data/cases/converted/${CASE}.json</span> \<br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="fl">--case-id</span> <span class="st">$CASE</span> \<br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="fl">--output</span> <span class="pa">results/real/${CASE}_bundle.json</span><br>&nbsp;&nbsp;python3 forensics/verify_ebs_v1.py <span class="pa">results/real/${CASE}_bundle.json</span> <span class="fl">--verbose</span><br><span class="kw">done</span></div>
-      <div class="cd">Runs all 18 real forensic cases sequentially. Each case produces a sealed <code>ForensicBundle</code> + 4-hash verification. Results in <code>results/real/</code>.</div>
+      <div class="cd">Runs all 18 real forensic cases sequentially. Each case produces a sealed <code>ForensicBundle</code> + 4-hash verification. Results in <code>results/real/</code>.<br><strong>Note:</strong> Replace <code>~/vigia-repo</code> on the first line with the path to your local clone, e.g. <code>~/vigia-intent-analysis</code>.</div>
     </div>
   </div>
 </div>
@@ -689,7 +689,7 @@ Expected: all 16 cases resolve to correct verdict in LLM-assisted mode (100%).</
     </div>
     <div class="card" style="--ca:var(--a4)">
       <div class="ch"><span class="cl">Verify stdlib purity of verify_ebs_v1</span><button class="cp" onclick="cp(this)">copy</button></div>
-      <div class="cc">python3 -c "import ast; t=ast.parse(open('vigia/forensics/verify_ebs_v1.py').read()); i=[n for n in ast.walk(t) if isinstance(n,(ast.Import,ast.ImportFrom))]; print('Imports:',len(i),'— stdlib only OK')"</div>
+      <div class="cc">python3 -c "import ast; t=ast.parse(open('forensics/verify_ebs_v1.py').read()); i=[n for n in ast.walk(t) if isinstance(n,(ast.Import,ast.ImportFrom))]; print('Imports:',len(i),'— stdlib only OK')"</div>
     </div>
   </div>
 </div>

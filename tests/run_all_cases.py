@@ -106,6 +106,13 @@ def main():
         cases_to_process = raw if isinstance(raw, list) else [raw]
 
         for idx, case in enumerate(cases_to_process):
+            # Skip cases excluded from the standard suite by audit_note (e.g. H-02)
+            audit_note = case.get("audit_note", "")
+            if "DO NOT include in run_all_cases" in audit_note:
+                cid = case.get("case_id", f"{cf.stem}_{idx}")
+                print(f"  {YEL}[SKIP]{RST} [{cid}] — excluded by audit_note (H-02)")
+                continue
+
             # Skip legacy schema v0 cases (no EBS v1 artifact structure)
             if not isinstance(case, dict) or "artifacts" not in case:
                 print(f"  {YEL}[SKIP]{RST} [{cf.stem}] — legacy schema v0 (no EBS v1)")
