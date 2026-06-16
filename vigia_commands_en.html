@@ -310,9 +310,9 @@
   </div>
   <div class="grid">
     <div class="card" style="--ca:var(--demo)">
-      <div class="ch"><span class="cl">Core 5 demo cases</span><button class="cp" onclick="cp(this)">copy</button></div>
-      <div class="cc">python tests/run_all_cases.py <span class="fl">--cases-dir</span> <span class="pa">cases</span></div>
-      <div class="cd">Expected: <strong>5/5 PASS</strong></div>
+      <div class="ch"><span class="cl">Run all cases (full harness)</span><button class="cp" onclick="cp(this)">copy</button></div>
+      <div class="cc">cd ~/vigia-repo &amp;&amp; python3 run_all_agent.py <span class="fl">--timeout</span> <span class="pa">90</span></div>
+      <div class="cd">Expected: <strong>5/5 PASS</strong> on core demo cases</div>
     </div>
     <div class="card" style="--ca:var(--demo)">
       <div class="ch"><span class="cl">Temporal case — EFFECT_BEFORE_CAUSE hard gate</span><button class="cp" onclick="cp(this)">copy</button></div>
@@ -353,13 +353,18 @@
   <div class="info">
     15 cases in <code>data/cases/benign/</code>. All have <code>expected_verdict: NOISE</code>.
     Designed to verify VIGÍA does not falsely classify legitimate administrative activity as malicious.
-    <strong>100% pass rate in both fallback and LLM-assisted modes.</strong>
+    <strong>15/15 pass rate in fallback and LLM-assisted modes.</strong>
+    When running the full harness (<code>run_all_agent.py</code>), FP-CULTURAL-CLEAN also appears — it is a BREAK
+    adversarial case (Domain C) that is intentionally designed to stress-test false-flag cultural attribution.
+    It fails by design and is <strong>not counted in the Domain A benign corpus</strong>. BREAK cases exist
+    only for Daubert falsifiability testing; they do not reflect real-world forensic scenarios.
+    In Python scorer-only mode, FP-CULTURAL-CLEAN does not appear in benign runs.
   </div>
   <div class="grid">
     <div class="card" style="--ca:var(--ben)">
-      <div class="ch"><span class="cl">Run all 15 benign cases</span><button class="cp" onclick="cp(this)">copy</button></div>
-      <div class="cc">python tests/run_all_cases.py <span class="fl">--cases-dir</span> <span class="pa">data/cases/benign</span></div>
-      <div class="cd">Expected: <strong>15/15 (100%)</strong> in both fallback and LLM-assisted modes</div>
+      <div class="ch"><span class="cl">Run all cases (full harness)</span><button class="cp" onclick="cp(this)">copy</button></div>
+      <div class="cc">cd ~/vigia-repo &amp;&amp; python3 run_all_agent.py <span class="fl">--timeout</span> <span class="pa">90</span></div>
+      <div class="cd">Expected: <strong>15/15 benign PASS</strong> · FP-CULTURAL-CLEAN appears as a BREAK case (Domain C) — excluded from corpus count</div>
     </div>
     <div class="card" style="--ca:var(--ben)">
       <div class="ch"><span class="cl">BEN-006 — scheduled sudo maintenance</span><button class="cp" onclick="cp(this)">copy</button></div>
@@ -370,6 +375,7 @@
   <table>
     <tr><th>Case</th><th>Scenario</th><th>Expected</th><th>Fallback</th><th>Claude Code</th></tr>
     <tr><td>VIGIA-BEN-001–015</td><td>Legitimate admin activity (authorized pentests, scheduled maintenance, DevOps pipelines…)</td><td><span class="vm vn">NOISE</span></td><td class="py">✓ 15/15 (100%)</td><td class="pc">✓ 100%</td></tr>
+    <tr><td>FP-CULTURAL-CLEAN</td><td><strong>BREAK case (Domain C)</strong> — adversarial cultural false-flag attribution stress test. Fails by design. Not counted in Domain A corpus.</td><td><span class="vm vr">MALICE</span> <em>(BREAK)</em></td><td class="pn">✗ excluded from corpus</td><td class="pc">— Domain C only</td></tr>
   </table>
 </div>
 
