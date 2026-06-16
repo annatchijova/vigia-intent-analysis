@@ -1207,23 +1207,23 @@ Expected output: three matching hashes — determinism confirmed.
 no VIGÍA code required. The verifier recomputes all hashes from scratch.
 
 ```bash
-# Cridex banking trojan (memory forensics — Claude Code investigation)
-python3 forensics/verify_ebs_v1.py results/real/VIGIA-REAL-008_bundle.json --verbose
-
-# SRL-DMZ-FTP (deterministic pipeline)
+# SRL-DMZ-FTP — EBS v1 cryptographic verification (legacy pipeline format)
 python3 forensics/verify_ebs_v1.py results/srl2018/VIGIA-REAL-SRL-DMZ-FTP_bundle.json --verbose
+
+# REAL-008 Cridex — agent bundle integrity (vigia_agent.py format, verified via sha256 sidecar)
+sha256sum -c results/agent_batch/VIGIA-REAL-008_agent_bundle.json.sha256
 ```
 
-Expected output (both):
+Expected output (SRL-DMZ-FTP):
 ```
 Resultado   : PASS
 Conformidad : Level 2 — Cryptographically valid
 Checks      : 8/9 OK
 ```
 
-> **Note:** `R5_ECL_BINDING: WARN` (ECL absent) is the expected result on both bundles — Level 3
+> **Note:** `R5_ECL_BINDING: WARN` (ECL absent) is the expected result on the SRL-DMZ-FTP bundle — Level 3
 > requires external chain anchoring, documented as a future feature. The WARN does not affect
-> verdict integrity.
+> verdict integrity. The REAL-008 bundle uses the vigia_agent.py format; R6_DEVIL_ADVOCATE does not apply.
 
 ---
 
