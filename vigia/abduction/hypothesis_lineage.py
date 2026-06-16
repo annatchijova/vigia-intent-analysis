@@ -1,17 +1,17 @@
 """
 vigia/abduction/hypothesis_lineage.py
 =======================================
-Árbol genealógico de hipótesis durante el ciclo abductivo de VIGÍA.
+Hypothesis genealogy tree during VIGÍA's abductive cycle.
 
-El analista SANS ve no solo el veredicto final sino el "mapa de alternativas":
-qué evidencia adicional cambiaría el veredicto y hacia dónde.
+The SANS analyst sees not only the final verdict but the "map of alternatives":
+what additional evidence would change the verdict and in which direction.
 
-Implementación completa de los stubs del documento original.
+Full implementation of the stubs from the original document.
 
-Invariantes:
-- HypothesisNode es frozen dataclass
-- Todos los costs son Fraction
-- audit_hash determinista desde traza completa
+Invariants:
+- HypothesisNode is a frozen dataclass
+- All costs are Fraction
+- audit_hash is deterministic from the full trace
 """
 from __future__ import annotations
 
@@ -26,7 +26,7 @@ from typing import Optional
 class HypothesisNode:
     hypothesis_id:      str
     hypothesis_name:    str
-    verdict:            str           # BENIGN | MALICE | ABSTAIN
+    verdict:            str           # NOISE | MALICE | ABSTAIN
     iteration:          int
     cost_ockham:        Fraction
     cost_adversarial:   Fraction
@@ -39,12 +39,12 @@ class HypothesisNode:
 
 @dataclass(frozen=True)
 class PivotSignal:
-    """Señal cuya presencia o ausencia cambiaría el veredicto."""
+    """Signal whose presence or absence would change the verdict."""
     signal_name:     str
     current_state:   str        # "present" | "absent" | "unknown"
-    if_found:        str        # Veredicto si se encontrara
-    if_not_found:    str        # Veredicto si se confirmara ausencia
-    confidence_delta: Fraction  # Cuánto cambiaría la confianza
+    if_found:        str        # Verdict if the signal were found
+    if_not_found:    str        # Verdict if absence were confirmed
+    confidence_delta: Fraction  # How much the confidence would shift
 
 
 @dataclass
@@ -59,7 +59,7 @@ class LineageReport:
 
 class HypothesisLineageTracker:
     """
-    Registra el ciclo abductivo completo para trazabilidad Daubert.
+    Records the full abductive cycle for Daubert traceability.
     """
 
     def __init__(self) -> None:
@@ -79,7 +79,7 @@ class HypothesisLineageTracker:
         parent_id:        Optional[str] = None,
         elimination_reason: Optional[str] = None,
     ) -> None:
-        """Registra una hipótesis en el árbol."""
+        """Records a hypothesis in the tree."""
         self._nodes.append(HypothesisNode(
             hypothesis_id=hypothesis_id,
             hypothesis_name=hypothesis_name,
@@ -96,24 +96,24 @@ class HypothesisLineageTracker:
 
     def finalize(self, winner_id: str) -> LineageReport:
         """
-        Cierra el ciclo abductivo y produce el reporte de linaje.
+        Closes the abductive cycle and produces the lineage report.
 
         Args:
-            winner_id: hypothesis_id de la hipótesis ganadora
+            winner_id: hypothesis_id of the winning hypothesis
 
         Returns:
-            LineageReport con near-misses, pivot signals y roadmap
+            LineageReport with near-misses, pivot signals, and roadmap
         """
         if not self._nodes:
-            raise ValueError("No hay hipótesis registradas")
+            raise ValueError("No hypotheses have been recorded")
 
-        # Encontrar ganadora
+        # Find the winner
         winner_nodes = [n for n in self._nodes if n.hypothesis_id == winner_id]
         if not winner_nodes:
-            raise ValueError(f"Hipótesis ganadora no encontrada: {winner_id}")
-        winner = winner_nodes[-1]  # Última versión si hubo iteraciones
+            raise ValueError(f"Winning hypothesis not found: {winner_id}")
+        winner = winner_nodes[-1]  # Last version if there were iterations
 
-        # Near misses: hipótesis con cost_final dentro del 20% del ganador
+        # Near misses: hypotheses with cost_final within 20% of the winner
         threshold = Fraction(1, 5)
         near_misses = [
             n for n in self._nodes
@@ -121,10 +121,10 @@ class HypothesisLineageTracker:
             and n.cost_final > Fraction(0)
             and abs(n.cost_final - winner.cost_final) / max(winner.cost_final, Fraction(1, 100)) <= threshold
         ]
-        # Ordenar por cercanía al ganador
+        # Sort by proximity to the winner
         near_misses.sort(key=lambda n: abs(n.cost_final - winner.cost_final))
 
-        # Verdict stability: proporción de iteraciones donde el ganador era líder
+        # Verdict stability: proportion of iterations where the winner was leading
         winner_iterations = sum(1 for n in self._nodes if n.hypothesis_id == winner_id)
         total_iterations = len(set(n.iteration for n in self._nodes))
         verdict_stability = (
@@ -133,7 +133,7 @@ class HypothesisLineageTracker:
             else Fraction(1)
         )
 
-        # Pivot signals: señales ignoradas por el ganador que podrían cambiar veredicto
+        # Pivot signals: signals ignored by the winner that could change the verdict
         pivot_signals = _compute_pivot_signals(winner, self._nodes)
 
         # Investigation roadmap
@@ -156,15 +156,15 @@ def _compute_pivot_signals(
     all_nodes: list[HypothesisNode],
 ) -> list[PivotSignal]:
     """
-    Identifica señales cuya presencia cambiaría el veredicto.
-    Se basa en las señales ignoradas por el ganador que otros candidatos cubrían.
+    Identifies signals whose presence would change the verdict.
+    Based on signals ignored by the winner that other candidates covered.
     """
     pivots: list[PivotSignal] = []
 
-    # Señales ignoradas por el ganador
+    # Signals ignored by the winner
     ignored = winner.signals_ignored
 
-    # Ver qué hipótesis alternativas cubrían esas señales
+    # Check which alternative hypotheses covered those signals
     for signal in ignored:
         covering_alternatives = [
             n for n in all_nodes
@@ -175,10 +175,10 @@ def _compute_pivot_signals(
         if not covering_alternatives:
             continue
 
-        # La alternativa más cercana al ganador
+        # The alternative closest to the winner
         best_alt = min(covering_alternatives, key=lambda n: n.cost_final)
 
-        # Delta de confianza: cuánto cambiaría el costo si se encontrara la señal
+        # Confidence delta: how much the cost would shift if the signal were found
         cost_delta = best_alt.cost_final - winner.cost_final
         confidence_delta = min(abs(cost_delta), Fraction(1))
 
@@ -190,9 +190,9 @@ def _compute_pivot_signals(
             confidence_delta=confidence_delta,
         ))
 
-    # Ordenar por impacto potencial
+    # Sort by potential impact
     pivots.sort(key=lambda p: p.confidence_delta, reverse=True)
-    return pivots[:5]  # Top 5 señales pivot
+    return pivots[:5]  # Top 5 pivot signals
 
 
 def _build_roadmap(
@@ -201,11 +201,11 @@ def _build_roadmap(
     pivot_signals: list[PivotSignal],
 ) -> list[str]:
     """
-    Genera roadmap de investigación para el analista SANS.
+    Generates an investigation roadmap for the SANS analyst.
     """
     roadmap: list[str] = []
 
-    # Instrucción base
+    # Base entry
     roadmap.append(
         f"Winning hypothesis: {winner.hypothesis_name} "
         f"(verdict={winner.verdict}, cost={winner.cost_final})"
@@ -234,7 +234,7 @@ def _build_roadmap(
                 f"(confidence delta: {int(ps.confidence_delta * 100)}%)"
             )
 
-    # Señales ignoradas por el ganador
+    # Signals ignored by the winner
     if winner.signals_ignored:
         roadmap.append(
             f"Signals not explained by winning hypothesis "
