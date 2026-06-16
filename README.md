@@ -922,7 +922,7 @@ post-hoc verification systems:
 scores a finding as INTENT, the gate evaluates whether corroborating evidence from
 independent sources meets the Daubert evidentiary threshold. If it does not, the
 finding is emitted as SUSPICION — not INTENT. This happens inside `vigia_scorer.py`
-before the bundle is built. No incorrect verdict reaches the ForensicBundle.
+before the bundle is built. The architecture prevents unsubstantiated findings from being included in the final bundle by imposing corroboration and refutation requirements before publication.
 
 This is distinct from "self-correction" in the sense of catching and fixing a mistake
 after the fact. The architecture does not produce incorrect verdicts that need
