@@ -362,9 +362,14 @@
   </div>
   <div class="grid">
     <div class="card" style="--ca:var(--ben)">
-      <div class="ch"><span class="cl">Run all cases (full harness)</span><button class="cp" onclick="cp(this)">copy</button></div>
+      <div class="ch"><span class="cl">Run all 15 benign cases</span><button class="cp" onclick="cp(this)">copy</button></div>
       <div class="cc">cd ~/vigia-repo &amp;&amp; python3 run_all_agent.py <span class="fl">--timeout</span> <span class="pa">90</span></div>
-      <div class="cd">Expected: <strong>15/15 benign PASS</strong> · FP-CULTURAL-CLEAN appears as a BREAK case (Domain C) — excluded from corpus count</div>
+      <div class="cd">
+        Expected output: <strong>15/16 PASS · 1 FAIL</strong><br>
+        The fail is <code>FP-CULTURAL-CLEAN</code> — a BREAK adversarial case (Domain C) included by the harness.
+        It is expected to fail in Python mode; it is <strong>not counted in the benign corpus</strong>.
+        15/15 canonical BEN cases pass.
+      </div>
     </div>
     <div class="card" style="--ca:var(--ben)">
       <div class="ch"><span class="cl">BEN-006 — scheduled sudo maintenance</span><button class="cp" onclick="cp(this)">copy</button></div>
