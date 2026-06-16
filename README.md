@@ -428,46 +428,6 @@ python3 vigia_agent.py --evidence /evidence/ --case-id CASE-001 --output bundle.
 Exit codes: `0` = no evil detected, `1` = evil found, `2` = error.
 A `.sha256` sidecar is written alongside every bundle for `sha256sum -c` verification.
 
-### Case replay / reproducibility
-
-To replay a documented case result from the corpus:
-
-```bash
-python3 run_case.py data/cases/VIGIA-REAL-001.json
-```
-
-### Run full corpus and get accuracy report
-
-```bash
-python3 run_all_cases.py --cases-dir data/cases/converted
-```
-
-### Run demo
-
-```bash
-python3 run_demo.py
-```
-
-### Verify a sealed ForensicBundle
-
-```bash
-python3 verify_ebs_v1.py ROCBA-001_bundle.json
-```
-
-### Run tests
-
-```bash
-python3 -m pytest tests/ -v
-```
-
-### Claude Code (MCP — interactive investigation)
-
-```
-Analyze the evidence at /evidence/case_001/ and determine whether there is
-malicious intent. Use VIGÍA tools to calculate entropy, detect habit anomalies,
-and generate a forensic narrative explaining the PURPOSE of each finding.
-```
-
 ### Under the hood: vigia_agent.py and SIFTOrchestrator
 
 All primary commands above invoke [`vigia_agent.py`](./vigia_agent.py) — the
