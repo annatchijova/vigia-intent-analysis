@@ -388,6 +388,94 @@ docker run vigia python3 -m pytest tests/ -v
 
 ---
 
+## Uso
+
+### Investigación autónoma de extremo a extremo (comando principal)
+
+VIGÍA corre completamente autónomo sobre evidencia forense cruda — sin
+preprocesamiento manual, sin preparación de JSON. Pasale un volcado de memoria,
+imagen de disco, directorio de logs o bundle de evidencia. El agente se
+auto-corrige, puntúa y emite un `ForensicBundle` sellado en aproximadamente
+30 minutos.
+
+```bash
+# Imagen de memoria — pipeline Volatility3 corre automáticamente
+python3 vigia_agent.py --evidence /cases/xp-tdungan.raw --case-id XP-TDUNGAN-001
+
+# Imagen de disco o directorio de evidencia mixta
+python3 vigia_agent.py --evidence /cases/ROCBA/ --case-id ROCBA-001
+
+# Bundle de evidencia en formato JSON EBS v1
+python3 vigia_agent.py --evidence /cases/evidence.json --case-id TEST-001
+
+# Con path de salida explícito
+python3 vigia_agent.py --evidence /evidence/ --case-id CASE-001 --output bundle.json
+```
+
+Códigos de salida: `0` = no se detectó evil, `1` = evil encontrado, `2` = error.
+Se escribe un sidecar `.sha256` junto a cada bundle para verificación con `sha256sum -c`.
+
+### Replay de caso / reproducibilidad
+
+Para reproducir un resultado de caso documentado del corpus:
+
+```bash
+python3 run_case.py data/cases/VIGIA-REAL-001.json
+```
+
+### Correr el corpus completo y obtener reporte de precisión
+
+```bash
+python3 run_all_cases.py --cases-dir data/cases/converted
+```
+
+### Correr la demo
+
+```bash
+python3 run_demo.py
+```
+
+### Verificar un ForensicBundle sellado
+
+```bash
+python3 verify_ebs_v1.py ROCBA-001_bundle.json
+```
+
+### Correr los tests
+
+```bash
+python3 -m pytest tests/ -v
+```
+
+### Claude Code (MCP — investigación interactiva)
+
+```
+Analiza la evidencia en /evidence/case_001/ y determiná si hay intención
+maliciosa. Usá las herramientas de VIGÍA para calcular entropía, detectar
+anomalías de hábito, y generá una narrativa forense que explique el PROPÓSITO
+de cada hallazgo.
+```
+
+### Detrás de escena: vigia_agent.py y SIFTOrchestrator
+
+Todos los comandos anteriores invocan [`vigia_agent.py`](./vigia_agent.py) —
+el agente forense autónomo que conduce el ciclo completo de investigación.
+Maneja la ingesta de evidencia, auto-corrección, puntuación determinista y
+emisión de bundle sellado sin pasos manuales. Revisá ese archivo para la
+arquitectura del agente, la lógica de `MAX_ITERATIONS` y el loop de detección
+de contradicciones.
+
+Para evidencia en imagen de disco o E01, `vigia_agent.py` delega la extracción
+del SIFT Workstation a
+[`vigia/sift/sift_orchestrator.py`](./vigia/sift/sift_orchestrator.py).
+SIFTOrchestrator automatiza RegRipper, parseo de evtx, análisis de MFT y
+recolección de artefactos antes de devolver los bundles de señales al pipeline
+de puntuación. Ese archivo es el punto de integración entre VIGÍA y el SANS
+SIFT Workstation — empezá por ahí si estás adaptando VIGÍA a un formato de
+evidencia diferente o a otra versión de las herramientas SIFT.
+
+---
+
 ## Operación Autónoma — Sin Aprobación Humana Requerida
 
 VIGÍA Modo 1 produce un veredicto sellado y criptográficamente verificable con cero
@@ -477,10 +565,7 @@ Genera un ForensicBundle sellado y una narrativa Amicus Curiae.
 ollama pull hermes3:8b
 export VIGIA_LLM_BACKEND=ollama
 export VIGIA_OLLAMA_MODEL=hermes3:8b
-python3 vigia_agent.py \
-  --evidence data/cases/converted/VIGIA-REAL-001.json \
-  --case-id VIGIA-REAL-001 \
-  --output results/real001_bundle.json
+python3 vigia_agent.py --evidence /cases/evidence/ --case-id CASE-001
 ```
 
 Modelos probados: `hermes3:8b`, `deepseek-r1:8b`, `gemma3:27b`.
