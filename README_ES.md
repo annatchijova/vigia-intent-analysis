@@ -826,6 +826,34 @@ Entropía temporal: 0.00 bits.
 
 ---
 
+## Evidencia de Procesamiento Forense Real
+
+VIGÍA ha sido ejecutado de extremo a extremo sobre imágenes de memoria forense reales del corpus SRL-2018 mediante Volatility3. No son archivos JSON preprocesados — son volcados de memoria crudos procesados directamente por `vigia_agent.py` usando `vol3_memory_adapter`. Los bundles sellados con trazas de auditoría de cadena de custodia completas están confirmados en `results/srl2018/`.
+
+| Caso | Archivo de Evidencia | Tiempo | Veredicto | Posterior |
+|------|---------------------|--------|-----------|-----------|
+| ADMIN-001 | `base-admin-memory.img` | 478s | MALICIOUS_INTENT_DETECTED | 14/25 |
+| AV-001 | `av-memory/` | 150s | MALICIOUS_INTENT_DETECTED | 14/25 |
+| MAIL-001 | `base-mail-memory.img` | 684s | MALICIOUS_INTENT_DETECTED | 17/50 |
+
+Cada bundle registra el SHA-256 del archivo de evidencia original, una traza de auditoría con marcas de tiempo de cada llamada de herramienta y el log de ejecución del pipeline de Volatility3. Para inspeccionar:
+
+```bash
+python3 -c "
+import json
+b = json.load(open('results/srl2018/ADMIN-001_bundle.json'))
+pr = b['pipeline_results']
+print('evidence:  ', b['evidence_path'])
+print('sha256:    ', b['evidence_sha256'])
+print('verdict:   ', pr['abduction']['best_hypothesis'])
+print('posterior: ', pr['abduction']['best_posterior'])
+print('source:    ', pr['pipeline_meta']['source'])
+print('sealed:    ', b['analysis_timestamp'])
+"
+```
+
+El directorio `results/srl2018/` contiene 43 bundles sellados de ejecuciones autónomas del agente sobre el corpus SRL-2018 completo.
+
 ## Arquitectura de Auto-Corrección
 
 `validate_and_correct_analysis` verifica cuatro falacias Peircianas:
