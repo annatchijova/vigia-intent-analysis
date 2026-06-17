@@ -1,0 +1,201 @@
+{
+  "analysis_timestamp": "2026-06-17T00:17:38.665825+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "VIGIA-REAL-VANKO-FALLBACK",
+    "end_time": "2026-06-17T00:17:38.665828+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "VIGIA-REAL-VANKO-FALLBACK",
+        "entry_sha256": "60c39327d863845c95f1c7ec8b7650f87ebfe4ef83ec34bcb8204828752ba0da",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "VIGIA-REAL-VANKO-FALLBACK"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: 4eeafb3bfb155486...",
+        "outputs_summary": {
+          "agent_sha256": "4eeafb3bfb155486142942ad7a2c8678676f86ffd5d076882459354d820591f6",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-06-17T00:14:47.778945+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-REAL-VANKO-FALLBACK",
+        "entry_sha256": "d747ec70412f0819c80ae070683c4507479bfe1ab1231208f5c38208ba544b08",
+        "inputs_summary": {
+          "path": "/mnt/vanko_ntfs"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-06-17T00:14:47.779017+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-REAL-VANKO-FALLBACK",
+        "entry_sha256": "59ef5962688f43d50b6f1e940a31eeaf0004df6f6f77bea1d77e552b6c7c6399",
+        "inputs_summary": {
+          "path": "/mnt/vanko_ntfs"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: fc9fce14b252f49a...",
+        "outputs_summary": {
+          "sha256": "fc9fce14b252f49ade7044ffce6c81b52ba79c88f862de9ceea111535e11a7e5"
+        },
+        "seq": 3,
+        "timestamp": "2026-06-17T00:17:14.212562+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "VIGIA-REAL-VANKO-FALLBACK",
+        "entry_sha256": "86f9469464e27a03baa1ea4c6f3dc3ebd6fe3c9ffa530234aaefd7e9b06423b5",
+        "inputs_summary": {
+          "evidence": "/mnt/vanko_ntfs",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-06-17T00:17:14.216172+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "VIGIA-REAL-VANKO-FALLBACK",
+        "entry_sha256": "e61409d529655603f231123eb339e13c692853bf787b48c5b4a2d4db3e135850",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 0 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "UNDETERMINED",
+            "best_posterior": "0",
+            "confidence": "0",
+            "is_conclusive": "False",
+            "narrative": "[FIRSTNESS] Se\u00f1ales insuficientes (0).",
+            "ontological_level": "None"
+          },
+          "case_id": "VIGIA-REAL-VANKO-FALLBACK",
+          "custody": {
+            "artifact_id": "UNKNOWN",
+            "case_id": "VIGIA-REAL-VANKO-FALLBACK",
+            "n_records": "0",
+            "records": []
+          },
+          "pipeline_meta": {
+            "anti_silencing": "True",
+            "frs_groups": "0",
+            "gamma_applied": "True",
+            "n_engine_signals": "0",
+            "n_sift_signals": "0",
+            "n_total_signals": "0",
+            "version": "V4-COLECTIVO-2026-05-06"
+          },
+          "results": {
+            "caie": {
+              "status": "NO_ARTIFACTS"
+            }
+          },
+          "signals": []
+        },
+        "seq": 5,
+        "timestamp": "2026-06-17T00:17:38.665575+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "VIGIA-REAL-VANKO-FALLBACK",
+        "entry_sha256": "048d88b41ebb92bd4be4500c75038fe52d9f515347092aec4338e5ee9f7af8d7",
+        "inputs_summary": {
+          "n_signals": "0"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-06-17T00:17:38.665673+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "VIGIA-REAL-VANKO-FALLBACK",
+        "entry_sha256": "7c5faf686fc6a6303011d3495780a15b6ec4b6c4416e338bee42400c6a2814b1",
+        "inputs_summary": {
+          "verdict": "UNDETERMINED"
+        },
+        "iteration": 0,
+        "note": "Exit code 0 \u2014 analysis complete.",
+        "outputs_summary": {
+          "exit_code": "0"
+        },
+        "seq": 7,
+        "timestamp": "2026-06-17T00:17:38.665779+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-06-17T00:14:47.778736+00:00",
+    "total_entries": 7
+  },
+  "case_id": "VIGIA-REAL-VANKO-FALLBACK",
+  "evidence_path": "/mnt/vanko_ntfs",
+  "evidence_sha256": "fc9fce14b252f49ade7044ffce6c81b52ba79c88f862de9ceea111535e11a7e5",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-REAL-VANKO-FALLBACK ===\nEvidence: /mnt/vanko_ntfs\nEvidence SHA-256: fc9fce14b252f49ade7044ffce6c81b52ba79c88f862de9ceea111535e11a7e5\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: UNDETERMINED\nPosterior confidence: 0\nConclusive: NO \u2014 requires human review\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] Se\u00f1ales insuficientes (0).\n\n--- FINAL ALERT LEVEL ---\nLOW \u2014 No significant anomalies detected in this iteration.\n\nCritical signals (z>3): 0\nHigh signals (2<z<=3): 0\nTotal signals analyzed: 0",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "UNDETERMINED",
+      "best_posterior": "0",
+      "confidence": "0",
+      "is_conclusive": false,
+      "narrative": "[FIRSTNESS] Se\u00f1ales insuficientes (0).",
+      "ontological_level": null
+    },
+    "case_id": "VIGIA-REAL-VANKO-FALLBACK",
+    "custody": {
+      "artifact_id": "UNKNOWN",
+      "case_id": "VIGIA-REAL-VANKO-FALLBACK",
+      "n_records": 0,
+      "records": []
+    },
+    "pipeline_meta": {
+      "anti_silencing": true,
+      "frs_groups": 0,
+      "gamma_applied": true,
+      "n_engine_signals": 0,
+      "n_sift_signals": 0,
+      "n_total_signals": 0,
+      "version": "V4-COLECTIVO-2026-05-06"
+    },
+    "results": {
+      "caie": {
+        "status": "NO_ARTIFACTS"
+      }
+    },
+    "signals": []
+  },
+  "sans_compliance": {
+    "accuracy_validation": false,
+    "analytical_reasoning": false,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}
