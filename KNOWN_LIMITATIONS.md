@@ -1,6 +1,6 @@
 # VIGÍA — Known Limitations
 
-**Version:** EBS v1 + P2 calibration | **Updated:** 2026-06-13
+**Version:** EBS v1 + P2 calibration | **Updated:** 2026-06-17
 **Applies to:** `github.com/annatchijova/vigia-intent-analysis`
 
 > VIGÍA does not claim to be infallible — it claims to be **auditable**.
@@ -576,6 +576,42 @@ both H2 and H3.
 
 ---
 
+### L-024 — Forensic Mount Point Allowlist Includes Generic `/mnt`
+
+**Affects:** `sift_orchestrator.py` PathGuard configuration; any case requiring
+mounted disk images via `ewfmount`/`ntfs-3g` (e.g. VANKO-FALLBACK-002) | **Status:** Design decision
+
+**Description:** `SIFTOrchestrator.__init__` configures `PathGuard` with an
+`allowed_base_paths` list that includes the generic Linux mount point `/mnt`
+in its entirety, rather than a scoped subdirectory dedicated to VIGÍA forensic
+mounts. Introduced in commit `e32a3c4` to support disk images too large to
+copy into the evidence directory.
+
+**Root cause:** Forensic images mounted via `ewfmount` or `ntfs-3g` may land
+at arbitrary subpaths under `/mnt` depending on operator choice and SIFT
+tooling conventions. There is no fixed, predictable subdirectory to scope the
+allowlist to without constraining legitimate workflows.
+
+**Forensic implication:** Any path under `/mnt` passes PathGuard's base-path
+check, regardless of whether it corresponds to evidence relevant to the active
+case. PathGuard's other controls remain in force — symlinks, device files,
+pipes, and sockets are still rejected, and paths are resolved before
+comparison — so this does not permit directory traversal or non-regular-file
+access. It does mean PathGuard cannot distinguish "this case's mounted
+evidence" from "any other regular file mounted anywhere on the system."
+
+**Mitigation:** SHA-256 verification against the expected hash, already
+enforced at the manifest layer, provides a secondary integrity check
+independent of PathGuard's base-path scoping — a manifest referencing the
+wrong mounted file will fail hash verification even though PathGuard accepts
+the path.
+
+**Roadmap:** Scope the allowlist to a dedicated, VIGÍA-managed mount namespace
+(e.g. a configurable `VIGIA_MOUNT_ROOT`) once SIFT integration defines a
+standard mount convention.
+
+---
+
 ## Part IV — Resolved Limitations
 
 ### [RESOLVED] Normalization Schema Mismatch
@@ -725,6 +761,7 @@ proven). The verdicts are conservative, not wrong in the harmful direction.
 | L-021 | Float intermediates in scoring path | vigia_scorer.py | **MITIGATED** |
 | L-022 | devil_advocate validation partially architectural | Mode 2 bundles | Post-audit improvement |
 | L-023 | Bundle save TOCTOU race (SEC-04) | bundle_builder.py | P0 — fix scheduled |
+| L-024 | Forensic mount allowlist includes generic /mnt | sift_orchestrator.py | Design decision |
 | — | Normalization schema mismatch | vigia_scorer.py | **RESOLVED** |
 | — | Gate G1 accepting legacy hashes | caie.py | **RESOLVED** |
 | — | Uniform prior_trust=0.7 in converter | convert_legacy_cases.py | **RESOLVED** |
