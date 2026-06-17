@@ -651,19 +651,26 @@ These numbers are not inflated. They reflect results on a specific, diverse, doc
 VIGÍA separates evaluation into three distinct domains. Only Domain A
 constitutes the system's accuracy claim.
 
-### Domain A — Deterministic Accuracy (core metric): 117/117 (100%)
+### Domain A — Deterministic Accuracy (core metric): 118/118 (100%)
 
 | Suite | Cases | Correct |
 |-------|-------|---------|
-| Real forensic corpus (NIST/DFRWS/DEF CON/SRL 2018) | 29 | 29 ✓ |
+| Real forensic corpus (NIST/DFRWS/DEF CON/SRL 2018) | 28 | 28 ✓ |
 | Canonical corpus (CAN-001–052) | 52 | 52 ✓ |
 | Legacy canonical cases | 10 | 10 ✓ |
 | Benign / Clean machines | 15 | 15 ✓ |
 | False positive suite | 3 | 3 ✓ |
 | False negative suite | 3 | 3 ✓ |
-| False flag (planted attribution) | 4 | 4 ✓ |
+| False flag (planted attribution) | 3 | 3 ✓ |
 | Demo corpus | 4 | 4 ✓ |
-| **Total Domain A** | **117** | **117 (100%)** |
+| **Total Domain A** | **118** | **118 (100%)** |
+
+> **2026-06-17 correction:** Domain A total corrected from 117 to 118 to
+> match the empirical case count produced by run_all_agent.py's find_cases().
+> Two phantom entries identified during audit: VIGIA-REAL-SRL-RD02-MEMORY.json
+> (counted but never created, sequence jumps RD01→RD03) and a fourth
+> false-flag case (counted but never created — only 3 exist: FF-GENUINE-001,
+> FP-CULTURAL-CLEAN-001, FP-CULTURAL-CLEAN).
 
 Reproduce: `python3 run_all_agent.py --timeout 90`
 
@@ -1179,9 +1186,9 @@ or benchmark reports, this section can be ignored entirely.
 
 ---
 
-### Domain A — 117/117 deterministic accuracy
+### Domain A — 118/118 deterministic accuracy
 
-**Claim:** 117 cases, 100% correct in fallback mode (no API key, no LLM).
+**Claim:** 118 cases, 100% correct in fallback mode (no API key, no LLM).
 
 ```bash
 python3 run_all_agent.py --timeout 90
@@ -1198,7 +1205,7 @@ FAILED CASES:
 VIGIA-AMB-001: agent=NOISE (exp=ABSTAIN)  [Domain B — L-012]
 VIGIA-AMB-002: agent=NOISE (exp=ABSTAIN)  [Domain B — L-012]
 
-Domain A (core metric): **117/117 PASS — 100%**
+Domain A (core metric): **118/118 PASS — 100%**
 ```
 
 ---

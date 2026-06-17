@@ -633,19 +633,26 @@ Estos números no están inflados. Reflejan resultados en un corpus específico,
 VIGÍA separa la evaluación en tres dominios distintos. Solo el Dominio A
 constituye la métrica de precisión del sistema.
 
-### Dominio A — Precisión Determinística (métrica principal): 117/117 (100%)
+### Dominio A — Precisión Determinística (métrica principal): 118/118 (100%)
 
 | Suite | Casos | Correctos |
 |-------|-------|-----------|
-| Corpus forense real (NIST/DFRWS/DEF CON/SRL 2018) | 29 | 29 ✓ |
+| Corpus forense real (NIST/DFRWS/DEF CON/SRL 2018) | 28 | 28 ✓ |
 | Corpus canónico (CAN-001–052) | 52 | 52 ✓ |
 | Casos canónicos legacy | 10 | 10 ✓ |
 | Máquinas benignas / limpias | 15 | 15 ✓ |
 | Suite de falsos positivos | 3 | 3 ✓ |
 | Suite de falsos negativos | 3 | 3 ✓ |
-| Falsa atribución (planted attribution) | 4 | 4 ✓ |
+| Falsa atribución (planted attribution) | 3 | 3 ✓ |
 | Corpus de demostración | 4 | 4 ✓ |
-| **Total Dominio A** | **117** | **117 (100%)** |
+| **Total Dominio A** | **118** | **118 (100%)** |
+
+> **Corrección 2026-06-17:** El total del Dominio A fue corregido de 117 a 118 para
+> coincidir con el conteo empírico de casos producido por find_cases() en run_all_agent.py.
+> Dos entradas fantasma identificadas durante la auditoría: VIGIA-REAL-SRL-RD02-MEMORY.json
+> (contado pero nunca creado, la secuencia salta de RD01 a RD03) y un cuarto caso de
+> falsa atribución (contado pero nunca creado — solo existen 3: FF-GENUINE-001,
+> FP-CULTURAL-CLEAN-001, FP-CULTURAL-CLEAN).
 
 Reproducir: `python3 run_all_agent.py --timeout 90`
 
@@ -1163,9 +1170,9 @@ por completo.
 
 ---
 
-### Dominio A — 117/117 precisión determinista
+### Dominio A — 118/118 precisión determinista
 
-**Afirmación:** 117 casos, 100% correctos en modo fallback (sin API key, sin LLM).
+**Afirmación:** 118 casos, 100% correctos en modo fallback (sin API key, sin LLM).
 
 ```bash
 python3 run_all_agent.py --timeout 90
@@ -1182,7 +1189,7 @@ FAILED CASES:
 VIGIA-AMB-001: agent=NOISE (exp=ABSTAIN)  [Domain B — L-012]
 VIGIA-AMB-002: agent=NOISE (exp=ABSTAIN)  [Domain B — L-012]
 
-Domain A (core metric): **117/117 PASS — 100%**
+Domain A (core metric): **118/118 PASS — 100%**
 ```
 
 ---

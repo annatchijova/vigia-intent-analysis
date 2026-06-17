@@ -722,15 +722,26 @@ Both are documented here for Daubert transparency.
 | Irreducible ambiguity (AMB-001–002) | 2 | 0 | NOISE instead of ABSTAIN (L-012) |
 | **Total** | **96** | **75 (78%)** | |
 
-**Interpretation:** Fallback mode accuracy (78%) reflects the scorer's designed
-scope — technically clear cases with structural anomalies. The 22% gap is
-concentrated in four specific structural limitations (L-015 through L-018). In
-production, LLM-assisted mode is recommended for all cases where those limitations
-apply.
+**Interpretation:** The 78% figure above describes the pure mathematical scorer
+in isolation (no LLM, no autonomous agent loop). It is NOT the production accuracy
+of VIGÍA. The autonomous agent (`vigia_agent.py`) achieves 134/136 (98.5%) across
+the same combined corpus — see Agent mode below. Fallback mode accuracy (78%)
+reflects the scorer's designed scope — technically clear cases with structural
+anomalies. The 22% gap is concentrated in four specific structural limitations
+(L-015 through L-018). In production, LLM-assisted mode is recommended for all
+cases where those limitations apply.
 
 **BREAK-001–010 note:** The 0/10 in fallback is not a crash — the scorer emits
 UNKNOWN/ABSTAIN, which is Daubert-compliant (refusing to assert what cannot be
 proven). The verdicts are conservative, not wrong in the harmful direction.
+
+### Agent mode (vigia_agent.py, batch run)
+
+| Suite | Cases | Correct | Notes |
+|-------|-------|---------|-------|
+| Domain A + B + C combined | 136 | 134 | 2 xfail, documented under L-012 |
+
+Reproduce: `python3 run_all_agent.py --timeout 90`
 
 ---
 
