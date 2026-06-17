@@ -131,7 +131,14 @@ class SIFTOrchestrator:
     def __init__(self, case_id: str):
         self.case_id = case_id
         self.chain = ChainOfCustody(case_id)
-        self.path_guard = PathGuard()
+        self.path_guard = PathGuard(allowed_base_paths=[
+            Path('/var/vigia'),
+            Path('/tmp/vigia'),
+            Path('/home/vigia/cases'),
+            Path.home() / 'vigia-repo' / 'evidence',
+            Path.home() / 'vigia-repo' / 'data',
+            Path('/mnt'),
+        ])
 
         # SIFT motores originales
         self.memory = MemoryForensicsEngine()
