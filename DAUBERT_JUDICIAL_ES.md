@@ -80,7 +80,7 @@ VIGIA implementa:
   ingestable por OpenCTI, MISP, y cualquier plataforma compatible.
 - **Mapeo MITRE ATT&CK**: cada senal se vincula a una tecnica ATT&CK
   especifica con su ID y URL.
-- **Codigo abierto (MIT)**: el sistema completo es auditable por cualquier
+- **Codigo abierto (Apache 2.0)**: el sistema completo es auditable por cualquier
   perito o contrapericia.
 
 ### Protocolo de Uso en Contexto Judicial
