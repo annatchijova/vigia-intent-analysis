@@ -917,6 +917,14 @@ are preserved, not deleted, at `results/r7_test/` —
    pre-existing corpus bundle flagged earlier — has not yet been
    regenerated with the fixed pipeline.
 
+**Numbering note:** the original Formal Policy Engine specification
+(2026-04-30) calls this rule R7. The implemented check in
+`forensics/verify_ebs_v1.py` is labeled `R6_DEVIL_ADVOCATE` (line 453). This
+is a drift between the original spec's numbering and the as-built code,
+confirmed 2026-06-19, not a different requirement — both refer to the same
+Eco's Razor / devil's-advocate invariant. Left as-is rather than renumbering
+working code; documenting the mismatch here instead.
+
 ---
 
 ## L-019b — Agent Runtime Bundles vs. Canonical EBS v1 Schema
