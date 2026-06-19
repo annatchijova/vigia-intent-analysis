@@ -1,5 +1,11 @@
 # VIGÍA — Motor de Análisis de Intencionalidad para SIFT Workstation
 
+> **Nota (2026-06-19, post-presentación):** un bundle del corpus anterior a esta fecha
+> (`results/srl2018/VIGIA-REAL-SRL-DMZ-FTP_bundle.json`) fue sellado antes de un ajuste
+> de estrictez en el verificador y mostrará un fallo R7 documentado si se re-verifica.
+> Esto es esperado e intencional — ver `KNOWN_LIMITATIONS.md`, ítem L-026. El verificador
+> está capturando correctamente una brecha que ya fue cerrada para todos los bundles nuevos.
+
 [🇬🇧 English version](./README.md)
 
 > *"Haciendo que el engaño sea computacionalmente costoso para el atacante."*

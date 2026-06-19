@@ -819,6 +819,7 @@ Reproduce: `python3 run_all_agent.py --timeout 90`
 | L-023 | Bundle save TOCTOU race (SEC-04) | bundle_builder.py | P0 — fix scheduled |
 | L-024 | Forensic mount allowlist includes generic /mnt | sift_orchestrator.py | Design decision |
 | L-025 | Devil's Advocate has no autonomous generator for unlabeled evidence | All live MALICE/INTENT findings | Active work |
+| L-026 | Devil's Advocate generator wired in; 1 pre-fix corpus bundle flagged | VIGIA-REAL-SRL-DMZ-FTP | **RESOLVED** / documented exception |
 | — | Normalization schema mismatch | vigia_scorer.py | **RESOLVED** |
 | — | Gate G1 accepting legacy hashes | caie.py | **RESOLVED** |
 | — | Uniform prior_trust=0.7 in converter | convert_legacy_cases.py | **RESOLVED** |
@@ -829,6 +830,62 @@ Reproduce: `python3 run_all_agent.py --timeout 90`
 *VIGÍA — SANS FIND EVIL Hackathon 2026*
 *Author: Anna Tchijova | AI Collective: Claude, Kimi, Gemini, DeepSeek, Qwen, Grok, ChatGPT*
 *License: Apache 2.0 | Repository: github.com/annatchijova/vigia-intent-analysis*
+
+---
+
+### L-026 — Devil's Advocate Generator Wired In; 1 Pre-Fix Corpus Bundle Flagged by Stricter Verifier
+
+**Status:** RESOLVED (generation gap) / DOCUMENTED (legacy bundle exception). Fixed 2026-06-19, POST HACKATHON.
+
+**What was broken:**
+`devil_advocate` in `caie_analysis` was only ever populated when a human curator
+wrote it by hand into a case JSON during corpus construction. No autonomous
+code path (`vigia_agent.py`, `vigia/pipeline/pipeline.py`,
+`vigia/core/bundle_builder.py::build_bundle()`) generated it from evidence.
+The intended generator, `LLMBackend._gorgias_counter_hypothesis()`, was an
+unimplemented stub (`return ""`). The verifier (`forensics/verify_ebs_v1.py`)
+only checked for an empty string and did not treat absence as a blocking
+failure for `conformity_level == 3`.
+
+**Fix applied (POST HACKATHON, 2026-06-19):**
+- `vigia/core/devil_advocate_gen.py` (new): deterministic composer, no LLM in
+  the path. Uses `missing_signals` from `CasePatternResult` when reachable;
+  falls back to an explicit, honest statement otherwise — today, both sealing
+  paths use the fallback, since `CasePatternLibrary` matching currently lives
+  only in `sift_orchestrator.py` and is not yet wired into either path
+  (tracked as follow-up below, not yet done).
+- Both `bundle_builder.py::build_bundle()` and `pipeline.py` now call the
+  composer when `caie_analysis["verdict"]` is `MALICE`/`INTENT` and no
+  `devil_advocate` was already supplied.
+- `forensics/verify_ebs_v1.py::_check_devil_advocate()` now returns CRITICAL
+  for any MALICE/INTENT bundle missing `devil_advocate`, blocking
+  `conformity_level == 3`. Verified by direct unit invocation against three
+  constructed cases (missing / present / not-applicable).
+
+**Corpus impact, measured, not assumed (2026-06-19):**
+Full scan of every true EBS v1 bundle in the repository (`bundle_version` +
+`decision_trace` present; legacy report-format files excluded) found
+**1 bundle** sealed before this fix with a MALICE/INTENT verdict and no
+`devil_advocate`:
+
+- `results/srl2018/VIGIA-REAL-SRL-DMZ-FTP_bundle.json` (verdict: MALICE)
+
+**If you re-run `verify_ebs_v1.py` against this specific file, it will
+correctly report a CRITICAL R7 failure.** This is the verifier doing its job
+on a bundle sealed under an earlier, less strict version of the same check —
+not a regression. The file predates this fix and has not yet been
+regenerated. Every other bundle in the repository, including the entire
+submitted hackathon corpus, was unaffected.
+
+**Follow-up (not yet done):**
+1. Regenerate `VIGIA-REAL-SRL-DMZ-FTP_bundle.json` with the current pipeline.
+2. Wire `sift_orchestrator.py`'s `CasePatternLibrary.missing_signals` into one
+   or both sealing paths so the rich composition already written in
+   `devil_advocate_gen.py` is actually reachable.
+
+**Discovered by:** Claude (Collective Integrator) + Anna Tchijova, live repo
+audit, 2026-06-19. Reviewed by the Collective (Grok, Gemini, Kimi, ChatGPT)
+same date.
 
 ---
 

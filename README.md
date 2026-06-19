@@ -1,5 +1,12 @@
 # VIGÍA — Intentionality Analysis Bridge for SIFT Workstation
 
+> **Note (2026-06-19, post-submission):** one pre-existing corpus bundle
+> (`results/srl2018/VIGIA-REAL-SRL-DMZ-FTP_bundle.json`) was sealed before a
+> verifier strictness fix and will show a documented R7 failure if
+> re-verified. This is expected and intentional — see `KNOWN_LIMITATIONS.md`,
+> item L-026. It is the verifier correctly catching a gap that has since been
+> closed for all new bundles.
+
 [🇪🇸 Versión en español](./README_ES.md)
 
 > *"Making deception computationally expensive for the attacker."*
