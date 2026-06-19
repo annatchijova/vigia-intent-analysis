@@ -1,6 +1,6 @@
 # VIGÍA — Known Limitations
 
-**Version:** EBS v1 + P2 calibration | **Updated:** 2026-06-17
+**Version:** EBS v1 + P2 calibration | **Updated:** 2026-06-19
 **Applies to:** `github.com/annatchijova/vigia-intent-analysis`
 
 > VIGÍA does not claim to be infallible — it claims to be **auditable**.
@@ -612,6 +612,51 @@ standard mount convention.
 
 ---
 
+### L-025 — Devil's Advocate (Eco's Razor) Has No Autonomous Generator for Unlabeled Evidence
+
+**Affects:** All MALICE/INTENT findings from live autonomous investigations | **Status:** Identified 2026-06-19 — active work, not a permanently accepted limitation
+
+**Description:** The `devil_advocate` field in MALICE/INTENT findings is only populated when
+a human curator writes it by hand in the case JSON before the corpus is built
+(`vigia/scripts/generate_execution_log.py:75`, via `case.get("devil_advocate", "")`).
+No component of the live autonomous pipeline — not `vigia_agent.py`, not `scripts/run_case.py`,
+not any of the three copies of `abductive_intent_engine.py` (`vigia/`, `vigia/core/`,
+`vigia/tools/`) — generates this field from evidence at investigation time.
+
+**Root cause:** The intended generator (`LLMBackend._gorgias_counter_hypothesis()` in
+`vigia/core/llm_backend.py:160`, identical in `vigia/llm_backend_v2.py`) exists only as a
+named stub — `return ""`. The surrounding class scaffolding (`_build_firstness_prompt`,
+`_build_thirdness_prompt`, `_symbolic_abduction`, etc.) is present but not wired into any
+live execution path. Neither file is imported anywhere in production code.
+
+**Forensic implication:** For a genuinely autonomous investigation over new, unlabeled
+evidence, VIGÍA currently has no mechanism to perform the abductive falsification step that
+Rule R7 requires. The field is absent unless a human provides it in advance — which negates
+the purpose of an autonomous Devil's Advocate in live incident response.
+
+**Secondary gap — verifier does not flag this as critical:** `forensics/verify_ebs_v1.py`
+`_check_devil_advocate()` only validates that the string is non-empty (rejects `""`, `"N/A"`,
+`"null"`, `"None"`). It does not detect generic or repeated boilerplate text, and
+`R6_DEVIL_ADVOCATE` is not among the conditions for `conformity_level = 3`
+(`verify_ebs_v1.py:440`). A bundle can reach maximum conformity with an empty
+`devil_advocate` on a MALICE finding — the check issues only a WARNING.
+
+**Candidate solution path (designed, not yet implemented):**
+`vigia/memory/case_pattern_library.py` and `vigia/inference/case_pattern_library.py`
+(duplicates — pending reconciliation) already define `exclusion_signals` per `CasePattern` —
+the benign alternative criteria that would rule out the malicious reading of the same
+evidence. `sift_orchestrator.py` already references this library, suggesting a live
+connection point. The proposed approach is to compose `devil_advocate` deterministically from
+`exclusion_signals` and `confidence_basis` of the matched pattern at verdict time — no LLM
+in the path — rather than writing a new free-text generator. Prerequisite: confirm whether
+`case_pattern_library` usage in `sift_orchestrator.py` feeds the final verdict composition or
+is limited to an earlier triage stage.
+
+**Discovered by:** Claude (AI Collective Integrator) + Anna Tchijova, during live repository
+audit, 2026-06-19. Surfaced while investigating a proposed Formal Policy Engine specification.
+
+---
+
 ## Part IV — Resolved Limitations
 
 ### [RESOLVED] Normalization Schema Mismatch
@@ -773,6 +818,7 @@ Reproduce: `python3 run_all_agent.py --timeout 90`
 | L-022 | devil_advocate validation partially architectural | Mode 2 bundles | Post-audit improvement |
 | L-023 | Bundle save TOCTOU race (SEC-04) | bundle_builder.py | P0 — fix scheduled |
 | L-024 | Forensic mount allowlist includes generic /mnt | sift_orchestrator.py | Design decision |
+| L-025 | Devil's Advocate has no autonomous generator for unlabeled evidence | All live MALICE/INTENT findings | Active work |
 | — | Normalization schema mismatch | vigia_scorer.py | **RESOLVED** |
 | — | Gate G1 accepting legacy hashes | caie.py | **RESOLVED** |
 | — | Uniform prior_trust=0.7 in converter | convert_legacy_cases.py | **RESOLVED** |
