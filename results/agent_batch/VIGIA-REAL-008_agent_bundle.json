@@ -1,32 +1,32 @@
 {
-  "analysis_timestamp": "2026-06-15T21:45:13.517726+00:00",
+  "analysis_timestamp": "2026-06-19T23:01:19.238011+00:00",
   "audit_trail": {
     "agent_version": "1.0.0-SANS-2026",
     "case_id": "VIGIA-REAL-008",
-    "end_time": "2026-06-15T21:45:13.517729+00:00",
+    "end_time": "2026-06-19T23:01:19.238015+00:00",
     "entries": [
       {
         "action": "AGENT_INITIALIZED",
         "case_id": "VIGIA-REAL-008",
-        "entry_sha256": "1c3913f18f5bc594555cd3aa28b298881274bbaeb9024905098666b0732c4082",
+        "entry_sha256": "8dcac3fc7894877caa8e7d9df2d581d14ec4cfe2ac83684d526a018cf2d0e791",
         "inputs_summary": {
           "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
           "case_id": "VIGIA-REAL-008"
         },
         "iteration": 0,
-        "note": "Agent initialized \u2014 source SHA-256: 4eeafb3bfb155486...",
+        "note": "Agent initialized \u2014 source SHA-256: 95ef6739e4df7cf2...",
         "outputs_summary": {
-          "agent_sha256": "4eeafb3bfb155486142942ad7a2c8678676f86ffd5d076882459354d820591f6",
+          "agent_sha256": "95ef6739e4df7cf28eef26e5338c0708c50348077baeca29d899806d950da740",
           "agent_version": "1.0.0-SANS-2026"
         },
         "seq": 1,
-        "timestamp": "2026-06-15T21:45:13.515211+00:00",
+        "timestamp": "2026-06-19T23:01:19.235016+00:00",
         "tool": "vigia_agent"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-REAL-008",
-        "entry_sha256": "fe884d5fc798b2be2e760f04f15ce3f5855c6a61ee1e850287ece3610ab04542",
+        "entry_sha256": "e132e78feeaaeb920f84a0d4f459fc9f83f8066cd0cef9d24fbbd70e8852662a",
         "inputs_summary": {
           "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-REAL-008.json"
         },
@@ -34,13 +34,13 @@
         "note": "Computing SHA-256 of original evidence",
         "outputs_summary": {},
         "seq": 2,
-        "timestamp": "2026-06-15T21:45:13.515281+00:00",
+        "timestamp": "2026-06-19T23:01:19.235089+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-REAL-008",
-        "entry_sha256": "d781fb8a6ed48a98a09e2a58220a384c04d38b49730845d4a901faf5230357da",
+        "entry_sha256": "57790844fde4600f8ca7c091f898802267a0ee234f712c518a82543f466f9e1f",
         "inputs_summary": {
           "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-REAL-008.json"
         },
@@ -50,13 +50,13 @@
           "sha256": "46a636cbdac8cf10ea46bd2a8c3e38505f12cfac570729f984186faef3bec8cf"
         },
         "seq": 3,
-        "timestamp": "2026-06-15T21:45:13.515352+00:00",
+        "timestamp": "2026-06-19T23:01:19.235160+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "PIPELINE_EXECUTE",
         "case_id": "VIGIA-REAL-008",
-        "entry_sha256": "380e13f80a8dc2f8ce7115e44bea7dddcbdc2ea8d7cc2af777895d49177e8cec",
+        "entry_sha256": "1bcde185f8c92c5fcc3b0a4c3d8cabd7c5508ffa9185181abd0073cf25febf42",
         "inputs_summary": {
           "evidence": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-REAL-008.json",
           "iteration": "0",
@@ -66,13 +66,13 @@
         "note": "Executing pipeline \u2014 iteration 0",
         "outputs_summary": {},
         "seq": 4,
-        "timestamp": "2026-06-15T21:45:13.515443+00:00",
+        "timestamp": "2026-06-19T23:01:19.235246+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "PIPELINE_COMPLETE",
         "case_id": "VIGIA-REAL-008",
-        "entry_sha256": "43c9036a1c1a32c85c63e5afec4c331f00b508bb17e4ce778f938c8647e640da",
+        "entry_sha256": "4bdba84252db80e17c453fe0dfac63589edaddb9af06d21f644ef41a0f8acc98",
         "inputs_summary": {
           "iteration": "0"
         },
@@ -129,13 +129,13 @@
           ]
         },
         "seq": 5,
-        "timestamp": "2026-06-15T21:45:13.517087+00:00",
+        "timestamp": "2026-06-19T23:01:19.236909+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "CONTRADICTION_CHECK",
         "case_id": "VIGIA-REAL-008",
-        "entry_sha256": "b73ea54c6bbcccc0969fa90542c4f2e8606835ce22527943bb9969828c21e065",
+        "entry_sha256": "1311185c9d89af1802336115d9494a5d4123ec1103ba3172abaf05418914bbed",
         "inputs_summary": {
           "n_signals": "4"
         },
@@ -146,13 +146,13 @@
           "threshold": "2"
         },
         "seq": 6,
-        "timestamp": "2026-06-15T21:45:13.517571+00:00",
+        "timestamp": "2026-06-19T23:01:19.237387+00:00",
         "tool": "contradiction_detector"
       },
       {
         "action": "AGENT_EXIT",
         "case_id": "VIGIA-REAL-008",
-        "entry_sha256": "83ed45aecb06ba76627ba04ef5483fa0e4c7fa6e7fb0057ce7a541317d6ee185",
+        "entry_sha256": "a537f69e07b604fb38f73f2ecd071b33ef4ef7a20c7f1044a9f7b324009c043e",
         "inputs_summary": {
           "verdict": "MALICIOUS_INTENT_DETECTED"
         },
@@ -162,11 +162,11 @@
           "exit_code": "1"
         },
         "seq": 7,
-        "timestamp": "2026-06-15T21:45:13.517655+00:00",
+        "timestamp": "2026-06-19T23:01:19.237481+00:00",
         "tool": "vigia_agent"
       }
     ],
-    "start_time": "2026-06-15T21:45:13.515015+00:00",
+    "start_time": "2026-06-19T23:01:19.234821+00:00",
     "total_entries": 7
   },
   "case_id": "VIGIA-REAL-008",
@@ -182,6 +182,30 @@
         "__fraction__": true,
         "den": 1,
         "num": 0
+      },
+      "devil_advocate": {
+        "aggregation": {
+          "k": 3,
+          "method": "top_k_already_validated_matches_v2",
+          "total_gap_mass": "0"
+        },
+        "counterfactual_summary": {
+          "primary_alternative_hypothesis": null
+        },
+        "decision_context": {
+          "confidence": "0",
+          "mapped_verdict": "MALICIOUS_INTENT_DETECTED",
+          "raw_verdict": "MALICIOUS_INTENT_DETECTED",
+          "score": "0"
+        },
+        "devil_advocate_source": "deterministic_no_pattern_data_available",
+        "meta": {
+          "deterministic": true,
+          "generated_from": "case_pattern_library"
+        },
+        "narrative": "Eco's Razor (Abductive Falsification) applied to verdict MALICIOUS_INTENT_DETECTED. Pattern-matching data was not available on this code path \u2014 CasePatternLibrary is not invoked here by design (agent audit-trail mode (vigia_agent.py \u2014 JSON-replay / autonomous path); see KNOWN_LIMITATIONS.md). No structured counter-hypothesis could be derived deterministically. This is a documented scope limitation of the current code path, not an absence of falsification attempt.",
+        "pattern_evidence_gaps": [],
+        "version": "r7-da-v1"
       },
       "is_conclusive": false,
       "narrative": "Memory dump cridex.vmem from a Windows XP SP2 machine infected with the Cridex banking trojan (Feodo/Bugat, predecessor of Dridex). The malware injects code into explorer.exe and communicates with C&C servers to steal banking credentials."
