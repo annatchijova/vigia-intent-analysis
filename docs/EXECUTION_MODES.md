@@ -26,16 +26,20 @@ These two were never reconciled into one schema. As of 2026-06-19, family
 (`vigia/core/devil_advocate_gen.py` — see `KNOWN_LIMITATIONS.md`, L-026).
 Family (2) doesn't have an equivalent yet.
 
-## Open invitation
+## Update — closed the same day (2026-06-19)
 
-Family (2)'s single hypothesis lives at
-`results["abduction"]["best_hypothesis"]` inside `vigia_agent.py`, finalized
-right before `_seal_bundle()` is called. Wiring a deterministic
-counter-hypothesis there — reusing or adapting the composer in
-`devil_advocate_gen.py` — is a well-scoped, concrete first contribution if
-you want one. It's a good example of how VIGÍA's invariants (no LLM in the
-decision path, Fraction-only scoring) have to be re-earned in every code
-path, not just the main one.
+Family (2) now has a deterministic devil_advocate too, at
+`results["abduction"]["devil_advocate"]` inside `vigia_agent.py`, right
+before `_seal_bundle()` is called — same composer as family (1)
+(`devil_advocate_gen.py`), with an honest `scope_note` explaining this path
+never has pattern-match data to begin with.
+
+Next concrete contribution, if you want one: confirm whether any evidence
+type handled by `vigia_agent.py` could realistically reach
+`vigia/sift/sift_orchestrator.py`'s `CasePatternLibrary` matching, and if
+so, wire `missing_signals_by_pattern` through so this path gets the richer
+counter-hypothesis instead of always falling back to "no pattern data
+available."
 
 ## Why this happened
 

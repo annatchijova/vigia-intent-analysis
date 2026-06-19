@@ -887,6 +887,36 @@ submitted hackathon corpus, was unaffected.
 audit, 2026-06-19. Reviewed by the Collective (Grok, Gemini, Kimi, ChatGPT)
 same date.
 
+**Second update — same day, 2026-06-19, after implementing the fix:**
+
+All three sealing paths now compose `devil_advocate` deterministically for
+MALICE/INTENT verdicts:
+
+- `vigia/pipeline/pipeline.py` — `scope_note="standalone scorer mode
+  (vigia/pipeline/pipeline.py)"`
+- `vigia/core/bundle_builder.py::build_bundle()` — `scope_note="standalone
+  scorer mode (vigia/core/bundle_builder.py build_bundle())"`
+- `vigia_agent.py::_seal_bundle()` (agent audit-trail format) —
+  `scope_note="agent audit-trail mode (vigia_agent.py — JSON-replay /
+  autonomous path)"`. Verified end-to-end against `VIGIA-REAL-VANKO`:
+  `pipeline_results.abduction.devil_advocate` now contains a populated,
+  scope-accurate structure (`devil_advocate_source:
+  deterministic_no_pattern_data_available`).
+
+`compose_devil_advocate_struct()` gained a `scope_note` parameter so each
+call site states its own real architecture instead of sharing one generic
+string that was only accurate for two of the three paths.
+
+**Still open, not done today:**
+1. `results/srl2018/VIGIA-REAL-SRL-DMZ-FTP_bundle.json` — the one
+   pre-existing corpus bundle flagged earlier — has not yet been
+   regenerated with the fixed pipeline.
+2. Whether `vigia_agent.py`, for evidence types other than pre-converted
+   case JSON, ever reaches real pattern-matching data is still unconfirmed
+   — `sift_orchestrator.py` as imported there is a deliberate compatibility
+   shim without `CasePatternLibrary`, by design, for every evidence type
+   this entry point handles today.
+
 ---
 
 ## L-019b — Agent Runtime Bundles vs. Canonical EBS v1 Schema
