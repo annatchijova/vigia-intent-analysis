@@ -925,6 +925,37 @@ confirmed 2026-06-19, not a different requirement — both refer to the same
 Eco's Razor / devil's-advocate invariant. Left as-is rather than renumbering
 working code; documenting the mismatch here instead.
 
+**Third update — same day, 2026-06-19, regeneration attempt for
+VIGIA-REAL-SRL-DMZ-FTP:**
+
+Attempted to regenerate the one flagged corpus bundle
+(`results/srl2018/VIGIA-REAL-SRL-DMZ-FTP_bundle.json`) with the R7 fix
+applied. Stopped before touching the real file after a schema-test run
+revealed the regeneration path was wrong.
+
+Confirmed: `vigia_agent.py`'s CLI (`--evidence ... --case-id ... --output
+...`) always produces the agent audit-trail schema (family 2 — see
+`EXECUTION_MODES.md`), regardless of input evidence. Verified twice
+independently — once against `VIGIA-REAL-VANKO`, once against
+`VIGIA-REAL-SRL-DMZ-FTP` — both produced `audit_trail`/`pipeline_results`,
+never `bundle_version`/`decision_trace`/`caie_analysis`.
+
+The real bundle (EBS v1 schema, `verdict: MALICE`, `confidence: 0.67`,
+sealed 2026-06-10T19:28:16Z, git commit `c21a819`) was almost certainly
+produced by an interactive Claude Code + MCP investigation session, not by
+running `vigia_agent.py` as a one-line CLI command. Three project documents
+(`SUBMISSION_COMPLIANCE.md:389-396`, `PROMPTS_REALCASES_CLAUDE.md:9-16`,
+`README.md:462-465`) each describe a different `--output` path, and none
+matches where the file actually lives — discrepancies confirmed, not yet
+resolved.
+
+**Conclusion:** regenerating this bundle with `devil_advocate` requires
+repeating the original interactive MCP investigation, not a terminal
+command. Deferred to a dedicated session. The real bundle was not modified
+— a schema-test run was sent to a disposable path
+(`results/r7_test/srl_dmz_schema_test.json`) and inspected before any write
+to the real file.
+
 ---
 
 ## L-019b — Agent Runtime Bundles vs. Canonical EBS v1 Schema
