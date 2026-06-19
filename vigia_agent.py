@@ -885,6 +885,25 @@ class VIGIAAgent:
             note=f"Exit code {exit_code_preview} — analysis complete.",
         )
 
+        # R7 — deterministic devil_advocate for the agent audit-trail path.
+        # sift_orchestrator.py as imported here resolves to the root-level
+        # compatibility shim (confirmed by direct diff, 2026-06-19), not
+        # vigia/sift/sift_orchestrator.py — CasePatternLibrary is never
+        # reachable from this entry point. pattern_signal_metadata=None is
+        # architecturally confirmed, not assumed. Never overwrites a
+        # human-provided value because this path never had one.
+        if exit_code_preview == 1 and not results.get("abduction", {}).get("devil_advocate"):
+            from vigia.core.devil_advocate_gen import compose_devil_advocate_struct
+            _verdict = results.get("abduction", {}).get("best_hypothesis", "UNKNOWN")
+            results.setdefault("abduction", {})["devil_advocate"] = compose_devil_advocate_struct(
+                pattern_signal_metadata=None,
+                raw_verdict=_verdict,
+                mapped_verdict=_verdict,
+                score=results.get("pipeline_meta", {}).get("avg_score", "0"),
+                confidence=results.get("abduction", {}).get("best_posterior", "0"),
+                scope_note="agent audit-trail mode (vigia_agent.py — JSON-replay / autonomous path)",
+            )
+
         narrative = self._generate_narrative(results, evidence_sha256)
 
         # 4. Seal bundle — returns (bundle_dict, canonical_json_text, sha256_digest)

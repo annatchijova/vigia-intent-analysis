@@ -686,6 +686,26 @@ class VigiaPipeline:
                 ],
             }
 
+            # R7 — deterministic devil_advocate. pattern_signal_metadata is
+            # always None here: CasePatternLibrary never runs inside
+            # pipeline.py (confirmed by direct audit, 2026-06-19 — no
+            # reference to CasePatternLibrary/case_pattern_library/
+            # sift_orchestrator anywhere in this file). It only runs inside
+            # sift_orchestrator.py, a separate, currently unconnected path.
+            # See KNOWN_LIMITATIONS.md. The composer falls back to an
+            # explicit scope-limitation narrative instead of a generic
+            # template.
+            if caie_analysis.get("verdict") in ("MALICE", "INTENT"):
+                from vigia.core.devil_advocate_gen import compose_devil_advocate_struct
+                caie_analysis["devil_advocate"] = compose_devil_advocate_struct(
+                    pattern_signal_metadata=None,
+                    raw_verdict=caie_analysis.get("verdict", "UNKNOWN"),
+                    mapped_verdict=decision_trace.decision,
+                    score=caie_analysis.get("composite_score", 0.0),
+                    confidence=decision_trace.posterior,
+                    scope_note="standalone scorer mode (vigia/pipeline/pipeline.py)",
+                )
+
         # ── CAIE structural hard gate (runs BEFORE sealing so the override is
         # covered by bundle_hash — caie_analysis is part of bundle_payload) ──
         # Rationale: causal impossibilities and tool-signature fractures are a

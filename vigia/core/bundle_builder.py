@@ -473,4 +473,21 @@ def build_bundle(case: Dict[str, Any], scorer_result: Dict[str, Any]) -> Dict[st
         "case_id":               case.get("case_id", case.get("name", "UNKNOWN")),
     }
 
+    # R7 — deterministic devil_advocate. Never overwrites a human-provided
+    # value because this path (_vigia_score / build_bundle) never had one.
+    # pattern_signal_metadata is always None here: CasePatternLibrary only
+    # runs inside sift_orchestrator.py, a separate code path — confirmed by
+    # direct audit of vigia_scorer.py, not assumed. The composer falls back
+    # to an explicit scope-limitation narrative instead of a generic template.
+    if raw_verdict in ("MALICE", "INTENT"):
+        from vigia.core.devil_advocate_gen import compose_devil_advocate_struct
+        caie_payload["devil_advocate"] = compose_devil_advocate_struct(
+            pattern_signal_metadata=None,
+            raw_verdict=raw_verdict,
+            mapped_verdict=decision_verdict,
+            score=score,
+            confidence=confidence,
+            scope_note="standalone scorer mode (vigia/core/bundle_builder.py build_bundle())",
+        )
+
     return BundleBuilder.seal(bundle, caie_analysis=caie_payload)

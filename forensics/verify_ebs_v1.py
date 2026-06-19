@@ -365,7 +365,24 @@ def _check_devil_advocate(bundle: Dict) -> Tuple[bool, str]:
     """R6 — MALICE/INTENT findings must have devil_advocate populated (Daubert requirement)."""
     findings = bundle.get("findings", [])
     if not findings:
-        return True, "No findings field — fallback mode bundle, check not applicable"
+        # R7 Option C (Collective vote, 2026-06-19): a single-verdict bundle
+        # with no findings[] is NOT exempt from this check just because it
+        # has a different shape. Same vocabulary as the rest of this
+        # function: caie_analysis.verdict, not decision_trace.decision
+        # (which uses the mapped EBS vocabulary REJECT/ABSTAIN/ACCEPT,
+        # distinct from the raw forensic MALICE/INTENT/SUSPICION verdict).
+        caie = bundle.get("caie_analysis") or {}
+        if caie.get("verdict", "") in ("MALICE", "INTENT"):
+            da = caie.get("devil_advocate")
+            if not da:
+                return False, (
+                    "R7 VIOLATION: single-verdict bundle has MALICE/INTENT verdict "
+                    "in caie_analysis but no devil_advocate object — the "
+                    "falsification step was never attempted. This bundle must not "
+                    "be treated as sealed-compliant."
+                )
+            return True, "Single-verdict bundle has devil_advocate populated in caie_analysis"
+        return True, "No findings field and no MALICE/INTENT verdict — check not applicable"
     violations = []
     for f in findings:
         if f.get("verdict", "") in ("MALICE", "INTENT"):
@@ -434,10 +451,10 @@ def verify_bundle(
     ok_ecl, msg_ecl = _check_ecl_binding(bundle)
     result.add("R5_ECL_BINDING", ok_ecl, msg_ecl, severity="WARNING" if not ok_ecl else "INFO")
     ok_da, msg_da = _check_devil_advocate(bundle)
-    result.add("R6_DEVIL_ADVOCATE", ok_da, msg_da, severity="WARNING" if not ok_da else "INFO")
+    result.add("R6_DEVIL_ADVOCATE", ok_da, msg_da, severity="CRITICAL" if not ok_da else "INFO")
 
     # Determinar Level 3
-    if not critical and hash_ok and ok_pc and ok_att and ok_ecl:
+    if not critical and hash_ok and ok_pc and ok_att and ok_ecl and ok_da:
         result.conformity_level = 3
 
     # Resultado final

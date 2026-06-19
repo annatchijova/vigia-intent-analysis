@@ -890,32 +890,32 @@ same date.
 **Second update — same day, 2026-06-19, after implementing the fix:**
 
 All three sealing paths now compose `devil_advocate` deterministically for
-MALICE/INTENT verdicts:
+MALICE/INTENT verdicts, each with its own accurate `scope_note`:
 
-- `vigia/pipeline/pipeline.py` — `scope_note="standalone scorer mode
-  (vigia/pipeline/pipeline.py)"`
-- `vigia/core/bundle_builder.py::build_bundle()` — `scope_note="standalone
-  scorer mode (vigia/core/bundle_builder.py build_bundle())"`
-- `vigia_agent.py::_seal_bundle()` (agent audit-trail format) —
-  `scope_note="agent audit-trail mode (vigia_agent.py — JSON-replay /
-  autonomous path)"`. Verified end-to-end against `VIGIA-REAL-VANKO`:
+- `vigia/pipeline/pipeline.py`
+- `vigia/core/bundle_builder.py::build_bundle()`
+- `vigia_agent.py::_seal_bundle()` (agent audit-trail format) — verified
+  end-to-end against `VIGIA-REAL-VANKO`:
   `pipeline_results.abduction.devil_advocate` now contains a populated,
   scope-accurate structure (`devil_advocate_source:
   deterministic_no_pattern_data_available`).
 
 `compose_devil_advocate_struct()` gained a `scope_note` parameter so each
 call site states its own real architecture instead of sharing one generic
-string that was only accurate for two of the three paths.
+string that was only accurate for two of the three paths. Confirmed by
+direct `diff`: `sift_orchestrator.py` as imported by `vigia_agent.py` is a
+deliberate compatibility shim without `CasePatternLibrary` — see
+`EXECUTION_MODES.md` for the full map.
+
+Test bundles for all three stages of this fix (before / partial / after)
+are preserved, not deleted, at `results/r7_test/` —
+`VIGIA-REAL-VANKO-R7TEST` (before), `R7TEST2` (3 of 4 files patched),
+`R7TEST3` (all 4 patched, working).
 
 **Still open, not done today:**
 1. `results/srl2018/VIGIA-REAL-SRL-DMZ-FTP_bundle.json` — the one
    pre-existing corpus bundle flagged earlier — has not yet been
    regenerated with the fixed pipeline.
-2. Whether `vigia_agent.py`, for evidence types other than pre-converted
-   case JSON, ever reaches real pattern-matching data is still unconfirmed
-   — `sift_orchestrator.py` as imported there is a deliberate compatibility
-   shim without `CasePatternLibrary`, by design, for every evidence type
-   this entry point handles today.
 
 ---
 

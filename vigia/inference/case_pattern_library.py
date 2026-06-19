@@ -66,6 +66,16 @@ class CasePatternResult:
                 "finding_types": sorted(list(set(
                     m.pattern_name for m in self.matches
                 ))),
+                # R7 — raw data for deterministic devil_advocate composition.
+                # Fraction serialised as str (H22: no floats on the verdict path).
+                # Every key here already cleared its own pattern.similarity_threshold
+                # inside match() — no separate confidence filter is applied downstream.
+                "missing_signals_by_pattern": {
+                    m.pattern_name: m.missing_signals for m in self.matches
+                },
+                "match_score_by_pattern": {
+                    m.pattern_name: str(m.match_score) for m in self.matches
+                },
             }
         )
 

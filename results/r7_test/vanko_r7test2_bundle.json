@@ -1,0 +1,329 @@
+{
+  "analysis_timestamp": "2026-06-19T22:24:36.011594+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "VIGIA-REAL-VANKO-R7TEST2",
+    "end_time": "2026-06-19T22:24:36.011598+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "VIGIA-REAL-VANKO-R7TEST2",
+        "entry_sha256": "22212d72b3fd2a9e548e7605db7b20a68a1e01fd604902f6d39c38c5f0d79c1d",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "VIGIA-REAL-VANKO-R7TEST2"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: 4eeafb3bfb155486...",
+        "outputs_summary": {
+          "agent_sha256": "4eeafb3bfb155486142942ad7a2c8678676f86ffd5d076882459354d820591f6",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-06-19T22:24:36.008814+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-REAL-VANKO-R7TEST2",
+        "entry_sha256": "38675ebe2a97f5083c98b5c396b2c0256f91ada30a6a1234252b7e469d6fe94d",
+        "inputs_summary": {
+          "path": "data/cases/converted/VIGIA-REAL-VANKO.json"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-06-19T22:24:36.008887+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-REAL-VANKO-R7TEST2",
+        "entry_sha256": "00651885b63fc3784ac2d2d3caad299b78d3c9688b41cd7e226fe58e07713251",
+        "inputs_summary": {
+          "path": "data/cases/converted/VIGIA-REAL-VANKO.json"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: 01f388e319aeea9a...",
+        "outputs_summary": {
+          "sha256": "01f388e319aeea9ac06022821f7b18f24baf96ac0ce9352d768513808fd129f1"
+        },
+        "seq": 3,
+        "timestamp": "2026-06-19T22:24:36.008973+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "VIGIA-REAL-VANKO-R7TEST2",
+        "entry_sha256": "abe7c0e8c6efc99e717efae146ecdbd10a4513030ee964462ced8b2f5c67f90c",
+        "inputs_summary": {
+          "evidence": "data/cases/converted/VIGIA-REAL-VANKO.json",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-06-19T22:24:36.009064+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "VIGIA-REAL-VANKO-R7TEST2",
+        "entry_sha256": "1949e8c902b15f8630f34465ebd55cc9183753ae39bc2fcf92504bad49205f37",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 7 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+            "best_posterior": "27409/175000",
+            "confidence": "27409/175000",
+            "is_conclusive": "True",
+            "narrative": "FOR500 case. Anthony Vanko, lead biochemical engineer at Stark Enterprises DC R&D Facility, suspected of exfiltrating classified research (zebrafish DNA, rapid cell regeneration, weaponization researc..."
+          },
+          "case_id": "VIGIA-REAL-VANKO",
+          "pipeline_meta": {
+            "artifact_count": "7",
+            "avg_score": "27409/35000",
+            "expected_verdict": "MALICE",
+            "source": "ebs_v1_json_adapter"
+          },
+          "signals": [
+            {
+              "artifact_id": "ART-001",
+              "confidence": "41/50",
+              "description": "smallftpd.exe found at C:\\Users\\defaultprinter\\smallftpd.exe, SHA-256: 4f1a4c44e268dfb78b8c9a1db6925775925498550e6a717e7576951a076bcd09. VirusTotal 1/72: Jiangmin detects Packed.BDF.en (packed executa",
+              "evidence_type": "filesystem_artifact",
+              "source": "ntfs-3g read-only mount + manual analysis",
+              "z_score": "3731/5000"
+            },
+            {
+              "artifact_id": "ART-002",
+              "confidence": "22/25",
+              "description": "ftpd.ini configuration file at C:\\Users\\defaultprinter\\ftpd.ini. Critical fields: auto_run=1 (FTP server starts automatically on login), port=21 (standard FTP, unencrypted), user_Login=defaultprinter,",
+              "evidence_type": "filesystem_artifact",
+              "source": "ntfs-3g read-only mount + manual analysis",
+              "z_score": "528/625"
+            },
+            {
+              "artifact_id": "ART-003",
+              "confidence": "23/25",
+              "description": "transfers.log at C:\\Users\\defaultprinter\\transfers.log. Single entry: '18/06/2016 18:21:49 Download started by defaultprinter [173.73.166.249] : c:\\Users\\defaultprinter\\Desktop\\temp.zip' / '18/06/2016",
+              "evidence_type": "filesystem_artifact",
+              "source": "ntfs-3g read-only mount + manual analysis",
+              "z_score": "1127/1250"
+            },
+            {
+              "artifact_id": "ART-004",
+              "confidence": "9/10",
+              "description": "Classified Stark Enterprises research documents found on device under C:\\Users\\defaultprinter\\Documents\\ and Desktop: (1) 'ZF DNA splice test notes.docx' \u2014 zebrafish DNA modification research; (2) 'Ra",
+              "evidence_type": "filesystem_artifact",
+              "source": "ntfs-3g read-only mount + directory listing",
+              "z_score": "873/1000"
+            },
+            {
+              "artifact_id": "ART-005",
+              "confidence": "87/100",
+              "description": "Hidden user account 'defaultprinter' at C:\\Users\\defaultprinter\\. Account name is a deliberate social engineering choice mimicking a Windows printer service account to avoid detection during casual in",
+              "evidence_type": "filesystem_artifact",
+              "source": "ntfs-3g read-only mount + directory listing",
+              "z_score": "8091/10000"
+            }
+          ]
+        },
+        "seq": 5,
+        "timestamp": "2026-06-19T22:24:36.011275+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "VIGIA-REAL-VANKO-R7TEST2",
+        "entry_sha256": "7ebc2f7bd115e6b0aae58a5a14c1e425ff547a22d1c15abc220619fccfe00086",
+        "inputs_summary": {
+          "n_signals": "7"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-06-19T22:24:36.011405+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "VIGIA-REAL-VANKO-R7TEST2",
+        "entry_sha256": "b0b166f25090df840d3412c6fdd83fd1c41b78c867b7955fd58429a70efd1280",
+        "inputs_summary": {
+          "verdict": "MALICIOUS_INTENT_DETECTED"
+        },
+        "iteration": 0,
+        "note": "Exit code 1 \u2014 analysis complete.",
+        "outputs_summary": {
+          "exit_code": "1"
+        },
+        "seq": 7,
+        "timestamp": "2026-06-19T22:24:36.011507+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-06-19T22:24:36.008622+00:00",
+    "total_entries": 7
+  },
+  "case_id": "VIGIA-REAL-VANKO-R7TEST2",
+  "evidence_path": "data/cases/converted/VIGIA-REAL-VANKO.json",
+  "evidence_sha256": "01f388e319aeea9ac06022821f7b18f24baf96ac0ce9352d768513808fd129f1",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-REAL-VANKO-R7TEST2 ===\nEvidence: data/cases/converted/VIGIA-REAL-VANKO.json\nEvidence SHA-256: 01f388e319aeea9ac06022821f7b18f24baf96ac0ce9352d768513808fd129f1\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 27409/175000\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\nFOR500 case. Anthony Vanko, lead biochemical engineer at Stark Enterprises DC R&D Facility, suspected of exfiltrating classified research (zebrafish DNA, rapid cell regeneration, weaponization research) to a Chinese university server. Evidence: Microsoft Surface 3 (119GB physical EWF image, FTK Imager 2.9, examiner Ovie Carroll, 2016-11-04). Key findings: hidden 'defaultprinter' service account; smallftpd.exe FTP server (VT 1/72, packed); ftpd.ini with auto_run=1 exposing entire user directory; \n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [transfers.log at C:\\Users\\defaultprinter\\transfers.log. Single entry: ] z=0.902 conf=0.92 \u2014 \n  [Classified Stark Enterprises research documents found on device under ] z=0.873 conf=0.90 \u2014 \n  [ftpd.ini configuration file at C:\\Users\\defaultprinter\\ftpd.ini. Criti] z=0.845 conf=0.88 \u2014 \n  [Hidden user account 'defaultprinter' at C:\\Users\\defaultprinter\\. Acco] z=0.809 conf=0.87 \u2014 \n  [smallftpd.exe found at C:\\Users\\defaultprinter\\smallftpd.exe, SHA-256:] z=0.746 conf=0.82 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW \u2014 No significant anomalies detected in this iteration.\n\nCritical signals (z>3): 0\nHigh signals (2<z<=3): 0\nTotal signals analyzed: 7",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+      "best_posterior": "27409/175000",
+      "confidence": {
+        "__fraction__": true,
+        "den": 175000,
+        "num": 27409
+      },
+      "is_conclusive": true,
+      "narrative": "FOR500 case. Anthony Vanko, lead biochemical engineer at Stark Enterprises DC R&D Facility, suspected of exfiltrating classified research (zebrafish DNA, rapid cell regeneration, weaponization research) to a Chinese university server. Evidence: Microsoft Surface 3 (119GB physical EWF image, FTK Imager 2.9, examiner Ovie Carroll, 2016-11-04). Key findings: hidden 'defaultprinter' service account; smallftpd.exe FTP server (VT 1/72, packed); ftpd.ini with auto_run=1 exposing entire user directory; "
+    },
+    "case_id": "VIGIA-REAL-VANKO",
+    "pipeline_meta": {
+      "artifact_count": 7,
+      "avg_score": "27409/35000",
+      "expected_verdict": "MALICE",
+      "source": "ebs_v1_json_adapter"
+    },
+    "signals": [
+      {
+        "artifact_id": "ART-001",
+        "confidence": {
+          "__fraction__": true,
+          "den": 50,
+          "num": 41
+        },
+        "description": "smallftpd.exe found at C:\\Users\\defaultprinter\\smallftpd.exe, SHA-256: 4f1a4c44e268dfb78b8c9a1db6925775925498550e6a717e7576951a076bcd09. VirusTotal 1/72: Jiangmin detects Packed.BDF.en (packed executa",
+        "evidence_type": "filesystem_artifact",
+        "source": "ntfs-3g read-only mount + manual analysis",
+        "z_score": {
+          "__fraction__": true,
+          "den": 5000,
+          "num": 3731
+        }
+      },
+      {
+        "artifact_id": "ART-002",
+        "confidence": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 22
+        },
+        "description": "ftpd.ini configuration file at C:\\Users\\defaultprinter\\ftpd.ini. Critical fields: auto_run=1 (FTP server starts automatically on login), port=21 (standard FTP, unencrypted), user_Login=defaultprinter,",
+        "evidence_type": "filesystem_artifact",
+        "source": "ntfs-3g read-only mount + manual analysis",
+        "z_score": {
+          "__fraction__": true,
+          "den": 625,
+          "num": 528
+        }
+      },
+      {
+        "artifact_id": "ART-003",
+        "confidence": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 23
+        },
+        "description": "transfers.log at C:\\Users\\defaultprinter\\transfers.log. Single entry: '18/06/2016 18:21:49 Download started by defaultprinter [173.73.166.249] : c:\\Users\\defaultprinter\\Desktop\\temp.zip' / '18/06/2016",
+        "evidence_type": "filesystem_artifact",
+        "source": "ntfs-3g read-only mount + manual analysis",
+        "z_score": {
+          "__fraction__": true,
+          "den": 1250,
+          "num": 1127
+        }
+      },
+      {
+        "artifact_id": "ART-004",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 9
+        },
+        "description": "Classified Stark Enterprises research documents found on device under C:\\Users\\defaultprinter\\Documents\\ and Desktop: (1) 'ZF DNA splice test notes.docx' \u2014 zebrafish DNA modification research; (2) 'Ra",
+        "evidence_type": "filesystem_artifact",
+        "source": "ntfs-3g read-only mount + directory listing",
+        "z_score": {
+          "__fraction__": true,
+          "den": 1000,
+          "num": 873
+        }
+      },
+      {
+        "artifact_id": "ART-005",
+        "confidence": {
+          "__fraction__": true,
+          "den": 100,
+          "num": 87
+        },
+        "description": "Hidden user account 'defaultprinter' at C:\\Users\\defaultprinter\\. Account name is a deliberate social engineering choice mimicking a Windows printer service account to avoid detection during casual in",
+        "evidence_type": "filesystem_artifact",
+        "source": "ntfs-3g read-only mount + directory listing",
+        "z_score": {
+          "__fraction__": true,
+          "den": 10000,
+          "num": 8091
+        }
+      },
+      {
+        "artifact_id": "ART-006",
+        "confidence": {
+          "__fraction__": true,
+          "den": 4,
+          "num": 3
+        },
+        "description": "Two IEEE 802.11 monitor-mode packet captures found at C:\\Users\\PC User\\Documents\\: 'starbucks pcap.pcap' (685 packets, 155 seconds, 2016-03-04T17:25Z) and 'testpcap.pcap' (510 packets, 97 seconds, 201",
+        "evidence_type": "network_capture",
+        "source": "tshark + strings analysis",
+        "z_score": {
+          "__fraction__": true,
+          "den": 200,
+          "num": 117
+        }
+      },
+      {
+        "artifact_id": "ART-007",
+        "confidence": {
+          "__fraction__": true,
+          "den": 100,
+          "num": 83
+        },
+        "description": "NTUSER.DAT from defaultprinter account confirms user activity on 2016-06-18 at 21:55:03Z (Snipping Tool, Paint, Notepad, Sticky Notes launched), 21:59:55Z (Google Chrome opened from Desktop shortcut),",
+        "evidence_type": "registry_hive",
+        "source": "RegRipper ntuser plugin on NTUSER_defaultprinter.DAT",
+        "z_score": {
+          "__fraction__": true,
+          "den": 10000,
+          "num": 7221
+        }
+      }
+    ]
+  },
+  "sans_compliance": {
+    "accuracy_validation": false,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}
