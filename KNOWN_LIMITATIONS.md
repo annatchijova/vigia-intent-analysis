@@ -820,6 +820,7 @@ Reproduce: `python3 run_all_agent.py --timeout 90`
 | L-024 | Forensic mount allowlist includes generic /mnt | sift_orchestrator.py | Design decision |
 | L-025 | Devil's Advocate has no autonomous generator for unlabeled evidence | All live MALICE/INTENT findings | Active work |
 | L-026 | Devil's Advocate generator wired in; 1 pre-fix corpus bundle flagged | VIGIA-REAL-SRL-DMZ-FTP | **RESOLVED** / documented exception |
+| L-027 | AbductiveIntentEngine call site in VigiaPipeline used wrong signature since birth | `vigia/pipeline/pipeline.py::run_full()` | **RESOLVED** 2026-06-22 — zero submission impact |
 | — | Normalization schema mismatch | vigia_scorer.py | **RESOLVED** |
 | — | Gate G1 accepting legacy hashes | caie.py | **RESOLVED** |
 | — | Uniform prior_trust=0.7 in converter | convert_legacy_cases.py | **RESOLVED** |
@@ -955,6 +956,42 @@ command. Deferred to a dedicated session. The real bundle was not modified
 — a schema-test run was sent to a disposable path
 (`results/r7_test/srl_dmz_schema_test.json`) and inspected before any write
 to the real file.
+
+---
+
+## L-027 — AbductiveIntentEngine Call Site Used Wrong Signature Since Birth
+
+**Affects:** `vigia/pipeline/pipeline.py::run_full()` | **Status:** **[DESIGNED]** 2026-06-22, POST HACKATHON — import path resolved; semantic integration pending
+
+**Description:** `VigiaPipeline.run_full()` called `AbductiveIntentEngine().infer(posterior=, signals=, evidence_graph=, vision_metadata=)` — a signature that exists in none of the three extant copies of the class. All copies define `infer_habit(artifacts, phase)` (or `infer(artifacts, phase)` in the root copy). The result was also treated as a `dict` via `.get()`, but all copies return `AbductiveResult` (dataclass). The call always raised `AttributeError: 'AbductiveIntentEngine' object has no attribute 'infer'`, caught by the surrounding `try/except`, falling back to `consistency_score=1.0`.
+
+**Root cause:** The call site was written aspirationally before the engine API was finalized. The bug was present since the file was created (commit `84e8bfd`, 2026-05-06) and never triggered a test failure because `VigiaPipeline` was not used by any submission entry point.
+
+**Submission impact:** **Zero.** Confirmed by tracing all three submission entry points in `SUBMISSION_COMPLIANCE.md` (`vigia_agent.py`, `scripts/run_case.py→vigia_sift_bridge.py::reason_with_llm`, `vigia/scripts/evaluate_detector.py`): none import `VigiaPipeline`. `generate_release_bundle.py` is a packaging script with no runtime imports. `generate_execution_log.py` uses `SemioticDetectorV2`/`aggregate_evidence`/`decide`, not `VigiaPipeline`.
+
+**Secondary effect of the bug:** `consistency_score` was hardcoded to `1.0` on every call, which suppressed the Disonancia Semántica rule (`posterior > 0.7 and consistency_score < 0.5 → ABSTAIN`). Any case routed through `VigiaPipeline` (not the submission path) would never trigger ABSTAIN via this gate.
+
+**Fix applied (POST HACKATHON, 2026-06-22):**
+
+1. **Canonical engine created:** `vigia/inference/abductive_intent_engine.py` — merged from `vigia/core/` as base, which had: (a) `H_XF_001` fix for EXFILTRATION hypothesis ID collision, (b) DAUBERT comments on `cost`/`coverage_score` fields, (c) 3-tuple Ockham sort key `(cost, -coverage, len(required_artifacts))`. Only change from base: import fixed from bare `from visible_variables import` → `from vigia.tools.visible_variables import`.
+
+2. **Import updated:** `pipeline.py:89` now imports from `vigia.inference.abductive_intent_engine` (matching the `vigia_namespace_shim.py:95` target that was already registered but pointing to a non-existent path).
+
+3. **Call site reverted to documented stub:** `pipeline.py::run_full()` now explicitly sets `consistency_score=1.0` and `abductive_result=None` with a comment referencing L-027. No adapter is active. The previous adapter (commit `86f6777`, reverted) was found to produce output constant per phase (vocabulary mismatch: `SignalOutput.tool_name` vs `HYPOTHESIS_TEMPLATES.required_artifacts`), which would have forced ABSTAIN on every high-posterior case via `consistency_score=0.0 < 0.5` — worse than the original silent failure.
+
+**Known limitation (not a bug, documented behavior):** Until a translation layer exists (`SignalOutput.tool_name` → template artifact name), the abductive engine cannot reason meaningfully from pipeline signals. The stub preserves the known pre-existing state (`consistency_score=1.0`, Disonancia Semántica inactive) rather than introducing a false sense of functionality.
+
+**Future work:** Design and implement `SignalOutput` → `Artifact` translation layer with:
+- Explicit mapping table: `tool_name` → `artifact_type` (e.g., `"audit_network"` → `"lateral_movement_auth"`, `"calculate_shannon_entropy"` → `"timestamp_uniformity"`)
+- Real `category` from signal metadata (not hardcoded `_VarCat.PROCESS`)
+- Real `observed_at` from signal timestamp
+- `consistency_score` as `Fraction(coverage_score, 100)` (no floats; `cost` remains `int`)
+
+**Triplication resolved:** `vigia/tools/abductive_intent_engine.py`, `vigia/core/abductive_intent_engine.py`, and `vigia/abductive_intent_engine.py` (root) remain in place as archived originals — not deleted, not imported by any active path after this fix. The `.bak` file at `vigia/core/abductive_intent_engine.py.bak` captures the pre-fix state.
+
+**Discovered by:** Anna Tchijova + Claude + Kimi, live repo audit, 2026-06-22.
+
+**Audited by:** Kimi (Moonshot AI), 2026-06-22. P0 found in adapter (output constant per phase, ABSTAIN over-trigger); P1 in documentation status (RESOLVED → DESIGNED); P2 in float reintroduction; P2 in hardcoded category; P3 in empty `observed_at`.
 
 ---
 

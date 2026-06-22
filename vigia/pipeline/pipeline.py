@@ -86,7 +86,7 @@ except ImportError:
     logger.warning("[Pipeline] VisibleVariablesEngine no disponible — lazy abstraction desactivada")
 
 try:
-    from vigia.tools.abductive_intent_engine import AbductiveIntentEngine
+    from vigia.inference.abductive_intent_engine import AbductiveIntentEngine
     _ABDUCTIVE_AVAILABLE = True
 except ImportError:
     AbductiveIntentEngine = None  # type: ignore
@@ -511,48 +511,14 @@ class VigiaPipeline:
         consistency_score: float = 1.0
 
         if _ABDUCTIVE_AVAILABLE and AbductiveIntentEngine is not None:
-            try:
-                aie = AbductiveIntentEngine()
-                abductive_result = aie.infer(
-                    posterior=posterior,
-                    signals=all_signals,
-                    evidence_graph=evidence_graph,
-                    vision_metadata=vision_metadata if vision_metadata else None,
-                )
-                consistency_score = float(abductive_result.get("consistency_score", 1.0))
-                logger.info(
-                    "[Pipeline] Terceridad: hipótesis=%s I=%.4f cost=%.4f",
-                    abductive_result.get("best_hypothesis", "N/A"),
-                    consistency_score,
-                    float(abductive_result.get("hypothesis_cost", 0.0)),
-                )
-                if _exec_log:
-                    _exec_log.log_event(
-                        phase=detected_phase or "UNKNOWN",
-                        peirce_layer="THIRDNESS",
-                        artifact="abductive_engine",
-                        finding=(
-                            f"hipótesis={abductive_result.get('best_hypothesis', 'N/A')} "
-                            f"consistency={consistency_score:.4f} "
-                            f"cost={float(abductive_result.get('hypothesis_cost', 0.0)):.3f}"
-                        ),
-                        intent_hypothesis=abductive_result.get("best_hypothesis"),
-                        tool_called="abductive_intent_engine",
-                        confidence=consistency_score,
-                    )
-
-                # REGLA DE ORO: Disonancia Semántica
-                # Posterior indica fabricación pero Ockham no encuentra hipótesis.
-                # El sistema DEBE emitir ABSTAIN — no es fallo, es honestidad epistémica.
-                if posterior > 0.7 and consistency_score < 0.5:
-                    logger.warning(
-                        "[Pipeline] DISONANCIA SEMÁNTICA: posterior=%.4f (FABRICADO) "
-                        "pero I=%.4f (sin hipótesis consistente). Forzando ABSTAIN.",
-                        posterior, consistency_score,
-                    )
-            except Exception as _aie_exc:
-                logger.warning("[Pipeline] AbductiveIntentEngine falló: %s — I=1.0", _aie_exc)
-                consistency_score = 1.0
+            # STUB — L-027: Integración semántica Terceridad requiere capa de
+            # traducción SignalOutput.tool_name → HYPOTHESIS_TEMPLATES.required_artifacts.
+            # Hasta entonces: Terceridad no aplica desde VigiaPipeline.
+            # Ver KNOWN_LIMITATIONS.md L-027 para detalle.
+            # Estado anterior conocido: consistency_score=1.0 (regla de
+            # disonancia semántica inactiva, documentado desde 2026-05-06).
+            consistency_score = 1.0
+            abductive_result = None
 
         # ── GOBERNANZA: RiskBoundedDecisionLayer con factor ω ──────────────
         decision_trace = self._risk_layer.decide(
