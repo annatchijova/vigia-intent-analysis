@@ -177,6 +177,8 @@ class SklearnCalibrator:
 
     def __init__(self) -> None:
         self._model = None
+        self._coef: Optional[float] = None
+        self._intercept: Optional[float] = None
         self._fitted: bool = False
         self._train_hash: str = ""
         self._version: str = "SklearnLogisticCalibrator-v0"
@@ -213,12 +215,22 @@ class SklearnCalibrator:
             )
 
     def calibrated_posterior(self, z_score: float) -> float:
-        if not self._fitted or self._model is None:
-            raise RuntimeError("SklearnCalibrator: llamar fit() primero.")
-        import numpy as np
+        if not self._fitted:
+            raise RuntimeError("SklearnCalibrator: llamar fit() primero o cargar via from_dict().")
         z_cap = max(min(z_score, 3.0), -3.0)
-        X = np.array([[z_cap]])
-        return float(self._model.predict_proba(X)[0, 1])
+        if self._model is not None:
+            import numpy as np
+            X = np.array([[z_cap]])
+            return float(self._model.predict_proba(X)[0, 1])
+        if self._coef is not None and self._intercept is not None:
+            # Reconstruido desde disco: forma cerrada equivalente — regresion
+            # logistica de 1 feature es matematicamente sigmoid(coef*z + intercept).
+            # No requiere reinstanciar un objeto sklearn ni importar sklearn aqui.
+            return _sigmoid(self._coef * z_cap + self._intercept)
+        raise RuntimeError(
+            "SklearnCalibrator: estado inconsistente — fitted=True pero sin "
+            "_model ni (_coef, _intercept). No se debe continuar."
+        )
 
     def calibrated_log_lr(self, z_score: float) -> float:
         p = self.calibrated_posterior(z_score)
@@ -226,12 +238,63 @@ class SklearnCalibrator:
         return math.log(p / (1.0 - p))
 
     def to_dict(self) -> Dict:
+        # Invariante explicito (P1, auditoria 2026-06-22): exactamente una de las
+        # dos fuentes debe existir. No se asume ninguna via ternario silencioso.
+        if self._model is not None:
+            coef = float(self._model.coef_[0][0])
+            intercept = float(self._model.intercept_[0])
+        elif self._coef is not None and self._intercept is not None:
+            coef, intercept = self._coef, self._intercept
+        else:
+            raise RuntimeError(
+                "SklearnCalibrator.to_dict: sin _model ni (_coef, _intercept) — "
+                "no hay nada que serializar (calibrador no ajustado)."
+            )
         return {
             "version": self._version,
             "type": self._method,
             "fitted": self._fitted,
             "train_hash": self._train_hash,
+            "coef": coef,
+            "intercept": intercept,
         }
+
+    @classmethod
+    def from_dict(cls, d: Dict) -> "SklearnCalibrator":
+        """
+        Reconstruye sin reinstanciar un objeto sklearn (evita romperse si la
+        version de sklearn que carga difiere de la que entreno).
+        """
+        if "coef" not in d or "intercept" not in d:
+            raise ValueError(
+                "SklearnCalibrator.from_dict: faltan 'coef'/'intercept' en el JSON. "
+                "Este archivo fue guardado con la version anterior del codigo "
+                "(bug de serializacion, corregido 2026-06-22) y no puede "
+                "reconstruirse sin perder la calibracion. Re-ejecutar "
+                "run_calibration.py para regenerarlo."
+            )
+        coef, intercept = d["coef"], d["intercept"]
+        if not isinstance(coef, (int, float)) or isinstance(coef, bool) \
+                or not isinstance(intercept, (int, float)) or isinstance(intercept, bool):
+            raise ValueError(
+                f"SklearnCalibrator.from_dict: 'coef'/'intercept' deben ser numericos. "
+                f"Recibido coef={coef!r} ({type(coef).__name__}), "
+                f"intercept={intercept!r} ({type(intercept).__name__})."
+            )
+        if not math.isfinite(coef) or not math.isfinite(intercept):
+            raise ValueError(
+                f"SklearnCalibrator.from_dict: 'coef'/'intercept' no finitos "
+                f"(coef={coef}, intercept={intercept}) — JSON corrupto o "
+                "calibrador ajustado sobre datos degenerados."
+            )
+        cal = cls()
+        cal._coef = float(coef)
+        cal._intercept = float(intercept)
+        cal._fitted = d.get("fitted", True)
+        cal._train_hash = d.get("train_hash", "")
+        cal._method = d.get("type", "logistic_sklearn")
+        cal._model = None
+        return cal
 
 
 # ---------------------------------------------------------------------------
@@ -297,15 +360,27 @@ class LRCalibrator:
         Retorna log(LR) calibrado para un z_score dado.
         Usado por LikelihoodEngine en reemplazo de z²/2.
         """
-        if not self._fitted or self._backend is None:
-            # Fallback al placeholder z²/2 si no hay calibración
+        if self._fitted and self._backend is None:
+            raise RuntimeError(
+                "LRCalibrator: estado inconsistente — fitted=True pero backend=None. "
+                "load() no pudo reconstruir el backend serializado. No continuar "
+                "con el placeholder sin calibrar silenciosamente."
+            )
+        if not self._fitted:
+            # Fallback intencional al placeholder z²/2 si nunca se calibro
             z_cap = max(min(z_score, 3.0), -3.0)
             return (z_cap ** 2) / 2.0
         return self._backend.calibrated_log_lr(z_score)  # type: ignore
 
     def calibrated_posterior(self, z_score: float) -> float:
         """P(fabricado | z_score)"""
-        if not self._fitted or self._backend is None:
+        if self._fitted and self._backend is None:
+            raise RuntimeError(
+                "LRCalibrator: estado inconsistente — fitted=True pero backend=None. "
+                "load() no pudo reconstruir el backend serializado. No continuar "
+                "con el placeholder sin calibrar silenciosamente."
+            )
+        if not self._fitted:
             z_cap = max(min(z_score, 3.0), -3.0)
             lr = math.exp((z_cap ** 2) / 2.0)
             return lr / (1.0 + lr)
@@ -387,9 +462,16 @@ class LRCalibrator:
         backend_data = data.get("backend")
         if backend_data:
             btype = backend_data.get("type", "platt_scaling")
-            if "platt" in btype:
+            if btype.startswith("platt"):
                 cal._backend = PlattCalibrator.from_dict(backend_data)
-            # sklearn no tiene from_dict — se necesita refitear si sklearn no serializó
+            elif btype.startswith("logistic"):
+                cal._backend = SklearnCalibrator.from_dict(backend_data)
+            else:
+                raise ValueError(
+                    f"LRCalibrator.load: tipo de backend desconocido '{btype}'. "
+                    "Antes este caso dejaba _backend=None y caia silenciosamente "
+                    "al placeholder sin calibrar — ahora se aborta explicitamente."
+                )
         return cal
 
     @property
