@@ -1710,6 +1710,22 @@ class CrossArtifactIncongruenceEngine:
         _VERDICT_RANK = {"NOISE": 0, "SUSPICION": 1, "MALICE": 2}
         verdict = max(structural_verdict, probabilistic_verdict, key=lambda v: _VERDICT_RANK[v])
 
+        # Daubert admissibility note — must be assigned before CDL block,
+        # which appends to it via +=. Only depends on self._artifacts.
+        irrefutable_count = sum(
+            1 for a in self._artifacts
+            if a.profile.spoofability <= 0.20
+        )
+        daubert_note = (
+            f"Daubert: {irrefutable_count}/{len(self._artifacts)} "
+            f"artifacts structurally irrefutable (spoofability ≤ 0.20). "
+            + (
+                "Anchored in hard evidence. Admissible."
+                if irrefutable_count >= 1
+                else "WARNING: No irrefutable anchor. Weak under cross-examination."
+            )
+        )
+
         # ================================================================
         # COLLAPSE DECISION LAYER — Política bajo colapso de supuestos.
         # Si el atacante rompe la independencia de sensores o la integridad
@@ -1806,21 +1822,6 @@ class CrossArtifactIncongruenceEngine:
                 + (f" Golden Rule triggered: {golden_rules[0].fracture_type}." if golden_rules else "")
             ),
         }
-
-        # Daubert admissibility note
-        irrefutable_count = sum(
-            1 for a in self._artifacts
-            if a.profile.spoofability <= 0.20
-        )
-        daubert_note = (
-            f"Daubert: {irrefutable_count}/{len(self._artifacts)} "
-            f"artifacts structurally irrefutable (spoofability ≤ 0.20). "
-            + (
-                "Anchored in hard evidence. Admissible."
-                if irrefutable_count >= 1
-                else "WARNING: No irrefutable anchor. Weak under cross-examination."
-            )
-        )
 
         # MITRE ATT&CK mapping (using centralized mitre_mapping.py)
         mitre_ttps = set()
