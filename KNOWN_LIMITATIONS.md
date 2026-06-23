@@ -1010,3 +1010,31 @@ For agent bundles, use the SHA-256 verification printed by the agent:
   `sha256sum -c results/real/${CASE}_bundle.json.sha256`
 
 **Impact:** Zero — verdicts, z-scores, and chain of custody are unaffected.
+
+## L-028 — Golden Rule LOG_VS_MEMORY Requires metadata["verdict"] Convention
+
+**Affects:** `vigia/tools/caie.py::detect_fractures()` | **Status:** [ACTIVE] 2026-06-22, POST HACKATHON — under investigation
+
+**Description:** The `LOG_VS_MEMORY` Golden Rule (structural fracture that forces `MALICE` regardless of probabilistic score) only fires when artifacts carry explicit `metadata["verdict"]` fields. When artifacts are built without this convention (direct `Artifact()` construction, upstream tools that don't emit `verdict` for negative findings), the rule does not engage and the case falls through to pure Noisy-OR probabilistic fusion. In this path, a high-spoofability log artifact (spoofability=0.85) can have its contribution depressed enough that the final verdict collapses to `NOISE`, even when containing a high-severity IoC (e.g., connection to a known C2 IP).
+
+**Impact:** This is an exploitable gap (T-5, "inverse credibility anchor"). An attacker can use a structurally irrefutable artifact (memory process, low spoofability=0.15) as an "innocence anchor" to neutralize a trivially forgeable artifact (log entry, high spoofability=0.85) that carries the real evidence of compromise. The memory artifact does not need to be forged — its mere presence without explicit `verdict` disables the Golden Rule.
+
+**Root cause:** The Golden Rule was designed with the assumption that all upstream tools emit `metadata["verdict"]` consistently. This assumption is not enforced by the `Artifact` dataclass nor by the ingestion pipeline. The rule's logic requires `tech_verdicts` to contain exactly `{"NOISE"}` — impossible when `verdict` is `None`.
+
+**Known workarounds (none fully satisfactory):**
+- Ensure all upstream tools emit `metadata["verdict"]` for every artifact (convention-dependent, not enforceable).
+- Manually inject `verdict` fields during case construction (error-prone, not scalable).
+
+**Planned fix:** Infer `verdict` from artifact structure when `metadata["verdict"]` is absent. Approaches under evaluation:
+- Semantic keyword matching (same pattern as `NARRATIVE_POISONING_DETECTED`) — rejected due to fragility.
+- Structural field analysis (presence/absence of `dst_ip`, `network_connections` in metadata) — under investigation, requires corpus analysis.
+- `adjusted_score` thresholding with existing `composite` thresholds (0.5/0.2) — rejected as introducing arbitrary numeric thresholds.
+
+**Test:** `test_red_team_anchor_bypass` in `vigia/tests/adversarial/test_spoofability_correlation_attack.py` confirms the gap. Status: `FAIL_T5_CONFIRMED`.
+
+**Discovered by:** Anna Tchijova + Claude + Kimi, red team audit, 2026-06-22.
+
+**Audited by:** Kimi (Moonshot AI), 2026-06-22.
+
+---
+
