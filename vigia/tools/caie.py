@@ -134,6 +134,33 @@ _D_ZERO: decimal.Decimal = decimal.Decimal("0")
 _D_ONE: decimal.Decimal = decimal.Decimal("1")
 
 
+
+# ---------------------------
+# Domain classification layer
+# ---------------------------
+
+_DOMAIN_MAP = {
+    "memory_process": "memory",
+    "memory_dump": "memory",
+    "lsass_session": "memory",
+    "log_entry": "network",
+    "network_artifact": "network",
+    "network_connection": "network",
+    "ip_geolocation": "network",
+    "dns_record": "network",
+    "file_timestamp": "filesystem",
+    "file_hash": "filesystem",
+    "mft_entry": "filesystem",
+    "usn_journal": "filesystem",
+    "registry_key": "filesystem",
+    "TPM_attestation": "hardware",
+    "hmac_audit_log": "hardware",
+}
+
+def classify_domain(evidence_type: str) -> str:
+    """Deterministic domain classifier for artifact types."""
+    return _DOMAIN_MAP.get(evidence_type, "UNKNOWN")
+
 def _dround(value: float, precision: int = _DETERMINISTIC_INTERNAL_PREC) -> float:
     """Deterministic rounding helper - ensures consistent rounding across platforms."""
     if not isinstance(value, (int, float)) or not math.isfinite(value):
