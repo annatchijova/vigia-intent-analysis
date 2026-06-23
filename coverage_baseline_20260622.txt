@@ -1,0 +1,363 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.3, pytest-9.0.3, pluggy-1.6.0 -- /home/labestiadevigia/vigia-repo/.venv/bin/python
+cachedir: .pytest_cache
+rootdir: /home/labestiadevigia/vigia-repo
+configfile: pyproject.toml
+plugins: anyio-4.13.0, cov-7.1.0, asyncio-1.3.0
+asyncio: mode=Mode.AUTO, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collecting ... collected 169 items
+
+tests/caie/test_caie_fixes_deepseek.py::TestUSNJournalGapImplicit::test_usn_gap_not_fired_when_scope_unknown PASSED [  0%]
+tests/caie/test_caie_fixes_deepseek.py::TestUSNJournalGapImplicit::test_usn_gap_fired_when_acquisition_confirmed PASSED [  1%]
+tests/caie/test_caie_fixes_deepseek.py::TestCryptographicInconsistency::test_crypto_unverified_not_golden_rule PASSED [  1%]
+tests/caie/test_caie_fixes_deepseek.py::TestCryptographicInconsistency::test_crypto_verified_is_golden_rule PASSED [  2%]
+tests/caie/test_caie_fixes_deepseek.py::TestFractureBonusEpistemology::test_bonus_not_applied_to_golden_rule PASSED [  2%]
+tests/caie/test_caie_fixes_deepseek.py::TestFractureBonusEpistemology::test_bonus_only_for_non_structural_fractures PASSED [  3%]
+tests/caie/test_caie_fixes_deepseek.py::TestLowCountHighScore::test_independent_sources_penalty_exists PASSED [  4%]
+tests/caie/test_caie_fixes_deepseek.py::TestLowCountHighScore::test_high_score_single_source_no_structural_verdict_override PASSED [  4%]
+tests/caie/test_caie_fixes_deepseek.py::TestEpistemicSeparation::test_output_has_both_verdicts PASSED [  5%]
+tests/caie/test_caie_fixes_deepseek.py::TestEpistemicSeparation::test_structural_overrides_probabilistic_for_malice PASSED [  5%]
+tests/caie/test_canonical_cases.py::TestCanonicalCases::test_all_cases_load PASSED [  6%]
+tests/caie/test_canonical_cases.py::TestCanonicalCases::test_case_caie_verdict[case_083_sacrificio_del_peon] PASSED [  7%]
+tests/caie/test_canonical_cases.py::TestCanonicalCases::test_case_caie_verdict[case_084_cebo_falso_layman] PASSED [  7%]
+tests/caie/test_canonical_cases.py::TestCanonicalCases::test_case_caie_verdict[case_085_mise_en_place_alterada] PASSED [  8%]
+tests/caie/test_canonical_cases.py::TestCanonicalCases::test_case_caie_verdict[case_086_doble_salto_layout] PASSED [  8%]
+tests/caie/test_canonical_cases.py::TestCanonicalCases::test_case_caie_verdict[case_087_estocolmo_inverso] PASSED [  9%]
+tests/caie/test_canonical_cases.py::TestCanonicalCases::test_case_caie_verdict[case_088_calco_semantico] PASSED [ 10%]
+tests/caie/test_canonical_cases.py::TestCanonicalCases::test_case_caie_verdict[case_089_huella_perfeccion] PASSED [ 10%]
+tests/caie/test_canonical_cases.py::TestCanonicalCases::test_case_caie_verdict[case_090_anacronismo_herramienta] PASSED [ 11%]
+tests/caie/test_canonical_cases.py::TestCanonicalCases::test_case_caie_verdict[case_091_disonancia_motivo_noble] PASSED [ 11%]
+tests/caie/test_canonical_cases.py::TestCanonicalCases::test_case_caie_verdict[case_092_verdad_por_saturacion] PASSED [ 12%]
+tests/caie/test_canonical_cases.py::TestCanonicalCases::test_case_caie_verdict[case_093_deepfake_estilo] PASSED [ 13%]
+tests/caie/test_canonical_cases.py::TestCanonicalCases::test_case_caie_verdict[case_094_agujero_negro_burocratico] PASSED [ 13%]
+tests/caie/test_canonical_cases.py::TestCanonicalCases::test_case_caie_verdict[case_095_sombra_fonetica] PASSED [ 14%]
+tests/caie/test_canonical_cases.py::TestCanonicalCases::test_case_caie_verdict[case_096_entropia_panico] PASSED [ 14%]
+tests/caie/test_canonical_cases.py::TestCanonicalCases::test_case_caie_verdict[case_097_falsa_misericordia] PASSED [ 15%]
+tests/caie/test_canonical_cases.py::TestCanonicalCases::test_case_caie_verdict[case_098_anacronismo_plataforma] PASSED [ 15%]
+tests/caie/test_canonical_cases.py::TestCanonicalCases::test_case_caie_verdict[case_099_troyano_emocional] PASSED [ 16%]
+tests/caie/test_canonical_cases.py::TestCanonicalCases::test_case_caie_verdict[case_100_fantasma_maquina] PASSED [ 17%]
+tests/caie/test_canonical_cases.py::TestCanonicalCases::test_case_caie_verdict[case_101_denunciante_humo] PASSED [ 17%]
+tests/caie/test_canonical_cases.py::TestCanonicalCases::test_case_caie_verdict[case_102_espejo_soporte] PASSED [ 18%]
+tests/caie/test_canonical_cases.py::TestCanonicalCases::test_case_caie_verdict[case_103_cebo_vulnerabilidad_autoinfligida] PASSED [ 18%]
+tests/caie/test_canonical_cases.py::TestCanonicalCases::test_case_caie_verdict[case_104_error_layout_comentario] PASSED [ 19%]
+tests/caie/test_canonical_cases.py::TestCanonicalCases::test_case_caie_verdict[case_105_disonancia_ritmo_procesamiento] PASSED [ 20%]
+tests/caie/test_canonical_cases.py::TestCanonicalCases::test_case_caie_verdict[case_106_mimesis_error_administrativo] PASSED [ 20%]
+tests/caie/test_canonical_cases.py::TestCanonicalCases::test_case_caie_verdict[case_107_anacronismo_firma_digital] PASSED [ 21%]
+tests/caie/test_canonical_cases.py::TestCanonicalCases::test_case_caie_verdict[case_108_inversion_carga_prueba] PASSED [ 21%]
+tests/caie/test_canonical_cases.py::TestCanonicalCases::test_case_caie_verdict[case_109_silencio_estadistico_log] PASSED [ 22%]
+tests/caie/test_canonical_cases.py::TestCanonicalCases::test_case_caie_verdict[case_110_paradoja_auditor_externo] PASSED [ 23%]
+tests/caie/test_canonical_cases.py::TestCanonicalCases::test_case_caie_verdict[case_111_falso_rastro_incompetencia] PASSED [ 23%]
+tests/caie/test_canonical_cases.py::TestCanonicalCases::test_case_caie_verdict[case_112_sincronizacion_panico_semantico] PASSED [ 24%]
+tests/caie/test_canonical_cases.py::TestCanonicalCases::test_case_caie_verdict[case_004_incompetencia_armamentizada] PASSED [ 24%]
+tests/caie/test_canonical_cases.py::TestCanonicalCases::test_case_caie_verdict[case_005_ruido_blanco_distractor] PASSED [ 25%]
+tests/caie/test_canonical_cases.py::TestCanonicalCases::test_case_caie_verdict[case_007_insomnio_tactico] PASSED [ 26%]
+tests/caie/test_canonical_cases.py::TestCanonicalCases::test_case_caie_verdict[case_008_paranoia_perimetro] PASSED [ 26%]
+tests/caie/test_canonical_cases.py::TestCanonicalCases::test_case_caie_verdict[case_009_vacio_quirurgico] PASSED [ 27%]
+tests/caie/test_canonical_cases.py::TestCanonicalCases::test_case_caie_verdict[case_010_falso_positivo_empatico] PASSED [ 27%]
+tests/caie/test_canonical_cases.py::TestCanonicalCases::test_case_caie_verdict[case_024_paracaidista_timestomping] PASSED [ 28%]
+tests/caie/test_canonical_cases.py::TestCanonicalCases::test_case_caie_verdict[case_026_ventrilocuo_process_hollowing] PASSED [ 28%]
+tests/caie/test_canonical_cases.py::TestCanonicalCases::test_case_caie_verdict[case_016_auto_gaslighting_sistema] PASSED [ 29%]
+tests/caie/test_canonical_cases.py::TestCanonicalCases::test_case_caie_verdict[case_020_mimetismo_topografico] PASSED [ 30%]
+tests/caie/test_canonical_cases.py::TestCanonicalCases::test_case_caie_verdict[case_011_traicion_puntuacion] PASSED [ 30%]
+tests/caie/test_canonical_cases.py::TestCanonicalCases::test_case_caie_verdict[case_012_camuflaje_simbiotico] PASSED [ 31%]
+tests/caie/test_canonical_cases.py::TestCanonicalCases::test_case_caie_verdict[case_013_estocolmo_inverso] PASSED [ 31%]
+tests/caie/test_canonical_cases.py::TestCanonicalCases::test_case_caie_verdict[case_018_clonacion_sintactica] PASSED [ 32%]
+tests/caie/test_canonical_cases.py::TestCanonicalCases::test_case_caie_verdict[case_021_motin_comillas] PASSED [ 33%]
+tests/caie/test_canonical_cases.py::TestCanonicalCases::test_case_caie_verdict[case_024_paracaidista] PASSED [ 33%]
+tests/caie/test_canonical_cases.py::TestCanonicalCases::test_case_caie_verdict[case_026_ventrilocuo] PASSED [ 34%]
+tests/caie/test_canonical_cases.py::TestCanonicalCases::test_case_caie_verdict[case_fusion_panico_coordinado] PASSED [ 34%]
+tests/caie/test_canonical_cases.py::TestCanonicalCases::test_case_caie_verdict[case_fusion_duda_instrumental] PASSED [ 35%]
+tests/caie/test_canonical_cases.py::TestCanonicalCases::test_case_caie_verdict[case_fusion_normalizacion_maliciosa] PASSED [ 36%]
+tests/caie/test_canonical_cases.py::TestCanonicalCases::test_case_caie_verdict[case_fusion_autoridad_tecnica_fabricada] PASSED [ 36%]
+tests/caie/test_canonical_cases.py::TestCanonicalCases::test_case_caie_verdict[case_fusion_agresion_defensiva] PASSED [ 37%]
+tests/e2e/test_integration_end_to_end.py::TestSecurityConstraints::test_path_traversal_blocked PASSED [ 37%]
+tests/e2e/test_integration_end_to_end.py::TestSecurityConstraints::test_null_byte_blocked PASSED [ 38%]
+tests/e2e/test_integration_end_to_end.py::TestSecurityConstraints::test_tilde_blocked PASSED [ 39%]
+tests/e2e/test_integration_end_to_end.py::TestSecurityConstraints::test_grep_semicolon_blocked PASSED [ 39%]
+tests/e2e/test_integration_end_to_end.py::TestSecurityConstraints::test_grep_unicode_homoglyph_blocked PASSED [ 40%]
+tests/e2e/test_integration_end_to_end.py::TestSecurityConstraints::test_safe_path_allowed PASSED [ 40%]
+tests/e2e/test_integration_end_to_end.py::TestSecurityConstraints::test_safe_grep_allowed PASSED [ 41%]
+tests/e2e/test_integration_end_to_end.py::TestVIGIA004WeaponizedIncompetence::test_reaction_time_is_premeditated PASSED [ 42%]
+tests/e2e/test_integration_end_to_end.py::TestVIGIA004WeaponizedIncompetence::test_entropy_detects_high_sophistication PASSED [ 42%]
+tests/e2e/test_integration_end_to_end.py::TestVIGIA004WeaponizedIncompetence::test_grice_violation_in_incompetence_claim PASSED [ 43%]
+tests/e2e/test_integration_end_to_end.py::TestVIGIA004WeaponizedIncompetence::test_jitter_detects_programmatic_actions PASSED [ 43%]
+tests/e2e/test_integration_end_to_end.py::TestVIGIA023MartyrNode::test_eco_filter_triggers_on_obvious_ioc PASSED [ 44%]
+tests/e2e/test_integration_end_to_end.py::TestVIGIA023MartyrNode::test_significant_silence_no_lateral_movement PASSED [ 44%]
+tests/e2e/test_integration_end_to_end.py::TestVIGIA023MartyrNode::test_carnegie_detection_in_c2_framing PASSED [ 45%]
+tests/e2e/test_integration_end_to_end.py::TestToolingAnomaly::test_low_entropy_inconsistent_with_apt PASSED [ 46%]
+tests/e2e/test_integration_end_to_end.py::TestToolingAnomaly::test_no_russian_strings_in_tool PASSED [ 46%]
+tests/e2e/test_integration_end_to_end.py::TestToolingAnomaly::test_intent_analysis_detects_false_flag PASSED [ 47%]
+tests/e2e/test_integration_end_to_end.py::TestDiscrepancyMath::test_cultural_evidence_low_weight_vs_technical PASSED [ 47%]
+tests/e2e/test_integration_end_to_end.py::TestDiscrepancyMath::test_irrefutable_evidence_dominates PASSED [ 48%]
+tests/e2e/test_integration_end_to_end.py::TestStylometry::test_honeypot_term_detects_collusion PASSED [ 49%]
+tests/e2e/test_integration_end_to_end.py::TestStylometry::test_unrelated_texts_no_collusion PASSED [ 49%]
+tests/e2e/test_integration_end_to_end.py::TestHabitIncongruence::test_calc_opening_network_is_malice PASSED [ 50%]
+tests/e2e/test_integration_end_to_end.py::TestHabitIncongruence::test_normal_calc_is_noise PASSED [ 50%]
+tests/e2e/test_integration_end_to_end.py::TestLLMShield::test_role_override_blocked PASSED [ 51%]
+tests/e2e/test_integration_end_to_end.py::TestLLMShield::test_jailbreak_blocked PASSED [ 52%]
+tests/e2e/test_integration_end_to_end.py::TestLLMShield::test_developer_mode_blocked PASSED [ 52%]
+tests/e2e/test_integration_end_to_end.py::TestLLMShield::test_clean_forensic_evidence_passes PASSED [ 53%]
+tests/e2e/test_integration_end_to_end.py::TestLLMShield::test_input_truncated_to_max_length PASSED [ 53%]
+tests/e2e/test_integration_end_to_end.py::TestAllowedCommands::test_unlisted_command_blocked PASSED [ 54%]
+tests/e2e/test_integration_end_to_end.py::TestAllowedCommands::test_shell_injection_via_path_blocked PASSED [ 55%]
+tests/e2e/test_integration_end_to_end.py::TestAllowedCommands::test_bash_blocked PASSED [ 55%]
+tests/e2e/test_integration_end_to_end.py::TestAllowedCommands::test_whitelist_is_not_empty PASSED [ 56%]
+tests/e2e/test_integration_end_to_end.py::TestAllowedCommands::test_sift_core_tools_whitelisted PASSED [ 56%]
+tests/e2e/test_integration_end_to_end.py::TestSyscallLatency::test_returns_peirce_verdict PASSED [ 57%]
+tests/e2e/test_integration_end_to_end.py::TestSyscallLatency::test_probability_in_valid_range PASSED [ 57%]
+tests/e2e/test_integration_end_to_end.py::TestSyscallLatency::test_latency_values_are_positive PASSED [ 58%]
+tests/e2e/test_integration_end_to_end.py::TestSyscallLatency::test_peirce_chain_present PASSED [ 59%]
+tests/e2e/test_integration_end_to_end.py::TestSyscallLatency::test_clean_system_verdict_noise PASSED [ 59%]
+tests/test_audit_false_flag.py::test_clean_foreign_machine_is_not_malice PASSED [ 60%]
+tests/test_audit_false_flag.py::test_clean_foreign_machine_does_not_trigger_false_flag_rule PASSED [ 60%]
+tests/test_audit_false_flag.py::test_genuine_false_flag_is_malice PASSED [ 61%]
+tests/test_audit_false_flag.py::test_genuine_false_flag_triggers_pattern PASSED [ 62%]
+tests/test_audit_gates.py::test_ccs_all_none_sits_exactly_on_threshold PASSED [ 62%]
+tests/test_audit_gates.py::test_ccs_no_information_forces_abstain XFAIL  [ 63%]
+tests/test_audit_gates.py::test_ccs_insufficient_coverage_abstains XFAIL [ 63%]
+tests/test_audit_gates.py::test_malice_requires_independent_sources XFAIL [ 64%]
+tests/test_audit_gates.py::test_rejected_artifact_is_surfaced_in_verdict XFAIL [ 65%]
+tests/test_audit_no_default_key (1).py::test_trust_level_files_exist PASSED [ 65%]
+tests/test_audit_no_default_key (1).py::test_no_default_hmac_key_fallback[trust_levels_p0.py] PASSED [ 66%]
+tests/test_audit_no_default_key.py::test_trust_level_files_exist PASSED  [ 66%]
+tests/test_audit_no_default_key.py::test_no_default_hmac_key_fallback[trust_levels_p0.py] PASSED [ 67%]
+tests/test_audit_temporal_skew.py::test_small_skew_does_not_hard_gate_to_malice XFAIL [ 68%]
+tests/test_audit_temporal_skew.py::test_large_negative_delta_still_flags PASSED [ 68%]
+tests/test_audit_temporal_skew.py::test_tcv_rule_tolerates_small_skew XFAIL [ 69%]
+tests/test_bypass_vectors.py::test_bv001_path_traversal_blocked PASSED   [ 69%]
+tests/test_bypass_vectors.py::test_bv002_tampered_bundle_fails_verification PASSED [ 70%]
+tests/test_bypass_vectors.py::test_bv003_float_to_fraction_is_deterministic PASSED [ 71%]
+tests/test_bypass_vectors.py::test_bv004_empty_artifact_list_cannot_produce_malice PASSED [ 71%]
+tests/test_bypass_vectors.py::test_bv005_adversarial_description_does_not_affect_scoring PASSED [ 72%]
+tests/test_conflict_dominance_stability.py::TestConflictDominanceStability::test_caso_1_memoria_vs_log PASSED [ 72%]
+tests/test_conflict_dominance_stability.py::TestConflictDominanceStability::test_caso_2_memoria_vs_registry PASSED [ 73%]
+tests/test_conflict_dominance_stability.py::TestConflictDominanceStability::test_caso_3_margen_minimo PASSED [ 73%]
+tests/test_conflict_dominance_stability.py::TestConflictDominanceStability::test_mft_vs_network PASSED [ 74%]
+tests/test_conflict_dominance_stability.py::TestConflictDominanceStability::test_registry_vs_event_log PASSED [ 75%]
+tests/test_conflict_dominance_stability.py::TestConflictDominanceStability::test_igual_z_diferente_gamma PASSED [ 75%]
+tests/test_conflict_dominance_stability.py::TestConflictDominanceStability::test_weighted_max_zero_no_crash PASSED [ 76%]
+tests/test_conflict_dominance_stability.py::TestConflictDominanceStability::test_penalty_clamped_to_one PASSED [ 76%]
+tests/test_e2e_pipeline.py::test_e2e_tres_espejos PASSED                 [ 77%]
+tests/test_e2e_pipeline.py::test_e2e_empty_case PASSED                   [ 78%]
+tests/test_e2e_pipeline.py::test_e2e_single_signal PASSED                [ 78%]
+tests/test_evidence_aggregator.py::TestEvidenceAggregatorInvariants::test_complement_product_no_double_count PASSED [ 79%]
+tests/test_evidence_aggregator.py::TestEvidenceAggregatorInvariants::test_determinism_same_input_same_output PASSED [ 79%]
+tests/test_evidence_aggregator.py::TestEvidenceAggregatorInvariants::test_identity_no_synergy_no_sequence PASSED [ 80%]
+tests/test_evidence_aggregator.py::TestEvidenceAggregatorInvariants::test_identity_zero_base PASSED [ 81%]
+tests/test_evidence_aggregator.py::TestEvidenceAggregatorInvariants::test_lower_bound_zero PASSED [ 81%]
+tests/test_evidence_aggregator.py::TestEvidenceAggregatorInvariants::test_monotonicity_both_increases_more PASSED [ 82%]
+tests/test_evidence_aggregator.py::TestEvidenceAggregatorInvariants::test_monotonicity_sequence_increases_mi PASSED [ 82%]
+tests/test_evidence_aggregator.py::TestEvidenceAggregatorInvariants::test_monotonicity_synergy_increases_mi PASSED [ 83%]
+tests/test_evidence_aggregator.py::TestEvidenceAggregatorInvariants::test_no_floats_in_mi_final PASSED [ 84%]
+tests/test_evidence_aggregator.py::TestEvidenceAggregatorInvariants::test_output_components_present PASSED [ 84%]
+tests/test_evidence_aggregator.py::TestEvidenceAggregatorInvariants::test_output_contains_mi_final PASSED [ 85%]
+tests/test_evidence_aggregator.py::TestEvidenceAggregatorInvariants::test_upper_bound_clamp_nine_tenths PASSED [ 85%]
+tests/test_evidence_aggregator.py::TestPipelineIntegration::test_basic_flow PASSED [ 86%]
+tests/test_evidence_aggregator.py::TestPipelineIntegration::test_critical_override_eco_semiotic_collision PASSED [ 86%]
+tests/test_evidence_aggregator.py::TestPipelineIntegration::test_high_mi_gives_high_or_critical PASSED [ 87%]
+tests/test_evidence_aggregator.py::TestPipelineIntegration::test_low_mi_gives_low_alert PASSED [ 88%]
+tests/test_frs_ghost_in_the_shell.py::test_pid_123_redundancy PASSED     [ 88%]
+tests/test_frs_ghost_in_the_shell.py::test_ghost_in_the_shell PASSED     [ 89%]
+tests/test_frs_ghost_in_the_shell.py::test_two_vs_one PASSED             [ 89%]
+tests/test_frs_ghost_in_the_shell.py::test_pid_recycling PASSED          [ 90%]
+tests/test_frs_ghost_in_the_shell.py::test_temporal_boundary PASSED      [ 91%]
+tests/test_frs_ghost_in_the_shell.py::test_gamma_application PASSED      [ 91%]
+tests/test_frs_ghost_in_the_shell_v2.py::test_pid_123_redundancy PASSED  [ 92%]
+tests/test_frs_ghost_in_the_shell_v2.py::test_ghost_in_the_shell PASSED  [ 92%]
+tests/test_frs_ghost_in_the_shell_v2.py::test_anti_silencing PASSED      [ 93%]
+tests/test_frs_ghost_in_the_shell_v2.py::test_dominance_stability PASSED [ 94%]
+tests/test_frs_ghost_in_the_shell_v2.py::test_two_vs_one PASSED          [ 94%]
+tests/test_frs_ghost_in_the_shell_v2.py::test_pid_recycling PASSED       [ 95%]
+tests/test_frs_ghost_in_the_shell_v2.py::test_temporal_boundary PASSED   [ 95%]
+tests/test_frs_ghost_in_the_shell_v2.py::test_gamma_application PASSED   [ 96%]
+tests/test_red_team.py::TestRedTeamSuite::test_determinism_same_payload_twice PASSED [ 97%]
+tests/test_red_team.py::TestRedTeamSuite::test_direct_destruction_detected PASSED [ 97%]
+tests/test_red_team.py::TestRedTeamSuite::test_full_suite_metrics PASSED [ 98%]
+tests/test_red_team.py::TestRedTeamSuite::test_negation_simple_gives_benign PASSED [ 98%]
+tests/test_red_team.py::TestRedTeamSuite::test_pipeline_imports PASSED   [ 99%]
+tests/test_red_team.py::TestRedTeamSuite::test_rt_008_contrastive_detected PASSED [100%]
+
+================================ tests coverage ================================
+_______________ coverage: platform linux, python 3.12.3-final-0 ________________
+
+Name                                                   Stmts   Miss Branch BrPart   Cover   Missing
+---------------------------------------------------------------------------------------------------
+vigia/__init__.py                                          1      0      0      0 100.00%
+vigia/abduction/__init__.py                                0      0      0      0 100.00%
+vigia/abduction/hypothesis_lineage.py                     88     88     20      0   0.00%   16-268
+vigia/abduction/vigia_artifact_graph.py                  383    383    160      0   0.00%   26-983
+vigia/abduction/vigia_counter_fact.py                    356    356    112      0   0.00%   34-1028
+vigia/abductive_intent_engine.py                          90     90     20      0   0.00%   32-1065
+vigia/cli.py                                              88     88     30      0   0.00%   3-201
+vigia/collapse_decision.py                                44      7     24      8  77.94%   36, 40, 43, 52, 60, 62, 64, 65->67
+vigia/config.py                                          116     78     24      1  27.86%   45-46, 129-137, 142-145, 154-208, 239-242, 251-267, 270-293, 296-316
+vigia/core/__init__.py                                     0      0      0      0 100.00%
+vigia/core/abductive_intent_engine.py                     91     91     20      0   0.00%   32-1076
+vigia/core/advanced_signal_router.py                      32     32      6      0   0.00%   11-98
+vigia/core/audit_action.py                               167     87     48      3  43.26%   40, 50, 81-85, 128-195, 273, 320, 375-415, 424, 512-611, 626-640, 648
+vigia/core/bundle_builder.py                             174     90     60      8  46.15%   54, 88, 90, 92, 103, 120, 187-188, 206, 239-244, 264, 276-277, 298-351, 383-493
+vigia/core/canonicalize.py                                25      8     20      6  64.44%   51, 56, 58, 60, 65, 68-70
+vigia/core/carnegie_education_detector.py                 69     69     20      0   0.00%   16-253
+vigia/core/causal_closure.py                              54      7      4      1  82.76%   63, 147-151, 155, 172
+vigia/core/chain_of_custody.py                            39     17      2      0  53.66%   38-40, 50-58, 69-71, 80-84, 88, 105, 108
+vigia/core/compare_baseline.py                            88     88     22      0   0.00%   21-151
+vigia/core/config_sentinel.py                            121    121     24      0   0.00%   16-287
+vigia/core/decision_layer.py                              57      7     16      3  86.30%   76-78, 113, 132-133, 144
+vigia/core/devil_advocate_gen.py                          40     40     14      0   0.00%   25-145
+vigia/core/dissent_report.py                             123    123     36      0   0.00%   22-305
+vigia/core/ebs_v1.py                                     427    221     76     11  45.92%   62-65, 118-136, 158, 161, 199, 207-230, 238-301, 356-378, 407-410, 418-449, 478-496, 527-540, 565-576, 636-656, 713-726, 729-731, 787, 789
+vigia/core/entanglement.py                               289    210     76      0  21.64%   55-57, 94-102, 120, 124, 153-181, 195-196, 204-240, 249-291, 294-308, 311-326, 335-342, 345-380, 385-404, 409-436, 439-448, 451-464, 473-493, 502-545, 549-559, 570, 577-605, 632-681
+vigia/core/evidence_aggregator.py                         68      4     12      2  92.50%   177, 179, 191-192
+vigia/core/execution_logger.py                            87     18     26      9  74.34%   122-133, 159, 161, 169, 172, 189, 211-215, 243, 287->289, 290, 292, 294, 296, 305, 309
+vigia/core/explainable_governance.py                     168    168     56      0   0.00%   14-375
+vigia/core/fit_calibration.py                            261    119     64     13  53.23%   88, 95-97, 104-106, 160, 164->157, 173, 179, 181, 187, 189, 227-233, 290-297, 359->353, 370, 386-387, 419, 432-433, 519-554, 562-654
+vigia/core/forensic_adapter.py                           100     66      0      0  34.00%   14-21, 25-34, 41-59, 125, 128, 139-147, 155-164, 173-177, 186-188
+vigia/core/forensic_db.py                                167    167     38      0   0.00%   26-471
+vigia/core/forensic_technical_detector.py                 61     61     16      0   0.00%   17-308
+vigia/core/geopolitical_v2.py                             90     90     28      0   0.00%   13-275
+vigia/core/graph_stability.py                            280    220    106      2  16.06%   64-66, 71-73, 78, 92-102, 110-117, 129-166, 183, 191-204, 238-274, 298-303, 307-309, 316-320, 327-333, 391-533, 557-587, 615-650, 666-724
+vigia/core/integrity_constraints.py                       91     91     26      0   0.00%   87-536
+vigia/core/likelihood_engine.py                           82      7     24      5  88.68%   45->exit, 52->48, 74, 100-104, 164
+vigia/core/likelihood_ratio.py                           131     49     32      7  55.83%   48-50, 123, 127-128, 156, 187, 198-199, 286-304, 311, 315, 319, 357-382, 397-409
+vigia/core/llm_backend.py                                 77     77     16      0   0.00%   16-161
+vigia/core/lr_calibration.py                             244    199     60      0  14.80%   49-52, 68-86, 96-100, 115-124, 130-135, 142-144, 147, 158-163, 179-185, 193-213, 218-230, 236-238, 243-253, 268-297, 333-356, 363-373, 377-387, 396-419, 429-442, 446-452, 457-475, 479, 483, 494-499, 517-546
+vigia/core/narrative_auditor.py                           66     66     16      0   0.00%   31-298
+vigia/core/negation_handler.py                            43     43     14      0   0.00%   19-146
+vigia/core/normalization_layer.py                         83     83     18      0   0.00%   17-216
+vigia/core/ockham_adversarial.py                          74     74     24      0   0.00%   18-217
+vigia/core/path_guard.py                                 111     87     38      0  16.11%   46, 58-134, 149-185, 198-234, 241-252
+vigia/core/peirceplanner_bounded.py                      184    184     54      0   0.00%   26-376
+vigia/core/pipeline.py                                    17     17      0      0   0.00%   16-89
+vigia/core/resource_optimizer.py                         189     66     34      5  61.88%   61, 126, 156-166, 269-270, 272-273, 289, 439, 469-495, 514-521, 568-570, 573, 576, 580, 606-608, 611-612, 615-617, 620-661
+vigia/core/risk_bounded_layer.py                         209     73     46      8  61.96%   65-67, 72, 120, 133-183, 187-191, 247-287, 300-310, 320, 329, 374-377, 515-516, 521-522, 598, 605, 608->612
+vigia/core/semiotic_detector.py                          250    250     60      0   0.00%   11-508
+vigia/core/semiotic_detector_v2.py                       344     53    102     18  80.94%   128-129, 176, 180, 238, 240-242, 262, 279-280, 292, 336-338, 352, 362-363, 369-374, 406, 418, 492->508, 527->522, 532->534, 534->538, 539->554, 541->554, 574-596, 606-608, 655, 669, 685-686
+vigia/core/shadow_mode.py                                142    142     44      0   0.00%   36-354
+vigia/core/signal_contract.py                              1      1      0      0   0.00%   1
+vigia/core/signal_mapper.py                               79     58     28      0  19.63%   52, 69-122, 136-188, 200-214, 218
+vigia/core/signal_quality_gate.py                        100    100     32      0   0.00%   22-258
+vigia/core/trust_fusion.py                               297    216     96      0  20.61%   44-46, 50-53, 68-73, 77-85, 88, 109, 113, 117-119, 123-125, 129-131, 146, 150, 153, 170-175, 178-186, 189, 192-214, 217-221, 224-229, 232-255, 260-271, 275-281, 284-295, 307-327, 336-344, 356-374, 377-380, 384-397, 410-447
+vigia/core/vigia_core_forensic_technical_detector.py      54     54     18      0   0.00%   14-243
+vigia/core/vigia_core_semiotic_detector.py                 3      3      0      0   0.00%   2-4
+vigia/core/vigia_scorer.py                               182    182     56      0   0.00%   53-499
+vigia/forensics/__init__.py                                0      0      0      0 100.00%
+vigia/forensics/document_integrity.py                    312    312     98      0   0.00%   27-780
+vigia/forensics/forensic_reporter.py                     193    193     12      0   0.00%   18-755
+vigia/forensics/pdf_dual_parser.py                       200    200     62      0   0.00%   24-389
+vigia/forensics/pki_tools.py                             214     96     34      5  49.60%   61, 69-71, 75-76, 153, 214-217, 229-240, 271-288, 348-351, 360-373, 427, 492-505, 539-591, 604-610, 613, 616, 642-645, 648, 651, 654, 703-718
+vigia/forensics/rfc3161_chain.py                         116    116     18      0   0.00%   24-281
+vigia/forensics/temporal_forensics.py                    180    180     42      0   0.00%   25-663
+vigia/forensics/temporal_forensics_redteam.py            214    214     70      0   0.00%   25-792
+vigia/forensics/vigia_chain_of_custody.py                217    217     40      0   0.00%   56-623
+vigia/forensics/vision_audit.py                          404    353    116      2  10.58%   110-122, 133, 182-187, 202-210, 229-239, 263-384, 392-395, 407-487, 511-574, 601-685, 693-702, 726-1143, 1177-1186
+vigia/forensics/vision_audit_final.py                    381    381    112      0   0.00%   33-1131
+vigia/inference/__init__.py                                0      0      0      0 100.00%
+vigia/inference/abductive_intent_engine.py                91     47     20      0  39.64%   65, 121, 151, 159, 914-915, 939-993, 1011-1032, 1055-1072, 1076
+vigia/inference/abductive_reasoner.py                     80     51     10      0  32.22%   67, 70-112, 117-143, 148-221, 226-254
+vigia/inference/abductive_reasoner_v2.py                 421    234     56      0  39.20%   102-104, 127, 143-159, 166, 189-195, 198-203, 224-225, 244-256, 286-287, 303-307, 329-361, 384-400, 473-505, 566-672, 795, 822-824, 852-856, 868-884, 897-917, 929-965, 977-993, 1005-1018, 1030-1050, 1069-1101, 1120-1150, 1161, 1205, 1219-1222, 1234-1244, 1251-1265, 1270-1277, 1281-1289, 1293-1317, 1321-1328, 1332-1342, 1350-1432
+vigia/inference/audit_action.py                            1      1      0      0   0.00%   1
+vigia/inference/behavioral_fingerprint.py                 68     42     20      0  29.55%   40-48, 78, 82-83, 87-138, 148-177
+vigia/inference/case_pattern_library.py                   84     49     18      0  34.31%   50-55, 95, 99, 137-153, 166-213, 223-225
+vigia/inference/check_determinism.py                     156    156     60      0   0.00%   28-412
+vigia/inference/cross_artifact_resonance.py               78     52     20      0  26.53%   40-45, 74-135, 144-151, 155-160, 164-179
+vigia/inference/metabolic_profiler.py                     78     53     24      0  24.51%   40-48, 87-174, 188-203, 207-211, 216-220
+vigia/llm_backend_v2.py                                   77     77     16      0   0.00%   16-161
+vigia/memory/__init__.py                                   0      0      0      0 100.00%
+vigia/memory/case_pattern_library.py                     177    177     38      0   0.00%   7-1040
+vigia/models/__init__.py                                   0      0      0      0 100.00%
+vigia/models/ebs.py                                      539    539     82      0   0.00%   42-1140
+vigia/patterns/__init__.py                                 0      0      0      0 100.00%
+vigia/patterns/adversarial_silence.py                     91     91     16      0   0.00%   19-292
+vigia/phonetic_loader.py                                 116     37     46     13  66.67%   79-80, 116, 164-168, 170, 173, 206-208, 217->exit, 225, 230-236, 241-242, 244-245, 247-248, 250-251, 254-255, 267-277, 298-303, 311-312, 331
+vigia/pipeline/BRIDGE_PATCH_FINAL.py                       2      2      0      0   0.00%   34-122
+vigia/pipeline/__init__.py                                 1      0      0      0 100.00%
+vigia/pipeline/evidence_bundle.py                         53     53     10      0   0.00%   3-160
+vigia/pipeline/pipeline.py                               498    267    128     28  44.57%   56->59, 83-86, 91-94, 99-102, 107-110, 115-118, 212-217, 257-258, 321->332, 324-325, 337->335, 340-356, 364-392, 399->407, 408-449, 471-487, 496->510, 513->524, 537->557, 575-596, 637-666, 695-705, 720, 730-743, 759->771, 823-826, 843-844, 868, 881, 889-893, 901, 932-934, 962-971, 995-1018, 1027-1047, 1051-1053, 1067, 1080-1096, 1100-1120, 1135-1156, 1177-1178, 1181-1182, 1186, 1190-1201, 1209, 1263-1264, 1284->1298, 1290-1291, 1307->1337, 1313-1334, 1343, 1350-1353, 1385-1465
+vigia/pipeline/report_builder.py                          50     50      4      0   0.00%   3-187
+vigia/pipeline/report_exporter.py                         86     86     10      0   0.00%   3-241
+vigia/pipeline/report_exporter_v2.py                      99     99     14      0   0.00%   3-254
+vigia/pipeline/security_evidence_registry.py              61     61      8      0   0.00%   3-198
+vigia/pipeline/vigia_integration_bridge.py               457    341    152     12  21.35%   50->59, 61, 81-86, 99, 112, 121, 173-178, 197-207, 298->324, 308-310, 317, 326-428, 461-494, 503-526, 557, 561, 565-567, 584-673, 687-710, 724-736, 747-760, 781-798, 823-894, 912-922, 953-986, 1016, 1031, 1069-1075, 1078-1084, 1099-1234, 1263-1272
+vigia/sandbox.py                                           2      2      0      0   0.00%   4-6
+vigia/scripts/__init__.py                                  0      0      0      0 100.00%
+vigia/scripts/ci_gate.py                                  96     96     18      0   0.00%   28-192
+vigia/scripts/compare_runs.py                            189    189     58      0   0.00%   19-319
+vigia/scripts/consolidate_cases.py                       269    269    118      0   0.00%   35-482
+vigia/scripts/evaluate_detector.py                       141    141     36      0   0.00%   18-286
+vigia/scripts/generate_execution_log.py                  119    119     42      0   0.00%   25-284
+vigia/scripts/negation_stress_test.py                    160    160     52      0   0.00%   29-352
+vigia/scripts/run_pipeline.py                             90     90     28      0   0.00%   25-198
+vigia/scripts/top_breaking_phrases.py                     65     65     16      0   0.00%   25-198
+vigia/security.py                                          5      5      0      0   0.00%   2-6
+vigia/security/__init__.py                                 4      0      0      0 100.00%
+vigia/security/sandbox.py                                169    145     40      2  12.44%   55-61, 76-87, 109-129, 144-174, 193-230, 262-344, 360-364, 392-546
+vigia/security/security.py                               442    177    108     23  56.73%   75-115, 266, 274-275, 277-284, 309-319, 328-340, 365, 372, 379, 382-383, 447-456, 463-469, 495-573, 603-667, 736, 852, 885, 942-986, 1063, 1073-1076, 1087->1119, 1094, 1108-1113, 1124->1165, 1130, 1136, 1138, 1142-1144, 1151-1152, 1159, 1166, 1225-1227, 1252-1253, 1262-1274, 1330-1334, 1348-1360, 1395-1407, 1412-1417
+vigia/security/vigia_seguridad.py                         64     64     30      0   0.00%   14-263
+vigia/sift/__init__.py                                    15      0      0      0 100.00%
+vigia/sift/_math_utils.py                                372    154    216     42  53.06%   47-66, 78, 80, 82, 84, 95-117, 124-146, 150-174, 182-197, 204-216, 225-246, 268, 281->278, 283-284, 310, 317, 323->326, 327->322, 343, 346->345, 350-353, 355, 382, 386->385, 390-393, 396->409, 398->407, 407->409, 411, 422, 426, 428, 446, 463->466, 466->459, 470->476, 485, 487->493, 490->493, 505->504, 509-512, 546->545, 548->545, 550->566, 553->566, 556->555, 558->555, 562->555, 569->568
+vigia/sift/amcache_shimcache.py                           56     17      8      0  60.94%   63-71, 104-116, 128
+vigia/sift/browser_forensics.py                           72     33     20      0  42.39%   64-72, 103-133, 144-156
+vigia/sift/disk_forensics.py                             160    114     72      0  19.83%   65-73, 87-132, 139-153, 164-206, 209-220, 231-294
+vigia/sift/event_log_correlator.py                       272    199     94      0  19.95%   20-21, 112-120, 134-140, 143-162, 165-178, 181-188, 191-220, 227-235, 238-262, 267-280, 285-304, 309, 312-363, 370-380, 383-390
+vigia/sift/ioc_manager.py                                 83     52     30      0  27.43%   20-33, 62-67, 88-99, 104-113, 117-137, 151-175, 186
+vigia/sift/memory_forensics.py                           318    196     94      1  29.85%   43, 124, 127, 179-187, 206-208, 212-221, 231-244, 247-257, 261-283, 286, 289, 292, 295, 299, 305-320, 324-338, 342-355, 359-368, 384-446, 451-481, 488-508, 513-517, 521-555, 563-567, 570-581
+vigia/sift/mft_timeline_analyzer.py                        3      3      0      0   0.00%   8-17
+vigia/sift/network_forensics.py                          154    121     70      0  14.73%   48-56, 70-95, 110-183, 191-202, 209-220, 223-235, 242-265
+vigia/sift/prefetch_analyzer.py                           76     42     20      0  35.42%   54-62, 88, 96-142, 153-169
+vigia/sift/registry_timeline_reconstructor.py            297    194     96      1  26.46%   38, 133-141, 159, 163-171, 175-182, 185-196, 199, 202, 205, 208, 211, 216-219, 222-247, 250-274, 279-295, 299-302, 307-332, 337-340, 343-385, 394-414, 417-421, 424-431, 434-441, 444-454
+vigia/sift/sans_phase.py                                  66     66      0      0   0.00%   19-204
+vigia/sift/shellbag_analyzer.py                           49     20     10      0  49.15%   50-58, 89-111, 121-122
+vigia/sift/sift_orchestrator.py                          395    342    114      0  10.41%   42-43, 46-47, 50-51, 54-55, 58-59, 62-63, 66-67, 72-73, 76-77, 80-81, 84-85, 88-89, 92-93, 132-166, 173-183, 187-191, 195-201, 235-626, 652
+vigia/sift/unified_timeline_engine.py                    105     73     46      0  21.19%   49-57, 87-118, 128-136, 140-150, 158-195, 202-233
+vigia/sift/usb_device_tracker.py                          51     20     10      0  50.82%   51-59, 90-110, 128-130
+vigia/signal_quality_gate.py                             100    100     32      0   0.00%   22-258
+vigia/temporal/__init__.py                                 0      0      0      0 100.00%
+vigia/temporal/coherence_validator.py                    119    119     36      0   0.00%   17-305
+vigia/tools/__init__.py                                    0      0      0      0 100.00%
+vigia/tools/abductive_intent_engine.py                    91     91     20      0   0.00%   32-1071
+vigia/tools/adversarial_mutation_suite.py                226    226     66      0   0.00%   141-1152
+vigia/tools/adversarial_nlp.py                           772    582    222      0  19.11%   75-77, 167-168, 171-183, 186-187, 206-209, 227-236, 314-321, 336, 370-388, 392-394, 408-409, 412-443, 457-465, 468-470, 473, 476, 479, 488-494, 505-506, 509-527, 542, 553-557, 567-600, 626, 637-646, 649-664, 667-672, 683-685, 688-738, 747-754, 757-763, 766-772, 775-784, 837-840, 853-871, 901-904, 927-936, 944-970, 973-976, 982-987, 992-997, 1001, 1033-1057, 1060, 1069-1083, 1094-1102, 1112-1153, 1167-1200, 1203, 1206, 1227, 1246, 1249-1257, 1260-1264, 1267-1271, 1274-1280, 1283-1300, 1312-1330, 1343-1344, 1347-1350, 1353-1372, 1378-1409, 1423, 1449, 1452-1468, 1471-1508, 1529, 1541-1564, 1567-1581, 1584-1598, 1605, 1619-1639
+vigia/tools/adversarial_robustness.py                    156    132     72      0  10.53%   51-102, 117-142, 150-167, 176-195, 203-228, 238-245, 248
+vigia/tools/behavioral_fingerprint.py                    235    235     98      0   0.00%   12-617
+vigia/tools/build_calibration_dataset.py                  52     52     22      0   0.00%   11-120
+vigia/tools/caie.py                                      536    144    226     34  69.55%   140, 164->162, 190, 195, 199, 204, 391->395, 496-506, 626, 678-681, 682->689, 685-688, 691, 737-746, 749-759, 764->766, 784-805, 915, 974->991, 1037-1053, 1116-1125, 1130-1159, 1165, 1171, 1203-1215, 1315->1320, 1346-1362, 1506-1508, 1554, 1597, 1621->1615, 1697, 1699, 1729-1730, 1805-1807, 1815-1818, 1940-1943, 2003-2077, 2095-2140
+vigia/tools/cross_artifact_resonance.py                  214    214     78      0   0.00%   12-570
+vigia/tools/document_integrity.py                        324    297    104      0   6.31%   61, 66-72, 80-84, 113-299, 346-467, 507-596, 642-773, 795-799
+vigia/tools/eml_gci.py                                   292    292     92      0   0.00%   31-739
+vigia/tools/eml_symbolic.py                              197    197     52      0   0.00%   34-691
+vigia/tools/entanglement.py                                1      0      0      0 100.00%
+vigia/tools/entropy_kernel.py                            247    247     70      0   0.00%   31-631
+vigia/tools/entropy_locality.py                          138    138     46      0   0.00%   12-365
+vigia/tools/forensic_db.py                               167    133     38      0  16.59%   75-80, 83-93, 101-121, 124-126, 134-219, 228-246, 254-275, 292-353, 363-372, 378-388, 394-403, 414-435, 443-455, 470-471
+vigia/tools/generate_calibration.py                       70     70     16      0   0.00%   12-125
+vigia/tools/geopolitical.py                              144    144     64      0   0.00%   17-307
+vigia/tools/init_patterns_db.py                           16     16      0      0   0.00%   12-208
+vigia/tools/metabolic_profiler.py                        278    278     74      0   0.00%   12-697
+vigia/tools/mitre_clustering.py                           74     74     16      0   0.00%   23-624
+vigia/tools/mitre_mapping.py                             181     87     60      4  41.49%   105, 109, 496-497, 543-579, 582, 611, 639-647, 670-704, 726-733, 766-783, 788-803, 815, 838-858
+vigia/tools/nlp_constants.py                              77      0      0      0 100.00%
+vigia/tools/pattern_detector.py                           67     67     12      0   0.00%   12-201
+vigia/tools/picerl_mapping.py                            127    127     20      0   0.00%   16-443
+vigia/tools/sanitize_judicial.py                         166    166     26      0   0.00%   9-333
+vigia/tools/signal_adapter.py                            184    184     66      0   0.00%   31-586
+vigia/tools/signal_contract.py                            72     44     18      0  31.11%   61, 66-68, 72-91, 104-106, 155-176, 198-199, 224-229
+vigia/tools/temporal_drift.py                            234    234    104      0   0.00%   12-540
+vigia/tools/vigia_adversarial_nlp.py                       3      3      0      0   0.00%   16-31
+vigia/tools/vigia_case_adapter.py                        183    183     56      0   0.00%   26-355
+vigia/tools/vigia_entanglement.py                          2      2      0      0   0.00%   12-14
+vigia/tools/vigia_planner.py                             815    815    342      0   0.00%   33-2530
+vigia/tools/visible_variables.py                         153     79     26      0  41.34%   254-255, 283-288, 327-352, 356, 370, 373-374, 392-444, 457-499, 517-526
+vigia/tools/vision_audit.py                                2      0      0      0 100.00%
+vigia/utils/__init__.py                                    0      0      0      0 100.00%
+vigia/utils/path_guard.py                                 26     26     16      0   0.00%   14-84
+vigia/verdict/__init__.py                                  0      0      0      0 100.00%
+vigia/verdict/quadripartite.py                           103     17     22      7  76.00%   259-260, 280-281, 299, 303, 322, 348, 368-400
+vigia/vigia_api.py                                        91     91      6      0   0.00%   6-146
+vigia/vigia_command_center.py                            316    316     72      0   0.00%   31-616
+vigia/vigia_core.py                                       70     70     28      0   0.00%   11-196
+vigia/vigia_namespace_shim.py                             51     51     18      0   0.00%   20-149
+vigia/vigia_sift_bridge.py                              1152    650    370     68  41.26%   84-85, 108-115, 154, 165, 167, 170, 184, 186, 188-194, 246-251, 253-259, 263-268, 271-274, 333, 389-394, 406-447, 482-493, 502-517, 552-557, 566, 578-579, 597-620, 635-637, 660-705, 745-788, 811-815, 869-1025, 1056-1172, 1185-1203, 1219-1233, 1245-1258, 1273-1322, 1336-1364, 1385, 1402, 1409, 1417-1419, 1424-1426, 1459-1520, 1547-1548, 1551, 1585-1586, 1603-1604, 1617->1630, 1637-1639, 1684-1833, 1877, 1880, 1882, 1898-1899, 1932-1933, 1956-1957, 1971-1976, 1987->2003, 1992-1993, 2030, 2062-2069, 2116-2117, 2140, 2160->2145, 2183-2188, 2238, 2244-2246, 2257->2270, 2270->2282, 2283-2287, 2297-2298, 2316-2321, 2365-2366, 2369, 2377-2378, 2390-2391, 2406->2419, 2427-2428, 2491-2496, 2504-2505, 2550-2551, 2572->2570, 2600, 2634-2723, 2741-2799, 2823-2862, 2884-2898, 2912-2916, 2949, 2950->2976, 2962-2963, 2977, 2978->3001, 2990-2991, 3001->3020, 3010-3011, 3020->3040, 3029-3030, 3087-3197, 3290, 3305, 3312-3319, 3339-3340, 3347-3348, 3367, 3369, 3371, 3373, 3377-3378, 3380-3381
+---------------------------------------------------------------------------------------------------
+TOTAL                                                  25975  20377   7526    352  19.16%
+Coverage HTML written to dir htmlcov
+======================= 163 passed, 6 xfailed in 52.24s ========================
