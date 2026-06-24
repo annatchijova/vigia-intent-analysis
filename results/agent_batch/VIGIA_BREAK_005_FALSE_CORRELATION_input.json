@@ -1,0 +1,25 @@
+{
+  "case_id": "VIGIA_BREAK_005_FALSE_CORRELATION",
+  "description": "Eventos simult\u00e1neos sin relaci\u00f3n causal",
+  "artifacts": [
+    {
+      "id": "event1",
+      "type": "netflow",
+      "content": "ftp transfer"
+    },
+    {
+      "id": "event2",
+      "type": "system",
+      "content": "package update"
+    },
+    {
+      "id": "event3",
+      "type": "auth",
+      "content": "ssh login"
+    }
+  ],
+  "expected": {
+    "no_false_causality": true,
+    "confidence_max": 0.75
+  }
+}

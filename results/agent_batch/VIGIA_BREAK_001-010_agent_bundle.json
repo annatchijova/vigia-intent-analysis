@@ -1,0 +1,161 @@
+{
+  "analysis_timestamp": "2026-06-24T02:55:09.962549+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "VIGIA_BREAK_001-010",
+    "end_time": "2026-06-24T02:55:09.962551+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "VIGIA_BREAK_001-010",
+        "entry_sha256": "65c69362bc86b72e5c5c64902a823ad624a4f48cdd2d3666fb632dab0c44dc3f",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "VIGIA_BREAK_001-010"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: 95ef6739e4df7cf2...",
+        "outputs_summary": {
+          "agent_sha256": "95ef6739e4df7cf28eef26e5338c0708c50348077baeca29d899806d950da740",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-06-24T02:55:09.960029+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA_BREAK_001-010",
+        "entry_sha256": "dc230d6225e33eb6f1f614bb71e2da6cae98a04a6f791f05becf0cc61f83e889",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA_BREAK_001-010.json"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-06-24T02:55:09.960102+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA_BREAK_001-010",
+        "entry_sha256": "3b7ab11c0944943466ccdc9a4f262dc120f5fe7ba3d60c306077a56575cf3f38",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA_BREAK_001-010.json"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: 6327ac2a7ea18102...",
+        "outputs_summary": {
+          "sha256": "6327ac2a7ea181027439c57223f7aeec425f695a32bb90408825922bf279181e"
+        },
+        "seq": 3,
+        "timestamp": "2026-06-24T02:55:09.960177+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "VIGIA_BREAK_001-010",
+        "entry_sha256": "464cbdb5e1422e173f0c4ca5012110b938e11b58b08737b016670d7501a64208",
+        "inputs_summary": {
+          "evidence": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA_BREAK_001-010.json",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-06-24T02:55:09.960262+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "VIGIA_BREAK_001-010",
+        "entry_sha256": "0bf07abc35d2547502d820ab3247bb114b984b2f36393301c8e980d57e15847a",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 0 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "PIPELINE_ERROR",
+            "is_conclusive": "False",
+            "narrative": "[ERROR] 'list' object has no attribute 'get'"
+          },
+          "case_id": "VIGIA_BREAK_001-010",
+          "pipeline_meta": {
+            "error": "'list' object has no attribute 'get'"
+          },
+          "signals": []
+        },
+        "seq": 5,
+        "timestamp": "2026-06-24T02:55:09.962357+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "VIGIA_BREAK_001-010",
+        "entry_sha256": "982cbebb0091ebb7b6cf69bc0333ae80b1349af5e0b60a9ab304070c73725fb5",
+        "inputs_summary": {
+          "n_signals": "0"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-06-24T02:55:09.962417+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "VIGIA_BREAK_001-010",
+        "entry_sha256": "5113eb8add5aae5024db95922c3dc35000f7e21234793ed53bfccef6d15f9bb4",
+        "inputs_summary": {
+          "verdict": "PIPELINE_ERROR"
+        },
+        "iteration": 0,
+        "note": "Exit code 0 \u2014 analysis complete.",
+        "outputs_summary": {
+          "exit_code": "0"
+        },
+        "seq": 7,
+        "timestamp": "2026-06-24T02:55:09.962509+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-06-24T02:55:09.959818+00:00",
+    "total_entries": 7
+  },
+  "case_id": "VIGIA_BREAK_001-010",
+  "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA_BREAK_001-010.json",
+  "evidence_sha256": "6327ac2a7ea181027439c57223f7aeec425f695a32bb90408825922bf279181e",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA_BREAK_001-010 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/VIGIA_BREAK_001-010.json\nEvidence SHA-256: 6327ac2a7ea181027439c57223f7aeec425f695a32bb90408825922bf279181e\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: PIPELINE_ERROR\nPosterior confidence: 0\nConclusive: NO \u2014 requires human review\n\n--- PEIRCEAN NARRATIVE ---\n[ERROR] 'list' object has no attribute 'get'\n\n--- FINAL ALERT LEVEL ---\nLOW \u2014 No significant anomalies detected in this iteration.\n\nCritical signals (z>3): 0\nHigh signals (2<z<=3): 0\nTotal signals analyzed: 0",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "PIPELINE_ERROR",
+      "is_conclusive": false,
+      "narrative": "[ERROR] 'list' object has no attribute 'get'"
+    },
+    "case_id": "VIGIA_BREAK_001-010",
+    "pipeline_meta": {
+      "error": "'list' object has no attribute 'get'"
+    },
+    "signals": []
+  },
+  "sans_compliance": {
+    "accuracy_validation": false,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}

@@ -1,0 +1,225 @@
+{
+  "analysis_timestamp": "2026-06-24T02:55:11.894246+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "VIGIA_BREAK_007_MISSING_LOGS",
+    "end_time": "2026-06-24T02:55:11.894249+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "VIGIA_BREAK_007_MISSING_LOGS",
+        "entry_sha256": "8df7009755d2ad0fe375f5e782cde4884110c3496cb7e923ff75cce1a63199d5",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "VIGIA_BREAK_007_MISSING_LOGS"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: 95ef6739e4df7cf2...",
+        "outputs_summary": {
+          "agent_sha256": "95ef6739e4df7cf28eef26e5338c0708c50348077baeca29d899806d950da740",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-06-24T02:55:11.891707+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA_BREAK_007_MISSING_LOGS",
+        "entry_sha256": "a0da8b0e2b7da3e604ad24432713dcccf4b697e6bf99888a84ba2f192c09e3a0",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA_BREAK_007_MISSING_LOGS.json"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-06-24T02:55:11.891780+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA_BREAK_007_MISSING_LOGS",
+        "entry_sha256": "190e0ce7943b4e1922c9c0d4605d70908179e2b3d6a64aa056f22936bc449b0d",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA_BREAK_007_MISSING_LOGS.json"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: 51ed1dfb14e108c7...",
+        "outputs_summary": {
+          "sha256": "51ed1dfb14e108c7ae5bc528e4e64f53ebf1aeb13353ccb39a16c8d6c42daa60"
+        },
+        "seq": 3,
+        "timestamp": "2026-06-24T02:55:11.891855+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "VIGIA_BREAK_007_MISSING_LOGS",
+        "entry_sha256": "bb405567958794111c571ea52f63405056c8713d264ce304686a128b1c380faa",
+        "inputs_summary": {
+          "evidence": "/home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA_BREAK_007_MISSING_LOGS.json",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-06-24T02:55:11.891943+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "VIGIA_BREAK_007_MISSING_LOGS",
+        "entry_sha256": "4172e1a99810193e0dcafbfe3834bc8afd97b994eaab008b6908aa928365da25",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 2 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "SUSPICION_DETECTED",
+            "best_posterior": "51/400",
+            "confidence": "51/400",
+            "is_conclusive": "True",
+            "narrative": "Ausencia de logs donde deber\u00edan existir"
+          },
+          "case_id": "VIGIA_BREAK_007_MISSING_LOGS",
+          "pipeline_meta": {
+            "artifact_count": "2",
+            "avg_score": "51/80",
+            "expected_verdict": "SUSPICION",
+            "source": "ebs_v1_json_adapter"
+          },
+          "signals": [
+            {
+              "artifact_id": "ART-001",
+              "confidence": "17/20",
+              "description": "ssh session present",
+              "evidence_type": "log_entry",
+              "source": "legacy_converter",
+              "z_score": "51/80"
+            },
+            {
+              "artifact_id": "ART-002",
+              "confidence": "17/20",
+              "description": "NO ENTRY",
+              "evidence_type": "log_entry",
+              "source": "legacy_converter",
+              "z_score": "51/80"
+            }
+          ]
+        },
+        "seq": 5,
+        "timestamp": "2026-06-24T02:55:11.893968+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "VIGIA_BREAK_007_MISSING_LOGS",
+        "entry_sha256": "2ffd233f5bfeeec58fc257e6ffffe8c1c1404f4f49a80a4159abc0c6e3232f8b",
+        "inputs_summary": {
+          "n_signals": "2"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-06-24T02:55:11.894055+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "VIGIA_BREAK_007_MISSING_LOGS",
+        "entry_sha256": "4692a1dc1e45f15caee51143f6736bfe2f51378ba3c6485c6bfd55b28818d25e",
+        "inputs_summary": {
+          "verdict": "SUSPICION_DETECTED"
+        },
+        "iteration": 0,
+        "note": "Exit code 0 \u2014 analysis complete.",
+        "outputs_summary": {
+          "exit_code": "0"
+        },
+        "seq": 7,
+        "timestamp": "2026-06-24T02:55:11.894137+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-06-24T02:55:11.891508+00:00",
+    "total_entries": 7
+  },
+  "case_id": "VIGIA_BREAK_007_MISSING_LOGS",
+  "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA_BREAK_007_MISSING_LOGS.json",
+  "evidence_sha256": "51ed1dfb14e108c7ae5bc528e4e64f53ebf1aeb13353ccb39a16c8d6c42daa60",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA_BREAK_007_MISSING_LOGS ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA_BREAK_007_MISSING_LOGS.json\nEvidence SHA-256: 51ed1dfb14e108c7ae5bc528e4e64f53ebf1aeb13353ccb39a16c8d6c42daa60\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: SUSPICION_DETECTED\nPosterior confidence: 51/400\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\nAusencia de logs donde deber\u00edan existir\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [ssh session present] z=0.637 conf=0.85 \u2014 \n  [NO ENTRY] z=0.637 conf=0.85 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW \u2014 No significant anomalies detected in this iteration.\n\nCritical signals (z>3): 0\nHigh signals (2<z<=3): 0\nTotal signals analyzed: 2",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "SUSPICION_DETECTED",
+      "best_posterior": "51/400",
+      "confidence": {
+        "__fraction__": true,
+        "den": 400,
+        "num": 51
+      },
+      "is_conclusive": true,
+      "narrative": "Ausencia de logs donde deber\u00edan existir"
+    },
+    "case_id": "VIGIA_BREAK_007_MISSING_LOGS",
+    "pipeline_meta": {
+      "artifact_count": 2,
+      "avg_score": "51/80",
+      "expected_verdict": "SUSPICION",
+      "source": "ebs_v1_json_adapter"
+    },
+    "signals": [
+      {
+        "artifact_id": "ART-001",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 17
+        },
+        "description": "ssh session present",
+        "evidence_type": "log_entry",
+        "source": "legacy_converter",
+        "z_score": {
+          "__fraction__": true,
+          "den": 80,
+          "num": 51
+        }
+      },
+      {
+        "artifact_id": "ART-002",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 17
+        },
+        "description": "NO ENTRY",
+        "evidence_type": "log_entry",
+        "source": "legacy_converter",
+        "z_score": {
+          "__fraction__": true,
+          "den": 80,
+          "num": 51
+        }
+      }
+    ]
+  },
+  "sans_compliance": {
+    "accuracy_validation": false,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}

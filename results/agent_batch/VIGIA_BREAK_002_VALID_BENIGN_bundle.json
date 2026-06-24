@@ -1,0 +1,225 @@
+{
+  "analysis_timestamp": "2026-06-15T20:50:25.165563+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "VIGIA_BREAK_002_VALID_BENIGN",
+    "end_time": "2026-06-15T20:50:25.165566+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "VIGIA_BREAK_002_VALID_BENIGN",
+        "entry_sha256": "bfb9668cb87444f8996124b4d1851a89ae8b94f816bf981fc862dd0f936f0ede",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "VIGIA_BREAK_002_VALID_BENIGN"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: 4eeafb3bfb155486...",
+        "outputs_summary": {
+          "agent_sha256": "4eeafb3bfb155486142942ad7a2c8678676f86ffd5d076882459354d820591f6",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-06-15T20:50:25.163055+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA_BREAK_002_VALID_BENIGN",
+        "entry_sha256": "e8888e4c2cb69bc1d8fd13eeddad1f6b86c66c1f313fd6a27664f5b1662613b0",
+        "inputs_summary": {
+          "path": "results/agent_batch/VIGIA_BREAK_002_VALID_BENIGN_input.json"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-06-15T20:50:25.163127+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA_BREAK_002_VALID_BENIGN",
+        "entry_sha256": "edfa4fb696bad98d05242e31fc93fd8e0463817bd3abe36d4c73a43949ad36a5",
+        "inputs_summary": {
+          "path": "results/agent_batch/VIGIA_BREAK_002_VALID_BENIGN_input.json"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: 09dd26c4df5ed4b4...",
+        "outputs_summary": {
+          "sha256": "09dd26c4df5ed4b4e93e28b6e001afe3342aaba2a95330efa88e9d85e9957e14"
+        },
+        "seq": 3,
+        "timestamp": "2026-06-15T20:50:25.163197+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "VIGIA_BREAK_002_VALID_BENIGN",
+        "entry_sha256": "4d93526ae4bfe4439148e8e94dcbae296354f1794e80fd29db5911d0ae5f7b8e",
+        "inputs_summary": {
+          "evidence": "results/agent_batch/VIGIA_BREAK_002_VALID_BENIGN_input.json",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-06-15T20:50:25.163283+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "VIGIA_BREAK_002_VALID_BENIGN",
+        "entry_sha256": "1d735dc30766789d37efd6563e9170fdfb7ee613ae20bcc6db4946de1e90d82a",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 2 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "NO_SEMIOTIC_ANOMALY_DETECTED",
+            "best_posterior": "0",
+            "confidence": "0",
+            "is_conclusive": "False",
+            "narrative": "Actividad sospechosa pero autorizada (pentest)"
+          },
+          "case_id": "VIGIA_BREAK_002_VALID_BENIGN",
+          "pipeline_meta": {
+            "artifact_count": "2",
+            "avg_score": "0",
+            "expected_verdict": "UNKNOWN",
+            "source": "ebs_v1_json_adapter"
+          },
+          "signals": [
+            {
+              "artifact_id": "?",
+              "confidence": "1/2",
+              "description": "",
+              "evidence_type": "unknown",
+              "source": "unknown",
+              "z_score": "0"
+            },
+            {
+              "artifact_id": "?",
+              "confidence": "1/2",
+              "description": "",
+              "evidence_type": "unknown",
+              "source": "unknown",
+              "z_score": "0"
+            }
+          ]
+        },
+        "seq": 5,
+        "timestamp": "2026-06-15T20:50:25.164941+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "VIGIA_BREAK_002_VALID_BENIGN",
+        "entry_sha256": "aff22832d01706f9917eee9756fedf2188a4903974634294bca93aa3a5f1e024",
+        "inputs_summary": {
+          "n_signals": "2"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-06-15T20:50:25.165405+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "VIGIA_BREAK_002_VALID_BENIGN",
+        "entry_sha256": "d6e307ebf7ef668463fb7e9cdbcaf8d279e526b87e9c4729c80834ba4361aceb",
+        "inputs_summary": {
+          "verdict": "NO_SEMIOTIC_ANOMALY_DETECTED"
+        },
+        "iteration": 0,
+        "note": "Exit code 0 \u2014 analysis complete.",
+        "outputs_summary": {
+          "exit_code": "0"
+        },
+        "seq": 7,
+        "timestamp": "2026-06-15T20:50:25.165498+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-06-15T20:50:25.162852+00:00",
+    "total_entries": 7
+  },
+  "case_id": "VIGIA_BREAK_002_VALID_BENIGN",
+  "evidence_path": "results/agent_batch/VIGIA_BREAK_002_VALID_BENIGN_input.json",
+  "evidence_sha256": "09dd26c4df5ed4b4e93e28b6e001afe3342aaba2a95330efa88e9d85e9957e14",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA_BREAK_002_VALID_BENIGN ===\nEvidence: results/agent_batch/VIGIA_BREAK_002_VALID_BENIGN_input.json\nEvidence SHA-256: 09dd26c4df5ed4b4e93e28b6e001afe3342aaba2a95330efa88e9d85e9957e14\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: NO_SEMIOTIC_ANOMALY_DETECTED\nPosterior confidence: 0\nConclusive: NO \u2014 requires human review\n\n--- PEIRCEAN NARRATIVE ---\nActividad sospechosa pero autorizada (pentest)\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [unknown] z=0.000 conf=0.50 \u2014 \n  [unknown] z=0.000 conf=0.50 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW \u2014 No significant anomalies detected in this iteration.\n\nCritical signals (z>3): 0\nHigh signals (2<z<=3): 0\nTotal signals analyzed: 2",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "NO_SEMIOTIC_ANOMALY_DETECTED",
+      "best_posterior": "0",
+      "confidence": {
+        "__fraction__": true,
+        "den": 1,
+        "num": 0
+      },
+      "is_conclusive": false,
+      "narrative": "Actividad sospechosa pero autorizada (pentest)"
+    },
+    "case_id": "VIGIA_BREAK_002_VALID_BENIGN",
+    "pipeline_meta": {
+      "artifact_count": 2,
+      "avg_score": "0",
+      "expected_verdict": "UNKNOWN",
+      "source": "ebs_v1_json_adapter"
+    },
+    "signals": [
+      {
+        "artifact_id": "?",
+        "confidence": {
+          "__fraction__": true,
+          "den": 2,
+          "num": 1
+        },
+        "description": "",
+        "evidence_type": "unknown",
+        "source": "unknown",
+        "z_score": {
+          "__fraction__": true,
+          "den": 1,
+          "num": 0
+        }
+      },
+      {
+        "artifact_id": "?",
+        "confidence": {
+          "__fraction__": true,
+          "den": 2,
+          "num": 1
+        },
+        "description": "",
+        "evidence_type": "unknown",
+        "source": "unknown",
+        "z_score": {
+          "__fraction__": true,
+          "den": 1,
+          "num": 0
+        }
+      }
+    ]
+  },
+  "sans_compliance": {
+    "accuracy_validation": false,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}
