@@ -26,13 +26,11 @@ import os
 import sys
 import datetime
 
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-
-from vigia_integration_bridge import (
+from vigia.pipeline.vigia_integration_bridge import (
     CaseAdapter, normalize_case_schema, validate_case_schema, CaseSchemaError,
 )
-from likelihood_ratio import LikelihoodEngine
-from lr_calibration import LRCalibrator
+from vigia.core.likelihood_ratio import LikelihoodEngine
+from vigia.core.lr_calibration import LRCalibrator
 
 # ---------------------------------------------------------------------------
 # Etiquetado: qué verdicts son "fabricated" (señal alta) vs "authentic" (ruido)
@@ -170,6 +168,8 @@ def main():
     parser = argparse.ArgumentParser(description="Calibración empírica LRCalibrator VIGÍA")
     parser.add_argument("--out", default="models/calibrated_lr.json",
                         help="Ruta de salida del calibrador (JSON)")
+    parser.add_argument("--data", default="data/cases/converted",
+                        help="Directorio raíz del corpus de calibración")
     parser.add_argument("--seed", type=int, default=42,
                         help="Semilla para reproducibilidad")
     parser.add_argument("--test-split", type=float, default=0.2,
@@ -177,12 +177,14 @@ def main():
     args = parser.parse_args()
 
     # ── Recopilar corpus ──────────────────────────────────────────────
-    base = os.path.dirname(os.path.abspath(__file__))
+    repo_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    data_dir = os.path.join(repo_root, args.data)
     files = (
-        glob.glob(os.path.join(base, "VIGIA-SYN-*.json")) +
-        glob.glob(os.path.join(base, "VIGIA-BEN-*.json")) +
-        glob.glob(os.path.join(base, "VIGIA-REAL-*.json")) +
-        glob.glob(os.path.join(base, "case_00*.json"))
+        glob.glob(os.path.join(data_dir, "VIGIA-SYN-*.json")) +
+        glob.glob(os.path.join(data_dir, "VIGIA-BEN-*.json")) +
+        glob.glob(os.path.join(data_dir, "VIGIA-REAL-*.json")) +
+        glob.glob(os.path.join(data_dir, "case_00*.json")) +
+        glob.glob(os.path.join(data_dir, "*.json"))
     )
     files = sorted(set(files))
     print(f"\n[Calibración] Corpus: {len(files)} casos")
@@ -238,13 +240,13 @@ def main():
         print("       El calibrador ayuda, pero el corpus necesita más casos.")
 
     # ── Guardar calibrador ────────────────────────────────────────────
-    os.makedirs(os.path.dirname(os.path.join(base, args.out)), exist_ok=True)
-    out_path = os.path.join(base, args.out)
+    os.makedirs(os.path.dirname(os.path.join(repo_root, args.out)), exist_ok=True)
+    out_path = os.path.join(repo_root, args.out)
     calibrator.save(out_path)
     print(f"\n[Calibración] Calibrador guardado: {out_path}")
 
     # ── Guardar metadata Daubert ──────────────────────────────────────
-    meta_path = os.path.join(base, "models/calibration_metadata.json")
+    meta_path = os.path.join(repo_root, "models/calibration_metadata.json")
     meta = {
         "calibration_date":    datetime.datetime.utcnow().isoformat() + "Z",
         "script_version":      "run_calibration-v1.0",
