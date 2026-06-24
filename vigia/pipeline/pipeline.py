@@ -517,7 +517,8 @@ class VigiaPipeline:
             # Ver KNOWN_LIMITATIONS.md L-027 para detalle.
             # Estado anterior conocido: consistency_score=1.0 (regla de
             # disonancia semántica inactiva, documentado desde 2026-05-06).
-            consistency_score = 1.0
+            from vigia.core.darvo_detector import adjust_consistency_score
+            consistency_score = adjust_consistency_score(1.0, signals)
             abductive_result = None
 
         # ── GOBERNANZA: RiskBoundedDecisionLayer con factor ω ──────────────
