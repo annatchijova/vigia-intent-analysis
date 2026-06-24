@@ -1013,7 +1013,7 @@ For agent bundles, use the SHA-256 verification printed by the agent:
 
 ## L-028 — Golden Rule LOG_VS_MEMORY Requires metadata["verdict"] Convention
 
-**Affects:** `vigia/tools/caie.py::detect_fractures()` | **Status:** [ACTIVE] 2026-06-22, POST HACKATHON — under investigation
+**Affects:** `vigia/tools/caie.py::detect_fractures()` | **Status:** [RESOLVED] 2026-06-24, POST HACKATHON — commit 588956b
 
 **Description:** The `LOG_VS_MEMORY` Golden Rule (structural fracture that forces `MALICE` regardless of probabilistic score) only fires when artifacts carry explicit `metadata["verdict"]` fields. When artifacts are built without this convention (direct `Artifact()` construction, upstream tools that don't emit `verdict` for negative findings), the rule does not engage and the case falls through to pure Noisy-OR probabilistic fusion. In this path, a high-spoofability log artifact (spoofability=0.85) can have its contribution depressed enough that the final verdict collapses to `NOISE`, even when containing a high-severity IoC (e.g., connection to a known C2 IP).
 
@@ -1029,6 +1029,15 @@ For agent bundles, use the SHA-256 verification printed by the agent:
 - Semantic keyword matching (same pattern as `NARRATIVE_POISONING_DETECTED`) — rejected due to fragility.
 - Structural field analysis (presence/absence of `dst_ip`, `network_connections` in metadata) — under investigation, requires corpus analysis.
 - `adjusted_score` thresholding with existing `composite` thresholds (0.5/0.2) — rejected as introducing arbitrary numeric thresholds.
+
+**Resolution:** `_extract_assertions()` added as a pure semantic translation
+layer between raw artifact metadata and Rule 2. LOG_VS_MEMORY now fires on
+`log_claims_outbound_connection` (dst_ip/dest_ip present in log metadata) AND
+`memory_shows_no_network_activity` (no dest_ip/source_ip/network_connections
+in memory metadata). No metadata["verdict"] field required. PID overlap
+between log and memory artifacts modulates severity (0.95 with overlap,
+0.75 without) but does not gate fracture existence. Fix applied symmetrically
+to both vigia/tools/caie.py and vigia/tools/caie_legacy_root.py.
 
 **Test:** `test_red_team_anchor_bypass` in `vigia/tests/adversarial/test_spoofability_correlation_attack.py` confirms the gap. Status: `FAIL_T5_CONFIRMED`.
 
