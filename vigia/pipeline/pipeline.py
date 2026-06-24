@@ -107,7 +107,7 @@ try:
 except ImportError:
     LRCalibrator = None  # type: ignore
     _LR_CALIBRATOR_AVAILABLE = False
-    logger.warning("[Pipeline] LRCalibrator no disponible — LR sin calibración isotónica")
+    logger.warning("[Pipeline] LRCalibrator no disponible — LR sin calibración logística")
 
 try:
     from vigia.core.execution_logger import VigiaExecutionLogger
@@ -204,7 +204,7 @@ class VigiaPipeline:
         # Backend LLM (solo para narrativa — nunca para decisión)
         self._ollama_model = ollama_model
 
-        # H28: LRCalibrator — calibración isotónica del LR antes de la gobernanza
+        # H28: LRCalibrator — calibración logística del LR antes de la gobernanza
         # Carga desde calibration_path con sufijo _isotonic.json.
         # Si no existe, pipeline corre sin calibrar (documentado en bundle).
         self._lr_calibrator = None
@@ -215,7 +215,7 @@ class VigiaPipeline:
                 logger.info("[VigiaPipeline] H28: LRCalibrator cargado desde %s", _iso_path)
             except Exception:
                 logger.info(
-                    "[VigiaPipeline] H28: %s no encontrado — LR sin calibración isotónica.",
+                    "[VigiaPipeline] H28: %s no encontrado — LR sin calibración logística.",
                     _iso_path,
                 )
 
@@ -461,9 +461,9 @@ class VigiaPipeline:
             evidence_graph.global_stability() if evidence_graph else 1.0
         )
 
-        # ── H28: Calibración isotónica del posterior (LRCalibrator) ────────
+        # ── H28: Calibración logística del posterior (LRCalibrator) ────────
         # El LikelihoodEngine escupe un posterior crudo. El LRCalibrator aplica
-        # regresión isotónica para producir probabilidades calibradas (ECE válido).
+        # regresión logística para producir probabilidades calibradas (ECE válido).
         # Sin calibración, el "posterior" es una estimación — no una probabilidad.
         # El método de calibración se registra en inference_result para Daubert.
         lr_calibration_method = "uncalibrated"
@@ -476,15 +476,15 @@ class VigiaPipeline:
                 calibrated_posterior = self._lr_calibrator.calibrated_posterior(_z_approx)
                 if 0.0 < calibrated_posterior < 1.0:
                     logger.info(
-                        "[Pipeline] H28: posterior calibrado isotónicamente %.4f → %.4f",
+                        "[Pipeline] H28: posterior calibrado logísticamente %.4f → %.4f",
                         posterior, calibrated_posterior,
                     )
                     posterior = calibrated_posterior
                     inference_result = dict(inference_result)
                     inference_result["posterior"] = posterior
-                    lr_calibration_method = "isotonic_regression"
+                    lr_calibration_method = "logistic_regression"
             except Exception as _cal_exc:
-                logger.warning("[Pipeline] H28: calibración isotónica falló: %s", _cal_exc)
+                logger.warning("[Pipeline] H28: calibración logística falló: %s", _cal_exc)
 
         inference_result["lr_calibration_method"] = lr_calibration_method
 
@@ -1300,9 +1300,9 @@ def run_vigia(
         covariance_path=covariance_path,
     )
 
-    # H28: aplicar LRCalibrator si está disponible — calibración isotónica
+    # H28: aplicar LRCalibrator si está disponible — calibración logística
     # El LR crudo del KDE no tiene curva de confianza respaldada hasta que
-    # pasa por la regresión isotónica. Sin esto el "Posterior" es una suposición.
+    # pasa por la regresión logística. Sin esto el "Posterior" es una suposición.
     calibrated_signals = signals
     if _LR_CALIBRATOR_AVAILABLE and LRCalibrator is not None:
         try:
@@ -1329,7 +1329,7 @@ def run_vigia(
                         except Exception:
                             _adjusted.append(sig)
                     calibrated_signals = _adjusted
-                    logger.info("[run_vigia] H28: LR calibrado isotónicamente (%d señales)", len(calibrated_signals))
+                    logger.info("[run_vigia] H28: LR calibrado logísticamente (%d señales)", len(calibrated_signals))
         except Exception as _cal_exc:
             logger.warning("[run_vigia] H28: LRCalibrator falló (%s) — usando señales sin calibrar", _cal_exc)
 
