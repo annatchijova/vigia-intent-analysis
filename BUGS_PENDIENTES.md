@@ -82,3 +82,46 @@ pytest tests/ -k "caie or order_sensitivity or spoofability" -v --no-cov
 ```
 
 ---
+
+## B-002 — `likelihood_engine.py` constructor mal llamado y ruta de importación plana
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | RESUELTO |
+| **Archivo** | `vigia/core/likelihood_engine.py` |
+| **Función** | `LikelihoodEngine.__init__()` (carga de calibrador) |
+| **Líneas originales** | 101 (`import_module`), 102 (`LRCalibrator(...)`) |
+| **Commit fix** | `4649427` |
+| **Detectado en** | Sesión post-hackathon 2026-06-24 |
+
+### Descripción
+
+Dos errores concatenados en la carga del calibrador LR:
+
+1. **Ruta de importación plana** (línea 101): `import_module("lr_calibration")` fallaba
+   fuera del directorio raíz porque el módulo no estaba en el `sys.path` plano.
+2. **Constructor posicional incorrecto** (línea 102): `LRCalibrator(calibration_path)`
+   llamaba al constructor con un argumento posicional que el constructor no acepta;
+   la clase expone `LRCalibrator.load(path)` como método de fábrica.
+
+### Impacto
+
+- El motor de likelihood fallaba al instanciar el calibrador en cualquier entorno
+  donde `vigia/` no estuviera en el `sys.path` raíz.
+- El error era silencioso en algunos paths de importación dinámica, produciendo un
+  calibrador `None` sin excepción visible, lo que generaba resultados incorrectos
+  aguas abajo sin traza de error clara.
+
+**APLICADO** 2026-06-24 — Fixed in vigia/core/likelihood_engine.py:
+- Line 101: `import_module("lr_calibration")` → `import_module("vigia.core.lr_calibration")`
+- Line 102: `LRCalibrator(calibration_path)` → `LRCalibrator.load(calibration_path)`
+5/5 serialization tests pass. Commit: 4649427.
+
+### Verificación
+
+```
+pytest tests/ -k "serialization" -v --no-cov
+→ 5 passed, 0 failed
+```
+
+---
