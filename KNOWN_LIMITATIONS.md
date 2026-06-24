@@ -818,7 +818,7 @@ Reproduce: `python3 run_all_agent.py --timeout 90`
 | L-022 | devil_advocate validation partially architectural | Mode 2 bundles | Post-audit improvement |
 | L-023 | Bundle save TOCTOU race (SEC-04) | bundle_builder.py | P0 — fix scheduled |
 | L-024 | Forensic mount allowlist includes generic /mnt | sift_orchestrator.py | Design decision |
-| L-025 | Devil's Advocate has no autonomous generator for unlabeled evidence | All live MALICE/INTENT findings | Active work |
+| L-025 | Devil's Advocate has no autonomous generator for unlabeled evidence | All live MALICE/INTENT findings | RESOLVED — see L-026 |
 | L-026 | Devil's Advocate generator wired in; 1 pre-fix corpus bundle flagged | VIGIA-REAL-SRL-DMZ-FTP | **RESOLVED** / documented exception |
 | L-027 | AbductiveIntentEngine call site in VigiaPipeline used wrong signature since birth | `vigia/pipeline/pipeline.py::run_full()` | **RESOLVED** 2026-06-22 — zero submission impact |
 | — | Normalization schema mismatch | vigia_scorer.py | **RESOLVED** |
