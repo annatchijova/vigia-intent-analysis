@@ -1258,6 +1258,7 @@ def run_vigia(
                 value=float(d.get("value", 0.0)),
                 z_score=float(d.get("z_score", 0.0)),
                 confidence=float(d.get("confidence", 1.0)),
+                description=d.get("description"),
                 metadata=d.get("metadata"),
             )
             signals.append(s)
