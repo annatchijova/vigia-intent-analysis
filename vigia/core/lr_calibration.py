@@ -452,8 +452,19 @@ class LRCalibrator:
             json.dump(data, f, indent=2, ensure_ascii=False)
 
     @classmethod
-    def load(cls, path: str) -> "LRCalibrator":
-        """Carga calibrador serializado."""
+    def load(cls, path: str, expected_train_hash: str = "") -> "LRCalibrator":
+        """
+        Load a serialized calibrator from disk.
+
+        Args:
+            path: path to the JSON file produced by save().
+            expected_train_hash: if non-empty, the train_hash stored in
+                the file must match this value exactly. Raises ValueError
+                if they differ — this means the calibrator was trained on
+                a different dataset than the one currently in use.
+                If empty (default), no validation is performed and the
+                calibrator loads silently as before (backward compatible).
+        """
         with open(path, "r", encoding="utf-8") as f:
             data = json.load(f)
         cal = cls()
@@ -471,6 +482,15 @@ class LRCalibrator:
                     f"LRCalibrator.load: tipo de backend desconocido '{btype}'. "
                     "Antes este caso dejaba _backend=None y caia silenciosamente "
                     "al placeholder sin calibrar — ahora se aborta explicitamente."
+                )
+        if expected_train_hash:
+            stored_hash = (cal._backend._train_hash if cal._backend else "")
+            if stored_hash != expected_train_hash:
+                raise ValueError(
+                    f"LRCalibrator.load: train_hash mismatch. "
+                    f"Stored: '{stored_hash}', expected: '{expected_train_hash}'. "
+                    "The calibrator was trained on a different dataset. "
+                    "Re-run scripts/run_calibration.py to regenerate."
                 )
         return cal
 
