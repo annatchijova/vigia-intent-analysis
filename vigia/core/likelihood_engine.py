@@ -98,8 +98,8 @@ class LikelihoodEngine(_BaseLikelihoodEngine):
         _calibrator = calibrator
         if not _calibrator and calibration_path:
             try:
-                _lr_cal = _il.import_module("lr_calibration")
-                _calibrator = _lr_cal.LRCalibrator(calibration_path)
+                _lr_cal = _il.import_module("vigia.core.lr_calibration")
+                _calibrator = _lr_cal.LRCalibrator.load(calibration_path)
             except Exception:
                 pass
 
