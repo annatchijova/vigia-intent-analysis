@@ -124,6 +124,11 @@ pytest tests/ -k "serialization" -v --no-cov
 → 5 passed, 0 failed
 ```
 
+**RESUELTO** 2026-06-24 — El último importador plano era scripts/run_calibration.py,
+eliminado en commit 10ced2c (B-004). No quedan referencias a `from likelihood_ratio import`
+ni `import likelihood_ratio` en el repo (verificado con grep). No requirió cambios
+en likelihood_ratio.py — el archivo ya usaba vigia.core.ebs_v1 internamente.
+
 ---
 
 ## B-003 — Terminología errónea "isotónica" en comentarios y logs de `pipeline.py`
