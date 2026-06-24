@@ -81,7 +81,14 @@
 > "Abduction does not have to be considered a 'solution' of an ignorance problem, but rather a response to it, in which the agent reaches presumptive attainment rather than actual attainment."
 > — Gabbay & Woods (citado por Magnani, 2009, **p. 11**)
 
-**Aplicación a VIGÍA:** El veredicto `UNKNOWN` no es un fallo — es una **"preservación de ignorancia"** honesta. VIGÍA no afirma `MALICE` cuando no puede alcanzar "actual attainment" de la verdad.
+**Traducción:** "La abducción no debe considerarse una 'solución' de un problema de ignorancia, sino más bien una respuesta a él, en la que el agente alcanza un logro presuntivo en lugar de un logro efectivo."
+
+> "Through abduction the basic ignorance is neither solved nor left intact: it is an ignorance-preserving accommodation of the problem at hand."
+> — Magnani, L. (2009). **p. 68**
+
+**Traducción:** "A través de la abducción, la ignorancia básica no se resuelve ni se deja intacta: es una acomodación del problema en cuestión que preserva la ignorancia."
+
+**Aplicación a VIGÍA:** El veredicto `ABSTAIN` no es un fallo — es una **"acomodación que preserva la ignorancia"** en términos de Magnani. VIGÍA no afirma `MALICE` cuando no puede alcanzar "actual attainment" de la verdad. La formulación de p. 68 es de primera mano; la de Gabbay & Woods (p. 11) es la versión indirecta que Magnani cita como antecedente.
 
 ---
 
@@ -109,6 +116,17 @@
 > — Magnani, L. (2009). **p. 38** (sección 1.5.2)
 
 **Aplicación a VIGÍA:** El scoring por fracciones en `likelihood_ratio.py` es una forma de **model-based abduction**: opera sobre modelos numéricos internos (no sobre datos crudos), calculando preferencias entre hipótesis explicativas.
+
+---
+
+## 📌 CITA 11 — ABDUCCIÓN PARA GOBERNAR INCONSISTENCIAS
+
+> "abductive reasoning is appropriate for 'governing' inconsistencies."
+> — Magnani, L. (2009). **Prefacio, p. X**
+
+**Traducción:** "El razonamiento abductivo es apropiado para 'gobernar' inconsistencias."
+
+**Aplicación a VIGÍA:** Fundamenta directamente por qué VIGÍA detecta intención a través de inconsistencias entre artefactos forenses. Una entrada de prefetch sin binario correspondiente, un timestamp que viola la causalidad, un proceso hijo imposible — son *inconsistencies* en el sentido de Magnani. CAIE las cuantifica; el motor abductivo las "gobierna" produciendo la hipótesis que mejor las acomoda. Mapea sobre el concepto de fractura narrativa y el mecanismo de `ContradictionDetector`.
 
 ---
 
