@@ -16,8 +16,8 @@ def compute_darvo_penalty(artifacts: List[Any]) -> Fraction:
     zero_contact_count = 0
 
     for a in artifacts:
-        desc = getattr(a, 'description', '').lower()
-        etype = getattr(a, 'evidence_type', '')
+        desc = (getattr(a, 'description', '') or '').lower()
+        etype = getattr(a, 'evidence_type', None) or (getattr(a, 'metadata', {}) or {}).get('evidence_type', '')
 
         if etype in ('file_metadata', 'log_entry') and any(k in desc for k in SURVEILLANCE_KEYWORDS):
             surveillance_count += 1
