@@ -1,6 +1,6 @@
 # VIGÍA — Known Limitations
 
-**Version:** EBS v1 + P2 calibration | **Updated:** 2026-06-19
+**Version:** EBS v1 + P2 calibration | **Updated:** 2026-06-24
 **Applies to:** `github.com/annatchijova/vigia-intent-analysis`
 
 > VIGÍA does not claim to be infallible — it claims to be **auditable**.
@@ -821,6 +821,8 @@ Reproduce: `python3 run_all_agent.py --timeout 90`
 | L-025 | Devil's Advocate has no autonomous generator for unlabeled evidence | All live MALICE/INTENT findings | RESOLVED — see L-026 |
 | L-026 | Devil's Advocate generator wired in; 1 pre-fix corpus bundle flagged | VIGIA-REAL-SRL-DMZ-FTP | **RESOLVED** / documented exception |
 | L-027 | AbductiveIntentEngine call site in VigiaPipeline used wrong signature since birth | `vigia/pipeline/pipeline.py::run_full()` | **RESOLVED** 2026-06-22 — zero submission impact |
+| L-028 | Golden Rule LOG_VS_MEMORY requires metadata["verdict"] convention | `vigia/tools/caie.py` | **RESOLVED** 2026-06-24 |
+| L-029 | DARVO false flag victim signal dilution — agent fallback blind; scorer lacks false_flag verdict type | VIGIA-KIWI-001/002/003 | Real limitation — roadmap FW-009 |
 | — | Normalization schema mismatch | vigia_scorer.py | **RESOLVED** |
 | — | Gate G1 accepting legacy hashes | caie.py | **RESOLVED** |
 | — | Uniform prior_trust=0.7 in converter | convert_legacy_cases.py | **RESOLVED** |
@@ -1044,6 +1046,100 @@ to both vigia/tools/caie.py and vigia/tools/caie_legacy_root.py.
 **Discovered by:** Anna Tchijova + Claude + Kimi, red team audit, 2026-06-22.
 
 **Audited by:** Kimi (Moonshot AI), 2026-06-22.
+
+---
+
+## L-029 — DARVO_FALSE_FLAG_VICTIM_SIGNAL_DILUTION
+
+**Affects:** Agent fallback (deterministic, no LLM) — full failure; Scorer mode — partial
+**Status:** Real limitation — roadmap Intent Amplifier Layer
+**Severity:** HIGH
+**Discovered:** 2026-06-24 via VIGIA-KIWI trilogy stress test
+**Test cases:** `VIGIA-KIWI-001`, `VIGIA-KIWI-002-ZAPALLO-POV`, `VIGIA-KIWI-003-AT-POV`
+
+**Description:** In DARVO false flag cases where the real aggressor is the
+complainant, agent fallback emits `NO_SEMIOTIC_ANOMALY`. Scorer mode partially
+resolves: KIWI-003 (victim POV, `prior_trust=0.8`, verified evidence) reaches
+MALICE at 87% confidence. However, `expected_verdict: false_flag` is not a
+supported verdict type in scorer mode — the correct semantic classification
+cannot be emitted even when the scoring threshold is crossed.
+
+KIWI-002 (aggressor POV, `prior_trust=0.3`, unverified complainant testimony)
+correctly reaches ABSTAIN at 40% confidence — low trust propagates correctly
+through the Noisy-OR pipeline. This is the system working as designed.
+
+**Architectural note — VERDICT vs QUADRIPARTITE STATE:**
+
+VERDICT and QUADRIPARTITE STATE are distinct layers. KIWI-001 emits
+`VERDICT=SUSPICION` (score 0.2696 crosses the SUSPICION threshold) while
+`QUADRIPARTITE STATE=ABSTAIN` (confidence 54% insufficient for action). This
+is correct behavior: signal exists but evidence is insufficient for a reliable
+verdict. These two outputs are not contradictory — they operate at different
+abstraction layers of the pipeline.
+
+**Observed behavior by mode and case:**
+
+| Case | Agent fallback | Scorer VERDICT | Scorer confidence | Quadripartite | Assessment |
+|------|---------------|----------------|-------------------|---------------|------------|
+| KIWI-001 (combined) | NO_SEMIOTIC_ANOMALY | SUSPICION | 54% | ABSTAIN | Signal present, insufficient for action |
+| KIWI-002 (aggressor POV) | NO_SEMIOTIC_ANOMALY | SUSPICION | 40% | ABSTAIN (stability 30%) | Correct — low trust propagates |
+| KIWI-003 (victim POV) | NO_SEMIOTIC_ANOMALY | MALICE | 87% | — | Correct direction; false_flag unsupported |
+
+**Root cause (two distinct gaps):**
+
+1. **Agent fallback — cross-artifact blindness:** The Noisy-OR composite formula
+   treats each artifact as an independent event. The DARVO pattern is a
+   relationship between bundles (role inversion across KIWI-002 and KIWI-003),
+   not a property of any single artifact. Without cross-bundle Peircean Thirdness
+   reasoning, the inversion is structurally invisible.
+
+2. **Scorer mode — verdict vocabulary gap:** `vigia_scorer.py` verdict set is
+   `{NOISE, UNKNOWN, SUSPICION, INTENT, MALICE, ABSTAIN}`. `false_flag` is a
+   semantic classification that describes *who* is the aggressor relative to
+   *who* filed the complaint — a relational verdict that requires role attribution
+   context outside the artifact bundle schema. MALICE 87% on KIWI-003 is the
+   correct directional output given the current vocabulary.
+
+**Concrete failure (KIWI-001, agent fallback):**
+
+| Artifact | Type | raw_score | prior_trust | Fallback contribution |
+|----------|------|-----------|-------------|----------------------|
+| KIWI-001-A01 | cultural_marker | 0.3 | 0.8 | Low — below SUSPICION threshold |
+| KIWI-001-A03 | document_visual | 0.5 | 0.8 | Medium — insufficient for INTENT |
+| KIWI-001-A04 | file_metadata | 0.6 | 0.8 | Medium — no cross-artifact anchor |
+| KIWI-001-A02 | log_entry | 0.7 | 0.8 | Strong — single-type cap applies (L-008) |
+
+The cross-artifact signal invisible to the scorer: the complainant who accuses
+the victim of symbolic threats simultaneously operates a surveillance server
+(`log_entry` 0.7). The inversion of roles is the signal. Four independent data
+points in fallback; one DARVO pattern in LLM mode.
+
+**Forensic implication:** DARVO false flag cases will systematically produce
+`NO_SEMIOTIC_ANOMALY` in agent fallback. Even when scorer mode reaches MALICE
+on the victim's bundle, the `false_flag` classification cannot be emitted —
+the analyst receives an unsigned verdict without role attribution.
+
+**LLM-assisted mode:** Resolves via Peircean Thirdness cross-artifact analysis
+across the full trilogy. `infer_intent` applied to KIWI-002 + KIWI-003 as paired
+bundles identifies: complainant maintains active surveillance infrastructure
+(`prior_trust=0.3` claims vs `prior_trust=0.8` verified server logs) while
+filing harassment allegations. Thirdness: DARVO, Carnegie authority inversion,
+false-flag staging. Verdict emittable: MALICE with role-inversion notation.
+
+**Workaround (fallback):** Submit KIWI-002 and KIWI-003 as a paired bundle review.
+The `prior_trust` asymmetry (0.3 vs 0.8) with inverted role attribution is
+visible to a human analyst comparing both bundles. Document in the forensic
+report: DARVO detection requires LLM mode; fallback result is incomplete, not
+wrong in the harmful direction.
+
+**Roadmap:** Intent Amplifier Layer (FW-009) — DARVO pattern detector as
+post-scorer module over paired bundles. Inputs: cross-bundle role attribution
+fields, `prior_trust` asymmetry, temporal context (`contact_attempts_by_actor_b:
+0` over 3 years), honeypot access logs. Output: `DARVO_PATTERN` fracture feeding
+back into CAIE before final verdict emission. Secondary roadmap item: extend
+verdict vocabulary to include `false_flag` as a relational verdict type.
+
+**Discovered by:** Anna Tchijova, 2026-06-24, via VIGIA-KIWI trilogy stress test.
 
 ---
 
