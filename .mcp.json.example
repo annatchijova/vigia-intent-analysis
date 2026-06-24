@@ -1,0 +1,14 @@
+{
+  "mcpServers": {
+    "vigia": {
+      "command": "/path/to/vigia-repo/.venv/bin/python3",
+      "args": ["/path/to/vigia-repo/vigia/vigia_sift_bridge.py"],
+      "env": {
+        "VIGIA_EVIDENCE_DIR": "/path/to/vigia-repo/evidence",
+        "VIGIA_LLM_BACKEND": "anthropic",
+        "VIGIA_SYSTEM_PROMPT_PATH": "/path/to/vigia-repo/vigia/data/system_prompt_peirce_EN.md",
+        "VIGIA_HMAC_KEY_FILE": "/path/to/.vigia_secrets/hmac_key"
+      }
+    }
+  }
+}

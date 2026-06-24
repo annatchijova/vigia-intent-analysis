@@ -282,14 +282,62 @@ curl http://127.0.0.1:8000/health
 
 ---
 
-## 12. Claude Code integration
+## 12. Claude Code integration (MCP Server Setup)
 
-Claude Code can call VIGÍA directly as an MCP tool.
-See `docs/claude_code_integration.md` for full configuration.
+Claude Code connects to VIGÍA via the MCP bridge (`vigia_sift_bridge.py`).
+This is the primary interactive investigation mode — 21 forensic tools exposed
+as MCP functions, driven by the Peircean investigation playbook in `CLAUDE.md`.
 
-Quick start:
+### Step 1 — Create `.mcp.json` in the repo root
+
+This file is gitignored. Copy the provided template and adjust paths:
+
 ```bash
-# In one terminal: start VIGÍA
+cp .mcp.json.example .mcp.json
+# Edit .mcp.json and replace placeholder paths with your local clone path
+```
+
+The file must contain:
+
+```json
+{
+  "mcpServers": {
+    "vigia": {
+      "command": "/home/labestiadevigia/vigia-repo/.venv/bin/python3",
+      "args": ["/home/labestiadevigia/vigia-repo/vigia/vigia_sift_bridge.py"],
+      "env": {
+        "VIGIA_EVIDENCE_DIR": "/home/labestiadevigia/vigia-repo/evidence",
+        "VIGIA_LLM_BACKEND": "anthropic",
+        "VIGIA_SYSTEM_PROMPT_PATH": "/home/labestiadevigia/vigia-repo/vigia/data/system_prompt_peirce_EN.md",
+        "VIGIA_HMAC_KEY_FILE": "/home/labestiadevigia/.vigia_secrets/hmac_key"
+      }
+    }
+  }
+}
+```
+
+Replace all paths with your local clone path.
+
+### Step 2 — Start the MCP server
+
+```bash
+bash launch_vigia_mcp.sh
+```
+
+### Step 3 — Open Claude Code
+
+```bash
+claude
+```
+
+Claude Code reads `CLAUDE.md` and the VIGÍA MCP server connects automatically.
+All 21 tools (`generate_forensic_hash`, `infer_intent`, `validate_and_correct_analysis`,
+etc.) are available as MCP functions for the full Peircean investigation workflow.
+
+### Alternative: REST API quick start
+
+```bash
+# In one terminal: start VIGÍA REST API
 python3 vigia_api.py
 
 # In another terminal: point Claude Code to http://127.0.0.1:8000

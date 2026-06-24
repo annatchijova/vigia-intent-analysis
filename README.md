@@ -409,6 +409,41 @@ docker run vigia python3 -m pytest tests/ -v
 
 ---
 
+## MCP Server Setup (Claude Code Integration)
+
+### Prerequisites
+
+`.mcp.json` must exist in the repo root. This file is gitignored — create it manually:
+
+```json
+{
+  "mcpServers": {
+    "vigia": {
+      "command": "/home/labestiadevigia/vigia-repo/.venv/bin/python3",
+      "args": ["/home/labestiadevigia/vigia-repo/vigia/vigia_sift_bridge.py"],
+      "env": {
+        "VIGIA_EVIDENCE_DIR": "/home/labestiadevigia/vigia-repo/evidence",
+        "VIGIA_LLM_BACKEND": "anthropic",
+        "VIGIA_SYSTEM_PROMPT_PATH": "/home/labestiadevigia/vigia-repo/vigia/data/system_prompt_peirce_EN.md",
+        "VIGIA_HMAC_KEY_FILE": "/home/labestiadevigia/.vigia_secrets/hmac_key"
+      }
+    }
+  }
+}
+```
+
+Replace paths with your local clone path. A template is provided in [`.mcp.json.example`](./.mcp.json.example).
+
+### Starting the server
+
+```bash
+bash launch_vigia_mcp.sh
+```
+
+Then open Claude Code — the VIGÍA MCP server connects automatically.
+
+---
+
 ## Usage
 
 ### Autonomous end-to-end investigation (primary command)
