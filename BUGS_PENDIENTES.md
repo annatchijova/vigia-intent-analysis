@@ -125,3 +125,45 @@ pytest tests/ -k "serialization" -v --no-cov
 ```
 
 ---
+
+## B-003 — Terminología errónea "isotónica" en comentarios y logs de `pipeline.py`
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | RESUELTO |
+| **Archivo** | `vigia/pipeline/pipeline.py` |
+| **Función** | `VigiaPipeline.__init__()`, `VigiaPipeline.run()`, `run_vigia()` |
+| **Líneas corregidas** | 110, 207, 218, 464, 466, 479, 485, 487, 1303, 1305, 1332 |
+| **Commit fix** | `43edd73` |
+| **Detectado en** | Sesión post-hackathon 2026-06-24 |
+
+### Descripción
+
+Los comentarios y mensajes de log usaban "calibración isotónica" / "regresión isotónica"
+para describir el paso H28 (LRCalibrator). La calibración siempre fue
+`LogisticRegression` — nunca isotonic regression. La confusión terminológica
+provenía de un nombre de archivo de persistencia (`_isotonic.json`) que se copió
+en los comentarios sin revisión.
+
+### Impacto
+
+- Puramente documental / auditivo. Sin impacto en el comportamiento del pipeline.
+- El término incorrecto habría confundido a un revisor Daubert sobre el método
+  estadístico real empleado.
+
+### Fix aplicado
+
+Reemplazados todos los usos de "isotónica/isotónico/isotónicamente/isotonic_regression"
+en comentarios y strings de log por los términos correctos ("logística/logístico/
+logísticamente/logistic_regression"). Las rutas de archivo `_isotonic.json`
+(líneas 212 y 1311) no fueron modificadas — son identificadores de fichero,
+no terminología estadística.
+
+### Verificación
+
+```
+pytest tests/ -q --no-cov
+→ 163 passed, 6 xfailed
+```
+
+**APLICADO** 2026-06-24 — Commit: 43edd73.
