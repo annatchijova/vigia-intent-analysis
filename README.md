@@ -820,8 +820,9 @@ VIGÍA has one documented case:
 The full bundles are at:
 - `results/llm_mode/VIGIA-BREAK-012_llm_bundle.json`
 - `results/agent_batch/VIGIA-BREAK-012_agent_bundle.json`
+- `evidence/VIGIA-BREAK-012.json` — original input case file
 
-All 22 documented limitations are in [`KNOWN_LIMITATIONS.md`](./KNOWN_LIMITATIONS.md).
+All 28 documented limitations are in [`KNOWN_LIMITATIONS.md`](./KNOWN_LIMITATIONS.md).
 
 Every finding in VIGÍA traces to the specific tool execution that produced
 it via `audit_trail[].entry_sha256`. This is not a flawless-looking demo.
