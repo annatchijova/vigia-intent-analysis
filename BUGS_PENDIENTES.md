@@ -261,3 +261,50 @@ Verificación: 78 casos cargados, Brier Score 0.149, modelo guardado en
 `models/calibrated_lr.json` (raíz del repo).
 
 **APLICADO** 2026-06-24 — Commit: 10ced2c.
+
+---
+
+## B-006 — `LRCalibrator.load()` no valida `train_hash` contra el dataset actual
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | APLICADO |
+| **Archivo** | `vigia/core/lr_calibration.py` |
+| **Función** | `LRCalibrator.load()` |
+| **Línea original** | 455 |
+| **Commit fix** | 1db3360 |
+| **Detectado en** | Sesión post-hackathon 2026-06-24, revisión BUGS_PENDIENTES |
+
+### Descripción
+
+`LRCalibrator.load()` cargaba el calibrador serializado sin verificar que el
+`train_hash` almacenado en el JSON coincidiera con el dataset actualmente en uso.
+Esto permitía que un calibrador entrenado sobre un dataset diferente se cargara
+silenciosamente, produciendo probabilidades calibradas incorrectas sin ningún error
+ni advertencia — un fallo de trazabilidad Daubert.
+
+### Impacto forense
+
+Un calibrador desincronizado del dataset activo produce scores de verosimilitud
+incorrectos. En un contexto forense esto es inaceptable: los valores numéricos
+quedarían sin respaldo reproducible, invalidando la cadena de custodia.
+
+### Fix aplicado
+
+Se agregó el parámetro opcional `expected_train_hash: str = ""` a `load()`.
+
+- Si se pasa vacío (default), el comportamiento es idéntico al anterior — compatible
+  hacia atrás sin cambios en código existente.
+- Si se pasa un hash, se compara contra `cal._backend._train_hash` inmediatamente
+  antes del `return cal`. Si no coinciden, se lanza `ValueError` con mensaje
+  descriptivo que incluye ambos hashes y la instrucción de regenerar con
+  `scripts/run_calibration.py`.
+
+### Verificación
+
+```
+5/5 tests passed — vigia/tests/test_lr_calibrator_serialization.py
+Smoke test: load sin hash OK, load con hash correcto OK, load con hash incorrecto → ValueError OK
+```
+
+**APLICADO** 2026-06-24 — Commit: 1db3360.
