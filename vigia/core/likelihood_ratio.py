@@ -202,6 +202,10 @@ class LikelihoodEngine:
             calibration_note = ("log_lr = z²/2 (placeholder gaussiano — pendiente calibración empírica. "
                                 "Ver lr_calibration.py)")
 
+        # Confidence weighting: scale each log_lr by signal's prior_trust propagated value
+        for i, s in enumerate(signals):
+            log_lrs[i] *= s.confidence
+
         # Paso 3: Penalización por correlación
         mean_corr, correction_factor = self._compute_correction(
             signals, correlation_matrix
