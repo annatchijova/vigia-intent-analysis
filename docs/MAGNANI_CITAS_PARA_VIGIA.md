@@ -10,7 +10,7 @@
 ## 📌 CITA 1 — DEFINICIÓN DE ABDUCCIÓN MANIPULATIVA
 
 > "Manipulative abduction happens when we are thinking through doing and not only, in a pragmatic sense, about doing."
-> — Magnani, L. (2009). *Abductive Cognition*, Springer, **p. 60** (sección 1.6)
+> — Magnani, L. (2009). *Abductive Cognition*, Springer, **p. 39** (sección 1.6)
 
 **Traducción:** "La abducción manipulativa ocurre cuando pensamos a través del hacer y no solo, en sentido pragmático, sobre el hacer."
 
@@ -20,10 +20,10 @@
 
 ## 📌 CITA 2 — MEDIADORES EPISTÉMICOS
 
-> "Many external things, usually inert from the epistemological point of view, can be transformed into what I call epistemic mediators."
-> — Magnani, L. (2004/2009). *Abductive Cognition*, p. 221 (reafirmado en 2009)
+> "Manipulative abduction occurs when many external things, usually inert from the semiotic point of view, can be transformed into what in the first chapter I have called, in the case of scientific reasoning, 'epistemic mediators' that give rise to new signs, new chances for interpretants, and new interpretations."
+> — Magnani, L. (2004/2009). *Abductive Cognition*, p. 174 (reafirmado en 2009)
 
-**Traducción:** "Muchas cosas externas, normalmente inertes desde el punto de vista epistemológico, pueden transformarse en lo que llamo mediadores epistémicos."
+**Traducción:** "La abducción manipulativa ocurre cuando muchas cosas externas, normalmente inertes desde el punto de vista semiótico, pueden transformarse en lo que en el primer capítulo he llamado, en el caso del razonamiento científico, 'mediadores epistémicos' que dan lugar a nuevos signos, nuevas oportunidades para interpretantes y nuevas interpretaciones."
 
 **Aplicación a VIGÍA:** Un registro SAM, una entrada de prefetch, un shellbag — son "inertes" epistemológicamente hasta que el detector los manipula. El parseo los convierte en **mediadores epistémicos** que generan hipótesis.
 
@@ -88,7 +88,7 @@
 ## 📌 CITA 8 — LA CREATIVIDAD NO ES IRRACIONAL
 
 > "Creativity and discovery are no longer seen as mysterious irrational processes, but, thanks to constructive accounts, they are viewed as complex relationships among different inferential steps that can be clearly analyzed and identified."
-> — Magnani, L. (2009). **p. 2**
+> — Magnani, L. (2009). **Prefacio, p. XI**
 
 **Aplicación a VIGÍA:** VIGÍA es una **"constructive account"** de la abducción forense. No es magia, no es ML, es un pipeline de pasos inferenciales claramente analizables.
 
