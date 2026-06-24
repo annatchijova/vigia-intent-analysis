@@ -818,7 +818,7 @@ VIGÍA has one documented case:
   timestamp, and full audit_trail. Not a claim. A cryptographic fact.
 
 The full bundles are at:
-- `results/llm_mode/VIGIA-BREAK-012_llm_bundle.json`
+- `results/agent_batch/VIGIA-BREAK-012_llm_bundle.json`
 - `results/agent_batch/VIGIA-BREAK-012_agent_bundle.json`
 - `evidence/VIGIA-BREAK-012.json` — original input case file
 

@@ -799,7 +799,7 @@ VIGÍA tiene un caso documentado:
   timestamp y audit_trail completo. No es una afirmación. Es un hecho criptográfico.
 
 Los bundles completos están en:
-- `results/llm_mode/VIGIA-BREAK-012_llm_bundle.json`
+- `results/agent_batch/VIGIA-BREAK-012_llm_bundle.json`
 - `results/agent_batch/VIGIA-BREAK-012_agent_bundle.json`
 - `evidence/VIGIA-BREAK-012.json` — archivo de caso original
 
