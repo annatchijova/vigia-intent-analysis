@@ -308,3 +308,19 @@ Smoke test: load sin hash OK, load con hash correcto OK, load con hash incorrect
 ```
 
 **APLICADO** 2026-06-24 — Commit: 1db3360.
+
+---
+
+## B-007 — Floats P0 introducidos por Claude Code en el scorer (descartado)
+
+**Estado:** DESCARTADO — nunca llegó al repositorio.
+
+**Descripción:** Durante una sesión con Claude Code se detectó que el código
+generado introducía ~10 violaciones P0 (floats en el scoring path) en algo
+relacionado al scorer. Al identificarlo se descartó el código completo antes
+de hacer cualquier commit. Git nunca vio el cambio. El scorer en HEAD mantiene
+las tablas Fraction (`_SUPPORT_SCORE_TABLE`, `_EXP_NEG2_TABLE`, `_EPC_FACTOR_TABLE`)
+intactas tal como quedaron en el P0 patch 2026-06-14 (commit 1807529).
+
+**Lección:** Validar siempre con `grep -n "math\.log\|math\.exp\|[0-9]\.[0-9]"
+vigia_scorer.py` antes de aceptar cualquier cambio al scoring path.
