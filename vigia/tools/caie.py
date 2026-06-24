@@ -720,6 +720,70 @@ def _caie_hmac_sign_canonical(canonical: str) -> str:
         del key
 
 
+def _extract_assertions(artifact: "Artifact") -> frozenset:
+    """
+    Translate observable metadata fields into atomic forensic assertion
+    strings. Returns facts about what the artifact claims — not
+    interpretations, not scores, not verdicts.
+
+    Deterministic contract: same artifact input → same frozenset output,
+    always. This is what allows Rule 2 (LOG_VS_MEMORY) to operate on
+    observed facts rather than derived verdicts (L-028 fix).
+
+    Three assertion domains are intentionally kept separate:
+      - network activity  (for LOG_VS_MEMORY / NETWORK_VS_HOST)
+      - process state     (for process-level cross-correlation)
+      - memory integrity  (for injection / kernel anomaly rules)
+
+    memory_appears_clean is NOT used by Rule 2. Rule 2 uses only
+    memory_shows_no_network_activity, which compares the same domain
+    as log_claims_outbound_connection (network activity).
+    """
+    meta = artifact.metadata
+    et   = artifact.evidence_type
+    assertions = set()
+
+    if et == "log_entry":
+        # Outbound/target connection: dst_ip or dest_ip
+        # Note: "ip" alone (HTTP access log source field) is intentionally
+        # excluded — it identifies the requester, not a suspicious outbound
+        # connection. Mixing these was the original source of false positives.
+        if meta.get("dst_ip") or meta.get("dest_ip"):
+            assertions.add("log_claims_outbound_connection")
+        if meta.get("pid"):
+            assertions.add("log_names_process")
+        target = str(meta.get("target", "")).lower()
+        if "lsass" in target or meta.get("credential_dump"):
+            assertions.add("log_claims_credential_access")
+
+    elif et in ("memory_process", "lsass_session", "kernel_structure"):
+        has_network = bool(
+            meta.get("dest_ip") or
+            meta.get("source_ip") or
+            meta.get("network_connections")
+        )
+        if has_network:
+            assertions.add("memory_shows_network_activity")
+        else:
+            assertions.add("memory_shows_no_network_activity")
+
+        if meta.get("injections_detected") or meta.get("injected_pid"):
+            assertions.add("memory_shows_injection")
+        if meta.get("kernel_anomalies") or meta.get("kernel_anomaly"):
+            assertions.add("memory_shows_kernel_anomaly")
+        if meta.get("pid"):
+            assertions.add("memory_shows_process_present")
+        # General cleanliness assertion (not used by Rule 2 directly)
+        if not any(meta.get(k) for k in (
+            "injections_detected", "injected_pid",
+            "kernel_anomalies", "kernel_anomaly",
+            "dest_ip", "source_ip", "network_connections"
+        )):
+            assertions.add("memory_appears_clean")
+
+    return frozenset(assertions)
+
+
 class CrossArtifactIncongruenceEngine:
     """
     Kimi's Cross-Artifact Incongruence Engine — EXPANDED v2.0 [DETERMINISTIC].
@@ -1014,25 +1078,44 @@ class CrossArtifactIncongruenceEngine:
                     ttp_id="T1070.006",
                 ))
 
-        # Rule 2: Log claims contradicted by memory
+        # Rule 2: Log claims contradicted by memory — L-028 fix
+        # Operates on observable facts (assertions), not on derived verdicts.
+        # Existence of fracture: purely logical (log claims network activity,
+        # memory shows no network activity → structural contradiction).
+        # Severity: modulated by PID correlation (same process referenced
+        # in both artifacts = stronger contradiction).
         if logs and technical:
-            log_verdicts = {a.metadata.get("verdict") for a in logs} - {None, "NOISE"}
-            tech_verdicts = {a.metadata.get("verdict") for a in technical}
+            log_assertions  = frozenset().union(*(_extract_assertions(a) for a in logs))
+            tech_assertions = frozenset().union(*(_extract_assertions(a) for a in technical))
 
-            if log_verdicts and "NOISE" in tech_verdicts and len(tech_verdicts) == 1:
+            log_claims_activity = "log_claims_outbound_connection" in log_assertions
+            memory_silent       = "memory_shows_no_network_activity" in tech_assertions
+
+            if log_claims_activity and memory_silent:
+                # PID correlation: same process named in log and present in
+                # memory → contradiction is intra-process, not just cross-source
+                log_pids  = {a.metadata.get("pid") for a in logs    if a.metadata.get("pid")}
+                tech_pids = {a.metadata.get("pid") for a in technical if a.metadata.get("pid")}
+                pid_overlap = log_pids & tech_pids
+
+                severity = _dround(0.95 if pid_overlap else 0.75, _DETERMINISTIC_INTERNAL_PREC)
+
                 self._fractures.append(Fracture(
-                    artifact_a=f"Log evidence claims: {log_verdicts}",
-                    artifact_b="Memory/kernel evidence: all NOISE (no corroboration)",
+                    artifact_a=f"Log evidence asserts outbound network activity",
+                    artifact_b="Memory/kernel evidence: no network activity observed",
                     fracture_type="LOG_VS_MEMORY",
-                    severity=0.9,
+                    severity=severity,
                     interpretation=(
-                        "Logs claim suspicious activity but memory shows no trace. "
+                        "Logs assert network activity but memory shows no trace. "
                         "Structural impossibility: if the activity happened, memory "
-                        "MUST contain traces (LSASS sessions, network objects). "
-                        "Their absence proves the logs were fabricated."
+                        "MUST contain network objects (sockets, connections). "
+                        "Their absence indicates log fabrication. "
+                        + (f"PID overlap {pid_overlap}: same process named in both sources — "
+                           "contradiction is intra-process." if pid_overlap else
+                           "No shared PID: contradiction is cross-source.")
                     ),
                     spoofability_delta=_dround(0.85 - 0.15, _DETERMINISTIC_INTERNAL_PREC),
-                    ttp_id="T1070.001",  # Clear Windows Event Logs
+                    ttp_id="T1070.001",
                 ))
 
         # Rule 3: Verdict conflict between tools
