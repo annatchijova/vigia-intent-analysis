@@ -1,0 +1,118 @@
+{
+  "case_id": "VIGIA-KIWI-001",
+  "case_name": "VIGIA-KIWI-001 False Flag Stress Test",
+  "schema_version": "ebs_v1",
+  "investigator": "VIGÍA Autonomous Agent (Claude Code + MCP / Anthropic)",
+  "mode": "claude_code",
+  "llm_backend": "anthropic",
+  "llm_fallback": true,
+  "session_start": "2026-06-24T16:32:40.724087Z",
+  "sealed_at": "2026-06-24T16:39:09.553730Z",
+  "sans_phase": "Phase 4 — Validation (Post-CAIE, Pre-Verdict)",
+  "case_origin": "MPF7779408",
+  "evidence_file": "scripts/VIGIA_KIWI_001.json",
+  "evidence_sha256": "114a73c667abffe94f4fd4210579383b033207b168f1c00f06b187eff45a3d1b",
+  "evidence_size_bytes": 7001,
+  "hashes": {
+    "bundle_hash":             "28de02f9751e568cd179929d321f6be238b8a62293fc742d2dcc14de56b7c313",
+    "decision_hash":           "3e4cb6d7c868e12eabc695941e051598cc82b7ce42bf8cced1d203fad2f86c42",
+    "engine_attestation_hash": "cf550ce92190c7caf6d15b40faaa4ad78e5c78fecc7245ff736d9ae2394f6865",
+    "graph_hash":              "94147b51c639cd0c5f361fc885bdd59a257ffaf3f770203ff7b7a3a787b57f53"
+  },
+  "bundle_verification": "PASSED",
+  "verdict": "SUSPICION",
+  "confidence_pct": 72,
+  "expected_verdict": "SUSPICION",
+  "verdict_match": true,
+  "pipeline": {
+    "decision": "REJECT",
+    "decision_reason": "REJECT_POSTERIOR",
+    "posterior": 1e-06,
+    "risk_score": 2.999997,
+    "caie_composite_score": 0.0137,
+    "caie_fractures_automated": 0,
+    "caie_fractures_manual": 5,
+    "caie_structural_verdict": "NOISE",
+    "consistency_score": 1.0,
+    "darvo_gate": "INFERRED_MANUAL",
+    "inference_mode": "CALIBRATED",
+    "drift_score_psi": 1.0
+  },
+  "artifacts": {
+    "count": 4,
+    "evidence_types": ["mixed — cultural_marker, file_metadata, log_entry"]
+  },
+  "fractures": [
+    {
+      "code": "FC-1",
+      "type": "SYMBOLIC_FALSE_FLAG",
+      "status": "CONFIRMED",
+      "description": "Chromatic mismatch (brown weapon vs bright-green logo); quantitative mismatch (multiple whole kiwis vs single cut kiwi logo); explicit legal text contradicts claimed violent intent"
+    },
+    {
+      "code": "FC-2",
+      "type": "SELF_INCRIMINATING_EVIDENCE_INVERSION",
+      "status": "CONFIRMED",
+      "description": "Server submitted as evidence documents submitter's own conduct — credentials self-provided by actor_A in judicial documentation"
+    },
+    {
+      "code": "FC-3",
+      "type": "CONTACT_IMPOSSIBILITY",
+      "status": "CONFIRMED",
+      "description": "imputada_contact_attempts_verified=0 over 3 years — structurally incompatible with active hostigamiento narrative"
+    },
+    {
+      "code": "FC-4",
+      "type": "UNILATERAL_SURVEILLANCE",
+      "status": "CONFIRMED",
+      "description": "Actor_A accessed imputada's networks via anonymous app (60/day) while restraining order in effect — inverts documented surveillance direction"
+    },
+    {
+      "code": "FC-5",
+      "type": "DARVO_PATTERN",
+      "status": "INFERRED",
+      "description": "Deny surveillance, Attack via judicial system, Reverse: actor_A occupies victim role while executing 60-accesses/day monitoring with active cautelar. Automated DARVO gate gap documented (metadata integration)."
+    }
+  ],
+  "darvo": {
+    "fired": true,
+    "method": "manual",
+    "automated_consistency_score": 1.0,
+    "automated_gap_reason": "evidence_type stored in SignalOutput.metadata, not direct attribute — darvo_detector cannot access without metadata lookup layer"
+  },
+  "grice_audit": {
+    "verdict": "SUSPICION",
+    "score_raw": 30.0,
+    "probability_deception": 0.3,
+    "violation_type": "TACTICAL_EVASION",
+    "maxim_violated": "RELATION"
+  },
+  "eco_overinterpretation": "NORMAL_DISTRIBUTION",
+  "infer_intent_result": "NOISE",
+  "refutation_gate": {
+    "candidate_verdict": "INTENT",
+    "gate_applied": "Daubert Corroboration Gate",
+    "gate_rule": "LLM FALLBACK; automated CAIE z-scores < 2.0; DARVO automated confirmation not achieved (metadata integration gap)",
+    "gate_result": "REJECTED pre-emission — emitted as SUSPICION",
+    "darvo_status": "INFERRED not CONFIRMED"
+  },
+  "mitre_ttps": ["T1036"],
+  "carnegie_patterns": ["False Specificity", "Authority inversion"],
+  "known_limitations": [
+    "LLM FALLBACK: reason_with_llm and validate_and_correct_analysis returned empty",
+    "DARVO automation gap: evidence_type in metadata not accessible as direct SignalOutput attribute",
+    "generate_forensic_hash MCP tool blocked scripts/ path — SHA-256 via sha256sum CLI",
+    "darvo_detector.py:19 None.lower() crash fixed during run",
+    "pipeline.py:1258 description field dropped — fixed during run"
+  ],
+  "tool_execution_log": [
+    {"seq": 1, "tool": "sha256sum (CLI)",               "target": "VIGIA_KIWI_001.json",       "result_summary": "114a73c6... 7001 bytes — GENESIS"},
+    {"seq": 2, "tool": "detect_eco_overinterpretation", "target": "4 artifacts",                "result_summary": "NORMAL_DISTRIBUTION, obvious_ratio=0.0"},
+    {"seq": 3, "tool": "audit_grice_maxims",            "target": "actor_A declarations",       "result_summary": "SUSPICION, p=0.30, TACTICAL_EVASION/RELATION"},
+    {"seq": 4, "tool": "infer_intent",                  "target": "KIWI-001 behavioral corpus", "result_summary": "NOISE — 0 escalation signals in 3 messages"},
+    {"seq": 5, "tool": "reason_with_llm",               "target": "Full CAIE + DARVO evidence", "result_summary": "FALLBACK — empty response"},
+    {"seq": 6, "tool": "validate_and_correct_analysis", "target": "Accumulated evidence",       "result_summary": "FALLBACK — empty response"},
+    {"seq": 7, "tool": "run_vigia (Python CLI)",        "target": "4 SignalOutput artifacts",   "result_summary": "REJECT, posterior=1e-6, bundle sealed"},
+    {"seq": 8, "tool": "contradiction_detector",        "target": "F-005 DARVO",                "result_summary": "BEFORE: CONFIRMED CANDIDATE | AFTER: INFERRED | REASON: metadata integration gap"}
+  ]
+}

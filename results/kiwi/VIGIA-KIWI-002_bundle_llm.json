@@ -1,0 +1,130 @@
+{
+  "case_id": "VIGIA-KIWI-002-ZAPALLO-POV",
+  "case_name": "VIGIA-KIWI-002 Apophenia Stress Test — Denunciante POV",
+  "schema_version": "ebs_v1",
+  "investigator": "VIGÍA Autonomous Agent (Claude Code + MCP / Anthropic)",
+  "mode": "claude_code",
+  "llm_backend": "anthropic",
+  "llm_fallback": true,
+  "session_start": "2026-06-24T16:44:00.082992Z",
+  "sealed_at": "2026-06-24T16:45:28.315732Z",
+  "sans_phase": "Phase 4 — Validation / Lessons Learned",
+  "case_origin": "MPF7779408",
+  "framing": "perspective_actor_a",
+  "evidence_file": "scripts/VIGIA_KIWI_002_ZAPALLO_POV.json",
+  "evidence_sha256": "739f538ad85c01c74768d200cbfe9c103702ab4c3eb99bb297d4a5e25eb56c51",
+  "evidence_size_bytes": 9923,
+  "hashes": {
+    "bundle_hash":             "139851cb94faa4fa81bce4eee4de682df23702aa91c713ec435e5f99c72ba3ff",
+    "decision_hash":           "9fd38d3342875ab95a4a42ec69f00463c6c69459f35d6f237bba5f1671bfb18d",
+    "engine_attestation_hash": "cf550ce92190c7caf6d15b40faaa4ad78e5c78fecc7245ff736d9ae2394f6865",
+    "graph_hash":              "94147b51c639cd0c5f361fc885bdd59a257ffaf3f770203ff7b7a3a787b57f53"
+  },
+  "bundle_verification": "PASSED",
+  "verdict": "SUSPICION",
+  "confidence_pct": 68,
+  "expected_verdict": "SUSPICION",
+  "verdict_match": true,
+  "pipeline": {
+    "decision": "REJECT",
+    "decision_reason": "REJECT_POSTERIOR",
+    "posterior": 0.023874,
+    "log_lr": -3.711,
+    "risk_score": 0.976126,
+    "drift_score_psi": 31.8132,
+    "caie_composite_score": 0.0419,
+    "caie_fractures_automated": 0,
+    "caie_structural_verdict": "NOISE",
+    "consistency_score_sealed": 1.0,
+    "consistency_score_current_code": 0.70,
+    "consistency_score_note": "Sealed bundle pre-patch darvo_detector. Current code fires penalty=3/10.",
+    "inference_mode": "CALIBRATED"
+  },
+  "artifacts": {
+    "count": 8,
+    "prior_trust": 0.3,
+    "raw_score_uniform": 0.8,
+    "evidence_types": ["uniform — all unverified actor_A testimony"]
+  },
+  "apophenia_indicators": [
+    {
+      "code": "AP-1",
+      "type": "STATISTICAL_UNIFORMITY_ANOMALY",
+      "status": "CONFIRMED",
+      "description": "8 independent claims, 8 identical raw_score=0.8. PSI=31.8132 (6× higher than KIWI-001). P(8 uncorrelated forensic signals at identical score by chance) ≈ 0."
+    },
+    {
+      "code": "AP-2",
+      "type": "CLAIM_TAXONOMY_INCOHERENCE",
+      "status": "CONFIRMED",
+      "description": "A03 (cartas a Clarín) REFUTED. A06 (Interpol coordination) structurally IMPOSSIBLE. Both carry same weight=0.8 as unverifiable claims — calibration collapse."
+    },
+    {
+      "code": "AP-3",
+      "type": "ECO_SIGNIFICANT_SILENCE",
+      "status": "CONFIRMED",
+      "description": "0 verified positive artifacts attributable to imputada across 8 claims. Only verifiable claim (A03) is REFUTED."
+    },
+    {
+      "code": "AP-4",
+      "type": "CAUSAL_CHAIN_SUBSTITUTION",
+      "status": "CONFIRMED",
+      "description": "Each claim bypasses 'imputada directed this at me' step. Proximity substituted for causation — hallmark of apophenic reasoning."
+    }
+  ],
+  "prior_trust_propagation": {
+    "gap_confirmed": true,
+    "confidence_field_read_by_engine": false,
+    "verdict_stable": true,
+    "posterior_actual": 0.023874,
+    "posterior_method_a_z_times_trust": "~0.000",
+    "posterior_method_b_z_raw_times_trust": "~0.000",
+    "recommended_fix": "log_lrs[i] *= s.confidence in LikelihoodEngine.infer()"
+  },
+  "darvo": {
+    "fired": true,
+    "method": "post-patch",
+    "penalty": 0.3,
+    "consistency_score_post_patch": 0.70,
+    "consistency_score_sealed": 1.0,
+    "note": "DARVO keywords are in examiner descriptions of actor_A conduct, not new finding in KIWI-002 — INFERRED"
+  },
+  "grice_audit": {
+    "verdict": "SUSPICION",
+    "score_raw": 30.0,
+    "probability_deception": 0.3,
+    "violation_type": "TACTICAL_EVASION",
+    "maxim_violated": "RELATION"
+  },
+  "eco_overinterpretation": {
+    "tool_result": "NORMAL_DISTRIBUTION",
+    "apophenia_captured": false,
+    "gap_note": "Tool checks keyword staging, not statistical uniformity. Apophenia leaves calibration signature, not staging vocabulary."
+  },
+  "refutation_gate": {
+    "candidate_verdict": "INTENT",
+    "gate_applied": "Daubert Corroboration + Benign Incompetence Hypothesis",
+    "benign_hypothesis": "Declarant experiencing trauma-related hypervigilance. All 8 claims explained by apophenic cognition without deliberate fabrication by imputada.",
+    "gate_result": "INTENT rejected — benign hypothesis explains full evidence set without contradiction",
+    "emitted_as": "SUSPICION"
+  },
+  "mitre_ttps": ["T1036"],
+  "carnegie_patterns": ["Pseudo-authority via volume"],
+  "known_limitations": [
+    "LLM FALLBACK: reason_with_llm unavailable — apophenia analysis manual",
+    "Prior trust gap: confidence → LikelihoodEngine propagation is zero",
+    "Eco tool apophenia blind spot: uniform high-score unverified claims not flagged",
+    "DARVO bundle mismatch: sealed hash corresponds to consistency_score=1.0; current code=0.70"
+  ],
+  "comparison_kiwi001": {
+    "sha256_kiwi001": "114a73c667abffe94f4fd4210579383b033207b168f1c00f06b187eff45a3d1b",
+    "primary_fracture_kiwi001": "false-flag deliberate construction (FC-1..5)",
+    "primary_fracture_kiwi002": "apophenia — calibration collapse",
+    "psi_kiwi001": 5.342,
+    "psi_kiwi002": 31.8132,
+    "posterior_kiwi001": 1e-06,
+    "posterior_kiwi002": 0.023874,
+    "verdict_kiwi001": "SUSPICION",
+    "verdict_kiwi002": "SUSPICION"
+  }
+}

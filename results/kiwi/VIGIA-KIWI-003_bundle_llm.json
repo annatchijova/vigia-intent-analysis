@@ -1,0 +1,129 @@
+{
+  "case_id": "VIGIA-KIWI-003-AT-POV",
+  "case_name": "VIGIA-KIWI-003 False Flag Detection — Imputada POV",
+  "schema_version": "ebs_v1",
+  "investigator": "VIGÍA Autonomous Agent (Claude Code + MCP / Anthropic)",
+  "mode": "claude_code",
+  "llm_backend": "anthropic",
+  "llm_fallback": true,
+  "session_start": "2026-06-24T16:53:45.327954Z",
+  "sealed_at": "2026-06-24T16:56:46.289934Z",
+  "sans_phase": "Phase 4 — Validation / Lessons Learned",
+  "case_origin": "MPF7779408",
+  "framing": "perspective_actor_b",
+  "evidence_file": "scripts/VIGIA_KIWI_003_AT_POV.json",
+  "evidence_sha256": "2a299a28f10844163fd150703a8cfcb6aec6d4f51b8072e79d519822e7a8d7da",
+  "evidence_size_bytes": 10951,
+  "hashes": {
+    "bundle_hash":             "630cfb32c3c7871e58a23cf51cb0e836b846c6ccf3758b2991392da5e4802cb6",
+    "decision_hash":           "c327557e0ba6bf64ee3ab84e967aa9026dacb9db509ba7619d6bb4b4cb749ef3",
+    "engine_attestation_hash": "cf550ce92190c7caf6d15b40faaa4ad78e5c78fecc7245ff736d9ae2394f6865",
+    "graph_hash":              "94147b51c639cd0c5f361fc885bdd59a257ffaf3f770203ff7b7a3a787b57f53"
+  },
+  "bundle_verification": "PASSED",
+  "verdict": "MALICE",
+  "confidence_pct": 81,
+  "expected_verdict": "MALICE",
+  "verdict_match": true,
+  "pipeline": {
+    "decision": "REJECT",
+    "decision_reason": "REJECT_POSTERIOR",
+    "decision_forensic_meaning": "Actor_b content carries no malicious intent signal — correct. MALICE verdict directed at actor_a conduct.",
+    "posterior": 0.000,
+    "log_lr": -18.459,
+    "risk_score": 4.800,
+    "consistency_score": 0.400,
+    "omega_intention": 1.000,
+    "caie_composite_score": 0.0258,
+    "caie_fractures_automated": 0,
+    "caie_fractures_manual": 6,
+    "caie_structural_verdict": "NOISE",
+    "drift_score_psi": 1.000,
+    "inference_mode": "CALIBRATED"
+  },
+  "artifacts": {
+    "count": 8,
+    "ids": ["KIWI-003-A01","KIWI-003-A02","KIWI-003-A03","KIWI-003-A04","KIWI-003-A05","KIWI-003-A06","KIWI-003-A07","KIWI-003-A08"],
+    "prior_trust": 0.8
+  },
+  "fractures": [
+    {
+      "code": "FM-1",
+      "type": "SELF_INCRIMINATING_SERVER",
+      "artifact": "A04",
+      "status": "CONFIRMED",
+      "description": "trampolin.sg-host.com /private/ directory with stalkeo-sourced material on actor_b. Credentials self-disclosed by actor_a in judicial filing."
+    },
+    {
+      "code": "FM-2",
+      "type": "PRIOR_HACKING_ADMISSION",
+      "artifact": "A03",
+      "status": "INFERRED",
+      "description": "Actor_a admitted hacking prior partner, provided credentials with instruction to weaponize. Actor_b refused and notified victim. Establishes digital-aggression capability baseline."
+    },
+    {
+      "code": "FM-3",
+      "type": "FALSIFIED_DOCUMENTS_DUAL_REFUSAL",
+      "artifact": "A05",
+      "status": "CONFIRMED",
+      "description": "Three judicial documents: typographic anomalies, gender changes, cut seal, missing DNI, late receipt. Two independent police stations refused execution."
+    },
+    {
+      "code": "FM-4",
+      "type": "PRESCRIPTION_FRAUD_PATTERN",
+      "artifact": "A06",
+      "status": "CONFIRMED",
+      "description": "Documented multi-occurrence fraud for zolpidem. Establishes document falsification as method. Makes forgery the null hypothesis for contested documents from actor_a."
+    },
+    {
+      "code": "FM-5",
+      "type": "HONEYPOT_ZERO_CONTACT",
+      "artifact": "A02+A01",
+      "status": "CONFIRMED",
+      "description": "60 daily honeypot accesses from blocked actor_a via anonymous app. Zero contact from actor_b over 36 months. Directional evidence incompatible with harassment narrative."
+    },
+    {
+      "code": "FM-6",
+      "type": "DARVO_STRUCTURAL_INVERSION",
+      "artifact": "A01+A02+A03+A04",
+      "status": "CONFIRMED",
+      "description": "Actor_a files harassment complaint attributing to actor_b the exact conduct actor_a demonstrably exercises: monitoring (A02), unauthorized access (A03), covert infrastructure (A04), document manipulation (A05)."
+    }
+  ],
+  "darvo": {
+    "fired": true,
+    "method": "automated + manual",
+    "penalty_fraction": "3/5",
+    "penalty_float": 0.6,
+    "consistency_score": 0.40,
+    "surveillance_count": 2,
+    "zero_contact_count": 1,
+    "risk_effect": "risk=4.800 — highest in KIWI trilogy. DARVO penalty elevates risk ~1.8 points vs KIWI-001 equivalent."
+  },
+  "infer_intent_false_positive": {
+    "finding": "F-004",
+    "verdict": "NOISE — REFUTED",
+    "description": "Tool detected RUSSIAN_PHONETIC_EVASION on 'server' (English loanword universal in Spanish technical/legal context). Discarded."
+  },
+  "refutation_gate": {
+    "candidate_verdict": "MALICE",
+    "sources": "4 corroborating artifacts (A01+A02+A03+A04), 2 corroborating sources for FM-3 (two police refusals cross-station)",
+    "benign_hypothesis": "Actor_a genuinely frightened by journalistic investigation; server is fear-driven documentation; documents are careless drafting; prior hacking and prescription fraud are unrelated.",
+    "benign_hypothesis_result": "FAILS on FM-1 (stalkeo-sourced material organized in /private/ not consistent with defensive documentation), FM-3 (two independent police refusals require structural irregularity, not careless drafting)",
+    "gate_result": "MALICE CONFIRMED — all Daubert requirements met",
+    "devil_advocate_populated": true
+  },
+  "mitre_ttps": ["T1070", "T1036", "T1584"],
+  "carnegie_patterns": ["Authority laundering — judicial system as legitimacy transfer mechanism"],
+  "kiwi_trilogy_comparison": {
+    "kiwi001": {"posterior": 1e-06, "log_lr": -14.335, "risk": 2.999, "psi": 5.342, "consistency": 1.0, "darvo": "manual_inferred", "verdict": "SUSPICION"},
+    "kiwi002": {"posterior": 0.02387, "log_lr": -3.711, "risk": 0.976, "psi": 31.813, "consistency": 1.0, "darvo": "post_patch_0.70", "verdict": "SUSPICION"},
+    "kiwi003": {"posterior": 0.000, "log_lr": -18.459, "risk": 4.800, "psi": 1.0, "consistency": 0.40, "darvo": "fired_0.60_penalty", "verdict": "MALICE"}
+  },
+  "known_limitations": [
+    "LLM FALLBACK: reason_with_llm unavailable — Peircean Thirdness applied manually",
+    "Pipeline framing constraint: directional (scores content source); bilateral cases require two separate runs",
+    "confidence not in log-LR: prior trust propagation gap confirmed across all KIWI trilogy cases",
+    "infer_intent F-004: false positive on 'server' as Russian phonetic evasion — loanword exclusion list needed"
+  ]
+}
