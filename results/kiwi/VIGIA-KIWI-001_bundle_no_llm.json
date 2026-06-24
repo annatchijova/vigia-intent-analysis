@@ -1,0 +1,240 @@
+{
+  "bundle_id": "VIGIA-KIWI-001",
+  "bundle_version": "ebs_v1",
+  "schema_version": "ebs_v1",
+  "case_id": "VIGIA-KIWI-001",
+  "case_name": "VIGIA-KIWI-001 False Flag Stress Test",
+  "investigator": "VIGÍA Autonomous Agent (Claude Code / claude-sonnet-4-6)",
+  "mode": "FALLBACK (LLM tools non-operational — ANTHROPIC_API_KEY not in MCP process)",
+  "sealed_at": "2026-06-24T18:09:00.000000Z",
+  "sans_phase": "Identification → Containment (PICERL)",
+  "chain_of_custody": {
+    "primary_artifact": "scripts/VIGIA_KIWI_001.json",
+    "sha256": "114a73c667abffe94f4fd4210579383b033207b168f1c00f06b187eff45a3d1b",
+    "file_size_bytes": 7001,
+    "acquisition_timestamp": "2026-06-24T18:04:48.199836Z",
+    "hash_method": "sha256sum (fallback: MCP generate_forensic_hash blocked — path outside evidence base)",
+    "write_blocker": false,
+    "limitation": "VIGIA_EVIDENCE_DIR not configured; MCP path guard blocked scripts/ directory. Hash integrity preserved via sha256sum."
+  },
+  "overall_verdict": "SUSPICION",
+  "expected_verdict": "SUSPICION",
+  "verdict_match": true,
+  "findings": [
+    {
+      "finding_id": "F-001",
+      "title": "Grice Maxim of Relation violation: Tactical Evasion in Actor A testimony",
+      "verdict": "SUSPICION",
+      "confidence": "MEDIUM",
+      "status": "INFERRED",
+      "artifact": "Actor A testimony — 5 statements",
+      "tools_used": [
+        "audit_grice_maxims"
+      ],
+      "firstness": "Actor A presents 5 testimonial claims. Each claim attributes threatening intent to Actor B based on symbolic association (color, shape, lyric content). No direct communication artifact cited.",
+      "secondness": "Grice Maxim of Relation violated: testimony systematically omits the structurally relevant facts (Actor A server, Actor A daily honeypot access, zero contact from Actor B). Deception probability 0.30. TACTICAL_EVASION pattern.",
+      "thirdness": "Deliberate or unconscious Red Herring: foregrounding subjective symbolic interpretation to displace attention from the observable surveillance inversion. Consistent with Carnegie False Authority pattern: judicial submission as legitimacy scaffold for unverifiable claims.",
+      "carnegie": "False Authority — judicial process as legitimacy transfer for unverifiable symbolic interpretation",
+      "mitre_ttps": [
+        "T1036 (Masquerading — social/legal layer)"
+      ],
+      "devil_advocate": "Actor A may sincerely perceive the symbolic associations as threatening due to trauma-mediated hypervigilance. Avoidance of counter-evidence in testimony may be unconscious rather than deliberate. Grice score of 0.30 is below the high-confidence deception threshold.",
+      "corroboration": "KIWI-001-A02 (server) + KIWI-001-A04 (honeypot access) independently confirm Actor A surveillance conduct, consistent with Gricean evasion of this topic",
+      "self_correction": "Cannot upgrade to INTENT: deliberate vs. sincere-delusional interpretation indistinguishable from available evidence. SUSPICION maintained."
+    },
+    {
+      "finding_id": "F-002",
+      "title": "calculate_human_entropy MALICE verdict — REFUTED (data format artifact)",
+      "verdict": "REFUTED",
+      "confidence": "HIGH",
+      "status": "REFUTED",
+      "artifact": "Actor A conduct sequence timestamps",
+      "tools_used": [
+        "calculate_human_entropy",
+        "contradiction_detector"
+      ],
+      "firstness": "calculate_human_entropy returned MALICE at 99% automation probability based on 4 anomalies including negative interval (-2,681,170s).",
+      "secondness": "Negative time interval is physically impossible. Timestamps passed were forensic acquisition timestamps (multiple events tagged 2025-08-01T00:00:00Z), not inter-message typing latencies.",
+      "thirdness": "Tool output is an artifact of incorrect data type mapping, not evidence of automation. No valid timing data exists to evaluate Actor A conduct regularity.",
+      "carnegie": "None detected",
+      "mitre_ttps": [],
+      "devil_advocate": "N/A — finding is self-refuted by data format analysis",
+      "corroboration": "Physical impossibility of negative time interval is conclusive. Self-corrected pre-emission.",
+      "self_correction": "REFUTATION GATE LOG — F-002: Candidate verdict: MALICE (99% automation). Gate: ContradictionDetector. Reason: negative interval is data format artifact, not evidence. Emitted as REFUTED."
+    },
+    {
+      "finding_id": "F-003",
+      "title": "False flag architecture: Actor A as documented surveillance agent filing harassment complaint",
+      "verdict": "SUSPICION",
+      "confidence": "HIGH",
+      "status": "CONFIRMED",
+      "artifact": "KIWI-001-A01, KIWI-001-A02, KIWI-001-A03, KIWI-001-A04, KIWI-001-A05",
+      "tools_used": [
+        "infer_intent",
+        "audit_grice_maxims",
+        "manual_structural_analysis"
+      ],
+      "firstness": "Actor A filed harassment complaint citing 3 symbolic evidence items (weapon+kiwi photo, orange playground, AI song). Actor A simultaneously: (a) operated server trampolin.sg-host.com/private/ collecting material on Actor B; (b) accessed Actor B blog honeypot up to 60 times daily from blocked account; (c) presented extrajudicial diagnosis from therapist without direct evaluation. Actor B: zero verified contact attempts in 3 years.",
+      "secondness": "Structural inversion: in a genuine harassment scenario, the harasser initiates contact. Contact count from Actor B = 0 (verified). All three primary evidence items admit stronger benign explanations than Actor A's hostile interpretations. Actor A had to actively seek each content item to view it. Server infrastructure and daily honeypot access are documented in Actor A's own judicial submissions.",
+      "thirdness": "False flag architecture: Actor A weaponizes judicial authority (Carnegie Authority Transfer) to reverse the observable power dynamic. The symbolic interpretation chain (kiwi=threat, orange=stalking, AI song=love declaration) is unfalsifiable from Actor B's position — only Actor A can assert or deny the subjective associative link. This creates an asymmetric epistemic burden that the judicial process cannot easily rebut without this forensic intentionality layer.",
+      "carnegie": "Authority Transfer — judicial process as legitimacy scaffold; False Familiarity — claim of knowledge of Actor B's internal state without verified communication",
+      "mitre_ttps": [
+        "T1036 (Masquerading — identity inversion at social/legal layer)",
+        "T1562.001 (Impair Defenses — extrajudicial diagnosis to pre-empt Actor B credibility)"
+      ],
+      "devil_advocate": "Actor A may be a genuine victim of psychological distress who developed compulsive monitoring as a trauma response. Surveillance infrastructure could represent fear-driven documentation rather than deliberate fabrication. Symbolic threat perception can be sincere even when objectively unsupported. The therapist, despite procedural impropriety, may have encountered genuine clinical presentation. Upgrade to INTENT requires evidence of knowing falsity — not available in this artifact set.",
+      "corroboration": "Two independent sources confirmed: KIWI-001-A02 (server infrastructure — Actor A own credentials) and KIWI-001-A04 (honeypot access log — up to 60 daily accesses from blocked account). Both sourced from Actor A's own judicial submissions.",
+      "self_correction": "REFUTATION GATE LOG — F-003: Candidate verdict: INTENT (two independent sources, structural inversion confirmed). Gate: Daubert Corroboration Gate. Gate rule: deliberate fabrication vs. sincere delusional interpretation indistinguishable from artifact set. Sincere delusional hypothesis not refuted by evidence. Emitted as SUSPICION."
+    },
+    {
+      "finding_id": "F-004",
+      "title": "reason_with_llm and validate_and_correct_analysis: FALLBACK MODE",
+      "verdict": "ABSTAIN",
+      "confidence": "HIGH",
+      "status": "DOCUMENTED_LIMITATION",
+      "artifact": "MCP server environment",
+      "tools_used": [
+        "reason_with_llm",
+        "validate_and_correct_analysis"
+      ],
+      "firstness": "Both LLM-dependent tools returned: LLM returned empty response. Backend: anthropic.",
+      "secondness": "ANTHROPIC_API_KEY is not accessible in the MCP server process environment. The MCP server runs as a separate process and does not inherit the calling session's API credentials.",
+      "thirdness": "FALLBACK mode: deterministic tools remain fully operational. LLM semantic reasoning layer unavailable. Per CLAUDE.md: document as known limitation, not investigation failure.",
+      "carnegie": "None",
+      "mitre_ttps": [],
+      "devil_advocate": "N/A — environmental limitation",
+      "corroboration": "Consistent failure across both LLM tools confirms systemic FALLBACK condition",
+      "self_correction": "Manual Peircean abductive analysis applied by investigator to substitute for validate_and_correct_analysis output. Mandatory Refutation Protocol applied manually. Documented per SANS submission requirement."
+    }
+  ],
+  "tool_execution_log": [
+    {
+      "seq": 1,
+      "event_id": "4305d9eb-ec89-4eae-8f73-111169c37778",
+      "timestamp": "2026-06-24T18:04:48.199836Z",
+      "mode": "claude_code",
+      "tool": "generate_forensic_hash_fallback",
+      "target": "scripts/VIGIA_KIWI_001.json",
+      "result_summary": "SHA-256: 114a73c667abffe94f4fd4210579383b033207b168f1c00f06b187eff45a3d1b | 7001 bytes | FALLBACK: path outside evidence base",
+      "input_hash": "e27d4b8bb2f70a3af910290a55ce9e2e06171b0a181f5c3b2a0ab3e12303c848",
+      "prev_hash": "GENESIS"
+    },
+    {
+      "seq": 2,
+      "event_id": "c9724ecb-2c92-4aa3-a760-bb033c27ec44",
+      "timestamp": "2026-06-24T18:05:20.718193Z",
+      "mode": "claude_code",
+      "tool": "infer_intent",
+      "target": "Actor A testimony trajectory (4 messages)",
+      "result_summary": "NOISE | evasion_prob=0.25 | 1 signal: GRADUAL_ESCALATION | tool scope: AI evasion patterns, not false flag architecture",
+      "input_hash": "7087d8ac57314172cddf72fb908e627cc77bfe114fdd2b2fa858652ff432cd81",
+      "prev_hash": "2d8ec99c08f219c54940e56b375f0bdbe7dd9c8e28a20fc115868e28762352f0"
+    },
+    {
+      "seq": 3,
+      "event_id": "7fd3010d-c706-4ebd-840d-c6a08ef41258",
+      "timestamp": "2026-06-24T18:05:50.188967Z",
+      "mode": "claude_code",
+      "tool": "audit_grice_maxims",
+      "target": "Actor A testimony (5 statements)",
+      "result_summary": "SUSPICION | deception_prob=0.30 | RELATION/TACTICAL_EVASION: systematic avoidance of central structural contradiction",
+      "input_hash": "3033db6791ac5acdd840dcd914ff079724811fd2cb6795ed9c984a1262743e06",
+      "prev_hash": "1bcc5888cb85e7fa8326f58afbcbc671326e9322fca68d78b73988492d0f8a9f"
+    },
+    {
+      "seq": 4,
+      "event_id": "c2aaf590-44d3-4d85-bd03-5222d7b3093d",
+      "timestamp": "2026-06-24T18:05:32.631282Z",
+      "mode": "claude_code",
+      "tool": "detect_eco_overinterpretation",
+      "target": "Evidence set KIWI-001-A01 through A06",
+      "result_summary": "NOISE | obvious_ratio=0.0 | keyword-based detection; symbolic false flag not within keyword scope. Documented tool limitation.",
+      "input_hash": "1953e4ae55c107348e9211ecd9a49440a0eaf4e9bb02ca9b0a1e18a5ee968df9",
+      "prev_hash": "d2829b640849bb8dc28a13d288976bdc69c6e386d6f103830586dd52ae9d6b1b"
+    },
+    {
+      "seq": 5,
+      "event_id": "5e136530-6b44-428f-acfb-2a46b12f77dc",
+      "timestamp": "2026-06-24T18:05:53.264212Z",
+      "mode": "claude_code",
+      "tool": "calculate_human_entropy",
+      "target": "Actor A conduct sequence (5 items, acquisition timestamps)",
+      "result_summary": "MALICE raw | 99% automation | SELF-CORRECTED: timestamps are acquisition metadata not typing latencies; negative interval artifact",
+      "input_hash": "05502854aaba1c784c6f4d1fdd0d042f00abcc91b175cfe6fbe874fd8fa2ea4f",
+      "prev_hash": "2c4a376d7de8ce6f03fdacbe21e9b1476a8d97c5085eded2c5c0b95b449d835d"
+    },
+    {
+      "seq": 6,
+      "event_id": "d4751254-e67c-42a5-ab94-b64cf59a15d5",
+      "timestamp": "2026-06-24T18:05:53.264300Z",
+      "mode": "claude_code",
+      "tool": "contradiction_detector",
+      "target": "F-002_human_entropy",
+      "result_summary": "BEFORE: MALICE (99% automation) | AFTER: REFUTED | REASON: acquisition timestamps passed as typing latencies — data format artifact, not real evidence",
+      "input_hash": "8b902c7d5cf6360fca3912bdf317660d8e9580d996f0288efaadf863973ba766",
+      "prev_hash": "b706ed2ed0d20419ad7b08279768abd07d00c90fdec345e8aa4d583e7c9d460b"
+    },
+    {
+      "seq": 7,
+      "event_id": "98b9ed1e-9e37-43b9-be08-0b8fc546383c",
+      "timestamp": "2026-06-24T18:06:13.745045Z",
+      "mode": "claude_code",
+      "tool": "reason_with_llm",
+      "target": "Full case VIGIA-KIWI-001 Peircean analysis",
+      "result_summary": "ERROR: LLM returned empty response | backend=anthropic | FALLBACK MODE | ANTHROPIC_API_KEY not in MCP server process environment",
+      "input_hash": "77b3de4666b64ed9808100b3682a75d8fc5ae9255b90797a12ece8427e721791",
+      "prev_hash": "28ca6401c78a4236d7e5beaf5cb9cb0f5175b4536b73c1686a47328f277fd522"
+    },
+    {
+      "seq": 8,
+      "event_id": "d716155e-8a7a-4b3e-9d7e-8d4339b622d0",
+      "timestamp": "2026-06-24T18:07:00.957700Z",
+      "mode": "claude_code",
+      "tool": "validate_and_correct_analysis",
+      "target": "VIGIA-KIWI-001 accumulated findings",
+      "result_summary": "ERROR: LLM returned empty response | FALLBACK MODE | Manual Daubert refutation protocol applied by investigator",
+      "input_hash": "84cd8d1c7f724f47900e213cf30f58a276357867503a4565c2359c1c56f95bc1",
+      "prev_hash": "60e19f79e76b319f504e9a32eb6a8c0687bf1911cbd02206ebe4ebcce10464e8"
+    }
+  ],
+  "integrity": {
+    "findings_hash": "9d2020852f0223de1e9e445576341dff7498b17c274f337fc2e5a54b63eb5e3a",
+    "tool_log_hash": "4eea151dc0ee236adece859211e0d5ce19428de98d6ce910dec81287b1bf5632",
+    "final_chain_hash": "b362bd48b9df5b2d131ff678b557a3fdea59dcbb4e5de9c457330120c47e9607",
+    "bundle_hash": "a5f640e347e26ae6ca744bad030c113e93e941cd3b0dca8013b01893928519b0"
+  },
+  "known_limitations": [
+    "VIGIA_EVIDENCE_DIR not set: MCP generate_forensic_hash blocked path outside evidence base. Fallback: sha256sum.",
+    "reason_with_llm: FALLBACK MODE — LLM returned empty response. ANTHROPIC_API_KEY not in MCP server process environment.",
+    "validate_and_correct_analysis: FALLBACK MODE — same root cause. Manual Daubert protocol applied.",
+    "calculate_human_entropy: acquisition timestamps passed as typing latencies — data format artifact. F-002 REFUTED.",
+    "detect_eco_overinterpretation: keyword-based detection; symbolic false flag architecture (subjective interpretive leap) not within keyword matching scope.",
+    "infer_intent: designed for AI conversation evasion patterns; judicial false flag architecture not within tool classification scope.",
+    "No timing data available for Actor A actual behavior — human entropy analysis inconclusive.",
+    "F-003 capped at SUSPICION: deliberate fabrication vs. sincere delusional interpretation indistinguishable from available artifact set. Knowing falsity not established."
+  ],
+  "refutation_gate_log": [
+    {
+      "finding_id": "F-002",
+      "candidate_verdict": "MALICE (99% automation)",
+      "gate_applied": "ContradictionDetector / Physical Impossibility Gate",
+      "gate_rule": "Negative time interval (-2681170s) is physically impossible; timestamps are acquisition metadata not typing latencies",
+      "gate_result": "REJECTED pre-emission. Emitted as REFUTED.",
+      "forensic_note": "Data format artifact, not evidence of automation."
+    },
+    {
+      "finding_id": "F-003",
+      "candidate_verdict": "INTENT (two independent sources, structural inversion)",
+      "gate_applied": "Daubert Corroboration Gate",
+      "gate_rule": "Sincere delusional interpretation not refuted by evidence; knowing falsity not established",
+      "gate_result": "CANDIDATE REJECTED pre-emission. Emitted as SUSPICION.",
+      "forensic_note": "Architectural self-correction. No incorrect verdict sealed. LLM FALLBACK did not affect this gate — it is deterministic."
+    }
+  ],
+  "token_usage": {
+    "note": "reason_with_llm and validate_and_correct_analysis both in FALLBACK MODE — no LLM tokens consumed by MCP server. Claude Code session tokens not tracked by MCP server. Full breakdown at usage.anthropic.com.",
+    "llm_calls_attempted": 2,
+    "llm_calls_successful": 0,
+    "session_id": "2026-06-24T18:04:48.199836Z"
+  }
+}
