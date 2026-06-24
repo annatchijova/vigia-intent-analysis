@@ -167,3 +167,92 @@ pytest tests/ -q --no-cov
 ```
 
 **APLICADO** 2026-06-24 — Commit: 43edd73.
+
+---
+
+## B-004 — `run_calibration.py` importaciones planas (pre-reorganización)
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | RESUELTO |
+| **Archivo** | `scripts/run_calibration.py` |
+| **Función** | Module-level imports |
+| **Líneas originales** | 29 (`sys.path.insert`), 31–35 (flat imports) |
+| **Commit fix** | `10ced2c` |
+| **Detectado en** | Sesión post-hackathon 2026-06-24 |
+
+### Descripción
+
+El script usaba un `sys.path.insert` para agregar el directorio `scripts/` al path,
+y luego importaba con nombres planos:
+
+```python
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from vigia_integration_bridge import (CaseAdapter, ...)
+from likelihood_ratio import LikelihoodEngine
+from lr_calibration import LRCalibrator
+```
+
+Después de la reorganización del paquete, los módulos residen en:
+- `vigia/pipeline/vigia_integration_bridge.py`
+- `vigia/core/likelihood_ratio.py`
+- `vigia/core/lr_calibration.py`
+
+El hack `sys.path.insert` enmascaraba el error fuera del entorno de desarrollo.
+
+### Fix aplicado
+
+Eliminado `sys.path.insert`. Reemplazadas las importaciones planas por rutas de paquete:
+
+```python
+from vigia.pipeline.vigia_integration_bridge import (CaseAdapter, ...)
+from vigia.core.likelihood_ratio import LikelihoodEngine
+from vigia.core.lr_calibration import LRCalibrator
+```
+
+**APLICADO** 2026-06-24 — Commit: 10ced2c.
+
+---
+
+## B-005 — `run_calibration.py` ruta de datos hardcodeada (directorio del script)
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | RESUELTO |
+| **Archivo** | `scripts/run_calibration.py` |
+| **Función** | `main()` — corpus glob |
+| **Líneas originales** | 180–186 (glob patterns), 241–247 (output paths) |
+| **Commit fix** | `10ced2c` |
+| **Detectado en** | Sesión post-hackathon 2026-06-24 |
+
+### Descripción
+
+El corpus se buscaba relativo al directorio del script (`scripts/`):
+
+```python
+base = os.path.dirname(os.path.abspath(__file__))
+files = (
+    glob.glob(os.path.join(base, "VIGIA-SYN-*.json")) + ...
+)
+```
+
+Los archivos de casos residen en `data/cases/converted/` bajo la raíz del repo.
+Con la ruta hardcodeada, el script encontraba 0 casos a menos que se ejecutara
+desde `scripts/` con los JSON copiados manualmente. Los modelos de salida también
+se guardaban en `scripts/models/` en lugar de `models/` en la raíz del repo.
+
+### Fix aplicado
+
+Añadido flag `--data` (default `data/cases/converted`) y `repo_root` como base:
+
+```python
+repo_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+data_dir = os.path.join(repo_root, args.data)
+files = glob.glob(os.path.join(data_dir, "*.json")) + ...
+out_path = os.path.join(repo_root, args.out)
+```
+
+Verificación: 78 casos cargados, Brier Score 0.149, modelo guardado en
+`models/calibrated_lr.json` (raíz del repo).
+
+**APLICADO** 2026-06-24 — Commit: 10ced2c.
