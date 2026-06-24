@@ -3,7 +3,7 @@
 **Module Designation:** `vigia/vigia_sift_bridge_final.py`  
 **System:** VIGÍA Intentionality Analysis Framework  
 **Author:** Anna Tchijova  
-**License:** GNU AGPL v3  
+**License:** Apache 2.0  
 
 ### What Is This Module?
 
@@ -114,7 +114,7 @@ The module provides the following formal guarantees:
 **Designación del módulo:** `vigia/vigia_sift_bridge_final.py`  
 **Sistema:** VIGÍA — Marco de Análisis de Intencionalidad  
 **Autora:** Anna Tchijova  
-**Licencia:** GNU AGPL v3  
+**Licencia:** Apache 2.0  
 
 ### ¿Qué es este módulo?
 
@@ -225,7 +225,7 @@ El módulo proporciona las siguientes garantías formales:
 **Наименование модуля:** `vigia/vigia_sift_bridge_final.py`  
 **Система:** VIGÍA — Инфраструктура анализа интенциональности  
 **Автор:** Anna Tchijova  
-**Лицензия:** GNU AGPL v3  
+**Лицензия:** Apache 2.0  
 
 ### Что представляет собой данный модуль?
 
@@ -336,7 +336,7 @@ $$
 **模块标识：** `vigia/vigia_sift_bridge_final.py`  
 **系统：** VIGÍA 意图性分析框架  
 **作者：** Anna Tchijova  
-**许可证：** GNU AGPL v3  
+**许可证：** Apache 2.0  
 
 ### 本模块是什么？
 

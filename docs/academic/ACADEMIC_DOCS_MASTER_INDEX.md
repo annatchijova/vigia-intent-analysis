@@ -416,5 +416,5 @@ Los siguientes documentos fueron generados con cobertura parcial de idiomas. Can
 
 ---
 
-*Licencia: GNU AGPL v3. Copyright © 2026 Anna Tchijova.*  
+*Licencia: Apache License, Versión 2.0. Copyright © 2026 Anna Tchijova.*  
 *Documentación generada por Batch API de Moonshot (Kimi K2.6) como parte del colectivo IA VIGIA.*

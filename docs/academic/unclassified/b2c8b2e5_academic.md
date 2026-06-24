@@ -51,7 +51,7 @@ Scientific Note:
 > La semiótica es un sensor, no misticismo.
 > Este módulo utiliza terminología de Charles Sanders Peirce, Umberto Eco y H.P. Grice... Piense en la tríada de Peirce (signo-objeto-interpretante) como un protocolo de transducción... Los códigos de Eco son comparables a protocolos de comunicación; el Principio de Cooperación de Grice funciona como una calibración base...
 
-License: Licenciado bajo GNU AGPL v3. Copyright © 2026 Anna Tchijova.
+License: Licenciado bajo Apache License, Version 2.0. Copyright © 2026 Anna Tchijova.
 
 ### РУССКИЙ
 
@@ -69,7 +69,7 @@ Scientific Note:
 > Семиотика — это датчик, а не мистицизм.
 > Модуль заимствует терминологию Чарльза Сандерса Пирса, Умберто Эко и Г. П. Грайса... Триада Пирса (знак-объект-интерпретант) — это протокол преобразования: файл изображения — знак, физический документ — объект, детерминированный вывод — интерпретант. Коды Эко сравнимы с коммуникационными протоколами; Принцип кооперации Грайса работает как базовая калибровка...
 
-License: Лицензировано под GNU AGPL v3. Copyright © 2026 Anna Tchijova.
+License: Лицензировано под Apache License, Version 2.0. Copyright © 2026 Anna Tchijova.
 
 ### 中文
 
