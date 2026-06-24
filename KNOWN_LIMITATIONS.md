@@ -822,7 +822,7 @@ Reproduce: `python3 run_all_agent.py --timeout 90`
 | L-026 | Devil's Advocate generator wired in; 1 pre-fix corpus bundle flagged | VIGIA-REAL-SRL-DMZ-FTP | **RESOLVED** / documented exception |
 | L-027 | AbductiveIntentEngine call site in VigiaPipeline used wrong signature since birth | `vigia/pipeline/pipeline.py::run_full()` | **RESOLVED** 2026-06-22 — zero submission impact |
 | L-028 | Golden Rule LOG_VS_MEMORY requires metadata["verdict"] convention | `vigia/tools/caie.py` | **RESOLVED** 2026-06-24 |
-| L-029 | DARVO false flag victim signal dilution — agent fallback blind; scorer lacks false_flag verdict type | VIGIA-KIWI-001/002/003 | Real limitation — roadmap FW-009 |
+| L-029 | DARVO false flag victim signal dilution — agent fallback blind; scorer lacks false_flag verdict type | VIGIA-KIWI-001/002/003 | **IN_PROGRESS** — FW-009 DARVO detector |
 | — | Normalization schema mismatch | vigia_scorer.py | **RESOLVED** |
 | — | Gate G1 accepting legacy hashes | caie.py | **RESOLVED** |
 | — | Uniform prior_trust=0.7 in converter | convert_legacy_cases.py | **RESOLVED** |
@@ -1052,7 +1052,7 @@ to both vigia/tools/caie.py and vigia/tools/caie_legacy_root.py.
 ## L-029 — DARVO_FALSE_FLAG_VICTIM_SIGNAL_DILUTION
 
 **Affects:** Agent fallback (deterministic, no LLM) — full failure; Scorer mode — partial
-**Status:** Real limitation — roadmap Intent Amplifier Layer
+**Status:** IN_PROGRESS — DARVO pattern detector implementation in pipeline (FW-009)
 **Severity:** HIGH
 **Discovered:** 2026-06-24 via VIGIA-KIWI trilogy stress test
 **Test cases:** `VIGIA-KIWI-001`, `VIGIA-KIWI-002-ZAPALLO-POV`, `VIGIA-KIWI-003-AT-POV`
