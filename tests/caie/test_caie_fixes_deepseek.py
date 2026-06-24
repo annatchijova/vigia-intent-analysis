@@ -174,7 +174,7 @@ class TestFractureBonusEpistemology:
             evidence_type="log_entry",
             raw_score=0.9,
             description="Malice detected",
-            metadata={"verdict": "MALICE"}
+            metadata={"verdict": "MALICE", "dst_ip": "192.168.1.100"}
         ))
         engine.add_artifact(Artifact(
             source_tool="tool_b",
@@ -215,7 +215,7 @@ class TestLowCountHighScore:
         """Score alto de fuente única + sin fracturas → structural_verdict = NOISE"""
         engine = CrossArtifactIncongruenceEngine()
 
-        engine.add_artifact(Artifact("tool_a", "memory_process", 0.95, "High", metadata={"verdict": "MALICE"}))
+        engine.add_artifact(Artifact("tool_a", "memory_process", 0.95, "High", metadata={"verdict": "MALICE", "dst_ip": "192.168.1.100"}))
         engine.add_artifact(Artifact("tool_a", "log_entry", 0.90, "High"))
 
         result = engine.evaluate()
@@ -247,7 +247,7 @@ class TestEpistemicSeparation:
 
         engine.add_artifact(Artifact(
             "log_tool", "log_entry", 0.9, "Logs claim intrusion",
-            metadata={"verdict": "MALICE"}
+            metadata={"verdict": "MALICE", "dst_ip": "192.168.1.100"}
         ))
         engine.add_artifact(Artifact(
             "mem_tool", "memory_process", 0.05, "Memory shows nothing",
