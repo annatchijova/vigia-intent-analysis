@@ -1,0 +1,225 @@
+{
+  "bundle_id": "VIGIA-KIWI-006",
+  "schema_version": "ebs_v1",
+  "case_id": "VIGIA-KIWI-006-WITNESS-SELF-INCRIM",
+  "case_origin": "MPF7779408",
+  "investigator": "VIGIA Autonomous Agent (Claude Code / Anthropic)",
+  "mode": "Claude Code + Ollama (deepseek-r1:8b)",
+  "timestamp_sealed": "2026-06-25T17:23:08.052174+00:00",
+  "primary_evidence_sha256": "8e605c769e184e35725fd3d065933611c1fbed110f614d997c2cfcb3db6837a1",
+  "sans_phase": "PICERL: Identification to Containment (Phase 3 complete)",
+  "final_verdict": "SUSPICION",
+  "expected_verdict": "suspicion",
+  "verdict_match": true,
+  "executive_summary": "Three linked witnesses (Testigo-A, Hermano-Denunciante, Madre-Denunciante) construct a coordinated peligrosidad narrative against the imputada in case MPF7779408. Stylometric analysis detected LINGUISTIC_CONTAGION (70% same-entity probability) between Testigo-A and Hermano-Denunciante. Grice audit detected TACTICAL_EVASION (maxim RELATION violation). reason_with_llm assessed INTENT candidate (Carnegie: social proof manipulation). However, all four artifacts derive from a single provenance source (AT-001 manual_forensic_review) with no independent technical verification. Daubert Corroboration Gate fires: n_independent_sources=1, capping verdict at SUSPICION. Candidate INTENT rejected pre-emission. No INTENT or MALICE verdict is sealed.",
+  "findings": [
+    {
+      "finding_id": "F-001",
+      "title": "Linguistic Contagion Between Non-Independent Witnesses",
+      "verdict": "SUSPICION",
+      "confidence": "MEDIUM",
+      "status": "INFERRED",
+      "artifacts": [
+        "KIWI-006-A01",
+        "KIWI-006-A02",
+        "KIWI-006-A04"
+      ],
+      "tools_used": [
+        "analyze_stylometry"
+      ],
+      "firstness": "Testimonios de Testigo-A y Hermano-Denunciante comparten frases literales: 'el hermano del', 'hermano del denunciante', 'de la imputada', 'material de la'.",
+      "secondness": "Testigos independientes no deberien compartir frasologia especifica referencial. Score stylometry: 70% probabilidad entidad unica.",
+      "thirdness": "COORDINATION SUSPICION: acuerdo previo entre testigos. Carnegie: social proof — multiples voces convergentes simulan validacion independiente.",
+      "carnegie": "Social proof manipulation — linked witnesses create self-reinforcing narrative",
+      "mitre_ttps": [
+        "T1585.001 (Establish Accounts — fictitious identity coordination)"
+      ],
+      "devil_advocate": "Testigos que conocen el caso pueden naturalmente usar el mismo vocabulario al describirlo. La contagion linguistica puede ser resultado de discusiones familiares previas, no de coordinacion maliciosa.",
+      "corroboration": "KIWI-006-A04 documenta testimony_coordination=true e independent_witnesses=0, pero proviene del mismo examinador AT-001 — no es fuente independiente.",
+      "self_correction": "INFERRED — single source AT-001. Daubert Gate aplicado: no alcanza umbral INTENT."
+    },
+    {
+      "finding_id": "F-002",
+      "title": "Systematic Grice Relation Maxim Violation — Tactical Evasion",
+      "verdict": "SUSPICION",
+      "confidence": "LOW",
+      "status": "INFERRED",
+      "artifacts": [
+        "KIWI-006-A01",
+        "KIWI-006-A02",
+        "KIWI-006-A03"
+      ],
+      "tools_used": [
+        "audit_grice_maxims"
+      ],
+      "firstness": "Los tres testimonios evitan sistematicamente los temas centrales del caso (contacto verificado, evidencia digital directa). Ninguno puede corroborar afirmaciones con prueba tecnica.",
+      "secondness": "Testimonios cooperativos esperados (Grice): responden directamente a la pregunta relevante. Los tres testimonios desvian o son incapaces de corroborar la afirmacion central.",
+      "thirdness": "TACTICAL_EVASION: los testigos construyen una narrativa emocional (miedo, locura) en lugar de evidencia factica. deception_probability=0.30.",
+      "carnegie": "Appeal to emotion — replacing factual claims with affect-laden assertions",
+      "mitre_ttps": [
+        "T1036 (Masquerading — testimony misrepresentation)"
+      ],
+      "devil_advocate": "Probabilidad de deception del 30% indica que el 70% restante puede explicarse por comunicacion deficiente, nerviosismo, o desconocimiento tecnico. No supera umbral INTENT.",
+      "corroboration": "analyze_stylometry corrobora indirectamente el patron de evasion con LINGUISTIC_CONTAGION, pero misma fuente AT-001.",
+      "self_correction": "INFERRED — deception_probability 0.30 insuficiente para INTENT sin segunda fuente tecnica independiente."
+    },
+    {
+      "finding_id": "F-003",
+      "title": "Universal Conflict of Interest — Zero Independent Witnesses",
+      "verdict": "SUSPICION",
+      "confidence": "CONFIRMED",
+      "status": "CONFIRMED",
+      "artifacts": [
+        "KIWI-006-A04"
+      ],
+      "tools_used": [
+        "manual_forensic_review (AT-001)",
+        "validate_and_correct_analysis"
+      ],
+      "firstness": "Tres testigos: Testigo-A (vinculo con hermano), Hermano-Denunciante (parte directa), Madre-Denunciante (pariente del denunciante). independent_witnesses=0.",
+      "secondness": "En testimonio valido para Daubert, se requieren testigos sin conflicto de interes documentado. Los tres tienen relacion directa con el denunciante.",
+      "thirdness": "La ausencia total de testigos independientes es condicion estructural documentable — no interpretacion. Es un hecho objetivo derivado de la relacion entre los testigos y el denunciante.",
+      "carnegie": "None — objective structural fact, not manipulation technique",
+      "mitre_ttps": [],
+      "devil_advocate": "Los testigos vinculados pueden tener conocimiento genuino de los hechos. El parentesco no invalida per se un testimonio bajo el sistema acusatorio argentino. La judicatura evalua credibilidad con este contexto.",
+      "corroboration": "CONFIRMED objetivamente: las relaciones familiares/personales documentadas en metadata de cada artefacto.",
+      "self_correction": "CONFIRMED — objetivo, no interpretativo. No requiere segunda fuente tecnica."
+    },
+    {
+      "finding_id": "F-004",
+      "title": "Examiner Methodology Gap — No Independent Technical Verification",
+      "verdict": "SUSPICION",
+      "confidence": "CONFIRMED",
+      "status": "CONFIRMED",
+      "artifacts": [
+        "KIWI-006-A01",
+        "KIWI-006-A02",
+        "KIWI-006-A03",
+        "KIWI-006-A04"
+      ],
+      "tools_used": [
+        "validate_and_correct_analysis"
+      ],
+      "firstness": "Todos los artefactos provienen de AT-001 manual_forensic_review. write_blocker_used=false en todos. No hay extraccion digital independiente, no hay network logs, no hay device forensics.",
+      "secondness": "Daubert exige al menos dos fuentes independientes para INTENT. n_independent_sources=1. Los raw_scores (0.6-0.8) exceden baseline tipico (0.4-0.6) sin calibracion documentada.",
+      "thirdness": "El gap metodologico es la razon tecnica por la cual el candidato INTENT no puede ser sellado. Device forensics adicional podria resolver la ambiguedad.",
+      "carnegie": "None — methodological gap, not manipulation",
+      "mitre_ttps": [],
+      "devil_advocate": "Manual forensic review es metodologia legitima para evidencia testimonial. No toda evidencia digital es tecnicamente extractable. La ausencia de device forensics puede ser limitacion operativa.",
+      "corroboration": "CONFIRMED — structurally evident from provenance_chain of all artifacts.",
+      "self_correction": "validate_and_correct_analysis flagged Appeal to Authority fallacy in raw_score methodology. EVIDENCE_DELIMITER_MISMATCH registered."
+    }
+  ],
+  "refutation_gate_log": {
+    "finding_id": "CANDIDATE-INTENT-001",
+    "candidate_verdict": "INTENT",
+    "candidate_confidence": 85,
+    "source": "reason_with_llm (ollama/deepseek-r1:8b)",
+    "gate_applied": "Daubert Corroboration Gate",
+    "gate_rule": "n_independent_sources < 2 for this evidence class → cap SUSPICION",
+    "gate_result": "CANDIDATE REJECTED pre-emission. Emitted as SUSPICION.",
+    "benign_hypothesis_tested": "Testigos discutieron el caso entre si (contagio linguistico natural), actuaron independientemente con comunicacion deficiente (Grice), conflictos de interes conocidos pero no probatoriamente maliciosos.",
+    "benign_hypothesis_result": "PARTIAL PASS — explica contagio linguistico e individual Grice violations, no explica evidence_withheld + independent_witnesses=0 + universal conflict_of_interest combinados. Sin segunda fuente tecnica independiente, INTENT no puede ser confirmado.",
+    "forensic_note": "Arquitectura de auto-correccion pre-emision. Ningun veredicto incorrecto fue sellado. El LLM no puede sobreescribir este gate."
+  },
+  "tool_execution_log": [
+    {
+      "seq": 1,
+      "tool": "reason_with_llm",
+      "target": "LLM mode probe",
+      "result_summary": "llm_backend=ollama CONFIRMED",
+      "verdict_emitted": null
+    },
+    {
+      "seq": 2,
+      "tool": "generate_forensic_hash",
+      "target": "evidence/VIGIA-KIWI-006.json",
+      "result_summary": "SHA256=8e605c769e184e35725fd3d065933611c1fbed110f614d997c2cfcb3db6837a1",
+      "verdict_emitted": null
+    },
+    {
+      "seq": 3,
+      "tool": "read_evidence",
+      "target": "evidence/VIGIA-KIWI-006.json",
+      "result_summary": "Hash match confirmed. 4504 bytes. 4 artifacts loaded.",
+      "verdict_emitted": null
+    },
+    {
+      "seq": 4,
+      "tool": "calculate_shannon_entropy",
+      "target": "A01 content",
+      "result_summary": "entropy=4.51, NORMAL human text range. NOISE.",
+      "verdict_emitted": "NOISE"
+    },
+    {
+      "seq": 5,
+      "tool": "infer_intent",
+      "target": "A01 testimony",
+      "result_summary": "NOISE — tool not applicable to static testimony (designed for conversational trajectories).",
+      "verdict_emitted": "NOISE"
+    },
+    {
+      "seq": 6,
+      "tool": "infer_intent",
+      "target": "A02 testimony",
+      "result_summary": "NOISE — tool not applicable to static testimony.",
+      "verdict_emitted": "NOISE"
+    },
+    {
+      "seq": 7,
+      "tool": "audit_grice_maxims",
+      "target": "A01+A02+A03 testimonies",
+      "result_summary": "SUSPICION. Maxim RELATION violation. TACTICAL_EVASION. deception_probability=0.30.",
+      "verdict_emitted": "SUSPICION"
+    },
+    {
+      "seq": 8,
+      "tool": "detect_eco_overinterpretation",
+      "target": "All 4 artifacts",
+      "result_summary": "NORMAL_DISTRIBUTION. obvious_ratio=0.0. No staging detected (false negative likely — tool uses term-frequency).",
+      "verdict_emitted": "NOISE"
+    },
+    {
+      "seq": 9,
+      "tool": "analyze_stylometry",
+      "target": "A01+A02+A03 testimonies",
+      "result_summary": "INTENT. LINGUISTIC_CONTAGION A01-A02. same_entity_probability=0.70. COORDINATION_SUSPICION.",
+      "verdict_emitted": "INTENT"
+    },
+    {
+      "seq": 10,
+      "tool": "reason_with_llm",
+      "target": "Full accumulated evidence",
+      "result_summary": "INTENT confidence=85. Carnegie: social proof manipulation. Coordinated fabrication pattern.",
+      "verdict_emitted": "INTENT"
+    },
+    {
+      "seq": 11,
+      "tool": "validate_and_correct_analysis",
+      "target": "Candidate INTENT",
+      "result_summary": "MALICE_ANALYSIS flag: single_source, no_baseline, Daubert Gate fires. EVIDENCE_DELIMITER_MISMATCH.",
+      "verdict_emitted": "CANDIDATE_REJECTED"
+    },
+    {
+      "seq": 12,
+      "tool": "contradiction_detector",
+      "target": "CANDIDATE-INTENT-001",
+      "result_summary": "BEFORE: INTENT(85%) | AFTER: SUSPICION | REASON: Daubert Corroboration Gate n_independent_sources=1",
+      "verdict_emitted": null
+    }
+  ],
+  "known_limitations": [
+    "L-001: All 4 artifacts from single examiner AT-001 (manual_forensic_review). No independent technical source. Prevents INTENT confirmation under Daubert.",
+    "L-002: write_blocker_used=false for all artifacts. Digital evidence chain of custody not established at device level.",
+    "L-003: infer_intent tool designed for conversational AI evasion trajectories — not applicable to static testimonial evidence. Applied and disregarded (NOISE).",
+    "L-004: detect_eco_overinterpretation did not detect coordination pattern — tool uses term-frequency matching, not semantic coordination analysis. False negative likely.",
+    "L-005: LLM backend = ollama (deepseek-r1:8b). Local model. reason_with_llm output treated as signal, not verdict.",
+    "L-006: Device forensics (phone extraction, network logs, download verification) would resolve open INTENT candidate. Not available in current evidence set."
+  ],
+  "token_usage": {
+    "note": "Session via Claude Code + Ollama backend. Ollama calls: local inference, no token billing. Claude Code token breakdown at usage.anthropic.com.",
+    "session_start": "2026-06-25T17:16:50Z",
+    "tools_called": 12
+  },
+  "bundle_sha256": "13b04eb93519b85deebdcde019c3220e22600a7daa561ea6df3e0b03df3f532d"
+}
