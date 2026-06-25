@@ -163,7 +163,7 @@ class TestFractureBonusEpistemology:
         golden_in_result = [f for f in result["fractures"] if f.get("is_golden_rule")]
         assert len(golden_in_result) >= 1
 
-        assert result["fracture_bonus_applied"] == 0.0, "Golden Rules should not add fracture bonus"
+        assert result["fracture_bonus_applied"] == "0.0000", "Golden Rules should not add fracture bonus"
 
     def test_bonus_only_for_non_structural_fractures(self):
         """Solo fracturas NO estructurales/NO Golden Rules aportan bonus"""
@@ -209,7 +209,7 @@ class TestLowCountHighScore:
 
         assert result["independent_sources"] >= 1
         # penalty depends on engine threshold — verificar score reduction instead
-        assert result["probabilistic_score"] < 0.85, "Penalty should reduce score significantly"
+        assert float(result["probabilistic_score"]) < 0.85, "Penalty should reduce score significantly"
 
     def test_high_score_single_source_no_structural_verdict_override(self):
         """Score alto de fuente única + sin fracturas → structural_verdict = NOISE"""
@@ -239,7 +239,7 @@ class TestEpistemicSeparation:
         assert "probabilistic_score" in result
         assert result["structural_verdict"] in ("NOISE", "SUSPICION", "MALICE", "INCONCLUSIVE")
         assert result["probabilistic_verdict"] in ("NOISE", "SUSPICION", "MALICE", "INCONCLUSIVE")
-        assert 0.0 <= result["probabilistic_score"] <= 1.0
+        assert 0.0 <= float(result["probabilistic_score"]) <= 1.0
 
     def test_structural_overrides_probabilistic_for_malice(self):
         """Cuando structural dice MALICE, final verdict es MALICE"""

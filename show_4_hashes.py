@@ -157,7 +157,7 @@ if fractures:
           f"golden={caie_analysis.get('golden_rules_triggered',0)}){RST}")
     for f in fractures:
         sev = f.get("severity", "0")
-        col = RED if sev >= 0.9 else YLW if sev >= 0.7 else GRN
+        col = RED if float(sev) >= 0.9 else YLW if float(sev) >= 0.7 else GRN
         print(f"  {col}[{f.get('type','?')}]{RST}  severity={sev}")
     print()
 

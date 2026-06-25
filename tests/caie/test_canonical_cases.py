@@ -77,7 +77,7 @@ class TestCanonicalCases:
 
         # Log details for debugging
         print(f"\n[{case['case_id']}] expected={expected} actual={actual}")
-        print(f"  composite={result.get('composite_score'):.4f}")
+        print(f"  composite={result.get('composite_score')}")
         print(f"  fractures={result.get('fractures_detected')}")
         print(f"  golden_rules={result.get('golden_rules_triggered')}")
 
