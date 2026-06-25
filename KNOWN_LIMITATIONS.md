@@ -371,32 +371,25 @@ multiplies the effective score of co-occurring login artifacts.
 
 ### L-021 — Float Intermediates in Core Scoring Path
 
-**Affects:** `vigia_scorer.py` | **Status:** [MITIGATED] — decision path representation-pure pending full Fraction conversion of intermediate scoring values. Transcendental functions (math.log, math.exp, 0.95**k) replaced with Fraction tables. Full Fraction conversion of composite/final_score: FW-008.
+**Affects:** `vigia_scorer.py`, `vigia/tools/caie.py`, `caie_legacy_root.py` | **Status:** [RESOLVED]
 
-**Description:** `vigia_scorer.py` uses `float` for intermediate scoring values
-(`effective_trust`, `adjusted_score`, `composite`, `final_score`) via `_dround()`
-which returns `round(float(value), precision)`. The `Fraction` guarantee applies
-to the quadripartite classifier inputs (`conf_frac`, `stab_frac`) and the
-canonical bundle posteriors, but not to the full scoring pipeline.
+**Description:** `_dround()` returned `float` and `_dsum()` returned `float`,
+allowing IEEE 754 platform-dependent rounding in intermediate scoring values
+(`effective_trust`, `adjusted_score`, `composite`, `final_score`).
 
-**Correct claim:** "Fraction arithmetic in the verdict classifier and canonical
-bundle output; Decimal rounding for intermediate scores."
+**Resolution (2026-06-25, L-021 Phase 1 + Phase 2):**
+- `_dround()` returns `decimal.Decimal` — internal algebra is Decimal throughout.
+- `_dsum()` returns `decimal.Decimal` — handles Decimal, Fraction, int, float inputs.
+- `evaluate()` output boundary uses `str()` serialization: `composite_score`,
+  `probabilistic_score`, `fracture_bonus_applied`, `severity`, `spoofability_delta`,
+  `ttp_confidences`, `raw_score`, `adjusted` — all `str`, never `float`.
+- No `float()` at any output boundary.
+- Tests updated for str comparisons. 163 passed, 0 failed, 6 xfailed.
+- Commits: `1a16ee9` (Phase 1), `6bba3d7` (Phase 2).
 
-**Post-hackathon fix:** Replace `_dround()` return type with `Decimal` throughout
-the scoring path.
-
-**Resolution:** Fixed in `patch_p0_scoring.py` (2026-06-14, Claude+Kimi audit):
-`math.log()`, `math.exp()`, and `0.95**k` replaced with precomputed Fraction
-lookup tables (`_SUPPORT_SCORE_TABLE`, `_EXP_NEG2_TABLE`, `_EPC_FACTOR_TABLE`).
-Verdict thresholds converted to `Fraction(33,100)`, `Fraction(18,100)`,
-`Fraction(8,100)`. 58 tests passed, 0 regressions.
-
-**Mitigation applied 2026-06-14:** `math.log()`, `math.exp()`, and `0.95**k`
-replaced with precomputed Fraction lookup tables (`_SUPPORT_SCORE_TABLE`,
-`_EXP_NEG2_TABLE`, `_EPC_FACTOR_TABLE`). Verdict thresholds converted to
-Fraction constants. Platform-dependent ULP non-determinism eliminated.
-Formal boundary invariance testing (property tests, threshold fuzzing)
-remains as post-hackathon roadmap item FW-008.
+**Prior mitigation (2026-06-14):** `math.log()`, `math.exp()`, and `0.95**k`
+replaced with precomputed Fraction lookup tables in `vigia_scorer.py`.
+Verdict thresholds converted to Fraction constants.
 
 ---
 
@@ -814,7 +807,7 @@ Reproduce: `python3 run_all_agent.py --timeout 90`
 | L-018 | Non-technical context opacity | FN-001/002 | Real limitation |
 | L-019 | FALSE_FLAG_PATTERN on clean foreign-language machines | FP-CULTURAL-CLEAN | **RESOLVED** |
 | L-020 | Claude Code bundle lacks granular audit_trail | Mode 2 bundles | Known limitation |
-| L-021 | Float intermediates in scoring path | vigia_scorer.py | **MITIGATED** |
+| L-021 | Float intermediates in scoring path | vigia_scorer.py, caie.py | **RESOLVED** |
 | L-022 | devil_advocate validation partially architectural | Mode 2 bundles | Post-audit improvement |
 | L-023 | Bundle save TOCTOU race (SEC-04) | bundle_builder.py | P0 — fix scheduled |
 | L-024 | Forensic mount allowlist includes generic /mnt | sift_orchestrator.py | Design decision |
