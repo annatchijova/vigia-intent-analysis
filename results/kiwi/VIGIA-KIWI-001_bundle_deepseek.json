@@ -1,0 +1,136 @@
+{
+  "bundle_id": "VIGIA-KIWI-001",
+  "schema_version": "ebs_v1",
+  "case_id": "VIGIA-KIWI-001",
+  "case_origin": "MPF7779408",
+  "investigator": "VIGIA Autonomous Agent (Claude Code / Anthropic)",
+  "mode": "Claude Code + Ollama (deepseek-r1:8b)",
+  "timestamp_sealed": "2026-06-25T17:34:52.214757+00:00",
+  "primary_evidence_sha256": "114a73c667abffe94f4fd4210579383b033207b168f1c00f06b187eff45a3d1b",
+  "sans_phase": "PICERL: Identification (Phase 2-3 complete)",
+  "final_verdict": "SUSPICION",
+  "expected_verdict": "SUSPICION",
+  "verdict_match": true,
+  "executive_summary": "El denunciante construye una narrativa de amenaza de muerte mediante asociaciones simbolicas subjetivas (imagen arma + kiwis = amenaza codificada) sin contacto directo con la imputada en 3 anos. Las refutaciones en A01 son verificables objetivamente: inconsistencia cromatica (arma marron vs logo verde brillante), cuantitativa (multiples kiwis enteros vs logo uno cortado), y textual (el propio texto de la imagen contradice intencion violenta). El servidor A02 fue auto-incriminado: credenciales provistas por el denunciante en documentacion judicial. El blog honeypot A04 documenta vigilancia activa unilateral (60 accesos diarios). reason_with_llm: SUSPICION, frame manipulation. Hipotesis benigna parcialmente valida: denunciante puede creer genuinamente en las amenazas simbolicas. Veredicto: SUSPICION.",
+  "findings": [
+    {
+      "finding_id": "F-001",
+      "title": "False Flag — Inconsistencias Verificables en Evidencia Principal",
+      "verdict": "SUSPICION",
+      "confidence": "MEDIUM",
+      "status": "CONFIRMED",
+      "artifacts": [
+        "KIWI-001-A01"
+      ],
+      "tools_used": [
+        "manual_forensic_review",
+        "reason_with_llm"
+      ],
+      "firstness": "Imagen de arma marron junto a multiples kiwis enteros. Texto superpuesto promueve uso legal de armas. raw_score=0.3.",
+      "secondness": "Tres inconsistencias verificables: (1) cromatica: arma marron vs logo denunciante verde brillante; (2) cuantitativa: imagen muestra multiples kiwis enteros, logo muestra uno solo cortado; (3) textual: el texto de la imagen promueve cumplimiento legal, contradiciendo intencion violenta alegada. Imputada sin CLU ni tenencia en RENAR/ANMaC.",
+      "thirdness": "El raw_score=0.3 refleja que las inconsistencias son suficientemente refutables. Frame manipulation: denunciante construye amenaza codificada sobre un patron estetico de la imputada sin evidencia directa de intencion.",
+      "carnegie": "Frame manipulation — symbolic association weaponized without causal link",
+      "mitre_ttps": [
+        "T1036 (Masquerading — false threat attribution)"
+      ],
+      "devil_advocate": "El denunciante puede percibir genuinamente una amenaza codificada en simbolos que conoce (kiwi = referencia a su identidad). La apofenia no requiere deliberacion. Sin evaluacion pericial psiquiatrica, no se puede descartar creencia sincera.",
+      "corroboration": "A04 (vigilancia activa) corrobora patron unilateral del denunciante.",
+      "self_correction": "CONFIRMED — refutaciones verificables objetivamente sin ambiguedad."
+    },
+    {
+      "finding_id": "F-002",
+      "title": "Servidor Stalkeo Auto-Incriminado",
+      "verdict": "SUSPICION",
+      "confidence": "HIGH",
+      "status": "CONFIRMED",
+      "artifacts": [
+        "KIWI-001-A02"
+      ],
+      "tools_used": [
+        "manual_forensic_review"
+      ],
+      "firstness": "PHP error logs trampolin.sg-host.com /private/ con material de imputada. Timestamps 01-Sep-2025. Credenciales provistas por el denunciante en documentacion judicial.",
+      "secondness": "Un denunciante que alega hostigamiento opera simultaneamente un servidor privado con material descargado desde sitios de stalkeo de la presunta hostigadora. Las credenciales del servidor fueron auto-provistas en la misma documentacion judicial.",
+      "thirdness": "Auto-incriminacion documentada: el denunciante proporciono la evidencia de su propia conducta de recopilacion activa. Carnegie: inversion de rol victima-victimario.",
+      "carnegie": "Role inversion — accuser documents own surveillance while alleging being surveilled",
+      "mitre_ttps": [
+        "T1074 (Data Staged — private server with target material)"
+      ],
+      "devil_advocate": "El servidor puede tener una explicacion legitima (ej. archivo personal, uso previo a la cautelar). Los logs pueden no demostrar acceso activo durante el periodo de denuncia. Sin pericia tecnica del servidor, la interpretacion es inferida.",
+      "corroboration": "A04 honeypot corrobora patron de vigilancia activa del denunciante.",
+      "self_correction": "CONFIRMED — auto-incriminacion documental directa."
+    },
+    {
+      "finding_id": "F-003",
+      "title": "Vigilancia Activa Unilateral — Blog Honeypot",
+      "verdict": "SUSPICION",
+      "confidence": "MEDIUM",
+      "status": "INFERRED",
+      "artifacts": [
+        "KIWI-001-A04"
+      ],
+      "tools_used": [
+        "manual_forensic_review"
+      ],
+      "firstness": "Blog conocido exclusivamente por el denunciante. Hasta 60 accesos diarios registrados desde denunciante bloqueado.",
+      "secondness": "El denunciante tramita denuncia por hostigamiento mientras accede activamente al blog de la imputada hasta 60 veces por dia. Inversion conductual documentada.",
+      "thirdness": "Patron de vigilancia unilateral activa que contradice el rol de victima pasiva alegado.",
+      "carnegie": "None — objective behavioral record",
+      "mitre_ttps": [],
+      "devil_advocate": "El acceso puede ser parte de la recopilacion de evidencia para la denuncia, no de hostigamiento. 60 accesos diarios puede incluir accesos automatizados (bots, RSS). Sin logs tecnicos independientes, la cifra es del examinador AT-001.",
+      "corroboration": "A02 servidor stalkeo corrobora patron de recopilacion activa.",
+      "self_correction": "INFERRED — cifra de accesos proviene de AT-001, sin verificacion tecnica independiente."
+    }
+  ],
+  "refutation_gate_log": {
+    "candidate_verdict": "SUSPICION",
+    "gate_result": "CANDIDATE CONFIRMED. Hipotesis benigna parcialmente valida (apofenia genuina no descartable). Sin dos fuentes independientes de intencion deliberada, INTENT no alcanzado.",
+    "forensic_note": "SUSPICION es el veredicto correcto: anomalias estructurales documentadas, hipotesis benigna no completamente refutada."
+  },
+  "tool_execution_log": [
+    {
+      "seq": 1,
+      "tool": "generate_forensic_hash",
+      "target": "VIGIA-KIWI-001.json",
+      "result_summary": "SHA256=114a73c667abffe94f4fd4210579383b033207b168f1c00f06b187eff45a3d1b"
+    },
+    {
+      "seq": 2,
+      "tool": "audit_grice_maxims",
+      "target": "A01+A03+A04",
+      "result_summary": "SUSPICION. TACTICAL_EVASION maxim RELATION. deception_probability=0.30."
+    },
+    {
+      "seq": 3,
+      "tool": "detect_eco_overinterpretation",
+      "target": "A01-A04",
+      "result_summary": "NOISE. Normal distribution. (Limitacion: term-frequency, no semantico.)"
+    },
+    {
+      "seq": 4,
+      "tool": "reason_with_llm",
+      "target": "Full evidence",
+      "result_summary": "SUSPICION confidence=65. Frame manipulation false_flag. Carnegie: frame manipulation."
+    },
+    {
+      "seq": 5,
+      "tool": "validate_and_correct_analysis",
+      "target": "Candidate SUSPICION",
+      "result_summary": "JSON truncado. Contenido: refutaciones verificables A01 consistentes con SUSPICION. Sin downgrade."
+    }
+  ],
+  "known_limitations": [
+    "L-001: Todos los artefactos de fuente unica AT-001 manual_forensic_review.",
+    "L-002: write_blocker_used=false en todos los artefactos.",
+    "L-003: detect_eco_overinterpretation: false negative esperado — usa term-frequency.",
+    "L-004: validate_and_correct_analysis devolvio JSON truncado; contenido parcial analizado.",
+    "L-005: Sin pericia tecnica independiente del servidor trampolin.sg-host.com.",
+    "L-006: Sin evaluacion pericial psiquiatrica del denunciante — hipotesis apofenia genuina no refutable sin ella."
+  ],
+  "token_usage": {
+    "llm_backend": "ollama (deepseek-r1:8b)",
+    "session_start": "2026-06-25T17:26:52Z",
+    "tools_called": 5
+  },
+  "bundle_sha256": "11f57a8ab54dcf6a5ae7b13ce307ed2df38acbf5ac7b2c17e618b7f938cd3461"
+}
