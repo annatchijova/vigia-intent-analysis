@@ -79,6 +79,7 @@ import hashlib
 import hmac as hmac_mod
 import json
 import math
+import copy
 import os
 import re
 import sys
@@ -767,16 +768,18 @@ def _extract_assertions(artifact: "Artifact") -> frozenset:
             assertions.add("log_claims_credential_access")
 
     elif et in ("memory_process", "lsass_session", "kernel_structure"):
-        # network_connections must be a non-empty list/dict — a string or True
-        # is not a valid connection list (truthiness bug: "1.2.3.4" is truthy
-        # but is not a list of observed network connections).
-        _nc = meta.get("network_connections")
-        _nc_valid = isinstance(_nc, (list, dict)) and bool(_nc)
-        has_network = bool(
-            meta.get("dest_ip") or
-            meta.get("source_ip") or
-            _nc_valid
-        )
+        # Type validation for network indicators — only semantically valid
+        # values count as "network activity observed":
+        # - dest_ip / source_ip: must be non-empty strings (int/bool/None are invalid)
+        # - network_connections: must be non-empty list or dict (string is not a
+        #   connection list — truthiness bug caught by fuzzing 2026-06-25)
+        _dest_ip = meta.get("dest_ip")
+        _src_ip  = meta.get("source_ip")
+        _nc      = meta.get("network_connections")
+        _nc_valid   = isinstance(_nc, (list, dict)) and bool(_nc)
+        _dest_valid = isinstance(_dest_ip, str) and bool(_dest_ip.strip())
+        _src_valid  = isinstance(_src_ip,  str) and bool(_src_ip.strip())
+        has_network = _dest_valid or _src_valid or _nc_valid
         if has_network:
             assertions.add("memory_shows_network_activity")
         else:
@@ -864,13 +867,14 @@ class CrossArtifactIncongruenceEngine:
             )
             return False
 
-        self._artifacts.append(artifact)
+        _artifact_copy = copy.deepcopy(artifact)
+        self._artifacts.append(_artifact_copy)
 
         # Index for temporal and network analysis
-        if artifact.timestamp:
-            self._temporal_index.setdefault(artifact.timestamp, []).append(artifact)
-        if "network" in artifact.evidence_type or "ip" in artifact.evidence_type:
-            self._network_index.setdefault(artifact.source_tool, []).append(artifact)
+        if _artifact_copy.timestamp:
+            self._temporal_index.setdefault(_artifact_copy.timestamp, []).append(_artifact_copy)
+        if "network" in _artifact_copy.evidence_type or "ip" in _artifact_copy.evidence_type:
+            self._network_index.setdefault(_artifact_copy.source_tool, []).append(_artifact_copy)
 
         return True
 
