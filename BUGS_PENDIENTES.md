@@ -410,3 +410,66 @@ correctamente con la arquitectura actual. Es deuda de migración para v3.0.
 
 Evaluar si SemioticDetectorV2 cubre todos los casos de forensic_technical_detector.
 Migración debe ser auditada por el colectivo antes de aplicar.
+
+---
+
+## B-011 — assert en guard P0 de abductive_reasoner_v2.py (python -O lo desactiva)
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | ABIERTO |
+| **Severidad** | P1 — guard Daubert desaparece en modo optimizado |
+| **Archivo** | `vigia/inference/abductive_reasoner_v2.py` |
+| **Línea** | 143 |
+| **Detectado en** | Sesión post-hackathon 2026-06-25 |
+
+### Descripción
+
+```python
+assert not isinstance(value, float), (
+    f"INVARIANTE 1 VIOLADA en '{context}':..."
+)
+```
+
+Este `assert` es el guard P0 que impide que floats entren al path de scoring
+abductivo. Con `python -O` (modo optimizado), todos los `assert` se eliminan
+en compilación y el guard desaparece silenciosamente — floats pasan sin
+detección, violando el invariante Daubert de reproducibilidad exacta.
+
+### Fix
+
+```python
+if isinstance(value, float):
+    raise ValueError(
+        f"INVARIANTE 1 VIOLADA en '{context}': "
+        f"Se detectó float: {repr(value)}. "
+        f"Todo cálculo de score DEBE usar Fraction(numerador, denominador). "
+        f"Corrección: Fraction({value}).limit_denominator(10**9). "
+        f"Fundamento: Daubert requiere reproducibilidad exacta."
+    )
+```
+
+---
+
+## B-012 — assert en verify_determinism_cross_arch() de caie.py (python -O lo desactiva)
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | ABIERTO |
+| **Severidad** | P2 — función de verificación, no path de scoring |
+| **Archivo** | `vigia/tools/caie.py` |
+| **Líneas** | 2239, 2242, 2248 |
+| **Detectado en** | Sesión post-hackathon 2026-06-25 |
+
+### Descripción
+
+`verify_determinism_cross_arch()` usa `assert` para verificar determinismo
+bit-idéntico. Con `python -O`, los asserts se eliminan y la función retorna
+`True` sin verificar nada — falsa sensación de verificación aprobada.
+
+No está en el path de scoring de producción (se llama explícitamente), pero
+es la función que valida el Deterministic Forensic Protocol P0.
+
+### Fix
+
+Reemplazar cada `assert condicion, mensaje` por `if not condicion: raise RuntimeError(mensaje)`.
