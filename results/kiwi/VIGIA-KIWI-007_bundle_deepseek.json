@@ -1,0 +1,174 @@
+{
+  "bundle_id": "VIGIA-KIWI-007",
+  "schema_version": "ebs_v1",
+  "case_id": "VIGIA-KIWI-007-TESTIMONY-QUANTITY-CONCEALMENT",
+  "case_origin": "MPF7779408",
+  "investigator": "VIGIA Autonomous Agent (Claude Code / Anthropic)",
+  "mode": "Claude Code + Ollama (deepseek-r1:8b)",
+  "timestamp_sealed": "2026-06-25T17:46:51.249607+00:00",
+  "primary_evidence_sha256": "119e4215c02ea9dc5a859c069f691dc90146151ab6632b80d5a166fd44653c8c",
+  "primary_evidence_path": "scripts/VIGIA_KIWI_007_TESTIMONY_QUANTITY_CONCEALMENT.json",
+  "sans_phase": "PICERL: Identification to Containment (Phase 4 complete — self-correction applied)",
+  "final_verdict": "SUSPICION",
+  "expected_verdict": "suspicion",
+  "verdict_match": true,
+  "executive_summary": "Caso MPF7779408: el hermano denunciante (testigo activo) presenta tres imposibilidades simultáneas en su testimonio (A01): afirma haber enviado capturas en tiempo real pero no puede presentar el dispositivo, desconoce el número del acusado, y la imputada lo tiene bloqueado desde hace años. Además omite la cantidad de material descargado (A03) mientras un testigo periférico declara 10GB exactos — patrón inverse_precision_pattern. Se activó un botón de pánico con registro policial verificable pero claimed outcome (imputada escapó) sin corroboración independiente (A02). Grice audit detectó TACTICAL_EVASION (maxim RELATION, 30% prob_deception). LLM deepseek-r1:8b evaluó candidato SUSPICION (75% confidence). Validate_and_correct rechazó candidato INTENT en F-001 por PREMATURE ABDUCTION, FALSE SECONDNESS y HABITLESS THIRDNESS. Daubert Corroboration Gate aplica: n_independent_sources=1 (single source AT-001) → cap SUSPICION. Ningún veredicto INTENT o MALICE sellado.",
+  "findings": [
+    {
+      "finding_id": "F-001",
+      "title": "Triple Imposibilidad Técnica en Testimonio del Hermano Denunciante",
+      "verdict": "SUSPICION",
+      "confidence": "MEDIUM",
+      "status": "INFERRED",
+      "artifacts": ["KIWI-007-A01", "KIWI-007-A03"],
+      "tools_used": ["audit_grice_maxims", "reason_with_llm", "validate_and_correct_analysis"],
+      "firstness": "Testigo activo (hermano denunciante) declara: (1) envió capturas en tiempo real, (2) no puede presentar el celular con dichas capturas, (3) no sabe el número de teléfono del acusado, (4) la imputada lo tiene bloqueado hace años. Cuatro afirmaciones; las últimas tres invalidan la primera.",
+      "secondness": "Baseline forense para testimonio de aviso en tiempo real: el testigo debe disponer del dispositivo con el registro de envío, conocer el número del destinatario, y el destinatario no tenerlo bloqueado. Las tres condiciones fallan simultáneamente. La probabilidad de fallo simultáneo por causas independientes es estructuralmente baja. Grice: TACTICAL_EVASION detectada (maxim RELATION, peso 30).",
+      "thirdness": "Patrón de omisión selectiva: la evidencia que validaría el testimonio (capturas, dispositivo) no está disponible, y las condiciones necesarias para que fuera verdadero tampoco se cumplen. Esto es consistente con un testimonio no respaldado por hechos. El mismo testigo omite quantity_declared en A03 — patrón de omisión coherente a través de artefactos.",
+      "carnegie": "Silencio significativo (Eco Filter) — ausencia de evidencia presentable donde debería existir",
+      "mitre_ttps": ["T1036 (Masquerading — testimony fabrication analogue)"],
+      "devil_advocate": "El testigo pudo perder genuinamente el celular. Puede conocer al acusado por nombre pero no memorizar su número. El bloqueo pudo activarse después del intercambio. La omisión de cantidad puede reflejar desconocimiento real del volumen descargado. Validate_and_correct detectó PREMATURE ABDUCTION al elevar a INTENT: la single-source AT-001 no provee corroboración independiente suficiente.",
+      "corroboration": "A03 muestra el mismo patrón de omisión (quantity=null) para el mismo testigo activo — consistencia interna. Sin embargo, ambos artefactos provienen de AT-001 (misma fuente). Daubert Gate: n_independent_sources=1 → INTENT rechazado pre-emisión.",
+      "self_correction": "INFERRED. Candidato INTENT rechazado por validate_and_correct_analysis: PREMATURE ABDUCTION (Firstness incompleta), FALSE SECONDNESS (contexto genérico no host-specific), HABITLESS THIRDNESS (patrón sin hábito empírico verificado), CARNEGIE BIAS (errores operativos confundidos con manipulación). Emitido como SUSPICION.",
+      "refutation_gate_log": {
+        "candidate_verdict": "INTENT",
+        "gate_applied": "Daubert Corroboration Gate + validate_and_correct_analysis",
+        "gate_rule": "n_independent_sources=1 para esta clase de evidencia → cap SUSPICION; además 4 falacias Peirceanas detectadas",
+        "gate_result": "Candidato RECHAZADO pre-emisión. Emitido como SUSPICION.",
+        "forensic_note": "Auto-corrección arquitectural. Ningún veredicto incorrecto fue sellado."
+      }
+    },
+    {
+      "finding_id": "F-002",
+      "title": "Inverse Precision Asymmetry — Quien Más Descargó Sabe Menos",
+      "verdict": "SUSPICION",
+      "confidence": "MEDIUM",
+      "status": "INFERRED",
+      "artifacts": ["KIWI-007-A03"],
+      "tools_used": ["reason_with_llm", "infer_intent"],
+      "firstness": "Testigo activo (hermano, participante principal): quantity_declared=null. Testigo periférica (menor participación declarada): quantity_declared='10gb exactos'. raw_score A03: 0.8. asymmetry_type: inverse_precision_pattern.",
+      "secondness": "Baseline esperado: quien más directamente participa en una actividad conoce mejor su magnitud. El patrón inverso — mayor participación, menor precisión declarada — es estadísticamente anómalo. Un participante activo que descargó material no puede desconocer el orden de magnitud, a diferencia de un testigo periférico que sí podría tener acceso accidental a una cifra.",
+      "thirdness": "Ocultamiento estratégico de escala: la omisión de cantidad por parte del testigo activo evita que ese dato sea usado como evidencia de la magnitud del hecho. La testigo periférica, al no ser el objetivo del proceso, puede declarar libremente la cifra que el testigo activo evita. Carnegie: silencio significativo.",
+      "carnegie": "Silencio significativo — omisión de dato cuantitativo por el actor con mayor acceso a él",
+      "mitre_ttps": ["T1070 (Indicator Removal — analogue: quantity concealment)"],
+      "devil_advocate": "Es posible que el hermano genuinamente no monitoreara el volumen total descargado y que la testigo periférica lo supiera por fuente diferente (p.ej. le fue dicho explícitamente). La asimetría de precisión no implica necesariamente ocultamiento.",
+      "corroboration": "F-001 muestra el mismo patrón de omisión selectiva en el mismo testigo activo (evidencia no presentable + número bloqueado). Coherencia de patrón a través de artefactos — pero mismo examinador AT-001.",
+      "self_correction": "INFERRED — single source AT-001. validate_and_correct detectó FALSE SECONDNESS: contexto de asimetría tratado como genérico. Mantenido como SUSPICION sin upgrade."
+    },
+    {
+      "finding_id": "F-003",
+      "title": "Botón de Pánico — Activación Verificable, Outcome No Corroborado",
+      "verdict": "SUSPICION",
+      "confidence": "LOW",
+      "status": "INFERRED",
+      "artifacts": ["KIWI-007-A02"],
+      "tools_used": ["audit_grice_maxims", "reason_with_llm"],
+      "firstness": "Registro policial verificable: timestamp, GPS, unidad despachada — todos contrastables en archivos Policía Ciudad. Claimed outcome: 'imputada escapó antes de que llegara la policía'. raw_score: 0.7, prior_trust: 0.3.",
+      "secondness": "El hecho verificable (activación del botón, registro policial) es real. El claim adjunto (presencia de la imputada + fuga) no tiene corroboración independiente: el registro policial documenta la respuesta, no la presencia previa de la imputada. La structure es: credibilidad institucional del registro + claim privado no verificable adjunto.",
+      "thirdness": "Uso instrumental del sistema de emergencia: la activación real de un recurso estatal (policía) presta credibilidad institucional a un claim que no puede verificarse de forma independiente. Carnegie: authority borrowing — el registro policial valida implícitamente el claim sobre la imputada, aunque no lo corrobora.",
+      "carnegie": "Authority borrowing — credibilidad del registro policial transferida implícitamente al claim de presencia no verificado",
+      "mitre_ttps": ["T1585 (Establish Accounts — analogue: establish institutional alibi via panic system)"],
+      "devil_advocate": "La imputada pudo haber estado presente y escapado genuinamente. El registro policial no niega su presencia previa — simplemente no la confirma. El botón de pánico pudo activarse por temor real. El sistema funciona como se diseñó.",
+      "corroboration": "Ninguna fuente independiente confirma o refuta la presencia de la imputada en el momento alegado. El registro policial es la única fuente y documenta la respuesta, no el trigger claim.",
+      "self_correction": "INFERRED — LOW confidence. Registro policial verificable pero claim central (presencia imputada) sin corroboración independiente. Mantenido como SUSPICION."
+    }
+  ],
+  "self_correction_events": [
+    {
+      "event": "CONTRADICTION_DETECTOR",
+      "finding_id": "F-001",
+      "before": "INTENT (candidato — CAIE score raw_score=0.8 superó umbral single-artifact)",
+      "after": "SUSPICION",
+      "reason": "validate_and_correct_analysis detectó: PREMATURE ABDUCTION, FALSE SECONDNESS, HABITLESS THIRDNESS, CARNEGIE BIAS. Daubert Gate: n_independent_sources=1.",
+      "timestamp": "2026-06-25T17:46:39.794246+00:00"
+    }
+  ],
+  "tool_execution_log": [
+    {
+      "seq": 1,
+      "tool": "bash_sha256",
+      "target": "VIGIA_KIWI_007_TESTIMONY_QUANTITY_CONCEALMENT.json",
+      "result_summary": "SHA-256: 119e4215c02ea9dc5a859c069f691dc90146151ab6632b80d5a166fd44653c8c",
+      "mode": "claude_code"
+    },
+    {
+      "seq": 2,
+      "tool": "audit_grice_maxims",
+      "target": "A01+A02+A03 testimony corpus",
+      "result_summary": "SUSPICION — TACTICAL_EVASION (maxim RELATION, weight 30, prob_deception 0.30)",
+      "mode": "claude_code"
+    },
+    {
+      "seq": 3,
+      "tool": "analyze_stylometry",
+      "target": "hermano_denunciante_A01 / denunciante_panico_A02 / testigo_periferica_A03",
+      "result_summary": "NOISE — 30% same-entity probability, 3 señales TOTAL_CULTURAL_NEUTRALITY, PROBABLE COINCIDENCE",
+      "mode": "claude_code"
+    },
+    {
+      "seq": 4,
+      "tool": "infer_intent",
+      "target": "A01+A02+A03 trajectory",
+      "result_summary": "NOISE — 0 signals detected, tool limitado para formato de testimonios forenses vs. conversacional",
+      "mode": "claude_code"
+    },
+    {
+      "seq": 5,
+      "tool": "reason_with_llm",
+      "target": "KIWI-007 full evidence + Peircean framework",
+      "result_summary": "SUSPICION — confidence 75%, Peirce chain completo, triple impossibility A01, inverse precision A03, authority borrowing A02. llm_backend=ollama (deepseek-r1:8b)",
+      "mode": "claude_code"
+    },
+    {
+      "seq": 6,
+      "tool": "validate_and_correct_analysis",
+      "target": "F-001 candidato INTENT + F-002 F-003",
+      "result_summary": "correction_applied=true — PREMATURE ABDUCTION, FALSE SECONDNESS, HABITLESS THIRDNESS, CARNEGIE BIAS detectados en F-001. Cap SUSPICION.",
+      "mode": "claude_code"
+    }
+  ],
+  "artifacts_examined": [
+    {
+      "artifact_id": "KIWI-007-A01",
+      "evidence_type": "log_entry",
+      "raw_score": 0.8,
+      "prior_trust": 0.1,
+      "disposition": "INFERRED SUSPICION — triple imposibilidad técnica + omisión de cantidad"
+    },
+    {
+      "artifact_id": "KIWI-007-A02",
+      "evidence_type": "log_entry",
+      "raw_score": 0.7,
+      "prior_trust": 0.3,
+      "disposition": "INFERRED SUSPICION — activación verificable, outcome no corroborado"
+    },
+    {
+      "artifact_id": "KIWI-007-A03",
+      "evidence_type": "document_geometry",
+      "raw_score": 0.8,
+      "prior_trust": 0.15,
+      "disposition": "INFERRED SUSPICION — inverse_precision_pattern, omisión estratégica de escala"
+    }
+  ],
+  "daubert_gate": {
+    "n_independent_sources": 1,
+    "single_source": "AT-001 (manual_forensic_review)",
+    "gate_fired": true,
+    "gate_rule": "n_independent_sources < 2 → cap SUSPICION para toda clase de evidencia",
+    "candidates_rejected": ["INTENT (F-001)"],
+    "verdicts_emitted": ["SUSPICION (F-001)", "SUSPICION (F-002)", "SUSPICION (F-003)"]
+  },
+  "known_limitations": [
+    "Todos los artefactos provienen de única fuente AT-001 (manual_forensic_review). Sin verificación técnica independiente.",
+    "infer_intent opera sobre formato conversacional; en testimonios forenses estructurados la detección de señales es subóptima.",
+    "Registro policial (A02) no fue accedido directamente — solo referenciado en metadata. Verificación pendiente contra archivos Policía Ciudad.",
+    "Cantidad exacta de material (A03: 10GB de testigo periférica) no corroborada por log técnico de transferencia.",
+    "LLM backend: ollama (deepseek-r1:8b). reason_with_llm como señal adicional, no como veredicto. No override del pipeline matemático."
+  ],
+  "token_usage": {
+    "note": "Sesión Claude Code + Ollama deepseek-r1:8b. Tokens LLM Anthropic: N/A (Claude Code session — sin llamadas directas a Anthropic API en reason_with_llm). reason_with_llm resuelto via Ollama local. Full token breakdown disponible en usage.anthropic.com para la sesión Claude Code.",
+    "llm_backend_used": "ollama",
+    "ollama_model": "deepseek-r1:8b",
+    "session_timestamp": "2026-06-25T17:44:55Z"
+  }
+}
