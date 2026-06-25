@@ -161,36 +161,44 @@ def classify_domain(evidence_type: str) -> str:
     """Deterministic domain classifier for artifact types."""
     return _DOMAIN_MAP.get(evidence_type, "UNKNOWN")
 
-def _dround(value: float, precision: int = _DETERMINISTIC_INTERNAL_PREC) -> float:
-    """Deterministic rounding helper - ensures consistent rounding across platforms."""
-    if not isinstance(value, (int, float)) or not math.isfinite(value):
-        return 0.0
-    return round(float(value), precision)
-
-
-def _dsum(values: list[float]) -> float:
+def _dround(value, precision: int = _DETERMINISTIC_INTERNAL_PREC) -> decimal.Decimal:
     """
-    Deterministic summation using decimal.Decimal (P0_CRITICO Directiva 4).
+    Deterministic rounding — returns Decimal, never float.
+    L-021 Phase 1: Decimal internal algebra throughout.
+    Finite Math Shield: returns Decimal('0') for inf, -inf, NaN.
+    """
+    if isinstance(value, decimal.Decimal):
+        if not value.is_finite():
+            return _D_ZERO
+        return value.quantize(decimal.Decimal(10) ** -precision,
+                              rounding=decimal.ROUND_HALF_EVEN)
+    if isinstance(value, Fraction):
+        value = decimal.Decimal(value.numerator) / decimal.Decimal(value.denominator)
+        return value.quantize(decimal.Decimal(10) ** -precision,
+                              rounding=decimal.ROUND_HALF_EVEN)
+    if not isinstance(value, (int, float)) or not math.isfinite(float(value)):
+        return _D_ZERO
+    return decimal.Decimal(str(value)).quantize(
+        decimal.Decimal(10) ** -precision,
+        rounding=decimal.ROUND_HALF_EVEN
+    )
 
-    Replaces math.fsum() for all score accumulation in CAIE.
-    math.fsum() uses C float bindings with platform-dependent FPU rounding
-    (x87 80-bit vs SSE2 64-bit vs ARM VFP). decimal.Decimal uses a pure-Python
-    IEEE 754 implementation with prec=28 and ROUND_HALF_EVEN — bit-identical
-    across x86/ARM, independent of hardware FPU state.
 
-    Args:
-        values: List of float scores. Non-finite values are silently zeroed
-                (defense-in-depth against score poisoning attacks).
-
-    Returns:
-        float: Sum as Python float, rounded to _DETERMINISTIC_INTERNAL_PREC.
+def _dsum(values) -> decimal.Decimal:
+    """
+    Deterministic summation — returns Decimal, never float.
+    L-021 Phase 1.
     """
     acc = _D_ZERO
     for v in values:
-        # Defensive: non-finite inputs silently zeroed (mirrors CAIE Artifact validation)
-        if isinstance(v, (int, float)) and math.isfinite(v):
+        if isinstance(v, decimal.Decimal):
+            if v.is_finite():
+                acc += v
+        elif isinstance(v, Fraction):
+            acc += decimal.Decimal(v.numerator) / decimal.Decimal(v.denominator)
+        elif isinstance(v, (int, float)) and math.isfinite(float(v)):
             acc += decimal.Decimal(str(v))
-    return _dround(float(acc), _DETERMINISTIC_INTERNAL_PREC)
+    return _dround(acc, _DETERMINISTIC_INTERNAL_PREC)
 
 
 # ---------------------------------------------------------------------------
@@ -576,7 +584,8 @@ class Artifact:
                 _DETERMINISTIC_INTERNAL_PREC,
             )
             self.base_trust = _dround(
-                max(_ACQ_TRUST_FLOOR, self.base_trust - _penalty),
+                max(decimal.Decimal(str(_ACQ_TRUST_FLOOR)),
+                    _dround(self.base_trust, _DETERMINISTIC_INTERNAL_PREC) - _penalty),
                 _DETERMINISTIC_INTERNAL_PREC,
             )
             audit_logger.log_block(
@@ -602,7 +611,8 @@ class Artifact:
                 _DETERMINISTIC_INTERNAL_PREC,
             )
             self.base_trust = _dround(
-                max(_ACQ_TRUST_FLOOR, self.base_trust - _penalty_w),
+                max(decimal.Decimal(str(_ACQ_TRUST_FLOOR)),
+                    _dround(self.base_trust, _DETERMINISTIC_INTERNAL_PREC) - _penalty_w),
                 _DETERMINISTIC_INTERNAL_PREC,
             )
             audit_logger.log_block(
@@ -639,20 +649,20 @@ class Artifact:
         # Step 1: raw_score × (1 - effective_spoofability)
         # effective_spoofability incorpora acquisition_assurance contextual
         # (calculado en __post_init__ con gates deterministas G1-G4)
-        step1 = _dround(self.raw_score * (1.0 - self.effective_spoofability), _DETERMINISTIC_INTERNAL_PREC)
+        step1 = _dround(_dround(self.raw_score, _DETERMINISTIC_INTERNAL_PREC) * (_D_ONE - decimal.Decimal(str(self.effective_spoofability))), _DETERMINISTIC_INTERNAL_PREC)
 
         # Step 2: × base_weight
-        step2 = _dround(step1 * p.base_weight, _DETERMINISTIC_INTERNAL_PREC)
+        step2 = _dround(step1 * decimal.Decimal(str(p.base_weight)), _DETERMINISTIC_INTERNAL_PREC)
 
         # Step 3: × base_trust
-        result = _dround(step2 * self.base_trust, _DETERMINISTIC_INTERNAL_PREC)
+        result = _dround(step2 * _dround(self.base_trust, _DETERMINISTIC_INTERNAL_PREC), _DETERMINISTIC_INTERNAL_PREC)
 
         # Defense-in-depth: should be impossible after __post_init__ clamp,
         # but protect against corrupted EvidenceProfile values.
-        if not math.isfinite(result):
-            return 0.0
+        if not result.is_finite():
+            return _D_ZERO
 
-        return _dround(max(0.0, min(1.0, result)), _DETERMINISTIC_INTERNAL_PREC)
+        return _dround(max(_D_ZERO, min(_D_ONE, result)), _DETERMINISTIC_INTERNAL_PREC)
 
 
 # ---------------------------------------------------------------------------
@@ -1706,14 +1716,14 @@ class CrossArtifactIncongruenceEngine:
         else:
             composite = 0.0
 
-        composite = _dround(min(composite, 0.99), _DETERMINISTIC_INTERNAL_PREC)
+        composite = _dround(min(composite, decimal.Decimal("0.99")), _DETERMINISTIC_INTERNAL_PREC)
 
         # P1: Confidence normalization - penalize if < 3 independent sources
         independent_sources = len(group_scores)
         confidence_penalty = 0.0
         if independent_sources < _MIN_INDEPENDENT_SOURCES:
             confidence_penalty = _LOW_SOURCE_PENALTY
-            composite = _dround(composite * (1.0 - confidence_penalty), _DETERMINISTIC_INTERNAL_PREC)
+            composite = _dround(composite * (_D_ONE - decimal.Decimal(str(confidence_penalty))), _DETERMINISTIC_INTERNAL_PREC)
 
         # P1: DETERMINISTIC fracture deduplication
         # Dedup key: (fracture_type, artifact_a, artifact_b)
@@ -1768,14 +1778,14 @@ class CrossArtifactIncongruenceEngine:
         if non_structural_fractures:
             bonus_terms = [
                 _dround(
-                    getattr(f, 'severity', 0.0) * getattr(f, 'spoofability_delta', 0.5) * 0.05,
+                    _dround(getattr(f, 'severity', 0.0), _DETERMINISTIC_INTERNAL_PREC) * _dround(getattr(f, 'spoofability_delta', 0.5), _DETERMINISTIC_INTERNAL_PREC) * decimal.Decimal("0.05"),
                     _DETERMINISTIC_INTERNAL_PREC
                 )
                 for f in non_structural_fractures
             ]
             bonus = _dsum(bonus_terms)
-            fracture_bonus = _dround(min(bonus, 0.2), _DETERMINISTIC_INTERNAL_PREC)
-            composite = _dround(min(composite + fracture_bonus, 0.99), _DETERMINISTIC_INTERNAL_PREC)
+            fracture_bonus = _dround(min(bonus, decimal.Decimal("0.2")), _DETERMINISTIC_INTERNAL_PREC)
+            composite = _dround(min(composite + fracture_bonus, decimal.Decimal("0.99")), _DETERMINISTIC_INTERNAL_PREC)
 
         # Verdict: structural_verdict takes precedence over probabilistic_score.
         # Two separate fields exposed in output for Daubert traceability.
@@ -1864,10 +1874,10 @@ class CrossArtifactIncongruenceEngine:
                 {
                     "tool": a.source_tool,
                     "type": a.evidence_type,
-                    "raw_score": _dround(a.raw_score, _DETERMINISTIC_OUTPUT_PREC),
+                    "raw_score": str(_dround(a.raw_score, _DETERMINISTIC_OUTPUT_PREC)),
                     "spoofability": a.profile.spoofability,
                     "weight": a.profile.base_weight,
-                    "adjusted": _dround(a.adjusted_score, _DETERMINISTIC_OUTPUT_PREC),
+                    "adjusted": str(_dround(a.adjusted_score, _DETERMINISTIC_OUTPUT_PREC)),
                     "description": a.description[:200],
                 }
                 for a in self._artifacts
@@ -1892,7 +1902,7 @@ class CrossArtifactIncongruenceEngine:
                 f"Noisy-OR fusion: {len(group_scores)} independent groups, "
                 f"composite={_dround(composite, 4):.4f}. "
                 f"Most reliable: {top_adjusted[0]['tool']} "
-                f"({top_adjusted[0]['type']}, adj={top_adjusted[0]['adjusted']:.4f}). "
+                f"({top_adjusted[0]['type']}, adj={top_adjusted[0]['adjusted']}). "
                 f"{len(filtered_fractures)} unique fracture(s), "
                 f"{len(golden_rules)} Golden Rule(s)."
             ),
@@ -1939,7 +1949,7 @@ class CrossArtifactIncongruenceEngine:
                 if related:
                     avg_reliability = _dround(_dsum([a.raw_score for a in related]) / len(related), _DETERMINISTIC_INTERNAL_PREC)
                     ttp_confidences[ttp_id] = calculate_ttp_confidence(
-                        ttp_id, avg_reliability, "cross_artifact_analysis"
+                        ttp_id, float(avg_reliability), "cross_artifact_analysis"
                     )
 
         # DETERMINISTIC: Build result with all floats rounded to output precision
@@ -1956,7 +1966,7 @@ class CrossArtifactIncongruenceEngine:
             # maximum of the two, with structural taking precedence.
             "structural_verdict": structural_verdict,
             "probabilistic_verdict": probabilistic_verdict,
-            "probabilistic_score": _dround(composite, _DETERMINISTIC_OUTPUT_PREC),
+            "probabilistic_score": str(_dround(composite, _DETERMINISTIC_OUTPUT_PREC)),
             "_determinism_protocol": "P0-v2.0-DECIMAL-6-4",
             "integrity_check": {
                 "math_engine": "decimal.Decimal",
@@ -1965,8 +1975,8 @@ class CrossArtifactIncongruenceEngine:
                 "fpu_native": False,
                 "alerts": [],
             },
-            "composite_score": _dround(composite, _DETERMINISTIC_OUTPUT_PREC),
-            "fracture_bonus_applied": _dround(fracture_bonus, _DETERMINISTIC_OUTPUT_PREC),
+            "composite_score": str(_dround(composite, _DETERMINISTIC_OUTPUT_PREC)),
+            "fracture_bonus_applied": str(_dround(fracture_bonus, _DETERMINISTIC_OUTPUT_PREC)),
             "artifacts_evaluated": len(self._artifacts),
             "independent_sources": independent_sources,
             "confidence_penalty_applied": confidence_penalty > 0,
@@ -1977,11 +1987,11 @@ class CrossArtifactIncongruenceEngine:
             "fractures": [
                 {
                     "type": f.fracture_type,
-                    "severity": _dround(f.severity, _DETERMINISTIC_OUTPUT_PREC),
+                    "severity": str(_dround(f.severity, _DETERMINISTIC_OUTPUT_PREC)),
                     "artifact_a": f.artifact_a,
                     "artifact_b": f.artifact_b,
                     "interpretation": f.interpretation,
-                    "spoofability_delta": _dround(f.spoofability_delta, _DETERMINISTIC_OUTPUT_PREC),
+                    "spoofability_delta": str(_dround(f.spoofability_delta, _DETERMINISTIC_OUTPUT_PREC)),
                     "mitre_ttp": f.ttp_id or _SIGNAL_TO_ATTACK.get(f.fracture_type),
                     "is_golden_rule": f.fracture_type in _GOLDEN_RULE_TYPES,
                     "is_structural": f.fracture_type in _STRUCTURAL_MALICE_TYPES,
@@ -1989,7 +1999,7 @@ class CrossArtifactIncongruenceEngine:
                 for f in filtered_fractures
             ],
             "mitre_ttps": sorted(mitre_ttps),
-            "ttp_confidences": {k: _dround(v, _DETERMINISTIC_OUTPUT_PREC) for k, v in ttp_confidences.items()},
+            "ttp_confidences": {k: str(_dround(v, _DETERMINISTIC_OUTPUT_PREC)) for k, v in ttp_confidences.items()},
             "peirce_chain": peirce_chain,
             "daubert_note": daubert_note,
             "timestamp": _utcnow(),

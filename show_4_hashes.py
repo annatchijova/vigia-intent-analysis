@@ -156,7 +156,7 @@ if fractures:
           f"score={caie_analysis.get('composite_score','?')} · "
           f"golden={caie_analysis.get('golden_rules_triggered',0)}){RST}")
     for f in fractures:
-        sev = f.get("severity", 0)
+        sev = f.get("severity", "0")
         col = RED if sev >= 0.9 else YLW if sev >= 0.7 else GRN
         print(f"  {col}[{f.get('type','?')}]{RST}  severity={sev}")
     print()
