@@ -324,3 +324,56 @@ intactas tal como quedaron en el P0 patch 2026-06-14 (commit 1807529).
 
 **Lección:** Validar siempre con `grep -n "math\.log\|math\.exp\|[0-9]\.[0-9]"
 vigia_scorer.py` antes de aceptar cualquier cambio al scoring path.
+
+---
+
+## B-008 — float() en SignalOutput constructors (vigia/sift/) — L-021 Fase 3
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | ABIERTO |
+| **Severidad** | P2 — deuda L-021, no urgente hasta integración SIFT activa |
+| **Archivos** | `vigia/sift/shellbag_analyzer.py`, `vigia/sift/amcache_shimcache.py`, `vigia/sift/memory_forensics.py`, `vigia/sift/disk_forensics.py` |
+| **Detectado en** | Sesión post-hackathon 2026-06-25 |
+
+### Descripción
+
+Los 4 módulos SIFT construyen `SignalOutput` usando `float()` explícito:
+
+```python
+# Patrón idéntico en los 4 archivos:
+value=float(z) / Z_CLIP_MAX if Z_CLIP_MAX > 0 else 0.0,
+z_score=float(z),
+confidence=float(conf),
+```
+
+Líneas exactas:
+- `shellbag_analyzer.py:60-62`
+- `amcache_shimcache.py:73-75`
+- `memory_forensics.py:176-177`
+- `disk_forensics.py:71-72`
+
+`SignalOutput` acepta float por API (definido en `vigia/models/ebs.py`). Cuando
+estos módulos alimenten el pipeline de scoring en integración SIFT real, los
+floats entrarán al path de inferencia — regresión potencial de L-021.
+
+### Root cause
+
+`SignalOutput.z_score` y `SignalOutput.confidence` están tipados como `float`
+en `ebs.py`. Para cerrar completamente L-021 en el path SIFT hay que:
+1. Migrar `SignalOutput` a aceptar `Decimal` o `str` (breaking change de API)
+2. Actualizar los 4 constructores en `vigia/sift/`
+3. Verificar que `likelihood_engine.py` consume los valores correctamente
+
+### Por qué no se toca ahora
+
+`sift_orchestrator.py` importa `MetabolicProfiler` desde `vigia.inference`,
+no estos módulos directamente. Los 4 archivos son helpers que se activan solo
+cuando hay artefactos SIFT reales (shellbags, amcache, memory dumps, disk
+images) — no se ejercitan en tests actuales. El riesgo es latente, no activo.
+
+### Fix cuando corresponda
+
+Coordinar con L-021 Fase 3. Requiere decisión arquitectónica sobre si
+`SignalOutput` acepta `Decimal` o si la conversión float es el boundary
+correcto entre SIFT y el motor de scoring.
