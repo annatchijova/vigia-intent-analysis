@@ -767,10 +767,15 @@ def _extract_assertions(artifact: "Artifact") -> frozenset:
             assertions.add("log_claims_credential_access")
 
     elif et in ("memory_process", "lsass_session", "kernel_structure"):
+        # network_connections must be a non-empty list/dict — a string or True
+        # is not a valid connection list (truthiness bug: "1.2.3.4" is truthy
+        # but is not a list of observed network connections).
+        _nc = meta.get("network_connections")
+        _nc_valid = isinstance(_nc, (list, dict)) and bool(_nc)
         has_network = bool(
             meta.get("dest_ip") or
             meta.get("source_ip") or
-            meta.get("network_connections")
+            _nc_valid
         )
         if has_network:
             assertions.add("memory_shows_network_activity")
@@ -1104,8 +1109,8 @@ class CrossArtifactIncongruenceEngine:
             if log_claims_activity and memory_silent:
                 # PID correlation: same process named in log and present in
                 # memory → contradiction is intra-process, not just cross-source
-                log_pids  = {a.metadata.get("pid") for a in logs    if a.metadata.get("pid")}
-                tech_pids = {a.metadata.get("pid") for a in technical if a.metadata.get("pid")}
+                log_pids  = {str(a.metadata.get("pid")) for a in logs    if a.metadata.get("pid") is not None}
+                tech_pids = {str(a.metadata.get("pid")) for a in technical if a.metadata.get("pid") is not None}
                 pid_overlap = log_pids & tech_pids
 
                 severity = _dround(0.95 if pid_overlap else 0.75, _DETERMINISTIC_INTERNAL_PREC)
