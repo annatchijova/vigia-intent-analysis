@@ -14,6 +14,9 @@ from fractions import Fraction
 from dataclasses import dataclass
 from typing import List, Tuple, Optional, Dict
 from pathlib import Path
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass(frozen=True)
@@ -433,9 +436,9 @@ class TimestampExtractor:
                         confidence=Fraction(8, 10),
                         metadata={'raw': metadata['creationDate']}
                     ))
-                except:
-                    pass
-            
+                except Exception as exc:
+                    logger.warning("[TemporalDrift] Failed to parse PDF CreationDate %r: %s", metadata.get('creationDate'), exc)
+
             # ModDate
             if metadata.get('modDate'):
                 try:
@@ -446,12 +449,12 @@ class TimestampExtractor:
                         confidence=Fraction(8, 10),
                         metadata={'raw': metadata['modDate']}
                     ))
-                except:
-                    pass
-            
+                except Exception as exc:
+                    logger.warning("[TemporalDrift] Failed to parse PDF ModDate %r: %s", metadata.get('modDate'), exc)
+
             doc.close()
-        except:
-            pass
+        except Exception as exc:
+            logger.warning("[TemporalDrift] Failed to open PDF %s: %s", pdf_path, exc)
         
         return events
     
@@ -477,9 +480,9 @@ class TimestampExtractor:
                         confidence=Fraction(9, 10),
                         metadata={'raw': msg['Date']}
                     ))
-                except:
-                    pass
-            
+                except Exception as exc:
+                    logger.warning("[TemporalDrift] Failed to parse Email Date header %r: %s", msg.get('Date'), exc)
+
             # Received headers (múltiples)
             for received in msg.get_all('Received', []):
                 try:
@@ -495,10 +498,11 @@ class TimestampExtractor:
                             confidence=Fraction(10, 10),  # Received es más confiable
                             metadata={'raw': date_str}
                         ))
-                except:
+                except Exception as exc:
+                    logger.warning("[TemporalDrift] Failed to parse Received header %r: %s", received, exc)
                     continue
-        except:
-            pass
+        except Exception as exc:
+            logger.warning("[TemporalDrift] Failed to open email %s: %s", email_path, exc)
         
         return events
     
