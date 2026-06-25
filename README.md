@@ -760,7 +760,7 @@ Known limitations: [KNOWN_LIMITATIONS.md](./KNOWN_LIMITATIONS.md)
 ### Unit Tests
 
 ```bash
-python3 -m pytest tests/ -v    # 163 passed, 6 xfailed
+python3 -m pytest tests/ -v    # 188 passed, 6 xfailed
 ```
 
 ![148 tests passing](screenshots/test148.png)
@@ -1159,7 +1159,7 @@ Temporal entropy: 0.00 bits.
 │   ├── protocols/P2/                    ← P2 canonical vectors + SHA-256 manifest
 │   └── academic/                        ← 193 module docs (EN/ES/RU/ZH in progress)
 │
-├── tests/                               ← 163 passed, 6 xfailed
+├── tests/                               ← 188 passed, 6 xfailed
 │   ├── run_all_cases.py
 │   ├── test_red_team.py
 │   └── test_ebs_v1_integration.py
@@ -1253,7 +1253,7 @@ Domain A (core metric): **118/118 PASS — 100%**
 
 ---
 
-### Unit test suite — 163 passed, 6 xfailed
+### Unit test suite — 188 passed, 6 xfailed
 
 **Claim:** 163 tests pass; 6 are `xfailed` (documented regressions with
 regression-preventing tests — see [`KNOWN_LIMITATIONS.md`](./KNOWN_LIMITATIONS.md)).
@@ -1262,7 +1262,7 @@ regression-preventing tests — see [`KNOWN_LIMITATIONS.md`](./KNOWN_LIMITATIONS
 python3 -m pytest tests/ -v
 ```
 
-Expected output: `163 passed, 6 xfailed`
+Expected output: `188 passed, 6 xfailed`
 
 ---
 

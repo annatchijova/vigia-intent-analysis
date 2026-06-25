@@ -384,7 +384,7 @@ allowing IEEE 754 platform-dependent rounding in intermediate scoring values
   `probabilistic_score`, `fracture_bonus_applied`, `severity`, `spoofability_delta`,
   `ttp_confidences`, `raw_score`, `adjusted` — all `str`, never `float`.
 - No `float()` at any output boundary.
-- Tests updated for str comparisons. 163 passed, 0 failed, 6 xfailed.
+- Tests updated for str comparisons. 188 passed, 0 failed, 6 xfailed.
 - Commits: `1a16ee9` (Phase 1), `6bba3d7` (Phase 2).
 
 **Prior mitigation (2026-06-14):** `math.log()`, `math.exp()`, and `0.95**k`

@@ -742,7 +742,7 @@ Limitaciones conocidas: [KNOWN_LIMITATIONS.md](./KNOWN_LIMITATIONS.md)
 ### Tests Unitarios
 
 ```bash
-python3 -m pytest tests/ -v    # 163 passed, 6 xfailed
+python3 -m pytest tests/ -v    # 188 passed, 6 xfailed
 ```
 
 ![148 tests pasando](screenshots/test148.png)
@@ -1140,7 +1140,7 @@ vigia-intent-analysis/
 │   ├── protocols/P2/                    ← Vectores canónicos P2 + manifiesto SHA-256
 │   └── academic/                        ← Docs de 193 módulos (EN/ES/RU/ZH en progreso)
 │
-├── tests/                               ← 163 passed, 6 xfailed
+├── tests/                               ← 188 passed, 6 xfailed
 │   ├── run_all_cases.py
 │   ├── test_red_team.py
 │   └── test_ebs_v1_integration.py
@@ -1236,7 +1236,7 @@ Domain A (core metric): **118/118 PASS — 100%**
 
 ---
 
-### Suite de tests unitarios — 163 passed, 6 xfailed
+### Suite de tests unitarios — 188 passed, 6 xfailed
 
 **Afirmación:** 163 tests pasan; 6 son `xfailed` (regresiones documentadas con
 tests que previenen regresión — ver [`KNOWN_LIMITATIONS.md`](./KNOWN_LIMITATIONS.md)).
@@ -1245,7 +1245,7 @@ tests que previenen regresión — ver [`KNOWN_LIMITATIONS.md`](./KNOWN_LIMITATI
 python3 -m pytest tests/ -v
 ```
 
-Salida esperada: `163 passed, 6 xfailed`
+Salida esperada: `188 passed, 6 xfailed`
 
 ---
 

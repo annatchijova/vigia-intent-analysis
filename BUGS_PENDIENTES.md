@@ -168,7 +168,7 @@ no terminología estadística.
 
 ```
 pytest tests/ -q --no-cov
-→ 163 passed, 6 xfailed
+→ 188 passed, 6 xfailed
 ```
 
 **APLICADO** 2026-06-24 — Commit: 43edd73.
