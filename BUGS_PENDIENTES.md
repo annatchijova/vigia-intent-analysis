@@ -532,3 +532,69 @@ Opción C es la más Daubert-compatible: "este log AFIRMA una conexión saliente
 Y la memoria NO LA MUESTRA — eso es una contradicción objetiva, independiente
 de cuán confiable sea el log". La fuerza del hallazgo se modula por severity
 (0.75 sin PID overlap, 0.95 con overlap), no por el raw_score del log.
+
+---
+
+## B-014 — _extract_assertions() no filtra IPs reservadas/loopback
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | ABIERTO |
+| **Severidad** | P1 — falso positivo garantizado, Daubert-indefendible |
+| **Archivo** | `vigia/tools/caie.py` — `_extract_assertions()` |
+| **Detectado en** | Sesión post-hackathon 2026-06-25, property-testing |
+
+### Descripción
+
+`_extract_assertions()` afirma `log_claims_outbound_connection` para cualquier
+valor string no vacío en `dst_ip`/`dest_ip`, incluyendo IPs que no pueden
+ser conexiones salientes reales:
+
+```
+127.0.0.1   → MALICE  (loopback — es localhost)
+0.0.0.0     → MALICE  (dirección nula)
+255.255.255.255 → MALICE  (broadcast)
+localhost   → MALICE  (nombre de loopback)
+::1         → MALICE  (IPv6 loopback)
+```
+
+Una conexión a `127.0.0.1` es comunicación intra-proceso — no puede ser
+exfiltración C2. Disparar LOG_VS_MEMORY por eso es un falso positivo
+estructural que ningún perito forense podría defender en juicio.
+
+### Fix
+
+Agregar lista de IPs/rangos reservados que no constituyen "conexión saliente":
+- `127.0.0.0/8` (loopback)
+- `0.0.0.0`
+- `255.255.255.255`
+- `localhost`, `::1`, `fe80::`
+
+---
+
+## B-015 — PID y dst_ip no se normalizan (whitespace, tabs, newlines)
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | ABIERTO |
+| **Severidad** | P1 — rompe correlación PID y dispara fractura con IPs malformadas |
+| **Archivo** | `vigia/tools/caie.py` — `_extract_assertions()`, PID canonicalization |
+| **Detectado en** | Sesión post-hackathon 2026-06-25, adversarial fuzzing |
+
+### Descripción
+
+Valores con whitespace no se normalizan antes de procesarse:
+
+**PID:** `str('4521 ') == '4521 '` ≠ `str(4521) == '4521'`
+→ PID overlap no se detecta → severity 0.75 en vez de 0.95
+
+**dst_ip:** `'1.2.3.4 '` (con espacio) es string no vacía
+→ `_dest_valid = isinstance(str, str) and bool('1.2.3.4 '.strip())` = True
+→ fractura dispara con IP malformada que ningún sistema real emitiría así
+
+### Fix
+
+Normalizar con `.strip()` antes de cualquier comparación:
+- PID: `str(pid).strip()` en lugar de `str(pid)`
+- dst_ip/dest_ip: ya tienen `.strip()` en `_dest_valid` pero el valor
+  malformado igual entra al bundle
