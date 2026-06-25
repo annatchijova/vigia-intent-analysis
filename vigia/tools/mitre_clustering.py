@@ -21,7 +21,7 @@ Determinismo:
 """
 
 from dataclasses import dataclass, field
-from typing import Dict, List, Set, Tuple
+from typing import Any, Dict, List, Set, Tuple
 from enum import Enum
 # from abductive_intent_engine_P0 import IRPhase, AbductiveHypothesis  # P1: imports no usados — removidos para evitar circular deps
 
@@ -535,6 +535,11 @@ class MITREClusterer:
     def __init__(self):
         self.hypothesis_to_mitre = HYPOTHESIS_TO_MITRE
         self.intent_clusters = INTENT_CLUSTERS
+        self._reverse_index = {
+            hyp_id: cluster
+            for cluster in self.intent_clusters.values()
+            for hyp_id in cluster.hypotheses
+        }
     
     def get_mitre_techniques_for_hypothesis(self, hyp_id: str) -> List[MITRETechnique]:
         """Retorna técnicas MITRE para una hipótesis"""
@@ -542,22 +547,16 @@ class MITREClusterer:
     
     def get_intent_cluster_for_hypothesis(self, hyp_id: str) -> IntentCluster | None:
         """Retorna el cluster de intención (STEALTH, PERSISTENCE, etc.) para una hipótesis"""
-        for cluster in self.intent_clusters.values():
-            if hyp_id in cluster.hypotheses:
-                return cluster
-        return None
+        return self._reverse_index.get(hyp_id)
     
     def cluster_by_tactic(self) -> Dict[MITRETactic, List[str]]:
         """Agrupa hipótesis por MITRE tactic"""
-        tactic_to_hyps = {}
+        result = {}
         for hyp_id, techniques in self.hypothesis_to_mitre.items():
             for tech in techniques:
                 for tactic in tech.tactics:
-                    if tactic not in tactic_to_hyps:
-                        tactic_to_hyps[tactic] = []
-                    if hyp_id not in tactic_to_hyps[tactic]:
-                        tactic_to_hyps[tactic].append(hyp_id)
-        return tactic_to_hyps
+                    result.setdefault(tactic, set()).add(hyp_id)
+        return {tactic: list(hyp_ids) for tactic, hyp_ids in result.items()}
     
     def cluster_by_intent(self) -> Dict[str, List[str]]:
         """Agrupa hipótesis por intención semántica (STEALTH, PERSISTENCE, etc.)"""
