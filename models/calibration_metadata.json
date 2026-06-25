@@ -1,32 +1,29 @@
 {
-  "abstain_interpretation": "ABSTAIN = zona de incertidumbre honesta, no fallo del sistema",
   "authentic_verdicts": [
     "ABSTAIN",
     "BENIGN",
     "NOISE"
   ],
   "backend": "sklearn_logistic",
-  "calibration_date": "2026-05-02T14:55:02.108694Z",
-  "calibration_note": "ABSTAIN en casos VIGIA-REAL es epistemol\u00f3gicamente correcto: los artefactos legacy tienen solo 2 anomalias derivadas del normalizador (no de an\u00e1lisis forense real), produciendo z-scores bajos y posterior ~0.5. VIG\u00cdA aplica Ockham \u2014 sin evidencia suficiente, ABSTAIN es la respuesta honesta y Daubert-defensible. REJECT requerir\u00eda m\u00e1s artefactos o se\u00f1ales t\u00e9cnicas directas (timestamps, hard gates).",
+  "calibration_date": "2026-06-24T03:15:11.268680Z",
   "calibrator_path": "models/calibrated_lr.json",
-  "corpus_hash": "025aacafd60ce8e906eb0818794a0d90eb33459e2fbdd87a025087120921178c",
-  "corpus_size": 105,
+  "corpus_hash": "52d6dc6c174645aa6ab8f8d45b2dadb374a657be5b1bec45fbfe01031c9af1e3",
+  "corpus_size": 78,
   "fabricated_verdicts": [
     "INTENT",
     "MALICE",
     "SUSPICION"
   ],
   "metrics_test": {
-    "brier_score": 0.0813,
-    "fpr_at_0.5": 1.0,
-    "n_eval": 20,
-    "tpr_at_0.5": 1.0
+    "brier_score": 0.1491,
+    "fpr_at_0.5": 0.25,
+    "n_eval": 14,
+    "tpr_at_0.5": 0.8
   },
-  "mode_with_calibrator": "calibrated (sklearn_logistic)",
-  "n_authentic_test": 3,
-  "n_authentic_train": 13,
-  "n_fabricated_test": 17,
-  "n_fabricated_train": 72,
+  "n_authentic_test": 4,
+  "n_authentic_train": 18,
+  "n_fabricated_test": 10,
+  "n_fabricated_train": 43,
   "script_version": "run_calibration-v1.0",
   "seed": 42,
   "test_split": 0.2
