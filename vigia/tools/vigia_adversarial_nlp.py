@@ -13,8 +13,8 @@ El código real está en:
 
 NO modificar este archivo directamente — modificar los originales.
 """
-from forensic_db import ForensicDatabaseManager
-from adversarial_nlp import (
+from vigia.tools.forensic_db import ForensicDatabaseManager
+from vigia.tools.adversarial_nlp import (
     LanguageDetector,
     ConfigLoader,
     SDA_NominalizationAnalyzer,
@@ -23,6 +23,7 @@ from adversarial_nlp import (
     ROI_Analyzer,
     ZipfImperfectionAnalyzer,
     ForensicVerdict,
+    InstitutionalEmitter,
     ForensicEngine,
     VigiaAdversarialNLP,
     calculate_entropy_profile,
@@ -38,6 +39,7 @@ __all__ = [
     "ROI_Analyzer",
     "ZipfImperfectionAnalyzer",
     "ForensicVerdict",
+    "InstitutionalEmitter",
     "ForensicEngine",
     "VigiaAdversarialNLP",
     "calculate_entropy_profile",
