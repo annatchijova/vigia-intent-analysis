@@ -353,7 +353,7 @@ def _word_search(term: str, text: str) -> bool:
 # Override: VIGIA_SYSTEM_PROMPT_PATH env var
 _SYSTEM_PROMPT_PATH_DEFAULT = os.path.join(
     os.path.dirname(os.path.abspath(__file__)),
-    "vigia", "data", "system_prompt_peirce.md",
+    "data", "system_prompt_peirce.md",
 )
 
 # SHA-256 of the canonical prompt. Update after editing the prompt file:
