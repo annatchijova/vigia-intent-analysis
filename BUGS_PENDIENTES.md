@@ -473,3 +473,62 @@ es la función que valida el Deterministic Forensic Protocol P0.
 ### Fix
 
 Reemplazar cada `assert condicion, mensaje` por `if not condicion: raise RuntimeError(mensaje)`.
+
+---
+
+## B-013 — LOG_VS_MEMORY dispara con raw_score bajo (diseño vs contrato)
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | ABIERTO — decisión de diseño pendiente |
+| **Severidad** | P1 — afecta monotonicidad del sistema |
+| **Archivo** | `vigia/tools/caie.py` — `_extract_assertions()` |
+| **Detectado en** | Sesión post-hackathon 2026-06-25, propiedad-testing |
+
+### Descripción
+
+Un artefacto `log_entry` con `raw_score=0.3` (evidencia débil) que contiene
+`dst_ip` dispara la fractura `LOG_VS_MEMORY` con `is_structural=True`, forzando
+`structural_verdict=MALICE` y `verdict=MALICE` aunque:
+- `probabilistic_verdict=NOISE`
+- `composite_score=0.0116` (muy bajo)
+
+### Secuencia reproducible
+
+```python
+A_mem  = Artifact('mem_tool', 'memory_process', 0.1, 'Clean', {'pid': 4521})
+A_weak = Artifact('log_tool', 'log_entry', 0.3, 'Weak', {'dst_ip': '10.0.0.1'})
+
+run([A_mem])           # verdict=INCONCLUSIVE, fractures=0
+run([A_weak, A_mem])   # verdict=MALICE, fractures=1 — salto no monotónico
+```
+
+### Causa raíz
+
+`_extract_assertions()` no considera `raw_score` — solo presencia/ausencia de
+campos de metadata. La fractura LOG_VS_MEMORY dispara si `dst_ip` existe en
+el log, independientemente de cuán débil sea la evidencia.
+
+La regresión L-028 (que reemplazó metadata["verdict"] por assertions) eliminó
+la dependencia del veredicto upstream pero también eliminó el gate implícito
+de severidad que ese veredicto proporcionaba.
+
+### Opciones de resolución
+
+A. Agregar gate de raw_score en `_extract_assertions()` para
+   `log_claims_outbound_connection`: solo afirmar si `raw_score >= threshold`.
+   Riesgo: introduce threshold arbitrario (anti-Daubert).
+
+B. Que la fractura estructural requiera corroboración mínima de score antes
+   de forzar MALICE. La contradicción existe, pero sin fuerza probatoria.
+
+C. Documentar como comportamiento intencional: la contradicción lógica existe
+   independientemente del score. El score mide "cuán sospechoso", la fractura
+   mide "cuán imposible". Son dimensiones ortogonales.
+
+### Nota
+
+Opción C es la más Daubert-compatible: "este log AFIRMA una conexión saliente
+Y la memoria NO LA MUESTRA — eso es una contradicción objetiva, independiente
+de cuán confiable sea el log". La fuerza del hallazgo se modula por severity
+(0.75 sin PID overlap, 0.95 con overlap), no por el raw_score del log.
