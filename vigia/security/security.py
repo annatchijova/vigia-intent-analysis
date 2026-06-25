@@ -218,7 +218,7 @@ class TrustExponentialDecay:
         if trust_d < self.trust_threshold:
             score_after_penalty = adjusted_score * 0.5
 
-        return float(trust_d), score_after_penalty
+        return trust_d, score_after_penalty
 
 
 # Global instance for convenience
