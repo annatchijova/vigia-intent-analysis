@@ -216,7 +216,7 @@ class PathGuard:
                     import fcntl
                     fcntl.flock(fd, fcntl.LOCK_SH)
                 return os.fdopen(fd, mode)
-            except:
+            except Exception:
                 os.close(fd)
                 raise
         else:
@@ -229,7 +229,7 @@ class PathGuard:
                     os.close(fd)
                     raise PermissionError("PathGuard REJECT: NOT_A_REGULAR_FILE")
                 return os.fdopen(fd, mode)
-            except:
+            except Exception:
                 os.close(fd)
                 raise
 
