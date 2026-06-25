@@ -9,6 +9,6 @@ Existe para resolver el import lazy en temporal_forensics_redteam.py:
 El código real está en entanglement.py.
 NO modificar este archivo directamente — modificar el original.
 """
-from entanglement import EntanglementEngine
+from vigia.core.entanglement import EntanglementEngine
 
 __all__ = ["EntanglementEngine"]
