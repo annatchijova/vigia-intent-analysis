@@ -2,7 +2,7 @@ import asyncio, json, sys
 sys.path.insert(0, '.')
 from dotenv import load_dotenv
 load_dotenv(override=True)
-from vigia.tools.vigia_sift_bridge import reason_with_llm
+from vigia.vigia_sift_bridge import reason_with_llm
 
 artifacts = json.load(open('data/cases/vigia_input_defcon_nist.json'))
 evidence = json.dumps(artifacts, ensure_ascii=False, indent=2)
