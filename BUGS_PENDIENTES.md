@@ -339,41 +339,74 @@ vigia_scorer.py` antes de aceptar cualquier cambio al scoring path.
 ### Descripción
 
 Los 4 módulos SIFT construyen `SignalOutput` usando `float()` explícito:
-
-```python
-# Patrón idéntico en los 4 archivos:
-value=float(z) / Z_CLIP_MAX if Z_CLIP_MAX > 0 else 0.0,
-z_score=float(z),
-confidence=float(conf),
-```
-
-Líneas exactas:
 - `shellbag_analyzer.py:60-62`
 - `amcache_shimcache.py:73-75`
 - `memory_forensics.py:176-177`
 - `disk_forensics.py:71-72`
 
-`SignalOutput` acepta float por API (definido en `vigia/models/ebs.py`). Cuando
-estos módulos alimenten el pipeline de scoring en integración SIFT real, los
-floats entrarán al path de inferencia — regresión potencial de L-021.
-
-### Root cause
-
-`SignalOutput.z_score` y `SignalOutput.confidence` están tipados como `float`
-en `ebs.py`. Para cerrar completamente L-021 en el path SIFT hay que:
-1. Migrar `SignalOutput` a aceptar `Decimal` o `str` (breaking change de API)
-2. Actualizar los 4 constructores en `vigia/sift/`
-3. Verificar que `likelihood_engine.py` consume los valores correctamente
-
-### Por qué no se toca ahora
-
-`sift_orchestrator.py` importa `MetabolicProfiler` desde `vigia.inference`,
-no estos módulos directamente. Los 4 archivos son helpers que se activan solo
-cuando hay artefactos SIFT reales (shellbags, amcache, memory dumps, disk
-images) — no se ejercitan en tests actuales. El riesgo es latente, no activo.
+`SignalOutput.z_score` y `confidence` están tipados como `float` en `ebs.py`.
+Cuando estos módulos alimenten el pipeline de scoring en integración SIFT real,
+los floats entrarán al path de inferencia — regresión potencial de L-021.
 
 ### Fix cuando corresponda
 
-Coordinar con L-021 Fase 3. Requiere decisión arquitectónica sobre si
-`SignalOutput` acepta `Decimal` o si la conversión float es el boundary
-correcto entre SIFT y el motor de scoring.
+Coordinar con L-021 Fase 3. Requiere decisión sobre si `SignalOutput` acepta
+`Decimal` o si la conversión float es el boundary correcto entre SIFT y scoring.
+
+---
+
+## B-009 — float() en vigia/abduction/vigia_artifact_graph.py — path de abducción activo
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | ABIERTO |
+| **Severidad** | P1 — path activo, no SIFT-only |
+| **Archivo** | `vigia/abduction/vigia_artifact_graph.py` |
+| **Líneas** | 432, 433, 457 |
+| **Detectado en** | Sesión post-hackathon 2026-06-25 |
+
+### Descripción
+
+```python
+z = float(node_data.get("z_score", 0.0))       # L432
+conf = float(node_data.get("confidence", 0.0))  # L433
+severity = float(anomaly.get("severity", ...))   # L457
+```
+
+A diferencia de B-008, este módulo está en el path de abducción activo
+(no es SIFT-only). Si `z_score` o `severity` vienen como `str` desde la
+frontera de L-021 (`evaluate()` ahora emite strings), `float(str_value)`
+funciona pero introduce float en el path de razonamiento abductivo —
+inconsistente con el invariante L-021.
+
+### Fix
+
+Reemplazar `float(...)` por `Decimal(str(...))` en las tres líneas.
+Verificar que los callers downstream aceptan `Decimal`.
+
+---
+
+## B-010 — TODO: migrar forensic_technical_detector.py a SemioticDetectorV2
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | ABIERTO |
+| **Severidad** | P3 — deuda técnica, no bug funcional |
+| **Archivo** | `vigia/core/forensic_technical_detector.py` |
+| **Línea** | 194 |
+| **Detectado en** | Sesión post-hackathon 2026-06-25 |
+
+### Descripción
+
+```python
+# TODO: migrar a SemioticDetectorV2 en v3.0
+```
+
+El detector técnico forense sigue usando la arquitectura v1. `SemioticDetectorV2`
+existe pero no está wired aquí. No es un bug funcional — el detector opera
+correctamente con la arquitectura actual. Es deuda de migración para v3.0.
+
+### Fix cuando corresponda
+
+Evaluar si SemioticDetectorV2 cubre todos los casos de forensic_technical_detector.
+Migración debe ser auditada por el colectivo antes de aplicar.
