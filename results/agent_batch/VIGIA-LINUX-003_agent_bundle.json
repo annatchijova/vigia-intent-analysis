@@ -1,0 +1,321 @@
+{
+  "analysis_timestamp": "2026-06-26T21:51:56.047012+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "VIGIA-LINUX-003",
+    "end_time": "2026-06-26T21:51:56.047018+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "VIGIA-LINUX-003",
+        "entry_sha256": "2d7408199ba9fe69bba542d7d1ff2ef6d9670c08506ea8808ed552b4daab025b",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "VIGIA-LINUX-003"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: 95f2da2a3bdcb4ca...",
+        "outputs_summary": {
+          "agent_sha256": "95f2da2a3bdcb4ca106059e2b06f58fd0ec414c887fec07ac7a0d5edfeb097a1",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-06-26T21:51:56.043536+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-LINUX-003",
+        "entry_sha256": "fcd554a3f3d604e1fba5439d2ab4be6d603ddf37bc77df6ed90ab86a25094177",
+        "inputs_summary": {
+          "path": "data/cases/VIGIA-LINUX-003.json"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-06-26T21:51:56.043639+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-LINUX-003",
+        "entry_sha256": "7af23f6eb1783ac89306e980f39d697a1c521f626598d7433bb57452243db31d",
+        "inputs_summary": {
+          "path": "data/cases/VIGIA-LINUX-003.json"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: 5a34c9c89f97f3e2...",
+        "outputs_summary": {
+          "sha256": "5a34c9c89f97f3e2c36cfacca12cc23232f877b7b1527fdceb95e69612705c43"
+        },
+        "seq": 3,
+        "timestamp": "2026-06-26T21:51:56.043742+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "VIGIA-LINUX-003",
+        "entry_sha256": "a1e6612a0ba2f105764740a1b24a04e565fc82dd064130433cf5e213646a889b",
+        "inputs_summary": {
+          "evidence": "data/cases/VIGIA-LINUX-003.json",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-06-26T21:51:56.043854+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "VIGIA-LINUX-003",
+        "entry_sha256": "fd53134ff446f2b9210d44fd61d5dcf7ffd3e73b9364bf6fb78ebbca754fb5e4",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 5 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+            "best_posterior": "4031/25000",
+            "confidence": "4031/25000",
+            "is_conclusive": "True",
+            "narrative": "A Linux server running Apache RocketMQ 5.0.0 was compromised via CVE-2023-33246 (unauthenticated RCE, CVSS 9.8). The threat actor deployed the perfctl malware family, which replaced system binaries /u..."
+          },
+          "case_id": "VIGIA-LINUX-003",
+          "pipeline_meta": {
+            "artifact_count": "5",
+            "avg_score": "4031/5000",
+            "expected_verdict": "MALICE",
+            "source": "ebs_v1_json_adapter"
+          },
+          "signals": [
+            {
+              "artifact_id": "linux003_01",
+              "confidence": "24/25",
+              "description": "File integrity check against dpkg package manifest reveals that /usr/bin/crontab on disk (SHA-256: d1e9a1b3c4f7e2a6b0c8d5f3e1a7b2c4) does not match the hash registered in the dpkg database for the ins",
+              "evidence_type": "file_metadata",
+              "source": "sift_file_integrity",
+              "z_score": "582/625"
+            },
+            {
+              "artifact_id": "linux003_02",
+              "confidence": "93/100",
+              "description": "/etc/ld.so.preload contains a single non-standard entry: /lib/libgcwrap.so. This library is not registered in any package manifest (dpkg -L output shows no package owns this path). The file was create",
+              "evidence_type": "file_metadata",
+              "source": "sift_file_integrity",
+              "z_score": "1023/1250"
+            },
+            {
+              "artifact_id": "linux003_03",
+              "confidence": "87/100",
+              "description": "Direct inspection of /proc/<PIDs> reveals active processes with cmdlines consistent with cron job execution, referencing paths under /tmp/.xdiag/int/. The parent process tree shows these originate fro",
+              "evidence_type": "memory_process",
+              "source": "sift_process_monitor",
+              "z_score": "8091/10000"
+            },
+            {
+              "artifact_id": "linux003_04",
+              "confidence": "79/100",
+              "description": "/tmp/.xdiag/int/.per.s is a runtime log file written by the malware containing timestamped records of cryptomining operations and process management events. Sample entries show XMRIG Monero mining ses",
+              "evidence_type": "log_entry",
+              "source": "sift_linux_forensics",
+              "z_score": "1343/2000"
+            },
+            {
+              "artifact_id": "linux003_05",
+              "confidence": "22/25",
+              "description": "Script recovered at /dev/health (non-standard path for an executable: /dev/ is a device filesystem, not a bin directory): infinite loop executing pkill -9 xmrig every 45 seconds. This watchdog kills c",
+              "evidence_type": "malware_static_analysis",
+              "source": "sift_static_analysis",
+              "z_score": "1001/1250"
+            }
+          ]
+        },
+        "seq": 5,
+        "timestamp": "2026-06-26T21:51:56.046245+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "VIGIA-LINUX-003",
+        "entry_sha256": "30c35d9d0cb3e625a561c5287fcebceea40927d5a75c3900f78868d4165e86ff",
+        "inputs_summary": {
+          "n_signals": "5"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-06-26T21:51:56.046412+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "VIGIA-LINUX-003",
+        "entry_sha256": "3b627a27a78ef2671557bd0823cdb1c172c88b4e9bc61a1edeb89c5f3930cb45",
+        "inputs_summary": {
+          "verdict": "MALICIOUS_INTENT_DETECTED"
+        },
+        "iteration": 0,
+        "note": "Exit code 1 \u2014 analysis complete.",
+        "outputs_summary": {
+          "exit_code": "1"
+        },
+        "seq": 7,
+        "timestamp": "2026-06-26T21:51:56.046523+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-06-26T21:51:56.043311+00:00",
+    "total_entries": 7
+  },
+  "case_id": "VIGIA-LINUX-003",
+  "evidence_path": "data/cases/VIGIA-LINUX-003.json",
+  "evidence_sha256": "5a34c9c89f97f3e2c36cfacca12cc23232f877b7b1527fdceb95e69612705c43",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-LINUX-003 ===\nEvidence: data/cases/VIGIA-LINUX-003.json\nEvidence SHA-256: 5a34c9c89f97f3e2c36cfacca12cc23232f877b7b1527fdceb95e69612705c43\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 4031/25000\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\nA Linux server running Apache RocketMQ 5.0.0 was compromised via CVE-2023-33246 (unauthenticated RCE, CVSS 9.8). The threat actor deployed the perfctl malware family, which replaced system binaries /usr/bin/crontab, /usr/bin/ldd, and /usr/bin/top with trojanized versions and installed a userland rootkit via LD_PRELOAD (/lib/libgcwrap.so). The trojanized crontab binary intercepts crontab -l output and suppresses all malicious cron entries, creating a forensic blind spot. A watchdog script at /dev\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [File integrity check against dpkg package manifest reveals that /usr/b] z=0.931 conf=0.96 \u2014 \n  [/etc/ld.so.preload contains a single non-standard entry: /lib/libgcwra] z=0.818 conf=0.93 \u2014 \n  [Direct inspection of /proc/<PIDs> reveals active processes with cmdlin] z=0.809 conf=0.87 \u2014 \n  [Script recovered at /dev/health (non-standard path for an executable: ] z=0.801 conf=0.88 \u2014 \n  [/tmp/.xdiag/int/.per.s is a runtime log file written by the malware co] z=0.671 conf=0.79 \u2014 \n\n--- FINAL ALERT LEVEL ---\nHIGH \u2014 Conclusive MALICE verdict from Bayesian posterior aggregation. Individual z-scores below threshold (distributed evidence pattern: no single dominant signal, but aggregate posterior is decisive).\n\nCritical signals (z>3): 0\nHigh signals (2<z<=3): 0\nTotal signals analyzed: 5",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+      "best_posterior": "4031/25000",
+      "confidence": {
+        "__fraction__": true,
+        "den": 25000,
+        "num": 4031
+      },
+      "devil_advocate": {
+        "aggregation": {
+          "k": 3,
+          "method": "top_k_already_validated_matches_v2",
+          "total_gap_mass": "0"
+        },
+        "counterfactual_summary": {
+          "primary_alternative_hypothesis": null
+        },
+        "decision_context": {
+          "confidence": "4031/25000",
+          "mapped_verdict": "MALICIOUS_INTENT_DETECTED",
+          "raw_verdict": "MALICIOUS_INTENT_DETECTED",
+          "score": "4031/5000"
+        },
+        "devil_advocate_source": "deterministic_no_pattern_data_available",
+        "meta": {
+          "deterministic": true,
+          "generated_from": "case_pattern_library"
+        },
+        "narrative": "Eco's Razor (Abductive Falsification) applied to verdict MALICIOUS_INTENT_DETECTED. Pattern-matching data was not available on this code path \u2014 CasePatternLibrary is not invoked here by design (agent audit-trail mode (vigia_agent.py \u2014 JSON-replay / autonomous path); see KNOWN_LIMITATIONS.md). No structured counter-hypothesis could be derived deterministically. This is a documented scope limitation of the current code path, not an absence of falsification attempt.",
+        "pattern_evidence_gaps": [],
+        "version": "r7-da-v1"
+      },
+      "is_conclusive": true,
+      "narrative": "A Linux server running Apache RocketMQ 5.0.0 was compromised via CVE-2023-33246 (unauthenticated RCE, CVSS 9.8). The threat actor deployed the perfctl malware family, which replaced system binaries /usr/bin/crontab, /usr/bin/ldd, and /usr/bin/top with trojanized versions and installed a userland rootkit via LD_PRELOAD (/lib/libgcwrap.so). The trojanized crontab binary intercepts crontab -l output and suppresses all malicious cron entries, creating a forensic blind spot. A watchdog script at /dev"
+    },
+    "case_id": "VIGIA-LINUX-003",
+    "pipeline_meta": {
+      "artifact_count": 5,
+      "avg_score": "4031/5000",
+      "expected_verdict": "MALICE",
+      "source": "ebs_v1_json_adapter"
+    },
+    "signals": [
+      {
+        "artifact_id": "linux003_01",
+        "confidence": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 24
+        },
+        "description": "File integrity check against dpkg package manifest reveals that /usr/bin/crontab on disk (SHA-256: d1e9a1b3c4f7e2a6b0c8d5f3e1a7b2c4) does not match the hash registered in the dpkg database for the ins",
+        "evidence_type": "file_metadata",
+        "source": "sift_file_integrity",
+        "z_score": {
+          "__fraction__": true,
+          "den": 625,
+          "num": 582
+        }
+      },
+      {
+        "artifact_id": "linux003_02",
+        "confidence": {
+          "__fraction__": true,
+          "den": 100,
+          "num": 93
+        },
+        "description": "/etc/ld.so.preload contains a single non-standard entry: /lib/libgcwrap.so. This library is not registered in any package manifest (dpkg -L output shows no package owns this path). The file was create",
+        "evidence_type": "file_metadata",
+        "source": "sift_file_integrity",
+        "z_score": {
+          "__fraction__": true,
+          "den": 1250,
+          "num": 1023
+        }
+      },
+      {
+        "artifact_id": "linux003_03",
+        "confidence": {
+          "__fraction__": true,
+          "den": 100,
+          "num": 87
+        },
+        "description": "Direct inspection of /proc/<PIDs> reveals active processes with cmdlines consistent with cron job execution, referencing paths under /tmp/.xdiag/int/. The parent process tree shows these originate fro",
+        "evidence_type": "memory_process",
+        "source": "sift_process_monitor",
+        "z_score": {
+          "__fraction__": true,
+          "den": 10000,
+          "num": 8091
+        }
+      },
+      {
+        "artifact_id": "linux003_04",
+        "confidence": {
+          "__fraction__": true,
+          "den": 100,
+          "num": 79
+        },
+        "description": "/tmp/.xdiag/int/.per.s is a runtime log file written by the malware containing timestamped records of cryptomining operations and process management events. Sample entries show XMRIG Monero mining ses",
+        "evidence_type": "log_entry",
+        "source": "sift_linux_forensics",
+        "z_score": {
+          "__fraction__": true,
+          "den": 2000,
+          "num": 1343
+        }
+      },
+      {
+        "artifact_id": "linux003_05",
+        "confidence": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 22
+        },
+        "description": "Script recovered at /dev/health (non-standard path for an executable: /dev/ is a device filesystem, not a bin directory): infinite loop executing pkill -9 xmrig every 45 seconds. This watchdog kills c",
+        "evidence_type": "malware_static_analysis",
+        "source": "sift_static_analysis",
+        "z_score": {
+          "__fraction__": true,
+          "den": 1250,
+          "num": 1001
+        }
+      }
+    ]
+  },
+  "sans_compliance": {
+    "accuracy_validation": false,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}

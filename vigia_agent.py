@@ -729,6 +729,31 @@ class VIGIAAgent:
         else:
             alert = "LOW — No significant anomalies detected in this iteration."
 
+        # Posterior verdict override: if the Bayesian posterior verdict is conclusive MALICE
+        # but individual z-scores are all below threshold (distributed evidence pattern),
+        # floor the alert level to prevent a misleading LOW alongside a MALICE verdict.
+        _hypothesis = abduction.get("best_hypothesis", "")
+        _is_conclusive = abduction.get("is_conclusive", False)
+        if _is_conclusive and "MALICI" in _hypothesis.upper():
+            _posterior_str = str(abduction.get("best_posterior", "0/1"))
+            try:
+                _num, _den = map(int, _posterior_str.split("/"))
+                _posterior_ratio = Fraction(_num, _den)
+            except Exception:
+                _posterior_ratio = Fraction(0, 1)
+            if alert.startswith("LOW") or alert.startswith("MEDIUM"):
+                if _posterior_ratio >= Fraction(1, 8):
+                    alert = (
+                        "HIGH — Conclusive MALICE verdict from Bayesian posterior aggregation. "
+                        "Individual z-scores below threshold (distributed evidence pattern: "
+                        "no single dominant signal, but aggregate posterior is decisive)."
+                    )
+                else:
+                    alert = (
+                        "MEDIUM — Conclusive MALICE verdict from posterior aggregation. "
+                        "Individual z-scores below threshold. Full signal review recommended."
+                    )
+
         narrative_parts.extend([
             "--- FINAL ALERT LEVEL ---",
             alert,

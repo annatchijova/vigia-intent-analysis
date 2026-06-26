@@ -1,0 +1,297 @@
+{
+  "analysis_timestamp": "2026-06-26T21:51:56.098403+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "VIGIA-LINUX-002",
+    "end_time": "2026-06-26T21:51:56.098409+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "VIGIA-LINUX-002",
+        "entry_sha256": "1cbd38945667a44cb4ef0202882f245e2cf7e769953442fcca9f81a624dad952",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "VIGIA-LINUX-002"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: 95f2da2a3bdcb4ca...",
+        "outputs_summary": {
+          "agent_sha256": "95f2da2a3bdcb4ca106059e2b06f58fd0ec414c887fec07ac7a0d5edfeb097a1",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-06-26T21:51:56.095362+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-LINUX-002",
+        "entry_sha256": "d695a8b8e4a76de79623fd708f50de0c11f8cbbba9815203eec7f768ab21d0e5",
+        "inputs_summary": {
+          "path": "data/cases/benign/VIGIA-LINUX-002.json"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-06-26T21:51:56.095454+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-LINUX-002",
+        "entry_sha256": "587a1117773dbc3a51ea19a0b022a425d73d9f059b721998e7a37114f62bd18b",
+        "inputs_summary": {
+          "path": "data/cases/benign/VIGIA-LINUX-002.json"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: 8489e60ce7ccc96d...",
+        "outputs_summary": {
+          "sha256": "8489e60ce7ccc96dbf92d9532d969576862f4ef9db9be3fbd1109ab7936b326a"
+        },
+        "seq": 3,
+        "timestamp": "2026-06-26T21:51:56.095559+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "VIGIA-LINUX-002",
+        "entry_sha256": "99b9ba6b15f475f2867281ff0518c59e589ce4096ce978ac0b541e7ce1b1fb7f",
+        "inputs_summary": {
+          "evidence": "data/cases/benign/VIGIA-LINUX-002.json",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-06-26T21:51:56.095682+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "VIGIA-LINUX-002",
+        "entry_sha256": "f799aee94c8453780630146679b355e09914087e4b5b7aebda34f8aaa341b744",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 5 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "NO_SEMIOTIC_ANOMALY_DETECTED",
+            "best_posterior": "869/50000",
+            "confidence": "869/50000",
+            "is_conclusive": "False",
+            "narrative": "Developer Alex Torres (GitHub: atorres-dev) submits a security patch to the libarchive project fixing a path traversal vulnerability. The contribution was explicitly solicited by a project maintainer ..."
+          },
+          "case_id": "VIGIA-LINUX-002",
+          "pipeline_meta": {
+            "artifact_count": "5",
+            "avg_score": "869/10000",
+            "expected_verdict": "NOISE",
+            "source": "ebs_v1_json_adapter"
+          },
+          "signals": [
+            {
+              "artifact_id": "linux002_01",
+              "confidence": "47/50",
+              "description": "GitHub account atorres-dev was created 8 months prior to contribution with 3 prior commits to unrelated projects (a Python linting tool and a documentation fix). The account has no prior history with ",
+              "evidence_type": "git_forensics",
+              "source": "sift_git_forensics",
+              "z_score": "1269/5000"
+            },
+            {
+              "artifact_id": "linux002_02",
+              "confidence": "97/100",
+              "description": "Binary comparison between libarchive 3.7.5 distributed tarball and git repository tree at the same version tag confirms hash equivalence: tarball content is deterministically derived from version-cont",
+              "evidence_type": "git_forensics",
+              "source": "sift_git_forensics",
+              "z_score": "97/2000"
+            },
+            {
+              "artifact_id": "linux002_03",
+              "confidence": "19/20",
+              "description": "Code review for the submitted patch involved three independent maintainers (Tim Kientzle, Martin Matuska, and Michihiro NAKAJIMA) over a 48-hour window. Review thread contains substantive technical di",
+              "evidence_type": "osint",
+              "source": "sift_osint",
+              "z_score": "19/400"
+            },
+            {
+              "artifact_id": "linux002_04",
+              "confidence": "93/100",
+              "description": "Static analysis of the submitted patch: 47 lines changed across 2 files (archive_read_support_format_tar.c and test_read_format_tar.c). The change removes a vulnerable code path that allowed path trav",
+              "evidence_type": "malware_static_analysis",
+              "source": "sift_static_analysis",
+              "z_score": "93/2500"
+            },
+            {
+              "artifact_id": "linux002_05",
+              "confidence": "19/20",
+              "description": "Public GitHub Issue #2041 by Tim Kientzle (libarchive maintainer since 2007): 'Looking for help fixing the path traversal edge case in the TAR reader \u2014 reproducible with the attached corpus file. Patc",
+              "evidence_type": "osint",
+              "source": "sift_osint",
+              "z_score": "19/400"
+            }
+          ]
+        },
+        "seq": 5,
+        "timestamp": "2026-06-26T21:51:56.098033+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "VIGIA-LINUX-002",
+        "entry_sha256": "608432c8513840a64b1191d884d2c90f089e126ce62366bfdef051201f8b830a",
+        "inputs_summary": {
+          "n_signals": "5"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-06-26T21:51:56.098201+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "VIGIA-LINUX-002",
+        "entry_sha256": "033682f54ad3355c0ef6b51d800a68eee102fd6103a5a3183f22c4f29690c615",
+        "inputs_summary": {
+          "verdict": "NO_SEMIOTIC_ANOMALY_DETECTED"
+        },
+        "iteration": 0,
+        "note": "Exit code 0 \u2014 analysis complete.",
+        "outputs_summary": {
+          "exit_code": "0"
+        },
+        "seq": 7,
+        "timestamp": "2026-06-26T21:51:56.098315+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-06-26T21:51:56.095122+00:00",
+    "total_entries": 7
+  },
+  "case_id": "VIGIA-LINUX-002",
+  "evidence_path": "data/cases/benign/VIGIA-LINUX-002.json",
+  "evidence_sha256": "8489e60ce7ccc96dbf92d9532d969576862f4ef9db9be3fbd1109ab7936b326a",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-LINUX-002 ===\nEvidence: data/cases/benign/VIGIA-LINUX-002.json\nEvidence SHA-256: 8489e60ce7ccc96dbf92d9532d969576862f4ef9db9be3fbd1109ab7936b326a\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: NO_SEMIOTIC_ANOMALY_DETECTED\nPosterior confidence: 869/50000\nConclusive: NO \u2014 requires human review\n\n--- PEIRCEAN NARRATIVE ---\nDeveloper Alex Torres (GitHub: atorres-dev) submits a security patch to the libarchive project fixing a path traversal vulnerability. The contribution was explicitly solicited by a project maintainer via a public GitHub issue. All code changes are present in the git repository with no tarball divergence. The patch was reviewed and approved by three independent maintainers before merge. The surface-level profile \u2014 new contributor, modifying a widely-deployed system library \u2014 may trigger pattern-m\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [GitHub account atorres-dev was created 8 months prior to contribution ] z=0.254 conf=0.94 \u2014 \n  [Binary comparison between libarchive 3.7.5 distributed tarball and git] z=0.049 conf=0.97 \u2014 \n  [Code review for the submitted patch involved three independent maintai] z=0.048 conf=0.95 \u2014 \n  [Public GitHub Issue #2041 by Tim Kientzle (libarchive maintainer since] z=0.048 conf=0.95 \u2014 \n  [Static analysis of the submitted patch: 47 lines changed across 2 file] z=0.037 conf=0.93 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW \u2014 No significant anomalies detected in this iteration.\n\nCritical signals (z>3): 0\nHigh signals (2<z<=3): 0\nTotal signals analyzed: 5",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "NO_SEMIOTIC_ANOMALY_DETECTED",
+      "best_posterior": "869/50000",
+      "confidence": {
+        "__fraction__": true,
+        "den": 50000,
+        "num": 869
+      },
+      "is_conclusive": false,
+      "narrative": "Developer Alex Torres (GitHub: atorres-dev) submits a security patch to the libarchive project fixing a path traversal vulnerability. The contribution was explicitly solicited by a project maintainer via a public GitHub issue. All code changes are present in the git repository with no tarball divergence. The patch was reviewed and approved by three independent maintainers before merge. The surface-level profile \u2014 new contributor, modifying a widely-deployed system library \u2014 may trigger pattern-m"
+    },
+    "case_id": "VIGIA-LINUX-002",
+    "pipeline_meta": {
+      "artifact_count": 5,
+      "avg_score": "869/10000",
+      "expected_verdict": "NOISE",
+      "source": "ebs_v1_json_adapter"
+    },
+    "signals": [
+      {
+        "artifact_id": "linux002_01",
+        "confidence": {
+          "__fraction__": true,
+          "den": 50,
+          "num": 47
+        },
+        "description": "GitHub account atorres-dev was created 8 months prior to contribution with 3 prior commits to unrelated projects (a Python linting tool and a documentation fix). The account has no prior history with ",
+        "evidence_type": "git_forensics",
+        "source": "sift_git_forensics",
+        "z_score": {
+          "__fraction__": true,
+          "den": 5000,
+          "num": 1269
+        }
+      },
+      {
+        "artifact_id": "linux002_02",
+        "confidence": {
+          "__fraction__": true,
+          "den": 100,
+          "num": 97
+        },
+        "description": "Binary comparison between libarchive 3.7.5 distributed tarball and git repository tree at the same version tag confirms hash equivalence: tarball content is deterministically derived from version-cont",
+        "evidence_type": "git_forensics",
+        "source": "sift_git_forensics",
+        "z_score": {
+          "__fraction__": true,
+          "den": 2000,
+          "num": 97
+        }
+      },
+      {
+        "artifact_id": "linux002_03",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 19
+        },
+        "description": "Code review for the submitted patch involved three independent maintainers (Tim Kientzle, Martin Matuska, and Michihiro NAKAJIMA) over a 48-hour window. Review thread contains substantive technical di",
+        "evidence_type": "osint",
+        "source": "sift_osint",
+        "z_score": {
+          "__fraction__": true,
+          "den": 400,
+          "num": 19
+        }
+      },
+      {
+        "artifact_id": "linux002_04",
+        "confidence": {
+          "__fraction__": true,
+          "den": 100,
+          "num": 93
+        },
+        "description": "Static analysis of the submitted patch: 47 lines changed across 2 files (archive_read_support_format_tar.c and test_read_format_tar.c). The change removes a vulnerable code path that allowed path trav",
+        "evidence_type": "malware_static_analysis",
+        "source": "sift_static_analysis",
+        "z_score": {
+          "__fraction__": true,
+          "den": 2500,
+          "num": 93
+        }
+      },
+      {
+        "artifact_id": "linux002_05",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 19
+        },
+        "description": "Public GitHub Issue #2041 by Tim Kientzle (libarchive maintainer since 2007): 'Looking for help fixing the path traversal edge case in the TAR reader \u2014 reproducible with the attached corpus file. Patc",
+        "evidence_type": "osint",
+        "source": "sift_osint",
+        "z_score": {
+          "__fraction__": true,
+          "den": 400,
+          "num": 19
+        }
+      }
+    ]
+  },
+  "sans_compliance": {
+    "accuracy_validation": false,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}
