@@ -1136,3 +1136,60 @@ verdict vocabulary to include `false_flag` as a relational verdict type.
 
 ---
 
+
+## L-029 — Formal Specification of Arbitration Contract Between Probabilistic Inference and Structural Contradiction Reasoning
+
+**Status:** [OPEN] 2026-06-25, POST HACKATHON — design gap, not implementation bug
+
+**Description:**
+
+VIGÍA is a hybrid forensic reasoning engine, not a pure probabilistic classifier.
+Two distinct epistemic questions coexist by design:
+
+- The scoring layer answers: "How compatible is the evidence set with malicious intent?"
+- CAIE answers: "Are there logical contradictions between artifacts?"
+
+These are different questions. The current behavior (structural fractures take
+precedence over probabilistic score) is correct. The gap is that this precedence
+rule exists implicitly in code but not as a formal system contract.
+
+**Current implicit rule:**
+```
+if structural_verdict == MALICE:
+    final_verdict = MALICE  # regardless of probabilistic_verdict
+```
+
+**What is missing:**
+A formal specification stating which fracture types carry structural authority,
+under what conditions, and why. Without this, the precedence rule can be broken
+by a future refactor without any test catching it (since the behavior is correct
+by implementation, not by contract).
+
+**Fractures with current structural authority (from code):**
+- LOG_VS_MEMORY
+- MEMORY_VS_DISK
+- TIMELINE_PARADOX / EFFECT_BEFORE_CAUSE
+- NARRATIVE_POISONING_DETECTED
+
+**Proposed resolution:**
+Document Axiom A1 formally:
+
+> A structural fracture constitutes evidence of probatory set inconsistency
+> and takes precedence over probabilistic estimation when the fracture passes
+> CAIE validity criteria (_STRUCTURAL_MALICE_TYPES). This is not an override;
+> it is the application of a different epistemic standard: logical impossibility
+> supersedes statistical likelihood.
+
+This makes the arbitration rule readable by a Daubert judge without requiring
+them to read the source code.
+
+**Not a bug.** Do not "fix" by introducing a weighted fusion function
+(e.g. final_score = p + fracture_weight). Such functions require empirical
+calibration and introduce thresholds that are scientifically indefensible
+without a calibration corpus. The current design is more defensible precisely
+because it separates the two reasoning modes rather than blending them.
+
+**See also:** B-013 (low raw_score triggers structural fracture — related
+design question)
+
+---
