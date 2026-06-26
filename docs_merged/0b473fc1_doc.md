@@ -117,7 +117,6 @@ Scientific Note Chinese:
 
 Need to ensure "deterministic integer arithmetic" emphasis. In the English and other sections, when describing the engine, mention it operates on exact arithmetic principles. For example, mention that all counting, indexing, hashing (SHA-256) are integer operations. The z-clipping and log-LR might be conceptualized as deterministic rational mappings. I will say something like: "Although statistical transformations appear continuous, the implementation treats them as deterministic functions over fixed-precision integer registers, ensuring bitwise reproducibility." Or more simply, avoid calling them floats.
 
-Actually, the user says "Do NOT use floating-point math explanations — emphasize deterministic integer arithmetic where applicable". So for SHA-256, record_hash, counting, indexing, the bootstrap error rate (integer counts of errors), I will explicitly mention integer arithmetic. For the statistical formulas, I'll describe them conceptually without using terms like "floating point". I'll say "deterministic arithmetic operations".
 
 Also, the module path and docstring should be referenced.
 
@@ -135,7 +134,6 @@ For each section:
 | ... | ... | ... |
 
 ### Component Overview (optional but helpful)
-Maybe brief descriptions of classes/functions in a table. The user asked for documentation of the module. I'll include a table for Classes and Functions.
 
 ### Glossary
 ...

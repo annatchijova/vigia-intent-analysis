@@ -85,7 +85,6 @@ Also, the license line must be exact: "" I'll place it at the end of the documen
 
 Let's write it.
 
-I need to be careful about formatting: Markdown.
 
 I'll use:
 # VIGÍA Trust Fusion Engine (P2) — Academic Technical Documentation

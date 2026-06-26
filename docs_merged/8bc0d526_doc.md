@@ -56,11 +56,9 @@ Need to ensure Chinese terms:
 - 取证工件 (artifact)
 - 逻辑断裂 (logical fracture)
 
-Also, Peirce in Chinese is usually 皮尔斯 (C.S. Peirce). The user didn't specify a banned translation for Peirce, only that Eco and Grice must be specific. I should use 皮尔斯 for Peirce, or 皮尔士. Let's use 皮尔斯 as it's common.
 
 Let's refine the content.
 
-Since the module path is `vigia/inference/metabolic_profiler.py` but docstring says `vigia/engine/metabolic_profiler.py`, I should note this discrepancy or just use the path given. The user says "MODULE PATH: vigia/inference/metabolic_profiler.py" and "MODULE DOCSTRING: vigia/engine/metabolic_profiler.py". I can mention that the canonical path is `vigia/inference/metabolic_profiler.py`.
 
 Let's think about the specific classes and functions to document.
 
@@ -77,7 +75,6 @@ Constants:
 - `TOOL_NAME`: Identifier string for the profiler in forensic logs.
 - `ARTIFACT_RELIABILITY`: A rational weight or score indicating the trustworthiness of the generated forensic artifact.
 
-I should describe these in non-Python terms.
 
 Let's draft the tables more carefully.
 
@@ -197,11 +194,6 @@ RU:
 ZH:
 本模块 `metabolic_profiler.py` 的功能相当于一台数字取证量热器。它并非测量化学能，而是测量计算机系统的“节律”：事件发生的频率、系统静止的时长，以及其行为模式的可预测性。科研人员可将其视为软件活动的“心电图（ECG）”。该模块接收按时间排序的离散事件序列，构建正常代谢轮廓基线，并利用精确的有理数运算标记偏差——称为“逻辑断裂”。分析过程中不引入任何舍入误差；证据字典中的每一个数值均以精确分数或其字符串形式存储，从而确保分析结果完全可复现且具有法律上的可辩护性。
 
-Now, I need to make sure I address the classes and functions in a way scientists understand, perhaps as "Components".
-
-Components Table maybe? The user wants "Key concepts with tables". I can include a table for components.
-
-Let's add a Component/Construct table in each language.
 
 EN:
 | Construct | Scientific Analogy | Function |
@@ -248,13 +240,9 @@ ZH:
 | `ARTIFACT_RELIABILITY` | 测量不确定度（有理数） | 量化对取证工件的置信度 |
 
 Now, the deterministic arithmetic emphasis.
-I should have a specific callout or paragraph: "All internal calculations are performed using Python's `fractions.Fraction`, which represents each number as a pair of integers. This avoids the non-deterministic rounding inherent in IEEE 754 double-precision floating-point arithmetic. The `evidence` dictionary therefore contains only exact rational numbers or their canonical string representations. The only exception is the `SignalOutput` constructor, which converts to float as required by the external API boundary."
 
 Let's integrate this into the text naturally.
 
-Also, the user specified the module docstring is `vigia/engine/metabolic_profiler.py`. I should mention that the source header indicates this path, but the deployed path is `vigia/inference/metabolic_profiler.py`. Or simply note the module is located at `vigia/inference/metabolic_profiler.py`. I'll add a small note.
-
-I need to make sure the document is "thorough but concise". So I shouldn't be overly verbose, but cover all required elements.
 
 Let's assemble the final Markdown.
 
@@ -272,7 +260,6 @@ Structure:
 - РУССКИЙ section
 - 中文 section
 
-Let's verify Chinese terminology again:
 - 艾柯: Yes.
 - 格赖斯: Yes.
 - 取证工件: Yes, for artifact.
@@ -281,7 +268,6 @@ Also, Peirce is 皮尔斯.
 
 Check scientific note content: Must explain that Peirce/Eco/Grice terminology is NOT mysticism — use the sensor analogy. My draft does exactly that.
 
-Check no floating-point math explanations for deterministic systems: I must not say "floating-point is used for X because it's faster/approximate". I should say float is ONLY in SignalOutput constructor, unavoidable by API. And internal is Fraction/integer.
 
 Check  Must be exact.
 

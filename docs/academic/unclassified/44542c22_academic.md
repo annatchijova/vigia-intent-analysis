@@ -5,190 +5,12 @@ Batch ID: vigia-doc-0158-44542c22
 Generated: 2026-05-20T14:56:47.878644+00:00
 -->
 
-ENGLISH:
-
 ## ENGLISH
 
 ### What Is This Module?
-This module is the **Entropy Kernel** of the VIGÍA Forensic Suite. In plain language, it is a specialized calculator that measures the disorder (randomness) inside digital evidence. Scientists can think of it as a digital "turbidity sensor": just as a turbidity sensor measures cloudiness in water, this kernel measures unpredictability in data streams. It replaces slower, non-deterministic manual calculations with fast, architecture-independent vectorized operations. It runs on CPU, GPU, or in isolated mode without any external dependencies.
+The Entropy Kernel is the digital turbidity sensor of the VIGÍA Forensic Suite. It quantifies disorder in streams of digital evidence. Instead of manually counting symbols and computing logarithms one by one, this module provides a unified, reproducible engine that works identically on laptops, servers, and graphics processors. Scientists may treat it as a laboratory instrument: feed it a frequency distribution, and it returns a deterministic measurement of randomness.
 
 ### Key Concepts
-
-| Concept | Plain-Language Definition | Role in Forensic Analysis |
-|---|---|---|
-| Shannon Entropy | A score from 0 (perfectly ordered) to higher values (more disordered) that quantifies how unpredictable a set of symbols is. | Detects encrypted or compressed payloads hidden inside network traffic or files. |
-| Normalized Entropy | The Shannon score rescaled to a strict 0-to-1 scale, where 1 means maximum possible disorder for that sample size. | Allows direct comparison between evidence samples of different lengths. |
-| Entropy Rate | Measures whether consecutive symbols depend on each other. Low rate = repeating patterns; high rate = independent randomness. | Identifies command-and-control (C2) scripts that generate correlated pairs instead of true noise. |
-| Batch Processing | Running the same measurement on many data series at once, distributing work across processor cores or graphics chips. | Accelerates triage when thousands of digital artifacts must be screened simultaneously. |
-| Deterministic Invariant | A guarantee that every run, on any machine (ARM laptop, x86 server, or CUDA GPU), yields the exact same integer-count histograms and, after scaling, the same rounded output. | Ensures that forensic reports are legally reproducible; two labs reaching different conclusions because of hardware differences is unacceptable. |
-| Backend | The underlying engine that executes the calculation (GPU via CuPy, CPU via NumPy, or pure Python). | Automatically selected for speed while preserving the deterministic invariant. |
-| Drop-in Replacement | A procedure that substitutes an old calculation without changing the surrounding workflow. | Upgrades legacy analysis pipelines without requiring scientists to rewrite protocols. |
-
-### Procedures (Functions)
-
-| Procedure | What It Does | Forensic Use Case |
-|---|---|---|
-| `entropy_shannon` | Computes the disorder score from a frequency table. | Quantifying randomness in a malware configuration block. |
-| `entropy_normalized` | Rescales the disorder score to [0, 1]. | Comparing entropy across email attachments of unequal size. |
-| `entropy_rate` | Computes pair-wise temporal dependence. | Spotting scripted beaconing where packet sizes follow a predictable chain. |
-| `entropy_batch` | Processes hundreds of time-series in one deterministic pass. | Mass screening of memory-dump segments during incident response. |
-| `patch_gci_entropy_score` | Replaces the legacy static-entropy procedure inside GCI Engine. | Seamless upgrade of existing VIGÍA integration tests. |
-| `patch_gci_entropy_rate` | Replaces the legacy entropy-rate procedure inside GCI Engine. | Same as above, for temporal-dependence calculations. |
-| `patch_gci_log_n` | Replaces base-2 logarithm of sample size; rounds to 6 decimals for hash stability. | Ensuring evidence indexes produce identical hashes on different hardware. |
-| `patch_integration_bridge_log_lr` | Replaces the natural logarithm used in likelihood-ratio bridging. | Maintaining deterministic chains in probabilistic forensic weighing. |
-| `get_backend_info` | Reports which engine (CPU/GPU/Python) is currently active. | Audit logs: regulators often require proof of the analytical environment. |
-| `self_test` | Cross-validates all backends against each other before production use. | Mandatory pre-shift verification in accredited laboratories. |
-
-### Configuration Constants
-
-| Constant | Purpose |
-|---|---|
-| `_INTEGRATION_GUIDE` | Internal reference document mapping kernel outputs to legacy suite formats. |
-| `_BACKEND` | Identifier of the active calculation engine (pure, numpy, cupy). |
-| `_CUPY_DEVICE` | Identifier of the graphics processor unit when GPU acceleration is active. |
-
-> **Note on Determinism:** All procedures begin by counting symbol occurrences as **exact integers**. Scaling and logarithmic transformation are applied afterward through deterministic algebraic operations with fixed, reproducible precision. No step relies on hardware-specific approximations.
-
-### Glossary
-
-| Term | Definition |
-|---|---|
-| **Entropy (Shannon)** | A mathematical measure of uncertainty or information density in a discrete distribution. |
-| **Vectorized Operation** | A computation applied simultaneously to an entire array of data rather than one item at a time. |
-| **Backend** | The specific software engine (CuPy, NumPy, or Python stdlib) executing the array operations. |
-| **Determinism** | The property that a given input always produces the exact same output, bit-for-bit, regardless of hardware or timing. |
-| **Histogram / Frequency Table** | A count of how many times each distinct value appears in a sample; derived from exact integer arithmetic. |
-| **Drop-in Replacement** | A substitute component that fits into an existing workflow without altering external protocols. |
-| **GPU (Graphics Processing Unit)** | A massively parallel co-processor capable of accelerating array calculations. |
-| **Forensic Artifact** | Any digital object (file, packet, memory segment) submitted as evidence in an investigation. |
-| **Time Series** | A sequence of data points ordered in time, such as network packet timestamps or keystroke logs. |
-| **Likelihood Ratio** | A statistical factor comparing the probability of evidence under two competing hypotheses. |
-
-### 【Scientific Note】Semiotics Is a Sensor, Not Mysticism
-VIGÍA occasionally references terminology associated with Charles Sanders Peirce, Umberto Eco, and H. P. Grice. These are not metaphysical doctrines. Think of them as **pattern-detection frameworks**—formal lenses, analogous to a spectrometer or a pressure transducer. Peirce’s abduction is a logical hypothesis generator; Eco’s codes are classification taxonomies for signs; Grice’s maxims are rules for detecting cooperative versus deceptive communication. In forensic practice, they serve as deterministic algorithms for spotting anomalies in digital evidence. A sensor does not "believe" in temperature; it registers it. Likewise, these semiotic models do not interpret meaning mystically; they measure structural properties of取证工件 (forensic artifacts) and flag 逻辑断裂 (logical fractures) in communication streams.
-
----
-
-ESPAÑOL:
-
-Need to translate keeping tone academic and for scientists not knowing Python.
-
-Terms: Peirce, Eco, Grice. Note box: "La semiótica es un sensor, no un misticismo."
-
-Key Chinese terms not needed here, but in Chinese section use specified terms.
-
-Need to ensure license line appears in all sections or at end? User said "Include license line". Probably at end of each section or global. I'll put it at end of each section or a global footer. Since it's 4 languages, maybe include in each or a final unified license. To be safe, include in each section.
-
-Must not use floating-point explanations. Instead "aritmética entera exacta" (exact integer arithmetic) and "escalas algebraicas deterministas".
-
-Let's draft ESPAÑOL.
-
-### What Is This Module? -> ¿Qué es este módulo?
-Kernel de Entropía... sensor de turbidez digital.
-
-Table concepts: Entropía de Shannon, Entropía Normalizada, Tasa de Entropía, Procesamiento por Lotes, Invariante Determinista, Backend, Reemplazo Directo.
-
-Procedures table.
-
-Constants: Constantes de Configuración.
-
-Note determinism.
-
-Glossary: Glosario.
-
-Scientific Note: 【科学说明】 or maybe keep box title in Spanish but user asked for 【科学说明】/【Scientific Note】 box. I think the box can have the title localized but include both markers? The user said: "A 【科学说明】/【Scientific Note】 box". So maybe title it with both? Or use the respective language equivalent but ensure both markers appear? I'll use:
-### 【科学说明】 / 【Scientific Note】
-in English? Actually user wants it in each section. I can use:
-**【科学说明】Nota Científica** in Chinese section, and **【Scientific Note】** in English, etc. But the user explicitly said "A 【科学说明】/【Scientific Note】 box". I'll make a boxed section titled exactly that in all languages? That might be weird. Better:
-In ENGLISH section: ### 【Scientific Note】
-In 中文 section: ### 【科学说明】
-In ESPAÑOL: ### 【Nota Científica】 maybe? But user didn't specify. However, user asked for a box explaining that terminology is NOT mysticism. I'll include the box with appropriate title for each language, but keep the spirit.
-
-Actually, to be safe and follow instruction literally: include a box titled 【科学说明】/【Scientific Note】 in each section? The slash suggests it's the same box with both labels. Maybe I should title each box with both labels: `【科学说明】 / 【Scientific Note】` and then the content in the respective language. That satisfies "A 【科学说明】/【Scientific Note】 box". Let's do that.
-
-Terms:
-Шеннон энтропия, нормализованная энтропия, скорость энтропии, пакетная обработка, детерминизм, бэкенд, замена без изменения окружения (drop-in replacement).
-"Семиотика — это датчик, а не мистицизм."
-Peirce = Пирс, Eco = Эко, Grice = Грайс.
-Forensic artifact = цифровой артефакт/объект доказательственной практики. But Chinese section specifically needs 取证工件. For Russian, I'll use "экспертно-цифровой артефакт" or "артефакт цифровой экспертизы".
-Logical fractures = "логические разрывы".
-Sensor analogy: аналогия с датчиком.
-
-中文:
-
-Must use:
-- 艾柯 (Eco)
-- 格赖斯 (Grice)
-- 取证工件 (forensic artifact, not 制品)
-- 逻辑断裂 (logical fracture, not 裂缝)
-
-Other terms:
-Shannon Entropy: 香农熵 / 夏农熵? Use 香农熵.
-Normalized: 归一化熵.
-Entropy Rate: 熵率.
-Batch: 批量处理.
-Determinism: 确定性.
-Backend: 后端 / 计算后端.
-Drop-in replacement: 直接替代 / 即插即用替换.
-Integer arithmetic: 整数运算.
-
-Box title: 【科学说明】/【Scientific Note】? I'll use 【科学说明】 because it's the Chinese section, but to satisfy user maybe include both. I'll write:
-> 【科学说明】/【Scientific Note】
-> ...
-
-License line in Chinese: "" Probably keep English or translate? The user specified exact line. I'll keep exact line in all sections.
-
-Let's double check the user's specific instruction on Chinese translations:
-"Chinese translations must use: 艾柯 (not Eco), 格赖斯 (not Grice), 取证工件 (not 制品), 逻辑断裂 (not 裂缝)"
-So in the Chinese glossary and note, I must use these.
-
-Also, "You NEVER use floating-point math explanations for deterministic systems." So I must avoid terms like "floating point", "IEEE 754" (the docstring mentions it but I should not use it in explanations), "round-off error", "precision loss". Instead emphasize integer counting and deterministic scaling. Wait, the module uses float64 and round(x,6). I can mention "fixed-precision deterministic arithmetic" but not explain floating-point math. I should avoid "IEEE 754". The note says "No step relies on hardware-specific approximations." That's good.
-
-Let's write the content carefully.
-
-Structure for each language:
-
-```
-## [LANGUAGE]
-
-### What Is This Module? / ¿Qué es este módulo? / Что представляет собой этот модуль? / 这是什么模块？
-
-[Plain language]
-
-### Key Concepts / Conceptos Clave / Ключевые понятия / 核心概念
-
-[Table]
-
-### Procedures / Procedimientos / Процедуры / 操作流程
-
-[Table]
-
-### Configuration Constants / Constantes de Configuración / Константы конфигурации / 配置常量
-
-[Table]
-
-### Determinism Note / Nota sobre el Determinismo / Примечание о детерминизме / 确定性说明
-
-[Short paragraph emphasizing integer arithmetic]
-
-### Glossary / Glosario / Глоссарий / 术语表
-
-[Table]
-
-### 【科学说明】/【Scientific Note】
-
-[Box text about Peirce/Eco/Grice]
-
-```
-
-Now, let's flesh out each.
-
-ENGLISH:
-
-What Is This Module?
-"The Entropy Kernel is the digital turbidity sensor of the VIGÍA Forensic Suite. It quantifies disorder in streams of digital evidence. Instead of manually counting symbols and computing logarithms one by one, this module provides a unified, reproducible engine that works identically on laptops, servers, and graphics processors. Scientists may treat it as a laboratory instrument: feed it a frequency distribution, and it returns a deterministic measurement of randomness."
-
-Key Concepts table:
 | Concept | Plain-Language Definition | Scientific Role |
 |---|---|---|
 | Shannon Entropy | A score of unpredictability. Zero means complete order; higher values mean greater disorder. | Detects encryption or compression in suspicious files. |
@@ -199,7 +21,7 @@ Key Concepts table:
 | Backend | The internal computational engine: GPU (CuPy), vectorized CPU (NumPy), or standard library (pure Python). | Automatically chosen for maximum speed while respecting the deterministic invariant. |
 | Drop-in Replacement | A substitute procedure that fits into an existing analytical pipeline without rewriting protocols. | Allows legacy systems to be upgraded transparently. |
 
-Procedures table:
+### Procedures
 | Procedure | Function | Forensic Application |
 |---|---|---|
 | `entropy_shannon` | Calculates raw disorder from an occurrence table. | Measuring randomness in malware configuration blocks. |
@@ -208,22 +30,24 @@ Procedures table:
 | `entropy_batch` | Analyzes multiple time series in a single deterministic pass. | Mass screening of memory-dump segments. |
 | `patch_gci_entropy_score` | Substitutes the legacy static-entropy routine in GCI Engine. | Transparent upgrade of existing VIGÍA integration tests. |
 | `patch_gci_entropy_rate` | Substitutes the legacy entropy-rate routine in GCI Engine. | Same as above, for temporal-dependence calculations. |
-| `patch_gci_log_n` | Computes the base-2 logarithm of sample size, rounded to six decimals for hash stability. | Ensuring evidence indexes produce identical hashes on any hardware. |
+| `patch_gci_log_n` | Computes the base-2 logarithm of sample size, rounded for hash stability. | Ensuring evidence indexes produce identical hashes on any hardware. |
 | `patch_integration_bridge_log_lr` | Computes the natural logarithm of a likelihood ratio with deterministic fallback. | Preserving deterministic chains in probabilistic forensic weighing. |
 | `get_backend_info` | Reports the active engine (CPU/GPU/Python) for audit logs. | Regulatory documentation of the analytical environment. |
 | `self_test` | Cross-validates all backends against each other before deployment. | Mandatory pre-shift verification in accredited laboratories. |
 
-Configuration Constants:
+### Configuration Constants
 | Constant | Purpose |
 |---|---|
 | `_INTEGRATION_GUIDE` | Internal mapping between kernel outputs and legacy suite formats. |
 | `_BACKEND` | Identifier of the active calculation engine (`pure`, `numpy`, or `cupy`). |
 | `_CUPY_DEVICE` | Identifier of the active graphics processor when GPU mode is selected. |
 
-Determinism Note:
-"All procedures begin by tabulating symbol occurrences as exact integer counts. Subsequent scaling and transformation apply deterministic algebraic rules with fixed, reproducible precision. Because the initial counting phase is purely integer-based and all downstream operations are standardized, the system never depends on hardware-specific approximations."
+> **Note on Determinism:** All procedures begin by counting symbol occurrences as **exact integers**. Scaling and transformation are applied afterward through deterministic algebraic operations with fixed, reproducible precision. No step relies on hardware-specific approximations.
 
-Glossary:
+> **【Scientific Note】Semiotics Is a Sensor, Not Mysticism**
+> VIGÍA occasionally references terminology associated with Charles Sanders Peirce, Umberto Eco, and H. P. Grice. These are not metaphysical doctrines. Think of them as **pattern-detection frameworks**—formal lenses, analogous to a spectrometer or a pressure transducer. Peirce's abduction is a logical hypothesis generator; Eco's codes are classification taxonomies for signs; Grice's maxims are rules for detecting cooperative versus deceptive communication. In forensic practice, they serve as deterministic algorithms for spotting anomalies in digital evidence. A sensor does not "believe" in temperature; it registers it. Likewise, these semiotic models do not interpret meaning mystically; they measure structural properties of forensic artifacts and flag logical fractures in communication streams.
+
+### Glossary
 | Term | Definition |
 |---|---|
 | **Entropy** | A mathematical measure of uncertainty or information density within a discrete set of values. |
@@ -237,132 +61,184 @@ Glossary:
 | **Time Series** | A chronologically ordered sequence of observations, such as network packets or keystrokes. |
 | **Likelihood Ratio** | A statistical factor comparing the probability of evidence under two competing hypotheses. |
 
-Scientific Note:
-"VIGÍA occasionally employs terminology associated with Charles Sanders Peirce, Umberto Eco, and H. P. Grice. These are not metaphysical doctrines. Treat them as formal pattern-detection frameworks—analogous to a spectrometer or a pressure transducer. Peirce’s abduction is a logical hypothesis generator; Eco’s codes are classification taxonomies for signs; Grice’s maxims are rules for distinguishing cooperative from deceptive communication. In forensic practice, they function as deterministic algorithms for detecting structural anomalies. A sensor does not 'believe' in temperature; it registers it. Likewise, these semiotic models do not interpret meaning mystically; they measure properties of forensic artifacts and flag logical fractures in communication streams."
+*Licensed under the Apache License, Version 2.0. Copyright 2026 Anna Tchijova.*
 
-License.
+---
 
-ESPAÑOL:
+## ESPAÑOL
 
-What: "El Kernel de Entropía es el sensor de turbidez digital de la Suite Forense VIGÍA. Cuantifica el desorden en flujos de evidencia digital. En lugar de contar símbolos y calcular logaritmos manualmente, este módulo ofrece un motor unificado y reproducible que opera de manera idéntica en computadoras portátiles, servidores y procesadores gráficos. Los científicos pueden tratarlo como un instrumento de laboratorio: se le proporciona una distribución de frecuencias y devuelve una medida determinista de la aleatoriedad."
+### ¿Qué es este módulo?
+El Kernel de Entropía es el sensor de turbidez digital de la Suite Forense VIGÍA. Cuantifica el desorden en flujos de evidencia digital. En lugar de contar símbolos y calcular logaritmos manualmente, este módulo ofrece un motor unificado y reproducible que opera de manera idéntica en computadoras portátiles, servidores y procesadores gráficos. Los científicos pueden tratarlo como un instrumento de laboratorio: se le proporciona una distribución de frecuencias y devuelve una medida determinista de la aleatoriedad.
 
-Key concepts:
-- Entropía de Shannon: Puntuación de impredecibilidad.
-- Entropía Normalizada: Reescalada a intervalo [0,1].
-- Tasa de Entropía: Dependencia temporal entre símbolos consecutivos.
-- Procesamiento por Lotes: Paralelización en CPU/GPU.
-- Invariante Determinista: Garantía cross-hardware.
-- Backend: Motor interno.
-- Reemplazo Directo (Drop-in): Sustitución sin reescribir protocolos.
+### Conceptos Clave
+| Concepto | Definición en lenguaje sencillo | Rol científico |
+|---|---|---|
+| Entropía de Shannon | Puntuación de impredecibilidad. Cero significa orden completo; valores más altos significan mayor desorden. | Detecta cifrado o compresión en archivos sospechosos. |
+| Entropía Normalizada | El puntaje de Shannon reescalado linealmente a un intervalo 0–1 para el tamaño específico de muestra. | Permite comparación justa entre muestras de evidencia pequeñas y grandes. |
+| Tasa de Entropía | Medida de si cada símbolo en una secuencia depende del anterior. | Revela automatización programada, como patrones de señalización de botnets. |
+| Procesamiento por Lotes | Medición simultánea de muchas series de datos usando núcleos de procesador paralelos o unidades GPU. | Cribado de alto rendimiento durante respuesta a incidentes a gran escala. |
+| Invariante Determinista | Garantía entre hardware de que entradas idénticas siempre producen histogramas enteros idénticos y resultados redondeados idénticos después del escalado. | Garantiza reproducibilidad judicial; dos laboratorios no deben divergir por diferentes CPUs. |
+| Backend | Motor de cálculo interno: GPU (CuPy), CPU vectorizada (NumPy) o biblioteca estándar (Python puro). | Elegido automáticamente para máxima velocidad respetando el invariante determinista. |
+| Reemplazo Directo | Procedimiento sustituto que encaja en un pipeline analítico existente sin reescribir protocolos. | Permite actualizar sistemas heredados de forma transparente. |
 
-Procedures: Procedimientos.
-- `entropy_shannon`: Calcula desorden bruto.
-- `entropy_normalized`: Reescala a [0,1].
-- `entropy_rate`: Cuantifica dependencia temporal.
-- `entropy_batch`: Análisis masivo de series temporales.
-- `patch_gci_entropy_score`: Reemplazo directo de rutina estática legacy.
-- `patch_gci_entropy_rate`: Reemplazo directo de tasa legacy.
-- `patch_gci_log_n`: Logaritmo base 2 redondeado para hash estable.
-- `patch_integration_bridge_log_lr`: Logaritmo natural de razón de verosimilitud.
-- `get_backend_info`: Informe del motor activo.
-- `self_test`: Validación cruzada de backends.
+### Procedimientos
+| Procedimiento | Función | Aplicación forense |
+|---|---|---|
+| `entropy_shannon` | Calcula el desorden bruto desde una tabla de ocurrencias. | Medir aleatoriedad en bloques de configuración de malware. |
+| `entropy_normalized` | Reescala el desorden bruto al rango [0, 1]. | Comparar entropía en archivos adjuntos de correo de diferentes tamaños. |
+| `entropy_rate` | Cuantifica la dependencia temporal entre símbolos consecutivos. | Identificar scripts C2 que emiten pares correlacionados en vez de aleatorios. |
+| `entropy_batch` | Analiza múltiples series temporales en un solo paso determinista. | Cribado masivo de segmentos de volcado de memoria. |
+| `patch_gci_entropy_score` | Sustituye la rutina de entropía estática heredada en GCI Engine. | Actualización transparente de pruebas de integración VIGÍA existentes. |
+| `patch_gci_entropy_rate` | Sustituye la rutina de tasa de entropía heredada en GCI Engine. | Igual que anterior, para cálculos de dependencia temporal. |
+| `patch_gci_log_n` | Calcula el logaritmo base 2 del tamaño de muestra, redondeado para estabilidad del hash. | Asegura que los índices de evidencia produzcan hashes idénticos en cualquier hardware. |
+| `patch_integration_bridge_log_lr` | Calcula el logaritmo natural de una razón de verosimilitud con respaldo determinista. | Preservar cadenas deterministas en ponderación forense probabilística. |
+| `get_backend_info` | Reporta el motor activo (CPU/GPU/Python) para registros de auditoría. | Documentación regulatoria del entorno analítico. |
+| `self_test` | Valida cruzadamente todos los backends entre sí antes del despliegue. | Verificación obligatoria pre-turno en laboratorios acreditados. |
 
-Constants:
-- `_INTEGRATION_GUIDE`: Guía interna.
-- `_BACKEND`: Motor activo.
-- `_CUPY_DEVICE`: Identificador GPU.
+### Constantes de Configuración
+| Constante | Propósito |
+|---|---|
+| `_INTEGRATION_GUIDE` | Mapeo interno entre salidas del kernel y formatos de suite heredada. |
+| `_BACKEND` | Identificador del motor de cálculo activo (`pure`, `numpy` o `cupy`). |
+| `_CUPY_DEVICE` | Identificador del procesador gráfico activo cuando el modo GPU está seleccionado. |
 
-Determinism note:
-"Todos los procedimientos comienzan tabulando ocurrencias de símbolos como conteos enteros exactos. El escalado y la transformación subsiguientes aplican reglas algebraicas deterministas con precisión fija y reproducible. Dado que la fase inicial de conteo es puramente de aritmética entera y todas las operaciones posteriores están estandarizadas, el sistema nunca depende de aproximaciones específicas del hardware."
+> **Nota sobre Determinismo:** Todos los procedimientos comienzan tabulando ocurrencias de símbolos como **conteos enteros exactos**. El escalado y la transformación subsiguientes aplican reglas algebraicas deterministas con precisión fija y reproducible. Ningún paso depende de aproximaciones específicas del hardware.
 
-Glossary:
-- Entropía: Medida de incertidumbre.
-- Operación Vectorizada: Cálculo simultáneo en arreglos.
-- Backend: Motor de software.
-- Determinismo: Misma salida para misma entrada siempre.
-- Tabla de Frecuencias: Recuento de símbolos mediante aritmética entera exacta.
-- Reemplazo Directo: Sustitución sin alterar flujo de trabajo.
-- GPU: Coprocesador paralelo.
-- Artefacto Forense: Objeto digital presentado como evidencia.
-- Serie Temporal: Secuencia ordenada cronológicamente.
-- Razón de Verosimilitud: Factor estadístico comparativo.
+> **【Nota Científica】La Semiótica es un Sensor, No Misticismo**
+> VIGÍA ocasionalmente utiliza terminología asociada a Charles Sanders Peirce, Umberto Eco y H. P. Grice. Estas no son doctrinas metafísicas. Considérenlas **marcos de detección de patrones** formales—lentes análogos a un espectrómetro o un transductor de presión. La abducción de Peirce es un generador lógico de hipótesis; los códigos de Eco son taxonomías de clasificación de signos; los máximas de Grice son reglas para distinguir comunicación cooperativa de comunicación engañosa. En la práctica forense funcionan como algoritmos deterministas para detectar anomalías estructurales. Un sensor no "cree" en la temperatura; la registra. Asimismo, estos modelos semióticos no interpretan el sentido místicamente; miden propiedades de artefactos forenses y señalan fracturas lógicas en flujos de comunicación.
 
-Scientific Note:
-"VIGÍA emplea ocasionalmente terminología asociada a Charles Sanders Peirce, Umberto Eco y H. P. Grice. Estas no son doctrinas metafísicas. Considérenlas marcos formales de detección de patrones, análogos a un espectrómetro o a un transductor de presión. La abducción de Peirce es un generador lógico de hipótesis; los códigos de Eco son taxonomías de clasificación de signos; los máximos de Grice son reglas para distinguir comunicación cooperativa de comunicación engañosa. En la práctica forense funcionan como algoritmos deterministas para detectar anomalías estructurales. Un sensor no 'cree' en la temperatura; la registra. Asimismo, estos modelos semióticos no interpretan el sentido místicamente; miden propiedades de artefactos forenses y señalan fracturas lógicas en flujos de comunicación."
+### Glosario
+| Término | Definición |
+|---|---|
+| **Entropía** | Medida matemática de incertidumbre o densidad de información dentro de un conjunto discreto de valores. |
+| **Operación Vectorizada** | Cálculo aplicado a un arreglo completo simultáneamente en lugar de elemento por elemento. |
+| **Backend** | Motor de software (CuPy, NumPy o biblioteca estándar de Python) que ejecuta operaciones de arreglo. |
+| **Determinismo** | Propiedad por la cual una entrada específica siempre produce la misma salida exacta, independientemente del hardware o el tiempo de ejecución. |
+| **Tabla de Frecuencias** | Recuento de cuántas veces aparece cada símbolo distinto; derivado de aritmética entera exacta. |
+| **Reemplazo Directo** | Componente que sustituye a uno más antiguo sin requerir cambios en el flujo de trabajo circundante. |
+| **GPU** | Coprocesador masivamente paralelo utilizado para acelerar cálculos de arreglos. |
+| **Artefacto Forense** | Cualquier objeto digital presentado como evidencia en una investigación. |
+| **Serie Temporal** | Secuencia cronológicamente ordenada de observaciones, como paquetes de red o pulsaciones de teclas. |
+| **Razón de Verosimilitud** | Factor estadístico que compara la probabilidad de evidencia bajo dos hipótesis competidoras. |
 
-License.
+*Licensed under the Apache License, Version 2.0. Copyright 2026 Anna Tchijova.*
 
-РУССКИЙ:
+---
 
-What: "Ядро энтропии — это цифровой турбидиметрический датчик судебного комплекса VIGÍA. Оно количественно оценивает беспорядок в потоках цифровых доказательств. Вместо ручного подсчёта символов и вычисления логарифмов по одному данный модуль предоставляет унифицированный воспроизводимый движок, работающий одинаково на ноутбуках, серверах и графических процессорах. Учёные могут воспринимать его как лабораторный прибор: подаёте таблицу частот — получаете детерминированную оценку случайности."
+## РУССКИЙ
 
-Key concepts:
-- Энтропия Шеннона: Оценка непредсказуемости.
-- Нормализованная энтропия: Приведение к шкале [0,1].
-- Скорость энтропии: Временная зависимость соседних символов.
-- Пакетная обработка: Параллельные вычисления на CPU/GPU.
-- Инвариант детерминизма: Кросс-платформенная гарантия.
-- Бэкенд: Вычислительный движок.
-- Прямая замена (Drop-in): Замена без переписывания протоколов.
+### Что это за модуль?
+Ядро энтропии — это цифровой турбидиметрический датчик судебного комплекса VIGÍA. Оно количественно оценивает беспорядок в потоках цифровых доказательств. Вместо ручного подсчёта символов и вычисления логарифмов по одному данный модуль предоставляет унифицированный воспроизводимый движок, работающий одинаково на ноутбуках, серверах и графических процессорах. Учёные могут воспринимать его как лабораторный прибор: подаёте таблицу частот — получаете детерминированную оценку случайности.
 
-Procedures:
-- `entropy_shannon`: Сырые вычисления энтропии.
-- `entropy_normalized`: Нормализация [0,1].
-- `entropy_rate`: Временная зависимость пар.
-- `entropy_batch`: Массовая обработка рядов.
-- `patch_gci_entropy_score`: Прямая замена статической энтропии GCI.
-- `patch_gci_entropy_rate`: Прямая замена скорости энтропии GCI.
-- `patch_gci_log_n`: Логарифм по основанию 2 с округлением для стабильности хеша.
-- `patch_integration_bridge_log_lr`: Натуральный логарифм отношения правдоподобия.
-- `get_backend_info`: Отчёт об активном движке.
-- `self_test`: Кросс-валидация всех бэкендов.
+### Ключевые понятия
+| Понятие | Определение простым языком | Научная роль |
+|---|---|---|
+| Энтропия Шеннона | Оценка непредсказуемости. Ноль означает полный порядок; большие значения означают большую хаотичность. | Обнаруживает шифрование или сжатие в подозрительных файлах. |
+| Нормализованная энтропия | Оценка Шеннона, линейно перемасштабированная до интервала 0–1 для конкретного размера выборки. | Позволяет справедливо сравнивать малые и большие образцы доказательств. |
+| Скорость энтропии | Мера того, зависит ли каждый символ в последовательности от предыдущего. | Выявляет автоматизацию по скрипту, например паттерны сигналов ботнетов. |
+| Пакетная обработка | Одновременное измерение многих серий данных с использованием параллельных ядер процессора или GPU. | Высокопроизводительный скрининг при масштабном реагировании на инциденты. |
+| Инвариант детерминизма | Межаппаратная гарантия того, что идентичные входные данные всегда дают идентичные целочисленные гистограммы и одинаковые результаты. | Гарантирует судебную воспроизводимость; два лаборатории не должны расходиться из-за разных ЦПУ. |
+| Бэкенд | Внутренний вычислительный движок: GPU (CuPy), векторизованный ЦПУ (NumPy) или стандартная библиотека (чистый Python). | Выбирается автоматически для максимальной скорости с соблюдением инварианта детерминизма. |
+| Прямая замена | Замещающая процедура, встраиваемая в существующий аналитический конвейер без переписывания протоколов. | Позволяет прозрачно обновлять устаревшие системы. |
 
-Constants:
-- `_INTEGRATION_GUIDE`: Внутреннее руководство интеграции.
-- `_BACKEND`: Активный вычислительный движок.
-- `_CUPY_DEVICE`: Идентификатор GPU.
+### Процедуры
+| Процедура | Функция | Судебное применение |
+|---|---|---|
+| `entropy_shannon` | Вычисляет сырую хаотичность по таблице вхождений. | Измерение случайности в блоках конфигурации вредоносного ПО. |
+| `entropy_normalized` | Перемасштабирует сырую хаотичность до [0, 1]. | Сравнение энтропии в почтовых вложениях разных размеров. |
+| `entropy_rate` | Количественно оценивает временную зависимость между соседними символами. | Выявление скриптов C2, испускающих коррелированные, а не случайные пары. |
+| `entropy_batch` | Анализирует несколько временны́х рядов за один детерминированный проход. | Массовый скрининг сегментов дампа памяти. |
+| `patch_gci_entropy_score` | Заменяет унаследованную процедуру статической энтропии в GCI Engine. | Прозрачное обновление существующих интеграционных тестов VIGÍA. |
+| `patch_gci_entropy_rate` | Заменяет унаследованную процедуру скорости энтропии в GCI Engine. | Аналогично выше, для расчётов временно́й зависимости. |
+| `patch_gci_log_n` | Вычисляет логарифм по основанию 2 от размера выборки, округлённый для стабильности хеша. | Обеспечение идентичных хешей индексов доказательств на любом оборудовании. |
+| `patch_integration_bridge_log_lr` | Вычисляет натуральный логарифм отношения правдоподобия с детерминированным откатом. | Сохранение детерминированных цепочек при вероятностном судебном взвешивании. |
+| `get_backend_info` | Сообщает активный движок (CPU/GPU/Python) для журналов аудита. | Нормативная документация аналитической среды. |
+| `self_test` | Перекрёстно проверяет все бэкенды друг против друга перед развёртыванием. | Обязательная доверочная проверка в аккредитованных лабораториях. |
 
-Determinism note:
-"Все процедуры начинаются с табуляции вхождений символов в виде точных целочисленных счётчиков. Последующее масштабирование и преобразование применяют детерминированные алгебраические правила с фиксированной воспроизводимой точностью. Поскольку начальная фаза подсчёта является чисто целочисленной, а все последующие операции стандартизированы, система никогда не зависит от аппаратно-специфичных аппроксимаций."
+### Константы конфигурации
+| Константа | Назначение |
+|---|---|
+| `_INTEGRATION_GUIDE` | Внутреннее отображение между выходами ядра и форматами унаследованного комплекса. |
+| `_BACKEND` | Идентификатор активного вычислительного движка (`pure`, `numpy` или `cupy`). |
+| `_CUPY_DEVICE` | Идентификатор активного графического процессора в режиме GPU. |
 
-Glossary:
-- Энтропия: Мера неопределённости.
-- Векторизованная операция: Одновременное вычисление над массивом.
-- Бэкенд: Программный движок.
-- Детерминизм: Свойство, при котором один и тот же вход всегда даёт один и тот же выход.
-- Таблица частот: Подсчёт символов на основе точной целочисленной арифметики.
-- Прямая замена: Компонент, заменяющий старый без изменения окружающего процесса.
-- GPU: Массивно-параллельный сопроцессор.
-- Цифровой артефакт/экспертный объект: Любой цифровой объект, представленный в качестве доказательства.
-- Временной ряд: Хронологически упорядоченная последовательность наблюдений.
-- Отношение правдоподобия: Статистический показатель сравнения двух гипотез.
+> **Примечание о детерминизме:** Все процедуры начинаются с табуляции вхождений символов как **точных целочисленных счётчиков**. Последующее масштабирование и преобразование применяют детерминированные алгебраические правила с фиксированной воспроизводимой точностью. Ни один шаг не зависит от аппаратно-специфичных аппроксимаций.
 
-Scientific Note:
-"В VIGÍA время от времени используется терминология, связанная с Чарльзом Сандерсом Пирсом, Умберто Эко и Г. П. Грайсом. Это не метафизические учения. Воспринимайте их как формальные框架 (лучше: формальные схемы) обнаружения паттернов — аналогично спектрометру или датчику давления. Абдукция Пирса — это логический генератор гипотез; коды Эко — таксономии классификации знаков; максимы Грайса — правила выявления кооперативной коммуникации в отличие от обманчивой. На практике судебной экспертизы они служат детерминированными алгоритмами обнаружения структурных аномалий. Датчик не «верит» в температуру; он её регистрирует. Точно так же эти семиотические модели не истолковывают смысл мистически; они измеряют свойства цифровых артефактов и выявляют логические разрывы в потоках коммуникации."
+> **【Научное примечание】Семиотика — это датчик, а не мистицизм**
+> VIGÍA иногда использует терминологию, связанную с Чарльзом Сандерсом Пирсом, Умберто Эко и Г. П. Грайсом. Это не метафизические учения. Воспринимайте их как формальные **схемы обнаружения паттернов** — аналогично спектрометру или датчику давления. Абдукция Пирса — логический генератор гипотез; коды Эко — таксономии классификации знаков; максимы Грайса — правила выявления кооперативной коммуникации в отличие от обманчивой. На практике судебной экспертизы они служат детерминированными алгоритмами обнаружения структурных аномалий. Датчик не «верит» в температуру; он её регистрирует. Точно так же эти семиотические модели не истолковывают смысл мистически; они измеряют свойства цифровых артефактов и выявляют логические разрывы в потоках коммуникации.
 
-License.
+### Глоссарий
+| Термин | Определение |
+|---|---|
+| **Энтропия** | Математическая мера неопределённости или плотности информации в дискретном наборе значений. |
+| **Векторизованная операция** | Вычисление, применяемое ко всему массиву одновременно, а не поэлементно. |
+| **Бэкенд** | Программный движок (CuPy, NumPy или стандартная библиотека Python), выполняющий операции с массивами. |
+| **Детерминизм** | Свойство, при котором конкретный вход всегда даёт точно такой же результат, независимо от оборудования или времени выполнения. |
+| **Таблица частот** | Подсчёт количества вхождений каждого отдельного символа; производный от точной целочисленной арифметики. |
+| **Прямая замена** | Компонент, заменяющий старый без изменений окружающего рабочего процесса. |
+| **GPU** | Массивно-параллельный сопроцессор для ускорения операций с массивами. |
+| **Цифровой артефакт** | Любой цифровой объект, представленный в качестве доказательства в расследовании. |
+| **Временной ряд** | Хронологически упорядоченная последовательность наблюдений, например сетевые пакеты или нажатия клавиш. |
+| **Отношение правдоподобия** | Статистический показатель сравнения вероятности доказательств при двух конкурирующих гипотезах. |
 
-中文:
+*Licensed under the Apache License, Version 2.0. Copyright 2026 Anna Tchijova.*
 
-What: "熵核（Entropy Kernel）是VIGÍA取证套件中的数字浊度传感器。它对数字证据流中的无序性进行定量测量。科学家无需手动逐个计数符号并计算对数，而可将该模块视为一台实验室仪器：输入频率分布表，即可获得确定性的随机度读数。该模块在笔记本电脑、服务器及图形处理器上均能产生完全一致的结果。"
+---
 
-Key concepts:
-- 香农熵 (Shannon Entropy): 不可预测性评分。
-- 归一化熵 (Normalized Entropy): 线性重标度至[0,1]区间。
-- 熵率 (Entropy Rate): 相邻符号间的时间依赖性。
-- 批量处理 (Batch Processing): 并行计算。
-- 确定性不变量 (Deterministic Invariant): 跨硬件保证。
-- 后端 (Backend): 计算引擎。
-- 直接替换 (Drop-in Replacement): 不改动现有流程的升级。
+## 中文
 
-Procedures:
+### 这是什么模块？
+熵核（Entropy Kernel）是 VIGÍA 取证套件中的数字浊度传感器。它对数字证据流中的无序性进行定量测量。科学家无需手动逐个计数符号并计算对数，而可将该模块视为一台实验室仪器：输入频率分布表，即可获得确定性的随机度读数。该模块在笔记本电脑、服务器及图形处理器上均能产生完全一致的结果。
+
+### 核心概念
+| 概念 | 通俗定义 | 科学作用 |
+|---|---|---|
+| 香农熵 | 不可预测性评分。零代表完全有序；值越高代表越无序。 | 检测可疑文件中的加密或压缩。 |
+| 归一化熵 | 针对特定样本大小将香农评分线性重标度至 0–1 区间。 | 允许对大小不同的证据样本进行公平比较。 |
+| 熵率 | 衡量序列中每个符号是否依赖于前一个符号。 | 揭示脚本化自动化，例如僵尸网络信标模式。 |
+| 批量处理 | 使用并行处理器核心或 GPU 单元同时测量多条数据序列。 | 大规模事件响应期间的高通量筛查。 |
+| 确定性不变量 | 跨硬件保证，确保相同输入始终产生相同整数直方图，缩放后结果也相同。 | 保证司法可复现性；两个实验室不得因 CPU 不同而产生分歧。 |
+| 后端 | 内部计算引擎：GPU (CuPy)、向量化 CPU (NumPy) 或标准库（纯 Python）。 | 在遵守确定性不变量的同时自动选择以获得最大速度。 |
+| 直接替换 | 不改动现有分析流程即可嵌入其中的替代程序。 | 允许透明地升级旧版系统。 |
+
+### 操作流程
 | 操作名称 | 功能 | 取证应用 |
 |---|---|---|
-| `entropy_shannon` | 根据频数表计算原始无序度 | 测量恶意软件配置块的随机性 |
-| `entropy_normalized` | 将原始无序度归一化至[0,1] | 比较不同大小邮件附件的熵值 |
-| `entropy_rate` | 量化相邻符号的时间依赖性 | 识别发出关联性而非随机性的C2脚本 |
-| `entropy_batch` | 一次确定性处理多组时间序列 | 大规模事件响应中对内存转储段进行批量筛查 |
-| `patch_gci_entropy_score` | 替换GCI引擎中的旧版静态熵计算 | 现有VIGÍA集成测试的无缝升级 |
-| `patch_gci_entropy_rate` | 替换
----
+| `entropy_shannon` | 根据频数表计算原始无序度。 | 测量恶意软件配置块的随机性。 |
+| `entropy_normalized` | 将原始无序度归一化至 [0,1]。 | 比较不同大小邮件附件的熵值。 |
+| `entropy_rate` | 量化相邻符号的时间依赖性。 | 识别发出关联性而非随机性信号的 C2 脚本。 |
+| `entropy_batch` | 一次确定性处理多组时间序列。 | 大规模事件响应中对内存转储段进行批量筛查。 |
+| `patch_gci_entropy_score` | 替换 GCI 引擎中的旧版静态熵计算。 | 现有 VIGÍA 集成测试的无缝升级。 |
+| `patch_gci_entropy_rate` | 替换 GCI 引擎中的旧版熵率计算。 | 同上，用于时间依赖性计算。 |
+| `patch_gci_log_n` | 计算样本大小的以 2 为底的对数，四舍五入以确保哈希稳定性。 | 确保证据索引在任何硬件上产生相同哈希。 |
+| `patch_integration_bridge_log_lr` | 计算似然比的自然对数，具有确定性回退。 | 在概率取证加权中维护确定性链。 |
+| `get_backend_info` | 报告当前活动引擎（CPU/GPU/Python）以供审计日志使用。 | 分析环境的监管文档记录。 |
+| `self_test` | 部署前对所有后端进行交叉验证。 | 认证实验室的强制性班前验证。 |
+
+### 配置常量
+| 常量 | 用途 |
+|---|---|
+| `_INTEGRATION_GUIDE` | 内核输出与旧版套件格式之间的内部映射。 |
+| `_BACKEND` | 当前活动计算引擎的标识符（`pure`、`numpy` 或 `cupy`）。 |
+| `_CUPY_DEVICE` | 选择 GPU 模式时当前活动图形处理器的标识符。 |
+
+> **确定性说明：** 所有程序均从将符号出现次数计为**精确整数**开始。后续的缩放和变换通过具有固定、可复现精度的确定性代数运算来应用。没有任何步骤依赖于特定硬件的近似值。
+
+> **【科学说明】符号学是传感器，不是神秘主义**
+> VIGÍA 偶尔使用与查尔斯·桑德斯·皮尔士、艾柯（Umberto Eco）和格赖斯（H. P. Grice）相关的术语。这些不是形而上学教义。请将它们视为形式化的**模式检测框架**——类似于光谱仪或压力传感器。皮尔士的溯因推理是逻辑假设生成器；艾柯的符码是符号分类分类法；格赖斯的准则是区分合作性与欺骗性通信的规则。在取证实践中，它们用作检测数字证据中结构异常的确定性算法。传感器不"信仰"温度；它只是记录温度。同样，这些符号学模型不以神秘方式解释意义；它们测量取证工件的结构属性并标记通信流中的逻辑断裂。
+
+### 术语表
+| 术语 | 定义 |
+|---|---|
+| **熵** | 离散值集合内不确定性或信息密度的数学度量。 |
+| **向量化操作** | 同时应用于整个数组而非逐元素应用的计算。 |
+| **后端** | 执行数组操作的软件引擎（CuPy、NumPy 或 Python 标准库）。 |
+| **确定性** | 特定输入始终产生完全相同输出的属性，与硬件或执行时序无关。 |
+| **频率表** | 每个不同符号出现次数的计数；由精确整数运算得出。 |
+| **直接替换** | 无需更改周围工作流即可替代旧组件的组件。 |
+| **GPU** | 用于加速数组计算的大规模并行协处理器。 |
+| **取证工件** | 在调查中作为证据提交的任何数字对象。 |
+| **时间序列** | 按时间顺序排列的观测序列，如网络数据包或击键记录。 |
+| **似然比** | 在两个竞争假设下比较证据概率的统计因子。 |
+
 *Licensed under the Apache License, Version 2.0. Copyright 2026 Anna Tchijova.*

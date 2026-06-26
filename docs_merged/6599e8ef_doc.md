@@ -111,7 +111,6 @@ Glossary -> Глоссарий
 - **可信根 (Доверенный корень)**: Фундаментальный криптографический ключ или измерение, от которого происходит всё доверие к системе.
 - **动态关联感知 (Динамическое корреляционное восприятие)**: Систематическое обнаружение паттернов across multiple discrete events in time. -> across multiple discrete events in time = across multiple discrete events in time. Translate: среди множества дискретных событий во времени.
 
-License line in Russian section? The requirement says include license line. Probably keep it in English as standard, or translate? The prompt says exactly: "License line: ''" So I should include that exact string in each section, likely at the end.
 
 ---
 
@@ -128,7 +127,6 @@ Need to use specified terms:
 - 取证工件 (not 制品)
 - 逻辑断裂 (not 裂缝)
 
-Also note: The module path is vigia/core/trust_levels.py. The docstring mentions vigia/governance/trust_levels.py. I should probably note the path as given in the prompt: `vigia/core/trust_levels.py`.
 
 Tables in Chinese:
 
@@ -181,15 +179,9 @@ Need to ensure the Chinese terms:
 - 艾柯 (Eco) — used.
 - 格赖斯 (Grice) — used.
 - 取证工件 — I used 取证工件 implicitly? Wait, in the "What Is This Module?" I said "计算取证工件". Good.
-- 逻辑断裂 — The prompt says "逻辑断裂 (not 裂缝)". I haven't used 裂缝 or 逻辑断裂 yet. Should I incorporate it? Maybe in the glossary or note. The prompt is a translation requirement: "Chinese translations must use: ... 逻辑断裂 (not 裂缝)". This suggests wherever "gap", "breach", "crack", or "fracture" might appear, use 逻辑断裂. But I haven't used those. I could add a note about integrity verification detecting logical breaks? Or in the glossary. Let me include it in the glossary or in the description of verify_integrity. Let's add in the "verify_integrity" row: "检测逻辑断裂（任何整数序列的不一致）". Or in the glossary: **逻辑断裂**：指确定性整数序列或证据链中出现的不一致或中断，表现为哈希值不匹配。 This fulfills the requirement.
 
 Also need to ensure no floating-point math explanations. I have emphasized integer arithmetic.
 
-Need to be thorough but concise. The document will be long because of 4 languages. I should format clearly with headers.
-
-One more thing: The user wants "You NEVER use floating-point math explanations for deterministic systems." I must make sure I don't mention floating point even to say "we don't use it" in a way that explains it? Saying "no floating-point errors" is okay as a negative statement. But better to frame positively: "exact integer arithmetic". I already did that.
-
-Let's check the Peirce/Eco/Grice scientific note in all languages for consistency.
 
 EN:
 - Peirce's Thirdness / Terceridad. Sensor analogy: raw voltage (Firstness), crossing threshold (Secondness), sensor fusion network (Thirdness).
@@ -206,13 +198,11 @@ RU:
 - Firstness: Первичность or Первоначальность.
 - Secondness: Вторичность.
 - Thirdness: Третичность or Терциарность.
-But the prompt says "Terceridad (Peirce)" and the user probably wants to keep the Spanish term or use a recognizable Russian form. I used Примерность (which is wrong; that's "exemplarity"). I should fix that.
 Better:
 - Первичность (Firstness) — raw voltage.
 - Вторичность (Secondness) — crossing threshold.
 - Третичность (Thirdness) — correlation network.
 But the prompt uses "Terceridad". In Russian academic texts, Peirce's terms are sometimes kept in transliteration or translated. To avoid confusion, I can say:
-"Терцерность (Третичность) Пирса" or use "Третьеобразие" (rare). Actually, standard Russian philosophical translation for Thirdness is "Третичность" or "Третьеобразие". But since the prompt says "Terceridad", I'll use "Терцерность (Третичность) Пирса" to link to the module's terminology.
 - Первичность (Firstness) = raw voltage.
 - Вторичность (Secondness) = threshold crossing.
 - Терцерность / Третичность (Thirdness) = sensor fusion.
@@ -226,9 +216,6 @@ In Chinese:
 - 格赖斯 (Grice)
 - 第一性, 第二性, 第三性 (Peirce's categories in Chinese academic literature). I used 第一性 etc. Good.
 
-I need to ensure the license line appears exactly as specified in each section.
-
-Also, the user said "Include glossaries and scientific notes." So each of the 4 languages must have its own glossary and scientific note.
 
 Let's finalize the content.
 
@@ -286,7 +273,6 @@ Structure:
 ### 术语表
 ...
 
-I should also ensure that I mention the deterministic integer arithmetic in the context of HMAC-SHA256. HMAC-SHA256 produces a byte string, which can be represented as a large integer. The hash chain uses these integer values. So it's appropriate.
 
 Also, the prompt mentions "逻辑断裂 (not 裂缝)". I will incorporate 逻辑断裂 in the Chinese glossary and maybe in the table for verify_integrity.
 
@@ -308,9 +294,6 @@ FUNCTIONS:
   - to_dict(): 
   - verify_level_1() ... etc.
 
-It seems `to_dict()` appears for multiple classes. For non-programmers, I can explain it as "Data export to standard record format" and list it once, noting it applies to all major classes. Or I can include it in the component table. I'll include it in the Component Reference table as a shared method.
-
-I should also mention that `verify_integrity()` appears twice (for TrustedRoot and AuditLog). I can note that the same integrity principle applies to both.
 
 Now, let's refine each language to ensure quality and accuracy.
 
@@ -349,7 +332,6 @@ ESPAÑOL:
 - "取证工件" used.
 - "逻辑断裂" used.
 
-I need to be thorough but concise. The four-language structure will be lengthy. I should avoid excessive verbosity while covering all requirements.
 
 Let's compose.
 

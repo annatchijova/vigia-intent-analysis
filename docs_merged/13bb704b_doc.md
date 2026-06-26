@@ -105,7 +105,6 @@ ES: Registro inmutable de casos limitados reportados pero no modificados.
 RU: Неизменяемая запись о зафиксированных, но не изменённых ограниченных кейсах.
 ZH: 对已报告但未修改的限制案例的不可变记录。
 
-Now let's count glossary words roughly. Each entry ~12 words x 4 languages = ~48 words per entry? No, that's too much. Wait, I need to count carefully.
 
 Actually, I can make the glossary terms very concise. Let's rewrite to be tighter and maybe have a header row.
 
@@ -125,15 +124,12 @@ Table:
 
 This is very concise, maybe ~60-80 words total.
 
-Let's verify the total word count.
 
 EN text: 46 words.
 ES text: 51 words.
 RU text: 44 words.
 ZH text: let's count. `recalibrate_cases.py` (1) 模块将案例 JSON 文件中的预期判决与当前 EBS v1 评分器逻辑（含全部补丁）进行同步。仅对不在 `KNOWN_LIMITATIONS` 登记册中的案例进行修改；已记录限制的案例会被记录备查但保持原状。此举确保参考数据集与系统确定性行为保持一致，同时不触碰已知的边界条件。
-Count: 1+模块(1)+将(1)+案例(1)+JSON(1)+文件(1)+中的(1)+预期(1)+判决(1)+与(1)+当前(1)+EBS(1)+v1(1)+评分器(1)+逻辑(1)+含(1)+全部(1)+补丁(1)+进行(1)+同步(1)。仅(1)+对(1)+不在(1)+KNOWN_LIMITATIONS(1)+登记册(1)+中的(1)+案例(1)+进行(1)+修改(1)；已(1)+记录(1)+限制(1)+的(1)+案例(1)+会(1)+被(1)+记录(1)+备查(1)+但(1)+保持(1)+原状(1)。此举(1)+确保(1)+参考(1)+数据集(1)+与(1)+系统(1)+确定性(1)+行为(1)+保持(1)+一致(1)，同时(1)+不(1)+触碰(1)+已知(1)+的(1)+边界(1)+条件(1)。 = ~56 words/tokens? In Chinese word count usually characters are counted or spaces? The user said under 500 words. For mixed text, Chinese characters often count as words. Even if so, it's around 60. Total ~200 words. Glossary maybe ~80 words. Total ~280. Well under 500.
 
-Let's check for any Python jargon. The user said scientists who do not know Python. I used "module", "JSON files", `KNOWN_LIMITATIONS`. These are domain terms but not Python-specific syntax explanations. I should avoid terms like "dictionary", "list", "script". I used "module" which is fine. I used "JSON files" which is a data format, not Python-specific. I think it's okay.
 
 Let's refine the EN text to ensure academic tone.
 "The `recalibrate_cases.py` module synchronizes the `expected_verdict` field in case JSON files with the current deterministic logic of the EBS v1 scorer, inclusive of all applied patches. It restricts write operations to cases absent from the `KNOWN_LIMITATIONS` registry; documented limitation cases are logged for audit but preserved unchanged. This maintains reference dataset integrity while respecting established boundary conditions."
@@ -188,20 +184,14 @@ Row 10: 3 + 5 + 4 + 4 = 16
 Total ~164 words.
 Grand total ~368 words. Under 500. Perfect.
 
-One thing: The user said "You NEVER use floating-point math explanations for deterministic systems." I didn't mention floating point. I mentioned "deterministic logic" and "deterministic system". This is fine.
-
-Also need scientific notes? The persona says "You include glossaries and scientific notes." Maybe I should add a brief scientific note? But word count is tight. I can include a short note in each language or one consolidated note? The user said "brief academic description... Include a 10-term glossary." Given the strict word limit, a "Scientific Note" could be a single sentence italicized or something. But the prompt didn't explicitly ask for scientific notes this time, it's part of the persona. However, I should try to include at least one brief note if possible, or maybe the glossary counts? No, glossary is separate. Let me see if I can add a small "Nota científica / Научное примечание / Scientific note / 科学注" section without blowing word count.
 
 Maybe integrate it into the text? Like "Scientific note: This process assumes the scorer behaves as a deterministic finite-state function; therefore, divergence between stored and rendered verdicts indicates a schema or logic update rather than computational indeterminacy."
 
-That might be too many words. But I can add a very short note:
 "[Scientific note: The scorer is modeled as a deterministic state function; divergence implies schema drift, not stochastic variance.]"
 
-But this is EN only. The user wants 4 languages. Maybe skip the explicit note section to respect the word limit, as the user specifically asked for "brief academic description" and "Keep it under 500 words total." The persona says "You include glossaries and scientific notes" but under a strict constraint, I might need to balance. I think I'll add a very brief single scientific note in English only after the EN paragraph, or perhaps a multilingual sentence? No, that would clutter.
 
 Actually, I can make the "Scientific note" part of the EN paragraph? No.
 
-Let's reconsider. The user wants total under 500 words. If I add 4 scientific notes (one per language), that's extra ~40-60 words. Still under 500. Let's try.
 
 EN Scientific note: *Scientific note: Because the EBS v1 scorer is deterministic, any mismatch between stored and rendered verdicts indicates a logic revision rather than stochastic variance.*
 (~20 words)
@@ -217,7 +207,6 @@ ZH 科学注释: *科学注释：由于 EBS v1 评分器具有确定性，存储
 
 Total added: ~87 words. New total ~290 + 87 = ~377. Still under 500. But wait, I must ensure I don't use floating-point math explanations. I used "deterministic" and said mismatch indicates logic revision not stochastic variance. This avoids floating point. Good.
 
-However, does the user want the scientific note to be separate? The persona says "You include glossaries and scientific notes." I'll include them as a short parenthetical or italicized sentence after each paragraph. It adds value for scientists.
 
 EN para: 46 words.
 EN note: 20 words.
@@ -239,9 +228,6 @@ Narrative total: 291 words.
 Glossary: ~164 words.
 Grand total: ~455 words. Under 500. Perfect.
 
-Let's double-check that no floating-point explanation is used. The note mentions deterministic and stochastic variance. No mention of floats. Good.
-
-Let's verify the EN text doesn't sound too Pythonic. "Module", "field", "JSON files", "registry", "logged for audit". These are accessible to scientists.
 
 One final check on Russian: "скорера" is transliteration, fine. "JSON-файлах" fine.
 Spanish: "evaluador" for scorer. Good. "condiciones límite" for boundary conditions. Good.
@@ -251,7 +237,6 @@ The user wrote the summary in Spanish ("Actualiza expected_verdict..."). They mi
 
 Let's ensure the glossary headers don't count too much, but they will. Still okay.
 
-I should present cleanly.
 
 Layout:
 **ENGLISH** [text] *Scientific note: ...*
@@ -265,7 +250,6 @@ Layout:
 **Glossary / Glosario / Глоссарий / 词汇表**
 [Table]
 
-I need to make sure the word count is strictly under 500. Let's do a precise count.
 
 EN:
 The(1) `recalibrate_cases.py`(2) module(3) synchronizes(4) the(5) `expected_verdict`(6) field(7) in(8) case(9) JSON(10) files(11) with(12) the(13) current(14) deterministic(15) logic(16) of(17) the(18) EBS(19) v1(20) scorer,(21) inclusive(22) of(23) all(24) applied(25) patches.(26) It(27) restricts(28) write(29) operations(30) to(31) cases(32) absent(33) from(34) the(35) `KNOWN_LIMITATIONS`(36) registry;(37) documented(38) limitation(39) cases(40) are(41) logged(42) for(43) audit(44) but(45) preserved(46) unchanged.(47) This(48) maintains(49) reference(50) dataset(51) integrity(52) while(53) respecting(54) established(55) boundary(56) conditions.(57)
@@ -289,7 +273,6 @@ ZH total: 53+23 = 76.
 
 Narrative sum: 81+94+72+76 = 323 words.
 
-Glossary count. I need to be careful. Let's assign each cell a word count.
 
 Row 1: Expected(1) verdict(2) | Veredicto(1) de(2) referencia(3) previsto.(4) | Ожидаемый(1) вердикт.(2) | 预期判决。(1)
 -> 2+4+2+1 = 9
@@ -330,6 +313,5 @@ Plus table header row: Term(1) (EN)(2) Español(1) Русский(1) 中文(1) =
 Total extra: 10.
 464 words. Still under 500.
 
-I should also include the section headers like "ENGLISH", "ESPAÑOL",
 ---
 *Licensed under the Apache License, Version 2.0. Copyright 2026 Anna Tchijova.*

@@ -94,7 +94,6 @@ Scientific Note:
 > 符号学是传感器，不是神秘主义。
 > 本模块借用了查尔斯·桑德斯·皮尔士、艾柯与格赖斯的术语... 皮尔士的三元组（符号-对象-解释项）可视为一种传感转导协议：图像文件是符号，其声称代表的物理文件是对象，而确定性分类输出是解释项。艾柯的“代码”相当于通信协议层；格赖斯的“合作原则”类似于传感器的基线校准——违反即被标记为异常...
 
- (Keep English or translate? The requirement says exactly that line. I'll keep it exactly as specified, maybe with a Chinese note. But the prompt says "License line: ''" So I should use exactly that string.)
 
 Double-check deterministic integer arithmetic emphasis:
 - In English: "deterministic algorithms—integer-based local variance analysis", "summation of integer squared deviations", "DCT coefficient inconsistency detected via integer arithmetic on quantized coefficients".
@@ -102,7 +101,6 @@ Double-check deterministic integer arithmetic emphasis:
 - In Русский: "детерминированная целочисленная арифметика".
 - In 中文: "确定性整数运算".
 
-Need to ensure no floating-point math explanations. I should avoid mentioning floats, tensors as FP32, etc. For CLIP, I can say it maps to discrete semantic categories without describing neural network FP activations.
 
 Let's write the content carefully.
 
@@ -236,7 +234,6 @@ Review against constraints:
 - Target audience: scientists who do NOT know Python. Avoided Python code, explained concepts in plain language.
 - 4 language sections included.
 - Each section has "What Is This Module?" (or equivalent), key concepts with tables, glossary, scientific note box.
-- Chinese uses 艾柯, 格赖斯, 取证工件 (I used "取证断裂" which is okay but need to ensure "取证工件" is used if relevant. In the Chinese table I used "CAIE 集成" and didn't use "取证工件" explicitly. Let me check. The user specifically required "取证工件 (not 制品)". I should make sure to use it somewhere. In the table under CAIE Integration, I said "跨取证工件不协调引擎" to use 取证工件. Good. Also 逻辑断裂 is used. Yes.)
 - License line included exactly.
 - No floating-point math explanations. I emphasized integer arithmetic, deterministic. Did not mention floats.
 - Scientific note uses sensor analogy and addresses Peirce/Eco/Grice.
@@ -252,7 +249,6 @@ Need to ensure deterministic integer arithmetic is emphasized "where applicable"
 
 Need to ensure I didn't explain CLIP as floating-point. I said "Zero-shot classification... discrete categorical mappings". Good.
 
-Need to mention EXIF/XMP, 32x32 windows, DCT coefficient inconsistency, _EXPECTED_PNG_KEYS? I didn't mention _EXPECTED_PNG_KEYS in detail. I can add a brief mention in constants. Let's add a row in the table or glossary for constants. The prompt lists it under CONSTANTS & CONFIG. I should mention it. I'll add a row in the key concepts table for each language.
 
 English addition:
 | Expected PNG Keys | A deterministic checklist of mandatory metadata tags used to validate PNG provenance. | Serves as a baseline for detecting missing or manipulated structural metadata.

@@ -15,9 +15,7 @@ Generated: 2026-05-20T14:56:47.863756+00:00
 #### ¿Qué es este módulo?
 #### Conceptos clave (con tablas)
 #### Glosario
-#### 【Nota Científica】 or 【科学说明】? The prompt says 【科学说明】/【Scientific Note】 box. So for Spanish maybe 【Nota Científica】 and Russian 【Научное Примечание】? But the prompt specifically says "A 【科学说明】/【Scientific Note】 box". I'll use the appropriate localized box title but keep the spirit. Actually to be safe and consistent, I can use 【Scientific Note】 in English, 【Nota Científica】 in Spanish, 【Научное Примечание】 in Russian, and 【科学说明】 in Chinese. Or use 【科学说明】/【Scientific Note】 universally? The prompt says "A 【科学说明】/【Scientific Note】 box". I'll make it clearly labeled in each language.
 
-#### License line at the end of document or per section? Probably once at the very end or per section. I'll put it at the end of the entire document, but the prompt says "Include license line". To be safe, I'll include it at the end of each language section or once globally. Let's do once at the very end of the document, but since it's a requirement, maybe include it in each section's footer. I'll include a standard footer in each section.
 
 Now let's draft content.
 
@@ -199,28 +197,15 @@ La terminología de Peirce (tríadas semióticas), Eco (codificación interpreta
 **【科学说明】**
 皮尔斯（符号三元组）、艾柯（阐释性编码）与格赖斯（交际准则）的术语有时被误解为玄学。在本模块中，这些框架的操作化方式与物理传感器校准完全相同。皮尔斯的符号-对象-解释项关系充当**模式匹配滤波器**；艾柯的编码充当**查表机制**，将词汇条目映射到历史语义场；格赖斯的准则充当**一致性校验**（布尔逻辑门），标记预期交际连贯性的违反。它们绝非神秘构造，而是确定性规则集，类似于光谱仪将波长数据解读为整数计数，或质谱仪将荷质比解读为整数计数。
 
-Now I need to ensure I do not use floating-point math explanations. I must emphasize deterministic integer arithmetic. In the tables and text, I used terms like "integer count", "boolean logic gates", "exact integer arithmetic", "no floating-point tolerance". That seems good.
-
-I need to include the license line. I will put it at the very end of the document, maybe centered or as a footer. Or under each section? The prompt says "License line: ''" I'll include it once at the end.
-
-I also need to mention Rob T. Lee Classification. The prompt had "Rob T. Lee Classific" which is cut off. I should probably mention it briefly. In the intro of the English section: "It aligns with the Rob T. Lee forensic classification schema for temporal evidence handling." Or in the Key Concepts. Let me add a row or mention.
-
-Actually "Rob T. Lee Classific" could be "Rob T. Lee Classification". I'll mention it as a classification taxonomy used for categorizing temporal findings. I'll add a small note in the "What Is This Module?" or in the Key Concepts table.
-
-Let's add in English: "Findings are categorized according to the Rob T. Lee forensic classification schema for temporal evidence." In Spanish: "Los hallazgos se clasifican según el esquema de clasificación forense de Rob T. Lee para evidencia temporal." In Russian: "Находки категоризируются согласно судебной классификационной схеме Роба Т. Ли для временных доказательств." In Chinese: "发现结果依据 Rob T. Lee 取证分类体系对时间证据进行分类。"
-
-Also, the user included a docstring path discrepancy: module path is vigia/forensics/temporal_forensics.py but docstring says vigia/tools/vigia_temporal_forensics.py. I should note this for the scientists. E.g., "Canonical path: `vigia/forensics/temporal_forensics.py`. The internal docstring references `vigia/tools/vigia_temporal_forensics.py` for legacy integration tracking." I'll include that in each language intro.
 
 Let's refine the Chinese terms:
 - 艾柯 (Eco) — used.
 - 格赖斯 (Grice) — used.
-- 取证工件 (artifact) — wait, the prompt says "取证工件 (not 制品)". I didn't use 取证工件 in my draft. I used 取证工件库 for repository? Actually I said "取证工件库" for evidence repository. That's okay. But maybe I should explicitly use 取证工件 somewhere to be safe. In Chinese, "artifact" can be 取证工件. I used 合成伪造件 for forgeries, but maybe I should use 取证工件 to refer to evidence items. Let me add a glossary term or use it. In the intro I said `vigia_forensic.db` 取证工件库. That's good. But maybe I should use 取证工件 in the glossary for "artifact". Let me add: "取证工件 (Forensic Artifact)".
 - 逻辑断裂 (not 裂缝) — I used 逻辑断裂. Good.
 - 皮尔斯 for Peirce. Good.
 
 Also check that I don't use floating-point explanations. I think I'm safe.
 
-One more thing: The user says "You NEVER use floating-point math explanations for deterministic systems." So I must ensure nowhere do I say "probability", "score between 0 and 1", "floating point", etc. I used "probabilistic" in the English glossary (under deterministic integer arithmetic). Actually I said "rather than probabilistic scores". That might be okay as a contrast, but to be ultra-safe, I should avoid even that. Let me rephrase: "This module uses integer tallies and exact logical comparisons rather than approximate statistical scoring." That's better.
 
 Also "sensor analogy" in the scientific note: I used spectrometer / mass spectrometer. That's good.
 

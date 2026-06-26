@@ -51,11 +51,9 @@ ESPAÑOL:
 - Terms: 皮尔斯 (Peirce), 第一性 (Firstness), 第二性 (Secondness), 第三性 (Thirdness). Or keep as firstness/secondness/thirdness with explanation? The user wrote the module docstring in Spanish/English but Chinese should localize. I'll use 第一性, 第二性, 第三性 as these are standard Peirce translations in Chinese semiotics. 退化 (degradation). 优雅降级 (graceful degradation). 确定性整数运算. 逻辑断裂. 取证工件.
 - Note: 【科学说明】皮尔斯（第一性、第二性、第三性）、艾柯与格赖斯的术语并非神秘主义。它如同科学传感器的处理流水线：第一性是原始未解释的电压（描述）；第二性是阈值越界或偏差标志（异常检测）；第三性是标定后的诊断模型，解释偏差为何发生（溯因推理）。“魔鬼辩护人”是在相反假设下运行的冗余传感器，用于检验系统性偏差。这些是确定性的、离散的操作阶段——有限状态机中的整数状态——而非玄学。
 
-License line at end of document or each section? User says "License line: ..." Probably at the very end of the document once, or in each section? Usually once at the end. But to be safe, I'll put it at the end of the entire document. Or perhaps each section should have it? The requirement says "License line: ...". I'll put it once at the bottom.
 
 Need to ensure thorough but concise. I'll create headers for each language.
 
-Also, the module path is `vigia/core/llm_backend.py` but docstring says `vigia/engine/llm_backend_v2.py`. I should mention both or treat the docstring as metadata. I'll present the module as `vigia/core/llm_backend.py` with internal engine reference.
 
 Double check: Do NOT use floating-point math explanations. Emphasize deterministic integer arithmetic.
 - When explaining BackendCapability, emphasize it is an integer ladder. Comparisons are integer comparisons (<=). No floating point thresholds.

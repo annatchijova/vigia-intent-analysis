@@ -56,8 +56,6 @@ ESPAÑOL:
 - 关键概念表
 - 术语表
 - 【科学说明】box
-- Must use: 艾柯 (Eco), 格赖斯 (Grice), 取证工件 (artifact, though the user said 取证工件 instead of 制品), 逻辑断裂 (logical break/fracture instead of 裂缝).
-- Note: The user said "取证工件" (not 制品) — I should use 取证工件 where appropriate or at least ensure I don't use 制品 for artifact/tool. Actually the user specifically listed these as Chinese translations that must be used. So I need to incorporate them naturally.
 - Terms:
   - NormalizedSignal: 归一化信号
   - NormalizationLayer: 归一化层
@@ -81,7 +79,6 @@ General technical details to convey:
 - get_baseline_spec() is for external audit (P2-A).
 - batch_normalize() handles multiple signals deterministically.
 
-I must NOT explain floating-point math. So instead of saying "float is bad because of IEEE 754 rounding", I should say "Decimal uses deterministic integer arithmetic at a fixed scale, eliminating representation uncertainty."
 
 The scientific note about Peirce/Eco/Grice: The module docstring mentions "Semiótico". This refers to Charles Sanders Peirce (logic, semiotics), Umberto Eco (semiotics), and H.P. Grice (pragmatics, implicature). The note should say: these are analytical frameworks for how signs convey meaning. In VIGÍA, a "semiotic signal" is treated like a sensor output that encodes information via a known protocol. Just as a mass spectrometer outputs voltage that represents molecular weight, a semiotic module outputs a Fraction that represents an interpretive state. The normalization layer converts these heterogeneous sensor outputs into a common exact scale. It is engineering, not mysticism.
 

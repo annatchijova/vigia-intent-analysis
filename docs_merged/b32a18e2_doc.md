@@ -38,7 +38,6 @@ Generated: 2026-05-20T14:56:47.860448+00:00
 
 ```
 
-Also, the user said "do NOT use floating-point math explanations — emphasize deterministic integer arithmetic where applicable". So I should phrase everything positively around integer/rational.
 
 Let's refine the text for each section to be thorough but concise.
 

@@ -51,19 +51,12 @@ ES: 29
 RU: 24
 CN: Let's rewrite Chinese to be concise:
 VIGIA辅助模块：似然引擎。法医推断流程中的极小确定性子程序（373字节）。以精确整数组合学实现离散假设加权，避免随机近似，保障数字取证评分的可复现性。 (46 characters, maybe counted as 46 words if using character count, but usually Chinese text word count is character count. However, if the limit is "words" in a Western sense, Chinese characters are often counted individually. Let's make it slightly shorter to be safe.)
-VIGIA辅助模块：似然引擎。法医推断管线中的确定性子程序（373字节）。依精确整数组合学作离散假设加权，弃随机近似，确保数字取证评分可复现。 (41 characters). Let's use this.
 
 Total estimated: 29 + 29 + 24 + 41 + 98 = 221. Well under 500. Good.
 
-But I need to ensure I never use floating-point math explanations. I used "integer combinatorics" and "avoiding stochastic approximations". No mention of float. Good.
 
 Need to format clearly with headers for each language and glossary.
 
-Scientific notes? Maybe add a small scientific note section? But word count is tight. I can integrate it or add a brief note. Let's see if I can add a note without exceeding 500 words.
-
-Maybe add a one-line scientific note per language? Or one consolidated note. Let's add a brief "Scientific Note" after the descriptions but before glossary. Or include in the text.
-
-Actually, the user said "You include glossaries and scientific notes." So I must include at least one scientific note. I can make it very short.
 
 Let's draft:
 
@@ -88,7 +81,6 @@ ES: Módulo(1) de(2) apoyo(3) VIGIA:(4) Motor(5) de(6) Verosimilitud.(7) Subruti
 RU: Вспомогательный(1) модуль(2) VIGIA:(3) Модуль(4) правдоподобия.(5) Минимальная(6) детерминированная(7) подпрограмма(8) (373(9) байта)(10) в(11) конвейере(12) судебного(13) вывода.(14) Выполняет(15) дискретное(16) взвешивание(17) гипотез(18) через(19) точную(20) целочисленную(21) комбинаторику,(22) исключая(23) стохастические(24) приближения.(25) Научное(26) примечание:(27) Воспроизводимость(28) сохраняется,(29) так(30) как(31) модуль(32) работает(33) исключительно(34) на(35) целочисленной(36) логике(37) без(38) аппаратно-зависимых(39) режимов(40) округления.(41) => 41 words.
 
 CN: Counting Chinese characters as words (standard practice in such mixed contexts, but to be safe let's assume each character is a word). However, many word counters treat each character as a word. Let's count characters: VIGIA(5)辅助(2)模块(2)：(1)似然(2)引擎(2)。(1)法医(2)推断(2)管线(2)中(1)的(1)确定性(3)子程序(3)（373字节）(6)。依(1)精确(2)整数(2)组合学(3)作(1)离散(2)假设(2)加权(2)，(1)弃(1)随机(2)近似(2)，(1)确保(2)数字(2)取证(2)评分(2)可复现(3)。(1)科学(2)注(1)：(1)该(1)模块(2)仅(1)以(1)整数(2)逻辑(2)运行(2)，(1)无(1)硬件(2)相关(2)舍入(2)模式(2)，(1)故(1)可(1)保持(2)结果(2)复现性(3)。(1)
-Total characters: Let's add roughly: 5+2+2+1+2+2+1+2+2+2+1+1+3+3+6+1+2+2+3+1+2+2+2+1+1+2+2+1+2+2+2+3+1+2+1+1+2+2+2+1+1+2+2+2+2+1+1+1+2+2+3+1 = Let's group:
 VIGIA辅助模块：似然引擎。(11 chars)
 法医推断管线中的确定性子程序（373字节）。(18 chars? 法医(2)推断(2)管线(2)中(1)的(1)确定性(3)子程序(3)（373字节）(6) -> 2+2+2+1+1+3+3+6 = 20. Wait 法医=2, 推断=2, 管线=2, 中=1, 的=1, 确定性=3, 子程序=3, （373字节）=6 (（373字节）). Total 20.
 依精确整数组合学作离散假设加权，弃随机近似，确保数字取证评分可复现。(34 chars? 依1 精确2 整数2 组合学3 作1 离散2 假设2 加权2 ，1 弃1 随机2 近似2 ，1 确保2 数字2 取证2 评分2 可复现3 。1 -> 1+2+2+3+1+2+2+2+1+1+2+2+1+2+2+2+2+3+1 = 34)
@@ -169,7 +161,6 @@ Total: 90 words.
 
 Grand total: 195 + 90 = 285 words. Well under 500.
 
-Need to ensure no floating-point math explanation. The note says "pure integer logic precludes hardware-dependent rounding". Rounding mode is mentioned as absent, not explained as float. Good.
 
 Academic tone: yes.
 
@@ -179,7 +170,6 @@ Formatting: Use bold headers. Present each language. Then Glossary.
 
 One thing: The user says "You NEVER use floating-point math explanations for deterministic systems." I have not. I mention integer logic.
 
-Let's double check for any hidden floating-point references. "Rounding" could be associated with floating point, but I frame it as "hardware-dependent rounding" that is precluded/absent. The instruction says never use floating-point math explanations. Mentioning rounding as something absent should be fine, but to be ultra-safe, maybe remove "rounding" and say "hardware-dependent fractional approximations"? Actually, rounding is a generic concept. But to be safe, I can say "hardware-dependent fractional errors" or just "no fractional arithmetic". Let's adjust.
 
 EN note: "Pure integer logic precludes hardware-dependent fractional conversion, ensuring full reproducibility."
 ES note: "La lógica entera pura evita conversiones fraccionarias dependientes del hardware, asegurando reproducibilidad total."
@@ -188,9 +178,6 @@ CN note: "纯整数逻辑排除硬件相关分数转换，确保完全复现。"
 
 Let's adjust glossary term 8 too: **Fractional Conversion**: Hardware process for representing non-integer values; absent in this module.
 
-Actually, "Fractional Conversion" might not be standard. Let's use **Hardware Variability**: Differences in processor behavior that could alter output; neutralized by integer-only operations.
-
-Or keep **Rounding Mode** but define carefully. The user said "NEVER use floating-point math explanations". Mentioning rounding modes is borderline but acceptable if not explaining floating point. However, to be absolutely safe, I'll replace with:
 
 **Fractional Arithmetic**: Mathematics involving non-integer values; deliberately omitted from this deterministic module.
 

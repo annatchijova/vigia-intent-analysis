@@ -28,7 +28,6 @@ ENGLISH:
 
 ESPAÑOL:
 - Similar structure. Plain language.
-- Note: "艾柯" is for Chinese only. In Spanish it's Eco, but I should use the standard Spanish names. The requirement specifically says "Chinese translations must use: 艾柯 (not Eco), 格赖斯 (not Grice)...". So in other languages, standard names are fine.
 - Key concepts: Función de riesgo, Posterior, Drift, Parámetros λ/γ/ε/ω, Traza de decisión, Aritmética de coma fija (Decimal), PSI, Regla de aislamiento.
 - Glossary: Aritmética determinista, Deriva (drift), Capa de gobernanza, Regla de aislamiento, Momento (momentum), Amortiguación, Probabilidad posterior, PSI, Acotamiento de riesgo, Trazabilidad.
 - Scientific Note: Same sensor analogy. Charles Sanders Peirce, Umberto Eco, H.P. Grice.
@@ -46,9 +45,6 @@ ESPAÑOL:
 - Glossary: 确定性算术, 漂移, 治理层, 隔离规则, 动量, 阻尼, 后验概率, PSI, 风险边界, 可追溯性, 取证工件, 逻辑断裂.
 - Scientific Note: 【科学说明】. Explain Pierce (皮尔斯), 艾柯, 格赖斯. Sensor analogy: 传感器/光谱仪 analogies. Not mysticism.
 
-Important: The user said "You NEVER use floating-point math explanations for deterministic systems." So I must not explain floating point. Instead, emphasize that the module uses `Decimal` which implements base-10 scaled integer arithmetic, yielding bit-exact reproducibility across x86/ARM/RISC-V. Frame it as deterministic integer arithmetic (since Decimal operates on integer significands with a separate exponent).
-
-I should also mention the `hist_freq()` function though it's cut off in the prompt. I'll mention it as a frequency histogram utility for drift analysis.
 
 Also mention `to_system_state()` exports to SystemState bundle, and `from_policy_spec()` reconstructs from sealed PolicySpec.
 

@@ -45,12 +45,10 @@ ESPAÑOL:
 中文:
 - 这是什么模块？: 溯因推理引擎，用于分析数字取证工件（原始观测数据）以确定攻击者意图。使用皮尔斯符号学和奥卡姆剃刀。通过“奥卡姆成本”（未观测假设的整数计数）对假设进行排序，并选择确定性的最优解。相同输入总是产生相同输出。符合道伯特标准（Daubert）的取证可采性要求（可审计、逻辑显式、无隐藏条件）。
 - 关键概念。
-- 术语表: 溯因（皮尔斯）、奥卡姆剃刀、首位性（第一性）、次位性（第二性）、第三位性（第三性）、取证工件、确定性系统、道伯特标准。 Note: 艾柯 (Eco) and 格赖斯 (Grice) must appear somewhere. I should mention them in the scientific note or glossary. Since the scientific note mentions Peirce/Eco/Grice, I will include them there. Also ensure 取证工件 and 逻辑断裂 (though the prompt says 逻辑断裂 not 裂缝, I need to see if there's a place for it. Maybe in the context of "breaks in logic"? The prompt says "use: 取证工件 (not 制品), 逻辑断裂 (not 裂缝)". I should probably mention 逻辑断裂 in the glossary or note, e.g., explaining that the engine detects logical breaks? Or just use it in a sentence. Let me incorporate it naturally. For example: "The engine flags logical断裂 (logical breaks) between artifacts rather than statistical anomalies." Or in the glossary: 逻辑断裂 — logical discontinuity between forensic artifacts. I'll make sure to include it.
 - 【科学说明】: 皮尔斯、艾柯与格赖斯的术语并非神秘主义。请使用传感器类比：首位性相当于传感器的原始电压读数（未经解释）；次位性相当于传感器A与传感器B同时触发的相关性；第三位性相当于固件规则——“当A与B以特定模式触发时，事件为X”。本引擎将此类传感器逻辑应用于取证工件，识别的是逻辑断裂与确定性模式，而非进行占卜。所有运算均为确定性整数运算，不存在浮点概率的“黑箱”。
 
 Important: Do NOT use floating-point math explanations for deterministic systems. Emphasize deterministic integer arithmetic.
 
-Also, the module path is vigia/abductive_intent_engine.py, docstring says vigia/engine/abductive_intent_engine.py — HITO 2.1. I should mention the path.
 
 The prompt lists FUNCTIONS: to_dict() three times, to_json(), infer(). It probably means each class has to_dict(), and maybe the engine has infer(). I will structure the tables to reflect methods.
 
@@ -204,12 +202,7 @@ ESPAÑOL Scientific Note:
 > - **第三位性（第三性）** 是固件定律，其表述为：“若传感器A与传感器B在序列S中以特定模式超过整数阈值T，则事件E成立。”
 > VIGÍA 引擎正是将此类传感器逻辑应用于取证工件。它并非占卜意图，而是以整数运算计数未观测假设，并选择能以最少未观测步骤弥合**逻辑断裂**的假设。全部运算均为确定性整数算术——相同输入恒得相同输出。
 
-Now I need to ensure the Chinese section uses 艾柯, 格赖斯, 取证工件, 逻辑断裂. I have used 艾柯, 格赖斯, 取证工件, 逻辑断裂 in the Chinese sections.
 
-Also, do not use floating-point math explanations. I must make sure I don't mention floats at all except to say they are prohibited. I should emphasize integer arithmetic.
-
-- "MOTOR DE INFERENCIA ABDUCTIVA CON OCKHAM'S RAZOR" -> I should include this as the module title.
-- The docstring says HITO 2.1. I should mention this.
 - The classes are Artifact, AbductiveHypothesis, AbductiveResult, AbductiveIntentEngine. I described them.
 - Functions: infer, to_dict, to_json. I described them.
 - "Determinista: mismo input → misma hipótesis ganadora" -> I covered this.
@@ -218,7 +211,6 @@ Also, do not use floating-point math explanations. I must make sure I don't ment
 - "Cobertura = porcentaje entero (no float)" -> I covered this.
 - "Tablas de templates son explícitas (no lógica condicional oculta)" -> I covered this.
 
-I need to make sure the document is Markdown formatted cleanly.
 
 Possible structure:
 

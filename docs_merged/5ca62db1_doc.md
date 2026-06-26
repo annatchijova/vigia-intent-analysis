@@ -66,11 +66,6 @@ RU: ~72
 Glossary: ~94
 Total: ~404 words. Well under 500. Good.
 
-Need to ensure no floating-point math explanations. None used.
-
-Need to include "scientific notes". Perhaps add a small [Scientific Note] after one of the sections, or within. But word count is tight. Maybe add a single scientific note in the EN section or as a separate small italic line? The user said "Include glossaries and scientific notes." Plural notes? Could be tricky with word count. Maybe one note appended to EN or ES.
-
-Let's integrate a brief scientific note in EN and RU or just one. Actually I can add a [Nota científica / Научное примечание / 科学注] as a one-liner in each language? That would multiply words. Better to have one scientific note in English or as a separate short line that is translated? The prompt doesn't specify notes must be in all languages, but since everything else is in 4 languages, maybe the note can be embedded in each language section. However, the sections themselves are already concise.
 
 Alternative: make the descriptions slightly shorter and add a note line.
 
@@ -96,7 +91,6 @@ Word count: ~71.
 
 Word count: ~95 Chinese characters, which is about 70-80 "words" if counting each character as a word. Usually Chinese word count is by characters. Let's assume okay.
 
-Now scientific notes. I can add a short bracketed note after each text? E.g.
 
 EN: [Scientific note: This correction removes lexical entropy from the forensic pipeline by binding all tokens to a priori definitions.]
 
@@ -125,7 +119,6 @@ Also "You include glossaries and scientific notes." I'm doing that.
 
 Need to make sure I don't use Python jargon like "module" in a way that assumes knowledge. I used "module" and "source" and "line 50". For scientists who don't know Python, "line 50" might be too code-specific. But the prompt explicitly mentions line 50 and diagnosis. I can say "detected at position line 50" or "at the 50th line of the source". Maybe keep it but frame as diagnostic location. It's okay.
 
-Actually, the user said "Module: vigia/tools/nlp_constants.py" and the content summary. It's okay to refer to the file path as the module identifier.
 
 Let's refine the glossary format. Since it's 4 languages, a table might be best but plain text is okay. I can present each term in 4 languages with a single definition in English? No, the audience is scientists who read all 4 languages? The prompt asks to write in 4 languages, so probably the glossary should have translations. But to save words, I can list the term in 4 languages and then one definition.
 
@@ -212,11 +205,9 @@ Total: ~456 words.
 
 Under 500. Perfect.
 
-One concern: The user said "You NEVER use floating-point math explanations for deterministic systems." I haven't. Also, the system prompt says I write for scientists who do not know Python. I used "line 50", "module", "source code" (in RU). For scientists, "line 50" might be okay as a diagnostic coordinate, but maybe rephrase to avoid code-centric jargon? However, the prompt explicitly says "the module las usaba en línea 50". It's part of the diagnosis. I think it's acceptable to mention "line 50" as the diagnostic locus.
 
 But to be safer for non-Python scientists, in EN I said "detected at line 50". In ES "detectadas en la línea 50". In RU "в строке 50". In 中文 "原第 50 行". That seems fine.
 
-Let's check the tone: Academic, technical, digital forensics. Good.
 
 Final check on glossary terms: Are there exactly 10? Yes.
 
@@ -239,7 +230,6 @@ Yes.
 
 Now, formatting. I will present each language section with its note. Then the glossary.
 
-Potential issue: The prompt says "You always write in 4 languages: ENGLISH, ESPAÑOL, РУССКИЙ, 中文." So I should label them clearly.
 
 Let's write the final output.
 
@@ -276,7 +266,6 @@ Glossary / Glosario / Глоссарий / 词汇表 (4) = 8 words.
 
 Total ~464. Still safe.
 
-Let's ensure no Python code blocks or backticks? The user used backticks for file path. I can use italics or plain text. Backticks are okay but might look code-ish. I'll use plain text without backticks to avoid Python associations, or just the path as a name. Actually, using the exact file path is fine as a proper noun identifier.
 
 I will omit backticks to make it less code-like.
 
@@ -285,7 +274,6 @@ vigia/tools/nlp_constants.py is a forensic NLP support module...
 
 Actually, keep it as is but no code formatting.
 
-One more check: "floating-point math explanations for deterministic systems" — I must not explain determinism via floating point. I don't. I mention deterministic as a property. That's fine.
 
 Let's finalize.
 
@@ -296,7 +284,6 @@ vigia/tools/nlp_constants.py is a forensic NLP support module that establishes a
 Scientific note: Removes lexical entropy via a priori definitions.
 
 Count:
-vigia/tools/nlp_constants.py(1?) Usually hyphenated paths count as multiple words depending on counter. To be safe, I should consider "vigia/tools/nlp_constants.py" as ~3 words (separated by slashes). But word counters vary. Let's assume standard: punctuation/slashes separate words. So "vigia/tools/nlp_constants.py" = 3 words: vigia, tools, nlp_constants.py. Or maybe 1 if treated as a token. In most word processors, slashes are word separators. So add ~2 extra per section.
 
 EN: +2 = 85
 ES: +2 = 87

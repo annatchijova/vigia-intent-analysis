@@ -7,7 +7,6 @@ Generated: 2026-05-20T14:56:47.859583+00:00
 
 English:
 - "What Is This Module?" plain language. Good.
-- Key concepts table: I should format it nicely.
 - Glossary: technical terms defined simply.
 - Scientific Note: mentions Peirce, Eco, Grice, sensor analogy, deterministic integer arithmetic. Good.
 
@@ -31,7 +30,6 @@ Chinese:
 
 One thing: The user says "Chinese translations must use: 艾柯 (not Eco), 格赖斯 (not Grice), 取证工件 (not 制品), 逻辑断裂 (not 裂缝)". I've used 皮尔斯 for Peirce, which is standard. Should be fine.
 
-I should ensure the module path and metadata are clearly stated at the top.
 
 Let's structure the Markdown:
 
@@ -84,7 +82,6 @@ Then sections:
 
 Then License line.
 
-I need to be careful with Markdown tables. They should render properly.
 
 Let's write out the tables.
 
@@ -118,7 +115,6 @@ Let's write out the tables.
 
 Looks good.
 
-Now Glossary items. I'll make them as definition lists or a compact table. A table might be cleaner. Let's use a table with Term / Definition.
 
 **ENGLISH Glossary:**
 | Term | Definition |
@@ -170,7 +166,6 @@ Now Glossary items. I'll make them as definition lists or a compact table. A tab
 
 Looks good.
 
-Now check the Scientific Note boxes again. Must have the box syntax. I'll use blockquote or bold headers. The user asked for 【科学说明】/【Scientific Note】 box. I'll use a blockquote with the header.
 
 Example for English:
 > **【Scientific Note】**
@@ -180,18 +175,15 @@ Double-check: "NEVER use floating-point math explanations for deterministic syst
 
 "emphasize deterministic integer arithmetic where applicable". I have done that.
 
-" Must be exact. I'll put it at the very bottom.
 
 "Be thorough but concise." I think the length is appropriate.
 
-Let's check for any accidental use of forbidden Chinese terms:
 - 取证工件: used. Did I use 制品? No.
 - 逻辑断裂: used. Did I use 裂缝? No. Wait, in my draft I wrote "逻辑断裂" in Chinese note. Good.
 - 艾柯: used.
 - 格赖斯: used.
 
 Check other languages for any hidden floating point mentions:
-- Spanish: "coma flotante" is floating point. I used "aproximaciones de coma flotante" and told not to use them. That's a negative mention, but is it an explanation? It says "no emplea aproximaciones de coma flotante". This is not explaining floating-point math; it's explicitly rejecting it. That should be okay. Similarly in English "No floating-point approximations are used". This is not explaining how floats work; it's stating they are excluded. The user said "You NEVER use floating-point math explanations". I think stating that we avoid them is fine, as long as I don't explain IEEE 754 or round-off error. I should probably remove even that to be safest. Let's rephrase to avoid the term entirely, so there's zero ambiguity.
 
 English: "The deterministic core operates exclusively on integer ratios and fixed thresholds." -> No mention of float.
 Spanish: "El núcleo determinista opera exclusivamente con razones enteras y umbrales fijos." -> No mention of coma flotante.
@@ -234,9 +226,6 @@ One thing: The user says "You are an academic technical writer specializing in d
 
 So the tone should be academic, technical, but accessible to non-programmers.
 
-I should also briefly explain what a module is? "A module is a self-contained file that groups related analytical functions." Maybe in the "What Is This Module?" section. Since they don't know Python, I should clarify that this document describes a single component file of the VIGÍA system.
-
-Let's add a sentence like: "In software engineering, a 'module' is simply a discrete file that contains a set of related analytical procedures—similar to a single protocol booklet in a laboratory." This helps non-Pythonists.
 
 Let's integrate that into each language's "What Is This Module?" section.
 
@@ -247,7 +236,6 @@ Chinese: "在软件术语中，模块是一个包含一组相关分析规程的�
 
 This is good.
 
-Also, the user provided args: text, artifact_id. I should mention these as inputs in plain language.
 
 English: "Inputs: (1) `text` — the character string to be examined; (2) `artifact_id` — a unique label for the specimen, equivalent to a laboratory sample ID."
 Spanish: "Entradas: (1) `text` — la cadena de caracteres a examinar; (2) `artifact_id` — una etiqueta única para el espécimen, equivalente a un ID de muestra de laboratorio."

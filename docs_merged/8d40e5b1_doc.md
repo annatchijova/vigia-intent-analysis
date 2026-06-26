@@ -8,7 +8,6 @@ Generated: 2026-05-20T14:56:47.883887+00:00
 中文:
 `path_guard.py` 是 VIGIA 取证分析工具的辅助模块。它对文件系统路径进行净化，阻止访问指定的 `base_dir` 之外的区域。根据 Kimi 阶段 3.2，该模块拒绝符号链接、设备文件、命名管道以及解析后超出基础目录的路径。不变量：所有路径在比较前必须完全解析，且仅接受常规文件；特殊文件类型均被阻断。确保证据处理确定且无染。
 
-Now glossary. Need 10 terms. Should be concise. Maybe list terms and brief defs in English only to save words? But user asked for 4 languages... usually glossary in such docs might be multilingual or in the language of the section. However, to keep under 500 words, maybe define each term once in English, or provide terms in 4 languages with a single English definition. Let's see.
 
 Terms to include:
 1. Path sanitization
@@ -45,14 +44,10 @@ ZH text: 56 words.
 Glossary: approx 80 words.
 Total: ~309 words. Well under 500. Great.
 
-I should double-check the requirement: "You NEVER use floating-point math explanations for deterministic systems." I didn't mention floating point. Good.
-
-I need to ensure it's academic and for scientists who do not know Python. So avoid Python-specific jargon (like "os.path.realpath" etc.). I used general terms like "utility" and "module". Good.
 
 Let's refine the texts slightly to make them more academic and polished.
 
 EN:
-`path_guard.py` is a VIGIA support module for forensic artifact analyzers. It sanitizes file-system paths to prevent directory traversal outside a designated `base_dir`. Per Kimi Phase 3.2, it rejects symbolic links, device files, named pipes, and any resolved path lying outside the base directory. Core invariants require that every path is fully resolved prior to comparison and that only regular files are admitted; all special file types are blocked. This ensures deterministic, contamination-free evidence handling.
 
 ES:
 `path_guard.py` es un módulo de soporte VIGIA para analizadores de artefactos forenses. Sanitiza rutas del sistema de archivos para evitar la salida del directorio `base_dir` designado. Según Kimi Fase 3.2, rechaza enlaces simbólicos, archivos de dispositivo, tuberías con nombre y rutas resueltas fuera del directorio base. Los invariantes exigen que toda ruta se resuelva antes de compararse y que solo se admitan archivos regulares, bloqueando tipos especiales. Garantiza un manejo determinista de evidencias sin contaminación.
@@ -63,7 +58,6 @@ RU:
 ZH:
 `path_guard.py` 是 VIGIA 取证工件分析器的支持模块。它对文件系统路径进行净化，防止目录遍历至指定的 `base_dir` 之外。依据 Kimi 阶段 3.2，模块拒绝符号链接、设备文件、命名管道以及解析后位于基础目录外的任何路径。核心不变量要求所有路径在比较前必须完全解析，且仅允许常规文件；所有特殊文件类型均被阻断。从而确保证据处理的确定性与无染性。
 
-Now glossary. I need to present it. I'll put a heading "Glossary / Glosario / Глоссарий / 词汇表" and then list terms. To save words but keep clarity, maybe just English terms with definitions, or short multilingual labels. Since the user didn't specify the glossary must be in 4 languages, but given the persona (always write in 4 languages), I should try to make the glossary accessible. However, 500 words is very tight. I think a single glossary in English is acceptable if the surrounding text is 4 languages, but to be safe, I can include the term translations in parentheses. But that might bloat.
 
 Alternative: make the glossary entries have the term in 4 languages, but very short. For example:
 
@@ -137,11 +131,7 @@ Total glossary words: ~166 words.
 Text words: ~229.
 Total: ~395 words. Under 500. Great.
 
-I should make sure no floating-point math is used. I used "deterministic" but didn't explain it via floating point. Good.
 
-I need to ensure it's academic tone. Words like "sanitizes", "directory traversal", "invariants", "contamination-free" are appropriate.
-
-Let's check the exact content summary to ensure I didn't miss anything:
 - Sanitización de paths para analizadores de artefactos forenses. (covered)
 - Kimi Fase 3.2: rechazar symlinks, device files, pipes, paths fuera de base_dir. (covered)
 - Invariantes: Siempre resolver path antes de comparar; Verificar que es archivo regular (no device... (covered)
@@ -150,10 +140,8 @@ Everything covered.
 
 Now formatting. I will present the four language blocks, then the glossary.
 
-I should check the word count carefully.
 
 EN:
-`path_guard.py` is a VIGIA support module for forensic artifact analyzers. It sanitizes file-system paths to prevent directory traversal outside a designated `base_dir`. Per Kimi Phase 3.2, it rejects symbolic links, device files, named pipes, and any resolved path lying outside the base directory. Core invariants require that every path is fully resolved prior to comparison and that only regular files are admitted; all special file types are blocked. This ensures deterministic, contamination-free evidence handling.
 Count: is(1) a(2) VIGIA(3) support(4) module(5) for(6) forensic(7) artifact(8) analyzers.(9) It(10) sanitizes(11) file-system(12) paths(13) to(14) prevent(15) directory(16) traversal(17) outside(18) a(19) designated(20) `base_dir`.(21) Per(22) Kimi(23) Phase(24) 3.2,(25) it(26) rejects(27) symbolic(28) links,(29) device(30) files,(31) named(32) pipes,(33) and(34) any(35) resolved(36) path(37) lying(38) outside(39) the(40) base(41) directory.(42) Core(43) invariants(44) require(45) that(46) every(47) path(48) is(49) fully(50) resolved(51) prior(52) to(53) comparison(54) and(55) that(56) only(57) regular(58) files(59) are(60) admitted;(61) all(62) special(63) file(64) types(65) are(66) blocked.(67) This(68) ensures(69) deterministic,(70) contamination-free(71) evidence(72) handling.(73)
 73 words.
 
@@ -211,12 +199,10 @@ Words: Deterministic(1) system(2) —(3) Sistema(4) determinista(5) /(6) Дет�
 Glossary total: 25+25+26+23+24+25+26+20+23+25 = 242 words.
 Grand total: 286 + 242 = 528 words. Oops, slightly over 500.
 
-I need to trim about 30 words. I can shorten the descriptions and the main texts.
 
 Let's tighten the main texts.
 
 EN (target ~60 -> 50):
-`path_guard.py` is a VIGIA support module for forensic artifact analyzers. It sanitizes file-system paths to prevent traversal outside a designated `base_dir`. Per Kimi Phase 3.2, it rejects symbolic links, device files, named pipes, and any resolved path outside the base directory. Core invariants: every path is fully resolved before comparison, and only regular files are admitted; special file types are blocked. This ensures deterministic, contamination-free evidence handling.
 Count: `path_guard.py`(1) is(2) a(3) VIGIA(4) support(5) module(6) for(7) forensic(8) artifact(9) analyzers.(10) It(11) sanitizes(12) file-system(13) paths(14) to(15) prevent(16) traversal(17) outside(18) a(19) designated(20) `base_dir`.(21) Per(22) Kimi(23) Phase(24) 3.2,(25) it(26) rejects(27) symbolic(28) links,(29) device(30) files,(31) named(32) pipes,(33) and(34) any(35) resolved(36) path(37) outside(38) the(39) base(40) directory.(41) Core(42) invariants:(43) every(44) path(45) is(46) fully(47) resolved(48) before(49) comparison,(50) and(51) only(52) regular(53) files(54) are(55) admitted;(56) special(57) file(58) types(59) are(60) blocked.(61) This(62) ensures(63) deterministic,(64) contamination-free(65) evidence(66) handling.(67)
 67 words. Slightly less than before? Actually before was 73. Good.
 

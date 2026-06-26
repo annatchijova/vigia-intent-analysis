@@ -17,7 +17,6 @@ ESPAÑOL:
 中文：
 `vigia_batch_postprocess.py` 是 VIGIA 数字取证框架内用于 Batch API 输出的确定性后处理工具。该模块摄取结构化结果日志（batch_results.jsonl），并在指定输出目录（docs_generados/）中生成人类可读的取证文档。它确保将原始批处理工件可复现地转换为标准化报告，且不涉及概率运算。科学注释：执行遵循精确序列；相同输入产生比特级一致输出，从而保全保管链完整性。
 
-Now word count check:
 EN: ~48 words
 ES: ~49 words
 RU: ~44 words
@@ -25,12 +24,10 @@ ZH: ~44 words (characters, but let's assume similar count)
 
 Total so far: ~185 words. That leaves ~315 words for glossary and headers. That's doable.
 
-Now the glossary with 10 terms. Since the main text is in 4 languages, maybe I should present the glossary in a compact multilingual format to respect the spirit of the prompt while keeping word count low.
 
 Option: Present each term in English, followed by 3 short translations and one consolidated definition? No, that's messy.
 
 Better: A table or list where each entry is:
-**Term** (EN / ES / RU / ZH) — Definition in English (or short multilingual). But since the instruction says "You always write in 4 languages", I should try to include all 4. However, with 500 words total, it's impossible to define each term in 4 languages (10 terms x 4 languages x ~10 words = 400 words, plus main text = too much).
 
 Alternative interpretation: The *document* should be accessible to speakers of those languages, so I can provide the glossary terms with labels in all 4 languages but definitions in English, or do a compact multi-column layout. But plain text output doesn't support tables well.
 
@@ -62,7 +59,6 @@ Now glossary can be ~400 words. That works!
 For glossary, I'll provide a list. To satisfy "4 languages", I'll format each glossary entry as:
 **Batch API** — Batch API / Lote API / Пакетный API / 批处理应用程序接口: Definition...
 
-But that's repetitive. Instead, I'll make the glossary section header in 4 languages and list terms with their translations, then define in English (or very compact multilingual). Actually, to best serve scientists who don't know Python and speak those languages, I should define in all 4. But space is limited.
 
 Let's try compact definitions: one sentence in English, then the key translation equivalents.
 
@@ -222,11 +218,6 @@ Glossary total: 23+27+30+28+27+23+26+19+23+26 = 252 words.
 
 Grand total: 153 + 252 = 405 words. Plus section headers and glossary title. Let's estimate headers as ~10 words. Total ~415. Well under 500.
 
-I should also add a "Scientific note" as required by the persona. I included it in the main text already ("The process is strictly reproducible..."). Good.
-
-I need to make sure I don't use floating-point math explanations. I didn't mention floating point at all. I mentioned deterministic, bit-identical, etc. That's fine.
-
-One issue: the prompt says "Content summary: vigia_batch_postprocess.py — Post-procesamiento automático de resultados Batch API" and shows usage. I should mention the command line usage in a way scientists understand, or at least mention the file paths. I did mention batch_results.jsonl and docs_generados/. Good.
 
 Russian: "Процесс строго воспроизводим: идентичные входные данные дают битово-идентичные результаты, сохраняя целостность цепочки сохранения. Вероятностные операции не применяются." Good.
 
@@ -238,7 +229,6 @@ Now formatting. I will present clearly with headers.
 
 One final check: "You NEVER use floating-point math explanations for deterministic systems." - I have not mentioned floating point. I only said no probabilistic operations. Good.
 
-The user is a scientist who does not know Python, so I should avoid Python jargon. I used "post-processor", "ingests", "generates" which are general enough. I did not mention Python modules, imports, etc.
 
 I think this is solid. I'll format it nicely.
 

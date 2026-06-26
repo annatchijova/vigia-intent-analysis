@@ -174,7 +174,6 @@ La terminología de Peirce, Eco y Grice se confunde a veces con especulación me
 Need to ensure Chinese terms:
 - 艾柯 (not Eco) — used.
 - 格赖斯 (not Grice) — used.
-- 取证工件 (not 制品) — I used 取证工件 in the ConfigLoader row? Let me check. I wrote "可审计的取证工件" — yes, I used 工件. Wait, in the table I wrote "可审计的取证配置" for ConfigLoader. Let me fix that to use 取证工件 explicitly or ensure it's in the doc. Actually, the requirement says "Chinese translations must use: ... 取证工件 (not 制品)". I should make sure I use 取证工件 somewhere prominent. I'll adjust the ConfigLoader row to say "可审计的取证工件". And perhaps mention it elsewhere. Let me check all Chinese terms.
 
 In Chinese section:
 - ConfigLoader row: "可审计的取证配置" -> change to "可审计的取证工件".
@@ -213,7 +212,6 @@ ESPAÑOL:
 - 术语表. Yes.
 - 科学说明. Yes.
 
-I need to include the license line exactly. I will put it at the very bottom of the document, after all four sections. Or perhaps after each? The prompt says "License line: ''" as requirement 5. It doesn't explicitly say "in each section". But to be safe, I'll put it at the end of the document. However, since the user said "Each section must include: ..." for items 1-4, and item 5 is separate, I'll include it once at the bottom. But I could also put it in each section's footer. It might look redundant. I'll put it once at the bottom, clearly separated.
 
 Double-check Chinese specific terms again:
 - 艾柯: used in Chinese scientific note.

@@ -37,7 +37,6 @@ ESPAÑOL:
 - Key terms: Señal (Signal), Capa de Evidencia, Capa de Inferencia, Capa de Informe.
 - Glossary: same concepts.
 - Scientific Note: analogía del sensor. No es mistisismo. Peirce, Eco, Grice.
-- License line in each section or just once? The requirement says "License line: ...". Usually put at the end of doc. But to be safe, I can put it at the bottom of each section or once globally. The prompt says "Each section must include..." but the license line is a separate requirement. I will include the license line at the very end of the document, or perhaps at the end of each section to be safe. Given it's a single module doc, one license block at the end is standard, but the prompt lists it as requirement #5 without specifying once or per section. I'll put it once at the bottom, clearly marked. Actually, to ensure compliance with "Each section must include" (which lists 4 bullet points) and requirement 5 is separate, I'll include the license line once at the end of the markdown. But to be extra safe, I'll append it to each section? That might be cluttered. Let's put a global license footer. No, re-reading: "5. License line: ''" This likely applies to the document. I'll place it at the very bottom. But since the user might want it visible, I'll put it as a footer under each language section? Let's do a single footer after all sections. Actually, standard practice in multi-language docs is to put license once. I'll put it once.
 
 РУССКИЙ:
 - "Что представляет собой этот модуль?"
@@ -56,7 +55,6 @@ ESPAÑOL:
 - Terms check: 艾柯, 格赖斯, 取证工件, 逻辑断裂.
 - Use 逻辑断裂 in the "What Is This Module?" or glossary to describe what happens without the contract. E.g., "没有此契约，证据层与推断层之间会出现逻辑断裂".
 
-Need to ensure no floating-point math explanations.
 - When describing z_score, say it is a deterministic standardized index computed via exact rational transformation from integer offsets, not "floating point division".
 - When describing from_raw, mention it uses deterministic integer arithmetic to normalize inputs before wrapping them into the contract.
 - Avoid terms like "float", "double", "rounding", "precision loss".
@@ -243,7 +241,6 @@ VIGÍA 借用**皮尔斯**（符号学）、**艾柯**（诠释代码）与**格
 License line at the bottom.
 
 Need to check:
-- Chinese: 艾柯 used, 格赖斯 used, 取证工件 used (in Glossary/Concepts? Yes, I used "取证工件" in the first paragraph. Let's double-check: "原始数字取证工件" — yes). 逻辑断裂 used — yes.
 - No floating-point math: I used "integer arithmetic", "rational observation", "exact integer offsets", "deterministic standardized index". No mention of float, double, IEEE 754, rounding errors.
 - Scientific note uses sensor analogy and mentions Peirce/Eco/Grice.
 - License line included.
@@ -253,8 +250,6 @@ Need to check:
 - Glossary included in each.
 - Scientific Note box included in each.
 
-One concern: The user wrote the module path as `vigia/tools/signal_contract.py` but the docstring says `vigia/core/signal_contract.py`. I should probably mention the path as given in the prompt: `vigia/tools/signal_contract.py`, but note the docstring. Or just stick to the user-provided path. I'll use `vigia/tools/signal_contract.py` as the primary path but mention the docstring namespace `vigia.core.signal_contract` maybe not necessary to avoid confusion. I'll just use the path provided in the prompt's title.
 
-Also, the user listed constants `_PYDANTIC_AVAILABLE` twice. I
 ---
 *Licensed under the Apache License, Version 2.0. Copyright 2026 Anna Tchijova.*

@@ -49,8 +49,6 @@ ESPAÑOL:
 - Classes: 恶意信号强度（MaliceSignalStrength）- 序数等级, 奥卡姆惩罚结果（OckhamPenaltyResult）- 不可变记录, 聚合恶意信号强度, 计算对抗性惩罚, 显示置信度（截断整数）.
 - Glossary: 对抗性惩罚, 精确有理数类型（fractions.Fraction）, 不可变集合（frozenset）, 序数量表, 皮尔斯第二性, 截断法.
 - Scientific Note: 【科学说明】皮尔斯/艾柯/格赖斯术语并非神秘主义。请将其想象为一种传感器：皮尔斯的“第二性”本质上是物理探针遇到阻力时产生的电压尖峰，是理论介入之前的原始数据；艾柯的符码与格赖斯的准则则是解读该电压的校准协议。在VIGÍA中，它们被用作形式化启发式规则，而非形而上学实体。
-- 取证工件 is used instead of 制品. For example: "取证工件" for forensic artifacts. The module mentions SolarWinds DLL signed. I should use 取证工件 there.
-- 逻辑断裂: use for logical fracture/break? The module doesn't explicitly mention fracture, but I can incorporate it if needed or just ensure I don't use 裂缝. Wait, the user specifically said "逻辑断裂 (not 裂缝)". I should probably use 逻辑断裂 somewhere appropriate, perhaps in the context of the "clean explanation" creating a logical break. Or perhaps in the glossary or concept table. Let's use it: "过于简洁的解释造成逻辑断裂".
 - License: "" (keep in English or translate? User said license line specifically. Probably keep as is, but can add translation. I'll keep exact line.)
 
 General structure:
@@ -62,7 +60,6 @@ Double check: no floating-point math explanations. Emphasize deterministic integ
 - No round().
 - _PENALTY_TABLE immutable frozenset.
 
-I need to be thorough but concise.
 
 Let's draft the ENGLISH section as template:
 

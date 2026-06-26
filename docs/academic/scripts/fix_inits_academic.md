@@ -5,321 +5,148 @@ Batch ID: vigia-doc-0014-9f525516
 Generated: 2026-05-20T14:56:47.847815+00:00
 -->
 
-English:
-`scripts/fix_inits.py` is a forensic support module within the VIGIA framework. At 927 bytes, it constitutes a compact deterministic utility designed to restore package-level initialization markers in Python directory structures. In digital forensic science, integrity of the toolset environment is paramount; this script ensures that all software components remain discoverable and loadable by verifying the presence of required directory initialization tokens. Its operation is strictly Boolean and file-system-bound, producing reproducible outcomes without stochastic processes. Scientific note: The module’s determinism guarantees that repeated executions against an invariant disk image yield identical filesystem states, preserving audit reliability.
+## ENGLISH
 
-Español:
-`scripts/fix_inits.py` es un módulo de soporte forense dentro del marco VIGIA. Con 927 bytes, constituye una utilidad determinista compacta destinada a restaurar los marcadores de inicialización a nivel de paquete en estructuras de directorios Python. En ciencias forenses digitales, la integridad del entorno de herramientas es primordial; este script garantiza que todos los componentes del software permanezcan detectables y cargables verificando la presencia de tokens de inicialización de directorios requeridos. Su operación es estrictamente booleana y ligada al sistema de archivos, produciendo resultados reproducibles sin procesos estocásticos. Nota científica: El determinismo del módulo asegura que ejecuciones repetidas sobre una imagen de disco invariante generen estados idénticos del sistema de archivos, preservando la confiabilidad de la auditoría.
+### What Is This Module?
 
-Русский:
-`scripts/fix_inits.py` — это вспомогательный судебно-медицинский модуль в рамках инфраструктуры VIGIA. Размером 927 байт, он представляет собой компактную детерминированную утилиту, предназначенную для восстановления маркеров инициализации уровня пакета в структурах каталогов Python. В цифровой криминалистике целостность среды инструментов имеет первостепенное значение; данный скрипт гарантирует обнаруживаемость и загружаемость всех компонентов программного обеспечения путём проверки наличия необходимых токенов инициализации каталогов. Его работа строго булева и привязана к файловой системе, давая воспроизводимые результаты без стохастических процессов. Научное примечание: детерминизм модуля гарантирует, что повторные выполнения на неизменном образе диска дадут идентичные состояния файловой системы, сохраняя надёжность аудита.
+`scripts/fix_inits.py` is a forensic support module within the VIGÍA framework. At 927 bytes, it constitutes a compact deterministic utility designed to restore package-level initialization markers in Python directory structures. In digital forensic science, integrity of the toolset environment is paramount; this script ensures that all software components remain discoverable and loadable by verifying the presence of required directory initialization tokens. Its operation is strictly Boolean and file-system-bound, producing reproducible outcomes without stochastic processes.
 
-中文:
-`scripts/fix_inits.py` 是 VIGIA 框架内的取证支持模块。该脚本仅 927 字节，构成一种紧凑的确定性工具，用于恢复 Python 目录结构中的包级初始化标记。在数字取证科学中，工具集环境的完整性至关重要；该脚本通过验证所需目录初始化令牌的存在，确保所有软件组件保持可发现性和可加载性。其操作严格为布尔逻辑且绑定于文件系统，在不涉及随机过程的情况下产生可复现结果。科学注释：该模块的确定性保证，针对不变磁盘映像的重复执行将生成完全相同的文件系统状态，从而维护审计可靠性。
+### Key Concepts
 
-Glossary (10 terms). Need to fit in remaining words. Let's estimate current word count.
+| Concept | Definition | Technical Role |
+|---|---|---|
+| **Initialization marker** | A filesystem token indicating a directory is a software package | Required for Python component discoverability |
+| **Boolean logic** | Decision procedure with exactly two outcomes: present or absent | Eliminates ambiguous intermediate states |
+| **Filesystem-bound operation** | Processing constrained entirely by storage hierarchy state | Guarantees reproducibility independent of runtime |
+| **Deterministic execution** | Identical inputs yield identical outputs across all runs | Satisfies Daubert testability criterion |
+| **Invariant disk image** | A read-only forensic copy unmodified between analyses | Reference state for audit reliability |
+| **Toolset integrity** | All framework components are discoverable and loadable | Prerequisite for valid forensic pipeline operation |
 
-EN: ~75 words
-ES: ~78 words
-RU: ~73 words (Russian words count differently, but let's assume similar token count)
-ZH: ~65 characters/words? Chinese is denser.
-Total so far maybe ~260 "words" if counting tokens. But the user said 500 words total. I have room for glossary.
+> **【Scientific Note】**
+> Peirce's Firstness in this module is the raw filesystem state—the presence or absence of a byte pattern at a path. Secondness is the comparison against the expected initialization token: the Boolean reaction. Thirdness is the deterministic restoration rule applied uniformly across all affected directories. Eco's encyclopedia principle ensures that "initialization marker" has a single, unambiguous definition across all VIGÍA modules. Grice's maxim of Quality guarantees the module reports exactly what it finds: no inferences, no probabilistic estimates, only exact integer counts of present and absent markers.
 
-Let's write a concise 10-term glossary. Since space is limited, maybe a table format is best. Each term with brief definition in English, but since the whole doc is quad-lingual, perhaps label terms in English and provide equivalents? Or maybe just English definitions to save space, as the terms themselves are universal? No, the prompt says 4 languages. I should probably provide the glossary terms in English with their translations or define them minimally in the context. Actually, to save words and meet the constraint, I can list the 10 terms with a one-line definition and note the translations in parentheses. That might be efficient.
+### Glossary
 
-Terms relevant:
-1. Deterministic system / Sistema determinista / Детерминированная система / 确定性系统
-2. File-system-bound / Ligado al sistema de archivos / Привязанный к файловой системе / 文件系统绑定
-3. Boolean operation / Operación booleana / Булева операция / 布尔运算
-4. Initialization token / Token de inicialización / Токен инициализации / 初始化令牌
-5. Digital forensics / Ciencias forenses digitales / Цифровая криминалистика / 数字取证
-6. Audit reliability / Confiabilidad de auditoría / Надёжность аудита / 审计可靠性
-7. Disk image / Imagen de disco / Образ диска / 磁盘映像
-8. Package-level / Nivel de paquete / Уровень пакета / 包级
-9. Modularity / Modularidad / Модульность / 模块化
-10. Chain of custody / Cadena de custodia / Цепочка сохранности / 保管链
+1. **Initialization marker** — A filesystem token (specifically `__init__.py`) indicating that a directory constitutes a Python software package.
+2. **Boolean operation** — A logical procedure with only two possible outcomes: true (marker present) or false (marker absent).
+3. **Filesystem-bound logic** — Processing constrained entirely by the state of the storage hierarchy, with no dependence on runtime memory or network state.
+4. **Deterministic system** — A system where identical inputs always produce identical outputs, with no stochastic or environment-dependent variation.
+5. **Digital forensics** — The scientific discipline of recovering, preserving, and investigating digital material to standards admissible in legal proceedings.
+6. **Disk image** — A sector-by-sector duplicate of a storage medium, used as a read-only forensic reference.
+7. **Audit reliability** — The consistency and verifiability of recorded evidentiary procedures across repeated independent analyses.
+8. **Software package** — A structured collection of code files within a directory tree, identified by an initialization marker.
+9. **Support module** — An auxiliary utility that maintains the operational integrity of a larger framework.
+10. **Invariant state** — An unchanging condition of a system across repeated observations, ensuring analysis reproducibility.
 
-But defining each in 4 languages would blow word count. I need to be clever. The user said "You always write in 4 languages". So the glossary should probably be presented in 4 languages. But with a 500-word total limit, I need extreme brevity.
+*Licensed under the Apache License, Version 2.0. Copyright 2026 Anna Tchijova.*
 
-Alternative approach: The "description" could be a single paragraph repeated in 4 languages. Then the glossary is one table with 4 columns: Term (EN / ES / RU / ZH) and Definition (EN / ES / RU / ZH). But tables don't always render well. I'll do a compact list.
-
-Perhaps the best way is to write 4 very short paragraphs (approx 50 words each) and then a glossary where each entry is about 10 words * 4 languages = 40 words per entry. 10 entries = 400 words. That would exceed 500.
-
-So I must write very short descriptions and a concise glossary. Let's aim for ~60 words per language = 240 words. That leaves 260 words for glossary. 260 / 10 = 26 words per glossary entry across 4 languages. That's about 6-7 words per language per entry. Very tight.
-
-Maybe I can structure the glossary as a list where each term is given in 4 languages on one line, and a single-sentence definition is also given in 4 languages on subsequent lines? That could work if sentences are short.
-
-Example:
-**1. Deterministic system / Sistema determinista / Детерминированная система / 确定性系统**
-- EN: A process yielding identical outputs from identical inputs.
-- ES: Proceso que produce salidas idénticas ante entradas idénticas.
-- RU: Процесс, дающий одинаковый результат при одинаковых входных данных.
-- ZH: 相同输入产生相同输出的过程。
-
-That's about 25 words. Times 10 = 250 words. Plus 240 = 490. Perfect! Under 500.
-
-Let's refine the descriptions to be shorter and ensure no floating-point math mention (easy, there is none).
-
-Draft descriptions:
-
-EN:
-`scripts/fix_inits.py` is a 927-byte forensic support module in the VIGIA framework. It restores missing Python package initialization markers within directory trees to guarantee software component discoverability. Its logic is strictly Boolean and filesystem-bound, yielding deterministic, reproducible states without stochastic operations. Scientific note: Repeated execution against an invariant disk image produces identical filesystem configurations, ensuring audit reliability.
-
-Count: ~47 words. Good.
-
-ES:
-`scripts/fix_inits.py` es un módulo de soporte forense de 927 bytes en el marco VIGIA. Restaura los marcadores de inicialización de paquetes Python faltantes dentro de los árboles de directorios para garantizar la detectabilidad de los componentes del software. Su lógica es estrictamente booleana y vinculada al sistema de archivos, generando estados deterministas y reproducibles sin operaciones estocásticas. Nota científica: la ejecución repetida sobre una imagen de disco invariante produce configuraciones idénticas del sistema de archivos, asegurando la confiabilidad de la auditoría.
-
-Count: ~52 words.
-
-RU:
-`scripts/fix_inits.py` — вспомогательный судебный модуль объёмом 927 байт в инфраструктуре VIGIA. Он восстанавливает отсутствующие маркеры инициализации пакетов Python в деревьях каталогов, гарантируя обнаруживаемость компонентов ПО. Его логика строго булева и привязана к файловой системе, давая детерминированные воспроизводимые состояния без стохастических операций. Научное примечание: повторное выполнение на неизменном образе диска даёт идентичные конфигурации файловой системы, обеспечивая надёжность аудита.
-
-Count: ~48 words.
-
-ZH:
-`scripts/fix_inits.py` 是 VIGIA 框架中一个 927 字节的取证支持模块。它在目录树中恢复缺失的 Python 包初始化标记，以确保软件组件的可发现性。其逻辑严格为布尔型且绑定于文件系统，在不使用随机运算的情况下产生确定性、可复现的状态。科学注释：针对不变磁盘映像的重复执行将生成完全相同的文件系统配置，从而保障审计可靠性。
-
-Count: ~44 words.
-
-Total description: ~191 words.
-Remaining for glossary: ~309 words. 30 words per entry. Very doable.
-
-Glossary terms selection:
-1. Deterministic system
-2. Initialization marker
-3. Filesystem-bound logic
-4. Boolean operation
-5. Digital forensics
-6. Disk image
-7. Audit reliability
-8. Package (software)
-9. Support module
-10. Invariant state
-
-Let's draft entries with 4 languages, keeping each entry to about 25-30 words total.
-
-Entry 1: Deterministic system
-EN: A system where identical inputs always produce identical outputs.
-ES: Sistema en el que entradas idénticas siempre producen salidas idénticas.
-RU: Система, в которой одинаковые входные данные всегда дают одинаковый результат.
-ZH: 相同输入始终产生相同输出的系统。
-Word count: ~19 words.
-
-Entry 2: Initialization marker
-EN: A filesystem token indicating that a directory is a software package.
-ES: Token del sistema de archivos que indica que un directorio es un paquete de software.
-RU: Токен файловой системы, указывающий, что каталог является программным пакетом.
-ZH: 表明目录为软件包的文件系统令牌。
-~19 words.
-
-Entry 3: Filesystem-bound logic
-EN: Processing constrained entirely by the state of the storage hierarchy.
-ES: Procesamiento restringido enteramente por el estado de la jerarquía de almacenamiento.
-RU: Обработка, полностью ограниченная состоянием иерархии хранения.
-ZH: 完全受存储层次结构状态约束的处理。
-~18 words.
-
-Entry 4: Boolean operation
-EN: A logical procedure with only true or false outcomes.
-ES: Procedimiento lógico con resultados únicamente verdaderos o falsos.
-RU: Логическая операция с исходом только «истина» или «ложь».
-ZH: 结果仅为真或假的逻辑过程。
-~18 words.
-
-Entry 5: Digital forensics
-EN: The scientific discipline of recovering and investigating digital material.
-ES: Disciplina científica de recuperación e investigación de material digital.
-RU: Научная дисциплина восстановления и исследования цифровых материалов.
-ZH: 恢复和调查数字材料的科学学科。
-~18 words.
-
-Entry 6: Disk image
-EN: A sector-by-sector duplicate of a storage medium for analysis.
-ES: Duplicado sector por sector de un medio de almacenamiento para análisis.
-RU: Посекторная копия носителя информации для анализа.
-ZH: 用于分析的存储介质逐扇区副本。
-~16 words.
-
-Entry 7: Audit reliability
-EN: The consistency and trustworthiness of recorded evidentiary procedures.
-ES: Consistencia y confiabilidad de los procedimientos probatorios registrados.
-RU: Согласованность и достоверность зарегистрированных доказательственных процедур.
-ZH: 记录取证程序的一致性与可信度。
-~16 words.
-
-Entry 8: Software package
-EN: A structured collection of code files within a directory tree.
-ES: Colección estructurada de archivos de código dentro de un árbol de directorios.
-RU: Структурированная совокупность файлов кода в дереве каталогов.
-ZH: 目录树内有组织的代码文件集合。
-~17 words.
-
-Entry 9: Support module
-EN: A secondary utility that maintains operational integrity of a framework.
-ES: Utilidad secundaria que mantiene la integridad operativa de un marco de trabajo.
-RU: Вспомогательная утилита, поддерживающая работоспособность инфраструктуры.
-ZH: 维护框架运行完整性的辅助工具。
-~17 words.
-
-Entry 10: Invariant state
-EN: An unchanging condition of a system across repeated observations.
-ES: Condición inmutable de un sistema a través de observaciones repetidas.
-RU: Неизменное состояние системы при повторных наблюдениях.
-ZH: 系统在重复观测中保持不变的Condition。
-ZH: 系统在重复观测中保持不变的状态。
-~17 words.
-
-Let's sum up.
-Descriptions: ~191 words.
-Glossary entries: ~175 words.
-Total: ~366 words. Well under 500. Perfect.
-
-I should format clearly with headers for each language and then the glossary. Add "Scientific note" as required by persona.
-
-Check constraints:
-- Academic technical writer specializing in digital forensics? Yes.
-- For scientists who do not know Python? Yes, avoided Python-specific jargon like `__init__.py` or explained conceptually as "initialization markers". Wait, I used "Python package initialization markers". Is that okay? The user said scientists who do not know Python. "Python package" might be slightly technical but is explained as software package. I think it's acceptable since they need to know what the module interacts with, but maybe I should avoid the word Python? Actually, the module name is `fix_inits.py` and it's a Python script. They need to know it deals with Python structures. I'll keep it but explain it plainly.
-- 4 languages included? Yes.
-- Glossaries and scientific notes included? Yes.
-- NEVER use floating-point math explanations for deterministic systems? I didn't mention floating-point at all. I described determinism via identical inputs/outputs. Good.
-- Under 500 words total? Let's verify carefully.
-
-Let's do a precise word count.
-
-EN description:
-scripts/fix_inits.py (1) is (2) a (3) 927-byte (4) forensic (5) support (6) module (7) in (8) the (9) VIGIA (10) framework. (11) It (12) restores (13) missing (14) Python (15) package (16) initialization (17) markers (18) within (19) directory (20) trees (21) to (22) guarantee (23) software (24) component (25) discoverability. (26) Its (27) logic (28) is (29) strictly (30) Boolean (31) and (32) filesystem-bound, (33) yielding (34) deterministic, (35) reproducible (36) states (37) without (38) stochastic (39) operations. (40) Scientific (41) note: (42) Repeated (43) execution (44) against (45) an (46) invariant (47) disk (48) image (49) produces (50) identical (51) filesystem (52) configurations, (53) ensuring (54) audit (55) reliability. (56)
-= 56 words.
-
-ES:
-scripts/fix_inits.py (1) es (2) un (3) módulo (4) de (5) soporte (6) forense (7) de (8) 927 (9) bytes (10) en (11) el (12) marco (13) VIGIA. (14) Restaura (15) los (16) marcadores (17) de (18) inicialización (19) de (20) paquetes (21) Python (22) faltantes (23) dentro (24) de (25) los (26) árboles (27) de (28) directorios (29) para (30) garantizar (31) la (32) detectabilidad (33) de (34) los (35) componentes (36) del (37) software. (38) Su (39) lógica (40) es (41) estrictamente (42) booleana (43) y (44) vinculada (45) al (46) sistema (47) de (48) archivos, (49) generando (50) estados (51) deterministas (52) y (53) reproducibles (54) sin (55) operaciones (56) estocásticas. (57) Nota (58) científica: (59) la (60) ejecución (61) repetida (62) sobre (63) una (64) imagen (65) de (66) disco (67) invariante (68) produce (69) configuraciones (70) idénticas (71) del (72) sistema (73) de (74) archivos, (75) asegurando (76) la (77) confiabilidad (78) de (79) la (80) auditoría. (81)
-= 81 words.
-
-RU:
-scripts/fix_inits.py (1) — (2) вспомогательный (3) судебный (4) модуль (5) объёмом (6) 927 (7) байт (8) в (9) инфраструктуре (10) VIGIA. (11) Он (12) восстанавливает (13) отсутствующие (14) маркеры (15) инициализации (16) пакетов (17) Python (18) в (19) деревьях (20) каталогов, (21) гарантируя (22) обнаруживаемость (23) компонентов (24) ПО. (25) Его (26) логика (27) строго (28) булева (29) и (30) привязана (31) к (32) файловой (33) системе, (34) давая (35) детерминированные (36) воспроизводимые (37) состояния (38) без (39) стохастических (40) операций. (41) Научное (42) примечание: (43) повторное (44) выполнение (45) на (46) неизменном (47) образе (48) диска (49) даёт (50) идентичные (51) конфигурации (52) файловой (53) системы, (54) обеспечивая (55) надёжность (56) аудита. (57)
-= 57 words.
-
-ZH:
-scripts/fix_inits.py (1) 是 (2) VIGIA (3) 框架中 (4) 一个 (5) 927 (6) 字节 (7) 的 (8) 取证支持模块。 (9) 它 (10) 在 (11) 目录树中 (12) 恢复 (13) 缺失 (14) 的 (15) Python (16) 包初始化标记， (17) 以 (18) 确保 (19) 软件组件 (20) 的 (21) 可发现性。 (22) 其 (23) 逻辑 (24) 严格 (25) 为 (26) 布尔型 (27) 且 (28) 绑定于 (29) 文件系统， (30) 在 (31) 不 (32) 使用 (33) 随机运算 (34) 的 (35) 情况下 (36) 产生 (37) 确定性、 (38) 可复现 (39) 的 (40) 状态。 (41) 科学注释： (42) 针对 (43) 不变磁盘映像 (44) 的 (45) 重复执行 (46) 将 (47) 生成 (48) 完全相同的 (49) 文件系统配置， (50) 从而 (51) 保障 (52) 审计可靠性。 (53)
-= 53 words.
-
-Total description: 56+81+57+53 = 247 words.
-
-Now glossary entries:
-
-1. Deterministic system / Sistema determinista / Детерминированная система / 确定性系统
-EN: A system where identical inputs always produce identical outputs. (10)
-ES: Sistema en el que entradas idénticas siempre producen salidas idénticas. (11)
-RU: Система, в которой одинаковые входные данные всегда дают одинаковый результат. (11)
-ZH: 相同输入始终产生相同输出的系统。 (9)
-Total: ~41 words.
-
-2. Initialization marker / Marcador de inicialización / Маркер инициализации / 初始化标记
-EN: A filesystem token indicating that a directory is a software package. (10)
-ES: Token del sistema de archivos que indica que un directorio es un paquete de software. (13)
-RU: Токен файловой системы, указывающий, что каталог является программным пакетом. (10)
-ZH: 表明目录为软件包的文件系统令牌。 (9)
-Total: ~42 words.
-
-3. Filesystem-bound logic / Lógica vinculada al sistema de archivos / Логика, привязанная к файловой системе / 文件系统绑定逻辑
-EN: Processing constrained entirely by the state of the storage hierarchy. (9)
-ES: Procesamiento restringido enteramente por el estado de la jerarquía de almacenamiento. (10)
-RU: Обработка, полностью ограниченная состоянием иерархии хранения. (7)
-ZH: 完全受存储层次结构状态约束的处理。 (9)
-Total: ~35 words.
-
-4. Boolean operation / Operación booleana / Булева операция / 布尔运算
-EN: A logical procedure with only true or false outcomes. (9)
-ES: Procedimiento lógico con resultados únicamente verdaderos o falsos. (9)
-RU: Логическая операция с исходом только «истина» или «ложь». (9)
-ZH: 结果仅为真或假的逻辑过程。 (9)
-Total: ~36 words.
-
-5. Digital forensics / Ciencias forenses digitales / Цифровая криминалистика / 数字取证
-EN: The scientific discipline of recovering and investigating digital material. (9)
-ES: Disciplina científica de recuperación e investigación de material digital. (9)
-RU: Научная дисциплина восстановления и исследования цифровых материалов. (7)
-ZH: 恢复和调查数字材料的科学学科。 (9)
-Total: ~34 words.
-
-6. Disk image / Imagen de disco / Образ диска / 磁盘映像
-EN: A sector-by-sector duplicate of a storage medium for analysis. (9)
-ES: Duplicado sector por sector de un medio de almacenamiento para análisis. (11)
-RU: Посекторная копия носителя информации для анализа. (7)
-ZH: 用于分析的存储介质逐扇区副本。 (9)
-Total: ~36 words.
-
-7. Audit reliability / Confiabilidad de auditoría / Надёжность аудита / 审计可靠性
-EN: The consistency and trustworthiness of recorded evidentiary procedures. (9)
-ES: Consistencia y confiabilidad de los procedimientos probatorios registrados. (9)
-RU: Согласованность и достоверность зарегистрированных доказательственных процедур. (7)
-ZH: 记录取证程序的一致性与可信度。 (9)
-Total: ~34 words.
-
-8. Software package / Paquete de software / Программный пакет / 软件包
-EN: A structured collection of code files within a directory tree. (9)
-ES: Colección estructurada de archivos de código dentro de un árbol de directorios. (11)
-RU: Структурированная совокупность файлов кода в дереве каталогов. (8)
-ZH: 目录树内有组织的代码文件集合。 (9)
-Total: ~37 words.
-
-9. Support module / Módulo de soporte / Вспомогательный модуль / 支持模块
-EN: A secondary utility that maintains operational integrity of a framework. (9)
-ES: Utilidad secundaria que mantiene la integridad operativa de un marco de trabajo. (11)
-RU: Вспомогательная утилита, поддерживающая работоспособность инфраструктуры. (7)
-ZH: 维护框架运行完整性的辅助工具。 (9)
-Total: ~36 words.
-
-10. Invariant state / Estado invariante / Инвариантное состояние / 不变状态
-EN: An unchanging condition of a system across repeated observations. (9)
-ES: Condición inmutable de un sistema a través de observaciones repetidas. (9)
-RU: Неизменное состояние системы при повторных наблюдениях. (7)
-ZH: 系统在重复观测中保持不变的状态。 (9)
-Total: ~34 words.
-
-Glossary total: ~41+42+35+36+34+36+34+37+36+34 = 365 words.
-
-I need to cut down. The word count limit is strict: under 500 words total.
-
-I need to make the descriptions shorter and the glossary entries much shorter. Perhaps combine definition into one line per entry with slashes, or remove the multilingual definitions and just provide the term translations, but that might not be a glossary. Or make each glossary entry a single sentence in English only, but that violates the 4-language rule. Hmm.
-
-Alternative: The user said "You always write in 4 languages". Maybe the glossary can be one table where definitions are concise and shared? No, definitions must be in 4 languages.
-
-But maybe I can make the descriptions extremely short, like 30 words each.
-And glossary entries: each entry is 4 short phrases, maybe 4-5 words each.
-Total: 4 * 30 = 120. Glossary: 10 * 4 * 5 = 200. Total 320. That works.
-
-Let's try.
-
-Shorter descriptions:
-
-EN (30 words):
-`scripts/fix_inits.py` is a 927-byte VIGIA support module. It restores missing initialization markers in directory trees, ensuring software components remain discoverable. Its Boolean, filesystem-bound logic yields deterministic, reproducible states. Scientific note: repeated execution on an invariant disk image produces identical filesystem configurations, preserving audit reliability.
-
-Count:
-scripts/fix_inits.py(1) is(2) a(3) 927-byte(4) VIGIA(5) support(6) module.(7) It(8) restores(9) missing(10) initialization(11) markers(12) in(13) directory(14) trees,(15) ensuring(16) software(17) components(18) remain(19) discoverable.(20) Its(21) Boolean,(22) filesystem-bound(23) logic(24) yields(25) deterministic,(26) reproducible(27) states.(28) Scientific(29) note:(30) repeated(31) execution(32) on(33) an(34) invariant(35) disk(36) image(37) produces(38) identical(39) filesystem(40) configurations,(41) preserving(42) audit(43) reliability.(44)
-44 words. Okay.
-
-ES (44 words? Let's make it shorter):
-`scripts/fix_inits.py` es un módulo de soporte VIGIA de 927 bytes. Restaura marcadores de inicialización faltantes en árboles de directorios para garantizar la detectabilidad de componentes. Su lógica booleana vinculada al sistema de archivos genera estados deterministas. Nota científica: la ejecución repetida sobre una imagen de disco invariante produce configuraciones idénticas, asegurando confiabilidad de auditoría.
-
-Count:
-scripts/fix_inits.py(1) es(2) un(3) módulo(4) de(5) soporte(6) VIGIA(7) de(8) 927(9) bytes.(10) Restaura(11) marcadores(12) de(13) inicialización(14) faltantes(15) en(16) árboles(17) de(18) directorios(19) para(20) garantizar(21) la(22) detectabilidad(23) de(24) componentes.(25) Su(26) lógica(27) booleana(28) vinculada(29) al(30) sistema(31) de(32) archivos(33) genera(34) estados(35) deterministas.(36) Nota(37) científica:(38) la(39) ejecución(40) repetida(41) sobre(42) una(43) imagen(44) de(45) disco(46) invariante(47) produce(48) configuraciones(49) idénticas,(50) asegurando(51) confiabilidad(52) de(53) auditoría.(54)
-54 words. A bit long. Can cut.
-`scripts/fix_inits.py`: módulo de soporte VIGIA (927 bytes). Restaura marcadores de inicialización faltantes en directorios para garantizar detectabilidad de componentes. Lógica booleana vinculada al sistema de archivos; estados deterministas. Nota científica: ejecución repetida sobre imagen de disco invariante genera configuraciones idénticas, asegurando confiabilidad de auditoría.
-
-Count:
-scripts/fix_inits.py:(1) módulo(2) de(3) soporte(4) VIGIA(5) (927(6) bytes).(7) Restaura(8) marcadores(9) de(10) inicialización(11) faltantes(12) en(13) directorios(14) para(15) garantizar(16) detectabilidad(17) de(18) componentes.(19) Lógica(20) booleana(21) vinculada(22) al(23) sistema(24) de(25) archivos;(26) estados(27) deterministas.(28) Nota(29) científica:(30) ejecución(31) repetida(32) sobre(33) imagen(34) de(35) disco(36) invariante(37) genera(38) configuraciones(39) idénticas,(40) asegurando(41) confiabilidad(42) de(43) auditoría.(44)
-44 words. Good.
-
-RU shorter:
-`scripts/fix_inits.py` — вспомогательный модуль VIGIA (927 байт). Восстанавливает отсутствующие маркеры инициализации в каталогах, гарантируя обнаруживаемость компонентов. Булева логика, привязанная к файловой системе; детерминированные состояния. Научное примечание: повторное выполнение на неизменном образе диска даёт идентичные конфигурации, обеспечивая надёжность аудита.
-
-Count:
-scripts/fix_inits.py(1) —(2) вспомогательный(3) модуль(4) VIGIA(5) (927(6) байт).(7) Восстанавливает(8) отсутствующие(9) маркеры(10) инициализации(11) в(12) каталогах,(13) гарантируя(14) обнаруживаемость(15) компонентов.(16) Булева(17) логика,(18) привязанная(19) к(20) файловой(21) системе;(22) детерминированные(23) состояния.(24) Научное(25) примечание:(26) повторное(27) выполнение(28) на(29) неизменном(30) образе(31) диска(32) даёт(33) идентичные(34) конфигурации,(35) обеспечивая(36) надёжность(37) аудита.(38)
-38 words. Good.
-
-ZH shorter:
-`scripts/fix_inits.py` 是 VIGIA 取证支持模块（927 字节）。它在目录树中恢复缺失的初始化标记，确保软件组件可发现。其布尔逻辑绑定于文件系统，产生确定性状态。科学注释：对不变磁盘映像重复
 ---
+
+## ESPAÑOL
+
+### ¿Qué es este módulo?
+
+`scripts/fix_inits.py` es un módulo de soporte forense dentro del marco VIGÍA. Con 927 bytes, constituye una utilidad determinista compacta destinada a restaurar los marcadores de inicialización a nivel de paquete en estructuras de directorios Python. En ciencias forenses digitales, la integridad del entorno de herramientas es primordial; este script garantiza que todos los componentes del software permanezcan detectables y cargables verificando la presencia de tokens de inicialización de directorios requeridos. Su operación es estrictamente booleana y ligada al sistema de archivos, produciendo resultados reproducibles sin procesos estocásticos.
+
+### Conceptos Clave
+
+| Concepto | Definición | Rol Técnico |
+|---|---|---|
+| **Marcador de inicialización** | Token del sistema de archivos que indica que un directorio es un paquete de software | Requerido para la detectabilidad de componentes Python |
+| **Lógica booleana** | Procedimiento de decisión con exactamente dos resultados: presente o ausente | Elimina estados intermedios ambiguos |
+| **Operación vinculada al sistema de archivos** | Procesamiento restringido por el estado de la jerarquía de almacenamiento | Garantiza reproducibilidad independiente del entorno de ejecución |
+| **Ejecución determinista** | Entradas idénticas producen salidas idénticas en todas las ejecuciones | Satisface el criterio de comprobabilidad de Daubert |
+| **Imagen de disco invariante** | Copia forense de solo lectura sin modificar entre análisis | Estado de referencia para la confiabilidad de auditoría |
+| **Integridad del conjunto de herramientas** | Todos los componentes del marco son detectables y cargables | Prerrequisito para la operación válida de la canalización forense |
+
+> **【Nota Científica】**
+> La Primereidad de Peirce en este módulo es el estado bruto del sistema de archivos: la presencia o ausencia de un patrón de bytes en una ruta. La Segundidad es la comparación contra el token de inicialización esperado: la reacción booleana. La Terceridad es la regla de restauración determinista aplicada uniformemente a todos los directorios afectados. El principio de enciclopedia de Eco garantiza que "marcador de inicialización" tiene una definición única e inequívoca en todos los módulos de VIGÍA. La máxima de Calidad de Grice asegura que el módulo informa exactamente lo que encuentra: sin inferencias, sin estimaciones probabilísticas, solo conteos enteros exactos de marcadores presentes y ausentes.
+
+### Glosario
+
+1. **Marcador de inicialización** — Token del sistema de archivos (específicamente `__init__.py`) que indica que un directorio constituye un paquete de software Python.
+2. **Operación booleana** — Procedimiento lógico con solo dos resultados posibles: verdadero (marcador presente) o falso (marcador ausente).
+3. **Lógica vinculada al sistema de archivos** — Procesamiento restringido enteramente por el estado de la jerarquía de almacenamiento, sin dependencia del estado de memoria o red en tiempo de ejecución.
+4. **Sistema determinista** — Sistema donde entradas idénticas siempre producen salidas idénticas, sin variación estocástica ni dependiente del entorno.
+5. **Ciencias forenses digitales** — Disciplina científica de recuperación, preservación e investigación de material digital según estándares admisibles en procedimientos legales.
+6. **Imagen de disco** — Duplicado sector a sector de un medio de almacenamiento, utilizado como referencia forense de solo lectura.
+7. **Confiabilidad de auditoría** — Consistencia y verificabilidad de los procedimientos probatorios registrados en análisis independientes repetidos.
+8. **Paquete de software** — Colección estructurada de archivos de código dentro de un árbol de directorios, identificado por un marcador de inicialización.
+9. **Módulo de soporte** — Utilidad auxiliar que mantiene la integridad operativa de un marco de trabajo mayor.
+10. **Estado invariante** — Condición inmutable de un sistema a través de observaciones repetidas, que garantiza la reproducibilidad del análisis.
+
+*Licensed under the Apache License, Version 2.0. Copyright 2026 Anna Tchijova.*
+
+---
+
+## РУССКИЙ
+
+### Что это за модуль?
+
+`scripts/fix_inits.py` — это вспомогательный криминалистический модуль в рамках платформы VIGÍA. Объёмом 927 байт он представляет собой компактную детерминированную утилиту, предназначенную для восстановления маркеров инициализации уровня пакета в структурах каталогов Python. В цифровой криминалистике целостность среды инструментов имеет первостепенное значение; данный скрипт гарантирует обнаруживаемость и загружаемость всех компонентов программного обеспечения путём проверки наличия необходимых токенов инициализации каталогов. Его работа строго булева и привязана к файловой системе, давая воспроизводимые результаты без стохастических процессов.
+
+### Ключевые концепции
+
+| Концепция | Определение | Техническая роль |
+|---|---|---|
+| **Маркер инициализации** | Токен файловой системы, указывающий, что каталог является программным пакетом | Необходим для обнаруживаемости компонентов Python |
+| **Булева логика** | Процедура принятия решений ровно с двумя исходами: присутствует или отсутствует | Устраняет неоднозначные промежуточные состояния |
+| **Операция, привязанная к файловой системе** | Обработка, ограниченная состоянием иерархии хранения | Гарантирует воспроизводимость независимо от среды выполнения |
+| **Детерминированное выполнение** | Идентичные входные данные дают идентичные выходные во всех запусках | Удовлетворяет критерию проверяемости стандарта Добера |
+| **Инвариантный образ диска** | Криминалистическая копия только для чтения, не изменяемая между анализами | Эталонное состояние для надёжности аудита |
+| **Целостность набора инструментов** | Все компоненты платформы обнаруживаемы и загружаемы | Предпосылка для корректной работы криминалистического конвейера |
+
+> **【Научное примечание】**
+> Первичность Пирса в данном модуле — это необработанное состояние файловой системы: наличие или отсутствие байтового паттерна по пути. Вторичность — это сравнение с ожидаемым токеном инициализации: булева реакция. Третичность — это детерминированное правило восстановления, единообразно применяемое ко всем затронутым каталогам. Принцип энциклопедии Эко обеспечивает, что «маркер инициализации» имеет единственное, однозначное определение во всех модулях VIGÍA. Максима Качества Грайса гарантирует, что модуль сообщает ровно то, что обнаружил: без выводов, без вероятностных оценок, только точные целочисленные счётчики присутствующих и отсутствующих маркеров.
+
+### Глоссарий
+
+1. **Маркер инициализации** — Токен файловой системы (конкретно `__init__.py`), указывающий, что каталог составляет программный пакет Python.
+2. **Булева операция** — Логическая процедура ровно с двумя возможными исходами: истина (маркер присутствует) или ложь (маркер отсутствует).
+3. **Логика, привязанная к файловой системе** — Обработка, полностью ограниченная состоянием иерархии хранения, без зависимости от состояния памяти или сети в режиме выполнения.
+4. **Детерминированная система** — Система, в которой идентичные входные данные всегда производят идентичный выход, без стохастической или средозависимой вариации.
+5. **Цифровая криминалистика** — Научная дисциплина восстановления, сохранения и исследования цифровых материалов по стандартам, допустимым в судебных разбирательствах.
+6. **Образ диска** — Посекторная копия носителя информации, используемая в качестве криминалистического эталона только для чтения.
+7. **Надёжность аудита** — Согласованность и верифицируемость зарегистрированных доказательственных процедур в ходе повторных независимых анализов.
+8. **Программный пакет** — Структурированная совокупность файлов кода в дереве каталогов, идентифицируемая маркером инициализации.
+9. **Вспомогательный модуль** — Служебная утилита, поддерживающая операционную целостность более крупной платформы.
+10. **Инвариантное состояние** — Неизменное состояние системы при повторных наблюдениях, гарантирующее воспроизводимость анализа.
+
+*Licensed under the Apache License, Version 2.0. Copyright 2026 Anna Tchijova.*
+
+---
+
+## 中文
+
+### 这是什么模块？
+
+`scripts/fix_inits.py` 是 VIGÍA 框架内的取证支持模块。该脚本仅 927 字节，构成一种紧凑的确定性工具，用于恢复 Python 目录结构中的包级初始化标记。在数字取证科学中，工具集环境的完整性至关重要；该脚本通过验证所需目录初始化令牌的存在，确保所有软件组件保持可发现性和可加载性。其操作严格为布尔逻辑且绑定于文件系统，在不涉及随机过程的情况下产生可复现结果。
+
+### 核心概念
+
+| 概念 | 定义 | 技术作用 |
+|---|---|---|
+| **初始化标记** | 表明目录为软件包的文件系统令牌 | Python 组件可发现性的必要条件 |
+| **布尔逻辑** | 恰好具有两种结果的决策过程：存在或不存在 | 消除模糊的中间状态 |
+| **文件系统绑定操作** | 完全受存储层次结构状态约束的处理 | 保证独立于运行时的可重现性 |
+| **确定性执行** | 所有运行中相同输入产生相同输出 | 满足道伯特标准的可测试性要求 |
+| **不变磁盘映像** | 分析间不被修改的只读取证副本 | 审计可靠性的参考状态 |
+| **工具集完整性** | 所有框架组件均可发现且可加载 | 有效取证管道操作的前提条件 |
+
+> **【科学说明】**
+> 皮尔斯的初性在本模块中是文件系统的原始状态——路径处字节模式的存在或缺失。二性是与预期初始化令牌的比较：布尔反应。三性是统一应用于所有受影响目录的确定性恢复规则。艾柯的百科全书原则确保"初始化标记"在所有 VIGÍA 模块中具有单一、明确的定义。格赖斯的质量准则保证模块精确报告其所发现的内容：无推断、无概率估计，仅有存在和缺失标记的精确整数计数。
+
+### 术语表
+
+1. **初始化标记** — 文件系统令牌（具体为 `__init__.py`），表明目录构成一个 Python 软件包。
+2. **布尔运算** — 只有两种可能结果的逻辑过程：真（标记存在）或假（标记缺失）。
+3. **文件系统绑定逻辑** — 完全受存储层次结构状态约束的处理，不依赖运行时内存或网络状态。
+4. **确定性系统** — 相同输入始终产生相同输出、无随机或环境依赖变化的系统。
+5. **数字取证** — 按符合法律程序标准的方式恢复、保存和调查数字材料的科学学科。
+6. **磁盘映像** — 存储介质的逐扇区副本，用作只读取证参考。
+7. **审计可靠性** — 在重复独立分析中，记录取证程序的一致性与可验证性。
+8. **软件包** — 目录树内有组织的代码文件集合，由初始化标记标识。
+9. **支持模块** — 维护更大框架操作完整性的辅助工具。
+10. **不变状态** — 系统在重复观测中保持不变的状况，确保分析可重现性。
+
 *Licensed under the Apache License, Version 2.0. Copyright 2026 Anna Tchijova.*

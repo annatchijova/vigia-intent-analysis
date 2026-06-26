@@ -98,7 +98,6 @@ ESPAÑOL:
   Следовательно, когда мы называем токен RFC 3161 «индексальным знаком» существования в данный момент, мы лишь констатируем, что TSA действует как независимое измерительное устройство — как сертифицированные часы, показания которых зафиксированы в неизменяемом целочисленном регистре. В арифметике нет интерпретационной неоднозначности; хеш — это детерминированное целое число, подпись — детерминированное целочисленное отношение, а метка времени — дискретная метка.
 
 中文:
-- Must use: 艾柯 (Eco), 格赖斯 (Grice), 取证工件 (artifact), 逻辑断裂 (logical break/gap? The user said "逻辑断裂 (not 裂缝)". I need to make sure I use 逻辑断裂 somewhere appropriate, perhaps in the context of NOT_INDEPENDENT_WITNESS or chain integrity? Or perhaps in the scientific note? Actually, the user specifically listed these Chinese translation requirements. I should incorporate 取证工件 for artifact/evidence item, and 逻辑断裂 instead of 裂缝 for any mention of crack/fracture/gap. Since the module is about chain integrity, "crack in the chain" could be translated as 逻辑断裂. Let's ensure to use it.
 - What is this module?
 - Key concepts:
   | 概念 | 说明 | 科学等效物 |
@@ -129,17 +128,11 @@ ESPAÑOL:
   请将**符号**（皮尔斯意义上的）视为一种**传感器读数**：温度计并非凭借魔法来“意指”温度；它通过确定性物理过程产生一个指示性符号。艾柯的“代码”类似于**校准协议**，将传感器的原始输出映射为可解释的单位。格赖斯的“准则”则相当于数据传输的**质控标准**——确保证据发送者（取证工件的生成方）所传达的信息如同一台经过良好校准的仪器所报告的那样，具有充分的信息量、真实性与相关性。  
   因此，当我们将RFC 3161令牌称为某一时刻存在性的“指示性符号”时，我们仅仅是在陈述：TSA充当了一台独立的测量装置——如同一台经过认证的时钟，其读数被冻结成一条不可变的整数记录。算术层面不存在解释上的歧义；哈希是确定性整数，签名是确定性的整数关系，而时间戳则是一个离散标签。
 
-Now, I need to ensure I incorporate 逻辑断裂 somewhere. The user specifically said: "逻辑断裂 (not 裂缝)". This likely refers to avoiding "裂缝" for "crack/breach" in chain of custody context. I can use it in the Chinese section when discussing chain integrity or the fallback local token. For example, in the description of verify_chain_integrity: "此函数检测保管链中的逻辑断裂" or in the NOT_INDEPENDENT_WITNESS row: "防止在证据链中引入逻辑断裂". Let me add that.
-
-Also, the user said "Do NOT use floating-point math explanations — emphasize deterministic integer arithmetic where applicable." I need to make sure I explicitly mention in the hash explanation that SHA-256/512 uses deterministic integer arithmetic (bitwise operations on 32-bit or 64-bit words), no floating point.
-
-The module path is `vigia/forensics/rfc3161_chain.py`. I should include this.
 
 The document should be Markdown.
 
 Let's construct the final output. I'll separate sections clearly.
 
-I should also make sure to mention the Kimi fix in plain language: the local fallback does not pretend to be an independent witness. It explicitly declares NOT_INDEPENDENT_WITNESS. This is important.
 
 Let's refine the "What Is This Module?" sections.
 
@@ -155,13 +148,9 @@ Este módulo, `vigia/forensics/rfc3161_chain.py`, es el equivalente digital de u
 中文:
 本模块 `vigia/forensics/rfc3161_chain.py` 相当于一本经过公证的数字化实验室日志。它通过向独立的时间戳机构（TSA）申请加密证明，为数字取证工件生成防篡改的时间戳。内部HMAC封印的含义是“自本系统处理该文件以来，它未被改动”；而RFC 3161封印的含义则是“在确切的时间点，有独立第三方见证了该文件的指纹”。对于Daubert等法律与科学标准而言，这一区别至关重要：它类似于研究者自证其数据，与由外部审计员进行认证之间的差别。本模块采用基于确定性整数运算的指纹算法（SHA-256与SHA-512），并将结果存入创建后不可更改的冻结记录中。
 
-Now, key concepts tables. I should make sure they are formatted nicely.
-
-I need to include the License line exactly: ""
 
 I will place it at the very end of the document, once.
 
-Let's double-check the Chinese terms:
 - 艾柯 (Eco) ✓
 - 格赖斯 (Grice) ✓
 - 取证工件 (artifact) ✓
@@ -171,11 +160,7 @@ Let's ensure the scientific note in Chinese uses 【科学说明】. The user wr
 
 Let's write the full text.
 
-One more thing: The user said "You NEVER use floating-point math explanations for deterministic systems." So when describing SHA, I must explicitly say it uses integer arithmetic, no floating point. I have done that.
 
-Also, the module computes both SHA-256 and SHA-512. I should mention that in the flow.
-
-Let's verify all requirements:
 1. Target audience: scientists who do NOT know Python. Yes, plain language, no Python code blocks or syntax explanations. I will not show code.
 2. Format: Markdown with 4 language sections. Yes.
 3. Each section includes:
@@ -203,11 +188,9 @@ Structure:
 
 Then license.
 
-One potential issue: The user said "A 【科学说明】/【Scientific Note】 box explaining that Peirce/Eco/Grice terminology is NOT mysticism — use the sensor analogy". So all four sections need to contain this box. I have drafted them.
 
 | `verify_chain_integrity` | 校验整条保管链的本地HMAC，侦测是否存在逻辑断裂；不校验TSA签名 | — |
 
-Actually, the module functions are `seal_artifact`, `export_chain`, `verify_chain_integrity`. I should mention these in the key concepts or in the text.
 
 Key concepts tables should probably include the main classes/functions too, or at least the concepts. Let me add rows for the functions.
 

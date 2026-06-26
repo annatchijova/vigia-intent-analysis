@@ -1,10 +1,35 @@
 # VIGIA — Índice Maestro de Documentación Académica
-<!-- Auto-generado: 2026-05-20 | Corpus: 193 módulos | Idiomas: EN / ES / RU / ZH -->
-<!-- Generado por Batch API de Moonshot (Kimi K2.6) | Auditoría: Colectivo IA VIGIA -->
+<!-- Actualizado: 2026-06-26 | Corpus: 192 módulos | Idiomas: EN / ES / RU / ZH -->
 
 > **Audiencia objetivo:** Investigadores forenses, jueces técnicos (SANS), revisores Daubert.  
-> Cada documento cubre el módulo en 4 idiomas con glosario técnico y nota 【科学说明】 sobre semiótica de Peirce, Eco y Grice.  
-> Todos los documentos se encuentran en `docs/academic/` del repositorio.
+> Cada documento cubre el módulo en 4 idiomas con glosario técnico y nota científica sobre semiótica de Peirce, Eco y Grice.
+
+## Cómo navegar este índice
+
+```
+docs/academic/
+├── ACADEMIC_DOCS_MASTER_INDEX.md    ← este archivo (ES)
+├── ACADEMIC_DOCS_MASTER_INDEX_EN.md ← versión en inglés
+├── refresh_index_status.py          ← actualiza la columna "Idiomas" en ambos índices
+│
+├── core/        — 38 docs — Pipeline central, semiótica, señales, calibración
+├── tools/       — 22 docs — CAIE, NLP adversarial, MITRE, patrones, EML
+├── sift/        —  9 docs — MFT, prefetch, shellbag, registry, network, browser, memory
+├── forensics/   —  5 docs — PDF, PKI, RFC3161, visión, cadena de custodia
+├── inference/   —  5 docs — Razonamiento abductivo, fingerprint conductual
+├── pipeline/    —  4 docs — Bundle, report, bridge SIFT, registro de evidencia
+├── security/    —  4 docs — Sandbox, seguridad forense, hardening
+├── governance/  —  2 docs — Trust levels, risk layer
+├── specialized/ —  2 docs — Módulos especializados menores
+├── root/        — 13 docs — API, CLI, config, namespace shim, core
+├── scripts/     — 10 docs — Utilidades de ejecución, conversión, análisis
+└── unclassified/— 78 docs — Módulos sin ruta Python resuelta (navegables vía sección 12)
+```
+
+Para actualizar el estado de idiomas tras añadir traducciones:
+```bash
+cd docs/academic && python3 refresh_index_status.py
+```
 
 ---
 
@@ -36,14 +61,14 @@
 |---------------|-----|---------|
 | `vigia/core/forensic_technical_detector.py` | [forensic_technical_detector_academic.md](core/forensic_technical_detector_academic.md) | EN/ES/RU/ZH |
 | `vigia/core/vigia_core_forensic_technical_detector.py` | [vigia_core_forensic_technical_detector_academic.md](core/vigia_core_forensic_technical_detector_academic.md) | EN/ES/RU/ZH |
-| `vigia/core/semiotic_detector.py` | [94fbce3d_academic.md](unclassified/94fbce3d_academic.md) | EN/ES |
+| `vigia/core/semiotic_detector.py` | [94fbce3d_academic.md](unclassified/94fbce3d_academic.md) | EN/ES/RU/ZH |
 | `vigia/core/semiotic_detector_v2.py` | [semiotic_detector_v2_academic.md](core/semiotic_detector_v2_academic.md) | EN/ES/RU/ZH |
 | `vigia/core/vigia_core_semiotic_detector.py` | [vigia_core_semiotic_detector_academic.md](core/vigia_core_semiotic_detector_academic.md) | EN/ES/RU/ZH |
 | `vigia/core/narrative_auditor.py` | [narrative_auditor_academic.md](core/narrative_auditor_academic.md) | EN/ES/RU/ZH |
 | `vigia/core/peirceplanner_bounded.py` | [673c2ea3_academic.md](unclassified/673c2ea3_academic.md) | EN/ES/RU/ZH |
 | `vigia/core/abductive_intent_engine.py` | [abductive_intent_engine_academic.md](core/abductive_intent_engine_academic.md) | EN/ES/RU/ZH |
 | `vigia/abductive_intent_engine.py` | [abductive_intent_engine_academic.md](root/abductive_intent_engine_academic.md) | EN/ES/RU/ZH |
-| `vigia/core/carnegie_education_detector.py` | [carnegie_education_detector_academic.md](core/carnegie_education_detector_academic.md) | EN |
+| `vigia/core/carnegie_education_detector.py` | [carnegie_education_detector_academic.md](core/carnegie_education_detector_academic.md) | EN/ES/RU/ZH |
 
 ### 01.2 — Señales, Mapeo y Calidad
 
@@ -74,11 +99,11 @@
 |---------------|-----|---------|
 | `vigia/core/pipeline.py` | [pipeline_academic.md](core/pipeline_academic.md) | EN/ES/RU/ZH |
 | `vigia/core/canonicalize.py` | [canonicalize_academic.md](core/canonicalize_academic.md) | EN/ES/RU/ZH |
-| `vigia/core/chain_of_custody.py` | [chain_of_custody_academic.md](core/chain_of_custody_academic.md) | EN/ES/RU |
+| `vigia/core/chain_of_custody.py` | [chain_of_custody_academic.md](core/chain_of_custody_academic.md) | EN/ES/RU/ZH |
 | `vigia/core/integrity_constraints.py` | [integrity_constraints_academic.md](core/integrity_constraints_academic.md) | EN/ES/RU/ZH |
 | `vigia/core/audit_action.py` | [audit_action_academic.md](core/audit_action_academic.md) | EN/ES/RU/ZH |
 | `vigia/core/execution_logger.py` | [execution_logger_academic.md](core/execution_logger_academic.md) | EN/ES/RU/ZH |
-| `vigia/core/bundle_builder.py` | [5d49495e_academic.md](unclassified/5d49495e_academic.md) | EN |
+| `vigia/core/bundle_builder.py` | [5d49495e_academic.md](unclassified/5d49495e_academic.md) | EN/ES/RU/ZH |
 
 ### 01.5 — Evidencia, Confianza y Decisión
 
@@ -87,9 +112,9 @@
 | `vigia/core/evidence_aggregator.py` | [evidence_aggregator_academic.md](core/evidence_aggregator_academic.md) | EN/ES/RU/ZH |
 | `vigia/core/trust_fusion.py` | [trust_fusion_academic.md](core/trust_fusion_academic.md) | EN/ES/RU/ZH |
 | `vigia/core/trust_levels.py` | [trust_levels_academic.md](core/trust_levels_academic.md) | EN/ES/RU/ZH |
-| `vigia/core/decision_layer.py` | [1ea10b1b_academic.md](unclassified/1ea10b1b_academic.md) | EN/ES/RU |
+| `vigia/core/decision_layer.py` | [1ea10b1b_academic.md](unclassified/1ea10b1b_academic.md) | EN/ES/RU/ZH |
 | `vigia/core/dissent_report.py` | [dissent_report_academic.md](core/dissent_report_academic.md) | EN/ES/RU/ZH |
-| `vigia/core/explainable_governance.py` | [explainable_governance_academic.md](core/explainable_governance_academic.md) | EN |
+| `vigia/core/explainable_governance.py` | [explainable_governance_academic.md](core/explainable_governance_academic.md) | EN/ES/RU/ZH |
 | `vigia/core/compare_baseline.py` | [compare_baseline_academic.md](core/compare_baseline_academic.md) | EN/ES/RU/ZH |
 
 ### 01.6 — Razonamiento y Causalidad
@@ -108,7 +133,7 @@
 | Módulo Python | Doc | Idiomas |
 |---------------|-----|---------|
 | `vigia/core/config_sentinel.py` | [config_sentinel_academic.md](core/config_sentinel_academic.md) | EN/ES/RU/ZH |
-| `vigia/core/path_guard.py` | [path_guard_academic.md](core/path_guard_academic.md) | EN |
+| `vigia/core/path_guard.py` | [path_guard_academic.md](core/path_guard_academic.md) | EN/ES/RU/ZH |
 | `vigia/core/risk_bounded_layer.py` | [777f8e26_academic.md](unclassified/777f8e26_academic.md) | EN/ES/RU/ZH |
 | `vigia/core/shadow_mode.py` | [be1aca3f_academic.md](unclassified/be1aca3f_academic.md) | EN/ES/RU/ZH |
 | `vigia/core/resource_optimizer.py` | [1566c038_academic.md](unclassified/1566c038_academic.md) | EN/ES/RU/ZH |
@@ -197,8 +222,7 @@
 |---------------|-----|---------|
 | `vigia/tools/vigia_case_adapter.py` | [vigia_case_adapter_academic.md](tools/vigia_case_adapter_academic.md) | EN/ES/RU/ZH |
 | `vigia/tools/vigia_entanglement.py` | [vigia_entanglement_academic.md](tools/vigia_entanglement_academic.md) | EN/ES/RU/ZH |
-| `vigia/tools/vigia_planner.py` | [vigia_planner_academic.md](tools/vigia_planner_academic.md) | EN/ES/RU/ZH |
-| `vigia/tools/vigia_planner_GIT.py` | [vigia_planner_GIT_academic.md](tools/vigia_planner_GIT_academic.md) | EN/ES/RU/ZH |
+| `vigia/tools/vigia_planner.py` / `vigia_planner_GIT.py` | [vigia_planner_academic.md](tools/vigia_planner_academic.md) | EN/ES/RU/ZH |
 | `vigia/tools/vigia_sift_bridge.py` | [3f495b70_academic.md](unclassified/3f495b70_academic.md) | EN/ES/RU/ZH |
 | `vigia/tools/vision_audit.py` | [vision_audit_academic.md](tools/vision_audit_academic.md) | EN/ES/RU/ZH |
 
@@ -241,10 +265,9 @@
 | `vigia/forensics/vision_audit_final.py` | [b2c8b2e5_academic.md](unclassified/b2c8b2e5_academic.md) | EN/ES/RU/ZH | Visión forense final |
 | `vigia/forensics/forensic_reporter.py` | [2640bfa6_academic.md](unclassified/2640bfa6_academic.md) | EN/ES/RU/ZH | Reporting forense |
 | `vigia/forensics/pdf_dual_parser.py` | [pdf_dual_parser_academic.md](forensics/pdf_dual_parser_academic.md) | EN/ES/RU/ZH | Análisis PDF dual |
-| `vigia/forensics/pki_tools.py` | [3c13ec36_academic.md](unclassified/3c13ec36_academic.md) | EN/ES/RU/ZH | PKI / Certificados |
+| `vigia/forensics/pki_tools.py` | [3c13ec36_academic.md](unclassified/3c13ec36_academic.md) | EN/ES/RU/ZH | PKI / X.509 / PKCS#11 |
 | `vigia/forensics/rfc3161_chain.py` | [rfc3161_chain_academic.md](forensics/rfc3161_chain_academic.md) | EN/ES/RU/ZH | RFC 3161 timestamp |
 | `vigia/forensics/vigia_chain_of_custody.py` | [vigia_chain_of_custody_academic.md](forensics/vigia_chain_of_custody_academic.md) | EN/ES/RU/ZH | Chain of Custody |
-| `vigia/forensics/pki_tools.py` | [3c13ec36_academic.md](unclassified/3c13ec36_academic.md) | EN/ES/RU/ZH | X.509 / PKCS#11 |
 
 ---
 
@@ -262,7 +285,7 @@
 | `vigia/inference/cross_artifact_resonance.py` | [cross_artifact_resonance_academic.md](inference/cross_artifact_resonance_academic.md) | EN/ES/RU/ZH |
 | `vigia/inference/metabolic_profiler.py` | [metabolic_profiler_academic.md](inference/metabolic_profiler_academic.md) | EN/ES/RU/ZH |
 | `vigia/memory/case_pattern_library.py` | [be71e68a_academic.md](unclassified/be71e68a_academic.md) | EN/ES/RU/ZH |
-| `vigia/collapse_decision.py` | [7b5f476a_academic.md](unclassified/7b5f476a_academic.md) | EN |
+| `vigia/collapse_decision.py` | [7b5f476a_academic.md](unclassified/7b5f476a_academic.md) | EN/ES/RU/ZH |
 
 ---
 
@@ -327,7 +350,7 @@
 |---------------|-----|---------|
 | `scripts/run_vigia_full.py` | [2c0d7aea_academic.md](unclassified/2c0d7aea_academic.md) | EN/ES/RU/ZH |
 | `scripts/run_case.py` | [run_case_academic.md](scripts/run_case_academic.md) | EN/ES/RU/ZH |
-| `scripts/run_demo.py` | [run_demo_academic.md](scripts/run_demo_academic.md) | EN |
+| `scripts/run_demo.py` | [run_demo_academic.md](scripts/run_demo_academic.md) | EN/ES/RU/ZH |
 | `scripts/pre_release_check.py` | [pre_release_check_academic.md](scripts/pre_release_check_academic.md) | EN/ES/RU/ZH |
 | `vigia/scripts/compare_runs.py` | [8cf3f33e_academic.md](unclassified/8cf3f33e_academic.md) | EN/ES/RU/ZH |
 | `vigia/scripts/evaluate_detector.py` | [c8cb7042_academic.md](unclassified/c8cb7042_academic.md) | EN/ES/RU/ZH |
@@ -342,10 +365,10 @@
 | `scripts/convert_legacy_cases.py` | [convert_legacy_cases_academic.md](scripts/convert_legacy_cases_academic.md) | EN/ES/RU/ZH |
 | `scripts/convert_md_cases.py` | [convert_md_cases_academic.md](scripts/convert_md_cases_academic.md) | EN/ES/RU/ZH |
 | `scripts/export_patterns.py` | [export_patterns_academic.md](scripts/export_patterns_academic.md) | EN/ES/RU/ZH |
-| `scripts/fix_inits.py` | [fix_inits_academic.md](scripts/fix_inits_academic.md) | ZH |
+| `scripts/fix_inits.py` | [fix_inits_academic.md](scripts/fix_inits_academic.md) | EN/ES/RU/ZH |
 | `scripts/fix_security_init.py` | [__init___academic.md](security/__init___academic.md) | EN/ES/RU/ZH |
-| `scripts/vigia_mass_refactor.py` | [vigia_mass_refactor_academic.md](scripts/vigia_mass_refactor_academic.md) | EN/ES |
-| `scripts/vigia_patch_valkyrie.py` | [2989e9bd_academic.md](unclassified/2989e9bd_academic.md) | EN/ES |
+| `scripts/vigia_mass_refactor.py` | [vigia_mass_refactor_academic.md](scripts/vigia_mass_refactor_academic.md) | EN/ES/RU/ZH |
+| `scripts/vigia_patch_valkyrie.py` | [2989e9bd_academic.md](unclassified/2989e9bd_academic.md) | EN/ES/RU/ZH |
 | `recalibrate_cases.py` | [13bb704b_academic.md](unclassified/13bb704b_academic.md) | EN/ES/RU/ZH |
 | `apply_caie_patch.py` | [442419c2_academic.md](unclassified/442419c2_academic.md) | EN/ES/RU/ZH |
 | `cases/demo_case.py` | [demo_case_academic.md](scripts/demo_case_academic.md) | EN/ES/RU/ZH |
@@ -359,8 +382,8 @@
 | Módulo Python | Doc | Idiomas |
 |---------------|-----|---------|
 | `vigia/abduction/hypothesis_lineage.py` | [hypothesis_lineage_academic.md](specialized/hypothesis_lineage_academic.md) | EN/ES/RU/ZH |
-| `vigia/abduction/vigia_artifact_graph.py` | [3254c6ec_academic.md](unclassified/3254c6ec_academic.md) | EN/ES |
-| `vigia/abduction/vigia_counter_fact.py` | [8f6f7187_academic.md](unclassified/8f6f7187_academic.md) | EN |
+| `vigia/abduction/vigia_artifact_graph.py` | [3254c6ec_academic.md](unclassified/3254c6ec_academic.md) | EN/ES/RU/ZH |
+| `vigia/abduction/vigia_counter_fact.py` | [8f6f7187_academic.md](unclassified/8f6f7187_academic.md) | EN/ES/RU/ZH |
 
 ### Acción Mitigación (`action/`)
 
@@ -376,43 +399,50 @@
 
 ---
 
-## Documentos con cobertura de idioma incompleta
+## 12 — Módulos Adicionales (sin clasificar por arquitectura)
 
-Los siguientes documentos fueron generados con cobertura parcial de idiomas. Candidatos a regeneración con Batch API si el tiempo lo permite:
+> Módulos identificados pero no asignados a una subsección específica. Todos referenciados por hash.
+> Ejecutar `python3 refresh_index_status.py` para actualizar la columna Idiomas.
 
-| Hash | Idiomas presentes | Faltante |
-|------|-------------------|----------|
-| `9f525516` | ZH únicamente | EN/ES/RU |
-| `69cb51de` | ZH únicamente | EN/ES/RU |
-| `d4e678b5` | EN únicamente | ES/RU/ZH |
-| `8f6f7187` | EN únicamente | ES/RU/ZH |
-| `aa4e03f6` | EN únicamente | ES/RU/ZH |
-| `9ae17aea` | EN únicamente | ES/RU/ZH |
-| `7b5f476a` | EN únicamente | ES/RU/ZH |
-| `608005f0` | EN únicamente | ES/RU/ZH |
-| `e0f29980` | EN únicamente | ES/RU/ZH |
-| `5d49495e` | EN únicamente | ES/RU/ZH |
-| `3254c6ec` | EN/ES únicamente | RU/ZH |
-| `2989e9bd` | EN/ES únicamente | RU/ZH |
-| `637ecdc6` | EN/ES únicamente | RU/ZH |
-| `94fbce3d` | EN/ES únicamente | RU/ZH |
-| `cc27fff8` | EN/ES/RU | ZH |
-| `1ea10b1b` | EN/ES/RU | ZH |
-| `779b4236` | EN/ES/RU | ZH |
+| Módulo Python | Doc | Idiomas |
+|---------------|-----|---------|
+| `pipeline_adapter.py` (Pipeline Adapter canónico) | [131c3f89_academic.md](unclassified/131c3f89_academic.md) | EN/ES/RU/ZH |
+| `vigia_sift_bridge_patch.py` (BRIDGE_PATCH_FINAL) | [19008897_academic.md](unclassified/19008897_academic.md) | EN/ES/RU/ZH |
+| `document_integrity.py` (v2, PDF/DOCX) | [1c52745b_academic.md](unclassified/1c52745b_academic.md) | EN/ES/RU/ZH |
+| `vigia_namespace_shim.py` (compatibility stub) | [2d6dff4d_academic.md](unclassified/2d6dff4d_academic.md) | EN/ES/RU/ZH |
+| `ci_gate.py` | [2ddb875b_academic.md](unclassified/2ddb875b_academic.md) | EN/ES/RU/ZH |
+| `vigia_batch_postprocess.py` | [43e2ca4a_academic.md](unclassified/43e2ca4a_academic.md) | EN/ES/RU/ZH |
+| `run_calibration.py` | [495820ba_academic.md](unclassified/495820ba_academic.md) | EN/ES/RU/ZH |
+| `pattern_repository_init.py` (FPRI) | [4cffb019_academic.md](unclassified/4cffb019_academic.md) | EN/ES/RU/ZH |
+| `vigia_server.py` | [59fb9f58_academic.md](unclassified/59fb9f58_academic.md) | EN/ES/RU/ZH |
+| `run_stress_tests.py` | [5f1c653e_academic.md](unclassified/5f1c653e_academic.md) | EN/ES/RU/ZH |
+| `evidence_narrative_generator.py` | [68e0e743_academic.md](unclassified/68e0e743_academic.md) | EN/ES/RU/ZH |
+| `vigia_scorer.py` (variante B) | [69cb51de_academic.md](unclassified/69cb51de_academic.md) | EN/ES/RU/ZH |
+| `vigia_batch_doc_generator.py` | [779b4236_academic.md](unclassified/779b4236_academic.md) | EN/ES/RU/ZH |
+| `report_exporter_v2.py` | [8d0b9079_academic.md](unclassified/8d0b9079_academic.md) | EN/ES/RU/ZH |
+| `verify_ebs_v1.py` (Independent EBS Verifier) | [9810a97e_academic.md](unclassified/9810a97e_academic.md) | EN/ES/RU/ZH |
+| `recommendation_engine_v3.1.py` | [adc5d097_academic.md](unclassified/adc5d097_academic.md) | EN/ES/RU/ZH |
+| `negation_handler.py` | [b8bde3c7_academic.md](unclassified/b8bde3c7_academic.md) | EN/ES/RU/ZH |
+| `generate_execution_log.py` | [e6461489_academic.md](unclassified/e6461489_academic.md) | EN/ES/RU/ZH |
+| `convert_synthetic_cases.py` | [e74f0754_academic.md](unclassified/e74f0754_academic.md) | EN/ES/RU/ZH |
+| `generate_release_bundle.py` | [ebd2829f_academic.md](unclassified/ebd2829f_academic.md) | EN/ES/RU/ZH |
+| `generate_report.py` | [ec80b958_academic.md](unclassified/ec80b958_academic.md) | EN/ES/RU/ZH |
+| `vigia_api.py` (variante — interface simplificada) | [ed735669_academic.md](unclassified/ed735669_academic.md) | EN/ES/RU/ZH |
+| `vigia_scorer.py` (variante C) | [ed8c1a84_academic.md](unclassified/ed8c1a84_academic.md) | EN/ES/RU/ZH |
+| `sanitize_judicial.py` | [f8ae3e67_academic.md](unclassified/f8ae3e67_academic.md) | EN/ES/RU/ZH |
 
 ---
 
 ## Estadísticas del corpus
 
+> Actualizar ejecutando: `python3 docs/academic/refresh_index_status.py`
+
 | Métrica | Valor |
 |---------|-------|
-| Total documentos | 193 |
-| Cobertura EN/ES/RU/ZH completa | ~160 docs (~83%) |
-| Documentos solo EN | 8 |
-| Documentos solo ZH | 2 |
+| Total documentos | 192 |
+| Cobertura EN/ES/RU/ZH completa | 192 docs (100%) |
 | Sección más grande | `core/` (49 docs) |
 | Sección más crítica para SIFT | `sift/` (16 docs) |
-| Módulos duplicados detectados | 7 pares (ver recomendaciones) |
 
 ---
 

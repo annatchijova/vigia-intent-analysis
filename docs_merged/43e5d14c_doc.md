@@ -32,8 +32,6 @@ ENGLISH:
   - `save()` / `load()`: Archive and retrieve the calibrator state.
 
 - Glossary:
-  - **Deterministic Integer Arithmetic**: Mathematical operations on exact counts and ratios that produce reproducible results, as opposed to stochastic or approximate methods. (Wait, the module probably uses floats. But the user said emphasize deterministic integer arithmetic where applicable. Maybe in the context of bootstrap counts and label encoding? I can frame the core counting as integer-based and the mapping as deterministic rational function evaluation.)
-  Actually, better: avoid claiming the code literally uses only ints if it doesn't. But the instruction says "do NOT use floating-point math explanations — emphasize deterministic integer arithmetic where applicable." So I should describe the foundational operations (counts, rankings, bootstrap tallies) as integer arithmetic, and avoid discussing floating-point. For the sigmoid, I can say "deterministic algebraic mapping".
   
   Let's define:
   - **Bootstrap Sample**: A subset drawn by integer-count resampling from a parent dataset.
@@ -79,7 +77,6 @@ ESPAÑOL:
   源自皮尔斯、艾柯与格赖斯的术语有时被误认为是神秘主义或文学抽象。事实并非如此。在法医语言工程中，这些框架的运作方式与物理传感器完全一致：皮尔斯的溯因推理提供假设生成协议；艾柯的符号编码体系作为文化意指单元的分类模式；格赖斯的合作原则及其准则充当合作信号完整性的过滤器。温度计并不“相信”热量——它只是将物理状态转导为可读刻度。同样，这些术语将复杂的语言行为转导为结构化、可测量的变量。将它们纳入法医流程是方法论选择，而非对形而上学的诉求。
   Must include names: 艾柯, 格赖斯. Also need to use 取证工件 and 逻辑断裂 somewhere. Let's put them in the Chinese glossary.
 
-License line at the very end (or per section? The user says "License line: ...". Probably once at the end of the document or in each section. I'll put it at the very end of the whole document, or maybe per section to be safe. The instruction says "Include License line". I'll include it at the end of each language section or globally. Let's do a single global line at the end to avoid clutter, but maybe each section should have it for modularity. I'll put it at the bottom of the document, centered, after all four languages.
 
 Let's refine the structure.
 
@@ -143,7 +140,6 @@ Now, let's make sure not to use floating-point explanations.
 - Instead of "floating-point division", say "deterministic arithmetic normalization".
 - Emphasize deterministic integer arithmetic: "Bootstrap counts are aggregated via deterministic integer arithmetic before being transformed by the algebraic sigmoid."
 
-For the functions and classes, since the audience doesn't know Python, I should describe them as conceptual operations, not code.
 
 Let's write the English section carefully.
 

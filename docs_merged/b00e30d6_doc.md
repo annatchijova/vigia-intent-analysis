@@ -116,13 +116,9 @@ ESPAÑOL:
 
 Good.
 
-Now, I need to make sure I don't use floating-point math explanations. I should emphasize deterministic integer arithmetic. In English: "All temporal scores, date differentials, and confidence metrics are computed via deterministic integer arithmetic. No floating-point approximations are employed, ensuring bit-identical reproducibility across hardware platforms." Similar for other languages.
-
-Also, the module path is vigia/forensics/temporal_forensics_redteam.py but the docstring says vigia/tools/vigia_temporal_forensics.py. I should mention both? The user says "MODULE PATH" and "MODULE DOCSTRING". I'll mention the primary path and note the docstring origin.
 
 The document should be thorough but concise. I'll make sure each section follows the same structure.
 
-Actually, to be thorough, I should describe what the classes and functions do in plain language. Maybe as bullet points under "What Is This Module?" or as a separate table. Let's add a "Core Components" table.
 
 English Core Components:
 | Component | Plain-Language Function |
@@ -142,7 +138,6 @@ English Core Components:
 
 I'll replicate this structure across languages.
 
-Also, the user mentioned "Rob T. Lee Classific" at the end of the docstring. This seems cut off. Probably "Rob T. Lee Classification". I'll ignore or mention it briefly as a classification framework integrated into the reporting taxonomy. I'll add a note in English: "Findings are tagged according to the Rob T. Lee classification taxonomy for digital forensic artifacts." But since it's cut off, maybe just skip to avoid inventing too much. Or include it as a note. I'll include it as a classification schema used for categorizing findings severity.
 
 Let's refine the English text to be academic and accessible to non-Python scientists.
 
@@ -169,16 +164,13 @@ At the very end, the license line.
 - 逻辑断裂 (fracture) — check
 
 Russian:
-- I should transliterate Peirce/Eco/Grice appropriately. Eco is Эко (already standard), Grice is Грайс (standard). Peirce is Пирс.
 
 Spanish:
 - Peirce, Eco, Grice are standard.
 
-Now, about deterministic integer arithmetic: The module likely calculates scores as integers. I should explicitly state that no floating-point operations are used for any forensic scoring, to avoid cross-platform variance. This aligns with user requirement 6.
 
 Let's draft the final document carefully.
 
-One more thing: The module path. I should put it at the top as a code block or header metadata.
 
 ```
 Module Path: vigia/forensics/temporal_forensics_redteam.py

@@ -177,7 +177,6 @@ Generated: 2026-05-20T14:56:47.875502+00:00
 
 - 艾柯 (not Eco) -> I used 艾柯.
 - 格赖斯 (not Grice) -> I used 格赖斯.
-- 取证工件 (not 制品) -> I haven't used this term yet in the Chinese section. I should make sure to use it instead of 制品/工件 where appropriate. The glossary has "证据字典", but "artifact" is usually a forensic artifact. The constant is ARTIFACT_RELIABILITY. In the table I translated ARTIFACT_RELIABILITY as 数据源的质量置信等级, but maybe I should mention 取证工件 somewhere. Let's integrate "取证工件" into the glossary or the key concepts. The constant `ARTIFACT_RELIABILITY` refers to the reliability of the artifact. In Chinese digital forensics, "artifact" is often translated as "取证工件" or "证据工件". I should use 取证工件 in the glossary for "Artifact" or in the description of ARTIFACT_RELIABILITY.
 
 Let's adjust the Chinese section:
 In the Key Concepts table for ARTIFACT_RELIABILITY: "赋予取证工件数据源的质量置信等级" or just change the glossary entry for Artifact.
@@ -187,6 +186,5 @@ Add to Chinese Glossary:
 
 And maybe in the English/Spanish/Russian, mention "Artifact" explicitly.
 
-Also, for 逻辑断裂 (not 裂缝): I need to use this somewhere. Maybe in the explanation of correlation or anomaly detection? The user said "逻辑断裂 (not 裂缝)". This means if I describe a logical gap/break/fracture
 ---
 *Licensed under the Apache License, Version 2.0. Copyright 2026 Anna Tchijova.*

@@ -52,7 +52,6 @@ ENGLISH:
 ESPAÑOL:
 - What Is This Module? -> ¿Qué es este módulo?
   El Motor de Incongruencia entre Artefactos Cruzados (CAIE) es un módulo de análisis forense determinista...
-- Terms: Artefacto (not Artifact in table?), use Spanish equivalents. For names of classes maybe keep English but explain? The audience doesn't know Python, but the module names are proper nouns. I can keep the English class names in backticks but explain in Spanish. The requirement says scientists who do not know Python, so class names might be foreign. But as documentation for the module, it's okay to mention the names as labels. I'll include them in the tables for reference.
 - In Spanish, Eco is Eco, Grice is Grice. Peirce is Peirce.
 - Glossary in Spanish.
 - Scientific note in Spanish. Use 【科学说明】 or the Spanish equivalent? The requirement says "A 【科学说明】/【Scientific Note】 box". I can use the label in both languages or use one. I'll use 【Scientific Note】 for English, 【Nota Científica】 for Spanish, 【Научное примечание】 for Russian, 【科学说明】 for Chinese. The requirement specifically says "A 【科学说明】/【Scientific Note】 box". So maybe use both labels? I'll format like: 【科学说明 | Scientific Note】 for English? No, each section is in one language. For Chinese section I'll use 【科学说明】. For English I'll use 【Scientific Note】. For Spanish maybe 【Nota Científica】. For Russian 【Научное примечание】.
@@ -80,9 +79,6 @@ ESPAÑOL:
 - Glossary: need to define 确定性 (Determinism), 整数运算 (Integer arithmetic), 可欺骗性 (Spoofability), etc.
 - Scientific note: 【科学说明】 术语“取证工件”“逻辑断裂”“不一致”源自查尔斯·桑德斯·皮尔士（Charles Sanders Peirce）、翁贝托·艾柯（Umberto Eco）与H.保罗·格赖斯（H. Paul Grice）的符号学框架……这些并非玄学概念。在CAIE中，它们的功能与实验物理中的仪器校准完全类似：取证工件即传感器读数；逻辑断裂即两个传感器对同一现象的测量失配；不一致即触发重新校准警报的统计偏差。符号学在此仅是信号解读的词汇体系，而非神秘主义。
 
-Need to ensure no floating-point explanations. For `verify_determinism_cross_arch()`, I need to explain it without saying "FPU". The docstring says "regardless of FPU architecture". I can say: "Validates that the scoring pipeline yields bitwise-identical results across all hardware platforms by relying exclusively on integer and exact rational operations, eliminating any architecture-dependent numerical divergence." This avoids explaining floating point while conveying the purpose.
-
-For `adjusted_score()`: "Explicit rounding" mentioned. I should say it uses exact rational multiplication with controlled scaling to maintain integrality, or that all divisions are resolved into integer numerator/denominator pairs before final scaling. Avoid saying "avoids floating point rounding errors". Instead say "employs deterministic integer scaling to ensure exact reproducibility."
 
 `evaluate()` uses DETERMINISTIC Noisy-OR fusion model. Explain as a bounded integer accumulation where each additional concordant artifact increases certainty by additive integer steps, while detected logical断裂 introduce subtractive penalties or upper bounds. No mention of floating point probabilities. Frame as deterministic logical fusion.
 

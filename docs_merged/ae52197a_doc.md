@@ -8,30 +8,23 @@ Generated: 2026-05-20T14:56:47.853917+00:00
 中文:
 **模块概述。** 支持脚本 `compare_baseline.py` 在 VIGÍA 分析引擎与朴素均值启发式之间执行确定性取证基准测试。该模块专为受控的黑客马拉松演示而设计，可处理离散的案例文件——完整队列或单一指定实例——并生成结构化输出键，将 VIGÍA 的推理逻辑与基线均值假设进行对比。不采用随机抽样；结果完全可复现。
 
-Now word count check:
 EN: ~48 words
 ES: ~52 words
 RU: ~46 words
 中文: ~46 words
 Total so far: ~192 words.
 
-Glossary (10 terms). Need to define them concisely. Maybe bilingual terms? The user wants 4 languages. The glossary could be a table or list with terms in English and definitions in 4 languages? That would be too long. Usually, a glossary is provided in the language of the text. But since the text is quadrilingual, perhaps the glossary entries should have the term and 4 short definitions? That would explode word count.
-
-Alternative: Provide the glossary in English only, but the user said "You always write in 4 languages". So probably everything should be in 4 languages. However, a glossary in 4 languages might mean listing the terms and their translations? Or 4 separate glossaries? Under 500 words total, that is impossible.
 
 Interpretation: The description should be in 4 languages. The glossary should contain 10 terms. The scientific notes should be included. Perhaps the glossary can be a single multilingual table where each term is given in English, Spanish, Russian, Chinese with a brief definition in English (or in all 4). But the constraint "You always write in 4 languages" suggests all content should be available in those languages. To fit under 500 words, I must be extremely terse.
 
-Maybe I should provide 4 very short descriptions (like 40 words each = 160 words), then one glossary section where each of the 10 terms is presented in English with its translation in the other 3 languages and a single English definition. But that violates "always write in 4 languages" somewhat.
 
 Better approach: The glossary itself can be concise entries, each defined in 4 languages? No, that's 4x the words.
 
-This implies the total output is under 500 words. So I need to be ruthlessly concise.
 
 Let's try a hybrid: The description is repeated in 4 languages (very short). Then the glossary is one list of 10 terms, where each term is given in English, and the definition is a single multilingual sentence? No, that's messy.
 
 Another idea: The glossary entries are just the 4-language equivalents of the term and a one-line definition in English only, but the intro says "Glossary / Glosario / Глоссарий / 词汇表". This might satisfy the requirement since the rest is in 4 languages.
 
-But the instruction "You always write in 4 languages: ENGLISH, ESPAÑOL, РУССКИЙ, 中文" is strong. However, a glossary is typically language-specific. Maybe I can provide 4 mini-glossaries, one per language, but each with fewer terms? The user said "Include a 10-term glossary." That likely means 10 terms total, not 40.
 
 Let's aim for a compact format:
 
@@ -156,11 +149,6 @@ Count: ~19 words.
 Total glossary: ~215 words.
 Grand total: ~236 + 215 = ~451 words. That's under 500! Perfect.
 
-But I need to make sure formatting doesn't add words? Word count is typically based on tokens separated by spaces. Punctuation attached to words counts as part of the word. My estimate should be fine.
-
-However, I should verify that I haven't used any floating-point math explanations. I have not. I mentioned "mean-value assumptions" and "bitwise reproducibility", but that's not floating-point math explanation. It's deterministic. Good.
-
-Also need to make sure no Python jargon. I used "script" which is somewhat technical but not specifically Python. I used "module" and "engine". The user said "scientists who do not know Python", so avoid terms like "import", "argparse", "JSON" maybe? The summary mentions JSON, but I can avoid it in the description. I used "case files" which is general enough. I did not mention command line arguments explicitly. Good.
 
 Let's refine the descriptions to be slightly more polished and ensure accurate word count.
 
@@ -227,13 +215,6 @@ Let's compress slightly.
 Total glossary: ~213 words.
 Grand total: ~245 + 213 = ~458 words. Under 500. Great.
 
-I should double-check if any floating-point explanation sneaked in. No. "mean-value assumptions" is about the naive method, not floating point. "Bitwise reproducibility" is about determinism, not floating point.
-
-One final check: The user said "Module: vigia/core/compare_baseline.py" and "Content summary: scripts/compare_baseline.py". I should probably refer to it as `compare_baseline.py` support module, not necessarily the full path, but I can mention it as the support module.
-
-Also, the user wants documentation for scientists who do not know Python. So avoid "script" maybe? "Support module" is okay. "Evaluates discrete case files" is okay.
-
-Let's format cleanly. Use bold headers. Maybe separate the 4 languages with horizontal rules or just bold headers. I'll use bold headers.
 
 Final check on word count. I will count more carefully.
 

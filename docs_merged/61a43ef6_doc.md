@@ -171,7 +171,6 @@ Trim descriptions:
 
 Total saved ~17 words. New glossary ~131 words. Total ~493. Good.
 
-Let's verify term counts again with exact word counts.
 
 EN text:
 "The `vigia/security/vigia_seguridad.py` module, codenamed "Cocinero", is the deterministic security kernel of the VIGÍA forensic architecture. It unifies four defensive primitives: (1) ASCII sanitization, enforcing a strict 7-bit boundary on untrusted inputs; (2) path sandboxing, restricting filesystem traversal to an enumerated allow-list directory; (3) prompt injection shielding, neutralizing adversarial substrings via lexical normalization before LLM dispatch; and (4) subprocess whitelisting, permitting only cryptographically verified binaries. Scientific note: validation relies on exact-set membership and discrete grammar rules, ensuring reproducible, stochastic-free behavior without floating-point logic in access-control decisions."

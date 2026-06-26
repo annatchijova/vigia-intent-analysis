@@ -13,7 +13,6 @@ ENGLISH:
   - Hash chaining: Each new entry incorporates the hash of the previous entry, creating a dependency chain. If any historical entry is altered, the mathematical linkage breaks.
   - Deterministic integer hashing: All digest values are computed via exact integer arithmetic (bitwise logic, modular addition) over finite fields. No floating-point operations are used; identical inputs always yield identical outputs.
   - root_hash: A concise fingerprint of the entire ledger's current state. Like a balance sheet total that reflects every prior transaction.
-  - verify(): A complete audit procedure that recomputes the chain of integer hashes from genesis to the present block and confirms zero logical断裂... wait, in English the user didn't specify a term for logical断裂, but in Chinese they did. For English, I should use "logical discontinuity" or "structural break". But the note about 逻辑断裂 is specifically for Chinese? The user said "Chinese translations must use: ... 逻辑断裂 (not 裂缝)". So I should use "logical断裂" in Chinese, but in English I can use "logical discontinuity" or similar. Actually, the user requirement is specifically about Chinese translations. I'll ensure Chinese uses those terms.
 
 Table of Classes/Functions:
 | Component | Role | Deterministic Guarantee |
@@ -100,9 +99,7 @@ Scientific Note:
 - 艾柯 (Eco) - used
 - 格赖斯 (Grice) - used
 - 取证工件 (artifacts) - used
-- 逻辑断裂 (not 裂缝) - I should include this somewhere. Maybe in key concepts or glossary, or in the note. The user said "逻辑断裂 (not 裂缝)". I should use it in the Chinese text when describing what verify() detects or chain breaks. I used "断裂" in the key concept description. Let me ensure it's "逻辑断裂" specifically. In the verify() description: "发现任何逻辑断裂". Good.
 
-Now I need to format everything nicely in Markdown.
 
 # Module Documentation: `vigia/pipeline/security_evidence_registry.py`
 
@@ -146,11 +143,9 @@ At the very end, the
 
 Simple.
 
-Now let me review the Chinese terms again to ensure compliance:
 - 艾柯: yes, in note.
 - 格赖斯: yes, in note.
 - 取证工件: yes, in note.
-- 逻辑断裂: yes, in key concepts table or verify description. I'll make sure it's in the Chinese text explicitly. I can add a table row or glossary entry.
 
 In Chinese section:
 Table:
@@ -169,15 +164,11 @@ Glossary should include 逻辑断裂:
 
 Now the scientific note for Chinese must be 【科学说明】.
 English: 【Scientific Note】
-Spanish: 【Nota Científica】 or keep 【Scientific Note】? The user said "A 【科学说明】/【Scientific Note】 box". So I can use the respective language's bracketed title or keep them consistent. I'll use:
 - EN: 【Scientific Note】
 - ES: 【Nota Científica】
 - RU: 【Научное Примечание】
 - ZH: 【科学说明】
 
-Now, about not using floating-point math explanations. I need to make sure I don't say things like "hash is a large decimal number" in a way that implies floating point. I should emphasize they are integers, fixed-length bit strings, exact arithmetic. I'll use phrasing like "finite field arithmetic", "bitwise logic", "modular addition", "exact integer representation".
-
-Also, I should ensure the module path is clearly stated at the top.
 
 ---
 

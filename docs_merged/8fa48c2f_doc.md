@@ -212,11 +212,9 @@ For Fraction: 精确分数（Fraction），即两个整数的比值，分子与�
 
 Ensure no floating-point math explanations. Emphasize 确定性整数运算.
 
-Now, I need to assemble all four sections in one Markdown document. I'll separate them clearly with headers.
 
 I must ensure I don't use Python code syntax or explain Python specifics beyond translating them to plain concepts (e.g., "frozen=True" can be mentioned as the technical mechanism behind immutable records, but explained simply).
 
-Let's write it out fully. Be thorough but concise. I need to make sure all classes, functions, constants are covered or at least the key ones are in tables. The user listed many functions. I should include a table for Test & Validation Functions and one for Core Computation Functions.
 
 Let's plan the tables for each language:
 
@@ -244,7 +242,6 @@ This is thorough. I'll make sure each table is clear.
 
 Now, writing the content. I will be careful with the Chinese section to use the mandated terms.
 
-One more check: The user said "You NEVER use floating-point math explanations for deterministic systems." So I must not say things like "instead of float for precision". I should say "uses exact integer fractions" and "rejects floating-point numbers because they introduce non-deterministic rounding". Actually, saying they introduce rounding is okay, but I should not explain floating-point math. Just state that the system uses integer-based exact rational arithmetic and bars floats.
 
 Also, the scientific note must explain that Peirce/Eco/Grice is NOT mysticism using sensor analogy.
 

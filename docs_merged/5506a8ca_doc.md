@@ -40,11 +40,6 @@ Generated: 2026-05-20T14:56:47.866047+00:00
 
 ```
 
-Also, the user specified "中文 translations must use: 艾柯 (not Eco), 格赖斯 (not Grice), 取证工件 (not 制品), 逻辑断裂 (not 裂缝)". I need to ensure 取证工件 is used in the Chinese glossary. I used it. Good.
-
-One more check: "Do NOT use floating-point math explanations for deterministic systems." and "emphasize deterministic integer arithmetic where applicable". I should make sure I don't explain fractions as "floating point alternatives" but rather as exact integer ratios. The wording "never a floating-point estimate" is acceptable as a negative prohibition, not an explanation of floating-point math. But to be ultra-safe, I should just say "exact integer ratio, never an approximate decimal". I'll avoid the phrase "floating-point" entirely if possible, except maybe to say "no floating-point arithmetic is used". The prompt says "Do NOT use floating-point math explanations". So I won't explain how floats work. I'll just say we use exact integer fractions.
-
-Let's double-check the denominator validation. The prompt mentions "FIX P0: Validación de denominador > 0 en TODAS las operaciones de Fraction." I need to include this in the documentation. I'll add it to the table and glossary.
 
 Let's refine the content one more time.
 

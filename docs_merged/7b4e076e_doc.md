@@ -18,20 +18,15 @@ ESPAÑOL:
 中文:
 **桥接候选工具 (_BRIDGE_CANDIDATES)**: 在获得确定性流程正式地位之前，正在接受稳定性评估的临时中间组件。
 
-Also, the docstring says "Exit codes: 0 — All runs pro". I should mention exit codes briefly. I can add a row in the table or mention in the text.
-
-Let's add to "What Is This Module?" or a separate small table. Since the user lists it, I should cover it.
 
 | Exit Code | Meaning |
 |---|---|
 | 0 | All runs produced identical hashes; the tool is deterministic. |
 | Non-zero | Hash mismatch detected; non-determinism found. |
 
-I'll add this to the key concepts table in each language.
 
 Now, compiling the final output.
 
-I need to ensure the markdown is clean. Use headers.
 
 Structure:
 # Module Documentation: `vigia/inference/check_determinism.py`
@@ -109,11 +104,9 @@ Structure:
 - 取证工件: used in glossary and text. Yes.
 - 逻辑断裂: used in table and glossary. Yes.
 
-Also, the user says "Do NOT use floating-point math explanations — emphasize deterministic integer arithmetic where applicable". I have explicitly stated in EN: "non-determinism... floating-point approximations (the latter being irrelevant here as the system uses integer arithmetic)." And in the SHA-256 description: "deterministic integer-based hashing algorithm". This is good.
 
 One final check on the scientific note sensor analogy. I used the word "witness" for sensor. That's a good analogy. I explicitly said they are formal abstractions, not mysticism. Good.
 
-I should ensure I don't use any Python code examples, since the audience doesn't know Python. The user said "Generate documentation for the following Python module... for scientists who do NOT know Python". I will not include code blocks or Python syntax beyond the module path.
 
 "VIGIA borrows terminology from semiotics—Charles Sanders Peirce, Umberto Eco, and H.P. Grice—to describe information structures. These terms are formal abstractions, not mysticism. Consider the sensor analogy: in engineering, we call a physical sensor a 'witness' to an event even though it lacks consciousness; it simply records data. Likewise, Peirce's sign, Eco's code, and Grice's maxims are analytical lenses for classifying how digital evidence carries meaning. They provide a rigorous logical framework; they do not invoke supernatural agency. When this module checks for determinism, it is ensuring that the 'sensor' (the analytical tool) records the same 'testimony' (the report) every time under identical conditions."
 

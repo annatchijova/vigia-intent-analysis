@@ -13,7 +13,7 @@ Generated: 2026-05-20T14:56:47.872977+00:00
 This module is a deterministic forensic engine that reads the Master File Table (MFT) of an NTFS volume. It treats each file record as an **evidence artifact** and subjects it to exact integer and rational arithmetic in order to detect temporal inconsistencies—specifically *timestomping*, where an attacker forges file dates. Raw binary timestamps are converted into structured, reproducible signals via `to_signal()`. Think of the module as a digital chromatograph: it separates the true timeline from injected noise by measuring **logical breaks** in the data sequence.
 
 **Security Update (Tanda Seguridad P0)**  
-The engine now detects *forced* consistency between the `$SI` (Standard Information) and `$FN` (File Name) attributes. An attacker who manipulates both attributes in concert is still detected through four orthogonal tests: (a) timestamp entropy analysis, flagging values that are suspiciously “round”; (b) creation-sequence logic, verifying that the MFT record number correlates with its claimed creation time; (c) time-tunnel detection, isolating files with impossible future or archaic dates; and (d) cross-source correlation, comparing MFT claims against independent Registry timelines.
+The engine now detects *forced* consistency between the `$SI` (Standard Information) and `$FN` (File Name) attributes. An attacker who manipulates both attributes in concert is still detected through four orthogonal tests: (a) timestamp entropy analysis, flagging values that are suspiciously "round"; (b) creation-sequence logic, verifying that the MFT record number correlates with its claimed creation time; (c) time-tunnel detection, isolating files with impossible future or archaic dates; and (d) cross-source correlation, comparing MFT claims against independent Registry timelines.
 
 All internal calculations are performed with exact rational numbers (`Fraction`), guaranteeing that every result is reproducible bit-for-bit on every run.
 
@@ -27,7 +27,7 @@ All internal calculations are performed with exact rational numbers (`Fraction`)
 | **$SI Attribute** | Standard Information attribute; stores creation, modification, access, and MFT-change timestamps. | Checked against `$FN` to expose forced consistency. |
 | **$FN Attribute** | File Name attribute; stores a redundant copy of timestamps plus the file name. | Provides a second, independent timeline source. |
 | **Timestomping** | An anti-forensic technique in which timestamp metadata is deliberately altered. | Detected via entropy thresholds and sequence logic. |
-| **Timestamp Entropy** | A metric of randomness; low entropy indicates an artificially “round” time value. | Compared against `TIMESTOMP_ENTROPY_THRESHOLD`. |
+| **Timestamp Entropy** | A metric of randomness; low entropy indicates an artificially "round" time value. | Compared against `TIMESTOMP_ENTROPY_THRESHOLD`. |
 | **Time Tunnel** | A file whose date lies outside the physically possible window (future or extremely distant past). | Flagged by `TIME_TUNNEL_FUTURE_DAYS` and `TIME_TUNNEL_PAST_DAYS`. |
 | **Record vs. Time Sequence** | NTFS assigns record numbers sequentially; creation order must follow MFT layout. | `MFTTimelineAnalyzer` validates this correlation. |
 | **Cross-source Correlation** | Reconciling MFT timestamps against Registry key last-write times. | Reveals incomplete forgeries. |
@@ -65,6 +65,144 @@ All internal calculations are performed with exact rational numbers (`Fraction`)
 - **MFT (Master File Table)** — The core relational database within an NTFS filesystem that indexes every file.
 - **NTFS** — New Technology File System; the default journaling filesystem for Windows operating systems.
 - **Registry** — The Windows hierarchical configuration database, providing an independent chronological source.
-- **Timestomping** — The deliberate alteration of timestamp metadata
+- **Timestomping** — The deliberate alteration of timestamp metadata to conceal file activity.
+- **Logical Break** — A detectable discontinuity in expected data sequence patterns.
+- **Rational Arithmetic** — Computation using exact fractions (ratios of integers), eliminating approximation errors.
+- **Signal Vector** — A fixed-length ordered list of exact numerical values derived from a forensic artifact.
+
+> **【Scientific Note】**
+> Peirce/Eco/Grice terminology is NOT mysticism. In VIGÍA, these concepts serve as sensor ontologies: Peirce's sign corresponds to a raw timestamp reading, Eco's interpretive frame corresponds to the baseline expectation (what a legitimate timestamp looks like), and Grice's cooperative maxim is violated when a timestamp is engineered to mislead. Every term maps to a measurable, reproducible test.
+
+*Licensed under the Apache License, Version 2.0. Copyright 2026 Anna Tchijova.*
+
 ---
+
+## ESPAÑOL
+
+### ¿Qué es este módulo?
+Este módulo es un motor forense determinista que lee la Tabla de Archivos Maestros (MFT) de un volumen NTFS. Trata cada registro de archivo como un **artefacto probatorio** y lo somete a aritmética entera y racional exacta para detectar inconsistencias temporales—específicamente el *timestomping*, técnica en la que un atacante falsifica fechas de archivos. Las marcas de tiempo binarias en bruto se convierten en señales estructuradas y reproducibles mediante `to_signal()`. El módulo actúa como un cromatógrafo digital: separa la línea de tiempo verdadera del ruido inyectado midiendo **rupturas lógicas** en la secuencia de datos.
+
+**Actualización de Seguridad (Tanda Seguridad P0)**  
+El motor detecta ahora la consistencia *forzada* entre los atributos `$SI` (Información Estándar) y `$FN` (Nombre de Archivo). Un atacante que manipula ambos atributos de forma coordinada sigue siendo detectado mediante cuatro pruebas ortogonales: (a) análisis de entropía de marca de tiempo, marcando valores sospechosamente "redondos"; (b) lógica de secuencia de creación, verificando que el número de registro MFT correlaciona con el tiempo de creación declarado; (c) detección de túnel temporal, aislando archivos con fechas imposibles; y (d) correlación entre fuentes, comparando las afirmaciones del MFT con las líneas de tiempo independientes del Registro de Windows.
+
+Todos los cálculos internos se realizan con números racionales exactos (`Fraction`), garantizando que cada resultado sea reproducible bit a bit en cada ejecución.
+
+---
+
+### Conceptos clave
+
+| Concepto | Definición | Rol técnico |
+|---|---|---|
+| **Registro MFT** | Entrada de longitud fija en la Tabla de Archivos Maestros NTFS que describe un archivo o directorio. | Analizado y encapsulado por `MFTRecord`. |
+| **Atributo $SI** | Información Estándar; almacena marcas de tiempo de creación, modificación, acceso y cambio MFT. | Se contrasta con `$FN` para exponer consistencia forzada. |
+| **Atributo $FN** | Nombre de Archivo; almacena una copia redundante de las marcas de tiempo y el nombre de archivo. | Proporciona una segunda fuente de línea de tiempo independiente. |
+| **Timestomping** | Técnica antiforense de alteración deliberada de metadatos de marcas de tiempo. | Detectado mediante umbrales de entropía y lógica de secuencia. |
+| **Entropía de Marca de Tiempo** | Métrica de aleatoriedad; baja entropía indica un valor artificialmente "redondo". | Comparada con `TIMESTOMP_ENTROPY_THRESHOLD`. |
+| **Túnel Temporal** | Archivo cuya fecha cae fuera de la ventana físicamente posible (futuro o pasado muy remoto). | Señalizado mediante `TIME_TUNNEL_FUTURE_DAYS` y `TIME_TUNNEL_PAST_DAYS`. |
+| **Correlación entre Fuentes** | Conciliación de marcas de tiempo MFT con tiempos de última escritura de claves del Registro. | Revela falsificaciones incompletas. |
+| **Pureza Fraction** | Uso exclusivo de aritmética racional exacta (`fractions.Fraction`). | Elimina representaciones aproximadas; garantiza determinismo. |
+
+> **【Nota Científica】**
+> La terminología de Peirce/Eco/Grice no es misticismo. En VIGÍA, estos conceptos actúan como ontologías de sensores: el signo de Peirce corresponde a una lectura de marca de tiempo en bruto, el marco interpretativo de Eco corresponde a la expectativa de referencia, y la máxima cooperativa de Grice se viola cuando una marca de tiempo es fabricada para engañar. Cada término se traduce en una prueba medible y reproducible.
+
+### Glosario
+1. **Artefacto** — Cualquier objeto de datos residual en medios digitales que posee valor probatorio.
+2. **Determinista** — Proceso que, dada la misma entrada, siempre produce la misma salida sin variación estocástica.
+3. **Entropía** — Medida de aleatoriedad; valores artificialmente bajos sugieren fabricación manual.
+4. **MFT (Master File Table)** — Base de datos relacional central dentro de un sistema de archivos NTFS que indexa cada archivo.
+5. **NTFS** — Sistema de archivos de Nueva Tecnología; el sistema de archivos de diario predeterminado de Windows.
+6. **Registro de Windows** — Base de datos jerárquica de configuración de Windows; fuente cronológica independiente.
+7. **Timestomping** — Alteración deliberada de metadatos de marca de tiempo para ocultar actividad de archivos.
+8. **Ruptura Lógica** — Discontinuidad detectable en los patrones esperados de secuencia de datos.
+9. **Aritmética Entera Determinista** — Cómputo con fracciones exactas (cocientes de enteros), eliminando errores de aproximación.
+10. **Vector de Señal** — Lista ordenada de longitud fija de valores numéricos exactos derivados de un artefacto forense.
+
+*Licensed under the Apache License, Version 2.0. Copyright 2026 Anna Tchijova.*
+
+---
+
+## РУССКИЙ
+
+### Что это за модуль?
+Данный модуль представляет собой детерминированный криминалистический движок, считывающий Таблицу мастер-файлов (MFT) тома NTFS. Каждая запись файла рассматривается как **криминалистический артефакт** и подвергается точной целочисленной и рациональной арифметике для выявления временных несоответствий — в частности, *timestomping*, при котором злоумышленник подделывает даты файлов. Необработанные двоичные метки времени преобразуются в структурированные воспроизводимые сигналы посредством `to_signal()`. Модуль функционирует как цифровой хроматограф: он отделяет истинную временну́ю шкалу от внедрённого шума, измеряя **логические разрывы** в последовательности данных.
+
+**Обновление безопасности (Tanda Seguridad P0)**  
+Движок теперь обнаруживает *принудительную* согласованность между атрибутами `$SI` (стандартная информация) и `$FN` (имя файла). Злоумышленник, манипулирующий обоими атрибутами одновременно, всё равно выявляется с помощью четырёх ортогональных тестов: (а) анализ энтропии меток времени; (б) логика последовательности создания; (в) обнаружение временно́го тоннеля; (г) перекрёстная корреляция источников — сравнение данных MFT с независимыми временны́ми шкалами реестра Windows.
+
+Все внутренние вычисления выполняются с использованием точных рациональных чисел (`Fraction`), что гарантирует побитовую воспроизводимость каждого результата при каждом запуске.
+
+---
+
+### Ключевые концепции
+
+| Концепция | Определение | Техническая роль |
+|---|---|---|
+| **Запись MFT** | Запись фиксированной длины в Таблице мастер-файлов NTFS, описывающая файл или директорию. | Разбирается и инкапсулируется `MFTRecord`. |
+| **Атрибут $SI** | Стандартная информация; хранит метки времени создания, изменения, доступа и изменения MFT. | Сверяется с `$FN` для выявления принудительной согласованности. |
+| **Атрибут $FN** | Имя файла; хранит избыточную копию меток времени и имени файла. | Обеспечивает второй независимый источник временно́й шкалы. |
+| **Timestomping** | Антикриминалистический метод намеренного изменения метаданных меток времени. | Обнаруживается через пороги энтропии и логику последовательности. |
+| **Энтропия метки времени** | Метрика случайности; низкая энтропия указывает на искусственно «круглое» значение. | Сравнивается с `TIMESTOMP_ENTROPY_THRESHOLD`. |
+| **Временно́й тоннель** | Файл, дата которого выходит за пределы физически возможного окна. | Маркируется константами `TIME_TUNNEL_FUTURE_DAYS` и `TIME_TUNNEL_PAST_DAYS`. |
+| **Перекрёстная корреляция** | Сверка меток времени MFT с временем последней записи ключей реестра. | Выявляет неполные подделки. |
+| **Чистота Fraction** | Исключительное использование точной рациональной арифметики (`fractions.Fraction`). | Исключает приближённые представления; обеспечивает детерминизм. |
+
+> **【Научное примечание】**
+> Терминология Пирса, Эко и Грайса — не мистика. В VIGÍA эти понятия выступают онтологиями сенсоров: знак Пирса соответствует необработанному показанию метки времени, интерпретационная рамка Эко соответствует эталонному ожиданию, а кооперативная максима Грайса нарушается, когда метка времени намеренно сфабрикована. Каждый термин отображается в измеримый и воспроизводимый тест.
+
+### Глоссарий
+1. **Артефакт** — Любой остаточный объект данных на цифровом носителе, обладающий доказательной ценностью.
+2. **Детерминированный** — Процесс, при котором одинаковые входные данные всегда порождают одинаковый результат без стохастических вариаций.
+3. **Энтропия** — Мера случайности; искусственно низкие значения указывают на ручную фабрикацию.
+4. **MFT (Master File Table)** — Центральная реляционная база данных файловой системы NTFS, индексирующая каждый файл.
+5. **NTFS** — Файловая система новой технологии; стандартная журналируемая файловая система Windows.
+6. **Реестр Windows** — Иерархическая база данных конфигурации Windows; независимый хронологический источник.
+7. **Timestomping** — Намеренное изменение метаданных меток времени для сокрытия файловой активности.
+8. **Логический разрыв** — Обнаруживаемая прерывность в ожидаемых паттернах последовательности данных.
+9. **Детерминированная целочисленная арифметика** — Вычисления с точными дробями (отношениями целых чисел), исключающие ошибки приближения.
+10. **Сигнальный вектор** — Упорядоченный список фиксированной длины точных числовых значений, извлечённых из криминалистического артефакта.
+
+*Licensed under the Apache License, Version 2.0. Copyright 2026 Anna Tchijova.*
+
+---
+
+## 中文
+
+### 这是什么模块？
+本模块是一个确定性取证引擎，用于读取 NTFS 卷的主文件表（MFT）。它将每条文件记录视为**证据工件**，并对其施以精确整数与有理数运算，以检测时间戳不一致性——尤其是*时间戳篡改*（timestomping），即攻击者伪造文件日期的技术。原始二进制时间戳通过 `to_signal()` 转换为结构化、可复现的信号。该模块如同数字色谱仪：通过测量数据序列中的**逻辑断裂**，将真实时间线与注入的噪声分离。
+
+**安全更新（Tanda Seguridad P0）**  
+引擎现可检测 `$SI`（标准信息）与 `$FN`（文件名）属性之间被*强制*制造的一致性。同时操纵两个属性的攻击者仍可通过四项正交测试被检测：(a) 时间戳熵分析，标记可疑的"整数"值；(b) 创建顺序逻辑，验证 MFT 记录号与声明创建时间的相关性；(c) 时间隧道检测，隔离含有不可能日期的文件；(d) 跨源关联，将 MFT 声明与独立的注册表时间线进行比对。
+
+所有内部计算均使用精确有理数（`Fraction`）执行，确保每次运行结果逐位可复现。
+
+---
+
+### 关键概念
+
+| 概念 | 定义 | 技术作用 |
+|---|---|---|
+| **MFT 记录** | NTFS 主文件表中描述单个文件或目录的固定长度条目。 | 由 `MFTRecord` 解析并封装。 |
+| **$SI 属性** | 标准信息属性；存储创建、修改、访问及 MFT 更改时间戳。 | 与 `$FN` 对比以暴露强制一致性。 |
+| **$FN 属性** | 文件名属性；存储时间戳及文件名的冗余副本。 | 提供第二个独立时间线来源。 |
+| **时间戳篡改** | 蓄意篡改时间戳元数据的反取证技术。 | 通过熵阈值和序列逻辑检测。 |
+| **时间戳熵** | 随机性度量；低熵表明存在人为"整数"时间值。 | 与 `TIMESTOMP_ENTROPY_THRESHOLD` 对比。 |
+| **时间隧道** | 日期落在物理可能窗口之外（未来或远古）的文件。 | 由 `TIME_TUNNEL_FUTURE_DAYS` 和 `TIME_TUNNEL_PAST_DAYS` 标记。 |
+| **跨源关联** | 将 MFT 时间戳与注册表键最后写入时间进行核对。 | 揭示不完整的伪造。 |
+| **精确有理运算** | 仅使用精确有理数运算（`fractions.Fraction`）。 | 消除近似表示；确保确定性。 |
+
+> **【科学说明】**
+> 皮尔斯、艾柯和格赖斯的术语并非神秘主义。在 VIGÍA 中，这些概念充当传感器本体论：皮尔斯的符号对应原始时间戳读数，艾柯的解释框架对应基线期望，而格赖斯的合作准则在时间戳被蓄意伪造时遭到违反。每个术语都映射到一项可测量、可复现的测试。
+
+### 词汇表
+1. **取证工件** — 数字介质上任何具有证据价值的残留数据对象。
+2. **确定性** — 给定相同输入始终产生相同输出、不含随机变化的过程。
+3. **熵** — 随机性度量；人为偏低的值表明存在手动伪造。
+4. **MFT（主文件表）** — NTFS 文件系统中索引每个文件的核心关系数据库。
+5. **NTFS** — 新技术文件系统；Windows 操作系统默认的日志文件系统。
+6. **Windows 注册表** — Windows 分层配置数据库；提供独立的时间参考来源。
+7. **时间戳篡改** — 蓄意篡改时间戳元数据以隐藏文件活动。
+8. **逻辑断裂** — 预期数据序列模式中可检测到的不连续性。
+9. **精确整数运算** — 使用精确分数（整数比值）进行计算，消除近似误差。
+10. **信号向量** — 从取证工件中导出的固定长度精确数值有序列表。
+
 *Licensed under the Apache License, Version 2.0. Copyright 2026 Anna Tchijova.*

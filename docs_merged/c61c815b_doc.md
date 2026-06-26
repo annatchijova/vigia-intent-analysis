@@ -28,7 +28,6 @@ Glossary terms:
 9. Vision-Analysis Pipeline / Canalización de análisis visual / Конвейер визуального анализа / 视觉分析管道
 10. Integrity Report / Informe de integridad / Отчёт о целостности / 完整性报告
 
-Let's draft concise definitions bilingual-ish? Actually the prompt says "Include glossaries". Since the whole text is 4 languages, perhaps the glossary should have terms in all 4 languages too. Or maybe one glossary section with terms in English and translations? To save words, I can present each term as: EN / ES / RU / ZH — definition. Or maybe just EN term with 4-language definition? That might be confusing. Better to list terms in 4 columns? But it's text.
 
 Alternative: provide glossary in English only? The prompt says "You always write in 4 languages". So glossary should probably follow suit. I can make a compact table-like format.
 
@@ -37,7 +36,6 @@ Let's estimate word count for glossary:
 1. **Compound Document / Documento compuesto / Составной документ / 复合文档** — A file format encapsulating multiple data streams (e.g., PDF, DOCX). / Formato que encapsula múltiples flujos de datos. / Формат, инкапсулирующий несколько потоков данных. / 封装多个数据流的文件格式。
 (~30 words)
 
-If I do 10 terms like this, it's too long. I need to be very brief. Maybe just define once in English and give equivalents? But the instruction is strong about 4 languages. Perhaps I can do a glossary where each entry is: Term (EN / ES / RU / ZH): Definition. But definition itself in 4 languages would be huge.
 
 Maybe the glossary is a separate section where each term is presented in 4 languages but with minimal definitions. Let's try:
 
@@ -46,9 +44,6 @@ Maybe the glossary is a separate section where each term is presented in 4 langu
 1. **Compound document** — Documento compuesto — Составной документ — 复合文档: File format embedding multiple data streams. / Formato que incrusta múltiples flujos. / Формат со встроенными потоками. / 嵌入多数据流的文件格式。
 (~25 words per entry x 10 = 250 words. Total ~450. Good.)
 
-But wait, the user said "Include a 10-term glossary." It doesn't explicitly say each definition must be 4 languages, but since I always write in 4 languages, I should attempt to make the glossary accessible. However, with a 500-word total limit, full 4-language definitions for 10 terms is nearly impossible. The body text already uses ~200 words. 10 terms with 4-language definitions would exceed 500.
-
-I need to be extremely concise. Let's calculate carefully.
 
 Body text draft:
 
@@ -126,7 +121,6 @@ Let's calculate total words for glossary entries:
 
 Entry 1: EN 4 + ES 4 + RU 4 + ZH 4 = 16? Actually Chinese words are counted differently but let's count tokens roughly. Let's just count English/Spanish/Russian words. Chinese characters count as words usually but let's be safe.
 
-Actually, total word count limit of 500 is likely counting English/Spanish/Russian words and Chinese characters. This is ambiguous. To be safe, I should make it even shorter. But the definitions above seem quite short. Let's sum body text word counts more precisely.
 
 EN text:
 Module(1) `vigia/tools/document_integrity.py`(2) provides(3) deterministic(4) forensic(5) utilities(6) for(7) compound-document(8) examination.(9) It(10) performs(11) multi-layer(12) structural(13) audits(14) on(15) PDF(16) and(17) DOCX(18) containers(19) to(20) detect(21) content(22) grafting,(23) metadata(24) discontinuities,(25) and(26) object-stream(27) tampering,(28) as(29) required(30) by(31) Case(32) 041(33) ("El(34) Documento(35) Frankenstein")(36) and(37) the(38) vision-analysis(39) pipeline.(40) The(41) primary(42) instrument,(43) `audit_document_integrity`,(44) returns(45) reproducible,(46) bitwise-verifiable(47) integrity(48) reports(49) without(50) probabilistic(51) approximations.(52) -> 52 words.
@@ -191,7 +185,6 @@ Now sum glossary totals:
 
 Body + Glossary = 230 + 347 = 577. Too much.
 
-Need to cut. Target under 500. So I need to reduce by ~80+ words.
 
 Options:
 - Shorten body text further.
@@ -237,7 +230,6 @@ Now sum telegraphic glossary:
 
 Body ~230. Total ~439. Under 500. Perfect.
 
-But I need to check if the glossary is too telegraphic to be useful for scientists. They are okay. Let's ensure they are accurate.
 
 Entry 1: Compound document. Definition: File format embedding heterogeneous streams. That's okay.
 Entry 2: Content grafting. Foreign material inserted into a document. Good.
@@ -247,7 +239,6 @@ Entry 5: Deterministic audit. Identical output for identical input. Good.
 Entry 6: Bitwise verification. Per-bit exact comparison. Good.
 Entry 7: Multi-layer analysis. Layer-by-layer file inspection. Good.
 Entry 8: Structural tampering. Unauthorized internal architecture change. Good.
-Entry 9: Vision-analysis pipeline. Automated visual-to-forensic workflow. Hmm. "Visual-to-forensic" is a bit odd. Maybe "Workflow linking visual extraction to forensic logic." That's longer. Let's see if we can shorten.
 EN: Workflow linking visual features to forensic logic. (7 words)
 ES: Flujo que vincula rasgos visuales a lógica forense. (8 words)
 RU: Процесс, связывающий визуальные признаки с судебной логикой. (5 words)
@@ -261,11 +252,9 @@ RU: Автоматизированный процесс визуально-су�
 ZH: 视觉取证分析的自动化工作流。(8)
 Total labels ~8 + 6+7+4+8 = 33. Acceptable.
 
-Let's adjust totals: remove 20, add 33. Glossary total = 209 - 20 + 33 = 222.
 
 Total ~452. Still under 500.
 
-Let's recalc body text to see if we can shave a few more words.
 
 EN:
 Module `vigia/tools/document_integrity.py` provides deterministic forensic utilities for compound-document examination. It performs multi-layer structural audits on PDF and DOCX containers to detect content grafting, metadata discontinuities, and object-stream tampering, as required by Case 041 ("El Documento Frankenstein") and the vision-analysis pipeline. The primary instrument, `audit_document_integrity`, returns reproducible, bitwise-verifiable integrity reports without probabilistic approximations.

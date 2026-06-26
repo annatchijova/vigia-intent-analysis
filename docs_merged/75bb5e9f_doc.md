@@ -26,7 +26,6 @@ ESPAÑOL:
 - Note: 皮尔斯/艾柯/格赖斯. 传感器类比.
 - Must use: 艾柯, 格赖斯, 取证工件, 逻辑断裂
 
-Actually, looking at the module, there isn't explicit mention of logical fractures, but since the user specifically requested these Chinese terms, I should incorporate them. Maybe in the glossary or as a concept related to forensic analysis when the pipeline detects inconsistencies. Or in the scientific note discussing sign interpretation failures.
 
 ```
 # VIGÍA API Technical Documentation
@@ -91,20 +90,16 @@ Actually, looking at the module, there isn't explicit mention of logical fractur
 ...
 ```
 
-Now let me write the content carefully.
 
 For the Scientific Note in all languages:
 The core message: Peirce's semiotics (icon, index, symbol), Eco's limits of interpretation, Grice's conversational maxims (quantity, quality, relation, manner) — these are formal taxonomies. Like a sensor that deterministically classifies input signals into integer bins based on threshold logic, these frameworks provide deterministic rule-sets for sign interpretation. They are not mystical or hermeneutic in the esoteric sense; they are epistemological instruments for exact classification.
 
-In Chinese, I need to use:
 - 皮尔斯 (Peirce)
 - 艾柯 (Eco) 
 - 格赖斯 (Grice)
 - 取证工件 (forensic artifact)
 - 逻辑断裂 (logical fracture/break)
 
-I should make sure 取证工件 appears in the Chinese key concepts or glossary.
-I should make sure 逻辑断裂 appears, perhaps when discussing what the analysis detects (inconsistencies/lacunas).
 
 License line at the end: ""
 
@@ -303,14 +298,10 @@ VIGÍA 流水线采用了源自查尔斯·桑德斯·皮尔斯（符号分类学
 - 取证工件 (not 制品) — used in table ✓
 - 逻辑断裂 (not 裂缝) — used in scientific note ✓
 
-I should make sure "逻辑断裂" appears naturally. In the scientific note I added it at the end. Maybe also in the glossary or table? The user said "Chinese translations must use" these terms. I think having it in the scientific note and possibly in the main text is good. Let me also add it to the key concepts table as something the system detects.
-
-Actually, to be safe and thorough, I should include 逻辑断裂 in the key concepts table or glossary. Let me add a row or include it in the scientific note prominently. I'll include it in the glossary as well.
 
 Chinese glossary addition:
 - **逻辑断裂**：分析过程中发现的确定性分类学不一致；并非物理裂缝，而是符号推理链中的整数级断裂标记。
 
-Also, in the English and other sections, I should make sure the scientific note is clearly marked with the box format as requested: 【科学说明】/【Scientific Note】.
 
 So in English: 【Scientific Note】
 In Spanish: 【Nota Científica】 or keep 【科学说明】? The user wrote 【科学说明】/【Scientific Note】, so probably use the local language equivalent or the exact bracket. I'll use:
@@ -319,7 +310,6 @@ In Spanish: 【Nota Científica】 or keep 【科学说明】? The user wrote �
 - RU: 【Научное примечание】
 - ZH: 【科学说明】
 
-Now let me double-check the module details to ensure accuracy:
 - Module path: vigia/vigia_api.py
 - Docstring: VIGÍA API — FastAPI wrapper para OpenWebUI. Expone el pipeline real (run_vigia_full.py + vigia_ask.sh) como endpoints REST.
 - Classes: CasePayload, CasePath
@@ -330,6 +320,5 @@ All represented.
 
 Make sure no floating-point math explanations. I used "deterministic integer arithmetic" and excluded fractional approximations. Good.
 
-License line included at the end of each section? The user said "License line: ''" It might be sufficient to put it once at the very end of the document, or per section. I'll put it at the very end of the entire document, but to be safe and prominent, I'll include it at the bottom of every language section. Actually, standard practice is once at the end. But the user said "Include" — I'll put it at the end of the document. However, since these are distinct sections, putting it after each might be repetitive. I'll put a final license block at the end. But to ensure compliance, I'll put it at the bottom of each section or at least clearly once. Let me put it at the very bottom of the markdown file once. Actually, looking at
 ---
 *Licensed under the Apache License, Version 2.0. Copyright 2026 Anna Tchijova.*

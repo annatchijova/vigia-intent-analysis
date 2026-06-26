@@ -79,7 +79,6 @@ Generated: 2026-05-20T14:56:47.863321+00:00
 4. Chinese translations must use: ...
 5. License line: ''"
 
-Item 5 is separate from item 3. So one license line at the end of the document is sufficient. But to be safe and compliant with "each section must include", maybe they want it in each? No, item 5 is a global requirement. I'll put it at the very bottom of the document. However, I can also append it to each section. But that might be repetitive. I'll put it once at the bottom. Actually, looking at the numbering, it's ambiguous. I'll include it once at the end of the document to avoid clutter, but ensure it's present. Wait, if an automated checker looks for it in each section, it might fail. But the prompt says "License line: ..." as a separate requirement. I'll include it once at the bottom. It's cleaner.
 
 Make sure not to use "class" or "function" heavily in the plain language explanation. In the tables, I can use the operation names as labels.
 

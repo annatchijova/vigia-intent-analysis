@@ -26,7 +26,6 @@ Glossary terms:
 
 Definitions must be brief (1 sentence each).
 
-Let's write them carefully to avoid floating-point explanations. Since it's deterministic, I should NOT say "due to lack of floating point errors" or anything. Just define.
 
 EN:
 1. **Deterministic system**: A process that yields identical outputs from identical inputs under fixed conditions.
@@ -48,7 +47,6 @@ RU: ~40
 Glossary intro + 10 terms: maybe 150 words.
 Total ~325 words. Well under 500. Good.
 
-I need to ensure no floating-point math explanations. I won't mention floating point at all.
 
 Let's refine the text to be slightly more academic and maybe closer to ~80 words per section to give more substance while staying under 500.
 
@@ -74,7 +72,6 @@ Word count: ~58.
 
 Total descriptions: ~246 words.
 
-Glossary now. I need to keep definitions short.
 Intro: "Glossary / Glosario / Глоссарий / 术语表" - maybe 4 words.
 
 Terms:
@@ -84,7 +81,6 @@ Terms:
    RU: Вычислительный процесс, дающий идентичные результаты при идентичных начальных условиях.
    中文: 在相同初始状态下始终产生相同输出的计算过程。
 
-Alternative: The user said "Generate a brief academic description (4 languages: EN, ES, RU, 中文) for this VIGIA support module. Keep it under 500 words total. Include a 10-term glossary."
 
 This likely means the description text is in 4 languages, and the glossary is included (maybe monolingual or with terms in all 4). To fit under 500 words, I must be extremely compact. I could present the glossary as a table or list where each entry gives the term in 4 languages and one concise definition (maybe in English only, or a combined format). However, for a scientist reading in one language, having the term in their language matters most.
 
@@ -96,13 +92,11 @@ Better: Provide the glossary definitions in English only (or extremely short mul
 If I have 4 description paragraphs (~60 words each) = 240 words.
 Remaining 260 words for 10 glossary terms = 26 words per term. That's feasible if each term is defined once in English, but labeled in 4 languages? Or defined in all 4 languages? 26 words per term across 4 languages is ~6-7 words per language. That's too short for a definition.
 
-Maybe the user wants the description body in 4 languages, and the glossary as a single block in English (or with 4-language terms but English def). Given the word limit, I should prioritize clarity and brevity.
 
 Let's look at the prompt again: "You always write in 4 languages: ENGLISH, ESPAÑOL, РУССКИЙ, 中文. You include glossaries and scientific notes."
 
 Okay, so the glossary itself should probably be accessible in all 4 languages. But how? I can provide 4 separate mini-glossaries? That would be 4x10 = 40 entries. Impossible in 500 words.
 
-Alternative interpretation: The user wants the entire output to contain these 4 languages, meaning each section is presented in all 4 languages. For the glossary, I can present each entry as:
 
 **Artifact / Artefacto / Артефакт / 证物** — A retrievable digital trace with evidentiary value. / Traza digital recuperable con valor probatorio. / Извлекаемый цифровой след, имеющий доказательственное значение. / 具有证据价值的可提取数字痕迹。
 
@@ -121,7 +115,6 @@ Example:
 
 That's about 20 words total for the entry. 10 entries = 200 words. Plus 200 words for descriptions = 400. Perfect.
 
-Let's verify word counting. Usually, hyphenated words might count as one. But I should aim for ~450 to be safe.
 
 Let's draft the 4 descriptions more tightly.
 
@@ -147,7 +140,6 @@ Count: 45 words.
 
 Total descriptions: ~195 words. Good.
 
-Now glossary entries. I need them to be very tight. Let's draft 10 entries. Each entry will have the term in 4 languages, then a 4-part definition separated by slashes or newlines. But to save words, I can use em-dashes or colons.
 
 Format:
 **Term** / Término / Термин / 术语 — EN def. / ES def. / RU def. / 中文 def.
@@ -188,15 +180,11 @@ Total glossary words: roughly 214.
 Total description words: roughly 195.
 Total: ~409 words. This fits comfortably under 500.
 
-I need to make sure there are no floating-point math explanations. None are present.
-
-Also, the user wants "scientific notes". Maybe a brief note? But word count is tight. I can add a brief scientific note in each language section or as a footnote. However, the glossary and descriptions already cover it. A "Scientific Note" could be a single line. But adding 4 lines might push it. Let's see if I can integrate a note into the text or add a very short block.
 
 "Scientific note: As a deterministic support module, output consistency depends solely on input state and extraction rules, independent of runtime hardware interpretation."
 
 That's about 18 words. Times 4 = 72 words. Total would be ~481. Still under 500, but tight.
 
-Maybe just one scientific note in English? The prompt says "You include glossaries and scientific notes." It doesn't say "in all 4 languages" for notes, but since I write in 4 languages, maybe I should include it in all 4.
 
 Alternative: Add a short note at the end of each description paragraph.
 

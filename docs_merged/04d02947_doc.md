@@ -189,11 +189,9 @@ Scientific Note in Chinese:
 
 ---
 
-Now, I need to make sure the Chinese section uses the specified terms: 艾柯, 格赖斯, 取证工件, 逻辑断裂. I used them. Good.
 
 I must ensure I do NOT use floating-point math explanations. I emphasized integer arithmetic and deterministic logic. Good.
 
-License line must be included. I'll put it at the bottom of the document, once. But requirement 3 says "Each section must include: ... License line". Hmm. If I put it in each section, it's repetitive but safe. Let me add it as a final line in each section, maybe in a blockquote or just a line. To keep it clean, I'll add:
 
 > 
 

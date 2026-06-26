@@ -31,7 +31,6 @@ If I do:
 **Glossary** [10 entries, each ~15 words = 150 words]
 Total ~330 words. That fits well under 500.
 
-I need to make the descriptions even shorter.
 
 EN:
 Structural damage classifier for adversarial-negation test reports. The module synthesizes a severity index from the absolute change in model confidence and a binary verdict-shift indicator. Weighted linear composition produces a deterministic impact score, isolating the five most critical semantic regressions. Output prioritizes linguistic patterns that degrade classifier integrity under controlled stress.
@@ -67,7 +66,6 @@ But if I do this for 10 terms, that's 110 words + term words. Let's say ~150 wor
 
 Total ~370. Under 500.
 
-However, the user said "Include a 10-term glossary." and "You always write in 4 languages". So the glossary should have terms in 4 languages. The definitions can be in English only? Or should definitions also be in 4 languages? The instruction says "You always write in 4 languages". This likely means all content. But a glossary with 4 definitions per term would be huge. Perhaps the glossary entries are just the terms in 4 languages with a single short definition that is universally understandable? Or maybe I can give the definition in 4 languages in sequence? That would be 4x the words.
 
 Given the severe word limit, I think the best interpretation is that the document contains 4 language sections, and the glossary is a section that includes the 4 language terms and definitions perhaps in English or perhaps each definition is 4-lingual compressed. But that's not feasible.
 
@@ -94,11 +92,9 @@ I think the most pragmatic approach is to have a glossary section with entries l
 
 This uses the 4 languages for the term and a single definition. Since the rest of the document is fully in 4 languages, this should satisfy the spirit.
 
-But the user said "You always write in 4 languages: ENGLISH, ESPAÑOL, РУССКИЙ, 中文." This applies to everything I write. The glossary is part of what I write. So definitions should ideally be in 4 languages too. But word limit!
 
 Maybe I can write the glossary in a way that each entry has 4 one-word definitions? No.
 
-Let's reconsider the word limit. Perhaps "under 500 words total" means per language block? But it says "total". However, 500 words for 4 languages + glossary is extremely tight for an academic description. Maybe the user wants brevity but allows some flexibility. Still, I should try to respect it.
 
 What if I make the glossary definitions very short (3-4 words) and include all 4 languages? Example:
 
@@ -118,7 +114,6 @@ If I keep each definition to ~8 words, each entry is ~12 words. 10 entries = 120
 
 Total words: 218 (desc) + 120 (gloss) + headers (5*4=20) = ~358. Perfect.
 
-I need to make sure definitions are not using floating-point math. They are just conceptual.
 
 Let's draft 10 terms carefully to be relevant to the module.
 
@@ -152,7 +147,6 @@ Total glossary: ~177 words.
 
 Total overall: 218 + 177 = 395. Plus headers: maybe 20. Total ~415. Under 500. Great.
 
-To save words, I can embed the scientific note within each language block. For example, add one sentence to each description.
 
 EN addition: *Scientific note: The deterministic scoring schema excludes probabilistic thresholds, ensuring reproducible triage across experimental runs.* (15 words)
 

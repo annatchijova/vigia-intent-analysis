@@ -5,80 +5,18 @@ Batch ID: vigia-doc-0067-adf95e94
 Generated: 2026-05-20T14:56:47.858908+00:00
 -->
 
-ENGLISH:
-- What Is This Module?: Explain it's a deterministic scoring engine within VIGÍA that corrects a dangerous bias: the tendency to prefer "benign incompetence" just because it looks simpler. Uses Peircean semiotics (Secondness) and adversarial thinking. Inspired by SolarWinds. Uses exact rational arithmetic (fractions.Fraction) and integer display to avoid cross-platform irreproducibility.
-- Key Concepts Table: 
-  - Ockham’s Razor (Adversarial Twist): Normally prefer simpler explanation; here, simplicity is suspect if malice signals exist.
-  - Peircean Secondness: The brute fact of resistance; a signal that something external (malice) is acting upon the system.
-  - Deterministic Integer Arithmetic: Using Python's fractions.Fraction and truncated integer conversion to guarantee identical results on all hardware.
-  - Immutable Configuration: _PENALTY_TABLE as frozenset prevents runtime tampering.
-  - SolarWinds Paradigm: Signed artifact + ignored anomalies = artificially clean benign explanation.
-- Classes/Functions Table:
-  - MaliceSignalStrength: Ordinal enum (NONE→CRITICAL). No continuous/floating values.
-  - OckhamPenaltyResult: Immutable record of penalty calculation.
-  - aggregate_malice_signal_strength(): Pools discrete malice weights (Fractions) into an aggregate.
-  - compute_adversarial_penalty(): Applies penalty to overly simple benign hypotheses.
-  - display_confidence(): Converts exact rational confidence to integer percent via truncation (int()), never banker's rounding.
-- Glossary:
-  - Adversarial Penalty: A cost increment added to the benign hypothesis to compensate for attacker-contrived simplicity.
-  - Fractions.Fraction: Python's exact rational number type; think of it as storing numerator and denominator as integers separately, avoiding decimal rounding.
-  - Frozenset: An immutable set; once created, its contents cannot be altered, ensuring forensic integrity.
-  - Ordinal Scale: A ranked category system (e.g., NONE < WEAK < ... < CRITICAL) without assuming equal intervals between ranks.
-  - Peircean Secondness: In C.S. Peirce's phenomenology, the mode of being of that which is such as it is, with respect to a second but regardless of any third; here, the irreducible fact of an anomalous signal pushing back against interpretation.
-  - Truncation: Discarding the decimal remainder rather than rounding; mathematically identical to floor for positive numbers, ensuring deterministic output.
-- Scientific Note box: Peirce/Eco/Grice terminology is NOT mysticism. Think of a sensor: Peirce's Secondness is simply the voltage spike when a physical probe encounters resistance. It is a raw datum before theory. Eco's codes and Grice's maxims are calibration protocols for interpreting that voltage. We use them as formal heuristics, not metaphysical entities.
-
-ESPAÑOL:
-- What Is This Module? -> ¿Qué es este módulo?
-- Similar content. Use "afección benigna" or "incompetencia benigna". "Segundo peirceano". "Rasero de Ockham". "Determinismo aritmético entero".
-- Specific terms: "fracciones.Fraction", "frozenset".
-- Glossary: "Penalización adversarial", "Fractions.Fraction" (número racional exacto), "Frozenset" (conjunto inmutable), "Escala ordinal", "Segundez peirceana", "Truncamiento".
-- Scientific Note: Same sensor analogy.
-
-РУССКИЙ:
-- What Is This Module? -> Что это за модуль?
-- Terms: Принцип Оккама (адверсариальный поворот), Пирсовская Secondness (Вторичность), Детерминированная целочисленная арифметика, Неизменяемая конфигурация, Парадигма SolarWinds.
-- Classes: MaliceSignalStrength (ординальная шкала силы сигналов зловредности), OckhamPenaltyResult (неизменяемый результат), aggregate... (агрегация), compute... (вычисление штрафа), display_confidence() (целочисленный процент).
-- Glossary: Адверсариальный штраф, Fractions.Fraction (точные рациональные числа), Frozenset (неизменяемое множество), Порядковая шкала, Пирсовская вторая категория (Secondness), Усечение (truncation).
-- Scientific Note: Аналогия с датчиком. Терминология Пирса/Эко/Грайса — не мистицизм.
-
-中文:
-- Must use: 艾柯 (not Eco), 格赖斯 (not Grice), 取证工件 (not 制品), 逻辑断裂 (not 裂缝).
-- What Is This Module? -> 本模块是什么？
-- Terms: 奥卡姆剃刀（对抗性修正）, 皮尔斯第二性（Peircean Secondness）, 确定性整数运算, 不可变配置, SolarWinds范式.
-- Classes: 恶意信号强度（MaliceSignalStrength）- 序数等级, 奥卡姆惩罚结果（OckhamPenaltyResult）- 不可变记录, 聚合恶意信号强度, 计算对抗性惩罚, 显示置信度（截断整数）.
-- Glossary: 对抗性惩罚, 精确有理数类型（fractions.Fraction）, 不可变集合（frozenset）, 序数量表, 皮尔斯第二性, 截断法.
-- Scientific Note: 【科学说明】皮尔斯/艾柯/格赖斯术语并非神秘主义。请将其想象为一种传感器：皮尔斯的“第二性”本质上是物理探针遇到阻力时产生的电压尖峰，是理论介入之前的原始数据；艾柯的符码与格赖斯的准则则是解读该电压的校准协议。在VIGÍA中，它们被用作形式化启发式规则，而非形而上学实体。
-- 取证工件 is used instead of 制品. For example: "取证工件" for forensic artifacts. The module mentions SolarWinds DLL signed. I should use 取证工件 there.
-- 逻辑断裂: use for logical fracture/break? The module doesn't explicitly mention fracture, but I can incorporate it if needed or just ensure I don't use 裂缝. Wait, the user specifically said "逻辑断裂 (not 裂缝)". I should probably use 逻辑断裂 somewhere appropriate, perhaps in the context of the "clean explanation" creating a logical break. Or perhaps in the glossary or concept table. Let's use it: "过于简洁的解释造成逻辑断裂".
-- License: "" (keep in English or translate? User said license line specifically. Probably keep as is, but can add translation. I'll keep exact line.)
-
-General structure:
-I'll make a markdown document with clear headings for each language.
-
-Double check: no floating-point math explanations. Emphasize deterministic integer arithmetic.
-- fractions.Fraction is exact rational arithmetic based on integers.
-- display uses int() truncation.
-- No round().
-- _PENALTY_TABLE immutable frozenset.
-
-I need to be thorough but concise.
-
-Let's draft the ENGLISH section as template:
-
----
 ## ENGLISH
 
 ### What Is This Module?
 This module is a deterministic correction engine inside the VIGÍA forensic framework. Its purpose is to stop an investigative trap: a sophisticated attacker deliberately stages an incident so that the simplest explanation appears to be innocent human error. The module detects when a "too-clean" benign story is artificially cheap and punishes that hypothesis, steering the investigator toward a conclusion of malice.
 
-The logic is inspired by the SolarWinds breach, where a legitimately signed dynamic-link library (DLL) plus five ignored anomalies produced an explanation that looked elegantly simple—yet was wrong. The module treats such suspicious simplicity as evidence in its own right (a phenomenon aligned with C. S. Peirce’s category of Secondness). All calculations use exact integer-based rational arithmetic (`fractions.Fraction`) to guarantee that two different computers always reach the identical score.
+The logic is inspired by the SolarWinds breach, where a legitimately signed dynamic-link library (DLL) plus five ignored anomalies produced an explanation that looked elegantly simple—yet was wrong. The module treats such suspicious simplicity as evidence in its own right (a phenomenon aligned with C. S. Peirce's category of Secondness). All calculations use exact integer-based rational arithmetic (`fractions.Fraction`) to guarantee that two different computers always reach the identical score.
 
 ### Key Concepts
 
 | Concept | Plain-Language Definition | Role in the Module |
 |---|---|---|
-| Adversarial Ockham’s Razor | The principle that, under attack, the simplest explanation may be a deliberately planted decoy rather than the truth. | Governs when to distrust low-complexity benign hypotheses. |
+| Adversarial Ockham's Razor | The principle that, under attack, the simplest explanation may be a deliberately planted decoy rather than the truth. | Governs when to distrust low-complexity benign hypotheses. |
 | Peircean Secondness | The raw, uninterpreted fact of resistance or anomaly—like a sensor spike—that signals an external force (malice) is present. | Provides the philosophical grounding for treating ignored anomalies as active signals, not passive noise. |
 | Deterministic Integer Arithmetic | Mathematical operations performed with exact fractions (pairs of integers) and truncated integer conversion, never with floating-point decimals. | Ensures bitwise-reproducible scores across CPU architectures. |
 | Immutable Configuration | A lookup table (`_PENALTY_TABLE`) locked as a `frozenset`, meaning its contents cannot be altered at runtime. | Protects forensic integrity by preventing in-memory tampering with penalty values. |
@@ -93,7 +31,7 @@ The logic is inspired by the SolarWinds breach, where a legitimately signed dyna
 | `OckhamPenaltyResult` | Class | An immutable data record that stores the outcome of a penalty calculation. Once created, it cannot be modified. |
 | `aggregate_malice_signal_strength()` | Function | Collects malice indicators from the active evidence pool. Each indicator carries an exact rational weight (`Fraction` between 0 and 1). The function merges them into a unified ordinal assessment. |
 | `compute_adversarial_penalty()` | Function | Measures how suspiciously simple the benign hypothesis is and adds a deterministic penalty cost to it. |
-| `display_confidence()` | Function | Converts an exact internal confidence score into a whole-number percentage (e.g., 73 %) using truncation (`int()`), avoiding floating-point display and banker's rounding. |
+| `display_confidence()` | Function | Converts an exact internal confidence score into a whole-number percentage (e.g., 73%) using truncation (`int()`), avoiding floating-point display and banker's rounding. |
 
 ### Glossary
 
@@ -106,14 +44,13 @@ The logic is inspired by the SolarWinds breach, where a legitimately signed dyna
 | **Peircean Secondness** | In the semiotics of Charles Sanders Peirce, the mode of being of brute fact or resistance. In digital forensics, it is the irreducible datum of an anomaly that refuses to be explained away by the simplest story. |
 | **Truncation** | The removal of any fractional remainder (e.g., turning 73.9 into 73). For positive scores this is identical to the mathematical floor function and yields deterministic, architecture-independent output. |
 
-### 【Scientific Note】
-> **Peirce, Eco, and Grice Are Not Mysticism**
->
-> The terminology borrowed from C. S. Peirce, Umberto **Eco**, and H. P. **Grice** is employed here as formal semiotic engineering, not metaphysical speculation. Think of a physical sensor: **Peircean Secondness** is nothing more than the voltage spike when a probe encounters unexpected resistance—a raw measurement before any theory is applied. **Eco’s** codes and **Grice’s** conversational maxims act as calibration protocols: they tell us how to interpret that voltage spike in context. VIGÍA uses these frameworks as deterministic heuristics—rules that map observed取证工件 (forensic artifacts) to logical states. They are mathematical instruments, not occult forces.
+> **【Scientific Note】**
+> The terminology borrowed from C. S. Peirce, Umberto **Eco**, and H. P. **Grice** is employed here as formal semiotic engineering, not metaphysical speculation. Think of a physical sensor: **Peircean Secondness** is nothing more than the voltage spike when a probe encounters unexpected resistance—a raw measurement before any theory is applied. **Eco's** codes and **Grice's** conversational maxims act as calibration protocols: they tell us how to interpret that voltage spike in context. VIGÍA uses these frameworks as deterministic heuristics—rules that map observed forensic artifacts to logical states. They are mathematical instruments, not occult forces.
+
+*Licensed under the Apache License, Version 2.0. Copyright 2026 Anna Tchijova.*
 
 ---
 
----
 ## ESPAÑOL
 
 ### ¿Qué es este módulo?
@@ -140,29 +77,26 @@ La lógica se inspira en el caso SolarWinds, donde una biblioteca de enlace din�
 | `OckhamPenaltyResult` | Clase | Registro de datos inmutable que almacena el resultado de un cálculo de penalización. Una vez creado, no puede modificarse. |
 | `aggregate_malice_signal_strength()` | Función | Recolecta indicadores de malicia del pool de evidencia activo. Cada indicador porta un peso racional exacto (`Fraction` entre 0 y 1). La función los fusiona en una evaluación ordinal unificada. |
 | `compute_adversarial_penalty()` | Función | Mide qué tan sospechosamente simple es la hipótesis benigna y le añade un costo de penalización determinista. |
-| `display_confidence()` | Función | Convierte una puntuación interna de confianza exacta en un porcentaje de número entero (p. ej., 73 %) usando truncamiento (`int()`), evitando la exhibición en punto flotante y el redondeo del banquero. |
+| `display_confidence()` | Función | Convierte una puntuación interna de confianza exacta en un porcentaje de número entero (p. ej., 73%) usando truncamiento (`int()`), evitando la exhibición en punto flotante y el redondeo del banquero. |
 
 ### Glosario
 
 | Término | Definición |
 |---|---|
 | **Penalización adversarial** | Incremento de costo determinista añadido deliberadamente a una hipótesis benigna para compensar una simplicidad que el atacante pudo haber diseñado. |
-| **`fractions.Fraction`** | Tipo de dato de Python que representa una razón exacta de dos enteros (numerador y denominador). Opera como la aritmética de fracciones simbólicas de álgebra básica, sin errores de redondeo. |
+| **`fractions.Fraction`** | Tipo de dato que representa una razón exacta de dos enteros (numerador y denominador). Opera como la aritmética de fracciones simbólicas de álgebra básica, sin errores de redondeo. |
 | **`frozenset`** | Colección inmutable. Dado que su contenido se fija en la creación, funciona como un sello de solo lectura que evita cambios accidentales o maliciosos en tiempo de ejecución de los parámetros de penalización. |
 | **Escala ordinal** | Sistema de jerarquización (p. ej., NONE → CRITICAL) donde el orden importa pero no se asume que la distancia numérica entre rangos sea igual. No hay decimales entre rangos. |
 | **Segundez peirceana** | En la semiótica de Charles Sanders Peirce, el modo de ser del hecho bruto o la resistencia. En informática forense, es el dato irreductible de una anomalía que se niega a ser disuelta por la narrativa más simple. |
 | **Truncamiento** | Eliminación de cualquier resto fraccionario (p. ej., convertir 73,9 en 73). Para puntuaciones positivas es idéntico a la función piso matemática y produce salida determinista e independiente de la arquitectura. |
 
-### 【Scientific Note】 / 【Nota Científica】
-> **Peirce, Eco y Grice no son misticismo**
->
-> La terminología tomada de C. S. Peirce, Umberto Eco y H. P. Grice se emplea aquí como ingeniería semiótica formal, no como especulación metafísica. Piense en un sensor físico: la **Segundez peirceana** no es más que el pico de voltaje cuando una sonda encuentra resistencia inesperada: una medición cruda antes de aplicar cualquier teoría. Los códigos de **Eco** y los máximas conversacionales de **Grice** actúan como protocolos de calibración: nos indican cómo interpretar ese pico en contexto. VIGÍA utiliza estos marcos como heurísticas deterministas—reglas que mapean artefactos forenses observados a estados lógicos. Son instrumentos matemáticos, no fuerzas ocultas.
+> **【Nota Científica】**
+> La terminología tomada de C. S. Peirce, Umberto Eco y H. P. Grice se emplea aquí como ingeniería semiótica formal, no como especulación metafísica. Piense en un sensor físico: la **Segundez peirceana** no es más que el pico de voltaje cuando una sonda encuentra resistencia inesperada: una medición cruda antes de aplicar cualquier teoría. Los códigos de **Eco** y las máximas conversacionales de **Grice** actúan como protocolos de calibración: nos indican cómo interpretar ese pico en contexto. VIGÍA utiliza estos marcos como heurísticas deterministas—reglas que mapean artefactos forenses observados a estados lógicos. Son instrumentos matemáticos, no fuerzas ocultas.
+
+*Licensed under the Apache License, Version 2.0. Copyright 2026 Anna Tchijova.*
 
 ---
 
-РУССКИЙ:
-
----
 ## РУССКИЙ
 
 ### Что это за модуль?
@@ -189,72 +123,66 @@ La lógica se inspira en el caso SolarWinds, donde una biblioteca de enlace din�
 | `OckhamPenaltyResult` | Класс | Неизменяемая запись данных, хранящая результат расчёта штрафа. После создания изменению не подлежит. |
 | `aggregate_malice_signal_strength()` | Функция | Собирает индикаторы злонамеренности из активного пула доказательств. Каждый индикатор несёт точный рациональный вес (`Fraction` от 0 до 1). Функция объединяет их в единую порядковую оценку. |
 | `compute_adversarial_penalty()` | Функция | Измеряет, насколько подозрительно проста благонамеренная гипотеза, и добавляет к ней детерминированный штраф. |
-| `display_confidence()` | Функция | Преобразует точное внутреннее значение уверенности в целочисленный процент (например, 73 %) посредством усечения (`int()`), избегая отображения чисел с плавающей запятой и банковского округления. |
+| `display_confidence()` | Функция | Преобразует точное внутреннее значение уверенности в целочисленный процент (например, 73%) посредством усечения (`int()`), избегая отображения чисел с плавающей запятой и банковского округления. |
 
 ### Глоссарий
 
 | Термин | Определение |
 |---|---|
 | **Адверсариальный штраф** | Детерминированное приращение стоимости, целенаправленно добавляемое к благонамеренной гипотезе для компенсации простоты, которую противник мог спроектировать. |
-| **`fractions.Fraction`** | Тип данных Python, представляющий точное отношение двух целых чисел (числителя и знаменателя). Работает как символьное дробное исчисление из школьной алгебры, не порождая ошибок округления. |
+| **`fractions.Fraction`** | Тип данных, представляющий точное отношение двух целых чисел (числителя и знаменателя). Работает как символьное дробное исчисление из школьной алгебры, не порождая ошибок округления. |
 | **`frozenset`** | Неизменяемое множество. Поскольку его содержимое фиксируется при создании, оно действует как печать только для чтения, предотвращая случайные или злонамеренные изменения штрафных параметров во время работы. |
 | **Порядковая шкала** | Система ранжирования (например, NONE → CRITICAL), в которой важен порядок, но числовое расстояние между рангами не предполагается равным. Между рангами нет десятичных дробей. |
 | **Пирсовская Вторичность (Secondness)** | В семиотике Чарльза Сандерса Пирса — модус бытия грубого факта или сопротивления. В цифровой криминалистике это ирредуцируемый датум аномалии, который отказывается быть развеянным простейшим рассказом. |
 | **Усечение (truncation)** | Отбрасывание любой дробной части (например, превращение 73,9 в 73). Для положительных оценок это тождественно функции пола и даёт детерминированный вывод, не зависящий от архитектуры. |
 
-### 【Scientific Note】 / 【Научное примечание】
-> **Терминология Пирса, Эко и Грайса — не мистицизм**
->
+> **【Научное примечание】**
 > Заимствованная из семиотики Ч. С. Пирса, Умберто **Эко** и Г. П. **Грайса** терминология используется здесь как формальная инженерная дисциплина, а не метафизическая спекуляция. Представьте физический датчик: **пирсовская Вторичность** — не что иное, как скачок напряжения при встрече зонда с неожиданным сопротивлением: сырые измерения до наложения теории. Коды **Эко** и разговорные максимы **Грайса** выступают протоколами калибровки: они сообщают, как интерпретировать этот скачок в контексте. VIGÍA применяет эти рамки как детерминированные эвристики — правила, отображающие наблюдаемые судебные артефакты на логические состояния. Это математические инструменты, а не оккультные силы.
 
----
-
-中文:
-
-Must include:
-- 艾柯 (Umberto Eco)
-- 格赖斯 (H.P. Grice)
-- 取证工件 (forensic artifact, not 制品)
-- 逻辑断裂 (logical break/fracture, not 裂缝)
-- 【科学说明】box
-
-Also: "display_confidence" uses int() truncated, not round.
-
-Chinese phrasing:
-- VIGÍA: keep as is.
-- Ockham's Razor: 奥卡姆剃刀.
-- Adversarial: 对抗性.
-- Peircean Secondness: 皮尔斯第二性 (or 皮尔斯所言的“第二性”).
-- Immutable: 不可变的.
-- Frozenset: 不可变集合.
-- Fraction: 精确分数 / 有理数类型. Use 精确有理数.
-- Truncation: 截断.
-- SolarWinds: SolarWinds事件.
-- DLL: 动态链接库 (DLL).
-- Ordinal: 序数的 / 序数量表.
-- Malice: 恶意.
-- Benign: 良性 / 善意的. 良性 hypothesis: 良性假设.
-- Sensor analogy: 传感器.
-
-Use 逻辑断裂 in a natural place. For example, in the "Adversarial Ockham's Razor" concept: "过度简化的良性叙事会造成逻辑断裂" or "攻击者设计的简单解释与真实证据之间存在逻辑断裂". Let's put it in the Key Concepts table or in the explanation.
-
-Let's draft:
+*Licensed under the Apache License, Version 2.0. Copyright 2026 Anna Tchijova.*
 
 ---
+
 ## 中文
 
 ### 本模块是什么？
-本模块是 VIGÍA 取证框架内部的一个确定性校正引擎，旨在阻止一种调查陷阱：老练的对手会刻意设计一起事件，使得最简单的解释看起来像是无害的人为失误。该模块负责识别那些“过于干净”的良性故事是否被人为压低了成本，并对该假设施加惩罚，从而将调查人员导向“恶意”结论。
+本模块是 VIGÍA 取证框架内部的一个确定性校正引擎，旨在阻止一种调查陷阱：老练的对手会刻意设计一起事件，使得最简单的解释看起来像是无害的人为失误。该模块负责识别那些"过于干净"的良性故事是否被人为压低了成本，并对该假设施加惩罚，从而将调查人员导向"恶意"结论。
 
-其逻辑灵感源自 SolarWinds 事件：一份经过合法签名的动态链接库（DLL）加上五处被忽略的异常，共同产生了一个看似优雅简洁、实则错误的解释。模块将这种可疑的简洁性本身视为证据（一种与 C. S. 皮尔斯“第二性”范畴相一致的现象）。所有计算均采用基于整数的精确有理数运算（`fractions.Fraction`），以确保不同计算机总能输出完全一致的评分。
+其逻辑灵感源自 SolarWinds 事件：一份经过合法签名的动态链接库（DLL）加上五处被忽略的异常，共同产生了一个看似优雅简洁、实则错误的解释。模块将这种可疑的简洁性本身视为证据（一种与 C. S. 皮尔斯"第二性"范畴相一致的现象）。所有计算均采用基于整数的精确有理数运算（`fractions.Fraction`），以确保不同计算机总能输出完全一致的评分。
 
 ### 核心概念
 
 | 概念 | 通俗定义 | 在本模块中的作用 |
 |---|---|---|
-| 对抗性奥卡姆剃刀 | 在遭受攻击的环境下，最简单的解释可能是对手刻意 planted 的诱饵，而非真相。 | 决定何时应对过度简化的良性假设保持怀疑。 |
-| 皮尔斯第二性 | 阻力或异常的原始事实——如同传感器上的电压尖峰——标志着外部力量（恶意）的存在。 | 为“将被忽略的异常视为主动信号而非被动噪声”提供理论基础。 |
+| 对抗性奥卡姆剃刀 | 在遭受攻击的环境下，最简单的解释可能是对手刻意植入的诱饵，而非真相。 | 决定何时应对过度简化的良性假设保持怀疑。 |
+| 皮尔斯第二性 | 阻力或异常的原始事实——如同传感器上的电压尖峰——标志着外部力量（恶意）的存在。 | 为"将被忽略的异常视为主动信号而非被动噪声"提供理论基础。 |
 | 确定性整数运算 | 使用精确分数（一对整数）及截断式整数转换完成数学运算，绝不使用浮点小数。 | 确保评分在不同 CPU 架构上实现按位可复现。 |
-| 不可变配置 | 以 `frozenset` 锁定的查找表（`_PENALTY_TABLE`），其内容在运行期间无法更改。 | 防止惩罚参数在内存中被篡改，保障取证完整性。
----
+| 不可变配置 | 以 `frozenset` 锁定的查找表（`_PENALTY_TABLE`），其内容在运行期间无法更改。 | 防止惩罚参数在内存中被篡改，保障取证完整性。 |
+| SolarWinds 范式 | 经合法签名的取证工件叠加多项被忽视的异常，共同制造出一个人为的"干净"良性叙事。 | 作为惩罚逻辑的动机性案例研究。 |
+
+### 模块组件
+
+| 组件 | 类型 | 功能 |
+|---|---|---|
+| `NONE`, `WEAK`, `MODERATE`, `STRONG`, `CRITICAL` | 常量 | 恶意信号强度的序数等级。无浮点渐变的离散等级。 |
+| `MaliceSignalStrength` | 类 | 封装恶意信号的序数量表。保证所有信号强度保持整数类型的序数。 |
+| `OckhamPenaltyResult` | 类 | 存储惩罚计算结果的不可变数据记录。一经创建，不可修改。 |
+| `aggregate_malice_signal_strength()` | 函数 | 从活跃证据池中收集恶意指标。每个指标携带精确有理数权重（0 到 1 之间的 `Fraction`）。该函数将它们合并为统一的序数评估。 |
+| `compute_adversarial_penalty()` | 函数 | 衡量良性假设的可疑简洁程度，并向其添加确定性惩罚成本。 |
+| `display_confidence()` | 函数 | 使用截断方式（`int()`）将精确内部置信度评分转换为整数百分比（如 73%），避免浮点显示和银行家舍入。 |
+
+### 词汇表
+
+| 术语 | 定义 |
+|---|---|
+| **对抗性惩罚** | 刻意添加到良性假设中的确定性成本增量，用于补偿对手可能人为设计的简洁性。 |
+| **`fractions.Fraction`** | 表示两个整数（分子和分母）的精确比值的数据类型。其工作方式如同基础代数中教授的符号分数运算，不产生舍入误差。 |
+| **`frozenset`** | 不可变集合。由于其内容在创建时固定，它充当只读封印，防止运行时对惩罚参数进行意外或恶意更改。 |
+| **序数量表** | 一种排序系统（如 NONE → CRITICAL），其中顺序重要，但各等级之间的数值距离不假设为相等。等级之间没有小数。 |
+| **皮尔斯第二性** | 在查尔斯·桑德斯·皮尔斯的符号学中，即原始事实或阻力的存在方式。在数字取证中，它是异常的不可化约数据，拒绝被最简单的叙事解释消解。 |
+| **截断法** | 去除任何分数余数（如将 73.9 转为 73）。对于正数评分，这等同于数学取整函数，产生与体系结构无关的确定性输出。 |
+
+> **【科学说明】**
+> 皮尔斯（C. S. Peirce）、**艾柯**（Umberto Eco）与**格赖斯**（H. P. Grice）的术语在本模块中作为形式化符号学工程使用，而非形而上学思辨。请设想一个物理传感器：**皮尔斯第二性**不过是探针遇到意外阻力时产生的电压尖峰——这是理论介入之前的原始测量值。**艾柯**的编码与**格赖斯**的会话准则充当校准协议：它们告诉我们如何在具体情境中解读该电压尖峰。VIGÍA 将这些框架用作确定性启发式规则——将观测到的取证工件映射到逻辑状态的规则。它们是数学工具，而非神秘力量。
+
 *Licensed under the Apache License, Version 2.0. Copyright 2026 Anna Tchijova.*

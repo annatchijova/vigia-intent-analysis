@@ -23,17 +23,14 @@ Terms:
 9. Orchestration layer / Capa de orquestación / Оркестрационный слой / 编排层
 10. Tamper-evident / Con evidencia de manipulación / С индикацией вмешательства / 防篡改
 
-But I need to present the glossary maybe once, with 4 languages for each term? Or separate glossaries? The user said "Include glossaries" (plural) but given the 500-word limit, a single consolidated glossary with multilingual terms is best. Or four mini-glossaries? The prompt says "You include glossaries and scientific notes." Since the word count is tight, I will do one glossary table/list where each term is shown in all 4 languages, or define each term in English only but list translations? No, the user wants the text in 4 languages. I think a glossary per language would be too long. Better: a multilingual glossary where each entry has the term in 4 languages and a brief definition in English (or maybe 4 definitions?). But that quadruples length.
 
 Alternative: provide the glossary in English only but note the translations? That might violate the spirit. However, with 500 words total, it's impossible to have 4 full glossaries. The main descriptions are already in 4 languages. A single glossary in English with cross-referenced terms should be acceptable, or I can make a compact table.
 
-Actually, the user said "You always write in 4 languages". So the glossary should probably be accessible in all 4. But I can do a combined format where each entry is one line with terms in all 4 languages and a one-sentence definition shared? No, definitions should be language-specific.
 
 Maybe the best approach: after the four descriptions, add a "Multilingual Glossary" where each entry is:
 - **EN** Term / **ES** Término / **RU** Термин / **中文** 术语
 - Brief definition (maybe EN only to save words, but that breaks the rule). Or I can write the definition in a way that is very short.
 
-I need to be extremely economical. Maybe the "glossary" can be a list of 10 terms with their 4-language equivalents and a single shared symbolic/technical definition? Or I can integrate the glossary into the text? No.
 
 Another idea: The user might accept a glossary where each term is presented in all four languages in one line, with a concise single-language definition (e.g., English) because the main text already explains everything in 4 languages. But the instruction says "You always write in 4 languages". However, a glossary is part of the text. This is challenging.
 
@@ -45,7 +42,6 @@ Let's reconsider the word count. "Keep it under 500 words total." If I make each
 Total: 200 words.
 Then glossary: 10 terms. If each term has ~10 words of definition across 4 languages... that's 400 words. No.
 
-Maybe Chinese characters and Russian words count differently in the user's expectation? Usually word count is word count. But maybe the limit is lenient. Still, I should try to respect it.
 
 Let's draft very short descriptions (~40 words each):
 
@@ -173,13 +169,9 @@ Now sum glossary words: 24+25+22+32+36+24+25+31+26+20 = 265.
 Descriptions: 150.
 Total: 415 words. Excellent, under 500.
 
-I should also add a brief scientific note. Maybe integrate it into the descriptions? The user asked for scientific notes. I can add a one-line note in each language or a shared note. Given word count, I'll add a short "Scientific note" at the end in all 4 languages, very briefly. Or integrate into each description (already did: "without probabilistic approximations").
 
 Actually, the descriptions already contain the scientific note about deterministic systems and no floating point. That should suffice.
 
-Let's double-check the constraint: "You NEVER use floating-point math explanations for deterministic systems." I avoided floating-point math. I mentioned "without probabilistic approximations" and "deterministic". Good.
-
-Let's verify no Python jargon is used that scientists wouldn't understand. I used "module", "execution engine", "JSON case descriptor", "bundle hashing". These are explained in the glossary. Good.
 
 Formatting: Use headers for each language. Then a Glossary section. Keep it clean.
 

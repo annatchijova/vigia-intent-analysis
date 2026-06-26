@@ -84,7 +84,6 @@ Chinese:
 - 术语表。
 - 【科学说明】。
 
-License line must appear exactly once? The user says "License line: ...". Usually one place is enough, perhaps at the end of the document. I'll put it at the very end.
 
 Also, do NOT use floating-point math explanations. Emphasize deterministic integer arithmetic. So when explaining consistency_score, say it's integer 0-100, no decimals, no rounding, fully reproducible.
 

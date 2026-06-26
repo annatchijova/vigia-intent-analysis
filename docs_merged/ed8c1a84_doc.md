@@ -46,7 +46,6 @@ Glossary terms should be relevant:
 7. Peer review / Revisión por pares / Рецензирование / 同行评审
 8. Courtroom admissibility / Admisibilidad judicial / Судебный допуск / 法庭可采性
 9. Structured criteria / Criterios estructurados / Структурированные критерии / 结构化标准
-10. Apache 2.0 / Apache 2.0 / Apache 2.0 / Apache 2.0 (maybe better something else? maybe "SIFT Workstation"? No, glossary should be terms. Let's use "Bit-exact congruence" / "Congruencia exacta de bits" / "Битово-точное соответствие" / 比特级一致性). That's more scientific.
 
 Let's write the glossary compactly.
 
@@ -56,7 +55,6 @@ Glossary (EN | ES | RU | ZH):
    Цифровой артефакт — Дискретный объект данных, извлечённый из носителя.
    数字工件 — 从存储介质中恢复的离散数据对象。
 
-Actually, to save words, I can present the glossary as a single list with parallel translations or separate by language? The user said "4 languages" and "include a 10-term glossary". Usually, one glossary with terms in all 4 languages is most efficient.
 
 Let's try a table-like text format, but since it's text, I can do:
 
@@ -99,13 +97,11 @@ Total notes: ~95 words.
 
 Grand total: 236 + 110 + 95 = 441 words. Under 500. Good.
 
-I should make sure the formatting is clear. I'll separate the languages with headers. Then Glossary, then Scientific Notes.
 
 Double-check: "scientists who do not know Python" — so no Python jargon. I used "module", "engine", "suite". That's okay, generic.
 
 Make sure "SANS FIND EVIL Hackathon 2026" and "SANS SIFT Workstation" and "Apache 2.0" are included as per source.
 
-The repo URL is truncated in source. I will omit it or just mention "Source repository available under Apache 2.0". But since it's truncated, better not to include the broken link. The source summary mentions it, but since the user only gave "https://gi", I should probably just refer to the license and omit the URL. Or say "Open-source repository: see project VIGÍA". I'll include the license and omit the truncated URL.
 
 Let's refine each text to be tight.
 
@@ -151,7 +147,6 @@ Let's look at the instruction again: "You always write in 4 languages: ENGLISH, 
 
 This suggests the entire output contains these 4 languages. It doesn't strictly say every single sentence must be quadrupled, but standard practice for this persona is parallel blocks.
 
-I will provide the glossary as a single list where each item shows the term in the four languages, followed by a brief English definition (since the audience is scientists, English is the lingua franca). To partially accommodate the other languages, I can make the definitions extremely short. But to be safe and consistent, I'll provide 4 parallel glossaries? That would be ~4 x 10 x 5 = 200 words. With 273 words of description, total 473. That's feasible! Let's try.
 
 Parallel glossaries mean:
 **Glossary / Glosario / Глоссарий / 词汇表**
@@ -171,7 +166,6 @@ But text format is not a real table. I can use a compact format:
 
 That's 4 lines per term. 10 terms = 40 lines. Each line ~6 words. 240 words. Plus 273 = 513. Over 500.
 
-I need to cut description or glossary words.
 
 Alternative: Make a single glossary list with terms in 4 languages and ONE definition in English (or a very compressed multilingual definition).
 
@@ -228,7 +222,6 @@ Glossary: ~68
 Notes: ~65
 Total: ~406 words. Well under 500.
 
-I should double-check the instruction: "You NEVER use floating-point math explanations for deterministic systems."
 In the scientific note I mention "integer-based scoring". This is good because it implies the deterministic nature without invoking floating-point. I do not mention floating-point.
 
 Also need to ensure I don't use Python jargon: I used "module", "engine", "suite". That's fine for non-Python scientists.

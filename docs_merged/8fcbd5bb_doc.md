@@ -16,7 +16,6 @@ ENGLISH:
 ESPAÑOL:
 - Same structure
 - Terms: Peirce, Eco, Grice
-- Note: use "nota científica" or similar but the box should probably be labeled 【Scientific Note】 in English and 【科学说明】 in Chinese... Wait, the user said "A 【科学说明】/【Scientific Note】 box". So in all sections, maybe use the bilingual label or the appropriate one? The user says "A 【科学说明】/【Scientific Note】 box". I'll use 【Scientific Note】 for EN/ES/RU and 【科学说明】 for ZH, or maybe use both labels. To be safe, I'll use the combined label for all sections as requested.
 
 РУССКИЙ:
 - Key terms: MITRE ATT&CK, абдукция (abduction), семиотика, etc.
@@ -29,9 +28,6 @@ ESPAÑOL:
 - Scientific Note: 【科学说明】
 - Explain that Pierce/Eco/Grice are analytical frameworks, not mysticism.
 
-Actually, the user listed: RECONNAISSANCE, RESOURCE_DEVELOPMENT, INITIAL_ACCESS, EXECUTION, PERSISTENCE, PRIVILEGE_ESCALATION, DEFENSE_EVASION, CREDENTIAL_ACCESS, DISCOVERY, LATERAL_MOVEMENT. That's 10. MITRE Enterprise has 14. But the user says "13 tácticas (Cyber Kill Chain)". The Cyber Kill Chain has 7 stages. MITRE Enterprise has 14. There might be some confusion, but I should stick to what the module provides and describe it as the canonical tactical categories used by the module. I will refer to them as the tactical constants defined in the module.
-
-For the tables, I should present the Classes and Functions in a way scientists understand.
 
 ENGLISH draft:
 
@@ -181,7 +177,6 @@ La terminología de **Charles Sanders Peirce** (abducción), **Umberto Eco** (um
 
 ---
 
-Now let me review all constraints:
 1. Target audience: scientists who do not know Python — Yes, I avoided Python syntax and used scientific analogies.
 2. 4 language sections — Yes.
 3. Each section has What Is This Module?, Key concepts with tables, Glossary, Scientific Note box — Yes.
@@ -200,6 +195,5 @@ Double-check Chinese terms:
 
 Check that I didn't use floating-point explanations. I explicitly condemned floating-point and praised integer arithmetic.
 
-Check the license line is exactly: "" — Yes, included in each section? The user said "License line" (singular). Maybe include once at the end? But to be safe and since they said "Each section must include" the four bullet points, but the license line is a separate requirement. I'll put it at the very end of the document once, or in each section? The user said "License line: ''" as requirement 5, separate from requirement 3. To be absolutely safe, I'll include it at the end of each language section or once globally. Given it's
 ---
 *Licensed under the Apache License, Version 2.0. Copyright 2026 Anna Tchijova.*

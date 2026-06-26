@@ -105,7 +105,6 @@ ESPAÑOL:
 中文:
 - What Is This Module? -> "本模块是什么？"
   Explain it's a VIGÍA 取证套件 (Forensic Suite) 的端到端演示脚本。它像一个自动化实验机器人，读取案件 JSON 文件，运行完整分析流程，生成可验证的证据包 (bundle) 和符合 ENFSI 标准的报告。不需要 Python 知识即可理解其功能。
-- Key concepts table. Must use 取证工件, 逻辑断裂 (if applicable, but the prompt says use 逻辑断裂 instead of 裂缝. I should probably use 逻辑断裂 in the glossary or note if relevant, but maybe not in the table unless needed. Let's ensure I include it somewhere appropriate. Actually, the prompt specifically mandates these Chinese terms: 艾柯, 格赖斯, 取证工件, 逻辑断裂. I must use them. I can mention 逻辑断裂 in the context of Peirce/Eco/Grice as "semiotic gap" or "logical break" maybe in the scientific note or glossary. Let's incorporate 取证工件 for artifacts/products. And 逻辑断裂 for "semiotic gap" or "fracture". I can explain that abduction fills 逻辑断裂. Let's weave them in.
   
   | 术语 | 作用 | 类比 |
   |---|---|---|
@@ -191,11 +190,6 @@ Then sections:
 
 Then license line.
 
-I should ensure the tables are clear.
-
-Also, I need to be careful with the module path and docstring info. The docstring mentions SANS FIND EVIL Hackathon 2026 jury. It mentions Ollama. I should include that.
-
-Also the requirement says "Do NOT use floating-point math explanations — emphasize deterministic integer arithmetic where applicable". In the English table for verify script, I already mentioned integer checksums. I should add a note in the "Key Concepts" or glossary about why integer arithmetic matters: because forensic verification must be bitwise exact and reproducible; floating point introduces non-deterministic rounding across architectures. I should probably add a row or note in each language.
 
 Let's refine the English content.
 
@@ -205,7 +199,6 @@ What Is This Module?
 This file, `cases/demo_case.py`, is the automated demonstrator for the VIGÍA Forensic Suite. Think of it as a laboratory robot that accepts a case file (a structured JSON document such as `case_001_temporal.json`) and executes a pre-defined analytical pipeline. It requires no knowledge of Python to operate; it is invoked from the system command line. The script produces two primary outputs: (1) a tamper-evident evidence bundle (`bundle_<case_id>.json`) that can be verified deterministically via integer checksum logic, and (2) a forensic report (`report_<case_id>.json`) compliant with ENFSI standards and containing an `AbductionTrace`. The module can process a single case or, with `--all-cases`, scan entire directories for batch execution. An optional connection to a local language model via Ollama (e.g., `llama3.2`) can be enabled for auxiliary textual analysis, though all core integrity checks rely strictly on deterministic integer arithmetic.
 
 Key Concepts table:
-Let's add a row for Deterministic Integer Arithmetic.
 
 | Term | Role | Analogy |
 |---|---|---|

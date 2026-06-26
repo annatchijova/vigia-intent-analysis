@@ -81,7 +81,6 @@ ESPAÑOL:
 - License.
 
 中文:
-- Need to use specific terms: 艾柯 (Eco), 格赖斯 (Grice), 取证工件 (artifact/evidence item, but the user said "取证工件" not "制品" — wait, the user said "取证工件 (not 制品)" but where does artifact appear? Maybe in glossary or explanation. I should use 取证工件 if referring to artifacts. Also 逻辑断裂 (not 裂缝). Let's see where "artifact" might come up. The module path is signal_quality_gate. Maybe I can introduce "取证工件" in the context of digital forensics artifacts. Or just ensure if I mention artifacts, I use 取证工件. For "logic break" or "fracture", use 逻辑断裂.
 - What Is This Module? -> "本模块是什么？"
 - Key concepts tables.
 - Glossary:
@@ -99,9 +98,6 @@ ESPAÑOL:
   本模块使用查尔斯·桑德斯·皮尔斯（初性/三性）、艾柯与格赖斯的术语。这并非神秘主义。在传感器工程中，单一原始电压读数（初性）并不构成经过验证的探测事件（三性）。传感器阵列必须至少包含一个信噪比高于校准阈值的换能器，系统才能断言正向告警。这些符号学术语只是认识论层面的简写，代表每位仪器物理学家都在使用的验证阶段：原始采集 → 噪声过滤 → 经确认的测量。
 - License.
 
-Let's re-read the prompt: "Chinese translations must use: 艾柯 (not Eco), 格赖斯 (not Grice), 取证工件 (not 制品), 逻辑断裂 (not 裂缝)". It doesn't say they must be used in every section, just that when translated, those terms must be used. So I should ensure they appear correctly.
-
-For 逻辑断裂: Perhaps in the scientific note or key concepts: "如果所有信号来自同一工具，则构成逻辑断裂" (If all signals come from the same tool, it constitutes a logical break). Or in the glossary. Let's add a glossary entry for "逻辑断裂" or use it in the Independence check description.
 
 For 取证工件: I can say the module evaluates digital 取证工件 (forensic artifacts). Or in the "What is this module" section: it inspects 取证工件 before verdict.
 
@@ -109,11 +105,6 @@ Okay.
 
 Now, formatting: Markdown. Use headers.
 
-I should also ensure I don't use floating-point math explanations. The module uses z >= 2.0. I will describe Z_STRONG as an exact rational threshold (2), not as a floating point. I can say "deterministic boundary at integer value 2" or "exact threshold". Actually z-scores are rational numbers, but the comparison is deterministic. I can note that while z-scores may be derived from integer counts, the threshold is an exact integer boundary, and the system avoids floating-point tolerance issues by using deterministic integer arithmetic for all gate logic (counts, ratios). Wait, z-scores themselves could be floats. But the user says "emphasize deterministic integer arithmetic where applicable". So for the gate logic (counts, ratios, variances), emphasize integer arithmetic. For z-scores, describe them as deterministic classifiers based on exact thresholds, without discussing IEEE 754 float representation.
-
-Let's structure the document with clear sections for each language. Since it's one document with 4 language sections, I can use top-level headers for each language.
-
-Also, the docstring says "Principio: Muchas Firstnesses (señales débiles) no hac" — it seems cut off. I should probably not worry about the cutoff; the user provided it as context.
 
 Let's write it.
 
@@ -331,9 +322,6 @@ Table 3: 核心组件
 
 ---
 
-I also need to ensure I don't use floating-point math explanations. I used "exact integer boundary" for Z_STRONG. I should make sure I don't say "floating point comparison" or anything. The phrase "z ≥ 2.0" contains a decimal, but I can frame it as a threshold value. To be safe, maybe write "z ≥ 2" or keep "z ≥ 2.0" but don't explain it as float. I'll use "z ≥ 2.0" as it's in the source, but I won't explain float internals. Actually, to be even safer and comply with "emphasize deterministic integer arithmetic where applicable", I can note that the threshold is treated as an exact integer boundary (2), even if the underlying score is rational. I'll phrase it carefully.
-
-Also, the user said "You NEVER use floating-point math explanations for deterministic systems." So I must avoid any mention of floating point precision, rounding, etc. I'll just not mention "float" at all.
 
 Let's refine the ENGLISH table for Z_STRONG to say "Exact integer threshold; deterministic classifier" rather than "Exact integer boundary". Since z-scores can be 2.0, it's a threshold. I'll say "Exact deterministic threshold; signals must meet or exceed the integer boundary of 2". That emphasizes integer arithmetic.
 
@@ -348,6 +336,5 @@ ZH: "查尔斯·桑德斯·皮尔斯（初性/三性）、艾柯与格赖斯". G
 
 Sensor analogy: raw voltage reading (Firstness) → validated detection (Thirdness). Good.
 
-License line: must be present in each section. The user said "
 ---
 *Licensed under the Apache License, Version 2.0. Copyright 2026 Anna Tchijova.*

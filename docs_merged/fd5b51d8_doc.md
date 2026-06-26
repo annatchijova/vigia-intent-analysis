@@ -64,7 +64,6 @@ ESPAÑOL:
 
 Important: Do NOT use floating-point math explanations. Emphasize deterministic integer arithmetic. The module uses integer counts for Ockham cost and integer percentages for coverage. No floats.
 
-Also, the user provided partial docstring text that cuts off. I should extrapolate the architecture gracefully without inventing too much speculative code. Focus on the documented classes and functions.
 
 Let's refine the content.
 
@@ -280,13 +279,11 @@ Este módulo es un motor de inferencia determinista destinado a la investigació
 
 ---
 
-I should place it once at the bottom. But to be safe and since the user said "License line" as a requirement, I'll include it once after all sections.
 
 Double-check Chinese requirements:
 - 艾柯 (not Eco) ✓
 - 格赖斯 (not Grice) ✓
 - 取证工件 (not 制品) ✓ — used 取证工件.
-- 逻辑断裂 (not 裂缝) — this term hasn't come up in my draft because the docstring didn't mention "logic break/fracture" explicitly. It mentioned "cadena de artefactos". I should check if I need to include it. The requirement says "Chinese translations must use: ... 逻辑断裂 (not 裂缝)". This implies there is a concept of "break/fracture/gap" somewhere. The docstring doesn't explicitly mention "break" but says "explica esta cadena de artefactos". Maybe the architecture implies no logic breaks? Or maybe I should mention it in the context of explicit templates preventing hidden logic断裂? The user might have a specific module where "logic break" is a term. Let me see if I can weave it in naturally. Perhaps in the Chinese glossary or key concepts: "逻辑断裂" as logical gap? Or maybe the original text had something like "no lógica condicional oculta" -> no hidden conditional logic prevents logic断裂? Hmm.
 
 ---
 *Licensed under the Apache License, Version 2.0. Copyright 2026 Anna Tchijova.*

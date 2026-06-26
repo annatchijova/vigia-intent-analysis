@@ -94,7 +94,6 @@ For the glossary in Chinese:
 - 合作准则: 格赖斯提出的理性沟通预期标准。
 - 红鲱鱼: 艾柯所指的、故意植入以误导调查的无关联噪声或诱饵。
 
-Need to be careful: The user said "逻辑断裂 (not 裂缝)". The module has "_IntegrityViolation" which is for integrity violations / logical fractures. So I should use 逻辑断裂 in the glossary for integrity violation / logical fracture.
 
 Also for Chinese: 艾柯 (Eco), 格赖斯 (Grice). Good.
 
@@ -127,7 +126,6 @@ Let's draft the full text carefully.
 
 One concern: The module docstring mentions MIT License, but the user explicitly requires the line: "" I will use that exact line as required.
 
-Also, the user says "Do NOT use floating-point math explanations — emphasize deterministic integer arithmetic where applicable". So when describing constants, I must say they are exact integer limits, not approximate or calculated via division/floats.
 
 Let's write the content.
 

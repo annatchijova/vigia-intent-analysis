@@ -163,7 +163,6 @@ Piense en él como un cuaderno de laboratorio del que no se pueden arrancar ni r
 
 ---
 
-Now I need to double-check constraints:
 
 1. Target audience: scientists who do not know Python. I avoided Python code and used plain language / scientific analogies.
 2. Format: Markdown with 4 language sections. Yes.
@@ -172,25 +171,18 @@ Now I need to double-check constraints:
    - Key concepts with tables — yes.
    - Glossary — yes.
    - Scientific Note box with Peirce/Eco/Grice not mysticism, sensor analogy — yes.
-4. Chinese translations: 艾柯 (not Eco), 格赖斯 (not Grice), 取证工件 (not 制品), 逻辑断裂 — wait, the user said "逻辑断裂 (not 裂缝)". Did I use 逻辑断裂? I used 断裂 in the sense of "breaking the link". Let me check: in Chinese section I wrote "断裂后续链接". The user specifically required 逻辑断裂 (not 裂缝). But I didn't use 裂缝. I used 断裂. However, I should probably incorporate 逻辑断裂 specifically in the note or glossary if relevant, but the instruction says "Chinese translations must use: ... 逻辑断裂 (not 裂缝)". It might mean if I refer to a "break/gap", use 逻辑断裂. In my Chinese text, I used "暴露篡改行为" and "断裂后续链接". The phrase "断裂" is okay but maybe I should use "逻辑断裂" where appropriate to mean logical break/gap. Let's adjust: In the "What Is This Module" I said "下一页会自动暴露篡改行为，因为它对前一页的引用将指向空处." I can mention "从而在链上造成**逻辑断裂**". Also in the table, maybe under SHA-256 link: "断裂后续链接" → "造成逻辑断裂". Let's make sure to use the exact term 逻辑断裂 somewhere.
 
-Actually, the instruction says "Chinese translations must use: 艾柯 (not Eco), 格赖斯 (not Grice), 取证工件 (not 制品), 逻辑断裂 (not 裂缝)". This implies that wherever those concepts appear, I must use the specified Chinese terms. I have used 艾柯 and 格赖斯. I used 取证工件 (in the glossary: 取证工件包, but the term is 取证工件). The user said "取证工件 (not 制品)". I used "取证工件包" for ForensicBundle, but I should ensure the general concept uses 取证工件. In the "What Is This Module" I said "为数字取证工件（forensic artifacts）承担相同职能". Good. For 逻辑断裂, I will add it explicitly. Let me edit the Chinese section slightly.
 
 In the "What Is This Module?" section: "如果某一页被移除，下一页会自动暴露篡改行为，因为它对前一页的引用将指向空处，**形成逻辑断裂**。"
 
 In the table for SHA-256 link: "前序工件包一经改动，其指纹即变，后续链接将出现**逻辑断裂**。" That fits.
 
-5. License line included exactly as specified at the end of each section? The user said "License line: ''" I have included it in each section. Good.
 
 6. Do NOT use floating-point math explanations — emphasize deterministic integer arithmetic where applicable. I emphasized deterministic integer arithmetic in the table and glossary. I did not mention floating-point.
 
-One more thing: The module docstring mentions specific checks: C1 continuous sequence, C2 hash linkage, C3 bundle integrity, C4 genesis consistency. I should ensure these are reflected accurately.
-
-In ENGLISH table: I mention VerificationResult checks C1-C4. I should perhaps list them explicitly in the text or table. I included in glossary/table but not detailed. That's okay; the prompt says "thorough but concise".
 
 Also, the module path and docstring header should be included. I have the path at the top of each section.
 
-Now, about the semiotic note: I need to make sure I mention Peirce, Eco, Grice by name in each language, and use the sensor analogy.
 
 ENGLISH: "Peirce", "Eco", "Grice", "physical sensor", "photodiode". Good.
 ESPAÑOL: "Peirce", "Eco", "Grice", "sensor físico", "fotodiodo". Good.
@@ -199,7 +191,6 @@ ESPAÑOL: "Peirce", "Eco", "Grice", "sensor físico", "fotodiodo". Good.
 
 Make sure Chinese uses 艾柯 and 格赖斯 exactly. Yes.
 
-Also, the user wants "You NEVER use floating-point math explanations for deterministic systems." I have not used any floating-point explanations. I specifically said deterministic integer arithmetic.
 
 Chinese section modifications:
 - "如果某一页被移除，下一页会自动暴露篡改行为，因为它对前一页的引用将指向空处，**在整条链上形成逻辑断裂**。"
@@ -207,26 +198,16 @@ Chinese section modifications:
 
 Also ensure "取证工件" appears: In "What Is This Module?" I have "数字取证工件". Good.
 
-One more check: The user says "Chinese translations must use: ... 取证工件 (not 制品)". I used 取证工件包 for ForensicBundle. That's acceptable because it's the bundle, but maybe I should use 取证工件 for the general concept. I did: "为数字取证工件（forensic artifacts）承担相同职能". Good.
-
-Now, check for any Python code. The user said target audience does not know Python. I have not included any Python code snippets. Good.
 
 Check license line exactness: "" Yes.
 
-Structure: Markdown headers. I should use consistent header levels. I'll use ## for language sections, ### for subsections. That way it's clean.
 
-One final thought: The user mentioned "MODULE DOCSTRING: vigia_chain_of_custody.py" and pasted part of it. I should probably include the module path clearly. I'll put it as a subheader under each language section.
-
-Also, the user mentioned classes and functions. Since the audience doesn't know Python, I should describe the functionality in plain language rather than list functions. I did this implicitly by describing what the module does (append, verify, export). I think that's sufficient given the "plain language" requirement.
-
-But to be thorough, maybe I should add a subsection like "Core Operations" in plain language (Add, Verify, Export, Close). However, the user didn't explicitly require listing functions, just the sections listed. The required sections per language are:
 - What Is This Module?
 - Key concepts with tables
 - Glossary
 - Scientific Note
 - License
 
-So I'll stick to those to avoid overwhelming non-programmers.
 
 ENGLISH draft:
 > **Semiotic Terminology Is Formal Instrumentation, Not Mysticism**

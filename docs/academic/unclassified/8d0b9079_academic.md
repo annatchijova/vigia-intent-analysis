@@ -26,7 +26,7 @@ Input and output specifications are formally constrained to ensure interoperabil
 
 Deterministic guarantees constitute the central forensic reliability pillar of `report_exporter_v2.py`. The subsystem is architected to exclude all internal entropy sources; pseudo-random number generators, when invoked for layout tasks such as identifier generation, are initialized with fixed constants. All temporal parameters are exogenous—$\tau$ is supplied by an external trusted timestamp authority rather than generated from local system clocks—thereby eliminating clock-skew variance. As a direct consequence, the module exhibits strict idempotence under fixed input conditions: $\mathcal{F}_{\text{exp}}(\mathcal{F}_{\text{exp}}(\mathcal{I})) = \mathcal{F}_{\text{exp}}(\mathcal{I})$ provided $\mathcal{M}$ and $\mathcal{T}$ remain constant. This behavioral determinism directly satisfies the reliability criteria articulated under the Daubert standard for expert testimony and Federal Rules of Evidence 702 (FRE 702). The underlying methodology is falsifiable and empirically testable; it has been subjected to peer review within the VIGÍA framework; it possesses a known error rate of zero for the transformation layer under specification-conforming inputs; it operates in accordance with standards accepted in the relevant forensic community, including ISO/IEC 27037 and the ACPO Good Practice Guide for Computer-Based Electronic Evidence; and it enjoys general acceptance among practitioners deploying deterministic pipelines. Additionally, the module satisfies Chinese national standard GB/T 29360-2012, which mandates reproducible documentation and fixation of electronic data forensic inspection procedures, and fulfills MLPS 2.0 (Multi-Level Protection Scheme 2.0) Level 3 security requirements concerning audit traceability, operational reproducibility, and non-repudiation for information systems processing evidentiary data. A reproducibility lemma follows: any independent peer reviewer equipped with identical inputs $\mathcal{I}$, access to the `vigia_template_registry`, and the canonicalization specification can faithfully regenerate $\mathcal{R}$ and cryptographically verify $h_{\mathcal{R}}$ against the published sidecar manifest.
 
-Interoperability with related VIGÍA modules is governed by strict data-flow contracts. Upstream, `report_exporter_v2.py` accepts artifact digests exclusively from `vigia_artifact_validator`, relying upon that module’s cryptographic seal as a precondition for ingestion. It simultaneously consumes chain-of-custody tokens from `vigia_chain_of_custody`, and acknowledges receipt by injecting a bidirectional acknowledgment hash into the custody log, thereby closing the provenance loop. Internally, the module queries `vigia_template_registry` to resolve template descriptors; template versioning is pinned at the descriptor level, ensuring that temporal drift in template definitions cannot compromise the byte-level reproducibility of historical reports. Downstream, the module transmits the sidecar manifest $\mathcal{S}$ to `vigia_audit_logger`, which persists tamper-evident log entries within the VIGÍA audit substrate and provides the evidentiary foundation for subsequent compliance inspections. Critically, the module enforces a unidirectional, feed-forward architecture: it maintains no callbacks, reverse channels, or procedural links to analytical modules such as `vigia_correlation_engine`, `vigia_temporal_analyzer`, or `vigia_heuristic_classifier`. This architectural isolation guarantees that the preparatory and archival functions of report export can never exert feedback pressure upon the analytical layer, preserving the integrity of the forensic pipeline and ensuring that the rendered report remains a faithful, unbiased representation of the validated investigative outputs.
+Interoperability with related VIGÍA modules is governed by strict data-flow contracts. Upstream, `report_exporter_v2.py` accepts artifact digests exclusively from `vigia_artifact_validator`, relying upon that module's cryptographic seal as a precondition for ingestion. It simultaneously consumes chain-of-custody tokens from `vigia_chain_of_custody`, and acknowledges receipt by injecting a bidirectional acknowledgment hash into the custody log, thereby closing the provenance loop. Internally, the module queries `vigia_template_registry` to resolve template descriptors; template versioning is pinned at the descriptor level, ensuring that temporal drift in template definitions cannot compromise the byte-level reproducibility of historical reports. Downstream, the module transmits the sidecar manifest $\mathcal{S}$ to `vigia_audit_logger`, which persists tamper-evident log entries within the VIGÍA audit substrate and provides the evidentiary foundation for subsequent compliance inspections. Critically, the module enforces a unidirectional, feed-forward architecture: it maintains no callbacks, reverse channels, or procedural links to analytical modules such as `vigia_correlation_engine`, `vigia_temporal_analyzer`, or `vigia_heuristic_classifier`. This architectural isolation guarantees that the preparatory and archival functions of report export can never exert feedback pressure upon the analytical layer, preserving the integrity of the forensic pipeline and ensuring that the rendered report remains a faithful, unbiased representation of the validated investigative outputs.
 
 ## ESPAÑOL
 
@@ -57,3 +57,85 @@ Las especificaciones de entrada y salida se encuentran formalmente restringidas 
 Las garantías deterministas constituyen el pilar central de la confiabilidad forense de `report_exporter_v2.py`. Tenés que tener presente que el subsistema se arquitecta para excluir toda fuente interna de entropía; los generadores de números pseudoaleatorios, cuando se requieren para tareas de layout tales como la generación de identificadores, se inicializan con constantes fijas. Todos los parámetros temporales son exógenos —$\tau$ se suministra mediante una autoridad de timestamp confiable externa en lugar de generarse a partir de relojes de sistema locales—, eliminando así la varianza por desviación de reloj. Como consecuencia directa, el módulo exhibe idempotencia estricta bajo condiciones de entrada invariante: $\mathcal{F}_{\text{exp}}(\mathcal{F}_{\text{exp}}(\mathcal{I})) = \mathcal{F}_{\text{exp}}(\mathcal{I})$ cuando $\mathcal{M}$ y $\mathcal{T}$ se mantienen constantes. Este determinismo conductual satisface directamente los criterios de confiabilidad articulados en el estándar Daubert para testimonio pericial y en las Federal Rules of Evidence 702 (FRE 702). La metodología subyacente es falsificable y empíricamente comprobable; ha sido sometida a revisión por pares dentro del framework VIGÍA; posee una tasa de error conocida de cero para la capa de transformación bajo entradas conformes a la especificación; opera de acuerdo con estándares aceptados en la comunidad forense pertinente, incluyendo ISO/IEC 27037 y las ACPO Good Practice Guide for Computer-Based Electronic Evidence; y goza de aceptación general entre los profesionales que despliegan pipelines deterministas. Además, el módulo satisface la norma nacional china GB/T 29360-2012, la cual exige documentación reproducible y fijación de los procedimientos de inspección forense de datos electrónicos, y cumple con los requisitos de seguridad de Nivel 3 del MLPS 2.0 (Multi-Level Protection Scheme 2.0) concernientes a la trazabilidad de auditoría, la reproducibilidad operativa y el no repudio para sistemas de información que procesan datos probatorios. Si desempeñás el rol de revisor independiente, contás con la posibilidad de equiparte con entradas idénticas $\mathcal{I}$, acceso al `vigia_template_registry` y la especificación de canonicalización para regenerar fielmente $\mathcal{R}$ y verificar criptográficamente $h_{\mathcal{R}}$ contra el manifiesto sidecar publicado.
 
 La interoperabilidad con los módulos VIGÍA relacionados se rige por contratos de flujo de datos estrictos. En el upstream, `report_exporter_v2.py` acepta digestos de artefactos exclusivamente de `vigia_artifact_validator`, confiando en el sello criptográfico de ese módulo como precondición de ingesta. Simultáneamente consume tokens de cadena de custodia de `vigia_chain_of_custody` y acusa recibo mediante la inyección de un hash de reconocimiento bidireccional en el registro de custodia, cerrando así el loop de procedencia. Internamente, el módulo consulta al `vigia_template_registry` para resolver descriptores de plantilla; el versionado de plantillas se ancla a nivel del descriptor, asegurando que la deriva temporal en las definiciones de plantilla no pueda comprometer la reproducibilidad a nivel de bytes de informes históricos. En el downstream, el módulo transmite el manifiesto sidecar $\mathcal{S}$ al `vigia_audit_logger`, el cual persiste entradas de registro a prueba de manipulación dentro del sustrato de auditoría VIGÍA y provee la base probatoria para inspecciones de cumplimiento subsecuentes. De manera crítica, el módulo impone una arquitectura unidireccional de avance: no mantiene callbacks, canales reversos ni enlaces procedimentales con módulos analíticos tales como `v
+
+---
+
+## РУССКИЙ
+
+### Что это за модуль?
+
+Модуль VIGÍA, идентифицируемый криптографическим хэшем `8d0b9079` и реализованный как `report_exporter_v2.py`, представляет собой детерминированный архивно-подготовительный терминус в интегрированном конвейере цифровой криминалистики VIGÍA. Его фундаментальная цель — строго синтаксическое преобразование структурированных результатов расследования: проверенных форензических артефактов, процессуальных метаданных и токенов провенанса цепочки хранения улик — в стандартизированные, читаемые человеком отчётные документы. Эти визуализированные выходные данные явно спроектированы для удовлетворения требований допустимости при научном рецензировании, судебном контроле и формальном юридическом раскрытии в уголовных и гражданских производствах.
+
+Модуль работает под нарушимым эпистемическим ограничением: он не выполняет никакого доказательного анализа, интерпретационной корреляции, статистического вывода или умозаключительной реконструкции обрабатываемых данных. Операционная область строго ограничена нормализацией формата, рендерингом на основе шаблонов, внедрением метаданных и криптографическим запечатыванием целостности. Благодаря этому онтологическому разделению аналитического движка и презентационного слоя `report_exporter_v2.py` устраняет риски эффектов наблюдателя, предвзятости подтверждения и непреднамеренного загрязнения доказательств на этапе составления отчёта.
+
+Детерминированный аксиом, управляющий модулем, гласит: для любых двух экземпляров выполнения идентичные входные данные с необходимостью порождают побайтово идентичные выходные данные. Для гарантии этого свойства все внутренние операции — от связывания переменных шаблона до сериализации документа — подвергаются оператору канонизации `CANON`, который налагает полный порядок на все ассоциативные структуры данных и подавляет любые источники энтропии выполнения.
+
+### Ключевые концепции
+| Концепция | Определение | Техническая роль |
+|---|---|---|
+| Валидированный пакет артефактов (VAB) | Форензический дайджест, проверенный `vigia_artifact_validator` | Единственный допустимый первичный вход модуля |
+| Токен цепочки хранения улик | Подписанный JWT или сертификат X.509, кодирующий непрерывный провенанс | Криптографически связывает отчёт с его доказательным происхождением |
+| Оператор канонизации (CANON) | Детерминированные правила упорядочения для всех внутренних структур данных | Гарантирует побайтовую воспроизводимость при идентичных входных данных |
+| Хэш целостности SHA-256 | Целочисленный дайджест над канонической последовательностью байт отчёта | Позволяет независимым рецензентам криптографически верифицировать вывод |
+| Манифест аудита (sidecar) | Читаемая машиной запись параметров канонизации и провенанса входных данных | Обеспечивает доказательную основу для проверок соответствия |
+| Семиэтапный конвейер | Строго определённые этапы: валидация, разрешение шаблона, CIR, метаданные, запечатывание, эмиссия формата, манифест | Обеспечивает соответствие стандарту Добера для каждой операции |
+| Строгая идемпотентность | $\mathcal{F}_{\text{exp}}(\mathcal{F}_{\text{exp}}(\mathcal{I})) = \mathcal{F}_{\text{exp}}(\mathcal{I})$ при фиксированных входных данных | Прямое следствие детерминированной целочисленной арифметики |
+| Архитектура прямой передачи | Отсутствие обратных вызовов или обратных каналов к аналитическим модулям | Предотвращает загрязнение аналитического слоя из слоя представления |
+
+> **【Научное примечание】**
+> Терминология Пирса, Эко и Грайса — это не мистика, а формальная аналитическая механика. Как спектрометр преобразует фотонные взаимодействия в дискретные целочисленные отсчёты, этот модуль преобразует сигналы улик в детерминированные целочисленные оценки. Целочисленная арифметика гарантирует воспроизводимость в суде без округлений и аппроксимаций. Любое нарушение логики в цепочке артефактов фиксируется как целочисленный флаг, а не интуитивное суждение.
+
+### Глоссарий
+1. **Форензический артефакт** — Любой файл, журнал или объект данных, который может быть представлен в качестве доказательства.
+2. **Канонизация** — Детерминированное преобразование структуры данных в единственное каноническое представление, устраняющее вариации порядка.
+3. **Провенанс** — Документированная история происхождения и хранения доказательного материала.
+4. **Не-отрицание** — Криптографическое свойство, исключающее возможность отрицания создания или передачи документа.
+5. **Идемпотентность** — Свойство операции: повторное применение к результату даёт тот же результат.
+6. **Токен временной метки RFC 3161** — Внешне поставляемое доверенное доказательство времени, соответствующее стандарту RFC 3161.
+7. **PDF/A-2b** — Стандарт ISO для долгосрочного архивирования PDF, требующий встраивания всех шрифтов и метаданных.
+8. **Стандарт Добера** — Правовой критерий допустимости научных доказательств, требующий воспроизводимости.
+9. **Детерминированная целочисленная арифметика** — Точные вычисления над целыми числами, исключающие ошибки представления.
+10. **Манифест аудита** — Машиночитаемая запись, содержащая хэш целостности, подпись, временную метку и идентификатор модуля.
+
+*Licensed under the Apache License, Version 2.0. Copyright 2026 Anna Tchijova.*
+
+---
+
+## 中文
+
+### 这是什么模块？
+
+由密码学哈希`8d0b9079`标识、以`report_exporter_v2.py`实现的VIGÍA模块，构成VIGÍA集成数字取证流程中的确定性归档准备终端。其基本目的是将结构化调查输出——包括经过验证的取证工件、程序元数据和监管链来源令牌——严格语法化地转换为标准化、人类可读的报告文件。这些渲染输出专门设计用于满足科学同行评审、司法审查以及刑事和民事证据程序中正式法律披露的可采性前提。
+
+模块在一个不可违反的认识论约束下运行：它不对所处理的数据执行任何证据分析、解释性关联、统计推断或推理重建。其操作范围严格限于格式规范化、模板驱动渲染、元数据嵌入和密码学完整性封印。通过在分析引擎和表示层之间强制执行这种本体论分离，`report_exporter_v2.py`减轻了报告阶段观察者效应、确认偏差和无意证据污染的风险。
+
+治理模块的确定性公理规定：对于执行空间中任意两个执行实例，相同输入必然产生逐字节相同的输出。为保证这一属性，所有内部操作——从模板变量绑定到文档序列化——都经过规范化算子`CANON`处理，该算子对所有关联数据结构施加全序，并抑制任何执行熵源。
+
+### 关键概念
+| 概念 | 定义 | 技术作用 |
+|---|---|---|
+| 经验证取证工件包（VAB） | 由`vigia_artifact_validator`验证的取证摘要 | 模块唯一允许的主要输入 |
+| 监管链令牌 | 编码连续来源链的签名JWT或X.509属性证书 | 将报告与其证据来源密码学绑定 |
+| 规范化算子（CANON） | 所有内部数据结构的确定性排序规则 | 保证相同输入下的逐字节可重现性 |
+| SHA-256完整性哈希 | 对报告规范字节序列的整数摘要 | 使独立审查者能密码学验证输出 |
+| 审计清单（sidecar） | 记录规范化参数和输入来源的机器可读记录 | 为合规检查提供证据基础 |
+| 七阶段流程 | 严格定义的阶段：验证、模板解析、CIR、元数据、封印、格式输出、清单 | 确保每个操作符合道伯特标准 |
+| 严格幂等性 | $\mathcal{F}_{\text{exp}}(\mathcal{F}_{\text{exp}}(\mathcal{I})) = \mathcal{F}_{\text{exp}}(\mathcal{I})$（固定输入时） | 精确整数运算的直接结果 |
+| 前向传播架构 | 不向分析模块维护回调或反向通道 | 防止表示层污染分析层 |
+
+> **【科学说明】**
+> 皮尔斯（Peirce）、艾柯（Eco）和格赖斯（Grice）的术语并非神秘主义，而是形式化的分析机制。如同光谱仪将光子相互作用转换为离散整数计数，本模块将证据信号转换为确定性整数分数。精确整数运算确保法庭可重现性。取证工件链的逻辑断裂以整数标志事件形式被检测。
+
+### 词汇表
+1. **取证工件** — 可在审计或法律程序中作为证据提交的任何文件、日志或数据对象。
+2. **规范化** — 将数据结构确定性转换为唯一规范表示，消除顺序变化。
+3. **来源（Provenance）** — 证据材料起源和保管的有据可查的历史。
+4. **不可否认性** — 密码学属性，排除否认文件创建或传输的可能性。
+5. **幂等性** — 操作属性：将操作重复应用于其结果产生相同结果。
+6. **RFC 3161时间戳令牌** — 符合RFC 3161标准的外部提供的可信时间证明。
+7. **PDF/A-2b** — 长期档案存储的ISO PDF标准，要求嵌入所有字体和元数据。
+8. **道伯特标准** — 要求可重现性的科学证据可采性法律标准。
+9. **精确整数运算** — 对整数进行精确计算，排除表示误差。
+10. **审计清单** — 包含完整性哈希、签名、时间戳和模块标识符的机器可读记录。
+
+*Licensed under the Apache License, Version 2.0. Copyright 2026 Anna Tchijova.*

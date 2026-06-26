@@ -87,13 +87,11 @@ Generated: 2026-05-20T14:56:47.878155+00:00
 
 ```
 
-Let's double check the content for floating-point explanations. I must not explain floating point math. I can mention that the engine avoids floating-point approximations by using integer epoch seconds and deterministic median operations. I should not explain how floats work or why they are bad beyond stating the system is free from their uncertainty.
 
 In the English glossary, I used "without floating-point approximations in the primary pipeline." That's okay; it's not explaining floating-point math, just stating the absence.
 
 Now, ensure the term "Peirce/Eco/Grice" appears in the scientific note. Yes.
 
-Let's verify the Spanish scientific note uses "Peirce, Eco y Grice". Yes.
 
 Russian: "Пирса, Эко и Грайса". Yes.
 

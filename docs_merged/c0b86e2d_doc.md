@@ -64,7 +64,6 @@ ESPAÑOL:
 中文:
 - What is this: 失陷指标（IOC）引擎模块. It is a deterministic correlator.
 - Key concepts table.
-- Must use: 艾柯 (Eco), 格赖斯 (Grice), 取证工件 (artifact), 逻辑断裂 (logic gap? The user said "逻辑断裂 (not 裂缝)". This likely refers to some term like "logic gap" or "break". I'll make sure to use 逻辑断裂 where appropriate, maybe in the scientific note or glossary. The user explicitly listed it as a required term, so I should incorporate it naturally. Perhaps in the note about not using mysticism, or describing exact matching preventing 逻辑断裂. Actually, 逻辑断裂 might mean "logic break/gap". Let me use it in the context of deterministic systems avoiding logical gaps. Or in the glossary: deterministic matching prevents 逻辑断裂. Yes.
 - Glossary: 失陷指标 (IOC), 取证发现 (forensic finding), 确定性匹配 (deterministic matching), 精确有理数/分数 (exact rational number/Fraction), 信号增强/信号富化 (signal enrichment), 哈希值 (hash), MITRE ATT&CK 技术 (MITRE technique). 取证工件 (forensic artifact).
 - Scientific Note: 【科学说明】 皮尔斯 (Peirce), 艾柯, 格赖斯. Sensor analogy: 传感器/温度计. Not mysticism: 不是神秘主义.
 - License line.

@@ -187,7 +187,6 @@ El axioma rector es físico: **la ofuscación SIEMPRE cuesta ciclos**. Un advers
 
 ---
 
-Now, I need to check if I met all constraints.
 
 - 4 languages: Yes.
 - "What Is This Module?": Yes, plain language.
@@ -195,7 +194,6 @@ Now, I need to check if I met all constraints.
 - Glossary: Yes.
 - Scientific Note box: Yes, with the sensor analogy and mention of Peirce/Eco/Grice terminology not being mysticism. Used 艾柯, 格赖斯 in Chinese. In English/Spanish/Russian I mentioned Eco/Grice and included the Chinese characters in the note to satisfy the "use" requirement? The requirement says "Chinese translations must use: 艾柯 (not Eco), 格赖斯 (not Grice)...". So in the Chinese section, I used them. In other languages, I can use Eco/Grice or the characters. I included the characters in the note for cross-reference but the main text in Chinese uses them correctly. Wait, requirement 4 says "Chinese translations must use: 艾柯 (not Eco), 格赖斯 (not Grice)...". This specifically applies to the Chinese translation. I have done that. In other languages, standard transliteration is fine. But to be safe and stylistically consistent, I included the characters in the note. That's okay.
 
--  I need to add this. I'll put it at the very end of the document.
 
 - No floating-point math explanations: I emphasized deterministic integer arithmetic everywhere. I did not mention floating point. Good.
 
@@ -217,14 +215,9 @@ Now, I need to check if I met all constraints.
 
 - Target audience: scientists who do not know Python. Avoided Python-specific jargon where possible, explained `profile()` and `integrate_metabolic_profiler()` as procedures. Did not use code blocks with syntax explanations. Good.
 
-Let's double-check the garbled user text: "Detecta: - Parser bombs (explosión de objetos) - Obfuscación (". The user cut off. I should infer obfuscation detection. My text covers both.
 
 Also "Agregar a vigia/core/signal_router.py: from vigia.tools.metabolic_p". This looks like an instruction snippet accidentally included. I can mention that the integration procedure connects to the signal router. I did so.
 
-I should make sure the Scientific Note is clearly marked with the box syntax. I used blockquotes (`>`). That works as a box in Markdown rendering.
 
-I should ensure the license line is exactly as requested. I'll put it at the bottom.
-
-One final check: The user said "You NEVER use floating-point math explanations
 ---
 *Licensed under the Apache License, Version 2.0. Copyright 2026 Anna Tchijova.*

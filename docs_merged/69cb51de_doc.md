@@ -24,7 +24,6 @@ Actually, I can present the glossary like this:
 
 But that's 4 definitions per term. 10 terms × 4 short definitions = maybe 120 words. Plus terms = 30 words. Total 150. Main text 200. Total 350. Under 500. This is doable if I keep each definition to ~4-5 words per language. Let's attempt.
 
-Also, the user is an academic technical writer. The tone should be formal and scientific.
 
 Let's refine the main texts to be slightly more descriptive but still under ~60 words each.
 
@@ -59,7 +58,6 @@ Example entry:
 
 Count: ~20 words per entry. 10 entries = 200 words. 226 + 200 = 426. Under 500. Perfect.
 
-But I need to ensure I don't use floating-point language. The module is deterministic, so I should avoid words like "floating-point", "real number", "approximation", etc.
 
 Let's select 10 relevant terms:
 1. Deterministic scoring (the main concept)
@@ -104,9 +102,6 @@ ZH: ~8 × 10 = 80.
 Terms: ~5 × 10 = 50.
 Total glossary: ~430? That's too much.
 
-I need to compress. The 500-word limit is for the entire output. So I must be brutal.
-
-Strategy: Provide the 4 language paragraphs (approx. 220 words). Then for the glossary, use a very compact format: just the 4-language term and a single 4-5 word definition in English only, or perhaps a bilingual definition. But the persona says 4 languages. However, maybe I can list the terms in 4 languages and not give a long definition, but rather a short one in English, and that will suffice because the main text is in 4 languages. Or I can give a definition in 4 languages but extremely short (3-4 words each). Let's see:
 
 Example:
 **Artifact / Artefacto / Артефакт / 工件** — Investigative digital trace. / Rastro digital investigativo. / След для расследования. / 调查用数字痕迹。
@@ -140,7 +135,6 @@ Each entry has terms (~4 words) + 4 definitions (~4 words each = 16 words) = ~20
 10 entries = ~200 words.
 Total = ~426 words.
 
-I need to make sure Chinese word count is not inflated. In many word counters, Chinese characters count as words. Let's count characters for the Chinese paragraph carefully:
 `vigia_scorer.py` (1) 是(2) VIGÍA(3) 套件中(4,5) 用于(6,7) 取证(8,9) 意图(10,11) 分析(12,13) 的(14) 确定性(15,16,17) 评分(18,19) 子模块(20,21)。它(22) 通过(23,24) 严格的(25,26,27) 规则(28,29) 逻辑(30,31) 评估(32,33) 数字(34,35) 工件(36,37) 的(38) 意图性(39,40,41)，为(42) 事件(43,44) 响应(45,46) 提供(47,48) 可复现(49,50,51) 的(52) 指标(53,54)。该模块(55,56) 为(57) 2026(58) 年(59) SANS(60) FIND(61) EVIL(62) 黑客松(63,64) 开发(65,66)，拟(67) 集成(68,69) 至(70) SANS(71) SIFT(72) 工作站(73,74)。采用(75,76) Apache(77) 2.0(78) 许可证(79,80)。
 So 80 "words". That's okay.
 
@@ -157,7 +151,6 @@ SANS 取证 Linux 发行版 = 6 words? SANS(1) 取证(2) Linux(3) 发行版(4,5)
 取证意图性分析平台 = 9 characters.
 
 So Chinese glossary definitions average maybe 8 characters. English ~5 words. Spanish ~5. Russian ~4. Terms ~4.
-Total per entry: 5+5+4+8 + 4 terms = ~26. ×10 = 260. + 226 = 486. That's close to 500 but under. Let's see if we can trim.
 
 Maybe reduce main text slightly.
 
@@ -212,8 +205,6 @@ EN 2, ES 5, RU 3, ZH 7. Total ~17.
 Total glossary word estimate: 22+22+25+17+18+19+22+18+20+17 = 220.
 Total document: 210 + 220 = 430. Under 500. Perfect.
 
-I should ensure no floating-point references. "Reproducible non-stochastic calculation" is fine. No mention of floats.
 
-I should also include a "Scientific Note" perhaps? The prompt says "You include glossaries and scientific notes." So I should add a brief scientific note. But word count is tight. I can add a very short scientific note in one place, maybe after the descriptions or integrated. For example, a single line: **Scientific note / Nota científica / Научное примечание / 科学注释** — Deterministic systems require exact integer logic rather than approximate representations. But that might be too close to floating-point? Actually, the user said NEVER use floating
 ---
 *Licensed under the Apache License, Version 2.0. Copyright 2026 Anna Tchijova.*

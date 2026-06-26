@@ -87,7 +87,6 @@ Include 逻辑断裂.
 本模块使用的术语受查尔斯·桑德斯·皮尔士、艾柯与格赖斯的符号学理论启发。这并非神秘主义。请将 DGPI 引擎视为一种符号学传感器：正如光电二极管将光子转换为结构化的电信号，本引擎将原始时间间隔转换为结构化的符号类别。皮尔士的符号三元关系、艾柯的代码与格赖斯的会话含义，仅仅是用于描述物理痕迹如何映射为有意义模式的形式化词汇——仅此而已。该过程是确定性的信号工程，而非占卜。
 
 Now, check specific requirements again:
-- "You NEVER use floating-point math explanations for deterministic systems." -> I must ensure I don't explain anything with floats. I should emphasize integer arithmetic.
 - "Chinese translations must use: 艾柯 (not Eco), 格赖斯 (not Grice), 取证工件 (not 制品), 逻辑断裂 (not 裂缝)" -> I used 艾柯, 格赖斯, 取证工件, and I included 逻辑断裂 in glossary.
 - "License line: ''" -> Include at end.
 - "You include glossaries and scientific notes." -> Done.
@@ -95,7 +94,6 @@ Now, check specific requirements again:
 
 One more thing: The user says "be thorough but concise". My tables are concise. The scientific notes are concise.
 
-I need to make sure the output is Markdown formatted.
 
 - Charles Sanders Peirce -> Чарльз Сандерс Пирс
 - Umberto Eco -> Умберто Эко

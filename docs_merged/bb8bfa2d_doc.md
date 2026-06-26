@@ -59,9 +59,6 @@ ESPAÑOL:
 
 Important: The user says "You NEVER use floating-point math explanations for deterministic systems." So when describing z_score, say it's computed via deterministic integer arithmetic (e.g., using scaled integer MAD) or rational representation, never "float". And pi_ij = count/500 as exact rational.
 
-Also, the user wants documentation for scientists who do not know Python. So avoid Python syntax, no "class", "def", etc. Use terms like "data container", "record type", "schema".
-
-The module path is vigia/core/ebs_v1.py but docstring says vigia/models/ebs_v1.py. I should mention EBS v1 module.
 
 Need to include all classes/functions mentioned in a cohesive way, but as concepts, not code.
 

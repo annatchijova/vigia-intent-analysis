@@ -187,7 +187,6 @@ Classes: IRPhase, VariableCategory, Artifact, FocusAnalysis, VisibleVariablesEng
 Functions: analyze_bundle_focus, to_dict, to_json, detect_phase, analyze_focus, infer_habit
 Constants: RECONNAISSANCE, INITIAL_ACCESS, EXECUTION, PERSISTENCE, PRIVILEGE_ESCALATION, DEFENSE_EVASION, CREDENTIAL_ACCESS, DISCOVERY, LATERAL_MOVEMENT, COLLECTION
 
-I should include these in the tables or mention them in the key concepts. Since the audience doesn't know Python, I shouldn't list them as "functions" but rather as "operations" or "capabilities".
 
 Revised Table 1 (EN): Core Components & Capabilities
 | Symbolic Component | Scientific Function | Deterministic Property |
@@ -212,7 +211,6 @@ For the Chinese section, check required translations:
 - 艾柯 (Eco) — used in scientific note
 - 格赖斯 (Grice) — used in scientific note
 - 取证工件 (Artifact) — used
-- 逻辑断裂 — wait, where does this fit? The prompt mentions "逻辑断裂 (not 裂缝)". Looking at the module description, there might be a concept of "logic break/gap". But the provided module docstring doesn't explicitly mention a logic break. The user just said Chinese translations must use those terms. I should probably incorporate "逻辑断裂" somewhere if relevant, or maybe it's just a constraint if the term appears. Since the module deals with inference and abduction, maybe I can mention it in the glossary or note as "logic break/gap" if needed. Actually, the user listed it as a requirement for Chinese translations, likely because the module might deal with "breaks" in logic or "gaps". But I don't see "gap" or "break" in the docstring explicitly. However, abductive inference often deals with explanatory gaps. Let me include it in the glossary as a precautionary compliance: perhaps "逻辑断裂" as the translation for "logic gap/break" if describing what the engine detects. But since the module description doesn't explicitly use this term, I should be careful not to invent module functionality. I'll include it in the glossary as a term related to abductive reasoning: the gap that abduction seeks to bridge. Or better: in the description of `infer_habit`, it generates hypotheses to bridge explanatory gaps. I'll mention "逻辑断裂" there.
 
 Actually, the requirement says "Chinese translations must use: 艾柯 (not Eco), 格赖斯 (not Grice), 取证工件 (not 制品), 逻辑断裂 (not 裂缝)". This is a mandatory vocabulary constraint. I will ensure these exact strings appear in the Chinese section. I'll make sure "逻辑断裂" appears in the scientific note or glossary.
 
@@ -225,13 +223,11 @@ H. P. 格赖斯 — yes
 取证工件 — yes
 逻辑断裂 — e.g., in the description of infer_habit: "填补原始取证工件与对手意图之间的逻辑断裂" (bridging the logic break between raw artifacts and adversary intent). This seems natural and compliant.
 
-Now, double check: "You NEVER use floating-point math explanations for deterministic systems." So when explaining consistency_score, I must say it's integer arithmetic, and avoid mentioning floats as an alternative to avoid. Actually, the prompt says "do NOT use floating-point math explanations". So I should not explain how floats are bad using float math. I can mention that the system uses integer arithmetic exclusively.
 
 Table 4 in each language should show the integer formula.
 
 Let's assemble the final document. I'll write it as a single Markdown file with four top-level sections.
 
-I'll ensure the license line appears at the end of the document. Actually, to be safest, I'll put it at the end of each language section since the user said "Each section must include..." and then listed the license separately. But the license is a global requirement. I'll put it once at the very bottom to avoid 4 repetitions cluttering the academic tone. Hmm, but compliance is key. I'll include it once after all four sections, clearly marked.
 
 Document structure:
 # Technical Documentation: `vigia/tools/visible_variables.py`

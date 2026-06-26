@@ -17,7 +17,6 @@ El módulo `report_builder` funciona como un componente de síntesis forense den
 Word count check:
 EN: 48 words
 ES: 49 words
-RU: 39 words (Russian words count differently, but let's assume word count by tokens/characters? Usually word count is language-agnostic count of words separated by spaces. Russian text is typically shorter in word count but denser. Let's check: Модуль(1) `report_builder`(2) выступает(3) в(4) роли(5) компонента(6) судебного(7) синтеза(8) в(9) конвейере(10) обработки(11) VIGIA.(12) Он(13) агрегирует(14) обработанные(15) артефакты—хеш-значения,(16) временные(17) метки(18) и(19) извлечённые(20) метаданные—в(21) единый(22) доказательственный(23) отчёт.(24) Детерминированно(25) преобразуя(26) сырые(27) аналитические(28) данные(29) в(30) структурированное(31) повествование,(32) модуль(33) обеспечивает(34) сохранность(35) документации(36) цепочки(37) хранения(38) для(39) экспертной(40) и(41) юридической(42) проверки.(43) = 43 words. Good.
 
 ZH: Let's count: `report_builder`(1) 模块(2) 是(3) VIGIA(4) 处理(5) 流水线(6) 中的(7) 法医(8) 综合(9) 组件(10)。它(11) 以(12) 确定性(13) 方式(14) 聚合(15) 已处理(16) 工件(17)——包括(18) 哈希值(19)、时间线(20) 条目(21) 与(22) 提取(23) 的(24) 元数据(25)——生成(26) 统一(27) 证据(28) 报告(29)。该(30) 模块(31) 将(32) 原始(33) 分析(34) 输出(35) 转化(36) 为(37) 结构化(38) 叙述(39)，供(40) 同行(41) 评审(42) 与(43) 法律(44) 审查(45) 使用(46)，并(47) 确保(48) 监管链(49) 文档(50) 完整(51) 无缺(52)。(53) = 53 words.
 
@@ -55,7 +54,6 @@ Let's count words for this entry:
 EN def: 5 words
 ES def: 5 words
 RU def: 5 words
-ZH def: 6 words (用于检验的恢复数字对象 = 7 characters but as words: 用于(1) 检验(2) 的(3) 恢复(4) 数字(5) 对象(6)). Actually in Chinese word counting, it's characters or space-separated tokens? Usually Chinese text word count is by characters or by natural segmentation. But to be safe, I'll keep it very short.
 
 Let's try to draft 10 entries with ultra-short definitions.
 
@@ -149,7 +147,6 @@ Total = 473 words. This is under 500. Good.
 
 Need to ensure I don't use floating-point math explanations. The glossary includes "Deterministic Output" but I won't mention floats.
 
-Scientific note: I should add a brief scientific note. But word count is tight. Maybe incorporate it into the description? The prompt says "You include glossaries and scientific notes." It might mean as part of my general style, but given the strict 500-word limit, a full separate scientific note might be hard. I can add a small "Scientific Note" sentence in each language block or one note after the descriptions. Let's see if I can fit a brief note.
 
 Maybe add after the descriptions, before glossary:
 **Scientific Note / Nota Científica / Научное Примечание / 科学注释** — This module performs deterministic aggregation; output depends solely on input artifacts and pipeline state, with no stochastic sampling or floating-point approximations involved. / Este módulo realiza agregación determinista; la salida depende únicamente de los artefactos de entrada y del estado del canal, sin muestreo estocástico ni aproximaciones de punto flotante. / Данный модуль выполняет детерминированную агрегацию; вывод зависит исключительно от входных артефактов и состояния конвейера без стохастической выборки или аппроксимаций с плавающей точкой. / 该模块执行确定性聚合；输出仅取决于输入工件与流水线状态，不涉及随机采样或浮点近似。
@@ -163,7 +160,6 @@ Glossary ~280. Total ~532. Slightly over.
 
 Need to trim. Let's make glossary definitions slightly shorter, maybe 4 words each on average. Or remove the scientific note and integrate the reproducibility concept into the main text (which I already did: "Operating deterministically"). The descriptions already mention deterministic operation. That serves as the scientific note implicitly? The prompt says "You include glossaries and scientific notes." It might be safer to have a one-line scientific note shared across languages? But the 4-language requirement suggests everything should be in 4 languages.
 
-Alternative: skip explicit "Scientific Note" header and incorporate the note as a parenthetical sentence in the main text. But I already have "Operating deterministically" in EN. I can expand slightly in each description to include the reproducibility aspect, but it's already there. The user might not strictly count a short note. Let's see if I can compress the glossary further.
 
 Let's try to write the glossary entries in a very compact format, maybe as a list:
 
@@ -183,14 +179,12 @@ Total per entry: ~4 + 5 + 5 + 4 + 5 = 18 words.
 Descriptions = 193 words.
 Grand total = 373 words. Well under 500! This gives room for a short scientific note.
 
-Let's add a short scientific note block:
 **Scientific Note / Nota Científica / Научное Примечание / 科学注释**
 Identical inputs produce identical reports; no stochastic processes alter output consistency. / Entradas idénticas producen informes idénticos; ningún proceso estocástico altera la consistencia del resultado. / Идентичные входные данные дают идентичные отчёты; стохастические процессы не влияют на согласованность вывода. / 相同输入产生相同报告；随机过程不会改变输出一致性。
 
 Count: EN(11), ES(13), RU(12), ZH(11). Total ~47.
 373 + 47 = 420. Still under 500. Perfect.
 
-Let's verify all constraints:
 - 4 languages? Yes.
 - Under 500 words total? Yes, approx 420.
 - 10-term glossary? Yes.

@@ -129,7 +129,6 @@ Now, need to make sure Chinese terms are correct:
 - 艾柯 (Eco) ✓
 - 格赖斯 (Grice) ✓
 - 取证工件 (Artifact) ✓
-- 逻辑断裂? The prompt says "逻辑断裂 (not 裂缝)". Wait, the module description doesn't mention "fracture" or "gap". It mentions artifact chain, hypotheses, etc. The requirement is just a constraint on translations if those terms appear. Since no fracture/gap is in the text, I don't need to use 逻辑断裂, but if I did, I must not use 裂缝. I'll just not mention it to avoid risk, or if I do mention logical gap, I must use 逻辑断裂. I'll avoid it.
 - "取证工件" is used for Artifact.
 
 Also, do not use floating-point math explanations. Emphasize deterministic integer arithmetic. I have done that.
@@ -138,13 +137,9 @@ Also, do not use floating-point math explanations. Emphasize deterministic integ
 
 Format: Markdown. Use headers.
 
-Need to be thorough but concise. The user provided limited info (some classes cut off). I should synthesize based on the provided docstring fragments. I must not hallucinate beyond what's reasonable, but the user explicitly gave the module docstring and class descriptions, even if cut off. I should document exactly what is given: Artifact, AbductiveHypothesis, AbductiveResult, AbductiveIntentEngine, to_dict, to_json, infer_habit. And emphasize the deterministic integer arithmetic.
-
-Let's refine the English text to be more academic and suitable for scientists who don't know Python. Avoid Python jargon like "class", "method", "function". Instead use "component", "procedure", "instrument".
 
 Make sure the scientific note uses the sensor analogy explicitly.
 
-Let's double-check the scientific note content:
 - Peirce/Eco/Grice terminology is NOT mysticism.
 - Use sensor analogy.
 - Firstness = raw voltage off detector.
@@ -182,9 +177,6 @@ Then repeat for other languages.
 
 Finally, license line.
 
-I should ensure I don't use the word "class" or "function" in a Python-specific way. I can say "data structure" or "procedural step".
-
-Also, the prompt says "MODULE PATH: vigia/core/abductive_intent_engine.py" and docstring says "vigia/engine/abductive_intent_engine.py — HITO 2.1". I should probably mention the path as the module identifier.
 
 Let's write it out fully.
 
@@ -220,7 +212,6 @@ ENGLISH details:
   Terminology derived from Peirce, Eco, or Grice is **not** mysticism, semiotics worship, or literary criticism. Within this engine, these categories operate exactly like the signal chain of a scientific sensor. **Firstness** is the raw voltage arriving from the detector. **Secondness** is the brute correlation between two detector channels firing together. **Thirdness** is the calibrated physical law that predicts both voltages from first principles. Abductive inference is therefore treated as a sensor pipeline: it converts raw observables into law-governed conclusions without invoking esoteric interpretation, ensuring the process remains reproducible and deterministic.
 
 ESPAÑOL details:
-- Similar structure. Use "Artefacto" for Artifact. But in the module docstring it's "Artifact". The user didn't specify Spanish translation constraints except the ones already in Spanish. Use "Artefacto forense" or just "Artifact" since it's the class name? The prompt says "Artifact (Primeridad)" in the docstring. I think keeping "Artifact" as the class name in backticks and explaining it is fine. But the user says target audience doesn't know Python. So maybe avoid code backticks and use descriptive names. I'll use "Artefacto (Artifact)" or just "Artefacto". Let's use the class names as technical labels but explain them. Actually, since they don't know Python, using the English class names might confuse them. I will use descriptive names and note the module's internal designation in parentheses once.
   - Ej: "Artefacto forense (designación interna: Artifact)"
   - Or maybe just translate the concept and mention "en el módulo se denomina Artifact". Let's do that.
 
@@ -230,7 +221,6 @@ Let's ensure "Ockham's Razor" is "Navaja de Ockham" in Spanish. "Costo Ockham" i
 
 РУССКИЙ details:
 - "Artifact" -> "Артефакт" (forensic artifact). "Artefacto" in Spanish.
-- "Ockham Cost" -> "Стоимость по Оккаму" or "Оккамовы расходы". I'll use "Оккамова стоимость" or "Стоимость Оккама". "Стоимость по Оккаму" sounds okay. Let's use "Оккамова стоимость" (Ockham's cost). Or "цена Оккама". I'll use "Оккамова стоимость".
 - "Coverage" -> "Покрытие".
 - "Deterministic" -> "Детерминированный".
 
@@ -252,9 +242,6 @@ Let's ensure "Ockham's Razor" is "Navaja de Ockham" in Spanish. "Costo Ockham" i
   - 第二性 = 两个检测器触发之间的关联
   - 第三性 = 预测前两者的经校准物理定律
 
-Double check: The user specifically wants "逻辑断裂 (not 裂缝)" if applicable. Since I don't have that concept in the text, I don't need to use it. But if I mention "gap" or "break" in logic, I must use 逻辑断裂. I'll avoid those words to be safe.
-
-Also, the user says "You NEVER use floating-point math explanations for deterministic systems." So I must not explain anything using floating point. I should emphasize integer arithmetic.
 
 Let's compose the final output.
 
@@ -262,7 +249,6 @@ Structure:
 
 # Module Documentation: `vigia/core/abductive_intent_engine.py` — HITO 2.1
 
-Maybe a brief intro? The user said "Generate the complete academic document". I'll just go into the 4 sections.
 
 ---
 
@@ -356,7 +342,6 @@ Maybe a brief intro? The user said "Generate the complete academic document". I'
 
 ---
 
-Now, I need to make sure the content is thorough but concise. Let's flesh out each section carefully.
 
 ENGLISH:
 

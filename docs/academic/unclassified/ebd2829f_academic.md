@@ -1,407 +1,179 @@
+<!-- VIGÍA Academic Documentation | Module: generate_release_bundle.py | Hash: ebd2829f | Format: Standardized v1 -->
+
 ## ENGLISH
 
-**Module Identifier:** `generate_release_bundle.py` (VIGÍA Hash: `ebd2829f`)
+### What Is This Module?
 
-**1. Module Purpose and Forensic Context**
+`generate_release_bundle.py` (VIGÍA hash `ebd2829f`) is the canonical artifact-sealing engine of the VIGÍA forensic platform. Its purpose is to generate cryptographically signed release bundles that encapsulate the platform's complete source tree, build-time metadata, and a tamper-evident manifest — and to do so in a way that is bit-for-bit reproducible from the same source inputs on any conformant system.
 
-The module `generate_release_bundle.py` constitutes the canonical artifact-sealing engine of the VIGÍA forensic platform. Its primary forensic function is to generate cryptographically signed release bundles that encapsulate the totality of the platform's source code, build-time metadata, and a tamper-evident cryptographic manifest. Within the broader VIGÍA ecosystem, this module establishes the root-of-trust for all deployable software artifacts, ensuring that the binaries executed in controlled or field environments are bitwise identical to the source baseline subjected to peer review and SANS DFIR audit protocols.
+The forensic necessity of this module is direct: the Daubert standard requires that analytical tools used in legal proceedings have demonstrably reliable provenance. If an examiner cannot prove that the binaries they ran are identical to the code that was reviewed and approved, the chain of custody is broken. This module establishes that chain. It acts as a critical custody checkpoint between code review and runtime execution, producing a bundle B = (A, M, σ) — a deterministic tar archive A, a cryptographic manifest M = [(p_i, h_i)], and an HMAC-SHA256 authentication tag σ.
 
-The forensic necessity of this module arises from the *Daubert* standard's mandate that analytical tools used in legal proceedings must have demonstrably reliable provenance. By producing deterministic, reproducible, and authenticated bundles, `generate_release_bundle.py` satisfies the *Daubert* criteria of testability, known error rates, and general acceptance within the digital forensics community. The module operates prior to deployment, functioning as a critical chain-of-custody checkpoint that preserves software integrity from the conclusion of code review through to runtime execution.
+The module operates over five strictly ordered phases: (1) Canonicalization — locale-independent lexicographic traversal, line-ending normalization, permission standardization; (2) Manifest Generation — SHA-256 of each file, assembled into M; (3) Archive Construction — deterministic POSIX tar with fixed metadata (uid=gid=0, mtime=0 or deterministic commit timestamp, UStar format); (4) Cryptographic Binding — HMAC-SHA256 over A∥M using a key from VIGÍA.KeyOrchestrator; (5) Bundle Sealing — emission of B with a JSON-LD chain-of-custody receipt.
 
-**2. Mathematical Foundations**
+### Key Concepts
 
-The cryptographic rigor of the module rests on two primitives: the SHA-256 hash function and the HMAC-SHA256 message authentication code, both standardized under FIPS 180-4 and FIPS 198-1 respectively.
+| Concept | Definition |
+|---------|-----------|
+| Source tree canonicalization | Locale-independent lexicographic traversal; line endings → LF; permissions → 0644/0755; extended attributes stripped |
+| Manifest M | Ordered sequence [(p_i, h_i)] where h_i = SHA-256(s_i) and p_i is the canonical relative path; sorted lexicographically |
+| Archive A | Deterministic POSIX.1-2001 tar with fixed metadata fields (uid=gid=0, mtime=0 or commit timestamp, UStar format) |
+| Bundle B | Ordered triple (A, M, σ): the archive, the manifest, and the authentication tag |
+| HMAC-SHA256 σ | σ = HMAC(K_release, Serialize(A, M)); provides existential unforgeability under adaptive chosen-message attack |
+| SHA-256 collision probability | ≈ 2^−256; this is the known error rate satisfying the Daubert "known error rate" criterion |
+| VIGÍA.KeyOrchestrator | Module managing the signing key lifecycle; private key material never resides in process memory |
+| Chain-of-custody receipt | JSON-LD record linking σ, hash of A, hash of M, operator identity, and immutable log sequence number (LSN) |
+| NonDeterministicInputError | Exception raised if the source tree contains files with non-reproducible ordering or unstable metadata |
 
-Let the source tree be represented as an ordered set of file canonicalizations \( \mathcal{F} = \{s_1, s_2, \ldots, s_n\} \), where each \( s_i \) is the pre-image of file \( f_i \) after deterministic normalization (line-ending canonicalization, permission standardization, and locale-independent lexicographic ordering of directory entries).
+> **【Scientific Note】**
+> The phrase "cryptographic signing" may invoke a sense of complexity, but the underlying operation is analogous to a calibration seal on a measurement instrument. The manifest M is the calibration certificate listing the measured value of every component. The HMAC tag σ is the seal that proves the certificate was issued by an authorized technician with a known key. If any component changes after sealing — even one bit — the seal verification fails. This is not a probabilistic or heuristic check: SHA-256 under the Merkle-Damgård construction is a deterministic function, and HMAC-SHA256 provides information-theoretic guarantees of unforgeability under cryptographic assumptions that are standardized in FIPS 180-4 and FIPS 198-1. Peirce, Eco, and Grice are not needed here — this module operates at the level of physical-layer integrity, below the semantic layer where intentionality analysis begins.
 
-The SHA-256 compression function is denoted as:
-\[
-h: \{0,1\}^* \to \{0,1\}^{256}
-\]
-implemented via the Merkle-Damgård construction with Davies-Meyer compression, producing a 256-bit digest immune to pre-image and second pre-image attacks under standard cryptographic assumptions.
+### Glossary
 
-The manifest \( \mathcal{M} \) is defined as an ordered sequence of tuples:
-\[
-\mathcal{M} = \left[ (p_i, h_i) \right]_{i=1}^{n}, \quad h_i = \text{SHA-256}(s_i)
-\]
-where \( p_i \) is the canonical relative path of \( s_i \), and the sequence is ordered lexicographically by \( p_i \).
+| Term | Definition |
+|------|-----------|
+| generate_release_bundle.py | Module that seals the VIGÍA source tree into a cryptographically authenticated, reproducible release bundle |
+| canonicalization | Process of normalizing all source files to a deterministic, platform-independent representation |
+| manifest M | Ordered list of (path, SHA-256 hash) pairs covering every file in the release |
+| deterministic tar archive | POSIX tar stream with fixed metadata so identical source trees produce bit-identical archives |
+| HMAC-SHA256 | Hash-based message authentication code; proves authenticity and integrity without providing confidentiality |
+| signing key K_release | Secret key managed by VIGÍA.KeyOrchestrator; used to compute the bundle authentication tag σ |
+| chain of custody | Documented, verifiable record linking every artifact to its origin and all subsequent custody events |
+| LSN (log sequence number) | Monotonic identifier from VIGÍA.AuditLogger anchoring each bundle generation event to the audit timeline |
+| HashMismatchException | Exception raised when the recomputed manifest hash does not match the archive's internal manifest copy |
 
-The HMAC-SHA256 construction is formalized as:
-\[
-\text{HMAC}(K, m) = H\Bigl( (K' \oplus \text{opad}) \,\|\, H\bigl( (K' \oplus \text{ipad}) \,\|\, m \bigr) \Bigr)
-\]
-where \( K \) is the secret signing key provisioned by VIGÍA.KeyOrchestrator, \( K' \) is the block-sized derivation of \( K \), \( H \) is SHA-256, \( \oplus \) denotes bitwise XOR, \( \| \) denotes concatenation, opad \( = \texttt{0x5c} \) repeated, and ipad \( = \texttt{0x36} \) repeated.
+*Licensed under the Apache License, Version 2.0. Copyright 2026 Anna Tchijova.*
 
-The deterministic archive \( \mathcal{A} \) is produced by canonical POSIX.1-2001 tar serialization of \( \mathcal{F} \) with fixed metadata fields (uid = gid = 0, mtime = 0 or deterministic commit timestamp, UStar format). The final bundle \( \mathcal{B} \) is the ordered structure:
-\[
-\mathcal{B} = (\mathcal{A}, \mathcal{M}, \sigma)
-\]
-where \( \sigma = \text{HMAC}(K_{\text{release}}, \text{Serialize}(\mathcal{A}, \mathcal{M})) \).
-
-**3. Algorithm Description**
-
-The execution of `generate_release_bundle.py` proceeds through five strictly ordered phases:
-
-*Phase 1: Canonicalization.* The module traverses the source directory using a locale-independent lexicographic sort on path strings. All regular files are normalized: text files undergo line-ending conversion to UNIX LF (`\n`), file permissions are coerced to `0644` (regular) or `0755` (executable directories), and extended attributes are stripped unless explicitly whitelisted. Symlinks are dereferenced or recorded canonically per configuration policy.
-
-*Phase 2: Manifest Generation.* For each canonicalized file \( s_i \), the module computes \( h_i = \text{SHA-256}(s_i) \). The resulting tuples \( (p_i, h_i) \) are assembled into \( \mathcal{M} \), serialized as a newline-delimited or JSON-structured manifest file, and itself hashed to produce \( h_{\mathcal{M}} \).
-
-*Phase 3: Archive Construction.* The module streams the canonicalized tree into a POSIX tar archive with deterministic headers. Non-deterministic metadata (user names, stochastic timestamps, system-specific permissions) are overridden by fixed values. The tar stream is written to a temporary file and hashed to yield \( h_{\mathcal{A}} \).
-
-*Phase 4: Cryptographic Binding.* Using the signing key handle retrieved from VIGÍA.KeyOrchestrator, the module computes the authentication tag \( \sigma \) over the bitwise concatenation of \( \mathcal{A} \) and \( \mathcal{M} \) (or their respective hashes, per policy). The signing operation occurs within a hardware-backed or HSM-bound context when available, preventing key exfiltration.
-
-*Phase 5: Bundle Sealing and Emission.* The final artifact \( \mathcal{B} \) is emitted as a composite file or file set: the tar archive, the manifest, and the detached or appended signature. A JSON-LD chain-of-custody receipt is generated, linking \( \sigma \), \( h_{\mathcal{A}} \), \( h_{\mathcal{M}} \), the operator identity, and an immutable log sequence number (LSN) obtained from VIGÍA.AuditLogger.
-
-**4. Input/Output Specifications**
-
-*Inputs:*
-- `SRC_DIR`: Absolute or relative path to the source tree root. Must be under version control (linked to VIGÍA.SourceAttestor).
-- `KEY_HANDLE`: Cryptographic key reference managed by VIGÍA.KeyOrchestrator. May reference a symmetric HMAC key or an asymmetric private key.
-- `BUILD_METADATA`: Dictionary containing `BUILD_ID`, `COMMIT_HASH`, `TIMESTAMP_POLICY` (epoch or deterministic), and `NORMALIZATION_RULES`.
-- `POLICY_CONFIG`: Forensic policy flags governing symlink handling, extended attribute retention, and signature format (detached vs. inline).
-
-*Outputs:*
-- `vigia-release-{BUILD_ID}.tar`: Deterministic source archive \( \mathcal{A} \).
-- `manifest.sha256`: Cryptographic manifest \( \mathcal{M} \) listing all \( (p_i, h_i) \).
-- `bundle.sig` or inline signature: The authentication tag \( \sigma \).
-- `custody-receipt.json`: Structured chain-of-custody record with LSN, timestamp, and operator binding.
-
-*Error Conditions:*
-- `NonDeterministicInputError`: Raised if the source tree contains files with non-reproducible ordering or unstable metadata that cannot be canonicalized.
-- `KeyAccessViolation`: Raised if the key handle lacks signing authorization or the HSM communication channel fails.
-- `HashMismatchException`: Raised if the computed manifest hash does not match the archive's internal manifest copy.
-
-**5. Deterministic Guarantees**
-
-The module provides three formal deterministic guarantees essential for forensic admissibility:
-
-*Theorem 1 (Manifest Invariance).* Given a fixed input set \( \mathcal{F} \) and canonicalization policy \( C \), the manifest \( \mathcal{M} \) is invariant across executions on heterogeneous host systems. Formally:
-\[
-\forall \mathcal{F}, C: \; \mathcal{M}_1 = \mathcal{M}_2 \iff C(\mathcal{F})_1 = C(\mathcal{F})_2
-\]
-*Proof Sketch.* SHA-256 is a deterministic function. Lexicographic ordering is total and deterministic. Therefore, the ordered sequence of path-hash tuples is a pure function of \( C(\mathcal{F}) \).
-
-*Theorem 2 (Archive Bitwise Identity).* Under the canonical tar policy (fixed uid/gid/mtime, deterministic ordering, UStar format), the archive stream \( \mathcal{A} \) is bitwise identical for any two executions with identical \( C(\mathcal{F}) \).
-
-*Theorem 3 (Signature Unforgeability and Binding).* Under the random oracle model and the assumption that SHA-256 is collision-resistant, HMAC-SHA256 provides existential unforgeability against adaptive chosen-message attacks. Consequently, any alteration \( \mathcal{A}' \neq \mathcal{A} \) or \( \mathcal{M}' \neq \mathcal{M} \) results in verification failure with overwhelming probability.
-
-**6. Chain-of-Custody and Standards Compliance**
-
-The module is designed to satisfy multiple jurisdictional and institutional standards for digital evidence and secure software supply chains.
-
-Under the *Daubert* standard, the module's outputs are testable (verifiable by VIGÍA.ManifestValidator), subject to known error rates (hash collision probability \( \approx 2^{-256} \)), and generally accepted via FIPS 180-4 and FIPS 198-1. This establishes the reliability of VIGÍA-derived evidence in U.S. federal proceedings.
-
-Under *GB/T 29360-2012* (Electronic Data Forensics Standard of the People's Republic of China), the module fulfills the requirement for integrity verification of forensic tools prior to examination. The manifest \( \mathcal{M} \) serves as the mandatory checksum baseline for tool validation.
-
-Under *MLPS 2.0* (Multi-Level Protection Scheme 2.0), Level 3 and above mandates cryptographic protection for critical system updates and deployment packages. The HMAC-SHA256 binding and HSM-backed key storage via VIGÍA.KeyOrchestrator satisfy the cryptographic control requirements for secure update transmission and storage.
-
-SANS DFIR audit protocols are supported by the deterministic nature of \( \mathcal{B} \), enabling auditors to recompute hashes and validate \( \sigma \) independently.
-
-**7. Related VIGÍA Modules**
-
-- **VIGÍA.KeyOrchestrator:** Manages the lifecycle of \( K_{\text{release}} \), including HSM provisioning, key rotation, and access control. The signing operation in `generate_release_bundle.py` is delegated to this module's API to ensure private key material never resides in process memory.
-- **VIGÍA.AuditLogger:** Provides an append-only, tamper-evident log. Every bundle generation event is recorded with an LSN, operator identity, and \( h_{\sigma} \), creating an auditable timeline.
-- **VIGÍA.ManifestValidator:** The verification counterpart. It recomputes \( \mathcal{M} \) and verifies \( \sigma \) against the published public key or shared secret, used in CI/CD pipelines and field audits.
-- **VIGÍA.DeployGuard:** Runtime enforcement agent that ingests \( \mathcal{B} \) and refuses deployment if \( \sigma \) is invalid or if \( \mathcal{M} \) contains unauthorized file modifications.
-- **VIGÍA.SourceAttestor:** Links the bundle's `COMMIT_HASH` to the version control system, cryptographically attesting that the bundled source corresponds to a specific, reviewed commit.
-
-**8. Security and Confidentiality Notice**
-
-HMAC-SHA256 guarantees authenticity and integrity; it does not provide confidentiality. The release bundle \( \mathcal{B} \) must be protected in transit and at rest through complementary mechanisms—such as AES-256-GCM encryption or TLS 1.3 transport—governed by the organization's access control policy. The module itself does not perform encryption, in compliance with the principle of cryptographic separation of duties.
+---
 
 ## ESPAÑOL
 
-**Identificador del Módulo:** `generate_release_bundle.py` (Hash VIGÍA: `ebd2829f`)
+### ¿Qué es este módulo?
 
-**1. Propósito del Módulo y Contexto Forense**
+`generate_release_bundle.py` (hash VIGÍA `ebd2829f`) es el motor de sellado de artefactos canónico de la plataforma forense VIGÍA. Su propósito es generar paquetes de release firmados criptográficamente que encapsulan el árbol de fuentes completo de la plataforma, metadatos de compilación y un manifiesto resistente a la manipulación — de forma bit a bit reproducible desde las mismas fuentes en cualquier sistema conforme.
 
-El módulo `generate_release_bundle.py` constituye el motor de sellado de artefactos canónico de la plataforma forense VIGÍA. Su función forense principal consiste en generar paquetes de release firmados criptográficamente que encapsulan la totalidad del código fuente de la plataforma, los metadatos de compilación y un manifiesto criptográfico resistente a la manipulación. Dentro del ecosistema VIGÍA, este módulo establece la raíz de confianza para todos los artefactos de software desplegables, garantizando que los binarios ejecutados en entornos controlados o de campo sean idénticos bit a bit con respecto a la línea base de fuentes sometida a revisión por pares y a los protocolos de auditoría SANS DFIR.
+La necesidad forense de este módulo es directa: el estándar Daubert exige que las herramientas analíticas usadas en procedimientos legales tengan una procedencia demostrablemente confiable. Si el perito no puede probar que los binarios ejecutados son idénticos al código revisado y aprobado, la cadena de custodia está rota. Este módulo establece esa cadena. Actúa como punto de control de custodia entre la revisión de código y la ejecución en runtime, produciendo un bundle B = (A, M, σ) — un archivo tar determinista A, un manifiesto criptográfico M = [(p_i, h_i)], y una etiqueta de autenticación HMAC-SHA256 σ.
 
-Como operador forense, podés emplear este módulo para asegurar que tus herramientas de análisis cumplan con el mandato del estándar *Daubert*, que exige que las herramientas analíticas utilizadas en procedimientos legales posean una procedencia demostrablemente confiable. Al producir paquetes deterministas, reproducibles y autenticados, `generate_release_bundle.py` satisface los criterios de *Daubert* referidos a la testabilidad, las tasas de error conocidas y la aceptación general en la comunidad de informática forense. El módulo opera con anterioridad al despliegue y funciona como un punto de control crítico de la cadena de custodia que preserva la integridad del software desde la conclusión de la revisión de código hasta la ejecución en tiempo de ejecución.
+El módulo opera en cinco fases estrictamente ordenadas: (1) Canonicalización — recorrido lexicográfico independiente de locale, normalización de finales de línea, estandarización de permisos; (2) Generación del manifiesto — SHA-256 de cada archivo, ensamblado en M; (3) Construcción del archivo — tar POSIX determinista con metadatos fijos (uid=gid=0, mtime=0 o timestamp determinista del commit, formato UStar); (4) Vinculación criptográfica — HMAC-SHA256 sobre A∥M usando clave de VIGÍA.KeyOrchestrator; (5) Sellado del bundle — emisión de B con recibo de cadena de custodia en JSON-LD.
 
-**2. Fundamentos Matemáticos**
+### Conceptos clave
 
-Para comprender el rigor criptográfico del módulo, debés considerar dos primitivas fundamentales: la función hash SHA-256 y el código de autenticación de mensajes HMAC-SHA256, estandarizadas respectivamente en FIPS 180-4 y FIPS 198-1.
+| Concepto | Definición |
+|---------|-----------|
+| Canonicalización del árbol de fuentes | Recorrido lexicográfico sin dependencia de locale; finales de línea → LF; permisos → 0644/0755; atributos extendidos eliminados |
+| Manifiesto M | Secuencia ordenada [(p_i, h_i)] donde h_i = SHA-256(s_i) y p_i es la ruta relativa canónica; ordenada lexicográficamente |
+| Archivo A | tar POSIX.1-2001 determinista con campos de metadatos fijos (uid=gid=0, mtime=0 o timestamp del commit, formato UStar) |
+| Bundle B | Triple ordenado (A, M, σ): el archivo, el manifiesto y la etiqueta de autenticación |
+| HMAC-SHA256 σ | σ = HMAC(K_release, Serialize(A, M)); provee inforgeabilidad existencial ante ataques adaptativos de mensaje escogido |
+| Probabilidad de colisión SHA-256 | ≈ 2^−256; esta es la tasa de error conocida que satisface el criterio Daubert |
+| VIGÍA.KeyOrchestrator | Módulo que gestiona el ciclo de vida de la clave de firma; la clave privada nunca reside en memoria del proceso |
+| Recibo de cadena de custodia | Registro JSON-LD que vincula σ, hash de A, hash de M, identidad del operador y LSN inmutable |
+| NonDeterministicInputError | Excepción lanzada si el árbol de fuentes contiene archivos con orden no reproducible o metadatos inestables |
 
-Sea el árbol de fuentes representado como un conjunto ordenado de canonicalizaciones de archivos \( \mathcal{F} = \{s_1, s_2, \ldots, s_n\} \), donde cada \( s_i \) es la pre-imagen del archivo \( f_i \) luego de una normalización determinista (canonicalización de finales de línea, estandarización de permisos y ordenamiento lexicográfico independiente de la localización de las entradas de directorio).
+> **【Nota Científica】**
+> La expresión "firma criptográfica" puede invocar una sensación de complejidad, pero la operación subyacente es análoga al sello de calibración de un instrumento de medición. El manifiesto M es el certificado de calibración que lista el valor medido de cada componente. La etiqueta HMAC σ es el sello que demuestra que el certificado fue emitido por un técnico autorizado con clave conocida. Si algún componente cambia después del sellado — aunque sea un bit — la verificación del sello falla. No es una verificación probabilística ni heurística: SHA-256 bajo la construcción Merkle-Damgård es una función determinista, y HMAC-SHA256 provee garantías de inforgeabilidad estandarizadas en FIPS 180-4 y FIPS 198-1. Peirce, Eco y Grice no son necesarios aquí — este módulo opera en el nivel de integridad de la capa física, por debajo de la capa semántica donde comienza el análisis de intencionalidad.
 
-La función de compresión SHA-256 se denota como:
-\[
-h: \{0,1\}^* \to \{0,1\}^{256}
-\]
-implementada mediante la construcción de Merkle-Damgård con compresión Davies-Meyer, produciendo un digest de 256 bits inmune a ataques de pre-imagen y segunda pre-imagen bajo supuestos criptográficos estándar.
+### Glosario
 
-El manifiesto \( \mathcal{M} \) se define como una secuencia ordenada de tuplas:
-\[
-\mathcal{M} = \left[ (p_i, h_i) \right]_{i=1}^{n}, \quad h_i = \text{SHA-256}(s_i)
-\]
-donde \( p_i \) es la ruta relativa canónica de \( s_i \), y la secuencia se ordena lexicográficamente por \( p_i \).
+| Término | Definición |
+|--------|-----------|
+| generate_release_bundle.py | Módulo que sella el árbol de fuentes VIGÍA en un bundle de release reproducible y autenticado criptográficamente |
+| canonicalización | Proceso de normalizar todos los archivos fuente a una representación determinista e independiente de la plataforma |
+| manifiesto M | Lista ordenada de pares (ruta, hash SHA-256) que cubre cada archivo del release |
+| archivo tar determinista | Stream tar POSIX con metadatos fijos para que árboles de fuentes idénticos produzcan archivos bit a bit idénticos |
+| HMAC-SHA256 | Código de autenticación de mensajes basado en hash; demuestra autenticidad e integridad sin proveer confidencialidad |
+| clave de firma K_release | Clave secreta gestionada por VIGÍA.KeyOrchestrator; usada para computar la etiqueta de autenticación σ del bundle |
+| cadena de custodia | Registro documentado y verificable que vincula cada artefacto a su origen y todos los eventos de custodia posteriores |
+| LSN (número de secuencia de log) | Identificador monótono de VIGÍA.AuditLogger que ancla cada evento de generación de bundle en la línea de tiempo de auditoría |
+| HashMismatchException | Excepción lanzada cuando el hash del manifiesto recomputado no coincide con la copia interna del manifiesto en el archivo |
 
-La construcción HMAC-SHA256 se formaliza como:
-\[
-\text{HMAC}(K, m) = H\Bigl( (K' \oplus \text{opad}) \,\|\, H\bigl( (K' \oplus \text{ipad}) \,\|\, m \bigr) \Bigr)
-\]
-donde \( K \) es la clave secreta de firma aprovisionada por VIGÍA.KeyOrchestrator, \( K' \) es la derivación de \( K \) a tamaño de bloque, \( H \) es SHA-256, \( \oplus \) denota el XOR bit a bit, \( \| \) denota la concatenación, opad \( = \texttt{0x5c} \) repetido, e ipad \( = \texttt{0x36} \) repetido.
+*Licensed under the Apache License, Version 2.0. Copyright 2026 Anna Tchijova.*
 
-El archivo determinista \( \mathcal{A} \) se produce mediante la serialización canónica tar conforme a POSIX.1-2001 de \( \mathcal{F} \) con campos de metadatos fijos (uid = gid = 0, mtime = 0 o timestamp de commit determinista, formato UStar). El paquete final \( \mathcal{B} \) es la estructura ordenada:
-\[
-\mathcal{B} = (\mathcal{A}, \mathcal{M}, \sigma)
-\]
-donde \( \sigma = \text{HMAC}(K_{\text{release}}, \text{Serialize}(\mathcal{A}, \mathcal{M})) \).
-
-**3. Descripción del Algoritmo**
-
-La ejecución de `generate_release_bundle.py` avanza mediante cinco fases estrictamente ordenadas:
-
-*Fase 1: Canonicalización.* El módulo recorre el directorio de fuentes utilizando un ordenamiento lexicográfico independiente de la localización sobre las cadenas de ruta. Todos los archivos regulares se normalizan: los archivos de texto se someten a conversión de finales de línea a LF de UNIX (`\n`), los permisos de archivo se coercionan a `0644` (regulares) o `0755` (directorios ejecutables), y los atributos extendidos se eliminan salvo que estén explícitamente incluidos en una lista blanca. Los enlaces simbólicos se desreferencian o registran canónicamente según la política de configuración. Vos no necesitás intervenir manualmente en esta fase, pero podés auditar el log de canonicalización.
-
-*Fase 2: Generación del Manifiesto.* Para cada archivo canonicalizado \( s_i \), el módulo computa \( h_i = \text{SHA-256}(s_i) \). Las tuplas resultantes \( (p_i, h_i) \) se ensamblan en \( \mathcal{M} \), serializadas como un archivo de manifiesto delimitado por saltos de línea o estructurado en JSON, y el propio manifiesto se hashea para producir \( h_{\mathcal{M}} \).
-
-*Fase 3: Construcción del Archivo.* El módulo emite el árbol canonicalizado hacia un archivo tar POSIX con encabezados deterministas. Los metadatos no deterministas (nombres de usuario, timestamps estocásticos, permisos específicos del sistema) se sobrescriben con valores fijos. El flujo tar se escribe en un archivo temporal y se hashea para obtener \( h_{\mathcal{A}} \).
-
-*Fase 4: Vinculación Criptográfica.* Utilizando el handle de clave de firma obtenido de VIGÍA.KeyOrchestrator, el módulo computa la etiqueta de autenticación \( \sigma \) sobre la concatenación bit a bit de \( \mathcal{A} \) y \( \mathcal{M} \) (o sus respectivos hashes, según la política). La operación de firma se ejecuta dentro de un contexto respaldado por hardware o vinculado a HSM cuando está disponible, evitando la exfiltración de la clave.
-
-*Fase 5: Sellado y Emisión del Paquete.* El artefacto final \( \mathcal{B} \) se emite como un archivo compuesto o un conjunto de archivos: el archivo tar, el manifiesto y la firma adjunta o separada. Se genera un recibo de cadena de custodia en JSON-LD que vincula \( \sigma \), \( h_{\mathcal{A}} \), \( h_{\mathcal{M}} \), la identidad del operador y un número de secuencia de registro (LSN) inmutable obtenido de VIGÍA.AuditLogger.
-
-**4. Especificaciones de Entrada y Salida**
-
-A continuación, detallamos las entradas que debés proporcionar y las salidas que obtenés al ejecutar el módulo:
-
-*Entradas:*
-- `SRC_DIR`: Ruta absoluta o relativa a la raíz del árbol de fuentes. Debés asegurarte de que esté bajo control de versiones (vinculado a VIGÍA.SourceAttestor).
-- `KEY_HANDLE`: Referencia criptográfica de clave gestionada por VIGÍA.KeyOrchestrator. Podés referirte a una clave simétrica HMAC o a una clave privada asimétrica.
-- `BUILD_METADATA`: Diccionario que contiene `BUILD_ID`, `COMMIT_HASH`, `TIMESTAMP_POLICY` (época o determinista) y `NORMALIZATION_RULES`.
-- `POLICY_CONFIG`: Banderas de política forense que gobiernan el manejo de enlaces simbólicos, la retención de atributos extendidos y el formato de firma (separada vs. inline).
-
-*Salidas:*
-- `vigia-release-{BUILD_ID}.tar`: Archivo de fuentes determinista \( \mathcal{A} \).
-- `manifest.sha256`: Manifiesto criptográfico \( \mathcal{M} \) que lista todos los \( (p_i, h_i) \).
-- `bundle.sig` o firma inline: La etiqueta de autenticación \( \sigma \).
-- `custody-receipt.json`: Registro estructurado de cadena de custodia con LSN, timestamp y vinculación del operador.
-
-*Condiciones de Error:*
-- `NonDeterministicInputError`: Se dispara si el árbol de fuentes contiene archivos con ordenamiento no reproducible o metadatos inestables que no pueden canonicalizarse.
-- `KeyAccessViolation`: Se dispara si el handle de clave carece de autorización para firmar o si el canal de comunicación con el HSM falla.
-- `HashMismatchException`: Se dispara si el hash del manifiesto computado no coincide con la copia interna del manifiesto en el archivo.
-
-**5. Garantías Deterministas**
-
-El módulo te ofrece tres garantías deterministas formales esenciales para la admisibilidad forense:
-
-*Teorema 1 (Invarianza del Manifiesto).* Dado un conjunto de entrada fijo \( \mathcal{F} \) y una política de canonicalización \( C \), el manifiesto \( \mathcal{M} \) es invariante entre ejecuciones en sistemas heterogéneos. Formalmente:
-\[
-\forall \mathcal{F}, C: \; \mathcal{M}_1 = \mathcal{M}_2 \iff C(\mathcal{F})_1 = C(\mathcal{F})_2
-\]
-*Esbozo de Demostración.* SHA-256 es una función determinista. El ordenamiento lexicográfico es total y determinista. Por lo tanto, la secuencia ordenada de tuplas ruta-hash es una función pura de \( C(\mathcal{F}) \). Si ejecutás dos veces el proceso con los mismos insumos, observás idénticos resultados.
-
-*Teorema 2 (Identidad Bit a Bit del Archivo).* Bajo la política tar canónica (uid/gid/mtime fijos, ordenamiento determinista, formato UStar), el flujo de archivo \( \mathcal{A} \) es idéntico bit a bit para cualesquiera dos ejecuciones con idéntico \( C(\mathcal{F}) \).
-
-*Teorema 3 (Vinculación e Inforgeabilidad de la Firma).* Bajo el modelo de oráculo aleatorio y el supuesto de que SHA-256 es resistente a colisiones, HMAC-SHA256 provee inforgeabilidad existencial ante ataques adaptativos de mensaje escogido. En consecuencia, cualquier alteración \( \mathcal{A}' \neq \mathcal{A} \) o \( \mathcal{M}' \neq \mathcal{M} \) resulta en un fallo de verificación con probabilidad abrumadora.
-
-**6. Cadena de Custodia y Cumplimiento Normativo**
-
-Como profesional de la informática forense, debés asegurarte de que tus herramientas cumplan con los estándares internacionales. El módulo está diseñado para satisfacer múltiples estándares jurisdiccionales e institucionales para evidencia digital y cadenas de suministro de software seguras.
-
-Bajo el estándar *Daubert*, las salidas del módulo son testables (verificables mediante VIGÍA.ManifestValidator), sujetas a tasas de error conocidas (probabilidad de colisión de hash \( \approx 2^{-256} \)), y generalmente aceptadas mediante FIPS 180-4 y FIPS 198-1. Esto establece la confiabilidad de la evidencia derivada de VIGÍA en procedimientos federales de los Estados Unidos.
-
-Bajo la norma *GB/T 29360-2012* (Estándar de Informática Forense de Datos Electrónicos de la República Popular China), el módulo cumple con el requisito de verificación de integridad de herramientas forenses previo al examen. El manifiesto \( \mathcal{M} \) sirve como la línea base obligatoria de checksum para la validación de herramientas.
-
-Bajo el *MLPS 2.0* (Esquema de Protección Multi-Nivel 2.0), los Niveles 3 y superiores exigen protección criptográfica para actualizaciones críticas del sistema y paquetes de despliegue. El vínculo HMAC-SHA256 y el almacenamiento de claves respaldado por HSM a través de VIGÍA.KeyOrchestrator satisfacen los requisitos de controles criptográficos para la transmisión y almacenamiento seguros de actualizaciones.
-
-Los protocolos de auditoría SANS DFIR se sustentan en la naturaleza determinista de \( \mathcal{B} \), permitiendo que los auditores recomputen los hashes y validen \( \sigma \) de manera independiente.
-
-**7. Módulos VIGÍA Relacionados**
-
-Contás con los siguientes módulos relacionados para complementar el flujo forense:
-
-- **VIGÍA.KeyOrchestrator:** Gestiona el ciclo de vida de \( K_{\text{release}} \), incluyendo el aprovisionamiento en HSM, la rotación de claves y el control de acceso. La operación de firma en `generate_release_bundle.py` se delega a la API de este módulo para garantizar que el material de clave privada nunca resida en la memoria del proceso.
-- **VIGÍA.AuditLogger:** Provee un registro de solo adición, resistente a la manipulación. Cada evento de generación de paquete se registra con un LSN, la identidad del operador y \( h_{\sigma} \), creando una línea de tiempo auditable.
-- **VIGÍA.ManifestValidator:** La contraparte de verificación. Recomputa \( \mathcal{M} \) y verifica \( \sigma \) contra la clave pública publicada o el secreto compartido, utilizado en pipelines de CI/CD y auditorías de campo. Podés ejecutarlo independientemente para validar cualquier paquete.
-- **VIGÍA.DeployGuard:** Agente de cumplimiento en tiempo de ejecución que ingiere \( \mathcal{B} \) y se niega a desplegarlo si \( \sigma \) es inválida o si \( \mathcal{M} \) contiene modificaciones no autorizadas en archivos.
-- **VIGÍA.SourceAttestor:** Vincula el `COMMIT_HASH` del paquete al sistema de control de versiones, atestando criptográficamente que el código fuente empaquetado corresponde a un commit específico y revisado.
-
-**8. Aviso de Seguridad y Confidencialidad**
-
-Tenés presente que HMAC-SHA256 garantiza autenticidad e integridad; no provee confidencialidad. El paquete de release \( \mathcal{B} \) debe protegerse en tránsito y en reposo mediante mecanismos complementarios —tales como cifrado AES-256-GCM o transporte TLS 1.3— gobernados por la política de control de acceso de la organización. El módulo en sí no realiza cifrado, en cumplimiento con el principio de separación de funciones criptográficas.
+---
 
 ## РУССКИЙ
 
-**Идентификатор модуля:** `generate_release_bundle.py` (Хэш VIGÍA: `ebd2829f`)
+### Что представляет собой этот модуль?
 
-**1. Назначение модуля и судебный контекст**
+`generate_release_bundle.py` (хеш VIGÍA `ebd2829f`) — канонический механизм упаковки и заверения артефактов судебной платформы VIGÍA. Его назначение — генерировать криптографически подписанные пакеты выпуска, инкапсулирующие полное дерево исходного кода платформы, метаданные сборки и устойчивый к подделке манифест, причём делать это побитово воспроизводимым образом из одних и тех же исходных данных на любой совместимой системе.
 
-Модуль `generate_release_bundle.py` представляет собой канонический механизм упаковки и заверения артефактов судебной платформы VIGÍA. Его основная судебная функция заключается в формировании криптографически подписанных пакетов выпуска, инкапсулирующих полный исходный код платформы, метаданные сборки и криптографически стойкий манифест, устойчивый к несанкционированному изменению. В рамках экосистемы VIGÍA данный модуль устанавливает корень доверия для всех развёртываемых программных артефактов, гарантируя, что исполняемые в контролируемых или полевых условиях бинарные файлы являются побитово идентичными базовому уровню исходного кода, прошедшему экспертную оценку и аудит по протоколам SANS DFIR.
+Судебная необходимость этого модуля очевидна: стандарт Daubert требует, чтобы аналитические инструменты, используемые в судебных разбирательствах, имели доказуемо надёжное происхождение. Если эксперт не может доказать, что запущенные им бинарные файлы идентичны проверенному и утверждённому коду, цепочка хранения разрушена. Этот модуль устанавливает данную цепочку. Он выступает критически важным пунктом контроля цепочки хранения между проверкой кода и исполнением, производя пакет B = (A, M, σ) — детерминированный tar-архив A, криптографический манифест M = [(p_i, h_i)] и тег аутентификации HMAC-SHA256 σ.
 
-Потребность в данном модуле обусловлена требованиями стандарта *Daubert*, предписывающего, чтобы аналитические инструменты, используемые в судебных разбирательствах, обладали доказуемо надёжной происхождением. Производя детерминированные, воспроизводимые и аутентифицированные пакеты, `generate_release_bundle.py` удовлетворяет критериям *Daubert*, касающимся тестируемости, известных частот ошибок и общего признания в сообществе цифровой судебной экспертизы. Модуль функционирует на этапе, предшествующем развёртыванию, выступая критически важным пунктом контроля цепочки хранения, обеспечивающим сохранение целостности программного обеспечения с момента завершения проверки кода до момента его исполнения.
+Модуль работает в пяти строго упорядоченных фазах: (1) Канонизация — лексикографический обход без зависимости от локали, нормализация концов строк, стандартизация прав доступа; (2) Генерация манифеста — SHA-256 каждого файла, собранный в M; (3) Построение архива — детерминированный tar POSIX с фиксированными метаданными (uid=gid=0, mtime=0 или детерминированная метка коммита, формат UStar); (4) Криптографическая привязка — HMAC-SHA256 по A∥M с ключом из VIGÍA.KeyOrchestrator; (5) Упаковка — эмиссия B с квитанцией цепочки хранения в JSON-LD.
 
-**2. Математические основания**
+### Ключевые понятия
 
-Криптографическая строгость модуля базируется на двух примитивах: хэш-функции SHA-256 и коде аутентификации сообщений HMAC-SHA256, стандартизированных соответственно в FIPS 180-4 и FIPS 198-1.
+| Понятие | Определение |
+|---------|------------|
+| Канонизация дерева исходного кода | Лексикографический обход без зависимости от локали; концы строк → LF; права → 0644/0755; расширенные атрибуты удалены |
+| Манифест M | Упорядоченная последовательность [(p_i, h_i)], где h_i = SHA-256(s_i), а p_i — канонический относительный путь; сортировка лексикографическая |
+| Архив A | Детерминированный tar POSIX.1-2001 с фиксированными полями метаданных (uid=gid=0, mtime=0 или метка коммита, формат UStar) |
+| Пакет B | Упорядоченный тройник (A, M, σ): архив, манифест и тег аутентификации |
+| HMAC-SHA256 σ | σ = HMAC(K_release, Serialize(A, M)); обеспечивает экзистенциальную неподделываемость при адаптивных атаках с выбором сообщения |
+| Вероятность коллизии SHA-256 | ≈ 2^−256; это известная частота ошибок, удовлетворяющая критерию Daubert |
+| VIGÍA.KeyOrchestrator | Модуль, управляющий жизненным циклом ключа подписи; закрытый ключ никогда не находится в памяти процесса |
+| Квитанция цепочки хранения | Запись JSON-LD, связывающая σ, хеш A, хеш M, идентификатор оператора и неизменяемый LSN |
+| NonDeterministicInputError | Исключение при наличии в дереве исходного кода файлов с невоспроизводимым порядком или нестабильными метаданными |
 
-Пусть дерево исходного кода представлено в виде упорядоченного множества канонизированных файлов \( \mathcal{F} = \{s_1, s_2, \ldots, s_n\} \), где каждый \( s_i \) является прообразом файла \( f_i \) после детерминированной нормализации (канонизация окончаний строк, стандартизация прав доступа и лексикографическое упорядочение элементов каталога, не зависящее от локали).
+> **【Научное примечание】**
+> Выражение «криптографическая подпись» может казаться сложным, но лежащая в основе операция аналогична калибровочному пломбированию измерительного прибора. Манифест M — это калибровочный сертификат, перечисляющий измеренное значение каждого компонента. Тег HMAC σ — пломба, доказывающая, что сертификат был выдан уполномоченным техником с известным ключом. Если какой-либо компонент изменяется после пломбирования — хотя бы один бит — проверка пломбы завершается неудачей. Это не вероятностная и не эвристическая проверка: SHA-256 в конструкции Меркла-Дамгора является детерминированной функцией, а HMAC-SHA256 обеспечивает теоретически обоснованные гарантии неподделываемости, стандартизированные в FIPS 180-4 и FIPS 198-1. Пирс, Эко и Грайс здесь не нужны — этот модуль работает на уровне физической целостности, ниже семантического уровня, где начинается анализ интенциональности.
 
-Функция сжатия SHA-256 обозначается как:
-\[
-h: \{0,1\}^* \to \{0,1\}^{256}
-\]
-реализуемая посредством конструкции Меркла — Дамгора со сжатием по Дэвису — Мейеру, формирующая 256-битный дайджест, устойчивый к атакам на прообраз и второй прообраз в рамках стандартных криптографических предположений.
+### Глоссарий
 
-Манифест \( \mathcal{M} \) определяется как упорядоченная последовательность кортежей:
-\[
-\mathcal{M} = \left[ (p_i, h_i) \right]_{i=1}^{n}, \quad h_i = \text{SHA-256}(s_i)
-\]
-где \( p_i \) — канонический относительный путь \( s_i \), а последовательность упорядочена лексикографически по \( p_i \).
+| Термин | Определение |
+|--------|------------|
+| generate_release_bundle.py | Модуль, запечатывающий дерево исходного кода VIGÍA в воспроизводимый, аутентифицированный пакет выпуска |
+| канонизация | Процесс нормализации всех исходных файлов до детерминированного, платформо-независимого представления |
+| манифест M | Упорядоченный список пар (путь, хеш SHA-256), охватывающий каждый файл релиза |
+| детерминированный tar-архив | Поток tar POSIX с фиксированными метаданными; идентичные деревья исходного кода дают побитово идентичные архивы |
+| HMAC-SHA256 | Код аутентификации сообщений на основе хеша; доказывает подлинность и целостность без обеспечения конфиденциальности |
+| ключ подписи K_release | Секретный ключ, управляемый VIGÍA.KeyOrchestrator; используется для вычисления тега аутентификации σ |
+| цепочка хранения | Документально подтверждённая, верифицируемая запись, связывающая каждый артефакт с его происхождением и всеми событиями хранения |
+| LSN (порядковый номер журнала) | Монотонный идентификатор от VIGÍA.AuditLogger, привязывающий каждое событие генерации пакета к временной шкале аудита |
+| HashMismatchException | Исключение при несовпадении пересчитанного хеша манифеста с внутренней копией манифеста в архиве |
 
-Конструкция HMAC-SHA256 формализуется следующим образом:
-\[
-\text{HMAC}(K, m) = H\Bigl( (K' \oplus \text{opad}) \,\|\, H\bigl( (K' \oplus \text{ipad}) \,\|\, m \bigr) \Bigr)
-\]
-где \( K \) — секретный ключ подписи, предоставляемый модулем VIGÍA.KeyOrchestrator, \( K' \) — производная от \( K \) размером с блок, \( H \) — SHA-256, \( \oplus \) обозначает побитовое исключающее ИЛИ, \( \| \) — конкатенацию, opad \( = \texttt{0x5c} \), повторяемый необходимое число раз, и ipad \( = \texttt{0x36} \), повторяемый аналогичным образом.
+*Licensed under the Apache License, Version 2.0. Copyright 2026 Anna Tchijova.*
 
-Детерминированный архив \( \mathcal{A} \) формируется путём канонической сериализации дерева \( \mathcal{F} \) в формат tar согласно POSIX.1-2001 с фиксированными полями метаданных (uid = gid = 0, mtime = 0 или детерминированная метка коммита, формат UStar). Итоговый пакет \( \mathcal{B} \) представляет собой упорядоченную структуру:
-\[
-\mathcal{B} = (\mathcal{A}, \mathcal{M}, \sigma)
-\]
-где \( \sigma = \text{HMAC}(K_{\text{release}}, \text{Serialize}(\mathcal{A}, \mathcal{M})) \).
-
-**3. Описание алгоритма**
-
-Выполнение модуля `generate_release_bundle.py` осуществляется в пять строго упорядоченных фаз:
-
-*Фаза 1: Канонизация.* Модуль осуществляет обход исходного каталога с применением лексикографической сортировки строк путей, не зависящей от локали. Все обычные файлы подвергаются нормализации: текстовые файлы преобразуются к окончаниям строк UNIX LF (`\n`), права доступа к файлам приводятся к значениям `0644` (обычные файлы) или `0755` (исполняемые каталоги), расширенные атрибуты удаляются, если они не включены в белый список. Символические ссылки разыменовываются или регистрируются каноническим образом в соответствии с политикой конфигурации.
-
-*Фаза 2: Генерация манифеста.* Для каждого канонизированного файла \( s_i \) модуль вычисляет \( h_i = \text{SHA-256}(s_i) \). Полученные кортежи \( (p_i, h_i) \) собираются в \( \mathcal{M} \), сериализуются в файл манифеста с разделителем в виде новой строки или в структурированном формате JSON, после чего сам манифест хэшируется для получения \( h_{\mathcal{M}} \).
-
-*Фаза 3: Построение архива.* Модуль формирует поток канонизированного дерева в архив tar стандарта POSIX с детерминированными заголовками. Недетерминированные метаданные (имена пользователей, стохастические временные метки, системно-специфичные права) замещаются фиксированными значениями. Поток tar записывается во временный файл и хэшируется с целью получения \( h_{\mathcal{A}} \).
-
-*Фаза 4: Криптографическая привязка.* Используя дескриптор ключа подписи, полученный от VIGÍA.KeyOrchestrator, модуль вычисляет тег аутентификации \( \sigma \) над побитовой конкатенацией \( \mathcal{A} \) и \( \mathcal{M} \) (или их соответствующих хэшей — в зависимости от политики). Операция подписи выполняется в аппаратно защищённом контексте или внутри модуля HSM при его наличии, что исключает эксфильтрацию ключа.
-
-*Фаза 5: Упаковка и выдача пакета.* Итоговый артефакт \( \mathcal{B} \) выдаётся в виде составного файла или набора файлов: архива tar, манифеста и отсоединённой либо встроенной подписи. Формируется квитанция цепочки хранения в формате JSON-LD, связывающая \( \sigma \), \( h_{\mathcal{A}} \), \( h_{\mathcal{M}} \), идентификатор оператора и неизменяемый порядковый номер журнала (LSN), полученный от VIGÍA.AuditLogger.
-
-**4. Спецификации входных и выходных данных**
-
-*Входные данные:*
-- `SRC_DIR`: Абсолютный или относительный путь к корню дерева исходного кода. Должен находиться под контролем версий (связан с VIGÍA.SourceAttestor).
-- `KEY_HANDLE`: Ссылка на криптографический ключ, управляемый VIGÍA.KeyOrchestrator. Может указывать на симметричный ключ HMAC или на асимметричный закрытый ключ.
-- `BUILD_METADATA`: Словарь, содержащий `BUILD_ID`, `COMMIT_HASH`, `TIMESTAMP_POLICY` (эпоха или детерминированная метка), а также `NORMALIZATION_RULES`.
-- `POLICY_CONFIG`: Флаги судебной политики, регламентирующие обработку символических ссылок, сохранение расширенных атрибутов и формат подписи (отсоединённая или встроенная).
-
-*Выходные данные:*
-- `vigia-release-{BUILD_ID}.tar`: Детерминированный архив исходного кода \( \mathcal{A} \).
-- `manifest.sha256`: Криптографический манифест \( \mathcal{M} \), содержащий перечисление всех \( (p_i, h_i) \).
-- `bundle.sig` или встроенная подпись: Тег аутентификации \( \sigma \).
-- `custody-receipt.json`: Структурированная запись цепочки хранения с LSN, временной меткой и привязкой к оператору.
-
-*Условия возникновения ошибок:*
-- `NonDeterministicInputError`: Инициируется, если дерево исходного кода содержит файлы с невоспроизводимым порядком или нестабильными метаданными, поддающимися канонизации.
-- `KeyAccessViolation`: Инициируется, если дескриптор ключа не обладает полномочиями на подпись либо нарушено соединение с HSM.
-- `HashMismatchException`: Инициируется, если вычисленный хэш манифеста не совпадает с внутренней копией манифеста в архиве.
-
-**5. Детерминистские гарантии**
-
-Модуль обеспечивает три формальные детерминистские гарантии, являющиеся необходимыми для судебного допустимости результатов:
-
-*Теорема 1 (Инвариантность манифеста).* При фиксированном входном множестве \( \mathcal{F} \) и политике канонизации \( C \) манифест \( \mathcal{M} \) инвариантен относительно выполнения на разнородных хост-системах. Формально:
-\[
-\forall \mathcal{F}, C: \; \mathcal{M}_1 = \mathcal{M}_2 \iff C(\mathcal{F})_1 = C(\mathcal{F})_2
-\]
-*Схема доказательства.* SHA-256 является детерминированной функцией. Лексикографическое упорядочение является полным и детерминированным. Следовательно, упорядоченная последовательность кортежей «путь — хэш» представляет собой чистую функцию от \( C(\mathcal{F}) \).
-
-*Теорема 2 (Побитовая идентичность архива).* При соблюдении политики канонического tar (фиксированные uid/gid/mtime, детерминированное упорядочение, формат UStar) поток архива \( \mathcal{A} \) является побитово идентичным для любых двух выполнений при идентичном \( C(\mathcal{F}) \).
-
-*Теорема 3 (Привязка подписи и неподделываемость).* В модели случайного оракула при предположении о столкновительной стойкости SHA-256 конструкция HMAC-SHA256 обеспечивает экзистенциальную неподделываемость при адаптивных атаках с выбором сообщения. Следовательно, любое изменение \( \mathcal{A}' \neq \mathcal{A} \) или \( \mathcal{M}' \neq \mathcal{M} \) приводит к отказу верификации с подавляющей вероятностью.
-
-**6. Цепочка хранения и соответствие стандартам**
-
-Модуль спроектирован с учётом требований многочисленных юрисдикционных и институциональных стандартов, регламентирующих обращение с цифровыми доказательствами и обеспечение безопасности цепочек поставок программного обеспечения.
-
-В соответствии со стандартом *Daubert* выходные данные модуля являются тестируемыми (верифицируемыми посредством VIGÍA.ManifestValidator), подчиняются известным частотам ошибок (вероятность хэш-коллизии \( \approx 2^{-256} \)) и общепризнаны на основании FIPS 180-4 и FIPS 198-1. Это устанавливает надёжность доказательств, полученных с применением VIGÍA, в федеральных судебных разбирательствах США.
-
-В соответствии со стандартом *GB/T 29360-2012* (стандарт компьютерной судебной экспертизы электронных данных Китайской Народной Республики) модуль удовлетворяет требованию обязательной проверки целостности судебных инструментов перед экспертизой. Манифест \( \mathcal{M} \) выступает в роли обязательной базовой линии контрольной суммы для валидации инструментария.
-
-В соответствии с требованиями *MLPS 2.0* (многоуровневой системы защиты, уровни 3 и выше) предписывается криптографическая защита критических обновлений системы и пакетов развёртывания. Криптографическая привязка HMAC-SHA256 и хранение ключей в HSM посредством VIGÍA.KeyOrchestrator удовлетворяют требованиям криптографических контролей, обеспечивающих безопасную передачу и хранение обновлений.
-
-Протоколы аудита SANS DFIR поддерживаются детерминистской природой \( \mathcal{B} \), позволяющей аудиторам самостоятельно пересчитывать хэши и верифицировать \( \sigma \).
-
-**7. Связанные модули VIGÍA**
-
-- **VIGÍA.KeyOrchestrator:** Управляет жизненным циклом ключа \( K_{\text{release}} \), включая развёртывание в HSM, ротацию ключей и управление доступом. Операция подписи в модуле `generate_release_bundle.py` делегируется API данного модуля, что гарантирует отсутствие закрытого ключа в оперативной памяти процесса.
-- **VIGÍA.AuditLogger:** Обеспечивает журнал с возможностью только добавления записей, устойчивый к несанкционированному изменению. Каждое событие формирования пакета регистрируется с указанием LSN, идентификатора оператора и \( h_{\sigma} \), формируя поддающуюся аудиту временную шкалу.
-- **VIGÍA.ManifestValidator:** Компонент верификации, выполняющий пересчёт \( \mathcal{M} \) и проверку \( \sigma \) относительно опубликованного открытого ключа или общего секрета. Используется в конвейерах CI/CD и при полевых аудитах.
-- **VIGÍA.DeployGuard:** Агент принудительного контроля в режиме исполнения, который принимает \( \mathcal{B} \) и блокирует развёртывание при недействительности \( \sigma \) либо при наличии в \( \mathcal{M} \) несанкционированных изменений файлов.
-- **VIGÍA.SourceAttestor:** Устанавливает связь между хэшем коммита (`COMMIT_HASH`) пакета и системой управления версиями, криптографически засвидетельствуя, что упакованный исходный код соответствует конкретному прошедшему проверку коммиту.
-
-**8. Примечание по безопасности и конфиденциальности**
-
-Конструкция HMAC-SHA256 гарантирует аутентичность и целостность, однако не обеспечивает конфиденциальность. Пакет выпуска \( \mathcal{B} \) должен защищаться при передаче и в состоянии покоя дополнительными механизмами — например, шифрованием AES-256-GCM или транспортом TLS 1.3, — регулируемыми корпоративной политикой управления доступом. Сам модуль не выполняет шифрования, что соответствует принципу разделения криптографических функций.
+---
 
 ## 中文
 
-**模块标识符：** `generate_release_bundle.py`（VIGÍA 哈希：`ebd2829f`）
+### 本模块是什么？
 
-**1. 模块目的与取证语境**
+`generate_release_bundle.py`（VIGÍA 哈希值 `ebd2829f`）是 VIGÍA 取证平台的规范化工件封装引擎。其目的是生成经密码学签名的发布包，完整封装平台源码树、构建时元数据以及防篡改的清单——并以比特级可复现的方式，从相同源输入在任何兼容系统上生成相同结果。
 
-`generate_release_bundle.py` 模块是 VIGÍA 取证平台的规范化工件封装引擎。其核心的取证功能在于生成经密码学签名的发布包（release bundle），该发布包完整封装平台源代码、构建时元数据以及具备防篡改能力的密码学清单（manifest）。在 VIGÍA 生态系统内，本模块为所有可部署软件工件建立信任根（root-of-trust），确保受控环境或现场环境中执行的二进制文件与经同行评审及 SANS DFIR 审计协议审查的源代码基线保持逐位一致。
+本模块的取证必要性直接明确：Daubert 标准要求用于法律程序的分析工具具备可证明的可靠来源。若检验员无法证明其运行的二进制文件与经过审查和批准的代码完全相同，保管链即告断裂。本模块建立这条链。它充当代码审查与运行时执行之间的关键保管节点，产生发布包 B = (A, M, σ)——确定性 tar 归档 A、密码学清单 M = [(p_i, h_i)] 以及 HMAC-SHA256 认证标签 σ。
 
-本模块的取证必要性源于 *Daubert* 标准的要求：用于法律程序的分析工具必须具备可证明的可靠来源。通过生成确定性、可复现且已认证的发布包，`generate_release_bundle.py` 满足了 *Daubert* 标准关于可测试性、已知错误率及数字取证领域普遍接受性的要求。该模块运行于部署前阶段，作为监管链（chain-of-custody）的关键控制节点，自代码审查结束起直至运行时刻，持续保全软件完整性。
+模块严格按照五个阶段顺序运行：（1）规范化——无 locale 依赖的词典序遍历、行尾符规范化、权限标准化；（2）清单生成——对每个文件计算 SHA-256，组装为 M；（3）归档构建——具有固定元数据的确定性 POSIX tar（uid=gid=0，mtime=0 或确定性提交时间戳，UStar 格式）；（4）密码学绑定——使用来自 VIGÍA.KeyOrchestrator 的密钥对 A∥M 计算 HMAC-SHA256；（5）包封——输出 B 并附带 JSON-LD 格式保管链凭据。
 
-**2. 数学基础**
+### 关键概念
 
-本模块的密码学严谨性建立在两种基础原语之上：SHA-256 哈希函数与 HMAC-SHA256 消息认证码，二者分别由 FIPS 180-4 与 FIPS 198-1 标准化。
+| 概念 | 定义 |
+|------|------|
+| 源码树规范化 | 无 locale 依赖的词典序遍历；行尾符 → LF；权限 → 0644/0755；剥离扩展属性 |
+| 清单 M | 有序序列 [(p_i, h_i)]，其中 h_i = SHA-256(s_i)，p_i 为规范化相对路径；按词典序排列 |
+| 归档 A | 具有固定元数据字段的确定性 POSIX.1-2001 tar（uid=gid=0，mtime=0 或提交时间戳，UStar 格式） |
+| 发布包 B | 有序三元组 (A, M, σ)：归档、清单和认证标签 |
+| HMAC-SHA256 σ | σ = HMAC(K_release, Serialize(A, M))；在自适应选择消息攻击下提供存在性不可伪造性 |
+| SHA-256 碰撞概率 | ≈ 2^−256；这是满足 Daubert "已知错误率"标准的已知错误率 |
+| VIGÍA.KeyOrchestrator | 管理签名密钥生命周期的模块；私钥材料从不驻留于进程内存 |
+| 保管链凭据 | JSON-LD 记录，关联 σ、A 的哈希、M 的哈希、操作者身份及不可变日志序列号（LSN） |
+| NonDeterministicInputError | 源码树包含顺序不可复现或元数据不稳定文件时抛出的异常 |
 
-设源码树表示为经规范化处理的文件的ordered set \( \mathcal{F} = \{s_1, s_2, \ldots, s_n\} \)，其中每个 \( s_i \) 均为文件 \( f_i \) 经确定性规范化（行尾符规范化、权限标准化、目录项与区域设置无关的词典序排序）后的原像。
+> **【科学说明】**
+> "密码学签名"这一表述可能令人感觉复杂，但其底层操作类似于测量仪器的校准铅封。清单 M 是列出每个组件测量值的校准证书。HMAC 标签 σ 是证明证书由持有已知密钥的授权技术人员颁发的铅封。若封印后任何组件发生变化——哪怕一个比特——铅封验证即告失败。这不是概率性或启发式检验：Merkle-Damgård 构造下的 SHA-256 是确定性函数，HMAC-SHA256 提供 FIPS 180-4 和 FIPS 198-1 标准化的不可伪造性保证。皮尔斯、艾柯和格赖斯在此处不涉及——本模块在物理层完整性层面运行，低于意图性分析起始的语义层。
 
-SHA-256 压缩函数记为：
-\[
-h: \{0,1\}^* \to \{0,1\}^{256}
-\]
-其实现采用 Merkle-Damgård 结构及 Davies-Meyer 压缩方式，在标准密码学假设下可生成抗原像攻击与第二原像攻击的 256 位摘要。
+### 术语表
 
-清单 \( \mathcal{M} \) 定义为有序元组序列：
-\[
-\mathcal{M} = \left[ (p_i, h_i) \right]_{i=1}^{n}, \quad h_i = \text{SHA-256}(s_i)
-\]
-其中 \( p_i \) 为 \( s_i \) 的规范化相对路径，序列按 \( p_i \) 词典序排列。
+| 术语 | 定义 |
+|------|------|
+| generate_release_bundle.py | 将 VIGÍA 源码树封装为可复现、经密码学认证的发布包的模块 |
+| 规范化 | 将所有源文件规范化为确定性、平台无关表示的过程 |
+| 清单 M | 覆盖发布中每个文件的有序 (路径, SHA-256 哈希) 对列表 |
+| 确定性 tar 归档 | 具有固定元数据的 POSIX tar 流；相同源码树产生比特级一致的归档 |
+| HMAC-SHA256 | 基于哈希的消息认证码；在不提供保密性的情况下证明真实性和完整性 |
+| 签名密钥 K_release | 由 VIGÍA.KeyOrchestrator 管理的密钥；用于计算包认证标签 σ |
+| 保管链 | 将每个工件与其来源及所有后续保管事件相关联的有文档记录、可验证的记录 |
+| LSN（日志序列号） | 来自 VIGÍA.AuditLogger 的单调标识符，将每次包生成事件锚定至审计时间线 |
+| HashMismatchException | 重新计算的清单哈希与归档内部清单副本不匹配时抛出的异常 |
 
-HMAC-SHA256 构造形式化表述为：
-\[
-\text{HMAC}(K, m) = H\Bigl( (K' \oplus \text{opad}) \,\|\, H\bigl( (K' \oplus \text{ipad}) \,\|\, m \bigr) \Bigr)
-\]
-式中，\( K \) 为由 VIGÍA.KeyOrchestrator 提供的签名密钥；\( K' \) 为经填充至分组长度后的密钥派生值；\( H \) 为 SHA-256；\( \oplus \) 表示按位异或；\( \| \) 表示串联；opad 为重复填充的 `0x5c`；ipad 为重复填充的 `0x36`。
-
-确定性归档 \( \mathcal{A} \) 采用符合 POSIX.1-2001 的 tar 格式对 \( \mathcal{F} \) 进行规范化序列化，元数据字段固定（uid = gid = 0，mtime = 0 或确定性提交时间戳，UStar 格式）。最终发布包 \( \mathcal{B} \) 为有序结构：
-\[
-\mathcal{B} = (\mathcal{A}, \mathcal{M}, \sigma)
-\]
-其中 \( \sigma = \text{HMAC}(K_{\text{release}}, \text{Serialize}(\mathcal{A}, \mathcal{M})) \)。
-
-**3. 算法描述**
-
-`generate_release_bundle.py` 的执行严格按以下五个阶段展开：
-
-*阶段一：规范化（Canonicalization）。* 模块以与区域设置无关的词典序遍历源码目录路径字符串。所有常规文件均接受规范化处理：文本文件行尾统一转换为 UNIX LF（`\n`）；文件权限强制为 `0644`（普通文件）或 `0755`（可执行目录）；扩展属性除非显式列入白名单否则一律剥离；符号链接根据配置策略进行解引用或规范化记录。
-
-*阶段二：清单生成。* 对每个规范化文件 \( s_i \)，模块计算 \( h_i = \text{SHA-256}(s_i) \)。所得元组 \( (p_i, h_i) \) 被组装为 \( \mathcal{M} \)，并以换行分隔或 JSON 结构形式序列化为清单文件，随后对清单本身进行哈希运算得到 \( h_{\mathcal{M}} \)。
-
-*阶段三：归档构建。* 模块将规范化后的源码树流式写入具有确定性头部的 POSIX tar 归档。非确定性元数据（用户名、随机时间戳、系统相关权限）被固定值覆盖。tar 流写入临时文件并进行哈希运算，得到 \( h_{\mathcal{A}} \)。
-
-*阶段四：密码学绑定。* 模块利用从 VIGÍA.KeyOrchestrator 获取的签名密钥句柄，针对 \( \mathcal{A} \) 与 \( \mathcal{M} \) 的按位串联（或根据策略采用其各自哈希值）计算认证标签 \( \sigma \)。签名操作在硬件支持或 HSM 边界内完成，以防密钥外泄。
-
-*阶段五：包封与输出。* 最终工件 \( \mathcal{B} \) 以组合文件或文件集形式输出：tar 归档、清单文件、以及分离式或内联式签名。同时生成 JSON-LD 格式的监管链接收凭据，关联 \( \sigma \)、\( h_{\mathcal{A}} \)、\( h_{\mathcal{M}} \)、操作者身份及由 VIGÍA.AuditLogger 提供的不可变日志序列号（LSN）。
-
-**4. 输入输出规范**
-
-*输入：*
-- `SRC_DIR`：源码树根目录的绝对或相对路径，须处于版本控制之下（并与 VIGÍA.SourceAttestor 关联）。
-- `KEY_HANDLE`：由 VIGÍA.KeyOrchestrator 管理的密码学密钥引用，可指向对称 HMAC 密钥或非对称私钥。
-- `BUILD_METADATA`：包含 `BUILD_ID`、`COMMIT_HASH`、`TIMESTAMP_POLICY`（纪元时间或确定性时间戳）及 `NORMALIZATION_RULES` 的字典。
-- `POLICY_CONFIG`：取证策略标志，管控符号链接处理、扩展属性保留及签名格式（分离式/内联式）。
-
-*输出：*
-- `vigia-release-{BUILD_ID}.tar`：确定性源码归档 \( \mathcal{A} \)。
-- `manifest.sha256`：密码学清单 \( \mathcal{M} \)，列出全部 \( (p_i, h_i) \)。
-- `bundle.sig` 或内联签名：认证标签 \( \sigma \)。
-- `custody-receipt.json`：结构化监管链记录，含 LSN、时间戳及操作者绑定信息。
-
-*错误条件：*
-- `NonDeterministicInputError`：源码树包含
+*Licensed under the Apache License, Version 2.0. Copyright 2026 Anna Tchijova.*

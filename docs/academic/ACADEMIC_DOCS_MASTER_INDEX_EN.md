@@ -40,7 +40,7 @@
 |---------------|-----|-----------|
 | `vigia/core/forensic_technical_detector.py` | [forensic_technical_detector_academic.md](core/forensic_technical_detector_academic.md) | EN/ES/RU/ZH |
 | `vigia/core/vigia_core_forensic_technical_detector.py` | [vigia_core_forensic_technical_detector_academic.md](core/vigia_core_forensic_technical_detector_academic.md) | EN/ES/RU/ZH |
-| `vigia/core/semiotic_detector.py` | [94fbce3d_academic.md](unclassified/94fbce3d_academic.md) | EN/ES |
+| `vigia/core/semiotic_detector.py` | [94fbce3d_academic.md](unclassified/94fbce3d_academic.md) | EN/ES/RU/ZH |
 | `vigia/core/semiotic_detector_v2.py` | [semiotic_detector_v2_academic.md](core/semiotic_detector_v2_academic.md) | EN/ES/RU/ZH |
 | `vigia/core/vigia_core_semiotic_detector.py` | [vigia_core_semiotic_detector_academic.md](core/vigia_core_semiotic_detector_academic.md) | EN/ES/RU/ZH |
 | `vigia/core/narrative_auditor.py` | [narrative_auditor_academic.md](core/narrative_auditor_academic.md) | EN/ES/RU/ZH |
@@ -206,7 +206,7 @@
 | `vigia/tools/vigia_case_adapter.py` | [vigia_case_adapter_academic.md](tools/vigia_case_adapter_academic.md) | EN/ES/RU/ZH |
 | `vigia/tools/vigia_entanglement.py` | [vigia_entanglement_academic.md](tools/vigia_entanglement_academic.md) | EN/ES/RU/ZH |
 | `vigia/tools/vigia_planner.py` | [vigia_planner_academic.md](tools/vigia_planner_academic.md) | EN/ES/RU/ZH |
-| `vigia/tools/vigia_planner_GIT.py` | [vigia_planner_GIT_academic.md](tools/vigia_planner_GIT_academic.md) | EN/ES/RU/ZH |
+| `vigia/tools/vigia_planner_GIT.py` | [vigia_planner_GIT_academic.md](tools/vigia_planner_GIT_academic.md) | — |
 | `vigia/tools/vigia_sift_bridge.py` | [3f495b70_academic.md](unclassified/3f495b70_academic.md) | EN/ES/RU/ZH |
 | `vigia/tools/vision_audit.py` | [vision_audit_academic.md](tools/vision_audit_academic.md) | EN/ES/RU/ZH |
 
@@ -392,29 +392,38 @@
 ## Documents with Incomplete Language Coverage
 
 The following documents require a new Batch API run to achieve full EN/ES/RU/ZH coverage.
-Priority: `generate_calibration.py` (ZH only) and `carnegie_education_detector.py` (EN only)
-are the highest risk for SANS reviewers.
+Run `python3 docs/academic/refresh_index_status.py` to update language status in all tables.
 
-| Hash | Module | Present | Missing |
-|------|--------|---------|---------|
-| `9f525516` | `scripts/fix_inits.py` | ZH | EN/ES/RU |
-| `69cb51de` | `vigia_scorer.py` | EN/ES/RU/ZH | — (license error, fixed by script) |
-| `9dc17ed4` | `vigia/tools/generate_calibration.py` | ZH | EN/ES/RU |
-| `d4e678b5` | `scripts/run_demo.py` | EN | ES/RU/ZH |
-| `8f6f7187` | `vigia/abduction/vigia_counter_fact.py` | EN | ES/RU/ZH |
-| `7b5f476a` | `vigia/collapse_decision.py` | EN | ES/RU/ZH |
-| `608005f0` | `vigia/core/path_guard.py` | EN | ES/RU/ZH |
-| `e0f29980` | `vigia/forensics/vision_audit.py` | EN | ES/RU/ZH |
-| `5d49495e` | `vigia/core/bundle_builder.py` | EN | ES/RU/ZH |
-| `9ae17aea` | `vigia/core/carnegie_education_detector.py` | EN | ES/RU/ZH |
-| `aa4e03f6` | `vigia/core/explainable_governance.py` | EN | ES/RU/ZH |
-| `3254c6ec` | `vigia/abduction/vigia_artifact_graph.py` | EN/ES | RU/ZH |
-| `2989e9bd` | `scripts/vigia_patch_valkyrie.py` | EN/ES | RU/ZH |
-| `637ecdc6` | `scripts/vigia_mass_refactor.py` | EN/ES | RU/ZH |
-| `94fbce3d` | `vigia/core/semiotic_detector.py` | EN/ES | RU/ZH |
-| `cc27fff8` | `vigia/core/chain_of_custody.py` | EN/ES/RU | ZH |
-| `1ea10b1b` | `vigia/core/decision_layer.py` | EN/ES/RU | ZH |
-| `779b4236` | *(unresolved path)* | EN/ES/RU | ZH |
+---
+
+## 12 — Additional Modules (architecturally unclassified)
+
+| Python Module | Doc | Languages |
+|---------------|-----|-----------|
+| `pipeline_adapter.py` (canonical pipeline adapter) | [131c3f89_academic.md](unclassified/131c3f89_academic.md) | EN/ES/RU/ZH |
+| `vigia_sift_bridge_patch.py` (BRIDGE_PATCH_FINAL) | [19008897_academic.md](unclassified/19008897_academic.md) | EN/ES/RU/ZH |
+| `document_integrity.py` (v2, PDF/DOCX) | [1c52745b_academic.md](unclassified/1c52745b_academic.md) | EN/ES/RU/ZH |
+| `vigia_namespace_shim.py` (compatibility stub) | [2d6dff4d_academic.md](unclassified/2d6dff4d_academic.md) | EN/ES/RU/ZH |
+| `ci_gate.py` | [2ddb875b_academic.md](unclassified/2ddb875b_academic.md) | EN/ES/RU/ZH |
+| `vigia_batch_postprocess.py` | [43e2ca4a_academic.md](unclassified/43e2ca4a_academic.md) | EN/ES/RU/ZH |
+| `run_calibration.py` | [495820ba_academic.md](unclassified/495820ba_academic.md) | EN/ES/RU/ZH |
+| `pattern_repository_init.py` (FPRI) | [4cffb019_academic.md](unclassified/4cffb019_academic.md) | EN/ES/RU/ZH |
+| `vigia_server.py` | [59fb9f58_academic.md](unclassified/59fb9f58_academic.md) | EN/ES/RU/ZH |
+| `run_stress_tests.py` | [5f1c653e_academic.md](unclassified/5f1c653e_academic.md) | EN/ES/RU/ZH |
+| `evidence_narrative_generator.py` | [68e0e743_academic.md](unclassified/68e0e743_academic.md) | EN/ES/RU/ZH |
+| `vigia_scorer.py` (variant B) | [69cb51de_academic.md](unclassified/69cb51de_academic.md) | EN/ES/RU/ZH |
+| `vigia_batch_doc_generator.py` | [779b4236_academic.md](unclassified/779b4236_academic.md) | EN/ES/RU/ZH |
+| `report_exporter_v2.py` | [8d0b9079_academic.md](unclassified/8d0b9079_academic.md) | EN/ES/RU/ZH |
+| `verify_ebs_v1.py` (Independent EBS Verifier) | [9810a97e_academic.md](unclassified/9810a97e_academic.md) | EN/ES/RU/ZH |
+| `recommendation_engine_v3.1.py` | [adc5d097_academic.md](unclassified/adc5d097_academic.md) | EN/ES/RU/ZH |
+| `negation_handler.py` | [b8bde3c7_academic.md](unclassified/b8bde3c7_academic.md) | EN/ES/RU/ZH |
+| `generate_execution_log.py` | [e6461489_academic.md](unclassified/e6461489_academic.md) | EN/ES/RU/ZH |
+| `convert_synthetic_cases.py` | [e74f0754_academic.md](unclassified/e74f0754_academic.md) | EN/ES/RU/ZH |
+| `generate_release_bundle.py` | [ebd2829f_academic.md](unclassified/ebd2829f_academic.md) | EN/ES/RU/ZH |
+| `generate_report.py` | [ec80b958_academic.md](unclassified/ec80b958_academic.md) | EN/ES/RU/ZH |
+| `vigia_api.py` (variant — simplified interface) | [ed735669_academic.md](unclassified/ed735669_academic.md) | EN/ES/RU/ZH |
+| `vigia_scorer.py` (variant C) | [ed8c1a84_academic.md](unclassified/ed8c1a84_academic.md) | EN/ES/RU/ZH |
+| `sanitize_judicial.py` | [f8ae3e67_academic.md](unclassified/f8ae3e67_academic.md) | EN/ES/RU/ZH |
 
 ---
 

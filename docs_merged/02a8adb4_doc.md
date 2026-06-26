@@ -123,9 +123,6 @@ For English table:
 
 That looks good and emphasizes integer arithmetic.
 
-For the changelog, I should mention the v2.3.5 improvements in the "What Is This Module?" text, which I did.
-
-Now, I need to ensure the document is Markdown formatted correctly with headers.
 
 I will structure:
 
@@ -141,25 +138,17 @@ Inside each H2:
 
 Let's write it out fully.
 
-One concern: The user said "You NEVER use floating-point math explanations for deterministic systems." I should make sure I don't say "z~1.3" or explain it as a float. I can mention the outcome in plain language: "a single strong category yields a lower-bound score, while three weak categories trigger rejection." I won't mention 1.3.
 
-Let's verify the license line requirement: "" I will place this at the very end of the document.
-
-Let's double-check Chinese terms:
 - 艾柯: yes.
 - 格赖斯: yes.
 - 取证工件: yes.
 - 逻辑断裂: yes.
 
-In the Chinese glossary, I'll include 逻辑断裂.
 
 Also, need to make sure I don't use "制品" or "裂缝". I'll use 取证工件 and 逻辑断裂 exclusively.
 
 Let's draft the final output carefully.
 
-Potential issue: The user wants me to act as an academic technical writer specializing in digital forensics, writing for scientists who do not know Python. So the tone should be formal, academic, precise.
-
-I should avoid code snippets. The audience doesn't know Python, so no `def analyze():` blocks. I can mention the names of classes/functions as proper nouns/labels.
 
 Let's finalize the text.
 
@@ -251,8 +240,6 @@ Finally, license line.
 
 One final check: The user says "You always write in 4 languages: ENGLISH, ESPAÑOL, РУССКИЙ, 中文." So the document must contain all four.
 
-Also, the user wants "glossaries and scientific notes" in each section.
 
-I should ensure the formatting is clean Markdown
 ---
 *Licensed under the Apache License, Version 2.0. Copyright 2026 Anna Tchijova.*

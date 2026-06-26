@@ -119,13 +119,11 @@ ESPAÑOL:
 
 License line at the end.
 
-I need to ensure the document is thorough but concise. I will format it with clear headings. Since it's Markdown, I'll use `##` for language sections, `###` for subsections.
 
 Double-check Chinese terms:
 - 艾柯 (Eco) ✓
 - 格赖斯 (Grice) ✓
 - 取证工件 (artifact) ✓
-- 逻辑断裂 (logical gap/fracture) — the prompt requires this translation, but where to use it? I should incorporate it naturally. Perhaps in the glossary or scientific note: explain that abduction fills the 逻辑断裂 (logical gap) between signal and hypothesis. Yes, I'll add it there.
 
 "Do NOT use floating-point math explanations — emphasize deterministic integer arithmetic where applicable": I have included this in the descriptions.
 
@@ -135,7 +133,6 @@ Let's make sure all classes and functions are covered in the tables.
 
 Also, constants: _LAYER_MAP, _EVIDENCE_MAP, _ONTOLOGY_MAP, LAYER_EPISTEMIC_WEIGHT, MEMORY, NETWORK, REGISTRY, DISK_MFT, TECHNIQUE, TACTIC.
 
-I should create a comprehensive table for each language.
 
 I will structure each language section identically:
 - Module Path header
@@ -297,20 +294,15 @@ Glossary Chinese:
 - **确定性整数运算**: 仅使用整数的计算，确保结果可复现，杜绝浮点舍入误差。
 - **逻辑断裂**: 信号与假设之间的逻辑缺口；溯因推理通过确定性规则填补此断裂。
 
-I should include 逻辑断裂 in the glossary or note. Let's put it in the glossary: "逻辑断裂 (Logical Gap): 原始信号与解释性假设之间的确定性缺口；由整数加权规则填补。" And maybe in the scientific note: "所谓‘逻辑断裂’仅是信号输入与结构化输出之间的待映射区间..."
 
 Let's make sure the scientific note in Chinese uses 艾柯 and 格赖斯.
 
 Chinese Scientific Note draft:
 【科学说明】皮尔斯、艾柯与格赖斯的术语有时被误认为玄学思辨。事实并非如此。这些术语是对确定性信息过程的操作性标记，其性质类似于物理传感器。当温度计记录温度时，无人将其视为神秘主义；同理，当本模块执行“溯因”时，它是在整数加权证据层上执行一种确定性的假设选择例程。格赖斯的“相关性”与艾柯的“诠释”在此处被实现为精确的查找与映射操作。所谓“逻辑断裂”不过是信号输入与结构化输出之间有待映射的区间，由确定性整数运算填补。传感器类比足以消除任何关于隐秘机制的错觉：适配器读取信号，施加确定性变换，写入结构化记录。仅此而已，不多不少。
 
-Now, check if I need to include "逻辑断裂" in the EN, ES, RU sections? The prompt only specified Chinese translations must use those terms. But the scientific note should explain the terminology is not mysticism. I should probably mention "logical gap" in English/Spanish/Russian too, but the strict requirement is only for Chinese. I'll mention it in all notes for consistency but ensure Chinese uses the exact term.
-
-Actually, the prompt says: "Chinese translations must use: 艾柯 (not Eco), 格赖斯 (not Grice), 取证工件 (not 制品), 逻辑断裂 (not 裂缝)". So I must ensure these appear in the Chinese section. I have them.
 
 Double-check: "取证工件" should be used instead of "制品". I used "取证工件" in Chinese. Good.
 
-One more thing: The user said "You NEVER use floating-point math explanations for deterministic systems." I must make sure I don't mention float anywhere except to say we don't use it. I have done that.
 
 Now, formatting. I'll write a single Markdown document.
 

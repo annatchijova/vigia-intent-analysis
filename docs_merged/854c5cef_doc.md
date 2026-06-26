@@ -34,7 +34,6 @@ Let's make tables:
 2. Functions
 3. Constants
 
-But the prompt says "Key concepts with tables". I can include all relevant tables.
 
 Glossary:
 - Deterministic integer arithmetic: Exact operations on whole numbers (hash digests represented as integers) where the same input always yields the identical output, with no rounding or approximation.
@@ -75,7 +74,6 @@ ESPAÑOL:
   - 安全管理中心 = Центр управления безопасностью
   - 动态可信验证 = Динамическая доверенная верификация
   - 动态关联感知 = Динамическое корреляционное восприятие
-  - 取证工件 = судебно-медицинский артефакт / цифровой артефакт для экспертизы (but this is Russian section, so maybe just "артефакт для цифровой экспертизы"). The user said Chinese translations must use 取证工件, so in Russian I can use something else, but if I include Chinese terms in the Russian text? No, the requirement is specifically for Chinese translations. In Russian, I will use standard Russian forensic terms.
   - 逻辑断裂 = логический разрыв (again, specific to Chinese, but I can note it).
 
 Scientific Note in Russian: explain Пирс/Эко/Грайс terminology is not mysticism. Use sensor analogy.
@@ -88,7 +86,6 @@ Scientific Note in Russian: explain Пирс/Эко/Грайс terminology is no
 - Glossary must include 取证工件 and 逻辑断裂.
 - Scientific Note: 【科学说明】 Terms like 皮尔斯 (Peirce) Thirdness, 艾柯 semiosis, 格赖斯 maxims are not mysticism. Sensor analogy.
 
-Let's think about the "逻辑断裂" requirement. The user said Chinese translations must use 逻辑断裂 (not 裂缝). Where to put it? Probably in the glossary or in describing what the integrity check prevents. I should ensure it's used naturally. For example, in the context of integrity verification: if the chain hash fails, it indicates a 逻辑断裂 (logical fracture/break) in the evidence chain.
 
 Also "取证工件" instead of "制品". Use it for "forensic artifact".
 
@@ -262,9 +259,6 @@ Los términos tomados de C. S. Peirce (Primeridad, Segundidad, Terceridad), Umbe
 【科学说明】
 源自皮尔斯（C. S. Peirce，第一性、第二性、第三性）、艾柯（Umberto Eco，无限符号过程、百科全书式语义学）与格赖斯（H. P. Grice，合作原则、会话含义）的术语有时被误认为是文学神秘主义。事实并非如此。在该确定性取证架构中，它们的作用完全等同于经校准的科学仪器：皮尔斯的“第三性”在形式上等同于一种传感器融合算法，它在多条经整数验证的事件流之间进行中介，以排除噪声；艾柯的符号学分层对应于协议首部向整数令牌的堆叠式编码与解码；格赖斯准则则充当日志条目的确定性相关性过滤器。正如温度计并不“相信”温度，这些符号学概念也不召唤超自然现象——它们是基于规则的描述符，说明确定性的整数结构如何生成可解释的意义。
 
-I should ensure the Chinese uses 艾柯, 格赖斯, 取证工件, 逻辑断裂. I've included 取证工件 and 逻辑断裂 in glossary. Good.
-
-Now, deterministic integer arithmetic emphasis: In the "What Is This Module?" and tables, I need to explicitly avoid floating-point and emphasize deterministic integer arithmetic.
 
 E.g., in ENGLISH: "All integrity comparisons rely on exact integer equality of 256-bit HMAC-SHA256 digests. There are no floating-point operations, approximations, or probabilistic roundings anywhere in the verification pipeline."
 
@@ -274,11 +268,9 @@ In РУССКИЙ: "Все сравнения целостности опира�
 
 In 中文: "所有完整性比较均依赖 256 位 HMAC-SHA256 摘要的精确整数相等性。验证流水线中不存在任何浮点运算、近似计算或概率舍入。"
 
-Also, the path and docstring mention REFACTORIZACIÓN P0 and TRANSPARENCIA DAUBERT. I should mention Daubert transparency. Daubert standard is about admissibility of scientific evidence. I can mention that the module is designed with Daubert transparency in mind: documenting that it's software emulation, not physical TPM.
 
 Now, formatting. I'll produce a clean Markdown document.
 
-I should also consider the `to_dict()` functions. The prompt lists them multiple times. I should mention them as serialization utilities that export deterministic integer states into dictionary structures for logging. I can include them in the function table.
 
 Let's refine the Function tables to include `to_dict()`:
 EN:
@@ -308,7 +300,6 @@ Structure per language:
 
 Then final License.
 
-I need to ensure the content is "thorough but concise". I will keep descriptions tight.
 
 Double-check Chinese terms:
 - 艾柯 (Eco) ✓

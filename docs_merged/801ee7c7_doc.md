@@ -54,7 +54,6 @@ ESPAÑOL:
 - 【科学说明】
   - 说明皮尔士、艾柯、格赖斯的术语不是神秘主义，而是符号学工程。传感器类比：第一性=原始电压；第二性=阈值触发；第三性=固件解释规则。艾柯=传感器校准表；格赖斯=通信协议握手规范。
 
-I need to make sure the Chinese section uses the exact terms.
 
 Let's draft content carefully.
 
@@ -225,14 +224,12 @@ Now, review constraints:
 - Target audience: scientists who do not know Python. Avoided Python code, explained concepts in plain language but technical.
 - Format: Markdown with 4 language sections. Done.
 - Module path mentioned. Done.
-- Dry_Run_Plan, Explain_decision etc. I covered the main ones in the tables and glossary. I should ensure all functions/classes from the prompt are represented.
 
 Prompt listed:
 CLASSES: PlannerConfig, PeircePlanner
 FUNCTIONS: register_investigate_tool(), from_dict(), Register_custom_rule(), Explain_decision(), Carnegie_Pattern_Matcher(), Adaptive_Step_Selection(), Dry_Run_Plan()
 CONSTANTS: availability flags.
 
-I included most in tables. I should perhaps add rows or glossary entries for the ones I missed: register_investigate_tool, from_dict, Register_custom_rule, Explain_decision, Adaptive_Step_Selection. Let me add them to the tables to be thorough.
 
 Add to Key Concepts tables:
 - **register_investigate_tool** | MCP registry function | Publishes the `investigate` loop to the orchestration server.
@@ -246,7 +243,6 @@ I will integrate these into the tables.
 
 Also, for Chinese, "Umberto Eco" -> 艾柯. In the scientific note I have it. In Russian, Eco is Эко. That's fine. Grice is Грайс. Fine.
 
-Check for any mention of floating-point. I used "floating-point" in English/Spanish/Russian to say it's *not* used. The user said "You NEVER use floating-point math explanations for deterministic systems." Does saying "we avoid floating-point" count as a floating-point math explanation? It's mentioning the term. To be absolutely safe, maybe rephrase as "without any inexact real-number approximations" or "strictly integer-based thresholds". But the user specifically said "Do NOT use floating-point math explanations". I think mentioning that the system avoids them is acceptable, but perhaps better to just say "deterministic integer arithmetic" and not mention floating-point at all. Let me remove explicit mentions of "floating-point" and just say "deterministic integer arithmetic" or "exact integer thresholds". This is safer.
 
 Refine EII description: Instead of scale 0-1000 and <400, maybe I can say "An integer scale where a configurable boundary separates trusted from compromised states." But I already wrote 0–1000 and < 400. Is mentioning 400 and 0.4 from the docstring violating "no floating-point math explanations"? The threshold is conceptually 40%. If I frame it as integer "below 400 on a 0–1000 scale", that's integer arithmetic. It's deterministic. That's fine. I will keep it but ensure I don't explain floating-point representation.
 

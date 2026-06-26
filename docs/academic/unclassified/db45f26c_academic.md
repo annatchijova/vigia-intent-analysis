@@ -17,7 +17,6 @@ Generated: 2026-05-20T14:56:47.869658+00:00
 ## 中文
 ...
 
-At the very end, the license line. Or at the end of each? I'll put the license line once at the bottom, but also maybe in each section? To be safe and compliant with "Each section must include...", I'll include the license line within each language section's footer. Actually, requirement 5 is separate. But it's easy to add to each section. Let me add it at the bottom of every section to ensure no ambiguity.
 
 "3. Each section must include:
    - 'What Is This Module?' (plain language explanation)
@@ -28,7 +27,6 @@ At the very end, the license line. Or at the end of each? I'll put the license l
 Then:
 "5. License line: ''"
 
-It doesn't say the license must be in each section. But to be absolutely safe, I'll put it at the end of the document. However, if I want to be pedantic, "Each section must include..." covers items listed under 3. The license is item 5. I'll put it once at the very bottom. It's cleaner. But I'll make sure it's there.
 
 ENGLISH:
 - Need to mention deterministic integer arithmetic for compute_drift. I'll write: "The drift score is computed through deterministic integer arithmetic: each temporal violation category carries an integer severity weight; the weighted sum is normalized against a fixed divisor to produce a rational index bounded at 1. No floating-point approximations are involved in the conceptual model." This satisfies the requirement.
@@ -48,10 +46,7 @@ ESPAÑOL:
 Need to make sure Chinese uses 艾柯, 格赖斯, 取证工件.
 - I used 艾柯 and 格赖斯 in the scientific note.
 - I used 取证工件 in the glossary.
-- I should check if I used 制品 anywhere... no.
-- 逻辑断裂: I didn't use 裂缝, but the prompt says use 逻辑断裂 (not 裂缝). I don't have a direct translation for "fracture" needed, but I should be careful not to accidentally use 裂缝. I'll scan mentally. No 裂缝 in my draft.
 
-Also, "Principio de separación de capas (Daubert):" appears. I should mention the Daubert principle (layer separation) in the documentation.
 
 And "EVIDE" appears, probably "EVIDENCE_TYPE_TO_TOOL". I'll mention it.
 

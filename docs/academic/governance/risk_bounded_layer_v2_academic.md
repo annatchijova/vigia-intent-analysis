@@ -138,4 +138,144 @@ El módulo te provee las siguientes garantías determinísticas, las cuales cons
 
 - **Totalidad de dominio:** La guarda de validación P0-001 convierte a `decide()` en una función total sobre el dominio \([0, 1]\). Si proporcionás una entrada inválida, el sistema la rechaza a través de rutas de excepción deterministas antes de que ocurra cualquier cómputo, asegurando que ningún comportamiento indefinido o dependiente de la plataforma pueda influir sobre el cálculo del riesgo.
 
-- **Integridad de la procedencia de la política (C4):** Dado que \( \lambda \), \( \gamma \) y \( \omega \) se leen exclusivamente desde `SelfAdaptiveRiskPolicy`, cada `DecisionTrace` que vos obtenés contiene un enlace de procedencia inequívoco hacia la configuración de riesgo institucional. La ausencia de plantillas locales o valores por defecto cod
+- **Integridad de la procedencia de la política (C4):** Dado que \( \lambda \), \( \gamma \) y \( \omega \) se leen exclusivamente desde `SelfAdaptiveRiskPolicy`, cada `DecisionTrace` contiene un enlace de procedencia inequívoco hacia la configuración de riesgo institucional, eliminando la deriva silenciosa de parámetros.
+
+- **No inversión semántica (P0-001):** Los comentarios de guarda documentan explícitamente que `posterior` representa \( P(\text{autenticidad} \mid \text{evidencia}) \) y que \( r \) representa el riesgo de fabricación, previniendo regresiones que inviertan el eje semántico autenticidad–fabricación.
+
+> **【Nota Científica】**
+> La capa de gobernanza operacionaliza los marcos de Peirce, Eco y Grice como mecanismos de control de riesgo institucional. La Primereidad peirceana es la probabilidad a posteriori bruta \( P(A \mid E) \) — el fenómeno tal como llega. La Segundidad es la comparación diferencial contra los umbrales \( \lambda \) y \( \gamma \): ¿dónde cae la probabilidad en relación con los límites de riesgo institucional? La Terceridad es el veredicto categórico — la ley repetible que transforma la incertidumbre continua en una decisión discreta y jurídicamente admisible. La enciclopedia de Eco es la política `SelfAdaptiveRiskPolicy`: el conocimiento institucional codificado sobre qué nivel de riesgo es tolerable. Las máximas de Grice imponen la zona inconclusa: cuando la evidencia no coopera con una respuesta clara, el sistema se abstiene de emitir un veredicto definitivo. Todas las operaciones usan aritmética decimal de precisión fija, garantizando reproducibilidad bajo el estándar Daubert.
+
+### Glosario
+
+1. **Probabilidad a posteriori bayesiana** — \( P(A \mid E) \): grado de creencia justificada en la autenticidad condicionada a la evidencia observada.
+2. **Riesgo de fabricación** — \( r = 1 - P(A \mid E) \): complemento exacto de la probabilidad a posteriori; mide la plausibilidad de adulteración.
+3. **Región inconclusa** — Zona de decisión donde la posterior cae entre \( \gamma \) y \( \lambda \); el sistema se abstiene de emitir un veredicto definitivo.
+4. **DecisionTrace** — Registro inmutable que captura la posterior, el riesgo calculado, la instantánea de la política y la marca temporal de cada decisión.
+5. **SelfAdaptiveRiskPolicy** — Fuente única y autorizada de los parámetros de riesgo globales \( (\lambda, \gamma, \omega) \).
+6. **Banda de tolerancia \( \omega \)** — Anchura mínima obligatoria de la zona inconclusa; impide que los límites colapsen a un umbral único.
+7. **Aritmética decimal de precisión fija** — Computaciones realizadas mediante `decimal.Decimal` con modo de redondeo explícito, eliminando la varianza de punto flotante.
+8. **Parche P0-001** — Guarda de validación que documenta la semántica exacta de los parámetros e impide la inversión autenticidad–fabricación.
+9. **Atomicidad de emisión** — Cada invocación de `decide()` genera exactamente un `DecisionTrace`; ningún veredicto se devuelve sin un registro de auditoría correspondiente.
+10. **Estándar Daubert** — Criterio legal estadounidense que exige métodos científicos verificables con tasas de error conocidas; satisfecho por la aritmética exacta y la trazabilidad completa de la capa.
+
+*Licensed under the Apache License, Version 2.0. Copyright 2026 Anna Tchijova.*
+
+---
+
+## РУССКИЙ
+
+Модуль `vigia/governance/risk_bounded_layer_v2.py` реализует `RiskBoundedDecisionLayer` (версия 3.0-P0-001, с применёнными патчами C4, C5, P1-A, P2 и P0-001). Он составляет терминальный управленческий слой конвейера судебной экспертизы VIGÍA, несущий институциональную ответственность за преобразование непрерывных вероятностных оценок доказательств в дискретные, юридически допустимые вердикты. Архитектура намеренно разделена: EBS отделён как от приёма доказательств, так и от вычисления апостериорной вероятности, обеспечивая чистое разделение ответственности между научным инференсом и управленческим действием. Каждый выданный вердикт сопровождается неизменяемой записью `DecisionTrace`, гарантирующей полную логическую провенанс от исходного доказательства до категорического решения.
+
+**Математические основания**
+
+Слой оперирует байесовской апостериорной вероятностью \( P(A \mid E) \), где \( A \) обозначает гипотезу о подлинности артефакта, а \( E \) — полный корпус судебных доказательств. Риск фальсификации определяется как точная дополнительная вероятность:
+
+\[
+r = 1 - P(A \mid E)
+\]
+
+Границы решений задаются тройкой параметров \( (\lambda, \gamma, \omega) \), читаемых исключительно из `SelfAdaptiveRiskPolicy` согласно патчу C4. Эти параметры разграничивают три взаимоисключающие области решений:
+
+- **Область подлинности:** \( \Omega_{\text{подлинный}} = \{ P \mid P \ge \lambda \} \)
+- **Неопределённая область:** \( \Omega_{\text{неопределённый}} = \{ P \mid \gamma < P < \lambda \} \)
+- **Область фальсификации:** \( \Omega_{\text{фальсифицированный}} = \{ P \mid P \le \gamma \} \)
+
+Ширина неопределённой зоны ограничена допустимым диапазоном неоднозначности \( \omega \), так что \( \lambda - \gamma \ge \omega \). Вся арифметика выполняется посредством класса `decimal.Decimal` в фиксированном контексте точности, исключая ошибки представления и неопределённость округления, присущие двоичной арифметике IEEE-754 с плавающей запятой.
+
+**Описание алгоритма**
+
+Основная точка входа `decide(posterior)` выполняет строго последовательный алгоритм:
+
+1. **Защитник валидации (P0-001):** Входной параметр `posterior` проходит доменную валидацию \( 0 \le \text{posterior} \le 1 \). Любое отклонение вызывает детерминированное исключение до начала любых вычислений.
+
+2. **Получение политики (C4):** Слой выполняет запрос только для чтения к `SelfAdaptiveRiskPolicy` для получения текущего набора глобальных параметров \( (\lambda, \gamma, \omega) \).
+
+3. **Вычисление риска:** Риск фальсификации вычисляется как \( r = 1 - \text{posterior} \) с использованием точного десятичного вычитания.
+
+4. **Оценка границ:** При \( \text{posterior} \ge \lambda \) — вердикт `ПОДЛИННЫЙ`; при \( \text{posterior} \le \gamma \) — вердикт `ФАЛЬСИФИЦИРОВАННЫЙ`; иначе — `НЕОПРЕДЕЛЁННЫЙ`.
+
+5. **Эмиссия трассы:** Инициализируется объект `DecisionTrace`, атомарно фиксирующий входную апостериорную вероятность, вычисленный риск, снимок активной политики, временну́ю метку UTC и уникальный идентификатор трассы.
+
+**Детерминированные гарантии**
+
+- **Побитовая воспроизводимость:** Исключительное использование `decimal.Decimal` с фиксированной точностью гарантирует идентичные результаты на всех совместимых платформах.
+- **Доменная полнота:** Защитник P0-001 делает `decide()` тотальной функцией на области \([0, 1]\).
+- **Целостность провенанс политики:** Каждый `DecisionTrace` содержает однозначную ссылку на институциональную конфигурацию риска.
+- **Атомарность аудита:** Каждый вызов `decide()` порождает ровно один `DecisionTrace`.
+
+> **【Научное примечание】**
+> Управленческий слой операционализирует концепции Пирса, Эко и Грайса как механизмы институционального контроля риска. Первичность Пирса — это необработанная апостериорная вероятность \( P(A \mid E) \): феномен как таковой. Вторичность — дифференциальное сравнение с порогами \( \lambda \) и \( \gamma \): где вероятность находится относительно институциональных границ риска? Третичность — категорический вердикт: повторяющийся закон, преобразующий непрерывную неопределённость в дискретное, юридически допустимое решение. Энциклопедия Эко — это политика `SelfAdaptiveRiskPolicy`: институционализированное знание о допустимом уровне риска. Максимы Грайса обеспечивают неопределённую зону: когда доказательства не дают чёткого ответа, система воздерживается от окончательного вердикта. Все операции используют десятичную арифметику фиксированной точности, гарантируя воспроизводимость согласно стандарту Daubert.
+
+### Глоссарий
+
+1. **Байесовская апостериорная вероятность** — \( P(A \mid E) \): степень обоснованного убеждения в подлинности при условии наблюдаемых доказательств.
+2. **Риск фальсификации** — \( r = 1 - P(A \mid E) \): точное дополнение апостериорной вероятности; измеряет правдоподобие фальсификации.
+3. **Неопределённая область** — Зона решений, где апостериорная вероятность попадает между \( \gamma \) и \( \lambda \); система воздерживается от окончательного вердикта.
+4. **DecisionTrace** — Неизменяемая запись, фиксирующая апостериорную вероятность, вычисленный риск, снимок политики и временну́ю метку каждого решения.
+5. **SelfAdaptiveRiskPolicy** — Единственный авторитетный источник глобальных параметров риска \( (\lambda, \gamma, \omega) \).
+6. **Допустимый диапазон \( \omega \)** — Минимальная обязательная ширина неопределённой зоны; предотвращает коллапс границ к единственному порогу.
+7. **Десятичная арифметика фиксированной точности** — Вычисления посредством `decimal.Decimal` с явным режимом округления, исключающим дисперсию с плавающей запятой.
+8. **Патч P0-001** — Защитник валидации, документирующий точную семантику параметров и предотвращающий инверсию оси подлинность–фальсификация.
+9. **Атомарность эмиссии** — Каждый вызов `decide()` порождает ровно один `DecisionTrace`; ни один вердикт не возвращается без соответствующей аудиторской записи.
+10. **Стандарт Daubert** — Американский правовой критерий, требующий верифицируемых научных методов с известными частотами ошибок.
+
+*Licensed under the Apache License, Version 2.0. Copyright 2026 Anna Tchijova.*
+
+---
+
+## 中文
+
+模块 `vigia/governance/risk_bounded_layer_v2.py` 实现了 `RiskBoundedDecisionLayer`（版本 3.0-P0-001，应用了补丁 C4、C5、P1-A、P2 和 P0-001）。它构成 VIGÍA 取证流水线的终端治理层，承担将连续概率证据评估转换为离散的、法律上可采纳的裁决的机构责任。其架构故意与证据摄取和后验计算分离，在科学推断和治理行动之间建立清晰的职责分离。每个发出的裁决都附有不可变的 `DecisionTrace` 记录，确保从原始证据到分类决策的完整逻辑溯源可用于对抗审计、同行审查和司法审查。
+
+**数学基础**
+
+该层在贝叶斯后验概率 \( P(A \mid E) \) 上运作，其中 \( A \) 表示给定证据工件是真实的假设，\( E \) 代表上游语义连贯模块综合的完整取证证据集。模块将伪造风险 \( r \) 定义为精确的互补概率：
+
+\[
+r = 1 - P(A \mid E)
+\]
+
+决策边界由参数三元组 \( (\lambda, \gamma, \omega) \) 控制，这些参数根据补丁 C4 专门从 `SelfAdaptiveRiskPolicy` 模块读取：
+
+- **真实性区域：** \( \Omega_{\text{真实}} = \{ P \mid P \ge \lambda \} \)
+- **不确定区域：** \( \Omega_{\text{不确定}} = \{ P \mid \gamma < P < \lambda \} \)
+- **伪造区域：** \( \Omega_{\text{伪造}} = \{ P \mid P \le \gamma \} \)
+
+不确定区域的宽度受模糊容忍带宽 \( \omega \) 约束，使得 \( \lambda - \gamma \ge \omega \)。所有运算均在固定精度的线程本地十进制上下文中使用 `decimal.Decimal` 类执行，消除 IEEE-754 二进制浮点运算固有的表示误差和舍入不确定性。
+
+**算法描述**
+
+主入口点 `decide(posterior)` 执行严格顺序算法：
+
+1. **验证守卫（P0-001）：** 输入 `posterior` 进行域验证，强制 \( 0 \le \text{posterior} \le 1 \)。
+2. **策略检索（C4）：** 层对 `SelfAdaptiveRiskPolicy` 执行只读查询，获取当前全局参数集 \( (\lambda, \gamma, \omega) \)。
+3. **风险计算：** 使用精确十进制减法计算伪造风险 \( r = 1 - \text{posterior} \)。
+4. **边界评估：** 若 \( \text{posterior} \ge \lambda \)，类别裁决为"真实"；若 \( \text{posterior} \le \gamma \)，裁决为"伪造"；否则为"不确定"。
+5. **轨迹发出：** 实例化 `DecisionTrace` 对象，原子性地捕获输入后验、计算的风险、活动策略快照、UTC 时间戳和唯一轨迹标识符。
+
+**确定性保证**
+
+- **逐位可重现性：** 专门使用带固定精度上下文的 `decimal.Decimal` 确保所有兼容执行环境中的相同结果。
+- **域完整性：** P0-001 验证守卫使 `decide()` 在域 \([0, 1]\) 上成为全函数。
+- **策略溯源完整性：** 每个 `DecisionTrace` 包含到机构风险配置的明确溯源链接。
+- **审计原子性：** 每次 `decide()` 调用恰好生成一个 `DecisionTrace`。
+
+> **【科学说明】**
+> 治理层将皮尔斯（Peirce）、艾柯（Eco）和格赖斯（Grice）的框架操作化为机构风险控制机制。皮尔斯的初性是原始后验概率 \( P(A \mid E) \)——现象本身。二性是与阈值 \( \lambda \) 和 \( \gamma \) 的差异比较：后验相对于机构风险边界处于何处？三性是类别裁决——将连续不确定性转化为离散、法律可采纳决策的可重复规律。艾柯的百科全书是 `SelfAdaptiveRiskPolicy`：关于可接受风险水平的机构化知识。格赖斯的准则强制执行不确定区域：当证据未能给出明确答案时，系统不发出明确裁决。所有运算使用固定精度十进制运算，确保道伯特标准下的法庭可重现性。
+
+### 词汇表
+
+1. **贝叶斯后验概率** — \( P(A \mid E) \)：在观察到的证据条件下对真实性的有理置信度。
+2. **伪造风险** — \( r = 1 - P(A \mid E) \)：后验概率的精确互补；衡量伪造的可信度。
+3. **不确定区域** — 后验落在 \( \gamma \) 和 \( \lambda \) 之间的决策区域；系统不发出明确裁决。
+4. **DecisionTrace** — 捕获每次决策的输入后验、计算风险、策略快照和时间戳的不可变记录。
+5. **SelfAdaptiveRiskPolicy** — 全局风险参数 \( (\lambda, \gamma, \omega) \) 的唯一权威来源。
+6. **容忍带宽 \( \omega \)** — 不确定区域的最小强制宽度；防止边界坍缩到单一阈值。
+7. **固定精度十进制运算** — 通过带显式舍入模式的 `decimal.Decimal` 进行的计算，消除浮点方差。
+8. **补丁 P0-001** — 记录精确参数语义并防止真实性-伪造语义轴反转的验证守卫。
+9. **发出原子性** — 每次 `decide()` 调用恰好生成一个 `DecisionTrace`；没有相应审计记录就不返回裁决。
+10. **道伯特标准（Daubert Standard）** — 要求可验证的科学方法具有已知错误率的美国联邦法律标准。
+
+*Licensed under the Apache License, Version 2.0. Copyright 2026 Anna Tchijova.*
+
+---

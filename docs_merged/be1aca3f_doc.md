@@ -100,7 +100,6 @@ Need to be careful with Russian terms.
 - What Is This Module? -> Что это за модуль?
 - Flight-recorder -> "чёрный ящик" or "регистратор перехода".
 - Microscope -> микроскоп (legacy). Spectrometer -> спектрометр (new).
-- Forensic Record -> Следственный артефакт / Экспертная запись. In Chinese it's 取证工件. In Russian I can use "судебный артефакт" or "экспертный объект". Let's use "Судебно-экспертная запись" or maybe "ForensicRecord" transliterated? No, better to translate meaningfully. I'll use "Следственная запись" (investigative record) but maybe "Судебный артефакт". Since the Chinese specifically requested 取证工件, I'll make sure Russian is natural.
 - Divergence -> Расхождение.
 - Thread-safe -> Потокобезопасность.
 - JSONL -> JSON Lines (format).
@@ -201,15 +200,12 @@ Double-check no floating-point explanations.
 Double-check structure:
 - 4 language sections.
 - Each has What Is This Module?, Key Concepts with tables, Glossary, Scientific Note box.
-- License line included at the end of each section or once? The user said "License line: ...". I'll put it at the end of each section or once at the very end. Since it's 4 independent sections, I'll append it to each section to ensure compliance, or maybe at the bottom of the whole document. The requirement says "Include", so I'll include it once at the bottom of the document, or in each section. To be safe and clear, I'll put it at the bottom of each language section. Actually, it might be cleaner to put it once at the very end. But the prompt says "Each section must include...". Wait, the list of requirements for each section was:
    - "What Is This Module?"
    - Key concepts with tables
    - A glossary
    - A Scientific Note box
-   - License line? The user listed the license line as requirement 5 separate from requirement 3. Requirement 3 says "Each section must include: ..." and lists 4 items. Requirement 5 says "License line: ...". It doesn't explicitly say each section must include it, but to be safe I can include it in each section or at the bottom. I'll include it once at the bottom of the document. But to guarantee visibility, I'll append it to the end of each section as a footer. Let's do a footer for each section. It's short.
 
 Actually, reading carefully: "5. License line: ''"
-This is a global requirement. I'll put it at the bottom of the document, after all 4 sections. Or maybe under each section. Let's put it at the very bottom once. But if the sections are meant to be standalone, maybe each should have it. I'll put it at the bottom of each section to be absolutely safe. It's just one line.
 
 Let's refine the content slightly for accuracy based on the docstring.
 
@@ -222,9 +218,6 @@ Docstring details:
 - P1: límite de 10,000 líneas (max log size lines? Or entries?). The docstring says P1: límite de 10,000 línea. And _MAX_LOG_SIZE_BYTES constant.
 - compute_divergence_stats: Retorna total, divergent_count, divergence_ra (rate).
 
-So in Key Concepts, I should mention the 10,000 line limit and size limit in bytes. Also `to_dict_display()` is rounded for human display, NOT for hashing. I can mention that in the glossary or concepts: human-readable rounding is intentionally separated from deterministic record-keeping.
-
-Let's add a row for Display Rounding vs Deterministic Record.
 
 English:
 | **Display Rounding** | A human-friendly view of numbers that may round long values for readability. | `to_dict_display()` produces this view explicitly; it is never used for hashing or auditing. |

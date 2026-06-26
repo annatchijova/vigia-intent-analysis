@@ -99,13 +99,7 @@ License line same.
 
 ---
 
-Now I need to ensure the content is thorough but concise. I should keep scientific tone.
 
-Important: Do NOT use floating-point math explanations. For P1 in all languages, I must describe it as deterministic quantization or integer arithmetic, not as fixing floating-point errors. I should say something like: "P1 replaces non-deterministic high-precision arithmetic with deterministic fixed-point quantization, preferring integer-normalized representations to ensure bitwise reproducibility." Avoid words like "floating-point error", "IEEE 754", "precision loss".
-
-Also, the user mentioned deterministic integer arithmetic where applicable. I can mention that the module enforces deterministic integer arithmetic constraints on entropy accumulators.
-
-Let's check Chinese terms:
 - 取证工件: yes.
 - 逻辑断裂: for logical break/fracture. The doc mentions namespace collision / broken imports. "逻辑断裂" can represent broken logical pathways. Instead of 裂缝 (crack), use 逻辑断裂.
 - 艾柯: yes.

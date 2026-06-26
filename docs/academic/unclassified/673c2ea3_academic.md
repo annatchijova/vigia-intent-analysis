@@ -33,9 +33,6 @@ Tables...
 
 Then license line.
 
-Also, the user said "You always write in 4 languages: ENGLISH, ESPAÑOL, РУССКИЙ, 中文." So the sections should be clearly demarcated.
-
-I need to be careful with formatting. I'll use blockquotes or admonition-style boxes for the scientific note. Since it's markdown, I'll use `> **【Scientific Note】**` or just bold headers. The user asked for a box. I'll use a blockquote (`>`) to simulate a box, or just a bold header. A blockquote is cleaner in markdown.
 
 Example:
 > **【Scientific Note】**
@@ -43,15 +40,9 @@ Example:
 
 Let's ensure all tables are properly formatted.
 
-One more thing: The prompt says "hypothesis_generator: función que genera nuevas hipó" and lists functions like digest(), display_confidence_pct(), etc. I should mention hypothesis_generator in the tables or text. It's the input function that feeds candidates.
-
-Also, the constants like ACTIVE, CONFIRMED etc. are in the HypothesisStatus class. I should explain that.
 
 In the EN section, I used "Forensic artifact (取证工件)" in the glossary. That's fine.
 
-Double check: "You NEVER use floating-point math explanations for deterministic systems." So when I talk about display_confidence_pct, I say it uses integer truncation, not rounding. I should not say "confidence is a float between 0 and 1". Instead, I should say "confidence is represented internally as a ratio, but reported as a deterministic integer percentage via truncation." Or simply "avoids floating-point representation by truncating to an integer percentage." This is good.
-
-Let's write it out. I'll be thorough but keep it concise. I'll avoid Python syntax like `def` or class definitions. I'll describe them as "components".
 
 Let's finalize the content.
 

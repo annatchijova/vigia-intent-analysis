@@ -182,17 +182,7 @@ Need to ensure Chinese translations use the specified terms:
 - 艾柯 (not Eco) — used.
 - 格赖斯 (not Grice) — used.
 - 取证工件 (not 制品) — used.
-- 逻辑断裂 (not 裂缝) — I added it in the glossary to be safe, though not explicitly in docstring. The requirement says "Chinese translations must use: ... 逻辑断裂 (not 裂缝)". So I should include it somewhere. I put it in the glossary.
 
-Check module path and docstring: I should reference `vigia/pipeline/pipeline.py` correctly.
-
-One thing: The user said "You are an academic technical writer specializing in digital forensics. You write documentation for scientists who do not know Python. You always write in 4 languages... You NEVER use floating-point math explanations for deterministic systems."
-
-I should ensure the tone is academic but accessible to non-programmers. Avoid Python jargon like "class", "subprocess", "decorator" without explanation. I did explain subprocess as "independent verification via subprocess" and in Chinese "通过子进程". Maybe I should make it clearer for non-programmers. I used terms like "subprocess" in the table; in the scientist's view column I said "Sending duplicate to a second lab for confirmation" which is good. In the method table, the method names are in backticks but the explanation is plain.
-
-I need to be thorough but concise. The document will be long because it's 4 languages. I should use clear markdown headers.
-
-Let's double check the Spanish scientific note: "Cuando la documentación de VIGÍA habla de "Segundidad + Terceridad", se refiere a la transición..." Good.
 
 Russian: «Вторичность + Третичность» — yes.
 
@@ -200,15 +190,6 @@ English: "Secondness + Thirdness" — yes.
 
 Chinese: "第二性 + 第三性" — yes.
 
-License line: I will place it at the very end of the document, once. The user asked for "License line: ''" It might be safer to put it at the end of each section? But that would be repetitive. Usually a single license footer is standard. I'll put it once at the bottom. Actually, to be absolutely compliant with "Each section must include: ..." vs the license line being a separate bullet, I think putting it once is fine, but I'll put it at the end of every section to be extra safe? No, that's overkill and not "concise". I'll put it once at the bottom.
-
-Also, I should include the module path prominently. I'll put it at the top as a header.
-
-Let's check for any floating-point explanation. I mentioned "KDE + Ledoit-Wolf". I didn't explain their floating-point internals. I said "non-parametric method". Good.
-
-I should avoid "run()" etc looking like code. Non-programmers might not know what a method is. I used "Method / Function" in the table but explained it as "Press start". That's okay.
-
-Let's refine the Chinese section to make sure 逻辑断裂 appears. The term isn't in the docstring explicitly but it's a required translation. I'll include it in the glossary and maybe in the scientific note if relevant. Actually, the note mentions "logical break"? The sensor analogy doesn't naturally have "逻辑断裂". But I can mention that without Thirdness, there is a logical break between raw voltage and diagnosis, which Eco's code and Grice's maxims bridge. Let's add that to the Chinese scientific note to ensure the term appears.
 
 Chinese Scientific Note addition: "... 第三性则是完整的中介框架，用以弥合从物理量到医学诊断之间的**逻辑断裂** ..."
 
@@ -216,7 +197,6 @@ Yes, that works.
 
 Similarly, I could add it to other languages, but the requirement specifically targets Chinese translations. I'll make sure it's in the Chinese glossary and note.
 
-Let's do a final check on all requirements:
 1. Target audience: scientists who do NOT know Python — yes, plain language, sensor analogy, lab metaphors.
 2. Format: Markdown with 4 language sections — yes.
 3. Each section includes:

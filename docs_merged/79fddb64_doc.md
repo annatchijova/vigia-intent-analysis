@@ -172,7 +172,6 @@ Generated: 2026-05-20T14:56:47.853470+00:00
 
 **License line requirement:**
 ""
-This should appear once at the end of the document (or per section? The requirement says "License line: ..." Usually one at the bottom of the file is fine. I'll put it at the very end of the markdown document.)
 
 **Formatting:**
 Use proper Markdown headers. Since it's one document with 4 sections, I'll use ## for languages, ### for subsections.
@@ -184,20 +183,16 @@ Use proper Markdown headers. Since it's one document with 4 sections, I'll use #
 - 逻辑断裂 (logical gap/break) — used in "无法解释的逻辑断裂" instead of 裂缝 ✓
 
 **Check on deterministic integer arithmetic:**
-I must emphasize `int()` truncation, never `round()`. I should mention this in the key concepts and perhaps under a specific "Arithmetic Integrity" subsection or within the display_pct function description.
 
 In EN: "The module guarantees deterministic output through integer truncation (int()), explicitly rejecting floating-point rounding (round())."
 In ES: "El módulo garantiza salidas deterministas mediante truncamiento entero (int()), rechazando explícitamente el redondeo de punto flotante (round())."
 In RU: "Модуль гарантирует детерминированный вывод посредством целочисленного усечения (int()), категорически исключая округление с плавающей точкой (round())."
 In CN: "本模块通过整数截断（int()）保证输出确定性，明确拒绝浮点舍入（round()）。"
 
-Also, the prompt mentions `display_pct()`: "Porcentaje entero — int() truncado, nunca round()." I should explain this function simply as "Integer Percentage Display".
 
 **Check on "Fracti":**
-The docstring says: "Cualquier dimensión no disponible se sustituye por Fracti". I should explain this as a placeholder default.
 
 **Tone Check:**
-Academic, technical, but accessible to non-Python scientists. Avoid words like "class", "function", "import", "immutable" in a programming sense? The prompt says they do NOT know Python. So I should describe CausalClosureResult as an "immutable output container/record" rather than a Python class. And describe compute_causal_closure as a "procedure/core algorithm".
 
 **Refining the structure within each language:**
 
@@ -233,17 +228,14 @@ Similar.
 - A glossary of technical terms
 - A 【科学说明】/【Scientific Note】 box
 
-It doesn't explicitly say I need to detail the classes/functions separately in tables, but since it's documentation for a module, I should cover them. I can integrate them into "Key Concepts" or a dedicated "Module Components" table. I'll add a "Module Components" table to each section.
 
 - 艾柯: in the table and note. ✓
 - 格赖斯: in the table and note. ✓
 - 取证工件: in glossary and text. ✓
 - 逻辑断裂: used. ✓
 
-Also, I need to ensure the Scientific Note specifically mentions the sensor analogy and explicitly denies mysticism.
 
 Now, let me consider the requirement: "You NEVER use floating-point math explanations for deterministic systems."
-I must be careful not to explain anything using floating point. I should emphasize integer arithmetic. When explaining display_pct, I say it uses integer truncation. I do not mention floating point except to say it is NOT used.
 
 Let's construct the final response.
 

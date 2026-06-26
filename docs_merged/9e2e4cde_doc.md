@@ -70,7 +70,6 @@ Mirror content.
 
 Chinese specific terms:
 - 取证工件 (forensic artifact)
-- 逻辑断裂 (logical fracture? maybe "logic gap"? Actually the user said "逻辑断裂 (not 裂缝)". I need to use it somewhere. Maybe in glossary or scientific note? The module description doesn't mention裂缝, but I should ensure if I refer to "gap" or "fracture" I use 逻辑断裂. Perhaps in the note about semiotics not being mysticism? Not sure. Maybe in glossary: "逻辑断裂" can be used for "logical break/fault". Since the user specifically required it, I must include it somewhere naturally. Maybe in the glossary as "逻辑断裂 (Logical Rupture): 当技术信号与语义上下文之间出现确定性断层时的状态。" Or in the scientific note. Let's find a way.
 
 Also: 艾柯 (Umberto Eco), 格赖斯 (Grice). Peirce is 皮尔斯 (but not specified; I can use 皮尔斯 or Charles Sanders Peirce). Use 皮尔士? Standard Chinese is 皮尔斯 or 皮尔士. I'll use C·S·皮尔士 or 皮尔斯.
 
@@ -105,7 +104,6 @@ Function analyze(): accepts forensic artifact text, applies regex rules, counts 
 
 The user wrote "Returns dict con: z_score: float (display only — I7) co" which is cut off. I can reasonably infer fields: `co_occurrence` or `confidence`. I'll mention it returns a structured result dictionary including the display z_score and integer-ratio internals.
 
-I must not invent too much beyond what is given, but since it's truncated, I need to fill in with plausible deterministic forensic detector features consistent with the description. I will describe the output dictionary entries generically but accurately.
 
 Specifically, the doc says "Returns dict con: z_score: float (display only — I7) co". Likely `co_occurrence` or `component_scores`. I'll mention that the dictionary contains the z_score (display-only decimal) and the integer-ratio components from which it is derived.
 

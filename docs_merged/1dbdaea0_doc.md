@@ -66,14 +66,12 @@ ESPAÑOL:
 - Key concepts: Глобальная энтропия, Пространственное распределение энтропии, Локальность энтропии, Блок (Chunk), Детерминированная целочисленная арифметика, Стеганография, Шеллкод.
 - Components: Профиль энтропии, Анализатор локальности энтропии, Визуализатор энтропии, analyze(), visualize().
 - Constants: РАЗМЕР_БЛОКА, ПОРОГ_ВЫСОКОЙ_ЭНТРОПИИ, ПОРОГ_СТЕГАНОГРАФИИ, ПОДОЗРИТЕЛЬНАЯ_ЛОКАЛЬНОСТЬ.
-- Glossary: Байт, Энтропия, Смещение, Полезная нагрузка, Следственный артефакт (or Цифровой артефакт?), Детерминированная система. Wait, the user specified 取证工件 for Chinese. For Russian, I'll use "Следственный артефакт" or "Объект цифровой экспертизы". Let's use "Следственный артефакт" or "Цифровой артефакт". Actually "артефакт цифровой экспертизы" is good.
 - Scientific Note:
   【Научное примечание】
   В модуле иногда используются концепции, связанные с Пирсом (семиотические триады), Эко (теория кодов) и Грайсом (прагматические максимы). Эти термины не являются мистическими формулами. Они работают точно так же, как калиброванный датчик: категории Пирса выявляют отношения знак–объект, коды Эко обнаруживают многоуровневые схемы кодирования, а максимы Грайса фиксируют логические разрывы, где нарушается ожидаемая коммуникативная структура. Датчик не «верит» в то, что измеряет; он регистрирует формальные отклонения. Таким образом, эти заимствованные термины — это формальные наблюдательные операторы, а не герменевтический мистицизм.
 - License line.
 
 中文:
-- Title: 熵空间分布分析器 (`vigia/tools/entropy_locality.py`) or 熵局部化分析器. The module name is Entropy Locality Analyzer. I'll use 熵空间局部分析器 or 熵局部性分析器. Let's use 熵空间局部分析器.
 - What Is This Module? -> "本模块是什么？"
 - Key concepts:
   - 全局熵
@@ -104,11 +102,7 @@ ESPAÑOL:
 - Scientific Note:
   【科学说明】
   本模块偶尔借用皮尔斯（Peirce）符号学三元组、艾柯（Eco）编码理论以及格赖斯（Grice）语用学准则的概念框架。这些术语并非神秘主义咒语。它们的功能与校准后的传感器完全一致：皮尔斯的范畴用于检测符号与对象之间的形式关系；艾柯的编码用于识别分层编码结构；格赖斯的准则用于侦测"逻辑断裂"——即预期通信结构遭到违反的位置。传感器不会"相信"它所测量的对象，它只记录形式偏差。因此，这些术语借用的本质是形式化观测算子，而非诠释学的神秘主义。
--  (Keep in English as per requirement, or translate? The requirement says "License line: ''" So I'll keep it exactly like that in all sections.)
 
-Also, the user said "You NEVER use floating-point math explanations for deterministic systems." and "Do NOT use floating-point math explanations — emphasize deterministic integer arithmetic where applicable". So in the English and other sections, when explaining entropy calculation, I must not say "uses floating point logarithms". I should say it uses integer histograms and deterministic counting.
-
-One thing: The module docstring mentions Peirce/Eco/Grice? Actually the provided docstring doesn't explicitly mention them, but the requirement says: "A 【科学说明】/【Scientific Note】 box explaining that Peirce/Eco/Grice terminology is NOT mysticism — use the sensor analogy". So I should assume the module or the broader VIGÍA framework uses these terms.
 
 Also, the module mentions "Steganografía (entropía" in the classes list but it's cut off. I'll infer it means steganography patterns in entropy.
 

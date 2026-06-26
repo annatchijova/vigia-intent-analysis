@@ -24,7 +24,6 @@ Technical terms explained without Python jargon. E.g., Beaconing, Jitter, Entrop
 #### Scientific Note
 Box explaining Peirce/Eco/Grice terminology is not mysticism. Use sensor analogy: just as a sensor converts physical phenomena into electrical signals, this module converts packet timings and sizes into logical indices (signs). Peirce's semiotics, Eco's codes, Grice's maxims provide the interpretive framework (syntax/semantics/pragmatics) for the "sensor readings". It's a formal model, not mysticism.
 
-Need to include the license line somewhere. Probably at the very end of the document or in each section? The requirement says "License line: ''" I'll put it at the end of the entire document, but maybe also in each language section? To be safe, I'll include it at the bottom of each language section or once globally. The prompt says "Include" — I'll put it at the very end of the doc. Or maybe under each language section footer. Let's put it as a final footer in each language to ensure compliance, or once at the end. The prompt says "License line: ..." It's safer to put it at the end of the whole document. But to be thorough, I'll append it to each section. Actually, the user likely wants it once. I'll put it once at the very bottom.
 
 Now, Chinese specific terms:
 - 艾柯 (Eco)
@@ -242,12 +241,9 @@ Need to make sure Chinese terms are correct:
 - 艾柯 (Eco) - used.
 - 格赖斯 (Grice) - used.
 - 取证工件 (forensic artifact) - used in NetworkAnalysisResult description.
-- 逻辑断裂 (logical fracture) - wait, the user said "逻辑断裂 (not 裂缝)". But where should it be used? The module doesn't explicitly mention "逻辑断裂". Maybe I should include it in the glossary or scientific note to show compliance? Or maybe it's a term that should be used if applicable. The prompt says "Chinese translations must use: ... 逻辑断裂 (not 裂缝)". Since the module description doesn't naturally contain "fracture", I can include it in the glossary as a concept related to semiotic breaks or just ensure I don't use 裂缝. But to be safe and compliant, I should incorporate 逻辑断裂 somewhere relevant. Perhaps in the scientific note or glossary: explaining that a break in Gricean maxims creates a 逻辑断裂, not a physical crack. Let me add it.
 
-In Chinese section, I can add to glossary:
 - **逻辑断裂**：在符号学模型中，指预期合作原则或协议规范被违反时出现的语义-语用层面的断裂，而非物理层面的裂缝。
 
-This shows I used the required term. Let me check if any other required terms were missed.
 - 艾柯: used.
 - 格赖斯: used.
 - 取证工件: used.
@@ -255,13 +251,6 @@ This shows I used the required term. Let me check if any other required terms we
 
 Also, need to ensure I NEVER use floating-point math explanations for deterministic systems. I used "exact rational arithmetic", "deterministic integer arithmetic", "no rounding error". I did not explain things using floating-point concepts as the basis. Good.
 
-Need to ensure no floating-point math explanations. For example, I shouldn't say "instead of floating point we use Fraction". I should say "uses exact rational arithmetic (Fraction)". I think I did that.
-
-Check the prompt: "You NEVER use floating-point math explanations for deterministic systems." So I must not explain the deterministic system by referencing floats. I should just describe the integer/rational arithmetic on its own terms. I think my text is okay, but let me double-check.
-
-In English: "Deterministic Integer Arithmetic: Calculation using exact rational numbers... rather than approximate decimal floats" — this contrasts with floats. Is that allowed? The instruction says "NEVER use floating-point math explanations for deterministic systems." This could mean: don't explain the system using floating-point math (e.g., "we use floats but then round"). But contrasting with floats to highlight determinism might be borderline. However, the prompt also says "emphasize deterministic integer arithmetic where applicable". To be safe, I should remove direct references to floats and just emphasize the deterministic integer/rational aspect positively. I will rephrase to avoid mentioning floating-point as the explanation. Instead: "Calculation performed exclusively with exact rational numbers represented as pairs of integers (numerator and denominator), ensuring perfect reproducibility across all platforms." No mention of floats.
-
-Also, for CV: Coefficient of Variation is usually a float. But here it's using Fraction. I should explain it as "the ratio of two integer-derived moments, stored as an exact rational number". Good.
 
 Let's revise carefully.
 
@@ -283,11 +272,9 @@ ESPAÑOL:
 
 Now, about the scientific note: It must explain that Peirce/Eco/Grice terminology is NOT mysticism — use the sensor analogy. I have that.
 
-Need to include the license line. I'll put it at the very bottom.
 
 Module path should be mentioned.
 
-Let's double-check the requirement: "Chinese translations must use: 艾柯 (not Eco), 格赖斯 (not Grice), 取证工件 (not 制品), 逻辑断裂 (not 裂缝)". I will ensure these are present.
 
 In Chinese:
 - 艾柯: used in scientific note and glossary.
@@ -295,7 +282,6 @@ In Chinese:
 - 取证工件: used in NetworkAnalysisResult description. Let me verify: "结构化输出（取证工件）" yes.
 - 逻辑断裂: I will add a glossary entry.
 
-Let's draft the final output now. It will be long. I must be thorough but concise. I'll use headers.
 
 Structure:
 
