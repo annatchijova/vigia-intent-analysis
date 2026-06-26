@@ -1,0 +1,205 @@
+{
+  "case_id": "VIGIA-LINUX-007",
+  "case_name": "Huntress Actor-B/C — Multi-Vector Botnet with Credential Harvesting (High Sophistication)",
+  "schema_version": "1.1",
+  "description": "On the same endpoint as Actor A (VIGIA-LINUX-006), a second cluster of threat actors (Actor B: botnet, Actor C: credential harvester) deployed eight distinct persistence mechanisms and exfiltrated 15 categories of sensitive data. Actor B operated infrastructure at 147.45.41[.]25 and 162.55.234[.]175:4082. Persistence mechanisms include user cron, root cron, systemd user services, systemd system services, UDEV rules, watchdog scripts, miner daemonization, and dropper re-execution. Revenue streams include XMR mining, bandwidth selling (EarnFM), residential proxy (Repocket), and a DNS-related binary of unknown purpose. This case isolates the high-sophistication signals from the concurrent Actor A activity.",
+  "abstention_risk": "low",
+  "expected_verdict": "MALICE",
+  "carnegie_pattern_expected": null,
+  "confidence_expected": 97,
+  "artifacts": [
+    {
+      "artifact_id": "linux007_01",
+      "evidence_type": "log_entry",
+      "source_tool": "sift_linux_forensics",
+      "timestamp": "2025-03-19T10:30:00Z",
+      "raw_score": 0.95,
+      "prior_trust": 0.92,
+      "provenance_chain": [
+        "sha256:linux007_eight_persistence_mechs"
+      ],
+      "description": "Enumeration reveals eight distinct persistence mechanisms deployed simultaneously: (1) user crontab with download/execute loop, (2) root crontab with watchdog check, (3) systemd user service in ~/.config/systemd/user/, (4) systemd system service in /etc/systemd/system/, (5) UDEV rule triggering payload on device events, (6) watchdog script at /dev/health (same pattern as perfctl), (7) miner daemonization via nohup/disown, (8) dropper re-execution via /tmp/.xdiag/. The diversity of persistence mechanisms indicates operational redundancy planning: the attacker assumes individual mechanisms will be discovered and removed, and deploys enough alternatives to survive partial remediation.",
+      "metadata": {
+        "acquisition_tool": "Huntress EDR agent — persistence enumeration",
+        "acquisition_hash": "sha256:linux007_01_huntress_persist_20250319",
+        "acquisition_timestamp": "2025-03-19T10:30:00Z",
+        "write_blocker_used": false,
+        "examiner_id": "Huntress SOC analysts",
+        "persistence_mechanism_count": 8,
+        "persistence_types": [
+          "user crontab",
+          "root crontab",
+          "systemd user service",
+          "systemd system service",
+          "UDEV rule",
+          "watchdog script (/dev/health)",
+          "miner daemonization (nohup/disown)",
+          "dropper re-execution (/tmp/.xdiag/)"
+        ],
+        "operational_redundancy": true
+      }
+    },
+    {
+      "artifact_id": "linux007_02",
+      "evidence_type": "log_entry",
+      "source_tool": "sift_linux_forensics",
+      "timestamp": "2025-03-19T11:00:00Z",
+      "raw_score": 0.93,
+      "prior_trust": 0.90,
+      "provenance_chain": [
+        "sha256:linux007_credential_exfiltration"
+      ],
+      "description": "Credential harvesting module exfiltrated 15 categories of sensitive data to 147.45.41[.]25:80 via HTTP POST: (1) SSH private keys (~/.ssh/), (2) SSH known_hosts, (3) SSH config, (4) AWS credentials (~/.aws/credentials), (5) GCP service account keys, (6) Azure CLI tokens, (7) Docker registry credentials, (8) Kubernetes kubeconfig, (9) Git credentials (~/.git-credentials), (10) .env files with API tokens, (11) bash_history, (12) /etc/passwd, (13) /etc/shadow (when readable), (14) system metadata (uname, hostname, IP), (15) crontab contents. The exfiltration was performed by a shell script that iterated over a hardcoded list of target paths.",
+      "metadata": {
+        "acquisition_tool": "Huntress EDR agent — file access and network telemetry",
+        "acquisition_hash": "sha256:linux007_02_huntress_exfil_20250319",
+        "acquisition_timestamp": "2025-03-19T11:00:00Z",
+        "write_blocker_used": false,
+        "examiner_id": "Huntress SOC analysts",
+        "exfiltration_categories": 15,
+        "exfiltration_destination": "147.45.41.25:80",
+        "exfiltration_protocol": "HTTP POST",
+        "cloud_credentials_stolen": ["AWS", "GCP", "Azure"],
+        "ssh_keys_stolen": true,
+        "kubernetes_kubeconfig_stolen": true
+      }
+    },
+    {
+      "artifact_id": "linux007_03",
+      "evidence_type": "network_capture",
+      "source_tool": "sift_network_forensics",
+      "timestamp": "2025-03-19T11:15:00Z",
+      "raw_score": 0.88,
+      "prior_trust": 0.87,
+      "provenance_chain": [
+        "sha256:linux007_c2_infrastructure"
+      ],
+      "description": "Network telemetry reveals connections to three distinct infrastructure nodes: (1) 147.45.41[.]25:80 — credential exfiltration endpoint shared with Actor B infrastructure, (2) 162.55.234[.]175:4082 — primary C2 for botnet command reception and payload delivery, (3) multiple connections to earnfm.com, repocket.com, and speedshare.app for bandwidth monetization services (residential proxy and bandwidth selling). The three-node infrastructure with distinct functions (exfiltration, C2, monetization) indicates a mature operational setup with revenue diversification.",
+      "metadata": {
+        "acquisition_tool": "Huntress EDR agent — network telemetry",
+        "acquisition_hash": "sha256:linux007_03_huntress_network_20250319",
+        "acquisition_timestamp": "2025-03-19T11:15:00Z",
+        "write_blocker_used": false,
+        "examiner_id": "Huntress SOC analysts",
+        "c2_nodes": [
+          {"ip": "147.45.41.25", "port": 80, "function": "credential exfiltration"},
+          {"ip": "162.55.234.175", "port": 4082, "function": "botnet C2"},
+          {"domain": "earnfm.com", "function": "bandwidth monetization"},
+          {"domain": "repocket.com", "function": "residential proxy"},
+          {"domain": "speedshare.app", "function": "bandwidth selling"}
+        ],
+        "revenue_diversification": true
+      }
+    },
+    {
+      "artifact_id": "linux007_04",
+      "evidence_type": "malware_static_analysis",
+      "source_tool": "sift_static_analysis",
+      "timestamp": "2025-03-19T12:00:00Z",
+      "raw_score": 0.82,
+      "prior_trust": 0.85,
+      "provenance_chain": [
+        "sha256:linux007_anti_competitor"
+      ],
+      "description": "Watchdog script at /dev/health implements anti-competitor logic: 'pkill -9 xmrig' executes every 45 seconds to kill rival cryptomining processes. This is identical to the pattern observed in perfctl (VIGIA-LINUX-003). Additionally, the dropper script contains logic to detect and kill processes matching known competitor miner signatures (including patterns for CGMiner, BFGMiner, and cpuminer). The anti-competitor module is an indicator of the commercial cryptomining botnet ecosystem where rival operators actively sabotage each other's deployments.",
+      "metadata": {
+        "acquisition_tool": "Huntress SOC — static script analysis",
+        "acquisition_hash": "sha256:linux007_04_huntress_anticomp_20250319",
+        "acquisition_timestamp": "2025-03-19T12:00:00Z",
+        "write_blocker_used": false,
+        "examiner_id": "Huntress SOC analysts",
+        "watchdog_path": "/dev/health",
+        "kill_interval_seconds": 45,
+        "target_processes": ["xmrig", "CGMiner", "BFGMiner", "cpuminer"],
+        "perfctl_pattern_match": true
+      }
+    },
+    {
+      "artifact_id": "linux007_05",
+      "evidence_type": "log_entry",
+      "source_tool": "sift_linux_forensics",
+      "timestamp": "2025-04-16T00:00:00Z",
+      "raw_score": 0.91,
+      "prior_trust": 0.93,
+      "provenance_chain": [
+        "sha256:linux007_reinfection_react2shell"
+      ],
+      "description": "After the initial incident was remediated and the host was rebuilt, the same Actor B infrastructure (162.55.234[.]175:4082) reinfected the host on 2025-04-16 via the same vector: CVE-2025-55182 (React2Shell) exploiting a vibecoded Next.js 15.4.6 / React 19.1.0 application that was redeployed on the rebuilt host without patching. The shell process downloaded and executed a script directly from the Actor B C2. This reinfection confirms: (1) the initial access vector, (2) the threat actor's infrastructure persistence, and (3) the vulnerability remained unpatched after rebuild.",
+      "metadata": {
+        "acquisition_tool": "Huntress EDR agent — post-rebuild monitoring",
+        "acquisition_hash": "sha256:linux007_05_huntress_reinfection_20250416",
+        "acquisition_timestamp": "2025-04-16T00:00:00Z",
+        "write_blocker_used": false,
+        "examiner_id": "Huntress SOC analysts",
+        "reinfection_confirmed": true,
+        "same_c2_infrastructure": true,
+        "cve": "CVE-2025-55182",
+        "vulnerable_app": "Next.js 15.4.6 / React 19.1.0",
+        "vulnerability_unpatched_after_rebuild": true
+      }
+    }
+  ],
+  "temporal_violations": [
+    {
+      "type": "REINFECTION_PATTERN",
+      "description": "Same C2 infrastructure (162.55.234[.]175:4082) reinfected the rebuilt host 28 days after initial remediation via the same unpatched vulnerability. The temporal loop — compromise, remediation, rebuild, recompromise via identical vector — demonstrates persistent attacker infrastructure and failure to address the root cause (unpatched React2Shell in the vibecoded application).",
+      "severity": 0.93,
+      "delta_seconds": 2419200,
+      "cause": {
+        "artifact_id": "linux007_05",
+        "detail": "CVE-2025-55182 unpatched in redeployed application"
+      },
+      "effect": {
+        "artifact_id": "linux007_01",
+        "detail": "identical persistence deployment pattern on rebuilt host"
+      }
+    }
+  ],
+  "caie_fractures": [
+    {
+      "fracture_type": "OPERATIONAL_REDUNDANCY_OVERKILL",
+      "severity": 0.95,
+      "interpretation": "Eight simultaneous persistence mechanisms across four distinct Linux subsystems (cron, systemd, UDEV, filesystem) indicates an attacker who anticipates partial remediation and has automated deployment of redundant persistence. This level of operational redundancy is incompatible with accidental deployment or legitimate administration — no system administrator deploys the same service through 8 different mechanisms.",
+      "artifact_a": "linux007_01",
+      "artifact_b": "linux007_02",
+      "ttp_id": "T1053"
+    },
+    {
+      "fracture_type": "CREDENTIAL_MASS_EXFILTRATION",
+      "severity": 0.96,
+      "interpretation": "Systematic exfiltration of 15 categories of credentials including cloud provider keys (AWS, GCP, Azure), Kubernetes configs, SSH keys, and API tokens via HTTP POST to a known malicious IP. The breadth of targeting (15 categories) and the inclusion of cloud credentials indicates the attacker's intent extends beyond the compromised host to the entire cloud infrastructure accessible via stored credentials.",
+      "artifact_a": "linux007_02",
+      "artifact_b": "linux007_03",
+      "ttp_id": "T1552"
+    }
+  ],
+  "peirce_expected": {
+    "firstness": "Eight persistence mechanisms. 15 categories of credentials exfiltrated via HTTP POST. Three-node C2 infrastructure with distinct functions. Anti-competitor watchdog killing rival miners. Post-rebuild reinfection via same vector.",
+    "secondness": "The persistence diversity across 4 Linux subsystems is operationally redundant — designed to survive partial remediation. Credential exfiltration targets cloud provider keys enabling lateral movement beyond the host. The reinfection loop confirms the initial access vector and demonstrates unaddressed root cause. The anti-competitor module proves commercial botnet ecosystem participation.",
+    "thirdness": "Actor B is a sophisticated, commercially motivated threat actor operating persistent infrastructure with revenue diversification (mining, bandwidth selling, residential proxy, credential theft). The 8-mechanism persistence indicates automated deployment tooling developed over time. The credential harvesting scope (15 categories including cloud keys) shows strategic intent beyond the individual host — the stolen credentials enable compromise of the organization's entire cloud footprint. The reinfection proves infrastructure persistence and continuous targeting."
+  },
+  "devil_advocate": "The eight persistence mechanisms could be artifacts of multiple uncoordinated automated scripts that ran independently. The credential collection could be a legitimate security audit tool. The bandwidth monetization services are legitimate commercial platforms.",
+  "expected_mitre_ttps": [
+    "T1053.003",
+    "T1543.002",
+    "T1547",
+    "T1552",
+    "T1041",
+    "T1496",
+    "T1059.004",
+    "T1190",
+    "T1078"
+  ],
+  "source_dataset": "Huntress Linux Incident — OpenAI Codex Twist, April 2025",
+  "source_origin": "public_incident_report",
+  "source_url": "https://www.huntress.com/blog/codex-part-two",
+  "notes": "POST-HACKATHON — Linux corpus expansion. Actor B/C isolated from multi-actor incident. Key differentiators vs Actor A (LINUX-006): 8 persistence mechanisms vs 1, credential exfiltration, multi-node C2, revenue diversification, reinfection capability. The reinfection artifact (linux007_05) is forensically decisive: same infrastructure, same vector, same vulnerability — confirms attribution and intent.",
+  "_consolidation": {
+    "consolidated_at": "2026-06-26T00:00:00Z",
+    "parser_version": "2.4",
+    "schema_version": "1.1",
+    "source_file": "VIGIA-LINUX-CORPUS.json",
+    "source_origin": "public_incident_report",
+    "corpus_tag": "POST-HACKATHON"
+  }
+}

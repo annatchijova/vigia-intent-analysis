@@ -1,0 +1,321 @@
+{
+  "analysis_timestamp": "2026-06-26T22:11:25.434751+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "VIGIA-LINUX-007",
+    "end_time": "2026-06-26T22:11:25.434756+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "VIGIA-LINUX-007",
+        "entry_sha256": "295291e0bc2d0bc7f619839c8b59860a4637fcd9a80bc49db47cd09df73e3ce0",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "VIGIA-LINUX-007"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: 95f2da2a3bdcb4ca...",
+        "outputs_summary": {
+          "agent_sha256": "95f2da2a3bdcb4ca106059e2b06f58fd0ec414c887fec07ac7a0d5edfeb097a1",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-06-26T22:11:25.431282+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-LINUX-007",
+        "entry_sha256": "2942e3bea5e455217e3984bacb58d7e399ca651c2fbc6d69b47a61286bfe2b43",
+        "inputs_summary": {
+          "path": "data/cases/VIGIA-LINUX-007.json"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-06-26T22:11:25.431375+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-LINUX-007",
+        "entry_sha256": "b817383dc946624ee28850acf9cdb101602fdb8ddacbac491166a11a5e9834d8",
+        "inputs_summary": {
+          "path": "data/cases/VIGIA-LINUX-007.json"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: f69aa7c831dffb77...",
+        "outputs_summary": {
+          "sha256": "f69aa7c831dffb777ec2c1109f0c6c4b65f17ac6a3b46506fd55fdbfb0107ebd"
+        },
+        "seq": 3,
+        "timestamp": "2026-06-26T22:11:25.431478+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "VIGIA-LINUX-007",
+        "entry_sha256": "47955fb34ff8de9fc854673514689443c779ffb0d8619016ab363d21de350da0",
+        "inputs_summary": {
+          "evidence": "data/cases/VIGIA-LINUX-007.json",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-06-26T22:11:25.431613+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "VIGIA-LINUX-007",
+        "entry_sha256": "a87cef45f2c01f1221446cb8a64ce9364fab220216e127d55816cd1a1b1c8bbf",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 5 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+            "best_posterior": "40199/250000",
+            "confidence": "40199/250000",
+            "is_conclusive": "True",
+            "narrative": "On the same endpoint as Actor A (VIGIA-LINUX-006), a second cluster of threat actors (Actor B: botnet, Actor C: credential harvester) deployed eight distinct persistence mechanisms and exfiltrated 15 ..."
+          },
+          "case_id": "VIGIA-LINUX-007",
+          "pipeline_meta": {
+            "artifact_count": "5",
+            "avg_score": "40199/50000",
+            "expected_verdict": "MALICE",
+            "source": "ebs_v1_json_adapter"
+          },
+          "signals": [
+            {
+              "artifact_id": "linux007_01",
+              "confidence": "23/25",
+              "description": "Enumeration reveals eight distinct persistence mechanisms deployed simultaneously: (1) user crontab with download/execute loop, (2) root crontab with watchdog check, (3) systemd user service in ~/.con",
+              "evidence_type": "log_entry",
+              "source": "sift_linux_forensics",
+              "z_score": "437/500"
+            },
+            {
+              "artifact_id": "linux007_02",
+              "confidence": "9/10",
+              "description": "Credential harvesting module exfiltrated 15 categories of sensitive data to 147.45.41[.]25:80 via HTTP POST: (1) SSH private keys (~/.ssh/), (2) SSH known_hosts, (3) SSH config, (4) AWS credentials (~",
+              "evidence_type": "log_entry",
+              "source": "sift_linux_forensics",
+              "z_score": "837/1000"
+            },
+            {
+              "artifact_id": "linux007_03",
+              "confidence": "87/100",
+              "description": "Network telemetry reveals connections to three distinct infrastructure nodes: (1) 147.45.41[.]25:80 \u2014 credential exfiltration endpoint shared with Actor B infrastructure, (2) 162.55.234[.]175:4082 \u2014 p",
+              "evidence_type": "network_capture",
+              "source": "sift_network_forensics",
+              "z_score": "957/1250"
+            },
+            {
+              "artifact_id": "linux007_04",
+              "confidence": "17/20",
+              "description": "Watchdog script at /dev/health implements anti-competitor logic: 'pkill -9 xmrig' executes every 45 seconds to kill rival cryptomining processes. This is identical to the pattern observed in perfctl (",
+              "evidence_type": "malware_static_analysis",
+              "source": "sift_static_analysis",
+              "z_score": "697/1000"
+            },
+            {
+              "artifact_id": "linux007_05",
+              "confidence": "93/100",
+              "description": "After the initial incident was remediated and the host was rebuilt, the same Actor B infrastructure (162.55.234[.]175:4082) reinfected the host on 2025-04-16 via the same vector: CVE-2025-55182 (React",
+              "evidence_type": "log_entry",
+              "source": "sift_linux_forensics",
+              "z_score": "8463/10000"
+            }
+          ]
+        },
+        "seq": 5,
+        "timestamp": "2026-06-26T22:11:25.433985+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "VIGIA-LINUX-007",
+        "entry_sha256": "2141a1e457c3102895c823812d3fda59a4a930c0e1eae0285b312d9ed9baf681",
+        "inputs_summary": {
+          "n_signals": "5"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-06-26T22:11:25.434155+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "VIGIA-LINUX-007",
+        "entry_sha256": "ca8208dcb34a5d249acd0b76c5cab5df8eb327f47debd2455f1b8388ba8bc0db",
+        "inputs_summary": {
+          "verdict": "MALICIOUS_INTENT_DETECTED"
+        },
+        "iteration": 0,
+        "note": "Exit code 1 \u2014 analysis complete.",
+        "outputs_summary": {
+          "exit_code": "1"
+        },
+        "seq": 7,
+        "timestamp": "2026-06-26T22:11:25.434266+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-06-26T22:11:25.431059+00:00",
+    "total_entries": 7
+  },
+  "case_id": "VIGIA-LINUX-007",
+  "evidence_path": "data/cases/VIGIA-LINUX-007.json",
+  "evidence_sha256": "f69aa7c831dffb777ec2c1109f0c6c4b65f17ac6a3b46506fd55fdbfb0107ebd",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-LINUX-007 ===\nEvidence: data/cases/VIGIA-LINUX-007.json\nEvidence SHA-256: f69aa7c831dffb777ec2c1109f0c6c4b65f17ac6a3b46506fd55fdbfb0107ebd\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 40199/250000\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\nOn the same endpoint as Actor A (VIGIA-LINUX-006), a second cluster of threat actors (Actor B: botnet, Actor C: credential harvester) deployed eight distinct persistence mechanisms and exfiltrated 15 categories of sensitive data. Actor B operated infrastructure at 147.45.41[.]25 and 162.55.234[.]175:4082. Persistence mechanisms include user cron, root cron, systemd user services, systemd system services, UDEV rules, watchdog scripts, miner daemonization, and dropper re-execution. Revenue streams\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Enumeration reveals eight distinct persistence mechanisms deployed sim] z=0.874 conf=0.92 \u2014 \n  [After the initial incident was remediated and the host was rebuilt, th] z=0.846 conf=0.93 \u2014 \n  [Credential harvesting module exfiltrated 15 categories of sensitive da] z=0.837 conf=0.90 \u2014 \n  [Network telemetry reveals connections to three distinct infrastructure] z=0.766 conf=0.87 \u2014 \n  [Watchdog script at /dev/health implements anti-competitor logic: 'pkil] z=0.697 conf=0.85 \u2014 \n\n--- FINAL ALERT LEVEL ---\nHIGH \u2014 Conclusive MALICE verdict from Bayesian posterior aggregation. Individual z-scores below threshold (distributed evidence pattern: no single dominant signal, but aggregate posterior is decisive).\n\nCritical signals (z>3): 0\nHigh signals (2<z<=3): 0\nTotal signals analyzed: 5",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+      "best_posterior": "40199/250000",
+      "confidence": {
+        "__fraction__": true,
+        "den": 250000,
+        "num": 40199
+      },
+      "devil_advocate": {
+        "aggregation": {
+          "k": 3,
+          "method": "top_k_already_validated_matches_v2",
+          "total_gap_mass": "0"
+        },
+        "counterfactual_summary": {
+          "primary_alternative_hypothesis": null
+        },
+        "decision_context": {
+          "confidence": "40199/250000",
+          "mapped_verdict": "MALICIOUS_INTENT_DETECTED",
+          "raw_verdict": "MALICIOUS_INTENT_DETECTED",
+          "score": "40199/50000"
+        },
+        "devil_advocate_source": "deterministic_no_pattern_data_available",
+        "meta": {
+          "deterministic": true,
+          "generated_from": "case_pattern_library"
+        },
+        "narrative": "Eco's Razor (Abductive Falsification) applied to verdict MALICIOUS_INTENT_DETECTED. Pattern-matching data was not available on this code path \u2014 CasePatternLibrary is not invoked here by design (agent audit-trail mode (vigia_agent.py \u2014 JSON-replay / autonomous path); see KNOWN_LIMITATIONS.md). No structured counter-hypothesis could be derived deterministically. This is a documented scope limitation of the current code path, not an absence of falsification attempt.",
+        "pattern_evidence_gaps": [],
+        "version": "r7-da-v1"
+      },
+      "is_conclusive": true,
+      "narrative": "On the same endpoint as Actor A (VIGIA-LINUX-006), a second cluster of threat actors (Actor B: botnet, Actor C: credential harvester) deployed eight distinct persistence mechanisms and exfiltrated 15 categories of sensitive data. Actor B operated infrastructure at 147.45.41[.]25 and 162.55.234[.]175:4082. Persistence mechanisms include user cron, root cron, systemd user services, systemd system services, UDEV rules, watchdog scripts, miner daemonization, and dropper re-execution. Revenue streams"
+    },
+    "case_id": "VIGIA-LINUX-007",
+    "pipeline_meta": {
+      "artifact_count": 5,
+      "avg_score": "40199/50000",
+      "expected_verdict": "MALICE",
+      "source": "ebs_v1_json_adapter"
+    },
+    "signals": [
+      {
+        "artifact_id": "linux007_01",
+        "confidence": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 23
+        },
+        "description": "Enumeration reveals eight distinct persistence mechanisms deployed simultaneously: (1) user crontab with download/execute loop, (2) root crontab with watchdog check, (3) systemd user service in ~/.con",
+        "evidence_type": "log_entry",
+        "source": "sift_linux_forensics",
+        "z_score": {
+          "__fraction__": true,
+          "den": 500,
+          "num": 437
+        }
+      },
+      {
+        "artifact_id": "linux007_02",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 9
+        },
+        "description": "Credential harvesting module exfiltrated 15 categories of sensitive data to 147.45.41[.]25:80 via HTTP POST: (1) SSH private keys (~/.ssh/), (2) SSH known_hosts, (3) SSH config, (4) AWS credentials (~",
+        "evidence_type": "log_entry",
+        "source": "sift_linux_forensics",
+        "z_score": {
+          "__fraction__": true,
+          "den": 1000,
+          "num": 837
+        }
+      },
+      {
+        "artifact_id": "linux007_03",
+        "confidence": {
+          "__fraction__": true,
+          "den": 100,
+          "num": 87
+        },
+        "description": "Network telemetry reveals connections to three distinct infrastructure nodes: (1) 147.45.41[.]25:80 \u2014 credential exfiltration endpoint shared with Actor B infrastructure, (2) 162.55.234[.]175:4082 \u2014 p",
+        "evidence_type": "network_capture",
+        "source": "sift_network_forensics",
+        "z_score": {
+          "__fraction__": true,
+          "den": 1250,
+          "num": 957
+        }
+      },
+      {
+        "artifact_id": "linux007_04",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 17
+        },
+        "description": "Watchdog script at /dev/health implements anti-competitor logic: 'pkill -9 xmrig' executes every 45 seconds to kill rival cryptomining processes. This is identical to the pattern observed in perfctl (",
+        "evidence_type": "malware_static_analysis",
+        "source": "sift_static_analysis",
+        "z_score": {
+          "__fraction__": true,
+          "den": 1000,
+          "num": 697
+        }
+      },
+      {
+        "artifact_id": "linux007_05",
+        "confidence": {
+          "__fraction__": true,
+          "den": 100,
+          "num": 93
+        },
+        "description": "After the initial incident was remediated and the host was rebuilt, the same Actor B infrastructure (162.55.234[.]175:4082) reinfected the host on 2025-04-16 via the same vector: CVE-2025-55182 (React",
+        "evidence_type": "log_entry",
+        "source": "sift_linux_forensics",
+        "z_score": {
+          "__fraction__": true,
+          "den": 10000,
+          "num": 8463
+        }
+      }
+    ]
+  },
+  "sans_compliance": {
+    "accuracy_validation": false,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}

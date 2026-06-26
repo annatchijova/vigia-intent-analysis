@@ -1,0 +1,192 @@
+{
+  "case_id": "VIGIA-LINUX-004",
+  "case_name": "PUMAKIT — LKM Rootkit with Anomalous Binary Naming and Syscall Hooking",
+  "schema_version": "1.1",
+  "description": "A loadable kernel module (LKM) rootkit dubbed PUMAKIT was discovered during routine VirusTotal threat hunting on 2024-09-04 with 0/N detections. The malware's dropper binary is named 'cron' to impersonate the legitimate cron daemon. Its multi-stage architecture includes a dropper, two memory-resident executables (/memfd:tgt and /memfd:wpn), an LKM rootkit module using ftrace to hook 18 syscalls, and a userland rootkit SO. It abuses the rmdir() syscall as a privilege escalation channel — a technique with no legitimate precedent.",
+  "abstention_risk": "low",
+  "expected_verdict": "MALICE",
+  "carnegie_pattern_expected": null,
+  "confidence_expected": 95,
+  "artifacts": [
+    {
+      "artifact_id": "linux004_01",
+      "evidence_type": "file_metadata",
+      "source_tool": "sift_virustotal_analysis",
+      "timestamp": "2024-09-04T00:00:00Z",
+      "raw_score": 0.92,
+      "prior_trust": 0.91,
+      "provenance_chain": [
+        "sha256:linux004_vt_cron_binary"
+      ],
+      "description": "Binary named 'cron' uploaded to VirusTotal on 2024-09-04 with 0 detections across all engines. File entropy analysis shows 7.89/8.0 (highly packed/encrypted), inconsistent with the legitimate cron daemon (entropy ~5.2). The binary is a UPX-packed ELF x86_64 executable of 2.1MB, whereas the legitimate cron binary for the same distribution is 47KB unpacked. The name 'cron' is a deliberate impersonation of the system cron daemon (/usr/sbin/cron) to blend into process listings.",
+      "metadata": {
+        "acquisition_tool": "VirusTotal threat hunting — Elastic Security Labs",
+        "acquisition_hash": "sha256:linux004_01_vt_upload_20240904",
+        "acquisition_timestamp": "2024-09-04T00:00:00Z",
+        "write_blocker_used": false,
+        "examiner_id": "Elastic Security Labs (Remco Sprooten, Ruben Groenewoud)",
+        "binary_name": "cron",
+        "legitimate_binary_name": "/usr/sbin/cron",
+        "file_entropy": 7.89,
+        "legitimate_cron_entropy": 5.2,
+        "file_size_bytes": 2200000,
+        "legitimate_cron_size_bytes": 47000,
+        "vt_detections_at_upload": 0,
+        "packing": "UPX"
+      }
+    },
+    {
+      "artifact_id": "linux004_02",
+      "evidence_type": "malware_static_analysis",
+      "source_tool": "sift_static_analysis",
+      "timestamp": "2024-12-12T00:00:00Z",
+      "raw_score": 0.96,
+      "prior_trust": 0.93,
+      "provenance_chain": [
+        "sha256:linux004_lkm_module_static"
+      ],
+      "description": "Static analysis of the extracted LKM rootkit module reveals ftrace-based hooking of 18 distinct syscalls including read, write, open, stat, lstat, getdents, getdents64, kill, mkdir, rmdir, unlink, unlinkat, rename, and renameat. The hooking mechanism intercepts kernel function pointers at runtime to filter process listings, hide files, and suppress network connections from userspace tools. The rmdir() syscall is repurposed as a covert privilege escalation command channel: calling rmdir() with a specific magic path string triggers the rootkit to grant root privileges to the calling process. This has no legitimate kernel or userspace precedent.",
+      "metadata": {
+        "acquisition_tool": "Elastic Security Labs static binary analysis",
+        "acquisition_hash": "sha256:linux004_02_elastic_static_20241212",
+        "acquisition_timestamp": "2024-12-12T00:00:00Z",
+        "write_blocker_used": false,
+        "examiner_id": "Elastic Security Labs",
+        "hooking_mechanism": "ftrace (Linux function tracer)",
+        "syscalls_hooked": 18,
+        "rmdir_privilege_escalation": true,
+        "rmdir_magic_path": true,
+        "legitimate_rmdir_privesc_precedent": false
+      }
+    },
+    {
+      "artifact_id": "linux004_03",
+      "evidence_type": "memory_process",
+      "source_tool": "sift_memory_forensics",
+      "timestamp": "2024-12-12T00:00:00Z",
+      "raw_score": 0.89,
+      "prior_trust": 0.88,
+      "provenance_chain": [
+        "sha256:linux004_memfd_executables"
+      ],
+      "description": "Two memory-resident executables detected: /memfd:tgt and /memfd:wpn. These use the memfd_create() syscall to create anonymous file descriptors that exist only in memory with no filesystem footprint. The /memfd:tgt binary performs target reconnaissance and environment fingerprinting. The /memfd:wpn binary deploys the LKM rootkit module and the userland SO rootkit. Both executables are fully fileless post-execution — no disk artifacts remain after the dropper completes its initial stage.",
+      "metadata": {
+        "acquisition_tool": "Elastic Security Labs memory forensics",
+        "acquisition_hash": "sha256:linux004_03_elastic_memfd_20241212",
+        "acquisition_timestamp": "2024-12-12T00:00:00Z",
+        "write_blocker_used": false,
+        "examiner_id": "Elastic Security Labs",
+        "fileless_executables": ["/memfd:tgt", "/memfd:wpn"],
+        "disk_artifacts_post_execution": false,
+        "mechanism": "memfd_create() anonymous file descriptors"
+      }
+    },
+    {
+      "artifact_id": "linux004_04",
+      "evidence_type": "malware_static_analysis",
+      "source_tool": "sift_static_analysis",
+      "timestamp": "2024-12-12T00:00:00Z",
+      "raw_score": 0.87,
+      "prior_trust": 0.90,
+      "provenance_chain": [
+        "sha256:linux004_c2_network_static"
+      ],
+      "description": "Network analysis of the rootkit's C2 communication module reveals encrypted callback channels to external infrastructure. The rootkit uses specialized kernel-level commands for configuration extraction, anti-debugging checks, and system manipulation. The C2 protocol includes heartbeat mechanisms and command reception for dynamic tasking. Anti-debugging capabilities include detection of ptrace attachment, /proc/self/status monitoring, and timing-based analysis detection.",
+      "metadata": {
+        "acquisition_tool": "Elastic Security Labs network and behavioral analysis",
+        "acquisition_hash": "sha256:linux004_04_elastic_c2_20241212",
+        "acquisition_timestamp": "2024-12-12T00:00:00Z",
+        "write_blocker_used": false,
+        "examiner_id": "Elastic Security Labs",
+        "c2_communication": true,
+        "encryption": true,
+        "anti_debugging": ["ptrace detection", "/proc/self/status monitoring", "timing analysis"],
+        "dynamic_tasking": true
+      }
+    },
+    {
+      "artifact_id": "linux004_05",
+      "evidence_type": "file_metadata",
+      "source_tool": "sift_file_integrity",
+      "timestamp": "2024-12-12T00:00:00Z",
+      "raw_score": 0.84,
+      "prior_trust": 0.87,
+      "provenance_chain": [
+        "sha256:linux004_developer_strings"
+      ],
+      "description": "String analysis of the unpacked rootkit module reveals developer-embedded identifiers: the string 'PUMA' appears in multiple function names and configuration structures, indicating an internal project codename. Additional strings reference 'kitsune' (Japanese for fox, commonly associated with stealth/deception in malware naming conventions). The presence of debug strings and version identifiers suggests active development at time of discovery, not a legacy or abandoned tool.",
+      "metadata": {
+        "acquisition_tool": "Elastic Security Labs string analysis",
+        "acquisition_hash": "sha256:linux004_05_elastic_strings_20241212",
+        "acquisition_timestamp": "2024-12-12T00:00:00Z",
+        "write_blocker_used": false,
+        "examiner_id": "Elastic Security Labs",
+        "internal_codename": "PUMA",
+        "additional_strings": ["kitsune"],
+        "active_development_indicators": true,
+        "debug_strings_present": true
+      }
+    }
+  ],
+  "temporal_violations": [
+    {
+      "type": "NAMING_IMPERSONATION",
+      "description": "Binary named 'cron' has entropy 7.89 (packed/encrypted) vs legitimate cron entropy ~5.2, file size 2.1MB vs 47KB, and is UPX-packed. No legitimate cron binary is packed or encrypted. The naming is a deliberate impersonation to survive process listing inspection by system administrators.",
+      "severity": 0.91,
+      "delta_seconds": 0,
+      "cause": {
+        "artifact_id": "linux004_01",
+        "detail": "binary named cron with anomalous entropy and size"
+      },
+      "effect": {
+        "artifact_id": "linux004_02",
+        "detail": "dropper deploys LKM rootkit that hides itself from process listings"
+      }
+    }
+  ],
+  "caie_fractures": [
+    {
+      "fracture_type": "SYSCALL_SEMANTIC_VIOLATION",
+      "severity": 0.96,
+      "interpretation": "The rmdir() syscall is a directory removal operation with a fixed POSIX semantic contract: it removes an empty directory. PUMAKIT repurposes rmdir() as a covert privilege escalation command channel by intercepting specific magic path arguments. This violates the fundamental semantic contract of the syscall — no legitimate kernel module or application uses rmdir() for privilege operations. The semantic violation is the decisive signal: it can only exist through deliberate kernel-level subversion.",
+      "artifact_a": "linux004_02",
+      "artifact_b": "linux004_03",
+      "ttp_id": "T1068"
+    },
+    {
+      "fracture_type": "PROCESS_IDENTITY_FABRICATION",
+      "severity": 0.89,
+      "interpretation": "The dropper binary is named 'cron' to impersonate the system cron daemon in process listings and forensic triage. Combined with the LKM rootkit's syscall hooking that filters getdents/getdents64 output, the impersonation creates a two-layer deception: the process name looks legitimate, and the rootkit prevents deeper inspection tools from revealing the true nature of the process.",
+      "artifact_a": "linux004_01",
+      "artifact_b": "linux004_02",
+      "ttp_id": "T1036.004"
+    }
+  ],
+  "peirce_expected": {
+    "firstness": "Binary named 'cron' with anomalous entropy (7.89 vs 5.2), anomalous size (2.1MB vs 47KB), UPX packing, and 0 VirusTotal detections at upload. Memory-resident executables via memfd_create() with no disk footprint. 18 syscalls hooked via ftrace.",
+    "secondness": "The rmdir() syscall is repurposed as a privilege escalation channel — a semantic contract violation with no legitimate precedent. The binary naming impersonates the system cron daemon while having completely different characteristics. Memory-only execution stages eliminate disk forensic artifacts.",
+    "thirdness": "A sophisticated actor built a multi-stage kernel-level rootkit with active anti-debugging, fileless execution, and a novel privilege escalation mechanism (rmdir() abuse) that demonstrates deep Linux kernel internals knowledge. The naming impersonation combined with syscall hooking creates layered deception: the attacker anticipated both process listing inspection and deeper forensic analysis, neutralizing both."
+  },
+  "devil_advocate": "The 'cron' binary could be a legitimate system administration tool that was packed for distribution efficiency. The rmdir() hooking could be a kernel debugging or testing module. The memfd executables could be part of a containerized application's normal runtime.",
+  "expected_mitre_ttps": [
+    "T1014",
+    "T1068",
+    "T1036.004",
+    "T1059.004",
+    "T1071",
+    "T1027.002",
+    "T1055"
+  ],
+  "source_dataset": "PUMAKIT LKM Rootkit — Elastic Security Labs, December 2024",
+  "source_origin": "public_incident_report",
+  "source_url": "https://www.elastic.co/security-labs/declawing-pumakit",
+  "notes": "POST-HACKATHON — Linux corpus expansion. Key semiotics: SYSCALL_SEMANTIC_VIOLATION is a new fracture type. The rmdir() privilege escalation has no legitimate precedent — this is the cleanest possible Peircean THIRDNESS signal because the semantic violation is absolute, not probabilistic.",
+  "_consolidation": {
+    "consolidated_at": "2026-06-26T00:00:00Z",
+    "parser_version": "2.4",
+    "schema_version": "1.1",
+    "source_file": "VIGIA-LINUX-CORPUS.json",
+    "source_origin": "public_incident_report",
+    "corpus_tag": "POST-HACKATHON"
+  }
+}

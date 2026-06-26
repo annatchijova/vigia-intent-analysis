@@ -1,0 +1,297 @@
+{
+  "analysis_timestamp": "2026-06-26T22:11:25.385548+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "VIGIA-LINUX-006",
+    "end_time": "2026-06-26T22:11:25.385554+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "VIGIA-LINUX-006",
+        "entry_sha256": "0251c9f99a9002aaf4fd87300d13b3163b864f0b7d7ead0e8b04d69aa0d1599c",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "VIGIA-LINUX-006"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: 95f2da2a3bdcb4ca...",
+        "outputs_summary": {
+          "agent_sha256": "95f2da2a3bdcb4ca106059e2b06f58fd0ec414c887fec07ac7a0d5edfeb097a1",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-06-26T22:11:25.382125+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-LINUX-006",
+        "entry_sha256": "ca64b06d101906a0bf05cb61bc62d3f6035396e9aca273c55dc9bc1bc09ba87f",
+        "inputs_summary": {
+          "path": "data/cases/VIGIA-LINUX-006.json"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-06-26T22:11:25.382219+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-LINUX-006",
+        "entry_sha256": "d995711491bc61ff91c6dd226d1867929550185c30e92391d22af5e4e5a824b8",
+        "inputs_summary": {
+          "path": "data/cases/VIGIA-LINUX-006.json"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: 290b477daa467ca7...",
+        "outputs_summary": {
+          "sha256": "290b477daa467ca775086148c1a50c2ae33c8ba1d2aaba4e49354a8b653f0ba1"
+        },
+        "seq": 3,
+        "timestamp": "2026-06-26T22:11:25.382331+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "VIGIA-LINUX-006",
+        "entry_sha256": "2d794db2f4bb8b1302665ae2f94632a1371d7c08bbb20b4447c6e7c945c474d9",
+        "inputs_summary": {
+          "evidence": "data/cases/VIGIA-LINUX-006.json",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-06-26T22:11:25.382443+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "VIGIA-LINUX-006",
+        "entry_sha256": "fa30692803a083d47f823d4a721fb50766303781d08984f7dee319dd37a04d32",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 4 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+            "best_posterior": "25133/200000",
+            "confidence": "25133/200000",
+            "is_conclusive": "True",
+            "narrative": "On a Linux endpoint compromised via CVE-2025-55182 (React2Shell, CVSS 10.0), Actor A deployed a Monero cryptominer as /var/tmp/systemd-logind, impersonating the legitimate systemd-logind daemon. The m..."
+          },
+          "case_id": "VIGIA-LINUX-006",
+          "pipeline_meta": {
+            "artifact_count": "4",
+            "avg_score": "25133/40000",
+            "expected_verdict": "MALICE",
+            "source": "ebs_v1_json_adapter"
+          },
+          "signals": [
+            {
+              "artifact_id": "linux006_01",
+              "confidence": "9/10",
+              "description": "Process /var/tmp/systemd-logind running as root with sustained 100% CPU utilization on all available cores. The legitimate systemd-logind binary resides at /usr/lib/systemd/systemd-logind; the malicio",
+              "evidence_type": "memory_process",
+              "source": "sift_process_monitor",
+              "z_score": "801/1000"
+            },
+            {
+              "artifact_id": "linux006_02",
+              "confidence": "22/25",
+              "description": "Network connection from /var/tmp/systemd-logind to 62.60.246[.]210:443 over TLS. The destination IP is a known Monero mining pool infrastructure node. The connection has been established since system ",
+              "evidence_type": "network_capture",
+              "source": "sift_network_forensics",
+              "z_score": "473/625"
+            },
+            {
+              "artifact_id": "linux006_03",
+              "confidence": "17/20",
+              "description": "Root crontab contains entry: '*/5 * * * * /var/tmp/systemd-logind --config /var/tmp/.config/miner.json >/dev/null 2>&1'. The cron entry restarts the miner every 5 minutes if not running. The config fi",
+              "evidence_type": "log_entry",
+              "source": "sift_linux_forensics",
+              "z_score": "663/1000"
+            },
+            {
+              "artifact_id": "linux006_04",
+              "confidence": "13/20",
+              "description": "Bash history and process telemetry show OpenAI Codex-generated commands executed by the legitimate user between 2025-03-19 08:00 and 12:00 UTC. Commands include: 'sudo systemctl stop systemd-logind' (",
+              "evidence_type": "log_entry",
+              "source": "sift_linux_forensics",
+              "z_score": "117/400"
+            }
+          ]
+        },
+        "seq": 5,
+        "timestamp": "2026-06-26T22:11:25.384788+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "VIGIA-LINUX-006",
+        "entry_sha256": "f151222d22ca5523b1b590f3539d63b431965db43b7124b78fdb93a854b1c736",
+        "inputs_summary": {
+          "n_signals": "4"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-06-26T22:11:25.384904+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "VIGIA-LINUX-006",
+        "entry_sha256": "5a4127fb95b907f83b8589798b3d721ed5364360d5cbd72284523a1efbde0ce5",
+        "inputs_summary": {
+          "verdict": "MALICIOUS_INTENT_DETECTED"
+        },
+        "iteration": 0,
+        "note": "Exit code 1 \u2014 analysis complete.",
+        "outputs_summary": {
+          "exit_code": "1"
+        },
+        "seq": 7,
+        "timestamp": "2026-06-26T22:11:25.385067+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-06-26T22:11:25.381897+00:00",
+    "total_entries": 7
+  },
+  "case_id": "VIGIA-LINUX-006",
+  "evidence_path": "data/cases/VIGIA-LINUX-006.json",
+  "evidence_sha256": "290b477daa467ca775086148c1a50c2ae33c8ba1d2aaba4e49354a8b653f0ba1",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-LINUX-006 ===\nEvidence: data/cases/VIGIA-LINUX-006.json\nEvidence SHA-256: 290b477daa467ca775086148c1a50c2ae33c8ba1d2aaba4e49354a8b653f0ba1\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 25133/200000\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\nOn a Linux endpoint compromised via CVE-2025-55182 (React2Shell, CVSS 10.0), Actor A deployed a Monero cryptominer as /var/tmp/systemd-logind, impersonating the legitimate systemd-logind daemon. The miner connected to a private pool at 62.60.246[.]210:443 and ran persistently since boot. The endpoint user noticed loud fan noise and used OpenAI Codex to attempt remediation; Codex silenced the fans but failed to remove the miner. This case isolates Actor A's signals from the concurrent Actor B/C a\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Process /var/tmp/systemd-logind running as root with sustained 100% CP] z=0.801 conf=0.90 \u2014 \n  [Network connection from /var/tmp/systemd-logind to 62.60.246[.]210:443] z=0.757 conf=0.88 \u2014 \n  [Root crontab contains entry: '*/5 * * * * /var/tmp/systemd-logind --co] z=0.663 conf=0.85 \u2014 \n  [Bash history and process telemetry show OpenAI Codex-generated command] z=0.292 conf=0.65 \u2014 \n\n--- FINAL ALERT LEVEL ---\nHIGH \u2014 Conclusive MALICE verdict from Bayesian posterior aggregation. Individual z-scores below threshold (distributed evidence pattern: no single dominant signal, but aggregate posterior is decisive).\n\nCritical signals (z>3): 0\nHigh signals (2<z<=3): 0\nTotal signals analyzed: 4",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+      "best_posterior": "25133/200000",
+      "confidence": {
+        "__fraction__": true,
+        "den": 200000,
+        "num": 25133
+      },
+      "devil_advocate": {
+        "aggregation": {
+          "k": 3,
+          "method": "top_k_already_validated_matches_v2",
+          "total_gap_mass": "0"
+        },
+        "counterfactual_summary": {
+          "primary_alternative_hypothesis": null
+        },
+        "decision_context": {
+          "confidence": "25133/200000",
+          "mapped_verdict": "MALICIOUS_INTENT_DETECTED",
+          "raw_verdict": "MALICIOUS_INTENT_DETECTED",
+          "score": "25133/40000"
+        },
+        "devil_advocate_source": "deterministic_no_pattern_data_available",
+        "meta": {
+          "deterministic": true,
+          "generated_from": "case_pattern_library"
+        },
+        "narrative": "Eco's Razor (Abductive Falsification) applied to verdict MALICIOUS_INTENT_DETECTED. Pattern-matching data was not available on this code path \u2014 CasePatternLibrary is not invoked here by design (agent audit-trail mode (vigia_agent.py \u2014 JSON-replay / autonomous path); see KNOWN_LIMITATIONS.md). No structured counter-hypothesis could be derived deterministically. This is a documented scope limitation of the current code path, not an absence of falsification attempt.",
+        "pattern_evidence_gaps": [],
+        "version": "r7-da-v1"
+      },
+      "is_conclusive": true,
+      "narrative": "On a Linux endpoint compromised via CVE-2025-55182 (React2Shell, CVSS 10.0), Actor A deployed a Monero cryptominer as /var/tmp/systemd-logind, impersonating the legitimate systemd-logind daemon. The miner connected to a private pool at 62.60.246[.]210:443 and ran persistently since boot. The endpoint user noticed loud fan noise and used OpenAI Codex to attempt remediation; Codex silenced the fans but failed to remove the miner. This case isolates Actor A's signals from the concurrent Actor B/C a"
+    },
+    "case_id": "VIGIA-LINUX-006",
+    "pipeline_meta": {
+      "artifact_count": 4,
+      "avg_score": "25133/40000",
+      "expected_verdict": "MALICE",
+      "source": "ebs_v1_json_adapter"
+    },
+    "signals": [
+      {
+        "artifact_id": "linux006_01",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 9
+        },
+        "description": "Process /var/tmp/systemd-logind running as root with sustained 100% CPU utilization on all available cores. The legitimate systemd-logind binary resides at /usr/lib/systemd/systemd-logind; the malicio",
+        "evidence_type": "memory_process",
+        "source": "sift_process_monitor",
+        "z_score": {
+          "__fraction__": true,
+          "den": 1000,
+          "num": 801
+        }
+      },
+      {
+        "artifact_id": "linux006_02",
+        "confidence": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 22
+        },
+        "description": "Network connection from /var/tmp/systemd-logind to 62.60.246[.]210:443 over TLS. The destination IP is a known Monero mining pool infrastructure node. The connection has been established since system ",
+        "evidence_type": "network_capture",
+        "source": "sift_network_forensics",
+        "z_score": {
+          "__fraction__": true,
+          "den": 625,
+          "num": 473
+        }
+      },
+      {
+        "artifact_id": "linux006_03",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 17
+        },
+        "description": "Root crontab contains entry: '*/5 * * * * /var/tmp/systemd-logind --config /var/tmp/.config/miner.json >/dev/null 2>&1'. The cron entry restarts the miner every 5 minutes if not running. The config fi",
+        "evidence_type": "log_entry",
+        "source": "sift_linux_forensics",
+        "z_score": {
+          "__fraction__": true,
+          "den": 1000,
+          "num": 663
+        }
+      },
+      {
+        "artifact_id": "linux006_04",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 13
+        },
+        "description": "Bash history and process telemetry show OpenAI Codex-generated commands executed by the legitimate user between 2025-03-19 08:00 and 12:00 UTC. Commands include: 'sudo systemctl stop systemd-logind' (",
+        "evidence_type": "log_entry",
+        "source": "sift_linux_forensics",
+        "z_score": {
+          "__fraction__": true,
+          "den": 400,
+          "num": 117
+        }
+      }
+    ]
+  },
+  "sans_compliance": {
+    "accuracy_validation": false,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}

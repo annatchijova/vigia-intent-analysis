@@ -1,0 +1,321 @@
+{
+  "analysis_timestamp": "2026-06-26T22:11:25.284471+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "VIGIA-LINUX-004",
+    "end_time": "2026-06-26T22:11:25.284478+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "VIGIA-LINUX-004",
+        "entry_sha256": "317027feed0330abe87b10135c100d4a437a6ed94f26894d2156ba3b35c04f04",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "VIGIA-LINUX-004"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: 95f2da2a3bdcb4ca...",
+        "outputs_summary": {
+          "agent_sha256": "95f2da2a3bdcb4ca106059e2b06f58fd0ec414c887fec07ac7a0d5edfeb097a1",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-06-26T22:11:25.280465+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-LINUX-004",
+        "entry_sha256": "94ca12b90ad09429ce7ec96884a12600b49b1a6b2ebb5018a9f2e23c13cea91f",
+        "inputs_summary": {
+          "path": "data/cases/VIGIA-LINUX-004.json"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-06-26T22:11:25.280573+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-LINUX-004",
+        "entry_sha256": "139bb5d91bbd6a2c316f5ef7e10b4001e1fa99a113d98b59fe9311698ecf6890",
+        "inputs_summary": {
+          "path": "data/cases/VIGIA-LINUX-004.json"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: 29d7acd80fb71dc2...",
+        "outputs_summary": {
+          "sha256": "29d7acd80fb71dc2c3aa2a10e24f70118d0aa7c8666f89446c014ac666d3b2cb"
+        },
+        "seq": 3,
+        "timestamp": "2026-06-26T22:11:25.280674+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "VIGIA-LINUX-004",
+        "entry_sha256": "3b303ac573ebacdea33fc7f8eb23f1a53b700b280664e851a421b58ab72d4420",
+        "inputs_summary": {
+          "evidence": "data/cases/VIGIA-LINUX-004.json",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-06-26T22:11:25.280787+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "VIGIA-LINUX-004",
+        "entry_sha256": "7381aefda2c93f77d89a7899cc07f3eccbcb3167ff7c945788fdf7d812c4ca38",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 5 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+            "best_posterior": "4027/25000",
+            "confidence": "4027/25000",
+            "is_conclusive": "True",
+            "narrative": "A loadable kernel module (LKM) rootkit dubbed PUMAKIT was discovered during routine VirusTotal threat hunting on 2024-09-04 with 0/N detections. The malware's dropper binary is named 'cron' to imperso..."
+          },
+          "case_id": "VIGIA-LINUX-004",
+          "pipeline_meta": {
+            "artifact_count": "5",
+            "avg_score": "4027/5000",
+            "expected_verdict": "MALICE",
+            "source": "ebs_v1_json_adapter"
+          },
+          "signals": [
+            {
+              "artifact_id": "linux004_01",
+              "confidence": "91/100",
+              "description": "Binary named 'cron' uploaded to VirusTotal on 2024-09-04 with 0 detections across all engines. File entropy analysis shows 7.89/8.0 (highly packed/encrypted), inconsistent with the legitimate cron dae",
+              "evidence_type": "file_metadata",
+              "source": "sift_virustotal_analysis",
+              "z_score": "2093/2500"
+            },
+            {
+              "artifact_id": "linux004_02",
+              "confidence": "93/100",
+              "description": "Static analysis of the extracted LKM rootkit module reveals ftrace-based hooking of 18 distinct syscalls including read, write, open, stat, lstat, getdents, getdents64, kill, mkdir, rmdir, unlink, unl",
+              "evidence_type": "malware_static_analysis",
+              "source": "sift_static_analysis",
+              "z_score": "558/625"
+            },
+            {
+              "artifact_id": "linux004_03",
+              "confidence": "22/25",
+              "description": "Two memory-resident executables detected: /memfd:tgt and /memfd:wpn. These use the memfd_create() syscall to create anonymous file descriptors that exist only in memory with no filesystem footprint. T",
+              "evidence_type": "memory_process",
+              "source": "sift_memory_forensics",
+              "z_score": "979/1250"
+            },
+            {
+              "artifact_id": "linux004_04",
+              "confidence": "9/10",
+              "description": "Network analysis of the rootkit's C2 communication module reveals encrypted callback channels to external infrastructure. The rootkit uses specialized kernel-level commands for configuration extractio",
+              "evidence_type": "malware_static_analysis",
+              "source": "sift_static_analysis",
+              "z_score": "783/1000"
+            },
+            {
+              "artifact_id": "linux004_05",
+              "confidence": "87/100",
+              "description": "String analysis of the unpacked rootkit module reveals developer-embedded identifiers: the string 'PUMA' appears in multiple function names and configuration structures, indicating an internal project",
+              "evidence_type": "file_metadata",
+              "source": "sift_file_integrity",
+              "z_score": "1827/2500"
+            }
+          ]
+        },
+        "seq": 5,
+        "timestamp": "2026-06-26T22:11:25.283698+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "VIGIA-LINUX-004",
+        "entry_sha256": "df9ee350f46f2a4f4faa71f27c4ca4a52ae018d616c3f1ed6ec06e2ce9c9cb2e",
+        "inputs_summary": {
+          "n_signals": "5"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-06-26T22:11:25.283866+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "VIGIA-LINUX-004",
+        "entry_sha256": "fa2bba8e851783d866d92e397d26af2edf36d791b23437140fe81485b11f0eb6",
+        "inputs_summary": {
+          "verdict": "MALICIOUS_INTENT_DETECTED"
+        },
+        "iteration": 0,
+        "note": "Exit code 1 \u2014 analysis complete.",
+        "outputs_summary": {
+          "exit_code": "1"
+        },
+        "seq": 7,
+        "timestamp": "2026-06-26T22:11:25.283982+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-06-26T22:11:25.280237+00:00",
+    "total_entries": 7
+  },
+  "case_id": "VIGIA-LINUX-004",
+  "evidence_path": "data/cases/VIGIA-LINUX-004.json",
+  "evidence_sha256": "29d7acd80fb71dc2c3aa2a10e24f70118d0aa7c8666f89446c014ac666d3b2cb",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-LINUX-004 ===\nEvidence: data/cases/VIGIA-LINUX-004.json\nEvidence SHA-256: 29d7acd80fb71dc2c3aa2a10e24f70118d0aa7c8666f89446c014ac666d3b2cb\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 4027/25000\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\nA loadable kernel module (LKM) rootkit dubbed PUMAKIT was discovered during routine VirusTotal threat hunting on 2024-09-04 with 0/N detections. The malware's dropper binary is named 'cron' to impersonate the legitimate cron daemon. Its multi-stage architecture includes a dropper, two memory-resident executables (/memfd:tgt and /memfd:wpn), an LKM rootkit module using ftrace to hook 18 syscalls, and a userland rootkit SO. It abuses the rmdir() syscall as a privilege escalation channel \u2014 a techni\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Static analysis of the extracted LKM rootkit module reveals ftrace-bas] z=0.893 conf=0.93 \u2014 \n  [Binary named 'cron' uploaded to VirusTotal on 2024-09-04 with 0 detect] z=0.837 conf=0.91 \u2014 \n  [Two memory-resident executables detected: /memfd:tgt and /memfd:wpn. T] z=0.783 conf=0.88 \u2014 \n  [Network analysis of the rootkit's C2 communication module reveals encr] z=0.783 conf=0.90 \u2014 \n  [String analysis of the unpacked rootkit module reveals developer-embed] z=0.731 conf=0.87 \u2014 \n\n--- FINAL ALERT LEVEL ---\nHIGH \u2014 Conclusive MALICE verdict from Bayesian posterior aggregation. Individual z-scores below threshold (distributed evidence pattern: no single dominant signal, but aggregate posterior is decisive).\n\nCritical signals (z>3): 0\nHigh signals (2<z<=3): 0\nTotal signals analyzed: 5",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+      "best_posterior": "4027/25000",
+      "confidence": {
+        "__fraction__": true,
+        "den": 25000,
+        "num": 4027
+      },
+      "devil_advocate": {
+        "aggregation": {
+          "k": 3,
+          "method": "top_k_already_validated_matches_v2",
+          "total_gap_mass": "0"
+        },
+        "counterfactual_summary": {
+          "primary_alternative_hypothesis": null
+        },
+        "decision_context": {
+          "confidence": "4027/25000",
+          "mapped_verdict": "MALICIOUS_INTENT_DETECTED",
+          "raw_verdict": "MALICIOUS_INTENT_DETECTED",
+          "score": "4027/5000"
+        },
+        "devil_advocate_source": "deterministic_no_pattern_data_available",
+        "meta": {
+          "deterministic": true,
+          "generated_from": "case_pattern_library"
+        },
+        "narrative": "Eco's Razor (Abductive Falsification) applied to verdict MALICIOUS_INTENT_DETECTED. Pattern-matching data was not available on this code path \u2014 CasePatternLibrary is not invoked here by design (agent audit-trail mode (vigia_agent.py \u2014 JSON-replay / autonomous path); see KNOWN_LIMITATIONS.md). No structured counter-hypothesis could be derived deterministically. This is a documented scope limitation of the current code path, not an absence of falsification attempt.",
+        "pattern_evidence_gaps": [],
+        "version": "r7-da-v1"
+      },
+      "is_conclusive": true,
+      "narrative": "A loadable kernel module (LKM) rootkit dubbed PUMAKIT was discovered during routine VirusTotal threat hunting on 2024-09-04 with 0/N detections. The malware's dropper binary is named 'cron' to impersonate the legitimate cron daemon. Its multi-stage architecture includes a dropper, two memory-resident executables (/memfd:tgt and /memfd:wpn), an LKM rootkit module using ftrace to hook 18 syscalls, and a userland rootkit SO. It abuses the rmdir() syscall as a privilege escalation channel \u2014 a techni"
+    },
+    "case_id": "VIGIA-LINUX-004",
+    "pipeline_meta": {
+      "artifact_count": 5,
+      "avg_score": "4027/5000",
+      "expected_verdict": "MALICE",
+      "source": "ebs_v1_json_adapter"
+    },
+    "signals": [
+      {
+        "artifact_id": "linux004_01",
+        "confidence": {
+          "__fraction__": true,
+          "den": 100,
+          "num": 91
+        },
+        "description": "Binary named 'cron' uploaded to VirusTotal on 2024-09-04 with 0 detections across all engines. File entropy analysis shows 7.89/8.0 (highly packed/encrypted), inconsistent with the legitimate cron dae",
+        "evidence_type": "file_metadata",
+        "source": "sift_virustotal_analysis",
+        "z_score": {
+          "__fraction__": true,
+          "den": 2500,
+          "num": 2093
+        }
+      },
+      {
+        "artifact_id": "linux004_02",
+        "confidence": {
+          "__fraction__": true,
+          "den": 100,
+          "num": 93
+        },
+        "description": "Static analysis of the extracted LKM rootkit module reveals ftrace-based hooking of 18 distinct syscalls including read, write, open, stat, lstat, getdents, getdents64, kill, mkdir, rmdir, unlink, unl",
+        "evidence_type": "malware_static_analysis",
+        "source": "sift_static_analysis",
+        "z_score": {
+          "__fraction__": true,
+          "den": 625,
+          "num": 558
+        }
+      },
+      {
+        "artifact_id": "linux004_03",
+        "confidence": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 22
+        },
+        "description": "Two memory-resident executables detected: /memfd:tgt and /memfd:wpn. These use the memfd_create() syscall to create anonymous file descriptors that exist only in memory with no filesystem footprint. T",
+        "evidence_type": "memory_process",
+        "source": "sift_memory_forensics",
+        "z_score": {
+          "__fraction__": true,
+          "den": 1250,
+          "num": 979
+        }
+      },
+      {
+        "artifact_id": "linux004_04",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 9
+        },
+        "description": "Network analysis of the rootkit's C2 communication module reveals encrypted callback channels to external infrastructure. The rootkit uses specialized kernel-level commands for configuration extractio",
+        "evidence_type": "malware_static_analysis",
+        "source": "sift_static_analysis",
+        "z_score": {
+          "__fraction__": true,
+          "den": 1000,
+          "num": 783
+        }
+      },
+      {
+        "artifact_id": "linux004_05",
+        "confidence": {
+          "__fraction__": true,
+          "den": 100,
+          "num": 87
+        },
+        "description": "String analysis of the unpacked rootkit module reveals developer-embedded identifiers: the string 'PUMA' appears in multiple function names and configuration structures, indicating an internal project",
+        "evidence_type": "file_metadata",
+        "source": "sift_file_integrity",
+        "z_score": {
+          "__fraction__": true,
+          "den": 2500,
+          "num": 1827
+        }
+      }
+    ]
+  },
+  "sans_compliance": {
+    "accuracy_validation": false,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}

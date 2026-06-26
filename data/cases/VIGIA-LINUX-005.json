@@ -1,0 +1,147 @@
+{
+  "case_id": "VIGIA-LINUX-005",
+  "case_name": "PUMAKIT False Flag — Binary Naming Epistemic Boundary",
+  "schema_version": "1.1",
+  "description": "Epistemological boundary test derived from VIGIA-LINUX-004. A binary named 'cron' is found on a Linux system with anomalous entropy and size. Without the kernel-level evidence (LKM module, rmdir() abuse, memfd executables), the binary naming alone is ambiguous: custom-compiled cron replacements exist in the wild (busybox, dcron, fcron), and UPX packing is used by some legitimate deployment pipelines. This case isolates the naming signal from the kernel-level signals to test whether VIGÍA correctly identifies the epistemic boundary: naming alone is insufficient for a MALICE verdict without corroborating kernel or behavioral evidence.",
+  "abstention_risk": "high",
+  "expected_verdict": "SUSPICION",
+  "carnegie_pattern_expected": null,
+  "confidence_expected": 55,
+  "artifacts": [
+    {
+      "artifact_id": "linux005_01",
+      "evidence_type": "file_metadata",
+      "source_tool": "sift_file_integrity",
+      "timestamp": "2024-09-10T14:00:00Z",
+      "raw_score": 0.62,
+      "prior_trust": 0.80,
+      "provenance_chain": [
+        "sha256:linux005_cron_binary_disk"
+      ],
+      "description": "Binary named 'cron' found at /opt/services/cron on a production web server. File entropy 7.4/8.0 (high, consistent with packing or compression). File size 1.8MB. UPX packing detected. Not registered in any package manager manifest (dpkg, rpm). The file was created 2024-09-10 at 02:17 UTC. No corresponding package manager event in the 7-day window surrounding the creation timestamp.",
+      "metadata": {
+        "acquisition_tool": "Incident response live triage — sift_file_integrity",
+        "acquisition_hash": "sha256:linux005_01_triage_20240910",
+        "acquisition_timestamp": "2024-09-10T14:00:00Z",
+        "write_blocker_used": false,
+        "examiner_id": "IR team — routine anomaly triage",
+        "binary_path": "/opt/services/cron",
+        "file_entropy": 7.4,
+        "file_size_bytes": 1800000,
+        "packing": "UPX",
+        "package_manager_registered": false,
+        "dpkg_event_in_7d_window": false
+      }
+    },
+    {
+      "artifact_id": "linux005_02",
+      "evidence_type": "log_entry",
+      "source_tool": "sift_linux_forensics",
+      "timestamp": "2024-09-10T14:15:00Z",
+      "raw_score": 0.35,
+      "prior_trust": 0.85,
+      "provenance_chain": [
+        "sha256:linux005_process_listing"
+      ],
+      "description": "Process listing shows /opt/services/cron running as user 'deploy' (UID 1001, non-root) with parent process /usr/bin/supervisord. The process has been running since system boot (uptime 14 days). CPU utilization averages 0.1% with no spikes. Memory footprint is 12MB RSS. No anomalous network connections observed from this PID. The process spawns no child processes.",
+      "metadata": {
+        "acquisition_tool": "Incident response live triage — ps, /proc, ss",
+        "acquisition_hash": "sha256:linux005_02_process_20240910",
+        "acquisition_timestamp": "2024-09-10T14:15:00Z",
+        "write_blocker_used": false,
+        "examiner_id": "IR team — routine anomaly triage",
+        "process_user": "deploy (UID 1001)",
+        "parent_process": "/usr/bin/supervisord",
+        "cpu_avg_percent": 0.1,
+        "memory_rss_mb": 12,
+        "anomalous_network_connections": false,
+        "child_processes": 0,
+        "running_since_boot": true
+      }
+    },
+    {
+      "artifact_id": "linux005_03",
+      "evidence_type": "osint",
+      "source_tool": "sift_osint",
+      "timestamp": "2024-09-10T15:00:00Z",
+      "raw_score": 0.25,
+      "prior_trust": 0.75,
+      "provenance_chain": [
+        "sha256:linux005_deploy_history"
+      ],
+      "description": "Deployment records show that the 'deploy' user account deployed a custom task scheduler on 2024-09-10 at 02:15 UTC via an Ansible playbook. The playbook references a custom Go binary named 'cron' built from an internal repository. The Go binary is compiled with -ldflags='-s -w' (stripped) and post-processed with UPX for size reduction. The deployment pipeline is documented in the team wiki and has been used for 8 months. No other anomalous deployments were recorded on the same date.",
+      "metadata": {
+        "acquisition_tool": "Ansible deployment audit log and wiki",
+        "acquisition_hash": "sha256:linux005_03_ansible_20240910",
+        "acquisition_timestamp": "2024-09-10T15:00:00Z",
+        "write_blocker_used": false,
+        "examiner_id": "IR team + DevOps lead interview",
+        "deployment_tool": "Ansible",
+        "deployment_timestamp": "2024-09-10T02:15:00Z",
+        "binary_language": "Go",
+        "build_flags": "-ldflags='-s -w'",
+        "upx_postprocessing": true,
+        "deployment_pipeline_age_months": 8,
+        "wiki_documented": true
+      }
+    },
+    {
+      "artifact_id": "linux005_04",
+      "evidence_type": "malware_static_analysis",
+      "source_tool": "sift_static_analysis",
+      "timestamp": "2024-09-10T16:00:00Z",
+      "raw_score": 0.18,
+      "prior_trust": 0.82,
+      "provenance_chain": [
+        "sha256:linux005_static_analysis"
+      ],
+      "description": "Static analysis of the unpacked binary reveals: Go runtime metadata confirms compilation with Go 1.22. Import table references standard library packages only (net/http, time, os, encoding/json). No syscall hooking, no kernel module loading, no memfd_create() calls, no privilege escalation primitives, no C2 callback infrastructure, no anti-debugging techniques. The binary implements an HTTP-based task scheduler with a REST API on localhost:8080. Functionality is consistent with deployment documentation.",
+      "metadata": {
+        "acquisition_tool": "Static binary analysis — strings, objdump, Go reverse engineering",
+        "acquisition_hash": "sha256:linux005_04_static_20240910",
+        "acquisition_timestamp": "2024-09-10T16:00:00Z",
+        "write_blocker_used": false,
+        "examiner_id": "IR team — malware analyst",
+        "language_runtime": "Go 1.22",
+        "imports_standard_only": true,
+        "syscall_hooking": false,
+        "kernel_module_loading": false,
+        "memfd_create_calls": false,
+        "privilege_escalation_primitives": false,
+        "c2_infrastructure": false,
+        "anti_debugging": false,
+        "functionality": "HTTP task scheduler on localhost:8080"
+      }
+    }
+  ],
+  "temporal_violations": [],
+  "caie_fractures": [
+    {
+      "fracture_type": "NAMING_AMBIGUITY",
+      "severity": 0.45,
+      "interpretation": "The binary is named 'cron' with anomalous entropy and size — surface indicators consistent with PUMAKIT-class impersonation. However, static analysis reveals no kernel-level malicious functionality, and deployment records provide a verified legitimate provenance chain. The naming is ambiguous without kernel-level corroboration: a legitimate Go binary compiled with standard flags and UPX-packed for deployment optimization produces the same surface profile as a malicious impersonation dropper. VIGÍA must distinguish these cases via depth of analysis, not surface pattern matching.",
+      "artifact_a": "linux005_01",
+      "artifact_b": "linux005_04"
+    }
+  ],
+  "peirce_expected": {
+    "firstness": "Binary named 'cron' with high entropy, large size, UPX packing, not in package manager. Surface profile matches PUMAKIT dropper characteristics.",
+    "secondness": "Static analysis reveals standard Go binary with no malicious functionality. Deployment records confirm legitimate Ansible-managed pipeline with 8-month history. Process runs as non-root user under supervisord with normal resource consumption and no anomalous network activity.",
+    "thirdness": "The naming anomaly (cron) is explained by the deployment pipeline: the internal team built a custom task scheduler and named it 'cron' because that is its function. The high entropy and UPX packing are explained by Go compilation flags and deployment optimization. All PUMAKIT-distinguishing signals (syscall hooking, memfd, kernel module, rmdir abuse) are absent. SUSPICION is warranted by the surface profile, but MALICE requires corroborating kernel-level evidence that does not exist."
+  },
+  "devil_advocate": "The 'cron' binary could be a PUMAKIT variant at an earlier deployment stage that has not yet activated its kernel module. The Ansible deployment records could have been fabricated after the fact. The static analysis may have missed obfuscated payload sections.",
+  "devil_refutation": "The early-stage hypothesis requires unverified future activation with no present indicators. The Ansible fabrication hypothesis requires compromising the deployment pipeline, the wiki, and the DevOps lead's testimony — Ockham cost 3 vs cost 1 for the legitimate explanation. The missed-payload hypothesis is refuted by the Go import table showing standard library only — Go binaries cannot hide syscall-level functionality without non-standard imports.",
+  "why_not_malice": "All PUMAKIT-distinguishing signals are absent: no syscall hooking, no kernel module, no memfd_create, no rmdir abuse, no C2, no anti-debugging. The binary has verified provenance through Ansible deployment records with 8-month history. Process behavior is normal (low CPU, no network anomalies, no child processes, non-root user). Static analysis confirms standard Go task scheduler functionality consistent with documentation.",
+  "expected_mitre_ttps": [],
+  "source_dataset": "VIGÍA Synthetic Corpus — Linux Epistemic Boundary Suite",
+  "source_origin": "synthetic_vigia_collective",
+  "notes": "POST-HACKATHON — Linux corpus expansion. Paired with VIGIA-LINUX-004. Tests whether VIGÍA can distinguish surface naming patterns from actual kernel-level rootkit indicators. The discriminator is depth of analysis: naming + entropy alone = SUSPICION; naming + kernel evidence = MALICE.",
+  "_consolidation": {
+    "consolidated_at": "2026-06-26T00:00:00Z",
+    "parser_version": "2.4",
+    "schema_version": "1.1",
+    "source_file": "VIGIA-LINUX-CORPUS.json",
+    "source_origin": "synthetic_vigia_collective",
+    "corpus_tag": "POST-HACKATHON"
+  }
+}
