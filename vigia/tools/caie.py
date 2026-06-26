@@ -2283,21 +2283,24 @@ def verify_determinism_cross_arch() -> bool:
     result2 = engine2.evaluate()
 
     # Verify determinism
-    assert result1["composite_score"] == result2["composite_score"], (
-        f"Determinism failed: {result1['composite_score']} != {result2['composite_score']}"
-    )
+    if result1["composite_score"] != result2["composite_score"]:
+        raise RuntimeError(
+            f"Determinism failed: {result1['composite_score']} != {result2['composite_score']}"
+        )
 
     # Verify all fracture severities are deterministic
     for i, (f1, f2) in enumerate(zip(result1.get("fractures", []), result2.get("fractures", []))):
-        assert f1["severity"] == f2["severity"], (
-            f"Fracture {i} severity non-deterministic: {f1['severity']} != {f2['severity']}"
-        )
+        if f1["severity"] != f2["severity"]:
+            raise RuntimeError(
+                f"Fracture {i} severity non-deterministic: {f1['severity']} != {f2['severity']}"
+            )
 
     # Verify TTP confidences are deterministic
     for ttp in result1.get("ttp_confidences", {}):
-        assert result1["ttp_confidences"][ttp] == result2["ttp_confidences"][ttp], (
-            f"TTP {ttp} confidence non-deterministic"
-        )
+        if result1["ttp_confidences"][ttp] != result2["ttp_confidences"][ttp]:
+            raise RuntimeError(
+                f"TTP {ttp} confidence non-deterministic"
+            )
 
     print(" CAIE Determinism Protocol P0: VERIFIED")
     print(f"   Composite Score: {result1['composite_score']}")
