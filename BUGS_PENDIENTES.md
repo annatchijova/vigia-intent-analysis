@@ -359,7 +359,7 @@ Coordinar con L-021 Fase 3. Requiere decisión sobre si `SignalOutput` acepta
 
 | Campo | Valor |
 |-------|-------|
-| **Estado** | ABIERTO |
+| **Estado** | DESCARTADO — 2026-06-26 |
 | **Severidad** | P1 — path activo, no SIFT-only |
 | **Archivo** | `vigia/abduction/vigia_artifact_graph.py` |
 | **Líneas** | 432, 433, 457 |
@@ -383,6 +383,14 @@ inconsistente con el invariante L-021.
 
 Reemplazar `float(...)` por `Decimal(str(...))` en las tres líneas.
 Verificar que los callers downstream aceptan `Decimal`.
+
+**DESCARTADO** 2026-06-26 — vigia_artifact_graph.py es un módulo de visualización
+puro (grafos de nodos/edges para display). Los float() calculan tamaños de pixel
+(int(15 + min(15, z * 3))), pesos de aristas y etiquetas de display — ninguno
+vuelve al path de scoring ni de veredicto. El módulo no tiene importadores en
+código de producción (grep confirmado). Convertir a Decimal en contexto de
+renderizado sería sobreingeniería sin beneficio Daubert. Cerrado como falso
+positivo de auditoría L-021.
 
 ---
 
