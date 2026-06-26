@@ -1,0 +1,71 @@
+{
+  "case_id": "VIGIA_BREAK_010_OVERPERFECT",
+  "name": "VIGIA_BREAK_010_OVERPERFECT",
+  "description": "Logs demasiado perfectos",
+  "artifacts": [
+    {
+      "artifact_id": "ART-001",
+      "evidence_type": "log_entry",
+      "source_tool": "legacy_converter",
+      "timestamp": "2026-04-10T10:00:00Z",
+      "raw_score": 0.75,
+      "prior_trust": 0.85,
+      "provenance_chain": [
+        "sha256:legacy_1"
+      ],
+      "acquisition_tool": "legacy_converter_v1",
+      "acquisition_hash": "sha256:legacy_1",
+      "acquisition_timestamp": "2026-04-10T10:00:00Z",
+      "description": "events every exactly 10.000 seconds",
+      "metadata": {
+        "original_type": "system",
+        "peirce_layer": "SECONDNESS",
+        "forensic_anomalies": [],
+        "content_preview": "events every exactly 10.000 seconds",
+        "acquisition_tool": "legacy_converter_v1",
+        "acquisition_hash": "sha256:legacy_1",
+        "acquisition_timestamp": "2026-04-10T10:00:00Z",
+        "write_blocker_used": true,
+        "examiner_id": "legacy_converter"
+      }
+    },
+    {
+      "artifact_id": "ART-002",
+      "evidence_type": "log_entry",
+      "source_tool": "legacy_converter",
+      "timestamp": "2026-04-10T10:00:00Z",
+      "raw_score": 0.75,
+      "prior_trust": 0.85,
+      "provenance_chain": [
+        "sha256:legacy_2"
+      ],
+      "acquisition_tool": "legacy_converter_v1",
+      "acquisition_hash": "sha256:legacy_2",
+      "acquisition_timestamp": "2026-04-10T10:00:00Z",
+      "description": "zero jitter",
+      "metadata": {
+        "original_type": "traffic",
+        "peirce_layer": "SECONDNESS",
+        "forensic_anomalies": [],
+        "content_preview": "zero jitter",
+        "acquisition_tool": "legacy_converter_v1",
+        "acquisition_hash": "sha256:legacy_2",
+        "acquisition_timestamp": "2026-04-10T10:00:00Z",
+        "write_blocker_used": true,
+        "examiner_id": "legacy_converter"
+      }
+    }
+  ],
+  "temporal_violations": [],
+  "expected_verdict": "SUSPICION",
+  "expected_confidence": 0.75,
+  "expected_mitre_ttps": [
+    "T1070.006"
+  ],
+  "metadata": {
+    "converted_from": "legacy_v1",
+    "original_verdict": "SUSPICION",
+    "abstention_risk": "bajo",
+    "carnegie_pattern": ""
+  }
+}

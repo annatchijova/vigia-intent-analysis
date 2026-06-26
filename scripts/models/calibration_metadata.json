@@ -1,0 +1,30 @@
+{
+  "authentic_verdicts": [
+    "ABSTAIN",
+    "BENIGN",
+    "NOISE"
+  ],
+  "backend": "sklearn_logistic",
+  "calibration_date": "2026-06-23T04:32:26.227729Z",
+  "calibrator_path": "../models/calibrated_lr.json",
+  "corpus_hash": "494322062775aad68335b87d344e74fa5f3772bc05d64a448dfdd0f0c34df99b",
+  "corpus_size": 48,
+  "fabricated_verdicts": [
+    "INTENT",
+    "MALICE",
+    "SUSPICION"
+  ],
+  "metrics_test": {
+    "brier_score": 0.0812,
+    "fpr_at_0.5": 0.0,
+    "n_eval": 9,
+    "tpr_at_0.5": 0.8333
+  },
+  "n_authentic_test": 3,
+  "n_authentic_train": 13,
+  "n_fabricated_test": 6,
+  "n_fabricated_train": 25,
+  "script_version": "run_calibration-v1.0",
+  "seed": 42,
+  "test_split": 0.2
+}
