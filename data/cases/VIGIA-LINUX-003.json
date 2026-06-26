@@ -1,0 +1,211 @@
+{
+  "case_id": "VIGIA-LINUX-003",
+  "case_name": "perfctl — Anti-Forensic Crontab Subversion and LD_PRELOAD Rootkit",
+  "description": "A Linux server running Apache RocketMQ 5.0.0 was compromised via CVE-2023-33246 (unauthenticated RCE, CVSS 9.8). The threat actor deployed the perfctl malware family, which replaced system binaries /usr/bin/crontab, /usr/bin/ldd, and /usr/bin/top with trojanized versions and installed a userland rootkit via LD_PRELOAD (/lib/libgcwrap.so). The trojanized crontab binary intercepts crontab -l output and suppresses all malicious cron entries, creating a forensic blind spot. A watchdog script at /dev/health kills competing miners every 45 seconds. Initial detection vector: sustained 100% CPU utilization with no corresponding scheduled workload.",
+  "abstention_risk": "low",
+  "expected_verdict": "MALICE",
+  "carnegie_pattern_expected": null,
+  "confidence_expected": 96,
+  "artifacts": [
+    {
+      "artifact_id": "linux003_01",
+      "evidence_type": "file_metadata",
+      "source_tool": "sift_file_integrity",
+      "timestamp": "2024-10-05T03:14:22Z",
+      "raw_score": 0.97,
+      "prior_trust": 0.96,
+      "provenance_chain": [
+        "sha256:linux003_crontab_disk_hash",
+        "sha256:linux003_dpkg_manifest_crontab"
+      ],
+      "description": "File integrity check against dpkg package manifest reveals that /usr/bin/crontab on disk (SHA-256: d1e9a1b3c4f7e2a6b0c8d5f3e1a7b2c4) does not match the hash registered in the dpkg database for the installed version of cron (3.0pl1-137, SHA-256: 7f3e1a9c2b0d4e6f8a1c3e5b7d0f2a4c). The binary was modified at 2024-10-05 03:14:22 UTC. No dpkg or apt operation was recorded for the cron package in the 72-hour window surrounding the modification timestamp. The binary size differs from the original by +4,096 bytes.",
+      "metadata": {
+        "binary_path": "/usr/bin/crontab",
+        "disk_sha256": "d1e9a1b3c4f7e2a6b0c8d5f3e1a7b2c4",
+        "dpkg_expected_sha256": "7f3e1a9c2b0d4e6f8a1c3e5b7d0f2a4c",
+        "modification_timestamp": "2024-10-05T03:14:22Z",
+        "dpkg_update_in_72h_window": false,
+        "size_delta_bytes": 4096,
+        "package": "cron 3.0pl1-137",
+        "also_affected": [
+          "/usr/bin/ldd",
+          "/usr/bin/top"
+        ],
+        "acquisition_tool": "Aqua Nautilus honeypot live forensics — dpkg integrity check",
+        "acquisition_hash": "sha256:linux003_01_aqua_dpkg_20241005",
+        "acquisition_timestamp": "2024-10-05T08:00:00Z",
+        "write_blocker_used": false,
+        "examiner_id": "Aqua Nautilus threat research team"
+      }
+    },
+    {
+      "artifact_id": "linux003_02",
+      "evidence_type": "file_metadata",
+      "source_tool": "sift_file_integrity",
+      "timestamp": "2024-10-05T03:15:01Z",
+      "raw_score": 0.88,
+      "prior_trust": 0.93,
+      "provenance_chain": [
+        "sha256:linux003_ld_so_preload_entry"
+      ],
+      "description": "/etc/ld.so.preload contains a single non-standard entry: /lib/libgcwrap.so. This library is not registered in any package manifest (dpkg -L output shows no package owns this path). The file was created at 2024-10-05 03:15:01 UTC, 39 seconds after the crontab binary was replaced. LD_PRELOAD via /etc/ld.so.preload is a system-wide dynamic linker override that forces libgcwrap.so to load into every process before any other library. This is the primary rootkit injection mechanism enabling user-space function hooking across the entire system.",
+      "metadata": {
+        "file_path": "/etc/ld.so.preload",
+        "entry": "/lib/libgcwrap.so",
+        "library_package_owner": null,
+        "library_creation_timestamp": "2024-10-05T03:15:01Z",
+        "seconds_after_crontab_modification": 39,
+        "mechanism": "system-wide LD_PRELOAD override",
+        "scope": "all processes system-wide",
+        "acquisition_tool": "Aqua Nautilus honeypot live forensics — ld.so.preload",
+        "acquisition_hash": "sha256:linux003_02_aqua_ldpreload_20241005",
+        "acquisition_timestamp": "2024-10-05T08:01:00Z",
+        "write_blocker_used": false,
+        "examiner_id": "Aqua Nautilus threat research team"
+      }
+    },
+    {
+      "artifact_id": "linux003_03",
+      "evidence_type": "memory_process",
+      "source_tool": "sift_process_monitor",
+      "timestamp": "2024-10-05T08:30:00Z",
+      "raw_score": 0.93,
+      "prior_trust": 0.87,
+      "provenance_chain": [
+        "sha256:linux003_proc_cron_processes",
+        "sha256:linux003_crontab_l_output"
+      ],
+      "description": "Direct inspection of /proc/<PIDs> reveals active processes with cmdlines consistent with cron job execution, referencing paths under /tmp/.xdiag/int/. The parent process tree shows these originate from crond. However, running crontab -l (which invokes the trojanized /usr/bin/crontab binary) returns an empty schedule for all users including root. The kernel-level evidence (/proc) and the user-space reporting tool (crontab) produce contradictory outputs for the same system state. This divergence is only possible if the user-space tool has been modified to suppress specific entries.",
+      "metadata": {
+        "proc_cron_processes_found": true,
+        "cron_process_paths": [
+          "/tmp/.xdiag/int/"
+        ],
+        "crontab_l_output": "no crontab for root",
+        "kernel_vs_userspace_contradiction": true,
+        "mechanism": "trojanized crontab binary filters output",
+        "additional_trojanized_binaries": [
+          "/usr/bin/ldd",
+          "/usr/bin/top"
+        ],
+        "acquisition_tool": "Aqua Nautilus honeypot — sift_process_monitor /proc",
+        "acquisition_hash": "sha256:linux003_03_aqua_proc_20241005",
+        "acquisition_timestamp": "2024-10-05T08:30:00Z",
+        "write_blocker_used": false,
+        "examiner_id": "Aqua Nautilus threat research team"
+      }
+    },
+    {
+      "artifact_id": "linux003_04",
+      "evidence_type": "log_entry",
+      "source_tool": "sift_linux_forensics",
+      "timestamp": "2024-10-05T03:25:00Z",
+      "raw_score": 0.85,
+      "prior_trust": 0.79,
+      "provenance_chain": [
+        "sha256:linux003_xdiag_log"
+      ],
+      "description": "/tmp/.xdiag/int/.per.s is a runtime log file written by the malware containing timestamped records of cryptomining operations and process management events. Sample entries show XMRIG Monero mining sessions initiated at regular intervals, hash rate measurements, and Monero wallet address: 48jWtAsev4V9iDeN5TK5PQVNGhnJJR35yiJfJ1tbA3f73ZCiiarUxc4RMU4hNMsd1Udjbe1tCiBeFbx216UXXJzLB98dmJR. The log path under /tmp/.xdiag/ uses a hidden directory structure (dotfile prefix) to reduce filesystem scan visibility.",
+      "metadata": {
+        "log_path": "/tmp/.xdiag/int/.per.s",
+        "log_type": "attacker-written runtime log",
+        "hidden_directory": true,
+        "content": "timestamped XMRIG mining sessions and process events",
+        "monero_wallet": "48jWtAsev4V9iDeN5TK5PQVNGhnJJR35yiJfJ1tbA3f73ZCiiarUxc4RMU4hNMsd1Udjbe1tCiBeFbx216UXXJzLB98dmJR",
+        "prior_trust_note": "log is attacker-authored; content could be fabricated, but corroborates kernel-level /proc observations",
+        "acquisition_tool": "Aqua Nautilus honeypot — filesystem log extraction",
+        "acquisition_hash": "sha256:linux003_04_aqua_xdiag_log_20241005",
+        "acquisition_timestamp": "2024-10-05T08:45:00Z",
+        "write_blocker_used": false,
+        "examiner_id": "Aqua Nautilus threat research team"
+      }
+    },
+    {
+      "artifact_id": "linux003_05",
+      "evidence_type": "malware_static_analysis",
+      "source_tool": "sift_static_analysis",
+      "timestamp": "2024-10-05T08:45:00Z",
+      "raw_score": 0.91,
+      "prior_trust": 0.88,
+      "provenance_chain": [
+        "sha256:linux003_dev_health_watchdog"
+      ],
+      "description": "Script recovered at /dev/health (non-standard path for an executable: /dev/ is a device filesystem, not a bin directory): infinite loop executing pkill -9 xmrig every 45 seconds. This watchdog kills competing cryptomining processes (specifically XMRIG instances not belonging to perfctl) to ensure exclusive control of CPU resources. The use of /dev/health as an execution path exploits the unconventional location to avoid standard filesystem integrity checks, which typically focus on /usr/bin, /usr/sbin, and /bin.",
+      "metadata": {
+        "script_path": "/dev/health",
+        "path_anomaly": "/dev/ used as executable storage",
+        "function": "competitive miner elimination via pkill -9 xmrig every 45 seconds",
+        "target": "rival XMRIG processes",
+        "evasion_technique": "non-standard filesystem location",
+        "execution_model": "infinite loop daemon",
+        "acquisition_tool": "Aqua Nautilus static malware analysis",
+        "acquisition_hash": "sha256:linux003_05_aqua_static_20241007",
+        "acquisition_timestamp": "2024-10-07T00:00:00Z",
+        "write_blocker_used": false,
+        "examiner_id": "Aqua Nautilus threat research team"
+      }
+    }
+  ],
+  "temporal_violations": [
+    {
+      "type": "BINARY_INTEGRITY_COLLAPSE",
+      "description": "/usr/bin/crontab modification timestamp (2024-10-05 03:14:22 UTC) falls outside all recorded dpkg/apt package manager operation windows for the cron package. On a correctly managed system, system binary modifications must correlate with package manager events. A binary replaced outside package management has no authorized provenance and constitutes an integrity chain break.",
+      "severity": 0.97,
+      "delta_seconds": 259200,
+      "cause": {
+        "artifact_id": "linux003_01",
+        "detail": "binary modified at 03:14:22 UTC; last dpkg cron update was 72+ hours earlier"
+      },
+      "effect": {
+        "artifact_id": "linux003_03",
+        "detail": "modified binary suppresses cron entries from forensic enumeration"
+      }
+    }
+  ],
+  "caie_fractures": [
+    {
+      "fracture_type": "TOOL_SUBVERSION",
+      "severity": 0.96,
+      "interpretation": "The forensic investigation tool (crontab) was compromised to suppress evidence of its own domain of inquiry. The trojanized binary creates a circular anti-forensic loop: the standard tool for enumerating cron persistence has been weaponized against the investigator. This is not accidental — it requires the attacker to understand that forensic responders use crontab -l as a persistence enumeration step. The subversion is deliberate and operationally informed.",
+      "artifact_a": "linux003_01",
+      "artifact_b": "linux003_03",
+      "ttp_id": "T1070"
+    },
+    {
+      "fracture_type": "OBSERVABLE_VS_REPORTED_DIVERGENCE",
+      "severity": 0.93,
+      "interpretation": "Kernel-level observation (/proc, read-only kernel data structures) shows active cron processes referencing malware paths. User-space reporting tool (crontab -l, compromised binary) reports empty schedule. These two observations of the same system state are logically contradictory. The contradiction resolves uniquely to user-space tool compromise: kernel data is read-only and cannot be falsified by user-space code.",
+      "artifact_a": "linux003_03",
+      "artifact_b": "linux003_01",
+      "ttp_id": "T1036.005"
+    }
+  ],
+  "peirce_expected": {
+    "firstness": "/usr/bin/crontab binary hash does not match dpkg manifest. /etc/ld.so.preload contains an unregistered library. crontab -l returns empty while /proc shows active cron processes. /dev/health watchdog script kills competitor processes.",
+    "secondness": "The binary replacement occurred outside any package manager event window (+72h delta). The LD_PRELOAD entry was created 39 seconds after the crontab replacement in the same operation. The /proc-vs-crontab contradiction is only resolvable via user-space tool compromise. The /dev/health path exploits the /dev/ filesystem location to evade integrity checks.",
+    "thirdness": "The attacker deliberately subverted the forensic investigation tool (crontab) to create a systematic blind spot in the persistence enumeration process. This demonstrates operational awareness of DFIR methodology: the attacker knows that responders use crontab -l to find persistence and pre-emptively neutralized that investigative step. The operation shows multi-layered intent: gain access, install persistence, subvert forensic tooling, eliminate competition, maintain exclusivity."
+  },
+  "devil_advocate": "The /usr/bin/crontab binary mismatch is the result of a failed or interrupted package update that left the filesystem in an inconsistent state. The LD_PRELOAD entry was added by a legitimate application deployment or monitoring agent that was later removed. The /dev/health script is a legitimate health monitoring script for competing processes.",
+  "expected_mitre_ttps": [
+    "T1053.003",
+    "T1574.006",
+    "T1036.005",
+    "T1070",
+    "T1059.004",
+    "T1496",
+    "T1027"
+  ],
+  "source_dataset": "perfctl Malware — Aqua Nautilus Research, October 2024",
+  "source_origin": "public_incident_report",
+  "source_url": "https://www.aquasec.com/blog/perfctl-a-stealthy-malware-targeting-millions-of-linux-servers/",
+  "notes": "POST-HACKATHON — Linux corpus expansion. This case tests VIGÍA detection of anti-forensic tool subversion: the attacker compromised the tool used to detect them. The TOOL_SUBVERSION caie_fracture and the OBSERVABLE_VS_REPORTED_DIVERGENCE fracture are the core Peircean signals. The /proc kernel data is read-only and cannot be falsified by user-space code — this asymmetry is the decisive semiotics.",
+  "_consolidation": {
+    "consolidated_at": "2026-06-26T00:00:00Z",
+    "parser_version": "2.4",
+    "schema_version": "1.1",
+    "source_file": "VIGIA-LINUX-CORPUS.json",
+    "source_origin": "public_incident_report",
+    "corpus_tag": "POST-HACKATHON"
+  },
+  "schema_version": "1.1"
+}

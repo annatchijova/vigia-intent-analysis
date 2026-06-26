@@ -1,0 +1,217 @@
+{
+  "case_id": "VIGIA-LINUX-001",
+  "case_name": "XZ Utils Supply Chain Backdoor — JiaT75 Operation",
+  "description": "In February 2024, XZ Utils versions 5.6.0 and 5.6.1 were found to contain a CVSS 10.0 backdoor enabling unauthenticated remote code execution via OpenSSH. The payload was injected into the distributed tarball during the build process via a modified build-to-host.m4 script that extracts and links obfuscated binary data embedded in test files. The payload is absent from the git source tree. Discovery was incidental: a 400ms SSH latency anomaly led Andres Freund to trace the root cause to liblzma on 2024-03-27. The operation is the result of a ~26-month identity construction and social engineering campaign by GitHub account JiaT75 (Jia Tan).",
+  "abstention_risk": "low",
+  "expected_verdict": "MALICE",
+  "carnegie_pattern_expected": null,
+  "confidence_expected": 97,
+  "artifacts": [
+    {
+      "artifact_id": "linux001_01",
+      "evidence_type": "binary_diff",
+      "source_tool": "sift_binary_analysis",
+      "timestamp": "2024-02-23T00:00:00Z",
+      "raw_score": 0.98,
+      "prior_trust": 0.93,
+      "provenance_chain": [
+        "sha256:linux001_tarball_5_6_0",
+        "sha256:linux001_git_tree_5_6_0"
+      ],
+      "description": "Binary diff between XZ Utils 5.6.0 distributed tarball and git repository tree at the same version tag reveals a critical divergence: the tarball's build-to-host.m4 script contains an extraction and execution block absent from the git source. The extracted payload (~500KB of obfuscated binary data) is embedded in test files tests/files/bad-3-corrupt_lzma2.xz and tests/files/good-large_compressed.lzma. The git tag and tarball carry the same version string but different content hashes.",
+      "metadata": {
+        "tarball_sha256": "935021f09234f1e1b6f8de94ad5dc927d3def7d591705e01ce049a95f76f2290",
+        "git_tree_divergence": true,
+        "divergence_location": "build-to-host.m4 + test binary files",
+        "payload_size_bytes": 512000,
+        "cve": "CVE-2024-3094",
+        "cvss": 10.0,
+        "backdoor_type": "unauthenticated RCE via SSH (Ed448 private key)",
+        "acquisition_tool": "CVE-2024-3094 public disclosure — Andres Freund / CISA",
+        "acquisition_hash": "sha256:linux001_01_openwall_disclosure_20240329",
+        "acquisition_timestamp": "2024-03-29T00:00:00Z",
+        "write_blocker_used": false,
+        "examiner_id": "Andres Freund / CISA CVE-2024-3094 response team"
+      }
+    },
+    {
+      "artifact_id": "linux001_02",
+      "evidence_type": "git_forensics",
+      "source_tool": "sift_git_forensics",
+      "timestamp": "2024-02-23T00:00:00Z",
+      "raw_score": 0.73,
+      "prior_trust": 0.94,
+      "provenance_chain": [
+        "sha256:linux001_github_jiat75_profile",
+        "sha256:linux001_commit_log_xz_repo"
+      ],
+      "description": "GitHub account JiaT75 was created on 2022-01-26 with no prior contribution history to any public repository. Over 26 months the account made 214 commits across xz and related projects, progressively escalating privileges from contributor to co-maintainer. Commit timestamp metadata shows timezone inconsistencies incompatible with a single developer natural workflow: burst commits across incompatible timezone windows on the same calendar day. Maintainer access was granted on 2023-10-14, approximately 6 months after a coordinated social pressure campaign began.",
+      "metadata": {
+        "account_created": "2022-01-26",
+        "first_xz_commit": "2022-10-29",
+        "maintainer_access_granted": "2023-10-14",
+        "backdoor_commit_date": "2024-02-23",
+        "total_commits": 214,
+        "timezone_inconsistency_detected": true,
+        "prior_oss_contribution_history": false,
+        "associated_pressure_accounts": [
+          "Jigar Kumar",
+          "Dennis Ens"
+        ],
+        "acquisition_tool": "GitHub public git history — sift_git_forensics",
+        "acquisition_hash": "sha256:linux001_02_github_jiat75_log_20240329",
+        "acquisition_timestamp": "2024-03-29T00:00:00Z",
+        "write_blocker_used": false,
+        "examiner_id": "Andres Freund / CISA CVE-2024-3094 response team"
+      }
+    },
+    {
+      "artifact_id": "linux001_03",
+      "evidence_type": "network_capture",
+      "source_tool": "sift_network_forensics",
+      "timestamp": "2024-03-27T00:00:00Z",
+      "raw_score": 0.72,
+      "prior_trust": 0.86,
+      "provenance_chain": [
+        "sha256:linux001_ssh_latency_measurement"
+      ],
+      "description": "SSH authentication latency on Debian Sid systems with XZ Utils 5.6.0/5.6.1 installed measured at approximately 500ms, compared to a verified 100ms baseline on unaffected systems. Memory profiling via Valgrind on the affected liblzma library produced unexpected errors during SSH operations. The 400ms delta was the sole observable behavioral symptom in production environments. The anomaly was reproducible and traceable to liblzma CPU overhead introduced by the backdoor's RSA key processing during every SSH connection attempt.",
+      "metadata": {
+        "baseline_latency_ms": 100,
+        "observed_latency_ms": 500,
+        "delta_ms": 400,
+        "affected_library": "liblzma (xz-utils 5.6.0 / 5.6.1)",
+        "profiling_tool": "Valgrind",
+        "discovery_date": "2024-03-27",
+        "discoverer": "Andres Freund",
+        "disclosure_channel": "oss-security@openwall.com",
+        "cause": "RSA public key processing on every incoming SSH connection",
+        "acquisition_tool": "Valgrind memory profiler — live system analysis",
+        "acquisition_hash": "sha256:linux001_03_valgrind_latency_20240327",
+        "acquisition_timestamp": "2024-03-27T00:00:00Z",
+        "write_blocker_used": false,
+        "examiner_id": "Andres Freund"
+      }
+    },
+    {
+      "artifact_id": "linux001_04",
+      "evidence_type": "osint",
+      "source_tool": "sift_osint",
+      "timestamp": "2023-04-01T00:00:00Z",
+      "raw_score": 0.85,
+      "prior_trust": 0.78,
+      "provenance_chain": [
+        "sha256:linux001_github_issues_pressure_campaign"
+      ],
+      "description": "GitHub issue analysis reveals a coordinated pressure campaign targeting Lasse Collin, XZ Utils sole maintainer. Accounts Jigar Kumar and Dennis Ens filed repeated issues and comments across multiple months citing Collin's mental health and slow merge velocity as justifications to add JiaT75 as co-maintainer. Both accounts show no other OSS activity outside this specific campaign and were created within a 90-day window of each other. The pressure campaign preceded JiaT75 receiving write access by approximately 6 months.",
+      "metadata": {
+        "pressure_accounts": [
+          "Jigar Kumar",
+          "Dennis Ens"
+        ],
+        "target": "Lasse Collin (xz-utils sole maintainer)",
+        "pressure_start": "2023-04-01",
+        "pressure_vector": "GitHub issues and mailing list posts",
+        "write_access_granted": "2023-10-14",
+        "pressure_accounts_other_oss_activity": false,
+        "accounts_creation_window_days": 90,
+        "acquisition_tool": "GitHub OSINT — public issue and commit history",
+        "acquisition_hash": "sha256:linux001_04_github_osint_20240401",
+        "acquisition_timestamp": "2024-04-01T00:00:00Z",
+        "write_blocker_used": false,
+        "examiner_id": "SentinelOne / Openwall / Datadog security researchers"
+      }
+    },
+    {
+      "artifact_id": "linux001_05",
+      "evidence_type": "malware_static_analysis",
+      "source_tool": "sift_static_analysis",
+      "timestamp": "2024-03-29T00:00:00Z",
+      "raw_score": 0.96,
+      "prior_trust": 0.91,
+      "provenance_chain": [
+        "sha256:linux001_backdoor_payload_static",
+        "sha256:linux001_distribution_check_scripts"
+      ],
+      "description": "Static analysis of the extracted backdoor payload reveals hardcoded distribution targeting: activation scripts contain explicit system checks that restrict payload execution to Debian and Fedora distributions where OpenSSH sshd is patched to link against liblzma via systemd. This specificity (targeting a precise distro + init system + daemon linkage combination) is incompatible with accidental introduction and demonstrates premeditated operational planning against a specific deployment target: internet-facing SSH servers on major Linux distributions.",
+      "metadata": {
+        "targeted_distributions": [
+          "Debian unstable/testing",
+          "Fedora Rawhide"
+        ],
+        "activation_condition": "sshd linked to liblzma via systemd",
+        "architecture": "x86_64 GNU/Linux only",
+        "backdoor_capability": "unauthenticated RCE via SSH with specific Ed448 private key",
+        "obfuscation_method": "build-time extraction from binary test files during tarball build",
+        "git_presence": false,
+        "tarball_presence": true,
+        "acquisition_tool": "Static binary analysis — sift_static_analysis",
+        "acquisition_hash": "sha256:linux001_05_static_analysis_20240329",
+        "acquisition_timestamp": "2024-03-29T00:00:00Z",
+        "write_blocker_used": false,
+        "examiner_id": "CISA CVE-2024-3094 response team"
+      }
+    }
+  ],
+  "temporal_violations": [
+    {
+      "type": "PROVENANCE_BIFURCATION",
+      "description": "XZ Utils 5.6.0 distributed tarball and git repository tree at the same version tag carry divergent content. Build artifacts must be deterministically derived from version-controlled source. Any hash divergence at identical version identifiers constitutes a provenance chain break indicating deliberate out-of-band payload injection into the distribution channel.",
+      "severity": 0.98,
+      "delta_seconds": 0,
+      "cause": {
+        "artifact_id": "linux001_05",
+        "mechanism": "build-to-host.m4 extracts payload from test binary files during tarball build"
+      },
+      "effect": {
+        "artifact_id": "linux001_01",
+        "observable": "tarball SHA-256 != git tree SHA-256 at same version tag"
+      }
+    }
+  ],
+  "caie_fractures": [
+    {
+      "fracture_type": "SUPPLY_CHAIN_INJECTION",
+      "severity": 0.98,
+      "interpretation": "The distribution tarball was weaponized as an injection point independent of version control. The backdoor bypasses all git-based code review processes because it is injected at build time from binary test files, not from readable source. Any organization relying solely on git history review to audit upstream dependencies is blind to this class of attack.",
+      "artifact_a": "linux001_01",
+      "artifact_b": "linux001_05",
+      "ttp_id": "T1195.001"
+    },
+    {
+      "fracture_type": "IDENTITY_CONSTRUCTION_OPERATION",
+      "severity": 0.89,
+      "interpretation": "GitHub account JiaT75 exhibits all characteristics of a purpose-built operational identity: zero prior OSS history, manufactured social proof via coordinated pressure accounts, timezone metadata inconsistencies, and a 26-month progressive privilege escalation pattern culminating in backdoor insertion. The identity was a tool, not a person.",
+      "artifact_a": "linux001_02",
+      "artifact_b": "linux001_04",
+      "ttp_id": "T1078"
+    }
+  ],
+  "peirce_expected": {
+    "firstness": "XZ Utils tarball contains binary payload absent from the git source at the same version tag. Build script is modified to extract and link the payload during the build process. SSH latency anomaly is the only observable behavioral symptom in production.",
+    "secondness": "GitHub account JiaT75 was created 26 months prior with no OSS history, gained maintainer trust through a coordinated social pressure campaign using fake accounts, and executed the backdoor commit immediately after obtaining write access. Payload targets only Debian/Fedora + systemd-linked sshd configurations.",
+    "thirdness": "A highly resourced actor executed a multi-year identity construction and trust infiltration operation against critical Linux supply chain infrastructure. The surgical targeting of a specific distro+init+daemon combination, combined with the 26-month patience and the false identity apparatus, indicates a state-level or state-directed adversary with a specific strategic objective: persistent unauthenticated access to internet-facing SSH servers at scale."
+  },
+  "devil_advocate": "JiaT75 is a legitimate open source contributor whose build script modifications introduced an unintended side effect from a performance optimization experiment. The payload embedded in test files is a corrupted test artifact, not a deliberate backdoor. The 500ms latency is an unrelated performance regression.",
+  "expected_mitre_ttps": [
+    "T1195.001",
+    "T1554",
+    "T1036",
+    "T1078",
+    "T1566",
+    "T1027"
+  ],
+  "source_dataset": "XZ Utils Backdoor — CVE-2024-3094 Public Incident Record",
+  "source_origin": "public_incident_report",
+  "source_url": "https://openwall.com/lists/oss-security/2024/03/29/4",
+  "notes": "POST-HACKATHON — Linux corpus expansion. This case tests VIGÍA detection of supply chain attacks where the injection point is the distribution channel, not version-controlled source. Key semiotics: the tarball/git divergence is a PROVENANCE fracture, not a temporal one. The 26-month patience pattern is the clearest THIRDNESS signal.",
+  "_consolidation": {
+    "consolidated_at": "2026-06-26T00:00:00Z",
+    "parser_version": "2.4",
+    "schema_version": "1.1",
+    "source_file": "VIGIA-LINUX-CORPUS.json",
+    "source_origin": "public_incident_report",
+    "corpus_tag": "POST-HACKATHON"
+  },
+  "schema_version": "1.1"
+}

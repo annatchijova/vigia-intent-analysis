@@ -1,0 +1,161 @@
+{
+  "case_id": "VIGIA-LINUX-002",
+  "case_name": "Open Source Contributor — False Positive Test (libarchive CVE Fix)",
+  "description": "Developer Alex Torres (GitHub: atorres-dev) submits a security patch to the libarchive project fixing a path traversal vulnerability. The contribution was explicitly solicited by a project maintainer via a public GitHub issue. All code changes are present in the git repository with no tarball divergence. The patch was reviewed and approved by three independent maintainers before merge. The surface-level profile — new contributor, modifying a widely-deployed system library — may trigger pattern-matching against the XZ Utils incident. This case tests whether VIGÍA can distinguish the absence of supply chain attack indicators from their presence.",
+  "abstention_risk": "low",
+  "expected_verdict": "NOISE",
+  "carnegie_pattern_expected": null,
+  "confidence_expected": 84,
+  "artifacts": [
+    {
+      "artifact_id": "linux002_01",
+      "evidence_type": "git_forensics",
+      "source_tool": "sift_git_forensics",
+      "timestamp": "2024-06-15T10:22:00Z",
+      "raw_score": 0.27,
+      "prior_trust": 0.94,
+      "provenance_chain": [
+        "sha256:linux002_github_atorres_profile",
+        "sha256:linux002_commit_log_libarchive"
+      ],
+      "description": "GitHub account atorres-dev was created 8 months prior to contribution with 3 prior commits to unrelated projects (a Python linting tool and a documentation fix). The account has no prior history with security-critical system libraries. The contribution was made in direct response to GitHub Issue #2041 filed by maintainer Tim Kientzle asking for help with a known path traversal edge case. The contributor's commit timezone (America/Argentina/Buenos_Aires, UTC-3) is consistent across all prior commits with no anomalous burst patterns.",
+      "metadata": {
+        "account_created_months_prior": 8,
+        "prior_commits": 3,
+        "prior_commits_security_critical": false,
+        "contribution_solicited_by_maintainer": true,
+        "solicitation_issue": "#2041",
+        "timezone_consistent": true,
+        "timezone_anomaly": false,
+        "associated_pressure_accounts": [],
+        "acquisition_tool": "VIGIA synthetic case generator v2.4",
+        "acquisition_hash": "sha256:linux002_01_synthetic_20260626",
+        "acquisition_timestamp": "2026-06-26T00:00:00Z",
+        "write_blocker_used": false,
+        "examiner_id": "VIGIA Collective — POST-HACKATHON synthetic corpus"
+      }
+    },
+    {
+      "artifact_id": "linux002_02",
+      "evidence_type": "git_forensics",
+      "source_tool": "sift_git_forensics",
+      "timestamp": "2024-06-15T10:22:00Z",
+      "raw_score": 0.05,
+      "prior_trust": 0.97,
+      "provenance_chain": [
+        "sha256:linux002_tarball_3_7_5",
+        "sha256:linux002_git_tree_3_7_5"
+      ],
+      "description": "Binary comparison between libarchive 3.7.5 distributed tarball and git repository tree at the same version tag confirms hash equivalence: tarball content is deterministically derived from version-controlled source with no divergence. Build scripts are unmodified. No binary artifacts are embedded in test files. This is the expected state for an uncompromised distribution.",
+      "metadata": {
+        "tarball_git_hash_match": true,
+        "build_scripts_modified": false,
+        "binary_test_files_anomalous": false,
+        "payload_embedded": false,
+        "distribution_checks_in_code": false,
+        "acquisition_tool": "VIGIA synthetic case generator v2.4",
+        "acquisition_hash": "sha256:linux002_02_synthetic_20260626",
+        "acquisition_timestamp": "2026-06-26T00:00:00Z",
+        "write_blocker_used": false,
+        "examiner_id": "VIGIA Collective — POST-HACKATHON synthetic corpus"
+      }
+    },
+    {
+      "artifact_id": "linux002_03",
+      "evidence_type": "osint",
+      "source_tool": "sift_osint",
+      "timestamp": "2024-06-17T14:00:00Z",
+      "raw_score": 0.05,
+      "prior_trust": 0.95,
+      "provenance_chain": [
+        "sha256:linux002_code_review_thread"
+      ],
+      "description": "Code review for the submitted patch involved three independent maintainers (Tim Kientzle, Martin Matuska, and Michihiro NAKAJIMA) over a 48-hour window. Review thread contains substantive technical discussion of the patch logic, alternative approaches considered, and two rounds of requested revisions. No rubber-stamp approval. All reviewer accounts have multi-year OSS contribution histories predating this interaction. No auxiliary accounts participated in the review.",
+      "metadata": {
+        "reviewer_count": 3,
+        "review_duration_hours": 48,
+        "revision_rounds": 2,
+        "reviewers_with_established_history": true,
+        "rubber_stamp_approval": false,
+        "auxiliary_pressure_accounts": false,
+        "acquisition_tool": "VIGIA synthetic case generator v2.4",
+        "acquisition_hash": "sha256:linux002_03_synthetic_20260626",
+        "acquisition_timestamp": "2026-06-26T00:00:00Z",
+        "write_blocker_used": false,
+        "examiner_id": "VIGIA Collective — POST-HACKATHON synthetic corpus"
+      }
+    },
+    {
+      "artifact_id": "linux002_04",
+      "evidence_type": "malware_static_analysis",
+      "source_tool": "sift_static_analysis",
+      "timestamp": "2024-06-15T10:22:00Z",
+      "raw_score": 0.04,
+      "prior_trust": 0.93,
+      "provenance_chain": [
+        "sha256:linux002_patch_diff"
+      ],
+      "description": "Static analysis of the submitted patch: 47 lines changed across 2 files (archive_read_support_format_tar.c and test_read_format_tar.c). The change removes a vulnerable code path that allowed path traversal via crafted archive entries. No new network calls, no new file execution paths, no build system modifications, no external dependencies introduced. The patch decreases the exploitable attack surface. No obfuscated logic, no dormant code branches, no timing-sensitive conditions.",
+      "metadata": {
+        "lines_changed": 47,
+        "files_modified": 2,
+        "new_network_calls": false,
+        "new_execution_paths": false,
+        "build_system_modified": false,
+        "external_dependencies_added": false,
+        "obfuscated_logic": false,
+        "attack_surface_delta": "decrease",
+        "acquisition_tool": "VIGIA synthetic case generator v2.4",
+        "acquisition_hash": "sha256:linux002_04_synthetic_20260626",
+        "acquisition_timestamp": "2026-06-26T00:00:00Z",
+        "write_blocker_used": false,
+        "examiner_id": "VIGIA Collective — POST-HACKATHON synthetic corpus"
+      }
+    },
+    {
+      "artifact_id": "linux002_05",
+      "evidence_type": "osint",
+      "source_tool": "sift_osint",
+      "timestamp": "2024-06-14T09:00:00Z",
+      "raw_score": 0.05,
+      "prior_trust": 0.95,
+      "provenance_chain": [
+        "sha256:linux002_maintainer_invitation"
+      ],
+      "description": "Public GitHub Issue #2041 by Tim Kientzle (libarchive maintainer since 2007): 'Looking for help fixing the path traversal edge case in the TAR reader — reproducible with the attached corpus file. Patch welcome.' Filed 24 hours before atorres-dev submitted the pull request. No coordinated accounts participated in the issue thread. The invitation is unprompted by atorres-dev and predates any contact from the contributor.",
+      "metadata": {
+        "maintainer_invitation": true,
+        "maintainer_account_age_years": 17,
+        "invitation_predates_pr_hours": 24,
+        "contributor_contact_prior_to_invitation": false,
+        "coordinated_accounts_in_thread": false,
+        "acquisition_tool": "VIGIA synthetic case generator v2.4",
+        "acquisition_hash": "sha256:linux002_05_synthetic_20260626",
+        "acquisition_timestamp": "2026-06-26T00:00:00Z",
+        "write_blocker_used": false,
+        "examiner_id": "VIGIA Collective — POST-HACKATHON synthetic corpus"
+      }
+    }
+  ],
+  "peirce_expected": {
+    "firstness": "New contributor with limited OSS history submits a patch to a widely-deployed system library shortly after a security issue was publicly filed. Surface pattern resembles early-phase supply chain infiltration.",
+    "secondness": "Tarball and git source are hash-equivalent (no divergence). Contribution was explicitly solicited by the maintainer. Code review was substantive, multi-reviewer, and resulted in revision requests. Patch reduces attack surface with no new execution paths or build system modifications.",
+    "thirdness": "All distinguishing indicators of supply chain attack are absent: no tarball/git divergence, no social pressure campaign, no fabricated identity pattern, no build system modification, explicit maintainer invitation. The contributor is a developer responding to a public request for help, not an adversary building operational trust."
+  },
+  "devil_advocate": "Alex Torres could be executing the XZ pattern at the trust-building phase — deliberately making benign contributions to establish credibility before a future malicious commit. The absence of current malicious activity is not proof of benign intent.",
+  "devil_refutation": "The devil's hypothesis requires unverifiable future intent with no present indicators. The XZ operation's distinguishing features — tarball/git divergence, build system modification, coordinated fake pressure accounts, timezone anomalies, zero prior OSS history — are ALL absent. Ockham cost: the supply chain infiltration hypothesis requires multiple unverified future steps with no present evidence; the legitimate contributor hypothesis requires no additional assumptions. The patch reduces attack surface; a future-malicious actor would not do this, as it eliminates a potential future exploitation vector.",
+  "why_not_malice": "All code changes are present in the git repository with no tarball divergence. The contribution was explicitly solicited by an established maintainer via a public issue. Code review was substantive and multi-reviewer with revision rounds. The patch reduces attack surface. No build system modifications. No pressure accounts. No timezone anomalies. No prior-zero OSS history (3 prior commits exist). The absence of every XZ-class indicator is itself meaningful evidence.",
+  "expected_mitre_ttps": [],
+  "source_dataset": "VIGÍA Synthetic Corpus — Linux False Positive Suite",
+  "source_origin": "synthetic_vigia_collective",
+  "notes": "POST-HACKATHON — Linux corpus expansion. This case is the paired NOISE counterpart to VIGIA-LINUX-001. It tests VIGÍA's ability to distinguish new-contributor + system-library patterns from actual supply chain attacks. The key discriminator is the tarball/git divergence check and the absence of pressure account infrastructure.",
+  "_consolidation": {
+    "consolidated_at": "2026-06-26T00:00:00Z",
+    "parser_version": "2.4",
+    "schema_version": "1.1",
+    "source_file": "VIGIA-LINUX-CORPUS.json",
+    "source_origin": "synthetic_vigia_collective",
+    "corpus_tag": "POST-HACKATHON"
+  },
+  "schema_version": "1.1"
+}
