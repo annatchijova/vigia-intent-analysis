@@ -398,7 +398,7 @@ def _vigia_score(case: dict) -> dict:
     provenance = case.get("provenance_analysis", {})
 
     if not artifacts:
-        return {"verdict": "ERROR", "score": 0.0, "confidence": 0.0, "fractures": []}
+        return {"verdict": "ERROR", "score": 0.0, "confidence": 0.0, "fractures": [], "error": "No artifacts provided — cannot evaluate intentionality without evidence"}
 
     # -----------------------------------------------------------------------
     # B1: Live CAIE — recompute fractures from artifacts
