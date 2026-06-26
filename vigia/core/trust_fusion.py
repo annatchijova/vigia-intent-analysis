@@ -419,7 +419,7 @@ async def trust_fusion_analysis(
             # Claude Code puede pasar: {indicator, value, confidence, weight}
             # CAIE espera:             {artifact_id, evidence_type, prior_trust, ...}
             if "indicator" in art_dict and "artifact_id" not in art_dict:
-                art_dict["artifact_id"] = f"mcp_{i}_{hashlib.sha256(str(sorted(art_dict.items())).encode()).hexdigest()[:4]}"
+                art_dict["artifact_id"] = f"mcp_{i}_{hashlib.sha256(json.dumps(art_dict, sort_keys=True, default=str).encode()).hexdigest()[:4]}"
             if "confidence" in art_dict and "prior_trust" not in art_dict:
                 art_dict["prior_trust"] = float(art_dict["confidence"])
             if "evidence_type" not in art_dict:
@@ -427,7 +427,7 @@ async def trust_fusion_analysis(
             if "source_tool" not in art_dict:
                 art_dict["source_tool"] = art_dict.get("label", "mcp_caller")
             if "artifact_id" not in art_dict:
-                art_dict["artifact_id"] = f"artifact_{i}_{hashlib.sha256(str(sorted(art_dict.items())).encode()).hexdigest()[:4]}"
+                art_dict["artifact_id"] = f"artifact_{i}_{hashlib.sha256(json.dumps(art_dict, sort_keys=True, default=str).encode()).hexdigest()[:4]}"
 
             if violations:
                 factor = TrustFusionEngine.compute_temporal_trust_factor(violations, art_dict["artifact_id"])

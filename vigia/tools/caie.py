@@ -631,6 +631,17 @@ class Artifact:
                 ),
             )
 
+        # Normalize metadata keys: strip whitespace and NFKC-fold Unicode
+        # Prevents invisible characters (ZWSP, NBSP, cyrillic lookalikes) from
+        # bypassing field detection in _extract_assertions().
+        # B-016 fix: 'dst_ip\u200b' was silently treated as unknown field.
+        import unicodedata
+        if self.metadata:
+            self.metadata = {
+                unicodedata.normalize("NFKC", k).strip().strip("\u200b\u200c\u200d\u200e\u200f\ufeff\u2060"): v
+                for k, v in self.metadata.items()
+            }
+
     @property
     def profile(self) -> EvidenceProfile:
         return EVIDENCE_PROFILES.get(
