@@ -140,13 +140,15 @@ def enforce_fraction(value: Any, context: str = "unknown") -> Fraction:
     Barrera de entrada: TODO score computado DEBE ser Fraction.
     Falla con AssertionError detallado si se detecta float.
     """
-    assert not isinstance(value, float), (
-        f"INVARIANTE 1 VIOLADA en '{context}':"
-        f"  Se detectó float: {repr(value)}"
-        f"  Todo cálculo de score DEBE usar Fraction(numerador, denominador)"
-        f"  Corrección: Fraction({value}).limit_denominator(10**9)"
-        f"  Fundamento: Daubert requiere reproducibilidad exacta."
-    )
+    if isinstance(value, float):
+        raise ValueError(
+            f"INVARIANTE 1 VIOLADA en '{context}':"
+            f"  Se detectó float: {repr(value)}"
+            f"  Todo cálculo de score DEBE usar Fraction(numerador, denominador)"
+            f"  Corrección: Fraction({value}).limit_denominator(10**9)"
+            f"  Fundamento: Daubert requiere reproducibilidad exacta."
+            f"  (guard activo aunque python -O esté habilitado)"
+        )
     try:
         if isinstance(value, Fraction):
             return value
