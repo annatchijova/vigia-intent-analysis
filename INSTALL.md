@@ -4,7 +4,25 @@
 
 ---
 
-## Prerequisites
+## macOS / Windows — recommended path: Docker
+
+Native installation on macOS requires system libraries that are not available
+via pip alone. The recommended path on macOS and Windows is Docker Desktop:
+
+```bash
+docker pull ghcr.io/annatchijova/vigia-intent-analysis:latest
+```
+
+> **Native macOS prerequisite (if you prefer not to use Docker):**
+> `python-magic` requires `libmagic`, which is not bundled with macOS.
+> Install it before running `pip install -e .`:
+> ```bash
+> brew install libmagic
+> ```
+
+---
+
+## Prerequisites (Linux)
 
 ```bash
 python3 --version   # 3.10 or higher
