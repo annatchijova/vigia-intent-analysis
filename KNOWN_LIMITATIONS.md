@@ -1193,3 +1193,41 @@ because it separates the two reasoning modes rather than blending them.
 design question)
 
 ---
+
+## L-030 — Two Distinct Bundle Sealing Paths Produce Incomparable bundle_hash Values
+
+**Status:** [DOCUMENTED] 2026-06-26, POST HACKATHON — architectural distinction, not a bug
+
+**Description:**
+
+VIGÍA has two legitimate bundle sealing paths that produce structurally different
+bundles, both containing a `bundle_hash` field:
+
+1. **Lightweight CLI bundle** (`vigia/core/bundle_builder.py::build_bundle()`):
+   Seals scorer output for standalone use, junior analysts, and chatbot integration
+   (OpenWebUI/Ollama). Input: dict from `_vigia_score()`. Contains: verdict,
+   score, CAIE fractures, peirce_chain, quadripartite_state.
+
+2. **Full forensic bundle** (`vigia/models/ebs.py::ForensicBundle.seal()`):
+   Seals the complete pipeline output for SIFT integration. Input: ForensicBundle
+   object with evidence_graph, decision_trace, policy_spec, system_state,
+   abduction_trace. Covers significantly more content.
+
+The two `bundle_hash` values are **not comparable** — they are computed over
+different content and represent different forensic artifacts. This is intentional
+and correct: the two paths serve different audiences and integration contexts.
+
+**What is missing:**
+
+A `bundle_schema_version` or `bundle_type` field (e.g. `"scorer_standalone"` vs
+`"pipeline_full"`) that allows a recipient to identify which sealing contract
+applies without reading the full bundle structure.
+
+**Not a bug.** Do not unify the two paths — they serve different purposes.
+The fix, when desired, is to add a `bundle_type` discriminator field to both
+schemas so consumers can distinguish them unambiguously.
+
+**See also:** #8 from the post-hackathon coverage report (CLI vs API hash
+divergence, confirmed 2026-06-23).
+
+---
