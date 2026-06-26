@@ -417,7 +417,7 @@ Migración debe ser auditada por el colectivo antes de aplicar.
 
 | Campo | Valor |
 |-------|-------|
-| **Estado** | ABIERTO |
+| **Estado** | RESUELTO — commit 9c7d923 |
 | **Severidad** | P1 — guard Daubert desaparece en modo optimizado |
 | **Archivo** | `vigia/inference/abductive_reasoner_v2.py` |
 | **Línea** | 143 |
@@ -455,7 +455,7 @@ if isinstance(value, float):
 
 | Campo | Valor |
 |-------|-------|
-| **Estado** | ABIERTO |
+| **Estado** | RESUELTO — commit 9c7d923 |
 | **Severidad** | P2 — función de verificación, no path de scoring |
 | **Archivo** | `vigia/tools/caie.py` |
 | **Líneas** | 2239, 2242, 2248 |
@@ -539,7 +539,7 @@ de cuán confiable sea el log". La fuerza del hallazgo se modula por severity
 
 | Campo | Valor |
 |-------|-------|
-| **Estado** | ABIERTO |
+| **Estado** | RESUELTO — commit 41908e4 (reserved IP filter in _extract_assertions) |
 | **Severidad** | P1 — falso positivo garantizado, Daubert-indefendible |
 | **Archivo** | `vigia/tools/caie.py` — `_extract_assertions()` |
 | **Detectado en** | Sesión post-hackathon 2026-06-25, property-testing |
@@ -576,7 +576,7 @@ Agregar lista de IPs/rangos reservados que no constituyen "conexión saliente":
 
 | Campo | Valor |
 |-------|-------|
-| **Estado** | ABIERTO |
+| **Estado** | RESUELTO — commit 3607cc7 (PID str().strip(), IP type validation) |
 | **Severidad** | P1 — rompe correlación PID y dispara fractura con IPs malformadas |
 | **Archivo** | `vigia/tools/caie.py` — `_extract_assertions()`, PID canonicalization |
 | **Detectado en** | Sesión post-hackathon 2026-06-25, adversarial fuzzing |
