@@ -1,0 +1,249 @@
+{
+  "analysis_timestamp": "2026-06-25T20:53:22.378806+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "VIGIA-REAL-SRL-DC-MEMORY",
+    "end_time": "2026-06-25T20:53:22.378811+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "VIGIA-REAL-SRL-DC-MEMORY",
+        "entry_sha256": "f79196ad9b7f7188cb7ba355595c4a7d8f4fc835c9715daf620d03b94818a137",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "VIGIA-REAL-SRL-DC-MEMORY"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: 95ef6739e4df7cf2...",
+        "outputs_summary": {
+          "agent_sha256": "95ef6739e4df7cf28eef26e5338c0708c50348077baeca29d899806d950da740",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-06-25T20:53:22.375920+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-REAL-SRL-DC-MEMORY",
+        "entry_sha256": "3889c556de96270b905a0e9df7555207e85388a3739653c48bb4d3d0d7585edb",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-REAL-SRL-DC-MEMORY.json"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-06-25T20:53:22.376013+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-REAL-SRL-DC-MEMORY",
+        "entry_sha256": "5e42980cae2cd3a3fefa7197bc263e197dd1ed6acd77ec7750705d6a7cd63800",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-REAL-SRL-DC-MEMORY.json"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: 5d0fa9a6fbecb18f...",
+        "outputs_summary": {
+          "sha256": "5d0fa9a6fbecb18f885e1cb7ca82ea18d0bedfc83356dcfd1551f211e4a75185"
+        },
+        "seq": 3,
+        "timestamp": "2026-06-25T20:53:22.376105+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "VIGIA-REAL-SRL-DC-MEMORY",
+        "entry_sha256": "c2956b1c7f9b237219d9d7482af376ce4777145511028eb61142caca58df7743",
+        "inputs_summary": {
+          "evidence": "/home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-REAL-SRL-DC-MEMORY.json",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-06-25T20:53:22.376217+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "VIGIA-REAL-SRL-DC-MEMORY",
+        "entry_sha256": "6da1b0ee6a8f4d19a69c9fce29faadcaa8aa3d372935a67af2fd85de445e4092",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 3 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "NO_SEMIOTIC_ANOMALY_DETECTED",
+            "best_posterior": "2817/50000",
+            "confidence": "2817/50000",
+            "is_conclusive": "False",
+            "narrative": "SRL-2018 compromised enterprise network. Domain Controller (172.16.4.4) memory dump (5 GB, 2018-09-07). Evidence SHA-256: 29da4caf98856751dd2f271bf833a0d53aa7c43025d2b99cb33c7e8d3655321f. DC serving K..."
+          },
+          "case_id": "VIGIA-REAL-SRL-DC-MEMORY",
+          "pipeline_meta": {
+            "artifact_count": "3",
+            "avg_score": "2817/10000",
+            "expected_verdict": "UNKNOWN",
+            "source": "ebs_v1_json_adapter"
+          },
+          "signals": [
+            {
+              "artifact_id": "ART-001",
+              "confidence": "18/25",
+              "description": "DC (172.16.4.4) serving LDAP port 389 and Global Catalog port 3268 to 172.16.4.6 (ESTABLISHED). Kerberos port 88 active via lsass PID 660. 172.16.4.6 is an unidentified internal host with multiple sim",
+              "evidence_type": "network_flow",
+              "source": "Volatility3/netscan",
+              "z_score": "261/625"
+            },
+            {
+              "artifact_id": "ART-002",
+              "confidence": "3/4",
+              "description": "lsass.exe (PID 660) malfind analysis COMPLETE: CLEAN. No PAGE_EXECUTE_READWRITE regions in lsass. No evidence of direct credential dumping via memory injection (Mimikatz/procdump). DC was not targeted",
+              "evidence_type": "memory_process",
+              "source": "Volatility3/malfind",
+              "z_score": "27/80"
+            },
+            {
+              "artifact_id": "ART-003",
+              "confidence": "9/10",
+              "description": "Windows x64 Domain Controller. Vol3 profile identified successfully.",
+              "evidence_type": "log_entry",
+              "source": "Volatility3/windows.info",
+              "z_score": "9/100"
+            }
+          ]
+        },
+        "seq": 5,
+        "timestamp": "2026-06-25T20:53:22.378461+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "VIGIA-REAL-SRL-DC-MEMORY",
+        "entry_sha256": "a1da136ea61a274488fc594b351cce0d8e572cab8328165930792b2fe3eda3cb",
+        "inputs_summary": {
+          "n_signals": "3"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-06-25T20:53:22.378564+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "VIGIA-REAL-SRL-DC-MEMORY",
+        "entry_sha256": "0fe13304033f2b9399c32d83728b6833d0d6b27570b22810e2d1b39aa4aabe13",
+        "inputs_summary": {
+          "verdict": "NO_SEMIOTIC_ANOMALY_DETECTED"
+        },
+        "iteration": 0,
+        "note": "Exit code 0 \u2014 analysis complete.",
+        "outputs_summary": {
+          "exit_code": "0"
+        },
+        "seq": 7,
+        "timestamp": "2026-06-25T20:53:22.378726+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-06-25T20:53:22.375681+00:00",
+    "total_entries": 7
+  },
+  "case_id": "VIGIA-REAL-SRL-DC-MEMORY",
+  "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-REAL-SRL-DC-MEMORY.json",
+  "evidence_sha256": "5d0fa9a6fbecb18f885e1cb7ca82ea18d0bedfc83356dcfd1551f211e4a75185",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-REAL-SRL-DC-MEMORY ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-REAL-SRL-DC-MEMORY.json\nEvidence SHA-256: 5d0fa9a6fbecb18f885e1cb7ca82ea18d0bedfc83356dcfd1551f211e4a75185\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: NO_SEMIOTIC_ANOMALY_DETECTED\nPosterior confidence: 2817/50000\nConclusive: NO \u2014 requires human review\n\n--- PEIRCEAN NARRATIVE ---\nSRL-2018 compromised enterprise network. Domain Controller (172.16.4.4) memory dump (5 GB, 2018-09-07). Evidence SHA-256: 29da4caf98856751dd2f271bf833a0d53aa7c43025d2b99cb33c7e8d3655321f. DC serving Kerberos (88), LDAP (389), Global Catalog (3268). Host 172.16.4.6 has active ESTABLISHED connections to LDAP and GC \u2014 consistent with legitimate domain queries OR with a compromised host performing LDAP reconnaissance / DCSync preparation. lsass injection pending malfind analysis. NOTE: DC memory alo\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [DC (172.16.4.4) serving LDAP port 389 and Global Catalog port 3268 to ] z=0.418 conf=0.72 \u2014 \n  [lsass.exe (PID 660) malfind analysis COMPLETE: CLEAN. No PAGE_EXECUTE_] z=0.338 conf=0.75 \u2014 \n  [Windows x64 Domain Controller. Vol3 profile identified successfully.] z=0.090 conf=0.90 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW \u2014 No significant anomalies detected in this iteration.\n\nCritical signals (z>3): 0\nHigh signals (2<z<=3): 0\nTotal signals analyzed: 3",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "NO_SEMIOTIC_ANOMALY_DETECTED",
+      "best_posterior": "2817/50000",
+      "confidence": {
+        "__fraction__": true,
+        "den": 50000,
+        "num": 2817
+      },
+      "is_conclusive": false,
+      "narrative": "SRL-2018 compromised enterprise network. Domain Controller (172.16.4.4) memory dump (5 GB, 2018-09-07). Evidence SHA-256: 29da4caf98856751dd2f271bf833a0d53aa7c43025d2b99cb33c7e8d3655321f. DC serving Kerberos (88), LDAP (389), Global Catalog (3268). Host 172.16.4.6 has active ESTABLISHED connections to LDAP and GC \u2014 consistent with legitimate domain queries OR with a compromised host performing LDAP reconnaissance / DCSync preparation. lsass injection pending malfind analysis. NOTE: DC memory alo"
+    },
+    "case_id": "VIGIA-REAL-SRL-DC-MEMORY",
+    "pipeline_meta": {
+      "artifact_count": 3,
+      "avg_score": "2817/10000",
+      "expected_verdict": "UNKNOWN",
+      "source": "ebs_v1_json_adapter"
+    },
+    "signals": [
+      {
+        "artifact_id": "ART-001",
+        "confidence": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 18
+        },
+        "description": "DC (172.16.4.4) serving LDAP port 389 and Global Catalog port 3268 to 172.16.4.6 (ESTABLISHED). Kerberos port 88 active via lsass PID 660. 172.16.4.6 is an unidentified internal host with multiple sim",
+        "evidence_type": "network_flow",
+        "source": "Volatility3/netscan",
+        "z_score": {
+          "__fraction__": true,
+          "den": 625,
+          "num": 261
+        }
+      },
+      {
+        "artifact_id": "ART-002",
+        "confidence": {
+          "__fraction__": true,
+          "den": 4,
+          "num": 3
+        },
+        "description": "lsass.exe (PID 660) malfind analysis COMPLETE: CLEAN. No PAGE_EXECUTE_READWRITE regions in lsass. No evidence of direct credential dumping via memory injection (Mimikatz/procdump). DC was not targeted",
+        "evidence_type": "memory_process",
+        "source": "Volatility3/malfind",
+        "z_score": {
+          "__fraction__": true,
+          "den": 80,
+          "num": 27
+        }
+      },
+      {
+        "artifact_id": "ART-003",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 9
+        },
+        "description": "Windows x64 Domain Controller. Vol3 profile identified successfully.",
+        "evidence_type": "log_entry",
+        "source": "Volatility3/windows.info",
+        "z_score": {
+          "__fraction__": true,
+          "den": 100,
+          "num": 9
+        }
+      }
+    ]
+  },
+  "sans_compliance": {
+    "accuracy_validation": false,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}

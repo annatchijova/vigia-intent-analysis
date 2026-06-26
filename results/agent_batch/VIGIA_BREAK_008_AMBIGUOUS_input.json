@@ -1,0 +1,22 @@
+{
+  "case_id": "VIGIA_BREAK_008_AMBIGUOUS",
+  "description": "Caso 50/50",
+  "artifacts": [
+    {
+      "id": "a",
+      "type": "log",
+      "content": "suspicious but explainable"
+    },
+    {
+      "id": "b",
+      "type": "context",
+      "content": "possible benign explanation"
+    }
+  ],
+  "expected": {
+    "confidence_range": [
+      0.4,
+      0.6
+    ]
+  }
+}

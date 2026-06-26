@@ -1,0 +1,273 @@
+{
+  "analysis_timestamp": "2026-06-25T20:53:20.833798+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "case_003_false_flag",
+    "end_time": "2026-06-25T20:53:20.833802+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "case_003_false_flag",
+        "entry_sha256": "43fafdca35e5918b1278006ee29b283d5f7b03d0c4b049720545ef4ccbf1d3a1",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "case_003_false_flag"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: 95ef6739e4df7cf2...",
+        "outputs_summary": {
+          "agent_sha256": "95ef6739e4df7cf28eef26e5338c0708c50348077baeca29d899806d950da740",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-06-25T20:53:20.830433+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "case_003_false_flag",
+        "entry_sha256": "64ab56ebce81ff08e7617e684c8f6086c85551333fd3eda6f16c45db5cdfe0c4",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/case_003_false_flag.json"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-06-25T20:53:20.830521+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "case_003_false_flag",
+        "entry_sha256": "3d7acd60b6e72540c98ea9b4e224d083eae31c6d2694838c1f3d4a299adf7f03",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/case_003_false_flag.json"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: d41e816d0c274249...",
+        "outputs_summary": {
+          "sha256": "d41e816d0c274249d80c5480316579c45f71e41c74ccc3745b8f150567416701"
+        },
+        "seq": 3,
+        "timestamp": "2026-06-25T20:53:20.830612+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "case_003_false_flag",
+        "entry_sha256": "361a8705daa06cb30d7fadf02a2e80c9f6e6c0bcd662d47139deedb3454a7092",
+        "inputs_summary": {
+          "evidence": "/home/labestiadevigia/vigia-repo/data/cases/case_003_false_flag.json",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-06-25T20:53:20.830728+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "case_003_false_flag",
+        "entry_sha256": "cf4ffb080f7f7eecdd4189704ecf07a36010b946f1431518e389549d28abd2e0",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 3 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+            "best_posterior": "238/1875",
+            "confidence": "238/1875",
+            "is_conclusive": "True",
+            "narrative": "A real compromise: process hollowing and credential dumping confirmed in memory (hard-to-fake structural evidence). On top of the real attack, the operator planted Cyrillic strings whose profile contr..."
+          },
+          "case_id": "case_003_false_flag",
+          "pipeline_meta": {
+            "artifact_count": "3",
+            "avg_score": "238/375",
+            "expected_verdict": "MALICE",
+            "source": "ebs_v1_json_adapter"
+          },
+          "signals": [
+            {
+              "artifact_id": "tech_real_001",
+              "confidence": "19/20",
+              "description": "Process hollowing in svchost.exe confirmed in memory (T1055.012). Reflective DLL injection detected. Hard-to-fake structural evidence of a real intrusion.",
+              "evidence_type": "memory_process",
+              "source": "list_processes",
+              "z_score": "209/250"
+            },
+            {
+              "artifact_id": "tech_real_002",
+              "confidence": "19/20",
+              "description": "LSASS credential dumping detected (T1003.001). Active compromise confirmed.",
+              "evidence_type": "lsass_session",
+              "source": "list_processes",
+              "z_score": "399/500"
+            },
+            {
+              "artifact_id": "cultural_planted_001",
+              "confidence": "3/10",
+              "description": "Cyrillic strings injected into the dropper: suspiciously pristine, inconsistent with the actor's actual toolchain and OPSEC. Attribution markers contradict the observed technical TTP profile. Placemen",
+              "evidence_type": "cultural_marker",
+              "source": "infer_intent",
+              "z_score": "27/100"
+            }
+          ]
+        },
+        "seq": 5,
+        "timestamp": "2026-06-25T20:53:20.833067+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "case_003_false_flag",
+        "entry_sha256": "979dda029a0da80d6dc72097f4ae205542e86b57707b44b552c1f063b0a7d72f",
+        "inputs_summary": {
+          "n_signals": "3"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-06-25T20:53:20.833170+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "case_003_false_flag",
+        "entry_sha256": "8c0358497d57331f88079259c0ac63907277654d4036e72be22a8a313ccf65d6",
+        "inputs_summary": {
+          "verdict": "MALICIOUS_INTENT_DETECTED"
+        },
+        "iteration": 0,
+        "note": "Exit code 1 \u2014 analysis complete.",
+        "outputs_summary": {
+          "exit_code": "1"
+        },
+        "seq": 7,
+        "timestamp": "2026-06-25T20:53:20.833320+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-06-25T20:53:20.830193+00:00",
+    "total_entries": 7
+  },
+  "case_id": "case_003_false_flag",
+  "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/case_003_false_flag.json",
+  "evidence_sha256": "d41e816d0c274249d80c5480316579c45f71e41c74ccc3745b8f150567416701",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE case_003_false_flag ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/case_003_false_flag.json\nEvidence SHA-256: d41e816d0c274249d80c5480316579c45f71e41c74ccc3745b8f150567416701\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 238/1875\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\nA real compromise: process hollowing and credential dumping confirmed in memory (hard-to-fake structural evidence). On top of the real attack, the operator planted Cyrillic strings whose profile contradicts the actual TTPs and OPSEC \u2014 the cultural markers are too pristine and inconsistent with the actor's toolchain. CAIE fracture: FALSE_FLAG_ATTRIBUTION_MISMATCH. The malice belongs to the planter, not to any Russian-speaker.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Process hollowing in svchost.exe confirmed in memory (T1055.012). Refl] z=0.836 conf=0.95 \u2014 \n  [LSASS credential dumping detected (T1003.001). Active compromise confi] z=0.798 conf=0.95 \u2014 \n  [Cyrillic strings injected into the dropper: suspiciously pristine, inc] z=0.270 conf=0.30 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW \u2014 No significant anomalies detected in this iteration.\n\nCritical signals (z>3): 0\nHigh signals (2<z<=3): 0\nTotal signals analyzed: 3",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+      "best_posterior": "238/1875",
+      "confidence": {
+        "__fraction__": true,
+        "den": 1875,
+        "num": 238
+      },
+      "devil_advocate": {
+        "aggregation": {
+          "k": 3,
+          "method": "top_k_already_validated_matches_v2",
+          "total_gap_mass": "0"
+        },
+        "counterfactual_summary": {
+          "primary_alternative_hypothesis": null
+        },
+        "decision_context": {
+          "confidence": "238/1875",
+          "mapped_verdict": "MALICIOUS_INTENT_DETECTED",
+          "raw_verdict": "MALICIOUS_INTENT_DETECTED",
+          "score": "238/375"
+        },
+        "devil_advocate_source": "deterministic_no_pattern_data_available",
+        "meta": {
+          "deterministic": true,
+          "generated_from": "case_pattern_library"
+        },
+        "narrative": "Eco's Razor (Abductive Falsification) applied to verdict MALICIOUS_INTENT_DETECTED. Pattern-matching data was not available on this code path \u2014 CasePatternLibrary is not invoked here by design (agent audit-trail mode (vigia_agent.py \u2014 JSON-replay / autonomous path); see KNOWN_LIMITATIONS.md). No structured counter-hypothesis could be derived deterministically. This is a documented scope limitation of the current code path, not an absence of falsification attempt.",
+        "pattern_evidence_gaps": [],
+        "version": "r7-da-v1"
+      },
+      "is_conclusive": true,
+      "narrative": "A real compromise: process hollowing and credential dumping confirmed in memory (hard-to-fake structural evidence). On top of the real attack, the operator planted Cyrillic strings whose profile contradicts the actual TTPs and OPSEC \u2014 the cultural markers are too pristine and inconsistent with the actor's toolchain. CAIE fracture: FALSE_FLAG_ATTRIBUTION_MISMATCH. The malice belongs to the planter, not to any Russian-speaker."
+    },
+    "case_id": "case_003_false_flag",
+    "pipeline_meta": {
+      "artifact_count": 3,
+      "avg_score": "238/375",
+      "expected_verdict": "MALICE",
+      "source": "ebs_v1_json_adapter"
+    },
+    "signals": [
+      {
+        "artifact_id": "tech_real_001",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 19
+        },
+        "description": "Process hollowing in svchost.exe confirmed in memory (T1055.012). Reflective DLL injection detected. Hard-to-fake structural evidence of a real intrusion.",
+        "evidence_type": "memory_process",
+        "source": "list_processes",
+        "z_score": {
+          "__fraction__": true,
+          "den": 250,
+          "num": 209
+        }
+      },
+      {
+        "artifact_id": "tech_real_002",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 19
+        },
+        "description": "LSASS credential dumping detected (T1003.001). Active compromise confirmed.",
+        "evidence_type": "lsass_session",
+        "source": "list_processes",
+        "z_score": {
+          "__fraction__": true,
+          "den": 500,
+          "num": 399
+        }
+      },
+      {
+        "artifact_id": "cultural_planted_001",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 3
+        },
+        "description": "Cyrillic strings injected into the dropper: suspiciously pristine, inconsistent with the actor's actual toolchain and OPSEC. Attribution markers contradict the observed technical TTP profile. Placemen",
+        "evidence_type": "cultural_marker",
+        "source": "infer_intent",
+        "z_score": {
+          "__fraction__": true,
+          "den": 100,
+          "num": 27
+        }
+      }
+    ]
+  },
+  "sans_compliance": {
+    "accuracy_validation": false,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}

@@ -1,0 +1,31 @@
+{
+  "case_id": "VIGIA_BREAK_001_SILENT_INCONSISTENCY",
+  "description": "Un \u00fanico artefacto con timezone inconsistente en evento cr\u00edtico",
+  "artifacts": [
+    {
+      "id": "log1",
+      "type": "auth.log",
+      "content": "SSH login 10:00 UTC+3"
+    },
+    {
+      "id": "log2",
+      "type": "netflow",
+      "content": "connection 10:00 UTC+3"
+    },
+    {
+      "id": "log3",
+      "type": "audit",
+      "content": "command execution 10:00 UTC+3"
+    },
+    {
+      "id": "log4",
+      "type": "filesystem",
+      "content": "file accessed 10:00 UTC+2"
+    }
+  ],
+  "expected": {
+    "detect_inconsistency": true,
+    "confidence_max": 0.85,
+    "must_flag": "temporal mismatch"
+  }
+}

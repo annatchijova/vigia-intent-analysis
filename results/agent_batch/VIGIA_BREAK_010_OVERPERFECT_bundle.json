@@ -1,0 +1,225 @@
+{
+  "analysis_timestamp": "2026-06-15T20:50:25.511763+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "VIGIA_BREAK_010_OVERPERFECT",
+    "end_time": "2026-06-15T20:50:25.511766+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "VIGIA_BREAK_010_OVERPERFECT",
+        "entry_sha256": "efd6137a130749b6d1284c52c8c34e89ff23854df806d9d44903efca62eef726",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "VIGIA_BREAK_010_OVERPERFECT"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: 4eeafb3bfb155486...",
+        "outputs_summary": {
+          "agent_sha256": "4eeafb3bfb155486142942ad7a2c8678676f86ffd5d076882459354d820591f6",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-06-15T20:50:25.509314+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA_BREAK_010_OVERPERFECT",
+        "entry_sha256": "cf8ce0da68829ab77b45922156d9cdb8ba77146b673d942038e5313924ac72cf",
+        "inputs_summary": {
+          "path": "results/agent_batch/VIGIA_BREAK_010_OVERPERFECT_input.json"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-06-15T20:50:25.509383+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA_BREAK_010_OVERPERFECT",
+        "entry_sha256": "3f7adbc08b966e3cb4f5e88b9b61ccd36f1b416a4b5e7f97407fd5b73599374a",
+        "inputs_summary": {
+          "path": "results/agent_batch/VIGIA_BREAK_010_OVERPERFECT_input.json"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: 98196de0672a9ba8...",
+        "outputs_summary": {
+          "sha256": "98196de0672a9ba81305404cebd57e5b9ccff81494c78f0d4b68a42ff629dc73"
+        },
+        "seq": 3,
+        "timestamp": "2026-06-15T20:50:25.509458+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "VIGIA_BREAK_010_OVERPERFECT",
+        "entry_sha256": "34ce28cb708321ac4f081c295c011753ba6bd3bcbc336be4000ac514e354e423",
+        "inputs_summary": {
+          "evidence": "results/agent_batch/VIGIA_BREAK_010_OVERPERFECT_input.json",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-06-15T20:50:25.509543+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "VIGIA_BREAK_010_OVERPERFECT",
+        "entry_sha256": "3ca48b5ebb8c535cf1bff477af9f771aa2e82d5f269c874a90e3f5d2f2a26ef6",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 2 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "NO_SEMIOTIC_ANOMALY_DETECTED",
+            "best_posterior": "0",
+            "confidence": "0",
+            "is_conclusive": "False",
+            "narrative": "Logs demasiado perfectos"
+          },
+          "case_id": "VIGIA_BREAK_010_OVERPERFECT",
+          "pipeline_meta": {
+            "artifact_count": "2",
+            "avg_score": "0",
+            "expected_verdict": "UNKNOWN",
+            "source": "ebs_v1_json_adapter"
+          },
+          "signals": [
+            {
+              "artifact_id": "?",
+              "confidence": "1/2",
+              "description": "",
+              "evidence_type": "unknown",
+              "source": "unknown",
+              "z_score": "0"
+            },
+            {
+              "artifact_id": "?",
+              "confidence": "1/2",
+              "description": "",
+              "evidence_type": "unknown",
+              "source": "unknown",
+              "z_score": "0"
+            }
+          ]
+        },
+        "seq": 5,
+        "timestamp": "2026-06-15T20:50:25.511150+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "VIGIA_BREAK_010_OVERPERFECT",
+        "entry_sha256": "4c819f836a55d78147b177582f71d56268b9dd14c0d822800377321a3dc9452c",
+        "inputs_summary": {
+          "n_signals": "2"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-06-15T20:50:25.511616+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "VIGIA_BREAK_010_OVERPERFECT",
+        "entry_sha256": "cf6e2e8f546979cc2b27bb117e34110844d56f80b623061744bab475c4c1a5b5",
+        "inputs_summary": {
+          "verdict": "NO_SEMIOTIC_ANOMALY_DETECTED"
+        },
+        "iteration": 0,
+        "note": "Exit code 0 \u2014 analysis complete.",
+        "outputs_summary": {
+          "exit_code": "0"
+        },
+        "seq": 7,
+        "timestamp": "2026-06-15T20:50:25.511701+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-06-15T20:50:25.509118+00:00",
+    "total_entries": 7
+  },
+  "case_id": "VIGIA_BREAK_010_OVERPERFECT",
+  "evidence_path": "results/agent_batch/VIGIA_BREAK_010_OVERPERFECT_input.json",
+  "evidence_sha256": "98196de0672a9ba81305404cebd57e5b9ccff81494c78f0d4b68a42ff629dc73",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA_BREAK_010_OVERPERFECT ===\nEvidence: results/agent_batch/VIGIA_BREAK_010_OVERPERFECT_input.json\nEvidence SHA-256: 98196de0672a9ba81305404cebd57e5b9ccff81494c78f0d4b68a42ff629dc73\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: NO_SEMIOTIC_ANOMALY_DETECTED\nPosterior confidence: 0\nConclusive: NO \u2014 requires human review\n\n--- PEIRCEAN NARRATIVE ---\nLogs demasiado perfectos\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [unknown] z=0.000 conf=0.50 \u2014 \n  [unknown] z=0.000 conf=0.50 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW \u2014 No significant anomalies detected in this iteration.\n\nCritical signals (z>3): 0\nHigh signals (2<z<=3): 0\nTotal signals analyzed: 2",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "NO_SEMIOTIC_ANOMALY_DETECTED",
+      "best_posterior": "0",
+      "confidence": {
+        "__fraction__": true,
+        "den": 1,
+        "num": 0
+      },
+      "is_conclusive": false,
+      "narrative": "Logs demasiado perfectos"
+    },
+    "case_id": "VIGIA_BREAK_010_OVERPERFECT",
+    "pipeline_meta": {
+      "artifact_count": 2,
+      "avg_score": "0",
+      "expected_verdict": "UNKNOWN",
+      "source": "ebs_v1_json_adapter"
+    },
+    "signals": [
+      {
+        "artifact_id": "?",
+        "confidence": {
+          "__fraction__": true,
+          "den": 2,
+          "num": 1
+        },
+        "description": "",
+        "evidence_type": "unknown",
+        "source": "unknown",
+        "z_score": {
+          "__fraction__": true,
+          "den": 1,
+          "num": 0
+        }
+      },
+      {
+        "artifact_id": "?",
+        "confidence": {
+          "__fraction__": true,
+          "den": 2,
+          "num": 1
+        },
+        "description": "",
+        "evidence_type": "unknown",
+        "source": "unknown",
+        "z_score": {
+          "__fraction__": true,
+          "den": 1,
+          "num": 0
+        }
+      }
+    ]
+  },
+  "sans_compliance": {
+    "accuracy_validation": false,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}

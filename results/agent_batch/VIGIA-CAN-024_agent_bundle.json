@@ -1,0 +1,297 @@
+{
+  "analysis_timestamp": "2026-06-25T20:53:24.118202+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "VIGIA-CAN-024",
+    "end_time": "2026-06-25T20:53:24.118208+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "VIGIA-CAN-024",
+        "entry_sha256": "4d965120543ea16d71ae05f70292a1de03401c8534b33397bd1b9178b407afa8",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "VIGIA-CAN-024"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: 95ef6739e4df7cf2...",
+        "outputs_summary": {
+          "agent_sha256": "95ef6739e4df7cf28eef26e5338c0708c50348077baeca29d899806d950da740",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-06-25T20:53:24.114898+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-CAN-024",
+        "entry_sha256": "03e5f98419c96dc70dc82b2ca86100c7b7f4e49e591027b9ecb72f3c6012e6a4",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-024.json"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-06-25T20:53:24.114984+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-CAN-024",
+        "entry_sha256": "620d51869b56c00e759f6df1b887718e1f6c153352bab9315dd6d5cc9c78ef7e",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-024.json"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: 6e2524691d6bcfab...",
+        "outputs_summary": {
+          "sha256": "6e2524691d6bcfab293f4efd1b4b91e332e403a6e435c187cae7857cdac6ed32"
+        },
+        "seq": 3,
+        "timestamp": "2026-06-25T20:53:24.115076+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "VIGIA-CAN-024",
+        "entry_sha256": "3fe1657921ffba4db149ac1eec9147c86276e90c6c5ef359c00de57f40e04573",
+        "inputs_summary": {
+          "evidence": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-024.json",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-06-25T20:53:24.115183+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "VIGIA-CAN-024",
+        "entry_sha256": "267c5b90a8a21e1900be0f718fe062e166bb4143806282a3642d15e30778be73",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 4 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+            "best_posterior": "2349/40000",
+            "confidence": "2349/40000",
+            "is_conclusive": "False",
+            "narrative": "PDF invoice with a 'printing error' covering the CBU/IBAN. Sender sends the 'corrected' account number via informal email. The account does not exist in the validated supplier database. Hash of the or..."
+          },
+          "case_id": "case_106_mimesis_error_administrativo",
+          "pipeline_meta": {
+            "artifact_count": "4",
+            "avg_score": "2349/8000",
+            "expected_verdict": "MALICE",
+            "source": "ebs_v1_json_adapter"
+          },
+          "signals": [
+            {
+              "artifact_id": "a106_01",
+              "confidence": "3/5",
+              "description": "PDF invoice: CBU/IBAN area covered by a black rectangle. Metadata says 'Print Error'. Hash differs from the original PDF sent 2 days earlier.",
+              "evidence_type": "file_hash",
+              "source": "sift_document",
+              "z_score": "54/125"
+            },
+            {
+              "artifact_id": "a106_02",
+              "confidence": "3/10",
+              "description": "Follow-up email: 'Oops, the PDF came out wrong, sending the CBU here so you're not blocked on the payment'.",
+              "evidence_type": "cultural_marker",
+              "source": "sift_mail_gateway",
+              "z_score": "27/100"
+            },
+            {
+              "artifact_id": "a106_03",
+              "confidence": "1/2",
+              "description": "'Corrected' account number does not exist in the validated supplier database. First appearance in the system.",
+              "evidence_type": "dns_record",
+              "source": "sift_pcap",
+              "z_score": "11/25"
+            },
+            {
+              "artifact_id": "a106_04",
+              "confidence": "13/20",
+              "description": "Hash of the original PDF (sent 2 days earlier) shows a visible legitimate CBU/IBAN. The 'error' version has a different hash.",
+              "evidence_type": "memory_process",
+              "source": "sift_file_audit",
+              "z_score": "13/400"
+            }
+          ]
+        },
+        "seq": 5,
+        "timestamp": "2026-06-25T20:53:24.117462+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "VIGIA-CAN-024",
+        "entry_sha256": "99781700c1ad34214e06e8b4b193cf8660756c65ff2b476c0f5c350b4171ad2e",
+        "inputs_summary": {
+          "n_signals": "4"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-06-25T20:53:24.117566+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "VIGIA-CAN-024",
+        "entry_sha256": "bcfbe6f12ebdd382eedc77d7e825c0fc67fd1de037931abc69acf45e00313471",
+        "inputs_summary": {
+          "verdict": "MALICIOUS_INTENT_DETECTED"
+        },
+        "iteration": 0,
+        "note": "Exit code 1 \u2014 analysis complete.",
+        "outputs_summary": {
+          "exit_code": "1"
+        },
+        "seq": 7,
+        "timestamp": "2026-06-25T20:53:24.117734+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-06-25T20:53:24.114666+00:00",
+    "total_entries": 7
+  },
+  "case_id": "VIGIA-CAN-024",
+  "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-024.json",
+  "evidence_sha256": "6e2524691d6bcfab293f4efd1b4b91e332e403a6e435c187cae7857cdac6ed32",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-CAN-024 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-024.json\nEvidence SHA-256: 6e2524691d6bcfab293f4efd1b4b91e332e403a6e435c187cae7857cdac6ed32\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 2349/40000\nConclusive: NO \u2014 requires human review\n\n--- PEIRCEAN NARRATIVE ---\nPDF invoice with a 'printing error' covering the CBU/IBAN. Sender sends the 'corrected' account number via informal email. The account does not exist in the validated supplier database. Hash of the original PDF shows a visible legitimate CBU.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  ['Corrected' account number does not exist in the validated supplier da] z=0.440 conf=0.50 \u2014 \n  [PDF invoice: CBU/IBAN area covered by a black rectangle. Metadata says] z=0.432 conf=0.60 \u2014 \n  [Follow-up email: 'Oops, the PDF came out wrong, sending the CBU here s] z=0.270 conf=0.30 \u2014 \n  [Hash of the original PDF (sent 2 days earlier) shows a visible legitim] z=0.033 conf=0.65 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW \u2014 No significant anomalies detected in this iteration.\n\nCritical signals (z>3): 0\nHigh signals (2<z<=3): 0\nTotal signals analyzed: 4",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+      "best_posterior": "2349/40000",
+      "confidence": {
+        "__fraction__": true,
+        "den": 40000,
+        "num": 2349
+      },
+      "devil_advocate": {
+        "aggregation": {
+          "k": 3,
+          "method": "top_k_already_validated_matches_v2",
+          "total_gap_mass": "0"
+        },
+        "counterfactual_summary": {
+          "primary_alternative_hypothesis": null
+        },
+        "decision_context": {
+          "confidence": "2349/40000",
+          "mapped_verdict": "MALICIOUS_INTENT_DETECTED",
+          "raw_verdict": "MALICIOUS_INTENT_DETECTED",
+          "score": "2349/8000"
+        },
+        "devil_advocate_source": "deterministic_no_pattern_data_available",
+        "meta": {
+          "deterministic": true,
+          "generated_from": "case_pattern_library"
+        },
+        "narrative": "Eco's Razor (Abductive Falsification) applied to verdict MALICIOUS_INTENT_DETECTED. Pattern-matching data was not available on this code path \u2014 CasePatternLibrary is not invoked here by design (agent audit-trail mode (vigia_agent.py \u2014 JSON-replay / autonomous path); see KNOWN_LIMITATIONS.md). No structured counter-hypothesis could be derived deterministically. This is a documented scope limitation of the current code path, not an absence of falsification attempt.",
+        "pattern_evidence_gaps": [],
+        "version": "r7-da-v1"
+      },
+      "is_conclusive": false,
+      "narrative": "PDF invoice with a 'printing error' covering the CBU/IBAN. Sender sends the 'corrected' account number via informal email. The account does not exist in the validated supplier database. Hash of the original PDF shows a visible legitimate CBU."
+    },
+    "case_id": "case_106_mimesis_error_administrativo",
+    "pipeline_meta": {
+      "artifact_count": 4,
+      "avg_score": "2349/8000",
+      "expected_verdict": "MALICE",
+      "source": "ebs_v1_json_adapter"
+    },
+    "signals": [
+      {
+        "artifact_id": "a106_01",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 3
+        },
+        "description": "PDF invoice: CBU/IBAN area covered by a black rectangle. Metadata says 'Print Error'. Hash differs from the original PDF sent 2 days earlier.",
+        "evidence_type": "file_hash",
+        "source": "sift_document",
+        "z_score": {
+          "__fraction__": true,
+          "den": 125,
+          "num": 54
+        }
+      },
+      {
+        "artifact_id": "a106_02",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 3
+        },
+        "description": "Follow-up email: 'Oops, the PDF came out wrong, sending the CBU here so you're not blocked on the payment'.",
+        "evidence_type": "cultural_marker",
+        "source": "sift_mail_gateway",
+        "z_score": {
+          "__fraction__": true,
+          "den": 100,
+          "num": 27
+        }
+      },
+      {
+        "artifact_id": "a106_03",
+        "confidence": {
+          "__fraction__": true,
+          "den": 2,
+          "num": 1
+        },
+        "description": "'Corrected' account number does not exist in the validated supplier database. First appearance in the system.",
+        "evidence_type": "dns_record",
+        "source": "sift_pcap",
+        "z_score": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 11
+        }
+      },
+      {
+        "artifact_id": "a106_04",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 13
+        },
+        "description": "Hash of the original PDF (sent 2 days earlier) shows a visible legitimate CBU/IBAN. The 'error' version has a different hash.",
+        "evidence_type": "memory_process",
+        "source": "sift_file_audit",
+        "z_score": {
+          "__fraction__": true,
+          "den": 400,
+          "num": 13
+        }
+      }
+    ]
+  },
+  "sans_compliance": {
+    "accuracy_validation": false,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}

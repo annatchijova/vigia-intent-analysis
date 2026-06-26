@@ -1,0 +1,297 @@
+{
+  "analysis_timestamp": "2026-06-25T20:53:25.512596+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "case_007_insomnio_tactico",
+    "end_time": "2026-06-25T20:53:25.512602+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "case_007_insomnio_tactico",
+        "entry_sha256": "5edb14544cb7020111b2ed78218a01611a7d746f1008d64fb0efe5796c9ba01f",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "case_007_insomnio_tactico"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: 95ef6739e4df7cf2...",
+        "outputs_summary": {
+          "agent_sha256": "95ef6739e4df7cf28eef26e5338c0708c50348077baeca29d899806d950da740",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-06-25T20:53:25.509327+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "case_007_insomnio_tactico",
+        "entry_sha256": "b4d8108e84146c734d8cff3bd8d91cf0e73f93890a5639707ec24557efefc34a",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/case_007_insomnio_tactico.json"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-06-25T20:53:25.509414+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "case_007_insomnio_tactico",
+        "entry_sha256": "ce7161a7f78bb97550d190475c8b1a5aef963632e24ad763619f298bbcf37786",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/case_007_insomnio_tactico.json"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: 085ad7daa852a7a6...",
+        "outputs_summary": {
+          "sha256": "085ad7daa852a7a6a9c4e8c16ffcca7a911447ae8af1bd53d54587af74f3cc79"
+        },
+        "seq": 3,
+        "timestamp": "2026-06-25T20:53:25.509507+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "case_007_insomnio_tactico",
+        "entry_sha256": "4651be67438523a624d87235962602c37dffcf96f30dc5e3d9199eeb84dbeb15",
+        "inputs_summary": {
+          "evidence": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/case_007_insomnio_tactico.json",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-06-25T20:53:25.509610+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "case_007_insomnio_tactico",
+        "entry_sha256": "0583261551cd2f7d7dfe50746736e9cc528081846c12747f69ed2d4ec397032d",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 4 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+            "best_posterior": "4341/40000",
+            "confidence": "4341/40000",
+            "is_conclusive": "True",
+            "narrative": "finance_user con baseline de 847 d\u00edas de actividad estrictamente 08:30-18:00 L-V se loguea a las 03:15 AM de un domingo. Accede a archivo Excel de 500MB clasificado como confidencial-3. Proceso excel...."
+          },
+          "case_id": "case_007_insomnio_tactico",
+          "pipeline_meta": {
+            "artifact_count": "4",
+            "avg_score": "4341/8000",
+            "expected_verdict": "MALICE",
+            "source": "ebs_v1_json_adapter"
+          },
+          "signals": [
+            {
+              "artifact_id": "a007_01",
+              "confidence": "2/5",
+              "description": "Login VPN exitoso a las 03:15 AM de domingo. Credenciales correctas. MFA aprobado.",
+              "evidence_type": "memory_process",
+              "source": "sift_vpn_log",
+              "z_score": "46/125"
+            },
+            {
+              "artifact_id": "a007_02",
+              "confidence": "1/2",
+              "description": "Baseline hist\u00f3rico: finance_user nunca hab\u00eda logueado fuera de 08:30-18:00 L-V en 847 d\u00edas. Desviaci\u00f3n de 6.2 sigma.",
+              "evidence_type": "memory_process",
+              "source": "sift_ueba",
+              "z_score": "23/50"
+            },
+            {
+              "artifact_id": "a007_03",
+              "confidence": "11/20",
+              "description": "Acceso a 'Q2_Financials_Forecast.xlsx' (500MB), clasificaci\u00f3n confidencial-3, a las 03:17 AM.",
+              "evidence_type": "file_timestamp",
+              "source": "sift_file_audit",
+              "z_score": "11/25"
+            },
+            {
+              "artifact_id": "a007_04",
+              "confidence": "19/20",
+              "description": "excel.exe en memoria con archivo mapeado y handle de escritura a \\Temp\\upload.tmp de 500MB.",
+              "evidence_type": "memory_process",
+              "source": "sift_volatility",
+              "z_score": "361/400"
+            }
+          ]
+        },
+        "seq": 5,
+        "timestamp": "2026-06-25T20:53:25.511877+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "case_007_insomnio_tactico",
+        "entry_sha256": "54995502335e667692fc2e5579c38a8fe3882817d3e563a74cbf5ac1b434767c",
+        "inputs_summary": {
+          "n_signals": "4"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-06-25T20:53:25.511981+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "case_007_insomnio_tactico",
+        "entry_sha256": "ed6b6eddeafcfb3ecc67ab8f846bc7be1b6409feac4c20281c539b8a6c013f62",
+        "inputs_summary": {
+          "verdict": "MALICIOUS_INTENT_DETECTED"
+        },
+        "iteration": 0,
+        "note": "Exit code 1 \u2014 analysis complete.",
+        "outputs_summary": {
+          "exit_code": "1"
+        },
+        "seq": 7,
+        "timestamp": "2026-06-25T20:53:25.512127+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-06-25T20:53:25.509107+00:00",
+    "total_entries": 7
+  },
+  "case_id": "case_007_insomnio_tactico",
+  "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/case_007_insomnio_tactico.json",
+  "evidence_sha256": "085ad7daa852a7a6a9c4e8c16ffcca7a911447ae8af1bd53d54587af74f3cc79",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE case_007_insomnio_tactico ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/case_007_insomnio_tactico.json\nEvidence SHA-256: 085ad7daa852a7a6a9c4e8c16ffcca7a911447ae8af1bd53d54587af74f3cc79\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 4341/40000\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\nfinance_user con baseline de 847 d\u00edas de actividad estrictamente 08:30-18:00 L-V se loguea a las 03:15 AM de un domingo. Accede a archivo Excel de 500MB clasificado como confidencial-3. Proceso excel.exe escribe archivo upload.tmp de 500MB.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [excel.exe en memoria con archivo mapeado y handle de escritura a \\Temp] z=0.902 conf=0.95 \u2014 \n  [Baseline hist\u00f3rico: finance_user nunca hab\u00eda logueado fuera de 08:30-1] z=0.460 conf=0.50 \u2014 \n  [Acceso a 'Q2_Financials_Forecast.xlsx' (500MB), clasificaci\u00f3n confiden] z=0.440 conf=0.55 \u2014 \n  [Login VPN exitoso a las 03:15 AM de domingo. Credenciales correctas. M] z=0.368 conf=0.40 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW \u2014 No significant anomalies detected in this iteration.\n\nCritical signals (z>3): 0\nHigh signals (2<z<=3): 0\nTotal signals analyzed: 4",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+      "best_posterior": "4341/40000",
+      "confidence": {
+        "__fraction__": true,
+        "den": 40000,
+        "num": 4341
+      },
+      "devil_advocate": {
+        "aggregation": {
+          "k": 3,
+          "method": "top_k_already_validated_matches_v2",
+          "total_gap_mass": "0"
+        },
+        "counterfactual_summary": {
+          "primary_alternative_hypothesis": null
+        },
+        "decision_context": {
+          "confidence": "4341/40000",
+          "mapped_verdict": "MALICIOUS_INTENT_DETECTED",
+          "raw_verdict": "MALICIOUS_INTENT_DETECTED",
+          "score": "4341/8000"
+        },
+        "devil_advocate_source": "deterministic_no_pattern_data_available",
+        "meta": {
+          "deterministic": true,
+          "generated_from": "case_pattern_library"
+        },
+        "narrative": "Eco's Razor (Abductive Falsification) applied to verdict MALICIOUS_INTENT_DETECTED. Pattern-matching data was not available on this code path \u2014 CasePatternLibrary is not invoked here by design (agent audit-trail mode (vigia_agent.py \u2014 JSON-replay / autonomous path); see KNOWN_LIMITATIONS.md). No structured counter-hypothesis could be derived deterministically. This is a documented scope limitation of the current code path, not an absence of falsification attempt.",
+        "pattern_evidence_gaps": [],
+        "version": "r7-da-v1"
+      },
+      "is_conclusive": true,
+      "narrative": "finance_user con baseline de 847 d\u00edas de actividad estrictamente 08:30-18:00 L-V se loguea a las 03:15 AM de un domingo. Accede a archivo Excel de 500MB clasificado como confidencial-3. Proceso excel.exe escribe archivo upload.tmp de 500MB."
+    },
+    "case_id": "case_007_insomnio_tactico",
+    "pipeline_meta": {
+      "artifact_count": 4,
+      "avg_score": "4341/8000",
+      "expected_verdict": "MALICE",
+      "source": "ebs_v1_json_adapter"
+    },
+    "signals": [
+      {
+        "artifact_id": "a007_01",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 2
+        },
+        "description": "Login VPN exitoso a las 03:15 AM de domingo. Credenciales correctas. MFA aprobado.",
+        "evidence_type": "memory_process",
+        "source": "sift_vpn_log",
+        "z_score": {
+          "__fraction__": true,
+          "den": 125,
+          "num": 46
+        }
+      },
+      {
+        "artifact_id": "a007_02",
+        "confidence": {
+          "__fraction__": true,
+          "den": 2,
+          "num": 1
+        },
+        "description": "Baseline hist\u00f3rico: finance_user nunca hab\u00eda logueado fuera de 08:30-18:00 L-V en 847 d\u00edas. Desviaci\u00f3n de 6.2 sigma.",
+        "evidence_type": "memory_process",
+        "source": "sift_ueba",
+        "z_score": {
+          "__fraction__": true,
+          "den": 50,
+          "num": 23
+        }
+      },
+      {
+        "artifact_id": "a007_03",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 11
+        },
+        "description": "Acceso a 'Q2_Financials_Forecast.xlsx' (500MB), clasificaci\u00f3n confidencial-3, a las 03:17 AM.",
+        "evidence_type": "file_timestamp",
+        "source": "sift_file_audit",
+        "z_score": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 11
+        }
+      },
+      {
+        "artifact_id": "a007_04",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 19
+        },
+        "description": "excel.exe en memoria con archivo mapeado y handle de escritura a \\Temp\\upload.tmp de 500MB.",
+        "evidence_type": "memory_process",
+        "source": "sift_volatility",
+        "z_score": {
+          "__fraction__": true,
+          "den": 400,
+          "num": 361
+        }
+      }
+    ]
+  },
+  "sans_compliance": {
+    "accuracy_validation": false,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}

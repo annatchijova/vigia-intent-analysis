@@ -1,0 +1,225 @@
+{
+  "analysis_timestamp": "2026-06-25T20:53:19.674580+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "VIGIA-FP-002",
+    "end_time": "2026-06-25T20:53:19.674585+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "VIGIA-FP-002",
+        "entry_sha256": "afabb46944961cd7c7ff5e6fa95ab36f3758c24fd45e1a2f7dac5bbc6de4db09",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "VIGIA-FP-002"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: 95ef6739e4df7cf2...",
+        "outputs_summary": {
+          "agent_sha256": "95ef6739e4df7cf28eef26e5338c0708c50348077baeca29d899806d950da740",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-06-25T20:53:19.671745+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-FP-002",
+        "entry_sha256": "02c1e42e36ee08f4425da92ca0028175d117e9feff5e30c2a74478445066dd6f",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-FP-002.json"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-06-25T20:53:19.671834+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-FP-002",
+        "entry_sha256": "bc2bca2b687a8dacf45d6ea99d322d2d2e32ac42db15973e3b096054ad1f34ad",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-FP-002.json"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: 64ad80a0d918b794...",
+        "outputs_summary": {
+          "sha256": "64ad80a0d918b7944321098f54e72fa48d0bb10a5e658c1cd3c39fecfe1be330"
+        },
+        "seq": 3,
+        "timestamp": "2026-06-25T20:53:19.671926+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "VIGIA-FP-002",
+        "entry_sha256": "02a02536ea0ed60650333217b0d91330324099f7cad9a48a742e31ec89af9fbd",
+        "inputs_summary": {
+          "evidence": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-FP-002.json",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-06-25T20:53:19.672030+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "VIGIA-FP-002",
+        "entry_sha256": "23f24c20114a84e71e7517089a275b9b57ab0de7a15a45bf83e3749b77089cd7",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 2 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "NO_SEMIOTIC_ANOMALY_DETECTED",
+            "best_posterior": "447/20000",
+            "confidence": "447/20000",
+            "is_conclusive": "False",
+            "narrative": "Legitimate backup script, documented in Change Management, approved by CISO. Copies 500GB to external storage overnight. Tool is rsync, destination is an approved cloud provider. Everything is documen..."
+          },
+          "case_id": "VIGIA-FP-002",
+          "pipeline_meta": {
+            "artifact_count": "2",
+            "avg_score": "447/4000",
+            "expected_verdict": "BENIGN",
+            "source": "ebs_v1_json_adapter"
+          },
+          "signals": [
+            {
+              "artifact_id": "fp002_01",
+              "confidence": "1/5",
+              "description": "500GB transferred to external IP 198.51.100.77 over 4 hours",
+              "evidence_type": "memory_process",
+              "source": "sift_netflow",
+              "z_score": "22/125"
+            },
+            {
+              "artifact_id": "fp002_02",
+              "confidence": "19/20",
+              "description": "CAB-2026-0610: Approval for nightly backup to cloud storage 198.51.100.77",
+              "evidence_type": "log_entry",
+              "source": "sift_change_management",
+              "z_score": "19/400"
+            }
+          ]
+        },
+        "seq": 5,
+        "timestamp": "2026-06-25T20:53:19.674261+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "VIGIA-FP-002",
+        "entry_sha256": "0fd74599ad94b868f7cd29bcc2c3af15a23eac0c3f0f784343125c1ab9e91fd9",
+        "inputs_summary": {
+          "n_signals": "2"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-06-25T20:53:19.674352+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "VIGIA-FP-002",
+        "entry_sha256": "b59bdd98750908e927547abe6dbe10af7c84a89d588b5338f25431820bf9d4fa",
+        "inputs_summary": {
+          "verdict": "NO_SEMIOTIC_ANOMALY_DETECTED"
+        },
+        "iteration": 0,
+        "note": "Exit code 0 \u2014 analysis complete.",
+        "outputs_summary": {
+          "exit_code": "0"
+        },
+        "seq": 7,
+        "timestamp": "2026-06-25T20:53:19.674461+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-06-25T20:53:19.671518+00:00",
+    "total_entries": 7
+  },
+  "case_id": "VIGIA-FP-002",
+  "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-FP-002.json",
+  "evidence_sha256": "64ad80a0d918b7944321098f54e72fa48d0bb10a5e658c1cd3c39fecfe1be330",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-FP-002 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/VIGIA-FP-002.json\nEvidence SHA-256: 64ad80a0d918b7944321098f54e72fa48d0bb10a5e658c1cd3c39fecfe1be330\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: NO_SEMIOTIC_ANOMALY_DETECTED\nPosterior confidence: 447/20000\nConclusive: NO \u2014 requires human review\n\n--- PEIRCEAN NARRATIVE ---\nLegitimate backup script, documented in Change Management, approved by CISO. Copies 500GB to external storage overnight. Tool is rsync, destination is an approved cloud provider. Everything is documented.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [500GB transferred to external IP 198.51.100.77 over 4 hours] z=0.176 conf=0.20 \u2014 \n  [CAB-2026-0610: Approval for nightly backup to cloud storage 198.51.100] z=0.048 conf=0.95 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW \u2014 No significant anomalies detected in this iteration.\n\nCritical signals (z>3): 0\nHigh signals (2<z<=3): 0\nTotal signals analyzed: 2",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "NO_SEMIOTIC_ANOMALY_DETECTED",
+      "best_posterior": "447/20000",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20000,
+        "num": 447
+      },
+      "is_conclusive": false,
+      "narrative": "Legitimate backup script, documented in Change Management, approved by CISO. Copies 500GB to external storage overnight. Tool is rsync, destination is an approved cloud provider. Everything is documented."
+    },
+    "case_id": "VIGIA-FP-002",
+    "pipeline_meta": {
+      "artifact_count": 2,
+      "avg_score": "447/4000",
+      "expected_verdict": "BENIGN",
+      "source": "ebs_v1_json_adapter"
+    },
+    "signals": [
+      {
+        "artifact_id": "fp002_01",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 1
+        },
+        "description": "500GB transferred to external IP 198.51.100.77 over 4 hours",
+        "evidence_type": "memory_process",
+        "source": "sift_netflow",
+        "z_score": {
+          "__fraction__": true,
+          "den": 125,
+          "num": 22
+        }
+      },
+      {
+        "artifact_id": "fp002_02",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 19
+        },
+        "description": "CAB-2026-0610: Approval for nightly backup to cloud storage 198.51.100.77",
+        "evidence_type": "log_entry",
+        "source": "sift_change_management",
+        "z_score": {
+          "__fraction__": true,
+          "den": 400,
+          "num": 19
+        }
+      }
+    ]
+  },
+  "sans_compliance": {
+    "accuracy_validation": false,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}

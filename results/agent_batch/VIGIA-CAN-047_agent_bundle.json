@@ -1,0 +1,297 @@
+{
+  "analysis_timestamp": "2026-06-25T20:53:25.225086+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "VIGIA-CAN-047",
+    "end_time": "2026-06-25T20:53:25.225092+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "VIGIA-CAN-047",
+        "entry_sha256": "db02864ef2f5e9ecde4f833a4306a31a5e5de16139a9c42ff837dcd82b66c3a2",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "VIGIA-CAN-047"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: 95ef6739e4df7cf2...",
+        "outputs_summary": {
+          "agent_sha256": "95ef6739e4df7cf28eef26e5338c0708c50348077baeca29d899806d950da740",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-06-25T20:53:25.221743+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-CAN-047",
+        "entry_sha256": "2d47dadd3e8d9ef8df6e6021af0ac3a62c9fe2107c36744a3c0f838c0a5ce66d",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-047.json"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-06-25T20:53:25.221834+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-CAN-047",
+        "entry_sha256": "2cb7828f7a7c780cf4777fbd90a99700cffc723043a79ae770c85ff1f79c1243",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-047.json"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: 8864690ba38fb6de...",
+        "outputs_summary": {
+          "sha256": "8864690ba38fb6de9f76d0ae67563f73db7ffe448ca37752cd5ec8381b5442e2"
+        },
+        "seq": 3,
+        "timestamp": "2026-06-25T20:53:25.221925+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "VIGIA-CAN-047",
+        "entry_sha256": "b45789a05141b28d8c83bbdb89f261b6023dd309c27c97127f9d79458dea6cef",
+        "inputs_summary": {
+          "evidence": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-047.json",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-06-25T20:53:25.222033+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "VIGIA-CAN-047",
+        "entry_sha256": "912542f110cc5f3fd1b081aa3aa2c4e398cebf2b10182e741f3dcaedd7923d18",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 4 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+            "best_posterior": "1789/40000",
+            "confidence": "1789/40000",
+            "is_conclusive": "False",
+            "narrative": "Legitimate svchost.exe process running. Everything looks normal. But it maintains a persistent connection to an IP in an unusual country on port 443. Process hollowing detected."
+          },
+          "case_id": "case_026_ventrilocuo",
+          "pipeline_meta": {
+            "artifact_count": "4",
+            "avg_score": "1789/8000",
+            "expected_verdict": "MALICE",
+            "source": "ebs_v1_json_adapter"
+          },
+          "signals": [
+            {
+              "artifact_id": "a026_process",
+              "confidence": "19/20",
+              "description": "Process svchost.exe (PID 612) in memory: .text section has RWX (read-write-execute) permissions \u2014 anomalous for a legitimate image.",
+              "evidence_type": "memory_process",
+              "source": "sift_volatility",
+              "z_score": "133/2000"
+            },
+            {
+              "artifact_id": "a026_network",
+              "confidence": "1/4",
+              "description": "Persistent TCP connection from svchost.exe (PID 612) to 185.220.101.42:443 for 72 hours; country not classified by organization (BY \u2014 Belarus).",
+              "evidence_type": "ip_geolocation",
+              "source": "sift_netflow",
+              "z_score": "41/200"
+            },
+            {
+              "artifact_id": "a026_parent",
+              "confidence": "2/5",
+              "description": "Anomalous parent process of svchost.exe: rundll32.exe (PID 881) instead of services.exe \u2014 indicates launch by injection, not SCM.",
+              "evidence_type": "log_entry",
+              "source": "sift_syslog",
+              "z_score": "7/250"
+            },
+            {
+              "artifact_id": "a026_pe",
+              "confidence": "7/10",
+              "description": "PE analysis in memory: entry point displaced 0x4A000 bytes from svchost.exe on-disk baseline; .text section rewritten.",
+              "evidence_type": "file_hash",
+              "source": "sift_file_audit",
+              "z_score": "119/200"
+            }
+          ]
+        },
+        "seq": 5,
+        "timestamp": "2026-06-25T20:53:25.224303+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "VIGIA-CAN-047",
+        "entry_sha256": "b3a068d6e3b80a83487594d4294f1f020f15fc7c06903966022cf5850e65b461",
+        "inputs_summary": {
+          "n_signals": "4"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-06-25T20:53:25.224411+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "VIGIA-CAN-047",
+        "entry_sha256": "6d70fbf0d0683a919f96f24f1cbc292047ded95c928941b99736dc344c3c7ff3",
+        "inputs_summary": {
+          "verdict": "MALICIOUS_INTENT_DETECTED"
+        },
+        "iteration": 0,
+        "note": "Exit code 1 \u2014 analysis complete.",
+        "outputs_summary": {
+          "exit_code": "1"
+        },
+        "seq": 7,
+        "timestamp": "2026-06-25T20:53:25.224570+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-06-25T20:53:25.221499+00:00",
+    "total_entries": 7
+  },
+  "case_id": "VIGIA-CAN-047",
+  "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-047.json",
+  "evidence_sha256": "8864690ba38fb6de9f76d0ae67563f73db7ffe448ca37752cd5ec8381b5442e2",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-CAN-047 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-047.json\nEvidence SHA-256: 8864690ba38fb6de9f76d0ae67563f73db7ffe448ca37752cd5ec8381b5442e2\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 1789/40000\nConclusive: NO \u2014 requires human review\n\n--- PEIRCEAN NARRATIVE ---\nLegitimate svchost.exe process running. Everything looks normal. But it maintains a persistent connection to an IP in an unusual country on port 443. Process hollowing detected.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [PE analysis in memory: entry point displaced 0x4A000 bytes from svchos] z=0.595 conf=0.70 \u2014 \n  [Persistent TCP connection from svchost.exe (PID 612) to 185.220.101.42] z=0.205 conf=0.25 \u2014 \n  [Process svchost.exe (PID 612) in memory: .text section has RWX (read-w] z=0.067 conf=0.95 \u2014 \n  [Anomalous parent process of svchost.exe: rundll32.exe (PID 881) instea] z=0.028 conf=0.40 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW \u2014 No significant anomalies detected in this iteration.\n\nCritical signals (z>3): 0\nHigh signals (2<z<=3): 0\nTotal signals analyzed: 4",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+      "best_posterior": "1789/40000",
+      "confidence": {
+        "__fraction__": true,
+        "den": 40000,
+        "num": 1789
+      },
+      "devil_advocate": {
+        "aggregation": {
+          "k": 3,
+          "method": "top_k_already_validated_matches_v2",
+          "total_gap_mass": "0"
+        },
+        "counterfactual_summary": {
+          "primary_alternative_hypothesis": null
+        },
+        "decision_context": {
+          "confidence": "1789/40000",
+          "mapped_verdict": "MALICIOUS_INTENT_DETECTED",
+          "raw_verdict": "MALICIOUS_INTENT_DETECTED",
+          "score": "1789/8000"
+        },
+        "devil_advocate_source": "deterministic_no_pattern_data_available",
+        "meta": {
+          "deterministic": true,
+          "generated_from": "case_pattern_library"
+        },
+        "narrative": "Eco's Razor (Abductive Falsification) applied to verdict MALICIOUS_INTENT_DETECTED. Pattern-matching data was not available on this code path \u2014 CasePatternLibrary is not invoked here by design (agent audit-trail mode (vigia_agent.py \u2014 JSON-replay / autonomous path); see KNOWN_LIMITATIONS.md). No structured counter-hypothesis could be derived deterministically. This is a documented scope limitation of the current code path, not an absence of falsification attempt.",
+        "pattern_evidence_gaps": [],
+        "version": "r7-da-v1"
+      },
+      "is_conclusive": false,
+      "narrative": "Legitimate svchost.exe process running. Everything looks normal. But it maintains a persistent connection to an IP in an unusual country on port 443. Process hollowing detected."
+    },
+    "case_id": "case_026_ventrilocuo",
+    "pipeline_meta": {
+      "artifact_count": 4,
+      "avg_score": "1789/8000",
+      "expected_verdict": "MALICE",
+      "source": "ebs_v1_json_adapter"
+    },
+    "signals": [
+      {
+        "artifact_id": "a026_process",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 19
+        },
+        "description": "Process svchost.exe (PID 612) in memory: .text section has RWX (read-write-execute) permissions \u2014 anomalous for a legitimate image.",
+        "evidence_type": "memory_process",
+        "source": "sift_volatility",
+        "z_score": {
+          "__fraction__": true,
+          "den": 2000,
+          "num": 133
+        }
+      },
+      {
+        "artifact_id": "a026_network",
+        "confidence": {
+          "__fraction__": true,
+          "den": 4,
+          "num": 1
+        },
+        "description": "Persistent TCP connection from svchost.exe (PID 612) to 185.220.101.42:443 for 72 hours; country not classified by organization (BY \u2014 Belarus).",
+        "evidence_type": "ip_geolocation",
+        "source": "sift_netflow",
+        "z_score": {
+          "__fraction__": true,
+          "den": 200,
+          "num": 41
+        }
+      },
+      {
+        "artifact_id": "a026_parent",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 2
+        },
+        "description": "Anomalous parent process of svchost.exe: rundll32.exe (PID 881) instead of services.exe \u2014 indicates launch by injection, not SCM.",
+        "evidence_type": "log_entry",
+        "source": "sift_syslog",
+        "z_score": {
+          "__fraction__": true,
+          "den": 250,
+          "num": 7
+        }
+      },
+      {
+        "artifact_id": "a026_pe",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 7
+        },
+        "description": "PE analysis in memory: entry point displaced 0x4A000 bytes from svchost.exe on-disk baseline; .text section rewritten.",
+        "evidence_type": "file_hash",
+        "source": "sift_file_audit",
+        "z_score": {
+          "__fraction__": true,
+          "den": 200,
+          "num": 119
+        }
+      }
+    ]
+  },
+  "sans_compliance": {
+    "accuracy_validation": false,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}

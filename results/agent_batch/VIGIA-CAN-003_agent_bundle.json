@@ -1,0 +1,297 @@
+{
+  "analysis_timestamp": "2026-06-25T20:53:23.112137+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "VIGIA-CAN-003",
+    "end_time": "2026-06-25T20:53:23.112142+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "VIGIA-CAN-003",
+        "entry_sha256": "282d0c0d3d70c4b5401e5f050ff66ce811c5bbfd64953564bec1e702f0acc6c2",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "VIGIA-CAN-003"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: 95ef6739e4df7cf2...",
+        "outputs_summary": {
+          "agent_sha256": "95ef6739e4df7cf28eef26e5338c0708c50348077baeca29d899806d950da740",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-06-25T20:53:23.108327+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-CAN-003",
+        "entry_sha256": "d2a682e6354bcbf9831062597d5186c9fe3b22319f5c225aa6830fafd2020ab0",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-003.json"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-06-25T20:53:23.108453+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-CAN-003",
+        "entry_sha256": "04d223d71a2d39c35f63fba6aeba471ba7b018636c9cf1d2346e9364abe9bc19",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-003.json"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: c73af18c6f8fff6f...",
+        "outputs_summary": {
+          "sha256": "c73af18c6f8fff6f572980d7240c3601b3cfe74f35068c9f112f554aad0eb3f8"
+        },
+        "seq": 3,
+        "timestamp": "2026-06-25T20:53:23.108545+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "VIGIA-CAN-003",
+        "entry_sha256": "a87650ca2da82810bd9ad4f2153a105f0e40bc52a58c7ebb6693f6f3fca6c4c3",
+        "inputs_summary": {
+          "evidence": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-003.json",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-06-25T20:53:23.108655+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "VIGIA-CAN-003",
+        "entry_sha256": "fbeac77b1c4aefe214a17c13de4cfda59d942648c8cd8bd44a24c12bf47b2900",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 4 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+            "best_posterior": "3659/40000",
+            "confidence": "3659/40000",
+            "is_conclusive": "True",
+            "narrative": "deploy.sh script modified with commit 'cleaning up redundant logs'. A single line redirects stderr to /dev/null, silencing authentication module errors and causing fail-open."
+          },
+          "case_id": "case_085_mise_en_place_alterada",
+          "pipeline_meta": {
+            "artifact_count": "4",
+            "avg_score": "3659/8000",
+            "expected_verdict": "MALICE",
+            "source": "ebs_v1_json_adapter"
+          },
+          "signals": [
+            {
+              "artifact_id": "a085_01",
+              "confidence": "9/20",
+              "description": "Commit: 'Cleaning up redundant logs for readability'. Single-line change in deploy.sh.",
+              "evidence_type": "memory_process",
+              "source": "sift_git_audit",
+              "z_score": "207/500"
+            },
+            {
+              "artifact_id": "a085_02",
+              "confidence": "13/20",
+              "description": "Diff: added line 'auth_check() 2>/dev/null || true'. Silences all authentication module errors.",
+              "evidence_type": "memory_process",
+              "source": "sift_code_audit",
+              "z_score": "299/500"
+            },
+            {
+              "artifact_id": "a085_03",
+              "confidence": "7/20",
+              "description": "47 authentication failures silenced in the post-deploy window. Zero Event 4625 generated.",
+              "evidence_type": "log_entry",
+              "source": "sift_syslog",
+              "z_score": "21/400"
+            },
+            {
+              "artifact_id": "a085_04",
+              "confidence": "9/10",
+              "description": "EPROCESS structure of the deploy service shows a handle to /dev/null replacing stderr at runtime.",
+              "evidence_type": "kernel_structure",
+              "source": "sift_volatility",
+              "z_score": "153/200"
+            }
+          ]
+        },
+        "seq": 5,
+        "timestamp": "2026-06-25T20:53:23.111358+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "VIGIA-CAN-003",
+        "entry_sha256": "8c734b546244b95bfc8fb86b37507527d3c778d709ac8b52147e5382f3299938",
+        "inputs_summary": {
+          "n_signals": "4"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-06-25T20:53:23.111468+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "VIGIA-CAN-003",
+        "entry_sha256": "4cc2d855beac4ae3d4663b4eaa11b1243f4d32979a0368b6bf21bfbe006bbbf7",
+        "inputs_summary": {
+          "verdict": "MALICIOUS_INTENT_DETECTED"
+        },
+        "iteration": 0,
+        "note": "Exit code 1 \u2014 analysis complete.",
+        "outputs_summary": {
+          "exit_code": "1"
+        },
+        "seq": 7,
+        "timestamp": "2026-06-25T20:53:23.111625+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-06-25T20:53:23.107924+00:00",
+    "total_entries": 7
+  },
+  "case_id": "VIGIA-CAN-003",
+  "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-003.json",
+  "evidence_sha256": "c73af18c6f8fff6f572980d7240c3601b3cfe74f35068c9f112f554aad0eb3f8",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-CAN-003 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-003.json\nEvidence SHA-256: c73af18c6f8fff6f572980d7240c3601b3cfe74f35068c9f112f554aad0eb3f8\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 3659/40000\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\ndeploy.sh script modified with commit 'cleaning up redundant logs'. A single line redirects stderr to /dev/null, silencing authentication module errors and causing fail-open.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [EPROCESS structure of the deploy service shows a handle to /dev/null r] z=0.765 conf=0.90 \u2014 \n  [Diff: added line 'auth_check() 2>/dev/null || true'. Silences all auth] z=0.598 conf=0.65 \u2014 \n  [Commit: 'Cleaning up redundant logs for readability'. Single-line chan] z=0.414 conf=0.45 \u2014 \n  [47 authentication failures silenced in the post-deploy window. Zero Ev] z=0.052 conf=0.35 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW \u2014 No significant anomalies detected in this iteration.\n\nCritical signals (z>3): 0\nHigh signals (2<z<=3): 0\nTotal signals analyzed: 4",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+      "best_posterior": "3659/40000",
+      "confidence": {
+        "__fraction__": true,
+        "den": 40000,
+        "num": 3659
+      },
+      "devil_advocate": {
+        "aggregation": {
+          "k": 3,
+          "method": "top_k_already_validated_matches_v2",
+          "total_gap_mass": "0"
+        },
+        "counterfactual_summary": {
+          "primary_alternative_hypothesis": null
+        },
+        "decision_context": {
+          "confidence": "3659/40000",
+          "mapped_verdict": "MALICIOUS_INTENT_DETECTED",
+          "raw_verdict": "MALICIOUS_INTENT_DETECTED",
+          "score": "3659/8000"
+        },
+        "devil_advocate_source": "deterministic_no_pattern_data_available",
+        "meta": {
+          "deterministic": true,
+          "generated_from": "case_pattern_library"
+        },
+        "narrative": "Eco's Razor (Abductive Falsification) applied to verdict MALICIOUS_INTENT_DETECTED. Pattern-matching data was not available on this code path \u2014 CasePatternLibrary is not invoked here by design (agent audit-trail mode (vigia_agent.py \u2014 JSON-replay / autonomous path); see KNOWN_LIMITATIONS.md). No structured counter-hypothesis could be derived deterministically. This is a documented scope limitation of the current code path, not an absence of falsification attempt.",
+        "pattern_evidence_gaps": [],
+        "version": "r7-da-v1"
+      },
+      "is_conclusive": true,
+      "narrative": "deploy.sh script modified with commit 'cleaning up redundant logs'. A single line redirects stderr to /dev/null, silencing authentication module errors and causing fail-open."
+    },
+    "case_id": "case_085_mise_en_place_alterada",
+    "pipeline_meta": {
+      "artifact_count": 4,
+      "avg_score": "3659/8000",
+      "expected_verdict": "MALICE",
+      "source": "ebs_v1_json_adapter"
+    },
+    "signals": [
+      {
+        "artifact_id": "a085_01",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 9
+        },
+        "description": "Commit: 'Cleaning up redundant logs for readability'. Single-line change in deploy.sh.",
+        "evidence_type": "memory_process",
+        "source": "sift_git_audit",
+        "z_score": {
+          "__fraction__": true,
+          "den": 500,
+          "num": 207
+        }
+      },
+      {
+        "artifact_id": "a085_02",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 13
+        },
+        "description": "Diff: added line 'auth_check() 2>/dev/null || true'. Silences all authentication module errors.",
+        "evidence_type": "memory_process",
+        "source": "sift_code_audit",
+        "z_score": {
+          "__fraction__": true,
+          "den": 500,
+          "num": 299
+        }
+      },
+      {
+        "artifact_id": "a085_03",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 7
+        },
+        "description": "47 authentication failures silenced in the post-deploy window. Zero Event 4625 generated.",
+        "evidence_type": "log_entry",
+        "source": "sift_syslog",
+        "z_score": {
+          "__fraction__": true,
+          "den": 400,
+          "num": 21
+        }
+      },
+      {
+        "artifact_id": "a085_04",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 9
+        },
+        "description": "EPROCESS structure of the deploy service shows a handle to /dev/null replacing stderr at runtime.",
+        "evidence_type": "kernel_structure",
+        "source": "sift_volatility",
+        "z_score": {
+          "__fraction__": true,
+          "den": 200,
+          "num": 153
+        }
+      }
+    ]
+  },
+  "sans_compliance": {
+    "accuracy_validation": false,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}

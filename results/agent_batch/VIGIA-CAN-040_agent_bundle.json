@@ -1,0 +1,297 @@
+{
+  "analysis_timestamp": "2026-06-25T20:53:24.886583+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "VIGIA-CAN-040",
+    "end_time": "2026-06-25T20:53:24.886589+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "VIGIA-CAN-040",
+        "entry_sha256": "2ea2873924c91d3a0de4c17ace6e04e72ee1ad0ef122c5af451755ce78e5624e",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "VIGIA-CAN-040"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: 95ef6739e4df7cf2...",
+        "outputs_summary": {
+          "agent_sha256": "95ef6739e4df7cf28eef26e5338c0708c50348077baeca29d899806d950da740",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-06-25T20:53:24.883120+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-CAN-040",
+        "entry_sha256": "63b7f30ae3bdca54edfb2a6ae355c38606ee91ad32222eabd34ee64f7b7e11c4",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-040.json"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-06-25T20:53:24.883212+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-CAN-040",
+        "entry_sha256": "2005ea4b4edb1db9770bdae4e4a127e6bbb44dfcc6302c806eb69f02efb4ae9d",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-040.json"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: d68de91122475986...",
+        "outputs_summary": {
+          "sha256": "d68de9112247598650e8ea6104b2a7ba57b91a8d8f04c4543bd90e96575fbfad"
+        },
+        "seq": 3,
+        "timestamp": "2026-06-25T20:53:24.883310+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "VIGIA-CAN-040",
+        "entry_sha256": "d8b983646ad0ebddc623a655f975c9fd04be51a7f5f0e38dbd88c1285731bc1f",
+        "inputs_summary": {
+          "evidence": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-040.json",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-06-25T20:53:24.883457+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "VIGIA-CAN-040",
+        "entry_sha256": "fbaf47bf4f66a1a64935d6a4deddf07f55ab40b2db9b3fb50124aedc6b14cf58",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 4 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+            "best_posterior": "1131/8000",
+            "confidence": "1131/8000",
+            "is_conclusive": "True",
+            "narrative": "svchost.exe with clean hash and valid Microsoft signature. Antivirus silent. But running from C:\\Users\\Public\\Downloads with parent explorer.exe. Maintains C2 connection to 45.134.26.109:8080. A legit..."
+          },
+          "case_id": "case_020_mimetismo_topografico",
+          "pipeline_meta": {
+            "artifact_count": "4",
+            "avg_score": "1131/1600",
+            "expected_verdict": "MALICE",
+            "source": "ebs_v1_json_adapter"
+          },
+          "signals": [
+            {
+              "artifact_id": "a020_01",
+              "confidence": "19/20",
+              "description": "svchost.exe PID 5124 from C:\\Users\\Public\\Downloads\\. Parent: explorer.exe. Expected: services.exe from System32.",
+              "evidence_type": "memory_process",
+              "source": "sift_volatility",
+              "z_score": "323/400"
+            },
+            {
+              "artifact_id": "a020_02",
+              "confidence": "17/20",
+              "description": "svchost.exe hash in Downloads: matches Windows 2025. Valid Microsoft signature. The attacker copied the clean binary to an anomalous location.",
+              "evidence_type": "memory_process",
+              "source": "sift_authenticode",
+              "z_score": "391/500"
+            },
+            {
+              "artifact_id": "a020_03",
+              "confidence": "4/5",
+              "description": "svchost.exe from Downloads maintains connection to 45.134.26.109:8080. The legitimate svchost.exe from System32 has no active connections.",
+              "evidence_type": "ip_geolocation",
+              "source": "sift_zeek",
+              "z_score": "16/25"
+            },
+            {
+              "artifact_id": "a020_04",
+              "confidence": "13/20",
+              "description": "Run key 'WindowsUpdate' pointing to C:\\Users\\Public\\Downloads\\svchost.exe for persistence.",
+              "evidence_type": "memory_process",
+              "source": "sift_regripper",
+              "z_score": "299/500"
+            }
+          ]
+        },
+        "seq": 5,
+        "timestamp": "2026-06-25T20:53:24.885843+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "VIGIA-CAN-040",
+        "entry_sha256": "c9f54a58836f7d8a3aaf0ca951d2507982528cd90f4188c7118b9886e37de96d",
+        "inputs_summary": {
+          "n_signals": "4"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-06-25T20:53:24.885957+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "VIGIA-CAN-040",
+        "entry_sha256": "c9d17d0acabd59a3f5fc7bf75f1e36389ff2ed6527bc8726b8cf72ae2a5301ef",
+        "inputs_summary": {
+          "verdict": "MALICIOUS_INTENT_DETECTED"
+        },
+        "iteration": 0,
+        "note": "Exit code 1 \u2014 analysis complete.",
+        "outputs_summary": {
+          "exit_code": "1"
+        },
+        "seq": 7,
+        "timestamp": "2026-06-25T20:53:24.886110+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-06-25T20:53:24.882877+00:00",
+    "total_entries": 7
+  },
+  "case_id": "VIGIA-CAN-040",
+  "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-040.json",
+  "evidence_sha256": "d68de9112247598650e8ea6104b2a7ba57b91a8d8f04c4543bd90e96575fbfad",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-CAN-040 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-040.json\nEvidence SHA-256: d68de9112247598650e8ea6104b2a7ba57b91a8d8f04c4543bd90e96575fbfad\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 1131/8000\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\nsvchost.exe with clean hash and valid Microsoft signature. Antivirus silent. But running from C:\\Users\\Public\\Downloads with parent explorer.exe. Maintains C2 connection to 45.134.26.109:8080. A legitimate binary in an illegitimate location.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [svchost.exe PID 5124 from C:\\Users\\Public\\Downloads\\. Parent: explorer] z=0.807 conf=0.95 \u2014 \n  [svchost.exe hash in Downloads: matches Windows 2025. Valid Microsoft s] z=0.782 conf=0.85 \u2014 \n  [svchost.exe from Downloads maintains connection to 45.134.26.109:8080.] z=0.640 conf=0.80 \u2014 \n  [Run key 'WindowsUpdate' pointing to C:\\Users\\Public\\Downloads\\svchost.] z=0.598 conf=0.65 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW \u2014 No significant anomalies detected in this iteration.\n\nCritical signals (z>3): 0\nHigh signals (2<z<=3): 0\nTotal signals analyzed: 4",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+      "best_posterior": "1131/8000",
+      "confidence": {
+        "__fraction__": true,
+        "den": 8000,
+        "num": 1131
+      },
+      "devil_advocate": {
+        "aggregation": {
+          "k": 3,
+          "method": "top_k_already_validated_matches_v2",
+          "total_gap_mass": "0"
+        },
+        "counterfactual_summary": {
+          "primary_alternative_hypothesis": null
+        },
+        "decision_context": {
+          "confidence": "1131/8000",
+          "mapped_verdict": "MALICIOUS_INTENT_DETECTED",
+          "raw_verdict": "MALICIOUS_INTENT_DETECTED",
+          "score": "1131/1600"
+        },
+        "devil_advocate_source": "deterministic_no_pattern_data_available",
+        "meta": {
+          "deterministic": true,
+          "generated_from": "case_pattern_library"
+        },
+        "narrative": "Eco's Razor (Abductive Falsification) applied to verdict MALICIOUS_INTENT_DETECTED. Pattern-matching data was not available on this code path \u2014 CasePatternLibrary is not invoked here by design (agent audit-trail mode (vigia_agent.py \u2014 JSON-replay / autonomous path); see KNOWN_LIMITATIONS.md). No structured counter-hypothesis could be derived deterministically. This is a documented scope limitation of the current code path, not an absence of falsification attempt.",
+        "pattern_evidence_gaps": [],
+        "version": "r7-da-v1"
+      },
+      "is_conclusive": true,
+      "narrative": "svchost.exe with clean hash and valid Microsoft signature. Antivirus silent. But running from C:\\Users\\Public\\Downloads with parent explorer.exe. Maintains C2 connection to 45.134.26.109:8080. A legitimate binary in an illegitimate location."
+    },
+    "case_id": "case_020_mimetismo_topografico",
+    "pipeline_meta": {
+      "artifact_count": 4,
+      "avg_score": "1131/1600",
+      "expected_verdict": "MALICE",
+      "source": "ebs_v1_json_adapter"
+    },
+    "signals": [
+      {
+        "artifact_id": "a020_01",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 19
+        },
+        "description": "svchost.exe PID 5124 from C:\\Users\\Public\\Downloads\\. Parent: explorer.exe. Expected: services.exe from System32.",
+        "evidence_type": "memory_process",
+        "source": "sift_volatility",
+        "z_score": {
+          "__fraction__": true,
+          "den": 400,
+          "num": 323
+        }
+      },
+      {
+        "artifact_id": "a020_02",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 17
+        },
+        "description": "svchost.exe hash in Downloads: matches Windows 2025. Valid Microsoft signature. The attacker copied the clean binary to an anomalous location.",
+        "evidence_type": "memory_process",
+        "source": "sift_authenticode",
+        "z_score": {
+          "__fraction__": true,
+          "den": 500,
+          "num": 391
+        }
+      },
+      {
+        "artifact_id": "a020_03",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 4
+        },
+        "description": "svchost.exe from Downloads maintains connection to 45.134.26.109:8080. The legitimate svchost.exe from System32 has no active connections.",
+        "evidence_type": "ip_geolocation",
+        "source": "sift_zeek",
+        "z_score": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 16
+        }
+      },
+      {
+        "artifact_id": "a020_04",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 13
+        },
+        "description": "Run key 'WindowsUpdate' pointing to C:\\Users\\Public\\Downloads\\svchost.exe for persistence.",
+        "evidence_type": "memory_process",
+        "source": "sift_regripper",
+        "z_score": {
+          "__fraction__": true,
+          "den": 500,
+          "num": 299
+        }
+      }
+    ]
+  },
+  "sans_compliance": {
+    "accuracy_validation": false,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}

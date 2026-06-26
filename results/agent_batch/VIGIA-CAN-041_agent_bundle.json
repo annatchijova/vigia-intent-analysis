@@ -1,0 +1,297 @@
+{
+  "analysis_timestamp": "2026-06-25T20:53:24.935214+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "VIGIA-CAN-041",
+    "end_time": "2026-06-25T20:53:24.935219+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "VIGIA-CAN-041",
+        "entry_sha256": "3351a5c0a7bdde108769deff351ff1fea46fbb20d35b664328ff6742db0d5b21",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "VIGIA-CAN-041"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: 95ef6739e4df7cf2...",
+        "outputs_summary": {
+          "agent_sha256": "95ef6739e4df7cf28eef26e5338c0708c50348077baeca29d899806d950da740",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-06-25T20:53:24.931953+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-CAN-041",
+        "entry_sha256": "87c389975914a96ce1cca29e91993130567745dd45e7576a23fd4aba511426c9",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-041.json"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-06-25T20:53:24.932039+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-CAN-041",
+        "entry_sha256": "ab3b8fa320bec70d801ce40280cee544fdc898afefb11a77d55a810e3429d01d",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-041.json"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: 48f5f58748d04e8b...",
+        "outputs_summary": {
+          "sha256": "48f5f58748d04e8b50339b9f54d8b488048041be6b3e99459210af47f1ec92ce"
+        },
+        "seq": 3,
+        "timestamp": "2026-06-25T20:53:24.932133+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "VIGIA-CAN-041",
+        "entry_sha256": "fb6f5c191d1c34155dbaee9a10e66fa67eccb11312b9fd12c063b7b01cf4ecd3",
+        "inputs_summary": {
+          "evidence": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-041.json",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-06-25T20:53:24.932241+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "VIGIA-CAN-041",
+        "entry_sha256": "b6853b870b47156ee6968e6e3216c0324e07057a8e0dc0eef2fbfbb3a48492b5",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 4 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+            "best_posterior": "823/20000",
+            "confidence": "823/20000",
+            "is_conclusive": "False",
+            "narrative": "Urgent email from compromised CEO account requesting a $250,000 transfer. The real CEO always uses 1 space after a period and never uses a period at the end of short messages. This email has 2 spaces ..."
+          },
+          "case_id": "case_011_traicion_puntuacion",
+          "pipeline_meta": {
+            "artifact_count": "4",
+            "avg_score": "823/4000",
+            "expected_verdict": "MALICE",
+            "source": "ebs_v1_json_adapter"
+          },
+          "signals": [
+            {
+              "artifact_id": "a011_01",
+              "confidence": "9/20",
+              "description": "CEO stylometric baseline: 847 emails. One space after period (100%). No period at end of messages <20 words (94%).",
+              "evidence_type": "log_entry",
+              "source": "sift_mail_gateway",
+              "z_score": "63/200"
+            },
+            {
+              "artifact_id": "a011_02",
+              "confidence": "7/20",
+              "description": "Suspicious email: 'Transfer urgently to this vendor.  The payment is critical.' \u2014 2 spaces after period, period at end, 9-word message.",
+              "evidence_type": "log_entry",
+              "source": "sift_mail_gateway",
+              "z_score": "287/1000"
+            },
+            {
+              "artifact_id": "a011_03",
+              "confidence": "1/5",
+              "description": "Stylometric analysis: 4.3 sigma deviation in post-period spacing and period usage. TTR and sentence length within baseline.",
+              "evidence_type": "cultural_marker",
+              "source": "sift_stylometry",
+              "z_score": "22/125"
+            },
+            {
+              "artifact_id": "a011_04",
+              "confidence": "9/10",
+              "description": "Login to CEO account at 04:15 from 185.220.101.50 (Tor node). Session lasted 8 minutes. CEO has an exclusive login history from Argentina and Spain.",
+              "evidence_type": "memory_process",
+              "source": "sift_azure_ad",
+              "z_score": "9/200"
+            }
+          ]
+        },
+        "seq": 5,
+        "timestamp": "2026-06-25T20:53:24.934469+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "VIGIA-CAN-041",
+        "entry_sha256": "a600ce62dfeda8af9d2c2f0ad587afbc992b533ffa6f458463bc7db5f0f01156",
+        "inputs_summary": {
+          "n_signals": "4"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-06-25T20:53:24.934575+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "VIGIA-CAN-041",
+        "entry_sha256": "449a3ff927d3c6db0978758d37f6a12b6099f063662df601e0e445382396a556",
+        "inputs_summary": {
+          "verdict": "MALICIOUS_INTENT_DETECTED"
+        },
+        "iteration": 0,
+        "note": "Exit code 1 \u2014 analysis complete.",
+        "outputs_summary": {
+          "exit_code": "1"
+        },
+        "seq": 7,
+        "timestamp": "2026-06-25T20:53:24.934738+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-06-25T20:53:24.931728+00:00",
+    "total_entries": 7
+  },
+  "case_id": "VIGIA-CAN-041",
+  "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-041.json",
+  "evidence_sha256": "48f5f58748d04e8b50339b9f54d8b488048041be6b3e99459210af47f1ec92ce",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-CAN-041 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-041.json\nEvidence SHA-256: 48f5f58748d04e8b50339b9f54d8b488048041be6b3e99459210af47f1ec92ce\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 823/20000\nConclusive: NO \u2014 requires human review\n\n--- PEIRCEAN NARRATIVE ---\nUrgent email from compromised CEO account requesting a $250,000 transfer. The real CEO always uses 1 space after a period and never uses a period at the end of short messages. This email has 2 spaces after a period and a period at the end of a 9-word message. DKIM valid (compromised account). Previous login from a Tor node at 04:15.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [CEO stylometric baseline: 847 emails. One space after period (100%). N] z=0.315 conf=0.45 \u2014 \n  [Suspicious email: 'Transfer urgently to this vendor.  The payment is c] z=0.287 conf=0.35 \u2014 \n  [Stylometric analysis: 4.3 sigma deviation in post-period spacing and p] z=0.176 conf=0.20 \u2014 \n  [Login to CEO account at 04:15 from 185.220.101.50 (Tor node). Session ] z=0.045 conf=0.90 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW \u2014 No significant anomalies detected in this iteration.\n\nCritical signals (z>3): 0\nHigh signals (2<z<=3): 0\nTotal signals analyzed: 4",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+      "best_posterior": "823/20000",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20000,
+        "num": 823
+      },
+      "devil_advocate": {
+        "aggregation": {
+          "k": 3,
+          "method": "top_k_already_validated_matches_v2",
+          "total_gap_mass": "0"
+        },
+        "counterfactual_summary": {
+          "primary_alternative_hypothesis": null
+        },
+        "decision_context": {
+          "confidence": "823/20000",
+          "mapped_verdict": "MALICIOUS_INTENT_DETECTED",
+          "raw_verdict": "MALICIOUS_INTENT_DETECTED",
+          "score": "823/4000"
+        },
+        "devil_advocate_source": "deterministic_no_pattern_data_available",
+        "meta": {
+          "deterministic": true,
+          "generated_from": "case_pattern_library"
+        },
+        "narrative": "Eco's Razor (Abductive Falsification) applied to verdict MALICIOUS_INTENT_DETECTED. Pattern-matching data was not available on this code path \u2014 CasePatternLibrary is not invoked here by design (agent audit-trail mode (vigia_agent.py \u2014 JSON-replay / autonomous path); see KNOWN_LIMITATIONS.md). No structured counter-hypothesis could be derived deterministically. This is a documented scope limitation of the current code path, not an absence of falsification attempt.",
+        "pattern_evidence_gaps": [],
+        "version": "r7-da-v1"
+      },
+      "is_conclusive": false,
+      "narrative": "Urgent email from compromised CEO account requesting a $250,000 transfer. The real CEO always uses 1 space after a period and never uses a period at the end of short messages. This email has 2 spaces after a period and a period at the end of a 9-word message. DKIM valid (compromised account). Previous login from a Tor node at 04:15."
+    },
+    "case_id": "case_011_traicion_puntuacion",
+    "pipeline_meta": {
+      "artifact_count": 4,
+      "avg_score": "823/4000",
+      "expected_verdict": "MALICE",
+      "source": "ebs_v1_json_adapter"
+    },
+    "signals": [
+      {
+        "artifact_id": "a011_01",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 9
+        },
+        "description": "CEO stylometric baseline: 847 emails. One space after period (100%). No period at end of messages <20 words (94%).",
+        "evidence_type": "log_entry",
+        "source": "sift_mail_gateway",
+        "z_score": {
+          "__fraction__": true,
+          "den": 200,
+          "num": 63
+        }
+      },
+      {
+        "artifact_id": "a011_02",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 7
+        },
+        "description": "Suspicious email: 'Transfer urgently to this vendor.  The payment is critical.' \u2014 2 spaces after period, period at end, 9-word message.",
+        "evidence_type": "log_entry",
+        "source": "sift_mail_gateway",
+        "z_score": {
+          "__fraction__": true,
+          "den": 1000,
+          "num": 287
+        }
+      },
+      {
+        "artifact_id": "a011_03",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 1
+        },
+        "description": "Stylometric analysis: 4.3 sigma deviation in post-period spacing and period usage. TTR and sentence length within baseline.",
+        "evidence_type": "cultural_marker",
+        "source": "sift_stylometry",
+        "z_score": {
+          "__fraction__": true,
+          "den": 125,
+          "num": 22
+        }
+      },
+      {
+        "artifact_id": "a011_04",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 9
+        },
+        "description": "Login to CEO account at 04:15 from 185.220.101.50 (Tor node). Session lasted 8 minutes. CEO has an exclusive login history from Argentina and Spain.",
+        "evidence_type": "memory_process",
+        "source": "sift_azure_ad",
+        "z_score": {
+          "__fraction__": true,
+          "den": 200,
+          "num": 9
+        }
+      }
+    ]
+  },
+  "sans_compliance": {
+    "accuracy_validation": false,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}

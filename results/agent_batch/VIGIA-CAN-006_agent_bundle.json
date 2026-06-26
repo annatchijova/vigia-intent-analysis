@@ -1,0 +1,297 @@
+{
+  "analysis_timestamp": "2026-06-25T20:53:23.257592+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "VIGIA-CAN-006",
+    "end_time": "2026-06-25T20:53:23.257598+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "VIGIA-CAN-006",
+        "entry_sha256": "c56f360f55a987ed301dddfb12b92ff71a52c16b936002a837b909479a54828e",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "VIGIA-CAN-006"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: 95ef6739e4df7cf2...",
+        "outputs_summary": {
+          "agent_sha256": "95ef6739e4df7cf28eef26e5338c0708c50348077baeca29d899806d950da740",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-06-25T20:53:23.254312+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-CAN-006",
+        "entry_sha256": "c340218d505bb751cc8220ac0ae1a66211b5fa6c552ae8a4fbab167547a39b6e",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-006.json"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-06-25T20:53:23.254401+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-CAN-006",
+        "entry_sha256": "806f11dd2a340eea7f6c84097b8dcfb59a467faec71e5b34202b061b3806df1a",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-006.json"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: 702cccfee4b2a114...",
+        "outputs_summary": {
+          "sha256": "702cccfee4b2a1142aafb7486e8ffd39bcdd5e7a09b0b4aefd2e5663dbf6a066"
+        },
+        "seq": 3,
+        "timestamp": "2026-06-25T20:53:23.254489+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "VIGIA-CAN-006",
+        "entry_sha256": "daf052e3e68a3b09bcd44fa547c264012e0273aa1c405f68ceb17e21778dab79",
+        "inputs_summary": {
+          "evidence": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-006.json",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-06-25T20:53:23.254596+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "VIGIA-CAN-006",
+        "entry_sha256": "733bb515cc66907314e8383888ae70fa39a74dc41b8162d08c601749f4514b92",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 4 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+            "best_posterior": "39/1250",
+            "confidence": "39/1250",
+            "is_conclusive": "False",
+            "narrative": "Internal ticket in English uses 'state of the country' as a calque of '\u0441\u0442\u0440\u0430\u043d\u0435' (area/side in Russian) in an electric utility company. The error reveals a native-language thought structure."
+          },
+          "case_id": "case_088_calco_semantico",
+          "pipeline_meta": {
+            "artifact_count": "4",
+            "avg_score": "39/250",
+            "expected_verdict": "MALICE",
+            "source": "ebs_v1_json_adapter"
+          },
+          "signals": [
+            {
+              "artifact_id": "a088_01",
+              "confidence": "3/10",
+              "description": "Ticket: 'I need to check the state of the country'. Context: electric utility server.",
+              "evidence_type": "log_entry",
+              "source": "sift_ticket_system",
+              "z_score": "117/500"
+            },
+            {
+              "artifact_id": "a088_02",
+              "confidence": "3/20",
+              "description": "Semantic calque: 'state of the country' directly translates '\u0441\u0442\u0440\u0430\u043d\u0435', which in informal Russian means 'area/sector'. Literal translation error.",
+              "evidence_type": "cultural_marker",
+              "source": "sift_linguistic",
+              "z_score": "123/1000"
+            },
+            {
+              "artifact_id": "a088_03",
+              "confidence": "19/20",
+              "description": "RDP session from IP geolocated in Moscow, timezone UTC+3, user 'field_tech'.",
+              "evidence_type": "memory_process",
+              "source": "sift_volatility",
+              "z_score": "57/1000"
+            },
+            {
+              "artifact_id": "a088_04",
+              "confidence": "7/20",
+              "description": "Command executed: 'Get-StateOfCountry -ServerId NY-42'. Cmdlet does not exist in the official repository; loaded from an unknown module.",
+              "evidence_type": "log_entry",
+              "source": "sift_syslog",
+              "z_score": "21/100"
+            }
+          ]
+        },
+        "seq": 5,
+        "timestamp": "2026-06-25T20:53:23.256854+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "VIGIA-CAN-006",
+        "entry_sha256": "0c0d921d4d8137d096a262f22a389a4e86560b6fa94b9b2364259b43d19f1d64",
+        "inputs_summary": {
+          "n_signals": "4"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-06-25T20:53:23.256960+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "VIGIA-CAN-006",
+        "entry_sha256": "1c582af4e43b89023bf2b0006ef9c9dceb8d27aec5b84f0369d5973b4c65b5e0",
+        "inputs_summary": {
+          "verdict": "MALICIOUS_INTENT_DETECTED"
+        },
+        "iteration": 0,
+        "note": "Exit code 1 \u2014 analysis complete.",
+        "outputs_summary": {
+          "exit_code": "1"
+        },
+        "seq": 7,
+        "timestamp": "2026-06-25T20:53:23.257117+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-06-25T20:53:23.254087+00:00",
+    "total_entries": 7
+  },
+  "case_id": "VIGIA-CAN-006",
+  "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-006.json",
+  "evidence_sha256": "702cccfee4b2a1142aafb7486e8ffd39bcdd5e7a09b0b4aefd2e5663dbf6a066",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-CAN-006 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-006.json\nEvidence SHA-256: 702cccfee4b2a1142aafb7486e8ffd39bcdd5e7a09b0b4aefd2e5663dbf6a066\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 39/1250\nConclusive: NO \u2014 requires human review\n\n--- PEIRCEAN NARRATIVE ---\nInternal ticket in English uses 'state of the country' as a calque of '\u0441\u0442\u0440\u0430\u043d\u0435' (area/side in Russian) in an electric utility company. The error reveals a native-language thought structure.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Ticket: 'I need to check the state of the country'. Context: electric ] z=0.234 conf=0.30 \u2014 \n  [Command executed: 'Get-StateOfCountry -ServerId NY-42'. Cmdlet does no] z=0.210 conf=0.35 \u2014 \n  [Semantic calque: 'state of the country' directly translates '\u0441\u0442\u0440\u0430\u043d\u0435', ] z=0.123 conf=0.15 \u2014 \n  [RDP session from IP geolocated in Moscow, timezone UTC+3, user 'field_] z=0.057 conf=0.95 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW \u2014 No significant anomalies detected in this iteration.\n\nCritical signals (z>3): 0\nHigh signals (2<z<=3): 0\nTotal signals analyzed: 4",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+      "best_posterior": "39/1250",
+      "confidence": {
+        "__fraction__": true,
+        "den": 1250,
+        "num": 39
+      },
+      "devil_advocate": {
+        "aggregation": {
+          "k": 3,
+          "method": "top_k_already_validated_matches_v2",
+          "total_gap_mass": "0"
+        },
+        "counterfactual_summary": {
+          "primary_alternative_hypothesis": null
+        },
+        "decision_context": {
+          "confidence": "39/1250",
+          "mapped_verdict": "MALICIOUS_INTENT_DETECTED",
+          "raw_verdict": "MALICIOUS_INTENT_DETECTED",
+          "score": "39/250"
+        },
+        "devil_advocate_source": "deterministic_no_pattern_data_available",
+        "meta": {
+          "deterministic": true,
+          "generated_from": "case_pattern_library"
+        },
+        "narrative": "Eco's Razor (Abductive Falsification) applied to verdict MALICIOUS_INTENT_DETECTED. Pattern-matching data was not available on this code path \u2014 CasePatternLibrary is not invoked here by design (agent audit-trail mode (vigia_agent.py \u2014 JSON-replay / autonomous path); see KNOWN_LIMITATIONS.md). No structured counter-hypothesis could be derived deterministically. This is a documented scope limitation of the current code path, not an absence of falsification attempt.",
+        "pattern_evidence_gaps": [],
+        "version": "r7-da-v1"
+      },
+      "is_conclusive": false,
+      "narrative": "Internal ticket in English uses 'state of the country' as a calque of '\u0441\u0442\u0440\u0430\u043d\u0435' (area/side in Russian) in an electric utility company. The error reveals a native-language thought structure."
+    },
+    "case_id": "case_088_calco_semantico",
+    "pipeline_meta": {
+      "artifact_count": 4,
+      "avg_score": "39/250",
+      "expected_verdict": "MALICE",
+      "source": "ebs_v1_json_adapter"
+    },
+    "signals": [
+      {
+        "artifact_id": "a088_01",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 3
+        },
+        "description": "Ticket: 'I need to check the state of the country'. Context: electric utility server.",
+        "evidence_type": "log_entry",
+        "source": "sift_ticket_system",
+        "z_score": {
+          "__fraction__": true,
+          "den": 500,
+          "num": 117
+        }
+      },
+      {
+        "artifact_id": "a088_02",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 3
+        },
+        "description": "Semantic calque: 'state of the country' directly translates '\u0441\u0442\u0440\u0430\u043d\u0435', which in informal Russian means 'area/sector'. Literal translation error.",
+        "evidence_type": "cultural_marker",
+        "source": "sift_linguistic",
+        "z_score": {
+          "__fraction__": true,
+          "den": 1000,
+          "num": 123
+        }
+      },
+      {
+        "artifact_id": "a088_03",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 19
+        },
+        "description": "RDP session from IP geolocated in Moscow, timezone UTC+3, user 'field_tech'.",
+        "evidence_type": "memory_process",
+        "source": "sift_volatility",
+        "z_score": {
+          "__fraction__": true,
+          "den": 1000,
+          "num": 57
+        }
+      },
+      {
+        "artifact_id": "a088_04",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 7
+        },
+        "description": "Command executed: 'Get-StateOfCountry -ServerId NY-42'. Cmdlet does not exist in the official repository; loaded from an unknown module.",
+        "evidence_type": "log_entry",
+        "source": "sift_syslog",
+        "z_score": {
+          "__fraction__": true,
+          "den": 100,
+          "num": 21
+        }
+      }
+    ]
+  },
+  "sans_compliance": {
+    "accuracy_validation": false,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}

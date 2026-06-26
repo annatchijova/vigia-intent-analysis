@@ -1,0 +1,297 @@
+{
+  "analysis_timestamp": "2026-06-25T20:53:23.161064+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "VIGIA-CAN-004",
+    "end_time": "2026-06-25T20:53:23.161069+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "VIGIA-CAN-004",
+        "entry_sha256": "f15a777a3f1ccb758c95d65e0dee25e684935295d2bc64c58e8fa3013fda9dd3",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "VIGIA-CAN-004"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: 95ef6739e4df7cf2...",
+        "outputs_summary": {
+          "agent_sha256": "95ef6739e4df7cf28eef26e5338c0708c50348077baeca29d899806d950da740",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-06-25T20:53:23.157797+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-CAN-004",
+        "entry_sha256": "7defe6dfb33f2cd5ac1727b7aa6ea56c7bb22aa8f36138d15f92740f7690e000",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-004.json"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-06-25T20:53:23.157883+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-CAN-004",
+        "entry_sha256": "fd374be9c2309100cfa351c1e8e949170df1d6100d18ff9c90938920041be0b4",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-004.json"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: d7f674adcabbc471...",
+        "outputs_summary": {
+          "sha256": "d7f674adcabbc471aebbac32e51da04ece00e70bfec47a3219ac41d427658d3f"
+        },
+        "seq": 3,
+        "timestamp": "2026-06-25T20:53:23.157972+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "VIGIA-CAN-004",
+        "entry_sha256": "c27576fc10febdca1ef50159a860af92926e3a0dd4376a6eb95d36661ca91b05",
+        "inputs_summary": {
+          "evidence": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-004.json",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-06-25T20:53:23.158074+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "VIGIA-CAN-004",
+        "entry_sha256": "7d19fb3d179c18174a27bd2e97d3d9a9e4c0ae40f2ed2ba1d44d1c78b31d20b3",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 4 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+            "best_posterior": "463/10000",
+            "confidence": "463/10000",
+            "is_conclusive": "False",
+            "narrative": "Bash history sequence: '\u043a\u0449\u0449\u0435' (root on Russian QWERTY layout), immediate deletion, then 'sudo'. The 800ms correction reveals an OPSEC-aware operator betrayed by muscle memory."
+          },
+          "case_id": "case_086_doble_salto_layout",
+          "pipeline_meta": {
+            "artifact_count": "4",
+            "avg_score": "463/2000",
+            "expected_verdict": "MALICE",
+            "source": "ebs_v1_json_adapter"
+          },
+          "signals": [
+            {
+              "artifact_id": "a086_01",
+              "confidence": "1/2",
+              "description": "Keystroke sequence: \u043a\u0449\u0449\u0435 [backspace\u00d74] sudo [enter]. The string \u043a\u0449\u0449\u0435 is 'root' typed with Russian \u0419\u0426\u0423\u041a\u0415\u041d layout active.",
+              "evidence_type": "log_entry",
+              "source": "sift_keylogger",
+              "z_score": "23/50"
+            },
+            {
+              "artifact_id": "a086_02",
+              "confidence": "3/10",
+              "description": "Phonetic analysis confirms \u043a\u0449\u0449\u0435 is the exact result of typing 'root' with Russian layout. Regional attribution: RU/CIS.",
+              "evidence_type": "ip_geolocation",
+              "source": "sift_linguistic",
+              "z_score": "69/250"
+            },
+            {
+              "artifact_id": "a086_03",
+              "confidence": "19/20",
+              "description": "Root session authenticated 27 seconds after the keyboard slip. The attacker achieved privilege escalation.",
+              "evidence_type": "log_entry",
+              "source": "sift_mimikatz",
+              "z_score": "57/500"
+            },
+            {
+              "artifact_id": "a086_04",
+              "confidence": "19/20",
+              "description": "Bash history in memory: 'sudo systemctl restart sshd' executed 120ms after the deleted string.",
+              "evidence_type": "memory_process",
+              "source": "sift_volatility",
+              "z_score": "19/250"
+            }
+          ]
+        },
+        "seq": 5,
+        "timestamp": "2026-06-25T20:53:23.160316+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "VIGIA-CAN-004",
+        "entry_sha256": "7227c39ce7046d30f52d09974045b1cf6eb9889d10fdb3ffe0a56eb11e84e7d6",
+        "inputs_summary": {
+          "n_signals": "4"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-06-25T20:53:23.160426+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "VIGIA-CAN-004",
+        "entry_sha256": "30d355577c290f57c491fcdda295db6a6d6338eba168d12790b15542955f6fda",
+        "inputs_summary": {
+          "verdict": "MALICIOUS_INTENT_DETECTED"
+        },
+        "iteration": 0,
+        "note": "Exit code 1 \u2014 analysis complete.",
+        "outputs_summary": {
+          "exit_code": "1"
+        },
+        "seq": 7,
+        "timestamp": "2026-06-25T20:53:23.160579+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-06-25T20:53:23.157563+00:00",
+    "total_entries": 7
+  },
+  "case_id": "VIGIA-CAN-004",
+  "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-004.json",
+  "evidence_sha256": "d7f674adcabbc471aebbac32e51da04ece00e70bfec47a3219ac41d427658d3f",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-CAN-004 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-004.json\nEvidence SHA-256: d7f674adcabbc471aebbac32e51da04ece00e70bfec47a3219ac41d427658d3f\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 463/10000\nConclusive: NO \u2014 requires human review\n\n--- PEIRCEAN NARRATIVE ---\nBash history sequence: '\u043a\u0449\u0449\u0435' (root on Russian QWERTY layout), immediate deletion, then 'sudo'. The 800ms correction reveals an OPSEC-aware operator betrayed by muscle memory.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Keystroke sequence: \u043a\u0449\u0449\u0435 [backspace\u00d74] sudo [enter]. The string \u043a\u0449\u0449\u0435 i] z=0.460 conf=0.50 \u2014 \n  [Phonetic analysis confirms \u043a\u0449\u0449\u0435 is the exact result of typing 'root' w] z=0.276 conf=0.30 \u2014 \n  [Root session authenticated 27 seconds after the keyboard slip. The att] z=0.114 conf=0.95 \u2014 \n  [Bash history in memory: 'sudo systemctl restart sshd' executed 120ms a] z=0.076 conf=0.95 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW \u2014 No significant anomalies detected in this iteration.\n\nCritical signals (z>3): 0\nHigh signals (2<z<=3): 0\nTotal signals analyzed: 4",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+      "best_posterior": "463/10000",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10000,
+        "num": 463
+      },
+      "devil_advocate": {
+        "aggregation": {
+          "k": 3,
+          "method": "top_k_already_validated_matches_v2",
+          "total_gap_mass": "0"
+        },
+        "counterfactual_summary": {
+          "primary_alternative_hypothesis": null
+        },
+        "decision_context": {
+          "confidence": "463/10000",
+          "mapped_verdict": "MALICIOUS_INTENT_DETECTED",
+          "raw_verdict": "MALICIOUS_INTENT_DETECTED",
+          "score": "463/2000"
+        },
+        "devil_advocate_source": "deterministic_no_pattern_data_available",
+        "meta": {
+          "deterministic": true,
+          "generated_from": "case_pattern_library"
+        },
+        "narrative": "Eco's Razor (Abductive Falsification) applied to verdict MALICIOUS_INTENT_DETECTED. Pattern-matching data was not available on this code path \u2014 CasePatternLibrary is not invoked here by design (agent audit-trail mode (vigia_agent.py \u2014 JSON-replay / autonomous path); see KNOWN_LIMITATIONS.md). No structured counter-hypothesis could be derived deterministically. This is a documented scope limitation of the current code path, not an absence of falsification attempt.",
+        "pattern_evidence_gaps": [],
+        "version": "r7-da-v1"
+      },
+      "is_conclusive": false,
+      "narrative": "Bash history sequence: '\u043a\u0449\u0449\u0435' (root on Russian QWERTY layout), immediate deletion, then 'sudo'. The 800ms correction reveals an OPSEC-aware operator betrayed by muscle memory."
+    },
+    "case_id": "case_086_doble_salto_layout",
+    "pipeline_meta": {
+      "artifact_count": 4,
+      "avg_score": "463/2000",
+      "expected_verdict": "MALICE",
+      "source": "ebs_v1_json_adapter"
+    },
+    "signals": [
+      {
+        "artifact_id": "a086_01",
+        "confidence": {
+          "__fraction__": true,
+          "den": 2,
+          "num": 1
+        },
+        "description": "Keystroke sequence: \u043a\u0449\u0449\u0435 [backspace\u00d74] sudo [enter]. The string \u043a\u0449\u0449\u0435 is 'root' typed with Russian \u0419\u0426\u0423\u041a\u0415\u041d layout active.",
+        "evidence_type": "log_entry",
+        "source": "sift_keylogger",
+        "z_score": {
+          "__fraction__": true,
+          "den": 50,
+          "num": 23
+        }
+      },
+      {
+        "artifact_id": "a086_02",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 3
+        },
+        "description": "Phonetic analysis confirms \u043a\u0449\u0449\u0435 is the exact result of typing 'root' with Russian layout. Regional attribution: RU/CIS.",
+        "evidence_type": "ip_geolocation",
+        "source": "sift_linguistic",
+        "z_score": {
+          "__fraction__": true,
+          "den": 250,
+          "num": 69
+        }
+      },
+      {
+        "artifact_id": "a086_03",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 19
+        },
+        "description": "Root session authenticated 27 seconds after the keyboard slip. The attacker achieved privilege escalation.",
+        "evidence_type": "log_entry",
+        "source": "sift_mimikatz",
+        "z_score": {
+          "__fraction__": true,
+          "den": 500,
+          "num": 57
+        }
+      },
+      {
+        "artifact_id": "a086_04",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 19
+        },
+        "description": "Bash history in memory: 'sudo systemctl restart sshd' executed 120ms after the deleted string.",
+        "evidence_type": "memory_process",
+        "source": "sift_volatility",
+        "z_score": {
+          "__fraction__": true,
+          "den": 250,
+          "num": 19
+        }
+      }
+    ]
+  },
+  "sans_compliance": {
+    "accuracy_validation": false,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}

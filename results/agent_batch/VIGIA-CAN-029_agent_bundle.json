@@ -1,0 +1,273 @@
+{
+  "analysis_timestamp": "2026-06-25T20:53:24.357107+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "VIGIA-CAN-029",
+    "end_time": "2026-06-25T20:53:24.357112+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "VIGIA-CAN-029",
+        "entry_sha256": "18effd453d0cae60bde1914657a600bfbaec5307547f8842e2ddc144b06e1359",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "VIGIA-CAN-029"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: 95ef6739e4df7cf2...",
+        "outputs_summary": {
+          "agent_sha256": "95ef6739e4df7cf28eef26e5338c0708c50348077baeca29d899806d950da740",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-06-25T20:53:24.354218+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-CAN-029",
+        "entry_sha256": "c8c765892a1136727d80dcb1ea1fb3daf533fa84c97cc8e716f02fd32ced60bf",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-029.json"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-06-25T20:53:24.354304+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-CAN-029",
+        "entry_sha256": "53b092f434e827eb458ae1bdb0f6c6e727798846de308b169868d361df57b8de",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-029.json"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: 513eff7156096057...",
+        "outputs_summary": {
+          "sha256": "513eff7156096057341e457b5d8aa31c23d68b551d59a6d12525ccac915d578e"
+        },
+        "seq": 3,
+        "timestamp": "2026-06-25T20:53:24.354400+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "VIGIA-CAN-029",
+        "entry_sha256": "5e6f80b5cd5b9c6412c395d890fac574097807f6929d5f8a1bf1d2c14af6d293",
+        "inputs_summary": {
+          "evidence": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-029.json",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-06-25T20:53:24.354506+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "VIGIA-CAN-029",
+        "entry_sha256": "d3718e4ab33a8035a80755fb880537a224c8a6c0c774b7a4b1413aa6f5862518",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 4 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "SUSPICION_DETECTED",
+            "best_posterior": "3157/40000",
+            "confidence": "3157/40000",
+            "is_conclusive": "True",
+            "narrative": "Noisy nmap scan (SYN flood, 65535 ports) generates 47 EDR alerts classified as low severity. Memory analysis reveals a C++ driver with SSDT hooks and a hollowed process with active C2. The nmap is the..."
+          },
+          "case_id": "case_111_falso_rastro_incompetencia",
+          "pipeline_meta": {
+            "artifact_count": "4",
+            "avg_score": "3157/8000",
+            "expected_verdict": "SUSPICION",
+            "source": "ebs_v1_json_adapter"
+          },
+          "signals": [
+            {
+              "artifact_id": "a111_01",
+              "confidence": "3/10",
+              "description": "Noisy nmap scan: SYN scan of ports 1-65535 from external IP. Trivially detectable.",
+              "evidence_type": "memory_process",
+              "source": "sift_ids",
+              "z_score": "69/250"
+            },
+            {
+              "artifact_id": "a111_02",
+              "confidence": "9/20",
+              "description": "EDR classifies nmap as 'Reconnaissance \u2014 Low Severity'. Tier-1 queue, 48h SLA. No automated response.",
+              "evidence_type": "lsass_session",
+              "source": "sift_edr",
+              "z_score": "837/2000"
+            },
+            {
+              "artifact_id": "a111_03",
+              "confidence": "24/25",
+              "description": "Custom kernel driver: C++ with SSDT hooks, process hiding, memory injection. Compiled 2026-04-15.",
+              "evidence_type": "memory_process",
+              "source": "sift_volatility",
+              "z_score": "6/125"
+            },
+            {
+              "artifact_id": "a111_04",
+              "confidence": "19/20",
+              "description": "Hidden process (SSDT hook). Persistent connection to 185.220.101.42:443. Not visible in tasklist or procmon.",
+              "evidence_type": "memory_process",
+              "source": "sift_volatility",
+              "z_score": "209/250"
+            }
+          ]
+        },
+        "seq": 5,
+        "timestamp": "2026-06-25T20:53:24.356752+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "VIGIA-CAN-029",
+        "entry_sha256": "484328deec7067df96e37a7220aa7cafd87da5023a7edb213014055888a573c0",
+        "inputs_summary": {
+          "n_signals": "4"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-06-25T20:53:24.356867+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "VIGIA-CAN-029",
+        "entry_sha256": "4ad3c0663e47d6a57e9863ed1d92c4729d53e4e8e82dc1308b41c7a9c4f0d36a",
+        "inputs_summary": {
+          "verdict": "SUSPICION_DETECTED"
+        },
+        "iteration": 0,
+        "note": "Exit code 0 \u2014 analysis complete.",
+        "outputs_summary": {
+          "exit_code": "0"
+        },
+        "seq": 7,
+        "timestamp": "2026-06-25T20:53:24.357022+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-06-25T20:53:24.353990+00:00",
+    "total_entries": 7
+  },
+  "case_id": "VIGIA-CAN-029",
+  "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-029.json",
+  "evidence_sha256": "513eff7156096057341e457b5d8aa31c23d68b551d59a6d12525ccac915d578e",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-CAN-029 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-029.json\nEvidence SHA-256: 513eff7156096057341e457b5d8aa31c23d68b551d59a6d12525ccac915d578e\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: SUSPICION_DETECTED\nPosterior confidence: 3157/40000\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\nNoisy nmap scan (SYN flood, 65535 ports) generates 47 EDR alerts classified as low severity. Memory analysis reveals a C++ driver with SSDT hooks and a hollowed process with active C2. The nmap is theater.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Hidden process (SSDT hook). Persistent connection to 185.220.101.42:44] z=0.836 conf=0.95 \u2014 \n  [EDR classifies nmap as 'Reconnaissance \u2014 Low Severity'. Tier-1 queue, ] z=0.418 conf=0.45 \u2014 \n  [Noisy nmap scan: SYN scan of ports 1-65535 from external IP. Trivially] z=0.276 conf=0.30 \u2014 \n  [Custom kernel driver: C++ with SSDT hooks, process hiding, memory inje] z=0.048 conf=0.96 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW \u2014 No significant anomalies detected in this iteration.\n\nCritical signals (z>3): 0\nHigh signals (2<z<=3): 0\nTotal signals analyzed: 4",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "SUSPICION_DETECTED",
+      "best_posterior": "3157/40000",
+      "confidence": {
+        "__fraction__": true,
+        "den": 40000,
+        "num": 3157
+      },
+      "is_conclusive": true,
+      "narrative": "Noisy nmap scan (SYN flood, 65535 ports) generates 47 EDR alerts classified as low severity. Memory analysis reveals a C++ driver with SSDT hooks and a hollowed process with active C2. The nmap is theater."
+    },
+    "case_id": "case_111_falso_rastro_incompetencia",
+    "pipeline_meta": {
+      "artifact_count": 4,
+      "avg_score": "3157/8000",
+      "expected_verdict": "SUSPICION",
+      "source": "ebs_v1_json_adapter"
+    },
+    "signals": [
+      {
+        "artifact_id": "a111_01",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 3
+        },
+        "description": "Noisy nmap scan: SYN scan of ports 1-65535 from external IP. Trivially detectable.",
+        "evidence_type": "memory_process",
+        "source": "sift_ids",
+        "z_score": {
+          "__fraction__": true,
+          "den": 250,
+          "num": 69
+        }
+      },
+      {
+        "artifact_id": "a111_02",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 9
+        },
+        "description": "EDR classifies nmap as 'Reconnaissance \u2014 Low Severity'. Tier-1 queue, 48h SLA. No automated response.",
+        "evidence_type": "lsass_session",
+        "source": "sift_edr",
+        "z_score": {
+          "__fraction__": true,
+          "den": 2000,
+          "num": 837
+        }
+      },
+      {
+        "artifact_id": "a111_03",
+        "confidence": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 24
+        },
+        "description": "Custom kernel driver: C++ with SSDT hooks, process hiding, memory injection. Compiled 2026-04-15.",
+        "evidence_type": "memory_process",
+        "source": "sift_volatility",
+        "z_score": {
+          "__fraction__": true,
+          "den": 125,
+          "num": 6
+        }
+      },
+      {
+        "artifact_id": "a111_04",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 19
+        },
+        "description": "Hidden process (SSDT hook). Persistent connection to 185.220.101.42:443. Not visible in tasklist or procmon.",
+        "evidence_type": "memory_process",
+        "source": "sift_volatility",
+        "z_score": {
+          "__fraction__": true,
+          "den": 250,
+          "num": 209
+        }
+      }
+    ]
+  },
+  "sans_compliance": {
+    "accuracy_validation": false,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}

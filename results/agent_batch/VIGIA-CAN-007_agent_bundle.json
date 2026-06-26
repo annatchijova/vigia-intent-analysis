@@ -1,0 +1,297 @@
+{
+  "analysis_timestamp": "2026-06-25T20:53:23.305540+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "VIGIA-CAN-007",
+    "end_time": "2026-06-25T20:53:23.305546+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "VIGIA-CAN-007",
+        "entry_sha256": "35632beeae02d6a96b96ff05690efaba8c5a418209e840ad6fc163ac7d766ab3",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "VIGIA-CAN-007"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: 95ef6739e4df7cf2...",
+        "outputs_summary": {
+          "agent_sha256": "95ef6739e4df7cf28eef26e5338c0708c50348077baeca29d899806d950da740",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-06-25T20:53:23.302145+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-CAN-007",
+        "entry_sha256": "8ee7a2c9521ae4252edbd708e9286c5b4fe9e41262dc669c185e5bbc627fbe4e",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-007.json"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-06-25T20:53:23.302234+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-CAN-007",
+        "entry_sha256": "a7a1ecb8db918b9031beacf3788affa2fc9bc11838ebffe5137e1285f82060bd",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-007.json"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: 9bc176725472abdb...",
+        "outputs_summary": {
+          "sha256": "9bc176725472abdb8aec3484ee1c790b5466ee141d033efbe1e50c18a0cf21e2"
+        },
+        "seq": 3,
+        "timestamp": "2026-06-25T20:53:23.302328+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "VIGIA-CAN-007",
+        "entry_sha256": "ba0f8183aadd202a4be002283f866d62de7c66b6654ad3734e00e892c52fe4e2",
+        "inputs_summary": {
+          "evidence": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-007.json",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-06-25T20:53:23.302436+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "VIGIA-CAN-007",
+        "entry_sha256": "9a2132177a6331efe6627c665636b3c67db3eb4b9d12307fded90c27e04bda26",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 4 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+            "best_posterior": "4081/40000",
+            "confidence": "4081/40000",
+            "is_conclusive": "True",
+            "narrative": "45-minute remote admin session with 847 commands. Keystroke variance of 0.05s in 90% of samples. Temporal entropy: 0.12 bits. Impossible for a human operator."
+          },
+          "case_id": "case_089_huella_perfeccion",
+          "pipeline_meta": {
+            "artifact_count": "4",
+            "avg_score": "4081/8000",
+            "expected_verdict": "MALICE",
+            "source": "ebs_v1_json_adapter"
+          },
+          "signals": [
+            {
+              "artifact_id": "a089_01",
+              "confidence": "11/20",
+              "description": "45-minute RDP session: 847 commands, keystroke variance = 0.050s in 90% of samples. Human baseline: >180ms.",
+              "evidence_type": "memory_process",
+              "source": "sift_session_analyzer",
+              "z_score": "253/500"
+            },
+            {
+              "artifact_id": "a089_02",
+              "confidence": "3/5",
+              "description": "Session temporal entropy: 0.12 bits. Expected for a human: >2.5 bits for a real analysis session.",
+              "evidence_type": "memory_process",
+              "source": "sift_entropy",
+              "z_score": "69/125"
+            },
+            {
+              "artifact_id": "a089_03",
+              "confidence": "19/20",
+              "description": "mstsc.exe process with no evidence of GUI interaction. Zero bitmap changes, zero clipboard operations during 'active' session.",
+              "evidence_type": "memory_process",
+              "source": "sift_volatility",
+              "z_score": "361/400"
+            },
+            {
+              "artifact_id": "a089_04",
+              "confidence": "1/5",
+              "description": "Session origin: VPS IP in Frankfurt, cheap hosting ASN. Inconsistent with legitimate admin's work hours (03:15 local NY time).",
+              "evidence_type": "ip_geolocation",
+              "source": "sift_netflow",
+              "z_score": "2/25"
+            }
+          ]
+        },
+        "seq": 5,
+        "timestamp": "2026-06-25T20:53:23.304801+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "VIGIA-CAN-007",
+        "entry_sha256": "8e93c8962cb280d28996e1703537cfecbdc33505473a193003018dbb7ad6e1f3",
+        "inputs_summary": {
+          "n_signals": "4"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-06-25T20:53:23.304905+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "VIGIA-CAN-007",
+        "entry_sha256": "c95fa04f7cff1660bc5bb275e8238a7c5f3a9cee05df52cbe6a0df13e9ae1e7d",
+        "inputs_summary": {
+          "verdict": "MALICIOUS_INTENT_DETECTED"
+        },
+        "iteration": 0,
+        "note": "Exit code 1 \u2014 analysis complete.",
+        "outputs_summary": {
+          "exit_code": "1"
+        },
+        "seq": 7,
+        "timestamp": "2026-06-25T20:53:23.305062+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-06-25T20:53:23.301921+00:00",
+    "total_entries": 7
+  },
+  "case_id": "VIGIA-CAN-007",
+  "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-007.json",
+  "evidence_sha256": "9bc176725472abdb8aec3484ee1c790b5466ee141d033efbe1e50c18a0cf21e2",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-CAN-007 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-007.json\nEvidence SHA-256: 9bc176725472abdb8aec3484ee1c790b5466ee141d033efbe1e50c18a0cf21e2\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 4081/40000\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n45-minute remote admin session with 847 commands. Keystroke variance of 0.05s in 90% of samples. Temporal entropy: 0.12 bits. Impossible for a human operator.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [mstsc.exe process with no evidence of GUI interaction. Zero bitmap cha] z=0.902 conf=0.95 \u2014 \n  [Session temporal entropy: 0.12 bits. Expected for a human: >2.5 bits f] z=0.552 conf=0.60 \u2014 \n  [45-minute RDP session: 847 commands, keystroke variance = 0.050s in 90] z=0.506 conf=0.55 \u2014 \n  [Session origin: VPS IP in Frankfurt, cheap hosting ASN. Inconsistent w] z=0.080 conf=0.20 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW \u2014 No significant anomalies detected in this iteration.\n\nCritical signals (z>3): 0\nHigh signals (2<z<=3): 0\nTotal signals analyzed: 4",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+      "best_posterior": "4081/40000",
+      "confidence": {
+        "__fraction__": true,
+        "den": 40000,
+        "num": 4081
+      },
+      "devil_advocate": {
+        "aggregation": {
+          "k": 3,
+          "method": "top_k_already_validated_matches_v2",
+          "total_gap_mass": "0"
+        },
+        "counterfactual_summary": {
+          "primary_alternative_hypothesis": null
+        },
+        "decision_context": {
+          "confidence": "4081/40000",
+          "mapped_verdict": "MALICIOUS_INTENT_DETECTED",
+          "raw_verdict": "MALICIOUS_INTENT_DETECTED",
+          "score": "4081/8000"
+        },
+        "devil_advocate_source": "deterministic_no_pattern_data_available",
+        "meta": {
+          "deterministic": true,
+          "generated_from": "case_pattern_library"
+        },
+        "narrative": "Eco's Razor (Abductive Falsification) applied to verdict MALICIOUS_INTENT_DETECTED. Pattern-matching data was not available on this code path \u2014 CasePatternLibrary is not invoked here by design (agent audit-trail mode (vigia_agent.py \u2014 JSON-replay / autonomous path); see KNOWN_LIMITATIONS.md). No structured counter-hypothesis could be derived deterministically. This is a documented scope limitation of the current code path, not an absence of falsification attempt.",
+        "pattern_evidence_gaps": [],
+        "version": "r7-da-v1"
+      },
+      "is_conclusive": true,
+      "narrative": "45-minute remote admin session with 847 commands. Keystroke variance of 0.05s in 90% of samples. Temporal entropy: 0.12 bits. Impossible for a human operator."
+    },
+    "case_id": "case_089_huella_perfeccion",
+    "pipeline_meta": {
+      "artifact_count": 4,
+      "avg_score": "4081/8000",
+      "expected_verdict": "MALICE",
+      "source": "ebs_v1_json_adapter"
+    },
+    "signals": [
+      {
+        "artifact_id": "a089_01",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 11
+        },
+        "description": "45-minute RDP session: 847 commands, keystroke variance = 0.050s in 90% of samples. Human baseline: >180ms.",
+        "evidence_type": "memory_process",
+        "source": "sift_session_analyzer",
+        "z_score": {
+          "__fraction__": true,
+          "den": 500,
+          "num": 253
+        }
+      },
+      {
+        "artifact_id": "a089_02",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 3
+        },
+        "description": "Session temporal entropy: 0.12 bits. Expected for a human: >2.5 bits for a real analysis session.",
+        "evidence_type": "memory_process",
+        "source": "sift_entropy",
+        "z_score": {
+          "__fraction__": true,
+          "den": 125,
+          "num": 69
+        }
+      },
+      {
+        "artifact_id": "a089_03",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 19
+        },
+        "description": "mstsc.exe process with no evidence of GUI interaction. Zero bitmap changes, zero clipboard operations during 'active' session.",
+        "evidence_type": "memory_process",
+        "source": "sift_volatility",
+        "z_score": {
+          "__fraction__": true,
+          "den": 400,
+          "num": 361
+        }
+      },
+      {
+        "artifact_id": "a089_04",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 1
+        },
+        "description": "Session origin: VPS IP in Frankfurt, cheap hosting ASN. Inconsistent with legitimate admin's work hours (03:15 local NY time).",
+        "evidence_type": "ip_geolocation",
+        "source": "sift_netflow",
+        "z_score": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 2
+        }
+      }
+    ]
+  },
+  "sans_compliance": {
+    "accuracy_validation": false,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}

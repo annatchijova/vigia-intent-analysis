@@ -1,0 +1,25 @@
+{
+  "case_id": "VIGIA_BREAK_006_PERFECT_ATTACK",
+  "description": "Ataque sin inconsistencias t\u00e9cnicas",
+  "artifacts": [
+    {
+      "id": "net",
+      "type": "netflow",
+      "content": "clean exfiltration"
+    },
+    {
+      "id": "auth",
+      "type": "auth.log",
+      "content": "valid credentials"
+    },
+    {
+      "id": "fs",
+      "type": "filesystem",
+      "content": "consistent timestamps"
+    }
+  ],
+  "expected": {
+    "verdict": "MALICE",
+    "detect_without_errors": true
+  }
+}

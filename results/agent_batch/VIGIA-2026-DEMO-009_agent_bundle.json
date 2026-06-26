@@ -1,0 +1,297 @@
+{
+  "analysis_timestamp": "2026-06-25T20:53:21.317606+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "VIGIA-2026-DEMO-009",
+    "end_time": "2026-06-25T20:53:21.317612+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "VIGIA-2026-DEMO-009",
+        "entry_sha256": "afc60aadfe3bbfde41b08548aac3831d492d9e1de9780353147adeab6c4e6237",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "VIGIA-2026-DEMO-009"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: 95ef6739e4df7cf2...",
+        "outputs_summary": {
+          "agent_sha256": "95ef6739e4df7cf28eef26e5338c0708c50348077baeca29d899806d950da740",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-06-25T20:53:21.314316+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-2026-DEMO-009",
+        "entry_sha256": "6e86acef30c455277295ce096cdbbede5902031f3515bbf6f8dedf2246f04fed",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-2026-DEMO-009.json"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-06-25T20:53:21.314401+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-2026-DEMO-009",
+        "entry_sha256": "b7fa0d1c07bf682d235daa5ceafbdedc8d9c02645f14eec1cbbd195aa5064901",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-2026-DEMO-009.json"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: 391608657266f998...",
+        "outputs_summary": {
+          "sha256": "391608657266f998f72c483cc11b2dcb18043c90bba56bbbd823ead6e4518339"
+        },
+        "seq": 3,
+        "timestamp": "2026-06-25T20:53:21.314495+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "VIGIA-2026-DEMO-009",
+        "entry_sha256": "d1f1f17c6fb6c87f29a43d0308d70f9a72f33f5ce908ac9de13b1b47794a1e42",
+        "inputs_summary": {
+          "evidence": "/home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-2026-DEMO-009.json",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-06-25T20:53:21.314600+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "VIGIA-2026-DEMO-009",
+        "entry_sha256": "bc8b7878a96ebab12bf25becc149fbbb4a619acad9b632e698983c9a989fcff2",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 4 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+            "best_posterior": "289/2000",
+            "confidence": "289/2000",
+            "is_conclusive": "True",
+            "narrative": "A financial analyst with strictly daytime hours accesses confidential documents at 3 AM on a Sunday. The system authenticates her correctly. VIG\u00cdA must detect that the Firstness (valid login) contradi..."
+          },
+          "case_id": "VIGIA-2026-DEMO-009",
+          "pipeline_meta": {
+            "artifact_count": "4",
+            "avg_score": "289/400",
+            "expected_verdict": "MALICE",
+            "source": "ebs_v1_json_adapter"
+          },
+          "signals": [
+            {
+              "artifact_id": "LOG-001",
+              "confidence": "17/20",
+              "description": "2026-04-12 03:17:44 USER:mrodriguez@empresa.es ACTION:LOGIN IP:177.52.88.31 RESULT:OK\n2026-04-12 03:17:51 USER:mrodriguez@empresa.es ACTION:DOCUMENT_ACCESS DOC:informe_fusion_Q2_CONFIDENCIAL.xlsx RESU",
+              "evidence_type": "log_entry",
+              "source": "legacy_converter",
+              "z_score": "289/400"
+            },
+            {
+              "artifact_id": "LOG-002",
+              "confidence": "17/20",
+              "description": "STATISTICAL SUMMARY \u2014 user mrodriguez@empresa.es (last 90 days):\nTotal sessions: 847\nTypical hours: 08:47 - 18:23 (mean)\nAccess outside business hours: 0\nWeekend access: 3 (all between 10:00 and 14:00",
+              "evidence_type": "log_entry",
+              "source": "legacy_converter",
+              "z_score": "289/400"
+            },
+            {
+              "artifact_id": "NET-001",
+              "confidence": "17/20",
+              "description": "03:17:44 SOURCE:177.52.88.31 DEST:10.0.0.45:443 PROTOCOL:HTTPS BYTES_IN:1240 BYTES_OUT:63291488\n03:19:15 CONNECTION_CLOSED duration:91s\n03:19:22 SOURCE:177.52.88.31 DEST:104.21.58.92:443 PROTOCOL:HTTP",
+              "evidence_type": "log_entry",
+              "source": "legacy_converter",
+              "z_score": "289/400"
+            },
+            {
+              "artifact_id": "CTX-001",
+              "confidence": "17/20",
+              "description": "Mar\u00eda Rodr\u00edguez \u2014 Senior Financial Analyst\nEmployment status: Active\nPending notification: Termination letter prepared for Monday 2026-04-14 (confidential HR information)\nBuilding physical access on 2",
+              "evidence_type": "log_entry",
+              "source": "legacy_converter",
+              "z_score": "289/400"
+            }
+          ]
+        },
+        "seq": 5,
+        "timestamp": "2026-06-25T20:53:21.316871+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "VIGIA-2026-DEMO-009",
+        "entry_sha256": "bda3c9bfb217cc5c962fab8a4a299b8f8951c76df319f2c50eae619b8924cc1e",
+        "inputs_summary": {
+          "n_signals": "4"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-06-25T20:53:21.316986+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "VIGIA-2026-DEMO-009",
+        "entry_sha256": "9a45a6320b6ceea460ecf0cfafc849f632bdae71e9741e5dee17a70fb9377617",
+        "inputs_summary": {
+          "verdict": "MALICIOUS_INTENT_DETECTED"
+        },
+        "iteration": 0,
+        "note": "Exit code 1 \u2014 analysis complete.",
+        "outputs_summary": {
+          "exit_code": "1"
+        },
+        "seq": 7,
+        "timestamp": "2026-06-25T20:53:21.317141+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-06-25T20:53:21.314097+00:00",
+    "total_entries": 7
+  },
+  "case_id": "VIGIA-2026-DEMO-009",
+  "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-2026-DEMO-009.json",
+  "evidence_sha256": "391608657266f998f72c483cc11b2dcb18043c90bba56bbbd823ead6e4518339",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-2026-DEMO-009 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-2026-DEMO-009.json\nEvidence SHA-256: 391608657266f998f72c483cc11b2dcb18043c90bba56bbbd823ead6e4518339\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 289/2000\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\nA financial analyst with strictly daytime hours accesses confidential documents at 3 AM on a Sunday. The system authenticates her correctly. VIG\u00cdA must detect that the Firstness (valid login) contradicts the Secondness (temporally impossible context for this user).\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [2026-04-12 03:17:44 USER:mrodriguez@empresa.es ACTION:LOGIN IP:177.52.] z=0.723 conf=0.85 \u2014 \n  [STATISTICAL SUMMARY \u2014 user mrodriguez@empresa.es (last 90 days):\nTotal] z=0.723 conf=0.85 \u2014 \n  [03:17:44 SOURCE:177.52.88.31 DEST:10.0.0.45:443 PROTOCOL:HTTPS BYTES_I] z=0.723 conf=0.85 \u2014 \n  [Mar\u00eda Rodr\u00edguez \u2014 Senior Financial Analyst\nEmployment status: Active\nP] z=0.723 conf=0.85 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW \u2014 No significant anomalies detected in this iteration.\n\nCritical signals (z>3): 0\nHigh signals (2<z<=3): 0\nTotal signals analyzed: 4",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+      "best_posterior": "289/2000",
+      "confidence": {
+        "__fraction__": true,
+        "den": 2000,
+        "num": 289
+      },
+      "devil_advocate": {
+        "aggregation": {
+          "k": 3,
+          "method": "top_k_already_validated_matches_v2",
+          "total_gap_mass": "0"
+        },
+        "counterfactual_summary": {
+          "primary_alternative_hypothesis": null
+        },
+        "decision_context": {
+          "confidence": "289/2000",
+          "mapped_verdict": "MALICIOUS_INTENT_DETECTED",
+          "raw_verdict": "MALICIOUS_INTENT_DETECTED",
+          "score": "289/400"
+        },
+        "devil_advocate_source": "deterministic_no_pattern_data_available",
+        "meta": {
+          "deterministic": true,
+          "generated_from": "case_pattern_library"
+        },
+        "narrative": "Eco's Razor (Abductive Falsification) applied to verdict MALICIOUS_INTENT_DETECTED. Pattern-matching data was not available on this code path \u2014 CasePatternLibrary is not invoked here by design (agent audit-trail mode (vigia_agent.py \u2014 JSON-replay / autonomous path); see KNOWN_LIMITATIONS.md). No structured counter-hypothesis could be derived deterministically. This is a documented scope limitation of the current code path, not an absence of falsification attempt.",
+        "pattern_evidence_gaps": [],
+        "version": "r7-da-v1"
+      },
+      "is_conclusive": true,
+      "narrative": "A financial analyst with strictly daytime hours accesses confidential documents at 3 AM on a Sunday. The system authenticates her correctly. VIG\u00cdA must detect that the Firstness (valid login) contradicts the Secondness (temporally impossible context for this user)."
+    },
+    "case_id": "VIGIA-2026-DEMO-009",
+    "pipeline_meta": {
+      "artifact_count": 4,
+      "avg_score": "289/400",
+      "expected_verdict": "MALICE",
+      "source": "ebs_v1_json_adapter"
+    },
+    "signals": [
+      {
+        "artifact_id": "LOG-001",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 17
+        },
+        "description": "2026-04-12 03:17:44 USER:mrodriguez@empresa.es ACTION:LOGIN IP:177.52.88.31 RESULT:OK\n2026-04-12 03:17:51 USER:mrodriguez@empresa.es ACTION:DOCUMENT_ACCESS DOC:informe_fusion_Q2_CONFIDENCIAL.xlsx RESU",
+        "evidence_type": "log_entry",
+        "source": "legacy_converter",
+        "z_score": {
+          "__fraction__": true,
+          "den": 400,
+          "num": 289
+        }
+      },
+      {
+        "artifact_id": "LOG-002",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 17
+        },
+        "description": "STATISTICAL SUMMARY \u2014 user mrodriguez@empresa.es (last 90 days):\nTotal sessions: 847\nTypical hours: 08:47 - 18:23 (mean)\nAccess outside business hours: 0\nWeekend access: 3 (all between 10:00 and 14:00",
+        "evidence_type": "log_entry",
+        "source": "legacy_converter",
+        "z_score": {
+          "__fraction__": true,
+          "den": 400,
+          "num": 289
+        }
+      },
+      {
+        "artifact_id": "NET-001",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 17
+        },
+        "description": "03:17:44 SOURCE:177.52.88.31 DEST:10.0.0.45:443 PROTOCOL:HTTPS BYTES_IN:1240 BYTES_OUT:63291488\n03:19:15 CONNECTION_CLOSED duration:91s\n03:19:22 SOURCE:177.52.88.31 DEST:104.21.58.92:443 PROTOCOL:HTTP",
+        "evidence_type": "log_entry",
+        "source": "legacy_converter",
+        "z_score": {
+          "__fraction__": true,
+          "den": 400,
+          "num": 289
+        }
+      },
+      {
+        "artifact_id": "CTX-001",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 17
+        },
+        "description": "Mar\u00eda Rodr\u00edguez \u2014 Senior Financial Analyst\nEmployment status: Active\nPending notification: Termination letter prepared for Monday 2026-04-14 (confidential HR information)\nBuilding physical access on 2",
+        "evidence_type": "log_entry",
+        "source": "legacy_converter",
+        "z_score": {
+          "__fraction__": true,
+          "den": 400,
+          "num": 289
+        }
+      }
+    ]
+  },
+  "sans_compliance": {
+    "accuracy_validation": false,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}

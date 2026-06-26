@@ -1,0 +1,297 @@
+{
+  "analysis_timestamp": "2026-06-25T20:53:23.590563+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "VIGIA-CAN-013",
+    "end_time": "2026-06-25T20:53:23.590569+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "VIGIA-CAN-013",
+        "entry_sha256": "42a394d5008c17967de1697a3adfaed11085018c5c000bfc099f1fa573ad3faa",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "VIGIA-CAN-013"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: 95ef6739e4df7cf2...",
+        "outputs_summary": {
+          "agent_sha256": "95ef6739e4df7cf28eef26e5338c0708c50348077baeca29d899806d950da740",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-06-25T20:53:23.587254+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-CAN-013",
+        "entry_sha256": "95f882a3912b6b1544a0198a147f6dde3ae1abc0e69352b3e52429f136eb5a93",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-013.json"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-06-25T20:53:23.587342+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-CAN-013",
+        "entry_sha256": "9b50dd74df7c2be6a873f3fa1190f6309cd8d2484b8cd36bf8389e4980478dd2",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-013.json"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: b29485d24b8b0746...",
+        "outputs_summary": {
+          "sha256": "b29485d24b8b074698eba7eeb6f96ecc27d434ba748a2b417d901339b972bad1"
+        },
+        "seq": 3,
+        "timestamp": "2026-06-25T20:53:23.587433+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "VIGIA-CAN-013",
+        "entry_sha256": "35fa11a73f9508e9ccf38757c5345d87d35b5a3367570ca6f12fa4614bf2d4c7",
+        "inputs_summary": {
+          "evidence": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-013.json",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-06-25T20:53:23.587537+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "VIGIA-CAN-013",
+        "entry_sha256": "04ed6878735a430b19ba9cab2dd3fcfe5056cf0d3bfdb0eebc0ee355a63afcc4",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 4 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+            "best_posterior": "167/5000",
+            "confidence": "167/5000",
+            "is_conclusive": "False",
+            "narrative": "Support ticket in English: 'I'll make the revision of the server'. Command executed: grep -R (uppercase R, from translated Chinese manuals). Double calque revealing Chinese native thought structure."
+          },
+          "case_id": "case_095_sombra_fonetica",
+          "pipeline_meta": {
+            "artifact_count": "4",
+            "avg_score": "167/1000",
+            "expected_verdict": "MALICE",
+            "source": "ebs_v1_json_adapter"
+          },
+          "signals": [
+            {
+              "artifact_id": "a095_01",
+              "confidence": "3/10",
+              "description": "Ticket: 'I'll make the revision of the server'. Use of 'revision' as an action noun (calque of \u4fee\u8ba2/\u5ba1\u6838).",
+              "evidence_type": "log_entry",
+              "source": "sift_ticket_system",
+              "z_score": "21/100"
+            },
+            {
+              "artifact_id": "a095_02",
+              "confidence": "3/20",
+              "description": "Semantic calque + manual syntax: 'revision' translates \u4fee\u8ba2. Uppercase flag '-R' appears in Chinese technical translations of Unix manuals.",
+              "evidence_type": "cultural_marker",
+              "source": "sift_linguistic",
+              "z_score": "3/25"
+            },
+            {
+              "artifact_id": "a095_03",
+              "confidence": "7/20",
+              "description": "Command executed: grep -R 'password' /etc. Uppercase -R is documented in Chinese translated manuals; a native speaker would use -r.",
+              "evidence_type": "log_entry",
+              "source": "sift_syslog",
+              "z_score": "581/2000"
+            },
+            {
+              "artifact_id": "a095_04",
+              "confidence": "19/20",
+              "description": "SSH session from Shanghai IP, timezone UTC+8, user 'support_temp' created 2 days prior.",
+              "evidence_type": "memory_process",
+              "source": "sift_volatility",
+              "z_score": "19/400"
+            }
+          ]
+        },
+        "seq": 5,
+        "timestamp": "2026-06-25T20:53:23.589817+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "VIGIA-CAN-013",
+        "entry_sha256": "e99d8ccc4ce5c10d9b89dee3602692039357ecf5bf0ada6dbc6752b3bc0e6be2",
+        "inputs_summary": {
+          "n_signals": "4"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-06-25T20:53:23.589923+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "VIGIA-CAN-013",
+        "entry_sha256": "094b9e79d07905cae3462043479e99b003d8e98b3b2d74d4284f51308921037e",
+        "inputs_summary": {
+          "verdict": "MALICIOUS_INTENT_DETECTED"
+        },
+        "iteration": 0,
+        "note": "Exit code 1 \u2014 analysis complete.",
+        "outputs_summary": {
+          "exit_code": "1"
+        },
+        "seq": 7,
+        "timestamp": "2026-06-25T20:53:23.590079+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-06-25T20:53:23.587028+00:00",
+    "total_entries": 7
+  },
+  "case_id": "VIGIA-CAN-013",
+  "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-013.json",
+  "evidence_sha256": "b29485d24b8b074698eba7eeb6f96ecc27d434ba748a2b417d901339b972bad1",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-CAN-013 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-013.json\nEvidence SHA-256: b29485d24b8b074698eba7eeb6f96ecc27d434ba748a2b417d901339b972bad1\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 167/5000\nConclusive: NO \u2014 requires human review\n\n--- PEIRCEAN NARRATIVE ---\nSupport ticket in English: 'I'll make the revision of the server'. Command executed: grep -R (uppercase R, from translated Chinese manuals). Double calque revealing Chinese native thought structure.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Command executed: grep -R 'password' /etc. Uppercase -R is documented ] z=0.290 conf=0.35 \u2014 \n  [Ticket: 'I'll make the revision of the server'. Use of 'revision' as a] z=0.210 conf=0.30 \u2014 \n  [Semantic calque + manual syntax: 'revision' translates \u4fee\u8ba2. Uppercase f] z=0.120 conf=0.15 \u2014 \n  [SSH session from Shanghai IP, timezone UTC+8, user 'support_temp' crea] z=0.048 conf=0.95 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW \u2014 No significant anomalies detected in this iteration.\n\nCritical signals (z>3): 0\nHigh signals (2<z<=3): 0\nTotal signals analyzed: 4",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+      "best_posterior": "167/5000",
+      "confidence": {
+        "__fraction__": true,
+        "den": 5000,
+        "num": 167
+      },
+      "devil_advocate": {
+        "aggregation": {
+          "k": 3,
+          "method": "top_k_already_validated_matches_v2",
+          "total_gap_mass": "0"
+        },
+        "counterfactual_summary": {
+          "primary_alternative_hypothesis": null
+        },
+        "decision_context": {
+          "confidence": "167/5000",
+          "mapped_verdict": "MALICIOUS_INTENT_DETECTED",
+          "raw_verdict": "MALICIOUS_INTENT_DETECTED",
+          "score": "167/1000"
+        },
+        "devil_advocate_source": "deterministic_no_pattern_data_available",
+        "meta": {
+          "deterministic": true,
+          "generated_from": "case_pattern_library"
+        },
+        "narrative": "Eco's Razor (Abductive Falsification) applied to verdict MALICIOUS_INTENT_DETECTED. Pattern-matching data was not available on this code path \u2014 CasePatternLibrary is not invoked here by design (agent audit-trail mode (vigia_agent.py \u2014 JSON-replay / autonomous path); see KNOWN_LIMITATIONS.md). No structured counter-hypothesis could be derived deterministically. This is a documented scope limitation of the current code path, not an absence of falsification attempt.",
+        "pattern_evidence_gaps": [],
+        "version": "r7-da-v1"
+      },
+      "is_conclusive": false,
+      "narrative": "Support ticket in English: 'I'll make the revision of the server'. Command executed: grep -R (uppercase R, from translated Chinese manuals). Double calque revealing Chinese native thought structure."
+    },
+    "case_id": "case_095_sombra_fonetica",
+    "pipeline_meta": {
+      "artifact_count": 4,
+      "avg_score": "167/1000",
+      "expected_verdict": "MALICE",
+      "source": "ebs_v1_json_adapter"
+    },
+    "signals": [
+      {
+        "artifact_id": "a095_01",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 3
+        },
+        "description": "Ticket: 'I'll make the revision of the server'. Use of 'revision' as an action noun (calque of \u4fee\u8ba2/\u5ba1\u6838).",
+        "evidence_type": "log_entry",
+        "source": "sift_ticket_system",
+        "z_score": {
+          "__fraction__": true,
+          "den": 100,
+          "num": 21
+        }
+      },
+      {
+        "artifact_id": "a095_02",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 3
+        },
+        "description": "Semantic calque + manual syntax: 'revision' translates \u4fee\u8ba2. Uppercase flag '-R' appears in Chinese technical translations of Unix manuals.",
+        "evidence_type": "cultural_marker",
+        "source": "sift_linguistic",
+        "z_score": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 3
+        }
+      },
+      {
+        "artifact_id": "a095_03",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 7
+        },
+        "description": "Command executed: grep -R 'password' /etc. Uppercase -R is documented in Chinese translated manuals; a native speaker would use -r.",
+        "evidence_type": "log_entry",
+        "source": "sift_syslog",
+        "z_score": {
+          "__fraction__": true,
+          "den": 2000,
+          "num": 581
+        }
+      },
+      {
+        "artifact_id": "a095_04",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 19
+        },
+        "description": "SSH session from Shanghai IP, timezone UTC+8, user 'support_temp' created 2 days prior.",
+        "evidence_type": "memory_process",
+        "source": "sift_volatility",
+        "z_score": {
+          "__fraction__": true,
+          "den": 400,
+          "num": 19
+        }
+      }
+    ]
+  },
+  "sans_compliance": {
+    "accuracy_validation": false,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}

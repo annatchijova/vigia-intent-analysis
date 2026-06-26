@@ -1,0 +1,273 @@
+{
+  "analysis_timestamp": "2026-06-25T20:53:19.531160+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "VIGIA-FN-002",
+    "end_time": "2026-06-25T20:53:19.531166+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "VIGIA-FN-002",
+        "entry_sha256": "a44b3578764cfe69231e4160bf29c6f084e6e05644d2a1194e1205ce9c908489",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "VIGIA-FN-002"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: 95ef6739e4df7cf2...",
+        "outputs_summary": {
+          "agent_sha256": "95ef6739e4df7cf28eef26e5338c0708c50348077baeca29d899806d950da740",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-06-25T20:53:19.527870+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-FN-002",
+        "entry_sha256": "759723ad9e38619ddc480d62e539c16057059953f91f070fdabd8970d7502c14",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-FN-002.json"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-06-25T20:53:19.527957+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-FN-002",
+        "entry_sha256": "d1f59ac7a1ea6765b081726a9ac6eee1f6262c31356d15190cd1d5c32f7f197c",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-FN-002.json"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: b31538bc3f295e3b...",
+        "outputs_summary": {
+          "sha256": "b31538bc3f295e3b14b1c39b5092b10df0776a1df7e55bdc02ac5adec74bfc22"
+        },
+        "seq": 3,
+        "timestamp": "2026-06-25T20:53:19.528049+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "VIGIA-FN-002",
+        "entry_sha256": "7b4d8d2b94b0469b5a73cba45b1dd338122fc062f9ac422576c7ac0747d7a5ac",
+        "inputs_summary": {
+          "evidence": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-FN-002.json",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-06-25T20:53:19.528152+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "VIGIA-FN-002",
+        "entry_sha256": "1c0bfbd8be0d55d837a8a42aebf5b26043d74a71b15fa00ed19aac50d04aed1b",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 3 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+            "best_posterior": "163/30000",
+            "confidence": "163/30000",
+            "is_conclusive": "False",
+            "narrative": "Attacker installs a legitimate backup agent (Veeam) with a valid licence, configured to send data to a cloud instance they rented. The tool is legitimate, signed, and the traffic is indistinguishable ..."
+          },
+          "case_id": "VIGIA-FN-002",
+          "pipeline_meta": {
+            "artifact_count": "3",
+            "avg_score": "163/6000",
+            "expected_verdict": "MALICE",
+            "source": "ebs_v1_json_adapter"
+          },
+          "signals": [
+            {
+              "artifact_id": "fn002_01",
+              "confidence": "19/20",
+              "description": "veeam_agent.exe running with valid certificate",
+              "evidence_type": "memory_process",
+              "source": "sift_process_list",
+              "z_score": "19/400"
+            },
+            {
+              "artifact_id": "fn002_02",
+              "confidence": "1/5",
+              "description": "Backup traffic to 198.51.100.77 on port 443",
+              "evidence_type": "ip_geolocation",
+              "source": "sift_netflow",
+              "z_score": "1/100"
+            },
+            {
+              "artifact_id": "fn002_03",
+              "confidence": "3/10",
+              "description": "NO change ticket found for Veeam installation on server 10.0.8.44",
+              "evidence_type": "log_entry",
+              "source": "sift_change_management",
+              "z_score": "3/125"
+            }
+          ]
+        },
+        "seq": 5,
+        "timestamp": "2026-06-25T20:53:19.530422+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "VIGIA-FN-002",
+        "entry_sha256": "6246de811b3a917cfdef2b118ad6ae8ebffaa7e8f76997b035a7cb543f18f868",
+        "inputs_summary": {
+          "n_signals": "3"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-06-25T20:53:19.530520+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "VIGIA-FN-002",
+        "entry_sha256": "c5126b90b67199c34b7a272eaa4f747c0a1f724945f0aa71d5a3e7d607785742",
+        "inputs_summary": {
+          "verdict": "MALICIOUS_INTENT_DETECTED"
+        },
+        "iteration": 0,
+        "note": "Exit code 1 \u2014 analysis complete.",
+        "outputs_summary": {
+          "exit_code": "1"
+        },
+        "seq": 7,
+        "timestamp": "2026-06-25T20:53:19.530675+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-06-25T20:53:19.527631+00:00",
+    "total_entries": 7
+  },
+  "case_id": "VIGIA-FN-002",
+  "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-FN-002.json",
+  "evidence_sha256": "b31538bc3f295e3b14b1c39b5092b10df0776a1df7e55bdc02ac5adec74bfc22",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-FN-002 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/VIGIA-FN-002.json\nEvidence SHA-256: b31538bc3f295e3b14b1c39b5092b10df0776a1df7e55bdc02ac5adec74bfc22\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 163/30000\nConclusive: NO \u2014 requires human review\n\n--- PEIRCEAN NARRATIVE ---\nAttacker installs a legitimate backup agent (Veeam) with a valid licence, configured to send data to a cloud instance they rented. The tool is legitimate, signed, and the traffic is indistinguishable from real backups.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [veeam_agent.exe running with valid certificate] z=0.048 conf=0.95 \u2014 \n  [NO change ticket found for Veeam installation on server 10.0.8.44] z=0.024 conf=0.30 \u2014 \n  [Backup traffic to 198.51.100.77 on port 443] z=0.010 conf=0.20 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW \u2014 No significant anomalies detected in this iteration.\n\nCritical signals (z>3): 0\nHigh signals (2<z<=3): 0\nTotal signals analyzed: 3",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+      "best_posterior": "163/30000",
+      "confidence": {
+        "__fraction__": true,
+        "den": 30000,
+        "num": 163
+      },
+      "devil_advocate": {
+        "aggregation": {
+          "k": 3,
+          "method": "top_k_already_validated_matches_v2",
+          "total_gap_mass": "0"
+        },
+        "counterfactual_summary": {
+          "primary_alternative_hypothesis": null
+        },
+        "decision_context": {
+          "confidence": "163/30000",
+          "mapped_verdict": "MALICIOUS_INTENT_DETECTED",
+          "raw_verdict": "MALICIOUS_INTENT_DETECTED",
+          "score": "163/6000"
+        },
+        "devil_advocate_source": "deterministic_no_pattern_data_available",
+        "meta": {
+          "deterministic": true,
+          "generated_from": "case_pattern_library"
+        },
+        "narrative": "Eco's Razor (Abductive Falsification) applied to verdict MALICIOUS_INTENT_DETECTED. Pattern-matching data was not available on this code path \u2014 CasePatternLibrary is not invoked here by design (agent audit-trail mode (vigia_agent.py \u2014 JSON-replay / autonomous path); see KNOWN_LIMITATIONS.md). No structured counter-hypothesis could be derived deterministically. This is a documented scope limitation of the current code path, not an absence of falsification attempt.",
+        "pattern_evidence_gaps": [],
+        "version": "r7-da-v1"
+      },
+      "is_conclusive": false,
+      "narrative": "Attacker installs a legitimate backup agent (Veeam) with a valid licence, configured to send data to a cloud instance they rented. The tool is legitimate, signed, and the traffic is indistinguishable from real backups."
+    },
+    "case_id": "VIGIA-FN-002",
+    "pipeline_meta": {
+      "artifact_count": 3,
+      "avg_score": "163/6000",
+      "expected_verdict": "MALICE",
+      "source": "ebs_v1_json_adapter"
+    },
+    "signals": [
+      {
+        "artifact_id": "fn002_01",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 19
+        },
+        "description": "veeam_agent.exe running with valid certificate",
+        "evidence_type": "memory_process",
+        "source": "sift_process_list",
+        "z_score": {
+          "__fraction__": true,
+          "den": 400,
+          "num": 19
+        }
+      },
+      {
+        "artifact_id": "fn002_02",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 1
+        },
+        "description": "Backup traffic to 198.51.100.77 on port 443",
+        "evidence_type": "ip_geolocation",
+        "source": "sift_netflow",
+        "z_score": {
+          "__fraction__": true,
+          "den": 100,
+          "num": 1
+        }
+      },
+      {
+        "artifact_id": "fn002_03",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 3
+        },
+        "description": "NO change ticket found for Veeam installation on server 10.0.8.44",
+        "evidence_type": "log_entry",
+        "source": "sift_change_management",
+        "z_score": {
+          "__fraction__": true,
+          "den": 125,
+          "num": 3
+        }
+      }
+    ]
+  },
+  "sans_compliance": {
+    "accuracy_validation": false,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}
