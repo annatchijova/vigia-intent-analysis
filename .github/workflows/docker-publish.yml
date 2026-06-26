@@ -138,8 +138,9 @@ jobs:
             --tmpfs /tmp:size=50M,noexec,nosuid \
             --cap-drop ALL \
             --security-opt no-new-privileges:true \
+            --entrypoint python3 \
             "$IMAGE" \
-            python3 -c "
+            -c "
           import sys
           sys.path.insert(0, '/app')
           from fractions import Fraction
