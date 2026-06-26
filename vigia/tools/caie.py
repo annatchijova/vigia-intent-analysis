@@ -1721,7 +1721,7 @@ class CrossArtifactIncongruenceEngine:
         # Group by (source_tool, evidence_type) - these are dependent
         grouped = defaultdict(list)
         for a in self._artifacts:
-            key = (a.source_tool, a.evidence_type)
+            key = (a.source_tool.strip().casefold(), a.evidence_type.strip().casefold())
             grouped[key].append(a.adjusted_score)
 
         # Within-group fusion (dependent evidence): 1 - ∏(1 - s)
