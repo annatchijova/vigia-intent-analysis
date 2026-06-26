@@ -731,6 +731,32 @@ def _caie_hmac_sign_canonical(canonical: str) -> str:
         del key
 
 
+_RESERVED_IPS: frozenset = frozenset({
+    "127.0.0.1", "localhost", "::1",
+    "0.0.0.0", "::",
+    "255.255.255.255",
+})
+
+
+def _is_reserved_ip(ip: str) -> bool:
+    """
+    Returns True if ip is a reserved/non-routable address that cannot
+    represent a real outbound C2 connection.
+    Daubert rationale: a connection to 127.0.0.1 is intra-process —
+    structurally impossible to be exfiltration.
+    RFC 1918 private ranges (10.x, 172.16.x, 192.168.x) are intentionally
+    NOT filtered — lateral movement to internal hosts is a valid IOC.
+    """
+    ip_clean = ip.strip().lower()
+    if ip_clean in _RESERVED_IPS:
+        return True
+    if ip_clean.startswith("127."):
+        return True
+    if ip_clean.startswith("fe80:"):
+        return True
+    return False
+
+
 def _extract_assertions(artifact: "Artifact") -> frozenset:
     """
     Translate observable metadata fields into atomic forensic assertion
@@ -759,7 +785,8 @@ def _extract_assertions(artifact: "Artifact") -> frozenset:
         # Note: "ip" alone (HTTP access log source field) is intentionally
         # excluded — it identifies the requester, not a suspicious outbound
         # connection. Mixing these was the original source of false positives.
-        if meta.get("dst_ip") or meta.get("dest_ip"):
+        _dst = meta.get("dst_ip") or meta.get("dest_ip")
+        if _dst and isinstance(_dst, str) and _dst.strip() and not _is_reserved_ip(_dst):
             assertions.add("log_claims_outbound_connection")
         if meta.get("pid"):
             assertions.add("log_names_process")
@@ -1113,8 +1140,8 @@ class CrossArtifactIncongruenceEngine:
             if log_claims_activity and memory_silent:
                 # PID correlation: same process named in log and present in
                 # memory → contradiction is intra-process, not just cross-source
-                log_pids  = {str(a.metadata.get("pid")) for a in logs    if a.metadata.get("pid") is not None}
-                tech_pids = {str(a.metadata.get("pid")) for a in technical if a.metadata.get("pid") is not None}
+                log_pids  = {str(a.metadata.get("pid")).strip() for a in logs    if a.metadata.get("pid") is not None}
+                tech_pids = {str(a.metadata.get("pid")).strip() for a in technical if a.metadata.get("pid") is not None}
                 pid_overlap = log_pids & tech_pids
 
                 severity = _dround(0.95 if pid_overlap else 0.75, _DETERMINISTIC_INTERNAL_PREC)
