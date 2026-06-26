@@ -205,6 +205,9 @@ async def check_determinism(
     unique = len(set(hashes))
     deterministic = unique == 1
 
+    with open(evidence_path, "rb") as _fh:
+        _evidence_sha256 = hashlib.sha256(_fh.read()).hexdigest()
+
     report = {
         "deterministic": deterministic,
         "runs": num_runs,
@@ -212,9 +215,7 @@ async def check_determinism(
         "unique_hashes": unique,
         "tool": tool_name,
         "evidence_path": evidence_path,
-        "evidence_sha256": hashlib.sha256(
-            open(evidence_path, "rb").read()
-        ).hexdigest(),
+        "evidence_sha256": _evidence_sha256,
         "timings_seconds": [round(t, 4) for t in timings],
     }
 
