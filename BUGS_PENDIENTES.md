@@ -606,3 +606,73 @@ Normalizar con `.strip()` antes de cualquier comparación:
 - PID: `str(pid).strip()` en lugar de `str(pid)`
 - dst_ip/dest_ip: ya tienen `.strip()` en `_dest_valid` pero el valor
   malformado igual entra al bundle
+
+---
+
+## AUDITORÍA NEGATIVA — Propiedades Verificadas y No Vulnerables (2026-06-25/26)
+
+Este apartado documenta invariantes y vectores de ataque que fueron probados
+exhaustivamente y NO encontraron bugs. Su propósito es evitar repetir auditorías
+sobre superficie ya cubierta.
+
+### Motor CAIE (vigia/tools/caie.py)
+
+| Propiedad | Resultado | Método |
+|-----------|-----------|--------|
+| Insertion order invariance (I1) | PASS | 3 permutaciones, mismo fracture_graph |
+| Re-evaluation idempotency (I2) | PASS | 10 runs consecutivos, mismo state vector |
+| Score determinism (I3) | PASS | 10 runs paralelos, composite_score idéntico |
+| Semantic content invariance (I4) | PASS | description ignorada por _extract_assertions |
+| Benign non-regression (I5) | PASS | 0 MALICE en 16 casos VIGIA-BEN-* |
+| Negative invariance (I6) | PASS | sin dst_ip → no fractura; score bajo → cambia |
+| Output aliasing | PASS | r["fractures"].append() no afecta estado interno |
+| Input mutation | PASS | add_artifact() hace deepcopy, metadata original intacta |
+| NaN/inf en raw_score | PASS | Finite Math Shield zeroa el score, fractura structual se evalúa correctamente |
+| Objetos arbitrarios en metadata (UUID, datetime, Path, bytes) | PASS | str() canonicalization absorbe todos |
+| Campos Unicode invisibles en keys (ZWSP, NBSP, cyrílico) | RESUELTO→PASS | B-016 fix: NFKC+strip |
+| Nested dict hash collision | RESUELTO→PASS | B-017 fix: json.dumps sort_keys=True |
+| PID int/str/float coercion | RESUELTO→PASS | str().strip() canonicalization |
+| network_connections truthiness | RESUELTO→PASS | isinstance(list/dict) validation |
+| source_tool casing/whitespace | RESUELTO→PASS | casefold() en Noisy-OR grouping |
+| reserved IPs (loopback, broadcast) | RESUELTO→PASS | B-014 fix: _is_reserved_ip() |
+| Metadata dict aliasing post-add_artifact | RESUELTO→PASS | copy.deepcopy() en add_artifact |
+
+### Scorer (vigia_scorer.py)
+
+| Propiedad | Resultado | Método |
+|-----------|-----------|--------|
+| Ley 1: run(A) == run(deepcopy(A)) | PASS | case_001_temporal |
+| Ley 2: json roundtrip invariance | PASS | json.dumps/loads preserve score |
+| Ley 4: input immutability | PASS | case no mutado post-run |
+| Ley 5: idempotency (sin timestamps) | PASS | 3 runs consecutivos |
+| Ley 6: monotonicidad | PASS (por diseño) | score crece al agregar artefactos |
+| Ley 7: score ∈ [0,1] | PASS | isfinite, bounded |
+| Ley 3: order invariance | PASS | artifacts reversed → mismo score |
+| Bundle vacío | DOCUMENTADO | verdict=ERROR con campo error explicativo |
+
+### Pipeline (vigia/pipeline/pipeline.py)
+
+| Propiedad | Resultado | Método |
+|-----------|-----------|--------|
+| Reentrancia (run case1, case2, case1) | PASS | run3 == run1 exacto |
+| Estado residual entre runs | PASS | fractures=0 constante en 4 runs |
+| Input immutability | PASS | bundle no mutado post-run_full |
+| Objetos compartidos (mismo artifact dos veces) | PASS | sin aliasing |
+| Campos Unicode/raros en metadata | PASS | absorbidos silenciosamente |
+| Recuperación post-excepción | PASS | pipe usado tras CaseSchemaError produce resultado idéntico a fresh pipe |
+| Singletons mutables | N/A | todos los globals son constantes de lookup frozen |
+
+### E/S y Sistema
+
+| Propiedad | Resultado | Método |
+|-----------|-----------|--------|
+| datetime.now() local (sin UTC) | PASS | grep: cero resultados sin timezone |
+| tempfile sin cleanup | PASS | document_integrity.py usa finally: os.unlink() |
+| json.dumps sin sort_keys en paths de hash | PASS | adversarial_mutation_suite y vigia_planner usan sort_keys=True |
+| NaN/inf en scores de pipeline | PASS | isfinite() confirmado |
+
+### Vectores descartados como falsos positivos
+
+- **B-009** (floats en vigia_artifact_graph.py): módulo de visualización puro, sin callers en scoring path. float() correcto para cálculos de tamaño de píxeles y pesos de display.
+- **Copilot Bug 28/11/15** (signal_mapper.py .lower() sobre tool_name): archivo inexistente, bug completamente alucinado por Copilot. Patrón no existe en el codebase.
+- **_calibration_dataset acumulación**: inicializado en __init__ pero nunca se llena entre runs — no hay estado residual.
