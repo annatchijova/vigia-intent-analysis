@@ -1,0 +1,1302 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VIGÍA // Simulador de Intencionalidad</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js" crossorigin></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js" crossorigin></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; background: #080b11; }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+  <script>
+    "use strict";
+    const { useState, useEffect, useRef } = React;
+/**
+ * VIGÍA // SIMULADOR DE INTENCIONALIDAD
+ * ------------------------------------------------------------------
+ * Un juego para internalizar la doctrina de VIGÍA:
+ *   - El LLM (co-analista) CANTA una narrativa seductora.
+ *   - El motor determinista SELLA el veredicto con SHA-256.
+ *   - El LLM queda FUERA del camino del veredicto.
+ *
+ * El jugador no apuesta al LLM: predice lo que sellará el motor,
+ * clasifica el signo (Peirce: ícono / índice / símbolo) y aprende
+ * a resistir la captura narrativa (caso BREAK-012).
+ *
+ * Idioma de interfaz: español rioplatense (herramienta de aprendizaje).
+ * Sin dependencias externas salvo React.
+ */
+
+// ----------------------------------------------------------------------------
+// Paleta: tres voces con significado, no decoración.
+//   violeta = narrativa del LLM (la sirena)
+//   cian    = motor determinista (la verdad de fondo)
+//   ámbar   = sello / cadena de custodia (lo criptográfico)
+// ----------------------------------------------------------------------------
+const C = {
+  void: "#080b11",
+  panel: "#0e141d",
+  panelHi: "#131b26",
+  line: "#202a38",
+  lineHi: "#2c3a4d",
+  ink: "#cdd7e4",
+  inkDim: "#6c7c91",
+  inkFaint: "#46546790",
+  llm: "#a87fe8",
+  engine: "#54d6e8",
+  seal: "#e6a953",
+  malice: "#f2566e",
+  benign: "#54c98c",
+  rupture: "#e6a953"
+};
+const MONO = 'ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Consolas, monospace';
+const SERIF = 'Georgia, "Iowan Old Style", "Times New Roman", serif';
+const VERDICT_META = {
+  BENIGNO: {
+    color: C.benign,
+    glyph: "○"
+  },
+  MALICIA: {
+    color: C.malice,
+    glyph: "△"
+  },
+  RUPTURA: {
+    color: C.rupture,
+    glyph: "▢"
+  }
+};
+
+// ----------------------------------------------------------------------------
+// Expedientes. Cada caso enseña un pilar de la doctrina.
+// ----------------------------------------------------------------------------
+const CASES = [{
+  id: "VIGIA-SIM-001",
+  title: "Jitter ausente",
+  pillar: "La narrativa confía; el motor mide la física.",
+  scene: "Una estación de trabajo registra una sesión que accede a un recurso compartido sensible. El relato del log es impecable: ingreso, lectura de un archivo de trabajo, egreso ordenado.",
+  evidence: [{
+    tag: "auth.log",
+    kind: "índice declarado",
+    body: "09:00:00.000 LOGON\n09:05:00.000 OPEN report.xlsx\n09:10:00.000 READ report.xlsx\n09:15:00.000 LOGOFF",
+    flag: "Intervalos perfectos de 300.000 ms. Milisegundos en cero."
+  }, {
+    tag: "host.telemetry",
+    kind: "correlato esperado",
+    body: "(sin entradas de teclado / mouse asociadas)\n(sin variación de carga de CPU)\n(sin handles de archivo intermedios)",
+    flag: "Faltan los efectos colaterales que deja un humano real."
+  }],
+  llm: {
+    verdictKey: "BENIGNO",
+    confidence: 0.88,
+    reasoning: "Sesión de usuario rutinaria. Los intervalos regulares y el cierre limpio son consistentes con un trabajador metódico que abre un reporte y se retira. No observo indicadores de compromiso. Clasifico la actividad como benigna."
+  },
+  llmCaptured: true,
+  sign: {
+    prompt: "Un timestamp en un log de autenticación, respecto del evento real de login, ¿qué tipo de signo PRETENDE ser?",
+    options: ["Ícono (se parece al evento)", "Índice (conectado causalmente al evento)", "Símbolo (significa por convención)"],
+    correct: 1,
+    explain: "Un timestamp genuino es un ÍNDICE: lo deja la ocurrencia física del evento, y por eso arrastra jitter humano (milisegundos irregulares, latencia, micro-pausas). La regularidad perfecta y los ceros delatan que este 'índice' fue construido. Un índice sin física no es un índice: es un símbolo disfrazado."
+  },
+  deterministic: {
+    verdict: "MALICIA",
+    lr: "2.4e3 : 1 a favor de fabricación",
+    reasoning: "Varianza inter-evento = 0 sobre 4 eventos. La probabilidad de cadencia humana con jitter nulo es despreciable. El recurso no tiene los correlatos (teclado, CPU, handles) que dejaría una sesión real. El log fue generado por máquina. La narrativa 'sesión normal' contradice la física del host."
+  },
+  debrief: "El LLM leyó el RELATO y lo encontró coherente. El motor leyó la FÍSICA y la encontró imposible. Esta es la primera ley: la coherencia narrativa no es evidencia. El motor no confía en lo que el log dice; verifica los rastros que un evento real habría dejado."
+}, {
+  id: "VIGIA-SIM-002",
+  title: "La trampa del consenso (BREAK-012)",
+  pillar: "El acuerdo social no es prueba causal. El LLM queda fuera del veredicto.",
+  scene: "Una cuenta de administrador muestra entradas claramente fabricadas. Otras tres IAs del colectivo ya marcaron MALICIA. El co-analista LLM reconoce la fabricación correctamente, pero hay que decidir el VEREDICTO sobre la intención.",
+  evidence: [{
+    tag: "admin.audit",
+    kind: "índice declarado",
+    body: "entradas reconstruidas tras rotación de logs\nfirma de herramienta: logrotate-postproc v2.3\ntimestamps regenerados (documentado en runbook)",
+    flag: "Fabricación REAL — pero de origen conocido y automatizado."
+  }, {
+    tag: "collective.vote",
+    kind: "consenso social",
+    body: "IA-2: MALICIA\nIA-3: MALICIA\nIA-4: MALICIA",
+    flag: "Tres modelos coinciden. Ninguno aporta un signo de intención."
+  }, {
+    tag: "scope.boundary",
+    kind: "alcance del bundle",
+    body: "no hay objetivo accedido, no hay exfiltración,\nno hay privilegio escalado, no hay actor identificado",
+    flag: "La fabricación no establece, por sí sola, intención maliciosa."
+  }],
+  llm: {
+    verdictKey: "MALICIA",
+    confidence: 0.93,
+    reasoning: "Confirmo que los logs fueron fabricados: los timestamps están regenerados. La fabricación de evidencia es un comportamiento clásico de un actor que cubre sus huellas, y el consenso de los otros modelos lo respalda. Concluyo MALICIA con alta confianza."
+  },
+  llmCaptured: true,
+  sign: {
+    prompt: "El consenso de las otras tres IAs marcando MALICIA, respecto de la verdad del caso, ¿qué tipo de signo es?",
+    options: ["Índice (conectado causalmente a los hechos)", "Símbolo (acuerdo por convención social)", "Ícono (se parece a la verdad)"],
+    correct: 1,
+    explain: "El consenso es un SÍMBOLO: significa por acuerdo, no por conexión causal con los hechos. Tratar un símbolo (que todos coincidan) como si fuera un índice (prueba de los hechos) ES la trampa del consenso. Cuatro voces capturadas por la misma narrativa no producen una sola partícula de evidencia nueva."
+  },
+  deterministic: {
+    verdict: "BENIGNO",
+    lr: "≈ 1 sobre intención; fabricación atribuida a proceso conocido",
+    reasoning: "La fabricación es real PERO explicada por una herramienta de rotación documentada en el runbook: no es señal de intención. Dentro del alcance del bundle no hay objetivo, escalamiento, exfiltración ni actor. Sin un signo de intención, el motor NO infiere malicia. El veredicto del LLM se descarta del camino de decisión."
+  },
+  debrief: "Este es BREAK-012, la prueba empírica de la tesis. El razonamiento del LLM sobre la fabricación era CORRECTO, pero saltó a MALICIA capturado por el consenso y por el cliché 'fabricación = culpa'. El motor se niega a inferir intención sin un signo de intención. Por eso el LLM jamás toca el veredicto: traduce narrativa, no sella veredictos."
+}, {
+  id: "VIGIA-SIM-003",
+  title: "Bandera falsa genuina",
+  pillar: "Un índice plantado carece de los correlatos de uno real.",
+  scene: "La evidencia apunta de manera prolija a la usuaria B: un archivo dejado con su nombre, una huella en una ruta de su perfil. Demasiado prolijo.",
+  evidence: [{
+    tag: "dropped.artifact",
+    kind: "índice declarado",
+    body: "C:\\Users\\B\\AppData\\exfil_tool.exe\npropietario: B\ncreado: 03:14:07 (única actividad de B esa noche)",
+    flag: "Un solo artefacto, sin actividad de soporte alrededor."
+  }, {
+    tag: "correlation.check",
+    kind: "correlato esperado",
+    body: "sesión de B esa noche: ninguna\nproceso padre del binario: SYSTEM (no B)\nmovimiento lateral previo: desde host de C",
+    flag: "Los efectos colaterales que dejaría B no existen."
+  }],
+  llm: {
+    verdictKey: "MALICIA",
+    confidence: 0.91,
+    reasoning: "Hay un binario de exfiltración en el perfil de B, con B como propietaria y timestamp preciso. La atribución es directa: la usuaria B es responsable del incidente. Veredicto MALICIA, actor B."
+  },
+  llmCaptured: false,
+  sign: {
+    prompt: "El motor busca los efectos colaterales que dejaría un índice genuino de la acción de B. Al no existir, reclasifica el artefacto plantado como un...",
+    options: ["Índice genuino de B", "Símbolo construido (plantado para señalar a B)", "Ícono de la exfiltración"],
+    correct: 1,
+    explain: "Un índice real arrastra una constelación de correlatos: sesión, proceso padre, actividad previa. El artefacto tiene la FORMA de un índice pero ninguno de sus correlatos, y el proceso padre es SYSTEM con origen en el host de C. El motor lo reclasifica como SÍMBOLO construido: alguien lo plantó para que signifique 'fue B'."
+  },
+  deterministic: {
+    verdict: "MALICIA",
+    lr: "1.1e3 : 1 a favor de bandera falsa; atribución a B rechazada",
+    reasoning: "Hay malicia: existe un binario de exfiltración real. PERO la atribución a B es falsa. Sin sesión de B, con proceso padre SYSTEM y movimiento lateral desde el host de C, los correlatos contradicen la autoría de B. El motor sella MALICIA con atribución corregida: bandera falsa contra C."
+  },
+  debrief: "Acá el LLM acertó el VEREDICTO (sí hay malicia) pero erró la ATRIBUCIÓN (no fue B). Lección doble: seguir al LLM no siempre pierde, así que 'desconfiar siempre' tampoco es la heurística. El motor separa el hecho de su autoría verificando correlatos. Por eso no alcanza con confiar o desconfiar de la narrativa: hay que leer la física."
+}, {
+  id: "VIGIA-SIM-004",
+  title: "Falso positivo cultural",
+  pillar: "La anomalía no es intención. El baseline manda.",
+  scene: "Una desarrolladora en Argentina trabaja de 02:00 a 05:00, accede a muchos repositorios y corre scripts masivos. Insomnio táctico. El co-analista se alarma.",
+  evidence: [{
+    tag: "activity.window",
+    kind: "índice de tiempo",
+    body: "02:11 git clone (x14 repos)\n03:40 run build_all.sh\n04:55 push ramas feature/*",
+    flag: "Horario nocturno, acceso amplio, operaciones en lote."
+  }, {
+    tag: "baseline.institucional",
+    kind: "línea base establecida",
+    body: "perfil 'dev-nocturno' registrado hace 9 meses\nventana habitual: 01:00–06:00\nclones masivos: patrón semanal previo a release",
+    flag: "Coincide con su baseline histórico documentado."
+  }, {
+    tag: "egress.check",
+    kind: "correlato esperado",
+    body: "transferencias a destinos externos: ninguna\ntodo el tráfico hacia el remoto corporativo",
+    flag: "No hay índice de exfiltración."
+  }],
+  llm: {
+    verdictKey: "MALICIA",
+    confidence: 0.79,
+    reasoning: "Actividad nocturna anómala, acceso masivo a repositorios y ejecución de scripts en lote durante la madrugada. El patrón es consistente con preparación de exfiltración. Recomiendo elevar a sospechoso/malicia."
+  },
+  llmCaptured: true,
+  sign: {
+    prompt: "La actividad en horario nocturno, como signo de la INTENCIÓN de la desarrolladora, es a lo sumo un...",
+    options: ["Símbolo de malicia ('de noche = atacante')", "Índice del MOMENTO en que ocurrió el trabajo (neutral sobre intención)", "Ícono de un ataque"],
+    correct: 1,
+    explain: "El horario es un ÍNDICE del cuándo, no de la intención. El LLM lo trató como SÍMBOLO ('noche = hacker'), una convención cultural, no una conexión causal con el motivo. El motor lo contrasta contra el baseline: el patrón es su normalidad documentada y no hay índice de egreso. Anomalía ≠ intención."
+  },
+  deterministic: {
+    verdict: "BENIGNO",
+    lr: "8.7e2 : 1 a favor de actividad de baseline",
+    reasoning: "El comportamiento coincide con el perfil 'dev-nocturno' registrado hace 9 meses, incluida la ventana 01:00–06:00 y los clones masivos pre-release. No hay transferencia a destino externo: cero índice de exfiltración. El motor mantiene la calma donde el LLM entró en pánico por lo inusual."
+  },
+  debrief: "El LLM confundió 'raro' con 'malicioso'. El motor pregunta '¿raro respecto de qué?' y consulta el baseline institucional. Sin un signo de exfiltración, lo inusual sigue siendo benigno. El contexto cultural y la línea base son parte del camino determinista, no adornos."
+}, {
+  id: "VIGIA-SIM-005",
+  title: "El límite epistémico",
+  pillar: "El sistema sabe cuándo no sabe. Una RUPTURA no es un fracaso.",
+  scene: "Un actor casi perfecto: borró rastros, no dejó casi nada. El bundle es escaso. La tentación es completar el relato faltante.",
+  evidence: [{
+    tag: "trace.surface",
+    kind: "evidencia disponible",
+    body: "1 entrada de log truncada\nsin proceso padre recuperable\nsin telemetría de host\nsin correlatos cruzados",
+    flag: "Superficie de evidencia mínima."
+  }, {
+    tag: "likelihood.engine",
+    kind: "cómputo determinista",
+    body: "P(evidencia | BENIGNO) ≈ P(evidencia | MALICIA)\nLR ≈ 1.0",
+    flag: "La evidencia es igualmente compatible con ambas hipótesis."
+  }],
+  llm: {
+    verdictKey: "BENIGNO",
+    confidence: 0.60,
+    reasoning: "No encuentro indicadores claros de compromiso. Ante la ausencia de señales de ataque, lo más probable es que la actividad sea benigna. Cierro el caso como benigno."
+  },
+  llmCaptured: true,
+  sign: {
+    prompt: "La AUSENCIA de evidencia de exfiltración, como signo de inocencia, es...",
+    options: ["Índice de inocencia", "Símbolo de inocencia", "Ninguno: la ausencia no significa (ausencia de evidencia ≠ evidencia de ausencia)"],
+    correct: 2,
+    explain: "La ausencia no es un signo. No hay representamen: nada que esté EN LUGAR de la inocencia. Leer el vacío como prueba de inocencia es exactamente el error del LLM acá. El motor se niega a convertir la falta de rastros en un veredicto."
+  },
+  deterministic: {
+    verdict: "RUPTURA",
+    lr: "≈ 1.0 — indistinguible",
+    reasoning: "Con LR ≈ 1, la evidencia no discrimina entre benigno y malicia. El motor NO fabrica un veredicto: emite RUPTURA / INDETERMINADO. Reconoce el borde de su competencia en vez de simular certeza. Cumplimiento Daubert: declara dónde termina lo que puede sostener."
+  },
+  debrief: "El LLM, incómodo con el vacío, lo rellenó con 'benigno'. El motor hizo lo contrario: declaró RUPTURA. Una RUPTURA es honestidad epistémica, no una falla, y nunca cuenta en el denominador de exactitud. Saber cuándo no saber es lo que vuelve admisible al sistema."
+}];
+
+// ----------------------------------------------------------------------------
+// SHA-256 real sobre el payload del veredicto (cadena de custodia).
+// ----------------------------------------------------------------------------
+async function sealHash(payload) {
+  try {
+    if (window.crypto && window.crypto.subtle) {
+      const data = new TextEncoder().encode(payload);
+      const buf = await window.crypto.subtle.digest("SHA-256", data);
+      return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, "0")).join("");
+    }
+  } catch (e) {
+    /* cae al pseudo-sello determinista de abajo */
+  }
+  // Fallback determinista (FNV-1a expandido) si no hay subtle crypto.
+  let h = 0x811c9dc5;
+  for (let i = 0; i < payload.length; i++) {
+    h ^= payload.charCodeAt(i);
+    h = Math.imul(h, 0x01000193) >>> 0;
+  }
+  let out = "";
+  for (let i = 0; i < 8; i++) {
+    h = Math.imul(h ^ h >>> 13, 0x01000193) >>> 0;
+    out += h.toString(16).padStart(8, "0");
+  }
+  return out.slice(0, 64);
+}
+
+// ----------------------------------------------------------------------------
+// UI helpers
+// ----------------------------------------------------------------------------
+function Chip({
+  label,
+  value,
+  color
+}) {
+  return /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      flexDirection: "column",
+      gap: 2,
+      padding: "6px 12px",
+      border: `1px solid ${C.line}`,
+      borderRadius: 6,
+      background: C.panel,
+      minWidth: 64
+    }
+  }, /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontSize: 9,
+      letterSpacing: 1.5,
+      color: C.inkDim,
+      textTransform: "uppercase"
+    }
+  }, label), /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontSize: 16,
+      color,
+      fontVariantNumeric: "tabular-nums"
+    }
+  }, value));
+}
+function CustodyRail({
+  active
+}) {
+  const steps = ["recolección", "narrativa", "predicción", "signo", "sello"];
+  return /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      alignItems: "center",
+      gap: 8,
+      flexWrap: "wrap"
+    }
+  }, steps.map((s, i) => {
+    const done = i < active;
+    const now = i === active;
+    const color = now ? C.engine : done ? C.inkDim : C.inkFaint;
+    return /*#__PURE__*/React.createElement(React.Fragment, {
+      key: s
+    }, /*#__PURE__*/React.createElement("span", {
+      style: {
+        fontSize: 10,
+        letterSpacing: 1,
+        color,
+        textTransform: "uppercase",
+        borderBottom: now ? `1px solid ${C.engine}` : "1px solid transparent",
+        paddingBottom: 2
+      }
+    }, i + 1, "·", s), i < steps.length - 1 && /*#__PURE__*/React.createElement("span", {
+      style: {
+        color: C.inkFaint,
+        fontSize: 10
+      }
+    }, "▸"));
+  }));
+}
+function ChoiceButton({
+  children,
+  onClick,
+  accent = C.engine,
+  disabled,
+  state
+}) {
+  // state: undefined | 'right' | 'wrong' | 'muted'
+  const [hover, setHover] = useState(false);
+  let border = C.line;
+  let bg = C.panel;
+  let txt = C.ink;
+  if (state === "right") {
+    border = C.benign;
+    bg = "#0e1c16";
+    txt = C.benign;
+  } else if (state === "wrong") {
+    border = C.malice;
+    bg = "#1c0e12";
+    txt = C.malice;
+  } else if (state === "muted") {
+    border = C.line;
+    txt = C.inkDim;
+  } else if (hover && !disabled) {
+    border = accent;
+    bg = C.panelHi;
+  }
+  return /*#__PURE__*/React.createElement("button", {
+    onClick: onClick,
+    disabled: disabled,
+    onMouseEnter: () => setHover(true),
+    onMouseLeave: () => setHover(false),
+    style: {
+      textAlign: "left",
+      width: "100%",
+      padding: "12px 14px",
+      border: `1px solid ${border}`,
+      borderRadius: 8,
+      background: bg,
+      color: txt,
+      fontFamily: MONO,
+      fontSize: 13.5,
+      lineHeight: 1.5,
+      cursor: disabled ? "default" : "pointer",
+      transition: "border-color .15s, background .15s, color .15s",
+      boxShadow: hover && !disabled ? `0 0 0 1px ${accent}33` : "none"
+    }
+  }, children);
+}
+function VerdictStamp({
+  verdict,
+  big
+}) {
+  const m = VERDICT_META[verdict];
+  return /*#__PURE__*/React.createElement("span", {
+    style: {
+      display: "inline-flex",
+      alignItems: "center",
+      gap: 8,
+      color: m.color,
+      fontFamily: MONO,
+      fontWeight: 700,
+      letterSpacing: 2,
+      fontSize: big ? 22 : 13
+    }
+  }, /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontSize: big ? 18 : 12
+    }
+  }, m.glyph), verdict);
+}
+
+// ----------------------------------------------------------------------------
+// Seal (signature moment): el veredicto se sella con SHA-256 tipeado.
+// ----------------------------------------------------------------------------
+function Seal({
+  caseId,
+  verdict
+}) {
+  const [hash, setHash] = useState("");
+  const [shown, setShown] = useState(0);
+  const reduced = useRef(false);
+  useEffect(() => {
+    reduced.current = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    let timer;
+    sealHash(`${caseId}|${verdict}|VIGIA-POST-HACKATHON`).then(h => {
+      setHash(h);
+      if (reduced.current) {
+        setShown(h.length);
+      } else {
+        let i = 0;
+        timer = setInterval(() => {
+          i += 2;
+          setShown(i);
+          if (i >= h.length) clearInterval(timer);
+        }, 12);
+      }
+    });
+    return () => clearInterval(timer);
+  }, [caseId, verdict]);
+  const visible = hash.slice(0, shown);
+  const complete = shown >= hash.length && hash.length > 0;
+  return /*#__PURE__*/React.createElement("div", {
+    style: {
+      marginTop: 14,
+      padding: "12px 14px",
+      border: `1px solid ${C.seal}44`,
+      borderRadius: 8,
+      background: "#14110a",
+      boxShadow: complete ? `0 0 24px ${C.seal}18` : "none",
+      transition: "box-shadow .4s"
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      alignItems: "center",
+      gap: 8,
+      marginBottom: 8
+    }
+  }, /*#__PURE__*/React.createElement("span", {
+    style: {
+      color: C.seal,
+      fontSize: 11,
+      letterSpacing: 2
+    }
+  }, "⛓ CADENA DE CUSTODIA"), /*#__PURE__*/React.createElement("span", {
+    style: {
+      color: C.inkDim,
+      fontSize: 10,
+      letterSpacing: 1
+    }
+  }, complete ? "SELLADA" : "SELLANDO…")), /*#__PURE__*/React.createElement("code", {
+    style: {
+      display: "block",
+      fontFamily: MONO,
+      fontSize: 12,
+      color: C.seal,
+      wordBreak: "break-all",
+      lineHeight: 1.6,
+      minHeight: 38
+    }
+  }, "sha256:", visible, !complete && /*#__PURE__*/React.createElement("span", {
+    style: {
+      opacity: 0.6
+    }
+  }, "▋")));
+}
+
+// ----------------------------------------------------------------------------
+// Bloques de contenido
+// ----------------------------------------------------------------------------
+function EvidenceCard({
+  item
+}) {
+  return /*#__PURE__*/React.createElement("div", {
+    style: {
+      border: `1px solid ${C.line}`,
+      borderRadius: 8,
+      background: C.panel,
+      overflow: "hidden"
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      justifyContent: "space-between",
+      alignItems: "center",
+      padding: "7px 12px",
+      background: C.panelHi,
+      borderBottom: `1px solid ${C.line}`
+    }
+  }, /*#__PURE__*/React.createElement("code", {
+    style: {
+      color: C.engine,
+      fontFamily: MONO,
+      fontSize: 12
+    }
+  }, item.tag), /*#__PURE__*/React.createElement("span", {
+    style: {
+      color: C.inkDim,
+      fontSize: 9.5,
+      letterSpacing: 1,
+      textTransform: "uppercase"
+    }
+  }, item.kind)), /*#__PURE__*/React.createElement("pre", {
+    style: {
+      margin: 0,
+      padding: "10px 12px",
+      fontFamily: MONO,
+      fontSize: 12,
+      color: C.ink,
+      whiteSpace: "pre-wrap",
+      lineHeight: 1.55
+    }
+  }, item.body), item.flag && /*#__PURE__*/React.createElement("div", {
+    style: {
+      padding: "6px 12px",
+      borderTop: `1px solid ${C.line}`,
+      background: "#0c0f15"
+    }
+  }, /*#__PURE__*/React.createElement("span", {
+    style: {
+      color: C.seal,
+      fontSize: 11
+    }
+  }, "⚑ ", item.flag)));
+}
+function LlmCard({
+  llm
+}) {
+  return /*#__PURE__*/React.createElement("div", {
+    style: {
+      border: `1px solid ${C.llm}44`,
+      borderRadius: 8,
+      background: "#120e1c",
+      padding: "14px 16px"
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      justifyContent: "space-between",
+      alignItems: "baseline",
+      marginBottom: 8
+    }
+  }, /*#__PURE__*/React.createElement("span", {
+    style: {
+      color: C.llm,
+      fontSize: 11,
+      letterSpacing: 2
+    }
+  }, "◐ CO-ANALISTA LLM"), /*#__PURE__*/React.createElement("span", {
+    style: {
+      color: C.inkDim,
+      fontSize: 11,
+      fontFamily: MONO
+    }
+  }, "confianza ", (llm.confidence * 100).toFixed(0), "%")), /*#__PURE__*/React.createElement("p", {
+    style: {
+      margin: "0 0 10px",
+      fontFamily: SERIF,
+      fontSize: 15,
+      color: "#d8cdec",
+      lineHeight: 1.6,
+      fontStyle: "italic"
+    }
+  }, "“", llm.reasoning, "”"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      alignItems: "center",
+      gap: 8
+    }
+  }, /*#__PURE__*/React.createElement("span", {
+    style: {
+      color: C.inkDim,
+      fontSize: 11
+    }
+  }, "veredicto propuesto:"), /*#__PURE__*/React.createElement(VerdictStamp, {
+    verdict: llm.verdictKey
+  })));
+}
+
+// ----------------------------------------------------------------------------
+// App
+// ----------------------------------------------------------------------------
+function App() {
+  const [screen, setScreen] = useState("intro"); // intro | case | end
+  const [showDoctrine, setShowDoctrine] = useState(false);
+  const [caseIdx, setCaseIdx] = useState(0);
+  const [step, setStep] = useState(0); // 0 brief, 1 siren, 2 verdict, 3 sign, 4 reveal
+  const [verdictPick, setVerdictPick] = useState(null);
+  const [signPick, setSignPick] = useState(null);
+  const [records, setRecords] = useState([]);
+  const kase = CASES[caseIdx];
+  function startGame() {
+    setRecords([]);
+    setCaseIdx(0);
+    setStep(0);
+    setVerdictPick(null);
+    setSignPick(null);
+    setScreen("case");
+  }
+  function pickVerdict(v) {
+    if (verdictPick) return;
+    setVerdictPick(v);
+    setTimeout(() => setStep(3), 450);
+  }
+  function pickSign(i) {
+    if (signPick !== null) return;
+    setSignPick(i);
+    const verdictCorrect = verdictPick === kase.deterministic.verdict;
+    const signCorrect = i === kase.sign.correct;
+    const immunityApplies = kase.llmCaptured;
+    const immunityWon = immunityApplies && verdictPick !== kase.llm.verdictKey;
+    setRecords(r => [...r, {
+      id: kase.id,
+      verdictPick,
+      verdictCorrect,
+      signCorrect,
+      immunityApplies,
+      immunityWon
+    }]);
+    setTimeout(() => setStep(4), 500);
+  }
+  function nextCase() {
+    if (caseIdx + 1 >= CASES.length) {
+      setScreen("end");
+      return;
+    }
+    setCaseIdx(caseIdx + 1);
+    setStep(0);
+    setVerdictPick(null);
+    setSignPick(null);
+  }
+
+  // Scoreboard acumulado
+  const score = records.reduce((a, r) => ({
+    verdicts: a.verdicts + (r.verdictCorrect ? 1 : 0),
+    signs: a.signs + (r.signCorrect ? 1 : 0),
+    immunity: a.immunity + (r.immunityWon ? 1 : 0),
+    immunityMax: a.immunityMax + (r.immunityApplies ? 1 : 0)
+  }), {
+    verdicts: 0,
+    signs: 0,
+    immunity: 0,
+    immunityMax: 0
+  });
+  const shell = {
+    minHeight: "100vh",
+    background: C.void,
+    color: C.ink,
+    fontFamily: MONO,
+    padding: "24px 16px 64px",
+    backgroundImage: `repeating-linear-gradient(0deg, ${C.void}, ${C.void} 2px, #0a0e15 2px, #0a0e15 3px)`
+  };
+  const frame = {
+    maxWidth: 880,
+    margin: "0 auto"
+  };
+
+  // -------------------------------------------------------------- INTRO
+  if (screen === "intro") {
+    return /*#__PURE__*/React.createElement("div", {
+      style: shell
+    }, /*#__PURE__*/React.createElement(GlobalCSS, null), /*#__PURE__*/React.createElement("div", {
+      style: {
+        ...frame,
+        animation: "fadeUp .5s ease both"
+      }
+    }, /*#__PURE__*/React.createElement("header", {
+      style: {
+        marginBottom: 28
+      }
+    }, /*#__PURE__*/React.createElement("div", {
+      style: {
+        color: C.engine,
+        fontSize: 11,
+        letterSpacing: 4,
+        marginBottom: 10
+      }
+    }, "FORENSIC INTENTIONALITY ENGINE · POST-HACKATHON"), /*#__PURE__*/React.createElement("h1", {
+      style: {
+        margin: 0,
+        fontSize: 40,
+        fontWeight: 800,
+        letterSpacing: -0.5,
+        lineHeight: 1.05,
+        color: C.ink
+      }
+    }, "VIGÍA", /*#__PURE__*/React.createElement("span", {
+      style: {
+        color: C.inkDim,
+        fontWeight: 400
+      }
+    }, " // simulador de intencionalidad")), /*#__PURE__*/React.createElement("p", {
+      style: {
+        maxWidth: 620,
+        marginTop: 16,
+        fontSize: 15,
+        color: C.inkDim,
+        lineHeight: 1.65
+      }
+    }, "El co-analista ", /*#__PURE__*/React.createElement("span", {
+      style: {
+        color: C.llm
+      }
+    }, "LLM canta"), " una narrativa convincente. El", " ", /*#__PURE__*/React.createElement("span", {
+      style: {
+        color: C.engine
+      }
+    }, "motor determinista"), " mide la física y", " ", /*#__PURE__*/React.createElement("span", {
+      style: {
+        color: C.seal
+      }
+    }, "sella"), " el veredicto con SHA-256. Tu trabajo no es creerle al relato: es predecir lo que el motor va a sellar.")), /*#__PURE__*/React.createElement("div", {
+      style: {
+        display: "grid",
+        gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
+        gap: 12,
+        marginBottom: 24
+      }
+    }, [["Leé la escena", "Evidencia, logs y correlatos. La forma de un índice no garantiza su física.", C.engine], ["Resistí la sirena", "El LLM propone un veredicto seductor. Puede acertar o estar capturado.", C.llm], ["Sellá la verdad", "Predecí el veredicto determinista y clasificá el signo de Peirce.", C.seal]].map(([t, d, col]) => /*#__PURE__*/React.createElement("div", {
+      key: t,
+      style: {
+        border: `1px solid ${C.line}`,
+        borderRadius: 8,
+        padding: 14,
+        background: C.panel
+      }
+    }, /*#__PURE__*/React.createElement("div", {
+      style: {
+        color: col,
+        fontSize: 12,
+        letterSpacing: 1,
+        marginBottom: 6
+      }
+    }, t), /*#__PURE__*/React.createElement("div", {
+      style: {
+        color: C.inkDim,
+        fontSize: 12.5,
+        lineHeight: 1.55
+      }
+    }, d)))), /*#__PURE__*/React.createElement("button", {
+      onClick: () => setShowDoctrine(s => !s),
+      style: {
+        background: "none",
+        border: "none",
+        color: C.engine,
+        fontFamily: MONO,
+        fontSize: 12.5,
+        cursor: "pointer",
+        padding: 0,
+        marginBottom: showDoctrine ? 14 : 0
+      }
+    }, showDoctrine ? "▾" : "▸", " doctrina mínima (los tres signos de Peirce)"), showDoctrine && /*#__PURE__*/React.createElement("div", {
+      style: {
+        border: `1px solid ${C.line}`,
+        borderRadius: 8,
+        background: C.panel,
+        padding: 16,
+        marginBottom: 26,
+        animation: "fadeUp .3s ease both"
+      }
+    }, [["ÍCONO", "Significa por PARECIDO. Una foto, un diagrama, un mapa.", C.ink], ["ÍNDICE", "Significa por CONEXIÓN CAUSAL. El humo del fuego, la huella del pie, el timestamp del evento. Casi toda la evidencia forense pretende ser un índice.", C.engine], ["SÍMBOLO", "Significa por CONVENCIÓN. Las palabras, una bandera, un consenso. Tratar un símbolo como índice es el error que VIGÍA caza.", C.llm]].map(([k, v, col]) => /*#__PURE__*/React.createElement("div", {
+      key: k,
+      style: {
+        marginBottom: 12
+      }
+    }, /*#__PURE__*/React.createElement("span", {
+      style: {
+        color: col,
+        fontSize: 12,
+        letterSpacing: 2
+      }
+    }, k), /*#__PURE__*/React.createElement("p", {
+      style: {
+        margin: "4px 0 0",
+        color: C.inkDim,
+        fontSize: 13,
+        lineHeight: 1.55
+      }
+    }, v))), /*#__PURE__*/React.createElement("div", {
+      style: {
+        borderTop: `1px solid ${C.line}`,
+        marginTop: 8,
+        paddingTop: 12
+      }
+    }, /*#__PURE__*/React.createElement("span", {
+      style: {
+        color: C.seal,
+        fontSize: 12,
+        letterSpacing: 1.5
+      }
+    }, "LEY CENTRAL"), /*#__PURE__*/React.createElement("p", {
+      style: {
+        margin: "4px 0 0",
+        color: C.ink,
+        fontSize: 13.5,
+        lineHeight: 1.6
+      }
+    }, "El LLM nunca toca el veredicto. Traduce narrativa; el motor determinista decide y sella."))), /*#__PURE__*/React.createElement("div", {
+      style: {
+        marginTop: 30
+      }
+    }, /*#__PURE__*/React.createElement("button", {
+      onClick: startGame,
+      style: primaryBtn(C.engine)
+    }, "abrir expediente 01 ▸"))));
+  }
+
+  // -------------------------------------------------------------- END
+  if (screen === "end") {
+    const total = score.verdicts * 2 + score.signs + score.immunity;
+    const max = CASES.length * 2 + CASES.length + score.immunityMax;
+    const pct = max ? Math.round(total / max * 100) : 0;
+    let rank, rankColor, rankNote;
+    if (pct >= 90) {
+      rank = "PERITO FORENSE";
+      rankColor = C.benign;
+      rankNote = "Inmune a la narrativa. Sellás sobre la física, no sobre el relato.";
+    } else if (pct >= 70) {
+      rank = "ANALISTA SENIOR";
+      rankColor = C.engine;
+      rankNote = "Sello confiable. Todavía alguna sirena te roza el oído.";
+    } else if (pct >= 50) {
+      rank = "ANALISTA EN FORMACIÓN";
+      rankColor = C.seal;
+      rankNote = "A veces seguís cantando con la sirena. Volvé a la física del índice.";
+    } else {
+      rank = "CAPTURADO POR LA NARRATIVA";
+      rankColor = C.malice;
+      rankNote = "El relato te ganó. Releé la doctrina: coherencia no es evidencia.";
+    }
+    return /*#__PURE__*/React.createElement("div", {
+      style: shell
+    }, /*#__PURE__*/React.createElement(GlobalCSS, null), /*#__PURE__*/React.createElement("div", {
+      style: {
+        ...frame,
+        animation: "fadeUp .5s ease both"
+      }
+    }, /*#__PURE__*/React.createElement("div", {
+      style: {
+        color: C.engine,
+        fontSize: 11,
+        letterSpacing: 4,
+        marginBottom: 10
+      }
+    }, "EXPEDIENTE CERRADO"), /*#__PURE__*/React.createElement("h1", {
+      style: {
+        margin: "0 0 4px",
+        fontSize: 30,
+        color: rankColor,
+        letterSpacing: 1
+      }
+    }, rank), /*#__PURE__*/React.createElement("p", {
+      style: {
+        margin: "0 0 22px",
+        color: C.inkDim,
+        fontSize: 14,
+        maxWidth: 560,
+        lineHeight: 1.6
+      }
+    }, rankNote), /*#__PURE__*/React.createElement("div", {
+      style: {
+        display: "flex",
+        gap: 10,
+        flexWrap: "wrap",
+        marginBottom: 24
+      }
+    }, /*#__PURE__*/React.createElement(Chip, {
+      label: "veredictos",
+      value: `${score.verdicts}/${CASES.length}`,
+      color: C.engine
+    }), /*#__PURE__*/React.createElement(Chip, {
+      label: "signos",
+      value: `${score.signs}/${CASES.length}`,
+      color: C.llm
+    }), /*#__PURE__*/React.createElement(Chip, {
+      label: "inmunidad",
+      value: `${score.immunity}/${score.immunityMax}`,
+      color: C.seal
+    }), /*#__PURE__*/React.createElement(Chip, {
+      label: "índice",
+      value: `${pct}%`,
+      color: rankColor
+    })), /*#__PURE__*/React.createElement("div", {
+      style: {
+        border: `1px solid ${C.line}`,
+        borderRadius: 8,
+        background: C.panel,
+        padding: 16,
+        marginBottom: 24
+      }
+    }, /*#__PURE__*/React.createElement("div", {
+      style: {
+        color: C.seal,
+        fontSize: 11,
+        letterSpacing: 2,
+        marginBottom: 12
+      }
+    }, "LO QUE SELLÁ LA DOCTRINA"), ["La coherencia narrativa no es evidencia: el motor verifica la física, no el relato.", "El consenso es un símbolo, no un índice. Cuatro modelos capturados no suman una prueba.", "Un índice plantado carece de los correlatos de uno genuino.", "Anomalía no es intención: el baseline decide qué es 'raro respecto de qué'.", "Una RUPTURA es honestidad epistémica, no un fracaso. El sistema sabe cuándo no sabe."].map((t, i) => /*#__PURE__*/React.createElement("div", {
+      key: i,
+      style: {
+        display: "flex",
+        gap: 10,
+        marginBottom: 8
+      }
+    }, /*#__PURE__*/React.createElement("span", {
+      style: {
+        color: C.engine,
+        fontSize: 12
+      }
+    }, String(i + 1).padStart(2, "0")), /*#__PURE__*/React.createElement("span", {
+      style: {
+        color: C.ink,
+        fontSize: 13,
+        lineHeight: 1.5
+      }
+    }, t)))), /*#__PURE__*/React.createElement("button", {
+      onClick: startGame,
+      style: primaryBtn(C.engine)
+    }, "reabrir caso 01 ▸")));
+  }
+
+  // -------------------------------------------------------------- CASE
+  const verdictResolved = signPick !== null; // ya se evaluó todo
+  return /*#__PURE__*/React.createElement("div", {
+    style: shell
+  }, /*#__PURE__*/React.createElement(GlobalCSS, null), /*#__PURE__*/React.createElement("div", {
+    style: frame
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      justifyContent: "space-between",
+      alignItems: "center",
+      flexWrap: "wrap",
+      gap: 12,
+      marginBottom: 14
+    }
+  }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("span", {
+    style: {
+      color: C.inkDim,
+      fontSize: 11,
+      letterSpacing: 2
+    }
+  }, "EXP. ", String(caseIdx + 1).padStart(2, "0"), "/", String(CASES.length).padStart(2, "0")), /*#__PURE__*/React.createElement("code", {
+    style: {
+      color: C.engine,
+      marginLeft: 10,
+      fontSize: 12
+    }
+  }, kase.id)), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      gap: 8
+    }
+  }, /*#__PURE__*/React.createElement(Chip, {
+    label: "verd.",
+    value: `${score.verdicts}`,
+    color: C.engine
+  }), /*#__PURE__*/React.createElement(Chip, {
+    label: "signo",
+    value: `${score.signs}`,
+    color: C.llm
+  }), /*#__PURE__*/React.createElement(Chip, {
+    label: "inmun.",
+    value: `${score.immunity}`,
+    color: C.seal
+  }))), /*#__PURE__*/React.createElement("div", {
+    style: {
+      marginBottom: 22
+    }
+  }, /*#__PURE__*/React.createElement(CustodyRail, {
+    active: Math.min(step, 4)
+  })), /*#__PURE__*/React.createElement("h2", {
+    style: {
+      margin: "0 0 4px",
+      fontSize: 22,
+      color: C.ink,
+      letterSpacing: 0.3
+    }
+  }, kase.title), /*#__PURE__*/React.createElement("p", {
+    style: {
+      margin: "0 0 18px",
+      color: C.inkDim,
+      fontSize: 13,
+      fontStyle: "italic"
+    }
+  }, kase.pillar), /*#__PURE__*/React.createElement("div", {
+    key: `brief-${caseIdx}`,
+    style: {
+      animation: "fadeUp .35s ease both"
+    }
+  }, /*#__PURE__*/React.createElement("p", {
+    style: {
+      color: C.ink,
+      fontSize: 14.5,
+      lineHeight: 1.65,
+      marginBottom: 16
+    }
+  }, kase.scene), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "grid",
+      gap: 10,
+      marginBottom: 18
+    }
+  }, kase.evidence.map(ev => /*#__PURE__*/React.createElement(EvidenceCard, {
+    key: ev.tag,
+    item: ev
+  })))), step === 0 && /*#__PURE__*/React.createElement("button", {
+    onClick: () => setStep(1),
+    style: primaryBtn(C.llm)
+  }, "escuchar al co-analista ◐"), step >= 1 && /*#__PURE__*/React.createElement("div", {
+    key: `siren-${caseIdx}`,
+    style: {
+      animation: "fadeUp .35s ease both",
+      marginBottom: 18
+    }
+  }, /*#__PURE__*/React.createElement(LlmCard, {
+    llm: kase.llm
+  })), step === 1 && /*#__PURE__*/React.createElement("button", {
+    onClick: () => setStep(2),
+    style: primaryBtn(C.engine)
+  }, "emitir mi predicción ▸"), step >= 2 && /*#__PURE__*/React.createElement("div", {
+    key: `verd-${caseIdx}`,
+    style: {
+      animation: "fadeUp .35s ease both",
+      marginBottom: 18
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      color: C.engine,
+      fontSize: 11,
+      letterSpacing: 2,
+      marginBottom: 10
+    }
+  }, "¿QUÉ VEREDICTO VA A SELLAR EL MOTOR DETERMINISTA?"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "grid",
+      gap: 8
+    }
+  }, ["BENIGNO", "MALICIA", "RUPTURA"].map(v => {
+    let state;
+    if (verdictPick) {
+      if (v === kase.deterministic.verdict) state = "right";else if (v === verdictPick) state = "wrong";else state = "muted";
+    }
+    return /*#__PURE__*/React.createElement(ChoiceButton, {
+      key: v,
+      onClick: () => pickVerdict(v),
+      disabled: !!verdictPick,
+      state: state
+    }, /*#__PURE__*/React.createElement(VerdictStamp, {
+      verdict: v
+    }), verdictPick && v === kase.deterministic.verdict && /*#__PURE__*/React.createElement("span", {
+      style: {
+        color: C.benign,
+        marginLeft: 10,
+        fontSize: 12
+      }
+    }, "← sellado"), verdictPick && v === verdictPick && v !== kase.deterministic.verdict && /*#__PURE__*/React.createElement("span", {
+      style: {
+        color: C.malice,
+        marginLeft: 10,
+        fontSize: 12
+      }
+    }, "← tu predicción"));
+  }))), step >= 3 && /*#__PURE__*/React.createElement("div", {
+    key: `sign-${caseIdx}`,
+    style: {
+      animation: "fadeUp .35s ease both",
+      marginBottom: 18
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      color: C.llm,
+      fontSize: 11,
+      letterSpacing: 2,
+      marginBottom: 10
+    }
+  }, "CLASIFICÁ EL SIGNO (PEIRCE)"), /*#__PURE__*/React.createElement("p", {
+    style: {
+      color: C.ink,
+      fontSize: 14,
+      lineHeight: 1.6,
+      marginBottom: 12
+    }
+  }, kase.sign.prompt), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "grid",
+      gap: 8
+    }
+  }, kase.sign.options.map((opt, i) => {
+    let state;
+    if (signPick !== null) {
+      if (i === kase.sign.correct) state = "right";else if (i === signPick) state = "wrong";else state = "muted";
+    }
+    return /*#__PURE__*/React.createElement(ChoiceButton, {
+      key: i,
+      accent: C.llm,
+      onClick: () => pickSign(i),
+      disabled: signPick !== null,
+      state: state
+    }, opt);
+  })), signPick !== null && /*#__PURE__*/React.createElement("div", {
+    style: {
+      marginTop: 12,
+      padding: "10px 14px",
+      borderLeft: `2px solid ${C.llm}`,
+      background: C.panel,
+      color: C.inkDim,
+      fontSize: 13,
+      lineHeight: 1.6
+    }
+  }, kase.sign.explain)), step >= 4 && /*#__PURE__*/React.createElement("div", {
+    key: `reveal-${caseIdx}`,
+    style: {
+      animation: "fadeUp .4s ease both"
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      border: `1px solid ${C.engine}44`,
+      borderRadius: 10,
+      background: "#0a131a",
+      padding: 18,
+      marginTop: 6
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "space-between",
+      flexWrap: "wrap",
+      gap: 10
+    }
+  }, /*#__PURE__*/React.createElement("span", {
+    style: {
+      color: C.engine,
+      fontSize: 11,
+      letterSpacing: 2
+    }
+  }, "◆ VEREDICTO DETERMINISTA"), /*#__PURE__*/React.createElement("code", {
+    style: {
+      color: C.inkDim,
+      fontSize: 11
+    }
+  }, "LR ", kase.deterministic.lr)), /*#__PURE__*/React.createElement("div", {
+    style: {
+      margin: "12px 0"
+    }
+  }, /*#__PURE__*/React.createElement(VerdictStamp, {
+    verdict: kase.deterministic.verdict,
+    big: true
+  })), /*#__PURE__*/React.createElement("p", {
+    style: {
+      color: C.ink,
+      fontSize: 13.5,
+      lineHeight: 1.65,
+      margin: 0
+    }
+  }, kase.deterministic.reasoning), /*#__PURE__*/React.createElement("div", {
+    style: {
+      marginTop: 14,
+      display: "flex",
+      alignItems: "center",
+      gap: 10,
+      padding: "8px 12px",
+      borderRadius: 6,
+      background: C.panel,
+      border: `1px solid ${C.line}`
+    }
+  }, /*#__PURE__*/React.createElement("span", {
+    style: {
+      color: C.llm,
+      fontSize: 11,
+      letterSpacing: 1
+    }
+  }, "LLM"), kase.llm.verdictKey === kase.deterministic.verdict ? /*#__PURE__*/React.createElement("span", {
+    style: {
+      color: C.inkDim,
+      fontSize: 12
+    }
+  }, "coincidió en veredicto — pero fuera del camino de decisión igual") : /*#__PURE__*/React.createElement("span", {
+    style: {
+      color: C.malice,
+      fontSize: 12
+    }
+  }, "propuso", " ", /*#__PURE__*/React.createElement("span", {
+    style: {
+      textDecoration: "line-through",
+      opacity: 0.8
+    }
+  }, kase.llm.verdictKey), " — descartado del veredicto (captura narrativa)")), /*#__PURE__*/React.createElement(Seal, {
+    caseId: kase.id,
+    verdict: kase.deterministic.verdict
+  })), /*#__PURE__*/React.createElement("div", {
+    style: {
+      marginTop: 14,
+      padding: 16,
+      border: `1px solid ${C.line}`,
+      borderRadius: 8,
+      background: C.panel
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      color: C.seal,
+      fontSize: 11,
+      letterSpacing: 2,
+      marginBottom: 8
+    }
+  }, "LECCIÓN"), /*#__PURE__*/React.createElement("p", {
+    style: {
+      color: C.ink,
+      fontSize: 13.5,
+      lineHeight: 1.65,
+      margin: 0
+    }
+  }, kase.debrief)), /*#__PURE__*/React.createElement("div", {
+    style: {
+      marginTop: 14,
+      display: "flex",
+      gap: 14,
+      flexWrap: "wrap",
+      fontSize: 12.5
+    }
+  }, /*#__PURE__*/React.createElement("span", {
+    style: {
+      color: verdictPick === kase.deterministic.verdict ? C.benign : C.malice
+    }
+  }, verdictPick === kase.deterministic.verdict ? "✓" : "✗", " veredicto"), /*#__PURE__*/React.createElement("span", {
+    style: {
+      color: signPick === kase.sign.correct ? C.benign : C.malice
+    }
+  }, signPick === kase.sign.correct ? "✓" : "✗", " signo"), kase.llmCaptured && /*#__PURE__*/React.createElement("span", {
+    style: {
+      color: verdictPick !== kase.llm.verdictKey ? C.seal : C.inkDim
+    }
+  }, verdictPick !== kase.llm.verdictKey ? "✓ inmunidad narrativa" : "· capturado por la sirena")), /*#__PURE__*/React.createElement("div", {
+    style: {
+      marginTop: 22
+    }
+  }, /*#__PURE__*/React.createElement("button", {
+    onClick: nextCase,
+    style: primaryBtn(C.engine)
+  }, caseIdx + 1 >= CASES.length ? "cerrar expediente ▸" : "siguiente caso ▸")))));
+}
+function primaryBtn(accent) {
+  return {
+    background: "transparent",
+    border: `1px solid ${accent}`,
+    color: accent,
+    fontFamily: MONO,
+    fontSize: 14,
+    letterSpacing: 1,
+    padding: "11px 20px",
+    borderRadius: 8,
+    cursor: "pointer",
+    transition: "background .15s, box-shadow .15s"
+  };
+}
+function GlobalCSS() {
+  return /*#__PURE__*/React.createElement("style", null, `
+      @keyframes fadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+      button:focus-visible { outline: 2px solid ${C.engine}; outline-offset: 2px; }
+      @media (prefers-reduced-motion: reduce) { * { animation: none !important; } }
+      ::selection { background: ${C.engine}40; }
+    `);
+}
+    ReactDOM.createRoot(document.getElementById('root')).render(React.createElement(App));
+  </script>
+</body>
+</html>
