@@ -221,6 +221,39 @@ class SIFTOrchestrator:
             })
             logger.info("[VOL3] OS info: %s", info["stdout"][:100])
         else:
+            stderr_lower = info["stderr"].lower()
+            if any(k in stderr_lower for k in [
+                "invalidaddressexception", "offset outside", "buffer boundaries",
+                "no valid kernel", "unable to determine", "vmware", "snapshot"
+            ]):
+                logger.error(
+                    "[VOL3] Format rejected — image is not a valid Windows RAM dump "
+                    "(VMware snapshot or disk image detected). "
+                    "Requires companion .vmss/.vmsn or different acquisition tool. "
+                    "stderr: %s", info["stderr"][:300]
+                )
+                return {
+                    "case_id": self.case_id,
+                    "signals": [],
+                    "abduction": {
+                        "best_hypothesis": "FORMAT_NOT_SUPPORTED",
+                        "is_conclusive": False,
+                        "confidence": "0/1",
+                        "best_posterior": "0/1",
+                        "narrative": (
+                            f"Image {Path(memory_path).name} rejected by Volatility3: "
+                            "not a valid Windows RAM dump. Likely a VMware disk snapshot "
+                            "or disk image requiring prior mounting. "
+                            "See BUGS_PENDIENTES #16."
+                        ),
+                    },
+                    "pipeline_meta": {
+                        "source": "vol3_memory_adapter",
+                        "memory_path": str(memory_path),
+                        "error": "FORMAT_NOT_SUPPORTED",
+                        "vol3_stderr": info["stderr"][:300],
+                    },
+                }
             logger.warning("[VOL3] windows.info failed: %s", info["stderr"][:200])
 
         # ── 2. Process list ───────────────────────────────────────────────

@@ -76,7 +76,7 @@ if _PYDANTIC_AVAILABLE:
             )
         )
         ollama_model: str = Field(
-            default_factory=lambda: os.getenv("VIGIA_OLLAMA_MODEL", "llama3")
+            default_factory=lambda: os.getenv("VIGIA_OLLAMA_MODEL", "deepseek-r1:8b")
         )
         ollama_host: str = Field(
             default_factory=lambda: os.getenv("VIGIA_OLLAMA_HOST", "http://127.0.0.1:11434")
@@ -170,7 +170,7 @@ else:
             )
         )
         ollama_model: str = field(
-            default_factory=lambda: os.getenv("VIGIA_OLLAMA_MODEL", "llama3")
+            default_factory=lambda: os.getenv("VIGIA_OLLAMA_MODEL", "deepseek-r1:8b")
         )
         ollama_host: str = field(
             default_factory=lambda: os.getenv("VIGIA_OLLAMA_HOST", "http://127.0.0.1:11434")
@@ -305,9 +305,12 @@ class LLMBackend:
                 async with session.post(
                     f"{self._ollama_host}/api/generate",
                     json=payload,
-                    timeout=aiohttp.ClientTimeout(total=60),
+                    timeout=aiohttp.ClientTimeout(total=300),
                 ) as resp:
                     data = await resp.json()
+                    if data.get("error"):
+                        from vigia.security import audit_logger
+                        audit_logger.log_info("LLM_ERROR", "LLMBackend.ollama_model_error", data["error"])
                     return data.get("response", "")
 
         except Exception as exc:  # noqa: BLE001

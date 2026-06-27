@@ -208,7 +208,7 @@ def main():
     summary_path = OUTPUT_DIR / "_batch_summary.json"
     import datetime
     summary = {
-        "generated_at": datetime.datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "generated_at": datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "total_elapsed_s": round(total_elapsed, 1),
         "avg_elapsed_s": round(total_elapsed / max(len(results), 1), 1),
         "passed": passed,
