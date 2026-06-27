@@ -1,17 +1,17 @@
 {
-  "analysis_timestamp": "2026-06-27T14:02:22.139531+00:00",
+  "analysis_timestamp": "2026-06-27T13:57:07.958765+00:00",
   "audit_trail": {
     "agent_version": "1.0.0-SANS-2026",
-    "case_id": "VIGIA-REAL-SRL-SP-MEMORY",
-    "end_time": "2026-06-27T14:02:22.139536+00:00",
+    "case_id": "VIGIA-REAL-SRL-ELF-MEMORY",
+    "end_time": "2026-06-27T13:57:07.958772+00:00",
     "entries": [
       {
         "action": "AGENT_INITIALIZED",
-        "case_id": "VIGIA-REAL-SRL-SP-MEMORY",
-        "entry_sha256": "e158bea2f9aaace71c15c2e35bf1244f14bc625f9b6632920cc029279cc40838",
+        "case_id": "VIGIA-REAL-SRL-ELF-MEMORY",
+        "entry_sha256": "bd0edcce54816c07b8a83976ceeafa7f21342d16b54afff4bdcf26fe41161c29",
         "inputs_summary": {
           "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
-          "case_id": "VIGIA-REAL-SRL-SP-MEMORY"
+          "case_id": "VIGIA-REAL-SRL-ELF-MEMORY"
         },
         "iteration": 0,
         "note": "Agent initialized \u2014 source SHA-256: 95f2da2a3bdcb4ca...",
@@ -20,45 +20,45 @@
           "agent_version": "1.0.0-SANS-2026"
         },
         "seq": 1,
-        "timestamp": "2026-06-27T14:01:30.838870+00:00",
+        "timestamp": "2026-06-27T13:56:53.880800+00:00",
         "tool": "vigia_agent"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
-        "case_id": "VIGIA-REAL-SRL-SP-MEMORY",
-        "entry_sha256": "c1fefcf5397ec6ebffdd086250db2507435403f5abbdee4685504d9efda231ae",
+        "case_id": "VIGIA-REAL-SRL-ELF-MEMORY",
+        "entry_sha256": "034b4292eb263a96300808f9eef00351e9215a08b6501d1b8bff356321d6f7bd",
         "inputs_summary": {
-          "path": "data/raw/srl2018/sp-memory/base-sp-memory.img"
+          "path": "data/raw/srl2018/elf/base-elf-memory.img"
         },
         "iteration": 0,
         "note": "Computing SHA-256 of original evidence",
         "outputs_summary": {},
         "seq": 2,
-        "timestamp": "2026-06-27T14:01:30.838958+00:00",
+        "timestamp": "2026-06-27T13:56:53.880886+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
-        "case_id": "VIGIA-REAL-SRL-SP-MEMORY",
-        "entry_sha256": "07f6c2004a31e781e6895b0d42e7bf9fed0ee0745ea9a5b1b40a949b9d5e2a9a",
+        "case_id": "VIGIA-REAL-SRL-ELF-MEMORY",
+        "entry_sha256": "0ccba4e2fc749165c511944da780f82b06b49f9356fdb70dd616864ff84800a1",
         "inputs_summary": {
-          "path": "data/raw/srl2018/sp-memory/base-sp-memory.img"
+          "path": "data/raw/srl2018/elf/base-elf-memory.img"
         },
         "iteration": 0,
-        "note": "Evidence verified: f253aaf8af9e8bec...",
+        "note": "Evidence verified: 39af7546aaa812e9...",
         "outputs_summary": {
-          "sha256": "f253aaf8af9e8becd6594e38d7b59a7e1f1cee0c047edc09326303daf2cbffc6"
+          "sha256": "39af7546aaa812e919271d4fe77cdee5fd49f30fada02282f8b6104fa0cdab59"
         },
         "seq": 3,
-        "timestamp": "2026-06-27T14:01:40.814113+00:00",
+        "timestamp": "2026-06-27T13:56:59.621807+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "PIPELINE_EXECUTE",
-        "case_id": "VIGIA-REAL-SRL-SP-MEMORY",
-        "entry_sha256": "12293ab0afb06464d68396b9d93de7f090bed77216c7fdac27d082ead3bc5391",
+        "case_id": "VIGIA-REAL-SRL-ELF-MEMORY",
+        "entry_sha256": "5b4208bcd8dd2032aaeb5808d06a03b9602ba12616a632218193f1ee8b585bbc",
         "inputs_summary": {
-          "evidence": "data/raw/srl2018/sp-memory/base-sp-memory.img",
+          "evidence": "data/raw/srl2018/elf/base-elf-memory.img",
           "iteration": "0",
           "params": {}
         },
@@ -66,13 +66,13 @@
         "note": "Executing pipeline \u2014 iteration 0",
         "outputs_summary": {},
         "seq": 4,
-        "timestamp": "2026-06-27T14:01:40.814318+00:00",
+        "timestamp": "2026-06-27T13:56:59.622010+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "PIPELINE_COMPLETE",
-        "case_id": "VIGIA-REAL-SRL-SP-MEMORY",
-        "entry_sha256": "81a711645dd14dbc6fbe288633908777ce2f65c14306c5d5df18952043feec7c",
+        "case_id": "VIGIA-REAL-SRL-ELF-MEMORY",
+        "entry_sha256": "85fc000b285f0c140a6aac80683bec52bf2adb79ee5dc7c450922ce24bdc0f41",
         "inputs_summary": {
           "iteration": "0"
         },
@@ -84,12 +84,12 @@
             "best_posterior": "3/50",
             "confidence": "3/50",
             "is_conclusive": "False",
-            "narrative": "Volatility3 memory analysis: 2 signals from base-sp-memory.img. Average intentionality score: 3/10. Suspicious activity \u2014 requires human review."
+            "narrative": "Volatility3 memory analysis: 2 signals from base-elf-memory.img. Average intentionality score: 3/10. Suspicious activity \u2014 requires human review."
           },
-          "case_id": "VIGIA-REAL-SRL-SP-MEMORY",
+          "case_id": "VIGIA-REAL-SRL-ELF-MEMORY",
           "pipeline_meta": {
             "avg_score": "3/10",
-            "memory_path": "data/raw/srl2018/sp-memory/base-sp-memory.img",
+            "memory_path": "data/raw/srl2018/elf/base-elf-memory.img",
             "signal_count": "2",
             "source": "vol3_memory_adapter",
             "vol3_binary": "/home/labestiadevigia/vigia-repo/.venv/bin/vol"
@@ -98,7 +98,7 @@
             {
               "confidence": "9/10",
               "description": "Windows OS profile identified from memory image",
-              "detail": "Volatility 3 Framework 2.28.0\n\nVariable\tValue\n\nKernel Base\t0xf803f3e02000\nDTB\t0x1aa000\nSymbols\tfile:///home/labestiadevigia/vigia-repo/.venv/lib/python3.12/site-packages/volatility3/symbols/windows/nt...",
+              "detail": "Volatility 3 Framework 2.28.0\n\nVariable\tValue\n\nKernel Base\t0xf80038e1b000\nDTB\t0x1aa000\nSymbols\tfile:///home/labestiadevigia/vigia-repo/.venv/lib/python3.12/site-packages/volatility3/symbols/windows/nt...",
               "evidence_type": "memory_os_profile",
               "source": "vol3.windows.info",
               "z_score": "1/2"
@@ -113,13 +113,13 @@
           ]
         },
         "seq": 5,
-        "timestamp": "2026-06-27T14:02:22.139206+00:00",
+        "timestamp": "2026-06-27T13:57:07.958171+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "CONTRADICTION_CHECK",
-        "case_id": "VIGIA-REAL-SRL-SP-MEMORY",
-        "entry_sha256": "f5603535248a8d1263f1d226bd76f687dc53cec55bb9dd7401f2e0398d3ddf06",
+        "case_id": "VIGIA-REAL-SRL-ELF-MEMORY",
+        "entry_sha256": "8170d3ca5883e47bee4ca628b5dcdbbf994c84fe38c176df7be75f0b43812906",
         "inputs_summary": {
           "n_signals": "2"
         },
@@ -130,13 +130,13 @@
           "threshold": "2"
         },
         "seq": 6,
-        "timestamp": "2026-06-27T14:02:22.139337+00:00",
+        "timestamp": "2026-06-27T13:57:07.958354+00:00",
         "tool": "contradiction_detector"
       },
       {
         "action": "AGENT_EXIT",
-        "case_id": "VIGIA-REAL-SRL-SP-MEMORY",
-        "entry_sha256": "19f8b5e15b42878c01c4783af915b7eb70ce96f607d542ee51057f97a44db6c0",
+        "case_id": "VIGIA-REAL-SRL-ELF-MEMORY",
+        "entry_sha256": "0ed7b917b72014cf66ab716976913bb3cf067984e2925728c21622d7f4151914",
         "inputs_summary": {
           "verdict": "SUSPICION_DETECTED"
         },
@@ -146,18 +146,18 @@
           "exit_code": "0"
         },
         "seq": 7,
-        "timestamp": "2026-06-27T14:02:22.139449+00:00",
+        "timestamp": "2026-06-27T13:57:07.958552+00:00",
         "tool": "vigia_agent"
       }
     ],
-    "start_time": "2026-06-27T14:01:30.838630+00:00",
+    "start_time": "2026-06-27T13:56:53.880554+00:00",
     "total_entries": 7
   },
-  "case_id": "VIGIA-REAL-SRL-SP-MEMORY",
-  "evidence_path": "data/raw/srl2018/sp-memory/base-sp-memory.img",
-  "evidence_sha256": "f253aaf8af9e8becd6594e38d7b59a7e1f1cee0c047edc09326303daf2cbffc6",
+  "case_id": "VIGIA-REAL-SRL-ELF-MEMORY",
+  "evidence_path": "data/raw/srl2018/elf/base-elf-memory.img",
+  "evidence_sha256": "39af7546aaa812e919271d4fe77cdee5fd49f30fada02282f8b6104fa0cdab59",
   "iterations_executed": 1,
-  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-REAL-SRL-SP-MEMORY ===\nEvidence: data/raw/srl2018/sp-memory/base-sp-memory.img\nEvidence SHA-256: f253aaf8af9e8becd6594e38d7b59a7e1f1cee0c047edc09326303daf2cbffc6\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: SUSPICION_DETECTED\nPosterior confidence: 3/50\nConclusive: NO \u2014 requires human review\n\n--- PEIRCEAN NARRATIVE ---\nVolatility3 memory analysis: 2 signals from base-sp-memory.img. Average intentionality score: 3/10. Suspicious activity \u2014 requires human review.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Windows OS profile identified from memory image] z=0.500 conf=0.90 \u2014 Volatility 3 Framework 2.28.0\n\nVariable\tValue\n\nKernel Base\t0xf803f3e02000\nDTB\t0x\n  [Process list analyzed \u2014 no obvious LOLBAS processes] z=0.100 conf=0.60 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW \u2014 No significant anomalies detected in this iteration.\n\nCritical signals (z>3): 0\nHigh signals (2<z<=3): 0\nTotal signals analyzed: 2",
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-REAL-SRL-ELF-MEMORY ===\nEvidence: data/raw/srl2018/elf/base-elf-memory.img\nEvidence SHA-256: 39af7546aaa812e919271d4fe77cdee5fd49f30fada02282f8b6104fa0cdab59\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: SUSPICION_DETECTED\nPosterior confidence: 3/50\nConclusive: NO \u2014 requires human review\n\n--- PEIRCEAN NARRATIVE ---\nVolatility3 memory analysis: 2 signals from base-elf-memory.img. Average intentionality score: 3/10. Suspicious activity \u2014 requires human review.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Windows OS profile identified from memory image] z=0.500 conf=0.90 \u2014 Volatility 3 Framework 2.28.0\n\nVariable\tValue\n\nKernel Base\t0xf80038e1b000\nDTB\t0x\n  [Process list analyzed \u2014 no obvious LOLBAS processes] z=0.100 conf=0.60 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW \u2014 No significant anomalies detected in this iteration.\n\nCritical signals (z>3): 0\nHigh signals (2<z<=3): 0\nTotal signals analyzed: 2",
   "pipeline_results": {
     "abduction": {
       "best_hypothesis": "SUSPICION_DETECTED",
@@ -168,16 +168,16 @@
         "num": 3
       },
       "is_conclusive": false,
-      "narrative": "Volatility3 memory analysis: 2 signals from base-sp-memory.img. Average intentionality score: 3/10. Suspicious activity \u2014 requires human review."
+      "narrative": "Volatility3 memory analysis: 2 signals from base-elf-memory.img. Average intentionality score: 3/10. Suspicious activity \u2014 requires human review."
     },
-    "case_id": "VIGIA-REAL-SRL-SP-MEMORY",
+    "case_id": "VIGIA-REAL-SRL-ELF-MEMORY",
     "pipeline_meta": {
       "avg_score": {
         "__fraction__": true,
         "den": 10,
         "num": 3
       },
-      "memory_path": "data/raw/srl2018/sp-memory/base-sp-memory.img",
+      "memory_path": "data/raw/srl2018/elf/base-elf-memory.img",
       "signal_count": 2,
       "source": "vol3_memory_adapter",
       "vol3_binary": "/home/labestiadevigia/vigia-repo/.venv/bin/vol"
@@ -190,7 +190,7 @@
           "num": 9
         },
         "description": "Windows OS profile identified from memory image",
-        "detail": "Volatility 3 Framework 2.28.0\n\nVariable\tValue\n\nKernel Base\t0xf803f3e02000\nDTB\t0x1aa000\nSymbols\tfile:///home/labestiadevigia/vigia-repo/.venv/lib/python3.12/site-packages/volatility3/symbols/windows/ntkrnlmp.pdb/10C14B8088E34D1BB29200A200744E5F-1.json.xz\nIs64Bit\tTrue\nIsPAE\tFalse\nlayer_name\t0 WindowsI",
+        "detail": "Volatility 3 Framework 2.28.0\n\nVariable\tValue\n\nKernel Base\t0xf80038e1b000\nDTB\t0x1aa000\nSymbols\tfile:///home/labestiadevigia/vigia-repo/.venv/lib/python3.12/site-packages/volatility3/symbols/windows/ntkrnlmp.pdb/DA4A2FB4BAD84D0F95A1A5B0FDE4F155-1.json.xz\nIs64Bit\tTrue\nIsPAE\tFalse\nlayer_name\t0 WindowsI",
         "evidence_type": "memory_os_profile",
         "source": "vol3.windows.info",
         "z_score": {

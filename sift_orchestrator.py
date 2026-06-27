@@ -254,7 +254,7 @@ class SIFTOrchestrator:
         if netscan["ok"]:
             external = [l for l in netscan["stdout"].splitlines()
                         if "ESTABLISHED" in l and
-                        not any(ip in l for ip in ["127.0.", "192.168.", "10.", "172.", "::1", "::", "fe80:"])]
+                        not any(ip in l for ip in ["127.0.", "192.168.", "10.", "172.16.4.", "172.16.3.", "172.16.2.", "172.16.1.", "::1", "::", "fe80:"])]
             if external:
                 signals.append({
                     "source": "vol3.windows.netscan",

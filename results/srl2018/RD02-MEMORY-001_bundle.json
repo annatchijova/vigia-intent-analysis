@@ -1,0 +1,281 @@
+{
+  "analysis_timestamp": "2026-06-27T14:13:23.313618+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "VIGIA-REAL-SRL-RD02-MEMORY",
+    "end_time": "2026-06-27T14:13:23.313625+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "VIGIA-REAL-SRL-RD02-MEMORY",
+        "entry_sha256": "472d95f2c088794b2eabe4f0971a7ecc2ffa4bfb7bbf1fa9deaca7980770f1ba",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "VIGIA-REAL-SRL-RD02-MEMORY"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: 95f2da2a3bdcb4ca...",
+        "outputs_summary": {
+          "agent_sha256": "95f2da2a3bdcb4ca106059e2b06f58fd0ec414c887fec07ac7a0d5edfeb097a1",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-06-27T14:12:43.157838+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-REAL-SRL-RD02-MEMORY",
+        "entry_sha256": "c83341a0f32dd785e4f3c11852249d5770c5c3d8d2582559539dc430d38666bd",
+        "inputs_summary": {
+          "path": "data/raw/srl2018/rd-02-memory/base-rd-02-memory.img"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-06-27T14:12:43.157929+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-REAL-SRL-RD02-MEMORY",
+        "entry_sha256": "582fefe6040c93e7d318f3128e638132f53ac16ce0770f810bfeac67bf793afe",
+        "inputs_summary": {
+          "path": "data/raw/srl2018/rd-02-memory/base-rd-02-memory.img"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: a4519af8720b1306...",
+        "outputs_summary": {
+          "sha256": "a4519af8720b130617f3ec92f064bf5103cbc74e329d59bc13d12a8cc14e0ee9"
+        },
+        "seq": 3,
+        "timestamp": "2026-06-27T14:13:07.340935+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "VIGIA-REAL-SRL-RD02-MEMORY",
+        "entry_sha256": "644521cf1c98cdd6a6a4ec5321acc005460b3c671a44917b3e7f799fb35cbb70",
+        "inputs_summary": {
+          "evidence": "data/raw/srl2018/rd-02-memory/base-rd-02-memory.img",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-06-27T14:13:07.341146+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "VIGIA-REAL-SRL-RD02-MEMORY",
+        "entry_sha256": "da8495ffbf40d8fdc812472ebcd62a4e198855b1fd85a98919b2986d8b2992b8",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 3 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+            "best_posterior": "4/25",
+            "confidence": "4/25",
+            "is_conclusive": "False",
+            "narrative": "Volatility3 memory analysis: 3 signals from base-rd-02-memory.img. Average intentionality score: 4/5. Malicious activity indicated."
+          },
+          "case_id": "VIGIA-REAL-SRL-RD02-MEMORY",
+          "pipeline_meta": {
+            "avg_score": "4/5",
+            "memory_path": "data/raw/srl2018/rd-02-memory/base-rd-02-memory.img",
+            "signal_count": "3",
+            "source": "vol3_memory_adapter",
+            "vol3_binary": "/home/labestiadevigia/vigia-repo/.venv/bin/vol"
+          },
+          "signals": [
+            {
+              "confidence": "9/10",
+              "description": "Windows OS profile identified from memory image",
+              "detail": "Volatility 3 Framework 2.28.0\n\nVariable\tValue\n\nKernel Base\t0xf80126c0c000\nDTB\t0x1aa000\nSymbols\tfile:///home/labestiadevigia/vigia-repo/.venv/lib/python3.12/site-packages/volatility3/symbols/windows/nt...",
+              "evidence_type": "memory_os_profile",
+              "source": "vol3.windows.info",
+              "z_score": "1/2"
+            },
+            {
+              "confidence": "3/5",
+              "description": "Process list analyzed \u2014 no obvious LOLBAS processes",
+              "evidence_type": "memory_process",
+              "source": "vol3.windows.pslist",
+              "z_score": "1/10"
+            },
+            {
+              "confidence": "4/5",
+              "description": "1 established connections to external IPs",
+              "detail": "0xdd83e8891770\tTCPv4\t172.16.6.12\t3262\t172.16.5.50\t50146\tESTABLISHED\t-\t-\tN/A",
+              "evidence_type": "network_flow",
+              "source": "vol3.windows.netscan",
+              "z_score": "9/5"
+            }
+          ]
+        },
+        "seq": 5,
+        "timestamp": "2026-06-27T14:13:23.312461+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "VIGIA-REAL-SRL-RD02-MEMORY",
+        "entry_sha256": "8560546fe05a0ae6bb8a445c67254766475fa74677d7bd9683eab85ba2b6b474",
+        "inputs_summary": {
+          "n_signals": "3"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-06-27T14:13:23.312726+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "VIGIA-REAL-SRL-RD02-MEMORY",
+        "entry_sha256": "2102c6967e17c82ce849ef42488832f7ef8ba5aba6c9beaab6759ef9dfe75488",
+        "inputs_summary": {
+          "verdict": "MALICIOUS_INTENT_DETECTED"
+        },
+        "iteration": 0,
+        "note": "Exit code 1 \u2014 analysis complete.",
+        "outputs_summary": {
+          "exit_code": "1"
+        },
+        "seq": 7,
+        "timestamp": "2026-06-27T14:13:23.313022+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-06-27T14:12:43.157592+00:00",
+    "total_entries": 7
+  },
+  "case_id": "VIGIA-REAL-SRL-RD02-MEMORY",
+  "evidence_path": "data/raw/srl2018/rd-02-memory/base-rd-02-memory.img",
+  "evidence_sha256": "a4519af8720b130617f3ec92f064bf5103cbc74e329d59bc13d12a8cc14e0ee9",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-REAL-SRL-RD02-MEMORY ===\nEvidence: data/raw/srl2018/rd-02-memory/base-rd-02-memory.img\nEvidence SHA-256: a4519af8720b130617f3ec92f064bf5103cbc74e329d59bc13d12a8cc14e0ee9\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 4/25\nConclusive: NO \u2014 requires human review\n\n--- PEIRCEAN NARRATIVE ---\nVolatility3 memory analysis: 3 signals from base-rd-02-memory.img. Average intentionality score: 4/5. Malicious activity indicated.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [1 established connections to external IPs] z=1.800 conf=0.80 \u2014 0xdd83e8891770\tTCPv4\t172.16.6.12\t3262\t172.16.5.50\t50146\tESTABLISHED\t-\t-\tN/A\n  [Windows OS profile identified from memory image] z=0.500 conf=0.90 \u2014 Volatility 3 Framework 2.28.0\n\nVariable\tValue\n\nKernel Base\t0xf80126c0c000\nDTB\t0x\n  [Process list analyzed \u2014 no obvious LOLBAS processes] z=0.100 conf=0.60 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW \u2014 No significant anomalies detected in this iteration.\n\nCritical signals (z>3): 0\nHigh signals (2<z<=3): 0\nTotal signals analyzed: 3",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+      "best_posterior": "4/25",
+      "confidence": {
+        "__fraction__": true,
+        "den": 25,
+        "num": 4
+      },
+      "devil_advocate": {
+        "aggregation": {
+          "k": 3,
+          "method": "top_k_already_validated_matches_v2",
+          "total_gap_mass": "0"
+        },
+        "counterfactual_summary": {
+          "primary_alternative_hypothesis": null
+        },
+        "decision_context": {
+          "confidence": "4/25",
+          "mapped_verdict": "MALICIOUS_INTENT_DETECTED",
+          "raw_verdict": "MALICIOUS_INTENT_DETECTED",
+          "score": {
+            "__fraction__": true,
+            "den": 5,
+            "num": 4
+          }
+        },
+        "devil_advocate_source": "deterministic_no_pattern_data_available",
+        "meta": {
+          "deterministic": true,
+          "generated_from": "case_pattern_library"
+        },
+        "narrative": "Eco's Razor (Abductive Falsification) applied to verdict MALICIOUS_INTENT_DETECTED. Pattern-matching data was not available on this code path \u2014 CasePatternLibrary is not invoked here by design (agent audit-trail mode (vigia_agent.py \u2014 JSON-replay / autonomous path); see KNOWN_LIMITATIONS.md). No structured counter-hypothesis could be derived deterministically. This is a documented scope limitation of the current code path, not an absence of falsification attempt.",
+        "pattern_evidence_gaps": [],
+        "version": "r7-da-v1"
+      },
+      "is_conclusive": false,
+      "narrative": "Volatility3 memory analysis: 3 signals from base-rd-02-memory.img. Average intentionality score: 4/5. Malicious activity indicated."
+    },
+    "case_id": "VIGIA-REAL-SRL-RD02-MEMORY",
+    "pipeline_meta": {
+      "avg_score": {
+        "__fraction__": true,
+        "den": 5,
+        "num": 4
+      },
+      "memory_path": "data/raw/srl2018/rd-02-memory/base-rd-02-memory.img",
+      "signal_count": 3,
+      "source": "vol3_memory_adapter",
+      "vol3_binary": "/home/labestiadevigia/vigia-repo/.venv/bin/vol"
+    },
+    "signals": [
+      {
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 9
+        },
+        "description": "Windows OS profile identified from memory image",
+        "detail": "Volatility 3 Framework 2.28.0\n\nVariable\tValue\n\nKernel Base\t0xf80126c0c000\nDTB\t0x1aa000\nSymbols\tfile:///home/labestiadevigia/vigia-repo/.venv/lib/python3.12/site-packages/volatility3/symbols/windows/ntkrnlmp.pdb/61298F7B9AA44AEFAF0646739619CECB-1.json.xz\nIs64Bit\tTrue\nIsPAE\tFalse\nlayer_name\t0 WindowsI",
+        "evidence_type": "memory_os_profile",
+        "source": "vol3.windows.info",
+        "z_score": {
+          "__fraction__": true,
+          "den": 2,
+          "num": 1
+        }
+      },
+      {
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 3
+        },
+        "description": "Process list analyzed \u2014 no obvious LOLBAS processes",
+        "evidence_type": "memory_process",
+        "source": "vol3.windows.pslist",
+        "z_score": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 1
+        }
+      },
+      {
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 4
+        },
+        "description": "1 established connections to external IPs",
+        "detail": "0xdd83e8891770\tTCPv4\t172.16.6.12\t3262\t172.16.5.50\t50146\tESTABLISHED\t-\t-\tN/A",
+        "evidence_type": "network_flow",
+        "source": "vol3.windows.netscan",
+        "z_score": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 9
+        }
+      }
+    ]
+  },
+  "sans_compliance": {
+    "accuracy_validation": false,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}
