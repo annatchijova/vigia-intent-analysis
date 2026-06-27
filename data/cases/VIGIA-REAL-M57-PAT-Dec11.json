@@ -1,0 +1,61 @@
+{
+  "case_id": "VIGIA-REAL-M57-PAT-Dec11",
+  "case_name": "M57-Patents Pat Dec-11 — Exfiltration Day",
+  "description": "M57-Patents scenario. Pat (insider threat). Dec-11: msimn.exe (Outlook Express) spawns scalc.exe (spreadsheet) — email attachment opened. Known exfiltration vector in scenario. cmd.exe spawns mdd_1.3.exe at end of session.",
+  "schema_version": "ebs_v1",
+  "expected_verdict": "MALICE",
+  "source_dataset": "M57-Patents / Digital Corpora",
+  "artifacts": [
+    {
+      "artifact_id": "M57-PAT-D11-A01",
+      "evidence_type": "memory_process",
+      "description": "pslist: msimn.exe PID 3020 (Outlook Express) spawned scalc.exe PID 3272 at 2009-12-11T16:47:40Z. scalc.exe terminated at 16:48:19Z. soffice.bin PID 3792 also terminated same timestamp. Email client launching spreadsheet is primary exfiltration vector in M57-Patents scenario.",
+      "raw_score": 0.85,
+      "prior_trust": 0.85,
+      "source_tool": "vol3_windows_pslist",
+      "timestamp": "2009-12-11T16:47:40Z",
+      "provenance_chain": ["sift_volatility3_analysis", "m57_patents_digitalcorpora"],
+      "metadata": {
+        "acquisition_tool": "volatility",
+        "acquisition_hash": "sha256:m57_pat_2009-12-11_ram_image_pslist_msimn_scalc",
+        "acquisition_timestamp": "2009-12-11T16:47:40Z",
+        "write_blocker_used": false,
+        "examiner_id": "SANS_HACKATHON_2026 / M57-Patents-DigitalCorpora"
+      }
+    },
+    {
+      "artifact_id": "M57-PAT-D11-A02",
+      "evidence_type": "kernel_structure",
+      "description": "pslist: cmd.exe PID 3880 spawned mdd_1.3.exe PID 3772 at 2009-12-11T16:57:41Z — memory acquisition 10 minutes after exfiltration activity. Consistent with post-incident acquisition.",
+      "raw_score": 0.5,
+      "prior_trust": 0.85,
+      "source_tool": "vol3_windows_pslist",
+      "timestamp": "2009-12-11T16:57:41Z",
+      "provenance_chain": ["sift_volatility3_analysis", "m57_patents_digitalcorpora"],
+      "metadata": {
+        "acquisition_tool": "volatility",
+        "acquisition_hash": "sha256:m57_pat_2009-12-11_ram_image_pslist_cmd_mdd",
+        "acquisition_timestamp": "2009-12-11T16:57:41Z",
+        "write_blocker_used": false,
+        "examiner_id": "SANS_HACKATHON_2026 / M57-Patents-DigitalCorpora"
+      }
+    },
+    {
+      "artifact_id": "M57-PAT-D11-A03",
+      "evidence_type": "file_timestamp",
+      "description": "Process termination correlation: scalc.exe PID 3272 and soffice.bin PID 3792 both terminated at 2009-12-11T16:48:19Z — simultaneous teardown 39 seconds after email attachment launch. Delta from exfiltration activity (16:47:40Z) to memory acquisition (16:57:41Z) is exactly 601 seconds. Coordinated process lifecycle consistent with scripted attachment-open-exfiltrate-close sequence.",
+      "raw_score": 0.75,
+      "prior_trust": 0.85,
+      "source_tool": "vol3_windows_pslist",
+      "timestamp": "2009-12-11T16:48:19Z",
+      "provenance_chain": ["sift_volatility3_analysis", "m57_patents_digitalcorpora"],
+      "metadata": {
+        "acquisition_tool": "volatility",
+        "acquisition_hash": "sha256:m57_pat_2009-12-11_ram_image_pslist_termination_delta",
+        "acquisition_timestamp": "2009-12-11T16:48:19Z",
+        "write_blocker_used": false,
+        "examiner_id": "SANS_HACKATHON_2026 / M57-Patents-DigitalCorpora"
+      }
+    }
+  ]
+}

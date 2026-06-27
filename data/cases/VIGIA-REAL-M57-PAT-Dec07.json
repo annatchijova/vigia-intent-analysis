@@ -1,0 +1,44 @@
+{
+  "case_id": "VIGIA-REAL-M57-PAT-Dec07",
+  "case_name": "M57-Patents Pat Dec-07 — Baseline",
+  "description": "M57-Patents scenario. Pat (insider threat suspect). Dec-07 baseline: AVG antivirus active, OpenOffice open, cmd.exe spawned mdd_1.3.exe for memory acquisition. No exfiltration indicators this day.",
+  "schema_version": "ebs_v1",
+  "expected_verdict": "SUSPICION",
+  "source_dataset": "M57-Patents / Digital Corpora",
+  "artifacts": [
+    {
+      "artifact_id": "M57-PAT-D07-A01",
+      "evidence_type": "memory_process",
+      "description": "pslist: soffice.bin (OpenOffice) active PID 1608. cmd.exe PID 1860 spawned mdd_1.3.exe PID 2784 at 2009-12-08T00:22:05Z for memory acquisition.",
+      "raw_score": 0.6,
+      "prior_trust": 0.85,
+      "source_tool": "vol3_windows_pslist",
+      "timestamp": "2009-12-07T18:34:00Z",
+      "provenance_chain": ["sift_volatility3_analysis", "m57_patents_digitalcorpora"],
+      "metadata": {
+        "acquisition_tool": "volatility",
+        "acquisition_hash": "sha256:m57_pat_2009-12-07_ram_image_pslist_baseline",
+        "acquisition_timestamp": "2009-12-07T18:34:00Z",
+        "write_blocker_used": false,
+        "examiner_id": "SANS_HACKATHON_2026 / M57-Patents-DigitalCorpora"
+      }
+    },
+    {
+      "artifact_id": "M57-PAT-D07-A02",
+      "evidence_type": "kernel_structure",
+      "description": "pslist: AVG suite active (avgwdsvc, avgnsx, avgemc, avgrsx, avgchsvx, avgcsrvx) — antivirus present and running. No suspicious processes beyond baseline.",
+      "raw_score": 0.2,
+      "prior_trust": 0.85,
+      "source_tool": "vol3_windows_pslist",
+      "timestamp": "2009-12-07T23:49:00Z",
+      "provenance_chain": ["sift_volatility3_analysis", "m57_patents_digitalcorpora"],
+      "metadata": {
+        "acquisition_tool": "volatility",
+        "acquisition_hash": "sha256:m57_pat_2009-12-07_ram_image_pslist_avg_running",
+        "acquisition_timestamp": "2009-12-07T23:49:00Z",
+        "write_blocker_used": false,
+        "examiner_id": "SANS_HACKATHON_2026 / M57-Patents-DigitalCorpora"
+      }
+    }
+  ]
+}

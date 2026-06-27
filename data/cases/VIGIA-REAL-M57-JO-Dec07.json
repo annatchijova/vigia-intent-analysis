@@ -1,0 +1,44 @@
+{
+  "case_id": "VIGIA-REAL-M57-JO-Dec07",
+  "case_name": "M57-Patents Jo Dec-07 — CEO Anomaly",
+  "description": "M57-Patents scenario. Jo (CEO, expected benign). Dec-07: python.exe spawned from cmd.exe at 16:54:31Z. Unusual for CEO role in 2009 Windows XP environment. Requires investigation.",
+  "schema_version": "ebs_v1",
+  "expected_verdict": "SUSPICION",
+  "source_dataset": "M57-Patents / Digital Corpora",
+  "artifacts": [
+    {
+      "artifact_id": "M57-JO-D07-A01",
+      "evidence_type": "memory_process",
+      "description": "pslist: cmd.exe PID 2748 spawned python.exe PID 900 at 2009-12-07T16:54:31Z. Python execution from command line unusual for CEO role in 2009 corporate Windows XP environment. Could indicate investigator activity or anomalous script execution.",
+      "raw_score": 0.65,
+      "prior_trust": 0.75,
+      "source_tool": "vol3_windows_pslist",
+      "timestamp": "2009-12-07T16:54:31Z",
+      "provenance_chain": ["sift_volatility3_analysis", "m57_patents_digitalcorpora"],
+      "metadata": {
+        "acquisition_tool": "volatility",
+        "acquisition_hash": "sha256:m57_jo_2009-12-07_ram_image_pslist_python_anomaly",
+        "acquisition_timestamp": "2009-12-07T16:54:31Z",
+        "write_blocker_used": false,
+        "examiner_id": "SANS_HACKATHON_2026 / M57-Patents-DigitalCorpora"
+      }
+    },
+    {
+      "artifact_id": "M57-JO-D07-A02",
+      "evidence_type": "kernel_structure",
+      "description": "pslist: msimn.exe PID 3464 (Outlook Express) and firefox.exe PID 3760 active simultaneously at 16:53Z. Normal executive activity pattern — email + browser. No suspicious child processes from these.",
+      "raw_score": 0.2,
+      "prior_trust": 0.85,
+      "source_tool": "vol3_windows_pslist",
+      "timestamp": "2009-12-07T16:53:00Z",
+      "provenance_chain": ["sift_volatility3_analysis", "m57_patents_digitalcorpora"],
+      "metadata": {
+        "acquisition_tool": "volatility",
+        "acquisition_hash": "sha256:m57_jo_2009-12-07_ram_image_pslist_msimn_firefox",
+        "acquisition_timestamp": "2009-12-07T16:53:00Z",
+        "write_blocker_used": false,
+        "examiner_id": "SANS_HACKATHON_2026 / M57-Patents-DigitalCorpora"
+      }
+    }
+  ]
+}
