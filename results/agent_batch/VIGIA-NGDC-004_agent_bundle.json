@@ -1,0 +1,337 @@
+{
+  "analysis_timestamp": "2026-06-27T14:32:14.282699+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "VIGIA-NGDC-004",
+    "end_time": "2026-06-27T14:32:14.282705+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "VIGIA-NGDC-004",
+        "entry_sha256": "009d670d5bfd62a4b9bd8103a63387667e0e8fb8a1a7f4ce296f4dff885cecf9",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "VIGIA-NGDC-004"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: 95f2da2a3bdcb4ca...",
+        "outputs_summary": {
+          "agent_sha256": "95f2da2a3bdcb4ca106059e2b06f58fd0ec414c887fec07ac7a0d5edfeb097a1",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-06-27T14:32:14.278960+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-NGDC-004",
+        "entry_sha256": "3c1dcb66744a0805af3470ec9671a66dae24bf7af0d7b8a04b804d9bbfe3033d",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-NGDC-004.json"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-06-27T14:32:14.279046+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-NGDC-004",
+        "entry_sha256": "fa7eff32f989444af505450d8c7c4119ee087c1a7007a76824e14501ce0afce9",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-NGDC-004.json"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: bcd3fe7633046838...",
+        "outputs_summary": {
+          "sha256": "bcd3fe7633046838d823dfbc4d559e9bb624a115bec00a68caf63fbf715abb8f"
+        },
+        "seq": 3,
+        "timestamp": "2026-06-27T14:32:14.279153+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "VIGIA-NGDC-004",
+        "entry_sha256": "a3f5abcf54792efffa706e6206e01fa4bb590e4ec42f6b75973725c246e491c8",
+        "inputs_summary": {
+          "evidence": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-NGDC-004.json",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-06-27T14:32:14.279258+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "VIGIA-NGDC-004",
+        "entry_sha256": "bddfd88994150ee45e12441608f9ea55a1f8da1c5954138b71f11510911dfe8a",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 6 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+            "best_posterior": "8203/50000",
+            "confidence": "8203/50000",
+            "is_conclusive": "True",
+            "narrative": "This bundle upgrades VIGIA-NGDC-003 (Joe, SUSPICION) to MALICE based on physical disk evidence extracted from tracy-home-2012-07-16-final.E01 (4.0GB + 1.4GB E02, Apple HFS+ v4, acquired 2012-07-16). T..."
+          },
+          "case_id": "VIGIA-NGDC-004",
+          "pipeline_meta": {
+            "artifact_count": "6",
+            "avg_score": "8203/10000",
+            "expected_verdict": "MALICE",
+            "source": "ebs_v1_json_adapter"
+          },
+          "signals": [
+            {
+              "artifact_id": "ngdc004_01",
+              "confidence": "93/100",
+              "description": "LogKext LaunchDaemon plist (com.fsb.logKext) physically present on Tracy's MacBook Air disk at /Library/LaunchDaemons/. LaunchDaemon configuration confirms: binary at /Library/Application Support/logK",
+              "evidence_type": "file_metadata",
+              "source": "fls (Sleuth Kit) + ewfmount 20140814 \u2014 tracy-home-2012-07-16-final.E01, HFS+ direct (no partition table)",
+              "z_score": "1767/2000"
+            },
+            {
+              "artifact_id": "ngdc004_02",
+              "confidence": "91/100",
+              "description": "User account joesumtwelve exists as a DELETED entry (inode 377895) on Tracy's MacBook Air. HFS+ preserves deleted directory contents until the blocks are overwritten \u2014 the home directory structure is ",
+              "evidence_type": "file_metadata",
+              "source": "fls (Sleuth Kit) \u2014 inode 377895 joesumtwelve DELETED",
+              "z_score": "8463/10000"
+            },
+            {
+              "artifact_id": "ngdc004_03",
+              "confidence": "93/100",
+              "description": "bash_history from joesumtwelve's deleted home directory contains commands referencing LogKext installation: sudo su escalation, vim editing of LaunchDaemon plist (com.fsb.logKext), logKextClient confi",
+              "evidence_type": "log_entry",
+              "source": "icat (Sleuth Kit) \u2014 joesumtwelve/.bash_history",
+              "z_score": "558/625"
+            },
+            {
+              "artifact_id": "ngdc004_04",
+              "confidence": "9/10",
+              "description": "12 exfiltration sessions confirmed via EML files spanning 2012-06-28 to 2012-07-12. Each EML confirms: LogKext Daemon running as root on Tracys-MacBook-Air.local, hourly delivery via Postfix to joe.su",
+              "evidence_type": "log_entry",
+              "source": "EML aggregate \u2014 email.zip (12 files, LogKext exfiltration output)",
+              "z_score": "819/1000"
+            },
+            {
+              "artifact_id": "ngdc004_05",
+              "confidence": "89/100",
+              "description": "Tracy-Carry email thread recovered from Carry's tablet provides independent corroboration that Joe's keylogger captured the conspiracy communications that led to law enforcement reporting. The thread ",
+              "evidence_type": "email_content",
+              "source": "sqlite3 \u2014 EmailProviderBody.db messageKeys 16-27, carry-tablet-2012-07-16-final.E01",
+              "z_score": "979/1250"
+            }
+          ]
+        },
+        "seq": 5,
+        "timestamp": "2026-06-27T14:32:14.281584+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "VIGIA-NGDC-004",
+        "entry_sha256": "44bad9dcb5709b854c80c18f19817b4233db153ad993377f95cbd7ba5d1de3b5",
+        "inputs_summary": {
+          "n_signals": "6"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-06-27T14:32:14.281753+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "VIGIA-NGDC-004",
+        "entry_sha256": "50e05bbc5a9d4f184947323f18ff8d4caf1bfb8ce8c66e61396cdf7425f7ec3b",
+        "inputs_summary": {
+          "verdict": "MALICIOUS_INTENT_DETECTED"
+        },
+        "iteration": 0,
+        "note": "Exit code 1 \u2014 analysis complete.",
+        "outputs_summary": {
+          "exit_code": "1"
+        },
+        "seq": 7,
+        "timestamp": "2026-06-27T14:32:14.281854+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-06-27T14:32:14.278727+00:00",
+    "total_entries": 7
+  },
+  "case_id": "VIGIA-NGDC-004",
+  "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-NGDC-004.json",
+  "evidence_sha256": "bcd3fe7633046838d823dfbc4d559e9bb624a115bec00a68caf63fbf715abb8f",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-NGDC-004 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/VIGIA-NGDC-004.json\nEvidence SHA-256: bcd3fe7633046838d823dfbc4d559e9bb624a115bec00a68caf63fbf715abb8f\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 8203/50000\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\nThis bundle upgrades VIGIA-NGDC-003 (Joe, SUSPICION) to MALICE based on physical disk evidence extracted from tracy-home-2012-07-16-final.E01 (4.0GB + 1.4GB E02, Apple HFS+ v4, acquired 2012-07-16). Three independent evidence sources now converge on the same actor: (1) 12 EML keylogger exfiltration logs (email.zip), (2) EmailProviderBody.db from carry-tablet-2012-07-16-final.E01, and (3) physical disk artifacts from Tracy's MacBook Air. The disk image reveals joesumtwelve as a DELETED user accou\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [bash_history from joesumtwelve's deleted home directory contains comma] z=0.893 conf=0.93 \u2014 \n  [LogKext LaunchDaemon plist (com.fsb.logKext) physically present on Tra] z=0.883 conf=0.93 \u2014 \n  [User account joesumtwelve exists as a DELETED entry (inode 377895) on ] z=0.846 conf=0.91 \u2014 \n  [12 exfiltration sessions confirmed via EML files spanning 2012-06-28 t] z=0.819 conf=0.90 \u2014 \n  [Tracy-Carry email thread recovered from Carry's tablet provides indepe] z=0.783 conf=0.89 \u2014 \n\n--- FINAL ALERT LEVEL ---\nHIGH \u2014 Conclusive MALICE verdict from Bayesian posterior aggregation. Individual z-scores below threshold (distributed evidence pattern: no single dominant signal, but aggregate posterior is decisive).\n\nCritical signals (z>3): 0\nHigh signals (2<z<=3): 0\nTotal signals analyzed: 6",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+      "best_posterior": "8203/50000",
+      "confidence": {
+        "__fraction__": true,
+        "den": 50000,
+        "num": 8203
+      },
+      "devil_advocate": {
+        "aggregation": {
+          "k": 3,
+          "method": "top_k_already_validated_matches_v2",
+          "total_gap_mass": "0"
+        },
+        "counterfactual_summary": {
+          "primary_alternative_hypothesis": null
+        },
+        "decision_context": {
+          "confidence": "8203/50000",
+          "mapped_verdict": "MALICIOUS_INTENT_DETECTED",
+          "raw_verdict": "MALICIOUS_INTENT_DETECTED",
+          "score": "8203/10000"
+        },
+        "devil_advocate_source": "deterministic_no_pattern_data_available",
+        "meta": {
+          "deterministic": true,
+          "generated_from": "case_pattern_library"
+        },
+        "narrative": "Eco's Razor (Abductive Falsification) applied to verdict MALICIOUS_INTENT_DETECTED. Pattern-matching data was not available on this code path \u2014 CasePatternLibrary is not invoked here by design (agent audit-trail mode (vigia_agent.py \u2014 JSON-replay / autonomous path); see KNOWN_LIMITATIONS.md). No structured counter-hypothesis could be derived deterministically. This is a documented scope limitation of the current code path, not an absence of falsification attempt.",
+        "pattern_evidence_gaps": [],
+        "version": "r7-da-v1"
+      },
+      "is_conclusive": true,
+      "narrative": "This bundle upgrades VIGIA-NGDC-003 (Joe, SUSPICION) to MALICE based on physical disk evidence extracted from tracy-home-2012-07-16-final.E01 (4.0GB + 1.4GB E02, Apple HFS+ v4, acquired 2012-07-16). Three independent evidence sources now converge on the same actor: (1) 12 EML keylogger exfiltration logs (email.zip), (2) EmailProviderBody.db from carry-tablet-2012-07-16-final.E01, and (3) physical disk artifacts from Tracy's MacBook Air. The disk image reveals joesumtwelve as a DELETED user accou"
+    },
+    "case_id": "VIGIA-NGDC-004",
+    "pipeline_meta": {
+      "artifact_count": 6,
+      "avg_score": "8203/10000",
+      "expected_verdict": "MALICE",
+      "source": "ebs_v1_json_adapter"
+    },
+    "signals": [
+      {
+        "artifact_id": "ngdc004_01",
+        "confidence": {
+          "__fraction__": true,
+          "den": 100,
+          "num": 93
+        },
+        "description": "LogKext LaunchDaemon plist (com.fsb.logKext) physically present on Tracy's MacBook Air disk at /Library/LaunchDaemons/. LaunchDaemon configuration confirms: binary at /Library/Application Support/logK",
+        "evidence_type": "file_metadata",
+        "source": "fls (Sleuth Kit) + ewfmount 20140814 \u2014 tracy-home-2012-07-16-final.E01, HFS+ direct (no partition table)",
+        "z_score": {
+          "__fraction__": true,
+          "den": 2000,
+          "num": 1767
+        }
+      },
+      {
+        "artifact_id": "ngdc004_02",
+        "confidence": {
+          "__fraction__": true,
+          "den": 100,
+          "num": 91
+        },
+        "description": "User account joesumtwelve exists as a DELETED entry (inode 377895) on Tracy's MacBook Air. HFS+ preserves deleted directory contents until the blocks are overwritten \u2014 the home directory structure is ",
+        "evidence_type": "file_metadata",
+        "source": "fls (Sleuth Kit) \u2014 inode 377895 joesumtwelve DELETED",
+        "z_score": {
+          "__fraction__": true,
+          "den": 10000,
+          "num": 8463
+        }
+      },
+      {
+        "artifact_id": "ngdc004_03",
+        "confidence": {
+          "__fraction__": true,
+          "den": 100,
+          "num": 93
+        },
+        "description": "bash_history from joesumtwelve's deleted home directory contains commands referencing LogKext installation: sudo su escalation, vim editing of LaunchDaemon plist (com.fsb.logKext), logKextClient confi",
+        "evidence_type": "log_entry",
+        "source": "icat (Sleuth Kit) \u2014 joesumtwelve/.bash_history",
+        "z_score": {
+          "__fraction__": true,
+          "den": 625,
+          "num": 558
+        }
+      },
+      {
+        "artifact_id": "ngdc004_04",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 9
+        },
+        "description": "12 exfiltration sessions confirmed via EML files spanning 2012-06-28 to 2012-07-12. Each EML confirms: LogKext Daemon running as root on Tracys-MacBook-Air.local, hourly delivery via Postfix to joe.su",
+        "evidence_type": "log_entry",
+        "source": "EML aggregate \u2014 email.zip (12 files, LogKext exfiltration output)",
+        "z_score": {
+          "__fraction__": true,
+          "den": 1000,
+          "num": 819
+        }
+      },
+      {
+        "artifact_id": "ngdc004_05",
+        "confidence": {
+          "__fraction__": true,
+          "den": 100,
+          "num": 89
+        },
+        "description": "Tracy-Carry email thread recovered from Carry's tablet provides independent corroboration that Joe's keylogger captured the conspiracy communications that led to law enforcement reporting. The thread ",
+        "evidence_type": "email_content",
+        "source": "sqlite3 \u2014 EmailProviderBody.db messageKeys 16-27, carry-tablet-2012-07-16-final.E01",
+        "z_score": {
+          "__fraction__": true,
+          "den": 1250,
+          "num": 979
+        }
+      },
+      {
+        "artifact_id": "ngdc004_06",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 17
+        },
+        "description": "Tracy's Trash contains documents.zip (135KB, encrypted with password 'Hercules' \u2014 captured by keylogger), Stamp insurance 1 2.pdf (186KB), and Stamp insurance 1.pdf.zip (134KB). The documents.zip was ",
+        "evidence_type": "file_metadata",
+        "source": "fls (Sleuth Kit) + icat \u2014 tracy-home E01, Trash contents",
+        "z_score": {
+          "__fraction__": true,
+          "den": 1000,
+          "num": 697
+        }
+      }
+    ]
+  },
+  "sans_compliance": {
+    "accuracy_validation": false,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}

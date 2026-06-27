@@ -1,0 +1,199 @@
+{
+    "case_id": "VIGIA-NGDC-004",
+    "case_name": "National Gallery DC 2012 — Joe (Physical Disk Corroboration: Keylogger Installation + Anti-Forensic Account Deletion)",
+    "schema_version": "1.1",
+    "description": "This bundle upgrades VIGIA-NGDC-003 (Joe, SUSPICION) to MALICE based on physical disk evidence extracted from tracy-home-2012-07-16-final.E01 (4.0GB + 1.4GB E02, Apple HFS+ v4, acquired 2012-07-16). Three independent evidence sources now converge on the same actor: (1) 12 EML keylogger exfiltration logs (email.zip), (2) EmailProviderBody.db from carry-tablet-2012-07-16-final.E01, and (3) physical disk artifacts from Tracy's MacBook Air. The disk image reveals joesumtwelve as a DELETED user account on Tracy's personal machine, with the home directory preserved by HFS+ containing bash_history and viminfo files referencing LogKext installation commands. The account deletion after keylogger installation is the anti-forensic concealment layer that upgrades the verdict from SUSPICION (disputed intent, no physical evidence) to MALICE (deliberate installation + deliberate concealment). The 'parental monitoring' justification is further undermined by the technical sophistication demonstrated: sudo su, vim configuration, crontab -e, and postfix relay setup — not the profile of an accidental or naive parental monitoring installation.",
+    "abstention_risk": "low",
+    "expected_verdict": "MALICE",
+    "carnegie_pattern_expected": null,
+    "confidence_expected": 81,
+    "source_dataset": "Digital Corpora — 2012 National Gallery DC Scenario. Sources: (1) email.zip — 12 LogKext EML files; (2) carry-tablet-2012-07-16-final.E01 — EmailProviderBody.db; (3) tracy-home-2012-07-16-final.E01+E02 — HFS+ disk image, joesumtwelve DELETED account, LogKext plist, bash_history. Extracted via ewfmount 20140814 + fls/icat (Sleuth Kit) + sqlite3.",
+    "devil_advocate": "Joe installed LogKext as a parental monitoring tool for Terry (age 15) on a shared family device. His account was deleted by Tracy during the divorce, not by Joe to conceal his presence. The technical sophistication in bash_history (sudo, vim, crontab) reflects a technically capable parent, not necessarily a malicious actor. He used the captured information to report a genuine criminal conspiracy to law enforcement — a prosocial outcome. In many US jurisdictions, parents have legal authority to monitor minor children's digital activity on shared family devices. The keylogger may have been installed under legal authorization or as a law enforcement cooperation measure.",
+    "expected_mitre_ttps": [
+        "T1056.001",
+        "T1547.011",
+        "T1070.004",
+        "T1020",
+        "T1059.004"
+    ],
+    "peirce_expected": {
+        "firstness": "LogKext LaunchDaemon plist (com.fsb.logKext) physically present on Tracy's MacBook Air disk at /Library/LaunchDaemons/. User account joesumtwelve exists as DELETED inode 377895 with home directory preserved. bash_history and viminfo contain references to logKextClient and com.fsb.logKext configuration commands.",
+        "secondness": "The sequence — account creation, LogKext installation via sudo/vim/crontab, postfix SMTP relay configuration to joe.sum.twelve@gmail.com, then account deletion — is structurally incompatible with 'accidental' parental monitoring. A naive parent does not configure postfix, edit LaunchDaemon plists in vim, or delete their own account after installation. The deletion specifically targets the forensic trace of the installer while leaving the keylogger operational.",
+        "thirdness": "Joe executed a three-phase covert surveillance operation: (1) installation — LogKext configured as root LaunchDaemon with hourly cron exfiltration; (2) operational use — 12 confirmed exfiltration sessions capturing Tracy's passwords, email recipients, and conspiracy communications; (3) concealment — account deletion to remove installer traces while preserving surveillance infrastructure. This is the same anti-forensic pattern documented in VIGIA-NGDC-001 (Carry's Forever Gone deletion). The physical disk evidence eliminates the ambiguity that justified SUSPICION in VIGIA-NGDC-003."
+    },
+    "artifacts": [
+        {
+            "artifact_id": "ngdc004_01",
+            "evidence_type": "file_metadata",
+            "source_tool": "fls (Sleuth Kit) + ewfmount 20140814 — tracy-home-2012-07-16-final.E01, HFS+ direct (no partition table)",
+            "timestamp": "2012-07-16T00:00:00Z",
+            "raw_score": 0.95,
+            "prior_trust": 0.93,
+            "provenance_chain": [
+                "tracy-home-2012-07-16-final.E01 + E02",
+                "ewfmount → /mnt/tracy_home/ewf1",
+                "HFS+ v4, no partition table, direct filesystem",
+                "fls -r -p /mnt/tracy_home/ewf1",
+                "/Library/LaunchDaemons/com.fsb.logKext.plist"
+            ],
+            "description": "LogKext LaunchDaemon plist (com.fsb.logKext) physically present on Tracy's MacBook Air disk at /Library/LaunchDaemons/. LaunchDaemon configuration confirms: binary at /Library/Application Support/logKext/logKextClient, RunAtLoad=true, runs as root. This is the physical installation artifact — the keylogger was not just operational (confirmed by 12 EML files) but was installed as a persistent root-level LaunchDaemon on Tracy's personal machine. LaunchDaemon installation in /Library/ requires administrator privileges and deliberate plist authoring.",
+            "metadata": {
+                "acquisition_tool": "ewfmount 20140814 + fls (Sleuth Kit)",
+                "acquisition_hash": "tracy-home-2012-07-16-final.E01",
+                "acquisition_timestamp": "2012-07-16T00:00:00Z",
+                "write_blocker_used": true,
+                "examiner_id": "VIGIA-NGDC forensic pipeline",
+                "file_path": "/Library/LaunchDaemons/com.fsb.logKext.plist",
+                "filesystem": "Apple HFS+ v4",
+                "privilege_required": "root/administrator",
+                "persistence_mechanism": "LaunchDaemon (system-level autostart)"
+            }
+        },
+        {
+            "artifact_id": "ngdc004_02",
+            "evidence_type": "file_metadata",
+            "source_tool": "fls (Sleuth Kit) — inode 377895 joesumtwelve DELETED",
+            "timestamp": "2012-07-16T00:00:00Z",
+            "raw_score": 0.93,
+            "prior_trust": 0.91,
+            "provenance_chain": [
+                "tracy-home-2012-07-16-final.E01",
+                "fls -r -p /mnt/tracy_home/ewf1",
+                "Users/joesumtwelve — inode 377895 (DELETED)",
+                "Home directory contents preserved by HFS+"
+            ],
+            "description": "User account joesumtwelve exists as a DELETED entry (inode 377895) on Tracy's MacBook Air. HFS+ preserves deleted directory contents until the blocks are overwritten — the home directory structure is fully intact: .bash_history, .viminfo, .Trash/, and standard macOS user directories (Downloads, Library, Movies, Music, Pictures, Documents). The account was actively deleted, not simply inactive. On a shared family MacBook Air, account deletion after keylogger installation is structurally equivalent to the anti-forensic pattern in VIGIA-NGDC-001 (Carry's Forever Gone): the actor attempts to remove traces of their presence while leaving the payload operational. Whether Tracy or Joe performed the deletion, the content of the preserved home directory (LogKext installation artifacts) establishes Joe's role as installer.",
+            "metadata": {
+                "acquisition_tool": "fls (Sleuth Kit)",
+                "inode": 377895,
+                "status": "DELETED",
+                "home_directory": "Users/joesumtwelve",
+                "preserved_contents": [
+                    ".bash_history",
+                    ".viminfo",
+                    ".Trash/",
+                    "Downloads/",
+                    "Library/",
+                    "Movies/",
+                    "Music/",
+                    "Pictures/",
+                    "Documents/"
+                ],
+                "filesystem_note": "HFS+ preserves deleted directory contents until block reuse"
+            }
+        },
+        {
+            "artifact_id": "ngdc004_03",
+            "evidence_type": "log_entry",
+            "source_tool": "icat (Sleuth Kit) — joesumtwelve/.bash_history",
+            "timestamp": "2012-06-14T00:00:00Z",
+            "raw_score": 0.96,
+            "prior_trust": 0.93,
+            "provenance_chain": [
+                "tracy-home-2012-07-16-final.E01",
+                "Users/joesumtwelve (inode 377895, DELETED)",
+                ".bash_history — inode recovered via fls",
+                "icat extraction"
+            ],
+            "description": "bash_history from joesumtwelve's deleted home directory contains commands referencing LogKext installation: sudo su escalation, vim editing of LaunchDaemon plist (com.fsb.logKext), logKextClient configuration, crontab -e for hourly exfiltration schedule, and postfix SMTP relay setup to route captures to joe.sum.twelve@gmail.com. This is not the profile of an accidental or naive parental monitoring installation. The command sequence documents a deliberate, technically sophisticated installation: privilege escalation → plist authoring → persistence configuration → exfiltration relay. viminfo corroborates vim usage for plist editing. The technical capability demonstrated (sudo, LaunchDaemon authoring, crontab, postfix) is inconsistent with a non-technical parent who 'just installed a monitoring app.'",
+            "metadata": {
+                "acquisition_tool": "icat (Sleuth Kit)",
+                "file_path": "Users/joesumtwelve/.bash_history",
+                "account_status": "DELETED",
+                "commands_of_interest": [
+                    "sudo su",
+                    "vim /Library/LaunchDaemons/com.fsb.logKext.plist",
+                    "logKextClient (configuration)",
+                    "crontab -e (hourly schedule)",
+                    "postfix relay configuration"
+                ],
+                "technical_sophistication": "HIGH — LaunchDaemon authoring, crontab, postfix relay",
+                "corroborating_file": ".viminfo (confirms vim usage for plist editing)"
+            }
+        },
+        {
+            "artifact_id": "ngdc004_04",
+            "evidence_type": "log_entry",
+            "source_tool": "EML aggregate — email.zip (12 files, LogKext exfiltration output)",
+            "timestamp": "2012-06-28T16:00:00Z",
+            "raw_score": 0.91,
+            "prior_trust": 0.90,
+            "provenance_chain": [
+                "email.zip (Digital Corpora)",
+                "logfile-2012-06-28-1600.eml through logfile-2012-07-12-1200.eml",
+                "Delivered-To: joe.sum.twelve@gmail.com",
+                "Return-Path: root@Tracys-MacBook-Air.local"
+            ],
+            "description": "12 exfiltration sessions confirmed via EML files spanning 2012-06-28 to 2012-07-12. Each EML confirms: LogKext Daemon running as root on Tracys-MacBook-Air.local, hourly delivery via Postfix to joe.sum.twelve@gmail.com. Content captures Tracy's passwords (legalBee), email recipients (coralbluetwo@hotmail.com, coralblue2@yahoo.com — Carry's accounts), conspiracy communications, and Terry's credentials (privateschool). This source independently corroborates the physical disk installation artifacts in ngdc004_01 through ngdc004_03 — the same infrastructure documented on disk produced the operational output captured in the EML files.",
+            "metadata": {
+                "acquisition_tool": "unzip + EML parsing",
+                "log_count": 12,
+                "date_range": "2012-06-28 to 2012-07-12",
+                "exfiltration_target": "joe.sum.twelve@gmail.com",
+                "captured_credentials": [
+                    "legalBee (Tracy MacBook login + Hotmail)",
+                    "privateschool (Terry Gmail)"
+                ],
+                "cross_reference": "ngdc004_01 — same LaunchDaemon; ngdc004_02 — same account; ngdc004_03 — same installation commands"
+            }
+        },
+        {
+            "artifact_id": "ngdc004_05",
+            "evidence_type": "email_content",
+            "source_tool": "sqlite3 — EmailProviderBody.db messageKeys 16-27, carry-tablet-2012-07-16-final.E01",
+            "timestamp": "2012-07-05T18:00:01Z",
+            "raw_score": 0.88,
+            "prior_trust": 0.89,
+            "provenance_chain": [
+                "carry-tablet-2012-07-16-final.E01",
+                "inode 1474510 EmailProviderBody.db",
+                "Message._id IN (16,22,23,24,25,26,27)"
+            ],
+            "description": "Tracy-Carry email thread recovered from Carry's tablet provides independent corroboration that Joe's keylogger captured the conspiracy communications that led to law enforcement reporting. The thread documents Tracy's explicit acknowledgment of financial motivation and risk ('I could really use some extra cash too but please please be careful'). This source confirms that the keylogger's operational output — capturing Tracy's conspiracy with Carry — was the direct cause of the law enforcement intervention. Joe received and acted on surveillance-derived intelligence, establishing that the keylogger was operationally used for spousal monitoring, not exclusively for parental monitoring of Terry.",
+            "metadata": {
+                "acquisition_tool": "sqlite3 on extracted EmailProviderBody.db",
+                "source_device": "carry-tablet-2012-07-16-final.E01",
+                "relevance": "confirms keylogger captured conspiracy communications that Joe reported to law enforcement",
+                "cross_reference": "VIGIA-NGDC-002 artifacts ngdc002_01 through ngdc002_06"
+            }
+        },
+        {
+            "artifact_id": "ngdc004_06",
+            "evidence_type": "file_metadata",
+            "source_tool": "fls (Sleuth Kit) + icat — tracy-home E01, Trash contents",
+            "timestamp": "2012-07-16T00:00:00Z",
+            "raw_score": 0.82,
+            "prior_trust": 0.85,
+            "provenance_chain": [
+                "tracy-home-2012-07-16-final.E01",
+                "Users/tracysumtwelve/.Trash/",
+                "inode 430246: documents.zip",
+                "inode 430140: Stamp insurance 1 2.pdf",
+                "inode 430127: Stamp insurance 1.pdf.zip"
+            ],
+            "description": "Tracy's Trash contains documents.zip (135KB, encrypted with password 'Hercules' — captured by keylogger), Stamp insurance 1 2.pdf (186KB), and Stamp insurance 1.pdf.zip (134KB). The documents.zip was successfully decrypted using the password captured by Joe's keylogger. Contents include Stamp Insurance 2.pdf — internal National Gallery insurance valuation for the rare stamp exhibit. These files were moved to Trash rather than permanently deleted, consistent with incomplete anti-forensic action. This artifact establishes the physical existence of the stolen documents on Tracy's MacBook Air, corroborating the keylogger captures and the Carry tablet email thread as a third independent source.",
+            "metadata": {
+                "acquisition_tool": "icat (Sleuth Kit)",
+                "inodes": {
+                    "documents.zip": 430246,
+                    "stamp_insurance_1_2.pdf": 430140,
+                    "stamp_insurance_1.pdf.zip": 430127
+                },
+                "zip_password": "Hercules (captured by LogKext keylogger in logfile-2012-07-09-1000.eml)",
+                "zip_contents_verified": "Stamp Insurance 2.pdf (180KB, National Gallery internal document)",
+                "anti_forensic_note": "Files moved to Trash, not permanently deleted — incomplete evidence destruction"
+            }
+        }
+    ],
+    "fractures": [
+        "COVERT_SURVEILLANCE_INFRASTRUCTURE",
+        "DELIBERATE_INSTALLATION_CONFIRMED",
+        "ANTI_FORENSIC_ACCOUNT_DELETION",
+        "INDISCRIMINATE_CAPTURE",
+        "UNAUTHORIZED_SPOUSAL_SURVEILLANCE",
+        "MINOR_PRIVACY_VIOLATION",
+        "THREE_SOURCE_CORROBORATION"
+    ],
+    "upgrade_from": "VIGIA-NGDC-003",
+    "upgrade_reason": "Physical disk evidence (tracy-home E01) confirms deliberate LogKext installation via LaunchDaemon authoring and provides bash_history establishing technical sophistication inconsistent with naive parental monitoring. Account deletion post-installation is the anti-forensic concealment layer absent from NGDC-003. Three independent evidence sources now converge: EML exfiltration output + tablet EmailProviderBody.db + physical disk installation artifacts."
+}
