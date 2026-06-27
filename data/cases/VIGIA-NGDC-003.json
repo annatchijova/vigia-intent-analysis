@@ -1,0 +1,155 @@
+{
+    "case_id": "VIGIA-NGDC-003",
+    "case_name": "National Gallery DC 2012 — Joe (Covert Surveillance / Disputed Intent)",
+    "schema_version": "1.1",
+    "description": "Joe installed LogKext Daemon on the family MacBook Air prior to his divorce from Tracy. His declared purpose was monitoring Terry, his 15-year-old daughter, whose online behavior he was concerned about. The implementation captures all keystrokes indiscriminately from all users on the device — Tracy included — and exfiltrates them hourly via cron+postfix running as root to joe.sum.twelve@gmail.com. Joe had a former account on the device that was deleted during the separation; the home folder may have been preserved. The keylogger captured Tracy's conspiracy with Carry, which Joe then reported to law enforcement, resulting in the seizure of devices and the termination of the defacement plot. The technical signature is unambiguously that of covert surveillance malware. The intent is genuinely disputed: parental monitoring of a minor (legally defensible in most jurisdictions) vs. spousal surveillance without consent (illegal in most jurisdictions) — implemented identically, indistinguishable from the artifact record alone.",
+    "abstention_risk": "medium",
+    "expected_verdict": "SUSPICION",
+    "carnegie_pattern_expected": null,
+    "confidence_expected": 67,
+    "source_dataset": "Digital Corpora — 2012 National Gallery DC Scenario. Source: email.zip — 12 LogKext EML files (2012-06-28 to 2012-07-12), delivered to joe.sum.twelve@gmail.com from root@Tracys-MacBook-Air.local via Postfix.",
+    "devil_advocate": "Joe is a father exercising parental oversight of his minor daughter Terry during a contentious divorce. In most US jurisdictions, parents have legal authority to install monitoring software on devices used by their minor children. The MacBook Air was a family device on which Joe previously held an account. The capture of Tracy's keystrokes was an unavoidable technical side effect of a single-user monitoring tool on a shared device, not the primary purpose. Joe used the captured information not for personal advantage or harassment but to report a genuine criminal conspiracy to law enforcement — a prosocial outcome. The divorce context provides motivation for concern about Terry's wellbeing, not for surveilling Tracy. No evidence exists that Joe used any captured information about Tracy for personal gain, blackmail, or harassment beyond the criminal report.",
+    "expected_mitre_ttps": [
+        "T1056.001",
+        "T1020",
+        "T1053.003",
+        "T1078"
+    ],
+    "peirce_expected": {
+        "firstness": "LogKext Daemon installed as root on Tracys-MacBook-Air.local, running hourly cron job via Postfix, exfiltrating keystroke logs to external Gmail account. Captures all users on the device without discrimination. Technical signature is identical to commercial spyware.",
+        "secondness": "The keylogger captures Terry (age 15) on July 6 — consistent with declared parental monitoring purpose. It also captures Tracy across 12 log sessions spanning June 28 to July 12, including passwords, email recipients, and private correspondence. Joe has documented motivation for both declared purpose (parental concern) and undeclared purpose (spousal surveillance during bitter divorce).",
+        "thirdness": "The artifact record cannot distinguish between two internally consistent hypotheses: (A) legitimate parental monitoring with incidental spousal capture, or (B) spousal surveillance with parental monitoring as pretext. Both hypotheses explain all observed artifacts without internal contradiction. The prosocial outcome (crime reported) is consistent with both. SUSPICION is the only epistemologically honest verdict — the system correctly detects covert surveillance infrastructure but cannot seal the intent determination without evidence unavailable in this artifact set."
+    },
+    "artifacts": [
+        {
+            "artifact_id": "ngdc003_01",
+            "evidence_type": "malware_infrastructure",
+            "source_tool": "EML header analysis — logfile-2012-06-28-1600.eml",
+            "timestamp": "2012-06-28T16:00:00Z",
+            "raw_score": 0.88,
+            "prior_trust": 0.85,
+            "provenance_chain": [
+                "email.zip (Digital Corpora)",
+                "logfile-2012-06-28-1600.eml",
+                "Return-Path: root@tracys-macbook-air.local",
+                "Received: from Tracys-MacBook-Air.local"
+            ],
+            "description": "LogKext Daemon running as root on Tracys-MacBook-Air.local. Hourly cron job sends keystroke logs via Postfix SMTP to joe.sum.twelve@gmail.com. Headers confirm: Return-Path root@tracys-macbook-air.local, Postfix message ID format (085D364123@Tracys-MacBook-Air.local), delivery via Google SMTP with IPv6 address 2600:1003:b016:ceaf:dca8:ff95:5012:998a. LogKext is a commercial MacOS kernel extension keylogger. Installation requires administrator privileges. Running as root with external exfiltration is the technical profile of surveillance malware regardless of declared purpose.",
+            "metadata": {
+                "acquisition_tool": "EML header parsing",
+                "keylogger": "LogKext Daemon",
+                "exfiltration_target": "joe.sum.twelve@gmail.com",
+                "exfiltration_method": "cron + Postfix SMTP",
+                "process_privilege": "root",
+                "device": "Tracys-MacBook-Air.local",
+                "log_count": 12,
+                "date_range": "2012-06-28 to 2012-07-12"
+            }
+        },
+        {
+            "artifact_id": "ngdc003_02",
+            "evidence_type": "keylogger_capture",
+            "source_tool": "LogKext Daemon — logfile-2012-07-06-1100.eml",
+            "timestamp": "2012-07-06T10:51:23Z",
+            "raw_score": 0.71,
+            "prior_trust": 0.78,
+            "provenance_chain": [
+                "email.zip (Digital Corpora)",
+                "logfile-2012-07-06-1100.eml",
+                "LogKext Daemon — User terrysumtwelve logged in 10:51:23"
+            ],
+            "description": "Terry (age 15, username terrysumtwelve) logs in on July 6 at 10:51am. Keylogger captures: password 'privateschool', email account 'just.terry.22', search queries 'how to help your parents afford private school' and 'best concerts'. This is the only session where Terry is the active user in the recovered logs. The capture is consistent with the declared parental monitoring purpose — Terry is using the device and the keylogger is functioning as described. However, this also confirms that Terry's private communications, passwords, and searches are being exfiltrated to an external server without her explicit consent. Terry is a minor; parental monitoring rights apply but are not unlimited.",
+            "metadata": {
+                "acquisition_tool": "LogKext Daemon",
+                "monitored_user": "terrysumtwelve (Terry, age 15)",
+                "terry_password_captured": "privateschool",
+                "terry_email": "just.terry.22",
+                "searches_captured": [
+                    "how to help your parents afford private school",
+                    "best concerts"
+                ],
+                "consistent_with_declared_purpose": true
+            }
+        },
+        {
+            "artifact_id": "ngdc003_03",
+            "evidence_type": "keylogger_capture",
+            "source_tool": "LogKext Daemon — aggregate across 12 EML files",
+            "timestamp": "2012-06-28T15:42:13Z",
+            "raw_score": 0.82,
+            "prior_trust": 0.80,
+            "provenance_chain": [
+                "email.zip (Digital Corpora)",
+                "logfile-2012-06-28-1600.eml through logfile-2012-07-12-1200.eml",
+                "LogKext Daemon — User tracysumtwelve — 11 of 12 sessions"
+            ],
+            "description": "Tracy (tracysumtwelve) is the active user in 11 of 12 recovered log sessions. Captured data includes: password 'legalBee' (repeated across sessions), email recipients including coralbluetwo@hotmail.com and coralblue2@yahoo.com (Carry's accounts), private correspondence content, search queries ('national gallery exhibit', 'value of international'), and her conspiracy communications with Carry. The volume of Tracy-specific capture relative to Terry-specific capture (11:1 session ratio) is structurally inconsistent with a tool calibrated primarily for child monitoring. However, this ratio may reflect usage patterns rather than targeting — if Tracy used the device more than Terry, the logs will reflect that.",
+            "metadata": {
+                "acquisition_tool": "LogKext Daemon aggregate",
+                "tracy_sessions": 11,
+                "terry_sessions": 1,
+                "tracy_passwords_captured": ["legalBee"],
+                "carry_emails_captured": [
+                    "coralbluetwo@hotmail.com",
+                    "coralblue2@yahoo.com"
+                ],
+                "session_ratio_note": "11:1 may reflect usage patterns, not deliberate targeting"
+            }
+        },
+        {
+            "artifact_id": "ngdc003_04",
+            "evidence_type": "behavioral_context",
+            "source_tool": "Digital Corpora scenario documentation",
+            "timestamp": "2012-07-16T00:00:00Z",
+            "raw_score": 0.65,
+            "prior_trust": 0.70,
+            "provenance_chain": [
+                "Digital Corpora scenario documentation — persona descriptions"
+            ],
+            "description": "Joe is described as financially well-off, bitter about the divorce, and holding a former account on the family MacBook Air that was deleted. The home folder may have been preserved. He is the father of Terry and ex-husband of Tracy. The custody battle over Terry is active at the time of the keylogger operation. Two competing motivations are documented: (1) parental concern for Terry's online behavior (stated), (2) bitterness toward Tracy and motivation to surveil her during divorce proceedings (inferred from context). Neither motivation can be ruled out from the artifact record. The deleted account raises a separate question about what data may remain in the preserved home folder.",
+            "metadata": {
+                "acquisition_tool": "scenario documentation",
+                "joe_financial_status": "well-off",
+                "divorce_status": "active",
+                "custody_dispute": "active",
+                "former_account": "deleted — home folder potentially preserved",
+                "competing_motivations": [
+                    "parental monitoring of Terry (declared)",
+                    "spousal surveillance during divorce (inferred)"
+                ]
+            }
+        },
+        {
+            "artifact_id": "ngdc003_05",
+            "evidence_type": "outcome_signal",
+            "source_tool": "Digital Corpora scenario documentation + EML aggregate",
+            "timestamp": "2012-07-15T00:00:00Z",
+            "raw_score": 0.55,
+            "prior_trust": 0.72,
+            "provenance_chain": [
+                "Digital Corpora scenario documentation",
+                "email.zip — logfile-2012-07-12-1200.eml (last log)"
+            ],
+            "description": "Joe reported Tracy's conspiracy to law enforcement based on information captured by the keylogger, directly causing the seizure of Tracy's phone (2012-07-15), Carry's phone and tablet (2012-07-15 and 2012-07-16), and Tracy's home computer. The defacement plot was terminated. This prosocial outcome is consistent with both the parental monitoring hypothesis (Joe incidentally discovered a crime) and the spousal surveillance hypothesis (Joe was monitoring Tracy and found actionable information). The outcome does not resolve the intent question but is noted as a mitigating factor in the weight of the SUSPICION verdict.",
+            "metadata": {
+                "acquisition_tool": "scenario documentation",
+                "outcome": "criminal conspiracy reported to law enforcement",
+                "devices_seized_as_result": [
+                    "Tracy phone (2012-07-15)",
+                    "Carry phone (2012-07-15)",
+                    "Carry tablet (2012-07-16)",
+                    "Tracy home computer"
+                ],
+                "plot_terminated": true,
+                "mitigating_factor": true
+            }
+        }
+    ],
+    "fractures": [
+        "COVERT_SURVEILLANCE_INFRASTRUCTURE",
+        "INDISCRIMINATE_CAPTURE",
+        "UNAUTHORIZED_EXFILTRATION",
+        "MINOR_PRIVACY_VIOLATION",
+        "DISPUTED_INTENT"
+    ]
+}
