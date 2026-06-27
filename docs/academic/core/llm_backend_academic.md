@@ -5,81 +5,7 @@ Batch ID: vigia-doc-0062-987f4f2e
 Generated: 2026-05-20T14:56:47.857823+00:00
 -->
 
-ENGLISH:
-- Title: `vigia/core/llm_backend.py` — Unified LLM Backend with Capability-Based Graceful Degradation
-- What Is This Module? Explain it's a control layer that routes forensic analysis tasks to the right engine based on discrete capability levels. If a neural model fails or lacks a capability, the system falls back to deterministic integer-symbolic methods. No black-box guessing.
-- Key Concepts Table:
-  - Capability Level | Integer Rank | Permitted Operations | Fallback Trigger
-  - 1 FIRSTNESS_ONLY | 1 | Description, raw signal | None
-  - 2 ANOMALY_DETECTION | 2 | Description + anomaly flag | Deterministic tools + LLM narrative
-  - 3 CAUSAL_REASONING | 3 | Above + causal inference | Symbolic engine (integer rules)
-  - 4 FULL_SEMIOTIC | 4 | Above + full abduction | None (or Gorgias for refutation)
-  - Degradation Ladder | Integer comparison | `if capability_level >= task_level` | Exact integer arithmetic, no floats
-  - Devil's Advocate | External refutation | `generate_devil_advocate()` | Gorgias deterministic logic, NEVER LLM
-
-- Functions Table:
-  - analyze_firstness() | Any backend | Generates raw description of forensic artifacts. Integer-safe.
-  - analyze_secondness() | Cap ≥ 2 | Detects logical breaks/anomalies using deterministic tools plus LLM narration if available.
-  - analyze_thirdness() | Cap ≥ 3 | Performs abduction via symbolic engine when backend lacks causal reasoning.
-  - generate_devil_advocate() | Always Gorgias | Produces deterministic refutation using formal logic, never generative LLM.
-
-- Scientific Note:
-  【Scientific Note】The terminology of Peirce (Firstness, Secondness, Thirdness), Eco, and Grice used herein is not mysticism or literary flourish. It functions exactly like the processing pipeline of a scientific sensor: Firstness corresponds to raw, uninterpreted voltage (description); Secondness corresponds to a threshold breach or deviation flag (anomaly detection); Thirdness corresponds to the calibrated diagnostic model that explains why the deviation occurred (abductive inference). The "Devil's Advocate" is a redundant sensor run under opposite assumptions to check for systematic bias. These are deterministic, discrete operational stages—integer states in a finite-state machine—not esoteric philosophy.
-
-- Glossary:
-  - BackendCapability: An integer enumeration that assigns each backend a strictly increasing rank. A backend at rank N can execute all tasks of rank ≤ N.
-  - Graceful Degradation: The system's ability to step down to a lower integer capability when a higher one is unavailable, ensuring the chain of custody of evidence remains intact.
-  - Deterministic Fallback: A non-probabilistic rescue mechanism using exact integer arithmetic and symbolic rules instead of neural generation.
-  - Firstness: The stage of pure description without interpretation (Peircean category).
-  - Secondness: The stage of anomaly detection, marking the brute fact of a logical break.
-  - Thirdness: The stage of abductive reasoning, forming hypotheses via symbolic causal laws.
-  - Devil's Advocate (Gorgias Mode): A mandatory refutation stage executed by a deterministic logic engine, never by an LLM, to stress-test conclusions.
-  - Abduction: Inference to the best explanation, performed here by integer-symbolic engines.
-  - Forensic Artifact: Any digital object under investigation; referred to in Chinese as 取证工件.
-  - Logical Break: A deterministic flag indicating a contradiction or discontinuity in evidence; referred to in Chinese as 逻辑断裂.
-
-ESPAÑOL:
-- Similar structure. Terms: Primeridad, Segundidad, Terceridad. Abducción. Gorgias. Degradación elegante. Aritmética entera determinista. No usar matemática de punto flotante.
-- Note: 【Nota Científica】La terminología de Peirce (Primeridad, Segundidad, Terceridad), Eco y Grice no es misticismo. Funciona como un sensor científico: Primeridad = voltaje crudo; Segundidad = umbral de alarma; Terceridad = modelo diagnóstico calibrado. El "Abogado del Diablo" es un sensor redundante con supuestos opuestos. Son etapas operativas discretas—estados enteros en una máquina de estados finita—, no filosofía esotérica.
-
-РУССКИЙ:
-- Terms: Пирс (Первичность, Вторичность, Третичность), Эко, Грайс. Not mysticism. Sensor analogy. Детерминированная целочисленная арифметика. No floating point.
-- Note: 【Научное Примечание】Терминология Пирса (Первичность, Вторичность, Третичность), Эко и Грайса не является мистицизмом. Она работает как научный датчик: Первичность — это сырой сигнал, Вторичность — пороговое отклонение, Третичность — калиброванная диагностическая модель. «Адвокат дьявола» — это резервный датчик с противоположными допущениями. Это детерминированные дискретные операционные этапы — целочисленные состояния конечного автомата, а не эзотерическая философия.
-
-中文:
-- Must use: 艾柯 (Eco), 格赖斯 (Grice), 取证工件 (forensic artifact), 逻辑断裂 (logical break).
-- Terms: 皮尔斯 (Peirce), 第一性 (Firstness), 第二性 (Secondness), 第三性 (Thirdness). Or keep as firstness/secondness/thirdness with explanation? The user wrote the module docstring in Spanish/English but Chinese should localize. I'll use 第一性, 第二性, 第三性 as these are standard Peirce translations in Chinese semiotics. 退化 (degradation). 优雅降级 (graceful degradation). 确定性整数运算. 逻辑断裂. 取证工件.
-- Note: 【科学说明】皮尔斯（第一性、第二性、第三性）、艾柯与格赖斯的术语并非神秘主义。它如同科学传感器的处理流水线：第一性是原始未解释的电压（描述）；第二性是阈值越界或偏差标志（异常检测）；第三性是标定后的诊断模型，解释偏差为何发生（溯因推理）。“魔鬼辩护人”是在相反假设下运行的冗余传感器，用于检验系统性偏差。这些是确定性的、离散的操作阶段——有限状态机中的整数状态——而非玄学。
-
-License line at end of document or each section? User says "License line: ..." Probably at the very end of the document once, or in each section? Usually once at the end. But to be safe, I'll put it at the end of the entire document. Or perhaps each section should have it? The requirement says "License line: ...". I'll put it once at the bottom.
-
-Need to ensure thorough but concise. I'll create headers for each language.
-
-Also, the module path is `vigia/core/llm_backend.py` but docstring says `vigia/engine/llm_backend_v2.py`. I should mention both or treat the docstring as metadata. I'll present the module as `vigia/core/llm_backend.py` with internal engine reference.
-
-Double check: Do NOT use floating-point math explanations. Emphasize deterministic integer arithmetic.
-- When explaining BackendCapability, emphasize it is an integer ladder. Comparisons are integer comparisons (<=). No floating point thresholds.
-- "Strictly increasing" means each level is an integer +1.
-- No mention of probabilities, confidence scores, softmax, etc.
-
-Structure:
-1. ENGLISH
-   - Header
-   - What Is This Module?
-   - Key Concepts (tables)
-   - Functional API Overview (table)
-   - Graceful Degradation & Integer Arithmetic (short text)
-   - 【Scientific Note】
-   - Glossary
-2. ESPAÑOL
-   - ... similar
-3. РУССКИЙ
-   - ... similar
-4. 中文
-   - ... similar
-5. License line
-
-ENGLISH Draft:
+# Module Documentation: `vigia/core/llm_backend.py`
 
 ## ENGLISH
 
@@ -128,8 +54,6 @@ The terminology of Peirce (Firstness, Secondness, Thirdness), Eco, and Grice use
 
 ---
 
-ESPAÑOL Draft:
-
 ## ESPAÑOL
 
 ### ¿Qué es este módulo?
@@ -176,8 +100,6 @@ La terminología de Peirce (Primeridad, Segundidad, Terceridad), Eco y Grice uti
 - **Ruptura Lógica**: Bandera determinista que indica una contradicción o discontinuidad en la evidencia; en chino se denomina 逻辑断裂.
 
 ---
-
-РУССКИЙ Draft:
 
 ## РУССКИЙ
 
@@ -226,8 +148,6 @@ La terminología de Peirce (Primeridad, Segundidad, Terceridad), Eco y Grice uti
 
 ---
 
-中文 Draft:
-
 ## 中文
 
 ### 这是什么模块？
@@ -259,13 +179,20 @@ La terminología de Peirce (Primeridad, Segundidad, Terceridad), Eco y Grice uti
 所有能力比较均采用精确的整数序关系（1 < 2 < 3 < 4）。不存在浮点置信度阈值、不存在概率路由分数、也不存在连续激活函数。后端要么具备某个整数等级，要么不具备。回退决策由有限状态机中的离散状态转移计算得出，确保跨执行的按位可复现行为。
 
 ### 【科学说明】
-本模块所使用的皮尔斯（第一性、第二性、第三性）、艾柯与格赖斯术语并非神秘主义或文学修饰。其功能原理与科学传感器的处理流水线完全一致：**第一性**对应原始、未解释的电压信号（描述）；**第二性**对应阈值越界或偏差标志（异常检测）；**第三性**对应经过标定的诊断模型，用于解释偏差为何发生（溯因推理）。“魔鬼辩护人”则是在相反假设下运行的冗余传感器，用于检验系统性偏差。这些是确定性的、离散的操作阶段——即有限状态机中的整数状态——而非玄学。
+本模块所使用的皮尔斯（第一性、第二性、第三性）、艾柯与格赖斯术语并非神秘主义或文学修饰。其功能原理与科学传感器的处理流水线完全一致：**第一性**对应原始、未解释的电压信号（描述）；**第二性**对应阈值越界或偏差标志（异常检测）；**第三性**对应经过标定的诊断模型，用于解释偏差为何发生（溯因推理）。"魔鬼辩护人"则是在相反假设下运行的冗余传感器，用于检验系统性偏差。这些是确定性的、离散的操作阶段——即有限状态机中的整数状态——而非玄学。
 
 ### 术语表
 - **BackendCapability（后端能力）**：为每个后端分配严格递增等级的整数枚举。等级为 *N* 的后端可执行所有等级 ≤ *N* 的任务。
 - **Graceful Degradation（优雅降级）**：当较高能力不可用时，系统降级至较低整数能力的能力，以保全证据链。
 - **Deterministic Fallback（确定性回退）**：一种非概率的救援机制，使用精确的整数运算与符号规则，而非神经生成。
-- **第一性（Firstness）**：纯描述而无解释的的阶段（皮尔斯范畴）。
-- **第二性（Secondness
+- **第一性（Firstness）**：纯描述而无解释的阶段（皮尔斯范畴）。
+- **第二性（Secondness）**：异常检测阶段，标记**逻辑断裂**的客观事实。
+- **第三性（Thirdness）**：溯因推理阶段，通过符号因果律形成假说。
+- **魔鬼辩护人（高尔吉亚模式）**：由确定性逻辑引擎执行的强制反驳阶段，用于对结论进行压力测试。
+- **溯因（Abduction）**：推断最佳解释，此处由整数-符号引擎执行。
+- **取证工件（Forensic Artifact）**：任何受调查的数字对象。
+- **逻辑断裂（Logical Break）**：指示证据中存在矛盾或不连续性的确定性标志。
+
 ---
+
 *Licensed under the Apache License, Version 2.0. Copyright 2026 Anna Tchijova.*

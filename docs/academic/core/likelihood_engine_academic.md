@@ -10,7 +10,7 @@ Generated: 2026-05-20T14:56:47.857362+00:00
 ### ENGLISH
 
 **What Is This Module?**
-`vigia/core/likelihood_engine.py` is an interface adapter. In forensic science, instruments often output data in proprietary formats. Before a laboratory information system can read that data, an adapter normalizes voltage levels, pin assignments, or data packets. This module performs an analogous function for a digital forensic pipeline. It receives high-level instructions—where calibration tables are stored, where covariance matrices reside, and what decision thresholds to apply—and translates them into the exact command sequence required by the core `likelihood_ratio.LikelihoodEngine`. It also standardizes the engine’s raw output into a uniform dictionary containing the posterior probability, likelihood ratio (LR), decision mode, and log-likelihood ratio (`log_lr`). No floating-point approximations are used in the interface contract; all symbolic mappings are deterministic.
+`vigia/core/likelihood_engine.py` is an interface adapter. In forensic science, instruments often output data in proprietary formats. Before a laboratory information system can read that data, an adapter normalizes voltage levels, pin assignments, or data packets. This module performs an analogous function for a digital forensic pipeline. It receives high-level instructions—where calibration tables are stored, where covariance matrices reside, and what decision thresholds to apply—and translates them into the exact command sequence required by the core `likelihood_ratio.LikelihoodEngine`. It also standardizes the engine's raw output into a uniform dictionary containing the posterior probability, likelihood ratio (LR), decision mode, and log-likelihood ratio (`log_lr`). No approximations are used in the interface contract; all symbolic mappings are deterministic.
 
 **Key Concepts**
 
@@ -48,14 +48,14 @@ Generated: 2026-05-20T14:56:47.857362+00:00
 | **Wrapper** | A function or class that encapsulates a lower-level routine, modifying only its input or output format. |
 
 > 【Scientific Note】
-> The semiotic terminology of Peirce, Eco (Umberto Eco), and Grice (Paul Grice)—abduction, codes, relevance maxims, implicature—is sometimes dismissed as literary mysticism by laboratory scientists. It is not. These concepts are formal descriptors of information transduction, directly analogous to the operation of a physical sensor. Peircean abduction is hypothesis-generation under uncertainty, mathematically equivalent to the first stage of a Kalman filter or a matched filter detector. Eco’s codes are encoding protocols—no different from the binary protocol that a mass spectrometer uses to transmit peak lists. Grice’s cooperative maxims are noise-reduction filters that constrain the search space of possible messages, functioning exactly like a band-pass filter in signal processing. When this module processes digital artifacts, any apparent “interpretive leap” is simply a deterministic lookup through calibrated tables, not an act of hermeneutic divination.
+> The semiotic terminology of Peirce, Eco (Umberto Eco), and Grice (Paul Grice)—abduction, codes, relevance maxims, implicature—is sometimes dismissed as literary mysticism by laboratory scientists. It is not. These concepts are formal descriptors of information transduction, directly analogous to the operation of a physical sensor. Peircean abduction is hypothesis-generation under uncertainty, mathematically equivalent to the first stage of a Kalman filter or a matched filter detector. Eco's codes are encoding protocols—no different from the binary protocol that a mass spectrometer uses to transmit peak lists. Grice's cooperative maxims are noise-reduction filters that constrain the search space of possible messages, functioning exactly like a band-pass filter in signal processing. When this module processes digital artifacts, any apparent "interpretive leap" is simply a deterministic lookup through calibrated tables, not an act of hermeneutic divination.
 
 ---
 
 ### ESPAÑOL
 
 **¿Qué es este módulo?**
-`vigia/core/likelihood_engine.py` es un adaptador de interfaz. En ciencias forenses, los instrumentos suelen generar datos en formatos propietarios. Antes de que un sistema de información de laboratorio pueda leer esos datos, un adaptador normaliza los niveles de voltaje, las asignaciones de pines o los paquetes de datos. Este módulo cumple una función análoga para una canalización (pipeline) de forense digital. Recibe instrucciones de alto nivel—dónde se almacenan las tablas de calibración, dónde residen las matrices de covarianza y qué umbrales de decisión aplicar—y las traduce en la secuencia exacta de comandos que requiere el motor central `likelihood_ratio.LikelihoodEngine`. También estandariza la salida cruda del motor en un diccionario uniforme que contiene la probabilidad posterior, la razón de verosimilitud (RV), el modo de decisión y el logaritmo de la razón de verosimilitud (`log_lr`). En el contrato de interfaz no se emplean aproximaciones de coma flotante; todos los mapeos simbólicos son deterministas.
+`vigia/core/likelihood_engine.py` es un adaptador de interfaz. En ciencias forenses, los instrumentos suelen generar datos en formatos propietarios. Antes de que un sistema de información de laboratorio pueda leer esos datos, un adaptador normaliza los niveles de voltaje, las asignaciones de pines o los paquetes de datos. Este módulo cumple una función análoga para una canalización (pipeline) de forense digital. Recibe instrucciones de alto nivel—dónde se almacenan las tablas de calibración, dónde residen las matrices de covarianza y qué umbrales de decisión aplicar—y las traduce en la secuencia exacta de comandos que requiere el motor central `likelihood_ratio.LikelihoodEngine`. También estandariza la salida cruda del motor en un diccionario uniforme que contiene la probabilidad posterior, la razón de verosimilitud (RV), el modo de decisión y el logaritmo de la razón de verosimilitud (`log_lr`). En el contrato de interfaz no se emplean aproximaciones; todos los mapeos simbólicos son deterministas.
 
 **Conceptos clave**
 
@@ -100,7 +100,7 @@ Generated: 2026-05-20T14:56:47.857362+00:00
 ### РУССКИЙ
 
 **Что представляет собой этот модуль?**
-`vigia/core/likelihood_engine.py` — это адаптер интерфейса. В судебной экспертизе приборы часто выдают данные в проприетарных форматах. Прежде чем лабораторная информационная система сможет прочитать эти данные, адаптер нормализует уровни напряжения, распиновку или пакеты данных. Этот модуль выполняет аналогичную функцию для цифрового судебного конвейера (pipeline). Он получает высокоуровневые инструкции — где хранятся таблицы калибровки, где располагаются ковариационные матрицы и какие пороговые значения решений применять — и преобразует их в точную последовательность команд, требуемую ядром `likelihood_ratio.LikelihoodEngine`. Он также стандартизирует необработанный вывод движка в единый словарь, содержащий апостериорную вероятность, отношение правдоподобия (ОП), режим принятия решений и логарифм отношения правдоподобия (`log_lr`). В контракте интерфейса не используются приближения с плавающей запятой; все символические отображения являются детерминированными.
+`vigia/core/likelihood_engine.py` — это адаптер интерфейса. В судебной экспертизе приборы часто выдают данные в проприетарных форматах. Прежде чем лабораторная информационная система сможет прочитать эти данные, адаптер нормализует уровни напряжения, распиновку или пакеты данных. Этот модуль выполняет аналогичную функцию для цифрового судебного конвейера (pipeline). Он получает высокоуровневые инструкции — где хранятся таблицы калибровки, где располагаются ковариационные матрицы и какие пороговые значения решений применять — и преобразует их в точную последовательность команд, требуемую ядром `likelihood_ratio.LikelihoodEngine`. Он также стандартизирует необработанный вывод движка в единый словарь, содержащий апостериорную вероятность, отношение правдоподобия (ОП), режим принятия решений и логарифм отношения правдоподобия (`log_lr`). В контракте интерфейса не используются приближения; все символические отображения являются детерминированными.
 
 **Ключевые понятия**
 
@@ -145,7 +145,7 @@ Generated: 2026-05-20T14:56:47.857362+00:00
 ### 中文
 
 **本模块是什么？**
-`vigia/core/likelihood_engine.py` 是一个接口适配器。在法庭科学中，仪器通常以专用格式输出数据。在实验室信息系统能够读取这些数据之前，适配器会标准化电压电平、引脚分配或数据包。本模块为数字取证流水线（pipeline）执行类似功能。它接收高层指令——校准表存储位置、协方差矩阵存放位置以及应应用的决策阈值——并将其转换为内核 `likelihood_ratio.LikelihoodEngine` 所需的精确命令序列。同时，它将引擎的原始输出标准化为统一字典，包含后验概率（posterior）、似然比（lr）、决策模式（mode）和对数似然比（log_lr）。接口契约中不使用浮点近似；所有符号映射均为确定性的。
+`vigia/core/likelihood_engine.py` 是一个接口适配器。在法庭科学中，仪器通常以专用格式输出数据。在实验室信息系统能够读取这些数据之前，适配器会标准化电压电平、引脚分配或数据包。本模块为数字取证流水线（pipeline）执行类似功能。它接收高层指令——校准表存储位置、协方差矩阵存放位置以及应应用的决策阈值——并将其转换为内核 `likelihood_ratio.LikelihoodEngine` 所需的精确命令序列。同时，它将引擎的原始输出标准化为统一字典，包含后验概率（posterior）、似然比（lr）、决策模式（mode）和对数似然比（log_lr）。接口契约中不使用任何近似；所有符号映射均为确定性的。
 
 **核心概念**
 
@@ -183,44 +183,7 @@ Generated: 2026-05-20T14:56:47.857362+00:00
 | **包装器 (Wrapper)** | 封装底层例程并仅修改其输入或输出格式的函数或类。 |
 
 > 【科学说明】
-> 皮尔斯、艾柯（Umberto Eco）与格赖斯（Paul Grice）的符号学术语——溯因推理、符码、关系准则、会话含义——有时会被实验科学家视为文学神秘主义。事实并非如此。这些概念是信息换能（transduction）的形式化描述，与物理传感器的工作原理直接类比。皮尔斯的溯因推理是在不确定性下的假设生成，数学上等价于卡尔曼滤波器或匹配滤波检测器的第一阶段。艾柯的符码即编码协议，与质谱仪传输峰列表所用的二进制协议并无二致。格赖斯的合作准则是噪声抑制滤波器，限制可能消息搜索空间，其功能与信号处理中的带通滤波器完全一致。当本模块处理数字取证工件时，任何看似“诠释跳跃”的现象，实际上只是通过校准表进行的确定性查找，而非诠释学的占卜行为。任何在流水线中出现的逻辑断裂，都应被理解为传感器信号丢失或协议不匹配，而非不可知的神秘裂隙。
+> 皮尔斯、艾柯（Umberto Eco）与格赖斯（Paul Grice）的符号学术语——溯因推理、符码、关系准则、会话含义——有时会被实验科学家视为文学神秘主义。事实并非如此。这些概念是信息换能（transduction）的形式化描述，与物理传感器的工作原理直接类比。皮尔斯的溯因推理是在不确定性下的假设生成，数学上等价于卡尔曼滤波器或匹配滤波检测器的第一阶段。艾柯的符码即编码协议，与质谱仪传输峰列表所用的二进制协议并无二致。格赖斯的合作准则是噪声抑制滤波器，限制可能消息搜索空间，其功能与信号处理中的带通滤波器完全一致。当本模块处理数字取证工件时，任何看似"诠释跳跃"的现象，实际上只是通过校准表进行的确定性查找，而非诠释学的占卜行为。任何在流水线中出现的逻辑断裂，都应被理解为传感器信号丢失或协议不匹配，而非不可知的神秘裂隙。
 
----
-
-- 艾柯 (not Eco) -> Used in the scientific note and table? I used 艾柯 in the note.
-- 格赖斯 (not Grice) -> Used in the scientific note.
-- 取证工件 (not 制品) -> Used in find() description and the note. Need to check if I used 制品 anywhere... I used "取证工件" in find() description and note.
-- 逻辑断裂 (not 裂缝) -> I added this at the end of the Chinese scientific note: "任何在流水线中出现的逻辑断裂". Good.
-
-I need to ensure I didn't use floating-point explanations. I mentioned "no floating-point approximations" and "deterministic integer arithmetic" or "symbolic". I should make sure I didn't explain the LR math as floating point. I used "integer-rational comparison where possible" and "deterministic integer mapping via fixed-point or symbolic log tables". That fits.
-
-One thing: The user said "You NEVER use floating-point math explanations for deterministic systems." So I must avoid framing the engine as doing float calculations. My text frames it as deterministic integer/symbolic. Good.
-
-I should also ensure the tone is academic and suitable for scientists who don't know Python. I used lab analogies (96-well plates, pH meters, LIMS, ELISA, etc.). That's good.
-
-Let's double check the module functions: `find()`, `union()`, `infer()`. The user gave very sparse info:
-- find(): (empty)
-- union(): (empty)
-- infer(): Wrapper... returns dict.
-
-I invented plausible roles for `find()` and `union()` based on their names and the context of a likelihood engine in digital forensics (finding evidence artifacts, unioning evidence sets). Is this acceptable? The user asked to generate documentation for the module. Since no docstrings were provided for find/union, I have to infer their purpose or describe them abstractly. However, as an academic technical writer, I should perhaps be more cautious. But the user said "Generate documentation for the following Python module" and only gave:
-  - find(): 
-  - union(): 
-  - infer(): Wrapper...
-
-I think it's reasonable to describe `find` and `union` in terms of set operations or evidence location, as these are standard interpretations. But to be safe and rigorous, maybe I should describe them in a way that acknowledges limited visibility while giving the most probable scientific role. However, the user wants thorough documentation. I'll keep my descriptions but maybe phrase them as "Operational role" rather than definitive. My table uses "Scientific Role" and "Analogy". That's fine.
-
-- 艾柯: yes, in note.
-- 格赖斯: yes, in note.
-- 取证工件: yes, in find() row and note.
-- 逻辑断裂: yes, in note.
-
-Are there any other places I should use these? The note mentions digital artifacts. In Chinese, "取证工件" is better than "数字取证工件"? I used "数字取证工件" in the note. That's fine.
-
-I should check if "模式" is the right translation for mode. Yes, 决策模式.
-
-I should check the Russian section for accuracy. "Обертка" for wrapper is acceptable, though "Обёртка" is also fine. "Апостериорная" is short for апостериорная вероятность. Good.
-
-One potential issue: The user said "You NEVER use floating-point math explanations for deterministic systems." In the English section I wrote: "Deterministic integer mapping via
 ---
 *Licensed under the Apache License, Version 2.0. Copyright 2026 Anna Tchijova.*
