@@ -1,0 +1,171 @@
+{
+  "analysis_timestamp": "2026-06-27T18:27:13.744100+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "VIGIA-REAL-NARCOS-STEVE-Day1",
+    "end_time": "2026-06-27T18:27:13.744104+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "VIGIA-REAL-NARCOS-STEVE-Day1",
+        "entry_sha256": "49cb38c2fc506477256ff26d0d0d61c726b65b39877a970886ae556615579d6f",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "VIGIA-REAL-NARCOS-STEVE-Day1"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: 95f2da2a3bdcb4ca...",
+        "outputs_summary": {
+          "agent_sha256": "95f2da2a3bdcb4ca106059e2b06f58fd0ec414c887fec07ac7a0d5edfeb097a1",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-06-27T18:27:00.910544+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-REAL-NARCOS-STEVE-Day1",
+        "entry_sha256": "c5a6d34dc3ecbb96cfd50db4115c315a5876bf55664582b27e2bd44c9e6390a0",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/Downloads/narcos/Steve Primary/Day 1/DESKTOP-FGEUJJC-20190129-043144.dmp"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-06-27T18:27:00.910645+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-REAL-NARCOS-STEVE-Day1",
+        "entry_sha256": "a3bc9985717a94ce9aa336a4357420bcfcece98d777de943a20bfcbb13896ab1",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/Downloads/narcos/Steve Primary/Day 1/DESKTOP-FGEUJJC-20190129-043144.dmp"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: dd5c4abca7871eab...",
+        "outputs_summary": {
+          "sha256": "dd5c4abca7871eaba9972f7d84e201ee8b0c1488609198a9156d11ea364013a9"
+        },
+        "seq": 3,
+        "timestamp": "2026-06-27T18:27:05.762321+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "VIGIA-REAL-NARCOS-STEVE-Day1",
+        "entry_sha256": "d794e76ccf3be8634b274a9e998decfed85add9886f3251873b53e76e3e5cc57",
+        "inputs_summary": {
+          "evidence": "/home/labestiadevigia/Downloads/narcos/Steve Primary/Day 1/DESKTOP-FGEUJJC-20190129-043144.dmp",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-06-27T18:27:05.762544+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "VIGIA-REAL-NARCOS-STEVE-Day1",
+        "entry_sha256": "16d9fd0149715bfbbbd2c1454527ee7129d32724a67f56d0a615b8efdb22815b",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 0 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "FORMAT_NOT_SUPPORTED",
+            "best_posterior": "0/1",
+            "confidence": "0/1",
+            "is_conclusive": "False",
+            "narrative": "Image DESKTOP-FGEUJJC-20190129-043144.dmp rejected by Volatility3: not a valid Windows RAM dump. Likely a VMware disk snapshot or disk image requiring prior mounting. See BUGS_PENDIENTES #16."
+          },
+          "case_id": "VIGIA-REAL-NARCOS-STEVE-Day1",
+          "pipeline_meta": {
+            "error": "FORMAT_NOT_SUPPORTED",
+            "memory_path": "/home/labestiadevigia/Downloads/narcos/Steve Primary/Day 1/DESKTOP-FGEUJJC-20190129-043144.dmp",
+            "source": "vol3_memory_adapter",
+            "vol3_stderr": "\nProgress:    0.00\t\tScanning WindowsCrashDump64Layer using PageMapScanner\n\nProgress:    0.00\t\tScanning WindowsCrashDump64Layer using PageMapScanner\n\nProgress:   15.11\t\tScanning WindowsCrashDump64Layer..."
+          },
+          "signals": []
+        },
+        "seq": 5,
+        "timestamp": "2026-06-27T18:27:13.743823+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "VIGIA-REAL-NARCOS-STEVE-Day1",
+        "entry_sha256": "6d9b4a3a10ffb38e0d0fd5f9d8b8452696a78a1eda67d631bee15b4cc10e2988",
+        "inputs_summary": {
+          "n_signals": "0"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-06-27T18:27:13.743927+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "VIGIA-REAL-NARCOS-STEVE-Day1",
+        "entry_sha256": "3c83b4c62c18bcd13ac073488947883f8554b5c6d3bbb4dd18965543f7d6c121",
+        "inputs_summary": {
+          "verdict": "FORMAT_NOT_SUPPORTED"
+        },
+        "iteration": 0,
+        "note": "Exit code 0 \u2014 analysis complete.",
+        "outputs_summary": {
+          "exit_code": "0"
+        },
+        "seq": 7,
+        "timestamp": "2026-06-27T18:27:13.744044+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-06-27T18:27:00.910283+00:00",
+    "total_entries": 7
+  },
+  "case_id": "VIGIA-REAL-NARCOS-STEVE-Day1",
+  "evidence_path": "/home/labestiadevigia/Downloads/narcos/Steve Primary/Day 1/DESKTOP-FGEUJJC-20190129-043144.dmp",
+  "evidence_sha256": "dd5c4abca7871eaba9972f7d84e201ee8b0c1488609198a9156d11ea364013a9",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-REAL-NARCOS-STEVE-Day1 ===\nEvidence: /home/labestiadevigia/Downloads/narcos/Steve Primary/Day 1/DESKTOP-FGEUJJC-20190129-043144.dmp\nEvidence SHA-256: dd5c4abca7871eaba9972f7d84e201ee8b0c1488609198a9156d11ea364013a9\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: FORMAT_NOT_SUPPORTED\nPosterior confidence: 0/1\nConclusive: NO \u2014 requires human review\n\n--- PEIRCEAN NARRATIVE ---\nImage DESKTOP-FGEUJJC-20190129-043144.dmp rejected by Volatility3: not a valid Windows RAM dump. Likely a VMware disk snapshot or disk image requiring prior mounting. See BUGS_PENDIENTES #16.\n\n--- FINAL ALERT LEVEL ---\nLOW \u2014 No significant anomalies detected in this iteration.\n\nCritical signals (z>3): 0\nHigh signals (2<z<=3): 0\nTotal signals analyzed: 0",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "FORMAT_NOT_SUPPORTED",
+      "best_posterior": "0/1",
+      "confidence": "0/1",
+      "is_conclusive": false,
+      "narrative": "Image DESKTOP-FGEUJJC-20190129-043144.dmp rejected by Volatility3: not a valid Windows RAM dump. Likely a VMware disk snapshot or disk image requiring prior mounting. See BUGS_PENDIENTES #16."
+    },
+    "case_id": "VIGIA-REAL-NARCOS-STEVE-Day1",
+    "pipeline_meta": {
+      "error": "FORMAT_NOT_SUPPORTED",
+      "memory_path": "/home/labestiadevigia/Downloads/narcos/Steve Primary/Day 1/DESKTOP-FGEUJJC-20190129-043144.dmp",
+      "source": "vol3_memory_adapter",
+      "vol3_stderr": "\nProgress:    0.00\t\tScanning WindowsCrashDump64Layer using PageMapScanner\n\nProgress:    0.00\t\tScanning WindowsCrashDump64Layer using PageMapScanner\n\nProgress:   15.11\t\tScanning WindowsCrashDump64Layer using PageMapScanner\n\nProgress:    0.00\t\tScanning WindowsCrashDump64Layer using PageMapScanner\n\nPro"
+    },
+    "signals": []
+  },
+  "sans_compliance": {
+    "accuracy_validation": false,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}

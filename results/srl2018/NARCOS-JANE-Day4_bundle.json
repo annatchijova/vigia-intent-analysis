@@ -1,0 +1,181 @@
+{
+  "analysis_timestamp": "2026-06-27T18:26:58.931359+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "VIGIA-REAL-NARCOS-JANE-Day4",
+    "end_time": "2026-06-27T18:26:58.931364+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "VIGIA-REAL-NARCOS-JANE-Day4",
+        "entry_sha256": "aaf68ddcc43d3302aba8cc848e3a8406b678094fe606522b355ea481d2ef3e77",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "VIGIA-REAL-NARCOS-JANE-Day4"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: 95f2da2a3bdcb4ca...",
+        "outputs_summary": {
+          "agent_sha256": "95f2da2a3bdcb4ca106059e2b06f58fd0ec414c887fec07ac7a0d5edfeb097a1",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-06-27T18:26:53.430939+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-REAL-NARCOS-JANE-Day4",
+        "entry_sha256": "758e41c69e55ea1eebb273543b7acf41211d6f571fdbca5334037d518633bd3c",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/Downloads/narcos/Jane Primary/Day 4/JELAPTOP-20190201-020917.dmp"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-06-27T18:26:53.431028+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-REAL-NARCOS-JANE-Day4",
+        "entry_sha256": "32dc3288a82e2f917040dbfdb366bd791b17925f5f63fe0f723c78b9c2270dc1",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/Downloads/narcos/Jane Primary/Day 4/JELAPTOP-20190201-020917.dmp"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: c500481a5a961c7e...",
+        "outputs_summary": {
+          "sha256": "c500481a5a961c7ee9bdff1768ad0458b68fc01d77b4fa1f8a8767081799babb"
+        },
+        "seq": 3,
+        "timestamp": "2026-06-27T18:26:58.927155+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "VIGIA-REAL-NARCOS-JANE-Day4",
+        "entry_sha256": "813ca1de0513a547867e919f0ff8c62a255d2c6deaf9ae72db657b5035ac2087",
+        "inputs_summary": {
+          "evidence": "/home/labestiadevigia/Downloads/narcos/Jane Primary/Day 4/JELAPTOP-20190201-020917.dmp",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-06-27T18:26:58.927334+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "VIGIA-REAL-NARCOS-JANE-Day4",
+        "entry_sha256": "e619993b647318dbfc3e9c3682c2d21493002c4a294c7c0666da5db77105bb2a",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 0 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "SUSPICION_DETECTED",
+            "best_posterior": "0",
+            "confidence": "0",
+            "is_conclusive": "False",
+            "narrative": "Volatility3 memory analysis: 0 signals from JELAPTOP-20190201-020917.dmp. Average intentionality score: 0/1. Suspicious activity \u2014 requires human review."
+          },
+          "case_id": "VIGIA-REAL-NARCOS-JANE-Day4",
+          "pipeline_meta": {
+            "avg_score": "0",
+            "memory_path": "/home/labestiadevigia/Downloads/narcos/Jane Primary/Day 4/JELAPTOP-20190201-020917.dmp",
+            "signal_count": "0",
+            "source": "vol3_memory_adapter",
+            "vol3_binary": "vol3"
+          },
+          "signals": []
+        },
+        "seq": 5,
+        "timestamp": "2026-06-27T18:26:58.931141+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "VIGIA-REAL-NARCOS-JANE-Day4",
+        "entry_sha256": "07a4788b57d22fe3a406c99e2e1eef91d212fc80b3714c775f588554dfc4f4c1",
+        "inputs_summary": {
+          "n_signals": "0"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-06-27T18:26:58.931208+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "VIGIA-REAL-NARCOS-JANE-Day4",
+        "entry_sha256": "745f6f1291a8891a366e6289a8fb564ce36d704f102913fc01ab7897b89bd603",
+        "inputs_summary": {
+          "verdict": "SUSPICION_DETECTED"
+        },
+        "iteration": 0,
+        "note": "Exit code 0 \u2014 analysis complete.",
+        "outputs_summary": {
+          "exit_code": "0"
+        },
+        "seq": 7,
+        "timestamp": "2026-06-27T18:26:58.931310+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-06-27T18:26:53.430707+00:00",
+    "total_entries": 7
+  },
+  "case_id": "VIGIA-REAL-NARCOS-JANE-Day4",
+  "evidence_path": "/home/labestiadevigia/Downloads/narcos/Jane Primary/Day 4/JELAPTOP-20190201-020917.dmp",
+  "evidence_sha256": "c500481a5a961c7ee9bdff1768ad0458b68fc01d77b4fa1f8a8767081799babb",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-REAL-NARCOS-JANE-Day4 ===\nEvidence: /home/labestiadevigia/Downloads/narcos/Jane Primary/Day 4/JELAPTOP-20190201-020917.dmp\nEvidence SHA-256: c500481a5a961c7ee9bdff1768ad0458b68fc01d77b4fa1f8a8767081799babb\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: SUSPICION_DETECTED\nPosterior confidence: 0\nConclusive: NO \u2014 requires human review\n\n--- PEIRCEAN NARRATIVE ---\nVolatility3 memory analysis: 0 signals from JELAPTOP-20190201-020917.dmp. Average intentionality score: 0/1. Suspicious activity \u2014 requires human review.\n\n--- FINAL ALERT LEVEL ---\nLOW \u2014 No significant anomalies detected in this iteration.\n\nCritical signals (z>3): 0\nHigh signals (2<z<=3): 0\nTotal signals analyzed: 0",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "SUSPICION_DETECTED",
+      "best_posterior": "0",
+      "confidence": {
+        "__fraction__": true,
+        "den": 1,
+        "num": 0
+      },
+      "is_conclusive": false,
+      "narrative": "Volatility3 memory analysis: 0 signals from JELAPTOP-20190201-020917.dmp. Average intentionality score: 0/1. Suspicious activity \u2014 requires human review."
+    },
+    "case_id": "VIGIA-REAL-NARCOS-JANE-Day4",
+    "pipeline_meta": {
+      "avg_score": {
+        "__fraction__": true,
+        "den": 1,
+        "num": 0
+      },
+      "memory_path": "/home/labestiadevigia/Downloads/narcos/Jane Primary/Day 4/JELAPTOP-20190201-020917.dmp",
+      "signal_count": 0,
+      "source": "vol3_memory_adapter",
+      "vol3_binary": "vol3"
+    },
+    "signals": []
+  },
+  "sans_compliance": {
+    "accuracy_validation": false,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}

@@ -1,0 +1,255 @@
+{
+  "analysis_timestamp": "2026-06-27T18:29:57.296322+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "VIGIA-REAL-NARCOS-STEVE-Day4",
+    "end_time": "2026-06-27T18:29:57.296330+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "VIGIA-REAL-NARCOS-STEVE-Day4",
+        "entry_sha256": "1d7e0c9133b2aeeeb8fe62b42a9c15eb3f608a2a9133661a30b654ee7e9980da",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "VIGIA-REAL-NARCOS-STEVE-Day4"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: 95f2da2a3bdcb4ca...",
+        "outputs_summary": {
+          "agent_sha256": "95f2da2a3bdcb4ca106059e2b06f58fd0ec414c887fec07ac7a0d5edfeb097a1",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-06-27T18:27:00.907287+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-REAL-NARCOS-STEVE-Day4",
+        "entry_sha256": "f94c249ce81ebece011c4c69980610bd3bf98033544c4c0f6a851add7d647dde",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/Downloads/narcos/Steve Primary/Day 4/SK-DESKTOP-20190201-030035.dmp"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-06-27T18:27:00.907382+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-REAL-NARCOS-STEVE-Day4",
+        "entry_sha256": "b79acd50640732e4c2351d48063a1fc5cb0436cf711d83afd6ccc51b9b94cbcf",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/Downloads/narcos/Steve Primary/Day 4/SK-DESKTOP-20190201-030035.dmp"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: e53d085c7436efe7...",
+        "outputs_summary": {
+          "sha256": "e53d085c7436efe7f074b6560069cc077027573abc869c486d7eea553cd9884d"
+        },
+        "seq": 3,
+        "timestamp": "2026-06-27T18:27:05.784275+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "VIGIA-REAL-NARCOS-STEVE-Day4",
+        "entry_sha256": "186cd3f1523da6a6518147b5933d83fbb649c6e4a659d80f703833d6a710007c",
+        "inputs_summary": {
+          "evidence": "/home/labestiadevigia/Downloads/narcos/Steve Primary/Day 4/SK-DESKTOP-20190201-030035.dmp",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-06-27T18:27:05.784508+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "VIGIA-REAL-NARCOS-STEVE-Day4",
+        "entry_sha256": "709056273528e6c7d0b8f59e27c7bf655f9e5f9f4fa53f3775e38261d287f9df",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 2 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+            "best_posterior": "9/25",
+            "confidence": "9/25",
+            "is_conclusive": "True",
+            "narrative": "Volatility3 memory analysis: 2 signals from SK-DESKTOP-20190201-030035.dmp. Average intentionality score: 9/5. Malicious activity indicated."
+          },
+          "case_id": "VIGIA-REAL-NARCOS-STEVE-Day4",
+          "pipeline_meta": {
+            "avg_score": "9/5",
+            "memory_path": "/home/labestiadevigia/Downloads/narcos/Steve Primary/Day 4/SK-DESKTOP-20190201-030035.dmp",
+            "signal_count": "2",
+            "source": "vol3_memory_adapter",
+            "vol3_binary": "/home/labestiadevigia/vigia-repo/.venv/bin/vol"
+          },
+          "signals": [
+            {
+              "confidence": "3/5",
+              "description": "Process list analyzed \u2014 no obvious LOLBAS processes",
+              "evidence_type": "memory_process",
+              "source": "vol3.windows.pslist",
+              "z_score": "1/10"
+            },
+            {
+              "confidence": "17/20",
+              "description": "Potential code injection in 21 process(es): 20, 08, 8d, 89, 1316",
+              "evidence_type": "memory_process",
+              "source": "vol3.windows.malfind",
+              "z_score": "7/2"
+            }
+          ]
+        },
+        "seq": 5,
+        "timestamp": "2026-06-27T18:29:57.292641+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "VIGIA-REAL-NARCOS-STEVE-Day4",
+        "entry_sha256": "77a168ce058a5be46ae6fb3b63133d08289fb0720c557ab00b2cdabac8e21792",
+        "inputs_summary": {
+          "n_signals": "2"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-06-27T18:29:57.292793+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "VIGIA-REAL-NARCOS-STEVE-Day4",
+        "entry_sha256": "bb7f8de3d558cc1b0a344d5da17a07a9f8c7d4f8fda249d4dbbc3565339c5c20",
+        "inputs_summary": {
+          "verdict": "MALICIOUS_INTENT_DETECTED"
+        },
+        "iteration": 0,
+        "note": "Exit code 1 \u2014 analysis complete.",
+        "outputs_summary": {
+          "exit_code": "1"
+        },
+        "seq": 7,
+        "timestamp": "2026-06-27T18:29:57.292919+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-06-27T18:27:00.906929+00:00",
+    "total_entries": 7
+  },
+  "case_id": "VIGIA-REAL-NARCOS-STEVE-Day4",
+  "evidence_path": "/home/labestiadevigia/Downloads/narcos/Steve Primary/Day 4/SK-DESKTOP-20190201-030035.dmp",
+  "evidence_sha256": "e53d085c7436efe7f074b6560069cc077027573abc869c486d7eea553cd9884d",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-REAL-NARCOS-STEVE-Day4 ===\nEvidence: /home/labestiadevigia/Downloads/narcos/Steve Primary/Day 4/SK-DESKTOP-20190201-030035.dmp\nEvidence SHA-256: e53d085c7436efe7f074b6560069cc077027573abc869c486d7eea553cd9884d\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 9/25\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\nVolatility3 memory analysis: 2 signals from SK-DESKTOP-20190201-030035.dmp. Average intentionality score: 9/5. Malicious activity indicated.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Potential code injection in 21 process(es): 20, 08, 8d, 89, 1316] z=3.500 conf=0.85 \u2014 \n  [Process list analyzed \u2014 no obvious LOLBAS processes] z=0.100 conf=0.60 \u2014 \n\n--- FINAL ALERT LEVEL ---\nHIGH \u2014 Significant anomalies detected. Priority forensic review recommended.\n\nCritical signals (z>3): 1\nHigh signals (2<z<=3): 0\nTotal signals analyzed: 2",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+      "best_posterior": "9/25",
+      "confidence": {
+        "__fraction__": true,
+        "den": 25,
+        "num": 9
+      },
+      "devil_advocate": {
+        "aggregation": {
+          "k": 3,
+          "method": "top_k_already_validated_matches_v2",
+          "total_gap_mass": "0"
+        },
+        "counterfactual_summary": {
+          "primary_alternative_hypothesis": null
+        },
+        "decision_context": {
+          "confidence": "9/25",
+          "mapped_verdict": "MALICIOUS_INTENT_DETECTED",
+          "raw_verdict": "MALICIOUS_INTENT_DETECTED",
+          "score": {
+            "__fraction__": true,
+            "den": 5,
+            "num": 9
+          }
+        },
+        "devil_advocate_source": "deterministic_no_pattern_data_available",
+        "meta": {
+          "deterministic": true,
+          "generated_from": "case_pattern_library"
+        },
+        "narrative": "Eco's Razor (Abductive Falsification) applied to verdict MALICIOUS_INTENT_DETECTED. Pattern-matching data was not available on this code path \u2014 CasePatternLibrary is not invoked here by design (agent audit-trail mode (vigia_agent.py \u2014 JSON-replay / autonomous path); see KNOWN_LIMITATIONS.md). No structured counter-hypothesis could be derived deterministically. This is a documented scope limitation of the current code path, not an absence of falsification attempt.",
+        "pattern_evidence_gaps": [],
+        "version": "r7-da-v1"
+      },
+      "is_conclusive": true,
+      "narrative": "Volatility3 memory analysis: 2 signals from SK-DESKTOP-20190201-030035.dmp. Average intentionality score: 9/5. Malicious activity indicated."
+    },
+    "case_id": "VIGIA-REAL-NARCOS-STEVE-Day4",
+    "pipeline_meta": {
+      "avg_score": {
+        "__fraction__": true,
+        "den": 5,
+        "num": 9
+      },
+      "memory_path": "/home/labestiadevigia/Downloads/narcos/Steve Primary/Day 4/SK-DESKTOP-20190201-030035.dmp",
+      "signal_count": 2,
+      "source": "vol3_memory_adapter",
+      "vol3_binary": "/home/labestiadevigia/vigia-repo/.venv/bin/vol"
+    },
+    "signals": [
+      {
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 3
+        },
+        "description": "Process list analyzed \u2014 no obvious LOLBAS processes",
+        "evidence_type": "memory_process",
+        "source": "vol3.windows.pslist",
+        "z_score": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 1
+        }
+      },
+      {
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 17
+        },
+        "description": "Potential code injection in 21 process(es): 20, 08, 8d, 89, 1316",
+        "evidence_type": "memory_process",
+        "source": "vol3.windows.malfind",
+        "z_score": {
+          "__fraction__": true,
+          "den": 2,
+          "num": 7
+        }
+      }
+    ]
+  },
+  "sans_compliance": {
+    "accuracy_validation": false,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}
