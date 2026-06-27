@@ -1,0 +1,181 @@
+{
+  "analysis_timestamp": "2026-06-27T17:52:38.832127+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "VIGIA-REAL-NARCOS-CCLEANER-MEMORY",
+    "end_time": "2026-06-27T17:52:38.832132+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "VIGIA-REAL-NARCOS-CCLEANER-MEMORY",
+        "entry_sha256": "695259a38b83ed30c77c5b75cc13e1007382c074dcebb5a2052988ade2460d23",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "VIGIA-REAL-NARCOS-CCLEANER-MEMORY"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: 95f2da2a3bdcb4ca...",
+        "outputs_summary": {
+          "agent_sha256": "95f2da2a3bdcb4ca106059e2b06f58fd0ec414c887fec07ac7a0d5edfeb097a1",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-06-27T17:52:28.425269+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-REAL-NARCOS-CCLEANER-MEMORY",
+        "entry_sha256": "e848a92c1f9805d509ff37d6499e2367996904251ba54e69459d297fc59def01",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/Downloads/narcos/narcos_ccleaner_mem.raw"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-06-27T17:52:28.425359+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-REAL-NARCOS-CCLEANER-MEMORY",
+        "entry_sha256": "e05ebad568dccdba42c8010c9542b43040cb08a6c5a2dd79c761ad958726950f",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/Downloads/narcos/narcos_ccleaner_mem.raw"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: 21a8b659984223f9...",
+        "outputs_summary": {
+          "sha256": "21a8b659984223f9efcba2942ab3947c5d15e947bfa5b85e753aed2552838e0a"
+        },
+        "seq": 3,
+        "timestamp": "2026-06-27T17:52:31.281401+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "VIGIA-REAL-NARCOS-CCLEANER-MEMORY",
+        "entry_sha256": "f5b8ff8dc71c9c5bd3999c6e8451816a90c4d35f0835d2cc0d25e3408a64e301",
+        "inputs_summary": {
+          "evidence": "/home/labestiadevigia/Downloads/narcos/narcos_ccleaner_mem.raw",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-06-27T17:52:31.281615+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "VIGIA-REAL-NARCOS-CCLEANER-MEMORY",
+        "entry_sha256": "bbc996c0fc2008526b1dffd65836d7879e4f698c5429441134a3185b7376d563",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 0 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "SUSPICION_DETECTED",
+            "best_posterior": "0",
+            "confidence": "0",
+            "is_conclusive": "False",
+            "narrative": "Volatility3 memory analysis: 0 signals from narcos_ccleaner_mem.raw. Average intentionality score: 0/1. Suspicious activity \u2014 requires human review."
+          },
+          "case_id": "VIGIA-REAL-NARCOS-CCLEANER-MEMORY",
+          "pipeline_meta": {
+            "avg_score": "0",
+            "memory_path": "/home/labestiadevigia/Downloads/narcos/narcos_ccleaner_mem.raw",
+            "signal_count": "0",
+            "source": "vol3_memory_adapter",
+            "vol3_binary": "/home/labestiadevigia/vigia-repo/.venv/bin/vol"
+          },
+          "signals": []
+        },
+        "seq": 5,
+        "timestamp": "2026-06-27T17:52:38.831858+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "VIGIA-REAL-NARCOS-CCLEANER-MEMORY",
+        "entry_sha256": "6dc752458482693f70f64a2c35d29d80ccdfb739366911426c1b790d44c9ea15",
+        "inputs_summary": {
+          "n_signals": "0"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-06-27T17:52:38.831951+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "VIGIA-REAL-NARCOS-CCLEANER-MEMORY",
+        "entry_sha256": "3ca25ad73d12aa07e8c03b34a0d7e8b63ec93db016059d29da2ea9320ae3c96a",
+        "inputs_summary": {
+          "verdict": "SUSPICION_DETECTED"
+        },
+        "iteration": 0,
+        "note": "Exit code 0 \u2014 analysis complete.",
+        "outputs_summary": {
+          "exit_code": "0"
+        },
+        "seq": 7,
+        "timestamp": "2026-06-27T17:52:38.832073+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-06-27T17:52:28.425037+00:00",
+    "total_entries": 7
+  },
+  "case_id": "VIGIA-REAL-NARCOS-CCLEANER-MEMORY",
+  "evidence_path": "/home/labestiadevigia/Downloads/narcos/narcos_ccleaner_mem.raw",
+  "evidence_sha256": "21a8b659984223f9efcba2942ab3947c5d15e947bfa5b85e753aed2552838e0a",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-REAL-NARCOS-CCLEANER-MEMORY ===\nEvidence: /home/labestiadevigia/Downloads/narcos/narcos_ccleaner_mem.raw\nEvidence SHA-256: 21a8b659984223f9efcba2942ab3947c5d15e947bfa5b85e753aed2552838e0a\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: SUSPICION_DETECTED\nPosterior confidence: 0\nConclusive: NO \u2014 requires human review\n\n--- PEIRCEAN NARRATIVE ---\nVolatility3 memory analysis: 0 signals from narcos_ccleaner_mem.raw. Average intentionality score: 0/1. Suspicious activity \u2014 requires human review.\n\n--- FINAL ALERT LEVEL ---\nLOW \u2014 No significant anomalies detected in this iteration.\n\nCritical signals (z>3): 0\nHigh signals (2<z<=3): 0\nTotal signals analyzed: 0",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "SUSPICION_DETECTED",
+      "best_posterior": "0",
+      "confidence": {
+        "__fraction__": true,
+        "den": 1,
+        "num": 0
+      },
+      "is_conclusive": false,
+      "narrative": "Volatility3 memory analysis: 0 signals from narcos_ccleaner_mem.raw. Average intentionality score: 0/1. Suspicious activity \u2014 requires human review."
+    },
+    "case_id": "VIGIA-REAL-NARCOS-CCLEANER-MEMORY",
+    "pipeline_meta": {
+      "avg_score": {
+        "__fraction__": true,
+        "den": 1,
+        "num": 0
+      },
+      "memory_path": "/home/labestiadevigia/Downloads/narcos/narcos_ccleaner_mem.raw",
+      "signal_count": 0,
+      "source": "vol3_memory_adapter",
+      "vol3_binary": "/home/labestiadevigia/vigia-repo/.venv/bin/vol"
+    },
+    "signals": []
+  },
+  "sans_compliance": {
+    "accuracy_validation": false,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}
