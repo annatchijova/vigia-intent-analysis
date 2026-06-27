@@ -110,6 +110,7 @@ VIGÍA. The truth is in the fracture.
 | **Origin story** | **[`VIGIA_STORY_EN.md`](./VIGIA_STORY_EN.md) (EN) · [`VIGIA_STORY.md`](./VIGIA_STORY.md) (ES)** |
 | Full compliance index | [`SUBMISSION_COMPLIANCE.md`](./SUBMISSION_COMPLIANCE.md) |
 | **Real-case investigation prompts** | **[`PROMPTS_REALCASES_CLAUDE.md`](./PROMPTS_REALCASES_CLAUDE.md)** — copy-paste into Claude Code to run full forensic investigations on all 18 real cases |
+| **NGDC 2012 full investigation** | **[Report (EN)](./docs/VIGIA-NGDC-2012-REPORT.md) · [Reporte (ES)](./docs/VIGIA-NGDC-2012-REPORTE-ES.md) · [Amicus Curiae](./docs/VIGIA-NGDC-2012-AMICUS-CURIAE.md)** — autonomous raw-evidence analysis of the SANS National Gallery DC 2012 case (17 artifacts, 7 findings, Peircean + Daubert compliant) |
 
 **Academic documentation (193 modules, 4 languages):**
 [`docs/academic/ACADEMIC_DOCS_MASTER_INDEX_EN.md`](./docs/academic/ACADEMIC_DOCS_MASTER_INDEX_EN.md)
