@@ -123,6 +123,8 @@ https://annatchijova.github.io/vigia/vigia_diagrams.html
 
 https://annatchijova.github.io/vigia/vigia_commands_en.html
 
+**Mini juego — Simulador VIGÍA:** [🇪🇸 Español](https://annatchijova.github.io/vigia/simulador.html) · [🇬🇧 English](https://annatchijova.github.io/vigia/simulator.html)
+
 ---
 
 ## The Paradigm Shift: From IoC to IoI
