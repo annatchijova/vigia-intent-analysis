@@ -1,0 +1,297 @@
+{
+  "analysis_timestamp": "2026-06-27T05:25:35.383476+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "VIGIA-NGDC-003",
+    "end_time": "2026-06-27T05:25:35.383481+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "VIGIA-NGDC-003",
+        "entry_sha256": "58e6eca841c8a9e93b24dfc568a3e0d1917e77d43f08f906956ddd86333c29ed",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "VIGIA-NGDC-003"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: 95f2da2a3bdcb4ca...",
+        "outputs_summary": {
+          "agent_sha256": "95f2da2a3bdcb4ca106059e2b06f58fd0ec414c887fec07ac7a0d5edfeb097a1",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-06-27T05:25:35.380530+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-NGDC-003",
+        "entry_sha256": "82cec20c16b125238f2ec46c80fac05aa20440e390dd76fe9cf3915e998eefec",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-NGDC-003.json"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-06-27T05:25:35.380629+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-NGDC-003",
+        "entry_sha256": "cea71c3ada9a099ca897c8ac528393e9a871e832b150c677f9cc20b95dacaa92",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-NGDC-003.json"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: b822c9eba781c49b...",
+        "outputs_summary": {
+          "sha256": "b822c9eba781c49b479e6842c9a4f9a4e6f27e516844a7e4d52d22f3315d38a2"
+        },
+        "seq": 3,
+        "timestamp": "2026-06-27T05:25:35.380732+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "VIGIA-NGDC-003",
+        "entry_sha256": "82e6949115586f84cb440423dc1b8acc6fad34e1328eaadc67aaec4651210a50",
+        "inputs_summary": {
+          "evidence": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-NGDC-003.json",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-06-27T05:25:35.380836+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "VIGIA-NGDC-003",
+        "entry_sha256": "69f243d05c8253c1611e5d2486c53433a3d652578d21c1173f2ef152afb23cd2",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 5 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "SUSPICION_DETECTED",
+            "best_posterior": "3511/31250",
+            "confidence": "3511/31250",
+            "is_conclusive": "True",
+            "narrative": "Joe installed LogKext Daemon on the family MacBook Air prior to his divorce from Tracy. His declared purpose was monitoring Terry, his 15-year-old daughter, whose online behavior he was concerned abou..."
+          },
+          "case_id": "VIGIA-NGDC-003",
+          "pipeline_meta": {
+            "artifact_count": "5",
+            "avg_score": "3511/6250",
+            "expected_verdict": "SUSPICION",
+            "source": "ebs_v1_json_adapter"
+          },
+          "signals": [
+            {
+              "artifact_id": "ngdc003_01",
+              "confidence": "17/20",
+              "description": "LogKext Daemon running as root on Tracys-MacBook-Air.local. Hourly cron job sends keystroke logs via Postfix SMTP to joe.sum.twelve@gmail.com. Headers confirm: Return-Path root@tracys-macbook-air.loca",
+              "evidence_type": "malware_infrastructure",
+              "source": "EML header analysis \u2014 logfile-2012-06-28-1600.eml",
+              "z_score": "187/250"
+            },
+            {
+              "artifact_id": "ngdc003_02",
+              "confidence": "39/50",
+              "description": "Terry (age 15, username terrysumtwelve) logs in on July 6 at 10:51am. Keylogger captures: password 'privateschool', email account 'just.terry.22', search queries 'how to help your parents afford priva",
+              "evidence_type": "keylogger_capture",
+              "source": "LogKext Daemon \u2014 logfile-2012-07-06-1100.eml",
+              "z_score": "2769/5000"
+            },
+            {
+              "artifact_id": "ngdc003_03",
+              "confidence": "4/5",
+              "description": "Tracy (tracysumtwelve) is the active user in 11 of 12 recovered log sessions. Captured data includes: password 'legalBee' (repeated across sessions), email recipients including coralbluetwo@hotmail.co",
+              "evidence_type": "keylogger_capture",
+              "source": "LogKext Daemon \u2014 aggregate across 12 EML files",
+              "z_score": "82/125"
+            },
+            {
+              "artifact_id": "ngdc003_04",
+              "confidence": "7/10",
+              "description": "Joe is described as financially well-off, bitter about the divorce, and holding a former account on the family MacBook Air that was deleted. The home folder may have been preserved. He is the father o",
+              "evidence_type": "behavioral_context",
+              "source": "Digital Corpora scenario documentation",
+              "z_score": "91/200"
+            },
+            {
+              "artifact_id": "ngdc003_05",
+              "confidence": "18/25",
+              "description": "Joe reported Tracy's conspiracy to law enforcement based on information captured by the keylogger, directly causing the seizure of Tracy's phone (2012-07-15), Carry's phone and tablet (2012-07-15 and ",
+              "evidence_type": "outcome_signal",
+              "source": "Digital Corpora scenario documentation + EML aggregate",
+              "z_score": "99/250"
+            }
+          ]
+        },
+        "seq": 5,
+        "timestamp": "2026-06-27T05:25:35.383162+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "VIGIA-NGDC-003",
+        "entry_sha256": "8e5b92457459aa2eaa847dd6cb4ce8d9ad40e19c2f8b8faf2871b2a1ffaec080",
+        "inputs_summary": {
+          "n_signals": "5"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-06-27T05:25:35.383282+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "VIGIA-NGDC-003",
+        "entry_sha256": "2b58596d353d3f6d9f94edb1b001ce68219cd7c0250a453ccf7b599706e2fe7f",
+        "inputs_summary": {
+          "verdict": "SUSPICION_DETECTED"
+        },
+        "iteration": 0,
+        "note": "Exit code 0 \u2014 analysis complete.",
+        "outputs_summary": {
+          "exit_code": "0"
+        },
+        "seq": 7,
+        "timestamp": "2026-06-27T05:25:35.383385+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-06-27T05:25:35.380311+00:00",
+    "total_entries": 7
+  },
+  "case_id": "VIGIA-NGDC-003",
+  "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-NGDC-003.json",
+  "evidence_sha256": "b822c9eba781c49b479e6842c9a4f9a4e6f27e516844a7e4d52d22f3315d38a2",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-NGDC-003 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/VIGIA-NGDC-003.json\nEvidence SHA-256: b822c9eba781c49b479e6842c9a4f9a4e6f27e516844a7e4d52d22f3315d38a2\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: SUSPICION_DETECTED\nPosterior confidence: 3511/31250\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\nJoe installed LogKext Daemon on the family MacBook Air prior to his divorce from Tracy. His declared purpose was monitoring Terry, his 15-year-old daughter, whose online behavior he was concerned about. The implementation captures all keystrokes indiscriminately from all users on the device \u2014 Tracy included \u2014 and exfiltrates them hourly via cron+postfix running as root to joe.sum.twelve@gmail.com. Joe had a former account on the device that was deleted during the separation; the home folder may \n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [LogKext Daemon running as root on Tracys-MacBook-Air.local. Hourly cro] z=0.748 conf=0.85 \u2014 \n  [Tracy (tracysumtwelve) is the active user in 11 of 12 recovered log se] z=0.656 conf=0.80 \u2014 \n  [Terry (age 15, username terrysumtwelve) logs in on July 6 at 10:51am. ] z=0.554 conf=0.78 \u2014 \n  [Joe is described as financially well-off, bitter about the divorce, an] z=0.455 conf=0.70 \u2014 \n  [Joe reported Tracy's conspiracy to law enforcement based on informatio] z=0.396 conf=0.72 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW \u2014 No significant anomalies detected in this iteration.\n\nCritical signals (z>3): 0\nHigh signals (2<z<=3): 0\nTotal signals analyzed: 5",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "SUSPICION_DETECTED",
+      "best_posterior": "3511/31250",
+      "confidence": {
+        "__fraction__": true,
+        "den": 31250,
+        "num": 3511
+      },
+      "is_conclusive": true,
+      "narrative": "Joe installed LogKext Daemon on the family MacBook Air prior to his divorce from Tracy. His declared purpose was monitoring Terry, his 15-year-old daughter, whose online behavior he was concerned about. The implementation captures all keystrokes indiscriminately from all users on the device \u2014 Tracy included \u2014 and exfiltrates them hourly via cron+postfix running as root to joe.sum.twelve@gmail.com. Joe had a former account on the device that was deleted during the separation; the home folder may "
+    },
+    "case_id": "VIGIA-NGDC-003",
+    "pipeline_meta": {
+      "artifact_count": 5,
+      "avg_score": "3511/6250",
+      "expected_verdict": "SUSPICION",
+      "source": "ebs_v1_json_adapter"
+    },
+    "signals": [
+      {
+        "artifact_id": "ngdc003_01",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 17
+        },
+        "description": "LogKext Daemon running as root on Tracys-MacBook-Air.local. Hourly cron job sends keystroke logs via Postfix SMTP to joe.sum.twelve@gmail.com. Headers confirm: Return-Path root@tracys-macbook-air.loca",
+        "evidence_type": "malware_infrastructure",
+        "source": "EML header analysis \u2014 logfile-2012-06-28-1600.eml",
+        "z_score": {
+          "__fraction__": true,
+          "den": 250,
+          "num": 187
+        }
+      },
+      {
+        "artifact_id": "ngdc003_02",
+        "confidence": {
+          "__fraction__": true,
+          "den": 50,
+          "num": 39
+        },
+        "description": "Terry (age 15, username terrysumtwelve) logs in on July 6 at 10:51am. Keylogger captures: password 'privateschool', email account 'just.terry.22', search queries 'how to help your parents afford priva",
+        "evidence_type": "keylogger_capture",
+        "source": "LogKext Daemon \u2014 logfile-2012-07-06-1100.eml",
+        "z_score": {
+          "__fraction__": true,
+          "den": 5000,
+          "num": 2769
+        }
+      },
+      {
+        "artifact_id": "ngdc003_03",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 4
+        },
+        "description": "Tracy (tracysumtwelve) is the active user in 11 of 12 recovered log sessions. Captured data includes: password 'legalBee' (repeated across sessions), email recipients including coralbluetwo@hotmail.co",
+        "evidence_type": "keylogger_capture",
+        "source": "LogKext Daemon \u2014 aggregate across 12 EML files",
+        "z_score": {
+          "__fraction__": true,
+          "den": 125,
+          "num": 82
+        }
+      },
+      {
+        "artifact_id": "ngdc003_04",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 7
+        },
+        "description": "Joe is described as financially well-off, bitter about the divorce, and holding a former account on the family MacBook Air that was deleted. The home folder may have been preserved. He is the father o",
+        "evidence_type": "behavioral_context",
+        "source": "Digital Corpora scenario documentation",
+        "z_score": {
+          "__fraction__": true,
+          "den": 200,
+          "num": 91
+        }
+      },
+      {
+        "artifact_id": "ngdc003_05",
+        "confidence": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 18
+        },
+        "description": "Joe reported Tracy's conspiracy to law enforcement based on information captured by the keylogger, directly causing the seizure of Tracy's phone (2012-07-15), Carry's phone and tablet (2012-07-15 and ",
+        "evidence_type": "outcome_signal",
+        "source": "Digital Corpora scenario documentation + EML aggregate",
+        "z_score": {
+          "__fraction__": true,
+          "den": 250,
+          "num": 99
+        }
+      }
+    ]
+  },
+  "sans_compliance": {
+    "accuracy_validation": false,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}

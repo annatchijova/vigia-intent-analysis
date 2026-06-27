@@ -1,0 +1,353 @@
+{
+  "analysis_timestamp": "2026-06-27T05:25:35.287179+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "VIGIA-NGDC-001",
+    "end_time": "2026-06-27T05:25:35.287185+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "VIGIA-NGDC-001",
+        "entry_sha256": "1cee6c88902deddec136a067d67729ebae4aecd60531610bf61f7eb879312ab1",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "VIGIA-NGDC-001"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: 95f2da2a3bdcb4ca...",
+        "outputs_summary": {
+          "agent_sha256": "95f2da2a3bdcb4ca106059e2b06f58fd0ec414c887fec07ac7a0d5edfeb097a1",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-06-27T05:25:35.283808+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-NGDC-001",
+        "entry_sha256": "e0e7669a428fc5dcb920c90930b625f2a930ff9790b3da63d31e788db5941cee",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-NGDC-001.json"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-06-27T05:25:35.283892+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-NGDC-001",
+        "entry_sha256": "8f3e65d47456856adecbfab91c3b027b3459c0d4715364b4f4596383a3b71dfc",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-NGDC-001.json"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: 4070e78b047a4bc3...",
+        "outputs_summary": {
+          "sha256": "4070e78b047a4bc353e5e8907e117ca29cc0680b8ca359712df91d8cf63bec9b"
+        },
+        "seq": 3,
+        "timestamp": "2026-06-27T05:25:35.283992+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "VIGIA-NGDC-001",
+        "entry_sha256": "534de6f3e084557ea273949deffe663290e862f498a9a33221e0b23cf5dd0e23",
+        "inputs_summary": {
+          "evidence": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-NGDC-001.json",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-06-27T05:25:35.284095+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "VIGIA-NGDC-001",
+        "entry_sha256": "41c2cdc5c8f722765401e6bc9dde5cb35788bc160cd05c4e17ae62a32b44d101",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 7 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+            "best_posterior": "15009/87500",
+            "confidence": "15009/87500",
+            "is_conclusive": "True",
+            "narrative": "Carry is a Krasnovian supporter recruited by Alex (alex.jfam11@gmail.com) to orchestrate the defacement of foreign art at the National Gallery DC. Evidence extracted empirically from carry-tablet-2012..."
+          },
+          "case_id": "VIGIA-NGDC-001",
+          "pipeline_meta": {
+            "artifact_count": "7",
+            "avg_score": "15009/17500",
+            "expected_verdict": "MALICE",
+            "source": "ebs_v1_json_adapter"
+          },
+          "signals": [
+            {
+              "artifact_id": "ngdc001_01",
+              "confidence": "19/20",
+              "description": "Three operational identities created within 24 hours on 2012-06-07: carrysum2012@yahoo.com (IMAP/SMTP confirmed in HostAuth table), cat2welve@gmail.com (Google verification email received 18:10:48 UTC",
+              "evidence_type": "email_account_creation",
+              "source": "sqlite3 \u2014 EmailProvider.db extracted via icat from carry-tablet-2012-07-16-final.E01 offset 3278848 inode 1474506",
+              "z_score": "361/400"
+            },
+            {
+              "artifact_id": "ngdc001_02",
+              "confidence": "19/20",
+              "description": "Alex (alex.jfam11@gmail.com) sends recruitment email to Carry (carrysum2012@yahoo.com) with subject 'Video'. Body text: 'I have some business in the states in the near future that I think you would be",
+              "evidence_type": "email_content",
+              "source": "sqlite3 \u2014 EmailProviderBody.db messageKey=12",
+              "z_score": "1843/2000"
+            },
+            {
+              "artifact_id": "ngdc001_03",
+              "confidence": "9/10",
+              "description": "Seven distinct @m57.biz addresses send emails to carrysum2012@yahoo.com with subject 'Busy' in 10-to-20-minute intervals between 17:35 and 18:40 on 2012-07-05, the same day Alex initiates contact. Ope",
+              "evidence_type": "network_communication_pattern",
+              "source": "sqlite3 \u2014 EmailProvider.db Message table",
+              "z_score": "819/1000"
+            },
+            {
+              "artifact_id": "ngdc001_04",
+              "confidence": "47/50",
+              "description": "Seven-email chain between Carry and Tracy (tracysumtwelve@gmail.com) spanning 2012-07-05 to 2012-07-12 documents a complete social engineering and insider recruitment operation. Carry exploits Tracy's",
+              "evidence_type": "email_content",
+              "source": "sqlite3 \u2014 EmailProviderBody.db messageKeys 16,22,23,24,25,26,27",
+              "z_score": "564/625"
+            },
+            {
+              "artifact_id": "ngdc001_05",
+              "confidence": "9/10",
+              "description": "File misc/wifi/wpa_supplicant.conf recovered from userdata partition reports Shannon entropy of 7.66/8.0 \u2014 anomalously high for a WiFi configuration file (typical wpa_supplicant.conf entropy: 3.5-4.5)",
+              "evidence_type": "file_metadata",
+              "source": "fls + icat (Sleuth Kit) \u2014 wpa_supplicant.conf inode 1031957",
+              "z_score": "837/1000"
+            }
+          ]
+        },
+        "seq": 5,
+        "timestamp": "2026-06-27T05:25:35.286448+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "VIGIA-NGDC-001",
+        "entry_sha256": "1fc2792c7051898b86435ffba9920b565ae8595473dd61658c102585650bf008",
+        "inputs_summary": {
+          "n_signals": "7"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-06-27T05:25:35.286587+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "VIGIA-NGDC-001",
+        "entry_sha256": "64bf6afe0e06d7e966234c689b9c4845dc9b82eb83e1bd10929e20d93146890e",
+        "inputs_summary": {
+          "verdict": "MALICIOUS_INTENT_DETECTED"
+        },
+        "iteration": 0,
+        "note": "Exit code 1 \u2014 analysis complete.",
+        "outputs_summary": {
+          "exit_code": "1"
+        },
+        "seq": 7,
+        "timestamp": "2026-06-27T05:25:35.286693+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-06-27T05:25:35.283596+00:00",
+    "total_entries": 7
+  },
+  "case_id": "VIGIA-NGDC-001",
+  "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-NGDC-001.json",
+  "evidence_sha256": "4070e78b047a4bc353e5e8907e117ca29cc0680b8ca359712df91d8cf63bec9b",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-NGDC-001 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/VIGIA-NGDC-001.json\nEvidence SHA-256: 4070e78b047a4bc353e5e8907e117ca29cc0680b8ca359712df91d8cf63bec9b\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 15009/87500\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\nCarry is a Krasnovian supporter recruited by Alex (alex.jfam11@gmail.com) to orchestrate the defacement of foreign art at the National Gallery DC. Evidence extracted empirically from carry-tablet-2012-07-16-final.E01 (Digital Corpora / USNA + West Point 2012) using ewfmount + Sleuth Kit + SQLite. The tablet was purchased specifically for this operation. Carry constructed three separate identities on the same day (2012-06-07), established a covert channel with Alex via steganographic video attach\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Alex (alex.jfam11@gmail.com) sends recruitment email to Carry (carrysu] z=0.921 conf=0.95 \u2014 \n  [Three operational identities created within 24 hours on 2012-06-07: ca] z=0.902 conf=0.95 \u2014 \n  [Seven-email chain between Carry and Tracy (tracysumtwelve@gmail.com) s] z=0.902 conf=0.94 \u2014 \n  [The tablet (ASUS TF101, Android 4.0.3 IML74K, build US_epad-9.2.1.24-2] z=0.856 conf=0.93 \u2014 \n  [File misc/wifi/wpa_supplicant.conf recovered from userdata partition r] z=0.837 conf=0.90 \u2014 \n\n--- FINAL ALERT LEVEL ---\nHIGH \u2014 Conclusive MALICE verdict from Bayesian posterior aggregation. Individual z-scores below threshold (distributed evidence pattern: no single dominant signal, but aggregate posterior is decisive).\n\nCritical signals (z>3): 0\nHigh signals (2<z<=3): 0\nTotal signals analyzed: 7",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+      "best_posterior": "15009/87500",
+      "confidence": {
+        "__fraction__": true,
+        "den": 87500,
+        "num": 15009
+      },
+      "devil_advocate": {
+        "aggregation": {
+          "k": 3,
+          "method": "top_k_already_validated_matches_v2",
+          "total_gap_mass": "0"
+        },
+        "counterfactual_summary": {
+          "primary_alternative_hypothesis": null
+        },
+        "decision_context": {
+          "confidence": "15009/87500",
+          "mapped_verdict": "MALICIOUS_INTENT_DETECTED",
+          "raw_verdict": "MALICIOUS_INTENT_DETECTED",
+          "score": "15009/17500"
+        },
+        "devil_advocate_source": "deterministic_no_pattern_data_available",
+        "meta": {
+          "deterministic": true,
+          "generated_from": "case_pattern_library"
+        },
+        "narrative": "Eco's Razor (Abductive Falsification) applied to verdict MALICIOUS_INTENT_DETECTED. Pattern-matching data was not available on this code path \u2014 CasePatternLibrary is not invoked here by design (agent audit-trail mode (vigia_agent.py \u2014 JSON-replay / autonomous path); see KNOWN_LIMITATIONS.md). No structured counter-hypothesis could be derived deterministically. This is a documented scope limitation of the current code path, not an absence of falsification attempt.",
+        "pattern_evidence_gaps": [],
+        "version": "r7-da-v1"
+      },
+      "is_conclusive": true,
+      "narrative": "Carry is a Krasnovian supporter recruited by Alex (alex.jfam11@gmail.com) to orchestrate the defacement of foreign art at the National Gallery DC. Evidence extracted empirically from carry-tablet-2012-07-16-final.E01 (Digital Corpora / USNA + West Point 2012) using ewfmount + Sleuth Kit + SQLite. The tablet was purchased specifically for this operation. Carry constructed three separate identities on the same day (2012-06-07), established a covert channel with Alex via steganographic video attach"
+    },
+    "case_id": "VIGIA-NGDC-001",
+    "pipeline_meta": {
+      "artifact_count": 7,
+      "avg_score": "15009/17500",
+      "expected_verdict": "MALICE",
+      "source": "ebs_v1_json_adapter"
+    },
+    "signals": [
+      {
+        "artifact_id": "ngdc001_01",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 19
+        },
+        "description": "Three operational identities created within 24 hours on 2012-06-07: carrysum2012@yahoo.com (IMAP/SMTP confirmed in HostAuth table), cat2welve@gmail.com (Google verification email received 18:10:48 UTC",
+        "evidence_type": "email_account_creation",
+        "source": "sqlite3 \u2014 EmailProvider.db extracted via icat from carry-tablet-2012-07-16-final.E01 offset 3278848 inode 1474506",
+        "z_score": {
+          "__fraction__": true,
+          "den": 400,
+          "num": 361
+        }
+      },
+      {
+        "artifact_id": "ngdc001_02",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 19
+        },
+        "description": "Alex (alex.jfam11@gmail.com) sends recruitment email to Carry (carrysum2012@yahoo.com) with subject 'Video'. Body text: 'I have some business in the states in the near future that I think you would be",
+        "evidence_type": "email_content",
+        "source": "sqlite3 \u2014 EmailProviderBody.db messageKey=12",
+        "z_score": {
+          "__fraction__": true,
+          "den": 2000,
+          "num": 1843
+        }
+      },
+      {
+        "artifact_id": "ngdc001_03",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 9
+        },
+        "description": "Seven distinct @m57.biz addresses send emails to carrysum2012@yahoo.com with subject 'Busy' in 10-to-20-minute intervals between 17:35 and 18:40 on 2012-07-05, the same day Alex initiates contact. Ope",
+        "evidence_type": "network_communication_pattern",
+        "source": "sqlite3 \u2014 EmailProvider.db Message table",
+        "z_score": {
+          "__fraction__": true,
+          "den": 1000,
+          "num": 819
+        }
+      },
+      {
+        "artifact_id": "ngdc001_04",
+        "confidence": {
+          "__fraction__": true,
+          "den": 50,
+          "num": 47
+        },
+        "description": "Seven-email chain between Carry and Tracy (tracysumtwelve@gmail.com) spanning 2012-07-05 to 2012-07-12 documents a complete social engineering and insider recruitment operation. Carry exploits Tracy's",
+        "evidence_type": "email_content",
+        "source": "sqlite3 \u2014 EmailProviderBody.db messageKeys 16,22,23,24,25,26,27",
+        "z_score": {
+          "__fraction__": true,
+          "den": 625,
+          "num": 564
+        }
+      },
+      {
+        "artifact_id": "ngdc001_05",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 9
+        },
+        "description": "File misc/wifi/wpa_supplicant.conf recovered from userdata partition reports Shannon entropy of 7.66/8.0 \u2014 anomalously high for a WiFi configuration file (typical wpa_supplicant.conf entropy: 3.5-4.5)",
+        "evidence_type": "file_metadata",
+        "source": "fls + icat (Sleuth Kit) \u2014 wpa_supplicant.conf inode 1031957",
+        "z_score": {
+          "__fraction__": true,
+          "den": 1000,
+          "num": 837
+        }
+      },
+      {
+        "artifact_id": "ngdc001_06",
+        "confidence": {
+          "__fraction__": true,
+          "den": 100,
+          "num": 87
+        },
+        "description": "Twenty-plus email body cache files deleted from data/com.android.email/cache/ prior to device seizure, recovered as (realloc) entries by Sleuth Kit fls. Inodes include 1474911, 1475098-1475103, 147510",
+        "evidence_type": "deleted_file_recovery",
+        "source": "fls (Sleuth Kit) \u2014 data/com.android.email/cache/ realloc inodes",
+        "z_score": {
+          "__fraction__": true,
+          "den": 1250,
+          "num": 957
+        }
+      },
+      {
+        "artifact_id": "ngdc001_07",
+        "confidence": {
+          "__fraction__": true,
+          "den": 100,
+          "num": 93
+        },
+        "description": "The tablet (ASUS TF101, Android 4.0.3 IML74K, build US_epad-9.2.1.24-20120503) was purchased and activated on 2012-06-07 \u2014 the same date all operational accounts were created. The device was dedicated",
+        "evidence_type": "device_acquisition_timeline",
+        "source": "Digital Corpora scenario metadata + EmailProvider.db HostAuth",
+        "z_score": {
+          "__fraction__": true,
+          "den": 2500,
+          "num": 2139
+        }
+      }
+    ]
+  },
+  "sans_compliance": {
+    "accuracy_validation": false,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}
