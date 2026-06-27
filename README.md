@@ -111,6 +111,7 @@ VIGÍA. The truth is in the fracture.
 | Full compliance index | [`SUBMISSION_COMPLIANCE.md`](./SUBMISSION_COMPLIANCE.md) |
 | **Real-case investigation prompts** | **[`PROMPTS_REALCASES_CLAUDE.md`](./PROMPTS_REALCASES_CLAUDE.md)** — copy-paste into Claude Code to run full forensic investigations on all 18 real cases |
 | **NGDC 2012 full investigation** | **[Report (EN)](./docs/VIGIA-NGDC-2012-REPORT.md) · [Reporte (ES)](./docs/VIGIA-NGDC-2012-REPORTE-ES.md) · [Amicus Curiae](./docs/VIGIA-NGDC-2012-AMICUS-CURIAE.md)** — autonomous raw-evidence analysis of the SANS National Gallery DC 2012 case (17 artifacts, 7 findings, Peircean + Daubert compliant) |
+| **NGDC 2012 — tracy-home E01/E02 (physical layer)** | **[Report](./docs/VIGIA-NGDC-2012-E01E02-REPORT.md) · [Amicus Curiae (EN)](./docs/VIGIA-NGDC-2012-E01E02-AMICUS-CURIAE-EN.md) · [Amicus Curiae (ES)](./docs/VIGIA-NGDC-2012-E01E02-AMICUS-CURIAE-ES.md)** — disk image analysis of Tracy's MacBook Air (5.5 GB HFS+): LogKext infrastructure, stolen stamp docs, anti-forensic VM, deleted account recovery. Physical corroboration of NGDC-002 verdict. |
 
 **Academic documentation (193 modules, 4 languages):**
 [`docs/academic/ACADEMIC_DOCS_MASTER_INDEX_EN.md`](./docs/academic/ACADEMIC_DOCS_MASTER_INDEX_EN.md)
