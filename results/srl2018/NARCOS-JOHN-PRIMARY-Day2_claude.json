@@ -1,0 +1,181 @@
+{
+  "analysis_timestamp": "2026-06-27T18:50:25.795796+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "VIGIA-REAL-NARCOS-JOHN-PRIMARY-Day2",
+    "end_time": "2026-06-27T18:50:25.795802+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "VIGIA-REAL-NARCOS-JOHN-PRIMARY-Day2",
+        "entry_sha256": "0ae9137611a4c99d2bf5559b9bbaff6e2b4f0b43862a65676797dcf3e63a95c1",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "VIGIA-REAL-NARCOS-JOHN-PRIMARY-Day2"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: 95f2da2a3bdcb4ca...",
+        "outputs_summary": {
+          "agent_sha256": "95f2da2a3bdcb4ca106059e2b06f58fd0ec414c887fec07ac7a0d5edfeb097a1",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-06-27T18:50:22.014046+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-REAL-NARCOS-JOHN-PRIMARY-Day2",
+        "entry_sha256": "78d6ba0eae587f262c4120d956ddf7a0757e5a98cfb24027e1d98f3faebc346a",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/Downloads/narcos/John Primary/Day 2/JOHNFLAPTOP1-20190130-020349.dmp"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-06-27T18:50:22.014137+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-REAL-NARCOS-JOHN-PRIMARY-Day2",
+        "entry_sha256": "5f60883b05a5f8556be4d5f270234d395a6f87f3dfa357c0acc46c783381f79a",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/Downloads/narcos/John Primary/Day 2/JOHNFLAPTOP1-20190130-020349.dmp"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: 8d860d9970ab0a8c...",
+        "outputs_summary": {
+          "sha256": "8d860d9970ab0a8cbbf9ee316da6b83d49d7db49fd41189d7f39644e51d2c06f"
+        },
+        "seq": 3,
+        "timestamp": "2026-06-27T18:50:25.790384+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "VIGIA-REAL-NARCOS-JOHN-PRIMARY-Day2",
+        "entry_sha256": "706452b59574f78eeac30e7c41e806d23548870df1800a1d3c47990ebaef9c24",
+        "inputs_summary": {
+          "evidence": "/home/labestiadevigia/Downloads/narcos/John Primary/Day 2/JOHNFLAPTOP1-20190130-020349.dmp",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-06-27T18:50:25.790595+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "VIGIA-REAL-NARCOS-JOHN-PRIMARY-Day2",
+        "entry_sha256": "59dd7850efa0e67684cf8414ade4d3f96eefcd157e6ecd3d08abff8e0ef7331c",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 0 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "SUSPICION_DETECTED",
+            "best_posterior": "0",
+            "confidence": "0",
+            "is_conclusive": "False",
+            "narrative": "Volatility3 memory analysis: 0 signals from JOHNFLAPTOP1-20190130-020349.dmp. Average intentionality score: 0/1. Suspicious activity \u2014 requires human review."
+          },
+          "case_id": "VIGIA-REAL-NARCOS-JOHN-PRIMARY-Day2",
+          "pipeline_meta": {
+            "avg_score": "0",
+            "memory_path": "/home/labestiadevigia/Downloads/narcos/John Primary/Day 2/JOHNFLAPTOP1-20190130-020349.dmp",
+            "signal_count": "0",
+            "source": "vol3_memory_adapter",
+            "vol3_binary": "vol3"
+          },
+          "signals": []
+        },
+        "seq": 5,
+        "timestamp": "2026-06-27T18:50:25.795332+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "VIGIA-REAL-NARCOS-JOHN-PRIMARY-Day2",
+        "entry_sha256": "053876592402e57deb0edc2f8c7d800b26ca2bd2409966aa22ceb5e6c39a2800",
+        "inputs_summary": {
+          "n_signals": "0"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-06-27T18:50:25.795455+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "VIGIA-REAL-NARCOS-JOHN-PRIMARY-Day2",
+        "entry_sha256": "0851c42c5104630785330b9e5af4641b4f0a549626325a341c46d325cd613709",
+        "inputs_summary": {
+          "verdict": "SUSPICION_DETECTED"
+        },
+        "iteration": 0,
+        "note": "Exit code 0 \u2014 analysis complete.",
+        "outputs_summary": {
+          "exit_code": "0"
+        },
+        "seq": 7,
+        "timestamp": "2026-06-27T18:50:25.795675+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-06-27T18:50:22.013801+00:00",
+    "total_entries": 7
+  },
+  "case_id": "VIGIA-REAL-NARCOS-JOHN-PRIMARY-Day2",
+  "evidence_path": "/home/labestiadevigia/Downloads/narcos/John Primary/Day 2/JOHNFLAPTOP1-20190130-020349.dmp",
+  "evidence_sha256": "8d860d9970ab0a8cbbf9ee316da6b83d49d7db49fd41189d7f39644e51d2c06f",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-REAL-NARCOS-JOHN-PRIMARY-Day2 ===\nEvidence: /home/labestiadevigia/Downloads/narcos/John Primary/Day 2/JOHNFLAPTOP1-20190130-020349.dmp\nEvidence SHA-256: 8d860d9970ab0a8cbbf9ee316da6b83d49d7db49fd41189d7f39644e51d2c06f\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: SUSPICION_DETECTED\nPosterior confidence: 0\nConclusive: NO \u2014 requires human review\n\n--- PEIRCEAN NARRATIVE ---\nVolatility3 memory analysis: 0 signals from JOHNFLAPTOP1-20190130-020349.dmp. Average intentionality score: 0/1. Suspicious activity \u2014 requires human review.\n\n--- FINAL ALERT LEVEL ---\nLOW \u2014 No significant anomalies detected in this iteration.\n\nCritical signals (z>3): 0\nHigh signals (2<z<=3): 0\nTotal signals analyzed: 0",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "SUSPICION_DETECTED",
+      "best_posterior": "0",
+      "confidence": {
+        "__fraction__": true,
+        "den": 1,
+        "num": 0
+      },
+      "is_conclusive": false,
+      "narrative": "Volatility3 memory analysis: 0 signals from JOHNFLAPTOP1-20190130-020349.dmp. Average intentionality score: 0/1. Suspicious activity \u2014 requires human review."
+    },
+    "case_id": "VIGIA-REAL-NARCOS-JOHN-PRIMARY-Day2",
+    "pipeline_meta": {
+      "avg_score": {
+        "__fraction__": true,
+        "den": 1,
+        "num": 0
+      },
+      "memory_path": "/home/labestiadevigia/Downloads/narcos/John Primary/Day 2/JOHNFLAPTOP1-20190130-020349.dmp",
+      "signal_count": 0,
+      "source": "vol3_memory_adapter",
+      "vol3_binary": "vol3"
+    },
+    "signals": []
+  },
+  "sans_compliance": {
+    "accuracy_validation": false,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}

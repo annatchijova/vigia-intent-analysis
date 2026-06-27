@@ -1,0 +1,181 @@
+{
+  "analysis_timestamp": "2026-06-27T18:52:50.548157+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "VIGIA-REAL-NARCOS-STEVE-Day1",
+    "end_time": "2026-06-27T18:52:50.548162+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "VIGIA-REAL-NARCOS-STEVE-Day1",
+        "entry_sha256": "034991642ade169ffbce78b9fba88442dd7fa57108aad702ae472a6cbbe03be8",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "VIGIA-REAL-NARCOS-STEVE-Day1"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: 95f2da2a3bdcb4ca...",
+        "outputs_summary": {
+          "agent_sha256": "95f2da2a3bdcb4ca106059e2b06f58fd0ec414c887fec07ac7a0d5edfeb097a1",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-06-27T18:52:46.376288+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-REAL-NARCOS-STEVE-Day1",
+        "entry_sha256": "ff045add32fb528c165b7b270c43735173ec2b7f9442ef74b936389ac2e74fda",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/Downloads/narcos/Steve Primary/Day 1/DESKTOP-FGEUJJC-20190129-043144.dmp"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-06-27T18:52:46.376374+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-REAL-NARCOS-STEVE-Day1",
+        "entry_sha256": "353e1fc769c373683cb94523c96b10686f2325e9bfb6575ebf1a1829a49c9da0",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/Downloads/narcos/Steve Primary/Day 1/DESKTOP-FGEUJJC-20190129-043144.dmp"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: 31443bcfb82e0629...",
+        "outputs_summary": {
+          "sha256": "31443bcfb82e0629a2453ab1c85fdd34201af978c68e4f851e3ea45163363a3e"
+        },
+        "seq": 3,
+        "timestamp": "2026-06-27T18:52:50.543576+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "VIGIA-REAL-NARCOS-STEVE-Day1",
+        "entry_sha256": "7da03f4d669b901401cf67bf9a73c8b7b00315f71e54dece2c1ba7eed2c7b51b",
+        "inputs_summary": {
+          "evidence": "/home/labestiadevigia/Downloads/narcos/Steve Primary/Day 1/DESKTOP-FGEUJJC-20190129-043144.dmp",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-06-27T18:52:50.543786+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "VIGIA-REAL-NARCOS-STEVE-Day1",
+        "entry_sha256": "33bfef5a4c676421299d401a9a70aebf1466b81b00cfae8a4a8caf67974c0a4d",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 0 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "SUSPICION_DETECTED",
+            "best_posterior": "0",
+            "confidence": "0",
+            "is_conclusive": "False",
+            "narrative": "Volatility3 memory analysis: 0 signals from DESKTOP-FGEUJJC-20190129-043144.dmp. Average intentionality score: 0/1. Suspicious activity \u2014 requires human review."
+          },
+          "case_id": "VIGIA-REAL-NARCOS-STEVE-Day1",
+          "pipeline_meta": {
+            "avg_score": "0",
+            "memory_path": "/home/labestiadevigia/Downloads/narcos/Steve Primary/Day 1/DESKTOP-FGEUJJC-20190129-043144.dmp",
+            "signal_count": "0",
+            "source": "vol3_memory_adapter",
+            "vol3_binary": "vol3"
+          },
+          "signals": []
+        },
+        "seq": 5,
+        "timestamp": "2026-06-27T18:52:50.547939+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "VIGIA-REAL-NARCOS-STEVE-Day1",
+        "entry_sha256": "f1ec6223fc385ac181fd9416d0f26740e41745c3f41cc535cf4a653730f3593c",
+        "inputs_summary": {
+          "n_signals": "0"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-06-27T18:52:50.548006+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "VIGIA-REAL-NARCOS-STEVE-Day1",
+        "entry_sha256": "9bd58b0316c142fa595a6a3930789b03c386bd9f66c19359724f4e5be9ce0a49",
+        "inputs_summary": {
+          "verdict": "SUSPICION_DETECTED"
+        },
+        "iteration": 0,
+        "note": "Exit code 0 \u2014 analysis complete.",
+        "outputs_summary": {
+          "exit_code": "0"
+        },
+        "seq": 7,
+        "timestamp": "2026-06-27T18:52:50.548108+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-06-27T18:52:46.376067+00:00",
+    "total_entries": 7
+  },
+  "case_id": "VIGIA-REAL-NARCOS-STEVE-Day1",
+  "evidence_path": "/home/labestiadevigia/Downloads/narcos/Steve Primary/Day 1/DESKTOP-FGEUJJC-20190129-043144.dmp",
+  "evidence_sha256": "31443bcfb82e0629a2453ab1c85fdd34201af978c68e4f851e3ea45163363a3e",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-REAL-NARCOS-STEVE-Day1 ===\nEvidence: /home/labestiadevigia/Downloads/narcos/Steve Primary/Day 1/DESKTOP-FGEUJJC-20190129-043144.dmp\nEvidence SHA-256: 31443bcfb82e0629a2453ab1c85fdd34201af978c68e4f851e3ea45163363a3e\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: SUSPICION_DETECTED\nPosterior confidence: 0\nConclusive: NO \u2014 requires human review\n\n--- PEIRCEAN NARRATIVE ---\nVolatility3 memory analysis: 0 signals from DESKTOP-FGEUJJC-20190129-043144.dmp. Average intentionality score: 0/1. Suspicious activity \u2014 requires human review.\n\n--- FINAL ALERT LEVEL ---\nLOW \u2014 No significant anomalies detected in this iteration.\n\nCritical signals (z>3): 0\nHigh signals (2<z<=3): 0\nTotal signals analyzed: 0",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "SUSPICION_DETECTED",
+      "best_posterior": "0",
+      "confidence": {
+        "__fraction__": true,
+        "den": 1,
+        "num": 0
+      },
+      "is_conclusive": false,
+      "narrative": "Volatility3 memory analysis: 0 signals from DESKTOP-FGEUJJC-20190129-043144.dmp. Average intentionality score: 0/1. Suspicious activity \u2014 requires human review."
+    },
+    "case_id": "VIGIA-REAL-NARCOS-STEVE-Day1",
+    "pipeline_meta": {
+      "avg_score": {
+        "__fraction__": true,
+        "den": 1,
+        "num": 0
+      },
+      "memory_path": "/home/labestiadevigia/Downloads/narcos/Steve Primary/Day 1/DESKTOP-FGEUJJC-20190129-043144.dmp",
+      "signal_count": 0,
+      "source": "vol3_memory_adapter",
+      "vol3_binary": "vol3"
+    },
+    "signals": []
+  },
+  "sans_compliance": {
+    "accuracy_validation": false,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}

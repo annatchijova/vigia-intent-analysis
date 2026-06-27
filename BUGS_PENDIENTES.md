@@ -769,3 +769,80 @@ pip install defusedxml>=0.7.1
 - **B-009** (floats en vigia_artifact_graph.py): módulo de visualización puro, sin callers en scoring path. float() correcto para cálculos de tamaño de píxeles y pesos de display.
 - **Copilot Bug 28/11/15** (signal_mapper.py .lower() sobre tool_name): archivo inexistente, bug completamente alucinado por Copilot. Patrón no existe en el codebase.
 - **_calibration_dataset acumulación**: inicializado en __init__ pero nunca se llena entre runs — no hay estado residual.
+
+---
+
+## B-018 — Volatility3 subprocess timeout en `vigia_agent.py` para dumps grandes (≥4 GB)
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | ABIERTO |
+| **Severidad** | P1 — el pipeline sella un bundle con 0 señales sin advertir que Volatility3 no terminó |
+| **Archivo** | `vigia/pipeline/` / `vigia_agent.py` (orquestador de subprocess vol3) |
+| **Detectado en** | Sesión 2026-06-27, batch NARCOS SRL-2018, 12 dumps ≥4 GB |
+
+### Descripción
+
+El pipeline lanza Volatility3 como subprocess (`vol3` o venv `vol`) y asume que termina
+en ~2 segundos. Para dumps de memoria RAM de ≥4 GB, los plugins individuales necesitan:
+- `windows.info`: ~8–10 s
+- `windows.pslist`: ~15–20 s
+- `windows.netscan`: ~25–35 s
+- `windows.malfind`: ~25–40 s
+
+Cuando el subprocess expira antes de que vol3 produzca output, el pipeline interpreta
+el stdout vacío como "0 señales" y sella el bundle con `signal_count=0`.
+
+La distinción crítica que se pierde:
+- `0 señales` porque el dump es benigno → NOISE válido
+- `0 señales` porque vol3 no terminó → artefacto de infraestructura
+
+### Síntoma observado
+
+En el batch NARCOS (12 dumps), los bundles `_claude.json` (nuevos) producen 0 señales
+con `vol3_binary=vol3` (binario de sistema, más lento). Los bundles `_bundle.json`
+(corridos previamente con timeout mayor o sin timeout) producen señales reales:
+- `NARCOS-JOHN-PRIMARY-Day2_bundle.json`: 4 señales (LOLBAS, netscan, malfind 30 proc)
+- `NARCOS-STEVE-Day4_bundle.json`: 2 señales (pslist, malfind 21 proc)
+- `NARCOS-JANE-*_bundle.json`: 0 señales reales (Jane genuinamente limpia o B-018)
+
+El bundle usa `vol3_binary=/home/.../venv/bin/vol` cuando el timeout es suficiente,
+y `vol3_binary=vol` (sistema) cuando no lo es — el path del binario es un indicador
+indirecto del timeout.
+
+### Impacto forense
+
+Un investigador que vea 0 señales en un dump de John Primary Day2 (donde hay LOLBAS,
+Discord C2, jRAT 4782 y malfind en 30 procesos) podría cerrar el caso como NOISE.
+Esto es un fallo de cadena de custodia, no un fallo de análisis.
+
+En el contexto NARCOS: Jane Day2/3/4 muestran 0 señales. No es posible distinguir
+desde el bundle solo si Jane está limpia o si el pipeline se agotó antes de terminar.
+
+### Fix cuando corresponda
+
+1. Aumentar el timeout del subprocess vol3 a ≥60 s por plugin (o configurable vía
+   `VIGIA_VOL3_TIMEOUT_SECONDS`).
+2. Capturar el returncode del subprocess: si vol3 termina por timeout (SIGKILL/SIGTERM),
+   emitir `PIPELINE_TIMEOUT` en `pipeline_meta.error`, no `signal_count=0`.
+3. Distinguir en el bundle: `"pipeline_status": "completed"` vs `"pipeline_status": "timeout"`.
+4. En el log de auditoría, registrar el tiempo de ejecución real del subprocess.
+
+### Workaround inmediato
+
+Correr vol3 directamente sobre el dump antes de llamar a `vigia_agent.py`:
+
+```bash
+vol -f /path/to/dump windows.info
+vol -f /path/to/dump windows.pslist
+vol -f /path/to/dump windows.netscan
+vol -f /path/to/dump windows.malfind
+```
+
+Y usar esos resultados como contexto para `reason_with_llm` en modo Claude Code.
+
+### Nota de auditoría
+
+Los bundles `NARCOS-*_claude.json` en `results/srl2018/` están afectados por este bug.
+Los bundles `NARCOS-*_bundle.json` (corridos con timeout suficiente) son los
+archivos de referencia para el análisis forense de esta sesión.

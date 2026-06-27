@@ -1,0 +1,181 @@
+{
+  "analysis_timestamp": "2026-06-27T18:50:42.820834+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "VIGIA-REAL-NARCOS-JOHN-ALT-Day2",
+    "end_time": "2026-06-27T18:50:42.820839+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "VIGIA-REAL-NARCOS-JOHN-ALT-Day2",
+        "entry_sha256": "8316df0995b86a6a4f8dbbf4f110f16b8776579d3455c013747397576499067f",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "VIGIA-REAL-NARCOS-JOHN-ALT-Day2"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: 95f2da2a3bdcb4ca...",
+        "outputs_summary": {
+          "agent_sha256": "95f2da2a3bdcb4ca106059e2b06f58fd0ec414c887fec07ac7a0d5edfeb097a1",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-06-27T18:50:38.721021+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-REAL-NARCOS-JOHN-ALT-Day2",
+        "entry_sha256": "6414e0975f929541da361a38978fdebbff146e2ecacc4626ccc01c5c24e07186",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/Downloads/narcos/John Alt/Day 2/JOHNFLAPTOP-20190130-014821.dmp"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-06-27T18:50:38.721109+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-REAL-NARCOS-JOHN-ALT-Day2",
+        "entry_sha256": "411ecf558ea534f6d3e7837382d6449bf5e095f8d238f4c0f7f5e5bd031eb592",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/Downloads/narcos/John Alt/Day 2/JOHNFLAPTOP-20190130-014821.dmp"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: 59f1970b32032eb9...",
+        "outputs_summary": {
+          "sha256": "59f1970b32032eb9a6ba08cbde633042f76fe620d5b4dbfeed9372d068aff240"
+        },
+        "seq": 3,
+        "timestamp": "2026-06-27T18:50:42.816226+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "VIGIA-REAL-NARCOS-JOHN-ALT-Day2",
+        "entry_sha256": "f5506199ba845f05e3ea7d154e26a87e77adfb5b9947e7a6d100f0517b10c421",
+        "inputs_summary": {
+          "evidence": "/home/labestiadevigia/Downloads/narcos/John Alt/Day 2/JOHNFLAPTOP-20190130-014821.dmp",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-06-27T18:50:42.816431+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "VIGIA-REAL-NARCOS-JOHN-ALT-Day2",
+        "entry_sha256": "8f5ca0b8545eaf91559c9fa92da623a597ca1be5a4d5131c4aec1a4cb4213eb1",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 0 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "SUSPICION_DETECTED",
+            "best_posterior": "0",
+            "confidence": "0",
+            "is_conclusive": "False",
+            "narrative": "Volatility3 memory analysis: 0 signals from JOHNFLAPTOP-20190130-014821.dmp. Average intentionality score: 0/1. Suspicious activity \u2014 requires human review."
+          },
+          "case_id": "VIGIA-REAL-NARCOS-JOHN-ALT-Day2",
+          "pipeline_meta": {
+            "avg_score": "0",
+            "memory_path": "/home/labestiadevigia/Downloads/narcos/John Alt/Day 2/JOHNFLAPTOP-20190130-014821.dmp",
+            "signal_count": "0",
+            "source": "vol3_memory_adapter",
+            "vol3_binary": "vol3"
+          },
+          "signals": []
+        },
+        "seq": 5,
+        "timestamp": "2026-06-27T18:50:42.820602+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "VIGIA-REAL-NARCOS-JOHN-ALT-Day2",
+        "entry_sha256": "586d0736fef66700aa9cb5f63847c1d27058269a8dd593a553dacff6a2061b2e",
+        "inputs_summary": {
+          "n_signals": "0"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-06-27T18:50:42.820681+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "VIGIA-REAL-NARCOS-JOHN-ALT-Day2",
+        "entry_sha256": "8f3acf6df69def6f576b2b92c5077b9da8e568dffcdecd2cf32b4a5ba4cf4e0c",
+        "inputs_summary": {
+          "verdict": "SUSPICION_DETECTED"
+        },
+        "iteration": 0,
+        "note": "Exit code 0 \u2014 analysis complete.",
+        "outputs_summary": {
+          "exit_code": "0"
+        },
+        "seq": 7,
+        "timestamp": "2026-06-27T18:50:42.820785+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-06-27T18:50:38.720814+00:00",
+    "total_entries": 7
+  },
+  "case_id": "VIGIA-REAL-NARCOS-JOHN-ALT-Day2",
+  "evidence_path": "/home/labestiadevigia/Downloads/narcos/John Alt/Day 2/JOHNFLAPTOP-20190130-014821.dmp",
+  "evidence_sha256": "59f1970b32032eb9a6ba08cbde633042f76fe620d5b4dbfeed9372d068aff240",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-REAL-NARCOS-JOHN-ALT-Day2 ===\nEvidence: /home/labestiadevigia/Downloads/narcos/John Alt/Day 2/JOHNFLAPTOP-20190130-014821.dmp\nEvidence SHA-256: 59f1970b32032eb9a6ba08cbde633042f76fe620d5b4dbfeed9372d068aff240\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: SUSPICION_DETECTED\nPosterior confidence: 0\nConclusive: NO \u2014 requires human review\n\n--- PEIRCEAN NARRATIVE ---\nVolatility3 memory analysis: 0 signals from JOHNFLAPTOP-20190130-014821.dmp. Average intentionality score: 0/1. Suspicious activity \u2014 requires human review.\n\n--- FINAL ALERT LEVEL ---\nLOW \u2014 No significant anomalies detected in this iteration.\n\nCritical signals (z>3): 0\nHigh signals (2<z<=3): 0\nTotal signals analyzed: 0",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "SUSPICION_DETECTED",
+      "best_posterior": "0",
+      "confidence": {
+        "__fraction__": true,
+        "den": 1,
+        "num": 0
+      },
+      "is_conclusive": false,
+      "narrative": "Volatility3 memory analysis: 0 signals from JOHNFLAPTOP-20190130-014821.dmp. Average intentionality score: 0/1. Suspicious activity \u2014 requires human review."
+    },
+    "case_id": "VIGIA-REAL-NARCOS-JOHN-ALT-Day2",
+    "pipeline_meta": {
+      "avg_score": {
+        "__fraction__": true,
+        "den": 1,
+        "num": 0
+      },
+      "memory_path": "/home/labestiadevigia/Downloads/narcos/John Alt/Day 2/JOHNFLAPTOP-20190130-014821.dmp",
+      "signal_count": 0,
+      "source": "vol3_memory_adapter",
+      "vol3_binary": "vol3"
+    },
+    "signals": []
+  },
+  "sans_compliance": {
+    "accuracy_validation": false,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}
