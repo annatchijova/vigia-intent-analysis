@@ -1,0 +1,91 @@
+{
+  "case_id": "VIGIA-REAL-DEFI-DRAIN-001",
+  "case_name": "DeFi Wallet Drainer — trustspendcards.net",
+  "description": "Multi-chain cryptocurrency drainer distributed via paid Instagram ads. Full attacker backend exposed in client-side JS bundle. Carnegie manipulation documented in source code.",
+  "schema_version": "ebs_v1",
+  "expected_verdict": "MALICE",
+  "artifacts": [
+    {
+      "artifact_id": "DRAIN-001-A01",
+      "evidence_type": "document_visual",
+      "description": "JS bundle index-BJT51uc1.js (578KB) contains VITE_DRAINER_SECRET, EVM wallet 0xD4d6A26Dc84516FF9e1AC8837Dd347Ebe5bCb0c7, TRON wallet TSxfbXySDAtoEyDDAHZxYA6X6dY2nB4P29, NowNodes API key fc94c112-d3c2-4202-8f08-e236870e1e4b — all in plaintext. Critical OPSEC failure enabling full forensic reconstruction without wallet interaction.",
+      "raw_score": 0.98,
+      "prior_trust": 0.95,
+      "source_tool": "playwright_cdp_sandbox",
+      "timestamp": "2026-06-21T20:49:00Z",
+      "provenance_chain": ["merabytes_soc_sandbox", "static_analysis_vite_bundle"],
+      "metadata": {
+        "mitre": ["T1583", "T1027"],
+        "carnegie_tactic": "authority_transfer",
+        "carnegie_detail": "disclaimer 'We never access your private keys' embedded in same file that does exactly that",
+        "acquisition_tool": "playwright_cdp_sandbox — static JS bundle capture via Chromium DevTools Protocol",
+        "acquisition_hash": "sha256:drain001_a01_index_BJT51uc1_js_578kb_20260621",
+        "acquisition_timestamp": "2026-06-21T20:49:00Z",
+        "write_blocker_used": false,
+        "examiner_id": "merabytes_soc_sandbox / SOC-2026-DRAIN-001"
+      }
+    },
+    {
+      "artifact_id": "DRAIN-001-A02",
+      "evidence_type": "network_flow",
+      "description": "WalletConnect v2 modal auto-activates on page load. connectWallet() enumerates USDT balances across ETH/BSC/POL/AVAX/ARB/BASE/TRON via NowNodes RPC, then POSTs signed transactions to /api/tron-drain and /api/register-approved authenticated with x-drainer-secret.",
+      "raw_score": 0.97,
+      "prior_trust": 0.95,
+      "source_tool": "playwright_cdp_network_intercept",
+      "timestamp": "2026-06-21T20:48:00Z",
+      "provenance_chain": ["merabytes_soc_sandbox", "cdp_network_intercept"],
+      "metadata": {
+        "mitre": ["T1204.001", "T1566", "T1071.001"],
+        "endpoints": ["/api/tron-drain", "/api/register-approved"],
+        "sign_methods": ["eth_sendTransaction", "personal_sign", "eth_signTypedData"],
+        "chains_targeted": 7,
+        "acquisition_tool": "playwright_cdp_network_intercept — live traffic capture via CDP Network.requestWillBeSent",
+        "acquisition_hash": "sha256:drain001_a02_network_intercept_cdp_20260621",
+        "acquisition_timestamp": "2026-06-21T20:48:00Z",
+        "write_blocker_used": false,
+        "examiner_id": "merabytes_soc_sandbox / SOC-2026-DRAIN-001"
+      }
+    },
+    {
+      "artifact_id": "DRAIN-001-A03",
+      "evidence_type": "cultural_marker",
+      "description": "Active Instagram paid ad campaign (utm_id: 52525097425042) impersonating Trust Wallet VISA USDT Debit Card with real Trust Wallet branding. Facebook Pixel 1695678144955877 tracks victim conversion. Carnegie: social proof via legitimate brand impersonation + paid promotion signal.",
+      "raw_score": 0.92,
+      "prior_trust": 0.90,
+      "source_tool": "playwright_cdp_sandbox",
+      "timestamp": "2026-06-21T20:48:00Z",
+      "provenance_chain": ["merabytes_soc_sandbox", "instagram_ad_capture"],
+      "metadata": {
+        "mitre": ["T1566.002", "T1036"],
+        "carnegie_tactic": "social_proof",
+        "pixel_fb": "1695678144955877",
+        "utm_id": "52525097425042",
+        "acquisition_tool": "playwright_cdp_sandbox — Instagram ad landing page capture with UTM parameter preservation",
+        "acquisition_hash": "sha256:drain001_a03_instagram_ad_utm52525097425042_20260621",
+        "acquisition_timestamp": "2026-06-21T20:48:00Z",
+        "write_blocker_used": false,
+        "examiner_id": "merabytes_soc_sandbox / SOC-2026-DRAIN-001"
+      }
+    },
+    {
+      "artifact_id": "DRAIN-001-A04",
+      "evidence_type": "log_entry",
+      "description": "WalletConnect project ID 5816c5bba147eba277e1575494697210 abused to display legitimate wallet icons and UI, creating false legitimacy signal. explorerapi.walletconnect.com called on page load to populate wallet list.",
+      "raw_score": 0.88,
+      "prior_trust": 0.92,
+      "source_tool": "playwright_cdp_network_intercept",
+      "timestamp": "2026-06-21T20:48:00Z",
+      "provenance_chain": ["merabytes_soc_sandbox", "cdp_network_intercept"],
+      "metadata": {
+        "mitre": ["T1036.005"],
+        "carnegie_tactic": "authority_transfer",
+        "walletconnect_project_id": "5816c5bba147eba277e1575494697210",
+        "acquisition_tool": "playwright_cdp_network_intercept — WalletConnect API call capture via CDP",
+        "acquisition_hash": "sha256:drain001_a04_walletconnect_explorerapi_20260621",
+        "acquisition_timestamp": "2026-06-21T20:48:00Z",
+        "write_blocker_used": false,
+        "examiner_id": "merabytes_soc_sandbox / SOC-2026-DRAIN-001"
+      }
+    }
+  ]
+}
