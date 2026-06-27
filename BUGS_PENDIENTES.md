@@ -710,6 +710,60 @@ Agregar detección de formato antes de invocar Volatility3:
 3. Documentar la limitación en `KNOWN_LIMITATIONS.md` si no se puede resolver
    en el scope actual.
 
+---
+
+## B-017 — `defusedxml` ausente en el venv produce PIPELINE_ERROR silencioso
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | ABIERTO |
+| **Severidad** | P2 — el agente sella el bundle con veredicto `PIPELINE_ERROR` en lugar de abortar con diagnóstico claro |
+| **Archivo** | `vigia/sift/` (orquestador real) — el import de `defusedxml` falla en runtime |
+| **Detectado en** | Sesión 2026-06-27, caso NPS-2010-EMAILS, modo 1 (`vigia_agent.py`) |
+
+### Descripción
+
+Cuando `defusedxml` no está instalado en el venv, el orquestador real falla al importar
+el módulo y lanza la excepción:
+
+```
+FIX P2: defusedxml es obligatorio para protección contra XXE/Billion Laughs.
+Instalar: pip install defusedxml>=0.7.1
+```
+
+El agente captura el error en el bloque `except` del orchestrator shim, emite 0 señales,
+y sella el bundle con `verdict = PIPELINE_ERROR`. El proceso termina con exit code 0 y
+`alert_level = LOW`, lo que enmascara el fallo de infraestructura como si fuera un
+resultado forense válido.
+
+### Impacto
+
+- El bundle queda sellado con `PIPELINE_ERROR` — un veredicto de error de pipeline,
+  no un veredicto forense. Si no se lee el log de ejecución, el resultado parece
+  un NOISE legítimo.
+- El pipeline determinista no procesa ningún artefacto: 0 señales, 0 z-scores.
+  La ausencia de señales no es evidencia de inocencia — es un artefacto del fallo.
+- En un entorno de producción o auditoría, esto podría registrar un "no malicioso"
+  sobre evidencia que nunca fue analizada.
+- `defusedxml` es una dependencia de seguridad obligatoria (protección XXE/Billion
+  Laughs en parsing XML). Su ausencia no es opcional.
+
+### Fix cuando corresponda
+
+1. Agregar `defusedxml>=0.7.1` a `requirements.txt` (y `pyproject.toml` si aplica).
+2. En el arranque del agente (`vigia_agent.py`), verificar que el import de `defusedxml`
+   tenga éxito antes de iniciar el pipeline. Si falla, abortar con exit code ≠ 0 y
+   mensaje explícito — no sellar un bundle con `PIPELINE_ERROR`.
+3. En el orquestador shim, distinguir entre "pipeline ejecutado y produjo 0 señales"
+   (NOISE legítimo) y "pipeline no ejecutado por fallo de dependencia" (error de
+   infraestructura — no emitir veredicto forense).
+
+### Workaround inmediato
+
+```bash
+pip install defusedxml>=0.7.1
+```
+
 ### Vectores descartados como falsos positivos
 
 - **B-009** (floats en vigia_artifact_graph.py): módulo de visualización puro, sin callers en scoring path. float() correcto para cálculos de tamaño de píxeles y pesos de display.
