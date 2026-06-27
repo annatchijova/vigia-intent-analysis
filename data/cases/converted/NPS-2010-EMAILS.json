@@ -1,0 +1,62 @@
+{
+  "case_id": "NPS-2010-EMAILS",
+  "description": "NPS-2010-emails educational forensic corpus. FAT16 E01 disk image containing 26 files with email addresses embedded in 7 application/encoding format families. Created by Simson Garfinkel, Naval Postgraduate School.",
+  "expected_verdict": "NOISE",
+  "expected_confidence": 0.90,
+  "artifacts": [
+    {
+      "id": "FORMAT-001",
+      "evidence_type": "file_metadata",
+      "description": "FAT16 macOS disk image, 10 MB, 26 files, 7 format families. Makefile confirms synthetic construction by Simson Garfinkel (NPS). No actual user data. Educational corpus.",
+      "raw_score": 0.04,
+      "prior_trust": 0.96,
+      "source": "nps-2010-emails.E01 + Makefile",
+      "sha256": "c9ffd969954c2f9b9f97f459916c3d2e8755f596eda952c306ab3f9bc0d43bf1"
+    },
+    {
+      "id": "STRINGS-001",
+      "evidence_type": "file_metadata",
+      "description": "strings output: 9/26 email addresses recovered. 17/26 absent. Recovery gap explained by FlateDecode PDF compression, OOXML ZIP, UTF-16 null bytes, iWork ZIP, nested GZIP/ZIP. Format barriers, not anti-forensics.",
+      "raw_score": 0.06,
+      "prior_trust": 0.94,
+      "source": "nps-2010-emails.strings",
+      "sha256": "07c0fd1c2becfdc4c2bdad23305311908ef5c91912bba5797fc81ddf94c0bd6d"
+    },
+    {
+      "id": "ENTROPY-001",
+      "evidence_type": "file_metadata",
+      "description": "E01 entropy H=7.95 (HIGH). Expected for EWF format compression stacking with compressed file content (OOXML, PDF, iWork, GZIP). OLE .doc entropy H=3.04 (NORMAL). Differential confirms format-driven entropy, not encryption.",
+      "raw_score": 0.05,
+      "prior_trust": 0.95,
+      "source": "calculate_shannon_entropy on E01 and OLE .doc",
+      "sha256": "c9ffd969954c2f9b9f97f459916c3d2e8755f596eda952c306ab3f9bc0d43bf1"
+    },
+    {
+      "id": "ENCODING-001",
+      "evidence_type": "file_metadata",
+      "description": "UTF-16 LE encoding confirmed (BOM ff fe on document3.txt). Null bytes between characters break strings default ASCII detection. Standard macOS TextEdit encoding. Recoverable via strings -e l or iconv.",
+      "raw_score": 0.03,
+      "prior_trust": 0.97,
+      "source": "hex inspection of document3.txt + iconv verification",
+      "sha256": "bf22eb2accbd5b54928f016e2d9d1ddd95d96b4e0cd2b5014021ab5d1bb808e6"
+    },
+    {
+      "id": "OLE-001",
+      "evidence_type": "file_metadata",
+      "description": "OLE .doc and .xls files: email addresses recoverable by strings. H=3.04. Uncompressed binary compound storage. user_doc@microsoftword.com appears twice (HYPERLINK field + body text). xls_cell and xls_comment also recovered. Consistent with OLE format specification.",
+      "raw_score": 0.04,
+      "prior_trust": 0.96,
+      "source": "search_pattern on nps-2010-emails.strings + entropy",
+      "sha256": "07c0fd1c2becfdc4c2bdad23305311908ef5c91912bba5797fc81ddf94c0bd6d"
+    },
+    {
+      "id": "CORPUS-001",
+      "evidence_type": "cryptographic_hash",
+      "description": "4 artifact hashes stable. E01=c9ffd969, strings=07c0fd1c, txt=bf22eb2a, zip=94d84f69. Chain of custody intact. No tampering detected. Educational corpus from NPS consistent with known distribution.",
+      "raw_score": 0.02,
+      "prior_trust": 0.98,
+      "source": "generate_forensic_hash (MCP) + sha256sum",
+      "sha256": "c9ffd969954c2f9b9f97f459916c3d2e8755f596eda952c306ab3f9bc0d43bf1"
+    }
+  ]
+}
