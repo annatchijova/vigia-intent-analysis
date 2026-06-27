@@ -1,0 +1,281 @@
+{
+  "analysis_timestamp": "2026-06-27T17:57:20.924741+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "VIGIA-REAL-NARCOS-JOHN-ALT-DAY2",
+    "end_time": "2026-06-27T17:57:20.924748+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "VIGIA-REAL-NARCOS-JOHN-ALT-DAY2",
+        "entry_sha256": "1bf68c4baafeadbd9fa67efa20cd846c0c24b8715c2ca733b3ad81293b4b53c1",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "VIGIA-REAL-NARCOS-JOHN-ALT-DAY2"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: 95f2da2a3bdcb4ca...",
+        "outputs_summary": {
+          "agent_sha256": "95f2da2a3bdcb4ca106059e2b06f58fd0ec414c887fec07ac7a0d5edfeb097a1",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-06-27T17:56:23.592748+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-REAL-NARCOS-JOHN-ALT-DAY2",
+        "entry_sha256": "c6aeb2c2849ede3b7bf55f66a4bb84130f841a64e6bc535ec27dec037d605d1e",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/Downloads/narcos/John Alt/Day 2/JOHNFLAPTOP-20190130-014821.dmp"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-06-27T17:56:23.592839+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-REAL-NARCOS-JOHN-ALT-DAY2",
+        "entry_sha256": "a55d7157ec7debeb1c1dbf6170b833f14e334c1e17a9de34f023713326949363",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/Downloads/narcos/John Alt/Day 2/JOHNFLAPTOP-20190130-014821.dmp"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: 59f1970b32032eb9...",
+        "outputs_summary": {
+          "sha256": "59f1970b32032eb9a6ba08cbde633042f76fe620d5b4dbfeed9372d068aff240"
+        },
+        "seq": 3,
+        "timestamp": "2026-06-27T17:56:27.187577+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "VIGIA-REAL-NARCOS-JOHN-ALT-DAY2",
+        "entry_sha256": "330323efc0ef27eebaf848967fa399633dffaefd84fc85198791c168946ed25a",
+        "inputs_summary": {
+          "evidence": "/home/labestiadevigia/Downloads/narcos/John Alt/Day 2/JOHNFLAPTOP-20190130-014821.dmp",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-06-27T17:56:27.187786+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "VIGIA-REAL-NARCOS-JOHN-ALT-DAY2",
+        "entry_sha256": "3c6998426e945ee1fc91312a1aa1de7d2438fa42f41f8490e1a6e27d6cfde2e8",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 3 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+            "best_posterior": "4/25",
+            "confidence": "4/25",
+            "is_conclusive": "False",
+            "narrative": "Volatility3 memory analysis: 3 signals from JOHNFLAPTOP-20190130-014821.dmp. Average intentionality score: 4/5. Malicious activity indicated."
+          },
+          "case_id": "VIGIA-REAL-NARCOS-JOHN-ALT-DAY2",
+          "pipeline_meta": {
+            "avg_score": "4/5",
+            "memory_path": "/home/labestiadevigia/Downloads/narcos/John Alt/Day 2/JOHNFLAPTOP-20190130-014821.dmp",
+            "signal_count": "3",
+            "source": "vol3_memory_adapter",
+            "vol3_binary": "/home/labestiadevigia/vigia-repo/.venv/bin/vol"
+          },
+          "signals": [
+            {
+              "confidence": "9/10",
+              "description": "Windows OS profile identified from memory image",
+              "detail": "Volatility 3 Framework 2.28.0\n\nVariable\tValue\n\nKernel Base\t0xf800b3a0b000\nDTB\t0x1ad000\nSymbols\tfile:///home/labestiadevigia/vigia-repo/.venv/lib/python3.12/site-packages/volatility3/symbols/windows/nt...",
+              "evidence_type": "memory_os_profile",
+              "source": "vol3.windows.info",
+              "z_score": "1/2"
+            },
+            {
+              "confidence": "3/5",
+              "description": "Process list analyzed \u2014 no obvious LOLBAS processes",
+              "evidence_type": "memory_process",
+              "source": "vol3.windows.pslist",
+              "z_score": "1/10"
+            },
+            {
+              "confidence": "4/5",
+              "description": "5 established connections to external IPs",
+              "detail": "0xe30b79008010\tTCPv4\t202.2.12.15\t50111\t202.2.12.14\t4782\tESTABLISHED\t-\t-\tN/A\n0xe30b7ba06cc0\tTCPv4\t202.2.12.15\t49766\t104.16.59.37\t443\tESTABLISHED\t-\t-\tN/A\n0xe30b7bc6b810\tTCPv4\t202.2.12.15\t52730\t204.79.19...",
+              "evidence_type": "network_flow",
+              "source": "vol3.windows.netscan",
+              "z_score": "9/5"
+            }
+          ]
+        },
+        "seq": 5,
+        "timestamp": "2026-06-27T17:57:20.886251+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "VIGIA-REAL-NARCOS-JOHN-ALT-DAY2",
+        "entry_sha256": "0a91ea0b6af4e94cb32ebb214a7adfa9f000302e5668d2071956058000b7595d",
+        "inputs_summary": {
+          "n_signals": "3"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-06-27T17:57:20.886392+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "VIGIA-REAL-NARCOS-JOHN-ALT-DAY2",
+        "entry_sha256": "0f3672b966d791fb6417214fd753906c403e9a91c784f66d5f1c2c05535908b7",
+        "inputs_summary": {
+          "verdict": "MALICIOUS_INTENT_DETECTED"
+        },
+        "iteration": 0,
+        "note": "Exit code 1 \u2014 analysis complete.",
+        "outputs_summary": {
+          "exit_code": "1"
+        },
+        "seq": 7,
+        "timestamp": "2026-06-27T17:57:20.886595+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-06-27T17:56:23.592483+00:00",
+    "total_entries": 7
+  },
+  "case_id": "VIGIA-REAL-NARCOS-JOHN-ALT-DAY2",
+  "evidence_path": "/home/labestiadevigia/Downloads/narcos/John Alt/Day 2/JOHNFLAPTOP-20190130-014821.dmp",
+  "evidence_sha256": "59f1970b32032eb9a6ba08cbde633042f76fe620d5b4dbfeed9372d068aff240",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-REAL-NARCOS-JOHN-ALT-DAY2 ===\nEvidence: /home/labestiadevigia/Downloads/narcos/John Alt/Day 2/JOHNFLAPTOP-20190130-014821.dmp\nEvidence SHA-256: 59f1970b32032eb9a6ba08cbde633042f76fe620d5b4dbfeed9372d068aff240\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 4/25\nConclusive: NO \u2014 requires human review\n\n--- PEIRCEAN NARRATIVE ---\nVolatility3 memory analysis: 3 signals from JOHNFLAPTOP-20190130-014821.dmp. Average intentionality score: 4/5. Malicious activity indicated.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [5 established connections to external IPs] z=1.800 conf=0.80 \u2014 0xe30b79008010\tTCPv4\t202.2.12.15\t50111\t202.2.12.14\t4782\tESTABLISHED\t-\t-\tN/A\n0xe3\n  [Windows OS profile identified from memory image] z=0.500 conf=0.90 \u2014 Volatility 3 Framework 2.28.0\n\nVariable\tValue\n\nKernel Base\t0xf800b3a0b000\nDTB\t0x\n  [Process list analyzed \u2014 no obvious LOLBAS processes] z=0.100 conf=0.60 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW \u2014 No significant anomalies detected in this iteration.\n\nCritical signals (z>3): 0\nHigh signals (2<z<=3): 0\nTotal signals analyzed: 3",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+      "best_posterior": "4/25",
+      "confidence": {
+        "__fraction__": true,
+        "den": 25,
+        "num": 4
+      },
+      "devil_advocate": {
+        "aggregation": {
+          "k": 3,
+          "method": "top_k_already_validated_matches_v2",
+          "total_gap_mass": "0"
+        },
+        "counterfactual_summary": {
+          "primary_alternative_hypothesis": null
+        },
+        "decision_context": {
+          "confidence": "4/25",
+          "mapped_verdict": "MALICIOUS_INTENT_DETECTED",
+          "raw_verdict": "MALICIOUS_INTENT_DETECTED",
+          "score": {
+            "__fraction__": true,
+            "den": 5,
+            "num": 4
+          }
+        },
+        "devil_advocate_source": "deterministic_no_pattern_data_available",
+        "meta": {
+          "deterministic": true,
+          "generated_from": "case_pattern_library"
+        },
+        "narrative": "Eco's Razor (Abductive Falsification) applied to verdict MALICIOUS_INTENT_DETECTED. Pattern-matching data was not available on this code path \u2014 CasePatternLibrary is not invoked here by design (agent audit-trail mode (vigia_agent.py \u2014 JSON-replay / autonomous path); see KNOWN_LIMITATIONS.md). No structured counter-hypothesis could be derived deterministically. This is a documented scope limitation of the current code path, not an absence of falsification attempt.",
+        "pattern_evidence_gaps": [],
+        "version": "r7-da-v1"
+      },
+      "is_conclusive": false,
+      "narrative": "Volatility3 memory analysis: 3 signals from JOHNFLAPTOP-20190130-014821.dmp. Average intentionality score: 4/5. Malicious activity indicated."
+    },
+    "case_id": "VIGIA-REAL-NARCOS-JOHN-ALT-DAY2",
+    "pipeline_meta": {
+      "avg_score": {
+        "__fraction__": true,
+        "den": 5,
+        "num": 4
+      },
+      "memory_path": "/home/labestiadevigia/Downloads/narcos/John Alt/Day 2/JOHNFLAPTOP-20190130-014821.dmp",
+      "signal_count": 3,
+      "source": "vol3_memory_adapter",
+      "vol3_binary": "/home/labestiadevigia/vigia-repo/.venv/bin/vol"
+    },
+    "signals": [
+      {
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 9
+        },
+        "description": "Windows OS profile identified from memory image",
+        "detail": "Volatility 3 Framework 2.28.0\n\nVariable\tValue\n\nKernel Base\t0xf800b3a0b000\nDTB\t0x1ad000\nSymbols\tfile:///home/labestiadevigia/vigia-repo/.venv/lib/python3.12/site-packages/volatility3/symbols/windows/ntkrnlmp.pdb/70E00AFDD91A4141A2EBD2A459533D65-1.json.xz\nIs64Bit\tTrue\nIsPAE\tFalse\nlayer_name\t0 WindowsI",
+        "evidence_type": "memory_os_profile",
+        "source": "vol3.windows.info",
+        "z_score": {
+          "__fraction__": true,
+          "den": 2,
+          "num": 1
+        }
+      },
+      {
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 3
+        },
+        "description": "Process list analyzed \u2014 no obvious LOLBAS processes",
+        "evidence_type": "memory_process",
+        "source": "vol3.windows.pslist",
+        "z_score": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 1
+        }
+      },
+      {
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 4
+        },
+        "description": "5 established connections to external IPs",
+        "detail": "0xe30b79008010\tTCPv4\t202.2.12.15\t50111\t202.2.12.14\t4782\tESTABLISHED\t-\t-\tN/A\n0xe30b7ba06cc0\tTCPv4\t202.2.12.15\t49766\t104.16.59.37\t443\tESTABLISHED\t-\t-\tN/A\n0xe30b7bc6b810\tTCPv4\t202.2.12.15\t52730\t204.79.197.200\t443\tESTABLISHED\t-\t-\tN/A\n0xe30b7bc7fcc0\tTCPv4\t202.2.12.15\t49699\t40.90.190.179\t443\tESTABLISHED\t-\t-\tN/A\n0xe30b7d68cad0\tTCPv4\t202.2.12.15\t52734\t13.107.3.254\t443\tESTABLISHED\t-\t-\tN/A",
+        "evidence_type": "network_flow",
+        "source": "vol3.windows.netscan",
+        "z_score": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 9
+        }
+      }
+    ]
+  },
+  "sans_compliance": {
+    "accuracy_validation": false,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}
