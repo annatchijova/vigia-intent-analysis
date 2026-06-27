@@ -5,67 +5,6 @@ Batch ID: vigia-doc-0172-26dcd8ee
 Generated: 2026-05-20T14:56:47.881842+00:00
 -->
 
-ENGLISH:
-- What Is This Module?: A standardized envelope (contract) that every forensic instrument in the VIGÍA system must use to report its findings. It guarantees that the LikelihoodEngine—the system's inference core—receives data in a single, predictable format. Without this contract, the chain of custody from evidence to statistical inference breaks, making conclusions inadmissible under Daubert standards. It is a deterministic, integer-arithmetic gateway between raw digital artifacts and probabilistic reasoning.
-- Key Concepts table:
-  | Concept | Role | Determinism Guarantee |
-  | SignalOutput | Immutable transfer object carrying a tool's measurement | Fields are set once; no LLM mutation |
-  | SignalBuilder | Factory that validates and assembles SignalOutput | Defensive checks prevent malformed entries |
-  | Evidence Layer | Stage where tools (SDA, CLI, GCI, ACP) run | No LLM involvement; exact integer arithmetic |
-  | Inference Layer | LikelihoodEngine consumes SignalOutput | Receives standardized numeric input |
-  | Report Layer | Narrative generation | LLM only sees final numeric result; cannot alter evidence |
-  | ENFSI Scale | Verbal translation of Likelihood Ratio | Deterministic mapping table |
-  | from_raw / from_z_score | Construction methods | Exact deterministic formulas |
-  | Pydantic / dataclass | Validation backend | Schema enforcement regardless of backend |
-- Glossary:
-  - SignalOutput: The standardized container.
-  - SignalBuilder: The factory.
-  - LikelihoodEngine: The inference core.
-  - ENFSI: European Network of Forensic Science Institutes verbal scale.
-  - Daubert: Standard for admissible scientific evidence.
-  - SDA / CLI / GCI / ACP: Forensic tool modules.
-  - z-score: Deterministic standardized measure derived from exact integer offsets.
-  - Evidence Layer: The deterministic extraction stage.
-  - Report Layer: The narrative stage.
-  - Contract: Interface specification ensuring interoperability.
-- Scientific Note:
-  【Scientific Note】
-  Terminology inspired by Peirce (theory of signs), Eco (codes of interpretation), and Grice (cooperative communication) is used in VIGÍA to describe how a forensic tool transforms a digital trace into a structured sign. This is not mysticism. Think of a digital sensor: a thermocouple converts heat into voltage according to a physical contract. The voltage is not an opinion; it is a signal. Likewise, SignalOutput is the voltage reading of a forensic sensor. Peirce's semiotics explains *why* the reading stands for something else (the artifact); Eco explains *how* the code (the contract) makes the reading interpretable; Grice explains *what* the tool cooperatively must disclose for the inference engine to understand. The contract removes ambiguity, exactly as a calibrated sensor removes guesswork from a laboratory measurement.
-
-ESPAÑOL:
-- Similar structure. Use "módulo", "contrato de señales".
-- Key terms: Señal (Signal), Capa de Evidencia, Capa de Inferencia, Capa de Informe.
-- Glossary: same concepts.
-- Scientific Note: analogía del sensor. No es mistisismo. Peirce, Eco, Grice.
-- License line in each section or just once? The requirement says "License line: ...". Usually put at the end of doc. But to be safe, I can put it at the bottom of each section or once globally. The prompt says "Each section must include..." but the license line is a separate requirement. I will include the license line at the very end of the document, or perhaps at the end of each section to be safe. Given it's a single module doc, one license block at the end is standard, but the prompt lists it as requirement #5 without specifying once or per section. I'll put it once at the bottom, clearly marked. Actually, to ensure compliance with "Each section must include" (which lists 4 bullet points) and requirement 5 is separate, I'll include the license line once at the end of the markdown. But to be extra safe, I'll append it to each section? That might be cluttered. Let's put a global license footer. No, re-reading: "5. License line: ''" This likely applies to the document. I'll place it at the very bottom. But since the user might want it visible, I'll put it as a footer under each language section? Let's do a single footer after all sections. Actually, standard practice in multi-language docs is to put license once. I'll put it once.
-
-РУССКИЙ:
-- "Что представляет собой этот модуль?"
-- Key concepts: Контракт сигналов (Signal Contract), Уровень доказательств (Evidence Layer), Уровень инференса (Inference Layer), etc.
-- Glossary: appropriate translations.
-- Scientific Note: Пирс, Эко, Грайс. Аналогия с датчиком.
-- Deterministic integer arithmetic: "целочисленная арифметика" (integer arithmetic), "детерминированные вычисления".
-
-中文:
-- 模块路径：vigia/tools/signal_contract.py
-- What Is This Module?: 此模块是什么？
-- Key concepts: 信号输出 (SignalOutput), 信号构建器 (SignalBuilder), 证据层 (Evidence Layer), 推断层 (Inference Layer), 报告层 (Report Layer), ENFSI量表, 原始值转换 (from_raw), Z分数封装 (from_z_score).
-- Glossary: 取证工件 (forensic artifact), 逻辑断裂 (logical break), 艾柯, 格赖斯, etc.
-- Scientific Note: 【科学说明】
-  VIGÍA 系统借用了皮尔斯（符号学）、艾柯（诠释代码）与格赖斯（合作原则）的术语，用以描述取证工具如何将数字痕迹转化为结构化信号。这并非神秘主义。请想象一枚数字传感器：热电偶依据物理契约将热量转换为电压。电压不是观点，而是信号。同理，SignalOutput 就是取证传感器发出的“电压读数”。皮尔斯解释了该读数为何能代表另一事物（取证工件）；艾柯解释了契约代码如何使该读数可被解读；格赖斯解释了工具必须合作性地披露哪些信息，以便推断引擎理解。该契约消除了歧义，正如校准过的传感器消除了实验测量中的猜测。
-- Terms check: 艾柯, 格赖斯, 取证工件, 逻辑断裂.
-- Use 逻辑断裂 in the "What Is This Module?" or glossary to describe what happens without the contract. E.g., "没有此契约，证据层与推断层之间会出现逻辑断裂".
-
-Need to ensure no floating-point math explanations.
-- When describing z_score, say it is a deterministic standardized index computed via exact rational transformation from integer offsets, not "floating point division".
-- When describing from_raw, mention it uses deterministic integer arithmetic to normalize inputs before wrapping them into the contract.
-- Avoid terms like "float", "double", "rounding", "precision loss".
-- Emphasize that the contract mandates exact numeric pathways.
-
-Let's refine the content.
-
-ENGLISH Section:
-
 ## ENGLISH
 
 ### What Is This Module?
@@ -107,8 +46,6 @@ Terminology inspired by **Peirce** (semiotics), **Eco** (codes of interpretation
 Consider a laboratory sensor: a thermocouple converts thermal energy into voltage according to a physical contract. The voltage reading is not an opinion; it is a signal. `SignalOutput` is the voltage reading of a forensic sensor. Peirce explains *why* the reading stands for something else (the underlying digital artifact); Eco explains *how* the contractual code makes that reading interpretable by the LikelihoodEngine; Grice explains *what* the tool must cooperatively disclose so that the inference engine is not misled. The contract removes ambiguity exactly as a calibrated sensor removes guesswork from measurement.
 
 ---
-
-ESPAÑOL Section:
 
 ## ESPAÑOL
 
@@ -152,8 +89,6 @@ Considere un sensor de laboratorio: un termopar convierte energía térmica en v
 
 ---
 
-РУССКИЙ Section:
-
 ## РУССКИЙ
 
 ### Что представляет собой этот модуль?
@@ -196,8 +131,6 @@ Considere un sensor de laboratorio: un termopar convierte energía térmica en v
 
 ---
 
-中文 Section:
-
 ## 中文
 
 ### 此模块是什么？
@@ -228,7 +161,7 @@ Considere un sensor de laboratorio: un termopar convierte energía térmica en v
 - **Daubert**：要求专家证言具备科学可靠性与相关性的法律标准。信号契约的破坏将导致无法符合该标准。
 - **SDA / CLI / GCI / ACP**：VIGÍA 内部的取证子工具。各工具产生的原始测量值都必须被封装为 `SignalOutput`。
 - **z-score（标准分数）**：一种确定性标准化指数，表示观测值与基线均值之间相差多少个整数标准差。
-- **ENFSI 量表**：七级言语量表（例如“有限支持”“中等强度支持”），由似然比经确定性映射得到。
+- **ENFSI 量表**：七级言语量表（例如"有限支持""中等强度支持"），由似然比经确定性映射得到。
 - **证据层**：确定性、无 LLM 参与的层级，原始观测值在此被转化为信号。
 - **报告层**：自然语言报告生成层级，严格位于数值推断完成之后。
 - **逻辑断裂**：由不合规数据格式导致的保管链条中断。
@@ -236,25 +169,8 @@ Considere un sensor de laboratorio: un termopar convierte energía térmica en v
 ### 【科学说明】
 VIGÍA 借用**皮尔斯**（符号学）、**艾柯**（诠释代码）与**格赖斯**（合作原则）的术语，来描述取证工具如何将数字痕迹转化为结构化符号。这并非神秘主义。
 
-请设想一枚实验室传感器：热电偶依据物理契约将热能转换为电压。电压读数不是主观意见，而是信号。`SignalOutput` 就是取证传感器的“电压读数”。皮尔斯解释了该读数为何能够代表另一事物（其背后的取证工件）；艾柯解释了契约编码如何使该读数对 LikelihoodEngine 而言可被解读；格赖斯解释了工具必须合作性地披露哪些信息，以免推断引擎受到误导。该契约消除了歧义，正如经过校准的传感器消除了实验测量中的猜测。
+请设想一枚实验室传感器：热电偶依据物理契约将热能转换为电压。电压读数不是主观意见，而是信号。`SignalOutput` 就是取证传感器的"电压读数"。皮尔斯解释了该读数为何能够代表另一事物（其背后的取证工件）；艾柯解释了契约编码如何使该读数对 LikelihoodEngine 而言可被解读；格赖斯解释了工具必须合作性地披露哪些信息，以免推断引擎受到误导。该契约消除了歧义，正如经过校准的传感器消除了实验测量中的猜测。
 
 ---
 
-License line at the bottom.
-
-Need to check:
-- Chinese: 艾柯 used, 格赖斯 used, 取证工件 used (in Glossary/Concepts? Yes, I used "取证工件" in the first paragraph. Let's double-check: "原始数字取证工件" — yes). 逻辑断裂 used — yes.
-- No floating-point math: I used "integer arithmetic", "rational observation", "exact integer offsets", "deterministic standardized index". No mention of float, double, IEEE 754, rounding errors.
-- Scientific note uses sensor analogy and mentions Peirce/Eco/Grice.
-- License line included.
-- Format is Markdown.
-- What Is This Module? included in each.
-- Key concepts with tables included in each.
-- Glossary included in each.
-- Scientific Note box included in each.
-
-One concern: The user wrote the module path as `vigia/tools/signal_contract.py` but the docstring says `vigia/core/signal_contract.py`. I should probably mention the path as given in the prompt: `vigia/tools/signal_contract.py`, but note the docstring. Or just stick to the user-provided path. I'll use `vigia/tools/signal_contract.py` as the primary path but mention the docstring namespace `vigia.core.signal_contract` maybe not necessary to avoid confusion. I'll just use the path provided in the prompt's title.
-
-Also, the user listed constants `_PYDANTIC_AVAILABLE` twice. I
----
 *Licensed under the Apache License, Version 2.0. Copyright 2026 Anna Tchijova.*

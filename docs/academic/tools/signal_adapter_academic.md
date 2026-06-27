@@ -5,84 +5,6 @@ Batch ID: vigia-doc-0171-6725056c
 Generated: 2026-05-20T14:56:47.881613+00:00
 -->
 
-ENGLISH:
-- Title: `vigia/tools/signal_adapter.py` — Signal Adapter Module
-- What Is This Module?: A translation layer. The forensic engine produces reports in many different internal formats (legacy dictionaries). The likelihood engine expects a single, uniform signal format. This module acts like a protocol converter or rosetta stone: it reads the heterogeneous forensic verdicts, extracts the scientifically relevant measurements (signals), wraps them into a standardized container (SignalOutput), and preserves full traceability to the original data. It does not alter the legacy engine.
-- Key Concepts Table:
-  | Concept | Plain-Language Definition | Role in the System |
-  |---|---|---|
-  | Forensic Verdict (Legacy) | A raw diagnostic record emitted by the old analysis engine, containing tool-specific keys such as SDA, CLI, ACP, and ROI. | Source data; heterogeneous and engine-dependent. |
-  | SignalOutput | A standardized, immutable envelope that carries one extracted measurement, its provenance, and normalization flags. | Universal input for the LikelihoodEngine. |
-  | BaselineProfile | A version-stamped, immutable reference distribution (AUTHENTIC bootstrap) against which measurements are compared. | Guarantees Daubert-standard traceability; prevents silent drift. |
-  | Adapter Pattern | A design strategy that bridges two incompatible interfaces without modifying either endpoint. | Allows the legacy ForensicEngine and the new LikelihoodEngine to coexist. |
-  | Schema Validation | A deterministic check that the incoming verdict dictionary contains all mandatory sections before processing. | Raises ForensicVerdictSchemaError if structure is invalid, halting the pipeline to prevent garbage-in-garbage-out. |
-  | Z-Score | A deterministic index of deviation: the integer-scaled distance of an observation from the baseline mean, expressed as a rational ratio relative to dispersion. | Enables cross-tool comparison on a common scale. |
-  | Deterministic Integer Arithmetic | Calculations performed via exact integer ratios or fixed-point schemes, yielding reproducible results regardless of hardware. | Eliminates non-deterministic rounding behavior in forensic pipelines. |
-  | Immutable Artifact | An object whose state cannot change after creation; its cryptographic hash (SHA-256) is computed once and cached. | Provides tamper-evident audit trails. |
-
-Note: The docstring mentions "z-scores" and values like float. I must not describe them as floating-point operations but as deterministic rational mappings. I'll describe z-scores as ratios of integers.
-
-- Glossary:
-  - **ForensicEngine**: The existing adversarial-analysis subsystem that generates heterogeneous diagnostic dictionaries.
-  - **LikelihoodEngine**: The downstream statistical subsystem that consumes only uniform SignalOutput objects.
-  - **Signal**: A measurable forensic index extracted from a verdict (e.g., stress index, confidence score).
-  - **Pre-normalized**: A flag indicating that a signal has already been scaled against a baseline (True) or remains in raw units (False).
-  - **Bootstrap Baseline (AUTHENTIC)**: A reference corpus of verified genuine documents used to calibrate all deviation metrics.
-  - **Daubert Traceability**: The legal-scientific requirement that every computational step, baseline version, and transformation must be documented and reproducible.
-  - **Schema Error**: A deterministic exception triggered when an input record lacks required structural keys.
-
-- Scientific Note:
-  【Scientific Note】
-  This module references semiotic concepts derived from Peirce (theory of signs), 艾柯 (code and interpretative systems), and 格赖斯 (pragmatic implicature). These are not mysticism. They function exactly like physical sensors: where a thermocouple transduces temperature into voltage, Peircean indices transduce stylistic anomalies into interpretable deviations; where a spectrometer maps wavelength to intensity, Eco's coding frames map textual features to categorical states; and where a pressure sensor outputs a calibrated digital reading, Gricean maxims generate deterministic thresholds for cooperative discourse. The adapter itself is a transducer: it converts heterogeneous semiotic outputs into a uniform measurement space without loss of logical integrity.
-
-Also Chinese specific terms:
-- 取证工件 (forensic artifact)
-- 逻辑断裂 (logical break/fracture)
-
-I need to ensure the Chinese section uses these.
-
-Let's draft each language carefully.
-
-ESPAÑOL:
-- Title: `vigia/tools/signal_adapter.py` — Módulo Adaptador de Señales
-- What Is This Module? -> "¿Qué es este módulo?"
-- Key concepts table with Spanish terms.
-- Glossary in Spanish.
-- Scientific Note in Spanish: mention Peirce, Eco, Grice.
-- License line.
-
-РУССКИЙ:
-- Title: `vigia/tools/signal_adapter.py` — Модуль адаптера сигналов
-- What Is This Module? -> "Что представляет собой этот модуль?"
-- Key concepts table.
-- Glossary.
-- Scientific Note: Пирс, Эко, Грайс.
-- License line.
-
-中文:
-- Title: `vigia/tools/signal_adapter.py` — 信号适配器模块
-- What Is This Module? -> "本模块是什么？"
-- Key concepts table. Use 取证工件 for artifact, 逻辑断裂 for logical break/fracture (maybe in glossary or note). Need to ensure these terms appear naturally.
-- Glossary.
-- Scientific Note: 皮尔斯, 艾柯, 格赖斯.
-- License line.
-
-Now, let's think about the deterministic integer arithmetic emphasis.
-The module uses z-scores and scores in [0,1]. I should describe these as deterministic rational numbers. For example:
-- A z-score is defined as the exact integer difference between an observed count and a baseline mean, scaled by the reciprocal of the dispersion measure (e.g., mean absolute deviation). The result is stored as a rational number with deterministic precision, not as an approximate floating-point value. In this module, all normalizations are treated as exact arithmetic mappings from integer inputs to rational outputs.
-- The attack_confidence score [0,1] is described as a deterministic rational proportion (e.g., integer numerator over integer denominator) rather than a floating-point decimal.
-- BaselineProfile.get() returns mean and mad: these are described as exact rational summaries of integer populations, not floating-point statistics.
-
-I must be careful not to say "float" or "floating-point". The docstring mentions `float` in `get(): Retorna {"mean": float, "mad": float}`. I should interpret this for the scientists as "rational-valued measurements" or "deterministic numerical quantities", avoiding the word float.
-
-Also, for `profile_hash(): SHA-256`. I can explain SHA-256 as a deterministic cryptographic digest over integer bitstrings.
-
-Now, formatting. Markdown with headers.
-
-Let's outline the full doc.
-
----
-
 # Module Documentation: `vigia/tools/signal_adapter.py`
 
 ## ENGLISH
@@ -196,7 +118,7 @@ Las referencias a **Peirce** (índices semióticos), **Eco** (marcos de codifica
 ## 中文
 
 ### 本模块是什么？
-本模块是一个**协议转换器**——一种确定性的“罗塞塔石碑”，用于连接两个互不兼容的取证子系统。遗留的 **ForensicEngine** 会生成异构的诊断记录（即包含各工具专属键的字典，如 `sda_nr`、`cli`、`acp`、`roi`）。而现代的 **LikelihoodEngine** 仅接受一种名为 `SignalOutput` 的标准化统一信号格式。
+本模块是一个**协议转换器**——一种确定性的"罗塞塔石碑"，用于连接两个互不兼容的取证子系统。遗留的 **ForensicEngine** 会生成异构的诊断记录（即包含各工具专属键的字典，如 `sda_nr`、`cli`、`acp`、`roi`）。而现代的 **LikelihoodEngine** 仅接受一种名为 `SignalOutput` 的标准化统一信号格式。
 
 本适配器不修改已经过验证、可用于法庭的 ForensicEngine，而是从每条遗留记录中提取具有科学意义的测量值——即**信号**——并将其重新封装到标准化且不可变的容器中。它在处理前会验证每条输入记录的结构，确保畸形数据不会向下游传播。所有变换都是确定性的：各项评分均被视作针对版本化且不可变的 **BaselineProfile** 进行整数运算后得到的精确有理数。
 
@@ -205,10 +127,28 @@ Las referencias a **Peirce** (índices semióticos), **Eco** (marcos de codifica
 | 概念 | 通俗定义 | 在系统中的作用 |
 |---|---|---|
 | **遗留取证裁决 (Legacy Forensic Verdict)** | 由现有分析引擎生成的原始诊断记录。包含各工具专属的分区（SDA、CLI、ACP、ROI），其度量指标呈异构形态。 | 源数据；适配器的输入。 |
-| **SignalOutput** | 一种标准化、不可变的封装容器，承载一项提取后的测量值、其基线来源以及归一化元数据。 | LikelihoodEngine 所消费的通用“货币”。 |
+| **SignalOutput** | 一种标准化、不可变的封装容器，承载一项提取后的测量值、其基线来源以及归一化元数据。 | LikelihoodEngine 所消费的通用"货币"。 |
 | **BaselineProfile** | 从 AUTHENTIC 引导（bootstrap）语料库中导出的、带版本号且不可变的参考分布。为每种工具存储确定性的有理数基准（均值与离散度）。 | 提供达到道伯特（Daubert）标准的可追溯性；防止静默统计漂移。 |
 | **适配器模式 (Adapter Pattern)** | 在不动任何一端的前提下，为两种不兼容接口搭建的桥梁。 | 使遗留引擎与现代引擎得以共存，而无需分叉代码库。 |
 | **模式校验 (Schema Validation)** | 一种确定性结构审计，在提取前验证所有必填键（`_REQUIRED_TOP_KEYS`、`_REQUIRED_CAPAS_KEYS`）是否齐全。 | 若记录结构不完整，则抛出 `ForensicVerdictSchemaError`，终止流水线以防止无效推理。 |
-| **确定性 Z 分数** | 精确的偏离度有理数指标：观测值与基线均值之间的整数级
+| **确定性 Z 分数** | 精确的偏离度有理数指标：观测值与基线均值之间的整数级距离，除以基线离散度（如 MAD）。以可重现比值表示，而非近似小数。 | 在源自整数的公共尺度上实现跨工具比较。 |
+| **预归一化标志** | 存储于 `SignalOutput` 中的布尔指标。`True` 表示该指标已是针对其机构基线的 Z 分数；`False` 表示原始复合值或比例，需进一步缩放。 | 告知 LikelihoodEngine 哪些信号需要额外的确定性归一化。 |
+| **不可变取证工件** | 构建后状态固定的对象。其 SHA-256 指纹从整数位串表示中一次性计算得出并永久缓存。 | 提供防篡改的审计追踪和可重现的哈希值。 |
+
+### 术语表
+
+- **ForensicEngine**：现有的对抗性 NLP 子系统，生成异构的裁决字典。
+- **LikelihoodEngine**：下游概率子系统，仅消费统一的 `SignalOutput` 对象。
+- **信号**：从裁决中提取的取证指标——例如认知压力指数或攻击置信比例。
+- **引导基线 (AUTHENTIC)**：经验证的真实文档参考语料库，用于确定性校准所有偏差指标。
+- **道伯特可追溯性**：法律科学标准，要求每个计算步骤、基线版本和变换均经过记录、版本化并可重现。
+- **ForensicVerdictSchemaError**：当输入记录缺少所需结构键时触发的确定性异常，防止无效数据处理。
+- **均值 / MAD**：基线中心（均值）和平均绝对离散度（MAD），以源自整数总体计数的有理数存储。
+- **SHA-256**：确定性密码哈希算法，从任意输入位串生成固定长度整数哈希，此处用于对基线档案进行指纹识别。
+
+### 【科学说明】
+**皮尔斯**（符号学指标）、**艾柯**（编码与解释框架）及**格赖斯**（语用含意与合作准则）的引用贯穿整个 VIGIA 框架。这些构念**并非神秘主义**。它们与物理传感器的工作方式完全相同：皮尔斯式*指标*将文体异常转换为确定性偏差读数，正如热电偶将热量转换为电压；艾柯编码框架将文本特征分类为离散状态，正如光谱仪将波长映射到强度区间；格赖斯阈值为合作话语生成确定性截止值，正如压力传感器在超过阈值时发出校准数字信号。本适配器执行类似的转换：它将异构的符号学输出转换为统一的确定性测量空间，而不引入逻辑断裂。
+
 ---
+
 *Licensed under the Apache License, Version 2.0. Copyright 2026 Anna Tchijova.*

@@ -41,15 +41,13 @@ The governing axiom is physical: **obfuscation always costs cycles**. An adversa
 >
 > References to Peirce, Eco (艾柯), and Grice (格赖斯) within forensic signaling frameworks are sometimes mistaken for metaphysical speculation. They are not. Semiotics functions here as a **sensor calibration model**.
 >
-> Consider a spectroscope: it does not "believe" in color, nor does it interpret emotion. It decomposes electromagnetic radiation into discrete, deterministic wavelengths according to physical laws. Likewise, Peircean sign theory, Eco’s codes, and Grice’s maxims of conversation provide the *expected transmission function* for structured communication. When an artifact violates these maxims—when it says too little, too much, or in the wrong order—it exerts a **physical stress** on the parser. The Metabolic Profiler measures that stress as an integer cost. The semiotic framework names the deviation; the integer arithmetic proves it. There is no mysticism, only measurable resistance in the channel.
+> Consider a spectroscope: it does not "believe" in color, nor does it interpret emotion. It decomposes electromagnetic radiation into discrete, deterministic wavelengths according to physical laws. Likewise, Peircean sign theory, Eco's codes, and Grice's maxims of conversation provide the *expected transmission function* for structured communication. When an artifact violates these maxims—when it says too little, too much, or in the wrong order—it exerts a **physical stress** on the parser. The Metabolic Profiler measures that stress as an integer cost. The semiotic framework names the deviation; the integer arithmetic proves it. There is no mysticism, only measurable resistance in the channel.
 
 ## Procedures
 - **Profiling Procedure (`profile`)**: Receives the file system path of an artifact. Executes deterministic integer-count parsing. Returns an immutable Metabolic Signature.
 - **Integration Procedure (`integrate_metabolic_profiler`)**: Inserts the Metabolic Profiler into the VIGÍA signal routing pipeline, ensuring all ingress artifacts undergo metabolic screening before semantic analysis.
 
 ---
-
-**ESPAÑOL Section:**
 
 # ESPAÑOL
 
@@ -95,8 +93,6 @@ El axioma rector es físico: **la ofuscación SIEMPRE cuesta ciclos**. Un advers
 
 ---
 
-**РУССКИЙ Section:**
-
 # РУССКИЙ
 
 ## Что это за модуль?
@@ -141,12 +137,10 @@ El axioma rector es físico: **la ofuscación SIEMPRE cuesta ciclos**. Un advers
 
 ---
 
-**中文 Section:**
-
 # 中文
 
 ## 这是什么模块？
-`metabolic_profiler.py` 模块是 VIGÍA 框架内的一款取证仪器。它将每一个数字**取证工件**视为生物标本，其“健康状态”并非由外表（文件内容）决定，而是由其*代谢*决定——即该工件被解析、展开和结构化时所消耗的离散计算周期之精确数量。
+`metabolic_profiler.py` 模块是 VIGÍA 框架内的一款取证仪器。它将每一个数字**取证工件**视为生物标本，其"健康状态"并非由外表（文件内容）决定，而是由其*代谢*决定——即该工件被解析、展开和结构化时所消耗的离散计算周期之精确数量。
 
 其核心公理是物理性的：**混淆永远消耗周期**。对手可以伪造文件看似包含的内容，但无法违反计算功的守恒定律。通过测量确定性整数指标——解析步数、嵌套深度和对象展开计数——本模块无需依赖语义解释即可检测解析器炸弹（parser bombs）和结构混淆等病理现象。
 
@@ -154,7 +148,7 @@ El axioma rector es físico: **la ofuscación SIEMPRE cuesta ciclos**. Un advers
 
 | 概念 | 科学定义 | 操作职能 |
 |---|---|---|
-| **代谢签名** | 一份不可变的、可审计的记录，量化摄取并展开一个数字取证工件所需的精确整数操作次数。 | 作为计算成本的确定性“指纹”。 |
+| **代谢签名** | 一份不可变的、可审计的记录，量化摄取并展开一个数字取证工件所需的精确整数操作次数。 | 作为计算成本的确定性"指纹"。 |
 | **代谢分析器** | 执行受控解析并以整数值记录资源消耗的分析引擎。 | 将观测到的整数成本与确定性基线进行比对，以标记异常。 |
 | **解析器炸弹** | 一种旨在触发解析期间指数级对象实例化的恶意取证工件，通过耗尽 CPU 或内存导致拒绝服务。 | 当整数解析成本超过 `PARSE_COST_BASELINE` 阈值时即被识别。 |
 | **混淆** | 在保留功能行为的同时增加结构复杂度的对抗性载荷变换。 | 通过相对于载荷熵而言过高的整数周期计数予以揭示。 |
@@ -179,7 +173,7 @@ El axioma rector es físico: **la ofuscación SIEMPRE cuesta ciclos**. Un advers
 >
 > 在取证信号框架中提及皮尔斯、艾柯与格赖斯时，有时会被误认为形而上学臆测。事实并非如此。符号学在此处充当**传感器校准模型**。
 >
-> 以光谱仪为例：它并不“相信”颜色，也不诠释情感。它依据物理定律将电磁辐射分解为离散的、确定性的波长。同样，皮尔斯的符号理论、艾柯的编码系统以及格赖斯的会话准则，为结构化通信提供了*预期传输函数*。当取证工件违反这些准则——说得过少、过多，或顺序错误——它便对解析器施加了一种**物理应力**。代谢分析器将该应力测量为一个整数成本。符号学框架为偏离命名；整数运算予以证明。这里没有神秘主义，只有通道中可测量的阻力。
+> 以光谱仪为例：它并不"相信"颜色，也不诠释情感。它依据物理定律将电磁辐射分解为离散的、确定性的波长。同样，皮尔斯的符号理论、艾柯的编码系统以及格赖斯的会话准则，为结构化通信提供了*预期传输函数*。当取证工件违反这些准则——说得过少、过多，或顺序错误——它便对解析器施加了一种**物理应力**。代谢分析器将该应力测量为一个整数成本。符号学框架为偏离命名；整数运算予以证明。这里没有神秘主义，只有通道中可测量的阻力。
 
 ## 程序说明
 - **剖析程序 (`profile`)**：接收取证工件的文件系统路径。执行确定性整数计数解析。返回一份不可变的代谢签名。
@@ -187,44 +181,4 @@ El axioma rector es físico: **la ofuscación SIEMPRE cuesta ciclos**. Un advers
 
 ---
 
-Now, I need to check if I met all constraints.
-
-- 4 languages: Yes.
-- "What Is This Module?": Yes, plain language.
-- Key concepts with tables: Yes.
-- Glossary: Yes.
-- Scientific Note box: Yes, with the sensor analogy and mention of Peirce/Eco/Grice terminology not being mysticism. Used 艾柯, 格赖斯 in Chinese. In English/Spanish/Russian I mentioned Eco/Grice and included the Chinese characters in the note to satisfy the "use" requirement? The requirement says "Chinese translations must use: 艾柯 (not Eco), 格赖斯 (not Grice)...". So in the Chinese section, I used them. In other languages, I can use Eco/Grice or the characters. I included the characters in the note for cross-reference but the main text in Chinese uses them correctly. Wait, requirement 4 says "Chinese translations must use: 艾柯 (not Eco), 格赖斯 (not Grice)...". This specifically applies to the Chinese translation. I have done that. In other languages, standard transliteration is fine. But to be safe and stylistically consistent, I included the characters in the note. That's okay.
-
--  I need to add this. I'll put it at the very end of the document.
-
-- No floating-point math explanations: I emphasized deterministic integer arithmetic everywhere. I did not mention floating point. Good.
-
-- Module path: vigia/tools/metabolic_profiler.py. Mentioned at the top.
-
-- Docstring principle included: "obfuscation always costs cycles", "laws of computational physics". Included.
-
-- Classes mentioned: MetabolicSignature, MetabolicProfiler. Yes.
-- Functions: integrate_metabolic_profiler(), profile(). Yes.
-- Constants: EFFICIENCY_BASELINE, PARSE_COST_BASELINE, EXPECTED_DEPTH. Yes, in tables.
-
-- Chinese specific terms:
-  - 艾柯: used in Chinese section Scientific Note.
-  - 格赖斯: used in Chinese section Scientific Note.
-  - 取证工件: used in Chinese section (What is this module, table, glossary). Yes.
-  - 逻辑断裂: used in Chinese section (table). Yes.
-
-- Do not use floating-point math explanations: I explicitly said integer arithmetic, no rounding, bit-wise reproducibility. Good.
-
-- Target audience: scientists who do not know Python. Avoided Python-specific jargon where possible, explained `profile()` and `integrate_metabolic_profiler()` as procedures. Did not use code blocks with syntax explanations. Good.
-
-Let's double-check the garbled user text: "Detecta: - Parser bombs (explosión de objetos) - Obfuscación (". The user cut off. I should infer obfuscation detection. My text covers both.
-
-Also "Agregar a vigia/core/signal_router.py: from vigia.tools.metabolic_p". This looks like an instruction snippet accidentally included. I can mention that the integration procedure connects to the signal router. I did so.
-
-I should make sure the Scientific Note is clearly marked with the box syntax. I used blockquotes (`>`). That works as a box in Markdown rendering.
-
-I should ensure the license line is exactly as requested. I'll put it at the bottom.
-
-One final check: The user said "You NEVER use floating-point math explanations
----
 *Licensed under the Apache License, Version 2.0. Copyright 2026 Anna Tchijova.*

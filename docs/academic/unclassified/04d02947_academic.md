@@ -7,13 +7,15 @@ Generated: 2026-05-20T14:56:47.884140+00:00
 
 ---
 
-ENGLISH:
+## ENGLISH
 
-What Is This Module?
+### What Is This Module?
 This module is a deterministic forensic decision engine. It converts a crude three-way label—MALICE, BENIGN, or ABSTAIN—into an eight-state classification that records both confidence (as an integer score from 0 to 100) and causal reason. Because forensic science requires reproducibility, the engine uses only deterministic integer comparisons. A given input always produces the identical output, eliminating the variability associated with floating-point arithmetic. The resulting verdict is treated as an immutable forensic fact: once computed, it is not altered, only recorded and reported.
 
-Key Concepts:
-Table 1: Eight Verdict States
+### Key Concepts
+
+**Table 1: Eight Verdict States**
+
 | State | Integer Confidence / Trigger | Forensic Meaning | Required Action |
 |---|---|---|---|
 | MALICE_HIGH | 81 – 100 | Court-admissible certainty; immediate threat | IMMEDIATE_CONTAINMENT |
@@ -25,9 +27,8 @@ Table 1: Eight Verdict States
 | ABSTAIN_DEGRADED | Integrity flag set | Evidence chain compromised; sensor/artifact degraded | ESCALATE |
 | ESCALATE | Policy or boundary trigger | Automation limit reached; human analyst required | ESCALATE |
 
-Alternatively, the 8th could be something like ABSTAIN_TIE. But since only constants provided, I'll use ESCALATE.
+**Table 2: Deterministic Integer Logic**
 
-Table 2: Deterministic Integer Logic
 | Feature | Why It Matters |
 |---|---|
 | Integer thresholds (0–100) | Confidence is stored and compared as whole numbers, not decimals. |
@@ -35,7 +36,8 @@ Table 2: Deterministic Integer Logic
 | No floating-point arithmetic | Rounding errors and platform-dependent precision are excluded by design. |
 | Immutable record | Verdict objects cannot be modified after creation, preserving chain-of-custody logic. |
 
-Glossary:
+### Glossary
+
 - **VerdictState**: The eight possible outcomes of the classification engine.
 - **Quadripartite**: Division into four semantic families (Malice, Benign, Abstain, Escalate), expanded to eight operational states.
 - **PeircePlanner**: The inference subsystem that evaluates evidence using abductive logic (hypothesis generation from signs).
@@ -46,37 +48,33 @@ Glossary:
 - **Logical Fracture**: A contradiction between two or more pieces of evidence that prevents a unified conclusion.
 - **Forensic Artifact**: A digital object (file, log, registry entry) introduced as evidence.
 
-Scientific Note:
-【Scientific Note】
-References to Peirce, Eco, and Grice in this system are formal semiotic constraints, not mysticism. Think of a digital sensor: Peirce’s abduction is the analog-to-digital conversion that turns raw voltage into a symbolic “alert”; Eco’s code is the protocol manual that tells the sensor what voltage thresholds mean; Grice’s maxims are the calibration rules that ensure the sensor does not claim “high temperature” when the probe is merely disconnected. The PeircePlanner is therefore a sensor network for logical evidence. When it reports a contradiction, it is reporting a hardware-level disagreement between inference channels—not invoking the supernatural.
-
-License line at end.
+### 【Scientific Note】
+References to Peirce, Eco, and Grice in this system are formal semiotic constraints, not mysticism. Think of a digital sensor: Peirce's abduction is the analog-to-digital conversion that turns raw voltage into a symbolic "alert"; Eco's code is the protocol manual that tells the sensor what voltage thresholds mean; Grice's maxims are the calibration rules that ensure the sensor does not claim "high temperature" when the probe is merely disconnected. The PeircePlanner is therefore a sensor network for logical evidence. When it reports a contradiction, it is reporting a hardware-level disagreement between inference channels—not invoking the supernatural.
 
 ---
 
-ESPAÑOL:
+## ESPAÑOL
 
-What Is This Module? → "¿Qué es este módulo?"
-This module is... → Este módulo es un motor forense de decisión determinista. Convierte una etiqueta rudimentaria de tres valores—MALICE, BENIGN o ABSTAIN—en una clasificación de ocho estados que registra tanto la confianza (como puntuación entera de 0 a 100) como la causa. Dado que la ciencia forense exige reproducibilidad, el motor emplea únicamente comparaciones enteras deterministas. Una entrada determinada siempre produce la misma salida, eliminando la variabilidad asociada a la aritmética de coma flotante. El veredicto resultante se trata como un hecho forense inmutable: una vez calculado, no se altera, solo se registra y reporta.
+### ¿Qué es este módulo?
+Este módulo es un motor forense de decisión determinista. Convierte una etiqueta rudimentaria de tres valores—MALICE, BENIGN o ABSTAIN—en una clasificación de ocho estados que registra tanto la confianza (como puntuación entera de 0 a 100) como la causa. Dado que la ciencia forense exige reproducibilidad, el motor emplea únicamente comparaciones enteras deterministas. Una entrada determinada siempre produce la misma salida, eliminando la variabilidad asociada a la aritmética de coma flotante. El veredicto resultante se trata como un hecho forense inmutable: una vez calculado, no se altera, solo se registra y reporta.
 
-Key concepts tables in Spanish.
+### Conceptos Clave
 
-Table 1: Los ocho estados del veredicto
+**Tabla 1: Los ocho estados del veredicto**
+
 | Estado | Confianza entera / Disparador | Significado forense | Acción requerida |
 |---|---|---|---|
-| MALICE_HIGH | 81 – 100 | Certeza admisible en tribunal; amenaza inmediata | INMEDIATE_CONTAINMENT (maybe INMEDIATO) — I'll use the constant names as given but translate meaning. |
-Actually keep constant names in English as they are code constants, but explain.
+| MALICE_HIGH | 81 – 100 | Certeza presentable en tribunal; amenaza inmediata | IMMEDIATE_CONTAINMENT |
+| MALICE_MEDIUM | 51 – 80 | Sospecha real pero no lista para juicio | CORROBORATE_THEN_ACT |
+| BENIGN_HIGH | 81 – 100 | Evidencia exoneratoria; riesgo residual nulo | CLOSE_CASE |
+| BENIGN_MEDIUM | 51 – 80 | Probablemente benigno; monitorear cambios | MONITOR |
+| ABSTAIN_CONTRADICTION | Indicador de oscilación activado | El PeircePlanner detectó una fractura lógica en la evidencia | ESCALATE |
+| ABSTAIN_INSUFFICIENT | Puntuación entera ≤ 50 | Señales insuficientes para concluir | COLLECT_MORE |
+| ABSTAIN_DEGRADED | Indicador de integridad activado | Cadena de custodia comprometida; artefacto/sensor degradado | ESCALATE |
+| ESCALATE | Disparador de política o límite | Límite de automatización alcanzado; se requiere analista humano | ESCALATE |
 
-| MALICE_HIGH | 81 – 100 | Certeza presentable en tribunal; amenaza inmediata | CONTENCIÓN_INMEDIATA |
-| MALICE_MEDIUM | 51 – 80 | Sospecha real pero no lista para juicio | CORROBORAR_ANTES_DE_ACTUAR |
-| BENIGN_HIGH | 81 – 100 | Evidencia exoneratoria; riesgo residual nulo | CERRAR_CASO |
-| BENIGN_MEDIUM | 51 – 80 | Probablemente benigno; monitorear cambios | MONITOREAR |
-| ABSTAIN_CONTRADICTION | Indicador de oscilación activado | El PeircePlanner detectó una fractura lógica en la evidencia | ESCALAR |
-| ABSTAIN_INSUFFICIENT | Puntuación entera ≤ 50 | Señales insuficientes para concluir | RECOLECTAR_MÁS |
-| ABSTAIN_DEGRADED | Indicador de integridad activado | Cadena de custodia comprometida; artefacto/sensor degradado | ESCALAR |
-| ESCALATE | Disparador de política o límite | Límite de automatización alcanzado; se requiere analista humano | ESCALAR |
+**Tabla 2: Lógica determinista de enteros**
 
-Table 2: Lógica determinista de enteros
 | Característica | Por qué importa |
 |---|---|
 | Umbrales enteros (0–100) | La confianza se almacena y compara con números enteros, no decimales. |
@@ -84,7 +82,8 @@ Table 2: Lógica determinista de enteros
 | Sin aritmética de coma flotante | Errores de redondeo y precisión dependiente de plataforma quedan excluidos por diseño. |
 | Registro inmutable | Los objetos de veredicto no pueden modificarse tras su creación, preservando la lógica de cadena de custodia. |
 
-Glossary:
+### Glosario
+
 - **VerdictState**: Los ocho resultados posibles del motor de clasificación.
 - **Cuatripartito**: División en cuatro familias semánticas (Malicia, Benigno, Abstención, Escalada), expandidas a ocho estados operativos.
 - **PeircePlanner**: El subsistema de inferencia que evalúa la evidencia mediante lógica abductiva (generación de hipótesis a partir de signos).
@@ -95,32 +94,33 @@ Glossary:
 - **Fractura lógica**: Contradicción entre dos o más piezas de evidencia que impide una conclusión unificada.
 - **Artefacto forense**: Objeto digital (archivo, registro, entrada de registro) presentado como evidencia.
 
-Scientific Note in Spanish:
-【Nota Científica】
+### 【Nota Científica】
 Las referencias a Peirce, Eco y Grice en este sistema son restricciones semióticas formales, no misticismo. Piense en un sensor digital: la abducción de Peirce es la conversión analógico-digital que convierte el voltaje crudo en una "alerta" simbólica; el código de Eco es el manual de protocolos que le dice al sensor qué significan los umbrales de voltaje; los máximas de Grice son las reglas de calibración que garantizan que el sensor no afirme "alta temperatura" cuando la sonda está simplemente desconectada. El PeircePlanner es, por tanto, una red de sensores para evidencia lógica. Cuando reporta una contradicción, está reportando un desacuerdo a nivel hardware entre canales de inferencia—no invoca lo sobrenatural.
 
 ---
 
-РУССКИЙ:
+## РУССКИЙ
 
-What Is This Module? → "Что это за модуль?"
+### Что это за модуль?
 Этот модуль — детерминированный судебно-экспертный решающий механизм. Он преобразует грубую трёхзначную метку — MALICE, BENIGN или ABSTAIN — в восьмипозиционную классификацию, фиксирующую как степень уверенности (в виде целочисленной оценки от 0 до 100), так и причину. Поскольку судебная экспертиза требует воспроизводимости, механизм использует только детерминированные целочисленные сравнения. Заданный вход всегда даёт идентичный выход, устраняя изменчивость, связанную с арифметикой с плавающей запятой. Полученный вердикт трактуется как неизменяемый судебный факт: однажды вычисленный, он не изменяется, а только регистрируется и включается в отчёт.
 
-Key concepts tables.
+### Ключевые концепции
 
-Table 1: Восемь состояний вердикта
+**Таблица 1: Восемь состояний вердикта**
+
 | Состояние | Целочисленная уверенность / Триггер | Судебно-экспертное значение | Требуемое действие |
 |---|---|---|---|
-| MALICE_HIGH | 81 – 100 | Допустимая в суде уверенность; немедленная угроза | НЕМЕДЛЕННАЯ_ИЗОЛЯЦИЯ (IMMEDIATE_CONTAINMENT) |
-| MALICE_MEDIUM | 51 – 80 | Подозрение обосновано, но недостаточно для суда | КОРРОБОРАЦИЯ_ЗАТЕМ_ДЕЙСТВИЕ (CORROBORATE_THEN_ACT) |
-| BENIGN_HIGH | 81 – 100 | Доказательства оправдывают; остаточный риск нулевой | ЗАКРЫТЬ_ДЕЛО (CLOSE_CASE) |
-| BENIGN_MEDIUM | 51 – 80 | Вероятно безвредно; наблюдение за изменениями | МОНИТОРИНГ (MONITOR) |
-| ABSTAIN_CONTRADICTION | Флаг осцилляции установлен | PeircePlanner обнаружил логический разрыв в доказательствах | ЭСКАЛАЦИЯ (ESCALATE) |
-| ABSTAIN_INSUFFICIENT | Целочисленная оценка ≤ 50 | Недостаточно сигналов для заключения | ДОПОЛНИТЕЛЬНЫЙ_СБОР (COLLECT_MORE) |
-| ABSTAIN_DEGRADED | Флаг целостности установлен | Цепочка хранения нарушена; артефакт/датчик деградирован | ЭСКАЛАЦИЯ (ESCALATE) |
-| ESCALATE | Триггер политики или границы | Достигнут предел автоматизации; требуется человек-аналитик | ЭСКАЛАЦИЯ (ESCALATE) |
+| MALICE_HIGH | 81 – 100 | Допустимая в суде уверенность; немедленная угроза | IMMEDIATE_CONTAINMENT |
+| MALICE_MEDIUM | 51 – 80 | Подозрение обосновано, но недостаточно для суда | CORROBORATE_THEN_ACT |
+| BENIGN_HIGH | 81 – 100 | Доказательства оправдывают; остаточный риск нулевой | CLOSE_CASE |
+| BENIGN_MEDIUM | 51 – 80 | Вероятно безвредно; наблюдение за изменениями | MONITOR |
+| ABSTAIN_CONTRADICTION | Флаг осцилляции установлен | PeircePlanner обнаружил логический разрыв в доказательствах | ESCALATE |
+| ABSTAIN_INSUFFICIENT | Целочисленная оценка ≤ 50 | Недостаточно сигналов для заключения | COLLECT_MORE |
+| ABSTAIN_DEGRADED | Флаг целостности установлен | Цепочка хранения нарушена; артефакт/датчик деградирован | ESCALATE |
+| ESCALATE | Триггер политики или границы | Достигнут предел автоматизации; требуется человек-аналитик | ESCALATE |
 
-Table 2: Детерминированная целочисленная логика
+**Таблица 2: Детерминированная целочисленная логика**
+
 | Свойство | Почему это важно |
 |---|---|
 | Целочисленные пороги (0–100) | Уверенность хранится и сравнивается целыми числами, а не десятичными дробями. |
@@ -128,7 +128,8 @@ Table 2: Детерминированная целочисленная логи�
 | Отсутствие арифметики с плавающей запятой | Ошибки округления и зависимая от платформы точность исключены по конструкции. |
 | Неизменяемая запись | Объекты вердикта нельзя изменить после создания, сохраняя логику цепочки хранения. |
 
-Glossary:
+### Глоссарий
+
 - **VerdictState** (СостояниеВердикта): Восемь возможных исходов классификационного механизма.
 - **Quadripartite** (Квадрипартитная система): Разделение на четыре семантических семейства (Вредоносность, Безвредность, Воздержание, Эскалация), расширенных до восьми операционных состояний.
 - **PeircePlanner**: Подсистема вывода, оценивающая доказательства с помощью абдуктивной логики (генерация гипотез из знаков).
@@ -139,32 +140,33 @@ Glossary:
 - **Логический разрыв** (logical fracture): Противоречие между двумя или более частями доказательств, препятствующее единому заключению.
 - **Судебный артефакт**: Цифровой объект (файл, журнал, запись реестра), представленный в качестве доказательства.
 
-Scientific Note in Russian:
-【Научное Примечание】
+### 【Научное Примечание】
 Ссылки на Пирса (Peirce), Эко (Eco) и Грайса (Grice) в данной системе являются формальными семиотическими ограничениями, а не мистицизмом. Вспомните цифровой датчик: абдукция Пирса — это аналого-цифровое преобразование, которое превращает сырой вольтаж в символическую «тревогу»; код Эко — это руководство по протоколу, сообщающее датчику, что означают пороговые значения вольтажа; максимы Грайса — это правила калибровки, гарантирующие, что датчик не заявит о «высокой температуре», если датчик просто отключён. Таким образом, PeircePlanner — это сеть датчиков для логических доказательств. Когда он сообщает о противоречии, он фиксирует аппаратное несогласие между каналами вывода — а не вызывает сверхъестественное.
 
 ---
 
-中文 (CHINESE):
+## 中文
 
-What Is This Module? → "本模块是什么？"
+### 本模块是什么？
 本模块是一个确定性取证裁决引擎。它将粗糙的三元标签——恶意（MALICE）、良性（BENIGN）或弃权（ABSTAIN）——转换为八状态分类，同时记录置信度（以0至100的整数评分表示）和成因。由于法庭科学要求可重复性，该引擎仅使用确定性整数比较。给定相同的输入，永远产生相同的输出，从而消除了与浮点运算相关的变异性。生成的裁决被视为不可变的取证事实：一经计算，不得更改，只能记录与报告。
 
-Key concepts tables.
+### 核心概念
 
-Table 1: 八类裁决状态
+**表1：八类裁决状态**
+
 | 状态 | 整数置信区间 / 触发条件 | 取证含义 | 所需操作 |
 |---|---|---|---|
-| MALICE_HIGH | 81 – 100 | 可呈堂证供的确定性；即时威胁 | 立即遏制 (IMMEDIATE_CONTAINMENT) |
-| MALICE_MEDIUM | 51 – 80 | 嫌疑真实，但尚不足以起诉 | 核实后行动 (CORROBORATE_THEN_ACT) |
-| BENIGN_HIGH | 81 – 100 | 证据表明无罪；无残留风险 | 结案 (CLOSE_CASE) |
-| BENIGN_MEDIUM | 51 – 80 | 可能为良性；需持续观察 | 监控 (MONITOR) |
-| ABSTAIN_CONTRADICTION | 振荡标志置位 | PeircePlanner 检测到证据中存在逻辑断裂 | 升级 (ESCALATE) |
-| ABSTAIN_INSUFFICIENT | 整数评分 ≤ 50 | 信号不足，无法得出任何结论 | 补充采集 (COLLECT_MORE) |
-| ABSTAIN_DEGRADED | 完整性标志置位 | 保管链受损；取证工件或传感器降级 | 升级 (ESCALATE) |
-| ESCALATE | 策略或边界触发 | 达到自动化极限；需人工分析师介入 | 升级 (ESCALATE) |
+| MALICE_HIGH | 81 – 100 | 可呈堂证供的确定性；即时威胁 | IMMEDIATE_CONTAINMENT |
+| MALICE_MEDIUM | 51 – 80 | 嫌疑真实，但尚不足以起诉 | CORROBORATE_THEN_ACT |
+| BENIGN_HIGH | 81 – 100 | 证据表明无罪；无残留风险 | CLOSE_CASE |
+| BENIGN_MEDIUM | 51 – 80 | 可能为良性；需持续观察 | MONITOR |
+| ABSTAIN_CONTRADICTION | 振荡标志置位 | PeircePlanner 检测到证据中存在逻辑断裂 | ESCALATE |
+| ABSTAIN_INSUFFICIENT | 整数评分 ≤ 50 | 信号不足，无法得出任何结论 | COLLECT_MORE |
+| ABSTAIN_DEGRADED | 完整性标志置位 | 保管链受损；取证工件或传感器降级 | ESCALATE |
+| ESCALATE | 策略或边界触发 | 达到自动化极限；需人工分析师介入 | ESCALATE |
 
-Table 2: 确定性整数逻辑
+**表2：确定性整数逻辑**
+
 | 特性 | 重要性说明 |
 |---|---|
 | 整数阈值（0–100） | 置信度以整数存储与比较，而非小数。 |
@@ -172,7 +174,8 @@ Table 2: 确定性整数逻辑
 | 不使用浮点运算 | 设计上排除了舍入误差与平台相关精度问题。 |
 | 不可变记录 | 裁决对象一旦创建即不可修改，从而保全保管链逻辑。 |
 
-Glossary (术语表):
+### 术语表
+
 - **VerdictState（裁决状态）**: 分类引擎的八种可能输出。
 - **Quadripartite（四元体系）**: 按四个语义族（恶意、良性、弃权、升级）划分，并扩展为八个操作状态。
 - **PeircePlanner**: 使用溯因逻辑（从符号生成假设）评估证据的推理子系统。
@@ -183,19 +186,9 @@ Glossary (术语表):
 - **逻辑断裂**: 两份或多份证据之间的矛盾，导致无法得出统一结论。
 - **取证工件**: 作为证据提交的数字对象（文件、日志、注册表项）。
 
-Scientific Note in Chinese:
-【科学说明】
-本系统中引用的皮尔士（Peirce）、艾柯（Eco）与格赖斯（Grice）术语属于形式符号学约束，而非神秘主义。请想象一台数字传感器：皮尔士的“溯因”相当于把原始电压转换为符号化“警报”的模数转换；艾柯的“编码”相当于告诉传感器电压阈值含义的协议手册；格赖斯的“准则”相当于确保传感器不会在探头断开时声称“高温”的校准规则。因此，PeircePlanner 是一套面向逻辑证据的传感器网络。当它报告逻辑断裂时，它只是在报告推理通道之间的硬件级不一致——而非召唤超自然力量。
+### 【科学说明】
+本系统中引用的皮尔士（Peirce）、艾柯（Eco）与格赖斯（Grice）术语属于形式符号学约束，而非神秘主义。请想象一台数字传感器：皮尔士的"溯因"相当于把原始电压转换为符号化"警报"的模数转换；艾柯的"编码"相当于告诉传感器电压阈值含义的协议手册；格赖斯的"准则"相当于确保传感器不会在探头断开时声称"高温"的校准规则。因此，PeircePlanner 是一套面向逻辑证据的传感器网络。当它报告逻辑断裂时，它只是在报告推理通道之间的硬件级不一致——而非召唤超自然力量。
 
 ---
 
-
-I must ensure I do NOT use floating-point math explanations. I emphasized integer arithmetic and deterministic logic. Good.
-
-
-> 
-
-at the end of each language section.
-
----
 *Licensed under the Apache License, Version 2.0. Copyright 2026 Anna Tchijova.*

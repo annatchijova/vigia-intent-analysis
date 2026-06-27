@@ -5,187 +5,6 @@ Batch ID: vigia-doc-0162-1c834989
 Generated: 2026-05-20T14:56:47.879519+00:00
 -->
 
-ENGLISH:
-Title: VIGÍA Geopolitical Intent Engine (vigia/tools/geopolitical.py)
-What Is This Module?
-This module is the Fifth Pillar of the VIGÍA forensic framework. It functions as a strategic-consistency analyzer. When a cyber incident occurs, analysts collect technical clues (malware signatures, network paths, language artifacts). Taken alone, these clues can be forged. This module cross-references the technical evidence against historical state doctrine, geopolitical opportunity, and linguistic coherence. It answers: Does the attributed actor actually benefit? Does the timing align with documented strategic goals? Are the language markers genuine or planted? The engine outputs a deterministically scored risk assessment using integer arithmetic to avoid probabilistic noise.
-
-Key Concepts table:
-| Concept | Role | Why It Matters |
-|---|---|---|
-| GeopoliticalIntentEngine | Central evaluation orchestrator | Coordinates all logical rules into a unified score |
-| Cui Bono Analysis | Interest alignment check | If the attributed actor gains nothing, the flag may be false |
-| Doctrine Consistency | Historical behavior pattern check | States follow documented strategic doctrine; deviation suggests deception |
-| Temporal Opportunity | Timing alignment check | Incident timing vs. geopolitical windows (elections, treaties, conflicts) |
-| Infrastructure Seizure Risk | Asset exposure check | True actors avoid burning high-value infrastructure needlessly |
-| Linguistic False-Flag Detection | Signal authenticity check | Natural language leaves statistical traces; planted markers show logical ruptures |
-| Thirdness (Peircean) | Mediation layer | Bridges raw technical sign and real-world object via historical model |
-| Deterministic Integer Scoring | Quantification method | All weights and thresholds use integer arithmetic to eliminate rounding ambiguity |
-
-Glossary:
-- **Attribution**: The formal assignment of responsibility for an incident to a specific actor.
-- **False Flag**: A covert operation designed to implicate a party other than the true perpetrator.
-- **Doctrine**: The publicly or confidentially recorded strategic principles that guide a state's actions.
-- **Technical Sign**: A forensic artifact (e.g., a compiler watermark, code snippet) that points toward an actor.
-- **Interpretant**: In this system, the structured knowledge base (historical patterns + doctrine tables) that decodes a sign.
-- **Disinformation Cost**: The political, economic, and operational price an actor pays if deception is exposed.
-- **Logical Rupture**: An inconsistency between expected and observed patterns, indicating fabrication.
-- **Baseline Mean / MAD**: Central tendency and median absolute deviation of historical scores, used for deviation detection via integer offsets.
-
-Scientific Note:
-【Scientific Note】
-The use of Peircean semiotics, Eco's codes, and Grice's maxims in this module is not mysticism. Think of a laboratory sensor: the **sign** is the voltage reading; the **object** is the chemical concentration you wish to measure; the **interpretant** is the calibration curve derived from prior controlled experiments. **Thirdness** is simply the signal-processing layer that translates raw voltage into a physical quantity using historical data. Similarly, linguistic markers are signals, state doctrine is the calibration standard, and Gricean maxims are noise-filtering rules. The framework treats these as deterministic logical constraints, not metaphysical entities. All computations are performed with integer arithmetic to maintain exact reproducibility.
-
-ESPAÑOL:
-Same structure, adapted.
-- 艾柯 -> Eco (in Spanish it's Eco, but user said Chinese must use 艾柯. For Spanish, standard is Eco. The restriction is only for Chinese. So in Spanish use Eco, Grice normally.)
-- 取证工件 -> only Chinese.
-- 逻辑断裂 -> only Chinese.
-
-What Is This Module? -> "¿Qué es este módulo?"
-This module is "Quinto Pilar: Motor de Intención Geopolítica". Acts as a strategic consistency analyzer... integer arithmetic.
-
-Key Concepts table -> Concepto | Función | Relevancia científica
-- Motor de Intención Geopolítica
-- Análisis de Cui Bono
-- Consistencia Doctrinal
-- Oportunidad Temporal
-- Riesgo de Exposición de Infraestructura
-- Detección Lingüística de False Flag
-- Terceridad (Peirce)
-- Puntuación Entera Determinista
-
-Glossary:
-- Atribución
-- Bandera Falsa (False Flag)
-- Doctrina
-- Signo Técnico
-- Interpretante
-- Costo de Desinformación
-- Ruptura Lógica (or Inconsistencia Lógica — but note user said Chinese must use 逻辑断裂; for Spanish I can use Ruptura Lógica or Inconsistencia Lógica. I'll use Ruptura lógica)
-- Media Basal / DAM (Desviación Absoluta Mediana) -> use MAD as Desviación Absoluta Mediana.
-
-Scientific Note:
-【Nota Científica】
-... analogía del sensor. Signo = lectura de voltaje. Objeto = concentración química. Interpretante = curva de calibración. Terceridad = capa de procesamiento de señal. Maximas de Grice = reglas de filtrado de ruido. Eco = estándares de codificación. Deterministic integer arithmetic.
-
-РУССКИЙ:
-What Is This Module? -> "Что это за модуль?"
-Key concepts table in Russian.
-- Геополитический движок намерений
-- Анализ Cui Bono (кому выгодно)
-- Доктринальная согласованность
-- Временно́е окно возможности
-- Риск компрометации инфраструктуры
-- Лингвистическое обнаружение ложного флага
-- Третичность (Пирс)
-- Детерминированное целочисленное оценивание
-
-Glossary:
-- Атрибуция
-- Ложный флаг
-- Доктрина
-- Технический знак (сигн)
-- Интерпретант
-- Цена дезинформации
-- Логический разрыв (логическое нарушение) — user said Chinese must use 逻辑断裂; Russian can be Логический разрыв or Разрыв логики. I'll use "Логический разрыв".
-- Базовое среднее / MAD (медианное абсолютное отклонение)
-
-Scientific Note:
-【Научное примечание】
-... аналогия с датчиком. Знак = показание напряжения. Объект = концентрация вещества. Интерпретант = калибровочная кривая. Третичность = уровень обработки сигнала. Максимы Грайса = правила фильтрации шума. Умберто Эко = кодировочные стандарты. Целочисленная арифметика.
-
-中文:
-Must use specific translations.
-- 艾柯 (not Eco)
-- 格赖斯 (not Grice)
-- 取证工件 (not 制品)
-- 逻辑断裂 (not 裂缝)
-
-What Is This Module? -> "本模块是什么？"
-This module is VIGÍA 第五支柱：地缘政治意图引擎. Functions as strategic consistency analyzer. Non-Python scientists.
-
-Key Concepts table:
-| 概念 | 作用 | 科学意义 |
-|---|---|---|
-| 地缘政治意图引擎 (GeopoliticalIntentEngine) | 核心评估协调器 | 整合所有逻辑规则为统一评分 |
-| 利益归属分析 (Cui Bono) | 利益一致性校验 | 若归因行为体无利可图，则为假旗嫌疑 |
-| 教义一致性 | 历史行为模式校验 | 国家遵循已记录的战略教义；偏离暗示欺骗 |
-| 时间窗口机遇 | 时机对齐校验 | 事件时机与地缘政治窗口（选举、条约、冲突） |
-| 基础设施暴露风险 | 资产暴露校验 | 真实行为体不会无意义地烧毁高价值基础设施 |
-| 语言学假旗检测 | 信号真实性校验 | 自然语言留下统计痕迹；植入标记呈现逻辑断裂 |
-| 第三性（皮尔斯） | 中介层 | 通过历史模型连接原始技术记号与真实世界对象 |
-| 确定性整数评分 | 量化方法 | 所有权值与阈值均使用整数运算，消除舍入歧义 |
-
-Glossary:
-- **归因 (Attribution)**: 将事件责任正式指派给特定行为体。
-- **假旗行动 (False Flag)**: 旨在嫁祸于他方的隐蔽行动。
-- **教义 (Doctrine)**: 公开或机密记录的指导国家行为的战略原则。
-- **技术记号 (Technical Sign)**: 指向特定行为体的取证工件（如编译器水印、代码片段）。
-- **解释项 (Interpretant)**: 本系统中指结构化知识库（历史模式 + 教义表），用于解码记号。
-- **虚假信息成本 (Disinformation Cost)**: 若欺骗被揭露，行为体需承担的政治、经济与行动代价。
-- **逻辑断裂 (Logical Rupture)**: 预期模式与观测模式之间的不一致，指示伪造。
-- **基线均值 / MAD (Baseline Mean / MAD)**: 历史评分数据的集中趋势与绝对中位差，用于整数偏移量偏差检测。
-
-Scientific Note:
-【科学说明】
-本模块使用的皮尔斯符号学、艾柯编码理论与格赖斯会话准则并非神秘主义。请以实验室传感器为类比：**记号**即电压读数；**对象**即待测化学浓度；**解释项**即由先前受控实验得出的校准曲线。**第三性**即利用历史数据将原始电压转换为物理量的信号处理层。同理，语言学标记是信号，国家教义是校准标准，格赖斯准则是滤波规则。该框架将这些视为确定性逻辑约束，而非形而上实体。所有计算均以整数运算执行，以确保结果可完全复现。
-
-Constants:
-Need to mention constants but in plain language.
-APT_PROFILES -> Actor capability and historical behavior tables.
-GEOPOLITICAL_EVENTS -> Timeline of conflicts, elections, treaties.
-RULE_WEIGHTS -> Integer coefficients for each rule.
-RULE_DEPENDENCIES -> Logical prerequisites (e.g., if doctrine check fails, temporal check weight changes).
-SIGMOID_SCALE / SIGMOID_SHIFT -> Rational scaling factors for threshold activation (integer-scaled).
-PENALTY_SCALE -> Integer decrement multiplier.
-BASELINE_MEAN / BASELINE_MAD -> Historical reference constants for deviation detection.
-
-Important: Do NOT explain floating point. So for sigmoid, say something like "rational scaling constants that map composite integer scores to discrete risk tiers using fixed-point arithmetic" or "deterministic threshold scaling parameters expressed as integer ratios". Avoid saying "floating-point sigmoid function". Emphasize integer arithmetic and deterministic logical thresholds.
-
-Let's write the content.
-
-ENGLISH:
-- Mention deterministic integer arithmetic explicitly.
-- Use tables.
-- Keep academic tone.
-
-ESPAÑOL:
-- "Motor de Intención Geopolítica"
-- "Quinto Pilar"
-
-РУССКИЙ:
-- "Пятый столп: Движок геополитического намерения"
-- Ensure Cyrillic formatting.
-
-中文:
-- "第五支柱：地缘政治意图引擎"
-- Use required terms.
-
-Also need to include the license line exactly: "" Probably at the very end.
-
-Let's construct final markdown.
-
-I should ensure no code blocks with Python syntax. I can use backticks for module path but that's fine. The user wants Markdown.
-
-Make sure the Scientific Note box is clearly delimited.
-
-Double-check Chinese terms:
-- 艾柯: yes.
-- 格赖斯: yes.
-- 取证工件: used in glossary? The user said "Chinese translations must use: ... 取证工件 (not 制品)". I should ensure 取证工件 appears in the Chinese text. In glossary for "Technical Sign" I said "取证工件（如编译器水印、代码片段）". Good.
-- 逻辑断裂: used. Good.
-
-Double-check no floating-point explanations:
-- Instead of "sigmoid function uses floating point", say "SIGMOID_SCALE and SIGMOID_SHIFT are integer scaling constants that partition the score continuum into deterministic activation bands without fractional drift."
-- BASELINE_MEAN and BASELINE_MAD are "integer reference statistics".
-- RULE_WEIGHTS are "integer coefficients".
-- PENALTY_SCALE is "integer multiplier".
-
-Let's draft thoroughly.
-
-ENGLISH text:
-
 ## ENGLISH
 
 ### What Is This Module?
@@ -229,8 +48,6 @@ All calculations rely on integer weights, integer penalties, and integer baselin
 The terminology of Peirce, Eco, and Grice is employed here as formal epistemological infrastructure, not mysticism. Consider a standard laboratory sensor: the **sign** is the raw voltage reading; the **object** is the underlying physical quantity (e.g., chemical concentration); the **interpretant** is the calibration curve built from prior controlled experiments. **Thirdness** is nothing more than the signal-processing layer that translates voltage into concentration by mediating between raw data and historical calibration. Likewise, in this module, a linguistic marker is a voltage, state doctrine is the calibration standard, and Gricean maxims are noise-filtering rules. Umberto Eco's codes define the encoding standard. The entire pipeline is a deterministic measurement apparatus; all internal arithmetic is performed with integers to ensure that every repetition of the same input yields exactly the same output.
 
 ---
-
-ESPAÑOL text:
 
 ## ESPAÑOL
 
@@ -276,8 +93,6 @@ La terminología de Peirce, Eco y Grice se emplea aquí como infraestructura epi
 
 ---
 
-РУССКИЙ text:
-
 ## РУССКИЙ
 
 ### Что это за модуль?
@@ -314,6 +129,50 @@ La terminología de Peirce, Eco y Grice se emplea aquí como infraestructura epi
 - **Технический знак** — Криминалистический артефакт (например, метка компилятора, комментарий в коде, путь к файлу), рассматриваемый как указатель на конкретного актёра.
 - **Интерпретант** — В данном фреймворке: структурированная база знаний (APT_PROFILES + GEOPOLITICAL_EVENTS), декодирующая технический знак в вывод о реальном мире.
 - **Цена дезинформации** — Совокупные политические, экономические и операционные потери актёра в случае разоблачения его обмана.
-- **Логический разрыв** — Детерминированное несоответствие между ож
+- **Логический разрыв** — Детерминированное несоответствие между ожидаемыми паттернами (из доктрины и истории) и наблюдаемыми характеристиками инцидента; первичный индикатор фабрикации.
+- **Базовое среднее / MAD** — Центральная тенденция и медианное абсолютное отклонение исторических оценок атрибуции, хранимые как целые числа для точного обнаружения отклонений.
+
+### 【Научное примечание】
+Терминология Пирса, Эко и Грайса применяется здесь как формальная эпистемологическая инфраструктура, а не мистика. Рассмотрим стандартный лабораторный датчик: **знак** — это необработанное показание напряжения; **объект** — лежащая в основе физическая величина (например, концентрация химического вещества); **интерпретант** — калибровочная кривая, построенная на основе предыдущих контролируемых экспериментов. **Третичность** — это не что иное, как уровень обработки сигнала, переводящий напряжение в концентрацию путём медиации между необработанными данными и исторической калибровкой. Аналогично, в данном модуле лингвистический маркер — это напряжение, государственная доктрина — стандарт калибровки, а максимы Грайса — правила фильтрации шума. Коды Умберто Эко определяют стандарт кодирования. Весь конвейер представляет собой детерминированный измерительный прибор; вся внутренняя арифметика выполняется с целыми числами, гарантируя, что каждое повторение одних и тех же входных данных даёт в точности одинаковый результат.
+
 ---
+
+## 中文
+
+### 本模块是什么？
+`vigia/tools/geopolitical.py` 实现了 **VIGÍA 第五支柱：地缘政治意图引擎**。它并非传统的恶意软件扫描器，而是一种战略一致性分析器，专为需要超越原始技术取证工件来评估网络攻击归因的科学家而设计。
+
+当事件发生时，调查人员会收集**技术记号**——编译器水印、语言偏好、网络节点。这些记号可能被刻意植入。本模块将每个记号视为一项假设，并从四个非技术维度对其进行检验：（1）已记录的国家**教义**；（2）事件发生的精确时刻所呈现的**地缘政治机遇**；（3）**基础设施暴露成本**；以及（4）**语言学真实性**。若技术归因与上述任一维度相矛盾，引擎将记录一处**逻辑断裂**，并通过确定性整数运算下调综合评分。
+
+所有计算均依赖整数权重、整数惩罚值和整数基线。不引入任何舍入误差或概率噪声。
+
+### 核心概念
+
+| 概念 | 作用 | 科学意义 |
+|---|---|---|
+| 地缘政治意图引擎 (GeopoliticalIntentEngine) | 核心评估协调器 | 整合所有逻辑规则为统一评分 |
+| 利益归属分析 (Cui Bono) | 利益一致性校验 | 若归因行为体无利可图，则为假旗嫌疑 |
+| 教义一致性 | 历史行为模式校验 | 国家遵循已记录的战略教义；偏离暗示欺骗 |
+| 时间窗口机遇 | 时机对齐校验 | 事件时机与地缘政治窗口（选举、条约、冲突） |
+| 基础设施暴露风险 | 资产暴露校验 | 真实行为体不会无意义地烧毁高价值基础设施 |
+| 语言学假旗检测 | 信号真实性校验 | 自然语言留下统计痕迹；植入标记呈现逻辑断裂 |
+| 第三性（皮尔斯） | 中介层 | 通过历史模型连接原始技术记号与真实世界对象 |
+| 确定性整数评分 | 量化方法 | 所有权值与阈值均使用整数运算，消除舍入歧义 |
+
+### 术语表
+
+- **归因 (Attribution)**: 将事件责任正式指派给特定行为体。
+- **假旗行动 (False Flag)**: 旨在嫁祸于他方的隐蔽行动。
+- **教义 (Doctrine)**: 公开或机密记录的指导国家行为的战略原则。
+- **技术记号 (Technical Sign)**: 指向特定行为体的取证工件（如编译器水印、代码片段）。
+- **解释项 (Interpretant)**: 本系统中指结构化知识库（历史模式 + 教义表），用于解码记号。
+- **虚假信息成本 (Disinformation Cost)**: 若欺骗被揭露，行为体需承担的政治、经济与行动代价。
+- **逻辑断裂 (Logical Rupture)**: 预期模式与观测模式之间的不一致，指示伪造。
+- **基线均值 / MAD (Baseline Mean / MAD)**: 历史评分数据的集中趋势与绝对中位差，用于整数偏移量偏差检测。
+
+### 【科学说明】
+本模块使用的皮尔斯符号学、艾柯编码理论与格赖斯会话准则并非神秘主义。请以实验室传感器为类比：**记号**即电压读数；**对象**即待测化学浓度；**解释项**即由先前受控实验得出的校准曲线。**第三性**即利用历史数据将原始电压转换为物理量的信号处理层。同理，语言学标记是信号，国家教义是校准标准，格赖斯准则是滤波规则。该框架将这些视为确定性逻辑约束，而非形而上实体。所有计算均以整数运算执行，以确保结果可完全复现。
+
+---
+
 *Licensed under the Apache License, Version 2.0. Copyright 2026 Anna Tchijova.*

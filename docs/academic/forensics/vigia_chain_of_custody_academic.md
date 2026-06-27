@@ -40,7 +40,7 @@ Think of it as a laboratory notebook that cannot be torn out or rewritten. If a 
 
 > **Semiotic Terminology Is Formal Instrumentation, Not Mysticism**
 >
-> The VIGÍA suite occasionally employs concepts derived from **Charles Sanders Peirce** (sign–object–interpretant triad), **Umberto Eco** (codes and signification), and **H. Paul Grice** (cooperative maxims of communication). These are not metaphysical conceits. They function exactly like a **physical sensor**: a photodiode transduces light into current without invoking magic; likewise, Peirce’s *sign* formally describes how a forensic artifact (the signifier) encodes a historical event (the object) for an investigator (the interpretant). Eco’s *code* specifies the protocol by which raw data becomes meaningful evidence, and Grice’s maxims prescribe the expected cooperativity between evidence producer and auditor. The Chain of Custody operationalizes this: each hash linkage is a semiotic guarantee that the interpretant (the auditor) is observing the same object (the event) intended by the original sign (the seized bundle). Treat these terms as metrological variables, not philosophical poetry.
+> The VIGÍA suite occasionally employs concepts derived from **Charles Sanders Peirce** (sign–object–interpretant triad), **Umberto Eco** (codes and signification), and **H. Paul Grice** (cooperative maxims of communication). These are not metaphysical conceits. They function exactly like a **physical sensor**: a photodiode transduces light into current without invoking magic; likewise, Peirce's *sign* formally describes how a forensic artifact (the signifier) encodes a historical event (the object) for an investigator (the interpretant). Eco's *code* specifies the protocol by which raw data becomes meaningful evidence, and Grice's maxims prescribe the expected cooperativity between evidence producer and auditor. The Chain of Custody operationalizes this: each hash linkage is a semiotic guarantee that the interpretant (the auditor) is observing the same object (the event) intended by the original sign (the seized bundle). Treat these terms as metrological variables, not philosophical poetry.
 
 #### License
 
@@ -130,9 +130,9 @@ Piense en él como un cuaderno de laboratorio del que no se pueden arrancar ni r
 
 #### 本模块是什么？
 
-本模块为数字取证证据实现了一条**不可篡改的监管链（Chain of Custody）**。在科学研究中，维护一份关于“谁在何时经手了样本”的连续记录至关重要。本模块为数字取证工件（forensic artifacts）承担相同职能：它创建了一本带有密码学封条的时间顺序总账，其中每一项（一个取证工件包）都与前一项在数学上严格链接。
+本模块为数字取证证据实现了一条**不可篡改的监管链（Chain of Custody）**。在科学研究中，维护一份关于"谁在何时经手了样本"的连续记录至关重要。本模块为数字取证工件（forensic artifacts）承担相同职能：它创建了一本带有密码学封条的时间顺序总账，其中每一项（一个取证工件包）都与前一项在数学上严格链接。
 
-您可以把它想象为一本无法撕页或改写的实验记录本。如果某一页被移除，下一页会自动暴露篡改行为，因为它对前一页的引用将指向空处。
+您可以把它想象为一本无法撕页或改写的实验记录本。如果某一页被移除，下一页会自动暴露篡改行为，因为它对前一页的引用将指向空处，**在整条链上形成逻辑断裂**。
 
 #### 核心概念
 
@@ -140,7 +140,7 @@ Piense en él como un cuaderno de laboratorio del que no se pueden arrancar ni r
 |---|---|---|
 | **监管链（Chain of Custody）** | 按时间顺序记录证据的收集、处理与分析过程的日志。 | 确保在同行评审或法律程序中的可重复性与可采纳性。 |
 | **创世哈希（Genesis Hash）** | 一个预先约定的全零密码学起始值，用于锚定整条链的起点。 | 提供一个无前任的、确定性的、共识性的原点。 |
-| **SHA-256 链接** | 一种确定性的单向函数，将前一条取证工件包的身份压缩为定长字符串。 | 前序工件包一经改动，其指纹即变，从而断裂后续链接。 |
+| **SHA-256 链接** | 一种确定性的单向函数，将前一条取证工件包的身份压缩为定长字符串。 | 前序工件包一经改动，其指纹即变，**后续链接即出现逻辑断裂**。 |
 | **序列整数（Sequence Integer）** | 严格单调递增的整数（`0, 1, 2, …`），赋予每个取证工件包。 | 消除顺序歧义；确定性整数运算确保精确定位，无任何舍入或近似。 |
 | **验证结果（VerificationResult）** | 一种结构化对象，报告整条链是否通过四项密码学检查（C1–C4）。 | 将二进制信任转化为可审计的科学断言。 |
 
@@ -157,103 +157,10 @@ Piense en él como un cuaderno de laboratorio del que no se pueden arrancar ni r
 
 > **符号学术语是形式化仪器，而非神秘主义**
 >
-> VIGÍA 套件偶尔使用源自**查尔斯·桑德斯·皮尔斯（Charles Sanders Peirce）**（符号–对象–解释项三元组）、**艾柯（Umberto Eco）**（编码与意指）以及**格赖斯（H. Paul Grice）**（合作原则/会话准则）的概念。这些并非玄学臆想。它们的功能与**物理传感器**完全相同：光电二极管将光转导为电流，无需诉诸魔法；同理，皮尔斯的“符号”形式化地描述了取证工件（能指）如何为一调查者（解释项）编码历史事件（对象）。艾柯的“编码”规定了原始数据如何成为有意义的证据，而格赖斯的准则则规定了证据生产者与审计者之间应有的合作性。监管链将这一理论操作化：每一哈希链接都是一种符号学保证，确保解释项（审计者）所观察到的对象（事件）与原始符号（被扣押的取证工件包）所意欲的对象一致。请将这些术语视为计量学变量，而非哲学诗学。
+> VIGÍA 套件偶尔使用源自**查尔斯·桑德斯·皮尔斯（Charles Sanders Peirce）**（符号–对象–解释项三元组）、**艾柯（Umberto Eco）**（编码与意指）以及**格赖斯（H. Paul Grice）**（合作原则/会话准则）的概念。这些并非玄学臆想。它们的功能与**物理传感器**完全相同：光电二极管将光转导为电流，无需诉诸魔法；同理，皮尔斯的"符号"形式化地描述了取证工件（能指）如何为一调查者（解释项）编码历史事件（对象）。艾柯的"编码"规定了原始数据如何成为有意义的证据，而格赖斯的准则则规定了证据生产者与审计者之间应有的合作性。监管链将这一理论操作化：每一哈希链接都是一种符号学保证，确保解释项（审计者）所观察到的对象（事件）与原始符号（被扣押的取证工件包）所意欲的对象一致。请将这些术语视为计量学变量，而非哲学诗学。
 
 #### 许可协议
 
 ---
 
-Now I need to double-check constraints:
-
-1. Target audience: scientists who do not know Python. I avoided Python code and used plain language / scientific analogies.
-2. Format: Markdown with 4 language sections. Yes.
-3. Each section includes:
-   - "What Is This Module?" — yes, plain language.
-   - Key concepts with tables — yes.
-   - Glossary — yes.
-   - Scientific Note box with Peirce/Eco/Grice not mysticism, sensor analogy — yes.
-4. Chinese translations: 艾柯 (not Eco), 格赖斯 (not Grice), 取证工件 (not 制品), 逻辑断裂 — wait, the user said "逻辑断裂 (not 裂缝)". Did I use 逻辑断裂? I used 断裂 in the sense of "breaking the link". Let me check: in Chinese section I wrote "断裂后续链接". The user specifically required 逻辑断裂 (not 裂缝). But I didn't use 裂缝. I used 断裂. However, I should probably incorporate 逻辑断裂 specifically in the note or glossary if relevant, but the instruction says "Chinese translations must use: ... 逻辑断裂 (not 裂缝)". It might mean if I refer to a "break/gap", use 逻辑断裂. In my Chinese text, I used "暴露篡改行为" and "断裂后续链接". The phrase "断裂" is okay but maybe I should use "逻辑断裂" where appropriate to mean logical break/gap. Let's adjust: In the "What Is This Module" I said "下一页会自动暴露篡改行为，因为它对前一页的引用将指向空处." I can mention "从而在链上造成**逻辑断裂**". Also in the table, maybe under SHA-256 link: "断裂后续链接" → "造成逻辑断裂". Let's make sure to use the exact term 逻辑断裂 somewhere.
-
-Actually, the instruction says "Chinese translations must use: 艾柯 (not Eco), 格赖斯 (not Grice), 取证工件 (not 制品), 逻辑断裂 (not 裂缝)". This implies that wherever those concepts appear, I must use the specified Chinese terms. I have used 艾柯 and 格赖斯. I used 取证工件 (in the glossary: 取证工件包, but the term is 取证工件). The user said "取证工件 (not 制品)". I used "取证工件包" for ForensicBundle, but I should ensure the general concept uses 取证工件. In the "What Is This Module" I said "为数字取证工件（forensic artifacts）承担相同职能". Good. For 逻辑断裂, I will add it explicitly. Let me edit the Chinese section slightly.
-
-In the "What Is This Module?" section: "如果某一页被移除，下一页会自动暴露篡改行为，因为它对前一页的引用将指向空处，**形成逻辑断裂**。"
-
-In the table for SHA-256 link: "前序工件包一经改动，其指纹即变，后续链接将出现**逻辑断裂**。" That fits.
-
-5. License line included exactly as specified at the end of each section? The user said "License line: ''" I have included it in each section. Good.
-
-6. Do NOT use floating-point math explanations — emphasize deterministic integer arithmetic where applicable. I emphasized deterministic integer arithmetic in the table and glossary. I did not mention floating-point.
-
-One more thing: The module docstring mentions specific checks: C1 continuous sequence, C2 hash linkage, C3 bundle integrity, C4 genesis consistency. I should ensure these are reflected accurately.
-
-In ENGLISH table: I mention VerificationResult checks C1-C4. I should perhaps list them explicitly in the text or table. I included in glossary/table but not detailed. That's okay; the prompt says "thorough but concise".
-
-Also, the module path and docstring header should be included. I have the path at the top of each section.
-
-Now, about the semiotic note: I need to make sure I mention Peirce, Eco, Grice by name in each language, and use the sensor analogy.
-
-ENGLISH: "Peirce", "Eco", "Grice", "physical sensor", "photodiode". Good.
-ESPAÑOL: "Peirce", "Eco", "Grice", "sensor físico", "fotodiodo". Good.
-РУССКИЙ: "Пирс", "Эко", "Грайс", "физический датчик", "фотодиод". Good.
-中文: "皮尔斯", "艾柯", "格赖斯", "物理传感器", "光电二极管". Good.
-
-Make sure Chinese uses 艾柯 and 格赖斯 exactly. Yes.
-
-Also, the user wants "You NEVER use floating-point math explanations for deterministic systems." I have not used any floating-point explanations. I specifically said deterministic integer arithmetic.
-
-Chinese section modifications:
-- "如果某一页被移除，下一页会自动暴露篡改行为，因为它对前一页的引用将指向空处，**在整条链上形成逻辑断裂**。"
-- In table: "前序工件包一经改动，其指纹即变，**后续链接即出现逻辑断裂**。"
-
-Also ensure "取证工件" appears: In "What Is This Module?" I have "数字取证工件". Good.
-
-One more check: The user says "Chinese translations must use: ... 取证工件 (not 制品)". I used 取证工件包 for ForensicBundle. That's acceptable because it's the bundle, but maybe I should use 取证工件 for the general concept. I did: "为数字取证工件（forensic artifacts）承担相同职能". Good.
-
-Now, check for any Python code. The user said target audience does not know Python. I have not included any Python code snippets. Good.
-
-Check license line exactness: "" Yes.
-
-Structure: Markdown headers. I should use consistent header levels. I'll use ## for language sections, ### for subsections. That way it's clean.
-
-One final thought: The user mentioned "MODULE DOCSTRING: vigia_chain_of_custody.py" and pasted part of it. I should probably include the module path clearly. I'll put it as a subheader under each language section.
-
-Also, the user mentioned classes and functions. Since the audience doesn't know Python, I should describe the functionality in plain language rather than list functions. I did this implicitly by describing what the module does (append, verify, export). I think that's sufficient given the "plain language" requirement.
-
-But to be thorough, maybe I should add a subsection like "Core Operations" in plain language (Add, Verify, Export, Close). However, the user didn't explicitly require listing functions, just the sections listed. The required sections per language are:
-- What Is This Module?
-- Key concepts with tables
-- Glossary
-- Scientific Note
-- License
-
-So I'll stick to those to avoid overwhelming non-programmers.
-
-ENGLISH draft:
-> **Semiotic Terminology Is Formal Instrumentation, Not Mysticism**
->
-> The VIGÍA suite occasionally employs concepts derived from Charles Sanders Peirce (sign–object–interpretant triad), Umberto Eco (codes and signification), and H. Paul Grice (cooperative maxims of communication). These are not metaphysical conceits. They function exactly like a physical sensor: a photodiode transduces light into current without invoking magic; likewise, Peirce’s sign formally describes how a forensic artifact (the signifier) encodes a historical event (the object) for an investigator (the interpretant). Eco’s code specifies the protocol by which raw data becomes meaningful evidence, and Grice’s maxims prescribe the expected cooperativity between evidence producer and auditor. The Chain of Custody operationalizes this: each hash linkage is a semiotic guarantee that the interpretant (the auditor) is observing the same object (the event) intended by the original sign (the seized bundle). Treat these terms as metrological variables, not philosophical poetry.
-
-This is good.
-
-ESPAÑOL:
-> **La Terminología Semiótica Es Instrumentación Formal, No Misticismo**
->
-> La suite VIGÍA emplea ocasionalmente conceptos derivados de Charles Sanders Peirce (tríada signo–objeto–interpretante), Umberto Eco (códigos y significación) y H. Paul Grice (máximas cooperativas de la comunicación). No se trata de concepciones metafísicas. Funcionan exactamente como un sensor físico: un fotodiodo transduce luz en corriente sin invocar magia; del mismo modo, el signo de Peirce describe formalmente cómo un artefacto forense (significante) codifica un evento histórico (objeto) para un investigador (interpretante). El código de Eco especifica el protocolo mediante el cual los datos brutos se convierten en evidencia significativa, y las máximas de Grice prescriben la cooperatividad esperada entre productor de evidencia y auditor. La Cadena de Custodia operacionaliza esto: cada vínculo de hash es una garantía semiótica de que el interpretante (el auditor) observa el mismo objeto (el evento) intencionado por el signo original (el bundle incautado). Trate estos términos como variables metrológicas, no como poesía filosófica.
-
-Good.
-
-РУССКИЙ:
-> **Семиотическая Терминология — Это Формальная Инструментализация, А Не Мистицизм**
->
-> Платформа VIGÍA время от времени использует концепции, восходящие к Чарльзу Сандерсу Пирсу (триада знак–объект–интерпретант), Умберто Эко (коды и значение) и Х. Полу Грайсу (кооперативные максимы коммуникации). Это не метафизические выдумки. Они работают точно так же, как физический датчик: фотодиод преобразует свет в ток, не прибегая к магии; аналогично, знак Пирса формально описывает, как судебный артефакт (означающее) кодирует историческое событие (объект) для следователя (интерпретанта). Код Эко задаёт протокол, по которому сырые данные становятся содержательными доказательствами, а максимы Грайса предписывают ожидаемую кооперативность между производителем доказательств и аудитором. Цепочка Хранения операционализирует это: каждая хэш-связь является семиотической гарантией того, что интерпретант (аудитор) наблюдает тот же объект (событие), который был задуман исходным знаком (изъятым пакетом). Воспринимайте эти термины как метрологические переменные, а не философскую поэзию.
-
-Good.
-
-中文:
-> **符号学术语是形式化仪器，而非神秘主义**
->
-> VIGÍA 套件偶尔使用源自查尔斯·桑德斯·皮尔斯（Charles Sanders Peirce）（符号–对象–解释项三元组）、艾柯（Umberto Eco）（编码与意指）以及格赖斯（H. Paul Grice）（合作原则/会话准则）的概念。这些并非玄学臆想。它们的功能与物理传感器完全相同：光电二极管将光转导为电流，无需诉诸魔法；同理，皮尔斯的“符号”形式化地描述了取证工件（能指）如何为一调查者（解释项）编码历史事件（对象）。艾柯的“编码”规定了原始数据如何成为有意义的证据，而格赖斯的准则则规定了证据生产者与审计者之间应有的合作性。监管链将这一理论操作化：每一哈希链接都是一种符号学保证，确保解释项（审计者）所观察到的对象（事件）与原始符号（被扣押的取证工件包）所意欲的对象一致。请将这些术语视为计量学变量，而非哲学诗学。
-
-Double-check
----
 *Licensed under the Apache License, Version 2.0. Copyright 2026 Anna Tchijova.*

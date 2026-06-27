@@ -5,101 +5,12 @@ Batch ID: vigia-doc-0019-5be37470
 Generated: 2026-05-20T14:56:47.848835+00:00
 -->
 
-ENGLISH:
-- Heading: ENGLISH
-- What Is This Module? Plain language: A robotic proofreader that scans the VIGÍA Forensic Suite codebase before release. It reads source files as abstract syntax trees (AST) to catch forbidden imports, architectural violations, and non-deterministic numeric pathways that could corrupt forensic hashes. It acts as a gatekeeper in CI/CD pipelines.
-- Key Concepts with tables.
-- Glossary.
-- Scientific Note.
-
-ESPAÑOL:
-- What Is This Module? = ¿Qué es este módulo? Un revisor robótico...
-- Key concepts = Conceptos clave
-- Glossary = Glosario
-- Scientific Note = 【Nota Científica】
-
-РУССКИЙ:
-- What Is This Module? = Что это за модуль? Роботизированный корректор...
-- Key concepts = Ключевые понятия
-- Glossary = Глоссарий
-- Scientific Note = 【Научное примечание】
-
-中文:
-- What Is This Module? = 本模块是什么？ 一个自动化代码审查员...
-- Key concepts = 核心概念
-- Glossary = 术语表
-- Scientific Note = 【科学说明】
-- Ensure translations: 艾柯, 格赖斯, 取证工件, 逻辑断裂.
-
-Let's think about the content.
-
-Key concepts tables should cover:
-1. AST Static Analysis vs Runtime Execution
-2. Banned Import Detection
-3. Architectural Invariant (seal() method)
-4. Version Coexistence (_v1/_v2 shims)
-5. Deterministic Integer Arithmetic vs Non-deterministic Float Paths in Hashing
-6. Hypothesis ID Collisions
-7. Severity Levels
-
-For each language, a table. Let's design the English table first.
-
-| Concept | Plain-Language Meaning | Why It Matters for Forensic Science |
-|---|---|---|
-| Static Audit (AST Walk) | Reading code structure without running it, like checking a blueprint before building. | Guarantees the review itself cannot alter evidence or introduce runtime side-effects. |
-| Banned Import | Any attempt to call a deprecated module (e.g., legacy `ebs` or `semiotic_detector` without v2). | Prevents contamination of the chain of custody by obsolete or unverified code paths. |
-| Seal Violation | If `ForensicBundle` defines its own `seal()` method instead of delegating to `BundleBuilder`. | Breaks the architectural invariant that sealing must follow a controlled, auditable workflow. |
-| Shadow Mode Import | Imports containing the keyword `shadow_mode`. | Indicates experimental or hidden execution paths that bypass standard logging. |
-| Version Shim Gap | Two files with `_v1` and `_v2` suffixes exist but lack an explicit compatibility bridge. | Risks 逻辑断裂 (logical fracture) where analysts unknowingly mix incompatible data schemas. |
-| Float-in-Hash Path | Use of `math.log` / `math.log2` inside functions that feed cryptographic hashes, unless guarded by `Fraction` or `_round_floats`. | Floating-point results differ subtly across ARM and x86 CPUs; hashes must rely on deterministic integer arithmetic to preserve reproducibility. |
-| Hypothesis ID Collision | The same `hypothesis_id` paired with different `intent_type` values inside one file. | Signals contradictory classifications of the same 取证工件 (forensic artifact), undermining peer review. |
-| Severity Levels | Critical (blocks release), Warning (requires justification), Info (advisory). | Mirrors forensic triage: evidence is either inadmissible, questionable, or noted. |
-
-Note: For the Chinese version, translate the concepts but keep the mandated terms.
-
-Glossary:
-- AST (Abstract Syntax Tree): A hierarchical map of source code, like a family tree of every command.
-- Pre-commit Hook: An automated checkpoint that runs before a code change is accepted.
-- CI/CD: Continuous Integration / Continuous Delivery; the automated assembly line that builds and tests software.
-- Hash / Cryptographic Hash: A deterministic numeric fingerprint of data; any change produces a different fingerprint.
-- Deterministic Integer Arithmetic: Calculations using whole numbers and exact fractions (e.g., Python's `Fraction` class) that yield identical results on every processor architecture.
-- Shim: A thin compatibility layer that translates between two versions of a protocol or file format.
-- Forensic Bundle: A container that packages digital evidence with metadata and integrity seals.
-- Invariant: A rule that must remain true at all times for the system to be valid.
-- Chain of Custody: The documented, unbroken transfer of evidence from collection to court.
-
-Need to adapt glossary to each language.
-
-Scientific Note:
-Must explain Peirce/Eco/Grice terminology is NOT mysticism. Use sensor analogy.
-"The module name `semiotic_detector` and terms such as `hypothesis_id` and `intent_type` derive from the semiotic frameworks of Charles Sanders Peirce, Umberto Eco, and Paul Grice. In forensic software engineering, these names denote classification layers—much like a sensor array that detects light, temperature, and pressure. A 'sign' (Peirce) is simply a detectable pattern; 'code' (Eco) is the protocol that maps patterns to categories; 'intent' (Grice) is the inferred purpose behind an action. They are epistemological instruments, not metaphysical claims. Treating them as mysticism would be akin to calling a spectrophotometer 'magic' because it assigns wavelengths to chemical identities."
-
-In Chinese: 皮尔斯 (Peirce), 艾柯 (Eco), 格赖斯 (Grice). 取证工件.
-"本模块中的 `semiotic_detector` 以及 `hypothesis_id`、`intent_type` 等术语源自查尔斯·桑德斯·皮尔斯、翁贝托·艾柯与保罗·格赖斯的符号学框架。在取证软件工程中，这些名称代表分类层级——正如传感器阵列分别检测光强、温度与压力。皮尔斯所指的‘符号’（sign）即可被捕捉的模式；艾柯的‘代码’（code）是将模式映射到类别的协议；格赖斯的‘意图’（intent）则是对行为背后目的的推断。它们是认识论工具，而非玄学主张。将其视为神秘主义，无异于因为分光光度计能将波长对应到化学身份，就称它为魔法。"
-
-Need to make sure Chinese uses 逻辑断裂 for "logical fracture" and 取证工件 for "forensic artifact". I already used 逻辑断裂 in the table concept for version shim gap.
-
-Also need license line at the end: "" Probably after all four sections, or at the very end. The user says "License line: ...". I'll put it at the very end of the document.
-
-Now let's structure the markdown.
-
-Title: `scripts/pre_release_check.py` — Static Pre-Release Audit Module
-
-Then four big sections.
-
-I need to ensure I don't use floating-point math explanations. For the float-in-hash path, I must say: "the tool flags modules that compute entropy using `math.log` / `math.log2` and then feed those values into cryptographic hashes without passing through `Fraction` or `_round_floats`. Because forensic hashes must be deterministic, the suite requires integer arithmetic pathways. Floating-point intermediate values can vary by CPU architecture (ARM vs x86), introducing drift." I should not explain IEEE 754, mantissa, exponent, rounding modes, etc. Just say "non-deterministic across architectures" and emphasize deterministic integer arithmetic.
-
-The user says "You NEVER use floating-point math explanations for deterministic systems." So stick to architectural drift, deterministic integer arithmetic.
-
-Also note the module path is `scripts/pre_release_check.py`.
-
-Let's draft content carefully.
-
-ENGLISH:
+# Module Documentation: `scripts/pre_release_check.py`
 
 ## ENGLISH
 
 ### What Is This Module?
+
 `scripts/pre_release_check.py` is an automated gatekeeper for the VIGÍA Forensic Suite. Before any new code is accepted, this script reads the entire repository as a set of blueprints—never executing the programs—and hunts for five specific risks: forbidden imports of deprecated modules, illegal architectural shortcuts, hidden shadow modes, incompatible version pairs without translation bridges, and non-deterministic numeric pathways that could corrupt cryptographic hashes. It is designed to run inside Continuous Integration (CI/CD) pipelines or as a pre-commit hook, blocking release if any critical finding appears.
 
 ### Key Concepts
@@ -137,15 +48,14 @@ The module name `semiotic_detector` and fields such as `hypothesis_id` and `inte
 - A **code** (Eco) is the protocol that maps those patterns to discrete categories.
 - An **intent** (Grice) is the inferred communicative purpose behind an observed action.
 
-They are **epistemological instruments**, not metaphysical claims. To treat them as mysticism would be akin to calling a spectrophotometer “magic” merely because it assigns wavelengths to chemical identities. The audit module enforces this rigor by ensuring that every classification (`hypothesis_id` paired with a single, consistent `intent_type`) remains logically coherent and reproducible.
+They are **epistemological instruments**, not metaphysical claims. To treat them as mysticism would be akin to calling a spectrophotometer "magic" merely because it assigns wavelengths to chemical identities. The audit module enforces this rigor by ensuring that every classification (`hypothesis_id` paired with a single, consistent `intent_type`) remains logically coherent and reproducible.
 
 ---
-
-ESPAÑOL:
 
 ## ESPAÑOL
 
 ### ¿Qué es este módulo?
+
 `scripts/pre_release_check.py` es un guardián automatizado del VIGÍA Forensic Suite. Antes de que cualquier código nuevo sea aceptado, este script lee todo el repositorio como un conjunto de planos—sin ejecutar nunca los programas—y busca cinco riesgos específicos: importaciones prohibidas de módulos obsoletos, atajos arquitectónicos ilegales, modos ocultos (`shadow_mode`), pares de versiones incompatibles sin puentes de traducción, y rutinas numéricas no deterministas que podrían corromper hashes criptográficos. Está diseñado para ejecutarse dentro de tuberías de Integración Continua (CI/CD) o como *pre-commit hook*, bloqueando la liberación si aparece algún hallazgo crítico.
 
 ### Conceptos Clave
@@ -183,15 +93,14 @@ El nombre del módulo `semiotic_detector` y los campos como `hypothesis_id` e `i
 - Un **código** (Eco) es el protocolo que asigna esos patrones a categorías discretas.
 - Una **intención** (Grice) es el propósito comunicativo inferido detrás de una acción observada.
 
-Son **instrumentos epistemológicos**, no afirmaciones metafísicas. Tratarlos como misticismo sería como llamar “mágico” a un espectrofotómetro solo porque asigna longitudes de onda a identidades químicas. El módulo de auditoría impone esta rigurosidad al asegurar que cada clasificación (`hypothesis_id` asociado a un único `intent_type` consistente) permanezca lógicamente coherente y reproducible.
+Son **instrumentos epistemológicos**, no afirmaciones metafísicas. Tratarlos como misticismo sería como llamar "mágico" a un espectrofotómetro solo porque asigna longitudes de onda a identidades químicas. El módulo de auditoría impone esta rigurosidad al asegurar que cada clasificación (`hypothesis_id` asociado a un único `intent_type` consistente) permanezca lógicamente coherente y reproducible.
 
 ---
-
-РУССКИЙ:
 
 ## РУССКИЙ
 
 ### Что это за модуль?
+
 `scripts/pre_release_check.py` — это автоматический привратник набора средств судебной экспертизы VIGÍA. Прежде чем новый код будет принят, скрипт читает всё хранилище как набор чертежей — никогда не запуская сами программы, — и выслеживает пять конкретных рисков: запрещённые импорты устаревших модулей, незаконные архитектурные сокращения, скрытые теневые режимы (`shadow_mode`), несовместимые пары версий без явных мостов совместимости и недетерминированные числовые пути, способные повредить криптографические хеши. Он предназначен для запуска в рамках непрерывной интеграции (CI/CD) или в качестве pre-commit hook, блокируя выпуск при обнаружении критических находок.
 
 ### Ключевые понятия
@@ -233,11 +142,10 @@ Son **instrumentos epistemológicos**, no afirmaciones metafísicas. Tratarlos c
 
 ---
 
-中文:
-
 ## 中文
 
 ### 本模块是什么？
+
 `scripts/pre_release_check.py` 是 VIGÍA 取证套件（VIGÍA Forensic Suite）的自动化守门人。在任何新代码被接纳之前，该脚本会将整个代码库视为一套蓝图——绝不执行程序本身——并搜寻五类特定风险：对已弃用模块的违禁导入、违规的架构捷径、隐藏的 shadow_mode 运行模式、缺乏显式兼容层的版本共存文件对，以及可能破坏加密哈希值的可复现性的非确定性数值路径。它设计为在持续集成/持续交付（CI/CD）流水线中运行，或作为 pre-commit hook（提交前钩子），一旦发现关键问题即阻止发布。
 
 ### 核心概念
@@ -269,6 +177,14 @@ Son **instrumentos epistemológicos**, no afirmaciones metafísicas. Tratarlos c
 
 ### 【科学说明】符号学术语是传感器阵列，而非神秘主义
 
-模块名 `semiotic_detector` 以及
+模块名 `semiotic_detector` 以及 `hypothesis_id`、`intent_type` 等字段借用了**查尔斯·桑德斯·皮尔斯**、**艾柯**与**格赖斯**符号学传统中的词汇。在取证软件工程的语境下，这些术语命名的是**分类层级**——与检测光、温度和压力的实验室传感器阵列并无本质区别。
+
+- **符号**（皮尔斯）仅是数据中可检测的模式。
+- **编码**（艾柯）是将这些模式映射到离散类别的协议。
+- **意图**（格赖斯）是对观察到的行为背后交际目的的推断。
+
+它们是**认识论工具**，而非形而上学主张。将其视为神秘主义，无异于因为分光光度计能将波长对应到化学身份，就称它为魔法。审计模块通过确保每一次分类（`hypothesis_id` 与唯一且一致的 `intent_type` 配对）保持逻辑连贯与可复现性来强制执行这一严谨性。
+
 ---
+
 *Licensed under the Apache License, Version 2.0. Copyright 2026 Anna Tchijova.*

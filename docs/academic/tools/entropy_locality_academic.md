@@ -5,118 +5,9 @@ Batch ID: vigia-doc-0159-1dbdaea0
 Generated: 2026-05-20T14:56:47.878870+00:00
 -->
 
-ENGLISH:
-- Title: Entropy Locality Analyzer (`vigia/tools/entropy_locality.py`)
-- What Is This Module?: Explain it's a digital forensics tool that maps WHERE high entropy occurs in a file, not just the average. Like an X-ray showing dense objects inside luggage.
-- Key Concepts Table:
-  | Term | Plain-Language Definition |
-  | Global Entropy | Average disorder across entire file (can hide localized secrets) |
-  | Spatial Entropy Distribution | How disorder is arranged across byte offsets |
-  | Entropy Locality | Specific regions with unusually high disorder |
-  | Chunk | A fixed-size window of bytes analyzed independently |
-  | Deterministic Integer Arithmetic | Exact counting methods using whole numbers, ensuring identical inputs always yield identical outputs |
-  | Steganography | Concealment of information inside other files |
-  | Shellcode | Machine instructions injected by attackers |
-  
-- Components Table:
-  | Component | Role |
-  | EntropyProfile | Immutable record of entropy values per region |
-  | EntropyLocalityAnalyzer | Detector that locates suspicious regions |
-  | EntropyVisualizer | ASCII graph generator for reports |
-  | analyze() | Main measurement function (takes bytes, returns profile) |
-  | visualize() | Creates text-based cluster map |
-  
-- Constants Table:
-  | Constant | Purpose |
-  | CHUNK_SIZE | Width of each analysis window in bytes |
-  | HIGH_ENTROPY_THRESHOLD | Integer cutoff marking probable encryption |
-  | STEGANOGRAPHY_THRESHOLD | Integer cutoff suggesting hidden data |
-  | LOCALITY_SUSPICIOUS | Integer score indicating spatial anomaly |
+## ENGLISH
 
-- Glossary:
-  - Byte: 8-bit unit of digital information.
-  - Entropy: Measure of unpredictability; high entropy = random-looking.
-  - Offset: Position within a file, measured in bytes from the start.
-  - Payload: Active malicious data or secret content.
-  - Forensic Artifact: Object of evidence in digital investigations (use 取证工件 in Chinese).
-  - Deterministic System: Process where the same input always produces the same output without statistical approximation.
-
-- Scientific Note:
-  【Scientific Note】
-  This module occasionally references conceptual frameworks associated with Peirce (semiotic triads), Eco (coding theory), and Grice (pragmatic maxims). These terms are not mystical incantations. They function exactly like a calibrated sensor: Peirce’s categories detect sign-to-object relationships, Eco’s codes detect layered encoding schemes, and Grice’s maxims detect logical fractures where expected communication structure is violated. A sensor does not “believe” in what it measures; it registers formal deviations. Likewise, these terminological borrowings are formal observational operators, not hermeneutic mysticism.
-
-- 
-
-ESPAÑOL:
-- Title: Analizador de Localidad de Entropía (`vigia/tools/entropy_locality.py`)
-- What Is This Module? -> "¿Qué es este módulo?"
-- Explain it's a forensic tool...
-- Key concepts: Entropía global, Distribución espacial de entropía, Localidad de entropía, Ventana (Chunk), Aritmética entera determinista, Esteganografía, Código de shell.
-- Components: Perfil de Entropía, Analizador, Visualizador, analizar(), visualizar().
-- Constants: TAMAÑO_DE_VENTANA, UMBRAL_ALTA_ENTROPÍA, UMBRAL_ESTEGANOGRAFÍA, LOCALIDAD_SOSPECHOSA.
-- Glossary: Byte, Entropía, Desplazamiento (Offset), Carga útil (Payload), Artefacto forense, Sistema determinista.
-- Scientific Note:
-  【Nota Científica】
-  Este módulo hace referencia ocasional a marcos conceptuales asociados con Peirce (tríadas semióticas), Eco (teoría de los códigos) y Grice (máximas pragmáticas). Estos términos no son invocaciones místicas. Funcionan exactamente como un sensor calibrado: las categorías de Peirce detectan relaciones signo-objeto, los códigos de Eco detectan esquemas de codificación en capas, y las máximas de Grice detectan rupturas lógicas donde la estructura comunicativa esperada es violada. Un sensor no "cree" en lo que mide; registra desviaciones formales. Así, estos préstamos terminológicos son operadores observacionales formales, no misticismo hermenéutico.
-- License line same.
-
-РУССКИЙ:
-- Title: Анализатор пространственной энтропии (`vigia/tools/entropy_locality.py`)
-- What Is This Module? -> "Что представляет собой этот модуль?"
-- Key concepts: Глобальная энтропия, Пространственное распределение энтропии, Локальность энтропии, Блок (Chunk), Детерминированная целочисленная арифметика, Стеганография, Шеллкод.
-- Components: Профиль энтропии, Анализатор локальности энтропии, Визуализатор энтропии, analyze(), visualize().
-- Constants: РАЗМЕР_БЛОКА, ПОРОГ_ВЫСОКОЙ_ЭНТРОПИИ, ПОРОГ_СТЕГАНОГРАФИИ, ПОДОЗРИТЕЛЬНАЯ_ЛОКАЛЬНОСТЬ.
-- Glossary: Байт, Энтропия, Смещение, Полезная нагрузка, Следственный артефакт (or Цифровой артефакт?), Детерминированная система. Wait, the user specified 取证工件 for Chinese. For Russian, I'll use "Следственный артефакт" or "Объект цифровой экспертизы". Let's use "Следственный артефакт" or "Цифровой артефакт". Actually "артефакт цифровой экспертизы" is good.
-- Scientific Note:
-  【Научное примечание】
-  В модуле иногда используются концепции, связанные с Пирсом (семиотические триады), Эко (теория кодов) и Грайсом (прагматические максимы). Эти термины не являются мистическими формулами. Они работают точно так же, как калиброванный датчик: категории Пирса выявляют отношения знак–объект, коды Эко обнаруживают многоуровневые схемы кодирования, а максимы Грайса фиксируют логические разрывы, где нарушается ожидаемая коммуникативная структура. Датчик не «верит» в то, что измеряет; он регистрирует формальные отклонения. Таким образом, эти заимствованные термины — это формальные наблюдательные операторы, а не герменевтический мистицизм.
-- License line.
-
-中文:
-- Title: 熵空间分布分析器 (`vigia/tools/entropy_locality.py`) or 熵局部化分析器. The module name is Entropy Locality Analyzer. I'll use 熵空间局部分析器 or 熵局部性分析器. Let's use 熵空间局部分析器.
-- What Is This Module? -> "本模块是什么？"
-- Key concepts:
-  - 全局熵
-  - 熵空间分布
-  - 熵局部性
-  - 数据块 (Chunk)
-  - 确定性整数运算
-  - 隐写术
-  -  shellcode / 植入代码
-- Components:
-  - 熵剖面 (EntropyProfile)
-  - 熵局部性分析器 (EntropyLocalityAnalyzer)
-  - 熵可视化器 (EntropyVisualizer)
-  - analyze() / 分析函数
-  - visualize() / 可视化函数
-- Constants:
-  - CHUNK_SIZE / 块大小
-  - HIGH_ENTROPY_THRESHOLD / 高熵阈值
-  - STEGANOGRAPHY_THRESHOLD / 隐写阈值
-  - LOCALITY_SUSPICIOUS / 局部可疑度
-- Glossary:
-  - 字节 (Byte)
-  - 熵 (Entropy)
-  - 偏移量 (Offset)
-  - 载荷 (Payload) - or 有效载荷? Maybe 载荷/有效载荷.
-  - 取证工件 (Forensic Artifact) - MUST use this.
-  - 确定性系统 (Deterministic System)
-- Scientific Note:
-  【科学说明】
-  本模块偶尔借用皮尔斯（Peirce）符号学三元组、艾柯（Eco）编码理论以及格赖斯（Grice）语用学准则的概念框架。这些术语并非神秘主义咒语。它们的功能与校准后的传感器完全一致：皮尔斯的范畴用于检测符号与对象之间的形式关系；艾柯的编码用于识别分层编码结构；格赖斯的准则用于侦测"逻辑断裂"——即预期通信结构遭到违反的位置。传感器不会"相信"它所测量的对象，它只记录形式偏差。因此，这些术语借用的本质是形式化观测算子，而非诠释学的神秘主义。
--  (Keep in English as per requirement, or translate? The requirement says "License line: ''" So I'll keep it exactly like that in all sections.)
-
-Also, the user said "You NEVER use floating-point math explanations for deterministic systems." and "Do NOT use floating-point math explanations — emphasize deterministic integer arithmetic where applicable". So in the English and other sections, when explaining entropy calculation, I must not say "uses floating point logarithms". I should say it uses integer histograms and deterministic counting.
-
-One thing: The module docstring mentions Peirce/Eco/Grice? Actually the provided docstring doesn't explicitly mention them, but the requirement says: "A 【科学说明】/【Scientific Note】 box explaining that Peirce/Eco/Grice terminology is NOT mysticism — use the sensor analogy". So I should assume the module or the broader VIGÍA framework uses these terms.
-
-Also, the module mentions "Steganografía (entropía" in the classes list but it's cut off. I'll infer it means steganography patterns in entropy.
-
-English Section:
-
-# ENGLISH
-
-## Module: `vigia/tools/entropy_locality.py` — Entropy Locality Analyzer
+### Module: `vigia/tools/entropy_locality.py` — Entropy Locality Analyzer
 
 ### What Is This Module?
 This module is a digital forensics instrument. It examines a file not as a single bag of bytes, but as a spatial map. Its purpose is to reveal *where* disorder hides inside a file, rather than reporting only an overall average. High entropy concentrated in a specific neighborhood is a strong indicator of encrypted payloads, steganographic insertion, or injected shellcode. By splitting the data into sequential chunks and measuring each zone independently through deterministic integer arithmetic, the tool produces an immutable spatial profile that an investigator can read, compare, and archive.
@@ -139,7 +30,7 @@ This module is a digital forensics instrument. It examines a file not as a singl
 | Component | Scientific Role |
 |---|---|
 | `EntropyProfile` | An immutable record—once created, it cannot be altered—storing entropy values for every spatial zone. |
-| `EntropyLocalityAnalyzer` | The core detector. It answers the question *“Where is the entropy?”* rather than *“How much entropy exists in total?”* |
+| `EntropyLocalityAnalyzer` | The core detector. It answers the question *"Where is the entropy?"* rather than *"How much entropy exists in total?"* |
 | `EntropyVisualizer` | A report generator that translates numerical results into ASCII bar charts for quick visual inspection. |
 | `analyze(data)` | The primary measurement function. Accepts raw byte content and returns a complete `EntropyProfile`. |
 | `visualize(profile)` | Renders cluster boundaries as ASCII graphics, allowing human analysts to spot peaks without plotting software. |
@@ -163,15 +54,13 @@ This module is a digital forensics instrument. It examines a file not as a singl
 - **Deterministic System**: A computational process in which the same input invariably produces the same output, free from stochastic variation or precision loss.
 
 ### 【Scientific Note】
-This module occasionally references conceptual frameworks associated with **Peirce** (semiotic triads), **Eco** (coding theory), and **Grice** (pragmatic maxims). These terms are not mystical incantations. They function exactly like a calibrated sensor: Peirce’s categories detect sign-to-object relationships, Eco’s codes detect layered encoding schemes, and Grice’s maxims detect **logical fractures** where expected communication structure is violated. A sensor does not “believe” in what it measures; it registers formal deviations. Likewise, these terminological borrowings are formal observational operators, not hermeneutic mysticism.
+This module occasionally references conceptual frameworks associated with **Peirce** (semiotic triads), **Eco** (coding theory), and **Grice** (pragmatic maxims). These terms are not mystical incantations. They function exactly like a calibrated sensor: Peirce's categories detect sign-to-object relationships, Eco's codes detect layered encoding schemes, and Grice's maxims detect **logical fractures** where expected communication structure is violated. A sensor does not "believe" in what it measures; it registers formal deviations. Likewise, these terminological borrowings are formal observational operators, not hermeneutic mysticism.
 
 ---
 
-ESPAÑOL Section:
+## ESPAÑOL
 
-# ESPAÑOL
-
-## Módulo: `vigia/tools/entropy_locality.py` — Analizador de Localidad de Entropía
+### Módulo: `vigia/tools/entropy_locality.py` — Analizador de Localidad de Entropía
 
 ### ¿Qué es este módulo?
 Este módulo es un instrumento de forense digital. Examina un archivo no como un simple conjunto de bytes, sino como un mapa espacial. Su propósito es revelar *dónde* se oculta el desorden dentro de un archivo, en lugar de reportar únicamente un promedio global. Una entropía alta concentrada en una vecindad específica es un indicio sólido de cargas útiles cifradas, inserción esteganográfica o código de inyección (shellcode). Al dividir los datos en ventanas secuenciales y medir cada zona de forma independiente mediante aritmética entera determinista, la herramienta genera un perfil espacial inmutable que el investigador puede leer, comparar y archivar.
@@ -222,11 +111,9 @@ Este módulo hace referencia ocasional a marcos conceptuales asociados con **Pei
 
 ---
 
-РУССКИЙ Section:
+## РУССКИЙ
 
-# РУССКИЙ
-
-## Модуль: `vigia/tools/entropy_locality.py` — Анализатор пространственной энтропии
+### Модуль: `vigia/tools/entropy_locality.py` — Анализатор пространственной энтропии
 
 ### Что представляет собой этот модуль?
 Этот модуль — инструмент цифровой криминалистики. Он исследует файл не как простой набор байтов, а как пространственную карту. Его цель — выявить, *где* именно в файле скрывается беспорядок, а не сообщить лишь общее среднее значение. Высокая энтропия, сконцентрированная в конкретной области, является надёжным признаком зашифрованной полезной нагрузки, стеганографической вставки или инжектированного шеллкода. Разделяя данные на последовательные блоки и измеряя каждую зону независимо с помощью детерминированной целочисленной арифметики, инструмент создаёт неизменяемый пространственный профиль, который следователь может прочитать, сравнить и заархивировать.
@@ -277,11 +164,9 @@ Este módulo hace referencia ocasional a marcos conceptuales asociados con **Pei
 
 ---
 
-中文 Section:
+## 中文
 
-# 中文
-
-## 模块：`vigia/tools/entropy_locality.py` — 熵空间局部分析器
+### 模块：`vigia/tools/entropy_locality.py` — 熵空间局部分析器
 
 ### 本模块是什么？
 本模块是一件数字取证工具。它检查文件时，不是将其视为一袋杂乱的字节，而是视为一张空间地图。其目的在于揭示文件内部*何处*藏匿着无序，而非仅报告一个总平均值。特定邻域内的高熵是加密载荷、隐写术嵌入或注入式 shellcode 的强指示信号。该工具将数据切分为连续的块，并通过**确定性整数运算**独立测量每个区域，从而生成不可变更的空间剖面，供调查人员阅读、比对与存档。
@@ -304,7 +189,7 @@ Este módulo hace referencia ocasional a marcos conceptuales asociados con **Pei
 | 组件 | 科学作用 |
 |---|---|
 | `EntropyProfile`（熵剖面） | 不可变记录——一经创建便不可更改——存储每个空间区域的熵值。 |
-| `EntropyLocalityAnalyzer`（熵局部性分析器） | 核心探测器。回答*“熵在哪里？”*，而非*“总共有多少熵？”* |
+| `EntropyLocalityAnalyzer`（熵局部性分析器） | 核心探测器。回答*"熵在哪里？"*，而非*"总共有多少熵？"* |
 | `EntropyVisualizer`（熵可视化器） | 报告生成器，将数值结果转换为 ASCII 条形图，以便快速目视检查。 |
 | `analyze(data)`（分析函数） | 主要测量函数。接收原始字节内容，返回完整的 `EntropyProfile`。 |
 | `visualize(profile)`（可视化函数） | 将聚类边界渲染为 ASCII 图形，使分析人员无需绘图软件即可发现峰值。 |
@@ -316,6 +201,21 @@ Este módulo hace referencia ocasional a marcos conceptuales asociados con **Pei
 | `CHUNK_SIZE`（块大小） | 每个分析窗口的宽度，以字节为单位。 |
 | `HIGH_ENTROPY_THRESHOLD`（高熵阈值） | 整数阈值，超过此值的数据块被归类为疑似加密内容。 |
 | `STEGANOGRAPHY_THRESHOLD`（隐写阈值） | 整数阈值，暗示存在隐藏的嵌入数据。 |
-| `LOCALITY_SUSPICIOUS`（局部可疑度） | 整数评分，表示某种
+| `LOCALITY_SUSPICIOUS`（局部可疑度） | 整数评分，表示某种空间模式偏离了正常文件结构。 |
+
+### 术语表
+
+- **字节（Byte）**：内存中最小的可寻址单元，由 8 位组成。
+- **熵（Entropy）**：从字节值频率分布中导出的不可预测性度量；较高的值表示较强的随机性。
+- **偏移量（Offset）**：从文件开头到特定位置的字节距离。
+- **载荷（Payload）**：由漏洞利用程序或隐蔽信道携带的恶意或秘密数据。
+- **取证工件（Forensic Artifact）**：取证过程中产生的任何可作为证据引用的有文档记录的输出。
+- **确定性系统（Deterministic System）**：相同输入必然产生相同输出的计算过程，不存在随机变化或精度损失。
+- **逻辑断裂**：预期通信结构遭到违反时出现的确定性不连续性，是模块通过熵空间分析所能检测到的客观现象。
+
+### 【科学说明】
+本模块偶尔借用**皮尔斯**（Peirce）符号学三元组、**艾柯**（Eco）编码理论以及**格赖斯**（Grice）语用学准则的概念框架。这些术语并非神秘主义咒语。它们的功能与校准后的传感器完全一致：皮尔斯的范畴用于检测符号与对象之间的形式关系；艾柯的编码用于识别分层编码结构；格赖斯的准则用于侦测**逻辑断裂**——即预期通信结构遭到违反的位置。传感器不会"相信"它所测量的对象，它只记录形式偏差。因此，这些术语借用的本质是形式化观测算子，而非诠释学的神秘主义。
+
 ---
+
 *Licensed under the Apache License, Version 2.0. Copyright 2026 Anna Tchijova.*

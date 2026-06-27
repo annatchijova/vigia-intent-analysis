@@ -5,119 +5,6 @@ Batch ID: vigia-doc-0072-777f8e26
 Generated: 2026-05-20T14:56:47.860024+00:00
 -->
 
-ENGLISH:
-- What Is This Module? It's Layer 3 (Governance) of the VIGÍA Forensic Suite. It acts as a formal referee that converts statistical evidence into bounded decisions (ACCEPT, REJECT, ABSTAIN). It uses deterministic arithmetic to ensure the same evidence always yields the same verdict on any hardware.
-- Key Concepts Table:
-  - Risk Function (r_total): The core formula combining posterior probability (P), drift score (D), and other integrity parameters.
-  - Posterior (P): Probability that evidence is fabricated given observations.
-  - Drift Score (D): Normalized PSI metric indicating distributional shift.
-  - Policy Parameters (λ, γ, ε, ω): Sensitivity knobs adjusted by historical error feedback.
-  - Decision Trace: Immutable record of verdict + reasoning + parameters.
-  - Fixed-Point Arithmetic (Decimal): Cross-platform deterministic calculation using scaled integer logic, not floating-point.
-  - PSI (Population Stability Index): Measures divergence between reference and current distributions.
-  - Isolation Rule: Architectural boundary preventing read access to audit/action layers.
-- Classes/Functions summary table (maybe separate or combined).
-  - RiskBoundedDecisionLayer
-  - SelfAdaptiveRiskPolicy
-  - PolicyStabilityController
-  - compute_risk(), decide(), stabilize(), etc.
-- Glossary:
-  - Deterministic arithmetic, Drift, Fixed-point, Governance layer, Isolation rule, Momentum, Parameter damping, Posterior probability, PSI, Risk bounding, Traceability.
-- Scientific Note:
-  - Mention Peirce (signs, interpretants), Eco (codes, overinterpretation), Grice (cooperative principle, implicature). Use sensor analogy: Just as a spectrograph interprets electromagnetic signals via calibration codes (Eco), inference rules (Peirce), and expected cooperativity of the source (Grice), this module interprets forensic artifacts. These are formal semiotic frameworks, not mysticism.
-
-ESPAÑOL:
-- Similar structure. Plain language.
-- Key concepts: Función de riesgo, Posterior, Drift, Parámetros λ/γ/ε/ω, Traza de decisión, Aritmética de coma fija (Decimal), PSI, Regla de aislamiento.
-- Glossary: Aritmética determinista, Deriva (drift), Capa de gobernanza, Regla de aislamiento, Momento (momentum), Amortiguación, Probabilidad posterior, PSI, Acotamiento de riesgo, Trazabilidad.
-- Scientific Note: Same sensor analogy. Charles Sanders Peirce, Umberto Eco, H.P. Grice.
-
-РУССКИЙ:
-- Что это за модуль?
-- Key concepts: Функция риска, Апостериорная вероятность, Дрифт, Параметры политики, След решения, Детерминированная арифметика с фиксированной точкой, PSI, Правило изоляции.
-- Glossary: Детерминированная арифметика, Дрифт, Слой управления (Governance), Правило изоляции, Момент инерции (momentum), Демпфирование, Апостериорная вероятность, PSI, Ограничение риска, Прослеживаемость.
-- Scientific Note: Пирс, Эко, Грайс. Use sensor analogy: аналогия с датчиком.
-
-中文:
-- 本模块是什么？
-- Key concepts: 风险函数、后验概率 (P)、漂移分数 (D)、策略参数 (λ, γ, ε, ω)、决策追溯记录、定点/确定性整数运算 (Decimal)、PSI、隔离规则.
-- Chinese terms: 艾柯 (Eco), 格赖斯 (Grice), 取证工件 (artifact, not 制品), 逻辑断裂 (logical fracture/breach, not 裂缝).
-- Glossary: 确定性算术, 漂移, 治理层, 隔离规则, 动量, 阻尼, 后验概率, PSI, 风险边界, 可追溯性, 取证工件, 逻辑断裂.
-- Scientific Note: 【科学说明】. Explain Pierce (皮尔斯), 艾柯, 格赖斯. Sensor analogy: 传感器/光谱仪 analogies. Not mysticism.
-
-
-Also mention `to_system_state()` exports to SystemState bundle, and `from_policy_spec()` reconstructs from sealed PolicySpec.
-
-Let's draft tables.
-
-ENGLISH Table 1: Core Components
-| Component | Role | Plain-Language Description |
-|---|---|---|
-| RiskBoundedDecisionLayer | Decision engine | Computes formal risk and issues ACCEPT/REJECT/ABSTAIN verdicts. |
-| SelfAdaptiveRiskPolicy | Calibration unit | Adjusts sensitivity parameters (λ, γ, ε) using historical error windows. |
-| PolicyStabilityController | Oscillation dampener | Applies momentum and damping to prevent parameter feedback loops from swinging wildly. |
-
-Table 2: Risk Formula Variables
-| Symbol | Name | Range | Meaning |
-|---|---|---|---|
-| P | Posterior probability | [0, 1] | Probability that a forensic artifact is fabricated given the evidence. |
-| D | Drift score | [0, 1] | Normalized distributional shift (PSI/KL). |
-| λ | Drift sensitivity | ≥ 0 | Adaptive weight controlling how much drift amplifies risk. |
-| γ | Integrity sensitivity | ≥ 0 | Adaptive weight for structural integrity deficits. |
-| ε | Abstention threshold | ≥ 0 | Boundary for uncertainty; decisions below confidence trigger ABSTAIN. |
-| ω | (Implied) | ≥ 0 | Weight for the interpretative coherence factor (I). |
-| S | Structural integrity | [0, 1] | Measure of internal consistency of the evidence bundle. |
-| I | Interpretative coherence | [0, 1] | Semiotic alignment score (e.g., Gricean maxima / Eco-code compliance). |
-
-`r_total = (1 - P) · (1 + λ·D) · (1 + γ·(1 - S)) · (1 + ω·(1 - I))`
-It defines P and D. S and I are implied. I'll describe them generally as per the module's context, noting they are inputs from lower layers.
-
-Table 3: Decision Outcomes
-| Verdict | Condition | Scientific Meaning |
-|---|---|---|
-| ACCEPT | r_total < threshold & P low | Evidence passes bounded risk criteria; artifact deemed authentic. |
-| REJECT | r_total ≥ threshold & P high | Risk exceeds bounds; fabrication strongly indicated. |
-| ABSTAIN | ε triggers uncertainty | Insufficient confidence; no decisive classification to avoid false positives/negatives. |
-
-Table 4: Key Functions
-| Function | Purpose |
-|---|---|
-| compute_risk() | Evaluates r_total using deterministic scaled-integer (Decimal) arithmetic. |
-| decide() | Generates a DecisionTrace containing verdict, reasoning, and all parameters. |
-| stabilize() | Damps proposed λ, γ, ε via momentum to reject noisy spikes. |
-| update_from_window() | Recalibrates parameters from a sliding window of historical FP/FN errors. |
-| record_decision() | Appends ground-truth feedback for future policy adaptation. |
-| compute_psi() | Measures drift via Population Stability Index between reference and current distributions. |
-| psi_to_drift_score() | Maps raw PSI to the [0, 1] normalized drift score D. |
-| to_system_state() / from_policy_spec() | Serializes and deserializes governance state into forensic bundles. |
-
-ESPAÑOL Tables:
-Similar.
-
-РУССКИЙ Tables:
-Similar.
-
-中文 Tables:
-Similar. Ensure 取证工件 is used if referring to artifacts. 逻辑断裂 for logical fractures.
-
-Now the Scientific Note content. It needs to be consistent across languages but culturally translated.
-
-Core idea:
-- Charles Sanders Peirce: semiotics, signs, abduction. In forensics, evidence is a sign of an event.
-- Umberto Eco 艾柯: codes, overinterpretation, limits of interpretation. The interpreter must know when a reading is excessive.
-- H.P. Grice 格赖斯: cooperative principle, conversational maxims (quality, quantity, relevance, manner). In forensics, evidence is expected to be cooperative; deviations (逻辑断裂) indicate fabrication.
-- Sensor analogy: A spectrometer receives raw photon counts. It does not "believe" in mysticism. It uses Peircean inference (if-then rules) to classify wavelengths, Eco-codes (calibration tables) to map counts to chemical species, and Gricean expectations (if the sample is pure, peaks should cooperate) to flag contamination. Similarly, this module treats forensic artifacts as signals interpreted through formal semiotic rules.
-
-I must explicitly state that this terminology is formal semiotics, not mysticism.
-
-License line: exactly ""
-
-Formatting: Markdown. Use headers. Use blockquotes or admonition-style boxes for the Scientific Note.
-
-Let's write.
-
-ENGLISH:
-
 ## ENGLISH
 
 ### What Is This Module?
@@ -177,7 +64,7 @@ Crucially, this layer does not use opaque machine learning. Instead, it relies o
 > 【Scientific Note】
 > This module occasionally references semiotic frameworks—**Charles Sanders Peirce** (theory of signs and abductive inference), **Umberto Eco** (interpretative codes and the limits of overinterpretation), and **H.P. Grice** (cooperative maxims of communication). These are **not mystical concepts**. They are formal models of how intelligent agents derive meaning from signals. Consider a laboratory spectrometer: it uses Peircean inference rules to classify wavelengths, Eco-codes (calibration tables) to map signals to chemical species, and Gricean expectations (that a pure sample will yield cooperative, non-contradictory peaks) to flag contamination. When this module evaluates an **interpretative coherence** score or detects a **logical fracture**, it is performing an analogous mechanistic reading of forensic artifacts. The terminology is philosophical, but the operation is strictly deterministic signal processing.
 
-ESPAÑOL:
+---
 
 ## ESPAÑOL
 
@@ -187,8 +74,6 @@ Este módulo, `risk_bounded_layer.py`, constituye la **Capa de Gobernanza (Capa 
 Esencialmente, esta capa no utiliza aprendizaje automático opaco. Se basa en una fórmula de riesgo transparente, acordada colectivamente, y en control por retroalimentación adaptativa. Todos los cálculos se ejecutan con **aritmética determinista de enteros escalados** (mediante el tipo `Decimal`), garantizando que la misma evidencia produzca exactamente el mismo resultado en una estación Intel x86, un servidor ARM o una placa RISC-V. No existe indeterminismo de punto flotante dependiente del hardware.
 
 ### Conceptos Clave
-
-(Similar tables, translated)
 
 | Componente | Rol | Descripción en lenguaje sencillo |
 |---|---|---|
@@ -240,7 +125,7 @@ Esencialmente, esta capa no utiliza aprendizaje automático opaco. Se basa en un
 > 【Nota Científica】
 > Este módulo hace referencia ocasional a marcos semióticos formales: **Charles Sanders Peirce** (teoría de los signos e inferencia abductiva), **Umberto Eco** (códigos interpretativos y límites de la sobreinterpretación) y **H.P. Grice** (máximas cooperativas de la comunicación). Estos **no son conceptos místicos**. Son modelos formales de cómo los agentes inteligentes extraen significado a partir de señales. Considere un espectrómetro de laboratorio: utiliza reglas de inferencia peirceanas para clasificar longitudes de onda, códigos ecoanos (tablas de calibración) para mapear señales a especies químicas, y expectativas griceanas (de que una muestra pura producirá picos cooperativos y no contradictorios) para señalar contaminación. Cuando este módulo evalúa una puntuación de **coherencia interpretativa** o detecta una **fractura lógica**, está realizando una lectura mecanicista análoga de artefactos forenses. La terminología es filosófica, pero la operación es un procesamiento estrictamente determinista de señales.
 
-РУССКИЙ:
+---
 
 ## РУССКИЙ
 
@@ -279,6 +164,25 @@ Esencialmente, esta capa no utiliza aprendizaje automático opaco. Se basa en un
 | `compute_risk()` | Вычисляет коллективно согласованную функцию риска с помощью **детерминированной целочисленной арифметики с фиксированным масштабом** (`Decimal`), без использования чисел с плавающей запятой. |
 | `decide()` | Генерирует полную **DecisionTrace** — неизменяемую запись вердикта, параметров и цепочки рассуждений. |
 | `stabilize()` | Демпфирует предлагаемые обновления λ, γ и ε с помощью момента инерции; отклоняет волатильные всплески. |
-| `update_from_window()` | Перекалибрует параметры по скользящему окну исторических ошибок (ложные срабаты
+| `update_from_window()` | Перекалибрует параметры по скользящему окну исторических ошибок (ложные срабатывания и пропуски). |
+| `record_decision()` | Архивирует обратную связь по истинной разметке (`FABRICATED`, `AUTHENTIC` или `None`) для будущей адаптации. |
+| `compute_psi()` | Вычисляет Population Stability Index между эталонным и текущим распределениями. |
+| `psi_to_drift_score()` | Нормализует сырой PSI к интервалу [0, 1], необходимому функции риска. |
+| `to_system_state()` / `from_policy_spec()` | Экспортирует или восстанавливает состояние управления в/из запечатанного криминалистического пакета. |
+
+### Глоссарий
+
+- **Детерминированная целочисленная арифметика**: Метод вычислений, использующий целочисленные мантиссы с фиксированным масштабом (здесь — через `Decimal`), гарантирующий побитовую воспроизводимость на разных архитектурах ЦПУ. Числа с плавающей запятой (IEEE-754) явно исключены.
+- **Дрифт**: Постепенное или резкое изменение статистического распределения доказательств по сравнению с проверенной базовой линией.
+- **Уровень управления**: Архитектурный слой, преобразующий выходные данные моделей в подотчётные решения, обеспечивая изоляцию от уровней аудита и действий.
+- **Правило изоляции**: Архитектурная политика, позволяющая этому уровню читать только из `models/` и `engine/`, но никогда из `audit/` или `action/`, предотвращая циклические зависимости.
+- **Момент инерции (momentum)**: Стабилизирующий член, заимствованный из теории управления, сохраняющий долю предыдущих значений параметров для сглаживания обновлений.
+- **Демпфирование параметров**: Подавляющий фактор, ослабляющий колебания в петлях адаптивной обратной связи.
+- **Апостериорная вероятность (P)**: В байесовских терминах — обновлённая вероятность гипотезы (подделки) после наблюдения доказательств.
+- **PSI (Population Stability Index)**: Симметричная статистика расхождения для количественной оценки распределительного сдвига; значения выше 0.2 указывают на серьёзный дрифт.
+- **Ограничение риска**: Практика установления верхних пределов допустимого риска, обеспечивающая принятие решений в научно обоснованных рамках.
+- **Прослеживаемость**: Свойство решения быть полностью восстановимым из записанных параметров, входных данных и версии кода.
+
 ---
+
 *Licensed under the Apache License, Version 2.0. Copyright 2026 Anna Tchijova.*

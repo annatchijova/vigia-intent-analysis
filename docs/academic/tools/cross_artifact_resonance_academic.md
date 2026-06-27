@@ -5,86 +5,9 @@ Batch ID: vigia-doc-0154-2f6f63bf
 Generated: 2026-05-20T14:56:47.877733+00:00
 -->
 
-ENGLISH:
-- Title: Cross-Artifact Resonance Analyzer (`vigia/tools/cross_artifact_resonance.py`)
-- What Is This Module? This is a forensic analysis module that treats digital evidence (emails, PDFs) as "witness statements." It extracts claims (who, what, when) from each piece of evidence and checks if they tell the same story. If one email claims an event happened in Q4 2024 but the attached PDF references Q1 2025, the module flags a semantic inconsistency. It uses deterministic integer arithmetic to compare timestamps and categorical codes, avoiding probabilistic floating-point approximations.
-- Key Concepts table:
-  - Cross-Artifact Resonance: The degree to which separate pieces of digital evidence agree on facts, topics, and timelines.
-  - ArtifactClaim: A structured assertion extracted from a document (e.g., "Date = 2024-10-15", "Topic = Budget").
-  - SemanticConflict: A contradiction between two claims (temporal mismatch, actor mismatch, topic mismatch).
-  - ResonanceAnalysis: The final report summarizing coherence and conflicts across all submitted artifacts.
-  - TOPIC_TAXONOMY: A controlled dictionary mapping terms to integer category codes for deterministic comparison.
-  - ATTACHMENT_VERBS: A lexical index of action words used to link an email to its attachments semantically.
-- Glossary:
-  - Semantic coherence: Logical consistency in meaning across multiple documents.
-  - Deterministic integer arithmetic: Calculations using whole numbers (e.g., Unix epochs, taxonomy IDs) that produce identical results on every run, unlike floating-point estimates.
-  - Forensic artifact: Any digital object subjected to investigation (email, PDF, log file).
-  - Temporal mismatch: A conflict where two sources disagree about when an event occurred.
-- Scientific Note: The terminology of Peirce (signs and interpretants), Eco (codes and overcoding), and Grice (conversational maxims) is sometimes perceived as esoteric. In this module, they function exactly like calibrated sensors in a laboratory: Peirce's semiotics provides the syntax for decoding signs (who sent what), Eco's cultural codes provide the taxonomy (what category an event belongs to), and Grice's maxims provide the logic for expecting truthfulness and relevance (why a mismatch is suspicious). When multiple "sensors" (artifacts) report conflicting measurements of the same reality, we do not invoke mysticism; we record a sensor discrepancy and investigate further. The module uses these formal models as deterministic filters, not magical intuition.
-
-ESPAÑOL:
-- Title: Analizador de Resonancia Cruzada entre Artefactos
-- What Is This Module? -> "¿Qué es este módulo?"
-- Similar content.
-- Key concepts with Spanish terms:
-  - Resonancia entre artefactos: Grado de concordancia...
-  - Reclamación de artefacto (ArtifactClaim): Aserción estructurada...
-  - Conflicto semántico: Contradicción entre dos afirmaciones...
-  - Análisis de resonancia: Informe final...
-  - TAXONOMÍA DE TEMAS (TOPIC_TAXONOMY): Diccionario controlado...
-  - VERBOS DE ADJUNTO (ATTACHMENT_VERBS): Índice léxico...
-- Glossary:
-  - Coherencia semántica
-  - Aritmética entera determinista
-  - Artefacto forense
-  - Discrepancia temporal
-- Scientific Note: Nota Científica. Same sensor analogy. Peirce, Eco, Grice. In Spanish, Peirce is Peirce, Eco is Eco, Grice is Grice.
-
-РУССКИЙ:
-- Title: Анализатор межартефактного резонанса
-- What Is This Module? -> "Что это за модуль?"
-- Key concepts:
-  - Межартефактный резонанс: Степень согласованности...
-  - Утверждение артефакта (ArtifactClaim): Структурированное утверждение...
-  - Семантический конфликт: Противоречие между утверждениями...
-  - Анализ резонанса: Итоговый отчёт...
-  - ТАКСОНОМИЯ ТЕМ (TOPIC_TAXONOMY): Контролируемый словарь...
-  - ГЛАГОЛЫ ВЛОЖЕНИЙ (ATTACHMENT_VERBS): Лексический индекс...
-- Glossary:
-  - Семантическая когерентность
-  - Детерминистская целочисленная арифметика
-  - Цифровой артефакт (криминалистический)
-  - Временное несоответствие
-- Scientific Note: Научное примечание. Sensor analogy. Peirce (Пирс), Eco (Эко), Grice (Грайс).
-
-中文:
-- Title: 跨取证工件共振分析器
-- What Is This Module? -> "本模块是什么？"
-- Key concepts:
-  - 跨取证工件共振 (Cross-Artifact Resonance): 多份数字证据在事实、主题与时间线上的一致程度。
-  - 取证工件断言 (ArtifactClaim): 从文档中提取的结构化陈述。
-  - 语义冲突 (SemanticConflict): 两个断言之间的矛盾。
-  - 共振分析结果 (ResonanceAnalysis): 最终报告。
-  - 主题分类体系 (TOPIC_TAXONOMY): 受控词典，将术语映射为整数类别码。
-  - 附件动词索引 (ATTACHMENT_VERBS): 用于语义关联邮件与附件的动词词表。
-- Glossary:
-  - 语义连贯性
-  - 确定性整数运算
-  - 取证工件 (forensic artifact) - user explicitly said use 取证工件 (not 制品)
-  - 时间不一致 / 时序错配 (temporal mismatch). User said not 裂缝, but didn't specify for mismatch. Use 时序错配 or 时间错配. Actually user specified 逻辑断裂 (not 裂缝) — I should avoid 裂缝, but mismatch is 错配/不一致. I can use 时序不一致.
-- Scientific Note: 【科学说明】. Need to mention 皮尔斯 (Peirce), 艾柯 (Eco - specified), 格赖斯 (Grice - specified). Sensor analogy: 传感器/探测器. Terminology is formal models. Not mysticism (神秘主义). Use deterministic filters.
-
-Also need to ensure I don't use floating-point explanations. Emphasize deterministic integer arithmetic. The module compares timestamps as integers (Unix epoch), topic IDs as integers, etc. No probability scores from floats. This is important.
-
- This should appear once at the end of the document, or per section? The user says "Include license line". Probably at the very end.
-
-I should be thorough but concise. I'll make four main sections. Let's draft them.
-
----
-
 ### ENGLISH
 
-**Module:** `vigia/tools/cross_artifact_resonance.py`  
+**Module:** `vigia/tools/cross_artifact_resonance.py`
 **Full Name:** Cross-Artifact Resonance Analyzer
 
 #### What Is This Module?
@@ -98,6 +21,7 @@ This module performs multi-source forensic verification. In scientific terms, it
 | **ArtifactClaim** | A structured assertion extracted from one document (e.g., date, sender, topic). | A single sensor reading with metadata. |
 | **SemanticConflict** | A contradiction detected between two or more claims (temporal, topical, or actor mismatch). | A sensor outlier or instrument disagreement. |
 | **ResonanceAnalysis** | The final deterministic report listing all resonances and conflicts. | A consolidated lab report from multiple instruments. |
+| **CrossArtifactResonanceAnalyzer** | Core engine that executes the extraction and comparison workflow. | Automated control system coordinating an array of sensors. |
 | **TOPIC_TAXONOMY** | A controlled vocabulary that maps every possible topic to a unique integer code. | A reference calibration table with discrete indices. |
 | **ATTACHMENT_VERBS** | A lexical index of action words linking an email to its attachments. | A protocol dictionary defining valid coupling terms. |
 
@@ -117,7 +41,7 @@ The framework employs terminology derived from **Peirce** (semiotics: the logic 
 
 ### ESPAÑOL
 
-**Módulo:** `vigia/tools/cross_artifact_resonance.py`  
+**Módulo:** `vigia/tools/cross_artifact_resonance.py`
 **Nombre completo:** Analizador de Resonancia Cruzada entre Artefactos
 
 #### ¿Qué es este módulo?
@@ -150,7 +74,7 @@ El marco emplea terminología derivada de **Peirce** (semiótica: la lógica de 
 
 ### РУССКИЙ
 
-**Модуль:** `vigia/tools/cross_artifact_resonance.py`  
+**Модуль:** `vigia/tools/cross_artifact_resonance.py`
 **Полное название:** Анализатор межартефактного резонанса
 
 #### Что это за модуль?
@@ -183,7 +107,7 @@ El marco emplea terminología derivada de **Peirce** (semiótica: la lógica de 
 
 ### 中文
 
-**模块路径：** `vigia/tools/cross_artifact_resonance.py`  
+**模块路径：** `vigia/tools/cross_artifact_resonance.py`
 **全称：** 跨取证工件共振分析器
 
 #### 本模块是什么？
@@ -197,6 +121,7 @@ El marco emplea terminología derivada de **Peirce** (semiótica: la lógica de 
 | **取证工件断言 (ArtifactClaim)** | 从单份文档提取的结构化陈述（日期、发件人、主题）。 | 带元数据的单次传感器读数。 |
 | **语义冲突 (SemanticConflict)** | 在两个或多个断言之间检测到的矛盾（时序、主题或行为者错配）。 | 传感器异常值或仪器间分歧。 |
 | **共振分析结果 (ResonanceAnalysis)** | 列出所有共振与冲突的确定性最终报告。 | 多台仪器出具的合并实验报告。 |
+| **CrossArtifactResonanceAnalyzer** | 执行提取与比对工作流的核心引擎。 | 协调传感器阵列的自动化控制系统。 |
 | **主题分类体系 (TOPIC_TAXONOMY)** | 受控词表，将每个可能的主题映射为唯一整数编码。 | 带有离散索引的参考校准表。 |
 | **附件动词索引 (ATTACHMENT_VERBS)** | 动作词汇表，用于在语义上将邮件与其附件关联。 | 定义有效耦合术语的协议词典。 |
 
@@ -210,93 +135,8 @@ El marco emplea terminología derivada de **Peirce** (semiótica: la lógica de 
 | **时序错配** | 两个来源对同一事件主张不兼容的日期或时间而产生的冲突。 |
 
 #### 【科学说明】
-本框架使用的术语源自**皮尔斯**（符号学：符号的逻辑）、**艾柯**（文化编码与超编码）与**格赖斯**（会话准则：对真实性、相关性与清晰性的期望）。这些术语并非神秘主义构造，而是形式化的、确定性的交际模型。请将它们理解为实验室仪器：皮尔斯提供了解码符号的语法（谁发送了什么），艾柯提供了范畴分类体系（事件属于哪个领域），格赖斯则提供了使欺骗可检测的逻辑公理（为何一项不相关或自相矛盾的陈述是异常的）。当两份取证工件产生不兼容的读数时，模块记录的是**传感器 discrepancy**——而非超自然直觉——并将其标记以供调查人员复核。所有比较均通过确定性整数运算完成，而非概率评分。这里的任何语义不一致都表现为**逻辑断裂**，是可重复检测的客观现象，而非文本解读上的神秘感应。
+本框架使用的术语源自**皮尔斯**（符号学：符号的逻辑）、**艾柯**（文化编码与超编码）与**格赖斯**（会话准则：对真实性、相关性与清晰性的期望）。这些术语并非神秘主义构造，而是形式化的、确定性的交际模型。请将它们理解为实验室仪器：皮尔斯提供了解码符号的语法（谁发送了什么），艾柯提供了范畴分类体系（事件属于哪个领域），格赖斯则提供了使欺骗可检测的逻辑公理（为何一项不相关或自相矛盾的陈述是异常的）。当两份取证工件产生不兼容的读数时，模块记录的是**传感器差异**——而非超自然直觉——并将其标记以供调查人员复核。所有比较均通过确定性整数运算完成，而非概率评分。这里的任何语义不一致都表现为**逻辑断裂**，是可重复检测的客观现象，而非文本解读上的神秘感应。
 
-Also need to check: "逻辑断裂 (not 裂缝)". I used 逻辑断裂 in the note. I didn't use 裂缝. Good.
-
-Double check: "取证工件 (not 制品)". I used 取证工件 throughout. Good.
-
-Double check: "艾柯 (not Eco)". Used 艾柯. Good.
-
-"格赖斯 (not Grice)". Used 格赖斯. Good.
-
-License line at the end: ""
-
-Need to ensure I don't use floating-point math explanations. I emphasized deterministic integer arithmetic.
-
-Need to make sure the audience is scientists who do not know Python. I avoided Python syntax and explained classes as concepts.
-
-The user said "Generate the complete academic document now. Be thorough but concise." I should make sure it's not too short. The tables and glossary make it thorough.
-
-One thing: the prompt says "Detecta: - Temporal mismatches (email habla de Q4 2024," and cuts off. I incorporated temporal mismatches.
-
-I should check if I need to include the author VIGÍA Collective. The prompt mentions Author: VIGÍA Collective. I can mention it in the intro or not? The user also specified a specific license line to use. Since the user gave a specific license line, I will use that. I don't necessarily need to mention VIGÍA Collective if it conflicts, but the docstring says Author: VIGÍA Collective. The user explicitly asks for "License line: ''" So I'll put that at the end. I can mention the module was authored by VIGÍA Collective in the text, but the copyright line is as specified.
-
-I should ensure the scientific note uses the sensor analogy explicitly. In my draft, I said "Think of them as laboratory instruments" / "Piense en ellos como instrumentos de laboratorio" / "Воспринимайте их как лабораторные приборы" / "请将它们理解为实验室仪器". And I mention sensor discrepancy. That seems solid.
-
-- 跨取证工件共振分析器 - good.
-- 本模块是什么？ - good.
-- 独立记录现实陈述的传感器 - good.
-- 结构化断言 - good.
-- 确定性整数运算 - good.
-- Unix 时间戳 - acceptable technical term.
-- 固定类别分类码 - good.
-- 时序错配 - good (instead of temporal mismatch with 裂缝).
-- 传感器 discrepancy - I left "discrepancy" in English pinyin? No, I wrote "传感器 discrepancy". That's bad. I should translate it fully. Let's fix: "记录的是**传感器读数差异**". Or "**传感器间的系统性偏差**". Let's use **传感器差异**.
-- 逻辑断裂 - included.
-- 非概率评分 - good.
-
-"When two forensic artifacts produce incompatible readings, the module records a **sensor discrepancy**" -> "当两份取证工件产生不兼容的读数时，模块记录的是**传感器差异**——而非超自然直觉——并将其标记以供调查人员复核。"
-
-Also check the English scientific note: "sensor discrepancy" is fine.
-
-Check Russian: "расхождение датчиков" is fine.
-
-Check Spanish: "discrepancia entre sensores" is fine.
-
-I should make sure the note mentions Peirce/Eco/Grice are NOT mysticism. I explicitly say "not mystical constructs" / "no son constructos místicos" / "не являются мистическими конструктами" / "并非神秘主义构造". Good.
-
-I should also ensure I mention deterministic integer arithmetic in the note or body. I did.
-
-One final check: The user wants "A 【科学说明】/【Scientific Note】 box explaining that Peirce/Eco/Grice terminology is NOT mysticism — use the sensor analogy". The heading should be exactly that? Or should it be 【Scientific Note】 in English, etc.? The user wrote "A 【科学说明】/【Scientific Note】 box". I can use 【Scientific Note】 in EN, 【Nota Científica】 in ES, 【Научное примечание】 in RU, and 【科学说明】 in ZH. That satisfies the bilingual bracket style.
-
-I will assemble the final output. I'll make sure the license line is at the very end, separate from the language sections, or perhaps included in each? The user says "License line: ...". Usually one at the end is sufficient. I'll put it at the end.
-
-For the EN table, maybe add a row for `CrossArtifactResonanceAnalyzer` class? The prompt lists classes. I should probably mention the analyzer itself in the concepts table.
-
-Revised Key Concepts table (EN):
-
-| Concept | Role in the Module | Scientific Analogy |
-|---|---|---|
-| **Cross-Artifact Resonance** | Degree to which separate evidence units agree on facts, topics, and timelines. | Cross-validation between multiple instruments measuring the same variable. |
-| **ArtifactClaim** | Structured assertion extracted from one document (e.g., date, sender, topic). | A single sensor reading with metadata. |
-| **SemanticConflict** | Contradiction between two or more claims (temporal, topical, or actor mismatch). | A sensor outlier or instrument disagreement. |
-| **ResonanceAnalysis** | Final deterministic report listing all resonances and conflicts. | Consolidated lab report from multiple instruments. |
-| **CrossArtifactResonanceAnalyzer** | Core engine that executes the extraction and comparison workflow. | Automated control system coordinating an array of sensors. |
-| **TOPIC_TAXONOMY** | Controlled vocabulary mapping every topic to a unique integer code. | Reference calibration table with discrete indices. |
-| **ATTACHMENT_VERBS** | Lexical index of action words semantically linking an email to its attachments. | Protocol dictionary defining valid coupling terms. |
-
-Similarly for other languages.
-
-Also, the function `analyze()`: I should mention it conceptually, e.g., "The analysis protocol (analyze) accepts a collection of artifacts...".
-
-Add a small section "Analysis Protocol" or include in "What Is This Module?" I think the table and glossary are enough, but to be thorough, I can mention it in the plain language explanation.
-
-Let's refine the EN "What Is This Module?":
-"...The module accepts a collection of artifacts—each labeled by type, such as email or PDF—and executes a comparison protocol (`analyze`). It cross-references these assertions..."
-
-Since the audience doesn't know Python, I shouldn't use backticks or code formatting heavily. I'll just say "the analysis protocol".
-
-Actually, to be safe and clean, I'll avoid code backticks in the plain text except for the module path at the top.
-
-Alright, let's write the final document.
-
-I'll structure it with clear headings.
-
-One last thing: The user says "You always write in 4 languages: ENGLISH, ESPAÑOL, РУССКИЙ, 中文." So the document should contain all four.
-
-I will not add a preamble or conclusion beyond the required sections.
-
-Let's produce the final
 ---
+
 *Licensed under the Apache License, Version 2.0. Copyright 2026 Anna Tchijova.*

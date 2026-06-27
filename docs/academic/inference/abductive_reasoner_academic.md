@@ -5,167 +5,18 @@ Batch ID: vigia-doc-0096-996f511d
 Generated: 2026-05-20T14:56:47.865330+00:00
 -->
 
----
-doc_hash: 996f511d
-module: vigia/inference/abductive_reasoner.py
-languages: [EN, ES, RU, ZH]
-generated_by: moonshot-kimi-k2.6-batch-api
-license: Apache-2.0
----
-
-ENGLISH:
-- What Is This Module?: It's a compatibility bridge. Imagine a lab instrument that used to output data on a serial port, but the internal electronics were upgraded. Rather than rewiring the whole lab, an adapter is placed on the back so the new electronics speak the old protocol. This module is that adapter. It takes forensic signals (evidence artifacts), runs them through an upgraded reasoning engine (V2) that uses deterministic integer arithmetic, and returns results in the exact format the older orchestrator expects (V1).
-- Key concepts table:
-  | Term | Plain-Language Definition | Role in Forensic Workflow |
-  | AbductionTrace | A structured log/record that captures every step of the hypothesis-generation process, formatted for downstream audit. | Output artifact consumed by the orchestrator to render verdicts or reports. |
-  | AbductiveReasoner | The public-facing instrument panel. It accepts signals and delegates to the upgraded V2 engine. | Entry point for evidence evaluation; shields scientists from internal version changes. |
-  | reason(signals) | The single operation a scientist calls: "Here are my signals; tell me the best explanatory hypothesis." | API v1 method preserved for backward compatibility. |
-  | CCS (Cumulative Confidence Score) | A deterministic integer score computed from validated evidence weights. No decimals; all thresholds are whole numbers. | Quantitative metric ranking competing hypotheses. |
-  | Veto | A hard-rejection gate. If a hypothesis violates a known physical or logical constraint, it is discarded regardless of score. | Quality-control filter preventing impossible explanations. |
-  | Daubert Verdict | A final admissibility ruling modeled on scientific-evidence standards: does the hypothesis rest on testable, falsifiable foundations? | Final gate before a trace is sent to the report generator. |
-  | API v1 / v2 Bridge | A translation layer ensuring legacy orchestration scripts continue to function while the core engine evolves. | Risk-mitigation strategy avoiding disruptive refactors. |
-
-- Glossary:
-  - Abductive reasoning (Peirce): Inference to the best explanation. Given an observation, enumerate possible causes and select the one that best accounts for the evidence under deterministic constraints.
-  - Trace (forensic): An immutable record of processing steps; analogous to a lab notebook page.
-  - Orchestrator: The master scheduler that coordinates multiple analysis modules.
-  - Deterministic integer arithmetic: Mathematical operations using only whole numbers (ℤ) where the same inputs always yield the same outputs, eliminating rounding errors and reproducibility concerns.
-  - Wrapper: A protective shell that changes the interface of an object without altering its internal mechanics.
-
-- Scientific Note:
-  > 【Scientific Note】The terminology of Peirce, Eco, and Grice is often mistaken for philosophical mysticism. In this system, these names are merely labels for deterministic signal-processing stages—no different from naming a temperature-compensation curve after its inventor. Peirce's abduction corresponds to "hypothesis generation from anomalous sensor readings"; Eco's interpretive limits correspond to "sensor range boundary conditions"; Grice's maxims correspond to "noise-filtering heuristics." The module does not "contemplate" meanings. It applies integer arithmetic rules to 取证工件 (forensic artifacts), producing logically consistent outputs through a fully mechanized, auditable pipeline.
-
-Wait, the scientific note should be in each language, and Chinese terms should be used in the Chinese section. But the note says "use the sensor analogy". So in English, I'll use sensor analogy.
-
-ESPAÑOL:
-- Similar structure.
-- Terms: Peirce, Eco, Grice.
-- Note: 【Nota Científica】La terminología de Peirce, Eco y Grice a menudo se confunde con misticismo filosófico. En este sistema, estos nombres son meramente etiquetas para etapas deterministas de procesamiento de señales... Peirce = generación de hipótesis a partir de lecturas anómalas de sensores; Eco = condiciones de rango/límite del sensor; Grice = heurísticas de filtrado de ruido. No contempla significados. Aplica reglas aritméticas de números enteros a artefactos forenses.
-
-РУССКИЙ:
-- Peirce = Пирс, Eco = Эко, Grice = Грайс.
-- Note: 【Научное примечание】Терминология Пирса, Эко и Грайса часто ошибочно принимается за философский мистицизм... аналогия с датчиком: Пирс = генерация гипотез по аномальным показаниям датчика; Эко = граничные условия диапазона датчика; Грайс = эвристики фильтрации шума. Система не "размышляет", а применяет детерминированные целочисленные правила.
-
-中文:
-- Must use: 艾柯 (not Eco), 格赖斯 (not Grice), 取证工件 (not 制品), 逻辑断裂 (not 裂缝)
-- Peirce = 皮尔斯 (standard), Eco = 艾柯, Grice = 格赖斯.
-- Module explanation: 这是一个兼容性桥接层...
-- Key terms:
-  - AbductionTrace = 溯因推理轨迹 (or 溯因痕迹)
-  - AbductiveReasoner = 溯因推理器
-  - reason(signals) = 推理(signals)
-  - CCS = 累积置信度评分 (deterministic integer arithmetic -> 确定性整数运算)
-  - Veto = 否决机制
-  - Daubert Verdict = 道伯特裁决
-  - API v1/v2 Bridge = API v1/v2 桥接层
-- Glossary:
-  - 溯因推理 (皮尔斯) = 最佳解释推理...
-  - 取证轨迹 = 处理步骤的不可变记录
-  - 编排器 = 协调多个分析模块的主调度器
-  - 确定性整数运算 = 仅使用整数（ℤ）的数学运算...
-  - 包装器 = 不改变内部 mechanics 的情况下改变对象接口的保护层
-- Note: 【科学说明】皮尔斯、艾柯与格赖斯的术语常被误认为哲学神秘主义。在本系统中，这些名称仅仅是确定性信号处理阶段的标签——无异于以发明者命名一条温度补偿曲线。皮尔斯的溯因推理对应“根据异常传感器读数生成假设”；艾柯的诠释边界对应“传感器量程的边界条件”；格赖斯的准则对应“噪声过滤启发式”。该模块并不“思考”意义。它对取证工件应用整数算术规则，通过完全机械化且可审计的流水线产生逻辑一致的输出。
-
-
-```markdown
 # Module Documentation: `vigia/inference/abductive_reasoner.py`
 
-> **Declared Path:** `vigia/inference/abductive_reasoner.py`  
-> **Internal Docstring Reference:** `vigia/engine/abductive_reasoner.py`  
+> **Declared Path:** `vigia/inference/abductive_reasoner.py`
+> **Internal Docstring Reference:** `vigia/engine/abductive_reasoner.py`
 > **Classification:** BRIDGE P2 — API v1 Compatibility Wrapper over AbductiveReasonerV2
 
 ---
 
 ## ENGLISH
 
-### What Is This Module?
-
-[explanation]
-
-### Key Concepts
-
-| Concept | Definition | Scientific Role |
-|---|---|---|
-
-### Glossary
-
-[terms]
-
-> 【Scientific Note】[text]
-
----
-
-## ESPAÑOL
-
-### ¿Qué es este módulo?
-
-...
-
-### Conceptos clave
-
-...
-
-### Glosario
-
-...
-
-> 【Nota Científica】...
-
----
-
-## РУССКИЙ
-
-### Что представляет собой этот модуль?
-
-...
-
-### Ключевые концепции
-
-...
-
-### Глоссарий
-
-...
-
-> 【Научное примечание】...
-
----
-
-## 中文
-
-### 本模块是什么？
-
-...
-
-### 核心概念
-
-...
-
-### 术语表
-
-...
-
-> 【科学说明】...
-
----
-
-
-```
-
-
-EN Scientific Note:
-> 【Scientific Note】Terms drawn from Peirce, Eco, and Grice are sometimes perceived as philosophical mysticism. Within this system they are strictly mnemonic labels for deterministic signal-processing stages—no more mystical than calling a temperature-correction function “Newton.” **Peirce** names the stage that generates candidate hypotheses from anomalous sensor readings. **Eco** names the boundary-condition check that rejects readings falling outside the calibrated sensor range. **Grice** names the noise-filtering heuristics that discard physically implausible signals before they enter the arithmetic core. The module does not interpret meaning; it applies deterministic integer-arithmetic rules to forensic artifacts, producing an auditable, reproducible trace.
-
-ES Nota Científica:
-> 【Nota Científica】Los términos derivados de Peirce, Eco y Grice a veces se perciben como misticismo filosófico. En este sistema son estrictamente etiquetas mnemónicas para etapas deterministas de procesamiento de señales... **Peirce** = generación de hipótesis a partir de lecturas anómalas del sensor. **Eco** = verificación de condiciones de frontera que rechaza lecturas fuera del rango calibrado. **Grice** = heurísticas de filtrado de ruido que descartan señales físicamente inverosímiles. El módulo no interpreta significados; aplica reglas aritméticas deterministas de números enteros a artefactos forenses...
-
-RU Научное примечание:
-> 【Научное примечание】Термины, заимствованные у Пирса, Эко и Грайса, иногда воспринимаются как философский мистицизм. В данной системе они являются строго мнемоническими метками для детерминированных этапов обработки сигналов... **Пирс** — этап генерации гипотез по аномальным показаниям датчика. **Эко** — проверка граничных условий, отбраковывающая показания за пределами калиброванного диапазона. **Грайс** — эвристические алгоритмы фильтрации шума, отсеивающие физически неправдоподобные сигналы. Модуль не интерпретирует смысл; он применяет детерминированные правила целочисленной арифметики к цифровым артефактам...
-
-### ENGLISH
-
 **What Is This Module?**
-Think of this module as an adapter plate on a laboratory spectrometer. The instrument’s internal electronics—the *AbductiveReasonerV2* engine—have been upgraded to compute Cumulative Confidence Scores (CCS), apply veto gates, and render Daubert verdicts using stricter, deterministic integer arithmetic. However, the rest of the laboratory software—specifically `sift_orchestrator.py`—still expects the older control panel layout, called API v1. Rather than rewiring every script, this module places a thin, transparent wrapper around the new engine. Scientists and automated orchestrators interact with the familiar `reason(signals)` method and receive an `AbductionTrace` object formatted exactly as before, while underneath the calculations are performed by the modernized V2 core.
+Think of this module as an adapter plate on a laboratory spectrometer. The instrument's internal electronics—the *AbductiveReasonerV2* engine—have been upgraded to compute Cumulative Confidence Scores (CCS), apply veto gates, and render Daubert verdicts using stricter, deterministic integer arithmetic. However, the rest of the laboratory software—specifically `sift_orchestrator.py`—still expects the older control panel layout, called API v1. Rather than rewiring every script, this module places a thin, transparent wrapper around the new engine. Scientists and automated orchestrators interact with the familiar `reason(signals)` method and receive an `AbductionTrace` object formatted exactly as before, while underneath the calculations are performed by the modernized V2 core.
 
 **Key Concepts**
 
@@ -173,7 +24,7 @@ Think of this module as an adapter plate on a laboratory spectrometer. The instr
 |---|---|---|
 | **AbductionTrace** | A structured, immutable record that documents every step of hypothesis generation, veto decisions, and the final verdict. | Output artifact consumed by the orchestrator to render reports or chain-of-custody logs. |
 | **AbductiveReasoner** | The public-facing instrument panel. Accepts evidence signals and delegates processing to the upgraded V2 engine. | Entry point for evidence evaluation; shields users from internal version migrations. |
-| **reason(signals)** | The single operation a user invokes: “Given these forensic signals, return the best explanatory hypothesis.” | API v1 method preserved for backward compatibility. |
+| **reason(signals)** | The single operation a user invokes: "Given these forensic signals, return the best explanatory hypothesis." | API v1 method preserved for backward compatibility. |
 | **CCS** | Cumulative Confidence Score. A ranking metric built exclusively from deterministic integer arithmetic—summation, comparison, and thresholding over whole numbers (ℤ). | Quantitative basis for competing hypotheses; reproducible and free from rounding error. |
 | **Veto** | A hard-rejection gate. If a hypothesis violates physical laws, chain-of-custody rules, or exhibits logical fractures, it is discarded regardless of score. | Quality-control filter preventing impossible or inadmissible explanations. |
 | **Daubert Verdict** | Final admissibility ruling modeled on scientific-evidence standards: does the hypothesis rest on falsifiable, testable foundations? | Ultimate gate before a trace is released to the report generator. |
@@ -186,9 +37,11 @@ Think of this module as an adapter plate on a laboratory spectrometer. The instr
 - **Deterministic integer arithmetic:** Mathematical operations restricted to whole numbers where identical inputs always yield identical outputs, ensuring full reproducibility and eliminating floating-point uncertainty.
 - **Wrapper:** A software adapter that preserves an existing interface while redirecting operations to a new internal implementation.
 
-> 【Scientific Note】Terms drawn from Peirce, Eco, and Grice are sometimes perceived as philosophical mysticism. Within this system they are strictly mnemonic labels for deterministic signal-processing stages—no more mystical than calling a temperature-correction function “Newton.” **Peirce** names the stage that generates candidate hypotheses from anomalous sensor readings. **Eco** names the boundary-condition check that rejects readings falling outside the calibrated sensor range. **Grice** names the noise-filtering heuristics that discard physically implausible signals before they enter the integer-arithmetic core. The module does not interpret meaning; it applies deterministic integer-arithmetic rules to forensic artifacts, producing an auditable, reproducible trace.
+> 【Scientific Note】Terms drawn from Peirce, Eco, and Grice are sometimes perceived as philosophical mysticism. Within this system they are strictly mnemonic labels for deterministic signal-processing stages—no more mystical than calling a temperature-correction function "Newton." **Peirce** names the stage that generates candidate hypotheses from anomalous sensor readings. **Eco** names the boundary-condition check that rejects readings falling outside the calibrated sensor range. **Grice** names the noise-filtering heuristics that discard physically implausible signals before they enter the integer-arithmetic core. The module does not interpret meaning; it applies deterministic integer-arithmetic rules to forensic artifacts, producing an auditable, reproducible trace.
 
-### ESPAÑOL
+---
+
+## ESPAÑOL
 
 **¿Qué es este módulo?**
 Imagine este módulo como una placa adaptadora en un espectrómetro de laboratorio. La electrónica interna del instrumento —el motor *AbductiveReasonerV2*— se ha actualizado para calcular Puntajes de Confianza Acumulativos (CCS), aplicar compuertas de veto y emitir veredictos Daubert mediante aritmética entera determinista más estricta. Sin embargo, el resto del software del laboratorio —específicamente `sift_orchestrator.py`— aún espera el antiguo panel de control, denominado API v1. En lugar de recablear cada script, este módulo envuelve el nuevo motor con una capa delgada y transparente. Los científicos y los orquestadores automatizados interactúan con el familiar método `reason(signals)` y reciben un objeto `AbductionTrace` con el formato exacto de antes, mientras que internamente los cálculos son ejecutados por el núcleo modernizado V2.
@@ -199,7 +52,7 @@ Imagine este módulo como una placa adaptadora en un espectrómetro de laborator
 |---|---|---|
 | **AbductionTrace** | Registro estructurado e inmutable que documenta cada paso de la generación de hipótesis, las decisiones de veto y el veredicto final. | Artefacto de salida consumido por el orquestador para generar informes o bitácoras de cadena de custodia. |
 | **AbductiveReasoner** | Panel de instrumentos público. Acepta señales de evidencia y delega el procesamiento al motor V2 actualizado. | Punto de entrada para la evaluación de evidencia; protege a los usuarios de las migraciones internas de versión. |
-| **reason(signals)** | La única operación que invoca el usuario: “Dadas estas señales forenses, devuelve la mejor hipótesis explicativa.” | Método API v1 preservado para compatibilidad retrospectiva. |
+| **reason(signals)** | La única operación que invoca el usuario: "Dadas estas señales forenses, devuelve la mejor hipótesis explicativa." | Método API v1 preservado para compatibilidad retrospectiva. |
 | **CCS** | Cumulative Confidence Score. Métrica de clasificación construida exclusivamente mediante aritmética entera determinista: sumas, comparaciones y umbrales sobre números enteros (ℤ). | Base cuantitativa para hipótesis competidoras; reproducible y libre de errores de redondeo. |
 | **Veto** | Compuerta de rechazo absoluto. Si una hipótesis viola leyes físicas, reglas de cadena de custodia o presenta fracturas lógicas, se descarta sin importar su puntaje. | Filtro de control de calidad que impide explicaciones imposibles o inadmisibles. |
 | **Veredicto Daubert** | Fallo final de admisibilidad modelado sobre estándares de evidencia científica: ¿la hipótesis se fundamenta en bases falsables y contrastables? | Compuerta final antes de que una traza se libere al generador de informes. |
@@ -212,9 +65,11 @@ Imagine este módulo como una placa adaptadora en un espectrómetro de laborator
 - **Aritmética entera determinista:** Operaciones matemáticas restringidas a números enteros donde entradas idénticas siempre producen salidas idénticas, garantizando plena reproducibilidad y eliminando la incertidumbre de punto flotante.
 - **Wrapper:** Adaptador de software que preserva una interfaz existente mientras redirige las operaciones hacia una nueva implementación interna.
 
-> 【Nota Científica】Los términos provenientes de Peirce, Eco y Grice a veces se perciben como misticismo filosófico. En este sistema son estrictamente etiquetas mnemónicas para etapas deterministas de procesamiento de señales —no más místicos que llamar a una función de corrección de temperatura “Newton”—. **Peirce** denomina la etapa que genera hipótesis candidatas a partir de lecturas anómalas de sensores. **Eco** denomina la verificación de condiciones de frontera que rechaza lecturas fuera del rango calibrado del sensor. **Grice** denomina las heurísticas de filtrado de ruido que descartan señales físicamente inverosímiles antes de que entren al núcleo de aritmética entera. El módulo no interpreta significados; aplica reglas deterministas de aritmética entera a artefactos forenses, produciendo una traza auditable y reproducible.
+> 【Nota Científica】Los términos provenientes de Peirce, Eco y Grice a veces se perciben como misticismo filosófico. En este sistema son estrictamente etiquetas mnemónicas para etapas deterministas de procesamiento de señales —no más místicos que llamar a una función de corrección de temperatura "Newton"—. **Peirce** denomina la etapa que genera hipótesis candidatas a partir de lecturas anómalas de sensores. **Eco** denomina la verificación de condiciones de frontera que rechaza lecturas fuera del rango calibrado del sensor. **Grice** denomina las heurísticas de filtrado de ruido que descartan señales físicamente inverosímiles antes de que entren al núcleo de aritmética entera. El módulo no interpreta significados; aplica reglas deterministas de aritmética entera a artefactos forenses, produciendo una traza auditable y reproducible.
 
-### РУССКИЙ
+---
+
+## РУССКИЙ
 
 **Что представляет собой этот модуль?**
 Представьте этот модуль как адаптерную пластину на лабораторном спектрометре. Внутренняя электроника прибора — движок *AbductiveReasonerV2* — была модернизирована для вычисления накопленного коэффициента уверенности (CCS), применения вето-ворот и вынесения вердиктов Daubert с помощью более строгой детерминированной целочисленной арифметики. Однако остальное лабораторное ПО — в частности, `sift_orchestrator.py` — по-прежнему ожидает старую панель управления, называемую API v1. Вместо того чтобы переключать каждый скрипт, данный модуль накрывает новый движок тонкой прозрачной оболочкой. Учёные и автоматизированные оркестраторы взаимодействуют с привычным методом `reason(signals)` и получают объект `AbductionTrace` в точности в прежнем формате, тогда как внутри вычисления выполняются современным ядром V2.
@@ -240,7 +95,9 @@ Imagine este módulo como una placa adaptadora en un espectrómetro de laborator
 
 > 【Научное примечание】Термины, заимствованные у Пирса, Эко и Грайса, иногда воспринимаются как философский мистицизм. В данной системе они являются строго мнемоническими метками для детерминированных этапов обработки сигналов — не более мистичными, чем называть функцию температурной коррекции «Ньютоном». **Пирс** обозначает этап генерации кандидатных гипотез по аномальным показаниям датчика. **Эко** обозначает проверку граничных условий, отбраковывающую показания за пределами калиброванного диапазона датчика. **Грайс** обозначает эвристические алгоритмы фильтрации шума, отсеивающие физически неправдоподобные сигналы до их поступления в целочисленное ядро. Модуль не интерпретирует смысл; он применяет детерминированные правила целочисленной арифметики к цифровым артефактам, формируя поддающуюся аудиту и воспроизводимую трассировку.
 
-### 中文
+---
+
+## 中文
 
 **本模块是什么？**
 请将本模块视为实验室光谱仪上的一块转接板。仪器的内部电子元件——即 *AbductiveReasonerV2* 引擎——已经升级，能够使用更严格的确定性整数运算来计算累积置信度评分（CCS）、应用否决机制并作出道伯特（Daubert）裁决。然而，实验室的其他软件——特别是 `sift_orchestrator.py`——仍然期待旧有的控制面板布局，即 API v1。本模块在不重构所有脚本的前提下，为新引擎加装了一层轻量、透明的包装器。科研人员与自动化编排器继续使用熟悉的 `reason(signals)` 方法，并接收格式完全一致的 `AbductionTrace` 对象；而在底层，所有计算均由现代化的 V2 核心完成。
@@ -251,8 +108,21 @@ Imagine este módulo como una placa adaptadora en un espectrómetro de laborator
 |---|---|---|
 | **AbductionTrace（溯因轨迹）** | 结构化、不可变的记录，记载假设生成的每一步、否决决定及最终裁决。 | 由编排器消费的输出取证工件，用于生成报告或保管链日志。 |
 | **AbductiveReasoner（溯因推理器）** | 面向用户的仪器面板。接收证据信号，并将处理委托给升级后的 V2 引擎。 | 证据评估的入口点；使用户无需关注内部版本迁移。 |
-| **reason(signals)** | 用户调用的唯一操作：“给定这些取证信号，返回最佳解释性假设。” | 为保持向后兼容而保留的 API v1 方法。 |
+| **reason(signals)** | 用户调用的唯一操作："给定这些取证信号，返回最佳解释性假设。" | 为保持向后兼容而保留的 API v1 方法。 |
 | **CCS（累积置信度评分）** | 排名指标，完全通过确定性整数运算构建——在整数集（ℤ）上进行求和、比较与阈值判断。 | 竞争性假设的量化依据；可复现，不存在舍入误差。 |
-| **否决（Veto）** | 硬拒绝门控。若假设违反物理定律、保管链规则或出现
+| **否决（Veto）** | 硬拒绝门控。若假设违反物理定律、保管链规则或出现逻辑断裂，则无论其评分如何均予以拒绝。 | 防止不可能或不可采信解释的质量控制过滤器。 |
+| **道伯特裁决（Daubert Verdict）** | 基于科学证据标准的最终可采信裁定：假设是否建立在可证伪、可检验的基础之上？ | 轨迹发布给报告生成器之前的最终门控。 |
+| **Bridge P2** | 在不改变外部行为的情况下，将遗留 v1 请求映射到 v2 内部机制的翻译层。 | 避免对生产编排器进行破坏性重构的风险缓解策略。 |
+
+**术语表**
+- **溯因推理（皮尔斯）：** 推断最佳解释。给定一个观测，系统枚举候选原因，并在确定性约束下选择最优解释。
+- **轨迹（取证）：** 处理步骤的不可变记录，功能等同于实验室记录本上的签署页面。
+- **编排器：** 协调 `vigia` 流水线中多个分析模块的主调度器。
+- **确定性整数运算：** 仅限于整数的数学运算，相同输入始终产生相同输出，确保完全可复现性并消除浮点不确定性。
+- **包装器（Wrapper）：** 在将操作重定向至新内部实现的同时保留现有接口的软件适配器。
+
+> 【科学说明】皮尔斯、艾柯与格赖斯的术语有时被视为哲学神秘主义。在本系统中，这些名称严格地只是确定性信号处理阶段的助记标签——无异于以发明者名字命名温度修正函数。**皮尔斯** 命名了根据异常传感器读数生成候选假设的阶段。**艾柯** 命名了拒绝超出校准传感器量程读数的边界条件检查。**格赖斯** 命名了在进入整数运算核心之前丢弃物理上不合理信号的噪声过滤启发式。本模块不解释意义；它对取证工件应用确定性整数运算规则，生成可审计、可复现的轨迹。
+
 ---
+
 *Licensed under the Apache License, Version 2.0. Copyright 2026 Anna Tchijova.*
