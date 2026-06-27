@@ -671,6 +671,45 @@ sobre superficie ya cubierta.
 | json.dumps sin sort_keys en paths de hash | PASS | adversarial_mutation_suite y vigia_planner usan sort_keys=True |
 | NaN/inf en scores de pipeline | PASS | isfinite() confirmado |
 
+---
+
+## B-016 — memory_forensics.py no valida formato de imagen de memoria (VMware vs RAM dump puro)
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | ABIERTO |
+| **Severidad** | P2 — produce error poco informativo en lugar de diagnóstico claro |
+| **Archivo** | `vigia/sift/memory_forensics.py` (o el caller que invoca Volatility3) |
+| **Detectado en** | Sesión 2026-06-27 |
+
+### Descripción
+
+Cuando se pasa un archivo `.img` que es en realidad una snapshot de VMware
+(formato VMEM/snapshot), Volatility3 falla con `InvalidAddressException`.
+El agente acepta el archivo sin verificar si es un dump de RAM puro o una imagen
+VMware que requiere archivos companion (`.vmss` o `.vmsn`) para resolver las
+estructuras internas.
+
+### Impacto
+
+- El error de Volatility3 no es informativo: el usuario ve `InvalidAddressException`
+  sin contexto de por qué falla.
+- Si faltan los archivos companion VMware, no hay forma de continuar el análisis
+  de memoria — la investigación queda truncada sin diagnóstico claro.
+- En un contexto forense, esto puede enmascarar evidencia no examinada como
+  "evidencia no disponible" cuando el problema es operativo, no de contenido.
+
+### Fix cuando corresponda
+
+Agregar detección de formato antes de invocar Volatility3:
+1. Leer los primeros bytes del archivo y verificar el magic number.
+   - RAM dump puro (LiME): magic `0x4C694D45`
+   - VMEM VMware: header diferente; requiere `.vmss`/`.vmsn` companion
+2. Si se detecta formato VMware, emitir mensaje de error claro indicando que
+   se requieren los archivos companion y qué hacer.
+3. Documentar la limitación en `KNOWN_LIMITATIONS.md` si no se puede resolver
+   en el scope actual.
+
 ### Vectores descartados como falsos positivos
 
 - **B-009** (floats en vigia_artifact_graph.py): módulo de visualización puro, sin callers en scoring path. float() correcto para cálculos de tamaño de píxeles y pesos de display.

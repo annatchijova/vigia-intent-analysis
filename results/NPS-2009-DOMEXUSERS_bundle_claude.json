@@ -1,0 +1,361 @@
+{
+  "analysis_timestamp": "2026-06-27T15:44:09.992437+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "NPS-2009-DOMEXUSERS",
+    "end_time": "2026-06-27T15:44:09.992442+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "NPS-2009-DOMEXUSERS",
+        "entry_sha256": "7fbb3cf28a2117fc9a3b025ef5c32baf33f5e1502fc1af72c3bf96470f969025",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "NPS-2009-DOMEXUSERS"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: 95f2da2a3bdcb4ca...",
+        "outputs_summary": {
+          "agent_sha256": "95f2da2a3bdcb4ca106059e2b06f58fd0ec414c887fec07ac7a0d5edfeb097a1",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-06-27T15:44:09.988854+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "NPS-2009-DOMEXUSERS",
+        "entry_sha256": "1e3cb18b2de82d7757e6646edc7143142dd135590c395e7ac5a400bc9398fc93",
+        "inputs_summary": {
+          "path": "data/cases/converted/NPS-2009-DOMEXUSERS.json"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-06-27T15:44:09.988943+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "NPS-2009-DOMEXUSERS",
+        "entry_sha256": "efe7de088b1756d8b9258f312553b386660f50bfa1cf1c5b9104ff9d71156551",
+        "inputs_summary": {
+          "path": "data/cases/converted/NPS-2009-DOMEXUSERS.json"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: f98d152c3be1b12c...",
+        "outputs_summary": {
+          "sha256": "f98d152c3be1b12ca6513034c2f57f050e5cb0c8de3b33e5dd657d3c40a577d8"
+        },
+        "seq": 3,
+        "timestamp": "2026-06-27T15:44:09.989045+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "NPS-2009-DOMEXUSERS",
+        "entry_sha256": "578ad8d8ad09104335af555e1ffd7331e5e4ef4db88dfbcfdd2cd407a4f5031f",
+        "inputs_summary": {
+          "evidence": "data/cases/converted/NPS-2009-DOMEXUSERS.json",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-06-27T15:44:09.989148+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "NPS-2009-DOMEXUSERS",
+        "entry_sha256": "2a0231f2603fe00daadc306dae5e95bdb8a9ead27cea336b51f38121fbd709b1",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 9 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "NO_SEMIOTIC_ANOMALY_DETECTED",
+            "best_posterior": "4223/225000",
+            "confidence": "4223/225000",
+            "is_conclusive": "False",
+            "narrative": "Windows XP NTFS forensic corpus published by the Naval Postgraduate School (2009). Simulated domain exercise with two scripted users (domex1/domex2). Image acquired 2008-10-30. Source: realistic.aff. ..."
+          },
+          "case_id": "NPS-2009-DOMEXUSERS",
+          "pipeline_meta": {
+            "artifact_count": "9",
+            "avg_score": "4223/45000",
+            "expected_verdict": "NOISE",
+            "source": "ebs_v1_json_adapter"
+          },
+          "signals": [
+            {
+              "artifact_id": "FIWALK-001",
+              "confidence": "19/20",
+              "description": "fiwalk XML catalog: 35313 fileobjects, NTFS partition offset=32256, sectorsize=512, block_count=10482404. Source image: realistic.aff. Acquisition: fiwalk v0.5.1 / TSK 3.0.0 / AFF 3.3.4. No deleted fi",
+              "evidence_type": "file_metadata",
+              "source": "read_evidence",
+              "z_score": "19/400"
+            },
+            {
+              "artifact_id": "USER-001",
+              "confidence": "22/25",
+              "description": "NTUSER.DAT registry hive for domex1 (SID S-1-5-21-842925246-725345543-1844994965-1003). Last write 2008-10-30 16:47:55 UTC. 786432 bytes. 16 restore point snapshots of SID-1003 registry found in Syste",
+              "evidence_type": "registry_key",
+              "source": "bash_xml_parse",
+              "z_score": "44/625"
+            },
+            {
+              "artifact_id": "USER-002",
+              "confidence": "22/25",
+              "description": "NTUSER.DAT registry hive for domex2 (SID S-1-5-21-842925246-725345543-1844994965-1004). Last write 2008-10-30 03:34:59 UTC. 786432 bytes. DPAPI credential store (CREDHIST + master key cc7fb371-278c-4e",
+              "evidence_type": "registry_key",
+              "source": "bash_xml_parse",
+              "z_score": "44/625"
+            },
+            {
+              "artifact_id": "DOC-001",
+              "confidence": "17/20",
+              "description": "domex1 document lifecycle: 4 Office 2007 files created/sent/deleted in 152 seconds (2008-10-29 16:14:52 to 16:17:24 UTC). Files: 'This is a word document by domex user 1.docx' (9844b, mtime=16:14:52),",
+              "evidence_type": "file_timestamp",
+              "source": "bash_xml_parse",
+              "z_score": "153/1000"
+            },
+            {
+              "artifact_id": "REC-001",
+              "confidence": "9/10",
+              "description": "RECYCLER SID-1003 (domex1): Dc3.docx (9852b, mtime=2008-10-29 16:15:34, ALLOC=1) and Dc4.xlsx (8236b, mtime=2008-10-29 16:17:24, ALLOC=1). Files are recoverable \u2014 not permanently deleted. INFO2 Recycl",
+              "evidence_type": "mft_entry",
+              "source": "bash_xml_parse",
+              "z_score": "9/50"
+            }
+          ]
+        },
+        "seq": 5,
+        "timestamp": "2026-06-27T15:44:09.992099+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "NPS-2009-DOMEXUSERS",
+        "entry_sha256": "56f0787e1fabf6882671c8f9185b57a0ee3439ba80418cc2fbed17744fca4fe0",
+        "inputs_summary": {
+          "n_signals": "9"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-06-27T15:44:09.992234+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "NPS-2009-DOMEXUSERS",
+        "entry_sha256": "5cef20bfe977c6d3cf5ad3694c5782d24d873b0e3bf2a4cb6de54637f32b1e40",
+        "inputs_summary": {
+          "verdict": "NO_SEMIOTIC_ANOMALY_DETECTED"
+        },
+        "iteration": 0,
+        "note": "Exit code 0 \u2014 analysis complete.",
+        "outputs_summary": {
+          "exit_code": "0"
+        },
+        "seq": 7,
+        "timestamp": "2026-06-27T15:44:09.992338+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-06-27T15:44:09.988622+00:00",
+    "total_entries": 7
+  },
+  "case_id": "NPS-2009-DOMEXUSERS",
+  "evidence_path": "data/cases/converted/NPS-2009-DOMEXUSERS.json",
+  "evidence_sha256": "f98d152c3be1b12ca6513034c2f57f050e5cb0c8de3b33e5dd657d3c40a577d8",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE NPS-2009-DOMEXUSERS ===\nEvidence: data/cases/converted/NPS-2009-DOMEXUSERS.json\nEvidence SHA-256: f98d152c3be1b12ca6513034c2f57f050e5cb0c8de3b33e5dd657d3c40a577d8\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: NO_SEMIOTIC_ANOMALY_DETECTED\nPosterior confidence: 4223/225000\nConclusive: NO \u2014 requires human review\n\n--- PEIRCEAN NARRATIVE ---\nWindows XP NTFS forensic corpus published by the Naval Postgraduate School (2009). Simulated domain exercise with two scripted users (domex1/domex2). Image acquired 2008-10-30. Source: realistic.aff. fiwalk v0.5.1, TSK 3.0.0. 35313 file objects cataloged. Evidence analyzed via Claude Code MCP (Mode 2) \u2014 this JSON feeds Mode 1 deterministic scorer for sealed bundle generation.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [RECYCLER SID-1003 (domex1): Dc3.docx (9852b, mtime=2008-10-29 16:15:34] z=0.180 conf=0.90 \u2014 \n  [Windows System Restore: 16 restore points (RP1 2008-10-20 21:59 to RP1] z=0.176 conf=0.80 \u2014 \n  [domex1 document lifecycle: 4 Office 2007 files created/sent/deleted in] z=0.153 conf=0.85 \u2014 \n  [domex2 Outlook 2007 email infrastructure: 3 PST files \u2014 Outldomexuser2] z=0.085 conf=0.85 \u2014 \n  [NTUSER.DAT registry hive for domex1 (SID S-1-5-21-842925246-725345543-] z=0.070 conf=0.88 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW \u2014 No significant anomalies detected in this iteration.\n\nCritical signals (z>3): 0\nHigh signals (2<z<=3): 0\nTotal signals analyzed: 9",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "NO_SEMIOTIC_ANOMALY_DETECTED",
+      "best_posterior": "4223/225000",
+      "confidence": {
+        "__fraction__": true,
+        "den": 225000,
+        "num": 4223
+      },
+      "is_conclusive": false,
+      "narrative": "Windows XP NTFS forensic corpus published by the Naval Postgraduate School (2009). Simulated domain exercise with two scripted users (domex1/domex2). Image acquired 2008-10-30. Source: realistic.aff. fiwalk v0.5.1, TSK 3.0.0. 35313 file objects cataloged. Evidence analyzed via Claude Code MCP (Mode 2) \u2014 this JSON feeds Mode 1 deterministic scorer for sealed bundle generation."
+    },
+    "case_id": "NPS-2009-DOMEXUSERS",
+    "pipeline_meta": {
+      "artifact_count": 9,
+      "avg_score": "4223/45000",
+      "expected_verdict": "NOISE",
+      "source": "ebs_v1_json_adapter"
+    },
+    "signals": [
+      {
+        "artifact_id": "FIWALK-001",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 19
+        },
+        "description": "fiwalk XML catalog: 35313 fileobjects, NTFS partition offset=32256, sectorsize=512, block_count=10482404. Source image: realistic.aff. Acquisition: fiwalk v0.5.1 / TSK 3.0.0 / AFF 3.3.4. No deleted fi",
+        "evidence_type": "file_metadata",
+        "source": "read_evidence",
+        "z_score": {
+          "__fraction__": true,
+          "den": 400,
+          "num": 19
+        }
+      },
+      {
+        "artifact_id": "USER-001",
+        "confidence": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 22
+        },
+        "description": "NTUSER.DAT registry hive for domex1 (SID S-1-5-21-842925246-725345543-1844994965-1003). Last write 2008-10-30 16:47:55 UTC. 786432 bytes. 16 restore point snapshots of SID-1003 registry found in Syste",
+        "evidence_type": "registry_key",
+        "source": "bash_xml_parse",
+        "z_score": {
+          "__fraction__": true,
+          "den": 625,
+          "num": 44
+        }
+      },
+      {
+        "artifact_id": "USER-002",
+        "confidence": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 22
+        },
+        "description": "NTUSER.DAT registry hive for domex2 (SID S-1-5-21-842925246-725345543-1844994965-1004). Last write 2008-10-30 03:34:59 UTC. 786432 bytes. DPAPI credential store (CREDHIST + master key cc7fb371-278c-4e",
+        "evidence_type": "registry_key",
+        "source": "bash_xml_parse",
+        "z_score": {
+          "__fraction__": true,
+          "den": 625,
+          "num": 44
+        }
+      },
+      {
+        "artifact_id": "DOC-001",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 17
+        },
+        "description": "domex1 document lifecycle: 4 Office 2007 files created/sent/deleted in 152 seconds (2008-10-29 16:14:52 to 16:17:24 UTC). Files: 'This is a word document by domex user 1.docx' (9844b, mtime=16:14:52),",
+        "evidence_type": "file_timestamp",
+        "source": "bash_xml_parse",
+        "z_score": {
+          "__fraction__": true,
+          "den": 1000,
+          "num": 153
+        }
+      },
+      {
+        "artifact_id": "REC-001",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 9
+        },
+        "description": "RECYCLER SID-1003 (domex1): Dc3.docx (9852b, mtime=2008-10-29 16:15:34, ALLOC=1) and Dc4.xlsx (8236b, mtime=2008-10-29 16:17:24, ALLOC=1). Files are recoverable \u2014 not permanently deleted. INFO2 Recycl",
+        "evidence_type": "mft_entry",
+        "source": "bash_xml_parse",
+        "z_score": {
+          "__fraction__": true,
+          "den": 50,
+          "num": 9
+        }
+      },
+      {
+        "artifact_id": "EMAIL-001",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 17
+        },
+        "description": "domex2 Outlook 2007 email infrastructure: 3 PST files \u2014 Outldomexuser2@gmail.com-00000002.pst (525312b, mtime=2008-10-30 03:32:51), Outldomexuser2@hotmail.com-00000004.pst (271360b, mtime=2008-10-30 0",
+        "evidence_type": "file_metadata",
+        "source": "bash_xml_parse",
+        "z_score": {
+          "__fraction__": true,
+          "den": 200,
+          "num": 17
+        }
+      },
+      {
+        "artifact_id": "IM-001",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 17
+        },
+        "description": "domex1 Pidgin IM infrastructure: accounts.xml (5138b, mtime=2008-10-21 20:04:42), blist.xml (5112b, mtime=2008-10-21 20:08:01), 7 buddy icons, Gmail TLS cert. AIM/AOL acccore: domexuser1 buddyicon + f",
+        "evidence_type": "file_metadata",
+        "source": "bash_xml_parse",
+        "z_score": {
+          "__fraction__": true,
+          "den": 400,
+          "num": 17
+        }
+      },
+      {
+        "artifact_id": "SYS-001",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 4
+        },
+        "description": "Windows System Restore: 16 restore points (RP1 2008-10-20 21:59 to RP16 2008-10-30 16:49) over 10 days. Distribution: RP1-RP5 in first 3 hours (setup phase), RP6 on 2008-10-22 (first domex user snapsh",
+        "evidence_type": "registry_key",
+        "source": "bash_xml_parse",
+        "z_score": {
+          "__fraction__": true,
+          "den": 125,
+          "num": 22
+        }
+      },
+      {
+        "artifact_id": "HASH-001",
+        "confidence": {
+          "__fraction__": true,
+          "den": 100,
+          "num": 99
+        },
+        "description": "Cryptographic chain of custody: 6 primary artifacts hashed before analysis. SHA-256 verified at acquisition. All hashes computed atomically (single-pass, TOCTOU-safe for XMLs via MCP; bash/sha256sum f",
+        "evidence_type": "cryptographic_hash",
+        "source": "generate_forensic_hash",
+        "z_score": {
+          "__fraction__": true,
+          "den": 5000,
+          "num": 99
+        }
+      }
+    ]
+  },
+  "sans_compliance": {
+    "accuracy_validation": false,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}
