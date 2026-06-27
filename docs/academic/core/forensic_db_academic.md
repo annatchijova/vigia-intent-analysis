@@ -43,9 +43,9 @@ Table 2: Security Features
 - **WAL (Write-Ahead Logging)**: A transactional mechanism ensuring durability by writing changes to a separate journal before committing them to the primary database file.
 
 **【Scientific Note】**
-Some terms used in adversarial linguistics—such as *sign* (Peirce), *interpretant* (Eco / 艾柯), and *implicature* (Grice / 格赖斯)—may appear esoteric to bench scientists. They are not mystical constructs. Think of them as formalized sensor readings: just as a mass spectrometer converts molecular interactions into integer m/z peaks, the ACP protocol converts semiotic behavior into deterministic integer features. Peirce’s taxonomy of signs provides the *ontology* (what categories to look for), Eco’s model of interpretation provides the *decoding schema* (how meaning is inferred from observed tokens), and Grice’s cooperative maxims provide the *baseline deviation detector* (how logical断裂 in conversation betray non-human generation). The database stores these readings as exact quantitative fields, not as ambiguous literary commentary. Semiotics, in this context, is metrology for language.
+Some terms used in adversarial linguistics—such as *sign* (Peirce), *interpretant* (Eco / 艾柯), and *implicature* (Grice / 格赖斯)—may appear esoteric to bench scientists. They are not mystical constructs. Think of them as formalized sensor readings: just as a mass spectrometer converts molecular interactions into integer m/z peaks, the ACP protocol converts semiotic behavior into deterministic integer features. Peirce's taxonomy of signs provides the *ontology* (what categories to look for), Eco's model of interpretation provides the *decoding schema* (how meaning is inferred from observed tokens), and Grice's cooperative maxims provide the *baseline deviation detector* (how logical breaks in conversation betray non-human generation). The database stores these readings as exact quantitative fields, not as ambiguous literary commentary. Semiotics, in this context, is metrology for language.
 
-License line.
+---
 
 ### ESPAÑOL
 
@@ -85,7 +85,9 @@ Tabla 2: Funciones de seguridad
 - **WAL (Write-Ahead Logging)**: Mecanismo transaccional que garantiza durabilidad escribiendo los cambios en un diario separado antes de confirmarlos en el archivo principal.
 
 **【Nota Científica】**
-Algunos términos de la lingüística adversativa—como *signo* (Peirce), *interpretante* (Eco / 艾柯) e *implicatura* (Grice / 格赖斯)—pueden parecer esotéricos a científicos de laboratorio. No son construcciones místicas. Piensen en ellos como lecturas formalizadas de sensores: así como un espectrómetro de masas convierte interacciones moleculares en picos enteros de m/z, el protocolo ACP convierte comportamiento semiótico en rasgos enteros deterministas. La taxonomía de signos de Peirce provee la *ontología* (qué categorías buscar), el modelo de interpretación de Eco provee el *esquema de decodificación* (cómo se infiere significado a partir de tokens observados), y los máximas cooperativas de Grice proveen el *detector de desviación baselinal* (cómo las rupturas lógicas en la conversación delatan generación no humana). La base de datos almacena estas lecturas como campos cuantitativos exactos, no como comentarios literarios ambiguos. La semiótica, en este contexto, es metrología del lenguaje.
+Algunos términos de la lingüística adversativa—como *signo* (Peirce), *interpretante* (Eco / 艾柯) e *implicatura* (Grice / 格赖斯)—pueden parecer esotéricos a científicos de laboratorio. No son construcciones místicas. Piensen en ellos como lecturas formalizadas de sensores: así como un espectrómetro de masas convierte interacciones moleculares en picos enteros de m/z, el protocolo ACP convierte comportamiento semiótico en rasgos enteros deterministas. La taxonomía de signos de Peirce provee la *ontología* (qué categorías buscar), el modelo de interpretación de Eco provee el *esquema de decodificación* (cómo se infiere significado a partir de tokens observados), y las máximas cooperativas de Grice proveen el *detector de desviación baselinal* (cómo las rupturas lógicas en la conversación delatan generación no humana). La base de datos almacena estas lecturas como campos cuantitativos exactos, no como comentarios literarios ambiguos. La semiótica, en este contexto, es metrología del lenguaje.
+
+---
 
 ### РУССКИЙ
 
@@ -127,6 +129,8 @@ Algunos términos de la lingüística adversativa—como *signo* (Peirce), *inte
 **【Научное Примечание】**
 Некоторые термины состязательной лингвистики — такие как *знак* (Пирс), *интерпретант* (Эко / 艾柯) и *импликатура* (Грайс / 格赖斯) — могут показаться эзотерическими лабораторным учёным. Это не мистические конструкты. Воспринимайте их как формализованные показания датчиков: так же, как масс-спектрометр преобразует молекулярные взаимодействия в целочисленные пики m/z, протокол ACP преобразует семиотическое поведение в детерминированные целочисленные признаки. Таксономия знаков Пирса задаёт *онтологию* (какие категории искать), модель интерпретации Эко задаёт *схему декодирования* (как из наблюдаемых токенов выводится значение), а кооперативные максимы Грайса служат *детектором отклонения от базовой линии* (как логические разрывы в разговоре выдают нечеловеческую генерацию). База данных хранит эти показания как точные количественные поля, а не как двусмысленные литературные комментарии. Семиотика в данном контексте есть метрология языка.
 
+---
+
 ### 中文
 
 **本模块是什么？**
@@ -147,7 +151,7 @@ Algunos términos de la lingüística adversativa—como *signo* (Peirce), *inte
 表2：安全特性
 | 特性 | 功能 | 取证相关性 |
 |---|---|---|
-| 路径净化 | 阻断 ".."  tricks 与符号链接跳转，防止数据被重定向至外部文件夹。 | 消除会破坏保管链的目录遍历攻击。 |
+| 路径净化 | 阻断 ".." 技巧与符号链接跳转，防止数据被重定向至外部文件夹。 | 消除会破坏保管链的目录遍历攻击。 |
 | 文件锁（`fcntl`） | 写入期间对文件施加独占的硬件级锁。 | 确保顺序、无重叠的事务——这对确定性审计追踪至关重要。 |
 | 大小上限（500 MB） | 使用精确字节整数计数设定增长的硬天花板。 | 防止因存储耗尽而导致的服务拒绝；边界以精确整数运算检查。 |
 | 反投毒（MCP > 2.5） | 拒绝操控置信度超过边界的传入侧写。 | 在持久化之前过滤对抗性注入，维护语料完整性。 |
@@ -165,35 +169,7 @@ Algunos términos de la lingüística adversativa—como *signo* (Peirce), *inte
 - **WAL（预写日志 / Write-Ahead Logging）**：通过先将变更写入独立日志再提交至主数据库文件来确保持久性的事务机制。
 
 **【科学说明】**
-对抗语言学中的某些术语——例如皮尔斯（Peirce）的“符号”、艾柯（Eco）的“解释项”、以及格赖斯（Grice）的“含义/会话隐含”——对实验科学家而言可能显得玄奥。它们绝非神秘主义构造。请将其视为形式化的传感器读数：正如质谱仪将分子相互作用转换为整数 m/z 峰，ACP 协议将符号行为转换为确定性整数特征。皮尔斯的符号分类学提供了本体论（寻找哪些范畴），艾柯的阐释模型提供了解码图式（如何从观测到的语符推断意义），而格赖斯的合作原则则提供了基线偏差检测器（对话中的逻辑断裂如何暴露非人类生成）。数据库存储的是这些读数作为精确的定量字段，而非模糊的文学评论。在此语境下，符号学即是语言的计量学。
+对抗语言学中的某些术语——例如皮尔斯（Peirce）的"符号"、艾柯（Eco）的"解释项"、以及格赖斯（Grice）的"含义/会话隐含"——对实验科学家而言可能显得玄奥。它们绝非神秘主义构造。请将其视为形式化的传感器读数：正如质谱仪将分子相互作用转换为整数 m/z 峰，ACP 协议将符号行为转换为确定性整数特征。皮尔斯的符号分类学提供了本体论（寻找哪些范畴），艾柯的阐释模型提供了解码图式（如何从观测到的语符推断意义），而格赖斯的合作原则则提供了基线偏差检测器（对话中的逻辑断裂如何暴露非人类生成）。数据库存储的是这些读数作为精确的定量字段，而非模糊的文学评论。在此语境下，符号学即是语言的计量学。
 
-Now, ensure all requirements met:
-- 4 languages? Yes.
-- What Is This Module? Yes in all.
-- Key concepts with tables? Yes, two tables each.
-- Glossary? Yes.
-- Scientific Note box with Peirce/Eco/Grice not mysticism, sensor analogy? Yes. In Chinese: 艾柯, 格赖斯. Also used in EN/ES/RU sections for consistency. Check Chinese translation constraints:
-  - 艾柯 (not Eco) — used in Chinese text? Yes, "艾柯（Eco）" or just 艾柯. Wait, the user said "Chinese translations must use: 艾柯 (not Eco), 格赖斯 (not Grice), 取证工件 (not 制品), 逻辑断裂 (not 裂缝)". I used 艾柯, 格赖斯. Did I use 取证工件? In the "What is this module" I said "取证工件" yes. Did I use 逻辑断裂? In the Chinese scientific note: "对话中的逻辑断裂" yes. Good.
-- License line at end? Need to include exactly: "" Should this be at the very end of the whole doc or per section? The user said "License line". Usually one at end. I'll put it at the end of the document.
-- Do NOT use floating-point math explanations: I avoided discussing IEEE 754, rounding errors, etc. I called MCP a rational metric with a fixed boundary, and emphasized deterministic integer arithmetic for counts/permissions. When mentioning 2.5, I didn't explain it as float but as a rational threshold. Good.
-- Module path and docstring noted? I should mention the path at the top maybe. The user gave MODULE PATH and MODULE DOCSTRING. I can include a header metadata.
-- SANS FIND EVIL? The user included this phrase at the end of module description. I should incorporate it. It's a motto/tagline. I can mention it in the intro as a design principle or tagline. E.g., "Operates under the SANS principle: FIND EVIL." I'll weave it into the EN intro and others. In EN: "It follows the SANS credo: FIND EVIL—every design choice prioritizes the discovery and preservation of malicious artifacts." In ES: "Sigue el credo de SANS: FIND EVIL—cada decisión de diseño prioriza hallar y preservar artefactos maliciosos." In RU: "Следует принципу SANS: FIND EVIL — каждое проектное решение ставит во главу угла обнаружение и сохранение вредоносных артефактов." In ZH: "遵循 SANS 宗旨：FIND EVIL——每一项设计选择都优先于发现与保存恶意取证工件。"
-
-Check for "deterministic integer arithmetic where applicable". I mentioned it in tables/glossary.
-
-Check conciseness vs thoroughness. The content seems thorough but concise enough.
-
-Let's double-check Chinese specific terms:
-- 取证工件: used in "What is this module" section: "每一件取证工件". Good.
-- 逻辑断裂: used in scientific note: "对话中的逻辑断裂". Good.
-- 艾柯: used in scientific note. Good.
-- 格赖斯: used in scientific note. Good.
-
-Check module path: The user says MODULE PATH: vigia/core/forensic_db.py but docstring says vigia/tools/forensic_db.py. I should probably note both or use the path as canonical. I'll mention the canonical path as `vigia/core/forensic_db.py` and note the docstring legacy path.
-
-Let's refine the EN text slightly for flow and to ensure no overly Pythonic terms without explanation. The audience doesn't know Python, so mentioning `ForensicDatabaseManager` as "the system's gatekeeper class" is okay if explained as a "software component". I should avoid saying "class" maybe? The user gave me classes and functions. I can describe them as "components" or "building blocks". I'll use "software component" or "module unit" in tables to be safe, but they can handle the term "class" if explained as a category. Actually, the requirement says scientists who do NOT know Python. So I should avoid terms like "class", "function", "JSON", "singleton" without defining them. I used "Singleton Pattern" in the glossary. That's fine. I used `fcntl` but explained it. I used JSON in ES and RU and ZH? In EN I used JSON in table 1. Let me define JSON in glossary or plain language. I have it in EN glossary? No, I don't have JSON in EN glossary. I should add it or replace with plain language. In ES I said "serializados en JSON". In RU "сериализованные в JSON". In ZH "JSON 序列化". Better to define it or use "structured text format". But since they are scientists, they might know JSON, but to be safe, I can add "(a structured text notation)" or add to glossary.
-
-I'll add to each glossary:
-- **
 ---
 *Licensed under the Apache License, Version 2.0. Copyright 2026 Anna Tchijova.*

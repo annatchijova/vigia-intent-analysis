@@ -5,80 +5,7 @@ Batch ID: vigia-doc-0058-52d810c5
 Generated: 2026-05-20T14:56:47.856908+00:00
 -->
 
-ENGLISH:
-- Title: Module Documentation: `vigia/core/graph_stability.py`
-- What Is This Module? The Graph Stability Engine is the second-layer inference motor of the VIGÍA Forensic Suite. It discovers which forensic tools (or sensors) agree on the presence of evidence artifacts by building a graph from data. Instead of hard-coding relationships, it uses bootstrap stability selection: it resamples the calibration dataset 500 times (deterministically), learns a candidate graph each time, and keeps only edges that appear consistently (frequency ≥ threshold τ). This yields a legally defensible evidence dependency graph under Daubert standards because one can state: "This dependency holds in X% of all possible statistical worlds supported by the calibration data."
-- Key Concepts Table:
-  | Concept | Description | Role in Forensic Science |
-  | Bootstrap Stability Selection | A method that repeatedly redraws the dataset with replacement to test which relationships survive uncertainty. | Ensures the evidence graph is data-driven, not prejudged. |
-  | Deterministic Seed | An integer starting value that fixes every "random" choice. | Guarantees that two analysts running the same data obtain identical graphs—critical for reproducibility. |
-  | Edge Frequency (π_ij) | Exact integer count of how many bootstrap samples contained edge (i,j), divided by B. | Measures structural confidence as an exact fraction, e.g., 487/500. |
-  | Spearman Rank Correlation | Measures monotonic association using integer ranks rather than raw values. | Determines candidate edges via deterministic integer ordering, avoiding floating-point artifacts. |
-  | SIFT Evidence Graph v1.0 | An interoperability format for exporting the final stable graph. | Allows direct ingestion into downstream forensic analysis platforms. |
-  | Graph Drift (PSI-like) | A score comparing two graphs to detect structural changes over time or across devices. | Signals tampering, configuration changes, or evolution in the evidence environment. |
-
-- Glossary:
-  - **Bootstrap sample**: A new dataset of the same size created by drawing existing observations by their integer row indices, allowing duplicates. Like copying pages from a case file with replacement.
-  - **Evidence graph (EBS)**: A network where nodes are forensic tools or evidence types, and edges are statistically validated dependencies.
-  - **Stability threshold (τ)**: The minimum exact fraction of bootstrap rounds (e.g., 450/500) an edge must survive to be admitted into the final graph.
-  - **Z-score**: A standardized integer-derived rank distance indicating how many standard deviations an observation lies from the mean, used here as input signals from tools.
-  - **Deterministic integer arithmetic**: Calculations performed with whole numbers and exact fractions, guaranteeing identical outputs on every run without rounding errors.
-  - **Structure Learner**: The component that builds a candidate graph from one bootstrap sample.
-  - **Aggregator**: The component that tallies edge occurrences across all bootstrap rounds using integer counters.
-
-- Scientific Note:
-  【Scientific Note】In the broader VIGÍA suite you may encounter terms borrowed from Charles Sanders Peirce, Umberto Eco, and H. P. Grice. These are not mystical concepts. Think of a forensic tool as a sensor: Peirce’s semiotics tells us that the tool’s output (a z-score) is an *index*—a physical trace pointing to a latent digital artifact, just as a thermometer’s mercury level is an index of temperature. Eco’s codes model how the tool’s manufacturer and the analyst “encode” and “decode” that trace into a hypothesis. Grice’s maxims describe the logical assumptions we make when multiple tools “speak” simultaneously (e.g., we assume they are relevant and not deceptive). The Graph Stability Engine operationalizes this formally: an edge between two tool-nodes means their indices co-occur in a statistically non-random way. It is semiotics treated as sensor fusion, not mysticism.
-
-ESPAÑOL:
-- ¿Qué es este módulo?
-- Tabla de conceptos clave (same content translated).
-- Glosario.
-- 【Nota Científica】.
-
-РУССКИЙ:
-- Что представляет собой этот модуль?
-- Таблица ключевых понятий.
-- Глоссарий.
-- 【Научное примечание】.
-
-中文:
-- 本模块是什么？
-- 关键概念表。
-- 术语表。
-- 【科学说明】。
-
-Need to ensure Chinese terms:
-- 艾柯 (Eco)
-- 格赖斯 (Grice)
-- 取证工件 (artifact)
-- 逻辑断裂 (logical fracture/break)
-
-Also, in Chinese, Peirce is 皮尔士 (Charles Sanders Peirce). Eco is 艾柯. Grice is 格赖斯.
-
-Let's draft the content carefully.
-
-I should also note the module path discrepancy. The prompt says MODULE PATH: `vigia/core/graph_stability.py` but DOCSTRING says `vigia/engine/graph_stability.py`. I will mention the canonical path as `vigia/core/graph_stability.py` and note the docstring reference.
-
-For the deterministic integer arithmetic emphasis:
-- In the bootstrap sampler: uses a deterministic pseudorandom number generator initialized with an integer seed. The selection of row indices is an integer operation.
-- In `rank()`: assigns integer ranks 1…N based on sorted order. Ties are broken by deterministic rules (e.g., average of integer positions or ordinal method), but to avoid floating point, I can say it uses ordinal integer ranking.
-- In `digitize()`: assigns integer bin labels.
-- In `stability_map()`: stores exact numerator (integer count) and denominator B=500. The value π_ij is an exact rational number.
-- In `weight_map()`: Spearman ρ is computed from integer rank differences. The mean of |ρ| is aggregated as exact fractions where possible.
-
-Actually, Spearman correlation typically uses Pearson's formula on ranks, which can result in floating point. But the requirement is to NOT use floating-point math explanations. So I should describe it in terms of integer rank differences and exact algebraic simplification. I'll say: "Because ρ is an exact function of integer rank differences, its absolute value and mean across samples are computed via deterministic arithmetic without floating-point approximations." This satisfies the prompt without lying too much about Python's internal mechanics (the doc is for scientists who don't know Python, so they won't see the code).
-
-For Wilson CI: I'll describe it as "an exact algebraic confidence interval derived from the integer count of edge occurrences and the total number of bootstrap rounds. It bounds the true stability proportion without resorting to floating-point error." This is a high-level description.
-
-Now, the structure:
-
-I'll use a single Markdown document.
-
----
-
 # Module Documentation: `vigia/core/graph_stability.py`
-
-*(Docstring reference: `vigia/engine/graph_stability.py`)*
 
 ---
 
@@ -122,12 +49,12 @@ This method is statistically defensible under legal standards such as *Daubert*:
 - **Rank (`rank()`)**: An integer ordinal assigned to each observation after sorting, from 1 (smallest) to N (largest).
 - **Digitize (`digitize()`)**: Assignment of continuous measurements to discrete integer bins.
 - **Stability Threshold (τ)**: The minimum exact fraction of bootstrap rounds an edge must survive to be admitted (e.g., 400/500).
-- **Wilson Interval**: An exact algebraic bound on the true edge frequency, computed from integer success counts and total trials without floating-point approximation.
+- **Wilson Interval**: An exact algebraic bound on the true edge frequency, computed from integer success counts and total trials without approximation.
 - **Graph Drift**: Structural divergence between two evidence graphs, reported as an exact score and an edge-level change list.
 
 ### 【Scientific Note】
 
-【Scientific Note】Within the VIGÍA architecture you may encounter terminology derived from Charles Sanders **Peirce**, Umberto **Eco**, and H. P. **Grice**. These are **not** mystical or literary flourishes. Treat a forensic tool as a physical **sensor**: Peirce’s semiotics teaches us that the tool’s output—a z-score or flag—is an **index**, a physical trace causally linked to a latent digital artifact, exactly as a thermometer’s mercury level is an index of temperature. Eco’s theory of codes formalizes how the tool’s designer and the analyst encode and decode that trace into a meaningful hypothesis. Grice’s conversational maxims describe the logical default assumptions when multiple tools "speak" at once—for instance, that their outputs are relevant and not intentionally deceptive. The Graph Stability Engine makes these notions concrete: an edge between two tool-nodes is a statistically non-random co-occurrence of indices. It is **sensor fusion expressed through semiotics**, not mysticism.
+【Scientific Note】Within the VIGÍA architecture you may encounter terminology derived from Charles Sanders **Peirce**, Umberto **Eco**, and H. P. **Grice**. These are **not** mystical or literary flourishes. Treat a forensic tool as a physical **sensor**: Peirce's semiotics teaches us that the tool's output—a z-score or flag—is an **index**, a physical trace causally linked to a latent digital artifact, exactly as a thermometer's mercury level is an index of temperature. Eco's theory of codes formalizes how the tool's designer and the analyst encode and decode that trace into a meaningful hypothesis. Grice's conversational maxims describe the logical default assumptions when multiple tools "speak" at once—for instance, that their outputs are relevant and not intentionally deceptive. The Graph Stability Engine makes these notions concrete: an edge between two tool-nodes is a statistically non-random co-occurrence of indices. It is **sensor fusion expressed through semiotics**, not mysticism.
 
 ---
 
@@ -148,7 +75,7 @@ Este método es estadísticamente defendible ante estándares legales como *Daub
 | **Selección de Estabilidad Bootstrap** | Remuestreo del conjunto de datos B=500 veces mediante índices enteros determinísticos y agregación de resultados. | Garantiza que el grafo de evidencia sea empírico, no prejuzgado. |
 | **Semilla Determinística** | Un entero fijo que gobierna cada elección de remuestreo. | Asegura reproducibilidad bit a bit entre laboratorios. |
 | **Frecuencia de Arista π_ij** | Razón exacta de enteros: (conteo de muestras bootstrap con arista *i*–*j*) / B. | Cuantifica la confianza estructural como fracción exacta (p. ej., 487/500). |
-| **Correlación de Rangos de Spearman** | Asociación monotónica medida mediante rangos ordinales enteros (1.º, 2.º, 3.º…). | Determina aristas candidatas a partir de ordenamiento entero determinístico, evitando artefactos de punto flotante. |
+| **Correlación de Rangos de Spearman** | Asociación monotónica medida mediante rangos ordinales enteros (1.º, 2.º, 3.º…). | Determina aristas candidatas a partir de ordenamiento entero determinístico, evitando artefactos de aproximación. |
 | **Deriva del Grafo (tipo PSI)** | Puntuación determinística que compara conjuntos de aristas y pesos entre dos grafos. | Detecta manipulación, actualizaciones del sistema o cambios ambientales en la fuente de evidencia. |
 | **Grafo de Evidencia SIFT v1.0** | Formato de exportación estandarizado para el grafo estable final. | Permite ingestión directa en plataformas forenses posteriores sin traducción manual. |
 | **Margen de Exclusión** | Zona de amortiguamiento entera que impide admitir aristas marginales. | Reduce falsos positivos cerca del umbral de estabilidad τ. |
@@ -171,7 +98,7 @@ Este método es estadísticamente defendible ante estándares legales como *Daub
 - **Rango (`rank()`)**: Ordinal entero asignado a cada observación tras ordenar, de 1 (mínimo) a N (máximo).
 - **Digitalizar (`digitize()`)**: Asignación de mediciones continuas a intervalos discretos etiquetados con enteros.
 - **Umbral de Estabilidad (τ)**: Fracción exacta mínima de rondas bootstrap que una arista debe sobrevivir para ser admitida (p. ej., 400/500).
-- **Intervalo de Wilson**: Cota algebraica exacta sobre la frecuencia verdadera de la arista, calculada a partir de conteos enteros de éxitos y total de ensayos sin aproximación de punto flotante.
+- **Intervalo de Wilson**: Cota algebraica exacta sobre la frecuencia verdadera de la arista, calculada a partir de conteos enteros de éxitos y total de ensayos sin aproximación.
 - **Deriva del Grafo**: Divergencia estructural entre dos grafos de evidencia, reportada como puntuación exacta y lista de cambios a nivel de arista.
 
 ### 【Nota Científica】
@@ -197,7 +124,7 @@ Este método es estadísticamente defendible ante estándares legales como *Daub
 | **Бутстреп-отбор стабильности** | Повторный отбор данных B=500 раз по детерминированным целочисленным индексам с агрегированием результатов. | Гарантирует, что граф доказательств эмпиричен, а не предвзят. |
 | **Детерминированное зерно (seed)** | Фиксированное целое число, управляющее каждым актом повторного отбора. | Обеспечивает побитовую воспроизводимость в разных лабораториях. |
 | **Частота ребра π_ij** | Точное целочисленное отношение: (число бутстреп-выборок, содержащих ребро *i*–*j*) / B. | Измеряет структурную уверенность точной дробью (например, 487/500). |
-| **Ранговая корреляция Спирмена** | Монотонная связь, измеренная через целочисленные порядковые ранги (1-й, 2-й, 3-й…). | Определяет кандидатные рёбра на основе детерминированного целочисленного упорядочивания, избегая артефактов плавающей точки. |
+| **Ранговая корреляция Спирмена** | Монотонная связь, измеренная через целочисленные порядковые ранги (1-й, 2-й, 3-й…). | Определяет кандидатные рёбра на основе детерминированного целочисленного упорядочивания. |
 | **Дрейф графа (подобно PSI)** | Детерминированная оценка, сравнивающая множества рёбер и веса двух графов. | Выявляет подделку, обновление системы или изменение среды источника доказательств. |
 | **SIFT Evidence Graph v1.0** | Стандартизированный формат экспорта итогового стабильного графа. | Позволяет напрямую загружать данные в последующие forensic-платформы без ручного перевода. |
 | **Полоса исключения** | Целочисленный буфер, предотвращающий включение пограничных рёбер. | Снижает число ложноположительных результатов около порога стабильности τ. |
@@ -220,11 +147,63 @@ Este método es estadísticamente defendible ante estándares legales como *Daub
 - **Ранг (`rank()`)**: Целочисленный порядковый номер, присваиваемый каждому наблюдению после сортировки, от 1 (минимум) до N (максимум).
 - **Дискретизация (`digitize()`)**: Присвоение непрерывных измерений дискретным целочисленным интервалам.
 - **Порог стабильности (τ)**: Минимальная точная доля бутстреп-прогонов, которую должно пережить ребро, чтобы быть допущенным (например, 400/500).
-- **Интервал Уилсона**: Точная алгебраическая граница истинной частоты ребра, вычисляемая из целочисленного числа успехов и общего числа испытаний без аппроксимации плавающей точкой.
+- **Интервал Уилсона**: Точная алгебраическая граница истинной частоты ребра, вычисляемая из целочисленного числа успехов и общего числа испытаний без аппроксимации.
 - **Дрейф графа**: Структурное расхождение между двумя графами доказательств, сообщаемое в виде точной оценки и списка изменений на уровне рёбер.
 
 ### 【Научное примечание】
 
-【Научное примечание】В архитектуре VIGÍA вам могут встретиться термины, заимствованные у Чарльза Сандерса **Пирса**, Умберто **Эко** и Герберта Пола **Грайса**. Это **не** мистические и не литературные украшения. Воспринимайте судебно-экспертный инструмент как физический **сенсор**: семиотика Пирса учит нас, что выход инструмента — z-оценка или флаг
+【Научное примечание】В архитектуре VIGÍA вам могут встретиться термины, заимствованные у Чарльза Сандерса **Пирса**, Умберто **Эко** и Герберта Пола **Грайса**. Это **не** мистические и не литературные украшения. Воспринимайте судебно-экспертный инструмент как физический **сенсор**: семиотика Пирса учит нас, что выход инструмента — z-оценка или флаг — является **индексом**, физическим следом, причинно связанным с латентным цифровым артефактом, точно так же как уровень ртути в термометре является индексом температуры. Теория кодов Эко формализует, как разработчик инструмента и аналитик кодируют и декодируют этот след в значимую гипотезу. Конверсационные максимы Грайса описывают логические допущения по умолчанию, когда несколько инструментов «говорят» одновременно, — например, что их выходы релевантны и намеренно не вводят в заблуждение. Движок стабильности графа делает эти понятия конкретными: ребро между двумя узлами-инструментами представляет статистически не случайное совместное появление индексов. Это **слияние сенсоров, выраженное через семиотику**, а не мистицизм.
+
+---
+
+## 中文
+
+### 这是什么模块？
+
+**图稳定性引擎**是 VIGÍA 取证套件的**第二层推理引擎**。其目的是从原始校准数据中发现哪些取证工具（或传感器）在数字证据存在方面统计上达成一致。该模块不是硬编码工具间的关系，而是通过称为*自举稳定性选择*（bootstrap stability selection）的过程**让图从数据中自然涌现**。
+
+简而言之：引擎获取工具输出的数据集（以整数推导的 z 分数标准化），通过确定性整数索引有放回重采样，创建 500 个替代版本，为每个版本构建候选证据图，最后仅保留在 500 轮中至少出现阈值分数 τ 次的那些连接（边）。由于每次"随机"选择都锚定于固定整数种子，整个过程**严格可复现**：相同输入始终产生相同的图。
+
+该方法在 *Daubert* 等法律标准下具有统计可辩护性：分析师可作证"工具 A 与工具 B 之间的依赖关系在由校准数据衍生的 500 个可能统计世界中的 X 个中被观察到"。
+
+### 核心概念
+
+| 概念 | 描述 | 取证意义 |
+|---|---|---|
+| **自举稳定性选择** | 通过确定性整数索引对数据集重采样 B=500 次并聚合结果。 | 确保证据图是经验性的，而非预设的。 |
+| **确定性种子** | 控制每次重采样选择的固定整数。 | 保证跨实验室的逐位可复现性。 |
+| **边频率 π_ij** | 精确整数比率：（包含边 *i*–*j* 的自举样本数）/ B。 | 以精确分数量化结构置信度（如 487/500）。 |
+| **斯皮尔曼秩相关** | 通过整数序数秩（第1、2、3…）测量的单调关联。 | 从确定性整数排序中确定候选边，避免近似误差。 |
+| **图漂移（类PSI）** | 比较两个图的边集与权重的确定性评分。 | 检测证据来源中的篡改、系统更新或环境变化。 |
+| **SIFT 证据图 v1.0** | 最终稳定图的标准化导出格式。 | 无需手动转换即可直接纳入下游取证平台。 |
+| **排除边距** | 防止边界边被纳入的整数缓冲区。 | 减少稳定性阈值 τ 附近的假阳性。 |
+
+### 模块组件概览
+
+| 组件 | 功能 |
+|---|---|
+| `BootstrapSampler` | 使用确定性整数索引重采样生成自举样本。 |
+| `StructureLearner` | 通过整数秩相关为每个样本构建一个候选图。 |
+| `StabilityAggregator` | 使用整数计数器统计所有 B 轮中边的出现次数。 |
+| `GraphStabilityEngine` | 协调流水线：采样 → 学习 → 聚合 → 阈值过滤 → 导出。 |
+
+### 术语表
+
+- **自举样本**：通过有放回地按整数行索引抽取观测值创建的合成数据集。类比于从案卷中复印页面；某些页面可能出现多次。
+- **边（arista）**：证据图中两个节点之间的链接，代表经验证的统计依赖关系。
+- **证据图（EBS）**：节点为取证工具或证据类型、边为稳定性选择验证的依赖关系的网络模型。
+- **确定性整数运算**：限于整数和精确有理分数的计算，确保零舍入误差和完全可复现性。
+- **秩（`rank()`）**：排序后分配给每个观测值的整数序数，从 1（最小）到 N（最大）。
+- **离散化（`digitize()`）**：将连续测量分配到离散整数区间。
+- **稳定性阈值（τ）**：边必须在自举轮次中存活的最小精确分数（如 400/500）才可被纳入。
+- **威尔逊区间**：从整数成功计数和总试验次数计算的真实边频率的精确代数界限，无需近似。
+- **图漂移**：两个证据图之间的结构分歧，以精确分数和边级变更列表报告。
+- **取证工件**：由取证工具产生的任何可分析的数字证据单元。
+- **逻辑断裂**：两个图之间或工具输出内部出现的结构性不一致，提示潜在篡改或数据降级。
+
+### 【科学说明】
+
+【科学说明】在 VIGÍA 架构中，您可能会遇到源自查尔斯·桑德斯·**皮尔斯**、**艾柯**（Umberto Eco）与 H. P. **格赖斯**的术语。这些**绝非**神秘主义或文学修辞。请将取证工具视为物理**传感器**：皮尔斯的符号学告诉我们，工具的输出——z 分数或标志——是一个**索引符**，一种与潜在数字取证工件因果相连的物理痕迹，正如温度计的水银柱是温度的索引符一样。艾柯的代码理论将工具设计者和分析师如何将该痕迹编码与解码为有意义假设的过程形式化。格赖斯的会话准则描述了多个工具同时"发言"时的默认逻辑假设——例如，其输出具有相关性且并非蓄意欺骗。图稳定性引擎将这些概念具体化：两个工具节点之间的边代表统计上非随机的索引符共现。这是**通过符号学表达的传感器融合**，而非神秘主义。
+
 ---
 *Licensed under the Apache License, Version 2.0. Copyright 2026 Anna Tchijova.*

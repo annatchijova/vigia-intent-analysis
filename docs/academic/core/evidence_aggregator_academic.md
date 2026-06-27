@@ -5,83 +5,6 @@ Batch ID: vigia-doc-0050-3c7b4268
 Generated: 2026-05-20T14:56:47.855244+00:00
 -->
 
-ENGLISH:
-- Title: MODULE DOCUMENTATION: `vigia/core/evidence_aggregator.py`
-- What Is This Module?: Plain language. It's a deterministic calculator that combines multiple independent indicators of suspicious activity into a single bounded score. No randomness, no rounding errors.
-- Key Concepts Table: Maybe 2 tables. One for inputs (MI_base, synergy, sequence, ALPHA), one for operations (complement-product, Fraction arithmetic, MAX_CAP).
-- Glossary: FSV, MI (Mutual Information or Mass Indicator?), Synergy, Sequence, ALPHA, Complement-Product, Deterministic Integer Arithmetic, Peirce, Eco, Grice. Need to define them simply.
-- Scientific Note: 【Scientific Note】Peirce/Eco/Grice terminology... Think of it like a sensor array: a thermometer, a motion detector, and a chemical strip each detect different aspects of the same event. Semiotics is the theory of how signs (like sensor readings) convey meaning. Not mysticism.
-
-ESPANOL:
-- ¿Qué es este módulo?
-- Conceptos clave
-- Glosario
-- 【Nota Científica】
-
-RUSSIAN:
-- Что это за модуль?
-- Ключевые понятия
-- Глоссарий
-- 【Научное Примечание】
-
-CHINESE:
-- 这是什么模块？
-- 核心概念
-- 术语表
-- 【科学说明】
-Terms: 皮尔斯 (Peirce), 艾柯 (Eco), 格赖斯 (Grice). 取证工件. 逻辑断裂.
-
-The formula is: MI_final = 1 - (1 - MI_base) * (1 - synergy*ALPHA) * (1 - sequence*ALPHA)
-This is bounded probabilistic composition using the complement product. Each term (1 - x) represents the "uncertainty" or "remaining doubt". Multiplying them gives combined remaining doubt. 1 minus that gives combined confidence.
-ALPHA is Fraction(1,2) by default, so it's exact rational arithmetic. No floating point.
-
-The user says "do NOT use floating-point math explanations — emphasize deterministic integer arithmetic where applicable".
-So I should explicitly state that all calculations use exact rational numbers (fractions) represented as integer pairs (numerator/denominator), avoiding IEEE-754 float approximations.
-
-Tables:
-Let's create a table for the components:
-
-| Symbol | Name | Role | Source |
-| MI_base | Base Mass Indicator | Initial evidence score from detection layer | Forensic Signal Vector |
-| synergy | Synergy modifier | Extra evidence from simultaneous correlated signals | Synergy Engine |
-| sequence | Sequence modifier | Extra evidence from temporal ordering | Sequence Analyzer |
-| ALPHA | Coupling coefficient | Dampening factor preventing overcounting | Constant (Fraction(1/2)) |
-
-And a table for the mathematical properties:
-
-| Property | Description | Scientific Rationale |
-| Deterministic rational arithmetic | All values stored as exact integer ratios (e.g., 1/2) | Eliminates rounding drift across audits |
-| Complement-product composition | Uncertainties multiply; confidence is the complement | Ensures independent evidence does not exceed 100% |
-| Non-amplifying | Synergy and sequence modify residual uncertainty, not base directly | Prevents runaway positive feedback |
-
-Glossary terms for all languages:
-- FSV (Forensic Signal Vector): A structured record of anomalies detected in a digital artifact.
-- MI (Mass Indicator / Mutual Information? The docstring uses MI. I'll interpret as "Mass Indicator" or "Mutual Information Index". Since the audience is scientists, maybe "Mass Indicator" is safer, but given "semiotics" context, maybe it's "Meaning Index" or "Mass Indicator". I'll define it as Mass Indicator or simply MI as bounded evidence metric. Let's use "Mass Indicator" in EN, "Indicador de Masa" in ES, "Массовый Индикатор" in RU, "质量指标" in CN. Actually "Mutual Information" is a real info-theory term. But the formula looks like probabilistic OR/complement product. I'll define MI as "Metric of Incrimination / Mutual Information" but to keep it simple, let's call it "Mass Indicator" or just explain it as a bounded scalar from 0 to 1. Let's use "Mass Indicator (MI)".
-- Evidence: Information that increases the certainty of a hypothesis.
-- Synergy: Coincident signals that reinforce each other beyond individual capability.
-- Sequence: Temporal ordering of events that adds structural meaning.
-- Complement-product: Mathematical operation where (1-a)(1-b)... represents combined uncertainty.
-- ALPHA: Rational coupling constant, default 1/2, preventing double-counting.
-- Deterministic integer arithmetic: Computation using exact fractions (pairs of integers) rather than decimal approximations.
-- MAX_CAP / MAX_MI: Upper bounds ensuring the score never exceeds logical certainty.
-
-Scientific Note content:
-The note must say that Peirce (Charles Sanders Peirce), Eco (Umberto Eco), and Grice (H.P. Grice) are semioticians/philosophers of language. Their terminology (sign, interpretant, implicature, etc.) is a formal analytical framework, not mysticism. Use sensor analogy: Just as a geophysicist uses seismometers, magnetometers, and gravimeters to infer subsurface structure without "magic", the VIGÍA system uses semiotic layers (detection, synergy, sequence) as distinct sensors. The "meaning" extracted is a measurement of structured deviation, not an occult property.
-
-Chinese terms check:
-- Peirce: 皮尔斯
-- Eco: 艾柯
-- Grice: 格赖斯
-- forensic artifact: 取证工件
-- logical fracture: 逻辑断裂 (though maybe not needed in this doc? The user said Chinese translations must use these. I should try to incorporate 取证工件 and 逻辑断裂 naturally. Since the module is evidence aggregator, "forensic artifact" can be mentioned as the input. "逻辑断裂" might fit in the glossary or as a concept related to sequence/synergy detection. Or maybe in the scientific note? Let's see. The user specifically listed these as requirements for Chinese translations. I should definitely use 取证工件 for forensic artifacts and 逻辑断裂 for logical fractures/cracks. I can mention that the Detection Layer scans 取证工件 for 逻辑断裂.)
-
-License line: Must appear exactly as:  Probably at the end of each section or top/bottom. I'll put it at the bottom of each language section.
-
-No floating point: I must avoid terms like "floating point" except to say we don't use it. Instead use "exact rational arithmetic", "integer ratios", "deterministic fraction arithmetic".
-
-Let's draft ENGLISH first.
-
----
 ## ENGLISH
 
 **MODULE PATH:** `vigia/core/evidence_aggregator.py`
@@ -132,22 +55,6 @@ This module references concepts from **Charles Sanders Peirce**, **Umberto Eco**
 - The **Sequence Analyzer** is like a motion detector revealing temporal progression.
 
 The "meaning" extracted by these layers is simply a measurement of structured deviation. When Peirce writes about the *interpretant* or Eco writes about *signification*, they are describing inference rules—mathematically analogous to sensor fusion. There is no mysticism; there is only multi-source signal integration under deterministic logic.
-
----
-
-Now ESPAÑOL. Need to mirror structure.
-
-Terms:
-- Peirce, Eco, Grice (names stay).
-- Evidence Aggregator = Agregador de Evidencias
-- Forensic Signal Vector = Vector de Señal Forense
-- Mass Indicator = Indicador de Masa (or Índice de Evidencia?). Let's use Indicador de Masa (MI).
-- Complement-product = producto de complementos
-- Deterministic integer arithmetic = aritmética entera determinista
-- MAX_CAP / MAX_MI = límite máximo
-
-Scientific Note: "La semiótica es una red de sensores, no un misticismo."
-Names: Charles Sanders Peirce, Umberto Eco, H. P. Grice.
 
 ---
 
@@ -204,27 +111,6 @@ El "significado" extraído por estas capas es simplemente una medición de desvi
 
 ---
 
-Now RUSSIAN.
-
-Terms:
-- Module path: ПУТЬ К МОДУЛЮ
-- What Is This Module?: Что это за модуль?
-- Deterministic evidence calculator: детерминированный калькулятор доказательственной массы
-- Exact rational numbers: точные рациональные числа (дроби)
-- Mass Indicator: Индикатор Массы (ИМ) or maybe Весовой Индикатор. Let's use Индекс Достоверности? No, let's stick to Индикатор Массы (IM) to match MI. Actually MI is "Mass Indicator" in English, so in Russian "Массовый Индикатор (МИ)" or "Показатель Массы". Let's use "Показатель Массы (МИ)" or "Индикатор Массы". Let's use Индикатор Массы (MI).
-- FSV: Вектор Следственного Сигнала (ВСС) or Вектор Криминалистического Сигнала. Let's use "Вектор Криминалистического Сигнала (ВКС)" or keep FSV acronym but explain. Let's use Вектор Сигнала (ВС) or Вектор Судебного Сигнала. Let's use "Вектор Судебного Сигнала (FSV)".
-- Synergy: Синергия
-- Sequence: Последовательность
-- Complement-product: произведение дополнений
-- Deterministic integer arithmetic: детерминированная целочисленная арифметика
-
-Scientific Note: 【Научное Примечание】Семиотика — это массив датчиков, а не мистика.
-Names: Чарльз Сандерс Пирс, Умберто Эко, Х. П. Грайс.
-
-Important: user said "РУССКИЙ" (all caps).
-
----
-
 ## РУССКИЙ
 
 **ПУТЬ К МОДУЛЮ:** `vigia/core/evidence_aggregator.py`
@@ -278,35 +164,6 @@ Important: user said "РУССКИЙ" (all caps).
 
 ---
 
-Now CHINESE. This is critical because of the mandated terms.
-
-Terms:
-- Module path: 模块路径
-- What Is This Module?: 这是什么模块？
-- Deterministic evidence calculator: 确定性证据计算器 / 确定性证据聚合计算器
-- Exact rational numbers: 精确有理数 (整数分数)
-- Mass Indicator: 质量指标 (MI) — wait, "Mass Indicator" could be 质量指标 or 块度指标? In this context, maybe "质量指标" is okay, but "质量" can mean quality. Maybe "质量" as in physics mass? The English used "Mass Indicator" to mean weight of evidence. In Chinese, "证据质量指标" or simply "质量指标". Let's use "质量指标 (MI)" and clarify it means cumulative weight. Or "集总指标"? Let's use "质量指标 (MI)" and note it represents cumulative evidentiary weight.
-- FSV: 取证信号向量 (FSV) — wait, the user said 取证工件 for forensic artifact. FSV is Forensic Signal Vector. So "取证信号向量 (FSV)" is fine. Or "法庭科学信号向量". Let's use "取证信号向量 (FSV)".
-- Synergy: 协同 / 协同效应. Let's use 协同.
-- Sequence: 时序 / 序列. Let's use 时序.
-- Complement-product: 补数乘积 / 互补乘积合成. Let's use 互补乘积合成.
-- ALPHA: 耦合系数 (exact value 1/2)
-- Deterministic integer arithmetic: 确定性整数运算. Actually it's rational arithmetic (分数运算). The requirement says emphasize deterministic integer arithmetic where applicable. Since Fraction is integer pair, I can say "基于整数对的精确分数运算" or "确定性整数比率运算". Let's use "确定性整数比率运算（精确分数）".
-- Evidence: 证据
-- Forensic artifact: 取证工件 (must use this)
-- Logical fracture: 逻辑断裂 (must use this)
-
-I need to incorporate 取证工件 and 逻辑断裂.
-In the "What Is This Module?" or Key Concepts, I can say the Detection Layer scans 取证工件 for anomalies including 逻辑断裂.
-For example: "检测层扫描取证工件以发现异常（如逻辑断裂）..."
-
-Scientific Note: 【科学说明】符号学不是神秘主义，而是传感器阵列。
-Names: 查尔斯·桑德斯·皮尔斯 (Charles Sanders Peirce), 艾柯 (Umberto Eco), 格赖斯 (H.P. Grice). User said 艾柯 and 格赖斯.
-
-Let's draft.
-
----
-
 ## 中文
 
 **模块路径：** `vigia/core/evidence_aggregator.py`
@@ -343,6 +200,20 @@ Let's draft.
 | **质量指标（MI）** | 一个介于 0 与 1 之间的有界标量，代表证据的累积权重。 |
 | **协同（Synergy）** | 多个同时出现的信号，其整体含义大于各信号单独含义之和。 |
 | **时序（Sequence）** | 按时间排列的事件模式，可赋予结构性的意义。 |
-| **互补乘积合成** | 一种数学运算：将各不确定度相
+| **互补乘积合成** | 一种数学运算：将各不确定度相乘，最终确定性为其补数（1 减去乘积）。 |
+| **ALPHA** | 有理数耦合常数（默认精确值为 1/2），用于缩放次级贡献以避免重复计算。 |
+| **确定性整数比率运算** | 使用精确整数比率而非十进制或二进制近似值进行计算。 |
+| **MAX_CAP / MAX_MI** | 严格的上限值，确保聚合评分永远不超过完全确定性。 |
+
+### 【科学说明】符号学是传感器阵列，而非神秘主义
+本模块引用了**查尔斯·桑德斯·皮尔斯**、**艾柯**（Umberto Eco）以及**格赖斯**（H. P. Grice）的概念——他们是现代符号学与语用学的奠基人。其术语并非形而上学，而是描述"符号"（数据点）如何在语境中传达意义的形式框架。
+
+**传感器类比：** 解释地震的地球物理学家不会依赖单一仪器，而是比较地震仪、磁力仪和 GPS 站的读数。每个传感器测量不同的物理属性，合在一起则约束模型。同样，VIGÍA 将符号学层次视为不同的传感器：
+- **检测层**如同记录温度异常的温度计。
+- **协同引擎**如同检测相关化合物的化学试纸。
+- **时序分析器**如同揭示时间进展的运动探测器。
+
+这些层次所提取的"意义"，不过是对结构性偏差的测量。皮尔斯论及*解释项*、艾柯论及*意义化*，描述的都是推理规则——在数学上等同于传感器融合。其中并无神秘主义，只有在确定性逻辑下对多源信号的整合。
+
 ---
 *Licensed under the Apache License, Version 2.0. Copyright 2026 Anna Tchijova.*
