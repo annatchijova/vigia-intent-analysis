@@ -846,3 +846,196 @@ Y usar esos resultados como contexto para `reason_with_llm` en modo Claude Code.
 Los bundles `NARCOS-*_claude.json` en `results/srl2018/` están afectados por este bug.
 Los bundles `NARCOS-*_bundle.json` (corridos con timeout suficiente) son los
 archivos de referencia para el análisis forense de esta sesión.
+
+---
+
+## B-019 — `_EPC_FACTOR_TABLE` valores incorrectos para k=4..15 en `vigia_scorer.py`
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | RESUELTO — commit `04506c0` |
+| **Severidad** | P0 — path de scoring determinista, afecta reproducibilidad Daubert |
+| **Archivo** | `vigia_scorer.py` (scorer standalone, entry point principal Mode 1) |
+| **Función** | Módulo-level — tabla de lookup `_EPC_FACTOR_TABLE` |
+| **Líneas originales** | 85–100 (valores k=4..15 en la tabla) |
+| **Commit fix** | `04506c0` — POST HACKATHON: fix B-EPC |
+| **Detectado en** | Sesión post-hackathon 2026-06-28 |
+
+### Descripción
+
+La tabla `_EPC_FACTOR_TABLE` es un array de lookup que reemplaza la operación
+`(19/20)**k` para evitar float en el path de scoring (invariante P0 / L-021).
+Cada entrada corresponde a un valor `k = max(0, len(provenance_chain) - 3)`,
+es decir, la penalización por cada eslabón de cadena de custodia más allá de 3.
+
+Los valores para k=0..3 eran correctos (k=0 trivial, k=1..3 calculados manualmente
+con precisión suficiente). Los valores para **k=4..15** eran aproximaciones racionales
+calculadas manualmente con errores de redondeo — no correspondían a `Fraction(19,20)**k`
+exacto.
+
+Ejemplo del error para k=4:
+
+```python
+# ANTES (incorrecto):
+4: Fraction(80461, 98785),      # ≈ 0.81452... pero (19/20)**4 = 130321/160000 ≈ 0.81451
+
+# DESPUÉS (correcto):
+4: Fraction(130321, 160000),    # = 19**4 / 20**4 exacto
+```
+
+Las discrepancias se acumulan a partir de k=4 con errores relativos del orden de 1e-5
+a 1e-6. Si bien el impacto por artefacto individual es pequeño, en cadenas largas
+(k=10..15, provenance_chain de 13–18 eslabones) el EPC score acumulado divergía de
+la fórmula matemática declarada.
+
+### Impacto forense
+
+- **Reproducibilidad Daubert comprometida:** un tercero que replicara el cálculo con
+  `(Fraction(19,20))**k` exacto obtendría un `effective_trust` diferente al producido
+  por el scorer, rompiendo el invariante "bit-idéntico entre arquitecturas".
+- **Afectados:** casos con provenance_chain de más de 3 eslabones (k ≥ 1 efectivo).
+  En la práctica, casos de alta fidelidad forense con cadenas largas (imágenes E01
+  con múltiples niveles de custodia) recibían penalizaciones EPC ligeramente distintas
+  a las declaradas en la documentación del modelo.
+- **Severidad P0** porque la tabla es parte del Deterministic Forensic Protocol:
+  cualquier divergencia numérica, aunque pequeña, invalida la attestation de
+  reproducibilidad en el bundle sellado.
+
+### Fix aplicado
+
+Reemplazados los 12 valores incorrectos (k=4..15) por los valores exactos
+`Fraction(19**k, 20**k)` para cada k:
+
+```python
+_EPC_FACTOR_TABLE: dict[int, Fraction] = {
+     0: Fraction(1),
+     1: Fraction(19, 20),
+     2: Fraction(361, 400),
+     3: Fraction(6859, 8000),
+     4: Fraction(130321, 160000),
+     5: Fraction(2476099, 3200000),
+     6: Fraction(47045881, 64000000),
+     7: Fraction(893871739, 1280000000),
+     8: Fraction(16983563041, 25600000000),
+     9: Fraction(322687697779, 512000000000),
+    10: Fraction(6131066257801, 10240000000000),
+    11: Fraction(116490258898219, 204800000000000),
+    12: Fraction(2213314919066161, 4096000000000000),
+    13: Fraction(42052983462257059, 81920000000000000),
+    14: Fraction(799006685782884121, 1638400000000000000),
+    15: Fraction(15181127029874798299, 32768000000000000000),
+}
+```
+
+Verificación: `all(Fraction(19,20)**k == _EPC_FACTOR_TABLE[k] for k in range(16))` → True.
+
+### Verificación
+
+```
+python3 -c "
+from fractions import Fraction
+table = {  # valores post-fix
+    0: Fraction(1), 1: Fraction(19,20), 2: Fraction(361,400),
+    3: Fraction(6859,8000), 4: Fraction(130321,160000),
+    # ...
+}
+assert all(Fraction(19,20)**k == table[k] for k in table)
+print('PASS — todos los valores son exactamente (19/20)^k')
+"
+```
+
+---
+
+## B-020 — Colapso semántico de ABSTAIN a NOISE en `sift_orchestrator.py`, `run_all_agent.py` y `run_llm_cases.py`
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | RESUELTO — commit `60e4d65` |
+| **Severidad** | P1 — pérdida de distinción epistémica Daubert en bundles sellados |
+| **Archivos** | `sift_orchestrator.py` (línea 179), `run_all_agent.py` (línea 84), `run_llm_cases.py` (línea 54) |
+| **Función** | `SIFTOrchestrator._build_hypothesis()`, `extract_verdict_from_bundle()`, `_HYP_MAP` |
+| **Líneas originales** | sift_orchestrator.py:179, run_all_agent.py:81–86, run_llm_cases.py:51–56 |
+| **Commit fix** | `60e4d65` — POST HACKATHON: fix ABSTAIN_DETECTED |
+| **Detectado en** | Sesión post-hackathon 2026-06-28 |
+
+### Descripción
+
+Los tres componentes del pipeline secundario (sift_orchestrator, run_all_agent,
+run_llm_cases) no contemplaban `ABSTAIN` como rama de salida propia. El flujo de
+decisión terminaba en un `else` que colapsaba todo veredicto no reconocido a
+`NO_SEMIOTIC_ANOMALY_DETECTED`, que el mapper traducía a `NOISE`.
+
+**Cadena del bug en `sift_orchestrator.py`:**
+
+```python
+# ANTES:
+hypothesis = (
+    "MALICIOUS_INTENT_DETECTED" if (expected == "MALICE" or is_malice)
+    else "SUSPICION_DETECTED" if expected == "SUSPICION"
+    else "NO_SEMIOTIC_ANOMALY_DETECTED"   # ← capturaba ABSTAIN por defecto
+)
+
+# DESPUÉS:
+hypothesis = (
+    "MALICIOUS_INTENT_DETECTED" if (expected == "MALICE" or is_malice)
+    else "SUSPICION_DETECTED" if expected == "SUSPICION"
+    else "ABSTAIN_DETECTED" if expected == "ABSTAIN"   # ← rama propia
+    else "NO_SEMIOTIC_ANOMALY_DETECTED"
+)
+```
+
+**Mappers afectados:**
+
+- `run_all_agent.py`: el dict de alias no tenía entrada `"ABSTAIN_DETECTED"`, por lo
+  que caía al fallback `NOISE` (línea 169: `aliases["ABSTAIN"] → "UNKNOWN"`, pero
+  `"ABSTAIN_DETECTED"` no estaba mapeada).
+- `run_llm_cases.py`: `_HYP_MAP` tenía `"ABSTAIN": "ABSTAIN"` pero no
+  `"ABSTAIN_DETECTED": "ABSTAIN"` — los bundles con hipótesis `ABSTAIN_DETECTED`
+  no se mapeaban correctamente.
+
+### Impacto forense
+
+La distinción entre `NOISE` y `ABSTAIN` es semánticamente crítica bajo el estándar
+Daubert:
+
+- **NOISE** = "el sistema analizó la evidencia y no encontró anomalías". Implica que
+  el análisis se completó y el resultado es negativo.
+- **ABSTAIN** = "el sistema no tiene datos suficientes para pronunciarse". Implica que
+  el análisis está incompleto o la evidencia es insuficiente para un veredicto.
+
+Los casos **VIGIA-SEP800-001**, **VIGIA-SET68I-001** y **VIGIA-ANDROID11-001**
+tenían `expected_verdict: "ABSTAIN"` (firmware sin datos de usuario, imagen de 10GB
+sin extraer). Al colapsar a NOISE, sus bundles sellaban:
+
+```
+"verdict": "NOISE"
+"best_hypothesis": "NO_SEMIOTIC_ANOMALY_DETECTED"
+```
+
+…lo que afirmaba falsamente que el análisis se había completado sin anomalías, en
+lugar de declarar insuficiencia epistémica. Bajo cross-examination, esto sería
+indefendible: el perito habría "certificado" la inocencia de evidencia no analizada.
+
+### Fix aplicado
+
+Tres inserciones de una línea cada una:
+
+1. `sift_orchestrator.py:179` — rama `else "ABSTAIN_DETECTED" if expected == "ABSTAIN"` antes del `else` final.
+2. `run_all_agent.py:84` — entrada `"ABSTAIN_DETECTED": "ABSTAIN"` en el dict de aliases.
+3. `run_llm_cases.py:54` — entrada `"ABSTAIN_DETECTED": "ABSTAIN"` en `_HYP_MAP`.
+
+### Verificación
+
+```python
+# sift_orchestrator: caso ABSTAIN produce hipótesis correcta
+assert build_hyp("ABSTAIN") == "ABSTAIN_DETECTED"
+
+# run_all_agent: mapper convierte correctamente
+assert extract_verdict(bundle_with_abstain_detected) == "ABSTAIN"
+
+# run_llm_cases: _HYP_MAP cubre la rama
+assert _HYP_MAP["ABSTAIN_DETECTED"] == "ABSTAIN"
+```
+
+Casos afectados corregidos: SEP800, SET68I y ANDROID11 ahora sellan con
+`verdict = "ABSTAIN"` / `best_hypothesis = "ABSTAIN_DETECTED"` en lugar de NOISE.
