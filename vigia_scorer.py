@@ -426,8 +426,12 @@ def _vigia_score(case: dict) -> dict:
             filtered = {k: v for k, v in art.items() if k in _valid_fields}
             try:
                 engine.add_artifact(CaieArtifact(**filtered))
-            except Exception:
-                continue  # artifact with invalid schema — skip, do not break pipeline
+            except Exception as _caie_skip_exc:
+                logging.warning(
+                    "CAIE: artifact %s skipped — schema validation failed: %s",
+                    art.get("artifact_id", "unknown"), _caie_skip_exc
+                )
+                continue
         raw_fractures = engine.detect_fractures()
         fractures = [
             {
@@ -474,7 +478,7 @@ def _vigia_score(case: dict) -> dict:
         prov_trust = a.get("prior_trust", 1.0)
         chain      = a.get("provenance_chain", [])
         if provenance.get("chain_status") == "BROKEN" or not chain:
-            epc_factor = 0.1
+            epc_factor = Fraction(1, 10)  # P0: consistencia con _EPC_FACTOR_TABLE
         else:
             _epc_k = min(15, max(0, len(chain) - 3))  # P0: Fraction lookup, no float pow
             epc_factor = _EPC_FACTOR_TABLE[_epc_k]
@@ -499,7 +503,11 @@ def _vigia_score(case: dict) -> dict:
             _filtered.setdefault("description", str(a.get("content", ""))[:200] or "legacy_artifact")
             _caie_art    = _CaieArtifact(**_filtered)
             spoofability = _caie_art.effective_spoofability
-        except Exception:
+        except Exception as _spoof_exc:
+            logging.warning(
+                "CAIE spoofability failed for artifact %s, using conservative fallback 0.50: %s",
+                a.get("artifact_id", "unknown"), _spoof_exc
+            )
             spoofability = 0.50
             weight       = 0.20
 
