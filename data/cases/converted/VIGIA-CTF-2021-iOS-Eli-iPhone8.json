@@ -1,0 +1,225 @@
+{
+  "case_id": "VIGIA-CTF-2021-iOS-Eli-iPhone8",
+  "name": "Magnet CTF 2021 iOS — Eli Flatt iPhone 8 Evasion Pattern",
+  "description": "GrayKey extraction of iPhone 8 (iOS 14.4) belonging to Eli Flatt. Triple encrypted comms stack (Wickr+Psiphon, Signal, ProtonMail) with active recruitment to Wickr, minimal digital footprint, prepaid carrier. SUSPICION verdict — coherent evasion pattern but each artifact individually explainable.",
+  "source": "Magnet Virtual Summit 2021 CTF — iOS Challenge",
+  "extraction_tool": "GrayKey v1.6.10/2.0.2-demo (Serial: 82c21ff2d481090d)",
+  "extraction_date": "2021-03-15T13:38:29Z",
+  "device": {
+    "name": "Elis iPhone",
+    "model": "iPhone 8 (GSM) [iPhone10,4 D201AP]",
+    "ios_version": "14.4 [18D52]",
+    "udid": "518e8d766f9b3e76db216f35fdb6b0604e50f61b",
+    "serial": "FFMV8CNHJC69",
+    "imei": "356759080486567",
+    "wifi_mac": "b0:19:c6:ac:84:be",
+    "phone": "+15855054132",
+    "owner": "Eli Flatt",
+    "apple_id": "e.flatt610@gmail.com",
+    "carrier": "Total Wireless (prepaid)",
+    "passcode": "185185"
+  },
+  "artifacts": [
+    {
+      "artifact_id": "wickr_app",
+      "evidence_type": "registry_key",
+      "source_tool": "filesystem_analysis",
+      "timestamp": "2021-02-12T04:01:55Z",
+      "raw_score": 0.7,
+      "description": "WickrEnterprise (com.mywickr.wickr) with embedded PsiphonTunnel.framework for censorship circumvention VPN. WickrID: eflatt610.",
+      "metadata": {
+        "bundle_id": "com.mywickr.wickr",
+        "wickr_id": "eflatt610",
+        "psiphon_framework": true,
+        "network_extension": "com.wickr.networkExtension",
+        "database": "wickrLocal.sqlite",
+        "users": 2,
+        "messages": 5,
+        "conversations": 1,
+        "message_date_range": "2021-03-04 to 2021-03-07",
+        "auto_destruct_fields": ["ZBURNONREAD", "ZLIFESPAN", "ZCLEANUPTIME"]
+      }
+    },
+    {
+      "artifact_id": "signal_app",
+      "evidence_type": "registry_key",
+      "source_tool": "filesystem_analysis",
+      "timestamp": "2021-02-16T02:57:12Z",
+      "raw_score": 0.5,
+      "description": "Signal v5.4.0 (org.whispersystems.signal) registered 2021-02-16 via SMS code 191-116. Database exists (signal.sqlite, SQLCipher encrypted).",
+      "metadata": {
+        "bundle_id": "org.whispersystems.signal",
+        "version": "5.4.0",
+        "registration_code": "191-116",
+        "database": "signal.sqlite",
+        "crash_detected": "2021-03-03"
+      }
+    },
+    {
+      "artifact_id": "protonmail_app",
+      "evidence_type": "registry_key",
+      "source_tool": "filesystem_analysis",
+      "timestamp": "2021-02-12T04:01:55Z",
+      "raw_score": 0.5,
+      "description": "ProtonMail (ch.protonmail.protonmail) with iCloud sync enabled. Persistent queue directories present.",
+      "metadata": {
+        "bundle_id": "ch.protonmail.protonmail",
+        "icloud_sync": true
+      }
+    },
+    {
+      "artifact_id": "wickr_recruitment_sms",
+      "evidence_type": "cultural_marker",
+      "source_tool": "sms_analysis",
+      "timestamp": "2021-03-03T15:33:31Z",
+      "raw_score": 0.8,
+      "description": "SMS sent from device recruiting contact +15713106012 to join Wickr: 'Hey! Join me on Wickr for the most secure communications experience - for FREE! Getting started is easy >> https://me-download.wickr.com. My WickrID is eflatt610'. First Wickr message follows 27h later.",
+      "metadata": {
+        "sms_rowid": 7,
+        "handle_id": 6,
+        "target_number": "+15713106012",
+        "is_from_me": 1,
+        "wickr_id_shared": "eflatt610",
+        "time_to_first_wickr_msg_hours": 27
+      }
+    },
+    {
+      "artifact_id": "wickr_messages",
+      "evidence_type": "log_entry",
+      "source_tool": "database_analysis",
+      "timestamp": "2021-03-04T18:08:39Z",
+      "raw_score": 0.6,
+      "description": "5 encrypted Wickr messages with auto-destruct between 2021-03-04 and 2021-03-07. All ZBODY fields are encrypted blobs. Message 3 is type 7 (media/call). Content irrecoverable without Wickr session keys.",
+      "metadata": {
+        "message_count": 5,
+        "date_range": "2021-03-04 to 2021-03-07",
+        "encrypted": true,
+        "auto_destruct": true,
+        "message_types": [0, 0, 7, 0, 0]
+      }
+    },
+    {
+      "artifact_id": "prepaid_carrier",
+      "evidence_type": "user_agent",
+      "source_tool": "keychain_analysis",
+      "timestamp": "2021-02-12T03:54:01Z",
+      "raw_score": 0.3,
+      "description": "Total Wireless prepaid carrier. No contract. Reduced traceability compared to postpaid carriers.",
+      "metadata": {
+        "carrier": "Total Wireless",
+        "type": "prepaid"
+      }
+    },
+    {
+      "artifact_id": "empty_contacts",
+      "evidence_type": "cultural_marker",
+      "source_tool": "addressbook_analysis",
+      "timestamp": "2021-02-12T03:54:01Z",
+      "raw_score": 0.5,
+      "description": "AddressBook contains only 1 contact (Apple Inc / 1-800-MY-APPLE). All personal contacts exist only in ephemeral SMS/iMessage cache.",
+      "metadata": {
+        "contact_count": 1,
+        "only_contact": "Apple Inc",
+        "numbers_in_cache": ["+15854178420", "+15713106012", "+13323730653", "+18337750707", "+15415005105", "+15852944011", "+19789036241", "+17067568825", "+15854498817"]
+      }
+    },
+    {
+      "artifact_id": "empty_locations",
+      "evidence_type": "cultural_marker",
+      "source_tool": "location_analysis",
+      "timestamp": "2021-03-04T00:00:00Z",
+      "raw_score": 0.4,
+      "description": "routined/Local.sqlite completely empty (0 visits, 0 learned locations, 0 WiFi APs). Only 1 geofence in consolidated.db: Burlington, VT (44.4737N, -73.2134W).",
+      "metadata": {
+        "routined_visits": 0,
+        "routined_locations": 0,
+        "routined_wifi_aps": 0,
+        "geofence_lat": 44.4737,
+        "geofence_lon": -73.2134,
+        "geofence_location": "Burlington, Vermont, USA"
+      }
+    },
+    {
+      "artifact_id": "weak_passcode",
+      "evidence_type": "cultural_marker",
+      "source_tool": "passcode_analysis",
+      "timestamp": "2021-02-12T03:57:22Z",
+      "raw_score": 0.15,
+      "description": "Passcode 185185 — 6-digit numeric, repeating pattern, Shannon entropy 1.585 bits. Inconsistent with privacy-focused app selection.",
+      "metadata": {
+        "passcode": "185185",
+        "entropy_bits": 1.585,
+        "all_digits": true,
+        "repeating": true
+      }
+    }
+  ],
+  "findings": [
+    {
+      "finding_id": "F-001",
+      "title": "Stack de comunicaciones cifradas multicapa con evasion VPN",
+      "verdict": "SUSPICION",
+      "confidence": "MEDIUM",
+      "status": "CONFIRMED",
+      "mitre_ttps": ["T1573", "T1572"],
+      "devil_advocate": "Wickr Me era popular entre usuarios privacy-conscious. Psiphon puede indicar acceso desde red restrictiva. Millones usan apps cifradas sin intencion maliciosa."
+    },
+    {
+      "finding_id": "F-002",
+      "title": "Reclutamiento activo de contacto a Wickr via SMS",
+      "verdict": "SUSPICION",
+      "confidence": "HIGH",
+      "status": "CONFIRMED",
+      "mitre_ttps": ["T1102"],
+      "devil_advocate": "SMS es template auto-generado de Wickr via funcion 'invite friend'. Muchos usuarios envian invitaciones sin implicaciones operativas."
+    },
+    {
+      "finding_id": "F-003",
+      "title": "Huella digital minima en dispositivo",
+      "verdict": "NOISE",
+      "confidence": "MEDIUM",
+      "status": "CONFIRMED",
+      "devil_advocate": "Dispositivo nuevo o secundario. Location Services desactivado por preferencia. Contactos no sincronizados desde iCloud."
+    },
+    {
+      "finding_id": "F-004",
+      "title": "Passcode debil inconsistente con perfil de privacidad",
+      "verdict": "NOISE",
+      "confidence": "LOW",
+      "status": "INFERRED",
+      "devil_advocate": "Passcodes debiles son extremadamente comunes. Privacidad de comunicaciones y seguridad de acceso fisico son preocupaciones independientes."
+    },
+    {
+      "finding_id": "F-005",
+      "title": "Geolocalizacion en Burlington, VT",
+      "verdict": "NOISE",
+      "confidence": "HIGH",
+      "status": "CONFIRMED",
+      "devil_advocate": "Area code 585 no vincula a ubicacion fisica en celulares prepago. Burlington es una ciudad universitaria."
+    },
+    {
+      "finding_id": "F-006",
+      "title": "Perfil de uso dual: apps cifradas + redes sociales",
+      "verdict": "NOISE",
+      "confidence": "MEDIUM",
+      "status": "CONFIRMED",
+      "devil_advocate": "Uso dual indica privacidad selectiva, no evasion sistematica. Actor que busca evasion total no tendria Facebook con identidad real."
+    }
+  ],
+  "overall_verdict": "SUSPICION",
+  "caie_composite": 0.0867,
+  "llm_verdict": "INTENT",
+  "llm_confidence": 0.9,
+  "llm_backend": "ollama",
+  "deterministic_verdict": "SUSPICION",
+  "gate_applied": "Daubert Corroboration Gate — CAIE composite below SUSPICION structural threshold, 0/9 artifacts irrefutable",
+  "hashes": {
+    "pdf_report": "63330a3e61ff91f9c26ffaf979aa9c70af48bd59ecac6b3654eb616697b8d119",
+    "passwords_txt": "864ea0dfe03ea2fcae2f1635154b9c5ae26047218a4c110730c7fffe2c582a86",
+    "pchistory_txt": "56928e1984b1b986b1a206611fdecf8877e3ae64b68254b60b7b1cd7990eb6cf",
+    "keychain_plist": "35911a414cc3a8d93188dbb23ab9923a88fd4f525050b5ae7b71652fa2b97dc6",
+    "filesystem_graykey": "6f12b7adaca815015112afaa5de21ffe72287ad6ead5f9dcac7dd4af2b980ced",
+    "memory_graykey": "6cfdbcf0d4c24f6e3dabcad03e0ed5b19a2c47fadae41c4eaf7928fe201cbdc0"
+  },
+  "analysis_timestamp": "2026-06-28T02:34:35Z"
+}
