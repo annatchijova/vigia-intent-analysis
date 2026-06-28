@@ -81,6 +81,7 @@ def extract_verdict_from_bundle(bundle_path: Path) -> str:
         "MALICIOUS_INTENT_DETECTED": "MALICE",
         "MALICIOUS_ACTIVITY_DETECTED": "MALICE",
         "NO_SEMIOTIC_ANOMALY_DETECTED": "NOISE",
+        "ABSTAIN_DETECTED":           "ABSTAIN",
         "NO_THREAT_DETECTED": "NOISE",
         "BENIGN_ACTIVITY": "NOISE",
         "INSUFFICIENT_EVIDENCE": "UNKNOWN",

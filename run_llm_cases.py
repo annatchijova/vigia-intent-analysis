@@ -51,6 +51,7 @@ _HYP_MAP = {
     "MALICIOUS_INTENT_DETECTED":  "MALICE",
     "SUSPICION_DETECTED":         "SUSPICION",
     "NO_SEMIOTIC_ANOMALY_DETECTED": "NOISE",
+    "ABSTAIN_DETECTED":             "ABSTAIN",
     "ABSTAIN":                    "ABSTAIN",
     "MALICE":                     "MALICE",
     "INTENT":                     "MALICE",

@@ -176,6 +176,7 @@ class SIFTOrchestrator:
         hypothesis = (
             "MALICIOUS_INTENT_DETECTED" if (expected == "MALICE" or is_malice)
             else "SUSPICION_DETECTED" if expected == "SUSPICION"
+            else "ABSTAIN_DETECTED" if expected == "ABSTAIN"
             else "NO_SEMIOTIC_ANOMALY_DETECTED"
         )
         logger.info("[SIFT_SHIM] EBS v1 adapter: case=%s artifacts=%d avg=%s hyp=%s",
