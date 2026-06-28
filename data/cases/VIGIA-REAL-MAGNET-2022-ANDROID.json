@@ -1,0 +1,45 @@
+{
+  "case_id": "VIGIA-REAL-MAGNET-2022-ANDROID",
+  "case_name": "Magnet CTF 2022 Android — Full Disk Encryption with Keymaster",
+  "description": "Android data partition image. Full disk encryption active with keymaster key blob. data/unencrypted/ directory contains encryption metadata but no decrypted content accessible without key. Bluetooth config and recovery artifacts present.",
+  "schema_version": "ebs_v1",
+  "expected_verdict": "NOISE",
+  "artifacts": [
+    {
+      "artifact_id": "AND2022-A01",
+      "evidence_type": "file_metadata",
+      "description": "data/unencrypted/key/ directory contains: keymaster_key_blob, encrypted_key, secdiscardable, stretching, version. Full Android FDE active. Content inaccessible without hardware-backed keymaster key from original device.",
+      "raw_score": 0.30,
+      "prior_trust": 0.80,
+      "source_tool": "filesystem_analysis",
+      "timestamp": "2022-01-01T00:00:00Z",
+      "provenance_chain": ["tar_extraction", "magnet_ctf_2022"],
+      "metadata": {
+        "acquisition_tool": "android_backup",
+        "acquisition_hash": "magnet_ctf_2022_android",
+        "acquisition_timestamp": "2022-01-01T00:00:00Z",
+        "write_blocker_used": false,
+        "examiner_id": "MAGNET-CTF-2022",
+        "encryption": "FDE_keymaster",
+        "forensic_note": "ABSTAIN — content inaccessible without device key. Structure confirms encryption active."
+      }
+    },
+    {
+      "artifact_id": "AND2022-A02",
+      "evidence_type": "file_metadata",
+      "description": "data/misc/bluedroid/bt_config.bak present — Bluetooth pairing history recoverable. data/misc/recovery/ contains build fingerprint. Metadata artifacts accessible despite FDE.",
+      "raw_score": 0.25,
+      "prior_trust": 0.80,
+      "source_tool": "filesystem_analysis",
+      "timestamp": "2022-01-01T00:00:00Z",
+      "provenance_chain": ["tar_extraction", "magnet_ctf_2022"],
+      "metadata": {
+        "acquisition_tool": "android_backup",
+        "acquisition_hash": "magnet_ctf_2022_android",
+        "acquisition_timestamp": "2022-01-01T00:00:00Z",
+        "write_blocker_used": false,
+        "examiner_id": "MAGNET-CTF-2022"
+      }
+    }
+  ]
+}
