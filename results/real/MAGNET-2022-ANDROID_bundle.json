@@ -1,0 +1,225 @@
+{
+  "analysis_timestamp": "2026-06-28T02:18:42.647244+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "VIGIA-REAL-MAGNET-2022-ANDROID",
+    "end_time": "2026-06-28T02:18:42.647249+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "VIGIA-REAL-MAGNET-2022-ANDROID",
+        "entry_sha256": "038aca72f8916119a7bb883b889128a4d42a643d30260f35a868df950d97bcb4",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "VIGIA-REAL-MAGNET-2022-ANDROID"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: 95f2da2a3bdcb4ca...",
+        "outputs_summary": {
+          "agent_sha256": "95f2da2a3bdcb4ca106059e2b06f58fd0ec414c887fec07ac7a0d5edfeb097a1",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-06-28T02:18:42.643173+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-REAL-MAGNET-2022-ANDROID",
+        "entry_sha256": "c5266b944f85aaf53b769b5f10e0981f13c5edc0042b09cdfa2c13817fbb8e64",
+        "inputs_summary": {
+          "path": "data/cases/VIGIA-REAL-MAGNET-2022-ANDROID.json"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-06-28T02:18:42.643261+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-REAL-MAGNET-2022-ANDROID",
+        "entry_sha256": "9787655c9f199c85ea232f99659e56a9e8b09df000e19391a814098853163f46",
+        "inputs_summary": {
+          "path": "data/cases/VIGIA-REAL-MAGNET-2022-ANDROID.json"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: d68f797d8cb3ad2a...",
+        "outputs_summary": {
+          "sha256": "d68f797d8cb3ad2a93bfaf986dd350f7a84e759cc3bafefde467b5eb7c48a5da"
+        },
+        "seq": 3,
+        "timestamp": "2026-06-28T02:18:42.643355+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "VIGIA-REAL-MAGNET-2022-ANDROID",
+        "entry_sha256": "3be49a212c43b196c1bb53402a9c9833530c93f5b139c7e1b15a18897b6765e2",
+        "inputs_summary": {
+          "evidence": "data/cases/VIGIA-REAL-MAGNET-2022-ANDROID.json",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-06-28T02:18:42.643459+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "VIGIA-REAL-MAGNET-2022-ANDROID",
+        "entry_sha256": "0affc21b69aaa2a20e53fdac33806e1a11bb49b12b9dfdc19765b96d12ad028a",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 2 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "NO_SEMIOTIC_ANOMALY_DETECTED",
+            "best_posterior": "11/250",
+            "confidence": "11/250",
+            "is_conclusive": "False",
+            "narrative": "Android data partition image. Full disk encryption active with keymaster key blob. data/unencrypted/ directory contains encryption metadata but no decrypted content accessible without key. Bluetooth c..."
+          },
+          "case_id": "VIGIA-REAL-MAGNET-2022-ANDROID",
+          "pipeline_meta": {
+            "artifact_count": "2",
+            "avg_score": "11/50",
+            "expected_verdict": "NOISE",
+            "source": "ebs_v1_json_adapter"
+          },
+          "signals": [
+            {
+              "artifact_id": "AND2022-A01",
+              "confidence": "4/5",
+              "description": "data/unencrypted/key/ directory contains: keymaster_key_blob, encrypted_key, secdiscardable, stretching, version. Full Android FDE active. Content inaccessible without hardware-backed keymaster key fr",
+              "evidence_type": "file_metadata",
+              "source": "filesystem_analysis",
+              "z_score": "6/25"
+            },
+            {
+              "artifact_id": "AND2022-A02",
+              "confidence": "4/5",
+              "description": "data/misc/bluedroid/bt_config.bak present \u2014 Bluetooth pairing history recoverable. data/misc/recovery/ contains build fingerprint. Metadata artifacts accessible despite FDE.",
+              "evidence_type": "file_metadata",
+              "source": "filesystem_analysis",
+              "z_score": "1/5"
+            }
+          ]
+        },
+        "seq": 5,
+        "timestamp": "2026-06-28T02:18:42.646568+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "VIGIA-REAL-MAGNET-2022-ANDROID",
+        "entry_sha256": "43269c6ab53b6813540869160d3615099a673c9b9f8b41bce4c565716f15ac05",
+        "inputs_summary": {
+          "n_signals": "2"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-06-28T02:18:42.647049+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "VIGIA-REAL-MAGNET-2022-ANDROID",
+        "entry_sha256": "0eb622c8979853bd1a11f9469f6746d59754934d40fe7f8d056df99cd725ee43",
+        "inputs_summary": {
+          "verdict": "NO_SEMIOTIC_ANOMALY_DETECTED"
+        },
+        "iteration": 0,
+        "note": "Exit code 0 \u2014 analysis complete.",
+        "outputs_summary": {
+          "exit_code": "0"
+        },
+        "seq": 7,
+        "timestamp": "2026-06-28T02:18:42.647170+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-06-28T02:18:42.642927+00:00",
+    "total_entries": 7
+  },
+  "case_id": "VIGIA-REAL-MAGNET-2022-ANDROID",
+  "evidence_path": "data/cases/VIGIA-REAL-MAGNET-2022-ANDROID.json",
+  "evidence_sha256": "d68f797d8cb3ad2a93bfaf986dd350f7a84e759cc3bafefde467b5eb7c48a5da",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-REAL-MAGNET-2022-ANDROID ===\nEvidence: data/cases/VIGIA-REAL-MAGNET-2022-ANDROID.json\nEvidence SHA-256: d68f797d8cb3ad2a93bfaf986dd350f7a84e759cc3bafefde467b5eb7c48a5da\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: NO_SEMIOTIC_ANOMALY_DETECTED\nPosterior confidence: 11/250\nConclusive: NO \u2014 requires human review\n\n--- PEIRCEAN NARRATIVE ---\nAndroid data partition image. Full disk encryption active with keymaster key blob. data/unencrypted/ directory contains encryption metadata but no decrypted content accessible without key. Bluetooth config and recovery artifacts present.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [data/unencrypted/key/ directory contains: keymaster_key_blob, encrypte] z=0.240 conf=0.80 \u2014 \n  [data/misc/bluedroid/bt_config.bak present \u2014 Bluetooth pairing history ] z=0.200 conf=0.80 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW \u2014 No significant anomalies detected in this iteration.\n\nCritical signals (z>3): 0\nHigh signals (2<z<=3): 0\nTotal signals analyzed: 2",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "NO_SEMIOTIC_ANOMALY_DETECTED",
+      "best_posterior": "11/250",
+      "confidence": {
+        "__fraction__": true,
+        "den": 250,
+        "num": 11
+      },
+      "is_conclusive": false,
+      "narrative": "Android data partition image. Full disk encryption active with keymaster key blob. data/unencrypted/ directory contains encryption metadata but no decrypted content accessible without key. Bluetooth config and recovery artifacts present."
+    },
+    "case_id": "VIGIA-REAL-MAGNET-2022-ANDROID",
+    "pipeline_meta": {
+      "artifact_count": 2,
+      "avg_score": "11/50",
+      "expected_verdict": "NOISE",
+      "source": "ebs_v1_json_adapter"
+    },
+    "signals": [
+      {
+        "artifact_id": "AND2022-A01",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 4
+        },
+        "description": "data/unencrypted/key/ directory contains: keymaster_key_blob, encrypted_key, secdiscardable, stretching, version. Full Android FDE active. Content inaccessible without hardware-backed keymaster key fr",
+        "evidence_type": "file_metadata",
+        "source": "filesystem_analysis",
+        "z_score": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 6
+        }
+      },
+      {
+        "artifact_id": "AND2022-A02",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 4
+        },
+        "description": "data/misc/bluedroid/bt_config.bak present \u2014 Bluetooth pairing history recoverable. data/misc/recovery/ contains build fingerprint. Metadata artifacts accessible despite FDE.",
+        "evidence_type": "file_metadata",
+        "source": "filesystem_analysis",
+        "z_score": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 1
+        }
+      }
+    ]
+  },
+  "sans_compliance": {
+    "accuracy_validation": false,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}
