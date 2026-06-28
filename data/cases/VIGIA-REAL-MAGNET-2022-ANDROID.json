@@ -1,9 +1,10 @@
 {
   "case_id": "VIGIA-REAL-MAGNET-2022-ANDROID",
-  "case_name": "Magnet CTF 2022 Android — Full Disk Encryption with Keymaster",
-  "description": "Android data partition image. Full disk encryption active with keymaster key blob. data/unencrypted/ directory contains encryption metadata but no decrypted content accessible without key. Bluetooth config and recovery artifacts present.",
+  "case_name": "Magnet CTF 2022 Android — Rafael Shell Google Pixel 3",
+  "description": "Android data partition image. Rafael Shell (rafaelshell24@gmail.com), Google Pixel 3 rooted with Magisk v23000, Champlain College Burlington VT, Log4Shell vCenter research. Full disk encryption active with keymaster key blob. Bluetooth config and recovery artifacts present. Wire app bookmarks and Bumble chat with Discord handle exchange indicate OPSEC-aware communication patterns.",
   "schema_version": "ebs_v1",
-  "expected_verdict": "NOISE",
+  "expected_verdict": "SUSPICION",
+  "cross_case_correlation": "VIGIA-REAL-MAGNET-2022-LINUX-RAFAEL — same actor, same TTPs",
   "artifacts": [
     {
       "artifact_id": "AND2022-A01",
@@ -39,6 +40,45 @@
         "acquisition_timestamp": "2022-01-01T00:00:00Z",
         "write_blocker_used": false,
         "examiner_id": "MAGNET-CTF-2022"
+      }
+    },
+    {
+      "artifact_id": "AND2022-A03",
+      "evidence_type": "cultural_marker",
+      "description": "Log4Shell CVE-2021-44228 bookmark/search against VMware vCenter. Indicates active research into critical RCE vulnerability targeting enterprise infrastructure. Correlates with Linux Rafael case where Log4Shell was exploited.",
+      "raw_score": 0.85,
+      "prior_trust": 0.85,
+      "source_tool": "browser_analysis",
+      "timestamp": "2022-01-01T00:00:00Z",
+      "provenance_chain": ["tar_extraction", "magnet_ctf_2022", "browser_history_extraction"],
+      "metadata": {
+        "acquisition_tool": "android_backup",
+        "acquisition_hash": "magnet_ctf_2022_android",
+        "acquisition_timestamp": "2022-01-01T00:00:00Z",
+        "write_blocker_used": false,
+        "examiner_id": "MAGNET-CTF-2022",
+        "cve": "CVE-2021-44228",
+        "target_system": "VMware vCenter",
+        "cross_case_ref": "VIGIA-REAL-MAGNET-2022-LINUX-RAFAEL"
+      }
+    },
+    {
+      "artifact_id": "AND2022-A04",
+      "evidence_type": "log_entry",
+      "description": "Wire app 7 bookmarks + Bumble chat with Discord handle exchange (PostMaster#9650/DesertBusDriver#9827). Encrypted messaging app usage combined with pseudonymous handle exchange across platforms indicates OPSEC-aware communication patterns.",
+      "raw_score": 0.65,
+      "prior_trust": 0.80,
+      "source_tool": "app_analysis",
+      "timestamp": "2022-01-01T00:00:00Z",
+      "provenance_chain": ["tar_extraction", "magnet_ctf_2022", "app_data_extraction"],
+      "metadata": {
+        "acquisition_tool": "android_backup",
+        "acquisition_hash": "magnet_ctf_2022_android",
+        "acquisition_timestamp": "2022-01-01T00:00:00Z",
+        "write_blocker_used": false,
+        "examiner_id": "MAGNET-CTF-2022",
+        "apps_detected": ["Wire", "Bumble"],
+        "discord_handles": ["PostMaster#9650", "DesertBusDriver#9827"]
       }
     }
   ]
