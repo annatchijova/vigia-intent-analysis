@@ -329,7 +329,13 @@ def _apply_quadripartite(
             "confidence_pct":  round(confidence * 100),
         }
 
-    raw_verdict    = _VERDICT_TO_RAW.get(verdict, "ABSTAIN")
+    if verdict not in _VERDICT_TO_RAW:
+        raise ValueError(
+            f"VIGÍA scorer: veredicto desconocido {verdict!r} — "
+            f"valores válidos: {list(_VERDICT_TO_RAW.keys())}. "
+            f"Fallo ruidoso en lugar de colapso silencioso a ABSTAIN (Daubert)."
+        )
+    raw_verdict    = _VERDICT_TO_RAW[verdict]
     abstain_reason = _ABSTAIN_REASONS.get(verdict)
 
     # Convert floats to Fraction for deterministic arithmetic.
