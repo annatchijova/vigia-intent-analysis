@@ -1744,3 +1744,127 @@ impacto forense Daubert, y estado del fix.
 - Handlers en `caie.py`
 - Cobertura de espacio de estados en `quadripartite.py`
 - Propagación de estados en los generadores de reporte
+
+---
+
+## B-029 — `quadripartite.py` Check 3 `else` branch is dead code (`ABSTAIN_CONTRADICTION` unreachable for non-OSCIL reasons)
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | ABIERTO — documentation only, no patch needed |
+| **Severidad** | P3 — dead code, no functional impact |
+| **Archivo** | `vigia/verdict/quadripartite.py` |
+| **Función** | `classify()` — Check 3 ABSTAIN branch |
+| **Líneas originales** | 297–303 |
+| **Commit fix** | — |
+| **Detectado en** | Sesión post-hackathon 2026-06-28, `quadripartite.py` state space audit |
+
+### Descripción
+
+The ABSTAIN branch in `classify()` (Check 3) has the following structure:
+
+```python
+if abstain_reason and "OSCIL" in abstain_reason.upper():
+    state = ABSTAIN_CONTRADICTION      # oscillation detected
+elif confidence < MEDIUM_CONFIDENCE_THRESHOLD:
+    state = ABSTAIN_INSUFFICIENT       # low confidence
+else:
+    state = ABSTAIN_INSUFFICIENT       # ← identical to elif — dead code
+```
+
+The `else` branch is unreachable in any meaningful sense: it produces the same state
+(`ABSTAIN_INSUFFICIENT`) as the `elif` branch. The only difference between the two
+paths is the `confidence` check, which is now irrelevant because both outcomes are
+identical. Any ABSTAIN case with a non-oscillation `abstain_reason` and confidence at
+or above `MEDIUM_CONFIDENCE_THRESHOLD` falls through to the dead `else` and receives
+`ABSTAIN_INSUFFICIENT` — indistinguishable from the low-confidence path.
+
+The three ABSTAIN sub-states defined by the quadripartite model:
+- `ABSTAIN_DEGRADED` — handled by Check 1 before this point (provenance collapse).
+- `ABSTAIN_CONTRADICTION` — only reachable when `"OSCIL" in abstain_reason.upper()`.
+- `ABSTAIN_INSUFFICIENT` — reachable via `elif` (low confidence) and via the dead
+  `else` (non-oscillation reason with sufficient confidence — currently a no-op).
+
+### Impacto forense
+
+No functional impact: `ABSTAIN_INSUFFICIENT` is the correct fallback for cases where
+the reason for abstention is not oscillation and confidence is insufficient. The dead
+`else` does not produce an incorrect result — it just makes the `elif` condition
+meaningless because the `else` duplicates it.
+
+The concern is investigative rather than operational: the dead `else` masks whether
+`ABSTAIN_CONTRADICTION` was intended to be reachable for non-oscillation contradiction
+reasons. If there are other types of contradiction (e.g., log-vs-memory fracture
+producing an irresolvable split) that should produce `ABSTAIN_CONTRADICTION` but
+currently map to `ABSTAIN_INSUFFICIENT` because they do not contain `"OSCIL"` in their
+reason string, the distinction is silently lost.
+
+### Investigación pendiente
+
+Before treating this as documentation-only:
+
+1. Review the full list of `abstain_reason` strings that can be emitted upstream
+   (in `sift_orchestrator.py`, `abductive_reasoner.py`, and any CAIE path that sets
+   `abstain_reason`). Determine whether any non-oscillation reason represents a
+   logical contradiction rather than mere insufficiency.
+2. If yes: the `"OSCIL"` check should be broadened to a set of contradiction-type
+   reasons, or replaced with a structured enum rather than a substring match.
+3. If no: the dead `else` should be removed and the condition simplified to:
+   ```python
+   if abstain_reason and "OSCIL" in abstain_reason.upper():
+       state = ABSTAIN_CONTRADICTION
+   else:
+       state = ABSTAIN_INSUFFICIENT
+   ```
+   This eliminates the misleading `elif` and makes the control flow honest.
+
+---
+
+## B-030 — `quadripartite.py` unrecognized `raw_verdict` falls through to fallback (INVESTIGATED — NOT A BUG)
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | CERRADO — investigated and dismissed |
+| **Severidad** | N/A |
+| **Archivo** | `vigia/verdict/quadripartite.py` |
+| **Función** | `classify()` — fallback path |
+| **Línea original** | 397 |
+| **Commit fix** | — |
+| **Detectado en** | Sesión post-hackathon 2026-06-28, `quadripartite.py` state space audit |
+
+### Descripción
+
+**Investigation summary:** if `raw_verdict` is not one of the recognized values
+(`"MALICE"`, `"BENIGN"`, `"ABSTAIN"`), all six checks in `classify()` are bypassed
+and the fallback at line 397 emits `ABSTAIN_INSUFFICIENT` with
+`abstain_reason="Unrecognized raw verdict: '{raw_verdict}'"`.
+
+**Finding:** this is correct behavior — fail-loud and self-documenting. The fallback
+does not silently map to a forensically meaningful verdict; it produces an explicit
+ABSTAIN with a diagnostic message that names the unrecognized input. Under
+cross-examination, the bundle is fully explainable: "the input verdict was not
+recognized; the system correctly abstained and recorded the reason."
+
+**Layered defense confirmed:** B-023 (`_apply_quadripartite` now raises `ValueError`
+for any unrecognized verdict string before calling `quadripartite.classify()`) means
+the fallback at line 397 is unreachable in the production path for any
+correctly-typed input. The unrecognized-verdict case is intercepted before it reaches
+`quadripartite.py`. The two layers are independent and complementary:
+- Layer 1 (B-023): `ValueError` at the scorer boundary — prevents sealed bundles
+  from being produced with an unknown verdict type.
+- Layer 2 (line 397): explicit `ABSTAIN_INSUFFICIENT` fallback — defensive last resort
+  if quadripartite is ever called directly with novel input.
+
+**Also investigated:** the string `"OSCILLATION_MITIGATED"` appears in the audit
+trail `action` field during oscillation resolution, but does **not** propagate to
+`abstain_reason`. Only terminal oscillation — where the resolution strategy fails and
+`termination_reason="OSCILLATION_DETECTED"` — produces the `forensic_verdict` string
+that is passed as `abstain_reason` to `quadripartite.classify()`. The `"OSCIL"` check
+in Check 3 (B-029) correctly targets only that terminal state. There is no case where
+`"OSCILLATION_MITIGATED"` reaches `abstain_reason` and accidentally triggers
+`ABSTAIN_CONTRADICTION`.
+
+### Conclusión
+
+Not a bug. Dismissed. The fallback is correct, the layered defense is sound, and the
+oscillation string routing is non-contradictory. No action required.

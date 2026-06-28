@@ -820,3 +820,203 @@ proposed or applied fix, and commit reference.
 - Exception handlers in `caie.py`
 - State space coverage in `quadripartite.py`
 - Verdict state propagation in all report generators
+
+---
+
+## B-029 — `quadripartite.py` Check 3 `else` Branch Is Dead Code (`ABSTAIN_CONTRADICTION` Unreachable for Non-OSCIL Reasons)
+
+| Field | Value |
+|-------|-------|
+| **Status** | OPEN — documentation only, no patch needed until investigation below is complete |
+| **Severity** | P3 — dead code, no functional impact |
+| **File** | `vigia/verdict/quadripartite.py` |
+| **Function** | `classify()` — Check 3 ABSTAIN sub-state branch |
+| **Original lines** | 297–303 |
+| **Fix commit** | — |
+| **Detected** | Post-hackathon session 2026-06-28, `quadripartite.py` state space audit |
+
+### Description
+
+The ABSTAIN branch in `classify()` (Check 3) assigns the ABSTAIN sub-state based on
+two conditions: the content of `abstain_reason` and the `confidence` level. The
+current structure is:
+
+```python
+# lines 297–303 — current (dead else):
+if abstain_reason and "OSCIL" in abstain_reason.upper():
+    state = ABSTAIN_CONTRADICTION      # oscillation-type contradiction
+elif confidence < MEDIUM_CONFIDENCE_THRESHOLD:
+    state = ABSTAIN_INSUFFICIENT       # low confidence
+else:
+    state = ABSTAIN_INSUFFICIENT       # ← identical to elif — dead code
+```
+
+The `else` branch is dead: it assigns the same `state` as the `elif` branch. The
+`confidence` comparison in the `elif` is meaningless because both outcomes are
+`ABSTAIN_INSUFFICIENT`. Any ABSTAIN case that is not oscillation-related lands in
+`ABSTAIN_INSUFFICIENT` regardless of whether confidence is above or below the
+threshold.
+
+**The three ABSTAIN sub-states in the quadripartite model:**
+
+| Sub-state | Intended meaning | Where handled |
+|-----------|-----------------|---------------|
+| `ABSTAIN_DEGRADED` | Provenance chain collapsed — evidence integrity too low to score | Check 1 (before this branch) |
+| `ABSTAIN_CONTRADICTION` | Logical contradiction between evidence sources that cannot be resolved | Check 3, `if "OSCIL"` branch only |
+| `ABSTAIN_INSUFFICIENT` | Not enough evidence to reach a verdict | Check 3, `elif` and dead `else` |
+
+`ABSTAIN_CONTRADICTION` is currently only reachable when `abstain_reason` contains
+the substring `"OSCIL"`. There is no path to `ABSTAIN_CONTRADICTION` for any other
+type of contradiction reason.
+
+### Forensic Significance
+
+**No functional impact today:** `ABSTAIN_INSUFFICIENT` is the correct verdict for
+any non-oscillation, non-provenance-collapse ABSTAIN case. The dead `else` does not
+produce a wrong result. The system does not misclassify cases.
+
+**The investigative question this raises:** is `ABSTAIN_CONTRADICTION` correctly
+scoped to oscillation only, or are there other types of contradiction that the model
+intends to classify as `ABSTAIN_CONTRADICTION` but currently cannot — because they
+do not produce an `"OSCIL"`-containing reason string?
+
+For example: if a CAIE LOG_VS_MEMORY fracture produces an irresolvable contradiction
+between two evidence sources (not oscillation, but genuine conflicting assertions),
+should that reach `ABSTAIN_CONTRADICTION` or `ABSTAIN_INSUFFICIENT`? The current code
+makes this impossible to distinguish at the quadripartite level — both would produce
+`ABSTAIN_INSUFFICIENT`.
+
+Under Daubert, the distinction matters: `ABSTAIN_CONTRADICTION` would signal to the
+court that evidence sources directly contradict each other, which is stronger grounds
+for requesting additional evidence than `ABSTAIN_INSUFFICIENT` (which merely signals
+evidentiary gaps). If contradiction cases are silently collapsed to insufficiency,
+the sealed bundle understates the adversarial nature of the evidence conflict.
+
+### Proposed Resolution
+
+**Step 1 — Investigation (required first):**
+
+Enumerate all `abstain_reason` strings that can be emitted upstream. Sources to check:
+- `sift_orchestrator.py` — oscillation termination path
+- `vigia/inference/abductive_reasoner.py` — oscillation and other termination paths
+- Any CAIE path that sets `abstain_reason` on a case artifact
+- `vigia_scorer.py` — if it sets `abstain_reason` before calling quadripartite
+
+For each reason string, classify it as: **oscillation** (→ `ABSTAIN_CONTRADICTION`),
+**other contradiction** (→ should be `ABSTAIN_CONTRADICTION` if the model intends it),
+or **insufficiency** (→ `ABSTAIN_INSUFFICIENT`).
+
+**Step 2a — If only oscillation produces contradiction:**
+
+Simplify the dead branch away:
+```python
+# AFTER (honest control flow):
+if abstain_reason and "OSCIL" in abstain_reason.upper():
+    state = ABSTAIN_CONTRADICTION
+else:
+    state = ABSTAIN_INSUFFICIENT
+```
+
+**Step 2b — If other contradiction types exist:**
+
+Replace the substring check with a structured enum or set of reason codes:
+```python
+_CONTRADICTION_REASONS = {"OSCIL", "LOG_VS_MEM_IRRESOLVABLE", ...}
+
+if abstain_reason and any(r in abstain_reason.upper() for r in _CONTRADICTION_REASONS):
+    state = ABSTAIN_CONTRADICTION
+else:
+    state = ABSTAIN_INSUFFICIENT
+```
+
+**Do not patch before Step 1 is complete.** The patch depends on the answer.
+
+---
+
+## B-030 — `quadripartite.py` Unrecognized `raw_verdict` Falls Through to Fallback (INVESTIGATED — NOT A BUG)
+
+| Field | Value |
+|-------|-------|
+| **Status** | CLOSED — investigated and dismissed |
+| **Severity** | N/A |
+| **File** | `vigia/verdict/quadripartite.py` |
+| **Function** | `classify()` — unrecognized verdict fallback |
+| **Original line** | 397 |
+| **Fix commit** | — |
+| **Detected** | Post-hackathon session 2026-06-28, `quadripartite.py` state space audit |
+
+### Investigation Summary
+
+**The question:** if `raw_verdict` is not one of the three recognized values
+(`"MALICE"`, `"BENIGN"`, `"ABSTAIN"`), what happens? All six checks in `classify()`
+are verdict-gated; none of them fire for an unrecognized value. Control falls through
+to a catch-all at line 397:
+
+```python
+# line 397 — fallback for unrecognized raw_verdict:
+return QuadripartiteResult(
+    state=ABSTAIN_INSUFFICIENT,
+    abstain_reason=f"Unrecognized raw verdict: '{raw_verdict}'",
+    ...
+)
+```
+
+**Finding: this is correct behavior.** The fallback is fail-loud and self-documenting:
+- It does not silently emit a forensically meaningful verdict (NOISE, SUSPICION, etc.).
+- It produces an explicit ABSTAIN with a diagnostic `abstain_reason` string that names
+  the unrecognized input verbatim.
+- The sealed bundle is fully explainable under cross-examination: "the scorer passed
+  an unrecognized verdict type; the quadripartite module correctly abstained and
+  recorded the reason in the bundle."
+
+**Layered defense is sound:**
+
+The fallback at line 397 is a last-resort defensive measure. In practice it is
+unreachable from the production scoring path because B-023 provides an upstream gate:
+`_apply_quadripartite()` now raises `ValueError` for any verdict string not present
+in `_VERDICT_TO_RAW` before calling `quadripartite.classify()`. An unrecognized
+verdict never reaches `quadripartite.py` in normal operation.
+
+The two layers are independent and complementary:
+
+| Layer | Location | Behavior |
+|-------|----------|----------|
+| B-023 gate | `vigia_scorer.py` — `_apply_quadripartite()` | Raises `ValueError` — no bundle sealed |
+| Line 397 fallback | `vigia/verdict/quadripartite.py` — `classify()` | Returns `ABSTAIN_INSUFFICIENT` with diagnostic reason |
+
+If `quadripartite.classify()` is ever called directly (e.g., from tests, scripts, or
+future code), the fallback provides correct behavior without depending on the B-023
+upstream gate.
+
+### OSCILLATION_MITIGATED String Routing — Also Investigated
+
+The string `"OSCILLATION_MITIGATED"` appears in the audit trail `action` field when
+the oscillation resolution strategy succeeds. The concern was whether this string
+could propagate to `abstain_reason` and accidentally trigger `ABSTAIN_CONTRADICTION`
+via the `"OSCIL"` substring check in Check 3 (B-029).
+
+**Finding: it does not.** The routing is:
+
+- **Successful oscillation mitigation:** `action = "OSCILLATION_MITIGATED"` in audit
+  trail. The case proceeds with a resolved verdict. `abstain_reason` is not set.
+  Does not reach `quadripartite.classify()` with an ABSTAIN verdict.
+
+- **Terminal oscillation (resolution fails):** `termination_reason = "OSCILLATION_DETECTED"`.
+  The `forensic_verdict` string derived from this termination is what gets passed as
+  `abstain_reason` to `quadripartite.classify()`. This string contains `"OSCIL"` and
+  correctly triggers `ABSTAIN_CONTRADICTION`.
+
+The two strings (`OSCILLATION_MITIGATED` vs the terminal oscillation verdict) follow
+completely separate code paths. There is no case where a successfully-mitigated
+oscillation reaches the `"OSCIL"` check in Check 3.
+
+### Conclusion
+
+Not a bug. The fallback at line 397 is correct forensic behavior (fail-loud,
+self-documenting ABSTAIN). The B-023 upstream gate provides additional protection
+that makes the fallback unreachable in production. The oscillation string routing
+is non-contradictory. **No action required.**
+
+This entry is preserved in the registry as an audit trail record: the scenario was
+examined, the defense was confirmed, and the dismissal reasoning is documented for
+any future reviewer who asks the same question.

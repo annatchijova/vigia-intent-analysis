@@ -477,6 +477,8 @@ def _vigia_score(case: dict) -> dict:
 
         prov_trust = a.get("prior_trust", 1.0)
         chain      = a.get("provenance_chain", [])
+        if not isinstance(chain, list):
+            chain = []  # B-031: provenance_chain mal tipado — string/dict produce len() incorrecto
         if provenance.get("chain_status") == "BROKEN" or not chain:
             epc_factor = Fraction(1, 10)  # P0: consistencia con _EPC_FACTOR_TABLE
         else:
