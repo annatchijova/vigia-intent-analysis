@@ -1,14 +1,14 @@
 {
-  "analysis_timestamp": "2026-06-28T02:18:42.647244+00:00",
+  "analysis_timestamp": "2026-06-28T02:27:32.513680+00:00",
   "audit_trail": {
     "agent_version": "1.0.0-SANS-2026",
     "case_id": "VIGIA-REAL-MAGNET-2022-ANDROID",
-    "end_time": "2026-06-28T02:18:42.647249+00:00",
+    "end_time": "2026-06-28T02:27:32.513685+00:00",
     "entries": [
       {
         "action": "AGENT_INITIALIZED",
         "case_id": "VIGIA-REAL-MAGNET-2022-ANDROID",
-        "entry_sha256": "038aca72f8916119a7bb883b889128a4d42a643d30260f35a868df950d97bcb4",
+        "entry_sha256": "3ef0ee53be278fa3f3899fa956c3f6af4475c7e870f4576a39d0abca241841fb",
         "inputs_summary": {
           "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
           "case_id": "VIGIA-REAL-MAGNET-2022-ANDROID"
@@ -20,13 +20,13 @@
           "agent_version": "1.0.0-SANS-2026"
         },
         "seq": 1,
-        "timestamp": "2026-06-28T02:18:42.643173+00:00",
+        "timestamp": "2026-06-28T02:27:32.510773+00:00",
         "tool": "vigia_agent"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-REAL-MAGNET-2022-ANDROID",
-        "entry_sha256": "c5266b944f85aaf53b769b5f10e0981f13c5edc0042b09cdfa2c13817fbb8e64",
+        "entry_sha256": "91d84713928d7b0610f11f93cec59f470ed846dd2ca1d47a76066a644383f9bb",
         "inputs_summary": {
           "path": "data/cases/VIGIA-REAL-MAGNET-2022-ANDROID.json"
         },
@@ -34,29 +34,29 @@
         "note": "Computing SHA-256 of original evidence",
         "outputs_summary": {},
         "seq": 2,
-        "timestamp": "2026-06-28T02:18:42.643261+00:00",
+        "timestamp": "2026-06-28T02:27:32.510858+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-REAL-MAGNET-2022-ANDROID",
-        "entry_sha256": "9787655c9f199c85ea232f99659e56a9e8b09df000e19391a814098853163f46",
+        "entry_sha256": "220924d239667185b661c6616b2fed326627a55ce7d04d7ed61fd546b4350f16",
         "inputs_summary": {
           "path": "data/cases/VIGIA-REAL-MAGNET-2022-ANDROID.json"
         },
         "iteration": 0,
-        "note": "Evidence verified: d68f797d8cb3ad2a...",
+        "note": "Evidence verified: 3b2def4d06b019f9...",
         "outputs_summary": {
-          "sha256": "d68f797d8cb3ad2a93bfaf986dd350f7a84e759cc3bafefde467b5eb7c48a5da"
+          "sha256": "3b2def4d06b019f9b1cf7227230758196fd7fa61ca43475828fa4a9391d8decd"
         },
         "seq": 3,
-        "timestamp": "2026-06-28T02:18:42.643355+00:00",
+        "timestamp": "2026-06-28T02:27:32.510948+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "PIPELINE_EXECUTE",
         "case_id": "VIGIA-REAL-MAGNET-2022-ANDROID",
-        "entry_sha256": "3be49a212c43b196c1bb53402a9c9833530c93f5b139c7e1b15a18897b6765e2",
+        "entry_sha256": "1402b6684200275cbfbe0f1ba06aac9a5587f376fe85eb07266e1c7863e6957d",
         "inputs_summary": {
           "evidence": "data/cases/VIGIA-REAL-MAGNET-2022-ANDROID.json",
           "iteration": "0",
@@ -66,31 +66,31 @@
         "note": "Executing pipeline \u2014 iteration 0",
         "outputs_summary": {},
         "seq": 4,
-        "timestamp": "2026-06-28T02:18:42.643459+00:00",
+        "timestamp": "2026-06-28T02:27:32.511052+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "PIPELINE_COMPLETE",
         "case_id": "VIGIA-REAL-MAGNET-2022-ANDROID",
-        "entry_sha256": "0affc21b69aaa2a20e53fdac33806e1a11bb49b12b9dfdc19765b96d12ad028a",
+        "entry_sha256": "095656c45de04b6e83240665578a28f02641460e7c87c2208d82173024c5af83",
         "inputs_summary": {
           "iteration": "0"
         },
         "iteration": 0,
-        "note": "Pipeline completed \u2014 2 signals",
+        "note": "Pipeline completed \u2014 4 signals",
         "outputs_summary": {
           "abduction": {
-            "best_hypothesis": "NO_SEMIOTIC_ANOMALY_DETECTED",
-            "best_posterior": "11/250",
-            "confidence": "11/250",
-            "is_conclusive": "False",
-            "narrative": "Android data partition image. Full disk encryption active with keymaster key blob. data/unencrypted/ directory contains encryption metadata but no decrypted content accessible without key. Bluetooth c..."
+            "best_hypothesis": "SUSPICION_DETECTED",
+            "best_posterior": "673/8000",
+            "confidence": "673/8000",
+            "is_conclusive": "True",
+            "narrative": "Android data partition image. Rafael Shell (rafaelshell24@gmail.com), Google Pixel 3 rooted with Magisk v23000, Champlain College Burlington VT, Log4Shell vCenter research. Full disk encryption active..."
           },
           "case_id": "VIGIA-REAL-MAGNET-2022-ANDROID",
           "pipeline_meta": {
-            "artifact_count": "2",
-            "avg_score": "11/50",
-            "expected_verdict": "NOISE",
+            "artifact_count": "4",
+            "avg_score": "673/1600",
+            "expected_verdict": "SUSPICION",
             "source": "ebs_v1_json_adapter"
           },
           "signals": [
@@ -109,19 +109,35 @@
               "evidence_type": "file_metadata",
               "source": "filesystem_analysis",
               "z_score": "1/5"
+            },
+            {
+              "artifact_id": "AND2022-A03",
+              "confidence": "17/20",
+              "description": "Log4Shell CVE-2021-44228 bookmark/search against VMware vCenter. Indicates active research into critical RCE vulnerability targeting enterprise infrastructure. Correlates with Linux Rafael case where ",
+              "evidence_type": "cultural_marker",
+              "source": "browser_analysis",
+              "z_score": "289/400"
+            },
+            {
+              "artifact_id": "AND2022-A04",
+              "confidence": "4/5",
+              "description": "Wire app 7 bookmarks + Bumble chat with Discord handle exchange (PostMaster#9650/DesertBusDriver#9827). Encrypted messaging app usage combined with pseudonymous handle exchange across platforms indica",
+              "evidence_type": "log_entry",
+              "source": "app_analysis",
+              "z_score": "13/25"
             }
           ]
         },
         "seq": 5,
-        "timestamp": "2026-06-28T02:18:42.646568+00:00",
+        "timestamp": "2026-06-28T02:27:32.512978+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "CONTRADICTION_CHECK",
         "case_id": "VIGIA-REAL-MAGNET-2022-ANDROID",
-        "entry_sha256": "43269c6ab53b6813540869160d3615099a673c9b9f8b41bce4c565716f15ac05",
+        "entry_sha256": "7ee14028fb52b380969c1d867fdfa4f6b7ed354e17f4dad3279c78d5fabc2f78",
         "inputs_summary": {
-          "n_signals": "2"
+          "n_signals": "4"
         },
         "iteration": 0,
         "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
@@ -130,15 +146,15 @@
           "threshold": "2"
         },
         "seq": 6,
-        "timestamp": "2026-06-28T02:18:42.647049+00:00",
+        "timestamp": "2026-06-28T02:27:32.513493+00:00",
         "tool": "contradiction_detector"
       },
       {
         "action": "AGENT_EXIT",
         "case_id": "VIGIA-REAL-MAGNET-2022-ANDROID",
-        "entry_sha256": "0eb622c8979853bd1a11f9469f6746d59754934d40fe7f8d056df99cd725ee43",
+        "entry_sha256": "e30af9b5515276ac88a102103a2dc0c7a20987c7c089ea294468cb90983ebd2d",
         "inputs_summary": {
-          "verdict": "NO_SEMIOTIC_ANOMALY_DETECTED"
+          "verdict": "SUSPICION_DETECTED"
         },
         "iteration": 0,
         "note": "Exit code 0 \u2014 analysis complete.",
@@ -146,35 +162,35 @@
           "exit_code": "0"
         },
         "seq": 7,
-        "timestamp": "2026-06-28T02:18:42.647170+00:00",
+        "timestamp": "2026-06-28T02:27:32.513596+00:00",
         "tool": "vigia_agent"
       }
     ],
-    "start_time": "2026-06-28T02:18:42.642927+00:00",
+    "start_time": "2026-06-28T02:27:32.510550+00:00",
     "total_entries": 7
   },
   "case_id": "VIGIA-REAL-MAGNET-2022-ANDROID",
   "evidence_path": "data/cases/VIGIA-REAL-MAGNET-2022-ANDROID.json",
-  "evidence_sha256": "d68f797d8cb3ad2a93bfaf986dd350f7a84e759cc3bafefde467b5eb7c48a5da",
+  "evidence_sha256": "3b2def4d06b019f9b1cf7227230758196fd7fa61ca43475828fa4a9391d8decd",
   "iterations_executed": 1,
-  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-REAL-MAGNET-2022-ANDROID ===\nEvidence: data/cases/VIGIA-REAL-MAGNET-2022-ANDROID.json\nEvidence SHA-256: d68f797d8cb3ad2a93bfaf986dd350f7a84e759cc3bafefde467b5eb7c48a5da\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: NO_SEMIOTIC_ANOMALY_DETECTED\nPosterior confidence: 11/250\nConclusive: NO \u2014 requires human review\n\n--- PEIRCEAN NARRATIVE ---\nAndroid data partition image. Full disk encryption active with keymaster key blob. data/unencrypted/ directory contains encryption metadata but no decrypted content accessible without key. Bluetooth config and recovery artifacts present.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [data/unencrypted/key/ directory contains: keymaster_key_blob, encrypte] z=0.240 conf=0.80 \u2014 \n  [data/misc/bluedroid/bt_config.bak present \u2014 Bluetooth pairing history ] z=0.200 conf=0.80 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW \u2014 No significant anomalies detected in this iteration.\n\nCritical signals (z>3): 0\nHigh signals (2<z<=3): 0\nTotal signals analyzed: 2",
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-REAL-MAGNET-2022-ANDROID ===\nEvidence: data/cases/VIGIA-REAL-MAGNET-2022-ANDROID.json\nEvidence SHA-256: 3b2def4d06b019f9b1cf7227230758196fd7fa61ca43475828fa4a9391d8decd\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: SUSPICION_DETECTED\nPosterior confidence: 673/8000\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\nAndroid data partition image. Rafael Shell (rafaelshell24@gmail.com), Google Pixel 3 rooted with Magisk v23000, Champlain College Burlington VT, Log4Shell vCenter research. Full disk encryption active with keymaster key blob. Bluetooth config and recovery artifacts present. Wire app bookmarks and Bumble chat with Discord handle exchange indicate OPSEC-aware communication patterns.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Log4Shell CVE-2021-44228 bookmark/search against VMware vCenter. Indic] z=0.723 conf=0.85 \u2014 \n  [Wire app 7 bookmarks + Bumble chat with Discord handle exchange (PostM] z=0.520 conf=0.80 \u2014 \n  [data/unencrypted/key/ directory contains: keymaster_key_blob, encrypte] z=0.240 conf=0.80 \u2014 \n  [data/misc/bluedroid/bt_config.bak present \u2014 Bluetooth pairing history ] z=0.200 conf=0.80 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW \u2014 No significant anomalies detected in this iteration.\n\nCritical signals (z>3): 0\nHigh signals (2<z<=3): 0\nTotal signals analyzed: 4",
   "pipeline_results": {
     "abduction": {
-      "best_hypothesis": "NO_SEMIOTIC_ANOMALY_DETECTED",
-      "best_posterior": "11/250",
+      "best_hypothesis": "SUSPICION_DETECTED",
+      "best_posterior": "673/8000",
       "confidence": {
         "__fraction__": true,
-        "den": 250,
-        "num": 11
+        "den": 8000,
+        "num": 673
       },
-      "is_conclusive": false,
-      "narrative": "Android data partition image. Full disk encryption active with keymaster key blob. data/unencrypted/ directory contains encryption metadata but no decrypted content accessible without key. Bluetooth config and recovery artifacts present."
+      "is_conclusive": true,
+      "narrative": "Android data partition image. Rafael Shell (rafaelshell24@gmail.com), Google Pixel 3 rooted with Magisk v23000, Champlain College Burlington VT, Log4Shell vCenter research. Full disk encryption active with keymaster key blob. Bluetooth config and recovery artifacts present. Wire app bookmarks and Bumble chat with Discord handle exchange indicate OPSEC-aware communication patterns."
     },
     "case_id": "VIGIA-REAL-MAGNET-2022-ANDROID",
     "pipeline_meta": {
-      "artifact_count": 2,
-      "avg_score": "11/50",
-      "expected_verdict": "NOISE",
+      "artifact_count": 4,
+      "avg_score": "673/1600",
+      "expected_verdict": "SUSPICION",
       "source": "ebs_v1_json_adapter"
     },
     "signals": [
@@ -208,6 +224,38 @@
           "__fraction__": true,
           "den": 5,
           "num": 1
+        }
+      },
+      {
+        "artifact_id": "AND2022-A03",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 17
+        },
+        "description": "Log4Shell CVE-2021-44228 bookmark/search against VMware vCenter. Indicates active research into critical RCE vulnerability targeting enterprise infrastructure. Correlates with Linux Rafael case where ",
+        "evidence_type": "cultural_marker",
+        "source": "browser_analysis",
+        "z_score": {
+          "__fraction__": true,
+          "den": 400,
+          "num": 289
+        }
+      },
+      {
+        "artifact_id": "AND2022-A04",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 4
+        },
+        "description": "Wire app 7 bookmarks + Bumble chat with Discord handle exchange (PostMaster#9650/DesertBusDriver#9827). Encrypted messaging app usage combined with pseudonymous handle exchange across platforms indica",
+        "evidence_type": "log_entry",
+        "source": "app_analysis",
+        "z_score": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 13
         }
       }
     ]
