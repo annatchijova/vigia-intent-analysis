@@ -166,7 +166,7 @@ def main():
                 got = "NO_BUNDLE"
 
             # Alias BENIGN → NOISE, INTENT → MALICE para comparación
-            aliases = {"BENIGN": "NOISE", "INTENT": "MALICE", "ABSTAIN": "UNKNOWN"}
+            aliases = {"BENIGN": "NOISE", "INTENT": "MALICE"}
             got_norm = aliases.get(got, got)
             exp_norm = aliases.get(expected, expected)
 

@@ -335,7 +335,7 @@ class SIFTOrchestrator:
             "case_id": self.case_id,
             "signals": signals,
             "abduction": {
-                "best_hypothesis": "MALICIOUS_INTENT_DETECTED" if is_malice else "SUSPICION_DETECTED",
+                "best_hypothesis": "MALICIOUS_INTENT_DETECTED" if is_malice else "NO_SEMIOTIC_ANOMALY_DETECTED" if avg == Fraction(0, 1) else "SUSPICION_DETECTED",
                 # FIX P2: Fraction puro — sin float
                 "is_conclusive": avg > Fraction(3, 2),
                 "confidence": conf_vol3,
