@@ -1,0 +1,229 @@
+{
+  "analysis_timestamp": "2026-06-28T01:04:00.740808+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "VIGIA-REAL-MAGNET-2020-CTF-WINDOWS",
+    "end_time": "2026-06-28T01:04:00.740816+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "VIGIA-REAL-MAGNET-2020-CTF-WINDOWS",
+        "entry_sha256": "3bc3285978c1bdcf95ab32c2f554d3521fcd0f3e5744fe65e0c09c578ee315e3",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "VIGIA-REAL-MAGNET-2020-CTF-WINDOWS"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: 95f2da2a3bdcb4ca...",
+        "outputs_summary": {
+          "agent_sha256": "95f2da2a3bdcb4ca106059e2b06f58fd0ec414c887fec07ac7a0d5edfeb097a1",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-06-28T01:02:47.633941+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-REAL-MAGNET-2020-CTF-WINDOWS",
+        "entry_sha256": "6c19b3f8f5246de281f7490f13e201939e17c9e894a91a94fbc7965bbf40b602",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/Downloads/memdump-001.mem"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-06-28T01:02:47.634035+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-REAL-MAGNET-2020-CTF-WINDOWS",
+        "entry_sha256": "2250d2becfe925e393d737739cace52009c4c09a73d3f2087408d95afd9aa2a1",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/Downloads/memdump-001.mem"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: 18e9007993c45f81...",
+        "outputs_summary": {
+          "sha256": "18e9007993c45f813dd5bd23b6bf6ad703d3e6ac70effd9c47a310a8443c7b8a"
+        },
+        "seq": 3,
+        "timestamp": "2026-06-28T01:02:52.911296+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "VIGIA-REAL-MAGNET-2020-CTF-WINDOWS",
+        "entry_sha256": "c8ed112110e5e916d241ede8885e9f19a5e0f62cd8dad266452dbf57f0b07154",
+        "inputs_summary": {
+          "evidence": "/home/labestiadevigia/Downloads/memdump-001.mem",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-06-28T01:02:52.911500+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "VIGIA-REAL-MAGNET-2020-CTF-WINDOWS",
+        "entry_sha256": "8024f4d867e3d7842a747457b5f07c1f4d46d8701714c495f3a43a84a3c134be",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 2 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "SUSPICION_DETECTED",
+            "best_posterior": "3/50",
+            "confidence": "3/50",
+            "is_conclusive": "False",
+            "narrative": "Volatility3 memory analysis: 2 signals from memdump-001.mem. Average intentionality score: 3/10. Suspicious activity \u2014 requires human review."
+          },
+          "case_id": "VIGIA-REAL-MAGNET-2020-CTF-WINDOWS",
+          "pipeline_meta": {
+            "avg_score": "3/10",
+            "memory_path": "/home/labestiadevigia/Downloads/memdump-001.mem",
+            "signal_count": "2",
+            "source": "vol3_memory_adapter",
+            "vol3_binary": "/home/labestiadevigia/vigia-repo/.venv/bin/vol"
+          },
+          "signals": [
+            {
+              "confidence": "9/10",
+              "description": "Windows OS profile identified from memory image",
+              "detail": "Volatility 3 Framework 2.28.0\n\nVariable\tValue\n\nKernel Base\t0xf80002a00000\nDTB\t0x187000\nSymbols\tfile:///home/labestiadevigia/vigia-repo/.venv/lib/python3.12/site-packages/volatility3/symbols/windows/nt...",
+              "evidence_type": "memory_os_profile",
+              "source": "vol3.windows.info",
+              "z_score": "1/2"
+            },
+            {
+              "confidence": "3/5",
+              "description": "Process list analyzed \u2014 no obvious LOLBAS processes",
+              "evidence_type": "memory_process",
+              "source": "vol3.windows.pslist",
+              "z_score": "1/10"
+            }
+          ]
+        },
+        "seq": 5,
+        "timestamp": "2026-06-28T01:04:00.740335+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "VIGIA-REAL-MAGNET-2020-CTF-WINDOWS",
+        "entry_sha256": "d9fd9ca8085f1585bd6f980f23d463237eb39d1ecb2d662c6fb8ea453836b090",
+        "inputs_summary": {
+          "n_signals": "2"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-06-28T01:04:00.740477+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "VIGIA-REAL-MAGNET-2020-CTF-WINDOWS",
+        "entry_sha256": "9b19a88d1c653fc7925c8d41d170c712130e46c146b9665e2a6a97f9e9706c7e",
+        "inputs_summary": {
+          "verdict": "SUSPICION_DETECTED"
+        },
+        "iteration": 0,
+        "note": "Exit code 0 \u2014 analysis complete.",
+        "outputs_summary": {
+          "exit_code": "0"
+        },
+        "seq": 7,
+        "timestamp": "2026-06-28T01:04:00.740605+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-06-28T01:02:47.633696+00:00",
+    "total_entries": 7
+  },
+  "case_id": "VIGIA-REAL-MAGNET-2020-CTF-WINDOWS",
+  "evidence_path": "/home/labestiadevigia/Downloads/memdump-001.mem",
+  "evidence_sha256": "18e9007993c45f813dd5bd23b6bf6ad703d3e6ac70effd9c47a310a8443c7b8a",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-REAL-MAGNET-2020-CTF-WINDOWS ===\nEvidence: /home/labestiadevigia/Downloads/memdump-001.mem\nEvidence SHA-256: 18e9007993c45f813dd5bd23b6bf6ad703d3e6ac70effd9c47a310a8443c7b8a\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: SUSPICION_DETECTED\nPosterior confidence: 3/50\nConclusive: NO \u2014 requires human review\n\n--- PEIRCEAN NARRATIVE ---\nVolatility3 memory analysis: 2 signals from memdump-001.mem. Average intentionality score: 3/10. Suspicious activity \u2014 requires human review.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Windows OS profile identified from memory image] z=0.500 conf=0.90 \u2014 Volatility 3 Framework 2.28.0\n\nVariable\tValue\n\nKernel Base\t0xf80002a00000\nDTB\t0x\n  [Process list analyzed \u2014 no obvious LOLBAS processes] z=0.100 conf=0.60 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW \u2014 No significant anomalies detected in this iteration.\n\nCritical signals (z>3): 0\nHigh signals (2<z<=3): 0\nTotal signals analyzed: 2",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "SUSPICION_DETECTED",
+      "best_posterior": "3/50",
+      "confidence": {
+        "__fraction__": true,
+        "den": 50,
+        "num": 3
+      },
+      "is_conclusive": false,
+      "narrative": "Volatility3 memory analysis: 2 signals from memdump-001.mem. Average intentionality score: 3/10. Suspicious activity \u2014 requires human review."
+    },
+    "case_id": "VIGIA-REAL-MAGNET-2020-CTF-WINDOWS",
+    "pipeline_meta": {
+      "avg_score": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 3
+      },
+      "memory_path": "/home/labestiadevigia/Downloads/memdump-001.mem",
+      "signal_count": 2,
+      "source": "vol3_memory_adapter",
+      "vol3_binary": "/home/labestiadevigia/vigia-repo/.venv/bin/vol"
+    },
+    "signals": [
+      {
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 9
+        },
+        "description": "Windows OS profile identified from memory image",
+        "detail": "Volatility 3 Framework 2.28.0\n\nVariable\tValue\n\nKernel Base\t0xf80002a00000\nDTB\t0x187000\nSymbols\tfile:///home/labestiadevigia/vigia-repo/.venv/lib/python3.12/site-packages/volatility3/symbols/windows/ntkrnlmp.pdb/ECE191A20CFF4465AE46DF96C2263845-1.json.xz\nIs64Bit\tTrue\nIsPAE\tFalse\nlayer_name\t0 WindowsI",
+        "evidence_type": "memory_os_profile",
+        "source": "vol3.windows.info",
+        "z_score": {
+          "__fraction__": true,
+          "den": 2,
+          "num": 1
+        }
+      },
+      {
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 3
+        },
+        "description": "Process list analyzed \u2014 no obvious LOLBAS processes",
+        "evidence_type": "memory_process",
+        "source": "vol3.windows.pslist",
+        "z_score": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 1
+        }
+      }
+    ]
+  },
+  "sans_compliance": {
+    "accuracy_validation": false,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}
