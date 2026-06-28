@@ -1,0 +1,297 @@
+{
+  "analysis_timestamp": "2026-06-28T16:51:58.004131+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "VIGIA-NITROBA-M57-001",
+    "end_time": "2026-06-28T16:51:58.004147+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "VIGIA-NITROBA-M57-001",
+        "entry_sha256": "9987c44d7037191f499c36357c859d6ba1ac24dac0b8775d2fe5c71e9db0b93b",
+        "inputs_summary": {
+          "agent_file": "/home/vegandelicious/vigia-repo/vigia_agent.py",
+          "case_id": "VIGIA-NITROBA-M57-001"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: 95f2da2a3bdcb4ca...",
+        "outputs_summary": {
+          "agent_sha256": "95f2da2a3bdcb4ca106059e2b06f58fd0ec414c887fec07ac7a0d5edfeb097a1",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-06-28T16:51:57.996384+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-NITROBA-M57-001",
+        "entry_sha256": "2e4ab3ef899649a904a84134acb297537cbf97ed3c3e8c72fa3c503375036cc4",
+        "inputs_summary": {
+          "path": "evidence/cases/nitroba/VIGIA-NITROBA-M57-001.json"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-06-28T16:51:57.996604+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-NITROBA-M57-001",
+        "entry_sha256": "4ebc54f07edd44f2e541ab340f70ffd6a6659017f9c292cdf5df921fca55e904",
+        "inputs_summary": {
+          "path": "evidence/cases/nitroba/VIGIA-NITROBA-M57-001.json"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: 45b88d1892d9d91e...",
+        "outputs_summary": {
+          "sha256": "45b88d1892d9d91e036cfee8ea697827ab1cc49eb3669b62281a1db74f16acef"
+        },
+        "seq": 3,
+        "timestamp": "2026-06-28T16:51:57.996851+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "VIGIA-NITROBA-M57-001",
+        "entry_sha256": "02e2adc0d3b5e0b00df8ceebcc2002fbe46111f84131a8a38849241d0ccb4441",
+        "inputs_summary": {
+          "evidence": "evidence/cases/nitroba/VIGIA-NITROBA-M57-001.json",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-06-28T16:51:57.997085+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "VIGIA-NITROBA-M57-001",
+        "entry_sha256": "26ecbe98ad61229fd5cca4355f2d22376d2c423cb05b5ab94ad5dbfdf72a601a",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 5 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "SUSPICION_DETECTED",
+            "best_posterior": "223/2500",
+            "confidence": "223/2500",
+            "is_conclusive": "True",
+            "narrative": "Network packet capture (nitroba.pcap, 56180821 bytes, SHA-256: 2b77a9eaefc1d6af163d1ba793c96dbccacb04e6befdf1a0b01f8c67553ec2fb) from the M57 Patents DFRWS 2009 forensics challenge. Capture period: Ju..."
+          },
+          "case_id": "VIGIA-NITROBA-M57-001",
+          "pipeline_meta": {
+            "artifact_count": "5",
+            "avg_score": "223/500",
+            "expected_verdict": "SUSPICION",
+            "source": "ebs_v1_json_adapter"
+          },
+          "signals": [
+            {
+              "artifact_id": "NITROBA-ART-001",
+              "confidence": "19/20",
+              "description": "PCAP file integrity verified. File: nitroba.pcap. Format: tcpdump/libpcap microsecond timestamps, Ethernet, capture length 4096. Size: 56,180,821 bytes. SHA-256: 2b77a9eaefc1d6af163d1ba793c96dbccacb04",
+              "evidence_type": "file_hash",
+              "source": "generate_forensic_hash",
+              "z_score": "19/200"
+            },
+            {
+              "artifact_id": "NITROBA-ART-002",
+              "confidence": "9/10",
+              "description": "Gmail session cookies captured in plaintext HTTP at 22:51:07. Cookie: gmailchat=mylady.ixchel@gmail.com/984626 \u2014 confirms active Gmail Chat session as mylady.ixchel@gmail.com. Gmail SID cookie (DQAAAG",
+              "evidence_type": "lsass_session",
+              "source": "search_pattern",
+              "z_score": "27/40"
+            },
+            {
+              "artifact_id": "NITROBA-ART-003",
+              "confidence": "17/20",
+              "description": "AOL AIM SyncML contact synchronization from 192.168.15.4 (Windows XP) to sync.aol.com (64.12.187.25). Three POST /m57jean HTTP/1.1 requests. SyncML 1.1 protocol. Target LocURI: http://sync.aol.com/m57",
+              "evidence_type": "log_entry",
+              "source": "audit_network",
+              "z_score": "17/25"
+            },
+            {
+              "artifact_id": "NITROBA-ART-004",
+              "confidence": "4/5",
+              "description": "SIP VoIP registration on LAN. SIP From/To: sip:16178766111@t.voncp.com:10000. Provider: VonCP (voncp.com). Server: 69.59.240.133. Auth: Digest MD5, username=16178766111, realm=69.59.240.133. Device: V",
+              "evidence_type": "log_entry",
+              "source": "audit_network",
+              "z_score": "12/25"
+            },
+            {
+              "artifact_id": "NITROBA-ART-005",
+              "confidence": "3/4",
+              "description": "Browsing context and user profile indicators: (1) PHD Comics (phdcomics.com) \u2014 webcomic exclusively targeting PhD students and academic researchers, Google AdSense publisher ca-pub-9906587369174250. C",
+              "evidence_type": "log_entry",
+              "source": "search_pattern",
+              "z_score": "3/10"
+            }
+          ]
+        },
+        "seq": 5,
+        "timestamp": "2026-06-28T16:51:58.003180+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "VIGIA-NITROBA-M57-001",
+        "entry_sha256": "7d8c7f41a8c17dbe5f852510661a1174d2971332204749d14f07ceec5e61f3a7",
+        "inputs_summary": {
+          "n_signals": "5"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-06-28T16:51:58.003539+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "VIGIA-NITROBA-M57-001",
+        "entry_sha256": "83c248e03c54352536b1ebe5966ac041dc1a233523cc1046d635f44f3aa63d4a",
+        "inputs_summary": {
+          "verdict": "SUSPICION_DETECTED"
+        },
+        "iteration": 0,
+        "note": "Exit code 0 \u2014 analysis complete.",
+        "outputs_summary": {
+          "exit_code": "0"
+        },
+        "seq": 7,
+        "timestamp": "2026-06-28T16:51:58.003796+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-06-28T16:51:57.995620+00:00",
+    "total_entries": 7
+  },
+  "case_id": "VIGIA-NITROBA-M57-001",
+  "evidence_path": "evidence/cases/nitroba/VIGIA-NITROBA-M57-001.json",
+  "evidence_sha256": "45b88d1892d9d91e036cfee8ea697827ab1cc49eb3669b62281a1db74f16acef",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-NITROBA-M57-001 ===\nEvidence: evidence/cases/nitroba/VIGIA-NITROBA-M57-001.json\nEvidence SHA-256: 45b88d1892d9d91e036cfee8ea697827ab1cc49eb3669b62281a1db74f16acef\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: SUSPICION_DETECTED\nPosterior confidence: 223/2500\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\nNetwork packet capture (nitroba.pcap, 56180821 bytes, SHA-256: 2b77a9eaefc1d6af163d1ba793c96dbccacb04e6befdf1a0b01f8c67553ec2fb) from the M57 Patents DFRWS 2009 forensics challenge. Capture period: July 21-22, 2008. The packet capture contains traffic from a residential LAN with two identified devices: (1) 192.168.1.64 \u2014 Mac OS X 10.5.4 (both PPC and Intel variants seen), running Safari 3.1.2 and Firefox 2.0.0.16. User logged into Gmail as mylady.ixchel@gmail.com, then logged out. Reading BBC Ne\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [AOL AIM SyncML contact synchronization from 192.168.15.4 (Windows XP) ] z=0.680 conf=0.85 \u2014 \n  [Gmail session cookies captured in plaintext HTTP at 22:51:07. Cookie: ] z=0.675 conf=0.90 \u2014 \n  [SIP VoIP registration on LAN. SIP From/To: sip:16178766111@t.voncp.com] z=0.480 conf=0.80 \u2014 \n  [Browsing context and user profile indicators: (1) PHD Comics (phdcomic] z=0.300 conf=0.75 \u2014 \n  [PCAP file integrity verified. File: nitroba.pcap. Format: tcpdump/libp] z=0.095 conf=0.95 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW \u2014 No significant anomalies detected in this iteration.\n\nCritical signals (z>3): 0\nHigh signals (2<z<=3): 0\nTotal signals analyzed: 5",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "SUSPICION_DETECTED",
+      "best_posterior": "223/2500",
+      "confidence": {
+        "__fraction__": true,
+        "den": 2500,
+        "num": 223
+      },
+      "is_conclusive": true,
+      "narrative": "Network packet capture (nitroba.pcap, 56180821 bytes, SHA-256: 2b77a9eaefc1d6af163d1ba793c96dbccacb04e6befdf1a0b01f8c67553ec2fb) from the M57 Patents DFRWS 2009 forensics challenge. Capture period: July 21-22, 2008. The packet capture contains traffic from a residential LAN with two identified devices: (1) 192.168.1.64 \u2014 Mac OS X 10.5.4 (both PPC and Intel variants seen), running Safari 3.1.2 and Firefox 2.0.0.16. User logged into Gmail as mylady.ixchel@gmail.com, then logged out. Reading BBC Ne"
+    },
+    "case_id": "VIGIA-NITROBA-M57-001",
+    "pipeline_meta": {
+      "artifact_count": 5,
+      "avg_score": "223/500",
+      "expected_verdict": "SUSPICION",
+      "source": "ebs_v1_json_adapter"
+    },
+    "signals": [
+      {
+        "artifact_id": "NITROBA-ART-001",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 19
+        },
+        "description": "PCAP file integrity verified. File: nitroba.pcap. Format: tcpdump/libpcap microsecond timestamps, Ethernet, capture length 4096. Size: 56,180,821 bytes. SHA-256: 2b77a9eaefc1d6af163d1ba793c96dbccacb04",
+        "evidence_type": "file_hash",
+        "source": "generate_forensic_hash",
+        "z_score": {
+          "__fraction__": true,
+          "den": 200,
+          "num": 19
+        }
+      },
+      {
+        "artifact_id": "NITROBA-ART-002",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 9
+        },
+        "description": "Gmail session cookies captured in plaintext HTTP at 22:51:07. Cookie: gmailchat=mylady.ixchel@gmail.com/984626 \u2014 confirms active Gmail Chat session as mylady.ixchel@gmail.com. Gmail SID cookie (DQAAAG",
+        "evidence_type": "lsass_session",
+        "source": "search_pattern",
+        "z_score": {
+          "__fraction__": true,
+          "den": 40,
+          "num": 27
+        }
+      },
+      {
+        "artifact_id": "NITROBA-ART-003",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 17
+        },
+        "description": "AOL AIM SyncML contact synchronization from 192.168.15.4 (Windows XP) to sync.aol.com (64.12.187.25). Three POST /m57jean HTTP/1.1 requests. SyncML 1.1 protocol. Target LocURI: http://sync.aol.com/m57",
+        "evidence_type": "log_entry",
+        "source": "audit_network",
+        "z_score": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 17
+        }
+      },
+      {
+        "artifact_id": "NITROBA-ART-004",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 4
+        },
+        "description": "SIP VoIP registration on LAN. SIP From/To: sip:16178766111@t.voncp.com:10000. Provider: VonCP (voncp.com). Server: 69.59.240.133. Auth: Digest MD5, username=16178766111, realm=69.59.240.133. Device: V",
+        "evidence_type": "log_entry",
+        "source": "audit_network",
+        "z_score": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 12
+        }
+      },
+      {
+        "artifact_id": "NITROBA-ART-005",
+        "confidence": {
+          "__fraction__": true,
+          "den": 4,
+          "num": 3
+        },
+        "description": "Browsing context and user profile indicators: (1) PHD Comics (phdcomics.com) \u2014 webcomic exclusively targeting PhD students and academic researchers, Google AdSense publisher ca-pub-9906587369174250. C",
+        "evidence_type": "log_entry",
+        "source": "search_pattern",
+        "z_score": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 3
+        }
+      }
+    ]
+  },
+  "sans_compliance": {
+    "accuracy_validation": false,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}

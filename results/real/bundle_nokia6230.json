@@ -1,0 +1,273 @@
+{
+  "analysis_timestamp": "2026-06-28T16:51:51.233423+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "VIGIA-NOKIA6230-001",
+    "end_time": "2026-06-28T16:51:51.233438+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "VIGIA-NOKIA6230-001",
+        "entry_sha256": "e6b2238594546aa1899dc4265ab8fe35030079d874b750efe2bf0dc07f696f63",
+        "inputs_summary": {
+          "agent_file": "/home/vegandelicious/vigia-repo/vigia_agent.py",
+          "case_id": "VIGIA-NOKIA6230-001"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: 95f2da2a3bdcb4ca...",
+        "outputs_summary": {
+          "agent_sha256": "95f2da2a3bdcb4ca106059e2b06f58fd0ec414c887fec07ac7a0d5edfeb097a1",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-06-28T16:51:51.212463+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-NOKIA6230-001",
+        "entry_sha256": "df57ba5285c63893a1fb66495eb50d4b84ad71f914b38c5e87d3f9b5aa22bd91",
+        "inputs_summary": {
+          "path": "evidence/cases/nokia_6230/VIGIA-NOKIA6230-001.json"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-06-28T16:51:51.212669+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-NOKIA6230-001",
+        "entry_sha256": "9600e750738de1a297b639780fe39bdbddee5c7287c8d4167a9e2538949edf62",
+        "inputs_summary": {
+          "path": "evidence/cases/nokia_6230/VIGIA-NOKIA6230-001.json"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: 0e2bd9714cf6f7e4...",
+        "outputs_summary": {
+          "sha256": "0e2bd9714cf6f7e46002a4e427cf1432c9c56e14bbbcc881916c36845387b388"
+        },
+        "seq": 3,
+        "timestamp": "2026-06-28T16:51:51.212894+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "VIGIA-NOKIA6230-001",
+        "entry_sha256": "383ef3463aeacfc57db9360b11e0edcb0be4d77383116dc0f239ba35370387c6",
+        "inputs_summary": {
+          "evidence": "evidence/cases/nokia_6230/VIGIA-NOKIA6230-001.json",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-06-28T16:51:51.213133+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "VIGIA-NOKIA6230-001",
+        "entry_sha256": "862b2d2682dce3812ac7e726ead90f1221b641435e5425175d340d22bf8e4ee5",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 4 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "NO_SEMIOTIC_ANOMALY_DETECTED",
+            "best_posterior": "23/1000",
+            "confidence": "23/1000",
+            "is_conclusive": "False",
+            "narrative": "Forensic image of Nokia 6230 internal flash memory (file Rh-12_352953003422072-bilder.bin). IMEI 352953003422072. Contains WAP browser cache and picture storage from a Norwegian user, June\u2013August 2004..."
+          },
+          "case_id": "VIGIA-NOKIA6230-001",
+          "pipeline_meta": {
+            "artifact_count": "4",
+            "avg_score": "23/200",
+            "expected_verdict": "NOISE",
+            "source": "ebs_v1_json_adapter"
+          },
+          "signals": [
+            {
+              "artifact_id": "NOKIA6230-ART-001",
+              "confidence": "19/20",
+              "description": "Nokia 6230 flash image. SHA-256 verified. Size 4718496 bytes. File date 2004-09-25 \u2014 consistent with handset acquisition in late September 2004. Zip container verified at intake (SHA-256: 8b98f0ba...)",
+              "evidence_type": "file_hash",
+              "source": "generate_forensic_hash",
+              "z_score": "19/200"
+            },
+            {
+              "artifact_id": "NOKIA6230-ART-002",
+              "confidence": "4/5",
+              "description": "WAP browser cache content. Norwegian-language WML pages from: no.wap.yahoo.com (Yahoo Norway \u2014 business/commerce directory, telecom section), wap.nrk.no (NRK Norwegian Broadcasting \u2014 MMS, mobile games",
+              "evidence_type": "log_entry",
+              "source": "read_evidence",
+              "z_score": "2/25"
+            },
+            {
+              "artifact_id": "NOKIA6230-ART-003",
+              "confidence": "7/10",
+              "description": "Two MMS MMSC session tokens found in binary: http://10.250.31.100:10021/mmsc?A_BHMavgV2c8GWcTw and http://10.250.31.100:10021/mmsc?AFc1X1BHJOxwDXh4n. Internal Telenor Norway MMSC endpoint (10.250.31.1",
+              "evidence_type": "log_entry",
+              "source": "search_pattern",
+              "z_score": "21/200"
+            },
+            {
+              "artifact_id": "NOKIA6230-ART-004",
+              "confidence": "9/10",
+              "description": "Shannon entropy 5.2114 bits/byte on sampled content. SUSPICIOUS range per VIGIA thresholds (>5.0). However, this is fully explained by WAP cache content: HTTP response bodies are compressed binary GIF",
+              "evidence_type": "file_hash",
+              "source": "calculate_shannon_entropy",
+              "z_score": "9/50"
+            }
+          ]
+        },
+        "seq": 5,
+        "timestamp": "2026-06-28T16:51:51.231255+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "VIGIA-NOKIA6230-001",
+        "entry_sha256": "83644e35197a00b65f52ffaca7cb215ae1ffac615feaf801dad06840b7c42d20",
+        "inputs_summary": {
+          "n_signals": "4"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-06-28T16:51:51.231586+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "VIGIA-NOKIA6230-001",
+        "entry_sha256": "3feb6126c436350887db49ab5a6814489f411774daba4761bb79e098184d32f1",
+        "inputs_summary": {
+          "verdict": "NO_SEMIOTIC_ANOMALY_DETECTED"
+        },
+        "iteration": 0,
+        "note": "Exit code 0 \u2014 analysis complete.",
+        "outputs_summary": {
+          "exit_code": "0"
+        },
+        "seq": 7,
+        "timestamp": "2026-06-28T16:51:51.231844+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-06-28T16:51:51.211690+00:00",
+    "total_entries": 7
+  },
+  "case_id": "VIGIA-NOKIA6230-001",
+  "evidence_path": "evidence/cases/nokia_6230/VIGIA-NOKIA6230-001.json",
+  "evidence_sha256": "0e2bd9714cf6f7e46002a4e427cf1432c9c56e14bbbcc881916c36845387b388",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-NOKIA6230-001 ===\nEvidence: evidence/cases/nokia_6230/VIGIA-NOKIA6230-001.json\nEvidence SHA-256: 0e2bd9714cf6f7e46002a4e427cf1432c9c56e14bbbcc881916c36845387b388\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: NO_SEMIOTIC_ANOMALY_DETECTED\nPosterior confidence: 23/1000\nConclusive: NO \u2014 requires human review\n\n--- PEIRCEAN NARRATIVE ---\nForensic image of Nokia 6230 internal flash memory (file Rh-12_352953003422072-bilder.bin). IMEI 352953003422072. Contains WAP browser cache and picture storage from a Norwegian user, June\u2013August 2004. User browsed Norwegian-language WAP sites: Yahoo Norway (no.wap.yahoo.com), NRK Norwegian Broadcasting (wap.nrk.no), TV2 (tv2.by.com), Aftenposten newspaper, Telenor Mobile WAP portal, Nordialog telecom. Two MMS sessions via internal Telenor MMSC (10.250.31.100:10021) with unique session tokens. W\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Shannon entropy 5.2114 bits/byte on sampled content. SUSPICIOUS range ] z=0.180 conf=0.90 \u2014 \n  [Two MMS MMSC session tokens found in binary: http://10.250.31.100:1002] z=0.105 conf=0.70 \u2014 \n  [Nokia 6230 flash image. SHA-256 verified. Size 4718496 bytes. File dat] z=0.095 conf=0.95 \u2014 \n  [WAP browser cache content. Norwegian-language WML pages from: no.wap.y] z=0.080 conf=0.80 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW \u2014 No significant anomalies detected in this iteration.\n\nCritical signals (z>3): 0\nHigh signals (2<z<=3): 0\nTotal signals analyzed: 4",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "NO_SEMIOTIC_ANOMALY_DETECTED",
+      "best_posterior": "23/1000",
+      "confidence": {
+        "__fraction__": true,
+        "den": 1000,
+        "num": 23
+      },
+      "is_conclusive": false,
+      "narrative": "Forensic image of Nokia 6230 internal flash memory (file Rh-12_352953003422072-bilder.bin). IMEI 352953003422072. Contains WAP browser cache and picture storage from a Norwegian user, June\u2013August 2004. User browsed Norwegian-language WAP sites: Yahoo Norway (no.wap.yahoo.com), NRK Norwegian Broadcasting (wap.nrk.no), TV2 (tv2.by.com), Aftenposten newspaper, Telenor Mobile WAP portal, Nordialog telecom. Two MMS sessions via internal Telenor MMSC (10.250.31.100:10021) with unique session tokens. W"
+    },
+    "case_id": "VIGIA-NOKIA6230-001",
+    "pipeline_meta": {
+      "artifact_count": 4,
+      "avg_score": "23/200",
+      "expected_verdict": "NOISE",
+      "source": "ebs_v1_json_adapter"
+    },
+    "signals": [
+      {
+        "artifact_id": "NOKIA6230-ART-001",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 19
+        },
+        "description": "Nokia 6230 flash image. SHA-256 verified. Size 4718496 bytes. File date 2004-09-25 \u2014 consistent with handset acquisition in late September 2004. Zip container verified at intake (SHA-256: 8b98f0ba...)",
+        "evidence_type": "file_hash",
+        "source": "generate_forensic_hash",
+        "z_score": {
+          "__fraction__": true,
+          "den": 200,
+          "num": 19
+        }
+      },
+      {
+        "artifact_id": "NOKIA6230-ART-002",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 4
+        },
+        "description": "WAP browser cache content. Norwegian-language WML pages from: no.wap.yahoo.com (Yahoo Norway \u2014 business/commerce directory, telecom section), wap.nrk.no (NRK Norwegian Broadcasting \u2014 MMS, mobile games",
+        "evidence_type": "log_entry",
+        "source": "read_evidence",
+        "z_score": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 2
+        }
+      },
+      {
+        "artifact_id": "NOKIA6230-ART-003",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 7
+        },
+        "description": "Two MMS MMSC session tokens found in binary: http://10.250.31.100:10021/mmsc?A_BHMavgV2c8GWcTw and http://10.250.31.100:10021/mmsc?AFc1X1BHJOxwDXh4n. Internal Telenor Norway MMSC endpoint (10.250.31.1",
+        "evidence_type": "log_entry",
+        "source": "search_pattern",
+        "z_score": {
+          "__fraction__": true,
+          "den": 200,
+          "num": 21
+        }
+      },
+      {
+        "artifact_id": "NOKIA6230-ART-004",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 9
+        },
+        "description": "Shannon entropy 5.2114 bits/byte on sampled content. SUSPICIOUS range per VIGIA thresholds (>5.0). However, this is fully explained by WAP cache content: HTTP response bodies are compressed binary GIF",
+        "evidence_type": "file_hash",
+        "source": "calculate_shannon_entropy",
+        "z_score": {
+          "__fraction__": true,
+          "den": 50,
+          "num": 9
+        }
+      }
+    ]
+  },
+  "sans_compliance": {
+    "accuracy_validation": false,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}

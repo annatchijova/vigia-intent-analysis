@@ -1,0 +1,249 @@
+{
+  "analysis_timestamp": "2026-06-28T16:51:55.827996+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "VIGIA-SET630-001",
+    "end_time": "2026-06-28T16:51:55.828007+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "VIGIA-SET630-001",
+        "entry_sha256": "3b0cc5e08194e0a51b699ba2cbaa6dbcc64946dc445c8aeb2d4b66a9461af462",
+        "inputs_summary": {
+          "agent_file": "/home/vegandelicious/vigia-repo/vigia_agent.py",
+          "case_id": "VIGIA-SET630-001"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: 95f2da2a3bdcb4ca...",
+        "outputs_summary": {
+          "agent_sha256": "95f2da2a3bdcb4ca106059e2b06f58fd0ec414c887fec07ac7a0d5edfeb097a1",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-06-28T16:51:55.818843+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-SET630-001",
+        "entry_sha256": "efce89e8a7846c4fa288c40757ed18d7fc2e3f367fad50d78b4d0df6df80bc58",
+        "inputs_summary": {
+          "path": "evidence/cases/se_t630/VIGIA-SET630-001.json"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-06-28T16:51:55.819175+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-SET630-001",
+        "entry_sha256": "6363b680af2211ed506aac54aa340102ab9fc0c4a9b4b7aa569b2f57f3e58065",
+        "inputs_summary": {
+          "path": "evidence/cases/se_t630/VIGIA-SET630-001.json"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: a8857abfe0ad8c07...",
+        "outputs_summary": {
+          "sha256": "a8857abfe0ad8c07f44c1c42625b49405f584f95e9493b12fd6348e1a922e546"
+        },
+        "seq": 3,
+        "timestamp": "2026-06-28T16:51:55.819509+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "VIGIA-SET630-001",
+        "entry_sha256": "9bffaf66cdf49e2847824cf953a24d3c04ecde872a02e8c79d233700bf0fd002",
+        "inputs_summary": {
+          "evidence": "evidence/cases/se_t630/VIGIA-SET630-001.json",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-06-28T16:51:55.819827+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "VIGIA-SET630-001",
+        "entry_sha256": "509b53f7647cdf80d77c888d5087e3dd7ccd9577791f762a3240f8160bc6175e",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 3 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "SUSPICION_DETECTED",
+            "best_posterior": "277/3000",
+            "confidence": "277/3000",
+            "is_conclusive": "True",
+            "narrative": "Forensic comparison of two Sony Ericsson T630 image memory dumps: images.bin (active state, SHA-256: b6b904e63a51e6a1c2350fade1f166dcd378eeb1c1b93b432c07a726f5095bfb) and images-deleted.bin (forensic ..."
+          },
+          "case_id": "VIGIA-SET630-001",
+          "pipeline_meta": {
+            "artifact_count": "3",
+            "avg_score": "277/600",
+            "expected_verdict": "SUSPICION",
+            "source": "ebs_v1_json_adapter"
+          },
+          "signals": [
+            {
+              "artifact_id": "SET630-ART-001",
+              "confidence": "19/20",
+              "description": "Sony Ericsson T630 image memory dumps. Both files 12582912 bytes. File date 2004-09-25. Zip container SHA-256 verified at intake. Two distinct hash values confirm files are different despite identical",
+              "evidence_type": "file_hash",
+              "source": "generate_forensic_hash",
+              "z_score": "19/200"
+            },
+            {
+              "artifact_id": "SET630-ART-002",
+              "confidence": "9/10",
+              "description": "Binary comparison (cmp -l) of both files: IDENTICAL for bytes 0\u20138388609 (first 8MB, device firmware). First divergence at byte 8388610. images.bin byte 8388610: value 0x2E (46 decimal). images-deleted",
+              "evidence_type": "file_timestamp",
+              "source": "search_pattern",
+              "z_score": "153/200"
+            },
+            {
+              "artifact_id": "SET630-ART-003",
+              "confidence": "3/4",
+              "description": "Recovered image data in images-deleted.bin: binary pattern starting at offset 8388608 is 16-bit RGB565 format image data, consistent with Sony Ericsson T630's internal picture format. Hex sample: 1f25",
+              "evidence_type": "document_visual",
+              "source": "audit_image_metadata",
+              "z_score": "21/40"
+            }
+          ]
+        },
+        "seq": 5,
+        "timestamp": "2026-06-28T16:51:55.825445+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "VIGIA-SET630-001",
+        "entry_sha256": "a7112af38b335f71c842dff2268d3b50307f2c5a602cbc42b3e9b4e7c235bf0a",
+        "inputs_summary": {
+          "n_signals": "3"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-06-28T16:51:55.827402+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "VIGIA-SET630-001",
+        "entry_sha256": "d8a55d40088a7afd6fbb9aac50e0bd0220f35752d2321e41c7ebaf8ae9eab98d",
+        "inputs_summary": {
+          "verdict": "SUSPICION_DETECTED"
+        },
+        "iteration": 0,
+        "note": "Exit code 0 \u2014 analysis complete.",
+        "outputs_summary": {
+          "exit_code": "0"
+        },
+        "seq": 7,
+        "timestamp": "2026-06-28T16:51:55.827772+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-06-28T16:51:55.817848+00:00",
+    "total_entries": 7
+  },
+  "case_id": "VIGIA-SET630-001",
+  "evidence_path": "evidence/cases/se_t630/VIGIA-SET630-001.json",
+  "evidence_sha256": "a8857abfe0ad8c07f44c1c42625b49405f584f95e9493b12fd6348e1a922e546",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-SET630-001 ===\nEvidence: evidence/cases/se_t630/VIGIA-SET630-001.json\nEvidence SHA-256: a8857abfe0ad8c07f44c1c42625b49405f584f95e9493b12fd6348e1a922e546\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: SUSPICION_DETECTED\nPosterior confidence: 277/3000\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\nForensic comparison of two Sony Ericsson T630 image memory dumps: images.bin (active state, SHA-256: b6b904e63a51e6a1c2350fade1f166dcd378eeb1c1b93b432c07a726f5095bfb) and images-deleted.bin (forensic recovery, SHA-256: c0be1453dd5d84b0225d23486ed508744c6f821b057e8247fd0d4a904266e14a). Both files 12582912 bytes (12MB). File dates: 2004-09-25. Binary comparison reveals: (1) First 8388608 bytes (8MB) are BYTE-FOR-BYTE IDENTICAL \u2014 this is the device firmware. (2) Files diverge at byte 8388610 (first\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Binary comparison (cmp -l) of both files: IDENTICAL for bytes 0\u2013838860] z=0.765 conf=0.90 \u2014 \n  [Recovered image data in images-deleted.bin: binary pattern starting at] z=0.525 conf=0.75 \u2014 \n  [Sony Ericsson T630 image memory dumps. Both files 12582912 bytes. File] z=0.095 conf=0.95 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW \u2014 No significant anomalies detected in this iteration.\n\nCritical signals (z>3): 0\nHigh signals (2<z<=3): 0\nTotal signals analyzed: 3",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "SUSPICION_DETECTED",
+      "best_posterior": "277/3000",
+      "confidence": {
+        "__fraction__": true,
+        "den": 3000,
+        "num": 277
+      },
+      "is_conclusive": true,
+      "narrative": "Forensic comparison of two Sony Ericsson T630 image memory dumps: images.bin (active state, SHA-256: b6b904e63a51e6a1c2350fade1f166dcd378eeb1c1b93b432c07a726f5095bfb) and images-deleted.bin (forensic recovery, SHA-256: c0be1453dd5d84b0225d23486ed508744c6f821b057e8247fd0d4a904266e14a). Both files 12582912 bytes (12MB). File dates: 2004-09-25. Binary comparison reveals: (1) First 8388608 bytes (8MB) are BYTE-FOR-BYTE IDENTICAL \u2014 this is the device firmware. (2) Files diverge at byte 8388610 (first"
+    },
+    "case_id": "VIGIA-SET630-001",
+    "pipeline_meta": {
+      "artifact_count": 3,
+      "avg_score": "277/600",
+      "expected_verdict": "SUSPICION",
+      "source": "ebs_v1_json_adapter"
+    },
+    "signals": [
+      {
+        "artifact_id": "SET630-ART-001",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 19
+        },
+        "description": "Sony Ericsson T630 image memory dumps. Both files 12582912 bytes. File date 2004-09-25. Zip container SHA-256 verified at intake. Two distinct hash values confirm files are different despite identical",
+        "evidence_type": "file_hash",
+        "source": "generate_forensic_hash",
+        "z_score": {
+          "__fraction__": true,
+          "den": 200,
+          "num": 19
+        }
+      },
+      {
+        "artifact_id": "SET630-ART-002",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 9
+        },
+        "description": "Binary comparison (cmp -l) of both files: IDENTICAL for bytes 0\u20138388609 (first 8MB, device firmware). First divergence at byte 8388610. images.bin byte 8388610: value 0x2E (46 decimal). images-deleted",
+        "evidence_type": "file_timestamp",
+        "source": "search_pattern",
+        "z_score": {
+          "__fraction__": true,
+          "den": 200,
+          "num": 153
+        }
+      },
+      {
+        "artifact_id": "SET630-ART-003",
+        "confidence": {
+          "__fraction__": true,
+          "den": 4,
+          "num": 3
+        },
+        "description": "Recovered image data in images-deleted.bin: binary pattern starting at offset 8388608 is 16-bit RGB565 format image data, consistent with Sony Ericsson T630's internal picture format. Hex sample: 1f25",
+        "evidence_type": "document_visual",
+        "source": "audit_image_metadata",
+        "z_score": {
+          "__fraction__": true,
+          "den": 40,
+          "num": 21
+        }
+      }
+    ]
+  },
+  "sans_compliance": {
+    "accuracy_validation": false,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}

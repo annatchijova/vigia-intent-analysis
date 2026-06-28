@@ -1,0 +1,249 @@
+{
+  "analysis_timestamp": "2026-06-28T16:51:54.376065+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "VIGIA-SET68I-001",
+    "end_time": "2026-06-28T16:51:54.376075+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "VIGIA-SET68I-001",
+        "entry_sha256": "8e2e05ebcad6db7c2475ff1d9888bb99760fae7834d90a0d05bcb0cba55969f3",
+        "inputs_summary": {
+          "agent_file": "/home/vegandelicious/vigia-repo/vigia_agent.py",
+          "case_id": "VIGIA-SET68I-001"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: 95f2da2a3bdcb4ca...",
+        "outputs_summary": {
+          "agent_sha256": "95f2da2a3bdcb4ca106059e2b06f58fd0ec414c887fec07ac7a0d5edfeb097a1",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-06-28T16:51:54.368509+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-SET68I-001",
+        "entry_sha256": "18368733c8cb2afba62c829a9e9a03783216e699c46e435a0c89ae1a34591439",
+        "inputs_summary": {
+          "path": "evidence/cases/se_t68i/VIGIA-SET68I-001.json"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-06-28T16:51:54.368717+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-SET68I-001",
+        "entry_sha256": "a0224bbf1e982a7582932874b44a9c79179c5940f50f6812fe38eda6ef8c3ccd",
+        "inputs_summary": {
+          "path": "evidence/cases/se_t68i/VIGIA-SET68I-001.json"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: 7a144ec350018409...",
+        "outputs_summary": {
+          "sha256": "7a144ec350018409ea5fcc397f70fb24626a83d1e066c7d09448059abcc670d6"
+        },
+        "seq": 3,
+        "timestamp": "2026-06-28T16:51:54.368941+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "VIGIA-SET68I-001",
+        "entry_sha256": "14d0bee962a6f5f52ac0fcdd76ff8cdcac086a1826dc6dc01920f84360d48569",
+        "inputs_summary": {
+          "evidence": "evidence/cases/se_t68i/VIGIA-SET68I-001.json",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-06-28T16:51:54.369182+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "VIGIA-SET68I-001",
+        "entry_sha256": "620ee1a77845273bbb6223aeaff14c5bae8a3443987aed5f5584a45b1e7cfd53",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 3 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "NO_SEMIOTIC_ANOMALY_DETECTED",
+            "best_posterior": "17/1200",
+            "confidence": "17/1200",
+            "is_conclusive": "False",
+            "narrative": "Forensic image of Sony Ericsson T68i internal flash memory (file ingebjorg.bin, 8388608 bytes, SHA-256: df9aa8809f752434fc4028196b890c28a75924eaec2fbd586538450e2995c71d). File date 2005-03-29. Filenam..."
+          },
+          "case_id": "VIGIA-SET68I-001",
+          "pipeline_meta": {
+            "artifact_count": "3",
+            "avg_score": "17/240",
+            "expected_verdict": "ABSTAIN",
+            "source": "ebs_v1_json_adapter"
+          },
+          "signals": [
+            {
+              "artifact_id": "SET68I-ART-001",
+              "confidence": "19/20",
+              "description": "Sony Ericsson T68i flash image. SHA-256 verified. Size 8388608 bytes (8MB). File date 2005-03-29. Zip container verified at intake.",
+              "evidence_type": "file_hash",
+              "source": "generate_forensic_hash",
+              "z_score": "19/400"
+            },
+            {
+              "artifact_id": "SET68I-ART-002",
+              "confidence": "3/4",
+              "description": "String analysis reveals firmware components: (1) Image format error handler strings \u2014 DEFAULT ERROR STRING, MEMORY NOT AVAILABLE, NOT A JPEG FILE, NOT A GIF FILE, NOT A BMP FILE, NOT A EBM FILE (Sony ",
+              "evidence_type": "log_entry",
+              "source": "read_evidence",
+              "z_score": "3/40"
+            },
+            {
+              "artifact_id": "SET68I-ART-003",
+              "confidence": "3/5",
+              "description": "Culturally significant filename: 'ingebjorg.bin' \u2014 Ingebjorg/Ingeborg is a traditional Norwegian/Swedish female name (from Old Norse: Ing + bjorg, meaning 'Ing's protection'). Combined with Nokia 6230",
+              "evidence_type": "log_entry",
+              "source": "search_pattern",
+              "z_score": "9/100"
+            }
+          ]
+        },
+        "seq": 5,
+        "timestamp": "2026-06-28T16:51:54.374012+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "VIGIA-SET68I-001",
+        "entry_sha256": "30074fcb9ce4d13cb030a7b31cfbb41add8bd3eba30df60566cb9dd35816a32e",
+        "inputs_summary": {
+          "n_signals": "3"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-06-28T16:51:54.375497+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "VIGIA-SET68I-001",
+        "entry_sha256": "09fa78a4b85d211320a9f3f03bd32a307b5c14bd2249de26fcdca0b06c9932dd",
+        "inputs_summary": {
+          "verdict": "NO_SEMIOTIC_ANOMALY_DETECTED"
+        },
+        "iteration": 0,
+        "note": "Exit code 0 \u2014 analysis complete.",
+        "outputs_summary": {
+          "exit_code": "0"
+        },
+        "seq": 7,
+        "timestamp": "2026-06-28T16:51:54.375854+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-06-28T16:51:54.367724+00:00",
+    "total_entries": 7
+  },
+  "case_id": "VIGIA-SET68I-001",
+  "evidence_path": "evidence/cases/se_t68i/VIGIA-SET68I-001.json",
+  "evidence_sha256": "7a144ec350018409ea5fcc397f70fb24626a83d1e066c7d09448059abcc670d6",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-SET68I-001 ===\nEvidence: evidence/cases/se_t68i/VIGIA-SET68I-001.json\nEvidence SHA-256: 7a144ec350018409ea5fcc397f70fb24626a83d1e066c7d09448059abcc670d6\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: NO_SEMIOTIC_ANOMALY_DETECTED\nPosterior confidence: 17/1200\nConclusive: NO \u2014 requires human review\n\n--- PEIRCEAN NARRATIVE ---\nForensic image of Sony Ericsson T68i internal flash memory (file ingebjorg.bin, 8388608 bytes, SHA-256: df9aa8809f752434fc4028196b890c28a75924eaec2fbd586538450e2995c71d). File date 2005-03-29. Filename 'ingebjorg.bin' indicates device ownership \u2014 'Ingebjorg' is a Norwegian female given name (variant: Ingeborg), strongly suggesting the handset belonged to a Scandinavian female user. String analysis reveals firmware layer with GSM stack processes and image format error handlers (JPEG, GIF, BMP, EB\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Culturally significant filename: 'ingebjorg.bin' \u2014 Ingebjorg/Ingeborg ] z=0.090 conf=0.60 \u2014 \n  [String analysis reveals firmware components: (1) Image format error ha] z=0.075 conf=0.75 \u2014 \n  [Sony Ericsson T68i flash image. SHA-256 verified. Size 8388608 bytes (] z=0.048 conf=0.95 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW \u2014 No significant anomalies detected in this iteration.\n\nCritical signals (z>3): 0\nHigh signals (2<z<=3): 0\nTotal signals analyzed: 3",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "NO_SEMIOTIC_ANOMALY_DETECTED",
+      "best_posterior": "17/1200",
+      "confidence": {
+        "__fraction__": true,
+        "den": 1200,
+        "num": 17
+      },
+      "is_conclusive": false,
+      "narrative": "Forensic image of Sony Ericsson T68i internal flash memory (file ingebjorg.bin, 8388608 bytes, SHA-256: df9aa8809f752434fc4028196b890c28a75924eaec2fbd586538450e2995c71d). File date 2005-03-29. Filename 'ingebjorg.bin' indicates device ownership \u2014 'Ingebjorg' is a Norwegian female given name (variant: Ingeborg), strongly suggesting the handset belonged to a Scandinavian female user. String analysis reveals firmware layer with GSM stack processes and image format error handlers (JPEG, GIF, BMP, EB"
+    },
+    "case_id": "VIGIA-SET68I-001",
+    "pipeline_meta": {
+      "artifact_count": 3,
+      "avg_score": "17/240",
+      "expected_verdict": "ABSTAIN",
+      "source": "ebs_v1_json_adapter"
+    },
+    "signals": [
+      {
+        "artifact_id": "SET68I-ART-001",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 19
+        },
+        "description": "Sony Ericsson T68i flash image. SHA-256 verified. Size 8388608 bytes (8MB). File date 2005-03-29. Zip container verified at intake.",
+        "evidence_type": "file_hash",
+        "source": "generate_forensic_hash",
+        "z_score": {
+          "__fraction__": true,
+          "den": 400,
+          "num": 19
+        }
+      },
+      {
+        "artifact_id": "SET68I-ART-002",
+        "confidence": {
+          "__fraction__": true,
+          "den": 4,
+          "num": 3
+        },
+        "description": "String analysis reveals firmware components: (1) Image format error handler strings \u2014 DEFAULT ERROR STRING, MEMORY NOT AVAILABLE, NOT A JPEG FILE, NOT A GIF FILE, NOT A BMP FILE, NOT A EBM FILE (Sony ",
+        "evidence_type": "log_entry",
+        "source": "read_evidence",
+        "z_score": {
+          "__fraction__": true,
+          "den": 40,
+          "num": 3
+        }
+      },
+      {
+        "artifact_id": "SET68I-ART-003",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 3
+        },
+        "description": "Culturally significant filename: 'ingebjorg.bin' \u2014 Ingebjorg/Ingeborg is a traditional Norwegian/Swedish female name (from Old Norse: Ing + bjorg, meaning 'Ing's protection'). Combined with Nokia 6230",
+        "evidence_type": "log_entry",
+        "source": "search_pattern",
+        "z_score": {
+          "__fraction__": true,
+          "den": 100,
+          "num": 9
+        }
+      }
+    ]
+  },
+  "sans_compliance": {
+    "accuracy_validation": false,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}
