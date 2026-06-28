@@ -1,0 +1,110 @@
+{
+    "case_id": "VIGIA-NOKIA6230-001",
+    "case_name": "Nokia 6230 — Norwegian WAP Cache Forensic Analysis (2004)",
+    "source_dataset": "Champlain College Digital Forensics Challenge — Mobile Phone Corpus",
+    "source_origin": "public_dataset",
+    "abstention_risk": "low",
+    "confidence_expected": 72,
+    "expected_verdict": "NOISE",
+    "carnegie_pattern_expected": null,
+    "expected_mitre_ttps": [],
+    "description": "Forensic image of Nokia 6230 internal flash memory (file Rh-12_352953003422072-bilder.bin). IMEI 352953003422072. Contains WAP browser cache and picture storage from a Norwegian user, June–August 2004. User browsed Norwegian-language WAP sites: Yahoo Norway (no.wap.yahoo.com), NRK Norwegian Broadcasting (wap.nrk.no), TV2 (tv2.by.com), Aftenposten newspaper, Telenor Mobile WAP portal, Nordialog telecom. Two MMS sessions via internal Telenor MMSC (10.250.31.100:10021) with unique session tokens. WML and GIF content cached. SSL certificates from VeriSign and Thawte present. Shannon entropy 5.21 bits/byte (SUSPICIOUS range, consistent with compressed WAP cache). No anomalous behavior detected — normal Norwegian mobile user activity in summer 2004.",
+    "devil_advocate": "N/A — verdict is NOISE, refutation protocol not required.",
+    "artifacts": [
+        {
+            "artifact_id": "NOKIA6230-ART-001",
+            "evidence_type": "file_hash",
+            "source_tool": "generate_forensic_hash",
+            "timestamp": "2026-06-28T16:39:00.884517Z",
+            "raw_score": 0.1,
+            "prior_trust": 0.95,
+            "provenance_chain": [
+                "sha256:8b98f0ba8d069903a36b8c2b43db6a2211bf3198d5add083cfa4207de32026e1 (Nokia_6230.zip)",
+                "sha256:b418a66ed190124d0674cbf638ab4d68f5bc61a5ad432c2c898e4a4b867c32fd (Rh-12_352953003422072-bilder.bin)"
+            ],
+            "acquisition_tool": "zip extraction + sha256sum",
+            "acquisition_hash": "b418a66ed190124d0674cbf638ab4d68f5bc61a5ad432c2c898e4a4b867c32fd",
+            "acquisition_timestamp": "2026-06-28T16:39:00Z",
+            "description": "Nokia 6230 flash image. SHA-256 verified. Size 4718496 bytes. File date 2004-09-25 — consistent with handset acquisition in late September 2004. Zip container verified at intake (SHA-256: 8b98f0ba...).",
+            "metadata": {
+                "device": "Nokia 6230",
+                "imei": "352953003422072",
+                "model_code": "Rh-12",
+                "file_type": "Flash memory image — WAP cache and picture storage",
+                "file_date": "2004-09-25",
+                "size_bytes": 4718496
+            }
+        },
+        {
+            "artifact_id": "NOKIA6230-ART-002",
+            "evidence_type": "log_entry",
+            "source_tool": "read_evidence",
+            "timestamp": "2004-08-18T00:00:00Z",
+            "raw_score": 0.1,
+            "prior_trust": 0.8,
+            "provenance_chain": [
+                "sha256:b418a66ed190124d0674cbf638ab4d68f5bc61a5ad432c2c898e4a4b867c32fd"
+            ],
+            "description": "WAP browser cache content. Norwegian-language WML pages from: no.wap.yahoo.com (Yahoo Norway — business/commerce directory, telecom section), wap.nrk.no (NRK Norwegian Broadcasting — MMS, mobile games), tv2.by.com (TV2 Norway), aftenposten.no (national newspaper), wap.telenormobil.no (Telenor Mobile operator portal), nordialog.no, wap.netcom.no (NetCom operator). Dates range June 5 2004 to August 18 2004. Content includes pages about telecom companies (Nokia 7110, Nordialog, Commit AS, Data Support Telenor Mobil). WML navigation structure cached. HTTP/WAP response headers preserved.",
+            "metadata": {
+                "sites_visited": [
+                    "no.wap.yahoo.com",
+                    "wap.nrk.no",
+                    "tv2.by.com",
+                    "tux.aftenposten.no",
+                    "wap.aftenposten.no",
+                    "wap.telenormobil.no",
+                    "www.nordialog.no",
+                    "wap.netcom.no",
+                    "helm.tekmob.com",
+                    "home.waptheweb.com"
+                ],
+                "language": "Norwegian (Bokmal)",
+                "date_range": "2004-06-05 to 2004-08-18",
+                "ua_profile": "http://nds1.nds.nokia.com/uaprof/N6230r200.xml",
+                "servers_seen": ["Microsoft-IIS/5.0", "WebLogic Server 6.1 SP4", "Apache-Coyote/1.1", "Apache/1.3.29"]
+            }
+        },
+        {
+            "artifact_id": "NOKIA6230-ART-003",
+            "evidence_type": "log_entry",
+            "source_tool": "search_pattern",
+            "timestamp": "2004-08-07T10:09:00Z",
+            "raw_score": 0.15,
+            "prior_trust": 0.7,
+            "provenance_chain": [
+                "sha256:b418a66ed190124d0674cbf638ab4d68f5bc61a5ad432c2c898e4a4b867c32fd"
+            ],
+            "description": "Two MMS MMSC session tokens found in binary: http://10.250.31.100:10021/mmsc?A_BHMavgV2c8GWcTw and http://10.250.31.100:10021/mmsc?AFc1X1BHJOxwDXh4n. Internal Telenor Norway MMSC endpoint (10.250.31.100 private IP, Telenor WAP gateway). Unique session tokens per MMS transaction indicate at least 2 MMS messages were processed. Normal carrier MMS infrastructure usage.",
+            "metadata": {
+                "mmsc_endpoint": "http://10.250.31.100:10021/mmsc",
+                "carrier": "Telenor Norway",
+                "session_tokens": [
+                    "A_BHMavgV2c8GWcTw",
+                    "AFc1X1BHJOxwDXh4n"
+                ],
+                "mms_count": 2
+            }
+        },
+        {
+            "artifact_id": "NOKIA6230-ART-004",
+            "evidence_type": "file_hash",
+            "source_tool": "calculate_shannon_entropy",
+            "timestamp": "2026-06-28T16:44:33.701731Z",
+            "raw_score": 0.2,
+            "prior_trust": 0.9,
+            "provenance_chain": [
+                "sha256:b418a66ed190124d0674cbf638ab4d68f5bc61a5ad432c2c898e4a4b867c32fd"
+            ],
+            "description": "Shannon entropy 5.2114 bits/byte on sampled content. SUSPICIOUS range per VIGIA thresholds (>5.0). However, this is fully explained by WAP cache content: HTTP response bodies are compressed binary GIF/JPEG images interleaved with plaintext WML. Mixed binary+text is structurally expected to produce entropy in 5.0-5.5 range. No encrypted payloads detected. No local entropy anomalies (hidden encrypted blocks) found. CAIE composite score 0.0479 (NOISE).",
+            "metadata": {
+                "global_entropy": 5.2114,
+                "max_local_entropy": 5.2064,
+                "suspicious_blocks": 0,
+                "caie_composite": 0.0479,
+                "caie_verdict": "NOISE",
+                "benign_explanation": "Mixed binary (GIF/JPEG images) and plaintext (WML) in WAP cache produces entropy above pure-text baseline"
+            }
+        }
+    ]
+}

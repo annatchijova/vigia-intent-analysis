@@ -1,0 +1,84 @@
+{
+    "case_id": "VIGIA-SET630-001",
+    "case_name": "Sony Ericsson T630 — Deleted Image Recovery / Anti-Forensic Wiping Analysis (2004)",
+    "source_dataset": "Champlain College Digital Forensics Challenge — Mobile Phone Corpus",
+    "source_origin": "public_dataset",
+    "abstention_risk": "low",
+    "confidence_expected": 68,
+    "expected_verdict": "SUSPICION",
+    "carnegie_pattern_expected": "Data hiding via targeted memory zeroing",
+    "expected_mitre_ttps": ["T1006", "T1564.001", "T1070.006"],
+    "description": "Forensic comparison of two Sony Ericsson T630 image memory dumps: images.bin (active state, SHA-256: b6b904e63a51e6a1c2350fade1f166dcd378eeb1c1b93b432c07a726f5095bfb) and images-deleted.bin (forensic recovery, SHA-256: c0be1453dd5d84b0225d23486ed508744c6f821b057e8247fd0d4a904266e14a). Both files 12582912 bytes (12MB). File dates: 2004-09-25. Binary comparison reveals: (1) First 8388608 bytes (8MB) are BYTE-FOR-BYTE IDENTICAL — this is the device firmware. (2) Files diverge at byte 8388610 (first difference in user data partition). (3) images.bin second 8MB: header bytes 1f260300 followed by nulls — user images WIPED/ZEROED. (4) images-deleted.bin second 8MB: header 1f250400 followed by 3,863,179 non-null bytes of image pixel data (16-bit RGB565 format) — RECOVERED deleted images. A forensic acquisition tool was able to recover 3.86MB of user photographs that had been deleted from the device's image storage. The existence of both files in a single challenge set is pedagogically designed to demonstrate mobile device image recovery.",
+    "devil_advocate": "The zeroing in images.bin could represent the device's normal factory reset behavior or a standard 'delete all pictures' operation by the user (not necessarily anti-forensic intent). Most users delete photos to free space, not to hide evidence. The recovery tool (images-deleted.bin) may be an artifact of the forensic acquisition process rather than evidence of deliberate anti-forensic action.",
+    "artifacts": [
+        {
+            "artifact_id": "SET630-ART-001",
+            "evidence_type": "file_hash",
+            "source_tool": "generate_forensic_hash",
+            "timestamp": "2026-06-28T16:39:02.487000Z",
+            "raw_score": 0.1,
+            "prior_trust": 0.95,
+            "provenance_chain": [
+                "sha256:a49c9fbadd3842624d8d6cd278ebd8eba0ee318fc42e94246c4c2064fa8163f3 (SE_T630.zip)",
+                "sha256:b6b904e63a51e6a1c2350fade1f166dcd378eeb1c1b93b432c07a726f5095bfb (images.bin)",
+                "sha256:c0be1453dd5d84b0225d23486ed508744c6f821b057e8247fd0d4a904266e14a (images-deleted.bin)"
+            ],
+            "acquisition_tool": "zip extraction + sha256sum",
+            "acquisition_hash": "b6b904e63a51e6a1c2350fade1f166dcd378eeb1c1b93b432c07a726f5095bfb",
+            "acquisition_timestamp": "2026-06-28T16:39:02Z",
+            "description": "Sony Ericsson T630 image memory dumps. Both files 12582912 bytes. File date 2004-09-25. Zip container SHA-256 verified at intake. Two distinct hash values confirm files are different despite identical size.",
+            "metadata": {
+                "device": "Sony Ericsson T630",
+                "file_images_bin": "images.bin — active state (SHA-256: b6b904...)",
+                "file_deleted_bin": "images-deleted.bin — forensic recovery (SHA-256: c0be14...)",
+                "file_date": "2004-09-25",
+                "size_bytes": 12582912
+            }
+        },
+        {
+            "artifact_id": "SET630-ART-002",
+            "evidence_type": "file_timestamp",
+            "source_tool": "search_pattern",
+            "timestamp": "2026-06-28T16:43:00Z",
+            "raw_score": 0.85,
+            "prior_trust": 0.9,
+            "provenance_chain": [
+                "sha256:b6b904e63a51e6a1c2350fade1f166dcd378eeb1c1b93b432c07a726f5095bfb",
+                "sha256:c0be1453dd5d84b0225d23486ed508744c6f821b057e8247fd0d4a904266e14a"
+            ],
+            "description": "Binary comparison (cmp -l) of both files: IDENTICAL for bytes 0–8388609 (first 8MB, device firmware). First divergence at byte 8388610. images.bin byte 8388610: value 0x2E (46 decimal). images-deleted.bin byte 8388610: value 0x2D (45 decimal). Subsequent bytes in images-deleted.bin contain dense non-null image data. Count of non-null bytes in images-deleted.bin second 8MB partition: 3,863,179 bytes. images.bin second 8MB: header 1f260300 followed by near-zero content (user data wiped). The 8MB boundary is a clean firmware/userdata partition split, consistent with T630 flash memory layout.",
+            "metadata": {
+                "first_divergence_offset": 8388610,
+                "firmware_partition_size": 8388608,
+                "images_bin_user_section": "header 1f26 0300 + zeroed (wiped)",
+                "deleted_bin_user_section": "header 1f25 0400 + 3863179 non-null bytes (recovered images)",
+                "partition_split": "Clean 8MB boundary — standard T630 flash layout"
+            }
+        },
+        {
+            "artifact_id": "SET630-ART-003",
+            "evidence_type": "document_visual",
+            "source_tool": "audit_image_metadata",
+            "timestamp": "2026-06-28T16:44:00Z",
+            "raw_score": 0.7,
+            "prior_trust": 0.75,
+            "provenance_chain": [
+                "sha256:c0be1453dd5d84b0225d23486ed508744c6f821b057e8247fd0d4a904266e14a"
+            ],
+            "description": "Recovered image data in images-deleted.bin: binary pattern starting at offset 8388608 is 16-bit RGB565 format image data, consistent with Sony Ericsson T630's internal picture format. Hex sample: 1f25 0400 da7c 3474 b16b 0f5b d23a 0f5b 2a7b 4282 c451 8141 2039... RGB565 pixel values represent color image content. 3.86MB of recoverable image data represents multiple photographs. Java MIDlet game (Q*bert by Sony Pictures Digital) found in user data: MIDlet-Jar-URL: Q-Bert_MR2.jar, size 51275 bytes, MIDlet-Version: 1.3. SSL/PKI certificates cached: Baltimore CyberTrust Mobile Root, Entrust.net WAP CA. http://wap.sonyericsson.com accessed.",
+            "metadata": {
+                "recovered_data_bytes": 3863179,
+                "image_format": "16-bit RGB565 (Sony Ericsson T630 native format)",
+                "java_midlet": {
+                    "name": "Q*bert",
+                    "vendor": "Sony Pictures Digital",
+                    "version": "1.3",
+                    "jar_url": "Q-Bert_MR2.jar",
+                    "jar_size": 51275
+                },
+                "wap_portal": "http://wap.sonyericsson.com",
+                "ssl_certs": ["Baltimore CyberTrust Mobile Root", "Entrust.net WAP CA"]
+            }
+        }
+    ]
+}

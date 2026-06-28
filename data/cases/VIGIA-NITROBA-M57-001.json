@@ -1,0 +1,124 @@
+{
+    "case_id": "VIGIA-NITROBA-M57-001",
+    "case_name": "M57 Patents / DFRWS 2009 — Network Capture Identity Attribution (July 2008)",
+    "source_dataset": "DFRWS 2009 Challenge — M57 Patents Scenario (nitroba.pcap)",
+    "source_origin": "public_dataset",
+    "abstention_risk": "low",
+    "confidence_expected": 78,
+    "expected_verdict": "SUSPICION",
+    "carnegie_pattern_expected": "Dual identity concealment (personal Gmail + corporate AIM on same LAN)",
+    "expected_mitre_ttps": ["T1078", "T1040", "T1550.004"],
+    "description": "Network packet capture (nitroba.pcap, 56180821 bytes, SHA-256: 2b77a9eaefc1d6af163d1ba793c96dbccacb04e6befdf1a0b01f8c67553ec2fb) from the M57 Patents DFRWS 2009 forensics challenge. Capture period: July 21-22, 2008. The packet capture contains traffic from a residential LAN with two identified devices: (1) 192.168.1.64 — Mac OS X 10.5.4 (both PPC and Intel variants seen), running Safari 3.1.2 and Firefox 2.0.0.16. User logged into Gmail as mylady.ixchel@gmail.com, then logged out. Reading BBC News RSS (July 21, 2008) and PHD Comics (academic webcomic about graduate students). Screen 1920x1200, Flash 9.0.124. (2) 192.168.15.4 — Windows XP SP2 (NT 5.1.0.2600), running AOL AIM client v4.1.4.1. Performing SyncML contact synchronization for account 'm57jean' with AOL servers (sync.aol.com). Device GUID: AFE626E1-58E0-465A-83E4-28D58FE33959. SyncML session DBCDBBFB88654ED38246ABD27843E13A. 0 contact changes — contacts already synchronized. VoIP SIP adapter registered: number 16178766111 (617 area code = Boston/Cambridge, MA), provider VonCP, device MAC 00:1D:D9:2E:4F:61 (Broadcom). The AIM account 'm57jean' links to M57 Patents company (m57.biz) and the character Jean Tanaka (company bookkeeper/analyst). The Gmail account 'mylady.ixchel@gmail.com' is a personal account also linked to the same residential location. Timezone UTC-7 (Pacific DST or Mountain). Cambridge (617) phone number places the subject in Massachusetts.",
+    "devil_advocate": "The two devices on the network could belong to different household members, not the same person. The Gmail account mylady.ixchel does not necessarily belong to Jean (m57jean AIM). The PHD Comics browsing suggests graduate student activity, which is common in Cambridge MA — many households include multiple students or researchers. The VoIP adapter could pre-date the current occupant. The 0 contact changes in AIM sync means no new contact activity was occurring at the time of capture — this is consistent with routine background sync, not active malicious use. SUSPICION rather than INTENT because co-location of accounts is established but coordination between them is not.",
+    "artifacts": [
+        {
+            "artifact_id": "NITROBA-ART-001",
+            "evidence_type": "file_hash",
+            "source_tool": "generate_forensic_hash",
+            "timestamp": "2026-06-28T16:38:47.737000Z",
+            "raw_score": 0.1,
+            "prior_trust": 0.95,
+            "provenance_chain": [
+                "sha256:2b77a9eaefc1d6af163d1ba793c96dbccacb04e6befdf1a0b01f8c67553ec2fb (nitroba.pcap)"
+            ],
+            "acquisition_tool": "sha256sum",
+            "acquisition_hash": "2b77a9eaefc1d6af163d1ba793c96dbccacb04e6befdf1a0b01f8c67553ec2fb",
+            "acquisition_timestamp": "2026-06-28T16:38:47Z",
+            "description": "PCAP file integrity verified. File: nitroba.pcap. Format: tcpdump/libpcap microsecond timestamps, Ethernet, capture length 4096. Size: 56,180,821 bytes. SHA-256: 2b77a9eaefc1d6af163d1ba793c96dbccacb04e6befdf1a0b01f8c67553ec2fb.",
+            "metadata": {
+                "file_type": "pcap capture — microsecond ts (little-endian), version 2.4, Ethernet, captlen 4096",
+                "size_bytes": 56180821,
+                "capture_period": "July 21-22, 2008"
+            }
+        },
+        {
+            "artifact_id": "NITROBA-ART-002",
+            "evidence_type": "lsass_session",
+            "source_tool": "search_pattern",
+            "timestamp": "2008-07-22T01:51:07Z",
+            "raw_score": 0.75,
+            "prior_trust": 0.9,
+            "provenance_chain": [
+                "sha256:2b77a9eaefc1d6af163d1ba793c96dbccacb04e6befdf1a0b01f8c67553ec2fb"
+            ],
+            "description": "Gmail session cookies captured in plaintext HTTP at 22:51:07. Cookie: gmailchat=mylady.ixchel@gmail.com/984626 — confirms active Gmail Chat session as mylady.ixchel@gmail.com. Gmail SID cookie (DQAAAG4A...) exposed. GMAIL_AT session token: xn3j32popno6mlbc3jnl1r7fac4285. User-Agent: Mozilla/5.0 (Macintosh; U; PPC Mac OS X 10_5_4; en-us) AppleWebKit/525.18 (KHTML, like Gecko) Version/3.1.2 Safari/525.20.1. Session TZ=420 (UTC-7). rememberme=false. PREF cookie first seen TM=1172981425 (2007-03-03). The cookie __utma first visit: 1185282466 (2007-07-24). Account created well before capture date.",
+            "metadata": {
+                "gmail_account": "mylady.ixchel@gmail.com",
+                "gmail_chat_resource": "984626",
+                "client_ip": "192.168.1.64",
+                "os_platform": "Mac OS X 10.5.4 PPC",
+                "browser": "Safari 3.1.2 (WebKit 525.18)",
+                "timezone": "UTC-7 (Pacific DST or Mountain Standard)",
+                "logout_timestamp": "2008-07-22T01:51:07Z",
+                "account_first_seen": "2007-07-24"
+            }
+        },
+        {
+            "artifact_id": "NITROBA-ART-003",
+            "evidence_type": "log_entry",
+            "source_tool": "audit_network",
+            "timestamp": "2008-07-22T01:56:23Z",
+            "raw_score": 0.8,
+            "prior_trust": 0.85,
+            "provenance_chain": [
+                "sha256:2b77a9eaefc1d6af163d1ba793c96dbccacb04e6befdf1a0b01f8c67553ec2fb"
+            ],
+            "description": "AOL AIM SyncML contact synchronization from 192.168.15.4 (Windows XP) to sync.aol.com (64.12.187.25). Three POST /m57jean HTTP/1.1 requests. SyncML 1.1 protocol. Target LocURI: http://sync.aol.com/m57jean. Source LocURI: AFE626E1-58E0-465A-83E4-28D58FE33959. DevInfo: Man=AOL, Mod=AOL Client, FwV=4.1.4.1, HwV=Windows NT 5.1.0.2600 (Windows XP SP2). Sync result: 0 contact changes (both sides up-to-date). Authentication: aol-auth Kerberos token (AOL's internal Kerberos variant, CSS/COOL service). The URL path '/m57jean' directly identifies this as AIM account 'm57jean' at the M57 Patents company (m57.biz).",
+            "metadata": {
+                "aim_screen_name": "m57jean",
+                "aim_server": "sync.aol.com (64.12.187.25)",
+                "client_ip": "192.168.15.4",
+                "client_os": "Windows XP SP2 (NT 5.1.0.2600)",
+                "aim_client_version": "4.1.4.1",
+                "device_guid": "AFE626E1-58E0-465A-83E4-28D58FE33959",
+                "syncml_session": "DBCDBBFB88654ED38246ABD27843E13A",
+                "contact_changes": 0,
+                "auth_mechanism": "AOL Kerberos (CSS/COOL)",
+                "m57_company_link": "m57.biz — M57 Patents company (DFRWS 2009 scenario)"
+            }
+        },
+        {
+            "artifact_id": "NITROBA-ART-004",
+            "evidence_type": "log_entry",
+            "source_tool": "audit_network",
+            "timestamp": "2008-07-22T01:51:07Z",
+            "raw_score": 0.6,
+            "prior_trust": 0.8,
+            "provenance_chain": [
+                "sha256:2b77a9eaefc1d6af163d1ba793c96dbccacb04e6befdf1a0b01f8c67553ec2fb"
+            ],
+            "description": "SIP VoIP registration on LAN. SIP From/To: sip:16178766111@t.voncp.com:10000. Provider: VonCP (voncp.com). Server: 69.59.240.133. Auth: Digest MD5, username=16178766111, realm=69.59.240.133. Device: VDV21 001DD92E4F61 (MAC 00:1D:D9:2E:4F:61 = Broadcom VoIP adapter). Phone number 617-876-6111: area code 617 = Boston/Cambridge, Massachusetts. Multiple SIP REGISTER messages with same auth hash throughout capture, consistent with keepalive registration (not call attempt). The 617 area code narrows geographic location to Greater Boston metro area.",
+            "metadata": {
+                "voip_number": "16178766111",
+                "area_code": "617",
+                "area_code_region": "Boston/Cambridge, Massachusetts, USA",
+                "provider": "VonCP (voncp.com)",
+                "device_model": "VDV21",
+                "device_mac": "00:1D:D9:2E:4F:61",
+                "device_chipset": "Broadcom",
+                "sip_server": "69.59.240.133 (t.voncp.com)",
+                "auth_method": "Digest MD5"
+            }
+        },
+        {
+            "artifact_id": "NITROBA-ART-005",
+            "evidence_type": "log_entry",
+            "source_tool": "search_pattern",
+            "timestamp": "2008-07-22T01:51:00Z",
+            "raw_score": 0.4,
+            "prior_trust": 0.75,
+            "provenance_chain": [
+                "sha256:2b77a9eaefc1d6af163d1ba793c96dbccacb04e6befdf1a0b01f8c67553ec2fb"
+            ],
+            "description": "Browsing context and user profile indicators: (1) PHD Comics (phdcomics.com) — webcomic exclusively targeting PhD students and academic researchers, Google AdSense publisher ca-pub-9906587369174250. Comic #1045 viewed (July 21, 2008 edition). (2) BBC News RSS feed read at 22:51 — July 21, 2008 headlines: Salim Hamdan trial (Guantanamo), McCann case (Portugal), France constitution vote, Kosovo passports, B-52 Guam crash, Burma cyclone aid. International news consumption. (3) Screen resolution 1920x1200, 24-bit color — professional workstation configuration. (4) 13 browser plugins, 143 MIME types — active, well-configured system. (5) Flash 9.0.124. (6) Both Safari 3.1.2 (PPC) and Safari 3.1.2 (Intel) + Firefox 2.0.0.16 user agents seen — suggests multiple Macs or OS reinstallation. (7) Blogger.com, Google Analytics, Google Ads traffic observed. Academic/researcher profile consistent with Cambridge MA 617 area code and PHD Comics consumption.",
+            "metadata": {
+                "browsing_profile": "Academic/graduate researcher",
+                "phd_comics": "Comic #1045, July 21 2008",
+                "bbc_news_date": "2008-07-21",
+                "screen_resolution": "1920x1200",
+                "browsers": ["Safari 3.1.2 (PPC)", "Safari 3.1.2 (Intel)", "Firefox 2.0.0.16"],
+                "location_indicator": "Cambridge/Boston MA (617 VoIP, academic browsing, PHD Comics)"
+            }
+        }
+    ]
+}
