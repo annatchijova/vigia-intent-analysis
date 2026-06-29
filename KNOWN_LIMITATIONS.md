@@ -1,6 +1,6 @@
 # VIGÍA — Known Limitations
 
-**Version:** EBS v1 + P2 calibration | **Updated:** 2026-06-24
+**Version:** EBS v1 + P2 calibration | **Updated:** 2026-06-29
 **Applies to:** `github.com/annatchijova/vigia-intent-analysis`
 
 > VIGÍA does not claim to be infallible — it claims to be **auditable**.
@@ -1303,5 +1303,52 @@ for `.evtx` files. Tracked as **B-032**.
 
 **Workaround:** Use Claude Code / MCP mode (Mode 2) for raw Windows disk evidence.
 Domain C accuracy figures for raw E01 are not reliable until B-032 is deployed.
+
+---
+
+## L-033 — Gamma Calibration Suppresses High-Confidence Event Log Signals (FN Risk)
+
+**Status:** [DESIGN DECISION — under review] 2026-06-29, POST HACKATHON
+**Severity:** P2
+**Mode affected:** All modes — `apply_artifact_reliability()` in scoring pipeline
+**Discovered:** 2026-06-29 | Case: `VIGIA-MAGNET-2022-WINDOWS`
+
+**Description:**
+
+`apply_artifact_reliability()` applies a fixed `gamma=0.60` discount factor to all
+`event_log` artifact class signals. A signal with `z=3.2` (e.g., 343 PASS_THE_HASH
+chains, `composite_score=19/20`) is downscaled to `z=1.920`, falling below the MALICE
+threshold.
+
+**Root cause:** Event logs are classified as more falsifiable than memory forensics or
+MFT artifacts — an attacker with SYSTEM-level access can clear or manipulate them.
+The `gamma=0.60` discount reflects this epistemic downgrade. The discount is applied
+uniformly regardless of the number of corroborating events or the composite score.
+
+**Forensic implication:** High-confidence aggregate event log evidence — e.g., 343
+independent PASS_THE_HASH chains with no contradicting signals — is suppressed to the
+same degree as a single, weakly-corroborated log entry. This creates false negative
+risk precisely in cases where the event log evidence is strongest.
+
+**Why it is architecturally intentional:** The fixed gamma prevents the scoring engine
+from over-trusting event logs in cases where log fabrication is the attack vector (see
+L-001, `BREAK_006`). Removing the discount entirely would increase FP risk in
+false-flag scenarios.
+
+**Why it requires review:** The fixed gamma does not account for high-confidence
+aggregate evidence. A calibrated gamma that scales with `n_corroborating_events` or
+`composite_score` would preserve the FP protection while reducing FN risk for
+well-evidenced chains. Adjusting the fixed value without calibration data risks
+shifting the FP/FN tradeoff incorrectly.
+
+**Fix path:** Requires calibration data across expanded real-world corpus before
+adjusting `gamma`. Tracked for review post-corpus-expansion. Do not change `gamma`
+without empirical validation on at least 20 real-case event log signals with known
+ground truth.
+
+**Workaround:** For investigations where event log evidence is high-confidence and
+aggregate (composite_score ≥ 18/20, n_events ≥ 50), document the gamma suppression
+explicitly in the report's Known Limitations section and note the pre-discount z-score
+alongside the post-discount value.
 
 ---
