@@ -76,7 +76,7 @@ class SIFTOrchestrator:
             run_kwargs: Dict[str, Any] = {}
             if kwargs.get("memory_path"):
                 run_kwargs["memory_dump_path"] = kwargs["memory_path"]
-            es = kwargs.get("event_stream")
+            es = kwargs.get("event_stream") or kwargs.get("event_logs")
             if es:
                 run_kwargs["event_logs"] = es if isinstance(es, list) else [es]
             lp = kwargs.get("log_path")

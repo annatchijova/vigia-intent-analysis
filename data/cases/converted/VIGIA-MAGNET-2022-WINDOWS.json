@@ -1,0 +1,203 @@
+{
+  "case_id": "VIGIA-MAGNET-2022-WINDOWS",
+  "name": "Magnet Forensics CTF 2022 — Windows Persistence Implant",
+  "description": "Windows workstation compromised via ZeroTier encrypted overlay (C2). Attacker obtained SYSTEM-level shell and executed a structured persistence sequence: RDP enabled, backdoor admin account 'minecraftsteve' created under SubjectUserSid=S-1-5-18, built-in Administrator password reset. All privileged operations executed within a 75-minute window on 2022-02-12. Carnegie familiarity-transfer technique used for account naming. VIGÍA must detect SYSTEM-as-creator anomaly as the decisive MALICE discriminator.",
+  "artifacts": [
+    {
+      "artifact_id": "EVTX-SEC-001",
+      "evidence_type": "windows_event_log",
+      "source_tool": "python-evtx",
+      "timestamp": "2022-02-12T01:29:43Z",
+      "raw_score": 0.95,
+      "prior_trust": 0.95,
+      "provenance_chain": [
+        "sha256:b050682f7fe96938aca2fc19a96d24641173b4f31a4f3837119ea916663344c1",
+        "sha256:92c791dd45b8002572e9886d18f1959a4c2f6b4ae9da0fb0d6da80607904e688"
+      ],
+      "acquisition_tool": "python-evtx + RegRipper",
+      "acquisition_hash": "sha256:b050682f7fe96938aca2fc19a96d24641173b4f31a4f3837119ea916663344c1",
+      "acquisition_timestamp": "2026-06-28T10:05:13Z",
+      "description": "EventID 4720 @ 2022-02-12 01:29:43Z: New account 'minecraftsteve' (RID 1002) created. SubjectUserSid=S-1-5-18 (LOCAL SYSTEM). EventID 4722 @ 01:29:43Z: account enabled, SubjectUserSid=S-1-5-18. EventID 4724 @ 01:29:43Z: password set, SubjectUserSid=S-1-5-18. EventID 4724 @ 02:06:06Z: password reset again, SubjectUserSid=S-1-5-18. EventID 4728 @ 01:29:43Z: added to global group Users, SubjectUserSid=S-1-5-18. EventID 4732 @ 01:37:07Z: added to local group Administrators (S-1-5-32-544), SubjectUserSid=S-1-5-18. EventID 4732 @ 01:37:18Z: added to local group Remote Management Users (S-1-5-32-580), SubjectUserSid=S-1-5-18. SAM corroboration: minecraftsteve RID 1002, LastLogin=never (Login Count=0), created 2022-02-12 01:29:43Z.",
+      "metadata": {
+        "original_type": "windows_security_event_log",
+        "peirce_layer": "THIRDNESS",
+        "forensic_anomalies": [
+          "SubjectUserSid=S-1-5-18 (LOCAL SYSTEM) across all 7 account lifecycle events — Windows interactive account creation never produces S-1-5-18; requires SYSTEM shell (post-exploitation tool, scheduled task, or malware)",
+          "Account name 'minecraftsteve' chosen to blend with gaming household — Carnegie familiarity-transfer technique to suppress scrutiny",
+          "Login Count=0 in SAM: account was created as a backdoor, never used interactively by a legitimate operator",
+          "Double password set (01:29:43Z and 02:06:06Z): first set during creation script, second reset may indicate attacker confirming credential before leaving the session",
+          "Group membership sequence (Users → Administrators → Remote Management Users) reflects deliberate privilege escalation order, not administrative provisioning"
+        ],
+        "content_preview": "4720 01:29:43Z minecraftsteve created SubjectUserSid=S-1-5-18 | 4732 01:37:07Z added Administrators S-1-5-18",
+        "acquisition_tool": "python-evtx",
+        "acquisition_hash": "sha256:b050682f7fe96938aca2fc19a96d24641173b4f31a4f3837119ea916663344c1",
+        "acquisition_timestamp": "2026-06-28T10:05:13Z",
+        "write_blocker_used": true,
+        "examiner_id": "vigia_claude_code_mode2",
+        "corroborating_source": "rip_output/sam.txt SHA-256:92c791dd45b8002572e9886d18f1959a4c2f6b4ae9da0fb0d6da80607904e688",
+        "mitre_ttps": ["T1136.001", "T1078.003", "T1098"]
+      }
+    },
+    {
+      "artifact_id": "EVTX-SYS-001",
+      "evidence_type": "windows_event_log",
+      "source_tool": "python-evtx",
+      "timestamp": "2022-02-12T01:01:32Z",
+      "raw_score": 0.85,
+      "prior_trust": 0.85,
+      "provenance_chain": [
+        "sha256:2d29ef7fa1b63b7297cb45860efd30b37a5613505f192b3044a3878bd9cb9bbe"
+      ],
+      "acquisition_tool": "python-evtx + RegRipper",
+      "acquisition_hash": "sha256:2d29ef7fa1b63b7297cb45860efd30b37a5613505f192b3044a3878bd9cb9bbe",
+      "acquisition_timestamp": "2026-06-28T10:05:13Z",
+      "description": "EventID 7040 @ 2022-02-12 01:01:32Z: TermService (Remote Desktop Services) start type changed from 'demand start' to 'auto start'. SYSTEM hive TermService key LastWrite corroborates timestamp 2022-02-12 01:01:32Z. RDP enabled 28 minutes before 'minecraftsteve' account creation, establishing remote access vector before persistence implant was deployed.",
+      "metadata": {
+        "original_type": "windows_system_event_log",
+        "peirce_layer": "SECONDNESS",
+        "forensic_anomalies": [
+          "TermService set to auto-start 28 minutes before backdoor account creation — access vector prepared first, then persistence implant deployed (deliberate sequencing)",
+          "Change executed without any corresponding user-visible prompt or legitimate administrative ticket",
+          "In a home/gaming workstation context, RDP auto-start is anomalous — not a default or expected configuration"
+        ],
+        "content_preview": "7040 2022-02-12 01:01:32Z TermService demand->auto start",
+        "acquisition_tool": "python-evtx",
+        "acquisition_hash": "sha256:2d29ef7fa1b63b7297cb45860efd30b37a5613505f192b3044a3878bd9cb9bbe",
+        "acquisition_timestamp": "2026-06-28T10:05:13Z",
+        "write_blocker_used": true,
+        "examiner_id": "vigia_claude_code_mode2",
+        "corroborating_source": "rip_output/system.txt SHA-256:2d29ef7fa1b63b7297cb45860efd30b37a5613505f192b3044a3878bd9cb9bbe",
+        "mitre_ttps": ["T1021.001", "T1543.003"]
+      }
+    },
+    {
+      "artifact_id": "REG-SYS-001",
+      "evidence_type": "windows_event_log",
+      "source_tool": "python-evtx + RegRipper",
+      "timestamp": "2022-02-06T07:15:35Z",
+      "raw_score": 0.80,
+      "prior_trust": 0.80,
+      "provenance_chain": [
+        "sha256:2d29ef7fa1b63b7297cb45860efd30b37a5613505f192b3044a3878bd9cb9bbe",
+        "sha256:bb09d4c6e65152a420b995cecfe53a77b52b9e55c1b827508d36fed9e5de093e"
+      ],
+      "acquisition_tool": "python-evtx + RegRipper",
+      "acquisition_hash": "sha256:2d29ef7fa1b63b7297cb45860efd30b37a5613505f192b3044a3878bd9cb9bbe",
+      "acquisition_timestamp": "2026-06-28T10:05:13Z",
+      "description": "EventID 7045 @ 2022-02-06 07:15:35Z: New service 'ZeroTier One' installed. ImagePath=C:\\ProgramData\\ZeroTier\\One\\zerotier-one_x64.exe, StartType=auto start, ServiceAccount=LocalSystem. EventID 7045 @ 2022-02-06 07:22:40Z: New service 'ZeroTier Virtual Port' installed (zttap300.sys driver). Application.evtx: 'ZeroTier One — Installation completed successfully', 'ZeroTier One Virtual Network Port — Installation completed successfully'. SOFTWARE hive: ZeroTier uninstall entry LastWrite 2022-02-06 07:17:06Z. Java 8 Update 181 + JDK installed same session (07:38:39Z).",
+      "metadata": {
+        "original_type": "windows_system_event_log",
+        "peirce_layer": "SECONDNESS",
+        "forensic_anomalies": [
+          "ZeroTier provides encrypted P2P SDN overlay — not a gaming or productivity application; purpose is encrypted network tunneling that bypasses firewall inspection",
+          "Installed 6 days before the 2022-02-12 persistence sequence — consistent with initial access phase of a two-stage intrusion (establish C2, then deploy persistence on return visit)",
+          "Java 8 Update 181 + JDK installed in same session — potential staging for Java-based RAT or exploit framework",
+          "INFERRED rating for active C2 use: no network packet captures available to confirm ZeroTier traffic to attacker-controlled network ID"
+        ],
+        "content_preview": "7045 2022-02-06 07:15:35Z ZeroTier One service auto-start LocalSystem | 7045 07:22:40Z zttap300.sys",
+        "acquisition_tool": "python-evtx",
+        "acquisition_hash": "sha256:2d29ef7fa1b63b7297cb45860efd30b37a5613505f192b3044a3878bd9cb9bbe",
+        "acquisition_timestamp": "2026-06-28T10:05:13Z",
+        "write_blocker_used": true,
+        "examiner_id": "vigia_claude_code_mode2",
+        "confidence_rating": "INFERRED",
+        "inferred_reason": "No network captures available to confirm active ZeroTier C2 traffic",
+        "mitre_ttps": ["T1572", "T1543.003", "T1133"]
+      }
+    },
+    {
+      "artifact_id": "EVTX-SEC-002",
+      "evidence_type": "windows_event_log",
+      "source_tool": "python-evtx",
+      "timestamp": "2022-02-12T02:17:18Z",
+      "raw_score": 0.95,
+      "prior_trust": 0.95,
+      "provenance_chain": [
+        "sha256:b050682f7fe96938aca2fc19a96d24641173b4f31a4f3837119ea916663344c1"
+      ],
+      "acquisition_tool": "python-evtx",
+      "acquisition_hash": "sha256:b050682f7fe96938aca2fc19a96d24641173b4f31a4f3837119ea916663344c1",
+      "acquisition_timestamp": "2026-06-28T10:05:13Z",
+      "description": "EventID 4724 @ 2022-02-12 02:17:18Z: Password reset on built-in Administrator account (RID 500). SubjectUserSid=S-1-5-18 (LOCAL SYSTEM). Executed 47 minutes after 'minecraftsteve' was fully configured. SECURITY hive Policy\\Secrets LastWrite 2022-02-12 23:17:11Z consistent with credential operations this date.",
+      "metadata": {
+        "original_type": "windows_security_event_log",
+        "peirce_layer": "THIRDNESS",
+        "forensic_anomalies": [
+          "SubjectUserSid=S-1-5-18 for built-in Administrator password reset — same anomaly as EVTX-SEC-001, confirms consistent SYSTEM-shell execution throughout session",
+          "Timing: 47 minutes after 'minecraftsteve' account fully configured — attacker secured two independent credential persistence paths (backdoor account + Administrator builtin) before terminating session",
+          "RID 500 reset ensures attacker can still access the machine even if 'minecraftsteve' is detected and removed — defense-in-depth persistence strategy"
+        ],
+        "content_preview": "4724 2022-02-12 02:17:18Z Administrator RID 500 pwd reset SubjectUserSid=S-1-5-18",
+        "acquisition_tool": "python-evtx",
+        "acquisition_hash": "sha256:b050682f7fe96938aca2fc19a96d24641173b4f31a4f3837119ea916663344c1",
+        "acquisition_timestamp": "2026-06-28T10:05:13Z",
+        "write_blocker_used": true,
+        "examiner_id": "vigia_claude_code_mode2",
+        "corroborating_source": "rip_output/security.txt SHA-256:2eb2a3a00a57186faacd7a9a6c37fa70ae5a79a6892351d35c7c4689166c635a",
+        "mitre_ttps": ["T1098", "T1078.003"]
+      }
+    },
+    {
+      "artifact_id": "REG-SEC-001",
+      "evidence_type": "registry_key",
+      "source_tool": "RegRipper",
+      "timestamp": "2022-02-04T00:00:00Z",
+      "raw_score": 0.35,
+      "prior_trust": 0.35,
+      "provenance_chain": [
+        "sha256:2eb2a3a00a57186faacd7a9a6c37fa70ae5a79a6892351d35c7c4689166c635a"
+      ],
+      "acquisition_tool": "RegRipper",
+      "acquisition_hash": "sha256:2eb2a3a00a57186faacd7a9a6c37fa70ae5a79a6892351d35c7c4689166c635a",
+      "acquisition_timestamp": "2026-06-28T10:05:13Z",
+      "description": "SECURITY hive audit policy LastWrite 2022-02-04 (OS installation date). Process Creation auditing=N, Credential Validation auditing=N. Timestamp predates the intrusion window (2022-02-12) by 8 days. These are Windows OS installation defaults — no attacker modification demonstrated.",
+      "metadata": {
+        "original_type": "registry_key",
+        "peirce_layer": "FIRSTNESS",
+        "forensic_anomalies": [],
+        "investigation_note": "NOISE verdict. Audit gaps are a limitation of the available evidence, not a MALICE signal. The LastWrite date (2022-02-04) is the OS install date and predates the intrusion. No attacker action on the SECURITY hive is evidenced. Absence of process creation logs (4688) means the initial access method cannot be reconstructed from available artifacts.",
+        "content_preview": "SECURITY hive policy LastWrite 2022-02-04. Process Creation=N, Credential Validation=N",
+        "acquisition_tool": "RegRipper",
+        "acquisition_hash": "sha256:2eb2a3a00a57186faacd7a9a6c37fa70ae5a79a6892351d35c7c4689166c635a",
+        "acquisition_timestamp": "2026-06-28T10:05:13Z",
+        "write_blocker_used": true,
+        "examiner_id": "vigia_claude_code_mode2",
+        "confidence_rating": "REFUTED",
+        "refutation_reason": "LastWrite predates intrusion. OS installation default. No attacker modification."
+      }
+    }
+  ],
+  "temporal_violations": [
+    {
+      "description": "ZeroTier installation (2022-02-06) precedes RDP enable and account creation (2022-02-12) by 6 days — consistent with two-phase intrusion: initial access/C2 setup, then return for persistence deployment",
+      "artifact_ids": ["REG-SYS-001", "EVTX-SYS-001", "EVTX-SEC-001"],
+      "severity": "HIGH"
+    }
+  ],
+  "expected_verdict": "MALICE",
+  "expected_confidence": 0.90,
+  "expected_mitre_ttps": [
+    "T1136.001",
+    "T1078.003",
+    "T1098",
+    "T1021.001",
+    "T1543.003",
+    "T1572",
+    "T1133"
+  ],
+  "metadata": {
+    "converted_from": "claude_code_mcp_mode2_investigation",
+    "original_verdict": "MALICE",
+    "abstention_risk": "bajo",
+    "carnegie_pattern": "familiarity_transfer — account named 'minecraftsteve' to blend with gaming context household",
+    "key_discriminator": "SubjectUserSid=S-1-5-18 across all account lifecycle events — structural impossibility for interactive account creation",
+    "evidence_sources": ["Security.evtx", "System.evtx", "Application.evtx", "SAM hive", "SYSTEM hive", "SOFTWARE hive", "SECURITY hive"],
+    "known_limitations": [
+      "No network packet captures — ZeroTier C2 use INFERRED only",
+      "Process Creation auditing=N — initial access vector unknown",
+      "No prefetch, MFT, or browser history available"
+    ],
+    "case_origin": "Magnet Forensics CTF 2022",
+    "analyst": "VIGIA Claude Code Mode 2 (Anthropic API)"
+  }
+}

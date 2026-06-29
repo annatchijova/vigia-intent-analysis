@@ -972,7 +972,7 @@ def _build_orchestrator_kwargs(evidence_path: Path, params: Dict) -> Dict:
     if evidence_path.is_dir():
         # Evidence directory — search for known artifact types
         for pattern, key in [
-            ("*.evtx", "event_stream"),
+            ("*.evtx", "event_logs"),
             ("*.raw", "memory_path"),
             ("*.E01", "disk_path"),
             ("*.e01", "disk_path"),
@@ -1013,7 +1013,7 @@ def _build_orchestrator_kwargs(evidence_path: Path, params: Dict) -> Dict:
         elif suffix in (".e01", ".E01"):
             kwargs["disk_path"] = str(evidence_path)
         elif suffix == ".evtx":
-            kwargs["event_stream"] = [str(evidence_path)]
+            kwargs["event_logs"] = [str(evidence_path)]
         elif suffix in (".img", ".vmem", ".mem", ".dmp"):
             # Raw memory image — route to vol3 adapter
             kwargs["memory_path"] = str(evidence_path)
