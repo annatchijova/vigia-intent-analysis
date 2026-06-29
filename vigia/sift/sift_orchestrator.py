@@ -27,6 +27,7 @@ from vigia.inference.abductive_reasoner import AbductiveReasoner
 # SIFT motores originales
 from vigia.sift._math_utils import (
     apply_artifact_reliability,
+    apply_artifact_reliability_dynamic,
     build_redundancy_groups,
     process_all_groups,
 )
@@ -439,7 +440,7 @@ class SIFTOrchestrator:
             try:
                 art_type = sig.metadata.get("artifact_type", "unknown")
                 z_frac = Fraction(int(round(sig.z_score * 100)), 100)
-                z_adjusted = apply_artifact_reliability(z_frac, art_type)
+                z_adjusted = apply_artifact_reliability_dynamic(z_frac, art_type, metadata=sig.metadata)
                 new_sig = SignalOutput(
                     tool_name=sig.tool_name,
                     value=sig.value,

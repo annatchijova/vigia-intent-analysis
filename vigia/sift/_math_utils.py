@@ -270,6 +270,53 @@ def apply_artifact_reliability(
     return score * gamma
 
 
+def apply_artifact_reliability_dynamic(
+    score: Fraction,
+    artifact_type: str,
+    metadata: Optional[Dict] = None,
+    gamma_map: Optional[Dict[str, Fraction]] = None,
+) -> Fraction:
+    """
+    Gamma dinámico para windows_event_log.
+    Kimi design: corroboration = chain_factor × score_factor
+    gamma = base + (1 - base) × corroboration, capped at 0.95.
+    Para otros tipos, delega a apply_artifact_reliability.
+    """
+    if artifact_type != "windows_event_log" or metadata is None:
+        return apply_artifact_reliability(score, artifact_type, gamma_map)
+
+    n_chains = int(metadata.get("chains", 0))
+    composite_raw = metadata.get("composite_score", None)
+
+    # Si no hay metadata útil, caer a gamma fijo
+    if n_chains == 0 and composite_raw is None:
+        return apply_artifact_reliability(score, artifact_type, gamma_map)
+
+    # Convertir composite_score a Fraction si viene como string (e.g. "19/20")
+    if isinstance(composite_raw, str) and "/" in composite_raw:
+        num, den = composite_raw.split("/")
+        composite_frac = Fraction(int(num), int(den))
+    elif composite_raw is not None:
+        composite_frac = Fraction(int(round(float(composite_raw) * 20)), 20)
+    else:
+        composite_frac = Fraction(0)
+
+    threshold_n = Fraction(100, 1)
+    max_score = Fraction(20, 1)
+
+    chain_factor = min(Fraction(1, 1), Fraction(n_chains, 1) / threshold_n)
+    score_factor = min(Fraction(1, 1), composite_frac * max_score / max_score)
+
+    corroboration = chain_factor * score_factor
+    base_gamma = Fraction(3, 5)  # 0.60 — base conservadora
+    one = Fraction(1, 1)
+    gamma = base_gamma + (one - base_gamma) * corroboration
+
+    # Cap a 0.95 — event logs siempre tienen incertidumbre residual
+    gamma = min(Fraction(19, 20), gamma)
+    return score * gamma
+
+
 def build_redundancy_groups(
     signals: List[Any],
     entity_key_fn,

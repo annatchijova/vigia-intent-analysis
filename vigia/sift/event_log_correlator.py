@@ -125,6 +125,7 @@ class EventLogAnalysisResult:
                 "artifact_type": "event_log",
                 "finding_types": sorted(list(set(f.finding_type for f in self.findings) | set(c.get("chain_name", "") for c in self.chain_detections))),
                 "chains": len(self.chain_detections), "gaps": len(self.log_gaps),
+                "composite_score": str(self.composite_score),
             }
         )
 
