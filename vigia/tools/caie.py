@@ -248,6 +248,7 @@ EVIDENCE_PROFILES: Final[dict[str, EvidenceProfile]] = {
     "ip_geolocation":       EvidenceProfile(0.90, 0.15, "IP/VPN/proxy -- trivially spoofable"),
     "cultural_marker":      EvidenceProfile(0.90, 0.15, "Language, keyboard layout -- easy to fake"),
     "log_entry":            EvidenceProfile(0.85, 0.15, "Syslog/eventlog -- writable by admin"),
+    "windows_event_log":    EvidenceProfile(0.55, 0.25, "Windows EVTX -- binary format, record IDs, chunk checksums, tamper-evident"),
     "user_agent":           EvidenceProfile(0.85, 0.15, "HTTP User-Agent -- trivially spoofable"),
 
     # Moderately spoofable
@@ -362,6 +363,7 @@ _ACQ_ASSURANCE_TIERS: Final[dict] = {
 
 _ACQ_SPOOFABILITY_FLOORS: Final[dict] = {
     "log_entry":      Fraction(1, 4),
+    "windows_event_log": Fraction(1, 5),
     "file_timestamp": Fraction(1, 5),
     "registry_key":   Fraction(3, 20),
 }

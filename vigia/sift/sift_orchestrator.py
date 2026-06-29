@@ -286,7 +286,7 @@ class SIFTOrchestrator:
                     ev_result = self.eventlog.analyze(sorted(safe_logs), self.chain, timestamp_utc)
                     sig = self._to_signal_safe(ev_result, "eventlog")
                     if sig:
-                        sig.metadata["artifact_type"] = "event_log"
+                        sig.metadata["artifact_type"] = "windows_event_log"
                         raw_signals.append(sig)
                         results["eventlog"] = sig.metadata
                 except Exception as e:

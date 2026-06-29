@@ -256,6 +256,7 @@ def apply_artifact_reliability(
         "mft": Fraction(80, 100),
         "registry": Fraction(70, 100),
         "event_log": Fraction(60, 100),
+        "windows_event_log": Fraction(70, 100),
         "network": Fraction(75, 100),
         "prefetch": Fraction(70, 100),
         "browser": Fraction(65, 100),
@@ -401,6 +402,7 @@ def apply_conflict_penalty(
                         "mft": Fraction(80, 100),
                         "registry": Fraction(70, 100),
                         "event_log": Fraction(60, 100),
+                        "windows_event_log": Fraction(70, 100),
                         "network": Fraction(75, 100),
                     }
                     gamma = gamma_map.get(art_type, Fraction(1, 1))
