@@ -977,6 +977,11 @@ def _build_orchestrator_kwargs(evidence_path: Path, params: Dict) -> Dict:
             ("*.E01", "disk_path"),
             ("*.e01", "disk_path"),
             ("*.log", "log_path"),
+            ("SAM", "registry_hives"),
+            ("SYSTEM", "registry_hives"),
+            ("SOFTWARE", "registry_hives"),
+            ("SECURITY", "registry_hives"),
+            ("NTUSER.DAT", "registry_hives"),
         ]:
             # FIX P2-7: cap at 100 files per pattern and maxdepth 3 — prevents DoS
             matches = []

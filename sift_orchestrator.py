@@ -84,6 +84,9 @@ class SIFTOrchestrator:
                 run_kwargs["event_logs"] = lp if isinstance(lp, list) else [lp]
             if kwargs.get("network_flows"):
                 run_kwargs["network_flows"] = kwargs["network_flows"]
+            rh = kwargs.get("registry_hives")
+            if rh:
+                run_kwargs["registry_hives"] = rh if isinstance(rh, list) else [rh]
 
             # disk_path (E01) has no direct mapping — requires prior mounting
             # and artifact extraction (ewfmount + registry hive extraction)

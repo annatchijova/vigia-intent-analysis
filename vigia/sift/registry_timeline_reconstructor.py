@@ -346,7 +346,7 @@ class RegistryTimelineReconstructor:
             hive_type = path.name.upper().replace(".DAT", "").replace(".HVE", "")
         hive_sha256 = self._hash_file(path)
         if chain:
-            chain.acquire(path.read_bytes()[:4096], "REGISTRY_ANALYST", timestamp_utc, notes=f"Hive: {hive_sha256[:16]}")
+            chain.acquire(path.read_bytes()[:4096], "REGISTRY_ANALYST", timestamp_utc)
 
         all_persist, all_usb, all_ts, shellbags, userassist = [], [], [], [], []
         if hive_type in {"SYSTEM", "SOFTWARE", "NTUSER"}:
