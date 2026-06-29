@@ -729,6 +729,27 @@ class VIGIAAgent:
         else:
             alert = "LOW — No significant anomalies detected in this iteration."
 
+        # Signal-based hypothesis override (L-036 fix):
+        # When the orchestrator returns UNDETERMINED but signals show z>3,
+        # the abduction is upgraded deterministically — no LLM involved.
+        _hyp = abduction.get("best_hypothesis", "")
+        if _hyp in ("", "UNDETERMINED", "UNKNOWN", None):
+            if n_critical >= 2:
+                abduction["best_hypothesis"] = "MALICIOUS_INTENT_DETECTED"
+                abduction["is_conclusive"] = True
+                abduction["best_posterior"] = str(Fraction(n_critical, max(len(signals), 1)))
+                abduction["override_source"] = "signal_count_z>3"
+            elif n_critical >= 1:
+                abduction["best_hypothesis"] = "INTENT_DETECTED"
+                abduction["is_conclusive"] = True
+                abduction["best_posterior"] = str(Fraction(n_critical, max(len(signals), 1)))
+                abduction["override_source"] = "signal_count_z>3"
+            elif n_high >= 2:
+                abduction["best_hypothesis"] = "SUSPICION_DETECTED"
+                abduction["is_conclusive"] = False
+                abduction["best_posterior"] = str(Fraction(n_high, max(len(signals), 1)))
+                abduction["override_source"] = "signal_count_z>2"
+
         # Posterior verdict override: if the Bayesian posterior verdict is conclusive MALICE
         # but individual z-scores are all below threshold (distributed evidence pattern),
         # floor the alert level to prevent a misleading LOW alongside a MALICE verdict.
@@ -1139,7 +1160,7 @@ def _run_text_pipeline(evidence_path: Path, case_id: str, params: Dict) -> Dict[
                 }
             })
 
-        high_signals = [s for s in signals if s["z_score"] > Fraction(5, 1)]
+        high_signals = [s for s in signals if s.get("z_score", 0) > Fraction(2, 1)]  # FIX: z>5 was impossible (Z_CLIP_MAX=5.0); use z>2 (HIGH threshold)
         hypothesis = "MALICIOUS_INTENT_DETECTED" if high_signals else "NO_ANOMALY_DETECTED"
 
         return {
@@ -1306,6 +1327,7 @@ Max iterations: 3 (hard cap, prevents infinite loops).
     abduction = bundle.get("pipeline_results", {}).get("abduction", {})
     hypothesis = abduction.get("best_hypothesis", "UNDETERMINED")
     evil_found = "MALICIOUS" in hypothesis or "CRITICAL" in hypothesis or "OVERRIDE" in hypothesis
+    intent_found = "INTENT" in hypothesis or "SUSPICION" in hypothesis
 
     print("\n" + "=" * 60)
     print(f"VIGÍA AGENT — CASE {args.case_id}")
@@ -1325,9 +1347,10 @@ Max iterations: 3 (hard cap, prevents infinite loops).
     # Print narrative
     print("\n" + bundle.get("narrative", "[No narrative]"))
 
-    # Documented exit code — 0=no evil, 1=evil found, 2=error
-    exit_code = 1 if evil_found else 0
-    logger.info("[AGENT] Exit code: %d (%s)", exit_code, "EVIL FOUND" if evil_found else "NO EVIL DETECTED")
+    # Documented exit code — 0=no evil, 1=evil found, 2=error, 3=intent/suspicion
+    exit_code = 1 if evil_found else 3 if intent_found else 0
+    _exit_label = "EVIL FOUND" if evil_found else "INTENT/SUSPICION DETECTED" if intent_found else "NO EVIL DETECTED"
+    logger.info("[AGENT] Exit code: %d (%s)", exit_code, _exit_label)
     sys.exit(exit_code)
 
 
