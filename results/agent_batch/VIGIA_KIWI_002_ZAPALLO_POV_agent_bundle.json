@@ -1,0 +1,345 @@
+{
+  "analysis_timestamp": "2026-06-28T14:47:23.593015+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "VIGIA_KIWI_002_ZAPALLO_POV",
+    "end_time": "2026-06-28T14:47:23.593018+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "VIGIA_KIWI_002_ZAPALLO_POV",
+        "entry_sha256": "a6c4eded3ae408b441454c5dc6097359cac85ef8189129a519f9f074411f4a4d",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "VIGIA_KIWI_002_ZAPALLO_POV"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: 95f2da2a3bdcb4ca...",
+        "outputs_summary": {
+          "agent_sha256": "95f2da2a3bdcb4ca106059e2b06f58fd0ec414c887fec07ac7a0d5edfeb097a1",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-06-28T14:47:23.590254+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA_KIWI_002_ZAPALLO_POV",
+        "entry_sha256": "07109c0e35816cd47d7207de3dec6925d5301a1045325487fb6d374b2c6ef335",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA_KIWI_002_ZAPALLO_POV.json"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-06-28T14:47:23.590325+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA_KIWI_002_ZAPALLO_POV",
+        "entry_sha256": "b03f3bab92ad077a60af4762c85e3c6cc8c7525fedbc47cd775fe211bf6dd3a0",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA_KIWI_002_ZAPALLO_POV.json"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: 739f538ad85c01c7...",
+        "outputs_summary": {
+          "sha256": "739f538ad85c01c74768d200cbfe9c103702ab4c3eb99bb297d4a5e25eb56c51"
+        },
+        "seq": 3,
+        "timestamp": "2026-06-28T14:47:23.590408+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "VIGIA_KIWI_002_ZAPALLO_POV",
+        "entry_sha256": "e9085d608d18361c42fd29085115e755492c65be462325aaa49a01726c2c63e6",
+        "inputs_summary": {
+          "evidence": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA_KIWI_002_ZAPALLO_POV.json",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-06-28T14:47:23.590492+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "VIGIA_KIWI_002_ZAPALLO_POV",
+        "entry_sha256": "01b219992ca9981ecf559bdeb3eddc4114f30dd595f72392761299b420aba6b8",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 8 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "SUSPICION_DETECTED",
+            "best_posterior": "6/125",
+            "confidence": "6/125",
+            "is_conclusive": "False",
+            "narrative": "Input construido desde narrativa sesgada del denunciante. Test de detecci\u00f3n de apofenia sistem\u00e1tica y razonamiento circular."
+          },
+          "case_id": "VIGIA-KIWI-002-ZAPALLO-POV",
+          "pipeline_meta": {
+            "artifact_count": "8",
+            "avg_score": "6/25",
+            "expected_verdict": "SUSPICION",
+            "source": "ebs_v1_json_adapter"
+          },
+          "signals": [
+            {
+              "artifact_id": "KIWI-002-A01",
+              "confidence": "3/10",
+              "description": "Claim: capacidad t\u00e9cnica (Ekoparty) implica hostigamiento activo.",
+              "evidence_type": "cultural_marker",
+              "source": "manual_forensic_review",
+              "z_score": "6/25"
+            },
+            {
+              "artifact_id": "KIWI-002-A02",
+              "confidence": "3/10",
+              "description": "Claim: canciones son declaraciones de amor dirigidas al denunciante.",
+              "evidence_type": "cultural_marker",
+              "source": "manual_forensic_review",
+              "z_score": "6/25"
+            },
+            {
+              "artifact_id": "KIWI-002-A03",
+              "confidence": "3/10",
+              "description": "Claim: 5 cartas documento enviadas a Clar\u00edn. Verificaci\u00f3n: ning\u00fan registro en expediente.",
+              "evidence_type": "document_visual",
+              "source": "manual_forensic_review",
+              "z_score": "6/25"
+            },
+            {
+              "artifact_id": "KIWI-002-A04",
+              "confidence": "3/10",
+              "description": "Claim: acceso inferido a armas por convivencia con padre. Sin CLU propio verificado.",
+              "evidence_type": "cultural_marker",
+              "source": "manual_forensic_review",
+              "z_score": "6/25"
+            },
+            {
+              "artifact_id": "KIWI-002-A05",
+              "confidence": "3/10",
+              "description": "Claim: deudas econ\u00f3micas como indicador de perfil de riesgo.",
+              "evidence_type": "document_visual",
+              "source": "manual_forensic_review",
+              "z_score": "6/25"
+            }
+          ]
+        },
+        "seq": 5,
+        "timestamp": "2026-06-28T14:47:23.592733+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "VIGIA_KIWI_002_ZAPALLO_POV",
+        "entry_sha256": "ff2e1e39f6545a7daf96cb4d36eea89b4f6fd28b5a3b6bf6163400d8985300b4",
+        "inputs_summary": {
+          "n_signals": "8"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-06-28T14:47:23.592841+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "VIGIA_KIWI_002_ZAPALLO_POV",
+        "entry_sha256": "126de2c2591b00ab7a661b9a1134dc1e75307df7c2fe6c5de1c27e1070ba2e8a",
+        "inputs_summary": {
+          "verdict": "SUSPICION_DETECTED"
+        },
+        "iteration": 0,
+        "note": "Exit code 0 \u2014 analysis complete.",
+        "outputs_summary": {
+          "exit_code": "0"
+        },
+        "seq": 7,
+        "timestamp": "2026-06-28T14:47:23.592932+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-06-28T14:47:23.590054+00:00",
+    "total_entries": 7
+  },
+  "case_id": "VIGIA_KIWI_002_ZAPALLO_POV",
+  "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA_KIWI_002_ZAPALLO_POV.json",
+  "evidence_sha256": "739f538ad85c01c74768d200cbfe9c103702ab4c3eb99bb297d4a5e25eb56c51",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA_KIWI_002_ZAPALLO_POV ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/VIGIA_KIWI_002_ZAPALLO_POV.json\nEvidence SHA-256: 739f538ad85c01c74768d200cbfe9c103702ab4c3eb99bb297d4a5e25eb56c51\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: SUSPICION_DETECTED\nPosterior confidence: 6/125\nConclusive: NO \u2014 requires human review\n\n--- PEIRCEAN NARRATIVE ---\nInput construido desde narrativa sesgada del denunciante. Test de detecci\u00f3n de apofenia sistem\u00e1tica y razonamiento circular.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Claim: capacidad t\u00e9cnica (Ekoparty) implica hostigamiento activo.] z=0.240 conf=0.30 \u2014 \n  [Claim: canciones son declaraciones de amor dirigidas al denunciante.] z=0.240 conf=0.30 \u2014 \n  [Claim: 5 cartas documento enviadas a Clar\u00edn. Verificaci\u00f3n: ning\u00fan regi] z=0.240 conf=0.30 \u2014 \n  [Claim: acceso inferido a armas por convivencia con padre. Sin CLU prop] z=0.240 conf=0.30 \u2014 \n  [Claim: deudas econ\u00f3micas como indicador de perfil de riesgo.] z=0.240 conf=0.30 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW \u2014 No significant anomalies detected in this iteration.\n\nCritical signals (z>3): 0\nHigh signals (2<z<=3): 0\nTotal signals analyzed: 8",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "SUSPICION_DETECTED",
+      "best_posterior": "6/125",
+      "confidence": {
+        "__fraction__": true,
+        "den": 125,
+        "num": 6
+      },
+      "is_conclusive": false,
+      "narrative": "Input construido desde narrativa sesgada del denunciante. Test de detecci\u00f3n de apofenia sistem\u00e1tica y razonamiento circular."
+    },
+    "case_id": "VIGIA-KIWI-002-ZAPALLO-POV",
+    "pipeline_meta": {
+      "artifact_count": 8,
+      "avg_score": "6/25",
+      "expected_verdict": "SUSPICION",
+      "source": "ebs_v1_json_adapter"
+    },
+    "signals": [
+      {
+        "artifact_id": "KIWI-002-A01",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 3
+        },
+        "description": "Claim: capacidad t\u00e9cnica (Ekoparty) implica hostigamiento activo.",
+        "evidence_type": "cultural_marker",
+        "source": "manual_forensic_review",
+        "z_score": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 6
+        }
+      },
+      {
+        "artifact_id": "KIWI-002-A02",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 3
+        },
+        "description": "Claim: canciones son declaraciones de amor dirigidas al denunciante.",
+        "evidence_type": "cultural_marker",
+        "source": "manual_forensic_review",
+        "z_score": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 6
+        }
+      },
+      {
+        "artifact_id": "KIWI-002-A03",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 3
+        },
+        "description": "Claim: 5 cartas documento enviadas a Clar\u00edn. Verificaci\u00f3n: ning\u00fan registro en expediente.",
+        "evidence_type": "document_visual",
+        "source": "manual_forensic_review",
+        "z_score": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 6
+        }
+      },
+      {
+        "artifact_id": "KIWI-002-A04",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 3
+        },
+        "description": "Claim: acceso inferido a armas por convivencia con padre. Sin CLU propio verificado.",
+        "evidence_type": "cultural_marker",
+        "source": "manual_forensic_review",
+        "z_score": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 6
+        }
+      },
+      {
+        "artifact_id": "KIWI-002-A05",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 3
+        },
+        "description": "Claim: deudas econ\u00f3micas como indicador de perfil de riesgo.",
+        "evidence_type": "document_visual",
+        "source": "manual_forensic_review",
+        "z_score": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 6
+        }
+      },
+      {
+        "artifact_id": "KIWI-002-A06",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 3
+        },
+        "description": "Claim: coordinaci\u00f3n con Interpol contra denunciante. Sin sustento verificable.",
+        "evidence_type": "log_entry",
+        "source": "manual_forensic_review",
+        "z_score": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 6
+        }
+      },
+      {
+        "artifact_id": "KIWI-002-A07",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 3
+        },
+        "description": "Claim: planea da\u00f1ar familia del denunciante. Basado en interpretaci\u00f3n de canciones y fotos.",
+        "evidence_type": "cultural_marker",
+        "source": "manual_forensic_review",
+        "z_score": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 6
+        }
+      },
+      {
+        "artifact_id": "KIWI-002-A08",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 3
+        },
+        "description": "Claim: tratamiento psiqui\u00e1trico causado por hostigamiento. Historial previo documentado.",
+        "evidence_type": "document_visual",
+        "source": "manual_forensic_review",
+        "z_score": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 6
+        }
+      }
+    ]
+  },
+  "sans_compliance": {
+    "accuracy_validation": false,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}

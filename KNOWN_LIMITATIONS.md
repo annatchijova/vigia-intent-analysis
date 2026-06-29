@@ -1271,3 +1271,37 @@ before checking field presence.
 vs. canonical EBS v1 schema).
 
 ---
+
+## L-032 — False Negative: Agent Fallback on Raw Windows Disk Evidence (E01)
+
+**Status:** [FIX DESIGNED] 2026-06-29, POST HACKATHON
+**Severity:** P1
+**Mode affected:** Autonomous agent fallback (`vigia_agent.py`) — raw Windows disk evidence
+**Discovered:** 2026-06-29 | Case: `VIGIA-MAGNET-2022-WINDOWS`
+
+**Description:**
+
+The autonomous agent produces `UNDETERMINED` on raw Windows disk evidence when artifacts
+are extracted manually and passed as a directory. Root cause:
+`_build_orchestrator_kwargs()` maps `*.evtx` files to the `event_stream` parameter, but
+`SIFTOrchestrator.analyze()` routes `event_stream` to `MetabolicProfiler`, not to
+`EventLogCorrelator`. The correct parameter is `event_logs`.
+
+As a result, `EventLogCorrelator` receives no input and produces `z=0`, while the
+actual composite score from direct invocation is **19/20** (343 PASS_THE_HASH chains,
+6 BRUTE_FORCE_SUCCESS, Event 25 ProcessTampering).
+
+**Claude Code / MCP mode result on the same artifacts:** `MALICE` — correctly identified
+via direct EVTX parsing. Two independent confirmed chains: account backdoor + RDP
+pre-staging, `SubjectUserSid=S-1-5-18` throughout.
+
+**Forensic implication:** Agent fallback is not reliable for raw Windows disk evidence.
+Use Claude Code / MCP mode for E01 investigations until B-032 is resolved.
+
+**Fix designed:** Change `event_stream` to `event_logs` in `_build_orchestrator_kwargs()`
+for `.evtx` files. Tracked as **B-032**.
+
+**Workaround:** Use Claude Code / MCP mode (Mode 2) for raw Windows disk evidence.
+Domain C accuracy figures for raw E01 are not reliable until B-032 is deployed.
+
+---

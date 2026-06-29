@@ -1,0 +1,225 @@
+{
+  "analysis_timestamp": "2026-06-28T14:47:22.682974+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "VIGIA-REAL-M57-JO-Dec07",
+    "end_time": "2026-06-28T14:47:22.682977+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "VIGIA-REAL-M57-JO-Dec07",
+        "entry_sha256": "50db5172747d7d67423a732b6a550bd77892f72d2a782b5f360639b03d28ca82",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "VIGIA-REAL-M57-JO-Dec07"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: 95f2da2a3bdcb4ca...",
+        "outputs_summary": {
+          "agent_sha256": "95f2da2a3bdcb4ca106059e2b06f58fd0ec414c887fec07ac7a0d5edfeb097a1",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-06-28T14:47:22.680405+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-REAL-M57-JO-Dec07",
+        "entry_sha256": "c1d75607038f943413f801916a9956f59e4ec379f71f60577a97705bc2508bf0",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-REAL-M57-JO-Dec07.json"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-06-28T14:47:22.680475+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-REAL-M57-JO-Dec07",
+        "entry_sha256": "3ec916790bf1abe5c92822445376e1124ea5173961e5d5dc8abeda71c74dbd6c",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-REAL-M57-JO-Dec07.json"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: a809195ea2c4f5ee...",
+        "outputs_summary": {
+          "sha256": "a809195ea2c4f5eec5a4eccdb9b14ee8c9626c98164ab3f160b1c37931fd8619"
+        },
+        "seq": 3,
+        "timestamp": "2026-06-28T14:47:22.680544+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "VIGIA-REAL-M57-JO-Dec07",
+        "entry_sha256": "23c339ae04b52e8f414437a77a7f23c17c4dd30a6ab5352c6e64012a7e3b6d59",
+        "inputs_summary": {
+          "evidence": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-REAL-M57-JO-Dec07.json",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-06-28T14:47:22.680628+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "VIGIA-REAL-M57-JO-Dec07",
+        "entry_sha256": "cf285b093cbeaa8de43e3e66c388e26bda1329f3284f48e2c8545f939cdc1b58",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 2 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "SUSPICION_DETECTED",
+            "best_posterior": "263/4000",
+            "confidence": "263/4000",
+            "is_conclusive": "False",
+            "narrative": "M57-Patents scenario. Jo (CEO, expected benign). Dec-07: python.exe spawned from cmd.exe at 16:54:31Z. Unusual for CEO role in 2009 Windows XP environment. Requires investigation."
+          },
+          "case_id": "VIGIA-REAL-M57-JO-Dec07",
+          "pipeline_meta": {
+            "artifact_count": "2",
+            "avg_score": "263/800",
+            "expected_verdict": "SUSPICION",
+            "source": "ebs_v1_json_adapter"
+          },
+          "signals": [
+            {
+              "artifact_id": "M57-JO-D07-A01",
+              "confidence": "3/4",
+              "description": "pslist: cmd.exe PID 2748 spawned python.exe PID 900 at 2009-12-07T16:54:31Z. Python execution from command line unusual for CEO role in 2009 corporate Windows XP environment. Could indicate investigat",
+              "evidence_type": "memory_process",
+              "source": "vol3_windows_pslist",
+              "z_score": "39/80"
+            },
+            {
+              "artifact_id": "M57-JO-D07-A02",
+              "confidence": "17/20",
+              "description": "pslist: msimn.exe PID 3464 (Outlook Express) and firefox.exe PID 3760 active simultaneously at 16:53Z. Normal executive activity pattern \u2014 email + browser. No suspicious child processes from these.",
+              "evidence_type": "kernel_structure",
+              "source": "vol3_windows_pslist",
+              "z_score": "17/100"
+            }
+          ]
+        },
+        "seq": 5,
+        "timestamp": "2026-06-28T14:47:22.682357+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "VIGIA-REAL-M57-JO-Dec07",
+        "entry_sha256": "0466ec72e2b3060bf1d2ced86b77403c2cf85d75cae98207798441776bac9f0a",
+        "inputs_summary": {
+          "n_signals": "2"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-06-28T14:47:22.682815+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "VIGIA-REAL-M57-JO-Dec07",
+        "entry_sha256": "76c74038bef4ae6c52d3ef8897e224edf923d1808eedb9f2273de2a0bdffff07",
+        "inputs_summary": {
+          "verdict": "SUSPICION_DETECTED"
+        },
+        "iteration": 0,
+        "note": "Exit code 0 \u2014 analysis complete.",
+        "outputs_summary": {
+          "exit_code": "0"
+        },
+        "seq": 7,
+        "timestamp": "2026-06-28T14:47:22.682910+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-06-28T14:47:22.680209+00:00",
+    "total_entries": 7
+  },
+  "case_id": "VIGIA-REAL-M57-JO-Dec07",
+  "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-REAL-M57-JO-Dec07.json",
+  "evidence_sha256": "a809195ea2c4f5eec5a4eccdb9b14ee8c9626c98164ab3f160b1c37931fd8619",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-REAL-M57-JO-Dec07 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/VIGIA-REAL-M57-JO-Dec07.json\nEvidence SHA-256: a809195ea2c4f5eec5a4eccdb9b14ee8c9626c98164ab3f160b1c37931fd8619\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: SUSPICION_DETECTED\nPosterior confidence: 263/4000\nConclusive: NO \u2014 requires human review\n\n--- PEIRCEAN NARRATIVE ---\nM57-Patents scenario. Jo (CEO, expected benign). Dec-07: python.exe spawned from cmd.exe at 16:54:31Z. Unusual for CEO role in 2009 Windows XP environment. Requires investigation.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [pslist: cmd.exe PID 2748 spawned python.exe PID 900 at 2009-12-07T16:5] z=0.487 conf=0.75 \u2014 \n  [pslist: msimn.exe PID 3464 (Outlook Express) and firefox.exe PID 3760 ] z=0.170 conf=0.85 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW \u2014 No significant anomalies detected in this iteration.\n\nCritical signals (z>3): 0\nHigh signals (2<z<=3): 0\nTotal signals analyzed: 2",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "SUSPICION_DETECTED",
+      "best_posterior": "263/4000",
+      "confidence": {
+        "__fraction__": true,
+        "den": 4000,
+        "num": 263
+      },
+      "is_conclusive": false,
+      "narrative": "M57-Patents scenario. Jo (CEO, expected benign). Dec-07: python.exe spawned from cmd.exe at 16:54:31Z. Unusual for CEO role in 2009 Windows XP environment. Requires investigation."
+    },
+    "case_id": "VIGIA-REAL-M57-JO-Dec07",
+    "pipeline_meta": {
+      "artifact_count": 2,
+      "avg_score": "263/800",
+      "expected_verdict": "SUSPICION",
+      "source": "ebs_v1_json_adapter"
+    },
+    "signals": [
+      {
+        "artifact_id": "M57-JO-D07-A01",
+        "confidence": {
+          "__fraction__": true,
+          "den": 4,
+          "num": 3
+        },
+        "description": "pslist: cmd.exe PID 2748 spawned python.exe PID 900 at 2009-12-07T16:54:31Z. Python execution from command line unusual for CEO role in 2009 corporate Windows XP environment. Could indicate investigat",
+        "evidence_type": "memory_process",
+        "source": "vol3_windows_pslist",
+        "z_score": {
+          "__fraction__": true,
+          "den": 80,
+          "num": 39
+        }
+      },
+      {
+        "artifact_id": "M57-JO-D07-A02",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 17
+        },
+        "description": "pslist: msimn.exe PID 3464 (Outlook Express) and firefox.exe PID 3760 active simultaneously at 16:53Z. Normal executive activity pattern \u2014 email + browser. No suspicious child processes from these.",
+        "evidence_type": "kernel_structure",
+        "source": "vol3_windows_pslist",
+        "z_score": {
+          "__fraction__": true,
+          "den": 100,
+          "num": 17
+        }
+      }
+    ]
+  },
+  "sans_compliance": {
+    "accuracy_validation": false,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}

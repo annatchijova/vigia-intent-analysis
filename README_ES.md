@@ -671,6 +671,33 @@ Estos números no están inflados. Reflejan resultados en un corpus específico,
 
 ---
 
+## ⚠ NOTA DE PRECISIÓN — TRES DOMINIOS DE EVALUACIÓN
+
+> **La cantidad de casos puede estar desactualizada.** Estamos agregando casos
+> activamente, especialmente investigaciones sobre evidencia raw (E01/evtx). Las
+> cifras mostradas reflejan el corpus al momento de la última actualización y pueden
+> subestimar la cobertura actual.
+
+**VIGÍA opera en tres modos distintos con perfiles de precisión diferentes:**
+
+**Dominio A — Claude Code / MCP (evidencia forense raw):** Pipeline completo. Probado
+en imágenes de disco E01 reales, volcados de memoria y archivos de logs. Este es el
+modo de investigación principal. **Las cifras de precisión en este README reflejan el
+Dominio A.**
+
+**Dominio B — Agente autónomo, casos pre-procesados en JSON:** Runner batch sobre
+bundles de casos estructurados. Tasa de éxito: 165/167 en el corpus canónico.
+
+**Dominio C — Agente autónomo, evidencia raw (E01/evtx):** Falso negativo conocido en
+evidencia de disco Windows por **B-032** (bug de routing `event_logs`). No confiable
+para E01 Windows hasta que se resuelva. Ver [L-032](./KNOWN_LIMITATIONS.md).
+
+> El porcentaje de precisión mostrado a continuación aplica **solo al Dominio B**.
+> Los resultados del Dominio A están documentados por caso en `evidence/` y `results/`.
+> El Dominio C está afectado por L-032 para evidencia de disco Windows.
+
+---
+
 VIGÍA separa la evaluación en tres dominios distintos. Solo el Dominio A
 constituye la métrica de precisión del sistema.
 
