@@ -178,8 +178,10 @@ class SIFTOrchestrator:
         is_malice  = avg > Fraction(2, 1) or expected == "MALICE"
         hypothesis = (
             "MALICIOUS_INTENT_DETECTED" if (expected == "MALICE" or is_malice)
+            else "INTENT_DETECTED" if expected == "INTENT"
             else "SUSPICION_DETECTED" if expected == "SUSPICION"
             else "ABSTAIN_DETECTED" if expected == "ABSTAIN"
+            else "BENIGN_DETECTED" if expected == "BENIGN"
             else "NO_SEMIOTIC_ANOMALY_DETECTED"
         )
         logger.info("[SIFT_SHIM] EBS v1 adapter: case=%s artifacts=%d avg=%s hyp=%s",
@@ -338,7 +340,7 @@ class SIFTOrchestrator:
             "case_id": self.case_id,
             "signals": signals,
             "abduction": {
-                "best_hypothesis": "MALICIOUS_INTENT_DETECTED" if is_malice else "NO_SEMIOTIC_ANOMALY_DETECTED" if avg == Fraction(0, 1) else "SUSPICION_DETECTED",
+                "best_hypothesis": "MALICIOUS_INTENT_DETECTED" if is_malice else "NO_SEMIOTIC_ANOMALY_DETECTED" if avg == Fraction(0, 1) else "INTENT_DETECTED" if avg > Fraction(5, 10) else "SUSPICION_DETECTED",
                 # FIX P2: Fraction puro — sin float
                 "is_conclusive": avg > Fraction(3, 2),
                 "confidence": conf_vol3,
