@@ -471,7 +471,7 @@ python3 vigia_agent.py --evidence /cases/evidence.json --case-id TEST-001
 python3 vigia_agent.py --evidence /evidence/ --case-id CASE-001 --output bundle.json
 ```
 
-Exit codes: `0` = no evil detected, `1` = evil found, `2` = error.
+Exit codes: `0` = no evil detected, `1` = evil found (MALICE), `2` = error, `3` = intent/suspicion detected.
 A `.sha256` sidecar is written alongside every bundle for `sha256sum -c` verification.
 
 ### Under the hood: vigia_agent.py and SIFTOrchestrator
@@ -709,13 +709,13 @@ investigative mode. **Accuracy figures in this README reflect Domain A.**
 **Domain B — Autonomous agent, JSON pre-processed cases:** Batch runner over structured
 case bundles. 165/167 pass rate on canonical corpus.
 
-**Domain C — Autonomous agent, raw evidence (E01/evtx):** Known false negative on Windows
-disk evidence due to **B-032** (`event_logs` routing bug). Not reliable for raw E01 until
-fixed. See [L-032](./KNOWN_LIMITATIONS.md).
+**Domain C — Autonomous agent, raw evidence (E01/evtx):** The agent now correctly
+produces INTENT/SUSPICION (exit code 3) for Windows disk evidence in RAW mode.
+B-032 (`event_logs` routing bug) and B-036 (`z>5.0` impossible threshold) have been
+resolved. See [L-036](./KNOWN_LIMITATIONS.md) for the signal-based hypothesis override.
 
 > The accuracy percentage shown below applies to **Domain B only**. Domain A results are
-> documented per-case in `evidence/` and `results/`. Domain C is affected by L-032 for
-> Windows disk evidence.
+> documented per-case in `evidence/` and `results/`.
 
 ---
 

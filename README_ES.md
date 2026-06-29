@@ -453,7 +453,7 @@ python3 vigia_agent.py --evidence /cases/evidence.json --case-id TEST-001
 python3 vigia_agent.py --evidence /evidence/ --case-id CASE-001 --output bundle.json
 ```
 
-Códigos de salida: `0` = no se detectó evil, `1` = evil encontrado, `2` = error.
+Códigos de salida: `0` = no se detectó evil, `1` = evil encontrado (MALICE), `2` = error, `3` = intent/suspicion detectado.
 Se escribe un sidecar `.sha256` junto a cada bundle para verificación con `sha256sum -c`.
 
 ### Detrás de escena: vigia_agent.py y SIFTOrchestrator
@@ -688,13 +688,14 @@ Dominio A.**
 **Dominio B — Agente autónomo, casos pre-procesados en JSON:** Runner batch sobre
 bundles de casos estructurados. Tasa de éxito: 165/167 en el corpus canónico.
 
-**Dominio C — Agente autónomo, evidencia raw (E01/evtx):** Falso negativo conocido en
-evidencia de disco Windows por **B-032** (bug de routing `event_logs`). No confiable
-para E01 Windows hasta que se resuelva. Ver [L-032](./KNOWN_LIMITATIONS.md).
+**Dominio C — Agente autónomo, evidencia raw (E01/evtx):** El agente ahora produce
+correctamente INTENT/SUSPICION (exit code 3) para evidencia de disco Windows en modo
+RAW. B-032 (bug de routing `event_logs`) y B-036 (threshold `z>5.0` imposible) han
+sido resueltos. Ver [L-036](./KNOWN_LIMITATIONS.md) para el override de hipótesis
+basado en señales.
 
 > El porcentaje de precisión mostrado a continuación aplica **solo al Dominio B**.
 > Los resultados del Dominio A están documentados por caso en `evidence/` y `results/`.
-> El Dominio C está afectado por L-032 para evidencia de disco Windows.
 
 ---
 
