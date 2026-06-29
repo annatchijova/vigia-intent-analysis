@@ -820,6 +820,12 @@ Reproduce: `python3 run_all_agent.py --timeout 90`
 | — | Gate G1 accepting legacy hashes | caie.py | **RESOLVED** |
 | — | Uniform prior_trust=0.7 in converter | convert_legacy_cases.py | **RESOLVED** |
 | — | Ali Hadi encryption FP (VIGIA-REAL-005) | VIGIA-REAL-005 | **RESOLVED** |
+| L-033b | Fixed gamma for windows_event_log | Scoring pipeline | **RESOLVED** |
+| L-034 | Multi-source corroboration sub-threshold aggregation | MAGNET-2022/2020-WINDOWS | Documented |
+| L-035 | event_log mapped to log_entry in forensic_adapter | forensic_adapter.py | **RESOLVED** |
+| L-036 | Pipeline RAW hypothesis override for UNDETERMINED | vigia_agent.py RAW path | **RESOLVED** |
+| L-037 | ARTIFACT_RELIABILITY not propagated to CAIE | iOS/Android forensics | PENDING |
+| L-038 | Dynamic gamma for windows_event_log | Scoring pipeline | IMPLEMENTED |
 
 ---
 
@@ -1350,5 +1356,163 @@ ground truth.
 aggregate (composite_score ≥ 18/20, n_events ≥ 50), document the gamma suppression
 explicitly in the report's Known Limitations section and note the pre-discount z-score
 alongside the post-discount value.
+
+---
+
+## L-033b — Fixed gamma for windows_event_log [RESOLVED]
+
+**Status:** RESOLVED — commit fix B-035
+**Severity:** P1
+**Mode affected:** All modes — scoring pipeline
+**Discovered:** 2026-06-29
+
+**Description:**
+
+Event log gamma was 0.60 for all `event_log` types including Windows EVTX. This
+treated Windows Event Logs (binary format with checksums, structurally harder to
+tamper) identically to generic syslog entries (plaintext, trivially editable).
+
+**Fix applied:**
+
+Added `windows_event_log` type with `gamma=0.70` and a separate CAIE profile:
+- `spoofability=0.55` (down from 0.85 for generic `log_entry`)
+- `base_weight=0.25`
+
+This reflects the structural integrity difference between binary EVTX (checksummed,
+requires specialized tools to modify) and plaintext syslog (editable with any text
+editor).
+
+**See also:** L-033 (the broader gamma calibration design question remains open for
+non-Windows event log types).
+
+---
+
+## L-034 — Multi-source corroboration does not compensate for sub-threshold individual signals
+
+**Status:** Documented — fix requires aggregation layer redesign
+**Severity:** P2
+**Mode affected:** All modes — scoring pipeline
+**Discovered:** 2026-06-29
+
+**Description:**
+
+Two signals at `z=1.96` and `z=2.24` do not combine to produce a MALICE verdict.
+The scorer requires at least one signal above the threshold independently. There
+is no aggregation mechanism that allows multiple sub-threshold signals to combine
+into a supra-threshold composite.
+
+**Cases affected:** `VIGIA-MAGNET-2022-WINDOWS`, `VIGIA-MAGNET-2020-WINDOWS`
+
+**Forensic implication:** Cases where all individual signals are below the MALICE
+threshold but multiple independent signals point to the same conclusion will cap
+at SUSPICION or INTENT. This is conservative by design (prevents noise accumulation
+from producing false MALICE) but creates false negative risk when multiple
+well-evidenced chains each fall just below the threshold.
+
+**Fix path:** Requires aggregation layer redesign — a mechanism to detect
+directional coherence across sub-threshold signals without collapsing the
+independence assumption that protects against noise accumulation.
+
+---
+
+## L-035 — event_log type mapped to log_entry profile in forensic_adapter [RESOLVED]
+
+**Status:** RESOLVED — commit fix B-035
+**Severity:** P1
+**Mode affected:** All modes — forensic_adapter.py CAIE profile mapping
+**Discovered:** 2026-06-29
+
+**Description:**
+
+`forensic_adapter.py` mapped `event_log` to `log_entry` (syslog generic profile,
+`spoofability=0.85`). Windows EVTX is a binary format with internal checksums —
+structurally much harder to tamper than plaintext syslog. The generic mapping
+applied an inappropriate spoofability penalty that suppressed event log signal
+contributions in the CAIE pipeline.
+
+**Fix applied:**
+
+Added `windows_event_log` to:
+- `forensic_adapter.py` mapping (event_log → windows_event_log for Windows evidence)
+- CAIE profiles (`spoofability=0.55`, `base_weight=0.25`)
+- Gamma tables in `_math_utils.py` (`gamma=0.70`)
+
+---
+
+## L-036 — Pipeline RAW hypothesis override for UNDETERMINED results [RESOLVED]
+
+**Status:** RESOLVED — commit fix L-036
+**Severity:** P1
+**Mode affected:** Agent fallback — `vigia_agent.py` RAW evidence path
+**Discovered:** 2026-06-29
+
+**Description:**
+
+When `SIFTOrchestrator` returns `UNDETERMINED` but signals show `z>3`, the agent
+now upgrades the hypothesis deterministically based on signal criticality:
+
+| Condition | Hypothesis |
+|-----------|------------|
+| `n_critical >= 2` | `MALICIOUS_INTENT_DETECTED` |
+| `n_critical >= 1` | `INTENT_DETECTED` |
+| `n_high >= 2` | `SUSPICION_DETECTED` |
+
+Exit code 3 was added for INTENT/SUSPICION (previously only `0`=clean, `1`=malice,
+`2`=error).
+
+**Root cause:** The original z-score threshold for hypothesis override was `z>5.0`,
+which was impossible because `Z_CLIP_MAX=5.0` (signals are clipped to this maximum).
+Fixed to `z>2.0`.
+
+---
+
+## L-037 — ARTIFACT_RELIABILITY not propagated to CAIE [PENDING]
+
+**Status:** PENDING — documented, awaiting implementation
+**Severity:** P2
+**Mode affected:** iOS and Android forensics modules
+**Discovered:** 2026-06-29
+
+**Description:**
+
+`ios_forensics.py` and `android_forensics.py` define
+`ARTIFACT_RELIABILITY=Fraction(70,100)`. The value is included in signal metadata
+but `forensic_adapter.py` sets `base_trust=1.0` fixed, ignoring the reliability
+discount from the signal metadata.
+
+**Impact:** CAIE does not apply the iOS/Android reliability discount. Signals from
+these platforms are treated with the same base trust as fully verified desktop
+forensic artifacts, which may overstate confidence in mobile evidence.
+
+**Fix path:** `forensic_adapter` should read `artifact_reliability` from signal
+metadata and apply it as a trust modifier. This is a straightforward integration
+change but requires validation against the mobile forensics corpus.
+
+---
+
+## L-038 — Dynamic gamma for windows_event_log [IMPLEMENTED]
+
+**Status:** IMPLEMENTED — Kimi design
+**Severity:** P2
+**Mode affected:** All modes — scoring pipeline
+**Discovered:** 2026-06-29
+
+**Description:**
+
+Dynamic gamma formula for `windows_event_log`:
+
+```
+gamma = base + (1-base) * corroboration
+```
+
+where `corroboration = chain_factor * score_factor`.
+
+Implemented as `apply_artifact_reliability_dynamic()` in
+`vigia/sift/_math_utils.py`. Requires `composite_score` in event_log signal
+metadata.
+
+**Result:** EVENT_LOG z-score raised from `1.920` to `2.240–3.040` depending
+on chain count, reflecting the corroborative strength of multiple independent
+event chains.
 
 ---
