@@ -1,0 +1,208 @@
+{
+  "case_id": "VIGIA-MAGNET-2022-iOS-JESS",
+  "name": "Magnet CTF 2022 iOS Jess -- Patrick Bentley OPSEC Profile and Hacking Awareness",
+  "description": "iPhone 8 (iOS 15.0.2) belonging to Patrick Bentley (pbentley0107@gmail.com, +1-973-294-1683), Champlain College student in Burlington VT. GrayKey extraction 2022-02-14. Device exhibits deliberate operational security posture: three encrypted messaging apps (Signal, Wire, WeChat) installed within 10 minutes, empty contacts and call history despite 24+ days of use, iCloud backup never enabled, Total Wireless prepaid carrier, BFU lock state at seizure. Safari history reveals IP reconnaissance (whatsmyip.com) and extensive late-night hacking remediation searches 72 hours before seizure. Suspicious phishing-style iMessage received 2 days before the hacking searches. Case name references Jess but device belongs to Patrick Bentley -- identity relationship unresolved.",
+  "artifacts": [
+    {
+      "artifact_id": "iOS-JESS-001",
+      "evidence_type": "log_entry",
+      "source_tool": "read_evidence",
+      "timestamp": "2022-01-21T22:02:00Z",
+      "raw_score": 0.75,
+      "prior_trust": 0.95,
+      "provenance_chain": ["sha256:ff0db8cd26236dc59ccf7f40637ad8bdcccd9b6f8ef975bd5f5c02325e1f1be0"],
+      "acquisition_tool": "graykey_2.2.2-demo",
+      "acquisition_hash": "sha256:a6d180aff36c9b37ec9a3819f3d98af46efc9c47b36a8a7b58cde791049b38c2",
+      "acquisition_timestamp": "2022-02-14T18:36:27Z",
+      "description": "Three encrypted messaging apps installed within 10 minutes: Signal (22:02), Wire (22:06), WeChat (22:07) on 2022-01-21. Combined with empty contacts database, empty call history, iCloud backup NEVER, and prepaid carrier -- all communication channeled through encrypted apps with minimal forensic footprint.",
+      "metadata": {
+        "original_type": "app_installation_pattern",
+        "peirce_layer": "SECONDNESS",
+        "apps_encrypted": ["Signal", "Wire", "WeChat"],
+        "installation_window_minutes": 5,
+        "contacts_count": 0,
+        "call_history_count": 0,
+        "icloud_backup": "Never",
+        "carrier": "Total Wireless (prepaid)",
+        "forensic_anomalies": [
+          "Three encrypted messaging apps in 5-minute window",
+          "Zero contacts despite 24+ days active use",
+          "Zero call history entries",
+          "iCloud backup deliberately never enabled",
+          "Prepaid carrier -- no contract, harder to trace"
+        ]
+      }
+    },
+    {
+      "artifact_id": "iOS-JESS-002",
+      "evidence_type": "log_entry",
+      "source_tool": "search_pattern",
+      "timestamp": "2022-02-11T03:59:00Z",
+      "raw_score": 0.8,
+      "prior_trust": 0.95,
+      "provenance_chain": ["sha256:a6d180aff36c9b37ec9a3819f3d98af46efc9c47b36a8a7b58cde791049b38c2"],
+      "acquisition_tool": "graykey_2.2.2-demo",
+      "acquisition_hash": "sha256:a6d180aff36c9b37ec9a3819f3d98af46efc9c47b36a8a7b58cde791049b38c2",
+      "acquisition_timestamp": "2022-02-14T18:36:27Z",
+      "description": "Safari history 2022-02-11 03:59-04:15 UTC: Subject searched what to do if you get hacked, how to fix a computer from being hacked, computer fix near me (Burlington VT Yelp), hacked computer what to do. Visited avnet-cyber.com, clario.co, preyproject.com hacking remediation articles. This is 72 hours before GrayKey seizure. Late-night timing (11PM-midnight EST) suggests urgency or anxiety.",
+      "metadata": {
+        "original_type": "safari_history",
+        "peirce_layer": "SECONDNESS",
+        "searches": [
+          "what to do if you get hacked",
+          "how to fix a computer from being hacked",
+          "computer fix near me",
+          "hacked computer what to do"
+        ],
+        "sites_visited": ["avnet-cyber.com", "clario.co", "preyproject.com", "yelp.com"],
+        "duration_minutes": 16,
+        "days_before_seizure": 3,
+        "forensic_anomalies": [
+          "Extensive hacking remediation research 72 hours before device seizure",
+          "Late-night timing suggests urgency",
+          "Searches reference COMPUTERS not phones"
+        ]
+      }
+    },
+    {
+      "artifact_id": "iOS-JESS-003",
+      "evidence_type": "log_entry",
+      "source_tool": "read_evidence",
+      "timestamp": "2022-02-09T15:06:05Z",
+      "raw_score": 0.45,
+      "prior_trust": 0.9,
+      "provenance_chain": ["sha256:a6d180aff36c9b37ec9a3819f3d98af46efc9c47b36a8a7b58cde791049b38c2"],
+      "acquisition_tool": "graykey_2.2.2-demo",
+      "acquisition_hash": "sha256:a6d180aff36c9b37ec9a3819f3d98af46efc9c47b36a8a7b58cde791049b38c2",
+      "acquisition_timestamp": "2022-02-14T18:36:27Z",
+      "description": "Suspicious iMessage from naomakile3zro@outlook.com containing ow.ly shortened URL with malformed content (extraneous whitespace, symbols). Randomly-generated sender address pattern. Arrived 2 days before hacking remediation searches, suggesting possible phishing attack vector.",
+      "metadata": {
+        "original_type": "sms_message",
+        "peirce_layer": "FIRSTNESS",
+        "sender": "naomakile3zro@outlook.com",
+        "url": "ow.ly/kBfe30sa6o2",
+        "days_before_hacking_searches": 2,
+        "forensic_anomalies": [
+          "Randomly-generated sender email pattern",
+          "URL shortener obscures destination",
+          "Malformed message body (whitespace, symbols)",
+          "Temporal proximity to hacking remediation searches"
+        ]
+      }
+    },
+    {
+      "artifact_id": "iOS-JESS-004",
+      "evidence_type": "log_entry",
+      "source_tool": "search_pattern",
+      "timestamp": "2022-01-21T20:42:00Z",
+      "raw_score": 0.5,
+      "prior_trust": 0.95,
+      "provenance_chain": ["sha256:a6d180aff36c9b37ec9a3819f3d98af46efc9c47b36a8a7b58cde791049b38c2"],
+      "acquisition_tool": "graykey_2.2.2-demo",
+      "acquisition_hash": "sha256:a6d180aff36c9b37ec9a3819f3d98af46efc9c47b36a8a7b58cde791049b38c2",
+      "acquisition_timestamp": "2022-02-14T18:36:27Z",
+      "description": "Safari search for whatsmyip.com on 2022-01-21 20:42 UTC. IP address reconnaissance on same day as encrypted app installations. Indicates OPSEC awareness -- checking network exposure before configuring encrypted communications.",
+      "metadata": {
+        "original_type": "safari_history",
+        "peirce_layer": "FIRSTNESS",
+        "search_query": "whatsmyip.com",
+        "same_day_as_app_installs": true,
+        "forensic_anomalies": [
+          "IP reconnaissance before encrypted app setup"
+        ]
+      }
+    },
+    {
+      "artifact_id": "iOS-JESS-005",
+      "evidence_type": "registry_key",
+      "source_tool": "read_evidence",
+      "timestamp": "2022-01-21T22:19:05Z",
+      "raw_score": 0.35,
+      "prior_trust": 0.9,
+      "provenance_chain": ["sha256:ff0db8cd26236dc59ccf7f40637ad8bdcccd9b6f8ef975bd5f5c02325e1f1be0"],
+      "acquisition_tool": "graykey_2.2.2-demo",
+      "acquisition_hash": "sha256:ff0db8cd26236dc59ccf7f40637ad8bdcccd9b6f8ef975bd5f5c02325e1f1be0",
+      "acquisition_timestamp": "2022-02-14T18:30:17Z",
+      "description": "Credential reuse pattern: 0107 suffix in email (pbentley0107@gmail.com), chess username (ChessGod0107), WiFi password (NetherConqueror0107). Plaintext password God@Chess! in keychain. Previous passcode 222222 (all repeating digits). Poor credential hygiene creates lateral movement risk.",
+      "metadata": {
+        "original_type": "credential_pattern",
+        "peirce_layer": "FIRSTNESS",
+        "pattern": "0107",
+        "credentials_affected": ["email", "chess.com", "wifi"],
+        "plaintext_password_stored": true,
+        "forensic_anomalies": [
+          "Predictable credential naming convention",
+          "Plaintext password in keychain",
+          "Previous passcode extremely weak (222222)"
+        ]
+      }
+    },
+    {
+      "artifact_id": "iOS-JESS-006",
+      "evidence_type": "log_entry",
+      "source_tool": "read_evidence",
+      "timestamp": "2022-02-14T18:25:23Z",
+      "raw_score": 0.55,
+      "prior_trust": 0.95,
+      "provenance_chain": ["sha256:1693b3b11047a990e32424944a96141081f4895a4aeab72e7a9ee6e2a59cc374"],
+      "acquisition_tool": "graykey_2.2.2-demo",
+      "acquisition_hash": "sha256:1693b3b11047a990e32424944a96141081f4895a4aeab72e7a9ee6e2a59cc374",
+      "acquisition_timestamp": "2022-02-14T18:37:46Z",
+      "description": "Device in Before First Unlock (BFU) state at GrayKey seizure. BFU means device had been powered off or rebooted before law enforcement obtained it. BFU state maximizes encryption protections and limits forensic extraction capabilities. Combined with overall OPSEC posture, suggests deliberate anti-forensic preparation.",
+      "metadata": {
+        "original_type": "device_state",
+        "peirce_layer": "SECONDNESS",
+        "lock_state": "Before First Unlock",
+        "forensic_anomalies": [
+          "BFU state limits forensic extraction",
+          "Device was powered off/rebooted before seizure",
+          "Consistent with deliberate anti-forensic behavior"
+        ]
+      }
+    }
+  ],
+  "temporal_violations": [],
+  "caie_fractures": [],
+  "peirce_expected": {
+    "firstness": "iPhone 8 belonging to Patrick Bentley at Champlain College. Signal, Wire, WeChat installed in 10-minute window. Zero contacts, zero call history. iCloud backup never. Prepaid carrier. whatsmyip.com search. 4AM hacking remediation searches 72 hours before seizure. Suspicious ow.ly phishing message. BFU lock state. Case name references Jess, device belongs to Patrick.",
+    "secondness": "The OPSEC posture (encrypted apps + empty contacts + empty calls + no cloud backup + prepaid) is structurally inconsistent with casual smartphone use. The temporal sequence -- ow.ly message (Feb 9) followed by hacking searches (Feb 11) followed by seizure (Feb 14) -- suggests an escalating security incident. The IP reconnaissance on the same day as encrypted app installation suggests preparation rather than spontaneous behavior.",
+    "thirdness": "Deliberate operational security awareness and data minimization. The subject channeled all communication through encrypted apps to avoid forensic recovery. The unresolved question: was this OPSEC defensive (protecting against being hacked) or offensive (concealing unauthorized activities)? The Champlain College cybersecurity affiliation provides both the motivation and the capability for either interpretation."
+  },
+  "devil_advocate": "Patrick Bentley is a Champlain College cybersecurity student practicing privacy-aware behavior as part of his education. Signal and Wire are mainstream privacy tools. Prepaid carriers are budget-friendly for students. Empty contacts/calls reflect a new device setup. The hacking searches reflect genuine victimhood after receiving a phishing message. iCloud backup disabled due to storage limits. BFU state could be a drained battery, not deliberate. The OPSEC posture is consistent with educated privacy awareness, not criminal concealment.",
+  "expected_verdict": "INTENT",
+  "expected_confidence": 82,
+  "expected_mitre_ttps": [
+    "T1562.001",
+    "T1070",
+    "T1027",
+    "T1566.003",
+    "T1078",
+    "T1592"
+  ],
+  "metadata": {
+    "converted_from": "claude_code_investigation",
+    "original_verdict": "INTENT",
+    "abstention_risk": "medium",
+    "carnegie_pattern": null,
+    "device_profile": {
+      "device": "iPhone 8 (Global)",
+      "ios_version": "15.0.2",
+      "owner": "Patrick Bentley",
+      "apple_id": "pbentley0107@gmail.com",
+      "phone": "+1-973-294-1683",
+      "carrier": "Total Wireless (prepaid)",
+      "location": "Burlington/Williston, Vermont",
+      "affiliation": "Champlain College",
+      "extraction_tool": "GrayKey 2.2.2-demo",
+      "extraction_date": "2022-02-14T18:36:27Z"
+    },
+    "investigation_timestamp": "2026-06-29T19:41:45Z",
+    "tools_used": 19,
+    "self_corrections": 2,
+    "daubert_admissible": true,
+    "llm_backend": "ollama_deepseek-r1_8b"
+  },
+  "source_dataset": "Magnet Forensics CTF 2022 -- iOS Challenge (Jess)",
+  "source_origin": "magnet_ctf_2022_ios_jess",
+  "notes": "Primary finding is deliberate OPSEC posture (INTENT) -- encrypted comms, data minimization, prepaid carrier, BFU at seizure. Secondary: hacking awareness searches 72 hours before seizure (INTENT). Signal database encrypted with SQLCipher -- likely contains decisive evidence. Identity of Jess unresolved. Subject may be victim (phishing) or perpetrator (hacking) -- encrypted messaging content needed to resolve."
+}
