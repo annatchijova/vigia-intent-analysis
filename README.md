@@ -694,31 +694,6 @@ These numbers are not inflated. They reflect results on a specific, diverse, doc
 
 ---
 
-## ⚠ ACCURACY NOTE — THREE EVALUATION DOMAINS
-
-> **The case count below may be outdated.** We are actively adding cases, especially
-> raw-evidence (E01/evtx) investigations. The figures shown reflect the corpus at the
-> time of last update and may undercount current coverage.
-
-**VIGÍA operates across three distinct modes with different accuracy profiles:**
-
-**Domain A — Claude Code / MCP mode (raw forensic evidence):** Full pipeline. Tested
-on real-world E01 disk images, memory dumps, and log archives. This is the primary
-investigative mode. **Accuracy figures in this README reflect Domain A.**
-
-**Domain B — Autonomous agent, JSON pre-processed cases:** Batch runner over structured
-case bundles. 165/167 pass rate on canonical corpus.
-
-**Domain C — Autonomous agent, raw evidence (E01/evtx):** Known false negative on Windows
-disk evidence due to **B-032** (`event_logs` routing bug). Not reliable for raw E01 until
-fixed. See [L-032](./KNOWN_LIMITATIONS.md).
-
-> The accuracy percentage shown below applies to **Domain B only**. Domain A results are
-> documented per-case in `evidence/` and `results/`. Domain C is affected by L-032 for
-> Windows disk evidence.
-
----
-
 VIGÍA separates evaluation into three distinct domains. Only Domain A
 constitutes the system's accuracy claim.
 
