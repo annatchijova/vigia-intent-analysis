@@ -1868,3 +1868,154 @@ in Check 3 (B-029) correctly targets only that terminal state. There is no case 
 
 Not a bug. Dismissed. The fallback is correct, the layered defense is sound, and the
 oscillation string routing is non-contradictory. No action required.
+
+---
+
+## Bugs de Sesión 2026-06-29 — Windows Disk Evidence & RAW Mode
+
+### B-032 [FIXED] — vigia_agent.py mapped *.evtx to event_stream kwarg instead of event_logs
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | RESUELTO |
+| **Archivo** | `vigia_agent.py` |
+| **Función** | `_build_orchestrator_kwargs()` |
+| **Detectado en** | Sesión 2026-06-29 |
+
+**Descripción:** `_build_orchestrator_kwargs()` mapped `.evtx` files to the `event_stream` parameter, but `SIFTOrchestrator.analyze()` routes `event_stream` to `MetabolicProfiler`, not to `EventLogCorrelator`. The correct parameter is `event_logs`. Result: `EventLogCorrelator` received no input and produced `z=0`, while the actual composite score from direct invocation was 19/20.
+
+---
+
+### B-033 [FIXED] — Agent did not auto-detect registry hives (SAM/SYSTEM/SOFTWARE/SECURITY)
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | RESUELTO |
+| **Archivo** | `vigia_agent.py` |
+| **Detectado en** | Sesión 2026-06-29 |
+
+**Descripción:** The autonomous agent did not auto-detect registry hive files (SAM, SYSTEM, SOFTWARE, SECURITY) when scanning evidence directories. These files lack extensions and were not matched by any glob pattern in the evidence scanner.
+
+---
+
+### B-034 [FIXED] — ChainOfCustody.acquire() missing notes kwarg in registry_timeline_reconstructor
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | RESUELTO |
+| **Archivo** | `vigia/sift/registry_timeline_reconstructor.py` |
+| **Función** | `ChainOfCustody.acquire()` |
+| **Detectado en** | Sesión 2026-06-29 |
+
+**Descripción:** `ChainOfCustody.acquire()` was called without the `notes` keyword argument required by the method signature, producing a `TypeError` on every registry hive acquisition.
+
+---
+
+### B-035 [FIXED] — forensic_adapter mapped event_log to log_entry (syslog generic) instead of windows_event_log
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | RESUELTO |
+| **Archivo** | `vigia/sift/forensic_adapter.py` |
+| **Detectado en** | Sesión 2026-06-29 |
+
+**Descripción:** `forensic_adapter.py` mapped `event_log` to `log_entry` (syslog generic, `spoofability=0.85`). Windows EVTX is a binary format with checksums, much harder to tamper. Fix: Added `windows_event_log` to forensic_adapter mapping, CAIE profiles, and gamma tables. See L-033b, L-035.
+
+---
+
+### B-036 [FIXED] — z>5.0 threshold impossible in vigia_agent.py fallback hypothesis (Z_CLIP_MAX=5.0)
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | RESUELTO |
+| **Archivo** | `vigia_agent.py` |
+| **Detectado en** | Sesión 2026-06-29 |
+
+**Descripción:** The fallback hypothesis override in `vigia_agent.py` required `z>5.0` to trigger, but `Z_CLIP_MAX=5.0` clips all signals at 5.0. The threshold was impossible to reach. Fixed to `z>2.0`. See L-036.
+
+---
+
+### B-037 [FIXED] — EBS v1 adapter missing INTENT/BENIGN hypothesis mapping in sift_orchestrator.py
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | RESUELTO |
+| **Archivo** | `sift_orchestrator.py` |
+| **Detectado en** | Sesión 2026-06-29 |
+
+**Descripción:** The EBS v1 adapter in `sift_orchestrator.py` did not have mappings for `INTENT` and `BENIGN` hypothesis types. Cases producing these hypotheses would fall through to the default handler and produce incorrect bundle metadata.
+
+---
+
+### B-038 [FIXED] — composite_score not included in event_log signal metadata
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | RESUELTO |
+| **Archivo** | Event log signal emission path |
+| **Detectado en** | Sesión 2026-06-29 |
+
+**Descripción:** `composite_score` was not included in event_log signal metadata. This field is required by `apply_artifact_reliability_dynamic()` (L-038) to compute dynamic gamma based on corroboration strength.
+
+---
+
+### B-039 [FIXED] — windows_event_log type missing from gamma tables in _math_utils.py
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | RESUELTO |
+| **Archivo** | `vigia/sift/_math_utils.py` |
+| **Detectado en** | Sesión 2026-06-29 |
+
+**Descripción:** The `windows_event_log` artifact type was not present in the gamma lookup tables in `_math_utils.py`. Signals of this type would fall through to the default gamma value instead of using the calibrated `gamma=0.70`.
+
+---
+
+### B-040 [PENDING] — ARTIFACT_RELIABILITY not propagated to CAIE
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | PENDIENTE |
+| **Severidad** | P2 |
+| **Archivo** | `vigia/sift/forensic_adapter.py` |
+| **Detectado en** | Sesión 2026-06-29 |
+
+**Descripción:** `ios_forensics.py` and `android_forensics.py` define `ARTIFACT_RELIABILITY=Fraction(70,100)` but `forensic_adapter.py` sets `base_trust=1.0` fixed, ignoring the signal metadata value. See L-037.
+
+---
+
+### B-041 [PENDING] — caie_artifacts not returned by run_full_analysis() — CAIE never runs in RAW mode
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | PENDIENTE |
+| **Severidad** | P1 |
+| **Detectado en** | Sesión 2026-06-29 |
+
+**Descripción:** `run_full_analysis()` does not return `caie_artifacts` in its output, so the CAIE cross-artifact analysis engine never receives artifacts when processing RAW evidence. This means structural fracture detection (LOG_VS_MEMORY, TIMELINE_PARADOX, etc.) is bypassed in RAW mode.
+
+---
+
+### B-042 [PENDING] — iOS forensics module — P0 float boundary in to_signal()
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | PENDIENTE — decisión arquitectónica requerida |
+| **Severidad** | P0 |
+| **Archivo** | `vigia/sift/ios_forensics.py` |
+| **Detectado en** | Sesión 2026-06-29 |
+
+**Descripción:** `to_signal()` in `ios_forensics.py` uses `float()` for z-score and confidence values. When this module feeds the deterministic scoring pipeline, floats enter the Fraction arithmetic path — a P0 violation of L-021. Architectural decision pending: should `SignalOutput` accept `Decimal`/`Fraction`, or is the float-to-Fraction conversion the correct boundary?
+
+---
+
+### B-043 [PENDING] — Android forensics module — same as B-042
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | PENDIENTE — misma decisión arquitectónica que B-042 |
+| **Severidad** | P0 |
+| **Archivo** | `vigia/sift/android_forensics.py` |
+| **Detectado en** | Sesión 2026-06-29 |
+
+**Descripción:** Same `float()` boundary issue as B-042 in `android_forensics.py`. The fix should be coordinated with B-042 as the same architectural decision applies.
