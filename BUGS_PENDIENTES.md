@@ -2177,6 +2177,72 @@ fix propuesto o aplicado, y referencia de commit.
 
 ---
 
+## L-037 — ForensicAdapter no propaga acquisition metadata a CAIE [FIXED]
+
+**Fecha**: 2026-06-30
+**Severidad**: Alta
+**Componentes**: `vigia/sift/sift_orchestrator.py`, `sift_orchestrator.py` (shim), `vigia_agent.py`
+
+### Síntoma
+CAIE degrada `base_trust` de todos los artefactos a 0.10 (floor) en modo RAW.
+Los SECURITY ALERTs reportaban 3 campos críticos ausentes (`acquisition_tool`,
+`acquisition_hash`, `acquisition_timestamp`) y 2 warnings (`examiner_id`,
+`write_blocker_used`) en CADA artefacto — trust residual ~0.10.
+
+### Causa raíz
+Ninguno de los 15 módulos SIFT que producen `SignalOutput` incluye acquisition
+metadata en `signal.metadata`. `ForensicAdapter.signal_to_caie_artifact()` copia
+`dict(sig.metadata)` completa — no filtra — pero si los campos nunca existen en
+origen, CAIE no los encuentra. El dato no se pierde en propagación; nunca se genera.
+
+### Fix aplicado
+Inyección centralizada en `sift_orchestrator.py`, en el punto de convergencia gamma
+(§4 del pipeline, donde todos los signals son re-empaquetados como `SignalOutput`
+nuevo). Se construye `_acq_meta` una sola vez desde `self.chain.records[0]`:
+- `acquisition_hash`: `sha256:{chain.records[0].artifact_hash}` (64 hex)
+- `acquisition_timestamp`: `chain.records[0].timestamp` (ISO-8601+tz)
+
+Merge order: `{_acq_meta, **sig.metadata, gamma_fields}` — signal's own metadata
+nunca es sobreescrita (un signal que ya traiga `acquisition_hash` propio lo conserva).
+
+`acquisition_tool`, `write_blocker_used`, `examiner_id` NO se sintetizan — deben
+declararse explícitamente via CLI flags:
+```
+--acquisition-tool "ftk imager"
+--write-blocker-used true
+--examiner-id "Craig Wilson"
+```
+Sin flags, estos campos siguen ausentes → degradación honesta, no un bug oculto.
+
+### Resultados (MAGNET-2020-WINDOWS)
+
+| Métrica | Antes | Después | Cambio |
+|---------|-------|---------|--------|
+| Composite score | 0.0027 | **0.0088** | +226% |
+| EVENT_LOG adjusted | 0.0014 | **0.0047** | +236% |
+| REGISTRY_RTR adjusted | 0.0012 | **0.0041** | +242% |
+| Critical campos ausentes (SIFT signals) | 3 | **1** | -67% |
+| Warning campos ausentes | 2 | 2 | sin cambio |
+| Gates CAIE pasados (SIFT signals) | 0/4 | **2/4** | VERIFIED tier |
+
+Nota: la proyección inicial de trust 0.10→0.75 no se alcanzó porque
+`trust_decay.apply_decay()` (línea 554 de caie.py) degrada trust por cadena de
+proveniencia corta (single-link chain, break_severity=0.5) ANTES de la degradación
+de acquisition metadata. Este trust_decay preexistente es comportamiento correcto
+(no un bug) — documenta que la cadena de proveniencia tiene un solo eslabón.
+
+### Archivos tocados
+- `vigia/sift/sift_orchestrator.py` — inyección de `_acq_meta` en convergencia gamma
+  + nuevo atributo `self.acquisition_overrides`
+- `sift_orchestrator.py` (shim raíz) — propaga `acquisition_overrides` al orchestrator real
+- `vigia_agent.py` — 3 CLI flags (`--acquisition-tool`, `--write-blocker-used`,
+  `--examiner-id`), propagación via `VIGIAAgent.acquisition_overrides`
+
+### Tests
+188 passed, 6 xfailed, 0 regresiones.
+
+---
+
 ## B-041 — CAIE output no expuesto en vigia_agent.py narrative [PARTIAL FIX]
 
 **Fecha**: 2026-06-30

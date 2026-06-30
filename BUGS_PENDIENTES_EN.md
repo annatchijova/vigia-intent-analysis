@@ -2333,3 +2333,93 @@ any future reviewer who asks the same question.
 3. In `vigia_agent.py` `_build_orchestrator_kwargs()` — added `("*.pcap", "pcap_path")` and `("*.pcapng", "pcap_path")` to the directory detection pattern list, and `elif suffix in (".pcap", ".pcapng")` case for single file.
 
 **Post-fix result:** NETWORK_FORENSICS emits signal with z=2.625, conf=0.95, 7220 flows, EXFILTRATION detected.
+
+---
+
+## L-037 — ForensicAdapter does not propagate acquisition metadata to CAIE [FIXED]
+
+**Date:** 2026-06-30
+**Severity:** High
+**Components:** `vigia/sift/sift_orchestrator.py`, `sift_orchestrator.py` (shim), `vigia_agent.py`
+
+**Symptom:** CAIE degrades `base_trust` of every artifact to 0.10 (floor) in Mode 1 RAW.
+SECURITY ALERTs reported 3 missing critical fields (`acquisition_tool`, `acquisition_hash`,
+`acquisition_timestamp`) and 2 missing warnings (`examiner_id`, `write_blocker_used`) per
+artifact — trust residual ~0.10, composite score collapsed to 0.0027.
+
+**Root cause:** None of the 15 SIFT modules that produce `SignalOutput` include acquisition
+metadata in `signal.metadata`. `ForensicAdapter.signal_to_caie_artifact()` faithfully copies
+the full metadata dict — no filtering, no loss — but the fields simply never exist at the
+source. The data is not lost in propagation; it is never generated.
+
+**Fix:** Centralised injection at the gamma convergence point in `sift_orchestrator.py`
+(§4 of the pipeline), where all signals are re-packaged as new `SignalOutput`. A single
+`_acq_meta` dict is built once from `self.chain.records[0]`:
+- `acquisition_hash`: `sha256:{chain.records[0].artifact_hash}` (64-char hex from ChainOfCustody)
+- `acquisition_timestamp`: `chain.records[0].timestamp` (ISO-8601 with timezone)
+
+Merge order: `{_acq_meta, **sig.metadata, gamma_fields}` — a signal's own metadata is never
+overwritten (a signal carrying its own `acquisition_hash` retains it).
+
+Three fields (`acquisition_tool`, `write_blocker_used`, `examiner_id`) are NOT synthesised —
+they must be declared explicitly via CLI flags:
+```
+python3 vigia_agent.py --evidence /path --case-id CASE \
+    --acquisition-tool "ftk imager" \
+    --write-blocker-used true \
+    --examiner-id "Craig Wilson"
+```
+Without these flags, the three fields remain absent → honest trust degradation, not a hidden bug.
+
+**Results (MAGNET-2020-WINDOWS):**
+
+| Metric | Before | After | Change |
+|--------|--------|-------|--------|
+| CAIE composite score | 0.0027 | 0.0088 | +226% |
+| EVENT_LOG adjusted_score | 0.0014 | 0.0047 | +236% |
+| REGISTRY_RTR adjusted_score | 0.0012 | 0.0041 | +242% |
+| Critical fields missing (SIFT signals) | 3 | 1 | -67% |
+| CAIE gates passed (SIFT signals) | 0/4 | 2/4 | VERIFIED tier |
+
+Note: the initial trust projection of 0.10→0.75 was not reached because
+`trust_decay.apply_decay()` (caie.py line 554) degrades trust for single-link
+provenance chains (break_severity=0.5) BEFORE acquisition metadata degradation.
+This pre-existing trust_decay is correct behaviour (not a bug).
+
+**Files touched:**
+- `vigia/sift/sift_orchestrator.py` — `_acq_meta` injection at gamma convergence + `self.acquisition_overrides`
+- `sift_orchestrator.py` (root shim) — propagates `acquisition_overrides` to real orchestrator
+- `vigia_agent.py` — 3 CLI flags, `VIGIAAgent.acquisition_overrides` parameter
+
+**Tests:** 188 passed, 6 xfailed, 0 regressions.
+
+---
+
+## B-041 — CAIE output not surfaced in vigia_agent.py narrative [PARTIAL FIX]
+
+**Date:** 2026-06-30
+**Severity:** Medium
+**Components:** `vigia_agent.py`, `vigia/sift/sift_orchestrator.py`
+
+**Original diagnosis:** `caie_artifacts` not returned by `run_full_analysis()` and CAIE
+never runs in RAW mode.
+
+**Corrected diagnosis (audit):** CAIE DOES run inside `sift_orchestrator.py` (lines 582-610).
+The result is stored in `results["caie"]` and IS returned in the dict. The real bug:
+- **B-041a:** `vigia_agent.py` never read `results["results"]["caie"]` — fractures were
+  computed but invisible in the narrative and the sealed bundle.
+- **B-041b:** CAIE runs AFTER abduction is already computed — fractures never feed back
+  into the verdict.
+
+**Fix applied (B-041a):** Added `--- CAIE ---` section to `_generate_narrative()` that
+surfaces verdict, structural verdict, composite score, per-fracture details (type, severity,
+golden rule / structural tags), and Daubert note.
+
+**Automatic INTENT→MALICE upgrade (B-041b) — DEFERRED:** Audit on MAGNET-2020-WINDOWS and
+MAGNET-2022-WINDOWS shows CAIE produces INCONCLUSIVE with 0 fractures — all artifacts are
+single-layer (`log_entry`), no cross-layer fractures possible. CDL downgrades to INCONCLUSIVE
+(coverage 16.7%). Automatic upgrade would be dead code until the pipeline produces multi-layer
+artifacts (memory_process, prefetch, kernel_structure in addition to log_entry).
+
+**Files touched:** `vigia_agent.py` — `_generate_narrative()` (CAIE reading added)
+**Tests:** 188 passed, 6 xfailed, 0 regressions.

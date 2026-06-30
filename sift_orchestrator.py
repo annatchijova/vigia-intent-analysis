@@ -27,6 +27,8 @@ class SIFTOrchestrator:
 
     def __init__(self, case_id: str):
         self.case_id = case_id
+        # L-037: examiner-declared acquisition metadata, set by vigia_agent.py
+        self.acquisition_overrides: Dict[str, Any] = {}
 
     def analyze(self, **kwargs) -> Dict[str, Any]:
         log_path = kwargs.get("log_path")
@@ -71,6 +73,9 @@ class SIFTOrchestrator:
             sys.path.insert(0, str(Path(__file__).parent))
             from vigia.sift.sift_orchestrator import SIFTOrchestrator as _Real
             real = _Real(self.case_id)
+            # L-037: propagate examiner-declared acquisition overrides
+            if self.acquisition_overrides:
+                real.acquisition_overrides = self.acquisition_overrides
 
             # Map shim kwargs → run_full_analysis parameters
             run_kwargs: Dict[str, Any] = {}

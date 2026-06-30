@@ -132,6 +132,12 @@ class SIFTOrchestrator:
     def __init__(self, case_id: str):
         self.case_id = case_id
         self.chain = ChainOfCustody(case_id)
+        # L-037: Examiner-declared acquisition metadata (CLI flags).
+        # Keys accepted: acquisition_tool, write_blocker_used, examiner_id.
+        # These are merged into every signal at the gamma convergence point
+        # so CAIE can evaluate all 4 gates.  Only set when the examiner
+        # explicitly provides them — absent fields degrade trust honestly.
+        self.acquisition_overrides: Dict[str, Any] = {}
         self.path_guard = PathGuard(allowed_base_paths=[
             Path('/var/vigia'),
             Path('/tmp/vigia'),
@@ -435,23 +441,54 @@ class SIFTOrchestrator:
         # ============================================================
         # 4. GAMMA (Artifact Reliability)
         # ============================================================
+
+        # L-037 FIX: Build acquisition metadata from ChainOfCustody.
+        # CAIE degrades base_trust when acquisition_hash and
+        # acquisition_timestamp are absent (NIST SP 800-86 §4.3).
+        # The chain already records ACQUIRE operations with hashes and
+        # timestamps — we propagate them to every signal here, at the
+        # single convergence point where all signals are re-packaged.
+        #
+        # Only acquisition_hash and acquisition_timestamp are injected
+        # (they exist in the chain).  acquisition_tool, write_blocker_used,
+        # and examiner_id are NOT synthesised — they must be declared
+        # explicitly by the examiner (vigia_agent.py CLI flags).  Absent
+        # fields cause honest trust degradation, not a hidden bug.
+        _acq_meta: Dict[str, Any] = {}
+        if self.chain.records:
+            _first = self.chain.records[0]
+            if _first.artifact_hash and len(_first.artifact_hash) == 64:
+                _acq_meta["acquisition_hash"] = f"sha256:{_first.artifact_hash}"
+            if _first.timestamp:
+                _acq_meta["acquisition_timestamp"] = _first.timestamp
+        # Merge examiner-declared overrides (CLI flags: --acquisition-tool,
+        # --write-blocker-used, --examiner-id).  These take precedence over
+        # chain-derived values for the same keys.
+        if self.acquisition_overrides:
+            _acq_meta.update(self.acquisition_overrides)
+
         gamma_adjusted = []
         for sig in raw_signals:
             try:
                 art_type = sig.metadata.get("artifact_type", "unknown")
                 z_frac = Fraction(int(round(sig.z_score * 100)), 100)
                 z_adjusted = apply_artifact_reliability_dynamic(z_frac, art_type, metadata=sig.metadata)
+                # Merge: signal's own metadata > gamma fields > acquisition metadata.
+                # _acq_meta is injected first so that any signal that already
+                # carries its own acquisition fields is NOT overwritten.
+                merged_meta = {
+                    **_acq_meta,
+                    **sig.metadata,
+                    "gamma_applied": True,
+                    "gamma_type": art_type,
+                    "z_original": sig.z_score,
+                }
                 new_sig = SignalOutput(
                     tool_name=sig.tool_name,
                     value=sig.value,
                     z_score=float(z_adjusted),
                     confidence=sig.confidence,
-                    metadata={
-                        **sig.metadata,
-                        "gamma_applied": True,
-                        "gamma_type": art_type,
-                        "z_original": sig.z_score,
-                    }
+                    metadata=merged_meta,
                 )
                 gamma_adjusted.append(new_sig)
             except Exception as e:

@@ -1466,27 +1466,60 @@ Fixed to `z>2.0`.
 
 ---
 
-## L-037 — ARTIFACT_RELIABILITY not propagated to CAIE [PENDING]
+## L-037 — Acquisition metadata not propagated to CAIE [RESOLVED]
 
-**Status:** PENDING — documented, awaiting implementation
-**Severity:** P2
-**Mode affected:** iOS and Android forensics modules
-**Discovered:** 2026-06-29
+**Status:** RESOLVED (2026-06-30)
+**Severity:** P1
+**Mode affected:** Mode 1 (RAW) — all evidence types
+**Discovered:** 2026-06-30
 
 **Description:**
+
+None of the 15 SIFT modules that produce `SignalOutput` included acquisition
+metadata (`acquisition_tool`, `acquisition_hash`, `acquisition_timestamp`,
+`examiner_id`, `write_blocker_used`) in their signal metadata. CAIE's NIST SP
+800-86 §4.3 validator found all 5 fields absent and degraded `base_trust` to the
+floor (0.10) on every artifact, collapsing composite scores.
+
+**Fix applied:** Centralised injection at the gamma convergence point in
+`sift_orchestrator.py`. `acquisition_hash` (sha256-prefixed) and
+`acquisition_timestamp` (ISO-8601) are derived from `ChainOfCustody.records[0]`.
+Three remaining fields (`acquisition_tool`, `write_blocker_used`, `examiner_id`)
+must be declared explicitly via CLI flags — absent fields degrade trust honestly.
+
+**Result:** CAIE composite score improved 226% (0.0027 → 0.0088) on MAGNET-2020-WINDOWS.
+SIFT signals now pass 2/4 CAIE gates (VERIFIED tier) instead of 0/4 (NONE tier).
+
+**Design constraint — single acquisition per case (L-037a):**
+
+The current fix assumes a single acquisition per case (`self.chain` is singular —
+one `ChainOfCustody` instance per `SIFTOrchestrator`). The first ACQUIRE record's
+hash and timestamp are propagated to ALL signals uniformly.
+
+If a future case mixes acquisitions from different tools (e.g., disk with FTK Imager +
+memory with DumpIt + Android with Cellebrite), this model is no longer valid: each
+artifact needs its own acquisition metadata, not case-level metadata. This would
+require per-module acquisition metadata in each `SignalOutput`, not centralised
+injection at the orchestrator.
+
+For the current pipeline scope (single evidence source per case), the centralised
+model is correct. If multi-source cases are needed, migration path:
+1. Each SIFT module declares its own acquisition metadata in `SignalOutput.metadata`
+2. The orchestrator's centralised injection becomes a fallback for modules that
+   don't declare their own
+3. The merge order (`{_acq_meta, **sig.metadata}`) already handles this: a module's
+   own metadata takes precedence over the centralised fallback.
+
+### L-037b — ARTIFACT_RELIABILITY not propagated to CAIE [PENDING]
 
 `ios_forensics.py` and `android_forensics.py` define
 `ARTIFACT_RELIABILITY=Fraction(70,100)`. The value is included in signal metadata
 but `forensic_adapter.py` sets `base_trust=1.0` fixed, ignoring the reliability
-discount from the signal metadata.
-
-**Impact:** CAIE does not apply the iOS/Android reliability discount. Signals from
-these platforms are treated with the same base trust as fully verified desktop
-forensic artifacts, which may overstate confidence in mobile evidence.
+discount from the signal metadata. Signals from mobile platforms are treated with
+the same base trust as fully verified desktop forensic artifacts.
 
 **Fix path:** `forensic_adapter` should read `artifact_reliability` from signal
-metadata and apply it as a trust modifier. This is a straightforward integration
-change but requires validation against the mobile forensics corpus.
+metadata and apply it as a trust modifier.
 
 ---
 

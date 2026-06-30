@@ -402,7 +402,8 @@ class VIGIAAgent:
     - Each iteration is recorded in the audit trail with timestamp
     """
 
-    def __init__(self, case_id: str, evidence_path: str):
+    def __init__(self, case_id: str, evidence_path: str,
+                 acquisition_overrides: Optional[Dict[str, Any]] = None):
         self.case_id = case_id
         self.evidence_path = Path(evidence_path)
         self.audit = AgentAuditTrail(case_id)
@@ -410,6 +411,8 @@ class VIGIAAgent:
         self.correction_engine = CorrectionEngine()
         self.iteration = 0
         self.corrections_applied: List[Dict] = []
+        # L-037: examiner-declared acquisition metadata for CAIE trust gates.
+        self.acquisition_overrides: Dict[str, Any] = acquisition_overrides or {}
 
     def _hash_evidence(self) -> str:
         """SHA-256 of the evidence. Guarantees integrity — no analysis modifies the original."""
@@ -508,6 +511,10 @@ class VIGIAAgent:
             # sys.path already adjusted with guard at start of _run_pipeline (FIX P2-6)
             from sift_orchestrator import SIFTOrchestrator
             orchestrator = SIFTOrchestrator(self.case_id)
+
+            # L-037: propagate examiner-declared acquisition metadata to orchestrator.
+            if self.acquisition_overrides:
+                orchestrator.acquisition_overrides = self.acquisition_overrides
 
             # Build inputs based on evidence type
             kwargs = _build_orchestrator_kwargs(self.evidence_path, params)
@@ -1289,6 +1296,22 @@ Max iterations: 3 (hard cap, prevents infinite loops).
         "--audit-only", action="store_true",
         help="Export only the audit trail (no full bundle)"
     )
+    # L-037: Examiner-declared acquisition metadata for CAIE trust gates.
+    # Without these flags, CAIE honestly degrades trust for the missing fields.
+    parser.add_argument(
+        "--acquisition-tool", default=None,
+        help="Forensic acquisition tool (e.g. 'ftk imager', 'dd', 'axiom'). "
+             "Must match CAIE whitelist for gate G2."
+    )
+    parser.add_argument(
+        "--write-blocker-used", default=None, choices=["true", "false"],
+        help="Whether a write blocker was used during acquisition (true/false). "
+             "Only 'true' passes CAIE gate G4."
+    )
+    parser.add_argument(
+        "--examiner-id", default=None,
+        help="Identity of the forensic examiner who acquired the evidence."
+    )
     args = parser.parse_args()
 
     # Validate evidence
@@ -1316,10 +1339,20 @@ Max iterations: 3 (hard cap, prevents infinite loops).
         sys.exit(2)
     output_path = str(output_path_obj)
 
+    # L-037: Build acquisition overrides from CLI flags
+    _acq_overrides: Dict[str, Any] = {}
+    if args.acquisition_tool:
+        _acq_overrides["acquisition_tool"] = args.acquisition_tool
+    if args.write_blocker_used is not None:
+        _acq_overrides["write_blocker_used"] = (args.write_blocker_used == "true")
+    if args.examiner_id:
+        _acq_overrides["examiner_id"] = args.examiner_id
+
     # Execute agent
     agent = VIGIAAgent(
         case_id=args.case_id,
         evidence_path=str(evidence_path),
+        acquisition_overrides=_acq_overrides or None,
     )
 
     t0 = time.monotonic()
