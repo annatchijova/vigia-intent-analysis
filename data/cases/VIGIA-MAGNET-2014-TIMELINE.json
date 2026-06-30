@@ -1,0 +1,117 @@
+{
+  "case_id": "VIGIA-MAGNET-2014-TIMELINE",
+  "case_name": "Magnet 2014 — Hidden.docx Staging + USB Exfiltration (HENRY-PC)",
+  "schema_version": 1,
+  "description": "Document named Hidden.docx with content 'Super secret document / Trade secrets worth millions' found at C:\\Users\\Public\\ on machine HENRY-PC. Author metadata wiped to literal '-'. LNK artifact records USB drive (D:\\) access. WINWORD.EXE Prefetch confirms execution. Four-artifact cluster consistent with insider threat data staging and possible exfiltration via removable media.",
+  "expected_verdict": "INTENT",
+  "expected_confidence": 0.70,
+  "expected_mitre_ttps": ["T1074.001", "T1052.001", "T1070.006"],
+  "peirce_chain": {
+    "firstness": "DOCX named 'Hidden.docx' at C:\\Users\\Public\\. Content: 'Super secret document' and 'Trade secrets worth millions'. Author: '-'. LastModifiedBy: '-'. Revision 1. TotalTime 2 min. Word 2007.",
+    "secondness": "Public folder requires no authentication — anomalous storage for sensitive content. Author '-' is not a valid Windows username default. Filename self-labels concealment. USB LNK to drive root (not subfolder) is consistent with bulk copy operation.",
+    "thirdness": "Insider threat staging pattern: actor created document, erased attribution, staged in shared folder accessible without authentication. USB access provides exfiltration vector. Carnegie: concealment — erasure of author→document identity link."
+  },
+  "devil_advocate": "Training/CTF artifact or test document created with anonymous template. Public folder used for legitimate inter-user sharing. USB access unrelated to document. Author field default from kiosk/OEM configuration.",
+  "artifacts": [
+    {
+      "artifact_id": "docx_hidden_001",
+      "evidence_type": "file_timestamp",
+      "source_tool": "read_evidence",
+      "timestamp": "2015-10-18T03:46:00Z",
+      "raw_score": 0.78,
+      "prior_trust": 0.85,
+      "provenance_chain": [
+        "sha256:8cdf2e96179cd62dbc607e63bbd9cccd3ad257e6684d3a67322605de6b43bb3d"
+      ],
+      "description": "Hidden.docx at C:\\Users\\Public\\Hidden.docx. Content: 'Super secret document' + 'Trade secrets worth millions'. Author='-', LastModifiedBy='-', Company=''. Revision=1. TotalTime=2min. Word 2007 (AppVersion 12.0000). Shannon entropy 3.96.",
+      "metadata": {
+        "path": "C:\\Users\\Public\\Hidden.docx",
+        "machine": "HENRY-PC",
+        "sha256": "8cdf2e96179cd62dbc607e63bbd9cccd3ad257e6684d3a67322605de6b43bb3d",
+        "author_field": "-",
+        "last_modified_by": "-",
+        "revision": 1,
+        "total_time_min": 2,
+        "word_version": "12.0000",
+        "created": "2015-10-18T03:46:00Z",
+        "modified": "2015-10-18T03:48:00Z",
+        "acquisition_tool": "python-zipfile (OOXML extraction)",
+        "acquisition_hash": "sha256:8cdf2e96179cd62dbc607e63bbd9cccd3ad257e6684d3a67322605de6b43bb3d",
+        "acquisition_timestamp": "2026-06-29T23:30:00Z",
+        "write_blocker_used": true,
+        "examiner_id": "VIGIA-MCP-CLAUDE-CODE"
+      }
+    },
+    {
+      "artifact_id": "prefetch_winword_001",
+      "evidence_type": "file_timestamp",
+      "source_tool": "read_evidence",
+      "timestamp": "2015-10-18T03:46:00Z",
+      "raw_score": 0.65,
+      "prior_trust": 0.90,
+      "provenance_chain": [
+        "sha256:f58a3f8eef471f344acec19e9c77f08a175e43a5983bd6532ffe5b0c88c403ed"
+      ],
+      "description": "WINWORD.EXE-CEA9B574.pf — Windows Prefetch file confirms Microsoft Word was executed on HENRY-PC. Corroborates Hidden.docx was opened in Word.",
+      "metadata": {
+        "filename": "WINWORD.EXE-CEA9B574.pf",
+        "process": "WINWORD.EXE",
+        "hash_suffix": "CEA9B574",
+        "sha256": "f58a3f8eef471f344acec19e9c77f08a175e43a5983bd6532ffe5b0c88c403ed",
+        "acquisition_tool": "SIFT read_evidence",
+        "acquisition_hash": "sha256:f58a3f8eef471f344acec19e9c77f08a175e43a5983bd6532ffe5b0c88c403ed",
+        "acquisition_timestamp": "2026-06-29T23:30:00Z",
+        "write_blocker_used": true,
+        "examiner_id": "VIGIA-MCP-CLAUDE-CODE"
+      }
+    },
+    {
+      "artifact_id": "lnk_hidden_docx_001",
+      "evidence_type": "file_timestamp",
+      "source_tool": "read_evidence",
+      "timestamp": "2015-10-18T03:46:00Z",
+      "raw_score": 0.70,
+      "prior_trust": 0.85,
+      "provenance_chain": [
+        "sha256:6c42c3155dfc0021767ca291c4b1212d0db2fa1601f04f06b54fabad8a7b152a"
+      ],
+      "description": "LNK Office-Recent/Hidden.docx.lnk — Windows Shell Link recording recent access to C:\\Users\\Public\\Hidden.docx on \\\\HENRY-PC. Machine name HENRY-PC extracted via strings.",
+      "metadata": {
+        "filename": "Hidden.docx.lnk",
+        "target_path": "C:\\Users\\Public\\Hidden.docx",
+        "machine": "HENRY-PC",
+        "lnk_type": "Office-Recent",
+        "sha256": "6c42c3155dfc0021767ca291c4b1212d0db2fa1601f04f06b54fabad8a7b152a",
+        "acquisition_tool": "strings (SIFT)",
+        "acquisition_hash": "sha256:6c42c3155dfc0021767ca291c4b1212d0db2fa1601f04f06b54fabad8a7b152a",
+        "acquisition_timestamp": "2026-06-29T23:30:00Z",
+        "write_blocker_used": true,
+        "examiner_id": "VIGIA-MCP-CLAUDE-CODE"
+      }
+    },
+    {
+      "artifact_id": "lnk_usb_drive_001",
+      "evidence_type": "file_timestamp",
+      "source_tool": "read_evidence",
+      "timestamp": "2015-10-18T03:46:00Z",
+      "raw_score": 0.72,
+      "prior_trust": 0.85,
+      "provenance_chain": [
+        "sha256:faf2a33dd52504151f847d1a379a8185a215f8fba91d100cb14059a81f54992c"
+      ],
+      "description": "LNK Windows-Recent/Removable Disk (D).lnk — access to USB drive D:\\ root on HENRY-PC. Drive root access consistent with bulk file copy or browsing for exfiltration target.",
+      "metadata": {
+        "filename": "Removable Disk (D).lnk",
+        "target_path": "D:\\",
+        "machine": "HENRY-PC",
+        "lnk_type": "Windows-Recent",
+        "sha256": "faf2a33dd52504151f847d1a379a8185a215f8fba91d100cb14059a81f54992c",
+        "acquisition_tool": "strings (SIFT)",
+        "acquisition_hash": "sha256:faf2a33dd52504151f847d1a379a8185a215f8fba91d100cb14059a81f54992c",
+        "acquisition_timestamp": "2026-06-29T23:30:00Z",
+        "write_blocker_used": true,
+        "examiner_id": "VIGIA-MCP-CLAUDE-CODE"
+      }
+    }
+  ]
+}
