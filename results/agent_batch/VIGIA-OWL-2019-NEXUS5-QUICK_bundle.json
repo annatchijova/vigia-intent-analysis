@@ -1,0 +1,201 @@
+{
+  "analysis_timestamp": "2026-06-30T17:33:21.262954+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "VIGIA-OWL-2019-NEXUS5-QUICK",
+    "end_time": "2026-06-30T17:33:21.262958+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "VIGIA-OWL-2019-NEXUS5-QUICK",
+        "entry_sha256": "aff53a73dd872dece93c95c58e726e1335f3cdffe8150e22934845d8fad0447c",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "VIGIA-OWL-2019-NEXUS5-QUICK"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: e2370a4038853830...",
+        "outputs_summary": {
+          "agent_sha256": "e2370a40388538304ddd05ecc8ae2b33b5d56a4fd275c4d6ef3a2c87ac898fa0",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-06-30T17:33:20.882394+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-OWL-2019-NEXUS5-QUICK",
+        "entry_sha256": "716458c7c2ca495133db01072ef0840550c7775622132fddefbe8c004b037ad8",
+        "inputs_summary": {
+          "path": "evidence/owl-2019-nexus5-quick"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-06-30T17:33:20.882465+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-OWL-2019-NEXUS5-QUICK",
+        "entry_sha256": "9570a201be08ce3894a7178640c16a21f338b494b157a6ec39ce6b8d75b43e88",
+        "inputs_summary": {
+          "path": "evidence/owl-2019-nexus5-quick"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: 1ab8a90ee67f19d0...",
+        "outputs_summary": {
+          "sha256": "1ab8a90ee67f19d03566dc63e29268a4e8da6c8357909ea956a1a75b76443a7a"
+        },
+        "seq": 3,
+        "timestamp": "2026-06-30T17:33:20.883395+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "VIGIA-OWL-2019-NEXUS5-QUICK",
+        "entry_sha256": "407548579caa4e77acab8d468d9d7a612702fd896278a48e39f89b14cf3abbd5",
+        "inputs_summary": {
+          "evidence": "evidence/owl-2019-nexus5-quick",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-06-30T17:33:20.883486+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "VIGIA-OWL-2019-NEXUS5-QUICK",
+        "entry_sha256": "a359bf6b27275c469346533c6bc22a6ca548c10b11288096ef339d038848bfa9",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 0 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "UNDETERMINED",
+            "best_posterior": "0",
+            "confidence": "0",
+            "is_conclusive": "False",
+            "narrative": "[FIRSTNESS] Se\u00f1ales insuficientes (0).",
+            "ontological_level": "None"
+          },
+          "case_id": "VIGIA-OWL-2019-NEXUS5-QUICK",
+          "custody": {
+            "artifact_id": "UNKNOWN",
+            "case_id": "VIGIA-OWL-2019-NEXUS5-QUICK",
+            "n_records": "0",
+            "records": []
+          },
+          "pipeline_meta": {
+            "anti_silencing": "True",
+            "frs_groups": "0",
+            "gamma_applied": "True",
+            "n_engine_signals": "0",
+            "n_sift_signals": "0",
+            "n_total_signals": "0",
+            "version": "V4-COLECTIVO-2026-05-06"
+          },
+          "results": {
+            "caie": {
+              "status": "NO_ARTIFACTS"
+            }
+          },
+          "signals": []
+        },
+        "seq": 5,
+        "timestamp": "2026-06-30T17:33:21.262653+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "VIGIA-OWL-2019-NEXUS5-QUICK",
+        "entry_sha256": "d57bd05426514b4b1fdb736265e643ef496ae782396b9060180ae47558aeab4e",
+        "inputs_summary": {
+          "n_signals": "0"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-06-30T17:33:21.262779+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "VIGIA-OWL-2019-NEXUS5-QUICK",
+        "entry_sha256": "949d8fa8617353d9ac5492a19913680ba370b0893199003eb41fcbe303572ac0",
+        "inputs_summary": {
+          "verdict": "UNDETERMINED"
+        },
+        "iteration": 0,
+        "note": "Exit code 0 \u2014 analysis complete.",
+        "outputs_summary": {
+          "exit_code": "0"
+        },
+        "seq": 7,
+        "timestamp": "2026-06-30T17:33:21.262896+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-06-30T17:33:20.882189+00:00",
+    "total_entries": 7
+  },
+  "case_id": "VIGIA-OWL-2019-NEXUS5-QUICK",
+  "evidence_path": "evidence/owl-2019-nexus5-quick",
+  "evidence_sha256": "1ab8a90ee67f19d03566dc63e29268a4e8da6c8357909ea956a1a75b76443a7a",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-OWL-2019-NEXUS5-QUICK ===\nEvidence: evidence/owl-2019-nexus5-quick\nEvidence SHA-256: 1ab8a90ee67f19d03566dc63e29268a4e8da6c8357909ea956a1a75b76443a7a\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: UNDETERMINED\nPosterior confidence: 0\nConclusive: NO \u2014 requires human review\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] Se\u00f1ales insuficientes (0).\n\n--- CAIE ---\n  No artifacts for cross-correlation (0 signals).\n\n--- FINAL ALERT LEVEL ---\nLOW \u2014 No significant anomalies detected in this iteration.\n\nCritical signals (z>3): 0\nHigh signals (2<z<=3): 0\nTotal signals analyzed: 0",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "UNDETERMINED",
+      "best_posterior": "0",
+      "confidence": "0",
+      "is_conclusive": false,
+      "narrative": "[FIRSTNESS] Se\u00f1ales insuficientes (0).",
+      "ontological_level": null
+    },
+    "case_id": "VIGIA-OWL-2019-NEXUS5-QUICK",
+    "custody": {
+      "artifact_id": "UNKNOWN",
+      "case_id": "VIGIA-OWL-2019-NEXUS5-QUICK",
+      "n_records": 0,
+      "records": []
+    },
+    "pipeline_meta": {
+      "anti_silencing": true,
+      "frs_groups": 0,
+      "gamma_applied": true,
+      "n_engine_signals": 0,
+      "n_sift_signals": 0,
+      "n_total_signals": 0,
+      "version": "V4-COLECTIVO-2026-05-06"
+    },
+    "results": {
+      "caie": {
+        "status": "NO_ARTIFACTS"
+      }
+    },
+    "signals": []
+  },
+  "sans_compliance": {
+    "accuracy_validation": false,
+    "analytical_reasoning": false,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}

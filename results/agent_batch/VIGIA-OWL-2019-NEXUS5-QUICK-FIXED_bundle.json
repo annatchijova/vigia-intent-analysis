@@ -1,0 +1,216 @@
+{
+  "analysis_timestamp": "2026-06-30T17:45:21.060684+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "VIGIA-OWL-2019-NEXUS5-QUICK-FIXED",
+    "end_time": "2026-06-30T17:45:21.060688+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "VIGIA-OWL-2019-NEXUS5-QUICK-FIXED",
+        "entry_sha256": "62c50fc7663de7c4a56df9ff97787613e4e5182dc30214e5312b76168d0c30b9",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "VIGIA-OWL-2019-NEXUS5-QUICK-FIXED"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: 70cdf94c93f994ac...",
+        "outputs_summary": {
+          "agent_sha256": "70cdf94c93f994ac5d7192112b5f7429e77c12f44631efc50d95aaf8b5639812",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-06-30T17:45:20.913755+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-OWL-2019-NEXUS5-QUICK-FIXED",
+        "entry_sha256": "c96cc2b976e94d00219ee7c1d2d4d2da3a77d005999f2cc872a2efe74ba42039",
+        "inputs_summary": {
+          "path": "evidence/owl-2019-nexus5-quick"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-06-30T17:45:20.913839+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-OWL-2019-NEXUS5-QUICK-FIXED",
+        "entry_sha256": "f5521450b7a88d8ead9c5795a143839035903a7341a4a739502a7a08c1638714",
+        "inputs_summary": {
+          "path": "evidence/owl-2019-nexus5-quick"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: 1ab8a90ee67f19d0...",
+        "outputs_summary": {
+          "sha256": "1ab8a90ee67f19d03566dc63e29268a4e8da6c8357909ea956a1a75b76443a7a"
+        },
+        "seq": 3,
+        "timestamp": "2026-06-30T17:45:20.915937+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "VIGIA-OWL-2019-NEXUS5-QUICK-FIXED",
+        "entry_sha256": "e2c77983255acd7aa6e4fb40265cc0afe415a2fafabc8caff80bb77730fc42d0",
+        "inputs_summary": {
+          "evidence": "evidence/owl-2019-nexus5-quick",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-06-30T17:45:20.916044+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "VIGIA-OWL-2019-NEXUS5-QUICK-FIXED",
+        "entry_sha256": "f2a0a3c0db8243b163e5a7da31355cd5bb4f0b7813027ee582cdfb2ead41bee1",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 1 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "MOBILE_EVIDENCE_ANALYZED",
+            "best_posterior": "0",
+            "confidence": "0",
+            "is_conclusive": "True",
+            "narrative": "[FIRSTNESS] Mobile forensic evidence analyzed: 1 signal(s) extracted."
+          },
+          "case_id": "VIGIA-OWL-2019-NEXUS5-QUICK-FIXED",
+          "pipeline_meta": {
+            "n_mobile_signals": "1",
+            "n_total_signals": "1",
+            "source": "mobile_forensics_adapter"
+          },
+          "signals": [
+            {
+              "confidence": "0.495",
+              "metadata": {
+                "android_version": "",
+                "device_model": "",
+                "encrypted_apps_count": "0",
+                "is_rooted": "False",
+                "opsec_indicators_count": "1",
+                "owner_email": "",
+                "root_method": "",
+                "total_calls": "0",
+                "total_contacts": "0",
+                "total_sms": "21"
+              },
+              "tool": "ANDROID_FORENSICS",
+              "value": "0.24",
+              "z_score": "1.2"
+            }
+          ]
+        },
+        "seq": 5,
+        "timestamp": "2026-06-30T17:45:21.060364+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "VIGIA-OWL-2019-NEXUS5-QUICK-FIXED",
+        "entry_sha256": "a8c5c6013a5743e2460cec3b911224dfffdb2df63840310741212a4c8f33577a",
+        "inputs_summary": {
+          "n_signals": "1"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-06-30T17:45:21.060488+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "VIGIA-OWL-2019-NEXUS5-QUICK-FIXED",
+        "entry_sha256": "117c16b1b59801582daa58ae415426d6ca7311666f49e16d8f7abbc62df4e029",
+        "inputs_summary": {
+          "verdict": "MOBILE_EVIDENCE_ANALYZED"
+        },
+        "iteration": 0,
+        "note": "Exit code 0 \u2014 analysis complete.",
+        "outputs_summary": {
+          "exit_code": "0"
+        },
+        "seq": 7,
+        "timestamp": "2026-06-30T17:45:21.060598+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-06-30T17:45:20.913514+00:00",
+    "total_entries": 7
+  },
+  "case_id": "VIGIA-OWL-2019-NEXUS5-QUICK-FIXED",
+  "evidence_path": "evidence/owl-2019-nexus5-quick",
+  "evidence_sha256": "1ab8a90ee67f19d03566dc63e29268a4e8da6c8357909ea956a1a75b76443a7a",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-OWL-2019-NEXUS5-QUICK-FIXED ===\nEvidence: evidence/owl-2019-nexus5-quick\nEvidence SHA-256: 1ab8a90ee67f19d03566dc63e29268a4e8da6c8357909ea956a1a75b76443a7a\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MOBILE_EVIDENCE_ANALYZED\nPosterior confidence: 0\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] Mobile forensic evidence analyzed: 1 signal(s) extracted.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [ANDROID_FORENSICS] z=1.200 conf=0.49 \u2014 0.24\n\n--- FINAL ALERT LEVEL ---\nLOW \u2014 No significant anomalies detected in this iteration.\n\nCritical signals (z>3): 0\nHigh signals (2<z<=3): 0\nTotal signals analyzed: 1",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "MOBILE_EVIDENCE_ANALYZED",
+      "best_posterior": "0",
+      "confidence": "0",
+      "is_conclusive": true,
+      "narrative": "[FIRSTNESS] Mobile forensic evidence analyzed: 1 signal(s) extracted."
+    },
+    "case_id": "VIGIA-OWL-2019-NEXUS5-QUICK-FIXED",
+    "pipeline_meta": {
+      "n_mobile_signals": 1,
+      "n_total_signals": 1,
+      "source": "mobile_forensics_adapter"
+    },
+    "signals": [
+      {
+        "confidence": 0.495,
+        "metadata": {
+          "android_version": "",
+          "artifact_reliability": "7/10",
+          "artifact_type": "android_forensic",
+          "chains": 1,
+          "composite_score": "9/20",
+          "data_minimization": true,
+          "device_model": "",
+          "encrypted_apps_count": 0,
+          "finding_types": [
+            "EMPTY_CONTACTS"
+          ],
+          "findings_count": 1,
+          "is_rooted": false,
+          "opsec_indicators_count": 1,
+          "owner_email": "",
+          "root_method": "",
+          "total_calls": 0,
+          "total_contacts": 0,
+          "total_sms": 21
+        },
+        "tool": "ANDROID_FORENSICS",
+        "value": 0.24,
+        "z_score": 1.2
+      }
+    ]
+  },
+  "sans_compliance": {
+    "accuracy_validation": true,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}
