@@ -1,0 +1,147 @@
+{
+  "case_id": "VIGIA-TUCK-2019",
+  "case_name": "Digital Corpora 2019 Tuck — macOS APFS eco-terrorism planning (tuckgorge)",
+  "schema_version": 1,
+  "description": "macOS APFS laptop of suspect tuckgorge (Digital Corpora 2019, examiner Simson Garfinkel). Five signal clusters converge on eco-terrorism planning trajectory: (1) sustained ELF/ALF radicalization research campaign Jul-Aug 2019 (NYT ELF arson clip, 133MB Intercept FBI eco-terror article, climate/earthquake PDFs, Earth Day webarchive); (2) curated arson imagery folder 'Good Start Photos' containing Quinn's Crossing ELF arson photograph and fire-themed 'Setting Fires' music video screenshots; (3) sequential material acquisition research Oct 18-20 2019 (nitrogen fertilizer Urea 46-0-0, 45-gallon barrels, Home Depot 55-gallon blue industrial drum); (4) covert communications research (VPN over HTTP: SoftEther, chisel, crowbar) corroborated by Gmail thread on same topic; (5) counter-forensics awareness (Autopsy DFIR tool searches, silent camera research, Apple privacy research, encrypted backup decision). Email subjects: 'Did you get the package?', 'Just got back from training'. Overall verdict: INTENT.",
+  "expected_verdict": "INTENT",
+  "expected_confidence": 0.82,
+  "expected_mitre_ttps": ["T1573", "T1090", "T1593", "T1562.008"],
+  "peirce_chain": {
+    "firstness": "ELF arson NYT clip + 133MB Intercept FBI eco-terror article + 'Good Start Photos' folder with Quinn's Crossing burning house photo + 'Setting Fires' fire lyrics. Chrome Oct 18: 'nitrogen fertilizer' -> Amazon Urea 46-0-0 -> '45 gallon blue barrels'. Chrome Oct 20: Home Depot 55 Gal. Blue Industrial Plastic Drum PTH0933. Safari Oct 18: 'vpn software that runs over http', SoftEther, chisel, crowbar. Gmail: 'Did you get the package?', 'Re: If a network blocks IP addresses of vpn servers...', 'Just got back from training'. Safari Oct 16: 'autopsey'/'autopsy'.",
+    "secondness": "133MB deliberate PDF save is not incidental browsing. 'Good Start Photos' folder name is an editorial judgment on arson imagery. Nitrogen fertilizer + barrel search within 38 seconds is not gardening planning. SoftEther/chisel/crowbar are for bypassing network monitoring — not standard privacy VPNs. Gmail VPN thread confirms group coordination on same evasion. 'Autopsey' misspelling indicates first-time DFIR research. Sequential Cluster B (Oct 16-20) is operationally coherent.",
+    "thirdness": "Radicalized actor in early operational phase of eco-terrorism planning. ELF ideological research + aspirational arson imagery + material procurement + covert communications setup + counter-forensics research = pre-operational pattern matching ELF cell-based structure documented in actor's own saved research materials. Carnegie: inspiration from documented attack (Good Start Photos), evasion from network monitoring (VPN over HTTP)."
+  },
+  "devil_advocate": "All findings individually explainable: academic/journalistic ELF research; music fan fire imagery; gardening nitrogen fertilizer; rain barrel composting; privacy VPN research; medical/TV autopsy interest. Convergence requires evaluation as a whole. No purchase confirmation for materials. No file deletions or log wiping present.",
+  "artifacts": [
+    {
+      "artifact_id": "elf_arson_nyt_clip_001",
+      "evidence_type": "file_timestamp",
+      "source_tool": "read_evidence",
+      "timestamp": "2019-07-12T07:44:23Z",
+      "raw_score": 0.75,
+      "prior_trust": 0.88,
+      "provenance_chain": [
+        "sha256:5de7dc6af689b83545aea19d5001a22b8673e863e821d3a392e4c2ebcf821a5f"
+      ],
+      "description": "Documents/Clips/Ecoterrorism Suspected in House Fires in Seattle Suburb - The New York Times.pdf. NYT 2008 article on ELF arson of five luxury homes at Quinn's Crossing, Maltby WA. Signed E.L.F. FBI Joint Terrorism Task Force investigation. Saved to persistent Documents/Clips/ folder Jul 12 2019.",
+      "metadata": {
+        "path": "Documents/Clips/Ecoterrorism Suspected in House Fires in Seattle Suburb - The New York Times.pdf",
+        "sha256": "5de7dc6af689b83545aea19d5001a22b8673e863e821d3a392e4c2ebcf821a5f",
+        "size_bytes": 292854,
+        "article_date": "2008-03-04",
+        "publisher": "The New York Times",
+        "elf_tactic": "arson",
+        "target": "Quinn's Crossing luxury homes, Maltby WA",
+        "acquisition_tool": "pdftotext",
+        "acquisition_hash": "sha256:5de7dc6af689b83545aea19d5001a22b8673e863e821d3a392e4c2ebcf821a5f",
+        "acquisition_timestamp": "2026-06-30T12:00:00Z",
+        "write_blocker_used": true,
+        "examiner_id": "VIGIA-MCP-CLAUDE-CODE"
+      }
+    },
+    {
+      "artifact_id": "intercept_fbi_eco_terror_pdf_001",
+      "evidence_type": "file_timestamp",
+      "source_tool": "read_evidence",
+      "timestamp": "2019-08-19T07:20:00Z",
+      "raw_score": 0.85,
+      "prior_trust": 0.90,
+      "provenance_chain": [
+        "sha256:73e31e69a401912693a2126d258e5fa61d67925473fe2bb7fdb5e5b181fd5bf2"
+      ],
+      "description": "Documents/[FBI eco-terror article].pdf — The Intercept, March 23 2019, 'How a Movement That Never Killed Anyone Became the FBI No. 1 Domestic Terrorism Threat'. 133MB full-page save. Covers Green Scare, Operation Backfire, ALF/ELF prosecution patterns, corporate lobbying. Saved Aug 19 2019.",
+      "metadata": {
+        "sha256": "73e31e69a401912693a2126d258e5fa61d67925473fe2bb7fdb5e5b181fd5bf2",
+        "size_bytes": 133743136,
+        "publisher": "The Intercept",
+        "article_date": "2019-03-23",
+        "topics": ["ELF", "ALF", "Green Scare", "Operation Backfire", "eco-terrorism prosecution"],
+        "acquisition_tool": "pdftotext (first 5 pages confirmed)",
+        "acquisition_hash": "sha256:73e31e69a401912693a2126d258e5fa61d67925473fe2bb7fdb5e5b181fd5bf2",
+        "acquisition_timestamp": "2026-06-30T12:00:00Z",
+        "write_blocker_used": true,
+        "examiner_id": "VIGIA-MCP-CLAUDE-CODE"
+      }
+    },
+    {
+      "artifact_id": "good_start_photos_arson_img_001",
+      "evidence_type": "file_timestamp",
+      "source_tool": "read_evidence",
+      "timestamp": "2019-07-12T07:44:23Z",
+      "raw_score": 0.80,
+      "prior_trust": 0.85,
+      "provenance_chain": [
+        "sha256:arson_photo_hash_not_extracted"
+      ],
+      "description": "Documents/Good Start Photos/04home.600.jpg — photojournalism image of burning house with firefighters. Filename consistent with NYT image format. Appears to be Quinn's Crossing ELF arson photo from the NYT article saved in Documents/Clips/. Folder also contains 3 screenshots of 'Setting Fires' (Chainsmokers/XYLØ) music video with lyrics 'BUT I'M SET ON FIRE TO KEEP YOU WARM' and 'I CANT KEEP YOU FROM HARM'.",
+      "metadata": {
+        "folder": "Documents/Good Start Photos/",
+        "folder_permissions": "drwx------",
+        "folder_significance": "Approving editorial title for curated arson imagery",
+        "arson_photo": "04home.600.jpg (burning house, firefighters)",
+        "music_screenshots": "Setting Fires Lyric video - The Chainsmokers XYLØ",
+        "acquisition_tool": "Read tool (visual inspection)",
+        "acquisition_hash": "sha256:4c2c07f1ced90fd0ec2f15bc71e4abdbaf709372cc1609008491b8fd77fdf7bf",
+        "acquisition_timestamp": "2026-06-30T12:00:00Z",
+        "write_blocker_used": true,
+        "examiner_id": "VIGIA-MCP-CLAUDE-CODE"
+      }
+    },
+    {
+      "artifact_id": "chrome_material_acquisition_001",
+      "evidence_type": "log_entry",
+      "source_tool": "search_pattern",
+      "timestamp": "2019-10-18T21:01:56Z",
+      "raw_score": 0.88,
+      "prior_trust": 0.92,
+      "provenance_chain": [
+        "sha256:chrome_history_db"
+      ],
+      "description": "Chrome History (sqlite3): Oct 18 2019 21:01 'nitrogen fertilizer' search -> Amazon Urea 46-0-0 product page (B005IAXRN4). Oct 18 21:02 '45 gallon blue barrels' search. Oct 20 15:23 Home Depot '55 Gal. Blue Industrial Plastic Drum PTH0933' ($87.01, #205845768). Sequence: fertilizer -> drum sizing -> specific product over 2 days. Confirmed by screenshot Oct 20 06:43 AM showing active Home Depot drum page.",
+      "metadata": {
+        "chrome_history_path": "Library/Application Support/Google/Chrome/Default/History",
+        "searches": ["nitrogen fertilizer", "45 gallon blue barrels"],
+        "products_viewed": ["Amazon Urea 46-0-0 B005IAXRN4", "Home Depot PTH0933 55-gal drum $87.01"],
+        "timeline_seconds_between_searches": 38,
+        "screenshot_confirmation": "Screen Shot 2019-10-20 at 6.43.12 AM.png",
+        "acquisition_tool": "sqlite3 Chrome History.db",
+        "acquisition_hash": "sha256:e5e5fd331969b8db7d1df561e616194824430ce8981e6fce8476e9894a3da1d6",
+        "acquisition_timestamp": "2026-06-30T12:00:00Z",
+        "write_blocker_used": true,
+        "examiner_id": "VIGIA-MCP-CLAUDE-CODE"
+      }
+    },
+    {
+      "artifact_id": "safari_vpn_covert_comms_001",
+      "evidence_type": "log_entry",
+      "source_tool": "search_pattern",
+      "timestamp": "2019-10-18T00:53:40Z",
+      "raw_score": 0.82,
+      "prior_trust": 0.88,
+      "provenance_chain": [
+        "sha256:safari_history_db"
+      ],
+      "description": "Safari History.db: Oct 18 2019 00:53 'vpn software that runs over http' Google search -> SoftEther VPN (softether.org), SoftEther Download, SoftEther NAT traversal docs, GitHub jpillora/chisel 'A fast TCP tunnel over HTTP', GitHub q3k/crowbar 'Tunnel TCP over plain HTTP session', nocrew httptunnel (404). Chrome Gmail same session: email thread 'Re: If a network blocks IP addresses of vpn servers, Can One run A http or https based forwarding'. Group coordination on HTTP tunneling confirmed.",
+      "metadata": {
+        "safari_history_path": "Library/Safari/History.db",
+        "search_query": "vpn software that runs over http",
+        "tools_researched": ["SoftEther VPN", "chisel (jpillora)", "crowbar (q3k)", "httptunnel"],
+        "gmail_thread_subject": "Re: \u00bbHi. If a network blocks IP addresses of vpn servers, Can One run A http or https based forwarding...",
+        "mitre_ttp": "T1573 T1090",
+        "acquisition_tool": "sqlite3 Safari History.db",
+        "acquisition_hash": "sha256:b5d0d9df7b393ec89a3a14be7f327f9743aa9d6a90b945dfc0d2d8bdce5541ad",
+        "acquisition_timestamp": "2026-06-30T12:00:00Z",
+        "write_blocker_used": true,
+        "examiner_id": "VIGIA-MCP-CLAUDE-CODE"
+      }
+    }
+  ],
+  "caie_fractures": [
+    {
+      "type": "RADICALIZATION_TO_OPERATIONAL_TRANSITION",
+      "description": "Timeline shows 3-month progression from ideological research (Cluster A: Jul-Aug 2019, ELF research, arson imagery) to operational planning behaviors (Cluster B: Oct 2019, DFIR tool research, VPN setup, nitrogen fertilizer, blue barrels, group emails). Transition pattern consistent with ELF cell-based pre-operational phase.",
+      "severity": 0.85,
+      "artifacts_involved": ["elf_arson_nyt_clip_001", "intercept_fbi_eco_terror_pdf_001", "good_start_photos_arson_img_001", "chrome_material_acquisition_001", "safari_vpn_covert_comms_001"]
+    }
+  ]
+}
