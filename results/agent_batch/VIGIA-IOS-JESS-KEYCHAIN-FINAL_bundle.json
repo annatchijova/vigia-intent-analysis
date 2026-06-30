@@ -1,0 +1,273 @@
+{
+  "analysis_timestamp": "2026-06-30T00:39:13.198930+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "VIGIA-IOS-JESS-KEYCHAIN-FINAL",
+    "end_time": "2026-06-30T00:39:13.198934+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "VIGIA-IOS-JESS-KEYCHAIN-FINAL",
+        "entry_sha256": "e1f87dab55dc507ee8e6c65a6ecf64dc43b3c9f5843f8cc60e629c5f96cf14a7",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "VIGIA-IOS-JESS-KEYCHAIN-FINAL"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: 2c5b86f179987975...",
+        "outputs_summary": {
+          "agent_sha256": "2c5b86f17998797564265c52e10be5f97c53c4b2d50ecc079b4ae51b0a53d0ce",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-06-30T00:39:13.196164+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-IOS-JESS-KEYCHAIN-FINAL",
+        "entry_sha256": "6d9c3d290827a36b8a5705ebb078a8348cb6a89f31111f56971addf52526235c",
+        "inputs_summary": {
+          "path": "data/cases/VIGIA-MAGNET-2022-IOS-JESS-KEYCHAIN.json"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-06-30T00:39:13.196239+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-IOS-JESS-KEYCHAIN-FINAL",
+        "entry_sha256": "85e009511aac9595e53b0af7824678a1a10f7681fc7dcd03ad66be76d50a99e4",
+        "inputs_summary": {
+          "path": "data/cases/VIGIA-MAGNET-2022-IOS-JESS-KEYCHAIN.json"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: d117e1b346917e58...",
+        "outputs_summary": {
+          "sha256": "d117e1b346917e58016e609ca60bd16314bc58dc1f5e610bae3b6d69eeefb1bd"
+        },
+        "seq": 3,
+        "timestamp": "2026-06-30T00:39:13.196320+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "VIGIA-IOS-JESS-KEYCHAIN-FINAL",
+        "entry_sha256": "921ff90deacdb7a4a4c4f7a54b7368bb77cfcb4054464b3faf05773d80e51148",
+        "inputs_summary": {
+          "evidence": "data/cases/VIGIA-MAGNET-2022-IOS-JESS-KEYCHAIN.json",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-06-30T00:39:13.196407+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "VIGIA-IOS-JESS-KEYCHAIN-FINAL",
+        "entry_sha256": "a965c1631ffa0603a13b1d4031e47d9a0f5c6af9c1f4854ecf56409bef867123",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 4 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "INTENT_DETECTED",
+            "best_posterior": "444/3125",
+            "confidence": "444/3125",
+            "is_conclusive": "True",
+            "narrative": "Supplement to prior INTENT verdict (VIGIA-MAGNET-2022-IOS-JESS). Three new artifacts: GrayKey extraction report PDF, keychain password dump TXT (1301 lines), raw keychain plist. Key findings: (1) Cham..."
+          },
+          "case_id": "VIGIA-MAGNET-2022-IOS-JESS-KEYCHAIN",
+          "pipeline_meta": {
+            "artifact_count": "4",
+            "avg_score": "444/625",
+            "expected_verdict": "INTENT",
+            "source": "ebs_v1_json_adapter"
+          },
+          "signals": [
+            {
+              "artifact_id": "graykey_pdf_001",
+              "confidence": "49/50",
+              "description": "GrayKey Progress Report PDF. Device: Patrick Bentley, iPhone 8 (Global), iOS 15.0.2, UDID fb028ddefa8af7df5b12d3e729f075d150637a31. Extraction 2022-02-14T18:21:48-18:37:46 UTC. BFU state at seizure. T",
+              "evidence_type": "file_timestamp",
+              "source": "read_evidence",
+              "z_score": "931/1000"
+            },
+            {
+              "artifact_id": "keychain_champlain_wifi_001",
+              "confidence": "23/25",
+              "description": "Keychain AirPort entry: Label/Account=ChamplainPSK, Item value='letusdare'. Created 2022-02-04T00:31:37Z. ChamplainPSK is Champlain College (Burlington, VT) WiFi PSK. 'letusdare' is the college's Lati",
+              "evidence_type": "log_entry",
+              "source": "read_evidence",
+              "z_score": "391/500"
+            },
+            {
+              "artifact_id": "keychain_wire_001",
+              "confidence": "22/25",
+              "description": "Keychain entry for Wire (com.wearezeta.zclient.ios), Access Group EDF3JCE8BC. Active session UUID 5C705A09-88C8-4845-BFD2-65EB6CBEE5DB with encrypted session token. Wire is E2E encrypted, zero-metadat",
+              "evidence_type": "log_entry",
+              "source": "read_evidence",
+              "z_score": "396/625"
+            },
+            {
+              "artifact_id": "keychain_chess_credentials_001",
+              "confidence": "9/10",
+              "description": "Keychain Chess.com (com.chess.iphone): Account=ChessGod0107, Item value='God@Chess!' (cleartext). The '0107' suffix matches pbentley0107@gmail.com \u2014 consistent personal identifier (likely Jan 7 birthd",
+              "evidence_type": "log_entry",
+              "source": "read_evidence",
+              "z_score": "99/200"
+            }
+          ]
+        },
+        "seq": 5,
+        "timestamp": "2026-06-30T00:39:13.198254+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "VIGIA-IOS-JESS-KEYCHAIN-FINAL",
+        "entry_sha256": "34252a08aee08f271fc678df7238bb2ea6c195011dc308149c0948ce19fa0850",
+        "inputs_summary": {
+          "n_signals": "4"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-06-30T00:39:13.198757+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "VIGIA-IOS-JESS-KEYCHAIN-FINAL",
+        "entry_sha256": "d95d8839cfd2801c10e556b6ceb8c2fbd60485eb3be0db9b3b7dd1e65e9c4ac7",
+        "inputs_summary": {
+          "verdict": "INTENT_DETECTED"
+        },
+        "iteration": 0,
+        "note": "Exit code 0 \u2014 analysis complete.",
+        "outputs_summary": {
+          "exit_code": "0"
+        },
+        "seq": 7,
+        "timestamp": "2026-06-30T00:39:13.198847+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-06-30T00:39:13.195903+00:00",
+    "total_entries": 7
+  },
+  "case_id": "VIGIA-IOS-JESS-KEYCHAIN-FINAL",
+  "evidence_path": "data/cases/VIGIA-MAGNET-2022-IOS-JESS-KEYCHAIN.json",
+  "evidence_sha256": "d117e1b346917e58016e609ca60bd16314bc58dc1f5e610bae3b6d69eeefb1bd",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-IOS-JESS-KEYCHAIN-FINAL ===\nEvidence: data/cases/VIGIA-MAGNET-2022-IOS-JESS-KEYCHAIN.json\nEvidence SHA-256: d117e1b346917e58016e609ca60bd16314bc58dc1f5e610bae3b6d69eeefb1bd\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: INTENT_DETECTED\nPosterior confidence: 444/3125\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\nSupplement to prior INTENT verdict (VIGIA-MAGNET-2022-IOS-JESS). Three new artifacts: GrayKey extraction report PDF, keychain password dump TXT (1301 lines), raw keychain plist. Key findings: (1) ChamplainPSK WiFi credential with password 'letusdare' (Champlain College motto) \u2014 places Bentley at a major cybersecurity school; (2) Wire encrypted messaging app installed (E2E OPSEC channel); (3) GrayKey confirms passcode 782677 recovered, device BFU at seizure, extraction 2022-02-14; (4) cleartext C\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [GrayKey Progress Report PDF. Device: Patrick Bentley, iPhone 8 (Global] z=0.931 conf=0.98 \u2014 \n  [Keychain AirPort entry: Label/Account=ChamplainPSK, Item value='letusd] z=0.782 conf=0.92 \u2014 \n  [Keychain entry for Wire (com.wearezeta.zclient.ios), Access Group EDF3] z=0.634 conf=0.88 \u2014 \n  [Keychain Chess.com (com.chess.iphone): Account=ChessGod0107, Item valu] z=0.495 conf=0.90 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW \u2014 No significant anomalies detected in this iteration.\n\nCritical signals (z>3): 0\nHigh signals (2<z<=3): 0\nTotal signals analyzed: 4",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "INTENT_DETECTED",
+      "best_posterior": "444/3125",
+      "confidence": {
+        "__fraction__": true,
+        "den": 3125,
+        "num": 444
+      },
+      "is_conclusive": true,
+      "narrative": "Supplement to prior INTENT verdict (VIGIA-MAGNET-2022-IOS-JESS). Three new artifacts: GrayKey extraction report PDF, keychain password dump TXT (1301 lines), raw keychain plist. Key findings: (1) ChamplainPSK WiFi credential with password 'letusdare' (Champlain College motto) \u2014 places Bentley at a major cybersecurity school; (2) Wire encrypted messaging app installed (E2E OPSEC channel); (3) GrayKey confirms passcode 782677 recovered, device BFU at seizure, extraction 2022-02-14; (4) cleartext C"
+    },
+    "case_id": "VIGIA-MAGNET-2022-IOS-JESS-KEYCHAIN",
+    "pipeline_meta": {
+      "artifact_count": 4,
+      "avg_score": "444/625",
+      "expected_verdict": "INTENT",
+      "source": "ebs_v1_json_adapter"
+    },
+    "signals": [
+      {
+        "artifact_id": "graykey_pdf_001",
+        "confidence": {
+          "__fraction__": true,
+          "den": 50,
+          "num": 49
+        },
+        "description": "GrayKey Progress Report PDF. Device: Patrick Bentley, iPhone 8 (Global), iOS 15.0.2, UDID fb028ddefa8af7df5b12d3e729f075d150637a31. Extraction 2022-02-14T18:21:48-18:37:46 UTC. BFU state at seizure. T",
+        "evidence_type": "file_timestamp",
+        "source": "read_evidence",
+        "z_score": {
+          "__fraction__": true,
+          "den": 1000,
+          "num": 931
+        }
+      },
+      {
+        "artifact_id": "keychain_champlain_wifi_001",
+        "confidence": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 23
+        },
+        "description": "Keychain AirPort entry: Label/Account=ChamplainPSK, Item value='letusdare'. Created 2022-02-04T00:31:37Z. ChamplainPSK is Champlain College (Burlington, VT) WiFi PSK. 'letusdare' is the college's Lati",
+        "evidence_type": "log_entry",
+        "source": "read_evidence",
+        "z_score": {
+          "__fraction__": true,
+          "den": 500,
+          "num": 391
+        }
+      },
+      {
+        "artifact_id": "keychain_wire_001",
+        "confidence": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 22
+        },
+        "description": "Keychain entry for Wire (com.wearezeta.zclient.ios), Access Group EDF3JCE8BC. Active session UUID 5C705A09-88C8-4845-BFD2-65EB6CBEE5DB with encrypted session token. Wire is E2E encrypted, zero-metadat",
+        "evidence_type": "log_entry",
+        "source": "read_evidence",
+        "z_score": {
+          "__fraction__": true,
+          "den": 625,
+          "num": 396
+        }
+      },
+      {
+        "artifact_id": "keychain_chess_credentials_001",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 9
+        },
+        "description": "Keychain Chess.com (com.chess.iphone): Account=ChessGod0107, Item value='God@Chess!' (cleartext). The '0107' suffix matches pbentley0107@gmail.com \u2014 consistent personal identifier (likely Jan 7 birthd",
+        "evidence_type": "log_entry",
+        "source": "read_evidence",
+        "z_score": {
+          "__fraction__": true,
+          "den": 200,
+          "num": 99
+        }
+      }
+    ]
+  },
+  "sans_compliance": {
+    "accuracy_validation": false,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}
