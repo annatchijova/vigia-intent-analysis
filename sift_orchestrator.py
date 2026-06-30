@@ -84,6 +84,19 @@ class SIFTOrchestrator:
                 run_kwargs["event_logs"] = lp if isinstance(lp, list) else [lp]
             if kwargs.get("network_flows"):
                 run_kwargs["network_flows"] = kwargs["network_flows"]
+            pcap_path = kwargs.get("pcap_path")
+            if isinstance(pcap_path, list):
+                pcap_path = pcap_path[0] if pcap_path else None
+            if pcap_path and not run_kwargs.get("network_flows"):
+                try:
+                    from vigia.sift.pcap_parser import parse_pcap_to_flows
+                    pcap_flows = parse_pcap_to_flows(str(pcap_path))
+                    if pcap_flows:
+                        run_kwargs["network_flows"] = pcap_flows
+                        logger.info("[SIFT_SHIM] Parsed %d flows from pcap: %s", len(pcap_flows), pcap_path)
+                except Exception as e:
+                    logger.error("[SIFT_SHIM] pcap parsing failed for %s: %s", pcap_path, e)
+                    raise
             rh = kwargs.get("registry_hives")
             if rh:
                 run_kwargs["registry_hives"] = rh if isinstance(rh, list) else [rh]

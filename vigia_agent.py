@@ -998,6 +998,8 @@ def _build_orchestrator_kwargs(evidence_path: Path, params: Dict) -> Dict:
             ("*.E01", "disk_path"),
             ("*.e01", "disk_path"),
             ("*.log", "log_path"),
+            ("*.pcap", "pcap_path"),
+            ("*.pcapng", "pcap_path"),
             ("SAM", "registry_hives"),
             ("SYSTEM", "registry_hives"),
             ("SOFTWARE", "registry_hives"),
@@ -1043,6 +1045,8 @@ def _build_orchestrator_kwargs(evidence_path: Path, params: Dict) -> Dict:
         elif suffix in (".img", ".vmem", ".mem", ".dmp"):
             # Raw memory image — route to vol3 adapter
             kwargs["memory_path"] = str(evidence_path)
+        elif suffix in (".pcap", ".pcapng"):
+            kwargs["pcap_path"] = str(evidence_path)
         else:
             # Generic text — use as event_stream
             kwargs["log_path"] = str(evidence_path)

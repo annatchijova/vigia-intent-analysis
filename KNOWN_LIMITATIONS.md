@@ -1516,3 +1516,26 @@ on chain count, reflecting the corroborative strength of multiple independent
 event chains.
 
 ---
+
+## L-039 — PCAP parser requires tshark in PATH
+
+**Status:** DOCUMENTED
+**Severity:** P2
+**Mode affected:** All modes — evidence ingestion
+**Discovered:** 2026-06-30
+
+**Description:**
+
+The pcap parser (`vigia/sift/pcap_parser.py`) depends on `tshark` (Wireshark CLI)
+being available in `PATH`. If tshark is not installed, pcap evidence will fail with
+`FileNotFoundError` (fail-loud, not silent).
+
+**Known constraints:**
+- Requires `tshark` ≥ 3.0 (tested with 4.2.2).
+- Install: `sudo apt install tshark` (Debian/Ubuntu) or `sudo dnf install wireshark-cli` (Fedora).
+- Safety cap: maximum 50,000 packets per file. Larger files are truncated with a warning.
+- Timestamps se truncan a segundo (epoch int) — sub-second jitter no es capturado por el parser, lo cual puede afectar la detección de beaconing con intervalos sub-segundo.
+- No soporta pcap sobre stdin ni streams en vivo — solo archivos en disco.
+- tshark subprocess tiene timeout de 120 segundos — pcaps extremadamente grandes pueden excederlo.
+
+---
