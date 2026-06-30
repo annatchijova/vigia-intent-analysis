@@ -717,6 +717,41 @@ class VIGIAAgent:
                     narrative_parts.append(f"    → {adj}")
             narrative_parts.append("")
 
+        # B-041: Surface CAIE results in narrative.
+        # CAIE runs inside sift_orchestrator.run_full_analysis() and stores
+        # its output in results["results"]["caie"].  Until this fix, the
+        # agent never read it — fractures were computed but invisible.
+        caie = results.get("results", {}).get("caie", {})
+        if caie and caie.get("status") == "OK":
+            n_fractures = caie.get("fractures_detected", 0)
+            caie_verdict = caie.get("verdict", "NOISE")
+            composite = caie.get("composite_score", "0")
+            structural = caie.get("structural_verdict", "NOISE")
+            golden = caie.get("golden_rules_triggered", 0)
+            narrative_parts.append("--- CAIE (Cross-Artifact Incongruence Engine) ---")
+            narrative_parts.append(
+                f"  Verdict: {caie_verdict} | Structural: {structural} "
+                f"| Composite: {composite} | Fractures: {n_fractures} "
+                f"| Golden Rules: {golden}"
+            )
+            for f in caie.get("fractures", []):
+                _ftype = f.get("type", "?")
+                _sev = f.get("severity", "?")
+                _interp = str(f.get("interpretation", ""))[:120]
+                _golden_tag = " [GOLDEN RULE]" if f.get("is_golden_rule") else ""
+                _struct_tag = " [STRUCTURAL]" if f.get("is_structural") else ""
+                narrative_parts.append(
+                    f"  Fracture: {_ftype} severity={_sev}"
+                    f"{_golden_tag}{_struct_tag} — {_interp}"
+                )
+            if caie.get("daubert_note"):
+                narrative_parts.append(f"  {caie['daubert_note'][:200]}")
+            narrative_parts.append("")
+        elif caie and caie.get("status") == "NO_ARTIFACTS":
+            narrative_parts.append("--- CAIE ---")
+            narrative_parts.append("  No artifacts for cross-correlation (0 signals).")
+            narrative_parts.append("")
+
         n_critical = sum(1 for s in signals if _to_frac_z(s) > Fraction(3, 1))
         n_high = sum(1 for s in signals if Fraction(2, 1) < _to_frac_z(s) <= Fraction(3, 1))
 

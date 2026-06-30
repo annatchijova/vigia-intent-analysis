@@ -2176,3 +2176,46 @@ fix propuesto o aplicado, y referencia de commit.
 - Propagación de estados de veredicto en todos los generadores de reportes
 
 ---
+
+## B-041 — CAIE output no expuesto en vigia_agent.py narrative [PARTIAL FIX]
+
+**Fecha**: 2026-06-30
+**Severidad**: Media
+**Componentes**: `vigia_agent.py`, `vigia/sift/sift_orchestrator.py`
+
+### Diagnóstico original
+Se reportó que `caie_artifacts` no era devuelto por `run_full_analysis()` y CAIE
+nunca corría en modo RAW.
+
+### Diagnóstico corregido (auditoría)
+CAIE **sí corre** dentro de `sift_orchestrator.py` líneas 582-610. El resultado se
+guarda en `results["caie"]` y se retorna en el dict. El bug real es:
+- **B-041a**: `vigia_agent.py` nunca leía `results["results"]["caie"]` — las fracturas
+  se computaban pero eran invisibles en el narrative y el bundle.
+- **B-041b**: CAIE corre DESPUÉS de que abduction ya se computó — las fracturas nunca
+  retroalimentan el veredicto.
+
+### Fix aplicado (B-041a)
+- **Archivo**: `vigia_agent.py`, método `_generate_narrative()`
+- **Cambio**: Agregada sección `--- CAIE ---` al narrative que expone verdict, structural
+  verdict, composite score, fractures (con tipo, severidad, golden rule / structural tags),
+  y daubert note.
+- **Impacto**: Fracturas CAIE ahora visibles en el bundle sellado para revisión humana.
+- **Tests**: 188 passed, 6 xfailed, 0 regresiones.
+
+### Upgrade automático INTENT→MALICE (B-041b) — DIFERIDO
+Auditoría sobre MAGNET-2020-WINDOWS y MAGNET-2022-WINDOWS en modo RAW muestra que
+CAIE produce INCONCLUSIVE con 0 fractures en ambos casos:
+1. Todos los artefactos son `log_entry` (una sola capa) → 0 fractures cross-layer
+2. `ForensicAdapter.signal_to_caie_artifact()` no inyecta metadata de adquisición →
+   trust degradado de 0.45 a 0.10 por NIST SP 800-86 §4.3
+3. CDL downgrade a INCONCLUSIVE por coverage 16.7% (1/6 capas)
+4. Composite score 0.0027 (NOISE probabilístico)
+
+**Conclusión**: el upgrade automático sería dead code con la metadata actual. Se
+requiere primero que `ForensicAdapter` propague acquisition metadata desde los
+signals, y/o que el pipeline produzca artefactos de múltiples capas epistémicas
+(memory_process, prefetch, kernel_structure además de log_entry).
+
+### Archivos tocados
+- `vigia_agent.py` — `_generate_narrative()` (añadida lectura de CAIE)
