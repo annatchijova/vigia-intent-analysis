@@ -13,6 +13,7 @@ FIX P0: Todo valor numérico en evidence dict usa Fraction/str. NUNCA float.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+from decimal import Decimal, ROUND_HALF_EVEN
 from fractions import Fraction
 from typing import Any, Dict, List, Optional, Tuple
 
@@ -96,9 +97,9 @@ class UnifiedTimelineEngine:
                 event_type=signal.tool_name,
                 description=f"{signal.tool_name}: z={signal.z_score}",
                 entity_id=entity,
-                confidence=Fraction(int(round(signal.confidence * 1000)), 1000),
+                confidence=Fraction(Decimal(str(signal.confidence)).quantize(Decimal("0.001"), rounding=ROUND_HALF_EVEN)),
                 raw_evidence={
-                    "z_score": str(Fraction(int(round(signal.z_score * 100)), 100)),
+                    "z_score": str(Fraction(Decimal(str(signal.z_score)).quantize(Decimal("0.01"), rounding=ROUND_HALF_EVEN))),
                     "metadata": signal.metadata,
                 },
             )

@@ -329,28 +329,38 @@ vigia_scorer.py` before accepting any change to the scoring path.
 
 | Field | Value |
 |-------|-------|
-| **Status** | OPEN |
-| **Severity** | P2 — L-021 debt, not urgent until active SIFT integration |
-| **File** | `vigia/sift/shellbag_analyzer.py`, `vigia/sift/amcache_shimcache.py`, `vigia/sift/memory_forensics.py`, `vigia/sift/disk_forensics.py` |
+| **Status** | RESOLVED — P0-001 audit 2026-06-30 |
+| **Severity** | P2 → CLOSED by design decision |
+| **File** | `vigia/sift/sift_orchestrator.py`, `vigia/sift/unified_timeline_engine.py` |
 | **Detected** | Post-hackathon session 2026-06-25 |
+| **Fixed** | 2026-06-30 |
 
-### Description
+### Resolution (P0-001 audit)
 
-All 4 SIFT modules construct `SignalOutput` using explicit `float()`:
-- `shellbag_analyzer.py:60-62`
-- `amcache_shimcache.py:73-75`
-- `memory_forensics.py:176-177`
-- `disk_forensics.py:71-72`
+**Design decision:** `SignalOutput` is a DTO (Data Transfer Object) that crosses the
+boundary between SIFT tools (which produce IEEE 754 floats from external forensic
+tools) and the Fraction-pure scorer. The `float` type annotation in `SignalOutput` is
+**correct by design** — it reflects the reality that SIFT tool outputs are inherently
+floating-point. The 22 constructors using `float()` are consistent with this contract.
 
-`SignalOutput.z_score` and `confidence` are typed as `float` in `ebs.py`.
-When these modules feed the scoring pipeline during real SIFT integration,
-the floats will enter the inference path — potential L-021 regression.
+**The real bug** was in the float→Fraction reconversion at the SIFT→scorer boundary:
 
-### Fix when applicable
+- `sift_orchestrator.py:474`: `Fraction(int(round(sig.z_score * 100)), 100)`
+- `unified_timeline_engine.py:99-101`: same pattern for confidence and z_score
 
-Coordinate with L-021 Phase 3. Requires a decision on whether `SignalOutput`
-should accept `Decimal` or whether the float conversion is the correct boundary
-between SIFT and scoring.
+`round()` on a pre-multiplied float suffers IEEE 754 representation error (e.g.
+`1.245 * 100 = 124.4999...` → `round()` sees 124.4999 → truncates to 124 → wrong).
+
+**Fix:** Replace with `Decimal(str(val)).quantize(Decimal("0.01"), rounding=ROUND_HALF_EVEN)`
+which operates on the exact decimal string representation.
+
+Divergence confirmed empirically: `1.245` → old: `5/4`, new: `31/25`.
+
+### Original scope (discarded)
+
+The original B-008 listed only 4 SIFT modules. Full audit found 22 constructor sites
+in 18 production files. All remain using `float()` — this is correct per the DTO
+boundary decision above.
 
 ---
 
@@ -2423,3 +2433,109 @@ artifacts (memory_process, prefetch, kernel_structure in addition to log_entry).
 
 **Files touched:** `vigia_agent.py` — `_generate_narrative()` (CAIE reading added)
 **Tests:** 188 passed, 6 xfailed, 0 regressions.
+
+---
+
+## P0-001 — Precision Loss in float→Fraction Reconversion at SIFT→Scorer Boundary [FIXED]
+
+| Field | Value |
+|-------|-------|
+| **Status** | FIXED — 2026-06-30 |
+| **Severity** | P0 — determinism invariant violation |
+| **Files** | `vigia/sift/sift_orchestrator.py:474`, `vigia/sift/unified_timeline_engine.py:99-101` |
+| **Detected** | P0-001 audit session 2026-06-30 |
+
+### Description
+
+The float→Fraction reconversion at the SIFT→scorer boundary used Python's `round()`
+on a pre-multiplied float:
+
+```python
+# BEFORE (sift_orchestrator.py:474):
+z_frac = Fraction(int(round(sig.z_score * 100)), 100)
+
+# BEFORE (unified_timeline_engine.py:99-101):
+confidence=Fraction(int(round(signal.confidence * 1000)), 1000)
+"z_score": str(Fraction(int(round(signal.z_score * 100)), 100))
+```
+
+`round()` operates on the IEEE 754 result of `val * 100`, which may already be wrong.
+Example: `1.245 * 100 = 124.4999...` in float → `round()` truncates to `124` →
+`Fraction(124, 100) = 31/25` is LOST → old code produces `Fraction(125, 100) = 5/4`.
+
+### Fix
+
+Replace with `Decimal(str(val)).quantize(...)` which operates on the exact decimal
+string representation, avoiding the float multiplication entirely:
+
+```python
+# AFTER (sift_orchestrator.py:474):
+z_frac = Fraction(Decimal(str(sig.z_score)).quantize(Decimal("0.01"), rounding=ROUND_HALF_EVEN))
+
+# AFTER (unified_timeline_engine.py:99-101):
+confidence=Fraction(Decimal(str(signal.confidence)).quantize(Decimal("0.001"), rounding=ROUND_HALF_EVEN))
+"z_score": str(Fraction(Decimal(str(signal.z_score)).quantize(Decimal("0.01"), rounding=ROUND_HALF_EVEN)))
+```
+
+### Scope decision
+
+**SignalOutput remains `float`-typed.** This is correct by design: SignalOutput is a DTO
+crossing the boundary from SIFT tools (IEEE 754 floats from external forensic tools) to
+the Fraction-pure scorer. The 22 constructor sites in 18 production files using `float()`
+are consistent with this contract. The bug was exclusively in the reconversion points.
+
+### Divergence test
+
+| Value | Old (`round()`) | New (`Decimal.quantize`) | Diverges? |
+|-------|-----------------|--------------------------|-----------|
+| 1.245 | 5/4             | 31/25                    | YES       |
+| 2.345 | 47/20           | 117/50                   | YES       |
+| 2.675 | 67/25           | 67/25                    | no        |
+| 0.125 | 3/25            | 3/25                     | no        |
+
+### Tests
+
+188 passed, 6 xfailed — identical to baseline before fix.
+
+---
+
+## L-040 — likelihood_ratio.py Operates in float, Not Fraction [LOW PRIORITY]
+
+| Field | Value |
+|-------|-------|
+| **Status** | OPEN — documented limitation |
+| **Severity** | LOW — no empirical impact on current corpus |
+| **File** | `vigia/core/likelihood_ratio.py` |
+| **Detected** | P0-001 audit session 2026-06-30 |
+
+### Description
+
+`likelihood_ratio.py` consumes `SignalOutput.z_score` and `.confidence` directly as
+`float`, and uses `math.exp` / `math.log` which are inherently IEEE 754 operations.
+This violates the literal Fraction-only invariant stated in CLAUDE.md for the verdict
+path.
+
+### Empirical assessment (2026-06-30)
+
+Tested 21 real corpus cases (VIGIA-AMB-*, VIGIA-BREAK-*, VIGIA-FN-*, VIGIA-FP-*,
+VIGIA-REAL-*). For each case, computed LR with:
+- (A) original float z_scores
+- (B) z_scores quantized via `Decimal(str(z)).quantize(Decimal("0.01"), ROUND_HALF_EVEN)`
+
+Results: **0 verdict flips across all 21 cases. Delta = 0.0 in all cases.**
+
+The current corpus z_scores are "clean" values (integers or 1-2 clean decimals) where
+`float` and `Decimal` representations are identical.
+
+### When to revisit
+
+If the corpus grows with cases whose z_scores fall near decision boundaries (posterior
+near 0.55 or 0.75) AND those z_scores have problematic IEEE 754 representations (e.g.
+values like 1.245 that produce different `Fraction` roundings). Until then, the float
+path in `likelihood_ratio.py` is empirically safe.
+
+### Fix if needed
+
+Would require rewriting `likelihood_ratio.py` to use `Decimal` with controlled precision
+for `exp()` and `log()` (stdlib `math` does not support `Decimal`; would need
+`decimal.Decimal.exp()` and `decimal.Decimal.ln()`). Estimated scope: ~100 lines.

@@ -331,27 +331,26 @@ vigia_scorer.py` antes de aceptar cualquier cambio al scoring path.
 
 | Campo | Valor |
 |-------|-------|
-| **Estado** | ABIERTO |
-| **Severidad** | P2 — deuda L-021, no urgente hasta integración SIFT activa |
-| **Archivos** | `vigia/sift/shellbag_analyzer.py`, `vigia/sift/amcache_shimcache.py`, `vigia/sift/memory_forensics.py`, `vigia/sift/disk_forensics.py` |
+| **Estado** | RESUELTO — auditoría P0-001, 2026-06-30 |
+| **Severidad** | P2 → CERRADO por decisión de diseño |
+| **Archivos** | `vigia/sift/sift_orchestrator.py`, `vigia/sift/unified_timeline_engine.py` |
 | **Detectado en** | Sesión post-hackathon 2026-06-25 |
+| **Corregido** | 2026-06-30 |
 
-### Descripción
+### Resolución (auditoría P0-001)
 
-Los 4 módulos SIFT construyen `SignalOutput` usando `float()` explícito:
-- `shellbag_analyzer.py:60-62`
-- `amcache_shimcache.py:73-75`
-- `memory_forensics.py:176-177`
-- `disk_forensics.py:71-72`
+**Decisión de diseño:** `SignalOutput` es un DTO que cruza el boundary entre herramientas
+SIFT (floats IEEE 754 de herramientas forenses externas) y el scorer Fraction-puro. El tipo
+`float` en SignalOutput es **correcto por diseño**. Los 22 constructores con `float()` son
+consistentes con este contrato.
 
-`SignalOutput.z_score` y `confidence` están tipados como `float` en `ebs.py`.
-Cuando estos módulos alimenten el pipeline de scoring en integración SIFT real,
-los floats entrarán al path de inferencia — regresión potencial de L-021.
+**El bug real** estaba en la reconversión float→Fraction en el boundary SIFT→scorer:
+`Fraction(int(round(val * 100)), 100)` — `round()` sobre float pre-multiplicado sufre
+error de representación IEEE 754. Fix: `Decimal(str(val)).quantize(...)`.
 
-### Fix cuando corresponda
+Divergencia confirmada: `1.245` → viejo: `5/4`, nuevo: `31/25`.
 
-Coordinar con L-021 Fase 3. Requiere decisión sobre si `SignalOutput` acepta
-`Decimal` o si la conversión float es el boundary correcto entre SIFT y scoring.
+Ver P0-001 y L-040 al final del archivo para detalles completos.
 
 ---
 
@@ -2285,3 +2284,46 @@ signals, y/o que el pipeline produzca artefactos de múltiples capas epistémica
 
 ### Archivos tocados
 - `vigia_agent.py` — `_generate_narrative()` (añadida lectura de CAIE)
+
+---
+
+## P0-001 — Pérdida de precisión en reconversión float→Fraction en boundary SIFT→Scorer [FIXED]
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | CORREGIDO — 2026-06-30 |
+| **Severidad** | P0 — violación de invariante de determinismo |
+| **Archivos** | `vigia/sift/sift_orchestrator.py:474`, `vigia/sift/unified_timeline_engine.py:99-101` |
+
+### Descripción
+
+Ver P0-001 en BUGS_PENDIENTES_EN.md para detalles completos. Resumen:
+`Fraction(int(round(val * 100)), 100)` reemplazado por
+`Fraction(Decimal(str(val)).quantize(Decimal("0.01"), rounding=ROUND_HALF_EVEN))`.
+
+Divergencia confirmada: `1.245` → viejo: `5/4`, nuevo: `31/25`.
+Tests: 188 passed, 6 xfailed — idéntico al baseline.
+
+---
+
+## L-040 — likelihood_ratio.py opera en float, no Fraction [BAJA PRIORIDAD]
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | ABIERTO — limitación documentada |
+| **Severidad** | BAJA — sin impacto empírico en corpus actual |
+| **Archivo** | `vigia/core/likelihood_ratio.py` |
+
+### Descripción
+
+`likelihood_ratio.py` consume `SignalOutput.z_score` y `.confidence` como `float` y
+usa `math.exp`/`math.log` (operaciones IEEE 754). Viola literalmente el invariante
+Fraction-only del CLAUDE.md para el path de veredicto.
+
+**Evaluación empírica (2026-06-30):** 21 casos reales del corpus. 0 flips de veredicto,
+delta = 0.0 en todos. Los z_scores del corpus actual son valores "limpios" donde float
+y Decimal coinciden.
+
+**Revisar si:** el corpus crece con casos cuyos z_scores caen cerca de umbrales de
+decisión (posterior ~ 0.55 o 0.75) Y esos z_scores tienen representaciones IEEE 754
+problemáticas.

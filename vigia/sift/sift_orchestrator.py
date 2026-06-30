@@ -15,6 +15,7 @@ from __future__ import annotations
 import json
 import asyncio
 import logging
+from decimal import Decimal, ROUND_HALF_EVEN
 from fractions import Fraction
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
@@ -471,7 +472,7 @@ class SIFTOrchestrator:
         for sig in raw_signals:
             try:
                 art_type = sig.metadata.get("artifact_type", "unknown")
-                z_frac = Fraction(int(round(sig.z_score * 100)), 100)
+                z_frac = Fraction(Decimal(str(sig.z_score)).quantize(Decimal("0.01"), rounding=ROUND_HALF_EVEN))
                 z_adjusted = apply_artifact_reliability_dynamic(z_frac, art_type, metadata=sig.metadata)
                 # Merge: signal's own metadata > gamma fields > acquisition metadata.
                 # _acq_meta is injected first so that any signal that already
