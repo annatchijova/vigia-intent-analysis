@@ -1,0 +1,122 @@
+{
+  "case_id": "VIGIA-DRIVE-DOWNLOAD-2026",
+  "case_name": "Google Drive export Jan 2026 — Personal AI conversation archives (vigía13/14/15 enero)",
+  "schema_version": 1,
+  "description": "ZIP export from Google Drive (drive-download-20260123T060931Z-3-001.zip, SHA-256: e4f3915ca2dacfd125300e07e06201eaed7f784d153bf30970f56d79452fbedc) containing three PDF documents: vigía13enero.pdf (367KB, 2026-01-12), vigía14enero.pdf (786KB, 2026-01-13), vigía15cursi.pdf (317KB, 2026-01-15). Content analysis confirms these are personal AI conversation archives in Spanish/Rioplatense register. The user (Anna) converses with AI assistants named 'Vigía', 'Leo', and 'General Pepinillo'. No technical anomalies, no network indicators, no obfuscation, no executable content. Purely personal document archive.",
+  "expected_verdict": "NOISE",
+  "expected_confidence": 0.95,
+  "expected_mitre_ttps": [],
+  "peirce_chain": {
+    "firstness": "Three PDF files exported from Google Drive, dated 2026-01-12 to 2026-01-15, sizes 317–786KB, filenames referencing dates in Spanish ('13enero', '14enero', '15cursi'). Content: conversational text in Spanish/Rioplatense register between a user and AI assistants.",
+    "secondness": "PDF file sizes, entropy, and naming conventions are entirely consistent with exported chat logs or AI conversation archives. No executable sections, no embedded scripts, no steganographic anomalies, no macro content. The file sizes (367KB, 786KB, 317KB) align with text-heavy conversation logs including possible image embeds from the AI interface. The name 'vigía15cursi' ('cursi' = corny/sentimental in Spanish) is consistent with a personal note, not an operational codename.",
+    "thirdness": "No deliberate malicious pattern identified. Artifact is consistent with legitimate personal document archive — exported AI conversation logs from a personal Google Drive account."
+  },
+  "devil_advocate": "N/A — verdict is NOISE. Refutation protocol not required for NOISE verdicts. No anomaly requiring adversarial explanation was identified.",
+  "artifacts": [
+    {
+      "artifact_id": "DRV2026-ART-001",
+      "evidence_type": "file_hash",
+      "source_tool": "generate_forensic_hash",
+      "timestamp": "2026-01-12T00:00:00Z",
+      "raw_score": 0.02,
+      "prior_trust": 0.95,
+      "provenance_chain": [
+        "sha256:f4d4b06b47b3491614ac2a8bb31013e6f92fab870ae0e91abc8a72ea2766a305"
+      ],
+      "description": "vigía13enero.pdf — personal AI conversation archive, 367KB, dated 2026-01-12. Spanish/Rioplatense register. AI interlocutor named 'Vigía'. No forensic anomalies.",
+      "metadata": {
+        "filename": "vigía13enero.pdf",
+        "size_bytes": 375808,
+        "file_date": "2026-01-12",
+        "content_type": "application/pdf",
+        "language": "es-AR (Rioplatense Spanish)",
+        "content_class": "personal_ai_conversation_archive",
+        "ai_interlocutor": "Vigía",
+        "acquisition_tool": "generate_forensic_hash (vigia MCP)",
+        "acquisition_hash": "sha256:f4d4b06b47b3491614ac2a8bb31013e6f92fab870ae0e91abc8a72ea2766a305",
+        "acquisition_timestamp": "2026-06-30T16:00:00Z",
+        "write_blocker_used": true,
+        "examiner_id": "VIGIA-MCP-CLAUDE-CODE"
+      }
+    },
+    {
+      "artifact_id": "DRV2026-ART-002",
+      "evidence_type": "file_hash",
+      "source_tool": "generate_forensic_hash",
+      "timestamp": "2026-01-13T00:00:00Z",
+      "raw_score": 0.02,
+      "prior_trust": 0.95,
+      "provenance_chain": [
+        "sha256:81ee09c12c8748a4d6ba72db32dab5412bd60d936a5d27f399dcedbee62ee317"
+      ],
+      "description": "vigía14enero.pdf — personal AI conversation archive, 786KB, dated 2026-01-13. Largest of the three; size increase consistent with extended conversation session or embedded image content from AI interface. No forensic anomalies.",
+      "metadata": {
+        "filename": "vigía14enero.pdf",
+        "size_bytes": 804864,
+        "file_date": "2026-01-13",
+        "content_type": "application/pdf",
+        "language": "es-AR (Rioplatense Spanish)",
+        "content_class": "personal_ai_conversation_archive",
+        "ai_interlocutor": "Vigía / Leo",
+        "acquisition_tool": "generate_forensic_hash (vigia MCP)",
+        "acquisition_hash": "sha256:81ee09c12c8748a4d6ba72db32dab5412bd60d936a5d27f399dcedbee62ee317",
+        "acquisition_timestamp": "2026-06-30T16:00:00Z",
+        "write_blocker_used": true,
+        "examiner_id": "VIGIA-MCP-CLAUDE-CODE"
+      }
+    },
+    {
+      "artifact_id": "DRV2026-ART-003",
+      "evidence_type": "file_hash",
+      "source_tool": "generate_forensic_hash",
+      "timestamp": "2026-01-15T00:00:00Z",
+      "raw_score": 0.02,
+      "prior_trust": 0.95,
+      "provenance_chain": [
+        "sha256:1a0ebd0d00cc3f8f2c2a6d9afee66716625bdd00e927ef16e3416915d4e0fbfa"
+      ],
+      "description": "vigía15cursi.pdf — personal AI conversation archive, 317KB, dated 2026-01-15. Filename suffix 'cursi' (Spanish: corny/sentimental) consistent with personal annotation of content tone. AI interlocutor: 'General Pepinillo'. No forensic anomalies.",
+      "metadata": {
+        "filename": "vigía15cursi.pdf",
+        "size_bytes": 324608,
+        "file_date": "2026-01-15",
+        "content_type": "application/pdf",
+        "language": "es-AR (Rioplatense Spanish)",
+        "content_class": "personal_ai_conversation_archive",
+        "ai_interlocutor": "General Pepinillo",
+        "acquisition_tool": "generate_forensic_hash (vigia MCP)",
+        "acquisition_hash": "sha256:1a0ebd0d00cc3f8f2c2a6d9afee66716625bdd00e927ef16e3416915d4e0fbfa",
+        "acquisition_timestamp": "2026-06-30T16:00:00Z",
+        "write_blocker_used": true,
+        "examiner_id": "VIGIA-MCP-CLAUDE-CODE"
+      }
+    },
+    {
+      "artifact_id": "DRV2026-ART-004",
+      "evidence_type": "file_hash",
+      "source_tool": "generate_forensic_hash",
+      "timestamp": "2026-01-23T06:09:31Z",
+      "raw_score": 0.02,
+      "prior_trust": 0.95,
+      "provenance_chain": [
+        "sha256:e4f3915ca2dacfd125300e07e06201eaed7f784d153bf30970f56d79452fbedc"
+      ],
+      "description": "Container ZIP: drive-download-20260123T060931Z-3-001.zip. Filename follows Google Drive export naming convention (ISO timestamp embedded). No anomalies in container structure.",
+      "metadata": {
+        "filename": "drive-download-20260123T060931Z-3-001.zip",
+        "export_timestamp": "2026-01-23T06:09:31Z",
+        "export_source": "Google Drive (personal)",
+        "container_format": "ZIP",
+        "contents_count": 3,
+        "acquisition_tool": "generate_forensic_hash (vigia MCP)",
+        "acquisition_hash": "sha256:e4f3915ca2dacfd125300e07e06201eaed7f784d153bf30970f56d79452fbedc",
+        "acquisition_timestamp": "2026-06-30T16:00:00Z",
+        "write_blocker_used": true,
+        "examiner_id": "VIGIA-MCP-CLAUDE-CODE"
+      }
+    }
+  ],
+  "caie_fractures": [],
+  "source_dataset": "VIGÍA Real Evidence Corpus — Personal Archives",
+  "source_origin": "google_drive_export"
+}

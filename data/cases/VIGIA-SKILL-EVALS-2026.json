@@ -1,0 +1,82 @@
+{
+  "case_id": "VIGIA-SKILL-EVALS-2026",
+  "case_name": "skill-evals — VIGÍA autonomous skill evaluation trigger corpus",
+  "schema_version": 1,
+  "description": "ZIP archive skill-evals.zip (SHA-256: 92a8ca61230a8eb12dd07d3cc5320a7a22ab12f7e9dc87432f8ff4bd03bea332) containing 11 JSON trigger files for VIGÍA skill evaluations, dated 2026-06-27. Triggers: atomic-state-mutation, audit-before-patch, deterministic-core, git-discipline, honest-degradation, llm-out-of-the-loop, sql-aggregation-not-materialization, surgical-patcher, tamper-evident-audit-chain, validate-at-the-boundary, versioned-schema-evolution. These are VIGÍA's own internal evaluation/testing mechanisms — skill triggers used to verify correct behavior of the VIGÍA forensic agent. Their presence in a personal archive is expected operational behavior.",
+  "expected_verdict": "NOISE",
+  "expected_confidence": 0.95,
+  "expected_mitre_ttps": [],
+  "peirce_chain": {
+    "firstness": "11 JSON files with names matching VIGÍA forensic agent skill evaluation triggers. Dated 2026-06-27. Content structure consistent with trigger configuration files for an AI-assisted forensic analysis system.",
+    "secondness": "The trigger names directly map to documented VIGÍA system properties: 'deterministic-core' tests the zero-token deterministic scoring pipeline; 'llm-out-of-the-loop' validates that LLM cannot override scoring; 'tamper-evident-audit-chain' tests the hash-chained audit log; 'validate-at-the-boundary' enforces input validation; 'versioned-schema-evolution' tests schema backward compatibility. These names are internally consistent with VIGÍA's own design documentation. The date (2026-06-27) aligns with active VIGÍA development. No anomalies in file format or content type.",
+    "thirdness": "No deliberate malicious pattern identified. Artifact is consistent with legitimate evaluation tooling — VIGÍA's own skill evaluation trigger corpus used in automated testing of the forensic agent's behavioral invariants."
+  },
+  "devil_advocate": "N/A — verdict is NOISE. Refutation protocol not required for NOISE verdicts. No anomaly requiring adversarial explanation was identified.",
+  "artifacts": [
+    {
+      "artifact_id": "EVALS-ART-001",
+      "evidence_type": "file_hash",
+      "source_tool": "generate_forensic_hash",
+      "timestamp": "2026-06-27T00:00:00Z",
+      "raw_score": 0.02,
+      "prior_trust": 0.95,
+      "provenance_chain": [
+        "sha256:92a8ca61230a8eb12dd07d3cc5320a7a22ab12f7e9dc87432f8ff4bd03bea332"
+      ],
+      "description": "skill-evals.zip — container archive with 11 VIGÍA skill evaluation trigger JSONs dated 2026-06-27. Trigger names correspond to documented VIGÍA behavioral invariants. No forensic anomalies.",
+      "metadata": {
+        "filename": "skill-evals.zip",
+        "file_date": "2026-06-27",
+        "container_format": "ZIP",
+        "contents_count": 11,
+        "contents_type": "JSON trigger configuration files",
+        "trigger_names": [
+          "atomic-state-mutation",
+          "audit-before-patch",
+          "deterministic-core",
+          "git-discipline",
+          "honest-degradation",
+          "llm-out-of-the-loop",
+          "sql-aggregation-not-materialization",
+          "surgical-patcher",
+          "tamper-evident-audit-chain",
+          "validate-at-the-boundary",
+          "versioned-schema-evolution"
+        ],
+        "system_origin": "VIGIA forensic agent skill evaluation corpus",
+        "acquisition_tool": "generate_forensic_hash (vigia MCP)",
+        "acquisition_hash": "sha256:92a8ca61230a8eb12dd07d3cc5320a7a22ab12f7e9dc87432f8ff4bd03bea332",
+        "acquisition_timestamp": "2026-06-30T16:00:00Z",
+        "write_blocker_used": true,
+        "examiner_id": "VIGIA-MCP-CLAUDE-CODE"
+      }
+    },
+    {
+      "artifact_id": "EVALS-ART-002",
+      "evidence_type": "log_entry",
+      "source_tool": "list_files",
+      "timestamp": "2026-06-27T00:00:00Z",
+      "raw_score": 0.02,
+      "prior_trust": 0.95,
+      "provenance_chain": [
+        "sha256:92a8ca61230a8eb12dd07d3cc5320a7a22ab12f7e9dc87432f8ff4bd03bea332"
+      ],
+      "description": "Directory listing: 11 JSON files named after VIGÍA behavioral invariants. Each filename maps to a documented VIGÍA design principle. File format (JSON) and content type (trigger configuration) are internally consistent with VIGÍA evaluation infrastructure.",
+      "metadata": {
+        "directory": "skill-evals/",
+        "file_count": 11,
+        "file_format": "JSON",
+        "naming_schema": "kebab-case behavioral invariant names",
+        "internally_consistent": true,
+        "acquisition_tool": "list_files (vigia MCP)",
+        "acquisition_hash": "sha256:92a8ca61230a8eb12dd07d3cc5320a7a22ab12f7e9dc87432f8ff4bd03bea332",
+        "acquisition_timestamp": "2026-06-30T16:00:00Z",
+        "write_blocker_used": true,
+        "examiner_id": "VIGIA-MCP-CLAUDE-CODE"
+      }
+    }
+  ],
+  "caie_fractures": [],
+  "source_dataset": "VIGÍA Real Evidence Corpus — Internal Evaluation Tooling",
+  "source_origin": "vigia_evaluation_corpus"
+}

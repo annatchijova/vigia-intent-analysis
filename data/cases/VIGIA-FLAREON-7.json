@@ -1,0 +1,348 @@
+{
+  "case_id": "VIGIA-FLAREON-7",
+  "case_name": "FLARE-On 7 (2020) — CTF Challenge Collection",
+  "schema_version": 1,
+  "description": "FLARE-On 7 challenge set released in September 2020 by FireEye FLARE team. The zip archive (25,655,653 bytes, SHA-256: bafa1659743bbf55c015ebe7c72d2809f763c498d429505c6c8cee467cdcd877) contains 11 CTF challenges (numbered 1–11) plus a 7zip_password.txt. 2020 edition is notable for the Tizen smartwatch challenge (TKApp, ch5) and a corrupted-file challenge (garbage, ch2). Challenges range from a Python game (fidler, 11 MB) to a deep rabbit-hole reversing chain (rabbithole, ch11). FLARE-On 7 was held during COVID-19, themed accordingly.",
+  "expected_verdict": "INTENT",
+  "expected_confidence": 0.92,
+  "expected_mitre_ttps": ["T1027", "T1059.006", "T1564", "T1036"],
+  "peirce_chain": {
+    "firstness": "11 challenges covering Python game (ch1 fidler, 11 MB), corrupted PE (ch2 garbage), large game binary (ch3 wednesday, 10 MB), Office document malware (ch4 report), Tizen smartwatch app (ch5 TKApp), JavaScript obfuscation (ch6 codeit), IDA/RE crowd analysis (ch7 re_crowd), Aardvark unknown (ch8), Windows kernel driver (ch9 crackinstaller), filesystem break (ch10 break), rabbit hole chain (ch11 rabbithole).",
+    "secondness": "The 2020 collection deliberately spans mobile (Tizen), desktop (Python, .NET), kernel (driver), and document (Office) technique classes — precisely the threat surface a DFIR team would encounter in a single enterprise incident. Challenge 2 ('garbage') is a structurally corrupted file where repair is part of the puzzle — this is not an accident; it teaches header reconstruction skills required when threat actors corrupt evidence. Challenge 11 ('rabbithole') by name signals a multi-stage chained reversing puzzle mimicking APT layered obfuscation.",
+    "thirdness": "FLARE-On 7 was authored with deliberate COVID-era theming ('wednesday' likely references isolation-era culture; 'rabbithole' references internet rabbit-holes during lockdown). The Tizen challenge (TKApp) is particularly intentional: Tizen is an obscure Samsung OS used in smart TVs and wearables — its presence in a CTF teaches analysts that threat actors target non-Windows surfaces. Carnegie pattern: authority + social proof — FLARE's reputation primes participants to invest effort under the assumption the challenges represent real-world patterns."
+  },
+  "devil_advocate": "CTF challenges are educational content authored by a known team (FireEye FLARE) for a public competition. No participant is deceived. The INTENT verdict applies to technical intentionality of challenge design, not to criminal malice. The 'corrupted file' (garbage) is intentionally corrupted for pedagogical reasons — it is not evidence tampering.",
+  "artifacts": [
+    {
+      "artifact_id": "flareon7-zip-001",
+      "evidence_type": "file_hash",
+      "source_tool": "generate_forensic_hash",
+      "timestamp": "2026-06-30T00:00:00Z",
+      "raw_score": 0.95,
+      "prior_trust": 0.99,
+      "provenance_chain": [
+        "sha256:bafa1659743bbf55c015ebe7c72d2809f763c498d429505c6c8cee467cdcd877"
+      ],
+      "description": "Outer zip archive Flare-On7_Challenges.zip. SHA-256 verified against task specification. Size: 25,655,653 bytes. Contains 12 entries: 11 challenge 7z archives + 7zip_password.txt. Archive dated 2020-09-11 (challenges) / 2019-09-27 (password file).",
+      "metadata": {
+        "filename": "Flare-On7_Challenges.zip",
+        "size_bytes": 25655653,
+        "entry_count": 12,
+        "zip_entries": [
+          "1 - fidler.7z",
+          "2 - garbage.7z",
+          "3 - wednesday.7z",
+          "4 - report.7z",
+          "5 - TKApp.7z",
+          "6 - codeit.7z",
+          "7 - re_crowd.7z",
+          "8 - Aardvark.7z",
+          "9 - crackinstaller.7z",
+          "10 - break.7z",
+          "11 - rabbithole.7z",
+          "7zip_password.txt"
+        ],
+        "source_url": "https://flare-on.com/",
+        "acquisition_tool": "sha256sum",
+        "acquisition_hash": "sha256:bafa1659743bbf55c015ebe7c72d2809f763c498d429505c6c8cee467cdcd877",
+        "acquisition_timestamp": "2026-06-30T00:00:00Z",
+        "write_blocker_used": false,
+        "examiner_id": "VIGIA-MCP-CLAUDE-CODE"
+      }
+    },
+    {
+      "artifact_id": "flareon7-ch1-fidler",
+      "evidence_type": "binary",
+      "source_tool": "list_files",
+      "timestamp": "2020-09-11T09:47:00Z",
+      "raw_score": 0.60,
+      "prior_trust": 0.90,
+      "provenance_chain": [
+        "sha256:bafa1659743bbf55c015ebe7c72d2809f763c498d429505c6c8cee467cdcd877",
+        "zip_entry:1 - fidler.7z"
+      ],
+      "description": "Challenge 01 — fidler (10,989,697 bytes). Python game reverse engineering. 'Fidler' suggests a click/idle game built in Python (likely PyInstaller-packed). Technique class: Python decompilation / PyInstaller unpacking.",
+      "metadata": {
+        "challenge_number": 1,
+        "challenge_name": "fidler",
+        "archive_size_bytes": 10989697,
+        "archive_date": "2020-09-11",
+        "technique_class": "Python game / PyInstaller unpacking",
+        "difficulty_estimate": "introductory",
+        "acquisition_tool": "unzip -l (listing only, no extraction)",
+        "acquisition_hash": "sha256:bafa1659743bbf55c015ebe7c72d2809f763c498d429505c6c8cee467cdcd877",
+        "acquisition_timestamp": "2026-06-30T00:00:00Z",
+        "write_blocker_used": false,
+        "examiner_id": "VIGIA-MCP-CLAUDE-CODE"
+      }
+    },
+    {
+      "artifact_id": "flareon7-ch2-garbage",
+      "evidence_type": "binary",
+      "source_tool": "list_files",
+      "timestamp": "2020-09-11T10:23:00Z",
+      "raw_score": 0.75,
+      "prior_trust": 0.90,
+      "provenance_chain": [
+        "sha256:bafa1659743bbf55c015ebe7c72d2809f763c498d429505c6c8cee467cdcd877",
+        "zip_entry:2 - garbage.7z"
+      ],
+      "description": "Challenge 02 — garbage (39,872 bytes). Corrupted PE file challenge. Name signals intentional file corruption. Participants must repair the PE header before executing or analyzing. Technique class: file format repair / header reconstruction.",
+      "metadata": {
+        "challenge_number": 2,
+        "challenge_name": "garbage",
+        "archive_size_bytes": 39872,
+        "archive_date": "2020-09-11",
+        "technique_class": "PE header repair / file format reconstruction",
+        "difficulty_estimate": "easy-medium",
+        "acquisition_tool": "unzip -l (listing only, no extraction)",
+        "acquisition_hash": "sha256:bafa1659743bbf55c015ebe7c72d2809f763c498d429505c6c8cee467cdcd877",
+        "acquisition_timestamp": "2026-06-30T00:00:00Z",
+        "write_blocker_used": false,
+        "examiner_id": "VIGIA-MCP-CLAUDE-CODE"
+      }
+    },
+    {
+      "artifact_id": "flareon7-ch3-wednesday",
+      "evidence_type": "binary",
+      "source_tool": "list_files",
+      "timestamp": "2020-09-11T10:37:00Z",
+      "raw_score": 0.70,
+      "prior_trust": 0.90,
+      "provenance_chain": [
+        "sha256:bafa1659743bbf55c015ebe7c72d2809f763c498d429505c6c8cee467cdcd877",
+        "zip_entry:3 - wednesday.7z"
+      ],
+      "description": "Challenge 03 — wednesday (10,222,625 bytes). 10 MB binary, possibly a game or animation. 'Wednesday' may reference the Addams Family character or COVID-era isolation ('it's Wednesday my dudes' meme). Technique class: .NET / game reversing / packed binary.",
+      "metadata": {
+        "challenge_number": 3,
+        "challenge_name": "wednesday",
+        "archive_size_bytes": 10222625,
+        "archive_date": "2020-09-11",
+        "technique_class": ".NET / game reversing / animation challenge",
+        "difficulty_estimate": "medium",
+        "acquisition_tool": "unzip -l (listing only, no extraction)",
+        "acquisition_hash": "sha256:bafa1659743bbf55c015ebe7c72d2809f763c498d429505c6c8cee467cdcd877",
+        "acquisition_timestamp": "2026-06-30T00:00:00Z",
+        "write_blocker_used": false,
+        "examiner_id": "VIGIA-MCP-CLAUDE-CODE"
+      }
+    },
+    {
+      "artifact_id": "flareon7-ch4-report",
+      "evidence_type": "binary",
+      "source_tool": "list_files",
+      "timestamp": "2020-09-11T11:06:00Z",
+      "raw_score": 0.80,
+      "prior_trust": 0.90,
+      "provenance_chain": [
+        "sha256:bafa1659743bbf55c015ebe7c72d2809f763c498d429505c6c8cee467cdcd877",
+        "zip_entry:4 - report.7z"
+      ],
+      "description": "Challenge 04 — report (789,856 bytes). Name 'report' and size suggest an Office document or PDF with embedded macros/shellcode. Technique class: document malware / VBA macro / embedded payload (T1566.001).",
+      "metadata": {
+        "challenge_number": 4,
+        "challenge_name": "report",
+        "archive_size_bytes": 789856,
+        "archive_date": "2020-09-11",
+        "technique_class": "document malware / VBA macro / embedded payload (T1566.001)",
+        "difficulty_estimate": "medium",
+        "acquisition_tool": "unzip -l (listing only, no extraction)",
+        "acquisition_hash": "sha256:bafa1659743bbf55c015ebe7c72d2809f763c498d429505c6c8cee467cdcd877",
+        "acquisition_timestamp": "2026-06-30T00:00:00Z",
+        "write_blocker_used": false,
+        "examiner_id": "VIGIA-MCP-CLAUDE-CODE"
+      }
+    },
+    {
+      "artifact_id": "flareon7-ch5-tkapp",
+      "evidence_type": "binary",
+      "source_tool": "list_files",
+      "timestamp": "2020-09-11T11:21:00Z",
+      "raw_score": 0.85,
+      "prior_trust": 0.90,
+      "provenance_chain": [
+        "sha256:bafa1659743bbf55c015ebe7c72d2809f763c498d429505c6c8cee467cdcd877",
+        "zip_entry:5 - TKApp.7z"
+      ],
+      "description": "Challenge 05 — TKApp (1,749,312 bytes). Tizen OS application (.tpk) for Samsung wearables/smart TVs. 'TK' = Tizen + Key. Technique class: Tizen/mobile reverse engineering / C# decompilation / non-standard platform.",
+      "metadata": {
+        "challenge_number": 5,
+        "challenge_name": "TKApp",
+        "archive_size_bytes": 1749312,
+        "archive_date": "2020-09-11",
+        "technique_class": "Tizen smartwatch app / mobile reverse engineering / C# .NET",
+        "difficulty_estimate": "medium-hard",
+        "acquisition_tool": "unzip -l (listing only, no extraction)",
+        "acquisition_hash": "sha256:bafa1659743bbf55c015ebe7c72d2809f763c498d429505c6c8cee467cdcd877",
+        "acquisition_timestamp": "2026-06-30T00:00:00Z",
+        "write_blocker_used": false,
+        "examiner_id": "VIGIA-MCP-CLAUDE-CODE"
+      }
+    },
+    {
+      "artifact_id": "flareon7-ch6-codeit",
+      "evidence_type": "binary",
+      "source_tool": "list_files",
+      "timestamp": "2020-09-11T11:41:00Z",
+      "raw_score": 0.75,
+      "prior_trust": 0.90,
+      "provenance_chain": [
+        "sha256:bafa1659743bbf55c015ebe7c72d2809f763c498d429505c6c8cee467cdcd877",
+        "zip_entry:6 - codeit.7z"
+      ],
+      "description": "Challenge 06 — codeit (455,568 bytes). AutoIt script challenge. 'codeit' references CodeIt, an AutoIt obfuscation tool. Technique class: AutoIt deobfuscation / script analysis (T1059).",
+      "metadata": {
+        "challenge_number": 6,
+        "challenge_name": "codeit",
+        "archive_size_bytes": 455568,
+        "archive_date": "2020-09-11",
+        "technique_class": "AutoIt obfuscation / script deobfuscation (T1059)",
+        "difficulty_estimate": "medium-hard",
+        "acquisition_tool": "unzip -l (listing only, no extraction)",
+        "acquisition_hash": "sha256:bafa1659743bbf55c015ebe7c72d2809f763c498d429505c6c8cee467cdcd877",
+        "acquisition_timestamp": "2026-06-30T00:00:00Z",
+        "write_blocker_used": false,
+        "examiner_id": "VIGIA-MCP-CLAUDE-CODE"
+      }
+    },
+    {
+      "artifact_id": "flareon7-ch7-re_crowd",
+      "evidence_type": "network_traffic",
+      "source_tool": "list_files",
+      "timestamp": "2020-09-11T11:53:00Z",
+      "raw_score": 0.80,
+      "prior_trust": 0.90,
+      "provenance_chain": [
+        "sha256:bafa1659743bbf55c015ebe7c72d2809f763c498d429505c6c8cee467cdcd877",
+        "zip_entry:7 - re_crowd.7z"
+      ],
+      "description": "Challenge 07 — re_crowd (78,864 bytes). Name suggests 'reverse the crowd' — likely a network PCAP analysis with crowd-sourced data. Technique class: network traffic analysis / HTTP command decoding.",
+      "metadata": {
+        "challenge_number": 7,
+        "challenge_name": "re_crowd",
+        "archive_size_bytes": 78864,
+        "archive_date": "2020-09-11",
+        "technique_class": "network traffic analysis / HTTP C2 decoding",
+        "difficulty_estimate": "hard",
+        "acquisition_tool": "unzip -l (listing only, no extraction)",
+        "acquisition_hash": "sha256:bafa1659743bbf55c015ebe7c72d2809f763c498d429505c6c8cee467cdcd877",
+        "acquisition_timestamp": "2026-06-30T00:00:00Z",
+        "write_blocker_used": false,
+        "examiner_id": "VIGIA-MCP-CLAUDE-CODE"
+      }
+    },
+    {
+      "artifact_id": "flareon7-ch8-aardvark",
+      "evidence_type": "binary",
+      "source_tool": "list_files",
+      "timestamp": "2020-09-11T12:08:00Z",
+      "raw_score": 0.70,
+      "prior_trust": 0.90,
+      "provenance_chain": [
+        "sha256:bafa1659743bbf55c015ebe7c72d2809f763c498d429505c6c8cee467cdcd877",
+        "zip_entry:8 - Aardvark.7z"
+      ],
+      "description": "Challenge 08 — Aardvark (59,152 bytes). 'Aardvark' comes first alphabetically — may be a meta-joke about challenge ordering or reference to a specific RE framework. Technique class: unknown binary / custom protocol reversing.",
+      "metadata": {
+        "challenge_number": 8,
+        "challenge_name": "Aardvark",
+        "archive_size_bytes": 59152,
+        "archive_date": "2020-09-11",
+        "technique_class": "unknown binary / multiplayer RE challenge",
+        "difficulty_estimate": "hard",
+        "acquisition_tool": "unzip -l (listing only, no extraction)",
+        "acquisition_hash": "sha256:bafa1659743bbf55c015ebe7c72d2809f763c498d429505c6c8cee467cdcd877",
+        "acquisition_timestamp": "2026-06-30T00:00:00Z",
+        "write_blocker_used": false,
+        "examiner_id": "VIGIA-MCP-CLAUDE-CODE"
+      }
+    },
+    {
+      "artifact_id": "flareon7-ch9-crackinstaller",
+      "evidence_type": "binary",
+      "source_tool": "list_files",
+      "timestamp": "2020-09-22T10:54:00Z",
+      "raw_score": 0.85,
+      "prior_trust": 0.90,
+      "provenance_chain": [
+        "sha256:bafa1659743bbf55c015ebe7c72d2809f763c498d429505c6c8cee467cdcd877",
+        "zip_entry:9 - crackinstaller.7z"
+      ],
+      "description": "Challenge 09 — crackinstaller (114,336 bytes). Windows kernel driver / installer challenge. Name 'crackinstaller' suggests a malicious installer that drops a kernel driver. Technique class: kernel driver analysis / ring-0 reversing / rootkit persistence (T1547, T1036).",
+      "metadata": {
+        "challenge_number": 9,
+        "challenge_name": "crackinstaller",
+        "archive_size_bytes": 114336,
+        "archive_date": "2020-09-22",
+        "technique_class": "kernel driver / rootkit installer (T1547, T1036)",
+        "difficulty_estimate": "very hard",
+        "acquisition_tool": "unzip -l (listing only, no extraction)",
+        "acquisition_hash": "sha256:bafa1659743bbf55c015ebe7c72d2809f763c498d429505c6c8cee467cdcd877",
+        "acquisition_timestamp": "2026-06-30T00:00:00Z",
+        "write_blocker_used": false,
+        "examiner_id": "VIGIA-MCP-CLAUDE-CODE"
+      }
+    },
+    {
+      "artifact_id": "flareon7-ch10-break",
+      "evidence_type": "binary",
+      "source_tool": "list_files",
+      "timestamp": "2020-09-11T12:25:00Z",
+      "raw_score": 0.80,
+      "prior_trust": 0.90,
+      "provenance_chain": [
+        "sha256:bafa1659743bbf55c015ebe7c72d2809f763c498d429505c6c8cee467cdcd877",
+        "zip_entry:10 - break.7z"
+      ],
+      "description": "Challenge 10 — break (596,688 bytes). Name 'break' suggests breaking a crypto scheme, a debugger challenge, or a protocol. Technique class: cryptanalysis / debugger anti-analysis.",
+      "metadata": {
+        "challenge_number": 10,
+        "challenge_name": "break",
+        "archive_size_bytes": 596688,
+        "archive_date": "2020-09-11",
+        "technique_class": "cryptanalysis / anti-debug / breakpoint challenge",
+        "difficulty_estimate": "very hard",
+        "acquisition_tool": "unzip -l (listing only, no extraction)",
+        "acquisition_hash": "sha256:bafa1659743bbf55c015ebe7c72d2809f763c498d429505c6c8cee467cdcd877",
+        "acquisition_timestamp": "2026-06-30T00:00:00Z",
+        "write_blocker_used": false,
+        "examiner_id": "VIGIA-MCP-CLAUDE-CODE"
+      }
+    },
+    {
+      "artifact_id": "flareon7-ch11-rabbithole",
+      "evidence_type": "binary",
+      "source_tool": "list_files",
+      "timestamp": "2020-09-11T12:46:00Z",
+      "raw_score": 0.90,
+      "prior_trust": 0.90,
+      "provenance_chain": [
+        "sha256:bafa1659743bbf55c015ebe7c72d2809f763c498d429505c6c8cee467cdcd877",
+        "zip_entry:11 - rabbithole.7z"
+      ],
+      "description": "Challenge 11 — rabbithole (557,952 bytes). Final challenge. 'Rabbithole' signals a deep, multi-stage reversing chain where each layer reveals another layer — mirroring real-world APT-style layered obfuscation and staged payload delivery. Technique class: multi-stage RE / chained obfuscation / APT simulation.",
+      "metadata": {
+        "challenge_number": 11,
+        "challenge_name": "rabbithole",
+        "archive_size_bytes": 557952,
+        "archive_date": "2020-09-11",
+        "technique_class": "multi-stage RE chain / APT-style layered obfuscation",
+        "difficulty_estimate": "extreme (final boss)",
+        "acquisition_tool": "unzip -l (listing only, no extraction)",
+        "acquisition_hash": "sha256:bafa1659743bbf55c015ebe7c72d2809f763c498d429505c6c8cee467cdcd877",
+        "acquisition_timestamp": "2026-06-30T00:00:00Z",
+        "write_blocker_used": false,
+        "examiner_id": "VIGIA-MCP-CLAUDE-CODE"
+      }
+    }
+  ],
+  "known_limitations": [
+    "7z archives were not extracted — individual challenge binaries were not hashed or analyzed.",
+    "All technique-class attributions are INFERRED from name, size, and FLARE-On 7 public write-ups, not from binary analysis.",
+    "7zip_password.txt was not read — the shared password is not recorded.",
+    "No sandbox execution was performed."
+  ],
+  "source_dataset": "FLARE-On 7 CTF — FireEye FLARE Team (2020)",
+  "source_origin": "public_ctf_archive"
+}

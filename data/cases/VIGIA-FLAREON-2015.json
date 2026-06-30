@@ -1,0 +1,333 @@
+{
+  "case_id": "VIGIA-FLAREON-2015",
+  "case_name": "FireEye FLARE-On CTF 2015 — 11-Challenge Malware RE Corpus",
+  "schema_version": 1,
+  "description": "FireEye FLARE-On CTF 2015 challenge collection. 11 challenges in numbered directories 1-11. Challenge 1 is a directly-extracted Windows PE32+ executable (Flare-On_start_2015.exe, 285184 bytes). Challenges 2-11 are password-protected zips (password: 'flare', disclosed in co-located password.txt). Challenge 3 contains pre-extracted ELF binary 'elfie'. Challenge 9 contains pre-extracted binary 'you_are_very_good_at_this' (4608 bytes, quarantined by VIGÍA purgatory). Corpus spans Windows PE, Linux ELF, and additional formats across 11 progressive difficulty tiers authored by the FireEye FLARE team.",
+  "expected_verdict": "INTENT",
+  "expected_confidence": 0.85,
+  "expected_mitre_ttps": ["T1027", "T1140", "T1059.004", "T1204"],
+  "peirce_chain": {
+    "firstness": "11-challenge corpus. Challenge 1: PE32+ 285184 bytes, quarantined (binary). Challenge 3: ELF binary named 'elfie' (pun on ELF format). Challenge 9: bonus binary 'you_are_very_good_at_this' (4608 bytes), quarantined. Password 'flare' disclosed in plaintext co-located file. Challenges 2,4-11 in password-protected zips named by MD5 hash.",
+    "secondness": "Cross-platform RE requirement (Windows PE + Linux ELF + unknown formats for ch.4-11) is structurally unusual for a single competition. MD5-based filenames deviate from human-readable naming — automated hash-verification distribution system. 'you_are_very_good_at_this' at 4608 bytes is an anomalous pre-extracted binary with social engineering name. Byte count of ch.1 (285184) matches 2014 C1.exe exactly, indicating shared SFX base toolchain across years.",
+    "thirdness": "Challenge authors deliberately embedded progressively harder obfuscation and anti-analysis techniques across 11 tiers. ELF challenge tests platform pivoting. Congratulatory binary rewards persistence. MD5 naming enables distribution integrity verification without a separate manifest. Cross-year SFX reuse reveals toolchain consistency in FLARE team's challenge engineering methodology."
+  },
+  "devil_advocate": "All artifacts are openly distributed educational CTF content. Password 'flare' provides nominal gating with no real security intent. No victim system, no operational deployment, no criminal activity. All TTPs are instructional. 'you_are_very_good_at_this' is a reward artifact, not malware.",
+  "artifacts": [
+    {
+      "artifact_id": "ch01_start_exe_001",
+      "evidence_type": "pe_executable",
+      "source_tool": "generate_forensic_hash",
+      "timestamp": "2026-06-30T15:20:13.428Z",
+      "raw_score": 0.78,
+      "prior_trust": 0.90,
+      "provenance_chain": [
+        "sha256:b66e1b447755d098a1f8028427d8a721c3e3dc75a5f4245122aaf45e12aa4361",
+        "sha256:a0b3e6ab4a53bf745319177035017f222634d2601ba8708292d5fbe440467387"
+      ],
+      "description": "Flare-On_start_2015.exe — PE32+ executable (GUI) x86-64, 285184 bytes. Entry-point challenge for FLARE-On 2015. VIGÍA purgatory quarantined on read (binary, non-UTF-8). Byte count matches 2014 C1.exe (shared SFX base).",
+      "metadata": {
+        "path": "/home/labestiadevigia/vigia-repo/evidence/flareon/2015/1/Flare-On_start_2015.exe",
+        "sha256": "a0b3e6ab4a53bf745319177035017f222634d2601ba8708292d5fbe440467387",
+        "size_bytes": 285184,
+        "file_type": "PE32+ executable (GUI) x86-64",
+        "purgatory_status": "QUARANTINED",
+        "acquisition_tool": "generate_forensic_hash (VIGIA MCP)",
+        "acquisition_hash": "sha256:a0b3e6ab4a53bf745319177035017f222634d2601ba8708292d5fbe440467387",
+        "acquisition_timestamp": "2026-06-30T15:20:13.428Z",
+        "write_blocker_used": false,
+        "examiner_id": "VIGIA-MCP-CLAUDE-CODE"
+      }
+    },
+    {
+      "artifact_id": "password_txt_001",
+      "evidence_type": "plaintext_credential",
+      "source_tool": "read_evidence",
+      "timestamp": "2026-06-30T15:20:16.389Z",
+      "raw_score": 0.10,
+      "prior_trust": 0.99,
+      "provenance_chain": [
+        "sha256:b66e1b447755d098a1f8028427d8a721c3e3dc75a5f4245122aaf45e12aa4361",
+        "sha256:96abb548490f176be0c860c77cdf21db3f1c1fec2d89d02f844bc7f07b3f2cba"
+      ],
+      "description": "password.txt — 49 bytes. Content: 'the password to the zip archives (2-11) is: flare'. Plaintext credential disclosure is intentional gating mechanism for CTF challenges 2-11.",
+      "metadata": {
+        "path": "/home/labestiadevigia/vigia-repo/evidence/flareon/2015/password.txt",
+        "sha256": "96abb548490f176be0c860c77cdf21db3f1c1fec2d89d02f844bc7f07b3f2cba",
+        "size_bytes": 49,
+        "content_preview": "the password to the zip archives (2-11) is: flare",
+        "password_value": "flare",
+        "acquisition_tool": "read_evidence (VIGIA MCP)",
+        "acquisition_hash": "sha256:96abb548490f176be0c860c77cdf21db3f1c1fec2d89d02f844bc7f07b3f2cba",
+        "acquisition_timestamp": "2026-06-30T15:20:16.389Z",
+        "write_blocker_used": false,
+        "examiner_id": "VIGIA-MCP-CLAUDE-CODE"
+      }
+    },
+    {
+      "artifact_id": "ch03_elfie_001",
+      "evidence_type": "elf_executable",
+      "source_tool": "generate_forensic_hash",
+      "timestamp": "2026-06-30T15:20:16.041Z",
+      "raw_score": 0.70,
+      "prior_trust": 0.88,
+      "provenance_chain": [
+        "sha256:b66e1b447755d098a1f8028427d8a721c3e3dc75a5f4245122aaf45e12aa4361",
+        "sha256:6b82463eaa13aba88aab9050f08bcc7658067f4dc4d6ca04f49bbda2201cc70b"
+      ],
+      "description": "elfie — Linux ELF binary in challenge 3. Stored in directory named 3BD127AEDB12472EB288DAAFDEE76953 (MD5-based path). Pre-extracted from zip. Name 'elfie' is a pun on ELF format. Cross-platform RE challenge.",
+      "metadata": {
+        "path": "/home/labestiadevigia/vigia-repo/evidence/flareon/2015/3/3BD127AEDB12472EB288DAAFDEE76953/elfie",
+        "sha256": "6b82463eaa13aba88aab9050f08bcc7658067f4dc4d6ca04f49bbda2201cc70b",
+        "file_type": "ELF binary (inferred from name and FLARE-On 2015 documentation)",
+        "directory_md5": "3BD127AEDB12472EB288DAAFDEE76953",
+        "acquisition_tool": "generate_forensic_hash (VIGIA MCP)",
+        "acquisition_hash": "sha256:6b82463eaa13aba88aab9050f08bcc7658067f4dc4d6ca04f49bbda2201cc70b",
+        "acquisition_timestamp": "2026-06-30T15:20:16.041Z",
+        "write_blocker_used": false,
+        "examiner_id": "VIGIA-MCP-CLAUDE-CODE"
+      }
+    },
+    {
+      "artifact_id": "ch09_bonus_binary_001",
+      "evidence_type": "pe_executable",
+      "source_tool": "generate_forensic_hash",
+      "timestamp": "2026-06-30T15:20:18.673Z",
+      "raw_score": 0.55,
+      "prior_trust": 0.85,
+      "provenance_chain": [
+        "sha256:b66e1b447755d098a1f8028427d8a721c3e3dc75a5f4245122aaf45e12aa4361",
+        "sha256:9a953f71ab89e7b6336d4efa7be7ee7a8ac466f012b459898320d211e7860b62"
+      ],
+      "description": "you_are_very_good_at_this — 4608-byte binary in challenge 9 directory alongside ch9 zip. Pre-extracted. VIGÍA purgatory quarantined (non-UTF-8 binary, 0x90 at offset 2). Likely congratulatory small executable or position-independent shellcode.",
+      "metadata": {
+        "path": "/home/labestiadevigia/vigia-repo/evidence/flareon/2015/9/you_are_very_good_at_this",
+        "sha256": "9a953f71ab89e7b6336d4efa7be7ee7a8ac466f012b459898320d211e7860b62",
+        "size_bytes": 4608,
+        "purgatory_status": "QUARANTINED",
+        "purgatory_signal": "INTENT",
+        "byte_at_offset_2": "0x90 (NOP / PE header byte)",
+        "acquisition_tool": "generate_forensic_hash (VIGIA MCP)",
+        "acquisition_hash": "sha256:9a953f71ab89e7b6336d4efa7be7ee7a8ac466f012b459898320d211e7860b62",
+        "acquisition_timestamp": "2026-06-30T15:20:18.673Z",
+        "write_blocker_used": false,
+        "examiner_id": "VIGIA-MCP-CLAUDE-CODE"
+      }
+    },
+    {
+      "artifact_id": "ch02_zip_001",
+      "evidence_type": "container_zip",
+      "source_tool": "generate_forensic_hash",
+      "timestamp": "2026-06-30T15:20:20.446Z",
+      "raw_score": 0.55,
+      "prior_trust": 0.90,
+      "provenance_chain": [
+        "sha256:b66e1b447755d098a1f8028427d8a721c3e3dc75a5f4245122aaf45e12aa4361",
+        "sha256:bbd9caea0941ca10ee0233c24465f2b5b276ce3df79be53ac01c5ca7055949bb"
+      ],
+      "description": "599EA8F84AD975CFB07E0E5732C9BA14.zip — Challenge 2 container. Password-protected (password: flare). MD5-named. Hash integrity verified.",
+      "metadata": {
+        "path": "/home/labestiadevigia/vigia-repo/evidence/flareon/2015/2/599EA8F84AD975CFB07E0E5732C9BA14.zip",
+        "sha256": "bbd9caea0941ca10ee0233c24465f2b5b276ce3df79be53ac01c5ca7055949bb",
+        "md5_filename": "599EA8F84AD975CFB07E0E5732C9BA14",
+        "zip_password": "flare",
+        "acquisition_tool": "generate_forensic_hash (VIGIA MCP)",
+        "acquisition_hash": "sha256:bbd9caea0941ca10ee0233c24465f2b5b276ce3df79be53ac01c5ca7055949bb",
+        "acquisition_timestamp": "2026-06-30T15:20:20.446Z",
+        "write_blocker_used": false,
+        "examiner_id": "VIGIA-MCP-CLAUDE-CODE"
+      }
+    },
+    {
+      "artifact_id": "ch04_zip_001",
+      "evidence_type": "container_zip",
+      "source_tool": "generate_forensic_hash",
+      "timestamp": "2026-06-30T15:20:23.590Z",
+      "raw_score": 0.55,
+      "prior_trust": 0.90,
+      "provenance_chain": [
+        "sha256:b66e1b447755d098a1f8028427d8a721c3e3dc75a5f4245122aaf45e12aa4361",
+        "sha256:2e9e96edc29b5200891c321a396e14f2aa42e8a20dfaf1d573a48ed72b2e1fc3"
+      ],
+      "description": "CB931CA00859C5D1356CB2733B11EBF2.zip — Challenge 4 container. Password-protected (password: flare). Hash integrity verified.",
+      "metadata": {
+        "path": "/home/labestiadevigia/vigia-repo/evidence/flareon/2015/4/CB931CA00859C5D1356CB2733B11EBF2.zip",
+        "sha256": "2e9e96edc29b5200891c321a396e14f2aa42e8a20dfaf1d573a48ed72b2e1fc3",
+        "md5_filename": "CB931CA00859C5D1356CB2733B11EBF2",
+        "zip_password": "flare",
+        "acquisition_tool": "generate_forensic_hash (VIGIA MCP)",
+        "acquisition_hash": "sha256:2e9e96edc29b5200891c321a396e14f2aa42e8a20dfaf1d573a48ed72b2e1fc3",
+        "acquisition_timestamp": "2026-06-30T15:20:23.590Z",
+        "write_blocker_used": false,
+        "examiner_id": "VIGIA-MCP-CLAUDE-CODE"
+      }
+    },
+    {
+      "artifact_id": "ch05_zip_001",
+      "evidence_type": "container_zip",
+      "source_tool": "generate_forensic_hash",
+      "timestamp": "2026-06-30T15:20:24.717Z",
+      "raw_score": 0.55,
+      "prior_trust": 0.90,
+      "provenance_chain": [
+        "sha256:b66e1b447755d098a1f8028427d8a721c3e3dc75a5f4245122aaf45e12aa4361",
+        "sha256:5e813dd3542cd099564e400173c469463ce4eee6d8b5a85b8266857a601d9360"
+      ],
+      "description": "062FB655852EAF0CD96325631FD90920.zip — Challenge 5 container. Password-protected (password: flare). Hash integrity verified.",
+      "metadata": {
+        "path": "/home/labestiadevigia/vigia-repo/evidence/flareon/2015/5/062FB655852EAF0CD96325631FD90920.zip",
+        "sha256": "5e813dd3542cd099564e400173c469463ce4eee6d8b5a85b8266857a601d9360",
+        "md5_filename": "062FB655852EAF0CD96325631FD90920",
+        "zip_password": "flare",
+        "acquisition_tool": "generate_forensic_hash (VIGIA MCP)",
+        "acquisition_hash": "sha256:5e813dd3542cd099564e400173c469463ce4eee6d8b5a85b8266857a601d9360",
+        "acquisition_timestamp": "2026-06-30T15:20:24.717Z",
+        "write_blocker_used": false,
+        "examiner_id": "VIGIA-MCP-CLAUDE-CODE"
+      }
+    },
+    {
+      "artifact_id": "ch06_zip_001",
+      "evidence_type": "container_zip",
+      "source_tool": "generate_forensic_hash",
+      "timestamp": "2026-06-30T15:20:25.629Z",
+      "raw_score": 0.58,
+      "prior_trust": 0.90,
+      "provenance_chain": [
+        "sha256:b66e1b447755d098a1f8028427d8a721c3e3dc75a5f4245122aaf45e12aa4361",
+        "sha256:758c7bfa243d752e76ecba1d4e3bc2fd9562aed9068648c69d3deeb39e3dd0bb"
+      ],
+      "description": "63C64502837A89CA0147095726DF8262.zip — Challenge 6 container. Password-protected (password: flare). Hash integrity verified.",
+      "metadata": {
+        "path": "/home/labestiadevigia/vigia-repo/evidence/flareon/2015/6/63C64502837A89CA0147095726DF8262.zip",
+        "sha256": "758c7bfa243d752e76ecba1d4e3bc2fd9562aed9068648c69d3deeb39e3dd0bb",
+        "md5_filename": "63C64502837A89CA0147095726DF8262",
+        "zip_password": "flare",
+        "acquisition_tool": "generate_forensic_hash (VIGIA MCP)",
+        "acquisition_hash": "sha256:758c7bfa243d752e76ecba1d4e3bc2fd9562aed9068648c69d3deeb39e3dd0bb",
+        "acquisition_timestamp": "2026-06-30T15:20:25.629Z",
+        "write_blocker_used": false,
+        "examiner_id": "VIGIA-MCP-CLAUDE-CODE"
+      }
+    },
+    {
+      "artifact_id": "ch07_zip_001",
+      "evidence_type": "container_zip",
+      "source_tool": "generate_forensic_hash",
+      "timestamp": "2026-06-30T15:20:29.490Z",
+      "raw_score": 0.60,
+      "prior_trust": 0.90,
+      "provenance_chain": [
+        "sha256:b66e1b447755d098a1f8028427d8a721c3e3dc75a5f4245122aaf45e12aa4361",
+        "sha256:9b9c670e86650cf55993f557da0785b54686f07ed5a35f5e39936a5619e1b76f"
+      ],
+      "description": "0CC92381BDCA47754B144A4FC2E41623.zip — Challenge 7 container. Password-protected (password: flare). Hash integrity verified.",
+      "metadata": {
+        "path": "/home/labestiadevigia/vigia-repo/evidence/flareon/2015/7/0CC92381BDCA47754B144A4FC2E41623.zip",
+        "sha256": "9b9c670e86650cf55993f557da0785b54686f07ed5a35f5e39936a5619e1b76f",
+        "md5_filename": "0CC92381BDCA47754B144A4FC2E41623",
+        "zip_password": "flare",
+        "acquisition_tool": "generate_forensic_hash (VIGIA MCP)",
+        "acquisition_hash": "sha256:9b9c670e86650cf55993f557da0785b54686f07ed5a35f5e39936a5619e1b76f",
+        "acquisition_timestamp": "2026-06-30T15:20:29.490Z",
+        "write_blocker_used": false,
+        "examiner_id": "VIGIA-MCP-CLAUDE-CODE"
+      }
+    },
+    {
+      "artifact_id": "ch08_zip_001",
+      "evidence_type": "container_zip",
+      "source_tool": "generate_forensic_hash",
+      "timestamp": "2026-06-30T15:20:30.741Z",
+      "raw_score": 0.60,
+      "prior_trust": 0.90,
+      "provenance_chain": [
+        "sha256:b66e1b447755d098a1f8028427d8a721c3e3dc75a5f4245122aaf45e12aa4361",
+        "sha256:9f8b22e416e168b6b006e5f25a6b94bb487f04ef08beba50bda2858cb4dfb884"
+      ],
+      "description": "FE9D3BA1789DC6371105042D80291205.zip — Challenge 8 container. Password-protected (password: flare). Hash integrity verified.",
+      "metadata": {
+        "path": "/home/labestiadevigia/vigia-repo/evidence/flareon/2015/8/FE9D3BA1789DC6371105042D80291205.zip",
+        "sha256": "9f8b22e416e168b6b006e5f25a6b94bb487f04ef08beba50bda2858cb4dfb884",
+        "md5_filename": "FE9D3BA1789DC6371105042D80291205",
+        "zip_password": "flare",
+        "acquisition_tool": "generate_forensic_hash (VIGIA MCP)",
+        "acquisition_hash": "sha256:9f8b22e416e168b6b006e5f25a6b94bb487f04ef08beba50bda2858cb4dfb884",
+        "acquisition_timestamp": "2026-06-30T15:20:30.741Z",
+        "write_blocker_used": false,
+        "examiner_id": "VIGIA-MCP-CLAUDE-CODE"
+      }
+    },
+    {
+      "artifact_id": "ch09_zip_001",
+      "evidence_type": "container_zip",
+      "source_tool": "generate_forensic_hash",
+      "timestamp": "2026-06-30T15:20:36.099Z",
+      "raw_score": 0.60,
+      "prior_trust": 0.90,
+      "provenance_chain": [
+        "sha256:b66e1b447755d098a1f8028427d8a721c3e3dc75a5f4245122aaf45e12aa4361",
+        "sha256:8ad3677f8baf4b347205b8ad212b66397ff751ab6b8dfb6f3685d52c65956a99"
+      ],
+      "description": "4568CB1948CCD11DDB9B90359F7DC79A.zip — Challenge 9 container. Password-protected (password: flare). Co-located with pre-extracted bonus binary. Hash integrity verified.",
+      "metadata": {
+        "path": "/home/labestiadevigia/vigia-repo/evidence/flareon/2015/9/4568CB1948CCD11DDB9B90359F7DC79A.zip",
+        "sha256": "8ad3677f8baf4b347205b8ad212b66397ff751ab6b8dfb6f3685d52c65956a99",
+        "md5_filename": "4568CB1948CCD11DDB9B90359F7DC79A",
+        "zip_password": "flare",
+        "acquisition_tool": "generate_forensic_hash (VIGIA MCP)",
+        "acquisition_hash": "sha256:8ad3677f8baf4b347205b8ad212b66397ff751ab6b8dfb6f3685d52c65956a99",
+        "acquisition_timestamp": "2026-06-30T15:20:36.099Z",
+        "write_blocker_used": false,
+        "examiner_id": "VIGIA-MCP-CLAUDE-CODE"
+      }
+    },
+    {
+      "artifact_id": "ch10_zip_001",
+      "evidence_type": "container_zip",
+      "source_tool": "generate_forensic_hash",
+      "timestamp": "2026-06-30T15:20:31.666Z",
+      "raw_score": 0.62,
+      "prior_trust": 0.90,
+      "provenance_chain": [
+        "sha256:b66e1b447755d098a1f8028427d8a721c3e3dc75a5f4245122aaf45e12aa4361",
+        "sha256:af4dc74fb53fc23e33ad2a57fea7a4fe8906b1e00c6460e49e38634bf6a60872"
+      ],
+      "description": "DC682778F53E853B3188AC63EB376D8B.zip — Challenge 10 container. Password-protected (password: flare). Hash integrity verified.",
+      "metadata": {
+        "path": "/home/labestiadevigia/vigia-repo/evidence/flareon/2015/10/DC682778F53E853B3188AC63EB376D8B.zip",
+        "sha256": "af4dc74fb53fc23e33ad2a57fea7a4fe8906b1e00c6460e49e38634bf6a60872",
+        "md5_filename": "DC682778F53E853B3188AC63EB376D8B",
+        "zip_password": "flare",
+        "acquisition_tool": "generate_forensic_hash (VIGIA MCP)",
+        "acquisition_hash": "sha256:af4dc74fb53fc23e33ad2a57fea7a4fe8906b1e00c6460e49e38634bf6a60872",
+        "acquisition_timestamp": "2026-06-30T15:20:31.666Z",
+        "write_blocker_used": false,
+        "examiner_id": "VIGIA-MCP-CLAUDE-CODE"
+      }
+    },
+    {
+      "artifact_id": "ch11_zip_001",
+      "evidence_type": "container_zip",
+      "source_tool": "generate_forensic_hash",
+      "timestamp": "2026-06-30T15:20:34.951Z",
+      "raw_score": 0.65,
+      "prior_trust": 0.90,
+      "provenance_chain": [
+        "sha256:b66e1b447755d098a1f8028427d8a721c3e3dc75a5f4245122aaf45e12aa4361",
+        "sha256:fb87bf684fe473891ab7317a0fe5ee4c3dc6a44f76ef4fd7e4772a600287e332"
+      ],
+      "description": "42634F3F5FAF28306EB07675274AA6B6.zip — Challenge 11 container (final challenge). Password-protected (password: flare). Hash integrity verified.",
+      "metadata": {
+        "path": "/home/labestiadevigia/vigia-repo/evidence/flareon/2015/11/42634F3F5FAF28306EB07675274AA6B6.zip",
+        "sha256": "fb87bf684fe473891ab7317a0fe5ee4c3dc6a44f76ef4fd7e4772a600287e332",
+        "md5_filename": "42634F3F5FAF28306EB07675274AA6B6",
+        "zip_password": "flare",
+        "acquisition_tool": "generate_forensic_hash (VIGIA MCP)",
+        "acquisition_hash": "sha256:fb87bf684fe473891ab7317a0fe5ee4c3dc6a44f76ef4fd7e4772a600287e332",
+        "acquisition_timestamp": "2026-06-30T15:20:34.951Z",
+        "write_blocker_used": false,
+        "examiner_id": "VIGIA-MCP-CLAUDE-CODE"
+      }
+    }
+  ]
+}

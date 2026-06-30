@@ -260,6 +260,305 @@ The forensic record accurately reflects the epistemic state of each investigatio
 
 ---
 
+## B-021 — `sift_orchestrator.py` vol3 path emitted SUSPICION with 0 signals
+
+| Field | Value |
+|-------|-------|
+| **Status** | RESOLVED — commit `1b0df1c` |
+| **Severity** | P1 — incorrect verdict on genuinely clean memory dumps |
+| **File** | `sift_orchestrator.py` |
+| **Function** | Volatility3 orchestrator path — verdict emission |
+| **Original line** | 337 |
+| **Fix commit** | `1b0df1c` — POST HACKATHON: fix B-021/B-022 |
+| **Detected** | Post-hackathon session 2026-06-28 |
+
+### Description
+
+The Volatility3 orchestrator path had a binary hypothesis: `MALICIOUS_INTENT_DETECTED`
+or `SUSPICION_DETECTED`. When `avg == Fraction(0, 1)` — i.e., memory analysis produced
+zero signals — the fallback branch emitted `SUSPICION_DETECTED` instead of
+`NO_SEMIOTIC_ANOMALY_DETECTED`.
+
+```python
+# BEFORE:
+verdict = (
+    "MALICIOUS_INTENT_DETECTED" if avg > threshold
+    else "SUSPICION_DETECTED"   # ← fired even when avg == Fraction(0,1)
+)
+
+# AFTER:
+verdict = (
+    "MALICIOUS_INTENT_DETECTED" if avg > threshold
+    else "NO_SEMIOTIC_ANOMALY_DETECTED" if avg == Fraction(0, 1)   # ← new middle branch
+    else "SUSPICION_DETECTED"
+)
+```
+
+A clean memory dump correctly analyzed by Volatility3 (no malicious processes, no
+network anomalies, no malfind hits) received an incorrect `SUSPICION` verdict solely
+because it produced zero signals — which is the expected result for a clean dump.
+
+### Forensic Impact
+
+- A genuinely clean memory image was sealed with `verdict = SUSPICION_DETECTED`, implying
+  anomalies were present when none were. Under Daubert cross-examination, the analyst
+  would be unable to identify what anomaly triggered the suspicion verdict — because
+  there was none. The bundle would be indefensible.
+- `SUSPICION` requires a "documented baseline deviation" (see Verdict Scale). Zero signals
+  is the absence of deviation, not a deviation. The verdict violated its own definition.
+- Affected any case processed through the vol3 path where the memory image was clean:
+  the incorrect verdict propagated into the sealed bundle and accuracy metrics.
+
+### Fix Applied
+
+Added middle branch at line 337: emit `NO_SEMIOTIC_ANOMALY_DETECTED` when
+`avg == Fraction(0, 1)`. `SUSPICION_DETECTED` is now only emitted when `avg > Fraction(0, 1)`
+but below the `MALICIOUS_INTENT_DETECTED` threshold — i.e., when there are real signals
+that do not reach the malice threshold.
+
+### Verification
+
+```python
+# vol3 path with 0 signals → NO_SEMIOTIC_ANOMALY_DETECTED
+assert orchestrator.build_vol3_verdict(avg=Fraction(0, 1)) == "NO_SEMIOTIC_ANOMALY_DETECTED"
+
+# vol3 path with weak signals → SUSPICION_DETECTED
+assert orchestrator.build_vol3_verdict(avg=Fraction(1, 10)) == "SUSPICION_DETECTED"
+```
+
+---
+
+## B-022 — `run_all_agent.py` accuracy comparator aliased `ABSTAIN` → `UNKNOWN`
+
+| Field | Value |
+|-------|-------|
+| **Status** | RESOLVED — commit `1b0df1c` |
+| **Severity** | P1 — ABSTAIN cases counted as FAIL in accuracy metrics |
+| **File** | `run_all_agent.py` |
+| **Function** | Accuracy comparator dict |
+| **Original line** | 168 |
+| **Fix commit** | `1b0df1c` — POST HACKATHON: fix B-021/B-022 |
+| **Detected** | Post-hackathon session 2026-06-28 |
+
+### Description
+
+The accuracy comparator dict contained the entry `"ABSTAIN": "UNKNOWN"`, while the
+main verdict mapper used `"ABSTAIN": "ABSTAIN"`. The two dicts were inconsistent:
+
+```python
+# run_all_agent.py line 168 — BEFORE:
+comparator_aliases = {
+    ...
+    "ABSTAIN": "UNKNOWN",   # ← diverged from main mapper
+}
+
+# main verdict mapper (correct):
+verdict_map = {
+    ...
+    "ABSTAIN": "ABSTAIN",
+}
+```
+
+When a case had `expected_verdict = "ABSTAIN"` and the scorer correctly produced a
+bundle with `verdict = "ABSTAIN"`, the comparator translated the produced verdict to
+`"ABSTAIN"` but the expected value went through the alias dict and became `"UNKNOWN"`.
+The comparison `"ABSTAIN" == "UNKNOWN"` evaluated to False → the case was counted as
+FAIL in accuracy metrics.
+
+### Forensic Impact
+
+- All ABSTAIN cases (e.g., VIGIA-SEP800-001, VIGIA-SET68I-001, VIGIA-ANDROID11-001)
+  that correctly produced ABSTAIN verdicts were counted as accuracy failures, depressing
+  the reported accuracy score.
+- The artifact made the system appear less accurate than it was, specifically on the
+  class of cases where the correct answer is epistemic abstention. This is the opposite
+  of a conservative error: the system was correct but reported as wrong.
+- Accuracy numbers computed with this bug in place must be treated as underestimates
+  for the ABSTAIN class.
+
+### Fix Applied
+
+Removed the `"ABSTAIN": "UNKNOWN"` alias from the comparator dict. `"ABSTAIN"` now
+maps to itself in both dicts, restoring consistency. ABSTAIN cases that produce the
+correct verdict are now counted as PASS.
+
+### Verification
+
+```python
+# ABSTAIN case with correct verdict → PASS
+bundle = {"verdict": "ABSTAIN"}
+expected = "ABSTAIN"
+assert comparator.compare(bundle, expected) == "PASS"
+```
+
+---
+
+## B-023 — `_apply_quadripartite` silently collapsed unknown verdicts to `ABSTAIN`
+
+| Field | Value |
+|-------|-------|
+| **Status** | RESOLVED — commit `fb95648` |
+| **Severity** | P1 — unrecognized verdict strings silently produced forensically incorrect ABSTAIN bundles |
+| **File** | `vigia_scorer.py` |
+| **Function** | `_apply_quadripartite()` |
+| **Original line** | 332 |
+| **Fix commit** | `fb95648` — POST HACKATHON: fix B-023 |
+| **Detected** | Post-hackathon session 2026-06-28 |
+
+### Description
+
+`_apply_quadripartite()` used `.get()` with a silent fallback to map verdict strings
+to their raw score representation:
+
+```python
+# BEFORE:
+raw = _VERDICT_TO_RAW.get(verdict, "ABSTAIN")
+```
+
+Any verdict string not present in `_VERDICT_TO_RAW` — whether from a typo, a new
+verdict state added to the scale without updating the table, or a pipeline bug
+producing a malformed string — was silently mapped to `"ABSTAIN"` with no error,
+no log entry, and no diagnostic output.
+
+This violated the Daubert fail-loud principle: a forensic system that silently
+produces an incorrect result is less defensible than one that halts with an explicit
+error, because the incorrect result may be presented as evidence without any visible
+indication that something went wrong.
+
+### Forensic Impact
+
+- A typo in a verdict string (e.g., `"MALICEE"`, `"intent"`, `"SUSPICION "` with
+  trailing whitespace) would produce a sealed bundle with `verdict = "ABSTAIN"` —
+  the epistemic abstention verdict — without any indication that the verdict is the
+  result of a lookup failure rather than a genuine analytical decision.
+- A new verdict state added to the scale (e.g., `"INCONCLUSIVE"`) without updating
+  `_VERDICT_TO_RAW` would silently collapse to ABSTAIN across all cases that reached
+  that state. The bug would be invisible in the bundle output, discoverable only by
+  auditing the source table.
+- Under cross-examination: the analyst would be unable to explain why the bundle
+  emits ABSTAIN for a case that reached a non-ABSTAIN verdict state.
+
+### Fix Applied
+
+Replaced `.get()` with explicit membership check. If `verdict` is not in
+`_VERDICT_TO_RAW`, a `ValueError` is raised with full diagnostic (Daubert fail-loud
+principle):
+
+```python
+# AFTER:
+if verdict not in _VERDICT_TO_RAW:
+    raise ValueError(
+        f"_apply_quadripartite: unrecognized verdict '{verdict}'. "
+        f"Valid values: {sorted(_VERDICT_TO_RAW.keys())}. "
+        f"Update _VERDICT_TO_RAW if a new verdict state was added to the scale."
+    )
+raw = _VERDICT_TO_RAW[verdict]
+```
+
+The failure is now loud, explicit, and traceable — the bundle is never sealed with
+a silently incorrect verdict.
+
+### Verification
+
+```python
+# recognized verdict → normal path
+assert _apply_quadripartite("MALICE") == expected_raw_malice
+
+# unrecognized verdict → ValueError, not silent ABSTAIN
+try:
+    _apply_quadripartite("MALICEE")
+    assert False, "should have raised"
+except ValueError as e:
+    assert "unrecognized verdict" in str(e)
+```
+
+---
+
+## B-024 — `epc_factor = 0.1` float literal in EPC path (BROKEN chain case)
+
+| Field | Value |
+|-------|-------|
+| **Status** | RESOLVED — commit `fb95648` (same as B-023) |
+| **Severity** | P0 — float in deterministic scoring path, L-021 homogeneity violation |
+| **File** | `vigia_scorer.py` |
+| **Function** | EPC (Evidence Provenance Chain) scoring path |
+| **Original line** | 476 |
+| **Fix commit** | `fb95648` — POST HACKATHON: fix B-023 |
+| **Detected** | Post-hackathon session 2026-06-28 |
+
+### Description
+
+When `provenance_chain` is empty or `chain_status == "BROKEN"`, the EPC scoring path
+assigned `epc_factor` using the float literal `0.1`:
+
+```python
+# BEFORE:
+if chain_status == "BROKEN" or not provenance_chain:
+    epc_factor = 0.1   # ← float literal in deterministic scoring path
+else:
+    epc_factor = _EPC_FACTOR_TABLE[k]   # ← Fraction from lookup table
+```
+
+The normal path (`_EPC_FACTOR_TABLE`) returns a `Fraction` with exact rational
+arithmetic (invariant P0 / L-021). The BROKEN/empty path introduced a `float` at
+the same variable in the same function, making the type of `epc_factor` dependent
+on a runtime branch condition. Any downstream multiplication of `epc_factor` by a
+`Fraction` score in the BROKEN path produced a `float` result, propagating the
+homogeneity violation through the rest of the scoring computation.
+
+This is classified P0 — the same severity as B-019 — because it represents a
+direct violation of the Deterministic Forensic Protocol: a `float` in the scoring
+path makes the result architecture-dependent and non-reproducible under the
+bit-identical cross-architecture requirement.
+
+### Forensic Impact
+
+- **Reproducibility violation:** on any case where `chain_status == "BROKEN"` or the
+  provenance chain is absent, the `effective_trust` computation used a `float`
+  intermediate. Two architectures (e.g., x86-64 Linux vs ARM64 macOS) may produce
+  different IEEE 754 rounding results for the same case, producing different sealed
+  bundles from identical input — breaking the Daubert attestation of reproducibility.
+- **Homogeneity violation:** the EPC scoring function mixed `Fraction` and `float`
+  arithmetic within a single execution depending on a runtime branch. This is
+  structurally different from a clean boundary conversion and violates the L-021
+  invariant that the entire scoring path operate in `Fraction`.
+- **Affected cases:** any case with a broken or absent provenance chain — which
+  includes adversarially submitted evidence, corrupted images, and cases where
+  chain-of-custody documentation was not provided.
+
+### Fix Applied
+
+Replaced the float literal with the exact `Fraction` equivalent:
+
+```python
+# AFTER:
+if chain_status == "BROKEN" or not provenance_chain:
+    epc_factor = Fraction(1, 10)   # exact rational: 0.1 = 1/10
+else:
+    epc_factor = _EPC_FACTOR_TABLE[k]
+```
+
+`epc_factor` is now always a `Fraction` regardless of branch, restoring type
+homogeneity across the entire EPC scoring path.
+
+### Verification
+
+```python
+from fractions import Fraction
+
+# BROKEN chain → Fraction, not float
+epc = compute_epc_factor(chain_status="BROKEN", provenance_chain=[])
+assert isinstance(epc, Fraction), f"expected Fraction, got {type(epc)}"
+assert epc == Fraction(1, 10)
+
+# empty chain → same
+epc = compute_epc_factor(chain_status="OK", provenance_chain=[])
+assert isinstance(epc, Fraction)
+assert epc == Fraction(1, 10)
+```
+
+---
+
 ## B-025 — Architectural Investigation: `Fraction` vs `float` Boundary in Scorer (OPEN)
 
 | Field | Value |
@@ -1020,3 +1319,176 @@ is non-contradictory. **No action required.**
 This entry is preserved in the registry as an audit trail record: the scenario was
 examined, the defense was confirmed, and the dismissal reasoning is documented for
 any future reviewer who asks the same question.
+
+---
+
+## Session 2026-06-29 Bugs — Windows Disk Evidence & RAW Mode
+
+### B-032 [FIXED] — vigia_agent.py mapped *.evtx to event_stream kwarg instead of event_logs
+
+| Field | Value |
+|-------|-------|
+| **Status** | RESOLVED |
+| **File** | `vigia_agent.py` |
+| **Function** | `_build_orchestrator_kwargs()` |
+| **Detected** | Session 2026-06-29 |
+
+**Description:** `_build_orchestrator_kwargs()` mapped `.evtx` files to the `event_stream` parameter, but `SIFTOrchestrator.analyze()` routes `event_stream` to `MetabolicProfiler`, not to `EventLogCorrelator`. The correct parameter is `event_logs`. Result: `EventLogCorrelator` received no input and produced `z=0`, while the actual composite score from direct invocation was 19/20.
+
+---
+
+### B-033 [FIXED] — Agent did not auto-detect registry hives (SAM/SYSTEM/SOFTWARE/SECURITY)
+
+| Field | Value |
+|-------|-------|
+| **Status** | RESOLVED |
+| **File** | `vigia_agent.py` |
+| **Detected** | Session 2026-06-29 |
+
+**Description:** The autonomous agent did not auto-detect registry hive files (SAM, SYSTEM, SOFTWARE, SECURITY) when scanning evidence directories. These files lack extensions and were not matched by any glob pattern in the evidence scanner.
+
+---
+
+### B-034 [FIXED] — ChainOfCustody.acquire() missing notes kwarg in registry_timeline_reconstructor
+
+| Field | Value |
+|-------|-------|
+| **Status** | RESOLVED |
+| **File** | `vigia/sift/registry_timeline_reconstructor.py` |
+| **Function** | `ChainOfCustody.acquire()` |
+| **Detected** | Session 2026-06-29 |
+
+**Description:** `ChainOfCustody.acquire()` was called without the `notes` keyword argument required by the method signature, producing a `TypeError` on every registry hive acquisition.
+
+---
+
+### B-035 [FIXED] — forensic_adapter mapped event_log to log_entry (syslog generic) instead of windows_event_log
+
+| Field | Value |
+|-------|-------|
+| **Status** | RESOLVED |
+| **File** | `vigia/sift/forensic_adapter.py` |
+| **Detected** | Session 2026-06-29 |
+
+**Description:** `forensic_adapter.py` mapped `event_log` to `log_entry` (syslog generic, `spoofability=0.85`). Windows EVTX is a binary format with checksums, much harder to tamper. Fix: Added `windows_event_log` to forensic_adapter mapping, CAIE profiles, and gamma tables. See L-033b, L-035.
+
+---
+
+### B-036 [FIXED] — z>5.0 threshold impossible in vigia_agent.py fallback hypothesis (Z_CLIP_MAX=5.0)
+
+| Field | Value |
+|-------|-------|
+| **Status** | RESOLVED |
+| **File** | `vigia_agent.py` |
+| **Detected** | Session 2026-06-29 |
+
+**Description:** The fallback hypothesis override in `vigia_agent.py` required `z>5.0` to trigger, but `Z_CLIP_MAX=5.0` clips all signals at 5.0. The threshold was impossible to reach. Fixed to `z>2.0`. See L-036.
+
+---
+
+### B-037 [FIXED] — EBS v1 adapter missing INTENT/BENIGN hypothesis mapping in sift_orchestrator.py
+
+| Field | Value |
+|-------|-------|
+| **Status** | RESOLVED |
+| **File** | `sift_orchestrator.py` |
+| **Detected** | Session 2026-06-29 |
+
+**Description:** The EBS v1 adapter in `sift_orchestrator.py` did not have mappings for `INTENT` and `BENIGN` hypothesis types. Cases producing these hypotheses would fall through to the default handler and produce incorrect bundle metadata.
+
+---
+
+### B-038 [FIXED] — composite_score not included in event_log signal metadata
+
+| Field | Value |
+|-------|-------|
+| **Status** | RESOLVED |
+| **File** | Event log signal emission path |
+| **Detected** | Session 2026-06-29 |
+
+**Description:** `composite_score` was not included in event_log signal metadata. This field is required by `apply_artifact_reliability_dynamic()` (L-038) to compute dynamic gamma based on corroboration strength.
+
+---
+
+### B-039 [FIXED] — windows_event_log type missing from gamma tables in _math_utils.py
+
+| Field | Value |
+|-------|-------|
+| **Status** | RESOLVED |
+| **File** | `vigia/sift/_math_utils.py` |
+| **Detected** | Session 2026-06-29 |
+
+**Description:** The `windows_event_log` artifact type was not present in the gamma lookup tables in `_math_utils.py`. Signals of this type would fall through to the default gamma value instead of using the calibrated `gamma=0.70`.
+
+---
+
+### B-040 [PENDING] — ARTIFACT_RELIABILITY not propagated to CAIE
+
+| Field | Value |
+|-------|-------|
+| **Status** | PENDING |
+| **Severity** | P2 |
+| **File** | `vigia/sift/forensic_adapter.py` |
+| **Detected** | Session 2026-06-29 |
+
+**Description:** `ios_forensics.py` and `android_forensics.py` define `ARTIFACT_RELIABILITY=Fraction(70,100)` but `forensic_adapter.py` sets `base_trust=1.0` fixed, ignoring the signal metadata value. See L-037.
+
+---
+
+### B-041 [PENDING] — caie_artifacts not returned by run_full_analysis() — CAIE never runs in RAW mode
+
+| Field | Value |
+|-------|-------|
+| **Status** | PENDING |
+| **Severity** | P1 |
+| **Detected** | Session 2026-06-29 |
+
+**Description:** `run_full_analysis()` does not return `caie_artifacts` in its output, so the CAIE cross-artifact analysis engine never receives artifacts when processing RAW evidence. This means structural fracture detection (LOG_VS_MEMORY, TIMELINE_PARADOX, etc.) is bypassed in RAW mode.
+
+---
+
+### B-042 [PENDING] — iOS forensics module — P0 float boundary in to_signal()
+
+| Field | Value |
+|-------|-------|
+| **Status** | PENDING — architectural decision required |
+| **Severity** | P0 |
+| **File** | `vigia/sift/ios_forensics.py` |
+| **Detected** | Session 2026-06-29 |
+
+**Description:** `to_signal()` in `ios_forensics.py` uses `float()` for z-score and confidence values. When this module feeds the deterministic scoring pipeline, floats enter the Fraction arithmetic path — a P0 violation of L-021. Architectural decision pending: should `SignalOutput` accept `Decimal`/`Fraction`, or is the float-to-Fraction conversion the correct boundary?
+
+---
+
+### B-043 [PENDING] — Android forensics module — same as B-042
+
+| Field | Value |
+|-------|-------|
+| **Status** | PENDING — same architectural decision as B-042 |
+| **Severity** | P0 |
+| **File** | `vigia/sift/android_forensics.py` |
+| **Detected** | Session 2026-06-29 |
+
+**Description:** Same `float()` boundary issue as B-042 in `android_forensics.py`. The fix should be coordinated with B-042 as the same architectural decision applies.
+
+---
+
+### B-044 [FIXED] — `_build_orchestrator_kwargs()` ignores .pcap files — NetworkForensicsEngine never receives data
+
+| Field | Value |
+|-------|-------|
+| **Status** | FIXED — 2026-06-30 |
+| **Severity** | P1 |
+| **Files** | `vigia/sift/pcap_parser.py` (new), `sift_orchestrator.py`, `vigia_agent.py` |
+| **Detected** | Session 2026-06-30 |
+
+**Description:** `_build_orchestrator_kwargs()` in `vigia_agent.py` did not detect `.pcap` or `.pcapng` files. No raw pcap parser existed in the repository. `NetworkForensicsEngine.analyze()` expected `List[NetworkFlow]` but never received real data — it could only be activated if an external caller manually constructed `NetworkFlow` objects.
+
+**Test case:** `evidence/flare-on/flareon4/12/20170801_1300_filtered.pcap` — confirmed C2 beaconing (7220 packets to AWS 52.0.104.200), generated 0 signals, exit code 0.
+
+**Fix applied:**
+1. Created `vigia/sift/pcap_parser.py` — tshark parser (`-T json`) → `List[NetworkFlow]`, with a safety cap of 50000 packets and fail-loud on tshark errors.
+2. In `sift_orchestrator.py` (shim) — when receiving `pcap_path`, parses the pcap with `parse_pcap_to_flows()` and passes the flows as `network_flows` to the real `run_full_analysis()`.
+3. In `vigia_agent.py` `_build_orchestrator_kwargs()` — added `("*.pcap", "pcap_path")` and `("*.pcapng", "pcap_path")` to the directory detection pattern list, and `elif suffix in (".pcap", ".pcapng")` case for single file.
+
+**Post-fix result:** NETWORK_FORENSICS emits signal with z=2.625, conf=0.95, 7220 flows, EXFILTRATION detected.

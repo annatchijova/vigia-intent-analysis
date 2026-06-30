@@ -1,0 +1,322 @@
+{
+  "case_id": "VIGIA-FLAREON-8",
+  "case_name": "FLARE-On 8 (2021) — CTF Challenge Collection",
+  "schema_version": 1,
+  "description": "FLARE-On 8 challenge set released in September 2021 by FireEye FLARE team. The zip archive (333,676,259 bytes, SHA-256: ae776be9dbdff5bddacd19cf367d662c112dccf29c87d38355e56f2d7e6daafb) contains 10 CTF challenges (01–10) plus a 7zip_password.txt. Naming convention changed from 2019/2020 to zero-padded numeric prefix + underscore + name. Most notable: challenge 05 is a full Linux VM (321 MB, FLARE_Linux_VM.7z). Other highlights: credchecker (credential checker logic reversal), known (file signature puzzle), antioch (search-your-name Monty Python theme), myaquaticlife (aquatic theming, likely a game), PetTheKitty (network challenge), spel (NES ROM or similar), beelogin (JavaScript login form), evil (likely obfuscated malware), wizardcult (magic/fantasy theme, complex challenge).",
+  "expected_verdict": "INTENT",
+  "expected_confidence": 0.92,
+  "expected_mitre_ttps": ["T1027", "T1059", "T1564", "T1078", "T1055"],
+  "peirce_chain": {
+    "firstness": "10 challenges covering credential reversing (ch01 credchecker, 132 KB), file-format identification (ch02 known, 88 KB), Monty Python search challenge (ch03 antioch, 1.8 MB), aquatic game (ch04 myaquaticlife, 2.3 MB), full Linux VM (ch05 FLARE_Linux_VM, 322 MB), network/PCAP (ch06 PetTheKitty, 676 KB), game/NES ROM (ch07 spel, 1 MB), JavaScript login (ch08 beelogin, 326 KB), obfuscated malware (ch09 evil, 1.4 MB), wizard cult chain (ch10 wizardcult, 3.9 MB).",
+    "secondness": "The 2021 collection spans JavaScript (browser-based attacks), Linux OS-level (full VM), credential theft simulation, NES ROM reversing, network traffic analysis, and obfuscated malware — a comprehensive 2021 threat surface map. The Linux VM (ch05 at 321 MB) is the dominant artifact by size and represents a full OS environment where participants must find flags through forensic analysis of a live system. Challenge 08 (beelogin at 326 KB) is a standalone credential verification challenge — 326 KB is consistent with a minified + obfuscated JavaScript bundle. Challenge 09 'evil' by name signals an intentionally malicious sample for analysis.",
+    "thirdness": "FLARE-On 8 was authored against the 2021 threat landscape: Log4Shell-era Linux targeting (ch05 VM), JavaScript supply-chain attacks (ch08), NES/retro platform reversing (ch07 spel — teaching analysts that malware can target unusual runtime environments). The 'credchecker' (ch01) teaches the most fundamental skill: reversing a password check, which underlies every crimeware login panel analysis. Carnegie pattern: competence authority — the FLARE team's pedagogical framing ensures participants invest maximum effort under institutional trust."
+  },
+  "devil_advocate": "CTF challenges are educational content authored by a known team (FireEye FLARE) for a public competition. No deception of participants occurs. The INTENT verdict here reflects technical intentionality of challenge design. The Linux VM (ch05) is not a threat — it is a sandboxed training environment. 'evil' (ch09) may be a benign sample with a provocative name.",
+  "artifacts": [
+    {
+      "artifact_id": "flareon8-zip-001",
+      "evidence_type": "file_hash",
+      "source_tool": "generate_forensic_hash",
+      "timestamp": "2026-06-30T00:00:00Z",
+      "raw_score": 0.95,
+      "prior_trust": 0.99,
+      "provenance_chain": [
+        "sha256:ae776be9dbdff5bddacd19cf367d662c112dccf29c87d38355e56f2d7e6daafb"
+      ],
+      "description": "Outer zip archive Flare-On8_Challenges.zip. SHA-256 verified against task specification. Size: 333,676,259 bytes. Contains 11 entries: 10 challenge 7z archives + 7zip_password.txt. Archive dated 2021-09-10 (challenges) / 2021-10-22 (password file).",
+      "metadata": {
+        "filename": "Flare-On8_Challenges.zip",
+        "size_bytes": 333676259,
+        "entry_count": 11,
+        "zip_entries": [
+          "01_credchecker.7z",
+          "02_known.7z",
+          "03_antioch.7z",
+          "04_myaquaticlife.7z",
+          "05_FLARE_Linux_VM.7z",
+          "06_PetTheKitty.7z",
+          "07_spel.7z",
+          "08_beelogin.7z",
+          "09_evil.7z",
+          "10_wizardcult.7z",
+          "7zip_password.txt"
+        ],
+        "source_url": "https://flare-on.com/",
+        "acquisition_tool": "sha256sum",
+        "acquisition_hash": "sha256:ae776be9dbdff5bddacd19cf367d662c112dccf29c87d38355e56f2d7e6daafb",
+        "acquisition_timestamp": "2026-06-30T00:00:00Z",
+        "write_blocker_used": false,
+        "examiner_id": "VIGIA-MCP-CLAUDE-CODE"
+      }
+    },
+    {
+      "artifact_id": "flareon8-ch01-credchecker",
+      "evidence_type": "binary",
+      "source_tool": "list_files",
+      "timestamp": "2021-09-10T09:22:00Z",
+      "raw_score": 0.65,
+      "prior_trust": 0.90,
+      "provenance_chain": [
+        "sha256:ae776be9dbdff5bddacd19cf367d662c112dccf29c87d38355e56f2d7e6daafb",
+        "zip_entry:01_credchecker.7z"
+      ],
+      "description": "Challenge 01 — credchecker (132,208 bytes). Credential checking challenge. A binary or script that validates a hardcoded password/username; participants must reverse the check to recover the flag. Technique class: patch-me / credential reversing (T1078).",
+      "metadata": {
+        "challenge_number": 1,
+        "challenge_name": "credchecker",
+        "archive_size_bytes": 132208,
+        "archive_date": "2021-09-10",
+        "technique_class": "credential checker / patch-me (T1078)",
+        "difficulty_estimate": "introductory",
+        "acquisition_tool": "unzip -l (listing only, no extraction)",
+        "acquisition_hash": "sha256:ae776be9dbdff5bddacd19cf367d662c112dccf29c87d38355e56f2d7e6daafb",
+        "acquisition_timestamp": "2026-06-30T00:00:00Z",
+        "write_blocker_used": false,
+        "examiner_id": "VIGIA-MCP-CLAUDE-CODE"
+      }
+    },
+    {
+      "artifact_id": "flareon8-ch02-known",
+      "evidence_type": "binary",
+      "source_tool": "list_files",
+      "timestamp": "2021-09-10T09:27:00Z",
+      "raw_score": 0.65,
+      "prior_trust": 0.90,
+      "provenance_chain": [
+        "sha256:ae776be9dbdff5bddacd19cf367d662c112dccf29c87d38355e56f2d7e6daafb",
+        "zip_entry:02_known.7z"
+      ],
+      "description": "Challenge 02 — known (88,128 bytes). File format identification and analysis. 'Known' likely references a known-plaintext attack or a file signature puzzle. Technique class: file format analysis / known-plaintext XOR decryption.",
+      "metadata": {
+        "challenge_number": 2,
+        "challenge_name": "known",
+        "archive_size_bytes": 88128,
+        "archive_date": "2021-09-10",
+        "technique_class": "file format analysis / known-plaintext XOR (T1027)",
+        "difficulty_estimate": "easy",
+        "acquisition_tool": "unzip -l (listing only, no extraction)",
+        "acquisition_hash": "sha256:ae776be9dbdff5bddacd19cf367d662c112dccf29c87d38355e56f2d7e6daafb",
+        "acquisition_timestamp": "2026-06-30T00:00:00Z",
+        "write_blocker_used": false,
+        "examiner_id": "VIGIA-MCP-CLAUDE-CODE"
+      }
+    },
+    {
+      "artifact_id": "flareon8-ch03-antioch",
+      "evidence_type": "binary",
+      "source_tool": "list_files",
+      "timestamp": "2021-09-10T09:40:00Z",
+      "raw_score": 0.70,
+      "prior_trust": 0.90,
+      "provenance_chain": [
+        "sha256:ae776be9dbdff5bddacd19cf367d662c112dccf29c87d38355e56f2d7e6daafb",
+        "zip_entry:03_antioch.7z"
+      ],
+      "description": "Challenge 03 — antioch (1,885,074 bytes). Monty Python and the Holy Grail reference ('Holy Hand Grenade of Antioch'). Likely a Docker/container-based challenge where participants navigate a custom environment. Technique class: container analysis / custom runtime.",
+      "metadata": {
+        "challenge_number": 3,
+        "challenge_name": "antioch",
+        "archive_size_bytes": 1885074,
+        "archive_date": "2021-09-10",
+        "technique_class": "Docker container / custom runtime analysis (Monty Python theme)",
+        "difficulty_estimate": "medium",
+        "acquisition_tool": "unzip -l (listing only, no extraction)",
+        "acquisition_hash": "sha256:ae776be9dbdff5bddacd19cf367d662c112dccf29c87d38355e56f2d7e6daafb",
+        "acquisition_timestamp": "2026-06-30T00:00:00Z",
+        "write_blocker_used": false,
+        "examiner_id": "VIGIA-MCP-CLAUDE-CODE"
+      }
+    },
+    {
+      "artifact_id": "flareon8-ch04-myaquaticlife",
+      "evidence_type": "binary",
+      "source_tool": "list_files",
+      "timestamp": "2021-09-10T09:41:00Z",
+      "raw_score": 0.70,
+      "prior_trust": 0.90,
+      "provenance_chain": [
+        "sha256:ae776be9dbdff5bddacd19cf367d662c112dccf29c87d38355e56f2d7e6daafb",
+        "zip_entry:04_myaquaticlife.7z"
+      ],
+      "description": "Challenge 04 — myaquaticlife (2,369,123 bytes). Aquatic-themed game or simulation. Likely a .NET or game binary where aquatic-themed logic conceals a key derivation puzzle. Technique class: game reversing / .NET decompilation.",
+      "metadata": {
+        "challenge_number": 4,
+        "challenge_name": "myaquaticlife",
+        "archive_size_bytes": 2369123,
+        "archive_date": "2021-09-10",
+        "technique_class": "game reversing / .NET / custom logic puzzle",
+        "difficulty_estimate": "medium",
+        "acquisition_tool": "unzip -l (listing only, no extraction)",
+        "acquisition_hash": "sha256:ae776be9dbdff5bddacd19cf367d662c112dccf29c87d38355e56f2d7e6daafb",
+        "acquisition_timestamp": "2026-06-30T00:00:00Z",
+        "write_blocker_used": false,
+        "examiner_id": "VIGIA-MCP-CLAUDE-CODE"
+      }
+    },
+    {
+      "artifact_id": "flareon8-ch05-flare-linux-vm",
+      "evidence_type": "disk_image",
+      "source_tool": "list_files",
+      "timestamp": "2021-09-10T09:48:00Z",
+      "raw_score": 0.90,
+      "prior_trust": 0.90,
+      "provenance_chain": [
+        "sha256:ae776be9dbdff5bddacd19cf367d662c112dccf29c87d38355e56f2d7e6daafb",
+        "zip_entry:05_FLARE_Linux_VM.7z"
+      ],
+      "description": "Challenge 05 — FLARE_Linux_VM (321,916,242 bytes). Dominant artifact at 322 MB — a full Linux virtual machine image. Participants must forensically analyze the live system to find the flag. This is an OS-level forensics challenge requiring Linux artifact analysis (bash history, cron, /proc, systemd, etc.). Technique class: Linux forensics / VM image analysis.",
+      "metadata": {
+        "challenge_number": 5,
+        "challenge_name": "FLARE_Linux_VM",
+        "archive_size_bytes": 321916242,
+        "archive_date": "2021-09-10",
+        "technique_class": "Linux VM image / OS-level forensics / live system analysis",
+        "difficulty_estimate": "hard",
+        "acquisition_tool": "unzip -l (listing only, no extraction)",
+        "acquisition_hash": "sha256:ae776be9dbdff5bddacd19cf367d662c112dccf29c87d38355e56f2d7e6daafb",
+        "acquisition_timestamp": "2026-06-30T00:00:00Z",
+        "write_blocker_used": false,
+        "examiner_id": "VIGIA-MCP-CLAUDE-CODE"
+      }
+    },
+    {
+      "artifact_id": "flareon8-ch06-petkitty",
+      "evidence_type": "network_traffic",
+      "source_tool": "list_files",
+      "timestamp": "2021-09-10T10:22:00Z",
+      "raw_score": 0.75,
+      "prior_trust": 0.90,
+      "provenance_chain": [
+        "sha256:ae776be9dbdff5bddacd19cf367d662c112dccf29c87d38355e56f2d7e6daafb",
+        "zip_entry:06_PetTheKitty.7z"
+      ],
+      "description": "Challenge 06 — PetTheKitty (675,952 bytes). Network challenge. 'Pet the kitty' likely refers to a SYN-ACK keepalive pattern or a network packet sequence that must be replicated or decoded. Technique class: network protocol analysis / PCAP reversing.",
+      "metadata": {
+        "challenge_number": 6,
+        "challenge_name": "PetTheKitty",
+        "archive_size_bytes": 675952,
+        "archive_date": "2021-09-10",
+        "technique_class": "network protocol analysis / PCAP / keepalive sequence",
+        "difficulty_estimate": "medium-hard",
+        "acquisition_tool": "unzip -l (listing only, no extraction)",
+        "acquisition_hash": "sha256:ae776be9dbdff5bddacd19cf367d662c112dccf29c87d38355e56f2d7e6daafb",
+        "acquisition_timestamp": "2026-06-30T00:00:00Z",
+        "write_blocker_used": false,
+        "examiner_id": "VIGIA-MCP-CLAUDE-CODE"
+      }
+    },
+    {
+      "artifact_id": "flareon8-ch07-spel",
+      "evidence_type": "binary",
+      "source_tool": "list_files",
+      "timestamp": "2021-09-10T10:32:00Z",
+      "raw_score": 0.80,
+      "prior_trust": 0.90,
+      "provenance_chain": [
+        "sha256:ae776be9dbdff5bddacd19cf367d662c112dccf29c87d38355e56f2d7e6daafb",
+        "zip_entry:07_spel.7z"
+      ],
+      "description": "Challenge 07 — spel (1,041,938 bytes). 'Spel' is Swedish/Dutch for 'game' and also an anagram of 'piles'. Likely an NES ROM or retro console game challenge requiring knowledge of the 6502 instruction set or custom emulator. Technique class: NES ROM / retro RE / 6502 assembly.",
+      "metadata": {
+        "challenge_number": 7,
+        "challenge_name": "spel",
+        "archive_size_bytes": 1041938,
+        "archive_date": "2021-09-10",
+        "technique_class": "NES ROM / retro console RE / 6502 assembly",
+        "difficulty_estimate": "hard",
+        "acquisition_tool": "unzip -l (listing only, no extraction)",
+        "acquisition_hash": "sha256:ae776be9dbdff5bddacd19cf367d662c112dccf29c87d38355e56f2d7e6daafb",
+        "acquisition_timestamp": "2026-06-30T00:00:00Z",
+        "write_blocker_used": false,
+        "examiner_id": "VIGIA-MCP-CLAUDE-CODE"
+      }
+    },
+    {
+      "artifact_id": "flareon8-ch08-beelogin",
+      "evidence_type": "binary",
+      "source_tool": "list_files",
+      "timestamp": "2021-09-10T10:51:00Z",
+      "raw_score": 0.80,
+      "prior_trust": 0.90,
+      "provenance_chain": [
+        "sha256:ae776be9dbdff5bddacd19cf367d662c112dccf29c87d38355e56f2d7e6daafb",
+        "zip_entry:08_beelogin.7z"
+      ],
+      "description": "Challenge 08 — beelogin (325,746 bytes). JavaScript login form challenge. 'Beelogin' suggests a bee-themed HTML/JS page where the authentication logic is obfuscated in JavaScript. Technique class: JavaScript deobfuscation / browser-based credential reversing (T1059.007).",
+      "metadata": {
+        "challenge_number": 8,
+        "challenge_name": "beelogin",
+        "archive_size_bytes": 325746,
+        "archive_date": "2021-09-10",
+        "technique_class": "JavaScript obfuscation / HTML login form reversing (T1059.007)",
+        "difficulty_estimate": "hard",
+        "acquisition_tool": "unzip -l (listing only, no extraction)",
+        "acquisition_hash": "sha256:ae776be9dbdff5bddacd19cf367d662c112dccf29c87d38355e56f2d7e6daafb",
+        "acquisition_timestamp": "2026-06-30T00:00:00Z",
+        "write_blocker_used": false,
+        "examiner_id": "VIGIA-MCP-CLAUDE-CODE"
+      }
+    },
+    {
+      "artifact_id": "flareon8-ch09-evil",
+      "evidence_type": "binary",
+      "source_tool": "list_files",
+      "timestamp": "2021-09-10T11:00:00Z",
+      "raw_score": 0.88,
+      "prior_trust": 0.90,
+      "provenance_chain": [
+        "sha256:ae776be9dbdff5bddacd19cf367d662c112dccf29c87d38355e56f2d7e6daafb",
+        "zip_entry:09_evil.7z"
+      ],
+      "description": "Challenge 09 — evil (1,383,970 bytes). The name 'evil' directly signals an obfuscated or malicious sample for behavioral analysis. Likely an anti-analysis challenge (packing, VM detection, timing attacks). Technique class: malware analysis / anti-debug / VM evasion (T1027, T1564).",
+      "metadata": {
+        "challenge_number": 9,
+        "challenge_name": "evil",
+        "archive_size_bytes": 1383970,
+        "archive_date": "2021-09-10",
+        "technique_class": "malware analysis / anti-debug / VM evasion (T1027, T1564)",
+        "difficulty_estimate": "very hard",
+        "acquisition_tool": "unzip -l (listing only, no extraction)",
+        "acquisition_hash": "sha256:ae776be9dbdff5bddacd19cf367d662c112dccf29c87d38355e56f2d7e6daafb",
+        "acquisition_timestamp": "2026-06-30T00:00:00Z",
+        "write_blocker_used": false,
+        "examiner_id": "VIGIA-MCP-CLAUDE-CODE"
+      }
+    },
+    {
+      "artifact_id": "flareon8-ch10-wizardcult",
+      "evidence_type": "binary",
+      "source_tool": "list_files",
+      "timestamp": "2021-09-10T11:13:00Z",
+      "raw_score": 0.90,
+      "prior_trust": 0.90,
+      "provenance_chain": [
+        "sha256:ae776be9dbdff5bddacd19cf367d662c112dccf29c87d38355e56f2d7e6daafb",
+        "zip_entry:10_wizardcult.7z"
+      ],
+      "description": "Challenge 10 — wizardcult (3,856,291 bytes). Final boss challenge. 'Wizardcult' suggests a fantasy-themed multi-stage challenge with custom encryption, protocol reversing, or a complete malware ecosystem. Largest challenge by archive size (excl. VM). Technique class: complex multi-stage RE / custom cryptography / network protocol.",
+      "metadata": {
+        "challenge_number": 10,
+        "challenge_name": "wizardcult",
+        "archive_size_bytes": 3856291,
+        "archive_date": "2021-09-10",
+        "technique_class": "multi-stage RE / custom crypto / complete malware ecosystem (final boss)",
+        "difficulty_estimate": "extreme (final boss)",
+        "acquisition_tool": "unzip -l (listing only, no extraction)",
+        "acquisition_hash": "sha256:ae776be9dbdff5bddacd19cf367d662c112dccf29c87d38355e56f2d7e6daafb",
+        "acquisition_timestamp": "2026-06-30T00:00:00Z",
+        "write_blocker_used": false,
+        "examiner_id": "VIGIA-MCP-CLAUDE-CODE"
+      }
+    }
+  ],
+  "known_limitations": [
+    "7z archives were not extracted — individual challenge binaries were not hashed or analyzed.",
+    "All technique-class attributions are INFERRED from name, size, naming conventions, and FLARE-On 8 public write-ups, not from binary analysis.",
+    "7zip_password.txt was not read — the shared password is not recorded.",
+    "No sandbox execution was performed.",
+    "ch03 antioch technique class (Docker) is based on community knowledge that FLARE-On 8 ch03 used Docker; if this is incorrect the classification is INFERRED-LOW."
+  ],
+  "source_dataset": "FLARE-On 8 CTF — FireEye FLARE Team (2021)",
+  "source_origin": "public_ctf_archive"
+}

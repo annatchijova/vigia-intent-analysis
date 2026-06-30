@@ -109,6 +109,8 @@ VIGÍA. The truth is in the fracture.
 | **Historia de origen** | **[`VIGIA_STORY_EN.md`](./VIGIA_STORY_EN.md) (EN) · [`VIGIA_STORY.md`](./VIGIA_STORY.md) (ES)** |
 | Índice de cumplimiento completo | [`SUBMISSION_COMPLIANCE.md`](./SUBMISSION_COMPLIANCE.md) |
 | **Prompts de investigación de casos reales** | **[`PROMPTS_REALCASES_CLAUDE.md`](./PROMPTS_REALCASES_CLAUDE.md)** — copiar y pegar en Claude Code para ejecutar investigaciones forenses completas en los 18 casos reales |
+| **Investigación completa NGDC 2012** | **[Reporte (EN)](./results/agent_batch/VIGIA-NGDC-2012-REPORT.md) · [Reporte (ES)](./results/agent_batch/VIGIA-NGDC-2012-REPORTE-ES.md) · [Amicus Curiae](./results/agent_batch/VIGIA-NGDC-2012-AMICUS-CURIAE.md)** — análisis autónomo de evidencia cruda del caso SANS National Gallery DC 2012 (17 artefactos, 7 hallazgos, Peircean + Daubert compliant) |
+| **NGDC 2012 — tracy-home E01/E02 (capa física)** | **[Reporte](./results/agent_batch/VIGIA-NGDC-2012-E01E02-REPORT.md) · [Amicus Curiae (EN)](./results/agent_batch/VIGIA-NGDC-2012-E01E02-AMICUS-CURIAE-EN.md) · [Amicus Curiae (ES)](./results/agent_batch/VIGIA-NGDC-2012-E01E02-AMICUS-CURIAE-ES.md)** — análisis de imagen de disco de la MacBook Air de Tracy (5.5 GB HFS+): infraestructura LogKext, documentos de sellos robados, VM anti-forense, recuperación de cuentas eliminadas. Corroboración física del veredicto NGDC-002. |
 
 **Documentación académica (193 módulos, 4 idiomas):**
 [`docs/academic/ACADEMIC_DOCS_MASTER_INDEX_EN.md`](./docs/academic/ACADEMIC_DOCS_MASTER_INDEX_EN.md)
@@ -121,6 +123,8 @@ https://annatchijova.github.io/vigia/vigia.html
 https://annatchijova.github.io/vigia/vigia_diagrams.html
 
 https://annatchijova.github.io/vigia/vigia_commands_en.html
+
+**Mini juego — Simulador VIGÍA:** [🇪🇸 Español](https://annatchijova.github.io/vigia/simulador.html) · [🇬🇧 English](https://annatchijova.github.io/vigia/simulator.html)
 
 ---
 
@@ -280,6 +284,19 @@ comportamiento anómalo.
 - `MAX_ITERATIONS=3`, `CONTRADICTION_THRESHOLD=2` — límites codificados, no sugerencias de prompt
 
 El puente LLM (`validate_and_correct_analysis`) es una capa de enriquecimiento separada y opcional. La detección determinista de contradicciones se ejecuta primero y es independiente de la disponibilidad del LLM.
+
+### Integridad de Evidencia — Qué Pasa con Payloads No Procesables
+
+Si un payload de evidencia no puede ser procesado (UnicodeDecodeError, corrupción de bytes,
+anomalía de integridad), VIGÍA no lo descarta silenciosamente. El payload crudo se sella
+bajo SHA-256 con permisos `0o400` (inmutable post-escritura) y se persiste en el directorio
+de purgatorio de evidencia. Descartar evidencia no procesable rompería la cadena de
+custodia — su ausencia es en sí misma una señal forense bajo Daubert.
+
+Los campos de cadena de custodia (`acquisition_hash`, `examiner_id`, `write_blocker_used`)
+son obligatorios. Los campos faltantes activan penalizaciones de confianza NIST SP 800-86
+§4.3 que reducen matemáticamente la puntuación del veredicto. El sistema no puede operarse
+silenciosamente sin cadena de custodia.
 
 ### Protocolo Kassandra — Defensa Contra Evidencia Adversarial
 
@@ -500,6 +517,8 @@ no se necesita compuerta humana porque ningún veredicto incorrecto llega al bun
 
 ## Modos de Despliegue
 
+> **Arquitectura de modos:** El Modo 1 es el núcleo forense. Los Modos 2-5 son capas de enriquecimiento opcionales. El Modo 2 (Claude Code) está implementado porque el hackathon requiere integración con frameworks agénticos, pero el veredicto determinista es idéntico en todos los modos.
+
 VIGÍA se ejecuta en cinco modos. El núcleo de puntuación determinista es idéntico en todos.
 
 ---
@@ -511,6 +530,12 @@ Fraction, fusión cross-artefacto CAIE, análisis temporal, fingerprinting de
 comportamiento — todo local. Cero costo API. Cero dependencia de red.
 
 **Resolución promedio de caso: < 50ms.** Viable para entornos air-gapped.
+
+> **Independencia operacional:** Si todos los proveedores de LLM dejaran de existir
+> mañana, VIGÍA seguiría produciendo veredictos idénticos a partir de la misma evidencia.
+> El motor de puntuación usa `fractions.Fraction` sobre la stdlib de Python — sin servicios
+> cloud, sin API keys, sin acceso a red. Un requisito de diseño para herramientas forenses
+> destinadas a infraestructura de largo plazo y despliegues air-gapped.
 
 ```bash
 python3 vigia_agent.py \
@@ -702,11 +727,11 @@ basado en señales.
 VIGÍA separa la evaluación en tres dominios distintos. Solo el Dominio A
 constituye la métrica de precisión del sistema.
 
-### Dominio A — Precisión Determinística (métrica principal): 118/118 (100%)
+### Dominio A — Precisión Determinística (métrica principal): 129/129 (100%)
 
 | Suite | Casos | Correctos |
 |-------|-------|-----------|
-| Corpus forense real (NIST/DFRWS/DEF CON/SRL 2018) | 28 | 28 ✓ |
+| Corpus forense real (NIST/DFRWS/DEF CON/SRL 2018/LINUX/NGDC) | 39 | 39 ✓ |
 | Corpus canónico (CAN-001–052) | 52 | 52 ✓ |
 | Casos canónicos legacy | 10 | 10 ✓ |
 | Máquinas benignas / limpias | 15 | 15 ✓ |
@@ -714,7 +739,7 @@ constituye la métrica de precisión del sistema.
 | Suite de falsos negativos | 3 | 3 ✓ |
 | Falsa atribución (planted attribution) | 3 | 3 ✓ |
 | Corpus de demostración | 4 | 4 ✓ |
-| **Total Dominio A** | **118** | **118 (100%)** |
+| **Total Dominio A** | **129** | **129 (100%)** |
 
 > **Corrección 2026-06-17:** El total del Dominio A fue corregido de 117 a 118 para
 > coincidir con el conteo empírico de casos producido por find_cases() en run_all_agent.py.
@@ -841,30 +866,6 @@ Es una que es forensicamente auditable.
 
 ## Ejemplos de Investigación
 
-### VIGIA-REAL-VANKO — Investigación Completa con Claude Code (14 llamadas MCP)
-**Caso:** Anthony Vanko, amenaza interna / exfiltración de PI, Stark Enterprises DC R&D, 2016.
-**Evidencia:** 7 artefactos — sistema de archivos (5), captura de red, hive de registro. Corpus SANS FOR500.
-**Veredicto VIGÍA:** MALICE | Confianza: HIGH | Fusión de confianza: 1.0 | Daubert: ADMISIBLE (error 8.12%)
-**Auto-corrección:** F-004 (capturas WiFi modo monitor 802.11) inicialmente INTENT.
-VIGÍA aplicó el estándar Daubert de fuente única. **Degradado: INTENT -> SUSPICION.**
-16 llamadas de herramientas (14 MCP + 2 eventos de auto-corrección) con marcas de tiempo en tool_execution_log dentro del bundle sellado.
-
-Amicus Curiae completo: [results/srl2018/VIGIA-REAL-VANKO_amicus_curiae.md](./results/srl2018/VIGIA-REAL-VANKO_amicus_curiae.md)
-
-**Todas las investigaciones de Claude Code:** [`results/srl2018/`](./results/srl2018/) — bundles, amicus curiae y archivos SHA-256 para cada caso.
-
-> La investigación de SRL-DMZ-FTP permanece en el repositorio. VANKO fue añadido después de que la retroalimentación de auditoría identificó la necesidad de entradas estructuradas de tool_execution_log en el bundle.
-
-### VIGIA-REAL-NROMANOFF — Troyano Bancario Zeus, Stark Research Labs 2012
-
-**Evidencia:** 5 artefactos — hooks de memoria (Volatility zeus-apihooks), persistencia shimcache, logs de eventos, caché de red. Corpus SANS FOR508.
-**Veredicto VIGÍA:** `MALICE` | Daubert: ADMISIBLE (tasa de error 0.39%) | Integridad de cadena: VERIFICADA 13/13
-**Calificación conservadora F-003:** `INTENT` (no MALICE) — la autenticación rsydow puede ser actividad legítima de DFIR. Estándar conservador Daubert aplicado.
-**F-004:** `SUSPICION` — Compuerta de Corroboración Daubert aplicada (fuente única network_flow).
-**Hallazgo clave:** Hooks Zeus Inline/Trampoline en ntdll.dll en services.exe PID 676, destino del hook 0x7e3b47 en memoria no mapeada — firma definitiva de rootkit.
-
-Amicus Curiae completo: [results/srl2018/VIGIA-REAL-NROMANOFF_amicus_curiae.md](./results/srl2018/VIGIA-REAL-NROMANOFF_amicus_curiae.md)
-
 ### VIGIA-REAL-NFURY — Compuerta Pre-Emisión en Acción (SUSPICION)
 
 **Caso:** Estación de trabajo de Nick Fury, SANS FOR508, investigación de movimiento lateral.
@@ -879,6 +880,32 @@ Esto es auto-corrección arquitectónica: la compuerta interceptó candidatos in
 **Veredicto VIGÍA:** `MALICE` — e identificó autónomamente que el framework de ataque coincidía con VIGIA-REAL-SRL-ADMIN (31 vs 29 procesos RWX, mismo patrón de inyección reflectiva). El cambio táctico de PowerShell (servidor admin) a cmd.exe (servidor AV) fue marcado como una decisión de ocultamiento: los productos AV monitorean PowerShell más agresivamente.
 
 No se solicitó correlación cross-caso. El agente formó la hipótesis independientemente a partir de la evidencia. Amicus completo: [`results/srl2018/VIGIA-REAL-SRL-AV_amicus_curiae.md`](./results/srl2018/VIGIA-REAL-SRL-AV_amicus_curiae.md)
+
+### VIGIA-REAL-NROMANOFF — Troyano Bancario Zeus, Stark Research Labs 2012
+
+**Evidencia:** 5 artefactos — hooks de memoria (Volatility zeus-apihooks), persistencia shimcache, logs de eventos, caché de red. Corpus SANS FOR508.
+**Veredicto VIGÍA:** `MALICE` | Daubert: ADMISIBLE (tasa de error 0.39%) | Integridad de cadena: VERIFICADA 13/13
+**Calificación conservadora F-003:** `INTENT` (no MALICE) — la autenticación rsydow puede ser actividad legítima de DFIR. Estándar conservador Daubert aplicado.
+**F-004:** `SUSPICION` — Compuerta de Corroboración Daubert aplicada (fuente única network_flow).
+**Hallazgo clave:** Hooks Zeus Inline/Trampoline en ntdll.dll en services.exe PID 676, destino del hook 0x7e3b47 en memoria no mapeada — firma definitiva de rootkit.
+
+Amicus Curiae completo: [results/srl2018/VIGIA-REAL-NROMANOFF_amicus_curiae.md](./results/srl2018/VIGIA-REAL-NROMANOFF_amicus_curiae.md)
+
+### VIGIA-REAL-VANKO — Modo Claude Code (Legacy, Opcional)
+
+> **Nota:** Este caso demuestra el Modo 2 (Claude Code + MCP). El veredicto determinista es idéntico al del Modo 1. El Modo 2 está implementado porque el hackathon requiere integración con frameworks agénticos, pero el núcleo forense opera en Modo 1 con 0 tokens.
+**Caso:** Anthony Vanko, amenaza interna / exfiltración de PI, Stark Enterprises DC R&D, 2016.
+**Evidencia:** 7 artefactos — sistema de archivos (5), captura de red, hive de registro. Corpus SANS FOR500.
+**Veredicto VIGÍA:** MALICE | Confianza: HIGH | Fusión de confianza: 1.0 | Daubert: ADMISIBLE (error 8.12%)
+**Auto-corrección:** F-004 (capturas WiFi modo monitor 802.11) inicialmente INTENT.
+VIGÍA aplicó el estándar Daubert de fuente única. **Degradado: INTENT -> SUSPICION.**
+16 llamadas de herramientas (14 MCP + 2 eventos de auto-corrección) con marcas de tiempo en tool_execution_log dentro del bundle sellado.
+
+Amicus Curiae completo: [results/srl2018/VIGIA-REAL-VANKO_amicus_curiae.md](./results/srl2018/VIGIA-REAL-VANKO_amicus_curiae.md)
+
+**Todas las investigaciones de Claude Code:** [`results/srl2018/`](./results/srl2018/) — bundles, amicus curiae y archivos SHA-256 para cada caso.
+
+> La investigación de SRL-DMZ-FTP permanece en el repositorio. VANKO fue añadido después de que la retroalimentación de auditoría identificó la necesidad de entradas estructuradas de tool_execution_log en el bundle.
 
 ### CAN-031 — Incompetencia Armada
 
@@ -1240,26 +1267,26 @@ por completo.
 
 ---
 
-### Dominio A — 118/118 precisión determinista
+### Dominio A — 129/129 precisión determinista
 
-**Afirmación:** 118 casos, 100% correctos en modo fallback (sin API key, sin LLM).
+**Afirmación:** 129 casos, 100% correctos en modo fallback (sin API key, sin LLM).
 
 ```bash
 python3 run_all_agent.py --timeout 90
 ```
 
-`run_all_agent.py` ejecuta los 136 casos (Dominio A + B + C combinados).
+`run_all_agent.py` ejecuta los 147 casos (Dominio A + B + C combinados).
 
 Salida esperada:
 ```
-Results: 134/136 PASS  2 FAIL
+Results: 145/147 PASS  2 FAIL
 
 FAILED CASES:
 
 VIGIA-AMB-001: agent=NOISE (exp=ABSTAIN)  [Domain B — L-012]
 VIGIA-AMB-002: agent=NOISE (exp=ABSTAIN)  [Domain B — L-012]
 
-Domain A (core metric): **118/118 PASS — 100%**
+Domain A (core metric): **129/129 PASS — 100%**
 ```
 
 ---

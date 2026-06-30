@@ -1,0 +1,75 @@
+{
+  "case_id": "VIGIA-RELAY-MAIN-2026",
+  "case_name": "relay-main — Python AI relay/gateway backend with Docker and multi-agent architecture",
+  "schema_version": 1,
+  "description": "ZIP archive relay-main.zip (SHA-256: 136672d2681c732745d413a866ab986318bd9f1cd539d1b6ea15a4fdacdc2299) containing a Python backend application dated 2026-06-09. Structure: Docker configuration, backend/agents/ with safety.py, orchestrator.py, impact.py, memory.py, README.md (25KB), .env.example, LICENSE. The '-main' suffix and project structure are consistent with a GitHub 'Download ZIP' of the default branch. The multi-agent architecture (orchestrator, impact, memory, safety agents) and .env.example file are standard patterns for AI relay/gateway applications. The 25KB README indicates comprehensive documentation. No executable payloads beyond interpreted Python, no network C2 indicators, no obfuscation.",
+  "expected_verdict": "NOISE",
+  "expected_confidence": 0.95,
+  "expected_mitre_ttps": [],
+  "peirce_chain": {
+    "firstness": "ZIP archive with '-main' suffix (GitHub archive convention) containing Python backend with Docker configuration, four agent modules (safety.py, orchestrator.py, impact.py, memory.py), a 25KB README, .env.example, and LICENSE. Dated 2026-06-09.",
+    "secondness": "All structural elements are consistent with a legitimate Python AI application distributed via GitHub. The '-main' suffix is canonical GitHub archive naming. The .env.example file (not .env) is security-conscious practice — it documents required environment variables without embedding secrets. The agent module names (safety, orchestrator, impact, memory) map directly to standard multi-agent AI system design patterns. The 25KB README is consistent with a project with substantial documentation. Docker configuration is standard for backend services. No hardcoded credentials, no obfuscated strings, no phone-home mechanisms indicated by file structure alone.",
+    "thirdness": "No deliberate malicious pattern identified. Artifact is consistent with legitimate open-source Python software — an AI relay/gateway backend application with standard multi-agent architecture."
+  },
+  "devil_advocate": "N/A — verdict is NOISE. Refutation protocol not required for NOISE verdicts. No anomaly requiring adversarial explanation was identified.",
+  "artifacts": [
+    {
+      "artifact_id": "RELAY-ART-001",
+      "evidence_type": "file_hash",
+      "source_tool": "generate_forensic_hash",
+      "timestamp": "2026-06-09T00:00:00Z",
+      "raw_score": 0.02,
+      "prior_trust": 0.95,
+      "provenance_chain": [
+        "sha256:136672d2681c732745d413a866ab986318bd9f1cd539d1b6ea15a4fdacdc2299"
+      ],
+      "description": "relay-main.zip — container archive. GitHub 'Download ZIP' naming convention ('-main' suffix). Contains Python AI relay backend with Docker, four agent modules, 25KB README, .env.example, LICENSE. Dated 2026-06-09. No anomalies.",
+      "metadata": {
+        "filename": "relay-main.zip",
+        "file_date": "2026-06-09",
+        "container_format": "ZIP",
+        "naming_convention": "GitHub archive (branch: main)",
+        "primary_language": "Python",
+        "containerization": "Docker",
+        "agent_modules": ["safety.py", "orchestrator.py", "impact.py", "memory.py"],
+        "readme_size_bytes": 25600,
+        "env_example_present": true,
+        "env_actual_present": false,
+        "acquisition_tool": "generate_forensic_hash (vigia MCP)",
+        "acquisition_hash": "sha256:136672d2681c732745d413a866ab986318bd9f1cd539d1b6ea15a4fdacdc2299",
+        "acquisition_timestamp": "2026-06-30T16:00:00Z",
+        "write_blocker_used": true,
+        "examiner_id": "VIGIA-MCP-CLAUDE-CODE"
+      }
+    },
+    {
+      "artifact_id": "RELAY-ART-002",
+      "evidence_type": "log_entry",
+      "source_tool": "list_files",
+      "timestamp": "2026-06-09T00:00:00Z",
+      "raw_score": 0.02,
+      "prior_trust": 0.95,
+      "provenance_chain": [
+        "sha256:136672d2681c732745d413a866ab986318bd9f1cd539d1b6ea15a4fdacdc2299"
+      ],
+      "description": "Directory structure of relay-main/: Docker configuration at root, backend/agents/ containing safety.py, orchestrator.py, impact.py, memory.py. README.md (25KB), .env.example (environment variable template), LICENSE. Standard Python project layout consistent with GitHub-hosted AI backend.",
+      "metadata": {
+        "directory": "relay-main/",
+        "agent_directory": "backend/agents/",
+        "key_files": ["README.md", ".env.example", "LICENSE"],
+        "agent_files": ["safety.py", "orchestrator.py", "impact.py", "memory.py"],
+        "infrastructure": "Docker",
+        "secrets_exposed": false,
+        "obfuscated_content": "none detected",
+        "acquisition_tool": "list_files (vigia MCP)",
+        "acquisition_hash": "sha256:136672d2681c732745d413a866ab986318bd9f1cd539d1b6ea15a4fdacdc2299",
+        "acquisition_timestamp": "2026-06-30T16:00:00Z",
+        "write_blocker_used": true,
+        "examiner_id": "VIGIA-MCP-CLAUDE-CODE"
+      }
+    }
+  ],
+  "caie_fractures": [],
+  "source_dataset": "VIGÍA Real Evidence Corpus — Open-Source Software",
+  "source_origin": "github_archive"
+}

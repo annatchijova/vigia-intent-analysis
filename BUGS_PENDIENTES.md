@@ -2041,3 +2041,138 @@ oscillation string routing is non-contradictory. No action required.
 3. En `vigia_agent.py` `_build_orchestrator_kwargs()` — agregado `("*.pcap", "pcap_path")` y `("*.pcapng", "pcap_path")` a la lista de patrones de detección de directorio, y caso `elif suffix in (".pcap", ".pcapng")` para archivo único.
 
 **Resultado post-fix:** NETWORK_FORENSICS emite señal con z=2.625, conf=0.95, 7220 flows, EXFILTRATION detectada.
+
+---
+
+## Sesión de Auditoría — Epistemic State Fuzzing (2026-06-28, día 14 post-hackathon)
+
+Esta sección documenta la metodología aplicada en la sesión de auditoría del 2026-06-28.
+Su propósito es evitar que sesiones futuras cubran el mismo terreno. Cada técnica está
+etiquetada con los bugs que encontró (si los hay) o marcada como limpia. Para los detalles
+completos de cada bug, consultar la entrada B-NNN correspondiente más arriba.
+
+### Técnicas Aplicadas
+
+**1. Cobertura de estados epistémicos**
+
+Se verificó que todos los estados de veredicto — MALICE, SUSPICION, NOISE, ABSTAIN, UNKNOWN,
+INTENT, BENIGN — existan de forma consistente en cada mapper y traductor del pipeline:
+`sift_orchestrator.py`, `run_all_agent.py`, `run_llm_cases.py`,
+`vigia_scorer.py`, `decision_layer.py`.
+
+Bugs encontrados: B-020 (ABSTAIN colapsado a NOISE en tres componentes del pipeline), B-021
+(la ruta vol3 tenía una decisión binaria MALICE/SUSPICION sin rama intermedia para cero
+señales), B-022 (ABSTAIN aliasado a UNKNOWN en el diccionario del comparador de accuracy).
+
+**2. Búsqueda de asimetrías**
+
+Se trazó cada estado de veredicto desde su punto de emisión hasta su punto de consumo,
+señalando estados que aparecen en un módulo y son descartados silenciosamente dos módulos
+después sin un handler explícito ni un error.
+
+Bugs encontrados: B-021 (caso de cero señales descartado), B-022 (ABSTAIN descartado en el
+comparador), B-023 (cadena de veredicto no reconocida descartada en `_VERDICT_TO_RAW`).
+
+**3. Defaults peligrosos**
+
+Se auditaron todos los patrones `.get(key, fallback)` en la ruta de scoring, específicamente
+aquellos donde el fallback es una cadena de veredicto o una constante semánticamente
+significativa. Premisa: un fallback silencioso en una ruta de scoring forense convierte un
+error de programación en un bundle sellado con el veredicto incorrecto, sin fallo visible.
+
+Bugs encontrados: B-023 (`_VERDICT_TO_RAW.get(verdict, "ABSTAIN")` — ABSTAIN silencioso para
+cualquier cadena de veredicto no reconocida; reemplazado con verificación explícita de
+membresía + `ValueError`).
+
+**4. Constantes duplicadas**
+
+Se buscaron literales float 0.95, 0.8, 0.75, 0.1, y el patrón 19/20 en cualquier parte
+de la ruta de scoring (`vigia_scorer.py`). Cada literal fue verificado contra la tabla de
+lookup de `Fraction` correspondiente para detectar copias divergentes de la misma constante.
+
+Bugs encontrados: B-024 (literal float `epc_factor = 0.1` en la rama de cadena BROKEN,
+mientras la ruta normal usa `_EPC_FACTOR_TABLE[k]` que devuelve un `Fraction` — reemplazado
+con `Fraction(1, 10)`).
+
+**5. Prueba de round-trip**
+
+Se verificó la simetría entre la construcción del bundle (`build_bundle`) y la carga del
+bundle (`load_bundle` / `extract_verdict_from_bundle` / `load_and_verify`).
+
+Hallazgo: no existe una función canónica `load_bundle`. `extract_verdict_from_bundle`
+recupera solo la cadena del veredicto. `load_and_verify` verifica la integridad criptográfica
+pero no reconstruye el estado de scoring. El round-trip completo (bundle sellado → estado
+de scoring original) no está soportado. Documentado como limitación arquitectónica (no una
+regresión); no se aplicó patch.
+
+**6. Invariantes matemáticos**
+
+Se verificó el invariante `effective ≤ prior_trust` en todas las rutas EPC. Confirmado:
+`epc_factor ∈ (0, 1]` (de la tabla de lookup), `temp_factor = exp(-2x) ∈ (0.135, 1]`
+— el invariante se mantiene bajo todas las entradas de la ruta normal.
+
+Bugs encontrados: B-026 (`prior_trust` se lee del JSON del caso sin validación de rango
+en la línea 474; un valor negativo rompe el invariante y se propaga a
+`confidence > 1.0` en el bundle sellado).
+
+**7. Estados imposibles**
+
+Se buscaron combinaciones semánticamente contradictorias de campos en el mismo bundle
+sellado — casos donde dos campos hacen afirmaciones mutuamente excluyentes sobre el
+análisis.
+
+Bugs encontrados: B-027 (`is_conclusive=True` co-ocurriendo con `best_hypothesis=ABSTAIN_DETECTED`
+— certeza y abstención epistémica afirmadas simultáneamente), B-028 (`is_conclusive=True`
+escrito en el bundle pero nunca consumido por el dispatch del agente para hipótesis
+no-MALICE — el flag no tiene significado operacional fuera de MALICE).
+
+**8. Auditoría de `except` desnudo / `except Exception`**
+
+Se auditaron todos los handlers de excepciones amplios en los archivos principales de
+scoring y orquestación. Los handlers amplios que absorben excepciones sin re-lanzar ni
+registrar son un riesgo Daubert: convierten errores del pipeline en respuestas incorrectas
+silenciosas.
+
+Resultados:
+- `vigia_agent.py` — 1 handler; evaluado como fallback conservador aceptable
+  (captura errores de importación para módulos de enriquecimiento opcionales, registra, continúa).
+- `vigia_scorer.py` — 5 handlers encontrados; revisión individual pendiente.
+- `sift_orchestrator.py` — 4 handlers encontrados; revisión individual pendiente.
+
+### Archivos Cubiertos — No Re-Auditar Sin Cambios Nuevos
+
+| Archivo | Técnicas | Resultado |
+|---------|----------|-----------|
+| `sift_orchestrator.py` | 1, 2, 7, 8 — estados, defaults, `is_conclusive`, ruta vol3 | B-021, B-027, B-028 |
+| `run_all_agent.py` | 1, 2 — mappers, aliases, comparador | B-022 |
+| `run_llm_cases.py` | 1 — `_HYP_MAP`, conjuntos de equivalencia | B-020 (parcial) |
+| `vigia_scorer.py` | 3, 4, 6 — ruta EPC, `_VERDICT_TO_RAW`, `prior_trust`, frontera `_dround` | B-023, B-024, B-025, B-026 |
+| `vigia_agent.py` | 7, 8 — dispatch de `is_conclusive`, handlers de excepciones | B-028 |
+| `vigia/core/decision_layer.py` | 1 — emisión de veredicto | Limpio |
+
+Re-auditar cualquiera de los archivos anteriores solo está justificado si el archivo ha
+cambiado desde esta sesión (verificar con `git log --since=2026-06-28 -- <archivo>`).
+
+### No Auditados Aún en Esta Sesión
+
+- `caie.py` — handlers `except Exception` (cantidad y alcance desconocidos)
+- `pipeline.py` — handlers `except Exception`
+- `vigia/inference/abductive_reasoner.py` — sitio de emisión de `is_conclusive`
+- `quadripartite.py` — cobertura del espacio de estados
+- `bundle_builder.py` — completitud de round-trip
+- Todos los generadores de reportes — propagación de estados de veredicto a campos de salida final
+
+### Bugs Encontrados en Esta Sesión
+
+B-019 a B-028. Ver las entradas individuales más arriba para descripción, impacto Daubert,
+fix propuesto o aplicado, y referencia de commit.
+
+### Próximos Objetivos de Auditoría
+
+- `except Exception` en `vigia_scorer.py` en las líneas 228, 370, 429, 444, 502
+- `except Exception` en `sift_orchestrator.py` en las líneas 36, 65, 101, 374
+- Handlers de excepciones en `caie.py`
+- Cobertura del espacio de estados en `quadripartite.py`
+- Propagación de estados de veredicto en todos los generadores de reportes
+
+---

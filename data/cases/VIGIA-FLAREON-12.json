@@ -1,0 +1,268 @@
+{
+  "case_id": "VIGIA-FLAREON-12",
+  "case_name": "Flare-On 12 (2025) — CTF Malware Reverse Engineering Corpus",
+  "schema_version": 1,
+  "description": "Flare-On 12 (2025) challenge corpus. Nine CTF reversing challenges distributed as a single ZIP (1,068,300,687 bytes) containing 7z archives protected with CTF passwords. The corpus spans: disk image analysis (DrillBabyDrill), project chimera (multi-stage chain), file format RE (pretty_devilish_file), dragon-themed crackme (UnholyDragon), NTFS forensics (ntfsm), extortion/demand chain (Chain of Demands), corporate espionage roleplay (The Boss Needs Help), mobile authenticator RE (FlareAuthenticator), and a massive 10000 iteration challenge (10000.7z at 1 GB). This corpus is used for forensic TTP classification and intentionality analysis training.",
+  "expected_verdict": "INTENT",
+  "peirce_chain": {
+    "firstness": "ZIP archive (1.07 GB) containing 9 CTF challenge 7z files and PASSWORD.txt. Challenge names encode technique families: 'DrillBabyDrill' (disk drilling / forensic carving), 'ntfsm' (NTFS manipulation), 'Chain of Demands' (extortion/ransomware chain), 'FlareAuthenticator' (mobile 2FA reverse engineering), '10000' (iterative computational challenge requiring automation).",
+    "secondness": "Size distribution is diagnostic. 10000.7z at 1,010,655,700 bytes (97% of the ZIP) is anomalous — consistent with a challenge requiring a large pre-generated lookup table, a brute-force corpus, or a full disk image for carving. DrillBabyDrill at 14.5 MB suggests a disk image or memory dump for forensic challenge. Chain of Demands at 30.7 MB suggests a multi-file extortion simulation.",
+    "thirdness": "Each challenge encodes a deliberate adversarial or forensic technique. 'ntfsm' directly targets NTFS alternate data stream manipulation (T1564.004). 'Chain of Demands' encodes extortion mechanics (T1486 + T1657). 'FlareAuthenticator' targets mobile authentication bypass (T1521). The 10000 challenge name implies forced brute-force or symbolic execution at scale. The aggregate corpus is a curated training set for adversarial technique recognition."
+  },
+  "devil_advocate": "This is an authorized Mandiant/FLARE CTF educational corpus released for 2025. All samples are password-protected 7z archives. No attacker infrastructure is active. The challenges are sandboxed RE puzzles designed to teach defensive analysts adversarial techniques. Forensic interest is taxonomic and educational, not threat-response.",
+  "expected_mitre_ttps": [
+    "T1486",
+    "T1027",
+    "T1140",
+    "T1564.004",
+    "T1657",
+    "T1521",
+    "T1059",
+    "T1055",
+    "T1005"
+  ],
+  "artifacts": [
+    {
+      "artifact_id": "ART-FO12-ZIP",
+      "evidence_type": "archive",
+      "source_tool": "generate_forensic_hash",
+      "timestamp": "2026-06-30T00:00:00Z",
+      "raw_score": 0.95,
+      "prior_trust": 1.0,
+      "provenance_chain": [
+        "sha256:3fee6766a90679b0abb8d297a7f746d5de0f372dbd51a959a388768aee4efc7f"
+      ],
+      "description": "Flare-On12_Challenges.zip — primary distribution archive. SHA-256 verified. Size 1,068,300,687 bytes. Contains 9 CTF challenge 7z files and PASSWORD.txt.",
+      "metadata": {
+        "filename": "Flare-On12_Challenges.zip",
+        "size_bytes": 1068300687,
+        "sha256": "3fee6766a90679b0abb8d297a7f746d5de0f372dbd51a959a388768aee4efc7f",
+        "file_count": 10,
+        "acquisition_tool": "python3 hashlib.sha256 (stdlib)",
+        "acquisition_hash": "sha256:3fee6766a90679b0abb8d297a7f746d5de0f372dbd51a959a388768aee4efc7f",
+        "acquisition_timestamp": "2026-06-30T00:00:00Z",
+        "write_blocker_used": false,
+        "examiner_id": "VIGIA-MCP-CLAUDE-CODE"
+      }
+    },
+    {
+      "artifact_id": "ART-FO12-DRILLBABYDRILL",
+      "evidence_type": "disk_image",
+      "source_tool": "list_files",
+      "timestamp": "2025-09-25T09:10:06Z",
+      "raw_score": 0.82,
+      "prior_trust": 0.88,
+      "provenance_chain": [
+        "sha256:3fee6766a90679b0abb8d297a7f746d5de0f372dbd51a959a388768aee4efc7f"
+      ],
+      "description": "1 - DrillBabyDrill.7z (14,525,761 bytes) — Challenge 1. Name references disk drilling/forensic carving. Size consistent with a partial disk image or memory dump. Likely requires file carving or deleted-file recovery. TTP: T1005 (data from local system via forensic carving).",
+      "metadata": {
+        "filename": "1 - DrillBabyDrill.7z",
+        "compressed_size_bytes": 14525761,
+        "challenge_number": 1,
+        "inferred_technique": "disk image forensic carving, deleted file recovery",
+        "mitre_ttp": "T1005",
+        "acquisition_tool": "python3 zipfile (stdlib listing)",
+        "acquisition_hash": "sha256:3fee6766a90679b0abb8d297a7f746d5de0f372dbd51a959a388768aee4efc7f",
+        "acquisition_timestamp": "2026-06-30T00:00:00Z",
+        "write_blocker_used": false,
+        "examiner_id": "VIGIA-MCP-CLAUDE-CODE"
+      }
+    },
+    {
+      "artifact_id": "ART-FO12-CHIMERA",
+      "evidence_type": "binary_executable",
+      "source_tool": "list_files",
+      "timestamp": "2025-09-25T09:20:32Z",
+      "raw_score": 0.78,
+      "prior_trust": 0.85,
+      "provenance_chain": [
+        "sha256:3fee6766a90679b0abb8d297a7f746d5de0f372dbd51a959a388768aee4efc7f"
+      ],
+      "description": "2 - project_chimera.7z (4,337 bytes) — Challenge 2. 'Chimera' suggests a multi-component or hybrid malware — combining disparate techniques or code from multiple origins. Tiny size (4 KB) consistent with a crackme stub or loader. TTP: T1055 (process injection, chimera pattern) or T1027 (obfuscation).",
+      "metadata": {
+        "filename": "2 - project_chimera.7z",
+        "compressed_size_bytes": 4337,
+        "challenge_number": 2,
+        "inferred_technique": "chimera/hybrid malware stub, multi-technique obfuscation or loader",
+        "mitre_ttp": "T1055",
+        "acquisition_tool": "python3 zipfile (stdlib listing)",
+        "acquisition_hash": "sha256:3fee6766a90679b0abb8d297a7f746d5de0f372dbd51a959a388768aee4efc7f",
+        "acquisition_timestamp": "2026-06-30T00:00:00Z",
+        "write_blocker_used": false,
+        "examiner_id": "VIGIA-MCP-CLAUDE-CODE"
+      }
+    },
+    {
+      "artifact_id": "ART-FO12-PRETTYDEVILISH",
+      "evidence_type": "binary_executable",
+      "source_tool": "list_files",
+      "timestamp": "2025-09-25T09:31:44Z",
+      "raw_score": 0.72,
+      "prior_trust": 0.85,
+      "provenance_chain": [
+        "sha256:3fee6766a90679b0abb8d297a7f746d5de0f372dbd51a959a388768aee4efc7f"
+      ],
+      "description": "3 - pretty_devilish_file.7z (1,361 bytes) — Challenge 3. Name implies a deceptively simple file with a malicious payload. Extremely small (1.3 KB) consistent with a polyglot file or crafted header-based challenge. TTP: T1027.009 (embedded payloads in benign file formats).",
+      "metadata": {
+        "filename": "3 - pretty_devilish_file.7z",
+        "compressed_size_bytes": 1361,
+        "challenge_number": 3,
+        "inferred_technique": "polyglot or crafted file format with embedded payload",
+        "mitre_ttp": "T1027.009",
+        "acquisition_tool": "python3 zipfile (stdlib listing)",
+        "acquisition_hash": "sha256:3fee6766a90679b0abb8d297a7f746d5de0f372dbd51a959a388768aee4efc7f",
+        "acquisition_timestamp": "2026-06-30T00:00:00Z",
+        "write_blocker_used": false,
+        "examiner_id": "VIGIA-MCP-CLAUDE-CODE"
+      }
+    },
+    {
+      "artifact_id": "ART-FO12-UNHOLYDRAGON",
+      "evidence_type": "binary_executable",
+      "source_tool": "list_files",
+      "timestamp": "2025-09-25T09:41:08Z",
+      "raw_score": 0.80,
+      "prior_trust": 0.85,
+      "provenance_chain": [
+        "sha256:3fee6766a90679b0abb8d297a7f746d5de0f372dbd51a959a388768aee4efc7f"
+      ],
+      "description": "4 - UnholyDragon.7z (2,117,603 bytes) — Challenge 4. Name evokes a complex, multi-headed threat. 'Unholy' suggests anti-debugging or anti-analysis techniques. 'Dragon' may reference a Chinese APT campaign or a Dragonfly TTP. TTP: T1497 (virtualization/sandbox evasion) or T1027 (obfuscation with anti-analysis).",
+      "metadata": {
+        "filename": "4 - UnholyDragon.7z",
+        "compressed_size_bytes": 2117603,
+        "challenge_number": 4,
+        "inferred_technique": "anti-debugging, anti-analysis crackme with complex protection scheme",
+        "mitre_ttp": "T1497",
+        "acquisition_tool": "python3 zipfile (stdlib listing)",
+        "acquisition_hash": "sha256:3fee6766a90679b0abb8d297a7f746d5de0f372dbd51a959a388768aee4efc7f",
+        "acquisition_timestamp": "2026-06-30T00:00:00Z",
+        "write_blocker_used": false,
+        "examiner_id": "VIGIA-MCP-CLAUDE-CODE"
+      }
+    },
+    {
+      "artifact_id": "ART-FO12-NTFSM",
+      "evidence_type": "disk_image",
+      "source_tool": "list_files",
+      "timestamp": "2025-09-25T10:00:20Z",
+      "raw_score": 0.88,
+      "prior_trust": 0.90,
+      "provenance_chain": [
+        "sha256:3fee6766a90679b0abb8d297a7f746d5de0f372dbd51a959a388768aee4efc7f"
+      ],
+      "description": "5 - ntfsm.7z (1,833,618 bytes) — Challenge 5. 'ntfsm' directly encodes NTFS manipulation. Likely involves alternate data streams (ADS), $MFT manipulation, or NTFS journal analysis. Real-world analog: threat actors hiding payloads in NTFS ADS to evade file scanners. TTP: T1564.004 (hide artifacts: NTFS file attributes).",
+      "metadata": {
+        "filename": "5 - ntfsm.7z",
+        "compressed_size_bytes": 1833618,
+        "challenge_number": 5,
+        "inferred_technique": "NTFS alternate data stream (ADS) manipulation, MFT record tampering, NTFS journal forensics",
+        "mitre_ttp": "T1564.004",
+        "acquisition_tool": "python3 zipfile (stdlib listing)",
+        "acquisition_hash": "sha256:3fee6766a90679b0abb8d297a7f746d5de0f372dbd51a959a388768aee4efc7f",
+        "acquisition_timestamp": "2026-06-30T00:00:00Z",
+        "write_blocker_used": false,
+        "examiner_id": "VIGIA-MCP-CLAUDE-CODE"
+      }
+    },
+    {
+      "artifact_id": "ART-FO12-CHAINOFDEMANDS",
+      "evidence_type": "binary_executable",
+      "source_tool": "list_files",
+      "timestamp": "2025-09-25T10:32:22Z",
+      "raw_score": 0.90,
+      "prior_trust": 0.88,
+      "provenance_chain": [
+        "sha256:3fee6766a90679b0abb8d297a7f746d5de0f372dbd51a959a388768aee4efc7f"
+      ],
+      "description": "6 - Chain of Demands.7z (30,699,395 bytes) — Challenge 6. Name references extortion chains — ransomware with multi-stage demands or a C2 command chain. At 30 MB, consistent with a multi-file simulation including encrypted payloads and ransom notes. TTP: T1486 (data encrypted for impact) and T1657 (financial theft via extortion).",
+      "metadata": {
+        "filename": "6 - Chain of Demands.7z",
+        "compressed_size_bytes": 30699395,
+        "challenge_number": 6,
+        "inferred_technique": "multi-stage ransomware with demand chain, C2 protocol RE or extortion simulation",
+        "mitre_ttp": "T1486",
+        "secondary_mitre_ttp": "T1657",
+        "acquisition_tool": "python3 zipfile (stdlib listing)",
+        "acquisition_hash": "sha256:3fee6766a90679b0abb8d297a7f746d5de0f372dbd51a959a388768aee4efc7f",
+        "acquisition_timestamp": "2026-06-30T00:00:00Z",
+        "write_blocker_used": false,
+        "examiner_id": "VIGIA-MCP-CLAUDE-CODE"
+      }
+    },
+    {
+      "artifact_id": "ART-FO12-BOSSNEEDS",
+      "evidence_type": "binary_executable",
+      "source_tool": "list_files",
+      "timestamp": "2025-09-25T10:53:42Z",
+      "raw_score": 0.72,
+      "prior_trust": 0.85,
+      "provenance_chain": [
+        "sha256:3fee6766a90679b0abb8d297a7f746d5de0f372dbd51a959a388768aee4efc7f"
+      ],
+      "description": "7 - The Boss Needs Help.7z (919,536 bytes) — Challenge 7. Name suggests social engineering or corporate espionage framing — a 'boss' requesting sensitive information. May involve phishing artifact RE or business email compromise simulation. TTP: T1566 (phishing) or T1059 (scripting in corporate context).",
+      "metadata": {
+        "filename": "7 - The Boss Needs Help.7z",
+        "compressed_size_bytes": 919536,
+        "challenge_number": 7,
+        "inferred_technique": "BEC / corporate espionage RE, phishing artifact or macro analysis",
+        "mitre_ttp": "T1566",
+        "acquisition_tool": "python3 zipfile (stdlib listing)",
+        "acquisition_hash": "sha256:3fee6766a90679b0abb8d297a7f746d5de0f372dbd51a959a388768aee4efc7f",
+        "acquisition_timestamp": "2026-06-30T00:00:00Z",
+        "write_blocker_used": false,
+        "examiner_id": "VIGIA-MCP-CLAUDE-CODE"
+      }
+    },
+    {
+      "artifact_id": "ART-FO12-FLAREAUTHENTICATOR",
+      "evidence_type": "binary_executable",
+      "source_tool": "list_files",
+      "timestamp": "2025-09-25T11:03:44Z",
+      "raw_score": 0.85,
+      "prior_trust": 0.88,
+      "provenance_chain": [
+        "sha256:3fee6766a90679b0abb8d297a7f746d5de0f372dbd51a959a388768aee4efc7f"
+      ],
+      "description": "8 - FlareAuthenticator.7z (7,215,633 bytes) — Challenge 8. Name directly references a mobile or desktop authenticator application. Requires RE of a 2FA/MFA implementation to extract or bypass the TOTP/HOTP seed. Real-world analog: reverse engineering Google Authenticator exports or custom TOTP apps. TTP: T1521 (encrypted channel / authentication bypass) and T1140 (deobfuscate to recover seed).",
+      "metadata": {
+        "filename": "8 - FlareAuthenticator.7z",
+        "compressed_size_bytes": 7215633,
+        "challenge_number": 8,
+        "inferred_technique": "mobile authenticator RE, TOTP/HOTP seed extraction or bypass",
+        "mitre_ttp": "T1521",
+        "secondary_mitre_ttp": "T1140",
+        "acquisition_tool": "python3 zipfile (stdlib listing)",
+        "acquisition_hash": "sha256:3fee6766a90679b0abb8d297a7f746d5de0f372dbd51a959a388768aee4efc7f",
+        "acquisition_timestamp": "2026-06-30T00:00:00Z",
+        "write_blocker_used": false,
+        "examiner_id": "VIGIA-MCP-CLAUDE-CODE"
+      }
+    },
+    {
+      "artifact_id": "ART-FO12-10000",
+      "evidence_type": "binary_executable",
+      "source_tool": "list_files",
+      "timestamp": "2025-09-24T10:40:08Z",
+      "raw_score": 0.88,
+      "prior_trust": 0.85,
+      "provenance_chain": [
+        "sha256:3fee6766a90679b0abb8d297a7f746d5de0f372dbd51a959a388768aee4efc7f"
+      ],
+      "description": "9 - 10000.7z (1,010,655,700 bytes) — Challenge 9. At 1,010 MB this is 97% of the entire ZIP. Name '10000' implies 10,000 iterations, rounds, or instances requiring automation or scripting to process at scale. Size consistent with a corpus of 10,000 challenge instances, a massive disk image, or a precomputed lookup table. Requires symbolic execution, Z3, or scripted automation. TTP: T1059 (scripting to automate attack) or T1027 (computationally expensive obfuscation).",
+      "metadata": {
+        "filename": "9 - 10000.7z",
+        "compressed_size_bytes": 1010655700,
+        "challenge_number": 9,
+        "inferred_technique": "10000-iteration computational challenge requiring Z3, symbolic execution, or scripted automation at scale",
+        "mitre_ttp": "T1059",
+        "notes": "Dominant artifact by size — 97% of total ZIP. Anomalous for a single CTF challenge; likely a corpus or massive lookup requirement.",
+        "acquisition_tool": "python3 zipfile (stdlib listing)",
+        "acquisition_hash": "sha256:3fee6766a90679b0abb8d297a7f746d5de0f372dbd51a959a388768aee4efc7f",
+        "acquisition_timestamp": "2026-06-30T00:00:00Z",
+        "write_blocker_used": false,
+        "examiner_id": "VIGIA-MCP-CLAUDE-CODE"
+      }
+    }
+  ]
+}

@@ -1,0 +1,291 @@
+{
+  "case_id": "VIGIA-FLAREON-11",
+  "case_name": "Flare-On 11 (2024) — CTF Malware Reverse Engineering Corpus",
+  "schema_version": 1,
+  "description": "Flare-On 11 (2024) challenge corpus. Ten CTF reversing challenges distributed as a single ZIP containing individual 7z archives protected with CTF passwords. Challenges span a spectrum of adversarial techniques: array-based obfuscation (aray), BLAKE2 cryptographic keying (bloke2), ransomware (CatbertRansomware), ClearFake-style dropper (clearlyfake), a trojanized OpenSSH server (sshd), and additional RE puzzles. This corpus is used for forensic TTP classification and intentionality analysis training.",
+  "expected_verdict": "INTENT",
+  "peirce_chain": {
+    "firstness": "ZIP archive containing 10 CTF challenge 7z files and a PASSWORD.txt. Challenge names self-describe the technique: 'CatbertRansomware', 'clearlyfake', 'sshd' (193 MB trojanized binary), 'serpentine', 'fullspeed'. The structure is consistent with a sanctioned reverse-engineering competition corpus.",
+    "secondness": "Challenge sizes are diagnostic. sshd.7z at 193 MB is anomalous for a CTF puzzle — consistent with a full trojanized SSH daemon binary, not a crafted crackme. CatbertRansomware.7z at 1.6 MB indicates a self-contained ransomware sample. clearlyfake.7z at 1.6 KB indicates a dropper stub, consistent with documented ClearFake campaign initial-access technique.",
+    "thirdness": "Each challenge encodes a deliberate adversarial technique requiring analyst knowledge of that TTP family to solve. The aggregate corpus constitutes a curated IoI (Indicator of Intent) training set covering T1486 (ransomware), T1566 (phishing/dropper), T1554 (compromised binaries), T1027 (obfuscation), T1140 (deobfuscation-keying via BLAKE2). The challenge designers deliberately selected real-world TTP archetypes."
+  },
+  "devil_advocate": "This is an authorized Mandiant/FLARE CTF educational corpus. No attacker infrastructure is active. The 'malware' samples are sandboxed CTF puzzles, not weaponized payloads. All files are 7z-password-protected and require participant-recovered passwords to execute. Forensic interest is taxonomic, not threat-response.",
+  "expected_mitre_ttps": [
+    "T1486",
+    "T1027",
+    "T1140",
+    "T1566.001",
+    "T1554",
+    "T1059",
+    "T1055"
+  ],
+  "artifacts": [
+    {
+      "artifact_id": "ART-FO11-ZIP",
+      "evidence_type": "archive",
+      "source_tool": "generate_forensic_hash",
+      "timestamp": "2026-06-30T00:00:00Z",
+      "raw_score": 0.95,
+      "prior_trust": 1.0,
+      "provenance_chain": [
+        "sha256:fea8333f3fb72ef8429f638c0ba4206b9c433d9e027a184365cfbcc949f380da"
+      ],
+      "description": "Flare-On11_Challenges.zip — primary distribution archive. SHA-256 verified. Size 214,568,790 bytes. Contains 10 CTF challenge 7z files and PASSWORD.txt.",
+      "metadata": {
+        "filename": "Flare-On11_Challenges.zip",
+        "size_bytes": 214568790,
+        "sha256": "fea8333f3fb72ef8429f638c0ba4206b9c433d9e027a184365cfbcc949f380da",
+        "file_count": 11,
+        "acquisition_tool": "python3 hashlib.sha256 (stdlib)",
+        "acquisition_hash": "sha256:fea8333f3fb72ef8429f638c0ba4206b9c433d9e027a184365cfbcc949f380da",
+        "acquisition_timestamp": "2026-06-30T00:00:00Z",
+        "write_blocker_used": false,
+        "examiner_id": "VIGIA-MCP-CLAUDE-CODE"
+      }
+    },
+    {
+      "artifact_id": "ART-FO11-ARAY",
+      "evidence_type": "binary_executable",
+      "source_tool": "list_files",
+      "timestamp": "2024-09-26T14:28:12Z",
+      "raw_score": 0.65,
+      "prior_trust": 0.85,
+      "provenance_chain": [
+        "sha256:fea8333f3fb72ef8429f638c0ba4206b9c433d9e027a184365cfbcc949f380da"
+      ],
+      "description": "aray.7z (2,927 bytes) — array-based obfuscation challenge. Small size consistent with a crackme using array index arithmetic to obscure control flow or key derivation. TTP: T1027 (obfuscated files/information).",
+      "metadata": {
+        "filename": "aray.7z",
+        "compressed_size_bytes": 2927,
+        "challenge_number": 1,
+        "inferred_technique": "array-based control flow obfuscation",
+        "mitre_ttp": "T1027",
+        "acquisition_tool": "python3 zipfile (stdlib listing)",
+        "acquisition_hash": "sha256:fea8333f3fb72ef8429f638c0ba4206b9c433d9e027a184365cfbcc949f380da",
+        "acquisition_timestamp": "2026-06-30T00:00:00Z",
+        "write_blocker_used": false,
+        "examiner_id": "VIGIA-MCP-CLAUDE-CODE"
+      }
+    },
+    {
+      "artifact_id": "ART-FO11-BLOKE2",
+      "evidence_type": "binary_executable",
+      "source_tool": "list_files",
+      "timestamp": "2024-09-26T14:29:26Z",
+      "raw_score": 0.70,
+      "prior_trust": 0.85,
+      "provenance_chain": [
+        "sha256:fea8333f3fb72ef8429f638c0ba4206b9c433d9e027a184365cfbcc949f380da"
+      ],
+      "description": "bloke2.7z (5,775 bytes) — BLAKE2 cryptographic hash-based challenge. Name is wordplay on BLAKE2 algorithm. Likely uses custom BLAKE2 implementation for key derivation or license check. TTP: T1140 (deobfuscate/decode files).",
+      "metadata": {
+        "filename": "bloke2.7z",
+        "compressed_size_bytes": 5775,
+        "challenge_number": 2,
+        "inferred_technique": "BLAKE2 custom hash-based key derivation",
+        "mitre_ttp": "T1140",
+        "acquisition_tool": "python3 zipfile (stdlib listing)",
+        "acquisition_hash": "sha256:fea8333f3fb72ef8429f638c0ba4206b9c433d9e027a184365cfbcc949f380da",
+        "acquisition_timestamp": "2026-06-30T00:00:00Z",
+        "write_blocker_used": false,
+        "examiner_id": "VIGIA-MCP-CLAUDE-CODE"
+      }
+    },
+    {
+      "artifact_id": "ART-FO11-CATBERT",
+      "evidence_type": "binary_executable",
+      "source_tool": "list_files",
+      "timestamp": "2024-09-26T15:14:58Z",
+      "raw_score": 0.92,
+      "prior_trust": 0.90,
+      "provenance_chain": [
+        "sha256:fea8333f3fb72ef8429f638c0ba4206b9c433d9e027a184365cfbcc949f380da"
+      ],
+      "description": "CatbertRansomware.7z (1,692,864 bytes) — ransomware sample. Largest text-challenge entry aside from sshd. Name references Dilbert character Catbert (evil HR director), consistent with Mandiant/FLARE humor. Self-contained ransomware binary. TTP: T1486 (data encrypted for impact).",
+      "metadata": {
+        "filename": "CatbertRansomware.7z",
+        "compressed_size_bytes": 1692864,
+        "challenge_number": 3,
+        "inferred_technique": "file encryption ransomware, likely AES or ChaCha20 with asymmetric key wrapping",
+        "mitre_ttp": "T1486",
+        "acquisition_tool": "python3 zipfile (stdlib listing)",
+        "acquisition_hash": "sha256:fea8333f3fb72ef8429f638c0ba4206b9c433d9e027a184365cfbcc949f380da",
+        "acquisition_timestamp": "2026-06-30T00:00:00Z",
+        "write_blocker_used": false,
+        "examiner_id": "VIGIA-MCP-CLAUDE-CODE"
+      }
+    },
+    {
+      "artifact_id": "ART-FO11-CHECKSUM",
+      "evidence_type": "binary_executable",
+      "source_tool": "list_files",
+      "timestamp": "2024-09-26T14:30:58Z",
+      "raw_score": 0.68,
+      "prior_trust": 0.85,
+      "provenance_chain": [
+        "sha256:fea8333f3fb72ef8429f638c0ba4206b9c433d9e027a184365cfbcc949f380da"
+      ],
+      "description": "checksum.7z (1,392,978 bytes) — checksum-based integrity or key derivation challenge. Name implies the binary computes or validates a checksum as part of its protection scheme. TTP: T1140 (deobfuscate/decode files or information).",
+      "metadata": {
+        "filename": "checksum.7z",
+        "compressed_size_bytes": 1392978,
+        "challenge_number": 4,
+        "inferred_technique": "checksum-based key validation or anti-tamper",
+        "mitre_ttp": "T1140",
+        "acquisition_tool": "python3 zipfile (stdlib listing)",
+        "acquisition_hash": "sha256:fea8333f3fb72ef8429f638c0ba4206b9c433d9e027a184365cfbcc949f380da",
+        "acquisition_timestamp": "2026-06-30T00:00:00Z",
+        "write_blocker_used": false,
+        "examiner_id": "VIGIA-MCP-CLAUDE-CODE"
+      }
+    },
+    {
+      "artifact_id": "ART-FO11-CLEARLYFAKE",
+      "evidence_type": "binary_executable",
+      "source_tool": "list_files",
+      "timestamp": "2024-09-26T14:45:24Z",
+      "raw_score": 0.88,
+      "prior_trust": 0.90,
+      "provenance_chain": [
+        "sha256:fea8333f3fb72ef8429f638c0ba4206b9c433d9e027a184365cfbcc949f380da"
+      ],
+      "description": "clearlyfake.7z (1,616 bytes) — ClearFake-style dropper. Extremely small size (1.6 KB) consistent with a JavaScript dropper or PowerShell stub, matching the documented ClearFake campaign that distributes fake browser updates. TTP: T1566.001 (spearphishing attachment / fake update dropper).",
+      "metadata": {
+        "filename": "clearlyfake.7z",
+        "compressed_size_bytes": 1616,
+        "challenge_number": 5,
+        "inferred_technique": "ClearFake fake-browser-update dropper, JavaScript or PowerShell initial stage",
+        "mitre_ttp": "T1566.001",
+        "acquisition_tool": "python3 zipfile (stdlib listing)",
+        "acquisition_hash": "sha256:fea8333f3fb72ef8429f638c0ba4206b9c433d9e027a184365cfbcc949f380da",
+        "acquisition_timestamp": "2026-06-30T00:00:00Z",
+        "write_blocker_used": false,
+        "examiner_id": "VIGIA-MCP-CLAUDE-CODE"
+      }
+    },
+    {
+      "artifact_id": "ART-FO11-FROG",
+      "evidence_type": "binary_executable",
+      "source_tool": "list_files",
+      "timestamp": "2024-09-26T14:26:44Z",
+      "raw_score": 0.60,
+      "prior_trust": 0.85,
+      "provenance_chain": [
+        "sha256:fea8333f3fb72ef8429f638c0ba4206b9c433d9e027a184365cfbcc949f380da"
+      ],
+      "description": "frog.7z (10,653,489 bytes) — challenge of moderate size. Name suggests obfuscation or game-engine challenge (10 MB consistent with Unity or similar runtime). TTP: T1027 (obfuscated files/information).",
+      "metadata": {
+        "filename": "frog.7z",
+        "compressed_size_bytes": 10653489,
+        "challenge_number": 6,
+        "inferred_technique": "game engine or runtime-embedded crackme, possible Unity IL2CPP",
+        "mitre_ttp": "T1027",
+        "acquisition_tool": "python3 zipfile (stdlib listing)",
+        "acquisition_hash": "sha256:fea8333f3fb72ef8429f638c0ba4206b9c433d9e027a184365cfbcc949f380da",
+        "acquisition_timestamp": "2026-06-30T00:00:00Z",
+        "write_blocker_used": false,
+        "examiner_id": "VIGIA-MCP-CLAUDE-CODE"
+      }
+    },
+    {
+      "artifact_id": "ART-FO11-FULLSPEED",
+      "evidence_type": "binary_executable",
+      "source_tool": "list_files",
+      "timestamp": "2024-09-26T14:14:02Z",
+      "raw_score": 0.72,
+      "prior_trust": 0.85,
+      "provenance_chain": [
+        "sha256:fea8333f3fb72ef8429f638c0ba4206b9c433d9e027a184365cfbcc949f380da"
+      ],
+      "description": "fullspeed.7z (771,776 bytes) — name suggests a speed-optimization or crypto challenge. 'Full speed' may reference elliptic curve cryptography (FullSpeed EC variant) or a timing-dependent protection. TTP: T1027 (obfuscation via cryptographic technique).",
+      "metadata": {
+        "filename": "fullspeed.7z",
+        "compressed_size_bytes": 771776,
+        "challenge_number": 7,
+        "inferred_technique": "elliptic curve or modular arithmetic-based protection (possible FullSpeed EC)",
+        "mitre_ttp": "T1027",
+        "acquisition_tool": "python3 zipfile (stdlib listing)",
+        "acquisition_hash": "sha256:fea8333f3fb72ef8429f638c0ba4206b9c433d9e027a184365cfbcc949f380da",
+        "acquisition_timestamp": "2026-06-30T00:00:00Z",
+        "write_blocker_used": false,
+        "examiner_id": "VIGIA-MCP-CLAUDE-CODE"
+      }
+    },
+    {
+      "artifact_id": "ART-FO11-MEMEMAKER",
+      "evidence_type": "binary_executable",
+      "source_tool": "list_files",
+      "timestamp": "2024-09-26T14:32:12Z",
+      "raw_score": 0.65,
+      "prior_trust": 0.85,
+      "provenance_chain": [
+        "sha256:fea8333f3fb72ef8429f638c0ba4206b9c433d9e027a184365cfbcc949f380da"
+      ],
+      "description": "mememaker3000.7z (1,010,226 bytes) — name suggests a social engineering or steganography-themed challenge, possibly hiding flags in images or using meme-format payloads. TTP: T1027.003 (steganography) or T1059 (scripting).",
+      "metadata": {
+        "filename": "mememaker3000.7z",
+        "compressed_size_bytes": 1010226,
+        "challenge_number": 8,
+        "inferred_technique": "steganography in image or web-based meme generator with embedded payload",
+        "mitre_ttp": "T1027.003",
+        "acquisition_tool": "python3 zipfile (stdlib listing)",
+        "acquisition_hash": "sha256:fea8333f3fb72ef8429f638c0ba4206b9c433d9e027a184365cfbcc949f380da",
+        "acquisition_timestamp": "2026-06-30T00:00:00Z",
+        "write_blocker_used": false,
+        "examiner_id": "VIGIA-MCP-CLAUDE-CODE"
+      }
+    },
+    {
+      "artifact_id": "ART-FO11-SERPENTINE",
+      "evidence_type": "binary_executable",
+      "source_tool": "list_files",
+      "timestamp": "2024-09-26T15:05:34Z",
+      "raw_score": 0.70,
+      "prior_trust": 0.85,
+      "provenance_chain": [
+        "sha256:fea8333f3fb72ef8429f638c0ba4206b9c433d9e027a184365cfbcc949f380da"
+      ],
+      "description": "serpentine.7z (5,725,299 bytes) — name references serpentine/snake motion, possibly Python-based challenge or a challenge featuring serpentine data encoding. TTP: T1059.006 (Python) or T1027 (obfuscation).",
+      "metadata": {
+        "filename": "serpentine.7z",
+        "compressed_size_bytes": 5725299,
+        "challenge_number": 9,
+        "inferred_technique": "Python-based or serpentine encoding obfuscation challenge",
+        "mitre_ttp": "T1059.006",
+        "acquisition_tool": "python3 zipfile (stdlib listing)",
+        "acquisition_hash": "sha256:fea8333f3fb72ef8429f638c0ba4206b9c433d9e027a184365cfbcc949f380da",
+        "acquisition_timestamp": "2026-06-30T00:00:00Z",
+        "write_blocker_used": false,
+        "examiner_id": "VIGIA-MCP-CLAUDE-CODE"
+      }
+    },
+    {
+      "artifact_id": "ART-FO11-SSHD",
+      "evidence_type": "binary_executable",
+      "source_tool": "list_files",
+      "timestamp": "2024-09-26T14:35:36Z",
+      "raw_score": 0.95,
+      "prior_trust": 0.90,
+      "provenance_chain": [
+        "sha256:fea8333f3fb72ef8429f638c0ba4206b9c433d9e027a184365cfbcc949f380da"
+      ],
+      "description": "sshd.7z (193,244,435 bytes) — by far the largest challenge at 193 MB. Name and size are consistent with a full trojanized OpenSSH daemon. Real-world analog: XZ Utils/liblzma supply chain compromise (CVE-2024-3094). Challenge likely requires diffing or patching a modified sshd binary. TTP: T1554 (compromise software supply chain) and T1059 (command execution via backdoored daemon).",
+      "metadata": {
+        "filename": "sshd.7z",
+        "compressed_size_bytes": 193244435,
+        "challenge_number": 10,
+        "inferred_technique": "trojanized sshd binary — supply chain compromise, analogous to XZ Utils CVE-2024-3094",
+        "mitre_ttp": "T1554",
+        "real_world_analogs": [
+          "XZ Utils liblzma backdoor (CVE-2024-3094)",
+          "SolarWinds SUNBURST trojanized DLL"
+        ],
+        "acquisition_tool": "python3 zipfile (stdlib listing)",
+        "acquisition_hash": "sha256:fea8333f3fb72ef8429f638c0ba4206b9c433d9e027a184365cfbcc949f380da",
+        "acquisition_timestamp": "2026-06-30T00:00:00Z",
+        "write_blocker_used": false,
+        "examiner_id": "VIGIA-MCP-CLAUDE-CODE"
+      }
+    }
+  ]
+}

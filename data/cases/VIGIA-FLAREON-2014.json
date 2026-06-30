@@ -1,0 +1,190 @@
+{
+  "case_id": "VIGIA-FLAREON-2014",
+  "case_name": "FireEye FLARE-On CTF 2014 — Malware RE Challenge Corpus",
+  "schema_version": 1,
+  "description": "FireEye FLARE-On CTF 2014 challenge collection. 8 artifacts: C1.exe (packed Windows PE32+ SFX, sha256:f8aac4d0cc..., 285184 bytes) and 6 zip containers (C2-C7, escalating complexity) plus byte-identical Flare_On_Challenge.EXE. C1.exe exhibits Shannon entropy 7.47 bits/byte, RunOnce registry key string, SFX dropper pattern. Corpus is pedagogical malware RE training material authored by the FireEye FLARE team for the 2014 competition season.",
+  "expected_verdict": "INTENT",
+  "expected_confidence": 0.82,
+  "expected_mitre_ttps": ["T1027", "T1547.001", "T1105", "T1027.009", "T1140"],
+  "peirce_chain": {
+    "firstness": "PE32+ 285184-byte binary, entropy 7.47 bits/byte, RunOnce key in strings, dual-named (C1.exe = Flare_On_Challenge.EXE by SHA-256). Six zip containers C2-C7 (2.7 KB to 1.1 MB escalating).",
+    "secondness": "7.47 bits/byte approaches packed-payload threshold (>7.5 CRITICAL). RunOnce registry key indicates persistence setup. Dual naming with byte-identical content is deliberate packaging, not accident. Container size escalation (3 orders of magnitude from C3 to C7) indicates structured difficulty progression, not organic growth.",
+    "thirdness": "SFX dropper template with persistence stub. Container series scaffolds RE skill development via deliberate obfuscation at each tier. Authors weaponized familiar installer UI (authority transfer) to mask packed payload delivery. INTENT: deliberate pedagogical design of anti-analysis countermeasures."
+  },
+  "devil_advocate": "This is an openly distributed CTF training collection with no victim system. All obfuscation techniques are instructional content, not operational. RunOnce key is an artifact of the SFX template, not evidence of live persistence. Entropy reflects compression, not encryption. No criminal intent can be attributed.",
+  "artifacts": [
+    {
+      "artifact_id": "c1_exe_001",
+      "evidence_type": "pe_executable",
+      "source_tool": "generate_forensic_hash",
+      "timestamp": "2026-06-30T15:20:03.870989Z",
+      "raw_score": 0.82,
+      "prior_trust": 0.90,
+      "provenance_chain": [
+        "sha256:960484758a09e9b7e96451254a091aeec186d4c560eac0a6b9172978cea15218",
+        "sha256:f8aac4d0cccabd11d7b10d63dc2acc451ea832077650971d3c66834861162981"
+      ],
+      "description": "C1.exe — PE32+ executable (GUI) x86-64, 6 sections, 285184 bytes. Shannon entropy 7.47 bits/byte. RunOnce registry key in strings. VIGÍA purgatory gate triggered on read (binary, non-UTF-8). Byte-identical to Flare_On_Challenge.EXE. SFX dropper template with persistence indicators.",
+      "metadata": {
+        "path": "/home/labestiadevigia/vigia-repo/evidence/flareon/2014/C1.exe",
+        "sha256": "f8aac4d0cccabd11d7b10d63dc2acc451ea832077650971d3c66834861162981",
+        "size_bytes": 285184,
+        "file_type": "PE32+ executable (GUI) x86-64, 6 sections",
+        "entropy_bits_per_byte": 7.47,
+        "purgatory_status": "QUARANTINED",
+        "registry_strings_observed": ["Software\\Microsoft\\Windows\\CurrentVersion\\RunOnce"],
+        "imported_dlls": ["SHELL32.DLL", "ADVAPI32.dll", "KERNEL32.dll", "GDI32.dll", "USER32.dll"],
+        "corpus_timestamp": "2015-07-27",
+        "acquisition_tool": "generate_forensic_hash (VIGIA MCP)",
+        "acquisition_hash": "sha256:f8aac4d0cccabd11d7b10d63dc2acc451ea832077650971d3c66834861162981",
+        "acquisition_timestamp": "2026-06-30T15:20:03.870989Z",
+        "write_blocker_used": false,
+        "examiner_id": "VIGIA-MCP-CLAUDE-CODE"
+      }
+    },
+    {
+      "artifact_id": "c2_zip_001",
+      "evidence_type": "container_zip",
+      "source_tool": "generate_forensic_hash",
+      "timestamp": "2026-06-30T15:20:40.244249Z",
+      "raw_score": 0.60,
+      "prior_trust": 0.90,
+      "provenance_chain": [
+        "sha256:960484758a09e9b7e96451254a091aeec186d4c560eac0a6b9172978cea15218",
+        "sha256:407c11647b9c58f41daba5a6b85f04ac2a0c31bab9eefe3362c2805329a59bd1"
+      ],
+      "description": "C2.zip — challenge container, 10758 bytes. Part of escalating-complexity series C2–C7. Inner content not extracted (challenge-gated). Hash integrity verified.",
+      "metadata": {
+        "path": "/home/labestiadevigia/vigia-repo/evidence/flareon/2014/C2.zip",
+        "sha256": "407c11647b9c58f41daba5a6b85f04ac2a0c31bab9eefe3362c2805329a59bd1",
+        "size_bytes": 10758,
+        "corpus_timestamp": "2015-07-27",
+        "acquisition_tool": "generate_forensic_hash (VIGIA MCP)",
+        "acquisition_hash": "sha256:407c11647b9c58f41daba5a6b85f04ac2a0c31bab9eefe3362c2805329a59bd1",
+        "acquisition_timestamp": "2026-06-30T15:20:40.244249Z",
+        "write_blocker_used": false,
+        "examiner_id": "VIGIA-MCP-CLAUDE-CODE"
+      }
+    },
+    {
+      "artifact_id": "c3_zip_001",
+      "evidence_type": "container_zip",
+      "source_tool": "generate_forensic_hash",
+      "timestamp": "2026-06-30T15:20:40.658Z",
+      "raw_score": 0.55,
+      "prior_trust": 0.90,
+      "provenance_chain": [
+        "sha256:960484758a09e9b7e96451254a091aeec186d4c560eac0a6b9172978cea15218",
+        "sha256:e81a25edd426d9cdcefe5ca06d8ddb21e248100e2f1150dea5834f420b64652b"
+      ],
+      "description": "C3.zip — smallest container at 2713 bytes. Likely minimal binary or script challenge. Hash integrity verified.",
+      "metadata": {
+        "path": "/home/labestiadevigia/vigia-repo/evidence/flareon/2014/C3.zip",
+        "sha256": "e81a25edd426d9cdcefe5ca06d8ddb21e248100e2f1150dea5834f420b64652b",
+        "size_bytes": 2713,
+        "corpus_timestamp": "2015-07-27",
+        "acquisition_tool": "generate_forensic_hash (VIGIA MCP)",
+        "acquisition_hash": "sha256:e81a25edd426d9cdcefe5ca06d8ddb21e248100e2f1150dea5834f420b64652b",
+        "acquisition_timestamp": "2026-06-30T15:20:40.658Z",
+        "write_blocker_used": false,
+        "examiner_id": "VIGIA-MCP-CLAUDE-CODE"
+      }
+    },
+    {
+      "artifact_id": "c4_zip_001",
+      "evidence_type": "container_zip",
+      "source_tool": "generate_forensic_hash",
+      "timestamp": "2026-06-30T15:20:40.791Z",
+      "raw_score": 0.58,
+      "prior_trust": 0.90,
+      "provenance_chain": [
+        "sha256:960484758a09e9b7e96451254a091aeec186d4c560eac0a6b9172978cea15218",
+        "sha256:1a2189b76f58130d41ae00d21676d51e94e81313c917f5cd97b9a41cde22a775"
+      ],
+      "description": "C4.zip — 17794 bytes. Mid-complexity challenge container. Hash integrity verified.",
+      "metadata": {
+        "path": "/home/labestiadevigia/vigia-repo/evidence/flareon/2014/C4.zip",
+        "sha256": "1a2189b76f58130d41ae00d21676d51e94e81313c917f5cd97b9a41cde22a775",
+        "size_bytes": 17794,
+        "corpus_timestamp": "2015-07-27",
+        "acquisition_tool": "generate_forensic_hash (VIGIA MCP)",
+        "acquisition_hash": "sha256:1a2189b76f58130d41ae00d21676d51e94e81313c917f5cd97b9a41cde22a775",
+        "acquisition_timestamp": "2026-06-30T15:20:40.791Z",
+        "write_blocker_used": false,
+        "examiner_id": "VIGIA-MCP-CLAUDE-CODE"
+      }
+    },
+    {
+      "artifact_id": "c5_zip_001",
+      "evidence_type": "container_zip",
+      "source_tool": "generate_forensic_hash",
+      "timestamp": "2026-06-30T15:20:44.284Z",
+      "raw_score": 0.60,
+      "prior_trust": 0.90,
+      "provenance_chain": [
+        "sha256:960484758a09e9b7e96451254a091aeec186d4c560eac0a6b9172978cea15218",
+        "sha256:3d4a3794905ca576e1460094bcc7917ae05cd21a046b91ad5bec427846ed032a"
+      ],
+      "description": "C5.zip — 39309 bytes. Escalated complexity container. Hash integrity verified.",
+      "metadata": {
+        "path": "/home/labestiadevigia/vigia-repo/evidence/flareon/2014/C5.zip",
+        "sha256": "3d4a3794905ca576e1460094bcc7917ae05cd21a046b91ad5bec427846ed032a",
+        "size_bytes": 39309,
+        "corpus_timestamp": "2015-07-27",
+        "acquisition_tool": "generate_forensic_hash (VIGIA MCP)",
+        "acquisition_hash": "sha256:3d4a3794905ca576e1460094bcc7917ae05cd21a046b91ad5bec427846ed032a",
+        "acquisition_timestamp": "2026-06-30T15:20:44.284Z",
+        "write_blocker_used": false,
+        "examiner_id": "VIGIA-MCP-CLAUDE-CODE"
+      }
+    },
+    {
+      "artifact_id": "c6_zip_001",
+      "evidence_type": "container_zip",
+      "source_tool": "generate_forensic_hash",
+      "timestamp": "2026-06-30T15:20:44.648Z",
+      "raw_score": 0.62,
+      "prior_trust": 0.90,
+      "provenance_chain": [
+        "sha256:960484758a09e9b7e96451254a091aeec186d4c560eac0a6b9172978cea15218",
+        "sha256:5393a597747831f250013f5ae6ef80e345ada370369cb678385d17384005def4"
+      ],
+      "description": "C6.zip — 484454 bytes. Large container, likely contains full PE executable. Hash integrity verified.",
+      "metadata": {
+        "path": "/home/labestiadevigia/vigia-repo/evidence/flareon/2014/C6.zip",
+        "sha256": "5393a597747831f250013f5ae6ef80e345ada370369cb678385d17384005def4",
+        "size_bytes": 484454,
+        "corpus_timestamp": "2015-07-27",
+        "acquisition_tool": "generate_forensic_hash (VIGIA MCP)",
+        "acquisition_hash": "sha256:5393a597747831f250013f5ae6ef80e345ada370369cb678385d17384005def4",
+        "acquisition_timestamp": "2026-06-30T15:20:44.648Z",
+        "write_blocker_used": false,
+        "examiner_id": "VIGIA-MCP-CLAUDE-CODE"
+      }
+    },
+    {
+      "artifact_id": "c7_zip_001",
+      "evidence_type": "container_zip",
+      "source_tool": "generate_forensic_hash",
+      "timestamp": "2026-06-30T15:20:44.890Z",
+      "raw_score": 0.65,
+      "prior_trust": 0.90,
+      "provenance_chain": [
+        "sha256:960484758a09e9b7e96451254a091aeec186d4c560eac0a6b9172978cea15218",
+        "sha256:d4c486f5af4572b7885d7cbeb7b32625a27e9ec5033dd8204e886a3dfde39c84"
+      ],
+      "description": "C7.zip — 1114575 bytes. Largest container. Final/hardest challenge. Hash integrity verified.",
+      "metadata": {
+        "path": "/home/labestiadevigia/vigia-repo/evidence/flareon/2014/C7.zip",
+        "sha256": "d4c486f5af4572b7885d7cbeb7b32625a27e9ec5033dd8204e886a3dfde39c84",
+        "size_bytes": 1114575,
+        "corpus_timestamp": "2015-07-27",
+        "acquisition_tool": "generate_forensic_hash (VIGIA MCP)",
+        "acquisition_hash": "sha256:d4c486f5af4572b7885d7cbeb7b32625a27e9ec5033dd8204e886a3dfde39c84",
+        "acquisition_timestamp": "2026-06-30T15:20:44.890Z",
+        "write_blocker_used": false,
+        "examiner_id": "VIGIA-MCP-CLAUDE-CODE"
+      }
+    }
+  ]
+}

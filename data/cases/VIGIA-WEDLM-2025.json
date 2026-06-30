@@ -1,0 +1,73 @@
+{
+  "case_id": "VIGIA-WEDLM-2025",
+  "case_name": "WeDLM-main — Python LLM evaluation framework for academic benchmarks",
+  "schema_version": 1,
+  "description": "ZIP archive WeDLM-main.zip (SHA-256: edf227d6d95fde1d1b8e92047eaafe6e40322a8b007202793acb38cdefb99d64) containing a Python LLM evaluation framework dated 2025-12-30. Structure: evaluation/dataset_download/ with benchmark download scripts for ARC, GPQA, GSM8K, HumanEval, MATH, MBPP, MMLU, HellaSwag; README.md (9.7KB), MANIFEST.in. The '-main' suffix indicates a GitHub archive. The benchmark names (ARC, GPQA, GSM8K, HumanEval, MATH, MBPP, MMLU, HellaSwag) are all publicly documented academic LLM evaluation datasets. This is a research/academic software project with no malicious indicators.",
+  "expected_verdict": "NOISE",
+  "expected_confidence": 0.95,
+  "expected_mitre_ttps": [],
+  "peirce_chain": {
+    "firstness": "ZIP archive with '-main' suffix (GitHub archive convention) containing Python evaluation framework. Benchmark download scripts for 8 academic datasets (ARC, GPQA, GSM8K, HumanEval, MATH, MBPP, MMLU, HellaSwag). README.md (9.7KB), MANIFEST.in. Dated 2025-12-30.",
+    "secondness": "All benchmark names are well-known, publicly documented academic LLM evaluation standards. ARC (AI2 Reasoning Challenge), GPQA (Graduate-Level Google-Proof Q&A), GSM8K (Grade School Math), HumanEval (HumanEval coding benchmark), MATH (competition math), MBPP (Mostly Basic Python Programming), MMLU (Massive Multitask Language Understanding), HellaSwag (commonsense NLI) — these are canonical benchmarks used in published ML research. MANIFEST.in is a Python packaging artifact. No executable payloads, no network C2 indicators, no obfuscated strings.",
+    "thirdness": "No deliberate malicious pattern identified. Artifact is consistent with legitimate academic research software — a Python LLM evaluation framework for standard academic benchmark datasets."
+  },
+  "devil_advocate": "N/A — verdict is NOISE. Refutation protocol not required for NOISE verdicts. No anomaly requiring adversarial explanation was identified.",
+  "artifacts": [
+    {
+      "artifact_id": "WEDLM-ART-001",
+      "evidence_type": "file_hash",
+      "source_tool": "generate_forensic_hash",
+      "timestamp": "2025-12-30T00:00:00Z",
+      "raw_score": 0.02,
+      "prior_trust": 0.95,
+      "provenance_chain": [
+        "sha256:edf227d6d95fde1d1b8e92047eaafe6e40322a8b007202793acb38cdefb99d64"
+      ],
+      "description": "WeDLM-main.zip — container archive. GitHub 'Download ZIP' naming convention ('-main' suffix). Python LLM evaluation framework with download scripts for 8 academic benchmarks. README.md (9.7KB), MANIFEST.in. Dated 2025-12-30. No anomalies.",
+      "metadata": {
+        "filename": "WeDLM-main.zip",
+        "file_date": "2025-12-30",
+        "container_format": "ZIP",
+        "naming_convention": "GitHub archive (branch: main)",
+        "primary_language": "Python",
+        "project_category": "academic LLM evaluation framework",
+        "benchmarks": ["ARC", "GPQA", "GSM8K", "HumanEval", "MATH", "MBPP", "MMLU", "HellaSwag"],
+        "readme_size_bytes": 9932,
+        "packaging_artifact": "MANIFEST.in",
+        "acquisition_tool": "generate_forensic_hash (vigia MCP)",
+        "acquisition_hash": "sha256:edf227d6d95fde1d1b8e92047eaafe6e40322a8b007202793acb38cdefb99d64",
+        "acquisition_timestamp": "2026-06-30T16:00:00Z",
+        "write_blocker_used": true,
+        "examiner_id": "VIGIA-MCP-CLAUDE-CODE"
+      }
+    },
+    {
+      "artifact_id": "WEDLM-ART-002",
+      "evidence_type": "log_entry",
+      "source_tool": "list_files",
+      "timestamp": "2025-12-30T00:00:00Z",
+      "raw_score": 0.02,
+      "prior_trust": 0.95,
+      "provenance_chain": [
+        "sha256:edf227d6d95fde1d1b8e92047eaafe6e40322a8b007202793acb38cdefb99d64"
+      ],
+      "description": "Directory structure of WeDLM-main/: evaluation/dataset_download/ containing benchmark download scripts for ARC, GPQA, GSM8K, HumanEval, MATH, MBPP, MMLU, HellaSwag. Root-level README.md and MANIFEST.in. All paths and file roles consistent with a Python research package.",
+      "metadata": {
+        "directory": "WeDLM-main/",
+        "evaluation_directory": "evaluation/dataset_download/",
+        "key_files": ["README.md", "MANIFEST.in"],
+        "benchmark_scripts": ["arc_download.py", "gpqa_download.py", "gsm8k_download.py", "humaneval_download.py", "math_download.py", "mbpp_download.py", "mmlu_download.py", "hellaswag_download.py"],
+        "all_scripts_public_datasets": true,
+        "obfuscated_content": "none detected",
+        "acquisition_tool": "list_files (vigia MCP)",
+        "acquisition_hash": "sha256:edf227d6d95fde1d1b8e92047eaafe6e40322a8b007202793acb38cdefb99d64",
+        "acquisition_timestamp": "2026-06-30T16:00:00Z",
+        "write_blocker_used": true,
+        "examiner_id": "VIGIA-MCP-CLAUDE-CODE"
+      }
+    }
+  ],
+  "caie_fractures": [],
+  "source_dataset": "VIGÍA Real Evidence Corpus — Academic/Research Software",
+  "source_origin": "github_archive"
+}

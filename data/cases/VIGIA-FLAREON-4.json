@@ -1,0 +1,469 @@
+{
+  "case_id": "VIGIA-FLAREON-4",
+  "case_name": "FLARE-On 4 (2017) — CTF Challenge Collection",
+  "schema_version": 1,
+  "description": "FLARE-On 4 challenge set released in 2017 by FireEye FLARE team. The zip archive (8,293,788 bytes, SHA-256: 760f1130aa0166a25a50c334d5ecc1537a71e3761360fa17b83ab63a402748b7) contains 12 challenges across folders 01–12. Notable artifacts: challenge 01 (login.html, 877 bytes) is a client-side JavaScript authentication challenge where the flag 'ClientSideLoginsAreEasy@flare-on.com' is obscured via ROT13; challenge 02 (IgniteMe.exe, 3,072 bytes) is a tiny PE32 console binary with XOR-based key derivation (prompt: 'G1v3 m3 t3h fl4g:'); challenge 04 (notepad.exe, 76,288 bytes) is a trojanized Windows Notepad binary; challenge 08 (flair.apk, 3,848,256 bytes) is an Android APK; challenge 09 (remorse.ino.hex, 12,503 bytes) is an Arduino firmware hex file; challenge 10 (shell.php, 3,586 bytes) is an obfuscated PHP webshell with base64-encoded XOR payload and MD5-based key derivation; challenge 12 includes a filtered PCAP (20170801_1300_filtered.pcap, 5,747,603 bytes) alongside a PE binary (coolprogram.exe). The collection spans Windows PE, .NET, ELF Linux, Android APK, Arduino firmware, PHP webshell, and PCAP — one of the most technically diverse FLARE-On editions.",
+  "expected_verdict": "INTENT",
+  "expected_confidence": 0.93,
+  "expected_mitre_ttps": ["T1027", "T1059.006", "T1071", "T1505.001", "T1204.002"],
+  "peirce_chain": {
+    "firstness": "13 files in 12 challenge folders. File types: PE32 console (x4), PE32 GUI ELF 64-bit Linux (x1), PE32 DLL x86-64 (x1), Android APK (x1), Arduino Intel HEX (x1), PHP script (x1), HTML/JS (x1), pcap (x1), PE32 GUI x86 (x1). Size range: 877 bytes (login.html) to 5,747,603 bytes (PCAP). Archive is AES-256 encrypted with password 'flare'.",
+    "secondness": "No benign archive of this cross-platform composition exists. login.html demonstrates deliberate ROT13 obfuscation of an email flag — a technique used in real phishing infrastructure. shell.php is a functional obfuscated webshell (base64+XOR+MD5 key derivation) of a class actually deployed in the wild. remorse.ino.hex targets an embedded firmware platform rarely seen in CTFs, indicating intent to cover firmware RE. notepad.exe is a trojanized legitimate Windows binary — a masquerading technique (MITRE T1036.005) used in real APT toolchains.",
+    "thirdness": "The FLARE-On 4 collection deliberately cross-trains on the full threat surface: web (PHP shell, HTML/JS), mobile (APK), embedded (Arduino), network (PCAP), and Windows malware (PE32, DLL, .NET). Each challenge teaches a distinct class of adversarial technique encountered in real IR engagements. The PHP webshell (challenge 10) in particular is indistinguishable from real deployed webshells without dynamic analysis — a deliberate choice to force dynamic execution awareness. Carnegie pattern: authority — FLARE brand primes analysts to engage actively with content they would otherwise sandbox or destroy."
+  },
+  "devil_advocate": "A CTF competition archive is not malicious by design. All samples are provided for educational reverse engineering in a sandboxed context. The PHP webshell (shell.php) requires a password not provided in the archive — it cannot execute autonomously. The ROT13 flag in login.html is a pedagogical demonstration of why client-side authentication is insecure, not an active attack. The INTENT verdict applies to the technical intentionality of the challenges, not criminal deployment.",
+  "artifacts": [
+    {
+      "artifact_id": "flareon4-zip-001",
+      "evidence_type": "file_hash",
+      "source_tool": "generate_forensic_hash",
+      "timestamp": "2026-06-30T15:20:00Z",
+      "raw_score": 0.95,
+      "prior_trust": 0.99,
+      "provenance_chain": [
+        "sha256:760f1130aa0166a25a50c334d5ecc1537a71e3761360fa17b83ab63a402748b7"
+      ],
+      "description": "Outer zip archive Flare-On4_Challenges.zip. SHA-256 verified against task specification. Size: 8,293,788 bytes. AES-256 encrypted (PK compat v5.1), password: 'flare'. Contains 13 files in 12 folders (challenges 01–12). Archive entry dates range 2017-04-28 to 2017-09-01.",
+      "metadata": {
+        "filename": "Flare-On4_Challenges.zip",
+        "size_bytes": 8293788,
+        "entry_count": 25,
+        "zip_entries": [
+          "01/login.html",
+          "02/IgniteMe.exe",
+          "03/greek_to_me.exe",
+          "04/notepad.exe",
+          "05/pewpewboat.exe",
+          "06/payload.dll",
+          "07/zsud.exe",
+          "08/flair.apk",
+          "09/remorse.ino.hex",
+          "10/shell.php",
+          "11/covfefe.exe",
+          "12/20170801_1300_filtered.pcap",
+          "12/coolprogram.exe"
+        ],
+        "encryption": "AES-256",
+        "archive_password": "flare",
+        "source_url": "https://flare-on.com/",
+        "acquisition_tool": "sha256sum + 7z x",
+        "acquisition_hash": "sha256:760f1130aa0166a25a50c334d5ecc1537a71e3761360fa17b83ab63a402748b7",
+        "acquisition_timestamp": "2026-06-30T15:20:00Z",
+        "write_blocker_used": false,
+        "examiner_id": "VIGIA-MCP-CLAUDE-CODE"
+      }
+    },
+    {
+      "artifact_id": "flareon4-ch01-login-html",
+      "evidence_type": "web_artifact",
+      "source_tool": "read_evidence",
+      "timestamp": "2026-06-30T15:22:00Z",
+      "raw_score": 0.70,
+      "prior_trust": 0.90,
+      "provenance_chain": [
+        "sha256:760f1130aa0166a25a50c334d5ecc1537a71e3761360fa17b83ab63a402748b7",
+        "zip_entry:01/login.html",
+        "sha256:b21633a4134a29462b1dd69bc8638358fd66472068b11ef56e7a6eedfcb24ebb"
+      ],
+      "description": "Challenge 01 — login.html (877 bytes). HTML/JavaScript client-side authentication. The JavaScript applies ROT13 to user input and compares against hardcoded ciphertext 'PyvragFvqrYbtvafNerRnfl@syner-ba.pbz'. ROT13 decodes to 'ClientSideLoginsAreEasy@flare-on.com'. Technique: client-side auth / ROT13 obfuscation — illustrates that client-side secrets are trivially reversible. Flag confirmed: ClientSideLoginsAreEasy@flare-on.com.",
+      "metadata": {
+        "challenge_number": 1,
+        "challenge_name": "login",
+        "file_type": "HTML document, ASCII text, with CRLF line terminators",
+        "size_bytes": 877,
+        "sha256": "b21633a4134a29462b1dd69bc8638358fd66472068b11ef56e7a6eedfcb24ebb",
+        "archive_date": "2017-08-17",
+        "technique_class": "client-side authentication / ROT13 obfuscation",
+        "difficulty_estimate": "introductory",
+        "obfuscation": "ROT13",
+        "encoded_flag": "PyvragFvqrYbtvafNerRnfl@syner-ba.pbz",
+        "decoded_flag": "ClientSideLoginsAreEasy@flare-on.com",
+        "acquisition_tool": "7z x -pflare + sha256sum",
+        "acquisition_hash": "sha256:b21633a4134a29462b1dd69bc8638358fd66472068b11ef56e7a6eedfcb24ebb",
+        "acquisition_timestamp": "2026-06-30T15:22:00Z",
+        "write_blocker_used": false,
+        "examiner_id": "VIGIA-MCP-CLAUDE-CODE"
+      }
+    },
+    {
+      "artifact_id": "flareon4-ch02-igniteme",
+      "evidence_type": "binary",
+      "source_tool": "generate_forensic_hash",
+      "timestamp": "2026-06-30T15:20:45Z",
+      "raw_score": 0.80,
+      "prior_trust": 0.90,
+      "provenance_chain": [
+        "sha256:760f1130aa0166a25a50c334d5ecc1537a71e3761360fa17b83ab63a402748b7",
+        "zip_entry:02/IgniteMe.exe",
+        "sha256:785f13da5d5aca22dc4dc2c3c93c798e05d4eded08c291a3b9cabaf18c682bbe"
+      ],
+      "description": "Challenge 02 — IgniteMe.exe (3,072 bytes). PE32 console Intel 80386, 3 sections. Extremely compact PE (3 KB). Imports: GetStdHandle, ReadFile, WriteFile, ExitProcess (KERNEL32.dll only). Prompts 'G1v3 m3 t3h fl4g:' — leet-speak for 'give me the flag'. Responses: 'G00d j0b!' or 'N0t t00 h0t R we? 7ry 4ga1nz plzzz!'. Contains obfuscated key material: strings '&IE*', 'xD+l]^E', '+DonV_EGs&'. Technique class: XOR key derivation / minimal PE crackme.",
+      "metadata": {
+        "challenge_number": 2,
+        "challenge_name": "IgniteMe",
+        "file_type": "PE32 executable (console) Intel 80386, for MS Windows, 3 sections",
+        "size_bytes": 3072,
+        "sha256": "785f13da5d5aca22dc4dc2c3c93c798e05d4eded08c291a3b9cabaf18c682bbe",
+        "archive_date": "2017-08-02",
+        "technique_class": "XOR key derivation / minimal PE crackme",
+        "difficulty_estimate": "introductory",
+        "imports": ["GetStdHandle", "ReadFile", "WriteFile", "ExitProcess"],
+        "import_dll": "KERNEL32.dll",
+        "key_strings": ["G1v3 m3 t3h fl4g:", "G00d j0b!", "N0t t00 h0t R we? 7ry 4ga1nz plzzz!"],
+        "acquisition_tool": "7z x -pflare + sha256sum",
+        "acquisition_hash": "sha256:785f13da5d5aca22dc4dc2c3c93c798e05d4eded08c291a3b9cabaf18c682bbe",
+        "acquisition_timestamp": "2026-06-30T15:20:45Z",
+        "write_blocker_used": false,
+        "examiner_id": "VIGIA-MCP-CLAUDE-CODE"
+      }
+    },
+    {
+      "artifact_id": "flareon4-ch03-greek-to-me",
+      "evidence_type": "binary",
+      "source_tool": "generate_forensic_hash",
+      "timestamp": "2026-06-30T15:22:00Z",
+      "raw_score": 0.75,
+      "prior_trust": 0.90,
+      "provenance_chain": [
+        "sha256:760f1130aa0166a25a50c334d5ecc1537a71e3761360fa17b83ab63a402748b7",
+        "zip_entry:03/greek_to_me.exe",
+        "sha256:a3eb21f603efb6731d3493be3427a33982a427f1b630214136531aba1746e540"
+      ],
+      "description": "Challenge 03 — greek_to_me.exe (2,048 bytes). PE32 console Intel 80386, 2 sections. Name 'it's all Greek to me' — references incomprehensible content. Tiny 2 KB PE with only 2 sections suggests shellcode stub or hand-crafted loader. Technique class: shellcode / XOR decryption stub.",
+      "metadata": {
+        "challenge_number": 3,
+        "challenge_name": "greek_to_me",
+        "file_type": "PE32 executable (console) Intel 80386, for MS Windows, 2 sections",
+        "size_bytes": 2048,
+        "sha256": "a3eb21f603efb6731d3493be3427a33982a427f1b630214136531aba1746e540",
+        "archive_date": "2017-07-08",
+        "technique_class": "shellcode / XOR decryption stub / minimal PE",
+        "difficulty_estimate": "easy",
+        "acquisition_tool": "7z x -pflare + sha256sum",
+        "acquisition_hash": "sha256:a3eb21f603efb6731d3493be3427a33982a427f1b630214136531aba1746e540",
+        "acquisition_timestamp": "2026-06-30T15:22:00Z",
+        "write_blocker_used": false,
+        "examiner_id": "VIGIA-MCP-CLAUDE-CODE"
+      }
+    },
+    {
+      "artifact_id": "flareon4-ch04-notepad",
+      "evidence_type": "binary",
+      "source_tool": "generate_forensic_hash",
+      "timestamp": "2026-06-30T15:22:00Z",
+      "raw_score": 0.85,
+      "prior_trust": 0.90,
+      "provenance_chain": [
+        "sha256:760f1130aa0166a25a50c334d5ecc1537a71e3761360fa17b83ab63a402748b7",
+        "zip_entry:04/notepad.exe",
+        "sha256:3bc4c643df6d9976ce2ee8d1317d34c6c6403a3756e6a572994c65069dc26ba8"
+      ],
+      "description": "Challenge 04 — notepad.exe (76,288 bytes). PE32 GUI Intel 80386, 3 sections. Timestamp 2008-04-14 — predating the challenge by 9 years, suggesting this is a modified copy of the Windows XP/Vista Notepad binary. Trojanized system binary challenge — participants must identify modifications to a legitimate Windows binary. Technique class: binary diffing / trojanized system binary (T1036.005). MITRE T1036.005.",
+      "metadata": {
+        "challenge_number": 4,
+        "challenge_name": "notepad (trojanized)",
+        "file_type": "PE32 executable (GUI) Intel 80386, for MS Windows, 3 sections",
+        "size_bytes": 76288,
+        "sha256": "3bc4c643df6d9976ce2ee8d1317d34c6c6403a3756e6a572994c65069dc26ba8",
+        "archive_date": "2008-04-14",
+        "technique_class": "trojanized system binary / binary diffing (T1036.005)",
+        "difficulty_estimate": "medium",
+        "mitre_ttps": ["T1036.005"],
+        "pe_timestamp": "2008-04-14T09:42:30Z",
+        "acquisition_tool": "7z x -pflare + sha256sum",
+        "acquisition_hash": "sha256:3bc4c643df6d9976ce2ee8d1317d34c6c6403a3756e6a572994c65069dc26ba8",
+        "acquisition_timestamp": "2026-06-30T15:22:00Z",
+        "write_blocker_used": false,
+        "examiner_id": "VIGIA-MCP-CLAUDE-CODE"
+      }
+    },
+    {
+      "artifact_id": "flareon4-ch05-pewpewboat",
+      "evidence_type": "binary",
+      "source_tool": "generate_forensic_hash",
+      "timestamp": "2026-06-30T15:22:00Z",
+      "raw_score": 0.75,
+      "prior_trust": 0.90,
+      "provenance_chain": [
+        "sha256:760f1130aa0166a25a50c334d5ecc1537a71e3761360fa17b83ab63a402748b7",
+        "zip_entry:05/pewpewboat.exe",
+        "sha256:c202342bce48c2bbdf762600109f8f6d7fc4a0bd6e22b7519d8f617b552a4f5a"
+      ],
+      "description": "Challenge 05 — pewpewboat.exe (80,560 bytes). ELF 64-bit LSB executable, x86-64, dynamically linked, for GNU/Linux 2.6.32, stripped. Name references a Battleship-style shooting game. Cross-platform Linux ELF requiring Linux RE tools. Technique class: Linux ELF reverse engineering / game logic reversal.",
+      "metadata": {
+        "challenge_number": 5,
+        "challenge_name": "pewpewboat",
+        "file_type": "ELF 64-bit LSB executable, x86-64, dynamically linked, stripped",
+        "size_bytes": 80560,
+        "sha256": "c202342bce48c2bbdf762600109f8f6d7fc4a0bd6e22b7519d8f617b552a4f5a",
+        "archive_date": "2017-07-31",
+        "technique_class": "Linux ELF RE / game logic reversal / cross-platform",
+        "difficulty_estimate": "medium",
+        "platform": "Linux x86-64",
+        "acquisition_tool": "7z x -pflare + sha256sum",
+        "acquisition_hash": "sha256:c202342bce48c2bbdf762600109f8f6d7fc4a0bd6e22b7519d8f617b552a4f5a",
+        "acquisition_timestamp": "2026-06-30T15:22:00Z",
+        "write_blocker_used": false,
+        "examiner_id": "VIGIA-MCP-CLAUDE-CODE"
+      }
+    },
+    {
+      "artifact_id": "flareon4-ch06-payload-dll",
+      "evidence_type": "binary",
+      "source_tool": "generate_forensic_hash",
+      "timestamp": "2026-06-30T15:22:00Z",
+      "raw_score": 0.80,
+      "prior_trust": 0.90,
+      "provenance_chain": [
+        "sha256:760f1130aa0166a25a50c334d5ecc1537a71e3761360fa17b83ab63a402748b7",
+        "zip_entry:06/payload.dll",
+        "sha256:2fbca35e033a0bd34b43ebbbb023bb98e6ac4063f9bb7800dd0f45b8bfe9a3e0"
+      ],
+      "description": "Challenge 06 — payload.dll (105,984 bytes). PE32+ DLL (GUI) x86-64, 7 sections. 64-bit DLL with 7 sections — more complex than typical CTF DLLs. Name 'payload' is unambiguous: this is the challenge payload component. Technique class: 64-bit DLL analysis / reflective DLL loading / export analysis.",
+      "metadata": {
+        "challenge_number": 6,
+        "challenge_name": "payload",
+        "file_type": "PE32+ executable (DLL) (GUI) x86-64, for MS Windows, 7 sections",
+        "size_bytes": 105984,
+        "sha256": "2fbca35e033a0bd34b43ebbbb023bb98e6ac4063f9bb7800dd0f45b8bfe9a3e0",
+        "archive_date": "2017-04-28",
+        "technique_class": "64-bit DLL analysis / reflective loading (T1055.001)",
+        "difficulty_estimate": "medium",
+        "mitre_ttps": ["T1055.001"],
+        "acquisition_tool": "7z x -pflare + sha256sum",
+        "acquisition_hash": "sha256:2fbca35e033a0bd34b43ebbbb023bb98e6ac4063f9bb7800dd0f45b8bfe9a3e0",
+        "acquisition_timestamp": "2026-06-30T15:22:00Z",
+        "write_blocker_used": false,
+        "examiner_id": "VIGIA-MCP-CLAUDE-CODE"
+      }
+    },
+    {
+      "artifact_id": "flareon4-ch07-zsud",
+      "evidence_type": "binary",
+      "source_tool": "generate_forensic_hash",
+      "timestamp": "2026-06-30T15:22:00Z",
+      "raw_score": 0.75,
+      "prior_trust": 0.90,
+      "provenance_chain": [
+        "sha256:760f1130aa0166a25a50c334d5ecc1537a71e3761360fa17b83ab63a402748b7",
+        "zip_entry:07/zsud.exe",
+        "sha256:6b9d9d9a36a577ccfa1c0452f48fe1da0b3a499ad162db75ce23765094df4b51"
+      ],
+      "description": "Challenge 07 — zsud.exe (385,536 bytes). PE32 GUI Intel 80386, 6 sections. Name 'zsud' may be a reference to Zork-like text adventure or a custom protocol. Size 385 KB with 6 sections suggests a substantial GUI application. Technique class: GUI application RE / custom protocol / text adventure crackme.",
+      "metadata": {
+        "challenge_number": 7,
+        "challenge_name": "zsud",
+        "file_type": "PE32 executable (GUI) Intel 80386, for MS Windows, 6 sections",
+        "size_bytes": 385536,
+        "sha256": "6b9d9d9a36a577ccfa1c0452f48fe1da0b3a499ad162db75ce23765094df4b51",
+        "archive_date": "2017-09-01",
+        "technique_class": "GUI application RE / custom protocol / text adventure",
+        "difficulty_estimate": "medium-hard",
+        "acquisition_tool": "7z x -pflare + sha256sum",
+        "acquisition_hash": "sha256:6b9d9d9a36a577ccfa1c0452f48fe1da0b3a499ad162db75ce23765094df4b51",
+        "acquisition_timestamp": "2026-06-30T15:22:00Z",
+        "write_blocker_used": false,
+        "examiner_id": "VIGIA-MCP-CLAUDE-CODE"
+      }
+    },
+    {
+      "artifact_id": "flareon4-ch08-flair-apk",
+      "evidence_type": "binary",
+      "source_tool": "generate_forensic_hash",
+      "timestamp": "2026-06-30T15:22:00Z",
+      "raw_score": 0.80,
+      "prior_trust": 0.90,
+      "provenance_chain": [
+        "sha256:760f1130aa0166a25a50c334d5ecc1537a71e3761360fa17b83ab63a402748b7",
+        "zip_entry:08/flair.apk",
+        "sha256:b6204bf593e52147a6c7d0f30280f12a509add5733feef87f952afdbe51396b2"
+      ],
+      "description": "Challenge 08 — flair.apk (3,848,256 bytes). Android package (APK) with AndroidManifest.xml and APK Signing Block. Name 'flair' may reference TGI Friday's 'flair' — a cultural in-joke. Largest non-PCAP artifact at 3.8 MB. Requires Android APK decompilation (jadx/apktool). Technique class: Android APK reverse engineering / Java/Dalvik RE.",
+      "metadata": {
+        "challenge_number": 8,
+        "challenge_name": "flair",
+        "file_type": "Android package (APK), with AndroidManifest.xml, with APK Signing Block",
+        "size_bytes": 3848256,
+        "sha256": "b6204bf593e52147a6c7d0f30280f12a509add5733feef87f952afdbe51396b2",
+        "archive_date": "2017-08-24",
+        "technique_class": "Android APK RE / Java/Dalvik disassembly",
+        "difficulty_estimate": "medium-hard",
+        "platform": "Android",
+        "acquisition_tool": "7z x -pflare + sha256sum",
+        "acquisition_hash": "sha256:b6204bf593e52147a6c7d0f30280f12a509add5733feef87f952afdbe51396b2",
+        "acquisition_timestamp": "2026-06-30T15:22:00Z",
+        "write_blocker_used": false,
+        "examiner_id": "VIGIA-MCP-CLAUDE-CODE"
+      }
+    },
+    {
+      "artifact_id": "flareon4-ch09-remorse-hex",
+      "evidence_type": "binary",
+      "source_tool": "generate_forensic_hash",
+      "timestamp": "2026-06-30T15:22:00Z",
+      "raw_score": 0.80,
+      "prior_trust": 0.90,
+      "provenance_chain": [
+        "sha256:760f1130aa0166a25a50c334d5ecc1537a71e3761360fa17b83ab63a402748b7",
+        "zip_entry:09/remorse.ino.hex",
+        "sha256:65722ab98f113ce8055ea0519943c5083217e20cf0f5ed6b33c70b76b7fe7c86"
+      ],
+      "description": "Challenge 09 — remorse.ino.hex (12,503 bytes). Arduino Intel HEX firmware file (ASCII text, CRLF). '.ino' extension indicates Arduino sketch source; '.hex' indicates compiled Intel HEX firmware. Requires AVR disassembly (avr-objdump or Ghidra AVR processor module). Unique in FLARE-On history as an embedded firmware challenge. Technique class: embedded firmware RE / AVR ISA disassembly.",
+      "metadata": {
+        "challenge_number": 9,
+        "challenge_name": "remorse",
+        "file_type": "ASCII text, with CRLF line terminators (Intel HEX format)",
+        "size_bytes": 12503,
+        "sha256": "65722ab98f113ce8055ea0519943c5083217e20cf0f5ed6b33c70b76b7fe7c86",
+        "archive_date": "2017-09-01",
+        "technique_class": "Arduino firmware RE / AVR ISA / embedded systems",
+        "difficulty_estimate": "hard",
+        "platform": "Arduino / AVR",
+        "format": "Intel HEX",
+        "acquisition_tool": "7z x -pflare + sha256sum",
+        "acquisition_hash": "sha256:65722ab98f113ce8055ea0519943c5083217e20cf0f5ed6b33c70b76b7fe7c86",
+        "acquisition_timestamp": "2026-06-30T15:22:00Z",
+        "write_blocker_used": false,
+        "examiner_id": "VIGIA-MCP-CLAUDE-CODE"
+      }
+    },
+    {
+      "artifact_id": "flareon4-ch10-shell-php",
+      "evidence_type": "web_artifact",
+      "source_tool": "read_evidence",
+      "timestamp": "2026-06-30T15:22:00Z",
+      "raw_score": 0.90,
+      "prior_trust": 0.90,
+      "provenance_chain": [
+        "sha256:760f1130aa0166a25a50c334d5ecc1537a71e3761360fa17b83ab63a402748b7",
+        "zip_entry:10/shell.php",
+        "sha256:278bb0066af4204fb23e0e662d2a1ab214529231023814ed13350b70c38e9c2a"
+      ],
+      "description": "Challenge 10 — shell.php (3,586 bytes). PHP webshell. Base64-encoded 2,268-byte payload XOR-decrypted with MD5-derived key from POST parameter 'o_o'. MD5 check: if MD5(decrypted) == '43a141570e0c926e0e3673216a4dd73d' → execute via create_function(). Structurally identical to real-world PHP webshells deployed in web server intrusions. Technique class: PHP webshell / base64+XOR obfuscation / password-protected backdoor (T1505.001, T1059.006). MITRE T1505.001.",
+      "metadata": {
+        "challenge_number": 10,
+        "challenge_name": "shell",
+        "file_type": "PHP script, ASCII text, with very long lines (3586), with no line terminators",
+        "size_bytes": 3586,
+        "sha256": "278bb0066af4204fb23e0e662d2a1ab214529231023814ed13350b70c38e9c2a",
+        "archive_date": "2017-08-31",
+        "technique_class": "PHP webshell / base64+XOR+MD5 obfuscation (T1505.001)",
+        "difficulty_estimate": "hard",
+        "obfuscation_layers": ["base64", "XOR with MD5-derived key"],
+        "md5_check": "43a141570e0c926e0e3673216a4dd73d",
+        "payload_size_bytes": 2268,
+        "post_param": "o_o",
+        "mitre_ttps": ["T1505.001", "T1059.006"],
+        "acquisition_tool": "7z x -pflare + sha256sum",
+        "acquisition_hash": "sha256:278bb0066af4204fb23e0e662d2a1ab214529231023814ed13350b70c38e9c2a",
+        "acquisition_timestamp": "2026-06-30T15:22:00Z",
+        "write_blocker_used": false,
+        "examiner_id": "VIGIA-MCP-CLAUDE-CODE"
+      }
+    },
+    {
+      "artifact_id": "flareon4-ch11-covfefe",
+      "evidence_type": "binary",
+      "source_tool": "generate_forensic_hash",
+      "timestamp": "2026-06-30T15:22:00Z",
+      "raw_score": 0.75,
+      "prior_trust": 0.90,
+      "provenance_chain": [
+        "sha256:760f1130aa0166a25a50c334d5ecc1537a71e3761360fa17b83ab63a402748b7",
+        "zip_entry:11/covfefe.exe",
+        "sha256:6c5d5a2695fa4fe06edc7d848be9a000b4b3462c6b5e161bb8e31d53c591438f"
+      ],
+      "description": "Challenge 11 — covfefe.exe (20,480 bytes). PE32 console Intel 80386, 3 sections. Name references the famous 2017 Trump typo-tweet 'covfefe' — a cultural in-joke for the 2017 CTF edition. Small 20 KB PE. Technique class: custom encoding / cipher / typo-based obfuscation.",
+      "metadata": {
+        "challenge_number": 11,
+        "challenge_name": "covfefe",
+        "file_type": "PE32 executable (console) Intel 80386, for MS Windows, 3 sections",
+        "size_bytes": 20480,
+        "sha256": "6c5d5a2695fa4fe06edc7d848be9a000b4b3462c6b5e161bb8e31d53c591438f",
+        "archive_date": "2017-08-31",
+        "technique_class": "custom encoding / cipher crackme / cultural obfuscation",
+        "difficulty_estimate": "hard",
+        "cultural_reference": "2017 Twitter 'covfefe' incident",
+        "acquisition_tool": "7z x -pflare + sha256sum",
+        "acquisition_hash": "sha256:6c5d5a2695fa4fe06edc7d848be9a000b4b3462c6b5e161bb8e31d53c591438f",
+        "acquisition_timestamp": "2026-06-30T15:22:00Z",
+        "write_blocker_used": false,
+        "examiner_id": "VIGIA-MCP-CLAUDE-CODE"
+      }
+    },
+    {
+      "artifact_id": "flareon4-ch12-pcap",
+      "evidence_type": "network_traffic",
+      "source_tool": "generate_forensic_hash",
+      "timestamp": "2026-06-30T15:22:00Z",
+      "raw_score": 0.85,
+      "prior_trust": 0.90,
+      "provenance_chain": [
+        "sha256:760f1130aa0166a25a50c334d5ecc1537a71e3761360fa17b83ab63a402748b7",
+        "zip_entry:12/20170801_1300_filtered.pcap",
+        "sha256:bd9f7db0a8acec4cc3b1c2d1420ff6608dd3762e3caf647948791b0af7b362e5"
+      ],
+      "description": "Challenge 12a — 20170801_1300_filtered.pcap (5,747,603 bytes). libpcap v2.4 Ethernet capture. Filename encodes date 2017-08-01 13:00 'filtered' — suggests traffic was pre-filtered to contain only relevant streams. Paired with coolprogram.exe. Technique class: PCAP forensics / C2 channel identification / paired binary-traffic analysis (T1071).",
+      "metadata": {
+        "challenge_number": 12,
+        "challenge_name": "20170801_1300_filtered.pcap",
+        "file_type": "pcap capture file, microsecond ts (little-endian) - version 2.4 (Ethernet, capture length 262144)",
+        "size_bytes": 5747603,
+        "sha256": "bd9f7db0a8acec4cc3b1c2d1420ff6608dd3762e3caf647948791b0af7b362e5",
+        "archive_date": "2017-08-01",
+        "technique_class": "PCAP forensics / C2 traffic identification (T1071)",
+        "difficulty_estimate": "hard",
+        "mitre_ttps": ["T1071"],
+        "pcap_version": "2.4",
+        "link_type": "Ethernet",
+        "snaplen": 262144,
+        "capture_timestamp": "2017-08-01T13:00:00",
+        "acquisition_tool": "7z x -pflare + sha256sum",
+        "acquisition_hash": "sha256:bd9f7db0a8acec4cc3b1c2d1420ff6608dd3762e3caf647948791b0af7b362e5",
+        "acquisition_timestamp": "2026-06-30T15:22:00Z",
+        "write_blocker_used": false,
+        "examiner_id": "VIGIA-MCP-CLAUDE-CODE"
+      }
+    },
+    {
+      "artifact_id": "flareon4-ch12-coolprogram",
+      "evidence_type": "binary",
+      "source_tool": "generate_forensic_hash",
+      "timestamp": "2026-06-30T15:22:00Z",
+      "raw_score": 0.85,
+      "prior_trust": 0.90,
+      "provenance_chain": [
+        "sha256:760f1130aa0166a25a50c334d5ecc1537a71e3761360fa17b83ab63a402748b7",
+        "zip_entry:12/coolprogram.exe",
+        "sha256:dd1dafc141661d2dd5331de7fe61c8183c6ade2a67fa8a689030279718e0be5a"
+      ],
+      "description": "Challenge 12b — coolprogram.exe (86,528 bytes). PE32 GUI Intel 80386, 9 sections. Name 'coolprogram' is deliberately banal — a masquerading tactic. 9 PE sections is unusually high and suggests runtime packing/unpacking or overlay data. Paired with 20170801_1300_filtered.pcap — this binary is the C2 client that generated or communicates with the PCAP traffic. Technique class: C2 client RE / paired binary+traffic analysis (T1071, T1027).",
+      "metadata": {
+        "challenge_number": 12,
+        "challenge_name": "coolprogram",
+        "file_type": "PE32 executable (GUI) Intel 80386, for MS Windows, 9 sections",
+        "size_bytes": 86528,
+        "sha256": "dd1dafc141661d2dd5331de7fe61c8183c6ade2a67fa8a689030279718e0be5a",
+        "archive_date": "2017-08-01",
+        "technique_class": "C2 client RE / packed PE / paired binary+traffic analysis (T1071, T1027)",
+        "difficulty_estimate": "hard (final boss)",
+        "pe_sections": 9,
+        "mitre_ttps": ["T1071", "T1027"],
+        "acquisition_tool": "7z x -pflare + sha256sum",
+        "acquisition_hash": "sha256:dd1dafc141661d2dd5331de7fe61c8183c6ade2a67fa8a689030279718e0be5a",
+        "acquisition_timestamp": "2026-06-30T15:22:00Z",
+        "write_blocker_used": false,
+        "examiner_id": "VIGIA-MCP-CLAUDE-CODE"
+      }
+    }
+  ],
+  "known_limitations": [
+    "shell.php payload (2,268 bytes XOR-decrypted content) was not fully decrypted — the password to derive the XOR key was not brute-forced or found. Payload type is INFERRED from structural analysis.",
+    "PCAP 20170801_1300_filtered.pcap was not parsed with tshark. Protocol breakdown, packet count, and C2 protocol identification are INFERRED from filename and size only.",
+    "No sandbox execution performed on any binary. Technique-class assignments for challenges 05, 07, 09, 11 are INFERRED from file metadata only.",
+    "Arduino remorse.ino.hex was not disassembled — AVR firmware analysis not performed.",
+    "Challenge 01 flag confirmed via static ROT13 reversal: ClientSideLoginsAreEasy@flare-on.com."
+  ],
+  "source_dataset": "FLARE-On 4 CTF — FireEye FLARE Team (2017)",
+  "source_origin": "public_ctf_archive"
+}
