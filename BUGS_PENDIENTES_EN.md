@@ -6,6 +6,847 @@ standard, the exact fix applied, and commit reference for independent verificati
 
 ---
 
+## B-001 — `daubert_note` UnboundLocalError in the CollapseDecisionLayer Path
+
+| Field | Value |
+|-------|-------|
+| **Status** | RESOLVED |
+| **File** | `vigia/tools/caie.py` |
+| **Function** | `CrossArtifactIncongruenceEngine.evaluate()` |
+| **Original lines** | 1754, 1757 (`+=`); 1815–1823 (assignment `=`) |
+| **Fix commit** | see commit "POST HACKATHON: fix daubert_note UnboundLocalError in CDL path" |
+| **Detected** | Post-hackathon session 2026-06-23, coverage gap #2 review |
+
+### Description
+
+Inside `evaluate()`, the `CollapseDecisionLayer` (CDL) block executed:
+
+```python
+# lines 1754 and 1757 — BEFORE the fix
+daubert_note += f" CDL: {cdl_explanation}"
+```
+
+...but `daubert_note` was not assigned until line 1815, in a later block:
+
+```python
+# line 1815 — original assignment (AFTER the CDL)
+daubert_note = (
+    f"Daubert: {irrefutable_count}/{len(self._artifacts)} "
+    ...
+)
+```
+
+This produces `UnboundLocalError: local variable 'daubert_note' referenced
+before assignment` every time the CDL downgrades the verdict
+(`INCONCLUSIVE` or `SUSPICION`).
+
+### Impact
+
+- The exception was **silenced** by the CDL's `except Exception as exc:` block,
+  which only logged the error at the `logging.ERROR` level.
+- The **verdict downgrade** (`verdict = "INCONCLUSIVE"` /
+  `verdict = "SUSPICION"`) executes **before** the faulty `+=`, so
+  the final verdict **was correct**.
+- What was lost was the **CDL explanatory note** in `daubert_note`:
+  the `"daubert_note"` field in the result never included the
+  `"CDL: ..."` clause when the CDL acted.
+- Daubert admissibility impact: the resulting bundle did not reflect that the
+  CDL had intervened, obscuring the reasoning trail under cross-examination.
+
+### Fix applied
+
+Moved the `irrefutable_count` / `daubert_note = (...)` block to **before** the
+CDL block. The variable depends only on `self._artifacts`, which is available
+throughout the function. The CDL block can then `+=` on an already-initialized
+variable.
+
+Removed the duplicate block at the original position.
+
+**Order after fix** (approximate post-edit line numbers):
+
+```
+~1715: irrefutable_count = sum(...)       # ← moved here
+~1719: daubert_note = (...)               # ← moved here
+~1713: # COLLAPSE DECISION LAYER (CDL)
+~1770: daubert_note += f" CDL: ..."       # now valid
+~1773: daubert_note += f" CDL: ..."       # now valid
+~1911: "daubert_note": daubert_note       # final use
+```
+
+### Verification
+
+```
+pytest tests/ -k "caie or order_sensitivity or spoofability" -v --no-cov
+→ 63 passed, 0 failed
+```
+
+---
+
+## B-002 — `likelihood_engine.py` Constructor Called Incorrectly and Flat Import Path
+
+| Field | Value |
+|-------|-------|
+| **Status** | RESOLVED |
+| **File** | `vigia/core/likelihood_engine.py` |
+| **Function** | `LikelihoodEngine.__init__()` (calibrator loading) |
+| **Original lines** | 101 (`import_module`), 102 (`LRCalibrator(...)`) |
+| **Fix commit** | `4649427` |
+| **Detected** | Post-hackathon session 2026-06-24 |
+
+### Description
+
+Two concatenated errors in LR calibrator loading:
+
+1. **Flat import path** (line 101): `import_module("lr_calibration")` failed
+   outside the root directory because the module was not on the flat `sys.path`.
+2. **Incorrect positional constructor** (line 102): `LRCalibrator(calibration_path)`
+   called the constructor with a positional argument it does not accept;
+   the class exposes `LRCalibrator.load(path)` as a factory method.
+
+### Impact
+
+- The likelihood engine failed to instantiate the calibrator in any environment
+  where `vigia/` was not on the root `sys.path`.
+- The error was silent in some dynamic import paths, producing a `None` calibrator
+  without a visible exception, which generated incorrect results downstream
+  with no clear error trace.
+
+**APPLIED** 2026-06-24 — Fixed in vigia/core/likelihood_engine.py:
+- Line 101: `import_module("lr_calibration")` → `import_module("vigia.core.lr_calibration")`
+- Line 102: `LRCalibrator(calibration_path)` → `LRCalibrator.load(calibration_path)`
+5/5 serialization tests pass. Commit: 4649427.
+
+### Verification
+
+```
+pytest tests/ -k "serialization" -v --no-cov
+→ 5 passed, 0 failed
+```
+
+**RESOLVED** 2026-06-24 — The last flat importer was scripts/run_calibration.py,
+removed in commit 10ced2c (B-004). No references to `from likelihood_ratio import`
+or `import likelihood_ratio` remain in the repo (verified with grep). No changes
+were needed in likelihood_ratio.py — the file already used vigia.core.ebs_v1 internally.
+
+---
+
+## B-003 — Incorrect "Isotonic" Terminology in Comments and Logs in `pipeline.py`
+
+| Field | Value |
+|-------|-------|
+| **Status** | RESOLVED |
+| **File** | `vigia/pipeline/pipeline.py` |
+| **Function** | `VigiaPipeline.__init__()`, `VigiaPipeline.run()`, `run_vigia()` |
+| **Original lines** | 110, 207, 218, 464, 466, 479, 485, 487, 1303, 1305, 1332 |
+| **Fix commit** | `43edd73` |
+| **Detected** | Post-hackathon session 2026-06-24 |
+
+### Description
+
+Comments and log messages used "isotonic calibration" / "isotonic regression"
+to describe step H28 (LRCalibrator). The calibration was always
+`LogisticRegression` — never isotonic regression. The terminology confusion
+originated from a persistence filename (`_isotonic.json`) that was copied
+into the comments without review.
+
+### Impact
+
+- Purely documentary / audit-related. No impact on pipeline behavior.
+- The incorrect term would have confused a Daubert reviewer about the actual
+  statistical method employed.
+
+### Fix applied
+
+Replaced all uses of "isotonic/isotonically/isotonic_regression" in comments
+and log strings with the correct terms ("logistic/logistically/
+logistic_regression"). File paths `_isotonic.json` (lines 212 and 1311)
+were not modified — they are file identifiers, not statistical terminology.
+
+### Verification
+
+```
+pytest tests/ -q --no-cov
+→ 188 passed, 6 xfailed
+```
+
+**APPLIED** 2026-06-24 — Commit: 43edd73.
+
+---
+
+## B-004 — `run_calibration.py` Flat Imports (Pre-Reorganization)
+
+| Field | Value |
+|-------|-------|
+| **Status** | RESOLVED |
+| **File** | `scripts/run_calibration.py` |
+| **Function** | Module-level imports |
+| **Original lines** | 29 (`sys.path.insert`), 31–35 (flat imports) |
+| **Fix commit** | `10ced2c` |
+| **Detected** | Post-hackathon session 2026-06-24 |
+
+### Description
+
+The script used a `sys.path.insert` to add the `scripts/` directory to the path,
+then imported with flat names:
+
+```python
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from vigia_integration_bridge import (CaseAdapter, ...)
+from likelihood_ratio import LikelihoodEngine
+from lr_calibration import LRCalibrator
+```
+
+After the package reorganization, the modules reside in:
+- `vigia/pipeline/vigia_integration_bridge.py`
+- `vigia/core/likelihood_ratio.py`
+- `vigia/core/lr_calibration.py`
+
+The `sys.path.insert` hack masked the error outside the development environment.
+
+### Fix applied
+
+Removed `sys.path.insert`. Replaced flat imports with package paths:
+
+```python
+from vigia.pipeline.vigia_integration_bridge import (CaseAdapter, ...)
+from vigia.core.likelihood_ratio import LikelihoodEngine
+from vigia.core.lr_calibration import LRCalibrator
+```
+
+**APPLIED** 2026-06-24 — Commit: 10ced2c.
+
+---
+
+## B-005 — `run_calibration.py` Hardcoded Data Path (Script Directory)
+
+| Field | Value |
+|-------|-------|
+| **Status** | RESOLVED |
+| **File** | `scripts/run_calibration.py` |
+| **Function** | `main()` — corpus glob |
+| **Original lines** | 180–186 (glob patterns), 241–247 (output paths) |
+| **Fix commit** | `10ced2c` |
+| **Detected** | Post-hackathon session 2026-06-24 |
+
+### Description
+
+The corpus was searched relative to the script directory (`scripts/`):
+
+```python
+base = os.path.dirname(os.path.abspath(__file__))
+files = (
+    glob.glob(os.path.join(base, "VIGIA-SYN-*.json")) + ...
+)
+```
+
+Case files reside in `data/cases/converted/` under the repo root.
+With the hardcoded path, the script found 0 cases unless run from `scripts/`
+with JSONs manually copied in. Output models were also saved to `scripts/models/`
+instead of `models/` at the repo root.
+
+### Fix applied
+
+Added `--data` flag (default `data/cases/converted`) and `repo_root` as base:
+
+```python
+repo_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+data_dir = os.path.join(repo_root, args.data)
+files = glob.glob(os.path.join(data_dir, "*.json")) + ...
+out_path = os.path.join(repo_root, args.out)
+```
+
+Verification: 78 cases loaded, Brier Score 0.149, model saved to
+`models/calibrated_lr.json` (repo root).
+
+**APPLIED** 2026-06-24 — Commit: 10ced2c.
+
+---
+
+## B-006 — `LRCalibrator.load()` Does Not Validate `train_hash` Against the Current Dataset
+
+| Field | Value |
+|-------|-------|
+| **Status** | APPLIED |
+| **File** | `vigia/core/lr_calibration.py` |
+| **Function** | `LRCalibrator.load()` |
+| **Original lines** | 455 |
+| **Fix commit** | 1db3360 |
+| **Detected** | Post-hackathon session 2026-06-24, BUGS_PENDIENTES review |
+
+### Description
+
+`LRCalibrator.load()` loaded the serialized calibrator without verifying that the
+stored `train_hash` in the JSON matched the dataset currently in use.
+This allowed a calibrator trained on a different dataset to be loaded silently,
+producing incorrectly calibrated probabilities with no error or warning — a
+Daubert traceability failure.
+
+### Forensic impact
+
+A calibrator desynchronized from the active dataset produces incorrect likelihood
+scores. In a forensic context this is unacceptable: the numerical values would
+lack reproducible backing, invalidating the chain of custody.
+
+### Fix applied
+
+Added the optional parameter `expected_train_hash: str = ""` to `load()`.
+
+- If passed empty (default), behavior is identical to before — backward-compatible
+  with no changes to existing code.
+- If a hash is passed, it is compared against `cal._backend._train_hash` immediately
+  before the `return cal`. If they do not match, a `ValueError` is raised with a
+  descriptive message that includes both hashes and instructions to regenerate with
+  `scripts/run_calibration.py`.
+
+### Verification
+
+```
+5/5 tests passed — vigia/tests/test_lr_calibrator_serialization.py
+Smoke test: load without hash OK, load with correct hash OK, load with incorrect hash → ValueError OK
+```
+
+**APPLIED** 2026-06-24 — Commit: 1db3360.
+
+---
+
+## B-007 — P0 Floats Introduced by Claude Code in the Scorer (Discarded)
+
+**Status:** DISCARDED — never reached the repository.
+
+**Description:** During a Claude Code session, the generated code was found to
+introduce ~10 P0 violations (floats in the scoring path) in something related
+to the scorer. Once identified, the entire code was discarded before any commit
+was made. Git never saw the change. The scorer at HEAD retains the Fraction
+tables (`_SUPPORT_SCORE_TABLE`, `_EXP_NEG2_TABLE`, `_EPC_FACTOR_TABLE`) intact
+as they were after the P0 patch 2026-06-14 (commit 1807529).
+
+**Lesson learned:** Always validate with `grep -n "math\.log\|math\.exp\|[0-9]\.[0-9]"
+vigia_scorer.py` before accepting any change to the scoring path.
+
+---
+
+## B-008 — float() in SignalOutput Constructors (vigia/sift/) — L-021 Phase 3
+
+| Field | Value |
+|-------|-------|
+| **Status** | OPEN |
+| **Severity** | P2 — L-021 debt, not urgent until active SIFT integration |
+| **File** | `vigia/sift/shellbag_analyzer.py`, `vigia/sift/amcache_shimcache.py`, `vigia/sift/memory_forensics.py`, `vigia/sift/disk_forensics.py` |
+| **Detected** | Post-hackathon session 2026-06-25 |
+
+### Description
+
+All 4 SIFT modules construct `SignalOutput` using explicit `float()`:
+- `shellbag_analyzer.py:60-62`
+- `amcache_shimcache.py:73-75`
+- `memory_forensics.py:176-177`
+- `disk_forensics.py:71-72`
+
+`SignalOutput.z_score` and `confidence` are typed as `float` in `ebs.py`.
+When these modules feed the scoring pipeline during real SIFT integration,
+the floats will enter the inference path — potential L-021 regression.
+
+### Fix when applicable
+
+Coordinate with L-021 Phase 3. Requires a decision on whether `SignalOutput`
+should accept `Decimal` or whether the float conversion is the correct boundary
+between SIFT and scoring.
+
+---
+
+## B-009 — float() in vigia/abduction/vigia_artifact_graph.py — Active Abduction Path
+
+| Field | Value |
+|-------|-------|
+| **Status** | DISCARDED — 2026-06-26 |
+| **Severity** | P1 — active path, not SIFT-only |
+| **File** | `vigia/abduction/vigia_artifact_graph.py` |
+| **Original lines** | 432, 433, 457 |
+| **Detected** | Post-hackathon session 2026-06-25 |
+
+### Description
+
+```python
+z = float(node_data.get("z_score", 0.0))       # L432
+conf = float(node_data.get("confidence", 0.0))  # L433
+severity = float(anomaly.get("severity", ...))   # L457
+```
+
+Unlike B-008, this module is in the active abduction path (not SIFT-only).
+If `z_score` or `severity` arrive as `str` from the L-021 boundary
+(`evaluate()` now emits strings), `float(str_value)` works but introduces
+float into the abductive reasoning path — inconsistent with the L-021
+invariant.
+
+### Fix
+
+Replace `float(...)` with `Decimal(str(...))` on all three lines.
+Verify that downstream callers accept `Decimal`.
+
+**DISCARDED** 2026-06-26 — vigia_artifact_graph.py is a pure visualization module
+(node/edge graphs for display). The float() calls compute pixel sizes
+(int(15 + min(15, z * 3))), edge weights, and display labels — none of which
+feed back into the scoring or verdict path. The module has no importers in
+production code (grep confirmed). Converting to Decimal in a rendering context
+would be overengineering with no Daubert benefit. Closed as L-021 audit false
+positive.
+
+---
+
+## B-010 — TODO: Migrate forensic_technical_detector.py to SemioticDetectorV2
+
+| Field | Value |
+|-------|-------|
+| **Status** | OPEN |
+| **Severity** | P3 — technical debt, not a functional bug |
+| **File** | `vigia/core/forensic_technical_detector.py` |
+| **Original lines** | 194 |
+| **Detected** | Post-hackathon session 2026-06-25 |
+
+### Description
+
+```python
+# TODO: migrar a SemioticDetectorV2 en v3.0
+```
+
+The forensic technical detector still uses the v1 architecture. `SemioticDetectorV2`
+exists but is not wired here. This is not a functional bug — the detector operates
+correctly with the current architecture. It is migration debt for v3.0.
+
+### Fix when applicable
+
+Evaluate whether SemioticDetectorV2 covers all forensic_technical_detector use cases.
+Migration must be audited by the team before applying.
+
+---
+
+## B-011 — assert in P0 Guard of abductive_reasoner_v2.py (python -O Disables It)
+
+| Field | Value |
+|-------|-------|
+| **Status** | RESOLVED — commit 9c7d923 |
+| **Severity** | P1 — Daubert guard disappears in optimized mode |
+| **File** | `vigia/inference/abductive_reasoner_v2.py` |
+| **Original lines** | 143 |
+| **Detected** | Post-hackathon session 2026-06-25 |
+
+### Description
+
+```python
+assert not isinstance(value, float), (
+    f"INVARIANTE 1 VIOLADA en '{context}':..."
+)
+```
+
+This `assert` is the P0 guard that prevents floats from entering the abductive
+scoring path. With `python -O` (optimized mode), all `assert` statements are
+removed at compilation and the guard silently disappears — floats pass through
+undetected, violating the Daubert exact reproducibility invariant.
+
+### Fix
+
+```python
+if isinstance(value, float):
+    raise ValueError(
+        f"INVARIANTE 1 VIOLADA en '{context}': "
+        f"Se detectó float: {repr(value)}. "
+        f"Todo cálculo de score DEBE usar Fraction(numerador, denominador). "
+        f"Corrección: Fraction({value}).limit_denominator(10**9). "
+        f"Fundamento: Daubert requiere reproducibilidad exacta."
+    )
+```
+
+---
+
+## B-012 — assert in verify_determinism_cross_arch() of caie.py (python -O Disables It)
+
+| Field | Value |
+|-------|-------|
+| **Status** | RESOLVED — commit 9c7d923 |
+| **Severity** | P2 — verification function, not in scoring path |
+| **File** | `vigia/tools/caie.py` |
+| **Original lines** | 2239, 2242, 2248 |
+| **Detected** | Post-hackathon session 2026-06-25 |
+
+### Description
+
+`verify_determinism_cross_arch()` uses `assert` to verify bit-identical determinism.
+With `python -O`, the asserts are removed and the function returns `True` without
+verifying anything — creating a false sense of passing verification.
+
+It is not in the production scoring path (it is called explicitly), but it is the
+function that validates the Deterministic Forensic Protocol P0.
+
+### Fix
+
+Replace each `assert condition, message` with `if not condition: raise RuntimeError(message)`.
+
+---
+
+## B-013 — LOG_VS_MEMORY Fires with Low raw_score (Design vs Contract)
+
+| Field | Value |
+|-------|-------|
+| **Status** | OPEN — design decision pending |
+| **Severity** | P1 — affects system monotonicity |
+| **File** | `vigia/tools/caie.py` — `_extract_assertions()` |
+| **Detected** | Post-hackathon session 2026-06-25, property-testing |
+
+### Description
+
+A `log_entry` artifact with `raw_score=0.3` (weak evidence) containing
+`dst_ip` triggers the `LOG_VS_MEMORY` fracture with `is_structural=True`, forcing
+`structural_verdict=MALICE` and `verdict=MALICE` even though:
+- `probabilistic_verdict=NOISE`
+- `composite_score=0.0116` (very low)
+
+### Reproducible sequence
+
+```python
+A_mem  = Artifact('mem_tool', 'memory_process', 0.1, 'Clean', {'pid': 4521})
+A_weak = Artifact('log_tool', 'log_entry', 0.3, 'Weak', {'dst_ip': '10.0.0.1'})
+
+run([A_mem])           # verdict=INCONCLUSIVE, fractures=0
+run([A_weak, A_mem])   # verdict=MALICE, fractures=1 — non-monotonic jump
+```
+
+### Root cause
+
+`_extract_assertions()` does not consider `raw_score` — only the presence/absence
+of metadata fields. The LOG_VS_MEMORY fracture fires if `dst_ip` exists in
+the log, regardless of how weak the evidence is.
+
+The L-028 regression (which replaced metadata["verdict"] with assertions) removed
+the upstream verdict dependency but also eliminated the implicit severity gate
+that verdict provided.
+
+### Resolution options
+
+A. Add a raw_score gate in `_extract_assertions()` for
+   `log_claims_outbound_connection`: only assert if `raw_score >= threshold`.
+   Risk: introduces an arbitrary threshold (anti-Daubert).
+
+B. Require minimum score corroboration before the structural fracture forces
+   MALICE. The contradiction exists, but lacks probative force.
+
+C. Document as intentional behavior: the logical contradiction exists
+   regardless of the score. The score measures "how suspicious"; the fracture
+   measures "how impossible". They are orthogonal dimensions.
+
+### Note
+
+Option C is the most Daubert-compatible: "this log ASSERTS an outbound connection
+AND the memory DOES NOT SHOW IT — that is an objective contradiction, independent
+of how reliable the log is." The strength of the finding is modulated by severity
+(0.75 without PID overlap, 0.95 with overlap), not by the log's raw_score.
+
+---
+
+## B-014 — _extract_assertions() Does Not Filter Reserved/Loopback IPs
+
+| Field | Value |
+|-------|-------|
+| **Status** | RESOLVED — commit 41908e4 (reserved IP filter in _extract_assertions) |
+| **Severity** | P1 — guaranteed false positive, Daubert-indefensible |
+| **File** | `vigia/tools/caie.py` — `_extract_assertions()` |
+| **Detected** | Post-hackathon session 2026-06-25, property-testing |
+
+### Description
+
+`_extract_assertions()` asserts `log_claims_outbound_connection` for any
+non-empty string value in `dst_ip`/`dest_ip`, including IPs that cannot
+be real outbound connections:
+
+```
+127.0.0.1   → MALICE  (loopback — it is localhost)
+0.0.0.0     → MALICE  (null address)
+255.255.255.255 → MALICE  (broadcast)
+localhost   → MALICE  (loopback name)
+::1         → MALICE  (IPv6 loopback)
+```
+
+A connection to `127.0.0.1` is intra-process communication — it cannot be
+C2 exfiltration. Triggering LOG_VS_MEMORY for this is a structural false
+positive that no forensic expert could defend in court.
+
+### Fix
+
+Add a list of reserved IPs/ranges that do not constitute an "outbound connection":
+- `127.0.0.0/8` (loopback)
+- `0.0.0.0`
+- `255.255.255.255`
+- `localhost`, `::1`, `fe80::`
+
+---
+
+## B-015 — PID and dst_ip Not Normalized (Whitespace, Tabs, Newlines)
+
+| Field | Value |
+|-------|-------|
+| **Status** | RESOLVED — commit 3607cc7 (PID str().strip(), IP type validation) |
+| **Severity** | P1 — breaks PID correlation and triggers fractures with malformed IPs |
+| **File** | `vigia/tools/caie.py` — `_extract_assertions()`, PID canonicalization |
+| **Detected** | Post-hackathon session 2026-06-25, adversarial fuzzing |
+
+### Description
+
+Values with whitespace are not normalized before processing:
+
+**PID:** `str('4521 ') == '4521 '` ≠ `str(4521) == '4521'`
+→ PID overlap not detected → severity 0.75 instead of 0.95
+
+**dst_ip:** `'1.2.3.4 '` (with trailing space) is a non-empty string
+→ `_dest_valid = isinstance(str, str) and bool('1.2.3.4 '.strip())` = True
+→ fracture fires with a malformed IP that no real system would emit
+
+### Fix
+
+Normalize with `.strip()` before any comparison:
+- PID: `str(pid).strip()` instead of `str(pid)`
+- dst_ip/dest_ip: already have `.strip()` in `_dest_valid` but the
+  malformed value still enters the bundle
+
+---
+
+## NEGATIVE AUDIT — Verified Properties Found Not Vulnerable (2026-06-25/26)
+
+This section documents invariants and attack vectors that were exhaustively tested
+and found NO bugs. Its purpose is to prevent repeating audits on already-covered
+surface area.
+
+### CAIE Engine (vigia/tools/caie.py)
+
+| Property | Result | Method |
+|----------|--------|--------|
+| Insertion order invariance (I1) | PASS | 3 permutations, same fracture_graph |
+| Re-evaluation idempotency (I2) | PASS | 10 consecutive runs, same state vector |
+| Score determinism (I3) | PASS | 10 parallel runs, identical composite_score |
+| Semantic content invariance (I4) | PASS | description ignored by _extract_assertions |
+| Benign non-regression (I5) | PASS | 0 MALICE in 16 VIGIA-BEN-* cases |
+| Negative invariance (I6) | PASS | without dst_ip → no fracture; low score → changes |
+| Output aliasing | PASS | r["fractures"].append() does not affect internal state |
+| Input mutation | PASS | add_artifact() performs deepcopy, original metadata intact |
+| NaN/inf in raw_score | PASS | Finite Math Shield zeros the score, structural fracture evaluates correctly |
+| Arbitrary objects in metadata (UUID, datetime, Path, bytes) | PASS | str() canonicalization absorbs all |
+| Invisible Unicode characters in keys (ZWSP, NBSP, Cyrillic) | RESOLVED→PASS | B-016 fix: NFKC+strip |
+| Nested dict hash collision | RESOLVED→PASS | B-017 fix: json.dumps sort_keys=True |
+| PID int/str/float coercion | RESOLVED→PASS | str().strip() canonicalization |
+| network_connections truthiness | RESOLVED→PASS | isinstance(list/dict) validation |
+| source_tool casing/whitespace | RESOLVED→PASS | casefold() in Noisy-OR grouping |
+| Reserved IPs (loopback, broadcast) | RESOLVED→PASS | B-014 fix: _is_reserved_ip() |
+| Metadata dict aliasing post-add_artifact | RESOLVED→PASS | copy.deepcopy() in add_artifact |
+
+### Scorer (vigia_scorer.py)
+
+| Property | Result | Method |
+|----------|--------|--------|
+| Law 1: run(A) == run(deepcopy(A)) | PASS | case_001_temporal |
+| Law 2: json roundtrip invariance | PASS | json.dumps/loads preserve score |
+| Law 4: input immutability | PASS | case not mutated post-run |
+| Law 5: idempotency (without timestamps) | PASS | 3 consecutive runs |
+| Law 6: monotonicity | PASS (by design) | score increases when adding artifacts |
+| Law 7: score ∈ [0,1] | PASS | isfinite, bounded |
+| Law 3: order invariance | PASS | artifacts reversed → same score |
+| Empty bundle | DOCUMENTED | verdict=ERROR with explanatory error field |
+
+### Pipeline (vigia/pipeline/pipeline.py)
+
+| Property | Result | Method |
+|----------|--------|--------|
+| Reentrancy (run case1, case2, case1) | PASS | run3 == run1 exact |
+| Residual state between runs | PASS | fractures=0 constant across 4 runs |
+| Input immutability | PASS | bundle not mutated post-run_full |
+| Shared objects (same artifact twice) | PASS | no aliasing |
+| Unicode/unusual fields in metadata | PASS | silently absorbed |
+| Recovery after exception | PASS | pipe used after CaseSchemaError produces result identical to fresh pipe |
+| Mutable singletons | N/A | all globals are frozen lookup constants |
+
+### I/O and System
+
+| Property | Result | Method |
+|----------|--------|--------|
+| datetime.now() local (no UTC) | PASS | grep: zero results without timezone |
+| tempfile without cleanup | PASS | document_integrity.py uses finally: os.unlink() |
+| json.dumps without sort_keys in hash paths | PASS | adversarial_mutation_suite and vigia_planner use sort_keys=True |
+| NaN/inf in pipeline scores | PASS | isfinite() confirmed |
+
+---
+
+## B-016 — memory_forensics.py Does Not Validate Memory Image Format (VMware vs Raw RAM Dump)
+
+| Field | Value |
+|-------|-------|
+| **Status** | OPEN |
+| **Severity** | P2 — produces uninformative error instead of clear diagnostics |
+| **File** | `vigia/sift/memory_forensics.py` (or the caller that invokes Volatility3) |
+| **Detected** | Session 2026-06-27 |
+
+### Description
+
+When a `.img` file that is actually a VMware snapshot (VMEM/snapshot format) is
+passed, Volatility3 fails with `InvalidAddressException`. The agent accepts the
+file without checking whether it is a raw RAM dump or a VMware image that requires
+companion files (`.vmss` or `.vmsn`) to resolve internal structures.
+
+### Impact
+
+- The Volatility3 error is uninformative: the user sees `InvalidAddressException`
+  with no context about why it fails.
+- If the VMware companion files are missing, there is no way to continue the memory
+  analysis — the investigation is truncated without clear diagnostics.
+- In a forensic context, this can mask unexamined evidence as "evidence not
+  available" when the problem is operational, not content-related.
+
+### Fix when applicable
+
+Add format detection before invoking Volatility3:
+1. Read the first bytes of the file and verify the magic number.
+   - Raw RAM dump (LiME): magic `0x4C694D45`
+   - VMEM VMware: different header; requires `.vmss`/`.vmsn` companion
+2. If VMware format is detected, emit a clear error message indicating that
+   companion files are required and what to do.
+3. Document the limitation in `KNOWN_LIMITATIONS.md` if it cannot be resolved
+   within the current scope.
+
+---
+
+## B-017 — `defusedxml` Missing from venv Produces Silent PIPELINE_ERROR
+
+| Field | Value |
+|-------|-------|
+| **Status** | OPEN |
+| **Severity** | P2 — the agent seals the bundle with a `PIPELINE_ERROR` verdict instead of aborting with clear diagnostics |
+| **File** | `vigia/sift/` (real orchestrator) — the `defusedxml` import fails at runtime |
+| **Detected** | Session 2026-06-27, case NPS-2010-EMAILS, Mode 1 (`vigia_agent.py`) |
+
+### Description
+
+When `defusedxml` is not installed in the venv, the real orchestrator fails to import
+the module and raises the exception:
+
+```
+FIX P2: defusedxml es obligatorio para protección contra XXE/Billion Laughs.
+Instalar: pip install defusedxml>=0.7.1
+```
+
+The agent catches the error in the orchestrator shim's `except` block, emits 0 signals,
+and seals the bundle with `verdict = PIPELINE_ERROR`. The process terminates with exit
+code 0 and `alert_level = LOW`, which masks the infrastructure failure as if it were a
+valid forensic result.
+
+### Impact
+
+- The bundle is sealed with `PIPELINE_ERROR` — a pipeline error verdict, not a forensic
+  verdict. If the execution log is not read, the result looks like a legitimate NOISE.
+- The deterministic pipeline processes no artifacts: 0 signals, 0 z-scores. The absence
+  of signals is not evidence of innocence — it is an artifact of the failure.
+- In a production or audit environment, this could register a "not malicious" finding
+  on evidence that was never analyzed.
+- `defusedxml` is a mandatory security dependency (XXE/Billion Laughs protection for
+  XML parsing). Its absence is not optional.
+
+### Fix when applicable
+
+1. Add `defusedxml>=0.7.1` to `requirements.txt` (and `pyproject.toml` if applicable).
+2. At agent startup (`vigia_agent.py`), verify that the `defusedxml` import succeeds
+   before starting the pipeline. If it fails, abort with exit code ≠ 0 and an explicit
+   message — do not seal a bundle with `PIPELINE_ERROR`.
+3. In the orchestrator shim, distinguish between "pipeline ran and produced 0 signals"
+   (legitimate NOISE) and "pipeline did not run due to dependency failure" (infrastructure
+   error — do not emit a forensic verdict).
+
+### Immediate workaround
+
+```bash
+pip install defusedxml>=0.7.1
+```
+
+### Vectors discarded as false positives
+
+- **B-009** (floats in vigia_artifact_graph.py): pure visualization module, no callers in scoring path. float() is correct for pixel size and display weight calculations.
+- **Copilot Bug 28/11/15** (signal_mapper.py .lower() on tool_name): file does not exist, bug entirely hallucinated by Copilot. Pattern does not exist in the codebase.
+- **_calibration_dataset accumulation**: initialized in __init__ but never populated between runs — no residual state.
+
+---
+
+## B-018 — Volatility3 Subprocess Timeout in `vigia_agent.py` for Large Dumps (>=4 GB)
+
+| Field | Value |
+|-------|-------|
+| **Status** | OPEN |
+| **Severity** | P1 — pipeline seals a bundle with 0 signals without warning that Volatility3 did not finish |
+| **File** | `vigia/pipeline/` / `vigia_agent.py` (vol3 subprocess orchestrator) |
+| **Detected** | Session 2026-06-27, batch NARCOS SRL-2018, 12 dumps >=4 GB |
+
+### Description
+
+The pipeline launches Volatility3 as a subprocess (`vol3` or venv `vol`) and assumes it
+finishes in ~2 seconds. For RAM memory dumps >=4 GB, individual plugins require:
+- `windows.info`: ~8–10 s
+- `windows.pslist`: ~15–20 s
+- `windows.netscan`: ~25–35 s
+- `windows.malfind`: ~25–40 s
+
+When the subprocess expires before vol3 produces output, the pipeline interprets
+the empty stdout as "0 signals" and seals the bundle with `signal_count=0`.
+
+The critical distinction that is lost:
+- `0 signals` because the dump is benign → valid NOISE
+- `0 signals` because vol3 did not finish → infrastructure artifact
+
+### Observed symptom
+
+In the NARCOS batch (12 dumps), the `_claude.json` bundles (new) produce 0 signals
+with `vol3_binary=vol3` (system binary, slower). The `_bundle.json` bundles
+(previously run with a longer or no timeout) produce actual signals:
+- `NARCOS-JOHN-PRIMARY-Day2_bundle.json`: 4 signals (LOLBAS, netscan, malfind 30 proc)
+- `NARCOS-STEVE-Day4_bundle.json`: 2 signals (pslist, malfind 21 proc)
+- `NARCOS-JANE-*_bundle.json`: 0 actual signals (Jane genuinely clean or B-018)
+
+The bundle uses `vol3_binary=/home/.../venv/bin/vol` when the timeout is sufficient,
+and `vol3_binary=vol` (system) when it is not — the binary path is an indirect
+indicator of the timeout.
+
+### Forensic impact
+
+An investigator who sees 0 signals on a John Primary Day2 dump (where there is LOLBAS,
+Discord C2, jRAT 4782, and malfind on 30 processes) could close the case as NOISE.
+This is a chain-of-custody failure, not an analysis failure.
+
+In the NARCOS context: Jane Day2/3/4 show 0 signals. It is not possible to distinguish
+from the bundle alone whether Jane is clean or whether the pipeline timed out before
+finishing.
+
+### Fix when applicable
+
+1. Increase the vol3 subprocess timeout to >=60 s per plugin (or configurable via
+   `VIGIA_VOL3_TIMEOUT_SECONDS`).
+2. Capture the subprocess returncode: if vol3 terminates due to timeout (SIGKILL/SIGTERM),
+   emit `PIPELINE_TIMEOUT` in `pipeline_meta.error`, not `signal_count=0`.
+3. Distinguish in the bundle: `"pipeline_status": "completed"` vs `"pipeline_status": "timeout"`.
+4. In the audit log, record the actual subprocess execution time.
+
+### Immediate workaround
+
+Run vol3 directly on the dump before calling `vigia_agent.py`:
+
+```bash
+vol -f /path/to/dump windows.info
+vol -f /path/to/dump windows.pslist
+vol -f /path/to/dump windows.netscan
+vol -f /path/to/dump windows.malfind
+```
+
+And use those results as context for `reason_with_llm` in Claude Code mode.
+
+### Audit note
+
+The `NARCOS-*_claude.json` bundles in `results/srl2018/` are affected by this bug.
+The `NARCOS-*_bundle.json` bundles (run with sufficient timeout) are the reference
+files for the forensic analysis of this session.
+
+---
+
 ## B-019 — `_EPC_FACTOR_TABLE` Incorrect Lookup Values for k=4..15 in `vigia_scorer.py`
 
 | Field | Value |
