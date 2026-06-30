@@ -2327,3 +2327,51 @@ y Decimal coinciden.
 **Revisar si:** el corpus crece con casos cuyos z_scores caen cerca de umbrales de
 decisión (posterior ~ 0.55 o 0.75) Y esos z_scores tienen representaciones IEEE 754
 problemáticas.
+
+---
+
+## B-045 — AndroidForensicsEngine y iOSForensicsAnalyzer nunca invocados [FIXED]
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | FIXED — 2026-06-30 |
+| **Severidad** | ALTA — evidencia Android/iOS producía 0 signals, UNDETERMINED |
+| **Archivos modificados** | `vigia_agent.py`, `sift_orchestrator.py` (shim) |
+| **Archivos afectados** | `vigia/sift/android_forensics.py`, `vigia/sift/ios_forensics.py` |
+| **Tag de restauración** | `pre-b045-android-ios-wiring-*` |
+
+### Descripción
+
+`AndroidForensicsAnalyzer` y `iOSForensicsAnalyzer` estaban completamente implementados
+(analyze(), to_signal(), _ANDROID_MARKER_FILES, _IOS_MARKER_FILES, etc.) pero nunca eran
+invocados por el pipeline. `_build_orchestrator_kwargs` no detectaba markers Android/iOS
+en directorios de evidencia, y el shim `sift_orchestrator.py` no tenía adaptadores para
+estos motores.
+
+Resultado: evidencia Android/iOS real producía 0 signals y veredicto UNDETERMINED con
+exit code 0.
+
+### Fix
+
+1. **`vigia_agent.py` → `_build_orchestrator_kwargs()`**: al escanear un directorio,
+   detectar `_ANDROID_MARKER_FILES` y `_IOS_MARKER_FILES` (importados desde los módulos,
+   no duplicados) y pasar `android_evidence_path` / `ios_evidence_path` en kwargs.
+
+2. **`sift_orchestrator.py` (shim) → `_analyze_mobile()`**: nuevo método que instancia
+   `AndroidForensicsAnalyzer` / `iOSForensicsAnalyzer`, ejecuta `.analyze()` sobre el
+   directorio de evidencia, y convierte a signal dict via `.to_signal()`.
+
+3. **`sift_orchestrator.py` (shim) → `_merge_mobile_signals()`**: merge de signals
+   móviles en el resultado del pipeline (compatible con todos los paths: EBS JSON,
+   vol3, real orchestrator).
+
+4. **Path solo-móvil**: si no hay evidencia Windows pero sí hay signals móviles,
+   retornar directamente sin caer al real orchestrator.
+
+### Validación
+
+- Baseline: 188 passed, 6 xfailed — sin regresiones.
+- Caso real: `evidence/owl-2019-nexus5-quick/` (Nexus 5, Magnet ACQUIRE):
+  - Antes: 0 signals, UNDETERMINED, exit 0
+  - Después: 1 signal ANDROID_FORENSICS (z=1.20, 21 SMS, 1 finding EMPTY_CONTACTS,
+    data_minimization=true), exit 0 (correcto: z < threshold)

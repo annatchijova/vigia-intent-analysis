@@ -2539,3 +2539,50 @@ path in `likelihood_ratio.py` is empirically safe.
 Would require rewriting `likelihood_ratio.py` to use `Decimal` with controlled precision
 for `exp()` and `log()` (stdlib `math` does not support `Decimal`; would need
 `decimal.Decimal.exp()` and `decimal.Decimal.ln()`). Estimated scope: ~100 lines.
+
+---
+
+## B-045 — AndroidForensicsEngine and iOSForensicsAnalyzer never invoked [FIXED]
+
+| Field | Value |
+|-------|-------|
+| **Status** | FIXED — 2026-06-30 |
+| **Severity** | HIGH — Android/iOS evidence produced 0 signals, UNDETERMINED |
+| **Files modified** | `vigia_agent.py`, `sift_orchestrator.py` (shim) |
+| **Files affected** | `vigia/sift/android_forensics.py`, `vigia/sift/ios_forensics.py` |
+| **Restore tag** | `pre-b045-android-ios-wiring-*` |
+
+### Description
+
+`AndroidForensicsAnalyzer` and `iOSForensicsAnalyzer` were fully implemented (analyze(),
+to_signal(), _ANDROID_MARKER_FILES, _IOS_MARKER_FILES, etc.) but never invoked by the
+pipeline. `_build_orchestrator_kwargs` did not detect Android/iOS markers in evidence
+directories, and the `sift_orchestrator.py` shim had no adapters for these engines.
+
+Result: real Android/iOS evidence produced 0 signals and UNDETERMINED verdict with
+exit code 0.
+
+### Fix
+
+1. **`vigia_agent.py` → `_build_orchestrator_kwargs()`**: when scanning a directory,
+   detect `_ANDROID_MARKER_FILES` and `_IOS_MARKER_FILES` (imported from the modules,
+   not duplicated) and pass `android_evidence_path` / `ios_evidence_path` in kwargs.
+
+2. **`sift_orchestrator.py` (shim) → `_analyze_mobile()`**: new method that instantiates
+   `AndroidForensicsAnalyzer` / `iOSForensicsAnalyzer`, runs `.analyze()` on the
+   evidence directory, and converts to signal dict via `.to_signal()`.
+
+3. **`sift_orchestrator.py` (shim) → `_merge_mobile_signals()`**: merges mobile signals
+   into the pipeline result (compatible with all paths: EBS JSON, vol3, real
+   orchestrator).
+
+4. **Mobile-only path**: if no Windows evidence is present but mobile signals exist,
+   return directly without falling through to the real orchestrator.
+
+### Validation
+
+- Baseline: 188 passed, 6 xfailed — no regressions.
+- Real case: `evidence/owl-2019-nexus5-quick/` (Nexus 5, Magnet ACQUIRE):
+  - Before: 0 signals, UNDETERMINED, exit 0
+  - After: 1 signal ANDROID_FORENSICS (z=1.20, 21 SMS, 1 finding EMPTY_CONTACTS,
+    data_minimization=true), exit 0 (correct: z < threshold)

@@ -31,13 +31,18 @@ class SIFTOrchestrator:
         self.acquisition_overrides: Dict[str, Any] = {}
 
     def analyze(self, **kwargs) -> Dict[str, Any]:
+        # B-045: run mobile forensic engines (Android/iOS) independently.
+        # These produce their own signals and merge into the final result.
+        mobile_signals = self._analyze_mobile(kwargs)
+
         log_path = kwargs.get("log_path")
         if log_path and str(log_path).endswith(".json"):
             try:
-                return self._analyze_ebs_json(str(log_path))
+                result = self._analyze_ebs_json(str(log_path))
             except Exception as e:
                 logger.error("[SIFT_SHIM] EBS JSON adapter failed: %s", e)
-                return self._error_result(str(e))
+                result = self._error_result(str(e))
+            return self._merge_mobile_signals(result, mobile_signals)
 
         memory_path = kwargs.get("memory_path")
         # Si el scanner de directorios devolvió una lista, tomar el primer elemento
@@ -63,10 +68,39 @@ class SIFTOrchestrator:
         if memory_path and not disk_path:
             logger.info("[SIFT_SHIM] Memory-only evidence → vol3 local adapter")
             try:
-                return self._analyze_memory_vol3(str(memory_path))
+                result = self._analyze_memory_vol3(str(memory_path))
             except Exception as e:
                 logger.error("[SIFT_SHIM] vol3 memory analysis failed: %s", e)
-                return self._error_result(str(e))
+                result = self._error_result(str(e))
+            return self._merge_mobile_signals(result, mobile_signals)
+
+        # B-045: if only mobile evidence is present (no Windows artifacts),
+        # return mobile signals directly without falling through to the real orchestrator.
+        has_windows_evidence = any(kwargs.get(k) for k in (
+            "memory_path", "disk_path", "event_logs", "event_stream",
+            "registry_hives", "pcap_path", "network_flows", "log_path",
+        ))
+        if not has_windows_evidence and mobile_signals:
+            result = {
+                "case_id": self.case_id,
+                "signals": mobile_signals,
+                "abduction": {
+                    "best_hypothesis": "MOBILE_EVIDENCE_ANALYZED",
+                    "is_conclusive": len(mobile_signals) > 0,
+                    "confidence": "0",
+                    "best_posterior": "0",
+                    "narrative": (
+                        f"[FIRSTNESS] Mobile forensic evidence analyzed: "
+                        f"{len(mobile_signals)} signal(s) extracted."
+                    ),
+                },
+                "pipeline_meta": {
+                    "source": "mobile_forensics_adapter",
+                    "n_mobile_signals": len(mobile_signals),
+                    "n_total_signals": len(mobile_signals),
+                },
+            }
+            return result
 
         # Disk or mixed → real orchestrator via run_full_analysis
         try:
@@ -113,15 +147,88 @@ class SIFTOrchestrator:
                     "[SIFT_SHIM] E01 requires prior mounting. "
                     "Mount with ewfmount, extract hives, then pass artifacts directly."
                 )
-                return self._error_result(
-                    "E01 disk image requires prior artifact extraction. "
-                    "Mount with ewfmount and pass registry_hives/event_logs explicitly."
+                return self._merge_mobile_signals(
+                    self._error_result(
+                        "E01 disk image requires prior artifact extraction. "
+                        "Mount with ewfmount and pass registry_hives/event_logs explicitly."
+                    ),
+                    mobile_signals,
                 )
 
-            return real.run_full_analysis(**run_kwargs)
+            result = real.run_full_analysis(**run_kwargs)
+            return self._merge_mobile_signals(result, mobile_signals)
         except Exception as e:
             logger.error("[SIFT_SHIM] Real orchestrator failed: %s", e)
-            return self._error_result(str(e))
+            return self._merge_mobile_signals(self._error_result(str(e)), mobile_signals)
+
+    # ── Mobile forensics (B-045) ────────────────────────────────────────
+
+    def _analyze_mobile(self, kwargs: Dict[str, Any]) -> list:
+        """Run Android/iOS forensic engines if evidence paths are present."""
+        signals = []
+
+        android_path = kwargs.get("android_evidence_path")
+        if android_path:
+            try:
+                from vigia.sift.android_forensics import AndroidForensicsAnalyzer
+                analyzer = AndroidForensicsAnalyzer()
+                result = analyzer.analyze(Path(android_path))
+                sig = result.to_signal()
+                if sig and (sig.z_score > 0 or result.findings or result.total_sms > 0):
+                    sig_dict = {
+                        "tool": sig.tool_name,
+                        "z_score": sig.z_score,
+                        "confidence": sig.confidence,
+                        "value": sig.value,
+                        "metadata": sig.metadata,
+                    }
+                    signals.append(sig_dict)
+                    logger.info(
+                        "[SIFT_SHIM] Android engine: %d findings, %d SMS, z=%.2f",
+                        len(result.findings), result.total_sms, sig.z_score,
+                    )
+            except Exception as e:
+                logger.error("[SIFT_SHIM] AndroidForensicsAnalyzer failed: %s", e)
+
+        ios_path = kwargs.get("ios_evidence_path")
+        if ios_path:
+            try:
+                from vigia.sift.ios_forensics import iOSForensicsAnalyzer
+                analyzer = iOSForensicsAnalyzer()
+                result = analyzer.analyze(Path(ios_path))
+                sig = result.to_signal()
+                if sig and (sig.z_score > 0 or result.findings or result.total_sms > 0):
+                    sig_dict = {
+                        "tool": sig.tool_name,
+                        "z_score": sig.z_score,
+                        "confidence": sig.confidence,
+                        "value": sig.value,
+                        "metadata": sig.metadata,
+                    }
+                    signals.append(sig_dict)
+                    logger.info(
+                        "[SIFT_SHIM] iOS engine: %d findings, %d SMS, z=%.2f",
+                        len(result.findings), result.total_sms, sig.z_score,
+                    )
+            except Exception as e:
+                logger.error("[SIFT_SHIM] iOSForensicsAnalyzer failed: %s", e)
+
+        return signals
+
+    @staticmethod
+    def _merge_mobile_signals(result: Dict[str, Any], mobile_signals: list) -> Dict[str, Any]:
+        """Merge mobile forensic signals into an existing pipeline result."""
+        if not mobile_signals:
+            return result
+        existing = result.get("signals", [])
+        if isinstance(existing, list):
+            result["signals"] = existing + mobile_signals
+        meta = result.get("pipeline_meta", {})
+        meta["n_mobile_signals"] = len(mobile_signals)
+        if "n_total_signals" in meta:
+            meta["n_total_signals"] = meta["n_total_signals"] + len(mobile_signals)
+        result["pipeline_meta"] = meta
+        return result
 
     # ── Adaptadores internos ──────────────────────────────────────────────
 

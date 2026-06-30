@@ -1075,6 +1075,21 @@ def _build_orchestrator_kwargs(evidence_path: Path, params: Dict) -> Dict:
                     kwargs[key] = existing + matches
                 else:
                     kwargs[key] = [existing] + matches
+
+        # B-045: detect Android/iOS evidence directories by marker files
+        all_names = {f.name for f in evidence_path.rglob("*") if f.is_file() and not f.is_symlink()}
+        try:
+            from vigia.sift.android_forensics import _ANDROID_MARKER_FILES
+            if all_names & _ANDROID_MARKER_FILES:
+                kwargs["android_evidence_path"] = str(evidence_path)
+        except ImportError:
+            pass
+        try:
+            from vigia.sift.ios_forensics import _IOS_MARKER_FILES
+            if all_names & _IOS_MARKER_FILES:
+                kwargs["ios_evidence_path"] = str(evidence_path)
+        except ImportError:
+            pass
     else:
         # Single file — detect type by extension
         suffix = evidence_path.suffix.lower()

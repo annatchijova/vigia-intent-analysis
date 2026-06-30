@@ -1572,3 +1572,53 @@ being available in `PATH`. If tshark is not installed, pcap evidence will fail w
 - tshark subprocess tiene timeout de 120 segundos — pcaps extremadamente grandes pueden excederlo.
 
 ---
+
+## L-041 — android_forensics.py: SMS content analysis limited to encrypted-app keyword matching [PENDING]
+
+**Status:** PENDING — documented limitation
+**Severity:** P1 — false negative risk on transaction/coordination content
+**File:** `vigia/sift/android_forensics.py::_analyze_sms()`
+**Discovered:** 2026-06-30, case VIGIA-OWL-2019-NEXUS5-QUICK
+
+### Description
+
+`_analyze_sms()` has exactly one detection rule: scanning outgoing SMS bodies
+for mentions of encrypted-app names (Signal, Wickr, etc.) to flag
+"SMS_ENCRYPTED_RECRUITMENT". It has no general-purpose content analysis for:
+- Transaction/coordination language (price, time, location, delivery terms)
+- Unknown/suspicious sender numbers
+- Message frequency or burst patterns
+- Cross-reference against contacts (sender not in contacts2.db)
+
+### Real case demonstrating the gap
+
+Owl 2019 Nexus5-Quick scenario (Digital Corpora, ground-truth documented):
+SMS from `+13045184333`: "Sarah, the delivery is today 7 tonight the
+confirmation will come later through pidgin." This is the exact coordination
+message the scenario was designed to test ("One message sent via SMS should
+confirm the time of the trade" — per scenario build guidelines). The message
+contains no encrypted-app keywords, so it does not match any existing rule.
+Result: 0 findings related to message content; only EMPTY_CONTACTS fired
+(z=1.20, structural signal unrelated to the actual evidence).
+
+### Why this matters
+
+This is a coverage gap distinct from B-045 (wiring). B-045 fixed the pipeline
+so AndroidForensicsAnalyzer actually runs — but once it runs, its SMS analysis
+is narrow by design. The scenario's own ground truth (AXIOM commercial tool,
+project logs) confirms this message exists and is the key evidence; VIGÍA's
+deterministic pipeline cannot see it without a new detection rule.
+
+### Fix path
+
+Requires new finding types in `_analyze_sms()`:
+- Generic transaction-language pattern (regex/keyword set: price/time/location
+  terms — needs calibration to avoid false positives on legitimate planning SMS)
+- Sender-not-in-contacts cross-reference (requires `_analyze_contacts()` to run
+  first and pass known numbers to `_analyze_sms()`)
+- This should NOT be a hardcoded "owl" keyword list — must generalize to any
+  transaction-coordination pattern, or it only solves this one scenario.
+
+Do not implement without calibration data across more cases — same caution
+as L-033 gamma calibration. A naive price/time/location keyword set risks
+false positives on ordinary scheduling SMS.
