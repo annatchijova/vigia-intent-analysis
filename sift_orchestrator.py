@@ -213,6 +213,30 @@ class SIFTOrchestrator:
             except Exception as e:
                 logger.error("[SIFT_SHIM] iOSForensicsAnalyzer failed: %s", e)
 
+        # B-046: Google Takeout forensics
+        takeout_path = kwargs.get("takeout_evidence_path")
+        if takeout_path:
+            try:
+                from vigia.sift.google_takeout_forensics import GoogleTakeoutForensicsAnalyzer
+                analyzer = GoogleTakeoutForensicsAnalyzer()
+                result = analyzer.analyze(Path(takeout_path))
+                sig = result.to_signal()
+                if sig and (sig.z_score > 0 or result.findings):
+                    sig_dict = {
+                        "tool": sig.tool_name,
+                        "z_score": sig.z_score,
+                        "confidence": sig.confidence,
+                        "value": sig.value,
+                        "metadata": sig.metadata,
+                    }
+                    signals.append(sig_dict)
+                    logger.info(
+                        "[SIFT_SHIM] Google Takeout engine: %d findings, z=%.2f",
+                        len(result.findings), sig.z_score,
+                    )
+            except Exception as e:
+                logger.error("[SIFT_SHIM] GoogleTakeoutForensicsAnalyzer failed: %s", e)
+
         return signals
 
     @staticmethod

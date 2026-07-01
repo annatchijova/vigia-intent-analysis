@@ -1090,6 +1090,13 @@ def _build_orchestrator_kwargs(evidence_path: Path, params: Dict) -> Dict:
                 kwargs["ios_evidence_path"] = str(evidence_path)
         except ImportError:
             pass
+        # B-046: detect Google Takeout evidence directories by marker files
+        try:
+            from vigia.sift.google_takeout_forensics import _TAKEOUT_MARKER_FILES
+            if all_names & _TAKEOUT_MARKER_FILES:
+                kwargs["takeout_evidence_path"] = str(evidence_path)
+        except ImportError:
+            pass
     else:
         # Single file — detect type by extension
         suffix = evidence_path.suffix.lower()

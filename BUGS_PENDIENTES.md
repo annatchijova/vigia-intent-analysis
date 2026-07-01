@@ -2375,3 +2375,72 @@ exit code 0.
   - Antes: 0 signals, UNDETERMINED, exit 0
   - Después: 1 signal ANDROID_FORENSICS (z=1.20, 21 SMS, 1 finding EMPTY_CONTACTS,
     data_minimization=true), exit 0 (correcto: z < threshold)
+
+---
+
+## B-046 — GoogleTakeoutForensicsAnalyzer nunca invocado [FIXED]
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | FIXED — 2026-06-30 |
+| **Severidad** | ALTA — evidencia Google Takeout producía 0 signals, UNDETERMINED |
+| **Archivos modificados** | `vigia_agent.py`, `sift_orchestrator.py` (shim) |
+| **Archivos afectados** | `vigia/sift/google_takeout_forensics.py` |
+| **Tag de restauración** | `pre-b046-takeout-wiring-*` |
+
+### Descripción
+
+`GoogleTakeoutForensicsAnalyzer` estaba completamente implementado (analyze(), to_signal(),
+_TAKEOUT_MARKER_FILES, etc.) pero nunca era invocado por el pipeline.
+`_build_orchestrator_kwargs` no detectaba markers de Google Takeout en directorios de
+evidencia, y el shim `sift_orchestrator.py` no tenía adaptador para este motor.
+
+Mismo patrón exacto que B-045 (Android/iOS wiring).
+
+Resultado: evidencia Google Takeout real producía 0 signals y veredicto UNDETERMINED con
+exit code 0.
+
+### Fix
+
+1. **`vigia_agent.py` → `_build_orchestrator_kwargs()`**: al escanear un directorio,
+   detectar `_TAKEOUT_MARKER_FILES` (importado desde el módulo, no duplicado) y pasar
+   `takeout_evidence_path` en kwargs.
+
+2. **`sift_orchestrator.py` (shim) → `_analyze_mobile()`**: bloque adicional que
+   instancia `GoogleTakeoutForensicsAnalyzer`, ejecuta `.analyze()` sobre el directorio
+   de evidencia, y convierte a signal dict via `.to_signal()`. Guard condition adaptado
+   (sin `total_sms` — el módulo Takeout no tiene ese atributo).
+
+### Validación
+
+- Baseline: 188 passed, 6 xfailed — sin regresiones.
+- Caso real: `evidence/takeout-2020/Takeout` (Google Takeout export):
+  - Antes: 0 signals, UNDETERMINED, exit 0
+  - Después: 1 signal GOOGLE_TAKEOUT_FORENSICS (z=4.20, 43 findings,
+    BROWSER_EXPLOIT_RESEARCH + ROOT_TOOL_INSTALLED + SUSPICIOUS_INSTALLED_APP +
+    LOCATION_HISTORY_GAP + OPSEC_ROOT_TOOLCHAIN), exit 0
+
+---
+
+## B-047 — _build_correlation_groups() retorna List[List[int]], noisy_or_correlated espera Dict[int, Set[int]] [PENDING]
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | PENDING |
+| **Severidad** | LATENTE — no explota con el corpus actual |
+| **Archivos afectados** | `vigia/sift/android_forensics.py`, `vigia/sift/ios_forensics.py`, `vigia/sift/macos_forensics.py` |
+
+### Descripción
+
+`_build_correlation_groups()` en los tres módulos retorna `List[List[int]]` pero
+`noisy_or_correlated()` (en `vigia/core/noisy_or.py`) espera `Dict[int, Set[int]]`.
+
+No explota actualmente porque ningún caso del corpus produce >=2 findings con el
+mismo `corr_group` en estos módulos. Si se agrega evidencia con correlación cruzada
+entre findings, la llamada fallará con TypeError.
+
+### Acción requerida
+
+Alinear el tipo de retorno de `_build_correlation_groups()` en los tres módulos con
+la firma esperada por `noisy_or_correlated()`, o adaptar `noisy_or_correlated()` para
+aceptar ambos formatos.
