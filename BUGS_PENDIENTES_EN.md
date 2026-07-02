@@ -2782,3 +2782,106 @@ Verification by presence of replacement; anchor-absence requirement only for
 substitutive patches. Also: idempotency detection ([SKIP] if replacement is
 already present), allowing patch scripts to be re-run after partial failures.
 Full changelog in the engine docstring.
+
+---
+
+## VAL-001 — MacOSForensicsAnalyzer: Real-Evidence Validation Against Digital Corpora Tuck-2019
+
+| Field | Value |
+|-------|-------|
+| **Type** | Validation (not a bug — confirms correct behavior) |
+| **Status** | VALIDATED — 2026-07-02 |
+| **Severity** | N/A — positive validation result |
+| **Corpus** | Digital Corpora — M57.Biz scenario, Tuck-2019 macOS image |
+| **Evidence SHA-256** | `8d38f0b18af01070ebad98313b4649d47ca269cd1906fae9aba4bf10694324c6` |
+| **Bundle (Mode 1)** | `results/agent_batch/VIGIA-TUCK-2019-MACOS_ewfmount_bundle.json` |
+| **Bundle (Mode 2)** | `results/VIGIA-REAL-010_bundle_claude.json` |
+| **Bundle SHA-256 (Mode 1)** | `9c8eb615d6adaaac905b102ec6f4bc4fe21c7d305e9e648e99fa167770a4c95d` |
+| **Bundle SHA-256 (Mode 2)** | `d97c44c39bf6b7566ea7d55ce6badfdfb91736af55cc4fd9e9b1b8d5ffa403de` |
+| **Restore tag** | `pre-tuck-2019-bundle-20260702-003623` |
+| **Exit code** | 3 (INTENT/SUSPICION) |
+| **Examiner** | Simson Garfinkel |
+| **Acquisition** | ewfmount (read-only mount, write blocker: true) |
+
+### Description
+
+End-to-end validation of `vigia/sift/macos_forensics.py` against a real macOS
+forensic image from the Digital Corpora M57.Biz scenario (Tuck Gorge's MacBook).
+The image is mounted read-only via ewfmount at:
+`/mnt/vigia_tuck_macOS2019_fs/root/Users/tuckgorge/`
+
+### Artifacts Analyzed
+
+- **Safari History.db**: 198 entries. MACOS_FORENSICS detected 23 SAFARI_SUSPICIOUS
+  findings. Direct SQLite queries confirm:
+  - `softether-download.com` (4 visits, 2019-10-18 00:56 UTC)
+  - `softether.org` VPN docs including NAT traversal configuration
+  - `"vpn software that runs over http"` — operationally specific evasion query
+  - `"autopsy"` / `"autopsey"` — Autopsy DFIR platform research (2019-10-16)
+
+- **Quarantine Events (QuarantineEventsV2)**: 4 events correctly detected.
+  Timestamps (CoreData epoch → UTC): 2019-07-12, 2019-08-17, 2019-08-19, 2019-09-08.
+  Chrome x2, Firefox 68.0.2, NYT image.
+
+### Forensic Findings Confirmed
+
+**F-001 — Counter-Forensics Reconnaissance (INTENT, CONFIRMED):**
+Subject researched Autopsy DFIR platform on 2019-10-16 17:45 UTC (9 visits, 14s
+window, typo → correction sequence). Establishes counter-forensics awareness.
+
+**F-002 — VPN-over-HTTP Research Chain → SoftEther NAT Traversal (INTENT, CONFIRMED):**
+31.3 hours after Autopsy research: 9.4-minute systematic chain from Google search
+"vpn software that runs over http" through SoftEther product comparison, installer
+download, and NAT traversal configuration documentation (final destination:
+`softether.org/4-docs/2-howto/6.VPN_Server_Behind_NAT_or_Firewall/1.Dynamic_DNS_and_NAT_Traversal`).
+MITRE: T1572 (Protocol Tunneling), T1071.001, T1090.
+
+**F-003 — ADV_ROBUST COORDINATED_EVASION z=3.500 (SUSPICION, gate-capped):**
+Four tools (EVENT_LOG, CROSS_RESONANCE, CASE_PATTERN_LIBRARY, UNIFIED_TIMELINE)
+at z=0.000. Correctly capped at SUSPICION by platform coverage gate (macOS-only
+image; Windows-oriented tools produce z=0 by design — documented limitation).
+
+### MACOS_FORENSICS Signal Scores
+
+| Signal | z-score | Value | Confidence |
+|--------|---------|-------|------------|
+| MACOS_FORENSICS | 1.600 | 0.320 | 0.95 |
+| ADV_ROBUST | 3.500 | 1.000 | 0.70 |
+| EVENT_LOG | 0.000 | 0.000 | 0.00 |
+| CROSS_RESONANCE | 0.000 | 0.000 | 0.00 |
+| CASE_PATTERN_LIBRARY | 0.000 | 0.000 | 0.00 |
+| UNIFIED_TIMELINE | 0.000 | 0.000 | 0.00 |
+
+composite_score: 19/20, artifact_reliability: 7/10.
+
+### Self-Correction Events
+
+1. **F-003 Daubert gate** (architectural): ADV_ROBUST z=3.500 candidate INTENT
+   downgraded to SUSPICION by platform coverage gate. MacOS image → Windows tools
+   produce z=0 by design → single-platform evidence → cap at SUSPICION.
+   No incorrect verdict was sealed.
+
+2. **F-004 Browser cycling** (analytical): Browser cycling (Chrome x2, Firefox)
+   downgraded from INTENT candidate to SUSPICION. Insufficient evidence to distinguish
+   evasion from ordinary maintenance without per-browser session attribution.
+
+### Open Questions
+
+1. SoftEther VPN installation not confirmed — `/Applications/SoftEtherVPN.app`
+   and `jp.softether.*` plists not queried. Follow-up required.
+2. Is `tuckgorge@gmail.com` the same actor as `tuckergorge@gmail.com` (M57.biz
+   attacker confirmed in VIGIA-REAL-009)? One character difference — cannot confirm
+   shared identity without additional attribution.
+3. `hostname` and `macos_version` blank in MACOS_FORENSICS output — read
+   `SystemConfiguration/preferences.plist` to populate.
+
+### Validation Result
+
+`macos_forensics.py` correctly:
+- Detected 198 Safari entries and extracted 23 SAFARI_SUSPICIOUS findings
+- Counted 4 quarantine events
+- Produced z=1.600 for MACOS_FORENSICS signal (escalation ladder: `has_suspicious_search`)
+- Emitted exit code 3 (INTENT/SUSPICION) — correct for this evidence
+- Detected COORDINATED_EVASION via ADV_ROBUST and correctly gate-capped it
+
+No regressions introduced. Full suite: 205 passed, 6 xfailed, 0 failures.
