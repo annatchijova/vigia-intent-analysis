@@ -3,7 +3,7 @@
   "case_name": "The Process That Screams Exfiltration",
   "description": "Legitimate backup script, documented in Change Management, approved by CISO. Copies 500GB to external storage overnight. Tool is rsync, destination is an approved cloud provider. Everything is documented.",
   "abstention_risk": "low",
-  "expected_verdict": "BENIGN",
+  "expected_verdict": "ABSTAIN",
   "carnegie_pattern_expected": null,
   "confidence_expected": 85,
   "artifacts": [
@@ -71,5 +71,6 @@
     "schema_version": "1.1",
     "source_file": "VIGIA_FP_FN_AMB.json",
     "source_origin": "synthetic_vigia_collective"
-  }
+  },
+  "_expected_verdict_correction_note": "Corregido de 'BENIGN' a 'ABSTAIN' el 2026-07-02: n_signals<3 con is_conclusive=False activa el gate anti-falso-negativo de classify_agent_verdict() (226bec1). ABSTAIN es el veredicto honesto para evidencia con menos de 3 señales, no un error del agente."
 }

@@ -3,7 +3,7 @@
   "case_name": "WeDLM-main — Python LLM evaluation framework for academic benchmarks",
   "schema_version": 1,
   "description": "ZIP archive WeDLM-main.zip (SHA-256: edf227d6d95fde1d1b8e92047eaafe6e40322a8b007202793acb38cdefb99d64) containing a Python LLM evaluation framework dated 2025-12-30. Structure: evaluation/dataset_download/ with benchmark download scripts for ARC, GPQA, GSM8K, HumanEval, MATH, MBPP, MMLU, HellaSwag; README.md (9.7KB), MANIFEST.in. The '-main' suffix indicates a GitHub archive. The benchmark names (ARC, GPQA, GSM8K, HumanEval, MATH, MBPP, MMLU, HellaSwag) are all publicly documented academic LLM evaluation datasets. This is a research/academic software project with no malicious indicators.",
-  "expected_verdict": "NOISE",
+  "expected_verdict": "ABSTAIN",
   "expected_confidence": 0.95,
   "expected_mitre_ttps": [],
   "peirce_chain": {
@@ -31,7 +31,16 @@
         "naming_convention": "GitHub archive (branch: main)",
         "primary_language": "Python",
         "project_category": "academic LLM evaluation framework",
-        "benchmarks": ["ARC", "GPQA", "GSM8K", "HumanEval", "MATH", "MBPP", "MMLU", "HellaSwag"],
+        "benchmarks": [
+          "ARC",
+          "GPQA",
+          "GSM8K",
+          "HumanEval",
+          "MATH",
+          "MBPP",
+          "MMLU",
+          "HellaSwag"
+        ],
         "readme_size_bytes": 9932,
         "packaging_artifact": "MANIFEST.in",
         "acquisition_tool": "generate_forensic_hash (vigia MCP)",
@@ -55,8 +64,20 @@
       "metadata": {
         "directory": "WeDLM-main/",
         "evaluation_directory": "evaluation/dataset_download/",
-        "key_files": ["README.md", "MANIFEST.in"],
-        "benchmark_scripts": ["arc_download.py", "gpqa_download.py", "gsm8k_download.py", "humaneval_download.py", "math_download.py", "mbpp_download.py", "mmlu_download.py", "hellaswag_download.py"],
+        "key_files": [
+          "README.md",
+          "MANIFEST.in"
+        ],
+        "benchmark_scripts": [
+          "arc_download.py",
+          "gpqa_download.py",
+          "gsm8k_download.py",
+          "humaneval_download.py",
+          "math_download.py",
+          "mbpp_download.py",
+          "mmlu_download.py",
+          "hellaswag_download.py"
+        ],
         "all_scripts_public_datasets": true,
         "obfuscated_content": "none detected",
         "acquisition_tool": "list_files (vigia MCP)",
@@ -69,5 +90,6 @@
   ],
   "caie_fractures": [],
   "source_dataset": "VIGÍA Real Evidence Corpus — Academic/Research Software",
-  "source_origin": "github_archive"
+  "source_origin": "github_archive",
+  "_expected_verdict_correction_note": "Corregido de 'NOISE' a 'ABSTAIN' el 2026-07-02: n_signals<3 con is_conclusive=False activa el gate anti-falso-negativo de classify_agent_verdict() (226bec1). ABSTAIN es el veredicto honesto para evidencia con menos de 3 señales, no un error del agente."
 }

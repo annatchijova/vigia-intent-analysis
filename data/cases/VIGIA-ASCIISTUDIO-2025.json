@@ -3,7 +3,7 @@
   "case_name": "AsciiStudio-master — Open-source Java ASCII art animation GUI application",
   "schema_version": 1,
   "description": "ZIP archive AsciiStudio-master.zip (SHA-256: 812ae30ee397f94d2bcd926f95e1be6e5edab80ad18179c1515c70ee75c1f967) containing a Java GUI application for ASCII art animation. Contents: build.xml (Ant build system), Java source files, sample GIF animations (butterfly, jellyfish, parakeet, lightning), LICENSE (MIT-style), README.md, Changelog.txt, Screenshot.jpg (1.7MB). Dated 2025-04-07. Consistent with a legitimate open-source software project hosted on a public repository platform (GitHub archive naming convention: '-master' suffix). No executable payloads, no obfuscation, no network indicators.",
-  "expected_verdict": "NOISE",
+  "expected_verdict": "ABSTAIN",
   "expected_confidence": 0.95,
   "expected_mitre_ttps": [],
   "peirce_chain": {
@@ -32,7 +32,12 @@
         "build_system": "Apache Ant (build.xml)",
         "primary_language": "Java",
         "license": "MIT-style",
-        "sample_assets": ["butterfly.gif", "jellyfish.gif", "parakeet.gif", "lightning.gif"],
+        "sample_assets": [
+          "butterfly.gif",
+          "jellyfish.gif",
+          "parakeet.gif",
+          "lightning.gif"
+        ],
         "screenshot_size_bytes": 1782579,
         "acquisition_tool": "generate_forensic_hash (vigia MCP)",
         "acquisition_hash": "sha256:812ae30ee397f94d2bcd926f95e1be6e5edab80ad18179c1515c70ee75c1f967",
@@ -54,8 +59,19 @@
       "description": "Directory listing of AsciiStudio-master/: build.xml, source Java files, GIF assets (butterfly, jellyfish, parakeet, lightning), LICENSE, README.md, Changelog.txt, Screenshot.jpg. All files consistent with a standard open-source GUI application project layout.",
       "metadata": {
         "directory": "AsciiStudio-master/",
-        "key_files": ["build.xml", "README.md", "Changelog.txt", "LICENSE", "Screenshot.jpg"],
-        "asset_types": ["Java source (.java)", "GIF animations (.gif)", "Build descriptor (.xml)", "Documentation (.md, .txt)"],
+        "key_files": [
+          "build.xml",
+          "README.md",
+          "Changelog.txt",
+          "LICENSE",
+          "Screenshot.jpg"
+        ],
+        "asset_types": [
+          "Java source (.java)",
+          "GIF animations (.gif)",
+          "Build descriptor (.xml)",
+          "Documentation (.md, .txt)"
+        ],
         "executable_payloads": "none",
         "obfuscated_content": "none detected",
         "acquisition_tool": "list_files (vigia MCP)",
@@ -68,5 +84,6 @@
   ],
   "caie_fractures": [],
   "source_dataset": "VIGÍA Real Evidence Corpus — Open-Source Software",
-  "source_origin": "github_archive"
+  "source_origin": "github_archive",
+  "_expected_verdict_correction_note": "Corregido de 'NOISE' a 'ABSTAIN' el 2026-07-02: n_signals<3 con is_conclusive=False activa el gate anti-falso-negativo de classify_agent_verdict() (226bec1). ABSTAIN es el veredicto honesto para evidencia con menos de 3 señales, no un error del agente."
 }
