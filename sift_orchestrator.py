@@ -135,6 +135,7 @@ class SIFTOrchestrator:
         has_windows_evidence = any(kwargs.get(k) for k in (
             "memory_path", "disk_path", "event_logs", "event_stream",
             "registry_hives", "pcap_path", "network_flows", "log_path",
+            "browser_profile",
         ))
         if not has_windows_evidence and mobile_signals:
             result = {
@@ -195,6 +196,11 @@ class SIFTOrchestrator:
             rh = kwargs.get("registry_hives")
             if rh:
                 run_kwargs["registry_hives"] = rh if isinstance(rh, list) else [rh]
+            # Browser profile (Chromium History / Firefox places.sqlite) — parser
+            # SQLite real (P1-A). Se pasa el directorio del perfil.
+            bp = kwargs.get("browser_profile")
+            if bp:
+                run_kwargs["browser_profile"] = bp[0] if isinstance(bp, list) else bp
 
             # disk_path (E01) has no direct mapping — requires prior mounting
             # and artifact extraction (ewfmount + registry hive extraction)

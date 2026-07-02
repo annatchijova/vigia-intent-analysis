@@ -201,6 +201,80 @@ class TestVol3Unavailable:
 # P1-E — event log de formato no soportado → UNANALYZED note
 # ──────────────────────────────────────────────────────────────────────────
 
+class TestResilientOrchestratorConstruction:
+    def test_missing_dependency_disables_only_that_engine(self, monkeypatch):
+        # Un motor cuyo __init__ lanza (binario ausente) no debe tumbar el
+        # orquestador entero — queda None, el resto opera.
+        import vigia.sift.sift_orchestrator as orch_mod
+
+        class _Boom:
+            def __init__(self, *a, **k):
+                raise RuntimeError("binario 'vol' no encontrado en PATH")
+
+        monkeypatch.setattr(orch_mod, "MemoryForensicsEngine", _Boom)
+        o = orch_mod.SIFTOrchestrator("CASE-RESILIENT")
+        assert o.memory is None            # motor deshabilitado
+        assert o.eventlog is not None      # el resto vive
+        assert o.reasoner is not None
+
+    def test_analysis_runs_without_memory_engine(self, monkeypatch, tmp_path):
+        import vigia.sift.sift_orchestrator as orch_mod
+
+        class _Boom:
+            def __init__(self, *a, **k):
+                raise RuntimeError("vol ausente")
+
+        monkeypatch.setattr(orch_mod, "MemoryForensicsEngine", _Boom)
+        o = orch_mod.SIFTOrchestrator("CASE-NOVOL")
+        # No lanza aunque se pida memory_dump_path (motor None → se salta)
+        result = o.run_full_analysis(memory_dump_path=str(tmp_path / "mem.raw"))
+        assert "abduction" in result
+
+
+class TestPathGuardAllowDir:
+    def _guard(self, base):
+        from vigia.core.path_guard import PathGuard
+        return PathGuard(allowed_base_paths=[base])
+
+    def test_directory_rejected_without_allow_dir(self, tmp_path):
+        d = tmp_path / "profile"
+        d.mkdir()
+        r = self._guard(tmp_path).validate(str(d), for_read=True)
+        assert not r.valid and r.reason == "NOT_A_REGULAR_FILE"
+
+    def test_directory_accepted_with_allow_dir(self, tmp_path):
+        d = tmp_path / "profile"
+        d.mkdir()
+        r = self._guard(tmp_path).validate(str(d), for_read=True, allow_dir=True)
+        assert r.valid
+
+    def test_regular_file_still_accepted_with_allow_dir(self, tmp_path):
+        f = tmp_path / "History"
+        f.write_bytes(b"data")
+        r = self._guard(tmp_path).validate(str(f), for_read=True, allow_dir=True)
+        assert r.valid
+
+
+class TestUnanalyzedStubsHonest:
+    @pytest.mark.parametrize("module,cls", [
+        ("vigia.sift.amcache_shimcache", "AmcacheShimcacheAnalyzer"),
+        ("vigia.sift.usb_device_tracker", "USBDeviceTracker"),
+    ])
+    def test_stub_engines_mark_unanalyzed(self, module, cls):
+        import importlib
+        mod = importlib.import_module(module)
+        engine = getattr(mod, cls)()
+        # Cada stub expone un método analyze_* — obtener el resultado y su señal.
+        # amcache: analyze(); usb: analyze_registry_hive()
+        if cls == "AmcacheShimcacheAnalyzer":
+            res = engine.analyze(amcache_path=None, system_hive_path=None)
+        else:
+            res = engine.analyze_registry_hive("/nonexistent")
+        meta = res.to_signal().metadata
+        assert meta.get("unanalyzed") is True, \
+            f"{cls}: stub debe marcar unanalyzed, no presentarse como limpio"
+
+
 class TestEventLogUnanalyzed:
     def test_plaintext_log_surfaces_unanalyzed(self, tmp_path):
         from vigia.sift.event_log_correlator import EventLogCorrelator

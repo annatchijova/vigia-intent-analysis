@@ -187,12 +187,19 @@ class SIFTOrchestrator:
         self.acquisition_overrides: Dict[str, Any] = {}
         self.path_guard = PathGuard(allowed_base_paths=_evidence_allowlist())
 
-        # SIFT motores originales
-        self.memory = MemoryForensicsEngine()
-        self.registry = RegistryTimelineReconstructor()
-        self.eventlog = EventLogCorrelator()
-        self.disk = MFTTimelineAnalyzer()
-        self.network = NetworkForensicsEngine()
+        # SIFT motores originales.
+        # FIX (auditoría FN, P1-D): construcción resiliente. Algunos motores
+        # validan un binario externo en su __init__ (MemoryForensicsEngine →
+        # `vol`, RegistryTimelineReconstructor → `rip.pl`) y lanzan si falta.
+        # Antes eso tumbaba el orquestador ENTERO, deshabilitando incluso los
+        # motores que no necesitan ese binario (browser/event log/network/MFT,
+        # que son stdlib). Ahora una dependencia ausente deshabilita SOLO su
+        # motor (queda None); el resto del pipeline opera.
+        self.memory = self._safe_engine("memory", MemoryForensicsEngine)
+        self.registry = self._safe_engine("registry", RegistryTimelineReconstructor)
+        self.eventlog = self._safe_engine("eventlog", EventLogCorrelator)
+        self.disk = self._safe_engine("disk", MFTTimelineAnalyzer)
+        self.network = self._safe_engine("network", NetworkForensicsEngine)
 
         # SIFT motores nuevos (instanciar solo si existen)
         self.prefetch = PrefetchAnalyzer() if PrefetchAnalyzer else None
@@ -212,15 +219,35 @@ class SIFTOrchestrator:
         self.adv_robust = AdversarialRobustnessEngine() if AdversarialRobustnessEngine else None
         self.reasoner = AbductiveReasoner()
 
-    def _safe_path(self, path_str: Optional[str], for_read: bool = True) -> Optional[Path]:
+    @staticmethod
+    def _safe_engine(name: str, ctor):
+        """
+        Instancia un motor; si su constructor falla (p.ej. binario externo
+        ausente), lo deshabilita (None) en vez de propagar el fallo al
+        orquestador completo. La dependencia ausente se degrada a "motor no
+        disponible", no a "pipeline caído".
+        """
+        try:
+            return ctor()
+        except Exception as e:  # pylint: disable=broad-except
+            logger.error("[SIFT] Motor '%s' no disponible (dependencia ausente?): %s",
+                         name, e)
+            return None
+
+    def _safe_path(self, path_str: Optional[str], for_read: bool = True,
+                   allow_dir: bool = False) -> Optional[Path]:
         """
         FIX V4+P2: PathGuard con TOCTOU completo. Si falla, loggea y retorna None.
         Usa safe_read para lecturas seguras integradas.
+
+        allow_dir=True para motores que operan sobre directorios (browser
+        profile, prefetch dir) — sin esto PathGuard rechazaba el directorio con
+        NOT_A_REGULAR_FILE y el motor nunca corría (falso negativo, P1-A/P0-C).
         """
         if not path_str:
             return None
         try:
-            check = self.path_guard.validate(path_str, for_read=for_read)
+            check = self.path_guard.validate(path_str, for_read=for_read, allow_dir=allow_dir)
             if not check.valid:
                 logger.error("PathGuard REJECT %s: %s", path_str, check.reason)
                 return None
@@ -287,7 +314,7 @@ class SIFTOrchestrator:
         # ============================================================
 
         # 1.1 Memory
-        if memory_dump_path:
+        if memory_dump_path and self.memory:
             v = self._safe_path(memory_dump_path)
             if v:
                 try:
@@ -302,7 +329,7 @@ class SIFTOrchestrator:
                     results["memory"] = {"error": str(e)}
 
         # 1.2 Registry
-        if registry_hives:
+        if registry_hives and self.registry:
             registry_signals = []
             for hive in sorted(registry_hives):
                 v = self._safe_path(hive)
@@ -322,7 +349,7 @@ class SIFTOrchestrator:
             results["registry"] = [s.metadata for s in registry_signals]
 
         # 1.3 Event Logs
-        if event_logs:
+        if event_logs and self.eventlog:
             safe_logs = []
             for lp in event_logs:
                 v = self._safe_path(lp)
@@ -341,7 +368,7 @@ class SIFTOrchestrator:
                     results["eventlog"] = {"error": str(e)}
 
         # 1.4 Disk (MFT)
-        if mft_json:
+        if mft_json and self.disk:
             try:
                 mft_bytes = json.dumps(json.loads(mft_json), sort_keys=True, separators=(",", ":")).encode()
                 disk_result = self.disk.analyze(mft_bytes, mft_json, self.chain, timestamp_utc)
@@ -355,7 +382,7 @@ class SIFTOrchestrator:
                 results["disk"] = {"error": str(e)}
 
         # 1.5 Network
-        if network_flows:
+        if network_flows and self.network:
             try:
                 net_result = self.network.analyze(
                     sorted(network_flows, key=lambda f: (f.timestamp, f.src_ip, f.dst_ip))
@@ -375,7 +402,7 @@ class SIFTOrchestrator:
 
         # 2.1 Prefetch
         if prefetch_dir and self.prefetch:
-            v = self._safe_path(prefetch_dir)
+            v = self._safe_path(prefetch_dir, allow_dir=True)
             if v:
                 try:
                     pf_result = self.prefetch.analyze_directory(str(v), self.chain, timestamp_utc)
@@ -403,7 +430,7 @@ class SIFTOrchestrator:
 
         # 2.3 Browser
         if browser_profile and self.browser:
-            v = self._safe_path(browser_profile)
+            v = self._safe_path(browser_profile, allow_dir=True)
             if v:
                 try:
                     br_result = self.browser.analyze_profile(str(v), self.chain, timestamp_utc)
@@ -701,6 +728,18 @@ class SIFTOrchestrator:
         except Exception as e:
             logger.error("AbductiveV2 prep failed: %s", e)
         # ====================================================================
+        # Artefactos NO analizados (motores stub / DBs ilegibles / dependencias
+        # ausentes). Visibilidad para que el agente distinga "no analizado" de
+        # "analizado y limpio" — 0 hallazgos aquí NO es evidencia de benignidad.
+        unanalyzed_artifacts = sorted({
+            s.metadata.get("artifact_type", s.tool_name)
+            for s in all_signals
+            if isinstance(s.metadata, dict) and s.metadata.get("unanalyzed")
+        })
+        if unanalyzed_artifacts:
+            results["unanalyzed_artifacts"] = unanalyzed_artifacts
+            logger.warning("[SIFT] Artefactos no analizados: %s", unanalyzed_artifacts)
+
         return {
             "case_id": self.case_id,
             "custody": custody_export,
@@ -718,6 +757,7 @@ class SIFTOrchestrator:
                 "n_sift_signals": len(frs_adjusted),
                 "n_engine_signals": len(engine_signals),
                 "n_total_signals": len(all_signals),
+                "n_unanalyzed_artifacts": len(unanalyzed_artifacts),
                 "frs_groups": len(frs_groups),
                 "gamma_applied": True,
                 "anti_silencing": True,
