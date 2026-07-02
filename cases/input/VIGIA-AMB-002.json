@@ -1,0 +1,90 @@
+{
+  "case_id": "VIGIA-AMB-002",
+  "case_name": "The Analyst's Error",
+  "description": "Tier-1 SOC analyst modifies a rule without a change ticket, citing 'human error'. The modification disables a critical alert. Could be: (1) genuine error, (2) insider sabotage, (3) negligence.",
+  "abstention_risk": "high",
+  "expected_verdict": "ABSTAIN",
+  "carnegie_pattern_expected": null,
+  "confidence_expected": 50,
+  "artifacts": [
+    {
+      "artifact_id": "amb002_01",
+      "evidence_type": "log_entry",
+      "source_tool": "sift_syslog",
+      "timestamp": "2026-06-15T08:00:00Z",
+      "raw_score": 0.55,
+      "prior_trust": 0.6,
+      "provenance_chain": [
+        "sha256:amb002sys01"
+      ],
+      "description": "Tier-1 analyst disabled DLP rule DLP-001",
+      "metadata": {
+        "user": "tier1_003",
+        "action": "rule_disable",
+        "rule_id": "DLP-001",
+        "change_ticket": null
+      }
+    },
+    {
+      "artifact_id": "amb002_02",
+      "evidence_type": "log_entry",
+      "source_tool": "sift_chat_system",
+      "timestamp": "2026-06-15T08:05:00Z",
+      "raw_score": 0.05,
+      "prior_trust": 0.7,
+      "provenance_chain": [
+        "sha256:amb002chat02"
+      ],
+      "description": "Analyst: 'Oops, accidentally touched a DLP rule. Already re-enabled it'",
+      "metadata": {
+        "sender": "tier1_003",
+        "channel": "#soc-internal",
+        "message": "accidentally touched a DLP rule",
+        "follow_up": "rule_reactivated"
+      }
+    },
+    {
+      "artifact_id": "amb002_03",
+      "evidence_type": "memory_process",
+      "source_tool": "sift_volatility",
+      "timestamp": "2026-06-15T08:00:00Z",
+      "raw_score": 0.05,
+      "prior_trust": 0.95,
+      "provenance_chain": [
+        "sha256:amb002mem03"
+      ],
+      "description": "No malicious processes on tier1_003 workstation",
+      "metadata": {
+        "station": "tier1_003",
+        "malicious_processes": 0,
+        "suspicious_connections": 0
+      }
+    }
+  ],
+  "temporal_violations": [],
+  "caie_fractures": [
+    {
+      "fracture_type": "UNVERIFIABLE_INTENT",
+      "severity": 0.6,
+      "interpretation": "Plausible explanation but unverifiable. No evidence of sabotage or genuine error.",
+      "artifact_a": "amb002_01",
+      "artifact_b": "amb002_02"
+    }
+  ],
+  "peirce_expected": {
+    "firstness": "Security rule disabled without a change ticket",
+    "secondness": "Analyst admits error and re-enables the rule. No malicious processes on workstation. No history of sabotage",
+    "thirdness": "No detectable habit of malice or chronic negligence. Explanation is plausible but not objectively verifiable"
+  },
+  "devil_advocate": "Disabling a critical DLP rule without a change ticket, even briefly, is a serious security violation regardless of stated intent.",
+  "source_dataset": "VIGÍA Synthetic Corpus — Irreducible Ambiguity Suite",
+  "source_origin": "synthetic_vigia_collective",
+  "notes": "Calibration test: evidence is ambivalent. VIGÍA must acknowledge genuine uncertainty, not force a verdict.",
+  "_consolidation": {
+    "consolidated_at": "2026-06-05T04:27:39.816083+00:00",
+    "parser_version": "2.4",
+    "schema_version": "1.1",
+    "source_file": "VIGIA_FP_FN_AMB.json",
+    "source_origin": "synthetic_vigia_collective"
+  }
+}

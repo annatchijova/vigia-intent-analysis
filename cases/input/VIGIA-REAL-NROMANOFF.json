@@ -1,0 +1,191 @@
+{
+  "_consolidation": {
+    "consolidated_at": "2026-05-28T10:00:00+00:00",
+    "parser_version": "1.0",
+    "schema_version": "1.0",
+    "source_file": "win7-32-nromanoff-10.3.58.5.zip",
+    "acquisition_tool": "AccessData FTK Imager (E01)",
+    "case_number": "Stark Research Labs Data Breach Intrusion",
+    "timeline_tool": "Plaso/log2timeline + Volatility shimcachemem",
+    "ioc_set": "Mandiant APT1 IOCs",
+    "analyst_note": "FOR508 course material. Zeus banking trojan. Executive target. ANALYSIS MODE: FALLBACK — LLM backend unavailable at scoring time. Deterministic scorer only for composite score."
+  },
+  "case_id": "VIGIA-REAL-NROMANOFF",
+  "case_name": "Stark Research Labs — Natasha Romanoff / Zeus Banking Trojan (2012)",
+  "source_dataset": "SANS FIND EVIL Hackathon 2026 — Rob T. Lee corpus / FOR508",
+  "source_origin": "public_dataset",
+  "source_url": "https://sansorg.egnyte.com/dd/HhH7crTYT4JK/",
+  "abstention_risk": "low",
+  "confidence_expected": 96,
+  "expected_verdict": "MALICE",
+  "carnegie_pattern_expected": "AV Evasion + Kernel Hook + Persistence via Temp",
+  "expected_mitre_ttps": [
+    "T1055",
+    "T1562.001",
+    "T1547.001",
+    "T1036.005",
+    "T1003.001",
+    "T1021.001"
+  ],
+  "description": "Natasha Romanoff (nromanoff), Executive at Stark Research Labs (OU=Executives, DC=shieldbase DC=local), Windows 7 SP1 x86 workstation WKS-WIN732BITA. Zeus banking trojan confirmed by Volatility zeus-apihooks. Inline/Trampoline hooks on ntdll.dll!NtCreateThread and NtQueryDirectoryFile in services.exe (PID 676) redirect to unknown module at 0x7e3b47 — kernel-level process hiding. Persistence binary a.exe runs every 65 seconds from C:\\Users\\VIBRAN~1\\AppData\\Local\\Temp\\ (shimcachemem, 29+ entries) and C:\\Windows\\TEMP\\ (shimcache disk). Two paths for same binary = disk/memory fracture. Second user rsydow authenticated on same workstation same day — lateral movement. APT1 IOC set: nromanoff.mans (244MB) present in zip manifest, not yet extracted. Confirmation pending Redline analysis.",
+  "devil_advocate": "a.exe could be a legitimate scheduled task; ntdll hooks could be from a security product; rsydow could have legitimate reason to use the same workstation",
+  "artifacts": [
+    {
+      "artifact_id": "ART-001",
+      "evidence_type": "memory_process",
+      "source_tool": "Volatility/zeus-apihooks",
+      "timestamp": "2012-04-06T20:52:56Z",
+      "raw_score": 0.97,
+      "prior_trust": 0.95,
+      "provenance_chain": [
+        "FTK Imager E01",
+        "Volatility Win7SP1x86",
+        "zeus-apihooks plugin"
+      ],
+      "acquisition_tool": "AccessData FTK Imager",
+      "acquisition_hash": "verified_e01",
+      "acquisition_timestamp": "2017-06-01T00:36:00Z",
+      "description": "Zeus banking trojan: Inline/Trampoline hooks on ntdll.dll!NtCreateThread (0x7c90d7d2 → JMP 0x7e3b47) and ntdll.dll!NtQueryDirectoryFile in services.exe PID 676. Hook destination 0x7e3b47 is in unknown module — not mapped to any loaded DLL. Hook code establishes stack frame (PUSH EBP, MOV EBP ESP) consistent with Zeus usermode rootkit.",
+      "metadata": {
+        "hook_mode": "Usermode",
+        "hook_type": "Inline/Trampoline",
+        "victim_process": "services.exe",
+        "victim_pid": 676,
+        "victim_module": "ntdll.dll",
+        "hooked_functions": [
+          "NtCreateThread",
+          "NtQueryDirectoryFile"
+        ],
+        "hook_address": "0x7e3b47",
+        "hooking_module": "<unknown>",
+        "apt1_ioc_match": true,
+        "anomaly": "NtQueryDirectoryFile hook makes processes invisible to pslist/tasklist — active process hiding. NtCreateThread hook intercepts thread creation for injection. Hook destination in unmapped memory region is definitive Zeus usermode API-hook signature."
+      }
+    },
+    {
+      "artifact_id": "ART-002",
+      "evidence_type": "file_metadata",
+      "source_tool": "Volatility/shimcachemem + AppCompatCache",
+      "timestamp": "2012-04-06T20:25:30Z",
+      "raw_score": 0.94,
+      "prior_trust": 0.93,
+      "provenance_chain": [
+        "FTK Imager E01",
+        "Volatility shimcachemem",
+        "AppCompatCache registry"
+      ],
+      "acquisition_tool": "AccessData FTK Imager",
+      "acquisition_hash": "verified_e01",
+      "acquisition_timestamp": "2017-06-01T00:36:00Z",
+      "description": "Persistence binary a.exe executed every 65 seconds from C:\\Users\\VIBRAN~1\\AppData\\Local\\Temp\\a.exe (shimcachemem: 29+ entries, 2012-04-06 20:25:30 to 20:52:56). Disk shimcache shows same binary at C:\\Windows\\TEMP\\a.exe (20+ entries, 2012-04-04 00:23:33 to 00:44:11). Two different paths for identical binary name.",
+      "metadata": {
+        "binary_name": "a.exe",
+        "memory_path": "C:\\Users\\VIBRAN~1\\AppData\\Local\\Temp\\a.exe",
+        "disk_path": "C:\\Windows\\TEMP\\a.exe",
+        "execution_interval_seconds": "~65 (range 65-66s, sigma < 1s)",
+        "shimcachemem_entries": 29,
+        "shimcache_disk_entries": 20,
+        "exec_flag": true,
+        "path_fracture": true,
+        "anomaly": "Identical 65-second execution interval across two different filesystem paths is mechanical persistence — not human behavior. VIBRAN~1 is 8.3 truncation of executive profile path. Two paths for same binary indicates the malware copies itself between locations to survive partial cleanup. McAfee EntVUtil.EXE appears between a.exe entries at position 12 — AV process interleaved with malware execution."
+      }
+    },
+    {
+      "artifact_id": "ART-003",
+      "evidence_type": "log_entry",
+      "source_tool": "Plaso/WinEVTX",
+      "timestamp": "2012-04-03T00:28:32Z",
+      "raw_score": 0.88,
+      "prior_trust": 0.9,
+      "provenance_chain": [
+        "FTK Imager E01",
+        "Plaso log2timeline",
+        "Microsoft-Windows-GroupPolicy/Operational.evtx"
+      ],
+      "acquisition_tool": "AccessData FTK Imager",
+      "acquisition_hash": "verified_e01",
+      "acquisition_timestamp": "2017-06-01T00:36:00Z",
+      "description": "Group Policy Event 5017: CN=Natasha Romanoff OU=Executives DC=shieldbase DC=local — confirms executive target in high-value OU. CertEnroll Events 64/65 for nromanoff at 05:52 and 13:52 UTC — certificate enrollment activity under Zeus-infected session. Same CertEnroll GUID {FF4EC912-3049-4750-BF0F-76264AB0DC15} appears for rsydow at 20:25 — certificate theft/reuse vector.",
+      "metadata": {
+        "target_dn": "CN=Natasha Romanoff OU=Executives DC=shieldbase DC=local",
+        "ou": "Executives",
+        "certenroll_guid": "{FF4EC912-3049-4750-BF0F-76264AB0DC15}",
+        "certenroll_nromanoff_times": [
+          "05:52:06Z",
+          "13:52:08Z",
+          "20:25:38Z"
+        ],
+        "certenroll_rsydow_times": [
+          "20:25:37Z",
+          "20:37:59Z"
+        ],
+        "second_user": "rsydow",
+        "anomaly": "Executive in high-value OU targeted by Zeus — credential theft of executive certificates has high business impact. CertEnroll events under active Zeus session mean certificate private keys may be compromised. rsydow authenticates on same machine 1 second before nromanoff CertEnroll at 20:25 — possible credential relay or session hijack."
+      }
+    },
+    {
+      "artifact_id": "ART-004",
+      "evidence_type": "acquisition_context",
+      "source_tool": "Volatility/shimcachemem",
+      "timestamp": "2012-04-06T20:30:57Z",
+      "raw_score": 0.0,
+      "prior_trust": 0.0,
+      "provenance_chain": [
+        "FTK Imager E01",
+        "Volatility Win7SP1x86",
+        "shimcachemem"
+      ],
+      "acquisition_tool": "AccessData FTK Imager",
+      "acquisition_hash": "verified_e01",
+      "acquisition_timestamp": "2017-06-01T00:36:00Z",
+      "description": "shimcachemem entry 20: f-response-ent.exe (2012-02-27 17:54:36) — F-Response Enterprise forensic acquisition tool present on victim machine. This is the tool used to acquire the memory image, meaning the acquisition itself was performed on a live infected system with Zeus hooks active in memory.",
+      "metadata": {
+        "binary": "C:\\Windows\\system32\\f-response-ent.exe",
+        "binary_date": "2012-02-27T17:54:36Z",
+        "significance": "F-Response Enterprise is the memory acquisition tool. Its presence in shimcachemem confirms live acquisition on Zeus-infected host. Zeus NtQueryDirectoryFile hook was active during acquisition — process list in memory image may be incomplete due to active rootkit hiding.",
+        "anomaly": "F-Response Enterprise confirms live acquisition on Zeus-infected host. NOT counted as malice evidence. Methodological transparency only.",
+        "role": "ACQUISITION_CONTEXT_NOT_ATTACK_EVIDENCE"
+      }
+    },
+    {
+      "artifact_id": "ART-005",
+      "evidence_type": "network_flow",
+      "source_tool": "Plaso/MSIE Cache",
+      "timestamp": "2012-04-03T00:25:29Z",
+      "raw_score": 0.79,
+      "prior_trust": 0.82,
+      "provenance_chain": [
+        "FTK Imager E01",
+        "Plaso log2timeline",
+        "MSIE Cache index.dat"
+      ],
+      "acquisition_tool": "AccessData FTK Imager",
+      "acquisition_hash": "verified_e01",
+      "acquisition_timestamp": "2017-06-01T00:36:00Z",
+      "description": "IE cache: Twitter profile images fetched from a0.twimg.com at 00:25 and 08:34 UTC — ~8 hours apart. Cache directory 201RVRNG contains _ndice_normal[1].jpg (762 bytes) and 336922595_normal[1].jpg (825 bytes). File _ndice_normal suggests non-English profile (underscore replacing accented character). Zeus banking trojan uses Twitter for C2 channel in several variants (T1102 — Web Service as C2).",
+      "metadata": {
+        "c2_candidate": "a0.twimg.com",
+        "cached_files": [
+          "_ndice_normal[1].jpg",
+          "336922595_normal[1].jpg"
+        ],
+        "cache_dir": "201RVRNG",
+        "file_sizes": [
+          762,
+          825
+        ],
+        "access_times": [
+          "2012-04-03T00:25:29Z",
+          "2012-04-03T08:34:03Z"
+        ],
+        "anomaly": "Zeus variants use steganography in Twitter profile images for C2 communication (T1102). Two profile images fetched 8 hours apart from same CDN path is consistent with periodic C2 beacon via image steganography. _ndice suggests Spanish/Portuguese profile — consistent with Zeus botnet infrastructure using compromised accounts.",
+        "apt1_ioc_match": "pending_mans_extraction"
+      }
+    }
+  ],
+  "peirce_expected": {
+    "firstness": "Zeus Inline/Trampoline hooks on ntdll in services.exe hiding processes; a.exe running every 65 seconds from two different Temp paths; executive certificate enrollment under infected session; rsydow authenticating 1 second before nromanoff CertEnroll; Twitter profile images fetched at 8-hour intervals",
+    "secondness": "NtQueryDirectoryFile hook makes the malware process invisible — memory acquisition on live infected host means pslist is incomplete, only psscan reveals PID 6404; two paths for a.exe (VIBRAN~1\\Temp vs Windows\\TEMP) is a self-copying persistence mechanism surviving partial cleanup; 65-second mechanical interval is not human; CertEnroll under Zeus session means private key material exposed",
+    "thirdness": "A Zeus banking trojan compromised the workstation of Natasha Romanoff (OU=Executives), installed kernel-level process hiding via ntdll hooks, established 65-second persistence via self-copying a.exe between two Temp locations, targeted the executive's certificate private keys via CertEnroll interception, used Twitter image steganography for C2 beaconing, and enabled lateral movement to rsydow. This is an APT1-linked Zeus deployment targeting executive credentials and certificates at Stark Research Labs."
+  }
+}

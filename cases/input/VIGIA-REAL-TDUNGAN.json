@@ -1,0 +1,135 @@
+{
+  "_consolidation": {
+    "consolidated_at": "2026-05-27T22:00:00+00:00",
+    "parser_version": "1.0",
+    "schema_version": "1.0",
+    "source_file": "xp-tdungan-10.3.58.7.zip",
+    "acquisition_tool": "AccessData FTK Imager 3.3.0.5",
+    "case_number": "Stark Research Labs Data Breach Intrusion"
+  },
+  "case_id": "VIGIA-REAL-TDUNGAN",
+  "case_name": "Stark Research Labs — Timothy Dungan Insider/APT (2012)",
+  "source_dataset": "SANS FIND EVIL Hackathon 2026 — Rob T. Lee corpus",
+  "source_origin": "public_dataset",
+  "source_url": "https://sansorg.egnyte.com/dd/HhH7crTYT4JK/",
+  "abstention_risk": "low",
+  "confidence_expected": 94,
+  "expected_verdict": "MALICE",
+  "carnegie_pattern_expected": "Credential Theft + Privileged Access Abuse",
+  "expected_mitre_ttps": ["T1078","T1003.001","T1021.001","T1048.002","T1562.001"],
+  "description": "Timothy Dungan (tdungan), employee of Stark Research Labs, domain SHIELDBASE, authenticated via RDP from FALCONIII (10.3.98.10) at 18:20 EST on 2012-04-02. SeDebugPrivilege assigned at logon. SAM credential dump via lsass.exe at 20:50. Password-protected ZIP evading AV. Dropbox active as exfiltration vector. APT1 IOCs present in Redline analysis.",
+  "devil_advocate": "Privileged token assignments are standard domain policy for IT staff; SAM access is routine LSASS operation; password-protected ZIP is a personal tax document",
+  "artifacts": [
+    {
+      "artifact_id": "ART-001",
+      "evidence_type": "log_entry",
+      "source_tool": "Plaso/WinEVT",
+      "timestamp": "2012-04-02T18:20:21-05:00",
+      "raw_score": 0.82,
+      "prior_trust": 0.88,
+      "provenance_chain": ["FTK Imager 3.3.0.5", "Plaso log2timeline", "SecEvent.Evt"],
+      "acquisition_tool": "AccessData FTK Imager 3.3.0.5",
+      "acquisition_hash": "verified_e01",
+      "acquisition_timestamp": "2016-06-11T00:01:00Z",
+      "description": "Event 528: tdungan RDP logon to WKS-WINXP32BIT from FALCONIII (10.3.98.10) via RDP-Tcp#9. Logon type 10 (RemoteInteractive). Auth: Negotiate.",
+      "metadata": {
+        "event_id": "528",
+        "logon_type": "10",
+        "source_host": "FALCONIII",
+        "source_ip": "10.3.98.10",
+        "domain": "SHIELDBASE",
+        "anomaly": "RDP lateral movement after-hours; RemoteInteractive logon type from non-primary workstation"
+      }
+    },
+    {
+      "artifact_id": "ART-002",
+      "evidence_type": "log_entry",
+      "source_tool": "Plaso/WinEVT",
+      "timestamp": "2012-04-02T18:20:21-05:00",
+      "raw_score": 0.93,
+      "prior_trust": 0.92,
+      "provenance_chain": ["FTK Imager 3.3.0.5", "Plaso log2timeline", "SecEvent.Evt"],
+      "acquisition_tool": "AccessData FTK Imager 3.3.0.5",
+      "acquisition_hash": "verified_e01",
+      "acquisition_timestamp": "2016-06-11T00:01:00Z",
+      "description": "Event 576: Special privileges assigned to tdungan at logon: SeDebugPrivilege, SeBackupPrivilege, SeRestorePrivilege, SeChangeNotifyPrivilege.",
+      "metadata": {
+        "event_id": "576",
+        "privileges": ["SeDebugPrivilege","SeBackupPrivilege","SeRestorePrivilege"],
+        "anomaly": "SeDebugPrivilege enables LSASS memory read and credential dumping. Combination with SeBackupPrivilege allows SAM hive access bypassing ACLs. Canonical mimikatz/pwdump prerequisite."
+      }
+    },
+    {
+      "artifact_id": "ART-003",
+      "evidence_type": "memory_process",
+      "source_tool": "Plaso/WinEVT+Volatility",
+      "timestamp": "2012-04-02T20:50:21-05:00",
+      "raw_score": 0.95,
+      "prior_trust": 0.93,
+      "provenance_chain": ["FTK Imager 3.3.0.5", "Plaso log2timeline", "SecEvent.Evt", "xp-tdungan-memory-raw.001"],
+      "acquisition_tool": "AccessData FTK Imager 3.3.0.5",
+      "acquisition_hash": "verified_e01",
+      "acquisition_timestamp": "2016-06-11T00:01:00Z",
+      "description": "Event 560/562 (Records 90242-90245): Two sequential SAM_SERVER object open/close sequences via lsass.exe (PID 1076) at 20:50:21 EST. Handle IDs 882888 and 955648. Access mask 0x62835816.",
+      "metadata": {
+        "event_id": "560/562",
+        "process": "lsass.exe",
+        "pid": "1076",
+        "object": "SAM_SERVER",
+        "handle_count": 2,
+        "access_mask": "0x62835816",
+        "time_delta_from_privilege_assignment_minutes": 150,
+        "anomaly": "Two independent SAM_SERVER handles opened in same second via lsass. Access mask includes GENERIC_READ over SAM. 150-minute gap from SeDebugPrivilege assignment suggests deliberate delay to evade real-time monitoring."
+      }
+    },
+    {
+      "artifact_id": "ART-004",
+      "evidence_type": "file_metadata",
+      "source_tool": "Plaso/McAfee+NTFS",
+      "timestamp": "2012-04-02T20:28:17-05:00",
+      "raw_score": 0.81,
+      "prior_trust": 0.84,
+      "provenance_chain": ["FTK Imager 3.3.0.5", "Plaso log2timeline", "AppEvent.Evt", "MFT"],
+      "acquisition_tool": "AccessData FTK Imager 3.3.0.5",
+      "acquisition_hash": "verified_e01",
+      "acquisition_timestamp": "2016-06-11T00:01:00Z",
+      "description": "McAfee scan failure: password-protected 2011-W2.zip containing 2011-W2.pdf blocked AV engine. Dropbox shellext created in tdungan profile at 18:20:26 EST (same minute as RDP logon).",
+      "metadata": {
+        "av_event": "Failure Audit 257",
+        "blocked_file": "2011-W2.zip\\2011-W2.pdf",
+        "av_engine": "5400.1158",
+        "dat_version": "6498.0000",
+        "dropbox_active": true,
+        "dropbox_crtime": "2012-04-02T18:20:26-05:00",
+        "anomaly": "Password-protected ZIP blocks AV — documented APT1 TTP for evading endpoint detection. Dropbox initialized at same minute as RDP logon suggests pre-staged exfiltration channel."
+      }
+    },
+    {
+      "artifact_id": "ART-005",
+      "evidence_type": "network_flow",
+      "source_tool": "Plaso/WinEVT+Firefox",
+      "timestamp": "2012-04-02T20:05:39-05:00",
+      "raw_score": 0.79,
+      "prior_trust": 0.80,
+      "provenance_chain": ["FTK Imager 3.3.0.5", "Plaso log2timeline", "SysEvent.Evt", "Firefox places.sqlite"],
+      "acquisition_tool": "AccessData FTK Imager 3.3.0.5",
+      "acquisition_hash": "verified_e01",
+      "acquisition_timestamp": "2016-06-11T00:01:00Z",
+      "description": "TermDD Event 50: WARNING Device\\Termdd DATA ENCRYPTION anomaly at 20:05:39 EST during active RDP session. Gmail (dungantimothy@gmail.com, 7 inbox messages) accessed via Firefox at 19:13 EST. APT1 IOC match in Redline .mans.",
+      "metadata": {
+        "termdd_event": "50",
+        "termdd_severity": "Warning",
+        "termdd_string": "DATA ENCRYPTION",
+        "gmail_account": "dungantimothy@gmail.com",
+        "gmail_access_time": "2012-04-02T19:13:48-05:00",
+        "apt1_ioc_match": true,
+        "anomaly": "TermDD DATA ENCRYPTION warning indicates RDP cipher negotiation failure or downgrade — consistent with RDP interception or non-standard client. Gmail accessed from corporate host during same session as credential dumping. APT1 IOC confirmed."
+      }
+    }
+  ],
+  "peirce_expected": {
+    "firstness": "RDP lateral movement from FALCONIII with SeDebugPrivilege assigned at logon; SAM_SERVER accessed via lsass 150 minutes later; password-protected ZIP blocking AV; Dropbox initialized at logon time",
+    "secondness": "150-minute gap between privilege assignment and SAM dump is deliberate evasion; TermDD encryption anomaly during active RDP session; personal Gmail accessed from corporate host in same window; APT1 IOC match in memory",
+    "thirdness": "Timothy Dungan used RDP lateral movement to access WKS-WINXP32BIT, obtained SeDebugPrivilege to dump SAM credentials, packaged exfiltrated data in a password-protected ZIP to evade AV, and used Dropbox as a passive cloud exfiltration channel — consistent with APT1-assisted insider credential theft at Stark Research Labs"
+  }
+}

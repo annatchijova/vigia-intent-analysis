@@ -1,0 +1,102 @@
+{
+  "case_id": "VIGIA-FN-003",
+  "case_name": "The Admin Mirror",
+  "description": "Attacker performs process hollowing on svchost.exe. The on-disk binary is the legitimate Microsoft one, signed. Network connections are to AWS IPs (legitimate CDN). Exfiltration occurs inside TLS, indistinguishable from normal traffic.",
+  "abstention_risk": "medium",
+  "expected_verdict": "MALICE",
+  "carnegie_pattern_expected": "Hidden Process Masquerading",
+  "confidence_expected": 88,
+  "artifacts": [
+    {
+      "artifact_id": "fn003_01",
+      "evidence_type": "memory_process",
+      "source_tool": "sift_volatility",
+      "timestamp": "2026-06-15T10:00:00Z",
+      "raw_score": 0.15,
+      "prior_trust": 0.95,
+      "provenance_chain": [
+        "sha256:fn003mem01"
+      ],
+      "description": "svchost.exe PID 612 with RWX memory regions",
+      "metadata": {
+        "pid": 612,
+        "process_name": "svchost.exe",
+        "text_section_perms": "RWX",
+        "expected_perms": "RX",
+        "disk_hash_clean": true,
+        "signed": true
+      }
+    },
+    {
+      "artifact_id": "fn003_02",
+      "evidence_type": "ip_geolocation",
+      "source_tool": "sift_netflow",
+      "timestamp": "2026-06-15T10:05:00Z",
+      "raw_score": 0.05,
+      "prior_trust": 0.8,
+      "provenance_chain": [
+        "sha256:fn003net02"
+      ],
+      "description": "Connection to 52.85.0.0/16 (AWS CloudFront) from svchost.exe",
+      "metadata": {
+        "source_ip": "10.0.4.22",
+        "dest_ip": "52.85.0.0",
+        "port": 443,
+        "asn": "AWS"
+      }
+    },
+    {
+      "artifact_id": "fn003_03",
+      "evidence_type": "memory_process",
+      "source_tool": "sift_parent_process",
+      "timestamp": "2026-06-15T10:00:00Z",
+      "raw_score": 0.88,
+      "prior_trust": 0.9,
+      "provenance_chain": [
+        "sha256:fn003par03"
+      ],
+      "description": "Parent of svchost.exe PID 612: cmd.exe (PID 4412), not services.exe",
+      "metadata": {
+        "pid": 612,
+        "parent_pid": 4412,
+        "parent_name": "cmd.exe",
+        "expected_parent": "services.exe"
+      }
+    }
+  ],
+  "temporal_violations": [],
+  "caie_fractures": [
+    {
+      "fracture_type": "MEMORY_VS_DISK",
+      "severity": 0.9,
+      "interpretation": "On-disk binary is clean, memory is compromised. Digital signature does not protect against process hollowing.",
+      "artifact_a": "fn003_01",
+      "artifact_b": "fn003_02",
+      "ttp_id": "T1055"
+    },
+    {
+      "fracture_type": "PARENT_ANOMALY",
+      "severity": 0.85,
+      "interpretation": "svchost.exe should be a child of services.exe, not cmd.exe.",
+      "artifact_a": "fn003_03",
+      "artifact_b": "fn003_01",
+      "ttp_id": "T1055.012"
+    }
+  ],
+  "peirce_expected": {
+    "firstness": "Legitimate svchost.exe, signed, connecting to AWS",
+    "secondness": "RWX region in memory (anomalous for .text), parent cmd.exe instead of services.exe. On-disk binary is clean but in-memory process is hollowed",
+    "thirdness": "Attacker habit of using process hollowing to maintain technical legitimacy appearance while executing malicious payload"
+  },
+  "devil_advocate": "Hash and signature are clean, the IP is an AWS CDN address used by thousands of legitimate applications, and svchost.exe is expected to make network connections.",
+  "source_dataset": "VIGÍA Synthetic Corpus — False Negative Suite",
+  "source_origin": "synthetic_vigia_collective",
+  "notes": "False negative test: clean hash and signature, legitimate CDN IP. Anomalies are in memory (RWX, wrong parent). If VIGÍA does not perform deep memory analysis, it will return BENIGN.",
+  "_consolidation": {
+    "consolidated_at": "2026-06-05T04:27:39.816083+00:00",
+    "parser_version": "2.4",
+    "schema_version": "1.1",
+    "source_file": "VIGIA_FP_FN_AMB.json",
+    "source_origin": "synthetic_vigia_collective"
+  }
+}
