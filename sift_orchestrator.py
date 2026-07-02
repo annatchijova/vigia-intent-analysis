@@ -176,7 +176,7 @@ class SIFTOrchestrator:
             if es:
                 run_kwargs["event_logs"] = es if isinstance(es, list) else [es]
             lp = kwargs.get("log_path")
-            if lp and not str(lp).endswith(".json"):
+            if lp and not str(lp).endswith(".json") and not run_kwargs.get("event_logs"):
                 run_kwargs["event_logs"] = lp if isinstance(lp, list) else [lp]
             if kwargs.get("network_flows"):
                 run_kwargs["network_flows"] = kwargs["network_flows"]

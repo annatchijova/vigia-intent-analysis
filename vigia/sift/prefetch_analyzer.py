@@ -70,6 +70,7 @@ class PrefetchAnalysisResult:
                 "source_path": self.source_path,
                 "total_files": self.total_files,
                 "suspicious_count": len(self.suspicious_executions),
+                "suspicious_executables": [e["filename"] for e in self.suspicious_executions],
                 "anti_forensic_count": len(self.anti_forensic_deletions),
                 "artifact_type": "prefetch",
                 "artifact_reliability": str(ARTIFACT_RELIABILITY),
