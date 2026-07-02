@@ -76,10 +76,12 @@ def extract_verdict_from_bundle(bundle_path: Path) -> str:
     _MAP = {
         # Veredictos canónicos
         "MALICE": "MALICE", "SUSPICION": "SUSPICION", "UNKNOWN": "UNKNOWN",
-        "NOISE": "NOISE", "ABSTAIN": "ABSTAIN", "BENIGN": "NOISE", "INTENT": "MALICE",
+        "NOISE": "NOISE", "ABSTAIN": "ABSTAIN", "BENIGN": "NOISE", "INTENT": "INTENT",
         # Veredictos del agente (best_hypothesis)
         "MALICIOUS_INTENT_DETECTED": "MALICE",
         "MALICIOUS_ACTIVITY_DETECTED": "MALICE",
+        "INTENT_DETECTED": "INTENT",
+        "SUSPICION_DETECTED": "SUSPICION",
         "NO_SEMIOTIC_ANOMALY_DETECTED": "NOISE",
         "ABSTAIN_DETECTED":           "ABSTAIN",
         "NO_THREAT_DETECTED": "NOISE",
@@ -166,7 +168,7 @@ def main():
                 got = "NO_BUNDLE"
 
             # Alias BENIGN → NOISE, INTENT → MALICE para comparación
-            aliases = {"BENIGN": "NOISE", "INTENT": "MALICE"}
+            aliases = {"BENIGN": "NOISE", "INTENT": "INTENT"}
             got_norm = aliases.get(got, got)
             exp_norm = aliases.get(expected, expected)
 
