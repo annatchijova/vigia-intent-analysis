@@ -61,7 +61,8 @@ import json
 import os
 import sqlite3
 import sys
-from dataclasses import dataclass
+import hmac as _hmac_mod
+from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
@@ -70,8 +71,16 @@ from typing import Dict, List, Optional, Tuple
 # CONSTANTES
 # ══════════════════════════════════════════════════════════════════════════
 
-CHAIN_VERSION = "1.0"
+CHAIN_VERSION = "1.1"
 GENESIS_HASH = "0" * 64  # hash del nodo anterior para el primer bloque
+
+# Campos agregados FUERA del payload hasheado por BundleBuilder.seal():
+#   integrity      — lo escribe el propio seal() (contiene el bundle_hash)
+#   forensic_chain — lo inyecta seal_with_chain() (metadata de esta cadena)
+#   pki            — lo inyecta pki_tools (receipt RFC 3161 / firma HSM)
+# La recomputación del bundle_hash debe excluirlos — mismo esquema que
+# BundleBuilder.quick_verify() y forensics/verify_ebs_v1.py.
+_PRESENTATION_FIELDS = ("integrity", "forensic_chain", "pki")
 
 # Schema SQLite — inmutable post-creación
 _SCHEMA = """
@@ -91,6 +100,20 @@ CREATE TABLE IF NOT EXISTS chain_metadata (
     value TEXT NOT NULL
 );
 
+-- Checkpoints de punta: anclan (tip, total) contra truncation attack.
+-- Borrar las últimas N entradas deja una cadena internamente válida;
+-- el checkpoint (idealmente HMAC-firmado y/o sellado por TSA RFC 3161)
+-- prueba que en un momento dado la cadena llegaba hasta cierta punta.
+CREATE TABLE IF NOT EXISTS chain_checkpoints (
+    checkpoint_seq  INTEGER PRIMARY KEY AUTOINCREMENT,
+    at_sequence     INTEGER NOT NULL,
+    tip_chain_hash  TEXT    NOT NULL,
+    total_entries   INTEGER NOT NULL,
+    checkpoint_hmac TEXT,
+    tsa_receipt     TEXT,
+    created_at      TEXT    NOT NULL
+);
+
 CREATE INDEX IF NOT EXISTS idx_bundle_id   ON chain_entries(bundle_id);
 CREATE INDEX IF NOT EXISTS idx_bundle_hash ON chain_entries(bundle_hash);
 CREATE INDEX IF NOT EXISTS idx_timestamp   ON chain_entries(timestamp);
@@ -104,20 +127,84 @@ def _sha256(data: str) -> str:
     return hashlib.sha256(data.encode("utf-8")).hexdigest()
 
 
+# Canonicalización idéntica a BundleBuilder._canonicalize / verify_ebs_v1.
+# Import del paquete cuando está instalado; copia local para ejecución
+# standalone del CLI (mismo patrón que los verificadores stdlib-only).
+try:
+    from vigia.core.canonicalize import _canonicalize
+except ImportError:  # pragma: no cover — solo CLI standalone
+    def _canonicalize(obj):
+        if isinstance(obj, bool):
+            return "true" if obj else "false"
+        if isinstance(obj, int):
+            return f"{obj}:int"
+        if isinstance(obj, float):
+            if obj != obj:
+                return "nan"
+            if obj == float("inf"):
+                return "inf"
+            if obj == float("-inf"):
+                return "-inf"
+            return f"{obj:.8f}"
+        if isinstance(obj, str):
+            return obj
+        if obj is None:
+            return "null"
+        if isinstance(obj, dict):
+            return {k: _canonicalize(v) for k, v in sorted(obj.items())}
+        if isinstance(obj, (list, tuple)):
+            return [_canonicalize(v) for v in obj]
+        return str(obj)
+
+
+def _recompute_sealed_bundle_hash(bundle: Dict) -> str:
+    """
+    Recomputa el bundle_hash con el MISMO esquema que BundleBuilder.seal():
+    SHA-256 del payload canónico excluyendo los campos de presentación
+    (integrity, forensic_chain, pki).
+    """
+    payload = {k: v for k, v in bundle.items() if k not in _PRESENTATION_FIELDS}
+    canonical = json.dumps(_canonicalize(payload), sort_keys=True, ensure_ascii=True)
+    return _sha256(canonical)
+
+
 def _compute_bundle_hash(bundle: Dict) -> str:
     """
-    Calcula el SHA-256 de un bundle sellado.
-    Si el bundle ya tiene un campo 'integrity.bundle_hash', lo usa directamente
-    (el bundle fue sellado por BundleBuilder — confiar en su hash).
-    De lo contrario, calcular sobre la serialización canónica.
+    SHA-256 de un bundle para la cadena de custodia.
+
+    Bundle sellado (tiene integrity.bundle_hash): SIEMPRE se recomputa
+    desde el contenido canónico. El hash declarado NUNCA se acepta sin
+    verificación — un bundle fabricado con un hash inventado no debe
+    entrar a la cadena como legítimo. La comparación declarado-vs-
+    recomputado la hace el caller (append rechaza; verify marca tampered).
+
+    Bundle sin sellar (sin integrity): serialización completa, esquema
+    legacy sin canonicalize — compatible con ledgers existentes.
     """
     integrity = bundle.get("integrity", {})
-    existing_hash = integrity.get("bundle_hash", "")
-    if existing_hash and len(existing_hash) == 64:
-        return existing_hash
-    # Fallback: serializar y hashear
+    if integrity.get("bundle_hash", ""):
+        return _recompute_sealed_bundle_hash(bundle)
+    # Fallback legacy: serializar y hashear el dict completo
     canonical = json.dumps(bundle, sort_keys=True, ensure_ascii=True)
     return _sha256(canonical)
+
+
+def _declared_hash_mismatch(bundle: Dict) -> Optional[str]:
+    """
+    Si el bundle declara integrity.bundle_hash y NO recomputa desde el
+    contenido, retorna el motivo. None si coincide o si no hay declarado.
+    """
+    declared = bundle.get("integrity", {}).get("bundle_hash", "")
+    if not declared:
+        return None
+    recomputed = _recompute_sealed_bundle_hash(bundle)
+    if recomputed != declared:
+        return (
+            f"integrity.bundle_hash declarado ({declared[:16]}...) no "
+            f"recomputa desde el contenido canónico ({recomputed[:16]}...). "
+            "Bundle fabricado o alterado post-sellado."
+        )
+    return None
 
 
 def _compute_chain_hash(
@@ -173,6 +260,8 @@ class VerificationResult:
     hash_mismatches: List[Dict]     # chain_hash recomputado != almacenado
     tampered_bundles: List[str]     # bundles en disco con hash diferente al de la cadena
     timestamp: str
+    truncation_findings: List[Dict] = field(default_factory=list)  # cola borrada vs checkpoints
+    checkpoints_verified: int = 0
 
     def to_dict(self) -> Dict:
         return {
@@ -182,12 +271,15 @@ class VerificationResult:
             "broken_links":      self.broken_links,
             "hash_mismatches":   self.hash_mismatches,
             "tampered_bundles":  self.tampered_bundles,
+            "truncation_findings": self.truncation_findings,
+            "checkpoints_verified": self.checkpoints_verified,
             "timestamp":         self.timestamp,
             "summary": {
                 "gaps":       len(self.gaps_detected),
                 "broken":     len(self.broken_links),
                 "mismatches": len(self.hash_mismatches),
                 "tampered":   len(self.tampered_bundles),
+                "truncations": len(self.truncation_findings),
             },
         }
 
@@ -266,7 +358,13 @@ class ChainOfCustody:
         if not bundle_id:
             raise ValueError("bundle must have a non-empty 'bundle_id' field")
 
-        # Computar hash del bundle
+        # El hash declarado DEBE recomputar desde el contenido — un bundle
+        # fabricado con integrity.bundle_hash inventado no entra a la cadena.
+        mismatch = _declared_hash_mismatch(bundle)
+        if mismatch:
+            raise ValueError(f"bundle '{bundle_id}' rechazado: {mismatch}")
+
+        # Computar hash del bundle (recomputado, nunca el declarado a ciegas)
         bundle_hash = _compute_bundle_hash(bundle)
 
         # Obtener el hash del nodo anterior (o GENESIS si es el primero)
@@ -318,7 +416,135 @@ class ChainOfCustody:
         )
         return entry
 
-    def verify(self, verify_files: bool = True) -> Tuple[bool, VerificationResult]:
+    # ------------------------------------------------------------------
+    # Checkpoints de punta — defensa contra truncation attack
+    # ------------------------------------------------------------------
+
+    @staticmethod
+    def _checkpoint_payload(at_sequence: int, tip_chain_hash: str,
+                            total_entries: int, created_at: str) -> str:
+        return f"{tip_chain_hash}:{at_sequence}:{total_entries}:{created_at}"
+
+    def checkpoint(
+        self,
+        hmac_key: Optional[bytes] = None,
+        tsa_receipt: Optional[Dict] = None,
+    ) -> Dict:
+        """
+        Ancla la punta actual de la cadena en un checkpoint.
+
+        Un checkpoint registra (tip_chain_hash, at_sequence, total_entries)
+        con HMAC opcional (clave fuera del ledger) y receipt RFC 3161
+        opcional (testigo temporal independiente — ver pki_tools /
+        rfc3161_chain). verify() usa los checkpoints para detectar
+        truncation: si la cadena actual es más corta que un checkpoint,
+        alguien borró la cola.
+
+        Sin hmac_key ni tsa_receipt el checkpoint vive en el mismo SQLite
+        que la cadena — detecta truncation accidental pero un atacante con
+        acceso al archivo puede borrarlo también. La clave/TSA es lo que
+        lo hace resistente a ese atacante; se documenta, no se exige.
+
+        Returns: dict del checkpoint creado.
+
+        Raises:
+            ValueError: si la cadena está vacía (nada que anclar).
+        """
+        last = self._get_last_entry()
+        if last is None:
+            raise ValueError("cadena vacía — no hay punta que anclar")
+
+        count = self._conn.execute(
+            "SELECT COUNT(*) FROM chain_entries"
+        ).fetchone()[0]
+        created_at = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
+        payload = self._checkpoint_payload(
+            last.sequence, last.chain_hash, count, created_at
+        )
+        checkpoint_hmac = (
+            _hmac_mod.new(hmac_key, payload.encode("utf-8"), "sha256").hexdigest()
+            if hmac_key else None
+        )
+        self._conn.execute(
+            """
+            INSERT INTO chain_checkpoints
+                (at_sequence, tip_chain_hash, total_entries, checkpoint_hmac,
+                 tsa_receipt, created_at)
+            VALUES (?, ?, ?, ?, ?, ?)
+            """,
+            (last.sequence, last.chain_hash, count, checkpoint_hmac,
+             json.dumps(tsa_receipt) if tsa_receipt else None, created_at),
+        )
+        self._conn.commit()
+        return {
+            "at_sequence":     last.sequence,
+            "tip_chain_hash":  last.chain_hash,
+            "total_entries":   count,
+            "checkpoint_hmac": checkpoint_hmac,
+            "tsa_stamped":     tsa_receipt is not None,
+            "created_at":      created_at,
+        }
+
+    def _verify_checkpoints(
+        self,
+        max_sequence: int,
+        chain_hash_by_seq: Dict[int, str],
+        hmac_key: Optional[bytes],
+    ) -> Tuple[List[Dict], int]:
+        """
+        C5 — Anti-truncation: cada checkpoint debe apuntar a un entry que
+        exista y cuyo chain_hash coincida con la punta anclada.
+        """
+        findings: List[Dict] = []
+        rows = self._conn.execute(
+            "SELECT * FROM chain_checkpoints ORDER BY checkpoint_seq ASC"
+        ).fetchall()
+        for row in rows:
+            at_seq = row["at_sequence"]
+            if hmac_key is not None and row["checkpoint_hmac"]:
+                expected = _hmac_mod.new(
+                    hmac_key,
+                    self._checkpoint_payload(
+                        at_seq, row["tip_chain_hash"],
+                        row["total_entries"], row["created_at"],
+                    ).encode("utf-8"),
+                    "sha256",
+                ).hexdigest()
+                if not _hmac_mod.compare_digest(expected, row["checkpoint_hmac"]):
+                    findings.append({
+                        "checkpoint_seq": row["checkpoint_seq"],
+                        "at_sequence": at_seq,
+                        "note": "checkpoint_hmac no recomputa — checkpoint alterado.",
+                    })
+                    continue
+            if at_seq > max_sequence:
+                findings.append({
+                    "checkpoint_seq": row["checkpoint_seq"],
+                    "at_sequence": at_seq,
+                    "current_max_sequence": max_sequence,
+                    "note": (
+                        f"TRUNCATION: el checkpoint del {row['created_at']} ancla "
+                        f"la cadena hasta sequence={at_seq}, pero la cadena actual "
+                        f"termina en sequence={max_sequence}. Se borraron "
+                        f"{at_seq - max_sequence} entrada(s) de la cola."
+                    ),
+                })
+            elif chain_hash_by_seq.get(at_seq) != row["tip_chain_hash"]:
+                findings.append({
+                    "checkpoint_seq": row["checkpoint_seq"],
+                    "at_sequence": at_seq,
+                    "note": (
+                        "El chain_hash anclado por el checkpoint no coincide con "
+                        "el entry actual en esa posición — historia reescrita."
+                    ),
+                })
+        return findings, len(rows)
+
+    def verify(
+        self,
+        verify_files: bool = True,
+        hmac_key: Optional[bytes] = None,
+    ) -> Tuple[bool, VerificationResult]:
         """
         Verifica la integridad completa de la cadena.
 
@@ -326,7 +552,11 @@ class ChainOfCustody:
           C1 — Secuencia continua: no hay huecos en los sequence numbers
           C2 — Encadenamiento: cada previous_bundle_hash == chain_hash del anterior
           C3 — Integridad del chain_hash: recomputar y comparar con el almacenado
-          C4 — Integridad de archivos en disco (opcional): leer JSON y comparar bundle_hash
+          C4 — Integridad de archivos en disco (opcional): leer JSON, recomputar
+               el bundle_hash canónico y comparar (el hash declarado en el
+               archivo NO se acepta a ciegas)
+          C5 — Anti-truncation: la cadena debe alcanzar la punta anclada por
+               cada checkpoint (HMAC del checkpoint verificado si hay clave)
 
         Returns:
             (passed: bool, result: VerificationResult)
@@ -339,9 +569,11 @@ class ChainOfCustody:
         broken_links: List[Dict] = []
         hash_mismatches: List[Dict] = []
         tampered: List[str] = []
+        chain_hash_by_seq: Dict[int, str] = {}
 
         prev_chain_hash = GENESIS_HASH
         expected_seq = 1
+        max_sequence = 0
 
         for row in rows:
             seq = row["sequence"]
@@ -394,7 +626,10 @@ class ChainOfCustody:
                     "note": "chain_hash almacenado no coincide con el recomputado — entry modificado.",
                 })
 
-            # C4: Verificar archivo en disco (si existe y se solicitó)
+            # C4: Verificar archivo en disco (si existe y se solicitó).
+            # El bundle_hash se RECOMPUTA desde el contenido canónico — un
+            # archivo alterado que conserva su integrity.bundle_hash original
+            # también se detecta (antes pasaba: se confiaba en el declarado).
             if verify_files and row["bundle_path"]:
                 path = Path(row["bundle_path"])
                 if path.exists():
@@ -403,16 +638,28 @@ class ChainOfCustody:
                         disk_hash = _compute_bundle_hash(disk_bundle)
                         if disk_hash != row["bundle_hash"]:
                             tampered.append(row["bundle_path"])
+                        elif _declared_hash_mismatch(disk_bundle):
+                            tampered.append(
+                                f"{row['bundle_path']} [declared-hash-mismatch]"
+                            )
                     except Exception:
                         tampered.append(f"{row['bundle_path']} [unreadable]")
 
             prev_chain_hash = row["chain_hash"]
+            chain_hash_by_seq[seq] = row["chain_hash"]
+            max_sequence = max(max_sequence, seq)
+
+        # C5: checkpoints de punta — detección de cola borrada
+        truncations, n_checkpoints = self._verify_checkpoints(
+            max_sequence, chain_hash_by_seq, hmac_key
+        )
 
         passed = (
             len(gaps) == 0
             and len(broken_links) == 0
             and len(hash_mismatches) == 0
             and len(tampered) == 0
+            and len(truncations) == 0
         )
 
         result = VerificationResult(
@@ -422,6 +669,8 @@ class ChainOfCustody:
             broken_links=broken_links,
             hash_mismatches=hash_mismatches,
             tampered_bundles=tampered,
+            truncation_findings=truncations,
+            checkpoints_verified=n_checkpoints,
             timestamp=datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
         )
         return passed, result
@@ -537,9 +786,74 @@ def _cmd_append(args) -> int:
     return 0
 
 
+def _resolve_env_hmac_key() -> Optional[bytes]:
+    """VIGIA_HMAC_KEY (hex) o VIGIA_HMAC_KEY_FILE — mismas vars que security.py."""
+    key_hex = os.getenv("VIGIA_HMAC_KEY", "").strip()
+    if key_hex:
+        try:
+            return bytes.fromhex(key_hex)
+        except ValueError:
+            print("WARNING: VIGIA_HMAC_KEY no es hex válido — ignorada",
+                  file=sys.stderr)
+    key_file = os.getenv("VIGIA_HMAC_KEY_FILE", "").strip()
+    if key_file and Path(key_file).is_file():
+        return Path(key_file).read_bytes().strip()
+    return None
+
+
+def _cmd_checkpoint(args) -> int:
+    hmac_key = _resolve_env_hmac_key()
+    if hmac_key is None:
+        print(
+            "WARNING: sin VIGIA_HMAC_KEY[_FILE] — checkpoint sin firma. "
+            "Detecta truncation accidental pero no a un atacante con "
+            "acceso de escritura al ledger.",
+            file=sys.stderr,
+        )
+
+    tsa_receipt = None
+    if args.tsa:
+        # Testigo temporal independiente: sellar la punta vía TSA RFC 3161.
+        # Se sella un archivo temporal con el estado de la punta — la
+        # infraestructura existente (rfc3161_chain) trabaja sobre paths.
+        try:
+            from vigia.forensics.rfc3161_chain import RFC3161Timestamper
+            with ChainOfCustody(args.db) as chain:
+                s = chain.status()
+            import tempfile
+            with tempfile.NamedTemporaryFile(
+                "w", suffix="_chain_tip.json", delete=False
+            ) as tmp:
+                json.dump(s, tmp, sort_keys=True)
+                tip_path = tmp.name
+            record = RFC3161Timestamper().seal_artifact(tip_path)
+            tsa_receipt = record.__dict__ if hasattr(record, "__dict__") else dict(record)
+            os.unlink(tip_path)
+        except Exception as exc:  # TSA caída/red ausente — checkpoint local válido
+            print(f"WARNING: TSA no disponible ({exc}) — checkpoint sin "
+                  "testigo externo.", file=sys.stderr)
+
+    with ChainOfCustody(args.db) as chain:
+        try:
+            cp = chain.checkpoint(hmac_key=hmac_key, tsa_receipt=tsa_receipt)
+        except ValueError as exc:
+            print(f"ERROR: {exc}", file=sys.stderr)
+            return 1
+
+    print("[OK] Checkpoint anclado")
+    print(f"     Sequence:   {cp['at_sequence']}")
+    print(f"     Tip hash:   {cp['tip_chain_hash'][:32]}...")
+    print(f"     Firmado:    {'HMAC' if cp['checkpoint_hmac'] else 'NO (sin clave)'}")
+    print(f"     TSA:        {'RFC 3161' if cp['tsa_stamped'] else 'no'}")
+    return 0
+
+
 def _cmd_verify(args) -> int:
     with ChainOfCustody(args.db) as chain:
-        passed, result = chain.verify(verify_files=not args.no_files)
+        passed, result = chain.verify(
+            verify_files=not args.no_files,
+            hmac_key=_resolve_env_hmac_key(),
+        )
 
     if args.json_out:
         print(json.dumps(result.to_dict(), indent=2, sort_keys=True))
@@ -553,7 +867,14 @@ def _cmd_verify(args) -> int:
     print(f"  Enlaces rotos:    {len(result.broken_links)}")
     print(f"  Hash inválidos:   {len(result.hash_mismatches)}")
     print(f"  Archivos alterados: {len(result.tampered_bundles)}")
+    print(f"  Truncations:      {len(result.truncation_findings)} "
+          f"(checkpoints verificados: {result.checkpoints_verified})")
     print()
+
+    if result.truncation_findings:
+        print("  TRUNCATION DETECTADO:")
+        for t in result.truncation_findings:
+            print(f"    {t['note']}")
 
     if result.gaps_detected:
         print("  HUECOS DETECTADOS:")
@@ -618,6 +939,14 @@ def main() -> int:
     sub.add_parser("status", help="Estado actual de la cadena")
     sub.add_parser("export", help="Exportar cadena completa como JSON")
 
+    p_checkpoint = sub.add_parser(
+        "checkpoint",
+        help="Anclar la punta de la cadena (anti-truncation; HMAC vía "
+             "VIGIA_HMAC_KEY; --tsa para testigo RFC 3161)",
+    )
+    p_checkpoint.add_argument("--tsa", action="store_true",
+                              help="Sellar la punta con TSA RFC 3161 externa")
+
     args = parser.parse_args()
 
     return {
@@ -625,6 +954,7 @@ def main() -> int:
         "verify": _cmd_verify,
         "status": _cmd_status,
         "export": _cmd_export,
+        "checkpoint": _cmd_checkpoint,
     }[args.command](args)
 
 

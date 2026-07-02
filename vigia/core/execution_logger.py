@@ -8,7 +8,8 @@ Entregable obligatorio del SANS Find Evil! Hackathon 2026.
 Cada evento registra:
   timestamp UTC ISO 8601, phase (IR), peirce_layer,
   artifact, finding, intent_hypothesis, devil_advocate,
-  tool_called, verdict_partial, _event_hash (SHA-256 parcial),
+  tool_called, verdict_partial, _event_hash (SHA-256 completo, 64 hex
+  desde log_version 1.1 — antes truncado a 16 hex),
   _seq (número de secuencia, canonicalizado como int)
 
 El archivo se genera en data/logs/{case_id}_execution.jsonl.
@@ -68,14 +69,16 @@ class VigiaExecutionLogger:
         self._event_count = 0
         # Timestamp fijo para runs de evaluación deterministas; real para producción
         self._session_start = deterministic_timestamp or _utcnow_iso()
-        self._bundle_hash_partial = "0" * 16
+        self._bundle_hash_partial = "0" * 64
 
-        # Evento SESSION_START — primer evento de la cadena
+        # Evento SESSION_START — primer evento de la cadena.
+        # log_version 1.1: digests completos de 64 hex (antes 16 hex / 64 bits).
+        # Los logs 1.0 existentes siguen siendo verificables con su esquema.
         self._write({
             "event_type": "SESSION_START",
             "case_id": case_id,
             "session_start": self._session_start,
-            "log_version": "1.0",
+            "log_version": "1.1",
             "standard": "SANS_FIND_EVIL_2026",
         })
 
@@ -88,12 +91,14 @@ class VigiaExecutionLogger:
 
         # Hash calculado ANTES de _local_timestamp — garantiza que el hash
         # sea idéntico en cualquier zona horaria (Qwen: trazabilidad cruzada Daubert).
+        # Digests COMPLETOS (64 hex): truncar a 16 hex deja 64 bits — colisión
+        # birthday en ~2^32, atacable con GPU. Inaceptable para Daubert.
         canonical = json.dumps(_canonicalize(event), sort_keys=True, ensure_ascii=True)
-        event_hash = hashlib.sha256(canonical.encode("utf-8")).hexdigest()[:16]
+        event_hash = hashlib.sha256(canonical.encode("utf-8")).hexdigest()
         bundle_input = f"{self._bundle_hash_partial}:{event_hash}"
         self._bundle_hash_partial = hashlib.sha256(
             bundle_input.encode("utf-8")
-        ).hexdigest()[:16]
+        ).hexdigest()
 
         event["_event_hash"] = event_hash
         event["_bundle_hash_partial"] = self._bundle_hash_partial
@@ -125,7 +130,7 @@ class VigiaExecutionLogger:
             "parameters": parameters,
             "parameters_hash": hashlib.sha256(
                 json.dumps(_canonicalize(parameters), sort_keys=True).encode()
-            ).hexdigest()[:12],
+            ).hexdigest(),
             "result_summary": result_summary,
         }
         if duration_ms is not None:
