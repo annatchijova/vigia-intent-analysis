@@ -1097,6 +1097,21 @@ def _build_orchestrator_kwargs(evidence_path: Path, params: Dict) -> Dict:
                 kwargs["takeout_evidence_path"] = str(evidence_path)
         except ImportError:
             pass
+        # B-048: detect macOS evidence directories by marker files.
+        # Collision guard: History.db (Safari) also lives in _IOS_MARKER_FILES,
+        # and every real macOS evidence set has one — detecting macOS on shared
+        # names would run both engines over the same artifacts (double count).
+        # macOS therefore requires a marker NOT shared with iOS. Residual risk
+        # (documented in B-048): full iOS extractions containing TCC.db may
+        # still trigger this detector; the shim precedence guard handles the
+        # same-directory case.
+        try:
+            from vigia.sift.macos_forensics import _MACOS_MARKER_FILES
+            from vigia.sift.ios_forensics import _IOS_MARKER_FILES
+            if all_names & (_MACOS_MARKER_FILES - _IOS_MARKER_FILES):
+                kwargs["macos_evidence_path"] = str(evidence_path)
+        except ImportError:
+            pass
     else:
         # Single file — detect type by extension
         suffix = evidence_path.suffix.lower()

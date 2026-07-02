@@ -191,6 +191,17 @@ class SIFTOrchestrator:
                 logger.error("[SIFT_SHIM] AndroidForensicsAnalyzer failed: %s", e)
 
         ios_path = kwargs.get("ios_evidence_path")
+        # B-048 precedence: if the same directory also matched macOS strong
+        # markers, run only the macOS engine — shared Safari artifacts
+        # (History.db) would otherwise be processed and counted by both.
+        if ios_path and ios_path == kwargs.get("macos_evidence_path"):
+            logger.warning(
+                "[SIFT_SHIM] iOS engine skipped for %s: directory also matched "
+                "macOS strong markers; macOS engine takes precedence to avoid "
+                "double-counting shared Safari artifacts (B-048).",
+                ios_path,
+            )
+            ios_path = None
         if ios_path:
             try:
                 from vigia.sift.ios_forensics import iOSForensicsAnalyzer
@@ -236,6 +247,30 @@ class SIFTOrchestrator:
                     )
             except Exception as e:
                 logger.error("[SIFT_SHIM] GoogleTakeoutForensicsAnalyzer failed: %s", e)
+
+        # B-048: macOS forensics
+        macos_path = kwargs.get("macos_evidence_path")
+        if macos_path:
+            try:
+                from vigia.sift.macos_forensics import MacOSForensicsAnalyzer
+                analyzer = MacOSForensicsAnalyzer()
+                result = analyzer.analyze(Path(macos_path))
+                sig = result.to_signal()
+                if sig and (sig.z_score > 0 or result.findings):
+                    sig_dict = {
+                        "tool": sig.tool_name,
+                        "z_score": sig.z_score,
+                        "confidence": sig.confidence,
+                        "value": sig.value,
+                        "metadata": sig.metadata,
+                    }
+                    signals.append(sig_dict)
+                    logger.info(
+                        "[SIFT_SHIM] macOS engine: %d findings, z=%.2f",
+                        len(result.findings), sig.z_score,
+                    )
+            except Exception as e:
+                logger.error("[SIFT_SHIM] MacOSForensicsAnalyzer failed: %s", e)
 
         return signals
 
