@@ -535,12 +535,19 @@ _LAST_STATE_HASH: str = _SESSION_NONCE  # genesis: el nonce es el estado inicial
 _HEARTBEAT_LOCK: asyncio.Lock = asyncio.Lock()
 
 
-async def _advance_heartbeat() -> tuple[int, str]:
+async def _advance_heartbeat(evidence_hash: str = "") -> tuple[int, str]:
     """
     Avanza el Heartbeat Criptografico un paso y retorna el nuevo estado.
 
-    Debe llamarse por cada bloque de evidencia procesado o enviado al LLM.
-    El hash encadenado es: SHA-256(prev_hash + "_" + counter)
+    Debe llamarse por cada bloque de evidencia procesado o enviado al LLM,
+    pasando el SHA-256 de la evidencia del paso.
+    El hash encadenado es: SHA-256(prev_hash + "_" + counter + "_" + evidence_hash)
+
+    El evidence_hash pliega CONTENIDO al estado: sin el, la cadena era
+    derivable solo de (nonce, counter) — un proceso sustituto (BYOI) podia
+    fast-forwardear el contador y reproducir el estado exacto, que era
+    justo lo que el heartbeat decia prevenir. Con contenido plegado, el
+    sustituto necesita ademas la secuencia exacta de evidencia procesada.
 
     Thread-safe via asyncio.Lock — multiples coroutines no pueden
     producir el mismo estado de heartbeat.
@@ -552,7 +559,7 @@ async def _advance_heartbeat() -> tuple[int, str]:
     async with _HEARTBEAT_LOCK:
         _HEARTBEAT_COUNTER += 1
         _LAST_STATE_HASH = hashlib.sha256(
-            f"{_LAST_STATE_HASH}_{_HEARTBEAT_COUNTER}".encode()
+            f"{_LAST_STATE_HASH}_{_HEARTBEAT_COUNTER}_{evidence_hash}".encode()
         ).hexdigest()
         return _HEARTBEAT_COUNTER, _LAST_STATE_HASH
 
@@ -2754,11 +2761,14 @@ async def reason_with_llm(evidence: str, context: str = "") -> dict:
     # la evidencia legitima porque el nonce no coincide con _SESSION_NONCE.
     # _get_session_prompt() resuelve {EVIDENCE_NONCE} en el system prompt.
 
-    # PARCHE 2 — Heartbeat Criptografico: avanzar estado antes de cada envio.
-    # El estado encadenado se incluye en la cabecera de evidencia.
+    # PARCHE 2 — Heartbeat Criptografico: avanzar estado antes de cada envio,
+    # plegando el hash de la evidencia al estado encadenado.
     # Un proceso sustituto (BYOI) no puede reproducir esta cadena sin conocer
-    # el estado interno exacto — la ruptura matematica prueba la manipulacion.
-    _hb_counter, _hb_hash = await _advance_heartbeat()
+    # el estado interno exacto Y la secuencia de evidencia procesada —
+    # la ruptura matematica prueba la manipulacion.
+    _hb_counter, _hb_hash = await _advance_heartbeat(
+        hashlib.sha256(evidence.encode("utf-8")).hexdigest()
+    )
 
     wrapped = _bind_evidence_to_prompt(evidence, context if context else "")
     prompt = (

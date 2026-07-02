@@ -1,15 +1,71 @@
 # sift_orchestrator.py — shim de compatibilidad para vigia_agent.py
 from __future__ import annotations
 
+import ipaddress
 import json
 import logging
+import re
 import subprocess
 import sys
 from fractions import Fraction
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any, Dict, List, Optional
 
 logger = logging.getLogger(__name__)
+
+# IPv4/IPv6 en el output de Volatility3 netscan (columnas separadas por espacios)
+_IP_TOKEN_RE = re.compile(
+    r"\b(?:\d{1,3}(?:\.\d{1,3}){3}|[0-9a-fA-F:]{2,}:[0-9a-fA-F:]*)\b"
+)
+
+
+def _is_external_ip(ip_str: str) -> bool:
+    """
+    True si la IP es enrutable en internet (candidata a C2/exfil).
+
+    FIX (auditoría FN, P1-C): reemplaza el filtro por substring
+    `any(ip in linea for ip in ["10.", "::", ...])`, que clasificaba como
+    internas IPs externas legítimas con la subcadena de una red privada —
+    p.ej. 85.10.20.30 (contiene "10."), 45.155.10.99, o casi cualquier IPv6
+    (contiene "::"). Esas conexiones C2 se descartaban silenciosamente.
+    Ahora se decide por red real con el módulo ipaddress.
+    """
+    try:
+        ip = ipaddress.ip_address(ip_str)
+    except ValueError:
+        return False
+    # is_global = enrutable en el internet público. Excluye en un solo check
+    # privado, loopback, link-local, multicast, unspecified, reservado,
+    # documentación (RFC 5737: 203.0.113.0/24, etc.) y CGNAT — todos los
+    # rangos no enrutables que un C2 real nunca usaría como destino.
+    return ip.is_global
+
+
+def _netscan_has_external_conn(line: str) -> bool:
+    """
+    Dada una línea de netscan, extrae la IP foránea (segunda IP de la línea:
+    LocalAddr, ForeignAddr) y decide si es externa.
+
+    Conservador ante ambigüedad: si no se pueden extraer dos IPs, se trata la
+    conexión como externa (no se descarta) — preferimos un falso positivo
+    revisable a un falso negativo silencioso de C2.
+    """
+    ips = _IP_TOKEN_RE.findall(line)
+    # Filtrar tokens que no parsean como IP (evita capturar timestamps raros)
+    valid = [t for t in ips if _safe_ip(t) is not None]
+    if len(valid) >= 2:
+        foreign = valid[1]  # LocalAddr, ForeignAddr
+        return _is_external_ip(foreign)
+    if len(valid) == 1:
+        return _is_external_ip(valid[0])
+    return True  # no se pudo determinar → conservar (posible C2)
+
+
+def _safe_ip(token: str) -> Optional[ipaddress._BaseAddress]:
+    try:
+        return ipaddress.ip_address(token)
+    except ValueError:
+        return None
 
 # Vol3 binary: buscar en venv primero
 _VOL3 = str(Path(sys.executable).parent / "vol")
@@ -476,8 +532,7 @@ class SIFTOrchestrator:
         netscan = self._vol3_run(memory_path, "windows.netscan.NetScan", timeout=300)
         if netscan["ok"]:
             external = [l for l in netscan["stdout"].splitlines()
-                        if "ESTABLISHED" in l and
-                        not any(ip in l for ip in ["127.0.", "192.168.", "10.", "172.16.4.", "172.16.3.", "172.16.2.", "172.16.1.", "::1", "::", "fe80:"])]
+                        if "ESTABLISHED" in l and _netscan_has_external_conn(l)]
             if external:
                 signals.append({
                     "source": "vol3.windows.netscan",
@@ -506,6 +561,50 @@ class SIFTOrchestrator:
                     "confidence": Fraction(85, 100),
                     "description": f"Potential code injection in {len(procs)} process(es): {', '.join(list(procs)[:5])}",
                 })
+
+        # FIX (auditoría FN, P1-D): distinguir "analizado y limpio" de "no se
+        # pudo analizar". Si NINGÚN plugin de Volatility3 corrió con éxito
+        # (binario `vol` ausente, imagen ilegible, todos los plugins en timeout),
+        # 0 señales NO significa evidencia benigna — significa que no se analizó.
+        # Antes esto caía en NO_SEMIOTIC_ANOMALY_DETECTED (benigno, exit 0);
+        # ahora abstiene con UNANALYZED_ARTIFACT (→ ABSTAIN en el agente).
+        any_plugin_ok = bool(
+            info["ok"] or pslist["ok"] or netscan["ok"] or malfind["ok"]
+        )
+        if not any_plugin_ok:
+            vol_missing = any(
+                "no such file" in r["stderr"].lower()
+                or "not found" in r["stderr"].lower()
+                for r in (info, pslist, netscan, malfind)
+            )
+            reason = (
+                "Volatility3 binary not found — memory image NOT analyzed"
+                if vol_missing else
+                "All Volatility3 plugins failed — memory image could not be analyzed"
+            )
+            logger.error("[VOL3] %s: %s", reason, Path(memory_path).name)
+            return {
+                "case_id": self.case_id,
+                "signals": [],
+                "abduction": {
+                    "best_hypothesis": "UNANALYZED_ARTIFACT",
+                    "is_conclusive": False,
+                    "confidence": "0/1",
+                    "best_posterior": "0/1",
+                    "narrative": (
+                        f"[ABSTAIN] {reason}: {Path(memory_path).name}. "
+                        "Absence of signals reflects an analysis failure, not "
+                        "the absence of malicious activity. Verify the vol3 "
+                        "binary and image format before drawing conclusions."
+                    ),
+                },
+                "pipeline_meta": {
+                    "source": "vol3_memory_adapter",
+                    "memory_path": str(memory_path),
+                    "error": "VOL3_UNAVAILABLE" if vol_missing else "VOL3_ALL_PLUGINS_FAILED",
+                    "vol3_binary": _VOL3,
+                },
+            }
 
         # FIX P2: avg en Fraction — sin float(s["z_score"])
         if signals:

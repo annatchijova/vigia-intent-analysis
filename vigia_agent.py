@@ -52,6 +52,79 @@ MAX_ITERATIONS = 3                    # Hard cap — prevents infinite loops
 CONTRADICTION_THRESHOLD = 2           # int: minimum contradictions to trigger re-analysis
 CONFIDENCE_FLOOR = Fraction(3, 10)    # Minimum MCA threshold for conclusive verdict
 
+# ── Verdict classification ────────────────────────────────────────────────────
+# Exit codes (documented): 0=no evil, 1=evil, 2=error, 3=intent/suspicion, 4=ABSTAIN
+EXIT_NOISE   = 0
+EXIT_MALICE  = 1
+EXIT_ERROR   = 2
+EXIT_INTENT  = 3
+EXIT_ABSTAIN = 4
+
+# Hypotheses that mean "could not analyze / indeterminate" — these must map to
+# ABSTAIN, NOT to benign. Convertir un error de extracción o una dependencia
+# ausente en "NO EVIL" es el falso-negativo raíz del modo agente (ver
+# AUDITORIA_FALSOS_NEGATIVOS_MODO_AGENTE.md, P0-A). ABSTAIN es un veredicto
+# válido y honesto; benigno afirma que se analizó y no había nada.
+ABSTAIN_HYPOTHESES = frozenset({
+    "PIPELINE_ERROR",
+    "PIPELINE_UNAVAILABLE",
+    "PIPELINE_INTERNAL_ERROR",
+    "FORMAT_NOT_SUPPORTED",
+    "BINARY_EVIDENCE_REQUIRES_SIFT_ORCHESTRATOR",
+    "SYMLINK_REJECTED",
+    "UNANALYZED_ARTIFACT",
+    "UNANALYZED",
+    "UNDETERMINED",
+    "UNKNOWN",
+    "",
+})
+
+
+def classify_agent_verdict(abduction: Dict[str, Any], n_signals: int) -> str:
+    """
+    Mapea el estado de la abducción a un veredicto de 4 valores:
+    "MALICE" | "INTENT" | "ABSTAIN" | "NOISE".
+
+    Reglas (en orden de precedencia):
+      1. Hipótesis de malicia (MALICIOUS/CRITICAL/OVERRIDE) → MALICE.
+      2. Hipótesis de intención (INTENT/SUSPICION)          → INTENT.
+      3. No se pudo analizar (ABSTAIN_HYPOTHESES) o veredicto
+         no-concluyente sin señales suficientes (<3)        → ABSTAIN.
+      4. Analizado y limpio (NO_*_ANOMALY_DETECTED, BENIGN) → NOISE.
+
+    La regla 3 es la corrección central: antes, todo lo que no fuera malicia
+    ni intención caía en NOISE (exit 0), incluidos errores de pipeline y
+    ausencia de señal. Ahora esos casos abstienen.
+    """
+    hyp = str(abduction.get("best_hypothesis") or "").upper()
+
+    if "MALICIOUS" in hyp or "CRITICAL" in hyp or "OVERRIDE" in hyp:
+        return "MALICE"
+    if "INTENT" in hyp or "SUSPICION" in hyp:
+        return "INTENT"
+    if hyp in ABSTAIN_HYPOTHESES:
+        return "ABSTAIN"
+    # Veredicto que se presenta como "limpio" pero se apoya en muy pocas
+    # señales: el reasoner no tuvo base suficiente para afirmar benignidad.
+    # <3 señales es el gate del propio AbductiveReasoner — sin base, abstener.
+    if n_signals < 3 and not abduction.get("is_conclusive", False):
+        return "ABSTAIN"
+    return "NOISE"
+
+
+_VERDICT_EXIT = {
+    "MALICE":  EXIT_MALICE,
+    "INTENT":  EXIT_INTENT,
+    "ABSTAIN": EXIT_ABSTAIN,
+    "NOISE":   EXIT_NOISE,
+}
+_VERDICT_LABEL = {
+    "MALICE":  "EVIL FOUND",
+    "INTENT":  "INTENT/SUSPICION DETECTED",
+    "ABSTAIN": "ABSTAIN — could not determine (insufficient/unanalyzed evidence)",
+    "NOISE":   "NO EVIL DETECTED",
+}
+
 
 # ── Rational conversion helpers ──────────────────────────────────────────────
 
@@ -838,6 +911,10 @@ class VIGIAAgent:
         Seals the final bundle with SHA-256.
         Includes full audit trail, results, and narrative.
         """
+        abduction = results.get("abduction", {})
+        n_signals = len(results.get("signals", []))
+        agent_verdict = classify_agent_verdict(abduction, n_signals)
+
         bundle = {
             "vigia_agent_version": AGENT_VERSION,
             "case_id": self.case_id,
@@ -846,6 +923,10 @@ class VIGIAAgent:
             "analysis_timestamp": _utcnow(),
             "iterations_executed": self.iteration + 1,
             "self_corrections_applied": len(self.corrections_applied),
+            # Veredicto de 4 valores (MALICE/INTENT/ABSTAIN/NOISE) — embebido y
+            # sellado para que main() y el bundle no puedan divergir. ABSTAIN
+            # distingue "no se pudo analizar" de "analizado y limpio".
+            "agent_verdict": agent_verdict,
             "pipeline_results": results,
             "narrative": narrative,
             "audit_trail": self.audit.export(),
@@ -958,19 +1039,20 @@ class VIGIAAgent:
 
         # 3. Generate narrative
         logger.info("[AGENT] Generating investigative narrative")
-        # Log agent exit in audit trail BEFORE sealing — so it appears in the bundle
-        exit_code_preview = 1 if (
-            "MALICIOUS" in str(results.get("abduction", {}).get("best_hypothesis", ""))
-            or "CRITICAL" in str(results.get("abduction", {}).get("best_hypothesis", ""))
-            or "OVERRIDE" in str(results.get("abduction", {}).get("best_hypothesis", ""))
-        ) else 0
+        # Log agent exit in audit trail BEFORE sealing — so it appears in the bundle.
+        # Usa la misma clasificación de 4 valores que el veredicto sellado.
+        _abduction_preview = results.get("abduction", {})
+        _verdict_preview = classify_agent_verdict(
+            _abduction_preview, len(results.get("signals", []))
+        )
+        exit_code_preview = _VERDICT_EXIT.get(_verdict_preview, EXIT_ABSTAIN)
         self.audit.log(
             action="AGENT_EXIT",
             tool="vigia_agent",
-            inputs={"verdict": results.get("abduction", {}).get("best_hypothesis", "UNKNOWN")},
-            outputs={"exit_code": exit_code_preview},
+            inputs={"verdict": _abduction_preview.get("best_hypothesis", "UNKNOWN")},
+            outputs={"exit_code": exit_code_preview, "agent_verdict": _verdict_preview},
             iteration=self.iteration,
-            note=f"Exit code {exit_code_preview} — analysis complete.",
+            note=f"Exit code {exit_code_preview} ({_verdict_preview}) — analysis complete.",
         )
 
         # R7 — deterministic devil_advocate for the agent audit-trail path.
@@ -1315,6 +1397,14 @@ Examples:
 Self-correction: automatic — no flags needed.
 Narrative: 100% deterministic — no LLMs in core analysis.
 Max iterations: 3 (hard cap, prevents infinite loops).
+
+Exit codes:
+  0  NO EVIL     — analyzed, no anomaly (NOISE / benign)
+  1  EVIL        — MALICE
+  2  ERROR       — agent-level exception (evidence unreadable, etc.)
+  3  INTENT      — INTENT / SUSPICION
+  4  ABSTAIN     — could not determine: pipeline error, missing dependency,
+                   unanalyzed artifact, or insufficient signals. NOT benign.
         """,
     )
     parser.add_argument(
@@ -1356,6 +1446,17 @@ Max iterations: 3 (hard cap, prevents infinite loops).
     if not evidence_path.exists():
         logger.error("[FATAL] Evidence not found: %s", evidence_path)
         sys.exit(2)
+
+    # FIX (auditoría FN, P0-B): publicar el directorio de evidencia en
+    # VIGIA_EVIDENCE_DIR para que PathGuard lo incluya en su allowlist. Sin
+    # esto, la evidencia pasada por --evidence fuera de las bases estáticas de
+    # PathGuard se rechazaba en silencio → 0 señales → veredicto benigno espurio.
+    # No sobreescribe un valor ya configurado por el operador.
+    if not os.environ.get("VIGIA_EVIDENCE_DIR", "").strip():
+        _ev_dir = evidence_path if evidence_path.is_dir() else evidence_path.parent
+        os.environ["VIGIA_EVIDENCE_DIR"] = str(_ev_dir.absolute())
+        logger.info("[AGENT] VIGIA_EVIDENCE_DIR=%s (PathGuard allowlist)",
+                    os.environ["VIGIA_EVIDENCE_DIR"])
 
     # Output path
     # Sanitizar case-id para uso seguro como nombre de archivo
@@ -1435,8 +1536,11 @@ Max iterations: 3 (hard cap, prevents infinite loops).
     # Console summary
     abduction = bundle.get("pipeline_results", {}).get("abduction", {})
     hypothesis = abduction.get("best_hypothesis", "UNDETERMINED")
-    evil_found = "MALICIOUS" in hypothesis or "CRITICAL" in hypothesis or "OVERRIDE" in hypothesis
-    intent_found = "INTENT" in hypothesis or "SUSPICION" in hypothesis
+    # Veredicto de 4 valores: leído del bundle sellado (no recomputado — así el
+    # exit code no puede divergir del veredicto que quedó firmado en disco).
+    agent_verdict = bundle.get("agent_verdict") or classify_agent_verdict(
+        abduction, len(bundle.get("pipeline_results", {}).get("signals", []))
+    )
 
     print("\n" + "=" * 60)
     print(f"VIGÍA AGENT — CASE {args.case_id}")
@@ -1448,17 +1552,18 @@ Max iterations: 3 (hard cap, prevents infinite loops).
     print(f"Iterations        : {bundle.get('iterations_executed', 1)}")
     print(f"Corrections       : {bundle.get('self_corrections_applied', 0)}")
     print(f"Analysis time     : {elapsed:.2f}s")
-    print(f"Verdict           : {hypothesis}")
-    print(f"Evil found        : {'YES' if evil_found else 'NO'}")
+    print(f"Hypothesis        : {hypothesis}")
+    print(f"Verdict           : {agent_verdict}")
+    print(f"Evil found        : {'YES' if agent_verdict == 'MALICE' else 'NO'}")
     print(f"Output            : {output_path}")
     print("=" * 60)
 
     # Print narrative
     print("\n" + bundle.get("narrative", "[No narrative]"))
 
-    # Documented exit code — 0=no evil, 1=evil found, 2=error, 3=intent/suspicion
-    exit_code = 1 if evil_found else 3 if intent_found else 0
-    _exit_label = "EVIL FOUND" if evil_found else "INTENT/SUSPICION DETECTED" if intent_found else "NO EVIL DETECTED"
+    # Documented exit code — 0=no evil, 1=evil, 2=error, 3=intent/suspicion, 4=ABSTAIN
+    exit_code = _VERDICT_EXIT.get(agent_verdict, EXIT_ABSTAIN)
+    _exit_label = _VERDICT_LABEL.get(agent_verdict, agent_verdict)
     logger.info("[AGENT] Exit code: %d (%s)", exit_code, _exit_label)
     sys.exit(exit_code)
 

@@ -522,9 +522,10 @@ Unlike LLM agents that emit incorrect verdicts and then revise them narratively,
 VIGÍA's self-correction occurs pre-emission: the mathematical gate intercepts
 incorrect candidates before they reach the ForensicBundle.
 
-## Tool Execution Log Format (Strict)
+## Tool Execution Log Format (Strict — chain v2)
 
-Every entry in tool_execution_log MUST follow this exact schema:
+Entries MUST be generated with `vigia.core.tool_log_chain.ToolExecutionLogChain`
+— do not implement the hashing by hand. Schema v2:
 
 ```json
 {
@@ -536,28 +537,38 @@ Every entry in tool_execution_log MUST follow this exact schema:
   "target": "<what was analyzed>",
   "result_summary": "<truncated to 120 chars>",
   "input_hash": "<SHA-256 of sanitized arguments as JSON string>",
-  "prev_hash": "<SHA-256 of previous entry result_summary, or 'GENESIS' for seq=1>"
+  "chain_version": "2",
+  "prev_hash": "<entry_hash of previous entry, or 64 zeros for seq=1>",
+  "entry_hash": "<SHA-256 of canonical(full entry + seq + prev_hash)>",
+  "entry_hmac": "<HMAC-SHA256(VIGIA_HMAC_KEY, entry_hash) — present when key is set>"
 }
 ```
 
-The prev_hash chain makes the log tamper-evident: any modification to an earlier
-entry breaks all subsequent prev_hash values.
+v2 covers the FULL entry: any field modified in any entry breaks the chain
+(under legacy v1, only result_summary was protected — timestamp/tool/target/
+input_hash were editable, and the last entry was fully editable).
+`entry_hmac` additionally detects an attacker who rewrites and recomputes the
+whole chain: SHA-256 alone is recomputable without the key.
+
+Verification: `python3 verify_tool_log.py <bundle>` (stdlib-only, verifies
+both v1 legacy bundles and v2; pass `--hmac-key-hex/--hmac-key-file` or set
+`VIGIA_HMAC_KEY[_FILE]` for keyed verification).
+
+Legacy v1 (`prev_hash = SHA-256(previous result_summary)`, `"GENESIS"` at
+seq=1) remains verifiable for historical bundles in `results/` but MUST NOT
+be used for new investigations.
 
 ## Self-Correction Event Schema
 
 When ContradictionDetector fires OR when a finding is downgraded by a gate,
-add a dedicated entry to tool_execution_log:
+add a dedicated entry to tool_execution_log — generated through the same
+`ToolExecutionLogChain` appender (it fills seq/prev_hash/entry_hash/entry_hmac):
 
-```json
-{
-  "seq": <N>,
-  "event_id": "<uuid4>",
-  "timestamp": "<ISO8601>",
-  "mode": "claude_code",
-  "tool": "contradiction_detector",
-  "target": "<finding_id or module pair>",
-  "result_summary": "BEFORE: <verdict_before> | AFTER: <verdict_after> | REASON: <gate or rule>",
-  "input_hash": "<hash>",
-  "prev_hash": "<prev entry hash>"
-}
+```python
+chain.append(
+    tool="contradiction_detector",
+    target="<finding_id or module pair>",
+    result_summary="BEFORE: <verdict_before> | AFTER: <verdict_after> | REASON: <gate or rule>",
+    arguments={...},
+)
 ```

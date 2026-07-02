@@ -15,6 +15,7 @@ from __future__ import annotations
 import json
 import asyncio
 import logging
+import os
 from decimal import Decimal, ROUND_HALF_EVEN
 from fractions import Fraction
 from pathlib import Path
@@ -96,6 +97,51 @@ except ImportError:
 
 logger = logging.getLogger(__name__)
 
+# Bases estáticas de la allowlist de PathGuard (rutas de despliegue conocidas).
+_STATIC_ALLOWLIST = (
+    Path('/var/vigia'),
+    Path('/tmp/vigia'),
+    Path('/home/vigia/cases'),
+    Path.home() / 'vigia-repo' / 'evidence',
+    Path.home() / 'vigia-repo' / 'data',
+    Path('/mnt'),
+)
+
+
+def _evidence_allowlist(extra_dirs: Optional[List[str]] = None) -> List[Path]:
+    """
+    Construye la allowlist de PathGuard incluyendo el directorio de evidencia
+    configurado por el operador.
+
+    FIX (auditoría FN, P0-B): antes la allowlist era 100% hardcodeada y
+    VIGIA_EVIDENCE_DIR — la variable que el CLAUDE.md documenta como el punto
+    de entrada de evidencia — NO se consultaba en ningún punto del modo agente.
+    Un operador que siguiera la doc y apuntara la evidencia a cualquier ruta
+    fuera de las seis bases estáticas obtenía 0 señales (rechazo silencioso de
+    PathGuard) → veredicto benigno espurio. Ahora VIGIA_EVIDENCE_DIR y el
+    directorio de evidencia efectivo se agregan a la allowlist.
+
+    La seguridad se mantiene: PathGuard sigue rechazando symlinks, TOCTOU y
+    path traversal. Solo se amplía la base permitida a directorios que el
+    propio operador declaró como fuente de evidencia.
+    """
+    allowed: List[Path] = list(_STATIC_ALLOWLIST)
+    env_dir = os.environ.get("VIGIA_EVIDENCE_DIR", "").strip()
+    if env_dir:
+        try:
+            allowed.append(Path(env_dir).absolute())
+        except (OSError, ValueError):
+            logger.warning("[PATHGUARD] VIGIA_EVIDENCE_DIR inválido: %r", env_dir)
+    for d in (extra_dirs or []):
+        if not d:
+            continue
+        try:
+            allowed.append(Path(d).absolute())
+        except (OSError, ValueError):
+            logger.warning("[PATHGUARD] evidence dir inválido: %r", d)
+    return allowed
+
+
 # Artifact reliability mapping per source
 ARTIFACT_GAMMA: Dict[str, str] = {
     "memory": "memory",
@@ -139,14 +185,7 @@ class SIFTOrchestrator:
         # so CAIE can evaluate all 4 gates.  Only set when the examiner
         # explicitly provides them — absent fields degrade trust honestly.
         self.acquisition_overrides: Dict[str, Any] = {}
-        self.path_guard = PathGuard(allowed_base_paths=[
-            Path('/var/vigia'),
-            Path('/tmp/vigia'),
-            Path('/home/vigia/cases'),
-            Path.home() / 'vigia-repo' / 'evidence',
-            Path.home() / 'vigia-repo' / 'data',
-            Path('/mnt'),
-        ])
+        self.path_guard = PathGuard(allowed_base_paths=_evidence_allowlist())
 
         # SIFT motores originales
         self.memory = MemoryForensicsEngine()
