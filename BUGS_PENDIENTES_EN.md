@@ -2885,3 +2885,128 @@ composite_score: 19/20, artifact_reliability: 7/10.
 - Detected COORDINATED_EVASION via ADV_ROBUST and correctly gate-capped it
 
 No regressions introduced. Full suite: 205 passed, 6 xfailed, 0 failures.
+
+---
+
+## L-043 — PrefetchAnalysisResult.to_signal() does not serialize suspicious executable list [FIXED]
+
+| Field | Value |
+|-------|-------|
+| **Status** | FIXED — 2026-07-02 |
+| **Severity** | MEDIUM — detected executable names were dropped before reaching the bundle and CAIE |
+| **File** | `vigia/sift/prefetch_analyzer.py` |
+| **Method** | `PrefetchAnalysisResult.to_signal()` |
+| **Detected** | 2026-07-02, serialization gap audit |
+
+### Description
+
+`analyze_directory()` correctly built `self.suspicious_executions` — a list of
+dicts with `filename`, `run_count`, `last_execution`, `severity` — but
+`to_signal()` only serialized the count (`suspicious_count`) into the
+`SignalOutput` metadata. The list of names was discarded at serialization: the
+resulting bundle knew that 12 suspicious executions had been detected but not
+which executables they were.
+
+### Fix
+
+One line added to `to_signal()`, between `suspicious_count` and
+`anti_forensic_count`:
+
+```python
+"suspicious_executables": [e["filename"] for e in self.suspicious_executions],
+```
+
+### Validation
+
+Full suite: **317 passed, 6 xfailed, 0 regressions** (13 prefetch-specific
+tests pass, including SCCA/MAM format detection and executable name parsing).
+
+Real-evidence case `evidence/owl-2019-hd1-windows` — bundle
+`results/agent_batch/VIGIA-OWL-2019-HD1-L043_bundle.json`:
+
+```json
+"suspicious_count": 12,
+"suspicious_executables": [
+  "RUNDLL32.EXE", "RUNDLL32.EXE", "RUNDLL32.EXE", "RUNDLL32.EXE",
+  "RUNDLL32.EXE", "RUNDLL32.EXE", "RUNDLL32.EXE", "RUNDLL32.EXE",
+  "RUNDLL32.EXE", "RUNDLL32.EXE", "RUNDLL32.EXE", "RUNDLL32.EXE"
+]
+```
+
+12 distinct RUNDLL32 `.pf` files (each with a different path hash) now visible
+in the bundle. PIDGIN.EXE is absent because it is not in
+`ANTI_FORENSIC_PREFETCH_SIGNS` — that is a separate blacklist coverage gap,
+outside the scope of this serialization fix.
+
+Restore tag: `pre-l043-prefetch-suspicious-executables-<timestamp>`
+
+---
+
+## B-050 — sift_orchestrator.py (shim): log_path overwrites event_logs [FIXED]
+
+| Field | Value |
+|-------|-------|
+| **Status** | FIXED — 2026-07-02 |
+| **Severity** | HIGH — EVENT_LOG completely blind in any evidence directory containing .log files alongside .evtx files |
+| **File** | `sift_orchestrator.py` (shim in repo root) |
+| **Line** | 180 |
+| **Detected** | 2026-07-02, attempting to reproduce on `evidence/owl-2019-hd1-windows` |
+
+### Description
+
+The `analyze()` shim in `sift_orchestrator.py` maps kwargs from
+`_build_orchestrator_kwargs()` to `run_full_analysis()` parameters. The mapping
+contained two consecutive assignments to `run_kwargs["event_logs"]`:
+
+```python
+# L.175-177: correctly maps .evtx files
+es = kwargs.get("event_stream") or kwargs.get("event_logs")
+if es:
+    run_kwargs["event_logs"] = es if isinstance(es, list) else [es]
+
+# L.178-180: .log fallback — OVERWROTE without a guard
+lp = kwargs.get("log_path")
+if lp and not str(lp).endswith(".json"):
+    run_kwargs["event_logs"] = lp if isinstance(lp, list) else [lp]
+```
+
+The `log_path` fallback existed for evidence without .evtx files (text log only).
+But without a "already set" guard, any directory containing both types (such as
+`owl-2019-hd1-windows`, which has `.evtx` files plus `security_audit.log`)
+caused the `.log` to overwrite the .evtx list. `EventLogCorrelator` received
+the .log instead of the .evtx files and produced 0 findings — EVENT_LOG never
+appeared in top signals.
+
+**Note on bug location:** The initial description pointed to `vigia_agent.py`
+L.1236. That code (`kwargs["event_logs"] = [str(evidence_path)]`) lives in the
+single-file `else` branch and is correct — in that branch `evidence_path` is
+already the individual file. The actual bug was in the `sift_orchestrator.py`
+shim.
+
+### Fix
+
+One added condition in `sift_orchestrator.py` L.179:
+
+```python
+# BEFORE:
+if lp and not str(lp).endswith(".json"):
+
+# AFTER:
+if lp and not str(lp).endswith(".json") and not run_kwargs.get("event_logs"):
+```
+
+The `log_path` fallback now only fires if no `.evtx` files have already been
+mapped.
+
+### Validation
+
+Full suite: **317 passed, 6 xfailed, 0 regressions**.
+
+Real-evidence case `evidence/owl-2019-hd1-windows` (VIGIA-OWL-2019-HD1-WINDOWS-V5):
+- Before fix: EVENT_LOG absent from top signals (0 findings)
+- After fix: **[EVENT_LOG] z=3.040 conf=0.95** in position 1 of top signals
+- finding_types: `['HIGH_SEVERITY_25', 'HIGH_SEVERITY_7045', 'PASS_THE_HASH']`
+- 178 findings across 4 .evtx files (2954 events)
+- Exit code: 3 (INTENT/SUSPICION DETECTED)
+
+Restore tag: `pre-eventlog-fix-<timestamp>`
