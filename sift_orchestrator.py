@@ -135,7 +135,7 @@ class SIFTOrchestrator:
         has_windows_evidence = any(kwargs.get(k) for k in (
             "memory_path", "disk_path", "event_logs", "event_stream",
             "registry_hives", "pcap_path", "network_flows", "log_path",
-            "browser_profile",
+            "browser_profile", "prefetch_dir",
         ))
         if not has_windows_evidence and mobile_signals:
             result = {
@@ -201,6 +201,10 @@ class SIFTOrchestrator:
             bp = kwargs.get("browser_profile")
             if bp:
                 run_kwargs["browser_profile"] = bp[0] if isinstance(bp, list) else bp
+            # Prefetch directory (P1-B) — parser real por nombre de ejecutable.
+            pd = kwargs.get("prefetch_dir")
+            if pd:
+                run_kwargs["prefetch_dir"] = pd[0] if isinstance(pd, list) else pd
 
             # disk_path (E01) has no direct mapping — requires prior mounting
             # and artifact extraction (ewfmount + registry hive extraction)
@@ -420,18 +424,24 @@ class SIFTOrchestrator:
             avg = sum(self._frac(s["z_score"]) for s in signals) / n
         else:
             avg = Fraction(0, 1)
-        expected   = case_data.get("expected_verdict", "UNKNOWN")
-        is_malice  = avg > Fraction(2, 1) or expected == "MALICE"
-        hypothesis = (
-            "MALICIOUS_INTENT_DETECTED" if (expected == "MALICE" or is_malice)
-            else "INTENT_DETECTED" if expected == "INTENT"
-            else "SUSPICION_DETECTED" if expected == "SUSPICION"
-            else "ABSTAIN_DETECTED" if expected == "ABSTAIN"
-            else "BENIGN_DETECTED" if expected == "BENIGN"
-            else "NO_SEMIOTIC_ANOMALY_DETECTED"
-        )
-        logger.info("[SIFT_SHIM] EBS v1 adapter: case=%s artifacts=%d avg=%s hyp=%s",
-                    case_id, len(artifacts), str(avg), hypothesis)
+        # FIX (auditoría FN, P2-C): la hipótesis se deriva EXCLUSIVAMENTE del
+        # score computado (avg), NUNCA de expected_verdict. Antes el adaptador
+        # hacía echo de la etiqueta de verdad del propio caso — una fuga
+        # train/eval que hacía "acertar" al leer la respuesta. Un forense no
+        # puede leer el veredicto esperado para decidir su veredicto.
+        # expected_verdict se conserva SOLO como referencia en pipeline_meta.
+        expected = case_data.get("expected_verdict", "UNKNOWN")
+        if avg > Fraction(2, 1):
+            hypothesis = "MALICIOUS_INTENT_DETECTED"
+        elif avg > Fraction(1, 1):
+            hypothesis = "INTENT_DETECTED"
+        elif avg > Fraction(33, 100):
+            hypothesis = "SUSPICION_DETECTED"
+        else:
+            hypothesis = "NO_SEMIOTIC_ANOMALY_DETECTED"
+        logger.info("[SIFT_SHIM] EBS v1 adapter: case=%s artifacts=%d avg=%s hyp=%s "
+                    "(expected=%s, NO usado en la decisión)",
+                    case_id, len(artifacts), str(avg), hypothesis, expected)
         # FIX P2 (Kimi post-patch/2026-06): usar avg_clamped directamente — sin int() truncamiento.
         # int(Fraction(1,3)*100) = 33, pero el valor real es 33.333... → pérdida de precisión.
         # Fraction ya está simplificada automáticamente — no necesita conversión.

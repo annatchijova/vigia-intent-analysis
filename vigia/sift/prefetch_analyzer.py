@@ -49,6 +49,8 @@ class PrefetchAnalysisResult:
     anti_forensic_deletions: List[Dict[str, Any]]
     timeline_gaps: List[Dict[str, Any]]
     composite_score: Fraction = Fraction(0)
+    # Nº de .pf presentes que no se pudieron parsear (firma inválida/corrupto).
+    unparsed_files: int = 0
 
     def to_signal(self) -> SignalOutput:
         z = Fraction(0, 1)
@@ -71,7 +73,14 @@ class PrefetchAnalysisResult:
                 "anti_forensic_count": len(self.anti_forensic_deletions),
                 "artifact_type": "prefetch",
                 "artifact_reliability": str(ARTIFACT_RELIABILITY),
-                "stub": True,
+                # Detección real por nombre de ejecutable (ambos formatos
+                # SCCA/MAM). unanalyzed=True solo si HABÍA .pf pero ninguno se
+                # pudo parsear — no presentar "0 hallazgos" como "limpio".
+                "unparsed_files": self.unparsed_files,
+                "unanalyzed": (
+                    self.total_files > 0
+                    and self.unparsed_files == self.total_files
+                ),
                 "finding_types": sorted(list(set(
                     s.get("type", "UNKNOWN") for s in self.suspicious_executions
                 ) | set(
@@ -105,20 +114,25 @@ class PrefetchAnalyzer:
         pf_files = sorted(p.glob("*.pf"))
         suspicious = []
         anti_forensic = []
+        unparsed = 0
 
         for pf in pf_files:
             try:
                 record = self._parse_pf(pf)
-                if record.filename.lower() in self._suspicious_names:
-                    suspicious.append({
-                        "type": "SUSPICIOUS_EXECUTION",
-                        "filename": record.filename,
-                        "run_count": record.run_count,
-                        "last_execution": record.last_execution_time,
-                        "severity": str(Fraction(85, 100)),
-                    })
             except Exception:
+                # FIX (auditoría FN, P1-B): antes cada .pf que fallaba el parse
+                # se descartaba en silencio. Ahora se cuenta para poder marcar
+                # el análisis como parcial en vez de "0 hallazgos = limpio".
+                unparsed += 1
                 continue
+            if record.filename.lower() in self._suspicious_names:
+                suspicious.append({
+                    "type": "SUSPICIOUS_EXECUTION",
+                    "filename": record.filename,
+                    "run_count": record.run_count,
+                    "last_execution": record.last_execution_time,
+                    "severity": str(Fraction(85, 100)),
+                })
 
         # Detección de borrado: si hay menos de 10 archivos .pf en un sistema
         # Windows típico (que suele tener 50-150), es sospechoso
@@ -146,24 +160,51 @@ class PrefetchAnalyzer:
             anti_forensic_deletions=anti_forensic,
             timeline_gaps=[],
             composite_score=composite,
+            unparsed_files=unparsed,
         )
 
+    @staticmethod
+    def _executable_name(stem: str) -> str:
+        """
+        Nombre del ejecutable desde el stem del .pf.
+
+        Convención de Windows Prefetch: `EJECUTABLE.EXE-HHHHHHHH.pf`, donde
+        HHHHHHHH es un hash de 8 hex. El nombre real es todo lo anterior al
+        último `-` (si el sufijo son exactamente 8 hex). El bug original hacía
+        stem.replace("-","") → "MIMIKATZ.EXE1234ABCD", que jamás matcheaba
+        "mimikatz.exe" en la blacklist.
+        """
+        base, sep, suffix = stem.rpartition("-")
+        if sep and len(suffix) == 8 and all(c in "0123456789ABCDEFabcdef" for c in suffix):
+            return base
+        return stem
+
     def _parse_pf(self, path: Path) -> PrefetchRecord:
-        """Parseo simplificado de Prefetch v17 (Windows 10)."""
+        """
+        Parseo de Prefetch. Acepta AMBOS formatos:
+          - Clásico SCCA (XP..Win8, versiones 17/23/26/30): firma "SCCA" en
+            el offset 4.
+          - Comprimido MAM (Win10+): firma "MAM\\x03"/"MAM\\x04" en el offset 0.
+
+        FIX (auditoría FN, P1-B): antes solo se aceptaba MAM y además se leía
+        la firma en el offset equivocado — todo .pf clásico se descartaba en
+        silencio (falso negativo de ejecución de malware).
+        """
         data = path.read_bytes()
         if len(data) < 8:
             raise ValueError("Archivo prefetch demasiado pequeño")
 
-        version = struct.unpack("<I", data[0:4])[0]
-        sig = data[4:8]
+        head = data[0:4]
+        sig_at_4 = data[4:8]
+        is_mam = head in (b"MAM\x04", b"MAM\x03")
+        is_scca = sig_at_4 == b"SCCA"
+        if not (is_mam or is_scca):
+            raise ValueError("Firma de prefetch inválida (ni SCCA ni MAM)")
 
-        if sig != b"MAM\x04" and sig != b"MAM\x03":
-            raise ValueError("Firma de prefetch inválida")
+        # El nombre del ejecutable se deriva del nombre del .pf (válido para
+        # ambos formatos; no requiere descomprimir el contenedor MAM).
+        filename = self._executable_name(path.stem)
 
-        # Simplificación: extraer nombre del archivo del path
-        filename = path.stem.replace("-", "")
-
-        # Hash del archivo para integridad
         file_hash = hashlib.sha256(data).hexdigest()[:16]
 
         return PrefetchRecord(

@@ -26,13 +26,14 @@ posible. Cada hallazgo cita `archivo:línea`. Los reproducidos se marcan
 | **P1-A** amcache/shellbag/usb stub | ✅ HONESTO | Emiten `unanalyzed=True` (0 hallazgos = "no analizado", no "limpio"). Implementación real diferida (requiere `regipy` + hives de test). |
 | **P1-D** orquestador frágil | ✅ CORREGIDO | Construcción resiliente (`_safe_engine`): una dependencia ausente (`vol`/`rip.pl`) deshabilita solo su motor, no tumba el pipeline. Motores core guardados con `if self.X`. |
 | **P0-C** PathGuard rechaza directorios | ✅ CORREGIDO | `validate(..., allow_dir=True)` para motores sobre directorios (browser/prefetch); antes `NOT_A_REGULAR_FILE` los mataba. |
-| **P0-C** shim descarta MFT/prefetch | ⏳ PARCIAL | Browser ya cableado. MFT/prefetch/hives requieren extractores nuevos (medio plazo). Mitigado: producen ABSTAIN, no benigno. |
+| **P1-B** prefetch parser roto | ✅ CORREGIDO | Acepta SCCA clásico + MAM comprimido (antes solo MAM y en offset equivocado → todo .pf clásico descartado). Extracción correcta del nombre del ejecutable (`NAME.EXE-HASH8` → `NAME.EXE`, antes `replace("-","")` nunca matcheaba). Cableado en el agente. .pf ilegibles → contados; todos ilegibles → `unanalyzed`. |
+| **P0-C** shim descarta MFT/prefetch | ⏳ PARCIAL | Browser y **prefetch** ya cableados. MFT/hives requieren extractores nuevos (medio plazo). Mitigado: producen ABSTAIN, no benigno. |
+| **P2-C** fuga de `expected_verdict` | ✅ CORREGIDO | Eliminada en los DOS sitios: (1) adaptador EBS-JSON — la hipótesis se deriva solo del score computado, no de la etiqueta; (2) `normalize_case_schema` — eliminada la atenuación de scores por etiqueta benigna (estaba en el core scorer `vigia_scorer.py` y la API, no solo en eval). **Nota:** exponer estas fugas puede bajar los números de accuracy del corpus — es la medición honesta. La limitación real L-018 ya no queda oculta. |
 | **P2-A** cadena de atenuación gamma/FRS | ⏳ DIFERIDO | L-033: no tocar `gamma` sin ≥20 señales reales con ground truth. |
-| **P2-C** fuga de `expected_verdict` | ⏳ PENDIENTE | Higiene de evaluación; no cambia FN en producción. |
 
-Regresión: `tests/test_false_negative_regression.py` (44 tests) +
-`tests/test_browser_forensics_real.py` (15 tests). Suite completa
-291 passed, 6 xfailed. **Cero regresiones.**
+Regresión: `tests/test_false_negative_regression.py` (47 tests) +
+`tests/test_browser_forensics_real.py` (15) + `tests/test_prefetch_real.py`
+(13). Suite completa **307 passed, 6 xfailed**. **Cero regresiones.**
 
 **Nota sobre corroboración:** un caso de fuente única (p.ej. solo un perfil de
 navegador con mimikatz + navegación C2) ahora produce **ABSTAIN**, no MALICE ni
