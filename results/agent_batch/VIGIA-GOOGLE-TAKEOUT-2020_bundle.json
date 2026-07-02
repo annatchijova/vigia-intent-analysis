@@ -1,0 +1,220 @@
+{
+  "analysis_timestamp": "2026-07-01T00:30:51.352182+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "VIGIA-GOOGLE-TAKEOUT-2020",
+    "end_time": "2026-07-01T00:30:51.352186+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "VIGIA-GOOGLE-TAKEOUT-2020",
+        "entry_sha256": "e9ecb82a756413ea9c517721cc0ba6bc19978dd7e9dc5c76e4108a8c87156833",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "VIGIA-GOOGLE-TAKEOUT-2020"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: 1165e177050faa4f...",
+        "outputs_summary": {
+          "agent_sha256": "1165e177050faa4ff8272a6a495c5649a4dd2d375487a16f0e60dcac1c43220d",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-07-01T00:30:50.684086+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-GOOGLE-TAKEOUT-2020",
+        "entry_sha256": "dd2769b23d1380dfcff0a97a30e28911f9d9868b0ab945fbdf1c5fcb565eba2b",
+        "inputs_summary": {
+          "path": "evidence/takeout-2020/Takeout"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-07-01T00:30:50.684167+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-GOOGLE-TAKEOUT-2020",
+        "entry_sha256": "d366519a9c012f03ac168f5a4ebb5875a8cf89565441ef46a437c648fbba39b3",
+        "inputs_summary": {
+          "path": "evidence/takeout-2020/Takeout"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: a04fb207663b5320...",
+        "outputs_summary": {
+          "sha256": "a04fb207663b5320dbdaf1d95a00e851bfa904a04ce2c60eacab466abfec1990"
+        },
+        "seq": 3,
+        "timestamp": "2026-07-01T00:30:51.183772+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "VIGIA-GOOGLE-TAKEOUT-2020",
+        "entry_sha256": "6d45b22bf6910dbb55037dd9684cd8a97304f7fdaf831a21715d91ae4b66b67f",
+        "inputs_summary": {
+          "evidence": "evidence/takeout-2020/Takeout",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-07-01T00:30:51.183927+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "VIGIA-GOOGLE-TAKEOUT-2020",
+        "entry_sha256": "37f150d1536ddb81db8f29a77584b2a4de7fa17dbaf8057b81fd807053cee4e7",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 1 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "MOBILE_EVIDENCE_ANALYZED",
+            "best_posterior": "0",
+            "confidence": "0",
+            "is_conclusive": "True",
+            "narrative": "[FIRSTNESS] Mobile forensic evidence analyzed: 1 signal(s) extracted."
+          },
+          "case_id": "VIGIA-GOOGLE-TAKEOUT-2020",
+          "pipeline_meta": {
+            "n_mobile_signals": "1",
+            "n_total_signals": "1",
+            "source": "mobile_forensics_adapter"
+          },
+          "signals": [
+            {
+              "confidence": "0.95",
+              "metadata": {
+                "account_email": "",
+                "device_model": "Google Pixel 3",
+                "location_date_range": "2020-03-05 to 2020-03-29",
+                "location_gaps_count": "1",
+                "location_unique_days": "17",
+                "total_browser_entries": "161",
+                "total_installed_apps": "70",
+                "total_location_points": "3233",
+                "total_semantic_places": "31",
+                "user_confirmed_places": "10"
+              },
+              "tool": "GOOGLE_TAKEOUT_FORENSICS",
+              "value": "0.84",
+              "z_score": "4.2"
+            }
+          ]
+        },
+        "seq": 5,
+        "timestamp": "2026-07-01T00:30:51.351872+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "VIGIA-GOOGLE-TAKEOUT-2020",
+        "entry_sha256": "1a2ac4e1e299c9ec45691de5b8bcaf520833ecfecaefa2e601ccce46ec644349",
+        "inputs_summary": {
+          "n_signals": "1"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-07-01T00:30:51.351995+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "VIGIA-GOOGLE-TAKEOUT-2020",
+        "entry_sha256": "037ee7fbf256e9919d32b04a8da22c8c160e5748485546b5c28a7750a36f3c12",
+        "inputs_summary": {
+          "verdict": "MOBILE_EVIDENCE_ANALYZED"
+        },
+        "iteration": 0,
+        "note": "Exit code 0 \u2014 analysis complete.",
+        "outputs_summary": {
+          "exit_code": "0"
+        },
+        "seq": 7,
+        "timestamp": "2026-07-01T00:30:51.352100+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-07-01T00:30:50.683841+00:00",
+    "total_entries": 7
+  },
+  "case_id": "VIGIA-GOOGLE-TAKEOUT-2020",
+  "evidence_path": "evidence/takeout-2020/Takeout",
+  "evidence_sha256": "a04fb207663b5320dbdaf1d95a00e851bfa904a04ce2c60eacab466abfec1990",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-GOOGLE-TAKEOUT-2020 ===\nEvidence: evidence/takeout-2020/Takeout\nEvidence SHA-256: a04fb207663b5320dbdaf1d95a00e851bfa904a04ce2c60eacab466abfec1990\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MOBILE_EVIDENCE_ANALYZED\nPosterior confidence: 0\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] Mobile forensic evidence analyzed: 1 signal(s) extracted.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [GOOGLE_TAKEOUT_FORENSICS] z=4.200 conf=0.95 \u2014 0.84\n\n--- FINAL ALERT LEVEL ---\nHIGH \u2014 Significant anomalies detected. Priority forensic review recommended.\n\nCritical signals (z>3): 1\nHigh signals (2<z<=3): 0\nTotal signals analyzed: 1",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "MOBILE_EVIDENCE_ANALYZED",
+      "best_posterior": "0",
+      "confidence": "0",
+      "is_conclusive": true,
+      "narrative": "[FIRSTNESS] Mobile forensic evidence analyzed: 1 signal(s) extracted."
+    },
+    "case_id": "VIGIA-GOOGLE-TAKEOUT-2020",
+    "pipeline_meta": {
+      "n_mobile_signals": 1,
+      "n_total_signals": 1,
+      "source": "mobile_forensics_adapter"
+    },
+    "signals": [
+      {
+        "confidence": 0.95,
+        "metadata": {
+          "account_email": "",
+          "artifact_reliability": "13/20",
+          "artifact_type": "google_takeout",
+          "chains": 3,
+          "composite_score": "19/20",
+          "device_model": "Google Pixel 3",
+          "finding_types": [
+            "BROWSER_EXPLOIT_RESEARCH",
+            "LOCATION_HISTORY_GAP",
+            "OPSEC_ROOT_TOOLCHAIN",
+            "ROOT_TOOL_INSTALLED",
+            "SUSPICIOUS_INSTALLED_APP"
+          ],
+          "findings_count": 43,
+          "location_date_range": "2020-03-05 to 2020-03-29",
+          "location_gaps_count": 1,
+          "location_unique_days": 17,
+          "opsec_indicators_count": 3,
+          "total_browser_entries": 161,
+          "total_installed_apps": 70,
+          "total_location_points": 3233,
+          "total_semantic_places": 31,
+          "user_confirmed_places": 10
+        },
+        "tool": "GOOGLE_TAKEOUT_FORENSICS",
+        "value": 0.84,
+        "z_score": 4.2
+      }
+    ]
+  },
+  "sans_compliance": {
+    "accuracy_validation": true,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}

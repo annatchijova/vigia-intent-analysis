@@ -1,0 +1,275 @@
+{
+  "agent_verdict": "MALICE",
+  "analysis_timestamp": "2026-07-02T14:50:07.618944+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "VIGIA-REAL-M57-PAT-Dec11",
+    "end_time": "2026-07-02T14:50:07.618949+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "VIGIA-REAL-M57-PAT-Dec11",
+        "entry_sha256": "a011bf2928d75181410c02dcd7f47c1a3523de1ddac737d53ef2f919037eb337",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "VIGIA-REAL-M57-PAT-Dec11"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: cf1b0ed196d5e39c...",
+        "outputs_summary": {
+          "agent_sha256": "cf1b0ed196d5e39c164122d40d9383c5c511ab4106c327bd204e9021613acbff",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-07-02T14:50:07.614909+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-REAL-M57-PAT-Dec11",
+        "entry_sha256": "4baea0842dcd849f4e08a73cc3458eb62383161641553cdd81e7dec665bec802",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-REAL-M57-PAT-Dec11.json"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-07-02T14:50:07.614990+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-REAL-M57-PAT-Dec11",
+        "entry_sha256": "a0f1ce09ddf9c245de5910cd7a2cd73964ee388aaeb386960cb999e77df34d79",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-REAL-M57-PAT-Dec11.json"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: 0c589e46a91d48b6...",
+        "outputs_summary": {
+          "sha256": "0c589e46a91d48b6c1795d6b513b0e1a820a69a85c0c3ef6ee491aea38d3f29a"
+        },
+        "seq": 3,
+        "timestamp": "2026-07-02T14:50:07.615072+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "VIGIA-REAL-M57-PAT-Dec11",
+        "entry_sha256": "6f6ac85fea2493c25bd6fb2f48c00cfa557b47f3908cda2195234c7ef67e06fe",
+        "inputs_summary": {
+          "evidence": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-REAL-M57-PAT-Dec11.json",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-07-02T14:50:07.615184+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "VIGIA-REAL-M57-PAT-Dec11",
+        "entry_sha256": "36e87d40f658d479a1f3503602031dcfd2a8ae9d72b950486aa6315347c69a06",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 3 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+            "best_posterior": "119/1000",
+            "confidence": "119/1000",
+            "is_conclusive": "True",
+            "narrative": "M57-Patents scenario. Pat (insider threat). Dec-11: msimn.exe (Outlook Express) spawns scalc.exe (spreadsheet) \u2014 email attachment opened. Known exfiltration vector in scenario. cmd.exe spawns mdd_1.3...."
+          },
+          "case_id": "VIGIA-REAL-M57-PAT-Dec11",
+          "pipeline_meta": {
+            "artifact_count": "3",
+            "avg_score": "119/200",
+            "expected_verdict": "MALICE",
+            "source": "ebs_v1_json_adapter"
+          },
+          "signals": [
+            {
+              "artifact_id": "M57-PAT-D11-A01",
+              "confidence": "17/20",
+              "description": "pslist: msimn.exe PID 3020 (Outlook Express) spawned scalc.exe PID 3272 at 2009-12-11T16:47:40Z. scalc.exe terminated at 16:48:19Z. soffice.bin PID 3792 also terminated same timestamp. Email client la",
+              "evidence_type": "memory_process",
+              "source": "vol3_windows_pslist",
+              "z_score": "289/400"
+            },
+            {
+              "artifact_id": "M57-PAT-D11-A02",
+              "confidence": "17/20",
+              "description": "pslist: cmd.exe PID 3880 spawned mdd_1.3.exe PID 3772 at 2009-12-11T16:57:41Z \u2014 memory acquisition 10 minutes after exfiltration activity. Consistent with post-incident acquisition.",
+              "evidence_type": "kernel_structure",
+              "source": "vol3_windows_pslist",
+              "z_score": "17/40"
+            },
+            {
+              "artifact_id": "M57-PAT-D11-A03",
+              "confidence": "17/20",
+              "description": "Process termination correlation: scalc.exe PID 3272 and soffice.bin PID 3792 both terminated at 2009-12-11T16:48:19Z \u2014 simultaneous teardown 39 seconds after email attachment launch. Delta from exfilt",
+              "evidence_type": "file_timestamp",
+              "source": "vol3_windows_pslist",
+              "z_score": "51/80"
+            }
+          ]
+        },
+        "seq": 5,
+        "timestamp": "2026-07-02T14:50:07.618240+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "VIGIA-REAL-M57-PAT-Dec11",
+        "entry_sha256": "13cfbb60d4ea4ab7279dccc4a79a588f395dae9dcedd52e546fd4690bd58a462",
+        "inputs_summary": {
+          "n_signals": "3"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-07-02T14:50:07.618352+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "VIGIA-REAL-M57-PAT-Dec11",
+        "entry_sha256": "84968b0ed0e0f66c34cf611646c2b5dd46fefcc2d97938eb4bbdac62b279aaa4",
+        "inputs_summary": {
+          "verdict": "MALICIOUS_INTENT_DETECTED"
+        },
+        "iteration": 0,
+        "note": "Exit code 1 (MALICE) \u2014 analysis complete.",
+        "outputs_summary": {
+          "agent_verdict": "MALICE",
+          "exit_code": "1"
+        },
+        "seq": 7,
+        "timestamp": "2026-07-02T14:50:07.618445+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-07-02T14:50:07.614703+00:00",
+    "total_entries": 7
+  },
+  "case_id": "VIGIA-REAL-M57-PAT-Dec11",
+  "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-REAL-M57-PAT-Dec11.json",
+  "evidence_sha256": "0c589e46a91d48b6c1795d6b513b0e1a820a69a85c0c3ef6ee491aea38d3f29a",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-REAL-M57-PAT-Dec11 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/VIGIA-REAL-M57-PAT-Dec11.json\nEvidence SHA-256: 0c589e46a91d48b6c1795d6b513b0e1a820a69a85c0c3ef6ee491aea38d3f29a\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 119/1000\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\nM57-Patents scenario. Pat (insider threat). Dec-11: msimn.exe (Outlook Express) spawns scalc.exe (spreadsheet) \u2014 email attachment opened. Known exfiltration vector in scenario. cmd.exe spawns mdd_1.3.exe at end of session.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [pslist: msimn.exe PID 3020 (Outlook Express) spawned scalc.exe PID 327] z=0.723 conf=0.85 \u2014 \n  [Process termination correlation: scalc.exe PID 3272 and soffice.bin PI] z=0.637 conf=0.85 \u2014 \n  [pslist: cmd.exe PID 3880 spawned mdd_1.3.exe PID 3772 at 2009-12-11T16] z=0.425 conf=0.85 \u2014 \n\n--- FINAL ALERT LEVEL ---\nMEDIUM \u2014 Conclusive MALICE verdict from posterior aggregation. Individual z-scores below threshold. Full signal review recommended.\n\nCritical signals (z>3): 0\nHigh signals (2<z<=3): 0\nTotal signals analyzed: 3",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+      "best_posterior": "119/1000",
+      "confidence": {
+        "__fraction__": true,
+        "den": 1000,
+        "num": 119
+      },
+      "devil_advocate": {
+        "aggregation": {
+          "k": 3,
+          "method": "top_k_already_validated_matches_v2",
+          "total_gap_mass": "0"
+        },
+        "counterfactual_summary": {
+          "primary_alternative_hypothesis": null
+        },
+        "decision_context": {
+          "confidence": "119/1000",
+          "mapped_verdict": "MALICIOUS_INTENT_DETECTED",
+          "raw_verdict": "MALICIOUS_INTENT_DETECTED",
+          "score": "119/200"
+        },
+        "devil_advocate_source": "deterministic_no_pattern_data_available",
+        "meta": {
+          "deterministic": true,
+          "generated_from": "case_pattern_library"
+        },
+        "narrative": "Eco's Razor (Abductive Falsification) applied to verdict MALICIOUS_INTENT_DETECTED. Pattern-matching data was not available on this code path \u2014 CasePatternLibrary is not invoked here by design (agent audit-trail mode (vigia_agent.py \u2014 JSON-replay / autonomous path); see KNOWN_LIMITATIONS.md). No structured counter-hypothesis could be derived deterministically. This is a documented scope limitation of the current code path, not an absence of falsification attempt.",
+        "pattern_evidence_gaps": [],
+        "version": "r7-da-v1"
+      },
+      "is_conclusive": true,
+      "narrative": "M57-Patents scenario. Pat (insider threat). Dec-11: msimn.exe (Outlook Express) spawns scalc.exe (spreadsheet) \u2014 email attachment opened. Known exfiltration vector in scenario. cmd.exe spawns mdd_1.3.exe at end of session."
+    },
+    "case_id": "VIGIA-REAL-M57-PAT-Dec11",
+    "pipeline_meta": {
+      "artifact_count": 3,
+      "avg_score": "119/200",
+      "expected_verdict": "MALICE",
+      "source": "ebs_v1_json_adapter"
+    },
+    "signals": [
+      {
+        "artifact_id": "M57-PAT-D11-A01",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 17
+        },
+        "description": "pslist: msimn.exe PID 3020 (Outlook Express) spawned scalc.exe PID 3272 at 2009-12-11T16:47:40Z. scalc.exe terminated at 16:48:19Z. soffice.bin PID 3792 also terminated same timestamp. Email client la",
+        "evidence_type": "memory_process",
+        "source": "vol3_windows_pslist",
+        "z_score": {
+          "__fraction__": true,
+          "den": 400,
+          "num": 289
+        }
+      },
+      {
+        "artifact_id": "M57-PAT-D11-A02",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 17
+        },
+        "description": "pslist: cmd.exe PID 3880 spawned mdd_1.3.exe PID 3772 at 2009-12-11T16:57:41Z \u2014 memory acquisition 10 minutes after exfiltration activity. Consistent with post-incident acquisition.",
+        "evidence_type": "kernel_structure",
+        "source": "vol3_windows_pslist",
+        "z_score": {
+          "__fraction__": true,
+          "den": 40,
+          "num": 17
+        }
+      },
+      {
+        "artifact_id": "M57-PAT-D11-A03",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 17
+        },
+        "description": "Process termination correlation: scalc.exe PID 3272 and soffice.bin PID 3792 both terminated at 2009-12-11T16:48:19Z \u2014 simultaneous teardown 39 seconds after email attachment launch. Delta from exfilt",
+        "evidence_type": "file_timestamp",
+        "source": "vol3_windows_pslist",
+        "z_score": {
+          "__fraction__": true,
+          "den": 80,
+          "num": 51
+        }
+      }
+    ]
+  },
+  "sans_compliance": {
+    "accuracy_validation": false,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}

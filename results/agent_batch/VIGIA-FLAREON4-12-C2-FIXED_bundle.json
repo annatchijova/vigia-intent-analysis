@@ -1,0 +1,577 @@
+{
+  "analysis_timestamp": "2026-06-30T15:22:01.009828+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "VIGIA-FLAREON4-12-C2-FIXED",
+    "end_time": "2026-06-30T15:22:01.009832+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "VIGIA-FLAREON4-12-C2-FIXED",
+        "entry_sha256": "b431b1cc23ae8ada8f6887b1c59c83cf7fa470415d3c160a5eb463f396bb1f5d",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "VIGIA-FLAREON4-12-C2-FIXED"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: 0303700fac9e3484...",
+        "outputs_summary": {
+          "agent_sha256": "0303700fac9e34847d8ab0a07ff25d85e77e432cbbae710f2ac799eebb7bed38",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-06-30T15:21:58.520991+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-FLAREON4-12-C2-FIXED",
+        "entry_sha256": "3436b8233ddc30744e62577142867b1419a85bbeef76ea4a623e843d0061e40e",
+        "inputs_summary": {
+          "path": "evidence/flare-on/flareon4/12"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-06-30T15:21:58.521069+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-FLAREON4-12-C2-FIXED",
+        "entry_sha256": "cb728508339585a080a6112656e15523717b686c7df8dc5cb3dbbefb6f79704b",
+        "inputs_summary": {
+          "path": "evidence/flare-on/flareon4/12"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: 2c4960af843b44e4...",
+        "outputs_summary": {
+          "sha256": "2c4960af843b44e4b90e119138e1f19e04cb323d14e4eec1eb75459c5e81948f"
+        },
+        "seq": 3,
+        "timestamp": "2026-06-30T15:21:58.524872+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "VIGIA-FLAREON4-12-C2-FIXED",
+        "entry_sha256": "51b0ebfee0236f336d1b689bc1c152e24467a7f6303e43906a75d068982318d2",
+        "inputs_summary": {
+          "evidence": "evidence/flare-on/flareon4/12",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-06-30T15:21:58.524969+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "VIGIA-FLAREON4-12-C2-FIXED",
+        "entry_sha256": "542285274376225d433b26b7f59fb264dc44f0e83ce8b99326e251bf0ca5d6ac",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 5 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "UNDETERMINED",
+            "best_posterior": "0",
+            "confidence": "0",
+            "is_conclusive": "False",
+            "narrative": "[FIRSTNESS] Pipeline error.",
+            "ontological_level": "None"
+          },
+          "case_id": "VIGIA-FLAREON4-12-C2-FIXED",
+          "custody": {
+            "artifact_id": "UNKNOWN",
+            "case_id": "VIGIA-FLAREON4-12-C2-FIXED",
+            "n_records": "0",
+            "records": []
+          },
+          "pipeline_meta": {
+            "anti_silencing": "True",
+            "frs_groups": "1",
+            "gamma_applied": "True",
+            "n_engine_signals": "2",
+            "n_sift_signals": "1",
+            "n_total_signals": "5",
+            "version": "V4-COLECTIVO-2026-05-06"
+          },
+          "results": {
+            "adversarial": {
+              "dominant_pattern": "NONE",
+              "indicators": [],
+              "n_indicators": "0",
+              "n_tools": "4",
+              "sift_critical_active": "1"
+            },
+            "caie": {
+              "_determinism_protocol": "P0-v2.0-DECIMAL-6-4",
+              "artifacts_evaluated": "5",
+              "composite_score": "0.0022",
+              "fracture_bonus_applied": "0.0000",
+              "integrity_check": {
+                "alerts": [],
+                "fpu_native": "False",
+                "internal_precision": "6",
+                "math_engine": "decimal.Decimal",
+                "output_precision": "4"
+              },
+              "probabilistic_score": "0.0022",
+              "probabilistic_verdict": "NOISE",
+              "status": "OK",
+              "structural_verdict": "INCONCLUSIVE",
+              "verdict": "INCONCLUSIVE"
+            },
+            "network": {
+              "artifact_type": "network",
+              "beaconing": "0",
+              "exfil": "2",
+              "finding_types": [
+                "EXFILTRATION"
+              ],
+              "flows": "7220",
+              "portscans": "0"
+            },
+            "patterns": {
+              "artifact_reliability": "17/20",
+              "artifact_type": "pattern",
+              "best_match": "NONE",
+              "finding_types": [],
+              "match_count": "0",
+              "match_score_by_pattern": {},
+              "missing_signals_by_pattern": {},
+              "timestamp_invalid": "True",
+              "total_patterns": "3"
+            },
+            "resonance": {
+              "artifact_reliability": "4/5",
+              "artifact_type": "resonance",
+              "finding_types": [],
+              "pattern_count": "0",
+              "timestamp_invalid": "True",
+              "total_resonance": "0"
+            },
+            "timeline": {
+              "anomaly_count": "0",
+              "artifact_reliability": "4/5",
+              "artifact_type": "timeline",
+              "finding_types": [
+                "NETWORK_WITHOUT_MEMORY"
+              ],
+              "gap_count": "1",
+              "total_events": "3"
+            }
+          },
+          "signals": [
+            {
+              "confidence": "0.95",
+              "metadata": {
+                "artifact_type": "network",
+                "beaconing": "0",
+                "exfil": "2",
+                "finding_types": [
+                  "EXFILTRATION"
+                ],
+                "flows": "7220",
+                "gamma_applied": "True",
+                "gamma_type": "network",
+                "portscans": "0",
+                "timestamp_invalid": "True",
+                "z_original": "3.5"
+              },
+              "tool": "NETWORK_FORENSICS",
+              "value": "0.7",
+              "z_score": "2.625"
+            },
+            {
+              "confidence": "0.0",
+              "metadata": {
+                "artifact_reliability": "4/5",
+                "artifact_type": "resonance",
+                "finding_types": [],
+                "pattern_count": "0",
+                "timestamp_invalid": "True",
+                "total_resonance": "0"
+              },
+              "tool": "CROSS_RESONANCE",
+              "value": "0.0",
+              "z_score": "0.0"
+            },
+            {
+              "confidence": "0.0",
+              "metadata": {
+                "artifact_reliability": "17/20",
+                "artifact_type": "pattern",
+                "best_match": "NONE",
+                "finding_types": [],
+                "match_count": "0",
+                "match_score_by_pattern": {},
+                "missing_signals_by_pattern": {},
+                "timestamp_invalid": "True",
+                "total_patterns": "3"
+              },
+              "tool": "CASE_PATTERN_LIBRARY",
+              "value": "0.0",
+              "z_score": "0.0"
+            },
+            {
+              "confidence": "0.0",
+              "metadata": {
+                "anomaly_count": "0",
+                "artifact_reliability": "4/5",
+                "artifact_type": "timeline",
+                "finding_types": [
+                  "NETWORK_WITHOUT_MEMORY"
+                ],
+                "gap_count": "1",
+                "total_events": "3"
+              },
+              "tool": "UNIFIED_TIMELINE",
+              "value": "0.3",
+              "z_score": "1.5"
+            },
+            {
+              "confidence": "0.1711",
+              "metadata": {
+                "dominant_pattern": "NONE",
+                "indicators": [],
+                "n_indicators": "0",
+                "n_tools": "4",
+                "sift_critical_active": "1"
+              },
+              "tool": "ADV_ROBUST",
+              "value": "0.0",
+              "z_score": "0.0"
+            }
+          ]
+        },
+        "seq": 5,
+        "timestamp": "2026-06-30T15:22:01.009338+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "VIGIA-FLAREON4-12-C2-FIXED",
+        "entry_sha256": "59f384db00ab737eef2c0620995dcd3b41d319ea4771e7e332608e1a271dfeef",
+        "inputs_summary": {
+          "n_signals": "5"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-06-30T15:22:01.009550+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "VIGIA-FLAREON4-12-C2-FIXED",
+        "entry_sha256": "0cc1d74a289db9d2b359bd72cb8119e055c8d0a1fb5293fe912c2ab11aa6595d",
+        "inputs_summary": {
+          "verdict": "UNDETERMINED"
+        },
+        "iteration": 0,
+        "note": "Exit code 0 \u2014 analysis complete.",
+        "outputs_summary": {
+          "exit_code": "0"
+        },
+        "seq": 7,
+        "timestamp": "2026-06-30T15:22:01.009663+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-06-30T15:21:58.520747+00:00",
+    "total_entries": 7
+  },
+  "case_id": "VIGIA-FLAREON4-12-C2-FIXED",
+  "evidence_path": "evidence/flare-on/flareon4/12",
+  "evidence_sha256": "2c4960af843b44e4b90e119138e1f19e04cb323d14e4eec1eb75459c5e81948f",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-FLAREON4-12-C2-FIXED ===\nEvidence: evidence/flare-on/flareon4/12\nEvidence SHA-256: 2c4960af843b44e4b90e119138e1f19e04cb323d14e4eec1eb75459c5e81948f\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: UNDETERMINED\nPosterior confidence: 0\nConclusive: NO \u2014 requires human review\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] Pipeline error.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [NETWORK_FORENSICS] z=2.625 conf=0.95 \u2014 0.7\n  [UNIFIED_TIMELINE] z=1.500 conf=0.00 \u2014 0.3\n  [CROSS_RESONANCE] z=0.000 conf=0.00 \u2014 \n  [CASE_PATTERN_LIBRARY] z=0.000 conf=0.00 \u2014 \n  [ADV_ROBUST] z=0.000 conf=0.17 \u2014 \n\n--- FINAL ALERT LEVEL ---\nMEDIUM \u2014 Moderate anomalies. Additional investigation recommended.\n\nCritical signals (z>3): 0\nHigh signals (2<z<=3): 1\nTotal signals analyzed: 5",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "UNDETERMINED",
+      "best_posterior": "0",
+      "confidence": "0",
+      "is_conclusive": false,
+      "narrative": "[FIRSTNESS] Pipeline error.",
+      "ontological_level": null
+    },
+    "case_id": "VIGIA-FLAREON4-12-C2-FIXED",
+    "custody": {
+      "artifact_id": "UNKNOWN",
+      "case_id": "VIGIA-FLAREON4-12-C2-FIXED",
+      "n_records": 0,
+      "records": []
+    },
+    "pipeline_meta": {
+      "anti_silencing": true,
+      "frs_groups": 1,
+      "gamma_applied": true,
+      "n_engine_signals": 2,
+      "n_sift_signals": 1,
+      "n_total_signals": 5,
+      "version": "V4-COLECTIVO-2026-05-06"
+    },
+    "results": {
+      "adversarial": {
+        "dominant_pattern": "NONE",
+        "indicators": [],
+        "n_indicators": 0,
+        "n_tools": 4,
+        "sift_critical_active": 1
+      },
+      "caie": {
+        "_determinism_protocol": "P0-v2.0-DECIMAL-6-4",
+        "_operation_hmac": "",
+        "artifacts_evaluated": 5,
+        "artifacts_rejected": 0,
+        "chain_of_custody": {
+          "evidence_count": 5,
+          "fracture_count": 0,
+          "processing_timestamp": "2026-06-30T15:22:00.993093Z"
+        },
+        "composite_score": "0.0022",
+        "confidence_penalty_applied": false,
+        "daubert_note": "Daubert: 0/5 artifacts structurally irrefutable (spoofability \u2264 0.20). WARNING: No irrefutable anchor. Weak under cross-examination. CDL: INCONCLUSIVE: Coverage too low (16.7%)",
+        "fracture_bonus_applied": "0.0000",
+        "fractures": [],
+        "fractures_detected": 0,
+        "fractures_unique": 0,
+        "golden_rules_triggered": 0,
+        "independent_sources": 5,
+        "integrity_check": {
+          "alerts": [],
+          "fpu_native": false,
+          "internal_precision": 6,
+          "math_engine": "decimal.Decimal",
+          "output_precision": 4
+        },
+        "mitre_ttps": [
+          "T1036.005",
+          "T1059",
+          "T1070.001",
+          "T1070.002",
+          "T1070.006",
+          "T1498",
+          "T1562.001",
+          "T1564",
+          "T1565.001",
+          "T1566.003"
+        ],
+        "peirce_chain": {
+          "firstness": "5 artifacts from 5 tools. Raw scores range: 0.00 to 0.70.",
+          "secondness": "Noisy-OR fusion: 5 independent groups, composite=0.0022. Most reliable: NETWORK_FORENSICS (log_entry, adj=0.0016). 0 unique fracture(s), 0 Golden Rule(s).",
+          "thirdness": "Inferred habit: fabrication/staging. No structural discrepancies."
+        },
+        "probabilistic_score": "0.0022",
+        "probabilistic_verdict": "NOISE",
+        "raw_scores": [
+          {
+            "adjusted": "0.0016",
+            "description": "0.7",
+            "raw_score": "0.7000",
+            "spoofability": 0.85,
+            "tool": "NETWORK_FORENSICS",
+            "type": "log_entry",
+            "weight": 0.15
+          },
+          {
+            "adjusted": "0.0007",
+            "description": "0.3",
+            "raw_score": "0.3000",
+            "spoofability": 0.85,
+            "tool": "UNIFIED_TIMELINE",
+            "type": "log_entry",
+            "weight": 0.15
+          },
+          {
+            "adjusted": "0.0000",
+            "description": "Signal from CROSS_RESONANCE",
+            "raw_score": "0.0000",
+            "spoofability": 0.85,
+            "tool": "CROSS_RESONANCE",
+            "type": "log_entry",
+            "weight": 0.15
+          },
+          {
+            "adjusted": "0.0000",
+            "description": "Signal from CASE_PATTERN_LIBRARY",
+            "raw_score": "0.0000",
+            "spoofability": 0.85,
+            "tool": "CASE_PATTERN_LIBRARY",
+            "type": "log_entry",
+            "weight": 0.15
+          },
+          {
+            "adjusted": "0.0000",
+            "description": "Signal from ADV_ROBUST",
+            "raw_score": "0.0000",
+            "spoofability": 0.85,
+            "tool": "ADV_ROBUST",
+            "type": "log_entry",
+            "weight": 0.15
+          }
+        ],
+        "status": "OK",
+        "structural_verdict": "INCONCLUSIVE",
+        "timestamp": "2026-06-30T15:22:00.993084Z",
+        "ttp_confidences": {
+          "T1036.005": "0.0390",
+          "T1059": "0.0385",
+          "T1070.001": "0.0400",
+          "T1070.002": "0.0400",
+          "T1070.006": "0.0210",
+          "T1498": "0.0680",
+          "T1562.001": "0.0553",
+          "T1564": "0.0292",
+          "T1565.001": "0.0480",
+          "T1566.003": "0.0280"
+        },
+        "verdict": "INCONCLUSIVE",
+        "vigia_verdict": "[VIGIA_CAIE]: INCONCLUSIVE. Structural=INCONCLUSIVE Probabilistic=NOISE (composite=0.0022) from 5 artifacts (5 independent). 0 fracture(s), 0 Golden Rule(s). Daubert: 0/5 artifacts structurally irrefutable (spoofability \u2264 0.20). WARNING: "
+      },
+      "network": {
+        "artifact_type": "network",
+        "beaconing": 0,
+        "exfil": 2,
+        "finding_types": [
+          "EXFILTRATION"
+        ],
+        "flows": 7220,
+        "portscans": 0
+      },
+      "patterns": {
+        "artifact_reliability": "17/20",
+        "artifact_type": "pattern",
+        "best_match": "NONE",
+        "finding_types": [],
+        "match_count": 0,
+        "match_score_by_pattern": {},
+        "missing_signals_by_pattern": {},
+        "timestamp_invalid": true,
+        "total_patterns": 3
+      },
+      "resonance": {
+        "artifact_reliability": "4/5",
+        "artifact_type": "resonance",
+        "finding_types": [],
+        "pattern_count": 0,
+        "timestamp_invalid": true,
+        "total_resonance": "0"
+      },
+      "timeline": {
+        "anomaly_count": 0,
+        "artifact_reliability": "4/5",
+        "artifact_type": "timeline",
+        "finding_types": [
+          "NETWORK_WITHOUT_MEMORY"
+        ],
+        "gap_count": 1,
+        "total_events": 3
+      }
+    },
+    "signals": [
+      {
+        "confidence": 0.95,
+        "metadata": {
+          "artifact_type": "network",
+          "beaconing": 0,
+          "exfil": 2,
+          "finding_types": [
+            "EXFILTRATION"
+          ],
+          "flows": 7220,
+          "gamma_applied": true,
+          "gamma_type": "network",
+          "portscans": 0,
+          "timestamp_invalid": true,
+          "z_original": 3.5
+        },
+        "tool": "NETWORK_FORENSICS",
+        "value": 0.7,
+        "z_score": 2.625
+      },
+      {
+        "confidence": 0.0,
+        "metadata": {
+          "artifact_reliability": "4/5",
+          "artifact_type": "resonance",
+          "finding_types": [],
+          "pattern_count": 0,
+          "timestamp_invalid": true,
+          "total_resonance": "0"
+        },
+        "tool": "CROSS_RESONANCE",
+        "value": 0.0,
+        "z_score": 0.0
+      },
+      {
+        "confidence": 0.0,
+        "metadata": {
+          "artifact_reliability": "17/20",
+          "artifact_type": "pattern",
+          "best_match": "NONE",
+          "finding_types": [],
+          "match_count": 0,
+          "match_score_by_pattern": {},
+          "missing_signals_by_pattern": {},
+          "timestamp_invalid": true,
+          "total_patterns": 3
+        },
+        "tool": "CASE_PATTERN_LIBRARY",
+        "value": 0.0,
+        "z_score": 0.0
+      },
+      {
+        "confidence": 0.0,
+        "metadata": {
+          "anomaly_count": 0,
+          "artifact_reliability": "4/5",
+          "artifact_type": "timeline",
+          "finding_types": [
+            "NETWORK_WITHOUT_MEMORY"
+          ],
+          "gap_count": 1,
+          "total_events": 3
+        },
+        "tool": "UNIFIED_TIMELINE",
+        "value": 0.3,
+        "z_score": 1.5
+      },
+      {
+        "confidence": 0.1711,
+        "metadata": {
+          "dominant_pattern": "NONE",
+          "indicators": [],
+          "n_indicators": 0,
+          "n_tools": 4,
+          "sift_critical_active": 1
+        },
+        "tool": "ADV_ROBUST",
+        "value": 0.0,
+        "z_score": 0.0
+      }
+    ]
+  },
+  "sans_compliance": {
+    "accuracy_validation": true,
+    "analytical_reasoning": false,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}

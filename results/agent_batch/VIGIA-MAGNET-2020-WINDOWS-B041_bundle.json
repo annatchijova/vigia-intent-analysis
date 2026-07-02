@@ -1,0 +1,927 @@
+{
+  "analysis_timestamp": "2026-06-30T16:03:05.871425+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "VIGIA-MAGNET-2020-WINDOWS-B041",
+    "end_time": "2026-06-30T16:03:05.871430+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "VIGIA-MAGNET-2020-WINDOWS-B041",
+        "entry_sha256": "a7b7592a567076b276328cab14a15f70dca435e6a2c7ee66a721a61a1007ba3e",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "VIGIA-MAGNET-2020-WINDOWS-B041"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: 5c7fc6cac601bba1...",
+        "outputs_summary": {
+          "agent_sha256": "5c7fc6cac601bba16d6f09433325a3bb99d27d50359cd038d2f5526e7032246f",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-06-30T16:02:03.550238+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-MAGNET-2020-WINDOWS-B041",
+        "entry_sha256": "7f8c0a5e1cbd72af053ea5242a3ad075c3c497eea62f8aec18d44a888add54e1",
+        "inputs_summary": {
+          "path": "evidence/magnet-2020-windows-artifacts"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-06-30T16:02:03.550314+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-MAGNET-2020-WINDOWS-B041",
+        "entry_sha256": "c07581ce2c9e1349ad008ab0d52f495b23a2fec754c06846f5174e389b054c38",
+        "inputs_summary": {
+          "path": "evidence/magnet-2020-windows-artifacts"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: 5a8e5de97afa27c2...",
+        "outputs_summary": {
+          "sha256": "5a8e5de97afa27c20922ec203ad1c2029c7f4bd5ee8418fb9f9688d473daf3b3"
+        },
+        "seq": 3,
+        "timestamp": "2026-06-30T16:02:03.678958+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "VIGIA-MAGNET-2020-WINDOWS-B041",
+        "entry_sha256": "1ad85ce643b47e94750efe0908ba2828ffc89c1bb5b9c5e506c0f175f543a878",
+        "inputs_summary": {
+          "evidence": "evidence/magnet-2020-windows-artifacts",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-06-30T16:02:03.679120+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "VIGIA-MAGNET-2020-WINDOWS-B041",
+        "entry_sha256": "d5f86c2944eb08b511531371f19f95729e9547fc524eba5484509e75f492f64e",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 9 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "UNDETERMINED",
+            "best_posterior": "0",
+            "confidence": "0",
+            "is_conclusive": "False",
+            "narrative": "[FIRSTNESS] Pipeline error.",
+            "ontological_level": "None"
+          },
+          "case_id": "VIGIA-MAGNET-2020-WINDOWS-B041",
+          "custody": {
+            "artifact_id": "UNKNOWN",
+            "case_id": "VIGIA-MAGNET-2020-WINDOWS-B041",
+            "n_records": "7",
+            "records": [
+              {
+                "actor": "REGISTRY_ANALYST",
+                "artifact_hash": "47036de42c7d2a9cf62d6f469f2ac9a084e3d746b40bf395eee022e458235ecc",
+                "metadata": {
+                  "data_size": "4096",
+                  "timestamp_utc": "1970-01-01T00:00:00Z"
+                },
+                "operation": "ACQUIRE",
+                "timestamp": "2026-06-30T16:02:04.071683+00:00"
+              },
+              {
+                "actor": "REGISTRY_ANALYST",
+                "artifact_hash": "eb5334b68f26734e37f4a16fc4c3db50880187279296b349d7754f9300e7f0d3",
+                "metadata": {
+                  "data_size": "4096",
+                  "timestamp_utc": "1970-01-01T00:00:00Z"
+                },
+                "operation": "ACQUIRE",
+                "timestamp": "2026-06-30T16:02:04.072336+00:00"
+              },
+              {
+                "actor": "REGISTRY_ANALYST",
+                "artifact_hash": "0b81975526a52eb0512599cb93135d818ccf9ae536eff8810bc81358e02baebc",
+                "metadata": {
+                  "data_size": "4096",
+                  "timestamp_utc": "1970-01-01T00:00:00Z"
+                },
+                "operation": "ACQUIRE",
+                "timestamp": "2026-06-30T16:02:04.166267+00:00"
+              },
+              {
+                "actor": "REGISTRY_ANALYST",
+                "artifact_hash": "7883dd1922e7403019543212ee24ffb4a463fc6013fb3de34568f82c4ba95a0c",
+                "metadata": {
+                  "data_size": "4096",
+                  "timestamp_utc": "1970-01-01T00:00:00Z"
+                },
+                "operation": "ACQUIRE",
+                "timestamp": "2026-06-30T16:02:04.399342+00:00"
+              },
+              {
+                "actor": "EVENTLOG_ANALYST",
+                "artifact_hash": "d9f33303527836efd030229c15d1fa7ea7e1ff2eb1a025700b33a7692e6f3f32",
+                "metadata": {
+                  "data_size": "4096",
+                  "timestamp_utc": "1970-01-01T00:00:00Z"
+                },
+                "operation": "ACQUIRE",
+                "timestamp": "2026-06-30T16:02:04.748249+00:00"
+              }
+            ]
+          },
+          "pipeline_meta": {
+            "anti_silencing": "True",
+            "frs_groups": "2",
+            "gamma_applied": "True",
+            "n_engine_signals": "2",
+            "n_sift_signals": "5",
+            "n_total_signals": "9",
+            "version": "V4-COLECTIVO-2026-05-06"
+          },
+          "results": {
+            "adversarial": {
+              "dominant_pattern": "NONE",
+              "indicators": [],
+              "n_indicators": "0",
+              "n_tools": "8",
+              "sift_critical_active": "1"
+            },
+            "caie": {
+              "_determinism_protocol": "P0-v2.0-DECIMAL-6-4",
+              "artifacts_evaluated": "9",
+              "composite_score": "0.0027",
+              "fracture_bonus_applied": "0.0000",
+              "integrity_check": {
+                "alerts": [],
+                "fpu_native": "False",
+                "internal_precision": "6",
+                "math_engine": "decimal.Decimal",
+                "output_precision": "4"
+              },
+              "probabilistic_score": "0.0027",
+              "probabilistic_verdict": "NOISE",
+              "status": "OK",
+              "structural_verdict": "INCONCLUSIVE",
+              "verdict": "INCONCLUSIVE"
+            },
+            "eventlog": {
+              "artifact_type": "windows_event_log",
+              "chains": "108",
+              "composite_score": "19/20",
+              "finding_types": [
+                "BRUTE_FORCE_SUCCESS",
+                "HIGH_SEVERITY_7045",
+                "HIGH_SEVERITY_8",
+                "PASS_THE_HASH",
+                "REMOTE_THREAD_INJECTION"
+              ],
+              "findings": "46",
+              "gaps": "802",
+              "total_events": "25452"
+            },
+            "patterns": {
+              "artifact_reliability": "17/20",
+              "artifact_type": "pattern",
+              "best_match": "NONE",
+              "finding_types": [],
+              "match_count": "0",
+              "match_score_by_pattern": {},
+              "missing_signals_by_pattern": {},
+              "timestamp_invalid": "True",
+              "total_patterns": "3"
+            },
+            "registry": [
+              {
+                "artifact_reliability": "17/20",
+                "artifact_type": "registry",
+                "finding_types": [],
+                "hive_sha256": "311ff67249dc073c5a5db3aebfa1dc79c0dbc33bbb5061a00aae452fce2765d7",
+                "persistence_count": "0",
+                "timestomp_count": "0",
+                "usb_count": "0"
+              },
+              {
+                "artifact_reliability": "17/20",
+                "artifact_type": "registry",
+                "finding_types": [],
+                "hive_sha256": "60520dcabb971d6547e666788e75c8af247db253b9ac1091db5142f5e82a6716",
+                "persistence_count": "0",
+                "timestomp_count": "0",
+                "usb_count": "0"
+              },
+              {
+                "artifact_reliability": "17/20",
+                "artifact_type": "registry",
+                "finding_types": [],
+                "hive_sha256": "882888ccf540d258503c22652fc2d0bd801bd740ec8f8d836a0e452de297fa4e",
+                "persistence_count": "0",
+                "timestomp_count": "0",
+                "usb_count": "0"
+              },
+              {
+                "artifact_reliability": "17/20",
+                "artifact_type": "registry",
+                "finding_types": [
+                  "service"
+                ],
+                "hive_sha256": "97a4f8cd9d8f1ee4d22116b4b48ff0e988443e70fd9546dbb43af927d66820fe",
+                "persistence_count": "70",
+                "timestomp_count": "0",
+                "usb_count": "0"
+              }
+            ],
+            "resonance": {
+              "artifact_reliability": "4/5",
+              "artifact_type": "resonance",
+              "finding_types": [],
+              "pattern_count": "0",
+              "timestamp_invalid": "True",
+              "total_resonance": "0"
+            },
+            "timeline": {
+              "anomaly_count": "0",
+              "artifact_reliability": "4/5",
+              "artifact_type": "timeline",
+              "finding_types": [],
+              "gap_count": "0",
+              "total_events": "7"
+            }
+          },
+          "signals": [
+            {
+              "confidence": "0.0",
+              "metadata": {
+                "artifact_reliability": "17/20",
+                "artifact_type": "registry",
+                "finding_types": [],
+                "gamma_applied": "True",
+                "gamma_type": "registry",
+                "hive_sha256": "311ff67249dc073c5a5db3aebfa1dc79c0dbc33bbb5061a00aae452fce2765d7",
+                "persistence_count": "0",
+                "timestomp_count": "0",
+                "usb_count": "0",
+                "z_original": "0.0"
+              },
+              "tool": "REGISTRY_RTR",
+              "value": "0.0",
+              "z_score": "0.0"
+            },
+            {
+              "confidence": "0.0",
+              "metadata": {
+                "artifact_reliability": "17/20",
+                "artifact_type": "registry",
+                "finding_types": [],
+                "gamma_applied": "True",
+                "gamma_type": "registry",
+                "hive_sha256": "60520dcabb971d6547e666788e75c8af247db253b9ac1091db5142f5e82a6716",
+                "persistence_count": "0",
+                "timestomp_count": "0",
+                "usb_count": "0",
+                "z_original": "0.0"
+              },
+              "tool": "REGISTRY_RTR",
+              "value": "0.0",
+              "z_score": "0.0"
+            },
+            {
+              "confidence": "0.0",
+              "metadata": {
+                "artifact_reliability": "17/20",
+                "artifact_type": "registry",
+                "finding_types": [],
+                "gamma_applied": "True",
+                "gamma_type": "registry",
+                "hive_sha256": "882888ccf540d258503c22652fc2d0bd801bd740ec8f8d836a0e452de297fa4e",
+                "persistence_count": "0",
+                "timestomp_count": "0",
+                "usb_count": "0",
+                "z_original": "0.0"
+              },
+              "tool": "REGISTRY_RTR",
+              "value": "0.0",
+              "z_score": "0.0"
+            },
+            {
+              "confidence": "0.7550125",
+              "metadata": {
+                "artifact_reliability": "17/20",
+                "artifact_type": "registry",
+                "finding_types": [
+                  "service"
+                ],
+                "gamma_applied": "True",
+                "gamma_type": "registry",
+                "hive_sha256": "97a4f8cd9d8f1ee4d22116b4b48ff0e988443e70fd9546dbb43af927d66820fe",
+                "persistence_count": "70",
+                "timestomp_count": "0",
+                "usb_count": "0",
+                "z_original": "2.8"
+              },
+              "tool": "REGISTRY_RTR",
+              "value": "0.5599999999999999",
+              "z_score": "1.96"
+            },
+            {
+              "confidence": "0.95",
+              "metadata": {
+                "artifact_type": "windows_event_log",
+                "chains": "108",
+                "composite_score": "19/20",
+                "finding_types": [
+                  "BRUTE_FORCE_SUCCESS",
+                  "HIGH_SEVERITY_7045",
+                  "HIGH_SEVERITY_8",
+                  "PASS_THE_HASH",
+                  "REMOTE_THREAD_INJECTION"
+                ],
+                "findings": "46",
+                "gamma_applied": "True",
+                "gamma_type": "windows_event_log",
+                "gaps": "802",
+                "total_events": "25452",
+                "z_original": "3.2"
+              },
+              "tool": "EVENT_LOG",
+              "value": "0.64",
+              "z_score": "3.04"
+            }
+          ]
+        },
+        "seq": 5,
+        "timestamp": "2026-06-30T16:03:05.870672+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "VIGIA-MAGNET-2020-WINDOWS-B041",
+        "entry_sha256": "7324a787327d99ab92a5b54a5eedc715f0b927c87a459642fabee2d9f2f36049",
+        "inputs_summary": {
+          "n_signals": "9"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-06-30T16:03:05.871042+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "VIGIA-MAGNET-2020-WINDOWS-B041",
+        "entry_sha256": "9d0d5573a8d8c6101d9604ba13ae58890f3b9f6de7efd845945d206c0d0ac2f2",
+        "inputs_summary": {
+          "verdict": "UNDETERMINED"
+        },
+        "iteration": 0,
+        "note": "Exit code 0 \u2014 analysis complete.",
+        "outputs_summary": {
+          "exit_code": "0"
+        },
+        "seq": 7,
+        "timestamp": "2026-06-30T16:03:05.871176+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-06-30T16:02:03.550012+00:00",
+    "total_entries": 7
+  },
+  "case_id": "VIGIA-MAGNET-2020-WINDOWS-B041",
+  "evidence_path": "evidence/magnet-2020-windows-artifacts",
+  "evidence_sha256": "5a8e5de97afa27c20922ec203ad1c2029c7f4bd5ee8418fb9f9688d473daf3b3",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-MAGNET-2020-WINDOWS-B041 ===\nEvidence: evidence/magnet-2020-windows-artifacts\nEvidence SHA-256: 5a8e5de97afa27c20922ec203ad1c2029c7f4bd5ee8418fb9f9688d473daf3b3\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: UNDETERMINED\nPosterior confidence: 0\nConclusive: NO \u2014 requires human review\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] Pipeline error.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [EVENT_LOG] z=3.040 conf=0.95 \u2014 0.64\n  [REGISTRY_RTR] z=1.960 conf=0.76 \u2014 0.5599999999999999\n  [REGISTRY_RTR] z=0.000 conf=0.00 \u2014 \n  [REGISTRY_RTR] z=0.000 conf=0.00 \u2014 \n  [REGISTRY_RTR] z=0.000 conf=0.00 \u2014 \n\n--- CAIE (Cross-Artifact Incongruence Engine) ---\n  Verdict: INCONCLUSIVE | Structural: INCONCLUSIVE | Composite: 0.0027 | Fractures: 0 | Golden Rules: 0\n  Daubert: 0/9 artifacts structurally irrefutable (spoofability \u2264 0.20). WARNING: No irrefutable anchor. Weak under cross-examination. CDL: INCONCLUSIVE: Coverage too low (16.7%)\n\n--- FINAL ALERT LEVEL ---\nHIGH \u2014 Significant anomalies detected. Priority forensic review recommended.\n\nCritical signals (z>3): 1\nHigh signals (2<z<=3): 0\nTotal signals analyzed: 9",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "INTENT_DETECTED",
+      "best_posterior": "1/9",
+      "confidence": "0",
+      "is_conclusive": true,
+      "narrative": "[FIRSTNESS] Pipeline error.",
+      "ontological_level": null,
+      "override_source": "signal_count_z>3"
+    },
+    "case_id": "VIGIA-MAGNET-2020-WINDOWS-B041",
+    "custody": {
+      "artifact_id": "UNKNOWN",
+      "case_id": "VIGIA-MAGNET-2020-WINDOWS-B041",
+      "n_records": 7,
+      "records": [
+        {
+          "actor": "REGISTRY_ANALYST",
+          "artifact_hash": "47036de42c7d2a9cf62d6f469f2ac9a084e3d746b40bf395eee022e458235ecc",
+          "metadata": {
+            "data_size": 4096,
+            "timestamp_utc": "1970-01-01T00:00:00Z"
+          },
+          "operation": "ACQUIRE",
+          "timestamp": "2026-06-30T16:02:04.071683+00:00"
+        },
+        {
+          "actor": "REGISTRY_ANALYST",
+          "artifact_hash": "eb5334b68f26734e37f4a16fc4c3db50880187279296b349d7754f9300e7f0d3",
+          "metadata": {
+            "data_size": 4096,
+            "timestamp_utc": "1970-01-01T00:00:00Z"
+          },
+          "operation": "ACQUIRE",
+          "timestamp": "2026-06-30T16:02:04.072336+00:00"
+        },
+        {
+          "actor": "REGISTRY_ANALYST",
+          "artifact_hash": "0b81975526a52eb0512599cb93135d818ccf9ae536eff8810bc81358e02baebc",
+          "metadata": {
+            "data_size": 4096,
+            "timestamp_utc": "1970-01-01T00:00:00Z"
+          },
+          "operation": "ACQUIRE",
+          "timestamp": "2026-06-30T16:02:04.166267+00:00"
+        },
+        {
+          "actor": "REGISTRY_ANALYST",
+          "artifact_hash": "7883dd1922e7403019543212ee24ffb4a463fc6013fb3de34568f82c4ba95a0c",
+          "metadata": {
+            "data_size": 4096,
+            "timestamp_utc": "1970-01-01T00:00:00Z"
+          },
+          "operation": "ACQUIRE",
+          "timestamp": "2026-06-30T16:02:04.399342+00:00"
+        },
+        {
+          "actor": "EVENTLOG_ANALYST",
+          "artifact_hash": "d9f33303527836efd030229c15d1fa7ea7e1ff2eb1a025700b33a7692e6f3f32",
+          "metadata": {
+            "data_size": 4096,
+            "timestamp_utc": "1970-01-01T00:00:00Z"
+          },
+          "operation": "ACQUIRE",
+          "timestamp": "2026-06-30T16:02:04.748249+00:00"
+        },
+        {
+          "actor": "EVENTLOG_ANALYST",
+          "artifact_hash": "12d5e8cc899900a9c2881ce8c058c9444e01a131208711d09ce7c8a5da3e3d94",
+          "metadata": {
+            "data_size": 4096,
+            "timestamp_utc": "1970-01-01T00:00:00Z"
+          },
+          "operation": "ACQUIRE",
+          "timestamp": "2026-06-30T16:02:15.210651+00:00"
+        },
+        {
+          "actor": "EVENTLOG_ANALYST",
+          "artifact_hash": "502b41fa8657d213e4f8df72ed22cf4dc595aadb37ca5d879a884af94ba8fa3f",
+          "metadata": {
+            "data_size": 4096,
+            "timestamp_utc": "1970-01-01T00:00:00Z"
+          },
+          "operation": "ACQUIRE",
+          "timestamp": "2026-06-30T16:02:46.790641+00:00"
+        }
+      ]
+    },
+    "pipeline_meta": {
+      "anti_silencing": true,
+      "frs_groups": 2,
+      "gamma_applied": true,
+      "n_engine_signals": 2,
+      "n_sift_signals": 5,
+      "n_total_signals": 9,
+      "version": "V4-COLECTIVO-2026-05-06"
+    },
+    "results": {
+      "adversarial": {
+        "dominant_pattern": "NONE",
+        "indicators": [],
+        "n_indicators": 0,
+        "n_tools": 8,
+        "sift_critical_active": 1
+      },
+      "caie": {
+        "_determinism_protocol": "P0-v2.0-DECIMAL-6-4",
+        "_operation_hmac": "4995f1380340237bfa00bc5cfad2d0ef99a652ffa70a3c5e5116595af55f5b4f",
+        "artifacts_evaluated": 9,
+        "artifacts_rejected": 0,
+        "chain_of_custody": {
+          "evidence_count": 9,
+          "fracture_count": 0,
+          "processing_timestamp": "2026-06-30T16:03:05.844318Z"
+        },
+        "composite_score": "0.0027",
+        "confidence_penalty_applied": false,
+        "daubert_note": "Daubert: 0/9 artifacts structurally irrefutable (spoofability \u2264 0.20). WARNING: No irrefutable anchor. Weak under cross-examination. CDL: INCONCLUSIVE: Coverage too low (16.7%)",
+        "fracture_bonus_applied": "0.0000",
+        "fractures": [],
+        "fractures_detected": 0,
+        "fractures_unique": 0,
+        "golden_rules_triggered": 0,
+        "independent_sources": 6,
+        "integrity_check": {
+          "alerts": [],
+          "fpu_native": false,
+          "internal_precision": 6,
+          "math_engine": "decimal.Decimal",
+          "output_precision": 4
+        },
+        "mitre_ttps": [
+          "T1036.005",
+          "T1059",
+          "T1070.001",
+          "T1070.002",
+          "T1070.006",
+          "T1498",
+          "T1562.001",
+          "T1564",
+          "T1565.001",
+          "T1566.003"
+        ],
+        "peirce_chain": {
+          "firstness": "9 artifacts from 6 tools. Raw scores range: 0.00 to 0.64.",
+          "secondness": "Noisy-OR fusion: 6 independent groups, composite=0.0027. Most reliable: EVENT_LOG (log_entry, adj=0.0014). 0 unique fracture(s), 0 Golden Rule(s).",
+          "thirdness": "Inferred habit: fabrication/staging. No structural discrepancies."
+        },
+        "probabilistic_score": "0.0027",
+        "probabilistic_verdict": "NOISE",
+        "raw_scores": [
+          {
+            "adjusted": "0.0014",
+            "description": "0.64",
+            "raw_score": "0.6400",
+            "spoofability": 0.85,
+            "tool": "EVENT_LOG",
+            "type": "log_entry",
+            "weight": 0.15
+          },
+          {
+            "adjusted": "0.0013",
+            "description": "0.5599999999999999",
+            "raw_score": "0.5600",
+            "spoofability": 0.85,
+            "tool": "REGISTRY_RTR",
+            "type": "log_entry",
+            "weight": 0.15
+          },
+          {
+            "adjusted": "0.0000",
+            "description": "Signal from REGISTRY_RTR",
+            "raw_score": "0.0000",
+            "spoofability": 0.85,
+            "tool": "REGISTRY_RTR",
+            "type": "log_entry",
+            "weight": 0.15
+          },
+          {
+            "adjusted": "0.0000",
+            "description": "Signal from REGISTRY_RTR",
+            "raw_score": "0.0000",
+            "spoofability": 0.85,
+            "tool": "REGISTRY_RTR",
+            "type": "log_entry",
+            "weight": 0.15
+          },
+          {
+            "adjusted": "0.0000",
+            "description": "Signal from REGISTRY_RTR",
+            "raw_score": "0.0000",
+            "spoofability": 0.85,
+            "tool": "REGISTRY_RTR",
+            "type": "log_entry",
+            "weight": 0.15
+          },
+          {
+            "adjusted": "0.0000",
+            "description": "Signal from CROSS_RESONANCE",
+            "raw_score": "0.0000",
+            "spoofability": 0.85,
+            "tool": "CROSS_RESONANCE",
+            "type": "log_entry",
+            "weight": 0.15
+          },
+          {
+            "adjusted": "0.0000",
+            "description": "Signal from CASE_PATTERN_LIBRARY",
+            "raw_score": "0.0000",
+            "spoofability": 0.85,
+            "tool": "CASE_PATTERN_LIBRARY",
+            "type": "log_entry",
+            "weight": 0.15
+          },
+          {
+            "adjusted": "0.0000",
+            "description": "Signal from UNIFIED_TIMELINE",
+            "raw_score": "0.0000",
+            "spoofability": 0.85,
+            "tool": "UNIFIED_TIMELINE",
+            "type": "log_entry",
+            "weight": 0.15
+          },
+          {
+            "adjusted": "0.0000",
+            "description": "Signal from ADV_ROBUST",
+            "raw_score": "0.0000",
+            "spoofability": 0.85,
+            "tool": "ADV_ROBUST",
+            "type": "log_entry",
+            "weight": 0.15
+          }
+        ],
+        "status": "OK",
+        "structural_verdict": "INCONCLUSIVE",
+        "timestamp": "2026-06-30T16:03:05.844307Z",
+        "ttp_confidences": {
+          "T1036.005": "0.0260",
+          "T1059": "0.0257",
+          "T1070.001": "0.0267",
+          "T1070.002": "0.0267",
+          "T1070.006": "0.0140",
+          "T1498": "0.0453",
+          "T1562.001": "0.0368",
+          "T1564": "0.0195",
+          "T1565.001": "0.0320",
+          "T1566.003": "0.0187"
+        },
+        "verdict": "INCONCLUSIVE",
+        "vigia_verdict": "[VIGIA_CAIE]: INCONCLUSIVE. Structural=INCONCLUSIVE Probabilistic=NOISE (composite=0.0027) from 9 artifacts (6 independent). 0 fracture(s), 0 Golden Rule(s). Daubert: 0/9 artifacts structurally irrefutable (spoofability \u2264 0.20). WARNING: "
+      },
+      "eventlog": {
+        "artifact_type": "windows_event_log",
+        "chains": 108,
+        "composite_score": "19/20",
+        "finding_types": [
+          "BRUTE_FORCE_SUCCESS",
+          "HIGH_SEVERITY_7045",
+          "HIGH_SEVERITY_8",
+          "PASS_THE_HASH",
+          "REMOTE_THREAD_INJECTION"
+        ],
+        "findings": 46,
+        "gaps": 802,
+        "total_events": 25452
+      },
+      "patterns": {
+        "artifact_reliability": "17/20",
+        "artifact_type": "pattern",
+        "best_match": "NONE",
+        "finding_types": [],
+        "match_count": 0,
+        "match_score_by_pattern": {},
+        "missing_signals_by_pattern": {},
+        "timestamp_invalid": true,
+        "total_patterns": 3
+      },
+      "registry": [
+        {
+          "artifact_reliability": "17/20",
+          "artifact_type": "registry",
+          "finding_types": [],
+          "hive_sha256": "311ff67249dc073c5a5db3aebfa1dc79c0dbc33bbb5061a00aae452fce2765d7",
+          "persistence_count": 0,
+          "timestomp_count": 0,
+          "usb_count": 0
+        },
+        {
+          "artifact_reliability": "17/20",
+          "artifact_type": "registry",
+          "finding_types": [],
+          "hive_sha256": "60520dcabb971d6547e666788e75c8af247db253b9ac1091db5142f5e82a6716",
+          "persistence_count": 0,
+          "timestomp_count": 0,
+          "usb_count": 0
+        },
+        {
+          "artifact_reliability": "17/20",
+          "artifact_type": "registry",
+          "finding_types": [],
+          "hive_sha256": "882888ccf540d258503c22652fc2d0bd801bd740ec8f8d836a0e452de297fa4e",
+          "persistence_count": 0,
+          "timestomp_count": 0,
+          "usb_count": 0
+        },
+        {
+          "artifact_reliability": "17/20",
+          "artifact_type": "registry",
+          "finding_types": [
+            "service"
+          ],
+          "hive_sha256": "97a4f8cd9d8f1ee4d22116b4b48ff0e988443e70fd9546dbb43af927d66820fe",
+          "persistence_count": 70,
+          "timestomp_count": 0,
+          "usb_count": 0
+        }
+      ],
+      "resonance": {
+        "artifact_reliability": "4/5",
+        "artifact_type": "resonance",
+        "finding_types": [],
+        "pattern_count": 0,
+        "timestamp_invalid": true,
+        "total_resonance": "0"
+      },
+      "timeline": {
+        "anomaly_count": 0,
+        "artifact_reliability": "4/5",
+        "artifact_type": "timeline",
+        "finding_types": [],
+        "gap_count": 0,
+        "total_events": 7
+      }
+    },
+    "signals": [
+      {
+        "confidence": 0.0,
+        "metadata": {
+          "artifact_reliability": "17/20",
+          "artifact_type": "registry",
+          "finding_types": [],
+          "frs_applied": true,
+          "frs_factor": "1/4",
+          "gamma_applied": true,
+          "gamma_type": "registry",
+          "hive_sha256": "311ff67249dc073c5a5db3aebfa1dc79c0dbc33bbb5061a00aae452fce2765d7",
+          "persistence_count": 0,
+          "timestamp_invalid": true,
+          "timestomp_count": 0,
+          "usb_count": 0,
+          "z_original": 0.0
+        },
+        "tool": "REGISTRY_RTR",
+        "value": 0.0,
+        "z_score": 0.0
+      },
+      {
+        "confidence": 0.0,
+        "metadata": {
+          "artifact_reliability": "17/20",
+          "artifact_type": "registry",
+          "finding_types": [],
+          "frs_applied": true,
+          "frs_factor": "1/4",
+          "gamma_applied": true,
+          "gamma_type": "registry",
+          "hive_sha256": "60520dcabb971d6547e666788e75c8af247db253b9ac1091db5142f5e82a6716",
+          "persistence_count": 0,
+          "timestamp_invalid": true,
+          "timestomp_count": 0,
+          "usb_count": 0,
+          "z_original": 0.0
+        },
+        "tool": "REGISTRY_RTR",
+        "value": 0.0,
+        "z_score": 0.0
+      },
+      {
+        "confidence": 0.0,
+        "metadata": {
+          "artifact_reliability": "17/20",
+          "artifact_type": "registry",
+          "finding_types": [],
+          "frs_applied": true,
+          "frs_factor": "1/4",
+          "gamma_applied": true,
+          "gamma_type": "registry",
+          "hive_sha256": "882888ccf540d258503c22652fc2d0bd801bd740ec8f8d836a0e452de297fa4e",
+          "persistence_count": 0,
+          "timestamp_invalid": true,
+          "timestomp_count": 0,
+          "usb_count": 0,
+          "z_original": 0.0
+        },
+        "tool": "REGISTRY_RTR",
+        "value": 0.0,
+        "z_score": 0.0
+      },
+      {
+        "confidence": 0.7550125,
+        "metadata": {
+          "artifact_reliability": "17/20",
+          "artifact_type": "registry",
+          "finding_types": [
+            "service"
+          ],
+          "gamma_applied": true,
+          "gamma_type": "registry",
+          "hive_sha256": "97a4f8cd9d8f1ee4d22116b4b48ff0e988443e70fd9546dbb43af927d66820fe",
+          "persistence_count": 70,
+          "timestamp_invalid": true,
+          "timestomp_count": 0,
+          "usb_count": 0,
+          "z_original": 2.8
+        },
+        "tool": "REGISTRY_RTR",
+        "value": 0.5599999999999999,
+        "z_score": 1.96
+      },
+      {
+        "confidence": 0.95,
+        "metadata": {
+          "artifact_type": "windows_event_log",
+          "chains": 108,
+          "composite_score": "19/20",
+          "finding_types": [
+            "BRUTE_FORCE_SUCCESS",
+            "HIGH_SEVERITY_7045",
+            "HIGH_SEVERITY_8",
+            "PASS_THE_HASH",
+            "REMOTE_THREAD_INJECTION"
+          ],
+          "findings": 46,
+          "gamma_applied": true,
+          "gamma_type": "windows_event_log",
+          "gaps": 802,
+          "timestamp_invalid": true,
+          "total_events": 25452,
+          "z_original": 3.2
+        },
+        "tool": "EVENT_LOG",
+        "value": 0.64,
+        "z_score": 3.04
+      },
+      {
+        "confidence": 0.0,
+        "metadata": {
+          "artifact_reliability": "4/5",
+          "artifact_type": "resonance",
+          "finding_types": [],
+          "pattern_count": 0,
+          "timestamp_invalid": true,
+          "total_resonance": "0"
+        },
+        "tool": "CROSS_RESONANCE",
+        "value": 0.0,
+        "z_score": 0.0
+      },
+      {
+        "confidence": 0.0,
+        "metadata": {
+          "artifact_reliability": "17/20",
+          "artifact_type": "pattern",
+          "best_match": "NONE",
+          "finding_types": [],
+          "match_count": 0,
+          "match_score_by_pattern": {},
+          "missing_signals_by_pattern": {},
+          "timestamp_invalid": true,
+          "total_patterns": 3
+        },
+        "tool": "CASE_PATTERN_LIBRARY",
+        "value": 0.0,
+        "z_score": 0.0
+      },
+      {
+        "confidence": 0.0,
+        "metadata": {
+          "anomaly_count": 0,
+          "artifact_reliability": "4/5",
+          "artifact_type": "timeline",
+          "finding_types": [],
+          "gap_count": 0,
+          "total_events": 7
+        },
+        "tool": "UNIFIED_TIMELINE",
+        "value": 0.0,
+        "z_score": 0.0
+      },
+      {
+        "confidence": 0.2639,
+        "metadata": {
+          "dominant_pattern": "NONE",
+          "indicators": [],
+          "n_indicators": 0,
+          "n_tools": 8,
+          "sift_critical_active": 1
+        },
+        "tool": "ADV_ROBUST",
+        "value": 0.0,
+        "z_score": 0.0
+      }
+    ]
+  },
+  "sans_compliance": {
+    "accuracy_validation": true,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}

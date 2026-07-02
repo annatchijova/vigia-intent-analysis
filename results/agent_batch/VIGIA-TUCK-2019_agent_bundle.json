@@ -1,0 +1,299 @@
+{
+  "agent_verdict": "INTENT",
+  "analysis_timestamp": "2026-07-02T14:50:08.707363+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "VIGIA-TUCK-2019",
+    "end_time": "2026-07-02T14:50:08.707366+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "VIGIA-TUCK-2019",
+        "entry_sha256": "1b5462d5b8214aa8c2afaf6de3346a2a198a13cc500ed22aac39bfaf4f85115f",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "VIGIA-TUCK-2019"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: cf1b0ed196d5e39c...",
+        "outputs_summary": {
+          "agent_sha256": "cf1b0ed196d5e39c164122d40d9383c5c511ab4106c327bd204e9021613acbff",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-07-02T14:50:08.704386+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-TUCK-2019",
+        "entry_sha256": "ac2935571c36761511177546fdc8a86e0e5a8e2f04c1324fc21c01df90181707",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-TUCK-2019.json"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-07-02T14:50:08.704459+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-TUCK-2019",
+        "entry_sha256": "2e6dcfb432b651361390f7700ac1b8f6da94a20d0ed72e222458ff84df9d7ba5",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-TUCK-2019.json"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: bac1377afd998cc8...",
+        "outputs_summary": {
+          "sha256": "bac1377afd998cc8460d19aa66972dae2b1bff61ae3fa338472efa85a12d202a"
+        },
+        "seq": 3,
+        "timestamp": "2026-07-02T14:50:08.704545+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "VIGIA-TUCK-2019",
+        "entry_sha256": "1196bcc4aecfd3e36fab76936b506c6fa4422945302b5b999841e27e2fd510ee",
+        "inputs_summary": {
+          "evidence": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-TUCK-2019.json",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-07-02T14:50:08.704633+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "VIGIA-TUCK-2019",
+        "entry_sha256": "b5c59e9b5cc49b2c7b60fe25a28085dc3398c03e1fd9ffeb03585d9fbaaf1eb2",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 5 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "INTENT_DETECTED",
+            "best_posterior": "18181/125000",
+            "confidence": "18181/125000",
+            "is_conclusive": "True",
+            "narrative": "macOS APFS laptop of suspect tuckgorge (Digital Corpora 2019, examiner Simson Garfinkel). Five signal clusters converge on eco-terrorism planning trajectory: (1) sustained ELF/ALF radicalization resea..."
+          },
+          "case_id": "VIGIA-TUCK-2019",
+          "pipeline_meta": {
+            "artifact_count": "5",
+            "avg_score": "18181/25000",
+            "expected_verdict": "INTENT",
+            "source": "ebs_v1_json_adapter"
+          },
+          "signals": [
+            {
+              "artifact_id": "elf_arson_nyt_clip_001",
+              "confidence": "22/25",
+              "description": "Documents/Clips/Ecoterrorism Suspected in House Fires in Seattle Suburb - The New York Times.pdf. NYT 2008 article on ELF arson of five luxury homes at Quinn's Crossing, Maltby WA. Signed E.L.F. FBI J",
+              "evidence_type": "file_timestamp",
+              "source": "read_evidence",
+              "z_score": "33/50"
+            },
+            {
+              "artifact_id": "intercept_fbi_eco_terror_pdf_001",
+              "confidence": "9/10",
+              "description": "Documents/[FBI eco-terror article].pdf \u2014 The Intercept, March 23 2019, 'How a Movement That Never Killed Anyone Became the FBI No. 1 Domestic Terrorism Threat'. 133MB full-page save. Covers Green Scar",
+              "evidence_type": "file_timestamp",
+              "source": "read_evidence",
+              "z_score": "153/200"
+            },
+            {
+              "artifact_id": "good_start_photos_arson_img_001",
+              "confidence": "17/20",
+              "description": "Documents/Good Start Photos/04home.600.jpg \u2014 photojournalism image of burning house with firefighters. Filename consistent with NYT image format. Appears to be Quinn's Crossing ELF arson photo from th",
+              "evidence_type": "file_timestamp",
+              "source": "read_evidence",
+              "z_score": "17/25"
+            },
+            {
+              "artifact_id": "chrome_material_acquisition_001",
+              "confidence": "23/25",
+              "description": "Chrome History (sqlite3): Oct 18 2019 21:01 'nitrogen fertilizer' search -> Amazon Urea 46-0-0 product page (B005IAXRN4). Oct 18 21:02 '45 gallon blue barrels' search. Oct 20 15:23 Home Depot '55 Gal.",
+              "evidence_type": "log_entry",
+              "source": "search_pattern",
+              "z_score": "506/625"
+            },
+            {
+              "artifact_id": "safari_vpn_covert_comms_001",
+              "confidence": "22/25",
+              "description": "Safari History.db: Oct 18 2019 00:53 'vpn software that runs over http' Google search -> SoftEther VPN (softether.org), SoftEther Download, SoftEther NAT traversal docs, GitHub jpillora/chisel 'A fast",
+              "evidence_type": "log_entry",
+              "source": "search_pattern",
+              "z_score": "451/625"
+            }
+          ]
+        },
+        "seq": 5,
+        "timestamp": "2026-07-02T14:50:08.707061+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "VIGIA-TUCK-2019",
+        "entry_sha256": "a7904167ea119d76dff5ccb3026ba2029f670a15e55545315822e69c5ea45497",
+        "inputs_summary": {
+          "n_signals": "5"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-07-02T14:50:08.707186+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "VIGIA-TUCK-2019",
+        "entry_sha256": "35c9a493a7eb61af07eb42857bc3618615c1cf482fd4dc58d5fcd906c67262cf",
+        "inputs_summary": {
+          "verdict": "INTENT_DETECTED"
+        },
+        "iteration": 0,
+        "note": "Exit code 3 (INTENT) \u2014 analysis complete.",
+        "outputs_summary": {
+          "agent_verdict": "INTENT",
+          "exit_code": "3"
+        },
+        "seq": 7,
+        "timestamp": "2026-07-02T14:50:08.707275+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-07-02T14:50:08.704193+00:00",
+    "total_entries": 7
+  },
+  "case_id": "VIGIA-TUCK-2019",
+  "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-TUCK-2019.json",
+  "evidence_sha256": "bac1377afd998cc8460d19aa66972dae2b1bff61ae3fa338472efa85a12d202a",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-TUCK-2019 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/VIGIA-TUCK-2019.json\nEvidence SHA-256: bac1377afd998cc8460d19aa66972dae2b1bff61ae3fa338472efa85a12d202a\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: INTENT_DETECTED\nPosterior confidence: 18181/125000\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\nmacOS APFS laptop of suspect tuckgorge (Digital Corpora 2019, examiner Simson Garfinkel). Five signal clusters converge on eco-terrorism planning trajectory: (1) sustained ELF/ALF radicalization research campaign Jul-Aug 2019 (NYT ELF arson clip, 133MB Intercept FBI eco-terror article, climate/earthquake PDFs, Earth Day webarchive); (2) curated arson imagery folder 'Good Start Photos' containing Quinn's Crossing ELF arson photograph and fire-themed 'Setting Fires' music video screenshots; (3) se\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Chrome History (sqlite3): Oct 18 2019 21:01 'nitrogen fertilizer' sear] z=0.810 conf=0.92 \u2014 \n  [Documents/[FBI eco-terror article].pdf \u2014 The Intercept, March 23 2019,] z=0.765 conf=0.90 \u2014 \n  [Safari History.db: Oct 18 2019 00:53 'vpn software that runs over http] z=0.722 conf=0.88 \u2014 \n  [Documents/Good Start Photos/04home.600.jpg \u2014 photojournalism image of ] z=0.680 conf=0.85 \u2014 \n  [Documents/Clips/Ecoterrorism Suspected in House Fires in Seattle Subur] z=0.660 conf=0.88 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW \u2014 No significant anomalies detected in this iteration.\n\nCritical signals (z>3): 0\nHigh signals (2<z<=3): 0\nTotal signals analyzed: 5",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "INTENT_DETECTED",
+      "best_posterior": "18181/125000",
+      "confidence": {
+        "__fraction__": true,
+        "den": 125000,
+        "num": 18181
+      },
+      "is_conclusive": true,
+      "narrative": "macOS APFS laptop of suspect tuckgorge (Digital Corpora 2019, examiner Simson Garfinkel). Five signal clusters converge on eco-terrorism planning trajectory: (1) sustained ELF/ALF radicalization research campaign Jul-Aug 2019 (NYT ELF arson clip, 133MB Intercept FBI eco-terror article, climate/earthquake PDFs, Earth Day webarchive); (2) curated arson imagery folder 'Good Start Photos' containing Quinn's Crossing ELF arson photograph and fire-themed 'Setting Fires' music video screenshots; (3) se"
+    },
+    "case_id": "VIGIA-TUCK-2019",
+    "pipeline_meta": {
+      "artifact_count": 5,
+      "avg_score": "18181/25000",
+      "expected_verdict": "INTENT",
+      "source": "ebs_v1_json_adapter"
+    },
+    "signals": [
+      {
+        "artifact_id": "elf_arson_nyt_clip_001",
+        "confidence": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 22
+        },
+        "description": "Documents/Clips/Ecoterrorism Suspected in House Fires in Seattle Suburb - The New York Times.pdf. NYT 2008 article on ELF arson of five luxury homes at Quinn's Crossing, Maltby WA. Signed E.L.F. FBI J",
+        "evidence_type": "file_timestamp",
+        "source": "read_evidence",
+        "z_score": {
+          "__fraction__": true,
+          "den": 50,
+          "num": 33
+        }
+      },
+      {
+        "artifact_id": "intercept_fbi_eco_terror_pdf_001",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 9
+        },
+        "description": "Documents/[FBI eco-terror article].pdf \u2014 The Intercept, March 23 2019, 'How a Movement That Never Killed Anyone Became the FBI No. 1 Domestic Terrorism Threat'. 133MB full-page save. Covers Green Scar",
+        "evidence_type": "file_timestamp",
+        "source": "read_evidence",
+        "z_score": {
+          "__fraction__": true,
+          "den": 200,
+          "num": 153
+        }
+      },
+      {
+        "artifact_id": "good_start_photos_arson_img_001",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 17
+        },
+        "description": "Documents/Good Start Photos/04home.600.jpg \u2014 photojournalism image of burning house with firefighters. Filename consistent with NYT image format. Appears to be Quinn's Crossing ELF arson photo from th",
+        "evidence_type": "file_timestamp",
+        "source": "read_evidence",
+        "z_score": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 17
+        }
+      },
+      {
+        "artifact_id": "chrome_material_acquisition_001",
+        "confidence": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 23
+        },
+        "description": "Chrome History (sqlite3): Oct 18 2019 21:01 'nitrogen fertilizer' search -> Amazon Urea 46-0-0 product page (B005IAXRN4). Oct 18 21:02 '45 gallon blue barrels' search. Oct 20 15:23 Home Depot '55 Gal.",
+        "evidence_type": "log_entry",
+        "source": "search_pattern",
+        "z_score": {
+          "__fraction__": true,
+          "den": 625,
+          "num": 506
+        }
+      },
+      {
+        "artifact_id": "safari_vpn_covert_comms_001",
+        "confidence": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 22
+        },
+        "description": "Safari History.db: Oct 18 2019 00:53 'vpn software that runs over http' Google search -> SoftEther VPN (softether.org), SoftEther Download, SoftEther NAT traversal docs, GitHub jpillora/chisel 'A fast",
+        "evidence_type": "log_entry",
+        "source": "search_pattern",
+        "z_score": {
+          "__fraction__": true,
+          "den": 625,
+          "num": 451
+        }
+      }
+    ]
+  },
+  "sans_compliance": {
+    "accuracy_validation": false,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}

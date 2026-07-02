@@ -1,0 +1,275 @@
+{
+  "agent_verdict": "INTENT",
+  "analysis_timestamp": "2026-07-02T14:50:09.104030+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "VIGIA_KIWI_006_WITNESS_SELF_INCRIM",
+    "end_time": "2026-07-02T14:50:09.104034+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "VIGIA_KIWI_006_WITNESS_SELF_INCRIM",
+        "entry_sha256": "b88645f26b374c46510f1c1a0ac01cc7c03c9a842ca6bb2d36c289dcb6eb4cdc",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "VIGIA_KIWI_006_WITNESS_SELF_INCRIM"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: cf1b0ed196d5e39c...",
+        "outputs_summary": {
+          "agent_sha256": "cf1b0ed196d5e39c164122d40d9383c5c511ab4106c327bd204e9021613acbff",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-07-02T14:50:09.101162+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA_KIWI_006_WITNESS_SELF_INCRIM",
+        "entry_sha256": "95080561d1632dd07e913bbc3bce42249312ccdf867663d3a26ec79a79dbc73b",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA_KIWI_006_WITNESS_SELF_INCRIM.json"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-07-02T14:50:09.101242+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA_KIWI_006_WITNESS_SELF_INCRIM",
+        "entry_sha256": "46d553956b2524fe4047bde3aecccb0b9dfd1aafbae49e6936d2db5c67e80081",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA_KIWI_006_WITNESS_SELF_INCRIM.json"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: 1748d2ee9fc4488a...",
+        "outputs_summary": {
+          "sha256": "1748d2ee9fc4488a7336993052e9ad2733fd8231d5350b10b2db24f843ca40ed"
+        },
+        "seq": 3,
+        "timestamp": "2026-07-02T14:50:09.101317+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "VIGIA_KIWI_006_WITNESS_SELF_INCRIM",
+        "entry_sha256": "80cd0d48cdd375f23beb013e535fc22603001538923fa4672c2863bd11754f6b",
+        "inputs_summary": {
+          "evidence": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA_KIWI_006_WITNESS_SELF_INCRIM.json",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-07-02T14:50:09.101404+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "VIGIA_KIWI_006_WITNESS_SELF_INCRIM",
+        "entry_sha256": "40fa861a6a3c81896dd0611b4133e1db12d9cef8914bce6701e1becf9178a3f9",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 4 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "SUSPICION_DETECTED",
+            "best_posterior": "13/800",
+            "confidence": "13/800",
+            "is_conclusive": "False",
+            "narrative": "Three coordinated witnesses construct peligrosidad narrative. Each witness testimony contains self-incriminating conduct. Conflicto de inter\u00e9s documentado en todos."
+          },
+          "case_id": "VIGIA-KIWI-006-WITNESS-SELF-INCRIM",
+          "pipeline_meta": {
+            "artifact_count": "4",
+            "avg_score": "13/160",
+            "expected_verdict": "SUSPICION",
+            "source": "ebs_v1_json_adapter"
+          },
+          "signals": [
+            {
+              "artifact_id": "KIWI-006-A01",
+              "confidence": "3/20",
+              "description": "Testigo-A descarg\u00f3 10gb de material de imputada. No la conoce. Declara miedo. V\u00ednculo directo con hermano del denunciante.",
+              "evidence_type": "cultural_marker",
+              "source": "manual_forensic_review",
+              "z_score": "21/200"
+            },
+            {
+              "artifact_id": "KIWI-006-A02",
+              "confidence": "1/10",
+              "description": "Hermano del denunciante descarg\u00f3 material de imputada. Imputada lo tiene bloqueado hace a\u00f1os. No pudo presentar capturas. No sabe el n\u00famero de su propio celular.",
+              "evidence_type": "log_entry",
+              "source": "manual_forensic_review",
+              "z_score": "2/25"
+            },
+            {
+              "artifact_id": "KIWI-006-A03",
+              "confidence": "1/10",
+              "description": "Madre del denunciante declara que imputada est\u00e1 loca y se mete con hermana del denunciante. Imputada nunca conoci\u00f3 a la hermana. Testigo tiene historial de declaraciones contradictorias sobre el denun",
+              "evidence_type": "cultural_marker",
+              "source": "manual_forensic_review",
+              "z_score": "3/50"
+            },
+            {
+              "artifact_id": "KIWI-006-A04",
+              "confidence": "1/10",
+              "description": "Tres testigos vinculados entre s\u00ed, ninguno independiente. Testimonios coordinados construyen narrativa de peligrosidad sin contacto verificado.",
+              "evidence_type": "cultural_marker",
+              "source": "manual_forensic_review",
+              "z_score": "2/25"
+            }
+          ]
+        },
+        "seq": 5,
+        "timestamp": "2026-07-02T14:50:09.103775+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "VIGIA_KIWI_006_WITNESS_SELF_INCRIM",
+        "entry_sha256": "70e128d8acbbd451a3a6eafb1f3d86b140ddf7b158b32a7310a60fb689234f00",
+        "inputs_summary": {
+          "n_signals": "4"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-07-02T14:50:09.103871+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "VIGIA_KIWI_006_WITNESS_SELF_INCRIM",
+        "entry_sha256": "49fa6cc165c9ffc92378424ea9051a535542862b4600b1d40b3cdbb5ed6b3c32",
+        "inputs_summary": {
+          "verdict": "SUSPICION_DETECTED"
+        },
+        "iteration": 0,
+        "note": "Exit code 3 (INTENT) \u2014 analysis complete.",
+        "outputs_summary": {
+          "agent_verdict": "INTENT",
+          "exit_code": "3"
+        },
+        "seq": 7,
+        "timestamp": "2026-07-02T14:50:09.103954+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-07-02T14:50:09.100960+00:00",
+    "total_entries": 7
+  },
+  "case_id": "VIGIA_KIWI_006_WITNESS_SELF_INCRIM",
+  "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA_KIWI_006_WITNESS_SELF_INCRIM.json",
+  "evidence_sha256": "1748d2ee9fc4488a7336993052e9ad2733fd8231d5350b10b2db24f843ca40ed",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA_KIWI_006_WITNESS_SELF_INCRIM ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/VIGIA_KIWI_006_WITNESS_SELF_INCRIM.json\nEvidence SHA-256: 1748d2ee9fc4488a7336993052e9ad2733fd8231d5350b10b2db24f843ca40ed\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: SUSPICION_DETECTED\nPosterior confidence: 13/800\nConclusive: NO \u2014 requires human review\n\n--- PEIRCEAN NARRATIVE ---\nThree coordinated witnesses construct peligrosidad narrative. Each witness testimony contains self-incriminating conduct. Conflicto de inter\u00e9s documentado en todos.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Testigo-A descarg\u00f3 10gb de material de imputada. No la conoce. Declara] z=0.105 conf=0.15 \u2014 \n  [Hermano del denunciante descarg\u00f3 material de imputada. Imputada lo tie] z=0.080 conf=0.10 \u2014 \n  [Tres testigos vinculados entre s\u00ed, ninguno independiente. Testimonios ] z=0.080 conf=0.10 \u2014 \n  [Madre del denunciante declara que imputada est\u00e1 loca y se mete con her] z=0.060 conf=0.10 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW \u2014 No significant anomalies detected in this iteration.\n\nCritical signals (z>3): 0\nHigh signals (2<z<=3): 0\nTotal signals analyzed: 4",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "SUSPICION_DETECTED",
+      "best_posterior": "13/800",
+      "confidence": {
+        "__fraction__": true,
+        "den": 800,
+        "num": 13
+      },
+      "is_conclusive": false,
+      "narrative": "Three coordinated witnesses construct peligrosidad narrative. Each witness testimony contains self-incriminating conduct. Conflicto de inter\u00e9s documentado en todos."
+    },
+    "case_id": "VIGIA-KIWI-006-WITNESS-SELF-INCRIM",
+    "pipeline_meta": {
+      "artifact_count": 4,
+      "avg_score": "13/160",
+      "expected_verdict": "SUSPICION",
+      "source": "ebs_v1_json_adapter"
+    },
+    "signals": [
+      {
+        "artifact_id": "KIWI-006-A01",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 3
+        },
+        "description": "Testigo-A descarg\u00f3 10gb de material de imputada. No la conoce. Declara miedo. V\u00ednculo directo con hermano del denunciante.",
+        "evidence_type": "cultural_marker",
+        "source": "manual_forensic_review",
+        "z_score": {
+          "__fraction__": true,
+          "den": 200,
+          "num": 21
+        }
+      },
+      {
+        "artifact_id": "KIWI-006-A02",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 1
+        },
+        "description": "Hermano del denunciante descarg\u00f3 material de imputada. Imputada lo tiene bloqueado hace a\u00f1os. No pudo presentar capturas. No sabe el n\u00famero de su propio celular.",
+        "evidence_type": "log_entry",
+        "source": "manual_forensic_review",
+        "z_score": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 2
+        }
+      },
+      {
+        "artifact_id": "KIWI-006-A03",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 1
+        },
+        "description": "Madre del denunciante declara que imputada est\u00e1 loca y se mete con hermana del denunciante. Imputada nunca conoci\u00f3 a la hermana. Testigo tiene historial de declaraciones contradictorias sobre el denun",
+        "evidence_type": "cultural_marker",
+        "source": "manual_forensic_review",
+        "z_score": {
+          "__fraction__": true,
+          "den": 50,
+          "num": 3
+        }
+      },
+      {
+        "artifact_id": "KIWI-006-A04",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 1
+        },
+        "description": "Tres testigos vinculados entre s\u00ed, ninguno independiente. Testimonios coordinados construyen narrativa de peligrosidad sin contacto verificado.",
+        "evidence_type": "cultural_marker",
+        "source": "manual_forensic_review",
+        "z_score": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 2
+        }
+      }
+    ]
+  },
+  "sans_compliance": {
+    "accuracy_validation": false,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}

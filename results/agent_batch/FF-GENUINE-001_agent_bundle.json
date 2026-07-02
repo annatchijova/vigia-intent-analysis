@@ -1,32 +1,33 @@
 {
-  "analysis_timestamp": "2026-06-27T05:25:34.173141+00:00",
+  "agent_verdict": "MALICE",
+  "analysis_timestamp": "2026-07-02T14:50:04.646715+00:00",
   "audit_trail": {
     "agent_version": "1.0.0-SANS-2026",
     "case_id": "FF-GENUINE-001",
-    "end_time": "2026-06-27T05:25:34.173147+00:00",
+    "end_time": "2026-07-02T14:50:04.646719+00:00",
     "entries": [
       {
         "action": "AGENT_INITIALIZED",
         "case_id": "FF-GENUINE-001",
-        "entry_sha256": "c3ca7ceb81b7ef5caff6d8ecc1904c94240543ac08a6dff8985287687b465bc2",
+        "entry_sha256": "b23051a58c4a9d5223d49938429dc29abdc39b72f09b2e4f4c70570587331dcb",
         "inputs_summary": {
           "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
           "case_id": "FF-GENUINE-001"
         },
         "iteration": 0,
-        "note": "Agent initialized \u2014 source SHA-256: 95f2da2a3bdcb4ca...",
+        "note": "Agent initialized \u2014 source SHA-256: cf1b0ed196d5e39c...",
         "outputs_summary": {
-          "agent_sha256": "95f2da2a3bdcb4ca106059e2b06f58fd0ec414c887fec07ac7a0d5edfeb097a1",
+          "agent_sha256": "cf1b0ed196d5e39c164122d40d9383c5c511ab4106c327bd204e9021613acbff",
           "agent_version": "1.0.0-SANS-2026"
         },
         "seq": 1,
-        "timestamp": "2026-06-27T05:25:34.169847+00:00",
+        "timestamp": "2026-07-02T14:50:04.639133+00:00",
         "tool": "vigia_agent"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "FF-GENUINE-001",
-        "entry_sha256": "e860a9832a1cdedd75e13fad455bd3be1214cc2d72d84d86069122eed0c39fd0",
+        "entry_sha256": "3579e52507ec521b7a592e621867189ec00cddc6f343b15fd8a833e1f127b6b2",
         "inputs_summary": {
           "path": "/home/labestiadevigia/vigia-repo/data/cases/FF-GENUINE-001.json"
         },
@@ -34,13 +35,13 @@
         "note": "Computing SHA-256 of original evidence",
         "outputs_summary": {},
         "seq": 2,
-        "timestamp": "2026-06-27T05:25:34.169931+00:00",
+        "timestamp": "2026-07-02T14:50:04.639214+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "FF-GENUINE-001",
-        "entry_sha256": "f6c5ef12b86a4a59048d16bf53b834d9ce7bb77b6fbe85f5741a2a7205ef7447",
+        "entry_sha256": "6e1afae11e9f3037a92d07b5d79151cacee30c94ebbcb1e9ead237b923b65d51",
         "inputs_summary": {
           "path": "/home/labestiadevigia/vigia-repo/data/cases/FF-GENUINE-001.json"
         },
@@ -50,13 +51,13 @@
           "sha256": "a4e9947e647b7235934c40560fd6707c0a6827de1c9012fa16c06572a34348e6"
         },
         "seq": 3,
-        "timestamp": "2026-06-27T05:25:34.170016+00:00",
+        "timestamp": "2026-07-02T14:50:04.639290+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "PIPELINE_EXECUTE",
         "case_id": "FF-GENUINE-001",
-        "entry_sha256": "3597704428cd15c01a6acf0347ffaf537d7e7b81baca7c673fca36f98a8fb556",
+        "entry_sha256": "5bfc00f8ec750096dcdc28661522c07b58fc0b0227ce9761eeef7ea09aa41955",
         "inputs_summary": {
           "evidence": "/home/labestiadevigia/vigia-repo/data/cases/FF-GENUINE-001.json",
           "iteration": "0",
@@ -66,13 +67,13 @@
         "note": "Executing pipeline \u2014 iteration 0",
         "outputs_summary": {},
         "seq": 4,
-        "timestamp": "2026-06-27T05:25:34.170118+00:00",
+        "timestamp": "2026-07-02T14:50:04.639372+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "PIPELINE_COMPLETE",
         "case_id": "FF-GENUINE-001",
-        "entry_sha256": "d7abf48f069c154bb610dd152d50557a7926f40b453491a6c74b2f74e3fec5f5",
+        "entry_sha256": "af2da79677e3bbc31835226ad8ad140a9197201e8a5282f2dd9d372413c69a7a",
         "inputs_summary": {
           "iteration": "0"
         },
@@ -121,13 +122,13 @@
           ]
         },
         "seq": 5,
-        "timestamp": "2026-06-27T05:25:34.172061+00:00",
+        "timestamp": "2026-07-02T14:50:04.645659+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "CONTRADICTION_CHECK",
         "case_id": "FF-GENUINE-001",
-        "entry_sha256": "e206d111992f3ae1d3a861ce905063d281cf3a219d9677b7d8cf87b70f2a2c4a",
+        "entry_sha256": "5818fe9f0d08ee472953b1eccc3130e21f80646ce83991e595d997bdc9e8cebb",
         "inputs_summary": {
           "n_signals": "3"
         },
@@ -138,27 +139,28 @@
           "threshold": "2"
         },
         "seq": 6,
-        "timestamp": "2026-06-27T05:25:34.172539+00:00",
+        "timestamp": "2026-07-02T14:50:04.645763+00:00",
         "tool": "contradiction_detector"
       },
       {
         "action": "AGENT_EXIT",
         "case_id": "FF-GENUINE-001",
-        "entry_sha256": "e600677f811dcb47d0a855a6437fe31d043464110854872238668898a0005683",
+        "entry_sha256": "f2fe2385c855f11c1549cae8ffe0dd7fc312368a2e5526d7a0e673944c6583b7",
         "inputs_summary": {
           "verdict": "MALICIOUS_INTENT_DETECTED"
         },
         "iteration": 0,
-        "note": "Exit code 1 \u2014 analysis complete.",
+        "note": "Exit code 1 (MALICE) \u2014 analysis complete.",
         "outputs_summary": {
+          "agent_verdict": "MALICE",
           "exit_code": "1"
         },
         "seq": 7,
-        "timestamp": "2026-06-27T05:25:34.172659+00:00",
+        "timestamp": "2026-07-02T14:50:04.645849+00:00",
         "tool": "vigia_agent"
       }
     ],
-    "start_time": "2026-06-27T05:25:34.169632+00:00",
+    "start_time": "2026-07-02T14:50:04.638945+00:00",
     "total_entries": 7
   },
   "case_id": "FF-GENUINE-001",

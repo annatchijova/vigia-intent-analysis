@@ -1,0 +1,299 @@
+{
+  "agent_verdict": "MALICE",
+  "analysis_timestamp": "2026-07-02T14:50:06.108297+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "VIGIA-HMG-99999-11",
+    "end_time": "2026-07-02T14:50:06.108302+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "VIGIA-HMG-99999-11",
+        "entry_sha256": "228e807e1359d8e7dc576307a8fcbaf5da5ba15ebac22a89f502d37bf06721bc",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "VIGIA-HMG-99999-11"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: cf1b0ed196d5e39c...",
+        "outputs_summary": {
+          "agent_sha256": "cf1b0ed196d5e39c164122d40d9383c5c511ab4106c327bd204e9021613acbff",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-07-02T14:50:06.104898+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-HMG-99999-11",
+        "entry_sha256": "01c8d1d580109270443b468dcbd98a955e2e5df1eea679459c8d9b94ae412a63",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-HMG-99999-11.json"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-07-02T14:50:06.104975+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-HMG-99999-11",
+        "entry_sha256": "5b82b8eb9e44a067e92efafd41c0b715cbb4d86be315940f913c523abfc9d03d",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-HMG-99999-11.json"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: 49e1145bc522a573...",
+        "outputs_summary": {
+          "sha256": "49e1145bc522a573e151a4ba8176d3962e86f2fc5c7fda201aefb25a4595f606"
+        },
+        "seq": 3,
+        "timestamp": "2026-07-02T14:50:06.105056+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "VIGIA-HMG-99999-11",
+        "entry_sha256": "5e55cddb66698e8989e682e0d671a7327a6adb69ee5a0d9857421c1ce8d8ad0c",
+        "inputs_summary": {
+          "evidence": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-HMG-99999-11.json",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-07-02T14:50:06.105142+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "VIGIA-HMG-99999-11",
+        "entry_sha256": "a85c3f47286b9c8270570f81876481f8e21dec9200fae1e162dc86f02e45926e",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 4 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+            "best_posterior": "1429/10000",
+            "confidence": "1429/10000",
+            "is_conclusive": "True",
+            "narrative": "Victor Bushell laptop (Windows 7) acquired 2011-10-23 by examiner Craig Wilson (CUC/1). NTFS volume shows zero user files in allocated space \u2014 CCleaner wipe executed. IE browser cache in unallocated s..."
+          },
+          "case_id": "VIGIA-HMG-99999-11",
+          "pipeline_meta": {
+            "artifact_count": "4",
+            "avg_score": "1429/2000",
+            "expected_verdict": "MALICE",
+            "source": "ebs_v1_json_adapter"
+          },
+          "signals": [
+            {
+              "artifact_id": "ntfs_empty_001",
+              "confidence": "19/20",
+              "description": "NTFS volume (ewf1) fls -r shows zero user files in allocated space. Only NTFS metadata structures present ($MFT, $LogFile, $Bitmap, $Volume, $Extend). Consistent with CCleaner full wipe of user partit",
+              "evidence_type": "mft_entry",
+              "source": "list_files",
+              "z_score": "437/500"
+            },
+            {
+              "artifact_id": "browser_ccleaner_001",
+              "confidence": "4/5",
+              "description": "IE browser cache (unallocated sectors): Bing search 'ccleaner filetype:pdf', CCleaner 3.11 download URL fs31.filehippo.com/4145/3d5912a1b2b245179e5d27b059c4eed7/ccsetup311.exe, desktop files 'How to U",
+              "evidence_type": "log_entry",
+              "source": "search_pattern",
+              "z_score": "88/125"
+            },
+            {
+              "artifact_id": "browser_ferry_001",
+              "confidence": "4/5",
+              "description": "IE cache (unallocated): P&O Ferries Book Journey Steps 1-2-3 (complete booking flow), Bing 'dover to calais foot passenger', Bing 'sealink ferry time dover to calais', timetable downloaded. Google Map",
+              "evidence_type": "log_entry",
+              "source": "search_pattern",
+              "z_score": "17/25"
+            },
+            {
+              "artifact_id": "browser_deutsche_bank_001",
+              "confidence": "3/4",
+              "description": "IE cache (unallocated): Deutsche Bank Home, Disclaimer, Money Transfer, Online Money Transfers pages cached. Access contemporaneous with Hamburg route planning. Indicates asset transfer to destination",
+              "evidence_type": "log_entry",
+              "source": "search_pattern",
+              "z_score": "3/5"
+            }
+          ]
+        },
+        "seq": 5,
+        "timestamp": "2026-07-02T14:50:06.107654+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "VIGIA-HMG-99999-11",
+        "entry_sha256": "0bd70d0406341fe21d820da0fc8858dff8030d343b75fecb0b9497bf243ea479",
+        "inputs_summary": {
+          "n_signals": "4"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-07-02T14:50:06.107764+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "VIGIA-HMG-99999-11",
+        "entry_sha256": "3ef4823c5ad38f370cf3457ad07b599c160fdbd978a4124a3c132e38ce1e613d",
+        "inputs_summary": {
+          "verdict": "MALICIOUS_INTENT_DETECTED"
+        },
+        "iteration": 0,
+        "note": "Exit code 1 (MALICE) \u2014 analysis complete.",
+        "outputs_summary": {
+          "agent_verdict": "MALICE",
+          "exit_code": "1"
+        },
+        "seq": 7,
+        "timestamp": "2026-07-02T14:50:06.107852+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-07-02T14:50:06.104698+00:00",
+    "total_entries": 7
+  },
+  "case_id": "VIGIA-HMG-99999-11",
+  "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-HMG-99999-11.json",
+  "evidence_sha256": "49e1145bc522a573e151a4ba8176d3962e86f2fc5c7fda201aefb25a4595f606",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-HMG-99999-11 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/VIGIA-HMG-99999-11.json\nEvidence SHA-256: 49e1145bc522a573e151a4ba8176d3962e86f2fc5c7fda201aefb25a4595f606\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 1429/10000\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\nVictor Bushell laptop (Windows 7) acquired 2011-10-23 by examiner Craig Wilson (CUC/1). NTFS volume shows zero user files in allocated space \u2014 CCleaner wipe executed. IE browser cache in unallocated sectors reveals 24-hour activity window (2011-10-18 to 2011-10-19): CCleaner 3.11 downloaded, InPrivate browsing researched, P&O Ferries booking completed (foot passenger, Dover-Calais), Google Maps route to Osterbrook Hamburg, Deutsche Bank Money Transfer accessed, Gmail accessed. Five-signal pre-fl\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [NTFS volume (ewf1) fls -r shows zero user files in allocated space. On] z=0.874 conf=0.95 \u2014 \n  [IE browser cache (unallocated sectors): Bing search 'ccleaner filetype] z=0.704 conf=0.80 \u2014 \n  [IE cache (unallocated): P&O Ferries Book Journey Steps 1-2-3 (complete] z=0.680 conf=0.80 \u2014 \n  [IE cache (unallocated): Deutsche Bank Home, Disclaimer, Money Transfer] z=0.600 conf=0.75 \u2014 \n\n--- FINAL ALERT LEVEL ---\nHIGH \u2014 Conclusive MALICE verdict from Bayesian posterior aggregation. Individual z-scores below threshold (distributed evidence pattern: no single dominant signal, but aggregate posterior is decisive).\n\nCritical signals (z>3): 0\nHigh signals (2<z<=3): 0\nTotal signals analyzed: 4",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+      "best_posterior": "1429/10000",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10000,
+        "num": 1429
+      },
+      "devil_advocate": {
+        "aggregation": {
+          "k": 3,
+          "method": "top_k_already_validated_matches_v2",
+          "total_gap_mass": "0"
+        },
+        "counterfactual_summary": {
+          "primary_alternative_hypothesis": null
+        },
+        "decision_context": {
+          "confidence": "1429/10000",
+          "mapped_verdict": "MALICIOUS_INTENT_DETECTED",
+          "raw_verdict": "MALICIOUS_INTENT_DETECTED",
+          "score": "1429/2000"
+        },
+        "devil_advocate_source": "deterministic_no_pattern_data_available",
+        "meta": {
+          "deterministic": true,
+          "generated_from": "case_pattern_library"
+        },
+        "narrative": "Eco's Razor (Abductive Falsification) applied to verdict MALICIOUS_INTENT_DETECTED. Pattern-matching data was not available on this code path \u2014 CasePatternLibrary is not invoked here by design (agent audit-trail mode (vigia_agent.py \u2014 JSON-replay / autonomous path); see KNOWN_LIMITATIONS.md). No structured counter-hypothesis could be derived deterministically. This is a documented scope limitation of the current code path, not an absence of falsification attempt.",
+        "pattern_evidence_gaps": [],
+        "version": "r7-da-v1"
+      },
+      "is_conclusive": true,
+      "narrative": "Victor Bushell laptop (Windows 7) acquired 2011-10-23 by examiner Craig Wilson (CUC/1). NTFS volume shows zero user files in allocated space \u2014 CCleaner wipe executed. IE browser cache in unallocated sectors reveals 24-hour activity window (2011-10-18 to 2011-10-19): CCleaner 3.11 downloaded, InPrivate browsing researched, P&O Ferries booking completed (foot passenger, Dover-Calais), Google Maps route to Osterbrook Hamburg, Deutsche Bank Money Transfer accessed, Gmail accessed. Five-signal pre-fl"
+    },
+    "case_id": "VIGIA-HMG-99999-11",
+    "pipeline_meta": {
+      "artifact_count": 4,
+      "avg_score": "1429/2000",
+      "expected_verdict": "MALICE",
+      "source": "ebs_v1_json_adapter"
+    },
+    "signals": [
+      {
+        "artifact_id": "ntfs_empty_001",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 19
+        },
+        "description": "NTFS volume (ewf1) fls -r shows zero user files in allocated space. Only NTFS metadata structures present ($MFT, $LogFile, $Bitmap, $Volume, $Extend). Consistent with CCleaner full wipe of user partit",
+        "evidence_type": "mft_entry",
+        "source": "list_files",
+        "z_score": {
+          "__fraction__": true,
+          "den": 500,
+          "num": 437
+        }
+      },
+      {
+        "artifact_id": "browser_ccleaner_001",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 4
+        },
+        "description": "IE browser cache (unallocated sectors): Bing search 'ccleaner filetype:pdf', CCleaner 3.11 download URL fs31.filehippo.com/4145/3d5912a1b2b245179e5d27b059c4eed7/ccsetup311.exe, desktop files 'How to U",
+        "evidence_type": "log_entry",
+        "source": "search_pattern",
+        "z_score": {
+          "__fraction__": true,
+          "den": 125,
+          "num": 88
+        }
+      },
+      {
+        "artifact_id": "browser_ferry_001",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 4
+        },
+        "description": "IE cache (unallocated): P&O Ferries Book Journey Steps 1-2-3 (complete booking flow), Bing 'dover to calais foot passenger', Bing 'sealink ferry time dover to calais', timetable downloaded. Google Map",
+        "evidence_type": "log_entry",
+        "source": "search_pattern",
+        "z_score": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 17
+        }
+      },
+      {
+        "artifact_id": "browser_deutsche_bank_001",
+        "confidence": {
+          "__fraction__": true,
+          "den": 4,
+          "num": 3
+        },
+        "description": "IE cache (unallocated): Deutsche Bank Home, Disclaimer, Money Transfer, Online Money Transfers pages cached. Access contemporaneous with Hamburg route planning. Indicates asset transfer to destination",
+        "evidence_type": "log_entry",
+        "source": "search_pattern",
+        "z_score": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 3
+        }
+      }
+    ]
+  },
+  "sans_compliance": {
+    "accuracy_validation": false,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}

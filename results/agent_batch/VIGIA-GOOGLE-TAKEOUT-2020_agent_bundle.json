@@ -1,0 +1,323 @@
+{
+  "agent_verdict": "MALICE",
+  "analysis_timestamp": "2026-07-02T14:50:06.056769+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "VIGIA-GOOGLE-TAKEOUT-2020",
+    "end_time": "2026-07-02T14:50:06.056773+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "VIGIA-GOOGLE-TAKEOUT-2020",
+        "entry_sha256": "9ba608354d53b0079c9ed251137e97c774521a527bf881b5293fa0f84c34b2cd",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "VIGIA-GOOGLE-TAKEOUT-2020"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: cf1b0ed196d5e39c...",
+        "outputs_summary": {
+          "agent_sha256": "cf1b0ed196d5e39c164122d40d9383c5c511ab4106c327bd204e9021613acbff",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-07-02T14:50:06.053462+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-GOOGLE-TAKEOUT-2020",
+        "entry_sha256": "1cc8baddb28f6a04287c5bf23b7c8d2ef08514a06bf11b9099c8a3199228b028",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-GOOGLE-TAKEOUT-2020.json"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-07-02T14:50:06.053536+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-GOOGLE-TAKEOUT-2020",
+        "entry_sha256": "37f9e225630afee5f11fbd89e0cacf2ba19c2acf62d414872d3c24afbfb02dfa",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-GOOGLE-TAKEOUT-2020.json"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: c312c383450cd9cb...",
+        "outputs_summary": {
+          "sha256": "c312c383450cd9cbdd5e93ecc100b229ec4ab96d359d115fa3d0058532da3d14"
+        },
+        "seq": 3,
+        "timestamp": "2026-07-02T14:50:06.053623+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "VIGIA-GOOGLE-TAKEOUT-2020",
+        "entry_sha256": "0edb697732bc855ad1822c68400e1d7c51a4eaed8dd0fab650d34c1ba82b1678",
+        "inputs_summary": {
+          "evidence": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-GOOGLE-TAKEOUT-2020.json",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-07-02T14:50:06.053711+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "VIGIA-GOOGLE-TAKEOUT-2020",
+        "entry_sha256": "962525cca1017b8f86864a283566c79c30f48b6684523b8fc8b20585561f1396",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 5 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+            "best_posterior": "42251/250000",
+            "confidence": "42251/250000",
+            "is_conclusive": "True",
+            "narrative": "Google Takeout export from Chester Russell (king.chester.802@gmail.com), Champlain College cybersecurity student, Google Pixel 3. Three convergent MALICE clusters: (1) Android exploitation research ca..."
+          },
+          "case_id": "VIGIA-GOOGLE-TAKEOUT-2020",
+          "pipeline_meta": {
+            "artifact_count": "5",
+            "avg_score": "42251/50000",
+            "expected_verdict": "MALICE",
+            "source": "ebs_v1_json_adapter"
+          },
+          "signals": [
+            {
+              "artifact_id": "takeout_zip_001",
+              "confidence": "19/20",
+              "description": "2020 CTF - Takeout.zip: complete Google account export for king.chester.802@gmail.com (Chester Russell). 356,764,506 bytes. Requested Mar 29 2020 (per delivery email in mbox). Contains: My Activity (S",
+              "evidence_type": "file_timestamp",
+              "source": "generate_forensic_hash",
+              "z_score": "171/200"
+            },
+            {
+              "artifact_id": "chestnut_cv_exe_001",
+              "confidence": "97/100",
+              "description": "Chestnut_CV.exe \u2014 PE32+ executable (console) x86-64, 26,895,731 bytes, Shannon entropy 7.9943 bits/byte (PyInstaller-packed Python payload). Shared by Alan Brunswick (abrunswick8675309@gmail.com) via ",
+              "evidence_type": "file_timestamp",
+              "source": "generate_forensic_hash",
+              "z_score": "1843/2000"
+            },
+            {
+              "artifact_id": "my_activity_hacking_research_001",
+              "confidence": "9/10",
+              "description": "My Activity/Search and Chrome: Jan 25 2020 \u2014 'how do i hack on an android' (00:47), YouTube 'Run the Kali Linux Hacking OS on an Unrooted Android Phone' (Null Byte), 'metasploit guide', 'kali msfconso",
+              "evidence_type": "log_entry",
+              "source": "read_evidence",
+              "z_score": "153/200"
+            },
+            {
+              "artifact_id": "mail_warren_attack_001",
+              "confidence": "19/20",
+              "description": "Mail/All mail.mbox (97 emails): Mar 23 19:52 \u2014 Chester emailed warrenhamiltonfinance@gmail.com from king.chester.802@gmail.com as fake persona 'Chestnut Russman': 'Esteemed entrepreneur... I'm worked ",
+              "evidence_type": "log_entry",
+              "source": "read_evidence",
+              "z_score": "437/500"
+            },
+            {
+              "artifact_id": "contacts_mastermind_001",
+              "confidence": "23/25",
+              "description": "Contacts/All Contacts.vcf: Alan Brunswick listed as 'Mastermind (Alan)', email abrunswick8675309@gmail.com, phone +1-518-653-7460 (area code 518 = Albany NY). Warren Hamilton listed as warrenhamiltonf",
+              "evidence_type": "log_entry",
+              "source": "read_evidence",
+              "z_score": "506/625"
+            }
+          ]
+        },
+        "seq": 5,
+        "timestamp": "2026-07-02T14:50:06.056113+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "VIGIA-GOOGLE-TAKEOUT-2020",
+        "entry_sha256": "7e3400860972d3da9b2ee99598ffefc7ed0448ac7053f0dbac56a183e2022e4c",
+        "inputs_summary": {
+          "n_signals": "5"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-07-02T14:50:06.056236+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "VIGIA-GOOGLE-TAKEOUT-2020",
+        "entry_sha256": "bcfeb7d466a903bf6803499a29796f4e0128c5a68ae9073f63098a4ee4fa257b",
+        "inputs_summary": {
+          "verdict": "MALICIOUS_INTENT_DETECTED"
+        },
+        "iteration": 0,
+        "note": "Exit code 1 (MALICE) \u2014 analysis complete.",
+        "outputs_summary": {
+          "agent_verdict": "MALICE",
+          "exit_code": "1"
+        },
+        "seq": 7,
+        "timestamp": "2026-07-02T14:50:06.056323+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-07-02T14:50:06.053277+00:00",
+    "total_entries": 7
+  },
+  "case_id": "VIGIA-GOOGLE-TAKEOUT-2020",
+  "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-GOOGLE-TAKEOUT-2020.json",
+  "evidence_sha256": "c312c383450cd9cbdd5e93ecc100b229ec4ab96d359d115fa3d0058532da3d14",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-GOOGLE-TAKEOUT-2020 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/VIGIA-GOOGLE-TAKEOUT-2020.json\nEvidence SHA-256: c312c383450cd9cbdd5e93ecc100b229ec4ab96d359d115fa3d0058532da3d14\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 42251/250000\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\nGoogle Takeout export from Chester Russell (king.chester.802@gmail.com), Champlain College cybersecurity student, Google Pixel 3. Three convergent MALICE clusters: (1) Android exploitation research campaign starting Jan 25 2020 (Metasploit, Magisk hidden root, system partition modification); (2) pre-travel OPSEC implementation Mar 5-6 (Magisk, camera metadata stripping 'camera app no metadata Android', app encryption) immediately before Norway trip; (3) spear-phishing attack Mar 23 against Warre\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Chestnut_CV.exe \u2014 PE32+ executable (console) x86-64, 26,895,731 bytes,] z=0.921 conf=0.97 \u2014 \n  [Mail/All mail.mbox (97 emails): Mar 23 19:52 \u2014 Chester emailed warrenh] z=0.874 conf=0.95 \u2014 \n  [2020 CTF - Takeout.zip: complete Google account export for king.cheste] z=0.855 conf=0.95 \u2014 \n  [Contacts/All Contacts.vcf: Alan Brunswick listed as 'Mastermind (Alan)] z=0.810 conf=0.92 \u2014 \n  [My Activity/Search and Chrome: Jan 25 2020 \u2014 'how do i hack on an andr] z=0.765 conf=0.90 \u2014 \n\n--- FINAL ALERT LEVEL ---\nHIGH \u2014 Conclusive MALICE verdict from Bayesian posterior aggregation. Individual z-scores below threshold (distributed evidence pattern: no single dominant signal, but aggregate posterior is decisive).\n\nCritical signals (z>3): 0\nHigh signals (2<z<=3): 0\nTotal signals analyzed: 5",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+      "best_posterior": "42251/250000",
+      "confidence": {
+        "__fraction__": true,
+        "den": 250000,
+        "num": 42251
+      },
+      "devil_advocate": {
+        "aggregation": {
+          "k": 3,
+          "method": "top_k_already_validated_matches_v2",
+          "total_gap_mass": "0"
+        },
+        "counterfactual_summary": {
+          "primary_alternative_hypothesis": null
+        },
+        "decision_context": {
+          "confidence": "42251/250000",
+          "mapped_verdict": "MALICIOUS_INTENT_DETECTED",
+          "raw_verdict": "MALICIOUS_INTENT_DETECTED",
+          "score": "42251/50000"
+        },
+        "devil_advocate_source": "deterministic_no_pattern_data_available",
+        "meta": {
+          "deterministic": true,
+          "generated_from": "case_pattern_library"
+        },
+        "narrative": "Eco's Razor (Abductive Falsification) applied to verdict MALICIOUS_INTENT_DETECTED. Pattern-matching data was not available on this code path \u2014 CasePatternLibrary is not invoked here by design (agent audit-trail mode (vigia_agent.py \u2014 JSON-replay / autonomous path); see KNOWN_LIMITATIONS.md). No structured counter-hypothesis could be derived deterministically. This is a documented scope limitation of the current code path, not an absence of falsification attempt.",
+        "pattern_evidence_gaps": [],
+        "version": "r7-da-v1"
+      },
+      "is_conclusive": true,
+      "narrative": "Google Takeout export from Chester Russell (king.chester.802@gmail.com), Champlain College cybersecurity student, Google Pixel 3. Three convergent MALICE clusters: (1) Android exploitation research campaign starting Jan 25 2020 (Metasploit, Magisk hidden root, system partition modification); (2) pre-travel OPSEC implementation Mar 5-6 (Magisk, camera metadata stripping 'camera app no metadata Android', app encryption) immediately before Norway trip; (3) spear-phishing attack Mar 23 against Warre"
+    },
+    "case_id": "VIGIA-GOOGLE-TAKEOUT-2020",
+    "pipeline_meta": {
+      "artifact_count": 5,
+      "avg_score": "42251/50000",
+      "expected_verdict": "MALICE",
+      "source": "ebs_v1_json_adapter"
+    },
+    "signals": [
+      {
+        "artifact_id": "takeout_zip_001",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 19
+        },
+        "description": "2020 CTF - Takeout.zip: complete Google account export for king.chester.802@gmail.com (Chester Russell). 356,764,506 bytes. Requested Mar 29 2020 (per delivery email in mbox). Contains: My Activity (S",
+        "evidence_type": "file_timestamp",
+        "source": "generate_forensic_hash",
+        "z_score": {
+          "__fraction__": true,
+          "den": 200,
+          "num": 171
+        }
+      },
+      {
+        "artifact_id": "chestnut_cv_exe_001",
+        "confidence": {
+          "__fraction__": true,
+          "den": 100,
+          "num": 97
+        },
+        "description": "Chestnut_CV.exe \u2014 PE32+ executable (console) x86-64, 26,895,731 bytes, Shannon entropy 7.9943 bits/byte (PyInstaller-packed Python payload). Shared by Alan Brunswick (abrunswick8675309@gmail.com) via ",
+        "evidence_type": "file_timestamp",
+        "source": "generate_forensic_hash",
+        "z_score": {
+          "__fraction__": true,
+          "den": 2000,
+          "num": 1843
+        }
+      },
+      {
+        "artifact_id": "my_activity_hacking_research_001",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 9
+        },
+        "description": "My Activity/Search and Chrome: Jan 25 2020 \u2014 'how do i hack on an android' (00:47), YouTube 'Run the Kali Linux Hacking OS on an Unrooted Android Phone' (Null Byte), 'metasploit guide', 'kali msfconso",
+        "evidence_type": "log_entry",
+        "source": "read_evidence",
+        "z_score": {
+          "__fraction__": true,
+          "den": 200,
+          "num": 153
+        }
+      },
+      {
+        "artifact_id": "mail_warren_attack_001",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 19
+        },
+        "description": "Mail/All mail.mbox (97 emails): Mar 23 19:52 \u2014 Chester emailed warrenhamiltonfinance@gmail.com from king.chester.802@gmail.com as fake persona 'Chestnut Russman': 'Esteemed entrepreneur... I'm worked ",
+        "evidence_type": "log_entry",
+        "source": "read_evidence",
+        "z_score": {
+          "__fraction__": true,
+          "den": 500,
+          "num": 437
+        }
+      },
+      {
+        "artifact_id": "contacts_mastermind_001",
+        "confidence": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 23
+        },
+        "description": "Contacts/All Contacts.vcf: Alan Brunswick listed as 'Mastermind (Alan)', email abrunswick8675309@gmail.com, phone +1-518-653-7460 (area code 518 = Albany NY). Warren Hamilton listed as warrenhamiltonf",
+        "evidence_type": "log_entry",
+        "source": "read_evidence",
+        "z_score": {
+          "__fraction__": true,
+          "den": 625,
+          "num": 506
+        }
+      }
+    ]
+  },
+  "sans_compliance": {
+    "accuracy_validation": false,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}

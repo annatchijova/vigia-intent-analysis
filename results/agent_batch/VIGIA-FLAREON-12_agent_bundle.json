@@ -1,0 +1,379 @@
+{
+  "agent_verdict": "INTENT",
+  "analysis_timestamp": "2026-07-02T14:50:05.324696+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "VIGIA-FLAREON-12",
+    "end_time": "2026-07-02T14:50:05.324699+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "VIGIA-FLAREON-12",
+        "entry_sha256": "5761b279ba2105958b348254f22a3a9272a0e6cd8616faa509cd6a76ac39c6e2",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "VIGIA-FLAREON-12"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: cf1b0ed196d5e39c...",
+        "outputs_summary": {
+          "agent_sha256": "cf1b0ed196d5e39c164122d40d9383c5c511ab4106c327bd204e9021613acbff",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-07-02T14:50:05.321593+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-FLAREON-12",
+        "entry_sha256": "e6279e7446504a9ec9ddd132c4519d5b7d402f6741139d40535d997f9d0f93fa",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-FLAREON-12.json"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-07-02T14:50:05.321666+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-FLAREON-12",
+        "entry_sha256": "79023fe78ea246cb2f15f4dffcc621f4092096fa1574494070c8bf8a7a21372f",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-FLAREON-12.json"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: ce8ad373ba63a458...",
+        "outputs_summary": {
+          "sha256": "ce8ad373ba63a458ba14d95878d8d367d206fb8054d8c6f444dc404ca9a87fcc"
+        },
+        "seq": 3,
+        "timestamp": "2026-07-02T14:50:05.321753+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "VIGIA-FLAREON-12",
+        "entry_sha256": "370c873df593673d8b07a0196e1d30fe87cc71455db88fa6122e27a8594b4e67",
+        "inputs_summary": {
+          "evidence": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-FLAREON-12.json",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-07-02T14:50:05.321840+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "VIGIA-FLAREON-12",
+        "entry_sha256": "505ae70936866b4a245b71eb80e066e80dfd037520bff894565c83417dc4582b",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 10 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "INTENT_DETECTED",
+            "best_posterior": "36593/250000",
+            "confidence": "36593/250000",
+            "is_conclusive": "True",
+            "narrative": "Flare-On 12 (2025) challenge corpus. Nine CTF reversing challenges distributed as a single ZIP (1,068,300,687 bytes) containing 7z archives protected with CTF passwords. The corpus spans: disk image a..."
+          },
+          "case_id": "VIGIA-FLAREON-12",
+          "pipeline_meta": {
+            "artifact_count": "10",
+            "avg_score": "36593/50000",
+            "expected_verdict": "INTENT",
+            "source": "ebs_v1_json_adapter"
+          },
+          "signals": [
+            {
+              "artifact_id": "ART-FO12-ZIP",
+              "confidence": "1",
+              "description": "Flare-On12_Challenges.zip \u2014 primary distribution archive. SHA-256 verified. Size 1,068,300,687 bytes. Contains 9 CTF challenge 7z files and PASSWORD.txt.",
+              "evidence_type": "archive",
+              "source": "generate_forensic_hash",
+              "z_score": "19/20"
+            },
+            {
+              "artifact_id": "ART-FO12-DRILLBABYDRILL",
+              "confidence": "22/25",
+              "description": "1 - DrillBabyDrill.7z (14,525,761 bytes) \u2014 Challenge 1. Name references disk drilling/forensic carving. Size consistent with a partial disk image or memory dump. Likely requires file carving or delete",
+              "evidence_type": "disk_image",
+              "source": "list_files",
+              "z_score": "451/625"
+            },
+            {
+              "artifact_id": "ART-FO12-CHIMERA",
+              "confidence": "17/20",
+              "description": "2 - project_chimera.7z (4,337 bytes) \u2014 Challenge 2. 'Chimera' suggests a multi-component or hybrid malware \u2014 combining disparate techniques or code from multiple origins. Tiny size (4 KB) consistent w",
+              "evidence_type": "binary_executable",
+              "source": "list_files",
+              "z_score": "663/1000"
+            },
+            {
+              "artifact_id": "ART-FO12-PRETTYDEVILISH",
+              "confidence": "17/20",
+              "description": "3 - pretty_devilish_file.7z (1,361 bytes) \u2014 Challenge 3. Name implies a deceptively simple file with a malicious payload. Extremely small (1.3 KB) consistent with a polyglot file or crafted header-bas",
+              "evidence_type": "binary_executable",
+              "source": "list_files",
+              "z_score": "153/250"
+            },
+            {
+              "artifact_id": "ART-FO12-UNHOLYDRAGON",
+              "confidence": "17/20",
+              "description": "4 - UnholyDragon.7z (2,117,603 bytes) \u2014 Challenge 4. Name evokes a complex, multi-headed threat. 'Unholy' suggests anti-debugging or anti-analysis techniques. 'Dragon' may reference a Chinese APT camp",
+              "evidence_type": "binary_executable",
+              "source": "list_files",
+              "z_score": "17/25"
+            }
+          ]
+        },
+        "seq": 5,
+        "timestamp": "2026-07-02T14:50:05.324317+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "VIGIA-FLAREON-12",
+        "entry_sha256": "516407349533883734f61328c1909ebd3f235dd70f8829c78d9659018fe52259",
+        "inputs_summary": {
+          "n_signals": "10"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-07-02T14:50:05.324475+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "VIGIA-FLAREON-12",
+        "entry_sha256": "44c53c5a55ab90c191830b33695c3cad543bbf8cc9639f04bf0b8af0426459d6",
+        "inputs_summary": {
+          "verdict": "INTENT_DETECTED"
+        },
+        "iteration": 0,
+        "note": "Exit code 3 (INTENT) \u2014 analysis complete.",
+        "outputs_summary": {
+          "agent_verdict": "INTENT",
+          "exit_code": "3"
+        },
+        "seq": 7,
+        "timestamp": "2026-07-02T14:50:05.324589+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-07-02T14:50:05.321406+00:00",
+    "total_entries": 7
+  },
+  "case_id": "VIGIA-FLAREON-12",
+  "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-FLAREON-12.json",
+  "evidence_sha256": "ce8ad373ba63a458ba14d95878d8d367d206fb8054d8c6f444dc404ca9a87fcc",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-FLAREON-12 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/VIGIA-FLAREON-12.json\nEvidence SHA-256: ce8ad373ba63a458ba14d95878d8d367d206fb8054d8c6f444dc404ca9a87fcc\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: INTENT_DETECTED\nPosterior confidence: 36593/250000\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\nFlare-On 12 (2025) challenge corpus. Nine CTF reversing challenges distributed as a single ZIP (1,068,300,687 bytes) containing 7z archives protected with CTF passwords. The corpus spans: disk image analysis (DrillBabyDrill), project chimera (multi-stage chain), file format RE (pretty_devilish_file), dragon-themed crackme (UnholyDragon), NTFS forensics (ntfsm), extortion/demand chain (Chain of Demands), corporate espionage roleplay (The Boss Needs Help), mobile authenticator RE (FlareAuthenticat\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Flare-On12_Challenges.zip \u2014 primary distribution archive. SHA-256 veri] z=0.950 conf=1.00 \u2014 \n  [5 - ntfsm.7z (1,833,618 bytes) \u2014 Challenge 5. 'ntfsm' directly encodes] z=0.792 conf=0.90 \u2014 \n  [6 - Chain of Demands.7z (30,699,395 bytes) \u2014 Challenge 6. Name referen] z=0.792 conf=0.88 \u2014 \n  [8 - FlareAuthenticator.7z (7,215,633 bytes) \u2014 Challenge 8. Name direct] z=0.748 conf=0.88 \u2014 \n  [9 - 10000.7z (1,010,655,700 bytes) \u2014 Challenge 9. At 1,010 MB this is ] z=0.748 conf=0.85 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW \u2014 No significant anomalies detected in this iteration.\n\nCritical signals (z>3): 0\nHigh signals (2<z<=3): 0\nTotal signals analyzed: 10",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "INTENT_DETECTED",
+      "best_posterior": "36593/250000",
+      "confidence": {
+        "__fraction__": true,
+        "den": 250000,
+        "num": 36593
+      },
+      "is_conclusive": true,
+      "narrative": "Flare-On 12 (2025) challenge corpus. Nine CTF reversing challenges distributed as a single ZIP (1,068,300,687 bytes) containing 7z archives protected with CTF passwords. The corpus spans: disk image analysis (DrillBabyDrill), project chimera (multi-stage chain), file format RE (pretty_devilish_file), dragon-themed crackme (UnholyDragon), NTFS forensics (ntfsm), extortion/demand chain (Chain of Demands), corporate espionage roleplay (The Boss Needs Help), mobile authenticator RE (FlareAuthenticat"
+    },
+    "case_id": "VIGIA-FLAREON-12",
+    "pipeline_meta": {
+      "artifact_count": 10,
+      "avg_score": "36593/50000",
+      "expected_verdict": "INTENT",
+      "source": "ebs_v1_json_adapter"
+    },
+    "signals": [
+      {
+        "artifact_id": "ART-FO12-ZIP",
+        "confidence": {
+          "__fraction__": true,
+          "den": 1,
+          "num": 1
+        },
+        "description": "Flare-On12_Challenges.zip \u2014 primary distribution archive. SHA-256 verified. Size 1,068,300,687 bytes. Contains 9 CTF challenge 7z files and PASSWORD.txt.",
+        "evidence_type": "archive",
+        "source": "generate_forensic_hash",
+        "z_score": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 19
+        }
+      },
+      {
+        "artifact_id": "ART-FO12-DRILLBABYDRILL",
+        "confidence": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 22
+        },
+        "description": "1 - DrillBabyDrill.7z (14,525,761 bytes) \u2014 Challenge 1. Name references disk drilling/forensic carving. Size consistent with a partial disk image or memory dump. Likely requires file carving or delete",
+        "evidence_type": "disk_image",
+        "source": "list_files",
+        "z_score": {
+          "__fraction__": true,
+          "den": 625,
+          "num": 451
+        }
+      },
+      {
+        "artifact_id": "ART-FO12-CHIMERA",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 17
+        },
+        "description": "2 - project_chimera.7z (4,337 bytes) \u2014 Challenge 2. 'Chimera' suggests a multi-component or hybrid malware \u2014 combining disparate techniques or code from multiple origins. Tiny size (4 KB) consistent w",
+        "evidence_type": "binary_executable",
+        "source": "list_files",
+        "z_score": {
+          "__fraction__": true,
+          "den": 1000,
+          "num": 663
+        }
+      },
+      {
+        "artifact_id": "ART-FO12-PRETTYDEVILISH",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 17
+        },
+        "description": "3 - pretty_devilish_file.7z (1,361 bytes) \u2014 Challenge 3. Name implies a deceptively simple file with a malicious payload. Extremely small (1.3 KB) consistent with a polyglot file or crafted header-bas",
+        "evidence_type": "binary_executable",
+        "source": "list_files",
+        "z_score": {
+          "__fraction__": true,
+          "den": 250,
+          "num": 153
+        }
+      },
+      {
+        "artifact_id": "ART-FO12-UNHOLYDRAGON",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 17
+        },
+        "description": "4 - UnholyDragon.7z (2,117,603 bytes) \u2014 Challenge 4. Name evokes a complex, multi-headed threat. 'Unholy' suggests anti-debugging or anti-analysis techniques. 'Dragon' may reference a Chinese APT camp",
+        "evidence_type": "binary_executable",
+        "source": "list_files",
+        "z_score": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 17
+        }
+      },
+      {
+        "artifact_id": "ART-FO12-NTFSM",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 9
+        },
+        "description": "5 - ntfsm.7z (1,833,618 bytes) \u2014 Challenge 5. 'ntfsm' directly encodes NTFS manipulation. Likely involves alternate data streams (ADS), $MFT manipulation, or NTFS journal analysis. Real-world analog: ",
+        "evidence_type": "disk_image",
+        "source": "list_files",
+        "z_score": {
+          "__fraction__": true,
+          "den": 125,
+          "num": 99
+        }
+      },
+      {
+        "artifact_id": "ART-FO12-CHAINOFDEMANDS",
+        "confidence": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 22
+        },
+        "description": "6 - Chain of Demands.7z (30,699,395 bytes) \u2014 Challenge 6. Name references extortion chains \u2014 ransomware with multi-stage demands or a C2 command chain. At 30 MB, consistent with a multi-file simulatio",
+        "evidence_type": "binary_executable",
+        "source": "list_files",
+        "z_score": {
+          "__fraction__": true,
+          "den": 125,
+          "num": 99
+        }
+      },
+      {
+        "artifact_id": "ART-FO12-BOSSNEEDS",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 17
+        },
+        "description": "7 - The Boss Needs Help.7z (919,536 bytes) \u2014 Challenge 7. Name suggests social engineering or corporate espionage framing \u2014 a 'boss' requesting sensitive information. May involve phishing artifact RE ",
+        "evidence_type": "binary_executable",
+        "source": "list_files",
+        "z_score": {
+          "__fraction__": true,
+          "den": 250,
+          "num": 153
+        }
+      },
+      {
+        "artifact_id": "ART-FO12-FLAREAUTHENTICATOR",
+        "confidence": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 22
+        },
+        "description": "8 - FlareAuthenticator.7z (7,215,633 bytes) \u2014 Challenge 8. Name directly references a mobile or desktop authenticator application. Requires RE of a 2FA/MFA implementation to extract or bypass the TOTP",
+        "evidence_type": "binary_executable",
+        "source": "list_files",
+        "z_score": {
+          "__fraction__": true,
+          "den": 250,
+          "num": 187
+        }
+      },
+      {
+        "artifact_id": "ART-FO12-10000",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 17
+        },
+        "description": "9 - 10000.7z (1,010,655,700 bytes) \u2014 Challenge 9. At 1,010 MB this is 97% of the entire ZIP. Name '10000' implies 10,000 iterations, rounds, or instances requiring automation or scripting to process a",
+        "evidence_type": "binary_executable",
+        "source": "list_files",
+        "z_score": {
+          "__fraction__": true,
+          "den": 250,
+          "num": 187
+        }
+      }
+    ]
+  },
+  "sans_compliance": {
+    "accuracy_validation": false,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}

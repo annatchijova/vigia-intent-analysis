@@ -1,0 +1,227 @@
+{
+  "agent_verdict": "ABSTAIN",
+  "analysis_timestamp": "2026-07-02T14:50:04.838101+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "VIGIA-ANDROID11-001",
+    "end_time": "2026-07-02T14:50:04.838104+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "VIGIA-ANDROID11-001",
+        "entry_sha256": "5850bd08e9db74e98319a8552ad239cb5fc2d97c92b214538c0dc56a3fe930c2",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "VIGIA-ANDROID11-001"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: cf1b0ed196d5e39c...",
+        "outputs_summary": {
+          "agent_sha256": "cf1b0ed196d5e39c164122d40d9383c5c511ab4106c327bd204e9021613acbff",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-07-02T14:50:04.835326+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-ANDROID11-001",
+        "entry_sha256": "6d7bebbb76a6e323db111d446dff6d220261dc1f74aca913bf680befc037a7e5",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-ANDROID11-001.json"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-07-02T14:50:04.835399+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-ANDROID11-001",
+        "entry_sha256": "16f9de60d66e619a6f74e9f9a236c913b6a16dbd58d7baf4377e5c01bb6cdf35",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-ANDROID11-001.json"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: 3c1d32575ff9ad24...",
+        "outputs_summary": {
+          "sha256": "3c1d32575ff9ad24adf3b3ed09e03ea5146a76f1c03d8b4cb03645a36b6d3d22"
+        },
+        "seq": 3,
+        "timestamp": "2026-07-02T14:50:04.835471+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "VIGIA-ANDROID11-001",
+        "entry_sha256": "3499718f0a3b968515d2d7265f8f294519de8818bf80b6bf8348e467b4cd9332",
+        "inputs_summary": {
+          "evidence": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-ANDROID11-001.json",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-07-02T14:50:04.835553+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "VIGIA-ANDROID11-001",
+        "entry_sha256": "0fcde3e6d37d9e67412d5a8c56a828a463bdb9bbad2b9d60ce8cc0d32ff5e615",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 2 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "ABSTAIN_DETECTED",
+            "best_posterior": "29/4000",
+            "confidence": "29/4000",
+            "is_conclusive": "False",
+            "narrative": "Forensic archive android_11.zip (SHA-256: abb27d4c5a57692d192a7619d179749abbd916d985d9fb4b10455d96d34d44a7, 10,944,907,975 bytes = 10.94GB). Contains nested archive: 'Android 11/Android 11 Image with ..."
+          },
+          "case_id": "VIGIA-ANDROID11-001",
+          "pipeline_meta": {
+            "artifact_count": "2",
+            "avg_score": "29/800",
+            "expected_verdict": "ABSTAIN",
+            "source": "ebs_v1_json_adapter"
+          },
+          "signals": [
+            {
+              "artifact_id": "ANDROID11-ART-001",
+              "confidence": "19/20",
+              "description": "Android 11 forensic archive. Outer archive SHA-256 computed and verified. Size: 10,944,907,975 bytes (10.94GB). Inner archive: 'Android 11/Android 11 Image with Documentation.zip', 10,973,972,708 byte",
+              "evidence_type": "file_hash",
+              "source": "generate_forensic_hash",
+              "z_score": "19/400"
+            },
+            {
+              "artifact_id": "ANDROID11-ART-002",
+              "confidence": "1/2",
+              "description": "Zip directory listing only (no extraction). Inner file path: 'Android 11/Android 11 Image with Documentation.zip'. Title 'Android 11 Image with Documentation' suggests this is a full Android 11 device",
+              "evidence_type": "log_entry",
+              "source": "read_evidence",
+              "z_score": "1/40"
+            }
+          ]
+        },
+        "seq": 5,
+        "timestamp": "2026-07-02T14:50:04.837857+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "VIGIA-ANDROID11-001",
+        "entry_sha256": "8353e015f2d0c4529cfdbee21224fd4dbd0786013b77dd78a7f9decc258df98c",
+        "inputs_summary": {
+          "n_signals": "2"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-07-02T14:50:04.837948+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "VIGIA-ANDROID11-001",
+        "entry_sha256": "c91b06890f3666157c3a1f5d0c65210e019da110bdeea09dbd696baada78d50e",
+        "inputs_summary": {
+          "verdict": "ABSTAIN_DETECTED"
+        },
+        "iteration": 0,
+        "note": "Exit code 4 (ABSTAIN) \u2014 analysis complete.",
+        "outputs_summary": {
+          "agent_verdict": "ABSTAIN",
+          "exit_code": "4"
+        },
+        "seq": 7,
+        "timestamp": "2026-07-02T14:50:04.838034+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-07-02T14:50:04.835138+00:00",
+    "total_entries": 7
+  },
+  "case_id": "VIGIA-ANDROID11-001",
+  "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-ANDROID11-001.json",
+  "evidence_sha256": "3c1d32575ff9ad24adf3b3ed09e03ea5146a76f1c03d8b4cb03645a36b6d3d22",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-ANDROID11-001 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/VIGIA-ANDROID11-001.json\nEvidence SHA-256: 3c1d32575ff9ad24adf3b3ed09e03ea5146a76f1c03d8b4cb03645a36b6d3d22\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: ABSTAIN_DETECTED\nPosterior confidence: 29/4000\nConclusive: NO \u2014 requires human review\n\n--- PEIRCEAN NARRATIVE ---\nForensic archive android_11.zip (SHA-256: abb27d4c5a57692d192a7619d179749abbd916d985d9fb4b10455d96d34d44a7, 10,944,907,975 bytes = 10.94GB). Contains nested archive: 'Android 11/Android 11 Image with Documentation.zip' (10,973,972,708 bytes = 10.97GB). File date: 2022-09-04. ABSTAIN verdict for this intake record: the outer archive has been hashed and its chain of custody established, but the nested image has not yet been extracted and analyzed due to size constraints (full extraction requires ~\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Android 11 forensic archive. Outer archive SHA-256 computed and verifi] z=0.048 conf=0.95 \u2014 \n  [Zip directory listing only (no extraction). Inner file path: 'Android ] z=0.025 conf=0.50 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW \u2014 No significant anomalies detected in this iteration.\n\nCritical signals (z>3): 0\nHigh signals (2<z<=3): 0\nTotal signals analyzed: 2",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "ABSTAIN_DETECTED",
+      "best_posterior": "29/4000",
+      "confidence": {
+        "__fraction__": true,
+        "den": 4000,
+        "num": 29
+      },
+      "is_conclusive": false,
+      "narrative": "Forensic archive android_11.zip (SHA-256: abb27d4c5a57692d192a7619d179749abbd916d985d9fb4b10455d96d34d44a7, 10,944,907,975 bytes = 10.94GB). Contains nested archive: 'Android 11/Android 11 Image with Documentation.zip' (10,973,972,708 bytes = 10.97GB). File date: 2022-09-04. ABSTAIN verdict for this intake record: the outer archive has been hashed and its chain of custody established, but the nested image has not yet been extracted and analyzed due to size constraints (full extraction requires ~"
+    },
+    "case_id": "VIGIA-ANDROID11-001",
+    "pipeline_meta": {
+      "artifact_count": 2,
+      "avg_score": "29/800",
+      "expected_verdict": "ABSTAIN",
+      "source": "ebs_v1_json_adapter"
+    },
+    "signals": [
+      {
+        "artifact_id": "ANDROID11-ART-001",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 19
+        },
+        "description": "Android 11 forensic archive. Outer archive SHA-256 computed and verified. Size: 10,944,907,975 bytes (10.94GB). Inner archive: 'Android 11/Android 11 Image with Documentation.zip', 10,973,972,708 byte",
+        "evidence_type": "file_hash",
+        "source": "generate_forensic_hash",
+        "z_score": {
+          "__fraction__": true,
+          "den": 400,
+          "num": 19
+        }
+      },
+      {
+        "artifact_id": "ANDROID11-ART-002",
+        "confidence": {
+          "__fraction__": true,
+          "den": 2,
+          "num": 1
+        },
+        "description": "Zip directory listing only (no extraction). Inner file path: 'Android 11/Android 11 Image with Documentation.zip'. Title 'Android 11 Image with Documentation' suggests this is a full Android 11 device",
+        "evidence_type": "log_entry",
+        "source": "read_evidence",
+        "z_score": {
+          "__fraction__": true,
+          "den": 40,
+          "num": 1
+        }
+      }
+    ]
+  },
+  "sans_compliance": {
+    "accuracy_validation": false,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}

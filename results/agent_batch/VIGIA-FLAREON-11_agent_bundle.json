@@ -1,0 +1,395 @@
+{
+  "agent_verdict": "INTENT",
+  "analysis_timestamp": "2026-07-02T14:50:05.275309+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "VIGIA-FLAREON-11",
+    "end_time": "2026-07-02T14:50:05.275313+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "VIGIA-FLAREON-11",
+        "entry_sha256": "d97133c6b2077b3177564cbbff62cb6a053d05bf095dab8b687cd80f1b8a7da0",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "VIGIA-FLAREON-11"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: cf1b0ed196d5e39c...",
+        "outputs_summary": {
+          "agent_sha256": "cf1b0ed196d5e39c164122d40d9383c5c511ab4106c327bd204e9021613acbff",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-07-02T14:50:05.272176+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-FLAREON-11",
+        "entry_sha256": "26117b4110c20f1973fe8bb1406a1f89a50da2fc657fc0add5fd031b4e3ab35b",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-FLAREON-11.json"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-07-02T14:50:05.272252+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-FLAREON-11",
+        "entry_sha256": "5262055d331cdf528247ca132a44ca5cfac73aa2d54fef6bc3b7c04458910a57",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-FLAREON-11.json"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: 760cb24f54e32b67...",
+        "outputs_summary": {
+          "sha256": "760cb24f54e32b674d517f48bb66b43bbf1e0e0d3e88af173be8fc87a7e60818"
+        },
+        "seq": 3,
+        "timestamp": "2026-07-02T14:50:05.272338+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "VIGIA-FLAREON-11",
+        "entry_sha256": "2e8810ac234932a9e40b6fa3ccc70398ea5e85edc579b33b112a126aa0245661",
+        "inputs_summary": {
+          "evidence": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-FLAREON-11.json",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-07-02T14:50:05.272428+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "VIGIA-FLAREON-11",
+        "entry_sha256": "585419b8bc4606754e5e665686dec0861e537040c34f2bb70fe1c51cf6ab182c",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 11 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "INTENT_DETECTED",
+            "best_posterior": "371/2750",
+            "confidence": "371/2750",
+            "is_conclusive": "True",
+            "narrative": "Flare-On 11 (2024) challenge corpus. Ten CTF reversing challenges distributed as a single ZIP containing individual 7z archives protected with CTF passwords. Challenges span a spectrum of adversarial ..."
+          },
+          "case_id": "VIGIA-FLAREON-11",
+          "pipeline_meta": {
+            "artifact_count": "11",
+            "avg_score": "371/550",
+            "expected_verdict": "INTENT",
+            "source": "ebs_v1_json_adapter"
+          },
+          "signals": [
+            {
+              "artifact_id": "ART-FO11-ZIP",
+              "confidence": "1",
+              "description": "Flare-On11_Challenges.zip \u2014 primary distribution archive. SHA-256 verified. Size 214,568,790 bytes. Contains 10 CTF challenge 7z files and PASSWORD.txt.",
+              "evidence_type": "archive",
+              "source": "generate_forensic_hash",
+              "z_score": "19/20"
+            },
+            {
+              "artifact_id": "ART-FO11-ARAY",
+              "confidence": "17/20",
+              "description": "aray.7z (2,927 bytes) \u2014 array-based obfuscation challenge. Small size consistent with a crackme using array index arithmetic to obscure control flow or key derivation. TTP: T1027 (obfuscated files/inf",
+              "evidence_type": "binary_executable",
+              "source": "list_files",
+              "z_score": "221/400"
+            },
+            {
+              "artifact_id": "ART-FO11-BLOKE2",
+              "confidence": "17/20",
+              "description": "bloke2.7z (5,775 bytes) \u2014 BLAKE2 cryptographic hash-based challenge. Name is wordplay on BLAKE2 algorithm. Likely uses custom BLAKE2 implementation for key derivation or license check. TTP: T1140 (deo",
+              "evidence_type": "binary_executable",
+              "source": "list_files",
+              "z_score": "119/200"
+            },
+            {
+              "artifact_id": "ART-FO11-CATBERT",
+              "confidence": "9/10",
+              "description": "CatbertRansomware.7z (1,692,864 bytes) \u2014 ransomware sample. Largest text-challenge entry aside from sshd. Name references Dilbert character Catbert (evil HR director), consistent with Mandiant/FLARE h",
+              "evidence_type": "binary_executable",
+              "source": "list_files",
+              "z_score": "207/250"
+            },
+            {
+              "artifact_id": "ART-FO11-CHECKSUM",
+              "confidence": "17/20",
+              "description": "checksum.7z (1,392,978 bytes) \u2014 checksum-based integrity or key derivation challenge. Name implies the binary computes or validates a checksum as part of its protection scheme. TTP: T1140 (deobfuscate",
+              "evidence_type": "binary_executable",
+              "source": "list_files",
+              "z_score": "289/500"
+            }
+          ]
+        },
+        "seq": 5,
+        "timestamp": "2026-07-02T14:50:05.274960+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "VIGIA-FLAREON-11",
+        "entry_sha256": "12661fd641f34b2a0b2f7bb15e5079d7c563ee5ebf02815579ba71bc77a81ec2",
+        "inputs_summary": {
+          "n_signals": "11"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-07-02T14:50:05.275105+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "VIGIA-FLAREON-11",
+        "entry_sha256": "b14aa6059cf77c7823927e47eca77483f2722ae813cadb8bd3b0fec4847172a6",
+        "inputs_summary": {
+          "verdict": "INTENT_DETECTED"
+        },
+        "iteration": 0,
+        "note": "Exit code 3 (INTENT) \u2014 analysis complete.",
+        "outputs_summary": {
+          "agent_verdict": "INTENT",
+          "exit_code": "3"
+        },
+        "seq": 7,
+        "timestamp": "2026-07-02T14:50:05.275198+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-07-02T14:50:05.271972+00:00",
+    "total_entries": 7
+  },
+  "case_id": "VIGIA-FLAREON-11",
+  "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-FLAREON-11.json",
+  "evidence_sha256": "760cb24f54e32b674d517f48bb66b43bbf1e0e0d3e88af173be8fc87a7e60818",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-FLAREON-11 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/VIGIA-FLAREON-11.json\nEvidence SHA-256: 760cb24f54e32b674d517f48bb66b43bbf1e0e0d3e88af173be8fc87a7e60818\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: INTENT_DETECTED\nPosterior confidence: 371/2750\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\nFlare-On 11 (2024) challenge corpus. Ten CTF reversing challenges distributed as a single ZIP containing individual 7z archives protected with CTF passwords. Challenges span a spectrum of adversarial techniques: array-based obfuscation (aray), BLAKE2 cryptographic keying (bloke2), ransomware (CatbertRansomware), ClearFake-style dropper (clearlyfake), a trojanized OpenSSH server (sshd), and additional RE puzzles. This corpus is used for forensic TTP classification and intentionality analysis trai\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Flare-On11_Challenges.zip \u2014 primary distribution archive. SHA-256 veri] z=0.950 conf=1.00 \u2014 \n  [sshd.7z (193,244,435 bytes) \u2014 by far the largest challenge at 193 MB. ] z=0.855 conf=0.90 \u2014 \n  [CatbertRansomware.7z (1,692,864 bytes) \u2014 ransomware sample. Largest te] z=0.828 conf=0.90 \u2014 \n  [clearlyfake.7z (1,616 bytes) \u2014 ClearFake-style dropper. Extremely smal] z=0.792 conf=0.90 \u2014 \n  [fullspeed.7z (771,776 bytes) \u2014 name suggests a speed-optimization or c] z=0.612 conf=0.85 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW \u2014 No significant anomalies detected in this iteration.\n\nCritical signals (z>3): 0\nHigh signals (2<z<=3): 0\nTotal signals analyzed: 11",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "INTENT_DETECTED",
+      "best_posterior": "371/2750",
+      "confidence": {
+        "__fraction__": true,
+        "den": 2750,
+        "num": 371
+      },
+      "is_conclusive": true,
+      "narrative": "Flare-On 11 (2024) challenge corpus. Ten CTF reversing challenges distributed as a single ZIP containing individual 7z archives protected with CTF passwords. Challenges span a spectrum of adversarial techniques: array-based obfuscation (aray), BLAKE2 cryptographic keying (bloke2), ransomware (CatbertRansomware), ClearFake-style dropper (clearlyfake), a trojanized OpenSSH server (sshd), and additional RE puzzles. This corpus is used for forensic TTP classification and intentionality analysis trai"
+    },
+    "case_id": "VIGIA-FLAREON-11",
+    "pipeline_meta": {
+      "artifact_count": 11,
+      "avg_score": "371/550",
+      "expected_verdict": "INTENT",
+      "source": "ebs_v1_json_adapter"
+    },
+    "signals": [
+      {
+        "artifact_id": "ART-FO11-ZIP",
+        "confidence": {
+          "__fraction__": true,
+          "den": 1,
+          "num": 1
+        },
+        "description": "Flare-On11_Challenges.zip \u2014 primary distribution archive. SHA-256 verified. Size 214,568,790 bytes. Contains 10 CTF challenge 7z files and PASSWORD.txt.",
+        "evidence_type": "archive",
+        "source": "generate_forensic_hash",
+        "z_score": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 19
+        }
+      },
+      {
+        "artifact_id": "ART-FO11-ARAY",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 17
+        },
+        "description": "aray.7z (2,927 bytes) \u2014 array-based obfuscation challenge. Small size consistent with a crackme using array index arithmetic to obscure control flow or key derivation. TTP: T1027 (obfuscated files/inf",
+        "evidence_type": "binary_executable",
+        "source": "list_files",
+        "z_score": {
+          "__fraction__": true,
+          "den": 400,
+          "num": 221
+        }
+      },
+      {
+        "artifact_id": "ART-FO11-BLOKE2",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 17
+        },
+        "description": "bloke2.7z (5,775 bytes) \u2014 BLAKE2 cryptographic hash-based challenge. Name is wordplay on BLAKE2 algorithm. Likely uses custom BLAKE2 implementation for key derivation or license check. TTP: T1140 (deo",
+        "evidence_type": "binary_executable",
+        "source": "list_files",
+        "z_score": {
+          "__fraction__": true,
+          "den": 200,
+          "num": 119
+        }
+      },
+      {
+        "artifact_id": "ART-FO11-CATBERT",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 9
+        },
+        "description": "CatbertRansomware.7z (1,692,864 bytes) \u2014 ransomware sample. Largest text-challenge entry aside from sshd. Name references Dilbert character Catbert (evil HR director), consistent with Mandiant/FLARE h",
+        "evidence_type": "binary_executable",
+        "source": "list_files",
+        "z_score": {
+          "__fraction__": true,
+          "den": 250,
+          "num": 207
+        }
+      },
+      {
+        "artifact_id": "ART-FO11-CHECKSUM",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 17
+        },
+        "description": "checksum.7z (1,392,978 bytes) \u2014 checksum-based integrity or key derivation challenge. Name implies the binary computes or validates a checksum as part of its protection scheme. TTP: T1140 (deobfuscate",
+        "evidence_type": "binary_executable",
+        "source": "list_files",
+        "z_score": {
+          "__fraction__": true,
+          "den": 500,
+          "num": 289
+        }
+      },
+      {
+        "artifact_id": "ART-FO11-CLEARLYFAKE",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 9
+        },
+        "description": "clearlyfake.7z (1,616 bytes) \u2014 ClearFake-style dropper. Extremely small size (1.6 KB) consistent with a JavaScript dropper or PowerShell stub, matching the documented ClearFake campaign that distribut",
+        "evidence_type": "binary_executable",
+        "source": "list_files",
+        "z_score": {
+          "__fraction__": true,
+          "den": 125,
+          "num": 99
+        }
+      },
+      {
+        "artifact_id": "ART-FO11-FROG",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 17
+        },
+        "description": "frog.7z (10,653,489 bytes) \u2014 challenge of moderate size. Name suggests obfuscation or game-engine challenge (10 MB consistent with Unity or similar runtime). TTP: T1027 (obfuscated files/information).",
+        "evidence_type": "binary_executable",
+        "source": "list_files",
+        "z_score": {
+          "__fraction__": true,
+          "den": 100,
+          "num": 51
+        }
+      },
+      {
+        "artifact_id": "ART-FO11-FULLSPEED",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 17
+        },
+        "description": "fullspeed.7z (771,776 bytes) \u2014 name suggests a speed-optimization or crypto challenge. 'Full speed' may reference elliptic curve cryptography (FullSpeed EC variant) or a timing-dependent protection. T",
+        "evidence_type": "binary_executable",
+        "source": "list_files",
+        "z_score": {
+          "__fraction__": true,
+          "den": 250,
+          "num": 153
+        }
+      },
+      {
+        "artifact_id": "ART-FO11-MEMEMAKER",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 17
+        },
+        "description": "mememaker3000.7z (1,010,226 bytes) \u2014 name suggests a social engineering or steganography-themed challenge, possibly hiding flags in images or using meme-format payloads. TTP: T1027.003 (steganography)",
+        "evidence_type": "binary_executable",
+        "source": "list_files",
+        "z_score": {
+          "__fraction__": true,
+          "den": 400,
+          "num": 221
+        }
+      },
+      {
+        "artifact_id": "ART-FO11-SERPENTINE",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 17
+        },
+        "description": "serpentine.7z (5,725,299 bytes) \u2014 name references serpentine/snake motion, possibly Python-based challenge or a challenge featuring serpentine data encoding. TTP: T1059.006 (Python) or T1027 (obfuscat",
+        "evidence_type": "binary_executable",
+        "source": "list_files",
+        "z_score": {
+          "__fraction__": true,
+          "den": 200,
+          "num": 119
+        }
+      },
+      {
+        "artifact_id": "ART-FO11-SSHD",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 9
+        },
+        "description": "sshd.7z (193,244,435 bytes) \u2014 by far the largest challenge at 193 MB. Name and size are consistent with a full trojanized OpenSSH daemon. Real-world analog: XZ Utils/liblzma supply chain compromise (C",
+        "evidence_type": "binary_executable",
+        "source": "list_files",
+        "z_score": {
+          "__fraction__": true,
+          "den": 200,
+          "num": 171
+        }
+      }
+    ]
+  },
+  "sans_compliance": {
+    "accuracy_validation": false,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}

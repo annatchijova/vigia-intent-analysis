@@ -1,0 +1,201 @@
+{
+  "analysis_timestamp": "2026-06-29T02:37:20.129513+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "TEST",
+    "end_time": "2026-06-29T02:37:20.129516+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "TEST",
+        "entry_sha256": "b02b515905f8baa9428942e780f7c9d43ba4d3956190035c4a33ad3802e554b7",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "TEST"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: af95d29853f1c43d...",
+        "outputs_summary": {
+          "agent_sha256": "af95d29853f1c43d73c9f6dc03791d08c0512c187816cf58521246145ec877c5",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-06-29T02:37:19.668258+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "TEST",
+        "entry_sha256": "59863beab7844a409e40767332359a11b4bf386d24d6e906c72f293149474136",
+        "inputs_summary": {
+          "path": "evidence/magnet-2022-windows-artifacts"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-06-29T02:37:19.668330+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "TEST",
+        "entry_sha256": "fcc81874a438bd7b9f571c416232d2a6403fbd6b3841c63c02cf9074b4a31228",
+        "inputs_summary": {
+          "path": "evidence/magnet-2022-windows-artifacts"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: 7850380aca100b67...",
+        "outputs_summary": {
+          "sha256": "7850380aca100b6790128ac174995399e29b52bafd936c03470a4812ddc8b861"
+        },
+        "seq": 3,
+        "timestamp": "2026-06-29T02:37:19.742793+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "TEST",
+        "entry_sha256": "6a19d03a4284cbdfdef4ca965e9ebcbd93dcea81e83fc64597a0224fd33a39f0",
+        "inputs_summary": {
+          "evidence": "evidence/magnet-2022-windows-artifacts",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-06-29T02:37:19.742895+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "TEST",
+        "entry_sha256": "df007e6baafe3484e9caf4abf2c3d134976f915996409956cb8858ee0fe70ba3",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 0 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "UNDETERMINED",
+            "best_posterior": "0",
+            "confidence": "0",
+            "is_conclusive": "False",
+            "narrative": "[FIRSTNESS] Se\u00f1ales insuficientes (0).",
+            "ontological_level": "None"
+          },
+          "case_id": "TEST",
+          "custody": {
+            "artifact_id": "UNKNOWN",
+            "case_id": "TEST",
+            "n_records": "0",
+            "records": []
+          },
+          "pipeline_meta": {
+            "anti_silencing": "True",
+            "frs_groups": "0",
+            "gamma_applied": "True",
+            "n_engine_signals": "0",
+            "n_sift_signals": "0",
+            "n_total_signals": "0",
+            "version": "V4-COLECTIVO-2026-05-06"
+          },
+          "results": {
+            "caie": {
+              "status": "NO_ARTIFACTS"
+            }
+          },
+          "signals": []
+        },
+        "seq": 5,
+        "timestamp": "2026-06-29T02:37:20.129227+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "TEST",
+        "entry_sha256": "e59e1be88bea22cacccf182a18183dc2a4441d17194dc86df1ef1b482ff20518",
+        "inputs_summary": {
+          "n_signals": "0"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-06-29T02:37:20.129348+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "TEST",
+        "entry_sha256": "53fba9760092db3beb01ae6a9220b16ca8c08dd4c884ce019584928c4e783858",
+        "inputs_summary": {
+          "verdict": "UNDETERMINED"
+        },
+        "iteration": 0,
+        "note": "Exit code 0 \u2014 analysis complete.",
+        "outputs_summary": {
+          "exit_code": "0"
+        },
+        "seq": 7,
+        "timestamp": "2026-06-29T02:37:20.129462+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-06-29T02:37:19.668066+00:00",
+    "total_entries": 7
+  },
+  "case_id": "TEST",
+  "evidence_path": "evidence/magnet-2022-windows-artifacts",
+  "evidence_sha256": "7850380aca100b6790128ac174995399e29b52bafd936c03470a4812ddc8b861",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE TEST ===\nEvidence: evidence/magnet-2022-windows-artifacts\nEvidence SHA-256: 7850380aca100b6790128ac174995399e29b52bafd936c03470a4812ddc8b861\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: UNDETERMINED\nPosterior confidence: 0\nConclusive: NO \u2014 requires human review\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] Se\u00f1ales insuficientes (0).\n\n--- FINAL ALERT LEVEL ---\nLOW \u2014 No significant anomalies detected in this iteration.\n\nCritical signals (z>3): 0\nHigh signals (2<z<=3): 0\nTotal signals analyzed: 0",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "UNDETERMINED",
+      "best_posterior": "0",
+      "confidence": "0",
+      "is_conclusive": false,
+      "narrative": "[FIRSTNESS] Se\u00f1ales insuficientes (0).",
+      "ontological_level": null
+    },
+    "case_id": "TEST",
+    "custody": {
+      "artifact_id": "UNKNOWN",
+      "case_id": "TEST",
+      "n_records": 0,
+      "records": []
+    },
+    "pipeline_meta": {
+      "anti_silencing": true,
+      "frs_groups": 0,
+      "gamma_applied": true,
+      "n_engine_signals": 0,
+      "n_sift_signals": 0,
+      "n_total_signals": 0,
+      "version": "V4-COLECTIVO-2026-05-06"
+    },
+    "results": {
+      "caie": {
+        "status": "NO_ARTIFACTS"
+      }
+    },
+    "signals": []
+  },
+  "sans_compliance": {
+    "accuracy_validation": false,
+    "analytical_reasoning": false,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}

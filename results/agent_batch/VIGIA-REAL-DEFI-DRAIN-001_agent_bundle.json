@@ -1,0 +1,299 @@
+{
+  "agent_verdict": "MALICE",
+  "analysis_timestamp": "2026-07-02T14:50:07.463359+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "VIGIA-REAL-DEFI-DRAIN-001",
+    "end_time": "2026-07-02T14:50:07.463363+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "VIGIA-REAL-DEFI-DRAIN-001",
+        "entry_sha256": "37fbbc97108a16b23d0a2f0df7289e2ce9ad89271423dc92e654eb0cfe50b1ad",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "VIGIA-REAL-DEFI-DRAIN-001"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: cf1b0ed196d5e39c...",
+        "outputs_summary": {
+          "agent_sha256": "cf1b0ed196d5e39c164122d40d9383c5c511ab4106c327bd204e9021613acbff",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-07-02T14:50:07.459894+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-REAL-DEFI-DRAIN-001",
+        "entry_sha256": "f58b689826c0e90c83e388931ed9b5aee459c68596a2c07744011ccaa7e44128",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-REAL-DEFI-DRAIN-001.json"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-07-02T14:50:07.459968+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-REAL-DEFI-DRAIN-001",
+        "entry_sha256": "b1f16ec903f6f7c7a670cc97e5ff0024dc6509d4da0f7083be722c0f0b6bce50",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-REAL-DEFI-DRAIN-001.json"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: 919e68ed68710d55...",
+        "outputs_summary": {
+          "sha256": "919e68ed68710d55ec5f3aba7ff72566b777879bea253b975936dc664095904f"
+        },
+        "seq": 3,
+        "timestamp": "2026-07-02T14:50:07.460048+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "VIGIA-REAL-DEFI-DRAIN-001",
+        "entry_sha256": "dd9d8be137149f5a965157e8a7714bc9b36fb3960ae0f52a49eab81d83a6d610",
+        "inputs_summary": {
+          "evidence": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-REAL-DEFI-DRAIN-001.json",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-07-02T14:50:07.460131+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "VIGIA-REAL-DEFI-DRAIN-001",
+        "entry_sha256": "d017a863680ada04cbca31f75df96cc10f4873819016251b9094893a23cc74f9",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 4 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+            "best_posterior": "34901/200000",
+            "confidence": "34901/200000",
+            "is_conclusive": "True",
+            "narrative": "Multi-chain cryptocurrency drainer distributed via paid Instagram ads. Full attacker backend exposed in client-side JS bundle. Carnegie manipulation documented in source code."
+          },
+          "case_id": "VIGIA-REAL-DEFI-DRAIN-001",
+          "pipeline_meta": {
+            "artifact_count": "4",
+            "avg_score": "34901/40000",
+            "expected_verdict": "MALICE",
+            "source": "ebs_v1_json_adapter"
+          },
+          "signals": [
+            {
+              "artifact_id": "DRAIN-001-A01",
+              "confidence": "19/20",
+              "description": "JS bundle index-BJT51uc1.js (578KB) contains VITE_DRAINER_SECRET, EVM wallet 0xD4d6A26Dc84516FF9e1AC8837Dd347Ebe5bCb0c7, TRON wallet TSxfbXySDAtoEyDDAHZxYA6X6dY2nB4P29, NowNodes API key fc94c112-d3c2-",
+              "evidence_type": "document_visual",
+              "source": "playwright_cdp_sandbox",
+              "z_score": "931/1000"
+            },
+            {
+              "artifact_id": "DRAIN-001-A02",
+              "confidence": "19/20",
+              "description": "WalletConnect v2 modal auto-activates on page load. connectWallet() enumerates USDT balances across ETH/BSC/POL/AVAX/ARB/BASE/TRON via NowNodes RPC, then POSTs signed transactions to /api/tron-drain a",
+              "evidence_type": "network_flow",
+              "source": "playwright_cdp_network_intercept",
+              "z_score": "1843/2000"
+            },
+            {
+              "artifact_id": "DRAIN-001-A03",
+              "confidence": "9/10",
+              "description": "Active Instagram paid ad campaign (utm_id: 52525097425042) impersonating Trust Wallet VISA USDT Debit Card with real Trust Wallet branding. Facebook Pixel 1695678144955877 tracks victim conversion. Ca",
+              "evidence_type": "cultural_marker",
+              "source": "playwright_cdp_sandbox",
+              "z_score": "207/250"
+            },
+            {
+              "artifact_id": "DRAIN-001-A04",
+              "confidence": "23/25",
+              "description": "WalletConnect project ID 5816c5bba147eba277e1575494697210 abused to display legitimate wallet icons and UI, creating false legitimacy signal. explorerapi.walletconnect.com called on page load to popul",
+              "evidence_type": "log_entry",
+              "source": "playwright_cdp_network_intercept",
+              "z_score": "506/625"
+            }
+          ]
+        },
+        "seq": 5,
+        "timestamp": "2026-07-02T14:50:07.462733+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "VIGIA-REAL-DEFI-DRAIN-001",
+        "entry_sha256": "7ea6ebb41e8147126f0fbad435a9d132dbb03b00133641194ffb515e0cea48e2",
+        "inputs_summary": {
+          "n_signals": "4"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-07-02T14:50:07.462838+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "VIGIA-REAL-DEFI-DRAIN-001",
+        "entry_sha256": "a75e104b4d875b849dbfc3b4effda70a4c734667e27d0dcaa935f1a2de21583f",
+        "inputs_summary": {
+          "verdict": "MALICIOUS_INTENT_DETECTED"
+        },
+        "iteration": 0,
+        "note": "Exit code 1 (MALICE) \u2014 analysis complete.",
+        "outputs_summary": {
+          "agent_verdict": "MALICE",
+          "exit_code": "1"
+        },
+        "seq": 7,
+        "timestamp": "2026-07-02T14:50:07.462921+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-07-02T14:50:07.459700+00:00",
+    "total_entries": 7
+  },
+  "case_id": "VIGIA-REAL-DEFI-DRAIN-001",
+  "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-REAL-DEFI-DRAIN-001.json",
+  "evidence_sha256": "919e68ed68710d55ec5f3aba7ff72566b777879bea253b975936dc664095904f",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-REAL-DEFI-DRAIN-001 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/VIGIA-REAL-DEFI-DRAIN-001.json\nEvidence SHA-256: 919e68ed68710d55ec5f3aba7ff72566b777879bea253b975936dc664095904f\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 34901/200000\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\nMulti-chain cryptocurrency drainer distributed via paid Instagram ads. Full attacker backend exposed in client-side JS bundle. Carnegie manipulation documented in source code.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [JS bundle index-BJT51uc1.js (578KB) contains VITE_DRAINER_SECRET, EVM ] z=0.931 conf=0.95 \u2014 \n  [WalletConnect v2 modal auto-activates on page load. connectWallet() en] z=0.921 conf=0.95 \u2014 \n  [Active Instagram paid ad campaign (utm_id: 52525097425042) impersonati] z=0.828 conf=0.90 \u2014 \n  [WalletConnect project ID 5816c5bba147eba277e1575494697210 abused to di] z=0.810 conf=0.92 \u2014 \n\n--- FINAL ALERT LEVEL ---\nHIGH \u2014 Conclusive MALICE verdict from Bayesian posterior aggregation. Individual z-scores below threshold (distributed evidence pattern: no single dominant signal, but aggregate posterior is decisive).\n\nCritical signals (z>3): 0\nHigh signals (2<z<=3): 0\nTotal signals analyzed: 4",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+      "best_posterior": "34901/200000",
+      "confidence": {
+        "__fraction__": true,
+        "den": 200000,
+        "num": 34901
+      },
+      "devil_advocate": {
+        "aggregation": {
+          "k": 3,
+          "method": "top_k_already_validated_matches_v2",
+          "total_gap_mass": "0"
+        },
+        "counterfactual_summary": {
+          "primary_alternative_hypothesis": null
+        },
+        "decision_context": {
+          "confidence": "34901/200000",
+          "mapped_verdict": "MALICIOUS_INTENT_DETECTED",
+          "raw_verdict": "MALICIOUS_INTENT_DETECTED",
+          "score": "34901/40000"
+        },
+        "devil_advocate_source": "deterministic_no_pattern_data_available",
+        "meta": {
+          "deterministic": true,
+          "generated_from": "case_pattern_library"
+        },
+        "narrative": "Eco's Razor (Abductive Falsification) applied to verdict MALICIOUS_INTENT_DETECTED. Pattern-matching data was not available on this code path \u2014 CasePatternLibrary is not invoked here by design (agent audit-trail mode (vigia_agent.py \u2014 JSON-replay / autonomous path); see KNOWN_LIMITATIONS.md). No structured counter-hypothesis could be derived deterministically. This is a documented scope limitation of the current code path, not an absence of falsification attempt.",
+        "pattern_evidence_gaps": [],
+        "version": "r7-da-v1"
+      },
+      "is_conclusive": true,
+      "narrative": "Multi-chain cryptocurrency drainer distributed via paid Instagram ads. Full attacker backend exposed in client-side JS bundle. Carnegie manipulation documented in source code."
+    },
+    "case_id": "VIGIA-REAL-DEFI-DRAIN-001",
+    "pipeline_meta": {
+      "artifact_count": 4,
+      "avg_score": "34901/40000",
+      "expected_verdict": "MALICE",
+      "source": "ebs_v1_json_adapter"
+    },
+    "signals": [
+      {
+        "artifact_id": "DRAIN-001-A01",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 19
+        },
+        "description": "JS bundle index-BJT51uc1.js (578KB) contains VITE_DRAINER_SECRET, EVM wallet 0xD4d6A26Dc84516FF9e1AC8837Dd347Ebe5bCb0c7, TRON wallet TSxfbXySDAtoEyDDAHZxYA6X6dY2nB4P29, NowNodes API key fc94c112-d3c2-",
+        "evidence_type": "document_visual",
+        "source": "playwright_cdp_sandbox",
+        "z_score": {
+          "__fraction__": true,
+          "den": 1000,
+          "num": 931
+        }
+      },
+      {
+        "artifact_id": "DRAIN-001-A02",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 19
+        },
+        "description": "WalletConnect v2 modal auto-activates on page load. connectWallet() enumerates USDT balances across ETH/BSC/POL/AVAX/ARB/BASE/TRON via NowNodes RPC, then POSTs signed transactions to /api/tron-drain a",
+        "evidence_type": "network_flow",
+        "source": "playwright_cdp_network_intercept",
+        "z_score": {
+          "__fraction__": true,
+          "den": 2000,
+          "num": 1843
+        }
+      },
+      {
+        "artifact_id": "DRAIN-001-A03",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 9
+        },
+        "description": "Active Instagram paid ad campaign (utm_id: 52525097425042) impersonating Trust Wallet VISA USDT Debit Card with real Trust Wallet branding. Facebook Pixel 1695678144955877 tracks victim conversion. Ca",
+        "evidence_type": "cultural_marker",
+        "source": "playwright_cdp_sandbox",
+        "z_score": {
+          "__fraction__": true,
+          "den": 250,
+          "num": 207
+        }
+      },
+      {
+        "artifact_id": "DRAIN-001-A04",
+        "confidence": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 23
+        },
+        "description": "WalletConnect project ID 5816c5bba147eba277e1575494697210 abused to display legitimate wallet icons and UI, creating false legitimacy signal. explorerapi.walletconnect.com called on page load to popul",
+        "evidence_type": "log_entry",
+        "source": "playwright_cdp_network_intercept",
+        "z_score": {
+          "__fraction__": true,
+          "den": 625,
+          "num": 506
+        }
+      }
+    ]
+  },
+  "sans_compliance": {
+    "accuracy_validation": false,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}

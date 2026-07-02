@@ -1,0 +1,345 @@
+{
+  "analysis_timestamp": "2026-06-29T20:33:21.960978+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "VIGIA-MAGNET-2020-WINDOWS-JSON",
+    "end_time": "2026-06-29T20:33:21.960982+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "VIGIA-MAGNET-2020-WINDOWS-JSON",
+        "entry_sha256": "8e980449a18a6efb5aa3bed5784ffc082ac097463c913b3ffd9e4a3adb6dc950",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "VIGIA-MAGNET-2020-WINDOWS-JSON"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: 53a3dc9104b21a91...",
+        "outputs_summary": {
+          "agent_sha256": "53a3dc9104b21a915e62f9d7caca6485d18fc371b1c1aed856cb46ce9e856ff2",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-06-29T20:33:21.958143+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-MAGNET-2020-WINDOWS-JSON",
+        "entry_sha256": "91962cf34bc60ec93ceb47426d3c884dad31ac88aae83839e75fe861363dae3b",
+        "inputs_summary": {
+          "path": "data/cases/converted/VIGIA-MAGNET-2020-WINDOWS.json"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-06-29T20:33:21.958217+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-MAGNET-2020-WINDOWS-JSON",
+        "entry_sha256": "677a29b5d6380b8d16f6079874d5e0dff526f46890bb72626149e04a4960bb80",
+        "inputs_summary": {
+          "path": "data/cases/converted/VIGIA-MAGNET-2020-WINDOWS.json"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: 22c8c489cccdb4ff...",
+        "outputs_summary": {
+          "sha256": "22c8c489cccdb4ff82138580560448bdc45900f20e9ccb3f971ed346e7de17fd"
+        },
+        "seq": 3,
+        "timestamp": "2026-06-29T20:33:21.958305+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "VIGIA-MAGNET-2020-WINDOWS-JSON",
+        "entry_sha256": "44c0799e49541ef289d69dd7d7c2078d4c39256ff8103fb05bbec9b7b557675a",
+        "inputs_summary": {
+          "evidence": "data/cases/converted/VIGIA-MAGNET-2020-WINDOWS.json",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-06-29T20:33:21.958391+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "VIGIA-MAGNET-2020-WINDOWS-JSON",
+        "entry_sha256": "700eec288f51a00ad3ac88483dc08ece8140210f1c6e2f8475ea5d413aa05525",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 8 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "NO_SEMIOTIC_ANOMALY_DETECTED",
+            "best_posterior": "779/8000",
+            "confidence": "779/8000",
+            "is_conclusive": "True",
+            "narrative": "Windows 7 x64 VMware VM (ComputerName: WIN-9H6J4FBP8F7, Volume: TestOS, IP: 192.168.10.146) belonging to user Warren. Registry analysis reveals a coordinated piracy toolkit installation: KMSAuto sched..."
+          },
+          "case_id": "VIGIA-MAGNET-2020-WINDOWS",
+          "pipeline_meta": {
+            "artifact_count": "8",
+            "avg_score": "779/1600",
+            "expected_verdict": "INTENT",
+            "source": "ebs_v1_json_adapter"
+          },
+          "signals": [
+            {
+              "artifact_id": "MAG2020W-001",
+              "confidence": "9/10",
+              "description": "KMSAuto scheduled task registered at \\KMSAuto (root-level, outside \\Microsoft\\ hierarchy). Task Reg Time: 2020-02-14 19:42:21Z. Task Last Run: 2020-04-20 01:12:47Z. KMSAuto is a well-documented Window",
+              "evidence_type": "registry_key",
+              "source": "read_evidence",
+              "z_score": "153/200"
+            },
+            {
+              "artifact_id": "MAG2020W-002",
+              "confidence": "9/10",
+              "description": "trashreg.exe registered in AppPaths from NSIS temp directory: c:\\users\\warren\\appdata\\local\\temp\\nsjbfbb.tmp\\trashreg.exe. Timestamp 2020-02-14 19:42:33Z \u2014 12 seconds after KMSAuto registration. The n",
+              "evidence_type": "registry_key",
+              "source": "read_evidence",
+              "z_score": "27/40"
+            },
+            {
+              "artifact_id": "MAG2020W-003",
+              "confidence": "9/10",
+              "description": "Office Tab Enterprise v.9.81 installed 2020-02-14 19:44:56Z \u2014 2 minutes 35 seconds after KMSAuto registration. Commercial Office add-on with no legitimate license key in registry (Licenses key is empt",
+              "evidence_type": "registry_key",
+              "source": "read_evidence",
+              "z_score": "63/100"
+            },
+            {
+              "artifact_id": "MAG2020W-004",
+              "confidence": "17/20",
+              "description": "RDP enabled (fDenyTSConnections=0) with Network Level Authentication disabled (UserAuthentication=0) on Windows 7 past End of Life. SecurityLayer=1, default port 3389. Creates Sticky Keys exploitation",
+              "evidence_type": "registry_key",
+              "source": "detect_habit_incongruence",
+              "z_score": "17/25"
+            },
+            {
+              "artifact_id": "MAG2020W-005",
+              "confidence": "4/5",
+              "description": "Ignition Casino Poker v.4.0 installed 2020-02-18 07:12:37Z under Wow6432Node (32-bit on x64). Online gambling software on a system provisioned with Office 2013 Professional Plus and corporate Slack. S",
+              "evidence_type": "log_entry",
+              "source": "read_evidence",
+              "z_score": "8/25"
+            }
+          ]
+        },
+        "seq": 5,
+        "timestamp": "2026-06-29T20:33:21.960665+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "VIGIA-MAGNET-2020-WINDOWS-JSON",
+        "entry_sha256": "8928ce72835653601e5890fa0fa29e4acec94f81a13765520ed0d5e36e866a58",
+        "inputs_summary": {
+          "n_signals": "8"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-06-29T20:33:21.960791+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "VIGIA-MAGNET-2020-WINDOWS-JSON",
+        "entry_sha256": "1f57949dfc58d21bb1ebb20364d28602565884697aa6f83032a3fd457b8d6855",
+        "inputs_summary": {
+          "verdict": "NO_SEMIOTIC_ANOMALY_DETECTED"
+        },
+        "iteration": 0,
+        "note": "Exit code 0 \u2014 analysis complete.",
+        "outputs_summary": {
+          "exit_code": "0"
+        },
+        "seq": 7,
+        "timestamp": "2026-06-29T20:33:21.960884+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-06-29T20:33:21.957941+00:00",
+    "total_entries": 7
+  },
+  "case_id": "VIGIA-MAGNET-2020-WINDOWS-JSON",
+  "evidence_path": "data/cases/converted/VIGIA-MAGNET-2020-WINDOWS.json",
+  "evidence_sha256": "22c8c489cccdb4ff82138580560448bdc45900f20e9ccb3f971ed346e7de17fd",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-MAGNET-2020-WINDOWS-JSON ===\nEvidence: data/cases/converted/VIGIA-MAGNET-2020-WINDOWS.json\nEvidence SHA-256: 22c8c489cccdb4ff82138580560448bdc45900f20e9ccb3f971ed346e7de17fd\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: NO_SEMIOTIC_ANOMALY_DETECTED\nPosterior confidence: 779/8000\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\nWindows 7 x64 VMware VM (ComputerName: WIN-9H6J4FBP8F7, Volume: TestOS, IP: 192.168.10.146) belonging to user Warren. Registry analysis reveals a coordinated piracy toolkit installation: KMSAuto scheduled task for persistent Windows/Office activation bypass, trashreg.exe registry cleaner from NSIS temp directory, and Office Tab Enterprise \u2014 all installed within a 155-second window on 2020-02-14. The system runs RDP with NLA disabled on an EOL Windows 7 OS, creating a Sticky Keys exploitation vec\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [KMSAuto scheduled task registered at \\KMSAuto (root-level, outside \\Mi] z=0.765 conf=0.90 \u2014 \n  [RDP enabled (fDenyTSConnections=0) with Network Level Authentication d] z=0.680 conf=0.85 \u2014 \n  [trashreg.exe registered in AppPaths from NSIS temp directory: c:\\users] z=0.675 conf=0.90 \u2014 \n  [Office Tab Enterprise v.9.81 installed 2020-02-14 19:44:56Z \u2014 2 minute] z=0.630 conf=0.90 \u2014 \n  [Default Windows 7 audit policy (Policy\\PolAdtEv, LastWrite 2009-07-14 ] z=0.540 conf=0.90 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW \u2014 No significant anomalies detected in this iteration.\n\nCritical signals (z>3): 0\nHigh signals (2<z<=3): 0\nTotal signals analyzed: 8",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "NO_SEMIOTIC_ANOMALY_DETECTED",
+      "best_posterior": "779/8000",
+      "confidence": {
+        "__fraction__": true,
+        "den": 8000,
+        "num": 779
+      },
+      "is_conclusive": true,
+      "narrative": "Windows 7 x64 VMware VM (ComputerName: WIN-9H6J4FBP8F7, Volume: TestOS, IP: 192.168.10.146) belonging to user Warren. Registry analysis reveals a coordinated piracy toolkit installation: KMSAuto scheduled task for persistent Windows/Office activation bypass, trashreg.exe registry cleaner from NSIS temp directory, and Office Tab Enterprise \u2014 all installed within a 155-second window on 2020-02-14. The system runs RDP with NLA disabled on an EOL Windows 7 OS, creating a Sticky Keys exploitation vec"
+    },
+    "case_id": "VIGIA-MAGNET-2020-WINDOWS",
+    "pipeline_meta": {
+      "artifact_count": 8,
+      "avg_score": "779/1600",
+      "expected_verdict": "INTENT",
+      "source": "ebs_v1_json_adapter"
+    },
+    "signals": [
+      {
+        "artifact_id": "MAG2020W-001",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 9
+        },
+        "description": "KMSAuto scheduled task registered at \\KMSAuto (root-level, outside \\Microsoft\\ hierarchy). Task Reg Time: 2020-02-14 19:42:21Z. Task Last Run: 2020-04-20 01:12:47Z. KMSAuto is a well-documented Window",
+        "evidence_type": "registry_key",
+        "source": "read_evidence",
+        "z_score": {
+          "__fraction__": true,
+          "den": 200,
+          "num": 153
+        }
+      },
+      {
+        "artifact_id": "MAG2020W-002",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 9
+        },
+        "description": "trashreg.exe registered in AppPaths from NSIS temp directory: c:\\users\\warren\\appdata\\local\\temp\\nsjbfbb.tmp\\trashreg.exe. Timestamp 2020-02-14 19:42:33Z \u2014 12 seconds after KMSAuto registration. The n",
+        "evidence_type": "registry_key",
+        "source": "read_evidence",
+        "z_score": {
+          "__fraction__": true,
+          "den": 40,
+          "num": 27
+        }
+      },
+      {
+        "artifact_id": "MAG2020W-003",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 9
+        },
+        "description": "Office Tab Enterprise v.9.81 installed 2020-02-14 19:44:56Z \u2014 2 minutes 35 seconds after KMSAuto registration. Commercial Office add-on with no legitimate license key in registry (Licenses key is empt",
+        "evidence_type": "registry_key",
+        "source": "read_evidence",
+        "z_score": {
+          "__fraction__": true,
+          "den": 100,
+          "num": 63
+        }
+      },
+      {
+        "artifact_id": "MAG2020W-004",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 17
+        },
+        "description": "RDP enabled (fDenyTSConnections=0) with Network Level Authentication disabled (UserAuthentication=0) on Windows 7 past End of Life. SecurityLayer=1, default port 3389. Creates Sticky Keys exploitation",
+        "evidence_type": "registry_key",
+        "source": "detect_habit_incongruence",
+        "z_score": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 17
+        }
+      },
+      {
+        "artifact_id": "MAG2020W-005",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 4
+        },
+        "description": "Ignition Casino Poker v.4.0 installed 2020-02-18 07:12:37Z under Wow6432Node (32-bit on x64). Online gambling software on a system provisioned with Office 2013 Professional Plus and corporate Slack. S",
+        "evidence_type": "log_entry",
+        "source": "read_evidence",
+        "z_score": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 8
+        }
+      },
+      {
+        "artifact_id": "MAG2020W-006",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 19
+        },
+        "description": "Memory process listing (psscan): 19 processes at capture time. chrome.exe (5 PIDs), slack.exe (4 PIDs), WINWORD.EXE, explorer.exe, iexplore.exe, FTK Imager.exe (forensic tool), vmtoolsd.exe, dwm.exe, ",
+        "evidence_type": "memory_process",
+        "source": "list_processes",
+        "z_score": {
+          "__fraction__": true,
+          "den": 400,
+          "num": 57
+        }
+      },
+      {
+        "artifact_id": "MAG2020W-007",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 19
+        },
+        "description": "Network connections from memory (netscan): All outbound to legitimate services. 192.168.10.146:54282 -> 172.253.63.188:443 (Google/Chrome). 192.168.10.146:54281 -> 13.35.82.31:443 (AWS CloudFront/Slac",
+        "evidence_type": "log_entry",
+        "source": "audit_network",
+        "z_score": {
+          "__fraction__": true,
+          "den": 400,
+          "num": 57
+        }
+      },
+      {
+        "artifact_id": "MAG2020W-008",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 9
+        },
+        "description": "Default Windows 7 audit policy (Policy\\PolAdtEv, LastWrite 2009-07-14 \u2014 never modified). Process Creation: N, Object Access: all N, Account Logon Credential Validation: N, Detailed Tracking: all N. Mi",
+        "evidence_type": "registry_key",
+        "source": "read_evidence",
+        "z_score": {
+          "__fraction__": true,
+          "den": 50,
+          "num": 27
+        }
+      }
+    ]
+  },
+  "sans_compliance": {
+    "accuracy_validation": false,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}

@@ -1,0 +1,251 @@
+{
+  "agent_verdict": "INTENT",
+  "analysis_timestamp": "2026-07-02T14:50:09.152865+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "VIGIA_KIWI_007_TESTIMONY_QUANTITY_CONCEALMENT",
+    "end_time": "2026-07-02T14:50:09.152868+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "VIGIA_KIWI_007_TESTIMONY_QUANTITY_CONCEALMENT",
+        "entry_sha256": "1f1dbb9f1abf38809d0620e983912b4c565e01c3e722497d44617b07922cd5c1",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "VIGIA_KIWI_007_TESTIMONY_QUANTITY_CONCEALMENT"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: cf1b0ed196d5e39c...",
+        "outputs_summary": {
+          "agent_sha256": "cf1b0ed196d5e39c164122d40d9383c5c511ab4106c327bd204e9021613acbff",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-07-02T14:50:09.149917+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA_KIWI_007_TESTIMONY_QUANTITY_CONCEALMENT",
+        "entry_sha256": "1e5956423832f37e537ee33be0cac402da73855406e8e4ebddb00573601df1bc",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA_KIWI_007_TESTIMONY_QUANTITY_CONCEALMENT.json"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-07-02T14:50:09.149995+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA_KIWI_007_TESTIMONY_QUANTITY_CONCEALMENT",
+        "entry_sha256": "0ddd32c78aed695b2ed82744c770e18770e9e7d5408f577e053f6504d8fd8b56",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA_KIWI_007_TESTIMONY_QUANTITY_CONCEALMENT.json"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: b17f869ae6282816...",
+        "outputs_summary": {
+          "sha256": "b17f869ae628281679b10541fecfdcb50a1a80ed2a09da2f29513df97c407b6b"
+        },
+        "seq": 3,
+        "timestamp": "2026-07-02T14:50:09.150068+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "VIGIA_KIWI_007_TESTIMONY_QUANTITY_CONCEALMENT",
+        "entry_sha256": "b67c25ae77efb40f8a0b47db69418ca26591f7cef405b5dd56fc3167e2928227",
+        "inputs_summary": {
+          "evidence": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA_KIWI_007_TESTIMONY_QUANTITY_CONCEALMENT.json",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-07-02T14:50:09.150150+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "VIGIA_KIWI_007_TESTIMONY_QUANTITY_CONCEALMENT",
+        "entry_sha256": "720f000e2341ee314e434b1542fc59fd46bef36fd7b76ed0339696f7a5aac1c1",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 3 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "SUSPICION_DETECTED",
+            "best_posterior": "41/1500",
+            "confidence": "41/1500",
+            "is_conclusive": "False",
+            "narrative": "Testigo activo omite cantidad de material descargado. Testigo perif\u00e9rico da cifra exacta. Bot\u00f3n de p\u00e1nico activado con registro policial verificable que contradice el testimonio."
+          },
+          "case_id": "VIGIA-KIWI-007-TESTIMONY-QUANTITY-CONCEALMENT",
+          "pipeline_meta": {
+            "artifact_count": "3",
+            "avg_score": "41/300",
+            "expected_verdict": "SUSPICION",
+            "source": "ebs_v1_json_adapter"
+          },
+          "signals": [
+            {
+              "artifact_id": "KIWI-007-A01",
+              "confidence": "1/10",
+              "description": "Hermano declara haber avisado en tiempo real via capturas. No puede presentar el celular. No sabe el n\u00famero de su hermano. Imputada lo tiene bloqueado hace a\u00f1os \u2014 acceso f\u00edsicamente imposible.",
+              "evidence_type": "log_entry",
+              "source": "manual_forensic_review",
+              "z_score": "2/25"
+            },
+            {
+              "artifact_id": "KIWI-007-A02",
+              "confidence": "3/10",
+              "description": "Bot\u00f3n de p\u00e1nico activado alegando presencia de imputada. Registro policial con timestamp, GPS y unidad despachada es verificable. Claimed outcome: imputada escap\u00f3.",
+              "evidence_type": "log_entry",
+              "source": "manual_forensic_review",
+              "z_score": "21/100"
+            },
+            {
+              "artifact_id": "KIWI-007-A03",
+              "confidence": "3/20",
+              "description": "Asimetr\u00eda de precisi\u00f3n: hermano activo no declara cantidad, testigo perif\u00e9rica declara 10gb exactos. Quien m\u00e1s descarg\u00f3 sabe menos.",
+              "evidence_type": "document_geometry",
+              "source": "manual_forensic_review",
+              "z_score": "3/25"
+            }
+          ]
+        },
+        "seq": 5,
+        "timestamp": "2026-07-02T14:50:09.152617+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "VIGIA_KIWI_007_TESTIMONY_QUANTITY_CONCEALMENT",
+        "entry_sha256": "cfedee468ea3410d3f90f744b1fc6ed760670a8d8671609aefef8fb6da61742a",
+        "inputs_summary": {
+          "n_signals": "3"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-07-02T14:50:09.152709+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "VIGIA_KIWI_007_TESTIMONY_QUANTITY_CONCEALMENT",
+        "entry_sha256": "6792ecffc11c69cecbcd1ee2beda5f4e70ff0f10f4dcc6986631c21698f1cfe2",
+        "inputs_summary": {
+          "verdict": "SUSPICION_DETECTED"
+        },
+        "iteration": 0,
+        "note": "Exit code 3 (INTENT) \u2014 analysis complete.",
+        "outputs_summary": {
+          "agent_verdict": "INTENT",
+          "exit_code": "3"
+        },
+        "seq": 7,
+        "timestamp": "2026-07-02T14:50:09.152793+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-07-02T14:50:09.149730+00:00",
+    "total_entries": 7
+  },
+  "case_id": "VIGIA_KIWI_007_TESTIMONY_QUANTITY_CONCEALMENT",
+  "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA_KIWI_007_TESTIMONY_QUANTITY_CONCEALMENT.json",
+  "evidence_sha256": "b17f869ae628281679b10541fecfdcb50a1a80ed2a09da2f29513df97c407b6b",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA_KIWI_007_TESTIMONY_QUANTITY_CONCEALMENT ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/VIGIA_KIWI_007_TESTIMONY_QUANTITY_CONCEALMENT.json\nEvidence SHA-256: b17f869ae628281679b10541fecfdcb50a1a80ed2a09da2f29513df97c407b6b\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: SUSPICION_DETECTED\nPosterior confidence: 41/1500\nConclusive: NO \u2014 requires human review\n\n--- PEIRCEAN NARRATIVE ---\nTestigo activo omite cantidad de material descargado. Testigo perif\u00e9rico da cifra exacta. Bot\u00f3n de p\u00e1nico activado con registro policial verificable que contradice el testimonio.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Bot\u00f3n de p\u00e1nico activado alegando presencia de imputada. Registro poli] z=0.210 conf=0.30 \u2014 \n  [Asimetr\u00eda de precisi\u00f3n: hermano activo no declara cantidad, testigo pe] z=0.120 conf=0.15 \u2014 \n  [Hermano declara haber avisado en tiempo real via capturas. No puede pr] z=0.080 conf=0.10 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW \u2014 No significant anomalies detected in this iteration.\n\nCritical signals (z>3): 0\nHigh signals (2<z<=3): 0\nTotal signals analyzed: 3",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "SUSPICION_DETECTED",
+      "best_posterior": "41/1500",
+      "confidence": {
+        "__fraction__": true,
+        "den": 1500,
+        "num": 41
+      },
+      "is_conclusive": false,
+      "narrative": "Testigo activo omite cantidad de material descargado. Testigo perif\u00e9rico da cifra exacta. Bot\u00f3n de p\u00e1nico activado con registro policial verificable que contradice el testimonio."
+    },
+    "case_id": "VIGIA-KIWI-007-TESTIMONY-QUANTITY-CONCEALMENT",
+    "pipeline_meta": {
+      "artifact_count": 3,
+      "avg_score": "41/300",
+      "expected_verdict": "SUSPICION",
+      "source": "ebs_v1_json_adapter"
+    },
+    "signals": [
+      {
+        "artifact_id": "KIWI-007-A01",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 1
+        },
+        "description": "Hermano declara haber avisado en tiempo real via capturas. No puede presentar el celular. No sabe el n\u00famero de su hermano. Imputada lo tiene bloqueado hace a\u00f1os \u2014 acceso f\u00edsicamente imposible.",
+        "evidence_type": "log_entry",
+        "source": "manual_forensic_review",
+        "z_score": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 2
+        }
+      },
+      {
+        "artifact_id": "KIWI-007-A02",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 3
+        },
+        "description": "Bot\u00f3n de p\u00e1nico activado alegando presencia de imputada. Registro policial con timestamp, GPS y unidad despachada es verificable. Claimed outcome: imputada escap\u00f3.",
+        "evidence_type": "log_entry",
+        "source": "manual_forensic_review",
+        "z_score": {
+          "__fraction__": true,
+          "den": 100,
+          "num": 21
+        }
+      },
+      {
+        "artifact_id": "KIWI-007-A03",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 3
+        },
+        "description": "Asimetr\u00eda de precisi\u00f3n: hermano activo no declara cantidad, testigo perif\u00e9rica declara 10gb exactos. Quien m\u00e1s descarg\u00f3 sabe menos.",
+        "evidence_type": "document_geometry",
+        "source": "manual_forensic_review",
+        "z_score": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 3
+        }
+      }
+    ]
+  },
+  "sans_compliance": {
+    "accuracy_validation": false,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}

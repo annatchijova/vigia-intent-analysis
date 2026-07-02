@@ -1,0 +1,227 @@
+{
+  "agent_verdict": "ABSTAIN",
+  "analysis_timestamp": "2026-07-02T14:50:04.885832+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "VIGIA-ASCIISTUDIO-2025",
+    "end_time": "2026-07-02T14:50:04.885836+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "VIGIA-ASCIISTUDIO-2025",
+        "entry_sha256": "9936fb34b4440acbe9169cd62daa451330eb7fe110aa284443d0269885be927e",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "VIGIA-ASCIISTUDIO-2025"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: cf1b0ed196d5e39c...",
+        "outputs_summary": {
+          "agent_sha256": "cf1b0ed196d5e39c164122d40d9383c5c511ab4106c327bd204e9021613acbff",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-07-02T14:50:04.883066+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-ASCIISTUDIO-2025",
+        "entry_sha256": "fd4295f39cd91a159004fcb34cc7d0d36e4d663747de0838938d9eeda9b01a9d",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-ASCIISTUDIO-2025.json"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-07-02T14:50:04.883137+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-ASCIISTUDIO-2025",
+        "entry_sha256": "0a3e6ed46c66ecfc3bb07c7c7bc7d3e3b2f3295b11a27a3d56c8f8d5f866f215",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-ASCIISTUDIO-2025.json"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: f28be29252af5f85...",
+        "outputs_summary": {
+          "sha256": "f28be29252af5f853db9ae4ff028dbff3f5e70aea8f6971fe3eb23a05ce95e04"
+        },
+        "seq": 3,
+        "timestamp": "2026-07-02T14:50:04.883222+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "VIGIA-ASCIISTUDIO-2025",
+        "entry_sha256": "ba17853d0d90991c08ebaf9b7c5d687e7397bca70744e279e6665ef1ac05b378",
+        "inputs_summary": {
+          "evidence": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-ASCIISTUDIO-2025.json",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-07-02T14:50:04.883306+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "VIGIA-ASCIISTUDIO-2025",
+        "entry_sha256": "8f8934e6d286973dc23d4394f8ab0d4a97bd7364418d7e5129e40bbefef55667",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 2 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "NO_SEMIOTIC_ANOMALY_DETECTED",
+            "best_posterior": "19/5000",
+            "confidence": "19/5000",
+            "is_conclusive": "False",
+            "narrative": "ZIP archive AsciiStudio-master.zip (SHA-256: 812ae30ee397f94d2bcd926f95e1be6e5edab80ad18179c1515c70ee75c1f967) containing a Java GUI application for ASCII art animation. Contents: build.xml (Ant build..."
+          },
+          "case_id": "VIGIA-ASCIISTUDIO-2025",
+          "pipeline_meta": {
+            "artifact_count": "2",
+            "avg_score": "19/1000",
+            "expected_verdict": "NOISE",
+            "source": "ebs_v1_json_adapter"
+          },
+          "signals": [
+            {
+              "artifact_id": "ASCII-ART-001",
+              "confidence": "19/20",
+              "description": "AsciiStudio-master.zip \u2014 container archive. GitHub 'Download ZIP' naming convention ('-master' suffix). Contains Java GUI application source, Ant build, MIT license, README, Changelog, GIF samples, Sc",
+              "evidence_type": "file_hash",
+              "source": "generate_forensic_hash",
+              "z_score": "19/1000"
+            },
+            {
+              "artifact_id": "ASCII-ART-002",
+              "confidence": "19/20",
+              "description": "Directory listing of AsciiStudio-master/: build.xml, source Java files, GIF assets (butterfly, jellyfish, parakeet, lightning), LICENSE, README.md, Changelog.txt, Screenshot.jpg. All files consistent ",
+              "evidence_type": "log_entry",
+              "source": "list_files",
+              "z_score": "19/1000"
+            }
+          ]
+        },
+        "seq": 5,
+        "timestamp": "2026-07-02T14:50:04.885595+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "VIGIA-ASCIISTUDIO-2025",
+        "entry_sha256": "73838c28efd5961f3d49c5640dc96619e4f2faf71ccd7f188b95391a45dbf095",
+        "inputs_summary": {
+          "n_signals": "2"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-07-02T14:50:04.885684+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "VIGIA-ASCIISTUDIO-2025",
+        "entry_sha256": "c8e9d142094b86c687ab0a822a3f389b0f069a3646f97671295f3299773f2718",
+        "inputs_summary": {
+          "verdict": "NO_SEMIOTIC_ANOMALY_DETECTED"
+        },
+        "iteration": 0,
+        "note": "Exit code 4 (ABSTAIN) \u2014 analysis complete.",
+        "outputs_summary": {
+          "agent_verdict": "ABSTAIN",
+          "exit_code": "4"
+        },
+        "seq": 7,
+        "timestamp": "2026-07-02T14:50:04.885766+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-07-02T14:50:04.882883+00:00",
+    "total_entries": 7
+  },
+  "case_id": "VIGIA-ASCIISTUDIO-2025",
+  "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-ASCIISTUDIO-2025.json",
+  "evidence_sha256": "f28be29252af5f853db9ae4ff028dbff3f5e70aea8f6971fe3eb23a05ce95e04",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-ASCIISTUDIO-2025 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/VIGIA-ASCIISTUDIO-2025.json\nEvidence SHA-256: f28be29252af5f853db9ae4ff028dbff3f5e70aea8f6971fe3eb23a05ce95e04\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: NO_SEMIOTIC_ANOMALY_DETECTED\nPosterior confidence: 19/5000\nConclusive: NO \u2014 requires human review\n\n--- PEIRCEAN NARRATIVE ---\nZIP archive AsciiStudio-master.zip (SHA-256: 812ae30ee397f94d2bcd926f95e1be6e5edab80ad18179c1515c70ee75c1f967) containing a Java GUI application for ASCII art animation. Contents: build.xml (Ant build system), Java source files, sample GIF animations (butterfly, jellyfish, parakeet, lightning), LICENSE (MIT-style), README.md, Changelog.txt, Screenshot.jpg (1.7MB). Dated 2025-04-07. Consistent with a legitimate open-source software project hosted on a public repository platform (GitHub archive na\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [AsciiStudio-master.zip \u2014 container archive. GitHub 'Download ZIP' nami] z=0.019 conf=0.95 \u2014 \n  [Directory listing of AsciiStudio-master/: build.xml, source Java files] z=0.019 conf=0.95 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW \u2014 No significant anomalies detected in this iteration.\n\nCritical signals (z>3): 0\nHigh signals (2<z<=3): 0\nTotal signals analyzed: 2",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "NO_SEMIOTIC_ANOMALY_DETECTED",
+      "best_posterior": "19/5000",
+      "confidence": {
+        "__fraction__": true,
+        "den": 5000,
+        "num": 19
+      },
+      "is_conclusive": false,
+      "narrative": "ZIP archive AsciiStudio-master.zip (SHA-256: 812ae30ee397f94d2bcd926f95e1be6e5edab80ad18179c1515c70ee75c1f967) containing a Java GUI application for ASCII art animation. Contents: build.xml (Ant build system), Java source files, sample GIF animations (butterfly, jellyfish, parakeet, lightning), LICENSE (MIT-style), README.md, Changelog.txt, Screenshot.jpg (1.7MB). Dated 2025-04-07. Consistent with a legitimate open-source software project hosted on a public repository platform (GitHub archive na"
+    },
+    "case_id": "VIGIA-ASCIISTUDIO-2025",
+    "pipeline_meta": {
+      "artifact_count": 2,
+      "avg_score": "19/1000",
+      "expected_verdict": "NOISE",
+      "source": "ebs_v1_json_adapter"
+    },
+    "signals": [
+      {
+        "artifact_id": "ASCII-ART-001",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 19
+        },
+        "description": "AsciiStudio-master.zip \u2014 container archive. GitHub 'Download ZIP' naming convention ('-master' suffix). Contains Java GUI application source, Ant build, MIT license, README, Changelog, GIF samples, Sc",
+        "evidence_type": "file_hash",
+        "source": "generate_forensic_hash",
+        "z_score": {
+          "__fraction__": true,
+          "den": 1000,
+          "num": 19
+        }
+      },
+      {
+        "artifact_id": "ASCII-ART-002",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 19
+        },
+        "description": "Directory listing of AsciiStudio-master/: build.xml, source Java files, GIF assets (butterfly, jellyfish, parakeet, lightning), LICENSE, README.md, Changelog.txt, Screenshot.jpg. All files consistent ",
+        "evidence_type": "log_entry",
+        "source": "list_files",
+        "z_score": {
+          "__fraction__": true,
+          "den": 1000,
+          "num": 19
+        }
+      }
+    ]
+  },
+  "sans_compliance": {
+    "accuracy_validation": false,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}

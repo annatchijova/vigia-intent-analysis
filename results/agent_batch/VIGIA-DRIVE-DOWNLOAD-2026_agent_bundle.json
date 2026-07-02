@@ -1,0 +1,275 @@
+{
+  "agent_verdict": "NOISE",
+  "analysis_timestamp": "2026-07-02T14:50:05.225953+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "VIGIA-DRIVE-DOWNLOAD-2026",
+    "end_time": "2026-07-02T14:50:05.225956+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "VIGIA-DRIVE-DOWNLOAD-2026",
+        "entry_sha256": "60eb92be129e3be1bf1d4fb71c771380058b42c981f9c0c1c31e52c02ed16528",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "VIGIA-DRIVE-DOWNLOAD-2026"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: cf1b0ed196d5e39c...",
+        "outputs_summary": {
+          "agent_sha256": "cf1b0ed196d5e39c164122d40d9383c5c511ab4106c327bd204e9021613acbff",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-07-02T14:50:05.222975+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-DRIVE-DOWNLOAD-2026",
+        "entry_sha256": "303012aac1566a7b9831d1d5499aa63fbc4d6bb0355324d5fa00022b0b8f94a9",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-DRIVE-DOWNLOAD-2026.json"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-07-02T14:50:05.223049+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-DRIVE-DOWNLOAD-2026",
+        "entry_sha256": "c84b74e75130991a1d173b4bf87c31408d346394d1836ee69fa8d82857bf7103",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-DRIVE-DOWNLOAD-2026.json"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: 28fff34d78b576ee...",
+        "outputs_summary": {
+          "sha256": "28fff34d78b576ee5e5689edb30141768b8ee3fa4596946ee3fce64cba29c9ad"
+        },
+        "seq": 3,
+        "timestamp": "2026-07-02T14:50:05.223134+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "VIGIA-DRIVE-DOWNLOAD-2026",
+        "entry_sha256": "d95c1b7311775c055e84b763df32f11f9b6fd5bc45b14591c3baabf13ca0eb8b",
+        "inputs_summary": {
+          "evidence": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-DRIVE-DOWNLOAD-2026.json",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-07-02T14:50:05.223231+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "VIGIA-DRIVE-DOWNLOAD-2026",
+        "entry_sha256": "d102b7eeddd9f4b02926b62681767ebcc3766668abe6ea2e7b515751727173bc",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 4 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "NO_SEMIOTIC_ANOMALY_DETECTED",
+            "best_posterior": "19/5000",
+            "confidence": "19/5000",
+            "is_conclusive": "False",
+            "narrative": "ZIP export from Google Drive (drive-download-20260123T060931Z-3-001.zip, SHA-256: e4f3915ca2dacfd125300e07e06201eaed7f784d153bf30970f56d79452fbedc) containing three PDF documents: vig\u00eda13enero.pdf (36..."
+          },
+          "case_id": "VIGIA-DRIVE-DOWNLOAD-2026",
+          "pipeline_meta": {
+            "artifact_count": "4",
+            "avg_score": "19/1000",
+            "expected_verdict": "NOISE",
+            "source": "ebs_v1_json_adapter"
+          },
+          "signals": [
+            {
+              "artifact_id": "DRV2026-ART-001",
+              "confidence": "19/20",
+              "description": "vig\u00eda13enero.pdf \u2014 personal AI conversation archive, 367KB, dated 2026-01-12. Spanish/Rioplatense register. AI interlocutor named 'Vig\u00eda'. No forensic anomalies.",
+              "evidence_type": "file_hash",
+              "source": "generate_forensic_hash",
+              "z_score": "19/1000"
+            },
+            {
+              "artifact_id": "DRV2026-ART-002",
+              "confidence": "19/20",
+              "description": "vig\u00eda14enero.pdf \u2014 personal AI conversation archive, 786KB, dated 2026-01-13. Largest of the three; size increase consistent with extended conversation session or embedded image content from AI interf",
+              "evidence_type": "file_hash",
+              "source": "generate_forensic_hash",
+              "z_score": "19/1000"
+            },
+            {
+              "artifact_id": "DRV2026-ART-003",
+              "confidence": "19/20",
+              "description": "vig\u00eda15cursi.pdf \u2014 personal AI conversation archive, 317KB, dated 2026-01-15. Filename suffix 'cursi' (Spanish: corny/sentimental) consistent with personal annotation of content tone. AI interlocutor:",
+              "evidence_type": "file_hash",
+              "source": "generate_forensic_hash",
+              "z_score": "19/1000"
+            },
+            {
+              "artifact_id": "DRV2026-ART-004",
+              "confidence": "19/20",
+              "description": "Container ZIP: drive-download-20260123T060931Z-3-001.zip. Filename follows Google Drive export naming convention (ISO timestamp embedded). No anomalies in container structure.",
+              "evidence_type": "file_hash",
+              "source": "generate_forensic_hash",
+              "z_score": "19/1000"
+            }
+          ]
+        },
+        "seq": 5,
+        "timestamp": "2026-07-02T14:50:05.225667+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "VIGIA-DRIVE-DOWNLOAD-2026",
+        "entry_sha256": "c410617abf61628af77aacec0d8235d98a67f89d8623d1029641821ef990989c",
+        "inputs_summary": {
+          "n_signals": "4"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-07-02T14:50:05.225778+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "VIGIA-DRIVE-DOWNLOAD-2026",
+        "entry_sha256": "5f6823ba814301636043d94f56d5d1737aace7d3952ab47f0506bf501cb4c109",
+        "inputs_summary": {
+          "verdict": "NO_SEMIOTIC_ANOMALY_DETECTED"
+        },
+        "iteration": 0,
+        "note": "Exit code 0 (NOISE) \u2014 analysis complete.",
+        "outputs_summary": {
+          "agent_verdict": "NOISE",
+          "exit_code": "0"
+        },
+        "seq": 7,
+        "timestamp": "2026-07-02T14:50:05.225869+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-07-02T14:50:05.222788+00:00",
+    "total_entries": 7
+  },
+  "case_id": "VIGIA-DRIVE-DOWNLOAD-2026",
+  "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-DRIVE-DOWNLOAD-2026.json",
+  "evidence_sha256": "28fff34d78b576ee5e5689edb30141768b8ee3fa4596946ee3fce64cba29c9ad",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-DRIVE-DOWNLOAD-2026 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/VIGIA-DRIVE-DOWNLOAD-2026.json\nEvidence SHA-256: 28fff34d78b576ee5e5689edb30141768b8ee3fa4596946ee3fce64cba29c9ad\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: NO_SEMIOTIC_ANOMALY_DETECTED\nPosterior confidence: 19/5000\nConclusive: NO \u2014 requires human review\n\n--- PEIRCEAN NARRATIVE ---\nZIP export from Google Drive (drive-download-20260123T060931Z-3-001.zip, SHA-256: e4f3915ca2dacfd125300e07e06201eaed7f784d153bf30970f56d79452fbedc) containing three PDF documents: vig\u00eda13enero.pdf (367KB, 2026-01-12), vig\u00eda14enero.pdf (786KB, 2026-01-13), vig\u00eda15cursi.pdf (317KB, 2026-01-15). Content analysis confirms these are personal AI conversation archives in Spanish/Rioplatense register. The user (Anna) converses with AI assistants named 'Vig\u00eda', 'Leo', and 'General Pepinillo'. No technica\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [vig\u00eda13enero.pdf \u2014 personal AI conversation archive, 367KB, dated 2026] z=0.019 conf=0.95 \u2014 \n  [vig\u00eda14enero.pdf \u2014 personal AI conversation archive, 786KB, dated 2026] z=0.019 conf=0.95 \u2014 \n  [vig\u00eda15cursi.pdf \u2014 personal AI conversation archive, 317KB, dated 2026] z=0.019 conf=0.95 \u2014 \n  [Container ZIP: drive-download-20260123T060931Z-3-001.zip. Filename fol] z=0.019 conf=0.95 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW \u2014 No significant anomalies detected in this iteration.\n\nCritical signals (z>3): 0\nHigh signals (2<z<=3): 0\nTotal signals analyzed: 4",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "NO_SEMIOTIC_ANOMALY_DETECTED",
+      "best_posterior": "19/5000",
+      "confidence": {
+        "__fraction__": true,
+        "den": 5000,
+        "num": 19
+      },
+      "is_conclusive": false,
+      "narrative": "ZIP export from Google Drive (drive-download-20260123T060931Z-3-001.zip, SHA-256: e4f3915ca2dacfd125300e07e06201eaed7f784d153bf30970f56d79452fbedc) containing three PDF documents: vig\u00eda13enero.pdf (367KB, 2026-01-12), vig\u00eda14enero.pdf (786KB, 2026-01-13), vig\u00eda15cursi.pdf (317KB, 2026-01-15). Content analysis confirms these are personal AI conversation archives in Spanish/Rioplatense register. The user (Anna) converses with AI assistants named 'Vig\u00eda', 'Leo', and 'General Pepinillo'. No technica"
+    },
+    "case_id": "VIGIA-DRIVE-DOWNLOAD-2026",
+    "pipeline_meta": {
+      "artifact_count": 4,
+      "avg_score": "19/1000",
+      "expected_verdict": "NOISE",
+      "source": "ebs_v1_json_adapter"
+    },
+    "signals": [
+      {
+        "artifact_id": "DRV2026-ART-001",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 19
+        },
+        "description": "vig\u00eda13enero.pdf \u2014 personal AI conversation archive, 367KB, dated 2026-01-12. Spanish/Rioplatense register. AI interlocutor named 'Vig\u00eda'. No forensic anomalies.",
+        "evidence_type": "file_hash",
+        "source": "generate_forensic_hash",
+        "z_score": {
+          "__fraction__": true,
+          "den": 1000,
+          "num": 19
+        }
+      },
+      {
+        "artifact_id": "DRV2026-ART-002",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 19
+        },
+        "description": "vig\u00eda14enero.pdf \u2014 personal AI conversation archive, 786KB, dated 2026-01-13. Largest of the three; size increase consistent with extended conversation session or embedded image content from AI interf",
+        "evidence_type": "file_hash",
+        "source": "generate_forensic_hash",
+        "z_score": {
+          "__fraction__": true,
+          "den": 1000,
+          "num": 19
+        }
+      },
+      {
+        "artifact_id": "DRV2026-ART-003",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 19
+        },
+        "description": "vig\u00eda15cursi.pdf \u2014 personal AI conversation archive, 317KB, dated 2026-01-15. Filename suffix 'cursi' (Spanish: corny/sentimental) consistent with personal annotation of content tone. AI interlocutor:",
+        "evidence_type": "file_hash",
+        "source": "generate_forensic_hash",
+        "z_score": {
+          "__fraction__": true,
+          "den": 1000,
+          "num": 19
+        }
+      },
+      {
+        "artifact_id": "DRV2026-ART-004",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 19
+        },
+        "description": "Container ZIP: drive-download-20260123T060931Z-3-001.zip. Filename follows Google Drive export naming convention (ISO timestamp embedded). No anomalies in container structure.",
+        "evidence_type": "file_hash",
+        "source": "generate_forensic_hash",
+        "z_score": {
+          "__fraction__": true,
+          "den": 1000,
+          "num": 19
+        }
+      }
+    ]
+  },
+  "sans_compliance": {
+    "accuracy_validation": false,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}

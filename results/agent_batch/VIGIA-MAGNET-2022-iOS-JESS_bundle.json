@@ -1,0 +1,201 @@
+{
+  "analysis_timestamp": "2026-06-29T19:42:04.836506+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "VIGIA-MAGNET-2022-iOS-JESS",
+    "end_time": "2026-06-29T19:42:04.836510+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "VIGIA-MAGNET-2022-iOS-JESS",
+        "entry_sha256": "167292846eaab6755075781552f48d6acee1c13ea2f7f2ff0e29141dcb74fb32",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "VIGIA-MAGNET-2022-iOS-JESS"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: 53a3dc9104b21a91...",
+        "outputs_summary": {
+          "agent_sha256": "53a3dc9104b21a915e62f9d7caca6485d18fc371b1c1aed856cb46ce9e856ff2",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-06-29T19:41:56.986690+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-MAGNET-2022-iOS-JESS",
+        "entry_sha256": "c7479c5e367760bb0ec0d192271e3d005b15c9846487dd1ac6e60be7adb6dc12",
+        "inputs_summary": {
+          "path": "evidence/magnet-2022-ios-jess/Jess_CTF_iPhone8"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-06-29T19:41:56.986766+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-MAGNET-2022-iOS-JESS",
+        "entry_sha256": "f9ed3f880875f213c2d9a15c0e98c268b8110886c8a627729f518894d9d8fed4",
+        "inputs_summary": {
+          "path": "evidence/magnet-2022-ios-jess/Jess_CTF_iPhone8"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: 448175fde171b07e...",
+        "outputs_summary": {
+          "sha256": "448175fde171b07e916c6b82e0c62a763c45ce62bc9b1a888bbe5b9d41f87957"
+        },
+        "seq": 3,
+        "timestamp": "2026-06-29T19:42:04.365880+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "VIGIA-MAGNET-2022-iOS-JESS",
+        "entry_sha256": "afe4eea2c1937a1863f2a30b9f949f49079e2977f705f4b71104fe05b4a33a7a",
+        "inputs_summary": {
+          "evidence": "evidence/magnet-2022-ios-jess/Jess_CTF_iPhone8",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-06-29T19:42:04.366045+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "VIGIA-MAGNET-2022-iOS-JESS",
+        "entry_sha256": "96ee4e2e4f37b6a2af4be1e3ca5bd4195f998389ae0c09f2aca8456b1ad6f3c1",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 0 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "UNDETERMINED",
+            "best_posterior": "0",
+            "confidence": "0",
+            "is_conclusive": "False",
+            "narrative": "[FIRSTNESS] Se\u00f1ales insuficientes (0).",
+            "ontological_level": "None"
+          },
+          "case_id": "VIGIA-MAGNET-2022-iOS-JESS",
+          "custody": {
+            "artifact_id": "UNKNOWN",
+            "case_id": "VIGIA-MAGNET-2022-iOS-JESS",
+            "n_records": "0",
+            "records": []
+          },
+          "pipeline_meta": {
+            "anti_silencing": "True",
+            "frs_groups": "0",
+            "gamma_applied": "True",
+            "n_engine_signals": "0",
+            "n_sift_signals": "0",
+            "n_total_signals": "0",
+            "version": "V4-COLECTIVO-2026-05-06"
+          },
+          "results": {
+            "caie": {
+              "status": "NO_ARTIFACTS"
+            }
+          },
+          "signals": []
+        },
+        "seq": 5,
+        "timestamp": "2026-06-29T19:42:04.836237+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "VIGIA-MAGNET-2022-iOS-JESS",
+        "entry_sha256": "d4e39a03b9698e5276cf2705823ae62571e14a5b8cc9eff009a2b9750e0eeef1",
+        "inputs_summary": {
+          "n_signals": "0"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-06-29T19:42:04.836353+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "VIGIA-MAGNET-2022-iOS-JESS",
+        "entry_sha256": "d30a4c03e54ec299d7f535a3017c3f626e57780f555b3d0463faa497d45234b8",
+        "inputs_summary": {
+          "verdict": "UNDETERMINED"
+        },
+        "iteration": 0,
+        "note": "Exit code 0 \u2014 analysis complete.",
+        "outputs_summary": {
+          "exit_code": "0"
+        },
+        "seq": 7,
+        "timestamp": "2026-06-29T19:42:04.836460+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-06-29T19:41:56.986477+00:00",
+    "total_entries": 7
+  },
+  "case_id": "VIGIA-MAGNET-2022-iOS-JESS",
+  "evidence_path": "evidence/magnet-2022-ios-jess/Jess_CTF_iPhone8",
+  "evidence_sha256": "448175fde171b07e916c6b82e0c62a763c45ce62bc9b1a888bbe5b9d41f87957",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-MAGNET-2022-iOS-JESS ===\nEvidence: evidence/magnet-2022-ios-jess/Jess_CTF_iPhone8\nEvidence SHA-256: 448175fde171b07e916c6b82e0c62a763c45ce62bc9b1a888bbe5b9d41f87957\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: UNDETERMINED\nPosterior confidence: 0\nConclusive: NO \u2014 requires human review\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] Se\u00f1ales insuficientes (0).\n\n--- FINAL ALERT LEVEL ---\nLOW \u2014 No significant anomalies detected in this iteration.\n\nCritical signals (z>3): 0\nHigh signals (2<z<=3): 0\nTotal signals analyzed: 0",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "UNDETERMINED",
+      "best_posterior": "0",
+      "confidence": "0",
+      "is_conclusive": false,
+      "narrative": "[FIRSTNESS] Se\u00f1ales insuficientes (0).",
+      "ontological_level": null
+    },
+    "case_id": "VIGIA-MAGNET-2022-iOS-JESS",
+    "custody": {
+      "artifact_id": "UNKNOWN",
+      "case_id": "VIGIA-MAGNET-2022-iOS-JESS",
+      "n_records": 0,
+      "records": []
+    },
+    "pipeline_meta": {
+      "anti_silencing": true,
+      "frs_groups": 0,
+      "gamma_applied": true,
+      "n_engine_signals": 0,
+      "n_sift_signals": 0,
+      "n_total_signals": 0,
+      "version": "V4-COLECTIVO-2026-05-06"
+    },
+    "results": {
+      "caie": {
+        "status": "NO_ARTIFACTS"
+      }
+    },
+    "signals": []
+  },
+  "sans_compliance": {
+    "accuracy_validation": false,
+    "analytical_reasoning": false,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}

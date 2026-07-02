@@ -1,0 +1,227 @@
+{
+  "agent_verdict": "ABSTAIN",
+  "analysis_timestamp": "2026-07-02T14:50:06.923857+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "VIGIA-PAGINA-WEB-PAPA-2026",
+    "end_time": "2026-07-02T14:50:06.923861+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "VIGIA-PAGINA-WEB-PAPA-2026",
+        "entry_sha256": "9a276547469ddebecc49eb55087a2116267faba5a12470e4f7ef51e814b8f46c",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "VIGIA-PAGINA-WEB-PAPA-2026"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: cf1b0ed196d5e39c...",
+        "outputs_summary": {
+          "agent_sha256": "cf1b0ed196d5e39c164122d40d9383c5c511ab4106c327bd204e9021613acbff",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-07-02T14:50:06.920600+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-PAGINA-WEB-PAPA-2026",
+        "entry_sha256": "33e3951138f9b83d77d05d50429af3aa32d3eb359d67b8e651b8cddde5d4403e",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-PAGINA-WEB-PAPA-2026.json"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-07-02T14:50:06.920673+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-PAGINA-WEB-PAPA-2026",
+        "entry_sha256": "d4f5b2e5e6bdea5c48dcccedd37d7f194114be73d0699d5a09385101e1a8654d",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-PAGINA-WEB-PAPA-2026.json"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: ff5c9fbe2db59081...",
+        "outputs_summary": {
+          "sha256": "ff5c9fbe2db59081e570f4d09e21f63be86896f435a8ade87559ca5d5202f9ca"
+        },
+        "seq": 3,
+        "timestamp": "2026-07-02T14:50:06.920756+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "VIGIA-PAGINA-WEB-PAPA-2026",
+        "entry_sha256": "8888311206f6550f96cd0cec3b1d894f1f589d3ab7a497b5cc3a7401c4d23f26",
+        "inputs_summary": {
+          "evidence": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-PAGINA-WEB-PAPA-2026.json",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-07-02T14:50:06.920846+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "VIGIA-PAGINA-WEB-PAPA-2026",
+        "entry_sha256": "03dbf2f09898955e832bb892657d5046bf49cdc9b471ab134b829c85c4d8d498",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 2 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "NO_SEMIOTIC_ANOMALY_DETECTED",
+            "best_posterior": "19/5000",
+            "confidence": "19/5000",
+            "is_conclusive": "False",
+            "narrative": "ZIP archive 'P\u00e1gina web para pap\u00e1.zip' (SHA-256: 166dc64e978a53aef82993fe7132f64ba0b825c92c7cc194dec2dd4e3059b9df) containing a React web application dated 2026-06-26. Contents: Admin-Categorias.dc.ht..."
+          },
+          "case_id": "VIGIA-PAGINA-WEB-PAPA-2026",
+          "pipeline_meta": {
+            "artifact_count": "2",
+            "avg_score": "19/1000",
+            "expected_verdict": "NOISE",
+            "source": "ebs_v1_json_adapter"
+          },
+          "signals": [
+            {
+              "artifact_id": "PAPA-ART-001",
+              "confidence": "19/20",
+              "description": "P\u00e1gina web para pap\u00e1.zip \u2014 personal family React web application. Contains JSX components, HTML pages, support.js (34KB), .thumbnail (2KB). Dated 2026-06-26. No forensic anomalies.",
+              "evidence_type": "file_hash",
+              "source": "generate_forensic_hash",
+              "z_score": "19/1000"
+            },
+            {
+              "artifact_id": "PAPA-ART-002",
+              "confidence": "19/20",
+              "description": "Directory structure: root HTML pages (.dc.html format), uploads/ subdirectory with JSX components, support.js utility, .thumbnail preview. Component names (Catalogo, HomePage, ListingDetalle, NuevoLis",
+              "evidence_type": "log_entry",
+              "source": "list_files",
+              "z_score": "19/1000"
+            }
+          ]
+        },
+        "seq": 5,
+        "timestamp": "2026-07-02T14:50:06.923607+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "VIGIA-PAGINA-WEB-PAPA-2026",
+        "entry_sha256": "389eab4fee857fb13d6d79c84638092e07ff8cbf487366e9f39e72ac8b409cc3",
+        "inputs_summary": {
+          "n_signals": "2"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-07-02T14:50:06.923702+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "VIGIA-PAGINA-WEB-PAPA-2026",
+        "entry_sha256": "e9ee83c2c98a3d27dd7101b8ddd63d9c74e10e05fd33041d7233ccdc611b8df9",
+        "inputs_summary": {
+          "verdict": "NO_SEMIOTIC_ANOMALY_DETECTED"
+        },
+        "iteration": 0,
+        "note": "Exit code 4 (ABSTAIN) \u2014 analysis complete.",
+        "outputs_summary": {
+          "agent_verdict": "ABSTAIN",
+          "exit_code": "4"
+        },
+        "seq": 7,
+        "timestamp": "2026-07-02T14:50:06.923788+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-07-02T14:50:06.920408+00:00",
+    "total_entries": 7
+  },
+  "case_id": "VIGIA-PAGINA-WEB-PAPA-2026",
+  "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-PAGINA-WEB-PAPA-2026.json",
+  "evidence_sha256": "ff5c9fbe2db59081e570f4d09e21f63be86896f435a8ade87559ca5d5202f9ca",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-PAGINA-WEB-PAPA-2026 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/VIGIA-PAGINA-WEB-PAPA-2026.json\nEvidence SHA-256: ff5c9fbe2db59081e570f4d09e21f63be86896f435a8ade87559ca5d5202f9ca\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: NO_SEMIOTIC_ANOMALY_DETECTED\nPosterior confidence: 19/5000\nConclusive: NO \u2014 requires human review\n\n--- PEIRCEAN NARRATIVE ---\nZIP archive 'P\u00e1gina web para pap\u00e1.zip' (SHA-256: 166dc64e978a53aef82993fe7132f64ba0b825c92c7cc194dec2dd4e3059b9df) containing a React web application dated 2026-06-26. Contents: Admin-Categorias.dc.html, Catalogo.dc.html, Foro*.dc.html (forum pages), Inicio.dc.html, Publicacion.dc.html, Publicar.dc.html, support.js (34KB), uploads/AdminCategorias.jsx, CatalogoPage.jsx, HomePage.jsx, ListingDetalle.jsx, NuevoListing.jsx, .thumbnail (2KB). The project name 'para pap\u00e1' (Spanish: 'for dad') indicate\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [P\u00e1gina web para pap\u00e1.zip \u2014 personal family React web application. Cont] z=0.019 conf=0.95 \u2014 \n  [Directory structure: root HTML pages (.dc.html format), uploads/ subdi] z=0.019 conf=0.95 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW \u2014 No significant anomalies detected in this iteration.\n\nCritical signals (z>3): 0\nHigh signals (2<z<=3): 0\nTotal signals analyzed: 2",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "NO_SEMIOTIC_ANOMALY_DETECTED",
+      "best_posterior": "19/5000",
+      "confidence": {
+        "__fraction__": true,
+        "den": 5000,
+        "num": 19
+      },
+      "is_conclusive": false,
+      "narrative": "ZIP archive 'P\u00e1gina web para pap\u00e1.zip' (SHA-256: 166dc64e978a53aef82993fe7132f64ba0b825c92c7cc194dec2dd4e3059b9df) containing a React web application dated 2026-06-26. Contents: Admin-Categorias.dc.html, Catalogo.dc.html, Foro*.dc.html (forum pages), Inicio.dc.html, Publicacion.dc.html, Publicar.dc.html, support.js (34KB), uploads/AdminCategorias.jsx, CatalogoPage.jsx, HomePage.jsx, ListingDetalle.jsx, NuevoListing.jsx, .thumbnail (2KB). The project name 'para pap\u00e1' (Spanish: 'for dad') indicate"
+    },
+    "case_id": "VIGIA-PAGINA-WEB-PAPA-2026",
+    "pipeline_meta": {
+      "artifact_count": 2,
+      "avg_score": "19/1000",
+      "expected_verdict": "NOISE",
+      "source": "ebs_v1_json_adapter"
+    },
+    "signals": [
+      {
+        "artifact_id": "PAPA-ART-001",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 19
+        },
+        "description": "P\u00e1gina web para pap\u00e1.zip \u2014 personal family React web application. Contains JSX components, HTML pages, support.js (34KB), .thumbnail (2KB). Dated 2026-06-26. No forensic anomalies.",
+        "evidence_type": "file_hash",
+        "source": "generate_forensic_hash",
+        "z_score": {
+          "__fraction__": true,
+          "den": 1000,
+          "num": 19
+        }
+      },
+      {
+        "artifact_id": "PAPA-ART-002",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 19
+        },
+        "description": "Directory structure: root HTML pages (.dc.html format), uploads/ subdirectory with JSX components, support.js utility, .thumbnail preview. Component names (Catalogo, HomePage, ListingDetalle, NuevoLis",
+        "evidence_type": "log_entry",
+        "source": "list_files",
+        "z_score": {
+          "__fraction__": true,
+          "den": 1000,
+          "num": 19
+        }
+      }
+    ]
+  },
+  "sans_compliance": {
+    "accuracy_validation": false,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}

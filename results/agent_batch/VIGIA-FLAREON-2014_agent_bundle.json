@@ -1,0 +1,331 @@
+{
+  "agent_verdict": "INTENT",
+  "analysis_timestamp": "2026-07-02T14:50:05.374310+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "VIGIA-FLAREON-2014",
+    "end_time": "2026-07-02T14:50:05.374314+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "VIGIA-FLAREON-2014",
+        "entry_sha256": "d47fc2d74c32f34cdea3ebe769e9168f80b19571a94de195e4e5bb4c546de89c",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "VIGIA-FLAREON-2014"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: cf1b0ed196d5e39c...",
+        "outputs_summary": {
+          "agent_sha256": "cf1b0ed196d5e39c164122d40d9383c5c511ab4106c327bd204e9021613acbff",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-07-02T14:50:05.371312+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-FLAREON-2014",
+        "entry_sha256": "eddedf86b54989bd9eab65d7f89e886ec9756c845dc3ce1ef7a4d0a9ce53ae97",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-FLAREON-2014.json"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-07-02T14:50:05.371390+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-FLAREON-2014",
+        "entry_sha256": "87ae796fc9ba1474ec31ada53e46e48c492ed867cff20ca243757fd34881aaa8",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-FLAREON-2014.json"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: 45be405ec2a66685...",
+        "outputs_summary": {
+          "sha256": "45be405ec2a66685b673151aa67c5d9c45300dd2ca3594cc53cf5000d4ddb9f7"
+        },
+        "seq": 3,
+        "timestamp": "2026-07-02T14:50:05.371474+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "VIGIA-FLAREON-2014",
+        "entry_sha256": "8a0106170f65400407979d1dcca8427b7ba4dba4d9579aa19d2a577b992d5b7f",
+        "inputs_summary": {
+          "evidence": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-FLAREON-2014.json",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-07-02T14:50:05.371562+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "VIGIA-FLAREON-2014",
+        "entry_sha256": "46afce512bfc41699c2873306dd4e695368618bdd58e3416ad89a16c17817844",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 7 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "INTENT_DETECTED",
+            "best_posterior": "1989/17500",
+            "confidence": "1989/17500",
+            "is_conclusive": "True",
+            "narrative": "FireEye FLARE-On CTF 2014 challenge collection. 8 artifacts: C1.exe (packed Windows PE32+ SFX, sha256:f8aac4d0cc..., 285184 bytes) and 6 zip containers (C2-C7, escalating complexity) plus byte-identic..."
+          },
+          "case_id": "VIGIA-FLAREON-2014",
+          "pipeline_meta": {
+            "artifact_count": "7",
+            "avg_score": "1989/3500",
+            "expected_verdict": "INTENT",
+            "source": "ebs_v1_json_adapter"
+          },
+          "signals": [
+            {
+              "artifact_id": "c1_exe_001",
+              "confidence": "9/10",
+              "description": "C1.exe \u2014 PE32+ executable (GUI) x86-64, 6 sections, 285184 bytes. Shannon entropy 7.47 bits/byte. RunOnce registry key in strings. VIG\u00cdA purgatory gate triggered on read (binary, non-UTF-8). Byte-iden",
+              "evidence_type": "pe_executable",
+              "source": "generate_forensic_hash",
+              "z_score": "369/500"
+            },
+            {
+              "artifact_id": "c2_zip_001",
+              "confidence": "9/10",
+              "description": "C2.zip \u2014 challenge container, 10758 bytes. Part of escalating-complexity series C2\u2013C7. Inner content not extracted (challenge-gated). Hash integrity verified.",
+              "evidence_type": "container_zip",
+              "source": "generate_forensic_hash",
+              "z_score": "27/50"
+            },
+            {
+              "artifact_id": "c3_zip_001",
+              "confidence": "9/10",
+              "description": "C3.zip \u2014 smallest container at 2713 bytes. Likely minimal binary or script challenge. Hash integrity verified.",
+              "evidence_type": "container_zip",
+              "source": "generate_forensic_hash",
+              "z_score": "99/200"
+            },
+            {
+              "artifact_id": "c4_zip_001",
+              "confidence": "9/10",
+              "description": "C4.zip \u2014 17794 bytes. Mid-complexity challenge container. Hash integrity verified.",
+              "evidence_type": "container_zip",
+              "source": "generate_forensic_hash",
+              "z_score": "261/500"
+            },
+            {
+              "artifact_id": "c5_zip_001",
+              "confidence": "9/10",
+              "description": "C5.zip \u2014 39309 bytes. Escalated complexity container. Hash integrity verified.",
+              "evidence_type": "container_zip",
+              "source": "generate_forensic_hash",
+              "z_score": "27/50"
+            }
+          ]
+        },
+        "seq": 5,
+        "timestamp": "2026-07-02T14:50:05.374000+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "VIGIA-FLAREON-2014",
+        "entry_sha256": "ce60d8966d034e5f2db4bb9b04c6b0557fe33a4dc448798b8095e040d83cde22",
+        "inputs_summary": {
+          "n_signals": "7"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-07-02T14:50:05.374124+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "VIGIA-FLAREON-2014",
+        "entry_sha256": "00476dd025927e363815eddfdd58c56c59789a61e9821bca814977a7bbf4e2dd",
+        "inputs_summary": {
+          "verdict": "INTENT_DETECTED"
+        },
+        "iteration": 0,
+        "note": "Exit code 3 (INTENT) \u2014 analysis complete.",
+        "outputs_summary": {
+          "agent_verdict": "INTENT",
+          "exit_code": "3"
+        },
+        "seq": 7,
+        "timestamp": "2026-07-02T14:50:05.374216+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-07-02T14:50:05.371001+00:00",
+    "total_entries": 7
+  },
+  "case_id": "VIGIA-FLAREON-2014",
+  "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-FLAREON-2014.json",
+  "evidence_sha256": "45be405ec2a66685b673151aa67c5d9c45300dd2ca3594cc53cf5000d4ddb9f7",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-FLAREON-2014 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/VIGIA-FLAREON-2014.json\nEvidence SHA-256: 45be405ec2a66685b673151aa67c5d9c45300dd2ca3594cc53cf5000d4ddb9f7\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: INTENT_DETECTED\nPosterior confidence: 1989/17500\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\nFireEye FLARE-On CTF 2014 challenge collection. 8 artifacts: C1.exe (packed Windows PE32+ SFX, sha256:f8aac4d0cc..., 285184 bytes) and 6 zip containers (C2-C7, escalating complexity) plus byte-identical Flare_On_Challenge.EXE. C1.exe exhibits Shannon entropy 7.47 bits/byte, RunOnce registry key string, SFX dropper pattern. Corpus is pedagogical malware RE training material authored by the FireEye FLARE team for the 2014 competition season.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [C1.exe \u2014 PE32+ executable (GUI) x86-64, 6 sections, 285184 bytes. Shan] z=0.738 conf=0.90 \u2014 \n  [C7.zip \u2014 1114575 bytes. Largest container. Final/hardest challenge. Ha] z=0.585 conf=0.90 \u2014 \n  [C6.zip \u2014 484454 bytes. Large container, likely contains full PE execut] z=0.558 conf=0.90 \u2014 \n  [C2.zip \u2014 challenge container, 10758 bytes. Part of escalating-complexi] z=0.540 conf=0.90 \u2014 \n  [C5.zip \u2014 39309 bytes. Escalated complexity container. Hash integrity v] z=0.540 conf=0.90 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW \u2014 No significant anomalies detected in this iteration.\n\nCritical signals (z>3): 0\nHigh signals (2<z<=3): 0\nTotal signals analyzed: 7",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "INTENT_DETECTED",
+      "best_posterior": "1989/17500",
+      "confidence": {
+        "__fraction__": true,
+        "den": 17500,
+        "num": 1989
+      },
+      "is_conclusive": true,
+      "narrative": "FireEye FLARE-On CTF 2014 challenge collection. 8 artifacts: C1.exe (packed Windows PE32+ SFX, sha256:f8aac4d0cc..., 285184 bytes) and 6 zip containers (C2-C7, escalating complexity) plus byte-identical Flare_On_Challenge.EXE. C1.exe exhibits Shannon entropy 7.47 bits/byte, RunOnce registry key string, SFX dropper pattern. Corpus is pedagogical malware RE training material authored by the FireEye FLARE team for the 2014 competition season."
+    },
+    "case_id": "VIGIA-FLAREON-2014",
+    "pipeline_meta": {
+      "artifact_count": 7,
+      "avg_score": "1989/3500",
+      "expected_verdict": "INTENT",
+      "source": "ebs_v1_json_adapter"
+    },
+    "signals": [
+      {
+        "artifact_id": "c1_exe_001",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 9
+        },
+        "description": "C1.exe \u2014 PE32+ executable (GUI) x86-64, 6 sections, 285184 bytes. Shannon entropy 7.47 bits/byte. RunOnce registry key in strings. VIG\u00cdA purgatory gate triggered on read (binary, non-UTF-8). Byte-iden",
+        "evidence_type": "pe_executable",
+        "source": "generate_forensic_hash",
+        "z_score": {
+          "__fraction__": true,
+          "den": 500,
+          "num": 369
+        }
+      },
+      {
+        "artifact_id": "c2_zip_001",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 9
+        },
+        "description": "C2.zip \u2014 challenge container, 10758 bytes. Part of escalating-complexity series C2\u2013C7. Inner content not extracted (challenge-gated). Hash integrity verified.",
+        "evidence_type": "container_zip",
+        "source": "generate_forensic_hash",
+        "z_score": {
+          "__fraction__": true,
+          "den": 50,
+          "num": 27
+        }
+      },
+      {
+        "artifact_id": "c3_zip_001",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 9
+        },
+        "description": "C3.zip \u2014 smallest container at 2713 bytes. Likely minimal binary or script challenge. Hash integrity verified.",
+        "evidence_type": "container_zip",
+        "source": "generate_forensic_hash",
+        "z_score": {
+          "__fraction__": true,
+          "den": 200,
+          "num": 99
+        }
+      },
+      {
+        "artifact_id": "c4_zip_001",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 9
+        },
+        "description": "C4.zip \u2014 17794 bytes. Mid-complexity challenge container. Hash integrity verified.",
+        "evidence_type": "container_zip",
+        "source": "generate_forensic_hash",
+        "z_score": {
+          "__fraction__": true,
+          "den": 500,
+          "num": 261
+        }
+      },
+      {
+        "artifact_id": "c5_zip_001",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 9
+        },
+        "description": "C5.zip \u2014 39309 bytes. Escalated complexity container. Hash integrity verified.",
+        "evidence_type": "container_zip",
+        "source": "generate_forensic_hash",
+        "z_score": {
+          "__fraction__": true,
+          "den": 50,
+          "num": 27
+        }
+      },
+      {
+        "artifact_id": "c6_zip_001",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 9
+        },
+        "description": "C6.zip \u2014 484454 bytes. Large container, likely contains full PE executable. Hash integrity verified.",
+        "evidence_type": "container_zip",
+        "source": "generate_forensic_hash",
+        "z_score": {
+          "__fraction__": true,
+          "den": 500,
+          "num": 279
+        }
+      },
+      {
+        "artifact_id": "c7_zip_001",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 9
+        },
+        "description": "C7.zip \u2014 1114575 bytes. Largest container. Final/hardest challenge. Hash integrity verified.",
+        "evidence_type": "container_zip",
+        "source": "generate_forensic_hash",
+        "z_score": {
+          "__fraction__": true,
+          "den": 200,
+          "num": 117
+        }
+      }
+    ]
+  },
+  "sans_compliance": {
+    "accuracy_validation": false,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}

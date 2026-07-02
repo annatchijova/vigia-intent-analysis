@@ -1,0 +1,227 @@
+{
+  "agent_verdict": "ABSTAIN",
+  "analysis_timestamp": "2026-07-02T14:50:08.658096+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "VIGIA-SKILL-EVALS-2026",
+    "end_time": "2026-07-02T14:50:08.658100+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "VIGIA-SKILL-EVALS-2026",
+        "entry_sha256": "0d37b9dba12c2b165e17ff256e940e63a8061e7f2c04ce637b32665d0af1bc92",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "VIGIA-SKILL-EVALS-2026"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: cf1b0ed196d5e39c...",
+        "outputs_summary": {
+          "agent_sha256": "cf1b0ed196d5e39c164122d40d9383c5c511ab4106c327bd204e9021613acbff",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-07-02T14:50:08.655249+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-SKILL-EVALS-2026",
+        "entry_sha256": "175295c43396ce9e10d85134fe0970117fab672039ed7b09c78adb859b46e4c0",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-SKILL-EVALS-2026.json"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-07-02T14:50:08.655323+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-SKILL-EVALS-2026",
+        "entry_sha256": "2711f9aa0d3d399080b74683e09a5f0c4b8b85533a40b09e751fa64d73aac157",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-SKILL-EVALS-2026.json"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: da4f9ff17f3272bd...",
+        "outputs_summary": {
+          "sha256": "da4f9ff17f3272bd0672839bdafd8d55baf410901a8dc0ba54d8728b27fedcc4"
+        },
+        "seq": 3,
+        "timestamp": "2026-07-02T14:50:08.655406+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "VIGIA-SKILL-EVALS-2026",
+        "entry_sha256": "ec7489ca66451a121b4bfcf0402ab8dead05c22d865be4ac52748e42835275ca",
+        "inputs_summary": {
+          "evidence": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-SKILL-EVALS-2026.json",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-07-02T14:50:08.655496+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "VIGIA-SKILL-EVALS-2026",
+        "entry_sha256": "4d4bc13af6dbf8ace2c92400c2900b97c299f898152ca1049c180d000c08ad71",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 2 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "NO_SEMIOTIC_ANOMALY_DETECTED",
+            "best_posterior": "19/5000",
+            "confidence": "19/5000",
+            "is_conclusive": "False",
+            "narrative": "ZIP archive skill-evals.zip (SHA-256: 92a8ca61230a8eb12dd07d3cc5320a7a22ab12f7e9dc87432f8ff4bd03bea332) containing 11 JSON trigger files for VIG\u00cdA skill evaluations, dated 2026-06-27. Triggers: atomic..."
+          },
+          "case_id": "VIGIA-SKILL-EVALS-2026",
+          "pipeline_meta": {
+            "artifact_count": "2",
+            "avg_score": "19/1000",
+            "expected_verdict": "NOISE",
+            "source": "ebs_v1_json_adapter"
+          },
+          "signals": [
+            {
+              "artifact_id": "EVALS-ART-001",
+              "confidence": "19/20",
+              "description": "skill-evals.zip \u2014 container archive with 11 VIG\u00cdA skill evaluation trigger JSONs dated 2026-06-27. Trigger names correspond to documented VIG\u00cdA behavioral invariants. No forensic anomalies.",
+              "evidence_type": "file_hash",
+              "source": "generate_forensic_hash",
+              "z_score": "19/1000"
+            },
+            {
+              "artifact_id": "EVALS-ART-002",
+              "confidence": "19/20",
+              "description": "Directory listing: 11 JSON files named after VIG\u00cdA behavioral invariants. Each filename maps to a documented VIG\u00cdA design principle. File format (JSON) and content type (trigger configuration) are int",
+              "evidence_type": "log_entry",
+              "source": "list_files",
+              "z_score": "19/1000"
+            }
+          ]
+        },
+        "seq": 5,
+        "timestamp": "2026-07-02T14:50:08.657844+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "VIGIA-SKILL-EVALS-2026",
+        "entry_sha256": "d17ab818b0c161ba95ae6c6338d4b7cee6f10d7b7c7e0d337c283e957f717345",
+        "inputs_summary": {
+          "n_signals": "2"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-07-02T14:50:08.657938+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "VIGIA-SKILL-EVALS-2026",
+        "entry_sha256": "fe88582ff9b21a28f7f7147ad7e4650c20162f3deaeb4616b198edce177aeea9",
+        "inputs_summary": {
+          "verdict": "NO_SEMIOTIC_ANOMALY_DETECTED"
+        },
+        "iteration": 0,
+        "note": "Exit code 4 (ABSTAIN) \u2014 analysis complete.",
+        "outputs_summary": {
+          "agent_verdict": "ABSTAIN",
+          "exit_code": "4"
+        },
+        "seq": 7,
+        "timestamp": "2026-07-02T14:50:08.658028+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-07-02T14:50:08.655056+00:00",
+    "total_entries": 7
+  },
+  "case_id": "VIGIA-SKILL-EVALS-2026",
+  "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-SKILL-EVALS-2026.json",
+  "evidence_sha256": "da4f9ff17f3272bd0672839bdafd8d55baf410901a8dc0ba54d8728b27fedcc4",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-SKILL-EVALS-2026 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/VIGIA-SKILL-EVALS-2026.json\nEvidence SHA-256: da4f9ff17f3272bd0672839bdafd8d55baf410901a8dc0ba54d8728b27fedcc4\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: NO_SEMIOTIC_ANOMALY_DETECTED\nPosterior confidence: 19/5000\nConclusive: NO \u2014 requires human review\n\n--- PEIRCEAN NARRATIVE ---\nZIP archive skill-evals.zip (SHA-256: 92a8ca61230a8eb12dd07d3cc5320a7a22ab12f7e9dc87432f8ff4bd03bea332) containing 11 JSON trigger files for VIG\u00cdA skill evaluations, dated 2026-06-27. Triggers: atomic-state-mutation, audit-before-patch, deterministic-core, git-discipline, honest-degradation, llm-out-of-the-loop, sql-aggregation-not-materialization, surgical-patcher, tamper-evident-audit-chain, validate-at-the-boundary, versioned-schema-evolution. These are VIG\u00cdA's own internal evaluation/testing\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [skill-evals.zip \u2014 container archive with 11 VIG\u00cdA skill evaluation tri] z=0.019 conf=0.95 \u2014 \n  [Directory listing: 11 JSON files named after VIG\u00cdA behavioral invarian] z=0.019 conf=0.95 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW \u2014 No significant anomalies detected in this iteration.\n\nCritical signals (z>3): 0\nHigh signals (2<z<=3): 0\nTotal signals analyzed: 2",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "NO_SEMIOTIC_ANOMALY_DETECTED",
+      "best_posterior": "19/5000",
+      "confidence": {
+        "__fraction__": true,
+        "den": 5000,
+        "num": 19
+      },
+      "is_conclusive": false,
+      "narrative": "ZIP archive skill-evals.zip (SHA-256: 92a8ca61230a8eb12dd07d3cc5320a7a22ab12f7e9dc87432f8ff4bd03bea332) containing 11 JSON trigger files for VIG\u00cdA skill evaluations, dated 2026-06-27. Triggers: atomic-state-mutation, audit-before-patch, deterministic-core, git-discipline, honest-degradation, llm-out-of-the-loop, sql-aggregation-not-materialization, surgical-patcher, tamper-evident-audit-chain, validate-at-the-boundary, versioned-schema-evolution. These are VIG\u00cdA's own internal evaluation/testing"
+    },
+    "case_id": "VIGIA-SKILL-EVALS-2026",
+    "pipeline_meta": {
+      "artifact_count": 2,
+      "avg_score": "19/1000",
+      "expected_verdict": "NOISE",
+      "source": "ebs_v1_json_adapter"
+    },
+    "signals": [
+      {
+        "artifact_id": "EVALS-ART-001",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 19
+        },
+        "description": "skill-evals.zip \u2014 container archive with 11 VIG\u00cdA skill evaluation trigger JSONs dated 2026-06-27. Trigger names correspond to documented VIG\u00cdA behavioral invariants. No forensic anomalies.",
+        "evidence_type": "file_hash",
+        "source": "generate_forensic_hash",
+        "z_score": {
+          "__fraction__": true,
+          "den": 1000,
+          "num": 19
+        }
+      },
+      {
+        "artifact_id": "EVALS-ART-002",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 19
+        },
+        "description": "Directory listing: 11 JSON files named after VIG\u00cdA behavioral invariants. Each filename maps to a documented VIG\u00cdA design principle. File format (JSON) and content type (trigger configuration) are int",
+        "evidence_type": "log_entry",
+        "source": "list_files",
+        "z_score": {
+          "__fraction__": true,
+          "den": 1000,
+          "num": 19
+        }
+      }
+    ]
+  },
+  "sans_compliance": {
+    "accuracy_validation": false,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}

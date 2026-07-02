@@ -1,0 +1,619 @@
+{
+  "agent_verdict": "NOISE",
+  "analysis_timestamp": "2026-07-02T14:50:07.871637+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "VIGIA-REAL-NPS-2010-EMAILS",
+    "end_time": "2026-07-02T14:50:07.871640+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "VIGIA-REAL-NPS-2010-EMAILS",
+        "entry_sha256": "f86e63d955279a139578c0bfa892c679b0895ed8a758178af003710640e87ce7",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "VIGIA-REAL-NPS-2010-EMAILS"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: cf1b0ed196d5e39c...",
+        "outputs_summary": {
+          "agent_sha256": "cf1b0ed196d5e39c164122d40d9383c5c511ab4106c327bd204e9021613acbff",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-07-02T14:50:07.867859+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-REAL-NPS-2010-EMAILS",
+        "entry_sha256": "53286f339f33a2a2f299eca7ff5cf9fa0f9de8a09a082bef34b92e9e1da4c1e6",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-REAL-NPS-2010-EMAILS.json"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-07-02T14:50:07.867938+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-REAL-NPS-2010-EMAILS",
+        "entry_sha256": "d1a23c77ac664a32419a4cce6cd1919fe4005ad2830f61c8fae0f9c70332f058",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-REAL-NPS-2010-EMAILS.json"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: a06e174b37d4b917...",
+        "outputs_summary": {
+          "sha256": "a06e174b37d4b91732d4aad62b45c42b64c89936a25ead815952e8380be1f684"
+        },
+        "seq": 3,
+        "timestamp": "2026-07-02T14:50:07.868050+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "VIGIA-REAL-NPS-2010-EMAILS",
+        "entry_sha256": "b2eb8ae7f9d83e70276111d7cf29ff8cff2b2ac841e15e8b15f46bb234f46e6a",
+        "inputs_summary": {
+          "evidence": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-REAL-NPS-2010-EMAILS.json",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-07-02T14:50:07.868148+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "VIGIA-REAL-NPS-2010-EMAILS",
+        "entry_sha256": "34a6fddafd3f75b4513e19eedbebdc3d27427367dea9a76ea72c295148e8eb65",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 25 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "NO_SEMIOTIC_ANOMALY_DETECTED",
+            "best_posterior": "0",
+            "confidence": "0",
+            "is_conclusive": "False",
+            "narrative": "Digital Corpora NPS-2010-emails corpus. A FAT32 disk image (nps_emails_fs) containing 25 document files, each embedding an email address using a different encoding or container format: plain ASCII, UT..."
+          },
+          "case_id": "VIGIA-REAL-NPS-2010-EMAILS",
+          "pipeline_meta": {
+            "artifact_count": "25",
+            "avg_score": "0",
+            "expected_verdict": "NOISE",
+            "source": "ebs_v1_json_adapter"
+          },
+          "signals": [
+            {
+              "artifact_id": "NPS2010-001",
+              "confidence": "1",
+              "description": "Baseline file: email address stored as plain ASCII. No obfuscation.",
+              "evidence_type": "file_text",
+              "source": "read_evidence",
+              "z_score": "0"
+            },
+            {
+              "artifact_id": "NPS2010-002",
+              "confidence": "1",
+              "description": "Email stored as UTF-16 LE. The BOM (FF FE) makes it unreadable to tools expecting ASCII; content is invisible as a character-set mismatch.",
+              "evidence_type": "file_text",
+              "source": "read_evidence",
+              "z_score": "0"
+            },
+            {
+              "artifact_id": "NPS2010-003",
+              "confidence": "1",
+              "description": "Email embedded in RTF body. RTF control words wrap the plaintext; parsers that only read raw bytes may extract it, but non-RTF-aware tools may include control sequences in the extracted string.",
+              "evidence_type": "document",
+              "source": "read_evidence",
+              "z_score": "0"
+            },
+            {
+              "artifact_id": "NPS2010-004",
+              "confidence": "1",
+              "description": "Email in PDF content stream. Raw bytes do not expose plaintext email; requires PDF parser (pdftotext / pdfminer).",
+              "evidence_type": "document",
+              "source": "read_evidence",
+              "z_score": "0"
+            },
+            {
+              "artifact_id": "NPS2010-005",
+              "confidence": "1",
+              "description": "PDF generated from RTF source document. Double container: RTF content re-encoded into PDF stream.",
+              "evidence_type": "document",
+              "source": "read_evidence",
+              "z_score": "0"
+            }
+          ]
+        },
+        "seq": 5,
+        "timestamp": "2026-07-02T14:50:07.871218+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "VIGIA-REAL-NPS-2010-EMAILS",
+        "entry_sha256": "1ed9b1adc7be488f52bc2180804678dd5765dbbfb5f85e36f6eed382cf5b9117",
+        "inputs_summary": {
+          "n_signals": "25"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-07-02T14:50:07.871417+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "VIGIA-REAL-NPS-2010-EMAILS",
+        "entry_sha256": "31e7ad80e5d463e086ceed97943cd413836093dc01f69cbfc26159e3e8497430",
+        "inputs_summary": {
+          "verdict": "NO_SEMIOTIC_ANOMALY_DETECTED"
+        },
+        "iteration": 0,
+        "note": "Exit code 0 (NOISE) \u2014 analysis complete.",
+        "outputs_summary": {
+          "agent_verdict": "NOISE",
+          "exit_code": "0"
+        },
+        "seq": 7,
+        "timestamp": "2026-07-02T14:50:07.871504+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-07-02T14:50:07.867651+00:00",
+    "total_entries": 7
+  },
+  "case_id": "VIGIA-REAL-NPS-2010-EMAILS",
+  "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-REAL-NPS-2010-EMAILS.json",
+  "evidence_sha256": "a06e174b37d4b91732d4aad62b45c42b64c89936a25ead815952e8380be1f684",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-REAL-NPS-2010-EMAILS ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/VIGIA-REAL-NPS-2010-EMAILS.json\nEvidence SHA-256: a06e174b37d4b91732d4aad62b45c42b64c89936a25ead815952e8380be1f684\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: NO_SEMIOTIC_ANOMALY_DETECTED\nPosterior confidence: 0\nConclusive: NO \u2014 requires human review\n\n--- PEIRCEAN NARRATIVE ---\nDigital Corpora NPS-2010-emails corpus. A FAT32 disk image (nps_emails_fs) containing 25 document files, each embedding an email address using a different encoding or container format: plain ASCII, UTF-16 LE, RTF, PDF, OLE2 binary (DOC/XLS), OOXML/ZIP (DOCX/XLSX), nested containers (DOC-in-DOC, PPTX-in-DOCX, XLS-in-DOC, DOCX-in-DOCX, XLSX-in-DOCX), ZIP, ZIP-in-ZIP, GZIP, GZIP-in-GZIP, iWork Pages/Keynote/Numbers, and spreadsheet comments vs. cell content. The corpus exists for DFIR tool validati\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Baseline file: email address stored as plain ASCII. No obfuscation.] z=0.000 conf=1.00 \u2014 \n  [Email stored as UTF-16 LE. The BOM (FF FE) makes it unreadable to tool] z=0.000 conf=1.00 \u2014 \n  [Email embedded in RTF body. RTF control words wrap the plaintext; pars] z=0.000 conf=1.00 \u2014 \n  [Email in PDF content stream. Raw bytes do not expose plaintext email; ] z=0.000 conf=1.00 \u2014 \n  [PDF generated from RTF source document. Double container: RTF content ] z=0.000 conf=1.00 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW \u2014 No significant anomalies detected in this iteration.\n\nCritical signals (z>3): 0\nHigh signals (2<z<=3): 0\nTotal signals analyzed: 25",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "NO_SEMIOTIC_ANOMALY_DETECTED",
+      "best_posterior": "0",
+      "confidence": {
+        "__fraction__": true,
+        "den": 1,
+        "num": 0
+      },
+      "is_conclusive": false,
+      "narrative": "Digital Corpora NPS-2010-emails corpus. A FAT32 disk image (nps_emails_fs) containing 25 document files, each embedding an email address using a different encoding or container format: plain ASCII, UTF-16 LE, RTF, PDF, OLE2 binary (DOC/XLS), OOXML/ZIP (DOCX/XLSX), nested containers (DOC-in-DOC, PPTX-in-DOCX, XLS-in-DOC, DOCX-in-DOCX, XLSX-in-DOCX), ZIP, ZIP-in-ZIP, GZIP, GZIP-in-GZIP, iWork Pages/Keynote/Numbers, and spreadsheet comments vs. cell content. The corpus exists for DFIR tool validati"
+    },
+    "case_id": "VIGIA-REAL-NPS-2010-EMAILS",
+    "pipeline_meta": {
+      "artifact_count": 25,
+      "avg_score": "0",
+      "expected_verdict": "NOISE",
+      "source": "ebs_v1_json_adapter"
+    },
+    "signals": [
+      {
+        "artifact_id": "NPS2010-001",
+        "confidence": {
+          "__fraction__": true,
+          "den": 1,
+          "num": 1
+        },
+        "description": "Baseline file: email address stored as plain ASCII. No obfuscation.",
+        "evidence_type": "file_text",
+        "source": "read_evidence",
+        "z_score": {
+          "__fraction__": true,
+          "den": 1,
+          "num": 0
+        }
+      },
+      {
+        "artifact_id": "NPS2010-002",
+        "confidence": {
+          "__fraction__": true,
+          "den": 1,
+          "num": 1
+        },
+        "description": "Email stored as UTF-16 LE. The BOM (FF FE) makes it unreadable to tools expecting ASCII; content is invisible as a character-set mismatch.",
+        "evidence_type": "file_text",
+        "source": "read_evidence",
+        "z_score": {
+          "__fraction__": true,
+          "den": 1,
+          "num": 0
+        }
+      },
+      {
+        "artifact_id": "NPS2010-003",
+        "confidence": {
+          "__fraction__": true,
+          "den": 1,
+          "num": 1
+        },
+        "description": "Email embedded in RTF body. RTF control words wrap the plaintext; parsers that only read raw bytes may extract it, but non-RTF-aware tools may include control sequences in the extracted string.",
+        "evidence_type": "document",
+        "source": "read_evidence",
+        "z_score": {
+          "__fraction__": true,
+          "den": 1,
+          "num": 0
+        }
+      },
+      {
+        "artifact_id": "NPS2010-004",
+        "confidence": {
+          "__fraction__": true,
+          "den": 1,
+          "num": 1
+        },
+        "description": "Email in PDF content stream. Raw bytes do not expose plaintext email; requires PDF parser (pdftotext / pdfminer).",
+        "evidence_type": "document",
+        "source": "read_evidence",
+        "z_score": {
+          "__fraction__": true,
+          "den": 1,
+          "num": 0
+        }
+      },
+      {
+        "artifact_id": "NPS2010-005",
+        "confidence": {
+          "__fraction__": true,
+          "den": 1,
+          "num": 1
+        },
+        "description": "PDF generated from RTF source document. Double container: RTF content re-encoded into PDF stream.",
+        "evidence_type": "document",
+        "source": "read_evidence",
+        "z_score": {
+          "__fraction__": true,
+          "den": 1,
+          "num": 0
+        }
+      },
+      {
+        "artifact_id": "NPS2010-006",
+        "confidence": {
+          "__fraction__": true,
+          "den": 1,
+          "num": 1
+        },
+        "description": "PDF generated from UTF-16 LE source. The PDF rendering normalises the character encoding; pdftotext recovers the email correctly.",
+        "evidence_type": "document",
+        "source": "read_evidence",
+        "z_score": {
+          "__fraction__": true,
+          "den": 1,
+          "num": 0
+        }
+      },
+      {
+        "artifact_id": "NPS2010-007",
+        "confidence": {
+          "__fraction__": true,
+          "den": 1,
+          "num": 1
+        },
+        "description": "PDF produced by Microsoft Word from a .doc source. Word-specific metadata (author, template) may survive in PDF XMP headers.",
+        "evidence_type": "document",
+        "source": "read_evidence",
+        "z_score": {
+          "__fraction__": true,
+          "den": 1,
+          "num": 0
+        }
+      },
+      {
+        "artifact_id": "NPS2010-008",
+        "confidence": {
+          "__fraction__": true,
+          "den": 1,
+          "num": 1
+        },
+        "description": "PDF produced from OOXML DOCX source. Email appears in PDF content stream after DOCX\u2192PDF conversion.",
+        "evidence_type": "document",
+        "source": "read_evidence",
+        "z_score": {
+          "__fraction__": true,
+          "den": 1,
+          "num": 0
+        }
+      },
+      {
+        "artifact_id": "NPS2010-009",
+        "confidence": {
+          "__fraction__": true,
+          "den": 1,
+          "num": 1
+        },
+        "description": "Email in OLE2 binary Word DOC. The structured storage format requires an OLE2-aware parser; raw grep only finds fragments.",
+        "evidence_type": "document",
+        "source": "catdoc",
+        "z_score": {
+          "__fraction__": true,
+          "den": 1,
+          "num": 0
+        }
+      },
+      {
+        "artifact_id": "NPS2010-010",
+        "confidence": {
+          "__fraction__": true,
+          "den": 1,
+          "num": 1
+        },
+        "description": "Email in OOXML DOCX content. Requires ZIP decompression then XML parsing to recover; raw grep on the .docx binary often fails.",
+        "evidence_type": "document",
+        "source": "unzip+xml_parse",
+        "z_score": {
+          "__fraction__": true,
+          "den": 1,
+          "num": 0
+        }
+      },
+      {
+        "artifact_id": "NPS2010-011",
+        "confidence": {
+          "__fraction__": true,
+          "den": 1,
+          "num": 1
+        },
+        "description": "DOC with two email addresses: one in body text, one as a HYPERLINK mailto: field. The mailto: address is stored in the OLE field instructions, not visible text.",
+        "evidence_type": "document",
+        "source": "strings+grep",
+        "z_score": {
+          "__fraction__": true,
+          "den": 1,
+          "num": 0
+        }
+      },
+      {
+        "artifact_id": "NPS2010-012",
+        "confidence": {
+          "__fraction__": true,
+          "den": 1,
+          "num": 1
+        },
+        "description": "DOCX containing an embedded DOCX object. The email is inside the nested ZIP. Two levels of ZIP decompression + XML parsing required.",
+        "evidence_type": "document",
+        "source": "unzip+xml_parse",
+        "z_score": {
+          "__fraction__": true,
+          "den": 1,
+          "num": 0
+        }
+      },
+      {
+        "artifact_id": "NPS2010-013",
+        "confidence": {
+          "__fraction__": true,
+          "den": 1,
+          "num": 1
+        },
+        "description": "DOCX containing an embedded PPTX. Cross-format nesting: email is in a PowerPoint slide XML inside a Word document ZIP.",
+        "evidence_type": "document",
+        "source": "unzip+xml_parse",
+        "z_score": {
+          "__fraction__": true,
+          "den": 1,
+          "num": 0
+        }
+      },
+      {
+        "artifact_id": "NPS2010-014",
+        "confidence": {
+          "__fraction__": true,
+          "den": 1,
+          "num": 1
+        },
+        "description": "DOCX containing an embedded XLSX. Email is in xl/sharedStrings.xml inside the nested ZIP.",
+        "evidence_type": "document",
+        "source": "unzip+xml_parse",
+        "z_score": {
+          "__fraction__": true,
+          "den": 1,
+          "num": 0
+        }
+      },
+      {
+        "artifact_id": "NPS2010-015",
+        "confidence": {
+          "__fraction__": true,
+          "den": 1,
+          "num": 1
+        },
+        "description": "OLE2 DOC with an embedded PPT object. The email is inside the PowerPoint OLE2 stream, nested within the Word OLE2 compound document.",
+        "evidence_type": "document",
+        "source": "strings",
+        "z_score": {
+          "__fraction__": true,
+          "den": 1,
+          "num": 0
+        }
+      },
+      {
+        "artifact_id": "NPS2010-016",
+        "confidence": {
+          "__fraction__": true,
+          "den": 1,
+          "num": 1
+        },
+        "description": "OLE2 DOC with an embedded XLS spreadsheet object. Email is in the Excel BIFF stream inside the Word compound document.",
+        "evidence_type": "document",
+        "source": "strings",
+        "z_score": {
+          "__fraction__": true,
+          "den": 1,
+          "num": 0
+        }
+      },
+      {
+        "artifact_id": "NPS2010-017",
+        "confidence": {
+          "__fraction__": true,
+          "den": 1,
+          "num": 1
+        },
+        "description": "Email in an XLS cell value (BIFF format). Requires XLS parser; raw hex does not expose plaintext in obvious locations.",
+        "evidence_type": "spreadsheet",
+        "source": "xls2csv",
+        "z_score": {
+          "__fraction__": true,
+          "den": 1,
+          "num": 0
+        }
+      },
+      {
+        "artifact_id": "NPS2010-018",
+        "confidence": {
+          "__fraction__": true,
+          "den": 1,
+          "num": 1
+        },
+        "description": "XLSX with email in a cell (sharedStrings.xml) AND in a spreadsheet comment (comments1.xml). Two distinct data channels in one file. Comments are hidden unless comment visibility is toggled on.",
+        "evidence_type": "spreadsheet",
+        "source": "unzip+xml_parse",
+        "z_score": {
+          "__fraction__": true,
+          "den": 1,
+          "num": 0
+        }
+      },
+      {
+        "artifact_id": "NPS2010-019",
+        "confidence": {
+          "__fraction__": true,
+          "den": 1,
+          "num": 1
+        },
+        "description": "Email in myfile.txt inside a ZIP container. DEFLATE-compressed; raw grep on the ZIP binary returns no plaintext.",
+        "evidence_type": "archive",
+        "source": "unzip",
+        "z_score": {
+          "__fraction__": true,
+          "den": 1,
+          "num": 0
+        }
+      },
+      {
+        "artifact_id": "NPS2010-020",
+        "confidence": {
+          "__fraction__": true,
+          "den": 1,
+          "num": 1
+        },
+        "description": "ZIP containing myfile2.zip, which contains myfile2.txt with the email. Requires two decompression passes. Single-level ZIP extractors miss the inner content.",
+        "evidence_type": "archive",
+        "source": "unzip (nested)",
+        "z_score": {
+          "__fraction__": true,
+          "den": 1,
+          "num": 0
+        }
+      },
+      {
+        "artifact_id": "NPS2010-021",
+        "confidence": {
+          "__fraction__": true,
+          "den": 1,
+          "num": 1
+        },
+        "description": "Email in a GZIP-compressed text file. GZIP header (1F 8B) identifies the format; content requires decompression.",
+        "evidence_type": "archive",
+        "source": "zcat",
+        "z_score": {
+          "__fraction__": true,
+          "den": 1,
+          "num": 0
+        }
+      },
+      {
+        "artifact_id": "NPS2010-022",
+        "confidence": {
+          "__fraction__": true,
+          "den": 1,
+          "num": 1
+        },
+        "description": "GZIP containing another GZIP stream. The unusual .gz.0.gz extension encodes the double-compression. Two decompression passes required.",
+        "evidence_type": "archive",
+        "source": "python3 gzip (nested)",
+        "z_score": {
+          "__fraction__": true,
+          "den": 1,
+          "num": 0
+        }
+      },
+      {
+        "artifact_id": "NPS2010-023",
+        "confidence": {
+          "__fraction__": true,
+          "den": 1,
+          "num": 1
+        },
+        "description": "iWork Pages document (ZIP container + Apple-proprietary index.xml). Two emails: body text and comment. Structurally similar to OOXML but uses a different XML schema namespace.",
+        "evidence_type": "document",
+        "source": "unzip+xml_parse",
+        "z_score": {
+          "__fraction__": true,
+          "den": 1,
+          "num": 0
+        }
+      },
+      {
+        "artifact_id": "NPS2010-024",
+        "confidence": {
+          "__fraction__": true,
+          "den": 1,
+          "num": 1
+        },
+        "description": "iWork Keynote presentation. ZIP+XML structure. Body email and comment email in index.xml.",
+        "evidence_type": "document",
+        "source": "unzip+xml_parse",
+        "z_score": {
+          "__fraction__": true,
+          "den": 1,
+          "num": 0
+        }
+      },
+      {
+        "artifact_id": "NPS2010-025",
+        "confidence": {
+          "__fraction__": true,
+          "den": 1,
+          "num": 1
+        },
+        "description": "iWork Numbers spreadsheet. Cell and comment channels. iWork Numbers uses Apple XML schema for cell values and annotations.",
+        "evidence_type": "spreadsheet",
+        "source": "unzip+xml_parse",
+        "z_score": {
+          "__fraction__": true,
+          "den": 1,
+          "num": 0
+        }
+      }
+    ]
+  },
+  "sans_compliance": {
+    "accuracy_validation": false,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}

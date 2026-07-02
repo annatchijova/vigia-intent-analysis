@@ -1,0 +1,323 @@
+{
+  "agent_verdict": "MALICE",
+  "analysis_timestamp": "2026-07-02T14:50:10.825643+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "VIGIA-MAGNET-2022-WINDOWS",
+    "end_time": "2026-07-02T14:50:10.825647+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "VIGIA-MAGNET-2022-WINDOWS",
+        "entry_sha256": "325a748f467ed39178b71ed4b84f8a506618599091edd622bdb3621d9254ea3a",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "VIGIA-MAGNET-2022-WINDOWS"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: cf1b0ed196d5e39c...",
+        "outputs_summary": {
+          "agent_sha256": "cf1b0ed196d5e39c164122d40d9383c5c511ab4106c327bd204e9021613acbff",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-07-02T14:50:10.822401+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-MAGNET-2022-WINDOWS",
+        "entry_sha256": "5c88cb121b0c25b1065d0c3085a906f762b8b6e1766b0ae16d65b4af5c3868a3",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-MAGNET-2022-WINDOWS.json"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-07-02T14:50:10.822471+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-MAGNET-2022-WINDOWS",
+        "entry_sha256": "503cdf5e45de634baeaab705fb4a89f6e57a396bd11d3fae275118b8f19201ab",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-MAGNET-2022-WINDOWS.json"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: f979080da6ce579d...",
+        "outputs_summary": {
+          "sha256": "f979080da6ce579dd92f040f474b22400677f912c2c3a23c452ae9ddadade6b8"
+        },
+        "seq": 3,
+        "timestamp": "2026-07-02T14:50:10.822553+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "VIGIA-MAGNET-2022-WINDOWS",
+        "entry_sha256": "aedd427d853e45bedbc03f4351bfdac6d5c8b9af3c8e2aa1d5546fc6c86c848e",
+        "inputs_summary": {
+          "evidence": "/home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-MAGNET-2022-WINDOWS.json",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-07-02T14:50:10.822637+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "VIGIA-MAGNET-2022-WINDOWS",
+        "entry_sha256": "5591e5b0271ac81b544b19c8713ecbc29b6e48fd224480ed865132687c69538c",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 5 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+            "best_posterior": "329/2500",
+            "confidence": "329/2500",
+            "is_conclusive": "True",
+            "narrative": "Windows workstation compromised via ZeroTier encrypted overlay (C2). Attacker obtained SYSTEM-level shell and executed a structured persistence sequence: RDP enabled, backdoor admin account 'minecraft..."
+          },
+          "case_id": "VIGIA-MAGNET-2022-WINDOWS",
+          "pipeline_meta": {
+            "artifact_count": "5",
+            "avg_score": "329/500",
+            "expected_verdict": "MALICE",
+            "source": "ebs_v1_json_adapter"
+          },
+          "signals": [
+            {
+              "artifact_id": "EVTX-SEC-001",
+              "confidence": "19/20",
+              "description": "EventID 4720 @ 2022-02-12 01:29:43Z: New account 'minecraftsteve' (RID 1002) created. SubjectUserSid=S-1-5-18 (LOCAL SYSTEM). EventID 4722 @ 01:29:43Z: account enabled, SubjectUserSid=S-1-5-18. EventI",
+              "evidence_type": "windows_event_log",
+              "source": "python-evtx",
+              "z_score": "361/400"
+            },
+            {
+              "artifact_id": "EVTX-SYS-001",
+              "confidence": "17/20",
+              "description": "EventID 7040 @ 2022-02-12 01:01:32Z: TermService (Remote Desktop Services) start type changed from 'demand start' to 'auto start'. SYSTEM hive TermService key LastWrite corroborates timestamp 2022-02-",
+              "evidence_type": "windows_event_log",
+              "source": "python-evtx",
+              "z_score": "289/400"
+            },
+            {
+              "artifact_id": "REG-SYS-001",
+              "confidence": "4/5",
+              "description": "EventID 7045 @ 2022-02-06 07:15:35Z: New service 'ZeroTier One' installed. ImagePath=C:\\ProgramData\\ZeroTier\\One\\zerotier-one_x64.exe, StartType=auto start, ServiceAccount=LocalSystem. EventID 7045 @ ",
+              "evidence_type": "windows_event_log",
+              "source": "python-evtx + RegRipper",
+              "z_score": "16/25"
+            },
+            {
+              "artifact_id": "EVTX-SEC-002",
+              "confidence": "19/20",
+              "description": "EventID 4724 @ 2022-02-12 02:17:18Z: Password reset on built-in Administrator account (RID 500). SubjectUserSid=S-1-5-18 (LOCAL SYSTEM). Executed 47 minutes after 'minecraftsteve' was fully configured",
+              "evidence_type": "windows_event_log",
+              "source": "python-evtx",
+              "z_score": "361/400"
+            },
+            {
+              "artifact_id": "REG-SEC-001",
+              "confidence": "7/20",
+              "description": "SECURITY hive audit policy LastWrite 2022-02-04 (OS installation date). Process Creation auditing=N, Credential Validation auditing=N. Timestamp predates the intrusion window (2022-02-12) by 8 days. T",
+              "evidence_type": "registry_key",
+              "source": "RegRipper",
+              "z_score": "49/400"
+            }
+          ]
+        },
+        "seq": 5,
+        "timestamp": "2026-07-02T14:50:10.824997+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "VIGIA-MAGNET-2022-WINDOWS",
+        "entry_sha256": "7abed9645059b072bf3cf03c314603741d0d8452911f15c20a3f1094e5f7045d",
+        "inputs_summary": {
+          "n_signals": "5"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-07-02T14:50:10.825110+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "VIGIA-MAGNET-2022-WINDOWS",
+        "entry_sha256": "392b2361d45ff850d6ba4c6551607420ca7f60c3c5ec5aa9582b4a27d392b462",
+        "inputs_summary": {
+          "verdict": "MALICIOUS_INTENT_DETECTED"
+        },
+        "iteration": 0,
+        "note": "Exit code 1 (MALICE) \u2014 analysis complete.",
+        "outputs_summary": {
+          "agent_verdict": "MALICE",
+          "exit_code": "1"
+        },
+        "seq": 7,
+        "timestamp": "2026-07-02T14:50:10.825203+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-07-02T14:50:10.822221+00:00",
+    "total_entries": 7
+  },
+  "case_id": "VIGIA-MAGNET-2022-WINDOWS",
+  "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-MAGNET-2022-WINDOWS.json",
+  "evidence_sha256": "f979080da6ce579dd92f040f474b22400677f912c2c3a23c452ae9ddadade6b8",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-MAGNET-2022-WINDOWS ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-MAGNET-2022-WINDOWS.json\nEvidence SHA-256: f979080da6ce579dd92f040f474b22400677f912c2c3a23c452ae9ddadade6b8\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 329/2500\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\nWindows workstation compromised via ZeroTier encrypted overlay (C2). Attacker obtained SYSTEM-level shell and executed a structured persistence sequence: RDP enabled, backdoor admin account 'minecraftsteve' created under SubjectUserSid=S-1-5-18, built-in Administrator password reset. All privileged operations executed within a 75-minute window on 2022-02-12. Carnegie familiarity-transfer technique used for account naming. VIG\u00cdA must detect SYSTEM-as-creator anomaly as the decisive MALICE discrim\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [EventID 4720 @ 2022-02-12 01:29:43Z: New account 'minecraftsteve' (RID] z=0.902 conf=0.95 \u2014 \n  [EventID 4724 @ 2022-02-12 02:17:18Z: Password reset on built-in Admini] z=0.902 conf=0.95 \u2014 \n  [EventID 7040 @ 2022-02-12 01:01:32Z: TermService (Remote Desktop Servi] z=0.723 conf=0.85 \u2014 \n  [EventID 7045 @ 2022-02-06 07:15:35Z: New service 'ZeroTier One' instal] z=0.640 conf=0.80 \u2014 \n  [SECURITY hive audit policy LastWrite 2022-02-04 (OS installation date)] z=0.122 conf=0.35 \u2014 \n\n--- FINAL ALERT LEVEL ---\nHIGH \u2014 Conclusive MALICE verdict from Bayesian posterior aggregation. Individual z-scores below threshold (distributed evidence pattern: no single dominant signal, but aggregate posterior is decisive).\n\nCritical signals (z>3): 0\nHigh signals (2<z<=3): 0\nTotal signals analyzed: 5",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+      "best_posterior": "329/2500",
+      "confidence": {
+        "__fraction__": true,
+        "den": 2500,
+        "num": 329
+      },
+      "devil_advocate": {
+        "aggregation": {
+          "k": 3,
+          "method": "top_k_already_validated_matches_v2",
+          "total_gap_mass": "0"
+        },
+        "counterfactual_summary": {
+          "primary_alternative_hypothesis": null
+        },
+        "decision_context": {
+          "confidence": "329/2500",
+          "mapped_verdict": "MALICIOUS_INTENT_DETECTED",
+          "raw_verdict": "MALICIOUS_INTENT_DETECTED",
+          "score": "329/500"
+        },
+        "devil_advocate_source": "deterministic_no_pattern_data_available",
+        "meta": {
+          "deterministic": true,
+          "generated_from": "case_pattern_library"
+        },
+        "narrative": "Eco's Razor (Abductive Falsification) applied to verdict MALICIOUS_INTENT_DETECTED. Pattern-matching data was not available on this code path \u2014 CasePatternLibrary is not invoked here by design (agent audit-trail mode (vigia_agent.py \u2014 JSON-replay / autonomous path); see KNOWN_LIMITATIONS.md). No structured counter-hypothesis could be derived deterministically. This is a documented scope limitation of the current code path, not an absence of falsification attempt.",
+        "pattern_evidence_gaps": [],
+        "version": "r7-da-v1"
+      },
+      "is_conclusive": true,
+      "narrative": "Windows workstation compromised via ZeroTier encrypted overlay (C2). Attacker obtained SYSTEM-level shell and executed a structured persistence sequence: RDP enabled, backdoor admin account 'minecraftsteve' created under SubjectUserSid=S-1-5-18, built-in Administrator password reset. All privileged operations executed within a 75-minute window on 2022-02-12. Carnegie familiarity-transfer technique used for account naming. VIG\u00cdA must detect SYSTEM-as-creator anomaly as the decisive MALICE discrim"
+    },
+    "case_id": "VIGIA-MAGNET-2022-WINDOWS",
+    "pipeline_meta": {
+      "artifact_count": 5,
+      "avg_score": "329/500",
+      "expected_verdict": "MALICE",
+      "source": "ebs_v1_json_adapter"
+    },
+    "signals": [
+      {
+        "artifact_id": "EVTX-SEC-001",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 19
+        },
+        "description": "EventID 4720 @ 2022-02-12 01:29:43Z: New account 'minecraftsteve' (RID 1002) created. SubjectUserSid=S-1-5-18 (LOCAL SYSTEM). EventID 4722 @ 01:29:43Z: account enabled, SubjectUserSid=S-1-5-18. EventI",
+        "evidence_type": "windows_event_log",
+        "source": "python-evtx",
+        "z_score": {
+          "__fraction__": true,
+          "den": 400,
+          "num": 361
+        }
+      },
+      {
+        "artifact_id": "EVTX-SYS-001",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 17
+        },
+        "description": "EventID 7040 @ 2022-02-12 01:01:32Z: TermService (Remote Desktop Services) start type changed from 'demand start' to 'auto start'. SYSTEM hive TermService key LastWrite corroborates timestamp 2022-02-",
+        "evidence_type": "windows_event_log",
+        "source": "python-evtx",
+        "z_score": {
+          "__fraction__": true,
+          "den": 400,
+          "num": 289
+        }
+      },
+      {
+        "artifact_id": "REG-SYS-001",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 4
+        },
+        "description": "EventID 7045 @ 2022-02-06 07:15:35Z: New service 'ZeroTier One' installed. ImagePath=C:\\ProgramData\\ZeroTier\\One\\zerotier-one_x64.exe, StartType=auto start, ServiceAccount=LocalSystem. EventID 7045 @ ",
+        "evidence_type": "windows_event_log",
+        "source": "python-evtx + RegRipper",
+        "z_score": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 16
+        }
+      },
+      {
+        "artifact_id": "EVTX-SEC-002",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 19
+        },
+        "description": "EventID 4724 @ 2022-02-12 02:17:18Z: Password reset on built-in Administrator account (RID 500). SubjectUserSid=S-1-5-18 (LOCAL SYSTEM). Executed 47 minutes after 'minecraftsteve' was fully configured",
+        "evidence_type": "windows_event_log",
+        "source": "python-evtx",
+        "z_score": {
+          "__fraction__": true,
+          "den": 400,
+          "num": 361
+        }
+      },
+      {
+        "artifact_id": "REG-SEC-001",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 7
+        },
+        "description": "SECURITY hive audit policy LastWrite 2022-02-04 (OS installation date). Process Creation auditing=N, Credential Validation auditing=N. Timestamp predates the intrusion window (2022-02-12) by 8 days. T",
+        "evidence_type": "registry_key",
+        "source": "RegRipper",
+        "z_score": {
+          "__fraction__": true,
+          "den": 400,
+          "num": 49
+        }
+      }
+    ]
+  },
+  "sans_compliance": {
+    "accuracy_validation": false,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}
