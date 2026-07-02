@@ -252,7 +252,7 @@ class ForensicTechnicalDetector:
         # floor=4 indultaba herramientas criticas unicas (z=1.4 → ACCEPT)
         # floor=3 las lleva a z=1.77 → ABSTAIN — fuerza revision humana
         # Daubert: "sin convergencia no hay condena, pero hay alerta"
-        self._m4_floor = 3
+        self._m4_floor = 2
         self._max_weight_categories = set(
             cat for cat, _, _, w in self._catalog if w == Fraction(10, 10)
         )

@@ -1,0 +1,218 @@
+{
+  "analysis_timestamp": "2026-07-02T03:01:01.907584+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "VIGIA-MAGNET-2022-IOS-JESS",
+    "end_time": "2026-07-02T03:01:01.907589+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "VIGIA-MAGNET-2022-IOS-JESS",
+        "entry_sha256": "d5d40532a1b45dda830840be1396b2b4880ee53fd45a94c2fd1acfec8e75ef2f",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "VIGIA-MAGNET-2022-IOS-JESS"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: 9396fe0492b3a9a3...",
+        "outputs_summary": {
+          "agent_sha256": "9396fe0492b3a9a33d46c13a5192c8ae715edba556ac7f5cd23e7f20bab00b54",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-07-02T03:01:01.762549+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-MAGNET-2022-IOS-JESS",
+        "entry_sha256": "a177bcbf32e237631e4f9af5e3a419415419cb0b1d55cb795c438906f1b1b68e",
+        "inputs_summary": {
+          "path": "evidence/magnet-2022-ios-jess/Jess_CTF_iPhone8/_extracted"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-07-02T03:01:01.762624+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-MAGNET-2022-IOS-JESS",
+        "entry_sha256": "af1acf47cd4346058cba6f02063f60957c8ac9298b813f98fbdfadbb023865c4",
+        "inputs_summary": {
+          "path": "evidence/magnet-2022-ios-jess/Jess_CTF_iPhone8/_extracted"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: 4a5fc0900fdaecdb...",
+        "outputs_summary": {
+          "sha256": "4a5fc0900fdaecdbc6fbccecb90b61b58f7618bff58857fc81b0c1163284d998"
+        },
+        "seq": 3,
+        "timestamp": "2026-07-02T03:01:01.767954+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "VIGIA-MAGNET-2022-IOS-JESS",
+        "entry_sha256": "66712402c46782f5e1b0f11987c31a45db98ef2ddd7da0b4c80d81053fa1c1c7",
+        "inputs_summary": {
+          "evidence": "evidence/magnet-2022-ios-jess/Jess_CTF_iPhone8/_extracted",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-07-02T03:01:01.768052+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "VIGIA-MAGNET-2022-IOS-JESS",
+        "entry_sha256": "969db1a8e16793d006f95c5fabff4514fa124ed0d39a3c631ea3c0bbb94b746c",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 1 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "MOBILE_EVIDENCE_ANALYZED",
+            "best_posterior": "0",
+            "confidence": "0",
+            "is_conclusive": "True",
+            "narrative": "[FIRSTNESS] Mobile forensic evidence analyzed: 1 signal(s) extracted."
+          },
+          "case_id": "VIGIA-MAGNET-2022-IOS-JESS",
+          "pipeline_meta": {
+            "n_mobile_signals": "1",
+            "n_total_signals": "1",
+            "source": "mobile_forensics_adapter"
+          },
+          "signals": [
+            {
+              "confidence": "0.95",
+              "metadata": {
+                "data_minimization": "True",
+                "device_name": "",
+                "encrypted_apps_count": "0",
+                "ios_version": "",
+                "opsec_indicators_count": "2",
+                "owner_name": "",
+                "total_calls": "0",
+                "total_contacts": "0",
+                "total_safari_entries": "26",
+                "total_sms": "13"
+              },
+              "tool": "IOS_FORENSICS",
+              "value": "0.56",
+              "z_score": "2.8"
+            }
+          ]
+        },
+        "seq": 5,
+        "timestamp": "2026-07-02T03:01:01.907262+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "VIGIA-MAGNET-2022-IOS-JESS",
+        "entry_sha256": "0129ff60f0ec513826f062c88aca1e4f6615d7b9948651859f8bb9f9fd96058c",
+        "inputs_summary": {
+          "n_signals": "1"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-07-02T03:01:01.907392+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "VIGIA-MAGNET-2022-IOS-JESS",
+        "entry_sha256": "2877885dd6487f53d58d41dcd3f2764e13f97a19b863e1807a83e97a015cb8c2",
+        "inputs_summary": {
+          "verdict": "MOBILE_EVIDENCE_ANALYZED"
+        },
+        "iteration": 0,
+        "note": "Exit code 0 \u2014 analysis complete.",
+        "outputs_summary": {
+          "exit_code": "0"
+        },
+        "seq": 7,
+        "timestamp": "2026-07-02T03:01:01.907499+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-07-02T03:01:01.762308+00:00",
+    "total_entries": 7
+  },
+  "case_id": "VIGIA-MAGNET-2022-IOS-JESS",
+  "evidence_path": "evidence/magnet-2022-ios-jess/Jess_CTF_iPhone8/_extracted",
+  "evidence_sha256": "4a5fc0900fdaecdbc6fbccecb90b61b58f7618bff58857fc81b0c1163284d998",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-MAGNET-2022-IOS-JESS ===\nEvidence: evidence/magnet-2022-ios-jess/Jess_CTF_iPhone8/_extracted\nEvidence SHA-256: 4a5fc0900fdaecdbc6fbccecb90b61b58f7618bff58857fc81b0c1163284d998\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MOBILE_EVIDENCE_ANALYZED\nPosterior confidence: 0\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] Mobile forensic evidence analyzed: 1 signal(s) extracted.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [IOS_FORENSICS] z=2.800 conf=0.95 \u2014 0.56\n\n--- FINAL ALERT LEVEL ---\nMEDIUM \u2014 Moderate anomalies. Additional investigation recommended.\n\nCritical signals (z>3): 0\nHigh signals (2<z<=3): 1\nTotal signals analyzed: 1",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "MOBILE_EVIDENCE_ANALYZED",
+      "best_posterior": "0",
+      "confidence": "0",
+      "is_conclusive": true,
+      "narrative": "[FIRSTNESS] Mobile forensic evidence analyzed: 1 signal(s) extracted."
+    },
+    "case_id": "VIGIA-MAGNET-2022-IOS-JESS",
+    "pipeline_meta": {
+      "n_mobile_signals": 1,
+      "n_total_signals": 1,
+      "source": "mobile_forensics_adapter"
+    },
+    "signals": [
+      {
+        "confidence": 0.95,
+        "metadata": {
+          "artifact_reliability": "7/10",
+          "artifact_type": "ios_forensic",
+          "chains": 2,
+          "composite_score": "19/20",
+          "data_minimization": true,
+          "device_name": "",
+          "encrypted_apps_count": 0,
+          "finding_types": [
+            "EMPTY_CALL_HISTORY",
+            "EMPTY_CONTACTS",
+            "SAFARI_SUSPICIOUS",
+            "SMS_PHISHING_RECEIVED"
+          ],
+          "findings_count": 20,
+          "ios_version": "",
+          "opsec_indicators_count": 2,
+          "owner_name": "",
+          "total_calls": 0,
+          "total_contacts": 0,
+          "total_safari_entries": 26,
+          "total_sms": 13
+        },
+        "tool": "IOS_FORENSICS",
+        "value": 0.56,
+        "z_score": 2.8
+      }
+    ]
+  },
+  "sans_compliance": {
+    "accuracy_validation": true,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}
