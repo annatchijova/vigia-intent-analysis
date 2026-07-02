@@ -2447,38 +2447,64 @@ aceptar ambos formatos.
 
 ---
 
-## B-048 — MacOSForensicsAnalyzer nunca invocado [PENDING]
+## B-048 — MacOSForensicsAnalyzer nunca invocado [FIXED]
 
 | Campo | Valor |
 |-------|-------|
-| **Estado** | PENDIENTE — confirmado 2026-07-01 |
-| **Severidad** | ALTA — mismo patrón que B-045/B-046 |
-| **Archivos a modificar** | `vigia_agent.py`, `sift_orchestrator.py` (shim) |
+| **Estado** | FIXED — 2026-07-01 |
+| **Severidad** | ALTA — evidencia macOS producía 0 signals, UNDETERMINED con exit 0 |
+| **Archivos modificados** | `vigia_agent.py`, `sift_orchestrator.py` (shim) |
 | **Archivo afectado** | `vigia/sift/macos_forensics.py` |
 | **Tag de restauración** | `pre-b048-macos-wiring-20260701` |
+| **Commit fix** | `<hash>` |
 
 ### Descripción
 
-`MacOSForensicsAnalyzer` está completamente implementado (analyze(), to_signal(),
-_MACOS_MARKER_FILES, Safari/Quarantine/plist/LaunchAgents) pero ningún componente
-del pipeline lo invoca. Confirmado por triple grep (2026-07-01):
-- `vigia_agent.py`: 0 referencias a _MACOS_MARKER_FILES / macos_evidence_path / MacOSForensics
-- `sift_orchestrator.py` (shim): 0 referencias case-insensitive a "macos"
-- Imports en producción: 0 (único consumidor: el test de B-047)
+`MacOSForensicsAnalyzer` estaba completamente implementado pero ningún
+componente del pipeline lo invocaba. Confirmado por triple grep (0
+referencias en el agente, 0 en el shim, 0 imports en producción). Mismo
+patrón que B-045 (Android/iOS) y B-046 (Takeout).
 
-Mismo patrón que B-045 (Android/iOS) y B-046 (Takeout): módulo implementado,
-nunca cableado. Consecuencia esperada, idéntica a esos dos casos y pendiente
-de smoke test: evidencia macOS produciría 0 signals y UNDETERMINED con exit 0.
+### Fix — patrón B-045/B-046 más dos guards anti doble conteo
 
-### Fix (mismo patrón que B-045/B-046)
+Colisión detectada durante el diseño: `History.db` vive en
+`_IOS_MARKER_FILES` y en `_MACOS_MARKER_FILES`, y toda evidencia macOS real
+tiene un Safari History.db — el calco puro habría corrido ambos engines
+sobre el mismo directorio y contado dos veces los mismos artefactos Safari.
 
-1. `vigia_agent.py` → `_build_orchestrator_kwargs()`: detectar
-   `_MACOS_MARKER_FILES` (importado del módulo, no duplicado) y pasar
-   `macos_evidence_path` en kwargs.
-2. `sift_orchestrator.py` (shim) → `_analyze_mobile()`: bloque que instancia
-   `MacOSForensicsAnalyzer`, ejecuta `.analyze()` y convierte via `.to_signal()`.
-   Guard condition a adaptar: macOS no tiene `total_sms` (mismo ajuste que
-   requirió B-046 para Takeout).
+1. `vigia_agent.py` → `_build_orchestrator_kwargs()`: detección con
+   `_MACOS_MARKER_FILES - _IOS_MARKER_FILES` (computado desde los imports,
+   sin duplicar datos). Evidencia iOS pura no dispara el detector macOS.
+2. `sift_orchestrator.py` (shim): guard de precedencia — si
+   `ios_evidence_path == macos_evidence_path`, corre solo el engine macOS
+   con warning en el log.
+3. `sift_orchestrator.py` (shim) → `_analyze_mobile()`: bloque
+   `MacOSForensicsAnalyzer` tras el de Takeout (guard sin `total_sms`,
+   mismo ajuste que requirió B-046).
+
+El gate solo-móvil (`has_windows_evidence`, línea ~83) no requirió cambios:
+decide por presencia de señales móviles, no por keys de plataforma.
+
+### Riesgo residual documentado
+
+Una extracción iOS full-filesystem que incluya `TCC.db` (iOS también lo
+tiene y no está en `_IOS_MARKER_FILES`) dispararía el detector macOS; la
+precedencia haría correr solo el engine macOS sobre evidencia iOS →
+atribución de plataforma equivocada y pérdida de los findings
+iOS-específicos (SMS, contacts, calls). Probabilidad baja con el corpus
+actual (sin evidencia iOS descargada). Mitigación futura: precedencia por
+score de markers fuertes por plataforma, o ejecución de ambos engines con
+deduplicación de artefactos compartidos.
+
+### Validación
+
+Smoke end-to-end (`smoke_b048.py`, fixture sintético con schemas SQLite
+reales): señal MACOS_FORENSICS presente con z=1.6 — exactamente el valor
+del escalation ladder para `has_suspicious_search` (`Fraction(16,10)`),
+determinismo confirmado; señal IOS_FORENSICS ausente pese a History.db en
+el fixture (precedencia verificada); path correlacionado de B-047
+ejercitado en producción (2 findings, mismo corr_group). Suite completa:
+205 passed, 6 xfailed, 0 regresiones.
 
 ---
 

@@ -2658,38 +2658,63 @@ to accept both formats.
 
 ---
 
-## B-048 — MacOSForensicsAnalyzer never invoked [PENDING]
+## B-048 — MacOSForensicsAnalyzer never invoked [FIXED]
 
 | Field | Value |
 |-------|-------|
-| **Status** | PENDING — confirmed 2026-07-01 |
-| **Severity** | HIGH — same pattern as B-045/B-046 |
-| **Files to modify** | `vigia_agent.py`, `sift_orchestrator.py` (shim) |
+| **Status** | FIXED — 2026-07-01 |
+| **Severity** | HIGH — macOS evidence produced 0 signals, UNDETERMINED with exit 0 |
+| **Files modified** | `vigia_agent.py`, `sift_orchestrator.py` (shim) |
 | **Affected file** | `vigia/sift/macos_forensics.py` |
 | **Restore tag** | `pre-b048-macos-wiring-20260701` |
+| **Fix commit** | `<hash>` |
 
 ### Description
 
-`MacOSForensicsAnalyzer` is fully implemented (analyze(), to_signal(),
-_MACOS_MARKER_FILES, Safari/Quarantine/plist/LaunchAgents) but no pipeline
-component invokes it. Confirmed by triple grep (2026-07-01):
-- `vigia_agent.py`: 0 references to _MACOS_MARKER_FILES / macos_evidence_path / MacOSForensics
-- `sift_orchestrator.py` (shim): 0 case-insensitive references to "macos"
-- Production imports: 0 (sole consumer: the B-047 test)
+`MacOSForensicsAnalyzer` was fully implemented but no pipeline component
+invoked it. Confirmed by triple grep (0 references in the agent, 0 in the
+shim, 0 production imports). Same pattern as B-045 (Android/iOS) and
+B-046 (Takeout).
 
-Same pattern as B-045 (Android/iOS) and B-046 (Takeout): module implemented,
-never wired. Expected consequence, identical to those two cases and pending
-smoke test: macOS evidence would produce 0 signals and UNDETERMINED with exit 0.
+### Fix — B-045/B-046 pattern plus two anti-double-counting guards
 
-### Fix (same pattern as B-045/B-046)
+Collision detected during design: `History.db` lives in both
+`_IOS_MARKER_FILES` and `_MACOS_MARKER_FILES`, and all real macOS evidence
+has a Safari History.db — a straight copy would have run both engines on
+the same directory and counted the same Safari artifacts twice.
 
-1. `vigia_agent.py` → `_build_orchestrator_kwargs()`: detect
-   `_MACOS_MARKER_FILES` (imported from the module, not duplicated) and pass
-   `macos_evidence_path` in kwargs.
-2. `sift_orchestrator.py` (shim) → `_analyze_mobile()`: block that instantiates
-   `MacOSForensicsAnalyzer`, runs `.analyze()` and converts via `.to_signal()`.
-   Guard condition to adapt: macOS has no `total_sms` (same adjustment required
-   by B-046 for Takeout).
+1. `vigia_agent.py` → `_build_orchestrator_kwargs()`: detection using
+   `_MACOS_MARKER_FILES - _IOS_MARKER_FILES` (computed from imports, no
+   data duplication). Pure iOS evidence does not trigger the macOS detector.
+2. `sift_orchestrator.py` (shim): precedence guard — if
+   `ios_evidence_path == macos_evidence_path`, run only the macOS engine
+   with a warning logged.
+3. `sift_orchestrator.py` (shim) → `_analyze_mobile()`: `MacOSForensicsAnalyzer`
+   block after the Takeout block (guard without `total_sms`, same adjustment
+   required by B-046).
+
+The mobile-only gate (`has_windows_evidence`, line ~83) required no changes:
+it gates on presence of mobile signals, not on platform keys.
+
+### Documented residual risk
+
+An iOS full-filesystem extraction that includes `TCC.db` (iOS also has it
+and it is not in `_IOS_MARKER_FILES`) would trigger the macOS detector; the
+precedence guard would run only the macOS engine on iOS evidence →
+wrong platform attribution and loss of iOS-specific findings (SMS, contacts,
+calls). Low probability with the current corpus (no iOS evidence downloaded).
+Future mitigation: precedence by strong-marker score per platform, or run
+both engines with shared-artifact deduplication.
+
+### Validation
+
+End-to-end smoke test (`smoke_b048.py`, synthetic fixture with real SQLite
+schemas): MACOS_FORENSICS signal present at z=1.6 — exactly the escalation
+ladder value for `has_suspicious_search` (`Fraction(16,10)`), determinism
+confirmed; IOS_FORENSICS signal absent despite History.db in the fixture
+(precedence verified); B-047 correlated path exercised in production
+(2 findings, same corr_group). Full suite: 205 passed, 6 xfailed, 0
+regressions.
 
 ---
 
