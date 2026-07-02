@@ -50,10 +50,16 @@ class PathGuard:
             Path.home() / "vigia-repo" / "evidence",
         ]
 
-    def validate(self, path_str: str, for_read: bool = True) -> PathValidationResult:
+    def validate(self, path_str: str, for_read: bool = True,
+                 allow_dir: bool = False) -> PathValidationResult:
         """
         Valida un path con protección TOCTOU.
         NO sigue symlinks. Usa lstat() para detectarlos.
+
+        allow_dir=True permite validar un DIRECTORIO (para motores que operan
+        sobre directorios: perfiles de navegador, carpetas de prefetch). Las
+        demás protecciones (symlink, allowlist, TOCTOU) se mantienen — solo se
+        relaja el requisito de "archivo regular".
         """
         try:
             p = Path(path_str)
@@ -110,7 +116,15 @@ class PathGuard:
             size = st.st_size
             mtime = st.st_mtime
             # FIX P2 (V14): Verificar que es archivo regular (no FIFO, device, etc.)
-            if not stat.S_ISREG(st.st_mode):
+            # allow_dir permite directorios (motores que operan sobre carpetas);
+            # se sigue rechazando FIFO/device/socket.
+            if allow_dir:
+                if not (stat.S_ISREG(st.st_mode) or stat.S_ISDIR(st.st_mode)):
+                    return PathValidationResult(
+                        valid=False, reason="NOT_A_REGULAR_FILE_OR_DIR",
+                        inode=inode, size=size, mtime=mtime, hash_prefix="",
+                    )
+            elif not stat.S_ISREG(st.st_mode):
                 return PathValidationResult(
                     valid=False, reason="NOT_A_REGULAR_FILE",
                     inode=inode, size=size, mtime=mtime, hash_prefix="",

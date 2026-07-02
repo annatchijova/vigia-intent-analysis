@@ -68,7 +68,10 @@ class USBAnalysisResult:
                 "exfil_candidates": len(self.exfiltration_candidates),
                 "artifact_type": "usb",
                 "artifact_reliability": str(ARTIFACT_RELIABILITY),
+                # Motor no implementado (parseo de USBSTOR no realizado).
+                # unanalyzed=True: 0 hallazgos = "no analizado", no "limpio".
                 "stub": True,
+                "unanalyzed": True,
                 "finding_types": sorted(list(set(
                     s.get("type", "UNKNOWN") for s in self.suspicious_devices
                 ) | set(

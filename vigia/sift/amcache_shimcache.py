@@ -81,7 +81,12 @@ class AmcacheAnalysisResult:
                 "suspicious_first_run_count": len(self.suspicious_first_runs),
                 "artifact_type": "amcache",
                 "artifact_reliability": str(ARTIFACT_RELIABILITY),
+                # Motor no implementado: NO se parsea Amcache.hve/AppCompatCache.
+                # unanalyzed=True marca honestamente que 0 hallazgos significa
+                # "no analizado", NO "analizado y limpio" — evita el falso
+                # negativo de presentar un stub como evidencia benigna.
                 "stub": True,
+                "unanalyzed": True,
                 "finding_types": sorted(list(set(
                     b.get("type", "UNKNOWN") for b in self.blacklisted_executions
                 ) | set(

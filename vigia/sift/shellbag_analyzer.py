@@ -67,7 +67,10 @@ class ShellbagAnalysisResult:
                 "deleted_visible_count": len(self.deleted_folders_still_visible),
                 "artifact_type": "shellbag",
                 "artifact_reliability": str(ARTIFACT_RELIABILITY),
+                # Motor no implementado (parseo de shellbags no realizado).
+                # unanalyzed=True: 0 hallazgos = "no analizado", no "limpio".
                 "stub": True,
+                "unanalyzed": True,
                 "finding_types": sorted(list(set(
                     s.get("type", "UNKNOWN") for s in self.sensitive_access
                 ) | set(

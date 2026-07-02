@@ -1160,6 +1160,18 @@ def _build_orchestrator_kwargs(evidence_path: Path, params: Dict) -> Dict:
 
         # B-045: detect Android/iOS evidence directories by marker files
         all_names = {f.name for f in evidence_path.rglob("*") if f.is_file() and not f.is_symlink()}
+
+        # P1-A: detectar perfil de navegador (Chromium History / Firefox
+        # places.sqlite) por archivos marcador. El parser SQLite real
+        # (browser_forensics) analiza descargas e historial. Se pasa el
+        # directorio que contiene la base como browser_profile.
+        for marker in ("History", "places.sqlite"):
+            for f in evidence_path.rglob(marker):
+                if f.is_file() and not f.is_symlink():
+                    kwargs["browser_profile"] = str(f.parent)
+                    break
+            if kwargs.get("browser_profile"):
+                break
         try:
             from vigia.sift.android_forensics import _ANDROID_MARKER_FILES
             if all_names & _ANDROID_MARKER_FILES:
