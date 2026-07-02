@@ -135,7 +135,7 @@ class SIFTOrchestrator:
         has_windows_evidence = any(kwargs.get(k) for k in (
             "memory_path", "disk_path", "event_logs", "event_stream",
             "registry_hives", "pcap_path", "network_flows", "log_path",
-            "browser_profile", "prefetch_dir",
+            "browser_profile", "prefetch_dir", "mft_path", "mft_json",
         ))
         if not has_windows_evidence and mobile_signals:
             result = {
@@ -205,6 +205,20 @@ class SIFTOrchestrator:
             pd = kwargs.get("prefetch_dir")
             if pd:
                 run_kwargs["prefetch_dir"] = pd[0] if isinstance(pd, list) else pd
+            # $MFT (P0-C): parsear el binario a JSON para el analyzer. Antes
+            # MFT/disco quedaba ciego en modo agente — falso negativo.
+            mp = kwargs.get("mft_path")
+            if isinstance(mp, list):
+                mp = mp[0] if mp else None
+            if mp:
+                try:
+                    from vigia.sift.mft_parser import parse_mft_file
+                    run_kwargs["mft_json"] = parse_mft_file(str(mp))
+                    logger.info("[SIFT_SHIM] Parsed $MFT: %s", mp)
+                except Exception as e:
+                    logger.error("[SIFT_SHIM] MFT parsing failed for %s: %s", mp, e)
+            elif kwargs.get("mft_json"):
+                run_kwargs["mft_json"] = kwargs["mft_json"]
 
             # disk_path (E01) has no direct mapping — requires prior mounting
             # and artifact extraction (ewfmount + registry hive extraction)

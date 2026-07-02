@@ -1180,6 +1180,17 @@ def _build_orchestrator_kwargs(evidence_path: Path, params: Dict) -> Dict:
             if f.is_file() and not f.is_symlink():
                 kwargs["prefetch_dir"] = str(f.parent)
                 break
+
+        # P0-C: detectar un $MFT extraído (nombre literal '$MFT' o *.mft). El
+        # parser binario (mft_parser) lo convierte a JSON para el analyzer —
+        # antes MFT/disco quedaba ciego en modo agente (falso negativo).
+        for pat in ("$MFT", "*.mft", "*.MFT"):
+            for f in evidence_path.rglob(pat):
+                if f.is_file() and not f.is_symlink():
+                    kwargs["mft_path"] = str(f)
+                    break
+            if kwargs.get("mft_path"):
+                break
         try:
             from vigia.sift.android_forensics import _ANDROID_MARKER_FILES
             if all_names & _ANDROID_MARKER_FILES:
