@@ -2444,3 +2444,63 @@ entre findings, la llamada fallará con TypeError.
 Alinear el tipo de retorno de `_build_correlation_groups()` en los tres módulos con
 la firma esperada por `noisy_or_correlated()`, o adaptar `noisy_or_correlated()` para
 aceptar ambos formatos.
+
+---
+
+## B-048 — MacOSForensicsAnalyzer nunca invocado [PENDING]
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | PENDIENTE — confirmado 2026-07-01 |
+| **Severidad** | ALTA — mismo patrón que B-045/B-046 |
+| **Archivos a modificar** | `vigia_agent.py`, `sift_orchestrator.py` (shim) |
+| **Archivo afectado** | `vigia/sift/macos_forensics.py` |
+| **Tag de restauración** | `pre-b048-macos-wiring-20260701` |
+
+### Descripción
+
+`MacOSForensicsAnalyzer` está completamente implementado (analyze(), to_signal(),
+_MACOS_MARKER_FILES, Safari/Quarantine/plist/LaunchAgents) pero ningún componente
+del pipeline lo invoca. Confirmado por triple grep (2026-07-01):
+- `vigia_agent.py`: 0 referencias a _MACOS_MARKER_FILES / macos_evidence_path / MacOSForensics
+- `sift_orchestrator.py` (shim): 0 referencias case-insensitive a "macos"
+- Imports en producción: 0 (único consumidor: el test de B-047)
+
+Mismo patrón que B-045 (Android/iOS) y B-046 (Takeout): módulo implementado,
+nunca cableado. Consecuencia esperada, idéntica a esos dos casos y pendiente
+de smoke test: evidencia macOS produciría 0 signals y UNDETERMINED con exit 0.
+
+### Fix (mismo patrón que B-045/B-046)
+
+1. `vigia_agent.py` → `_build_orchestrator_kwargs()`: detectar
+   `_MACOS_MARKER_FILES` (importado del módulo, no duplicado) y pasar
+   `macos_evidence_path` en kwargs.
+2. `sift_orchestrator.py` (shim) → `_analyze_mobile()`: bloque que instancia
+   `MacOSForensicsAnalyzer`, ejecuta `.analyze()` y convierte via `.to_signal()`.
+   Guard condition a adaptar: macOS no tiene `total_sms` (mismo ajuste que
+   requirió B-046 para Takeout).
+
+---
+
+## B-049 — surgical_patch.py v1: falso positivo de verificación con parches aditivos [RESUELTO]
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | RESUELTO — engine v2 (ENG-001), mismo commit que B-048 |
+| **Severidad** | MEDIA — deshacía parches correctos; el restore fail-safe evitó daño al repo |
+| **Archivo** | `scripts/surgical_patch.py` |
+| **Detectado en** | 2026-07-01, aplicando B-048 sobre vigia_agent.py |
+
+### Descripción
+
+La verificación post-escritura chequeaba `anchor in written` y revertía si el
+anchor seguía presente. En parches ADITIVOS (replacement = anchor + bloque
+nuevo) el anchor debe seguir presente por diseño — la v1 los revertía como
+fallos. B-047 no lo disparó porque todos sus parches eran sustitutivos.
+
+### Fix (ENG-001, v2)
+
+Verificación por presencia del replacement; exigencia de anchor ausente solo
+para parches sustitutivos. Además: detección de idempotencia ([SKIP] si el
+replacement ya está presente), que permite re-ejecutar scripts de parches
+tras fallos parciales. Changelog completo en el docstring del engine.
