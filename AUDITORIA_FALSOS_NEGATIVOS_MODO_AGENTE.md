@@ -22,13 +22,30 @@ posible. Cada hallazgo cita `archivo:línea`. Los reproducidos se marcan
 | **P1-C** filtro de IP por substring | ✅ CORREGIDO | `_is_external_ip()` usa `ipaddress.is_global`; ya no descarta C2 externos con subcadena de red privada, ni todo IPv6. |
 | **P1-D** dependencia ausente → benigno | ✅ CORREGIDO (memoria) | Adaptador vol3: si ningún plugin corre → `UNANALYZED_ARTIFACT` (→ABSTAIN). Resto de dependencias ausentes → 0 señales → UNDETERMINED → ABSTAIN vía P0-A. |
 | **P1-E** `.log` muere por sufijo | ✅ CORREGIDO | `event_log_correlator` intenta `.log/.txt`, marca `UNANALYZED_ARTIFACT` en `analysis_notes` para formatos no soportados y `.evtx` sin librería `Evtx`. |
-| **P0-C** shim descarta MFT/prefetch/etc. | ⏳ PENDIENTE | Requiere extractores nuevos (medio plazo). Mitigado: ahora produce ABSTAIN, no benigno. |
-| **P1-A** 4 motores stub | ⏳ PENDIENTE | Implementar o marcar `UNANALYZED` ruidoso (medio plazo). |
+| **P1-A** browser_forensics stub | ✅ CORREGIDO | Parser SQLite real (Chromium `History` + Firefox `places.sqlite`), read-only inmutable, basename Windows/POSIX, cableado en el agente por marcador. DB ilegible → `unanalyzed` (→ABSTAIN). |
+| **P1-A** amcache/shellbag/usb stub | ✅ HONESTO | Emiten `unanalyzed=True` (0 hallazgos = "no analizado", no "limpio"). Implementación real diferida (requiere `regipy` + hives de test). |
+| **P1-D** orquestador frágil | ✅ CORREGIDO | Construcción resiliente (`_safe_engine`): una dependencia ausente (`vol`/`rip.pl`) deshabilita solo su motor, no tumba el pipeline. Motores core guardados con `if self.X`. |
+| **P0-C** PathGuard rechaza directorios | ✅ CORREGIDO | `validate(..., allow_dir=True)` para motores sobre directorios (browser/prefetch); antes `NOT_A_REGULAR_FILE` los mataba. |
+| **P1-B** prefetch parser roto | ✅ CORREGIDO | Acepta SCCA clásico + MAM comprimido (antes solo MAM y en offset equivocado → todo .pf clásico descartado). Extracción correcta del nombre del ejecutable (`NAME.EXE-HASH8` → `NAME.EXE`, antes `replace("-","")` nunca matcheaba). Cableado en el agente. .pf ilegibles → contados; todos ilegibles → `unanalyzed`. |
+| **P0-C** shim descarta MFT/disco | ✅ CORREGIDO (MFT) | Parser `$MFT` binario stdlib (`vigia/sift/mft_parser.py`): extrae timestamps MACE de $SI/$FN, nombre, ADS, hardlinks, tamaño. Cableado en el agente (detecta `$MFT`/`*.mft`); el shim lo parsea a JSON y alimenta el analyzer. Timestomping detectado end-to-end (z=2.8). Destapó y arregló un bug latente: `ChainOfCustody.acquire()` no aceptaba `notes` → el motor de disco fallaba (nunca corría en agente). |
+| **P0-C** shim descarta prefetch/browser | ✅ CORREGIDO | Browser y prefetch cableados (tandas anteriores). |
+| **P0-C** hives de registro (amcache/shellbag/usb) | ⏳ PENDIENTE | Requiere `regipy` + hives de test reales. Stubs honestos (ABSTAIN) mientras tanto. |
+| **P2-C** fuga de `expected_verdict` | ⏳ NO SE TOCA | Se intentó eliminar (adaptador EBS-JSON + `normalize_case_schema`) pero el corpus regresó de 198/198 a 60/198: `expected_verdict` es load-bearing para el pipeline de batch actual (deriva la hipótesis del adaptador y calibra la atenuación benigna en `normalize_case_schema`). Se **retiene deliberadamente**. Rediseño pendiente: separar la etiqueta de evaluación del camino de scoring sin regresar el corpus (requiere recalibrar el scorer sobre evidencia real, no la etiqueta). Ver L-018/L-033. |
 | **P2-A** cadena de atenuación gamma/FRS | ⏳ DIFERIDO | L-033: no tocar `gamma` sin ≥20 señales reales con ground truth. |
-| **P2-C** fuga de `expected_verdict` | ⏳ PENDIENTE | Higiene de evaluación; no cambia FN en producción. |
 
-Regresión: `tests/test_false_negative_regression.py` (37 tests). Suite completa
-269 passed, 6 xfailed. **Cero regresiones.**
+Regresión (rama de salvataje): `test_false_negative_regression.py` (44) +
+`test_browser_forensics_real.py` (15) + `test_prefetch_real.py` (13) +
+`test_mft_parser_real.py` (13) = **85 passed**. Corpus de batch
+`run_all_agent.py`: **198/198 PASS**. Los 3 tests que fijaban la eliminación
+de la fuga `expected_verdict` (`TestExpectedVerdictLeakRemoved`) se retiraron
+junto con la fuga — ver fila P2-C.
+
+**Nota sobre corroboración:** un caso de fuente única (p.ej. solo un perfil de
+navegador con mimikatz + navegación C2) ahora produce **ABSTAIN**, no MALICE ni
+benigno. Es el comportamiento conservador correcto: el gate de corroboración
+Daubert (≥2 fuentes) de VIGÍA no permite MALICE mono-fuente. La diferencia
+clave vs. el bug original: antes decía "NO EVIL" (exit 0), ahora abstiene
+(exit 4) y marca el caso para revisión humana.
 
 > **Conclusión de una línea:** en modo Claude Code el LLM lee cada artefacto
 > directamente por herramientas MCP (`read_evidence`, `search_pattern`, …), evitando

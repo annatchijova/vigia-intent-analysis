@@ -62,17 +62,27 @@ class ChainOfCustody:
         data: bytes,
         actor: str = "vigia_system",
         timestamp: str = "",
+        notes: str = "",
     ) -> None:
         """Compatibility shim: records raw-data acquisition into custody chain.
-        Called by SIFT modules as chain.acquire(bytes, actor, timestamp).
+        Called by SIFT modules as chain.acquire(bytes, actor, timestamp[, notes]).
+
+        `notes` es opcional: disk_forensics (y otros motores) lo pasan para
+        anotar la adquisición. Antes acquire() no lo aceptaba y el motor de
+        disco fallaba con TypeError — bug latente que solo se disparaba cuando
+        el MFT llegaba realmente al motor (nunca ocurría en modo agente hasta
+        que se cableó el parser de $MFT).
         """
         import hashlib
         artifact_hash = hashlib.sha256(data).hexdigest()
+        meta = {"data_size": len(data), "timestamp_utc": timestamp}
+        if notes:
+            meta["notes"] = notes
         self.add_record(
             operation="ACQUIRE",
             actor=actor,
             artifact_hash=artifact_hash,
-            metadata={"data_size": len(data), "timestamp_utc": timestamp},
+            metadata=meta,
         )
 
     def hash_file(self, path: str) -> str:
