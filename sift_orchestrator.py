@@ -135,7 +135,7 @@ class SIFTOrchestrator:
         has_windows_evidence = any(kwargs.get(k) for k in (
             "memory_path", "disk_path", "event_logs", "event_stream",
             "registry_hives", "pcap_path", "network_flows", "log_path",
-            "browser_profile",
+            "browser_profile", "prefetch_dir",
         ))
         if not has_windows_evidence and mobile_signals:
             result = {
@@ -201,6 +201,10 @@ class SIFTOrchestrator:
             bp = kwargs.get("browser_profile")
             if bp:
                 run_kwargs["browser_profile"] = bp[0] if isinstance(bp, list) else bp
+            # Prefetch directory (P1-B) — parser real por nombre de ejecutable.
+            pd = kwargs.get("prefetch_dir")
+            if pd:
+                run_kwargs["prefetch_dir"] = pd[0] if isinstance(pd, list) else pd
 
             # disk_path (E01) has no direct mapping — requires prior mounting
             # and artifact extraction (ewfmount + registry hive extraction)

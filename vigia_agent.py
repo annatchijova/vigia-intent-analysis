@@ -1172,6 +1172,14 @@ def _build_orchestrator_kwargs(evidence_path: Path, params: Dict) -> Dict:
                     break
             if kwargs.get("browser_profile"):
                 break
+
+        # P1-B: detectar directorio de Prefetch (archivos .pf) por marcador.
+        # El parser real detecta ejecución de herramientas de ataque por nombre
+        # (formatos SCCA clásico y MAM comprimido).
+        for f in evidence_path.rglob("*.pf"):
+            if f.is_file() and not f.is_symlink():
+                kwargs["prefetch_dir"] = str(f.parent)
+                break
         try:
             from vigia.sift.android_forensics import _ANDROID_MARKER_FILES
             if all_names & _ANDROID_MARKER_FILES:
