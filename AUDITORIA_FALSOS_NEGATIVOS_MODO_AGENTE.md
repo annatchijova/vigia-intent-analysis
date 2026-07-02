@@ -11,6 +11,25 @@ en modo Claude Code** sobre los mismos artefactos.
 posible. Cada hallazgo cita `archivo:línea`. Los reproducidos se marcan
 `[REPRODUCIDO]`.
 
+---
+
+## Estado de correcciones (2026-07-02, rama `claude/vigia-hash-chain-hardening`)
+
+| Hallazgo | Estado | Corrección |
+|---|---|---|
+| **P0-A** ABSTAIN inexistente | ✅ CORREGIDO | `classify_agent_verdict()` + exit code 4 = ABSTAIN. Error/ausencia de señal → ABSTAIN, no benigno. Veredicto embebido y sellado en el bundle (`agent_verdict`). |
+| **P0-B** PathGuard vs `VIGIA_EVIDENCE_DIR` | ✅ CORREGIDO | `_evidence_allowlist()` incluye `VIGIA_EVIDENCE_DIR`; el agente publica el dir de `--evidence` en esa variable. Reproducción invertida en test. |
+| **P1-C** filtro de IP por substring | ✅ CORREGIDO | `_is_external_ip()` usa `ipaddress.is_global`; ya no descarta C2 externos con subcadena de red privada, ni todo IPv6. |
+| **P1-D** dependencia ausente → benigno | ✅ CORREGIDO (memoria) | Adaptador vol3: si ningún plugin corre → `UNANALYZED_ARTIFACT` (→ABSTAIN). Resto de dependencias ausentes → 0 señales → UNDETERMINED → ABSTAIN vía P0-A. |
+| **P1-E** `.log` muere por sufijo | ✅ CORREGIDO | `event_log_correlator` intenta `.log/.txt`, marca `UNANALYZED_ARTIFACT` en `analysis_notes` para formatos no soportados y `.evtx` sin librería `Evtx`. |
+| **P0-C** shim descarta MFT/prefetch/etc. | ⏳ PENDIENTE | Requiere extractores nuevos (medio plazo). Mitigado: ahora produce ABSTAIN, no benigno. |
+| **P1-A** 4 motores stub | ⏳ PENDIENTE | Implementar o marcar `UNANALYZED` ruidoso (medio plazo). |
+| **P2-A** cadena de atenuación gamma/FRS | ⏳ DIFERIDO | L-033: no tocar `gamma` sin ≥20 señales reales con ground truth. |
+| **P2-C** fuga de `expected_verdict` | ⏳ PENDIENTE | Higiene de evaluación; no cambia FN en producción. |
+
+Regresión: `tests/test_false_negative_regression.py` (37 tests). Suite completa
+269 passed, 6 xfailed. **Cero regresiones.**
+
 > **Conclusión de una línea:** en modo Claude Code el LLM lee cada artefacto
 > directamente por herramientas MCP (`read_evidence`, `search_pattern`, …), evitando
 > por completo el pipeline programático. En modo agente ese pipeline (a) **descarta

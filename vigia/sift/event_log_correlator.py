@@ -312,6 +312,12 @@ class EventLogCorrelator:
     def analyze(self, log_paths: List[str], chain: Optional[ChainOfCustody] = None, timestamp_utc: str = "1970-01-01T00:00:00Z") -> EventLogAnalysisResult:
         all_events = []
         source_files = []
+        # FIX (auditoría FN, P1-D/E): rastrear archivos presentes que NO se
+        # pudieron parsear, para distinguir "analizado, sin eventos" de "no se
+        # pudo analizar". Antes un .log de texto plano (sufijo no reconocido) o
+        # un .evtx sin la librería Evtx producían 0 eventos en silencio →
+        # veredicto benigno espurio. Ahora se reportan como UNANALYZED.
+        unparsed_files: List[str] = []
         for lp in log_paths:
             path = Path(lp)
             if not path.exists():
@@ -319,17 +325,41 @@ class EventLogCorrelator:
             # FIX: Validación de tamaño
             if path.stat().st_size > MAX_LOG_SIZE_BYTES:
                 logger.warning("Log omitido por tamaño >50MB: %s", lp)
+                unparsed_files.append(f"{lp} [>50MB, omitido]")
                 continue
             source_files.append(lp)
             if chain:
                 chain.acquire(path.read_bytes()[:4096], "EVENTLOG_ANALYST", timestamp_utc)
-            if path.suffix.lower() == ".evtx":
+            suffix = path.suffix.lower()
+            before = len(all_events)
+            if suffix == ".evtx":
+                if not self._parser._available:
+                    # Librería Evtx ausente: el .evtx binario NO se analiza.
+                    unparsed_files.append(f"{lp} [librería 'Evtx' ausente]")
+                    continue
                 all_events.extend(self._parser.parse_evtx(lp))
-            elif path.suffix.lower() in {".xml", ".txt"}:
+            elif suffix in {".xml", ".txt", ".log", ".evt"}:
+                # .log/.txt: se intenta parseo XML (logs exportados suelen ser
+                # XML). parse_xml captura errores y devuelve [] si no es XML.
                 all_events.extend(self._parser.parse_xml(lp))
+            else:
+                unparsed_files.append(f"{lp} [formato no soportado: {suffix or 'sin extensión'}]")
+                continue
+            if len(all_events) == before:
+                # El archivo se reconoció pero no produjo eventos parseables.
+                unparsed_files.append(f"{lp} [0 eventos parseados]")
 
         if not all_events:
-            return EventLogAnalysisResult(source_files=source_files, total_events=0, time_range=(0, 0), analysis_notes=["No eventos parseados."])
+            notes = ["No eventos parseados."]
+            if unparsed_files:
+                # Marcador UNANALYZED: aguas abajo esto debe mapear a ABSTAIN,
+                # no a benigno. La ausencia de eventos aquí es un fallo de
+                # análisis, no evidencia de que no hubo actividad.
+                notes.append("UNANALYZED_ARTIFACT: " + "; ".join(unparsed_files[:10]))
+            return EventLogAnalysisResult(
+                source_files=source_files, total_events=0, time_range=(0, 0),
+                analysis_notes=notes,
+            )
 
         timestamps = [e.timestamp for e in all_events]
         time_range = (min(timestamps), max(timestamps))
