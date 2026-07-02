@@ -222,6 +222,12 @@ def noisy_or_correlated(
     penalty: Fraction = Fraction(15, 100),
     penalty_map: Optional[Dict[str, Fraction]] = None,
 ) -> Fraction:
+    if correlation_groups is not None and not isinstance(correlation_groups, dict):
+        raise TypeError(
+            f"noisy_or_correlated: correlation_groups must be "
+            f"Dict[int, Set[int]] or None, got {type(correlation_groups).__name__}. "
+            f"Use build_correlation_groups() to construct it. (B-047)"
+        )
     if not severities:
         return Fraction(0, 1)
     n = len(severities)
@@ -244,6 +250,41 @@ def noisy_or_correlated(
         product = product * (Fraction(1, 1) - sev)
     result = Fraction(1, 1) - product
     return min(result, Fraction(95, 100))
+
+
+def build_correlation_groups(corr_tags: List[str]) -> Dict[int, Set[int]]:
+    """Build the correlation map in the format noisy_or_correlated expects:
+    Dict[int, Set[int]] where each finding index maps to the set of its
+    correlated peers (same non-empty corr_group tag, self excluded).
+
+    Only groups with >= 2 members produce entries. Findings with an empty
+    corr_group tag are independent and never appear in the map.
+
+    B-047 fix: single shared implementation replacing four per-module copies
+    (macos_forensics, ios_forensics, android_forensics had List[List[int]] —
+    a format noisy_or_correlated does not accept and previously crashed on
+    with AttributeError as soon as a case produced >=2 correlated findings;
+    google_takeout_forensics had this exact correct format).
+
+    Args:
+        corr_tags: corr_group tag of each finding, in finding order.
+                   Index i in the returned map refers to corr_tags[i].
+    """
+    tag_groups: Dict[str, List[int]] = {}
+    for i, tag in enumerate(corr_tags):
+        if tag:
+            tag_groups.setdefault(tag, []).append(i)
+    result: Dict[int, Set[int]] = {}
+    for indices in tag_groups.values():
+        if len(indices) < 2:
+            continue
+        for idx in indices:
+            peers = {j for j in indices if j != idx}
+            if idx in result:
+                result[idx] |= peers
+            else:
+                result[idx] = peers
+    return result
 
 
 def apply_artifact_reliability(

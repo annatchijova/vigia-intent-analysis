@@ -26,7 +26,7 @@ from typing import Any, Dict, List, Optional, Tuple
 
 from vigia.core.ebs_v1 import SignalOutput, Z_CLIP_MAX
 from vigia.core.chain_of_custody import ChainOfCustody
-from vigia.sift._math_utils import noisy_or_correlated
+from vigia.sift._math_utils import build_correlation_groups, noisy_or_correlated
 
 logger = logging.getLogger(__name__)
 
@@ -363,28 +363,9 @@ class GoogleTakeoutForensicsAnalyzer:
         return None
 
     def _build_correlation_groups(self) -> Dict[int, set]:
-        """Build correlation map in the format noisy_or_correlated expects:
-        Dict[int, Set[int]] where each key maps to its correlated peers.
-
-        NOTE: Android/iOS/macOS _build_correlation_groups return List[List[int]]
-        which is a latent bug — noisy_or_correlated expects Dict[int, Set[int]].
-        This module uses the correct format.
-        """
-        tag_groups: Dict[str, List[int]] = {}
-        for i, f in enumerate(self._findings):
-            if f.corr_group:
-                tag_groups.setdefault(f.corr_group, []).append(i)
-        result: Dict[int, set] = {}
-        for indices in tag_groups.values():
-            if len(indices) < 2:
-                continue
-            for idx in indices:
-                peers = {j for j in indices if j != idx}
-                if idx in result:
-                    result[idx] |= peers
-                else:
-                    result[idx] = peers
-        return result
+        """Correlation map for noisy_or_correlated — delegates to the shared
+        helper in _math_utils (B-047 fix; canonical semantics live there)."""
+        return build_correlation_groups([f.corr_group for f in self._findings])
 
     @staticmethod
     def _safe_json_load(path: Path, max_bytes: int = 50_000_000) -> Optional[Any]:

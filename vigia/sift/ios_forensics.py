@@ -24,7 +24,7 @@ from typing import Any, Dict, List, Optional, Tuple
 
 from vigia.core.ebs_v1 import SignalOutput, Z_CLIP_MAX
 from vigia.core.chain_of_custody import ChainOfCustody
-from vigia.sift._math_utils import noisy_or_correlated
+from vigia.sift._math_utils import build_correlation_groups, noisy_or_correlated
 
 logger = logging.getLogger(__name__)
 
@@ -330,13 +330,10 @@ class iOSForensicsAnalyzer:
         return [f for f in sorted(base.rglob(pattern), key=lambda p: str(p))
                 if not f.is_symlink() and f.is_file()][:limit]
 
-    def _build_correlation_groups(self) -> List[List[int]]:
-        """Group correlated findings by corr_group tag (P0-003 fix)."""
-        groups: Dict[str, List[int]] = {}
-        for i, f in enumerate(self._findings):
-            if f.corr_group:
-                groups.setdefault(f.corr_group, []).append(i)
-        return [idxs for idxs in groups.values() if len(idxs) >= 2]
+    def _build_correlation_groups(self) -> Dict[int, set]:
+        """Correlation map for noisy_or_correlated — delegates to the shared
+        helper in _math_utils (B-047 fix; replaces List[List[int]] format)."""
+        return build_correlation_groups([f.corr_group for f in self._findings])
 
     @staticmethod
     def _coredata_to_unix(ts: int) -> int:
