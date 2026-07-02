@@ -33,10 +33,12 @@ posible. Cada hallazgo cita `archivo:línea`. Los reproducidos se marcan
 | **P2-C** fuga de `expected_verdict` | ⏳ NO SE TOCA | Se intentó eliminar (adaptador EBS-JSON + `normalize_case_schema`) pero el corpus regresó de 198/198 a 60/198: `expected_verdict` es load-bearing para el pipeline de batch actual (deriva la hipótesis del adaptador y calibra la atenuación benigna en `normalize_case_schema`). Se **retiene deliberadamente**. Rediseño pendiente: separar la etiqueta de evaluación del camino de scoring sin regresar el corpus (requiere recalibrar el scorer sobre evidencia real, no la etiqueta). Ver L-018/L-033. |
 | **P2-A** cadena de atenuación gamma/FRS | ⏳ DIFERIDO | L-033: no tocar `gamma` sin ≥20 señales reales con ground truth. |
 
-Regresión: `test_false_negative_regression.py` (47) +
+Regresión (rama de salvataje): `test_false_negative_regression.py` (44) +
 `test_browser_forensics_real.py` (15) + `test_prefetch_real.py` (13) +
-`test_mft_parser_real.py` (13). Suite completa **320 passed, 6 xfailed**.
-**Cero regresiones.**
+`test_mft_parser_real.py` (13) = **85 passed**. Corpus de batch
+`run_all_agent.py`: **198/198 PASS**. Los 3 tests que fijaban la eliminación
+de la fuga `expected_verdict` (`TestExpectedVerdictLeakRemoved`) se retiraron
+junto con la fuga — ver fila P2-C.
 
 **Nota sobre corroboración:** un caso de fuente única (p.ej. solo un perfil de
 navegador con mimikatz + navegación C2) ahora produce **ABSTAIN**, no MALICE ni
