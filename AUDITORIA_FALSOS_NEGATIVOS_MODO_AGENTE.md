@@ -27,13 +27,16 @@ posible. Cada hallazgo cita `archivo:línea`. Los reproducidos se marcan
 | **P1-D** orquestador frágil | ✅ CORREGIDO | Construcción resiliente (`_safe_engine`): una dependencia ausente (`vol`/`rip.pl`) deshabilita solo su motor, no tumba el pipeline. Motores core guardados con `if self.X`. |
 | **P0-C** PathGuard rechaza directorios | ✅ CORREGIDO | `validate(..., allow_dir=True)` para motores sobre directorios (browser/prefetch); antes `NOT_A_REGULAR_FILE` los mataba. |
 | **P1-B** prefetch parser roto | ✅ CORREGIDO | Acepta SCCA clásico + MAM comprimido (antes solo MAM y en offset equivocado → todo .pf clásico descartado). Extracción correcta del nombre del ejecutable (`NAME.EXE-HASH8` → `NAME.EXE`, antes `replace("-","")` nunca matcheaba). Cableado en el agente. .pf ilegibles → contados; todos ilegibles → `unanalyzed`. |
-| **P0-C** shim descarta MFT/prefetch | ⏳ PARCIAL | Browser y **prefetch** ya cableados. MFT/hives requieren extractores nuevos (medio plazo). Mitigado: producen ABSTAIN, no benigno. |
+| **P0-C** shim descarta MFT/disco | ✅ CORREGIDO (MFT) | Parser `$MFT` binario stdlib (`vigia/sift/mft_parser.py`): extrae timestamps MACE de $SI/$FN, nombre, ADS, hardlinks, tamaño. Cableado en el agente (detecta `$MFT`/`*.mft`); el shim lo parsea a JSON y alimenta el analyzer. Timestomping detectado end-to-end (z=2.8). Destapó y arregló un bug latente: `ChainOfCustody.acquire()` no aceptaba `notes` → el motor de disco fallaba (nunca corría en agente). |
+| **P0-C** shim descarta prefetch/browser | ✅ CORREGIDO | Browser y prefetch cableados (tandas anteriores). |
+| **P0-C** hives de registro (amcache/shellbag/usb) | ⏳ PENDIENTE | Requiere `regipy` + hives de test reales. Stubs honestos (ABSTAIN) mientras tanto. |
 | **P2-C** fuga de `expected_verdict` | ⏳ NO SE TOCA | Se intentó eliminar (adaptador EBS-JSON + `normalize_case_schema`) pero el corpus regresó de 198/198 a 60/198: `expected_verdict` es load-bearing para el pipeline de batch actual (deriva la hipótesis del adaptador y calibra la atenuación benigna en `normalize_case_schema`). Se **retiene deliberadamente**. Rediseño pendiente: separar la etiqueta de evaluación del camino de scoring sin regresar el corpus (requiere recalibrar el scorer sobre evidencia real, no la etiqueta). Ver L-018/L-033. |
 | **P2-A** cadena de atenuación gamma/FRS | ⏳ DIFERIDO | L-033: no tocar `gamma` sin ≥20 señales reales con ground truth. |
 
-Regresión: `tests/test_false_negative_regression.py` (47 tests) +
-`tests/test_browser_forensics_real.py` (15) + `tests/test_prefetch_real.py`
-(13). Suite completa **307 passed, 6 xfailed**. **Cero regresiones.**
+Regresión: `test_false_negative_regression.py` (47) +
+`test_browser_forensics_real.py` (15) + `test_prefetch_real.py` (13) +
+`test_mft_parser_real.py` (13). Suite completa **320 passed, 6 xfailed**.
+**Cero regresiones.**
 
 **Nota sobre corroboración:** un caso de fuente única (p.ej. solo un perfil de
 navegador con mimikatz + navegación C2) ahora produce **ABSTAIN**, no MALICE ni
