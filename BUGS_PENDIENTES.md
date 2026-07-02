@@ -2508,6 +2508,48 @@ ejercitado en producción (2 findings, mismo corr_group). Suite completa:
 
 ---
 
+## L-042 — _detect_installed_apps() no detecta Signal en extracciones lógicas [FIXED]
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | FIXED — 2026-07-02 |
+| **Severidad** | ALTA — Signal nunca aparecía en `encrypted_apps` para extracciones lógicas |
+| **Archivo modificado** | `vigia/sift/ios_forensics.py` |
+| **Tag de restauración** | `pre-l042-ios-signal-detection-20260702-000337` |
+| **Commit fix** | `<hash>` |
+
+### Descripción
+
+En extracciones lógicas (archivos sueltos sin estructura de directorios de
+apps iOS completa), `signal.sqlite` aparece como archivo suelto en el
+directorio de evidencia o en un subdirectorio inmediato, en lugar de bajo
+`Library/Application Support/org.whispersystems.signal/`. El detector
+existente usaba `rglob("*/org.whispersystems.signal")` — que busca un
+directorio con ese nombre exacto — y nunca encontraba coincidencia.
+
+Consecuencia: caso real Magnet 2022 iOS Jess con `signal.sqlite` presente
+→ `encrypted_apps_count: 0`, señal IOS_FORENSICS subestimada.
+
+### Fix
+
+1. **`_IOS_MARKER_FILES`**: agregado `"signal.sqlite"` para que el motor
+   reconozca evidencia iOS aunque solo esté este archivo presente.
+
+2. **`_detect_installed_apps()`**: detección por nombre de archivo — busca
+   `signal.sqlite` en `evidence_path` y en todos sus subdirectorios
+   inmediatos (un nivel). Guard anti-doble conteo: no agrega la entrada si
+   `org.whispersystems.signal` ya fue detectado por el path de bundle_id.
+   Peso idéntico al path existente: `Fraction(60, 100)`, MITRE T1573.
+
+### Validación
+
+Caso real `evidence/magnet-2022-ios-jess/Jess_CTF_iPhone8/_extracted`:
+- Antes: señal IOS_FORENSICS con `encrypted_apps_count: 0`
+- Después: `encrypted_apps_count: 1` (Signal detectada), z=2.8, MEDIUM alert
+- Suite completa: 205 passed, 6 xfailed, 0 regresiones
+
+---
+
 ## B-049 — surgical_patch.py v1: falso positivo de verificación con parches aditivos [RESUELTO]
 
 | Campo | Valor |

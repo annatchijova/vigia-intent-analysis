@@ -75,6 +75,7 @@ PHISHING_PATTERNS: List[Tuple[str, Fraction, str]] = [
 _IOS_MARKER_FILES = {
     "sms.db", "AddressBook.sqlitedb", "CallHistory.storedata",
     "History.db", "Info.plist", "keychain-2.db",
+    "signal.sqlite",
 }
 
 
@@ -579,6 +580,25 @@ class iOSForensicsAnalyzer:
                     "severity": str(severity),
                     "paths_found": len(matches),
                 })
+
+        # Signal detection by filename — logical extractions (loose files without
+        # full iOS app directory structure) expose signal.sqlite directly.
+        # Same weight as detection by bundle_id "org.whispersystems.signal".
+        signal_db_matches = (
+            list(evidence_path.glob("signal.sqlite"))
+            + [p for d in evidence_path.iterdir() if d.is_dir()
+               for p in d.glob("signal.sqlite")]
+        )
+        if signal_db_matches and not any(
+            app["bundle_id"] == "org.whispersystems.signal"
+            for app in self._encrypted_apps
+        ):
+            self._encrypted_apps.append({
+                "bundle_id": "org.whispersystems.signal",
+                "description": "Signal — end-to-end encrypted messaging (filename detection)",
+                "severity": str(Fraction(60, 100)),
+                "paths_found": len(signal_db_matches),
+            })
 
         # Psiphon tunneling framework
         # Case-insensitive Psiphon detection

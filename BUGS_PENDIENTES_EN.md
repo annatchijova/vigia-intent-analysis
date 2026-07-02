@@ -2718,6 +2718,48 @@ regressions.
 
 ---
 
+## L-042 — _detect_installed_apps() does not detect Signal in logical extractions [FIXED]
+
+| Field | Value |
+|-------|-------|
+| **Status** | FIXED — 2026-07-02 |
+| **Severity** | HIGH — Signal never appeared in `encrypted_apps` for logical extractions |
+| **File modified** | `vigia/sift/ios_forensics.py` |
+| **Restore tag** | `pre-l042-ios-signal-detection-20260702-000337` |
+| **Fix commit** | `<hash>` |
+
+### Description
+
+In logical extractions (loose files without a full iOS app directory
+structure), `signal.sqlite` appears as a loose file in the evidence
+directory or an immediate subdirectory, rather than under
+`Library/Application Support/org.whispersystems.signal/`. The existing
+detector used `rglob("*/org.whispersystems.signal")` — which looks for a
+directory with that exact name — and never found a match.
+
+Consequence: real case Magnet 2022 iOS Jess with `signal.sqlite` present
+→ `encrypted_apps_count: 0`, IOS_FORENSICS signal underweighted.
+
+### Fix
+
+1. **`_IOS_MARKER_FILES`**: added `"signal.sqlite"` so the engine
+   recognizes iOS evidence even when only this file is present.
+
+2. **`_detect_installed_apps()`**: filename-based detection — searches for
+   `signal.sqlite` in `evidence_path` and all immediate subdirectories
+   (one level). Anti-double-counting guard: does not add the entry if
+   `org.whispersystems.signal` was already detected via the bundle_id path.
+   Identical weight to the existing path: `Fraction(60, 100)`, MITRE T1573.
+
+### Validation
+
+Real case `evidence/magnet-2022-ios-jess/Jess_CTF_iPhone8/_extracted`:
+- Before: IOS_FORENSICS signal with `encrypted_apps_count: 0`
+- After: `encrypted_apps_count: 1` (Signal detected), z=2.8, MEDIUM alert
+- Full suite: 205 passed, 6 xfailed, 0 regressions
+
+---
+
 ## B-049 — surgical_patch.py v1: false positive verification with additive patches [RESOLVED]
 
 | Field | Value |
