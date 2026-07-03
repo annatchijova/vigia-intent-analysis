@@ -1,33 +1,33 @@
 {
   "agent_verdict": "ABSTAIN",
-  "analysis_timestamp": "2026-07-02T14:50:04.885832+00:00",
+  "analysis_timestamp": "2026-07-03T01:17:49.704565+00:00",
   "audit_trail": {
     "agent_version": "1.0.0-SANS-2026",
     "case_id": "VIGIA-ASCIISTUDIO-2025",
-    "end_time": "2026-07-02T14:50:04.885836+00:00",
+    "end_time": "2026-07-03T01:17:49.704568+00:00",
     "entries": [
       {
         "action": "AGENT_INITIALIZED",
         "case_id": "VIGIA-ASCIISTUDIO-2025",
-        "entry_sha256": "9936fb34b4440acbe9169cd62daa451330eb7fe110aa284443d0269885be927e",
+        "entry_sha256": "092e9b5236f53750c9765bba8f8924b3f6cf4b4a362a9070068df2b76d1784dc",
         "inputs_summary": {
           "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
           "case_id": "VIGIA-ASCIISTUDIO-2025"
         },
         "iteration": 0,
-        "note": "Agent initialized \u2014 source SHA-256: cf1b0ed196d5e39c...",
+        "note": "Agent initialized \u2014 source SHA-256: 000e2ed1850838c4...",
         "outputs_summary": {
-          "agent_sha256": "cf1b0ed196d5e39c164122d40d9383c5c511ab4106c327bd204e9021613acbff",
+          "agent_sha256": "000e2ed1850838c47ebe53c0485191683fa1b119e0f722feafbba40de21960b6",
           "agent_version": "1.0.0-SANS-2026"
         },
         "seq": 1,
-        "timestamp": "2026-07-02T14:50:04.883066+00:00",
+        "timestamp": "2026-07-03T01:17:49.701672+00:00",
         "tool": "vigia_agent"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-ASCIISTUDIO-2025",
-        "entry_sha256": "fd4295f39cd91a159004fcb34cc7d0d36e4d663747de0838938d9eeda9b01a9d",
+        "entry_sha256": "60e85380192ac575601f7595d198f3553480e09d89f9fcd781b17526031c52b3",
         "inputs_summary": {
           "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-ASCIISTUDIO-2025.json"
         },
@@ -35,29 +35,29 @@
         "note": "Computing SHA-256 of original evidence",
         "outputs_summary": {},
         "seq": 2,
-        "timestamp": "2026-07-02T14:50:04.883137+00:00",
+        "timestamp": "2026-07-03T01:17:49.701749+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-ASCIISTUDIO-2025",
-        "entry_sha256": "0a3e6ed46c66ecfc3bb07c7c7bc7d3e3b2f3295b11a27a3d56c8f8d5f866f215",
+        "entry_sha256": "9f730c3f99730fc7e56a833577bfecdab8838d8891f371db15209a8e2c65ea7a",
         "inputs_summary": {
           "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-ASCIISTUDIO-2025.json"
         },
         "iteration": 0,
-        "note": "Evidence verified: f28be29252af5f85...",
+        "note": "Evidence verified: 4fb4e1ba7c8cc429...",
         "outputs_summary": {
-          "sha256": "f28be29252af5f853db9ae4ff028dbff3f5e70aea8f6971fe3eb23a05ce95e04"
+          "sha256": "4fb4e1ba7c8cc429891cb4589e547a954379aef1256ebe6b688fa2d26b661b15"
         },
         "seq": 3,
-        "timestamp": "2026-07-02T14:50:04.883222+00:00",
+        "timestamp": "2026-07-03T01:17:49.701833+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "PIPELINE_EXECUTE",
         "case_id": "VIGIA-ASCIISTUDIO-2025",
-        "entry_sha256": "ba17853d0d90991c08ebaf9b7c5d687e7397bca70744e279e6665ef1ac05b378",
+        "entry_sha256": "47b3f22a689423f9c559c2d3d998087c2ce807cf10872abdbe2e9c8b208bec07",
         "inputs_summary": {
           "evidence": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-ASCIISTUDIO-2025.json",
           "iteration": "0",
@@ -67,13 +67,13 @@
         "note": "Executing pipeline \u2014 iteration 0",
         "outputs_summary": {},
         "seq": 4,
-        "timestamp": "2026-07-02T14:50:04.883306+00:00",
+        "timestamp": "2026-07-03T01:17:49.701919+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "PIPELINE_COMPLETE",
         "case_id": "VIGIA-ASCIISTUDIO-2025",
-        "entry_sha256": "8f8934e6d286973dc23d4394f8ab0d4a97bd7364418d7e5129e40bbefef55667",
+        "entry_sha256": "bb57c88970de87d35af8ec4dcce85349c0462c9106923f75da4fe51c39bb3109",
         "inputs_summary": {
           "iteration": "0"
         },
@@ -81,7 +81,7 @@
         "note": "Pipeline completed \u2014 2 signals",
         "outputs_summary": {
           "abduction": {
-            "best_hypothesis": "NO_SEMIOTIC_ANOMALY_DETECTED",
+            "best_hypothesis": "ABSTAIN_DETECTED",
             "best_posterior": "19/5000",
             "confidence": "19/5000",
             "is_conclusive": "False",
@@ -91,7 +91,7 @@
           "pipeline_meta": {
             "artifact_count": "2",
             "avg_score": "19/1000",
-            "expected_verdict": "NOISE",
+            "expected_verdict": "ABSTAIN",
             "source": "ebs_v1_json_adapter"
           },
           "signals": [
@@ -114,13 +114,13 @@
           ]
         },
         "seq": 5,
-        "timestamp": "2026-07-02T14:50:04.885595+00:00",
+        "timestamp": "2026-07-03T01:17:49.704266+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "CONTRADICTION_CHECK",
         "case_id": "VIGIA-ASCIISTUDIO-2025",
-        "entry_sha256": "73838c28efd5961f3d49c5640dc96619e4f2faf71ccd7f188b95391a45dbf095",
+        "entry_sha256": "9a139dd14f173bcf82ed5ff62e8d27c38d247448dc8e63d56839544291367396",
         "inputs_summary": {
           "n_signals": "2"
         },
@@ -131,15 +131,15 @@
           "threshold": "2"
         },
         "seq": 6,
-        "timestamp": "2026-07-02T14:50:04.885684+00:00",
+        "timestamp": "2026-07-03T01:17:49.704404+00:00",
         "tool": "contradiction_detector"
       },
       {
         "action": "AGENT_EXIT",
         "case_id": "VIGIA-ASCIISTUDIO-2025",
-        "entry_sha256": "c8e9d142094b86c687ab0a822a3f389b0f069a3646f97671295f3299773f2718",
+        "entry_sha256": "3334991bf6fd9b93ad2439adb556c8212d853f41296776879bf310fd2e47389a",
         "inputs_summary": {
-          "verdict": "NO_SEMIOTIC_ANOMALY_DETECTED"
+          "verdict": "ABSTAIN_DETECTED"
         },
         "iteration": 0,
         "note": "Exit code 4 (ABSTAIN) \u2014 analysis complete.",
@@ -148,21 +148,21 @@
           "exit_code": "4"
         },
         "seq": 7,
-        "timestamp": "2026-07-02T14:50:04.885766+00:00",
+        "timestamp": "2026-07-03T01:17:49.704496+00:00",
         "tool": "vigia_agent"
       }
     ],
-    "start_time": "2026-07-02T14:50:04.882883+00:00",
+    "start_time": "2026-07-03T01:17:49.701489+00:00",
     "total_entries": 7
   },
   "case_id": "VIGIA-ASCIISTUDIO-2025",
   "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-ASCIISTUDIO-2025.json",
-  "evidence_sha256": "f28be29252af5f853db9ae4ff028dbff3f5e70aea8f6971fe3eb23a05ce95e04",
+  "evidence_sha256": "4fb4e1ba7c8cc429891cb4589e547a954379aef1256ebe6b688fa2d26b661b15",
   "iterations_executed": 1,
-  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-ASCIISTUDIO-2025 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/VIGIA-ASCIISTUDIO-2025.json\nEvidence SHA-256: f28be29252af5f853db9ae4ff028dbff3f5e70aea8f6971fe3eb23a05ce95e04\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: NO_SEMIOTIC_ANOMALY_DETECTED\nPosterior confidence: 19/5000\nConclusive: NO \u2014 requires human review\n\n--- PEIRCEAN NARRATIVE ---\nZIP archive AsciiStudio-master.zip (SHA-256: 812ae30ee397f94d2bcd926f95e1be6e5edab80ad18179c1515c70ee75c1f967) containing a Java GUI application for ASCII art animation. Contents: build.xml (Ant build system), Java source files, sample GIF animations (butterfly, jellyfish, parakeet, lightning), LICENSE (MIT-style), README.md, Changelog.txt, Screenshot.jpg (1.7MB). Dated 2025-04-07. Consistent with a legitimate open-source software project hosted on a public repository platform (GitHub archive na\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [AsciiStudio-master.zip \u2014 container archive. GitHub 'Download ZIP' nami] z=0.019 conf=0.95 \u2014 \n  [Directory listing of AsciiStudio-master/: build.xml, source Java files] z=0.019 conf=0.95 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW \u2014 No significant anomalies detected in this iteration.\n\nCritical signals (z>3): 0\nHigh signals (2<z<=3): 0\nTotal signals analyzed: 2",
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-ASCIISTUDIO-2025 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/VIGIA-ASCIISTUDIO-2025.json\nEvidence SHA-256: 4fb4e1ba7c8cc429891cb4589e547a954379aef1256ebe6b688fa2d26b661b15\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: ABSTAIN_DETECTED\nPosterior confidence: 19/5000\nConclusive: NO \u2014 requires human review\n\n--- PEIRCEAN NARRATIVE ---\nZIP archive AsciiStudio-master.zip (SHA-256: 812ae30ee397f94d2bcd926f95e1be6e5edab80ad18179c1515c70ee75c1f967) containing a Java GUI application for ASCII art animation. Contents: build.xml (Ant build system), Java source files, sample GIF animations (butterfly, jellyfish, parakeet, lightning), LICENSE (MIT-style), README.md, Changelog.txt, Screenshot.jpg (1.7MB). Dated 2025-04-07. Consistent with a legitimate open-source software project hosted on a public repository platform (GitHub archive na\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [AsciiStudio-master.zip \u2014 container archive. GitHub 'Download ZIP' nami] z=0.019 conf=0.95 \u2014 \n  [Directory listing of AsciiStudio-master/: build.xml, source Java files] z=0.019 conf=0.95 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW \u2014 No significant anomalies detected in this iteration.\n\nCritical signals (z>3): 0\nHigh signals (2<z<=3): 0\nTotal signals analyzed: 2",
   "pipeline_results": {
     "abduction": {
-      "best_hypothesis": "NO_SEMIOTIC_ANOMALY_DETECTED",
+      "best_hypothesis": "ABSTAIN_DETECTED",
       "best_posterior": "19/5000",
       "confidence": {
         "__fraction__": true,
@@ -176,7 +176,7 @@
     "pipeline_meta": {
       "artifact_count": 2,
       "avg_score": "19/1000",
-      "expected_verdict": "NOISE",
+      "expected_verdict": "ABSTAIN",
       "source": "ebs_v1_json_adapter"
     },
     "signals": [

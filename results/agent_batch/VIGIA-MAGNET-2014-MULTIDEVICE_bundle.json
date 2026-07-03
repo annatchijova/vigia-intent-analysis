@@ -1,0 +1,607 @@
+{
+  "agent_verdict": "ABSTAIN",
+  "analysis_timestamp": "2026-07-02T22:40:51.491545+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "VIGIA-MAGNET-2014-MULTIDEVICE",
+    "end_time": "2026-07-02T22:40:51.491550+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "VIGIA-MAGNET-2014-MULTIDEVICE",
+        "entry_sha256": "2ac1caec41bf19aa9da78d8cca61caefaf55e797a7db4bb6bc5109b49c25d90d",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "VIGIA-MAGNET-2014-MULTIDEVICE"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: 000e2ed1850838c4...",
+        "outputs_summary": {
+          "agent_sha256": "000e2ed1850838c47ebe53c0485191683fa1b119e0f722feafbba40de21960b6",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-07-02T22:40:50.877213+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-MAGNET-2014-MULTIDEVICE",
+        "entry_sha256": "810d10594f1d7fa379e6b428f3f8c205d2b09aa423354bb544db41903cdbb34c",
+        "inputs_summary": {
+          "path": "evidence/magnet-2014-multidevice"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-07-02T22:40:50.877289+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-MAGNET-2014-MULTIDEVICE",
+        "entry_sha256": "14ae97514f189b7b7bc89f91e62c99af904847c5ddacd10d047bad8985af7d9f",
+        "inputs_summary": {
+          "path": "evidence/magnet-2014-multidevice"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: c4ee54d3a8b18337...",
+        "outputs_summary": {
+          "sha256": "c4ee54d3a8b18337df13e90479cc6e2f13f2e2ddb81f2f0011e6201dd0b3323a"
+        },
+        "seq": 3,
+        "timestamp": "2026-07-02T22:40:50.880432+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "VIGIA-MAGNET-2014-MULTIDEVICE",
+        "entry_sha256": "eefa5b814bf3d38f35ae9d9b03bbbf07f860a3455212404deeda71f24ea3c008",
+        "inputs_summary": {
+          "evidence": "evidence/magnet-2014-multidevice",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-07-02T22:40:50.880535+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "VIGIA-MAGNET-2014-MULTIDEVICE",
+        "entry_sha256": "62978adf226d066a5f3693ea9781b4d9c201d063f5c156ab50ab22d483efb4b5",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 5 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "UNDETERMINED",
+            "best_posterior": "0",
+            "confidence": "0",
+            "is_conclusive": "False",
+            "narrative": "[FIRSTNESS] Pipeline error.",
+            "ontological_level": "None"
+          },
+          "case_id": "VIGIA-MAGNET-2014-MULTIDEVICE",
+          "custody": {
+            "artifact_id": "UNKNOWN",
+            "case_id": "VIGIA-MAGNET-2014-MULTIDEVICE",
+            "n_records": "1",
+            "records": [
+              {
+                "actor": "PREFETCH_ANALYZER",
+                "artifact_hash": "2b977c213de546ed65a0a3c74f2dc13351083866213cce05d93015f0b5c4db74",
+                "metadata": {
+                  "data_size": "17",
+                  "timestamp_utc": "1970-01-01T00:00:00Z"
+                },
+                "operation": "ACQUIRE",
+                "timestamp": "2026-07-02T22:40:51.441939+00:00"
+              }
+            ]
+          },
+          "pipeline_meta": {
+            "anti_silencing": "True",
+            "frs_groups": "1",
+            "gamma_applied": "True",
+            "n_engine_signals": "2",
+            "n_sift_signals": "1",
+            "n_total_signals": "5",
+            "n_unanalyzed_artifacts": "0",
+            "version": "V4-COLECTIVO-2026-05-06"
+          },
+          "results": {
+            "adversarial": {
+              "dominant_pattern": "NONE",
+              "indicators": [],
+              "n_indicators": "0",
+              "n_tools": "4",
+              "sift_critical_active": "0"
+            },
+            "caie": {
+              "_determinism_protocol": "P0-v2.0-DECIMAL-6-4",
+              "artifacts_evaluated": "5",
+              "composite_score": "0.0047",
+              "fracture_bonus_applied": "0.0000",
+              "integrity_check": {
+                "alerts": [],
+                "fpu_native": "False",
+                "internal_precision": "6",
+                "math_engine": "decimal.Decimal",
+                "output_precision": "4"
+              },
+              "probabilistic_score": "0.0047",
+              "probabilistic_verdict": "NOISE",
+              "status": "OK",
+              "structural_verdict": "INCONCLUSIVE",
+              "verdict": "INCONCLUSIVE"
+            },
+            "patterns": {
+              "artifact_reliability": "17/20",
+              "artifact_type": "pattern",
+              "best_match": "NONE",
+              "finding_types": [],
+              "match_count": "0",
+              "match_score_by_pattern": {},
+              "missing_signals_by_pattern": {},
+              "timestamp_invalid": "True",
+              "total_patterns": "3"
+            },
+            "prefetch": {
+              "anti_forensic_count": "1",
+              "artifact_reliability": "7/10",
+              "artifact_type": "prefetch",
+              "finding_types": [
+                "PREFETCH_WIPE"
+              ],
+              "source_path": "/home/labestiadevigia/vigia-repo/evidence/magnet-2014-multidevice",
+              "suspicious_count": "0",
+              "suspicious_executables": [],
+              "total_files": "1",
+              "unanalyzed": "False",
+              "unparsed_files": "0"
+            },
+            "resonance": {
+              "artifact_reliability": "4/5",
+              "artifact_type": "resonance",
+              "finding_types": [],
+              "pattern_count": "0",
+              "timestamp_invalid": "True",
+              "total_resonance": "0"
+            },
+            "timeline": {
+              "anomaly_count": "0",
+              "artifact_reliability": "4/5",
+              "artifact_type": "timeline",
+              "finding_types": [],
+              "gap_count": "0",
+              "total_events": "3"
+            }
+          },
+          "signals": [
+            {
+              "confidence": "0.5775",
+              "metadata": {
+                "acquisition_hash": "sha256:2b977c213de546ed65a0a3c74f2dc13351083866213cce05d93015f0b5c4db74",
+                "acquisition_timestamp": "2026-07-02T22:40:51.441939+00:00",
+                "anti_forensic_count": "1",
+                "artifact_reliability": "7/10",
+                "artifact_type": "prefetch",
+                "source_path": "/home/labestiadevigia/vigia-repo/evidence/magnet-2014-multidevice",
+                "suspicious_count": "0",
+                "suspicious_executables": [],
+                "total_files": "1",
+                "unparsed_files": "0"
+              },
+              "tool": "PREFETCH_ANALYZER",
+              "value": "0.64",
+              "z_score": "2.24"
+            },
+            {
+              "confidence": "0.0",
+              "metadata": {
+                "artifact_reliability": "4/5",
+                "artifact_type": "resonance",
+                "finding_types": [],
+                "pattern_count": "0",
+                "timestamp_invalid": "True",
+                "total_resonance": "0"
+              },
+              "tool": "CROSS_RESONANCE",
+              "value": "0.0",
+              "z_score": "0.0"
+            },
+            {
+              "confidence": "0.0",
+              "metadata": {
+                "artifact_reliability": "17/20",
+                "artifact_type": "pattern",
+                "best_match": "NONE",
+                "finding_types": [],
+                "match_count": "0",
+                "match_score_by_pattern": {},
+                "missing_signals_by_pattern": {},
+                "timestamp_invalid": "True",
+                "total_patterns": "3"
+              },
+              "tool": "CASE_PATTERN_LIBRARY",
+              "value": "0.0",
+              "z_score": "0.0"
+            },
+            {
+              "confidence": "0.0",
+              "metadata": {
+                "anomaly_count": "0",
+                "artifact_reliability": "4/5",
+                "artifact_type": "timeline",
+                "finding_types": [],
+                "gap_count": "0",
+                "total_events": "3"
+              },
+              "tool": "UNIFIED_TIMELINE",
+              "value": "0.0",
+              "z_score": "0.0"
+            },
+            {
+              "confidence": "0.2864",
+              "metadata": {
+                "dominant_pattern": "NONE",
+                "indicators": [],
+                "n_indicators": "0",
+                "n_tools": "4",
+                "sift_critical_active": "0"
+              },
+              "tool": "ADV_ROBUST",
+              "value": "0.0",
+              "z_score": "0.0"
+            }
+          ]
+        },
+        "seq": 5,
+        "timestamp": "2026-07-02T22:40:51.491067+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "VIGIA-MAGNET-2014-MULTIDEVICE",
+        "entry_sha256": "f9f73ec50c49686873b88b2c43c45c1a3631a57639ca651c7e306448ffe2c39c",
+        "inputs_summary": {
+          "n_signals": "5"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-07-02T22:40:51.491279+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "VIGIA-MAGNET-2014-MULTIDEVICE",
+        "entry_sha256": "9bcf13ca6464af3078f4dfbccb5def4bc34ac602c8c39a8f5a429c9c55e40907",
+        "inputs_summary": {
+          "verdict": "UNDETERMINED"
+        },
+        "iteration": 0,
+        "note": "Exit code 4 (ABSTAIN) \u2014 analysis complete.",
+        "outputs_summary": {
+          "agent_verdict": "ABSTAIN",
+          "exit_code": "4"
+        },
+        "seq": 7,
+        "timestamp": "2026-07-02T22:40:51.491389+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-07-02T22:40:50.877016+00:00",
+    "total_entries": 7
+  },
+  "case_id": "VIGIA-MAGNET-2014-MULTIDEVICE",
+  "evidence_path": "evidence/magnet-2014-multidevice",
+  "evidence_sha256": "c4ee54d3a8b18337df13e90479cc6e2f13f2e2ddb81f2f0011e6201dd0b3323a",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-MAGNET-2014-MULTIDEVICE ===\nEvidence: evidence/magnet-2014-multidevice\nEvidence SHA-256: c4ee54d3a8b18337df13e90479cc6e2f13f2e2ddb81f2f0011e6201dd0b3323a\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: UNDETERMINED\nPosterior confidence: 0\nConclusive: NO \u2014 requires human review\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] Pipeline error.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [PREFETCH_ANALYZER] z=2.240 conf=0.58 \u2014 0.64\n  [CROSS_RESONANCE] z=0.000 conf=0.00 \u2014 \n  [CASE_PATTERN_LIBRARY] z=0.000 conf=0.00 \u2014 \n  [UNIFIED_TIMELINE] z=0.000 conf=0.00 \u2014 \n  [ADV_ROBUST] z=0.000 conf=0.29 \u2014 \n\n--- CAIE (Cross-Artifact Incongruence Engine) ---\n  Verdict: INCONCLUSIVE | Structural: INCONCLUSIVE | Composite: 0.0047 | Fractures: 0 | Golden Rules: 0\n  Daubert: 0/5 artifacts structurally irrefutable (spoofability \u2264 0.20). WARNING: No irrefutable anchor. Weak under cross-examination. CDL: INCONCLUSIVE: Coverage too low (16.7%)\n\n--- FINAL ALERT LEVEL ---\nMEDIUM \u2014 Moderate anomalies. Additional investigation recommended.\n\nCritical signals (z>3): 0\nHigh signals (2<z<=3): 1\nTotal signals analyzed: 5",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "UNDETERMINED",
+      "best_posterior": "0",
+      "confidence": "0",
+      "is_conclusive": false,
+      "narrative": "[FIRSTNESS] Pipeline error.",
+      "ontological_level": null
+    },
+    "case_id": "VIGIA-MAGNET-2014-MULTIDEVICE",
+    "custody": {
+      "artifact_id": "UNKNOWN",
+      "case_id": "VIGIA-MAGNET-2014-MULTIDEVICE",
+      "n_records": 1,
+      "records": [
+        {
+          "actor": "PREFETCH_ANALYZER",
+          "artifact_hash": "2b977c213de546ed65a0a3c74f2dc13351083866213cce05d93015f0b5c4db74",
+          "metadata": {
+            "data_size": 17,
+            "timestamp_utc": "1970-01-01T00:00:00Z"
+          },
+          "operation": "ACQUIRE",
+          "timestamp": "2026-07-02T22:40:51.441939+00:00"
+        }
+      ]
+    },
+    "pipeline_meta": {
+      "anti_silencing": true,
+      "frs_groups": 1,
+      "gamma_applied": true,
+      "n_engine_signals": 2,
+      "n_sift_signals": 1,
+      "n_total_signals": 5,
+      "n_unanalyzed_artifacts": 0,
+      "version": "V4-COLECTIVO-2026-05-06"
+    },
+    "results": {
+      "adversarial": {
+        "dominant_pattern": "NONE",
+        "indicators": [],
+        "n_indicators": 0,
+        "n_tools": 4,
+        "sift_critical_active": 0
+      },
+      "caie": {
+        "_determinism_protocol": "P0-v2.0-DECIMAL-6-4",
+        "_operation_hmac": "",
+        "artifacts_evaluated": 5,
+        "artifacts_rejected": 0,
+        "chain_of_custody": {
+          "evidence_count": 5,
+          "fracture_count": 0,
+          "processing_timestamp": "2026-07-02T22:40:51.477601Z"
+        },
+        "composite_score": "0.0047",
+        "confidence_penalty_applied": false,
+        "daubert_note": "Daubert: 0/5 artifacts structurally irrefutable (spoofability \u2264 0.20). WARNING: No irrefutable anchor. Weak under cross-examination. CDL: INCONCLUSIVE: Coverage too low (16.7%)",
+        "fracture_bonus_applied": "0.0000",
+        "fractures": [],
+        "fractures_detected": 0,
+        "fractures_unique": 0,
+        "golden_rules_triggered": 0,
+        "independent_sources": 5,
+        "integrity_check": {
+          "alerts": [],
+          "fpu_native": false,
+          "internal_precision": 6,
+          "math_engine": "decimal.Decimal",
+          "output_precision": 4
+        },
+        "mitre_ttps": [
+          "T1036.005",
+          "T1059",
+          "T1070.001",
+          "T1070.002",
+          "T1070.006",
+          "T1498",
+          "T1562.001",
+          "T1564",
+          "T1565.001",
+          "T1566.003"
+        ],
+        "peirce_chain": {
+          "firstness": "5 artifacts from 5 tools. Raw scores range: 0.00 to 0.64.",
+          "secondness": "Noisy-OR fusion: 5 independent groups, composite=0.0047. Most reliable: PREFETCH_ANALYZER (log_entry, adj=0.0047). 0 unique fracture(s), 0 Golden Rule(s).",
+          "thirdness": "Inferred habit: fabrication/staging. No structural discrepancies."
+        },
+        "probabilistic_score": "0.0047",
+        "probabilistic_verdict": "NOISE",
+        "raw_scores": [
+          {
+            "adjusted": "0.0047",
+            "description": "0.64",
+            "raw_score": "0.6400",
+            "spoofability": 0.85,
+            "tool": "PREFETCH_ANALYZER",
+            "type": "log_entry",
+            "weight": 0.15
+          },
+          {
+            "adjusted": "0.0000",
+            "description": "Signal from CROSS_RESONANCE",
+            "raw_score": "0.0000",
+            "spoofability": 0.85,
+            "tool": "CROSS_RESONANCE",
+            "type": "log_entry",
+            "weight": 0.15
+          },
+          {
+            "adjusted": "0.0000",
+            "description": "Signal from CASE_PATTERN_LIBRARY",
+            "raw_score": "0.0000",
+            "spoofability": 0.85,
+            "tool": "CASE_PATTERN_LIBRARY",
+            "type": "log_entry",
+            "weight": 0.15
+          },
+          {
+            "adjusted": "0.0000",
+            "description": "Signal from UNIFIED_TIMELINE",
+            "raw_score": "0.0000",
+            "spoofability": 0.85,
+            "tool": "UNIFIED_TIMELINE",
+            "type": "log_entry",
+            "weight": 0.15
+          },
+          {
+            "adjusted": "0.0000",
+            "description": "Signal from ADV_ROBUST",
+            "raw_score": "0.0000",
+            "spoofability": 0.85,
+            "tool": "ADV_ROBUST",
+            "type": "log_entry",
+            "weight": 0.15
+          }
+        ],
+        "status": "OK",
+        "structural_verdict": "INCONCLUSIVE",
+        "timestamp": "2026-07-02T22:40:51.477592Z",
+        "ttp_confidences": {
+          "T1036.005": "0.0250",
+          "T1059": "0.0246",
+          "T1070.001": "0.0256",
+          "T1070.002": "0.0256",
+          "T1070.006": "0.0134",
+          "T1498": "0.0435",
+          "T1562.001": "0.0354",
+          "T1564": "0.0187",
+          "T1565.001": "0.0307",
+          "T1566.003": "0.0179"
+        },
+        "verdict": "INCONCLUSIVE",
+        "vigia_verdict": "[VIGIA_CAIE]: INCONCLUSIVE. Structural=INCONCLUSIVE Probabilistic=NOISE (composite=0.0047) from 5 artifacts (5 independent). 0 fracture(s), 0 Golden Rule(s). Daubert: 0/5 artifacts structurally irrefutable (spoofability \u2264 0.20). WARNING: "
+      },
+      "patterns": {
+        "artifact_reliability": "17/20",
+        "artifact_type": "pattern",
+        "best_match": "NONE",
+        "finding_types": [],
+        "match_count": 0,
+        "match_score_by_pattern": {},
+        "missing_signals_by_pattern": {},
+        "timestamp_invalid": true,
+        "total_patterns": 3
+      },
+      "prefetch": {
+        "anti_forensic_count": 1,
+        "artifact_reliability": "7/10",
+        "artifact_type": "prefetch",
+        "finding_types": [
+          "PREFETCH_WIPE"
+        ],
+        "source_path": "/home/labestiadevigia/vigia-repo/evidence/magnet-2014-multidevice",
+        "suspicious_count": 0,
+        "suspicious_executables": [],
+        "total_files": 1,
+        "unanalyzed": false,
+        "unparsed_files": 0
+      },
+      "resonance": {
+        "artifact_reliability": "4/5",
+        "artifact_type": "resonance",
+        "finding_types": [],
+        "pattern_count": 0,
+        "timestamp_invalid": true,
+        "total_resonance": "0"
+      },
+      "timeline": {
+        "anomaly_count": 0,
+        "artifact_reliability": "4/5",
+        "artifact_type": "timeline",
+        "finding_types": [],
+        "gap_count": 0,
+        "total_events": 3
+      }
+    },
+    "signals": [
+      {
+        "confidence": 0.5775,
+        "metadata": {
+          "acquisition_hash": "sha256:2b977c213de546ed65a0a3c74f2dc13351083866213cce05d93015f0b5c4db74",
+          "acquisition_timestamp": "2026-07-02T22:40:51.441939+00:00",
+          "anti_forensic_count": 1,
+          "artifact_reliability": "7/10",
+          "artifact_type": "prefetch",
+          "finding_types": [
+            "PREFETCH_WIPE"
+          ],
+          "gamma_applied": true,
+          "gamma_type": "prefetch",
+          "source_path": "/home/labestiadevigia/vigia-repo/evidence/magnet-2014-multidevice",
+          "suspicious_count": 0,
+          "suspicious_executables": [],
+          "timestamp_invalid": true,
+          "total_files": 1,
+          "unanalyzed": false,
+          "unparsed_files": 0,
+          "z_original": 3.2
+        },
+        "tool": "PREFETCH_ANALYZER",
+        "value": 0.64,
+        "z_score": 2.24
+      },
+      {
+        "confidence": 0.0,
+        "metadata": {
+          "artifact_reliability": "4/5",
+          "artifact_type": "resonance",
+          "finding_types": [],
+          "pattern_count": 0,
+          "timestamp_invalid": true,
+          "total_resonance": "0"
+        },
+        "tool": "CROSS_RESONANCE",
+        "value": 0.0,
+        "z_score": 0.0
+      },
+      {
+        "confidence": 0.0,
+        "metadata": {
+          "artifact_reliability": "17/20",
+          "artifact_type": "pattern",
+          "best_match": "NONE",
+          "finding_types": [],
+          "match_count": 0,
+          "match_score_by_pattern": {},
+          "missing_signals_by_pattern": {},
+          "timestamp_invalid": true,
+          "total_patterns": 3
+        },
+        "tool": "CASE_PATTERN_LIBRARY",
+        "value": 0.0,
+        "z_score": 0.0
+      },
+      {
+        "confidence": 0.0,
+        "metadata": {
+          "anomaly_count": 0,
+          "artifact_reliability": "4/5",
+          "artifact_type": "timeline",
+          "finding_types": [],
+          "gap_count": 0,
+          "total_events": 3
+        },
+        "tool": "UNIFIED_TIMELINE",
+        "value": 0.0,
+        "z_score": 0.0
+      },
+      {
+        "confidence": 0.2864,
+        "metadata": {
+          "dominant_pattern": "NONE",
+          "indicators": [],
+          "n_indicators": 0,
+          "n_tools": 4,
+          "sift_critical_active": 0
+        },
+        "tool": "ADV_ROBUST",
+        "value": 0.0,
+        "z_score": 0.0
+      }
+    ]
+  },
+  "sans_compliance": {
+    "accuracy_validation": true,
+    "analytical_reasoning": false,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}

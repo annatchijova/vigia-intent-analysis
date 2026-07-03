@@ -1,33 +1,33 @@
 {
   "agent_verdict": "ABSTAIN",
-  "analysis_timestamp": "2026-07-02T14:50:08.756302+00:00",
+  "analysis_timestamp": "2026-07-03T01:17:53.392118+00:00",
   "audit_trail": {
     "agent_version": "1.0.0-SANS-2026",
     "case_id": "VIGIA-WEDLM-2025",
-    "end_time": "2026-07-02T14:50:08.756305+00:00",
+    "end_time": "2026-07-03T01:17:53.392121+00:00",
     "entries": [
       {
         "action": "AGENT_INITIALIZED",
         "case_id": "VIGIA-WEDLM-2025",
-        "entry_sha256": "4205af91e25d7f44be4cce2e94a6d3b32376b37b2f44cda403d369853dc08c26",
+        "entry_sha256": "4dc68c56a6681a1f9aca725c546174419fc01117296f49bc35a84d2b8e752dda",
         "inputs_summary": {
           "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
           "case_id": "VIGIA-WEDLM-2025"
         },
         "iteration": 0,
-        "note": "Agent initialized \u2014 source SHA-256: cf1b0ed196d5e39c...",
+        "note": "Agent initialized \u2014 source SHA-256: 000e2ed1850838c4...",
         "outputs_summary": {
-          "agent_sha256": "cf1b0ed196d5e39c164122d40d9383c5c511ab4106c327bd204e9021613acbff",
+          "agent_sha256": "000e2ed1850838c47ebe53c0485191683fa1b119e0f722feafbba40de21960b6",
           "agent_version": "1.0.0-SANS-2026"
         },
         "seq": 1,
-        "timestamp": "2026-07-02T14:50:08.753445+00:00",
+        "timestamp": "2026-07-03T01:17:53.389285+00:00",
         "tool": "vigia_agent"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-WEDLM-2025",
-        "entry_sha256": "289cae48368f2bb59fd4fa7d9d557c662fff509cb7a107417977c99fcde2fac3",
+        "entry_sha256": "c2c0488d8026d8b1d89576dc77cbe15fdb29576c8449c53eabfa6d91cb2a4ff0",
         "inputs_summary": {
           "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-WEDLM-2025.json"
         },
@@ -35,29 +35,29 @@
         "note": "Computing SHA-256 of original evidence",
         "outputs_summary": {},
         "seq": 2,
-        "timestamp": "2026-07-02T14:50:08.753517+00:00",
+        "timestamp": "2026-07-03T01:17:53.389358+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-WEDLM-2025",
-        "entry_sha256": "025dd1b21700204cfced2ee954e0f1800a7db93dad24cb6bc97de67cffdd608d",
+        "entry_sha256": "11c8d7559f528181120ab0c99bb1be5f141cc95d9e84ba3cc97e2dc6209abfc7",
         "inputs_summary": {
           "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-WEDLM-2025.json"
         },
         "iteration": 0,
-        "note": "Evidence verified: b7d4b862dbf71c48...",
+        "note": "Evidence verified: dd08c9bc326232eb...",
         "outputs_summary": {
-          "sha256": "b7d4b862dbf71c48087eaf99c22f24c8c8c8bd57fbc4bb3f4811ce7a4b347e02"
+          "sha256": "dd08c9bc326232eb5fa0397f3c07ef23437c74bb38f56fd218dfb20513f1bdea"
         },
         "seq": 3,
-        "timestamp": "2026-07-02T14:50:08.753597+00:00",
+        "timestamp": "2026-07-03T01:17:53.389437+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "PIPELINE_EXECUTE",
         "case_id": "VIGIA-WEDLM-2025",
-        "entry_sha256": "ba2b2da802dc53a636a88a04dfcaeb2ba366faf9043ce959e16bbfcaf29617e9",
+        "entry_sha256": "8e6f8d10bb77e6c206db068ecd0098819e1fbe03a2569f2a1bb37cd3fff88335",
         "inputs_summary": {
           "evidence": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-WEDLM-2025.json",
           "iteration": "0",
@@ -67,13 +67,13 @@
         "note": "Executing pipeline \u2014 iteration 0",
         "outputs_summary": {},
         "seq": 4,
-        "timestamp": "2026-07-02T14:50:08.753684+00:00",
+        "timestamp": "2026-07-03T01:17:53.389522+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "PIPELINE_COMPLETE",
         "case_id": "VIGIA-WEDLM-2025",
-        "entry_sha256": "569e0d119f067fb20fb4c8b958dac1301f7bc2aacdc962ea11856729404181a5",
+        "entry_sha256": "58fa25f26061ad79db99c6fc2ae0ada1568031c62ab8e61ff69edf390550c678",
         "inputs_summary": {
           "iteration": "0"
         },
@@ -81,7 +81,7 @@
         "note": "Pipeline completed \u2014 2 signals",
         "outputs_summary": {
           "abduction": {
-            "best_hypothesis": "NO_SEMIOTIC_ANOMALY_DETECTED",
+            "best_hypothesis": "ABSTAIN_DETECTED",
             "best_posterior": "19/5000",
             "confidence": "19/5000",
             "is_conclusive": "False",
@@ -91,7 +91,7 @@
           "pipeline_meta": {
             "artifact_count": "2",
             "avg_score": "19/1000",
-            "expected_verdict": "NOISE",
+            "expected_verdict": "ABSTAIN",
             "source": "ebs_v1_json_adapter"
           },
           "signals": [
@@ -114,13 +114,13 @@
           ]
         },
         "seq": 5,
-        "timestamp": "2026-07-02T14:50:08.756048+00:00",
+        "timestamp": "2026-07-03T01:17:53.391830+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "CONTRADICTION_CHECK",
         "case_id": "VIGIA-WEDLM-2025",
-        "entry_sha256": "418aae6d357fa83b4662ff4b0792f565999aa839d15659e230f3128c1bf5cd0b",
+        "entry_sha256": "a094847ae06bfe82c6962636b5cf8f00c8a49cb57b5d22a0e02c1707dd829a1d",
         "inputs_summary": {
           "n_signals": "2"
         },
@@ -131,15 +131,15 @@
           "threshold": "2"
         },
         "seq": 6,
-        "timestamp": "2026-07-02T14:50:08.756141+00:00",
+        "timestamp": "2026-07-03T01:17:53.391963+00:00",
         "tool": "contradiction_detector"
       },
       {
         "action": "AGENT_EXIT",
         "case_id": "VIGIA-WEDLM-2025",
-        "entry_sha256": "02a1ae20bb5eb20924abb0d1cae6b2b5af1b76cd3d9b86c1e8dedb137c742d26",
+        "entry_sha256": "8c13c98b669185b5f2aebb5ad5336c67fc81da304a3a017fa7fb2f7a6ed09716",
         "inputs_summary": {
-          "verdict": "NO_SEMIOTIC_ANOMALY_DETECTED"
+          "verdict": "ABSTAIN_DETECTED"
         },
         "iteration": 0,
         "note": "Exit code 4 (ABSTAIN) \u2014 analysis complete.",
@@ -148,21 +148,21 @@
           "exit_code": "4"
         },
         "seq": 7,
-        "timestamp": "2026-07-02T14:50:08.756234+00:00",
+        "timestamp": "2026-07-03T01:17:53.392051+00:00",
         "tool": "vigia_agent"
       }
     ],
-    "start_time": "2026-07-02T14:50:08.753252+00:00",
+    "start_time": "2026-07-03T01:17:53.389101+00:00",
     "total_entries": 7
   },
   "case_id": "VIGIA-WEDLM-2025",
   "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-WEDLM-2025.json",
-  "evidence_sha256": "b7d4b862dbf71c48087eaf99c22f24c8c8c8bd57fbc4bb3f4811ce7a4b347e02",
+  "evidence_sha256": "dd08c9bc326232eb5fa0397f3c07ef23437c74bb38f56fd218dfb20513f1bdea",
   "iterations_executed": 1,
-  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-WEDLM-2025 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/VIGIA-WEDLM-2025.json\nEvidence SHA-256: b7d4b862dbf71c48087eaf99c22f24c8c8c8bd57fbc4bb3f4811ce7a4b347e02\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: NO_SEMIOTIC_ANOMALY_DETECTED\nPosterior confidence: 19/5000\nConclusive: NO \u2014 requires human review\n\n--- PEIRCEAN NARRATIVE ---\nZIP archive WeDLM-main.zip (SHA-256: edf227d6d95fde1d1b8e92047eaafe6e40322a8b007202793acb38cdefb99d64) containing a Python LLM evaluation framework dated 2025-12-30. Structure: evaluation/dataset_download/ with benchmark download scripts for ARC, GPQA, GSM8K, HumanEval, MATH, MBPP, MMLU, HellaSwag; README.md (9.7KB), MANIFEST.in. The '-main' suffix indicates a GitHub archive. The benchmark names (ARC, GPQA, GSM8K, HumanEval, MATH, MBPP, MMLU, HellaSwag) are all publicly documented academic LLM e\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [WeDLM-main.zip \u2014 container archive. GitHub 'Download ZIP' naming conve] z=0.019 conf=0.95 \u2014 \n  [Directory structure of WeDLM-main/: evaluation/dataset_download/ conta] z=0.019 conf=0.95 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW \u2014 No significant anomalies detected in this iteration.\n\nCritical signals (z>3): 0\nHigh signals (2<z<=3): 0\nTotal signals analyzed: 2",
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-WEDLM-2025 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/VIGIA-WEDLM-2025.json\nEvidence SHA-256: dd08c9bc326232eb5fa0397f3c07ef23437c74bb38f56fd218dfb20513f1bdea\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: ABSTAIN_DETECTED\nPosterior confidence: 19/5000\nConclusive: NO \u2014 requires human review\n\n--- PEIRCEAN NARRATIVE ---\nZIP archive WeDLM-main.zip (SHA-256: edf227d6d95fde1d1b8e92047eaafe6e40322a8b007202793acb38cdefb99d64) containing a Python LLM evaluation framework dated 2025-12-30. Structure: evaluation/dataset_download/ with benchmark download scripts for ARC, GPQA, GSM8K, HumanEval, MATH, MBPP, MMLU, HellaSwag; README.md (9.7KB), MANIFEST.in. The '-main' suffix indicates a GitHub archive. The benchmark names (ARC, GPQA, GSM8K, HumanEval, MATH, MBPP, MMLU, HellaSwag) are all publicly documented academic LLM e\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [WeDLM-main.zip \u2014 container archive. GitHub 'Download ZIP' naming conve] z=0.019 conf=0.95 \u2014 \n  [Directory structure of WeDLM-main/: evaluation/dataset_download/ conta] z=0.019 conf=0.95 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW \u2014 No significant anomalies detected in this iteration.\n\nCritical signals (z>3): 0\nHigh signals (2<z<=3): 0\nTotal signals analyzed: 2",
   "pipeline_results": {
     "abduction": {
-      "best_hypothesis": "NO_SEMIOTIC_ANOMALY_DETECTED",
+      "best_hypothesis": "ABSTAIN_DETECTED",
       "best_posterior": "19/5000",
       "confidence": {
         "__fraction__": true,
@@ -176,7 +176,7 @@
     "pipeline_meta": {
       "artifact_count": 2,
       "avg_score": "19/1000",
-      "expected_verdict": "NOISE",
+      "expected_verdict": "ABSTAIN",
       "source": "ebs_v1_json_adapter"
     },
     "signals": [
