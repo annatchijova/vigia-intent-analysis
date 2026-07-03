@@ -3010,3 +3010,57 @@ Real-evidence case `evidence/owl-2019-hd1-windows` (VIGIA-OWL-2019-HD1-WINDOWS-V
 - Exit code: 3 (INTENT/SUSPICION DETECTED)
 
 Restore tag: `pre-eventlog-fix-<timestamp>`
+
+---
+
+## B-051 — likelihood_ratio.py: unguarded math.exp(combined_log_lr) → OverflowError [FIXED]
+
+| Field | Value |
+|-------|-------|
+| **Status** | FIXED — 2026-07-03 |
+| **Severity** | P1 — deterministic crash (DoS) of Mode 4 Secondness phase |
+| **File** | `vigia/core/likelihood_ratio.py` (step 5 of `infer()`) |
+| **Detected** | AUDITORIA_L040_LIKELIHOOD_RATIO.md §2.3 (formal L-040 analysis) |
+| **Restore tag** | `pre-b051-overflow-20260703-041212` |
+
+### Description
+
+`lr_combined = math.exp(combined_log_lr)` did not bound its argument.
+`combined_log_lr` is an unbounded sum (`Σ (z²/2)·conf × correction`) and
+`math.exp` overflows for arguments > ~709.78 (float64 limit). Exact thresholds
+reproduced by bisection:
+
+- Base engine (`z_cap=3.0`): **≥158 signals** z=3, conf=1 (158×4.5 = 711).
+- `pipeline.py` adapter (`z_cap=10.0` default, `Z_CLIP_MAX=5.0`):
+  **≥57 signals** z=5, conf=1 (57×12.5 = 712.5). The adapter's own ±20 clamp
+  (`likelihood_engine.py`) came too late: `super().infer()` had already crashed.
+
+Result: `OverflowError: math range error` → the Mode 4 Secondness phase
+(`pipeline.py`) dies with an exception, not an ABSTAIN. A large batch case
+with high-z signals (the corpus already has VIGIA-BREAK-014 with 101
+artifacts) or an adversary injecting signals had a deterministic DoS.
+
+### Fix
+
+Clamp the argument to `±LOG_LR_EXP_CAP = 700.0` before `math.exp`:
+
+- `|combined_log_lr| ≤ 700` → **bit-for-bit identical** result (no previously
+  working input changes).
+- `combined_log_lr > 700` → `lr = exp(700) ≈ 1.01e304`, `posterior = 1.0`,
+  ENFSI label `very strong` — overwhelming evidence saturated honestly, not a
+  crash. Saturation is documented in `ForensicRecord.notes`
+  (`[B-051: combined_log_lr=... > 700 — exp argument saturated...]`) for
+  Daubert.
+- Window `(700, 709.78]` (n=156-157 at z=3): previously produced a huge finite
+  exp, now saturates at `exp(700)`. Posterior, ENFSI label and every
+  verdict-relevant output are identical; only the raw `lr_combined` in the
+  record changes, with a note.
+
+### Validation
+
+- `tests/test_b051_overflow_guard.py` — 7 tests with the exact thresholds:
+  158×z=3 and 57×z=5 (adapter) return finite values with posterior=1.0 and
+  the B-051 note; log_lr ≤ 700 bit-for-bit untouched; record_hash still
+  computable.
+- Full suite and `run_all_agent.py` corpus 198/198 with no regressions
+  (see commit).

@@ -72,6 +72,21 @@ Mínimo de señales necesarias para calcular matriz de correlación.
 Con menos señales, la penalización no aplica (factor = 1.0).
 """
 
+LOG_LR_EXP_CAP: float = 700.0
+"""
+B-051: math.exp(x) desborda (OverflowError) con x > ~709.78 (límite float64).
+combined_log_lr es una suma no acotada y supera ese límite con suficientes
+señales de alta z: 158 señales z=3·conf=1 con z_cap=3.0, o 57 señales z=5 vía
+el adaptador de pipeline.py (z_cap=10.0) — reproducido en
+AUDITORIA_L040_LIKELIHOOD_RATIO.md §2.3. Sin guard, un caso legítimo grande
+(o un adversario que inyecte señales) crasheaba la Segundidad de Mode 4.
+
+El clamp a ±700 preserva SIN CAMBIOS todo input que no desbordaba
+(|combined_log_lr| ≤ 700 → mismo resultado bit a bit) y satura el resto:
+exp(700) ≈ 1.01e304 → posterior = 1.0 (evidencia abrumadora, no un crash).
+La saturación queda documentada en ForensicRecord.notes para Daubert.
+"""
+
 
 # ---------------------------------------------------------------------------
 # ForensicRecord — trazabilidad completa de cada inferencia
@@ -215,7 +230,29 @@ class LikelihoodEngine:
         combined_log_lr = sum(log_lrs) * correction_factor
 
         # Paso 5: LR y probabilidad posterior (prior neutral 0.5)
-        lr_combined = math.exp(combined_log_lr)
+        # B-051 FIX: clamp del argumento antes de exp — math.exp desborda en
+        # ~709.78 y crasheaba con ≥158 señales z=3 (o ≥57 señales z=5 vía el
+        # adaptador z_cap=10). ±700 no altera ningún input que antes
+        # funcionaba; los que desbordaban saturan a posterior=1.0 con nota
+        # forense en el registro en vez de tumbar el pipeline.
+        _exp_arg = combined_log_lr
+        if _exp_arg > LOG_LR_EXP_CAP:
+            _exp_arg = LOG_LR_EXP_CAP
+            calibration_note += (
+                f" [B-051: combined_log_lr={combined_log_lr:.2f} > "
+                f"{LOG_LR_EXP_CAP:.0f} — argumento de exp saturado; "
+                f"LR≈1.01e304, posterior=1.0]"
+            )
+        elif _exp_arg < -LOG_LR_EXP_CAP:
+            # Inalcanzable con la fórmula actual (z²/2·conf ≥ 0 y
+            # correction_factor ≥ 0), pero el clamp es simétrico por robustez.
+            _exp_arg = -LOG_LR_EXP_CAP
+            calibration_note += (
+                f" [B-051: combined_log_lr={combined_log_lr:.2f} < "
+                f"-{LOG_LR_EXP_CAP:.0f} — argumento de exp saturado; "
+                f"posterior≈0.0]"
+            )
+        lr_combined = math.exp(_exp_arg)
         posterior = lr_combined / (1.0 + lr_combined)
 
         # Paso 6: Etiqueta ENFSI para el REPORT LAYER

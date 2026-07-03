@@ -2693,3 +2693,56 @@ Caso real `evidence/owl-2019-hd1-windows` (VIGIA-OWL-2019-HD1-WINDOWS-V5):
 - Exit code: 3 (INTENT/SUSPICION DETECTED)
 
 Restore tag: `pre-eventlog-fix-<timestamp>`
+
+---
+
+## B-051 — likelihood_ratio.py: math.exp(combined_log_lr) sin guard → OverflowError [FIXED]
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | CORREGIDO — 2026-07-03 |
+| **Severidad** | P1 — crash determinista (DoS) de la Segundidad de Mode 4 |
+| **Archivo** | `vigia/core/likelihood_ratio.py` (paso 5 de `infer()`) |
+| **Detectado** | AUDITORIA_L040_LIKELIHOOD_RATIO.md §2.3 (análisis formal de L-040) |
+| **Tag de restauración** | `pre-b051-overflow-20260703-041212` |
+
+### Descripción
+
+`lr_combined = math.exp(combined_log_lr)` no acotaba el argumento.
+`combined_log_lr` es una suma no acotada (`Σ (z²/2)·conf × correction`) y
+`math.exp` desborda con argumento > ~709.78 (límite float64). Umbrales exactos
+reproducidos por bisección:
+
+- Engine base (`z_cap=3.0`): **≥158 señales** z=3, conf=1 (158×4.5 = 711).
+- Adaptador de `pipeline.py` (`z_cap=10.0` por defecto, `Z_CLIP_MAX=5.0`):
+  **≥57 señales** z=5, conf=1 (57×12.5 = 712.5). El clamp ±20 del adaptador
+  (`likelihood_engine.py`) llegaba tarde: `super().infer()` ya había crasheado.
+
+Resultado: `OverflowError: math range error` → la fase de Segundidad de
+Mode 4 (`pipeline.py`) muere con excepción, no con ABSTAIN. Un caso de batch
+grande con señales de alta z (el corpus ya tiene VIGIA-BREAK-014 con 101
+artefactos) o un adversario que inyecte señales tenía un DoS determinista.
+
+### Fix
+
+Clamp del argumento a `±LOG_LR_EXP_CAP = 700.0` antes de `math.exp`:
+
+- `|combined_log_lr| ≤ 700` → resultado **bit a bit idéntico** al previo
+  (ningún input que funcionaba cambia).
+- `combined_log_lr > 700` → `lr = exp(700) ≈ 1.01e304`, `posterior = 1.0`,
+  etiqueta ENFSI `very strong` — evidencia abrumadora saturada honestamente,
+  no un crash. La saturación queda documentada en `ForensicRecord.notes`
+  (`[B-051: combined_log_lr=... > 700 — argumento de exp saturado...]`) para
+  Daubert.
+- Ventana `(700, 709.78]` (n=156-157 con z=3): antes producía un exp finito
+  gigante, ahora satura en `exp(700)`. Posterior, etiqueta ENFSI y toda salida
+  relevante al veredicto son idénticos; solo cambia el `lr_combined` crudo del
+  registro, con nota.
+
+### Validación
+
+- `tests/test_b051_overflow_guard.py` — 7 tests con los umbrales exactos:
+  158×z=3 y 57×z=5 (adaptador) retornan finito con posterior=1.0 y nota
+  B-051; log_lr ≤ 700 bit a bit intacto; record_hash sigue computable.
+- Suite completa y corpus `run_all_agent.py` 198/198 sin regresiones
+  (ver commit).
