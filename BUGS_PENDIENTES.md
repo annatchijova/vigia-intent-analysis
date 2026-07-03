@@ -3256,3 +3256,216 @@ Que 44 casos MALICE tengan `is_conclusive=False` y posteriors ~0.05 conecta
 con el leak de `expected_verdict` en el adaptador EBS (ítem Tanda C). Este
 fix elimina la contradicción visible en la narrativa; esa causa raíz sigue
 abierta y es decisión de doctrina.
+
+---
+
+## B-066 — Whitelist mobile Fase 1: 8 tipos de evidencia + mapas del adapter + test de contrato [RESUELTO]
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | RESUELTO — POST HACKATHON (2026-07-03). Implementa AUDITORIA_MOBILE_WHITELIST §4 Fase 1; cierra la propuesta de B-060 |
+| **Severidad** | P2 — evidencia mobile sin perfil: excluida de CAIE (skip silencioso) y puntuada con fallback no calibrado |
+| **Archivo** | `vigia/tools/caie.py` (EVIDENCE_PROFILES), `vigia/core/forensic_adapter.py` (los 3 mapas) |
+| **Tag de restauración** | `pre-fase1-mobile-whitelist-20260703-175549` |
+
+### Fix
+
+1. **8 perfiles mobile** en `EVIDENCE_PROFILES`, calibrados por analogía con
+   la escala existente (§2 de la auditoría): `chat_message` (.35/.28), `sms`
+   (.40/.26), `call_log` (.40/.26), `web_search` (.45/.24), `app_data`
+   (.50/.22), `social_media` (.55/.22), `location_data` (.30/.30),
+   `contact_data` (.60/.20). Cero apariciones en el corpus → sin efecto
+   retroactivo.
+2. **Mapas del adapter** (`_LAYER_MAP`/`_EVIDENCE_MAP`/`_ONTOLOGY_MAP`): los
+   8 tipos + las 4 etiquetas agregadas de motor (`android_forensic`,
+   `ios_forensic`, `macos_forensic`, `google_takeout` → `app_data` hasta
+   B-052-P2). Cierra los defaults silenciosos de B-060.
+3. **Test de contrato** (`tests/test_b066_b067_mobile_whitelist.py`):
+   todo tipo emitido debe resolver en los 3 mapas Y todo valor de
+   `_EVIDENCE_MAP` debe existir en `EVIDENCE_PROFILES` — la convención
+   productor/consumidor ahora es contrato que falla en CI.
+
+### Validación
+
+Suite 413 → 439 passed (+26), mismos 21 e2e preexistentes, 6 xfailed.
+Corpus agente 198/198. Comparativa scorer sobre 267 casos: **0 flips,
+0 moves**.
+
+---
+
+## B-067 — Whitelist invertido: un tipo desconocido puntuaba MÁS ALTO que la peor clase conocida [RESUELTO]
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | RESUELTO — POST HACKATHON (2026-07-03) |
+| **Severidad** | P2 — bypass de spoofability vía tipo inventado (el que `caie.py` `add_artifact` declara prevenir, abierto en el camino del scorer) |
+| **Archivo** | `vigia/tools/caie.py` (`Artifact.profile` + default duplicado inline en `__post_init__`), `vigia_scorer.py:514` (weight default) |
+| **Detectado en** | AUDITORIA_MOBILE_WHITELIST §3.2, hallazgo colateral cuantificado |
+| **Tag de restauración** | `pre-fase1-mobile-whitelist-20260703-175549` |
+
+### Descripción
+
+El fallback para tipo desconocido era `(spoofability=0.50, weight=0.20)` —
+producto `(1-s)×w = 0.10`, **mejor** que `log_entry` (0.85/0.15 → 0.0225) y
+que `ip_geolocation` (0.90/0.15 → 0.015). Un caso JSON adversarial podía
+inventar `evidence_type` para esquivar el perfil real de su tipo. El default
+además estaba **duplicado** en dos lugares (`Artifact.profile` y un inline en
+`__post_init__` que alimentaba `effective_spoofability`) — lente 6.
+
+### Fix — y lo que la corrida comparativa obligó a corregir del plan
+
+1. Fallback → `(0.90, 0.15)` = la peor clase conocida real; fuente única
+   (`self.profile`), default duplicado eliminado.
+2. **El fix naive rompía el corpus** (medido, no especulado): 6 flips, 3
+   contra `expected_verdict` (VIGIA-LINUX-001/007, case_009 perdían MALICE
+   esperado) — ~36 tipos en uso nunca perfilados dependían de facto del
+   fallback generoso. Resolución: esos 36 tipos (incluido `"default"`, el
+   placeholder de `normalize_case_schema` para artefactos sin tipo) se
+   **pinnean explícitos al valor legacy exacto** (0.50/0.20, marcados
+   "Uncalibrated -- pinned at legacy fallback value") → **veredicto** bit a
+   bit idéntico, y el fallback duro queda solo para tipos realmente
+   desconocidos. El bypass muere: inventar un tipo ya no paga.
+3. Invariante protegida por test: `(1-s)×w` del desconocido ≤ mínimo de TODA
+   la tabla — si un perfil futuro baja el mínimo, el test obliga a bajar el
+   fallback.
+
+### Aclaración de alcance (self-review 2026-07-03)
+
+La frase "bit a bit idéntico" arriba aplica al **veredicto y al score** (267/267
+casos, verificado), NO a la membresía interna de CAIE. Efecto secundario
+medido y benigno de agregar los 36 tipos a `EVIDENCE_PROFILES`: el frozenset
+`_VALID_EVIDENCE_TYPES` (que CAIE `add_artifact` enforcea) ahora los incluye,
+así que **31 casos del corpus** pasan artefactos al motor de fracturas que
+antes eran rechazados (ej. VIGIA-FLAREON-11: 0→11 artefactos aceptados; casos
+llenos de `binary`/`malware_static_analysis`). Medición: **0 casos cambiaron
+su nº de fracturas** → 0 cambio de score → 0 cambio de veredicto. Es
+arguablemente una mejora (cerraba un falso-negativo latente: esos tipos son
+evidencia legítima que debía participar del análisis cross-artefacto), pero se
+documenta explícitamente porque "bit a bit idéntico" sin calificar era
+impreciso sobre el procesamiento interno.
+
+### Pendiente derivado (documentado, no resuelto)
+
+Los 36 perfiles pinneados son legacy heredado, no calibración forense por
+tipo. Calibrarlos mueve ~193 artefactos del corpus (~16%) — trabajo aparte
+con corrida comparativa propia. Nota: la comparativa también mostró que
+VIGIA-NGDC-003 emite MALICE con expected SUSPICION bajo los valores legacy —
+candidato a corrección en esa calibración futura.
+
+### Validación
+
+Comparativa scorer 267 casos: **0 flips, 0 moves** (267/267 idénticos).
+Suite 439 passed. Corpus agente 198/198. Tests:
+`TestB067FallbackInversion` (3) — invariante contra toda la tabla, regresión
+del experimento §3.2, y tipos mobile fuera del fallback.
+
+---
+
+## B-068 — FP VIGIA-NGDC-003: documentación del escenario contaba como corroboración de MALICE [RESUELTO]
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | RESUELTO — POST HACKATHON (2026-07-03) |
+| **Severidad** | P1 — falso positivo MALICE en caso de intención genuinamente disputada (la clase de error más cara bajo Daubert: atribución indebida) |
+| **Archivo** | `vigia_scorer.py` (gate de corroboración, rama `final_score > 0.33`) |
+| **Detectado en** | Corrida comparativa de B-067 (FP latente bajo valores legacy); confirmado como FP real leyendo el caso |
+| **Tag de restauración** | `pre-ngdc003-fix-20260703-182734` |
+
+### Diagnóstico — ¿FP real o expected desactualizado?
+
+**FP real.** NGDC-003 (National Gallery DC 2012 — Joe/LogKext) es un caso de
+intención disputada por diseño: monitoreo parental de una menor (legal) vs
+espionaje conyugal durante un divorcio (ilegal), implementados de forma
+idéntica — el registro de artefactos no puede distinguir las dos hipótesis, y
+el propio caso lo argumenta en `peirce_expected.thirdness`. SUSPICION es el
+único veredicto epistemológicamente honesto; el expected está correcto.
+
+El MALICE salía así: intent score 0.4296 > 0.33 sin fracturas, y el gate de
+corroboración (`n_artifacts >= 4 OR n_types >= 3`) pasaba con 5 artefactos —
+pero **2 de los 5 son documentación del escenario** (`behavioral_context`,
+`outcome_signal`, fuente "Digital Corpora scenario documentation"), no
+evidencia de dispositivo. La evidencia técnica real: 3 artefactos / 2 clases
+→ el gate no debía pasar.
+
+### Fix mínimo
+
+El gate cuenta solo evidencia **técnica**: se excluyen las clases
+contextuales/narrativas (`behavioral_context`, `behavioral_profile`,
+`outcome_signal`, `acquisition_context`, `device_acquisition_timeline`,
+`osint`). Describen motivo, circunstancias y outcomes — informan la
+narrativa, pero no son fuentes independientes que corroboren una inferencia
+de malicia ("two independent sources" = clases de evidencia de dispositivo).
+Cuando el gate capea, el `reason` lo documenta explícitamente (patrón
+REFUTATION GATE LOG). NGDC-001/002/004 no cambian: su corroboración es
+técnica (6/6/6 artefactos de dispositivo).
+
+### Validación
+
+Comparativa scorer 267 casos: **exactamente 1 flip** —
+`VIGIA-NGDC-003 MALICE→SUSPICION (== expected)` — y 0 moves. Suite 439 →
+445 passed (+6 tests, `tests/test_b068_context_corroboration.py`: regresión
+NGDC completa + gate sintético, incluido "un caso armado solo con clases
+contextuales nunca sella MALICE"). Corpus agente 198/198.
+
+---
+
+## B-069 — Calibración de los 36 perfiles legacy: INTENTADA, RECHAZADA por la comparativa [NO APLICADO — gate negativo]
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | NO APLICADO — la corrida comparativa (gate obligatorio) rechazó el cambio. Pins legacy de B-067 retenidos. |
+| **Severidad** | N/A — resultado negativo documentado; ningún cambio de código sellado |
+| **Archivo** | `vigia/tools/caie.py` (`EVIDENCE_PROFILES`, bloque de pins legacy de B-067) — editado y **revertido** |
+| **Tag de restauración** | `pre-ngdc003-fix-20260703-182734` |
+
+### Qué se intentó
+
+Reemplazar los 36 perfiles pinneados al valor legacy (0.50/0.20, marcados
+"Uncalibrated" en B-067) por perfiles calibrados **por tipo**, con el mismo
+método que los perfiles mobile de B-066: analogía con la escala existente
+(`binary`→0.45/0.24 hash-verificable, `git_forensics`→0.30/0.28 SHA-chained,
+`disk_image`→0.20/0.30, `email_content`→0.60/0.20, clases contextuales
+subidas a 0.70-0.85, etc.).
+
+### Por qué se rechazó — la comparativa es el gate
+
+Corrida comparativa completa sobre 267 casos, baseline = HEAD committeado
+(post B-068):
+
+- **Casos ARREGLADOS vs expected: 0.**
+- **Casos ROTOS vs expected: 1** — `VIGIA-LINUX-002` NOISE→UNKNOWN. Es el
+  caso benigno de *test de falso positivo* (contribuidor open-source
+  legítimo, libarchive CVE). La calibración de `git_forensics` (0.10/0.28,
+  "difícil de spoofear") hace que la actividad git **legítima** pese más y
+  cruce el umbral NOISE→UNKNOWN: un FP nuevo en el caso que existe para
+  atrapar FPs.
+- Accuracy vs expected: 70.8% → **70.4%** (neta negativa).
+- 27 score moves, casi todos **al alza** (inflación).
+
+### Causa raíz de por qué la calibración batch no cierra
+
+Los umbrales del scorer (MALICE>0.33, SUSPICION>0.18, UNKNOWN>0.08) fueron
+"calibrados sobre la distribución real de casos EBS v1" (comentario en
+`vigia_scorer.py`) **con los pesos legacy**. Subir los pesos por tipo infla
+la distribución entera contra umbrales fijos → los casos benignos derivan
+hacia arriba. Recalibrar los perfiles por tipo **sin** re-ajustar
+conjuntamente los umbrales del veredicto rompe el balance.
+
+### Conclusión (valor del resultado negativo)
+
+La comparativa **prueba que los pins legacy no causan ningún error de
+veredicto en el corpus** (0 casos que la recalibración pudiera arreglar). Los
+36 perfiles legacy son "no calibrados" en el sentido de que no derivan de una
+decisión forense por tipo, pero son **correctos en la práctica** para la
+distribución actual. Recalibrarlos es riesgo sin recompensa hasta que exista
+un re-fit conjunto perfiles+umbrales con dataset etiquetado (ver
+`fit_calibration.py` y el roadmap "Bayesian calibration on labelled case
+dataset" en `vigia_scorer.py`). Pendiente reclasificado: de "calibrar los 36
+perfiles" a "re-fit conjunto perfiles+umbrales" — trabajo mayor, fuera del
+alcance de un fix acotado.
+
+### Validación
+
+Ningún cambio de código sellado. `caie.py` revertido a HEAD (`a021a6a`);
+árbol de trabajo limpio. La comparativa que sustenta esta decisión está
+archivada como artefacto de sesión (baseline vs post, 267 casos).

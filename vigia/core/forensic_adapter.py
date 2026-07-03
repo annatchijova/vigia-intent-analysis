@@ -80,6 +80,15 @@ _LAYER_MAP = {
     "usb": EvidenceLayer.REGISTRY, "browser": EvidenceLayer.DISK_MFT,
     "shellbag": EvidenceLayer.REGISTRY, "amcache": EvidenceLayer.DISK_MFT,
     "event_log": EvidenceLayer.REGISTRY, "unknown": EvidenceLayer.DISK_MFT,
+    # B-066/B-060: tipos mobile — bases SQLite en disco → DISK_MFT explícito
+    # (antes caían al mismo default en silencio; ahora es una decisión).
+    "chat_message": EvidenceLayer.DISK_MFT, "sms": EvidenceLayer.DISK_MFT,
+    "call_log": EvidenceLayer.DISK_MFT, "web_search": EvidenceLayer.DISK_MFT,
+    "app_data": EvidenceLayer.DISK_MFT, "social_media": EvidenceLayer.DISK_MFT,
+    "location_data": EvidenceLayer.DISK_MFT, "contact_data": EvidenceLayer.DISK_MFT,
+    # Etiquetas agregadas de motor (hasta B-052-P2, señal única por motor)
+    "android_forensic": EvidenceLayer.DISK_MFT, "ios_forensic": EvidenceLayer.DISK_MFT,
+    "macos_forensic": EvidenceLayer.DISK_MFT, "google_takeout": EvidenceLayer.DISK_MFT,
 }
 
 _EVIDENCE_MAP = {
@@ -109,6 +118,16 @@ _EVIDENCE_MAP = {
     "mft_entry": "mft_entry",
     "usn_journal_gap": "usn_journal_gap",
     "unknown": "log_entry",
+    # B-066/B-060: tipos mobile canónicos (identidad — están en
+    # EVIDENCE_PROFILES) + etiquetas agregadas de motor mapeadas a app_data
+    # (perfil 0.50/0.22, el más cercano al carácter heterogéneo del agregado)
+    # hasta que B-052-P2 tipifique por hallazgo.
+    "chat_message": "chat_message", "sms": "sms",
+    "call_log": "call_log", "web_search": "web_search",
+    "app_data": "app_data", "social_media": "social_media",
+    "location_data": "location_data", "contact_data": "contact_data",
+    "android_forensic": "app_data", "ios_forensic": "app_data",
+    "macos_forensic": "app_data", "google_takeout": "app_data",
 }
 
 _ONTOLOGY_MAP = {
@@ -118,6 +137,14 @@ _ONTOLOGY_MAP = {
     "usb": OntologicalLevel.TECHNIQUE, "browser": OntologicalLevel.TECHNIQUE,
     "shellbag": OntologicalLevel.TECHNIQUE, "amcache": OntologicalLevel.TECHNIQUE,
     "event_log": OntologicalLevel.TECHNIQUE, "unknown": OntologicalLevel.TECHNIQUE,
+    # B-066/B-060: mobile — contenido de comunicación/ubicación es TACTIC
+    # (qué hizo el actor); storage genérico de app es TECHNIQUE.
+    "chat_message": OntologicalLevel.TACTIC, "sms": OntologicalLevel.TACTIC,
+    "call_log": OntologicalLevel.TACTIC, "web_search": OntologicalLevel.TACTIC,
+    "social_media": OntologicalLevel.TACTIC, "location_data": OntologicalLevel.TACTIC,
+    "app_data": OntologicalLevel.TECHNIQUE, "contact_data": OntologicalLevel.TECHNIQUE,
+    "android_forensic": OntologicalLevel.TECHNIQUE, "ios_forensic": OntologicalLevel.TECHNIQUE,
+    "macos_forensic": OntologicalLevel.TECHNIQUE, "google_takeout": OntologicalLevel.TECHNIQUE,
 }
 
 

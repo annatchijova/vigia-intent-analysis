@@ -286,7 +286,54 @@ EVIDENCE_PROFILES: Final[dict[str, EvidenceProfile]] = {
     # VABS-1 / CAIE-GAP-001: network and file metadata evidence types
     "network_flow":         EvidenceProfile(0.75, 0.18, "Network flow record -- IP spoofable, content tunnelable"),
     "file_metadata":        EvidenceProfile(0.65, 0.20, "File attributes (size/owner/perms) -- modifiable with privs, MFT cross-check possible"),
+
+    # B-066 (AUDITORIA_MOBILE_WHITELIST §2): mobile forensics evidence types.
+    # Calibración por analogía con la escala existente: "editable con root"
+    # ≈ registry_key (0.55, "writable with privs"); lo que sube el peso es la
+    # correlacionabilidad externa (carrier CDR, server-side, cell towers).
+    # Cero apariciones en el corpus al momento de agregarlos — extensión sin
+    # efecto retroactivo.
+    "chat_message":         EvidenceProfile(0.35, 0.28, "App chat DB (SQLite WAL + FK integrity) -- server-correlatable, coherent forgery requires root + tooling"),
+    "sms":                  EvidenceProfile(0.40, 0.26, "mmssms.db / sms.db -- editable with root, carrier CDR correlatable"),
+    "call_log":             EvidenceProfile(0.40, 0.26, "calllog.db -- editable with root, carrier CDR correlatable"),
+    "web_search":           EvidenceProfile(0.45, 0.24, "Browser history SQLite -- editable with root, visit chains cross-checkable"),
+    "app_data":             EvidenceProfile(0.50, 0.22, "App-private storage -- heterogeneous, no uniform guarantee"),
+    "social_media":         EvidenceProfile(0.55, 0.22, "Social app client cache -- editable, server-side correlation out of local exam scope"),
+    "location_data":        EvidenceProfile(0.30, 0.30, "Location history (GPS/Takeout) -- consistent forgery vs cell towers is hard"),
+    "contact_data":         EvidenceProfile(0.60, 0.20, "contacts2.db -- trivially editable with root; value is structural (empty/unknown-sender)"),
 }
+
+# B-067: tipos EN USO en el corpus que nunca fueron perfilados. Hasta este
+# fix viajaban con el fallback implícito (0.50, 0.20); la corrida comparativa
+# demostró que sus veredictos dependen de facto de esos valores (6 flips al
+# endurecer el fallback, 3 contra expected_verdict). Se pinnean EXPLÍCITOS al
+# valor legacy exacto — comportamiento bit a bit idéntico, cero flips — y el
+# fallback para tipos realmente desconocidos pasa a la peor clase conocida.
+# PENDIENTE DE CALIBRACIÓN: estos valores son el legacy heredado, no una
+# decisión forense por tipo. Calibrarlos es un trabajo aparte (ver
+# AUDITORIA_MOBILE_WHITELIST §3.1: mover estos perfiles mueve ~193 artefactos).
+_LEGACY_UNCALIBRATED = EvidenceProfile(
+    0.50, 0.20, "Uncalibrated -- pinned at legacy fallback value (B-067), pending per-type calibration"
+)
+EVIDENCE_PROFILES.update({
+    t: _LEGACY_UNCALIBRATED for t in (
+        "binary", "binary_executable", "elf_executable", "pe_executable",
+        "binary_diff", "malware_static_analysis", "malware_infrastructure",
+        "document", "spreadsheet", "file_text", "web_artifact",
+        "container_zip", "archive", "disk_image", "filesystem_artifact",
+        "deleted_file_recovery", "registry_hive", "shimcache", "event_log",
+        "network_traffic", "network_capture", "network_communication_pattern",
+        "email_content", "email_account_creation", "keylogger_capture",
+        "osint", "git_forensics", "TPM_attestation", "acquisition_context",
+        "memory_os_profile", "device_acquisition_timeline",
+        "behavioral_context", "behavioral_profile", "outcome_signal",
+        "plaintext_credential",
+        # Placeholder que normalize_case_schema asigna a artefactos SIN
+        # evidence_type declarado — población legacy sin etiquetar, no un
+        # tipo adversarial inventado (case_009 dependía de él).
+        "default",
+    )
+})
 
 # Whitelist of valid evidence types — any type not in this set is rejected
 _VALID_EVIDENCE_TYPES: Final[frozenset[str]] = frozenset(EVIDENCE_PROFILES.keys())
@@ -572,10 +619,10 @@ class Artifact:
         _floor     = _ACQ_SPOOFABILITY_FLOORS.get(
             self.evidence_type, _ACQ_SPOOFABILITY_FLOOR_DEFAULT
         )
-        _intrinsic = EVIDENCE_PROFILES.get(
-            self.evidence_type,
-            EvidenceProfile(0.50, 0.20, "default"),
-        ).spoofability
+        # B-067: fuente única — self.profile (que trata el tipo desconocido
+        # como la peor clase conocida). Acá había un default duplicado
+        # (0.50, 0.20) que reabría el bypass aunque profile estuviera bien.
+        _intrinsic = self.profile.spoofability
         self.effective_spoofability: float = _compute_effective_spoofability(
             _intrinsic, _assurance, _floor
         )
@@ -646,9 +693,16 @@ class Artifact:
 
     @property
     def profile(self) -> EvidenceProfile:
+        # B-067: el default para tipo DESCONOCIDO no puede ser mejor que la
+        # peor clase conocida. Con (0.50, 0.20), un tipo inventado puntuaba
+        # MÁS ALTO que log_entry (0.85, 0.15) — el bypass exacto que el
+        # whitelist de add_artifact dice prevenir ("Unknown types could
+        # bypass spoofability weighting"), abierto en el camino del scorer.
+        # (0.90, 0.15) = ip_geolocation/cultural_marker, la peor clase real:
+        # invariante (1-spoof)×weight del desconocido ≤ mínimo de la tabla.
         return EVIDENCE_PROFILES.get(
             self.evidence_type,
-            EvidenceProfile(0.50, 0.20, "Unknown evidence type -- default weights"),
+            EvidenceProfile(0.90, 0.15, "Unknown evidence type -- treated as worst known class (B-067)"),
         )
 
     @property
