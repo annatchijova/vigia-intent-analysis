@@ -682,11 +682,11 @@ surface area.
 
 ---
 
-## B-016 — memory_forensics.py Does Not Validate Memory Image Format (VMware vs Raw RAM Dump)
+## B-016 — memory_forensics.py Does Not Validate Memory Image Format (VMware vs Raw RAM Dump) [PARTIALLY MITIGATED]
 
 | Field | Value |
 |-------|-------|
-| **Status** | OPEN |
+| **Status** | PARTIALLY MITIGATED — operational path covered; pending in V4 engine |
 | **Severity** | P2 — produces uninformative error instead of clear diagnostics |
 | **File** | `vigia/sift/memory_forensics.py` (or the caller that invokes Volatility3) |
 | **Detected** | Session 2026-06-27 |
@@ -718,13 +718,19 @@ Add format detection before invoking Volatility3:
 3. Document the limitation in `KNOWN_LIMITATIONS.md` if it cannot be resolved
    within the current scope.
 
+### Update (2026-07-03, triage)
+
+The shim's vol3 adapter — the path that actually runs in agent mode — already
+detects the case (stderr markers) and emits `FORMAT_NOT_SUPPORTED` → ABSTAIN.
+Remaining: port the same detector to `memory_forensics.py` (V4 engine). Tanda B.
+
 ---
 
-## B-017 — `defusedxml` Missing from venv Produces Silent PIPELINE_ERROR
+## B-017 — `defusedxml` Missing from venv Produces Silent PIPELINE_ERROR [RESOLVED]
 
 | Field | Value |
 |-------|-------|
-| **Status** | OPEN |
+| **Status** | RESOLVED — Tanda A (TRIAGE 2026-07-03), tag `pre-tanda-a-20260703-134624` |
 | **Severity** | P2 — the agent seals the bundle with a `PIPELINE_ERROR` verdict instead of aborting with clear diagnostics |
 | **File** | `vigia/sift/` (real orchestrator) — the `defusedxml` import fails at runtime |
 | **Detected** | Session 2026-06-27, case NPS-2010-EMAILS, Mode 1 (`vigia_agent.py`) |
@@ -777,13 +783,25 @@ pip install defusedxml>=0.7.1
 - **Copilot Bug 28/11/15** (signal_mapper.py .lower() on tool_name): file does not exist, bug entirely hallucinated by Copilot. Pattern does not exist in the codebase.
 - **_calibration_dataset accumulation**: initialized in __init__ but never populated between runs — no residual state.
 
+### Closure update (2026-07-03, Tanda A — T-1/T-2)
+
+Triage widened the real blast radius: the module-level `raise ImportError` in
+`event_log_correlator.py` killed the ENTIRE `vigia.sift` package (all 14 V4
+engines, via the unconditional import in `vigia/sift/__init__.py:19`) — not
+just event-log analysis [REPRODUCED]. Real trigger (T-2): `defusedxml` was in
+`requirements.txt`/`pyproject.toml` but NOT in `requirements-ci.txt`.
+Fix: (1) added to requirements-ci; (2) guarded import (`ET = None`) — without
+defusedxml, XML/EVTX files are marked `UNANALYZED_ARTIFACT` (→ ABSTAIN) and
+every other engine keeps operating; XXE protection preserved (never falls
+back to `xml.etree`). Tests: `TestA1DefusedxmlResilient` (4).
+
 ---
 
-## B-018 — Volatility3 Subprocess Timeout in `vigia_agent.py` for Large Dumps (>=4 GB)
+## B-018 — Volatility3 Subprocess Timeout in `vigia_agent.py` for Large Dumps (>=4 GB) [PARTIALLY MITIGATED]
 
 | Field | Value |
 |-------|-------|
-| **Status** | OPEN |
+| **Status** | PARTIALLY MITIGATED — full timeout already degrades to honest ABSTAIN |
 | **Severity** | P1 — pipeline seals a bundle with 0 signals without warning that Volatility3 did not finish |
 | **File** | `vigia/pipeline/` / `vigia_agent.py` (vol3 subprocess orchestrator) |
 | **Detected** | Session 2026-06-27, batch NARCOS SRL-2018, 12 dumps >=4 GB |
@@ -854,6 +872,13 @@ And use those results as context for `reason_with_llm` in Claude Code mode.
 The `NARCOS-*_claude.json` bundles in `results/srl2018/` are affected by this bug.
 The `NARCOS-*_bundle.json` bundles (run with sufficient timeout) are the reference
 files for the forensic analysis of this session.
+
+### Update (2026-07-03, triage)
+
+Post P1-D: if ALL plugins time out → `UNANALYZED_ARTIFACT` → ABSTAIN (not
+benign, not a crash). Remaining to actually complete analysis on large dumps:
+`VIGIA_VOL3_TIMEOUT` env var + size-scaled timeouts, recorded in
+`pipeline_meta`. Tanda B.
 
 ---
 
@@ -1410,11 +1435,11 @@ assert epc == Fraction(1, 10)
 
 ---
 
-## B-025 — Architectural Investigation: `Fraction` vs `float` Boundary in Scorer (OPEN)
+## B-025 — Architectural Investigation: `Fraction` vs `float` Boundary in Scorer [CLOSED — subsumed]
 
 | Field | Value |
 |-------|-------|
-| **Status** | OPEN — investigation required, no patch yet |
+| **Status** | CLOSED — subsumed by AUDITORIA_L040_LIKELIHOOD_RATIO.md §4 (2026-07-03) |
 | **Severity** | P2 — architectural debt, not a functional bug |
 | **File** | `vigia_scorer.py` |
 | **Function** | `_dround()`, `_dsum()`, and scoring formula path |
@@ -1506,13 +1531,21 @@ Before any refactoring of `_dround()`, `_dsum()`, or the scoring formulas:
 **This investigation is a prerequisite for any L-021 Phase 3 work on `vigia_scorer.py`.**
 Do not proceed with arithmetic refactoring until the contract is written down.
 
+### Closure (2026-07-03)
+
+The requested investigation exists: `AUDITORIA_L040_LIKELIHOOD_RATIO.md` §4
+maps the 7 float paths of the verdict pipeline (U1-U7) with coverage status,
+measured divergences (~1 ulp, no accumulation) and a table-based de-floating
+plan (U7 — cross-platform record_hash — first). Remaining work tracked in
+Tanda B of TRIAGE_BUGS_LIMITACIONES_20260703.md.
+
 ---
 
-## B-026 — `prior_trust` Not Validated at Scorer Boundary — Negative Values Produce Impossible States
+## B-026 — `prior_trust` Not Validated at Scorer Boundary — Negative Values Produce Impossible States [RESOLVED]
 
 | Field | Value |
 |-------|-------|
-| **Status** | OPEN — fix pending, design decision required |
+| **Status** | RESOLVED — Tanda A (TRIAGE 2026-07-03) |
 | **Severity** | P1 — produces `confidence > 1.0` and incorrect `NOISE` verdict |
 | **File** | `vigia_scorer.py` |
 | **Function** | EPC / provenance trust scoring path |
@@ -1636,13 +1669,23 @@ raises `ValueError` for unrecognized verdict strings rather than silently defaul
 **Recommendation: implement Option B at line 474**, before the trust multiplication,
 before any `Fraction` arithmetic is performed on the invalid value.
 
+### Closure (2026-07-03, Tanda A — A2)
+
+Same Finite Math Shield as `raw_score` two lines above: non-numeric/NaN/inf →
+1.0 (neutral default), then clamp [0,1]. Applied to the LIVE scorer
+(`vigia_scorer.py:478`, repo root) and to the `vigia/core/` copy. **Side
+finding T-6 (new, B-055):** `vigia/core/vigia_scorer.py` is a stale divergent
+copy referencing `_EPC_FACTOR_TABLE` without defining it (latent NameError) —
+already flagged "stale and unused" by the r7 patch (2026-06-19). See B-055.
+Tests: `TestA2PriorTrustClamp` (9).
+
 ---
 
-## B-027 — `is_conclusive=True` Semantically Incompatible with `ABSTAIN_DETECTED`
+## B-027 — `is_conclusive=True` Semantically Incompatible with `ABSTAIN_DETECTED` [RESOLVED]
 
 | Field | Value |
 |-------|-------|
-| **Status** | OPEN |
+| **Status** | RESOLVED — Tanda A (TRIAGE 2026-07-03) |
 | **Severity** | P1 — logical self-contradiction in sealed bundle |
 | **File** | `sift_orchestrator.py` |
 | **Function** | EBS path (line 195) and vol3 path (line 340) |
@@ -1733,6 +1776,15 @@ assert bundle["best_hypothesis"] == "ABSTAIN_DETECTED"
 bundle = orchestrator.run(expected="MALICE", avg=Fraction(9, 10))
 assert bundle["is_conclusive"] is True
 ```
+
+### Closure (2026-07-03, Tanda A — A3)
+
+(1) EBS adapter: `is_conclusive` now also requires the hypothesis not to be
+ABSTAIN/UNDETERMINED (originally cited lines 195/340 are ~606/794 today —
+T-5). (2) vol3 path annotated (its hypothesis ladder never yields ABSTAIN).
+(3) Central guard in `vigia_agent._seal_bundle`: any future path sealing an
+ABSTAIN verdict with `is_conclusive=True` gets downgraded with an
+`is_conclusive_downgraded` annotation. Tests: `TestA3IsConclusiveCoherent` (3).
 
 ---
 
@@ -1973,11 +2025,11 @@ proposed or applied fix, and commit reference.
 
 ---
 
-## B-029 — `quadripartite.py` Check 3 `else` Branch Is Dead Code (`ABSTAIN_CONTRADICTION` Unreachable for Non-OSCIL Reasons)
+## B-029 — `quadripartite.py` Check 3 `else` Branch Is Dead Code (`ABSTAIN_CONTRADICTION` Unreachable for Non-OSCIL Reasons) [CLOSED]
 
 | Field | Value |
 |-------|-------|
-| **Status** | OPEN — documentation only, no patch needed until investigation below is complete |
+| **Status** | CLOSED — 2026-07-03 (documentation-only entry; investigation covered by B-030, dismissed) |
 | **Severity** | P3 — dead code, no functional impact |
 | **File** | `vigia/verdict/quadripartite.py` |
 | **Function** | `classify()` — Check 3 ABSTAIN sub-state branch |
@@ -3147,3 +3199,96 @@ Extend the reasoner's layer_map with mobile layers. **Do not touch without a
 full corpus run**: it changes the verdict of every mobile case (tuck-2019
 would move from ABSTAIN to INTENT/MALICE). See
 `AUDITORIA_MACOS_NARRATIVA.md` §4.
+
+---
+
+## B-053 — shim: a corrupt pcap aborted the ENTIRE case (T-3) [RESOLVED]
+
+| Field | Value |
+|-------|-------|
+| **Status** | RESOLVED — Tanda A (TRIAGE 2026-07-03) |
+| **Severity** | P1 — total analysis loss on mixed evidence |
+| **File** | `sift_orchestrator.py` (shim, pcap block) |
+| **Detected** | TRIAGE_BUGS_LIMITACIONES_20260703.md (T-3) |
+| **Restore tag** | `pre-tanda-a-20260703-134624` |
+
+### Description
+
+A pcap parse failure (missing tshark — L-039 — or corrupt file) did `raise`,
+falling to the global except of `analyze()` → `_error_result` →
+**PIPELINE_ERROR for the WHOLE case**. On mixed evidence (pcap + evtx +
+hives), one broken pcap also discarded the analysis of the healthy artifacts.
+
+### Fix
+
+F7 pattern: the error is captured, the pcap is materialized as a synthetic
+`PCAP_UNANALYZED` signal (unanalyzed=True, error in metadata), "pcap" is
+added to `results.unanalyzed_artifacts` and `pipeline_meta.pcap_error`, and
+the rest of the evidence CONTINUES. Verdict degrades to ABSTAIN only if no
+other signal remains (existing N8/F7 gates).
+
+### Validation
+
+`TestA4PcapDoesNotAbortCase` (2): broken pcap + evtx → hypothesis ≠
+PIPELINE_ERROR, PCAP_UNANALYZED signal present; healthy-pcap control.
+
+---
+
+## B-054 — Dead text fallback: import of nonexistent module + incompatible parser (F-L040-6) [RESOLVED]
+
+| Field | Value |
+|-------|-------|
+| **Status** | RESOLVED — Tanda A (TRIAGE 2026-07-03) |
+| **Severity** | P2 — a safety net that never worked |
+| **File** | `vigia_agent.py` (`_run_text_pipeline`) |
+| **Detected** | AUDITORIA_L040_LIKELIHOOD_RATIO.md (F-L040-6) |
+| **Restore tag** | `pre-tanda-a-20260703-134624` |
+
+### Description (two chained bugs)
+
+1. `from run_pipeline import run` pointed at a module that does not exist in
+   the repo root → the text fallback ALWAYS degraded to PIPELINE_UNAVAILABLE.
+   The real module is `vigia/scripts/run_pipeline.py`, identical signature.
+2. **Latent bug exposed by reviving it:** the semiotic pipeline serializes
+   integers in canonical tagged format (`mi_final = {"num": "29:int", "den":
+   "70:int"}`) and the agent's parser expected raw ints → TypeError. That
+   code had never run against real output (the broken import kept it dead).
+
+### Fix
+
+(1) Import corrected to `vigia.scripts.run_pipeline` with a legacy flat-layout
+fallback. (2) Defensive `_tagged_int()` decoder ("29:int" → 29; raw ints
+still work; invalid strings → default).
+
+### Validation
+
+`TestA6TextFallbackAlive` (2): import resolves; end-to-end fallback on real
+text evidence → hypothesis ≠ PIPELINE_UNAVAILABLE.
+
+---
+
+## B-055 — vigia/core/vigia_scorer.py: stale divergent copy with latent NameError (T-6) [OPEN]
+
+| Field | Value |
+|-------|-------|
+| **Status** | OPEN — decision pending (delete vs re-export) |
+| **Severity** | P2 — trap for future imports; no impact on live path |
+| **Files** | `vigia/core/vigia_scorer.py` (stale, 523 lines) vs `vigia_scorer.py` (live, 764 lines) |
+| **Detected** | Tanda A (while applying B-026): the core copy's `_vigia_score` crashes with `NameError: _EPC_FACTOR_TABLE is not defined` for any non-BROKEN custody chain |
+
+### Description
+
+Two copies of the scorer exist. The live one (repo root) has
+`_EPC_FACTOR_TABLE` (B-019 fix), B-031 and the rest of the evolution; the
+`vigia/core/` copy diverged and references the table without defining it —
+a **latent NameError** for any importer (real consumers, `vigia_api.py` ×2,
+import the root). Already flagged "stale and unused" by the r7 patch
+(2026-06-19); never acted on. The B-026 clamp was applied to BOTH copies for
+consistency.
+
+### Proposal
+
+Delete `vigia/core/vigia_scorer.py` or turn it into a one-line re-export
+(`from vigia_scorer import *`) so it cannot diverge. Requires verifying no
+external consumer imports it (current grep: only comments in the r7 patch).
+Tanda B.

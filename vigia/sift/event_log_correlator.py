@@ -15,13 +15,17 @@ import json
 import logging
 import re
 import subprocess
+# B-017/T-1 FIX (TRIAGE 2026-07-03): import GUARDED, no raise a nivel de
+# módulo. El raise anterior mataba el paquete vigia.sift ENTERO (los 14
+# motores V4, vía el import incondicional en vigia/sift/__init__.py) por la
+# ausencia de una lib que solo necesita el parseo XML. Ahora: sin defusedxml,
+# los archivos XML/EVTX se marcan UNANALYZED_ARTIFACT (→ ABSTAIN aguas
+# arriba) y el resto de los motores opera. La protección XXE se mantiene:
+# NUNCA se cae a xml.etree — sin defusedxml simplemente no se parsea XML.
 try:
     from defusedxml import ElementTree as ET
-except ImportError as _defused_err:
-    raise ImportError(
-        "FIX P2: defusedxml es obligatorio para protección contra XXE/Billion Laughs. "
-        "Instalar: pip install defusedxml>=0.7.1"
-    ) from _defused_err
+except ImportError:
+    ET = None  # type: ignore[assignment]
 from collections import defaultdict
 from dataclasses import dataclass, field
 from fractions import Fraction
@@ -163,6 +167,10 @@ class WindowsEventLogParser:
         return records
 
     def parse_xml(self, xml_path: str) -> List[EventRecord]:
+        if ET is None:
+            # B-017: sin defusedxml no se parsea XML (nunca fallback a
+            # xml.etree). El caller marca el archivo como UNANALYZED.
+            return []
         records = []
         try:
             p = Path(xml_path)
@@ -179,6 +187,8 @@ class WindowsEventLogParser:
         return records
 
     def _parse_xml(self, xml_str: str) -> Optional[EventRecord]:
+        if ET is None:
+            return None
         try:
             # FIX: Limitar tamaño de string XML
             if len(xml_str) > 1024 * 1024:  # 1MB por registro
@@ -337,8 +347,16 @@ class EventLogCorrelator:
                     # Librería Evtx ausente: el .evtx binario NO se analiza.
                     unparsed_files.append(f"{lp} [librería 'Evtx' ausente]")
                     continue
+                if ET is None:
+                    # B-017: el XML interno de cada registro EVTX requiere
+                    # defusedxml — sin él, el archivo NO se analiza.
+                    unparsed_files.append(f"{lp} [librería 'defusedxml' ausente]")
+                    continue
                 all_events.extend(self._parser.parse_evtx(lp))
             elif suffix in {".xml", ".txt", ".log", ".evt"}:
+                if ET is None:
+                    unparsed_files.append(f"{lp} [librería 'defusedxml' ausente]")
+                    continue
                 # .log/.txt: se intenta parseo XML (logs exportados suelen ser
                 # XML). parse_xml captura errores y devuelve [] si no es XML.
                 all_events.extend(self._parser.parse_xml(lp))

@@ -1101,6 +1101,24 @@ class VIGIAAgent:
         n_primary, n_unanalyzed = _signal_stats(results)
         agent_verdict = classify_agent_verdict(abduction, n_primary, n_unanalyzed)
 
+        # B-027 (guard central): un bundle con veredicto ABSTAIN no puede
+        # sellar is_conclusive=True — "no puedo formar opinión" y "estoy
+        # seguro" son mutuamente excluyentes bajo cross-examination. Los
+        # adaptadores ya lo evitan en origen; este guard cierra la clase
+        # entera para cualquier camino futuro. Se degrada DESPUÉS de
+        # clasificar (no cambia el veredicto) y queda anotado.
+        if agent_verdict == "ABSTAIN" and abduction.get("is_conclusive"):
+            abduction["is_conclusive"] = False
+            abduction["is_conclusive_downgraded"] = (
+                "B-027: ABSTAIN es incompatible con is_conclusive=True — "
+                "degradado en el sellado"
+            )
+            logger.warning(
+                "[SEAL] B-027 guard: is_conclusive=True degradado a False "
+                "(veredicto ABSTAIN, hipótesis %s)",
+                abduction.get("best_hypothesis"),
+            )
+
         bundle = {
             "vigia_agent_version": AGENT_VERSION,
             "case_id": self.case_id,
@@ -1525,20 +1543,52 @@ def _run_text_pipeline(evidence_path: Path, case_id: str, params: Dict) -> Dict[
 
         output_path = input_path.replace(".json", "_out.json")
 
-        from run_pipeline import run as run_pipeline_fn
+        # B-054/F-L040-6 FIX (TRIAGE 2026-07-03): el import plano
+        # `from run_pipeline import ...` apuntaba a un módulo que no existe
+        # en el root del repo → este fallback SIEMPRE degradaba a
+        # PIPELINE_UNAVAILABLE (código muerto que aparentaba ser red de
+        # seguridad). El módulo real es vigia/scripts/run_pipeline.py, con
+        # firma idéntica. Se conserva el import plano como segundo intento
+        # para layouts legados.
+        try:
+            from vigia.scripts.run_pipeline import run as run_pipeline_fn
+        except ImportError:
+            from run_pipeline import run as run_pipeline_fn  # layout plano legado
         run_pipeline_fn(input_path, output_path, negation_enabled=True)
 
         with open(output_path) as f:
             pipeline_results = json.load(f)
 
         # Convertir al formato del agente — z_score como Fraction
+        def _tagged_int(v: Any, default: int) -> int:
+            """
+            B-054 (2do hallazgo): el pipeline semiótico serializa enteros en
+            formato canónico taggeado ("29:int"). Este parser esperaba ints
+            crudos y crasheaba con TypeError en cuanto el fallback revivió
+            (el import roto lo mantuvo como código muerto y el bug latente
+            nunca se ejercitó).
+            """
+            if isinstance(v, bool):
+                return default
+            if isinstance(v, int):
+                return v
+            if isinstance(v, str):
+                try:
+                    return int(v.split(":", 1)[0])
+                except ValueError:
+                    return default
+            return default
+
         signals = []
         for r in pipeline_results:
             dec = r.get("decision", {})
             agg = r.get("aggregator", {})
             mi = agg.get("mi_final", {"num": 0, "den": 1})
             # Rational Fraction — never float
-            z_frac = Fraction(mi["num"], max(mi["den"], 1))
+            z_frac = Fraction(
+                _tagged_int(mi.get("num"), 0),
+                max(_tagged_int(mi.get("den"), 1), 1),
+            )
             # Confidence derived from alert_level — not fabricated
             alert_to_conf = {"LOW": Fraction(1, 10), "MEDIUM": Fraction(4, 10),
                              "HIGH": Fraction(7, 10), "CRITICAL": Fraction(9, 10)}

@@ -475,7 +475,15 @@ def _vigia_score(case: dict) -> dict:
             raw_score = 0.0
         raw_score = max(0.0, min(1.0, raw_score))
 
+        # B-026 FIX: prior_trust validado con el mismo Finite Math Shield que
+        # raw_score (arriba). Sin este clamp, un prior_trust negativo/NaN/inf
+        # entraba directo a effective = prov_trust × epc × temporal y producía
+        # un trust efectivo imposible (negativo o NaN propagado al veredicto).
         prov_trust = a.get("prior_trust", 1.0)
+        if not isinstance(prov_trust, (int, float)) or isinstance(prov_trust, bool) \
+                or not math.isfinite(prov_trust):
+            prov_trust = 1.0
+        prov_trust = max(0.0, min(1.0, prov_trust))
         chain      = a.get("provenance_chain", [])
         if not isinstance(chain, list):
             chain = []  # B-031: provenance_chain mal tipado — string/dict produce len() incorrecto

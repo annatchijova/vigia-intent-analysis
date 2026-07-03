@@ -546,9 +546,9 @@ mode bundle serialization, enforcing the same R6 check programmatically.
 
 ---
 
-### L-023 — Bundle Save TOCTOU Race (SEC-04)
+### L-023 — Bundle Save TOCTOU Race (SEC-04) [RESOLVED 2026-07-03]
 
-**Affects:** `bundle_builder.py` | **Status:** P0 — fix scheduled post-hackathon
+**Affects:** `bundle_builder.py` | **Status:** RESOLVED — Tanda A (TRIAGE 2026-07-03), tag `pre-tanda-a-20260703-134624`
 
 **Description:** The bundle hash is computed from in-memory content, not from
 disk. Between `f.write()` and hash computation, the file can be swapped via
@@ -563,9 +563,14 @@ Without the key, tampering is detectable post-write. However, the HMAC is
 computed from the same in-memory content, so a TOCTOU at write time affects
 both H2 and H3.
 
-**Post-hackathon fix:** Atomic write via `tempfile.mkstemp()` → `fsync()` →
-`os.replace()`. Hash computed from disk after fsync. See Claude Code audit report
-2026-06-09.
+**Fix applied (2026-07-03, Tanda A — A5):** exactly the scheduled design:
+`BundleBuilder.save()` now writes via `tempfile.mkstemp()` in the target
+directory → `fsync()` → `os.replace()` (atomic publish — no half-written
+bundle is ever visible), the returned hash is computed FROM DISK after the
+replace, and a memory-vs-disk hash divergence raises RuntimeError. Orphan
+tempfiles are cleaned on failure and the previous bundle is left intact if
+the write fails. Tests: `tests/test_tanda_a_triage.py::TestA5AtomicBundleSave`
+(3, including simulated fsync failure).
 
 ---
 

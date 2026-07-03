@@ -269,6 +269,7 @@ class SIFTOrchestrator:
             pcap_path = kwargs.get("pcap_path")
             if isinstance(pcap_path, list):
                 pcap_path = pcap_path[0] if pcap_path else None
+            pcap_error: Optional[str] = None
             if pcap_path and not run_kwargs.get("network_flows"):
                 try:
                     from vigia.sift.pcap_parser import parse_pcap_to_flows
@@ -277,8 +278,16 @@ class SIFTOrchestrator:
                         run_kwargs["network_flows"] = pcap_flows
                         logger.info("[SIFT_SHIM] Parsed %d flows from pcap: %s", len(pcap_flows), pcap_path)
                 except Exception as e:
+                    # B-053/T-3 FIX (TRIAGE 2026-07-03): antes este `raise`
+                    # caía al except global de analyze() → PIPELINE_ERROR
+                    # para el caso ENTERO — un pcap corrupto (o tshark
+                    # ausente, L-039) descartaba también los evtx/hives que
+                    # SÍ podían analizarse. Ahora el pcap se marca como
+                    # UNANALYZED (patrón F7) y el resto de la evidencia
+                    # continúa; el veredicto degrada a ABSTAIN solo si no
+                    # queda ninguna otra señal (gate N8/F7).
                     logger.error("[SIFT_SHIM] pcap parsing failed for %s: %s", pcap_path, e)
-                    raise
+                    pcap_error = f"{type(e).__name__}: {e}"
             rh = kwargs.get("registry_hives")
             if rh:
                 run_kwargs["registry_hives"] = rh if isinstance(rh, list) else [rh]
@@ -322,6 +331,33 @@ class SIFTOrchestrator:
                 )
 
             result = real.run_full_analysis(**run_kwargs)
+
+            # B-053/T-3: si el pcap no se pudo parsear, materializar la
+            # pérdida en el resultado — señal sintética + lista de artefactos
+            # no analizados. Integra con F7: sección "ARTEFACTOS NO
+            # ANALIZADOS" en la narrativa y NOISE→ABSTAIN si aplica.
+            if pcap_error:
+                result.setdefault("signals", []).append({
+                    "tool": "PCAP_UNANALYZED",
+                    "z_score": 0.0,
+                    "confidence": 0.0,
+                    "value": 0.0,
+                    "metadata": {
+                        "artifact_type": "pcap",
+                        "unanalyzed": True,
+                        "signal_class": "derived",
+                        "error": pcap_error[:200],
+                        "path": str(pcap_path),
+                    },
+                })
+                _inner = result.setdefault("results", {})
+                if isinstance(_inner, dict):
+                    _ua = _inner.setdefault("unanalyzed_artifacts", [])
+                    if "pcap" not in _ua:
+                        _ua.append("pcap")
+                _meta = result.setdefault("pipeline_meta", {})
+                _meta["pcap_error"] = pcap_error[:200]
+
             return self._merge_mobile_signals(result, mobile_signals)
         except Exception as e:
             logger.error("[SIFT_SHIM] Real orchestrator failed: %s", e)
@@ -603,7 +639,14 @@ class SIFTOrchestrator:
             "case_id": case_id, "signals": signals,
             "abduction": {
                 "best_hypothesis": hypothesis,
-                "is_conclusive": avg > Fraction(33, 100),
+                # B-027 FIX: is_conclusive respeta la hipótesis. Antes se
+                # derivaba SOLO del promedio de scores, y un caso
+                # ABSTAIN_DETECTED con scores individuales altos sellaba la
+                # contradicción lógica "no puedo formar opinión" +
+                # is_conclusive=True en el mismo bundle.
+                "is_conclusive": (avg > Fraction(33, 100)
+                                  and "ABSTAIN" not in hypothesis
+                                  and "UNDETERMINED" not in hypothesis),
                 "confidence": confidence_f,
                 "best_posterior": str(confidence_f),
                 "narrative": case_data.get("description", "")[:500],
@@ -791,6 +834,11 @@ class SIFTOrchestrator:
             "abduction": {
                 "best_hypothesis": "MALICIOUS_INTENT_DETECTED" if is_malice else "NO_SEMIOTIC_ANOMALY_DETECTED" if avg == Fraction(0, 1) else "INTENT_DETECTED" if avg > Fraction(5, 10) else "SUSPICION_DETECTED",
                 # FIX P2: Fraction puro — sin float
+                # B-027 FIX: este path nunca produce hipótesis ABSTAIN hoy,
+                # pero el flag queda condicionado por coherencia (si la
+                # escalera de hipótesis incorporara ABSTAIN, el flag no puede
+                # quedar en True). Los paths UNANALYZED/FORMAT_NOT_SUPPORTED
+                # de arriba ya emiten is_conclusive=False explícito.
                 "is_conclusive": avg > Fraction(3, 2),
                 "confidence": conf_vol3,
                 "best_posterior": str(conf_vol3),

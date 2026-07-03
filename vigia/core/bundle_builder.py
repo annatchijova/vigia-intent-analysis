@@ -235,13 +235,57 @@ class BundleBuilder:
         """
         Guarda el bundle sellado en disco.
         Retorna el hash del archivo para verificacion de transporte.
+
+        L-023 FIX (SEC-04): escritura ATÓMICA — mkstemp en el mismo
+        directorio + fsync + os.replace. Antes se escribía directo sobre
+        `path` sin fsync ni rename atómico: entre el write y el cómputo del
+        hash (que además se calculaba desde memoria, no desde disco) el
+        archivo podía ser swapeado (symlink attack / escritor concurrente) —
+        ruptura de cadena de custodia bajo Daubert. Ahora:
+          1. el contenido se escribe en un tempfile del mismo filesystem,
+          2. fsync garantiza que llegó a disco,
+          3. os.replace lo publica atómicamente (nunca hay un bundle a
+             medio escribir visible en `path`),
+          4. el hash retornado se computa DESDE DISCO post-replace y se
+             verifica contra el hash en memoria — divergencia = RuntimeError.
         """
+        import tempfile
+
         content = json.dumps(sealed_dict, sort_keys=True, indent=2, default=str)
-        os.makedirs(os.path.dirname(os.path.abspath(path)), exist_ok=True)
-        with open(path, "w", encoding="utf-8") as f:
-            f.write(content)
-        file_hash = hashlib.sha256(content.encode("utf-8")).hexdigest()
-        return file_hash
+        abs_path = os.path.abspath(path)
+        target_dir = os.path.dirname(abs_path)
+        os.makedirs(target_dir, exist_ok=True)
+
+        mem_hash = hashlib.sha256(content.encode("utf-8")).hexdigest()
+
+        fd, tmp_path = tempfile.mkstemp(
+            dir=target_dir, prefix=".bundle_", suffix=".tmp"
+        )
+        try:
+            with os.fdopen(fd, "w", encoding="utf-8") as f:
+                f.write(content)
+                f.flush()
+                os.fsync(f.fileno())
+            os.replace(tmp_path, abs_path)
+        except BaseException:
+            # No dejar tempfiles huérfanos si algo falla antes del replace.
+            try:
+                os.unlink(tmp_path)
+            except OSError:
+                pass
+            raise
+
+        # Hash desde disco: lo que se verifica es lo que quedó escrito,
+        # no lo que estaba en memoria.
+        with open(abs_path, "rb") as f:
+            disk_hash = hashlib.sha256(f.read()).hexdigest()
+        if disk_hash != mem_hash:
+            raise RuntimeError(
+                f"L-023: hash en disco difiere del hash en memoria tras la "
+                f"escritura atómica ({disk_hash[:16]} != {mem_hash[:16]}) — "
+                f"posible corrupción de filesystem o tampering concurrente."
+            )
+        return disk_hash
 
     @staticmethod
     def quick_verify(sealed_dict: Dict[str, Any]) -> tuple:
