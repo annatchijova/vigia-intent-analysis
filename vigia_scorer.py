@@ -629,8 +629,26 @@ def _vigia_score(case: dict) -> dict:
         "ATTRIBUTION_INCONSISTENCY",
     }
 
+    def _sev_float(raw, default: float = 0.5) -> float:
+        """
+        B-057 FIX: las fracturas del CAIE VIVO llevan severity como
+        decimal.Decimal (aritmética interna de caie.py); las del fallback
+        JSON llevan float. `Decimal * float` crudo → TypeError — crasheaba
+        _vigia_score entero en cuanto CAIE vivo emitía una fractura
+        maliciosa (reproducido con VIGIA-BREAK-016). Misma familia de
+        frontera de tipos que B-024/B-026: coerción + Finite Math Shield
+        en el boundary, nunca aritmética mixta.
+        """
+        try:
+            v = float(raw)
+        except (TypeError, ValueError):
+            return default
+        if not math.isfinite(v):
+            return default
+        return max(0.0, min(1.0, v))
+
     for f in fractures:
-        sev = f.get("severity", 0.5)
+        sev = _sev_float(f.get("severity", 0.5))
         ft  = f.get("fracture_type", "")
         if ft in MALICIOUS_FRACTURE_TYPES:
             fracture_malice_boost += sev * 0.45
@@ -643,7 +661,7 @@ def _vigia_score(case: dict) -> dict:
     # STATISTICAL_UNIFORMITY from the temporal engine (not CAIE) — valid signal
     for v in violations:
         if v.get("type") == "STATISTICAL_UNIFORMITY":
-            fracture_malice_boost += v.get("severity", 0) * 0.35
+            fracture_malice_boost += _sev_float(v.get("severity", 0), 0.0) * 0.35
 
     fracture_malice_boost = min(0.5, fracture_malice_boost)
 
