@@ -3256,3 +3256,90 @@ Que 44 casos MALICE tengan `is_conclusive=False` y posteriors ~0.05 conecta
 con el leak de `expected_verdict` en el adaptador EBS (ítem Tanda C). Este
 fix elimina la contradicción visible en la narrativa; esa causa raíz sigue
 abierta y es decisión de doctrina.
+
+---
+
+## B-066 — Whitelist mobile Fase 1: 8 tipos de evidencia + mapas del adapter + test de contrato [RESUELTO]
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | RESUELTO — POST HACKATHON (2026-07-03). Implementa AUDITORIA_MOBILE_WHITELIST §4 Fase 1; cierra la propuesta de B-060 |
+| **Severidad** | P2 — evidencia mobile sin perfil: excluida de CAIE (skip silencioso) y puntuada con fallback no calibrado |
+| **Archivo** | `vigia/tools/caie.py` (EVIDENCE_PROFILES), `vigia/core/forensic_adapter.py` (los 3 mapas) |
+| **Tag de restauración** | `pre-fase1-mobile-whitelist-20260703-175549` |
+
+### Fix
+
+1. **8 perfiles mobile** en `EVIDENCE_PROFILES`, calibrados por analogía con
+   la escala existente (§2 de la auditoría): `chat_message` (.35/.28), `sms`
+   (.40/.26), `call_log` (.40/.26), `web_search` (.45/.24), `app_data`
+   (.50/.22), `social_media` (.55/.22), `location_data` (.30/.30),
+   `contact_data` (.60/.20). Cero apariciones en el corpus → sin efecto
+   retroactivo.
+2. **Mapas del adapter** (`_LAYER_MAP`/`_EVIDENCE_MAP`/`_ONTOLOGY_MAP`): los
+   8 tipos + las 4 etiquetas agregadas de motor (`android_forensic`,
+   `ios_forensic`, `macos_forensic`, `google_takeout` → `app_data` hasta
+   B-052-P2). Cierra los defaults silenciosos de B-060.
+3. **Test de contrato** (`tests/test_b066_b067_mobile_whitelist.py`):
+   todo tipo emitido debe resolver en los 3 mapas Y todo valor de
+   `_EVIDENCE_MAP` debe existir en `EVIDENCE_PROFILES` — la convención
+   productor/consumidor ahora es contrato que falla en CI.
+
+### Validación
+
+Suite 413 → 439 passed (+26), mismos 21 e2e preexistentes, 6 xfailed.
+Corpus agente 198/198. Comparativa scorer sobre 267 casos: **0 flips,
+0 moves**.
+
+---
+
+## B-067 — Whitelist invertido: un tipo desconocido puntuaba MÁS ALTO que la peor clase conocida [RESUELTO]
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | RESUELTO — POST HACKATHON (2026-07-03) |
+| **Severidad** | P2 — bypass de spoofability vía tipo inventado (el que `caie.py` `add_artifact` declara prevenir, abierto en el camino del scorer) |
+| **Archivo** | `vigia/tools/caie.py` (`Artifact.profile` + default duplicado inline en `__post_init__`), `vigia_scorer.py:514` (weight default) |
+| **Detectado en** | AUDITORIA_MOBILE_WHITELIST §3.2, hallazgo colateral cuantificado |
+| **Tag de restauración** | `pre-fase1-mobile-whitelist-20260703-175549` |
+
+### Descripción
+
+El fallback para tipo desconocido era `(spoofability=0.50, weight=0.20)` —
+producto `(1-s)×w = 0.10`, **mejor** que `log_entry` (0.85/0.15 → 0.0225) y
+que `ip_geolocation` (0.90/0.15 → 0.015). Un caso JSON adversarial podía
+inventar `evidence_type` para esquivar el perfil real de su tipo. El default
+además estaba **duplicado** en dos lugares (`Artifact.profile` y un inline en
+`__post_init__` que alimentaba `effective_spoofability`) — lente 6.
+
+### Fix — y lo que la corrida comparativa obligó a corregir del plan
+
+1. Fallback → `(0.90, 0.15)` = la peor clase conocida real; fuente única
+   (`self.profile`), default duplicado eliminado.
+2. **El fix naive rompía el corpus** (medido, no especulado): 6 flips, 3
+   contra `expected_verdict` (VIGIA-LINUX-001/007, case_009 perdían MALICE
+   esperado) — ~36 tipos en uso nunca perfilados dependían de facto del
+   fallback generoso. Resolución: esos 36 tipos (incluido `"default"`, el
+   placeholder de `normalize_case_schema` para artefactos sin tipo) se
+   **pinnean explícitos al valor legacy exacto** (0.50/0.20, marcados
+   "Uncalibrated -- pinned at legacy fallback value") → comportamiento bit a
+   bit idéntico, y el fallback duro queda solo para tipos realmente
+   desconocidos. El bypass muere: inventar un tipo ya no paga.
+3. Invariante protegida por test: `(1-s)×w` del desconocido ≤ mínimo de TODA
+   la tabla — si un perfil futuro baja el mínimo, el test obliga a bajar el
+   fallback.
+
+### Pendiente derivado (documentado, no resuelto)
+
+Los 36 perfiles pinneados son legacy heredado, no calibración forense por
+tipo. Calibrarlos mueve ~193 artefactos del corpus (~16%) — trabajo aparte
+con corrida comparativa propia. Nota: la comparativa también mostró que
+VIGIA-NGDC-003 emite MALICE con expected SUSPICION bajo los valores legacy —
+candidato a corrección en esa calibración futura.
+
+### Validación
+
+Comparativa scorer 267 casos: **0 flips, 0 moves** (267/267 idénticos).
+Suite 439 passed. Corpus agente 198/198. Tests:
+`TestB067FallbackInversion` (3) — invariante contra toda la tabla, regresión
+del experimento §3.2, y tipos mobile fuera del fallback.

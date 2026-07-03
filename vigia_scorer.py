@@ -511,7 +511,10 @@ def _vigia_score(case: dict) -> dict:
         try:
             from vigia.tools.caie import EVIDENCE_PROFILES, Artifact as _CaieArtifact
             profile = EVIDENCE_PROFILES.get(a.get("evidence_type"))
-            weight  = profile.base_weight if profile else 0.20
+            # B-067: tipo desconocido → peso de la peor clase conocida (0.15),
+            # no 0.20 — coherente con Artifact.profile. Un tipo inventado no
+            # puede pesar más que log_entry.
+            weight  = profile.base_weight if profile else 0.15
             _filtered = {
                 k: v for k, v in a.items()
                 if k in {"source_tool", "evidence_type", "raw_score",
