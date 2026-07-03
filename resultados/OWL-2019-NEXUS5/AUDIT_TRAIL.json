@@ -1,0 +1,224 @@
+{
+  "vigia_bundle": {
+    "version": "2.0",
+    "case_id": "VIGIA-OWL-2019-NEXUS5",
+    "generated_utc": "2026-07-03T17:17:02Z",
+    "engine": "VIGIA Forensic Intentionality Analysis Engine",
+    "operator": "Anna Tchijova",
+    "llm_backend": "ollama/deepseek-r1:8b (local inference)"
+  },
+  "source_evidence": {
+    "image_file": "LGE Nexus 5 Full Image.raw",
+    "image_sha1": "F46EE05CE1A2210501EA512ED9E4C7EC59222CCA",
+    "image_md5": "B334843A07A9E16494EEBDF3079E6BC6",
+    "image_size_bytes": 31268536320,
+    "imaging_tool": "Magnet ACQUIRE v2.0.0.5412",
+    "imaging_examiner": "Magnet Forensics",
+    "imaging_start_utc": "2017-02-06T20:51:09Z",
+    "imaging_end_utc": "2017-02-06T22:13:08Z"
+  },
+  "analysis_steps": [
+    {
+      "step": 1,
+      "timestamp_utc": "2026-07-03T17:10:00Z",
+      "action": "PARTITION_TABLE_ANALYSIS",
+      "tool": "fdisk / sgdisk",
+      "result": "GPT table with 29 partitions identified. Key partitions: system (P25), cache (P27), userdata (P28), crypto (P26).",
+      "finding": "Userdata partition (P28) contains valid ext4 superblock at offset +1024. NOT encrypted despite device configuration. Crypto partition (P26) is zeroed."
+    },
+    {
+      "step": 2,
+      "timestamp_utc": "2026-07-03T17:11:00Z",
+      "action": "FILESYSTEM_VERIFICATION",
+      "tool": "dd + xxd + file",
+      "result": "ext4 magic 0xEF53 confirmed at userdata superblock. Mount point: /data. UUID: 57f8f4bc-abf4-655f-bf67-946fc0f9f25b."
+    },
+    {
+      "step": 3,
+      "timestamp_utc": "2026-07-03T17:12:00Z",
+      "action": "BUILD_PROP_EXTRACTION",
+      "tool": "dd + strings",
+      "result": "Android 6.0.1 (M4B30X/M4B30Z), hammerhead-user, security patch 2016-10-05, build date 2016-09-01."
+    },
+    {
+      "step": 4,
+      "timestamp_utc": "2026-07-03T17:13:00Z",
+      "action": "PARTITION_MOUNT_READONLY",
+      "tool": "mount -o ro,loop,offset",
+      "result": "Userdata mounted at /mnt/owl-userdata. System and cache previously mounted.",
+      "mount_options": "ro,loop,offset=2031628288"
+    },
+    {
+      "step": 5,
+      "timestamp_utc": "2026-07-03T17:13:30Z",
+      "action": "ACCOUNTS_DB_EXTRACTION",
+      "tool": "sqlite3",
+      "artifact_hash": "SHA256:42ab39e2cd3d91b61948f7fe6a6ac44c76d5025ef0c59e8764fcd2874021dbbc",
+      "result": "5 accounts recovered: Google (mcavoys87@gmail.com), 2x TikTok (SarahMcavoy, sarahmcavoy), Skype, Twitter. First/last names: Sarah/Mcavoy. Google UID: 101797553944830818468."
+    },
+    {
+      "step": 6,
+      "timestamp_utc": "2026-07-03T17:14:00Z",
+      "action": "RECENT_TASKS_EXTRACTION",
+      "tool": "XML parsing",
+      "result": "13 recent tasks recovered. Key findings: Google search 'Tina and password' (task 95), Chrome 'Green sea turtle' (task 105), Snapchat (task 110), Twitter (task 113), Google Maps (task 112), Settings (task 128), CM Security (task 107)."
+    },
+    {
+      "step": 7,
+      "timestamp_utc": "2026-07-03T17:14:30Z",
+      "action": "SYSTEM_EVENT_EXTRACTION",
+      "tool": "file read",
+      "result": "SYSTEM_BOOT log confirms hammerhead build. Event logs show Skype ANR on boot. Account dumps confirm 5 accounts active at imaging time."
+    },
+    {
+      "step": 8,
+      "timestamp_utc": "2026-07-03T17:15:00Z",
+      "action": "RAW_STRING_SEARCH_OWL_KEYWORDS",
+      "tool": "dd + strings + grep",
+      "search_terms": ["owl", "owlet", "layla", "layster", "birdtrader", "feather", "nocturnal", "hoot", "wingspan"],
+      "result": "Multiple hits: birdtrader.co.uk URLs with specific listing IDs (557933, 558006, 557493), Facebook cached owl images (shareably.net, owlday.com), Wikipedia snowy owl images, Layla Aster contact data."
+    },
+    {
+      "step": 9,
+      "timestamp_utc": "2026-07-03T17:15:30Z",
+      "action": "RAW_STRING_SEARCH_GOOGLE_QUERIES",
+      "tool": "dd + strings + grep",
+      "result": "Recovered: 'Green sea turtle' (Google), 'snowy owl facts' (Facebook), 'harry potter bird name', birdtrader.co.uk/owls browsing with 'Baby owl' search."
+    },
+    {
+      "step": 10,
+      "timestamp_utc": "2026-07-03T17:15:45Z",
+      "action": "MUSICALLY_CHAT_EXTRACTION",
+      "tool": "dd + strings + grep (JSON pattern matching)",
+      "result": "5 Musical.ly messages recovered between sarahmcavoy (190719500932296704) and layster82/Layla Aster (190723800861179904). Messages include: email request, email provision, owl image exchange (UUID: 66560c50-e73f-11e6-be73-fff3b1707aec), product verification.",
+      "critical_evidence": true
+    },
+    {
+      "step": 11,
+      "timestamp_utc": "2026-07-03T17:16:00Z",
+      "action": "MUSICALLY_TELEMETRY_EXTRACTION",
+      "tool": "dd + strings",
+      "result": "ChatActivity sessions at timestamps 1485817063738, 1485817081751, 1485817083573 confirm app v5.0.3 was actively used for chat on 2017-01-30. Device Android ID: 688cc0e601b78cd3, Advertising ID: e2215033-ad7c-459d-ac6a-1d625fe78cb9."
+    },
+    {
+      "step": 12,
+      "timestamp_utc": "2026-07-03T17:16:15Z",
+      "action": "ANTI_FORENSIC_ASSESSMENT",
+      "tool": "filesystem analysis",
+      "result": "CM Security AppLock (com.cleanmaster.security) and CM Locker (com.cmcm.locker) installed. SuperSU v2.79 active. TWRP backups present. App data directories for key apps are empty (data wiped or never synced to local storage). su.img (100MB) present."
+    },
+    {
+      "step": 13,
+      "timestamp_utc": "2026-07-03T17:16:21Z",
+      "action": "VIGIA_CASE_JSON_CREATION",
+      "tool": "manual case construction",
+      "artifact_hash": "SHA256:4ba85cb2ea8ce555cdb8a4cf51ff5c9d93a751aa733cac870816733059ac16c6",
+      "result": "20 artifacts documented in VIGIA case JSON format."
+    },
+    {
+      "step": 14,
+      "timestamp_utc": "2026-07-03T17:16:21Z",
+      "action": "VIGIA_SCORER_EXECUTION",
+      "tool": "vigia_scorer._vigia_score()",
+      "artifact_hash": "SHA256:050bb36a04e7362735706349a028839197cc82b96042e7c1f26ecff5a5da785a",
+      "result": "Verdict: NOISE (score: 0.0715, confidence: 93%). All artifacts classified as evidence_type=default due to missing mobile forensics types in whitelist.",
+      "limitation_noted": true
+    },
+    {
+      "step": 15,
+      "timestamp_utc": "2026-07-03T17:17:02Z",
+      "action": "REPORT_GENERATION",
+      "tool": "manual report construction",
+      "result": "Three reports generated: Forensic Report, Amicus Curiae, Audit Trail Bundle."
+    }
+  ],
+  "bundle_manifest": [
+    {
+      "file": "OWL-NEXUS5-CASE.json",
+      "description": "VIGIA case definition with 20 forensic artifacts",
+      "sha256": "4ba85cb2ea8ce555cdb8a4cf51ff5c9d93a751aa733cac870816733059ac16c6"
+    },
+    {
+      "file": "vigia_score_result.json",
+      "description": "VIGIA automated scorer output",
+      "sha256": "050bb36a04e7362735706349a028839197cc82b96042e7c1f26ecff5a5da785a"
+    },
+    {
+      "file": "FORENSIC_REPORT_OWL-NEXUS5.md",
+      "description": "Complete forensic report with timeline and Peirce analysis",
+      "sha256": "26315da90624df84a05672b37b1ac865d5f6385315afd81342eac1d748e105b4"
+    },
+    {
+      "file": "AMICUS_CURIAE_OWL-NEXUS5.md",
+      "description": "Amicus curiae report for court submission",
+      "sha256": "e7f87e19c8b5900ae0399b7ac8fa76684ce48fa793912ae64418352e71bb6406"
+    },
+    {
+      "file": "AUDIT_TRAIL.json",
+      "description": "This file — complete analysis audit trail"
+    }
+  ],
+  "key_artifacts_recovered": {
+    "accounts": [
+      {"account": "mcavoys87@gmail.com", "platform": "Google", "created": "2017-01-24T14:28:06Z"},
+      {"account": "SarahMcavoy", "platform": "Musical.ly", "created": "2017-01-30T22:03:15Z"},
+      {"account": "sarahmcavoy", "platform": "Musical.ly", "created": "2017-01-30T22:27:51Z"},
+      {"account": "mcavoys87@gmail.com", "platform": "Skype", "created": "2017-01-30T23:01:58Z"},
+      {"account": "mcavoys87", "platform": "Twitter", "created": "2017-02-01T17:04:42Z"}
+    ],
+    "critical_messages": [
+      {
+        "platform": "Musical.ly",
+        "from": "sarahmcavoy",
+        "to": "layster82 (Layla Aster)",
+        "content": "Hi Layla I accidentally deleted the string of emails we sent so I lost your contact. do you. are to send me your email again sorry for the inconvenience. also if it's easier you can send me information through here as well"
+      },
+      {
+        "platform": "Musical.ly",
+        "from": "layster82",
+        "to": "sarahmcavoy",
+        "content": "The email is Layster82gmail"
+      },
+      {
+        "platform": "Musical.ly",
+        "from": "layster82",
+        "to": "sarahmcavoy",
+        "content": "[IMAGE: owl photo, 220x310px, UUID: 66560c50-e73f-11e6-be73-fff3b1707aec]"
+      },
+      {
+        "platform": "Musical.ly",
+        "from": "layster82",
+        "to": "sarahmcavoy",
+        "content": "How do you like him"
+      },
+      {
+        "platform": "Musical.ly",
+        "from": "sarahmcavoy",
+        "to": "layster82",
+        "content": "is that an image of the exact one you have or is it a photo of what it will look like?"
+      }
+    ],
+    "web_searches": [
+      "where to buy owls",
+      "how to take care of owls",
+      "harry potter bird name",
+      "snowy owl facts",
+      "Baby owl (birdtrader.co.uk)",
+      "Green sea turtle (distractor)",
+      "Tina and password (anomalous)"
+    ],
+    "birdtrader_listings_viewed": [
+      "557933 - Barn Owls (Lincolnshire)",
+      "558006 - Asian Wood Owls (Northamptonshire)",
+      "557493 - Tawny Owls (Londonderry)"
+    ]
+  },
+  "verdict_summary": {
+    "automated_verdict": "NOISE",
+    "automated_score": 0.0715,
+    "automated_confidence": 0.93,
+    "manual_override": "SUSPICION",
+    "override_reason": "VIGIA scorer whitelist does not include mobile forensics evidence types. Manual Peirce semiotic analysis of recovered Musical.ly messages, birdtrader.co.uk browsing, and anti-forensic measures indicates active participation in illegal owl trade negotiation.",
+    "recommendation": "Correlate with companion HP computer image for escalation to MALICE (email confirmation of completed purchase expected on PC)."
+  }
+}
