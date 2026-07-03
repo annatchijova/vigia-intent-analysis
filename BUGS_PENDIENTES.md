@@ -2422,28 +2422,64 @@ exit code 0.
 
 ---
 
-## B-047 — _build_correlation_groups() retorna List[List[int]], noisy_or_correlated espera Dict[int, Set[int]] [PENDING]
+## B-047 — _build_correlation_groups() retornaba List[List[int]], noisy_or_correlated espera Dict[int, Set[int]] [RESUELTO]
 
 | Campo | Valor |
 |-------|-------|
-| **Estado** | PENDING |
-| **Severidad** | LATENTE — no explota con el corpus actual |
-| **Archivos afectados** | `vigia/sift/android_forensics.py`, `vigia/sift/ios_forensics.py`, `vigia/sift/macos_forensics.py` |
+| **Estado** | RESUELTO — commit `d8ce147` (2026-07-01) |
+| **Severidad** | LATENTE → cerrado antes de explotar con corpus grande |
+| **Archivos** | `vigia/sift/_math_utils.py`, `android_forensics.py`, `ios_forensics.py`, `macos_forensics.py`, `google_takeout_forensics.py` |
+| **Tag de restauración** | `pre-b047-correlation-groups-20260701` |
+| **Detectado en** | Sesión 2026-06-30 |
+| **Corregido** | 2026-07-01 |
+| **Auditoría de cierre** | `AUDITORIA_B047_CORRELATION.md` (2026-07-03) |
 
 ### Descripción
 
-`_build_correlation_groups()` en los tres módulos retorna `List[List[int]]` pero
-`noisy_or_correlated()` (en `vigia/core/noisy_or.py`) espera `Dict[int, Set[int]]`.
+Android/iOS/macOS retornaban `List[List[int]]`; takeout tenía el formato
+correcto `Dict[int, Set[int]]`. El consumidor `noisy_or_correlated()` vive en
+`vigia/sift/_math_utils.py:219` (la entrada [PENDING] original citaba
+`vigia/core/noisy_or.py`, que no existe). No explotaba con el corpus de
+entonces porque ningún caso producía >=2 findings con el mismo corr_group en
+los módulos afectados (Owl-Android: 1 finding → lista vacía → falsy → salta
+el bloque de correlación).
 
-No explota actualmente porque ningún caso del corpus produce >=2 findings con el
-mismo `corr_group` en estos módulos. Si se agrega evidencia con correlación cruzada
-entre findings, la llamada fallará con TypeError.
+**Modo de fallo pre-fix confirmado (2026-07-01, grep sobre repo vivo):**
+`sorted(correlation_groups.items())` sobre lista no vacía →
+`AttributeError: 'list' object has no attribute 'items'` (no TypeError, como
+decía la entrada original) → crash de `analyze()` en cualquier caso real con
+findings correlacionados. Fail-loud accidental, no corrupción silenciosa de
+score — el composite nunca se computó con el formato inválido.
 
-### Acción requerida
+### Fix aplicado
 
-Alinear el tipo de retorno de `_build_correlation_groups()` en los tres módulos con
-la firma esperada por `noisy_or_correlated()`, o adaptar `noisy_or_correlated()` para
-aceptar ambos formatos.
+1. Helper canónico `build_correlation_groups(List[str]) -> Dict[int, Set[int]]`
+   en `_math_utils.py:255`, junto a su único consumidor. Semántica exacta de la
+   implementación de referencia de takeout (peers sin self, solo grupos >= 2,
+   tags vacíos ignorados).
+2. Los 4 módulos delegan al helper — elimina la cuadruplicación que originó
+   el bug. Los 5 motores Windows nunca estuvieron afectados (dict inline).
+3. Guard fail-loud en `noisy_or_correlated` (`_math_utils.py:225-230`):
+   `TypeError` explícito si `correlation_groups` no es dict ni None (raise,
+   no assert — criterio B-011/B-023/B-026 opción B). Reemplaza el
+   AttributeError opaco y hace imposible reintroducir el formato viejo en
+   silencio.
+
+### Verificación
+
+17 tests en `vigia/tests/test_b047_correlation_groups.py` (semántica
+del helper, equivalencia contra la implementación de referencia congelada,
+delegación de los 4 módulos, monotonía correlado<=independiente, guard).
+Suite completa post-fix: 205 passed, 6 xfailed, 0 regresiones.
+grep: 0 ocurrencias de List[List[int]] en código de módulos SIFT; 4 delegaciones.
+
+**Gatillo real verificado post-cierre (2026-07-03):** la condición "ningún
+caso produce >=2 findings correlacionados" quedó obsoleta al descargar
+`cases/tuck-2019-macos` — produce 23 findings `corr_group="browser_suspicious"`
+y ejercita el path correlacionado completo: `composite_score = 19/20`, sin
+crash. Pre-fix, ese caso habría reventado `MacOSForensicsAnalyzer.analyze()`
+con AttributeError (la combinación B-048 wiring + tuck-2019 lo habría
+explotado en producción). Ver `AUDITORIA_B047_CORRELATION.md` §3.
 
 ---
 
@@ -2746,3 +2782,48 @@ Clamp del argumento a `±LOG_LR_EXP_CAP = 700.0` antes de `math.exp`:
   B-051; log_lr ≤ 700 bit a bit intacto; record_hash sigue computable.
 - Suite completa y corpus `run_all_agent.py` 198/198 sin regresiones
   (ver commit).
+
+---
+
+## B-052 — Motores mobile/macOS: señal única agregada puentea el AbductiveReasoner [P1 FIXED / P2 PENDING]
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | P1 (narrativa honesta) FIXED — 2026-07-03; P2 (granularidad) PENDING |
+| **Severidad** | MEDIA — la narrativa Peircean del motor v2 es inalcanzable para evidencia mobile por diseño |
+| **Archivos** | `sift_orchestrator.py` (shim, ruta mobile-only); P2: `vigia/sift/{macos,ios,android,google_takeout}_forensics.py` |
+| **Detectado en** | `AUDITORIA_MACOS_NARRATIVA.md` (2026-07-03) |
+| **Tag de restauración** | `pre-b052-p1-20260703-051457` |
+
+### Descripción
+
+La evidencia mobile/macOS va por la ruta mobile-only del shim, que nunca
+invoca `run_full_analysis` (donde vive el AbductiveReasoner). Además cada
+engine colapsa N findings en UNA `SignalOutput` (escalera de z), y el
+reasoner exige ≥3 señales primarias — aunque se enrutara a V4, no correría.
+Resultado: tuck-2019 (23 findings Safari) produce 1 señal z=1.6, ABSTAIN,
+sin narrativa del motor v2. No es "Pipeline error": es limitación de diseño.
+
+### P1 aplicado (solo presentación, cero cambio de scoring)
+
+- FIRSTNESS de la ruta mobile enriquecido con hallazgos reales por engine
+  (`findings_count` + `finding_types` desde metadata, defensivo).
+- La narrativa declara explícitamente: "Motor abductivo v2: NO ejecutado en
+  esta ruta (adaptador mobile de fuente única)... limitación de diseño
+  documentada (B-052), no un error de pipeline."
+- `pipeline_meta.abductive_reasoner = "NOT_RUN_MOBILE_SINGLE_SOURCE"` —
+  distingue programáticamente "no corrió por diseño" de "corrió y falló".
+- Tests: `TestB052MobileNarrative` (3) en
+  `tests/test_pipeline_robustness_narrative.py`. Hipótesis/posterior
+  verificados idénticos pre/post-P1.
+
+### P2 pendiente (requiere calibración con corpus)
+
+`to_signal()` → `to_signals()`: una señal por dominio de artefacto
+(browser_suspicious / quarantine / antiforensic / persistence /
+encrypted_apps — los corr_group ya marcan las familias), con
+artifact_type/layer propio, y enrutamiento por V4 cuando el conteo ≥3.
+Extender el layer_map del reasoner con layers mobile. **No tocar sin correr
+el corpus completo**: cambia el veredicto de todos los casos mobile
+(tuck-2019 pasaría de ABSTAIN a INTENT/MALICE). Ver
+`AUDITORIA_MACOS_NARRATIVA.md` §4.

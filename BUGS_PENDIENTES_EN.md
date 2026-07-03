@@ -2633,28 +2633,65 @@ exit code 0.
 
 ---
 
-## B-047 — _build_correlation_groups() returns List[List[int]], noisy_or_correlated expects Dict[int, Set[int]] [PENDING]
+## B-047 — _build_correlation_groups() returned List[List[int]], noisy_or_correlated expects Dict[int, Set[int]] [RESOLVED]
 
 | Field | Value |
 |-------|-------|
-| **Status** | PENDING |
-| **Severity** | LATENT — does not trigger with current corpus |
-| **Files affected** | `vigia/sift/android_forensics.py`, `vigia/sift/ios_forensics.py`, `vigia/sift/macos_forensics.py` |
+| **Status** | RESOLVED — commit `d8ce147` (2026-07-01) |
+| **Severity** | LATENT → closed before it could blow up with a larger corpus |
+| **Files** | `vigia/sift/_math_utils.py`, `android_forensics.py`, `ios_forensics.py`, `macos_forensics.py`, `google_takeout_forensics.py` |
+| **Restore tag** | `pre-b047-correlation-groups-20260701` |
+| **Detected** | Session 2026-06-30 |
+| **Fixed** | 2026-07-01 |
+| **Closure audit** | `AUDITORIA_B047_CORRELATION.md` (2026-07-03) |
 
 ### Description
 
-`_build_correlation_groups()` in all three modules returns `List[List[int]]` but
-`noisy_or_correlated()` (in `vigia/core/noisy_or.py`) expects `Dict[int, Set[int]]`.
+Android/iOS/macOS returned `List[List[int]]`; takeout already had the correct
+`Dict[int, Set[int]]` format. The consumer `noisy_or_correlated()` lives in
+`vigia/sift/_math_utils.py:219` (the original [PENDING] entry cited
+`vigia/core/noisy_or.py`, which does not exist). It did not trigger with the
+corpus of the time because no case produced >=2 findings sharing a corr_group
+in the affected modules (Owl-Android: 1 finding → empty list → falsy → the
+correlation block is skipped).
 
-Does not trigger currently because no corpus case produces >=2 findings with the
-same `corr_group` in these modules. If evidence with cross-finding correlation is
-added, the call will fail with TypeError.
+**Pre-fix failure mode confirmed (2026-07-01, grep over live repo):**
+`sorted(correlation_groups.items())` over a non-empty list →
+`AttributeError: 'list' object has no attribute 'items'` (not TypeError, as
+the original entry claimed) → `analyze()` crash on any real case with
+correlated findings. Accidental fail-loud, not silent score corruption — the
+composite was never computed with the invalid format.
 
-### Required action
+### Fix applied
 
-Align the return type of `_build_correlation_groups()` in all three modules with
-the signature expected by `noisy_or_correlated()`, or adapt `noisy_or_correlated()`
-to accept both formats.
+1. Canonical helper `build_correlation_groups(List[str]) -> Dict[int, Set[int]]`
+   in `_math_utils.py:255`, next to its only consumer. Exact semantics of the
+   takeout reference implementation (peers without self, only groups >= 2,
+   empty tags ignored).
+2. All 4 modules delegate to the helper — removing the quadruplication that
+   caused the bug. The 5 Windows engines were never affected (inline dict).
+3. Fail-loud guard in `noisy_or_correlated` (`_math_utils.py:225-230`):
+   explicit `TypeError` if `correlation_groups` is neither dict nor None
+   (raise, not assert — B-011/B-023/B-026 option B criterion). Replaces the
+   opaque AttributeError and makes silently reintroducing the old format
+   impossible.
+
+### Verification
+
+17 tests in `vigia/tests/test_b047_correlation_groups.py` (helper semantics,
+equivalence against the frozen reference implementation, delegation of the 4
+modules, correlated<=independent monotonicity, guard).
+Full suite post-fix: 205 passed, 6 xfailed, 0 regressions.
+grep: 0 occurrences of List[List[int]] in SIFT module code; 4 delegations.
+
+**Real trigger verified post-closure (2026-07-03):** the "no case produces
+>=2 correlated findings" condition became obsolete once
+`cases/tuck-2019-macos` was downloaded — it produces 23 findings with
+`corr_group="browser_suspicious"` and exercises the full correlated path:
+`composite_score = 19/20`, no crash. Pre-fix, that case would have crashed
+`MacOSForensicsAnalyzer.analyze()` with AttributeError (the B-048 wiring +
+tuck-2019 combination would have detonated it in production). See
+`AUDITORIA_B047_CORRELATION.md` §3.
 
 ---
 
@@ -3064,3 +3101,49 @@ Clamp the argument to `±LOG_LR_EXP_CAP = 700.0` before `math.exp`:
   computable.
 - Full suite and `run_all_agent.py` corpus 198/198 with no regressions
   (see commit).
+
+---
+
+## B-052 — Mobile/macOS engines: single aggregated signal bypasses the AbductiveReasoner [P1 FIXED / P2 PENDING]
+
+| Field | Value |
+|-------|-------|
+| **Status** | P1 (honest narrative) FIXED — 2026-07-03; P2 (granularity) PENDING |
+| **Severity** | MEDIUM — the v2 engine's Peircean narrative is unreachable for mobile evidence by design |
+| **Files** | `sift_orchestrator.py` (shim, mobile-only route); P2: `vigia/sift/{macos,ios,android,google_takeout}_forensics.py` |
+| **Detected** | `AUDITORIA_MACOS_NARRATIVA.md` (2026-07-03) |
+| **Restore tag** | `pre-b052-p1-20260703-051457` |
+
+### Description
+
+Mobile/macOS evidence takes the shim's mobile-only route, which never invokes
+`run_full_analysis` (where the AbductiveReasoner lives). Additionally each
+engine collapses N findings into ONE `SignalOutput` (z-score ladder), and the
+reasoner requires ≥3 primary signals — even routed through V4 it would not
+run. Result: tuck-2019 (23 Safari findings) produces 1 signal z=1.6, ABSTAIN,
+with no v2 engine narrative. This is not "Pipeline error": it is a design
+limitation.
+
+### P1 applied (presentation only, zero scoring change)
+
+- Mobile-route FIRSTNESS enriched with real per-engine findings
+  (`findings_count` + `finding_types` from metadata, defensive).
+- The narrative states explicitly: "Motor abductivo v2: NO ejecutado en esta
+  ruta (adaptador mobile de fuente única)... documented design limitation
+  (B-052), not a pipeline error."
+- `pipeline_meta.abductive_reasoner = "NOT_RUN_MOBILE_SINGLE_SOURCE"` —
+  programmatically distinguishes "did not run by design" from "ran and failed".
+- Tests: `TestB052MobileNarrative` (3) in
+  `tests/test_pipeline_robustness_narrative.py`. Hypothesis/posterior
+  verified identical pre/post-P1.
+
+### P2 pending (requires corpus calibration)
+
+`to_signal()` → `to_signals()`: one signal per artifact domain
+(browser_suspicious / quarantine / antiforensic / persistence /
+encrypted_apps — the existing corr_group tags already mark the families),
+each with its own artifact_type/layer, and V4 routing when the count is ≥3.
+Extend the reasoner's layer_map with mobile layers. **Do not touch without a
+full corpus run**: it changes the verdict of every mobile case (tuck-2019
+would move from ABSTAIN to INTENT/MALICE). See
+`AUDITORIA_MACOS_NARRATIVA.md` §4.

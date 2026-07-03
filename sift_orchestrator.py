@@ -184,6 +184,24 @@ class SIFTOrchestrator:
             hypothesis, max_z, is_conclusive, n_critical = _mobile_hypothesis(mobile_signals)
             _engines = sorted({str(s.get("tool", "?")) for s in mobile_signals})
             _posterior = min(max_z / Fraction(5, 1), Fraction(99, 100))
+
+            # B-052 P1 (AUDITORIA_MACOS_NARRATIVA.md §4): FIRSTNESS con el
+            # detalle real de hallazgos por engine (los metadata ya lo traen),
+            # y declaración explícita de por qué el motor abductivo v2 no
+            # corre en esta ruta — la ausencia de inferencia abductiva es una
+            # limitación de diseño documentada, no un error de pipeline.
+            _finding_bits = []
+            for _s in mobile_signals:
+                _meta = _s.get("metadata") or {}
+                _fc = _meta.get("findings_count")
+                if _fc is None:
+                    continue
+                _bit = f"{_s.get('tool', '?')}: {_fc} finding(s)"
+                _ftypes = _meta.get("finding_types") or []
+                if _ftypes:
+                    _bit += f" [{', '.join(str(t) for t in _ftypes[:4])}]"
+                _finding_bits.append(_bit)
+
             result = {
                 "case_id": self.case_id,
                 "signals": mobile_signals,
@@ -195,7 +213,9 @@ class SIFTOrchestrator:
                     "narrative": (
                         f"[FIRSTNESS] Mobile forensic evidence analyzed: "
                         f"{len(mobile_signals)} signal(s) extracted "
-                        f"(engines: {', '.join(_engines)}).\n"
+                        f"(engines: {', '.join(_engines)})."
+                        + (f" Hallazgos: {'; '.join(_finding_bits)}."
+                           if _finding_bits else "") + "\n"
                         f"[SECONDNESS] Max z-score: "
                         f"{float(max_z):.2f}; señales críticas (z>3): {n_critical}.\n"
                         f"[THIRDNESS] Hipótesis: {hypothesis}. "
@@ -203,6 +223,14 @@ class SIFTOrchestrator:
                            if max_z > Fraction(2, 1) else
                            "Sin desviación sobre umbral — fuente única, sin base "
                            "para afirmar benignidad concluyente (gate <3 fuentes).")
+                        + "\n"
+                        "Motor abductivo v2: NO ejecutado en esta ruta "
+                        "(adaptador mobile de fuente única). El razonador "
+                        "requiere ≥3 fuentes primarias independientes y cada "
+                        "engine de dispositivo emite una única señal agregada. "
+                        "Esto es una limitación de diseño documentada "
+                        "(B-052, AUDITORIA_MACOS_NARRATIVA.md), no un error "
+                        "de pipeline."
                     ),
                 },
                 "pipeline_meta": {
@@ -210,6 +238,9 @@ class SIFTOrchestrator:
                     "n_mobile_signals": len(mobile_signals),
                     "n_total_signals": len(mobile_signals),
                     "max_mobile_z": str(max_z),
+                    # B-052 P1: estado del razonador explícito y consultable —
+                    # distingue "no corrió por diseño" de "corrió y falló".
+                    "abductive_reasoner": "NOT_RUN_MOBILE_SINGLE_SOURCE",
                 },
             }
             return result
