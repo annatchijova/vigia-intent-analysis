@@ -80,16 +80,21 @@ class TestB028IntentAlertFloor:
 
     def test_conclusive_intent_floors_alert_to_medium(self):
         narrative = self._narrative(is_conclusive=True)
-        assert "LOW — No significant anomalies" not in narrative
+        assert "No significant anomalies" not in narrative
         assert "B-028" in narrative
-        assert "MEDIUM — Conclusive INTENT" in narrative
+        assert "MEDIUM — INTENT verdict" in narrative
 
-    def test_non_conclusive_intent_keeps_low(self):
+    def test_non_conclusive_intent_also_floors(self):
+        # B-065: el piso se calcula sobre el veredicto final, no sobre
+        # is_conclusive. INTENT no-concluyente con 4 primarias clasifica
+        # INTENT → también pisa a MEDIUM (antes quedaba LOW — ese era el bug).
         narrative = self._narrative(is_conclusive=False)
-        assert "LOW — No significant anomalies" in narrative
+        assert "MEDIUM — INTENT verdict" in narrative
+        assert "Reconciliation: verdict INTENT" in narrative
 
     def test_malice_floor_unchanged(self):
-        # El floor MALICE existente no se toca.
+        # El floor MALICE mantiene los umbrales de B-028 (posterior >= 1/8
+        # → HIGH), ahora keyed en el veredicto final (B-065).
         from vigia_agent import VIGIAAgent
         agent = VIGIAAgent("T-B028-M", ".")
         results = {
@@ -101,7 +106,7 @@ class TestB028IntentAlertFloor:
             "results": {},
         }
         narrative = agent._generate_narrative(results, "b" * 64)
-        assert "HIGH — Conclusive MALICE" in narrative
+        assert "HIGH — MALICE verdict" in narrative
 
 
 # ──────────────────────────────────────────────────────────────────────────
