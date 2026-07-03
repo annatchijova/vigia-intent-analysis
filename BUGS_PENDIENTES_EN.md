@@ -3767,3 +3767,67 @@ scope for a bounded fix.
 No code change sealed. `caie.py` reverted to HEAD (`a021a6a`); working tree
 clean. The comparative supporting this decision is archived as a session
 artifact (baseline vs post, 267 cases).
+
+---
+
+## B-070 — Device/contextual/narrative epistemic role: closes the NGDC-003 FP composite channel (Option C) [RESOLVED]
+
+| Field | Value |
+|-------|-------|
+| **Status** | RESOLVED — POST HACKATHON (2026-07-03). Option C of AUDITORIA_ABDUCTIVA_NGDC003_FP; attacks root cause (b) |
+| **Severity** | P2 — malice score/confidence inflation by narrative evidence (the channel B-068 did not close) |
+| **File** | `vigia/tools/caie.py` (`evidence_role` registry), `vigia_scorer.py` (narrative filter + B-068 gate refactor) |
+| **Restore tag** | `pre-b070-signalclass-20260703-230411` |
+
+### Root cause attacked
+
+The abductive investigation identified cause (b): the data model did not
+distinguish device-evidence from narrative-context, so both flowed into the
+malice composite and the gate count. B-068 cut the **gate channel**; the
+**composite channel** stayed open (NGDC-003: narrative inflated the score
+0.2803→0.4296 and confidence 0.56→0.86; corpus: 1 latent flip LINUX-005).
+
+### Fix (Option C — role registry, single source of truth)
+
+New `_EVIDENCE_ROLE` registry + `evidence_role()` in `caie.py` (seed of the
+B-060 unified registry). Three roles:
+
+- **DEVICE** (default, incl. unknown types): counts in composite **and** gate.
+- **CONTEXTUAL** (`osint`, `acquisition_context`, `device_acquisition_timeline`):
+  counts in composite (may carry real signal, e.g. off-hours deployment), does
+  **not** corroborate (gate).
+- **NARRATIVE** (`behavioral_context`, `behavioral_profile`, `outcome_signal`):
+  **out** of composite and gate. Informs the report narrative only.
+
+The scorer sets NARRATIVE artifacts aside **before** all scoring (they feed
+neither CAIE, composite, nor gate) and retains them in `narrative_context` for
+the report. The B-068 gate was **refactored** to read the role from the single
+registry instead of its local 6-type list (identical gate behavior; now one
+source of truth).
+
+### Why 3 roles, not binary (the key distinction)
+
+`osint`/`acquisition_context` are **device-adjacent** (real OSINT, acquisition
+metadata): they carry anomaly signal in the composite but are not independent
+device sources. The 3 NARRATIVE types are scenario documentation
+(motive/persona/outcome) whose own text often declares intent undecidable. A
+binary split would have regressed **LINUX-005** (SUSPICION == expected,
+sustained by its `osint` artifact): excluding OSINT from the composite would
+have dropped it to UNKNOWN. The 3-role model closes NGDC-003 without touching
+LINUX-005.
+
+### Validation
+
+Scorer comparative, 267 cases: **0 flips**, accuracy unchanged (184/260 — the
+verdict was already correct since B-068; B-070 fixes score/confidence). 2
+intentional score moves: NGDC-002 (0.568→0.4785, still MALICE), NGDC-003
+(0.4296→0.2803, still SUSPICION, confidence 0.86→**0.56** honest). LINUX-005
+**unchanged**. Suite 445→455 passed (+9 `test_b070_signal_class.py` +1 gate
+coverage in `test_b068`). Agent corpus 198/198 (does not use `_vigia_score`).
+
+### Scope
+
+Scorer path only (Mode 4 / EBS-JSON / `vigia_api`). The agent (Mode 1) does
+not go through `_vigia_score`. B-068 (gate) is subsumed and refactored onto the
+same registry. Future work: extend `evidence_role` into the full B-060 unified
+registry (layer+ontology+profile+role in a single source).

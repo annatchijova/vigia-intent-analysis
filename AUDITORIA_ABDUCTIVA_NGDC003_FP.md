@@ -136,7 +136,15 @@ La hipótesis benigna explica todo; la de MALICE requiere descartar evidence.
 
 ---
 
-## Lo que la abducción surface más allá de B-068 — canal composite (candidato B-070)
+## Lo que la abducción surface más allá de B-068 — canal composite (B-070 ✅ RESUELTO)
+
+> **Actualización 2026-07-03:** implementado como **B-070 (Opción C)**. El
+> registro de roles `evidence_role` (device/contextual/narrative) en `caie.py`
+> aparta la narrativa del composite y del gate. NGDC-003: confianza 0.86→0.56;
+> comparativa 0 flips; LINUX-005 sin regresión (su `osint` es CONTEXTUAL, no
+> NARRATIVE). Ver B-070 en `BUGS_PENDIENTES.md`. El detalle de abajo queda como
+> registro del diagnóstico que motivó el fix.
+
 
 B-068 cerró el **canal del gate** (contexto ya no cuenta como clase de
 corroboración). El **canal del composite sigue abierto**: los artefactos de

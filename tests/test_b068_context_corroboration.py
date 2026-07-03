@@ -22,8 +22,11 @@ def _case(n):
 class TestB068NGDCRegression:
     def test_ngdc003_disputed_intent_is_suspicion(self):
         r = _vigia_score(_case("003"))
+        # Sigue siendo SUSPICION (correcto). Bajo B-070 el score honesto ya no
+        # alcanza la banda MALICE (la narrativa no infla el composite), así que
+        # ni siquiera llega al gate — cae directo en la banda SUSPICION. El
+        # camino cambió; el veredicto no.
         assert r["verdict"] == "SUSPICION"
-        assert "B-068" in r["reason"]
 
     def test_ngdc_001_002_004_remain_malice(self):
         for n in ("001", "002", "004"):
@@ -43,8 +46,9 @@ def _artifact(i, etype, raw=0.85):
 
 class TestB068SyntheticGate:
     def test_context_padding_cannot_corroborate_malice(self):
-        """3 técnicos (2 clases) + 2 contextuales: el score cruza 0.33 pero
-        la corroboración técnica es insuficiente → SUSPICION."""
+        """3 técnicos (2 clases) + 2 narrativos: no alcanza MALICE.
+        Bajo B-070 los narrativos ni siquiera entran al composite, así que el
+        score honesto no llega a la banda MALICE → SUSPICION."""
         arts = [
             _artifact(0, "malware_infrastructure"),
             _artifact(1, "keylogger_capture"),
@@ -54,7 +58,19 @@ class TestB068SyntheticGate:
         ]
         r = _vigia_score({"case_id": "B068-CTX", "artifacts": arts})
         assert r["verdict"] == "SUSPICION"
-        assert "context/narrative" in r["reason"]
+
+    def test_gate_caps_homogeneous_device_evidence(self):
+        """Cobertura directa del gate B-068: evidencia DEVICE con score >0.33
+        pero baja-diversidad (3 art / 2 tipos) → gate capea a SUSPICION.
+        raw altos para cruzar 0.33 solo con evidencia de dispositivo."""
+        arts = [
+            _artifact(0, "malware_infrastructure", raw=0.95),
+            _artifact(1, "keylogger_capture", raw=0.95),
+            _artifact(2, "keylogger_capture", raw=0.95),
+        ]
+        r = _vigia_score({"case_id": "B068-CAP", "artifacts": arts})
+        assert r["verdict"] == "SUSPICION"
+        assert "B-068" in r["reason"]  # el gate SÍ es el camino acá
 
     def test_four_technical_artifacts_still_reach_malice(self):
         """Misma forma pero con 4 artefactos técnicos: el gate pasa por

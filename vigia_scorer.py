@@ -406,13 +406,54 @@ def _vigia_score(case: dict) -> dict:
         caie_fractures_source indicates whether live CAIE ("live_caie") or
         pre-computed JSON fractures ("json_fallback") were used.
     """
-    case       = _normalize_case(case)
-    artifacts  = case.get("artifacts", [])
-    violations = case.get("temporal_violations", [])
-    provenance = case.get("provenance_analysis", {})
+    case          = _normalize_case(case)
+    artifacts_all = case.get("artifacts", [])
+    violations    = case.get("temporal_violations", [])
+    provenance    = case.get("provenance_analysis", {})
+
+    if not artifacts_all:
+        return {"verdict": "ERROR", "score": 0.0, "confidence": 0.0, "fractures": [], "error": "No artifacts provided — cannot evaluate intentionality without evidence"}
+
+    # -----------------------------------------------------------------------
+    # B-070: rol epistémico (device / contextual / narrative). Fuente única en
+    # vigia.tools.caie.evidence_role. Las clases NARRATIVE (motivo/persona/
+    # desenlace) se apartan ANTES de todo el scoring: no alimentan CAIE, ni el
+    # composite de malicia, ni el gate de corroboración — informan solo la
+    # narrativa del reporte. Cierra el canal composite del FP NGDC-003
+    # (AUDITORIA_ABDUCTIVA_NGDC003_FP §canal composite): un artefacto que
+    # documenta la intención como indecidible no puede subir el score de
+    # malicia. Fallback mínimo si el paquete no está disponible (standalone).
+    # -----------------------------------------------------------------------
+    try:
+        from vigia.tools.caie import (
+            evidence_role as _evidence_role,
+            EVIDENCE_ROLE_NARRATIVE as _ROLE_NARR,
+            EVIDENCE_ROLE_DEVICE as _ROLE_DEVICE,
+        )
+    except Exception:
+        _ROLE_NARR, _ROLE_DEVICE = "narrative", "device"
+        _FALLBACK_NARR = frozenset({"behavioral_context", "behavioral_profile", "outcome_signal"})
+        def _evidence_role(_t):  # mirror mínimo — fuente de verdad es caie
+            return _ROLE_NARR if _t in _FALLBACK_NARR else _ROLE_DEVICE
+
+    _narrative_artifacts = [
+        a for a in artifacts_all
+        if _evidence_role(str(a.get("evidence_type", ""))) == _ROLE_NARR
+    ]
+    artifacts = [
+        a for a in artifacts_all
+        if _evidence_role(str(a.get("evidence_type", ""))) != _ROLE_NARR
+    ]
 
     if not artifacts:
-        return {"verdict": "ERROR", "score": 0.0, "confidence": 0.0, "fractures": [], "error": "No artifacts provided — cannot evaluate intentionality without evidence"}
+        # Todo el evidence es narrativa de escenario: no hay evidencia de
+        # dispositivo sobre la cual afirmar intención. ABSTAIN, no NOISE.
+        return {
+            "verdict": "ABSTAIN", "score": 0.0, "confidence": 0.0, "fractures": [],
+            "narrative_context": [a.get("evidence_type") for a in _narrative_artifacts],
+            "reason": ("Only narrative/scenario context present (motive, persona, "
+                       "outcome) — no device evidence to evaluate intent (B-070)"),
+        }
 
     # -----------------------------------------------------------------------
     # B1: Live CAIE — recompute fractures from artifacts
@@ -749,22 +790,18 @@ def _vigia_score(case: dict) -> dict:
         # its raw_score, does not justify an inference of malicious intent.
         # Requirement: n_artifacts >= 4 OR n_unique_types >= 3.
         #
-        # B-068 (FP VIGIA-NGDC-003): el gate cuenta solo evidencia TÉCNICA.
-        # Las clases contextuales/narrativas (documentación de escenario,
-        # perfiles de comportamiento, outcomes, OSINT) describen motivo y
-        # circunstancias — informan la narrativa pero NO son fuentes
-        # independientes que corroboren una inferencia de MALICE ("two
-        # independent sources" = clases de evidencia de dispositivo).
-        # NGDC-003 (intención disputada: monitoreo parental vs espionaje
-        # conyugal, artefactos idénticos) cruzaba el gate contando 2
-        # artefactos de documentación del escenario como corroboración.
-        _CONTEXT_EVIDENCE_TYPES = {
-            "behavioral_context", "behavioral_profile", "outcome_signal",
-            "acquisition_context", "device_acquisition_timeline", "osint",
-        }
+        # B-068 (FP VIGIA-NGDC-003), refactor B-070: el gate cuenta solo
+        # evidencia DEVICE. Las clases NARRATIVE ya se apartaron arriba (no
+        # están en `artifacts`); acá se excluyen además las CONTEXTUAL (OSINT,
+        # metadata de adquisición): device-adyacentes, pueden portar señal en
+        # el composite pero NO son fuentes independientes de dispositivo, así
+        # que no corroboran ("two independent sources" = clases DEVICE). El rol
+        # se lee del registro único (vigia.tools.caie.evidence_role), no de una
+        # lista local. NGDC-003 (intención disputada) cruzaba el gate contando
+        # documentación de escenario como corroboración.
         _tech_arts = [
             a for a in artifacts
-            if a.get("evidence_type") not in _CONTEXT_EVIDENCE_TYPES
+            if _evidence_role(str(a.get("evidence_type", ""))) == _ROLE_DEVICE
         ]
         _n_arts  = len(_tech_arts)
         _n_types = len(set(a.get("evidence_type", "") for a in _tech_arts))
@@ -815,6 +852,14 @@ def _vigia_score(case: dict) -> dict:
         "caie_fractures_source":        _caie_source,
         "peirce_chain":                 case.get("peirce_chain", {}),
         "expected_verdict":             case.get("expected_verdict", "UNKNOWN"),
+        # B-070: artefactos NARRATIVE apartados del scoring — retenidos para la
+        # narrativa del reporte, no contribuyen al veredicto ni a la confianza.
+        "narrative_context":            [
+            {"evidence_type": a.get("evidence_type"),
+             "artifact_id": a.get("artifact_id"),
+             "raw_score": a.get("raw_score")}
+            for a in _narrative_artifacts
+        ],
     }
 
     base_result["quadripartite_state"] = _apply_quadripartite(
