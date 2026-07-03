@@ -186,6 +186,11 @@ class SIFTOrchestrator:
         # explicitly provides them — absent fields degrade trust honestly.
         self.acquisition_overrides: Dict[str, Any] = {}
         self.path_guard = PathGuard(allowed_base_paths=_evidence_allowlist())
+        # F7 (AUDITORIA_PIPELINE_ROBUSTEZ): visibilidad de pérdidas silenciosas.
+        # _rejected_paths: rechazos de PathGuard (antes: log + skip invisible).
+        # _signal_drops: resultados que fallaron la conversión a SignalOutput.
+        self._rejected_paths: List[Tuple[str, str]] = []
+        self._signal_drops: List[str] = []
 
         # SIFT motores originales.
         # FIX (auditoría FN, P1-D): construcción resiliente. Algunos motores
@@ -250,10 +255,14 @@ class SIFTOrchestrator:
             check = self.path_guard.validate(path_str, for_read=for_read, allow_dir=allow_dir)
             if not check.valid:
                 logger.error("PathGuard REJECT %s: %s", path_str, check.reason)
+                # F7: el rechazo deja de ser invisible — se registra para
+                # emitir una señal `unanalyzed` al final del pipeline.
+                self._rejected_paths.append((path_str, str(check.reason)))
                 return None
             return Path(path_str).absolute()
         except SecurityException as e:
             logger.error("SecurityException en %s: %s", path_str, e)
+            self._rejected_paths.append((path_str, f"SecurityException: {e}"))
             return None
 
     def _safe_read(self, path_str: str) -> Optional[bytes]:
@@ -272,7 +281,45 @@ class SIFTOrchestrator:
             return None
         except Exception as e:
             logger.error("Error en to_signal de %s: %s", method_name, e)
+            # F8 (N14): el drop se contabiliza — pipeline_meta lo expone.
+            self._signal_drops.append(f"{method_name}: {type(e).__name__}: {e}")
             return None
+
+    @staticmethod
+    def _unanalyzed_signal(engine: str, artifact_type: str, error: str) -> SignalOutput:
+        """
+        F7 (N7): señal sintética que marca un artefacto como NO ANALIZADO
+        cuando su motor lanzó una excepción o PathGuard rechazó su ruta.
+        z=0 y signal_class=derived: no aporta al veredicto ni a los gates de
+        corroboración — solo hace visible la pérdida (0 hallazgos sobre
+        evidencia no analizada NO es evidencia de benignidad).
+        """
+        return SignalOutput(
+            tool_name=f"{engine.upper()}_UNANALYZED",
+            value=0.0,
+            z_score=0.0,
+            confidence=0.0,
+            metadata={
+                "artifact_type": artifact_type,
+                "unanalyzed": True,
+                "signal_class": "derived",
+                "error": str(error)[:200],
+            },
+        )
+
+    @staticmethod
+    def _mark_derived(sig: Optional[SignalOutput]) -> Optional[SignalOutput]:
+        """
+        F5 (N4): etiqueta una señal como DERIVADA (motores engine, timeline,
+        adversarial robustness). Las derivadas no cuentan para el gate de
+        corroboración ≥3 del reasoner ni para el override L-036 del agente.
+        """
+        if sig is None:
+            return None
+        meta = dict(sig.metadata) if isinstance(sig.metadata, dict) else {}
+        meta["signal_class"] = "derived"
+        sig.metadata = meta
+        return sig
 
     def run_full_analysis(
         self,
@@ -308,6 +355,9 @@ class SIFTOrchestrator:
         """
         raw_signals: List[SignalOutput] = []
         results: Dict[str, Any] = {}
+        # F7/F8: estado de visibilidad limpio por corrida.
+        self._rejected_paths = []
+        self._signal_drops = []
 
         # ============================================================
         # 1. SIFT ORIGINALES (5 mundos)
@@ -327,6 +377,7 @@ class SIFTOrchestrator:
                 except Exception as e:
                     logger.error("MemoryForensicsEngine falló: %s", e)
                     results["memory"] = {"error": str(e)}
+                    raw_signals.append(self._unanalyzed_signal("memory", "memory", e))
 
         # 1.2 Registry
         if registry_hives and self.registry:
@@ -346,6 +397,7 @@ class SIFTOrchestrator:
                         raw_signals.append(sig)
                 except Exception as e:
                     logger.error("RegistryTimelineReconstructor falló para %s: %s", hive, e)
+                    raw_signals.append(self._unanalyzed_signal("registry", "registry", f"{hive}: {e}"))
             results["registry"] = [s.metadata for s in registry_signals]
 
         # 1.3 Event Logs
@@ -366,6 +418,7 @@ class SIFTOrchestrator:
                 except Exception as e:
                     logger.error("EventLogCorrelator falló: %s", e)
                     results["eventlog"] = {"error": str(e)}
+                    raw_signals.append(self._unanalyzed_signal("eventlog", "windows_event_log", e))
 
         # 1.4 Disk (MFT)
         if mft_json and self.disk:
@@ -380,6 +433,7 @@ class SIFTOrchestrator:
             except Exception as e:
                 logger.error("MFTTimelineAnalyzer falló: %s", e)
                 results["disk"] = {"error": str(e)}
+                raw_signals.append(self._unanalyzed_signal("disk", "mft", e))
 
         # 1.5 Network
         if network_flows and self.network:
@@ -395,6 +449,7 @@ class SIFTOrchestrator:
             except Exception as e:
                 logger.error("NetworkForensicsEngine falló: %s", e)
                 results["network"] = {"error": str(e)}
+                raw_signals.append(self._unanalyzed_signal("network", "network", e))
 
         # ============================================================
         # 2. SIFT NUEVOS (6 motores)
@@ -413,6 +468,7 @@ class SIFTOrchestrator:
                         results["prefetch"] = sig.metadata
                 except Exception as e:
                     logger.error("PrefetchAnalyzer falló: %s", e)
+                    raw_signals.append(self._unanalyzed_signal("prefetch", "prefetch", e))
 
         # 2.2 USB
         if usb_hive_path and self.usb:
@@ -427,6 +483,7 @@ class SIFTOrchestrator:
                         results["usb"] = sig.metadata
                 except Exception as e:
                     logger.error("USBDeviceTracker falló: %s", e)
+                    raw_signals.append(self._unanalyzed_signal("usb", "usb", e))
 
         # 2.3 Browser
         if browser_profile and self.browser:
@@ -441,6 +498,7 @@ class SIFTOrchestrator:
                         results["browser"] = sig.metadata
                 except Exception as e:
                     logger.error("BrowserForensicsEngine falló: %s", e)
+                    raw_signals.append(self._unanalyzed_signal("browser", "browser", e))
 
         # 2.4 Shellbag
         if shellbag_hive and self.shellbag:
@@ -455,6 +513,7 @@ class SIFTOrchestrator:
                         results["shellbag"] = sig.metadata
                 except Exception as e:
                     logger.error("ShellbagAnalyzer falló: %s", e)
+                    raw_signals.append(self._unanalyzed_signal("shellbag", "shellbag", e))
 
         # 2.5 Amcache/Shimcache
         if (amcache_path or system_hive_path) and self.amcache:
@@ -472,6 +531,7 @@ class SIFTOrchestrator:
                     results["amcache"] = sig.metadata
             except Exception as e:
                 logger.error("AmcacheShimcacheAnalyzer falló: %s", e)
+                raw_signals.append(self._unanalyzed_signal("amcache", "amcache", e))
 
         # 2.6 IOC enrichment (si hay base de datos externa)
         if self.ioc:
@@ -504,6 +564,16 @@ class SIFTOrchestrator:
                     results["ccs_gate"] = {"applied": True, "count": len(mapped)}
             except Exception as e:
                 logger.error("SignalMapper CCS Gate falló: %s", e)
+
+        # F7 (N7 variante PathGuard): cada ruta rechazada por PathGuard se
+        # materializa como señal `unanalyzed` — el rechazo silencioso era el
+        # candidato más fuerte del patrón "agente no ve lo que Claude sí ve".
+        for rejected_path, reason in self._rejected_paths:
+            raw_signals.append(self._unanalyzed_signal(
+                "pathguard_reject",
+                "pathguard_reject",
+                f"{rejected_path}: {reason}",
+            ))
 
         # ============================================================
         # 4. GAMMA (Artifact Reliability)
@@ -550,6 +620,14 @@ class SIFTOrchestrator:
                     "gamma_type": art_type,
                     "z_original": sig.z_score,
                 }
+                # F5 (N4): clase de señal. Las señales SIFT de artefacto son
+                # PRIMARIAS; las `unanalyzed` (stubs honestos, motores caídos,
+                # rechazos PathGuard) son DERIVADAS — marcan pérdida, no
+                # evidencia. setdefault respeta etiquetas ya presentes.
+                if merged_meta.get("unanalyzed"):
+                    merged_meta["signal_class"] = "derived"
+                else:
+                    merged_meta.setdefault("signal_class", "primary")
                 new_sig = SignalOutput(
                     tool_name=sig.tool_name,
                     value=sig.value,
@@ -592,7 +670,7 @@ class SIFTOrchestrator:
         if event_stream and self.metabolic:
             try:
                 meta_result = self.metabolic.analyze(event_stream)
-                sig = self._to_signal_safe(meta_result, "metabolic")
+                sig = self._mark_derived(self._to_signal_safe(meta_result, "metabolic"))
                 if sig:
                     engine_signals.append(sig)
                     results["metabolic"] = sig.metadata
@@ -603,7 +681,7 @@ class SIFTOrchestrator:
         if frs_adjusted and self.resonance:
             try:
                 res_result = self.resonance.analyze(frs_adjusted)
-                sig = self._to_signal_safe(res_result, "resonance")
+                sig = self._mark_derived(self._to_signal_safe(res_result, "resonance"))
                 if sig:
                     engine_signals.append(sig)
                     results["resonance"] = sig.metadata
@@ -617,7 +695,7 @@ class SIFTOrchestrator:
                     self.behavioral.train_baseline(normal_events)
                 if event_stream:
                     beh_result = self.behavioral.analyze(event_stream)
-                    sig = self._to_signal_safe(beh_result, "behavioral")
+                    sig = self._mark_derived(self._to_signal_safe(beh_result, "behavioral"))
                     if sig:
                         engine_signals.append(sig)
                         results["behavioral"] = sig.metadata
@@ -628,7 +706,7 @@ class SIFTOrchestrator:
         if frs_adjusted and self.patterns:
             try:
                 pat_result = self.patterns.match(frs_adjusted)
-                sig = self._to_signal_safe(pat_result, "patterns")
+                sig = self._mark_derived(self._to_signal_safe(pat_result, "patterns"))
                 if sig:
                     engine_signals.append(sig)
                     results["patterns"] = sig.metadata
@@ -644,7 +722,7 @@ class SIFTOrchestrator:
         if all_signals and self.timeline_engine:
             try:
                 tl_result = self.timeline_engine.build_timeline(all_signals)
-                sig = self._to_signal_safe(tl_result, "timeline")
+                sig = self._mark_derived(self._to_signal_safe(tl_result, "timeline"))
                 if sig:
                     all_signals.append(sig)
                     results["timeline"] = sig.metadata
@@ -657,7 +735,7 @@ class SIFTOrchestrator:
         adv_signal: Optional[SignalOutput] = None
         if all_signals and self.adv_robust:
             try:
-                adv_signal = self.adv_robust.analyze(all_signals)
+                adv_signal = self._mark_derived(self.adv_robust.analyze(all_signals))
                 if adv_signal:
                     all_signals.append(adv_signal)
                     results["adversarial"] = adv_signal.metadata
@@ -667,11 +745,18 @@ class SIFTOrchestrator:
         # ============================================================
         # 9. ABDUCTIVE REASONING
         # ============================================================
+        # F2 (AUDITORIA_PIPELINE_ROBUSTEZ, N1): el error del reasoner nunca
+        # más genérico ni solo-en-logs. reason() ya devuelve REASONER_ERROR
+        # ante cualquier excepción interna; este except es la segunda red
+        # (defensa en profundidad) y conserva tipo+mensaje para el bundle.
         abduction = None
+        reasoner_error: Optional[str] = None
         try:
             abduction = self.reasoner.reason(all_signals)
         except Exception as e:
-            logger.error("AbductiveReasoner falló: %s", e)
+            logger.exception("AbductiveReasoner falló")
+            reasoner_error = f"{type(e).__name__}: {e}"
+            results["reasoner_error"] = reasoner_error
 
         # ============================================================
         # 10. CUSTODY EXPORT
@@ -740,28 +825,61 @@ class SIFTOrchestrator:
             results["unanalyzed_artifacts"] = unanalyzed_artifacts
             logger.warning("[SIFT] Artefactos no analizados: %s", unanalyzed_artifacts)
 
+        # F2: narrativa degradada honesta si el reasoner crasheó pese a su
+        # propia red interna. Nunca más "[FIRSTNESS] Pipeline error." seco:
+        # la extracción SÍ corrió — se narra qué hay y qué falló exactamente.
+        if abduction is not None:
+            _narrative = abduction.peirce_narrative
+        else:
+            _narrative = (
+                f"[FIRSTNESS] {len(all_signals)} señales extraídas y selladas "
+                f"por el pipeline ({len(frs_adjusted)} SIFT, "
+                f"{len(engine_signals)} engine).\n"
+                f"[SECONDNESS] El razonador abductivo falló antes de emitir "
+                f"inferencia: {reasoner_error or 'error desconocido'}.\n"
+                f"[THIRDNESS] Sin inferencia abductiva disponible — el "
+                f"veredicto se resuelve por override determinista de señales "
+                f"(L-036) o ABSTAIN. El fallo del razonador NO es evidencia "
+                f"de benignidad ni de malicia."
+            )
+
+        # F8 (N14): drops de conversión visibles en el resultado.
+        if self._signal_drops:
+            results["signal_conversion_drops"] = list(self._signal_drops)
+            logger.warning("[SIFT] Señales perdidas en to_signal: %s",
+                           self._signal_drops)
+
         return {
             "case_id": self.case_id,
             "custody": custody_export,
             "signals": [self._signal_to_dict(s) for s in all_signals],
             "abduction": {
-                "best_hypothesis": abduction.best_hypothesis if abduction else "UNDETERMINED",
+                "best_hypothesis": abduction.best_hypothesis if abduction else "REASONER_ERROR",
                 "best_posterior": str(abduction.best_posterior) if abduction else "0",
                 "confidence": str(abduction.confidence) if abduction else "0",
-                "narrative": abduction.peirce_narrative if abduction else "[FIRSTNESS] Pipeline error.",
+                "narrative": _narrative,
                 "ontological_level": abduction.ontological_level if abduction else None,
                 "is_conclusive": abduction.is_conclusive if abduction else False,
+                **({"reasoner_error": reasoner_error} if reasoner_error else {}),
             },
             "results": results,
             "pipeline_meta": {
                 "n_sift_signals": len(frs_adjusted),
                 "n_engine_signals": len(engine_signals),
                 "n_total_signals": len(all_signals),
+                "n_primary_signals": len([
+                    s for s in all_signals
+                    if not isinstance(s.metadata, dict)
+                    or (s.metadata.get("signal_class") != "derived"
+                        and not s.metadata.get("unanalyzed"))
+                ]),
                 "n_unanalyzed_artifacts": len(unanalyzed_artifacts),
+                "n_pathguard_rejects": len(self._rejected_paths),
+                "n_signal_conversion_drops": len(self._signal_drops),
                 "frs_groups": len(frs_groups),
                 "gamma_applied": True,
                 "anti_silencing": True,
-                "version": "V4-COLECTIVO-2026-05-06",
+                "version": "V4-COLECTIVO-2026-07-03",
             }
         }
 

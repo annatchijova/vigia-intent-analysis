@@ -21,6 +21,49 @@ pata: **la generación de la narrativa determinista en sí**.
 
 ---
 
+## Estado de implementación (2026-07-03, rama `claude/vigia-pipeline-robustness-cv9lk1`)
+
+Las 4 tandas de §5 fueron implementadas. Resumen:
+
+| Fix | Estado | Dónde |
+|---|---|---|
+| **F1** invariante 4 + CCS por hipótesis + desempate + mapeo ABSTAIN_V2 | ✅ | `abductive_reasoner.py` (`_build_hypotheses`, `_v2_result_to_trace`), `abductive_reasoner_v2.py` (`phase_thirdness`) |
+| **F2** error del reasoner nunca genérico | ✅ | `reason()` con try total + `REASONER_ERROR`; orquestador V4 narra `tipo: mensaje` y expone `results.reasoner_error` |
+| **F3** override L-036 antes de serializar | ✅ | `vigia_agent._generate_narrative` (override primero, anotado `[OVERRIDE L-036 …]`); `run()` genera narrativa antes del log AGENT_EXIT |
+| **F4** narrativa Peircean siempre-informativa | ✅ | Capas FIRSTNESS/SECONDNESS/THIRDNESS deterministas desde señales + capa del motor v2 (`phases[].notes`, ya no se descartan) |
+| **F5** señales primarias vs derivadas | ✅ | Tagging `signal_class` en orquestador (SIFT=primary; engine/timeline/adv/unanalyzed=derived); gates ≥3, <3→ABSTAIN y L-036 cuentan solo primarias |
+| **F6** mobile por z real + escalación en merge | ✅ | shim `_mobile_hypothesis()`; `_merge_mobile_signals` escala si mobile z>3 y el veredicto previo no está flaggeado |
+| **F7** "no analizado" visible y ruidoso | ✅ | Señal sintética `*_UNANALYZED` por motor caído y por rechazo PathGuard; sección "ARTEFACTOS NO ANALIZADOS" en narrativa; NOISE+unanalyzed→ABSTAIN |
+| **F8** textos menores (vol3 0-señales, CAIE ERROR, `source`, drops) | ✅ | shim + `vigia_agent` + `pipeline_meta.n_signal_conversion_drops` |
+| **F9** tests de regresión | ✅ | `tests/test_pipeline_robustness_narrative.py` (27 tests) + fix del self-test estanco `test_abstain_conditions` en v2 |
+
+**Hallazgos adicionales descubiertos DURANTE la implementación** (extienden §3.1):
+
+| ID | Severidad | Punto de fallo | Fix |
+|----|-----------|----------------|-----|
+| **N16** | **P0** | `run_pipeline` v2 pasaba `inversion_resolved=(verdict != NO_CONTRADICTION)`: la AUSENCIA de contradicción se trataba como "no resuelto" → ABSTAIN-INVERSION disparaba en TODO caso sin contradicción Memory/Disk → el veredicto REJECT era prácticamente inalcanzable vía wrapper | ✅ `inversion_resolved` = NO_CONTRADICTION (trivialmente resuelta) ∨ CONTRADICTION_IS_EVIDENCE ∨ dominant_layer definido |
+| **N17** | **P0** | `AbductiveReasonerV2` acumula estado (`selected_hypothesis`, `phase_log`) entre corridas — el wrapper reutilizaba la instancia y un THIRDNESS sin selección (empate) **heredaba la hipótesis ganadora de la llamada anterior** | ✅ reset de estado al inicio de `run_pipeline` + instancia fresca por llamada en el wrapper. `[REPRODUCIDO]` |
+| **N18** | P1 | Guard anti-swallow: H2-BENIGN ganando por mayoría de señales quietas sellaba NOISE conclusivo aunque existiera una señal primaria crítica (z>3) diluida | ✅ H2 + señal crítica → `SUSPICION_DETECTED`, no conclusivo |
+| **N19** | P2 | El log `AGENT_EXIT` del audit trail se computaba ANTES del override L-036 → el audit trail podía registrar un veredicto distinto del sellado (y `run_all_agent.py` lee ese entry) | ✅ narrativa (y override) se generan antes del log AGENT_EXIT |
+
+**Decisiones de diseño documentadas:**
+- `ABSTAIN_V2` (abstención deliberada del motor v2: veto duro, CCS≤1/2, empate)
+  **NO** es overrideable por L-036 — la abstención razonada tiene precedencia
+  sobre el conteo de señales. `REASONER_ERROR` (fallo, no razonamiento) SÍ es
+  overrideable.
+- `MALICIOUS_INTENT_DETECTED` desde el bridge requiere ≥2 tipos de artefacto
+  con z>3 (gate Daubert de dos fuentes); un solo tipo capea en
+  `INTENT_DETECTED`.
+- Evidencia mobile limpia de fuente única → `ABSTAIN` (antes NOISE): 1 señal
+  sin corroboración no alcanza para afirmar benignidad. Flip intencional.
+
+**Verificación:** suite completa 323 passed (21 fallos preexistentes en
+`tests/e2e/test_integration_end_to_end.py`, idénticos en HEAD — entorno MCP,
+no regresión); self-tests v2 9/9; F9 27/27. Corpus `run_all_agent.py`: ver
+resultado en el mensaje de commit correspondiente.
+
+---
+
 ## Resumen ejecutivo
 
 1. **Causa raíz encontrada y reproducida.** `[FIRSTNESS] Pipeline error.` no es
