@@ -157,7 +157,15 @@ def classify_agent_verdict(
         return "MALICE"
     if "INTENT" in hyp or "SUSPICION" in hyp:
         return "INTENT"
-    if hyp in ABSTAIN_HYPOTHESES:
+    # B-058 FIX (auditoría de invariantes 2026-07-03): match por SUBSTRING,
+    # no solo exacto. El adaptador EBS emite "ABSTAIN_DETECTED" (expected==
+    # ABSTAIN), que NO estaba en ABSTAIN_HYPOTHESES → caía a NOISE (exit 0):
+    # un caso que el sistema etiqueta explícitamente ABSTAIN se sellaba como
+    # benigno (misma familia P0-A). El batch comparator de run_all_agent.py
+    # lo enmascaraba con su propio mapeo ABSTAIN_DETECTED→ABSTAIN, dando PASS
+    # sobre un bundle con agent_verdict=NOISE. Ahora "ABSTAIN" en cualquier
+    # posición de la hipótesis clasifica ABSTAIN.
+    if "ABSTAIN" in hyp or hyp in ABSTAIN_HYPOTHESES:
         return "ABSTAIN"
     # Veredicto que se presenta como "limpio" pero se apoya en muy pocas
     # señales: el reasoner no tuvo base suficiente para afirmar benignidad.
