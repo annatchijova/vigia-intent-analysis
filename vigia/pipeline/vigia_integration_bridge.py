@@ -1180,10 +1180,11 @@ class VigiaIntegrationEngine:
                     # ecl_hash es metadata del bloque de integridad, no del payload
                     self._log("ECL_HASH_INJECTED")
                 if save_bundle:
-                    import hashlib as _hl
+                    # B-064: escritura atómica (patrón L-023) — el bundle
+                    # sellado no puede quedar truncado en disco.
+                    from vigia.core.atomic_io import atomic_write_text
                     content = json.dumps(sealed_dict, sort_keys=True, indent=2, default=str)
-                    with open(bundle_path, "w", encoding="utf-8") as f:
-                        f.write(content)
+                    atomic_write_text(bundle_path, content)
             except ImportError:
                 logger.warning("[VigiaEngine] BundleBuilder no disponible — Level 2 solamente")
 
@@ -1212,8 +1213,12 @@ class VigiaIntegrationEngine:
 
                 report_filename = f"report_{case_id}.json"
                 report_path = os.path.join(self._output_dir, report_filename)
-                with open(report_path, "w", encoding="utf-8") as f:
-                    json.dump(report_data, f, sort_keys=True, indent=2, default=str)
+                # B-064: escritura atómica (patrón L-023)
+                from vigia.core.atomic_io import atomic_write_text
+                atomic_write_text(
+                    report_path,
+                    json.dumps(report_data, sort_keys=True, indent=2, default=str),
+                )
                 self._log("REPORT_SAVED", path=report_path)
 
             except Exception as e:

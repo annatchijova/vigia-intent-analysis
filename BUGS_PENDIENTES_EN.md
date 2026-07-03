@@ -3369,3 +3369,122 @@ fail-loud rejected it with ValueError — correctly noisy).
 Comparative run over the 198 scored cases: **0 verdict flips, 0 score moves**
 (no corpus case hits the collapsed branch — the fix protects the class, it
 does not relabel cases). Tests: `TestP2DProvenanceCollapsedAbstain` (2).
+
+---
+
+## B-062 — pipeline.py: the "CAIE structural hard gate" claimed to override the verdict but only annotates the bundle [RESOLVED — semantics documented]
+
+| Field | Value |
+|-------|-------|
+| **Status** | RESOLVED — POST HACKATHON (2026-07-03). Design decision: the gate IS an annotation, not an order |
+| **Severity** | P2 — diverging verdict paths (B-058 family) + misleading log (lens 9) |
+| **File** | `vigia/pipeline/pipeline.py:676-720` |
+| **Scope** | Mode 4 / standalone CLI (`vigia` in pyproject). **Does NOT affect Mode 1** (`vigia_agent.py` → `sift_orchestrator`), which never goes through `pipeline.py` |
+| **Detected in** | Invariant sweep over `vigia/pipeline/` (2026-07-03), reproduced end-to-end through the CLI path |
+| **Restore tag** | `pre-pipeline-fixes-20260703-162541` |
+
+### Description
+
+When CAIE detects a golden rule or a fracture from the structural veto list,
+the gate wrote `caie_analysis.gate_verdict="MALICE"` into the bundle and
+logged *"verdict overridden → MALICE"*. But `decision_trace.decision` — what
+the CLI prints (`:1362`, `:1455`), what the exec log records (`:762`) and
+what the bridge's judicial report exports
+(`vigia_integration_bridge.py:992`) — was never modified: CAIE runs *after*
+`RiskBoundedDecisionLayer.decide()` and never feeds back. The only consumer
+of `gate_verdict` in the repo is `show_4_hashes.py` (demo), which treats it
+as top priority. Reproduced: CLI `decision: REJECT` with a sealed bundle
+carrying `gate_verdict: MALICE` and a log claiming "verdict overridden".
+
+### Resolution (design decision, approved 2026-07-03)
+
+The gate **is a sealed annotation, not an order**. The log was corrected
+(*"CAIE structural veto annotated in sealed bundle ... decision_trace.decision
+no se modifica"*) and the `gate_verdict` semantics were documented in the
+`run_full` docstring and the block comment: a consumer that wants to
+prioritize the structural impossibility must read
+`caie_analysis.gate_verdict` explicitly. No behavior change in verdicts or in
+the bundle.
+
+### Validation
+
+Suite 405 passed (+11 new), same 21 preexisting e2e failures, 6 xfailed.
+Corpus 198/198. Tests: `TestB062GateAnnotation` (1) in
+`tests/test_b062_b064_pipeline_fixes.py` — verifies sealed annotation,
+untouched decision, honest log.
+
+---
+
+## B-063 — forensic_adapter.py: signals with metadata=None crashed the adapter → CAIE silently skipped on the CLI [RESOLVED]
+
+| Field | Value |
+|-------|-------|
+| **Status** | RESOLVED — POST HACKATHON (2026-07-03) |
+| **Severity** | P2 — enrichment module silently disabled by the CLI's own documented input format |
+| **File** | `vigia/core/forensic_adapter.py:134,166,184` (crash) + `vigia/pipeline/pipeline.py:1262` (source of the None) |
+| **Scope** | `run_vigia` CLI path (Mode 4). The bridge is unaffected (it always builds the metadata dict) |
+| **Detected in** | Differential reproduction during the invariant sweep (2026-07-03) |
+| **Restore tag** | `pre-pipeline-fixes-20260703-162541` |
+
+### Description
+
+`SignalOutput.metadata` defaults to `None` (`ebs_v1.py:104/128`, both the
+pydantic and dataclass variants). `run_vigia()` builds signals with
+`metadata=d.get("metadata")` → `None` when the field is absent — and the
+input format documented in the CLI's own docstring (`{"tool_name": "SDA",
+"value": 0.8, "z_score": 2.3, "confidence": 0.9}`) does not carry it. The
+three `ForensicAdapter` converters did `sig.metadata.get(...)` →
+`TypeError`, swallowed upstream as *"CAIE failed (non-blocking)"* → **CAIE
+never ran and nobody noticed**. Verified differentially: the same run with
+`"metadata": {}` runs CAIE; without it, CAIE is skipped. Additional
+consequence: it made the B-062 gate unreachable from the documented input.
+
+### Fix
+
+`_meta = sig.metadata or {}` at the top of the three converters
+(`signal_to_caie_artifact`, `signal_to_abductive_record`,
+`signal_to_causal_link`) — covers every caller, not just the CLI. Guaranteed
+parity: `metadata=None` behaves identically to `metadata={}`.
+
+### Validation
+
+Suite 405 passed, corpus 198/198. Tests: `TestB063MetadataNone` (6) —
+includes the CLI docstring format end-to-end, verifying that "CAIE failed
+(non-blocking)" no longer appears in the log.
+
+---
+
+## B-064 — Non-atomic writes of chain-of-custody artifacts (ledger, manifest, signature, bundle, report) [RESOLVED]
+
+| Field | Value |
+|-------|-------|
+| **Status** | RESOLVED — POST HACKATHON (2026-07-03) |
+| **Severity** | P2 — L-023 family: a crash mid-write leaves a truncated custody artifact on disk |
+| **File** | `vigia/pipeline/evidence_bundle.py` (PDF/ledger/manifest/signature), `vigia/pipeline/vigia_integration_bridge.py:1185,1215` (sealed bundle and report), `vigia/pipeline/security_evidence_registry.py:187` (ledger export) |
+| **Detected in** | Invariant sweep, "operation without inverse/atomicity" lens (2026-07-03) |
+| **Restore tag** | `pre-pipeline-fixes-20260703-162541` |
+
+### Description
+
+The L-023 atomic fix (Tanda A) landed only in `BundleBuilder.save`. The
+remaining custody artifacts on the pipeline path were written with raw
+`open("w")` + `write`/`json.dump`: the evidence bundle's ledger, manifest and
+**signature**, the sealed bundle persisted by the bridge, its ENFSI report,
+and the `EvidenceLedger` JSON export. A crash or power cut between open and
+close leaves the file truncated — and a half-written manifest or signature is
+a chain-of-custody break under Daubert.
+
+### Fix
+
+New shared helper `vigia/core/atomic_io.py`
+(`atomic_write_text`/`atomic_write_bytes`) with the exact L-023 pattern:
+mkstemp in the same directory + fsync + `os.replace`, cleaning up the
+tempfile if anything fails before the replace. Applied to all 6 write sites
+across the three files. A shared helper instead of 6 copies, to avoid
+relapsing into lens 6 (duplicated algorithms).
+
+### Validation
+
+Suite 405 passed, corpus 198/198. Tests: `TestB064AtomicWrites` (4) —
+text/bytes roundtrip, no orphan tempfiles, and target-file preservation when
+a write fails midway.
