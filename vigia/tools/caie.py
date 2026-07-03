@@ -338,6 +338,55 @@ EVIDENCE_PROFILES.update({
 # Whitelist of valid evidence types — any type not in this set is rejected
 _VALID_EVIDENCE_TYPES: Final[frozenset[str]] = frozenset(EVIDENCE_PROFILES.keys())
 
+# ---------------------------------------------------------------------------
+# B-070 — Rol epistémico del evidence_type (device / contextual / narrative)
+#
+# Fuente ÚNICA de verdad (semilla del registro unificado de tipos de B-060).
+# Resuelve la causa raíz (b) del FP NGDC-003 (AUDITORIA_ABDUCTIVA_NGDC003_FP):
+# el modelo de datos no distinguía evidencia-de-dispositivo de contexto-
+# narrativo, así que ambos fluían al composite de malicia y al gate de
+# corroboración por igual. Con esto, cada consumidor (scorer, gate, CAIE)
+# consulta el mismo registro en vez de parchear su propia lista.
+#
+#   DEVICE     — evidencia derivada del dispositivo. Cuenta en el composite
+#                de malicia Y como fuente de corroboración (gate). Default:
+#                un tipo desconocido se trata como DEVICE (conservador — no
+#                deja de contar por no estar clasificado).
+#   CONTEXTUAL — evidencia device-adyacente (OSINT, metadata de adquisición).
+#                Cuenta en el composite (puede portar señal de anomalía real,
+#                ej. un deployment off-hours) pero NO es una fuente
+#                independiente de dispositivo → NO corrobora (gate).
+#   NARRATIVE  — documentación de escenario: motivo, persona, desenlace. NO
+#                mueve el score de malicia ni corrobora. Informa solo la
+#                narrativa del reporte. Es la clase cuyo propio texto suele
+#                declarar la intención indecidible ("consistent with both
+#                hypotheses") — contarla como malicia es la inversión que
+#                producía el FP.
+# ---------------------------------------------------------------------------
+EVIDENCE_ROLE_DEVICE: Final[str] = "device"
+EVIDENCE_ROLE_CONTEXTUAL: Final[str] = "contextual"
+EVIDENCE_ROLE_NARRATIVE: Final[str] = "narrative"
+
+_EVIDENCE_ROLE: Final[dict[str, str]] = {
+    # Narrativa de escenario — fuera del composite y del gate
+    "behavioral_context":          EVIDENCE_ROLE_NARRATIVE,
+    "behavioral_profile":          EVIDENCE_ROLE_NARRATIVE,
+    "outcome_signal":              EVIDENCE_ROLE_NARRATIVE,
+    # Contextual device-adyacente — en el composite, fuera del gate
+    "osint":                       EVIDENCE_ROLE_CONTEXTUAL,
+    "acquisition_context":         EVIDENCE_ROLE_CONTEXTUAL,
+    "device_acquisition_timeline": EVIDENCE_ROLE_CONTEXTUAL,
+    # (todo lo demás → DEVICE por defecto, incluido cualquier tipo desconocido)
+}
+
+
+def evidence_role(evidence_type: str) -> str:
+    """Rol epistémico de un evidence_type (B-070). Default DEVICE:
+    un tipo no clasificado cuenta como evidencia de dispositivo (conservador —
+    nunca deja de contar por falta de clasificación)."""
+    return _EVIDENCE_ROLE.get(evidence_type, EVIDENCE_ROLE_DEVICE)
+
+
 # Maximum artifacts per evaluation — prevents DoS via artifact flooding
 _MAX_ARTIFACTS: Final[int] = 1000
 

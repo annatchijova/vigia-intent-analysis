@@ -3469,3 +3469,67 @@ alcance de un fix acotado.
 Ningún cambio de código sellado. `caie.py` revertido a HEAD (`a021a6a`);
 árbol de trabajo limpio. La comparativa que sustenta esta decisión está
 archivada como artefacto de sesión (baseline vs post, 267 casos).
+
+---
+
+## B-070 — Rol epistémico device/contextual/narrative: cierra el canal composite del FP NGDC-003 (Opción C) [RESUELTO]
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | RESUELTO — POST HACKATHON (2026-07-03). Opción C de AUDITORIA_ABDUCTIVA_NGDC003_FP; ataca la causa raíz (b) |
+| **Severidad** | P2 — inflación de score/confianza de malicia por evidencia narrativa (1 canal que B-068 no cerró) |
+| **Archivo** | `vigia/tools/caie.py` (registro `evidence_role`), `vigia_scorer.py` (filtro narrativa + refactor del gate B-068) |
+| **Tag de restauración** | `pre-b070-signalclass-20260703-230411` |
+
+### Causa raíz atacada
+
+La investigación abductiva identificó la causa (b): el modelo de datos no
+distinguía evidencia-de-dispositivo de contexto-narrativo, así que ambos
+fluían al composite de malicia y al conteo del gate por igual. B-068 cortó el
+**canal del gate**; el **canal del composite** seguía abierto (NGDC-003:
+narrativa inflaba el score 0.2803→0.4296 y la confianza 0.56→0.86; corpus:
+1 flip latente LINUX-005).
+
+### Fix (Opción C — registro de roles, fuente única)
+
+Nuevo registro `_EVIDENCE_ROLE` + `evidence_role()` en `caie.py` (semilla del
+registro unificado de B-060). Tres roles:
+
+- **DEVICE** (default, incl. tipos desconocidos): cuenta en composite **y** gate.
+- **CONTEXTUAL** (`osint`, `acquisition_context`, `device_acquisition_timeline`):
+  cuenta en composite (puede portar señal real, ej. deployment off-hours), **no**
+  corrobora (gate).
+- **NARRATIVE** (`behavioral_context`, `behavioral_profile`, `outcome_signal`):
+  **fuera** del composite y del gate. Informa solo la narrativa del reporte.
+
+El scorer aparta los artefactos NARRATIVE **antes** de todo el scoring (no
+alimentan CAIE, ni composite, ni gate) y los retiene en `narrative_context`
+para el reporte. El gate B-068 se **refactorizó** para leer el rol del
+registro único en vez de su lista local de 6 tipos (comportamiento idéntico
+del gate; ahora una sola fuente de verdad).
+
+### Por qué 3 roles y no binario (la distinción clave)
+
+`osint`/`acquisition_context` son **device-adyacentes** (OSINT real,
+metadata de adquisición): portan señal de anomalía en el composite pero no son
+fuentes independientes de dispositivo. Los 3 tipos NARRATIVE son documentación
+de escenario (motivo/persona/desenlace) cuyo propio texto suele declarar la
+intención indecidible. Un binario habría regresado **LINUX-005** (SUSPICION==
+expected, sostenido por su artefacto `osint`): excluir OSINT del composite lo
+habría tirado a UNKNOWN. El modelo de 3 roles cierra NGDC-003 sin tocar LINUX-005.
+
+### Validación
+
+Comparativa scorer 267 casos: **0 flips**, accuracy intacta (184/260 — el
+veredicto ya estaba bien desde B-068; B-070 corrige score/confianza). 2 score
+moves intencionales: NGDC-002 (0.568→0.4785, sigue MALICE), NGDC-003
+(0.4296→0.2803, sigue SUSPICION, confianza 0.86→**0.56** honesta). LINUX-005
+**sin cambio**. Suite 445→455 passed (+9 `test_b070_signal_class.py` +1
+cobertura de gate en `test_b068`). Corpus agente 198/198 (no usa `_vigia_score`).
+
+### Alcance
+
+Solo camino scorer (Modo 4 / EBS-JSON / `vigia_api`). El agente (Modo 1) no
+pasa por `_vigia_score`. B-068 (gate) queda subsumido y refactorizado sobre el
+mismo registro. Pendiente futuro: extender `evidence_role` al registro
+unificado completo de B-060 (layer+ontology+profile+role en una sola fuente).
