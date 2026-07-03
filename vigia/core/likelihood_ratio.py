@@ -137,9 +137,50 @@ class ForensicRecord:
     def to_json(self, indent: int = 2) -> str:
         return json.dumps(self.to_dict(), ensure_ascii=False, indent=indent)
 
+    @staticmethod
+    def _quantize_for_hash(value):
+        """
+        U7 FIX (L-040 §4, Tanda B): representación canónica cuantizada para
+        el hash. `round(x, 6)` + repr float dependía del bit 52 de math.exp,
+        que puede diferir entre x86 y ARM (precedente reconocido por el repo
+        en security.py P1-005) — el MISMO registro podía producir
+        record_hash distintos según la arquitectura. Cuantizar con Decimal a
+        exponente fijo (1e-6, ROUND_HALF_EVEN) hace el hash función de
+        valores idénticos cross-arch: una divergencia de ~1 ulp (1e-16)
+        colapsa a la misma cadena.
+        """
+        if isinstance(value, bool):
+            return value
+        if isinstance(value, float):
+            from decimal import Decimal, ROUND_HALF_EVEN, localcontext
+            if value != value or value in (float("inf"), float("-inf")):
+                return str(value)
+            # localcontext con precisión amplia: valores saturados (B-051,
+            # lr≈1.01e304) tienen ~310 dígitos enteros y desbordarían la
+            # precisión por defecto (28) al cuantizar a 1e-6.
+            with localcontext() as ctx:
+                ctx.prec = 400
+                return str(Decimal(str(value)).quantize(
+                    Decimal("0.000001"), rounding=ROUND_HALF_EVEN))
+        if isinstance(value, list):
+            return [ForensicRecord._quantize_for_hash(v) for v in value]
+        if isinstance(value, dict):
+            return {k: ForensicRecord._quantize_for_hash(v)
+                    for k, v in value.items()}
+        return value
+
     def record_hash(self) -> str:
-        """SHA-256 del registro serializado. Integridad para cadena de custodia."""
-        raw = json.dumps(self.to_dict(), sort_keys=True, ensure_ascii=False)
+        """
+        SHA-256 del registro serializado. Integridad para cadena de custodia.
+
+        U7: se hashea la representación CUANTIZADA (floats → strings Decimal
+        con exponente fijo 1e-6) — estable cross-plataforma. El to_dict() de
+        display no cambia. Los hashes emitidos antes de este fix no se
+        re-verifican en ningún flujo (consumidor único: signal_adapter, que
+        solo lo embebe); los registros nuevos usan el esquema estable.
+        """
+        raw = json.dumps(self._quantize_for_hash(self.to_dict()),
+                         sort_keys=True, ensure_ascii=False)
         return hashlib.sha256(raw.encode()).hexdigest()
 
 

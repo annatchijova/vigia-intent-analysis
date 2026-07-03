@@ -98,14 +98,46 @@ except ImportError:
 logger = logging.getLogger(__name__)
 
 # Bases estáticas de la allowlist de PathGuard (rutas de despliegue conocidas).
+# L-024 FIX (Tanda B, 2026-07-03, prefijos aprobados por la operadora):
+# `/mnt` genérico salió de la allowlist — permitía leer CUALQUIER montaje del
+# host (NFS corporativo, discos personales). Solo los puntos de montaje
+# forenses declarados entran, vía _forensic_mounts(). Un montaje fuera de
+# esos prefijos requiere exportar VIGIA_EVIDENCE_DIR (el contrato documentado
+# en CLAUDE.md), y su rechazo es VISIBLE (señal PATHGUARD unanalyzed, F7).
 _STATIC_ALLOWLIST = (
     Path('/var/vigia'),
     Path('/tmp/vigia'),
     Path('/home/vigia/cases'),
     Path.home() / 'vigia-repo' / 'evidence',
     Path.home() / 'vigia-repo' / 'data',
-    Path('/mnt'),
 )
+
+# Prefijos de montaje forense permitidos bajo /mnt (glob), decisión Tanda B:
+#   /mnt/vigia_*  — montajes propios del operador
+#   /mnt/ewf*     — ewfmount (imágenes E01)
+#   /mnt/evidence — punto de montaje genérico documentado
+_FORENSIC_MOUNT_GLOBS = ("vigia_*", "ewf*", "evidence")
+
+
+def _forensic_mounts(base: Path = Path('/mnt')) -> List[Path]:
+    """
+    Expande los prefijos forenses de /mnt a puntos de montaje EXISTENTES al
+    momento de construir el orquestador. Un montaje creado después requiere
+    re-instanciar (o VIGIA_EVIDENCE_DIR). Determinista: orden sorted.
+    `base` es parametrizable solo para tests.
+    """
+    mounts: List[Path] = []
+    mnt = base
+    if not mnt.is_dir():
+        return mounts
+    for pattern in _FORENSIC_MOUNT_GLOBS:
+        try:
+            for p in sorted(mnt.glob(pattern)):
+                if p.is_dir() and not p.is_symlink():
+                    mounts.append(p)
+        except OSError:
+            continue
+    return mounts
 
 
 def _evidence_allowlist(extra_dirs: Optional[List[str]] = None) -> List[Path]:
@@ -126,6 +158,9 @@ def _evidence_allowlist(extra_dirs: Optional[List[str]] = None) -> List[Path]:
     propio operador declaró como fuente de evidencia.
     """
     allowed: List[Path] = list(_STATIC_ALLOWLIST)
+    # L-024: puntos de montaje forenses existentes bajo /mnt (prefijos
+    # aprobados), en lugar del /mnt genérico anterior.
+    allowed.extend(_forensic_mounts())
     env_dir = os.environ.get("VIGIA_EVIDENCE_DIR", "").strip()
     if env_dir:
         try:
@@ -864,6 +899,19 @@ class SIFTOrchestrator:
             },
             "results": results,
             "pipeline_meta": {
+                # N11 (Tanda B, opción B): Metabolic/Behavioral requieren
+                # event_stream, que el modo agente nunca genera (el shim
+                # re-mapea event_stream→event_logs). Se declara explícito —
+                # "no corrió por diseño" ≠ "corrió y no encontró nada".
+                # Patrón B-052-P1. Alimentarlos desde los EventRecord ya
+                # parseados queda como mejora futura (ver PROPUESTA_TANDA_B
+                # ítem 7, opción A).
+                **({"engines_not_run_no_event_stream": sorted(
+                    name for name, eng in (
+                        ("metabolic", self.metabolic),
+                        ("behavioral", self.behavioral),
+                    ) if eng is not None
+                )} if not event_stream else {}),
                 "n_sift_signals": len(frs_adjusted),
                 "n_engine_signals": len(engine_signals),
                 "n_total_signals": len(all_signals),

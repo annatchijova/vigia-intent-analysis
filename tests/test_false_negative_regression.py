@@ -112,7 +112,11 @@ class TestPathGuardEvidenceDir:
         from pathlib import Path
         allow = _evidence_allowlist()
         assert Path("/tmp/vigia") in allow
-        assert Path("/mnt") in allow
+        # L-024 (Tanda B): /mnt genérico salió de la allowlist — solo entran
+        # los puntos de montaje forenses existentes (/mnt/vigia_*, /mnt/ewf*,
+        # /mnt/evidence). El acceso a otros montajes requiere
+        # VIGIA_EVIDENCE_DIR.
+        assert Path("/mnt") not in allow
 
 
 # ──────────────────────────────────────────────────────────────────────────

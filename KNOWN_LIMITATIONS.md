@@ -574,7 +574,7 @@ the write fails. Tests: `tests/test_tanda_a_triage.py::TestA5AtomicBundleSave`
 
 ---
 
-### L-024 — Forensic Mount Point Allowlist Includes Generic `/mnt`
+### L-024 — Forensic Mount Point Allowlist Includes Generic `/mnt` [RESOLVED 2026-07-03]
 
 **Affects:** `sift_orchestrator.py` PathGuard configuration; any case requiring
 mounted disk images via `ewfmount`/`ntfs-3g` (e.g. VANKO-FALLBACK-002) | **Status:** Design decision
@@ -607,6 +607,15 @@ the path.
 **Roadmap:** Scope the allowlist to a dedicated, VIGÍA-managed mount namespace
 (e.g. a configurable `VIGIA_MOUNT_ROOT`) once SIFT integration defines a
 standard mount convention.
+
+
+**Fix applied (2026-07-03, Tanda B — prefixes approved by the operator):**
+generic `/mnt` removed from the static allowlist. Only existing forensic
+mount points enter, expanded at orchestrator construction from the approved
+prefixes `/mnt/vigia_*`, `/mnt/ewf*` (ewfmount) and `/mnt/evidence`
+(symlinks excluded). Any other mount requires `VIGIA_EVIDENCE_DIR` — the
+documented contract — and its rejection is VISIBLE (PathGuard unanalyzed
+signal, F7). Tests: `TestL024MntPrefixes` (3).
 
 ---
 
@@ -1627,3 +1636,25 @@ Requires new finding types in `_analyze_sms()`:
 Do not implement without calibration data across more cases — same caution
 as L-033 gamma calibration. A naive price/time/location keyword set risks
 false positives on ordinary scheduling SMS.
+
+
+---
+
+## L-044 — MetabolicProfiler and BehavioralFingerprint do not run in Mode 1 (agent) [DOCUMENTED]
+
+**Affects:** `vigia/inference/metabolic_profiler.py`, `vigia/inference/behavioral_fingerprint.py` | **Status:** documented design limitation (Tanda B, option B)
+
+**Description:** both engines require an `event_stream` (list of event dicts
+with epoch `timestamp`), which the agent never generates (the shim re-maps
+`event_stream` → `event_logs`). They are fully implemented but only reachable
+in Mode 4 / direct API usage.
+
+**Honesty marker:** since Tanda B, `pipeline_meta.engines_not_run_no_event_stream`
+lists them explicitly in every V4 result without an event_stream — "did not
+run by design" is distinguishable from "ran and found nothing"
+(B-052-P1 pattern).
+
+**Future work (PROPUESTA_TANDA_B.md item 7, option A):** feed them from the
+`EventRecord`s already parsed by EventLogCorrelator (`timestamp` epoch int —
+exactly the expected format). Deferred until a case demonstrates forensic
+value over a single evtx.

@@ -483,11 +483,11 @@ Reemplazar cada `assert condicion, mensaje` por `if not condicion: raise Runtime
 
 ---
 
-## B-013 — LOG_VS_MEMORY dispara con raw_score bajo (diseño vs contrato)
+## B-013 — LOG_VS_MEMORY dispara con raw_score bajo (diseño vs contrato) [CERRADO POR DISEÑO]
 
 | Campo | Valor |
 |-------|-------|
-| **Estado** | ABIERTO — decisión de diseño pendiente |
+| **Estado** | CERRADO POR DISEÑO — decisión de Anna, Tanda B (2026-07-03) |
 | **Severidad** | P1 — afecta monotonicidad del sistema |
 | **Archivo** | `vigia/tools/caie.py` — `_extract_assertions()` |
 | **Detectado en** | Sesión post-hackathon 2026-06-25, propiedad-testing |
@@ -539,6 +539,21 @@ Opción C es la más Daubert-compatible: "este log AFIRMA una conexión saliente
 Y la memoria NO LA MUESTRA — eso es una contradicción objetiva, independiente
 de cuán confiable sea el log". La fuerza del hallazgo se modula por severity
 (0.75 sin PID overlap, 0.95 con overlap), no por el raw_score del log.
+
+### Cierre por diseño (Tanda B, decisión de Anna)
+
+Doctrina adoptada: **la contradicción estructural ES la señal** — la
+magnitud individual de los artefactos es irrelevante cuando dos fuentes se
+contradicen. El filtro correcto contra artefactos-basura es el trust de
+adquisición (L-037b, propagación de artifact_reliability a CAIE base_trust —
+mismo commit Tanda B), no un umbral arbitrario de raw_score.
+
+**Caveat registrado (Anna, 2026-07-03):** "No hay FP aún. No encontrados al
+menos — no significa que no haya escenarios que puedan pasar."
+**Condición de reapertura:** si aparece un FP real de golden rule con
+artefactos débiles POST-L-037b, reabrir con la opción A del
+PROPUESTA_TANDA_B.md ítem 8 (umbral `GOLDEN_RULE_MIN_SCORE`), calibrado con
+ese caso como dato.
 
 ---
 
@@ -1663,11 +1678,11 @@ conclusivo legítimo no se degrada.
 
 ---
 
-## B-028 — `is_conclusive=True` silently ignored for all verdicts except `MALICE`
+## B-028 — `is_conclusive=True` silently ignored for all verdicts except `MALICE` [RESUELTO]
 
 | Campo | Valor |
 |-------|-------|
-| **Estado** | ABIERTO |
+| **Estado** | RESUELTO — Tanda B opción A (aprobada 2026-07-03) |
 | **Severidad** | P2 — flag has no observable effect outside MALICE path |
 | **Archivo** | `vigia_agent.py` |
 | **Función** | Post-scoring agent action dispatch |
@@ -1724,6 +1739,16 @@ it from SUSPICION, NOISE, and ABSTAIN bundles entirely. Update all callers.
 Option B is lower risk and more honest about the current behavior. Option A is
 more architecturally complete but requires non-trivial design work per verdict.
 Document the decision in the orchestrator before implementing either option.
+
+### Cierre (Tanda B, opción A — aprobada por Anna)
+
+Semántica definida y documentada (docstring de `classify_agent_verdict`):
+el flag modula (1) el gate de corroboración <3 primarias y (2) el piso del
+nivel de alerta — MALICE conclusivo (existente) e INTENT conclusivo (nuevo:
+LOW → MEDIUM, "a conclusive intent finding cannot present as LOW"); es
+informativo para NOISE/SUSPICION; incompatible con ABSTAIN (guard B-027).
+Sin flips de veredicto/exit code: el alert no alimenta classify.
+Tests: `TestB028IntentAlertFloor` (3).
 
 ---
 

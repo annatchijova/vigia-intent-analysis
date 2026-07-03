@@ -493,11 +493,11 @@ Replace each `assert condition, message` with `if not condition: raise RuntimeEr
 
 ---
 
-## B-013 — LOG_VS_MEMORY Fires with Low raw_score (Design vs Contract)
+## B-013 — LOG_VS_MEMORY Fires with Low raw_score (Design vs Contract) [CLOSED BY DESIGN]
 
 | Field | Value |
 |-------|-------|
-| **Status** | OPEN — design decision pending |
+| **Status** | CLOSED BY DESIGN — Anna's decision, Tanda B (2026-07-03) |
 | **Severity** | P1 — affects system monotonicity |
 | **File** | `vigia/tools/caie.py` — `_extract_assertions()` |
 | **Detected** | Post-hackathon session 2026-06-25, property-testing |
@@ -549,6 +549,20 @@ Option C is the most Daubert-compatible: "this log ASSERTS an outbound connectio
 AND the memory DOES NOT SHOW IT — that is an objective contradiction, independent
 of how reliable the log is." The strength of the finding is modulated by severity
 (0.75 without PID overlap, 0.95 with overlap), not by the log's raw_score.
+
+### Closed by design (Tanda B, Anna's decision)
+
+Adopted doctrine: **the structural contradiction IS the signal** — the
+individual magnitude of the artifacts is irrelevant when two sources
+contradict each other. The correct filter against garbage artifacts is
+acquisition trust (L-037b — artifact_reliability propagated to CAIE
+base_trust, same Tanda B commit), not an arbitrary raw_score threshold.
+
+**Recorded caveat (Anna, 2026-07-03):** "No FPs yet. At least none found —
+which does not mean no such scenario can happen."
+**Reopen condition:** if a real golden-rule FP with weak artifacts appears
+POST-L-037b, reopen with option A of PROPUESTA_TANDA_B.md item 8
+(`GOLDEN_RULE_MIN_SCORE` threshold), calibrated with that case as data.
 
 ---
 
@@ -1788,11 +1802,11 @@ ABSTAIN verdict with `is_conclusive=True` gets downgraded with an
 
 ---
 
-## B-028 — `is_conclusive=True` Silently Ignored for All Verdicts Except `MALICE`
+## B-028 — `is_conclusive=True` Silently Ignored for All Verdicts Except `MALICE` [RESOLVED]
 
 | Field | Value |
 |-------|-------|
-| **Status** | OPEN |
+| **Status** | RESOLVED — Tanda B option A (approved 2026-07-03) |
 | **Severity** | P2 — flag has no observable effect outside MALICE path |
 | **File** | `vigia_agent.py` |
 | **Function** | Post-scoring agent action dispatch |
@@ -1892,6 +1906,15 @@ bundle consumers that read `is_conclusive` would need to be updated to
 behavioral change), then revisit Option A as a separate design task if SUSPICION
 or NOISE conclusiveness is ever defined. Option A without a design definition per
 verdict would just add more code paths that also have no effect.
+
+### Closure (Tanda B, option A — approved by Anna)
+
+Semantics defined and documented (`classify_agent_verdict` docstring): the
+flag modulates (1) the <3-primary corroboration gate and (2) the alert-level
+floor — conclusive MALICE (existing) and conclusive INTENT (new: LOW →
+MEDIUM); informative for NOISE/SUSPICION; incompatible with ABSTAIN (B-027
+guard). No verdict/exit-code flips: alert does not feed classify.
+Tests: `TestB028IntentAlertFloor` (3).
 
 ---
 
@@ -3267,11 +3290,11 @@ text evidence → hypothesis ≠ PIPELINE_UNAVAILABLE.
 
 ---
 
-## B-055 — vigia/core/vigia_scorer.py: stale divergent copy with latent NameError (T-6) [OPEN]
+## B-055 — vigia/core/vigia_scorer.py: stale divergent copy with latent NameError (T-6) [RESOLVED]
 
 | Field | Value |
 |-------|-------|
-| **Status** | OPEN — decision pending (delete vs re-export) |
+| **Status** | RESOLVED — Tanda B (2026-07-03): re-export |
 | **Severity** | P2 — trap for future imports; no impact on live path |
 | **Files** | `vigia/core/vigia_scorer.py` (stale, 523 lines) vs `vigia_scorer.py` (live, 764 lines) |
 | **Detected** | Tanda A (while applying B-026): the core copy's `_vigia_score` crashes with `NameError: _EPC_FACTOR_TABLE is not defined` for any non-BROKEN custody chain |
@@ -3292,3 +3315,11 @@ Delete `vigia/core/vigia_scorer.py` or turn it into a one-line re-export
 (`from vigia_scorer import *`) so it cannot diverge. Requires verifying no
 external consumer imports it (current grep: only comments in the r7 patch).
 Tanda B.
+
+### Closure (Tanda B)
+
+The copy was frozen as a full re-export of the canonical root scorer
+(including underscore names, which `import *` omits) — it can no longer
+diverge; single source of truth. Re-export was chosen over deletion to keep
+compatibility with undetected external imports.
+Tests: `TestB055ScorerReexport` (3).

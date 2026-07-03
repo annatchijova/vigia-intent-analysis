@@ -142,6 +142,14 @@ def classify_agent_verdict(
     La regla 3 es la corrección central: antes, todo lo que no fuera malicia
     ni intención caía en NOISE (exit 0), incluidos errores de pipeline y
     ausencia de señal. Ahora esos casos abstienen.
+
+    Semántica de is_conclusive (B-028, definida en Tanda B):
+      1. Modula el gate de corroboración de la regla 3 (<3 primarias sin
+         conclusión firme → ABSTAIN).
+      2. Modula el piso del nivel de alerta en la narrativa (MALICE
+         conclusivo → HIGH/MEDIUM; INTENT conclusivo → mínimo MEDIUM).
+      3. Es informativo para NOISE/SUSPICION.
+      4. Incompatible con veredicto ABSTAIN (guard B-027 en _seal_bundle).
     """
     hyp = str(abduction.get("best_hypothesis") or "").upper()
 
@@ -1052,8 +1060,23 @@ class VIGIAAgent:
         # Posterior verdict override: if the Bayesian posterior verdict is conclusive MALICE
         # but individual z-scores are all below threshold (distributed evidence pattern),
         # floor the alert level to prevent a misleading LOW alongside a MALICE verdict.
+        #
+        # B-028 (Tanda B, opción A): semántica COMPLETA de is_conclusive —
+        # el flag modula exactamente dos cosas: (1) el gate de corroboración
+        # `<3 señales and not is_conclusive → ABSTAIN` en
+        # classify_agent_verdict, y (2) el piso del nivel de alerta (MALICE
+        # abajo, INTENT acá). Para NOISE/SUSPICION es informativo. Un bundle
+        # ABSTAIN nunca puede sellarlo en True (guard B-027 en _seal_bundle).
         _hypothesis = abduction.get("best_hypothesis", "")
         _is_conclusive = abduction.get("is_conclusive", False)
+        if (_is_conclusive and "INTENT" in _hypothesis.upper()
+                and "MALICI" not in _hypothesis.upper()
+                and alert.startswith("LOW")):
+            alert = (
+                "MEDIUM — Conclusive INTENT verdict with individual z-scores "
+                "below threshold. Alert floored (B-028): a conclusive intent "
+                "finding cannot present as LOW."
+            )
         if _is_conclusive and "MALICI" in _hypothesis.upper():
             _posterior_str = str(abduction.get("best_posterior", "0/1"))
             try:

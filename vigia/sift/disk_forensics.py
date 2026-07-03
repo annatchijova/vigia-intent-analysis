@@ -61,6 +61,29 @@ class MFTAnalysisResult:
     sequence_anomalies: List[Dict]
     composite_score: Fraction = Fraction(0)
 
+    def _latest_anomaly_ts(self) -> int:
+        """
+        P2-E (Tanda B): timestamp epoch del hallazgo más reciente, para que
+        el UnifiedTimelineEngine pueda correlacionar temporalmente. 0 si no
+        hay timestamps parseables (comportamiento previo).
+        """
+        latest = 0
+        for d in self.sequence_anomalies:
+            v = d.get("modified", 0)
+            if isinstance(v, int) and v > latest:
+                latest = v
+        for t in self.timestomp_entries:
+            for key in ("si", "fn"):
+                v = t.get(key)
+                if isinstance(v, str):
+                    try:
+                        ts = _parse_iso_timestamp(v)
+                    except ValueError:
+                        continue
+                    if ts > latest:
+                        latest = ts
+        return latest
+
     def to_signal(self) -> SignalOutput:
         z = Fraction(0, 1)
         if self.timestomp_entries or self.sequence_anomalies:
@@ -78,6 +101,8 @@ class MFTAnalysisResult:
                 "total": self.total_entries,
                 "timestomp": len(self.timestomp_entries), "ads": len(self.ads_entries),
                 "sequence_anomalies": len(self.sequence_anomalies),
+                # P2-E (Tanda B): alimenta el UnifiedTimelineEngine.
+                "timestamp": self._latest_anomaly_ts(),
             }
         )
 

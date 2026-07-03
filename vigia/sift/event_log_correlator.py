@@ -126,6 +126,13 @@ class EventLogAnalysisResult:
             z_score=float(z), confidence=float(conf),
             metadata={
                 "total_events": self.total_events, "findings": len(self.findings),
+                # P2-E (Tanda B): timestamp del evento más reciente + rango —
+                # el UnifiedTimelineEngine busca metadata["timestamp"] y hasta
+                # ahora ningún to_signal() lo poblaba (todos los eventos del
+                # timeline quedaban en t=0 y la correlación temporal
+                # cross-source nunca disparaba).
+                "timestamp": self.time_range[1],
+                "time_range": [self.time_range[0], self.time_range[1]],
                 "artifact_type": "event_log",
                 "finding_types": sorted(list(set(f.finding_type for f in self.findings) | set(c.get("chain_name", "") for c in self.chain_detections))),
                 "chains": len(self.chain_detections), "gaps": len(self.log_gaps),
