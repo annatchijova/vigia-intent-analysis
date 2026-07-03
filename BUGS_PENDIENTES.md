@@ -2424,6 +2424,19 @@ y Decimal coinciden.
 decisión (posterior ~ 0.55 o 0.75) Y esos z_scores tienen representaciones IEEE 754
 problemáticas.
 
+### Actualización (2026-07-03, Tanda B — U7/U3 del mapa §4 de AUDITORIA_L040)
+
+- **U7 cerrado (PR-B1):** `ForensicRecord.record_hash()` cuantiza los floats
+  (Decimal 1e-6 ROUND_HALF_EVEN) antes de hashear — estable cross-arquitectura
+  (bit 52 x86/ARM). El to_dict() de display no cambia.
+- **U3 cerrado (PR-B2):** `trust_fusion.compute_temporal_trust_factor` usa la
+  tabla precomputada `_EXP_NEG2_TABLE` (buckets 0.05, réplica del scorer) en
+  vez de `math.exp` nativa. Nota: la bucketización cambia el factor hasta ~5%
+  para severidades entre buckets — corrida comparativa: 0 flips, 0 moves (el
+  corpus no ejercita este camino; el consumidor es la tool MCP trust_fusion).
+- Restantes del mapa (U1 sigmoide H28, U4 LSE de eml_gci, U5, U6): tolerados
+  (~1 ulp, sin acumulación, medido) — sin cambio de estado.
+
 ---
 
 ## B-045 — AndroidForensicsEngine y iOSForensicsAnalyzer nunca invocados [FIXED]
@@ -3020,3 +3033,36 @@ Eliminar `vigia/core/vigia_scorer.py` o convertirla en re-export de una
 línea (`from vigia_scorer import *`) para que no pueda divergir. Requiere
 verificar que ningún consumidor externo la importe (grep actual: solo
 referencias en comentarios del patch r7). Tanda B.
+
+---
+
+## B-056 — Scorer: provenance colapsada emitía NOISE confiado (P2-D) [RESUELTO]
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | RESUELTO — Tanda B PR-B2 (2026-07-03) |
+| **Severidad** | P1 — familia de falso negativo (incapacidad de análisis presentada como benignidad) |
+| **Archivo** | `vigia_scorer.py` (rama `provenance_collapsed`) |
+| **Detectado en** | AUDITORIA_FALSOS_NEGATIVOS_MODO_AGENTE.md (P2-D), triage 2026-07-03 |
+| **Tag de restauración** | `pre-tanda-b-20260703-141147` |
+
+### Descripción
+
+Con trust efectivo medio colapsado (`mean_effective < 0.01`) y sin fracturas,
+el scorer emitía `NOISE` con `confidence = 1 - mean_effective` (~0.99): un
+veredicto "analizado y limpio" con 99% de confianza **derivada de la ausencia
+de confianza**. El propio reason decía "inadmissible under Daubert". Misma
+familia que P0-A: incapacidad de confiar en la evidencia ≠ benignidad.
+
+### Fix
+
+Rama → `verdict="ABSTAIN"`, `confidence=0.0`, reason explícito (re-adquisición
+requerida). `_VERDICT_TO_RAW`/`_ABSTAIN_REASONS` extendidos para que el
+QuadripartiteClassifier resuelva el ABSTAIN de primera clase (antes: el
+fail-loud de B-023 lo rechazaba con ValueError — correctamente ruidoso).
+
+### Validación
+
+Corrida comparativa sobre los 198 casos con scorer: **0 verdict flips, 0
+score moves** (ningún caso del corpus toca la rama colapsada — el fix protege
+la clase, no re-etiqueta casos). Tests: `TestP2DProvenanceCollapsedAbstain` (2).

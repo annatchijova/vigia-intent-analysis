@@ -1524,7 +1524,7 @@ model is correct. If multi-source cases are needed, migration path:
 3. The merge order (`{_acq_meta, **sig.metadata}`) already handles this: a module's
    own metadata takes precedence over the centralised fallback.
 
-### L-037b — ARTIFACT_RELIABILITY not propagated to CAIE [PENDING]
+### L-037b — ARTIFACT_RELIABILITY not propagated to CAIE [RESOLVED 2026-07-03]
 
 `ios_forensics.py` and `android_forensics.py` define
 `ARTIFACT_RELIABILITY=Fraction(70,100)`. The value is included in signal metadata
@@ -1534,6 +1534,19 @@ the same base trust as fully verified desktop forensic artifacts.
 
 **Fix path:** `forensic_adapter` should read `artifact_reliability` from signal
 metadata and apply it as a trust modifier.
+
+
+**Fix applied (2026-07-03, Tanda B PR-B2):**
+`ForensicAdapter.signal_to_caie_artifact` now propagates the reliability each
+SIFT engine declares (`metadata["artifact_reliability"]`, Fraction-string) as
+CAIE `base_trust`, clamped to [0,1]; absent/unparseable → 1.0 (previous
+behavior). A forgeable event log no longer weighs the same as a memory dump
+in CAIE. Verified: comparative scorer run over the 198 scored cases → 0
+verdict flips, 0 score moves (this path feeds the orchestrator→CAIE flow,
+not the scorer's JSON adapter). Tests: `TestL037bBaseTrustPropagation` (5,
+ratio-based to isolate propagation from CAIE's own acquisition decays).
+This removes one of the two preconditions of B-041b (CAIE→verdict feedback);
+the remaining one is multi-layer artifacts (B-052-P2).
 
 ---
 

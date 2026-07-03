@@ -144,10 +144,21 @@ class ForensicAdapter:
         meta["z_score_original"] = sig.z_score
         canonical = _canonical_json({"tool": sig.tool_name, "value": sig.value, "z": sig.z_score})
         provenance = [_sha256(canonical)]
+        # L-037b FIX (Tanda B, PR-B2): base_trust deja de ser 1.0 fijo — se
+        # propaga la confiabilidad que el motor SIFT declara en su metadata
+        # (artifact_reliability, serializada como Fraction-string). Un event
+        # log fabricable ya no pesa igual que un dump de memoria en CAIE.
+        # Defensivo: ausente/no-parseable → 1.0 (comportamiento previo);
+        # fuera de rango → clamp [0,1].
+        _rel = meta.get("artifact_reliability", "1")
+        try:
+            base_trust = max(0.0, min(1.0, float(Fraction(str(_rel)))))
+        except (ValueError, ZeroDivisionError):
+            base_trust = 1.0
         return CAIEArtifact(
             source_tool=sig.tool_name, evidence_type=evidence_type,
             raw_score=raw_score, description=desc, metadata=meta,
-            provenance_chain=provenance, base_trust=1.0,
+            provenance_chain=provenance, base_trust=base_trust,
         )
 
     @staticmethod

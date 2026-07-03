@@ -39,6 +39,35 @@ _TEMPORAL_VIOLATION_WEIGHTS: Final[dict[str, float]] = {
     "CLOCK_SKEW":             0.4,
 }
 
+# U3 FIX (L-040 §4, Tanda B PR-B2): tabla precomputada de exp(-2x) en
+# buckets de 0.05 — réplica exacta de _EXP_NEG2_TABLE del scorer canónico
+# (vigia_scorer.py). Reemplaza math.exp nativa, cuyo bit 52 puede diferir
+# entre x86 y ARM (precedente P1-005 en security.py) — el trust temporal
+# deja de depender de la FPU de la máquina del perito.
+_EXP_NEG2_TABLE: Final[dict] = {
+     0: 1.0,
+     1: 57630 / 63691,
+     2: 13559 / 16561,
+     3: 50286 / 67879,
+     4: 26788 / 39963,
+     5: 20841 / 34361,
+     6: 28148 / 51289,
+     7: 46609 / 93859,
+     8: 37297 / 83006,
+     9: 40263 / 99031,
+    10: 18089 / 49171,
+    11: 6481 / 19470,
+    12: 13342 / 44297,
+    13: 4436 / 16277,
+    14: 24529 / 99470,
+    15: 21053 / 94353,
+    16: 9283 / 45979,
+    17: 9999 / 54734,
+    18: 3404 / 20593,
+    19: 4282 / 28629,
+    20: 12957 / 95740,
+}
+
 
 def _dround(value: float, precision: int = _DETERMINISTIC_INTERNAL_PREC) -> float:
     if not isinstance(value, (int, float)) or not math.isfinite(value):
@@ -268,7 +297,10 @@ class TrustFusionEngine:
             v.get("severity", 0.5) * _TEMPORAL_VIOLATION_WEIGHTS.get(v.get("type", ""), 0.5)
             for v in relevant
         ]
-        return max(0.0, min(1.0, _dround(math.exp(-2.0 * max(weighted)))))
+        # U3: lookup en tabla precomputada (bucket 0.05, idéntico al scorer)
+        # en lugar de math.exp nativa — determinismo cross-arquitectura.
+        _bucket = min(20, max(0, round(float(min(1.0, max(0.0, max(weighted)))) / 0.05)))
+        return max(0.0, min(1.0, _dround(float(_EXP_NEG2_TABLE[_bucket]))))
 
     def compute_effective_trust(self, artifact_id: str, provenance_chain_trust: float, temporal_violations: list) -> float:
         """effective_trust = provenance_trust × temporal_integrity_factor."""

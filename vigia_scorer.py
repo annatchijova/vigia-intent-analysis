@@ -203,6 +203,10 @@ _VERDICT_TO_RAW: dict[str, str] = {
     "SUSPICION": "ABSTAIN",
     "NOISE":     "BENIGN",
     "UNKNOWN":   "ABSTAIN",
+    # P2-D (Tanda B): el scorer ahora emite ABSTAIN de primera clase
+    # (provenance colapsada). Mapea directo — el clasificador lo resuelve
+    # como ABSTAIN_DEGRADED vía la razón de abajo.
+    "ABSTAIN":   "ABSTAIN",
 }
 
 _ABSTAIN_REASONS: dict[str, str] = {
@@ -213,6 +217,10 @@ _ABSTAIN_REASONS: dict[str, str] = {
     "UNKNOWN": (
         "Insufficient structural support — "
         "more evidence required."
+    ),
+    "ABSTAIN": (
+        "Provenance chain collapsed — evidence trust insufficient to "
+        "assert benignity; re-acquisition required (P2-D)."
     ),
 }
 
@@ -696,9 +704,20 @@ def _vigia_score(case: dict) -> dict:
         confidence = 0.95
         reason     = "HARD GATE: EFFECT_BEFORE_CAUSE — physical law violation"
     elif provenance_collapsed:
-        verdict    = "NOISE"
-        confidence = _dround(1.0 - mean_effective, 2)
-        reason     = "Provenance chain collapsed, no active fractures — inadmissible under Daubert"
+        # P2-D FIX (Tanda B, PR-B2): antes esta rama emitía NOISE con
+        # confidence = 1 - mean_effective (~0.99) — un veredicto "analizado y
+        # limpio" con 99% de confianza DERIVADA DE LA AUSENCIA de confianza.
+        # Una cadena de custodia colapsada significa "no puedo confiar en
+        # nada de esta evidencia": eso es ABSTAIN ("no puedo determinar"),
+        # nunca benignidad confiada. Misma familia de falso-negativo que
+        # P0-A. El propio reason lo decía: "inadmissible under Daubert" — un
+        # veredicto inadmisible no puede presentarse como NOISE confiado.
+        verdict    = "ABSTAIN"
+        confidence = 0.0
+        reason     = ("PROVENANCE COLLAPSED: effective trust < 0.01 sin "
+                      "fracturas — cadena de custodia insuficiente para "
+                      "afirmar benignidad. Inadmisible bajo Daubert; requiere "
+                      "re-adquisición de la evidencia.")
     elif mean_effective < 0.15 and fractures:
         verdict    = "SUSPICION"
         confidence = _dround(min(0.75, fracture_malice_boost + 0.3), 2)

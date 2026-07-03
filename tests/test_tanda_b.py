@@ -265,31 +265,64 @@ class TestP2DProvenanceCollapsedAbstain:
 # ──────────────────────────────────────────────────────────────────────────
 
 class TestL037bBaseTrustPropagation:
+    # CAIE degrada base_trust en __post_init__ si faltan metadatos de
+    # adquisición (NIST SP 800-86) — para testear la PROPAGACIÓN (L-037b)
+    # sin mezclarla con esa degradación, se provee metadata completa.
+    _FULL_ACQ = {
+        "acquisition_tool": "ftk imager",
+        "acquisition_hash": "sha256:" + "a" * 64,
+        "acquisition_timestamp": "2026-07-03T00:00:00+00:00",
+        "examiner_id": "tester",
+        "write_blocker_used": True,
+    }
+
     def _artifact_for(self, metadata):
         from vigia.core.forensic_adapter import ForensicAdapter
         from vigia.core.ebs_v1 import SignalOutput
+        meta = {**self._FULL_ACQ, **metadata}
         sig = SignalOutput(tool_name="EVENT_LOG", value=0.5, z_score=2.0,
-                           confidence=0.8, metadata=metadata)
+                           confidence=0.8, metadata=meta)
         return ForensicAdapter.signal_to_caie_artifact(sig)
 
+    # CAIE aplica además decays propios post-init (p.ej. un factor e⁻¹ por
+    # la cadena de provenance corta) — se asserta el RATIO contra el caso
+    # base (reliability ausente = 1.0), que aísla exactamente la propagación.
+    def _ratio(self, metadata):
+        base = self._artifact_for({"artifact_type": "event_log"})
+        art = self._artifact_for(metadata)
+        return float(art.base_trust) / float(base.base_trust)
+
     def test_reliability_propagates(self):
-        art = self._artifact_for({"artifact_type": "event_log",
-                                  "artifact_reliability": "39/50"})
-        assert art.base_trust == pytest.approx(0.78)
+        ratio = self._ratio({"artifact_type": "event_log",
+                             "artifact_reliability": "39/50"})
+        assert ratio == pytest.approx(0.78, abs=1e-4)
 
     def test_missing_reliability_defaults_to_one(self):
-        art = self._artifact_for({"artifact_type": "event_log"})
-        assert art.base_trust == 1.0
+        ratio = self._ratio({"artifact_type": "event_log"})
+        assert ratio == pytest.approx(1.0, abs=1e-6)
 
     def test_garbage_reliability_defaults_to_one(self):
-        art = self._artifact_for({"artifact_type": "event_log",
-                                  "artifact_reliability": "not-a-fraction"})
-        assert art.base_trust == 1.0
+        ratio = self._ratio({"artifact_type": "event_log",
+                             "artifact_reliability": "not-a-fraction"})
+        assert ratio == pytest.approx(1.0, abs=1e-6)
 
     def test_out_of_range_clamped(self):
-        art = self._artifact_for({"artifact_type": "event_log",
-                                  "artifact_reliability": "7/2"})
-        assert art.base_trust == 1.0
+        ratio = self._ratio({"artifact_type": "event_log",
+                             "artifact_reliability": "7/2"})
+        assert ratio == pytest.approx(1.0, abs=1e-6)
+
+    def test_lower_reliability_yields_lower_trust_end_to_end(self):
+        # Propiedad de orden aun CON degradación por metadata ausente:
+        # menor artifact_reliability nunca produce mayor base_trust.
+        from vigia.core.forensic_adapter import ForensicAdapter
+        from vigia.core.ebs_v1 import SignalOutput
+        def bt(meta):
+            sig = SignalOutput(tool_name="EVENT_LOG", value=0.5, z_score=2.0,
+                               confidence=0.8, metadata=meta)
+            return float(ForensicAdapter.signal_to_caie_artifact(sig).base_trust)
+        low = bt({"artifact_type": "event_log", "artifact_reliability": "1/5"})
+        high = bt({"artifact_type": "event_log", "artifact_reliability": "1"})
+        assert low <= high
 
 
 # ──────────────────────────────────────────────────────────────────────────
@@ -301,7 +334,7 @@ class TestU3TrustFusionExpTable:
         import inspect
         from vigia.core import trust_fusion
         src = inspect.getsource(trust_fusion.TrustFusionEngine.compute_temporal_trust_factor)
-        assert "math.exp" not in src, (
+        assert "math.exp(" not in src, (
             "U3: compute_temporal_trust_factor no debe usar math.exp nativa "
             "(bit 52 x86/ARM) — tabla precomputada como _EXP_NEG2_TABLE"
         )

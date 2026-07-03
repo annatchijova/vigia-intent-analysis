@@ -2615,6 +2615,19 @@ Would require rewriting `likelihood_ratio.py` to use `Decimal` with controlled p
 for `exp()` and `log()` (stdlib `math` does not support `Decimal`; would need
 `decimal.Decimal.exp()` and `decimal.Decimal.ln()`). Estimated scope: ~100 lines.
 
+### Update (2026-07-03, Tanda B — U7/U3 from AUDITORIA_L040 §4 map)
+
+- **U7 closed (PR-B1):** `ForensicRecord.record_hash()` quantizes floats
+  (Decimal 1e-6 ROUND_HALF_EVEN) before hashing — cross-architecture stable
+  (x86/ARM bit 52). Display to_dict() unchanged.
+- **U3 closed (PR-B2):** `trust_fusion.compute_temporal_trust_factor` uses the
+  precomputed `_EXP_NEG2_TABLE` (0.05 buckets, scorer replica) instead of
+  native `math.exp`. Note: bucketing shifts the factor by up to ~5% for
+  severities between buckets — comparative run: 0 flips, 0 moves (the corpus
+  does not exercise this path; the consumer is the trust_fusion MCP tool).
+- Remaining map items (U1 H28 sigmoid, U4 eml_gci LSE, U5, U6): tolerated
+  (~1 ulp, no accumulation, measured) — status unchanged.
+
 ---
 
 ## B-045 — AndroidForensicsEngine and iOSForensicsAnalyzer never invoked [FIXED]
@@ -3323,3 +3336,36 @@ The copy was frozen as a full re-export of the canonical root scorer
 diverge; single source of truth. Re-export was chosen over deletion to keep
 compatibility with undetected external imports.
 Tests: `TestB055ScorerReexport` (3).
+
+---
+
+## B-056 — Scorer: collapsed provenance emitted confident NOISE (P2-D) [RESOLVED]
+
+| Field | Value |
+|-------|-------|
+| **Status** | RESOLVED — Tanda B PR-B2 (2026-07-03) |
+| **Severity** | P1 — false-negative family (inability to analyze presented as benignity) |
+| **File** | `vigia_scorer.py` (`provenance_collapsed` branch) |
+| **Detected** | AUDITORIA_FALSOS_NEGATIVOS_MODO_AGENTE.md (P2-D), triage 2026-07-03 |
+| **Restore tag** | `pre-tanda-b-20260703-141147` |
+
+### Description
+
+With collapsed mean effective trust (`< 0.01`) and no fractures, the scorer
+emitted `NOISE` with `confidence = 1 - mean_effective` (~0.99): an "analyzed
+and clean" verdict with 99% confidence **derived from the absence of
+confidence**. The reason string itself said "inadmissible under Daubert".
+Same family as P0-A: inability to trust the evidence ≠ benignity.
+
+### Fix
+
+Branch → `verdict="ABSTAIN"`, `confidence=0.0`, explicit reason
+(re-acquisition required). `_VERDICT_TO_RAW`/`_ABSTAIN_REASONS` extended so
+the QuadripartiteClassifier resolves first-class ABSTAIN (previously B-023's
+fail-loud rejected it with ValueError — correctly noisy).
+
+### Validation
+
+Comparative run over the 198 scored cases: **0 verdict flips, 0 score moves**
+(no corpus case hits the collapsed branch — the fix protects the class, it
+does not relabel cases). Tests: `TestP2DProvenanceCollapsedAbstain` (2).
