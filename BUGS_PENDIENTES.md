@@ -3343,3 +3343,51 @@ Comparativa scorer 267 casos: **0 flips, 0 moves** (267/267 idénticos).
 Suite 439 passed. Corpus agente 198/198. Tests:
 `TestB067FallbackInversion` (3) — invariante contra toda la tabla, regresión
 del experimento §3.2, y tipos mobile fuera del fallback.
+
+---
+
+## B-068 — FP VIGIA-NGDC-003: documentación del escenario contaba como corroboración de MALICE [RESUELTO]
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | RESUELTO — POST HACKATHON (2026-07-03) |
+| **Severidad** | P1 — falso positivo MALICE en caso de intención genuinamente disputada (la clase de error más cara bajo Daubert: atribución indebida) |
+| **Archivo** | `vigia_scorer.py` (gate de corroboración, rama `final_score > 0.33`) |
+| **Detectado en** | Corrida comparativa de B-067 (FP latente bajo valores legacy); confirmado como FP real leyendo el caso |
+| **Tag de restauración** | `pre-ngdc003-fix-20260703-182734` |
+
+### Diagnóstico — ¿FP real o expected desactualizado?
+
+**FP real.** NGDC-003 (National Gallery DC 2012 — Joe/LogKext) es un caso de
+intención disputada por diseño: monitoreo parental de una menor (legal) vs
+espionaje conyugal durante un divorcio (ilegal), implementados de forma
+idéntica — el registro de artefactos no puede distinguir las dos hipótesis, y
+el propio caso lo argumenta en `peirce_expected.thirdness`. SUSPICION es el
+único veredicto epistemológicamente honesto; el expected está correcto.
+
+El MALICE salía así: intent score 0.4296 > 0.33 sin fracturas, y el gate de
+corroboración (`n_artifacts >= 4 OR n_types >= 3`) pasaba con 5 artefactos —
+pero **2 de los 5 son documentación del escenario** (`behavioral_context`,
+`outcome_signal`, fuente "Digital Corpora scenario documentation"), no
+evidencia de dispositivo. La evidencia técnica real: 3 artefactos / 2 clases
+→ el gate no debía pasar.
+
+### Fix mínimo
+
+El gate cuenta solo evidencia **técnica**: se excluyen las clases
+contextuales/narrativas (`behavioral_context`, `behavioral_profile`,
+`outcome_signal`, `acquisition_context`, `device_acquisition_timeline`,
+`osint`). Describen motivo, circunstancias y outcomes — informan la
+narrativa, pero no son fuentes independientes que corroboren una inferencia
+de malicia ("two independent sources" = clases de evidencia de dispositivo).
+Cuando el gate capea, el `reason` lo documenta explícitamente (patrón
+REFUTATION GATE LOG). NGDC-001/002/004 no cambian: su corroboración es
+técnica (6/6/6 artefactos de dispositivo).
+
+### Validación
+
+Comparativa scorer 267 casos: **exactamente 1 flip** —
+`VIGIA-NGDC-003 MALICE→SUSPICION (== expected)` — y 0 moves. Suite 439 →
+445 passed (+6 tests, `tests/test_b068_context_corroboration.py`: regresión
+NGDC completa + gate sintético, incluido "un caso armado solo con clases
+contextuales nunca sella MALICE"). Corpus agente 198/198.

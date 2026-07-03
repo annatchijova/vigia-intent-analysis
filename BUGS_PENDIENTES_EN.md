@@ -3643,3 +3643,51 @@ Scorer comparative, 267 cases: **0 flips, 0 moves** (267/267 identical).
 Suite 439 passed. Agent corpus 198/198. Tests:
 `TestB067FallbackInversion` (3) — whole-table invariant, regression of the
 §3.2 experiment, and mobile types off the fallback.
+
+---
+
+## B-068 — VIGIA-NGDC-003 FP: scenario documentation counted as MALICE corroboration [RESOLVED]
+
+| Field | Value |
+|-------|-------|
+| **Status** | RESOLVED — POST HACKATHON (2026-07-03) |
+| **Severity** | P1 — MALICE false positive on a genuinely-disputed-intent case (the most expensive error class under Daubert: wrongful attribution) |
+| **File** | `vigia_scorer.py` (corroboration gate, `final_score > 0.33` branch) |
+| **Detected in** | B-067 comparative run (latent FP under legacy values); confirmed as a real FP by reading the case |
+| **Restore tag** | `pre-ngdc003-fix-20260703-182734` |
+
+### Diagnosis — real FP or stale expected?
+
+**Real FP.** NGDC-003 (National Gallery DC 2012 — Joe/LogKext) is a
+disputed-intent case by design: parental monitoring of a minor (legal) vs
+spousal surveillance during a divorce (illegal), implemented identically —
+the artifact record cannot distinguish the two hypotheses, and the case
+argues this itself in `peirce_expected.thirdness`. SUSPICION is the only
+epistemologically honest verdict; the expected is correct.
+
+MALICE arose as: intent score 0.4296 > 0.33 with no fractures, and the
+corroboration gate (`n_artifacts >= 4 OR n_types >= 3`) passed with 5
+artifacts — but **2 of the 5 are scenario documentation**
+(`behavioral_context`, `outcome_signal`, source "Digital Corpora scenario
+documentation"), not device evidence. The real technical evidence: 3
+artifacts / 2 classes → the gate should not have passed.
+
+### Minimal fix
+
+The gate counts only **technical** evidence: context/narrative classes are
+excluded (`behavioral_context`, `behavioral_profile`, `outcome_signal`,
+`acquisition_context`, `device_acquisition_timeline`, `osint`). They
+describe motive, circumstances and outcomes — they inform the narrative but
+are not independent sources corroborating a malice inference ("two
+independent sources" = device evidence classes). When the gate caps, the
+`reason` documents it explicitly (REFUTATION GATE LOG pattern).
+NGDC-001/002/004 unchanged: their corroboration is technical (6/6/6 device
+artifacts).
+
+### Validation
+
+Scorer comparative, 267 cases: **exactly 1 flip** —
+`VIGIA-NGDC-003 MALICE→SUSPICION (== expected)` — and 0 moves. Suite 439 →
+445 passed (+6 tests, `tests/test_b068_context_corroboration.py`: full NGDC
+regression + synthetic gate, including "a case built purely from context
+classes never seals MALICE"). Agent corpus 198/198.

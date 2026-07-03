@@ -748,14 +748,38 @@ def _vigia_score(case: dict) -> dict:
         # Daubert principle: a single class of technical evidence, regardless of
         # its raw_score, does not justify an inference of malicious intent.
         # Requirement: n_artifacts >= 4 OR n_unique_types >= 3.
-        _n_arts  = len(artifacts)
-        _n_types = len(set(a.get("evidence_type", "") for a in artifacts))
+        #
+        # B-068 (FP VIGIA-NGDC-003): el gate cuenta solo evidencia TÉCNICA.
+        # Las clases contextuales/narrativas (documentación de escenario,
+        # perfiles de comportamiento, outcomes, OSINT) describen motivo y
+        # circunstancias — informan la narrativa pero NO son fuentes
+        # independientes que corroboren una inferencia de MALICE ("two
+        # independent sources" = clases de evidencia de dispositivo).
+        # NGDC-003 (intención disputada: monitoreo parental vs espionaje
+        # conyugal, artefactos idénticos) cruzaba el gate contando 2
+        # artefactos de documentación del escenario como corroboración.
+        _CONTEXT_EVIDENCE_TYPES = {
+            "behavioral_context", "behavioral_profile", "outcome_signal",
+            "acquisition_context", "device_acquisition_timeline", "osint",
+        }
+        _tech_arts = [
+            a for a in artifacts
+            if a.get("evidence_type") not in _CONTEXT_EVIDENCE_TYPES
+        ]
+        _n_arts  = len(_tech_arts)
+        _n_types = len(set(a.get("evidence_type", "") for a in _tech_arts))
         if _n_arts >= 4 or _n_types >= 3:
             verdict = "MALICE"
+            reason  = f"Intent score {final_score:.4f} exceeds MALICE threshold (P2+acq_assurance scale, threshold=0.33)"
         else:
             verdict = "SUSPICION"
+            reason  = (
+                f"Intent score {final_score:.4f} exceeds MALICE threshold but "
+                f"corroboration rests on {_n_arts} technical artifact(s) / "
+                f"{_n_types} technical evidence class(es) — context/narrative "
+                f"classes do not corroborate MALICE (B-068 Daubert gate)"
+            )
         confidence = _dround(min(0.95, final_score * 2.0), 2)
-        reason     = f"Intent score {final_score:.4f} exceeds MALICE threshold (P2+acq_assurance scale, threshold=0.33)"
     elif final_score > Fraction(18, 100):
         verdict    = "SUSPICION"
         confidence = _dround(final_score * 2.0, 2)
