@@ -77,10 +77,51 @@ ABSTAIN_HYPOTHESES = frozenset({
     "UNDETERMINED",
     "UNKNOWN",
     "",
+    # AUDITORIA_PIPELINE_ROBUSTEZ (F1/F2):
+    # REASONER_ERROR — el razonador abductivo crasheó; la extracción corrió
+    #   pero no hay inferencia. Sin señales que lo overrideen (L-036), abstener.
+    # ABSTAIN_V2 — el motor v2 abstuvo deliberadamente (veto duro, CCS<=1/2 o
+    #   empate de hipótesis). Es un ABSTAIN razonado, nunca benigno.
+    "REASONER_ERROR",
+    "ABSTAIN_V2",
 })
 
 
-def classify_agent_verdict(abduction: Dict[str, Any], n_signals: int) -> str:
+def _is_primary_signal(s: Any) -> bool:
+    """
+    F5 (AUDITORIA_PIPELINE_ROBUSTEZ, N4): una señal cuenta para los gates de
+    corroboración solo si es PRIMARIA (proviene de un artefacto). Las señales
+    DERIVADAS (motores engine: resonance/patterns/timeline/adv_robust) y los
+    marcadores `unanalyzed` no son evidencia. Señales sin metadata se tratan
+    como primarias (adaptadores del shim que no etiquetan).
+    """
+    meta = s.get("metadata") if isinstance(s, dict) else None
+    if not isinstance(meta, dict):
+        return True
+    return meta.get("signal_class") != "derived" and not meta.get("unanalyzed")
+
+
+def _signal_stats(results: Dict[str, Any]) -> Tuple[int, int]:
+    """
+    Retorna (n_primary_signals, n_unanalyzed_artifacts) de un resultado de
+    pipeline. Ambos alimentan classify_agent_verdict: el primero para el gate
+    de corroboración <3, el segundo para degradar NOISE→ABSTAIN cuando hubo
+    artefactos que no se pudieron analizar (F7).
+    """
+    signals = results.get("signals", []) or []
+    n_primary = sum(1 for s in signals if _is_primary_signal(s))
+    inner = results.get("results")
+    unanalyzed = []
+    if isinstance(inner, dict):
+        unanalyzed = inner.get("unanalyzed_artifacts") or []
+    return n_primary, len(unanalyzed)
+
+
+def classify_agent_verdict(
+    abduction: Dict[str, Any],
+    n_signals: int,
+    n_unanalyzed: int = 0,
+) -> str:
     """
     Mapea el estado de la abducción a un veredicto de 4 valores:
     "MALICE" | "INTENT" | "ABSTAIN" | "NOISE".
@@ -91,6 +132,12 @@ def classify_agent_verdict(abduction: Dict[str, Any], n_signals: int) -> str:
       3. No se pudo analizar (ABSTAIN_HYPOTHESES) o veredicto
          no-concluyente sin señales suficientes (<3)        → ABSTAIN.
       4. Analizado y limpio (NO_*_ANOMALY_DETECTED, BENIGN) → NOISE.
+         F7: si además hubo artefactos NO analizados (n_unanalyzed>0),
+         "limpio" no es afirmable sobre lo que no se procesó → ABSTAIN.
+
+    F5: n_signals debe ser el conteo de señales PRIMARIAS (ver
+    _is_primary_signal / _signal_stats) — las derivadas de motores engine
+    inflaban el conteo y desactivaban el gate de corroboración.
 
     La regla 3 es la corrección central: antes, todo lo que no fuera malicia
     ni intención caía en NOISE (exit 0), incluidos errores de pipeline y
@@ -108,6 +155,10 @@ def classify_agent_verdict(abduction: Dict[str, Any], n_signals: int) -> str:
     # señales: el reasoner no tuvo base suficiente para afirmar benignidad.
     # <3 señales es el gate del propio AbductiveReasoner — sin base, abstener.
     if n_signals < 3 and not abduction.get("is_conclusive", False):
+        return "ABSTAIN"
+    # F7 (N8): "analizado y limpio" con artefactos sin analizar no es NOISE —
+    # 0 hallazgos sobre evidencia no procesada no es evidencia de benignidad.
+    if n_unanalyzed > 0:
         return "ABSTAIN"
     return "NOISE"
 
@@ -748,14 +799,71 @@ class VIGIAAgent:
         Generates 100% deterministic investigative narrative.
         No LLMs — all derived from pipeline data.
         Each section references the modules that produced it.
+
+        AUDITORIA_PIPELINE_ROBUSTEZ:
+        - F3 (N10): el override L-036 se aplica ANTES de serializar cualquier
+          sección — la narrativa y el veredicto sellado no pueden divergir.
+        - F4: la sección Peircean se construye desde datos que SIEMPRE existen
+          (inventario de señales, anomalías vs umbral, estado de motores); la
+          narrativa del reasoner es una capa adicional, no la única fuente.
+        - F5 (N4): alerta y override cuentan SOLO señales primarias.
+        - F7 (N8): los artefactos no analizados tienen sección propia.
         """
         abduction = results.get("abduction", {})
         signals = results.get("signals", [])
         corrections = results.get("self_corrections", [])
+        inner = results.get("results") if isinstance(results.get("results"), dict) else {}
 
         def _to_frac_z(s: dict) -> Fraction:
             """Local helper — delegates to _to_frac for consistency with the rest of the agent."""
             return abs(_to_frac(s.get("z_score", 0)))
+
+        def _label_of(s: dict) -> str:
+            return str(s.get('description') or s.get('source')
+                       or s.get('tool') or '?')
+
+        primary = [s for s in signals if _is_primary_signal(s)]
+        derived = [s for s in signals if not _is_primary_signal(s)]
+        n_critical = sum(1 for s in primary if _to_frac_z(s) > Fraction(3, 1))
+        n_high = sum(1 for s in primary if Fraction(2, 1) < _to_frac_z(s) <= Fraction(3, 1))
+
+        # ------------------------------------------------------------------
+        # F3: Signal-based hypothesis override (L-036) — PRIMERO, antes de
+        # serializar. Cuando el orquestador retorna UNDETERMINED (o el
+        # reasoner falló: REASONER_ERROR) pero hay señales PRIMARIAS z>3,
+        # la abducción se eleva determinísticamente — sin LLM. Las señales
+        # derivadas (meta-indicadores como ADV_ROBUST) no pueden fabricar
+        # un veredicto por sí solas (N4). Un ABSTAIN_V2 deliberado del motor
+        # v2 NO se overridea: la abstención razonada tiene precedencia.
+        # ------------------------------------------------------------------
+        override_note = ""
+        _hyp_pre = abduction.get("best_hypothesis", "")
+        if _hyp_pre in ("", "UNDETERMINED", "UNKNOWN", "REASONER_ERROR", None):
+            _new_hyp = None
+            if n_critical >= 2:
+                _new_hyp = "MALICIOUS_INTENT_DETECTED"
+                abduction["is_conclusive"] = True
+                abduction["best_posterior"] = str(Fraction(n_critical, max(len(primary), 1)))
+                abduction["override_source"] = "signal_count_z>3"
+            elif n_critical >= 1:
+                _new_hyp = "INTENT_DETECTED"
+                abduction["is_conclusive"] = True
+                abduction["best_posterior"] = str(Fraction(n_critical, max(len(primary), 1)))
+                abduction["override_source"] = "signal_count_z>3"
+            elif n_high >= 2:
+                _new_hyp = "SUSPICION_DETECTED"
+                abduction["is_conclusive"] = False
+                abduction["best_posterior"] = str(Fraction(n_high, max(len(primary), 1)))
+                abduction["override_source"] = "signal_count_z>2"
+            if _new_hyp:
+                abduction["best_hypothesis"] = _new_hyp
+                abduction["override_of"] = _hyp_pre or "EMPTY"
+                override_note = (
+                    f"[OVERRIDE L-036 sobre {_hyp_pre or 'EMPTY'}: "
+                    f"{n_critical} señal(es) primaria(s) z>3, "
+                    f"{n_high} con 2<z<=3]"
+                )
+                abduction["override_note"] = override_note
 
         narrative_parts = [
             f"=== VIGÍA FORENSIC AGENT — CASE {self.case_id} ===",
@@ -765,14 +873,83 @@ class VIGIAAgent:
             f"Self-corrections applied: {len(corrections)}",
             "",
             "--- MAIN HYPOTHESIS ---",
-            f"Hypothesis: {abduction.get('best_hypothesis', 'UNDETERMINED')}",
+            f"Hypothesis: {abduction.get('best_hypothesis', 'UNDETERMINED')}"
+            + (f" {override_note}" if override_note else ""),
             f"Posterior confidence: {abduction.get('best_posterior', '0')}",
             f"Conclusive: {'YES' if abduction.get('is_conclusive') else 'NO — requires human review'}",
             "",
-            "--- PEIRCEAN NARRATIVE ---",
-            abduction.get("narrative", "[No narrative available]"),
-            "",
         ]
+
+        # ------------------------------------------------------------------
+        # F4: PEIRCEAN NARRATIVE — capas deterministas construidas desde las
+        # señales (siempre presentes), más la narrativa del reasoner si existe.
+        # ------------------------------------------------------------------
+        narrative_parts.append("--- PEIRCEAN NARRATIVE ---")
+
+        # FIRSTNESS — inventario fenomenológico: qué se observó.
+        def _artifact_type_of(s: dict) -> str:
+            meta = s.get("metadata")
+            at = meta.get("artifact_type") if isinstance(meta, dict) else None
+            return str(at or s.get("tool") or s.get("source") or "?")
+
+        _types = sorted({_artifact_type_of(s) for s in primary}) if primary else []
+        firstness = (
+            f"[FIRSTNESS] {len(signals)} señal(es): {len(primary)} primaria(s)"
+            + (f" de {_types}" if _types else "")
+            + f", {len(derived)} derivada(s)/no-analizada(s)."
+        )
+        if signals:
+            _top3 = sorted(signals, key=_to_frac_z, reverse=True)[:3]
+            firstness += " Top z: " + ", ".join(
+                f"{_label_of(s)[:40]}={float(_to_frac_z(s)):.2f}" for s in _top3
+            ) + "."
+        narrative_parts.append(firstness)
+
+        # SECONDNESS — contraste contra baseline: qué desvía y cuánto.
+        _anomalous = [s for s in primary if _to_frac_z(s) > Fraction(2, 1)]
+        if _anomalous:
+            secondness = (
+                f"[SECONDNESS] {len(_anomalous)} señal(es) primaria(s) sobre "
+                f"umbral z>2: " + "; ".join(
+                    f"{_label_of(s)[:50]} (z={float(_to_frac_z(s)):.2f})"
+                    for s in _anomalous[:5]
+                ) + "."
+            )
+        else:
+            secondness = (
+                "[SECONDNESS] Ninguna señal primaria supera z>2 — sin "
+                "desviación estructural contra baseline en esta iteración."
+            )
+        _caie_summary = inner.get("caie", {}) if isinstance(inner, dict) else {}
+        if _caie_summary:
+            _caie_status = _caie_summary.get("status", "OK" if _caie_summary.get("verdict") else "?")
+            if _caie_summary.get("verdict"):
+                secondness += (
+                    f" CAIE: {_caie_summary.get('verdict')} "
+                    f"({_caie_summary.get('fractures_detected', 0)} fractura(s))."
+                )
+            elif _caie_status == "ERROR":
+                secondness += " CAIE: ERROR — correlación cross-artefacto no disponible."
+        narrative_parts.append(secondness)
+
+        # THIRDNESS — la ley inferida: hipótesis y cómo se llegó a ella.
+        thirdness = (
+            f"[THIRDNESS] Hipótesis: {abduction.get('best_hypothesis', 'UNDETERMINED')}. "
+            f"Conclusiva: {'sí' if abduction.get('is_conclusive') else 'no — requiere revisión humana'}."
+        )
+        if override_note:
+            thirdness += f" {override_note}"
+        if abduction.get("reasoner_error"):
+            thirdness += f" Razonador abductivo falló: {abduction['reasoner_error']}."
+        narrative_parts.append(thirdness)
+
+        # Capa del reasoner (motor v2 / adaptadores) — verbatim, si existe.
+        _reasoner_narr = abduction.get("narrative")
+        if _reasoner_narr:
+            narrative_parts.append("")
+            narrative_parts.append("Razonamiento del motor abductivo:")
+            narrative_parts.append(str(_reasoner_narr))
+        narrative_parts.append("")
 
         if signals:
             top_signals = sorted(signals, key=_to_frac_z, reverse=True)[:5]
@@ -780,11 +957,11 @@ class VIGIAAgent:
             for s in top_signals:
                 z_frac = _to_frac_z(s)
                 conf_frac = _to_frac(s.get("confidence", 0))
-                _label = (s.get('description') or s.get('source')
-                          or s.get('tool') or '?')
+                _label = _label_of(s)
                 _detail = s.get('detail') or s.get('value') or ''
+                _class_tag = "" if _is_primary_signal(s) else " [DERIVED]"
                 narrative_parts.append(
-                    f"  [{_label[:70]}] z={float(z_frac):.3f} "
+                    f"  [{_label[:70]}]{_class_tag} z={float(z_frac):.3f} "
                     f"conf={float(conf_frac):.2f} — {str(_detail)[:80]}"
                 )
             narrative_parts.append("")
@@ -801,7 +978,7 @@ class VIGIAAgent:
         # CAIE runs inside sift_orchestrator.run_full_analysis() and stores
         # its output in results["results"]["caie"].  Until this fix, the
         # agent never read it — fractures were computed but invisible.
-        caie = results.get("results", {}).get("caie", {})
+        caie = inner.get("caie", {}) if isinstance(inner, dict) else {}
         if caie and caie.get("status") == "OK":
             n_fractures = caie.get("fractures_detected", 0)
             caie_verdict = caie.get("verdict", "NOISE")
@@ -831,9 +1008,37 @@ class VIGIAAgent:
             narrative_parts.append("--- CAIE ---")
             narrative_parts.append("  No artifacts for cross-correlation (0 signals).")
             narrative_parts.append("")
+        elif caie and caie.get("status") == "ERROR":
+            # F8 (N9): un fallo del motor CAIE era invisible en el reporte.
+            narrative_parts.append("--- CAIE ---")
+            narrative_parts.append(
+                f"  ERROR — el motor de fracturas cross-artefacto falló: "
+                f"{str(caie.get('error', ''))[:160]}"
+            )
+            narrative_parts.append("  La correlación cross-artefacto NO está disponible para este caso.")
+            narrative_parts.append("")
 
-        n_critical = sum(1 for s in signals if _to_frac_z(s) > Fraction(3, 1))
-        n_high = sum(1 for s in signals if Fraction(2, 1) < _to_frac_z(s) <= Fraction(3, 1))
+        # F7 (N8): sección explícita de artefactos no analizados — "no
+        # analizado" nunca más enterrado en el JSON del bundle.
+        _unanalyzed = inner.get("unanalyzed_artifacts", []) if isinstance(inner, dict) else []
+        _engine_errors = {
+            k: v.get("error") for k, v in inner.items()
+            if isinstance(v, dict) and v.get("error")
+        } if isinstance(inner, dict) else {}
+        _reasoner_err = inner.get("reasoner_error") if isinstance(inner, dict) else None
+        if _unanalyzed or _engine_errors or _reasoner_err:
+            narrative_parts.append("--- ARTEFACTOS NO ANALIZADOS / MOTORES CON ERROR ---")
+            for art in _unanalyzed:
+                narrative_parts.append(f"  NO ANALIZADO: {art}")
+            for eng, err in _engine_errors.items():
+                narrative_parts.append(f"  MOTOR {eng}: {str(err)[:120]}")
+            if _reasoner_err:
+                narrative_parts.append(f"  REASONER: {str(_reasoner_err)[:160]}")
+            narrative_parts.append(
+                "  Nota: 0 hallazgos sobre un artefacto no analizado NO es "
+                "evidencia de benignidad."
+            )
+            narrative_parts.append("")
 
         if n_critical >= 3:
             alert = "CRITICAL — Multiple high-magnitude signals. Compromise confirmed with high probability."
@@ -843,27 +1048,6 @@ class VIGIAAgent:
             alert = "MEDIUM — Moderate anomalies. Additional investigation recommended."
         else:
             alert = "LOW — No significant anomalies detected in this iteration."
-
-        # Signal-based hypothesis override (L-036 fix):
-        # When the orchestrator returns UNDETERMINED but signals show z>3,
-        # the abduction is upgraded deterministically — no LLM involved.
-        _hyp = abduction.get("best_hypothesis", "")
-        if _hyp in ("", "UNDETERMINED", "UNKNOWN", None):
-            if n_critical >= 2:
-                abduction["best_hypothesis"] = "MALICIOUS_INTENT_DETECTED"
-                abduction["is_conclusive"] = True
-                abduction["best_posterior"] = str(Fraction(n_critical, max(len(signals), 1)))
-                abduction["override_source"] = "signal_count_z>3"
-            elif n_critical >= 1:
-                abduction["best_hypothesis"] = "INTENT_DETECTED"
-                abduction["is_conclusive"] = True
-                abduction["best_posterior"] = str(Fraction(n_critical, max(len(signals), 1)))
-                abduction["override_source"] = "signal_count_z>3"
-            elif n_high >= 2:
-                abduction["best_hypothesis"] = "SUSPICION_DETECTED"
-                abduction["is_conclusive"] = False
-                abduction["best_posterior"] = str(Fraction(n_high, max(len(signals), 1)))
-                abduction["override_source"] = "signal_count_z>2"
 
         # Posterior verdict override: if the Bayesian posterior verdict is conclusive MALICE
         # but individual z-scores are all below threshold (distributed evidence pattern),
@@ -894,9 +1078,9 @@ class VIGIAAgent:
             "--- FINAL ALERT LEVEL ---",
             alert,
             "",
-            f"Critical signals (z>3): {n_critical}",
-            f"High signals (2<z<=3): {n_high}",
-            f"Total signals analyzed: {len(signals)}",
+            f"Critical signals (z>3, primary): {n_critical}",
+            f"High signals (2<z<=3, primary): {n_high}",
+            f"Primary signals: {len(primary)} | Derived: {len(derived)} | Total: {len(signals)}",
         ])
 
         return "\n".join(narrative_parts)
@@ -912,8 +1096,10 @@ class VIGIAAgent:
         Includes full audit trail, results, and narrative.
         """
         abduction = results.get("abduction", {})
-        n_signals = len(results.get("signals", []))
-        agent_verdict = classify_agent_verdict(abduction, n_signals)
+        # F5/F7: el veredicto se clasifica sobre señales PRIMARIAS y considera
+        # los artefactos no analizados (NOISE con pérdidas → ABSTAIN).
+        n_primary, n_unanalyzed = _signal_stats(results)
+        agent_verdict = classify_agent_verdict(abduction, n_primary, n_unanalyzed)
 
         bundle = {
             "vigia_agent_version": AGENT_VERSION,
@@ -927,16 +1113,25 @@ class VIGIAAgent:
             # sellado para que main() y el bundle no puedan divergir. ABSTAIN
             # distingue "no se pudo analizar" de "analizado y limpio".
             "agent_verdict": agent_verdict,
+            # F5/F7: estadísticas que sustentan la clasificación de arriba.
+            "signal_stats": {
+                "n_total_signals": len(results.get("signals", []) or []),
+                "n_primary_signals": n_primary,
+                "n_unanalyzed_artifacts": n_unanalyzed,
+            },
             "pipeline_results": results,
             "narrative": narrative,
             "audit_trail": self.audit.export(),
             "sans_compliance": {
                 # FIX P1-5: real verifications instead of hardcoded True flags
                 "self_correction": self.iteration > 0 or len(self.corrections_applied) > 0,
+                # F8 (N13): los adaptadores del shim (vol3, EBS-JSON, mobile)
+                # etiquetan la herramienta como "source" — aceptar ambos.
                 "accuracy_validation": bool(
                     results.get("signals")
                     and all(
-                        s.get("tool") and s.get("z_score") is not None
+                        (s.get("tool") or s.get("source"))
+                        and s.get("z_score") is not None
                         for s in results.get("signals", [])
                     )
                 ),
@@ -1039,11 +1234,17 @@ class VIGIAAgent:
 
         # 3. Generate narrative
         logger.info("[AGENT] Generating investigative narrative")
+        # F3 (AUDITORIA_PIPELINE_ROBUSTEZ, N10): la narrativa se genera ANTES
+        # del log AGENT_EXIT — _generate_narrative aplica el override L-036,
+        # y el audit trail debe registrar el mismo veredicto que se sella.
+        narrative = self._generate_narrative(results, evidence_sha256)
+
         # Log agent exit in audit trail BEFORE sealing — so it appears in the bundle.
         # Usa la misma clasificación de 4 valores que el veredicto sellado.
         _abduction_preview = results.get("abduction", {})
+        _n_primary_prev, _n_unanalyzed_prev = _signal_stats(results)
         _verdict_preview = classify_agent_verdict(
-            _abduction_preview, len(results.get("signals", []))
+            _abduction_preview, _n_primary_prev, _n_unanalyzed_prev
         )
         exit_code_preview = _VERDICT_EXIT.get(_verdict_preview, EXIT_ABSTAIN)
         self.audit.log(
@@ -1073,8 +1274,6 @@ class VIGIAAgent:
                 confidence=results.get("abduction", {}).get("best_posterior", "0"),
                 scope_note="agent audit-trail mode (vigia_agent.py — JSON-replay / autonomous path)",
             )
-
-        narrative = self._generate_narrative(results, evidence_sha256)
 
         # 4. Seal bundle — returns (bundle_dict, canonical_json_text, sha256_digest)
         bundle, bundle_canonical_text, bundle_digest = self._seal_bundle(
@@ -1570,7 +1769,7 @@ Exit codes:
     # Veredicto de 4 valores: leído del bundle sellado (no recomputado — así el
     # exit code no puede divergir del veredicto que quedó firmado en disco).
     agent_verdict = bundle.get("agent_verdict") or classify_agent_verdict(
-        abduction, len(bundle.get("pipeline_results", {}).get("signals", []))
+        abduction, *_signal_stats(bundle.get("pipeline_results", {}))
     )
 
     print("\n" + "=" * 60)

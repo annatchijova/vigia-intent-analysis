@@ -73,6 +73,46 @@ if not Path(_VOL3).exists():
     _VOL3 = "vol3"
 
 
+def _mobile_hypothesis(mobile_signals: List[Dict[str, Any]]) -> tuple:
+    """
+    F6 (AUDITORIA_PIPELINE_ROBUSTEZ, N5): deriva la hipótesis mobile de los
+    z-scores reales — no de una etiqueta fija. Antes MOBILE_EVIDENCE_ANALYZED
+    con is_conclusive=len(signals)>0 clasificaba SIEMPRE NOISE (exit 0),
+    incluso con hallazgos z>3 (el override L-036 tampoco aplicaba porque la
+    hipótesis no estaba en su lista de disparo).
+
+    Mapping (mismo criterio que el adaptador vol3 + gate Daubert de 2 fuentes
+    para MALICIOUS):
+      ≥2 señales z>3  → MALICIOUS_INTENT_DETECTED
+      max z > 3       → INTENT_DETECTED
+      max z > 2       → SUSPICION_DETECTED
+      resto           → MOBILE_EVIDENCE_ANALYZED (con is_conclusive=False:
+                        1-2 señales limpias no bastan para afirmar benigno —
+                        el agente abstiene por el gate <3)
+
+    Returns: (hypothesis, max_z: Fraction, is_conclusive: bool, n_critical: int)
+    """
+    z_values = []
+    for s in mobile_signals:
+        try:
+            z_values.append(abs(Fraction(str(s.get("z_score", 0)))))
+        except (ValueError, ZeroDivisionError):
+            z_values.append(Fraction(0, 1))
+    max_z = max(z_values) if z_values else Fraction(0, 1)
+    n_critical = sum(1 for z in z_values if z > Fraction(3, 1))
+
+    if n_critical >= 2:
+        hypothesis = "MALICIOUS_INTENT_DETECTED"
+    elif max_z > Fraction(3, 1):
+        hypothesis = "INTENT_DETECTED"
+    elif max_z > Fraction(2, 1):
+        hypothesis = "SUSPICION_DETECTED"
+    else:
+        hypothesis = "MOBILE_EVIDENCE_ANALYZED"
+    is_conclusive = max_z > Fraction(3, 1)
+    return hypothesis, max_z, is_conclusive, n_critical
+
+
 class SIFTOrchestrator:
     """
     Shim de compatibilidad.
@@ -138,23 +178,38 @@ class SIFTOrchestrator:
             "browser_profile", "prefetch_dir", "mft_path", "mft_json",
         ))
         if not has_windows_evidence and mobile_signals:
+            # F6 (N5): hipótesis derivada de los z reales — antes la etiqueta
+            # fija MOBILE_EVIDENCE_ANALYZED clasificaba NOISE aunque hubiera
+            # hallazgos z>3. Narrativa Peircean de 3 capas (F4).
+            hypothesis, max_z, is_conclusive, n_critical = _mobile_hypothesis(mobile_signals)
+            _engines = sorted({str(s.get("tool", "?")) for s in mobile_signals})
+            _posterior = min(max_z / Fraction(5, 1), Fraction(99, 100))
             result = {
                 "case_id": self.case_id,
                 "signals": mobile_signals,
                 "abduction": {
-                    "best_hypothesis": "MOBILE_EVIDENCE_ANALYZED",
-                    "is_conclusive": len(mobile_signals) > 0,
-                    "confidence": "0",
-                    "best_posterior": "0",
+                    "best_hypothesis": hypothesis,
+                    "is_conclusive": is_conclusive,
+                    "confidence": str(_posterior),
+                    "best_posterior": str(_posterior),
                     "narrative": (
                         f"[FIRSTNESS] Mobile forensic evidence analyzed: "
-                        f"{len(mobile_signals)} signal(s) extracted."
+                        f"{len(mobile_signals)} signal(s) extracted "
+                        f"(engines: {', '.join(_engines)}).\n"
+                        f"[SECONDNESS] Max z-score: "
+                        f"{float(max_z):.2f}; señales críticas (z>3): {n_critical}.\n"
+                        f"[THIRDNESS] Hipótesis: {hypothesis}. "
+                        + ("Anomalía estructural en evidencia mobile — revisión prioritaria."
+                           if max_z > Fraction(2, 1) else
+                           "Sin desviación sobre umbral — fuente única, sin base "
+                           "para afirmar benignidad concluyente (gate <3 fuentes).")
                     ),
                 },
                 "pipeline_meta": {
                     "source": "mobile_forensics_adapter",
                     "n_mobile_signals": len(mobile_signals),
                     "n_total_signals": len(mobile_signals),
+                    "max_mobile_z": str(max_z),
                 },
             }
             return result
@@ -260,7 +315,12 @@ class SIFTOrchestrator:
                         "z_score": sig.z_score,
                         "confidence": sig.confidence,
                         "value": sig.value,
-                        "metadata": sig.metadata,
+                        # F5: señal de artefacto real → primaria (cuenta para
+                        # gates de corroboración y override L-036 del agente).
+                        "metadata": {
+                            **(sig.metadata or {}),
+                            "signal_class": "primary",
+                        },
                     }
                     signals.append(sig_dict)
                     logger.info(
@@ -294,7 +354,12 @@ class SIFTOrchestrator:
                         "z_score": sig.z_score,
                         "confidence": sig.confidence,
                         "value": sig.value,
-                        "metadata": sig.metadata,
+                        # F5: señal de artefacto real → primaria (cuenta para
+                        # gates de corroboración y override L-036 del agente).
+                        "metadata": {
+                            **(sig.metadata or {}),
+                            "signal_class": "primary",
+                        },
                     }
                     signals.append(sig_dict)
                     logger.info(
@@ -318,7 +383,12 @@ class SIFTOrchestrator:
                         "z_score": sig.z_score,
                         "confidence": sig.confidence,
                         "value": sig.value,
-                        "metadata": sig.metadata,
+                        # F5: señal de artefacto real → primaria (cuenta para
+                        # gates de corroboración y override L-036 del agente).
+                        "metadata": {
+                            **(sig.metadata or {}),
+                            "signal_class": "primary",
+                        },
                     }
                     signals.append(sig_dict)
                     logger.info(
@@ -342,7 +412,12 @@ class SIFTOrchestrator:
                         "z_score": sig.z_score,
                         "confidence": sig.confidence,
                         "value": sig.value,
-                        "metadata": sig.metadata,
+                        # F5: señal de artefacto real → primaria (cuenta para
+                        # gates de corroboración y override L-036 del agente).
+                        "metadata": {
+                            **(sig.metadata or {}),
+                            "signal_class": "primary",
+                        },
                     }
                     signals.append(sig_dict)
                     logger.info(
@@ -356,7 +431,15 @@ class SIFTOrchestrator:
 
     @staticmethod
     def _merge_mobile_signals(result: Dict[str, Any], mobile_signals: list) -> Dict[str, Any]:
-        """Merge mobile forensic signals into an existing pipeline result."""
+        """
+        Merge mobile forensic signals into an existing pipeline result.
+
+        F6 (AUDITORIA_PIPELINE_ROBUSTEZ, N6): las señales mobile se fusionan
+        DESPUÉS de que la abducción del pipeline Windows ya se computó — la
+        escalación explícita de abajo evita que un hallazgo mobile crítico
+        (z>3) quede silenciado por un veredicto benigno/indeterminado del
+        resto de la evidencia.
+        """
         if not mobile_signals:
             return result
         existing = result.get("signals", [])
@@ -367,6 +450,34 @@ class SIFTOrchestrator:
         if "n_total_signals" in meta:
             meta["n_total_signals"] = meta["n_total_signals"] + len(mobile_signals)
         result["pipeline_meta"] = meta
+
+        hypothesis, max_z, _concl, n_critical = _mobile_hypothesis(mobile_signals)
+        abduction = result.get("abduction")
+        if isinstance(abduction, dict) and max_z > Fraction(3, 1):
+            current = str(abduction.get("best_hypothesis") or "").upper()
+            already_flagged = any(
+                k in current for k in
+                ("MALICIOUS", "INTENT", "SUSPICION", "CRITICAL", "OVERRIDE")
+            )
+            if not already_flagged:
+                escalated = ("MALICIOUS_INTENT_DETECTED"
+                             if n_critical >= 2 else "INTENT_DETECTED")
+                abduction["mobile_escalation"] = {
+                    "from": abduction.get("best_hypothesis"),
+                    "to": escalated,
+                    "max_mobile_z": str(max_z),
+                    "n_critical_mobile": n_critical,
+                }
+                abduction["best_hypothesis"] = escalated
+                abduction["is_conclusive"] = True
+                abduction["narrative"] = (
+                    (abduction.get("narrative") or "")
+                    + f"\n[MOBILE] Escalación determinista: {len(mobile_signals)} "
+                      f"señal(es) mobile con max z={float(max_z):.2f} > 3 — "
+                      f"hipótesis elevada a {escalated} "
+                      f"(era: {abduction['mobile_escalation']['from']})."
+                )
+                meta["mobile_escalation_applied"] = True
         return result
 
     # ── Adaptadores internos ──────────────────────────────────────────────
@@ -652,11 +763,21 @@ class SIFTOrchestrator:
                 "is_conclusive": avg > Fraction(3, 2),
                 "confidence": conf_vol3,
                 "best_posterior": str(conf_vol3),
+                # F8 (N12): el texto de cierre coincide con la hipótesis. Antes
+                # 0 señales / avg=0 decían "Suspicious activity — requires
+                # human review" junto a NO_SEMIOTIC_ANOMALY_DETECTED — la
+                # narrativa contradecía el veredicto (observado en DC-MEM-003).
                 "narrative": (
                     f"Volatility3 memory analysis: {len(signals)} signals from "
                     f"{Path(memory_path).name}. "
                     f"Average intentionality score: {avg.numerator}/{avg.denominator}. "
-                    f"{'Malicious activity indicated.' if is_malice else 'Suspicious activity — requires human review.'}"
+                    + ("Malicious activity indicated." if is_malice
+                       else ("No signals extracted — analysis produced no reviewable "
+                             "output; absence of extraction output is not evidence "
+                             "of benignity." if not signals
+                             else ("No anomalous signals above threshold — nothing "
+                                   "to review in this image." if avg == Fraction(0, 1)
+                                   else "Suspicious activity — requires human review.")))
                 ),
             },
             "pipeline_meta": {

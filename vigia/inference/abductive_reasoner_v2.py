@@ -946,6 +946,30 @@ class AbductiveReasonerV2:
             reverse=True,
         )
 
+        # FIX (AUDITORIA_PIPELINE_ROBUSTEZ, N2): un empate exacto de CCS entre
+        # las dos mejores hipótesis NO puede resolverse por orden lexicográfico
+        # del hypothesis_id (sesgo estructural: "H2-BENIGN" > "H1-MALICIOUS").
+        # Empate = no hay mejor explicación única → ABSTAIN forzado.
+        if (
+            len(sorted_hyp) >= 2
+            and sorted_hyp[0].ccs.value == sorted_hyp[1].ccs.value
+        ):
+            self.hypotheses = list(candidate_hypotheses)
+            result = PhaseResult(
+                phase=PeircePhase.THIRDNESS,
+                completed=False,
+                artifacts_produced=[],
+                notes=(
+                    f"THIRDNESS: Empate exacto de CCS ({sorted_hyp[0].ccs.value}) "
+                    f"entre '{sorted_hyp[0].hypothesis_id}' y "
+                    f"'{sorted_hyp[1].hypothesis_id}'. Sin mejor explicación "
+                    f"única — ABSTAIN forzado (el desempate lexicográfico está "
+                    f"prohibido: sesgaría el veredicto por nomenclatura)."
+                ),
+            )
+            self.phase_log.append(result)
+            return result
+
         winner = sorted_hyp[0]
         winner.is_selected = True
         self.selected_hypothesis = winner
@@ -1119,6 +1143,16 @@ class AbductiveReasonerV2:
         """
         Ejecuta el pipeline completo de 6 fases y retorna bundle de resultado.
         """
+        # FIX (AUDITORIA_PIPELINE_ROBUSTEZ, N17): cada corrida del pipeline
+        # parte de estado limpio. Sin este reset, una instancia reutilizada
+        # arrastra selected_hypothesis/phase_log de la corrida anterior y un
+        # THIRDNESS sin selección (empate) hereda el ganador previo.
+        self.phase_log = []
+        self.hypotheses = []
+        self.selected_hypothesis = None
+        self.verdict = None
+        self.reason_code = None
+
         self.phase_firstness(artifacts)
         self.phase_secondness(artifacts, baseline_expectations)
         self.phase_thirdness(candidate_hypotheses)
@@ -1136,6 +1170,18 @@ class AbductiveReasonerV2:
         missing_ids = [a.artifact_id for a in artifacts if not a.observed]
         self.phase_gap_analysis(missing_ids)
 
+        # FIX (AUDITORIA_PIPELINE_ROBUSTEZ, N16): NO_CONTRADICTION significa
+        # "no hay contradicción que resolver" — está trivialmente resuelta.
+        # La expresión anterior (verdict != NO_CONTRADICTION) trataba la
+        # ausencia de contradicción como "no resuelto", activando
+        # ABSTAIN-INVERSION en TODO caso sin contradicción Memory/Disk y
+        # haciendo el veredicto REJECT prácticamente inalcanzable vía wrapper.
+        # "No resuelto" real = hay contradicción declarada sin capa dominante.
+        _inversion_resolved = (
+            inversion.verdict == InversionVerdict.NO_CONTRADICTION
+            or inversion.verdict == InversionVerdict.CONTRADICTION_IS_EVIDENCE
+            or inversion.dominant_layer is not None
+        )
         abstain_checks = AbstainConditionsEngine.check_all(
             ccs=ccs,
             artifacts=artifacts,
@@ -1143,7 +1189,7 @@ class AbductiveReasonerV2:
             si_fn_delta_seconds=si_fn_delta_seconds,
             c2_ip_known=c2_ip_known,
             registry_service_match=registry_service_match,
-            inversion_resolved=(inversion.verdict != InversionVerdict.NO_CONTRADICTION),
+            inversion_resolved=_inversion_resolved,
         )
 
         self.selected_hypothesis.abstain_checks = abstain_checks
@@ -1208,6 +1254,17 @@ class AbductiveReasonerV2:
             "verdict": "ABSTAIN",
             "reason_code": reason.name,
             "detail": detail,
+            # Fases ya ejecutadas (FIRSTNESS/SECONDNESS/THIRDNESS): sus notas
+            # son la narrativa Peircean del ABSTAIN — sin ellas el wrapper
+            # solo podría emitir un genérico "sin hipótesis" (F4).
+            "phases": [
+                {
+                    "phase": p.phase.name,
+                    "completed": p.completed,
+                    "notes": p.notes,
+                }
+                for p in self.phase_log
+            ],
             "daubert_compliant": True,
             "determinism_contract": "v2.0_fraction_only",
         }
@@ -1300,9 +1357,18 @@ def test_abstain_conditions() -> None:
         broken_links=[],
         missing_links=[],
     )
+    # FIX test estanco (pre-auditoría robustez): ABSTAIN-1 y ABSTAIN-3 solo
+    # disparan si existen artefactos de capa MEMORY / NETWORK respectivamente.
+    # Con artifacts=[] el test esperaba 4 triggers pero solo 2 eran posibles.
+    _test_artifacts = [
+        ArtifactRecord("MEM-T", "memdump", "a" * 64, "2026-05-06T00:00:00Z", 1,
+                       EvidenceLayer.MEMORY, OntologicalLevel.TECHNIQUE, True),
+        ArtifactRecord("NET-T", "flow", "b" * 64, "2026-05-06T00:00:00Z", 1,
+                       EvidenceLayer.NETWORK, OntologicalLevel.TACTIC, True),
+    ]
     checks = AbstainConditionsEngine.check_all(
         ccs=ccs,
-        artifacts=[],
+        artifacts=_test_artifacts,
         memory_has_active_thread=False,  # Triggea ABSTAIN-1
         si_fn_delta_seconds=5000,        # Triggea ABSTAIN-2 (>3600)
         c2_ip_known=False,               # Triggea ABSTAIN-3
