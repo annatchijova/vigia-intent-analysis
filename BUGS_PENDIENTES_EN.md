@@ -3691,3 +3691,64 @@ Scorer comparative, 267 cases: **exactly 1 flip** —
 445 passed (+6 tests, `tests/test_b068_context_corroboration.py`: full NGDC
 regression + synthetic gate, including "a case built purely from context
 classes never seals MALICE"). Agent corpus 198/198.
+
+---
+
+## B-069 — Calibration of the 36 legacy profiles: ATTEMPTED, REJECTED by the comparative [NOT APPLIED — negative gate]
+
+| Field | Value |
+|-------|-------|
+| **Status** | NOT APPLIED — the comparative run (mandatory gate) rejected the change. B-067 legacy pins retained. |
+| **Severity** | N/A — documented negative result; no code change sealed |
+| **File** | `vigia/tools/caie.py` (`EVIDENCE_PROFILES`, B-067 legacy pin block) — edited and **reverted** |
+| **Restore tag** | `pre-ngdc003-fix-20260703-182734` |
+
+### What was attempted
+
+Replace the 36 profiles pinned at the legacy value (0.50/0.20, labelled
+"Uncalibrated" in B-067) with per-type calibrated profiles, using the same
+method as the B-066 mobile profiles: analogy with the existing scale
+(`binary`→0.45/0.24 hash-verifiable, `git_forensics`→0.30/0.28 SHA-chained,
+`disk_image`→0.20/0.30, `email_content`→0.60/0.20, context classes raised to
+0.70-0.85, etc.).
+
+### Why it was rejected — the comparative is the gate
+
+Full comparative run over 267 cases, baseline = committed HEAD (post B-068):
+
+- **Cases FIXED vs expected: 0.**
+- **Cases BROKEN vs expected: 1** — `VIGIA-LINUX-002` NOISE→UNKNOWN. This is
+  the benign *false-positive test* case (legitimate open-source contributor,
+  libarchive CVE). Calibrating `git_forensics` (0.10/0.28, "hard to spoof")
+  makes **legitimate** git activity weigh more and cross the NOISE→UNKNOWN
+  threshold: a new FP on the very case built to catch FPs.
+- Accuracy vs expected: 70.8% → **70.4%** (net negative).
+- 27 score moves, almost all **upward** (inflation).
+
+### Root cause of why the batch calibration doesn't close
+
+The scorer thresholds (MALICE>0.33, SUSPICION>0.18, UNKNOWN>0.08) were
+"calibrated on the real EBS v1 case distribution" (comment in
+`vigia_scorer.py`) **with the legacy weights**. Raising per-type weights
+inflates the whole distribution against fixed thresholds → benign cases drift
+upward. Recalibrating per-type profiles **without** jointly re-fitting the
+verdict thresholds breaks the balance.
+
+### Conclusion (value of the negative result)
+
+The comparative **proves the legacy pins cause zero corpus verdict errors**
+(0 cases the recalibration could fix). The 36 legacy profiles are
+"uncalibrated" in that they don't derive from a per-type forensic decision,
+but they are **correct in practice** for the current distribution.
+Recalibrating them is risk without reward until a joint profiles+thresholds
+re-fit with a labelled dataset exists (see `fit_calibration.py` and the
+"Bayesian calibration on labelled case dataset" roadmap note in
+`vigia_scorer.py`). Reclassified pending item: from "calibrate the 36
+profiles" to "joint profiles+thresholds re-fit" — a larger effort, out of
+scope for a bounded fix.
+
+### Validation
+
+No code change sealed. `caie.py` reverted to HEAD (`a021a6a`); working tree
+clean. The comparative supporting this decision is archived as a session
+artifact (baseline vs post, 267 cases).

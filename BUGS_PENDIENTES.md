@@ -3391,3 +3391,66 @@ Comparativa scorer 267 casos: **exactamente 1 flip** —
 445 passed (+6 tests, `tests/test_b068_context_corroboration.py`: regresión
 NGDC completa + gate sintético, incluido "un caso armado solo con clases
 contextuales nunca sella MALICE"). Corpus agente 198/198.
+
+---
+
+## B-069 — Calibración de los 36 perfiles legacy: INTENTADA, RECHAZADA por la comparativa [NO APLICADO — gate negativo]
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | NO APLICADO — la corrida comparativa (gate obligatorio) rechazó el cambio. Pins legacy de B-067 retenidos. |
+| **Severidad** | N/A — resultado negativo documentado; ningún cambio de código sellado |
+| **Archivo** | `vigia/tools/caie.py` (`EVIDENCE_PROFILES`, bloque de pins legacy de B-067) — editado y **revertido** |
+| **Tag de restauración** | `pre-ngdc003-fix-20260703-182734` |
+
+### Qué se intentó
+
+Reemplazar los 36 perfiles pinneados al valor legacy (0.50/0.20, marcados
+"Uncalibrated" en B-067) por perfiles calibrados **por tipo**, con el mismo
+método que los perfiles mobile de B-066: analogía con la escala existente
+(`binary`→0.45/0.24 hash-verificable, `git_forensics`→0.30/0.28 SHA-chained,
+`disk_image`→0.20/0.30, `email_content`→0.60/0.20, clases contextuales
+subidas a 0.70-0.85, etc.).
+
+### Por qué se rechazó — la comparativa es el gate
+
+Corrida comparativa completa sobre 267 casos, baseline = HEAD committeado
+(post B-068):
+
+- **Casos ARREGLADOS vs expected: 0.**
+- **Casos ROTOS vs expected: 1** — `VIGIA-LINUX-002` NOISE→UNKNOWN. Es el
+  caso benigno de *test de falso positivo* (contribuidor open-source
+  legítimo, libarchive CVE). La calibración de `git_forensics` (0.10/0.28,
+  "difícil de spoofear") hace que la actividad git **legítima** pese más y
+  cruce el umbral NOISE→UNKNOWN: un FP nuevo en el caso que existe para
+  atrapar FPs.
+- Accuracy vs expected: 70.8% → **70.4%** (neta negativa).
+- 27 score moves, casi todos **al alza** (inflación).
+
+### Causa raíz de por qué la calibración batch no cierra
+
+Los umbrales del scorer (MALICE>0.33, SUSPICION>0.18, UNKNOWN>0.08) fueron
+"calibrados sobre la distribución real de casos EBS v1" (comentario en
+`vigia_scorer.py`) **con los pesos legacy**. Subir los pesos por tipo infla
+la distribución entera contra umbrales fijos → los casos benignos derivan
+hacia arriba. Recalibrar los perfiles por tipo **sin** re-ajustar
+conjuntamente los umbrales del veredicto rompe el balance.
+
+### Conclusión (valor del resultado negativo)
+
+La comparativa **prueba que los pins legacy no causan ningún error de
+veredicto en el corpus** (0 casos que la recalibración pudiera arreglar). Los
+36 perfiles legacy son "no calibrados" en el sentido de que no derivan de una
+decisión forense por tipo, pero son **correctos en la práctica** para la
+distribución actual. Recalibrarlos es riesgo sin recompensa hasta que exista
+un re-fit conjunto perfiles+umbrales con dataset etiquetado (ver
+`fit_calibration.py` y el roadmap "Bayesian calibration on labelled case
+dataset" en `vigia_scorer.py`). Pendiente reclasificado: de "calibrar los 36
+perfiles" a "re-fit conjunto perfiles+umbrales" — trabajo mayor, fuera del
+alcance de un fix acotado.
+
+### Validación
+
+Ningún cambio de código sellado. `caie.py` revertido a HEAD (`a021a6a`);
+árbol de trabajo limpio. La comparativa que sustenta esta decisión está
+archivada como artefacto de sesión (baseline vs post, 267 casos).
