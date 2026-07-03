@@ -184,8 +184,10 @@ class EvidenceLedger:
         }
 
     def export_json(self, path: str) -> None:
-        with open(path, "w") as f:
-            json.dump(self.to_dict(), f, indent=2)
+        # B-064: escritura atómica (patrón L-023) — el ledger exportado no
+        # puede quedar truncado en disco por un crash a mitad de escritura.
+        from vigia.core.atomic_io import atomic_write_text
+        atomic_write_text(path, json.dumps(self.to_dict(), indent=2))
 
     # -----------------------------------------------------------------------
     # Hash global

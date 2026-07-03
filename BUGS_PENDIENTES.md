@@ -3066,3 +3066,122 @@ fail-loud de B-023 lo rechazaba con ValueError — correctamente ruidoso).
 Corrida comparativa sobre los 198 casos con scorer: **0 verdict flips, 0
 score moves** (ningún caso del corpus toca la rama colapsada — el fix protege
 la clase, no re-etiqueta casos). Tests: `TestP2DProvenanceCollapsedAbstain` (2).
+
+---
+
+## B-062 — pipeline.py: el "CAIE structural hard gate" decía sobrescribir el veredicto pero solo anota el bundle [RESUELTO — semántica documentada]
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | RESUELTO — POST HACKATHON (2026-07-03). Decisión de diseño: el gate ES anotación, no orden |
+| **Severidad** | P2 — divergencia de caminos de veredicto (familia B-058) + log engañoso (lente 9) |
+| **Archivo** | `vigia/pipeline/pipeline.py:676-720` |
+| **Alcance** | Modo 4 / CLI standalone (`vigia` en pyproject). **No afecta al Modo 1** (`vigia_agent.py` → `sift_orchestrator`), que no pasa por `pipeline.py` |
+| **Detectado en** | Barrido de invariantes en `vigia/pipeline/` (2026-07-03), reproducido de punta a punta por el camino del CLI |
+| **Tag de restauración** | `pre-pipeline-fixes-20260703-162541` |
+
+### Descripción
+
+Cuando CAIE detecta una regla de oro o una fractura de la lista de veto
+estructural, el gate escribía `caie_analysis.gate_verdict="MALICE"` en el
+bundle y logueaba *"verdict overridden → MALICE"*. Pero
+`decision_trace.decision` — lo que imprime el CLI (`:1362`, `:1455`), lo que
+registra el exec log (`:762`) y lo que exporta el reporte judicial del bridge
+(`vigia_integration_bridge.py:992`) — no se modificaba nunca: CAIE corre
+*después* de `RiskBoundedDecisionLayer.decide()` y no realimenta. El único
+consumidor de `gate_verdict` en el repo es `show_4_hashes.py` (demo), que lo
+trata como primera prioridad. Reproducido: CLI `decision: REJECT` con bundle
+sellado `gate_verdict: MALICE` y log "verdict overridden".
+
+### Resolución (decisión de diseño, aprobada 2026-07-03)
+
+El gate **es una anotación sellada, no una orden**. Se corrigió el log
+(*"CAIE structural veto annotated in sealed bundle ... decision_trace.decision
+no se modifica"*) y se documentó la semántica de `gate_verdict` en el
+docstring de `run_full` y en el comentario del bloque: el consumidor que
+quiera priorizar la imposibilidad estructural debe leer
+`caie_analysis.gate_verdict` explícitamente. Sin cambios de comportamiento en
+veredictos ni en el bundle.
+
+### Validación
+
+Suite 405 passed (+11 nuevos), mismos 21 e2e preexistentes, 6 xfailed.
+Corpus 198/198. Tests: `TestB062GateAnnotation` (1) en
+`tests/test_b062_b064_pipeline_fixes.py` — verifica anotación sellada,
+decisión intacta y log honesto.
+
+---
+
+## B-063 — forensic_adapter.py: señales con metadata=None crasheaban el adapter → CAIE se salteaba en silencio en el CLI [RESUELTO]
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | RESUELTO — POST HACKATHON (2026-07-03) |
+| **Severidad** | P2 — módulo de enriquecimiento desactivado silenciosamente con el input documentado del propio CLI |
+| **Archivo** | `vigia/core/forensic_adapter.py:134,166,184` (crash) + `vigia/pipeline/pipeline.py:1262` (origen del None) |
+| **Alcance** | Camino CLI `run_vigia` (Modo 4). El bridge no está afectado (siempre construye el dict de metadata) |
+| **Detectado en** | Reproducción diferencial durante el barrido de invariantes (2026-07-03) |
+| **Tag de restauración** | `pre-pipeline-fixes-20260703-162541` |
+
+### Descripción
+
+`SignalOutput.metadata` tiene default `None` (`ebs_v1.py:104/128`, ambas
+variantes pydantic y dataclass). `run_vigia()` construye señales con
+`metadata=d.get("metadata")` → `None` si el campo no viene — y el formato de
+entrada documentado en el docstring del CLI (`{"tool_name": "SDA", "value":
+0.8, "z_score": 2.3, "confidence": 0.9}`) no lo trae. Los tres conversores del
+`ForensicAdapter` hacían `sig.metadata.get(...)` → `TypeError`, capturado
+aguas arriba como *"CAIE failed (non-blocking)"* → **CAIE nunca corría y nadie
+se enteraba**. Verificado diferencialmente: misma corrida con `"metadata": {}`
+y CAIE corre; sin él, se saltea. Consecuencia adicional: hacía inalcanzable el
+gate de B-062 desde el input documentado.
+
+### Fix
+
+`_meta = sig.metadata or {}` al inicio de los tres conversores
+(`signal_to_caie_artifact`, `signal_to_abductive_record`,
+`signal_to_causal_link`) — cubre a todos los callers, no solo al CLI.
+Paridad garantizada: `metadata=None` se comporta idéntico a `metadata={}`.
+
+### Validación
+
+Suite 405 passed, corpus 198/198. Tests: `TestB063MetadataNone` (6) —
+incluye el formato exacto del docstring del CLI de punta a punta verificando
+que "CAIE failed (non-blocking)" ya no aparece en el log.
+
+---
+
+## B-064 — Escrituras no atómicas de artefactos de cadena de custodia (ledger, manifest, firma, bundle, reporte) [RESUELTO]
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | RESUELTO — POST HACKATHON (2026-07-03) |
+| **Severidad** | P2 — familia L-023: un crash a mitad de escritura deja un artefacto de custodia truncado en disco |
+| **Archivo** | `vigia/pipeline/evidence_bundle.py` (PDF/ledger/manifest/firma), `vigia/pipeline/vigia_integration_bridge.py:1185,1215` (bundle sellado y reporte), `vigia/pipeline/security_evidence_registry.py:187` (export del ledger) |
+| **Detectado en** | Barrido de invariantes, lente "operación sin inversa/atomicidad" (2026-07-03) |
+| **Tag de restauración** | `pre-pipeline-fixes-20260703-162541` |
+
+### Descripción
+
+El fix atómico de L-023 (Tanda A) quedó solo en `BundleBuilder.save`. Los
+demás artefactos de custodia del camino pipeline se escribían con
+`open("w")` + `write`/`json.dump` crudos: ledger, manifest y **firma** del
+evidence bundle, el bundle sellado que persiste el bridge, su reporte ENFSI y
+el export JSON del `EvidenceLedger`. Un crash o corte de energía entre el
+open y el close deja el archivo truncado — y un manifest o una firma a medias
+es una ruptura de cadena de custodia bajo Daubert.
+
+### Fix
+
+Nuevo helper compartido `vigia/core/atomic_io.py`
+(`atomic_write_text`/`atomic_write_bytes`) con el patrón exacto de L-023:
+mkstemp en el mismo directorio + fsync + `os.replace`, con limpieza del
+tempfile si algo falla antes del replace. Aplicado a los 6 sitios de
+escritura de los tres archivos. Helper compartido en lugar de 6 copias para
+no reincidir en la lente 6 (algoritmos duplicados).
+
+### Validación
+
+Suite 405 passed, corpus 198/198. Tests: `TestB064AtomicWrites` (4) —
+roundtrip texto/bytes, sin tempfiles huérfanos, y preservación del archivo
+destino cuando la escritura falla a mitad de camino.

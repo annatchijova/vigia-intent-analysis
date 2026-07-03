@@ -131,7 +131,12 @@ def _sha256(data: str) -> str:
 class ForensicAdapter:
     @staticmethod
     def signal_to_caie_artifact(sig: SignalOutput) -> CAIEArtifact:
-        art_type = str(sig.metadata.get("evidence_type", "unknown")).lower()
+        # B-063: SignalOutput.metadata tiene default None (ebs_v1.py) — el CLI
+        # run_vigia() construye señales sin metadata y el .get() sobre None
+        # tiraba TypeError, capturado aguas arriba como "CAIE failed
+        # (non-blocking)" → CAIE se salteaba en silencio.
+        _meta = sig.metadata or {}
+        art_type = str(_meta.get("evidence_type", "unknown")).lower()
         # If art_type is already a canonical CAIE evidence type (e.g. file_timestamp,
         # memory_process) it won't appear as a key in _EVIDENCE_MAP, which maps legacy
         # labels (e.g. "mft" → "file_timestamp").  Fall back to art_type itself so that
@@ -139,8 +144,8 @@ class ForensicAdapter:
         evidence_type = _EVIDENCE_MAP.get(art_type, art_type)
         z = float(getattr(sig, 'z_score', 0.0))
         raw_score = float(sig.value)
-        desc = str(sig.metadata.get("description", sig.value or f"Signal from {sig.tool_name}"))[:500]
-        meta = dict(sig.metadata) if sig.metadata else {}
+        desc = str(_meta.get("description", sig.value or f"Signal from {sig.tool_name}"))[:500]
+        meta = dict(_meta)
         meta["z_score_original"] = sig.z_score
         canonical = _canonical_json({"tool": sig.tool_name, "value": sig.value, "z": sig.z_score})
         provenance = [_sha256(canonical)]
@@ -163,13 +168,14 @@ class ForensicAdapter:
 
     @staticmethod
     def signal_to_abductive_record(sig: SignalOutput) -> ArtifactRecord:
-        art_type = str(sig.metadata.get("artifact_type", "unknown")).lower()
+        _meta = sig.metadata or {}  # B-063: metadata puede ser None
+        art_type = str(_meta.get("artifact_type", "unknown")).lower()
         layer = _LAYER_MAP.get(art_type, EvidenceLayer.DISK_MFT)
         ontology = _ONTOLOGY_MAP.get(art_type, OntologicalLevel.TECHNIQUE)
         artifact_id = f"{sig.tool_name}-{art_type}-{id(sig)}"
-        source_path = sig.metadata.get("source_path", sig.metadata.get("path", "unknown"))
-        ts = sig.metadata.get("timestamp", "2026-05-15T00:00:00Z")
-        canonical = _canonical_json({"tool": sig.tool_name, "value": sig.value, "z": sig.z_score, "meta_keys": sorted(sig.metadata.keys())})
+        source_path = _meta.get("source_path", _meta.get("path", "unknown"))
+        ts = _meta.get("timestamp", "2026-05-15T00:00:00Z")
+        canonical = _canonical_json({"tool": sig.tool_name, "value": sig.value, "z": sig.z_score, "meta_keys": sorted(_meta.keys())})
         sha256_hash = _sha256(canonical)
         byte_size = len(canonical.encode("utf-8"))
         return ArtifactRecord(
@@ -181,10 +187,11 @@ class ForensicAdapter:
 
     @staticmethod
     def signal_to_causal_link(sig: SignalOutput, consistent: bool = True) -> CausalLink:
-        art_type = str(sig.metadata.get("artifact_type", "unknown")).lower()
+        _meta = sig.metadata or {}  # B-063: metadata puede ser None
+        art_type = str(_meta.get("artifact_type", "unknown")).lower()
         layer = _LAYER_MAP.get(art_type, EvidenceLayer.DISK_MFT)
         weight = LAYER_EPISTEMIC_WEIGHT.get(layer, Fraction(5, 10))
-        desc = str(sig.metadata.get("description", sig.value or f"{sig.tool_name} signal"))[:200]
+        desc = str(_meta.get("description", sig.value or f"{sig.tool_name} signal"))[:200]
         return CausalLink(
             link_id=f"link-{sig.tool_name}-{art_type}", description=desc,
             weight=weight, evidence_present=True,

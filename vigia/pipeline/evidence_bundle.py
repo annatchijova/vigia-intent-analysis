@@ -6,6 +6,8 @@ import hashlib
 import zipfile
 from typing import Dict, Any, Optional
 
+from vigia.core.atomic_io import atomic_write_text, atomic_write_bytes
+
 
 # ---------------------------------------------------------------------------
 # Hash helper
@@ -114,15 +116,16 @@ def build_evidence_bundle(
     # Copiar PDF
     # -----------------------------------------------------------------------
 
-    with open(pdf_path, "rb") as src, open(pdf_out, "wb") as dst:
-        dst.write(src.read())
+    # B-064: escrituras atómicas (patrón L-023) — un crash a mitad de
+    # escritura no puede dejar un artefacto de custodia truncado en disco.
+    with open(pdf_path, "rb") as src:
+        atomic_write_bytes(pdf_out, src.read())
 
     # -----------------------------------------------------------------------
     # Guardar ledger
     # -----------------------------------------------------------------------
 
-    with open(ledger_out, "w") as f:
-        json.dump(ledger_dict, f, indent=2)
+    atomic_write_text(ledger_out, json.dumps(ledger_dict, indent=2))
 
     # -----------------------------------------------------------------------
     # Manifest
@@ -130,8 +133,7 @@ def build_evidence_bundle(
 
     manifest = build_manifest(pdf_out, ledger_out, metadata)
 
-    with open(manifest_out, "w") as f:
-        json.dump(manifest, f, indent=2)
+    atomic_write_text(manifest_out, json.dumps(manifest, indent=2))
 
     # -----------------------------------------------------------------------
     # Firma
@@ -140,8 +142,7 @@ def build_evidence_bundle(
     signature = sign_manifest(manifest["manifest_hash"], private_key)
 
     if signature:
-        with open(sig_out, "w") as f:
-            f.write(signature)
+        atomic_write_text(sig_out, signature)
 
     # -----------------------------------------------------------------------
     # ZIP opcional

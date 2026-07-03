@@ -298,7 +298,15 @@ class VigiaPipeline:
         Returns:
             {
                 "bundle"         : ForensicBundle sellado
-                "sealed_dict"    : dict sellado completo
+                "sealed_dict"    : dict sellado completo.
+                                   Si CAIE detectó una regla de oro o una
+                                   fractura de veto estructural, incluye
+                                   caie_analysis.gate_verdict="MALICE" +
+                                   gate_override_reason. Es una ANOTACIÓN
+                                   sellada (cubierta por bundle_hash): NO
+                                   modifica "decision" — el consumidor que
+                                   quiera priorizar la imposibilidad
+                                   estructural debe leerla explícitamente.
                 "inference"      : resultado LikelihoodEngine
                 "abductive"      : resultado AbductiveIntentEngine | None
                 "decision"       : DecisionTrace con reason_code y omega
@@ -673,8 +681,16 @@ class VigiaPipeline:
                     scope_note="standalone scorer mode (vigia/pipeline/pipeline.py)",
                 )
 
-        # ── CAIE structural hard gate (runs BEFORE sealing so the override is
-        # covered by bundle_hash — caie_analysis is part of bundle_payload) ──
+        # ── CAIE structural veto — ANOTACIÓN sellada, NO orden (B-062) ──────
+        # Semántica de gate_verdict: si CAIE detecta una regla de oro o una
+        # fractura de la lista de veto, se anota caie_analysis.gate_verdict=
+        # "MALICE" DENTRO del bundle, antes del sellado, para que quede
+        # cubierta por bundle_hash. La anotación NO modifica
+        # decision_trace.decision: la decisión de gobernanza sigue siendo lo
+        # que emiten el CLI, el exec log y el reporte del bridge. Un
+        # consumidor que quiera priorizar la imposibilidad estructural debe
+        # leer caie_analysis.gate_verdict explícitamente (ej.:
+        # show_4_hashes.py, que la trata como primera prioridad).
         # Rationale: causal impossibilities and tool-signature fractures are a
         # different epistemic category from probabilistic evidence — they are
         # not subject to Bayesian updating.
@@ -704,9 +720,10 @@ class VigiaPipeline:
                     f"CAIE structural veto: {_veto_type} detected. Pre-override: {_pre_verdict}."
                 )
                 logger.warning(
-                    "[Pipeline] CAIE structural hard gate triggered: verdict overridden "
-                    "%s → MALICE (%s)",
-                    _pre_verdict, caie_analysis["gate_override_reason"],
+                    "[Pipeline] CAIE structural veto annotated in sealed bundle: "
+                    "caie_analysis.gate_verdict=MALICE (%s). "
+                    "decision_trace.decision no se modifica.",
+                    caie_analysis["gate_override_reason"],
                 )
 
         sealed_dict = BundleBuilder.seal(
