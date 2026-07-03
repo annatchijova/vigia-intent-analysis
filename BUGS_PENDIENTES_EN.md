@@ -3623,11 +3623,26 @@ an `evidence_type` to dodge its real type's profile. The default was also
    the `normalize_case_schema` placeholder for untyped artifacts) are
    **pinned explicitly at the exact legacy value** (0.50/0.20, labelled
    "Uncalibrated -- pinned at legacy fallback value") → bit-for-bit
-   identical behavior, and the hard fallback remains only for genuinely
+   identical **verdict**, and the hard fallback remains only for genuinely
    unknown types. The bypass dies: inventing a type no longer pays.
 3. Invariant protected by test: the unknown type's `(1-s)×w` ≤ the minimum
    of the ENTIRE table — if a future profile lowers the minimum, the test
    forces the fallback down too.
+
+### Scope clarification (self-review 2026-07-03)
+
+The "bit-for-bit identical" claim above applies to the **verdict and score**
+(267/267 cases, verified), NOT to CAIE's internal membership. A measured,
+benign side-effect of adding the 36 types to `EVIDENCE_PROFILES`: the
+`_VALID_EVIDENCE_TYPES` frozenset (enforced by CAIE `add_artifact`) now
+includes them, so **31 corpus cases** feed artifacts into the fracture engine
+that were previously rejected (e.g. VIGIA-FLAREON-11: 0→11 artifacts accepted;
+cases full of `binary`/`malware_static_analysis`). Measurement: **0 cases
+changed their fracture count** → 0 score change → 0 verdict change. It is
+arguably an improvement (it closed a latent false-negative: those types are
+legitimate evidence that should participate in cross-artifact analysis), but
+it is documented explicitly because unqualified "bit-for-bit identical" was
+imprecise about the internal processing.
 
 ### Derived pending item (documented, not resolved)
 

@@ -3322,12 +3322,27 @@ además estaba **duplicado** en dos lugares (`Artifact.profile` y un inline en
    fallback generoso. Resolución: esos 36 tipos (incluido `"default"`, el
    placeholder de `normalize_case_schema` para artefactos sin tipo) se
    **pinnean explícitos al valor legacy exacto** (0.50/0.20, marcados
-   "Uncalibrated -- pinned at legacy fallback value") → comportamiento bit a
+   "Uncalibrated -- pinned at legacy fallback value") → **veredicto** bit a
    bit idéntico, y el fallback duro queda solo para tipos realmente
    desconocidos. El bypass muere: inventar un tipo ya no paga.
 3. Invariante protegida por test: `(1-s)×w` del desconocido ≤ mínimo de TODA
    la tabla — si un perfil futuro baja el mínimo, el test obliga a bajar el
    fallback.
+
+### Aclaración de alcance (self-review 2026-07-03)
+
+La frase "bit a bit idéntico" arriba aplica al **veredicto y al score** (267/267
+casos, verificado), NO a la membresía interna de CAIE. Efecto secundario
+medido y benigno de agregar los 36 tipos a `EVIDENCE_PROFILES`: el frozenset
+`_VALID_EVIDENCE_TYPES` (que CAIE `add_artifact` enforcea) ahora los incluye,
+así que **31 casos del corpus** pasan artefactos al motor de fracturas que
+antes eran rechazados (ej. VIGIA-FLAREON-11: 0→11 artefactos aceptados; casos
+llenos de `binary`/`malware_static_analysis`). Medición: **0 casos cambiaron
+su nº de fracturas** → 0 cambio de score → 0 cambio de veredicto. Es
+arguablemente una mejora (cerraba un falso-negativo latente: esos tipos son
+evidencia legítima que debía participar del análisis cross-artefacto), pero se
+documenta explícitamente porque "bit a bit idéntico" sin calificar era
+impreciso sobre el procesamiento interno.
 
 ### Pendiente derivado (documentado, no resuelto)
 
