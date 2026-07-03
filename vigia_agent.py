@@ -142,6 +142,14 @@ def classify_agent_verdict(
     La regla 3 es la corrección central: antes, todo lo que no fuera malicia
     ni intención caía en NOISE (exit 0), incluidos errores de pipeline y
     ausencia de señal. Ahora esos casos abstienen.
+
+    Semántica de is_conclusive (B-028, definida en Tanda B):
+      1. Modula el gate de corroboración de la regla 3 (<3 primarias sin
+         conclusión firme → ABSTAIN).
+      2. Modula el piso del nivel de alerta en la narrativa (MALICE
+         conclusivo → HIGH/MEDIUM; INTENT conclusivo → mínimo MEDIUM).
+      3. Es informativo para NOISE/SUSPICION.
+      4. Incompatible con veredicto ABSTAIN (guard B-027 en _seal_bundle).
     """
     hyp = str(abduction.get("best_hypothesis") or "").upper()
 
@@ -149,7 +157,15 @@ def classify_agent_verdict(
         return "MALICE"
     if "INTENT" in hyp or "SUSPICION" in hyp:
         return "INTENT"
-    if hyp in ABSTAIN_HYPOTHESES:
+    # B-058 FIX (auditoría de invariantes 2026-07-03): match por SUBSTRING,
+    # no solo exacto. El adaptador EBS emite "ABSTAIN_DETECTED" (expected==
+    # ABSTAIN), que NO estaba en ABSTAIN_HYPOTHESES → caía a NOISE (exit 0):
+    # un caso que el sistema etiqueta explícitamente ABSTAIN se sellaba como
+    # benigno (misma familia P0-A). El batch comparator de run_all_agent.py
+    # lo enmascaraba con su propio mapeo ABSTAIN_DETECTED→ABSTAIN, dando PASS
+    # sobre un bundle con agent_verdict=NOISE. Ahora "ABSTAIN" en cualquier
+    # posición de la hipótesis clasifica ABSTAIN.
+    if "ABSTAIN" in hyp or hyp in ABSTAIN_HYPOTHESES:
         return "ABSTAIN"
     # Veredicto que se presenta como "limpio" pero se apoya en muy pocas
     # señales: el reasoner no tuvo base suficiente para afirmar benignidad.
@@ -1052,8 +1068,23 @@ class VIGIAAgent:
         # Posterior verdict override: if the Bayesian posterior verdict is conclusive MALICE
         # but individual z-scores are all below threshold (distributed evidence pattern),
         # floor the alert level to prevent a misleading LOW alongside a MALICE verdict.
+        #
+        # B-028 (Tanda B, opción A): semántica COMPLETA de is_conclusive —
+        # el flag modula exactamente dos cosas: (1) el gate de corroboración
+        # `<3 señales and not is_conclusive → ABSTAIN` en
+        # classify_agent_verdict, y (2) el piso del nivel de alerta (MALICE
+        # abajo, INTENT acá). Para NOISE/SUSPICION es informativo. Un bundle
+        # ABSTAIN nunca puede sellarlo en True (guard B-027 en _seal_bundle).
         _hypothesis = abduction.get("best_hypothesis", "")
         _is_conclusive = abduction.get("is_conclusive", False)
+        if (_is_conclusive and "INTENT" in _hypothesis.upper()
+                and "MALICI" not in _hypothesis.upper()
+                and alert.startswith("LOW")):
+            alert = (
+                "MEDIUM — Conclusive INTENT verdict with individual z-scores "
+                "below threshold. Alert floored (B-028): a conclusive intent "
+                "finding cannot present as LOW."
+            )
         if _is_conclusive and "MALICI" in _hypothesis.upper():
             _posterior_str = str(abduction.get("best_posterior", "0/1"))
             try:
@@ -1100,6 +1131,24 @@ class VIGIAAgent:
         # los artefactos no analizados (NOISE con pérdidas → ABSTAIN).
         n_primary, n_unanalyzed = _signal_stats(results)
         agent_verdict = classify_agent_verdict(abduction, n_primary, n_unanalyzed)
+
+        # B-027 (guard central): un bundle con veredicto ABSTAIN no puede
+        # sellar is_conclusive=True — "no puedo formar opinión" y "estoy
+        # seguro" son mutuamente excluyentes bajo cross-examination. Los
+        # adaptadores ya lo evitan en origen; este guard cierra la clase
+        # entera para cualquier camino futuro. Se degrada DESPUÉS de
+        # clasificar (no cambia el veredicto) y queda anotado.
+        if agent_verdict == "ABSTAIN" and abduction.get("is_conclusive"):
+            abduction["is_conclusive"] = False
+            abduction["is_conclusive_downgraded"] = (
+                "B-027: ABSTAIN es incompatible con is_conclusive=True — "
+                "degradado en el sellado"
+            )
+            logger.warning(
+                "[SEAL] B-027 guard: is_conclusive=True degradado a False "
+                "(veredicto ABSTAIN, hipótesis %s)",
+                abduction.get("best_hypothesis"),
+            )
 
         bundle = {
             "vigia_agent_version": AGENT_VERSION,
@@ -1525,20 +1574,52 @@ def _run_text_pipeline(evidence_path: Path, case_id: str, params: Dict) -> Dict[
 
         output_path = input_path.replace(".json", "_out.json")
 
-        from run_pipeline import run as run_pipeline_fn
+        # B-054/F-L040-6 FIX (TRIAGE 2026-07-03): el import plano
+        # `from run_pipeline import ...` apuntaba a un módulo que no existe
+        # en el root del repo → este fallback SIEMPRE degradaba a
+        # PIPELINE_UNAVAILABLE (código muerto que aparentaba ser red de
+        # seguridad). El módulo real es vigia/scripts/run_pipeline.py, con
+        # firma idéntica. Se conserva el import plano como segundo intento
+        # para layouts legados.
+        try:
+            from vigia.scripts.run_pipeline import run as run_pipeline_fn
+        except ImportError:
+            from run_pipeline import run as run_pipeline_fn  # layout plano legado
         run_pipeline_fn(input_path, output_path, negation_enabled=True)
 
         with open(output_path) as f:
             pipeline_results = json.load(f)
 
         # Convertir al formato del agente — z_score como Fraction
+        def _tagged_int(v: Any, default: int) -> int:
+            """
+            B-054 (2do hallazgo): el pipeline semiótico serializa enteros en
+            formato canónico taggeado ("29:int"). Este parser esperaba ints
+            crudos y crasheaba con TypeError en cuanto el fallback revivió
+            (el import roto lo mantuvo como código muerto y el bug latente
+            nunca se ejercitó).
+            """
+            if isinstance(v, bool):
+                return default
+            if isinstance(v, int):
+                return v
+            if isinstance(v, str):
+                try:
+                    return int(v.split(":", 1)[0])
+                except ValueError:
+                    return default
+            return default
+
         signals = []
         for r in pipeline_results:
             dec = r.get("decision", {})
             agg = r.get("aggregator", {})
             mi = agg.get("mi_final", {"num": 0, "den": 1})
             # Rational Fraction — never float
-            z_frac = Fraction(mi["num"], max(mi["den"], 1))
+            z_frac = Fraction(
+                _tagged_int(mi.get("num"), 0),
+                max(_tagged_int(mi.get("den"), 1), 1),
+            )
             # Confidence derived from alert_level — not fabricated
             alert_to_conf = {"LOW": Fraction(1, 10), "MEDIUM": Fraction(4, 10),
                              "HIGH": Fraction(7, 10), "CRITICAL": Fraction(9, 10)}

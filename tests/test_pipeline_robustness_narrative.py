@@ -409,3 +409,61 @@ class TestOrchestratorV4Narrative:
         # Y clasifica ABSTAIN, nunca benigno:
         v = classify_agent_verdict(ab, 0)
         assert v == "ABSTAIN"
+
+
+# ──────────────────────────────────────────────────────────────────────────
+# B-052 P1 — narrativa mobile honesta (AUDITORIA_MACOS_NARRATIVA.md §4)
+# ──────────────────────────────────────────────────────────────────────────
+
+class TestB052MobileNarrative:
+    def _mobile_only_result(self, monkeypatch, mobile):
+        from sift_orchestrator import SIFTOrchestrator
+        orch = SIFTOrchestrator("T-B052")
+        monkeypatch.setattr(orch, "_analyze_mobile", lambda kw: mobile)
+        # macos_evidence_path no está en la lista has_windows_evidence →
+        # rama mobile-only.
+        return orch.analyze(macos_evidence_path="/evidence/macos")
+
+    def test_narrative_declares_reasoner_not_run_by_design(self, monkeypatch):
+        mobile = [{
+            "tool": "MACOS_FORENSICS", "z_score": 1.6, "confidence": 0.95,
+            "value": 0.32,
+            "metadata": {"signal_class": "primary", "findings_count": 23,
+                         "finding_types": ["SAFARI_SUSPICIOUS"]},
+        }]
+        result = self._mobile_only_result(monkeypatch, mobile)
+        narr = result["abduction"]["narrative"]
+        for layer in ("[FIRSTNESS]", "[SECONDNESS]", "[THIRDNESS]"):
+            assert layer in narr
+        # La ausencia del reasoner se declara como diseño, no como error.
+        assert "Motor abductivo v2: NO ejecutado" in narr
+        assert "B-052" in narr
+        assert "Pipeline error" not in narr
+        # FIRSTNESS enriquecido con los hallazgos reales del engine.
+        assert "23 finding(s)" in narr
+        assert "SAFARI_SUSPICIOUS" in narr
+        # Estado consultable en pipeline_meta.
+        assert result["pipeline_meta"]["abductive_reasoner"] == \
+            "NOT_RUN_MOBILE_SINGLE_SOURCE"
+
+    def test_narrative_without_findings_metadata_still_complete(self, monkeypatch):
+        # Señal mobile sin findings_count (engines viejos / metadata parcial):
+        # la narrativa no debe romperse ni inventar hallazgos.
+        mobile = [{"tool": "IOS_FORENSICS", "z_score": 4.0, "confidence": 0.9,
+                   "value": 4.0, "metadata": {"signal_class": "primary"}}]
+        result = self._mobile_only_result(monkeypatch, mobile)
+        narr = result["abduction"]["narrative"]
+        assert "Hallazgos:" not in narr
+        assert "Motor abductivo v2: NO ejecutado" in narr
+        # F6 intacto: z=4 → INTENT, no NOISE.
+        assert result["abduction"]["best_hypothesis"] == "INTENT_DETECTED"
+
+    def test_verdict_and_scoring_unchanged_by_p1(self, monkeypatch):
+        # P1 es solo presentación: hipótesis/posterior idénticos a F6.
+        mobile = [{"tool": "MACOS_FORENSICS", "z_score": 1.6, "confidence": 0.95,
+                   "value": 0.32, "metadata": {"signal_class": "primary"}}]
+        result = self._mobile_only_result(monkeypatch, mobile)
+        ab = result["abduction"]
+        assert ab["best_hypothesis"] == "MOBILE_EVIDENCE_ANALYZED"
+        assert ab["is_conclusive"] is False
+        assert ab["best_posterior"] == "8/25"  # 1.6/5 — igual que pre-P1

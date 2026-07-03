@@ -203,6 +203,10 @@ _VERDICT_TO_RAW: dict[str, str] = {
     "SUSPICION": "ABSTAIN",
     "NOISE":     "BENIGN",
     "UNKNOWN":   "ABSTAIN",
+    # P2-D (Tanda B): el scorer ahora emite ABSTAIN de primera clase
+    # (provenance colapsada). Mapea directo — el clasificador lo resuelve
+    # como ABSTAIN_DEGRADED vía la razón de abajo.
+    "ABSTAIN":   "ABSTAIN",
 }
 
 _ABSTAIN_REASONS: dict[str, str] = {
@@ -213,6 +217,10 @@ _ABSTAIN_REASONS: dict[str, str] = {
     "UNKNOWN": (
         "Insufficient structural support — "
         "more evidence required."
+    ),
+    "ABSTAIN": (
+        "Provenance chain collapsed — evidence trust insufficient to "
+        "assert benignity; re-acquisition required (P2-D)."
     ),
 }
 
@@ -475,7 +483,15 @@ def _vigia_score(case: dict) -> dict:
             raw_score = 0.0
         raw_score = max(0.0, min(1.0, raw_score))
 
+        # B-026 FIX: prior_trust validado con el mismo Finite Math Shield que
+        # raw_score (arriba). Sin este clamp, un prior_trust negativo/NaN/inf
+        # entraba directo a effective = prov_trust × epc × temporal y producía
+        # un trust efectivo imposible (negativo o NaN propagado al veredicto).
         prov_trust = a.get("prior_trust", 1.0)
+        if not isinstance(prov_trust, (int, float)) or isinstance(prov_trust, bool) \
+                or not math.isfinite(prov_trust):
+            prov_trust = 1.0
+        prov_trust = max(0.0, min(1.0, prov_trust))
         chain      = a.get("provenance_chain", [])
         if not isinstance(chain, list):
             chain = []  # B-031: provenance_chain mal tipado — string/dict produce len() incorrecto
@@ -613,8 +629,26 @@ def _vigia_score(case: dict) -> dict:
         "ATTRIBUTION_INCONSISTENCY",
     }
 
+    def _sev_float(raw, default: float = 0.5) -> float:
+        """
+        B-057 FIX: las fracturas del CAIE VIVO llevan severity como
+        decimal.Decimal (aritmética interna de caie.py); las del fallback
+        JSON llevan float. `Decimal * float` crudo → TypeError — crasheaba
+        _vigia_score entero en cuanto CAIE vivo emitía una fractura
+        maliciosa (reproducido con VIGIA-BREAK-016). Misma familia de
+        frontera de tipos que B-024/B-026: coerción + Finite Math Shield
+        en el boundary, nunca aritmética mixta.
+        """
+        try:
+            v = float(raw)
+        except (TypeError, ValueError):
+            return default
+        if not math.isfinite(v):
+            return default
+        return max(0.0, min(1.0, v))
+
     for f in fractures:
-        sev = f.get("severity", 0.5)
+        sev = _sev_float(f.get("severity", 0.5))
         ft  = f.get("fracture_type", "")
         if ft in MALICIOUS_FRACTURE_TYPES:
             fracture_malice_boost += sev * 0.45
@@ -627,7 +661,7 @@ def _vigia_score(case: dict) -> dict:
     # STATISTICAL_UNIFORMITY from the temporal engine (not CAIE) — valid signal
     for v in violations:
         if v.get("type") == "STATISTICAL_UNIFORMITY":
-            fracture_malice_boost += v.get("severity", 0) * 0.35
+            fracture_malice_boost += _sev_float(v.get("severity", 0), 0.0) * 0.35
 
     fracture_malice_boost = min(0.5, fracture_malice_boost)
 
@@ -688,9 +722,20 @@ def _vigia_score(case: dict) -> dict:
         confidence = 0.95
         reason     = "HARD GATE: EFFECT_BEFORE_CAUSE — physical law violation"
     elif provenance_collapsed:
-        verdict    = "NOISE"
-        confidence = _dround(1.0 - mean_effective, 2)
-        reason     = "Provenance chain collapsed, no active fractures — inadmissible under Daubert"
+        # P2-D FIX (Tanda B, PR-B2): antes esta rama emitía NOISE con
+        # confidence = 1 - mean_effective (~0.99) — un veredicto "analizado y
+        # limpio" con 99% de confianza DERIVADA DE LA AUSENCIA de confianza.
+        # Una cadena de custodia colapsada significa "no puedo confiar en
+        # nada de esta evidencia": eso es ABSTAIN ("no puedo determinar"),
+        # nunca benignidad confiada. Misma familia de falso-negativo que
+        # P0-A. El propio reason lo decía: "inadmissible under Daubert" — un
+        # veredicto inadmisible no puede presentarse como NOISE confiado.
+        verdict    = "ABSTAIN"
+        confidence = 0.0
+        reason     = ("PROVENANCE COLLAPSED: effective trust < 0.01 sin "
+                      "fracturas — cadena de custodia insuficiente para "
+                      "afirmar benignidad. Inadmisible bajo Daubert; requiere "
+                      "re-adquisición de la evidencia.")
     elif mean_effective < 0.15 and fractures:
         verdict    = "SUSPICION"
         confidence = _dround(min(0.75, fracture_malice_boost + 0.3), 2)

@@ -546,9 +546,9 @@ mode bundle serialization, enforcing the same R6 check programmatically.
 
 ---
 
-### L-023 — Bundle Save TOCTOU Race (SEC-04)
+### L-023 — Bundle Save TOCTOU Race (SEC-04) [RESOLVED 2026-07-03]
 
-**Affects:** `bundle_builder.py` | **Status:** P0 — fix scheduled post-hackathon
+**Affects:** `bundle_builder.py` | **Status:** RESOLVED — Tanda A (TRIAGE 2026-07-03), tag `pre-tanda-a-20260703-134624`
 
 **Description:** The bundle hash is computed from in-memory content, not from
 disk. Between `f.write()` and hash computation, the file can be swapped via
@@ -563,13 +563,18 @@ Without the key, tampering is detectable post-write. However, the HMAC is
 computed from the same in-memory content, so a TOCTOU at write time affects
 both H2 and H3.
 
-**Post-hackathon fix:** Atomic write via `tempfile.mkstemp()` → `fsync()` →
-`os.replace()`. Hash computed from disk after fsync. See Claude Code audit report
-2026-06-09.
+**Fix applied (2026-07-03, Tanda A — A5):** exactly the scheduled design:
+`BundleBuilder.save()` now writes via `tempfile.mkstemp()` in the target
+directory → `fsync()` → `os.replace()` (atomic publish — no half-written
+bundle is ever visible), the returned hash is computed FROM DISK after the
+replace, and a memory-vs-disk hash divergence raises RuntimeError. Orphan
+tempfiles are cleaned on failure and the previous bundle is left intact if
+the write fails. Tests: `tests/test_tanda_a_triage.py::TestA5AtomicBundleSave`
+(3, including simulated fsync failure).
 
 ---
 
-### L-024 — Forensic Mount Point Allowlist Includes Generic `/mnt`
+### L-024 — Forensic Mount Point Allowlist Includes Generic `/mnt` [RESOLVED 2026-07-03]
 
 **Affects:** `sift_orchestrator.py` PathGuard configuration; any case requiring
 mounted disk images via `ewfmount`/`ntfs-3g` (e.g. VANKO-FALLBACK-002) | **Status:** Design decision
@@ -602,6 +607,15 @@ the path.
 **Roadmap:** Scope the allowlist to a dedicated, VIGÍA-managed mount namespace
 (e.g. a configurable `VIGIA_MOUNT_ROOT`) once SIFT integration defines a
 standard mount convention.
+
+
+**Fix applied (2026-07-03, Tanda B — prefixes approved by the operator):**
+generic `/mnt` removed from the static allowlist. Only existing forensic
+mount points enter, expanded at orchestrator construction from the approved
+prefixes `/mnt/vigia_*`, `/mnt/ewf*` (ewfmount) and `/mnt/evidence`
+(symlinks excluded). Any other mount requires `VIGIA_EVIDENCE_DIR` — the
+documented contract — and its rejection is VISIBLE (PathGuard unanalyzed
+signal, F7). Tests: `TestL024MntPrefixes` (3).
 
 ---
 
@@ -1510,7 +1524,7 @@ model is correct. If multi-source cases are needed, migration path:
 3. The merge order (`{_acq_meta, **sig.metadata}`) already handles this: a module's
    own metadata takes precedence over the centralised fallback.
 
-### L-037b — ARTIFACT_RELIABILITY not propagated to CAIE [PENDING]
+### L-037b — ARTIFACT_RELIABILITY not propagated to CAIE [RESOLVED 2026-07-03]
 
 `ios_forensics.py` and `android_forensics.py` define
 `ARTIFACT_RELIABILITY=Fraction(70,100)`. The value is included in signal metadata
@@ -1520,6 +1534,19 @@ the same base trust as fully verified desktop forensic artifacts.
 
 **Fix path:** `forensic_adapter` should read `artifact_reliability` from signal
 metadata and apply it as a trust modifier.
+
+
+**Fix applied (2026-07-03, Tanda B PR-B2):**
+`ForensicAdapter.signal_to_caie_artifact` now propagates the reliability each
+SIFT engine declares (`metadata["artifact_reliability"]`, Fraction-string) as
+CAIE `base_trust`, clamped to [0,1]; absent/unparseable → 1.0 (previous
+behavior). A forgeable event log no longer weighs the same as a memory dump
+in CAIE. Verified: comparative scorer run over the 198 scored cases → 0
+verdict flips, 0 score moves (this path feeds the orchestrator→CAIE flow,
+not the scorer's JSON adapter). Tests: `TestL037bBaseTrustPropagation` (5,
+ratio-based to isolate propagation from CAIE's own acquisition decays).
+This removes one of the two preconditions of B-041b (CAIE→verdict feedback);
+the remaining one is multi-layer artifacts (B-052-P2).
 
 ---
 
@@ -1622,3 +1649,25 @@ Requires new finding types in `_analyze_sms()`:
 Do not implement without calibration data across more cases — same caution
 as L-033 gamma calibration. A naive price/time/location keyword set risks
 false positives on ordinary scheduling SMS.
+
+
+---
+
+## L-044 — MetabolicProfiler and BehavioralFingerprint do not run in Mode 1 (agent) [DOCUMENTED]
+
+**Affects:** `vigia/inference/metabolic_profiler.py`, `vigia/inference/behavioral_fingerprint.py` | **Status:** documented design limitation (Tanda B, option B)
+
+**Description:** both engines require an `event_stream` (list of event dicts
+with epoch `timestamp`), which the agent never generates (the shim re-maps
+`event_stream` → `event_logs`). They are fully implemented but only reachable
+in Mode 4 / direct API usage.
+
+**Honesty marker:** since Tanda B, `pipeline_meta.engines_not_run_no_event_stream`
+lists them explicitly in every V4 result without an event_stream — "did not
+run by design" is distinguishable from "ran and found nothing"
+(B-052-P1 pattern).
+
+**Future work (PROPUESTA_TANDA_B.md item 7, option A):** feed them from the
+`EventRecord`s already parsed by EventLogCorrelator (`timestamp` epoch int —
+exactly the expected format). Deferred until a case demonstrates forensic
+value over a single evtx.

@@ -483,11 +483,11 @@ Reemplazar cada `assert condicion, mensaje` por `if not condicion: raise Runtime
 
 ---
 
-## B-013 — LOG_VS_MEMORY dispara con raw_score bajo (diseño vs contrato)
+## B-013 — LOG_VS_MEMORY dispara con raw_score bajo (diseño vs contrato) [CERRADO POR DISEÑO]
 
 | Campo | Valor |
 |-------|-------|
-| **Estado** | ABIERTO — decisión de diseño pendiente |
+| **Estado** | CERRADO POR DISEÑO — decisión de Anna, Tanda B (2026-07-03) |
 | **Severidad** | P1 — afecta monotonicidad del sistema |
 | **Archivo** | `vigia/tools/caie.py` — `_extract_assertions()` |
 | **Detectado en** | Sesión post-hackathon 2026-06-25, propiedad-testing |
@@ -539,6 +539,21 @@ Opción C es la más Daubert-compatible: "este log AFIRMA una conexión saliente
 Y la memoria NO LA MUESTRA — eso es una contradicción objetiva, independiente
 de cuán confiable sea el log". La fuerza del hallazgo se modula por severity
 (0.75 sin PID overlap, 0.95 con overlap), no por el raw_score del log.
+
+### Cierre por diseño (Tanda B, decisión de Anna)
+
+Doctrina adoptada: **la contradicción estructural ES la señal** — la
+magnitud individual de los artefactos es irrelevante cuando dos fuentes se
+contradicen. El filtro correcto contra artefactos-basura es el trust de
+adquisición (L-037b, propagación de artifact_reliability a CAIE base_trust —
+mismo commit Tanda B), no un umbral arbitrario de raw_score.
+
+**Caveat registrado (Anna, 2026-07-03):** "No hay FP aún. No encontrados al
+menos — no significa que no haya escenarios que puedan pasar."
+**Condición de reapertura:** si aparece un FP real de golden rule con
+artefactos débiles POST-L-037b, reabrir con la opción A del
+PROPUESTA_TANDA_B.md ítem 8 (umbral `GOLDEN_RULE_MIN_SCORE`), calibrado con
+ese caso como dato.
 
 ---
 
@@ -672,11 +687,11 @@ sobre superficie ya cubierta.
 
 ---
 
-## B-016 — memory_forensics.py no valida formato de imagen de memoria (VMware vs RAM dump puro)
+## B-016 — memory_forensics.py no valida formato de imagen de memoria (VMware vs RAM dump puro) [PARCIALMENTE MITIGADO]
 
 | Campo | Valor |
 |-------|-------|
-| **Estado** | ABIERTO |
+| **Estado** | PARCIALMENTE MITIGADO — camino operativo cubierto; pendiente en motor V4 |
 | **Severidad** | P2 — produce error poco informativo en lugar de diagnóstico claro |
 | **Archivo** | `vigia/sift/memory_forensics.py` (o el caller que invoca Volatility3) |
 | **Detectado en** | Sesión 2026-06-27 |
@@ -709,12 +724,41 @@ Agregar detección de formato antes de invocar Volatility3:
 3. Documentar la limitación en `KNOWN_LIMITATIONS.md` si no se puede resolver
    en el scope actual.
 
+### Actualización (2026-07-03, triage)
+
+El adaptador vol3 del shim — el camino que realmente corre en modo agente —
+ya detecta el caso (stderr: InvalidAddressException / no valid kernel / …) y
+emite `FORMAT_NOT_SUPPORTED` → ABSTAIN. Pendiente solo: portar el mismo
+detector a `memory_forensics.py` (motor V4, requiere binario `vol`). Tanda B.
+
 ---
 
-## B-017 — `defusedxml` ausente en el venv produce PIPELINE_ERROR silencioso
+## B-017 — `defusedxml` ausente en el venv produce PIPELINE_ERROR silencioso [RESUELTO]
 
 | Campo | Valor |
-|-------|-------|
+|
+### Actualización de cierre (2026-07-03, Tanda A — T-1/T-2)
+
+El triage amplió el alcance real del bug:
+- **T-1**: el `raise ImportError` a nivel de módulo en
+  `event_log_correlator.py` mataba el paquete `vigia.sift` ENTERO (los 14
+  motores V4, vía el import incondicional de `vigia/sift/__init__.py:19`) —
+  no solo el análisis de event logs. `[REPRODUCIDO]`
+- **T-2**: el gatillo real: `defusedxml` estaba en `requirements.txt` y
+  `pyproject.toml` pero NO en `requirements-ci.txt` — un entorno CI arrancaba
+  sin él.
+
+Fix aplicado:
+1. `requirements-ci.txt`: agregado `defusedxml>=0.7.1`.
+2. `event_log_correlator.py`: import GUARDED (`ET = None`); sin defusedxml
+   los archivos XML/EVTX se marcan `UNANALYZED_ARTIFACT` (→ ABSTAIN) y el
+   resto de los motores opera. La protección XXE se mantiene: NUNCA se cae a
+   `xml.etree` — sin defusedxml simplemente no se parsea XML.
+3. Tests: `tests/test_tanda_a_triage.py::TestA1DefusedxmlResilient` (4) —
+   incluye subproceso con defusedxml bloqueado que verifica que
+   `vigia.sift` importa y el orquestador se construye.
+
+-------|-------|
 | **Estado** | ABIERTO |
 | **Severidad** | P2 — el agente sella el bundle con veredicto `PIPELINE_ERROR` en lugar de abortar con diagnóstico claro |
 | **Archivo** | `vigia/sift/` (orquestador real) — el import de `defusedxml` falla en runtime |
@@ -771,11 +815,11 @@ pip install defusedxml>=0.7.1
 
 ---
 
-## B-018 — Volatility3 subprocess timeout en `vigia_agent.py` para dumps grandes (≥4 GB)
+## B-018 — Volatility3 subprocess timeout en `vigia_agent.py` para dumps grandes (≥4 GB) [PARCIALMENTE MITIGADO]
 
 | Campo | Valor |
 |-------|-------|
-| **Estado** | ABIERTO |
+| **Estado** | PARCIALMENTE MITIGADO — timeout total ya degrada a ABSTAIN honesto |
 | **Severidad** | P1 — el pipeline sella un bundle con 0 señales sin advertir que Volatility3 no terminó |
 | **Archivo** | `vigia/pipeline/` / `vigia_agent.py` (orquestador de subprocess vol3) |
 | **Detectado en** | Sesión 2026-06-27, batch NARCOS SRL-2018, 12 dumps ≥4 GB |
@@ -845,6 +889,13 @@ Y usar esos resultados como contexto para `reason_with_llm` en modo Claude Code.
 Los bundles `NARCOS-*_claude.json` en `results/srl2018/` están afectados por este bug.
 Los bundles `NARCOS-*_bundle.json` (corridos con timeout suficiente) son los
 archivos de referencia para el análisis forense de esta sesión.
+
+### Actualización (2026-07-03, triage)
+
+Post P1-D: si TODOS los plugins timeoutean → `UNANALYZED_ARTIFACT` → ABSTAIN
+(no benigno, no crash). Pendiente para completar el análisis en dumps
+grandes: `VIGIA_VOL3_TIMEOUT` (env var) + escalado por tamaño de imagen,
+registrando el timeout usado en `pipeline_meta`. Tanda B.
 
 ---
 
@@ -1340,11 +1391,11 @@ assert epc == Fraction(1, 10)
 
 ---
 
-## B-025 — Architectural investigation: `Fraction` vs `float` boundary in scorer (OPEN)
+## B-025 — Architectural investigation: `Fraction` vs `float` boundary in scorer [CERRADO — subsumido]
 
 | Campo | Valor |
 |-------|-------|
-| **Estado** | ABIERTO — investigation required, no patch yet |
+| **Estado** | CERRADO — subsumido por AUDITORIA_L040_LIKELIHOOD_RATIO.md §4 (2026-07-03) |
 | **Severidad** | P2 — architectural debt, not a functional bug |
 | **Archivo** | `vigia_scorer.py` |
 | **Función** | `_dround()`, `_dsum()`, and scoring formula path |
@@ -1418,13 +1469,22 @@ Before any refactoring of `_dround()`, `_dsum()`, or the scoring formulas:
 
 This investigation is a prerequisite for any future L-021 Phase 3 work on this file.
 
+### Cierre (2026-07-03)
+
+La investigación pedida existe: `AUDITORIA_L040_LIKELIHOOD_RATIO.md` §4 mapea
+los 7 paths float del camino de veredicto (U1-U7) con estado de cobertura,
+divergencias medidas (~1 ulp, sin acumulación) y plan de de-floateo por
+tablas (patrón `_EXP_NEG2_TABLE` del scorer / `security.py` P1-005), con U7
+(record_hash cross-plataforma) como prioridad. Trabajo restante trackeado en
+la Tanda B del TRIAGE_BUGS_LIMITACIONES_20260703.md.
+
 ---
 
-## B-026 — `prior_trust` not validated at scorer boundary — negative values produce impossible states
+## B-026 — `prior_trust` not validated at scorer boundary — negative values produce impossible states [RESUELTO]
 
 | Campo | Valor |
 |-------|-------|
-| **Estado** | ABIERTO — fix pending, design decision required |
+| **Estado** | RESUELTO — Tanda A (TRIAGE 2026-07-03) |
 | **Severidad** | P1 — produces `confidence > 1.0` and incorrect `NOISE` verdict |
 | **Archivo** | `vigia_scorer.py` |
 | **Función** | EPC / provenance trust scoring path |
@@ -1516,13 +1576,26 @@ The Daubert principle favors Option B: a pipeline that halts on invalid input is
 forensically defensible than one that silently produces a wrong answer. Implement
 Option B at line 474 before the trust computation begins.
 
+### Cierre (2026-07-03, Tanda A — A2)
+
+Clamp con el mismo Finite Math Shield que `raw_score` dos líneas arriba:
+no-numérico/NaN/inf → 1.0 (default neutro); después `max(0, min(1, v))`.
+Aplicado en el scorer VIVO (`vigia_scorer.py:478`, raíz) y también en la
+copia `vigia/core/vigia_scorer.py`. **Hallazgo colateral T-6 (nuevo,
+B-055):** la copia `vigia/core/vigia_scorer.py` está stale y divergente —
+referencia `_EPC_FACTOR_TABLE` sin definirla (NameError latente en
+`_vigia_score` para toda cadena no-BROKEN) y ya estaba flaggeada como "stale
+and unused" por el patch r7 (2026-06-19). Ver B-055.
+Tests: `TestA2PriorTrustClamp` (9) — negativos, NaN, ±inf, string, None,
+clamp >1, y control de que valores válidos no cambian.
+
 ---
 
-## B-027 — `is_conclusive=True` semantically incompatible with `ABSTAIN_DETECTED`
+## B-027 — `is_conclusive=True` semantically incompatible with `ABSTAIN_DETECTED` [RESUELTO]
 
 | Campo | Valor |
 |-------|-------|
-| **Estado** | ABIERTO |
+| **Estado** | RESUELTO — Tanda A (TRIAGE 2026-07-03) |
 | **Severidad** | P1 — semantic contradiction in sealed bundle |
 | **Archivo** | `sift_orchestrator.py` |
 | **Función** | EBS path (line 195) and vol3 path (line 340) |
@@ -1590,13 +1663,26 @@ Alternatively, compute `is_conclusive` after `hypothesis` is determined and appl
 the gate there. Either formulation prevents the contradiction. The fix is one line
 per path.
 
+### Cierre (2026-07-03, Tanda A — A3)
+
+1. Adaptador EBS (`sift_orchestrator.py`, shim): `is_conclusive` ahora exige
+   además `"ABSTAIN" not in hypothesis and "UNDETERMINED" not in hypothesis`.
+   (Las líneas citadas originalmente, 195/340, hoy son ~606/794 — T-5.)
+2. Path vol3: anotado (su escalera de hipótesis nunca produce ABSTAIN; los
+   paths UNANALYZED/FORMAT_NOT_SUPPORTED ya emitían False explícito).
+3. Guard central en `vigia_agent._seal_bundle`: cualquier camino futuro que
+   selle veredicto ABSTAIN con `is_conclusive=True` se degrada a False con
+   anotación `is_conclusive_downgraded` — cierra la clase entera.
+Tests: `TestA3IsConclusiveCoherent` (3), incluye control de que MALICE
+conclusivo legítimo no se degrada.
+
 ---
 
-## B-028 — `is_conclusive=True` silently ignored for all verdicts except `MALICE`
+## B-028 — `is_conclusive=True` silently ignored for all verdicts except `MALICE` [RESUELTO]
 
 | Campo | Valor |
 |-------|-------|
-| **Estado** | ABIERTO |
+| **Estado** | RESUELTO — Tanda B opción A (aprobada 2026-07-03) |
 | **Severidad** | P2 — flag has no observable effect outside MALICE path |
 | **Archivo** | `vigia_agent.py` |
 | **Función** | Post-scoring agent action dispatch |
@@ -1653,6 +1739,16 @@ it from SUSPICION, NOISE, and ABSTAIN bundles entirely. Update all callers.
 Option B is lower risk and more honest about the current behavior. Option A is
 more architecturally complete but requires non-trivial design work per verdict.
 Document the decision in the orchestrator before implementing either option.
+
+### Cierre (Tanda B, opción A — aprobada por Anna)
+
+Semántica definida y documentada (docstring de `classify_agent_verdict`):
+el flag modula (1) el gate de corroboración <3 primarias y (2) el piso del
+nivel de alerta — MALICE conclusivo (existente) e INTENT conclusivo (nuevo:
+LOW → MEDIUM, "a conclusive intent finding cannot present as LOW"); es
+informativo para NOISE/SUSPICION; incompatible con ABSTAIN (guard B-027).
+Sin flips de veredicto/exit code: el alert no alimenta classify.
+Tests: `TestB028IntentAlertFloor` (3).
 
 ---
 
@@ -1746,11 +1842,11 @@ impacto forense Daubert, y estado del fix.
 
 ---
 
-## B-029 — `quadripartite.py` Check 3 `else` branch is dead code (`ABSTAIN_CONTRADICTION` unreachable for non-OSCIL reasons)
+## B-029 — `quadripartite.py` Check 3 `else` branch is dead code (`ABSTAIN_CONTRADICTION` unreachable for non-OSCIL reasons) [CERRADO]
 
 | Campo | Valor |
 |-------|-------|
-| **Estado** | ABIERTO — documentation only, no patch needed |
+| **Estado** | CERRADO — 2026-07-03 (la propia entrada declara: documentation only, no patch needed) |
 | **Severidad** | P3 — dead code, no functional impact |
 | **Archivo** | `vigia/verdict/quadripartite.py` |
 | **Función** | `classify()` — Check 3 ABSTAIN branch |
@@ -2328,6 +2424,19 @@ y Decimal coinciden.
 decisión (posterior ~ 0.55 o 0.75) Y esos z_scores tienen representaciones IEEE 754
 problemáticas.
 
+### Actualización (2026-07-03, Tanda B — U7/U3 del mapa §4 de AUDITORIA_L040)
+
+- **U7 cerrado (PR-B1):** `ForensicRecord.record_hash()` cuantiza los floats
+  (Decimal 1e-6 ROUND_HALF_EVEN) antes de hashear — estable cross-arquitectura
+  (bit 52 x86/ARM). El to_dict() de display no cambia.
+- **U3 cerrado (PR-B2):** `trust_fusion.compute_temporal_trust_factor` usa la
+  tabla precomputada `_EXP_NEG2_TABLE` (buckets 0.05, réplica del scorer) en
+  vez de `math.exp` nativa. Nota: la bucketización cambia el factor hasta ~5%
+  para severidades entre buckets — corrida comparativa: 0 flips, 0 moves (el
+  corpus no ejercita este camino; el consumidor es la tool MCP trust_fusion).
+- Restantes del mapa (U1 sigmoide H28, U4 LSE de eml_gci, U5, U6): tolerados
+  (~1 ulp, sin acumulación, medido) — sin cambio de estado.
+
 ---
 
 ## B-045 — AndroidForensicsEngine y iOSForensicsAnalyzer nunca invocados [FIXED]
@@ -2422,28 +2531,64 @@ exit code 0.
 
 ---
 
-## B-047 — _build_correlation_groups() retorna List[List[int]], noisy_or_correlated espera Dict[int, Set[int]] [PENDING]
+## B-047 — _build_correlation_groups() retornaba List[List[int]], noisy_or_correlated espera Dict[int, Set[int]] [RESUELTO]
 
 | Campo | Valor |
 |-------|-------|
-| **Estado** | PENDING |
-| **Severidad** | LATENTE — no explota con el corpus actual |
-| **Archivos afectados** | `vigia/sift/android_forensics.py`, `vigia/sift/ios_forensics.py`, `vigia/sift/macos_forensics.py` |
+| **Estado** | RESUELTO — commit `d8ce147` (2026-07-01) |
+| **Severidad** | LATENTE → cerrado antes de explotar con corpus grande |
+| **Archivos** | `vigia/sift/_math_utils.py`, `android_forensics.py`, `ios_forensics.py`, `macos_forensics.py`, `google_takeout_forensics.py` |
+| **Tag de restauración** | `pre-b047-correlation-groups-20260701` |
+| **Detectado en** | Sesión 2026-06-30 |
+| **Corregido** | 2026-07-01 |
+| **Auditoría de cierre** | `AUDITORIA_B047_CORRELATION.md` (2026-07-03) |
 
 ### Descripción
 
-`_build_correlation_groups()` en los tres módulos retorna `List[List[int]]` pero
-`noisy_or_correlated()` (en `vigia/core/noisy_or.py`) espera `Dict[int, Set[int]]`.
+Android/iOS/macOS retornaban `List[List[int]]`; takeout tenía el formato
+correcto `Dict[int, Set[int]]`. El consumidor `noisy_or_correlated()` vive en
+`vigia/sift/_math_utils.py:219` (la entrada [PENDING] original citaba
+`vigia/core/noisy_or.py`, que no existe). No explotaba con el corpus de
+entonces porque ningún caso producía >=2 findings con el mismo corr_group en
+los módulos afectados (Owl-Android: 1 finding → lista vacía → falsy → salta
+el bloque de correlación).
 
-No explota actualmente porque ningún caso del corpus produce >=2 findings con el
-mismo `corr_group` en estos módulos. Si se agrega evidencia con correlación cruzada
-entre findings, la llamada fallará con TypeError.
+**Modo de fallo pre-fix confirmado (2026-07-01, grep sobre repo vivo):**
+`sorted(correlation_groups.items())` sobre lista no vacía →
+`AttributeError: 'list' object has no attribute 'items'` (no TypeError, como
+decía la entrada original) → crash de `analyze()` en cualquier caso real con
+findings correlacionados. Fail-loud accidental, no corrupción silenciosa de
+score — el composite nunca se computó con el formato inválido.
 
-### Acción requerida
+### Fix aplicado
 
-Alinear el tipo de retorno de `_build_correlation_groups()` en los tres módulos con
-la firma esperada por `noisy_or_correlated()`, o adaptar `noisy_or_correlated()` para
-aceptar ambos formatos.
+1. Helper canónico `build_correlation_groups(List[str]) -> Dict[int, Set[int]]`
+   en `_math_utils.py:255`, junto a su único consumidor. Semántica exacta de la
+   implementación de referencia de takeout (peers sin self, solo grupos >= 2,
+   tags vacíos ignorados).
+2. Los 4 módulos delegan al helper — elimina la cuadruplicación que originó
+   el bug. Los 5 motores Windows nunca estuvieron afectados (dict inline).
+3. Guard fail-loud en `noisy_or_correlated` (`_math_utils.py:225-230`):
+   `TypeError` explícito si `correlation_groups` no es dict ni None (raise,
+   no assert — criterio B-011/B-023/B-026 opción B). Reemplaza el
+   AttributeError opaco y hace imposible reintroducir el formato viejo en
+   silencio.
+
+### Verificación
+
+17 tests en `vigia/tests/test_b047_correlation_groups.py` (semántica
+del helper, equivalencia contra la implementación de referencia congelada,
+delegación de los 4 módulos, monotonía correlado<=independiente, guard).
+Suite completa post-fix: 205 passed, 6 xfailed, 0 regresiones.
+grep: 0 ocurrencias de List[List[int]] en código de módulos SIFT; 4 delegaciones.
+
+**Gatillo real verificado post-cierre (2026-07-03):** la condición "ningún
+caso produce >=2 findings correlacionados" quedó obsoleta al descargar
+`cases/tuck-2019-macos` — produce 23 findings `corr_group="browser_suspicious"`
+y ejercita el path correlacionado completo: `composite_score = 19/20`, sin
+crash. Pre-fix, ese caso habría reventado `MacOSForensicsAnalyzer.analyze()`
+con AttributeError (la combinación B-048 wiring + tuck-2019 lo habría
+explotado en producción). Ver `AUDITORIA_B047_CORRELATION.md` §3.
 
 ---
 
@@ -2693,3 +2838,231 @@ Caso real `evidence/owl-2019-hd1-windows` (VIGIA-OWL-2019-HD1-WINDOWS-V5):
 - Exit code: 3 (INTENT/SUSPICION DETECTED)
 
 Restore tag: `pre-eventlog-fix-<timestamp>`
+
+---
+
+## B-051 — likelihood_ratio.py: math.exp(combined_log_lr) sin guard → OverflowError [FIXED]
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | CORREGIDO — 2026-07-03 |
+| **Severidad** | P1 — crash determinista (DoS) de la Segundidad de Mode 4 |
+| **Archivo** | `vigia/core/likelihood_ratio.py` (paso 5 de `infer()`) |
+| **Detectado** | AUDITORIA_L040_LIKELIHOOD_RATIO.md §2.3 (análisis formal de L-040) |
+| **Tag de restauración** | `pre-b051-overflow-20260703-041212` |
+
+### Descripción
+
+`lr_combined = math.exp(combined_log_lr)` no acotaba el argumento.
+`combined_log_lr` es una suma no acotada (`Σ (z²/2)·conf × correction`) y
+`math.exp` desborda con argumento > ~709.78 (límite float64). Umbrales exactos
+reproducidos por bisección:
+
+- Engine base (`z_cap=3.0`): **≥158 señales** z=3, conf=1 (158×4.5 = 711).
+- Adaptador de `pipeline.py` (`z_cap=10.0` por defecto, `Z_CLIP_MAX=5.0`):
+  **≥57 señales** z=5, conf=1 (57×12.5 = 712.5). El clamp ±20 del adaptador
+  (`likelihood_engine.py`) llegaba tarde: `super().infer()` ya había crasheado.
+
+Resultado: `OverflowError: math range error` → la fase de Segundidad de
+Mode 4 (`pipeline.py`) muere con excepción, no con ABSTAIN. Un caso de batch
+grande con señales de alta z (el corpus ya tiene VIGIA-BREAK-014 con 101
+artefactos) o un adversario que inyecte señales tenía un DoS determinista.
+
+### Fix
+
+Clamp del argumento a `±LOG_LR_EXP_CAP = 700.0` antes de `math.exp`:
+
+- `|combined_log_lr| ≤ 700` → resultado **bit a bit idéntico** al previo
+  (ningún input que funcionaba cambia).
+- `combined_log_lr > 700` → `lr = exp(700) ≈ 1.01e304`, `posterior = 1.0`,
+  etiqueta ENFSI `very strong` — evidencia abrumadora saturada honestamente,
+  no un crash. La saturación queda documentada en `ForensicRecord.notes`
+  (`[B-051: combined_log_lr=... > 700 — argumento de exp saturado...]`) para
+  Daubert.
+- Ventana `(700, 709.78]` (n=156-157 con z=3): antes producía un exp finito
+  gigante, ahora satura en `exp(700)`. Posterior, etiqueta ENFSI y toda salida
+  relevante al veredicto son idénticos; solo cambia el `lr_combined` crudo del
+  registro, con nota.
+
+### Validación
+
+- `tests/test_b051_overflow_guard.py` — 7 tests con los umbrales exactos:
+  158×z=3 y 57×z=5 (adaptador) retornan finito con posterior=1.0 y nota
+  B-051; log_lr ≤ 700 bit a bit intacto; record_hash sigue computable.
+- Suite completa y corpus `run_all_agent.py` 198/198 sin regresiones
+  (ver commit).
+
+---
+
+## B-052 — Motores mobile/macOS: señal única agregada puentea el AbductiveReasoner [P1 FIXED / P2 PENDING]
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | P1 (narrativa honesta) FIXED — 2026-07-03; P2 (granularidad) PENDING |
+| **Severidad** | MEDIA — la narrativa Peircean del motor v2 es inalcanzable para evidencia mobile por diseño |
+| **Archivos** | `sift_orchestrator.py` (shim, ruta mobile-only); P2: `vigia/sift/{macos,ios,android,google_takeout}_forensics.py` |
+| **Detectado en** | `AUDITORIA_MACOS_NARRATIVA.md` (2026-07-03) |
+| **Tag de restauración** | `pre-b052-p1-20260703-051457` |
+
+### Descripción
+
+La evidencia mobile/macOS va por la ruta mobile-only del shim, que nunca
+invoca `run_full_analysis` (donde vive el AbductiveReasoner). Además cada
+engine colapsa N findings en UNA `SignalOutput` (escalera de z), y el
+reasoner exige ≥3 señales primarias — aunque se enrutara a V4, no correría.
+Resultado: tuck-2019 (23 findings Safari) produce 1 señal z=1.6, ABSTAIN,
+sin narrativa del motor v2. No es "Pipeline error": es limitación de diseño.
+
+### P1 aplicado (solo presentación, cero cambio de scoring)
+
+- FIRSTNESS de la ruta mobile enriquecido con hallazgos reales por engine
+  (`findings_count` + `finding_types` desde metadata, defensivo).
+- La narrativa declara explícitamente: "Motor abductivo v2: NO ejecutado en
+  esta ruta (adaptador mobile de fuente única)... limitación de diseño
+  documentada (B-052), no un error de pipeline."
+- `pipeline_meta.abductive_reasoner = "NOT_RUN_MOBILE_SINGLE_SOURCE"` —
+  distingue programáticamente "no corrió por diseño" de "corrió y falló".
+- Tests: `TestB052MobileNarrative` (3) en
+  `tests/test_pipeline_robustness_narrative.py`. Hipótesis/posterior
+  verificados idénticos pre/post-P1.
+
+### P2 pendiente (requiere calibración con corpus)
+
+`to_signal()` → `to_signals()`: una señal por dominio de artefacto
+(browser_suspicious / quarantine / antiforensic / persistence /
+encrypted_apps — los corr_group ya marcan las familias), con
+artifact_type/layer propio, y enrutamiento por V4 cuando el conteo ≥3.
+Extender el layer_map del reasoner con layers mobile. **No tocar sin correr
+el corpus completo**: cambia el veredicto de todos los casos mobile
+(tuck-2019 pasaría de ABSTAIN a INTENT/MALICE). Ver
+`AUDITORIA_MACOS_NARRATIVA.md` §4.
+
+---
+
+## B-053 — shim: un pcap corrupto abortaba el caso COMPLETO (T-3) [RESUELTO]
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | RESUELTO — Tanda A (TRIAGE 2026-07-03) |
+| **Severidad** | P1 — pérdida total del análisis en evidencia mixta |
+| **Archivo** | `sift_orchestrator.py` (shim, bloque pcap) |
+| **Detectado en** | TRIAGE_BUGS_LIMITACIONES_20260703.md (T-3) |
+| **Tag de restauración** | `pre-tanda-a-20260703-134624` |
+
+### Descripción
+
+El fallo de parseo pcap (tshark ausente — L-039 — o archivo corrupto) hacía
+`raise`, que caía al `except` global de `analyze()` → `_error_result` →
+**PIPELINE_ERROR para TODO el caso**. En evidencia mixta (pcap + evtx +
+hives), un solo pcap roto descartaba también el análisis de los artefactos
+sanos.
+
+### Fix
+
+Patrón F7: el error se captura, el pcap se materializa como señal sintética
+`PCAP_UNANALYZED` (`unanalyzed=True`, error en metadata), se agrega "pcap" a
+`results.unanalyzed_artifacts` y `pipeline_meta.pcap_error`, y el resto de la
+evidencia CONTINÚA. El veredicto degrada a ABSTAIN solo si no queda ninguna
+otra señal (gates N8/F7 existentes). La sección "ARTEFACTOS NO ANALIZADOS"
+de la narrativa lo muestra.
+
+### Validación
+
+`TestA4PcapDoesNotAbortCase` (2): pcap roto + evtx → hipótesis ≠
+PIPELINE_ERROR, señal PCAP_UNANALYZED presente; control con pcap sano.
+
+---
+
+## B-054 — Fallback de texto muerto: import de módulo inexistente + parser incompatible (F-L040-6) [RESUELTO]
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | RESUELTO — Tanda A (TRIAGE 2026-07-03) |
+| **Severidad** | P2 — red de seguridad que nunca funcionó |
+| **Archivo** | `vigia_agent.py` (`_run_text_pipeline`) |
+| **Detectado en** | AUDITORIA_L040_LIKELIHOOD_RATIO.md (F-L040-6) |
+| **Tag de restauración** | `pre-tanda-a-20260703-134624` |
+
+### Descripción (dos bugs encadenados)
+
+1. `from run_pipeline import run` apuntaba a un módulo que no existe en el
+   root del repo → el fallback de texto SIEMPRE degradaba a
+   PIPELINE_UNAVAILABLE. El módulo real es `vigia/scripts/run_pipeline.py`,
+   con firma idéntica (`run(input_path, output_path, negation_enabled)`).
+2. **Bug latente expuesto al revivirlo:** el pipeline semiótico serializa
+   enteros en formato canónico taggeado (`mi_final = {"num": "29:int",
+   "den": "70:int"}`) y el parser del agente esperaba ints crudos →
+   `TypeError` en `Fraction(mi["num"], max(mi["den"], 1))`. Ese código nunca
+   había corrido contra output real (el import roto lo mantenía muerto).
+
+### Fix
+
+1. Import corregido: `from vigia.scripts.run_pipeline import run` con
+   fallback al import plano para layouts legados.
+2. Decodificador `_tagged_int()` defensivo ("29:int" → 29; ints crudos
+   siguen funcionando; strings inválidos → default).
+
+### Validación
+
+`TestA6TextFallbackAlive` (2): el import resuelve; end-to-end del fallback
+sobre evidencia de texto real → hipótesis ≠ PIPELINE_UNAVAILABLE.
+
+---
+
+## B-055 — vigia/core/vigia_scorer.py: copia stale divergente con NameError latente (T-6) [ABIERTO]
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | ABIERTO — decisión pendiente (eliminar vs re-exportar) |
+| **Severidad** | P2 — trampa para futuros imports; sin impacto en camino vivo |
+| **Archivos** | `vigia/core/vigia_scorer.py` (stale, 523 líneas) vs `vigia_scorer.py` (vivo, 764 líneas) |
+| **Detectado en** | Tanda A (aplicando B-026): `_vigia_score` de la copia core crashea con `NameError: _EPC_FACTOR_TABLE is not defined` para toda cadena de custodia no-BROKEN |
+
+### Descripción
+
+Existen dos copias del scorer. La viva (raíz) tiene `_EPC_FACTOR_TABLE`
+(fix B-019), B-031 y el resto de la evolución; la de `vigia/core/` divergió y
+referencia la tabla sin definirla — **NameError latente** en cuanto alguien
+la importe (los consumidores reales, `vigia_api.py` ×2, importan la raíz).
+Ya estaba flaggeada como "stale and unused" por el patch r7 (2026-06-19) y
+nunca se actuó. El clamp B-026 se aplicó a AMBAS copias por consistencia.
+
+### Propuesta
+
+Eliminar `vigia/core/vigia_scorer.py` o convertirla en re-export de una
+línea (`from vigia_scorer import *`) para que no pueda divergir. Requiere
+verificar que ningún consumidor externo la importe (grep actual: solo
+referencias en comentarios del patch r7). Tanda B.
+
+---
+
+## B-056 — Scorer: provenance colapsada emitía NOISE confiado (P2-D) [RESUELTO]
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | RESUELTO — Tanda B PR-B2 (2026-07-03) |
+| **Severidad** | P1 — familia de falso negativo (incapacidad de análisis presentada como benignidad) |
+| **Archivo** | `vigia_scorer.py` (rama `provenance_collapsed`) |
+| **Detectado en** | AUDITORIA_FALSOS_NEGATIVOS_MODO_AGENTE.md (P2-D), triage 2026-07-03 |
+| **Tag de restauración** | `pre-tanda-b-20260703-141147` |
+
+### Descripción
+
+Con trust efectivo medio colapsado (`mean_effective < 0.01`) y sin fracturas,
+el scorer emitía `NOISE` con `confidence = 1 - mean_effective` (~0.99): un
+veredicto "analizado y limpio" con 99% de confianza **derivada de la ausencia
+de confianza**. El propio reason decía "inadmissible under Daubert". Misma
+familia que P0-A: incapacidad de confiar en la evidencia ≠ benignidad.
+
+### Fix
+
+Rama → `verdict="ABSTAIN"`, `confidence=0.0`, reason explícito (re-adquisición
+requerida). `_VERDICT_TO_RAW`/`_ABSTAIN_REASONS` extendidos para que el
+QuadripartiteClassifier resuelva el ABSTAIN de primera clase (antes: el
+fail-loud de B-023 lo rechazaba con ValueError — correctamente ruidoso).
+
+### Validación
+
+Corrida comparativa sobre los 198 casos con scorer: **0 verdict flips, 0
+score moves** (ningún caso del corpus toca la rama colapsada — el fix protege
+la clase, no re-etiqueta casos). Tests: `TestP2DProvenanceCollapsedAbstain` (2).
