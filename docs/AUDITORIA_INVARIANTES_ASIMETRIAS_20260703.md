@@ -45,13 +45,19 @@ unsupported operand type(s) for *: 'decimal.Decimal' and 'float'` → crash de
 
 - **Invariante violada:** ningún boundary de tipo del path de scoring debe
   mezclar Decimal y float en aritmética cruda (misma familia B-024/B-026).
-- **Escenario:** `[REPRODUCIDO]` con `VIGIA-BREAK-016` (expected MALICE) — el
-  crash enmascaraba el veredicto MALICE correcto: el caso figuraba como
-  `ERROR: TypeError` en el baseline de la Tanda B.
+- **Escenario:** `[REPRODUCIDO]` con `VIGIA-BREAK-016` (expected MALICE). El
+  caso **siempre** devolvió `MALICIOUS_INTENT_DETECTED` / exit code 1,
+  verificado contra el bundle del 15 de junio (analysis_timestamp 01:18 UTC).
+  El crash no enmascaraba el veredicto: el TypeError se activa sólo cuando
+  CAIE emite fracturas maliciosas y el scorer llega a la multiplicación
+  `sev * 0.45` — el path de scoring puede terminar antes si las condiciones
+  de corte se cumplen antes. El fix es **preventivo**, no correctivo de un
+  veredicto erróneo existente: sin él, cualquier caso nuevo donde el scorer
+  alcance esa línea con severity Decimal haría crash.
 - **Fix (commit posterior a Tanda B):** helper `_sev_float()` (coerción +
   Finite Math Shield: `float()`, `isfinite`, clamp [0,1]) en el boundary de
-  fracturas y violations. Comparativa 198 casos: único flip ERROR→MALICE
-  (== expected). Tests: `test_b057_decimal_severity.py` (6).
+  fracturas y violations. Comparativa 198 casos: sin flips de veredicto (el
+  corpus ya era correcto). Tests: `test_b057_decimal_severity.py` (6).
 
 ### B-058 — `ABSTAIN_DETECTED` sellaba NOISE; el batch lo ocultaba (Lente 1/4/6)
 
