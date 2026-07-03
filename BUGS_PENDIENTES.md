@@ -3185,3 +3185,74 @@ no reincidir en la lente 6 (algoritmos duplicados).
 Suite 405 passed, corpus 198/198. Tests: `TestB064AtomicWrites` (4) —
 roundtrip texto/bytes, sin tempfiles huérfanos, y preservación del archivo
 destino cuando la escritura falla a mitad de camino.
+
+---
+
+## B-065 — Agente: "Verdict: MALICE" junto a "LOW — No significant anomalies detected" — el floor B-028 estaba muerto para su población objetivo [RESUELTO]
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | RESUELTO — POST HACKATHON (2026-07-03), opciones A+B aprobadas |
+| **Severidad** | P2 — contradicción interna citable en la narrativa sellada (44/198 bundles del corpus) |
+| **Archivo** | `vigia_agent.py` (`_generate_narrative`, bloque FINAL ALERT LEVEL) |
+| **Alcance** | Modo 1 (agente). Solo narrativa: `agent_verdict`, exit codes y el comparador del corpus no cambian |
+| **Detectado en** | Reporte de Anna (2026-07-03): "cuando el agente corre y el caso es MALICE, dice luego LOW". Reproducido en fresco con `VIGIA-CAN-004` |
+| **Tag de restauración** | `pre-b065-alert-floor-20260703-164437` |
+
+### Descripción
+
+Tres vocabularios que no se hablaban:
+
+1. **El veredicto es categórico, a nivel hipótesis** — `classify_agent_verdict`
+   mira el texto de `best_hypothesis` ("MALICI" → MALICE).
+2. **El alert level era un detector de picos por señal individual** — solo
+   contaba magnitudes (z>3 → CRITICAL; 2<z≤3 → HIGH; si no → LOW). Evidencia
+   *distribuida* (muchas señales chicas coherentes, el patrón de un atacante
+   cuidadoso) → todo z<2 → "LOW — **No significant anomalies detected**", que
+   afirma benignidad dos líneas después de `Verdict: MALICE`.
+3. **El floor B-028 existía para esto pero usaba un proxy** —
+   `is_conclusive=True` + substring de la hipótesis. Los 44 bundles
+   MALICE+LOW del corpus tienen `is_conclusive=False` → el floor nunca
+   disparaba **precisamente en los casos para los que fue escrito**. Misma
+   familia que B-058: una re-derivación paralela del veredicto que diverge
+   del clasificador.
+
+Reproducido con HEAD del día: `VIGIA-CAN-004` → `Verdict: MALICE` (exit 1) +
+"LOW — No significant anomalies detected in this iteration." (4 señales
+primarias z<0.5, posterior 463/10000, `is_conclusive=False`).
+
+### Fix (A+B, aprobado 2026-07-03)
+
+**A)** El piso se calcula sobre el **veredicto final real**:
+`_generate_narrative` llama a `classify_agent_verdict` (el mismo camino único
+que sella `agent_verdict` y decide el exit code — elimina la re-derivación en
+vez de agregar otra). Umbrales de B-028 intactos: MALICE → HIGH si
+`posterior ≥ 1/8`, si no MEDIUM; INTENT → mínimo MEDIUM (ahora también con
+`is_conclusive=False` — antes ese caso quedaba LOW).
+
+**B)** LOW nunca afirma benignidad: "LOW (per-signal magnitude) — no
+individual primary signal exceeds z>2 in this iteration." Y cuando el piso se
+aplica, la narrativa emite una línea de reconciliación explicando que el
+veredicto se sostiene por agregación de hipótesis y cuál era el nivel de
+magnitud por señal.
+
+Docstring de `classify_agent_verdict` actualizado (la semántica 2 de
+`is_conclusive` ya no aplica al piso). Tests de B-028 en `test_tanda_b.py`
+actualizados a la semántica nueva — incluido
+`test_non_conclusive_intent_keeps_low`, que asertaba el comportamiento buggy
+(renombrado a `test_non_conclusive_intent_also_floors`).
+
+### Validación
+
+Suite 405 → **413 passed** (+8 tests nuevos en `tests/test_b065_alert_floor.py`),
+mismos 21 e2e preexistentes del entorno, 6 xfailed. **Corpus 198/198** (el
+comparador lee `agent_verdict`, que no cambia). Corrida fresca de
+`VIGIA-CAN-004` post-fix: MEDIUM con "Alert floored (B-028/B-065)" + línea de
+reconciliación — la contradicción desapareció.
+
+### Nota de causa raíz conexa (pendiente, Tanda C)
+
+Que 44 casos MALICE tengan `is_conclusive=False` y posteriors ~0.05 conecta
+con el leak de `expected_verdict` en el adaptador EBS (ítem Tanda C). Este
+fix elimina la contradicción visible en la narrativa; esa causa raíz sigue
+abierta y es decisión de doctrina.

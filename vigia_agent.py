@@ -143,11 +143,15 @@ def classify_agent_verdict(
     ni intención caía en NOISE (exit 0), incluidos errores de pipeline y
     ausencia de señal. Ahora esos casos abstienen.
 
-    Semántica de is_conclusive (B-028, definida en Tanda B):
+    Semántica de is_conclusive (B-028, definida en Tanda B; ajustada por
+    B-065):
       1. Modula el gate de corroboración de la regla 3 (<3 primarias sin
          conclusión firme → ABSTAIN).
-      2. Modula el piso del nivel de alerta en la narrativa (MALICE
-         conclusivo → HIGH/MEDIUM; INTENT conclusivo → mínimo MEDIUM).
+      2. (B-065) Ya NO modula el piso del nivel de alerta: el piso se
+         calcula sobre el veredicto final que retorna esta función (MALICE
+         → HIGH/MEDIUM según posterior; INTENT → mínimo MEDIUM). El proxy
+         is_conclusive+substring dejaba el piso muerto para evidencia
+         distribuida no-concluyente.
       3. Es informativo para NOISE/SUSPICION.
       4. Incompatible con veredicto ABSTAIN (guard B-027 en _seal_bundle).
     """
@@ -1063,51 +1067,72 @@ class VIGIAAgent:
         elif n_high >= 1:
             alert = "MEDIUM — Moderate anomalies. Additional investigation recommended."
         else:
-            alert = "LOW — No significant anomalies detected in this iteration."
-
-        # Posterior verdict override: if the Bayesian posterior verdict is conclusive MALICE
-        # but individual z-scores are all below threshold (distributed evidence pattern),
-        # floor the alert level to prevent a misleading LOW alongside a MALICE verdict.
-        #
-        # B-028 (Tanda B, opción A): semántica COMPLETA de is_conclusive —
-        # el flag modula exactamente dos cosas: (1) el gate de corroboración
-        # `<3 señales and not is_conclusive → ABSTAIN` en
-        # classify_agent_verdict, y (2) el piso del nivel de alerta (MALICE
-        # abajo, INTENT acá). Para NOISE/SUSPICION es informativo. Un bundle
-        # ABSTAIN nunca puede sellarlo en True (guard B-027 en _seal_bundle).
-        _hypothesis = abduction.get("best_hypothesis", "")
-        _is_conclusive = abduction.get("is_conclusive", False)
-        if (_is_conclusive and "INTENT" in _hypothesis.upper()
-                and "MALICI" not in _hypothesis.upper()
-                and alert.startswith("LOW")):
+            # B-065 (parte B): LOW describe magnitud por señal — no afirma
+            # benignidad. El texto anterior ("No significant anomalies
+            # detected") contradecía un veredicto MALICE dos líneas más abajo.
             alert = (
-                "MEDIUM — Conclusive INTENT verdict with individual z-scores "
-                "below threshold. Alert floored (B-028): a conclusive intent "
-                "finding cannot present as LOW."
+                "LOW (per-signal magnitude) — no individual primary signal "
+                "exceeds z>2 in this iteration."
             )
-        if _is_conclusive and "MALICI" in _hypothesis.upper():
+
+        # B-065 (parte A — supersede el proxy de B-028): el piso del nivel de
+        # alerta se calcula sobre el VEREDICTO FINAL (classify_agent_verdict,
+        # el mismo camino único que sella agent_verdict y decide el exit
+        # code), no sobre is_conclusive + substring de la hipótesis. El proxy
+        # dejaba el piso muerto para evidencia distribuida no-concluyente:
+        # 44 bundles del corpus sellaban "Verdict: MALICE" junto a "LOW — No
+        # significant anomalies detected" (misma familia que B-058: una
+        # re-derivación paralela del veredicto que divergía del clasificador).
+        # Umbrales de B-028 intactos: MALICE → HIGH si posterior ≥ 1/8, si no
+        # MEDIUM; INTENT → mínimo MEDIUM.
+        _n_primary_cls, _n_unanalyzed_cls = _signal_stats(results)
+        _final_verdict = classify_agent_verdict(
+            abduction, _n_primary_cls, _n_unanalyzed_cls
+        )
+        _magnitude_alert = alert
+        if _final_verdict == "MALICE" and (
+                alert.startswith("LOW") or alert.startswith("MEDIUM")):
             _posterior_str = str(abduction.get("best_posterior", "0/1"))
             try:
                 _num, _den = map(int, _posterior_str.split("/"))
-                _posterior_ratio = Fraction(_num, _den)
+                _posterior_ratio = Fraction(_num, max(_den, 1))
             except Exception:
                 _posterior_ratio = Fraction(0, 1)
-            if alert.startswith("LOW") or alert.startswith("MEDIUM"):
-                if _posterior_ratio >= Fraction(1, 8):
-                    alert = (
-                        "HIGH — Conclusive MALICE verdict from Bayesian posterior aggregation. "
-                        "Individual z-scores below threshold (distributed evidence pattern: "
-                        "no single dominant signal, but aggregate posterior is decisive)."
-                    )
-                else:
-                    alert = (
-                        "MEDIUM — Conclusive MALICE verdict from posterior aggregation. "
-                        "Individual z-scores below threshold. Full signal review recommended."
-                    )
+            if _posterior_ratio >= Fraction(1, 8):
+                alert = (
+                    "HIGH — MALICE verdict from Bayesian posterior aggregation. "
+                    "Individual z-scores below threshold (distributed evidence "
+                    "pattern: no single dominant signal, but aggregate posterior "
+                    "is decisive). Alert floored (B-028/B-065)."
+                )
+            else:
+                alert = (
+                    "MEDIUM — MALICE verdict from posterior aggregation. "
+                    "Individual z-scores below threshold. Full signal review "
+                    "recommended. Alert floored (B-028/B-065)."
+                )
+        elif _final_verdict == "INTENT" and alert.startswith("LOW"):
+            alert = (
+                "MEDIUM — INTENT verdict with individual z-scores below "
+                "threshold. Alert floored (B-028/B-065): an intent finding "
+                "cannot present as LOW."
+            )
 
         narrative_parts.extend([
             "--- FINAL ALERT LEVEL ---",
             alert,
+        ])
+        # B-065 (parte B): línea de reconciliación — cuando el veredicto y la
+        # magnitud por señal divergen, la narrativa explica ambos niveles en
+        # vez de imprimirlos contradictorios lado a lado.
+        if alert is not _magnitude_alert:
+            narrative_parts.append(
+                f"Reconciliation: verdict {_final_verdict} rests on "
+                f"hypothesis-level aggregation, not on any single "
+                f"high-magnitude signal. Per-signal magnitude level was: "
+                f"{_magnitude_alert}"
+            )
+        narrative_parts.extend([
             "",
             f"Critical signals (z>3, primary): {n_critical}",
             f"High signals (2<z<=3, primary): {n_high}",
