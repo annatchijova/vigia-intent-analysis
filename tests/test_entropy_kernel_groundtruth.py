@@ -10,11 +10,12 @@ That makes it a high-value target for ground-truth testing — the entropy of a
 known distribution has one correct value, so a numerical regression cannot
 hide behind "looks plausible".
 
-Most tests here PASS and pin the correct behavior. One test
-(TestSignedZeroRegression) currently FAILS on purpose: it documents a real
-determinism defect found while writing these tests. It is left failing — not
-xfail'd — so the defect stays visible in the suite until it is fixed. See its
-docstring for the full analysis.
+Most tests here pin the correct behavior. TestSignedZeroRegression guards
+against BUG-ENTROPY-001, a real determinism defect found while writing these
+tests (the entropy functions returned IEEE-754 -0.0 for zero-entropy inputs,
+which canonicalizes differently from 0.0 and breaks seal reproducibility). It
+is now fixed at the source (+0.0 at the rounded return sites); that class is
+the regression guard. See its docstring for the full analysis.
 """
 from __future__ import annotations
 
@@ -142,14 +143,15 @@ class TestSelfDiagnostics:
 
 
 # ---------------------------------------------------------------------------
-# KNOWN DEFECT — left failing on purpose (do not xfail; see module docstring)
+# REGRESSION GUARD — BUG-ENTROPY-001, now fixed at the source (see class docstring)
 # ---------------------------------------------------------------------------
 
 class TestSignedZeroRegression:
     """
-    BUG-ENTROPY-001 — signed-zero leak breaks seal canonicalization.
+    BUG-ENTROPY-001 (FIXED) — signed-zero leak broke seal canonicalization.
+    This class is now the regression guard for the fix.
 
-    Every zero-entropy input makes entropy_shannon / entropy_normalized /
+    Every zero-entropy input made entropy_shannon / entropy_normalized /
     entropy_rate return -0.0 (IEEE 754 negative zero) rather than 0.0. The two
     are equal under `==`, so it is invisible to normal comparisons, but the
     bundle canonicalizer (vigia/core/bundle_builder._canonicalize) formats
@@ -168,9 +170,9 @@ class TestSignedZeroRegression:
     (proven above). Whether a raw entropy float reaches a sealed bundle field
     unrounded end-to-end is PLAUSIBLE but not yet traced through eml_gci/CAIE.
 
-    Suggested fix: normalize signed zero at the return sites, e.g.
-    `return round(value, _HASH_PRECISION) + 0.0` (adding 0.0 maps -0.0 -> 0.0),
-    or `value if value != 0 else 0.0`.
+    Fix applied: signed zero is normalized at the rounded return sites in
+    entropy_kernel (`round(value, _HASH_PRECISION) + 0.0`, which maps
+    -0.0 -> 0.0). These tests assert every zero-entropy result is +0.0.
     """
 
     @pytest.mark.parametrize(

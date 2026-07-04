@@ -1080,7 +1080,9 @@ def calculate_entropy_profile(text: str) -> Dict[str, float]:
         char_entropy = -sum((c / ctotal) * math.log2(c / ctotal) for c in cfreq.values() if c > 0)
     else:
         char_entropy = 0.0
-    return {"lexical_entropy": lex_entropy, "char_entropy": char_entropy}
+    # +0.0 maps -0.0 -> 0.0: a zero-entropy document must not seal differently
+    # from another (BUG-NLP-001; -0.0 canonicalizes to "-0.00000000").
+    return {"lexical_entropy": lex_entropy + 0.0, "char_entropy": char_entropy + 0.0}
 
 
 class ForensicEngine:

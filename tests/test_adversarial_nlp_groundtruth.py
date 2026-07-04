@@ -11,15 +11,16 @@ which makes it a good ground-truth target: a regression cannot hide behind
 "looks plausible" when the entropy of a known distribution, the OLS slope of a
 known point set, or the syllable count of a known word is fixed by definition.
 
-Most tests here PASS and pin the correct behavior. Two classes are left
-FAILING on purpose (not xfail'd) because they document real defects found while
-writing these tests:
+Most tests here pin the correct behavior. Two classes are regression tests for
+real defects found while writing these tests:
 
-  * TestSignedZeroRegression -> BUG-NLP-001 (signed-zero leak, CONFIRMED)
-  * TestL33tOOVUnreachable    -> BUG-NLP-002 (dead OOV heuristic, CONFIRMED)
+  * TestSignedZeroRegression -> BUG-NLP-001 (signed-zero leak) — FIXED at the
+    source; the class now guards the fix.
+  * TestL33tOOVUnreachable    -> BUG-NLP-002 (dead OOV heuristic) — still OPEN;
+    left FAILING on purpose (not xfail'd) so the defect stays visible until it
+    is fixed (the fix changes tokenizer output and needs threshold revalidation).
 
-See each class docstring for the full analysis and suggested fix. They are left
-failing so the defects stay visible in the suite until fixed.
+See each class docstring for the full analysis and suggested fix.
 """
 from __future__ import annotations
 
@@ -303,16 +304,18 @@ class TestConfigLoader:
 
 
 # ===========================================================================
-# KNOWN DEFECTS — left failing on purpose (do not xfail)
+# REGRESSION GUARDS — BUG-NLP-001 fixed (below); BUG-NLP-002 still open, left
+# failing on purpose (do not xfail)
 # ===========================================================================
 
 class TestSignedZeroRegression:
     """
-    BUG-NLP-001 — signed-zero leak in calculate_entropy_profile.
+    BUG-NLP-001 (FIXED) — signed-zero leak in calculate_entropy_profile. This
+    class is now the regression guard for the fix.
 
     For any input whose word (or character) distribution is degenerate — a
-    single type repeated, e.g. "foo foo foo" — the Shannon sum is
-    -(1.0 * log2(1.0)) == -0.0, so calculate_entropy_profile returns
+    single type repeated, e.g. "foo foo foo" — the Shannon sum was
+    -(1.0 * log2(1.0)) == -0.0, so calculate_entropy_profile returned
     lexical_entropy == -0.0 (IEEE 754 negative zero) instead of 0.0.
 
     -0.0 == 0.0 is True, so it is invisible to normal comparisons, but it is a
@@ -334,9 +337,9 @@ class TestSignedZeroRegression:
     Repro:
       calculate_entropy_profile("foo foo foo")["lexical_entropy"] -> -0.0
 
-    Suggested fix: normalize signed zero at the return site, e.g.
-      lex_entropy = lex_entropy + 0.0   # maps -0.0 -> 0.0
-    or `lex_entropy if lex_entropy != 0 else 0.0`, and likewise for char_entropy.
+    Fix applied: signed zero is normalized at the return site of
+    calculate_entropy_profile (lexical_entropy + 0.0, char_entropy + 0.0, which
+    map -0.0 -> 0.0). These tests assert the degenerate result is +0.0.
     """
 
     @pytest.mark.parametrize("text", ["foo foo foo", "aaa"])
