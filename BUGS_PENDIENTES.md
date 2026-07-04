@@ -3553,3 +3553,111 @@ Solo camino scorer (Modo 4 / EBS-JSON / `vigia_api`). El agente (Modo 1) no
 pasa por `_vigia_score`. B-068 (gate) queda subsumido y refactorizado sobre el
 mismo registro. Pendiente futuro: extender `evidence_role` al registro
 unificado completo de B-060 (layer+ontology+profile+role en una sola fuente).
+
+---
+
+## B-072 — Mobile: conflación "no-parseable == vacío" escalaba el veredicto [RESUELTO]
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | RESUELTO — POST HACKATHON (2026-07-04) |
+| **Severidad** | P1 — falso INTENT/MALICE (familia P0-A: incapacidad de análisis presentada como señal) |
+| **Archivo** | `ios_forensics.py::_analyze_contacts`, `android_forensics.py::_analyze_contacts` + `_analyze_call_log` |
+| **Detectado en** | AUDITORIA_COBERTURA_MOBILE_SIFT §D |
+| **Tag** | `pre-p1-mobile-verdict-20260704-022839` |
+
+**Descripción:** cuando la tabla esperada no existía (schema desconocido), el
+`OperationalError` se tragaba y el contador quedaba en su default 0 → se emitía
+`EMPTY_CONTACTS`/`EMPTY_CALL_LOG` → alimentaba `data_minimization` → escalaba el
+veredicto. Un fallo de parseo inocente se puntuaba idéntico a una agenda
+deliberadamente borrada.
+
+**Verificación §4.1 (audit-before-patch):** de los 4 métodos que el audit
+señaló, solo 3 tenían el bug. `ios_forensics::_analyze_call_history` YA hacía
+`return` en el `except` antes de emitir EMPTY — falso positivo del audit,
+rechazado sin tocar.
+
+**Fix:** flag `parsed` — `EMPTY_*` se emite solo si el conteo fue EXITOSO y dio
+0. Un fallo de parseo deja `analysis_note` (rastro para ABSTAIN) y NO escala.
+
+**Validación:** `tests/test_b072_b074_mobile_verdict_fixes.py` (5 de B-072):
+schema desconocido no emite EMPTY; tabla vacía real sí. Suite 455→485, corpus 198/198.
+
+---
+
+## B-073 — iOS: has_phishing computado pero nunca usado en la escalera (rama muerta) [RESUELTO]
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | RESUELTO — POST HACKATHON (2026-07-04) |
+| **Severidad** | P2 — detección viva pero sin efecto en el veredicto |
+| **Archivo** | `vigia/sift/ios_forensics.py::to_signal` |
+| **Detectado en** | AUDITORIA_COBERTURA_MOBILE_SIFT §A |
+
+**Descripción:** `has_phishing` (finding_type `SMS_PHISHING_RECEIVED`, emitido de
+verdad por `_analyze_sms`) se computaba pero nunca entraba a la escalera z → un
+caso de phishing puro caía al piso genérico 1.2.
+
+**Fix:** rama `elif has_phishing: z=1.6`. Es una señal PASIVA (phishing recibido,
+le pasó al usuario, no la generó él) → pesa menos que la búsqueda ACTIVA de
+exploits (has_hacking_search=1.8) y por sí sola no alcanza SUSPICION (>2). El
+tier 1.6 es decisión de calibración conservadora, abierta a ajuste (familia
+L-033/B-069).
+
+**Validación:** 2 tests — phishing lifts z sobre el piso genérico; phishing solo ≤2.
+
+---
+
+## B-074 — macOS: has_sip_disabled siempre False → ramas de veredicto muertas [RESUELTO]
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | RESUELTO — POST HACKATHON (2026-07-04). Decisión de Anna: VIGÍA debe detectar SIP disabled desde chequeo real. |
+| **Severidad** | P1 — escalación anti-forense inalcanzable |
+| **Archivo** | `vigia/sift/macos_forensics.py` (`_detect_sip_status` nuevo + wire en `analyze`) |
+| **Detectado en** | AUDITORIA_COBERTURA_MOBILE_SIFT §A (confirmado empíricamente: `SIP_DISABLED` solo aparecía donde se lee) |
+
+**Descripción:** `to_signal` lee `has_sip_disabled` (finding_type `SIP_DISABLED`)
+en dos ramas anti-forenses (z=3.4 y z=2.4), pero NINGÚN analyzer emitía ese
+finding → ramas estructuralmente MUERTAS. Un macOS con SIP deshabilitado +
+tooling anti-forense nunca recibía la escalación codificada para ese escenario.
+
+**Fix:** `_detect_sip_status` — fuente autoritativa es la NVRAM
+`csr-active-config`; cuando la adquisición no capturó NVRAM, la señal
+filesystem-tractable es un `csrutil disable` / `csrutil enable --without` en un
+shell history (acción inequívoca de debilitar SIP, MITRE T1562.001). Emite
+`SIP_DISABLED` → las ramas dejan de estar muertas. Degradación honesta (§5.3):
+sin ninguna fuente, SIP status queda "undetermined" (note), nunca
+asumido-habilitado. NVRAM `csr-active-config` parsing queda como trabajo futuro.
+
+**Nota de doctrina (para Anna):** ambas ramas exigen `has_sip_disabled AND
+has_antiforensic`. Disable-SIP es en sí anti-forense (T1562.001); si se quiere
+que SIP-disabled escale por sí solo, habría que hacer que el finding también
+satisfaga `has_antiforensic` — decisión de doctrina, no aplicada.
+
+**Validación:** 3 tests — csrutil-disable en history emite SIP_DISABLED; sin
+evidencia no emite pero deja note; SIP_DISABLED+ANTIFORENSIC revive la rama
+z=2.4. Suite 485, corpus 198/198.
+
+---
+
+## B-071 — Mobile: acceso SQLite de evidencia read-only + immutable (S1) [RESUELTO]
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | RESUELTO — POST HACKATHON (2026-07-04) |
+| **Severidad** | P1 — escritura en evidencia (viola invariante read-only) + DB vacía silenciosa |
+| **Archivo** | `vigia/sift/_sql_utils.py` (nuevo) + los 3 `_safe_sqlite_connect` |
+| **Detectado en** | AUDITORIA_COBERTURA_MOBILE_SIFT §C / patrón sistémico S1 |
+
+**Descripción:** los 3 `_safe_sqlite_connect` abrían `sqlite3.connect(str(path))`
+read-WRITE. Una DB con WAL/journal sucio dispara auto-recovery que escribe
+`-wal`/`-journal` de vuelta en `VIGIA_EVIDENCE_DIR` (viola invariante #1) y un
+path inexistente CREA una DB vacía (0 hallazgos lee limpio). Ambos verificados
+empíricamente.
+
+**Fix:** helper compartido `safe_sqlite_connect` con URI
+`file:...?mode=ro&immutable=1` — cero escrituras, se niega a crear/recuperar.
+Una implementación (no tres copias), un test de contrato. Cierra S1.
+
+**Validación:** `tests/test_b071_sqlite_readonly.py` (10). Suite 485, corpus 198/198.

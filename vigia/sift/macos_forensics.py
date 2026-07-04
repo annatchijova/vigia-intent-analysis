@@ -275,6 +275,10 @@ class MacOSForensicsAnalyzer:
         # 1. System identification — version, hostname, owner
         self._identify_system(evidence_path, result)
 
+        # 1b. SIP status (B-074) — emit SIP_DISABLED from a real check so the
+        # anti-forensic escalation branches in to_signal are no longer dead.
+        self._detect_sip_status(evidence_path, result)
+
         # 2. Safari history (SQLite — same schema as iOS Safari)
         for db in self._safe_rglob(evidence_path, "History.db", limit=5):
             # Only process Safari History.db, not Chrome/other browsers
@@ -406,6 +410,56 @@ class MacOSForensicsAnalyzer:
                 result.analysis_notes.append(
                     f"SystemVersion.plist: could not parse {sv}: {e}"
                 )
+
+    # ── SIP (System Integrity Protection) ───────────────────────────────────
+
+    _SIP_DISABLE_RE = re.compile(r"csrutil\s+(disable|enable\s+--without)", re.IGNORECASE)
+
+    def _detect_sip_status(self, evidence_path: Path, result: MacOSAnalysisResult) -> None:
+        """Detect evidence that SIP (System Integrity Protection) was
+        disabled/weakened, and emit a SIP_DISABLED finding.
+
+        B-074: to_signal() reads has_sip_disabled (finding_type == "SIP_DISABLED")
+        in two anti-forensic escalation branches, but NO analyzer ever emitted
+        that finding — the branches (z=3.4 and z=2.4) were structurally DEAD. A
+        macOS host with SIP disabled + anti-forensic tooling never received the
+        escalation coded for exactly that scenario.
+
+        Authoritative source is the NVRAM csr-active-config flag; when the
+        acquisition did not capture NVRAM, the tractable filesystem signal is a
+        `csrutil disable` / `csrutil enable --without ...` command in a shell
+        history — an unambiguous SIP-weakening action (MITRE T1562.001, Impair
+        Defenses). NVRAM csr-active-config parsing is future work; absence of
+        both sources means SIP status is undetermined (honest: no finding, a
+        note), never assumed-enabled.
+        """
+        found = False
+        for pattern in (".bash_history", ".zsh_history", ".sh_history", ".bash_sessions"):
+            if found:
+                break
+            for hist in self._safe_rglob(evidence_path, pattern, limit=5):
+                try:
+                    text = hist.read_text(errors="replace")
+                except OSError:
+                    continue
+                m = self._SIP_DISABLE_RE.search(text)
+                if m:
+                    self._findings.append(MacOSFinding(
+                        finding_type="SIP_DISABLED",
+                        severity=Fraction(70, 100),
+                        description="Evidence of System Integrity Protection being disabled/weakened",
+                        evidence=f"'{m.group(0)}' in {hist.name}",
+                        mitre_technique="T1562.001",
+                        rule_ref="MACOS-SIP-DISABLED",
+                        corr_group="antiforensic",
+                    ))
+                    found = True
+                    break
+        if not found:
+            result.analysis_notes.append(
+                "SIP status undetermined (no NVRAM csr-active-config captured, "
+                "no csrutil-disable evidence in shell histories)"
+            )
 
     # ── Safari ─────────────────────────────────────────────────────────────
 

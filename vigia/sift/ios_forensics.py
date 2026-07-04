@@ -156,6 +156,16 @@ class iOSAnalysisResult:
             z = Fraction(20, 10)
         elif has_hacking_search:
             z = Fraction(18, 10)
+        elif has_phishing:
+            # B-073: has_phishing se computaba (SMS_PHISHING_RECEIVED) pero
+            # NUNCA entraba a la escalera — rama muerta, un caso de phishing
+            # puro caía al piso genérico 1.2. Ahora registra a z=1.6: es una
+            # señal PASIVA (phishing recibido — le pasó al usuario, no la
+            # generó él), por eso pesa menos que la búsqueda ACTIVA de exploits
+            # (has_hacking_search=1.8) y por sí sola no alcanza SUSPICION (>2).
+            # El tier 1.6 es una decisión de calibración conservadora, abierta
+            # a ajuste (misma familia de calibración que L-033/B-069).
+            z = Fraction(16, 10)
         elif n_encrypted >= 1 and (empty_contacts or empty_calls):
             z = Fraction(16, 10)
         elif self.findings:
@@ -424,22 +434,30 @@ class iOSForensicsAnalyzer:
         if conn is None:
             result.analysis_notes.append(f"AddressBook: could not open {db_path}")
             return
+        parsed = False
         try:
             try:
                 count = conn.execute("SELECT COUNT(*) FROM ABPerson").fetchone()[0]
                 result.total_contacts = count
+                parsed = True
             except sqlite3.OperationalError:
                 try:
                     count = conn.execute(
                         "SELECT COUNT(*) FROM ABPersonFullTextSearch_content"
                     ).fetchone()[0]
                     result.total_contacts = count
+                    parsed = True
                 except sqlite3.OperationalError:
                     result.analysis_notes.append("AddressBook: could not count contacts")
         finally:
             conn.close()
 
-        if result.total_contacts == 0:
+        # B-072: no conflar "no-parseable" con "vacío". Solo un conteo EXITOSO
+        # de 0 es evidencia de agenda borrada (data_minimization). Un fallo de
+        # parseo (schema desconocido) NO puede escalar el veredicto — sería
+        # incapacidad de análisis presentada como señal (familia P0-A). El
+        # analysis_note ya deja rastro para que el veredicto abstenga.
+        if parsed and result.total_contacts == 0:
             self._opsec_indicators.append({
                 "indicator": "EMPTY_CONTACTS",
                 "severity": str(Fraction(60, 100)),

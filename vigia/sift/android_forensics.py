@@ -444,20 +444,25 @@ class AndroidForensicsAnalyzer:
         if conn is None:
             result.analysis_notes.append(f"contacts2.db: could not open {db_path}")
             return
+        parsed = False
         try:
             try:
                 count = conn.execute("SELECT COUNT(*) FROM raw_contacts").fetchone()[0]
                 result.total_contacts = count
+                parsed = True
             except sqlite3.OperationalError:
                 try:
                     count = conn.execute("SELECT COUNT(*) FROM contacts").fetchone()[0]
                     result.total_contacts = count
+                    parsed = True
                 except sqlite3.OperationalError:
                     result.analysis_notes.append("contacts2.db: could not count contacts")
         finally:
             conn.close()
 
-        if result.total_contacts == 0:
+        # B-072: fallo de parseo != agenda vacía. Solo un conteo exitoso de 0
+        # escala data_minimization (ver iOS _analyze_contacts).
+        if parsed and result.total_contacts == 0:
             self._opsec_indicators.append({
                 "indicator": "EMPTY_CONTACTS",
                 "severity": str(Fraction(60, 100)),
@@ -480,16 +485,19 @@ class AndroidForensicsAnalyzer:
         if conn is None:
             result.analysis_notes.append(f"calllog.db: could not open {db_path}")
             return
+        parsed = False
         try:
             try:
                 count = conn.execute("SELECT COUNT(*) FROM calls").fetchone()[0]
                 result.total_calls = count
+                parsed = True
             except sqlite3.OperationalError:
                 result.analysis_notes.append("calllog.db: 'calls' table not found")
         finally:
             conn.close()
 
-        if result.total_calls == 0:
+        # B-072: fallo de parseo != call log vacío (ver iOS _analyze_contacts).
+        if parsed and result.total_calls == 0:
             self._opsec_indicators.append({
                 "indicator": "EMPTY_CALL_LOG",
                 "severity": str(Fraction(55, 100)),
