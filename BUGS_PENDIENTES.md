@@ -2091,29 +2091,49 @@ oscillation string routing is non-contradictory. No action required.
 
 ---
 
-### B-042 [PENDING] — iOS forensics module — P0 float boundary in to_signal()
+### B-042 [RESUELTO — borde cosmético, determinismo probado] — iOS forensics to_signal() float boundary
 
 | Campo | Valor |
 |-------|-------|
-| **Estado** | PENDIENTE — decisión arquitectónica requerida |
-| **Severidad** | P0 |
+| **Estado** | RESUELTO — POST HACKATHON (2026-07-04). El borde float NO está en el decision path. |
+| **Severidad** | ~~P0~~ → cosmético (el float es el contrato de transporte de `SignalOutput`, no una fuga de determinismo) |
 | **Archivo** | `vigia/sift/ios_forensics.py` |
-| **Detectado en** | Sesión 2026-06-29 |
+| **Detectado en** | Sesión 2026-06-29; zanjado con test de determinismo 2026-07-04 |
+| **Tag de restauración** | `pre-p1-mobile-verdict-20260704-022839` |
 
-**Descripción:** `to_signal()` in `ios_forensics.py` uses `float()` for z-score and confidence values. When this module feeds the deterministic scoring pipeline, floats enter the Fraction arithmetic path — a P0 violation of L-021. Architectural decision pending: should `SignalOutput` accept `Decimal`/`Fraction`, or is the float-to-Fraction conversion the correct boundary?
+**Resolución (ENGINEERING_DISCIPLINE §5.2 "provalo"):** se escribió el test de
+determinismo ANTES de tocar código (`tests/test_b042_b043_mobile_determinism.py`).
+El decision path del veredicto mobile es el `z_score`; `sift_orchestrator.
+_mobile_hypothesis` lo reconstruye con `Fraction(str(z_score))`. El test prueba
+(10/10 pass) que:
+- `z_score` es siempre un múltiplo limpio de 1/10 → `Fraction(str(float(z)))` es
+  **identidad exacta** (round-trip lossless): el decisor recupera la Fraction
+  interna sin pérdida.
+- `value` (múltiplo de 1/50) también round-trip exacto.
+- Dos llamadas a `to_signal()` → bytes idénticos.
+- **Proceso fresco con `PYTHONHASHSEED` distinto (0/1/42) → z_score/value
+  idénticos** (sin leak de orden de set/dict).
+
+Conclusión: `float(z)` es el borde de transporte del contrato `SignalOutput`
+(cuyos campos son float por diseño), y el decisor re-parsea a Fraction sin
+pérdida. NO es una violación de L-021 en el decision path. `confidence` sí tiene
+un borde float potencialmente lossy (composite × 11/10), pero `confidence` es
+metadata — NO entra a `_mobile_hypothesis`. Sin cambio de código; el test queda
+como regresión permanente del invariante.
 
 ---
 
-### B-043 [PENDING] — Android forensics module — same as B-042
+### B-043 [RESUELTO — borde cosmético] — Android (y macOS) forensics to_signal() float boundary
 
 | Campo | Valor |
 |-------|-------|
-| **Estado** | PENDIENTE — misma decisión arquitectónica que B-042 |
-| **Severidad** | P0 |
-| **Archivo** | `vigia/sift/android_forensics.py` |
-| **Detectado en** | Sesión 2026-06-29 |
+| **Estado** | RESUELTO — POST HACKATHON (2026-07-04). Igual que B-042. |
+| **Severidad** | ~~P0~~ → cosmético |
+| **Archivo** | `vigia/sift/android_forensics.py` (y `macos_forensics.py`, misma forma) |
 
-**Descripción:** Same `float()` boundary issue as B-042 in `android_forensics.py`. The fix should be coordinated with B-042 as the same architectural decision applies.
+**Resolución:** el mismo test de determinismo cubre los tres módulos
+(`android`/`ios`/`macos` parametrizados). 10/10 pass: el borde `float(z)` es
+lossless para el decision path en los tres. Ver B-042 para el detalle.
 
 ---
 
