@@ -23,7 +23,16 @@ estos matices.
 
 ---
 
-## B-071 — sqlite read-only + immutable: REAL, pero introduce un falso negativo grave
+## B-071 — sqlite read-only + immutable: REAL, pero introduce un falso negativo grave → ✅ RESUELTO (fix v2 copy-to-working-dir)
+
+> **Actualización 2026-07-04:** corregido con el rework recomendado (c).
+> `safe_sqlite_connect` copia la familia `db`+`-wal`+`-shm`+`-journal` a un
+> working dir efímero y abre la COPIA read-write. Verificado: los datos del
+> `-wal` ahora son visibles (FN cerrado) y la evidencia original queda intacta
+> (hash idéntico tras escribir en la copia). El working dir se limpia al cerrar.
+> Tests: `test_wal_data_is_visible`, `test_writes_to_copy_do_not_touch_evidence`,
+> `test_working_dir_cleaned_on_close`. El detalle de abajo queda como registro.
+
 
 **Lo que arregla (verificado):** `mode=ro&immutable=1` sí impide la escritura
 en evidencia (rechaza INSERT, no crea `-wal`/`-journal`) y sí se niega a crear

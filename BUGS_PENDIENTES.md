@@ -3669,8 +3669,26 @@ read-WRITE. Una DB con WAL/journal sucio dispara auto-recovery que escribe
 path inexistente CREA una DB vacía (0 hallazgos lee limpio). Ambos verificados
 empíricamente.
 
-**Fix:** helper compartido `safe_sqlite_connect` con URI
-`file:...?mode=ro&immutable=1` — cero escrituras, se niega a crear/recuperar.
-Una implementación (no tres copias), un test de contrato. Cierra S1.
+**Fix v1 (mode=ro&immutable=1) — REFUTADO por el red-team:** cerraba la
+escritura y la creación, pero `immutable=1` IGNORA el `-wal` → una DB en modo
+WAL con datos en el `-wal` (estado normal de un teléfono vivo) se leía como
+tabla vacía → **falso negativo grave** (evidencia inculpatoria invisible).
+`mode=ro` solo tampoco servía: crea el `-shm` en evidencia. Cambié custodia por
+completitud.
 
-**Validación:** `tests/test_b071_sqlite_readonly.py` (10). Suite 485, corpus 198/198.
+**Fix v2 (copy-to-working-dir) — REAL:** `safe_sqlite_connect` copia la familia
+`db` + `-wal` + `-shm` + `-journal` a un working dir efímero y abre la COPIA
+read-write ahí. Satisface los dos invariantes a la vez: cero escritura en
+evidencia (el original nunca se abre) Y lectura completa del WAL. El working dir
+se borra al cerrar la conexión (`_WorkingCopyConnection.close`) + backstop por
+GC (`weakref.finalize`). Path ausente → None (no crea). DB malformada → error
+lazy en el query (lo captura el parser). Una implementación, contrato compartido.
+
+**Limitación honesta (§5.3):** copia el archivo — costo O(tamaño DB) por
+artefacto; aceptable porque los callers acotan cuántas DBs abren (`_safe_rglob`
+limit=N).
+
+**Validación:** `tests/test_b071_sqlite_readonly.py` (12): escritura en la copia
+NO toca la evidencia (hash idéntico), **datos del WAL visibles** (el FN), working
+dir limpiado al cerrar, path ausente no crea, DB malformada lazy. Suite 491,
+corpus 198/198. Restore tag: `pre-b071-rework-20260704-...`.

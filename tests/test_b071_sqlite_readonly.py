@@ -44,11 +44,44 @@ class TestSharedContract:
         # invariante evidencia: ningún archivo nuevo (no -wal, no -journal)
         assert set(os.listdir(tmp_path)) == before
 
-    def test_connection_is_readonly(self, valid_db):
+    def test_writes_to_copy_do_not_touch_evidence(self, valid_db):
+        """B-071 v2: la conexión es sobre una COPIA (read-write), pero escribir
+        en ella NO modifica el archivo de evidencia original — es el invariante
+        real (no 'conexión read-only'; el read-only es a nivel evidencia)."""
+        import hashlib
+        before = hashlib.sha256(valid_db.read_bytes()).hexdigest()
         conn = safe_sqlite_connect(valid_db, "TEST", _LOG)
-        with pytest.raises(sqlite3.OperationalError):
-            conn.execute("INSERT INTO msg VALUES (2, 'x')")
+        conn.execute("INSERT INTO msg VALUES (2, 'x')")  # escribe en la COPIA
+        conn.commit()
         conn.close()
+        after = hashlib.sha256(valid_db.read_bytes()).hexdigest()
+        assert before == after, "la escritura tocó el archivo de evidencia original"
+
+    def test_wal_data_is_visible(self, tmp_path):
+        """El FN que el red-team encontró: una DB en modo WAL con datos SOLO en
+        el -wal (no checkpointeados) DEBE ser visible. immutable=1 los perdía."""
+        db = tmp_path / "sms.db"
+        w = sqlite3.connect(str(db))
+        w.execute("PRAGMA journal_mode=WAL")
+        w.execute("PRAGMA wal_autocheckpoint=0")
+        w.execute("CREATE TABLE msg(id INTEGER, body TEXT)")
+        w.execute("INSERT INTO msg VALUES (1, 'row_in_wal')")
+        w.commit()
+        # mantener 'w' abierta -> el -wal NO se checkpointea al main
+        assert (tmp_path / "sms.db-wal").exists()
+        conn = safe_sqlite_connect(db, "TEST", _LOG)
+        rows = [r[0] for r in conn.execute("SELECT body FROM msg").fetchall()]
+        conn.close()
+        w.close()
+        assert rows == ["row_in_wal"], f"perdió datos del WAL: {rows}"
+
+    def test_working_dir_cleaned_on_close(self, valid_db):
+        """El working dir efímero se borra al cerrar (no leak de tempfiles)."""
+        conn = safe_sqlite_connect(valid_db, "TEST", _LOG)
+        wd = conn.__dict__.get("_vigia_workdir")
+        assert wd and os.path.isdir(wd)
+        conn.close()
+        assert not os.path.isdir(wd)
 
     def test_missing_path_returns_none_and_creates_nothing(self, tmp_path):
         missing = tmp_path / "does_not_exist.db"
@@ -71,13 +104,16 @@ class TestModulesDelegate:
     @pytest.mark.parametrize("analyzer_cls", [
         iOSForensicsAnalyzer, AndroidForensicsAnalyzer, MacOSForensicsAnalyzer,
     ])
-    def test_module_safe_connect_is_readonly(self, analyzer_cls, valid_db):
+    def test_module_writes_do_not_touch_evidence(self, analyzer_cls, valid_db):
+        import hashlib
+        before = hashlib.sha256(valid_db.read_bytes()).hexdigest()
         a = analyzer_cls()
         conn = a._safe_sqlite_connect(valid_db)
         assert conn is not None
-        with pytest.raises(sqlite3.OperationalError):
-            conn.execute("INSERT INTO msg VALUES (9, 'z')")
+        conn.execute("INSERT INTO msg VALUES (9, 'z')")  # en la copia
+        conn.commit()
         conn.close()
+        assert hashlib.sha256(valid_db.read_bytes()).hexdigest() == before
 
     @pytest.mark.parametrize("analyzer_cls", [
         iOSForensicsAnalyzer, AndroidForensicsAnalyzer, MacOSForensicsAnalyzer,
