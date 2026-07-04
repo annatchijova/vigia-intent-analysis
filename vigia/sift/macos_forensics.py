@@ -26,6 +26,7 @@ from typing import Any, Dict, List, Optional, Tuple
 from vigia.core.ebs_v1 import SignalOutput, Z_CLIP_MAX
 from vigia.core.chain_of_custody import ChainOfCustody
 from vigia.sift._math_utils import build_correlation_groups, noisy_or_correlated
+from vigia.sift._sql_utils import safe_sqlite_connect
 
 logger = logging.getLogger(__name__)
 
@@ -384,12 +385,9 @@ class MacOSForensicsAnalyzer:
 
     @staticmethod
     def _safe_sqlite_connect(db_path: Path) -> Optional[sqlite3.Connection]:
-        """Connect to SQLite with proper error handling (BUG-003 fix)."""
-        try:
-            return sqlite3.connect(str(db_path))
-        except (sqlite3.Error, OSError) as e:
-            logger.error("[MACOS] Cannot open SQLite database %s: %s", db_path, e)
-            return None
+        """Open SQLite evidence read-only + immutable (B-071 → _sql_utils).
+        Never writes to evidence, never creates an empty DB on a missing path."""
+        return safe_sqlite_connect(db_path, "MACOS", logger)
 
     # ── System Identification ──────────────────────────────────────────────
 
