@@ -215,3 +215,77 @@ class TestB074SipDetection:
         z = r.to_signal().z_score
         # la rama has_sip_disabled and has_antiforensic -> z=2.4 (antes inalcanzable)
         assert z == pytest.approx(2.4)
+
+
+class TestB074NvramAuthoritative:
+    """B-074 v2: la fuente autoritativa es la NVRAM csr-active-config, para
+    recall real (el red-team mostró que shell-history solo rara vez fira)."""
+
+    def _nvram(self, tmp_path, value):
+        import plistlib
+        with open(tmp_path / "nvram.plist", "wb") as f:
+            plistlib.dump({"csr-active-config": value.to_bytes(4, "little")}, f)
+
+    def _run(self, tmp_path):
+        (tmp_path / "SystemVersion.plist").write_bytes(b"x")
+        a = MacOSForensicsAnalyzer()
+        a._findings = []
+        r = MacOSAnalysisResult()
+        a._detect_sip_status(tmp_path, r)
+        return a._findings, r.analysis_notes
+
+    def test_nvram_disabled_emits_finding_with_flags(self, tmp_path):
+        self._nvram(tmp_path, 0x77)  # csrutil disable típico
+        findings, _ = self._run(tmp_path)
+        sip = [f for f in findings if f.finding_type == "SIP_DISABLED"]
+        assert sip
+        assert "0x77" in sip[0].evidence
+        assert "UNRESTRICTED_FS" in sip[0].evidence
+        assert sip[0].rule_ref == "MACOS-SIP-DISABLED-NVRAM"
+
+    def test_nvram_enabled_no_finding_authoritative_note(self, tmp_path):
+        self._nvram(tmp_path, 0x0)
+        findings, notes = self._run(tmp_path)
+        assert not any(f.finding_type == "SIP_DISABLED" for f in findings)
+        assert any("SIP enabled (authoritative" in n for n in notes)
+
+    def test_nvram_overrides_shell_history(self, tmp_path):
+        """NVRAM 0x0 (SIP ON) gana sobre un csrutil disable en history (intento
+        fallido / re-habilitado). El estado autoritativo manda."""
+        self._nvram(tmp_path, 0x0)
+        (tmp_path / ".zsh_history").write_text("csrutil disable\n")
+        findings, notes = self._run(tmp_path)
+        assert not any(f.finding_type == "SIP_DISABLED" for f in findings)
+        assert any("SIP enabled (authoritative" in n for n in notes)
+
+    def test_nvram_guid_prefixed_key(self, tmp_path):
+        import plistlib
+        key = "7C436110-AB2A-4BBB-A880-FE41995C9F82:csr-active-config"
+        with open(tmp_path / "nvram.plist", "wb") as f:
+            plistlib.dump({key: (0x77).to_bytes(4, "little")}, f)
+        findings, _ = self._run(tmp_path)
+        assert any(f.finding_type == "SIP_DISABLED" for f in findings)
+
+
+class TestB074CsrParser:
+    def test_parse_bytes_little_endian(self):
+        from vigia.sift.macos_forensics import MacOSForensicsAnalyzer as M
+        v, flags = M._parse_csr_config((0x77).to_bytes(4, "little"))
+        assert v == 0x77
+        assert "UNRESTRICTED_FS" in flags
+
+    def test_parse_zero(self):
+        from vigia.sift.macos_forensics import MacOSForensicsAnalyzer as M
+        v, flags = M._parse_csr_config(b"\x00\x00\x00\x00")
+        assert v == 0 and flags == []
+
+    def test_parse_hex_string_and_int(self):
+        from vigia.sift.macos_forensics import MacOSForensicsAnalyzer as M
+        assert M._parse_csr_config("0x3")[0] == 3
+        assert M._parse_csr_config(3)[0] == 3
+
+    def test_parse_garbage_returns_none(self):
+        from vigia.sift.macos_forensics import MacOSForensicsAnalyzer as M
+        assert M._parse_csr_config(b"") is None
+        assert M._parse_csr_config("notanumber") is None
+        assert M._parse_csr_config(True) is None  # bool no es int válido acá

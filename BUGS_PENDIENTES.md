@@ -3635,22 +3635,35 @@ en dos ramas anti-forenses (z=3.4 y z=2.4), pero NINGÚN analyzer emitía ese
 finding → ramas estructuralmente MUERTAS. Un macOS con SIP deshabilitado +
 tooling anti-forense nunca recibía la escalación codificada para ese escenario.
 
-**Fix:** `_detect_sip_status` — fuente autoritativa es la NVRAM
-`csr-active-config`; cuando la adquisición no capturó NVRAM, la señal
-filesystem-tractable es un `csrutil disable` / `csrutil enable --without` en un
-shell history (acción inequívoca de debilitar SIP, MITRE T1562.001). Emite
-`SIP_DISABLED` → las ramas dejan de estar muertas. Degradación honesta (§5.3):
-sin ninguna fuente, SIP status queda "undetermined" (note), nunca
-asumido-habilitado. NVRAM `csr-active-config` parsing queda como trabajo futuro.
+**Fix v1 (2026-07-04):** `_detect_sip_status` con solo el fallback de shell
+history (`csrutil disable`/`enable --without`). **El red-team
+(AUDITORIA_REDTEAM_P1_MOBILE) lo marcó de baja recall:** `csrutil disable`
+corre SOLO desde Recovery OS, así que casi nunca aparece en los shell histories
+del OS booteado que capturan las herramientas forenses → perdía la mayoría de
+los Macs con SIP realmente deshabilitado.
 
-**Nota de doctrina (para Anna):** ambas ramas exigen `has_sip_disabled AND
-has_antiforensic`. Disable-SIP es en sí anti-forense (T1562.001); si se quiere
-que SIP-disabled escale por sí solo, habría que hacer que el finding también
-satisfaga `has_antiforensic` — decisión de doctrina, no aplicada.
+**Fix v2 (2026-07-04, recall real):** se agregó la **fuente autoritativa NVRAM
+`csr-active-config`** (parser `_parse_csr_config` + tabla `_CSR_FLAGS`). Lee
+`nvram.plist` (key bare o con prefijo GUID), interpreta el valor de 32 bits
+little-endian: `0x0` = SIP habilitado (note autoritativo, sin finding); ≠0 =
+`SIP_DISABLED` con los flags CSR_ALLOW_* concretos en el evidence
+(ej. `0x77` = UNTRUSTED_KEXTS, UNRESTRICTED_FS, TASK_FOR_PID, APPLE_INTERNAL,
+UNRESTRICTED_DTRACE, UNRESTRICTED_NVRAM). **NVRAM gana sobre el shell history**
+(un `csrutil disable` en history puede ser un intento fallido/re-habilitado; el
+estado NVRAM es el real). El shell history queda como fallback cuando no hay
+NVRAM. Degradación honesta (§5.3): sin ninguna fuente, "undetermined".
 
-**Validación:** 3 tests — csrutil-disable en history emite SIP_DISABLED; sin
-evidencia no emite pero deja note; SIP_DISABLED+ANTIFORENSIC revive la rama
-z=2.4. Suite 485, corpus 198/198.
+**Nota de doctrina (para Anna, sigue abierta):** ambas ramas exigen
+`has_sip_disabled AND has_antiforensic`. Disable-SIP es en sí anti-forense
+(T1562.001); si se quiere que SIP-disabled escale por sí solo, habría que hacer
+que el finding también satisfaga `has_antiforensic` — decisión de doctrina, no
+aplicada.
+
+**Validación:** `tests/test_b072_b074_mobile_verdict_fixes.py` — 11 de B-074
+(3 shell-history/rama + 4 `TestB074NvramAuthoritative` + 4 `TestB074CsrParser`).
+NVRAM 0x77 → SIP_DISABLED con flags; 0x0 → note autoritativo; NVRAM gana sobre
+history; key con prefijo GUID; parser bytes/int/hex/basura. Suite 499,
+corpus 198/198. Restore tag: `pre-b074-nvram-20260704-...`.
 
 ---
 

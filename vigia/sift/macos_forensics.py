@@ -415,28 +415,103 @@ class MacOSForensicsAnalyzer:
 
     _SIP_DISABLE_RE = re.compile(r"csrutil\s+(disable|enable\s+--without)", re.IGNORECASE)
 
+    # CSR (Configurable Security Restrictions) flags — csr-active-config bits.
+    # 0x0 = SIP fully enabled; any set bit weakens a protection. `csrutil disable`
+    # typically sets 0x77. Reference: XNU csr.h (CSR_ALLOW_*).
+    _CSR_FLAGS = {
+        0x001: "UNTRUSTED_KEXTS",
+        0x002: "UNRESTRICTED_FS",
+        0x004: "TASK_FOR_PID",
+        0x008: "KERNEL_DEBUGGER",
+        0x010: "APPLE_INTERNAL",
+        0x020: "UNRESTRICTED_DTRACE",
+        0x040: "UNRESTRICTED_NVRAM",
+        0x080: "DEVICE_CONFIGURATION",
+        0x100: "ANY_RECOVERY_OS",
+        0x200: "UNAPPROVED_KEXTS",
+        0x400: "EXECUTABLE_POLICY_OVERRIDE",
+        0x800: "UNAUTHENTICATED_ROOT",
+    }
+
+    @classmethod
+    def _parse_csr_config(cls, raw):
+        """Parse a csr-active-config value (bytes little-endian, int, or hex str).
+        Returns (value:int, flags:list[str]) or None if unparseable."""
+        if isinstance(raw, (bytes, bytearray)):
+            if not raw:
+                return None
+            value = int.from_bytes(bytes(raw[:4]), "little")
+        elif isinstance(raw, bool):  # bool antes que int
+            return None
+        elif isinstance(raw, int):
+            value = raw
+        elif isinstance(raw, str):
+            try:
+                value = int(raw.strip(), 0)
+            except ValueError:
+                return None
+        else:
+            return None
+        flags = [name for bit, name in sorted(cls._CSR_FLAGS.items()) if value & bit]
+        return value, flags
+
     def _detect_sip_status(self, evidence_path: Path, result: MacOSAnalysisResult) -> None:
-        """Detect evidence that SIP (System Integrity Protection) was
-        disabled/weakened, and emit a SIP_DISABLED finding.
+        """Detect whether SIP (System Integrity Protection) is disabled/weakened
+        and emit a SIP_DISABLED finding.
 
         B-074: to_signal() reads has_sip_disabled (finding_type == "SIP_DISABLED")
         in two anti-forensic escalation branches, but NO analyzer ever emitted
-        that finding — the branches (z=3.4 and z=2.4) were structurally DEAD. A
-        macOS host with SIP disabled + anti-forensic tooling never received the
-        escalation coded for exactly that scenario.
+        that finding — the branches (z=3.4 and z=2.4) were structurally DEAD.
 
-        Authoritative source is the NVRAM csr-active-config flag; when the
-        acquisition did not capture NVRAM, the tractable filesystem signal is a
-        `csrutil disable` / `csrutil enable --without ...` command in a shell
-        history — an unambiguous SIP-weakening action (MITRE T1562.001, Impair
-        Defenses). NVRAM csr-active-config parsing is future work; absence of
-        both sources means SIP status is undetermined (honest: no finding, a
-        note), never assumed-enabled.
+        Two sources, in order of authority:
+        1. AUTHORITATIVE — NVRAM csr-active-config (nvram.plist). 0x0 = SIP fully
+           enabled; any non-zero value = a protection disabled. This is the real
+           state of the machine (B-074 v2: added for real-world recall — the red
+           team showed shell-history alone rarely fires on real evidence).
+        2. FALLBACK — a `csrutil disable` / `csrutil enable --without` command in
+           a shell history: evidence of a SIP-weakening ACTION/attempt (MITRE
+           T1562.001). Note: csrutil disable runs from Recovery OS, so this
+           rarely appears in the booted-OS histories — low recall, hence the
+           NVRAM source is preferred.
+
+        Honest degradation (§5.3): if neither source is present, SIP status is
+        undetermined (a note, no finding) — never assumed-enabled.
         """
-        found = False
+        # 1. AUTHORITATIVE — NVRAM csr-active-config
+        for nv in self._safe_rglob(evidence_path, "nvram.plist", limit=3):
+            plist = self._safe_plist_load(nv)
+            if not isinstance(plist, dict):
+                continue
+            raw = None
+            for k, v in plist.items():
+                # key may be bare or GUID-prefixed (e.g. "7C43...:csr-active-config")
+                if "csr-active-config" in str(k).lower():
+                    raw = v
+                    break
+            if raw is None:
+                continue
+            parsed = self._parse_csr_config(raw)
+            if parsed is None:
+                continue
+            value, flags = parsed
+            if value != 0:
+                self._findings.append(MacOSFinding(
+                    finding_type="SIP_DISABLED",
+                    severity=Fraction(75, 100),
+                    description="System Integrity Protection disabled/weakened (NVRAM csr-active-config)",
+                    evidence=f"csr-active-config=0x{value:x} ({', '.join(flags) or 'nonzero'}) in {nv.name}",
+                    mitre_technique="T1562.001",
+                    rule_ref="MACOS-SIP-DISABLED-NVRAM",
+                    corr_group="antiforensic",
+                ))
+            else:
+                result.analysis_notes.append(
+                    f"SIP enabled (authoritative: csr-active-config=0x0 in {nv.name})"
+                )
+            return  # NVRAM is authoritative — decided either way
+
+        # 2. FALLBACK — shell-history evidence of a SIP-weakening command
         for pattern in (".bash_history", ".zsh_history", ".sh_history", ".bash_sessions"):
-            if found:
-                break
             for hist in self._safe_rglob(evidence_path, pattern, limit=5):
                 try:
                     text = hist.read_text(errors="replace")
@@ -447,19 +522,18 @@ class MacOSForensicsAnalyzer:
                     self._findings.append(MacOSFinding(
                         finding_type="SIP_DISABLED",
                         severity=Fraction(70, 100),
-                        description="Evidence of System Integrity Protection being disabled/weakened",
+                        description="Evidence of a SIP-weakening command (shell history)",
                         evidence=f"'{m.group(0)}' in {hist.name}",
                         mitre_technique="T1562.001",
-                        rule_ref="MACOS-SIP-DISABLED",
+                        rule_ref="MACOS-SIP-DISABLED-HISTORY",
                         corr_group="antiforensic",
                     ))
-                    found = True
-                    break
-        if not found:
-            result.analysis_notes.append(
-                "SIP status undetermined (no NVRAM csr-active-config captured, "
-                "no csrutil-disable evidence in shell histories)"
-            )
+                    return
+
+        result.analysis_notes.append(
+            "SIP status undetermined (no NVRAM csr-active-config captured, "
+            "no csrutil-disable evidence in shell histories)"
+        )
 
     # ── Safari ─────────────────────────────────────────────────────────────
 

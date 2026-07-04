@@ -140,7 +140,17 @@ ya marqué como abierta, pero el red-team confirma que HOY no mueve nada).
 
 ---
 
-## B-074 — detección de SIP disabled: REAL pero de baja recall
+## B-074 — detección de SIP disabled: REAL pero de baja recall → ✅ RESUELTO (fix v2 NVRAM)
+
+> **Actualización 2026-07-04:** recall real cerrado. Se agregó la fuente
+> autoritativa NVRAM `csr-active-config` (`_parse_csr_config` + `_CSR_FLAGS`):
+> lee `nvram.plist`, interpreta el flag de 32 bits (0x0 = SIP ON; ≠0 =
+> SIP_DISABLED con los flags concretos). NVRAM gana sobre el shell-history (que
+> queda como fallback). Verificado: 0x77 → SIP_DISABLED con flags; 0x0 → note
+> autoritativo; NVRAM 0x0 override sobre un `csrutil disable` en history. Tests:
+> `TestB074NvramAuthoritative` (4) + `TestB074CsrParser` (4). Queda abierta solo
+> la nota de doctrina (has_antiforensic). El detalle de abajo queda como registro.
+
 
 **Lo que hice:** `_detect_sip_status` emite `SIP_DISABLED` al ver
 `csrutil disable`/`enable --without` en un shell history → las ramas z=3.4/z=2.4
