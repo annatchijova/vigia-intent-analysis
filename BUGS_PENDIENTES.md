@@ -2121,6 +2121,12 @@ un borde float potencialmente lossy (composite × 11/10), pero `confidence` es
 metadata — NO entra a `_mobile_hypothesis`. Sin cambio de código; el test queda
 como regresión permanente del invariante.
 
+**Refuerzo de cobertura (2026-07-04, tras red-team):** el test original tocaba
+5 de ~11 salidas del ladder. Se agregó `TestLadderDomainExhaustive` (invariante
+para TODO múltiplo de 1/10 en [0, Z_CLIP_MAX], superset de lo emitible) +
+`TestLadderCoverage` (grid combinatorio: iOS 18 / Android 19 / macOS 22 valores
+z distintos, incl. las ramas altas). 14 tests. Sigue sin cambio de código.
+
 ---
 
 ### B-043 [RESUELTO — borde cosmético] — Android (y macOS) forensics to_signal() float boundary

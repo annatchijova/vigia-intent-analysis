@@ -175,7 +175,16 @@ SIP es en sí T1562.001).
 
 ---
 
-## B-042/B-043 — test de determinismo: SÓLIDO, cobertura de ramas parcial
+## B-042/B-043 — test de determinismo: SÓLIDO, cobertura de ramas parcial → ✅ REFORZADO
+
+> **Actualización 2026-07-04:** gap de cobertura cerrado. Se agregó
+> `TestLadderDomainExhaustive.test_all_tenths_roundtrip_lossless` (prueba el
+> invariante para TODO múltiplo de 1/10 en [0, Z_CLIP_MAX] — superset de lo que
+> el ladder emite) + `TestLadderCoverage` (grid combinatorio por módulo).
+> Cobertura real ahora: iOS 18 / Android 19 / macOS 22 valores z distintos
+> (antes 5), incluyendo las ramas altas (3.5/3.8) que el test original perdía,
+> todos round-trip lossless. El detalle de abajo queda como registro.
+
 
 **Refutación intentada:** ¿el test realmente prueba el determinismo o solo las
 ramas que construí? Verificado: el test ejercitó z ∈ {0.0, 1.2, 1.6, 2.2, 3.4}

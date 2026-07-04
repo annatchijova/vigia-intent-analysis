@@ -157,3 +157,119 @@ def test_fresh_process_determinism():
         assert p.returncode == 0, p.stderr
         outs.add(p.stdout.strip())
     assert len(outs) == 1, f"z_score/value divergen entre procesos con PYTHONHASHSEED distinto: {outs}"
+
+
+# ===========================================================================
+# B-042/B-043 — cierre del gap de cobertura del red-team: el test original
+# tocaba 5 de ~11 salidas del ladder. Acá se prueba el invariante para TODO el
+# dominio de z (cada múltiplo de 1/10 en [0, Z_CLIP_MAX]) + un grid combinatorio
+# que recorre las ramas reales de los 3 ladders y confirma que cada z emitido
+# round-trip y es múltiplo de 1/10.
+# ===========================================================================
+
+import itertools
+from vigia.core.ebs_v1 import Z_CLIP_MAX
+
+
+def _f(cls, ft):
+    return cls(finding_type=ft, severity=Fraction(1, 2), description="d",
+               evidence="e", mitre_technique="T1", rule_ref="r", corr_group="g")
+
+
+def _ios_grid():
+    for exploit, hacking, phishing, n_enc, data_min, n_opsec in itertools.product(
+        (False, True), (False, True), (False, True), (0, 1, 2, 3), (False, True), (0, 2, 3)
+    ):
+        r = iOSAnalysisResult()
+        fs = []
+        if exploit:
+            fs.append(_f(iOSFinding, "SAFARI_EXPLOIT_RESEARCH"))
+        if hacking:
+            fs.append(_f(iOSFinding, "SAFARI_SUSPICIOUS_SITE"))
+        if phishing:
+            fs.append(_f(iOSFinding, "SMS_PHISHING_RECEIVED"))
+        r.findings = fs
+        r.encrypted_apps = [{"a": i} for i in range(n_enc)]
+        r.contacts_parsed = r.calls_parsed = True
+        r.total_contacts, r.total_calls = (0, 0) if data_min else (50, 30)
+        r.opsec_indicators = [{"i": i} for i in range(n_opsec)]
+        yield r
+    yield iOSAnalysisResult()  # sin findings -> z=0.0
+
+
+def _android_grid():
+    for exploit, root, n_enc, data_min, n_opsec in itertools.product(
+        (False, True), (False, True), (0, 1, 2, 3), (False, True), (0, 2, 3)
+    ):
+        r = AndroidAnalysisResult()
+        fs = []
+        if exploit:
+            fs.append(_f(AndroidFinding, "BROWSER_EXPLOIT_RESEARCH"))
+        r.findings = fs
+        r.is_rooted = root
+        r.encrypted_apps = [{"a": i} for i in range(n_enc)]
+        r.contacts_parsed = r.calls_parsed = True
+        r.total_contacts, r.total_calls = (0, 0) if data_min else (50, 30)
+        r.opsec_indicators = [{"i": i} for i in range(n_opsec)]
+        yield r
+    yield AndroidAnalysisResult()
+
+
+def _macos_grid():
+    for exploit, suspicious, antif, quar, sip, n_enc, n_opsec in itertools.product(
+        (False, True), (False, True), (False, True), (False, True), (False, True),
+        (0, 2, 3), (0, 2, 3)
+    ):
+        r = MacOSAnalysisResult()
+        fs = []
+        if exploit:
+            fs.append(_f(MacOSFinding, "SAFARI_EXPLOIT_RESEARCH"))
+        if suspicious:
+            fs.append(_f(MacOSFinding, "SAFARI_SUSPICIOUS_SITE"))
+        if antif:
+            fs.append(_f(MacOSFinding, "ANTIFORENSIC_LOG_DELETION"))
+        if quar:
+            fs.append(_f(MacOSFinding, "QUARANTINE_SUSPICIOUS_SOURCE"))
+        if sip:
+            fs.append(_f(MacOSFinding, "SIP_DISABLED"))
+        r.findings = fs
+        r.encrypted_apps = [{"a": i} for i in range(n_enc)]
+        r.opsec_indicators = [{"i": i} for i in range(n_opsec)]
+        yield r
+    yield MacOSAnalysisResult()
+
+
+class TestLadderDomainExhaustive:
+    def test_all_tenths_roundtrip_lossless(self):
+        """El invariante para TODO el dominio: cada múltiplo de 1/10 en
+        [0, Z_CLIP_MAX] sobrevive float -> str -> Fraction exacto. Como el ladder
+        SIEMPRE emite un múltiplo de 1/10, esto prueba el round-trip para toda z
+        posible, se haya construido el estado o no."""
+        n = int(Z_CLIP_MAX) * 10
+        for k in range(0, n + 1):
+            z = Fraction(k, 10)
+            zf = float(z)
+            assert Fraction(str(zf)) == z, f"{z} no round-trip exacto (float={zf})"
+
+
+GRIDS = [("ios", _ios_grid), ("android", _android_grid), ("macos", _macos_grid)]
+
+
+class TestLadderCoverage:
+    @pytest.mark.parametrize("mod,grid", GRIDS)
+    def test_every_emitted_z_is_tenth_and_roundtrips(self, mod, grid):
+        emitted = set()
+        for r in grid():
+            sig = r.to_signal()
+            z_frac = Fraction(str(sig.z_score))
+            # múltiplo de 1/10
+            assert 10 % z_frac.denominator == 0, f"{mod}: z={sig.z_score} no es múltiplo de 1/10"
+            # round-trip exacto
+            assert float(z_frac) == sig.z_score
+            # determinismo: segunda llamada idéntica
+            assert repr(r.to_signal().z_score) == repr(sig.z_score)
+            emitted.add(z_frac)
+        # cobertura: el grid alcanza las ramas altas (antes el test tocaba 5/11)
+        assert max(emitted) >= Fraction(35, 10), \
+            f"{mod}: el grid no alcanzó una rama alta (max={max(emitted)})"
+        assert len(emitted) >= 8, f"{mod}: cobertura pobre, solo {len(emitted)} z distintos"
