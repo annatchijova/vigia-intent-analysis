@@ -10,11 +10,12 @@ scoring core `_evaluate_metabolism` is a pure, deterministic function of its
 inputs (Fraction arithmetic, fixed weight/threshold tables), so each verdict
 and confidence has exactly one correct value that can be pinned from the code.
 
-Most tests here PASS and pin that correct behavior. One class
-(TestMicroObjectsBranchRegression) currently FAILS on purpose: it documents a
-real defect (BUG-METAB-001) found while writing these tests. It is left failing
--- not xfail'd -- so the defect stays visible until it is fixed. See its
-docstring for the full analysis.
+Most tests here pin that correct behavior. TestMicroObjectsBranchRegression
+guards against BUG-METAB-001, a real defect found while writing these tests:
+SIGNAL 5 (micro-object attack) referenced an out-of-scope `file_size`, raising
+NameError on any artifact with >1000 objects. It is now fixed by threading
+file_size into _evaluate_metabolism; that class is the regression guard. See
+its docstring for the full analysis.
 """
 from __future__ import annotations
 
@@ -41,10 +42,15 @@ def profiler():
 
 
 def _eval(profiler, *, eff=EFF_BASE, cost=COST_BASE, depth=NORMAL,
-          circular=0, object_count=100, parse_time_ns=1):
-    """Thin wrapper to call the pure scoring core with named signals."""
+          circular=0, object_count=100, parse_time_ns=1, file_size=100_000):
+    """Thin wrapper to call the pure scoring core with named signals.
+
+    file_size only feeds SIGNAL 5 (object_count > 1000); with the default
+    object_count=100 it never trips, so callers that do not set it are
+    unaffected.
+    """
     return profiler._evaluate_metabolism(
-        PDF, eff, cost, depth, circular, object_count, parse_time_ns
+        PDF, eff, cost, depth, circular, object_count, parse_time_ns, file_size
     )
 
 
@@ -119,7 +125,7 @@ class TestEvaluateMetabolismGroundTruth:
         # Unknown type -> default efficiency baseline 50; 300 > 50*5 -> 0.6.
         verdict, conf, _, _ = profiler._evaluate_metabolism(
             "unknown", Fraction(300, 1), Fraction(100_000, 1),
-            NORMAL, 0, 100, 1
+            NORMAL, 0, 100, 1, 100_000
         )
         assert verdict == "SUSPICIOUS"
         assert conf == Fraction(6, 10)
@@ -237,10 +243,11 @@ class TestProfileEndToEnd:
 
 class TestMicroObjectsBranchRegression:
     """
-    BUG-METAB-001 -- micro-objects signal crashes on any artifact with >1000
-    objects because it references an out-of-scope name.
+    BUG-METAB-001 (FIXED) -- micro-objects signal crashed on any artifact with
+    >1000 objects because it referenced an out-of-scope name. This class is now
+    the regression guard for the fix.
 
-    In _evaluate_metabolism, SIGNAL 5 (fragmentation / micro-object attack) is:
+    In _evaluate_metabolism, SIGNAL 5 (fragmentation / micro-object attack) was:
 
         if object_count > 1000:
             avg_size = file_size / object_count   # <-- NameError
@@ -271,9 +278,10 @@ class TestMicroObjectsBranchRegression:
     not a test misunderstanding (the parameter list provably omits file_size).
     It is a genuine defect.
 
-    Suggested fix: thread file_size into the method -- add it to the
-    _evaluate_metabolism signature and pass it from profile(), e.g.
-    `avg_size = file_size / object_count` with file_size supplied by the caller.
+    Fix applied: file_size was added to the _evaluate_metabolism signature and
+    is passed from profile(), so `avg_size = file_size / object_count` now
+    resolves. These tests assert the >1000-object path completes and returns a
+    valid verdict instead of raising.
     """
 
     def test_scoring_handles_over_1000_objects(self, profiler):
