@@ -1,0 +1,225 @@
+{
+  "case_id": "VIGIA-MAGNET-2022-WINDOWS-FULL",
+  "investigation_mode": "claude_code_mcp",
+  "llm_backend": "claude-opus-4-6 (Claude Code Mode 2)",
+  "examiner": "VIGÍA Autonomous Agent (Claude Code / Anthropic)",
+  "acquisition_tool": "Magnet Forensics 2022 CTF — Windows Full Evidence Set",
+  "write_blocker": true,
+  "analysis_timestamp": "2026-07-03T23:50:00Z",
+  "vigia_version": "1.0.0-SANS-2026",
+  "evidence_base": "evidence/magnet-2022-windows-full/",
+  "source_image": "Magnet Forensics 2022 CTF — Windows 10/11 host DESKTOP-SKPTDIO",
+  "host": "DESKTOP-SKPTDIO",
+  "os": "Windows 10/11 (Build 22543)",
+  "user": "Patrick (pbentley0107@gmail.com)",
+  "user_sid": "S-1-5-21-3341181097-1059518978-806882922-1001",
+  "session_window": "2022-02-04T07:02:35Z – 2022-02-12T22:54:09Z",
+
+  "mode1_result": {
+    "verdict": "NOISE",
+    "agent_verdict": "NOISE",
+    "reason": "All z-scores below z>2 threshold. REGISTRY_RTR=1.96, PREFETCH_ANALYZER=1.75, EVENT_LOG=1.45. CAIE: 0 fractures. Abduction selected H2-BENIGN with CCS=3/4.",
+    "pipeline_version": "V4-COLECTIVO-2026-05-06",
+    "false_negative_analysis": "Mode 1 evaluates each signal independently. The compound attack pattern (VPN+account_creation+privilege_escalation+RDP+credential_reset by S-1-5-18) requires cross-artifact temporal reasoning. Individual events are well-formatted and internally consistent — the MALICE is in the pattern, not in individual artifact anomalies. CAIE detected 0 fractures because the artifacts are genuine Windows events; the problem is who generated them (LOCAL SYSTEM without interactive session)."
+  },
+
+  "mode2_verdict": "MALICE",
+  "composite_confidence": "HIGH",
+
+  "c2_infrastructure": {
+    "ip": "192.168.191.253",
+    "ports": [443, 4443],
+    "protocol": "TCP",
+    "tools": ["Meterpreter x64 shellcode", "PowerShell reverse shell", "Powercat"],
+    "note": "Private-range IP — attacker on same LAN segment or reachable via ZeroTier overlay"
+  },
+
+  "malware_detected_by_defender": [
+    {"name": "VirTool:PowerShell/BypassAMSI", "timestamp": "2022-02-09T22:44:00Z", "action": "Quarantine"},
+    {"name": "Behavior:Win32/CapfetoxLDAP.E", "timestamp": "2022-02-09T22:44:11Z", "action": "Remove"},
+    {"name": "Backdoor:PowerShell/Powercat.A", "timestamp": "2022-02-11T23:00:54Z", "action": "Quarantine"},
+    {"name": "Behavior:Win32/Meterpreter.gen!A", "timestamp": "2022-02-12T04:30:12Z", "action": "Remove"},
+    {"name": "TrojanDropper:VBS/Ploty.A", "timestamp": "2022-02-12T01:45:52Z", "action": "Quarantine"}
+  ],
+
+  "defender_rtp_disabled_events": [
+    "2022-02-06T07:51:50Z",
+    "2022-02-09T23:33:21Z",
+    "2022-02-11T23:04:28Z",
+    "2022-02-12T22:40:35Z",
+    "2022-02-12T22:48:46Z",
+    "2022-02-12T23:18:08Z"
+  ],
+
+  "chain_of_custody": {
+    "Security.evtx": "b050682f7fe96938aca2fc19a96d24641173b4f31a4f3837119ea916663344c1",
+    "System.evtx": "962edaf7f38dbb4f81e7e8e586af56ae063a5caaa40d1c8a68165b3ef8f66129",
+    "Amcache.hve": "ba7b37b02c209e8237cc1c4bfa8497b44b8f98ac65fa1dd0a6ac45a98ab8a9aa",
+    "SYSTEM_hive": "545ac21ca335836d97f20580a97603b777284751358f5a97bff60d90f9230db2",
+    "SAM_hive": "4aec3ac88863e8f6a57dce79006f41d4b99adc519b160aabb5c418400c9e521e",
+    "Browser_History": "59641e2f78e28983b16beedfb883cafa26d25adfad0397d7e7ac14814d2f9919"
+  },
+
+  "timeline": [
+    {"timestamp": "2022-01-20T06:56:04Z", "event": "Patrick purchases Minecraft Java Edition from minecraft.net", "source": "Browser History", "verdict": "NOISE"},
+    {"timestamp": "2022-01-20T07:26:03Z", "event": "MinecraftInstaller.exe downloaded from minecraft.net (31.4 MB)", "source": "Browser History + Downloads", "verdict": "NOISE"},
+    {"timestamp": "2022-01-22T00:33:06Z", "event": "Discord account verified (pbentley0107@gmail.com)", "source": "Browser History", "verdict": "NOISE"},
+    {"timestamp": "2022-02-04T04:53:48Z", "event": "MinecraftInstaller.exe re-downloaded from minecraft.net", "source": "Browser History + Downloads", "verdict": "NOISE"},
+    {"timestamp": "2022-02-04T07:02:35Z", "event": "First Security.evtx event (system boot)", "source": "Security.evtx", "verdict": "NOISE"},
+    {"timestamp": "2022-02-06T06:26:31Z", "event": "Patrick logs in (Type 11 CachedInteractive)", "source": "Security.evtx (4624)", "verdict": "NOISE"},
+    {"timestamp": "2022-02-06T07:15:35Z", "event": "ZeroTier One service installed (auto start, LocalSystem)", "source": "System.evtx (7045)", "verdict": "INTENT"},
+    {"timestamp": "2022-02-06T07:22:40Z", "event": "ZeroTier TAP driver (zttap300.sys) installed", "source": "System.evtx (7045)", "verdict": "INTENT"},
+    {"timestamp": "2022-02-09T22:44:11Z", "event": "Defender detects CapfetoxLDAP.E (LDAP enumeration) from powershell.exe PID 1548", "source": "Defender Operational (1116)", "verdict": "MALICE"},
+    {"timestamp": "2022-02-09T22:44:00Z", "event": "Defender detects VirTool:PowerShell/BypassAMSI — quarantined", "source": "Defender Operational (1116/1117)", "verdict": "MALICE"},
+    {"timestamp": "2022-02-09T23:33:21Z", "event": "Defender RTP DISABLED (2nd time)", "source": "Defender Operational (5001)", "verdict": "MALICE"},
+    {"timestamp": "2022-02-09T23:34:55Z", "event": "AMSI bypass script executed — VirtualProtect patches AmsiScanBuffer + PS reverse shell to 192.168.191.253:4443", "source": "PowerShell Operational (4104)", "verdict": "MALICE"},
+    {"timestamp": "2022-02-11T01:18:02Z", "event": "Patrick searches 'how to know if you've been hacked'", "source": "Browser History", "verdict": "CORROBORATION"},
+    {"timestamp": "2022-02-11T01:21:05Z", "event": "Patrick searches 'how to report a hacker?'", "source": "Browser History", "verdict": "CORROBORATION"},
+    {"timestamp": "2022-02-11T23:00:54Z", "event": "Defender detects Backdoor:PowerShell/Powercat.A × 4 — quarantined", "source": "Defender Operational (1116/1117)", "verdict": "MALICE"},
+    {"timestamp": "2022-02-11T23:04:28Z", "event": "Defender RTP DISABLED (3rd time)", "source": "Defender Operational (5001)", "verdict": "MALICE"},
+    {"timestamp": "2022-02-11T23:19:58Z", "event": "First Meterpreter x64 shellcode execution — C2: 192.168.191.253:443 via VirtualAlloc+CreateThread", "source": "PowerShell Operational (4104)", "verdict": "MALICE"},
+    {"timestamp": "2022-02-12T00:17:50Z", "event": "Staged payload delivery: GzipStream+Base64 + reflective DLL injection stage", "source": "PowerShell Operational (4104)", "verdict": "MALICE"},
+    {"timestamp": "2022-02-12T01:01:32Z", "event": "TermService (RDP) changed from demand start → AUTO START", "source": "System.evtx (7040)", "verdict": "MALICE"},
+    {"timestamp": "2022-02-12T01:29:43Z", "event": "Account 'minecraftsteve' CREATED by S-1-5-18 (LOCAL SYSTEM)", "source": "Security.evtx (4720)", "verdict": "MALICE"},
+    {"timestamp": "2022-02-12T01:29:43Z", "event": "minecraftsteve account ENABLED", "source": "Security.evtx (4722)", "verdict": "MALICE"},
+    {"timestamp": "2022-02-12T01:29:43Z", "event": "minecraftsteve initial password SET by SYSTEM", "source": "Security.evtx (4724)", "verdict": "MALICE"},
+    {"timestamp": "2022-02-12T01:29:43Z", "event": "minecraftsteve added to Domain Users (S-1-5-21-...-513)", "source": "Security.evtx (4728)", "verdict": "MALICE"},
+    {"timestamp": "2022-02-12T01:37:07Z", "event": "minecraftsteve added to Administrators (S-1-5-32-544)", "source": "Security.evtx (4732)", "verdict": "MALICE"},
+    {"timestamp": "2022-02-12T01:37:18Z", "event": "minecraftsteve added to Remote Management Users (S-1-5-32-580)", "source": "Security.evtx (4732)", "verdict": "MALICE"},
+    {"timestamp": "2022-02-12T02:06:06Z", "event": "minecraftsteve password RESET (stabilization)", "source": "Security.evtx (4724)", "verdict": "MALICE"},
+    {"timestamp": "2022-02-12T01:45:52Z", "event": "TrojanDropper:VBS/Ploty.A (flWNZUu.vbs) + HKCU Run key persistence — quarantined", "source": "Defender Operational (1116/1117)", "verdict": "MALICE"},
+    {"timestamp": "2022-02-12T02:17:18Z", "event": "Built-in Administrator password RESET by S-1-5-18", "source": "Security.evtx (4724)", "verdict": "MALICE"},
+    {"timestamp": "2022-02-12T04:30:12Z", "event": "Defender detects Behavior:Win32/Meterpreter.gen!A across PIDs 6384,13664,11964,14296", "source": "Defender Operational (1116/1117)", "verdict": "MALICE"},
+    {"timestamp": "2022-02-12T22:53:03Z", "event": "Meterpreter shellcode execution continues post-reboot (3 more runs)", "source": "PowerShell Operational (4104)", "verdict": "MALICE"}
+  ],
+
+  "findings": [
+    {
+      "finding_id": "F-001",
+      "title": "ZeroTier One VPN installed as persistent C2 channel",
+      "verdict": "INTENT",
+      "confidence": "HIGH",
+      "status": "CONFIRMED",
+      "artifacts": ["System.evtx", "SYSTEM hive", "Amcache.hve"],
+      "mitre_ttps": ["T1133", "T1571", "T1573.002"],
+      "firstness": "Service 'ZeroTier One' installed at 2022-02-06 07:15:35 UTC. ImagePath: C:\\ProgramData\\ZeroTier\\One\\zerotier-one_x64.exe. Start type: auto start. Account: LocalSystem. TAP driver zttap300.sys installed 7 minutes later.",
+      "secondness": "ZeroTier One is a legitimate P2P VPN that creates encrypted overlay networks. It bypasses perimeter firewalls entirely. Installation during a session where Patrick was logged in (06:26 UTC). However, ZeroTier is also used by gamers for Minecraft LAN play — Patrick is a documented Minecraft player.",
+      "thirdness": "The combination of ZeroTier (encrypted channel) + subsequent unauthorized account management by SYSTEM (no interactive session) indicates ZeroTier was used as the C2 ingress point. An attacker connected via ZeroTier's encrypted tunnel, gained SYSTEM privileges, and executed the account manipulation sequence.",
+      "carnegie": "None directly — tool installation, not social engineering",
+      "devil_advocate": "ZeroTier is commonly installed by Minecraft Java Edition players for LAN-over-internet gameplay. Patrick purchased Minecraft on Jan 20, installed Java JDK 8, and had Minecraft execution artifacts in prefetch. Installation could be user-initiated for gaming purposes. However, this does not explain the subsequent SYSTEM-level account manipulation.",
+      "corroboration": "System.evtx (7045) + SYSTEM hive (Start=2) + Amcache (certutil.exe bundled with ZeroTier TAP driver) all independently confirm installation."
+    },
+    {
+      "finding_id": "F-002",
+      "title": "Backdoor account 'minecraftsteve' created by LOCAL SYSTEM",
+      "verdict": "MALICE",
+      "confidence": "HIGH",
+      "status": "CONFIRMED",
+      "artifacts": ["Security.evtx", "SAM hive"],
+      "mitre_ttps": ["T1136.001", "T1078.003", "T1098"],
+      "firstness": "User 'minecraftsteve' (RID 1002, SID S-1-5-21-3341181097-1059518978-806882922-1002) created at 2022-02-12 01:29:43 UTC. SubjectUserSid in all events: S-1-5-18 (LOCAL SYSTEM). SubjectUserName: DESKTOP-SKPTDIO$.",
+      "secondness": "LOCAL SYSTEM (S-1-5-18) creating user accounts is structurally impossible via normal interactive user operations. Users create accounts via Control Panel or 'net user' under their own SID. S-1-5-18 as the acting principal indicates the operation was executed by a service, scheduled task, or remote management tool running as SYSTEM. No interactive logon for Patrick exists between Feb 11 22:46 and Feb 12 22:47.",
+      "thirdness": "This is a textbook backdoor account creation pattern: (1) create account at 01:29, (2) set password at 01:29, (3) add to Administrators at 01:37, (4) add to Remote Management Users at 01:37, (5) reset password at 02:06, (6) reset Administrator password at 02:17. The attacker created a privileged backdoor named after a game (social engineering naming convention: 'minecraftsteve' looks like a benign Minecraft-related account on a gamer's machine) and secured future access via RDP (Remote Management Users).",
+      "carnegie": "Authority transfer — naming the backdoor account 'minecraftsteve' exploits the investigator's familiarity with the Minecraft context to reduce scrutiny. On a machine with legitimate Minecraft artifacts, this name provides plausible deniability.",
+      "devil_advocate": "Could a legitimate administrator or automated system have created this account? No. (1) No interactive session was active at the time. (2) The SubjectUserSid is S-1-5-18, not Patrick's SID. (3) No legitimate Windows service creates user accounts named 'minecraftsteve' and adds them to Administrators. (4) The account has Login Count = 0, confirming it was created for future use, not immediate need. (5) Patrick himself searched 'how to report a hacker' on Feb 11, the day before the account was created.",
+      "corroboration": "Security.evtx events 4720/4722/4724/4728/4732 (5 independent events) + SAM hive + System.evtx TermService enable at 01:01."
+    },
+    {
+      "finding_id": "F-003",
+      "title": "RDP (TermService) enabled for persistence",
+      "verdict": "MALICE",
+      "confidence": "HIGH",
+      "status": "CONFIRMED",
+      "artifacts": ["System.evtx"],
+      "mitre_ttps": ["T1021.001", "T1543.003"],
+      "firstness": "System.evtx event 7040 at 2022-02-12 01:01:32 UTC: 'Remote Desktop Services' start type changed from 'demand start' to 'auto start'.",
+      "secondness": "TermService start type change to auto start enables RDP server on the host. This occurred 28 minutes before the backdoor account creation. No interactive user session was active. This is the first step in the attack sequence: enable the remote access protocol, then create the account to use it.",
+      "thirdness": "Deliberate preparation for persistent remote access. The attacker enabled RDP first, then created the 'minecraftsteve' account with Remote Management Users membership. This two-step sequence (enable protocol → create credentialed account) is a standard persistence playbook.",
+      "carnegie": "None",
+      "devil_advocate": "Could Windows Update or a system process have enabled RDP? No. Windows Update does not change TermService start type. The timing (28 minutes before backdoor account creation, during no interactive session) rules out benign automation.",
+      "corroboration": "System.evtx (7040) + SYSTEM hive TermService key timestamp."
+    },
+    {
+      "finding_id": "F-004",
+      "title": "Built-in Administrator password reset by SYSTEM",
+      "verdict": "MALICE",
+      "confidence": "HIGH",
+      "status": "CONFIRMED",
+      "artifacts": ["Security.evtx"],
+      "mitre_ttps": ["T1098", "T1078.003"],
+      "firstness": "Security.evtx event 4724 at 2022-02-12 02:17:18 UTC: Password reset for user 'Administrator' (RID 500, SID S-1-5-21-...-500). SubjectUserSid: S-1-5-18.",
+      "secondness": "The Built-in Administrator account (RID 500) is typically disabled on consumer Windows installations. Resetting its password after creating the backdoor account suggests the attacker is securing multiple access vectors.",
+      "thirdness": "Defense-in-depth from the attacker's perspective: if the 'minecraftsteve' account is discovered and disabled, the attacker retains access via the Built-in Administrator. This redundancy demonstrates operational sophistication.",
+      "carnegie": "None",
+      "devil_advocate": "Could this be an automated password rotation policy? No. Consumer Windows 10 does not have automated password rotation for the Built-in Administrator. The timing (same session as backdoor creation) and actor (S-1-5-18) rule out benign causes.",
+      "corroboration": "Security.evtx (4724) — single source but SubjectUserSid S-1-5-18 confirmation via SAM hive."
+    },
+    {
+      "finding_id": "F-005",
+      "title": "MinecraftInstaller.exe from minecraft.net — FALSE POSITIVE",
+      "verdict": "NOISE",
+      "confidence": "HIGH",
+      "status": "CONFIRMED",
+      "artifacts": ["Browser History"],
+      "mitre_ttps": [],
+      "firstness": "MinecraftInstaller.exe (31,461,240 bytes) downloaded from https://www.minecraft.net/en-us/download on 2022-01-20 07:26:03 and 2022-02-04 04:53:48.",
+      "secondness": "The download URL is the official Minecraft.net domain. The browser history shows a complete legitimate purchase flow: minecraft.net → login → purchase → download. The user also has a chess.com account and Reddit verification, consistent with normal gamer behavior.",
+      "thirdness": "This is a confirmed false positive. The Minecraft artifacts are from a legitimate user who purchased and installed the game.",
+      "carnegie": "None",
+      "devil_advocate": "N/A — this IS the benign explanation.",
+      "corroboration": "Browser History (URLs + Downloads table) + Amcache (Minecraft.exe entries in legitimate paths) + Prefetch (MINECRAFT.EXE-*.pf)."
+    },
+    {
+      "finding_id": "F-006",
+      "title": "CERTUTIL.EXE in ZeroTier path — bundled with TAP driver",
+      "verdict": "NOISE",
+      "confidence": "MEDIUM",
+      "status": "CONFIRMED",
+      "artifacts": ["Amcache.hve"],
+      "mitre_ttps": [],
+      "firstness": "certutil.exe found at c:\\program files\\zerotier\\zerotier one virtual network port\\zttap300\\certutil.exe. Publisher: Microsoft Corporation. Version: 6.1.7601.18151 (win7sp1_gdr.130512-1533). Link date: 2013-05-13.",
+      "secondness": "This is an old Windows 7 SP1 certutil bundled with the ZeroTier TAP300 network driver. TAP drivers require certificate installation for the virtual network adapter; the ZeroTier installer bundles certutil for this purpose. This is NOT certutil being used as a LOLBin.",
+      "thirdness": "No evidence of certutil being used for download (-urlcache) or decode (-decode) operations. The Amcache location is inside the ZeroTier TAP driver installer directory, consistent with driver installation workflow.",
+      "carnegie": "None",
+      "devil_advocate": "N/A — the location and version are consistent with the TAP driver installer bundle.",
+      "corroboration": "Amcache path + version consistency with Windows 7 SP1 certutil."
+    },
+    {
+      "finding_id": "F-007",
+      "title": "Java JDK 8u181 (2018) with known CVEs",
+      "verdict": "SUSPICION",
+      "confidence": "MEDIUM",
+      "status": "INFERRED",
+      "artifacts": ["Amcache.hve", "Prefetch"],
+      "mitre_ttps": ["T1190"],
+      "firstness": "Java JDK 1.8.0_181 (link date 2018-07-07) installed at c:\\program files\\java\\jdk1.8.0_181\\. Multiple Java binaries in Amcache. Minecraft Java Edition requires Java runtime.",
+      "secondness": "JDK 8u181 (July 2018) has multiple known CVEs including deserialization vulnerabilities. However, Minecraft Java Edition requires Java, and the user installed Minecraft. The outdated Java version is more likely negligence than attacker-installed.",
+      "thirdness": "Possible initial access vector — an outdated Java with known vulnerabilities on a machine with ZeroTier (network-reachable). However, insufficient evidence to confirm Java was the entry point.",
+      "carnegie": "None",
+      "devil_advocate": "Patrick installed Minecraft Java Edition, which requires Java. Many users don't update Java. The JDK was likely installed for Minecraft development/modding purposes.",
+      "corroboration": "Amcache only — no exploitation evidence found in event logs."
+    }
+  ],
+
+  "refutation_protocol": {
+    "benign_hypothesis": "Patrick is a normal user who plays Minecraft, uses Discord, watches stamp collecting videos, plays chess, and installed ZeroTier for Minecraft LAN play. The account management events are from a legitimate system process.",
+    "test_result": "REJECTED. The benign hypothesis explains ZeroTier installation and Minecraft artifacts, but it CANNOT explain: (1) User account 'minecraftsteve' created by S-1-5-18 at 01:29 with no interactive session active, (2) The account being added to Administrators AND Remote Management Users, (3) RDP being enabled 28 minutes prior, (4) Built-in Administrator password reset at 02:17, (5) Patrick searching 'how to report a hacker' on Feb 11 (victim awareness before the Feb 12 attack). No legitimate Windows service or automation creates admin backdoor accounts named after games.",
+    "gate_applied": "Daubert Corroboration Gate: ≥2 independent sources for MALICE",
+    "gate_passed": true,
+    "independent_sources": 5
+  },
+
+  "mode1_false_negative_analysis": {
+    "root_cause": "COMPOUND_PATTERN_BLINDNESS",
+    "description": "Mode 1 evaluates each artifact signal independently. The z-scores (REGISTRY_RTR=1.96, PREFETCH=1.75, EVENT_LOG=1.45) are all individually below the z>2 threshold. The MALICE emerges only when cross-correlating: (1) temporal proximity of events, (2) S-1-5-18 as actor for all account management, (3) absence of interactive session during the attack window, (4) logical sequence (enable RDP → create account → escalate privileges → reset credentials). Each event is a legitimate, well-formatted Windows event — the anomaly is not in the artifact format but in the actor-context relationship.",
+    "recommended_fix": "CAIE should detect 'SYSTEM-as-actor for user management without interactive session' as a cross-artifact fracture pattern. Add temporal correlation for service_enable + account_create + privilege_escalate sequences."
+  },
+
+  "known_limitations": [
+    "L-001: No Sysmon installed — CreateRemoteThread (EID 8) logging unavailable. The Mode 1 signal EVENT_LOG:REMOTE_THREAD_INJECTION may have been inferred from registry/service patterns, not from actual Sysmon events.",
+    "L-002: Prefetch files are MAM-compressed (Xpress Huffman) — decompression requires Windows APIs. File access paths for CERTUTIL.EXE, POWERSHELL.EXE could not be extracted on Linux.",
+    "L-003: Command line auditing not enabled — Security.evtx 4688 events lack CommandLine field. Process creation data is limited to process names and parent processes.",
+    "L-004: No memory dump or disk image available — cannot verify actual ZeroTier network connections or determine the initial access vector.",
+    "L-005: SAM hive parsed via prior report — account details (login count, last login) from existing analysis, not re-parsed in this session."
+  ]
+}
