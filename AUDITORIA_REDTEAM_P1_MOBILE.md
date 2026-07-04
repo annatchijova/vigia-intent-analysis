@@ -69,7 +69,15 @@ limitación documentada es más defendible que (a) bajo el invariante #1.
 
 ---
 
-## B-072 — conflación no-parseable==vacío: PARCIALMENTE COSMÉTICO
+## B-072 — conflación no-parseable==vacío: PARCIALMENTE COSMÉTICO → ✅ RESUELTO (fix v2)
+
+> **Actualización 2026-07-04:** corregido de verdad. Centinela
+> `contacts_parsed`/`calls_parsed`: `to_signal` computa `empty_contacts =
+> contacts_parsed and total_contacts == 0`. El escenario de abajo ahora da
+> z=2.4 (no escala); una agenda realmente parseada-y-vacía sí escala (z=3.0).
+> Tests: `TestB072DataMinimizationEscalation` (4). El detalle de abajo queda
+> como registro de por qué el fix v1 era cosmético.
+
 
 **Lo que hice:** un flag `parsed` para que el *finding* `EMPTY_CONTACTS`/
 `EMPTY_CALL_LOG` no se emita cuando el parseo falla.

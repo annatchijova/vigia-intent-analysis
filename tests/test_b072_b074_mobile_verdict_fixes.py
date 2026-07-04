@@ -88,6 +88,65 @@ class TestB072ContactsConflation:
         assert any(f.finding_type == "EMPTY_CALL_LOG" for f in a._findings)
 
 
+class TestB072DataMinimizationEscalation:
+    """El bug REAL (red-team): removimos el finding EMPTY_* pero to_signal
+    escalaba igual vía data_minimization = (total_contacts==0 and total_calls==0),
+    leyendo el contador crudo (0 por default tras un parseo fallido). El fix con
+    centinela contacts_parsed/calls_parsed corta la escalación, no solo el finding."""
+
+    def _ios(self, contacts_parsed, calls_parsed):
+        r = iOSAnalysisResult()
+        r.encrypted_apps = [{"a": 1}, {"a": 2}, {"a": 3}]
+        r.total_contacts = 0
+        r.total_calls = 0
+        r.contacts_parsed = contacts_parsed
+        r.calls_parsed = calls_parsed
+        r.findings = [iOSFinding(finding_type="X", severity=Fraction(1, 2),
+                                 description="d", evidence="e", mitre_technique="T1",
+                                 rule_ref="r", corr_group="g")]
+        return r
+
+    def test_parse_failure_does_not_escalate(self):
+        """Contadores 0 por PARSEO FALLIDO (parsed=False) -> NO data_minimization."""
+        z_fail = self._ios(False, False).to_signal().z_score
+        # mismo caso con datos reales (no vacío) para comparar
+        r = self._ios(True, True)
+        r.total_contacts = 50
+        r.total_calls = 30
+        z_data = r.to_signal().z_score
+        assert z_fail == z_data, (
+            f"parseo fallido escaló ({z_fail}) distinto que datos reales ({z_data}) "
+            f"— data_minimization todavía se dispara sobre no-parseable (bug cosmético)"
+        )
+
+    def test_genuinely_empty_still_escalates(self):
+        """Agenda REAL vacía (parsed=True, count=0) -> SÍ data_minimization."""
+        z_empty = self._ios(True, True).to_signal().z_score
+        z_fail = self._ios(False, False).to_signal().z_score
+        assert z_empty > z_fail, "el empty real parseado debe seguir escalando"
+
+    def test_end_to_end_unparseable_leaves_flags_false(self, tmp_path):
+        """_analyze_contacts sobre schema desconocido deja contacts_parsed=False."""
+        db = tmp_path / "AddressBook.sqlitedb"
+        _make_db(db, ["CREATE TABLE nope(x)"])
+        a = iOSForensicsAnalyzer()
+        a._findings = []
+        a._opsec_indicators = []
+        r = iOSAnalysisResult()
+        a._analyze_contacts(db, r)
+        assert r.contacts_parsed is False
+
+    def test_end_to_end_parsed_sets_flag_true(self, tmp_path):
+        db = tmp_path / "AddressBook.sqlitedb"
+        _make_db(db, ["CREATE TABLE ABPerson(ROWID INTEGER)"])
+        a = iOSForensicsAnalyzer()
+        a._findings = []
+        a._opsec_indicators = []
+        r = iOSAnalysisResult()
+        a._analyze_contacts(db, r)
+        assert r.contacts_parsed is True
+
+
 # ===========================================================================
 # B-073 — has_phishing entra a la escalera iOS
 # ===========================================================================

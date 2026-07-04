@@ -111,6 +111,10 @@ class AndroidAnalysisResult:
     total_sms: int = 0
     total_contacts: int = 0
     total_calls: int = 0
+    # B-072: solo un conteo EXITOSO de 0 es evidencia de data_minimization
+    # (ver iOSAnalysisResult). Un parseo fallido/DB ausente no escala.
+    contacts_parsed: bool = False
+    calls_parsed: bool = False
     total_browser_entries: int = 0
     encrypted_apps: List[Dict[str, Any]] = field(default_factory=list)
     findings: List[AndroidFinding] = field(default_factory=list)
@@ -129,8 +133,9 @@ class AndroidAnalysisResult:
             for f in self.findings
         )
         has_root = self.is_rooted
-        empty_contacts = self.total_contacts == 0
-        empty_calls = self.total_calls == 0
+        # B-072: empty solo si el conteo fue EXITOSO y dio 0 (ver iOS to_signal).
+        empty_contacts = self.contacts_parsed and self.total_contacts == 0
+        empty_calls = self.calls_parsed and self.total_calls == 0
         data_minimization = empty_contacts and empty_calls
 
         # Opsec bump (BUG-011 fix)
@@ -460,8 +465,11 @@ class AndroidForensicsAnalyzer:
         finally:
             conn.close()
 
+        result.contacts_parsed = parsed
+
         # B-072: fallo de parseo != agenda vacía. Solo un conteo exitoso de 0
-        # escala data_minimization (ver iOS _analyze_contacts).
+        # escala data_minimization (ver iOS _analyze_contacts). El flag
+        # contacts_parsed corta la escalación en to_signal, no solo el finding.
         if parsed and result.total_contacts == 0:
             self._opsec_indicators.append({
                 "indicator": "EMPTY_CONTACTS",
@@ -495,6 +503,8 @@ class AndroidForensicsAnalyzer:
                 result.analysis_notes.append("calllog.db: 'calls' table not found")
         finally:
             conn.close()
+
+        result.calls_parsed = parsed
 
         # B-072: fallo de parseo != call log vacío (ver iOS _analyze_contacts).
         if parsed and result.total_calls == 0:

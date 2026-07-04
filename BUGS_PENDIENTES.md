@@ -3577,11 +3577,24 @@ señaló, solo 3 tenían el bug. `ios_forensics::_analyze_call_history` YA hací
 `return` en el `except` antes de emitir EMPTY — falso positivo del audit,
 rechazado sin tocar.
 
-**Fix:** flag `parsed` — `EMPTY_*` se emite solo si el conteo fue EXITOSO y dio
-0. Un fallo de parseo deja `analysis_note` (rastro para ABSTAIN) y NO escala.
+**Fix v1 (2026-07-04, PARCIAL — cosmético):** flag `parsed` local — `EMPTY_*`
+se emitía solo con conteo exitoso de 0. **El red-team (AUDITORIA_REDTEAM_P1_MOBILE)
+lo refutó:** `to_signal` NO lee el finding — computa
+`empty_contacts = self.total_contacts == 0` del contador crudo, que queda en 0
+tras el parseo fallido. Reproducido: contacts+calls no-parseables seguían
+escalando de z=2.4 a **z=3.0** vía `data_minimization`. El falso INTENT/MALICE
+seguía vivo. Removí el finding, no la escalación.
 
-**Validación:** `tests/test_b072_b074_mobile_verdict_fixes.py` (5 de B-072):
-schema desconocido no emite EMPTY; tabla vacía real sí. Suite 455→485, corpus 198/198.
+**Fix v2 (2026-07-04, REAL):** centinela `contacts_parsed`/`calls_parsed` en las
+dataclasses (default False), seteado True solo con conteo exitoso. `to_signal`
+ahora computa `empty_contacts = self.contacts_parsed and self.total_contacts == 0`
+— un parseo fallido o una DB ausente (parsed=False) NO escala `data_minimization`.
+Verificado: escenario del red-team ahora z=2.4 (== caso con datos), mientras una
+agenda REALMENTE parseada-y-vacía sí escala (z=3.0). La distinción quedó correcta.
+
+**Validación:** `tests/test_b072_b074_mobile_verdict_fixes.py` — 9 de B-072
+(5 del finding + 4 de `TestB072DataMinimizationEscalation`: parseo fallido no
+escala, empty real sí, flags end-to-end). Suite 489, corpus 198/198.
 
 ---
 

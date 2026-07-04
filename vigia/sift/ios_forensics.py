@@ -107,6 +107,12 @@ class iOSAnalysisResult:
     total_sms: int = 0
     total_contacts: int = 0
     total_calls: int = 0
+    # B-072: solo un conteo EXITOSO de 0 es evidencia de data_minimization.
+    # Un parseo fallido o una DB ausente dejan total_*=0 por default, lo que NO
+    # debe escalar el veredicto (falso INTENT/MALICE). Estos flags distinguen
+    # "parseado y vacío" de "no determinado".
+    contacts_parsed: bool = False
+    calls_parsed: bool = False
     total_safari_entries: int = 0
     encrypted_apps: List[Dict[str, Any]] = field(default_factory=list)
     findings: List[iOSFinding] = field(default_factory=list)
@@ -128,8 +134,11 @@ class iOSAnalysisResult:
         has_phishing = any(
             f.finding_type == "SMS_PHISHING_RECEIVED" for f in self.findings
         )
-        empty_contacts = self.total_contacts == 0
-        empty_calls = self.total_calls == 0
+        # B-072: empty solo si el conteo fue EXITOSO y dio 0. Un parseo fallido
+        # o una DB ausente (parsed=False) NO cuenta como agenda/llamadas vacías
+        # — no puede escalar data_minimization (evita falso INTENT/MALICE).
+        empty_contacts = self.contacts_parsed and self.total_contacts == 0
+        empty_calls = self.calls_parsed and self.total_calls == 0
         data_minimization = empty_contacts and empty_calls
 
         # Bump for opsec_indicators (BUG-011 fix: opsec contributes to z)
@@ -452,11 +461,14 @@ class iOSForensicsAnalyzer:
         finally:
             conn.close()
 
+        result.contacts_parsed = parsed
+
         # B-072: no conflar "no-parseable" con "vacío". Solo un conteo EXITOSO
         # de 0 es evidencia de agenda borrada (data_minimization). Un fallo de
         # parseo (schema desconocido) NO puede escalar el veredicto — sería
         # incapacidad de análisis presentada como señal (familia P0-A). El
-        # analysis_note ya deja rastro para que el veredicto abstenga.
+        # analysis_note ya deja rastro para que el veredicto abstenga. El flag
+        # contacts_parsed corta la escalación en to_signal (no solo el finding).
         if parsed and result.total_contacts == 0:
             self._opsec_indicators.append({
                 "indicator": "EMPTY_CONTACTS",
@@ -485,6 +497,7 @@ class iOSForensicsAnalyzer:
             try:
                 count = conn.execute("SELECT COUNT(*) FROM ZCALLRECORD").fetchone()[0]
                 result.total_calls = count
+                result.calls_parsed = True  # B-072
             except sqlite3.OperationalError:
                 result.analysis_notes.append("CallHistory: 'ZCALLRECORD' table not found")
                 return
