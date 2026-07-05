@@ -278,17 +278,18 @@ class TestEngineAnalyzeBatch:
 
 
 # ---------------------------------------------------------------------------
-# KNOWN DEFECT — left failing on purpose (do not xfail; see class docstring)
+# REGRESSION GUARD — BUG-ENT-001, fixed with keep-both semantics (see docstring)
 # ---------------------------------------------------------------------------
 
 class TestIdenticalDocumentCollapse:
     """
-    BUG-ENT-001 — byte-identical documents collapse, breaking document accounting.
+    BUG-ENT-001 (FIXED, keep-both) — byte-identical documents collapsed,
+    breaking document accounting. This class is now the regression guard.
 
-    analyze_batch() keys its per-document state (fingerprints, texts,
+    analyze_batch() keyed its per-document state (fingerprints, texts,
     errors_by_doc) by `doc_hash = sha256(text)[:16]`. Two byte-identical inputs
-    therefore share one key and silently overwrite each other in those dicts,
-    while `document_count` is set from `len(document_paths)` (== 2). The result:
+    therefore shared one key and silently overwrote each other in those dicts,
+    while `document_count` was set from `len(document_paths)` (== 2). The result:
 
       * entanglement_matrix is EMPTY (only one fingerprint key survives, so
         _calc_entanglement_matrix produces no pairs);
@@ -303,15 +304,19 @@ class TestIdenticalDocumentCollapse:
     de-duplication were intended, document_count should be 1; if not, the second
     document must contribute a distinct analyzed unit. It cannot be both.
 
-    Scope of confirmation: CONFIRMED. Reproduced end-to-end: two files with
-    identical content yield document_count == 2, an empty entanglement_matrix,
-    and exactly one persisted row in entanglement_analysis for the batch.
+    Fix applied (keep-both semantics, maintainer decision D2): a duplicate
+    content hash gets an ordinal in-memory suffix ("hash#2") so the second
+    document survives as a distinct analyzed unit, while the PERSISTED doc_hash
+    column keeps the pure content hash taken from fingerprint.doc_hash — two
+    byte-identical documents produce two rows with the same content hash, which
+    is the forensic truth. "#" is outside the hex alphabet, so a suffixed id
+    can never collide with a real hash; suffix order follows input order, so
+    the result stays deterministic.
 
-    Suggested fix: key the per-document dicts by a value derived from the input
-    path (e.g. the resolved path or path+ordinal) rather than the content hash,
-    keeping content_hash as a stored attribute; or, if de-duplication is the
-    desired semantics, set document_count to the number of unique doc_hashes so
-    the report and the persisted rows agree.
+    These tests now pin the keep-both contract: full accounting (rows ==
+    document_count), the identical pair visible in the matrix at composite 1.0,
+    factory detection firing on a verbatim duplicate, and the DB column staying
+    a pure content hash.
     """
 
     def test_identical_documents_are_accounted_for(self, tmp_path):
@@ -329,12 +334,39 @@ class TestIdenticalDocumentCollapse:
         # ...so exactly two documents must have been analyzed and persisted.
         with eng.db.connection() as conn:
             rows = conn.execute(
-                "SELECT COUNT(*) AS c FROM entanglement_analysis WHERE batch_id = ?",
+                "SELECT doc_hash FROM entanglement_analysis WHERE batch_id = ?",
                 (batch_id,),
-            ).fetchone()
-        persisted = dict(rows)["c"]
-        assert persisted == report.document_count, (
-            f"document_count={report.document_count} but only {persisted} row(s) "
-            f"persisted: byte-identical documents collapse on doc_hash, so the "
-            f"second document is silently dropped (BUG-ENT-001)."
+            ).fetchall()
+        hashes = [dict(r)["doc_hash"] for r in rows]
+        assert len(hashes) == report.document_count, (
+            f"document_count={report.document_count} but only {len(hashes)} "
+            f"row(s) persisted: byte-identical documents collapse on doc_hash, "
+            f"so the second document is silently dropped (BUG-ENT-001)."
         )
+
+        # DB contract: the persisted doc_hash is the pure content hash (16 hex
+        # chars, never an in-memory suffixed id), identical for identical docs.
+        assert all(len(h) == 16 and "#" not in h for h in hashes)
+        assert hashes[0] == hashes[1]
+
+    def test_identical_pair_is_detected_as_entangled(self, tmp_path):
+        # Keep-both semantics: a verbatim duplicate is the strongest possible
+        # entanglement signal and must be DETECTED, not collapsed away.
+        text = "The quick brown fox jumps over the lazy dog. " * 20
+        p1 = _write(tmp_path, "dup1.txt", text)
+        p2 = _write(tmp_path, "dup2.txt", text)
+
+        report = EntanglementEngine().analyze_batch(
+            [p1, p2], batch_id="KEEPBOTH-" + uuid.uuid4().hex[:8]
+        )
+
+        # The pair appears in the matrix with a perfect composite score.
+        assert report.entanglement_matrix, "identical pair missing from matrix"
+        assert all(
+            sims["composite"] == pytest.approx(1.0)
+            for sims in report.entanglement_matrix.values()
+        )
+        # Verbatim shared sequences span both analyzed units.
+        assert report.identical_sequences
+        # A verbatim duplicate batch is factory production by definition.
+        assert report.is_factory_production is True
