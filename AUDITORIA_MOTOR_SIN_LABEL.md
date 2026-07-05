@@ -98,20 +98,98 @@ separate corpus issue; it is not the cause of the FP/FN.
 
 ---
 
+## 3b. Label-flip test — leakage isolated to the agent
+
+Single case (`VIGIA-CAN-008`), flip **only** `expected_verdict` MALICE -> NOISE, change
+nothing else, measure both engines. Motor seal = SHA-256 of the decision dict excluding
+the passthrough `expected_verdict` field; agent seal = SHA-256 of bundle content
+excluding volatile timestamps / audit trail.
+
+| `expected_verdict` | Engine | verdict | score / posterior | seal |
+|---|---|---|---|---|
+| MALICE | Motor | MALICE | score 0.5553 | `260aef13...` |
+| NOISE | Motor | MALICE | score 0.5553 | `260aef13...` |
+| MALICE | Agent | MALICE | posterior 57/1000 | `ef326ea9...` |
+| NOISE | Agent | NOISE | posterior 57/1000 | `d31bdf42...` |
+
+- **Motor:** verdict, score, and seal are identical under both labels. No leakage.
+- **Agent:** the same posterior `57/1000` is sealed as MALICE under one label and NOISE
+  under the other; the seal changes. The label determines the agent's verdict and seal.
+
+## 3c. `avg > 2` — concrete unreachable threshold (code audit)
+
+The agent's decision in `_analyze_ebs_json` (`sift_orchestrator.py`):
+
+```
+effective  = raw_score * prior_trust        # per artifact (line ~604)
+avg        = mean(effective)                # line ~616
+is_malice  = avg > Fraction(2, 1) or expected == "MALICE"   # line 620
+```
+
+`validate_case.py` enforces `0.0 <= raw_score <= 1.0` and `0.0 <= prior_trust <= 1.0`
+(lines 128, 132). Therefore for any schema-valid case:
+
+- `effective = raw_score * prior_trust` in `[0, 1]`
+- `avg = mean(effective)` in `[0, 1]`, theoretical max `1.0` (all artifacts raw=1, trust=1)
+
+The threshold `avg > 2` is **unreachable** for normalized inputs — it requires twice the
+domain maximum. The evidence branch to MALICE can never fire; the only surviving route to
+`MALICIOUS_INTENT_DETECTED` in this adapter is `expected == "MALICE"`, i.e. the label.
+Measured corpus max `avg` = 0.87. This is the concrete mechanism behind the label-flip
+result in 3b.
+
+---
+
 ## 4. Verified root causes (deduction confirmed by induction)
 
-### 4.1 FP — cultural marker (`FP-CULTURAL-CLEAN-001` / `FP-CULTURAL-CLEAN`)
+### 4.1 FP — `evidence_type=cultural_marker` with high `raw_score` (language-independent)
 
 Clean host (memory / LSASS / MFT raw 0.04-0.08, trust 0.95) plus one `cultural_marker`
-artifact "Cyrillic filename" (raw 0.85, trust 0.3). Ground truth NOISE.
+artifact (raw 0.85, trust 0.3). Ground truth NOISE.
 
 | Run | Motor verdict | Score |
 |---|---|---|
 | Full case | MALICE | 0.4209 |
 | `cultural_marker` artifact removed | NOISE | 0.0336 |
 
-Dropping the single cultural-marker artifact flips the verdict to NOISE. The Cyrillic
-filename alone drives MALICE.
+Dropping the single `cultural_marker` artifact flips the verdict to NOISE.
+
+**This is NOT a language / script bias.** Varying only the filename script while holding
+`raw_score=0.85`, `evidence_type=cultural_marker`, and the two clean forensic artifacts
+constant yields an identical score for every script (measured):
+
+| Script in `cultural_marker` description | Motor verdict | Score |
+|---|---|---|
+| Latin (control) `report_finance.docx` | SUSPICION | 0.3612 |
+| Cyrillic `отчет_финансы.docx` | SUSPICION | 0.3612 |
+| Arabic `تقرير_مالي.docx` | SUSPICION | 0.3612 |
+| Chinese `财务报告.docx` | SUSPICION | 0.3612 |
+| Japanese `財務報告.docx` | SUSPICION | 0.3612 |
+
+The score is byte-identical across all five scripts — the scorer does not read the
+Unicode content. What drives the elevation is the artifact's `evidence_type` and
+`raw_score`, isolated by these controls (Cyrillic held fixed):
+
+| Perturbation | Motor verdict | Score |
+|---|---|---|
+| `cultural_marker`, `raw_score=0.05` | NOISE | 0.0033 |
+| `evidence_type=log_entry`, `raw_score=0.85` | NOISE | 0.0062 |
+| Latin + `log_entry`, `raw_score=0.85` | NOISE | 0.0062 |
+
+Same `raw_score=0.85` as a `log_entry` does not elevate; as a `cultural_marker` it does.
+Grounded in code (`vigia/tools/caie.py`):
+
+- `evidence_role("cultural_marker")` returns `DEVICE` (default; it is not in the
+  NARRATIVE set `behavioral_context` / `behavioral_profile` / `outcome_signal`,
+  `caie.py:372-387`), so it feeds the malice composite instead of being set aside as
+  contextual.
+- Its spoofability profile is `EvidenceProfile(0.90, 0.15, "Language, keyboard layout
+  -- easy to fake")` (`caie.py:249`), commented in-code as the worst real class.
+
+So the FP is a weighting of the `cultural_marker` evidence class as scored DEVICE
+evidence, independent of the language of the content — not a Cyrillic/cultural bias.
+(The 0.4209 in the first table vs 0.3612 here reflects the exact metadata fields present
+in the original artifact; the language is irrelevant in both.)
 
 ### 4.2 FN — low-trust colluding sources (`VIGIA_KIWI_006` / `VIGIA_KIWI_007`)
 
