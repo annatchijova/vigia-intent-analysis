@@ -212,9 +212,21 @@ class EntanglementEngine:
 
         for path in document_paths:
             doc_hash, text, fingerprint, errors = self._process_document(path)
-            fingerprints[doc_hash] = fingerprint
-            texts[doc_hash] = text
-            errors_by_doc[doc_hash] = errors
+            # Keep-both semantics (BUG-ENT-001): byte-identical documents are
+            # distinct analyzed units — a factory emitting the same template
+            # verbatim twice is the primary detection target, not a duplicate
+            # to collapse. The content hash stays the key for unique docs; a
+            # duplicate gets an ordinal suffix ("#" is outside the hex
+            # alphabet, so a suffixed id can never collide with a real hash).
+            # The pure content hash remains available as fingerprint.doc_hash.
+            doc_id = doc_hash
+            dup = 1
+            while doc_id in fingerprints:
+                dup += 1
+                doc_id = f"{doc_hash}#{dup}"
+            fingerprints[doc_id] = fingerprint
+            texts[doc_id] = text
+            errors_by_doc[doc_id] = errors
 
         matrix = self._calc_entanglement_matrix(fingerprints)
         identical_seqs = self._find_identical_sequences(texts)
@@ -521,16 +533,16 @@ class EntanglementEngine:
                 ON entanglement_analysis(batch_id)
             """)
 
-            for doc_hash in fingerprints:
+            for doc_id, fingerprint in fingerprints.items():
                 sigs = [
                     s.error_pattern
                     for s in report.physical_key_signatures
-                    if doc_hash in s.affected_docs
+                    if doc_id in s.affected_docs
                 ]
                 seqs = [
                     s["hash"]
                     for s in report.identical_sequences
-                    if doc_hash in s["documents"]
+                    if doc_id in s["documents"]
                 ]
                 conn.execute("""
                     INSERT INTO entanglement_analysis
@@ -538,7 +550,11 @@ class EntanglementEngine:
                      physical_signatures, identical_sequences)
                     VALUES (?, ?, ?, ?, ?, ?)
                 """, (
-                    report.batch_id, doc_hash,
+                    # The persisted doc_hash is the pure content hash, never a
+                    # suffixed in-memory doc_id: two byte-identical documents
+                    # produce two rows with the same hash, which is the
+                    # forensic truth under keep-both (BUG-ENT-001).
+                    report.batch_id, fingerprint.doc_hash,
                     report.is_factory_production, report.confidence,
                     json.dumps(sigs), json.dumps(seqs),
                 ))
