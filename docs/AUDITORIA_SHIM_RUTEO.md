@@ -5,8 +5,19 @@ on raw evidence, while the LLM never decides the verdict. Root cause is in the r
 layer of the compatibility shim (`sift_orchestrator.py`, the module the agent imports),
 not in the LLM and not in the deterministic engine.
 
-Everything below was verified against live code and one inductive routing test on this
-repository state. No code was modified. This document reports measurements only.
+The original investigation below was verified against live code and one inductive routing
+test. This document reports measurements only.
+
+**Status (updated):**
+- **B1** — fixed at the visibility level by **B1-a** (commit `3de3b29`): the memory-only
+  branch now marks the dropped artifacts as `unanalyzed` (F7) instead of dropping them
+  silently, so the verdict degrades `NOISE -> ABSTAIN` instead of sealing a spurious
+  benign result. It does **not** yet recover those signals — that is **B1-c**, deferred
+  as a larger architecture decision (route the other artifacts to `run_full_analysis`
+  while keeping vol3 as the memory engine, merged without double-counting).
+- **B2** — found **already fixed** in `_analyze_memory_vol3` (lines 774-816, prior P1-D
+  fix); no code change was needed. See the B2 section for the correction.
+- **B3** — unchanged; already degrades honestly (visible error, not silent).
 
 - **Scope:** Mode 1 raw-evidence path. Agent
   (`vigia_agent.py` -> root `sift_orchestrator.py` shim -> `SIFTOrchestrator.analyze`)
@@ -135,7 +146,7 @@ res = SH.SIFTOrchestrator("H1-TEST").analyze(**kwargs)
 
 ## Secondary findings
 
-### B2 — vol3 is an external binary; absent/failed -> zero memory signals
+### B2 — vol3 is an external binary; absent/failed -> ALREADY handled (no fix needed)
 
 `_analyze_memory_vol3` runs Volatility3 via `_vol3_run`, which shells out to the `_VOL3`
 binary:
@@ -146,12 +157,22 @@ binary:
 73  _VOL3 = "vol3"
 ```
 
-If the binary is absent, or the image is not a valid Windows RAM dump (VMware snapshot /
-disk image), the adapter returns `FORMAT_NOT_SUPPORTED` (or an `ok:False` run) with
-`signals: []`. In this environment no `vol`/`vol3`/`volatility3` binary is on PATH
-(`which vol vol3 volatility3` -> none). Combined with B1: a mixed directory routes to the
-memory-only branch (B1), then that branch yields zero signals (B2) — so the whole
-directory produces zero signals even though its evtx/registry were perfectly analyzable.
+In this environment no `vol`/`vol3`/`volatility3` binary is on PATH
+(`which vol vol3 volatility3` -> none).
+
+**Correction (verified in live code, §4.1):** the "zero signals looking benign" risk is
+**already handled**. `_analyze_memory_vol3` lines 774-816 (prior fix, "auditoria FN,
+P1-D") compute `any_plugin_ok = info["ok"] or pslist["ok"] or netscan["ok"] or
+malfind["ok"]`; when no plugin ran it returns `best_hypothesis="UNANALYZED_ARTIFACT"`
+(`error="VOL3_UNAVAILABLE"` when stderr shows "no such file"/"not found"), which maps to
+ABSTAIN in the agent — not to a benign NOISE. The earlier draft of this section flagged
+B2 as an open finding because that guard had not been read to completion; it is closed.
+No code change was made for B2.
+
+Note on composition with B1: on a mixed directory where vol3 is unavailable, the memory
+branch now yields `UNANALYZED_ARTIFACT` (from the P1-D guard) **and** the B1-a marks flag
+the dropped evtx/registry as `unanalyzed` — so the whole directory degrades to ABSTAIN
+with an explicit list of what was not analyzed, instead of a silent benign verdict.
 
 ### B3 — E01 disk image without prior mounting -> zero signals
 
