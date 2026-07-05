@@ -23,6 +23,7 @@ defect stays visible until fixed. See its docstring for the full analysis.
 """
 from __future__ import annotations
 
+import os
 import uuid
 
 import pytest
@@ -35,6 +36,35 @@ from vigia.core.entanglement import (
     EntanglementEngine,
     PHYSICAL_KEY_MIN_DOCS,
 )
+
+
+@pytest.fixture(scope="module", autouse=True)
+def _isolated_forensic_db(tmp_path_factory):
+    """Route the ForensicDatabaseManager singleton to a temp directory.
+
+    EntanglementEngine() defaults to ForensicDatabaseManager(), whose default
+    DB path is $VIGIA_EVIDENCE_PATH/vigia_forensic.db, falling back to
+    /mnt/evidence — unwritable (or read-only evidence!) on most machines, and
+    a global-state leak on the rest. The manager is a process-wide singleton,
+    so per-test db_path injection is unreliable: whichever construction runs
+    first wins for the whole process. Instead, park the existing singleton,
+    point the env var at a pytest temp dir for this module, and restore both
+    afterwards so other test modules see exactly the state they had before.
+    """
+    from vigia.tools import forensic_db as fdb
+
+    saved_instance = fdb.ForensicDatabaseManager._instance
+    saved_env = os.environ.get(fdb.EVIDENCE_PATH_ENV)
+    fdb.ForensicDatabaseManager._instance = None
+    os.environ[fdb.EVIDENCE_PATH_ENV] = str(tmp_path_factory.mktemp("entanglement_db"))
+    try:
+        yield
+    finally:
+        if saved_env is None:
+            os.environ.pop(fdb.EVIDENCE_PATH_ENV, None)
+        else:
+            os.environ[fdb.EVIDENCE_PATH_ENV] = saved_env
+        fdb.ForensicDatabaseManager._instance = saved_instance
 
 
 # ---------------------------------------------------------------------------
