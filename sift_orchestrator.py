@@ -168,6 +168,13 @@ class SIFTOrchestrator:
             except Exception as e:
                 logger.error("[SIFT_SHIM] vol3 memory analysis failed: %s", e)
                 result = self._error_result(str(e))
+            # B1-a (AUDITORIA_SHIM_RUTEO): esta rama analiza SOLO la memoria con
+            # vol3. Cualquier otro artefacto detectado en la misma evidencia
+            # (evtx, hives, pcap, mft, browser, prefetch) NO se ve en esta ruta.
+            # Materializar la pérdida (patrón F7) para que "solo memoria" no se
+            # selle como cobertura completa. No recupera las señales; las hace
+            # visibles → degradación honesta, no silenciosa.
+            self._mark_memory_only_dropped(result, kwargs)
             return self._merge_mobile_signals(result, mobile_signals)
 
         # B-045: if only mobile evidence is present (no Windows artifacts),
@@ -546,6 +553,67 @@ class SIFTOrchestrator:
                 )
                 meta["mobile_escalation_applied"] = True
         return result
+
+    @staticmethod
+    def _mark_memory_only_dropped(result: Dict[str, Any], kwargs: Dict[str, Any]) -> None:
+        """
+        B1-a (AUDITORIA_SHIM_RUTEO): la rama memory-only del shim analiza SOLO
+        la memoria con vol3 (el motor de memoria confiable para evidencia real).
+        Cualquier otro artefacto detectado en la misma evidencia (evtx, hives,
+        pcap, mft, browser, prefetch) NO se analiza en esta ruta. Este helper
+        materializa esa pérdida con el patrón F7 ya usado para pcap: una señal
+        `unanalyzed` (signal_class=derived → no cuenta para el gate de
+        corroboración ni infla el conteo) por artefacto descartado, más la
+        lista `results.unanalyzed_artifacts` que classify_agent_verdict lee para
+        degradar NOISE→ABSTAIN. NO recupera las señales (eso sería B1-c) — las
+        hace VISIBLES para que "solo memoria" no se selle como cobertura total.
+        """
+        dropped: List[tuple] = []
+        for key, art_type in (
+            ("event_logs", "windows_event_log"),
+            ("event_stream", "windows_event_log"),
+            ("registry_hives", "registry"),
+            ("pcap_path", "pcap"),
+            ("network_flows", "network"),
+            ("browser_profile", "browser"),
+            ("prefetch_dir", "prefetch"),
+            ("mft_path", "mft"),
+            ("mft_json", "mft"),
+        ):
+            if kwargs.get(key):
+                dropped.append((key, art_type, kwargs.get(key)))
+        # log_path solo si NO es JSON (los .json entran por _analyze_ebs_json antes)
+        _lp = kwargs.get("log_path")
+        if _lp and not str(_lp).endswith(".json"):
+            dropped.append(("log_path", "event_log", _lp))
+        if not dropped:
+            return
+
+        sigs = result.setdefault("signals", [])
+        if not isinstance(sigs, list):
+            return
+        inner = result.setdefault("results", {})
+        ua = inner.setdefault("unanalyzed_artifacts", []) if isinstance(inner, dict) else None
+        for key, art_type, val in dropped:
+            sigs.append({
+                "tool": f"{art_type.upper()}_UNANALYZED",
+                "z_score": 0.0,
+                "confidence": 0.0,
+                "value": 0.0,
+                "metadata": {
+                    "artifact_type": art_type,
+                    "unanalyzed": True,
+                    "signal_class": "derived",
+                    "error": "memory-first routing: not analyzed by vol3 memory adapter (B1-a)",
+                    "path": str(val),
+                    "dropped_kwarg": key,
+                },
+            })
+            if isinstance(ua, list) and art_type not in ua:
+                ua.append(art_type)
+        meta = result.setdefault("pipeline_meta", {})
+        if isinstance(meta, dict):
+            meta["memory_only_dropped"] = [k for k, _, _ in dropped]
 
     # ── Adaptadores internos ──────────────────────────────────────────────
 
