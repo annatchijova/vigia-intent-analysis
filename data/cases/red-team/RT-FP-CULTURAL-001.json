@@ -1,0 +1,89 @@
+{
+  "case_id": "RT-FP-CULTURAL-001",
+  "name": "Clean Foreign Machine — Native Russian Configuration, No Incident",
+  "description": "A developer in Torzhok. Cyrillic filenames, RU keyboard, UTC+3 timezone. Memory, LSASS and kernel are clean. There was NO incident. The cultural markers are native configuration, not planted bait. This is the discriminating negative case for FALSE_FLAG_PATTERN: high cultural markers + clean system must NOT be MALICE. The absence of a malicious event is not evidence of a staged one.",
+  "audit_note": "Finding H-02. DO NOT include in run_all_cases (green corpus) until the FALSE_FLAG_PATTERN rule fix is applied: with the current rule this case resolves to MALICE incorrectly. Serves as documentary fixture and regression guard.",
+  "artifacts": [
+    {
+      "artifact_id": "cultural_clean_001",
+      "evidence_type": "cultural_marker",
+      "source_tool": "infer_intent",
+      "timestamp": "2026-04-10T12:00:00Z",
+      "raw_score": 0.85,
+      "prior_trust": 0.3,
+      "provenance_chain": [
+        "sha256:cultural_clean_chain_001"
+      ],
+      "description": "Cyrillic filename: 'отчет_финансы.docx'. Keyboard layout: RU. Timezone: UTC+3. Comments in Russian. Native developer configuration.",
+      "metadata": {
+        "cyrillic_filenames": 3,
+        "keyboard_layout_detected": "RU",
+        "timezone_offset": "+03:00",
+        "language_confidence": 0.91,
+        "acquisition_tool": "ftk imager",
+        "acquisition_hash": "sha256:redteam_fixture_hash",
+        "acquisition_timestamp": "2026-01-01T00:00:00Z",
+        "write_blocker_used": true,
+        "examiner_id": "redteam_examiner"
+      }
+    },
+    {
+      "artifact_id": "technical_clean_001",
+      "evidence_type": "memory_process",
+      "source_tool": "list_processes",
+      "timestamp": "2026-04-10T12:00:10Z",
+      "raw_score": 0.05,
+      "prior_trust": 0.95,
+      "provenance_chain": [
+        "sha256:mem_clean_001",
+        "sha256:mem_clean_002"
+      ],
+      "description": "Memory: No process injection. No kernel anomalies. Clean system state.",
+      "metadata": {
+        "injections_detected": 0,
+        "kernel_anomalies": 0,
+        "suspicious_handles": 0,
+        "acquisition_tool": "ftk imager",
+        "acquisition_hash": "sha256:redteam_fixture_hash",
+        "acquisition_timestamp": "2026-01-01T00:00:00Z",
+        "write_blocker_used": true,
+        "examiner_id": "redteam_examiner"
+      }
+    },
+    {
+      "artifact_id": "technical_clean_002",
+      "evidence_type": "lsass_session",
+      "source_tool": "list_processes",
+      "timestamp": "2026-04-10T12:00:12Z",
+      "raw_score": 0.08,
+      "prior_trust": 0.95,
+      "provenance_chain": [
+        "sha256:lsass_clean_001"
+      ],
+      "description": "LSASS: No credential dumping. Normal session count.",
+      "metadata": {
+        "sessions": 2,
+        "anomalies": 0,
+        "acquisition_tool": "ftk imager",
+        "acquisition_hash": "sha256:redteam_fixture_hash",
+        "acquisition_timestamp": "2026-01-01T00:00:00Z",
+        "write_blocker_used": true,
+        "examiner_id": "redteam_examiner"
+      }
+    }
+  ],
+  "temporal_violations": [],
+  "caie_fractures": [],
+  "expected_verdict": "NOISE",
+  "expected_confidence": 0.15,
+  "peirce_chain": {
+    "firstness": "Cyrillic filenames, RU keyboard, UTC+3 — all present.",
+    "secondness": "Memory, LSASS, kernel — all clean. There is no malicious event to attribute.",
+    "thirdness": "Most parsimonious explanation (Eco's razor): this is a Russian developer's machine. No staging, no flag. Russian is spoken in many places; configuration is not intent."
+  },
+  "demo_quote": "VIGÍA does not accuse someone for writing in Russian. Without a real malicious event, there is no attribution to falsify.",
+  "schema_version": "ebs_v1",
+  "case_name": "RED-TEAM FIXTURE — RT-FP-CULTURAL-001",
+  "red_team_derived_from": "FP-CULTURAL-CLEAN-001",
+  "red_team_note": "False positive: clean host flagged MALICE solely due to a Cyrillic-filename cultural_marker."
+}

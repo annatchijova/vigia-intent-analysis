@@ -1,0 +1,112 @@
+{
+  "case_id": "RT-FN-CONSTELLATION-001",
+  "case_name": "RED-TEAM FIXTURE — RT-FN-CONSTELLATION-001",
+  "description": "Attacker installs a legitimate backup agent (Veeam) with a valid licence, configured to send data to a cloud instance they rented. The tool is legitimate, signed, and the traffic is indistinguishable from real backups.",
+  "abstention_risk": "high",
+  "expected_verdict": "MALICE",
+  "carnegie_pattern_expected": null,
+  "confidence_expected": 78,
+  "artifacts": [
+    {
+      "artifact_id": "fn002_01",
+      "evidence_type": "memory_process",
+      "source_tool": "sift_process_list",
+      "timestamp": "2026-06-15T02:00:00Z",
+      "raw_score": 0.05,
+      "prior_trust": 0.95,
+      "provenance_chain": [
+        "sha256:fn002proc01"
+      ],
+      "description": "veeam_agent.exe running with valid certificate",
+      "metadata": {
+        "process": "veeam_agent.exe",
+        "signed": true,
+        "signer": "Veeam Software",
+        "install_date": "2026-06-14",
+        "installer": "system_admin",
+        "acquisition_tool": "ftk imager",
+        "acquisition_hash": "sha256:redteam_fixture_hash",
+        "acquisition_timestamp": "2026-01-01T00:00:00Z",
+        "write_blocker_used": true,
+        "examiner_id": "redteam_examiner"
+      }
+    },
+    {
+      "artifact_id": "fn002_02",
+      "evidence_type": "ip_geolocation",
+      "source_tool": "sift_netflow",
+      "timestamp": "2026-06-15T02:30:00Z",
+      "raw_score": 0.05,
+      "prior_trust": 0.2,
+      "provenance_chain": [
+        "sha256:fn002net02"
+      ],
+      "description": "Backup traffic to 198.51.100.77 on port 443",
+      "metadata": {
+        "source_ip": "10.0.8.44",
+        "dest_ip": "198.51.100.77",
+        "bytes": 107374182400,
+        "tool": "veeam",
+        "port": 443,
+        "acquisition_tool": "ftk imager",
+        "acquisition_hash": "sha256:redteam_fixture_hash",
+        "acquisition_timestamp": "2026-01-01T00:00:00Z",
+        "write_blocker_used": true,
+        "examiner_id": "redteam_examiner"
+      }
+    },
+    {
+      "artifact_id": "fn002_03",
+      "evidence_type": "log_entry",
+      "source_tool": "sift_change_management",
+      "timestamp": "2026-06-14T09:00:00Z",
+      "raw_score": 0.08,
+      "prior_trust": 0.3,
+      "provenance_chain": [
+        "sha256:fn002chg03"
+      ],
+      "description": "NO change ticket found for Veeam installation on server 10.0.8.44",
+      "metadata": {
+        "server": "10.0.8.44",
+        "software": "Veeam Agent",
+        "change_ticket_found": false,
+        "expected_approver": "backup_ops",
+        "acquisition_tool": "ftk imager",
+        "acquisition_hash": "sha256:redteam_fixture_hash",
+        "acquisition_timestamp": "2026-01-01T00:00:00Z",
+        "write_blocker_used": true,
+        "examiner_id": "redteam_examiner"
+      }
+    }
+  ],
+  "temporal_violations": [],
+  "caie_fractures": [
+    {
+      "fracture_type": "MISSING_AUTHORIZATION",
+      "severity": 0.85,
+      "interpretation": "Legitimate tool but installed without a change ticket. Technical legitimacy does not imply operational legitimacy.",
+      "artifact_a": "fn002_01",
+      "artifact_b": "fn002_03",
+      "ttp_id": "T1072"
+    }
+  ],
+  "peirce_expected": {
+    "firstness": "Legitimate backup agent, signed, normal traffic",
+    "secondness": "No change ticket for the installation. The tool is technically legitimate but its presence is not authorised",
+    "thirdness": "Attacker habit of using legitimate tools as exfiltration vectors, trusting that technical legitimacy conceals the lack of operational authorisation"
+  },
+  "devil_advocate": "The binary is signed by Veeam Software, the traffic looks like standard backup traffic, and backups to cloud storage are normal business practice.",
+  "source_dataset": "VIGÍA Synthetic Corpus — False Negative Suite",
+  "source_origin": "synthetic_vigia_collective",
+  "notes": "False negative test: everything is technically legitimate. The only anomaly is the absence of authorisation. If VIGÍA only checks hashes and signatures, it will return BENIGN.",
+  "_consolidation": {
+    "consolidated_at": "2026-06-05T04:27:39.816083+00:00",
+    "parser_version": "2.4",
+    "schema_version": "1.1",
+    "source_file": "VIGIA_FP_FN_AMB.json",
+    "source_origin": "synthetic_vigia_collective"
+  },
+  "schema_version": "ebs_v1",
+  "red_team_derived_from": "VIGIA-FN-002",
+  "red_team_note": "False negative: living-off-the-land; each artifact individually low raw_score, malice is emergent."
+}

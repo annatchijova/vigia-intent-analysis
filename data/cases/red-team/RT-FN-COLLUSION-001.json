@@ -1,0 +1,116 @@
+{
+  "case_id": "RT-FN-COLLUSION-001",
+  "case_name": "RED-TEAM FIXTURE — RT-FN-COLLUSION-001",
+  "description": "Three coordinated witnesses construct peligrosidad narrative. Each witness testimony contains self-incriminating conduct. Conflicto de interés documentado en todos.",
+  "expected_verdict": "SUSPICION",
+  "schema_version": "ebs_v1",
+  "artifacts": [
+    {
+      "artifact_id": "KIWI-006-A01",
+      "evidence_type": "cultural_marker",
+      "description": "Testigo-A descargó 10gb de material de imputada. No la conoce. Declara miedo. Vínculo directo con hermano del denunciante.",
+      "raw_score": 0.7,
+      "prior_trust": 0.15,
+      "source_tool": "manual_forensic_review",
+      "timestamp": "2025-08-01T00:00:00Z",
+      "provenance_chain": [
+        "AT-001-manual-collection"
+      ],
+      "examiner_id": "AT-001",
+      "schema_version": "ebs_v1",
+      "metadata": {
+        "examiner": "AT-001",
+        "case_origin": "MPF7779408",
+        "schema": "ebs_v1",
+        "acquisition_tool": "manual_forensic_review",
+        "acquisition_hash": "a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2",
+        "acquisition_timestamp": "2025-08-01T00:00:00Z",
+        "write_blocker_used": false,
+        "examiner_id": "AT-001",
+        "witness_conflict_of_interest": true,
+        "material_downloaded_gb": 10
+      }
+    },
+    {
+      "artifact_id": "KIWI-006-A02",
+      "evidence_type": "log_entry",
+      "description": "Hermano del denunciante descargó material de imputada. Imputada lo tiene bloqueado hace años. No pudo presentar capturas. No sabe el número de su propio celular.",
+      "raw_score": 0.8,
+      "prior_trust": 0.1,
+      "source_tool": "manual_forensic_review",
+      "timestamp": "2025-08-01T00:00:00Z",
+      "provenance_chain": [
+        "AT-001-manual-collection"
+      ],
+      "examiner_id": "AT-001",
+      "schema_version": "ebs_v1",
+      "metadata": {
+        "examiner": "AT-001",
+        "case_origin": "MPF7779408",
+        "schema": "ebs_v1",
+        "acquisition_tool": "manual_forensic_review",
+        "acquisition_hash": "b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3",
+        "acquisition_timestamp": "2025-08-01T00:00:00Z",
+        "write_blocker_used": false,
+        "examiner_id": "AT-001",
+        "blocked_by_imputada": true,
+        "evidence_withheld": true,
+        "stated_reason": "no_sabe_su_celular"
+      }
+    },
+    {
+      "artifact_id": "KIWI-006-A03",
+      "evidence_type": "cultural_marker",
+      "description": "Madre del denunciante declara que imputada está loca y se mete con hermana del denunciante. Imputada nunca conoció a la hermana. Testigo tiene historial de declaraciones contradictorias sobre el denunciante.",
+      "raw_score": 0.6,
+      "prior_trust": 0.1,
+      "source_tool": "manual_forensic_review",
+      "timestamp": "2025-08-01T00:00:00Z",
+      "provenance_chain": [
+        "AT-001-manual-collection"
+      ],
+      "examiner_id": "AT-001",
+      "schema_version": "ebs_v1",
+      "metadata": {
+        "examiner": "AT-001",
+        "case_origin": "MPF7779408",
+        "schema": "ebs_v1",
+        "acquisition_tool": "manual_forensic_review",
+        "acquisition_hash": "c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4",
+        "acquisition_timestamp": "2025-08-01T00:00:00Z",
+        "write_blocker_used": false,
+        "examiner_id": "AT-001",
+        "claims_about_unknown_person": true,
+        "contradictory_prior_statements": true
+      }
+    },
+    {
+      "artifact_id": "KIWI-006-A04",
+      "evidence_type": "cultural_marker",
+      "description": "Tres testigos vinculados entre sí, ninguno independiente. Testimonios coordinados construyen narrativa de peligrosidad sin contacto verificado.",
+      "raw_score": 0.8,
+      "prior_trust": 0.1,
+      "source_tool": "manual_forensic_review",
+      "timestamp": "2025-08-01T00:00:00Z",
+      "provenance_chain": [
+        "AT-001-manual-collection"
+      ],
+      "examiner_id": "AT-001",
+      "schema_version": "ebs_v1",
+      "metadata": {
+        "examiner": "AT-001",
+        "case_origin": "MPF7779408",
+        "schema": "ebs_v1",
+        "acquisition_tool": "manual_forensic_review",
+        "acquisition_hash": "d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5",
+        "acquisition_timestamp": "2025-08-01T00:00:00Z",
+        "write_blocker_used": false,
+        "examiner_id": "AT-001",
+        "testimony_coordination": true,
+        "independent_witnesses": 0
+      }
+    }
+  ],
+  "red_team_derived_from": "VIGIA_KIWI_006_WITNESS_SELF_INCRIM",
+  "red_team_note": "False negative: non-independent (colluding) witnesses with low prior_trust collapse to NOISE."
+}
