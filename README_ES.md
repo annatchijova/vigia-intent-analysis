@@ -707,16 +707,19 @@ Estos números no están inflados. Reflejan resultados en un corpus específico,
 > la etiqueta removida (`VIGIA_EBS_RESOLVE=motor`, ahora el default), y la métrica del
 > corpus mide **detección real ciega a la etiqueta**:
 >
-> **`run_all_agent.py` sobre el corpus JSON de 199 casos: 153/199 (76.9%) —
+> **`run_all_agent.py` sobre el corpus JSON de 199 casos: 167/199 (83.9%) —
 > ciego a la etiqueta, distribución idéntica a la del scorer standalone corriendo
-> ciego.** El flip B-075 quedó en 143/199; B-076 (2026-07-05) calibró después el
-> umbral SUSPICION contra el dataset de ground truth de 198 casos
-> (`data/calibration_ladder_dataset_20260705.json`): +10, cero regresiones. De los
-> 46 desacuerdos restantes, la mayoría son de severidad adyacente (INTENT↔MALICE,
-> MALICE↔SUSPICION, ABSTAIN↔NOISE); los errores duros de dirección son ~7
-> (2 FP + 5 FN). Esos 46 son el backlog de calibración abierto. Metodología
-> completa, prueba de invariancia al label-flip y análisis por cluster:
-> [`docs/FASE1_RESOLVE_EBS.md`](./docs/FASE1_RESOLVE_EBS.md) y
+> ciego.** Trayectoria, cada paso con gate: el flip B-075 quedó en 143/199; B-076
+> calibró el umbral SUSPICION contra el dataset de ground truth de 198 casos
+> (`data/calibration_ladder_dataset_20260705.json`): +10, cero regresiones
+> (153/199); las decisiones de doctrina del 2026-07-05 sumaron +14 (el comparador
+> acepta MALICE-donde-INTENT como sobre-severidad — el ladder del motor no tiene
+> escalón INTENT — nunca al revés; etiquetas sintéticas de AMB-001/002 revisadas
+> ABSTAIN→NOISE según el diseño documentado L-012, corpus real intacto). De los 32
+> desacuerdos restantes, la mayoría son de severidad adyacente; los errores duros
+> de dirección son ~7 (2 FP + 5 FN). Esos 32 son el backlog de calibración
+> abierto. Metodología completa, prueba de invariancia al label-flip y análisis
+> por cluster: [`docs/FASE1_RESOLVE_EBS.md`](./docs/FASE1_RESOLVE_EBS.md) y
 > [`docs/FASE2_DATASET_CALIBRACION.md`](./docs/FASE2_DATASET_CALIBRACION.md).
 >
 > Las tasas pre-B-075 de este camino (p.ej. "129/129", "165/167") medían
@@ -736,9 +739,9 @@ modo de investigación principal. **Las cifras de precisión en este README refl
 Dominio A.**
 
 **Dominio B — Agente autónomo, casos pre-procesados en JSON:** Runner batch sobre
-bundles de casos estructurados. **Detección ciega a la etiqueta: 153/199** desde
-B-075/B-076 (2026-07-05); la cifra anterior 165/167 medía reproducción de etiqueta
-(ver la nota de cambio de métrica arriba).
+bundles de casos estructurados. **Detección ciega a la etiqueta: 167/199** desde
+B-075/B-076 + las decisiones de doctrina del 2026-07-05; la cifra anterior 165/167
+medía reproducción de etiqueta (ver la nota de cambio de métrica arriba).
 
 **Dominio C — Agente autónomo, evidencia raw (E01/evtx):** El agente ahora produce
 correctamente INTENT/SUSPICION (exit code 3) para evidencia de disco Windows en modo
@@ -760,7 +763,7 @@ constituye la métrica de precisión del sistema.
 > cuando el adaptador EBS todavía eco-reproducía `expected_verdict` (fuga P2-C), así
 > que mide reproducción de etiqueta, no detección. Se conserva como registro
 > histórico de la evaluación del hackathon. La métrica honesta vigente para este
-> camino es el **153/199 de detección ciega** en la nota de cambio de métrica de
+> camino es el **167/199 de detección ciega** en la nota de cambio de métrica de
 > arriba. `SUBMISSION_COMPLIANCE.md` refleja los claims tal como se presentaron y
 > queda intencionalmente sin modificar.
 
@@ -783,8 +786,8 @@ constituye la métrica de precisión del sistema.
 > falsa atribución (contado pero nunca creado — solo existen 3: FF-GENUINE-001,
 > FP-CULTURAL-CLEAN-001, FP-CULTURAL-CLEAN).
 
-Reproducir (post-B-075/B-076 esto da el 153/199 honesto, no la tabla histórica de
-arriba): `python3 run_all_agent.py --timeout 90`
+Reproducir (post-B-075/B-076 + doctrina esto da el 167/199 honesto, no la tabla
+histórica de arriba): `python3 run_all_agent.py --timeout 90`
 Para reproducir explícitamente el comportamiento histórico de eco de etiqueta:
 `VIGIA_EBS_RESOLVE=legacy python3 run_all_agent.py --timeout 90`
 
@@ -798,12 +801,17 @@ de forzar un veredicto.
 
 | Caso | Esperado | Resultado | Notas |
 |------|----------|-----------|-------|
-| VIGIA-AMB-001 | ABSTAIN | NOISE | L-012: señal insuficiente para la compuerta ABSTAIN |
-| VIGIA-AMB-002 | ABSTAIN | NOISE | L-012: ídem |
+| VIGIA-AMB-001 | NOISE (revisado 2026-07-05; era ABSTAIN) | NOISE | L-012: señal insuficiente para la compuerta ABSTAIN |
+| VIGIA-AMB-002 | NOISE (revisado 2026-07-05; era ABSTAIN) | NOISE | L-012: ídem |
 
 **Nota de diseño:** ABSTAIN requiere conflicto estructural entre hipótesis
 competidoras con evidencia no trivial. Los casos de señal nula retornan
 correctamente NOISE. Ver [KNOWN_LIMITATIONS.md L-012](./KNOWN_LIMITATIONS.md).
+**Revisión de etiquetas (2026-07-05, Fase 2):** las etiquetas sintéticas de
+AMB-001/002 se actualizaron ABSTAIN→NOISE para coincidir con esta doctrina
+documentada — las etiquetas originales contradecían la nota de diseño de
+arriba (los archivos de caso llevan un campo de auditoría `_label_revision`).
+Las etiquetas del corpus real no se tocaron.
 
 ---
 

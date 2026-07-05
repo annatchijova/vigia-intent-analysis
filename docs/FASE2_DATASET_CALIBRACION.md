@@ -87,6 +87,15 @@ estructural.
 
 ## 4. Hallazgo estructural — el ladder no tiene INTENT
 
+> **DECISIÓN 2026-07-05 (Anna, para corpus sintético): opción (a).** El
+> comparador batch acepta MALICE donde la etiqueta dice INTENT — es
+> sobre-severidad, no error de dirección (+12). La sub-severidad
+> (INTENT→SUSPICION) sigue siendo FAIL. Implementado en `run_all_agent.py`
+> (regla `over_severity`) y replicado en el campo `agree` del generador del
+> dataset (`scripts/generate_ladder_dataset.py`). Las opciones (b)
+> discriminador de ocultamiento real y (c) revisión de etiquetas INTENT
+> quedan abiertas para el futuro.
+
 El espacio de veredictos del motor es {MALICE, SUSPICION, UNKNOWN, NOISE,
 ABSTAIN, ERROR}: **no puede emitir INTENT jamás**. Los 14 casos etiquetados
 INTENT (12→MALICE, 2→SUSPICION) no pueden acertar en modo motor por
@@ -104,6 +113,16 @@ discriminador barato):
 - (c) Revisar las 14 etiquetas INTENT (¿algunas son MALICE mal etiquetado?).
 
 ## 5. Auditoría de los 9 ABSTAIN→NOISE
+
+> **DECISIÓN 2026-07-05 (Anna, para corpus sintético):** las etiquetas
+> sintéticas de AMB-001/002 se actualizaron ABSTAIN→NOISE para reflejar
+> L-012 (la doctrina documentada en el README ya declaraba NOISE como el
+> comportamiento correcto para señal nula — la etiqueta contradecía el
+> diseño). Los archivos llevan campo de auditoría `_label_revision`; el test
+> B-058 que usaba AMB-001 quedó independizado de la etiqueta del corpus
+> (fuerza ABSTAIN inline). **El corpus real NO se tocó** — los otros 7 del
+> cluster (ANDROID11 intake, ASCIISTUDIO, PAGINA-WEB-PAPA, WEDLM, SEP800,
+> SET68I, FP-002) permanecen con su etiqueta original en el backlog.
 
 Los 9 tienen score ≤ 0.053 (sin señal) y confianza NOISE 0.95–0.99 con 2–3
 artefactos. Composición:
@@ -135,14 +154,19 @@ artefactos. Composición:
 | Desacuerdos | 56 | **46** |
 | Regresiones | — | **0** |
 
-## 7. Backlog restante (46) y qué necesita cada cluster
+## 7. Backlog restante y qué necesita cada cluster
+
+**Actualización 2026-07-05 (post decisiones §4/§5):** con la doctrina del
+comparador (+12) y la revisión de etiquetas AMB (+2), el backlog queda en
+**32 desacuerdos** y el corpus en **167/199**:
 
 | Cluster | n | Camino |
 |---|---|---|
-| INTENT→MALICE | 12 | decisión §4 (a)/(b)/(c) |
-| MALICE→SUSPICION | 11 | 9 son umbral MALICE 0.33 (scores 0.211–0.32) — bajarlo requiere medir FP nuevos; 1 es el gate de corroboración (FN-001) — no tocar sin revisar B-068; 1 nuevo de E1 (0.148) |
-| ABSTAIN→NOISE | 9 | revisión de etiquetas (§5) + señal UNANALYZED para intake |
+| MALICE→SUSPICION | 11 | 9-10 son umbral MALICE 0.33 (scores 0.148–0.32) — bajarlo requiere medir FP nuevos; 1 es el gate de corroboración (FN-001) — no tocar sin revisar B-068 |
+| ABSTAIN→NOISE | 7 | corpus real, NO tocado (§5): intake ANDROID11 necesita señal UNANALYZED en el caso; el resto es revisión de etiquetas pendiente de Anna |
 | SUSPICION→NOISE | 3 | estructural (L-016 testigos coludidos) — no es umbral |
 | NOISE→MALICE (FP) | 2 | cluster cultural_marker — conecta con B-070/roles; revisar perfil de la clase |
 | MALICE→NOISE (FN) | 2 | constelación L-014 — necesita señal emergente cross-artifact (CAIE), no umbral |
-| singletons | 7 | caso a caso con el dataset |
+| BENIGN/NOISE→SUSPICION | 3 | efecto de banda de E1 (scores 0.13–0.27) — vigilar: son los candidatos a FP si se baja más algún umbral |
+| INTENT→SUSPICION | 2 | sub-severidad, sigue FAIL por diseño de la doctrina (a) |
+| otros | 2 | caso a caso con el dataset |

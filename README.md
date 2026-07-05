@@ -706,15 +706,19 @@ These numbers are not inflated. They reflect results on a specific, diverse, doc
 > now the default), and the corpus metric measures **real label-blind
 > detection**:
 >
-> **`run_all_agent.py` over the 199-case JSON corpus: 153/199 (76.9%) —
+> **`run_all_agent.py` over the 199-case JSON corpus: 167/199 (83.9%) —
 > label-blind, distribution identical to the standalone scorer run blind.**
-> The B-075 flip landed at 143/199; B-076 (2026-07-05) then calibrated the
-> SUSPICION threshold against the 198-case ground-truth dataset
-> (`data/calibration_ladder_dataset_20260705.json`): +10, zero regressions.
-> Of the 46 remaining disagreements, most are adjacent-severity
-> (INTENT↔MALICE, MALICE↔SUSPICION, ABSTAIN↔NOISE); hard direction errors
-> are ~7 (2 FP + 5 FN). These 46 are the open calibration backlog. Full
-> methodology, label-flip invariance proof, and per-cluster analysis:
+> Trajectory, every step gated: the B-075 flip landed at 143/199; B-076
+> calibrated the SUSPICION threshold against the 198-case ground-truth
+> dataset (`data/calibration_ladder_dataset_20260705.json`): +10, zero
+> regressions (153/199); the 2026-07-05 doctrine decisions added +14
+> (comparator accepts MALICE-where-INTENT as over-severity since the motor
+> ladder has no INTENT rung — never the reverse; synthetic AMB-001/002
+> labels revised ABSTAIN→NOISE per the documented L-012 design, real-corpus
+> labels untouched). Of the 32 remaining disagreements, most are
+> adjacent-severity; hard direction errors are ~7 (2 FP + 5 FN). These 32
+> are the open calibration backlog. Full methodology, label-flip invariance
+> proof, and per-cluster analysis:
 > [`docs/FASE1_RESOLVE_EBS.md`](./docs/FASE1_RESOLVE_EBS.md) and
 > [`docs/FASE2_DATASET_CALIBRACION.md`](./docs/FASE2_DATASET_CALIBRACION.md).
 >
@@ -733,8 +737,9 @@ on real-world E01 disk images, memory dumps, and log archives. This is the prima
 investigative mode. **Accuracy figures in this README reflect Domain A.**
 
 **Domain B — Autonomous agent, JSON pre-processed cases:** Batch runner over structured
-case bundles. **153/199 label-blind detection** since B-075/B-076 (2026-07-05); the
-previous 165/167 figure measured label reproduction (see metric change note above).
+case bundles. **167/199 label-blind detection** since B-075/B-076 + the 2026-07-05
+doctrine decisions; the previous 165/167 figure measured label reproduction (see
+metric change note above).
 
 **Domain C — Autonomous agent, raw evidence (E01/evtx):** The agent now correctly
 produces INTENT/SUSPICION (exit code 3) for Windows disk evidence in RAW mode.
@@ -755,7 +760,7 @@ constitutes the system's accuracy claim.
 > path while the EBS adapter still echoed `expected_verdict` (P2-C label leak), so it
 > measures label reproduction, not detection. It is retained as historical record of
 > the hackathon-time evaluation. The current honest metric for this path is the
-> **153/199 label-blind detection** figure in the metric-change note above.
+> **167/199 label-blind detection** figure in the metric-change note above.
 > `SUBMISSION_COMPLIANCE.md` reflects the claims as submitted and is intentionally
 > left unmodified.
 
@@ -778,8 +783,8 @@ constitutes the system's accuracy claim.
 > false-flag case (counted but never created — only 3 exist: FF-GENUINE-001,
 > FP-CULTURAL-CLEAN-001, FP-CULTURAL-CLEAN).
 
-Reproduce (post-B-075/B-076 this yields the honest 153/199, not the historical
-table above): `python3 run_all_agent.py --timeout 90`
+Reproduce (post-B-075/B-076 + doctrine this yields the honest 167/199, not the
+historical table above): `python3 run_all_agent.py --timeout 90`
 To reproduce the historical label-echo behavior explicitly:
 `VIGIA_EBS_RESOLVE=legacy python3 run_all_agent.py --timeout 90`
 
@@ -792,12 +797,16 @@ to recognize irreducible ambiguity and emit ABSTAIN rather than forcing a verdic
 
 | Case | Expected | Result | Notes |
 |------|----------|--------|-------|
-| VIGIA-AMB-001 | ABSTAIN | NOISE | L-012: insufficient signal for ABSTAIN gate |
-| VIGIA-AMB-002 | ABSTAIN | NOISE | L-012: same |
+| VIGIA-AMB-001 | NOISE (revised 2026-07-05; was ABSTAIN) | NOISE | L-012: insufficient signal for ABSTAIN gate |
+| VIGIA-AMB-002 | NOISE (revised 2026-07-05; was ABSTAIN) | NOISE | L-012: same |
 
 **Design note:** ABSTAIN requires structural conflict between competing
 hypotheses with non-trivial evidence. Null-signal cases correctly return NOISE.
 See [KNOWN_LIMITATIONS.md L-012](./KNOWN_LIMITATIONS.md).
+**Label revision (2026-07-05, Fase 2):** the synthetic labels of AMB-001/002
+were updated ABSTAIN→NOISE to match this documented doctrine — the original
+labels contradicted the design note above (the case files carry a
+`_label_revision` audit field). Real-corpus labels were not touched.
 
 ---
 
