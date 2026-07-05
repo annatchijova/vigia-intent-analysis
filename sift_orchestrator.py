@@ -4,6 +4,7 @@ from __future__ import annotations
 import ipaddress
 import json
 import logging
+import os
 import re
 import subprocess
 import sys
@@ -12,6 +13,24 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 logger = logging.getLogger(__name__)
+
+# ─────────────────────────────────────────────────────────────────────────────
+# B-075 / P2-C (Fase 1, 2026-07-05): mapa veredicto-del-motor → hipótesis del
+# agente. Es la tabla de correspondencia entre el espacio de veredictos del
+# scorer canónico (vigia_scorer._vigia_score) y el espacio de hipótesis que
+# consumen classify_agent_verdict (substring match) y el comparador batch
+# (run_all_agent._MAP). UNKNOWN del motor ("anomalía débil, requiere análisis
+# humano") va a UNDETERMINED, que classify_agent_verdict resuelve a ABSTAIN —
+# honesto: el motor no formó opinión.
+# ─────────────────────────────────────────────────────────────────────────────
+_MOTOR_HYPOTHESIS_MAP: Dict[str, str] = {
+    "MALICE":    "MALICIOUS_INTENT_DETECTED",
+    "SUSPICION": "SUSPICION_DETECTED",
+    "UNKNOWN":   "UNDETERMINED",
+    "ABSTAIN":   "ABSTAIN_DETECTED",
+    "NOISE":     "NO_SEMIOTIC_ANOMALY_DETECTED",
+    "ERROR":     "PIPELINE_ERROR",
+}
 
 # IPv4/IPv6 en el output de Volatility3 netscan (columnas separadas por espacios)
 _IP_TOKEN_RE = re.compile(
@@ -591,6 +610,77 @@ class SIFTOrchestrator:
                 return Fraction(default)
         raise TypeError(f"_frac: tipo no convertible: {type(val)!r}")
 
+    def _resolve_hypothesis(self, case_data: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        B-075 — resolve(): selección abductiva SIN etiqueta (P2-C, Fase 1).
+
+        Formalización mínima siguiendo a Aliseda (2006; 2000): la abducción
+        tiene dos momentos distintos — la GENERACIÓN de hipótesis candidatas
+        y la SELECCIÓN de una hipótesis entre las ya generadas. En este
+        adaptador la generación es el espacio fijo de hipótesis del agente
+        (_MOTOR_HYPOTHESIS_MAP.values()); la selección estaba ausente: la
+        tapaba la etiqueta `expected_verdict` (label leak) con el umbral
+        muerto `avg > 2` como única alternativa, inalcanzable para inputs
+        normalizados [0,1] (AUDITORIA_MOTOR_SIN_LABEL §3c).
+
+        La función de selección canónica del repo YA existe: el ladder de
+        decisión de `vigia_scorer._vigia_score` (TrustFusion →
+        CorrelationDecay → CAIE → Decision → Quadripartite; umbrales
+        0.33/0.18/0.08, hard gate temporal, gate de corroboración Daubert
+        B-068/B-070). Es determinista, Fraction-based, y demostradamente
+        ciega a la etiqueta (label-flip: mismo veredicto/score/seal —
+        auditoría §3b). resolve() = invocar esa selección sobre la evidencia
+        con la etiqueta REMOVIDA y mapear el veredicto al espacio de
+        hipótesis del agente.
+
+        H2 ("umbral re-escalado sobre avg bastaría") fue refutada por
+        medición 2026-07-05: mejor acuerdo alcanzable 58.6% (4 clases) /
+        74.7% (binario) contra el motor ciego — el escalar avg no porta la
+        información del ladder.
+
+        Devuelve dict con: hypothesis, confidence (Fraction), is_conclusive,
+        resolve_meta (trazabilidad Daubert: qué decidió y por qué).
+        """
+        blind = {k: v for k, v in case_data.items() if k != "expected_verdict"}
+        try:
+            from vigia_scorer import _vigia_score  # lazy: evita costo/ciclos en import
+            motor = _vigia_score(blind)
+            motor_verdict = str(motor.get("verdict", "ERROR"))
+            error = None
+        except Exception as e:  # motor crasheado ≠ evidencia limpia → ABSTAIN
+            logger.error("[SIFT_SHIM] resolve(): motor falló: %s", e)
+            motor = {}
+            motor_verdict = "ERROR"
+            error = f"{type(e).__name__}: {e}"
+
+        hypothesis = _MOTOR_HYPOTHESIS_MAP.get(motor_verdict, "UNDETERMINED")
+        try:
+            confidence = Fraction(str(motor.get("confidence", 0)))
+        except (ValueError, ZeroDivisionError):
+            confidence = Fraction(0)
+        confidence = max(Fraction(0), min(confidence, Fraction(99, 100)))
+        # Paralelo exacto del guard B-027: nunca conclusivo para la familia
+        # abstain/error; para el resto, el mismo umbral 1/3 del camino legacy.
+        is_conclusive = (
+            confidence > Fraction(33, 100)
+            and not any(k in hypothesis for k in ("ABSTAIN", "UNDETERMINED", "ERROR"))
+        )
+        resolve_meta = {
+            "selection_function": "vigia_scorer._vigia_score (Aliseda selection)",
+            "motor_verdict": motor_verdict,
+            "motor_score": str(motor.get("score", "")),
+            "motor_confidence": str(motor.get("confidence", "")),
+            "motor_reason": str(motor.get("reason", ""))[:200],
+        }
+        if error:
+            resolve_meta["error"] = error
+        return {
+            "hypothesis": hypothesis,
+            "confidence": confidence,
+            "is_conclusive": is_conclusive,
+            "resolve_meta": resolve_meta,
+        }
+
     def _analyze_ebs_json(self, json_path: str) -> Dict[str, Any]:
         case_data = json.loads(Path(json_path).read_text(encoding="utf-8"))
         case_id = case_data.get("case_id", self.case_id)
@@ -616,47 +706,85 @@ class SIFTOrchestrator:
             avg = sum(self._frac(s["z_score"]) for s in signals) / n
         else:
             avg = Fraction(0, 1)
-        expected   = case_data.get("expected_verdict", "UNKNOWN")
-        is_malice  = avg > Fraction(2, 1) or expected == "MALICE"
-        hypothesis = (
-            "MALICIOUS_INTENT_DETECTED" if (expected == "MALICE" or is_malice)
-            else "INTENT_DETECTED" if expected == "INTENT"
-            else "SUSPICION_DETECTED" if expected == "SUSPICION"
-            else "ABSTAIN_DETECTED" if expected == "ABSTAIN"
-            else "BENIGN_DETECTED" if expected == "BENIGN"
-            else "NO_SEMIOTIC_ANOMALY_DETECTED"
-        )
-        logger.info("[SIFT_SHIM] EBS v1 adapter: case=%s artifacts=%d avg=%s hyp=%s",
-                    case_id, len(artifacts), str(avg), hypothesis)
+        expected = case_data.get("expected_verdict", "UNKNOWN")
+
+        # ── B-075 / P2-C (Fase 1): selección de modo ────────────────────────
+        # "motor"  → resolve(): la hipótesis sale del scorer canónico SIN la
+        #            etiqueta (label-blind, ver _resolve_hypothesis).
+        # "legacy" → comportamiento histórico: la etiqueta determina la
+        #            hipótesis (label leak documentado, P2-C). Default HASTA
+        #            la decisión de doctrina — regla de seguridad del plan:
+        #            esta rama sostiene el corpus 199/199 y no se retira
+        #            hasta que el flip del default se decida con los números
+        #            comparativos a la vista (docs/FASE1_RESOLVE_EBS.md).
+        mode = os.environ.get("VIGIA_EBS_RESOLVE", "legacy").strip().lower()
+        if mode != "motor":
+            mode = "legacy"
+
+        resolve_meta: Optional[Dict[str, Any]] = None
+        if mode == "motor":
+            resolved = self._resolve_hypothesis(case_data)
+            hypothesis = resolved["hypothesis"]
+            resolve_meta = resolved["resolve_meta"]
+        else:
+            # LABEL LEAK (P2-C) — vigente solo en modo legacy. El umbral
+            # avg > 2 es inalcanzable para inputs [0,1] (AUDITORIA_MOTOR_SIN_
+            # LABEL §3c): la única vía real a MALICE aquí es la etiqueta.
+            is_malice  = avg > Fraction(2, 1) or expected == "MALICE"
+            hypothesis = (
+                "MALICIOUS_INTENT_DETECTED" if (expected == "MALICE" or is_malice)
+                else "INTENT_DETECTED" if expected == "INTENT"
+                else "SUSPICION_DETECTED" if expected == "SUSPICION"
+                else "ABSTAIN_DETECTED" if expected == "ABSTAIN"
+                else "BENIGN_DETECTED" if expected == "BENIGN"
+                else "NO_SEMIOTIC_ANOMALY_DETECTED"
+            )
+        logger.info("[SIFT_SHIM] EBS v1 adapter: case=%s artifacts=%d avg=%s hyp=%s mode=%s",
+                    case_id, len(artifacts), str(avg), hypothesis, mode)
         # FIX P2 (Kimi post-patch/2026-06): usar avg_clamped directamente — sin int() truncamiento.
         # int(Fraction(1,3)*100) = 33, pero el valor real es 33.333... → pérdida de precisión.
         # Fraction ya está simplificada automáticamente — no necesita conversión.
         # FIX P2 (Kimi post-patch-v2): normalizar confidence al rango [0,1]
         # avg puede ser > 1 si raw_score*prior_trust son z-scores. Z_CLIP_MAX = 5.
         _Z_MAX = Fraction(5, 1)  # consistente con ebs_v1.Z_CLIP_MAX
-        confidence_f = min(avg / _Z_MAX, Fraction(99, 100))
+        if mode == "motor":
+            # La confianza y la conclusividad vienen de la función de
+            # selección (mismo guard B-027, umbral 1/3 — ver _resolve_hypothesis).
+            confidence_f = resolved["confidence"]
+            is_conclusive = resolved["is_conclusive"]
+        else:
+            confidence_f = min(avg / _Z_MAX, Fraction(99, 100))
+            # B-027 FIX: is_conclusive respeta la hipótesis. Antes se
+            # derivaba SOLO del promedio de scores, y un caso
+            # ABSTAIN_DETECTED con scores individuales altos sellaba la
+            # contradicción lógica "no puedo formar opinión" +
+            # is_conclusive=True en el mismo bundle.
+            is_conclusive = (avg > Fraction(33, 100)
+                             and "ABSTAIN" not in hypothesis
+                             and "UNDETERMINED" not in hypothesis)
+        pipeline_meta: Dict[str, Any] = {
+            "source": "ebs_v1_json_adapter",
+            "artifact_count": len(artifacts),
+            "avg_score": str(avg),   # Fraction serializada como string
+            # Passthrough para tooling de evaluación (mismo criterio que el
+            # motor en vigia_scorer). En modo motor NUNCA participa del
+            # scoring — la invariancia al label-flip lo prueba
+            # (tests/test_fase1_resolve.py::TestLabelFlipInvariance).
+            "expected_verdict": expected,
+            "ebs_adapter_mode": mode,
+        }
+        if resolve_meta is not None:
+            pipeline_meta["resolve"] = resolve_meta
         return {
             "case_id": case_id, "signals": signals,
             "abduction": {
                 "best_hypothesis": hypothesis,
-                # B-027 FIX: is_conclusive respeta la hipótesis. Antes se
-                # derivaba SOLO del promedio de scores, y un caso
-                # ABSTAIN_DETECTED con scores individuales altos sellaba la
-                # contradicción lógica "no puedo formar opinión" +
-                # is_conclusive=True en el mismo bundle.
-                "is_conclusive": (avg > Fraction(33, 100)
-                                  and "ABSTAIN" not in hypothesis
-                                  and "UNDETERMINED" not in hypothesis),
+                "is_conclusive": is_conclusive,
                 "confidence": confidence_f,
                 "best_posterior": str(confidence_f),
                 "narrative": case_data.get("description", "")[:500],
             },
-            "pipeline_meta": {
-                "source": "ebs_v1_json_adapter",
-                "artifact_count": len(artifacts),
-                "avg_score": str(avg),   # Fraction serializada como string
-                "expected_verdict": expected,
-            },
+            "pipeline_meta": pipeline_meta,
         }
 
     def _analyze_memory_vol3(self, memory_path: str) -> Dict[str, Any]:

@@ -3762,3 +3762,45 @@ limit=N).
 NO toca la evidencia (hash idéntico), **datos del WAL visibles** (el FN), working
 dir limpiado al cerrar, path ausente no crea, DB malformada lazy. Suite 491,
 corpus 198/198. Restore tag: `pre-b071-rework-20260704-...`.
+
+---
+
+## B-075 — Adaptador EBS: fuga de expected_verdict al veredicto (P2-C) — resolve() implementado, default pendiente de doctrina [PARCIAL]
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | PARCIAL — resolve() implementado y verificado detrás de `VIGIA_EBS_RESOLVE=motor`; el default sigue `legacy` (leak vigente) hasta la decisión de doctrina del flip |
+| **Severidad** | P1 — en modo legacy el veredicto sellado del agente para casos EBS ES la etiqueta (0 detecciones sin ella); riesgo Daubert directo |
+| **Archivo** | `sift_orchestrator.py` (`_analyze_ebs_json`, `_resolve_hypothesis`, `_MOTOR_HYPOTHESIS_MAP`) |
+| **Detectado en** | AUDITORIA_MOTOR_SIN_LABEL (blind run + label-flip 3b + umbral muerto 3c); formalizado en PLAN_ABDUCTIVO_PENDIENTES_20260705 §3 Fase 1 |
+| **Tag de restauración** | `pre-fase1-label-leak-20260705-221206` |
+
+### Descripción
+
+Sin `expected_verdict`, el agente colapsaba a NOISE 189/ABSTAIN 9 (cero
+detecciones) mientras el motor (`vigia_scorer._vigia_score`) produce
+MALICE 108/SUSPICION 35/UNKNOWN 14/NOISE 41. La única vía del adaptador a un
+veredicto malicioso era la etiqueta; el umbral alternativo `avg > 2` es
+inalcanzable para inputs [0,1]. H2 ("re-escalar el umbral bastaría") fue
+refutada por medición: mejor acuerdo posible con umbrales sobre avg = 58.6%
+(4 clases) / 74.7% (binario).
+
+### Fix aplicado (Fase 1, 2026-07-05)
+
+`resolve()` — la selección abductiva de Aliseda (generación vs selección): el
+adaptador invoca al scorer canónico con la etiqueta removida y mapea su
+veredicto al espacio de hipótesis del agente. Modo `VIGIA_EBS_RESOLVE=motor`;
+trazabilidad sellada en `pipeline_meta.resolve`. Tests:
+`tests/test_fase1_resolve.py` (10; blind gate, equivalencia con el scorer,
+invariancia al label-flip, pin del legacy, honestidad FN, guard B-027).
+
+**Comparativa (gate B-069):** legacy 199/199 (eco de etiqueta, 0 detecciones
+ciegas) vs motor 143/199 honesto con distribución idéntica al motor ciego;
+~41/56 desacuerdos son de severidad adyacente. Detalle y matriz de decisión:
+`docs/FASE1_RESOLVE_EBS.md`.
+
+### Pendiente
+
+La decisión de doctrina del default (flip a motor / doble sello / mantener
+legacy) es de Anna — opciones (a)/(b)/(c) en el doc §5. El leak NO se retira
+del código hasta esa decisión (regla de seguridad del plan).

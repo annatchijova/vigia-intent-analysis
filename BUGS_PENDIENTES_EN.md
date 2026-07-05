@@ -3852,3 +3852,45 @@ Scorer path only (Mode 4 / EBS-JSON / `vigia_api`). The agent (Mode 1) does
 not go through `_vigia_score`. B-068 (gate) is subsumed and refactored onto the
 same registry. Future work: extend `evidence_role` into the full B-060 unified
 registry (layer+ontology+profile+role in a single source).
+
+---
+
+## B-075 — EBS adapter: expected_verdict leaks into the verdict (P2-C) — resolve() implemented, default pending doctrine [PARTIAL]
+
+| Field | Value |
+|-------|-------|
+| **Status** | PARTIAL — resolve() implemented and verified behind `VIGIA_EBS_RESOLVE=motor`; default remains `legacy` (leak live) until the doctrine decision on the flip |
+| **Severity** | P1 — in legacy mode the agent's sealed verdict for EBS cases IS the label (0 detections without it); direct Daubert risk |
+| **File** | `sift_orchestrator.py` (`_analyze_ebs_json`, `_resolve_hypothesis`, `_MOTOR_HYPOTHESIS_MAP`) |
+| **Detected** | AUDITORIA_MOTOR_SIN_LABEL (blind run + label-flip 3b + dead threshold 3c); formalized in PLAN_ABDUCTIVO_PENDIENTES_20260705 §3 Fase 1 |
+| **Restore tag** | `pre-fase1-label-leak-20260705-221206` |
+
+### Description
+
+Without `expected_verdict` the agent collapsed to NOISE 189/ABSTAIN 9 (zero
+detections) while the motor (`vigia_scorer._vigia_score`) produces
+MALICE 108/SUSPICION 35/UNKNOWN 14/NOISE 41. The adapter's only route to a
+malicious verdict was the label; the alternative threshold `avg > 2` is
+unreachable for [0,1] inputs. H2 ("rescaling the threshold suffices") was
+refuted by measurement: best achievable agreement with thresholds over avg =
+58.6% (4-class) / 74.7% (binary).
+
+### Fix applied (Fase 1, 2026-07-05)
+
+`resolve()` — Aliseda's abductive selection (generation vs selection): the
+adapter invokes the canonical scorer with the label stripped and maps its
+verdict onto the agent's hypothesis space. Mode `VIGIA_EBS_RESOLVE=motor`;
+traceability sealed in `pipeline_meta.resolve`. Tests:
+`tests/test_fase1_resolve.py` (10; blind gate, scorer equivalence, label-flip
+invariance, legacy pin, FN honesty, B-027 guard).
+
+**Comparative (B-069 gate):** legacy 199/199 (label echo, 0 blind detections)
+vs motor 143/199 honest with a distribution identical to the audit's blind
+motor; ~41/56 disagreements are adjacent-severity. Detail and decision matrix:
+`docs/FASE1_RESOLVE_EBS.md`.
+
+### Pending
+
+The doctrine decision on the default (flip to motor / dual seal / keep legacy)
+belongs to Anna — options (a)/(b)/(c) in the doc §5. The leak is NOT removed
+from the code until that decision (plan safety rule).

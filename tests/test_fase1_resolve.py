@@ -1,0 +1,169 @@
+"""
+Fase 1 (PLAN_ABDUCTIVO_PENDIENTES_20260705 §3) — B-075: resolve() en el
+adaptador EBS. Tests rojos escritos ANTES del fix (ENGINEERING_DISCIPLINE
+§5.2 "provalo"): son la definición ejecutable de "resuelto" para P2-C.
+
+La sorpresa (AUDITORIA_MOTOR_SIN_LABEL): sin `expected_verdict`, el agente
+colapsa a NOISE 189/ABSTAIN 9 (cero detecciones) mientras el motor
+determinista (`vigia_scorer._vigia_score`) produce la distribución real
+(MALICE 108 / SUSPICION 35 / UNKNOWN 14 / NOISE 41). El único camino del
+adaptador a un veredicto malicioso era la etiqueta (label leak,
+`sift_orchestrator.py:620`), con el umbral `avg > 2` inalcanzable para
+inputs normalizados [0,1].
+
+Hipótesis rivales (bucle A–D–I):
+- H2 (error de unidades): un umbral re-escalado sobre avg reproduciría la
+  distribución del motor. REFUTADA por medición 2026-07-05: el mejor juego
+  de umbrales posible sobre avg alcanza 58.6% de acuerdo 4-clases (74.7%
+  binario) contra el motor ciego — las clases se solapan (MALICE avg
+  min=0.000, NOISE avg max=0.788). El escalar no porta la información del
+  ladder (TrustFusion → CAIE → gates Daubert).
+- H3 (falta la función de selección — Aliseda): la selección formal entre
+  hipótesis ya generadas EXISTE en el repo — es el ladder de decisión de
+  `_vigia_score` (umbrales 0.33/0.18/0.08, hard gate temporal, gate de
+  corroboración B-068). El adaptador nunca la llamaba; la etiqueta tapaba
+  el hueco. CORROBORADA: resolve() = invocar esa selección canónica.
+
+Modo de despliegue: VIGIA_EBS_RESOLVE=motor|legacy (default legacy hasta la
+decisión de doctrina — regla de seguridad del plan: la línea del leak
+sostiene el corpus 199/199 y no se retira hasta que estos tests pasen en
+verde por el camino nuevo Y Anna decida el flip del default).
+"""
+
+from __future__ import annotations
+
+import json
+from pathlib import Path
+
+import pytest
+
+import sift_orchestrator as so
+
+REPO = Path(__file__).resolve().parent.parent
+FIXTURES = REPO / "data" / "cases" / "red-team"
+
+RT_NOLABEL = FIXTURES / "RT-NOLABEL-001.json"          # motor ciego: MALICE 0.5553
+RT_CONSTELLATION = FIXTURES / "RT-FN-CONSTELLATION-001.json"  # GT MALICE, motor: NOISE
+RT_CULTURAL = FIXTURES / "RT-FP-CULTURAL-001.json"     # GT NOISE, motor: MALICE
+
+
+def _adapter(monkeypatch, mode: str | None, json_path: Path) -> dict:
+    if mode is None:
+        monkeypatch.delenv("VIGIA_EBS_RESOLVE", raising=False)
+    else:
+        monkeypatch.setenv("VIGIA_EBS_RESOLVE", mode)
+    orch = so.SIFTOrchestrator(case_id=json_path.stem)
+    return orch._analyze_ebs_json(str(json_path))
+
+
+def _flip_label(tmp_path: Path, src: Path, label: str | None) -> Path:
+    case = json.loads(src.read_text(encoding="utf-8"))
+    if label is None:
+        case.pop("expected_verdict", None)
+    else:
+        case["expected_verdict"] = label
+    out = tmp_path / f"{src.stem}__{label or 'nolabel'}.json"
+    out.write_text(json.dumps(case), encoding="utf-8")
+    return out
+
+
+class TestBlindGate:
+    """El agente sin etiqueta NO puede colapsar a NOISE sobre evidencia
+    que el motor canónico clasifica MALICE."""
+
+    def test_nolabel_case_is_not_dismissed_as_noise(self, monkeypatch):
+        res = _adapter(monkeypatch, "motor", RT_NOLABEL)
+        hyp = res["abduction"]["best_hypothesis"]
+        assert hyp == "MALICIOUS_INTENT_DETECTED", (
+            f"RT-NOLABEL-001 (motor ciego: MALICE 0.5553) produjo '{hyp}' — "
+            "el adaptador sigue ciego sin etiqueta (P2-C)."
+        )
+
+    def test_motor_mode_matches_canonical_scorer_on_all_fixtures(self, monkeypatch):
+        """resolve() ES la selección del motor: hipótesis == map(veredicto motor)."""
+        from vigia_scorer import _vigia_score
+
+        for fixture in sorted(FIXTURES.glob("RT-*.json")):
+            case = json.loads(fixture.read_text(encoding="utf-8"))
+            blind = {k: v for k, v in case.items() if k != "expected_verdict"}
+            motor_verdict = _vigia_score(blind)["verdict"]
+            res = _adapter(monkeypatch, "motor", fixture)
+            expected_hyp = so._MOTOR_HYPOTHESIS_MAP[motor_verdict]
+            assert res["abduction"]["best_hypothesis"] == expected_hyp, fixture.name
+
+    def test_resolve_metadata_sealed_for_traceability(self, monkeypatch):
+        """Daubert: el bundle debe declarar QUÉ función de selección decidió."""
+        res = _adapter(monkeypatch, "motor", RT_NOLABEL)
+        meta = res["pipeline_meta"]
+        assert meta["ebs_adapter_mode"] == "motor"
+        assert meta["resolve"]["motor_verdict"] == "MALICE"
+        assert "motor_score" in meta["resolve"]
+
+
+class TestLabelFlipInvariance:
+    """3b de la auditoría, ahora como contrato: en modo motor, la etiqueta
+    no puede mover ni la hipótesis ni la sección abduction completa."""
+
+    @pytest.mark.parametrize("fixture", [RT_CONSTELLATION, RT_CULTURAL])
+    def test_flip_does_not_change_abduction(self, monkeypatch, tmp_path, fixture):
+        variants = {}
+        for label in ("MALICE", "NOISE", None):
+            path = _flip_label(tmp_path, fixture, label)
+            res = _adapter(monkeypatch, "motor", path)
+            res["pipeline_meta"].pop("expected_verdict", None)  # passthrough declarado
+            variants[label] = res
+        base = variants["MALICE"]
+        for label, res in variants.items():
+            assert res["abduction"] == base["abduction"], (
+                f"label={label}: la sección abduction cambió con la etiqueta — "
+                "el leak sigue vivo en modo motor."
+            )
+            assert res["signals"] == base["signals"], f"label={label}: señales cambiaron"
+
+    def test_legacy_mode_still_leaks_pinned(self, monkeypatch, tmp_path):
+        """Pin del comportamiento legacy (documentado, NO deseado): la misma
+        evidencia cambia de hipótesis con la etiqueta. Si este test truena,
+        el default cambió — debe hacerse solo con la decisión de doctrina."""
+        flipped = _flip_label(tmp_path, RT_CONSTELLATION, "NOISE")
+        original = _flip_label(tmp_path, RT_CONSTELLATION, "MALICE")
+        res_m = _adapter(monkeypatch, None, original)
+        res_n = _adapter(monkeypatch, None, flipped)
+        assert res_m["abduction"]["best_hypothesis"] == "MALICIOUS_INTENT_DETECTED"
+        assert res_n["abduction"]["best_hypothesis"] == "NO_SEMIOTIC_ANOMALY_DETECTED"
+
+
+class TestLegacyDefaultUnchanged:
+    """Regla de seguridad del plan: el default NO cambia en esta fase."""
+
+    def test_default_mode_is_legacy(self, monkeypatch):
+        res = _adapter(monkeypatch, None, RT_CONSTELLATION)
+        assert res["pipeline_meta"]["ebs_adapter_mode"] == "legacy"
+        # RT-FN-CONSTELLATION trae expected=MALICE → legacy la eco-reproduce.
+        assert res["abduction"]["best_hypothesis"] == "MALICIOUS_INTENT_DETECTED"
+
+    def test_unknown_mode_value_falls_back_to_legacy(self, monkeypatch):
+        res = _adapter(monkeypatch, "banana", RT_CONSTELLATION)
+        assert res["pipeline_meta"]["ebs_adapter_mode"] == "legacy"
+
+
+class TestMotorModeHonesty:
+    """En modo motor los FN/FP conocidos del motor se emiten TAL CUAL
+    (honestidad sobre completitud, Regla 5) — no se maquillan con la etiqueta."""
+
+    def test_constellation_fn_is_emitted_not_masked(self, monkeypatch):
+        # GT=MALICE pero el motor ciego dice NOISE (0.0179): en modo motor el
+        # adaptador debe decir NOISE — es el FN real de L-014/FN-002, visible,
+        # no un MALICE copiado de la etiqueta.
+        res = _adapter(monkeypatch, "motor", RT_CONSTELLATION)
+        assert res["abduction"]["best_hypothesis"] == "NO_SEMIOTIC_ANOMALY_DETECTED"
+
+    def test_conclusive_never_true_for_abstain_family(self, monkeypatch, tmp_path):
+        # Guard B-027 preservado en el camino nuevo.
+        case = json.loads(RT_NOLABEL.read_text(encoding="utf-8"))
+        case["artifacts"] = []  # sin artefactos → motor ERROR → PIPELINE_ERROR
+        path = tmp_path / "empty.json"
+        path.write_text(json.dumps(case), encoding="utf-8")
+        res = _adapter(monkeypatch, "motor", path)
+        assert "ABSTAIN" in res["abduction"]["best_hypothesis"] or \
+            "ERROR" in res["abduction"]["best_hypothesis"]
+        assert res["abduction"]["is_conclusive"] is False
