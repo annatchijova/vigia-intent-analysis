@@ -1,0 +1,2132 @@
+{
+  "agent_verdict": "NOISE",
+  "analysis_timestamp": "2026-07-03T23:35:56.407566+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "VIGIA-MAGNET-2022-WINDOWS-FULL",
+    "end_time": "2026-07-03T23:35:56.407574+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "VIGIA-MAGNET-2022-WINDOWS-FULL",
+        "entry_sha256": "02e699d707ba5809e9f225f24c057eec477b2de1248079bd6bf75fa5ac7886cb",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "VIGIA-MAGNET-2022-WINDOWS-FULL"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: 23d8581225c57725...",
+        "outputs_summary": {
+          "agent_sha256": "23d8581225c577250e3cd8db6e82cbc8c8e9144bc1f796ceb68c606364a7ef6c",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-07-03T23:34:51.743167+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-MAGNET-2022-WINDOWS-FULL",
+        "entry_sha256": "85eb7278f14aaa7c0df9236aca86230c770b8c7f651442491600dac8f5446de8",
+        "inputs_summary": {
+          "path": "evidence/magnet-2022-windows-full"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-07-03T23:34:51.743251+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-MAGNET-2022-WINDOWS-FULL",
+        "entry_sha256": "fd504040be0ac0d76a2de36e24e49d39a4beb1e4265b155478f907acf686f4f4",
+        "inputs_summary": {
+          "path": "evidence/magnet-2022-windows-full"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: af31a437731d5abb...",
+        "outputs_summary": {
+          "sha256": "af31a437731d5abbe589817ae5f80055a47c609e93e37883a3dae825614c35e8"
+        },
+        "seq": 3,
+        "timestamp": "2026-07-03T23:34:52.111903+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "VIGIA-MAGNET-2022-WINDOWS-FULL",
+        "entry_sha256": "3555926f2e94a0bb64c7f964cf79df575c307158ee0e39061e0ef3924733672c",
+        "inputs_summary": {
+          "evidence": "evidence/magnet-2022-windows-full",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-07-03T23:34:52.112064+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "VIGIA-MAGNET-2022-WINDOWS-FULL",
+        "entry_sha256": "eaf180d34d0daf52ed6b30b0ca17cf845be7ee177b4d9c2cf842e37f0d91ec5d",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 11 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "NO_ANOMALY_DETECTED",
+            "best_posterior": "3/4",
+            "confidence": "3/4",
+            "is_conclusive": "True",
+            "narrative": "[FIRSTNESS] 8 artefactos observados, 0 silencios significativos (Eco). Layers presentes: ['DISK_MFT', 'REGISTRY'].\n[SECONDNESS] 8 anomal\u00edas contrastadas contra baseline. Cada se\u00f1al evaluada en su domi...",
+            "ontological_level": "TECHNIQUE"
+          },
+          "case_id": "VIGIA-MAGNET-2022-WINDOWS-FULL",
+          "custody": {
+            "artifact_id": "UNKNOWN",
+            "case_id": "VIGIA-MAGNET-2022-WINDOWS-FULL",
+            "n_records": "107",
+            "records": [
+              {
+                "actor": "REGISTRY_ANALYST",
+                "artifact_hash": "11a614598d61ddaef6818e784b98bb9d38ce23a83f42655d290cb3719fed81d0",
+                "metadata": {
+                  "data_size": "4096",
+                  "timestamp_utc": "1970-01-01T00:00:00Z"
+                },
+                "operation": "ACQUIRE",
+                "timestamp": "2026-07-03T23:34:52.543243+00:00"
+              },
+              {
+                "actor": "REGISTRY_ANALYST",
+                "artifact_hash": "e132ead798d7150dbde7e66e3b8d846e728d330e618f3dc16efffeea29af100e",
+                "metadata": {
+                  "data_size": "4096",
+                  "timestamp_utc": "1970-01-01T00:00:00Z"
+                },
+                "operation": "ACQUIRE",
+                "timestamp": "2026-07-03T23:34:52.543819+00:00"
+              },
+              {
+                "actor": "REGISTRY_ANALYST",
+                "artifact_hash": "d2e3381b63db2a48717209f9fae7ce3e7c1b866fe32fd53d2758281f1d134edd",
+                "metadata": {
+                  "data_size": "4096",
+                  "timestamp_utc": "1970-01-01T00:00:00Z"
+                },
+                "operation": "ACQUIRE",
+                "timestamp": "2026-07-03T23:34:52.622613+00:00"
+              },
+              {
+                "actor": "REGISTRY_ANALYST",
+                "artifact_hash": "737a8c0d2982373cd49171537294bed315e3168ec6bcdd35ce8ac4fc0f86a9bc",
+                "metadata": {
+                  "data_size": "4096",
+                  "timestamp_utc": "1970-01-01T00:00:00Z"
+                },
+                "operation": "ACQUIRE",
+                "timestamp": "2026-07-03T23:34:52.875541+00:00"
+              },
+              {
+                "actor": "REGISTRY_ANALYST",
+                "artifact_hash": "76b8522edd043f4a78586cacdfbd402ef760b21c2bb6d9412fab124ade581704",
+                "metadata": {
+                  "data_size": "4096",
+                  "timestamp_utc": "1970-01-01T00:00:00Z"
+                },
+                "operation": "ACQUIRE",
+                "timestamp": "2026-07-03T23:34:53.328093+00:00"
+              }
+            ]
+          },
+          "pipeline_meta": {
+            "engines_not_run_no_event_stream": [
+              "behavioral",
+              "metabolic"
+            ],
+            "frs_groups": "4",
+            "gamma_applied": "True",
+            "n_engine_signals": "2",
+            "n_pathguard_rejects": "0",
+            "n_primary_signals": "8",
+            "n_sift_signals": "8",
+            "n_signal_conversion_drops": "0",
+            "n_total_signals": "11",
+            "n_unanalyzed_artifacts": "0"
+          },
+          "results": {
+            "adversarial": {
+              "dominant_pattern": "NONE",
+              "indicators": [],
+              "n_indicators": "0",
+              "n_tools": "10",
+              "sift_critical_active": "0",
+              "signal_class": "derived"
+            },
+            "browser": {
+              "analysis_notes": [
+                "chromium: 2 downloads, 88 urls"
+              ],
+              "artifact_reliability": "13/20",
+              "artifact_type": "browser",
+              "c2_count": "0",
+              "finding_types": [
+                "SUSPICIOUS_DOWNLOAD"
+              ],
+              "source_profile": "/home/labestiadevigia/vigia-repo/evidence/magnet-2022-windows-full/browser",
+              "suspicious_count": "2",
+              "total_downloads": "2",
+              "unanalyzed": "False"
+            },
+            "caie": {
+              "_determinism_protocol": "P0-v2.0-DECIMAL-6-4",
+              "artifacts_evaluated": "11",
+              "composite_score": "0.0139",
+              "fracture_bonus_applied": "0.0000",
+              "integrity_check": {
+                "alerts": [],
+                "fpu_native": "False",
+                "internal_precision": "6",
+                "math_engine": "decimal.Decimal",
+                "output_precision": "4"
+              },
+              "probabilistic_score": "0.0139",
+              "probabilistic_verdict": "NOISE",
+              "status": "OK",
+              "structural_verdict": "INCONCLUSIVE",
+              "verdict": "INCONCLUSIVE"
+            },
+            "eventlog": {
+              "artifact_type": "windows_event_log",
+              "chains": "1",
+              "composite_score": "19/20",
+              "finding_types": [
+                "HIGH_SEVERITY_104",
+                "HIGH_SEVERITY_8",
+                "REMOTE_THREAD_INJECTION"
+              ],
+              "findings": "145",
+              "gaps": "630",
+              "time_range": [
+                "1643958154",
+                "1644709137"
+              ],
+              "timestamp": "1644709137",
+              "total_events": "19419"
+            },
+            "patterns": {
+              "artifact_reliability": "17/20",
+              "artifact_type": "pattern",
+              "best_match": "NONE",
+              "finding_types": [],
+              "match_count": "0",
+              "match_score_by_pattern": {},
+              "missing_signals_by_pattern": {},
+              "signal_class": "derived",
+              "total_patterns": "3"
+            },
+            "prefetch": {
+              "anti_forensic_count": "0",
+              "artifact_reliability": "7/10",
+              "artifact_type": "prefetch",
+              "finding_types": [
+                "SUSPICIOUS_EXECUTION"
+              ],
+              "source_path": "/home/labestiadevigia/vigia-repo/evidence/magnet-2022-windows-full/prefetch",
+              "suspicious_count": "8",
+              "suspicious_executables": [
+                "CERTUTIL.EXE",
+                "RUNDLL32.EXE",
+                "RUNDLL32.EXE",
+                "RUNDLL32.EXE",
+                "RUNDLL32.EXE"
+              ],
+              "total_files": "352",
+              "unanalyzed": "False",
+              "unparsed_files": "0"
+            },
+            "registry": [
+              {
+                "artifact_reliability": "17/20",
+                "artifact_type": "registry",
+                "finding_types": [],
+                "hive_sha256": "4aec3ac88863e8f6a57dce79006f41d4b99adc519b160aabb5c418400c9e521e",
+                "persistence_count": "0",
+                "timestomp_count": "0",
+                "usb_count": "0"
+              },
+              {
+                "artifact_reliability": "17/20",
+                "artifact_type": "registry",
+                "finding_types": [],
+                "hive_sha256": "987c6b547632140553727f1c60f97a75f33f2dec79a28295ab1c85f9aef3059a",
+                "persistence_count": "0",
+                "timestomp_count": "0",
+                "usb_count": "0"
+              },
+              {
+                "artifact_reliability": "17/20",
+                "artifact_type": "registry",
+                "finding_types": [],
+                "hive_sha256": "2e9fb43409ef7c6e90c2e88622b3fe21cd202b5899de2a1b330764ff6296a875",
+                "persistence_count": "0",
+                "timestomp_count": "0",
+                "usb_count": "0"
+              },
+              {
+                "artifact_reliability": "17/20",
+                "artifact_type": "registry",
+                "finding_types": [
+                  "service"
+                ],
+                "hive_sha256": "545ac21ca335836d97f20580a97603b777284751358f5a97bff60d90f9230db2",
+                "persistence_count": "65",
+                "timestomp_count": "0",
+                "usb_count": "0"
+              },
+              {
+                "artifact_reliability": "17/20",
+                "artifact_type": "registry",
+                "finding_types": [],
+                "hive_sha256": "d47412982c700a5ad7fa6428ac3aa17ef2c62132afbe0254823748ad66874c40",
+                "persistence_count": "0",
+                "timestomp_count": "0",
+                "usb_count": "0"
+              }
+            ],
+            "resonance": {
+              "artifact_reliability": "4/5",
+              "artifact_type": "resonance",
+              "finding_types": [],
+              "pattern_count": "0",
+              "signal_class": "derived",
+              "total_resonance": "0"
+            }
+          },
+          "signals": [
+            {
+              "confidence": "0.0",
+              "metadata": {
+                "acquisition_hash": "sha256:11a614598d61ddaef6818e784b98bb9d38ce23a83f42655d290cb3719fed81d0",
+                "acquisition_timestamp": "2026-07-03T23:34:52.543243+00:00",
+                "artifact_reliability": "17/20",
+                "artifact_type": "registry",
+                "finding_types": [],
+                "gamma_applied": "True",
+                "hive_sha256": "4aec3ac88863e8f6a57dce79006f41d4b99adc519b160aabb5c418400c9e521e",
+                "persistence_count": "0",
+                "timestomp_count": "0",
+                "usb_count": "0"
+              },
+              "tool": "REGISTRY_RTR",
+              "value": "0.0",
+              "z_score": "0.0"
+            },
+            {
+              "confidence": "0.0",
+              "metadata": {
+                "acquisition_hash": "sha256:11a614598d61ddaef6818e784b98bb9d38ce23a83f42655d290cb3719fed81d0",
+                "acquisition_timestamp": "2026-07-03T23:34:52.543243+00:00",
+                "artifact_reliability": "17/20",
+                "artifact_type": "registry",
+                "finding_types": [],
+                "gamma_applied": "True",
+                "hive_sha256": "987c6b547632140553727f1c60f97a75f33f2dec79a28295ab1c85f9aef3059a",
+                "persistence_count": "0",
+                "timestomp_count": "0",
+                "usb_count": "0"
+              },
+              "tool": "REGISTRY_RTR",
+              "value": "0.0",
+              "z_score": "0.0"
+            },
+            {
+              "confidence": "0.0",
+              "metadata": {
+                "acquisition_hash": "sha256:11a614598d61ddaef6818e784b98bb9d38ce23a83f42655d290cb3719fed81d0",
+                "acquisition_timestamp": "2026-07-03T23:34:52.543243+00:00",
+                "artifact_reliability": "17/20",
+                "artifact_type": "registry",
+                "finding_types": [],
+                "gamma_applied": "True",
+                "hive_sha256": "2e9fb43409ef7c6e90c2e88622b3fe21cd202b5899de2a1b330764ff6296a875",
+                "persistence_count": "0",
+                "timestomp_count": "0",
+                "usb_count": "0"
+              },
+              "tool": "REGISTRY_RTR",
+              "value": "0.0",
+              "z_score": "0.0"
+            },
+            {
+              "confidence": "0.7550125",
+              "metadata": {
+                "acquisition_hash": "sha256:11a614598d61ddaef6818e784b98bb9d38ce23a83f42655d290cb3719fed81d0",
+                "acquisition_timestamp": "2026-07-03T23:34:52.543243+00:00",
+                "artifact_reliability": "17/20",
+                "artifact_type": "registry",
+                "finding_types": [
+                  "service"
+                ],
+                "gamma_applied": "True",
+                "hive_sha256": "545ac21ca335836d97f20580a97603b777284751358f5a97bff60d90f9230db2",
+                "persistence_count": "65",
+                "timestomp_count": "0",
+                "usb_count": "0"
+              },
+              "tool": "REGISTRY_RTR",
+              "value": "0.5599999999999999",
+              "z_score": "1.96"
+            },
+            {
+              "confidence": "0.0",
+              "metadata": {
+                "acquisition_hash": "sha256:11a614598d61ddaef6818e784b98bb9d38ce23a83f42655d290cb3719fed81d0",
+                "acquisition_timestamp": "2026-07-03T23:34:52.543243+00:00",
+                "artifact_reliability": "17/20",
+                "artifact_type": "registry",
+                "finding_types": [],
+                "gamma_applied": "True",
+                "hive_sha256": "d47412982c700a5ad7fa6428ac3aa17ef2c62132afbe0254823748ad66874c40",
+                "persistence_count": "0",
+                "timestomp_count": "0",
+                "usb_count": "0"
+              },
+              "tool": "REGISTRY_RTR",
+              "value": "0.0",
+              "z_score": "0.0"
+            }
+          ]
+        },
+        "seq": 5,
+        "timestamp": "2026-07-03T23:35:56.406692+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "VIGIA-MAGNET-2022-WINDOWS-FULL",
+        "entry_sha256": "ce91a8923f59ea0974d6adc19b0ef6d5515e4e7dd14c67fa8ba08ae2c8d08c50",
+        "inputs_summary": {
+          "n_signals": "11"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-07-03T23:35:56.407036+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "VIGIA-MAGNET-2022-WINDOWS-FULL",
+        "entry_sha256": "24123774fd0016c56085de44d9d2b9fa3d80cce150a0131d926873a47cfcca47",
+        "inputs_summary": {
+          "verdict": "NO_ANOMALY_DETECTED"
+        },
+        "iteration": 0,
+        "note": "Exit code 0 (NOISE) \u2014 analysis complete.",
+        "outputs_summary": {
+          "agent_verdict": "NOISE",
+          "exit_code": "0"
+        },
+        "seq": 7,
+        "timestamp": "2026-07-03T23:35:56.407481+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-07-03T23:34:51.742952+00:00",
+    "total_entries": 7
+  },
+  "case_id": "VIGIA-MAGNET-2022-WINDOWS-FULL",
+  "evidence_path": "evidence/magnet-2022-windows-full",
+  "evidence_sha256": "af31a437731d5abbe589817ae5f80055a47c609e93e37883a3dae825614c35e8",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-MAGNET-2022-WINDOWS-FULL ===\nEvidence: evidence/magnet-2022-windows-full\nEvidence SHA-256: af31a437731d5abbe589817ae5f80055a47c609e93e37883a3dae825614c35e8\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: NO_ANOMALY_DETECTED\nPosterior confidence: 3/4\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 11 se\u00f1al(es): 8 primaria(s) de ['browser', 'prefetch', 'registry', 'windows_event_log'], 3 derivada(s)/no-analizada(s). Top z: REGISTRY_RTR=1.96, PREFETCH_ANALYZER=1.75, EVENT_LOG=1.45.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n. CAIE: INCONCLUSIVE (0 fractura(s)).\n[THIRDNESS] Hip\u00f3tesis: NO_ANOMALY_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\n[FIRSTNESS] 8 artefactos observados, 0 silencios significativos (Eco). Layers presentes: ['DISK_MFT', 'REGISTRY'].\n[SECONDNESS] 8 anomal\u00edas contrastadas contra baseline. Cada se\u00f1al evaluada en su dominio espec\u00edfico. Veredicto v2: REJECT. CCS: 3/4.\n[THIRDNESS] Hip\u00f3tesis seleccionada 'H2-BENIGN' con CCS=3/4. Criterio: m\u00e1ximo cierre causal (Occam racional). Mapeo VIG\u00cdA: NO_ANOMALY_DETECTED.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [REGISTRY_RTR] z=1.960 conf=0.76 \u2014 0.5599999999999999\n  [PREFETCH_ANALYZER] z=1.750 conf=0.73 \u2014 0.5\n  [EVENT_LOG] z=1.449 conf=0.95 \u2014 0.48\n  [BROWSER_FORENSICS] z=1.170 conf=0.43 \u2014 0.36\n  [REGISTRY_RTR] z=0.000 conf=0.00 \u2014 \n\n--- CAIE (Cross-Artifact Incongruence Engine) ---\n  Verdict: INCONCLUSIVE | Structural: INCONCLUSIVE | Composite: 0.0139 | Fractures: 0 | Golden Rules: 0\n  Daubert: 0/11 artifacts structurally irrefutable (spoofability \u2264 0.20). WARNING: No irrefutable anchor. Weak under cross-examination. CDL: INCONCLUSIVE: Coverage too low (16.7%)\n\n--- FINAL ALERT LEVEL ---\nLOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 8 | Derived: 3 | Total: 11",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "NO_ANOMALY_DETECTED",
+      "best_posterior": "3/4",
+      "confidence": "3/4",
+      "is_conclusive": true,
+      "narrative": "[FIRSTNESS] 8 artefactos observados, 0 silencios significativos (Eco). Layers presentes: ['DISK_MFT', 'REGISTRY'].\n[SECONDNESS] 8 anomal\u00edas contrastadas contra baseline. Cada se\u00f1al evaluada en su dominio espec\u00edfico. Veredicto v2: REJECT. CCS: 3/4.\n[THIRDNESS] Hip\u00f3tesis seleccionada 'H2-BENIGN' con CCS=3/4. Criterio: m\u00e1ximo cierre causal (Occam racional). Mapeo VIG\u00cdA: NO_ANOMALY_DETECTED.",
+      "ontological_level": "TECHNIQUE"
+    },
+    "case_id": "VIGIA-MAGNET-2022-WINDOWS-FULL",
+    "custody": {
+      "artifact_id": "UNKNOWN",
+      "case_id": "VIGIA-MAGNET-2022-WINDOWS-FULL",
+      "n_records": 107,
+      "records": [
+        {
+          "actor": "REGISTRY_ANALYST",
+          "artifact_hash": "11a614598d61ddaef6818e784b98bb9d38ce23a83f42655d290cb3719fed81d0",
+          "metadata": {
+            "data_size": 4096,
+            "timestamp_utc": "1970-01-01T00:00:00Z"
+          },
+          "operation": "ACQUIRE",
+          "timestamp": "2026-07-03T23:34:52.543243+00:00"
+        },
+        {
+          "actor": "REGISTRY_ANALYST",
+          "artifact_hash": "e132ead798d7150dbde7e66e3b8d846e728d330e618f3dc16efffeea29af100e",
+          "metadata": {
+            "data_size": 4096,
+            "timestamp_utc": "1970-01-01T00:00:00Z"
+          },
+          "operation": "ACQUIRE",
+          "timestamp": "2026-07-03T23:34:52.543819+00:00"
+        },
+        {
+          "actor": "REGISTRY_ANALYST",
+          "artifact_hash": "d2e3381b63db2a48717209f9fae7ce3e7c1b866fe32fd53d2758281f1d134edd",
+          "metadata": {
+            "data_size": 4096,
+            "timestamp_utc": "1970-01-01T00:00:00Z"
+          },
+          "operation": "ACQUIRE",
+          "timestamp": "2026-07-03T23:34:52.622613+00:00"
+        },
+        {
+          "actor": "REGISTRY_ANALYST",
+          "artifact_hash": "737a8c0d2982373cd49171537294bed315e3168ec6bcdd35ce8ac4fc0f86a9bc",
+          "metadata": {
+            "data_size": 4096,
+            "timestamp_utc": "1970-01-01T00:00:00Z"
+          },
+          "operation": "ACQUIRE",
+          "timestamp": "2026-07-03T23:34:52.875541+00:00"
+        },
+        {
+          "actor": "REGISTRY_ANALYST",
+          "artifact_hash": "76b8522edd043f4a78586cacdfbd402ef760b21c2bb6d9412fab124ade581704",
+          "metadata": {
+            "data_size": 4096,
+            "timestamp_utc": "1970-01-01T00:00:00Z"
+          },
+          "operation": "ACQUIRE",
+          "timestamp": "2026-07-03T23:34:53.328093+00:00"
+        },
+        {
+          "actor": "EVENTLOG_ANALYST",
+          "artifact_hash": "4a7e7d632724f3089c5966f854c44fea65d1ae0d7b533f3b14761831edd18e85",
+          "metadata": {
+            "data_size": 4096,
+            "timestamp_utc": "1970-01-01T00:00:00Z"
+          },
+          "operation": "ACQUIRE",
+          "timestamp": "2026-07-03T23:34:53.537689+00:00"
+        },
+        {
+          "actor": "EVENTLOG_ANALYST",
+          "artifact_hash": "3c515dd576f3948a1a07092b613ac0fde60947a582488750bf1302a6415f9f65",
+          "metadata": {
+            "data_size": 4096,
+            "timestamp_utc": "1970-01-01T00:00:00Z"
+          },
+          "operation": "ACQUIRE",
+          "timestamp": "2026-07-03T23:34:55.939716+00:00"
+        },
+        {
+          "actor": "EVENTLOG_ANALYST",
+          "artifact_hash": "3c515dd576f3948a1a07092b613ac0fde60947a582488750bf1302a6415f9f65",
+          "metadata": {
+            "data_size": 4096,
+            "timestamp_utc": "1970-01-01T00:00:00Z"
+          },
+          "operation": "ACQUIRE",
+          "timestamp": "2026-07-03T23:34:55.939879+00:00"
+        },
+        {
+          "actor": "EVENTLOG_ANALYST",
+          "artifact_hash": "3c515dd576f3948a1a07092b613ac0fde60947a582488750bf1302a6415f9f65",
+          "metadata": {
+            "data_size": 4096,
+            "timestamp_utc": "1970-01-01T00:00:00Z"
+          },
+          "operation": "ACQUIRE",
+          "timestamp": "2026-07-03T23:34:55.940004+00:00"
+        },
+        {
+          "actor": "EVENTLOG_ANALYST",
+          "artifact_hash": "3c515dd576f3948a1a07092b613ac0fde60947a582488750bf1302a6415f9f65",
+          "metadata": {
+            "data_size": 4096,
+            "timestamp_utc": "1970-01-01T00:00:00Z"
+          },
+          "operation": "ACQUIRE",
+          "timestamp": "2026-07-03T23:34:55.940169+00:00"
+        },
+        {
+          "actor": "EVENTLOG_ANALYST",
+          "artifact_hash": "06315810ad36c9d004ef6236dd3d31ff3cd6f7c75b02641bbbe6bb179396cf2a",
+          "metadata": {
+            "data_size": 4096,
+            "timestamp_utc": "1970-01-01T00:00:00Z"
+          },
+          "operation": "ACQUIRE",
+          "timestamp": "2026-07-03T23:34:55.940414+00:00"
+        },
+        {
+          "actor": "EVENTLOG_ANALYST",
+          "artifact_hash": "beb293f45003a5e3f344077e6d7b467e96f17e38dffa2f033199c24528b65474",
+          "metadata": {
+            "data_size": 4096,
+            "timestamp_utc": "1970-01-01T00:00:00Z"
+          },
+          "operation": "ACQUIRE",
+          "timestamp": "2026-07-03T23:34:56.467740+00:00"
+        },
+        {
+          "actor": "EVENTLOG_ANALYST",
+          "artifact_hash": "0842f07f65cce6ccc8205c1cc251b5da05a3585c8d79efe522569da02acf72df",
+          "metadata": {
+            "data_size": 4096,
+            "timestamp_utc": "1970-01-01T00:00:00Z"
+          },
+          "operation": "ACQUIRE",
+          "timestamp": "2026-07-03T23:34:56.682740+00:00"
+        },
+        {
+          "actor": "EVENTLOG_ANALYST",
+          "artifact_hash": "f12ab031d92a1aeece77cf390520539e9a9041152c51adf63a16e9c5c58c4122",
+          "metadata": {
+            "data_size": 4096,
+            "timestamp_utc": "1970-01-01T00:00:00Z"
+          },
+          "operation": "ACQUIRE",
+          "timestamp": "2026-07-03T23:34:58.573690+00:00"
+        },
+        {
+          "actor": "EVENTLOG_ANALYST",
+          "artifact_hash": "0e3a4e974c09c092cc5d3c3b06c8a4d13c37e80e1122cfe6348e65f94f338b57",
+          "metadata": {
+            "data_size": 4096,
+            "timestamp_utc": "1970-01-01T00:00:00Z"
+          },
+          "operation": "ACQUIRE",
+          "timestamp": "2026-07-03T23:34:59.094039+00:00"
+        },
+        {
+          "actor": "EVENTLOG_ANALYST",
+          "artifact_hash": "2cb9f9a6139a41b554ceea6e34e940ea46f0a9b5921a0bc6fc232210422ff58b",
+          "metadata": {
+            "data_size": 4096,
+            "timestamp_utc": "1970-01-01T00:00:00Z"
+          },
+          "operation": "ACQUIRE",
+          "timestamp": "2026-07-03T23:34:59.142720+00:00"
+        },
+        {
+          "actor": "EVENTLOG_ANALYST",
+          "artifact_hash": "0a2f66753a1dc9bb5220267849da4da38e01e7bfed73ab48c7ff9eec3f3c4eb1",
+          "metadata": {
+            "data_size": 4096,
+            "timestamp_utc": "1970-01-01T00:00:00Z"
+          },
+          "operation": "ACQUIRE",
+          "timestamp": "2026-07-03T23:34:59.240338+00:00"
+        },
+        {
+          "actor": "EVENTLOG_ANALYST",
+          "artifact_hash": "3c515dd576f3948a1a07092b613ac0fde60947a582488750bf1302a6415f9f65",
+          "metadata": {
+            "data_size": 4096,
+            "timestamp_utc": "1970-01-01T00:00:00Z"
+          },
+          "operation": "ACQUIRE",
+          "timestamp": "2026-07-03T23:35:07.578842+00:00"
+        },
+        {
+          "actor": "EVENTLOG_ANALYST",
+          "artifact_hash": "e6adacbd76332319308abc9f25d9a74f7c671185e74a7dc668d08f1c8d87aa37",
+          "metadata": {
+            "data_size": 4096,
+            "timestamp_utc": "1970-01-01T00:00:00Z"
+          },
+          "operation": "ACQUIRE",
+          "timestamp": "2026-07-03T23:35:07.579071+00:00"
+        },
+        {
+          "actor": "EVENTLOG_ANALYST",
+          "artifact_hash": "3c515dd576f3948a1a07092b613ac0fde60947a582488750bf1302a6415f9f65",
+          "metadata": {
+            "data_size": 4096,
+            "timestamp_utc": "1970-01-01T00:00:00Z"
+          },
+          "operation": "ACQUIRE",
+          "timestamp": "2026-07-03T23:35:07.584969+00:00"
+        },
+        {
+          "actor": "EVENTLOG_ANALYST",
+          "artifact_hash": "3c515dd576f3948a1a07092b613ac0fde60947a582488750bf1302a6415f9f65",
+          "metadata": {
+            "data_size": 4096,
+            "timestamp_utc": "1970-01-01T00:00:00Z"
+          },
+          "operation": "ACQUIRE",
+          "timestamp": "2026-07-03T23:35:07.585103+00:00"
+        },
+        {
+          "actor": "EVENTLOG_ANALYST",
+          "artifact_hash": "a86599fd3792959d21f8869d421e92c036ddd29b3efd58339b6db3346198fe2b",
+          "metadata": {
+            "data_size": 4096,
+            "timestamp_utc": "1970-01-01T00:00:00Z"
+          },
+          "operation": "ACQUIRE",
+          "timestamp": "2026-07-03T23:35:07.585352+00:00"
+        },
+        {
+          "actor": "EVENTLOG_ANALYST",
+          "artifact_hash": "3c515dd576f3948a1a07092b613ac0fde60947a582488750bf1302a6415f9f65",
+          "metadata": {
+            "data_size": 4096,
+            "timestamp_utc": "1970-01-01T00:00:00Z"
+          },
+          "operation": "ACQUIRE",
+          "timestamp": "2026-07-03T23:35:08.261178+00:00"
+        },
+        {
+          "actor": "EVENTLOG_ANALYST",
+          "artifact_hash": "4ecb786cefc7a4733ac65c9005c16035a21070da80cf98e9f5ea884b8ac6b743",
+          "metadata": {
+            "data_size": 4096,
+            "timestamp_utc": "1970-01-01T00:00:00Z"
+          },
+          "operation": "ACQUIRE",
+          "timestamp": "2026-07-03T23:35:08.261479+00:00"
+        },
+        {
+          "actor": "EVENTLOG_ANALYST",
+          "artifact_hash": "3c515dd576f3948a1a07092b613ac0fde60947a582488750bf1302a6415f9f65",
+          "metadata": {
+            "data_size": 4096,
+            "timestamp_utc": "1970-01-01T00:00:00Z"
+          },
+          "operation": "ACQUIRE",
+          "timestamp": "2026-07-03T23:35:09.095382+00:00"
+        },
+        {
+          "actor": "EVENTLOG_ANALYST",
+          "artifact_hash": "9076c5540937a464a5ecde5083bcf81709a33bb3fb64c892ea4c8f48641877e2",
+          "metadata": {
+            "data_size": 4096,
+            "timestamp_utc": "1970-01-01T00:00:00Z"
+          },
+          "operation": "ACQUIRE",
+          "timestamp": "2026-07-03T23:35:09.095552+00:00"
+        },
+        {
+          "actor": "EVENTLOG_ANALYST",
+          "artifact_hash": "e6adacbd76332319308abc9f25d9a74f7c671185e74a7dc668d08f1c8d87aa37",
+          "metadata": {
+            "data_size": 4096,
+            "timestamp_utc": "1970-01-01T00:00:00Z"
+          },
+          "operation": "ACQUIRE",
+          "timestamp": "2026-07-03T23:35:09.190602+00:00"
+        },
+        {
+          "actor": "EVENTLOG_ANALYST",
+          "artifact_hash": "caa3e795e8a77f99ae668e7ef6fcc8299b5012a2b4f918c0cd123179b40790fc",
+          "metadata": {
+            "data_size": 4096,
+            "timestamp_utc": "1970-01-01T00:00:00Z"
+          },
+          "operation": "ACQUIRE",
+          "timestamp": "2026-07-03T23:35:09.196284+00:00"
+        },
+        {
+          "actor": "EVENTLOG_ANALYST",
+          "artifact_hash": "0106c553f7f7bffc817bc1ba9f2e4396f0d50e05bb03ac27b6ff46c8af8857e5",
+          "metadata": {
+            "data_size": 4096,
+            "timestamp_utc": "1970-01-01T00:00:00Z"
+          },
+          "operation": "ACQUIRE",
+          "timestamp": "2026-07-03T23:35:09.852389+00:00"
+        },
+        {
+          "actor": "EVENTLOG_ANALYST",
+          "artifact_hash": "ed1fe12f61bd7b0093a276f021c48abf835cee92c0bdf6b8113eadbbc7096656",
+          "metadata": {
+            "data_size": 4096,
+            "timestamp_utc": "1970-01-01T00:00:00Z"
+          },
+          "operation": "ACQUIRE",
+          "timestamp": "2026-07-03T23:35:09.976958+00:00"
+        },
+        {
+          "actor": "EVENTLOG_ANALYST",
+          "artifact_hash": "e9e8e145317a39cba7255843aabcbd9e84daf58220df2312556a3550fa244cbc",
+          "metadata": {
+            "data_size": 4096,
+            "timestamp_utc": "1970-01-01T00:00:00Z"
+          },
+          "operation": "ACQUIRE",
+          "timestamp": "2026-07-03T23:35:09.996213+00:00"
+        },
+        {
+          "actor": "EVENTLOG_ANALYST",
+          "artifact_hash": "78a9429848ae0a605bf28c0f23bcf2d3fdfa0c6f5c166571bd21931780a0d074",
+          "metadata": {
+            "data_size": 4096,
+            "timestamp_utc": "1970-01-01T00:00:00Z"
+          },
+          "operation": "ACQUIRE",
+          "timestamp": "2026-07-03T23:35:11.525916+00:00"
+        },
+        {
+          "actor": "EVENTLOG_ANALYST",
+          "artifact_hash": "d1267dfdd578f70bada2e2e6977ee875069121eba10e61894b949735c6215875",
+          "metadata": {
+            "data_size": 4096,
+            "timestamp_utc": "1970-01-01T00:00:00Z"
+          },
+          "operation": "ACQUIRE",
+          "timestamp": "2026-07-03T23:35:11.614361+00:00"
+        },
+        {
+          "actor": "EVENTLOG_ANALYST",
+          "artifact_hash": "d1267dfdd578f70bada2e2e6977ee875069121eba10e61894b949735c6215875",
+          "metadata": {
+            "data_size": 4096,
+            "timestamp_utc": "1970-01-01T00:00:00Z"
+          },
+          "operation": "ACQUIRE",
+          "timestamp": "2026-07-03T23:35:11.624580+00:00"
+        },
+        {
+          "actor": "EVENTLOG_ANALYST",
+          "artifact_hash": "d1267dfdd578f70bada2e2e6977ee875069121eba10e61894b949735c6215875",
+          "metadata": {
+            "data_size": 4096,
+            "timestamp_utc": "1970-01-01T00:00:00Z"
+          },
+          "operation": "ACQUIRE",
+          "timestamp": "2026-07-03T23:35:11.633550+00:00"
+        },
+        {
+          "actor": "EVENTLOG_ANALYST",
+          "artifact_hash": "3c515dd576f3948a1a07092b613ac0fde60947a582488750bf1302a6415f9f65",
+          "metadata": {
+            "data_size": 4096,
+            "timestamp_utc": "1970-01-01T00:00:00Z"
+          },
+          "operation": "ACQUIRE",
+          "timestamp": "2026-07-03T23:35:11.642627+00:00"
+        },
+        {
+          "actor": "EVENTLOG_ANALYST",
+          "artifact_hash": "a67e552a6556892d632df2d398271878ecac3633d91d468c0d9748811bb0e63d",
+          "metadata": {
+            "data_size": 4096,
+            "timestamp_utc": "1970-01-01T00:00:00Z"
+          },
+          "operation": "ACQUIRE",
+          "timestamp": "2026-07-03T23:35:11.642764+00:00"
+        },
+        {
+          "actor": "EVENTLOG_ANALYST",
+          "artifact_hash": "3c515dd576f3948a1a07092b613ac0fde60947a582488750bf1302a6415f9f65",
+          "metadata": {
+            "data_size": 4096,
+            "timestamp_utc": "1970-01-01T00:00:00Z"
+          },
+          "operation": "ACQUIRE",
+          "timestamp": "2026-07-03T23:35:11.819943+00:00"
+        },
+        {
+          "actor": "EVENTLOG_ANALYST",
+          "artifact_hash": "cc4f8c0014b4d6728cebf7168a0fa7e86a710fd1030b8d3345c4f50ecea9026b",
+          "metadata": {
+            "data_size": 4096,
+            "timestamp_utc": "1970-01-01T00:00:00Z"
+          },
+          "operation": "ACQUIRE",
+          "timestamp": "2026-07-03T23:35:11.820241+00:00"
+        },
+        {
+          "actor": "EVENTLOG_ANALYST",
+          "artifact_hash": "6cc9f426ac16be47217add4774d9dd01d4c87d1d1d7e37c656872c813294a69b",
+          "metadata": {
+            "data_size": 4096,
+            "timestamp_utc": "1970-01-01T00:00:00Z"
+          },
+          "operation": "ACQUIRE",
+          "timestamp": "2026-07-03T23:35:12.315990+00:00"
+        },
+        {
+          "actor": "EVENTLOG_ANALYST",
+          "artifact_hash": "3c515dd576f3948a1a07092b613ac0fde60947a582488750bf1302a6415f9f65",
+          "metadata": {
+            "data_size": 4096,
+            "timestamp_utc": "1970-01-01T00:00:00Z"
+          },
+          "operation": "ACQUIRE",
+          "timestamp": "2026-07-03T23:35:12.454541+00:00"
+        },
+        {
+          "actor": "EVENTLOG_ANALYST",
+          "artifact_hash": "fab8bc510601fb0247c2670199ec4b52b09aaaddd7aac04052dcd639864020b3",
+          "metadata": {
+            "data_size": 4096,
+            "timestamp_utc": "1970-01-01T00:00:00Z"
+          },
+          "operation": "ACQUIRE",
+          "timestamp": "2026-07-03T23:35:12.454704+00:00"
+        },
+        {
+          "actor": "EVENTLOG_ANALYST",
+          "artifact_hash": "dfd3a56d12ad56468574e94778524a6e6c05dcd4ae245e5c07a4cff20945191b",
+          "metadata": {
+            "data_size": 4096,
+            "timestamp_utc": "1970-01-01T00:00:00Z"
+          },
+          "operation": "ACQUIRE",
+          "timestamp": "2026-07-03T23:35:12.561267+00:00"
+        },
+        {
+          "actor": "EVENTLOG_ANALYST",
+          "artifact_hash": "2770ddaa76e149e0288aa269cf736968d2359b63cba7f22fbcab3cedb1bd47a7",
+          "metadata": {
+            "data_size": 4096,
+            "timestamp_utc": "1970-01-01T00:00:00Z"
+          },
+          "operation": "ACQUIRE",
+          "timestamp": "2026-07-03T23:35:12.706391+00:00"
+        },
+        {
+          "actor": "EVENTLOG_ANALYST",
+          "artifact_hash": "97ab98667d66b6498047cd406097fd01f88b831745365b8998d21a1573fb0829",
+          "metadata": {
+            "data_size": 4096,
+            "timestamp_utc": "1970-01-01T00:00:00Z"
+          },
+          "operation": "ACQUIRE",
+          "timestamp": "2026-07-03T23:35:12.766867+00:00"
+        },
+        {
+          "actor": "EVENTLOG_ANALYST",
+          "artifact_hash": "2e82d6b509995d1dd9883bf9c1113e50ce0b79767800ee415af54ef3e378defe",
+          "metadata": {
+            "data_size": 4096,
+            "timestamp_utc": "1970-01-01T00:00:00Z"
+          },
+          "operation": "ACQUIRE",
+          "timestamp": "2026-07-03T23:35:13.022353+00:00"
+        },
+        {
+          "actor": "EVENTLOG_ANALYST",
+          "artifact_hash": "355a1547eac09ed9c5e6cfc048bf3bc691b7c5334fa5c7b2e4b551b7f466d36e",
+          "metadata": {
+            "data_size": 4096,
+            "timestamp_utc": "1970-01-01T00:00:00Z"
+          },
+          "operation": "ACQUIRE",
+          "timestamp": "2026-07-03T23:35:13.025846+00:00"
+        },
+        {
+          "actor": "EVENTLOG_ANALYST",
+          "artifact_hash": "5532fb9bbedd9776250a58c51842bf06ab7c44c1163ea030e5927869e97ac029",
+          "metadata": {
+            "data_size": 4096,
+            "timestamp_utc": "1970-01-01T00:00:00Z"
+          },
+          "operation": "ACQUIRE",
+          "timestamp": "2026-07-03T23:35:13.157986+00:00"
+        },
+        {
+          "actor": "EVENTLOG_ANALYST",
+          "artifact_hash": "2e82d6b509995d1dd9883bf9c1113e50ce0b79767800ee415af54ef3e378defe",
+          "metadata": {
+            "data_size": 4096,
+            "timestamp_utc": "1970-01-01T00:00:00Z"
+          },
+          "operation": "ACQUIRE",
+          "timestamp": "2026-07-03T23:35:13.168715+00:00"
+        },
+        {
+          "actor": "EVENTLOG_ANALYST",
+          "artifact_hash": "70f3301317a715452adaf1ee8ea43c597d76c734df96f447b829d755669a4cf2",
+          "metadata": {
+            "data_size": 4096,
+            "timestamp_utc": "1970-01-01T00:00:00Z"
+          },
+          "operation": "ACQUIRE",
+          "timestamp": "2026-07-03T23:35:13.171471+00:00"
+        },
+        {
+          "actor": "EVENTLOG_ANALYST",
+          "artifact_hash": "2770ddaa76e149e0288aa269cf736968d2359b63cba7f22fbcab3cedb1bd47a7",
+          "metadata": {
+            "data_size": 4096,
+            "timestamp_utc": "1970-01-01T00:00:00Z"
+          },
+          "operation": "ACQUIRE",
+          "timestamp": "2026-07-03T23:35:13.178800+00:00"
+        },
+        {
+          "actor": "EVENTLOG_ANALYST",
+          "artifact_hash": "0ffce02cce65ec25acbe45d651091d5b8556b84022630f65ca62db8421efff6a",
+          "metadata": {
+            "data_size": 4096,
+            "timestamp_utc": "1970-01-01T00:00:00Z"
+          },
+          "operation": "ACQUIRE",
+          "timestamp": "2026-07-03T23:35:13.326818+00:00"
+        },
+        {
+          "actor": "EVENTLOG_ANALYST",
+          "artifact_hash": "ca28bf1f50e8dfae7a5fa06508f4d46ae2becce1ba64f591713a308633953327",
+          "metadata": {
+            "data_size": 4096,
+            "timestamp_utc": "1970-01-01T00:00:00Z"
+          },
+          "operation": "ACQUIRE",
+          "timestamp": "2026-07-03T23:35:13.388191+00:00"
+        },
+        {
+          "actor": "EVENTLOG_ANALYST",
+          "artifact_hash": "3c515dd576f3948a1a07092b613ac0fde60947a582488750bf1302a6415f9f65",
+          "metadata": {
+            "data_size": 4096,
+            "timestamp_utc": "1970-01-01T00:00:00Z"
+          },
+          "operation": "ACQUIRE",
+          "timestamp": "2026-07-03T23:35:13.396566+00:00"
+        },
+        {
+          "actor": "EVENTLOG_ANALYST",
+          "artifact_hash": "7e7ae5bf464bfe2d4ebdd8418e983d636becac47061475c40414b6600940c3e0",
+          "metadata": {
+            "data_size": 4096,
+            "timestamp_utc": "1970-01-01T00:00:00Z"
+          },
+          "operation": "ACQUIRE",
+          "timestamp": "2026-07-03T23:35:13.396866+00:00"
+        },
+        {
+          "actor": "EVENTLOG_ANALYST",
+          "artifact_hash": "446bc0f26aa20ab2a0ac81bf5455f512abe9b1712850b515acfd82784dbd12e6",
+          "metadata": {
+            "data_size": 4096,
+            "timestamp_utc": "1970-01-01T00:00:00Z"
+          },
+          "operation": "ACQUIRE",
+          "timestamp": "2026-07-03T23:35:15.346021+00:00"
+        },
+        {
+          "actor": "EVENTLOG_ANALYST",
+          "artifact_hash": "3c515dd576f3948a1a07092b613ac0fde60947a582488750bf1302a6415f9f65",
+          "metadata": {
+            "data_size": 4096,
+            "timestamp_utc": "1970-01-01T00:00:00Z"
+          },
+          "operation": "ACQUIRE",
+          "timestamp": "2026-07-03T23:35:15.490578+00:00"
+        },
+        {
+          "actor": "EVENTLOG_ANALYST",
+          "artifact_hash": "3c515dd576f3948a1a07092b613ac0fde60947a582488750bf1302a6415f9f65",
+          "metadata": {
+            "data_size": 4096,
+            "timestamp_utc": "1970-01-01T00:00:00Z"
+          },
+          "operation": "ACQUIRE",
+          "timestamp": "2026-07-03T23:35:15.490800+00:00"
+        },
+        {
+          "actor": "EVENTLOG_ANALYST",
+          "artifact_hash": "9be2f32a998ca2282d09fb10c184aed5d3ae987639fa16201de5e6cebb0753d5",
+          "metadata": {
+            "data_size": 4096,
+            "timestamp_utc": "1970-01-01T00:00:00Z"
+          },
+          "operation": "ACQUIRE",
+          "timestamp": "2026-07-03T23:35:15.491072+00:00"
+        },
+        {
+          "actor": "EVENTLOG_ANALYST",
+          "artifact_hash": "d1267dfdd578f70bada2e2e6977ee875069121eba10e61894b949735c6215875",
+          "metadata": {
+            "data_size": 4096,
+            "timestamp_utc": "1970-01-01T00:00:00Z"
+          },
+          "operation": "ACQUIRE",
+          "timestamp": "2026-07-03T23:35:20.087734+00:00"
+        },
+        {
+          "actor": "EVENTLOG_ANALYST",
+          "artifact_hash": "0ffce02cce65ec25acbe45d651091d5b8556b84022630f65ca62db8421efff6a",
+          "metadata": {
+            "data_size": 4096,
+            "timestamp_utc": "1970-01-01T00:00:00Z"
+          },
+          "operation": "ACQUIRE",
+          "timestamp": "2026-07-03T23:35:20.096418+00:00"
+        },
+        {
+          "actor": "EVENTLOG_ANALYST",
+          "artifact_hash": "56b4e1ae3e14091cea80bbec9ae10b0286a7b48e141388cfdd3e19af3f290a9a",
+          "metadata": {
+            "data_size": 4096,
+            "timestamp_utc": "1970-01-01T00:00:00Z"
+          },
+          "operation": "ACQUIRE",
+          "timestamp": "2026-07-03T23:35:20.165946+00:00"
+        },
+        {
+          "actor": "EVENTLOG_ANALYST",
+          "artifact_hash": "64a7bf74ba37052e79253ccea571996c832fb17ca248598855f9c34898441989",
+          "metadata": {
+            "data_size": 4096,
+            "timestamp_utc": "1970-01-01T00:00:00Z"
+          },
+          "operation": "ACQUIRE",
+          "timestamp": "2026-07-03T23:35:21.909289+00:00"
+        },
+        {
+          "actor": "EVENTLOG_ANALYST",
+          "artifact_hash": "93336fede4c725e0741777a8def6d4548c84ece6406376e2a8e77ce949582423",
+          "metadata": {
+            "data_size": 4096,
+            "timestamp_utc": "1970-01-01T00:00:00Z"
+          },
+          "operation": "ACQUIRE",
+          "timestamp": "2026-07-03T23:35:22.102517+00:00"
+        },
+        {
+          "actor": "EVENTLOG_ANALYST",
+          "artifact_hash": "3c515dd576f3948a1a07092b613ac0fde60947a582488750bf1302a6415f9f65",
+          "metadata": {
+            "data_size": 4096,
+            "timestamp_utc": "1970-01-01T00:00:00Z"
+          },
+          "operation": "ACQUIRE",
+          "timestamp": "2026-07-03T23:35:22.132261+00:00"
+        },
+        {
+          "actor": "EVENTLOG_ANALYST",
+          "artifact_hash": "40491f243d14593d296cc1929d6f5dd2dd3312aac853f8bd32ab0016dca997a9",
+          "metadata": {
+            "data_size": 4096,
+            "timestamp_utc": "1970-01-01T00:00:00Z"
+          },
+          "operation": "ACQUIRE",
+          "timestamp": "2026-07-03T23:35:22.132410+00:00"
+        },
+        {
+          "actor": "EVENTLOG_ANALYST",
+          "artifact_hash": "3c515dd576f3948a1a07092b613ac0fde60947a582488750bf1302a6415f9f65",
+          "metadata": {
+            "data_size": 4096,
+            "timestamp_utc": "1970-01-01T00:00:00Z"
+          },
+          "operation": "ACQUIRE",
+          "timestamp": "2026-07-03T23:35:22.351862+00:00"
+        },
+        {
+          "actor": "EVENTLOG_ANALYST",
+          "artifact_hash": "3c515dd576f3948a1a07092b613ac0fde60947a582488750bf1302a6415f9f65",
+          "metadata": {
+            "data_size": 4096,
+            "timestamp_utc": "1970-01-01T00:00:00Z"
+          },
+          "operation": "ACQUIRE",
+          "timestamp": "2026-07-03T23:35:22.352025+00:00"
+        },
+        {
+          "actor": "EVENTLOG_ANALYST",
+          "artifact_hash": "3738ab9dfc14b1c0316067b3183a9a6ef1c79c9f7cf0c61977aad91854dcf631",
+          "metadata": {
+            "data_size": 4096,
+            "timestamp_utc": "1970-01-01T00:00:00Z"
+          },
+          "operation": "ACQUIRE",
+          "timestamp": "2026-07-03T23:35:22.352296+00:00"
+        },
+        {
+          "actor": "EVENTLOG_ANALYST",
+          "artifact_hash": "657ebb343b1e9e7354e60c2dffaf3d8768f1ba6aa636c99e10065e48735a22f0",
+          "metadata": {
+            "data_size": 4096,
+            "timestamp_utc": "1970-01-01T00:00:00Z"
+          },
+          "operation": "ACQUIRE",
+          "timestamp": "2026-07-03T23:35:22.466188+00:00"
+        },
+        {
+          "actor": "EVENTLOG_ANALYST",
+          "artifact_hash": "70f3301317a715452adaf1ee8ea43c597d76c734df96f447b829d755669a4cf2",
+          "metadata": {
+            "data_size": 4096,
+            "timestamp_utc": "1970-01-01T00:00:00Z"
+          },
+          "operation": "ACQUIRE",
+          "timestamp": "2026-07-03T23:35:22.670440+00:00"
+        },
+        {
+          "actor": "EVENTLOG_ANALYST",
+          "artifact_hash": "4d148a629e8f6afe80a7065bc6cbbcce32017ae575d90f845098b9aad0aad725",
+          "metadata": {
+            "data_size": 4096,
+            "timestamp_utc": "1970-01-01T00:00:00Z"
+          },
+          "operation": "ACQUIRE",
+          "timestamp": "2026-07-03T23:35:22.677526+00:00"
+        },
+        {
+          "actor": "EVENTLOG_ANALYST",
+          "artifact_hash": "3c515dd576f3948a1a07092b613ac0fde60947a582488750bf1302a6415f9f65",
+          "metadata": {
+            "data_size": 4096,
+            "timestamp_utc": "1970-01-01T00:00:00Z"
+          },
+          "operation": "ACQUIRE",
+          "timestamp": "2026-07-03T23:35:23.863608+00:00"
+        },
+        {
+          "actor": "EVENTLOG_ANALYST",
+          "artifact_hash": "2b8a0a34b03a0ec73bb3f48f1e5d790854c8b7ad914428a5621d8a26a713a185",
+          "metadata": {
+            "data_size": 4096,
+            "timestamp_utc": "1970-01-01T00:00:00Z"
+          },
+          "operation": "ACQUIRE",
+          "timestamp": "2026-07-03T23:35:23.863826+00:00"
+        },
+        {
+          "actor": "EVENTLOG_ANALYST",
+          "artifact_hash": "0106c553f7f7bffc817bc1ba9f2e4396f0d50e05bb03ac27b6ff46c8af8857e5",
+          "metadata": {
+            "data_size": 4096,
+            "timestamp_utc": "1970-01-01T00:00:00Z"
+          },
+          "operation": "ACQUIRE",
+          "timestamp": "2026-07-03T23:35:23.927230+00:00"
+        },
+        {
+          "actor": "EVENTLOG_ANALYST",
+          "artifact_hash": "14bc98b985bd3c6060a571149598cf9a3ff9ec913696e6a82eccf066c706a122",
+          "metadata": {
+            "data_size": 4096,
+            "timestamp_utc": "1970-01-01T00:00:00Z"
+          },
+          "operation": "ACQUIRE",
+          "timestamp": "2026-07-03T23:35:24.038255+00:00"
+        },
+        {
+          "actor": "EVENTLOG_ANALYST",
+          "artifact_hash": "91a984b8ea60e57d12446bf33b0d468e851c798f89a1c685927232876df80f28",
+          "metadata": {
+            "data_size": 4096,
+            "timestamp_utc": "1970-01-01T00:00:00Z"
+          },
+          "operation": "ACQUIRE",
+          "timestamp": "2026-07-03T23:35:24.567808+00:00"
+        },
+        {
+          "actor": "EVENTLOG_ANALYST",
+          "artifact_hash": "d1267dfdd578f70bada2e2e6977ee875069121eba10e61894b949735c6215875",
+          "metadata": {
+            "data_size": 4096,
+            "timestamp_utc": "1970-01-01T00:00:00Z"
+          },
+          "operation": "ACQUIRE",
+          "timestamp": "2026-07-03T23:35:43.397355+00:00"
+        },
+        {
+          "actor": "EVENTLOG_ANALYST",
+          "artifact_hash": "3f03e301e7760277655d79f737ab8fcd48e58661356b3ce47f3e2a5f431c87d5",
+          "metadata": {
+            "data_size": 4096,
+            "timestamp_utc": "1970-01-01T00:00:00Z"
+          },
+          "operation": "ACQUIRE",
+          "timestamp": "2026-07-03T23:35:43.407299+00:00"
+        },
+        {
+          "actor": "EVENTLOG_ANALYST",
+          "artifact_hash": "40491f243d14593d296cc1929d6f5dd2dd3312aac853f8bd32ab0016dca997a9",
+          "metadata": {
+            "data_size": 4096,
+            "timestamp_utc": "1970-01-01T00:00:00Z"
+          },
+          "operation": "ACQUIRE",
+          "timestamp": "2026-07-03T23:35:43.798264+00:00"
+        },
+        {
+          "actor": "EVENTLOG_ANALYST",
+          "artifact_hash": "3c515dd576f3948a1a07092b613ac0fde60947a582488750bf1302a6415f9f65",
+          "metadata": {
+            "data_size": 4096,
+            "timestamp_utc": "1970-01-01T00:00:00Z"
+          },
+          "operation": "ACQUIRE",
+          "timestamp": "2026-07-03T23:35:44.066575+00:00"
+        },
+        {
+          "actor": "EVENTLOG_ANALYST",
+          "artifact_hash": "9887fa5ed81a7c37f1064c227ad4d5516ccda339d0b4086a55a21f7776cf7509",
+          "metadata": {
+            "data_size": 4096,
+            "timestamp_utc": "1970-01-01T00:00:00Z"
+          },
+          "operation": "ACQUIRE",
+          "timestamp": "2026-07-03T23:35:44.068554+00:00"
+        },
+        {
+          "actor": "EVENTLOG_ANALYST",
+          "artifact_hash": "c582368fbc8962a862b30d17cadb131d92850f1ace457c069bf8b8da7b2bbbce",
+          "metadata": {
+            "data_size": 4096,
+            "timestamp_utc": "1970-01-01T00:00:00Z"
+          },
+          "operation": "ACQUIRE",
+          "timestamp": "2026-07-03T23:35:45.313897+00:00"
+        },
+        {
+          "actor": "EVENTLOG_ANALYST",
+          "artifact_hash": "1d6d361e463b19a740a1d0d29a82f7b4640a4b36c66a25a0d1891922f82a7f43",
+          "metadata": {
+            "data_size": 4096,
+            "timestamp_utc": "1970-01-01T00:00:00Z"
+          },
+          "operation": "ACQUIRE",
+          "timestamp": "2026-07-03T23:35:45.360730+00:00"
+        },
+        {
+          "actor": "EVENTLOG_ANALYST",
+          "artifact_hash": "3c515dd576f3948a1a07092b613ac0fde60947a582488750bf1302a6415f9f65",
+          "metadata": {
+            "data_size": 4096,
+            "timestamp_utc": "1970-01-01T00:00:00Z"
+          },
+          "operation": "ACQUIRE",
+          "timestamp": "2026-07-03T23:35:45.400984+00:00"
+        },
+        {
+          "actor": "EVENTLOG_ANALYST",
+          "artifact_hash": "3c515dd576f3948a1a07092b613ac0fde60947a582488750bf1302a6415f9f65",
+          "metadata": {
+            "data_size": 4096,
+            "timestamp_utc": "1970-01-01T00:00:00Z"
+          },
+          "operation": "ACQUIRE",
+          "timestamp": "2026-07-03T23:35:45.401140+00:00"
+        },
+        {
+          "actor": "EVENTLOG_ANALYST",
+          "artifact_hash": "3c515dd576f3948a1a07092b613ac0fde60947a582488750bf1302a6415f9f65",
+          "metadata": {
+            "data_size": 4096,
+            "timestamp_utc": "1970-01-01T00:00:00Z"
+          },
+          "operation": "ACQUIRE",
+          "timestamp": "2026-07-03T23:35:45.401268+00:00"
+        },
+        {
+          "actor": "EVENTLOG_ANALYST",
+          "artifact_hash": "3c515dd576f3948a1a07092b613ac0fde60947a582488750bf1302a6415f9f65",
+          "metadata": {
+            "data_size": 4096,
+            "timestamp_utc": "1970-01-01T00:00:00Z"
+          },
+          "operation": "ACQUIRE",
+          "timestamp": "2026-07-03T23:35:45.401468+00:00"
+        },
+        {
+          "actor": "EVENTLOG_ANALYST",
+          "artifact_hash": "ee1c53347939ca07d41c01a25e05b05bd71e6d7758f5ac2d01a541157809f6db",
+          "metadata": {
+            "data_size": 4096,
+            "timestamp_utc": "1970-01-01T00:00:00Z"
+          },
+          "operation": "ACQUIRE",
+          "timestamp": "2026-07-03T23:35:45.401743+00:00"
+        },
+        {
+          "actor": "EVENTLOG_ANALYST",
+          "artifact_hash": "ca28bf1f50e8dfae7a5fa06508f4d46ae2becce1ba64f591713a308633953327",
+          "metadata": {
+            "data_size": 4096,
+            "timestamp_utc": "1970-01-01T00:00:00Z"
+          },
+          "operation": "ACQUIRE",
+          "timestamp": "2026-07-03T23:35:49.844940+00:00"
+        },
+        {
+          "actor": "EVENTLOG_ANALYST",
+          "artifact_hash": "4841749aa4e495ae72e649a157ea8870b672ff72ddd56656a29ff912cb3a09cd",
+          "metadata": {
+            "data_size": 4096,
+            "timestamp_utc": "1970-01-01T00:00:00Z"
+          },
+          "operation": "ACQUIRE",
+          "timestamp": "2026-07-03T23:35:49.855105+00:00"
+        },
+        {
+          "actor": "EVENTLOG_ANALYST",
+          "artifact_hash": "5532fb9bbedd9776250a58c51842bf06ab7c44c1163ea030e5927869e97ac029",
+          "metadata": {
+            "data_size": 4096,
+            "timestamp_utc": "1970-01-01T00:00:00Z"
+          },
+          "operation": "ACQUIRE",
+          "timestamp": "2026-07-03T23:35:49.913680+00:00"
+        },
+        {
+          "actor": "EVENTLOG_ANALYST",
+          "artifact_hash": "3c515dd576f3948a1a07092b613ac0fde60947a582488750bf1302a6415f9f65",
+          "metadata": {
+            "data_size": 4096,
+            "timestamp_utc": "1970-01-01T00:00:00Z"
+          },
+          "operation": "ACQUIRE",
+          "timestamp": "2026-07-03T23:35:49.926562+00:00"
+        },
+        {
+          "actor": "EVENTLOG_ANALYST",
+          "artifact_hash": "3c515dd576f3948a1a07092b613ac0fde60947a582488750bf1302a6415f9f65",
+          "metadata": {
+            "data_size": 4096,
+            "timestamp_utc": "1970-01-01T00:00:00Z"
+          },
+          "operation": "ACQUIRE",
+          "timestamp": "2026-07-03T23:35:49.926716+00:00"
+        },
+        {
+          "actor": "EVENTLOG_ANALYST",
+          "artifact_hash": "3c515dd576f3948a1a07092b613ac0fde60947a582488750bf1302a6415f9f65",
+          "metadata": {
+            "data_size": 4096,
+            "timestamp_utc": "1970-01-01T00:00:00Z"
+          },
+          "operation": "ACQUIRE",
+          "timestamp": "2026-07-03T23:35:49.926845+00:00"
+        },
+        {
+          "actor": "EVENTLOG_ANALYST",
+          "artifact_hash": "3c515dd576f3948a1a07092b613ac0fde60947a582488750bf1302a6415f9f65",
+          "metadata": {
+            "data_size": 4096,
+            "timestamp_utc": "1970-01-01T00:00:00Z"
+          },
+          "operation": "ACQUIRE",
+          "timestamp": "2026-07-03T23:35:49.926970+00:00"
+        },
+        {
+          "actor": "EVENTLOG_ANALYST",
+          "artifact_hash": "1e8b41d35c6f9377a2c1bc6e556f984ee6d822debe536a59f1b4fb3eff54e206",
+          "metadata": {
+            "data_size": 4096,
+            "timestamp_utc": "1970-01-01T00:00:00Z"
+          },
+          "operation": "ACQUIRE",
+          "timestamp": "2026-07-03T23:35:49.927255+00:00"
+        },
+        {
+          "actor": "EVENTLOG_ANALYST",
+          "artifact_hash": "3c515dd576f3948a1a07092b613ac0fde60947a582488750bf1302a6415f9f65",
+          "metadata": {
+            "data_size": 4096,
+            "timestamp_utc": "1970-01-01T00:00:00Z"
+          },
+          "operation": "ACQUIRE",
+          "timestamp": "2026-07-03T23:35:51.362493+00:00"
+        },
+        {
+          "actor": "EVENTLOG_ANALYST",
+          "artifact_hash": "da2aca791ad867eec3956a9e89740737290e56664ab95e76f9d6e3c7c547e8b7",
+          "metadata": {
+            "data_size": 4096,
+            "timestamp_utc": "1970-01-01T00:00:00Z"
+          },
+          "operation": "ACQUIRE",
+          "timestamp": "2026-07-03T23:35:51.362816+00:00"
+        },
+        {
+          "actor": "EVENTLOG_ANALYST",
+          "artifact_hash": "9fed198b672c53ad0bd5719d3a0b4c2c8db64f7eabf2b804d342bf8c9c618a3e",
+          "metadata": {
+            "data_size": 4096,
+            "timestamp_utc": "1970-01-01T00:00:00Z"
+          },
+          "operation": "ACQUIRE",
+          "timestamp": "2026-07-03T23:35:56.019980+00:00"
+        },
+        {
+          "actor": "EVENTLOG_ANALYST",
+          "artifact_hash": "3c515dd576f3948a1a07092b613ac0fde60947a582488750bf1302a6415f9f65",
+          "metadata": {
+            "data_size": 4096,
+            "timestamp_utc": "1970-01-01T00:00:00Z"
+          },
+          "operation": "ACQUIRE",
+          "timestamp": "2026-07-03T23:35:56.126550+00:00"
+        },
+        {
+          "actor": "EVENTLOG_ANALYST",
+          "artifact_hash": "2e82d6b509995d1dd9883bf9c1113e50ce0b79767800ee415af54ef3e378defe",
+          "metadata": {
+            "data_size": 4096,
+            "timestamp_utc": "1970-01-01T00:00:00Z"
+          },
+          "operation": "ACQUIRE",
+          "timestamp": "2026-07-03T23:35:56.126709+00:00"
+        },
+        {
+          "actor": "EVENTLOG_ANALYST",
+          "artifact_hash": "3c515dd576f3948a1a07092b613ac0fde60947a582488750bf1302a6415f9f65",
+          "metadata": {
+            "data_size": 4096,
+            "timestamp_utc": "1970-01-01T00:00:00Z"
+          },
+          "operation": "ACQUIRE",
+          "timestamp": "2026-07-03T23:35:56.128849+00:00"
+        },
+        {
+          "actor": "EVENTLOG_ANALYST",
+          "artifact_hash": "3c515dd576f3948a1a07092b613ac0fde60947a582488750bf1302a6415f9f65",
+          "metadata": {
+            "data_size": 4096,
+            "timestamp_utc": "1970-01-01T00:00:00Z"
+          },
+          "operation": "ACQUIRE",
+          "timestamp": "2026-07-03T23:35:56.128982+00:00"
+        },
+        {
+          "actor": "EVENTLOG_ANALYST",
+          "artifact_hash": "c6b71dad9ff86fa09eda13ee5131e55f296db5c5e515824f838cfa7c2a5b50e3",
+          "metadata": {
+            "data_size": 4096,
+            "timestamp_utc": "1970-01-01T00:00:00Z"
+          },
+          "operation": "ACQUIRE",
+          "timestamp": "2026-07-03T23:35:56.129157+00:00"
+        },
+        {
+          "actor": "PREFETCH_ANALYZER",
+          "artifact_hash": "2b977c213de546ed65a0a3c74f2dc13351083866213cce05d93015f0b5c4db74",
+          "metadata": {
+            "data_size": 17,
+            "timestamp_utc": "1970-01-01T00:00:00Z"
+          },
+          "operation": "ACQUIRE",
+          "timestamp": "2026-07-03T23:35:56.293155+00:00"
+        },
+        {
+          "actor": "BROWSER_FORENSICS",
+          "artifact_hash": "c8f6d398f1e2db22c978f52d78afc33e4f6965181b67415b7626f63f44a26dbe",
+          "metadata": {
+            "data_size": 16,
+            "timestamp_utc": "1970-01-01T00:00:00Z"
+          },
+          "operation": "ACQUIRE",
+          "timestamp": "2026-07-03T23:35:56.294187+00:00"
+        }
+      ]
+    },
+    "pipeline_meta": {
+      "anti_silencing": true,
+      "engines_not_run_no_event_stream": [
+        "behavioral",
+        "metabolic"
+      ],
+      "frs_groups": 4,
+      "gamma_applied": true,
+      "n_engine_signals": 2,
+      "n_pathguard_rejects": 0,
+      "n_primary_signals": 8,
+      "n_sift_signals": 8,
+      "n_signal_conversion_drops": 0,
+      "n_total_signals": 11,
+      "n_unanalyzed_artifacts": 0,
+      "version": "V4-COLECTIVO-2026-07-03"
+    },
+    "results": {
+      "adversarial": {
+        "dominant_pattern": "NONE",
+        "indicators": [],
+        "n_indicators": 0,
+        "n_tools": 10,
+        "sift_critical_active": 0,
+        "signal_class": "derived"
+      },
+      "browser": {
+        "analysis_notes": [
+          "chromium: 2 downloads, 88 urls"
+        ],
+        "artifact_reliability": "13/20",
+        "artifact_type": "browser",
+        "c2_count": 0,
+        "finding_types": [
+          "SUSPICIOUS_DOWNLOAD"
+        ],
+        "source_profile": "/home/labestiadevigia/vigia-repo/evidence/magnet-2022-windows-full/browser",
+        "suspicious_count": 2,
+        "total_downloads": 2,
+        "unanalyzed": false
+      },
+      "caie": {
+        "_determinism_protocol": "P0-v2.0-DECIMAL-6-4",
+        "_operation_hmac": "",
+        "artifacts_evaluated": 11,
+        "artifacts_rejected": 0,
+        "chain_of_custody": {
+          "evidence_count": 11,
+          "fracture_count": 0,
+          "processing_timestamp": "2026-07-03T23:35:56.373157Z"
+        },
+        "composite_score": "0.0139",
+        "confidence_penalty_applied": false,
+        "daubert_note": "Daubert: 0/11 artifacts structurally irrefutable (spoofability \u2264 0.20). WARNING: No irrefutable anchor. Weak under cross-examination. CDL: INCONCLUSIVE: Coverage too low (16.7%)",
+        "fracture_bonus_applied": "0.0000",
+        "fractures": [],
+        "fractures_detected": 0,
+        "fractures_unique": 0,
+        "golden_rules_triggered": 0,
+        "independent_sources": 7,
+        "integrity_check": {
+          "alerts": [],
+          "fpu_native": false,
+          "internal_precision": 6,
+          "math_engine": "decimal.Decimal",
+          "output_precision": 4
+        },
+        "mitre_ttps": [
+          "T1036.005",
+          "T1059",
+          "T1070.001",
+          "T1070.002",
+          "T1070.006",
+          "T1498",
+          "T1562.001",
+          "T1564",
+          "T1565.001",
+          "T1566.003"
+        ],
+        "peirce_chain": {
+          "firstness": "11 artifacts from 7 tools. Raw scores range: 0.00 to 0.56.",
+          "secondness": "Noisy-OR fusion: 7 independent groups, composite=0.0139. Most reliable: REGISTRY_RTR (log_entry, adj=0.0041). 0 unique fracture(s), 0 Golden Rule(s).",
+          "thirdness": "Inferred habit: fabrication/staging. No structural discrepancies."
+        },
+        "probabilistic_score": "0.0139",
+        "probabilistic_verdict": "NOISE",
+        "raw_scores": [
+          {
+            "adjusted": "0.0041",
+            "description": "0.5599999999999999",
+            "raw_score": "0.5600",
+            "spoofability": 0.85,
+            "tool": "REGISTRY_RTR",
+            "type": "log_entry",
+            "weight": 0.15
+          },
+          {
+            "adjusted": "0.0037",
+            "description": "0.5",
+            "raw_score": "0.5000",
+            "spoofability": 0.85,
+            "tool": "PREFETCH_ANALYZER",
+            "type": "log_entry",
+            "weight": 0.15
+          },
+          {
+            "adjusted": "0.0035",
+            "description": "0.48",
+            "raw_score": "0.4800",
+            "spoofability": 0.85,
+            "tool": "EVENT_LOG",
+            "type": "log_entry",
+            "weight": 0.15
+          },
+          {
+            "adjusted": "0.0026",
+            "description": "0.36",
+            "raw_score": "0.3600",
+            "spoofability": 0.85,
+            "tool": "BROWSER_FORENSICS",
+            "type": "log_entry",
+            "weight": 0.15
+          },
+          {
+            "adjusted": "0.0000",
+            "description": "Signal from REGISTRY_RTR",
+            "raw_score": "0.0000",
+            "spoofability": 0.85,
+            "tool": "REGISTRY_RTR",
+            "type": "log_entry",
+            "weight": 0.15
+          },
+          {
+            "adjusted": "0.0000",
+            "description": "Signal from REGISTRY_RTR",
+            "raw_score": "0.0000",
+            "spoofability": 0.85,
+            "tool": "REGISTRY_RTR",
+            "type": "log_entry",
+            "weight": 0.15
+          },
+          {
+            "adjusted": "0.0000",
+            "description": "Signal from REGISTRY_RTR",
+            "raw_score": "0.0000",
+            "spoofability": 0.85,
+            "tool": "REGISTRY_RTR",
+            "type": "log_entry",
+            "weight": 0.15
+          },
+          {
+            "adjusted": "0.0000",
+            "description": "Signal from REGISTRY_RTR",
+            "raw_score": "0.0000",
+            "spoofability": 0.85,
+            "tool": "REGISTRY_RTR",
+            "type": "log_entry",
+            "weight": 0.15
+          },
+          {
+            "adjusted": "0.0000",
+            "description": "Signal from CROSS_RESONANCE",
+            "raw_score": "0.0000",
+            "spoofability": 0.85,
+            "tool": "CROSS_RESONANCE",
+            "type": "log_entry",
+            "weight": 0.15
+          },
+          {
+            "adjusted": "0.0000",
+            "description": "Signal from CASE_PATTERN_LIBRARY",
+            "raw_score": "0.0000",
+            "spoofability": 0.85,
+            "tool": "CASE_PATTERN_LIBRARY",
+            "type": "log_entry",
+            "weight": 0.15
+          },
+          {
+            "adjusted": "0.0000",
+            "description": "Signal from ADV_ROBUST",
+            "raw_score": "0.0000",
+            "spoofability": 0.85,
+            "tool": "ADV_ROBUST",
+            "type": "log_entry",
+            "weight": 0.15
+          }
+        ],
+        "status": "OK",
+        "structural_verdict": "INCONCLUSIVE",
+        "timestamp": "2026-07-03T23:35:56.373145Z",
+        "ttp_confidences": {
+          "T1036.005": "0.0337",
+          "T1059": "0.0332",
+          "T1070.001": "0.0345",
+          "T1070.002": "0.0345",
+          "T1070.006": "0.0181",
+          "T1498": "0.0587",
+          "T1562.001": "0.0477",
+          "T1564": "0.0253",
+          "T1565.001": "0.0415",
+          "T1566.003": "0.0242"
+        },
+        "verdict": "INCONCLUSIVE",
+        "vigia_verdict": "[VIGIA_CAIE]: INCONCLUSIVE. Structural=INCONCLUSIVE Probabilistic=NOISE (composite=0.0139) from 11 artifacts (7 independent). 0 fracture(s), 0 Golden Rule(s). Daubert: 0/11 artifacts structurally irrefutable (spoofability \u2264 0.20). WARNING:"
+      },
+      "eventlog": {
+        "artifact_type": "windows_event_log",
+        "chains": 1,
+        "composite_score": "19/20",
+        "finding_types": [
+          "HIGH_SEVERITY_104",
+          "HIGH_SEVERITY_8",
+          "REMOTE_THREAD_INJECTION"
+        ],
+        "findings": 145,
+        "gaps": 630,
+        "time_range": [
+          1643958154,
+          1644709137
+        ],
+        "timestamp": 1644709137,
+        "total_events": 19419
+      },
+      "patterns": {
+        "artifact_reliability": "17/20",
+        "artifact_type": "pattern",
+        "best_match": "NONE",
+        "finding_types": [],
+        "match_count": 0,
+        "match_score_by_pattern": {},
+        "missing_signals_by_pattern": {},
+        "signal_class": "derived",
+        "total_patterns": 3
+      },
+      "prefetch": {
+        "anti_forensic_count": 0,
+        "artifact_reliability": "7/10",
+        "artifact_type": "prefetch",
+        "finding_types": [
+          "SUSPICIOUS_EXECUTION"
+        ],
+        "source_path": "/home/labestiadevigia/vigia-repo/evidence/magnet-2022-windows-full/prefetch",
+        "suspicious_count": 8,
+        "suspicious_executables": [
+          "CERTUTIL.EXE",
+          "RUNDLL32.EXE",
+          "RUNDLL32.EXE",
+          "RUNDLL32.EXE",
+          "RUNDLL32.EXE",
+          "RUNDLL32.EXE",
+          "RUNDLL32.EXE",
+          "RUNDLL32.EXE"
+        ],
+        "total_files": 352,
+        "unanalyzed": false,
+        "unparsed_files": 0
+      },
+      "registry": [
+        {
+          "artifact_reliability": "17/20",
+          "artifact_type": "registry",
+          "finding_types": [],
+          "hive_sha256": "4aec3ac88863e8f6a57dce79006f41d4b99adc519b160aabb5c418400c9e521e",
+          "persistence_count": 0,
+          "timestomp_count": 0,
+          "usb_count": 0
+        },
+        {
+          "artifact_reliability": "17/20",
+          "artifact_type": "registry",
+          "finding_types": [],
+          "hive_sha256": "987c6b547632140553727f1c60f97a75f33f2dec79a28295ab1c85f9aef3059a",
+          "persistence_count": 0,
+          "timestomp_count": 0,
+          "usb_count": 0
+        },
+        {
+          "artifact_reliability": "17/20",
+          "artifact_type": "registry",
+          "finding_types": [],
+          "hive_sha256": "2e9fb43409ef7c6e90c2e88622b3fe21cd202b5899de2a1b330764ff6296a875",
+          "persistence_count": 0,
+          "timestomp_count": 0,
+          "usb_count": 0
+        },
+        {
+          "artifact_reliability": "17/20",
+          "artifact_type": "registry",
+          "finding_types": [
+            "service"
+          ],
+          "hive_sha256": "545ac21ca335836d97f20580a97603b777284751358f5a97bff60d90f9230db2",
+          "persistence_count": 65,
+          "timestomp_count": 0,
+          "usb_count": 0
+        },
+        {
+          "artifact_reliability": "17/20",
+          "artifact_type": "registry",
+          "finding_types": [],
+          "hive_sha256": "d47412982c700a5ad7fa6428ac3aa17ef2c62132afbe0254823748ad66874c40",
+          "persistence_count": 0,
+          "timestomp_count": 0,
+          "usb_count": 0
+        }
+      ],
+      "resonance": {
+        "artifact_reliability": "4/5",
+        "artifact_type": "resonance",
+        "finding_types": [],
+        "pattern_count": 0,
+        "signal_class": "derived",
+        "total_resonance": "0"
+      }
+    },
+    "signals": [
+      {
+        "confidence": 0.0,
+        "metadata": {
+          "acquisition_hash": "sha256:11a614598d61ddaef6818e784b98bb9d38ce23a83f42655d290cb3719fed81d0",
+          "acquisition_timestamp": "2026-07-03T23:34:52.543243+00:00",
+          "artifact_reliability": "17/20",
+          "artifact_type": "registry",
+          "finding_types": [],
+          "frs_applied": true,
+          "frs_factor": "1/5",
+          "gamma_applied": true,
+          "gamma_type": "registry",
+          "hive_sha256": "4aec3ac88863e8f6a57dce79006f41d4b99adc519b160aabb5c418400c9e521e",
+          "persistence_count": 0,
+          "signal_class": "primary",
+          "timestamp_invalid": true,
+          "timestomp_count": 0,
+          "usb_count": 0,
+          "z_original": 0.0
+        },
+        "tool": "REGISTRY_RTR",
+        "value": 0.0,
+        "z_score": 0.0
+      },
+      {
+        "confidence": 0.0,
+        "metadata": {
+          "acquisition_hash": "sha256:11a614598d61ddaef6818e784b98bb9d38ce23a83f42655d290cb3719fed81d0",
+          "acquisition_timestamp": "2026-07-03T23:34:52.543243+00:00",
+          "artifact_reliability": "17/20",
+          "artifact_type": "registry",
+          "finding_types": [],
+          "frs_applied": true,
+          "frs_factor": "1/5",
+          "gamma_applied": true,
+          "gamma_type": "registry",
+          "hive_sha256": "987c6b547632140553727f1c60f97a75f33f2dec79a28295ab1c85f9aef3059a",
+          "persistence_count": 0,
+          "signal_class": "primary",
+          "timestamp_invalid": true,
+          "timestomp_count": 0,
+          "usb_count": 0,
+          "z_original": 0.0
+        },
+        "tool": "REGISTRY_RTR",
+        "value": 0.0,
+        "z_score": 0.0
+      },
+      {
+        "confidence": 0.0,
+        "metadata": {
+          "acquisition_hash": "sha256:11a614598d61ddaef6818e784b98bb9d38ce23a83f42655d290cb3719fed81d0",
+          "acquisition_timestamp": "2026-07-03T23:34:52.543243+00:00",
+          "artifact_reliability": "17/20",
+          "artifact_type": "registry",
+          "finding_types": [],
+          "frs_applied": true,
+          "frs_factor": "1/5",
+          "gamma_applied": true,
+          "gamma_type": "registry",
+          "hive_sha256": "2e9fb43409ef7c6e90c2e88622b3fe21cd202b5899de2a1b330764ff6296a875",
+          "persistence_count": 0,
+          "signal_class": "primary",
+          "timestamp_invalid": true,
+          "timestomp_count": 0,
+          "usb_count": 0,
+          "z_original": 0.0
+        },
+        "tool": "REGISTRY_RTR",
+        "value": 0.0,
+        "z_score": 0.0
+      },
+      {
+        "confidence": 0.7550125,
+        "metadata": {
+          "acquisition_hash": "sha256:11a614598d61ddaef6818e784b98bb9d38ce23a83f42655d290cb3719fed81d0",
+          "acquisition_timestamp": "2026-07-03T23:34:52.543243+00:00",
+          "artifact_reliability": "17/20",
+          "artifact_type": "registry",
+          "finding_types": [
+            "service"
+          ],
+          "gamma_applied": true,
+          "gamma_type": "registry",
+          "hive_sha256": "545ac21ca335836d97f20580a97603b777284751358f5a97bff60d90f9230db2",
+          "persistence_count": 65,
+          "signal_class": "primary",
+          "timestamp_invalid": true,
+          "timestomp_count": 0,
+          "usb_count": 0,
+          "z_original": 2.8
+        },
+        "tool": "REGISTRY_RTR",
+        "value": 0.5599999999999999,
+        "z_score": 1.96
+      },
+      {
+        "confidence": 0.0,
+        "metadata": {
+          "acquisition_hash": "sha256:11a614598d61ddaef6818e784b98bb9d38ce23a83f42655d290cb3719fed81d0",
+          "acquisition_timestamp": "2026-07-03T23:34:52.543243+00:00",
+          "artifact_reliability": "17/20",
+          "artifact_type": "registry",
+          "finding_types": [],
+          "frs_applied": true,
+          "frs_factor": "1/5",
+          "gamma_applied": true,
+          "gamma_type": "registry",
+          "hive_sha256": "d47412982c700a5ad7fa6428ac3aa17ef2c62132afbe0254823748ad66874c40",
+          "persistence_count": 0,
+          "signal_class": "primary",
+          "timestamp_invalid": true,
+          "timestomp_count": 0,
+          "usb_count": 0,
+          "z_original": 0.0
+        },
+        "tool": "REGISTRY_RTR",
+        "value": 0.0,
+        "z_score": 0.0
+      },
+      {
+        "confidence": 0.95,
+        "metadata": {
+          "acquisition_hash": "sha256:11a614598d61ddaef6818e784b98bb9d38ce23a83f42655d290cb3719fed81d0",
+          "acquisition_timestamp": "2026-07-03T23:34:52.543243+00:00",
+          "artifact_type": "windows_event_log",
+          "chains": 1,
+          "composite_score": "19/20",
+          "finding_types": [
+            "HIGH_SEVERITY_104",
+            "HIGH_SEVERITY_8",
+            "REMOTE_THREAD_INJECTION"
+          ],
+          "findings": 145,
+          "gamma_applied": true,
+          "gamma_type": "windows_event_log",
+          "gaps": 630,
+          "signal_class": "primary",
+          "time_range": [
+            1643958154,
+            1644709137
+          ],
+          "timestamp": 1644709137,
+          "total_events": 19419,
+          "z_original": 2.4
+        },
+        "tool": "EVENT_LOG",
+        "value": 0.48,
+        "z_score": 1.44912
+      },
+      {
+        "confidence": 0.7315,
+        "metadata": {
+          "acquisition_hash": "sha256:11a614598d61ddaef6818e784b98bb9d38ce23a83f42655d290cb3719fed81d0",
+          "acquisition_timestamp": "2026-07-03T23:34:52.543243+00:00",
+          "anti_forensic_count": 0,
+          "artifact_reliability": "7/10",
+          "artifact_type": "prefetch",
+          "finding_types": [
+            "SUSPICIOUS_EXECUTION"
+          ],
+          "gamma_applied": true,
+          "gamma_type": "prefetch",
+          "signal_class": "primary",
+          "source_path": "/home/labestiadevigia/vigia-repo/evidence/magnet-2022-windows-full/prefetch",
+          "suspicious_count": 8,
+          "suspicious_executables": [
+            "CERTUTIL.EXE",
+            "RUNDLL32.EXE",
+            "RUNDLL32.EXE",
+            "RUNDLL32.EXE",
+            "RUNDLL32.EXE",
+            "RUNDLL32.EXE",
+            "RUNDLL32.EXE",
+            "RUNDLL32.EXE"
+          ],
+          "total_files": 352,
+          "unanalyzed": false,
+          "unparsed_files": 0,
+          "z_original": 2.5
+        },
+        "tool": "PREFETCH_ANALYZER",
+        "value": 0.5,
+        "z_score": 1.75
+      },
+      {
+        "confidence": 0.429,
+        "metadata": {
+          "acquisition_hash": "sha256:11a614598d61ddaef6818e784b98bb9d38ce23a83f42655d290cb3719fed81d0",
+          "acquisition_timestamp": "2026-07-03T23:34:52.543243+00:00",
+          "analysis_notes": [
+            "chromium: 2 downloads, 88 urls"
+          ],
+          "artifact_reliability": "13/20",
+          "artifact_type": "browser",
+          "c2_count": 0,
+          "finding_types": [
+            "SUSPICIOUS_DOWNLOAD"
+          ],
+          "gamma_applied": true,
+          "gamma_type": "browser",
+          "signal_class": "primary",
+          "source_profile": "/home/labestiadevigia/vigia-repo/evidence/magnet-2022-windows-full/browser",
+          "suspicious_count": 2,
+          "total_downloads": 2,
+          "unanalyzed": false,
+          "z_original": 1.8
+        },
+        "tool": "BROWSER_FORENSICS",
+        "value": 0.36,
+        "z_score": 1.17
+      },
+      {
+        "confidence": 0.0,
+        "metadata": {
+          "artifact_reliability": "4/5",
+          "artifact_type": "resonance",
+          "finding_types": [],
+          "pattern_count": 0,
+          "signal_class": "derived",
+          "total_resonance": "0"
+        },
+        "tool": "CROSS_RESONANCE",
+        "value": 0.0,
+        "z_score": 0.0
+      },
+      {
+        "confidence": 0.0,
+        "metadata": {
+          "artifact_reliability": "17/20",
+          "artifact_type": "pattern",
+          "best_match": "NONE",
+          "finding_types": [],
+          "match_count": 0,
+          "match_score_by_pattern": {},
+          "missing_signals_by_pattern": {},
+          "signal_class": "derived",
+          "total_patterns": 3
+        },
+        "tool": "CASE_PATTERN_LIBRARY",
+        "value": 0.0,
+        "z_score": 0.0
+      },
+      {
+        "confidence": 0.5716,
+        "metadata": {
+          "dominant_pattern": "NONE",
+          "indicators": [],
+          "n_indicators": 0,
+          "n_tools": 10,
+          "sift_critical_active": 0,
+          "signal_class": "derived"
+        },
+        "tool": "ADV_ROBUST",
+        "value": 0.0,
+        "z_score": 0.0
+      }
+    ]
+  },
+  "sans_compliance": {
+    "accuracy_validation": true,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "signal_stats": {
+    "n_primary_signals": 8,
+    "n_total_signals": 11,
+    "n_unanalyzed_artifacts": 0
+  },
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}
