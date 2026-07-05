@@ -38,9 +38,15 @@ class TestB058AbstainClassification:
         v = classify_agent_verdict({"best_hypothesis": hyp, "is_conclusive": conc}, n)
         assert v == "ABSTAIN", f"{hyp!r} debe clasificar ABSTAIN, no {v}"
 
-    def test_ebs_abstain_case_seals_abstain_not_noise(self):
+    def test_ebs_abstain_case_seals_abstain_not_noise(self, monkeypatch):
         # El caso real del corpus: VIGIA-AMB-001 (expected ABSTAIN, 3 señales)
         # sellaba agent_verdict=NOISE/exit 0.
+        # B-075 (flip 2026-07-05): este test ejercita la cadena
+        # adaptador-legacy → classify (la etiqueta ABSTAIN debe honrarse en
+        # esa rama, no degradar a NOISE). Se fija a legacy explícito; en modo
+        # motor la hipótesis sale de la evidencia (AMB-001 → NOISE del motor,
+        # el desacuerdo con la etiqueta es backlog de Fase 2).
+        monkeypatch.setenv("VIGIA_EBS_RESOLVE", "legacy")
         from sift_orchestrator import SIFTOrchestrator
         from vigia_agent import classify_agent_verdict, _signal_stats
         case = json.loads((REPO / "data/cases/VIGIA-AMB-001.json").read_text())

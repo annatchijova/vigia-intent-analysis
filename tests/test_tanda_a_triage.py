@@ -133,9 +133,15 @@ class TestA2PriorTrustClamp:
 # ──────────────────────────────────────────────────────────────────────────
 
 class TestA3IsConclusiveCoherent:
-    def test_ebs_abstain_with_high_scores_not_conclusive(self, tmp_path):
+    # B-075 (flip 2026-07-05): estos dos tests ejercitan el contrato B-027
+    # de la RAMA LEGACY del adaptador (hipótesis derivada de la etiqueta),
+    # que quedó como modo explícito de reproducción. Se fijan a legacy; el
+    # guard B-027 del camino motor tiene su propio test en
+    # tests/test_fase1_resolve.py::TestMotorModeHonesty.
+    def test_ebs_abstain_with_high_scores_not_conclusive(self, tmp_path, monkeypatch):
         # El caso exacto de B-027: expected_verdict=ABSTAIN con scores altos
         # sellaba ABSTAIN_DETECTED + is_conclusive=True.
+        monkeypatch.setenv("VIGIA_EBS_RESOLVE", "legacy")
         from sift_orchestrator import SIFTOrchestrator
         case = {
             "case_id": "T-B027",
@@ -155,8 +161,9 @@ class TestA3IsConclusiveCoherent:
             "ABSTAIN_DETECTED no puede sellar is_conclusive=True (B-027)"
         )
 
-    def test_ebs_malice_keeps_conclusive(self, tmp_path):
+    def test_ebs_malice_keeps_conclusive(self, tmp_path, monkeypatch):
         # Control: el fix no degrada los casos legítimamente conclusivos.
+        monkeypatch.setenv("VIGIA_EBS_RESOLVE", "legacy")
         from sift_orchestrator import SIFTOrchestrator
         case = {
             "case_id": "T-B027-M",

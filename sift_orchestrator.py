@@ -710,16 +710,19 @@ class SIFTOrchestrator:
 
         # ── B-075 / P2-C (Fase 1): selección de modo ────────────────────────
         # "motor"  → resolve(): la hipótesis sale del scorer canónico SIN la
-        #            etiqueta (label-blind, ver _resolve_hypothesis).
+        #            etiqueta (label-blind, ver _resolve_hypothesis). DEFAULT
+        #            desde la decisión de doctrina de Anna (opción (a), flip
+        #            2026-07-05 — docs/FASE1_RESOLVE_EBS.md §5): el corpus
+        #            pasa a medir detección real (143/199 honesto), no
+        #            reproducción de etiqueta (199/199 eco).
         # "legacy" → comportamiento histórico: la etiqueta determina la
-        #            hipótesis (label leak documentado, P2-C). Default HASTA
-        #            la decisión de doctrina — regla de seguridad del plan:
-        #            esta rama sostiene el corpus 199/199 y no se retira
-        #            hasta que el flip del default se decida con los números
-        #            comparativos a la vista (docs/FASE1_RESOLVE_EBS.md).
-        mode = os.environ.get("VIGIA_EBS_RESOLVE", "legacy").strip().lower()
-        if mode != "motor":
-            mode = "legacy"
+        #            hipótesis (label leak documentado, P2-C). Retenido SOLO
+        #            como modo explícito de reproducción/evaluación de
+        #            bundles históricos — nunca default. Cualquier valor
+        #            desconocido cae a motor (el modo honesto), no a legacy.
+        mode = os.environ.get("VIGIA_EBS_RESOLVE", "motor").strip().lower()
+        if mode != "legacy":
+            mode = "motor"
 
         resolve_meta: Optional[Dict[str, Any]] = None
         if mode == "motor":

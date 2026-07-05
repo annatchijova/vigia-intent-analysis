@@ -3765,11 +3765,11 @@ corpus 198/198. Restore tag: `pre-b071-rework-20260704-...`.
 
 ---
 
-## B-075 — Adaptador EBS: fuga de expected_verdict al veredicto (P2-C) — resolve() implementado, default pendiente de doctrina [PARCIAL]
+## B-075 — Adaptador EBS: fuga de expected_verdict al veredicto (P2-C) — resolve() implementado y default motor [RESUELTO]
 
 | Campo | Valor |
 |-------|-------|
-| **Estado** | PARCIAL — resolve() implementado y verificado detrás de `VIGIA_EBS_RESOLVE=motor`; el default sigue `legacy` (leak vigente) hasta la decisión de doctrina del flip |
+| **Estado** | RESUELTO — resolve() implementado; **default motor desde 2026-07-05** (decisión de doctrina de Anna, opción (a): flip ya). Legacy queda solo como modo explícito de reproducción (`VIGIA_EBS_RESOLVE=legacy`); valores desconocidos caen a motor. Claims del README actualizados (143/199 detección ciega); tag del flip `pre-fase1-flip-default-20260705-223653` |
 | **Severidad** | P1 — en modo legacy el veredicto sellado del agente para casos EBS ES la etiqueta (0 detecciones sin ella); riesgo Daubert directo |
 | **Archivo** | `sift_orchestrator.py` (`_analyze_ebs_json`, `_resolve_hypothesis`, `_MOTOR_HYPOTHESIS_MAP`) |
 | **Detectado en** | AUDITORIA_MOTOR_SIN_LABEL (blind run + label-flip 3b + umbral muerto 3c); formalizado en PLAN_ABDUCTIVO_PENDIENTES_20260705 §3 Fase 1 |
@@ -3799,8 +3799,15 @@ ciegas) vs motor 143/199 honesto con distribución idéntica al motor ciego;
 ~41/56 desacuerdos son de severidad adyacente. Detalle y matriz de decisión:
 `docs/FASE1_RESOLVE_EBS.md`.
 
-### Pendiente
+### Cierre (flip 2026-07-05)
 
-La decisión de doctrina del default (flip a motor / doble sello / mantener
-legacy) es de Anna — opciones (a)/(b)/(c) en el doc §5. El leak NO se retira
-del código hasta esa decisión (regla de seguridad del plan).
+Decisión de doctrina tomada: **opción (a), flip ya** — `VIGIA_EBS_RESOLVE=motor`
+default; el corpus mide detección real (143/199); los 56 desacuerdos con las
+etiquetas pasan a ser el backlog de calibración de Fase 2. La rama legacy se
+retiene SOLO como modo explícito de reproducción de bundles históricos (los
+tests B-027/B-058 que ejercitan sus contratos quedaron fijados a
+`VIGIA_EBS_RESOLVE=legacy`); un valor desconocido de la env var cae a motor
+(fail-honest, nunca reactiva el leak). Claims actualizados en
+README.md/README_ES.md con nota de cambio de métrica;
+`SUBMISSION_COMPLIANCE.md` intencionalmente sin tocar. Comparativa
+antes/después sellada en `docs/FASE1_RESOLVE_EBS.md` §4-§5.

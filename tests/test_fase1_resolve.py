@@ -24,10 +24,11 @@ Hipótesis rivales (bucle A–D–I):
   corroboración B-068). El adaptador nunca la llamaba; la etiqueta tapaba
   el hueco. CORROBORADA: resolve() = invocar esa selección canónica.
 
-Modo de despliegue: VIGIA_EBS_RESOLVE=motor|legacy (default legacy hasta la
-decisión de doctrina — regla de seguridad del plan: la línea del leak
-sostiene el corpus 199/199 y no se retira hasta que estos tests pasen en
-verde por el camino nuevo Y Anna decida el flip del default).
+Modo de despliegue: VIGIA_EBS_RESOLVE=motor|legacy. Default **motor** desde
+la decisión de doctrina (opción (a), flip 2026-07-05 — Anna): el corpus pasa
+a medir detección real. Legacy queda solo como modo explícito de
+reproducción/evaluación de bundles históricos; cualquier valor desconocido
+cae a motor (el modo honesto), nunca a legacy.
 """
 
 from __future__ import annotations
@@ -122,28 +123,31 @@ class TestLabelFlipInvariance:
 
     def test_legacy_mode_still_leaks_pinned(self, monkeypatch, tmp_path):
         """Pin del comportamiento legacy (documentado, NO deseado): la misma
-        evidencia cambia de hipótesis con la etiqueta. Si este test truena,
-        el default cambió — debe hacerse solo con la decisión de doctrina."""
+        evidencia cambia de hipótesis con la etiqueta. Legacy quedó como modo
+        explícito de reproducción de bundles históricos tras el flip (a) —
+        este pin documenta POR QUÉ nunca puede volver a ser default."""
         flipped = _flip_label(tmp_path, RT_CONSTELLATION, "NOISE")
         original = _flip_label(tmp_path, RT_CONSTELLATION, "MALICE")
-        res_m = _adapter(monkeypatch, None, original)
-        res_n = _adapter(monkeypatch, None, flipped)
+        res_m = _adapter(monkeypatch, "legacy", original)
+        res_n = _adapter(monkeypatch, "legacy", flipped)
         assert res_m["abduction"]["best_hypothesis"] == "MALICIOUS_INTENT_DETECTED"
         assert res_n["abduction"]["best_hypothesis"] == "NO_SEMIOTIC_ANOMALY_DETECTED"
 
 
-class TestLegacyDefaultUnchanged:
-    """Regla de seguridad del plan: el default NO cambia en esta fase."""
+class TestDefaultModeIsMotor:
+    """Doctrina (a) — flip 2026-07-05: el default es el modo honesto."""
 
-    def test_default_mode_is_legacy(self, monkeypatch):
+    def test_default_mode_is_motor(self, monkeypatch):
         res = _adapter(monkeypatch, None, RT_CONSTELLATION)
-        assert res["pipeline_meta"]["ebs_adapter_mode"] == "legacy"
-        # RT-FN-CONSTELLATION trae expected=MALICE → legacy la eco-reproduce.
-        assert res["abduction"]["best_hypothesis"] == "MALICIOUS_INTENT_DETECTED"
+        assert res["pipeline_meta"]["ebs_adapter_mode"] == "motor"
+        # RT-FN-CONSTELLATION trae expected=MALICE pero el motor ciego dice
+        # NOISE (0.0179): el default HONESTO emite el FN real, no el eco.
+        assert res["abduction"]["best_hypothesis"] == "NO_SEMIOTIC_ANOMALY_DETECTED"
 
-    def test_unknown_mode_value_falls_back_to_legacy(self, monkeypatch):
+    def test_unknown_mode_value_falls_back_to_motor(self, monkeypatch):
+        # Fail-honest: un valor desconocido nunca puede reactivar el leak.
         res = _adapter(monkeypatch, "banana", RT_CONSTELLATION)
-        assert res["pipeline_meta"]["ebs_adapter_mode"] == "legacy"
+        assert res["pipeline_meta"]["ebs_adapter_mode"] == "motor"
 
 
 class TestMotorModeHonesty:

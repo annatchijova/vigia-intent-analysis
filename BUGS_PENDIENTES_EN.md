@@ -3855,11 +3855,11 @@ registry (layer+ontology+profile+role in a single source).
 
 ---
 
-## B-075 — EBS adapter: expected_verdict leaks into the verdict (P2-C) — resolve() implemented, default pending doctrine [PARTIAL]
+## B-075 — EBS adapter: expected_verdict leaks into the verdict (P2-C) — resolve() implemented, default motor [RESOLVED]
 
 | Field | Value |
 |-------|-------|
-| **Status** | PARTIAL — resolve() implemented and verified behind `VIGIA_EBS_RESOLVE=motor`; default remains `legacy` (leak live) until the doctrine decision on the flip |
+| **Status** | RESOLVED — resolve() implemented; **default motor since 2026-07-05** (Anna's doctrine decision, option (a): flip now). Legacy remains only as an explicit reproduction mode (`VIGIA_EBS_RESOLVE=legacy`); unknown values fall back to motor. README claims updated (143/199 label-blind detection); flip tag `pre-fase1-flip-default-20260705-223653` |
 | **Severity** | P1 — in legacy mode the agent's sealed verdict for EBS cases IS the label (0 detections without it); direct Daubert risk |
 | **File** | `sift_orchestrator.py` (`_analyze_ebs_json`, `_resolve_hypothesis`, `_MOTOR_HYPOTHESIS_MAP`) |
 | **Detected** | AUDITORIA_MOTOR_SIN_LABEL (blind run + label-flip 3b + dead threshold 3c); formalized in PLAN_ABDUCTIVO_PENDIENTES_20260705 §3 Fase 1 |
@@ -3889,8 +3889,15 @@ vs motor 143/199 honest with a distribution identical to the audit's blind
 motor; ~41/56 disagreements are adjacent-severity. Detail and decision matrix:
 `docs/FASE1_RESOLVE_EBS.md`.
 
-### Pending
+### Closure (flip 2026-07-05)
 
-The doctrine decision on the default (flip to motor / dual seal / keep legacy)
-belongs to Anna — options (a)/(b)/(c) in the doc §5. The leak is NOT removed
-from the code until that decision (plan safety rule).
+Doctrine decision taken: **option (a), flip now** — `VIGIA_EBS_RESOLVE=motor`
+default; the corpus measures real detection (143/199); the 56 disagreements
+with the labels become the Fase 2 calibration backlog. The legacy branch is
+retained ONLY as an explicit reproduction mode for historical bundles (the
+B-027/B-058 tests exercising its contracts are pinned to
+`VIGIA_EBS_RESOLVE=legacy`); an unknown env value falls back to motor
+(fail-honest — it can never reactivate the leak). Claims updated in
+README.md/README_ES.md with a metric-change note; `SUBMISSION_COMPLIANCE.md`
+intentionally untouched. Before/after comparison sealed in
+`docs/FASE1_RESOLVE_EBS.md` §4-§5.
