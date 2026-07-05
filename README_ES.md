@@ -698,6 +698,31 @@ Estos números no están inflados. Reflejan resultados en un corpus específico,
 
 ## ⚠ NOTA DE PRECISIÓN — TRES DOMINIOS DE EVALUACIÓN
 
+> **⚠ CAMBIO DE MÉTRICA (2026-07-05, B-075 — decisión de doctrina post-hackathon).**
+> La auditoría red-team `AUDITORIA_MOTOR_SIN_LABEL.md` demostró que el camino batch
+> del corpus JSON (`run_all_agent.py`) reproducía la etiqueta `expected_verdict` de
+> cada caso en vez de derivar el veredicto de la evidencia (fuga de etiqueta, P2-C):
+> con la etiqueta removida, ese camino detectaba **cero** casos maliciosos. Desde el
+> fix B-075 el adaptador EBS deriva su veredicto del scorer determinista canónico con
+> la etiqueta removida (`VIGIA_EBS_RESOLVE=motor`, ahora el default), y la métrica del
+> corpus mide **detección real ciega a la etiqueta**:
+>
+> **`run_all_agent.py` sobre el corpus JSON de 199 casos: 153/199 (76.9%) —
+> ciego a la etiqueta, distribución idéntica a la del scorer standalone corriendo
+> ciego.** El flip B-075 quedó en 143/199; B-076 (2026-07-05) calibró después el
+> umbral SUSPICION contra el dataset de ground truth de 198 casos
+> (`data/calibration_ladder_dataset_20260705.json`): +10, cero regresiones. De los
+> 46 desacuerdos restantes, la mayoría son de severidad adyacente (INTENT↔MALICE,
+> MALICE↔SUSPICION, ABSTAIN↔NOISE); los errores duros de dirección son ~7
+> (2 FP + 5 FN). Esos 46 son el backlog de calibración abierto. Metodología
+> completa, prueba de invariancia al label-flip y análisis por cluster:
+> [`docs/FASE1_RESOLVE_EBS.md`](./docs/FASE1_RESOLVE_EBS.md) y
+> [`docs/FASE2_DATASET_CALIBRACION.md`](./docs/FASE2_DATASET_CALIBRACION.md).
+>
+> Las tasas pre-B-075 de este camino (p.ej. "129/129", "165/167") medían
+> reproducción de etiqueta, no detección, y se conservan abajo solo como registro
+> histórico.
+
 > **La cantidad de casos puede estar desactualizada.** Estamos agregando casos
 > activamente, especialmente investigaciones sobre evidencia raw (E01/evtx). Las
 > cifras mostradas reflejan el corpus al momento de la última actualización y pueden
@@ -711,7 +736,9 @@ modo de investigación principal. **Las cifras de precisión en este README refl
 Dominio A.**
 
 **Dominio B — Agente autónomo, casos pre-procesados en JSON:** Runner batch sobre
-bundles de casos estructurados. Tasa de éxito: 165/167 en el corpus canónico.
+bundles de casos estructurados. **Detección ciega a la etiqueta: 153/199** desde
+B-075/B-076 (2026-07-05); la cifra anterior 165/167 medía reproducción de etiqueta
+(ver la nota de cambio de métrica arriba).
 
 **Dominio C — Agente autónomo, evidencia raw (E01/evtx):** El agente ahora produce
 correctamente INTENT/SUSPICION (exit code 3) para evidencia de disco Windows en modo
@@ -727,7 +754,15 @@ basado en señales.
 VIGÍA separa la evaluación en tres dominios distintos. Solo el Dominio A
 constituye la métrica de precisión del sistema.
 
-### Dominio A — Precisión Determinística (métrica principal): 129/129 (100%)
+### Dominio A — Precisión Determinística: 129/129 — HISTÓRICO (pre-B-075)
+
+> **Superado el 2026-07-05 (B-075):** esta tabla se produjo por el camino batch JSON
+> cuando el adaptador EBS todavía eco-reproducía `expected_verdict` (fuga P2-C), así
+> que mide reproducción de etiqueta, no detección. Se conserva como registro
+> histórico de la evaluación del hackathon. La métrica honesta vigente para este
+> camino es el **153/199 de detección ciega** en la nota de cambio de métrica de
+> arriba. `SUBMISSION_COMPLIANCE.md` refleja los claims tal como se presentaron y
+> queda intencionalmente sin modificar.
 
 | Suite | Casos | Correctos |
 |-------|-------|-----------|
@@ -748,7 +783,10 @@ constituye la métrica de precisión del sistema.
 > falsa atribución (contado pero nunca creado — solo existen 3: FF-GENUINE-001,
 > FP-CULTURAL-CLEAN-001, FP-CULTURAL-CLEAN).
 
-Reproducir: `python3 run_all_agent.py --timeout 90`
+Reproducir (post-B-075/B-076 esto da el 153/199 honesto, no la tabla histórica de
+arriba): `python3 run_all_agent.py --timeout 90`
+Para reproducir explícitamente el comportamiento histórico de eco de etiqueta:
+`VIGIA_EBS_RESOLVE=legacy python3 run_all_agent.py --timeout 90`
 
 ---
 

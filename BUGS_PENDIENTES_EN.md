@@ -3855,11 +3855,11 @@ registry (layer+ontology+profile+role in a single source).
 
 ---
 
-## B-075 — EBS adapter: expected_verdict leaks into the verdict (P2-C) — resolve() implemented, default pending doctrine [PARTIAL]
+## B-075 — EBS adapter: expected_verdict leaks into the verdict (P2-C) — resolve() implemented, default motor [RESOLVED]
 
 | Field | Value |
 |-------|-------|
-| **Status** | PARTIAL — resolve() implemented and verified behind `VIGIA_EBS_RESOLVE=motor`; default remains `legacy` (leak live) until the doctrine decision on the flip |
+| **Status** | RESOLVED — resolve() implemented; **default motor since 2026-07-05** (Anna's doctrine decision, option (a): flip now). Legacy remains only as an explicit reproduction mode (`VIGIA_EBS_RESOLVE=legacy`); unknown values fall back to motor. README claims updated (143/199 label-blind detection); flip tag `pre-fase1-flip-default-20260705-223653` |
 | **Severity** | P1 — in legacy mode the agent's sealed verdict for EBS cases IS the label (0 detections without it); direct Daubert risk |
 | **File** | `sift_orchestrator.py` (`_analyze_ebs_json`, `_resolve_hypothesis`, `_MOTOR_HYPOTHESIS_MAP`) |
 | **Detected** | AUDITORIA_MOTOR_SIN_LABEL (blind run + label-flip 3b + dead threshold 3c); formalized in PLAN_ABDUCTIVO_PENDIENTES_20260705 §3 Fase 1 |
@@ -3889,8 +3889,49 @@ vs motor 143/199 honest with a distribution identical to the audit's blind
 motor; ~41/56 disagreements are adjacent-severity. Detail and decision matrix:
 `docs/FASE1_RESOLVE_EBS.md`.
 
-### Pending
+### Closure (flip 2026-07-05)
 
-The doctrine decision on the default (flip to motor / dual seal / keep legacy)
-belongs to Anna — options (a)/(b)/(c) in the doc §5. The leak is NOT removed
-from the code until that decision (plan safety rule).
+Doctrine decision taken: **option (a), flip now** — `VIGIA_EBS_RESOLVE=motor`
+default; the corpus measures real detection (143/199); the 56 disagreements
+with the labels become the Fase 2 calibration backlog. The legacy branch is
+retained ONLY as an explicit reproduction mode for historical bundles (the
+B-027/B-058 tests exercising its contracts are pinned to
+`VIGIA_EBS_RESOLVE=legacy`); an unknown env value falls back to motor
+(fail-honest — it can never reactivate the leak). Claims updated in
+README.md/README_ES.md with a metric-change note; `SUBMISSION_COMPLIANCE.md`
+intentionally untouched. Before/after comparison sealed in
+`docs/FASE1_RESOLVE_EBS.md` §4-§5.
+
+---
+
+## B-076 — Scorer ladder: SUSPICION threshold recalibrated 0.18 → 0.10 with ground truth (Fase 2, E1) [RESOLVED]
+
+| Field | Value |
+|-------|-------|
+| **Status** | RESOLVED — applied 2026-07-05 behind a comparative gate (B-069 pattern): +10 correct, 0 regressions |
+| **Severity** | P2 — 10 SUSPICION-labeled cases emitted UNKNOWN (dead band [0.101, 0.148] between the 0.08 and 0.18 thresholds) |
+| **File** | `vigia_scorer.py:820` (decision ladder) |
+| **Detected** | Fase 2 calibration dataset (`data/calibration_ladder_dataset_20260705.json`, 198 cases): all 10 SUSPICION→UNKNOWN cases fell within <0.05 of the 0.18 threshold |
+| **Restore tag** | `pre-fase2-dataset-20260705-232536` |
+
+### Description and prior measurement (deduction before the change)
+
+The dataset census showed lowering the threshold to 0.10 could only affect
+cases with score in [0.10, 0.18): the 10 misclassified SUSPICION cases plus
+exactly ONE correct case (VIGIA-REAL-SRL-DC-MEMORY, exp=UNKNOWN, score
+0.167) — which the comparator accepts under any verdict (expected=UNKNOWN
+always passes). Expected collateral: zero.
+
+### Comparative gate (induction)
+
+- Suite: 719 passed / 7 xfailed (unchanged).
+- Corpus default (motor): 143/199 → **153/199** (+10 exact, 0 regressions).
+- Disagreements: 56 → 46 (the score-0.148 MALICE→UNKNOWN becomes
+  MALICE→SUSPICION: still a fail, one rung closer).
+
+Sibling experiments measured and NOT applied (documented in
+`docs/FASE2_DATASET_CALIBRACION.md`): E2 (INTENT rung via CAIE fractures —
+refuted: would break 49 correct MALICE cases) and E3 (NOISE with <3
+artifacts → ABSTAIN — refuted: net ≈ +1 with doctrinal cost). The ladder's
+structural INTENT gap and the ABSTAIN/L-012 label review remain open
+decisions (doc §4 and §5).

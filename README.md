@@ -696,6 +696,32 @@ These numbers are not inflated. They reflect results on a specific, diverse, doc
 
 ## ⚠ ACCURACY NOTE — THREE EVALUATION DOMAINS
 
+> **⚠ METRIC CHANGE (2026-07-05, B-075 — post-hackathon doctrine decision).**
+> The red-team audit `AUDITORIA_MOTOR_SIN_LABEL.md` proved that the JSON-corpus
+> batch path (`run_all_agent.py`) was reproducing each case's `expected_verdict`
+> label instead of deriving the verdict from the evidence (label leak, P2-C):
+> with the label stripped, that path detected **zero** malicious cases. As of
+> the B-075 fix the EBS adapter derives its verdict from the canonical
+> deterministic scorer with the label removed (`VIGIA_EBS_RESOLVE=motor`,
+> now the default), and the corpus metric measures **real label-blind
+> detection**:
+>
+> **`run_all_agent.py` over the 199-case JSON corpus: 153/199 (76.9%) —
+> label-blind, distribution identical to the standalone scorer run blind.**
+> The B-075 flip landed at 143/199; B-076 (2026-07-05) then calibrated the
+> SUSPICION threshold against the 198-case ground-truth dataset
+> (`data/calibration_ladder_dataset_20260705.json`): +10, zero regressions.
+> Of the 46 remaining disagreements, most are adjacent-severity
+> (INTENT↔MALICE, MALICE↔SUSPICION, ABSTAIN↔NOISE); hard direction errors
+> are ~7 (2 FP + 5 FN). These 46 are the open calibration backlog. Full
+> methodology, label-flip invariance proof, and per-cluster analysis:
+> [`docs/FASE1_RESOLVE_EBS.md`](./docs/FASE1_RESOLVE_EBS.md) and
+> [`docs/FASE2_DATASET_CALIBRACION.md`](./docs/FASE2_DATASET_CALIBRACION.md).
+>
+> Pre-B-075 pass rates for this path (e.g. "129/129", "165/167") measured
+> label reproduction, not detection, and are retained below only as
+> historical record.
+
 > **The case count below may be outdated.** We are actively adding cases, especially
 > raw-evidence (E01/evtx) investigations. The figures shown reflect the corpus at the
 > time of last update and may undercount current coverage.
@@ -707,7 +733,8 @@ on real-world E01 disk images, memory dumps, and log archives. This is the prima
 investigative mode. **Accuracy figures in this README reflect Domain A.**
 
 **Domain B — Autonomous agent, JSON pre-processed cases:** Batch runner over structured
-case bundles. 165/167 pass rate on canonical corpus.
+case bundles. **153/199 label-blind detection** since B-075/B-076 (2026-07-05); the
+previous 165/167 figure measured label reproduction (see metric change note above).
 
 **Domain C — Autonomous agent, raw evidence (E01/evtx):** The agent now correctly
 produces INTENT/SUSPICION (exit code 3) for Windows disk evidence in RAW mode.
@@ -722,7 +749,15 @@ resolved. See [L-036](./KNOWN_LIMITATIONS.md) for the signal-based hypothesis ov
 VIGÍA separates evaluation into three distinct domains. Only Domain A
 constitutes the system's accuracy claim.
 
-### Domain A — Deterministic Accuracy (core metric): 129/129 (100%)
+### Domain A — Deterministic Accuracy: 129/129 — HISTORICAL (pre-B-075)
+
+> **Superseded 2026-07-05 (B-075):** this table was produced through the JSON batch
+> path while the EBS adapter still echoed `expected_verdict` (P2-C label leak), so it
+> measures label reproduction, not detection. It is retained as historical record of
+> the hackathon-time evaluation. The current honest metric for this path is the
+> **153/199 label-blind detection** figure in the metric-change note above.
+> `SUBMISSION_COMPLIANCE.md` reflects the claims as submitted and is intentionally
+> left unmodified.
 
 | Suite | Cases | Correct |
 |-------|-------|---------|
@@ -743,7 +778,10 @@ constitutes the system's accuracy claim.
 > false-flag case (counted but never created — only 3 exist: FF-GENUINE-001,
 > FP-CULTURAL-CLEAN-001, FP-CULTURAL-CLEAN).
 
-Reproduce: `python3 run_all_agent.py --timeout 90`
+Reproduce (post-B-075/B-076 this yields the honest 153/199, not the historical
+table above): `python3 run_all_agent.py --timeout 90`
+To reproduce the historical label-echo behavior explicitly:
+`VIGIA_EBS_RESOLVE=legacy python3 run_all_agent.py --timeout 90`
 
 ---
 

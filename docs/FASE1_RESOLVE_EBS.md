@@ -4,9 +4,15 @@
 **Rama:** `claude/audits-bugs-analysis-kr3bcy`
 **Origen:** `PLAN_ABDUCTIVO_PENDIENTES_20260705.md` §3 Fase 1; evidencia base
 `AUDITORIA_MOTOR_SIN_LABEL.md`.
-**Tag de restore:** `pre-fase1-label-leak-20260705-221206`
-**Estado:** implementado detrás de `VIGIA_EBS_RESOLVE` (default **legacy** —
-el flip del default es la decisión de doctrina pendiente, §5).
+**Tag de restore:** `pre-fase1-label-leak-20260705-221206` (implementación) /
+`pre-fase1-flip-default-20260705-223653` (flip del default).
+**Estado:** implementado y **default motor** — decisión de doctrina de Anna
+(opción (a), 2026-07-05): "flip ya; el corpus pasa a medir detección real; los
+56 desacuerdos son el backlog de Fase 2". Legacy queda como modo explícito de
+reproducción (`VIGIA_EBS_RESOLVE=legacy`); cualquier valor desconocido cae a
+motor. Claims actualizados en README.md / README_ES.md (nota de cambio de
+métrica, 143/199); `SUBMISSION_COMPLIANCE.md` intencionalmente sin tocar
+(refleja lo presentado al hackathon).
 
 ---
 
@@ -79,7 +85,22 @@ dirección son ~7 (2 FP + 5 FN benigno-vs-malicioso), consistentes con los 3 FP
 / 17 FN del motor ciego medidos por la auditoría (la diferencia es la
 normalización binaria de aquella tabla).
 
-## 5. La decisión pendiente (doctrina — Anna)
+## 4b. Verificación post-flip (2026-07-05, default motor)
+
+Corridas con el default ya flipeado, mismo protocolo:
+
+| Corrida | Resultado |
+|---|---|
+| Suite completa | **719 passed, 0 failed, 7 xfailed** (los 3 tests B-027/B-058 que ejercitan contratos de la rama legacy quedaron fijados a `VIGIA_EBS_RESOLVE=legacy` explícito) |
+| `run_all_agent.py` (default = motor) | **143/199 PASS** — el corpus mide detección |
+| `VIGIA_EBS_RESOLVE=legacy run_all_agent.py` | **199/199 PASS** — el eco histórico sigue reproducible bajo demanda |
+
+## 5. La decisión (doctrina — Anna)
+
+> **RESUELTO 2026-07-05: opción (a), flip ya.** `VIGIA_EBS_RESOLVE=motor` es
+> el default; el corpus mide detección real (143/199); los 56 desacuerdos son
+> el backlog de Fase 2. El texto original de las opciones se conserva abajo
+> como registro de la decisión.
 
 El 199/199 actual **no mide detección**: mide reproducción de la etiqueta (el
 agente ciego detecta 0). El 143/199 del modo motor es el número honesto de la
