@@ -25,6 +25,7 @@ from typing import Any, Dict, List, Optional, Tuple
 from vigia.core.ebs_v1 import SignalOutput, Z_CLIP_MAX
 from vigia.core.chain_of_custody import ChainOfCustody
 from vigia.sift._math_utils import build_correlation_groups, noisy_or_correlated
+from vigia.sift._sql_utils import safe_sqlite_connect
 
 logger = logging.getLogger(__name__)
 
@@ -106,6 +107,12 @@ class iOSAnalysisResult:
     total_sms: int = 0
     total_contacts: int = 0
     total_calls: int = 0
+    # B-072: solo un conteo EXITOSO de 0 es evidencia de data_minimization.
+    # Un parseo fallido o una DB ausente dejan total_*=0 por default, lo que NO
+    # debe escalar el veredicto (falso INTENT/MALICE). Estos flags distinguen
+    # "parseado y vacío" de "no determinado".
+    contacts_parsed: bool = False
+    calls_parsed: bool = False
     total_safari_entries: int = 0
     encrypted_apps: List[Dict[str, Any]] = field(default_factory=list)
     findings: List[iOSFinding] = field(default_factory=list)
@@ -127,8 +134,11 @@ class iOSAnalysisResult:
         has_phishing = any(
             f.finding_type == "SMS_PHISHING_RECEIVED" for f in self.findings
         )
-        empty_contacts = self.total_contacts == 0
-        empty_calls = self.total_calls == 0
+        # B-072: empty solo si el conteo fue EXITOSO y dio 0. Un parseo fallido
+        # o una DB ausente (parsed=False) NO cuenta como agenda/llamadas vacías
+        # — no puede escalar data_minimization (evita falso INTENT/MALICE).
+        empty_contacts = self.contacts_parsed and self.total_contacts == 0
+        empty_calls = self.calls_parsed and self.total_calls == 0
         data_minimization = empty_contacts and empty_calls
 
         # Bump for opsec_indicators (BUG-011 fix: opsec contributes to z)
@@ -155,6 +165,16 @@ class iOSAnalysisResult:
             z = Fraction(20, 10)
         elif has_hacking_search:
             z = Fraction(18, 10)
+        elif has_phishing:
+            # B-073: has_phishing se computaba (SMS_PHISHING_RECEIVED) pero
+            # NUNCA entraba a la escalera — rama muerta, un caso de phishing
+            # puro caía al piso genérico 1.2. Ahora registra a z=1.6: es una
+            # señal PASIVA (phishing recibido — le pasó al usuario, no la
+            # generó él), por eso pesa menos que la búsqueda ACTIVA de exploits
+            # (has_hacking_search=1.8) y por sí sola no alcanza SUSPICION (>2).
+            # El tier 1.6 es una decisión de calibración conservadora, abierta
+            # a ajuste (misma familia de calibración que L-033/B-069).
+            z = Fraction(16, 10)
         elif n_encrypted >= 1 and (empty_contacts or empty_calls):
             z = Fraction(16, 10)
         elif self.findings:
@@ -352,12 +372,9 @@ class iOSForensicsAnalyzer:
 
     @staticmethod
     def _safe_sqlite_connect(db_path: Path) -> Optional[sqlite3.Connection]:
-        """Connect to SQLite with proper error handling (BUG-003 fix)."""
-        try:
-            return sqlite3.connect(str(db_path))
-        except (sqlite3.Error, OSError) as e:
-            logger.error("[IOS] Cannot open SQLite database %s: %s", db_path, e)
-            return None
+        """Open SQLite evidence read-only + immutable (B-071 → _sql_utils).
+        Never writes to evidence, never creates an empty DB on a missing path."""
+        return safe_sqlite_connect(db_path, "IOS", logger)
 
     # ── SMS ─────────────────────────────────────────────────────────────────
 
@@ -426,22 +443,33 @@ class iOSForensicsAnalyzer:
         if conn is None:
             result.analysis_notes.append(f"AddressBook: could not open {db_path}")
             return
+        parsed = False
         try:
             try:
                 count = conn.execute("SELECT COUNT(*) FROM ABPerson").fetchone()[0]
                 result.total_contacts = count
+                parsed = True
             except sqlite3.OperationalError:
                 try:
                     count = conn.execute(
                         "SELECT COUNT(*) FROM ABPersonFullTextSearch_content"
                     ).fetchone()[0]
                     result.total_contacts = count
+                    parsed = True
                 except sqlite3.OperationalError:
                     result.analysis_notes.append("AddressBook: could not count contacts")
         finally:
             conn.close()
 
-        if result.total_contacts == 0:
+        result.contacts_parsed = parsed
+
+        # B-072: no conflar "no-parseable" con "vacío". Solo un conteo EXITOSO
+        # de 0 es evidencia de agenda borrada (data_minimization). Un fallo de
+        # parseo (schema desconocido) NO puede escalar el veredicto — sería
+        # incapacidad de análisis presentada como señal (familia P0-A). El
+        # analysis_note ya deja rastro para que el veredicto abstenga. El flag
+        # contacts_parsed corta la escalación en to_signal (no solo el finding).
+        if parsed and result.total_contacts == 0:
             self._opsec_indicators.append({
                 "indicator": "EMPTY_CONTACTS",
                 "severity": str(Fraction(60, 100)),
@@ -469,6 +497,7 @@ class iOSForensicsAnalyzer:
             try:
                 count = conn.execute("SELECT COUNT(*) FROM ZCALLRECORD").fetchone()[0]
                 result.total_calls = count
+                result.calls_parsed = True  # B-072
             except sqlite3.OperationalError:
                 result.analysis_notes.append("CallHistory: 'ZCALLRECORD' table not found")
                 return

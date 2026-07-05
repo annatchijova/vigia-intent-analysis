@@ -26,6 +26,7 @@ from typing import Any, Dict, List, Optional, Tuple
 from vigia.core.ebs_v1 import SignalOutput, Z_CLIP_MAX
 from vigia.core.chain_of_custody import ChainOfCustody
 from vigia.sift._math_utils import build_correlation_groups, noisy_or_correlated
+from vigia.sift._sql_utils import safe_sqlite_connect
 
 logger = logging.getLogger(__name__)
 
@@ -274,6 +275,10 @@ class MacOSForensicsAnalyzer:
         # 1. System identification — version, hostname, owner
         self._identify_system(evidence_path, result)
 
+        # 1b. SIP status (B-074) — emit SIP_DISABLED from a real check so the
+        # anti-forensic escalation branches in to_signal are no longer dead.
+        self._detect_sip_status(evidence_path, result)
+
         # 2. Safari history (SQLite — same schema as iOS Safari)
         for db in self._safe_rglob(evidence_path, "History.db", limit=5):
             # Only process Safari History.db, not Chrome/other browsers
@@ -384,12 +389,9 @@ class MacOSForensicsAnalyzer:
 
     @staticmethod
     def _safe_sqlite_connect(db_path: Path) -> Optional[sqlite3.Connection]:
-        """Connect to SQLite with proper error handling (BUG-003 fix)."""
-        try:
-            return sqlite3.connect(str(db_path))
-        except (sqlite3.Error, OSError) as e:
-            logger.error("[MACOS] Cannot open SQLite database %s: %s", db_path, e)
-            return None
+        """Open SQLite evidence read-only + immutable (B-071 → _sql_utils).
+        Never writes to evidence, never creates an empty DB on a missing path."""
+        return safe_sqlite_connect(db_path, "MACOS", logger)
 
     # ── System Identification ──────────────────────────────────────────────
 
@@ -408,6 +410,130 @@ class MacOSForensicsAnalyzer:
                 result.analysis_notes.append(
                     f"SystemVersion.plist: could not parse {sv}: {e}"
                 )
+
+    # ── SIP (System Integrity Protection) ───────────────────────────────────
+
+    _SIP_DISABLE_RE = re.compile(r"csrutil\s+(disable|enable\s+--without)", re.IGNORECASE)
+
+    # CSR (Configurable Security Restrictions) flags — csr-active-config bits.
+    # 0x0 = SIP fully enabled; any set bit weakens a protection. `csrutil disable`
+    # typically sets 0x77. Reference: XNU csr.h (CSR_ALLOW_*).
+    _CSR_FLAGS = {
+        0x001: "UNTRUSTED_KEXTS",
+        0x002: "UNRESTRICTED_FS",
+        0x004: "TASK_FOR_PID",
+        0x008: "KERNEL_DEBUGGER",
+        0x010: "APPLE_INTERNAL",
+        0x020: "UNRESTRICTED_DTRACE",
+        0x040: "UNRESTRICTED_NVRAM",
+        0x080: "DEVICE_CONFIGURATION",
+        0x100: "ANY_RECOVERY_OS",
+        0x200: "UNAPPROVED_KEXTS",
+        0x400: "EXECUTABLE_POLICY_OVERRIDE",
+        0x800: "UNAUTHENTICATED_ROOT",
+    }
+
+    @classmethod
+    def _parse_csr_config(cls, raw):
+        """Parse a csr-active-config value (bytes little-endian, int, or hex str).
+        Returns (value:int, flags:list[str]) or None if unparseable."""
+        if isinstance(raw, (bytes, bytearray)):
+            if not raw:
+                return None
+            value = int.from_bytes(bytes(raw[:4]), "little")
+        elif isinstance(raw, bool):  # bool antes que int
+            return None
+        elif isinstance(raw, int):
+            value = raw
+        elif isinstance(raw, str):
+            try:
+                value = int(raw.strip(), 0)
+            except ValueError:
+                return None
+        else:
+            return None
+        flags = [name for bit, name in sorted(cls._CSR_FLAGS.items()) if value & bit]
+        return value, flags
+
+    def _detect_sip_status(self, evidence_path: Path, result: MacOSAnalysisResult) -> None:
+        """Detect whether SIP (System Integrity Protection) is disabled/weakened
+        and emit a SIP_DISABLED finding.
+
+        B-074: to_signal() reads has_sip_disabled (finding_type == "SIP_DISABLED")
+        in two anti-forensic escalation branches, but NO analyzer ever emitted
+        that finding — the branches (z=3.4 and z=2.4) were structurally DEAD.
+
+        Two sources, in order of authority:
+        1. AUTHORITATIVE — NVRAM csr-active-config (nvram.plist). 0x0 = SIP fully
+           enabled; any non-zero value = a protection disabled. This is the real
+           state of the machine (B-074 v2: added for real-world recall — the red
+           team showed shell-history alone rarely fires on real evidence).
+        2. FALLBACK — a `csrutil disable` / `csrutil enable --without` command in
+           a shell history: evidence of a SIP-weakening ACTION/attempt (MITRE
+           T1562.001). Note: csrutil disable runs from Recovery OS, so this
+           rarely appears in the booted-OS histories — low recall, hence the
+           NVRAM source is preferred.
+
+        Honest degradation (§5.3): if neither source is present, SIP status is
+        undetermined (a note, no finding) — never assumed-enabled.
+        """
+        # 1. AUTHORITATIVE — NVRAM csr-active-config
+        for nv in self._safe_rglob(evidence_path, "nvram.plist", limit=3):
+            plist = self._safe_plist_load(nv)
+            if not isinstance(plist, dict):
+                continue
+            raw = None
+            for k, v in plist.items():
+                # key may be bare or GUID-prefixed (e.g. "7C43...:csr-active-config")
+                if "csr-active-config" in str(k).lower():
+                    raw = v
+                    break
+            if raw is None:
+                continue
+            parsed = self._parse_csr_config(raw)
+            if parsed is None:
+                continue
+            value, flags = parsed
+            if value != 0:
+                self._findings.append(MacOSFinding(
+                    finding_type="SIP_DISABLED",
+                    severity=Fraction(75, 100),
+                    description="System Integrity Protection disabled/weakened (NVRAM csr-active-config)",
+                    evidence=f"csr-active-config=0x{value:x} ({', '.join(flags) or 'nonzero'}) in {nv.name}",
+                    mitre_technique="T1562.001",
+                    rule_ref="MACOS-SIP-DISABLED-NVRAM",
+                    corr_group="antiforensic",
+                ))
+            else:
+                result.analysis_notes.append(
+                    f"SIP enabled (authoritative: csr-active-config=0x0 in {nv.name})"
+                )
+            return  # NVRAM is authoritative — decided either way
+
+        # 2. FALLBACK — shell-history evidence of a SIP-weakening command
+        for pattern in (".bash_history", ".zsh_history", ".sh_history", ".bash_sessions"):
+            for hist in self._safe_rglob(evidence_path, pattern, limit=5):
+                try:
+                    text = hist.read_text(errors="replace")
+                except OSError:
+                    continue
+                m = self._SIP_DISABLE_RE.search(text)
+                if m:
+                    self._findings.append(MacOSFinding(
+                        finding_type="SIP_DISABLED",
+                        severity=Fraction(70, 100),
+                        description="Evidence of a SIP-weakening command (shell history)",
+                        evidence=f"'{m.group(0)}' in {hist.name}",
+                        mitre_technique="T1562.001",
+                        rule_ref="MACOS-SIP-DISABLED-HISTORY",
+                        corr_group="antiforensic",
+                    ))
+                    return
+
+        result.analysis_notes.append(
+            "SIP status undetermined (no NVRAM csr-active-config captured, "
+            "no csrutil-disable evidence in shell histories)"
+        )
 
     # ── Safari ─────────────────────────────────────────────────────────────
 

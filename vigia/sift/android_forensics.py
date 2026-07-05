@@ -26,6 +26,7 @@ from typing import Any, Dict, List, Optional, Tuple
 from vigia.core.ebs_v1 import SignalOutput, Z_CLIP_MAX
 from vigia.core.chain_of_custody import ChainOfCustody
 from vigia.sift._math_utils import build_correlation_groups, noisy_or_correlated
+from vigia.sift._sql_utils import safe_sqlite_connect
 
 logger = logging.getLogger(__name__)
 
@@ -110,6 +111,10 @@ class AndroidAnalysisResult:
     total_sms: int = 0
     total_contacts: int = 0
     total_calls: int = 0
+    # B-072: solo un conteo EXITOSO de 0 es evidencia de data_minimization
+    # (ver iOSAnalysisResult). Un parseo fallido/DB ausente no escala.
+    contacts_parsed: bool = False
+    calls_parsed: bool = False
     total_browser_entries: int = 0
     encrypted_apps: List[Dict[str, Any]] = field(default_factory=list)
     findings: List[AndroidFinding] = field(default_factory=list)
@@ -128,8 +133,9 @@ class AndroidAnalysisResult:
             for f in self.findings
         )
         has_root = self.is_rooted
-        empty_contacts = self.total_contacts == 0
-        empty_calls = self.total_calls == 0
+        # B-072: empty solo si el conteo fue EXITOSO y dio 0 (ver iOS to_signal).
+        empty_contacts = self.contacts_parsed and self.total_contacts == 0
+        empty_calls = self.calls_parsed and self.total_calls == 0
         data_minimization = empty_contacts and empty_calls
 
         # Opsec bump (BUG-011 fix)
@@ -338,12 +344,9 @@ class AndroidForensicsAnalyzer:
 
     @staticmethod
     def _safe_sqlite_connect(db_path: Path) -> Optional[sqlite3.Connection]:
-        """Connect to SQLite with proper error handling (BUG-003 fix)."""
-        try:
-            return sqlite3.connect(str(db_path))
-        except (sqlite3.Error, OSError) as e:
-            logger.error("[ANDROID] Cannot open SQLite database %s: %s", db_path, e)
-            return None
+        """Open SQLite evidence read-only + immutable (B-071 → _sql_utils).
+        Never writes to evidence, never creates an empty DB on a missing path."""
+        return safe_sqlite_connect(db_path, "ANDROID", logger)
 
     # ── Root Detection ──────────────────────────────────────────────────────
 
@@ -446,20 +449,28 @@ class AndroidForensicsAnalyzer:
         if conn is None:
             result.analysis_notes.append(f"contacts2.db: could not open {db_path}")
             return
+        parsed = False
         try:
             try:
                 count = conn.execute("SELECT COUNT(*) FROM raw_contacts").fetchone()[0]
                 result.total_contacts = count
+                parsed = True
             except sqlite3.OperationalError:
                 try:
                     count = conn.execute("SELECT COUNT(*) FROM contacts").fetchone()[0]
                     result.total_contacts = count
+                    parsed = True
                 except sqlite3.OperationalError:
                     result.analysis_notes.append("contacts2.db: could not count contacts")
         finally:
             conn.close()
 
-        if result.total_contacts == 0:
+        result.contacts_parsed = parsed
+
+        # B-072: fallo de parseo != agenda vacía. Solo un conteo exitoso de 0
+        # escala data_minimization (ver iOS _analyze_contacts). El flag
+        # contacts_parsed corta la escalación en to_signal, no solo el finding.
+        if parsed and result.total_contacts == 0:
             self._opsec_indicators.append({
                 "indicator": "EMPTY_CONTACTS",
                 "severity": str(Fraction(60, 100)),
@@ -482,16 +493,21 @@ class AndroidForensicsAnalyzer:
         if conn is None:
             result.analysis_notes.append(f"calllog.db: could not open {db_path}")
             return
+        parsed = False
         try:
             try:
                 count = conn.execute("SELECT COUNT(*) FROM calls").fetchone()[0]
                 result.total_calls = count
+                parsed = True
             except sqlite3.OperationalError:
                 result.analysis_notes.append("calllog.db: 'calls' table not found")
         finally:
             conn.close()
 
-        if result.total_calls == 0:
+        result.calls_parsed = parsed
+
+        # B-072: fallo de parseo != call log vacío (ver iOS _analyze_contacts).
+        if parsed and result.total_calls == 0:
             self._opsec_indicators.append({
                 "indicator": "EMPTY_CALL_LOG",
                 "severity": str(Fraction(55, 100)),

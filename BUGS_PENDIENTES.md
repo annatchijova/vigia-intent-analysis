@@ -2091,29 +2091,55 @@ oscillation string routing is non-contradictory. No action required.
 
 ---
 
-### B-042 [PENDING] — iOS forensics module — P0 float boundary in to_signal()
+### B-042 [RESUELTO — borde cosmético, determinismo probado] — iOS forensics to_signal() float boundary
 
 | Campo | Valor |
 |-------|-------|
-| **Estado** | PENDIENTE — decisión arquitectónica requerida |
-| **Severidad** | P0 |
+| **Estado** | RESUELTO — POST HACKATHON (2026-07-04). El borde float NO está en el decision path. |
+| **Severidad** | ~~P0~~ → cosmético (el float es el contrato de transporte de `SignalOutput`, no una fuga de determinismo) |
 | **Archivo** | `vigia/sift/ios_forensics.py` |
-| **Detectado en** | Sesión 2026-06-29 |
+| **Detectado en** | Sesión 2026-06-29; zanjado con test de determinismo 2026-07-04 |
+| **Tag de restauración** | `pre-p1-mobile-verdict-20260704-022839` |
 
-**Descripción:** `to_signal()` in `ios_forensics.py` uses `float()` for z-score and confidence values. When this module feeds the deterministic scoring pipeline, floats enter the Fraction arithmetic path — a P0 violation of L-021. Architectural decision pending: should `SignalOutput` accept `Decimal`/`Fraction`, or is the float-to-Fraction conversion the correct boundary?
+**Resolución (ENGINEERING_DISCIPLINE §5.2 "provalo"):** se escribió el test de
+determinismo ANTES de tocar código (`tests/test_b042_b043_mobile_determinism.py`).
+El decision path del veredicto mobile es el `z_score`; `sift_orchestrator.
+_mobile_hypothesis` lo reconstruye con `Fraction(str(z_score))`. El test prueba
+(10/10 pass) que:
+- `z_score` es siempre un múltiplo limpio de 1/10 → `Fraction(str(float(z)))` es
+  **identidad exacta** (round-trip lossless): el decisor recupera la Fraction
+  interna sin pérdida.
+- `value` (múltiplo de 1/50) también round-trip exacto.
+- Dos llamadas a `to_signal()` → bytes idénticos.
+- **Proceso fresco con `PYTHONHASHSEED` distinto (0/1/42) → z_score/value
+  idénticos** (sin leak de orden de set/dict).
+
+Conclusión: `float(z)` es el borde de transporte del contrato `SignalOutput`
+(cuyos campos son float por diseño), y el decisor re-parsea a Fraction sin
+pérdida. NO es una violación de L-021 en el decision path. `confidence` sí tiene
+un borde float potencialmente lossy (composite × 11/10), pero `confidence` es
+metadata — NO entra a `_mobile_hypothesis`. Sin cambio de código; el test queda
+como regresión permanente del invariante.
+
+**Refuerzo de cobertura (2026-07-04, tras red-team):** el test original tocaba
+5 de ~11 salidas del ladder. Se agregó `TestLadderDomainExhaustive` (invariante
+para TODO múltiplo de 1/10 en [0, Z_CLIP_MAX], superset de lo emitible) +
+`TestLadderCoverage` (grid combinatorio: iOS 18 / Android 19 / macOS 22 valores
+z distintos, incl. las ramas altas). 14 tests. Sigue sin cambio de código.
 
 ---
 
-### B-043 [PENDING] — Android forensics module — same as B-042
+### B-043 [RESUELTO — borde cosmético] — Android (y macOS) forensics to_signal() float boundary
 
 | Campo | Valor |
 |-------|-------|
-| **Estado** | PENDIENTE — misma decisión arquitectónica que B-042 |
-| **Severidad** | P0 |
-| **Archivo** | `vigia/sift/android_forensics.py` |
-| **Detectado en** | Sesión 2026-06-29 |
+| **Estado** | RESUELTO — POST HACKATHON (2026-07-04). Igual que B-042. |
+| **Severidad** | ~~P0~~ → cosmético |
+| **Archivo** | `vigia/sift/android_forensics.py` (y `macos_forensics.py`, misma forma) |
 
-**Descripción:** Same `float()` boundary issue as B-042 in `android_forensics.py`. The fix should be coordinated with B-042 as the same architectural decision applies.
+**Resolución:** el mismo test de determinismo cubre los tres módulos
+(`android`/`ios`/`macos` parametrizados). 10/10 pass: el borde `float(z)` es
+lossless para el decision path en los tres. Ver B-042 para el detalle.
 
 ---
 
@@ -3533,3 +3559,155 @@ Solo camino scorer (Modo 4 / EBS-JSON / `vigia_api`). El agente (Modo 1) no
 pasa por `_vigia_score`. B-068 (gate) queda subsumido y refactorizado sobre el
 mismo registro. Pendiente futuro: extender `evidence_role` al registro
 unificado completo de B-060 (layer+ontology+profile+role en una sola fuente).
+
+---
+
+## B-072 — Mobile: conflación "no-parseable == vacío" escalaba el veredicto [RESUELTO]
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | RESUELTO — POST HACKATHON (2026-07-04) |
+| **Severidad** | P1 — falso INTENT/MALICE (familia P0-A: incapacidad de análisis presentada como señal) |
+| **Archivo** | `ios_forensics.py::_analyze_contacts`, `android_forensics.py::_analyze_contacts` + `_analyze_call_log` |
+| **Detectado en** | AUDITORIA_COBERTURA_MOBILE_SIFT §D |
+| **Tag** | `pre-p1-mobile-verdict-20260704-022839` |
+
+**Descripción:** cuando la tabla esperada no existía (schema desconocido), el
+`OperationalError` se tragaba y el contador quedaba en su default 0 → se emitía
+`EMPTY_CONTACTS`/`EMPTY_CALL_LOG` → alimentaba `data_minimization` → escalaba el
+veredicto. Un fallo de parseo inocente se puntuaba idéntico a una agenda
+deliberadamente borrada.
+
+**Verificación §4.1 (audit-before-patch):** de los 4 métodos que el audit
+señaló, solo 3 tenían el bug. `ios_forensics::_analyze_call_history` YA hacía
+`return` en el `except` antes de emitir EMPTY — falso positivo del audit,
+rechazado sin tocar.
+
+**Fix v1 (2026-07-04, PARCIAL — cosmético):** flag `parsed` local — `EMPTY_*`
+se emitía solo con conteo exitoso de 0. **El red-team (AUDITORIA_REDTEAM_P1_MOBILE)
+lo refutó:** `to_signal` NO lee el finding — computa
+`empty_contacts = self.total_contacts == 0` del contador crudo, que queda en 0
+tras el parseo fallido. Reproducido: contacts+calls no-parseables seguían
+escalando de z=2.4 a **z=3.0** vía `data_minimization`. El falso INTENT/MALICE
+seguía vivo. Removí el finding, no la escalación.
+
+**Fix v2 (2026-07-04, REAL):** centinela `contacts_parsed`/`calls_parsed` en las
+dataclasses (default False), seteado True solo con conteo exitoso. `to_signal`
+ahora computa `empty_contacts = self.contacts_parsed and self.total_contacts == 0`
+— un parseo fallido o una DB ausente (parsed=False) NO escala `data_minimization`.
+Verificado: escenario del red-team ahora z=2.4 (== caso con datos), mientras una
+agenda REALMENTE parseada-y-vacía sí escala (z=3.0). La distinción quedó correcta.
+
+**Validación:** `tests/test_b072_b074_mobile_verdict_fixes.py` — 9 de B-072
+(5 del finding + 4 de `TestB072DataMinimizationEscalation`: parseo fallido no
+escala, empty real sí, flags end-to-end). Suite 489, corpus 198/198.
+
+---
+
+## B-073 — iOS: has_phishing computado pero nunca usado en la escalera (rama muerta) [RESUELTO]
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | RESUELTO — POST HACKATHON (2026-07-04) |
+| **Severidad** | P2 — detección viva pero sin efecto en el veredicto |
+| **Archivo** | `vigia/sift/ios_forensics.py::to_signal` |
+| **Detectado en** | AUDITORIA_COBERTURA_MOBILE_SIFT §A |
+
+**Descripción:** `has_phishing` (finding_type `SMS_PHISHING_RECEIVED`, emitido de
+verdad por `_analyze_sms`) se computaba pero nunca entraba a la escalera z → un
+caso de phishing puro caía al piso genérico 1.2.
+
+**Fix:** rama `elif has_phishing: z=1.6`. Es una señal PASIVA (phishing recibido,
+le pasó al usuario, no la generó él) → pesa menos que la búsqueda ACTIVA de
+exploits (has_hacking_search=1.8) y por sí sola no alcanza SUSPICION (>2). El
+tier 1.6 es decisión de calibración conservadora, abierta a ajuste (familia
+L-033/B-069).
+
+**Validación:** 2 tests — phishing lifts z sobre el piso genérico; phishing solo ≤2.
+
+---
+
+## B-074 — macOS: has_sip_disabled siempre False → ramas de veredicto muertas [RESUELTO]
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | RESUELTO — POST HACKATHON (2026-07-04). Decisión de Anna: VIGÍA debe detectar SIP disabled desde chequeo real. |
+| **Severidad** | P1 — escalación anti-forense inalcanzable |
+| **Archivo** | `vigia/sift/macos_forensics.py` (`_detect_sip_status` nuevo + wire en `analyze`) |
+| **Detectado en** | AUDITORIA_COBERTURA_MOBILE_SIFT §A (confirmado empíricamente: `SIP_DISABLED` solo aparecía donde se lee) |
+
+**Descripción:** `to_signal` lee `has_sip_disabled` (finding_type `SIP_DISABLED`)
+en dos ramas anti-forenses (z=3.4 y z=2.4), pero NINGÚN analyzer emitía ese
+finding → ramas estructuralmente MUERTAS. Un macOS con SIP deshabilitado +
+tooling anti-forense nunca recibía la escalación codificada para ese escenario.
+
+**Fix v1 (2026-07-04):** `_detect_sip_status` con solo el fallback de shell
+history (`csrutil disable`/`enable --without`). **El red-team
+(AUDITORIA_REDTEAM_P1_MOBILE) lo marcó de baja recall:** `csrutil disable`
+corre SOLO desde Recovery OS, así que casi nunca aparece en los shell histories
+del OS booteado que capturan las herramientas forenses → perdía la mayoría de
+los Macs con SIP realmente deshabilitado.
+
+**Fix v2 (2026-07-04, recall real):** se agregó la **fuente autoritativa NVRAM
+`csr-active-config`** (parser `_parse_csr_config` + tabla `_CSR_FLAGS`). Lee
+`nvram.plist` (key bare o con prefijo GUID), interpreta el valor de 32 bits
+little-endian: `0x0` = SIP habilitado (note autoritativo, sin finding); ≠0 =
+`SIP_DISABLED` con los flags CSR_ALLOW_* concretos en el evidence
+(ej. `0x77` = UNTRUSTED_KEXTS, UNRESTRICTED_FS, TASK_FOR_PID, APPLE_INTERNAL,
+UNRESTRICTED_DTRACE, UNRESTRICTED_NVRAM). **NVRAM gana sobre el shell history**
+(un `csrutil disable` en history puede ser un intento fallido/re-habilitado; el
+estado NVRAM es el real). El shell history queda como fallback cuando no hay
+NVRAM. Degradación honesta (§5.3): sin ninguna fuente, "undetermined".
+
+**Nota de doctrina (para Anna, sigue abierta):** ambas ramas exigen
+`has_sip_disabled AND has_antiforensic`. Disable-SIP es en sí anti-forense
+(T1562.001); si se quiere que SIP-disabled escale por sí solo, habría que hacer
+que el finding también satisfaga `has_antiforensic` — decisión de doctrina, no
+aplicada.
+
+**Validación:** `tests/test_b072_b074_mobile_verdict_fixes.py` — 11 de B-074
+(3 shell-history/rama + 4 `TestB074NvramAuthoritative` + 4 `TestB074CsrParser`).
+NVRAM 0x77 → SIP_DISABLED con flags; 0x0 → note autoritativo; NVRAM gana sobre
+history; key con prefijo GUID; parser bytes/int/hex/basura. Suite 499,
+corpus 198/198. Restore tag: `pre-b074-nvram-20260704-...`.
+
+---
+
+## B-071 — Mobile: acceso SQLite de evidencia read-only + immutable (S1) [RESUELTO]
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | RESUELTO — POST HACKATHON (2026-07-04) |
+| **Severidad** | P1 — escritura en evidencia (viola invariante read-only) + DB vacía silenciosa |
+| **Archivo** | `vigia/sift/_sql_utils.py` (nuevo) + los 3 `_safe_sqlite_connect` |
+| **Detectado en** | AUDITORIA_COBERTURA_MOBILE_SIFT §C / patrón sistémico S1 |
+
+**Descripción:** los 3 `_safe_sqlite_connect` abrían `sqlite3.connect(str(path))`
+read-WRITE. Una DB con WAL/journal sucio dispara auto-recovery que escribe
+`-wal`/`-journal` de vuelta en `VIGIA_EVIDENCE_DIR` (viola invariante #1) y un
+path inexistente CREA una DB vacía (0 hallazgos lee limpio). Ambos verificados
+empíricamente.
+
+**Fix v1 (mode=ro&immutable=1) — REFUTADO por el red-team:** cerraba la
+escritura y la creación, pero `immutable=1` IGNORA el `-wal` → una DB en modo
+WAL con datos en el `-wal` (estado normal de un teléfono vivo) se leía como
+tabla vacía → **falso negativo grave** (evidencia inculpatoria invisible).
+`mode=ro` solo tampoco servía: crea el `-shm` en evidencia. Cambié custodia por
+completitud.
+
+**Fix v2 (copy-to-working-dir) — REAL:** `safe_sqlite_connect` copia la familia
+`db` + `-wal` + `-shm` + `-journal` a un working dir efímero y abre la COPIA
+read-write ahí. Satisface los dos invariantes a la vez: cero escritura en
+evidencia (el original nunca se abre) Y lectura completa del WAL. El working dir
+se borra al cerrar la conexión (`_WorkingCopyConnection.close`) + backstop por
+GC (`weakref.finalize`). Path ausente → None (no crea). DB malformada → error
+lazy en el query (lo captura el parser). Una implementación, contrato compartido.
+
+**Limitación honesta (§5.3):** copia el archivo — costo O(tamaño DB) por
+artefacto; aceptable porque los callers acotan cuántas DBs abren (`_safe_rglob`
+limit=N).
+
+**Validación:** `tests/test_b071_sqlite_readonly.py` (12): escritura en la copia
+NO toca la evidencia (hash idéntico), **datos del WAL visibles** (el FN), working
+dir limpiado al cerrar, path ausente no crea, DB malformada lazy. Suite 491,
+corpus 198/198. Restore tag: `pre-b071-rework-20260704-...`.
