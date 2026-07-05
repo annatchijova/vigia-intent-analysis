@@ -176,6 +176,68 @@ class TestB073PhishingLadder:
         r.findings = [_ios_finding("SMS_PHISHING_RECEIVED")]
         assert r.to_signal().z_score <= 2.0
 
+    def test_phishing_alone_with_max_bump_still_below_suspicion(self):
+        """Doctrina B-073 (b): ni con el opsec_bump máximo el phishing solo
+        cruza — 1.6+0.4=2.0 y el umbral de _mobile_hypothesis es estricto >2."""
+        r = iOSAnalysisResult()
+        r.findings = [_ios_finding("SMS_PHISHING_RECEIVED")]
+        r.opsec_indicators = [{"i": 1}, {"i": 2}, {"i": 3}]
+        assert r.to_signal().z_score <= 2.0
+
+
+class TestB073DoctrineCombined:
+    """Doctrina B-073 v2 (decisión de Anna, opción b): phishing recibido PUEDE
+    alcanzar SUSPICION combinado con otras señales — nunca solo."""
+
+    def _base(self):
+        r = iOSAnalysisResult()
+        r.findings = [_ios_finding("SMS_PHISHING_RECEIVED")]
+        r.contacts_parsed = r.calls_parsed = True
+        r.total_contacts, r.total_calls = 50, 30
+        return r
+
+    def test_phishing_plus_encrypted_apps_reaches_suspicion(self):
+        r = self._base()
+        r.encrypted_apps = [{"a": 1}, {"a": 2}]
+        z = r.to_signal().z_score
+        assert z > 2.0, f"phishing + 2 apps cifradas debe cruzar SUSPICION (z={z})"
+
+    def test_phishing_plus_parsed_data_minimization_reaches_suspicion(self):
+        r = self._base()
+        r.total_contacts, r.total_calls = 0, 0  # parseado Y vacío
+        z = r.to_signal().z_score
+        assert z > 2.0
+
+    def test_phishing_plus_unparsed_counters_does_not_combine(self):
+        """Interacción con B-072: contadores en 0 por parseo FALLIDO no son
+        data_minimization — la rama combinada NO se habilita."""
+        r = iOSAnalysisResult()
+        r.findings = [_ios_finding("SMS_PHISHING_RECEIVED")]
+        r.total_contacts, r.total_calls = 0, 0  # parsed=False (default)
+        assert r.to_signal().z_score <= 2.0
+
+    def test_combined_stays_below_active_search_combos(self):
+        """El phishing es pasivo: su combinación (2.2) queda debajo de las
+        combinaciones con búsqueda ACTIVA (hacking+data_min=2.6, enc2+hacking=2.8)."""
+        r = self._base()
+        r.encrypted_apps = [{"a": 1}, {"a": 2}]
+        z_phish_combo = r.to_signal().z_score
+
+        r2 = self._base()
+        r2.findings = [_ios_finding("SAFARI_SUSPICIOUS_SITE")]
+        r2.encrypted_apps = [{"a": 1}, {"a": 2}]
+        z_active_combo = r2.to_signal().z_score
+        assert z_phish_combo < z_active_combo
+
+    def test_existing_branches_unchanged(self):
+        """Sin phishing, nada se mueve: 2 apps=2.0, hacking solo=1.8."""
+        r = iOSAnalysisResult()
+        r.encrypted_apps = [{"a": 1}, {"a": 2}]
+        assert r.to_signal().z_score == pytest.approx(2.0)
+        r2 = iOSAnalysisResult()
+        r2.findings = [_ios_finding("SAFARI_SUSPICIOUS_SITE")]
+        assert r2.to_signal().z_score == pytest.approx(1.8)
+
 
 # ===========================================================================
 # B-074 — SIP_DISABLED se emite desde chequeo real -> ramas vivas

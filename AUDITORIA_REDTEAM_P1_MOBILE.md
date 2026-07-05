@@ -119,7 +119,17 @@ los tres sitios de parseo.
 
 ---
 
-## B-073 — has_phishing al ladder: VERDICT-COSMÉTICO
+## B-073 — has_phishing al ladder: VERDICT-COSMÉTICO → ✅ RESUELTO (doctrina b, 2026-07-05)
+
+> **Actualización 2026-07-05:** Anna decidió la opción (b): phishing recibido
+> puede alcanzar SUSPICION **combinado** con otras señales, nunca solo. Nueva
+> rama `has_phishing and (n_encrypted >= 2 or data_minimization) → z=2.2`
+> (cruza el >2 estricto; debajo de las combinaciones con búsqueda activa).
+> Verificado: solo=1.6, solo+bump=2.0 (no cruza), combinado=2.2 (cruza),
+> contadores sin parsear no habilitan la rama (B-072), ramas existentes
+> intactas. Tests: `TestB073DoctrineCombined` (6). El detalle de abajo queda
+> como registro de por qué v1 era cosmético.
+
 
 **Lo que hice:** rama `elif has_phishing: z=1.6` — el flag deja de estar muerto.
 
