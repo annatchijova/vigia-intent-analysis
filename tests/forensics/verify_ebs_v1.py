@@ -63,7 +63,7 @@ from typing import Any, Dict, List, Optional, Tuple
 
 _EBS_VERSION = "1.0"
 _EBS_SUPPORTED_VERSIONS = ["1.0"]
-_VERIFIER_VERSION = "1.1.0"   # bumped por refactorizacion
+_VERIFIER_VERSION = "1.3.0"   # bumped: signed-zero normalization (-0.0 == 0.0)
 
 
 # ---------------------------------------------------------------------------
@@ -98,7 +98,7 @@ def _canonicalize(obj: Any) -> Any:
             return "inf"
         if obj == float("-inf"):
             return "-inf"
-        return f"{obj:.8f}"
+        return f"{obj + 0.0:.8f}"  # +0.0 maps -0.0 -> 0.0: signed zero must canonicalize identically
     if isinstance(obj, str):
         return obj
     if obj is None:

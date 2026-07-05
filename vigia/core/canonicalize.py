@@ -25,6 +25,15 @@ en cualquier módulo — requisito Daubert de reproducibilidad.
 CANONICALIZE_VERSION = "1" — incluir en bundles para trazabilidad.
 Cuando se migre al esquema v2 (prefijos "tipo::"), incrementar este valor
 y mantener soporte de verificación para v1.
+
+v1 clarification (signed zero, D3): the canonical form of every float zero
+is "0.00000000" — IEEE-754 negative zero (-0.0) is normalized before
+formatting ("obj + 0.0"). This is not a schema change: -0.0 == 0.0 are the
+same number, and no historically sealed bundle contains -0.0 (verified
+against results/), so every previously emitted hash still verifies
+identically. Every copy of the encoder (bundle_builder, the stdlib-only
+verifiers, verify_tool_log, the chain_of_custody fallback) applies the same
+rule in lockstep.
 """
 from __future__ import annotations
 
@@ -58,7 +67,7 @@ def _canonicalize(obj: Any) -> Any:
             return "inf"
         if obj == float("-inf"):
             return "-inf"
-        return f"{obj:.8f}"
+        return f"{obj + 0.0:.8f}"  # +0.0 maps -0.0 -> 0.0: signed zero must canonicalize identically
     if isinstance(obj, str):
         return obj
     if obj is None:

@@ -59,7 +59,7 @@ def _canonicalize(obj):
             return "inf"
         if obj == float("-inf"):
             return "-inf"
-        return f"{obj:.8f}"
+        return f"{obj + 0.0:.8f}"  # +0.0 maps -0.0 -> 0.0: signed zero must canonicalize identically
     if isinstance(obj, str):
         return obj
     if obj is None:

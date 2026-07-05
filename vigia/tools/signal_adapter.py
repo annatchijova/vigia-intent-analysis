@@ -34,7 +34,7 @@ import math
 from typing import Any, Dict, List, Optional
 
 from vigia.core.ebs_v1 import SignalOutput
-from vigia.core.signal_contract import SignalBuilder
+from vigia.tools.signal_contract import SignalBuilder
 
 import datetime
 import hashlib
