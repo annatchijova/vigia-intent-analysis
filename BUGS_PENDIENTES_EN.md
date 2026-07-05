@@ -2348,16 +2348,25 @@ any future reviewer who asks the same question.
 
 ---
 
-### B-040 [PENDING] — ARTIFACT_RELIABILITY not propagated to CAIE
+### B-040 [RESOLVED] — ARTIFACT_RELIABILITY not propagated to CAIE
 
 | Field | Value |
 |-------|-------|
-| **Status** | PENDING |
+| **Status** | RESOLVED — subsumed by L-037b (Tanda B PR-B2, 2026-07-03); tracker closure verified 2026-07-05 (Fase 0, finding S-4) |
 | **Severity** | P2 |
 | **File** | `vigia/sift/forensic_adapter.py` |
 | **Detected** | Session 2026-06-29 |
 
 **Description:** `ios_forensics.py` and `android_forensics.py` define `ARTIFACT_RELIABILITY=Fraction(70,100)` but `forensic_adapter.py` sets `base_trust=1.0` fixed, ignoring the signal metadata value. See L-037.
+
+**Resolution (verified against live code 2026-07-05):** the L-037b fix covers
+exactly this bug — `forensic_adapter.py:179-193` reads
+`metadata["artifact_reliability"]` (Fraction-string), clamps it to [0,1] with
+fallback 1.0, and propagates it as `base_trust` into CAIE. All three engines
+emit it: `ios_forensics.py:216`, `android_forensics.py:193`,
+`macos_forensics.py:220`. Tests:
+`tests/test_tanda_b.py::TestL037bBaseTrustPropagation` (4). The entry went
+stale because the fix was recorded under L-037b without closing B-040.
 
 ---
 
@@ -2373,25 +2382,37 @@ any future reviewer who asks the same question.
 
 ---
 
-### B-042 [PENDING] — iOS forensics module — P0 float boundary in to_signal()
+### B-042 [RESOLVED — cosmetic boundary, determinism proven] — iOS forensics module — float boundary in to_signal()
 
 | Field | Value |
 |-------|-------|
-| **Status** | PENDING — architectural decision required |
-| **Severity** | P0 |
+| **Status** | RESOLVED — POST HACKATHON (2026-07-04). The float boundary is NOT on the decision path. EN entry synced from the ES tracker 2026-07-05 (Fase 0, finding S-4) |
+| **Severity** | ~~P0~~ → cosmetic (float is the transport contract of `SignalOutput`, not a determinism leak) |
 | **File** | `vigia/sift/ios_forensics.py` |
-| **Detected** | Session 2026-06-29 |
+| **Detected** | Session 2026-06-29; settled with determinism test 2026-07-04 |
+| **Restore tag** | `pre-p1-mobile-verdict-20260704-022839` |
 
 **Description:** `to_signal()` in `ios_forensics.py` uses `float()` for z-score and confidence values. When this module feeds the deterministic scoring pipeline, floats enter the Fraction arithmetic path — a P0 violation of L-021. Architectural decision pending: should `SignalOutput` accept `Decimal`/`Fraction`, or is the float-to-Fraction conversion the correct boundary?
 
+**Resolution (ENGINEERING_DISCIPLINE §5.2 "prove it"):** the determinism test
+was written BEFORE touching code (`tests/test_b042_b043_mobile_determinism.py`).
+The mobile verdict decision path is the `z_score`;
+`sift_orchestrator._mobile_hypothesis` reconstructs it with
+`Fraction(str(z_score))`, and the test proves the round-trip is lossless
+(z multiples of 1/10, value multiples of 1/50 → exact identity), `to_signal()`
+is byte-identical across calls, and fresh processes with different
+`PYTHONHASHSEED` (0/1/42) produce identical z/value. Reinforced 2026-07-05
+with `test_all_tenths_roundtrip_lossless` + combinatorial grid after the
+red-team flagged partial branch coverage. Full detail in the ES tracker entry.
+
 ---
 
-### B-043 [PENDING] — Android forensics module — same as B-042
+### B-043 [RESOLVED — cosmetic boundary] — Android forensics module — same as B-042
 
 | Field | Value |
 |-------|-------|
-| **Status** | PENDING — same architectural decision as B-042 |
-| **Severity** | P0 |
+| **Status** | RESOLVED — POST HACKATHON (2026-07-04), same determinism proof as B-042 (`tests/test_b042_b043_mobile_determinism.py` covers android and macOS too). EN entry synced from the ES tracker 2026-07-05 (Fase 0, finding S-4) |
+| **Severity** | ~~P0~~ → cosmetic |
 | **File** | `vigia/sift/android_forensics.py` |
 | **Detected** | Session 2026-06-29 |
 

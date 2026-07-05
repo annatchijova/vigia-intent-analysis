@@ -736,7 +736,12 @@ detector a `memory_forensics.py` (motor V4, requiere binario `vol`). Tanda B.
 ## B-017 — `defusedxml` ausente en el venv produce PIPELINE_ERROR silencioso [RESUELTO]
 
 | Campo | Valor |
-|
+|-------|-------|
+| **Estado** | RESUELTO — Tanda A (TRIAGE 2026-07-03), tag `pre-tanda-a-20260703-134624` |
+| **Severidad** | P2 — el agente sella el bundle con veredicto `PIPELINE_ERROR` en lugar de abortar con diagnóstico claro |
+| **Archivo** | `vigia/sift/` (orquestador real) — el import de `defusedxml` falla en runtime |
+| **Detectado en** | Sesión 2026-06-27, caso NPS-2010-EMAILS, modo 1 (`vigia_agent.py`) |
+
 ### Actualización de cierre (2026-07-03, Tanda A — T-1/T-2)
 
 El triage amplió el alcance real del bug:
@@ -758,11 +763,11 @@ Fix aplicado:
    incluye subproceso con defusedxml bloqueado que verifica que
    `vigia.sift` importa y el orquestador se construye.
 
--------|-------|
-| **Estado** | ABIERTO |
-| **Severidad** | P2 — el agente sella el bundle con veredicto `PIPELINE_ERROR` en lugar de abortar con diagnóstico claro |
-| **Archivo** | `vigia/sift/` (orquestador real) — el import de `defusedxml` falla en runtime |
-| **Detectado en** | Sesión 2026-06-27, caso NPS-2010-EMAILS, modo 1 (`vigia_agent.py`) |
+*(Nota de higiene 2026-07-05, Fase 0: la nota de cierre anterior se había
+insertado partiendo la tabla de campos en dos, dejando `Estado: ABIERTO`
+huérfano debajo — el campo decía ABIERTO mientras el título decía RESUELTO.
+Tabla restaurada y Estado sincronizado; hallazgo S-4 de
+`docs/PLAN_ABDUCTIVO_PENDIENTES_20260705.md`.)*
 
 ### Descripción
 
@@ -2066,16 +2071,25 @@ oscillation string routing is non-contradictory. No action required.
 
 ---
 
-### B-040 [PENDING] — ARTIFACT_RELIABILITY not propagated to CAIE
+### B-040 [RESUELTO] — ARTIFACT_RELIABILITY not propagated to CAIE
 
 | Campo | Valor |
 |-------|-------|
-| **Estado** | PENDIENTE |
+| **Estado** | RESUELTO — subsumido por L-037b (Tanda B PR-B2, 2026-07-03); cierre verificado en tracker 2026-07-05 (Fase 0, hallazgo S-4) |
 | **Severidad** | P2 |
 | **Archivo** | `vigia/sift/forensic_adapter.py` |
 | **Detectado en** | Sesión 2026-06-29 |
 
 **Descripción:** `ios_forensics.py` and `android_forensics.py` define `ARTIFACT_RELIABILITY=Fraction(70,100)` but `forensic_adapter.py` sets `base_trust=1.0` fixed, ignoring the signal metadata value. See L-037.
+
+**Resolución (verificada contra código vivo 2026-07-05):** el fix de L-037b
+cubre exactamente este bug — `forensic_adapter.py:179-193` lee
+`metadata["artifact_reliability"]` (Fraction-string), lo clampa a [0,1] con
+fallback 1.0 y lo propaga como `base_trust` a CAIE. Los tres motores lo
+emiten: `ios_forensics.py:216`, `android_forensics.py:193`,
+`macos_forensics.py:220`. Tests:
+`tests/test_tanda_b.py::TestL037bBaseTrustPropagation` (4). La entrada quedó
+estanca porque el fix se registró bajo L-037b sin cerrar B-040.
 
 ---
 
@@ -3035,11 +3049,11 @@ sobre evidencia de texto real → hipótesis ≠ PIPELINE_UNAVAILABLE.
 
 ---
 
-## B-055 — vigia/core/vigia_scorer.py: copia stale divergente con NameError latente (T-6) [ABIERTO]
+## B-055 — vigia/core/vigia_scorer.py: copia stale divergente con NameError latente (T-6) [RESUELTO]
 
 | Campo | Valor |
 |-------|-------|
-| **Estado** | ABIERTO — decisión pendiente (eliminar vs re-exportar) |
+| **Estado** | RESUELTO — Tanda B (2026-07-03): re-export. Cierre sincronizado desde el tracker EN 2026-07-05 (Fase 0, hallazgo S-4) |
 | **Severidad** | P2 — trampa para futuros imports; sin impacto en camino vivo |
 | **Archivos** | `vigia/core/vigia_scorer.py` (stale, 523 líneas) vs `vigia_scorer.py` (vivo, 764 líneas) |
 | **Detectado en** | Tanda A (aplicando B-026): `_vigia_score` de la copia core crashea con `NameError: _EPC_FACTOR_TABLE is not defined` para toda cadena de custodia no-BROKEN |
@@ -3059,6 +3073,15 @@ Eliminar `vigia/core/vigia_scorer.py` o convertirla en re-export de una
 línea (`from vigia_scorer import *`) para que no pueda divergir. Requiere
 verificar que ningún consumidor externo la importe (grep actual: solo
 referencias en comentarios del patch r7). Tanda B.
+
+### Resolución (Tanda B PR-B1, 2026-07-03)
+
+Se aplicó la opción re-export: `vigia/core/vigia_scorer.py` quedó congelada
+como re-export del scorer canónico de la raíz (misma identidad de objetos,
+no copia). Tests: `tests/test_tanda_b.py::TestB055ScorerReexport` (3) —
+verifican identidad de objeto, presencia de `_EPC_FACTOR_TABLE` vía el import
+core y scoring sin NameError. Esta entrada ES quedó estanca (el tracker EN
+ya la tenía `[RESOLVED]`); sincronizada 2026-07-05.
 
 ---
 

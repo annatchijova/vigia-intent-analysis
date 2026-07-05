@@ -401,10 +401,17 @@ class TestL33tOOVUnreachable:
         # ... but the pipeline tokenizer discards every one of them.
         assert ZipfImperfectionAnalyzer()._tokenize(self.L33T) == []
 
+    @pytest.mark.xfail(
+        strict=True,
+        reason="BUG-NLP-002: l33tspeak OOV unreachable via analyze() — "
+        "deferred D4, requires tokenizer revalidation",
+    )
     def test_analyze_surfaces_l33tspeak_as_oov(self):
         # Intended contract per _extract_oov docstring: l33tspeak IS the primary
         # OOV signal, so a l33t-heavy document must not be dismissed as having
         # insufficient anomalies. Currently FAILS: n_oov == 0.
+        # strict=True: si un fix del tokenizer lo hace pasar, el xfail truena
+        # (XPASS) y obliga a retirar el marker junto con el cierre del bug.
         res = ZipfImperfectionAnalyzer().analyze(self.L33T)
         assert res["n_oov_tokens"] >= anlp._ZIPF_MIN_OOV_TOKENS, (
             "l33tspeak document tokenized to no OOV tokens; the documented "

@@ -3,8 +3,21 @@
 
 pytest>=8.0.0
 pytest-repeat>=0.9.0
+# S-1 (Fase 0, 2026-07-05): pytest-cov es obligatorio — pyproject.toml lo exige
+# vía addopts (--cov); sin él pytest aborta con "unrecognized arguments".
+pytest-cov>=4.0.0
+# S-1 (Fase 0, 2026-07-05): pytest-asyncio es obligatorio — pyproject.toml
+# configura asyncio_mode="auto" y los 21 tests async de e2e fallan sin él
+# ("async def functions are not natively supported"). Reproducido 2026-07-05.
+pytest-asyncio>=0.21.0
 ruff>=0.4.0
 mypy>=1.10.0
 bandit>=1.7.0
 scikit-learn>=1.3.0
 defusedxml>=0.7.1
+# S-1 (Fase 0, 2026-07-05): psutil lo importan los tests e2e/adversarial vía
+# módulos locales; estaba en requirements.txt pero no acá (misma clase de
+# deriva que T-2/defusedxml en B-017). Guard: tests/test_requirements_ci_contract.py
+# NOTA: `mcp` queda deliberadamente FUERA — no instalable con PyJWT de sistema
+# (ver KNOWN_LIMITATIONS.md L-045).
+psutil>=5.9.0

@@ -823,8 +823,8 @@ Reproduce: `python3 run_all_agent.py --timeout 90`
 | L-020 | Claude Code bundle lacks granular audit_trail | Mode 2 bundles | Known limitation |
 | L-021 | Float intermediates in scoring path | vigia_scorer.py, caie.py | **RESOLVED** |
 | L-022 | devil_advocate validation partially architectural | Mode 2 bundles | Post-audit improvement |
-| L-023 | Bundle save TOCTOU race (SEC-04) | bundle_builder.py | P0 — fix scheduled |
-| L-024 | Forensic mount allowlist includes generic /mnt | sift_orchestrator.py | Design decision |
+| L-023 | Bundle save TOCTOU race (SEC-04) | bundle_builder.py | **RESOLVED** 2026-07-03 (atomic write) |
+| L-024 | Forensic mount allowlist includes generic /mnt | sift_orchestrator.py | **RESOLVED** 2026-07-03 (forensic prefixes) |
 | L-025 | Devil's Advocate has no autonomous generator for unlabeled evidence | All live MALICE/INTENT findings | RESOLVED — see L-026 |
 | L-026 | Devil's Advocate generator wired in; 1 pre-fix corpus bundle flagged | VIGIA-REAL-SRL-DMZ-FTP | **RESOLVED** / documented exception |
 | L-027 | AbductiveIntentEngine call site in VigiaPipeline used wrong signature since birth | `vigia/pipeline/pipeline.py::run_full()` | **RESOLVED** 2026-06-22 — zero submission impact |
@@ -1671,3 +1671,33 @@ run by design" is distinguishable from "ran and found nothing"
 `EventRecord`s already parsed by EventLogCorrelator (`timestamp` epoch int —
 exactly the expected format). Deferred until a case demonstrates forensic
 value over a single evtx.
+
+## L-045 — `mcp` not installable in minimal CI environments (PyJWT conflict) [DOCUMENTED]
+
+**Affects:** `requirements-ci.txt`, `tests/e2e/test_integration_end_to_end.py`,
+`vigia/tests/adversarial/test_human_jitter_deterministic_bypass.py` |
+**Status:** documented CI limitation (Fase 0, finding S-1 of
+`docs/PLAN_ABDUCTIVO_PENDIENTES_20260705.md`)
+
+**Description:** the `mcp` package (required by the two e2e/adversarial test
+modules that exercise the MCP bridge) cannot be installed in environments
+where `PyJWT` was provisioned by the system package manager (e.g. Debian):
+`pip` fails with `Cannot uninstall PyJWT — RECORD file not found`. Reproduced
+2026-07-05 in a clean CI-like container. `mcp` therefore stays OUT of
+`requirements-ci.txt` deliberately; it remains in `requirements.txt` and
+`pyproject.toml` for full installs.
+
+**Consequence:** in a minimal CI environment (requirements-ci only), those two
+test modules do not collect. This is an infrastructure gap, not a forensic
+one — no verdict-path code depends on `mcp`.
+
+**Guard:** `tests/test_requirements_ci_contract.py` enforces that every other
+third-party import reachable from `tests/` and `vigia/tests/` is covered by
+`requirements-ci.txt`; `mcp` is the single allowlisted exception, pointing at
+this entry. Adding a new dependency to tests without updating
+`requirements-ci.txt` fails the contract test (this is the third occurrence
+of the drift class: defusedxml/T-2 in B-017, then psutil and pytest-cov —
+both reproduced 2026-07-05).
+
+**Workaround for full local runs:** `pip install --ignore-installed PyJWT`
+first (gives pip a RECORD to manage), then `pip install mcp`.
