@@ -3678,11 +3678,20 @@ UNRESTRICTED_DTRACE, UNRESTRICTED_NVRAM). **NVRAM gana sobre el shell history**
 estado NVRAM es el real). El shell history queda como fallback cuando no hay
 NVRAM. Degradación honesta (§5.3): sin ninguna fuente, "undetermined".
 
-**Nota de doctrina (para Anna, sigue abierta):** ambas ramas exigen
-`has_sip_disabled AND has_antiforensic`. Disable-SIP es en sí anti-forense
-(T1562.001); si se quiere que SIP-disabled escale por sí solo, habría que hacer
-que el finding también satisfaga `has_antiforensic` — decisión de doctrina, no
-aplicada.
+**Doctrina RESUELTA (2026-07-05, decisión de Anna):** SIP-disabled cuenta como
+`has_antiforensic` (T1562.001) y escala por sí solo. Implementación con guarda
+anti-FP verificada empíricamente:
+- `has_antiforensic = has_antiforensic_finding or has_sip_disabled` (SIP cuenta).
+- SIP solo → rama `has_sip_disabled` → **z=2.4 (SUSPICION)** — escala por sí solo.
+- SIP + exploit → rama `exploit and has_antiforensic` → z=3.8.
+- **Guarda anti-FP:** las ramas de combinación FUERTE (3.4 triple, 2.8) usan el
+  flag EXPLÍCITO `has_antiforensic_finding` (acto anti-forense separado y
+  deliberado), NO el inclusivo. Sin esto, el OR global colapsaba la rama triple:
+  medido → SIP + 2 apps cifradas normales (Signal/WhatsApp de un dev con SIP
+  off) saltaba a **3.4 (INTENT)** — falso positivo sobre perfiles inocentes.
+  Con la guarda: SIP + apps normales = 2.4 (SUSPICION), y el triple genuino
+  (SIP + acto anti-forense real + apps) = 3.4, distinguido.
+- Controles sin cambio: real-AF+2apps=2.8, 2apps=2.0, exploit=3.5.
 
 **Validación:** `tests/test_b072_b074_mobile_verdict_fixes.py` — 11 de B-074
 (3 shell-history/rama + 4 `TestB074NvramAuthoritative` + 4 `TestB074CsrParser`).
