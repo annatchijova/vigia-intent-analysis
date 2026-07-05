@@ -143,7 +143,7 @@ class MacOSAnalysisResult:
         has_exploit_research = any(
             f.finding_type == "SAFARI_EXPLOIT_RESEARCH" for f in self.findings
         )
-        has_antiforensic = any(
+        has_antiforensic_finding = any(
             f.finding_type.startswith("ANTIFORENSIC") for f in self.findings
         )
         has_quarantine_suspicious = any(
@@ -152,6 +152,11 @@ class MacOSAnalysisResult:
         has_sip_disabled = any(
             f.finding_type == "SIP_DISABLED" for f in self.findings
         )
+        # B-074 doctrine (Anna): disabling SIP IS an anti-forensic act
+        # (MITRE T1562.001, Impair Defenses), so SIP_DISABLED counts toward
+        # has_antiforensic — it escalates on its own (branch `has_sip_disabled
+        # and has_antiforensic` -> z=2.4 now fires for SIP alone).
+        has_antiforensic = has_antiforensic_finding or has_sip_disabled
 
         # Opsec bump (same pattern as iOS/Android — BUG-011 fix)
         opsec_bump = Fraction(0)
@@ -165,15 +170,22 @@ class MacOSAnalysisResult:
             z = Fraction(38, 10)
         elif has_exploit_research:
             z = Fraction(35, 10)
-        elif has_antiforensic and n_encrypted >= 2 and has_sip_disabled:
+        # B-074 doctrine: las ramas de COMBINACIÓN FUERTE (3.4/2.8) exigen un
+        # acto anti-forense SEPARADO y deliberado (has_antiforensic_finding),
+        # NO solo SIP. Si usaran el has_antiforensic inclusivo, SIP + apps de
+        # mensajería normales (Signal/WhatsApp de un dev con SIP off) saltaría a
+        # 3.4 (INTENT) — falso positivo sobre perfiles inocentes. SIP escala por
+        # sí solo a 2.4 (rama de abajo) y con exploit a 3.8 (rama de arriba),
+        # pero no infla combinaciones benignas.
+        elif has_antiforensic_finding and n_encrypted >= 2 and has_sip_disabled:
             z = Fraction(34, 10)
         elif n_encrypted >= 3 and has_suspicious_search:
             z = Fraction(30, 10)
-        elif has_antiforensic and n_encrypted >= 2:
+        elif has_antiforensic_finding and n_encrypted >= 2:
             z = Fraction(28, 10)
         elif n_encrypted >= 3:
             z = Fraction(24, 10)
-        elif has_sip_disabled and has_antiforensic:
+        elif has_sip_disabled:  # SIP escala por sí solo (doctrina B-074)
             z = Fraction(24, 10)
         elif n_encrypted >= 2:
             z = Fraction(20, 10)

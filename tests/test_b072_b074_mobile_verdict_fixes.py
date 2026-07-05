@@ -351,3 +351,46 @@ class TestB074CsrParser:
         assert M._parse_csr_config(b"") is None
         assert M._parse_csr_config("notanumber") is None
         assert M._parse_csr_config(True) is None  # bool no es int válido acá
+
+
+class TestB074SipAntiforensicDoctrine:
+    """Doctrina B-074 (Anna): SIP_DISABLED cuenta como anti-forense (T1562.001)
+    y escala por sí solo — PERO sin inflar perfiles inocentes (SIP + apps de
+    mensajería normales) a INTENT. Las combinaciones fuertes exigen un acto
+    anti-forense SEPARADO."""
+
+    def _mf(self, ft):
+        from vigia.sift.macos_forensics import MacOSFinding
+        return MacOSFinding(finding_type=ft, severity=Fraction(1, 2), description="d",
+                            evidence="e", mitre_technique="T1", rule_ref="r", corr_group="g")
+
+    def _z(self, findings=(), n_enc=0):
+        r = MacOSAnalysisResult()
+        r.findings = [self._mf(f) for f in findings]
+        r.encrypted_apps = [{"a": i} for i in range(n_enc)]
+        return r.to_signal().z_score
+
+    def test_sip_alone_reaches_suspicion(self):
+        """El objetivo de la doctrina: SIP escala por sí solo (>2)."""
+        assert self._z(["SIP_DISABLED"]) == pytest.approx(2.4)
+
+    def test_sip_plus_normal_apps_stays_suspicion_not_intent(self):
+        """FP-avoidance: SIP + apps cifradas normales NO salta a INTENT."""
+        z2 = self._z(["SIP_DISABLED"], n_enc=2)
+        z3 = self._z(["SIP_DISABLED"], n_enc=3)
+        assert z2 == pytest.approx(2.4) and z2 <= 3.0
+        assert z3 == pytest.approx(2.4)
+
+    def test_sip_plus_exploit_escalates(self):
+        """SIP cuenta como anti-forense en el combo con exploit -> 3.8."""
+        assert self._z(["SIP_DISABLED", "SAFARI_EXPLOIT_RESEARCH"]) == pytest.approx(3.8)
+
+    def test_genuine_triple_still_distinguished(self):
+        """SIP + acto anti-forense REAL + apps -> 3.4 (el triple genuino)."""
+        assert self._z(["SIP_DISABLED", "ANTIFORENSIC_LOG_DELETION"], n_enc=2) == pytest.approx(3.4)
+
+    def test_controls_unchanged(self):
+        """Sin SIP, nada se mueve."""
+        assert self._z(["ANTIFORENSIC_LOG_DELETION"], n_enc=2) == pytest.approx(2.8)
+        assert self._z(n_enc=2) == pytest.approx(2.0)
+        assert self._z(["SAFARI_EXPLOIT_RESEARCH"]) == pytest.approx(3.5)
