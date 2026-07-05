@@ -161,7 +161,7 @@ def _entropy_numpy(data: List[int], normalize: bool = False) -> float:
     # El drift de acumulación pairwise vs serial (float64) es ~10⁻¹⁴, 4 órdenes
     # bajo el umbral de round(x, 6) (0.5×10⁻⁶). Verificado por self_test().
     # NO modificar _HASH_PRECISION sin revalidar self_test() bit-a-bit.
-    return round(entropy_raw, _HASH_PRECISION)
+    return round(entropy_raw, _HASH_PRECISION) + 0.0  # +0.0 maps -0.0 -> 0.0 (BUG-ENTROPY-001: signed zero seals differently under _canonicalize)
 
 
 def _entropy_python(data: List[int], normalize: bool = False) -> float:
@@ -186,7 +186,7 @@ def _entropy_python(data: List[int], normalize: bool = False) -> float:
         if max_entropy > 0:
             entropy_raw /= max_entropy
 
-    return round(entropy_raw, _HASH_PRECISION)
+    return round(entropy_raw, _HASH_PRECISION) + 0.0  # +0.0 maps -0.0 -> 0.0 (BUG-ENTROPY-001: signed zero seals differently under _canonicalize)
 
 
 def _entropy_dispatch(data: List[int], normalize: bool = False) -> float:
@@ -216,7 +216,7 @@ def _entropy_dispatch(data: List[int], normalize: bool = False) -> float:
                 if normalize:
                     me = math.log2(len(nonzero)) if len(nonzero) > 1 else 1.0
                     raw = raw / me if me > 0 else raw
-                return round(raw, _HASH_PRECISION)
+                return round(raw, _HASH_PRECISION) + 0.0  # +0.0 maps -0.0 -> 0.0 (BUG-ENTROPY-001)
         except Exception:
             pass
 
@@ -355,7 +355,7 @@ def entropy_rate(data: Sequence[Union[int, float]]) -> float:
         max_entropy = math.log2(n_unique)
         if max_entropy > 0:
             entropy_raw /= max_entropy
-    return round(entropy_raw, _HASH_PRECISION)
+    return round(entropy_raw, _HASH_PRECISION) + 0.0  # +0.0 maps -0.0 -> 0.0 (BUG-ENTROPY-001: signed zero seals differently under _canonicalize)
 
 
 def entropy_batch(

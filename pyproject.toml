@@ -89,14 +89,19 @@ exclude = ["*__pycache__*", "*.pyc", "tests*", "data*", "docs*"]
 testpaths = ["tests"]
 python_files = ["test_*.py", "*_test.py"]
 python_functions = ["test_*"]
-addopts = "-v --tb=short --cov=vigia --cov-report=term-missing --cov-report=html:htmlcov"
+# Coverage scope includes the root decision-path modules (vigia_scorer,
+# vigia_agent, sift_orchestrator) that live outside the vigia/ package. They
+# ARE the sealed verdict pipeline — measuring only vigia/ hid the primary core.
+addopts = "-v --tb=short --cov=vigia --cov=vigia_scorer --cov=vigia_agent --cov=sift_orchestrator --cov-report=term-missing --cov-report=html:htmlcov"
 asyncio_mode = "auto"
 markers = [
     "asyncio: mark test as async",
 ]
 
 [tool.coverage.run]
-source = ["vigia"]
+# Root decision-path modules are measured alongside the vigia/ package so the
+# reported number reflects the code that produces the sealed verdict.
+source = ["vigia", "vigia_scorer", "vigia_agent", "sift_orchestrator"]
 branch = true
 omit = ["*/tests/*", "*/__pycache__/*"]
 

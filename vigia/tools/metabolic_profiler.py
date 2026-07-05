@@ -117,7 +117,7 @@ class MetabolicProfiler:
         # Evaluación
         verdict, confidence, reasoning, evidence = self._evaluate_metabolism(
             file_type, efficiency, parse_cost, depth_anomaly, circular,
-            object_count, parse_time_ns
+            object_count, parse_time_ns, file_size
         )
         
         return MetabolicSignature(
@@ -143,7 +143,8 @@ class MetabolicProfiler:
         depth_anomaly: Fraction,
         circular: int,
         object_count: int,
-        parse_time_ns: int
+        parse_time_ns: int,
+        file_size: int
     ) -> Tuple[str, Fraction, str, Dict]:
         """
         Evalúa si el perfil metabólico indica malicia.
