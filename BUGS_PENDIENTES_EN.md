@@ -3901,3 +3901,37 @@ B-027/B-058 tests exercising its contracts are pinned to
 README.md/README_ES.md with a metric-change note; `SUBMISSION_COMPLIANCE.md`
 intentionally untouched. Before/after comparison sealed in
 `docs/FASE1_RESOLVE_EBS.md` §4-§5.
+
+---
+
+## B-076 — Scorer ladder: SUSPICION threshold recalibrated 0.18 → 0.10 with ground truth (Fase 2, E1) [RESOLVED]
+
+| Field | Value |
+|-------|-------|
+| **Status** | RESOLVED — applied 2026-07-05 behind a comparative gate (B-069 pattern): +10 correct, 0 regressions |
+| **Severity** | P2 — 10 SUSPICION-labeled cases emitted UNKNOWN (dead band [0.101, 0.148] between the 0.08 and 0.18 thresholds) |
+| **File** | `vigia_scorer.py:820` (decision ladder) |
+| **Detected** | Fase 2 calibration dataset (`data/calibration_ladder_dataset_20260705.json`, 198 cases): all 10 SUSPICION→UNKNOWN cases fell within <0.05 of the 0.18 threshold |
+| **Restore tag** | `pre-fase2-dataset-20260705-232536` |
+
+### Description and prior measurement (deduction before the change)
+
+The dataset census showed lowering the threshold to 0.10 could only affect
+cases with score in [0.10, 0.18): the 10 misclassified SUSPICION cases plus
+exactly ONE correct case (VIGIA-REAL-SRL-DC-MEMORY, exp=UNKNOWN, score
+0.167) — which the comparator accepts under any verdict (expected=UNKNOWN
+always passes). Expected collateral: zero.
+
+### Comparative gate (induction)
+
+- Suite: 719 passed / 7 xfailed (unchanged).
+- Corpus default (motor): 143/199 → **153/199** (+10 exact, 0 regressions).
+- Disagreements: 56 → 46 (the score-0.148 MALICE→UNKNOWN becomes
+  MALICE→SUSPICION: still a fail, one rung closer).
+
+Sibling experiments measured and NOT applied (documented in
+`docs/FASE2_DATASET_CALIBRACION.md`): E2 (INTENT rung via CAIE fractures —
+refuted: would break 49 correct MALICE cases) and E3 (NOISE with <3
+artifacts → ABSTAIN — refuted: net ≈ +1 with doctrinal cost). The ladder's
+structural INTENT gap and the ABSTAIN/L-012 label review remain open
+decisions (doc §4 and §5).

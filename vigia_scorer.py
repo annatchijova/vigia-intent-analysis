@@ -733,9 +733,18 @@ def _vigia_score(case: dict) -> dict:
     # mathematically impossible without fractures — guaranteed false negative.
     # New thresholds calibrated on real EBS v1 case distribution:
     #   MALICE    : > 0.33 (P2 + acquisition_assurance recalibration)
-    #   SUSPICION : > 0.18 (structural signal without certainty threshold)
+    #   SUSPICION : > 0.10 (structural signal without certainty threshold)
     #   UNKNOWN   : > 0.08 (weak anomaly — requires human analysis)
     #   NOISE     : <= 0.08 (no relevant forensic signal)
+    #
+    # B-076 (Fase 2, 2026-07-05): SUSPICION 0.18 → 0.10, calibrado con el
+    # dataset de ground truth de 198 casos (data/calibration_ladder_dataset_
+    # 20260705.json). Los 10 casos etiquetados SUSPICION que caían en la
+    # banda [0.101, 0.148] emitían UNKNOWN; el único caso correcto en la
+    # banda [0.10, 0.18) era exp=UNKNOWN (score 0.167 — sigue correcto como
+    # SUSPICION bajo el comparador, que acepta cualquier veredicto para
+    # expected=UNKNOWN). Gate comparativo: +10 aciertos, 0 regresiones
+    # (docs/FASE2_DATASET_CALIBRACION.md, experimento E1).
     # -----------------------------------------------------------------------
     raw_intent_score = _dround(
         max(0.0, min(0.99, composite + fracture_malice_boost - fracture_credibility_penalty)),
@@ -817,7 +826,7 @@ def _vigia_score(case: dict) -> dict:
                 f"classes do not corroborate MALICE (B-068 Daubert gate)"
             )
         confidence = _dround(min(0.95, final_score * 2.0), 2)
-    elif final_score > Fraction(18, 100):
+    elif final_score > Fraction(10, 100):  # B-076: 18/100 → 10/100 (ground truth)
         verdict    = "SUSPICION"
         confidence = _dround(final_score * 2.0, 2)
         reason     = f"Significant signal with structural support (score={final_score:.4f})"

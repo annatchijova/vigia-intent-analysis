@@ -3811,3 +3811,37 @@ tests B-027/B-058 que ejercitan sus contratos quedaron fijados a
 README.md/README_ES.md con nota de cambio de métrica;
 `SUBMISSION_COMPLIANCE.md` intencionalmente sin tocar. Comparativa
 antes/después sellada en `docs/FASE1_RESOLVE_EBS.md` §4-§5.
+
+---
+
+## B-076 — Ladder del scorer: umbral SUSPICION 0.18 recalibrado a 0.10 con ground truth (Fase 2, E1) [RESUELTO]
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | RESUELTO — aplicado 2026-07-05 con gate comparativo (patrón B-069): +10 aciertos, 0 regresiones |
+| **Severidad** | P2 — 10 casos etiquetados SUSPICION emitían UNKNOWN (banda muerta [0.101, 0.148] entre los umbrales 0.08 y 0.18) |
+| **Archivo** | `vigia_scorer.py:820` (ladder de decisión) |
+| **Detectado en** | Dataset de calibración de Fase 2 (`data/calibration_ladder_dataset_20260705.json`, 198 casos): los 10 SUSPICION→UNKNOWN caían TODOS a <0.05 del umbral 0.18 |
+| **Tag de restauración** | `pre-fase2-dataset-20260705-232536` |
+
+### Descripción y medición previa (deducción antes del cambio)
+
+El censo del dataset mostró que bajar el umbral a 0.10 solo podía afectar a
+casos con score en [0.10, 0.18): los 10 SUSPICION mal clasificados más UN
+solo caso correcto (VIGIA-REAL-SRL-DC-MEMORY, exp=UNKNOWN, score 0.167) —
+que el comparador acepta con cualquier veredicto (expected=UNKNOWN pasa
+siempre). Colateral esperado: cero.
+
+### Gate comparativo (inducción)
+
+- Suite: 719 passed / 7 xfailed (sin cambios).
+- Corpus default (motor): 143/199 → **153/199** (+10 exactos, 0 regresiones).
+- Desacuerdos: 56 → 46 (el MALICE→UNKNOWN de score 0.148 pasa a
+  MALICE→SUSPICION: sigue fail, un escalón más cerca).
+
+Experimentos hermanos medidos y NO aplicados (documentados en
+`docs/FASE2_DATASET_CALIBRACION.md`): E2 (escalón INTENT por fracturas CAIE
+— refutado: rompería 49 MALICE correctos) y E3 (NOISE con <3 artefactos →
+ABSTAIN — refutado: neto ≈ +1 con costo doctrinal). El hueco estructural
+INTENT del ladder y la revisión de etiquetas ABSTAIN/L-012 quedan como
+decisiones abiertas (doc §4 y §5).
