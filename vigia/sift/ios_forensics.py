@@ -161,19 +161,25 @@ class iOSAnalysisResult:
             z = Fraction(26, 10)
         elif n_encrypted >= 3:
             z = Fraction(24, 10)
+        elif has_phishing and (n_encrypted >= 2 or data_minimization):
+            # B-073 v2 — decisión de doctrina (Anna, opción b): phishing
+            # recibido PUEDE alcanzar SUSPICION combinado con otras señales
+            # (apps cifradas o data_minimization parseada), nunca solo.
+            # z=2.2 cruza el umbral estricto >2 de _mobile_hypothesis; queda
+            # debajo de las combinaciones con búsqueda ACTIVA (2.6/2.8)
+            # porque el phishing sigue siendo una señal pasiva.
+            z = Fraction(22, 10)
         elif n_encrypted >= 2:
             z = Fraction(20, 10)
         elif has_hacking_search:
             z = Fraction(18, 10)
         elif has_phishing:
-            # B-073: has_phishing se computaba (SMS_PHISHING_RECEIVED) pero
-            # NUNCA entraba a la escalera — rama muerta, un caso de phishing
-            # puro caía al piso genérico 1.2. Ahora registra a z=1.6: es una
-            # señal PASIVA (phishing recibido — le pasó al usuario, no la
-            # generó él), por eso pesa menos que la búsqueda ACTIVA de exploits
-            # (has_hacking_search=1.8) y por sí sola no alcanza SUSPICION (>2).
-            # El tier 1.6 es una decisión de calibración conservadora, abierta
-            # a ajuste (misma familia de calibración que L-033/B-069).
+            # B-073: phishing SOLO — señal PASIVA (recibido, no generado por
+            # el usuario), pesa menos que la búsqueda activa de exploits
+            # (has_hacking_search=1.8) y por sí sola no alcanza SUSPICION (>2)
+            # ni con el opsec_bump máximo (1.6+0.4=2.0, y el umbral es
+            # estricto). La vía a SUSPICION es la rama combinada de arriba
+            # (doctrina B-073 v2).
             z = Fraction(16, 10)
         elif n_encrypted >= 1 and (empty_contacts or empty_calls):
             z = Fraction(16, 10)

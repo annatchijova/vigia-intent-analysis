@@ -3617,13 +3617,32 @@ escala, empty real sí, flags end-to-end). Suite 489, corpus 198/198.
 verdad por `_analyze_sms`) se computaba pero nunca entraba a la escalera z → un
 caso de phishing puro caía al piso genérico 1.2.
 
-**Fix:** rama `elif has_phishing: z=1.6`. Es una señal PASIVA (phishing recibido,
-le pasó al usuario, no la generó él) → pesa menos que la búsqueda ACTIVA de
-exploits (has_hacking_search=1.8) y por sí sola no alcanza SUSPICION (>2). El
-tier 1.6 es decisión de calibración conservadora, abierta a ajuste (familia
-L-033/B-069).
+**Fix v1:** rama `elif has_phishing: z=1.6`. Es una señal PASIVA (phishing
+recibido, le pasó al usuario, no la generó él) → pesa menos que la búsqueda
+ACTIVA de exploits (has_hacking_search=1.8). **El red-team
+(AUDITORIA_REDTEAM_P1_MOBILE) lo marcó verdict-cosmético:** 1.6 (y hasta 2.0
+con bump máximo) nunca cruza el umbral estricto >2 — ningún veredicto cambiaba.
 
-**Validación:** 2 tests — phishing lifts z sobre el piso genérico; phishing solo ≤2.
+**Fix v2 (2026-07-05, decisión de doctrina de Anna — opción b):** *"phishing
+recibido puede alcanzar SUSPICION combinado con otras señales"*. Nueva rama
+`elif has_phishing and (n_encrypted >= 2 or data_minimization): z=2.2` —
+cruza el umbral estricto >2 de `_mobile_hypothesis` solo en combinación. Diseño:
+
+- **Solo, nunca:** phishing puro = 1.6; con bump máximo = 2.0 (no es >2).
+- **Combinado, sí:** con ≥2 apps cifradas o con `data_minimization`
+  **parseada** (interacción B-072: contadores en 0 por parseo fallido NO
+  habilitan la rama) → z=2.2 → SUSPICION_DETECTED.
+- **Sigue pasivo:** 2.2 queda debajo de las combinaciones con búsqueda ACTIVA
+  (hacking+data_min=2.6, enc2+hacking=2.8). Ramas existentes intactas
+  (2 apps solas=2.0, hacking solo=1.8).
+- Nota de mapeo (preexistente, para conciencia): la hipótesis
+  `SUSPICION_DETECTED` sella `agent_verdict=INTENT` (exit 3) en la escala de
+  4 valores del agente, cuyo tier INTENT representa "INTENT/SUSPICION".
+
+**Validación:** 8 tests (2 de v1 + 6 de `TestB073DoctrineCombined`: combinado
+cruza, solo no cruza ni con bump, B-072 interplay, pasivo < activo, ramas
+existentes sin cambio). Suite 509, corpus 198/198. Restore tag:
+`pre-b073-doctrine-20260705-014509`.
 
 ---
 
