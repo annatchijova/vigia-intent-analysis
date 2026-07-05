@@ -21,3 +21,6 @@ defusedxml>=0.7.1
 # NOTA: `mcp` queda deliberadamente FUERA — no instalable con PyJWT de sistema
 # (ver KNOWN_LIMITATIONS.md L-045).
 psutil>=5.9.0
+# S-1 (contrato 2026-07-05): pyyaml es importado por vigia/config/ vía yaml.safe_load;
+# estaba en requirements.txt pero no acá. Detectado por test_requirements_ci_contract.py.
+pyyaml>=6.0.0
