@@ -81,10 +81,17 @@ class TestSafeGrepIntegration:
 
     def test_safe_grep_no_longer_name_errors(self, evidence_dir):
         """Colateral TANDA 2: audit_logger sin bindear → NameError en la
-        primera llamada real. Este test falla en el código pre-fix."""
+        primera llamada real. Este test falla en el código pre-fix.
+
+        LaBestia fix (2026-07-06): también falla si find/grep no pueden
+        siquiera ejecutar (p.ej. RLIMIT_AS insuficiente para el linker
+        dinámico en un sistema real con más shared libs que este
+        contenedor) — el mensaje de assert vuelca el dict completo para
+        no depender de reproducir el entorno exacto para diagnosticar.
+        """
         r = asyncio.run(safe_grep("malware", evidence_dir))
-        assert r["error"] is None
-        assert any("malware" in m for m in r["matches"])
+        assert r["error"] is None, f"safe_grep devolvió error: {r}"
+        assert any("malware" in m for m in r["matches"]), f"sin matches: {r}"
 
     def test_safe_grep_rejects_invalid_pattern_with_reason(self, evidence_dir):
         r = asyncio.run(safe_grep("term; rm -rf /", evidence_dir))

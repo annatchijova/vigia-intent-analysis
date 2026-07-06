@@ -420,7 +420,17 @@ async def safe_grep(
     pattern: str,
     folder: str,
     max_depth: int | None = None,  # Kimi P1-10: Now uses VIGIA_GREP_DEPTH by default
-    max_memory_mb: int = 256,
+    # LaBestia fix (2026-07-06): 256 was a stale literal, inconsistent with
+    # the rest of the codebase — CONFIG.sandbox_memory_mb (the only
+    # production caller, search_pattern) and DEFAULT_MAX_MEMORY_MB both
+    # default to 512. On a minimal container grep/find link ~4-5 shared
+    # libs and 256MB is generous; on a real desktop distro (NSS modules,
+    # PAM, systemd libs, ICU/locale data) dynamic linking legitimately
+    # needs more virtual address space — RLIMIT_AS too tight makes the
+    # loader abort ("failed to map segment"), which sandboxed_execute
+    # cannot distinguish from a clean run (see returncode check below),
+    # so it silently reported "no matches" instead of "grep couldn't run".
+    max_memory_mb: int = DEFAULT_MAX_MEMORY_MB,
     max_cpu_seconds: int = 30,
     allowed_dirs: list[str] | None = None,
     max_total_scan_bytes: int = 500 * 1024 * 1024,  # 500 MB
@@ -565,6 +575,31 @@ async def safe_grep(
         }
 
     file_list = find_result["stdout"]
+
+    # LaBestia fix (2026-07-06): sandboxed_execute() never sets "error" for a
+    # nonzero returncode (only for exceptions/timeout) — a find(1) crash
+    # (permission fault, resource-limit loader failure, missing binary
+    # resolved via a broken PATH) produces empty stdout with error=None,
+    # which fell through to the "empty directory" branch below: a forensic
+    # tool silently reporting "no matches" when the search never actually
+    # ran. Same anti-pattern this repo already guards against elsewhere
+    # (UNANALYZED_ARTIFACT vs NO_ANOMALY in sift_orchestrator.py) — absence
+    # of output is not evidence of a clean scan. Only treat empty+nonzero as
+    # fatal; GNU find can return 1 on partial permission errors while still
+    # listing what it could read, so a nonzero code with actual output is
+    # not fatal here.
+    if find_result["returncode"] != 0 and not file_list.strip():
+        return {
+            "matches": [],
+            "truncated": False,
+            "error": (
+                f"find exited with code {find_result['returncode']} and "
+                f"produced no output — treating as a failed scan, not an "
+                f"empty directory (stderr: {find_result['stderr'][:300]!r})"
+            ),
+            "depth_limit_applied": effective_depth,
+        }
+
     if not file_list.strip():
         return {
             "matches": [],
@@ -598,6 +633,27 @@ async def safe_grep(
             "matches": [],
             "truncated": grep_result["truncated"],
             "error": grep_result["error"],
+            "depth_limit_applied": effective_depth,
+        }
+
+    # LaBestia fix (2026-07-06): grep exit 0 = matches found, 1 = clean run,
+    # no matches (benign — the only two codes this function used to treat as
+    # "search worked"). ANY other code (2 = usage/file error, 126/127 =
+    # dynamic-linker/exec failure, negative = killed by signal) meant grep
+    # never actually searched, but fell through silently to "matches: [],
+    # error: None" below — the exact false-negative pattern this repo's own
+    # doctrine treats as inadmissible elsewhere (silent absence ≠ clean
+    # result).
+    if grep_result["returncode"] not in (0, 1):
+        return {
+            "matches": [],
+            "truncated": grep_result["truncated"],
+            "error": (
+                f"grep exited with code {grep_result['returncode']} — "
+                f"treating as a failed search, not \"no matches\" "
+                f"(stderr: {grep_result['stderr'][:300]!r})"
+            ),
+            "returncode": grep_result["returncode"],
             "depth_limit_applied": effective_depth,
         }
 
