@@ -733,6 +733,11 @@ These numbers are not inflated. They reflect results on a specific, diverse, doc
 > epistemic-boundary cases — and they must be read separately (segmentation
 > from the ground-truth dataset, 2026-07-06):
 >
+> **Note:** 167/199 covers ALL cases in JSON format — including the 31
+> BREAK/adversarial cases that are NOT the detection corpus. The detection
+> corpus (Domain A) is 146/159 (91.8%). For raw evidence (Domain C), the
+> agent reaches better results or returns ABSTAIN — work in progress.
+>
 > | Segment | Cases | Label-blind | Reading |
 > |---|---|---|---|
 > | **Detection corpus** (canonical 61, benign 15, FLARE-ON CTF 10, real/converted 51, demo 4, other 18) | **159** | **146/159 (91.8%)** | **the accuracy-bearing metric for this path** — canonical 61/61, benign 15/15, FLARE-ON 10/10; the 13 misses are mostly adjacent-severity (MALICE→SUSPICION) on real/converted cases |
@@ -883,7 +888,7 @@ Known limitations: [KNOWN_LIMITATIONS.md](./KNOWN_LIMITATIONS.md)
 ### Unit Tests
 
 ```bash
-python3 -m pytest tests/ -v    # 188 passed, 6 xfailed
+python3 -m pytest tests/ -v    # 719 passed, 7 xfailed
 ```
 
 ![148 tests passing](screenshots/test148.png)
@@ -1282,7 +1287,7 @@ Temporal entropy: 0.00 bits.
 │   ├── protocols/P2/                    ← P2 canonical vectors + SHA-256 manifest
 │   └── academic/                        ← 193 module docs (EN/ES/RU/ZH in progress)
 │
-├── tests/                               ← 188 passed, 6 xfailed
+├── tests/                               ← 719 passed, 7 xfailed
 │   ├── run_all_cases.py
 │   ├── test_red_team.py
 │   └── test_ebs_v1_integration.py
@@ -1387,16 +1392,16 @@ Domain A (core metric): **129/129 PASS — 100%**
 
 ---
 
-### Unit test suite — 188 passed, 6 xfailed
+### Unit test suite — 719 passed, 7 xfailed
 
-**Claim:** 163 tests pass; 6 are `xfailed` (documented regressions with
+**Claim:** 719 tests pass; 7 are `xfailed` (documented regressions with
 regression-preventing tests — see [`KNOWN_LIMITATIONS.md`](./KNOWN_LIMITATIONS.md)).
 
 ```bash
 python3 -m pytest tests/ -v
 ```
 
-Expected output: `188 passed, 6 xfailed`
+Expected output: `719 passed, 7 xfailed`
 
 ---
 

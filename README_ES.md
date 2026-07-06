@@ -734,6 +734,11 @@ Estos números no están inflados. Reflejan resultados en un corpus específico,
 > sistema* y casos de frontera epistémica — y deben leerse por separado
 > (segmentación desde el dataset de ground truth, 2026-07-06):
 >
+> **Nota:** 167/199 cubre TODOS los casos en formato JSON — incluyendo los 31
+> casos BREAK/adversariales que NO son el corpus de detección. El corpus de
+> detección (Dominio A) es 146/159 (91.8%). Para evidencia raw (Dominio C),
+> el agente llega a mejores resultados o retorna ABSTAIN — trabajo en curso.
+>
 > | Segmento | Casos | Ciego a etiqueta | Lectura |
 > |---|---|---|---|
 > | **Corpus de detección** (canónico 61, benigno 15, FLARE-ON CTF 10, real/convertido 51, demo 4, otros 18) | **159** | **146/159 (91.8%)** | **la métrica de precisión de este camino** — canónico 61/61, benigno 15/15, FLARE-ON 10/10; los 13 fallos son mayormente severidad adyacente (MALICE→SUSPICION) en casos reales/convertidos |
@@ -888,7 +893,7 @@ Limitaciones conocidas: [KNOWN_LIMITATIONS.md](./KNOWN_LIMITATIONS.md)
 ### Tests Unitarios
 
 ```bash
-python3 -m pytest tests/ -v    # 188 passed, 6 xfailed
+python3 -m pytest tests/ -v    # 719 passed, 7 xfailed
 ```
 
 ![148 tests pasando](screenshots/test148.png)
@@ -1288,7 +1293,7 @@ vigia-intent-analysis/
 │   ├── protocols/P2/                    ← Vectores canónicos P2 + manifiesto SHA-256
 │   └── academic/                        ← Docs de 193 módulos (EN/ES/RU/ZH en progreso)
 │
-├── tests/                               ← 188 passed, 6 xfailed
+├── tests/                               ← 719 passed, 7 xfailed
 │   ├── run_all_cases.py
 │   ├── test_red_team.py
 │   └── test_ebs_v1_integration.py
@@ -1397,16 +1402,16 @@ Domain A (core metric): **129/129 PASS — 100%**
 
 ---
 
-### Suite de tests unitarios — 188 passed, 6 xfailed
+### Suite de tests unitarios — 719 passed, 7 xfailed
 
-**Afirmación:** 163 tests pasan; 6 son `xfailed` (regresiones documentadas con
+**Afirmación:** 719 tests pasan; 7 son `xfailed` (regresiones documentadas con
 tests que previenen regresión — ver [`KNOWN_LIMITATIONS.md`](./KNOWN_LIMITATIONS.md)).
 
 ```bash
 python3 -m pytest tests/ -v
 ```
 
-Salida esperada: `188 passed, 6 xfailed`
+Salida esperada: `719 passed, 7 xfailed`
 
 ---
 
