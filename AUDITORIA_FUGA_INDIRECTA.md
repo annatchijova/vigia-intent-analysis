@@ -227,4 +227,71 @@ Medido por barrido de 5001 puntos en [0, 5]: **`INTENT_DETECTED` es inalcanzable
 
 ---
 
+## ADDENDUM 2026-07-06 — Q1: ¿LA CALIBRACIÓN B-069/B-076 SE HIZO SOBRE DATOS CONTAMINADOS? / Q2: ¿HAY LÓGICA SIMÉTRICA DE INFLACIÓN?
+
+### Q1 — Calibración de umbrales vs contaminación. Respuesta corta: **sí, B-076 se calibró sobre datos contaminados — por la puerta de datos, no por la puerta runtime.** Y `run_calibration.py` entrenó el LRCalibrator sobre el mismo corpus contaminado, aunque ese modelo no entra al scorer por default.
+
+**Atribución precisa de cada artefacto de calibración:**
+
+| Artefacto | Generador | ¿is_benign runtime activo? | ¿Datos contaminados? |
+|-----------|-----------|---------------------------|---------------------|
+| Umbral B-076 (0.18→0.10) | `scripts/generate_ladder_dataset.py` → `data/calibration_ladder_dataset_20260705.json` | **NO** — remueve `expected_verdict` antes de `_vigia_score` (línea `blind = {k: v ...}`) | **SÍ** — lee `data/cases/converted/` vía `run_all_agent.find_cases`; la dedup por stem (`CASES_DIRS`: converted antes que benign) hace ganar al archivo convertido |
+| Gate B-069 (143→153/199) | `run_all_agent.py` sobre los mismos `CASES_DIRS` | NO (camino motor, blind) | **SÍ** — mismos archivos fuente |
+| `models/calibrated_lr.json` (LRCalibrator) | `scripts/run_calibration.py` | **NO se ejecuta la rama** — llama `normalize_case_schema(case)` CON etiqueta (línea 82) pero su corpus default es `data/cases/converted` (schema canónico → retorno temprano en `bridge:458` antes del bloque `is_benign`). Verificado: sin doble reducción (0.175 → 0.175) | **SÍ** — los scores ya venían reducidos del conversor |
+
+**Medición 1 — el dataset B-076 contiene los scores contaminados, bit a bit:**
+
+Las 15 filas `VIGIA-BEN-001..015` del dataset tienen `path=data/cases/converted/...` y su `score` coincide **exactamente** (diff < 1e-9) con re-puntuar ciego el archivo convertido. 15/198 filas = 7.6% del dataset de calibración. Ninguna proviene de los originales de `data/cases/benign/`.
+
+**Medición 2 — descontaminación (re-scoring ciego desde los originales):**
+
+```
+caso         dataset  convertido_ciego  ORIGINAL_ciego  veredicto   banda
+BEN-001       0.0207      0.0207           0.2543       SUSPICION   >0.18
+BEN-002       0.0202      0.0202           0.3037       SUSPICION   >0.18
+BEN-003       0.0127      0.0127           0.2391       SUSPICION   >0.18
+BEN-004       0.0361      0.0361           0.4008       MALICE      >0.18
+BEN-005..007  0.02xx      = dataset        0.25-0.27    SUSPICION   >0.18
+BEN-008/009   0.035x      = dataset        0.4033/0.4008 MALICE     >0.18
+BEN-010       0.0127      0.0127           0.1600       SUSPICION   (0.10, 0.18] ← BANDA DELTA B-076
+BEN-011..015  0.02xx      = dataset        0.248-0.363  SUSPICION   >0.18
+```
+
+**Consecuencias medidas sobre B-076:**
+
+1. El censo de E1 afirmó "colateral esperado: cero" para bajar el umbral 0.18→0.10 porque la banda (0.10, 0.18] solo contenía los 10 SUSPICION mal clasificados + 1 UNKNOWN. Con datos descontaminados, **VIGIA-BEN-010 (score 0.1600, exp=NOISE) cae dentro de la banda delta**: bajar el umbral habría creado al menos 1 regresión medible (NOISE→SUSPICION). La afirmación "0 colaterales" solo se sostiene sobre el corpus contaminado.
+2. Los otros 14 casos descontaminados quedan **por encima de 0.18**: son falsos positivos latentes bajo ambos umbrales. En el dataset figuran como `agree=True` (motor NOISE) — es decir, **la métrica del corpus (143→153/199) contiene 15 aciertos que existen solo por la reducción persistida**. Sin ella serían 15 fallos (12 SUSPICION + 3 MALICE contra exp=NOISE).
+3. Alcance del LRCalibrator: `models/calibration_metadata.json` (2026-06-24) registra corpus de 78 casos con **n_authentic = 22 (18 train + 4 test)** — exactamente los 22 convertidos con etiqueta benigna. El separador authentic/fabricated del calibrador se ajustó con la clase authentic artificialmente comprimida (÷4). Atenuante verificado: ni `_vigia_score` ni el pipeline cargan ese modelo por default (`calibration_path` default es `None`/`""`; `vigia_scorer.py` no referencia LRCalibrator) — el modelo contaminado solo afecta a quien lo pase explícitamente.
+
+### Q2 — ¿Lógica simétrica de inflación para MALICE/SUSPICION? Respuesta corta: **no existe. La fuga es estrictamente asimétrica, solo hacia abajo y solo para etiqueta benigna.**
+
+**Medición — label-flip a nivel conversor** (mismo caso sintético con 3 artefactos idénticos, variando solo `expected_verdict`, vía `convert_case()` importado de `scripts/convert_legacy_cases.py`):
+
+```
+expected_verdict IN -> raw_scores convertidos    prior_trust      verdict OUT
+MALICE              -> [0.6, 0.75, 0.95]         [0.7,0.85,0.9]   MALICE
+INTENT              -> [0.6, 0.75, 0.95]         [0.7,0.85,0.9]   MALICE
+SUSPICION           -> [0.6, 0.75, 0.95]         [0.7,0.85,0.9]   SUSPICION
+UNKNOWN             -> [0.6, 0.75, 0.95]         [0.7,0.85,0.9]   SUSPICION
+ABSTAIN             -> [0.6, 0.75, 0.95]         [0.7,0.85,0.9]   SUSPICION
+NOISE               -> [0.15, 0.1875, 0.2375]    [0.3,0.3,0.3]    NOISE
+BENIGN              -> [0.15, 0.1875, 0.2375]    [0.3,0.3,0.3]    NOISE
+```
+
+- Los 5 labels no-benignos producen scores **idénticos**: no hay inflación condicionada al veredicto. El único ajuste hacia arriba del conversor (`+0.10` si `len(forensic_anomalies) >= 2`, `convert_artifact`) es **evidence-driven**, independiente de la etiqueta (el 0.95 del tercer artefacto aparece igual en la fila NOISE: 0.2375 = 0.95×0.25).
+- El score base sale del `peirce_layer` del artefacto (0.60/0.75/0.88), no del veredicto.
+
+**Dirección real de la asimetría:** la reducción se aplica cuando la *etiqueta* dice benigno. Efecto primario medido: suprime artificialmente la tasa de falsos positivos del motor sobre los casos etiquetados benignos (los 15 de arriba). Modo de fallo derivado: un caso mal etiquetado como NOISE (malicia real con etiqueta benigna) entra al corpus con su evidencia atenuada ÷4 y `prior_trust` 0.3 — en ese escenario la asimetría sí oculta malicia.
+
+**Hallazgo adicional (divergencia con la "misma lógica" declarada):** el comentario del conversor (línea 150) dice replicar `normalize_case_schema`, pero las dos implementaciones de `is_benign` divergen de forma medible:
+
+| Condición | `normalize_case_schema` (bridge:473-476) | `convert_legacy_cases.convert_case` |
+|-----------|------------------------------------------|-------------------------------------|
+| ABSTAIN cuenta como benigno | **SÍ** | **NO** — `VERDICT_MAP` reescribe ABSTAIN→SUSPICION *antes* del check |
+| Exige `expected_mitre_ttps == []` | **SÍ** | **NO** — ignora MITRE |
+
+Además el conversor **reescribe las etiquetas mismas** en el corpus persistido (INTENT→MALICE, UNKNOWN→SUSPICION, ABSTAIN→SUSPICION): los UNKNOWN originales — que el comparador acepta con cualquier veredicto — dejan de existir como UNKNOWN en los archivos convertidos, endureciendo o distorsionando la evaluación de esos casos según la dirección de la reescritura.
+
+---
+
 *Auditoría ejecutada sin modificar código. Todos los números provienen de ejecuciones reproducibles sobre HEAD `849475b` con los comandos descriptos en cada sección.*
