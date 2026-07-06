@@ -168,10 +168,22 @@ def _make_preexec(max_memory_mb: int, max_cpu_seconds: int) -> None:
     stack_limit = min(64 * 1024 * 1024, mem_bytes // 4)  # 64MB or 1/4 of memory
     resource.setrlimit(resource.RLIMIT_STACK, (stack_limit, stack_limit))
 
-    # 7. Limit number of processes (prevent fork bombs)
+    # 7. Number of processes.
+    # LaBestia fix (2026-07-06): (64, 64) era un cap por-UID que cuenta TODOS los
+    # procesos del uid real, no sólo este sandbox. En un host forense real (sesión
+    # de escritorio, servidor multi-analista) el uid supera 64 procesos de rutina,
+    # así que apretar a 64 hacía fallar el fork de grep por parte de xargs con
+    # EAGAIN ("xargs: cannot fork: Resource temporarily unavailable"): la búsqueda
+    # nunca corría y safe_grep reportaba un scan fallido — no un resultado limpio.
+    # RLIMIT_NPROC es per-UID (no per-árbol-de-procesos): es el primitivo
+    # equivocado para aislar este sandbox, y un número fijo (64/512) rompe en el
+    # host que lo supere. El fork-bomb ya está acotado por RLIMIT_AS, RLIMIT_CPU y
+    # el timeout duro de asyncio. Se eleva al límite del sistema (hard) en vez de
+    # apretar: se conserva el techo que impone el SO sin romper por conteo de uid.
     try:
-        resource.setrlimit(resource.RLIMIT_NPROC, (64, 64))
-    except ValueError:
+        _np_soft, _np_hard = resource.getrlimit(resource.RLIMIT_NPROC)
+        resource.setrlimit(resource.RLIMIT_NPROC, (_np_hard, _np_hard))
+    except (ValueError, OSError):
         pass  # May not be available on all systems
 
 

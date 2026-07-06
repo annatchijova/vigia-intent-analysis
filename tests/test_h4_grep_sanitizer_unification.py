@@ -105,15 +105,18 @@ class TestSafeGrepIntegration:
         assert r["matches"] == []
         assert r["error"] and "null byte" in r["error"]
 
-    def test_safe_grep_populated_dir_with_match(self, tmp_path, monkeypatch):
-        """LaBestia fix v2: el escenario que fallaba en el entorno real.
+    def test_safe_grep_multifile_dir_match_has_no_spurious_error(self, tmp_path, monkeypatch):
+        """Sobre un directorio con varios archivos y un match, safe_grep debe
+        devolver los matches reales SIN error espurio.
 
-        Con muchos archivos, xargs parte la lista en varias invocaciones de
-        grep; el batch SIN el patrón sale con grep exit 1 y xargs COLAPSA
-        todo a exit 123 — aun cuando otro batch SÍ matcheó y produjo salida.
-        El fix e10a364 trataba 123 como fallo → error espurio pese a haber
-        matches. Este test pasa un directorio poblado (no el single-file del
-        fixture) para ejercitar el split de xargs.
+        CORRECCIÓN (2026-07-06): la versión previa afirmaba "ejercitar el split
+        de xargs" — es FALSO. Con 13 archivos xargs NO splitea: el split ocurre
+        recién cerca de ARG_MAX/len(path) archivos (~decenas de miles en un
+        sistema típico). Este test cubre el camino de UN SOLO batch de grep + el
+        parseo de returncode; NO ejercita el colapso multi-batch a exit 123.
+        El fallo que reproducía en LaBestia NO era el split sino RLIMIT_NPROC=64:
+        xargs no podía forkear grep ("cannot fork: Resource temporarily
+        unavailable") → la búsqueda no corría → error espurio en vez de matches.
         """
         monkeypatch.setenv("VIGIA_EVIDENCE_DIR", str(tmp_path))
         for i in range(12):
@@ -123,11 +126,52 @@ class TestSafeGrepIntegration:
         assert r["error"] is None, f"falso error en dir poblado con match: {r}"
         assert any("malware" in m for m in r["matches"]), f"sin matches: {r}"
 
-    def test_safe_grep_populated_dir_no_match_is_benign(self, tmp_path, monkeypatch):
-        """El no-match en dir poblado (xargs 123) NO es un error."""
+    def test_safe_grep_multifile_dir_no_match_is_benign(self, tmp_path, monkeypatch):
+        """El no-match sobre un directorio con varios archivos NO es un error.
+
+        Con un solo batch de grep, un no-match hace que grep salga 1 y xargs
+        colapse a exit 123; safe_grep debe tratarlo como "sin matches" benigno
+        (no como fallo). CORRECCIÓN (2026-07-06): 13 archivos = un solo batch —
+        NO ejercita el split de xargs (haría falta ~ARG_MAX/len(path) archivos).
+        Cubre el manejo benigno de returncode 123 en batch único, no el split.
+        """
         monkeypatch.setenv("VIGIA_EVIDENCE_DIR", str(tmp_path))
         for i in range(12):
             (tmp_path / f"f_{i}.txt").write_text("nothing relevant here\n")
         r = asyncio.run(safe_grep("zzz_pattern_absent_zzz", str(tmp_path)))
         assert r["error"] is None, f"no-match tratado como error: {r}"
         assert r["matches"] == []
+
+    def test_make_preexec_does_not_tighten_nproc(self):
+        """Regresión LaBestia real (RLIMIT_NPROC): el sandbox NO debe apretar
+        RLIMIT_NPROC por debajo del hard heredado. El cap (64,64) previo hacía
+        que xargs fallara al forkear grep ('xargs: cannot fork: Resource
+        temporarily unavailable') en cualquier host con >64 procesos del uid —
+        el fallo REAL de LaBestia (confirmado por stderr). Se verifica en un hijo
+        forkeado porque _make_preexec aplica límites al proceso que lo llama."""
+        import os
+        import resource
+        if not hasattr(os, "fork") or not hasattr(resource, "RLIMIT_NPROC"):
+            pytest.skip("RLIMIT_NPROC / fork no disponibles en esta plataforma")
+        from vigia.security.sandbox import _make_preexec
+
+        _, inherited_hard = resource.getrlimit(resource.RLIMIT_NPROC)
+        rfd, wfd = os.pipe()
+        pid = os.fork()
+        if pid == 0:                       # hijo: aplica límites, reporta NPROC
+            os.close(rfd)
+            try:
+                _make_preexec(512, 30)
+                soft, _ = resource.getrlimit(resource.RLIMIT_NPROC)
+                os.write(wfd, str(soft).encode())
+            finally:
+                os._exit(0)
+        os.close(wfd)
+        child_soft = int(os.read(rfd, 64).decode() or "-1")
+        os.close(rfd)
+        os.waitpid(pid, 0)
+        # Invariante: se eleva al hard heredado, nunca se aprieta a 64.
+        assert child_soft == inherited_hard, (
+            f"NPROC quedó en {child_soft}, esperado == hard heredado "
+            f"{inherited_hard} (no el cap viejo de 64)"
+        )
