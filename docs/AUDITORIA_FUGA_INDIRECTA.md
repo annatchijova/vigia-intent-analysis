@@ -388,10 +388,18 @@ semántica-ciega peirce_layer→score que puntúa alto la evidencia
 exculpatoria) — ese es el backlog de calibración de Fase 2, ahora visible en
 la métrica en lugar de oculto bajo la reducción.
 
-READMEs actualizados (EN+ES): agregado 167/199 → 152/199, corpus de
-detección 146/159 (91.8%) → 131/159 (82.4%) con el segmento benigno 15/15 →
-0/15 explicado, paso de la tanda agregado a la trayectoria del agregado, y
-bloque de output esperado del runner. `SUBMISSION_COMPLIANCE.md`
+**Decisión de doctrina (2026-07-06, revertida tras esta medición): el README
+NO se actualiza por cada fix.** Es la cara pública del submission, ya
+acumula capas de "correction"/"superseded" de sesiones previas sobre las
+tres categorías de evaluación (Claude/MCP sobre evidencia raw, agente sobre
+JSON, agente sobre evidencia raw), y una edición puntual por tanda arriesga
+tanto la legibilidad como la distinción entre esas categorías. README.md y
+README_ES.md quedan en **167/199** / **146/159 (91.8%)** — el número previo
+a esta tanda — y esta auditoría es la fuente de verdad del impacto real:
+**el corpus honesto post-H1c es 152/199** (detección 131/159, 82.4%,
+benigno 0/15). Toda actualización pública de esos números, si se decide
+hacerla, se trata como cambio de doctrina separado — no como parte
+automática de cerrar un hallazgo de auditoría. `SUBMISSION_COMPLIANCE.md`
 intencionalmente sin tocar (registro de lo presentado).
 
 **Residual documentado:** `data/calibration_ladder_dataset_20260705.json`

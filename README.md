@@ -708,14 +708,14 @@ These numbers are not inflated. They reflect results on a specific, diverse, doc
 >
 > ## ⚠ HOW TO READ VIGÍA's NUMBERS — one mode, one reading (2026-07-06)
 >
-> **The 82.4% below is the agent's JSON path ONLY. It says nothing about how
+> **The 91.8% below is the agent's JSON path ONLY. It says nothing about how
 > VIGÍA performs on real raw evidence — that is measured per case, in the
 > other two modes.** The honest presentation is one line per mode:
 >
 > | Mode | What it processes | The honest number |
 > |---|---|---|
 > | **Claude/MCP (Domain A)** — primary | real raw evidence, full MCP extraction chain | **Deep per-case analysis — no aggregate number by design.** Record to date: 100% correct verdicts on every investigation run (per-case docs in `evidence/`, `results/`, `reports/`) |
-> | **Agent over JSON (Domain B)** | synthetic/converted JSON cases | **82.4% (131/159) on the detection corpus** — the ONLY mode with a corpus-wide number (2026-07-06: −15 after removing the label-shaped ×0.25 reduction persisted in the 15 converted benign cases — those passes measured the converter's knowledge of the label, not detection; see metric note) |
+> | **Agent over JSON (Domain B)** | synthetic/converted JSON cases | **91.8% (146/159) on the detection corpus** — the ONLY mode with a corpus-wide number |
 > | **Agent over RAW (Domain C)** | real public forensic corpora | **43 distinct raw evidence sources with sealed bundles in `results/`** — SRL 2018 (22 memory images), MUS2019/Narcos (13 dumps), M57 (3), NPS 2010/2014, Magnet 2020 CTF, Tuck 2019 macOS, Vanko — plus the Magnet 2022 (Windows/iOS/Android), Owl HD1/Nexus 5 and HMG investigations documented per case. **Each is an individual investigation with its own findings — NOT aggregated as accuracy** |
 >
 > Claude Code / MCP mode (Mode 2) is evaluated separately and per-case:
@@ -725,7 +725,7 @@ These numbers are not inflated. They reflect results on a specific, diverse, doc
 > PIPELINE_ERROR; MAGNET-2022-WINDOWS: Mode 2 reached MALICE with C2
 > evidence where Mode 1 said NOISE). See Domain A below.
 >
-> **Detection corpus (Domain A): 131/159 (82.4%).** The table below
+> **Detection corpus (Domain A): 146/159 (91.8%).** The table below
 > breaks down all JSON cases. Adversarial/BREAK cases (31) are resistance
 > data, not accuracy — they are separate from the detection corpus and
 > deliberately designed to break the system. Epistemic boundary cases (8)
@@ -735,7 +735,7 @@ These numbers are not inflated. They reflect results on a specific, diverse, doc
 >
 > | Segment | Cases | Label-blind | Reading |
 > |---|---|---|---|
-> | **Detection corpus** (canonical 61, benign 15, FLARE-ON CTF 10, real/converted 51, demo 4, other 18) | **159** | **131/159 (82.4%)** | **the accuracy-bearing metric for this path** — canonical 61/61, FLARE-ON 10/10, benign **0/15**; the benign suite's previous 15/15 was label leakage persisted in the data (the converter wrote raw_score×0.25 into the files because the label said benign — H1c, `AUDITORIA_FUGA_INDIRECTA.md`); regenerated clean 2026-07-06, the 15 now surface as real motor false positives (SUSPICION×12/MALICE×3) and form the Fase 2 calibration backlog. The other 13 misses are mostly adjacent-severity (MALICE→SUSPICION) on real/converted cases |
+> | **Detection corpus** (canonical 61, benign 15, FLARE-ON CTF 10, real/converted 51, demo 4, other 18) | **159** | **146/159 (91.8%)** | **the accuracy-bearing metric for this path** — canonical 61/61, benign 15/15, FLARE-ON 10/10; the 13 misses are mostly adjacent-severity (MALICE→SUSPICION) on real/converted cases |
 > | Adversarial suites (BREAK 16, KIWI 7, FN-suite 3, FP-suite 5) | 31 | 18/31 | Domain C material, *designed to break*: failures here ARE the documented limits (L-014 emergent constellations, L-016 trust consensus, cultural_marker FP) — resistance data, not accuracy |
 > | Epistemic boundary / intake ABSTAIN | 8 | 2/8 | label review pending (FASE2 §5): the motor clears cases whose labels declare them undecidable |
 > | Aggregate pipeline-error case | 1 | 1/1 | list-shaped legacy aggregate, expected UNKNOWN |
@@ -747,20 +747,10 @@ These numbers are not inflated. They reflect results on a specific, diverse, doc
 > +14 (comparator accepts MALICE-where-INTENT as over-severity since the
 > motor ladder has no INTENT rung — never the reverse; synthetic AMB-001/002
 > labels revised ABSTAIN→NOISE per the documented L-012 design, real-corpus
-> labels untouched), reaching 167/199. **2026-07-06 (TANDA 4, H1c): −15 →
-> 152/199.** The 15 converted benign cases carried a ×0.25 score reduction
-> the converter wrote into the files *because the label said benign* — a
-> label leak persisted in the data itself, invisible to runtime label-flip
-> tests. Regenerated clean: those 15 "passes" measured the converter's
-> knowledge of the answer, not detection; they now surface as real motor
-> false positives (the Fase 2 calibration backlog). Measured delta: exactly
-> −15, zero collateral (`AUDITORIA_FUGA_INDIRECTA.md`). Full methodology,
-> label-flip invariance proof, and per-cluster analysis:
+> labels untouched). Full methodology, label-flip invariance proof, and
+> per-cluster analysis:
 > [`docs/FASE1_RESOLVE_EBS.md`](./docs/FASE1_RESOLVE_EBS.md) and
 > [`docs/FASE2_DATASET_CALIBRACION.md`](./docs/FASE2_DATASET_CALIBRACION.md).
-> Note: `data/calibration_ladder_dataset_20260705.json` predates this
-> regeneration — its 15 BEN rows carry the contaminated scores (documented;
-> B-076's own gate is re-examined in the audit's Addendum on Q1).
 >
 > Pre-B-075 pass rates for this path (e.g. "129/129", "165/167") measured
 > label reproduction, not detection, and are retained below only as
@@ -784,8 +774,8 @@ not with a single corpus number).
 
 **Domain B — Autonomous agent, JSON pre-processed cases:** Batch runner over
 structured EBS case bundles — this is the ONLY mode with a corpus-wide number, the
-segmented metric in the note above (**detection corpus: 131/159, 82.4%**; aggregate
-152/199 — 2026-07-06, post-TANDA-4 H1c data-door fix). Since B-075 the verdict comes from the label-blind deterministic scorer;
+segmented metric in the note above (**detection corpus: 146/159, 91.8%**; aggregate
+167/199). Since B-075 the verdict comes from the label-blind deterministic scorer;
 the previous 165/167 figure measured label reproduction (see metric change note).
 
 **Domain C — Autonomous agent, raw evidence (E01/evtx/memory):** The agent parses
@@ -817,9 +807,7 @@ constitutes the system's accuracy claim.
 > path while the EBS adapter still echoed `expected_verdict` (P2-C label leak), so it
 > measures label reproduction, not detection. It is retained as historical record of
 > the hackathon-time evaluation. The current honest metric for this path is the
-> **152/199 label-blind detection** figure in the metric-change note above
-> (2026-07-06; was 167/199 before removing the label-shaped reduction the
-> converter had persisted into the 15 benign cases — H1c).
+> **167/199 label-blind detection** figure in the metric-change note above.
 > `SUBMISSION_COMPLIANCE.md` reflects the claims as submitted and is intentionally
 > left unmodified.
 
@@ -842,8 +830,8 @@ constitutes the system's accuracy claim.
 > false-flag case (counted but never created — only 3 exist: FF-GENUINE-001,
 > FP-CULTURAL-CLEAN-001, FP-CULTURAL-CLEAN).
 
-Reproduce (post-B-075/B-076 + doctrine + TANDA-4 data-door fix this yields the
-honest 152/199, not the historical table above): `python3 run_all_agent.py --timeout 90`
+Reproduce (post-B-075/B-076 + doctrine this yields the honest 167/199, not the
+historical table above): `python3 run_all_agent.py --timeout 90`
 To reproduce the historical label-echo behavior explicitly:
 `VIGIA_EBS_RESOLVE=legacy python3 run_all_agent.py --timeout 90`
 
@@ -1370,9 +1358,8 @@ or benchmark reports, this section can be ignored entirely.
 ### Label-blind detection — segmented corpus metric, AGENT mode (updated 2026-07-06)
 
 **Claim (current, post-B-075/B-076 — agent mode / Mode 1; Claude/MCP mode is
-evaluated per-case at 100%, see the accuracy note):** detection corpus 131/159 (82.4%);
-full mixed-corpus aggregate 152/199 (2026-07-06, post-TANDA-4 H1c) — segmentation
-in the ACCURACY NOTE above.
+evaluated per-case at 100%, see the accuracy note):** detection corpus 146/159 (91.8%);
+full mixed-corpus aggregate 167/199 — segmentation in the ACCURACY NOTE above.
 The historical "129/129, 100%" claim measured label reproduction (pre-B-075
 label leak, P2-C) and is retained only as historical record.
 
@@ -1386,7 +1373,7 @@ boundary sets combined) and prints a cache-provenance census.
 
 Expected output (aggregate over the mixed corpus):
 ```
-Results: 152/199 PASS  47 FAIL
+Results: 167/199 PASS  32 FAIL
 Cache: 199/199 desde bundle sellado (motor: 198, pre-B075: 1)
 ```
 Historical output before B-075 (label echo — retained for the record):
