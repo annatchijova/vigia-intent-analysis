@@ -547,6 +547,19 @@ def validate_case_schema(case: Dict[str, Any]) -> None:
             raise CaseSchemaError(
                 f"Artefacto '{art.get('artifact_id')}': raw_score debe ser número finito"
             )
+        # FASE 2: semantic_role es opcional (default incriminatory) pero si
+        # está presente debe ser un valor del contrato — un typo silencioso
+        # ("exculpatoria") dejaría al artefacto sumando al composite cuando
+        # el examinador declaró lo contrario. Fail-loud.
+        sr = art.get("semantic_role")
+        if sr is not None and str(sr).strip().lower() not in (
+            "incriminatory", "exculpatory", "contextual"
+        ):
+            raise CaseSchemaError(
+                f"Artefacto '{art.get('artifact_id')}': semantic_role inválido "
+                f"{sr!r} — valores permitidos: incriminatory, exculpatory, "
+                f"contextual (examiner-declared, FASE 2)"
+            )
 
 
 # ===========================================================================

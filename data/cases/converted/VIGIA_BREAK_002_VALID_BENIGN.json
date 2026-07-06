@@ -53,11 +53,12 @@
         "acquisition_timestamp": "2026-04-10T10:00:00Z",
         "write_blocker_used": true,
         "examiner_id": "legacy_converter"
-      }
+      },
+      "semantic_role": "exculpatory"
     }
   ],
   "temporal_violations": [],
-  "expected_verdict": "SUSPICION",
+  "expected_verdict": "NOISE",
   "expected_confidence": 0.75,
   "expected_mitre_ttps": [
     "T1070.006"
@@ -107,5 +108,6 @@
     "source": "results/agent_batch/VIGIA_BREAK_002_VALID_BENIGN_agent_bundle.json",
     "method": "señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canónica preservada",
     "n_signals": 2
-  }
+  },
+  "_label_revision": "2026-07-06 (Fase 2 semantic_role, decision de Anna, D2): SUSPICION -> NOISE. Pentest autorizado con memo legitimo declarado exculpatory por el examinador = NOISE; la etiqueta SUSPICION del suite BREAK presuponia que la autorizacion sumaba al composite (pre-semantic_role). Veredicto anterior: SUSPICION. Contenido del caso sin cambios."
 }

@@ -456,6 +456,94 @@ def _vigia_score(case: dict) -> dict:
         }
 
     # -----------------------------------------------------------------------
+    # FASE 2 — semantic_role: dirección de la inferencia (ortogonal a B-070).
+    # `evidence_role` clasifica la CLASE del artefacto; `semantic_role`
+    # clasifica QUÉ ARGUMENTA su contenido:
+    #   incriminatory (default) — suma al composite y corrobora el gate.
+    #   exculpatory   — refutación documental (HR record, memo de
+    #                   autorización, runbook auditado): se APARTA del
+    #                   composite Y del gate B-068 (semántica V1 medida en
+    #                   docs/FASE2_EVIDENCIA_EXCULPATORIA.md §3 — un HR
+    #                   record es DEVICE por clase, así que sin este campo
+    #                   no solo sumaba el score más alto: corroboraba
+    #                   MALICE). Retenido en refutation_context del reporte.
+    #   contextual    — permanece en el composite pero NO corrobora el gate
+    #                   (mismo trato que el rol contextual de B-070).
+    #
+    # EXAMINER-DECLARED ÚNICAMENTE. Jamás derivado del contenido: el corpus
+    # adversarial contiene el ataque exacto (cebo_falso_layman,
+    # incompetencia_armamentizada, denunciante_humo — tickets lastimeros que
+    # SON la firma Carnegie) y el auto-clasificador medido degrada 9 casos
+    # maliciosos (§3, escenario S1).
+    #
+    # D1 (decisión de doctrina, Anna 2026-07-06): barra de corroboración
+    # mínima — cada exculpatorio pasa por el filtro Eco (mismo criterio que
+    # detect_eco_overinterpretation, fuente única en vigia.core.eco_check)
+    # ANTES de ser apartado. Una "refutación" cuyo texto contiene vocabulario
+    # de cebo obvio (onion, c&c, mimikatz…) NO se aparta: documentación
+    # demasiado perfecta / mal etiquetada = señal, no refutación. El evento
+    # queda sellado en refutation_context.eco_retained.
+    # -----------------------------------------------------------------------
+    try:
+        from vigia.core.eco_check import text_obvious_bait_hits as _eco_bait_hits
+    except Exception:
+        def _eco_bait_hits(_t):  # fail-open documentado: sin el módulo Eco,
+            return []            # D1 no puede evaluarse — se aparta igual.
+
+    def _semantic_role(a) -> str:
+        role = str(a.get("semantic_role", "incriminatory")).strip().lower()
+        return role if role in ("incriminatory", "exculpatory", "contextual") else "incriminatory"
+
+    def _artifact_text(a) -> str:
+        md = a.get("metadata", {})
+        preview = str(md.get("content_preview", "")) if isinstance(md, dict) else ""
+        return f"{a.get('description', '')} {preview}"
+
+    _exculpatory_set_aside = []
+    _exculpatory_eco_retained = []
+    _scored_artifacts = []
+    for a in artifacts:
+        if _semantic_role(a) == "exculpatory":
+            _hits = _eco_bait_hits(_artifact_text(a))
+            if _hits:
+                # D1: el filtro Eco disparó — la "refutación" grita ataque.
+                # Permanece en el scoring como cualquier artefacto.
+                _exculpatory_eco_retained.append({
+                    "artifact_id": a.get("artifact_id"),
+                    "evidence_type": a.get("evidence_type"),
+                    "eco_bait_terms": _hits,
+                    "note": ("examiner-declared exculpatory RETAINED in scoring: "
+                             "Eco filter fired — too-perfect/staged refutation "
+                             "is a signal, not a refutation (D1)"),
+                })
+                _scored_artifacts.append(a)
+            else:
+                _exculpatory_set_aside.append({
+                    "artifact_id": a.get("artifact_id"),
+                    "evidence_type": a.get("evidence_type"),
+                    "raw_score": a.get("raw_score"),
+                })
+        else:
+            _scored_artifacts.append(a)
+    artifacts = _scored_artifacts
+
+    if not artifacts:
+        # Toda la evidencia de dispositivo fue declarada exculpatoria por el
+        # examinador y superó el filtro Eco: refutación documental completa.
+        # NOISE explícito (no ABSTAIN: acá SÍ hay evidencia, y refuta).
+        return {
+            "verdict": "NOISE", "score": 0.0, "confidence": 0.9, "fractures": [],
+            "refutation_context": {
+                "set_aside": _exculpatory_set_aside,
+                "eco_retained": _exculpatory_eco_retained,
+            },
+            "narrative_context": [a.get("evidence_type") for a in _narrative_artifacts],
+            "reason": ("All device evidence is examiner-declared exculpatory and "
+                       "passed the Eco filter — documented refutation of malice "
+                       "(FASE 2 semantic_role)"),
+        }
+
+    # -----------------------------------------------------------------------
     # B1: Live CAIE — recompute fractures from artifacts
     # The original bug read fractures from the pre-computed JSON, so new CAIE
     # rules were never applied. Case 009 (NARRATIVE_POISONING) failed because
@@ -811,6 +899,10 @@ def _vigia_score(case: dict) -> dict:
         _tech_arts = [
             a for a in artifacts
             if _evidence_role(str(a.get("evidence_type", ""))) == _ROLE_DEVICE
+            # FASE 2: semantic_role=contextual no corrobora MALICE (mismo
+            # trato que el rol contextual de B-070); los exculpatory ya no
+            # están en `artifacts` (apartados arriba, semántica V1).
+            and _semantic_role(a) != "contextual"
         ]
         _n_arts  = len(_tech_arts)
         _n_types = len(set(a.get("evidence_type", "") for a in _tech_arts))
@@ -861,6 +953,13 @@ def _vigia_score(case: dict) -> dict:
         "caie_fractures_source":        _caie_source,
         "peirce_chain":                 case.get("peirce_chain", {}),
         "expected_verdict":             case.get("expected_verdict", "UNKNOWN"),
+        # FASE 2: artefactos exculpatorios apartados (semántica V1) + los
+        # retenidos por el filtro Eco (D1) — trazabilidad Daubert de qué
+        # refutaciones se aceptaron y cuáles se rechazaron y por qué.
+        "refutation_context": {
+            "set_aside": _exculpatory_set_aside,
+            "eco_retained": _exculpatory_eco_retained,
+        },
         # B-070: artefactos NARRATIVE apartados del scoring — retenidos para la
         # narrativa del reporte, no contribuyen al veredicto ni a la confianza.
         "narrative_context":            [

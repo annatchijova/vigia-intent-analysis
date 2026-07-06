@@ -1,15 +1,15 @@
 {
-  "agent_verdict": "MALICE",
-  "analysis_timestamp": "2026-07-06T04:39:55.988599+00:00",
+  "agent_verdict": "NOISE",
+  "analysis_timestamp": "2026-07-06T17:13:30.702466+00:00",
   "audit_trail": {
     "agent_version": "1.0.0-SANS-2026",
     "case_id": "VIGIA-BEN-009",
-    "end_time": "2026-07-06T04:39:55.988608+00:00",
+    "end_time": "2026-07-06T17:13:30.702471+00:00",
     "entries": [
       {
         "action": "AGENT_INITIALIZED",
         "case_id": "VIGIA-BEN-009",
-        "entry_sha256": "da958c45c9b8adf349d85e9e622548045366b910720114fd9c3c8d6a61a58b31",
+        "entry_sha256": "07c49f9b89f6233ae21e8be070cb461d8af537c6b9f7baf0ab1f9e221ebc53fc",
         "inputs_summary": {
           "agent_file": "/home/user/vigia-intent-analysis/vigia_agent.py",
           "case_id": "VIGIA-BEN-009"
@@ -21,13 +21,13 @@
           "agent_version": "1.0.0-SANS-2026"
         },
         "seq": 1,
-        "timestamp": "2026-07-06T04:39:55.204986+00:00",
+        "timestamp": "2026-07-06T17:13:29.871569+00:00",
         "tool": "vigia_agent"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-BEN-009",
-        "entry_sha256": "34a1e6a2c3a2d8299a40a68a1fb3dc1cc11c464b2d7e5312c898ecf16ee0f3a3",
+        "entry_sha256": "041222830701faa2577b85f5939f5e95f41b0fa9fbf82fd9f00ff042367041cc",
         "inputs_summary": {
           "path": "/home/user/vigia-intent-analysis/data/cases/converted/VIGIA-BEN-009.json"
         },
@@ -35,29 +35,29 @@
         "note": "Computing SHA-256 of original evidence",
         "outputs_summary": {},
         "seq": 2,
-        "timestamp": "2026-07-06T04:39:55.205123+00:00",
+        "timestamp": "2026-07-06T17:13:29.871736+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-BEN-009",
-        "entry_sha256": "be6e4f3cf3dcbd22500264db61cb2f8c7fecb6bf04fc9a4a5955354beb80621e",
+        "entry_sha256": "e8ad8a1f5e5a0bc7a8961906634732b65c5c155eed3ec5dc958f30debfce751f",
         "inputs_summary": {
           "path": "/home/user/vigia-intent-analysis/data/cases/converted/VIGIA-BEN-009.json"
         },
         "iteration": 0,
-        "note": "Evidence verified: 092d557dc09b73c9...",
+        "note": "Evidence verified: adfce32ebd8902e6...",
         "outputs_summary": {
-          "sha256": "092d557dc09b73c9e735b690a57b2b8db5fc0521dceb06d82991ac7dde0677fd"
+          "sha256": "adfce32ebd8902e69db02b3cd7b802b43263aa09fdb383d2038094747af5ade9"
         },
         "seq": 3,
-        "timestamp": "2026-07-06T04:39:55.205255+00:00",
+        "timestamp": "2026-07-06T17:13:29.871871+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "PIPELINE_EXECUTE",
         "case_id": "VIGIA-BEN-009",
-        "entry_sha256": "392f6085cde3d8baa998c29b365be659beebc7e4308a3c37a3b1335f5168afd0",
+        "entry_sha256": "f03ee958f0774e2c6f3562c853777f80fcd4fc2da9ed6e01dbfca4da1efcfcb3",
         "inputs_summary": {
           "evidence": "/home/user/vigia-intent-analysis/data/cases/converted/VIGIA-BEN-009.json",
           "iteration": "0",
@@ -67,13 +67,13 @@
         "note": "Executing pipeline \u2014 iteration 0",
         "outputs_summary": {},
         "seq": 4,
-        "timestamp": "2026-07-06T04:39:55.205458+00:00",
+        "timestamp": "2026-07-06T17:13:29.872045+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "PIPELINE_COMPLETE",
         "case_id": "VIGIA-BEN-009",
-        "entry_sha256": "613cf8ab4a1e91597e91cdbf384eb4b1599f86fc373f8df3dca59ee7cb4a745a",
+        "entry_sha256": "05d5a57e7b4efe64c48c9b881154bc564483f4bef6b7d25503f59d6a9066a64c",
         "inputs_summary": {
           "iteration": "0"
         },
@@ -81,9 +81,9 @@
         "note": "Pipeline completed \u2014 3 signals",
         "outputs_summary": {
           "abduction": {
-            "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
-            "best_posterior": "3/4",
-            "confidence": "3/4",
+            "best_hypothesis": "NO_SEMIOTIC_ANOMALY_DETECTED",
+            "best_posterior": "19/20",
+            "confidence": "19/20",
             "is_conclusive": "True",
             "narrative": "Directorio /var/lib/legacy_app tiene permisos 777. Es requerimiento t\u00e9cnico de aplicaci\u00f3n de 1998 que no soporta ACLs modernas, documentado en deuda t\u00e9cnica y con plan de migraci\u00f3n aprobado."
           },
@@ -94,10 +94,10 @@
             "ebs_adapter_mode": "motor",
             "expected_verdict": "NOISE",
             "resolve": {
-              "motor_confidence": "0.75",
-              "motor_reason": "Intent score 0.3734 exceeds MALICE threshold (P2+acq_assurance scale, threshold=0.33)",
-              "motor_score": "0.3734",
-              "motor_verdict": "MALICE",
+              "motor_confidence": "0.95",
+              "motor_reason": "Insufficient evidence of malicious intent (score=0.0457)",
+              "motor_score": "0.0457",
+              "motor_verdict": "NOISE",
               "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
             },
             "source": "ebs_v1_json_adapter"
@@ -130,13 +130,13 @@
           ]
         },
         "seq": 5,
-        "timestamp": "2026-07-06T04:39:55.987875+00:00",
+        "timestamp": "2026-07-06T17:13:30.701962+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "CONTRADICTION_CHECK",
         "case_id": "VIGIA-BEN-009",
-        "entry_sha256": "a04c1efd7e14be55d390356569a6ecf6990564550203f9c5aee991b02b0eebdd",
+        "entry_sha256": "5ea33c5a08b21c7a2b53d4caada329932d04b8a2c6fc2970e3228620dfee6ecd",
         "inputs_summary": {
           "n_signals": "3"
         },
@@ -147,67 +147,43 @@
           "threshold": "2"
         },
         "seq": 6,
-        "timestamp": "2026-07-06T04:39:55.988067+00:00",
+        "timestamp": "2026-07-06T17:13:30.702137+00:00",
         "tool": "contradiction_detector"
       },
       {
         "action": "AGENT_EXIT",
         "case_id": "VIGIA-BEN-009",
-        "entry_sha256": "eadff77e7cfa8488b2d568f70517040684ab5fcf0766f1d414923cc119136874",
+        "entry_sha256": "6cc7b1e992849d8ac3d17c7a1c091cbf470d799f15d600f94e2ea45007400513",
         "inputs_summary": {
-          "verdict": "MALICIOUS_INTENT_DETECTED"
+          "verdict": "NO_SEMIOTIC_ANOMALY_DETECTED"
         },
         "iteration": 0,
-        "note": "Exit code 1 (MALICE) \u2014 analysis complete.",
+        "note": "Exit code 0 (NOISE) \u2014 analysis complete.",
         "outputs_summary": {
-          "agent_verdict": "MALICE",
-          "exit_code": "1"
+          "agent_verdict": "NOISE",
+          "exit_code": "0"
         },
         "seq": 7,
-        "timestamp": "2026-07-06T04:39:55.988353+00:00",
+        "timestamp": "2026-07-06T17:13:30.702393+00:00",
         "tool": "vigia_agent"
       }
     ],
-    "start_time": "2026-07-06T04:39:55.204462+00:00",
+    "start_time": "2026-07-06T17:13:29.871259+00:00",
     "total_entries": 7
   },
   "case_id": "VIGIA-BEN-009",
   "evidence_path": "/home/user/vigia-intent-analysis/data/cases/converted/VIGIA-BEN-009.json",
-  "evidence_sha256": "092d557dc09b73c9e735b690a57b2b8db5fc0521dceb06d82991ac7dde0677fd",
+  "evidence_sha256": "adfce32ebd8902e69db02b3cd7b802b43263aa09fdb383d2038094747af5ade9",
   "iterations_executed": 1,
-  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-BEN-009 ===\nEvidence: /home/user/vigia-intent-analysis/data/cases/converted/VIGIA-BEN-009.json\nEvidence SHA-256: 092d557dc09b73c9e735b690a57b2b8db5fc0521dceb06d82991ac7dde0677fd\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 3/4\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 3 se\u00f1al(es): 3 primaria(s) de ['legacy_converter'], 0 derivada(s)/no-analizada(s). Top z: Application: legacy_app (PID 3344, start=0.85, Technical debt ticket: TD-2019-042 | 'le=0.72, ls -ld /var/lib/legacy_app | drwxrwxrwx =0.49.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: MALICIOUS_INTENT_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nDirectorio /var/lib/legacy_app tiene permisos 777. Es requerimiento t\u00e9cnico de aplicaci\u00f3n de 1998 que no soporta ACLs modernas, documentado en deuda t\u00e9cnica y con plan de migraci\u00f3n aprobado.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Application: legacy_app (PID 3344, started 2020-01-02) | User: legacy_] z=0.855 conf=0.90 \u2014 \n  [Technical debt ticket: TD-2019-042 | 'legacy_app v1.2 requires 777 for] z=0.723 conf=0.85 \u2014 \n  [ls -ld /var/lib/legacy_app | drwxrwxrwx 3 root root 4096 2020-01-01 /v] z=0.490 conf=0.70 \u2014 \n\n--- FINAL ALERT LEVEL ---\nHIGH \u2014 MALICE verdict from Bayesian posterior aggregation. Individual z-scores below threshold (distributed evidence pattern: no single dominant signal, but aggregate posterior is decisive). Alert floored (B-028/B-065).\nReconciliation: verdict MALICE rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 3 | Derived: 0 | Total: 3",
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-BEN-009 ===\nEvidence: /home/user/vigia-intent-analysis/data/cases/converted/VIGIA-BEN-009.json\nEvidence SHA-256: adfce32ebd8902e69db02b3cd7b802b43263aa09fdb383d2038094747af5ade9\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: NO_SEMIOTIC_ANOMALY_DETECTED\nPosterior confidence: 19/20\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 3 se\u00f1al(es): 3 primaria(s) de ['legacy_converter'], 0 derivada(s)/no-analizada(s). Top z: Application: legacy_app (PID 3344, start=0.85, Technical debt ticket: TD-2019-042 | 'le=0.72, ls -ld /var/lib/legacy_app | drwxrwxrwx =0.49.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: NO_SEMIOTIC_ANOMALY_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nDirectorio /var/lib/legacy_app tiene permisos 777. Es requerimiento t\u00e9cnico de aplicaci\u00f3n de 1998 que no soporta ACLs modernas, documentado en deuda t\u00e9cnica y con plan de migraci\u00f3n aprobado.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Application: legacy_app (PID 3344, started 2020-01-02) | User: legacy_] z=0.855 conf=0.90 \u2014 \n  [Technical debt ticket: TD-2019-042 | 'legacy_app v1.2 requires 777 for] z=0.723 conf=0.85 \u2014 \n  [ls -ld /var/lib/legacy_app | drwxrwxrwx 3 root root 4096 2020-01-01 /v] z=0.490 conf=0.70 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 3 | Derived: 0 | Total: 3",
   "pipeline_results": {
     "abduction": {
-      "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
-      "best_posterior": "3/4",
+      "best_hypothesis": "NO_SEMIOTIC_ANOMALY_DETECTED",
+      "best_posterior": "19/20",
       "confidence": {
         "__fraction__": true,
-        "den": 4,
-        "num": 3
-      },
-      "devil_advocate": {
-        "aggregation": {
-          "k": 3,
-          "method": "top_k_already_validated_matches_v2",
-          "total_gap_mass": "0"
-        },
-        "counterfactual_summary": {
-          "primary_alternative_hypothesis": null
-        },
-        "decision_context": {
-          "confidence": "3/4",
-          "mapped_verdict": "MALICIOUS_INTENT_DETECTED",
-          "raw_verdict": "MALICIOUS_INTENT_DETECTED",
-          "score": "827/1200"
-        },
-        "devil_advocate_source": "deterministic_no_pattern_data_available",
-        "meta": {
-          "deterministic": true,
-          "generated_from": "case_pattern_library"
-        },
-        "narrative": "Eco's Razor (Abductive Falsification) applied to verdict MALICIOUS_INTENT_DETECTED. Pattern-matching data was not available on this code path \u2014 CasePatternLibrary is not invoked here by design (agent audit-trail mode (vigia_agent.py \u2014 JSON-replay / autonomous path); see KNOWN_LIMITATIONS.md). No structured counter-hypothesis could be derived deterministically. This is a documented scope limitation of the current code path, not an absence of falsification attempt.",
-        "pattern_evidence_gaps": [],
-        "version": "r7-da-v1"
+        "den": 20,
+        "num": 19
       },
       "is_conclusive": true,
       "narrative": "Directorio /var/lib/legacy_app tiene permisos 777. Es requerimiento t\u00e9cnico de aplicaci\u00f3n de 1998 que no soporta ACLs modernas, documentado en deuda t\u00e9cnica y con plan de migraci\u00f3n aprobado."
@@ -219,10 +195,10 @@
       "ebs_adapter_mode": "motor",
       "expected_verdict": "NOISE",
       "resolve": {
-        "motor_confidence": "0.75",
-        "motor_reason": "Intent score 0.3734 exceeds MALICE threshold (P2+acq_assurance scale, threshold=0.33)",
-        "motor_score": "0.3734",
-        "motor_verdict": "MALICE",
+        "motor_confidence": "0.95",
+        "motor_reason": "Insufficient evidence of malicious intent (score=0.0457)",
+        "motor_score": "0.0457",
+        "motor_verdict": "NOISE",
         "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
       },
       "source": "ebs_v1_json_adapter"

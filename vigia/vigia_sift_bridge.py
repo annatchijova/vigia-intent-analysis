@@ -2514,60 +2514,29 @@ async def detect_eco_overinterpretation(evidence_list: list) -> dict:
     except ValueError as e:
         return {"error": str(e)}
 
-    obvious_bait = [
-        "hack", "virus", "password", "contraseña", "attack",
-        "log_deleted", "malware", "backdoor", "exploit",
-        "admin123", "root", "pwned", "compromised", "hacked",
-        # Términos de threat intel y herramientas de ataque conocidas
-        "mimikatz", "ransomware", "vssadmin", "onion", "virustotal",
-        "c2", "cobalt", "metasploit", "meterpreter", "empire",
-        "lsass", "credential", "dump", "exfil", "lateral",
-        "threatintel", "threat intel", "known_ransomware", "known malicious",
-        "public threat", "VirusTotal", "virus total",
-        # IOCs de red y atribución geográfica
-        "port scan", "portscan", "russian isp", "russian range",
-        "known russian", "isp range", "known bad", "known malware",
-        "threat intel", "blacklisted", "blocked ip", "tor exit",
-        "command and control", "c&c", "botnet",
-    ]
-    found = []
-    for ev in evidence_list:
-        hits = [p for p in obvious_bait if _word_search(p, ev.lower())]
-        if hits:
-            found.append({"evidence": ev, "obvious_terms": hits})
+    # FASE 2 / D1: la lógica pura vive en vigia.core.eco_check (fuente única)
+    # — el scorer determinista aplica EXACTAMENTE el mismo criterio a los
+    # artefactos exculpatorios antes de apartarlos. Este tool conserva la
+    # capa MCP: sanitización, timestamp y narrativa [VIGIA_VERDICT].
+    from vigia.core.eco_check import eco_overinterpretation_check
 
-    ratio = len(found) / len(evidence_list) if evidence_list else 0
-
-    if ratio > 0.5:
-        abduction = (
-            "ABDUCTIVE HYPOTHESIS: This evidence was manufactured or planted. "
-            "The real trail is elsewhere. "
-            "Look for what is NOT there, not what is."
-        )
-        vigia = (
+    result = eco_overinterpretation_check(evidence_list)
+    result["timestamp"] = _utcnow()
+    ratio = result.get("obvious_ratio", 0.0)
+    if result["verdict"] == "POSSIBLE_SCENE_STAGING":
+        result["vigia_verdict"] = (
             f"[VIGIA_VERDICT]: MALICE_BY_DISTRACTION. "
             f"Eco filter triggered: {round(ratio * 100)}% of evidence contains "
             f"obvious bait terms. Scene staging probability is high. "
             f"Invert analysis — search for significant silence."
         )
-        return {
-            "verdict"           : "POSSIBLE_SCENE_STAGING",
-            "eco_theory"        : "Attacker wants you looking here. An overly obvious scene is deliberate distraction.",
-            "suspicious_evidence": found,
-            "obvious_ratio"     : round(ratio, 2),
-            "abduction"         : abduction,
-            "suggested_action"  : "INVERT ANALYSIS: search for significant silence, not obvious noise.",
-            "timestamp"         : _utcnow(),
-            "vigia_verdict"     : vigia,
-        }
-
-    return {
-        "verdict"       : "NORMAL_DISTRIBUTION",
-        "interpretation": "Evidence distribution within expected parameters. No staging detected.",
-        "obvious_ratio" : round(ratio, 2),
-        "timestamp"     : _utcnow(),
-        "vigia_verdict" : f"[VIGIA_VERDICT]: NOISE. Evidence ratio normal ({round(ratio * 100)}% obvious terms).",
-    }
+    else:
+        result.pop("suspicious_evidence", None)  # contrato histórico del tool
+        result["vigia_verdict"] = (
+            f"[VIGIA_VERDICT]: NOISE. Evidence ratio normal "
+            f"({round(ratio * 100)}% obvious terms)."
+        )
+    return result
 
 
 _ALLOWED_HONEY_VAR_PREFIX = "VIGIA_HONEY_"

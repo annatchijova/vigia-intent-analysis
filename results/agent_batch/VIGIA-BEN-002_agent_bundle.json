@@ -1,15 +1,15 @@
 {
-  "agent_verdict": "INTENT",
-  "analysis_timestamp": "2026-07-06T04:39:49.281432+00:00",
+  "agent_verdict": "NOISE",
+  "analysis_timestamp": "2026-07-06T17:13:23.445602+00:00",
   "audit_trail": {
     "agent_version": "1.0.0-SANS-2026",
     "case_id": "VIGIA-BEN-002",
-    "end_time": "2026-07-06T04:39:49.281439+00:00",
+    "end_time": "2026-07-06T17:13:23.445608+00:00",
     "entries": [
       {
         "action": "AGENT_INITIALIZED",
         "case_id": "VIGIA-BEN-002",
-        "entry_sha256": "67ed7528eac7be2e4e7906155b5c5e19c57beb2d6917aac5eabda23b98445bba",
+        "entry_sha256": "d5569f3122ffa05905584c1fc6aedcbaf9bf74b29d0d80e68abd392abc957b71",
         "inputs_summary": {
           "agent_file": "/home/user/vigia-intent-analysis/vigia_agent.py",
           "case_id": "VIGIA-BEN-002"
@@ -21,13 +21,13 @@
           "agent_version": "1.0.0-SANS-2026"
         },
         "seq": 1,
-        "timestamp": "2026-07-06T04:39:48.469474+00:00",
+        "timestamp": "2026-07-06T17:13:22.591044+00:00",
         "tool": "vigia_agent"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-BEN-002",
-        "entry_sha256": "2650a4a7ff2083818a963f9b23d56b693aff25e0e544b66dadf219a8747eeb8f",
+        "entry_sha256": "dd4a324a7acb1f148b1adbaa437b66eefb52417c25a772582ec390a581b52fbf",
         "inputs_summary": {
           "path": "/home/user/vigia-intent-analysis/data/cases/converted/VIGIA-BEN-002.json"
         },
@@ -35,29 +35,29 @@
         "note": "Computing SHA-256 of original evidence",
         "outputs_summary": {},
         "seq": 2,
-        "timestamp": "2026-07-06T04:39:48.469640+00:00",
+        "timestamp": "2026-07-06T17:13:22.591188+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-BEN-002",
-        "entry_sha256": "b8ecc65854af4289cbf3d887ba29b6a1a3e8d2d2c5f9eed64aa3307133992959",
+        "entry_sha256": "781a0442c85d53025f6c0abd2084a8e37d4ab872fe84f2ae4143c3177e2e920b",
         "inputs_summary": {
           "path": "/home/user/vigia-intent-analysis/data/cases/converted/VIGIA-BEN-002.json"
         },
         "iteration": 0,
-        "note": "Evidence verified: 868b3fceb85d81c1...",
+        "note": "Evidence verified: 4a3145e46222b772...",
         "outputs_summary": {
-          "sha256": "868b3fceb85d81c126583acb6dadd96be35eed4d0ad5943460e01083acff7ef3"
+          "sha256": "4a3145e46222b772456da3116cb412b5f509a1c834430e0bcfed3618812996c0"
         },
         "seq": 3,
-        "timestamp": "2026-07-06T04:39:48.469775+00:00",
+        "timestamp": "2026-07-06T17:13:22.591293+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "PIPELINE_EXECUTE",
         "case_id": "VIGIA-BEN-002",
-        "entry_sha256": "6e264ef66b78aedf8cd05000b40ea8d0c766a6fbeda51fbec6689e9d2e1cdab4",
+        "entry_sha256": "8bb19739f4581eff6e23cbcac42c6d5c782ce8a871f22ce2f69f8d2b9c2078c6",
         "inputs_summary": {
           "evidence": "/home/user/vigia-intent-analysis/data/cases/converted/VIGIA-BEN-002.json",
           "iteration": "0",
@@ -67,13 +67,13 @@
         "note": "Executing pipeline \u2014 iteration 0",
         "outputs_summary": {},
         "seq": 4,
-        "timestamp": "2026-07-06T04:39:48.470006+00:00",
+        "timestamp": "2026-07-06T17:13:22.591460+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "PIPELINE_COMPLETE",
         "case_id": "VIGIA-BEN-002",
-        "entry_sha256": "f177c7c8509ce430678b0fa2adbf9ae2170ad6fe1f47eb88883e6708ef8c667f",
+        "entry_sha256": "adad58cfa7329af05bc31ca62d91bd1314e2dac0e00751c83dbdf5d05a1bde49",
         "inputs_summary": {
           "iteration": "0"
         },
@@ -81,9 +81,9 @@
         "note": "Pipeline completed \u2014 3 signals",
         "outputs_summary": {
           "abduction": {
-            "best_hypothesis": "SUSPICION_DETECTED",
-            "best_posterior": "21/50",
-            "confidence": "21/50",
+            "best_hypothesis": "NO_SEMIOTIC_ANOMALY_DETECTED",
+            "best_posterior": "19/20",
+            "confidence": "19/20",
             "is_conclusive": "True",
             "narrative": "El sistema muestra transferencia masiva de datos a las 3:15 AM. Es el backup automatizado diario configurado por el DBA hace 2 a\u00f1os, documentado en runbook y aprobado por auditor\u00eda."
           },
@@ -94,10 +94,10 @@
             "ebs_adapter_mode": "motor",
             "expected_verdict": "NOISE",
             "resolve": {
-              "motor_confidence": "0.42",
-              "motor_reason": "Significant signal with structural support (score=0.2098)",
-              "motor_score": "0.2098",
-              "motor_verdict": "SUSPICION",
+              "motor_confidence": "0.95",
+              "motor_reason": "Insufficient evidence of malicious intent (score=0.0457)",
+              "motor_score": "0.0457",
+              "motor_verdict": "NOISE",
               "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
             },
             "source": "ebs_v1_json_adapter"
@@ -130,13 +130,13 @@
           ]
         },
         "seq": 5,
-        "timestamp": "2026-07-06T04:39:49.280844+00:00",
+        "timestamp": "2026-07-06T17:13:23.444987+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "CONTRADICTION_CHECK",
         "case_id": "VIGIA-BEN-002",
-        "entry_sha256": "bd40f3f5782263a23917fb688b9623fdc129d8f2bb810038f5a0085f4d87aefc",
+        "entry_sha256": "cb9b7df8b23fe85d1156272ac6dc583829fca6d439bcb9f7053b1769e0145c7e",
         "inputs_summary": {
           "n_signals": "3"
         },
@@ -147,43 +147,43 @@
           "threshold": "2"
         },
         "seq": 6,
-        "timestamp": "2026-07-06T04:39:49.281067+00:00",
+        "timestamp": "2026-07-06T17:13:23.445203+00:00",
         "tool": "contradiction_detector"
       },
       {
         "action": "AGENT_EXIT",
         "case_id": "VIGIA-BEN-002",
-        "entry_sha256": "d524d0d453c9ec1ee53f2724b980dc3aac6b4c622a8440507fcc48d5718b3011",
+        "entry_sha256": "fc1b801daa779a8dbc95f8f6851fa0933976faf400d69fe44a6eef953d8d9fbd",
         "inputs_summary": {
-          "verdict": "SUSPICION_DETECTED"
+          "verdict": "NO_SEMIOTIC_ANOMALY_DETECTED"
         },
         "iteration": 0,
-        "note": "Exit code 3 (INTENT) \u2014 analysis complete.",
+        "note": "Exit code 0 (NOISE) \u2014 analysis complete.",
         "outputs_summary": {
-          "agent_verdict": "INTENT",
-          "exit_code": "3"
+          "agent_verdict": "NOISE",
+          "exit_code": "0"
         },
         "seq": 7,
-        "timestamp": "2026-07-06T04:39:49.281347+00:00",
+        "timestamp": "2026-07-06T17:13:23.445520+00:00",
         "tool": "vigia_agent"
       }
     ],
-    "start_time": "2026-07-06T04:39:48.468973+00:00",
+    "start_time": "2026-07-06T17:13:22.590674+00:00",
     "total_entries": 7
   },
   "case_id": "VIGIA-BEN-002",
   "evidence_path": "/home/user/vigia-intent-analysis/data/cases/converted/VIGIA-BEN-002.json",
-  "evidence_sha256": "868b3fceb85d81c126583acb6dadd96be35eed4d0ad5943460e01083acff7ef3",
+  "evidence_sha256": "4a3145e46222b772456da3116cb412b5f509a1c834430e0bcfed3618812996c0",
   "iterations_executed": 1,
-  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-BEN-002 ===\nEvidence: /home/user/vigia-intent-analysis/data/cases/converted/VIGIA-BEN-002.json\nEvidence SHA-256: 868b3fceb85d81c126583acb6dadd96be35eed4d0ad5943460e01083acff7ef3\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: SUSPICION_DETECTED\nPosterior confidence: 21/50\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 3 se\u00f1al(es): 3 primaria(s) de ['legacy_converter'], 0 derivada(s)/no-analizada(s). Top z: S3 bucket: company-backups-prod | IAM ro=0.85, /etc/cron.d/backup_db: created 2023-01-1=0.72, 00 03 * * * /usr/local/bin/backup_db.sh =0.49.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: SUSPICION_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nEl sistema muestra transferencia masiva de datos a las 3:15 AM. Es el backup automatizado diario configurado por el DBA hace 2 a\u00f1os, documentado en runbook y aprobado por auditor\u00eda.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [S3 bucket: company-backups-prod | IAM role: BackupServiceRole | Encryp] z=0.855 conf=0.90 \u2014 \n  [/etc/cron.d/backup_db: created 2023-01-10 by dba_admin | runbook_v2.4.] z=0.723 conf=0.85 \u2014 \n  [00 03 * * * /usr/local/bin/backup_db.sh --full --encrypt --destination] z=0.490 conf=0.70 \u2014 \n\n--- FINAL ALERT LEVEL ---\nMEDIUM \u2014 INTENT verdict with individual z-scores below threshold. Alert floored (B-028/B-065): an intent finding cannot present as LOW.\nReconciliation: verdict INTENT rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 3 | Derived: 0 | Total: 3",
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-BEN-002 ===\nEvidence: /home/user/vigia-intent-analysis/data/cases/converted/VIGIA-BEN-002.json\nEvidence SHA-256: 4a3145e46222b772456da3116cb412b5f509a1c834430e0bcfed3618812996c0\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: NO_SEMIOTIC_ANOMALY_DETECTED\nPosterior confidence: 19/20\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 3 se\u00f1al(es): 3 primaria(s) de ['legacy_converter'], 0 derivada(s)/no-analizada(s). Top z: S3 bucket: company-backups-prod | IAM ro=0.85, /etc/cron.d/backup_db: created 2023-01-1=0.72, 00 03 * * * /usr/local/bin/backup_db.sh =0.49.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: NO_SEMIOTIC_ANOMALY_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nEl sistema muestra transferencia masiva de datos a las 3:15 AM. Es el backup automatizado diario configurado por el DBA hace 2 a\u00f1os, documentado en runbook y aprobado por auditor\u00eda.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [S3 bucket: company-backups-prod | IAM role: BackupServiceRole | Encryp] z=0.855 conf=0.90 \u2014 \n  [/etc/cron.d/backup_db: created 2023-01-10 by dba_admin | runbook_v2.4.] z=0.723 conf=0.85 \u2014 \n  [00 03 * * * /usr/local/bin/backup_db.sh --full --encrypt --destination] z=0.490 conf=0.70 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 3 | Derived: 0 | Total: 3",
   "pipeline_results": {
     "abduction": {
-      "best_hypothesis": "SUSPICION_DETECTED",
-      "best_posterior": "21/50",
+      "best_hypothesis": "NO_SEMIOTIC_ANOMALY_DETECTED",
+      "best_posterior": "19/20",
       "confidence": {
         "__fraction__": true,
-        "den": 50,
-        "num": 21
+        "den": 20,
+        "num": 19
       },
       "is_conclusive": true,
       "narrative": "El sistema muestra transferencia masiva de datos a las 3:15 AM. Es el backup automatizado diario configurado por el DBA hace 2 a\u00f1os, documentado en runbook y aprobado por auditor\u00eda."
@@ -195,10 +195,10 @@
       "ebs_adapter_mode": "motor",
       "expected_verdict": "NOISE",
       "resolve": {
-        "motor_confidence": "0.42",
-        "motor_reason": "Significant signal with structural support (score=0.2098)",
-        "motor_score": "0.2098",
-        "motor_verdict": "SUSPICION",
+        "motor_confidence": "0.95",
+        "motor_reason": "Insufficient evidence of malicious intent (score=0.0457)",
+        "motor_score": "0.0457",
+        "motor_verdict": "NOISE",
         "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
       },
       "source": "ebs_v1_json_adapter"

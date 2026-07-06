@@ -1,17 +1,17 @@
 {
-  "agent_verdict": "INTENT",
-  "analysis_timestamp": "2026-07-06T02:08:32.507692+00:00",
+  "agent_verdict": "NOISE",
+  "analysis_timestamp": "2026-07-06T17:13:52.286733+00:00",
   "audit_trail": {
     "agent_version": "1.0.0-SANS-2026",
     "case_id": "VIGIA_BREAK_002_VALID_BENIGN",
-    "end_time": "2026-07-06T02:08:32.507698+00:00",
+    "end_time": "2026-07-06T17:13:52.286739+00:00",
     "entries": [
       {
         "action": "AGENT_INITIALIZED",
         "case_id": "VIGIA_BREAK_002_VALID_BENIGN",
-        "entry_sha256": "e84bcb7974ed099983544c514ac4a2f7a103c2e94ba706d2856b868ccc78bc0f",
+        "entry_sha256": "ef4748134badb9c7416def155f7674d6d35229ccfd83d8bf0e59ade1c11f615f",
         "inputs_summary": {
-          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "agent_file": "/home/user/vigia-intent-analysis/vigia_agent.py",
           "case_id": "VIGIA_BREAK_002_VALID_BENIGN"
         },
         "iteration": 0,
@@ -21,45 +21,45 @@
           "agent_version": "1.0.0-SANS-2026"
         },
         "seq": 1,
-        "timestamp": "2026-07-06T02:08:32.461876+00:00",
+        "timestamp": "2026-07-06T17:13:51.496706+00:00",
         "tool": "vigia_agent"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA_BREAK_002_VALID_BENIGN",
-        "entry_sha256": "d4d7db4f24eea30ac52c4ed8b07c0dd08da10a076dff94601e1e7d3a2748c5cc",
+        "entry_sha256": "d2b90542a7a491758f9c66d00ceb6fb604b4b95033b61dee1fa9823e3d1eeada",
         "inputs_summary": {
-          "path": "/home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA_BREAK_002_VALID_BENIGN.json"
+          "path": "/home/user/vigia-intent-analysis/data/cases/converted/VIGIA_BREAK_002_VALID_BENIGN.json"
         },
         "iteration": 0,
         "note": "Computing SHA-256 of original evidence",
         "outputs_summary": {},
         "seq": 2,
-        "timestamp": "2026-07-06T02:08:32.461961+00:00",
+        "timestamp": "2026-07-06T17:13:51.496864+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA_BREAK_002_VALID_BENIGN",
-        "entry_sha256": "a4d3fac7442cc7442be4447fed16d7e68ee78c51186c0a03f1c1efa1e398620e",
+        "entry_sha256": "511d41233c2775664571e55308a01ff12d04d0afb112859c34dbbb7242bf0334",
         "inputs_summary": {
-          "path": "/home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA_BREAK_002_VALID_BENIGN.json"
+          "path": "/home/user/vigia-intent-analysis/data/cases/converted/VIGIA_BREAK_002_VALID_BENIGN.json"
         },
         "iteration": 0,
-        "note": "Evidence verified: 24b0f724bb848282...",
+        "note": "Evidence verified: 7de26333c82ac7bc...",
         "outputs_summary": {
-          "sha256": "24b0f724bb848282384cd0bd46cb2c571e1c40ff85adbaf27dd44683eeb3e1b5"
+          "sha256": "7de26333c82ac7bc10e2c7cc0c9a486e2a4102d1da41eebda325d68ffac5b7b4"
         },
         "seq": 3,
-        "timestamp": "2026-07-06T02:08:32.462057+00:00",
+        "timestamp": "2026-07-06T17:13:51.496961+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "PIPELINE_EXECUTE",
         "case_id": "VIGIA_BREAK_002_VALID_BENIGN",
-        "entry_sha256": "afebe9c117da287091a7e18e052ee076bdd513ee7d7f4afb85d661f124ed3fbe",
+        "entry_sha256": "1baa686315c918011246a404872a0a195363d1b6e92ec1987d952c3d3babcd8d",
         "inputs_summary": {
-          "evidence": "/home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA_BREAK_002_VALID_BENIGN.json",
+          "evidence": "/home/user/vigia-intent-analysis/data/cases/converted/VIGIA_BREAK_002_VALID_BENIGN.json",
           "iteration": "0",
           "params": {}
         },
@@ -67,13 +67,13 @@
         "note": "Executing pipeline \u2014 iteration 0",
         "outputs_summary": {},
         "seq": 4,
-        "timestamp": "2026-07-06T02:08:32.462159+00:00",
+        "timestamp": "2026-07-06T17:13:51.497134+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "PIPELINE_COMPLETE",
         "case_id": "VIGIA_BREAK_002_VALID_BENIGN",
-        "entry_sha256": "28eceaf66660a74a6ce38d3aea60a880152108a0285c196ed4a7f8fc77836a1d",
+        "entry_sha256": "4ff4884cad6818d4d0da3a97f5f9a41ce6d2222546426ac1250aa51b9082594e",
         "inputs_summary": {
           "iteration": "0"
         },
@@ -81,10 +81,10 @@
         "note": "Pipeline completed \u2014 2 signals",
         "outputs_summary": {
           "abduction": {
-            "best_hypothesis": "SUSPICION_DETECTED",
-            "best_posterior": "1/5",
-            "confidence": "1/5",
-            "is_conclusive": "False",
+            "best_hypothesis": "NO_SEMIOTIC_ANOMALY_DETECTED",
+            "best_posterior": "47/50",
+            "confidence": "47/50",
+            "is_conclusive": "True",
             "narrative": "Actividad sospechosa pero autorizada (pentest)"
           },
           "case_id": "VIGIA_BREAK_002_VALID_BENIGN",
@@ -92,12 +92,12 @@
             "artifact_count": "2",
             "avg_score": "51/80",
             "ebs_adapter_mode": "motor",
-            "expected_verdict": "SUSPICION",
+            "expected_verdict": "NOISE",
             "resolve": {
-              "motor_confidence": "0.2",
-              "motor_reason": "Significant signal with structural support (score=0.1010)",
-              "motor_score": "0.101",
-              "motor_verdict": "SUSPICION",
+              "motor_confidence": "0.94",
+              "motor_reason": "Insufficient evidence of malicious intent (score=0.0595)",
+              "motor_score": "0.0595",
+              "motor_verdict": "NOISE",
               "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
             },
             "source": "ebs_v1_json_adapter"
@@ -122,13 +122,13 @@
           ]
         },
         "seq": 5,
-        "timestamp": "2026-07-06T02:08:32.507362+00:00",
+        "timestamp": "2026-07-06T17:13:52.286120+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "CONTRADICTION_CHECK",
         "case_id": "VIGIA_BREAK_002_VALID_BENIGN",
-        "entry_sha256": "d4c782e6f446cd6916d2a87efcb0785bfa2b383004fe2a4772ca04fc007ebf32",
+        "entry_sha256": "a9c75b93cd8304506c399f953187761a0e3ef088c89daf1d03ddadca74e1107a",
         "inputs_summary": {
           "n_signals": "2"
         },
@@ -139,45 +139,45 @@
           "threshold": "2"
         },
         "seq": 6,
-        "timestamp": "2026-07-06T02:08:32.507478+00:00",
+        "timestamp": "2026-07-06T17:13:52.286319+00:00",
         "tool": "contradiction_detector"
       },
       {
         "action": "AGENT_EXIT",
         "case_id": "VIGIA_BREAK_002_VALID_BENIGN",
-        "entry_sha256": "fa1ba9031ba1896afaa5b9b02ff0b4e3833e29029e77131c952fdde68e692871",
+        "entry_sha256": "f82f7f7d3ff190c375c260d350fd6a49128334d3c8235af76c82a2a579beee16",
         "inputs_summary": {
-          "verdict": "SUSPICION_DETECTED"
+          "verdict": "NO_SEMIOTIC_ANOMALY_DETECTED"
         },
         "iteration": 0,
-        "note": "Exit code 3 (INTENT) \u2014 analysis complete.",
+        "note": "Exit code 0 (NOISE) \u2014 analysis complete.",
         "outputs_summary": {
-          "agent_verdict": "INTENT",
-          "exit_code": "3"
+          "agent_verdict": "NOISE",
+          "exit_code": "0"
         },
         "seq": 7,
-        "timestamp": "2026-07-06T02:08:32.507643+00:00",
+        "timestamp": "2026-07-06T17:13:52.286653+00:00",
         "tool": "vigia_agent"
       }
     ],
-    "start_time": "2026-07-06T02:08:32.461667+00:00",
+    "start_time": "2026-07-06T17:13:51.496399+00:00",
     "total_entries": 7
   },
   "case_id": "VIGIA_BREAK_002_VALID_BENIGN",
-  "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA_BREAK_002_VALID_BENIGN.json",
-  "evidence_sha256": "24b0f724bb848282384cd0bd46cb2c571e1c40ff85adbaf27dd44683eeb3e1b5",
+  "evidence_path": "/home/user/vigia-intent-analysis/data/cases/converted/VIGIA_BREAK_002_VALID_BENIGN.json",
+  "evidence_sha256": "7de26333c82ac7bc10e2c7cc0c9a486e2a4102d1da41eebda325d68ffac5b7b4",
   "iterations_executed": 1,
-  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA_BREAK_002_VALID_BENIGN ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA_BREAK_002_VALID_BENIGN.json\nEvidence SHA-256: 24b0f724bb848282384cd0bd46cb2c571e1c40ff85adbaf27dd44683eeb3e1b5\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: SUSPICION_DETECTED\nPosterior confidence: 1/5\nConclusive: NO \u2014 requires human review\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 2 se\u00f1al(es): 2 primaria(s) de ['legacy_converter'], 0 derivada(s)/no-analizada(s). Top z: nmap, mimikatz, exfil simulation=0.64, authorized pentest window approved=0.64.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: SUSPICION_DETECTED. Conclusiva: no \u2014 requiere revisi\u00f3n humana.\n\nRazonamiento del motor abductivo:\nActividad sospechosa pero autorizada (pentest)\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [nmap, mimikatz, exfil simulation] z=0.637 conf=0.85 \u2014 \n  [authorized pentest window approved] z=0.637 conf=0.85 \u2014 \n\n--- FINAL ALERT LEVEL ---\nMEDIUM \u2014 INTENT verdict with individual z-scores below threshold. Alert floored (B-028/B-065): an intent finding cannot present as LOW.\nReconciliation: verdict INTENT rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 2 | Derived: 0 | Total: 2",
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA_BREAK_002_VALID_BENIGN ===\nEvidence: /home/user/vigia-intent-analysis/data/cases/converted/VIGIA_BREAK_002_VALID_BENIGN.json\nEvidence SHA-256: 7de26333c82ac7bc10e2c7cc0c9a486e2a4102d1da41eebda325d68ffac5b7b4\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: NO_SEMIOTIC_ANOMALY_DETECTED\nPosterior confidence: 47/50\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 2 se\u00f1al(es): 2 primaria(s) de ['legacy_converter'], 0 derivada(s)/no-analizada(s). Top z: nmap, mimikatz, exfil simulation=0.64, authorized pentest window approved=0.64.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: NO_SEMIOTIC_ANOMALY_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nActividad sospechosa pero autorizada (pentest)\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [nmap, mimikatz, exfil simulation] z=0.637 conf=0.85 \u2014 \n  [authorized pentest window approved] z=0.637 conf=0.85 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 2 | Derived: 0 | Total: 2",
   "pipeline_results": {
     "abduction": {
-      "best_hypothesis": "SUSPICION_DETECTED",
-      "best_posterior": "1/5",
+      "best_hypothesis": "NO_SEMIOTIC_ANOMALY_DETECTED",
+      "best_posterior": "47/50",
       "confidence": {
         "__fraction__": true,
-        "den": 5,
-        "num": 1
+        "den": 50,
+        "num": 47
       },
-      "is_conclusive": false,
+      "is_conclusive": true,
       "narrative": "Actividad sospechosa pero autorizada (pentest)"
     },
     "case_id": "VIGIA_BREAK_002_VALID_BENIGN",
@@ -185,12 +185,12 @@
       "artifact_count": 2,
       "avg_score": "51/80",
       "ebs_adapter_mode": "motor",
-      "expected_verdict": "SUSPICION",
+      "expected_verdict": "NOISE",
       "resolve": {
-        "motor_confidence": "0.2",
-        "motor_reason": "Significant signal with structural support (score=0.1010)",
-        "motor_score": "0.101",
-        "motor_verdict": "SUSPICION",
+        "motor_confidence": "0.94",
+        "motor_reason": "Insufficient evidence of malicious intent (score=0.0595)",
+        "motor_score": "0.0595",
+        "motor_verdict": "NOISE",
         "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
       },
       "source": "ebs_v1_json_adapter"
