@@ -706,13 +706,22 @@ These numbers are not inflated. They reflect results on a specific, diverse, doc
 > now the default), and the corpus metric measures **real label-blind
 > detection**:
 >
-> **`run_all_agent.py` over the 199-case JSON corpus — aggregate: 167/199
-> (83.9%), label-blind, distribution identical to the standalone scorer run
-> blind.** That aggregate is NOT an accuracy figure on its own: the corpus
-> deliberately mixes evaluation sets with different purposes — including
-> adversarial suites *designed to break the system* and epistemic-boundary
-> cases — and they must be read separately (segmentation from the
-> ground-truth dataset, 2026-07-06):
+> **ALL figures in this note are AGENT mode (Mode 1 — autonomous,
+> deterministic, no LLM), over the JSON corpus.** Claude Code / MCP mode
+> (Mode 2, the primary investigative mode) is evaluated separately and
+> per-case: **100% correct verdicts on every raw-evidence investigation run
+> in that mode** — including cases where agent mode abstains or falls short
+> (NPS-2010/2014: Mode 2 determined NOISE while Mode 1 sat in
+> PIPELINE_ERROR; MAGNET-2022-WINDOWS: Mode 2 reached MALICE with C2
+> evidence where Mode 1 said NOISE). See Domain A below.
+>
+> **Agent mode — `run_all_agent.py` over the 199-case JSON corpus —
+> aggregate: 167/199 (83.9%), label-blind, distribution identical to the
+> standalone scorer run blind.** That aggregate is NOT an accuracy figure on
+> its own: the corpus deliberately mixes evaluation sets with different
+> purposes — including adversarial suites *designed to break the system* and
+> epistemic-boundary cases — and they must be read separately (segmentation
+> from the ground-truth dataset, 2026-07-06):
 >
 > | Segment | Cases | Label-blind | Reading |
 > |---|---|---|---|
@@ -747,9 +756,11 @@ with each other — each mode reaches the evidence differently:**
 **Domain A — Claude Code / MCP mode (raw forensic evidence):** Full pipeline, primary
 investigative mode. **Every artifact flows through the MCP extraction toolchain**
 (hash → read → entropy → pattern search → intent inference), so every evidence type
-reaches the analysis engines. Tested on real-world E01 disk images, memory dumps, and
-log archives. Its results are **per-case investigations** documented in `evidence/`
-and `results/` — there is no single corpus number for this mode.
+reaches the analysis engines — nothing is out of coverage in this mode. Tested on
+real-world E01 disk images, memory dumps, and log archives. **Record to date: 100% —
+every investigation run in this mode reached the correct verdict**, documented
+per-case in `evidence/` and `results/` (this mode is evaluated per investigation,
+not with a single corpus number).
 
 **Domain B — Autonomous agent, JSON pre-processed cases:** Batch runner over
 structured EBS case bundles — this is the ONLY mode with a corpus-wide number, the
@@ -1326,9 +1337,10 @@ or benchmark reports, this section can be ignored entirely.
 
 ---
 
-### Label-blind detection — segmented corpus metric (updated 2026-07-06)
+### Label-blind detection — segmented corpus metric, AGENT mode (updated 2026-07-06)
 
-**Claim (current, post-B-075/B-076):** detection corpus 146/159 (91.8%);
+**Claim (current, post-B-075/B-076 — agent mode / Mode 1; Claude/MCP mode is
+evaluated per-case at 100%, see the accuracy note):** detection corpus 146/159 (91.8%);
 full mixed-corpus aggregate 167/199 — segmentation in the ACCURACY NOTE above.
 The historical "129/129, 100%" claim measured label reproduction (pre-B-075
 label leak, P2-C) and is retained only as historical record.

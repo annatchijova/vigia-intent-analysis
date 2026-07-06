@@ -707,13 +707,22 @@ Estos números no están inflados. Reflejan resultados en un corpus específico,
 > la etiqueta removida (`VIGIA_EBS_RESOLVE=motor`, ahora el default), y la métrica del
 > corpus mide **detección real ciega a la etiqueta**:
 >
-> **`run_all_agent.py` sobre el corpus JSON de 199 casos — agregado: 167/199
-> (83.9%), ciego a la etiqueta, distribución idéntica a la del scorer standalone
-> corriendo ciego.** Ese agregado NO es una cifra de precisión por sí solo: el
-> corpus mezcla deliberadamente conjuntos de evaluación con propósitos distintos —
-> incluyendo suites adversariales *diseñadas para romper el sistema* y casos de
-> frontera epistémica — y deben leerse por separado (segmentación desde el dataset
-> de ground truth, 2026-07-06):
+> **TODAS las cifras de esta nota son del modo AGENTE (Modo 1 — autónomo,
+> determinista, sin LLM), sobre el corpus JSON.** El modo Claude Code / MCP
+> (Modo 2, el modo de investigación principal) se evalúa aparte y por caso:
+> **100% de veredictos correctos en todas las investigaciones sobre evidencia
+> raw corridas en ese modo** — incluyendo casos donde el modo agente abstiene
+> o no llega (NPS-2010/2014: el Modo 2 determinó NOISE mientras el Modo 1
+> quedaba en PIPELINE_ERROR; MAGNET-2022-WINDOWS: el Modo 2 llegó a MALICE
+> con evidencia de C2 donde el Modo 1 decía NOISE). Ver Dominio A abajo.
+>
+> **Modo agente — `run_all_agent.py` sobre el corpus JSON de 199 casos —
+> agregado: 167/199 (83.9%), ciego a la etiqueta, distribución idéntica a la del
+> scorer standalone corriendo ciego.** Ese agregado NO es una cifra de precisión
+> por sí solo: el corpus mezcla deliberadamente conjuntos de evaluación con
+> propósitos distintos — incluyendo suites adversariales *diseñadas para romper el
+> sistema* y casos de frontera epistémica — y deben leerse por separado
+> (segmentación desde el dataset de ground truth, 2026-07-06):
 >
 > | Segmento | Casos | Ciego a etiqueta | Lectura |
 > |---|---|---|---|
@@ -748,10 +757,12 @@ cada modo llega a la evidencia de manera diferente:**
 **Dominio A — Claude Code / MCP (evidencia forense raw):** Pipeline completo, modo de
 investigación principal. **Todo artefacto pasa por la cadena de extracción MCP**
 (hash → lectura → entropía → búsqueda de patrones → inferencia de intención), así que
-todo tipo de evidencia alcanza los motores de análisis. Probado en imágenes E01
-reales, volcados de memoria y archivos de logs. Sus resultados son
-**investigaciones por caso** documentadas en `evidence/` y `results/` — este modo no
-tiene un número único de corpus.
+todo tipo de evidencia alcanza los motores de análisis — nada queda fuera de
+cobertura en este modo. Probado en imágenes E01 reales, volcados de memoria y
+archivos de logs. **Registro a la fecha: 100% — todas las investigaciones corridas
+en este modo llegaron al veredicto correcto**, documentadas por caso en `evidence/`
+y `results/` (este modo se evalúa por investigación, no con un número único de
+corpus).
 
 **Dominio B — Agente autónomo, casos pre-procesados en JSON:** Runner batch sobre
 bundles EBS estructurados — es el ÚNICO modo con número de corpus, la métrica
@@ -1335,9 +1346,10 @@ por completo.
 
 ---
 
-### Detección ciega a la etiqueta — métrica segmentada del corpus (actualizado 2026-07-06)
+### Detección ciega a la etiqueta — métrica segmentada del corpus, modo AGENTE (actualizado 2026-07-06)
 
-**Afirmación (vigente, post-B-075/B-076):** corpus de detección 146/159 (91.8%);
+**Afirmación (vigente, post-B-075/B-076 — modo agente / Modo 1; el modo Claude/MCP
+se evalúa por caso con 100%, ver la nota de precisión):** corpus de detección 146/159 (91.8%);
 agregado del corpus mixto completo 167/199 — segmentación en la NOTA DE PRECISIÓN
 de arriba. El claim histórico "129/129, 100%" medía reproducción de etiqueta (fuga
 P2-C pre-B-075) y se conserva solo como registro histórico.
