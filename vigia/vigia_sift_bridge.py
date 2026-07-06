@@ -131,13 +131,11 @@ mcp = FastMCP("Vigia_Sift_Bridge")
 MAX_TEXT_LENGTH    = 50_000   # 50 KB por texto individual
 MAX_TEXTS_IN_LIST  = 20       # máximo ítems por llamada de lista
 MAX_TOTAL_BYTES    = 500_000  # 500 KB total por llamada
-MAX_PATTERN_LENGTH = 200      # máximo largo de patrón grep
 MAX_FILE_PREVIEW   = 100_000  # máximo bytes de preview de archivo
 
-# Gemini P0: fullmatch (not match) — ensures the ENTIRE pattern conforms,
-# not just the prefix. The $ anchor is a real end-of-string anchor, not \$
-# (which would match a literal dollar sign and let trailing garbage through).
-_ALLOWED_PATTERN = re.compile(r'^[\w\s.\-_@#!?,;:]+$')
+# H4/TANDA 2: MAX_PATTERN_LENGTH y _ALLOWED_PATTERN se movieron con la
+# función canónica a vigia.security.sandbox (MAX_GREP_PATTERN_LENGTH,
+# _ALLOWED_GREP_PATTERN) — una sola fuente para el contrato del validador.
 
 
 # _sanitize_path viene de vigia.security (version completa con null byte,
@@ -171,53 +169,12 @@ def _sanitize_text_list(texts: list) -> list:
     return [_sanitize_text(t) for t in texts]
 
 
-def _sanitize_grep_pattern(pattern: str) -> str:
-    """
-    Valida patron grep para prevenir inyeccion de comandos.
-
-    Gemini P0 fix: uses re.fullmatch (not re.match) to ensure the ENTIRE
-    string conforms to the whitelist. re.match only checks from the start,
-    so a pattern like "safe_text\x00; rm -rf /" would pass match but fail
-    fullmatch.
-    """
-    if not isinstance(pattern, str):
-        raise ValueError("Pattern must be a string.")
-    if len(pattern) > MAX_PATTERN_LENGTH:
-        raise ValueError(f"Pattern too long. Maximum: {MAX_PATTERN_LENGTH} chars.")
-    if "\x00" in pattern:
-        audit_logger.log_block(
-            event_type="GREP_PATTERN_NULL_BYTE",
-            tool="_sanitize_grep_pattern",
-            input_preview=pattern[:50],
-            reason="Null byte in grep pattern — C-string truncation attack.",
-        )
-        raise ValueError("Pattern contains null byte.")
-    # Rechazo explicito de homoglifos Unicode
-    try:
-        pattern.encode("ascii")
-    except UnicodeEncodeError:
-        audit_logger.log_block(
-            event_type="GREP_PATTERN_HOMOGLYPH",
-            tool="_sanitize_grep_pattern",
-            input_preview=pattern[:50],
-            reason="Non-ASCII characters in grep pattern — homoglyph injection.",
-        )
-        raise ValueError(
-            "Pattern contains non-ASCII characters. "
-            "Unicode homoglyph injection detected."
-        )
-    if not _ALLOWED_PATTERN.fullmatch(pattern):
-        audit_logger.log_block(
-            event_type="GREP_PATTERN_REJECTED",
-            tool="_sanitize_grep_pattern",
-            input_preview=pattern[:50],
-            reason="Pattern contains disallowed characters.",
-        )
-        raise ValueError(
-            "Pattern contains disallowed characters. "
-            "Only alphanumeric, spaces and . - _ @ # ! ? , ; : are permitted."
-        )
-    return pattern
+# H4 / TANDA 2 (2026-07-06): _sanitize_grep_pattern vive en
+# vigia.security.sandbox (fuente única, fail-closed). La copia local era una
+# de dos implementaciones divergentes con el mismo nombre — la del sandbox
+# mutaba el patrón silenciosamente (strip NUL + truncado). Se conserva el
+# nombre importable desde este módulo (tests e2e y consumidores existentes).
+from vigia.security.sandbox import _sanitize_grep_pattern  # noqa: E402,F401
 
 
 def _utcnow() -> str:

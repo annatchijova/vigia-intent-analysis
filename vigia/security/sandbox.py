@@ -33,6 +33,7 @@ from __future__ import annotations
 
 import asyncio
 import os
+import re
 import resource
 import sys
 import warnings
@@ -350,18 +351,69 @@ async def sandboxed_execute(
     }
 
 
+# ── Validación canónica de patrones grep (H4 / TANDA 2, 2026-07-06) ─────────
+# Antes había DOS _sanitize_grep_pattern divergentes: este (fail-open —
+# strip silencioso de NUL + truncado a 512: el patrón EJECUTADO difería del
+# pedido sin ninguna señal, resultados forenses mal atribuidos) y el del
+# bridge (fail-closed — whitelist + rechazo con audit log). La canónica es la
+# estricta: los tests e2e ya fijaban su contrato (rechaza inyección shell y
+# homoglifos) y una herramienta forense no puede mutar silenciosamente lo que
+# el analista pidió buscar. El bridge ahora re-exporta esta.
+
+MAX_GREP_PATTERN_LENGTH: Final = 200      # máximo largo de patrón grep
+_ALLOWED_GREP_PATTERN = re.compile(r'^[\w\s.\-_@#!?,;:]+$')
+
+
 def _sanitize_grep_pattern(pattern: str) -> str:
     """
-    Strip characters that could cause grep to behave unexpectedly even when
-    passed via exec list (not shell).  In particular, NUL bytes would silently
-    truncate the pattern string in C land.
+    Valida patron grep para prevenir inyeccion de comandos. Fail-closed:
+    rechaza con ValueError (y audit log) en lugar de mutar silenciosamente.
+
+    Gemini P0 fix: uses re.fullmatch (not re.match) to ensure the ENTIRE
+    string conforms to the whitelist. re.match only checks from the start,
+    so a pattern like "safe_text\\x00; rm -rf /" would pass match but fail
+    fullmatch.
     """
-    # Remove NUL bytes
-    cleaned = pattern.replace("\x00", "")
-    # Warn if the pattern is suspiciously long
-    if len(cleaned) > 512:
-        cleaned = cleaned[:512]
-    return cleaned
+    from vigia.security import audit_logger  # lazy: evita import circular
+
+    if not isinstance(pattern, str):
+        raise ValueError("Pattern must be a string.")
+    if len(pattern) > MAX_GREP_PATTERN_LENGTH:
+        raise ValueError(f"Pattern too long. Maximum: {MAX_GREP_PATTERN_LENGTH} chars.")
+    if "\x00" in pattern:
+        audit_logger.log_block(
+            event_type="GREP_PATTERN_NULL_BYTE",
+            tool="_sanitize_grep_pattern",
+            input_preview=pattern[:50],
+            reason="Null byte in grep pattern — C-string truncation attack.",
+        )
+        raise ValueError("Pattern contains null byte.")
+    # Rechazo explicito de homoglifos Unicode
+    try:
+        pattern.encode("ascii")
+    except UnicodeEncodeError:
+        audit_logger.log_block(
+            event_type="GREP_PATTERN_HOMOGLYPH",
+            tool="_sanitize_grep_pattern",
+            input_preview=pattern[:50],
+            reason="Non-ASCII characters in grep pattern — homoglyph injection.",
+        )
+        raise ValueError(
+            "Pattern contains non-ASCII characters. "
+            "Unicode homoglyph injection detected."
+        )
+    if not _ALLOWED_GREP_PATTERN.fullmatch(pattern):
+        audit_logger.log_block(
+            event_type="GREP_PATTERN_REJECTED",
+            tool="_sanitize_grep_pattern",
+            input_preview=pattern[:50],
+            reason="Pattern contains disallowed characters.",
+        )
+        raise ValueError(
+            "Pattern contains disallowed characters. "
+            "Only alphanumeric, spaces and . - _ @ # ! ? , ; : are permitted."
+        )
+    return pattern
 
 
 async def safe_grep(
@@ -389,7 +441,11 @@ async def safe_grep(
         scan_volume_bytes (int)    – total bytes in scanned directory tree
         depth_limit_applied (int) – the effective depth limit used
     """
-    from vigia.security import _sanitize_path  # local import avoids circular
+    # local imports avoid circular (vigia.security.__init__ importa sandbox).
+    # audit_logger: TANDA 2 — estaba SIN bindear en este módulo; safe_grep
+    # crasheaba con NameError en la primera llamada real (línea del
+    # GREP_DEPTH_LIMIT log). Latente porque el corpus JSON no ejercita grep.
+    from vigia.security import _sanitize_path, audit_logger
 
     # Validate folder path
     try:
@@ -461,7 +517,12 @@ async def safe_grep(
     except OSError as exc:
         return {"matches": [], "truncated": False, "error": f"Cannot stat directory: {exc}"}
 
-    clean_pattern = _sanitize_grep_pattern(pattern)
+    # TANDA 2: validación fail-closed — un patrón inválido se rechaza con el
+    # motivo exacto; nunca se ejecuta una versión silenciosamente alterada.
+    try:
+        clean_pattern = _sanitize_grep_pattern(pattern)
+    except ValueError as exc:
+        return {"matches": [], "truncated": False, "error": str(exc)}
     if not clean_pattern:
         return {"matches": [], "truncated": False, "error": "Empty pattern after sanitisation."}
 
