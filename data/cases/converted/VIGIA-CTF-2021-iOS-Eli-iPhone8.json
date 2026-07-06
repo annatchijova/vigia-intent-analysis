@@ -37,7 +37,11 @@
         "messages": 5,
         "conversations": 1,
         "message_date_range": "2021-03-04 to 2021-03-07",
-        "auto_destruct_fields": ["ZBURNONREAD", "ZLIFESPAN", "ZCLEANUPTIME"]
+        "auto_destruct_fields": [
+          "ZBURNONREAD",
+          "ZLIFESPAN",
+          "ZCLEANUPTIME"
+        ]
       }
     },
     {
@@ -95,7 +99,13 @@
         "date_range": "2021-03-04 to 2021-03-07",
         "encrypted": true,
         "auto_destruct": true,
-        "message_types": [0, 0, 7, 0, 0]
+        "message_types": [
+          0,
+          0,
+          7,
+          0,
+          0
+        ]
       }
     },
     {
@@ -120,7 +130,17 @@
       "metadata": {
         "contact_count": 1,
         "only_contact": "Apple Inc",
-        "numbers_in_cache": ["+15854178420", "+15713106012", "+13323730653", "+18337750707", "+15415005105", "+15852944011", "+19789036241", "+17067568825", "+15854498817"]
+        "numbers_in_cache": [
+          "+15854178420",
+          "+15713106012",
+          "+13323730653",
+          "+18337750707",
+          "+15415005105",
+          "+15852944011",
+          "+19789036241",
+          "+17067568825",
+          "+15854498817"
+        ]
       }
     },
     {
@@ -161,7 +181,10 @@
       "verdict": "SUSPICION",
       "confidence": "MEDIUM",
       "status": "CONFIRMED",
-      "mitre_ttps": ["T1573", "T1572"],
+      "mitre_ttps": [
+        "T1573",
+        "T1572"
+      ],
       "devil_advocate": "Wickr Me era popular entre usuarios privacy-conscious. Psiphon puede indicar acceso desde red restrictiva. Millones usan apps cifradas sin intencion maliciosa."
     },
     {
@@ -170,7 +193,9 @@
       "verdict": "SUSPICION",
       "confidence": "HIGH",
       "status": "CONFIRMED",
-      "mitre_ttps": ["T1102"],
+      "mitre_ttps": [
+        "T1102"
+      ],
       "devil_advocate": "SMS es template auto-generado de Wickr via funcion 'invite friend'. Muchos usuarios envian invitaciones sin implicaciones operativas."
     },
     {
@@ -221,5 +246,157 @@
     "filesystem_graykey": "6f12b7adaca815015112afaa5de21ffe72287ad6ead5f9dcac7dd4af2b980ced",
     "memory_graykey": "6cfdbcf0d4c24f6e3dabcad03e0ed5b19a2c47fadae41c4eaf7928fe201cbdc0"
   },
-  "analysis_timestamp": "2026-06-28T02:34:35Z"
+  "analysis_timestamp": "2026-06-28T02:34:35Z",
+  "signals": [
+    {
+      "artifact_id": "wickr_app",
+      "confidence": {
+        "__fraction__": true,
+        "den": 2,
+        "num": 1
+      },
+      "description": "WickrEnterprise (com.mywickr.wickr) with embedded PsiphonTunnel.framework for censorship circumvention VPN. WickrID: eflatt610.",
+      "evidence_type": "registry_key",
+      "source": "filesystem_analysis",
+      "z_score": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 7
+      }
+    },
+    {
+      "artifact_id": "signal_app",
+      "confidence": {
+        "__fraction__": true,
+        "den": 2,
+        "num": 1
+      },
+      "description": "Signal v5.4.0 (org.whispersystems.signal) registered 2021-02-16 via SMS code 191-116. Database exists (signal.sqlite, SQLCipher encrypted).",
+      "evidence_type": "registry_key",
+      "source": "filesystem_analysis",
+      "z_score": {
+        "__fraction__": true,
+        "den": 4,
+        "num": 1
+      }
+    },
+    {
+      "artifact_id": "protonmail_app",
+      "confidence": {
+        "__fraction__": true,
+        "den": 2,
+        "num": 1
+      },
+      "description": "ProtonMail (ch.protonmail.protonmail) with iCloud sync enabled. Persistent queue directories present.",
+      "evidence_type": "registry_key",
+      "source": "filesystem_analysis",
+      "z_score": {
+        "__fraction__": true,
+        "den": 4,
+        "num": 1
+      }
+    },
+    {
+      "artifact_id": "wickr_recruitment_sms",
+      "confidence": {
+        "__fraction__": true,
+        "den": 2,
+        "num": 1
+      },
+      "description": "SMS sent from device recruiting contact +15713106012 to join Wickr: 'Hey! Join me on Wickr for the most secure communications experience - for FREE! Getting started is easy >> https://me-download.wick",
+      "evidence_type": "cultural_marker",
+      "source": "sms_analysis",
+      "z_score": {
+        "__fraction__": true,
+        "den": 5,
+        "num": 2
+      }
+    },
+    {
+      "artifact_id": "wickr_messages",
+      "confidence": {
+        "__fraction__": true,
+        "den": 2,
+        "num": 1
+      },
+      "description": "5 encrypted Wickr messages with auto-destruct between 2021-03-04 and 2021-03-07. All ZBODY fields are encrypted blobs. Message 3 is type 7 (media/call). Content irrecoverable without Wickr session key",
+      "evidence_type": "log_entry",
+      "source": "database_analysis",
+      "z_score": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 3
+      }
+    },
+    {
+      "artifact_id": "prepaid_carrier",
+      "confidence": {
+        "__fraction__": true,
+        "den": 2,
+        "num": 1
+      },
+      "description": "Total Wireless prepaid carrier. No contract. Reduced traceability compared to postpaid carriers.",
+      "evidence_type": "user_agent",
+      "source": "keychain_analysis",
+      "z_score": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 3
+      }
+    },
+    {
+      "artifact_id": "empty_contacts",
+      "confidence": {
+        "__fraction__": true,
+        "den": 2,
+        "num": 1
+      },
+      "description": "AddressBook contains only 1 contact (Apple Inc / 1-800-MY-APPLE). All personal contacts exist only in ephemeral SMS/iMessage cache.",
+      "evidence_type": "cultural_marker",
+      "source": "addressbook_analysis",
+      "z_score": {
+        "__fraction__": true,
+        "den": 4,
+        "num": 1
+      }
+    },
+    {
+      "artifact_id": "empty_locations",
+      "confidence": {
+        "__fraction__": true,
+        "den": 2,
+        "num": 1
+      },
+      "description": "routined/Local.sqlite completely empty (0 visits, 0 learned locations, 0 WiFi APs). Only 1 geofence in consolidated.db: Burlington, VT (44.4737N, -73.2134W).",
+      "evidence_type": "cultural_marker",
+      "source": "location_analysis",
+      "z_score": {
+        "__fraction__": true,
+        "den": 5,
+        "num": 1
+      }
+    },
+    {
+      "artifact_id": "weak_passcode",
+      "confidence": {
+        "__fraction__": true,
+        "den": 2,
+        "num": 1
+      },
+      "description": "Passcode 185185 — 6-digit numeric, repeating pattern, Shannon entropy 1.585 bits. Inconsistent with privacy-focused app selection.",
+      "evidence_type": "cultural_marker",
+      "source": "passcode_analysis",
+      "z_score": {
+        "__fraction__": true,
+        "den": 40,
+        "num": 3
+      }
+    }
+  ],
+  "_migration_note": {
+    "date": "2026-07-06",
+    "source": "results/agent_batch/VIGIA-CTF-2021-iOS-Eli-iPhone8_agent_bundle.json",
+    "method": "señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canónica preservada",
+    "n_signals": 9
+  }
 }

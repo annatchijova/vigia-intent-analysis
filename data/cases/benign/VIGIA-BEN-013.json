@@ -47,5 +47,61 @@
     "thirdness": "Es cumplimiento regulatorio de retención de datos. El borrado es selectivo (solo >30 días), documentado, y excluye logs de auditoría. No hay indicio de anti-forense."
   },
   "source_origin": "synthetic_validation",
-  "why_not_malice": "El borrado tiene raíz en política GDPR aprobada y auditada. Es selectivo y no toca logs de auditoría."
+  "why_not_malice": "El borrado tiene raíz en política GDPR aprobada y auditada. Es selectivo y no toca logs de auditoría.",
+  "signals": [
+    {
+      "artifact_id": "ART-001",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 3
+      },
+      "description": "00 02 * * * /usr/local/bin/cleanup_logs.sh --retention=30 --path=/var/log/app | crontab -l shows entry from 2023-05-20 | User: log_admin | Script signed by: dpo@company.com",
+      "evidence_type": "log_entry",
+      "source": "legacy_converter",
+      "z_score": {
+        "__fraction__": true,
+        "den": 400,
+        "num": 21
+      }
+    },
+    {
+      "artifact_id": "ART-002",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 3
+      },
+      "description": "GDPR compliance doc v3.2, section 4.3: 'Application logs retained for 30 days maximum. Automated deletion after retention period.' | Approved by: DPO | Legal review: 2023-04-15 | Audit: PASSED 2024-Q1",
+      "evidence_type": "file_timestamp",
+      "source": "legacy_converter",
+      "z_score": {
+        "__fraction__": true,
+        "den": 800,
+        "num": 51
+      }
+    },
+    {
+      "artifact_id": "ART-003",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 3
+      },
+      "description": "cleanup_logs.sh content: find /var/log/app -name '*.log' -mtime +30 -delete | Logs to syslog: 'Deleted 45 files older than 30 days' | No deletion of files < 30 days | No deletion of audit logs (/var/l",
+      "evidence_type": "log_entry",
+      "source": "legacy_converter",
+      "z_score": {
+        "__fraction__": true,
+        "den": 800,
+        "num": 57
+      }
+    }
+  ],
+  "_migration_note": {
+    "date": "2026-07-06",
+    "source": "results/agent_batch/VIGIA-BEN-013_agent_bundle.json",
+    "method": "señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canónica preservada",
+    "n_signals": 3
+  }
 }

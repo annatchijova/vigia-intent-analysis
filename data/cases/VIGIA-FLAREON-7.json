@@ -5,7 +5,12 @@
   "description": "FLARE-On 7 challenge set released in September 2020 by FireEye FLARE team. The zip archive (25,655,653 bytes, SHA-256: bafa1659743bbf55c015ebe7c72d2809f763c498d429505c6c8cee467cdcd877) contains 11 CTF challenges (numbered 1–11) plus a 7zip_password.txt. 2020 edition is notable for the Tizen smartwatch challenge (TKApp, ch5) and a corrupted-file challenge (garbage, ch2). Challenges range from a Python game (fidler, 11 MB) to a deep rabbit-hole reversing chain (rabbithole, ch11). FLARE-On 7 was held during COVID-19, themed accordingly.",
   "expected_verdict": "INTENT",
   "expected_confidence": 0.92,
-  "expected_mitre_ttps": ["T1027", "T1059.006", "T1564", "T1036"],
+  "expected_mitre_ttps": [
+    "T1027",
+    "T1059.006",
+    "T1564",
+    "T1036"
+  ],
   "peirce_chain": {
     "firstness": "11 challenges covering Python game (ch1 fidler, 11 MB), corrupted PE (ch2 garbage), large game binary (ch3 wednesday, 10 MB), Office document malware (ch4 report), Tizen smartwatch app (ch5 TKApp), JavaScript obfuscation (ch6 codeit), IDA/RE crowd analysis (ch7 re_crowd), Aardvark unknown (ch8), Windows kernel driver (ch9 crackinstaller), filesystem break (ch10 break), rabbit hole chain (ch11 rabbithole).",
     "secondness": "The 2020 collection deliberately spans mobile (Tizen), desktop (Python, .NET), kernel (driver), and document (Office) technique classes — precisely the threat surface a DFIR team would encounter in a single enterprise incident. Challenge 2 ('garbage') is a structurally corrupted file where repair is part of the puzzle — this is not an accident; it teaches header reconstruction skills required when threat actors corrupt evidence. Challenge 11 ('rabbithole') by name signals a multi-stage chained reversing puzzle mimicking APT layered obfuscation.",
@@ -55,8 +60,8 @@
       "evidence_type": "binary",
       "source_tool": "list_files",
       "timestamp": "2020-09-11T09:47:00Z",
-      "raw_score": 0.60,
-      "prior_trust": 0.90,
+      "raw_score": 0.6,
+      "prior_trust": 0.9,
       "provenance_chain": [
         "sha256:bafa1659743bbf55c015ebe7c72d2809f763c498d429505c6c8cee467cdcd877",
         "zip_entry:1 - fidler.7z"
@@ -82,7 +87,7 @@
       "source_tool": "list_files",
       "timestamp": "2020-09-11T10:23:00Z",
       "raw_score": 0.75,
-      "prior_trust": 0.90,
+      "prior_trust": 0.9,
       "provenance_chain": [
         "sha256:bafa1659743bbf55c015ebe7c72d2809f763c498d429505c6c8cee467cdcd877",
         "zip_entry:2 - garbage.7z"
@@ -107,8 +112,8 @@
       "evidence_type": "binary",
       "source_tool": "list_files",
       "timestamp": "2020-09-11T10:37:00Z",
-      "raw_score": 0.70,
-      "prior_trust": 0.90,
+      "raw_score": 0.7,
+      "prior_trust": 0.9,
       "provenance_chain": [
         "sha256:bafa1659743bbf55c015ebe7c72d2809f763c498d429505c6c8cee467cdcd877",
         "zip_entry:3 - wednesday.7z"
@@ -133,8 +138,8 @@
       "evidence_type": "binary",
       "source_tool": "list_files",
       "timestamp": "2020-09-11T11:06:00Z",
-      "raw_score": 0.80,
-      "prior_trust": 0.90,
+      "raw_score": 0.8,
+      "prior_trust": 0.9,
       "provenance_chain": [
         "sha256:bafa1659743bbf55c015ebe7c72d2809f763c498d429505c6c8cee467cdcd877",
         "zip_entry:4 - report.7z"
@@ -160,7 +165,7 @@
       "source_tool": "list_files",
       "timestamp": "2020-09-11T11:21:00Z",
       "raw_score": 0.85,
-      "prior_trust": 0.90,
+      "prior_trust": 0.9,
       "provenance_chain": [
         "sha256:bafa1659743bbf55c015ebe7c72d2809f763c498d429505c6c8cee467cdcd877",
         "zip_entry:5 - TKApp.7z"
@@ -186,7 +191,7 @@
       "source_tool": "list_files",
       "timestamp": "2020-09-11T11:41:00Z",
       "raw_score": 0.75,
-      "prior_trust": 0.90,
+      "prior_trust": 0.9,
       "provenance_chain": [
         "sha256:bafa1659743bbf55c015ebe7c72d2809f763c498d429505c6c8cee467cdcd877",
         "zip_entry:6 - codeit.7z"
@@ -211,8 +216,8 @@
       "evidence_type": "network_traffic",
       "source_tool": "list_files",
       "timestamp": "2020-09-11T11:53:00Z",
-      "raw_score": 0.80,
-      "prior_trust": 0.90,
+      "raw_score": 0.8,
+      "prior_trust": 0.9,
       "provenance_chain": [
         "sha256:bafa1659743bbf55c015ebe7c72d2809f763c498d429505c6c8cee467cdcd877",
         "zip_entry:7 - re_crowd.7z"
@@ -237,8 +242,8 @@
       "evidence_type": "binary",
       "source_tool": "list_files",
       "timestamp": "2020-09-11T12:08:00Z",
-      "raw_score": 0.70,
-      "prior_trust": 0.90,
+      "raw_score": 0.7,
+      "prior_trust": 0.9,
       "provenance_chain": [
         "sha256:bafa1659743bbf55c015ebe7c72d2809f763c498d429505c6c8cee467cdcd877",
         "zip_entry:8 - Aardvark.7z"
@@ -264,7 +269,7 @@
       "source_tool": "list_files",
       "timestamp": "2020-09-22T10:54:00Z",
       "raw_score": 0.85,
-      "prior_trust": 0.90,
+      "prior_trust": 0.9,
       "provenance_chain": [
         "sha256:bafa1659743bbf55c015ebe7c72d2809f763c498d429505c6c8cee467cdcd877",
         "zip_entry:9 - crackinstaller.7z"
@@ -289,8 +294,8 @@
       "evidence_type": "binary",
       "source_tool": "list_files",
       "timestamp": "2020-09-11T12:25:00Z",
-      "raw_score": 0.80,
-      "prior_trust": 0.90,
+      "raw_score": 0.8,
+      "prior_trust": 0.9,
       "provenance_chain": [
         "sha256:bafa1659743bbf55c015ebe7c72d2809f763c498d429505c6c8cee467cdcd877",
         "zip_entry:10 - break.7z"
@@ -315,8 +320,8 @@
       "evidence_type": "binary",
       "source_tool": "list_files",
       "timestamp": "2020-09-11T12:46:00Z",
-      "raw_score": 0.90,
-      "prior_trust": 0.90,
+      "raw_score": 0.9,
+      "prior_trust": 0.9,
       "provenance_chain": [
         "sha256:bafa1659743bbf55c015ebe7c72d2809f763c498d429505c6c8cee467cdcd877",
         "zip_entry:11 - rabbithole.7z"
@@ -344,5 +349,205 @@
     "No sandbox execution was performed."
   ],
   "source_dataset": "FLARE-On 7 CTF — FireEye FLARE Team (2020)",
-  "source_origin": "public_ctf_archive"
+  "source_origin": "public_ctf_archive",
+  "signals": [
+    {
+      "artifact_id": "flareon7-zip-001",
+      "confidence": {
+        "__fraction__": true,
+        "den": 100,
+        "num": 99
+      },
+      "description": "Outer zip archive Flare-On7_Challenges.zip. SHA-256 verified against task specification. Size: 25,655,653 bytes. Contains 12 entries: 11 challenge 7z archives + 7zip_password.txt. Archive dated 2020-0",
+      "evidence_type": "file_hash",
+      "source": "generate_forensic_hash",
+      "z_score": {
+        "__fraction__": true,
+        "den": 2000,
+        "num": 1881
+      }
+    },
+    {
+      "artifact_id": "flareon7-ch1-fidler",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 9
+      },
+      "description": "Challenge 01 — fidler (10,989,697 bytes). Python game reverse engineering. 'Fidler' suggests a click/idle game built in Python (likely PyInstaller-packed). Technique class: Python decompilation / PyIn",
+      "evidence_type": "binary",
+      "source": "list_files",
+      "z_score": {
+        "__fraction__": true,
+        "den": 50,
+        "num": 27
+      }
+    },
+    {
+      "artifact_id": "flareon7-ch2-garbage",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 9
+      },
+      "description": "Challenge 02 — garbage (39,872 bytes). Corrupted PE file challenge. Name signals intentional file corruption. Participants must repair the PE header before executing or analyzing. Technique class: fil",
+      "evidence_type": "binary",
+      "source": "list_files",
+      "z_score": {
+        "__fraction__": true,
+        "den": 40,
+        "num": 27
+      }
+    },
+    {
+      "artifact_id": "flareon7-ch3-wednesday",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 9
+      },
+      "description": "Challenge 03 — wednesday (10,222,625 bytes). 10 MB binary, possibly a game or animation. 'Wednesday' may reference the Addams Family character or COVID-era isolation ('it's Wednesday my dudes' meme). ",
+      "evidence_type": "binary",
+      "source": "list_files",
+      "z_score": {
+        "__fraction__": true,
+        "den": 100,
+        "num": 63
+      }
+    },
+    {
+      "artifact_id": "flareon7-ch4-report",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 9
+      },
+      "description": "Challenge 04 — report (789,856 bytes). Name 'report' and size suggest an Office document or PDF with embedded macros/shellcode. Technique class: document malware / VBA macro / embedded payload (T1566.",
+      "evidence_type": "binary",
+      "source": "list_files",
+      "z_score": {
+        "__fraction__": true,
+        "den": 25,
+        "num": 18
+      }
+    },
+    {
+      "artifact_id": "flareon7-ch5-tkapp",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 9
+      },
+      "description": "Challenge 05 — TKApp (1,749,312 bytes). Tizen OS application (.tpk) for Samsung wearables/smart TVs. 'TK' = Tizen + Key. Technique class: Tizen/mobile reverse engineering / C# decompilation / non-stan",
+      "evidence_type": "binary",
+      "source": "list_files",
+      "z_score": {
+        "__fraction__": true,
+        "den": 200,
+        "num": 153
+      }
+    },
+    {
+      "artifact_id": "flareon7-ch6-codeit",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 9
+      },
+      "description": "Challenge 06 — codeit (455,568 bytes). AutoIt script challenge. 'codeit' references CodeIt, an AutoIt obfuscation tool. Technique class: AutoIt deobfuscation / script analysis (T1059).",
+      "evidence_type": "binary",
+      "source": "list_files",
+      "z_score": {
+        "__fraction__": true,
+        "den": 40,
+        "num": 27
+      }
+    },
+    {
+      "artifact_id": "flareon7-ch7-re_crowd",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 9
+      },
+      "description": "Challenge 07 — re_crowd (78,864 bytes). Name suggests 'reverse the crowd' — likely a network PCAP analysis with crowd-sourced data. Technique class: network traffic analysis / HTTP command decoding.",
+      "evidence_type": "network_traffic",
+      "source": "list_files",
+      "z_score": {
+        "__fraction__": true,
+        "den": 25,
+        "num": 18
+      }
+    },
+    {
+      "artifact_id": "flareon7-ch8-aardvark",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 9
+      },
+      "description": "Challenge 08 — Aardvark (59,152 bytes). 'Aardvark' comes first alphabetically — may be a meta-joke about challenge ordering or reference to a specific RE framework. Technique class: unknown binary / c",
+      "evidence_type": "binary",
+      "source": "list_files",
+      "z_score": {
+        "__fraction__": true,
+        "den": 100,
+        "num": 63
+      }
+    },
+    {
+      "artifact_id": "flareon7-ch9-crackinstaller",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 9
+      },
+      "description": "Challenge 09 — crackinstaller (114,336 bytes). Windows kernel driver / installer challenge. Name 'crackinstaller' suggests a malicious installer that drops a kernel driver. Technique class: kernel dri",
+      "evidence_type": "binary",
+      "source": "list_files",
+      "z_score": {
+        "__fraction__": true,
+        "den": 200,
+        "num": 153
+      }
+    },
+    {
+      "artifact_id": "flareon7-ch10-break",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 9
+      },
+      "description": "Challenge 10 — break (596,688 bytes). Name 'break' suggests breaking a crypto scheme, a debugger challenge, or a protocol. Technique class: cryptanalysis / debugger anti-analysis.",
+      "evidence_type": "binary",
+      "source": "list_files",
+      "z_score": {
+        "__fraction__": true,
+        "den": 25,
+        "num": 18
+      }
+    },
+    {
+      "artifact_id": "flareon7-ch11-rabbithole",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 9
+      },
+      "description": "Challenge 11 — rabbithole (557,952 bytes). Final challenge. 'Rabbithole' signals a deep, multi-stage reversing chain where each layer reveals another layer — mirroring real-world APT-style layered obf",
+      "evidence_type": "binary",
+      "source": "list_files",
+      "z_score": {
+        "__fraction__": true,
+        "den": 100,
+        "num": 81
+      }
+    }
+  ],
+  "_migration_note": {
+    "date": "2026-07-06",
+    "source": "results/agent_batch/VIGIA-FLAREON-7_agent_bundle.json",
+    "method": "señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canónica preservada",
+    "n_signals": 12
+  }
 }

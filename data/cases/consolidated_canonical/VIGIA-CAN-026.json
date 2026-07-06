@@ -113,5 +113,77 @@
     "secondness": "Confrontation + blame inversion + managerial appeal without evidence. Memory confirms Mimikatz.",
     "thirdness": "Habit of using escalated interpersonal aggression to nullify the forensic process through hierarchical intimidation."
   },
-  "notes": "Inverted Carnegie: the attacker uses intimidation so the analyst feels insecure and stops the investigation."
+  "notes": "Inverted Carnegie: the attacker uses intimidation so the analyst feels insecure and stops the investigation.",
+  "signals": [
+    {
+      "artifact_id": "a108_01",
+      "confidence": {
+        "__fraction__": true,
+        "den": 5,
+        "num": 2
+      },
+      "description": "SOC inquiry: 'We detected unusual activity on your account yesterday at 03:15. Can you confirm if it was you?'",
+      "evidence_type": "memory_process",
+      "source": "sift_chat_system",
+      "z_score": {
+        "__fraction__": true,
+        "den": 125,
+        "num": 46
+      }
+    },
+    {
+      "artifact_id": "a108_02",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 3
+      },
+      "description": "Response: 'Why are you asking me? Don't you trust my work? I already spoke with the manager about the excessive monitoring'. Technical question unanswered.",
+      "evidence_type": "memory_process",
+      "source": "sift_chat_system",
+      "z_score": {
+        "__fraction__": true,
+        "den": 250,
+        "num": 69
+      }
+    },
+    {
+      "artifact_id": "a108_03",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 19
+      },
+      "description": "powershell.exe process in memory: downloading payload from 185.220.101.42, executing Mimikatz, credentials dumped.",
+      "evidence_type": "memory_process",
+      "source": "sift_volatility",
+      "z_score": {
+        "__fraction__": true,
+        "den": 200,
+        "num": 171
+      }
+    },
+    {
+      "artifact_id": "a108_04",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 3
+      },
+      "description": "Management verification: NO communication record between user@corp.com and manager@corp.com in the 48h window.",
+      "evidence_type": "log_entry",
+      "source": "sift_syslog",
+      "z_score": {
+        "__fraction__": true,
+        "den": 500,
+        "num": 9
+      }
+    }
+  ],
+  "_migration_note": {
+    "date": "2026-07-06",
+    "source": "results/agent_batch/VIGIA-CAN-026_agent_bundle.json",
+    "method": "señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canónica preservada",
+    "n_signals": 4
+  }
 }

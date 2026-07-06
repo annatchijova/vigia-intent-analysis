@@ -105,5 +105,77 @@
     "secondness": "Recent ctime. MFT entry posterior to 2026 entries. 7 zeros in sub-seconds.",
     "thirdness": "Habit of copying timestamps from legitimate binaries to blend in. The ctime and MFT are the layers that cannot be forged from userspace."
   },
-  "notes": "Two independent golden rules: MFT_ENTRY_ANOMALY + TIMESTAMP_PRECISION_ANOMALY."
+  "notes": "Two independent golden rules: MFT_ENTRY_ANOMALY + TIMESTAMP_PRECISION_ANOMALY.",
+  "signals": [
+    {
+      "artifact_id": "a024_01",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 7
+      },
+      "description": "system_updater.elf: mtime=2022-03-15T10:00:00Z (identical to /usr/bin/ls). ctime=2026-07-01T12:00:00Z (3 hours ago). 7 zeros in sub-seconds.",
+      "evidence_type": "file_timestamp",
+      "source": "sift_sleuthkit",
+      "z_score": {
+        "__fraction__": true,
+        "den": 125,
+        "num": 77
+      }
+    },
+    {
+      "artifact_id": "a024_02",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 9
+      },
+      "description": "MFT entry #147823 assigned after #147822 (2026 timestamps) but carries a 2022 mtime. Monotonicity violation.",
+      "evidence_type": "mft_entry",
+      "source": "sift_mft_parser",
+      "z_score": {
+        "__fraction__": true,
+        "den": 100,
+        "num": 81
+      }
+    },
+    {
+      "artifact_id": "a024_03",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 17
+      },
+      "description": "SHA-256 hash not present in any known binary database for the distribution. Not a system file.",
+      "evidence_type": "file_hash",
+      "source": "sift_sha256",
+      "z_score": {
+        "__fraction__": true,
+        "den": 500,
+        "num": 391
+      }
+    },
+    {
+      "artifact_id": "a024_04",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 19
+      },
+      "description": "system_updater in memory with a 4MB RWX region not backed by a file on disk. Active reverse shell.",
+      "evidence_type": "memory_process",
+      "source": "sift_volatility",
+      "z_score": {
+        "__fraction__": true,
+        "den": 2000,
+        "num": 1653
+      }
+    }
+  ],
+  "_migration_note": {
+    "date": "2026-07-06",
+    "source": "results/agent_batch/VIGIA-CAN-037_agent_bundle.json",
+    "method": "señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canónica preservada",
+    "n_signals": 4
+  }
 }

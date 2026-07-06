@@ -87,5 +87,61 @@
     "schema_version": "1.1",
     "source_file": "VIGIA_FP_FN_AMB.json",
     "source_origin": "synthetic_vigia_collective"
+  },
+  "signals": [
+    {
+      "artifact_id": "amb002_01",
+      "confidence": {
+        "__fraction__": true,
+        "den": 5,
+        "num": 3
+      },
+      "description": "Tier-1 analyst disabled DLP rule DLP-001",
+      "evidence_type": "log_entry",
+      "source": "sift_syslog",
+      "z_score": {
+        "__fraction__": true,
+        "den": 100,
+        "num": 33
+      }
+    },
+    {
+      "artifact_id": "amb002_02",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 7
+      },
+      "description": "Analyst: 'Oops, accidentally touched a DLP rule. Already re-enabled it'",
+      "evidence_type": "log_entry",
+      "source": "sift_chat_system",
+      "z_score": {
+        "__fraction__": true,
+        "den": 200,
+        "num": 7
+      }
+    },
+    {
+      "artifact_id": "amb002_03",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 19
+      },
+      "description": "No malicious processes on tier1_003 workstation",
+      "evidence_type": "memory_process",
+      "source": "sift_volatility",
+      "z_score": {
+        "__fraction__": true,
+        "den": 400,
+        "num": 19
+      }
+    }
+  ],
+  "_migration_note": {
+    "date": "2026-07-06",
+    "source": "results/agent_batch/VIGIA-AMB-002_agent_bundle.json",
+    "method": "señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canónica preservada",
+    "n_signals": 3
   }
 }

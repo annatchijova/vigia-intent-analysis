@@ -88,5 +88,61 @@
     "schema_version": "1.1",
     "source_file": "VIGIA_BREAK_011_016.json",
     "source_origin": "synthetic_vigia_collective"
+  },
+  "signals": [
+    {
+      "artifact_id": "b013_01",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 17
+      },
+      "description": "50 git commits with valid hashes, correct GPG signatures, coherent timestamps",
+      "evidence_type": "file_hash",
+      "source": "sift_git_audit",
+      "z_score": {
+        "__fraction__": true,
+        "den": 400,
+        "num": 17
+      }
+    },
+    {
+      "artifact_id": "b013_02",
+      "confidence": {
+        "__fraction__": true,
+        "den": 5,
+        "num": 3
+      },
+      "description": "Timestamp variance between commits: exactly 3600.0 seconds (1 hour) in all cases. Commit message entropy: 4.2 bits (human expected: 5.5-7.0)",
+      "evidence_type": "memory_process",
+      "source": "sift_entropy",
+      "z_score": {
+        "__fraction__": true,
+        "den": 125,
+        "num": 69
+      }
+    },
+    {
+      "artifact_id": "b013_03",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 7
+      },
+      "description": "Modified filenames: a.py, b.py, c.py... ax.py. Perfect alphabetical sequential pattern.",
+      "evidence_type": "memory_process",
+      "source": "sift_file_audit",
+      "z_score": {
+        "__fraction__": true,
+        "den": 125,
+        "num": 77
+      }
+    }
+  ],
+  "_migration_note": {
+    "date": "2026-07-06",
+    "source": "results/agent_batch/VIGIA-BREAK-013_agent_bundle.json",
+    "method": "señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canónica preservada",
+    "n_signals": 3
   }
 }

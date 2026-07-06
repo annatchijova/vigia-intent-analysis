@@ -1,7 +1,7 @@
 {
   "case_id": "case_002_log_fabrication",
-  "name": "Log Fabrication \u2014 Statistical Uniformity",
-  "description": "50 log entries arrive with suspiciously uniform 2-second intervals and identical entropy. Naive system flags MALICE. VIG\u00cdA detects correlation, reduces confidence.",
+  "name": "Log Fabrication — Statistical Uniformity",
+  "description": "50 log entries arrive with suspiciously uniform 2-second intervals and identical entropy. Naive system flags MALICE. VIGÍA detects correlation, reduces confidence.",
   "artifacts": [
     {
       "artifact_id": "log_bulk_001",
@@ -54,9 +54,9 @@
       },
       "effect": {
         "artifact_id": "log_bulk_001",
-        "description": "Interval std=0.001s \u2014 inhuman precision"
+        "description": "Interval std=0.001s — inhuman precision"
       },
-      "interpretation": "2.000s \u00b1 0.001s intervals across 50 events. Human typing or real attacks have variance > 0.1s. This is scripted injection."
+      "interpretation": "2.000s ± 0.001s intervals across 50 events. Human typing or real attacks have variance > 0.1s. This is scripted injection."
     }
   ],
   "naive_verdict": "MALICE",
@@ -74,7 +74,7 @@
   "peirce_chain": {
     "firstness": "50 AuthFailure log entries with near-perfect 2s intervals",
     "secondness": "Memory shows no process capable of generating these events",
-    "thirdness": "Logs are fabricated \u2014 high correlation, zero independent confirmation"
+    "thirdness": "Logs are fabricated — high correlation, zero independent confirmation"
   },
   "baseline_comparison": {
     "naive": {
@@ -89,5 +89,45 @@
     }
   },
   "demo_command": "python compare_baseline.py --case cases/case_002_log_fabrication.json",
-  "demo_quote": "The baseline sees 50 strong log entries and concludes MALICE. VIG\u00cdA detects temporal uniformity and memory contradiction, reducing confidence and avoiding a false positive."
+  "demo_quote": "The baseline sees 50 strong log entries and concludes MALICE. VIGÍA detects temporal uniformity and memory contradiction, reducing confidence and avoiding a false positive.",
+  "signals": [
+    {
+      "artifact_id": "log_bulk_001",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 13
+      },
+      "description": "50 log entries: AuthFailure events, 2.000s intervals, entropy=3.145 each",
+      "evidence_type": "log_entry",
+      "source": "read_evidence",
+      "z_score": {
+        "__fraction__": true,
+        "den": 25,
+        "num": 13
+      }
+    },
+    {
+      "artifact_id": "memory_001",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 19
+      },
+      "description": "Memory scan: NO brute force tool running. No network socket matching log source.",
+      "evidence_type": "memory_process",
+      "source": "list_processes",
+      "z_score": {
+        "__fraction__": true,
+        "den": 200,
+        "num": 19
+      }
+    }
+  ],
+  "_migration_note": {
+    "date": "2026-07-06",
+    "source": "results/agent_batch/case_002_log_fabrication_agent_bundle.json",
+    "method": "señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canónica preservada",
+    "n_signals": 2
+  }
 }

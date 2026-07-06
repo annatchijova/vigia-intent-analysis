@@ -86,5 +86,77 @@
     "secondness": "shred -n 7 for a 2KB file. Disproportionate asymmetry between size and destruction effort.",
     "thirdness": "Habit of eliminating activity traces with forensic-destructive tools. Over-destruction is the footprint."
   },
-  "notes": "Eco: Meaningful Silence. Absence is the dirtiest footprint. The asymmetry screams concealment."
+  "notes": "Eco: Meaningful Silence. Absence is the dirtiest footprint. The asymmetry screams concealment.",
+  "signals": [
+    {
+      "artifact_id": "a009_01",
+      "confidence": {
+        "__fraction__": true,
+        "den": 25,
+        "num": 23
+      },
+      "description": "Command: shred -n 7 -z -u /tmp/nota.txt. DoD 5220.22-M method (7 passes). File: 2,048 bytes.",
+      "evidence_type": "memory_process",
+      "source": "sift_auditd",
+      "z_score": {
+        "__fraction__": true,
+        "den": 625,
+        "num": 529
+      }
+    },
+    {
+      "artifact_id": "a009_02",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 7
+      },
+      "description": "Directory entry deleted. Inode reassigned. No recovery possible post-shred. MFT confirms overwriting.",
+      "evidence_type": "memory_process",
+      "source": "sift_sleuthkit",
+      "z_score": {
+        "__fraction__": true,
+        "den": 250,
+        "num": 161
+      }
+    },
+    {
+      "artifact_id": "a009_03",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 19
+      },
+      "description": "shred process in memory with handle to the file. Previous bash history: access to a credentials file 40 minutes earlier.",
+      "evidence_type": "memory_process",
+      "source": "sift_volatility",
+      "z_score": {
+        "__fraction__": true,
+        "den": 400,
+        "num": 361
+      }
+    },
+    {
+      "artifact_id": "a009_04",
+      "confidence": {
+        "__fraction__": true,
+        "den": 5,
+        "num": 2
+      },
+      "description": "Access to /tmp/nota.txt 40 minutes before the destruction. SSH session from an unrecognized IP.",
+      "evidence_type": "log_entry",
+      "source": "sift_syslog",
+      "z_score": {
+        "__fraction__": true,
+        "den": 250,
+        "num": 7
+      }
+    }
+  ],
+  "_migration_note": {
+    "date": "2026-07-06",
+    "source": "results/agent_batch/VIGIA-CAN-035_agent_bundle.json",
+    "method": "señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canónica preservada",
+    "n_signals": 4
+  }
 }

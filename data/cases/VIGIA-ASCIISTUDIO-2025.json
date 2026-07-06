@@ -85,5 +85,45 @@
   "caie_fractures": [],
   "source_dataset": "VIGÍA Real Evidence Corpus — Open-Source Software",
   "source_origin": "github_archive",
-  "_expected_verdict_correction_note": "Corregido de 'NOISE' a 'ABSTAIN' el 2026-07-02: n_signals<3 con is_conclusive=False activa el gate anti-falso-negativo de classify_agent_verdict() (226bec1). ABSTAIN es el veredicto honesto para evidencia con menos de 3 señales, no un error del agente."
+  "_expected_verdict_correction_note": "Corregido de 'NOISE' a 'ABSTAIN' el 2026-07-02: n_signals<3 con is_conclusive=False activa el gate anti-falso-negativo de classify_agent_verdict() (226bec1). ABSTAIN es el veredicto honesto para evidencia con menos de 3 señales, no un error del agente.",
+  "signals": [
+    {
+      "artifact_id": "ASCII-ART-001",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 19
+      },
+      "description": "AsciiStudio-master.zip — container archive. GitHub 'Download ZIP' naming convention ('-master' suffix). Contains Java GUI application source, Ant build, MIT license, README, Changelog, GIF samples, Sc",
+      "evidence_type": "file_hash",
+      "source": "generate_forensic_hash",
+      "z_score": {
+        "__fraction__": true,
+        "den": 1000,
+        "num": 19
+      }
+    },
+    {
+      "artifact_id": "ASCII-ART-002",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 19
+      },
+      "description": "Directory listing of AsciiStudio-master/: build.xml, source Java files, GIF assets (butterfly, jellyfish, parakeet, lightning), LICENSE, README.md, Changelog.txt, Screenshot.jpg. All files consistent ",
+      "evidence_type": "log_entry",
+      "source": "list_files",
+      "z_score": {
+        "__fraction__": true,
+        "den": 1000,
+        "num": 19
+      }
+    }
+  ],
+  "_migration_note": {
+    "date": "2026-07-06",
+    "source": "results/agent_batch/VIGIA-ASCIISTUDIO-2025_agent_bundle.json",
+    "method": "señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canónica preservada",
+    "n_signals": 2
+  }
 }

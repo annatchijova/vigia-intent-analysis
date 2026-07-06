@@ -106,5 +106,93 @@
     "secondness": "Same rare punctuation error in 100% of tickets; entropy 0.08 bits (impossible for 3 distinct human authors); DLP disabled without approval.",
     "thirdness": "Habit of astroturfing operation: three puppets, one puppeteer with an invariable syntactic pattern."
   },
-  "notes": "Excellent for sockpuppets, coordinated campaigns, and influence ops."
+  "notes": "Excellent for sockpuppets, coordinated campaigns, and influence ops.",
+  "signals": [
+    {
+      "artifact_id": "a018_t1",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 3
+      },
+      "description": "Manager ticket: 'I need you to temporarily disable the DLP rule , it's urgent for fiscal close' — space before comma.",
+      "evidence_type": "memory_process",
+      "source": "sift_ticket_system",
+      "z_score": {
+        "__fraction__": true,
+        "den": 250,
+        "num": 3
+      }
+    },
+    {
+      "artifact_id": "a018_t2",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 3
+      },
+      "description": "Employee ticket: 'The DLP rule , is blocking a legitimate client shipment' — space before comma.",
+      "evidence_type": "log_entry",
+      "source": "sift_ticket_system",
+      "z_score": {
+        "__fraction__": true,
+        "den": 500,
+        "num": 9
+      }
+    },
+    {
+      "artifact_id": "a018_t3",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 3
+      },
+      "description": "Vendor ticket: 'Please , disable the DLP rule for this account' — space before comma.",
+      "evidence_type": "log_entry",
+      "source": "sift_ticket_system",
+      "z_score": {
+        "__fraction__": true,
+        "den": 125,
+        "num": 3
+      }
+    },
+    {
+      "artifact_id": "a018_style",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 3
+      },
+      "description": "Stylometric analysis: all 3 tickets share TTR=0.42, average sentence length=12.3 words, and the 'space_before_comma' error in 100% of samples. Entropy between tickets: 0.08 bits.",
+      "evidence_type": "cultural_marker",
+      "source": "sift_stylometry",
+      "z_score": {
+        "__fraction__": true,
+        "den": 250,
+        "num": 33
+      }
+    },
+    {
+      "artifact_id": "a018_dlp",
+      "confidence": {
+        "__fraction__": true,
+        "den": 5,
+        "num": 2
+      },
+      "description": "DLP rule disabled 8 minutes after the third ticket by a Tier-1 analyst without CISO approval.",
+      "evidence_type": "log_entry",
+      "source": "sift_syslog",
+      "z_score": {
+        "__fraction__": true,
+        "den": 50,
+        "num": 13
+      }
+    }
+  ],
+  "_migration_note": {
+    "date": "2026-07-06",
+    "source": "results/agent_batch/VIGIA-CAN-044_agent_bundle.json",
+    "method": "señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canónica preservada",
+    "n_signals": 5
+  }
 }

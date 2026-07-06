@@ -90,5 +90,61 @@
     "schema_version": "1.1",
     "source_file": "VIGIA_FP_FN_AMB.json",
     "source_origin": "synthetic_vigia_collective"
+  },
+  "signals": [
+    {
+      "artifact_id": "fn002_01",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 19
+      },
+      "description": "veeam_agent.exe running with valid certificate",
+      "evidence_type": "memory_process",
+      "source": "sift_process_list",
+      "z_score": {
+        "__fraction__": true,
+        "den": 400,
+        "num": 19
+      }
+    },
+    {
+      "artifact_id": "fn002_02",
+      "confidence": {
+        "__fraction__": true,
+        "den": 5,
+        "num": 1
+      },
+      "description": "Backup traffic to 198.51.100.77 on port 443",
+      "evidence_type": "ip_geolocation",
+      "source": "sift_netflow",
+      "z_score": {
+        "__fraction__": true,
+        "den": 100,
+        "num": 1
+      }
+    },
+    {
+      "artifact_id": "fn002_03",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 3
+      },
+      "description": "NO change ticket found for Veeam installation on server 10.0.8.44",
+      "evidence_type": "log_entry",
+      "source": "sift_change_management",
+      "z_score": {
+        "__fraction__": true,
+        "den": 125,
+        "num": 3
+      }
+    }
+  ],
+  "_migration_note": {
+    "date": "2026-07-06",
+    "source": "results/agent_batch/VIGIA-FN-002_agent_bundle.json",
+    "method": "señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canónica preservada",
+    "n_signals": 3
   }
 }

@@ -5,7 +5,13 @@
   "description": "FLARE-On 8 challenge set released in September 2021 by FireEye FLARE team. The zip archive (333,676,259 bytes, SHA-256: ae776be9dbdff5bddacd19cf367d662c112dccf29c87d38355e56f2d7e6daafb) contains 10 CTF challenges (01–10) plus a 7zip_password.txt. Naming convention changed from 2019/2020 to zero-padded numeric prefix + underscore + name. Most notable: challenge 05 is a full Linux VM (321 MB, FLARE_Linux_VM.7z). Other highlights: credchecker (credential checker logic reversal), known (file signature puzzle), antioch (search-your-name Monty Python theme), myaquaticlife (aquatic theming, likely a game), PetTheKitty (network challenge), spel (NES ROM or similar), beelogin (JavaScript login form), evil (likely obfuscated malware), wizardcult (magic/fantasy theme, complex challenge).",
   "expected_verdict": "INTENT",
   "expected_confidence": 0.92,
-  "expected_mitre_ttps": ["T1027", "T1059", "T1564", "T1078", "T1055"],
+  "expected_mitre_ttps": [
+    "T1027",
+    "T1059",
+    "T1564",
+    "T1078",
+    "T1055"
+  ],
   "peirce_chain": {
     "firstness": "10 challenges covering credential reversing (ch01 credchecker, 132 KB), file-format identification (ch02 known, 88 KB), Monty Python search challenge (ch03 antioch, 1.8 MB), aquatic game (ch04 myaquaticlife, 2.3 MB), full Linux VM (ch05 FLARE_Linux_VM, 322 MB), network/PCAP (ch06 PetTheKitty, 676 KB), game/NES ROM (ch07 spel, 1 MB), JavaScript login (ch08 beelogin, 326 KB), obfuscated malware (ch09 evil, 1.4 MB), wizard cult chain (ch10 wizardcult, 3.9 MB).",
     "secondness": "The 2021 collection spans JavaScript (browser-based attacks), Linux OS-level (full VM), credential theft simulation, NES ROM reversing, network traffic analysis, and obfuscated malware — a comprehensive 2021 threat surface map. The Linux VM (ch05 at 321 MB) is the dominant artifact by size and represents a full OS environment where participants must find flags through forensic analysis of a live system. Challenge 08 (beelogin at 326 KB) is a standalone credential verification challenge — 326 KB is consistent with a minified + obfuscated JavaScript bundle. Challenge 09 'evil' by name signals an intentionally malicious sample for analysis.",
@@ -55,7 +61,7 @@
       "source_tool": "list_files",
       "timestamp": "2021-09-10T09:22:00Z",
       "raw_score": 0.65,
-      "prior_trust": 0.90,
+      "prior_trust": 0.9,
       "provenance_chain": [
         "sha256:ae776be9dbdff5bddacd19cf367d662c112dccf29c87d38355e56f2d7e6daafb",
         "zip_entry:01_credchecker.7z"
@@ -81,7 +87,7 @@
       "source_tool": "list_files",
       "timestamp": "2021-09-10T09:27:00Z",
       "raw_score": 0.65,
-      "prior_trust": 0.90,
+      "prior_trust": 0.9,
       "provenance_chain": [
         "sha256:ae776be9dbdff5bddacd19cf367d662c112dccf29c87d38355e56f2d7e6daafb",
         "zip_entry:02_known.7z"
@@ -106,8 +112,8 @@
       "evidence_type": "binary",
       "source_tool": "list_files",
       "timestamp": "2021-09-10T09:40:00Z",
-      "raw_score": 0.70,
-      "prior_trust": 0.90,
+      "raw_score": 0.7,
+      "prior_trust": 0.9,
       "provenance_chain": [
         "sha256:ae776be9dbdff5bddacd19cf367d662c112dccf29c87d38355e56f2d7e6daafb",
         "zip_entry:03_antioch.7z"
@@ -132,8 +138,8 @@
       "evidence_type": "binary",
       "source_tool": "list_files",
       "timestamp": "2021-09-10T09:41:00Z",
-      "raw_score": 0.70,
-      "prior_trust": 0.90,
+      "raw_score": 0.7,
+      "prior_trust": 0.9,
       "provenance_chain": [
         "sha256:ae776be9dbdff5bddacd19cf367d662c112dccf29c87d38355e56f2d7e6daafb",
         "zip_entry:04_myaquaticlife.7z"
@@ -158,8 +164,8 @@
       "evidence_type": "disk_image",
       "source_tool": "list_files",
       "timestamp": "2021-09-10T09:48:00Z",
-      "raw_score": 0.90,
-      "prior_trust": 0.90,
+      "raw_score": 0.9,
+      "prior_trust": 0.9,
       "provenance_chain": [
         "sha256:ae776be9dbdff5bddacd19cf367d662c112dccf29c87d38355e56f2d7e6daafb",
         "zip_entry:05_FLARE_Linux_VM.7z"
@@ -185,7 +191,7 @@
       "source_tool": "list_files",
       "timestamp": "2021-09-10T10:22:00Z",
       "raw_score": 0.75,
-      "prior_trust": 0.90,
+      "prior_trust": 0.9,
       "provenance_chain": [
         "sha256:ae776be9dbdff5bddacd19cf367d662c112dccf29c87d38355e56f2d7e6daafb",
         "zip_entry:06_PetTheKitty.7z"
@@ -210,8 +216,8 @@
       "evidence_type": "binary",
       "source_tool": "list_files",
       "timestamp": "2021-09-10T10:32:00Z",
-      "raw_score": 0.80,
-      "prior_trust": 0.90,
+      "raw_score": 0.8,
+      "prior_trust": 0.9,
       "provenance_chain": [
         "sha256:ae776be9dbdff5bddacd19cf367d662c112dccf29c87d38355e56f2d7e6daafb",
         "zip_entry:07_spel.7z"
@@ -236,8 +242,8 @@
       "evidence_type": "binary",
       "source_tool": "list_files",
       "timestamp": "2021-09-10T10:51:00Z",
-      "raw_score": 0.80,
-      "prior_trust": 0.90,
+      "raw_score": 0.8,
+      "prior_trust": 0.9,
       "provenance_chain": [
         "sha256:ae776be9dbdff5bddacd19cf367d662c112dccf29c87d38355e56f2d7e6daafb",
         "zip_entry:08_beelogin.7z"
@@ -263,7 +269,7 @@
       "source_tool": "list_files",
       "timestamp": "2021-09-10T11:00:00Z",
       "raw_score": 0.88,
-      "prior_trust": 0.90,
+      "prior_trust": 0.9,
       "provenance_chain": [
         "sha256:ae776be9dbdff5bddacd19cf367d662c112dccf29c87d38355e56f2d7e6daafb",
         "zip_entry:09_evil.7z"
@@ -288,8 +294,8 @@
       "evidence_type": "binary",
       "source_tool": "list_files",
       "timestamp": "2021-09-10T11:13:00Z",
-      "raw_score": 0.90,
-      "prior_trust": 0.90,
+      "raw_score": 0.9,
+      "prior_trust": 0.9,
       "provenance_chain": [
         "sha256:ae776be9dbdff5bddacd19cf367d662c112dccf29c87d38355e56f2d7e6daafb",
         "zip_entry:10_wizardcult.7z"
@@ -318,5 +324,189 @@
     "ch03 antioch technique class (Docker) is based on community knowledge that FLARE-On 8 ch03 used Docker; if this is incorrect the classification is INFERRED-LOW."
   ],
   "source_dataset": "FLARE-On 8 CTF — FireEye FLARE Team (2021)",
-  "source_origin": "public_ctf_archive"
+  "source_origin": "public_ctf_archive",
+  "signals": [
+    {
+      "artifact_id": "flareon8-zip-001",
+      "confidence": {
+        "__fraction__": true,
+        "den": 100,
+        "num": 99
+      },
+      "description": "Outer zip archive Flare-On8_Challenges.zip. SHA-256 verified against task specification. Size: 333,676,259 bytes. Contains 11 entries: 10 challenge 7z archives + 7zip_password.txt. Archive dated 2021-",
+      "evidence_type": "file_hash",
+      "source": "generate_forensic_hash",
+      "z_score": {
+        "__fraction__": true,
+        "den": 2000,
+        "num": 1881
+      }
+    },
+    {
+      "artifact_id": "flareon8-ch01-credchecker",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 9
+      },
+      "description": "Challenge 01 — credchecker (132,208 bytes). Credential checking challenge. A binary or script that validates a hardcoded password/username; participants must reverse the check to recover the flag. Tec",
+      "evidence_type": "binary",
+      "source": "list_files",
+      "z_score": {
+        "__fraction__": true,
+        "den": 200,
+        "num": 117
+      }
+    },
+    {
+      "artifact_id": "flareon8-ch02-known",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 9
+      },
+      "description": "Challenge 02 — known (88,128 bytes). File format identification and analysis. 'Known' likely references a known-plaintext attack or a file signature puzzle. Technique class: file format analysis / kno",
+      "evidence_type": "binary",
+      "source": "list_files",
+      "z_score": {
+        "__fraction__": true,
+        "den": 200,
+        "num": 117
+      }
+    },
+    {
+      "artifact_id": "flareon8-ch03-antioch",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 9
+      },
+      "description": "Challenge 03 — antioch (1,885,074 bytes). Monty Python and the Holy Grail reference ('Holy Hand Grenade of Antioch'). Likely a Docker/container-based challenge where participants navigate a custom env",
+      "evidence_type": "binary",
+      "source": "list_files",
+      "z_score": {
+        "__fraction__": true,
+        "den": 100,
+        "num": 63
+      }
+    },
+    {
+      "artifact_id": "flareon8-ch04-myaquaticlife",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 9
+      },
+      "description": "Challenge 04 — myaquaticlife (2,369,123 bytes). Aquatic-themed game or simulation. Likely a .NET or game binary where aquatic-themed logic conceals a key derivation puzzle. Technique class: game rever",
+      "evidence_type": "binary",
+      "source": "list_files",
+      "z_score": {
+        "__fraction__": true,
+        "den": 100,
+        "num": 63
+      }
+    },
+    {
+      "artifact_id": "flareon8-ch05-flare-linux-vm",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 9
+      },
+      "description": "Challenge 05 — FLARE_Linux_VM (321,916,242 bytes). Dominant artifact at 322 MB — a full Linux virtual machine image. Participants must forensically analyze the live system to find the flag. This is an",
+      "evidence_type": "disk_image",
+      "source": "list_files",
+      "z_score": {
+        "__fraction__": true,
+        "den": 100,
+        "num": 81
+      }
+    },
+    {
+      "artifact_id": "flareon8-ch06-petkitty",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 9
+      },
+      "description": "Challenge 06 — PetTheKitty (675,952 bytes). Network challenge. 'Pet the kitty' likely refers to a SYN-ACK keepalive pattern or a network packet sequence that must be replicated or decoded. Technique c",
+      "evidence_type": "network_traffic",
+      "source": "list_files",
+      "z_score": {
+        "__fraction__": true,
+        "den": 40,
+        "num": 27
+      }
+    },
+    {
+      "artifact_id": "flareon8-ch07-spel",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 9
+      },
+      "description": "Challenge 07 — spel (1,041,938 bytes). 'Spel' is Swedish/Dutch for 'game' and also an anagram of 'piles'. Likely an NES ROM or retro console game challenge requiring knowledge of the 6502 instruction ",
+      "evidence_type": "binary",
+      "source": "list_files",
+      "z_score": {
+        "__fraction__": true,
+        "den": 25,
+        "num": 18
+      }
+    },
+    {
+      "artifact_id": "flareon8-ch08-beelogin",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 9
+      },
+      "description": "Challenge 08 — beelogin (325,746 bytes). JavaScript login form challenge. 'Beelogin' suggests a bee-themed HTML/JS page where the authentication logic is obfuscated in JavaScript. Technique class: Jav",
+      "evidence_type": "binary",
+      "source": "list_files",
+      "z_score": {
+        "__fraction__": true,
+        "den": 25,
+        "num": 18
+      }
+    },
+    {
+      "artifact_id": "flareon8-ch09-evil",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 9
+      },
+      "description": "Challenge 09 — evil (1,383,970 bytes). The name 'evil' directly signals an obfuscated or malicious sample for behavioral analysis. Likely an anti-analysis challenge (packing, VM detection, timing atta",
+      "evidence_type": "binary",
+      "source": "list_files",
+      "z_score": {
+        "__fraction__": true,
+        "den": 125,
+        "num": 99
+      }
+    },
+    {
+      "artifact_id": "flareon8-ch10-wizardcult",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 9
+      },
+      "description": "Challenge 10 — wizardcult (3,856,291 bytes). Final boss challenge. 'Wizardcult' suggests a fantasy-themed multi-stage challenge with custom encryption, protocol reversing, or a complete malware ecosys",
+      "evidence_type": "binary",
+      "source": "list_files",
+      "z_score": {
+        "__fraction__": true,
+        "den": 100,
+        "num": 81
+      }
+    }
+  ],
+  "_migration_note": {
+    "date": "2026-07-06",
+    "source": "results/agent_batch/VIGIA-FLAREON-8_agent_bundle.json",
+    "method": "señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canónica preservada",
+    "n_signals": 11
+  }
 }

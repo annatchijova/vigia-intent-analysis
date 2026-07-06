@@ -11,7 +11,9 @@
       "timestamp": "2026-04-10T12:00:00Z",
       "raw_score": 0.85,
       "prior_trust": 0.3,
-      "provenance_chain": ["sha256:cultural_clean_chain_001"],
+      "provenance_chain": [
+        "sha256:cultural_clean_chain_001"
+      ],
       "description": "Cyrillic filename: 'отчет_финансы.docx'. Keyboard layout: RU. Timezone: UTC+3. Comments in Russian. Native developer configuration.",
       "metadata": {
         "cyrillic_filenames": 3,
@@ -27,9 +29,16 @@
       "timestamp": "2026-04-10T12:00:10Z",
       "raw_score": 0.05,
       "prior_trust": 0.95,
-      "provenance_chain": ["sha256:mem_clean_001", "sha256:mem_clean_002"],
+      "provenance_chain": [
+        "sha256:mem_clean_001",
+        "sha256:mem_clean_002"
+      ],
       "description": "Memory: No process injection. No kernel anomalies. Clean system state.",
-      "metadata": {"injections_detected": 0, "kernel_anomalies": 0, "suspicious_handles": 0}
+      "metadata": {
+        "injections_detected": 0,
+        "kernel_anomalies": 0,
+        "suspicious_handles": 0
+      }
     },
     {
       "artifact_id": "technical_clean_002",
@@ -38,9 +47,14 @@
       "timestamp": "2026-04-10T12:00:12Z",
       "raw_score": 0.08,
       "prior_trust": 0.95,
-      "provenance_chain": ["sha256:lsass_clean_001"],
+      "provenance_chain": [
+        "sha256:lsass_clean_001"
+      ],
       "description": "LSASS: No credential dumping. Normal session count.",
-      "metadata": {"sessions": 2, "anomalies": 0}
+      "metadata": {
+        "sessions": 2,
+        "anomalies": 0
+      }
     }
   ],
   "temporal_violations": [],
@@ -52,5 +66,61 @@
     "secondness": "Memory, LSASS, kernel — all clean. There is no malicious event to attribute.",
     "thirdness": "Most parsimonious explanation (Eco's razor): this is a Russian developer's machine. No staging, no flag. Russian is spoken in many places; configuration is not intent."
   },
-  "demo_quote": "VIGÍA does not accuse someone for writing in Russian. Without a real malicious event, there is no attribution to falsify."
+  "demo_quote": "VIGÍA does not accuse someone for writing in Russian. Without a real malicious event, there is no attribution to falsify.",
+  "signals": [
+    {
+      "artifact_id": "cultural_clean_001",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 3
+      },
+      "description": "Cyrillic filename: 'отчет_финансы.docx'. Keyboard layout: RU. Timezone: UTC+3. Comments in Russian. Native developer configuration.",
+      "evidence_type": "cultural_marker",
+      "source": "infer_intent",
+      "z_score": {
+        "__fraction__": true,
+        "den": 200,
+        "num": 51
+      }
+    },
+    {
+      "artifact_id": "technical_clean_001",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 19
+      },
+      "description": "Memory: No process injection. No kernel anomalies. Clean system state.",
+      "evidence_type": "memory_process",
+      "source": "list_processes",
+      "z_score": {
+        "__fraction__": true,
+        "den": 400,
+        "num": 19
+      }
+    },
+    {
+      "artifact_id": "technical_clean_002",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 19
+      },
+      "description": "LSASS: No credential dumping. Normal session count.",
+      "evidence_type": "lsass_session",
+      "source": "list_processes",
+      "z_score": {
+        "__fraction__": true,
+        "den": 250,
+        "num": 19
+      }
+    }
+  ],
+  "_migration_note": {
+    "date": "2026-07-06",
+    "source": "results/agent_batch/FP-CULTURAL-CLEAN-001_agent_bundle.json",
+    "method": "señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canónica preservada",
+    "n_signals": 3
+  }
 }

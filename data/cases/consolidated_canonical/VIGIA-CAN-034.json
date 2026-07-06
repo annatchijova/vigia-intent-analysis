@@ -93,5 +93,77 @@
     "firstness": "Basic reconnaissance cycles repeated at regular intervals.",
     "secondness": "8 cycles in 40 minutes with exactly 300s interval from a Tor node. No legitimate user audits their environment every 5 minutes.",
     "thirdness": "Habit of the infiltrated actor continuously checking if they have been detected before proceeding."
+  },
+  "signals": [
+    {
+      "artifact_id": "a008_01",
+      "confidence": {
+        "__fraction__": true,
+        "den": 5,
+        "num": 2
+      },
+      "description": "8 cycles in 40 minutes: whoami → netstat -an → w → ps aux|grep root. Exact 300s interval. Variance: 2.3s.",
+      "evidence_type": "memory_process",
+      "source": "sift_auditd",
+      "z_score": {
+        "__fraction__": true,
+        "den": 125,
+        "num": 46
+      }
+    },
+    {
+      "artifact_id": "a008_02",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 17
+      },
+      "description": "SSH session from Tor IP (198.51.100.42, confirmed exit node). User 'backup_agent'. No previous SSH logins in 180 days.",
+      "evidence_type": "lsass_session",
+      "source": "sift_pam",
+      "z_score": {
+        "__fraction__": true,
+        "den": 2000,
+        "num": 1377
+      }
+    },
+    {
+      "artifact_id": "a008_03",
+      "confidence": {
+        "__fraction__": true,
+        "den": 4,
+        "num": 3
+      },
+      "description": "At minute 45, connection to internal database server (10.0.5.20). Duration: 8 seconds. Transfer: 2KB.",
+      "evidence_type": "memory_process",
+      "source": "sift_zeek",
+      "z_score": {
+        "__fraction__": true,
+        "den": 100,
+        "num": 69
+      }
+    },
+    {
+      "artifact_id": "a008_04",
+      "confidence": {
+        "__fraction__": true,
+        "den": 5,
+        "num": 3
+      },
+      "description": "Reconnaissance cycle entropy: 0.09 bits. Expected for a human: >2.0 bits for unplanned reconnaissance.",
+      "evidence_type": "file_timestamp",
+      "source": "sift_entropy",
+      "z_score": {
+        "__fraction__": true,
+        "den": 125,
+        "num": 51
+      }
+    }
+  ],
+  "_migration_note": {
+    "date": "2026-07-06",
+    "source": "results/agent_batch/VIGIA-CAN-034_agent_bundle.json",
+    "method": "señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canónica preservada",
+    "n_signals": 4
   }
 }

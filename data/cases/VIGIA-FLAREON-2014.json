@@ -5,7 +5,13 @@
   "description": "FireEye FLARE-On CTF 2014 challenge collection. 8 artifacts: C1.exe (packed Windows PE32+ SFX, sha256:f8aac4d0cc..., 285184 bytes) and 6 zip containers (C2-C7, escalating complexity) plus byte-identical Flare_On_Challenge.EXE. C1.exe exhibits Shannon entropy 7.47 bits/byte, RunOnce registry key string, SFX dropper pattern. Corpus is pedagogical malware RE training material authored by the FireEye FLARE team for the 2014 competition season.",
   "expected_verdict": "INTENT",
   "expected_confidence": 0.82,
-  "expected_mitre_ttps": ["T1027", "T1547.001", "T1105", "T1027.009", "T1140"],
+  "expected_mitre_ttps": [
+    "T1027",
+    "T1547.001",
+    "T1105",
+    "T1027.009",
+    "T1140"
+  ],
   "peirce_chain": {
     "firstness": "PE32+ 285184-byte binary, entropy 7.47 bits/byte, RunOnce key in strings, dual-named (C1.exe = Flare_On_Challenge.EXE by SHA-256). Six zip containers C2-C7 (2.7 KB to 1.1 MB escalating).",
     "secondness": "7.47 bits/byte approaches packed-payload threshold (>7.5 CRITICAL). RunOnce registry key indicates persistence setup. Dual naming with byte-identical content is deliberate packaging, not accident. Container size escalation (3 orders of magnitude from C3 to C7) indicates structured difficulty progression, not organic growth.",
@@ -19,7 +25,7 @@
       "source_tool": "generate_forensic_hash",
       "timestamp": "2026-06-30T15:20:03.870989Z",
       "raw_score": 0.82,
-      "prior_trust": 0.90,
+      "prior_trust": 0.9,
       "provenance_chain": [
         "sha256:960484758a09e9b7e96451254a091aeec186d4c560eac0a6b9172978cea15218",
         "sha256:f8aac4d0cccabd11d7b10d63dc2acc451ea832077650971d3c66834861162981"
@@ -32,8 +38,16 @@
         "file_type": "PE32+ executable (GUI) x86-64, 6 sections",
         "entropy_bits_per_byte": 7.47,
         "purgatory_status": "QUARANTINED",
-        "registry_strings_observed": ["Software\\Microsoft\\Windows\\CurrentVersion\\RunOnce"],
-        "imported_dlls": ["SHELL32.DLL", "ADVAPI32.dll", "KERNEL32.dll", "GDI32.dll", "USER32.dll"],
+        "registry_strings_observed": [
+          "Software\\Microsoft\\Windows\\CurrentVersion\\RunOnce"
+        ],
+        "imported_dlls": [
+          "SHELL32.DLL",
+          "ADVAPI32.dll",
+          "KERNEL32.dll",
+          "GDI32.dll",
+          "USER32.dll"
+        ],
         "corpus_timestamp": "2015-07-27",
         "acquisition_tool": "generate_forensic_hash (VIGIA MCP)",
         "acquisition_hash": "sha256:f8aac4d0cccabd11d7b10d63dc2acc451ea832077650971d3c66834861162981",
@@ -47,8 +61,8 @@
       "evidence_type": "container_zip",
       "source_tool": "generate_forensic_hash",
       "timestamp": "2026-06-30T15:20:40.244249Z",
-      "raw_score": 0.60,
-      "prior_trust": 0.90,
+      "raw_score": 0.6,
+      "prior_trust": 0.9,
       "provenance_chain": [
         "sha256:960484758a09e9b7e96451254a091aeec186d4c560eac0a6b9172978cea15218",
         "sha256:407c11647b9c58f41daba5a6b85f04ac2a0c31bab9eefe3362c2805329a59bd1"
@@ -72,7 +86,7 @@
       "source_tool": "generate_forensic_hash",
       "timestamp": "2026-06-30T15:20:40.658Z",
       "raw_score": 0.55,
-      "prior_trust": 0.90,
+      "prior_trust": 0.9,
       "provenance_chain": [
         "sha256:960484758a09e9b7e96451254a091aeec186d4c560eac0a6b9172978cea15218",
         "sha256:e81a25edd426d9cdcefe5ca06d8ddb21e248100e2f1150dea5834f420b64652b"
@@ -96,7 +110,7 @@
       "source_tool": "generate_forensic_hash",
       "timestamp": "2026-06-30T15:20:40.791Z",
       "raw_score": 0.58,
-      "prior_trust": 0.90,
+      "prior_trust": 0.9,
       "provenance_chain": [
         "sha256:960484758a09e9b7e96451254a091aeec186d4c560eac0a6b9172978cea15218",
         "sha256:1a2189b76f58130d41ae00d21676d51e94e81313c917f5cd97b9a41cde22a775"
@@ -119,8 +133,8 @@
       "evidence_type": "container_zip",
       "source_tool": "generate_forensic_hash",
       "timestamp": "2026-06-30T15:20:44.284Z",
-      "raw_score": 0.60,
-      "prior_trust": 0.90,
+      "raw_score": 0.6,
+      "prior_trust": 0.9,
       "provenance_chain": [
         "sha256:960484758a09e9b7e96451254a091aeec186d4c560eac0a6b9172978cea15218",
         "sha256:3d4a3794905ca576e1460094bcc7917ae05cd21a046b91ad5bec427846ed032a"
@@ -144,7 +158,7 @@
       "source_tool": "generate_forensic_hash",
       "timestamp": "2026-06-30T15:20:44.648Z",
       "raw_score": 0.62,
-      "prior_trust": 0.90,
+      "prior_trust": 0.9,
       "provenance_chain": [
         "sha256:960484758a09e9b7e96451254a091aeec186d4c560eac0a6b9172978cea15218",
         "sha256:5393a597747831f250013f5ae6ef80e345ada370369cb678385d17384005def4"
@@ -168,7 +182,7 @@
       "source_tool": "generate_forensic_hash",
       "timestamp": "2026-06-30T15:20:44.890Z",
       "raw_score": 0.65,
-      "prior_trust": 0.90,
+      "prior_trust": 0.9,
       "provenance_chain": [
         "sha256:960484758a09e9b7e96451254a091aeec186d4c560eac0a6b9172978cea15218",
         "sha256:d4c486f5af4572b7885d7cbeb7b32625a27e9ec5033dd8204e886a3dfde39c84"
@@ -186,5 +200,125 @@
         "examiner_id": "VIGIA-MCP-CLAUDE-CODE"
       }
     }
-  ]
+  ],
+  "signals": [
+    {
+      "artifact_id": "c1_exe_001",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 9
+      },
+      "description": "C1.exe — PE32+ executable (GUI) x86-64, 6 sections, 285184 bytes. Shannon entropy 7.47 bits/byte. RunOnce registry key in strings. VIGÍA purgatory gate triggered on read (binary, non-UTF-8). Byte-iden",
+      "evidence_type": "pe_executable",
+      "source": "generate_forensic_hash",
+      "z_score": {
+        "__fraction__": true,
+        "den": 500,
+        "num": 369
+      }
+    },
+    {
+      "artifact_id": "c2_zip_001",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 9
+      },
+      "description": "C2.zip — challenge container, 10758 bytes. Part of escalating-complexity series C2–C7. Inner content not extracted (challenge-gated). Hash integrity verified.",
+      "evidence_type": "container_zip",
+      "source": "generate_forensic_hash",
+      "z_score": {
+        "__fraction__": true,
+        "den": 50,
+        "num": 27
+      }
+    },
+    {
+      "artifact_id": "c3_zip_001",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 9
+      },
+      "description": "C3.zip — smallest container at 2713 bytes. Likely minimal binary or script challenge. Hash integrity verified.",
+      "evidence_type": "container_zip",
+      "source": "generate_forensic_hash",
+      "z_score": {
+        "__fraction__": true,
+        "den": 200,
+        "num": 99
+      }
+    },
+    {
+      "artifact_id": "c4_zip_001",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 9
+      },
+      "description": "C4.zip — 17794 bytes. Mid-complexity challenge container. Hash integrity verified.",
+      "evidence_type": "container_zip",
+      "source": "generate_forensic_hash",
+      "z_score": {
+        "__fraction__": true,
+        "den": 500,
+        "num": 261
+      }
+    },
+    {
+      "artifact_id": "c5_zip_001",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 9
+      },
+      "description": "C5.zip — 39309 bytes. Escalated complexity container. Hash integrity verified.",
+      "evidence_type": "container_zip",
+      "source": "generate_forensic_hash",
+      "z_score": {
+        "__fraction__": true,
+        "den": 50,
+        "num": 27
+      }
+    },
+    {
+      "artifact_id": "c6_zip_001",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 9
+      },
+      "description": "C6.zip — 484454 bytes. Large container, likely contains full PE executable. Hash integrity verified.",
+      "evidence_type": "container_zip",
+      "source": "generate_forensic_hash",
+      "z_score": {
+        "__fraction__": true,
+        "den": 500,
+        "num": 279
+      }
+    },
+    {
+      "artifact_id": "c7_zip_001",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 9
+      },
+      "description": "C7.zip — 1114575 bytes. Largest container. Final/hardest challenge. Hash integrity verified.",
+      "evidence_type": "container_zip",
+      "source": "generate_forensic_hash",
+      "z_score": {
+        "__fraction__": true,
+        "den": 200,
+        "num": 117
+      }
+    }
+  ],
+  "_migration_note": {
+    "date": "2026-07-06",
+    "source": "results/agent_batch/VIGIA-FLAREON-2014_agent_bundle.json",
+    "method": "señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canónica preservada",
+    "n_signals": 7
+  }
 }

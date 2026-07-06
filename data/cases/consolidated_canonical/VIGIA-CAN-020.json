@@ -86,5 +86,77 @@
     "secondness": "94% match with internal KB. CFO reset without controls. Response in 180ms (pre-loaded).",
     "thirdness": "Habit of using 'house language' to neutralize operator alertness through false belonging."
   },
-  "notes": "Carnegie: the mirroring effect to generate an immediate false sense of trust."
+  "notes": "Carnegie: the mirroring effect to generate an immediate false sense of trust.",
+  "signals": [
+    {
+      "artifact_id": "a102_01",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 3
+      },
+      "description": "Support chat: attacker uses identical phrases to the technician 5 times. 'I understand your frustration', 'We are working on it'.",
+      "evidence_type": "log_entry",
+      "source": "sift_chat_system",
+      "z_score": {
+        "__fraction__": true,
+        "den": 500,
+        "num": 117
+      }
+    },
+    {
+      "artifact_id": "a102_02",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 3
+      },
+      "description": "NLP analysis: user replicates operator syntax with 94% match to internal KB. Response latency: 180ms (pre-loaded).",
+      "evidence_type": "cultural_marker",
+      "source": "sift_linguistic",
+      "z_score": {
+        "__fraction__": true,
+        "den": 1000,
+        "num": 129
+      }
+    },
+    {
+      "artifact_id": "a102_03",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 9
+      },
+      "description": "CFO password reset executed by Tier-2 without an approved change ticket or secondary identity verification.",
+      "evidence_type": "memory_process",
+      "source": "sift_syslog",
+      "z_score": {
+        "__fraction__": true,
+        "den": 400,
+        "num": 9
+      }
+    },
+    {
+      "artifact_id": "a102_04",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 3
+      },
+      "description": "Request: 'I need an emergency password reset for the CFO account — urgent for fiscal close'.",
+      "evidence_type": "memory_process",
+      "source": "sift_chat_system",
+      "z_score": {
+        "__fraction__": true,
+        "den": 250,
+        "num": 3
+      }
+    }
+  ],
+  "_migration_note": {
+    "date": "2026-07-06",
+    "source": "results/agent_batch/VIGIA-CAN-020_agent_bundle.json",
+    "method": "señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canónica preservada",
+    "n_signals": 4
+  }
 }

@@ -103,5 +103,77 @@
     "secondness": "HMAC does not match. Domain with '4' instead of 'a'. Verdict contradicts authentic internal log from 58 minutes ago.",
     "thirdness": "Habit of attacking the observer, not the observed system. If the forensic engine can be corrupted, all future verdicts are suspect."
   },
-  "notes": "Peirce Thirdness: the attacker uses VIGÍA's own 'law' against itself. Directed semiotic collision."
+  "notes": "Peirce Thirdness: the attacker uses VIGÍA's own 'law' against itself. Directed semiotic collision.",
+  "signals": [
+    {
+      "artifact_id": "a110_01",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 13
+      },
+      "description": "audit_report_final.json received via unverified channel. JSON structure identical to VIGÍA. Verdict NOISE for IP flagged MALICE 58 minutes ago.",
+      "evidence_type": "cryptographic_hash",
+      "source": "sift_file_audit",
+      "z_score": {
+        "__fraction__": true,
+        "den": 2000,
+        "num": 1183
+      }
+    },
+    {
+      "artifact_id": "a110_02",
+      "confidence": {
+        "__fraction__": true,
+        "den": 50,
+        "num": 49
+      },
+      "description": "VIGÍA internal log with valid HMAC: IP 185.220.101.42 received verdict MALICE at 09:02 with composite=0.94.",
+      "evidence_type": "log_entry",
+      "source": "sift_vigia_internal",
+      "z_score": {
+        "__fraction__": true,
+        "den": 2500,
+        "num": 49
+      }
+    },
+    {
+      "artifact_id": "a110_03",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 9
+      },
+      "description": "HMAC of the external report FAILS verification with VIGÍA key. The JSON replicates internal fields '_determinism_protocol', 'integrity_check' without access to the signing key.",
+      "evidence_type": "cryptographic_hash",
+      "source": "sift_crypto_audit",
+      "z_score": {
+        "__fraction__": true,
+        "den": 200,
+        "num": 171
+      }
+    },
+    {
+      "artifact_id": "a110_04",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 7
+      },
+      "description": "Sender domain: 'vigi4-security.corp' (with '4') vs legitimate domain 'vigia-security.corp'. DKIM fails. SPF fails.",
+      "evidence_type": "memory_process",
+      "source": "sift_mail_gateway",
+      "z_score": {
+        "__fraction__": true,
+        "den": 1000,
+        "num": 329
+      }
+    }
+  ],
+  "_migration_note": {
+    "date": "2026-07-06",
+    "source": "results/agent_batch/VIGIA-CAN-028_agent_bundle.json",
+    "method": "señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canónica preservada",
+    "n_signals": 4
+  }
 }

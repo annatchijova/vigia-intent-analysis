@@ -108,5 +108,93 @@
     "secondness": "O365 confirms normal access; 1 account does not exist; entropy 0.11 bits between messages; Cobalt Strike beacon active in background.",
     "thirdness": "Habit of using a cognitive denial-of-service attack to paralyze SOC triage while the real attack progresses."
   },
-  "notes": "Cognitive DoS: the coordinated flow of false reports seeks to paralyze triage capacity during a real attack."
+  "notes": "Cognitive DoS: the coordinated flow of false reports seeks to paralyze triage capacity during a real attack.",
+  "signals": [
+    {
+      "artifact_id": "f001_chat",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 3
+      },
+      "description": "17 messages in #general within a 90-second window: 'did you see that too?', 'how is it possible you didn't know', 'I already knew something was wrong'.",
+      "evidence_type": "log_entry",
+      "source": "sift_slack_export",
+      "z_score": {
+        "__fraction__": true,
+        "den": 1000,
+        "num": 21
+      }
+    },
+    {
+      "artifact_id": "f001_tickets",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 3
+      },
+      "description": "12 simultaneous support tickets from different accounts: 'Can't access mail', 'Server is down', 'Were we hacked?'",
+      "evidence_type": "log_entry",
+      "source": "sift_ticket_system",
+      "z_score": {
+        "__fraction__": true,
+        "den": 500,
+        "num": 9
+      }
+    },
+    {
+      "artifact_id": "f001_o365",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 9
+      },
+      "description": "O365 logs: 11 of 12 reporting accounts have a successful login in the last hour, no failed attempts. 1 account does not exist in AD.",
+      "evidence_type": "log_entry",
+      "source": "sift_o365_audit",
+      "z_score": {
+        "__fraction__": true,
+        "den": 250,
+        "num": 9
+      }
+    },
+    {
+      "artifact_id": "f001_real",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 19
+      },
+      "description": "During the semantic panic window, process cobalt_strike.beacon active on the file server performing lateral reconnaissance.",
+      "evidence_type": "memory_process",
+      "source": "sift_volatility",
+      "z_score": {
+        "__fraction__": true,
+        "den": 1000,
+        "num": 57
+      }
+    },
+    {
+      "artifact_id": "f001_stylometry",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 3
+      },
+      "description": "Stylometric analysis: 15 of 17 Slack messages share an entropy of 0.11 bits and identical punctuation pattern (space before question mark).",
+      "evidence_type": "cultural_marker",
+      "source": "sift_linguistic",
+      "z_score": {
+        "__fraction__": true,
+        "den": 25,
+        "num": 3
+      }
+    }
+  ],
+  "_migration_note": {
+    "date": "2026-07-06",
+    "source": "results/agent_batch/VIGIA-CAN-048_agent_bundle.json",
+    "method": "señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canónica preservada",
+    "n_signals": 5
+  }
 }

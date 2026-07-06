@@ -104,5 +104,77 @@
     "secondness": "Router reports 847 Mbps. Kernel confirms active sockets with manipulated counters. Log compromised.",
     "thirdness": "Habit of compromising the observation layer to hide the scale of the theft, not the event itself."
   },
-  "notes": "Eco: the 'void' is the message. Grice: Quantity maxim violation by omission of magnitude."
+  "notes": "Eco: the 'void' is the message. Grice: Quantity maxim violation by omission of magnitude.",
+  "signals": [
+    {
+      "artifact_id": "a109_01",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 7
+      },
+      "description": "1,247 'Connection established/terminated' events with bytes_transferred=0 or empty during the 14:00-15:15 window.",
+      "evidence_type": "memory_process",
+      "source": "sift_syslog",
+      "z_score": {
+        "__fraction__": true,
+        "den": 500,
+        "num": 161
+      }
+    },
+    {
+      "artifact_id": "a109_02",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 17
+      },
+      "description": "Core router: 847 Mbps of sustained outbound traffic. 47GB total. WAN interface saturation at 98%.",
+      "evidence_type": "ip_geolocation",
+      "source": "sift_netflow",
+      "z_score": {
+        "__fraction__": true,
+        "den": 125,
+        "num": 102
+      }
+    },
+    {
+      "artifact_id": "a109_03",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 9
+      },
+      "description": "14 TCP sockets in ESTABLISHED state with byte counters manipulated to 0x0 in _TCB structures. Evidence of direct kernel write.",
+      "evidence_type": "kernel_structure",
+      "source": "sift_volatility",
+      "z_score": {
+        "__fraction__": true,
+        "den": 100,
+        "num": 81
+      }
+    },
+    {
+      "artifact_id": "a109_04",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 19
+      },
+      "description": "logging_service.exe process compromised: hook in LogNetworkEvent() function that truncates the bytes field to 0 before writing to disk.",
+      "evidence_type": "memory_process",
+      "source": "sift_volatility",
+      "z_score": {
+        "__fraction__": true,
+        "den": 250,
+        "num": 209
+      }
+    }
+  ],
+  "_migration_note": {
+    "date": "2026-07-06",
+    "source": "results/agent_batch/VIGIA-CAN-027_agent_bundle.json",
+    "method": "señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canónica preservada",
+    "n_signals": 4
+  }
 }

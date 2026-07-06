@@ -91,5 +91,77 @@
     "secondness": "'Corrected' account does not exist in validated database. PDF hash changed. Informal channel used for critical data.",
     "thirdness": "Habit of sabotaging document integrity using a fabricated 'error' to divert payment."
   },
-  "notes": "Grice: Manner maxim violation (informal channel for critical information)."
+  "notes": "Grice: Manner maxim violation (informal channel for critical information).",
+  "signals": [
+    {
+      "artifact_id": "a106_01",
+      "confidence": {
+        "__fraction__": true,
+        "den": 5,
+        "num": 3
+      },
+      "description": "PDF invoice: CBU/IBAN area covered by a black rectangle. Metadata says 'Print Error'. Hash differs from the original PDF sent 2 days earlier.",
+      "evidence_type": "file_hash",
+      "source": "sift_document",
+      "z_score": {
+        "__fraction__": true,
+        "den": 125,
+        "num": 54
+      }
+    },
+    {
+      "artifact_id": "a106_02",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 3
+      },
+      "description": "Follow-up email: 'Oops, the PDF came out wrong, sending the CBU here so you're not blocked on the payment'.",
+      "evidence_type": "cultural_marker",
+      "source": "sift_mail_gateway",
+      "z_score": {
+        "__fraction__": true,
+        "den": 100,
+        "num": 27
+      }
+    },
+    {
+      "artifact_id": "a106_03",
+      "confidence": {
+        "__fraction__": true,
+        "den": 2,
+        "num": 1
+      },
+      "description": "'Corrected' account number does not exist in the validated supplier database. First appearance in the system.",
+      "evidence_type": "dns_record",
+      "source": "sift_pcap",
+      "z_score": {
+        "__fraction__": true,
+        "den": 25,
+        "num": 11
+      }
+    },
+    {
+      "artifact_id": "a106_04",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 13
+      },
+      "description": "Hash of the original PDF (sent 2 days earlier) shows a visible legitimate CBU/IBAN. The 'error' version has a different hash.",
+      "evidence_type": "memory_process",
+      "source": "sift_file_audit",
+      "z_score": {
+        "__fraction__": true,
+        "den": 400,
+        "num": 13
+      }
+    }
+  ],
+  "_migration_note": {
+    "date": "2026-07-06",
+    "source": "results/agent_batch/VIGIA-CAN-024_agent_bundle.json",
+    "method": "señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canónica preservada",
+    "n_signals": 4
+  }
 }

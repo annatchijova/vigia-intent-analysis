@@ -100,5 +100,61 @@
     "original_verdict": "NOISE",
     "abstention_risk": "bajo",
     "carnegie_pattern": null
+  },
+  "signals": [
+    {
+      "artifact_id": "ART-001",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 3
+      },
+      "description": "sudo systemctl restart postgresql | sudo apt update | sudo apt upgrade -y | sudo reboot | User: admin.carlos | Time: 2024-02-15 01:00-03:00 UTC | 12 sudo commands total",
+      "evidence_type": "log_entry",
+      "source": "legacy_converter",
+      "z_score": {
+        "__fraction__": true,
+        "den": 400,
+        "num": 21
+      }
+    },
+    {
+      "artifact_id": "ART-002",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 3
+      },
+      "description": "Calendar event: 'DB Server Maintenance — Carlos Rodriguez' | Date: 2024-02-15 01:00 UTC | Attendees: dba_team, security_oncall | Change ticket: CHG-0038 | Approved by: CTO | VPN from: admin.carlos hom",
+      "evidence_type": "log_entry",
+      "source": "legacy_converter",
+      "z_score": {
+        "__fraction__": true,
+        "den": 800,
+        "num": 51
+      }
+    },
+    {
+      "artifact_id": "ART-003",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 3
+      },
+      "description": "Post-maintenance report: Carlos Rodriguez | 'PostgreSQL updated to 15.4, kernel patched, reboot completed. Downtime: 45 min. Next maintenance: 2024-03-15.' | Signed off by DBA lead",
+      "evidence_type": "file_timestamp",
+      "source": "legacy_converter",
+      "z_score": {
+        "__fraction__": true,
+        "den": 800,
+        "num": 57
+      }
+    }
+  ],
+  "_migration_note": {
+    "date": "2026-07-06",
+    "source": "results/agent_batch/VIGIA-BEN-006_agent_bundle.json",
+    "method": "señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canónica preservada",
+    "n_signals": 3
   }
 }

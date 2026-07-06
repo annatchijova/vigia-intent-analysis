@@ -5,7 +5,16 @@
   "description": "Google Takeout export from Chester Russell (king.chester.802@gmail.com), Champlain College cybersecurity student, Google Pixel 3. Three convergent MALICE clusters: (1) Android exploitation research campaign starting Jan 25 2020 (Metasploit, Magisk hidden root, system partition modification); (2) pre-travel OPSEC implementation Mar 5-6 (Magisk, camera metadata stripping 'camera app no metadata Android', app encryption) immediately before Norway trip; (3) spear-phishing attack Mar 23 against Warren Hamilton using fake identity 'Chestnut Russman' and PyInstaller Python malware Chestnut_CV.exe (7.9943 bits/byte entropy, Google API C2 via googleapiclient/httplib2). Accomplice 'Mastermind (Alan Brunswick)' listed in device contacts with email abrunswick8675309@gmail.com, shared payload via Google Drive. Active concealment at every layer: hidden root, fake persona, malware masquerading as CV, Google-domain C2. Verdict: MALICE.",
   "expected_verdict": "MALICE",
   "expected_confidence": 0.85,
-  "expected_mitre_ttps": ["T1566.001", "T1204.002", "T1059.006", "T1567.002", "T1036", "T1562.008", "T1598.003", "T1608.001"],
+  "expected_mitre_ttps": [
+    "T1566.001",
+    "T1204.002",
+    "T1059.006",
+    "T1567.002",
+    "T1036",
+    "T1562.008",
+    "T1598.003",
+    "T1608.001"
+  ],
   "peirce_chain": {
     "firstness": "My Activity/Search Jan 25: 'how do i hack on an android' → 'metasploit guide' → 'kali msfconsole' → 'install metasploit debian'. Mar 5 midnight: 'adbd insecure', 'root pixel 3', Magisk Manager APK from topjohnwu GitHub. Mar 6: 'camera app no metadata Android', 'encrypt an app', 'cm locker'. Mar 23 19:52: email to warrenhamiltonfinance@gmail.com as 'Chestnut Russman': 'I have the file super encrypted with 6 layers of NSA encryption encodings'. Mar 24 01:47: Alan Brunswick shared Chestnut_CV.exe via Google Drive. Contacts: 'Mastermind (Alan)' = abrunswick8675309@gmail.com. Chestnut_CV.exe: PE32+ x86-64, 26,895,731 bytes, 7.9943 bits/byte, PyImport_AddModule, google.auth.transport._http_client, googleapiclient.http.",
     "secondness": "New phone received Jan 21 — 4 days later searching 'how do i hack on an android' is not normal student behavior. Magisk specifically hides root from apps and SafetyNet — it does not simply root; it conceals rooting. 'Camera app no metadata Android' is covert photography, not privacy — the timing (evening before Norway departure) is not coincidental. A legitimate CV is PDF or DOCX; an executable file named Chestnut_CV.exe is categorically not. Entropy 7.9943 bits/byte = packed Python runtime (PyInstaller). Google API imports in a CV file are malware C2 infrastructure. 'Mastermind' in a contact label is an operational designation, not a casual nickname.",
@@ -18,7 +27,7 @@
       "evidence_type": "file_timestamp",
       "source_tool": "generate_forensic_hash",
       "timestamp": "2020-03-29T18:19:00Z",
-      "raw_score": 0.90,
+      "raw_score": 0.9,
       "prior_trust": 0.95,
       "provenance_chain": [
         "sha256:0cff235410a2475d71aca69bde9c4f6e8835fe8aaca3f87b6a35dd6184b4b59d"
@@ -72,13 +81,16 @@
       "source_tool": "read_evidence",
       "timestamp": "2020-01-25T00:47:00Z",
       "raw_score": 0.85,
-      "prior_trust": 0.90,
+      "prior_trust": 0.9,
       "provenance_chain": [
         "sha256:0cff235410a2475d71aca69bde9c4f6e8835fe8aaca3f87b6a35dd6184b4b59d"
       ],
       "description": "My Activity/Search and Chrome: Jan 25 2020 — 'how do i hack on an android' (00:47), YouTube 'Run the Kali Linux Hacking OS on an Unrooted Android Phone' (Null Byte), 'metasploit guide', 'kali msfconsole', 'install metasploit debian'. Mar 5 00:46-01:28: 'adbd insecure', 'adbinsecue', 'root pixel 3', Magisk Manager APK downloaded from topjohnwu GitHub, 'solid explorer' (root file manager), 'mount system write android'. Mar 5 09:25-09:29: Metasploit Framework GitHub nightly installer download. Mar 6 16:03-16:14: 'encrypt an app', 'cm locker', 'camera app no metadata Android'.",
       "metadata": {
-        "source_files": ["Takeout/My Activity/Search/MyActivity.html", "Takeout/My Activity/Chrome/MyActivity.html"],
+        "source_files": [
+          "Takeout/My Activity/Search/MyActivity.html",
+          "Takeout/My Activity/Chrome/MyActivity.html"
+        ],
         "key_searches": [
           "how do i hack on an android",
           "metasploit guide",
@@ -118,7 +130,12 @@
         "attack_timestamp": "2020-03-23T19:52:00Z",
         "warren_discovery_timestamp": "2020-03-23T22:01:00Z",
         "alan_drive_share_timestamp": "2020-03-24T01:47:00Z",
-        "alan_twitter_dms": ["2020-03-07", "2020-03-08", "2020-03-11", "2020-03-24"],
+        "alan_twitter_dms": [
+          "2020-03-07",
+          "2020-03-08",
+          "2020-03-11",
+          "2020-03-24"
+        ],
         "acquisition_tool": "python3 mailbox module",
         "acquisition_hash": "sha256:0cff235410a2475d71aca69bde9c4f6e8835fe8aaca3f87b6a35dd6184b4b59d",
         "acquisition_timestamp": "2026-06-30T15:25:00Z",
@@ -143,7 +160,10 @@
         "alan_email": "abrunswick8675309@gmail.com",
         "alan_phone": "+1-518-653-7460",
         "alan_phone_area": "518 (Albany/Upstate NY)",
-        "gamertag_searches": ["alan brunswick xbox live", "alan#8740"],
+        "gamertag_searches": [
+          "alan brunswick xbox live",
+          "alan#8740"
+        ],
         "gamertag_search_timestamp": "2020-03-23",
         "acquisition_tool": "python3 vobject / regex",
         "acquisition_hash": "sha256:0cff235410a2475d71aca69bde9c4f6e8835fe8aaca3f87b6a35dd6184b4b59d",
@@ -158,13 +178,108 @@
       "type": "MALWARE_DELIVERY_CHAIN",
       "description": "Three independent signals converge on the same attack: (1) Chestnut_CV.exe (malware file with Google API C2) shared by Alan Brunswick via Drive; (2) Warren Hamilton email thread documenting the social engineering and his discovery; (3) Chester's own search history for Alan's Xbox gamertag on the same day as the attack — real-time coordination. Three independent forensic sources confirm a single attack event.",
       "severity": 0.92,
-      "artifacts_involved": ["chestnut_cv_exe_001", "mail_warren_attack_001", "contacts_mastermind_001"]
+      "artifacts_involved": [
+        "chestnut_cv_exe_001",
+        "mail_warren_attack_001",
+        "contacts_mastermind_001"
+      ]
     },
     {
       "type": "OPSEC_BEFORE_OPERATION",
       "description": "OPSEC implementation (Mar 5-6: Magisk, camera metadata, app encryption) immediately precedes Norway departure (Mar 6-7). The temporal proximity — 12-24 hours between OPSEC setup and departure — is not coincidental. Pattern matches pre-operation preparation: secure the platform before deploying it in the field.",
-      "severity": 0.80,
-      "artifacts_involved": ["my_activity_hacking_research_001", "takeout_zip_001"]
+      "severity": 0.8,
+      "artifacts_involved": [
+        "my_activity_hacking_research_001",
+        "takeout_zip_001"
+      ]
     }
-  ]
+  ],
+  "signals": [
+    {
+      "artifact_id": "takeout_zip_001",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 19
+      },
+      "description": "2020 CTF - Takeout.zip: complete Google account export for king.chester.802@gmail.com (Chester Russell). 356,764,506 bytes. Requested Mar 29 2020 (per delivery email in mbox). Contains: My Activity (S",
+      "evidence_type": "file_timestamp",
+      "source": "generate_forensic_hash",
+      "z_score": {
+        "__fraction__": true,
+        "den": 200,
+        "num": 171
+      }
+    },
+    {
+      "artifact_id": "chestnut_cv_exe_001",
+      "confidence": {
+        "__fraction__": true,
+        "den": 100,
+        "num": 97
+      },
+      "description": "Chestnut_CV.exe — PE32+ executable (console) x86-64, 26,895,731 bytes, Shannon entropy 7.9943 bits/byte (PyInstaller-packed Python payload). Shared by Alan Brunswick (abrunswick8675309@gmail.com) via ",
+      "evidence_type": "file_timestamp",
+      "source": "generate_forensic_hash",
+      "z_score": {
+        "__fraction__": true,
+        "den": 2000,
+        "num": 1843
+      }
+    },
+    {
+      "artifact_id": "my_activity_hacking_research_001",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 9
+      },
+      "description": "My Activity/Search and Chrome: Jan 25 2020 — 'how do i hack on an android' (00:47), YouTube 'Run the Kali Linux Hacking OS on an Unrooted Android Phone' (Null Byte), 'metasploit guide', 'kali msfconso",
+      "evidence_type": "log_entry",
+      "source": "read_evidence",
+      "z_score": {
+        "__fraction__": true,
+        "den": 200,
+        "num": 153
+      }
+    },
+    {
+      "artifact_id": "mail_warren_attack_001",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 19
+      },
+      "description": "Mail/All mail.mbox (97 emails): Mar 23 19:52 — Chester emailed warrenhamiltonfinance@gmail.com from king.chester.802@gmail.com as fake persona 'Chestnut Russman': 'Esteemed entrepreneur... I'm worked ",
+      "evidence_type": "log_entry",
+      "source": "read_evidence",
+      "z_score": {
+        "__fraction__": true,
+        "den": 500,
+        "num": 437
+      }
+    },
+    {
+      "artifact_id": "contacts_mastermind_001",
+      "confidence": {
+        "__fraction__": true,
+        "den": 25,
+        "num": 23
+      },
+      "description": "Contacts/All Contacts.vcf: Alan Brunswick listed as 'Mastermind (Alan)', email abrunswick8675309@gmail.com, phone +1-518-653-7460 (area code 518 = Albany NY). Warren Hamilton listed as warrenhamiltonf",
+      "evidence_type": "log_entry",
+      "source": "read_evidence",
+      "z_score": {
+        "__fraction__": true,
+        "den": 625,
+        "num": 506
+      }
+    }
+  ],
+  "_migration_note": {
+    "date": "2026-07-06",
+    "source": "results/agent_batch/VIGIA-GOOGLE-TAKEOUT-2020_agent_bundle.json",
+    "method": "señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canónica preservada",
+    "n_signals": 5
+  }
 }

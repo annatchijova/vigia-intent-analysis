@@ -13,7 +13,9 @@
       "prior_trust": 0.1,
       "source_tool": "manual_forensic_review",
       "timestamp": "2025-08-01T00:00:00Z",
-      "provenance_chain": ["AT-001-manual-collection"],
+      "provenance_chain": [
+        "AT-001-manual-collection"
+      ],
       "examiner_id": "AT-001",
       "schema_version": "ebs_v1",
       "metadata": {
@@ -39,7 +41,9 @@
       "prior_trust": 0.3,
       "source_tool": "manual_forensic_review",
       "timestamp": "2025-08-01T00:00:00Z",
-      "provenance_chain": ["AT-001-manual-collection"],
+      "provenance_chain": [
+        "AT-001-manual-collection"
+      ],
       "examiner_id": "AT-001",
       "schema_version": "ebs_v1",
       "metadata": {
@@ -64,7 +68,9 @@
       "prior_trust": 0.15,
       "source_tool": "manual_forensic_review",
       "timestamp": "2025-08-01T00:00:00Z",
-      "provenance_chain": ["AT-001-manual-collection"],
+      "provenance_chain": [
+        "AT-001-manual-collection"
+      ],
       "examiner_id": "AT-001",
       "schema_version": "ebs_v1",
       "metadata": {
@@ -81,5 +87,61 @@
         "asymmetry_type": "inverse_precision_pattern"
       }
     }
-  ]
+  ],
+  "signals": [
+    {
+      "artifact_id": "KIWI-007-A01",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 1
+      },
+      "description": "Hermano declara haber avisado en tiempo real via capturas. No puede presentar el celular. No sabe el número de su hermano. Imputada lo tiene bloqueado hace años — acceso físicamente imposible.",
+      "evidence_type": "log_entry",
+      "source": "manual_forensic_review",
+      "z_score": {
+        "__fraction__": true,
+        "den": 25,
+        "num": 2
+      }
+    },
+    {
+      "artifact_id": "KIWI-007-A02",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 3
+      },
+      "description": "Botón de pánico activado alegando presencia de imputada. Registro policial con timestamp, GPS y unidad despachada es verificable. Claimed outcome: imputada escapó.",
+      "evidence_type": "log_entry",
+      "source": "manual_forensic_review",
+      "z_score": {
+        "__fraction__": true,
+        "den": 100,
+        "num": 21
+      }
+    },
+    {
+      "artifact_id": "KIWI-007-A03",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 3
+      },
+      "description": "Asimetría de precisión: hermano activo no declara cantidad, testigo periférica declara 10gb exactos. Quien más descargó sabe menos.",
+      "evidence_type": "document_geometry",
+      "source": "manual_forensic_review",
+      "z_score": {
+        "__fraction__": true,
+        "den": 25,
+        "num": 3
+      }
+    }
+  ],
+  "_migration_note": {
+    "date": "2026-07-06",
+    "source": "results/agent_batch/VIGIA_KIWI_007_TESTIMONY_QUANTITY_CONCEALMENT_agent_bundle.json",
+    "method": "señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canónica preservada",
+    "n_signals": 3
+  }
 }

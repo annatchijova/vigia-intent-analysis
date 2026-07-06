@@ -149,5 +149,109 @@
     "schema_version": "1.1",
     "source_file": "VIGIA_BREAK_011_016.json",
     "source_origin": "synthetic_vigia_collective"
+  },
+  "signals": [
+    {
+      "artifact_id": "b012_01",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 3
+      },
+      "description": "Server WEB-01: 'user jdoe executed rm -rf / at 03:00'",
+      "evidence_type": "log_entry",
+      "source": "sift_syslog",
+      "z_score": {
+        "__fraction__": true,
+        "den": 500,
+        "num": 123
+      }
+    },
+    {
+      "artifact_id": "b012_02",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 3
+      },
+      "description": "Server WEB-02: 'user jdoe executed rm -rf / at 03:00'",
+      "evidence_type": "log_entry",
+      "source": "sift_syslog",
+      "z_score": {
+        "__fraction__": true,
+        "den": 500,
+        "num": 123
+      }
+    },
+    {
+      "artifact_id": "b012_03",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 3
+      },
+      "description": "Server WEB-03: 'user jdoe executed rm -rf / at 03:00'",
+      "evidence_type": "log_entry",
+      "source": "sift_syslog",
+      "z_score": {
+        "__fraction__": true,
+        "den": 500,
+        "num": 123
+      }
+    },
+    {
+      "artifact_id": "b012_04",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 3
+      },
+      "description": "Server WEB-04: 'user jdoe executed rm -rf / at 03:00'",
+      "evidence_type": "log_entry",
+      "source": "sift_syslog",
+      "z_score": {
+        "__fraction__": true,
+        "den": 500,
+        "num": 123
+      }
+    },
+    {
+      "artifact_id": "b012_05",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 19
+      },
+      "description": "Server AIRGAPPED-01 (no network): 'user jdoe executed ls -la at 03:05'",
+      "evidence_type": "log_entry",
+      "source": "sift_syslog",
+      "z_score": {
+        "__fraction__": true,
+        "den": 400,
+        "num": 19
+      }
+    },
+    {
+      "artifact_id": "b012_meta",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 17
+      },
+      "description": "SSH key analysis: WEB-01 through WEB-04 share the same compromised SSH key (fingerprint: a1b2c3d4). AIRGAPPED-01 uses a different key (fingerprint: e5f6g7h8).",
+      "evidence_type": "memory_process",
+      "source": "sift_crypto_audit",
+      "z_score": {
+        "__fraction__": true,
+        "den": 500,
+        "num": 391
+      }
+    }
+  ],
+  "_migration_note": {
+    "date": "2026-07-06",
+    "source": "results/agent_batch/VIGIA-BREAK-012_agent_bundle.json",
+    "method": "señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canónica preservada",
+    "n_signals": 6
   }
 }

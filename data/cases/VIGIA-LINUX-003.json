@@ -207,5 +207,93 @@
     "source_origin": "public_incident_report",
     "corpus_tag": "POST-HACKATHON"
   },
-  "schema_version": "1.1"
+  "schema_version": "1.1",
+  "signals": [
+    {
+      "artifact_id": "linux003_01",
+      "confidence": {
+        "__fraction__": true,
+        "den": 25,
+        "num": 24
+      },
+      "description": "File integrity check against dpkg package manifest reveals that /usr/bin/crontab on disk (SHA-256: d1e9a1b3c4f7e2a6b0c8d5f3e1a7b2c4) does not match the hash registered in the dpkg database for the ins",
+      "evidence_type": "file_metadata",
+      "source": "sift_file_integrity",
+      "z_score": {
+        "__fraction__": true,
+        "den": 625,
+        "num": 582
+      }
+    },
+    {
+      "artifact_id": "linux003_02",
+      "confidence": {
+        "__fraction__": true,
+        "den": 100,
+        "num": 93
+      },
+      "description": "/etc/ld.so.preload contains a single non-standard entry: /lib/libgcwrap.so. This library is not registered in any package manifest (dpkg -L output shows no package owns this path). The file was create",
+      "evidence_type": "file_metadata",
+      "source": "sift_file_integrity",
+      "z_score": {
+        "__fraction__": true,
+        "den": 1250,
+        "num": 1023
+      }
+    },
+    {
+      "artifact_id": "linux003_03",
+      "confidence": {
+        "__fraction__": true,
+        "den": 100,
+        "num": 87
+      },
+      "description": "Direct inspection of /proc/<PIDs> reveals active processes with cmdlines consistent with cron job execution, referencing paths under /tmp/.xdiag/int/. The parent process tree shows these originate fro",
+      "evidence_type": "memory_process",
+      "source": "sift_process_monitor",
+      "z_score": {
+        "__fraction__": true,
+        "den": 10000,
+        "num": 8091
+      }
+    },
+    {
+      "artifact_id": "linux003_04",
+      "confidence": {
+        "__fraction__": true,
+        "den": 100,
+        "num": 79
+      },
+      "description": "/tmp/.xdiag/int/.per.s is a runtime log file written by the malware containing timestamped records of cryptomining operations and process management events. Sample entries show XMRIG Monero mining ses",
+      "evidence_type": "log_entry",
+      "source": "sift_linux_forensics",
+      "z_score": {
+        "__fraction__": true,
+        "den": 2000,
+        "num": 1343
+      }
+    },
+    {
+      "artifact_id": "linux003_05",
+      "confidence": {
+        "__fraction__": true,
+        "den": 25,
+        "num": 22
+      },
+      "description": "Script recovered at /dev/health (non-standard path for an executable: /dev/ is a device filesystem, not a bin directory): infinite loop executing pkill -9 xmrig every 45 seconds. This watchdog kills c",
+      "evidence_type": "malware_static_analysis",
+      "source": "sift_static_analysis",
+      "z_score": {
+        "__fraction__": true,
+        "den": 1250,
+        "num": 1001
+      }
+    }
+  ],
+  "_migration_note": {
+    "date": "2026-07-06",
+    "source": "results/agent_batch/VIGIA-LINUX-003_agent_bundle.json",
+    "method": "señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canónica preservada",
+    "n_signals": 5
+  }
 }

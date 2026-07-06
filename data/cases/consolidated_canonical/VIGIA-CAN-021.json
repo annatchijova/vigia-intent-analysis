@@ -98,5 +98,77 @@
     "secondness": "Port 8080 is the decoy. svc_backup performs lateral movement. LSASS session precedes the report.",
     "thirdness": "Habit of strategic over-incrimination to divert the response team's attention toward a controlled zone."
   },
-  "notes": "Carnegie: 'Admit your mistakes quickly and emphatically' — the mistake is the decoy."
+  "notes": "Carnegie: 'Admit your mistakes quickly and emphatically' — the mistake is the decoy.",
+  "signals": [
+    {
+      "artifact_id": "a103_01",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 7
+      },
+      "description": "Email: 'I accidentally left port 8080 open while testing a microservice. I'm hopeless'. Voluntary self-report of minor negligence.",
+      "evidence_type": "memory_process",
+      "source": "sift_ticket_system",
+      "z_score": {
+        "__fraction__": true,
+        "den": 500,
+        "num": 161
+      }
+    },
+    {
+      "artifact_id": "a103_02",
+      "confidence": {
+        "__fraction__": true,
+        "den": 5,
+        "num": 2
+      },
+      "description": "Port 8080 open but only 3 local test connections in 48h. Real vector is not this port.",
+      "evidence_type": "ip_geolocation",
+      "source": "sift_netflow",
+      "z_score": {
+        "__fraction__": true,
+        "den": 50,
+        "num": 11
+      }
+    },
+    {
+      "artifact_id": "a103_03",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 19
+      },
+      "description": "wmiexec.py using credential 'svc_backup' connecting to DC01, DC02, FS01, SQL01 simultaneously.",
+      "evidence_type": "memory_process",
+      "source": "sift_volatility",
+      "z_score": {
+        "__fraction__": true,
+        "den": 1000,
+        "num": 893
+      }
+    },
+    {
+      "artifact_id": "a103_04",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 17
+      },
+      "description": "LSASS session for svc_backup created 2 minutes BEFORE the voluntary report. No interactive login record.",
+      "evidence_type": "lsass_session",
+      "source": "sift_mimikatz",
+      "z_score": {
+        "__fraction__": true,
+        "den": 400,
+        "num": 289
+      }
+    }
+  ],
+  "_migration_note": {
+    "date": "2026-07-06",
+    "source": "results/agent_batch/VIGIA-CAN-021_agent_bundle.json",
+    "method": "señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canónica preservada",
+    "n_signals": 4
+  }
 }

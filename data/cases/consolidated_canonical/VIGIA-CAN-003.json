@@ -92,5 +92,77 @@
     "secondness": "stderr redirection destroys authentication failure visibility; auth enters permissive mode.",
     "thirdness": "Habit of using 'cleanup' as a sign to conceal deliberate degradation of security controls."
   },
-  "notes": "Lethal minimalism: a single line blinds a critical control."
+  "notes": "Lethal minimalism: a single line blinds a critical control.",
+  "signals": [
+    {
+      "artifact_id": "a085_01",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 9
+      },
+      "description": "Commit: 'Cleaning up redundant logs for readability'. Single-line change in deploy.sh.",
+      "evidence_type": "memory_process",
+      "source": "sift_git_audit",
+      "z_score": {
+        "__fraction__": true,
+        "den": 500,
+        "num": 207
+      }
+    },
+    {
+      "artifact_id": "a085_02",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 13
+      },
+      "description": "Diff: added line 'auth_check() 2>/dev/null || true'. Silences all authentication module errors.",
+      "evidence_type": "memory_process",
+      "source": "sift_code_audit",
+      "z_score": {
+        "__fraction__": true,
+        "den": 500,
+        "num": 299
+      }
+    },
+    {
+      "artifact_id": "a085_03",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 7
+      },
+      "description": "47 authentication failures silenced in the post-deploy window. Zero Event 4625 generated.",
+      "evidence_type": "log_entry",
+      "source": "sift_syslog",
+      "z_score": {
+        "__fraction__": true,
+        "den": 400,
+        "num": 21
+      }
+    },
+    {
+      "artifact_id": "a085_04",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 9
+      },
+      "description": "EPROCESS structure of the deploy service shows a handle to /dev/null replacing stderr at runtime.",
+      "evidence_type": "kernel_structure",
+      "source": "sift_volatility",
+      "z_score": {
+        "__fraction__": true,
+        "den": 200,
+        "num": 153
+      }
+    }
+  ],
+  "_migration_note": {
+    "date": "2026-07-06",
+    "source": "results/agent_batch/VIGIA-CAN-003_agent_bundle.json",
+    "method": "señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canónica preservada",
+    "n_signals": 4
+  }
 }

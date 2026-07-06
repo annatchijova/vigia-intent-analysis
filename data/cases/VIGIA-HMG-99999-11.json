@@ -5,7 +5,12 @@
   "description": "Victor Bushell laptop (Windows 7) acquired 2011-10-23 by examiner Craig Wilson (CUC/1). NTFS volume shows zero user files in allocated space — CCleaner wipe executed. IE browser cache in unallocated sectors reveals 24-hour activity window (2011-10-18 to 2011-10-19): CCleaner 3.11 downloaded, InPrivate browsing researched, P&O Ferries booking completed (foot passenger, Dover-Calais), Google Maps route to Osterbrook Hamburg, Deutsche Bank Money Transfer accessed, Gmail accessed. Five-signal pre-flight evidence-destruction and asset-transfer cluster 4 days before seizure.",
   "expected_verdict": "MALICE",
   "expected_confidence": 0.88,
-  "expected_mitre_ttps": ["T1070.004", "T1070.006", "T1036", "T1657"],
+  "expected_mitre_ttps": [
+    "T1070.004",
+    "T1070.006",
+    "T1036",
+    "T1657"
+  ],
   "peirce_chain": {
     "firstness": "NTFS fls shows zero user files in allocated space. IE browser cache in unallocated: CCleaner 3.11 downloaded (fs31.filehippo.com), How-to-Use-CCleaner.pdf on Desktop, Bing 'ccleaner filetype:pdf', InPrivate browsing research, P&O Ferries Steps 1-2-3, 'dover to calais foot passenger', Google Maps Calais→Osterbrook Hamburg, Deutsche Bank Money Transfer, Gmail. Activity: 2011-10-18T15:23:23 to 2011-10-19T15:23:26.",
     "secondness": "Normal Windows 7 after use has extensive AppData and user files. Completely empty NTFS is physically impossible without deliberate wipe. Foot passenger search (not generic 'ferry') specifically avoids vehicle manifest recording. Deutsche Bank Money Transfer (not home banking) accessed same day as Hamburg route planning. All five signals within 24h window, 4 days before seizure.",
@@ -48,7 +53,7 @@
       "source_tool": "search_pattern",
       "timestamp": "2011-10-18T15:23:23Z",
       "raw_score": 0.88,
-      "prior_trust": 0.80,
+      "prior_trust": 0.8,
       "provenance_chain": [
         "sha256:ac4c6156870606af1f62a5f09595bda0cf566f4a3b2e41316ac660304d1a4cb9"
       ],
@@ -58,7 +63,10 @@
         "recovery_method": "strings extraction from ewf1",
         "search_query": "ccleaner filetype:pdf",
         "download_url": "http://fs31.filehippo.com/4145/3d5912a1b2b245179e5d27b059c4eed7/ccsetup311.exe",
-        "desktop_files": ["How to Use CCleaner.pdf", "CCleaner_Disk_File_Cleanup.pdf"],
+        "desktop_files": [
+          "How to Use CCleaner.pdf",
+          "CCleaner_Disk_File_Cleanup.pdf"
+        ],
         "inprivate_research": true,
         "acquisition_tool": "strings -e l (GNU binutils)",
         "acquisition_hash": "sha256:ac4c6156870606af1f62a5f09595bda0cf566f4a3b2e41316ac660304d1a4cb9",
@@ -73,7 +81,7 @@
       "source_tool": "search_pattern",
       "timestamp": "2011-10-19T15:23:26Z",
       "raw_score": 0.85,
-      "prior_trust": 0.80,
+      "prior_trust": 0.8,
       "provenance_chain": [
         "sha256:ac4c6156870606af1f62a5f09595bda0cf566f4a3b2e41316ac660304d1a4cb9"
       ],
@@ -99,7 +107,7 @@
       "evidence_type": "log_entry",
       "source_tool": "search_pattern",
       "timestamp": "2011-10-19T15:23:26Z",
-      "raw_score": 0.80,
+      "raw_score": 0.8,
       "prior_trust": 0.75,
       "provenance_chain": [
         "sha256:ac4c6156870606af1f62a5f09595bda0cf566f4a3b2e41316ac660304d1a4cb9"
@@ -108,7 +116,12 @@
       "metadata": {
         "artifact_location": "unallocated sectors (IE browser cache)",
         "recovery_method": "strings extraction from ewf1",
-        "pages_accessed": ["Deutsche Bank - Home", "Deutsche Bank - Disclaimer", "Deutsche Bank - Money Transfer", "Deutsche Bank - Online Money Transfers"],
+        "pages_accessed": [
+          "Deutsche Bank - Home",
+          "Deutsche Bank - Disclaimer",
+          "Deutsche Bank - Money Transfer",
+          "Deutsche Bank - Online Money Transfers"
+        ],
         "bank": "Deutsche Bank (Germany)",
         "transfer_amount": "UNKNOWN (only page titles recovered, not form data)",
         "acquisition_tool": "strings -e l (GNU binutils)",
@@ -124,7 +137,84 @@
       "type": "ANTI_FORENSIC_CONVERGENCE",
       "description": "CCleaner wipe (F-001) + foot passenger ferry (F-002) + Deutsche Bank transfer (F-003) all occur within 24h window, 4 days pre-seizure. Three independent anti-forensic/evasion signals converging on a single timeline.",
       "severity": 0.92,
-      "artifacts_involved": ["ntfs_empty_001", "browser_ccleaner_001", "browser_ferry_001", "browser_deutsche_bank_001"]
+      "artifacts_involved": [
+        "ntfs_empty_001",
+        "browser_ccleaner_001",
+        "browser_ferry_001",
+        "browser_deutsche_bank_001"
+      ]
     }
-  ]
+  ],
+  "signals": [
+    {
+      "artifact_id": "ntfs_empty_001",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 19
+      },
+      "description": "NTFS volume (ewf1) fls -r shows zero user files in allocated space. Only NTFS metadata structures present ($MFT, $LogFile, $Bitmap, $Volume, $Extend). Consistent with CCleaner full wipe of user partit",
+      "evidence_type": "mft_entry",
+      "source": "list_files",
+      "z_score": {
+        "__fraction__": true,
+        "den": 500,
+        "num": 437
+      }
+    },
+    {
+      "artifact_id": "browser_ccleaner_001",
+      "confidence": {
+        "__fraction__": true,
+        "den": 5,
+        "num": 4
+      },
+      "description": "IE browser cache (unallocated sectors): Bing search 'ccleaner filetype:pdf', CCleaner 3.11 download URL fs31.filehippo.com/4145/3d5912a1b2b245179e5d27b059c4eed7/ccsetup311.exe, desktop files 'How to U",
+      "evidence_type": "log_entry",
+      "source": "search_pattern",
+      "z_score": {
+        "__fraction__": true,
+        "den": 125,
+        "num": 88
+      }
+    },
+    {
+      "artifact_id": "browser_ferry_001",
+      "confidence": {
+        "__fraction__": true,
+        "den": 5,
+        "num": 4
+      },
+      "description": "IE cache (unallocated): P&O Ferries Book Journey Steps 1-2-3 (complete booking flow), Bing 'dover to calais foot passenger', Bing 'sealink ferry time dover to calais', timetable downloaded. Google Map",
+      "evidence_type": "log_entry",
+      "source": "search_pattern",
+      "z_score": {
+        "__fraction__": true,
+        "den": 25,
+        "num": 17
+      }
+    },
+    {
+      "artifact_id": "browser_deutsche_bank_001",
+      "confidence": {
+        "__fraction__": true,
+        "den": 4,
+        "num": 3
+      },
+      "description": "IE cache (unallocated): Deutsche Bank Home, Disclaimer, Money Transfer, Online Money Transfers pages cached. Access contemporaneous with Hamburg route planning. Indicates asset transfer to destination",
+      "evidence_type": "log_entry",
+      "source": "search_pattern",
+      "z_score": {
+        "__fraction__": true,
+        "den": 5,
+        "num": 3
+      }
+    }
+  ],
+  "_migration_note": {
+    "date": "2026-07-06",
+    "source": "results/agent_batch/VIGIA-HMG-99999-11_agent_bundle.json",
+    "method": "señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canónica preservada",
+    "n_signals": 4
+  }
 }

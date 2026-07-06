@@ -76,7 +76,10 @@
         "acquisition_timestamp": "2024-12-12T00:00:00Z",
         "write_blocker_used": false,
         "examiner_id": "Elastic Security Labs",
-        "fileless_executables": ["/memfd:tgt", "/memfd:wpn"],
+        "fileless_executables": [
+          "/memfd:tgt",
+          "/memfd:wpn"
+        ],
         "disk_artifacts_post_execution": false,
         "mechanism": "memfd_create() anonymous file descriptors"
       }
@@ -87,7 +90,7 @@
       "source_tool": "sift_static_analysis",
       "timestamp": "2024-12-12T00:00:00Z",
       "raw_score": 0.87,
-      "prior_trust": 0.90,
+      "prior_trust": 0.9,
       "provenance_chain": [
         "sha256:linux004_c2_network_static"
       ],
@@ -100,7 +103,11 @@
         "examiner_id": "Elastic Security Labs",
         "c2_communication": true,
         "encryption": true,
-        "anti_debugging": ["ptrace detection", "/proc/self/status monitoring", "timing analysis"],
+        "anti_debugging": [
+          "ptrace detection",
+          "/proc/self/status monitoring",
+          "timing analysis"
+        ],
         "dynamic_tasking": true
       }
     },
@@ -122,7 +129,9 @@
         "write_blocker_used": false,
         "examiner_id": "Elastic Security Labs",
         "internal_codename": "PUMA",
-        "additional_strings": ["kitsune"],
+        "additional_strings": [
+          "kitsune"
+        ],
         "active_development_indicators": true,
         "debug_strings_present": true
       }
@@ -188,5 +197,93 @@
     "source_file": "VIGIA-LINUX-CORPUS.json",
     "source_origin": "public_incident_report",
     "corpus_tag": "POST-HACKATHON"
+  },
+  "signals": [
+    {
+      "artifact_id": "linux004_01",
+      "confidence": {
+        "__fraction__": true,
+        "den": 100,
+        "num": 91
+      },
+      "description": "Binary named 'cron' uploaded to VirusTotal on 2024-09-04 with 0 detections across all engines. File entropy analysis shows 7.89/8.0 (highly packed/encrypted), inconsistent with the legitimate cron dae",
+      "evidence_type": "file_metadata",
+      "source": "sift_virustotal_analysis",
+      "z_score": {
+        "__fraction__": true,
+        "den": 2500,
+        "num": 2093
+      }
+    },
+    {
+      "artifact_id": "linux004_02",
+      "confidence": {
+        "__fraction__": true,
+        "den": 100,
+        "num": 93
+      },
+      "description": "Static analysis of the extracted LKM rootkit module reveals ftrace-based hooking of 18 distinct syscalls including read, write, open, stat, lstat, getdents, getdents64, kill, mkdir, rmdir, unlink, unl",
+      "evidence_type": "malware_static_analysis",
+      "source": "sift_static_analysis",
+      "z_score": {
+        "__fraction__": true,
+        "den": 625,
+        "num": 558
+      }
+    },
+    {
+      "artifact_id": "linux004_03",
+      "confidence": {
+        "__fraction__": true,
+        "den": 25,
+        "num": 22
+      },
+      "description": "Two memory-resident executables detected: /memfd:tgt and /memfd:wpn. These use the memfd_create() syscall to create anonymous file descriptors that exist only in memory with no filesystem footprint. T",
+      "evidence_type": "memory_process",
+      "source": "sift_memory_forensics",
+      "z_score": {
+        "__fraction__": true,
+        "den": 1250,
+        "num": 979
+      }
+    },
+    {
+      "artifact_id": "linux004_04",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 9
+      },
+      "description": "Network analysis of the rootkit's C2 communication module reveals encrypted callback channels to external infrastructure. The rootkit uses specialized kernel-level commands for configuration extractio",
+      "evidence_type": "malware_static_analysis",
+      "source": "sift_static_analysis",
+      "z_score": {
+        "__fraction__": true,
+        "den": 1000,
+        "num": 783
+      }
+    },
+    {
+      "artifact_id": "linux004_05",
+      "confidence": {
+        "__fraction__": true,
+        "den": 100,
+        "num": 87
+      },
+      "description": "String analysis of the unpacked rootkit module reveals developer-embedded identifiers: the string 'PUMA' appears in multiple function names and configuration structures, indicating an internal project",
+      "evidence_type": "file_metadata",
+      "source": "sift_file_integrity",
+      "z_score": {
+        "__fraction__": true,
+        "den": 2500,
+        "num": 1827
+      }
+    }
+  ],
+  "_migration_note": {
+    "date": "2026-07-06",
+    "source": "results/agent_batch/VIGIA-LINUX-004_agent_bundle.json",
+    "method": "señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canónica preservada",
+    "n_signals": 5
   }
 }

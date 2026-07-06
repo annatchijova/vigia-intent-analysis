@@ -120,5 +120,77 @@
     "secondness": "Certificate revoked in 2022 still in local store. Active policy prohibits it. CRL not verified.",
     "thirdness": "Habit of reusing old attack infrastructure or long-standing latent persistence in the organization."
   },
-  "notes": "Eco: the sign of authority is an anachronism. A legitimate admin would have no access to or reason to use SHA-1."
+  "notes": "Eco: the sign of authority is an anachronism. A legitimate admin would have no access to or reason to use SHA-1.",
+  "signals": [
+    {
+      "artifact_id": "a107_01",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 7
+      },
+      "description": "GPO 'Security_Baseline_2026' digitally signed with SHA-1 algorithm. Corporate policy prohibits it since 2022.",
+      "evidence_type": "file_hash",
+      "source": "sift_file_audit",
+      "z_score": {
+        "__fraction__": true,
+        "den": 500,
+        "num": 273
+      }
+    },
+    {
+      "artifact_id": "a107_02",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 9
+      },
+      "description": "Corporate policy SEC-POL-2022-003: SHA-1 prohibited for code signing and GPOs since 2022-03-01.",
+      "evidence_type": "log_entry",
+      "source": "sift_compliance_audit",
+      "z_score": {
+        "__fraction__": true,
+        "den": 250,
+        "num": 81
+      }
+    },
+    {
+      "artifact_id": "a107_03",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 9
+      },
+      "description": "SHA-1 certificate revoked in 2022 but still in TrustedPublishers local store on the DC. Online CRL not verified.",
+      "evidence_type": "cryptographic_hash",
+      "source": "sift_crypto_audit",
+      "z_score": {
+        "__fraction__": true,
+        "den": 250,
+        "num": 207
+      }
+    },
+    {
+      "artifact_id": "a107_04",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 19
+      },
+      "description": "lsass.exe on DC with handle to legacy SHA-1 certificate loaded during GPO application.",
+      "evidence_type": "memory_process",
+      "source": "sift_volatility",
+      "z_score": {
+        "__fraction__": true,
+        "den": 400,
+        "num": 361
+      }
+    }
+  ],
+  "_migration_note": {
+    "date": "2026-07-06",
+    "source": "results/agent_batch/VIGIA-CAN-025_agent_bundle.json",
+    "method": "señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canónica preservada",
+    "n_signals": 4
+  }
 }

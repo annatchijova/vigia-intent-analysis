@@ -105,5 +105,77 @@
     "secondness": "Cleanup process started 5 minutes before the Slack message. The flagged IP is a Tor node with no real evidence.",
     "thirdness": "Habit of using incident urgency as cover to destroy forensic traces of the real attack vector."
   },
-  "notes": "Inverted Carnegie: the 'help' IS the method to destroy evidence."
+  "notes": "Inverted Carnegie: the 'help' IS the method to destroy evidence.",
+  "signals": [
+    {
+      "artifact_id": "a087_01",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 3
+      },
+      "description": "Slack message: 'Guys, found a Ukrainian IP attacking us. Already blocked it and deleting logs from that region to avoid saturating the SIEM'.",
+      "evidence_type": "memory_process",
+      "source": "sift_slack_export",
+      "z_score": {
+        "__fraction__": true,
+        "den": 250,
+        "num": 69
+      }
+    },
+    {
+      "artifact_id": "a087_02",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 19
+      },
+      "description": "log_cleaner.exe process executed from contractor's machine 5 minutes BEFORE the Slack message. Not an authorized stack tool.",
+      "evidence_type": "memory_process",
+      "source": "sift_volatility",
+      "z_score": {
+        "__fraction__": true,
+        "den": 400,
+        "num": 323
+      }
+    },
+    {
+      "artifact_id": "a087_03",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 9
+      },
+      "description": "2.4GB of access logs deleted with shred -n 7. Forensic-destructive method, not operational.",
+      "evidence_type": "memory_process",
+      "source": "sift_siem",
+      "z_score": {
+        "__fraction__": true,
+        "den": 250,
+        "num": 207
+      }
+    },
+    {
+      "artifact_id": "a087_04",
+      "confidence": {
+        "__fraction__": true,
+        "den": 4,
+        "num": 1
+      },
+      "description": "Ukrainian IP flagged as attacker turns out to be a Tor exit node. No evidence of real attack from that IP.",
+      "evidence_type": "cultural_marker",
+      "source": "sift_ip_geolocation",
+      "z_score": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 3
+      }
+    }
+  ],
+  "_migration_note": {
+    "date": "2026-07-06",
+    "source": "results/agent_batch/VIGIA-CAN-005_agent_bundle.json",
+    "method": "señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canónica preservada",
+    "n_signals": 4
+  }
 }

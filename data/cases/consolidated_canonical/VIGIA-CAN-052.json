@@ -106,5 +106,93 @@
     "secondness": "Technical confrontation + blame inversion + managerial appeal (without evidence); memory confirms Mimikatz and payload download.",
     "thirdness": "Habit of using escalated interpersonal aggression to nullify the forensic process through hierarchical intimidation and analyst fatigue."
   },
-  "notes": "Defensive Aggression fusion: the attacker uses intimidation and efficiency appeals to stop the investigation."
+  "notes": "Defensive Aggression fusion: the attacker uses intimidation and efficiency appeals to stop the investigation.",
+  "signals": [
+    {
+      "artifact_id": "f005_soc",
+      "confidence": {
+        "__fraction__": true,
+        "den": 5,
+        "num": 2
+      },
+      "description": "Initial SOC inquiry: 'We detected unusual activity on your account yesterday at 03:15. Can you confirm?'",
+      "evidence_type": "log_entry",
+      "source": "sift_chat_system",
+      "z_score": {
+        "__fraction__": true,
+        "den": 250,
+        "num": 7
+      }
+    },
+    {
+      "artifact_id": "f005_resp1",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 3
+      },
+      "description": "Confrontational response: 'How can you be so wrong? This is not an error, it's a lack of knowledge on your part. You don't understand the protocol.'",
+      "evidence_type": "log_entry",
+      "source": "sift_chat_system",
+      "z_score": {
+        "__fraction__": true,
+        "den": 500,
+        "num": 9
+      }
+    },
+    {
+      "artifact_id": "f005_resp2",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 3
+      },
+      "description": "Second response with blame inversion: 'Why are you asking me this? Don't you trust my work? I already spoke with the manager about the excessive monitoring.'",
+      "evidence_type": "cultural_marker",
+      "source": "sift_chat_system",
+      "z_score": {
+        "__fraction__": true,
+        "den": 100,
+        "num": 27
+      }
+    },
+    {
+      "artifact_id": "f005_technical",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 19
+      },
+      "description": "Confirmed malicious activity in memory: powershell.exe process downloading payload from 185.220.101.42 and executing Mimikatz.",
+      "evidence_type": "memory_process",
+      "source": "sift_volatility",
+      "z_score": {
+        "__fraction__": true,
+        "den": 400,
+        "num": 19
+      }
+    },
+    {
+      "artifact_id": "f005_manager",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 3
+      },
+      "description": "Management verification: NO communication record between user@corp.com and manager@corp.com in the claimed time window.",
+      "evidence_type": "log_entry",
+      "source": "sift_syslog",
+      "z_score": {
+        "__fraction__": true,
+        "den": 200,
+        "num": 3
+      }
+    }
+  ],
+  "_migration_note": {
+    "date": "2026-07-06",
+    "source": "results/agent_batch/VIGIA-CAN-052_agent_bundle.json",
+    "method": "señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canónica preservada",
+    "n_signals": 5
+  }
 }

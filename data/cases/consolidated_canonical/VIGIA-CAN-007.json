@@ -96,5 +96,77 @@
     "firstness": "45-minute session with perfectly uniform inter-command timings.",
     "secondness": "0.05s variance is a machine's law. 0.12 bits entropy is incompatible with real human analysis.",
     "thirdness": "Habit of automation that attempts to simulate human rhythm but fails at cognitive entropy."
+  },
+  "signals": [
+    {
+      "artifact_id": "a089_01",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 11
+      },
+      "description": "45-minute RDP session: 847 commands, keystroke variance = 0.050s in 90% of samples. Human baseline: >180ms.",
+      "evidence_type": "memory_process",
+      "source": "sift_session_analyzer",
+      "z_score": {
+        "__fraction__": true,
+        "den": 500,
+        "num": 253
+      }
+    },
+    {
+      "artifact_id": "a089_02",
+      "confidence": {
+        "__fraction__": true,
+        "den": 5,
+        "num": 3
+      },
+      "description": "Session temporal entropy: 0.12 bits. Expected for a human: >2.5 bits for a real analysis session.",
+      "evidence_type": "memory_process",
+      "source": "sift_entropy",
+      "z_score": {
+        "__fraction__": true,
+        "den": 125,
+        "num": 69
+      }
+    },
+    {
+      "artifact_id": "a089_03",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 19
+      },
+      "description": "mstsc.exe process with no evidence of GUI interaction. Zero bitmap changes, zero clipboard operations during 'active' session.",
+      "evidence_type": "memory_process",
+      "source": "sift_volatility",
+      "z_score": {
+        "__fraction__": true,
+        "den": 400,
+        "num": 361
+      }
+    },
+    {
+      "artifact_id": "a089_04",
+      "confidence": {
+        "__fraction__": true,
+        "den": 5,
+        "num": 1
+      },
+      "description": "Session origin: VPS IP in Frankfurt, cheap hosting ASN. Inconsistent with legitimate admin's work hours (03:15 local NY time).",
+      "evidence_type": "ip_geolocation",
+      "source": "sift_netflow",
+      "z_score": {
+        "__fraction__": true,
+        "den": 25,
+        "num": 2
+      }
+    }
+  ],
+  "_migration_note": {
+    "date": "2026-07-06",
+    "source": "results/agent_batch/VIGIA-CAN-007_agent_bundle.json",
+    "method": "señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canónica preservada",
+    "n_signals": 4
   }
 }

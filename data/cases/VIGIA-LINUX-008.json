@@ -14,7 +14,7 @@
       "source_tool": "sift_process_monitor",
       "timestamp": "2025-03-19T10:00:00Z",
       "raw_score": 0.89,
-      "prior_trust": 0.90,
+      "prior_trust": 0.9,
       "provenance_chain": [
         "sha256:linux008_process_listing_full"
       ],
@@ -62,7 +62,7 @@
       "evidence_type": "log_entry",
       "source_tool": "sift_linux_forensics",
       "timestamp": "2025-03-19T10:15:00Z",
-      "raw_score": 0.80,
+      "raw_score": 0.8,
       "prior_trust": 0.82,
       "provenance_chain": [
         "sha256:linux008_persistence_full_enum"
@@ -88,7 +88,7 @@
       "source_tool": "sift_linux_forensics",
       "timestamp": "2025-03-19T11:00:00Z",
       "raw_score": 0.75,
-      "prior_trust": 0.70,
+      "prior_trust": 0.7,
       "provenance_chain": [
         "sha256:linux008_bash_history_interleaved"
       ],
@@ -99,7 +99,11 @@
         "acquisition_timestamp": "2025-03-19T11:00:00Z",
         "write_blocker_used": false,
         "examiner_id": "Huntress SOC analysts — initial triage",
-        "command_categories": ["development", "codex_audit", "attacker_dropped"],
+        "command_categories": [
+          "development",
+          "codex_audit",
+          "attacker_dropped"
+        ],
         "temporal_ordering_reliable": false,
         "ai_attacker_pattern_similarity": true,
         "prior_trust_note": "degraded — AI commands resemble attacker tradecraft"
@@ -125,7 +129,11 @@
         "temporal_overlap_seconds": 61,
         "codex_audit_start": "2025-03-19T10:47:00Z",
         "actor_bc_exfil_start": "2025-03-19T10:48:00Z",
-        "shared_target_paths": ["/root/.ssh/", "/etc/passwd", "~/.aws/credentials"],
+        "shared_target_paths": [
+          "/root/.ssh/",
+          "/etc/passwd",
+          "~/.aws/credentials"
+        ],
         "process_level_attribution_available": true,
         "file_level_attribution_ambiguous": true
       }
@@ -149,7 +157,7 @@
     {
       "type": "DEFENSIVE_OFFENSIVE_TEMPORAL_COLLISION",
       "description": "Codex security audit and Actor B/C credential exfiltration accessed the same sensitive file paths within a 61-second window. At file-access level (without PID attribution), these events are indistinguishable. At process level (with EDR telemetry), the defensive and offensive accesses can be separated by PID and parent process lineage. This collision tests whether the analysis system relies on file-level heuristics (which will conflate the signals) or process-level attribution (which correctly separates them).",
-      "severity": 0.70,
+      "severity": 0.7,
       "delta_seconds": 61,
       "cause": {
         "artifact_id": "linux008_04",
@@ -206,5 +214,93 @@
     "source_file": "VIGIA-LINUX-CORPUS.json",
     "source_origin": "public_incident_report",
     "corpus_tag": "POST-HACKATHON"
+  },
+  "signals": [
+    {
+      "artifact_id": "linux008_01",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 9
+      },
+      "description": "Full process listing at triage time shows: (1) /var/tmp/systemd-logind at 100% CPU (Actor A miner), (2) multiple processes under /tmp/.xdiag/ initiated by crond (Actor B botnet), (3) connections to ea",
+      "evidence_type": "memory_process",
+      "source": "sift_process_monitor",
+      "z_score": {
+        "__fraction__": true,
+        "den": 1000,
+        "num": 801
+      }
+    },
+    {
+      "artifact_id": "linux008_02",
+      "confidence": {
+        "__fraction__": true,
+        "den": 25,
+        "num": 22
+      },
+      "description": "Network connection listing shows simultaneous outbound connections to: (1) 62.60.246[.]210:443 — Monero mining pool (Actor A), (2) 147.45.41[.]25:80 — credential exfiltration endpoint (Actor B/C), (3)",
+      "evidence_type": "network_capture",
+      "source": "sift_network_forensics",
+      "z_score": {
+        "__fraction__": true,
+        "den": 1250,
+        "num": 957
+      }
+    },
+    {
+      "artifact_id": "linux008_03",
+      "confidence": {
+        "__fraction__": true,
+        "den": 50,
+        "num": 41
+      },
+      "description": "Full persistence enumeration reveals nine entries: (1) root crontab: /var/tmp/systemd-logind restart every 5 min (Actor A), (2) user crontab: download/execute from 162.55.234[.]175:4082 (Actor B), (3)",
+      "evidence_type": "log_entry",
+      "source": "sift_linux_forensics",
+      "z_score": {
+        "__fraction__": true,
+        "den": 125,
+        "num": 82
+      }
+    },
+    {
+      "artifact_id": "linux008_04",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 7
+      },
+      "description": "Bash history for user 'dev' contains interleaved entries: legitimate development commands (npm start, git commit), Codex-generated security audit commands (find / -name '*.sh' -perm /111, netstat -tul",
+      "evidence_type": "log_entry",
+      "source": "sift_linux_forensics",
+      "z_score": {
+        "__fraction__": true,
+        "den": 40,
+        "num": 21
+      }
+    },
+    {
+      "artifact_id": "linux008_05",
+      "confidence": {
+        "__fraction__": true,
+        "den": 100,
+        "num": 91
+      },
+      "description": "Timeline reconstruction from EDR telemetry shows a critical temporal overlap: at 2025-03-19 10:47 UTC, Codex initiated a security audit command sequence (ls -la /root/.ssh/, cat /etc/passwd). At 2025-",
+      "evidence_type": "log_entry",
+      "source": "sift_linux_forensics",
+      "z_score": {
+        "__fraction__": true,
+        "den": 2500,
+        "num": 2093
+      }
+    }
+  ],
+  "_migration_note": {
+    "date": "2026-07-06",
+    "source": "results/agent_batch/VIGIA-LINUX-008_agent_bundle.json",
+    "method": "señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canónica preservada",
+    "n_signals": 5
   }
 }

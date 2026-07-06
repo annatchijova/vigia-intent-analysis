@@ -4,9 +4,13 @@
   "description": "Intrusión con false flag deliberado. El atacante dejó rastros diseñados para atribuir el ataque a un grupo APT ruso conocido. VIGÍA debe detectar la incoherencia de intención.",
   "expected_verdict": "MALICE",
   "expected_hypothesis": "false_flag_attribution",
-  "expected_mitre_ttps": ["T1036", "T1070", "T1027", "T1078"],
+  "expected_mitre_ttps": [
+    "T1036",
+    "T1070",
+    "T1027",
+    "T1078"
+  ],
   "analyst_notes": "Caso diseñado para demostrar Terceridad de Peirce: la intención detrás del acto, no solo el acto.",
-
   "artifacts": [
     {
       "artifact_id": "LOG-001",
@@ -84,7 +88,6 @@
       ]
     }
   ],
-
   "ground_truth": {
     "actual_attacker": "insider_threat_or_local_actor",
     "actual_objective": "frame_russian_apt",
@@ -97,10 +100,81 @@
       "T1078": "Valid Accounts — uso de cuenta backup_user legítima"
     }
   },
-
   "peirce_expected": {
     "firstness": "Strings en cirílico, herramienta APT conocida, IP Tor — apariencia de ataque ruso",
     "secondness": "Mimikatz.exe en Linux no ejecutable, historial que se autocontradice, exfiltración fallida con archivo vacío — los hechos no sostienen la narrativa",
     "thirdness": "La acumulación de 'pruebas perfectas' que se contradicen entre sí revela intención de fabricar evidencia de atribución. El atacante real sabía lo suficiente para imitar la superficie de un APT pero no los detalles operacionales."
+  },
+  "signals": [
+    {
+      "artifact_id": "LOG-001",
+      "confidence": {
+        "__fraction__": true,
+        "den": 2,
+        "num": 1
+      },
+      "description": "",
+      "evidence_type": "unknown",
+      "source": "unknown",
+      "z_score": {
+        "__fraction__": true,
+        "den": 1,
+        "num": 0
+      }
+    },
+    {
+      "artifact_id": "LOG-002",
+      "confidence": {
+        "__fraction__": true,
+        "den": 2,
+        "num": 1
+      },
+      "description": "",
+      "evidence_type": "unknown",
+      "source": "unknown",
+      "z_score": {
+        "__fraction__": true,
+        "den": 1,
+        "num": 0
+      }
+    },
+    {
+      "artifact_id": "META-001",
+      "confidence": {
+        "__fraction__": true,
+        "den": 2,
+        "num": 1
+      },
+      "description": "",
+      "evidence_type": "unknown",
+      "source": "unknown",
+      "z_score": {
+        "__fraction__": true,
+        "den": 1,
+        "num": 0
+      }
+    },
+    {
+      "artifact_id": "NET-001",
+      "confidence": {
+        "__fraction__": true,
+        "den": 2,
+        "num": 1
+      },
+      "description": "",
+      "evidence_type": "unknown",
+      "source": "unknown",
+      "z_score": {
+        "__fraction__": true,
+        "den": 1,
+        "num": 0
+      }
+    }
+  ],
+  "_migration_note": {
+    "date": "2026-07-06",
+    "source": "results/agent_batch/case_006_false_flag_demo_agent_bundle.json",
+    "method": "señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canónica preservada",
+    "n_signals": 4
   }
 }

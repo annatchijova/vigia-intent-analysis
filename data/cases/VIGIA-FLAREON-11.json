@@ -72,7 +72,7 @@
       "evidence_type": "binary_executable",
       "source_tool": "list_files",
       "timestamp": "2024-09-26T14:29:26Z",
-      "raw_score": 0.70,
+      "raw_score": 0.7,
       "prior_trust": 0.85,
       "provenance_chain": [
         "sha256:fea8333f3fb72ef8429f638c0ba4206b9c433d9e027a184365cfbcc949f380da"
@@ -97,7 +97,7 @@
       "source_tool": "list_files",
       "timestamp": "2024-09-26T15:14:58Z",
       "raw_score": 0.92,
-      "prior_trust": 0.90,
+      "prior_trust": 0.9,
       "provenance_chain": [
         "sha256:fea8333f3fb72ef8429f638c0ba4206b9c433d9e027a184365cfbcc949f380da"
       ],
@@ -145,7 +145,7 @@
       "source_tool": "list_files",
       "timestamp": "2024-09-26T14:45:24Z",
       "raw_score": 0.88,
-      "prior_trust": 0.90,
+      "prior_trust": 0.9,
       "provenance_chain": [
         "sha256:fea8333f3fb72ef8429f638c0ba4206b9c433d9e027a184365cfbcc949f380da"
       ],
@@ -168,7 +168,7 @@
       "evidence_type": "binary_executable",
       "source_tool": "list_files",
       "timestamp": "2024-09-26T14:26:44Z",
-      "raw_score": 0.60,
+      "raw_score": 0.6,
       "prior_trust": 0.85,
       "provenance_chain": [
         "sha256:fea8333f3fb72ef8429f638c0ba4206b9c433d9e027a184365cfbcc949f380da"
@@ -240,7 +240,7 @@
       "evidence_type": "binary_executable",
       "source_tool": "list_files",
       "timestamp": "2024-09-26T15:05:34Z",
-      "raw_score": 0.70,
+      "raw_score": 0.7,
       "prior_trust": 0.85,
       "provenance_chain": [
         "sha256:fea8333f3fb72ef8429f638c0ba4206b9c433d9e027a184365cfbcc949f380da"
@@ -265,7 +265,7 @@
       "source_tool": "list_files",
       "timestamp": "2024-09-26T14:35:36Z",
       "raw_score": 0.95,
-      "prior_trust": 0.90,
+      "prior_trust": 0.9,
       "provenance_chain": [
         "sha256:fea8333f3fb72ef8429f638c0ba4206b9c433d9e027a184365cfbcc949f380da"
       ],
@@ -287,5 +287,189 @@
         "examiner_id": "VIGIA-MCP-CLAUDE-CODE"
       }
     }
-  ]
+  ],
+  "signals": [
+    {
+      "artifact_id": "ART-FO11-ZIP",
+      "confidence": {
+        "__fraction__": true,
+        "den": 1,
+        "num": 1
+      },
+      "description": "Flare-On11_Challenges.zip — primary distribution archive. SHA-256 verified. Size 214,568,790 bytes. Contains 10 CTF challenge 7z files and PASSWORD.txt.",
+      "evidence_type": "archive",
+      "source": "generate_forensic_hash",
+      "z_score": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 19
+      }
+    },
+    {
+      "artifact_id": "ART-FO11-ARAY",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 17
+      },
+      "description": "aray.7z (2,927 bytes) — array-based obfuscation challenge. Small size consistent with a crackme using array index arithmetic to obscure control flow or key derivation. TTP: T1027 (obfuscated files/inf",
+      "evidence_type": "binary_executable",
+      "source": "list_files",
+      "z_score": {
+        "__fraction__": true,
+        "den": 400,
+        "num": 221
+      }
+    },
+    {
+      "artifact_id": "ART-FO11-BLOKE2",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 17
+      },
+      "description": "bloke2.7z (5,775 bytes) — BLAKE2 cryptographic hash-based challenge. Name is wordplay on BLAKE2 algorithm. Likely uses custom BLAKE2 implementation for key derivation or license check. TTP: T1140 (deo",
+      "evidence_type": "binary_executable",
+      "source": "list_files",
+      "z_score": {
+        "__fraction__": true,
+        "den": 200,
+        "num": 119
+      }
+    },
+    {
+      "artifact_id": "ART-FO11-CATBERT",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 9
+      },
+      "description": "CatbertRansomware.7z (1,692,864 bytes) — ransomware sample. Largest text-challenge entry aside from sshd. Name references Dilbert character Catbert (evil HR director), consistent with Mandiant/FLARE h",
+      "evidence_type": "binary_executable",
+      "source": "list_files",
+      "z_score": {
+        "__fraction__": true,
+        "den": 250,
+        "num": 207
+      }
+    },
+    {
+      "artifact_id": "ART-FO11-CHECKSUM",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 17
+      },
+      "description": "checksum.7z (1,392,978 bytes) — checksum-based integrity or key derivation challenge. Name implies the binary computes or validates a checksum as part of its protection scheme. TTP: T1140 (deobfuscate",
+      "evidence_type": "binary_executable",
+      "source": "list_files",
+      "z_score": {
+        "__fraction__": true,
+        "den": 500,
+        "num": 289
+      }
+    },
+    {
+      "artifact_id": "ART-FO11-CLEARLYFAKE",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 9
+      },
+      "description": "clearlyfake.7z (1,616 bytes) — ClearFake-style dropper. Extremely small size (1.6 KB) consistent with a JavaScript dropper or PowerShell stub, matching the documented ClearFake campaign that distribut",
+      "evidence_type": "binary_executable",
+      "source": "list_files",
+      "z_score": {
+        "__fraction__": true,
+        "den": 125,
+        "num": 99
+      }
+    },
+    {
+      "artifact_id": "ART-FO11-FROG",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 17
+      },
+      "description": "frog.7z (10,653,489 bytes) — challenge of moderate size. Name suggests obfuscation or game-engine challenge (10 MB consistent with Unity or similar runtime). TTP: T1027 (obfuscated files/information).",
+      "evidence_type": "binary_executable",
+      "source": "list_files",
+      "z_score": {
+        "__fraction__": true,
+        "den": 100,
+        "num": 51
+      }
+    },
+    {
+      "artifact_id": "ART-FO11-FULLSPEED",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 17
+      },
+      "description": "fullspeed.7z (771,776 bytes) — name suggests a speed-optimization or crypto challenge. 'Full speed' may reference elliptic curve cryptography (FullSpeed EC variant) or a timing-dependent protection. T",
+      "evidence_type": "binary_executable",
+      "source": "list_files",
+      "z_score": {
+        "__fraction__": true,
+        "den": 250,
+        "num": 153
+      }
+    },
+    {
+      "artifact_id": "ART-FO11-MEMEMAKER",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 17
+      },
+      "description": "mememaker3000.7z (1,010,226 bytes) — name suggests a social engineering or steganography-themed challenge, possibly hiding flags in images or using meme-format payloads. TTP: T1027.003 (steganography)",
+      "evidence_type": "binary_executable",
+      "source": "list_files",
+      "z_score": {
+        "__fraction__": true,
+        "den": 400,
+        "num": 221
+      }
+    },
+    {
+      "artifact_id": "ART-FO11-SERPENTINE",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 17
+      },
+      "description": "serpentine.7z (5,725,299 bytes) — name references serpentine/snake motion, possibly Python-based challenge or a challenge featuring serpentine data encoding. TTP: T1059.006 (Python) or T1027 (obfuscat",
+      "evidence_type": "binary_executable",
+      "source": "list_files",
+      "z_score": {
+        "__fraction__": true,
+        "den": 200,
+        "num": 119
+      }
+    },
+    {
+      "artifact_id": "ART-FO11-SSHD",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 9
+      },
+      "description": "sshd.7z (193,244,435 bytes) — by far the largest challenge at 193 MB. Name and size are consistent with a full trojanized OpenSSH daemon. Real-world analog: XZ Utils/liblzma supply chain compromise (C",
+      "evidence_type": "binary_executable",
+      "source": "list_files",
+      "z_score": {
+        "__fraction__": true,
+        "den": 200,
+        "num": 171
+      }
+    }
+  ],
+  "_migration_note": {
+    "date": "2026-07-06",
+    "source": "results/agent_batch/VIGIA-FLAREON-11_agent_bundle.json",
+    "method": "señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canónica preservada",
+    "n_signals": 11
+  }
 }

@@ -5,7 +5,12 @@
   "description": "FLARE-On 6 challenge set released in 2019 by FireEye FLARE team. The zip archive (507,631,141 bytes, SHA-256: 8e28568616e8e5bdf3a319f214fd8162d8e0bdc24a8385a02c3f6f55c7bcce8b) contains 12 CTF challenges (numbered 1–12) plus a 7zip_password.txt. Notable scale: challenge 12 (help.7z, 479 MB) is almost certainly a VM or disk image. Challenge 2 (Overlong.7z, 1,391 bytes) is the smallest — likely a tiny obfuscation or encoding puzzle. Each challenge is a password-protected 7z archive; the password is held in 7zip_password.txt within the zip. Verdict INTENT: the archive represents deliberate, methodically crafted adversarial content designed to exercise reverse engineering skills. The presence of a full VM (ch12), a game-based challenge (ch1), DNS-based exfiltration (ch4), and sub-kilobyte obfuscation (ch2) demonstrates structured multi-technique coverage consistent with an intentional curriculum authored by a team with deep offensive knowledge.",
   "expected_verdict": "INTENT",
   "expected_confidence": 0.92,
-  "expected_mitre_ttps": ["T1027", "T1059", "T1071.004", "T1564"],
+  "expected_mitre_ttps": [
+    "T1027",
+    "T1059",
+    "T1071.004",
+    "T1564"
+  ],
   "peirce_chain": {
     "firstness": "12 CTF challenges spanning 1 KB to 479 MB. Techniques visible from size/name alone: game reversing (ch1), sub-byte obfuscation (ch2), Android/APK (ch3 Flarebear), DNS covert channel (ch4 Dnschess), binary steganography (ch6 bmphide), WOPR simulation (ch7), snake (ch8), reloaded-packing (ch9), VM image (ch12 help).",
     "secondness": "A benign archive of this composition does not exist. The combination of a 479 MB VM, a sub-2 KB obfuscated blob, a DNS-chess-based C2 simulation, and steganographic BMP challenges is not accidental. Each size/name pair maps to a distinct adversarial technique class. The 7zip_password.txt inside the outer zip (not inside each 7z) is itself an access-control choice — challenges are locked behind a single shared secret rather than individual keys, which is consistent with a competition model where the password is released at event start.",
@@ -56,8 +61,8 @@
       "evidence_type": "binary",
       "source_tool": "list_files",
       "timestamp": "2019-08-16T08:27:00Z",
-      "raw_score": 0.60,
-      "prior_trust": 0.90,
+      "raw_score": 0.6,
+      "prior_trust": 0.9,
       "provenance_chain": [
         "sha256:8e28568616e8e5bdf3a319f214fd8162d8e0bdc24a8385a02c3f6f55c7bcce8b",
         "zip_entry:1 - Memecat Battlestation.7z"
@@ -83,7 +88,7 @@
       "source_tool": "list_files",
       "timestamp": "2019-08-16T08:43:00Z",
       "raw_score": 0.75,
-      "prior_trust": 0.90,
+      "prior_trust": 0.9,
       "provenance_chain": [
         "sha256:8e28568616e8e5bdf3a319f214fd8162d8e0bdc24a8385a02c3f6f55c7bcce8b",
         "zip_entry:2 - Overlong.7z"
@@ -108,8 +113,8 @@
       "evidence_type": "binary",
       "source_tool": "list_files",
       "timestamp": "2019-08-16T08:53:00Z",
-      "raw_score": 0.70,
-      "prior_trust": 0.90,
+      "raw_score": 0.7,
+      "prior_trust": 0.9,
       "provenance_chain": [
         "sha256:8e28568616e8e5bdf3a319f214fd8162d8e0bdc24a8385a02c3f6f55c7bcce8b",
         "zip_entry:3 - Flarebear.7z"
@@ -135,7 +140,7 @@
       "source_tool": "list_files",
       "timestamp": "2019-08-16T09:27:00Z",
       "raw_score": 0.85,
-      "prior_trust": 0.90,
+      "prior_trust": 0.9,
       "provenance_chain": [
         "sha256:8e28568616e8e5bdf3a319f214fd8162d8e0bdc24a8385a02c3f6f55c7bcce8b",
         "zip_entry:4 - Dnschess.7z"
@@ -161,7 +166,7 @@
       "source_tool": "list_files",
       "timestamp": "2019-08-16T09:48:00Z",
       "raw_score": 0.65,
-      "prior_trust": 0.90,
+      "prior_trust": 0.9,
       "provenance_chain": [
         "sha256:8e28568616e8e5bdf3a319f214fd8162d8e0bdc24a8385a02c3f6f55c7bcce8b",
         "zip_entry:5 - demo.7z"
@@ -186,8 +191,8 @@
       "evidence_type": "binary",
       "source_tool": "list_files",
       "timestamp": "2019-08-16T10:17:00Z",
-      "raw_score": 0.80,
-      "prior_trust": 0.90,
+      "raw_score": 0.8,
+      "prior_trust": 0.9,
       "provenance_chain": [
         "sha256:8e28568616e8e5bdf3a319f214fd8162d8e0bdc24a8385a02c3f6f55c7bcce8b",
         "zip_entry:6 - bmphide.7z"
@@ -212,8 +217,8 @@
       "evidence_type": "binary",
       "source_tool": "list_files",
       "timestamp": "2019-08-16T10:33:00Z",
-      "raw_score": 0.80,
-      "prior_trust": 0.90,
+      "raw_score": 0.8,
+      "prior_trust": 0.9,
       "provenance_chain": [
         "sha256:8e28568616e8e5bdf3a319f214fd8162d8e0bdc24a8385a02c3f6f55c7bcce8b",
         "zip_entry:7 - wopr.7z"
@@ -238,8 +243,8 @@
       "evidence_type": "binary",
       "source_tool": "list_files",
       "timestamp": "2019-08-16T10:47:00Z",
-      "raw_score": 0.70,
-      "prior_trust": 0.90,
+      "raw_score": 0.7,
+      "prior_trust": 0.9,
       "provenance_chain": [
         "sha256:8e28568616e8e5bdf3a319f214fd8162d8e0bdc24a8385a02c3f6f55c7bcce8b",
         "zip_entry:8 - snake.7z"
@@ -264,8 +269,8 @@
       "evidence_type": "binary",
       "source_tool": "list_files",
       "timestamp": "2019-08-16T11:18:00Z",
-      "raw_score": 0.80,
-      "prior_trust": 0.90,
+      "raw_score": 0.8,
+      "prior_trust": 0.9,
       "provenance_chain": [
         "sha256:8e28568616e8e5bdf3a319f214fd8162d8e0bdc24a8385a02c3f6f55c7bcce8b",
         "zip_entry:9 - reloadered.7z"
@@ -291,7 +296,7 @@
       "source_tool": "list_files",
       "timestamp": "2019-08-16T11:31:00Z",
       "raw_score": 0.75,
-      "prior_trust": 0.90,
+      "prior_trust": 0.9,
       "provenance_chain": [
         "sha256:8e28568616e8e5bdf3a319f214fd8162d8e0bdc24a8385a02c3f6f55c7bcce8b",
         "zip_entry:10 - Mugatu.7z"
@@ -317,7 +322,7 @@
       "source_tool": "list_files",
       "timestamp": "2019-08-16T11:45:00Z",
       "raw_score": 0.75,
-      "prior_trust": 0.90,
+      "prior_trust": 0.9,
       "provenance_chain": [
         "sha256:8e28568616e8e5bdf3a319f214fd8162d8e0bdc24a8385a02c3f6f55c7bcce8b",
         "zip_entry:11 - vv_max.7z"
@@ -342,8 +347,8 @@
       "evidence_type": "disk_image",
       "source_tool": "list_files",
       "timestamp": "2019-08-16T12:57:00Z",
-      "raw_score": 0.90,
-      "prior_trust": 0.90,
+      "raw_score": 0.9,
+      "prior_trust": 0.9,
       "provenance_chain": [
         "sha256:8e28568616e8e5bdf3a319f214fd8162d8e0bdc24a8385a02c3f6f55c7bcce8b",
         "zip_entry:12 - help.7z"
@@ -370,5 +375,221 @@
     "No sandbox execution was performed. All technique class assignments are INFERRED, not CONFIRMED."
   ],
   "source_dataset": "FLARE-On 6 CTF — FireEye FLARE Team (2019)",
-  "source_origin": "public_ctf_archive"
+  "source_origin": "public_ctf_archive",
+  "signals": [
+    {
+      "artifact_id": "flareon6-zip-001",
+      "confidence": {
+        "__fraction__": true,
+        "den": 100,
+        "num": 99
+      },
+      "description": "Outer zip archive Flare-On6_Challenges.zip. SHA-256 verified against task specification. Size: 507,631,141 bytes. Contains 13 entries: 12 challenge 7z archives + 7zip_password.txt. Archive dated 2019-",
+      "evidence_type": "file_hash",
+      "source": "generate_forensic_hash",
+      "z_score": {
+        "__fraction__": true,
+        "den": 2000,
+        "num": 1881
+      }
+    },
+    {
+      "artifact_id": "flareon6-ch1-memecat",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 9
+      },
+      "description": "Challenge 01 — Memecat Battlestation (5,512,209 bytes). Game-based reverse engineering challenge. Title and size suggest a game binary (likely .NET or Unity) where meme-themed gameplay conceals a key-",
+      "evidence_type": "binary",
+      "source": "list_files",
+      "z_score": {
+        "__fraction__": true,
+        "den": 50,
+        "num": 27
+      }
+    },
+    {
+      "artifact_id": "flareon6-ch2-overlong",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 9
+      },
+      "description": "Challenge 02 — Overlong (1,391 bytes). Sub-2 KB 7z archive. Name 'Overlong' directly references the overlong UTF-8 encoding vulnerability (CVE-2008-2938, Apache Tomcat; also used in IIS Unicode path t",
+      "evidence_type": "binary",
+      "source": "list_files",
+      "z_score": {
+        "__fraction__": true,
+        "den": 40,
+        "num": 27
+      }
+    },
+    {
+      "artifact_id": "flareon6-ch3-flarebear",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 9
+      },
+      "description": "Challenge 03 — Flarebear (3,278,433 bytes). Android APK reverse engineering challenge. 'Flarebear' is a virtual pet app where the correct sequence of interactions unlocks the flag. Technique class: An",
+      "evidence_type": "binary",
+      "source": "list_files",
+      "z_score": {
+        "__fraction__": true,
+        "den": 100,
+        "num": 63
+      }
+    },
+    {
+      "artifact_id": "flareon6-ch4-dnschess",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 9
+      },
+      "description": "Challenge 04 — Dnschess (16,351 bytes). DNS-based covert channel challenge. A chess game that queries a custom DNS server; the server's responses encode the flag. Technique class: DNS C2 simulation / ",
+      "evidence_type": "network_traffic",
+      "source": "list_files",
+      "z_score": {
+        "__fraction__": true,
+        "den": 200,
+        "num": 153
+      }
+    },
+    {
+      "artifact_id": "flareon6-ch5-demo",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 9
+      },
+      "description": "Challenge 05 — demo (4,479 bytes). Small binary challenge. Name 'demo' may reference a demoscene executable. Technique class: x86 shellcode or packed PE / demoscene crackme.",
+      "evidence_type": "binary",
+      "source": "list_files",
+      "z_score": {
+        "__fraction__": true,
+        "den": 200,
+        "num": 117
+      }
+    },
+    {
+      "artifact_id": "flareon6-ch6-bmphide",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 9
+      },
+      "description": "Challenge 06 — bmphide (4,386,993 bytes). BMP steganography challenge. Name explicitly signals BMP-based data hiding. Technique class: LSB steganography / image forensics. MITRE T1027.",
+      "evidence_type": "binary",
+      "source": "list_files",
+      "z_score": {
+        "__fraction__": true,
+        "den": 25,
+        "num": 18
+      }
+    },
+    {
+      "artifact_id": "flareon6-ch7-wopr",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 9
+      },
+      "description": "Challenge 07 — wopr (5,170,081 bytes). War Operations Plan Response simulation. References the 1983 film WarGames. Likely a self-modifying or anti-debug challenge simulating an adversarial AI/system. ",
+      "evidence_type": "binary",
+      "source": "list_files",
+      "z_score": {
+        "__fraction__": true,
+        "den": 25,
+        "num": 18
+      }
+    },
+    {
+      "artifact_id": "flareon6-ch8-snake",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 9
+      },
+      "description": "Challenge 08 — snake (5,999 bytes). Snake game reverse engineering. Small binary — likely a custom-runtime or VM-protected crackme using a Snake game as cover. Technique class: custom VM / crackme.",
+      "evidence_type": "binary",
+      "source": "list_files",
+      "z_score": {
+        "__fraction__": true,
+        "den": 100,
+        "num": 63
+      }
+    },
+    {
+      "artifact_id": "flareon6-ch9-reloadered",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 9
+      },
+      "description": "Challenge 09 — reloadered (7,279 bytes). Pun on 'The Matrix Reloaded'. Small binary suggesting a packing / reload challenge. Technique class: PE packing / process injection (T1055).",
+      "evidence_type": "binary",
+      "source": "list_files",
+      "z_score": {
+        "__fraction__": true,
+        "den": 25,
+        "num": 18
+      }
+    },
+    {
+      "artifact_id": "flareon6-ch10-mugatu",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 9
+      },
+      "description": "Challenge 10 — Mugatu (10,003,313 bytes). References the Zoolander villain. 10 MB archive suggests a substantial binary or dataset. Technique class: obfuscated malware sample / network protocol revers",
+      "evidence_type": "binary",
+      "source": "list_files",
+      "z_score": {
+        "__fraction__": true,
+        "den": 40,
+        "num": 27
+      }
+    },
+    {
+      "artifact_id": "flareon6-ch11-vv_max",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 9
+      },
+      "description": "Challenge 11 — vv_max (55,680 bytes). Name suggests Vim scripting ('vv') or a 'max' algorithm challenge. Technique class: scripting language interpreter / esoteric language reversing.",
+      "evidence_type": "binary",
+      "source": "list_files",
+      "z_score": {
+        "__fraction__": true,
+        "den": 40,
+        "num": 27
+      }
+    },
+    {
+      "artifact_id": "flareon6-ch12-help",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 9
+      },
+      "description": "Challenge 12 — help (479,187,058 bytes). Final challenge. 479 MB 7z archive strongly suggests a VM image or disk image. Name 'help' may be ironic or reference a system that requires rescue/analysis. T",
+      "evidence_type": "disk_image",
+      "source": "list_files",
+      "z_score": {
+        "__fraction__": true,
+        "den": 100,
+        "num": 81
+      }
+    }
+  ],
+  "_migration_note": {
+    "date": "2026-07-06",
+    "source": "results/agent_batch/VIGIA-FLAREON-6_agent_bundle.json",
+    "method": "señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canónica preservada",
+    "n_signals": 13
+  }
 }

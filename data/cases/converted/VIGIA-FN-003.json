@@ -98,5 +98,61 @@
     "schema_version": "1.1",
     "source_file": "VIGIA_FP_FN_AMB.json",
     "source_origin": "synthetic_vigia_collective"
+  },
+  "signals": [
+    {
+      "artifact_id": "fn003_01",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 19
+      },
+      "description": "svchost.exe PID 612 with RWX memory regions",
+      "evidence_type": "memory_process",
+      "source": "sift_volatility",
+      "z_score": {
+        "__fraction__": true,
+        "den": 400,
+        "num": 57
+      }
+    },
+    {
+      "artifact_id": "fn003_02",
+      "confidence": {
+        "__fraction__": true,
+        "den": 5,
+        "num": 4
+      },
+      "description": "Connection to 52.85.0.0/16 (AWS CloudFront) from svchost.exe",
+      "evidence_type": "ip_geolocation",
+      "source": "sift_netflow",
+      "z_score": {
+        "__fraction__": true,
+        "den": 25,
+        "num": 1
+      }
+    },
+    {
+      "artifact_id": "fn003_03",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 9
+      },
+      "description": "Parent of svchost.exe PID 612: cmd.exe (PID 4412), not services.exe",
+      "evidence_type": "memory_process",
+      "source": "sift_parent_process",
+      "z_score": {
+        "__fraction__": true,
+        "den": 125,
+        "num": 99
+      }
+    }
+  ],
+  "_migration_note": {
+    "date": "2026-07-06",
+    "source": "results/agent_batch/VIGIA-FN-003_agent_bundle.json",
+    "method": "señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canónica preservada",
+    "n_signals": 3
   }
 }

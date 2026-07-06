@@ -5,7 +5,10 @@
   "description": "Supplement to prior INTENT verdict (VIGIA-MAGNET-2022-IOS-JESS). Three new artifacts: GrayKey extraction report PDF, keychain password dump TXT (1301 lines), raw keychain plist. Key findings: (1) ChamplainPSK WiFi credential with password 'letusdare' (Champlain College motto) — places Bentley at a major cybersecurity school; (2) Wire encrypted messaging app installed (E2E OPSEC channel); (3) GrayKey confirms passcode 782677 recovered, device BFU at seizure, extraction 2022-02-14; (4) cleartext Chess.com credentials ChessGod0107/God@Chess!. Prior verdict INTENT maintained and corroborated.",
   "expected_verdict": "INTENT",
   "expected_confidence": 0.82,
-  "expected_mitre_ttps": ["T1573", "T1078"],
+  "expected_mitre_ttps": [
+    "T1573",
+    "T1078"
+  ],
   "peirce_chain": {
     "firstness": "Keychain AirPort entry: Label=ChamplainPSK, value='letusdare'. Wire session UUID in keychain. GrayKey PDF: device BFU, two bruteforce failures, manual unlock, passcode=782677, extraction success 2022-02-14. Chess.com: ChessGod0107/God@Chess! in cleartext.",
     "secondness": "ChamplainPSK + 'letusdare' is an unambiguous attribution to Champlain College (cybersecurity school, Burlington VT). 'letusdare' is not a common phrase — it is the college's Latin motto rendered in English. Wire co-installed with iMessage indicates deliberate selection of a zero-metadata channel for specific communications. Prior finding of hacking searches 72h before seizure now has institutional context: this is not amateur curiosity.",
@@ -111,7 +114,7 @@
       "source_tool": "read_evidence",
       "timestamp": "2022-01-21T22:14:32Z",
       "raw_score": 0.55,
-      "prior_trust": 0.90,
+      "prior_trust": 0.9,
       "provenance_chain": [
         "sha256:ff0db8cd26236dc59ccf7f40637ad8bdcccd9b6f8ef975bd5f5c02325e1f1be0"
       ],
@@ -130,5 +133,77 @@
         "examiner_id": "VIGIA-MCP-CLAUDE-CODE"
       }
     }
-  ]
+  ],
+  "signals": [
+    {
+      "artifact_id": "graykey_pdf_001",
+      "confidence": {
+        "__fraction__": true,
+        "den": 50,
+        "num": 49
+      },
+      "description": "GrayKey Progress Report PDF. Device: Patrick Bentley, iPhone 8 (Global), iOS 15.0.2, UDID fb028ddefa8af7df5b12d3e729f075d150637a31. Extraction 2022-02-14T18:21:48-18:37:46 UTC. BFU state at seizure. T",
+      "evidence_type": "file_timestamp",
+      "source": "read_evidence",
+      "z_score": {
+        "__fraction__": true,
+        "den": 1000,
+        "num": 931
+      }
+    },
+    {
+      "artifact_id": "keychain_champlain_wifi_001",
+      "confidence": {
+        "__fraction__": true,
+        "den": 25,
+        "num": 23
+      },
+      "description": "Keychain AirPort entry: Label/Account=ChamplainPSK, Item value='letusdare'. Created 2022-02-04T00:31:37Z. ChamplainPSK is Champlain College (Burlington, VT) WiFi PSK. 'letusdare' is the college's Lati",
+      "evidence_type": "log_entry",
+      "source": "read_evidence",
+      "z_score": {
+        "__fraction__": true,
+        "den": 500,
+        "num": 391
+      }
+    },
+    {
+      "artifact_id": "keychain_wire_001",
+      "confidence": {
+        "__fraction__": true,
+        "den": 25,
+        "num": 22
+      },
+      "description": "Keychain entry for Wire (com.wearezeta.zclient.ios), Access Group EDF3JCE8BC. Active session UUID 5C705A09-88C8-4845-BFD2-65EB6CBEE5DB with encrypted session token. Wire is E2E encrypted, zero-metadat",
+      "evidence_type": "log_entry",
+      "source": "read_evidence",
+      "z_score": {
+        "__fraction__": true,
+        "den": 625,
+        "num": 396
+      }
+    },
+    {
+      "artifact_id": "keychain_chess_credentials_001",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 9
+      },
+      "description": "Keychain Chess.com (com.chess.iphone): Account=ChessGod0107, Item value='God@Chess!' (cleartext). The '0107' suffix matches pbentley0107@gmail.com — consistent personal identifier (likely Jan 7 birthd",
+      "evidence_type": "log_entry",
+      "source": "read_evidence",
+      "z_score": {
+        "__fraction__": true,
+        "den": 200,
+        "num": 99
+      }
+    }
+  ],
+  "_migration_note": {
+    "date": "2026-07-06",
+    "source": "results/agent_batch/VIGIA-MAGNET-2022-IOS-JESS-KEYCHAIN_agent_bundle.json",
+    "method": "señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canónica preservada",
+    "n_signals": 4
+  }
 }

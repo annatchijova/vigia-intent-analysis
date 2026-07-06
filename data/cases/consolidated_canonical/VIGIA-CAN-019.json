@@ -113,5 +113,77 @@
     "secondness": "The 'strange file' is an exploit that activates when opened by admin. Informant is the vector.",
     "thirdness": "Habit of role inversion: the report IS the attack. The informant acts as the trigger."
   },
-  "notes": "Trap reporting: the security system becomes the attack vector."
+  "notes": "Trap reporting: the security system becomes the attack vector.",
+  "signals": [
+    {
+      "artifact_id": "a101_01",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 3
+      },
+      "description": "Ticket: 'I think I was hacked, I see strange files in my folder'. Attaches file for review.",
+      "evidence_type": "memory_process",
+      "source": "sift_ticket_system",
+      "z_score": {
+        "__fraction__": true,
+        "den": 250,
+        "num": 69
+      }
+    },
+    {
+      "artifact_id": "a101_02",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 7
+      },
+      "description": "Strange file: LNK with PDF magic bytes and CVE-2024-XXXX exploit in compressed stream. Activates when opened by a privileged viewer.",
+      "evidence_type": "memory_process",
+      "source": "sift_file_audit",
+      "z_score": {
+        "__fraction__": true,
+        "den": 250,
+        "num": 161
+      }
+    },
+    {
+      "artifact_id": "a101_03",
+      "confidence": {
+        "__fraction__": true,
+        "den": 5,
+        "num": 2
+      },
+      "description": "Admin (domain\\admin_sec) opens file from share using privileged internal viewer.",
+      "evidence_type": "log_entry",
+      "source": "sift_syslog",
+      "z_score": {
+        "__fraction__": true,
+        "den": 25,
+        "num": 8
+      }
+    },
+    {
+      "artifact_id": "a101_04",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 19
+      },
+      "description": "Shellcode injected into admin_viewer.exe 2 seconds after opening. Reverse shell established to 185.220.101.42:4444.",
+      "evidence_type": "memory_process",
+      "source": "sift_volatility",
+      "z_score": {
+        "__fraction__": true,
+        "den": 500,
+        "num": 437
+      }
+    }
+  ],
+  "_migration_note": {
+    "date": "2026-07-06",
+    "source": "results/agent_batch/VIGIA-CAN-019_agent_bundle.json",
+    "method": "señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canónica preservada",
+    "n_signals": 4
+  }
 }

@@ -4,9 +4,12 @@
   "description": "Una empresa recibe un informe de auditoría externa que concluye que no hubo irregularidades contables. El informe viene acompañado de logs del sistema y una captura de pantalla del dashboard financiero. VIGÍA debe correlacionar tres fuentes independientes para detectar que las tres fueron manipuladas con el mismo objetivo.",
   "expected_verdict": "MALICE",
   "expected_hypothesis": "coordinated_evidence_fabrication",
-  "expected_mitre_ttps": ["T1565.001", "T1036.006", "T1027"],
+  "expected_mitre_ttps": [
+    "T1565.001",
+    "T1036.006",
+    "T1027"
+  ],
   "analyst_notes": "Caso multi-fuente. La clave es que ninguna fuente aislada es concluyente — la correlación entre las tres es lo que prueba la fabricación coordinada.",
-
   "artifacts": [
     {
       "artifact_id": "DOC-001",
@@ -100,7 +103,6 @@
       ]
     }
   ],
-
   "ground_truth": {
     "actual_attacker": "jmartinez — Controller financiero interno de Corporación Nexus S.A.",
     "actual_objective": "ocultar desfalco de aproximadamente 291.750 USD mediante pagos ficticios a consultoras fantasma registradas en cuenta 6210",
@@ -113,10 +115,81 @@
       "T1027": "Obfuscated Files — imagen procesada en Photoshop para ocultar alteración"
     }
   },
-
   "peirce_expected": {
     "firstness": "Informe de auditoría limpio, logs SAP sin alertas, dashboard financiero en verde. Superficialmente todo en orden.",
     "secondness": "Metadatos del PDF revelan autor interno. Log SAP con gaps imposibles y timestamps degradados. Imagen procesada en Photoshop con ELA positivo en región de cifras. Los tres artefactos fueron creados la misma madrugada del 10 de abril.",
     "thirdness": "La coordinación temporal entre los tres artefactos — PDF creado a las 02:14, imagen a las 01:58, log exportado el mismo día — revela una operación de fabricación de evidencia ejecutada en una sola sesión nocturna. El autor conocía qué documentos necesitaría para convencer al directorio pero no entendió que los metadatos cuentan su propia historia."
+  },
+  "signals": [
+    {
+      "artifact_id": "DOC-001",
+      "confidence": {
+        "__fraction__": true,
+        "den": 2,
+        "num": 1
+      },
+      "description": "",
+      "evidence_type": "unknown",
+      "source": "unknown",
+      "z_score": {
+        "__fraction__": true,
+        "den": 1,
+        "num": 0
+      }
+    },
+    {
+      "artifact_id": "LOG-001",
+      "confidence": {
+        "__fraction__": true,
+        "den": 2,
+        "num": 1
+      },
+      "description": "",
+      "evidence_type": "unknown",
+      "source": "unknown",
+      "z_score": {
+        "__fraction__": true,
+        "den": 1,
+        "num": 0
+      }
+    },
+    {
+      "artifact_id": "IMG-001",
+      "confidence": {
+        "__fraction__": true,
+        "den": 2,
+        "num": 1
+      },
+      "description": "",
+      "evidence_type": "unknown",
+      "source": "unknown",
+      "z_score": {
+        "__fraction__": true,
+        "den": 1,
+        "num": 0
+      }
+    },
+    {
+      "artifact_id": "META-001",
+      "confidence": {
+        "__fraction__": true,
+        "den": 2,
+        "num": 1
+      },
+      "description": "",
+      "evidence_type": "unknown",
+      "source": "unknown",
+      "z_score": {
+        "__fraction__": true,
+        "den": 1,
+        "num": 0
+      }
+    }
+  ],
+  "_migration_note": {
+    "date": "2026-07-06",
+    "source": "results/agent_batch/case_008_multi_source_fraud_demo_agent_bundle.json",
+    "method": "señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canónica preservada",
+    "n_signals": 4
   }
 }

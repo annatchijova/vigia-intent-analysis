@@ -114,5 +114,77 @@
     "thirdness": "Hábito de usar credenciales válidas en contexto temporal que rompe el patrón biológico del usuario real."
   },
   "notes": "Primeridad válida (login correcto) pero Segundidad rota (contexto temporal imposible para este usuario).",
-  "devil_advocate": "Authorized emergency access: credentials valid, MFA approved, no policy violation. The 03:15 AM Sunday login could reflect a genuine financial emergency. A 6.2-sigma behavioral deviation is anomalous but not per se criminal. Excel handle to upload.tmp may be an autosave or antivirus staging artifact. This argument fails because no emergency ticket was opened and the VPN session terminated after exactly 4 minutes with no outbound alert generated."
+  "devil_advocate": "Authorized emergency access: credentials valid, MFA approved, no policy violation. The 03:15 AM Sunday login could reflect a genuine financial emergency. A 6.2-sigma behavioral deviation is anomalous but not per se criminal. Excel handle to upload.tmp may be an autosave or antivirus staging artifact. This argument fails because no emergency ticket was opened and the VPN session terminated after exactly 4 minutes with no outbound alert generated.",
+  "signals": [
+    {
+      "artifact_id": "a007_01",
+      "confidence": {
+        "__fraction__": true,
+        "den": 5,
+        "num": 2
+      },
+      "description": "Login VPN exitoso a las 03:15 AM de domingo. Credenciales correctas. MFA aprobado.",
+      "evidence_type": "memory_process",
+      "source": "sift_vpn_log",
+      "z_score": {
+        "__fraction__": true,
+        "den": 125,
+        "num": 46
+      }
+    },
+    {
+      "artifact_id": "a007_02",
+      "confidence": {
+        "__fraction__": true,
+        "den": 2,
+        "num": 1
+      },
+      "description": "Baseline histórico: finance_user nunca había logueado fuera de 08:30-18:00 L-V en 847 días. Desviación de 6.2 sigma.",
+      "evidence_type": "memory_process",
+      "source": "sift_ueba",
+      "z_score": {
+        "__fraction__": true,
+        "den": 50,
+        "num": 23
+      }
+    },
+    {
+      "artifact_id": "a007_03",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 11
+      },
+      "description": "Acceso a 'Q2_Financials_Forecast.xlsx' (500MB), clasificación confidencial-3, a las 03:17 AM.",
+      "evidence_type": "file_timestamp",
+      "source": "sift_file_audit",
+      "z_score": {
+        "__fraction__": true,
+        "den": 25,
+        "num": 11
+      }
+    },
+    {
+      "artifact_id": "a007_04",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 19
+      },
+      "description": "excel.exe en memoria con archivo mapeado y handle de escritura a \\Temp\\upload.tmp de 500MB.",
+      "evidence_type": "memory_process",
+      "source": "sift_volatility",
+      "z_score": {
+        "__fraction__": true,
+        "den": 400,
+        "num": 361
+      }
+    }
+  ],
+  "_migration_note": {
+    "date": "2026-07-06",
+    "source": "results/agent_batch/case_007_insomnio_tactico_agent_bundle.json",
+    "method": "señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canónica preservada",
+    "n_signals": 4
+  }
 }

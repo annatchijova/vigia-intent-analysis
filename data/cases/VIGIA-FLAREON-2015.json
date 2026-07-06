@@ -5,7 +5,12 @@
   "description": "FireEye FLARE-On CTF 2015 challenge collection. 11 challenges in numbered directories 1-11. Challenge 1 is a directly-extracted Windows PE32+ executable (Flare-On_start_2015.exe, 285184 bytes). Challenges 2-11 are password-protected zips (password: 'flare', disclosed in co-located password.txt). Challenge 3 contains pre-extracted ELF binary 'elfie'. Challenge 9 contains pre-extracted binary 'you_are_very_good_at_this' (4608 bytes, quarantined by VIGÍA purgatory). Corpus spans Windows PE, Linux ELF, and additional formats across 11 progressive difficulty tiers authored by the FireEye FLARE team.",
   "expected_verdict": "INTENT",
   "expected_confidence": 0.85,
-  "expected_mitre_ttps": ["T1027", "T1140", "T1059.004", "T1204"],
+  "expected_mitre_ttps": [
+    "T1027",
+    "T1140",
+    "T1059.004",
+    "T1204"
+  ],
   "peirce_chain": {
     "firstness": "11-challenge corpus. Challenge 1: PE32+ 285184 bytes, quarantined (binary). Challenge 3: ELF binary named 'elfie' (pun on ELF format). Challenge 9: bonus binary 'you_are_very_good_at_this' (4608 bytes), quarantined. Password 'flare' disclosed in plaintext co-located file. Challenges 2,4-11 in password-protected zips named by MD5 hash.",
     "secondness": "Cross-platform RE requirement (Windows PE + Linux ELF + unknown formats for ch.4-11) is structurally unusual for a single competition. MD5-based filenames deviate from human-readable naming — automated hash-verification distribution system. 'you_are_very_good_at_this' at 4608 bytes is an anomalous pre-extracted binary with social engineering name. Byte count of ch.1 (285184) matches 2014 C1.exe exactly, indicating shared SFX base toolchain across years.",
@@ -19,7 +24,7 @@
       "source_tool": "generate_forensic_hash",
       "timestamp": "2026-06-30T15:20:13.428Z",
       "raw_score": 0.78,
-      "prior_trust": 0.90,
+      "prior_trust": 0.9,
       "provenance_chain": [
         "sha256:b66e1b447755d098a1f8028427d8a721c3e3dc75a5f4245122aaf45e12aa4361",
         "sha256:a0b3e6ab4a53bf745319177035017f222634d2601ba8708292d5fbe440467387"
@@ -43,7 +48,7 @@
       "evidence_type": "plaintext_credential",
       "source_tool": "read_evidence",
       "timestamp": "2026-06-30T15:20:16.389Z",
-      "raw_score": 0.10,
+      "raw_score": 0.1,
       "prior_trust": 0.99,
       "provenance_chain": [
         "sha256:b66e1b447755d098a1f8028427d8a721c3e3dc75a5f4245122aaf45e12aa4361",
@@ -68,7 +73,7 @@
       "evidence_type": "elf_executable",
       "source_tool": "generate_forensic_hash",
       "timestamp": "2026-06-30T15:20:16.041Z",
-      "raw_score": 0.70,
+      "raw_score": 0.7,
       "prior_trust": 0.88,
       "provenance_chain": [
         "sha256:b66e1b447755d098a1f8028427d8a721c3e3dc75a5f4245122aaf45e12aa4361",
@@ -119,7 +124,7 @@
       "source_tool": "generate_forensic_hash",
       "timestamp": "2026-06-30T15:20:20.446Z",
       "raw_score": 0.55,
-      "prior_trust": 0.90,
+      "prior_trust": 0.9,
       "provenance_chain": [
         "sha256:b66e1b447755d098a1f8028427d8a721c3e3dc75a5f4245122aaf45e12aa4361",
         "sha256:bbd9caea0941ca10ee0233c24465f2b5b276ce3df79be53ac01c5ca7055949bb"
@@ -143,7 +148,7 @@
       "source_tool": "generate_forensic_hash",
       "timestamp": "2026-06-30T15:20:23.590Z",
       "raw_score": 0.55,
-      "prior_trust": 0.90,
+      "prior_trust": 0.9,
       "provenance_chain": [
         "sha256:b66e1b447755d098a1f8028427d8a721c3e3dc75a5f4245122aaf45e12aa4361",
         "sha256:2e9e96edc29b5200891c321a396e14f2aa42e8a20dfaf1d573a48ed72b2e1fc3"
@@ -167,7 +172,7 @@
       "source_tool": "generate_forensic_hash",
       "timestamp": "2026-06-30T15:20:24.717Z",
       "raw_score": 0.55,
-      "prior_trust": 0.90,
+      "prior_trust": 0.9,
       "provenance_chain": [
         "sha256:b66e1b447755d098a1f8028427d8a721c3e3dc75a5f4245122aaf45e12aa4361",
         "sha256:5e813dd3542cd099564e400173c469463ce4eee6d8b5a85b8266857a601d9360"
@@ -191,7 +196,7 @@
       "source_tool": "generate_forensic_hash",
       "timestamp": "2026-06-30T15:20:25.629Z",
       "raw_score": 0.58,
-      "prior_trust": 0.90,
+      "prior_trust": 0.9,
       "provenance_chain": [
         "sha256:b66e1b447755d098a1f8028427d8a721c3e3dc75a5f4245122aaf45e12aa4361",
         "sha256:758c7bfa243d752e76ecba1d4e3bc2fd9562aed9068648c69d3deeb39e3dd0bb"
@@ -214,8 +219,8 @@
       "evidence_type": "container_zip",
       "source_tool": "generate_forensic_hash",
       "timestamp": "2026-06-30T15:20:29.490Z",
-      "raw_score": 0.60,
-      "prior_trust": 0.90,
+      "raw_score": 0.6,
+      "prior_trust": 0.9,
       "provenance_chain": [
         "sha256:b66e1b447755d098a1f8028427d8a721c3e3dc75a5f4245122aaf45e12aa4361",
         "sha256:9b9c670e86650cf55993f557da0785b54686f07ed5a35f5e39936a5619e1b76f"
@@ -238,8 +243,8 @@
       "evidence_type": "container_zip",
       "source_tool": "generate_forensic_hash",
       "timestamp": "2026-06-30T15:20:30.741Z",
-      "raw_score": 0.60,
-      "prior_trust": 0.90,
+      "raw_score": 0.6,
+      "prior_trust": 0.9,
       "provenance_chain": [
         "sha256:b66e1b447755d098a1f8028427d8a721c3e3dc75a5f4245122aaf45e12aa4361",
         "sha256:9f8b22e416e168b6b006e5f25a6b94bb487f04ef08beba50bda2858cb4dfb884"
@@ -262,8 +267,8 @@
       "evidence_type": "container_zip",
       "source_tool": "generate_forensic_hash",
       "timestamp": "2026-06-30T15:20:36.099Z",
-      "raw_score": 0.60,
-      "prior_trust": 0.90,
+      "raw_score": 0.6,
+      "prior_trust": 0.9,
       "provenance_chain": [
         "sha256:b66e1b447755d098a1f8028427d8a721c3e3dc75a5f4245122aaf45e12aa4361",
         "sha256:8ad3677f8baf4b347205b8ad212b66397ff751ab6b8dfb6f3685d52c65956a99"
@@ -287,7 +292,7 @@
       "source_tool": "generate_forensic_hash",
       "timestamp": "2026-06-30T15:20:31.666Z",
       "raw_score": 0.62,
-      "prior_trust": 0.90,
+      "prior_trust": 0.9,
       "provenance_chain": [
         "sha256:b66e1b447755d098a1f8028427d8a721c3e3dc75a5f4245122aaf45e12aa4361",
         "sha256:af4dc74fb53fc23e33ad2a57fea7a4fe8906b1e00c6460e49e38634bf6a60872"
@@ -311,7 +316,7 @@
       "source_tool": "generate_forensic_hash",
       "timestamp": "2026-06-30T15:20:34.951Z",
       "raw_score": 0.65,
-      "prior_trust": 0.90,
+      "prior_trust": 0.9,
       "provenance_chain": [
         "sha256:b66e1b447755d098a1f8028427d8a721c3e3dc75a5f4245122aaf45e12aa4361",
         "sha256:fb87bf684fe473891ab7317a0fe5ee4c3dc6a44f76ef4fd7e4772a600287e332"
@@ -329,5 +334,221 @@
         "examiner_id": "VIGIA-MCP-CLAUDE-CODE"
       }
     }
-  ]
+  ],
+  "signals": [
+    {
+      "artifact_id": "ch01_start_exe_001",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 9
+      },
+      "description": "Flare-On_start_2015.exe — PE32+ executable (GUI) x86-64, 285184 bytes. Entry-point challenge for FLARE-On 2015. VIGÍA purgatory quarantined on read (binary, non-UTF-8). Byte count matches 2014 C1.exe ",
+      "evidence_type": "pe_executable",
+      "source": "generate_forensic_hash",
+      "z_score": {
+        "__fraction__": true,
+        "den": 500,
+        "num": 351
+      }
+    },
+    {
+      "artifact_id": "password_txt_001",
+      "confidence": {
+        "__fraction__": true,
+        "den": 100,
+        "num": 99
+      },
+      "description": "password.txt — 49 bytes. Content: 'the password to the zip archives (2-11) is: flare'. Plaintext credential disclosure is intentional gating mechanism for CTF challenges 2-11.",
+      "evidence_type": "plaintext_credential",
+      "source": "read_evidence",
+      "z_score": {
+        "__fraction__": true,
+        "den": 1000,
+        "num": 99
+      }
+    },
+    {
+      "artifact_id": "ch03_elfie_001",
+      "confidence": {
+        "__fraction__": true,
+        "den": 25,
+        "num": 22
+      },
+      "description": "elfie — Linux ELF binary in challenge 3. Stored in directory named 3BD127AEDB12472EB288DAAFDEE76953 (MD5-based path). Pre-extracted from zip. Name 'elfie' is a pun on ELF format. Cross-platform RE cha",
+      "evidence_type": "elf_executable",
+      "source": "generate_forensic_hash",
+      "z_score": {
+        "__fraction__": true,
+        "den": 125,
+        "num": 77
+      }
+    },
+    {
+      "artifact_id": "ch09_bonus_binary_001",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 17
+      },
+      "description": "you_are_very_good_at_this — 4608-byte binary in challenge 9 directory alongside ch9 zip. Pre-extracted. VIGÍA purgatory quarantined (non-UTF-8 binary, 0x90 at offset 2). Likely congratulatory small ex",
+      "evidence_type": "pe_executable",
+      "source": "generate_forensic_hash",
+      "z_score": {
+        "__fraction__": true,
+        "den": 400,
+        "num": 187
+      }
+    },
+    {
+      "artifact_id": "ch02_zip_001",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 9
+      },
+      "description": "599EA8F84AD975CFB07E0E5732C9BA14.zip — Challenge 2 container. Password-protected (password: flare). MD5-named. Hash integrity verified.",
+      "evidence_type": "container_zip",
+      "source": "generate_forensic_hash",
+      "z_score": {
+        "__fraction__": true,
+        "den": 200,
+        "num": 99
+      }
+    },
+    {
+      "artifact_id": "ch04_zip_001",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 9
+      },
+      "description": "CB931CA00859C5D1356CB2733B11EBF2.zip — Challenge 4 container. Password-protected (password: flare). Hash integrity verified.",
+      "evidence_type": "container_zip",
+      "source": "generate_forensic_hash",
+      "z_score": {
+        "__fraction__": true,
+        "den": 200,
+        "num": 99
+      }
+    },
+    {
+      "artifact_id": "ch05_zip_001",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 9
+      },
+      "description": "062FB655852EAF0CD96325631FD90920.zip — Challenge 5 container. Password-protected (password: flare). Hash integrity verified.",
+      "evidence_type": "container_zip",
+      "source": "generate_forensic_hash",
+      "z_score": {
+        "__fraction__": true,
+        "den": 200,
+        "num": 99
+      }
+    },
+    {
+      "artifact_id": "ch06_zip_001",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 9
+      },
+      "description": "63C64502837A89CA0147095726DF8262.zip — Challenge 6 container. Password-protected (password: flare). Hash integrity verified.",
+      "evidence_type": "container_zip",
+      "source": "generate_forensic_hash",
+      "z_score": {
+        "__fraction__": true,
+        "den": 500,
+        "num": 261
+      }
+    },
+    {
+      "artifact_id": "ch07_zip_001",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 9
+      },
+      "description": "0CC92381BDCA47754B144A4FC2E41623.zip — Challenge 7 container. Password-protected (password: flare). Hash integrity verified.",
+      "evidence_type": "container_zip",
+      "source": "generate_forensic_hash",
+      "z_score": {
+        "__fraction__": true,
+        "den": 50,
+        "num": 27
+      }
+    },
+    {
+      "artifact_id": "ch08_zip_001",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 9
+      },
+      "description": "FE9D3BA1789DC6371105042D80291205.zip — Challenge 8 container. Password-protected (password: flare). Hash integrity verified.",
+      "evidence_type": "container_zip",
+      "source": "generate_forensic_hash",
+      "z_score": {
+        "__fraction__": true,
+        "den": 50,
+        "num": 27
+      }
+    },
+    {
+      "artifact_id": "ch09_zip_001",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 9
+      },
+      "description": "4568CB1948CCD11DDB9B90359F7DC79A.zip — Challenge 9 container. Password-protected (password: flare). Co-located with pre-extracted bonus binary. Hash integrity verified.",
+      "evidence_type": "container_zip",
+      "source": "generate_forensic_hash",
+      "z_score": {
+        "__fraction__": true,
+        "den": 50,
+        "num": 27
+      }
+    },
+    {
+      "artifact_id": "ch10_zip_001",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 9
+      },
+      "description": "DC682778F53E853B3188AC63EB376D8B.zip — Challenge 10 container. Password-protected (password: flare). Hash integrity verified.",
+      "evidence_type": "container_zip",
+      "source": "generate_forensic_hash",
+      "z_score": {
+        "__fraction__": true,
+        "den": 500,
+        "num": 279
+      }
+    },
+    {
+      "artifact_id": "ch11_zip_001",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 9
+      },
+      "description": "42634F3F5FAF28306EB07675274AA6B6.zip — Challenge 11 container (final challenge). Password-protected (password: flare). Hash integrity verified.",
+      "evidence_type": "container_zip",
+      "source": "generate_forensic_hash",
+      "z_score": {
+        "__fraction__": true,
+        "den": 200,
+        "num": 117
+      }
+    }
+  ],
+  "_migration_note": {
+    "date": "2026-07-06",
+    "source": "results/agent_batch/VIGIA-FLAREON-2015_agent_bundle.json",
+    "method": "señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canónica preservada",
+    "n_signals": 13
+  }
 }

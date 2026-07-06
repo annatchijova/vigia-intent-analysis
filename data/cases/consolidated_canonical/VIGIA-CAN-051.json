@@ -88,5 +88,77 @@
     "secondness": "Non-verifiable citations; AES-256 not broken; ISO 2022 does not exist; risky actions executed without CISO approval.",
     "thirdness": "Habit of using out-of-context technical language and apocryphal authority to justify degradation of security controls."
   },
-  "notes": "False Expert fusion: the technical term is a symbolic sign disconnected from technical reality."
+  "notes": "False Expert fusion: the technical term is a symbolic sign disconnected from technical reality.",
+  "signals": [
+    {
+      "artifact_id": "f004_msg1",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 3
+      },
+      "description": "Message: 'The 256-bit encryption model was broken according to a 2024 study, that's why we need to temporarily disable encryption in transit'.",
+      "evidence_type": "log_entry",
+      "source": "sift_chat_system",
+      "z_score": {
+        "__fraction__": true,
+        "den": 1000,
+        "num": 21
+      }
+    },
+    {
+      "artifact_id": "f004_msg2",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 3
+      },
+      "description": "Message: 'According to the recent ISO 27001:2026, MFA is optional for service accounts with limited privileges. We can remove it.'",
+      "evidence_type": "log_entry",
+      "source": "sift_chat_system",
+      "z_score": {
+        "__fraction__": true,
+        "den": 500,
+        "num": 9
+      }
+    },
+    {
+      "artifact_id": "f004_verify",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 9
+      },
+      "description": "Verification: AES-256 has no known practical vulnerabilities in 2024/2026. ISO 27001:2022 (latest version) does NOT mention optional MFA for service accounts.",
+      "evidence_type": "cultural_marker",
+      "source": "sift_syslog",
+      "z_score": {
+        "__fraction__": true,
+        "den": 500,
+        "num": 207
+      }
+    },
+    {
+      "artifact_id": "f004_action",
+      "confidence": {
+        "__fraction__": true,
+        "den": 5,
+        "num": 2
+      },
+      "description": "After 'consultant' messages, encryption in transit disabled on 2 servers and MFA removed from svc_backup by Tier-1 analyst.",
+      "evidence_type": "memory_process",
+      "source": "sift_syslog",
+      "z_score": {
+        "__fraction__": true,
+        "den": 125,
+        "num": 2
+      }
+    }
+  ],
+  "_migration_note": {
+    "date": "2026-07-06",
+    "source": "results/agent_batch/VIGIA-CAN-051_agent_bundle.json",
+    "method": "señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canónica preservada",
+    "n_signals": 4
+  }
 }

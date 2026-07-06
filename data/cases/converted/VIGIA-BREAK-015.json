@@ -148,5 +148,93 @@
     "schema_version": "1.1",
     "source_file": "VIGIA_BREAK_011_016.json",
     "source_origin": "synthetic_vigia_collective"
+  },
+  "signals": [
+    {
+      "artifact_id": "b015_01",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 7
+      },
+      "description": "Security camera video: user 'jdoe' at their desk, timestamp 14:30:00",
+      "evidence_type": "memory_process",
+      "source": "sift_cctv_forensic",
+      "z_score": {
+        "__fraction__": true,
+        "den": 200,
+        "num": 7
+      }
+    },
+    {
+      "artifact_id": "b015_02",
+      "confidence": {
+        "__fraction__": true,
+        "den": 5,
+        "num": 1
+      },
+      "description": "Successful VPN login by 'jdoe' from IP 185.220.101.42 (Tor exit node)",
+      "evidence_type": "log_entry",
+      "source": "sift_vpn_gateway",
+      "z_score": {
+        "__fraction__": true,
+        "den": 125,
+        "num": 22
+      }
+    },
+    {
+      "artifact_id": "b015_03",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 9
+      },
+      "description": "Successful VPN login by 'jdoe' from IP 10.0.1.50 (office)",
+      "evidence_type": "log_entry",
+      "source": "sift_vpn_gateway",
+      "z_score": {
+        "__fraction__": true,
+        "den": 200,
+        "num": 9
+      }
+    },
+    {
+      "artifact_id": "b015_04",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 17
+      },
+      "description": "Forensic video analysis: subject in CAM-OFFICE-03 has birthmark on left neck. Real jdoe does NOT have that mark (HR biometric record: negative).",
+      "evidence_type": "memory_process",
+      "source": "sift_biometric_verifier",
+      "z_score": {
+        "__fraction__": true,
+        "den": 400,
+        "num": 323
+      }
+    },
+    {
+      "artifact_id": "b015_05",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 19
+      },
+      "description": "jdoe badged into physical office at 08:00. No badge-out recorded.",
+      "evidence_type": "log_entry",
+      "source": "sift_hr_system",
+      "z_score": {
+        "__fraction__": true,
+        "den": 400,
+        "num": 19
+      }
+    }
+  ],
+  "_migration_note": {
+    "date": "2026-07-06",
+    "source": "results/agent_batch/VIGIA-BREAK-015_agent_bundle.json",
+    "method": "señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canónica preservada",
+    "n_signals": 5
   }
 }

@@ -78,5 +78,45 @@
   ],
   "caie_fractures": [],
   "source_dataset": "VIGÍA Real Evidence Corpus — Internal Evaluation Tooling",
-  "source_origin": "vigia_evaluation_corpus"
+  "source_origin": "vigia_evaluation_corpus",
+  "signals": [
+    {
+      "artifact_id": "EVALS-ART-001",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 19
+      },
+      "description": "skill-evals.zip — container archive with 11 VIGÍA skill evaluation trigger JSONs dated 2026-06-27. Trigger names correspond to documented VIGÍA behavioral invariants. No forensic anomalies.",
+      "evidence_type": "file_hash",
+      "source": "generate_forensic_hash",
+      "z_score": {
+        "__fraction__": true,
+        "den": 1000,
+        "num": 19
+      }
+    },
+    {
+      "artifact_id": "EVALS-ART-002",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 19
+      },
+      "description": "Directory listing: 11 JSON files named after VIGÍA behavioral invariants. Each filename maps to a documented VIGÍA design principle. File format (JSON) and content type (trigger configuration) are int",
+      "evidence_type": "log_entry",
+      "source": "list_files",
+      "z_score": {
+        "__fraction__": true,
+        "den": 1000,
+        "num": 19
+      }
+    }
+  ],
+  "_migration_note": {
+    "date": "2026-07-06",
+    "source": "results/agent_batch/VIGIA-SKILL-EVALS-2026_agent_bundle.json",
+    "method": "señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canónica preservada",
+    "n_signals": 2
+  }
 }

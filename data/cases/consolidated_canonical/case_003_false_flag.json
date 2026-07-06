@@ -44,7 +44,7 @@
       "evidence_type": "cultural_marker",
       "source_tool": "infer_intent",
       "timestamp": "2026-04-10T03:16:00Z",
-      "raw_score": 0.90,
+      "raw_score": 0.9,
       "prior_trust": 0.3,
       "provenance_chain": [
         "sha256:cultural_planted_001"
@@ -73,7 +73,7 @@
     }
   ],
   "expected_verdict": "MALICE",
-  "expected_confidence": 0.80,
+  "expected_confidence": 0.8,
   "expected_mitre_ttps": [
     "T1036.005",
     "T1055.012",
@@ -84,5 +84,61 @@
     "secondness": "The attribution profile contradicts the technical TTPs — the markers are too clean for the observed OPSEC.",
     "thirdness": "The real attacker staged the attribution to misdirect blame. The deception is the malicious act. MALICE belongs to the planter, not to the language of the flag."
   },
-  "demo_quote": "A real false flag has the attack present. The malice belongs to the planter, not to whoever writes in Russian."
+  "demo_quote": "A real false flag has the attack present. The malice belongs to the planter, not to whoever writes in Russian.",
+  "signals": [
+    {
+      "artifact_id": "tech_real_001",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 19
+      },
+      "description": "Process hollowing in svchost.exe confirmed in memory (T1055.012). Reflective DLL injection detected. Hard-to-fake structural evidence of a real intrusion.",
+      "evidence_type": "memory_process",
+      "source": "list_processes",
+      "z_score": {
+        "__fraction__": true,
+        "den": 250,
+        "num": 209
+      }
+    },
+    {
+      "artifact_id": "tech_real_002",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 19
+      },
+      "description": "LSASS credential dumping detected (T1003.001). Active compromise confirmed.",
+      "evidence_type": "lsass_session",
+      "source": "list_processes",
+      "z_score": {
+        "__fraction__": true,
+        "den": 500,
+        "num": 399
+      }
+    },
+    {
+      "artifact_id": "cultural_planted_001",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 3
+      },
+      "description": "Cyrillic strings injected into the dropper: suspiciously pristine, inconsistent with the actor's actual toolchain and OPSEC. Attribution markers contradict the observed technical TTP profile. Placemen",
+      "evidence_type": "cultural_marker",
+      "source": "infer_intent",
+      "z_score": {
+        "__fraction__": true,
+        "den": 100,
+        "num": 27
+      }
+    }
+  ],
+  "_migration_note": {
+    "date": "2026-07-06",
+    "source": "results/agent_batch/case_003_false_flag_agent_bundle.json",
+    "method": "señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canónica preservada",
+    "n_signals": 3
+  }
 }

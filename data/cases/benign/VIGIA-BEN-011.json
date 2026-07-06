@@ -47,5 +47,61 @@
     "thirdness": "This is a legitimate technical support procedure in an air-gapped environment. The technician's physical presence and manager approval mitigate the risk. No exfiltration or persistence installed."
   },
   "source_origin": "synthetic_validation",
-  "why_not_malice": "The activity stems from an approved support ticket, with escorted physical presence, on an air-gapped machine."
+  "why_not_malice": "The activity stems from an approved support ticket, with escorted physical presence, on an air-gapped machine.",
+  "signals": [
+    {
+      "artifact_id": "ART-001",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 3
+      },
+      "description": "USB inserted: SanDisk Cruzer, S/N 4C530001230512345678 | Time: 2024-04-20 14:30 | User: it.technician (badge: IT-204) | Escorted by: finance.manager | Location: Finance Dept, Desk 12",
+      "evidence_type": "log_entry",
+      "source": "legacy_converter",
+      "z_score": {
+        "__fraction__": true,
+        "den": 400,
+        "num": 21
+      }
+    },
+    {
+      "artifact_id": "ART-002",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 3
+      },
+      "description": "IT ticket SUP-2024-1120: 'HP LaserJet fiscal printer not printing. Requires driver update v3.2.1 from USB (no network on machine per policy).' | Approved by: finance.manager | SLA: 4 hours | Technicia",
+      "evidence_type": "file_timestamp",
+      "source": "legacy_converter",
+      "z_score": {
+        "__fraction__": true,
+        "den": 800,
+        "num": 51
+      }
+    },
+    {
+      "artifact_id": "ART-003",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 3
+      },
+      "description": "lsusb | grep SanDisk | dmesg | tail -20 | mount /dev/sdb1 /mnt/usb | cp /mnt/usb/drivers/hp_lj_fiscal_321.exe /tmp/ | ./hp_lj_fiscal_321.exe /silent | umount /mnt/usb | dmesg | tail -5",
+      "evidence_type": "log_entry",
+      "source": "legacy_converter",
+      "z_score": {
+        "__fraction__": true,
+        "den": 800,
+        "num": 57
+      }
+    }
+  ],
+  "_migration_note": {
+    "date": "2026-07-06",
+    "source": "results/agent_batch/VIGIA-BEN-011_agent_bundle.json",
+    "method": "señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canónica preservada",
+    "n_signals": 3
+  }
 }

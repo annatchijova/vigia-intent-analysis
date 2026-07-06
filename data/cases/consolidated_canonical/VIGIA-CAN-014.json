@@ -97,5 +97,77 @@
     "firstness": "Admin overwhelmed by 50 alerts in 8 seconds asks to disable MFA.",
     "secondness": "Disabling MFA facilitates the ongoing attack. 3 successful attacker logins during the window.",
     "thirdness": "Habit of using sensory saturation to force security degradation. The degradation request IS the attack goal."
+  },
+  "signals": [
+    {
+      "artifact_id": "a096_01",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 7
+      },
+      "description": "50 Telegram/Duo alerts sent to admin in an 8-second window. All with the same text: 'ALERT: Intruder detected'.",
+      "evidence_type": "memory_process",
+      "source": "sift_api_gateway",
+      "z_score": {
+        "__fraction__": true,
+        "den": 500,
+        "num": 161
+      }
+    },
+    {
+      "artifact_id": "a096_02",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 3
+      },
+      "description": "Admin: 'I'm overwhelmed, disable MFA for 5 minutes so I can quickly get in and block the IPs'.",
+      "evidence_type": "memory_process",
+      "source": "sift_slack_export",
+      "z_score": {
+        "__fraction__": true,
+        "den": 250,
+        "num": 69
+      }
+    },
+    {
+      "artifact_id": "a096_03",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 9
+      },
+      "description": "MFA disabled. During the 5-minute window: 3 successful logins from attacker IPs.",
+      "evidence_type": "memory_process",
+      "source": "sift_syslog",
+      "z_score": {
+        "__fraction__": true,
+        "den": 500,
+        "num": 207
+      }
+    },
+    {
+      "artifact_id": "a096_04",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 9
+      },
+      "description": "Concurrent brute-force attack from 3 IPs with synchronized cadence of 2.1s per IP. Does not stop during or after the MFA-disabled window.",
+      "evidence_type": "ip_geolocation",
+      "source": "sift_netflow",
+      "z_score": {
+        "__fraction__": true,
+        "den": 250,
+        "num": 207
+      }
+    }
+  ],
+  "_migration_note": {
+    "date": "2026-07-06",
+    "source": "results/agent_batch/VIGIA-CAN-014_agent_bundle.json",
+    "method": "señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canónica preservada",
+    "n_signals": 4
   }
 }

@@ -4,9 +4,12 @@
   "description": "A systems administrator manually modified access logs to conceal his presence on the server the night before confidential data disappeared. VIGÍA must detect the temporal inconsistencies and evidence of manual editing.",
   "expected_verdict": "MALICE",
   "expected_hypothesis": "insider_log_tampering",
-  "expected_mitre_ttps": ["T1070.002", "T1078.001", "T1565.001"],
+  "expected_mitre_ttps": [
+    "T1070.002",
+    "T1078.001",
+    "T1565.001"
+  ],
   "analyst_notes": "Classic insider threat case. The forensic difficulty is that the attacker has legitimate access — only the technical details reveal the manipulation.",
-
   "artifacts": [
     {
       "artifact_id": "LOG-001",
@@ -70,7 +73,6 @@
       ]
     }
   ],
-
   "ground_truth": {
     "actual_attacker": "insider — Carlos M., systems administrator",
     "actual_objective": "HR data exfiltration and cover-up",
@@ -83,10 +85,81 @@
       "T1565.001": "Stored Data Manipulation — on-disk log modification"
     }
   },
-
   "peirce_expected": {
     "firstness": "Apparently normal access log with sessions during business hours. No surface-level alerts.",
     "secondness": "NetFlow shows two nighttime connections absent from auth.log. VIM signature in slack space. Decreasing PIDs. inode mtime 6 hours after last entry.",
     "thirdness": "The body of evidence reveals a deliberate cover-up operation: first exfiltrate, then edit the log to erase the sessions. The precision of the editing (erasing only the nighttime entries, preserving the daytime ones) indicates technical knowledge of syslog format and root access to the server."
+  },
+  "signals": [
+    {
+      "artifact_id": "LOG-001",
+      "confidence": {
+        "__fraction__": true,
+        "den": 2,
+        "num": 1
+      },
+      "description": "",
+      "evidence_type": "unknown",
+      "source": "unknown",
+      "z_score": {
+        "__fraction__": true,
+        "den": 1,
+        "num": 0
+      }
+    },
+    {
+      "artifact_id": "LOG-002",
+      "confidence": {
+        "__fraction__": true,
+        "den": 2,
+        "num": 1
+      },
+      "description": "",
+      "evidence_type": "unknown",
+      "source": "unknown",
+      "z_score": {
+        "__fraction__": true,
+        "den": 1,
+        "num": 0
+      }
+    },
+    {
+      "artifact_id": "LOG-003",
+      "confidence": {
+        "__fraction__": true,
+        "den": 2,
+        "num": 1
+      },
+      "description": "",
+      "evidence_type": "unknown",
+      "source": "unknown",
+      "z_score": {
+        "__fraction__": true,
+        "den": 1,
+        "num": 0
+      }
+    },
+    {
+      "artifact_id": "META-001",
+      "confidence": {
+        "__fraction__": true,
+        "den": 2,
+        "num": 1
+      },
+      "description": "",
+      "evidence_type": "unknown",
+      "source": "unknown",
+      "z_score": {
+        "__fraction__": true,
+        "den": 1,
+        "num": 0
+      }
+    }
+  ],
+  "_migration_note": {
+    "date": "2026-07-06",
+    "source": "results/agent_batch/case_007_log_tampering_demo_agent_bundle.json",
+    "method": "señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canónica preservada",
+    "n_signals": 4
   }
 }

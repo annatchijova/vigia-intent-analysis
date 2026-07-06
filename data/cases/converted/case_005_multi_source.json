@@ -110,5 +110,77 @@
     "thirdness": "Cobalt Strike beacon with process injection confirmed. Evidence is reliable."
   },
   "demo_command": "python run_vigia_case.py cases/case_005_multi_source.json",
-  "demo_quote": "Independent sources, high trust, consistent timeline. Correlation is low, and trust remains high. VIGÍA confirms this as reliable evidence."
+  "demo_quote": "Independent sources, high trust, consistent timeline. Correlation is low, and trust remains high. VIGÍA confirms this as reliable evidence.",
+  "signals": [
+    {
+      "artifact_id": "memory_multi_001",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 19
+      },
+      "description": "Memory: Process injection detected. PID 2244 injected into lsass.exe. Kernel structure anomaly confirmed.",
+      "evidence_type": "memory_process",
+      "source": "list_processes",
+      "z_score": {
+        "__fraction__": true,
+        "den": 2000,
+        "num": 1729
+      }
+    },
+    {
+      "artifact_id": "network_multi_001",
+      "confidence": {
+        "__fraction__": true,
+        "den": 50,
+        "num": 41
+      },
+      "description": "DNS: beacon to c2-domain.evil every 300s ± 45s. Consistent with Cobalt Strike default beacon interval.",
+      "evidence_type": "dns_record",
+      "source": "audit_network",
+      "z_score": {
+        "__fraction__": true,
+        "den": 2500,
+        "num": 1599
+      }
+    },
+    {
+      "artifact_id": "disk_multi_001",
+      "confidence": {
+        "__fraction__": true,
+        "den": 25,
+        "num": 23
+      },
+      "description": "Disk: beacon DLL found in C:\\Windows\\System32\\windef.dll (impersonation). Hash matches known Cobalt Strike beacon.",
+      "evidence_type": "file_hash",
+      "source": "generate_forensic_hash",
+      "z_score": {
+        "__fraction__": true,
+        "den": 625,
+        "num": 506
+      }
+    },
+    {
+      "artifact_id": "tpm_multi_001",
+      "confidence": {
+        "__fraction__": true,
+        "den": 100,
+        "num": 99
+      },
+      "description": "TPM PCR values confirm boot integrity was NOT compromised. Attack is post-boot, runtime injection only.",
+      "evidence_type": "TPM_attestation",
+      "source": "audit_network",
+      "z_score": {
+        "__fraction__": true,
+        "den": 10000,
+        "num": 9603
+      }
+    }
+  ],
+  "_migration_note": {
+    "date": "2026-07-06",
+    "source": "results/agent_batch/case_005_multi_source_agent_bundle.json",
+    "method": "señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canónica preservada",
+    "n_signals": 4
+  }
 }

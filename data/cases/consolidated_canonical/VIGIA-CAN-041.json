@@ -95,5 +95,77 @@
     "secondness": "2 spaces after period + period at end of short message = 4.3 sigma deviation. Previous Tor login.",
     "thirdness": "Habit of being unable to steal the stylometric fingerprint along with the password. Hands have their own identity."
   },
-  "notes": "The attacker can steal the password, not the muscle memory of typing hands."
+  "notes": "The attacker can steal the password, not the muscle memory of typing hands.",
+  "signals": [
+    {
+      "artifact_id": "a011_01",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 9
+      },
+      "description": "CEO stylometric baseline: 847 emails. One space after period (100%). No period at end of messages <20 words (94%).",
+      "evidence_type": "log_entry",
+      "source": "sift_mail_gateway",
+      "z_score": {
+        "__fraction__": true,
+        "den": 200,
+        "num": 63
+      }
+    },
+    {
+      "artifact_id": "a011_02",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 7
+      },
+      "description": "Suspicious email: 'Transfer urgently to this vendor.  The payment is critical.' — 2 spaces after period, period at end, 9-word message.",
+      "evidence_type": "log_entry",
+      "source": "sift_mail_gateway",
+      "z_score": {
+        "__fraction__": true,
+        "den": 1000,
+        "num": 287
+      }
+    },
+    {
+      "artifact_id": "a011_03",
+      "confidence": {
+        "__fraction__": true,
+        "den": 5,
+        "num": 1
+      },
+      "description": "Stylometric analysis: 4.3 sigma deviation in post-period spacing and period usage. TTR and sentence length within baseline.",
+      "evidence_type": "cultural_marker",
+      "source": "sift_stylometry",
+      "z_score": {
+        "__fraction__": true,
+        "den": 125,
+        "num": 22
+      }
+    },
+    {
+      "artifact_id": "a011_04",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 9
+      },
+      "description": "Login to CEO account at 04:15 from 185.220.101.50 (Tor node). Session lasted 8 minutes. CEO has an exclusive login history from Argentina and Spain.",
+      "evidence_type": "memory_process",
+      "source": "sift_azure_ad",
+      "z_score": {
+        "__fraction__": true,
+        "den": 200,
+        "num": 9
+      }
+    }
+  ],
+  "_migration_note": {
+    "date": "2026-07-06",
+    "source": "results/agent_batch/VIGIA-CAN-041_agent_bundle.json",
+    "method": "señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canónica preservada",
+    "n_signals": 4
+  }
 }

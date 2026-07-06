@@ -47,5 +47,61 @@
     "thirdness": "Es una operación de backup automatizada legítima, no exfiltración. La anomalía temporal se explica por política de mantenimiento en horario de baja demanda."
   },
   "source_origin": "synthetic_validation",
-  "why_not_malice": "La actividad tiene raíz documentada, aprobada y auditada. No hay desviación del patrón histórico."
+  "why_not_malice": "La actividad tiene raíz documentada, aprobada y auditada. No hay desviación del patrón histórico.",
+  "signals": [
+    {
+      "artifact_id": "ART-001",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 3
+      },
+      "description": "00 03 * * * /usr/local/bin/backup_db.sh --full --encrypt --destination=s3://company-backups/ | crontab -l shows entry from 2023-01-10 | Last modified by: dba_admin (sudo)",
+      "evidence_type": "log_entry",
+      "source": "legacy_converter",
+      "z_score": {
+        "__fraction__": true,
+        "den": 400,
+        "num": 21
+      }
+    },
+    {
+      "artifact_id": "ART-002",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 3
+      },
+      "description": "/etc/cron.d/backup_db: created 2023-01-10 by dba_admin | runbook_v2.4.pdf page 47: 'Daily encrypted backup to S3 at 03:00 UTC' | Auditoría 2024-Q3: PASSED",
+      "evidence_type": "file_timestamp",
+      "source": "legacy_converter",
+      "z_score": {
+        "__fraction__": true,
+        "den": 800,
+        "num": 51
+      }
+    },
+    {
+      "artifact_id": "ART-003",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 3
+      },
+      "description": "S3 bucket: company-backups-prod | IAM role: BackupServiceRole | Encryption: AES-256-SSE | Access logs: consistent daily pattern since 2023-01-10 | No anomalous IPs",
+      "evidence_type": "log_entry",
+      "source": "legacy_converter",
+      "z_score": {
+        "__fraction__": true,
+        "den": 800,
+        "num": 57
+      }
+    }
+  ],
+  "_migration_note": {
+    "date": "2026-07-06",
+    "source": "results/agent_batch/VIGIA-BEN-002_agent_bundle.json",
+    "method": "señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canónica preservada",
+    "n_signals": 3
+  }
 }

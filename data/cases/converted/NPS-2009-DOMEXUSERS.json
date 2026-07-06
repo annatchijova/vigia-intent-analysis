@@ -112,8 +112,8 @@
       "evidence_type": "mft_entry",
       "source_tool": "bash_xml_parse",
       "timestamp": "2008-10-29T16:15:34Z",
-      "raw_score": 0.20,
-      "prior_trust": 0.90,
+      "raw_score": 0.2,
+      "prior_trust": 0.9,
       "provenance_chain": [
         "sha256:f48d4218562ee5f2d1d95839aff3e0d53ddf84a41150d1f5f50355f5a828cd97"
       ],
@@ -126,8 +126,18 @@
         "sid": "S-1-5-21-842925246-725345543-1844994965-1003",
         "path": "RECYCLER/S-1-5-21-842925246-725345543-1844994965-1003/",
         "entries": [
-          {"name": "Dc3.docx", "size": 9852, "mtime": "2008-10-29T16:15:34Z", "alloc": 1},
-          {"name": "Dc4.xlsx", "size": 8236, "mtime": "2008-10-29T16:17:24Z", "alloc": 1}
+          {
+            "name": "Dc3.docx",
+            "size": 9852,
+            "mtime": "2008-10-29T16:15:34Z",
+            "alloc": 1
+          },
+          {
+            "name": "Dc4.xlsx",
+            "size": 8236,
+            "mtime": "2008-10-29T16:17:24Z",
+            "alloc": 1
+          }
         ],
         "info2_last_write_1": "2008-10-30T03:38:44Z",
         "info2_last_write_2": "2008-10-30T03:40:07Z",
@@ -139,7 +149,7 @@
       "evidence_type": "file_metadata",
       "source_tool": "bash_xml_parse",
       "timestamp": "2008-10-30T03:32:51Z",
-      "raw_score": 0.10,
+      "raw_score": 0.1,
       "prior_trust": 0.85,
       "provenance_chain": [
         "sha256:f48d4218562ee5f2d1d95839aff3e0d53ddf84a41150d1f5f50355f5a828cd97"
@@ -177,8 +187,16 @@
       "acquisition_timestamp": "2026-06-27T15:22:30Z",
       "description": "domex1 Pidgin IM infrastructure: accounts.xml (5138b, mtime=2008-10-21 20:04:42), blist.xml (5112b, mtime=2008-10-21 20:08:01), 7 buddy icons, Gmail TLS cert. AIM/AOL acccore: domexuser1 buddyicon + feedbag (2008-10-29). XMPP caps updated 2008-10-21 19:44. domex2 Pidgin: MSN certs (contacts.msn.com, login.live.com), Gmail cert, blist.xml (4834b, 2008-10-30 02:48:55).",
       "metadata": {
-        "domex1_im_platforms": ["Pidgin/XMPP", "Gmail/XMPP", "AIM/AOL"],
-        "domex2_im_platforms": ["Pidgin/MSN", "Pidgin/Gmail", "Pidgin/XMPP"],
+        "domex1_im_platforms": [
+          "Pidgin/XMPP",
+          "Gmail/XMPP",
+          "AIM/AOL"
+        ],
+        "domex2_im_platforms": [
+          "Pidgin/MSN",
+          "Pidgin/Gmail",
+          "Pidgin/XMPP"
+        ],
         "pidgin_accounts_xml_size": 5138,
         "pidgin_blist_size": 5112,
         "buddy_icons_count": 7,
@@ -191,7 +209,7 @@
       "source_tool": "bash_xml_parse",
       "timestamp": "2008-10-30T16:49:00Z",
       "raw_score": 0.22,
-      "prior_trust": 0.80,
+      "prior_trust": 0.8,
       "provenance_chain": [
         "sha256:f48d4218562ee5f2d1d95839aff3e0d53ddf84a41150d1f5f50355f5a828cd97"
       ],
@@ -245,8 +263,163 @@
     "url": "https://digitalcorpora.org/corpora/disk-images/nps-2009-domexusers",
     "purpose": "Educational DFIR training corpus",
     "public": true,
-    "scripted_users": ["domex1", "domex2"],
+    "scripted_users": [
+      "domex1",
+      "domex2"
+    ],
     "image_type": "Windows XP NTFS full disk image",
     "acquisition_tool": "AFF/fiwalk"
+  },
+  "signals": [
+    {
+      "artifact_id": "FIWALK-001",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 19
+      },
+      "description": "fiwalk XML catalog: 35313 fileobjects, NTFS partition offset=32256, sectorsize=512, block_count=10482404. Source image: realistic.aff. Acquisition: fiwalk v0.5.1 / TSK 3.0.0 / AFF 3.3.4. No deleted fi",
+      "evidence_type": "file_metadata",
+      "source": "read_evidence",
+      "z_score": {
+        "__fraction__": true,
+        "den": 400,
+        "num": 19
+      }
+    },
+    {
+      "artifact_id": "USER-001",
+      "confidence": {
+        "__fraction__": true,
+        "den": 25,
+        "num": 22
+      },
+      "description": "NTUSER.DAT registry hive for domex1 (SID S-1-5-21-842925246-725345543-1844994965-1003). Last write 2008-10-30 16:47:55 UTC. 786432 bytes. 16 restore point snapshots of SID-1003 registry found in Syste",
+      "evidence_type": "registry_key",
+      "source": "bash_xml_parse",
+      "z_score": {
+        "__fraction__": true,
+        "den": 625,
+        "num": 44
+      }
+    },
+    {
+      "artifact_id": "USER-002",
+      "confidence": {
+        "__fraction__": true,
+        "den": 25,
+        "num": 22
+      },
+      "description": "NTUSER.DAT registry hive for domex2 (SID S-1-5-21-842925246-725345543-1844994965-1004). Last write 2008-10-30 03:34:59 UTC. 786432 bytes. DPAPI credential store (CREDHIST + master key cc7fb371-278c-4e",
+      "evidence_type": "registry_key",
+      "source": "bash_xml_parse",
+      "z_score": {
+        "__fraction__": true,
+        "den": 625,
+        "num": 44
+      }
+    },
+    {
+      "artifact_id": "DOC-001",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 17
+      },
+      "description": "domex1 document lifecycle: 4 Office 2007 files created/sent/deleted in 152 seconds (2008-10-29 16:14:52 to 16:17:24 UTC). Files: 'This is a word document by domex user 1.docx' (9844b, mtime=16:14:52),",
+      "evidence_type": "file_timestamp",
+      "source": "bash_xml_parse",
+      "z_score": {
+        "__fraction__": true,
+        "den": 1000,
+        "num": 153
+      }
+    },
+    {
+      "artifact_id": "REC-001",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 9
+      },
+      "description": "RECYCLER SID-1003 (domex1): Dc3.docx (9852b, mtime=2008-10-29 16:15:34, ALLOC=1) and Dc4.xlsx (8236b, mtime=2008-10-29 16:17:24, ALLOC=1). Files are recoverable — not permanently deleted. INFO2 Recycl",
+      "evidence_type": "mft_entry",
+      "source": "bash_xml_parse",
+      "z_score": {
+        "__fraction__": true,
+        "den": 50,
+        "num": 9
+      }
+    },
+    {
+      "artifact_id": "EMAIL-001",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 17
+      },
+      "description": "domex2 Outlook 2007 email infrastructure: 3 PST files — Outldomexuser2@gmail.com-00000002.pst (525312b, mtime=2008-10-30 03:32:51), Outldomexuser2@hotmail.com-00000004.pst (271360b, mtime=2008-10-30 0",
+      "evidence_type": "file_metadata",
+      "source": "bash_xml_parse",
+      "z_score": {
+        "__fraction__": true,
+        "den": 200,
+        "num": 17
+      }
+    },
+    {
+      "artifact_id": "IM-001",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 17
+      },
+      "description": "domex1 Pidgin IM infrastructure: accounts.xml (5138b, mtime=2008-10-21 20:04:42), blist.xml (5112b, mtime=2008-10-21 20:08:01), 7 buddy icons, Gmail TLS cert. AIM/AOL acccore: domexuser1 buddyicon + f",
+      "evidence_type": "file_metadata",
+      "source": "bash_xml_parse",
+      "z_score": {
+        "__fraction__": true,
+        "den": 400,
+        "num": 17
+      }
+    },
+    {
+      "artifact_id": "SYS-001",
+      "confidence": {
+        "__fraction__": true,
+        "den": 5,
+        "num": 4
+      },
+      "description": "Windows System Restore: 16 restore points (RP1 2008-10-20 21:59 to RP16 2008-10-30 16:49) over 10 days. Distribution: RP1-RP5 in first 3 hours (setup phase), RP6 on 2008-10-22 (first domex user snapsh",
+      "evidence_type": "registry_key",
+      "source": "bash_xml_parse",
+      "z_score": {
+        "__fraction__": true,
+        "den": 125,
+        "num": 22
+      }
+    },
+    {
+      "artifact_id": "HASH-001",
+      "confidence": {
+        "__fraction__": true,
+        "den": 100,
+        "num": 99
+      },
+      "description": "Cryptographic chain of custody: 6 primary artifacts hashed before analysis. SHA-256 verified at acquisition. All hashes computed atomically (single-pass, TOCTOU-safe for XMLs via MCP; bash/sha256sum f",
+      "evidence_type": "cryptographic_hash",
+      "source": "generate_forensic_hash",
+      "z_score": {
+        "__fraction__": true,
+        "den": 5000,
+        "num": 99
+      }
+    }
+  ],
+  "_migration_note": {
+    "date": "2026-07-06",
+    "source": "results/agent_batch/NPS-2009-DOMEXUSERS_agent_bundle.json",
+    "method": "señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canónica preservada",
+    "n_signals": 9
   }
 }

@@ -87,5 +87,77 @@
     "secondness": "Exfiltration starts 120ms after Zoom; total traffic 200× greater than reported by Zoom; injected hidden process.",
     "thirdness": "Habit of using a legitimate application as a contextual trigger to hide exfiltration within expected noise."
   },
-  "notes": "Biological mimicry applied to code: the malware waits for the legitimate host to camouflage itself."
+  "notes": "Biological mimicry applied to code: the malware waits for the legitimate host to camouflage itself.",
+  "signals": [
+    {
+      "artifact_id": "a012_hidden",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 19
+      },
+      "description": "Hidden process in memory (no entry in userland process list) with handle to a TCP socket in ESTABLISHED state but no activity for 4.2 hours.",
+      "evidence_type": "memory_process",
+      "source": "sift_volatility",
+      "z_score": {
+        "__fraction__": true,
+        "den": 200,
+        "num": 171
+      }
+    },
+    {
+      "artifact_id": "a012_zoom",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 7
+      },
+      "description": "User opens zoom.exe at 14:32:15.000; video call start log with external participant.",
+      "evidence_type": "memory_process",
+      "source": "sift_syslog",
+      "z_score": {
+        "__fraction__": true,
+        "den": 500,
+        "num": 161
+      }
+    },
+    {
+      "artifact_id": "a012_exfil",
+      "confidence": {
+        "__fraction__": true,
+        "den": 4,
+        "num": 1
+      },
+      "description": "Outbound traffic spike of 2.3GB in 180 seconds initiated exactly at 14:32:15.120 (120ms after Zoom) toward a suspicious CDN IP.",
+      "evidence_type": "memory_process",
+      "source": "sift_netflow",
+      "z_score": {
+        "__fraction__": true,
+        "den": 100,
+        "num": 23
+      }
+    },
+    {
+      "artifact_id": "a012_bandwidth",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 3
+      },
+      "description": "Zoom reports 4.2Mbps bandwidth usage (HD video); total traffic measured at the interface is 847Mbps — 200:1 discrepancy.",
+      "evidence_type": "log_entry",
+      "source": "sift_netflow",
+      "z_score": {
+        "__fraction__": true,
+        "den": 500,
+        "num": 9
+      }
+    }
+  ],
+  "_migration_note": {
+    "date": "2026-07-06",
+    "source": "results/agent_batch/VIGIA-CAN-042_agent_bundle.json",
+    "method": "señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canónica preservada",
+    "n_signals": 4
+  }
 }

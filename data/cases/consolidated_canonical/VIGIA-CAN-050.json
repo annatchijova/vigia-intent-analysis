@@ -88,5 +88,77 @@
     "secondness": "Senders have never previously normalized alerts; one of them appears in real DLP exfiltration logs.",
     "thirdness": "Habit of using normalization language to avoid verification of real anomalies and cover exfiltration."
   },
-  "notes": "Case normalization fusion: the 'this is normal' message is not backed by evidence and avoids verification."
+  "notes": "Case normalization fusion: the 'this is normal' message is not backed by evidence and avoids verification.",
+  "signals": [
+    {
+      "artifact_id": "f003_chat1",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 3
+      },
+      "description": "Message in #security: 'This is normal, servers always throw CPU alerts sometimes. No problem.' — during a 97% CPU spike from an unknown process.",
+      "evidence_type": "log_entry",
+      "source": "sift_slack_export",
+      "z_score": {
+        "__fraction__": true,
+        "den": 1000,
+        "num": 21
+      }
+    },
+    {
+      "artifact_id": "f003_chat2",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 3
+      },
+      "description": "Message in response to DLP alert: 'Everyone does it, it's common to send files via WhatsApp to be faster. It's not a real security problem.'",
+      "evidence_type": "log_entry",
+      "source": "sift_slack_export",
+      "z_score": {
+        "__fraction__": true,
+        "den": 500,
+        "num": 9
+      }
+    },
+    {
+      "artifact_id": "f003_baseline",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 9
+      },
+      "description": "Behavioral baseline: both senders had NEVER previously normalized security alerts in 2 years of history.",
+      "evidence_type": "cultural_marker",
+      "source": "sift_ueba",
+      "z_score": {
+        "__fraction__": true,
+        "den": 2000,
+        "num": 819
+      }
+    },
+    {
+      "artifact_id": "f003_dlp",
+      "confidence": {
+        "__fraction__": true,
+        "den": 5,
+        "num": 2
+      },
+      "description": "Real DLP alert: 847 client files exfiltrated via WhatsApp Web over 3 days; the sender who said 'no problem' appears in the send logs.",
+      "evidence_type": "memory_process",
+      "source": "sift_syslog",
+      "z_score": {
+        "__fraction__": true,
+        "den": 50,
+        "num": 1
+      }
+    }
+  ],
+  "_migration_note": {
+    "date": "2026-07-06",
+    "source": "results/agent_batch/VIGIA-CAN-050_agent_bundle.json",
+    "method": "señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canónica preservada",
+    "n_signals": 4
+  }
 }
