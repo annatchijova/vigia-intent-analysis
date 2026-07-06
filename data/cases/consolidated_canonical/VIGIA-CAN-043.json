@@ -94,5 +94,77 @@
     "secondness": "Exact analyst jargon (96% match with internal KB); flattery; reset executed without change controls.",
     "thirdness": "Habit of using excessive docility and linguistic mirroring to lower the support operator's defenses."
   },
-  "notes": "Grice Quantity maxim violation (more information than required) + Carnegie manipulation. VERY VIGÍA."
+  "notes": "Grice Quantity maxim violation (more information than required) + Carnegie manipulation. VERY VIGÍA.",
+  "signals": [
+    {
+      "artifact_id": "a013_chat",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 3
+      },
+      "description": "Support chat: user starts with 'Hi, I need an admin password reset for svc_backup. I know it's delicate. My SID is S-1-5-21-...' before the operator asks.",
+      "evidence_type": "memory_process",
+      "source": "sift_chat_system",
+      "z_score": {
+        "__fraction__": true,
+        "den": 200,
+        "num": 3
+      }
+    },
+    {
+      "artifact_id": "a013_jargon",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 3
+      },
+      "description": "Use of exact internal analyst jargon: 'let's rotate the hash', 'I need to verify the primary domain controller', 'are you on the PDC or the BDC?'",
+      "evidence_type": "cultural_marker",
+      "source": "sift_linguistic",
+      "z_score": {
+        "__fraction__": true,
+        "den": 1000,
+        "num": 123
+      }
+    },
+    {
+      "artifact_id": "a013_flattery",
+      "confidence": {
+        "__fraction__": true,
+        "den": 4,
+        "num": 1
+      },
+      "description": "Flattery messages: 'You're the best on the team, you helped me last time and saved me', 'I know I can trust you with this'.",
+      "evidence_type": "log_entry",
+      "source": "sift_chat_system",
+      "z_score": {
+        "__fraction__": true,
+        "den": 200,
+        "num": 3
+      }
+    },
+    {
+      "artifact_id": "a013_reset",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 9
+      },
+      "description": "svc_backup password reset executed by tier2_009 without an approved change ticket or secondary identity verification.",
+      "evidence_type": "log_entry",
+      "source": "sift_syslog",
+      "z_score": {
+        "__fraction__": true,
+        "den": 250,
+        "num": 9
+      }
+    }
+  ],
+  "_migration_note": {
+    "date": "2026-07-06",
+    "source": "results/agent_batch/VIGIA-CAN-043_agent_bundle.json",
+    "method": "señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canónica preservada",
+    "n_signals": 4
+  }
 }

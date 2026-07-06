@@ -83,5 +83,77 @@
     "secondness": "'cnfnbz' is 'статья' in Russian layout. Commit from a machine with locale ru_RU. Session from a Russian IP.",
     "thirdness": "Habit of an attacker writing 'developer' comments while muscle memory betrays them in non-executable text."
   },
-  "notes": "Peirce Index: the string 'cnfnbz' reveals the operator's native hardware configuration."
+  "notes": "Peirce Index: the string 'cnfnbz' reveals the operator's native hardware configuration.",
+  "signals": [
+    {
+      "artifact_id": "a104_01",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 13
+      },
+      "description": "Comment in production script: '# TODO: fix the cnfnbz.py script'. Meaningless word in Spanish or English.",
+      "evidence_type": "file_hash",
+      "source": "sift_code_audit",
+      "z_score": {
+        "__fraction__": true,
+        "den": 250,
+        "num": 143
+      }
+    },
+    {
+      "artifact_id": "a104_02",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 3
+      },
+      "description": "Keyboard slip: 'cnfnbz' maps exactly to 'статья' (article) in active Russian ЙЦУКЕН layout. Confidence: 1.0.",
+      "evidence_type": "cultural_marker",
+      "source": "sift_linguistic",
+      "z_score": {
+        "__fraction__": true,
+        "den": 500,
+        "num": 69
+      }
+    },
+    {
+      "artifact_id": "a104_03",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 9
+      },
+      "description": "Commit made from a machine with git config locale ru_RU.UTF-8, timezone Europe/Moscow.",
+      "evidence_type": "log_entry",
+      "source": "sift_git_audit",
+      "z_score": {
+        "__fraction__": true,
+        "den": 500,
+        "num": 171
+      }
+    },
+    {
+      "artifact_id": "a104_04",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 19
+      },
+      "description": "Development session from IP geolocated in St. Petersburg with a physical keyboard configured in Russian.",
+      "evidence_type": "memory_process",
+      "source": "sift_volatility",
+      "z_score": {
+        "__fraction__": true,
+        "den": 400,
+        "num": 19
+      }
+    }
+  ],
+  "_migration_note": {
+    "date": "2026-07-06",
+    "source": "results/agent_batch/VIGIA-CAN-022_agent_bundle.json",
+    "method": "señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canónica preservada",
+    "n_signals": 4
+  }
 }

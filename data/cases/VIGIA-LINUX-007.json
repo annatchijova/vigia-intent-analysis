@@ -45,7 +45,7 @@
       "source_tool": "sift_linux_forensics",
       "timestamp": "2025-03-19T11:00:00Z",
       "raw_score": 0.93,
-      "prior_trust": 0.90,
+      "prior_trust": 0.9,
       "provenance_chain": [
         "sha256:linux007_credential_exfiltration"
       ],
@@ -59,7 +59,11 @@
         "exfiltration_categories": 15,
         "exfiltration_destination": "147.45.41.25:80",
         "exfiltration_protocol": "HTTP POST",
-        "cloud_credentials_stolen": ["AWS", "GCP", "Azure"],
+        "cloud_credentials_stolen": [
+          "AWS",
+          "GCP",
+          "Azure"
+        ],
         "ssh_keys_stolen": true,
         "kubernetes_kubeconfig_stolen": true
       }
@@ -82,11 +86,28 @@
         "write_blocker_used": false,
         "examiner_id": "Huntress SOC analysts",
         "c2_nodes": [
-          {"ip": "147.45.41.25", "port": 80, "function": "credential exfiltration"},
-          {"ip": "162.55.234.175", "port": 4082, "function": "botnet C2"},
-          {"domain": "earnfm.com", "function": "bandwidth monetization"},
-          {"domain": "repocket.com", "function": "residential proxy"},
-          {"domain": "speedshare.app", "function": "bandwidth selling"}
+          {
+            "ip": "147.45.41.25",
+            "port": 80,
+            "function": "credential exfiltration"
+          },
+          {
+            "ip": "162.55.234.175",
+            "port": 4082,
+            "function": "botnet C2"
+          },
+          {
+            "domain": "earnfm.com",
+            "function": "bandwidth monetization"
+          },
+          {
+            "domain": "repocket.com",
+            "function": "residential proxy"
+          },
+          {
+            "domain": "speedshare.app",
+            "function": "bandwidth selling"
+          }
         ],
         "revenue_diversification": true
       }
@@ -110,7 +131,12 @@
         "examiner_id": "Huntress SOC analysts",
         "watchdog_path": "/dev/health",
         "kill_interval_seconds": 45,
-        "target_processes": ["xmrig", "CGMiner", "BFGMiner", "cpuminer"],
+        "target_processes": [
+          "xmrig",
+          "CGMiner",
+          "BFGMiner",
+          "cpuminer"
+        ],
         "perfctl_pattern_match": true
       }
     },
@@ -201,5 +227,93 @@
     "source_file": "VIGIA-LINUX-CORPUS.json",
     "source_origin": "public_incident_report",
     "corpus_tag": "POST-HACKATHON"
+  },
+  "signals": [
+    {
+      "artifact_id": "linux007_01",
+      "confidence": {
+        "__fraction__": true,
+        "den": 25,
+        "num": 23
+      },
+      "description": "Enumeration reveals eight distinct persistence mechanisms deployed simultaneously: (1) user crontab with download/execute loop, (2) root crontab with watchdog check, (3) systemd user service in ~/.con",
+      "evidence_type": "log_entry",
+      "source": "sift_linux_forensics",
+      "z_score": {
+        "__fraction__": true,
+        "den": 500,
+        "num": 437
+      }
+    },
+    {
+      "artifact_id": "linux007_02",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 9
+      },
+      "description": "Credential harvesting module exfiltrated 15 categories of sensitive data to 147.45.41[.]25:80 via HTTP POST: (1) SSH private keys (~/.ssh/), (2) SSH known_hosts, (3) SSH config, (4) AWS credentials (~",
+      "evidence_type": "log_entry",
+      "source": "sift_linux_forensics",
+      "z_score": {
+        "__fraction__": true,
+        "den": 1000,
+        "num": 837
+      }
+    },
+    {
+      "artifact_id": "linux007_03",
+      "confidence": {
+        "__fraction__": true,
+        "den": 100,
+        "num": 87
+      },
+      "description": "Network telemetry reveals connections to three distinct infrastructure nodes: (1) 147.45.41[.]25:80 — credential exfiltration endpoint shared with Actor B infrastructure, (2) 162.55.234[.]175:4082 — p",
+      "evidence_type": "network_capture",
+      "source": "sift_network_forensics",
+      "z_score": {
+        "__fraction__": true,
+        "den": 1250,
+        "num": 957
+      }
+    },
+    {
+      "artifact_id": "linux007_04",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 17
+      },
+      "description": "Watchdog script at /dev/health implements anti-competitor logic: 'pkill -9 xmrig' executes every 45 seconds to kill rival cryptomining processes. This is identical to the pattern observed in perfctl (",
+      "evidence_type": "malware_static_analysis",
+      "source": "sift_static_analysis",
+      "z_score": {
+        "__fraction__": true,
+        "den": 1000,
+        "num": 697
+      }
+    },
+    {
+      "artifact_id": "linux007_05",
+      "confidence": {
+        "__fraction__": true,
+        "den": 100,
+        "num": 93
+      },
+      "description": "After the initial incident was remediated and the host was rebuilt, the same Actor B infrastructure (162.55.234[.]175:4082) reinfected the host on 2025-04-16 via the same vector: CVE-2025-55182 (React",
+      "evidence_type": "log_entry",
+      "source": "sift_linux_forensics",
+      "z_score": {
+        "__fraction__": true,
+        "den": 10000,
+        "num": 8463
+      }
+    }
+  ],
+  "_migration_note": {
+    "date": "2026-07-06",
+    "source": "results/agent_batch/VIGIA-LINUX-007_agent_bundle.json",
+    "method": "señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canónica preservada",
+    "n_signals": 5
   }
 }

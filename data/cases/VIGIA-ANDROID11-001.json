@@ -1,57 +1,97 @@
 {
-    "case_id": "VIGIA-ANDROID11-001",
-    "case_name": "Android 11 — Forensic Image with Documentation (2022)",
-    "source_dataset": "Digital Forensics Challenge — Android 11 Corpus",
-    "source_origin": "public_dataset",
-    "abstention_risk": "high",
-    "confidence_expected": 30,
-    "expected_verdict": "ABSTAIN",
-    "carnegie_pattern_expected": null,
-    "expected_mitre_ttps": [],
-    "description": "Forensic archive android_11.zip (SHA-256: abb27d4c5a57692d192a7619d179749abbd916d985d9fb4b10455d96d34d44a7, 10,944,907,975 bytes = 10.94GB). Contains nested archive: 'Android 11/Android 11 Image with Documentation.zip' (10,973,972,708 bytes = 10.97GB). File date: 2022-09-04. ABSTAIN verdict for this intake record: the outer archive has been hashed and its chain of custody established, but the nested image has not yet been extracted and analyzed due to size constraints (full extraction requires ~22GB disk space and extended processing time). The chain of custody for the outer archive is intact. Inner archive content, documentation type, and forensic scenario are pending extraction and analysis. This record establishes intake hash only.",
-    "devil_advocate": "N/A — verdict is ABSTAIN (preliminary intake only), refutation protocol not required.",
-    "artifacts": [
-        {
-            "artifact_id": "ANDROID11-ART-001",
-            "evidence_type": "file_hash",
-            "source_tool": "generate_forensic_hash",
-            "timestamp": "2026-06-28T16:45:00Z",
-            "raw_score": 0.05,
-            "prior_trust": 0.95,
-            "provenance_chain": [
-                "sha256:abb27d4c5a57692d192a7619d179749abbd916d985d9fb4b10455d96d34d44a7 (android_11.zip)"
-            ],
-            "acquisition_tool": "sha256sum (background process, completed)",
-            "acquisition_hash": "abb27d4c5a57692d192a7619d179749abbd916d985d9fb4b10455d96d34d44a7",
-            "acquisition_timestamp": "2026-06-28T16:45:00Z",
-            "description": "Android 11 forensic archive. Outer archive SHA-256 computed and verified. Size: 10,944,907,975 bytes (10.94GB). Inner archive: 'Android 11/Android 11 Image with Documentation.zip', 10,973,972,708 bytes. File date: 2022-09-04 16:17. Chain of custody established for outer archive. Full analysis pending extraction.",
-            "metadata": {
-                "outer_archive": "android_11.zip",
-                "outer_sha256": "abb27d4c5a57692d192a7619d179749abbd916d985d9fb4b10455d96d34d44a7",
-                "outer_size_bytes": 10944907975,
-                "inner_archive": "Android 11/Android 11 Image with Documentation.zip",
-                "inner_size_bytes": 10973972708,
-                "file_date": "2022-09-04",
-                "status": "INTAKE_ONLY — extraction pending"
-            }
-        },
-        {
-            "artifact_id": "ANDROID11-ART-002",
-            "evidence_type": "log_entry",
-            "source_tool": "read_evidence",
-            "timestamp": "2026-06-28T16:45:00Z",
-            "raw_score": 0.05,
-            "prior_trust": 0.5,
-            "provenance_chain": [
-                "sha256:abb27d4c5a57692d192a7619d179749abbd916d985d9fb4b10455d96d34d44a7"
-            ],
-            "description": "Zip directory listing only (no extraction). Inner file path: 'Android 11/Android 11 Image with Documentation.zip'. Title 'Android 11 Image with Documentation' suggests this is a full Android 11 device image accompanied by challenge documentation. Android 11 was released September 2020 (API level 30). File date 2022-09-04 suggests the image was acquired approximately 2 years after the OS release, consistent with a forensics challenge dataset. No further content analysis possible without extraction.",
-            "metadata": {
-                "android_version": "Android 11 (API 30, released 2020-09)",
-                "archive_description": "Full device image with documentation",
-                "acquisition_year_estimated": "2022",
-                "analysis_status": "PENDING — requires ~22GB extraction space"
-            }
-        }
-    ]
+  "case_id": "VIGIA-ANDROID11-001",
+  "case_name": "Android 11 — Forensic Image with Documentation (2022)",
+  "source_dataset": "Digital Forensics Challenge — Android 11 Corpus",
+  "source_origin": "public_dataset",
+  "abstention_risk": "high",
+  "confidence_expected": 30,
+  "expected_verdict": "ABSTAIN",
+  "carnegie_pattern_expected": null,
+  "expected_mitre_ttps": [],
+  "description": "Forensic archive android_11.zip (SHA-256: abb27d4c5a57692d192a7619d179749abbd916d985d9fb4b10455d96d34d44a7, 10,944,907,975 bytes = 10.94GB). Contains nested archive: 'Android 11/Android 11 Image with Documentation.zip' (10,973,972,708 bytes = 10.97GB). File date: 2022-09-04. ABSTAIN verdict for this intake record: the outer archive has been hashed and its chain of custody established, but the nested image has not yet been extracted and analyzed due to size constraints (full extraction requires ~22GB disk space and extended processing time). The chain of custody for the outer archive is intact. Inner archive content, documentation type, and forensic scenario are pending extraction and analysis. This record establishes intake hash only.",
+  "devil_advocate": "N/A — verdict is ABSTAIN (preliminary intake only), refutation protocol not required.",
+  "artifacts": [
+    {
+      "artifact_id": "ANDROID11-ART-001",
+      "evidence_type": "file_hash",
+      "source_tool": "generate_forensic_hash",
+      "timestamp": "2026-06-28T16:45:00Z",
+      "raw_score": 0.05,
+      "prior_trust": 0.95,
+      "provenance_chain": [
+        "sha256:abb27d4c5a57692d192a7619d179749abbd916d985d9fb4b10455d96d34d44a7 (android_11.zip)"
+      ],
+      "acquisition_tool": "sha256sum (background process, completed)",
+      "acquisition_hash": "abb27d4c5a57692d192a7619d179749abbd916d985d9fb4b10455d96d34d44a7",
+      "acquisition_timestamp": "2026-06-28T16:45:00Z",
+      "description": "Android 11 forensic archive. Outer archive SHA-256 computed and verified. Size: 10,944,907,975 bytes (10.94GB). Inner archive: 'Android 11/Android 11 Image with Documentation.zip', 10,973,972,708 bytes. File date: 2022-09-04 16:17. Chain of custody established for outer archive. Full analysis pending extraction.",
+      "metadata": {
+        "outer_archive": "android_11.zip",
+        "outer_sha256": "abb27d4c5a57692d192a7619d179749abbd916d985d9fb4b10455d96d34d44a7",
+        "outer_size_bytes": 10944907975,
+        "inner_archive": "Android 11/Android 11 Image with Documentation.zip",
+        "inner_size_bytes": 10973972708,
+        "file_date": "2022-09-04",
+        "status": "INTAKE_ONLY — extraction pending"
+      }
+    },
+    {
+      "artifact_id": "ANDROID11-ART-002",
+      "evidence_type": "log_entry",
+      "source_tool": "read_evidence",
+      "timestamp": "2026-06-28T16:45:00Z",
+      "raw_score": 0.05,
+      "prior_trust": 0.5,
+      "provenance_chain": [
+        "sha256:abb27d4c5a57692d192a7619d179749abbd916d985d9fb4b10455d96d34d44a7"
+      ],
+      "description": "Zip directory listing only (no extraction). Inner file path: 'Android 11/Android 11 Image with Documentation.zip'. Title 'Android 11 Image with Documentation' suggests this is a full Android 11 device image accompanied by challenge documentation. Android 11 was released September 2020 (API level 30). File date 2022-09-04 suggests the image was acquired approximately 2 years after the OS release, consistent with a forensics challenge dataset. No further content analysis possible without extraction.",
+      "metadata": {
+        "android_version": "Android 11 (API 30, released 2020-09)",
+        "archive_description": "Full device image with documentation",
+        "acquisition_year_estimated": "2022",
+        "analysis_status": "PENDING — requires ~22GB extraction space"
+      }
+    }
+  ],
+  "signals": [
+    {
+      "artifact_id": "ANDROID11-ART-001",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 19
+      },
+      "description": "Android 11 forensic archive. Outer archive SHA-256 computed and verified. Size: 10,944,907,975 bytes (10.94GB). Inner archive: 'Android 11/Android 11 Image with Documentation.zip', 10,973,972,708 byte",
+      "evidence_type": "file_hash",
+      "source": "generate_forensic_hash",
+      "z_score": {
+        "__fraction__": true,
+        "den": 400,
+        "num": 19
+      }
+    },
+    {
+      "artifact_id": "ANDROID11-ART-002",
+      "confidence": {
+        "__fraction__": true,
+        "den": 2,
+        "num": 1
+      },
+      "description": "Zip directory listing only (no extraction). Inner file path: 'Android 11/Android 11 Image with Documentation.zip'. Title 'Android 11 Image with Documentation' suggests this is a full Android 11 device",
+      "evidence_type": "log_entry",
+      "source": "read_evidence",
+      "z_score": {
+        "__fraction__": true,
+        "den": 40,
+        "num": 1
+      }
+    }
+  ],
+  "_migration_note": {
+    "date": "2026-07-06",
+    "source": "results/agent_batch/VIGIA-ANDROID11-001_agent_bundle.json",
+    "method": "señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canónica preservada",
+    "n_signals": 2
+  }
 }

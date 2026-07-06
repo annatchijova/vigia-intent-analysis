@@ -100,5 +100,61 @@
     "original_verdict": "NOISE",
     "abstention_risk": "bajo",
     "carnegie_pattern": null
+  },
+  "signals": [
+    {
+      "artifact_id": "ART-001",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 3
+      },
+      "description": "PID: 7 | Name: kworker/0:1H | PPID: 2 (kthreadd) | User: root | CPU: 0.0% | MEM: 0.0% | Start: boot time | pslist shows NO parent (expected for kernel threads)",
+      "evidence_type": "memory_process",
+      "source": "legacy_converter",
+      "z_score": {
+        "__fraction__": true,
+        "den": 400,
+        "num": 21
+      }
+    },
+    {
+      "artifact_id": "ART-002",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 3
+      },
+      "description": "Parent in kernel space: kthreadd (PID 2) | All kernel threads children of kthreadd | /proc/7/status: PPid: 2 | /proc/7/comm: kworker/0:1H | Kernel doc: 'Workqueue mechanism for deferred work'",
+      "evidence_type": "memory_process",
+      "source": "legacy_converter",
+      "z_score": {
+        "__fraction__": true,
+        "den": 800,
+        "num": 51
+      }
+    },
+    {
+      "artifact_id": "ART-003",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 3
+      },
+      "description": "System: Ubuntu 22.04 LTS | Kernel: 5.15.0-generic | Uptime: 45 days | 12 other kworker threads present | No anomalous network connections | No file descriptors to suspicious files",
+      "evidence_type": "log_entry",
+      "source": "legacy_converter",
+      "z_score": {
+        "__fraction__": true,
+        "den": 800,
+        "num": 57
+      }
+    }
+  ],
+  "_migration_note": {
+    "date": "2026-07-06",
+    "source": "results/agent_batch/VIGIA-BEN-012_agent_bundle.json",
+    "method": "señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canónica preservada",
+    "n_signals": 3
   }
 }

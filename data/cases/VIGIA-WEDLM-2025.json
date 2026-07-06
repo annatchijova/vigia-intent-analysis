@@ -91,5 +91,45 @@
   "caie_fractures": [],
   "source_dataset": "VIGÍA Real Evidence Corpus — Academic/Research Software",
   "source_origin": "github_archive",
-  "_expected_verdict_correction_note": "Corregido de 'NOISE' a 'ABSTAIN' el 2026-07-02: n_signals<3 con is_conclusive=False activa el gate anti-falso-negativo de classify_agent_verdict() (226bec1). ABSTAIN es el veredicto honesto para evidencia con menos de 3 señales, no un error del agente."
+  "_expected_verdict_correction_note": "Corregido de 'NOISE' a 'ABSTAIN' el 2026-07-02: n_signals<3 con is_conclusive=False activa el gate anti-falso-negativo de classify_agent_verdict() (226bec1). ABSTAIN es el veredicto honesto para evidencia con menos de 3 señales, no un error del agente.",
+  "signals": [
+    {
+      "artifact_id": "WEDLM-ART-001",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 19
+      },
+      "description": "WeDLM-main.zip — container archive. GitHub 'Download ZIP' naming convention ('-main' suffix). Python LLM evaluation framework with download scripts for 8 academic benchmarks. README.md (9.7KB), MANIFE",
+      "evidence_type": "file_hash",
+      "source": "generate_forensic_hash",
+      "z_score": {
+        "__fraction__": true,
+        "den": 1000,
+        "num": 19
+      }
+    },
+    {
+      "artifact_id": "WEDLM-ART-002",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 19
+      },
+      "description": "Directory structure of WeDLM-main/: evaluation/dataset_download/ containing benchmark download scripts for ARC, GPQA, GSM8K, HumanEval, MATH, MBPP, MMLU, HellaSwag. Root-level README.md and MANIFEST.i",
+      "evidence_type": "log_entry",
+      "source": "list_files",
+      "z_score": {
+        "__fraction__": true,
+        "den": 1000,
+        "num": 19
+      }
+    }
+  ],
+  "_migration_note": {
+    "date": "2026-07-06",
+    "source": "results/agent_batch/VIGIA-WEDLM-2025_agent_bundle.json",
+    "method": "señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canónica preservada",
+    "n_signals": 2
+  }
 }

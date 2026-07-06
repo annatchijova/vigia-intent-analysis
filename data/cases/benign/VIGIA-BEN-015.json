@@ -47,5 +47,61 @@
     "thirdness": "This is an artifact of mass VM restoration from snapshot. Identical timestamps are characteristic of restore operations, not timestomping. The benign hypothesis explains the scale (100 files, 47 VMs) without requiring malicious coordination."
   },
   "source_origin": "synthetic_validation",
-  "why_not_malice": "The identical timestamps stem from a documented and vendor-verifiable infrastructure event. The scale (47 VMs) is consistent with hardware failure, not a targeted attack."
+  "why_not_malice": "The identical timestamps stem from a documented and vendor-verifiable infrastructure event. The scale (47 VMs) is consistent with hardware failure, not a targeted attack.",
+  "signals": [
+    {
+      "artifact_id": "ART-001",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 3
+      },
+      "description": "ls -l /data | 100 files with identical mtime: 2024-05-10 03:47:22 | atime varies | ctime identical | All files from same snapshot",
+      "evidence_type": "file_timestamp",
+      "source": "legacy_converter",
+      "z_score": {
+        "__fraction__": true,
+        "den": 400,
+        "num": 21
+      }
+    },
+    {
+      "artifact_id": "ART-002",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 3
+      },
+      "description": "Infrastructure ticket INF-2024-0551: 'Hardware failure on VM host node-07. 47 VMs affected. Restored from backup snapshot 2024-05-09-23:00.' | Technician: infra_team | Approval: VP Infrastructure | Do",
+      "evidence_type": "log_entry",
+      "source": "legacy_converter",
+      "z_score": {
+        "__fraction__": true,
+        "den": 800,
+        "num": 51
+      }
+    },
+    {
+      "artifact_id": "ART-003",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 3
+      },
+      "description": "Backup system: Veeam | Snapshot: 2024-05-09-23:00 | Restore point: 2024-05-10-03:47 (completion time) | 47 VMs restored simultaneously | All show identical mtime for restored files | atime reflects po",
+      "evidence_type": "file_timestamp",
+      "source": "legacy_converter",
+      "z_score": {
+        "__fraction__": true,
+        "den": 800,
+        "num": 57
+      }
+    }
+  ],
+  "_migration_note": {
+    "date": "2026-07-06",
+    "source": "results/agent_batch/VIGIA-BEN-015_agent_bundle.json",
+    "method": "señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canónica preservada",
+    "n_signals": 3
+  }
 }

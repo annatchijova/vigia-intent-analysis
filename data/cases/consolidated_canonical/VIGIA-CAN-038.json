@@ -1,6 +1,6 @@
 {
   "case_id": "case_026_ventrilocuo_process_hollowing",
-  "name": "The Ventriloquist \u2014 Process Hollowing",
+  "name": "The Ventriloquist — Process Hollowing",
   "description": "svchost.exe (clean hash, valid Microsoft signature) running from C:\\Users\\Public\\Downloads\\, parent cmd.exe, .text section with RWX permissions, exfiltrating 1GB to an AS in Ukraine. Firewall reports 0 bytes.",
   "artifacts": [
     {
@@ -113,9 +113,81 @@
   ],
   "expected_verdict": "MALICE",
   "peirce_chain": {
-    "firstness": "svchost.exe with clean hash and valid Microsoft signature \u2014 invisible to antivirus.",
+    "firstness": "svchost.exe with clean hash and valid Microsoft signature — invisible to antivirus.",
     "secondness": "Running from Downloads, parent cmd.exe, RWX on .text, 1GB exfiltrated that firewall does not see.",
     "thirdness": "Habit of stealing a system process's identity. AV protects the name; CAIE protects against memory."
   },
-  "notes": "The OS believes it is svchost.exe but executes the attacker's code."
+  "notes": "The OS believes it is svchost.exe but executes the attacker's code.",
+  "signals": [
+    {
+      "artifact_id": "a026_01",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 19
+      },
+      "description": "svchost.exe (PID 3847): 8MB RWX region with PE header at offset 0 not mapped to a file on disk. Parent: cmd.exe. Expected: services.exe.",
+      "evidence_type": "memory_process",
+      "source": "sift_volatility",
+      "z_score": {
+        "__fraction__": true,
+        "den": 200,
+        "num": 171
+      }
+    },
+    {
+      "artifact_id": "a026_02",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 9
+      },
+      "description": "svchost.exe hash on disk: matches Windows 2025 Build 26100. Valid Microsoft signature. The file on disk is clean.",
+      "evidence_type": "memory_process",
+      "source": "sift_authenticode",
+      "z_score": {
+        "__fraction__": true,
+        "den": 250,
+        "num": 207
+      }
+    },
+    {
+      "artifact_id": "a026_03",
+      "confidence": {
+        "__fraction__": true,
+        "den": 5,
+        "num": 4
+      },
+      "description": "Persistent connection to 185.62.58.207 (AS57169, Ukraine). 1GB exfiltrated. Firewall reports 0 bytes. TLS cert mismatch.",
+      "evidence_type": "memory_process",
+      "source": "sift_zeek",
+      "z_score": {
+        "__fraction__": true,
+        "den": 125,
+        "num": 92
+      }
+    },
+    {
+      "artifact_id": "a026_04",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 13
+      },
+      "description": "Run key pointing to C:\\Users\\Public\\Downloads\\svchost.exe for persistence.",
+      "evidence_type": "registry_key",
+      "source": "sift_regripper",
+      "z_score": {
+        "__fraction__": true,
+        "den": 250,
+        "num": 117
+      }
+    }
+  ],
+  "_migration_note": {
+    "date": "2026-07-06",
+    "source": "results/agent_batch/VIGIA-CAN-038_agent_bundle.json",
+    "method": "señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canónica preservada",
+    "n_signals": 4
+  }
 }

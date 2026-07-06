@@ -1,184 +1,304 @@
 {
-    "case_id": "VIGIA-NGDC-002",
-    "case_name": "National Gallery DC 2012 — Tracy (Insider Threat / Dolo Eventual)",
-    "schema_version": "1.1",
-    "description": "Tracy is a National Gallery DC supervisor recruited by Carry as an insider asset. Evidence sourced from two independent channels: (1) keystroke logs captured by LogKext Daemon on Tracy's MacBook Air, exfiltrated hourly via cron+postfix to joe.sum.twelve@gmail.com and recovered from email.zip (Digital Corpora); (2) the outbound side of Tracy's correspondence recovered from EmailProviderBody.db extracted from carry-tablet-2012-07-16-final.E01. Tracy was not the initiator and did not know the real objective (defacement of foreign art). She was socially engineered by Carry who deliberately exploited her documented financial distress (divorce, custody battle, private school tuition). However, Tracy explicitly acknowledged the illegality of her actions, accepted cash payment for security shift schedules, and confirmed participation after perceiving the risk. This constitutes dolo eventual: awareness of wrongdoing with conscious acceptance of risk, not ignorance or total deception.",
-    "abstention_risk": "low",
-    "expected_verdict": "MALICE",
-    "carnegie_pattern_expected": "FINANCIAL_MOTIVATION_EXPLOITATION",
-    "confidence_expected": 83,
-    "source_dataset": "Digital Corpora — 2012 National Gallery DC Scenario. Sources: (1) email.zip — LogKext keylogger EML files (12 logs, 2012-06-28 to 2012-07-12); (2) carry-tablet-2012-07-16-final.E01 — EmailProviderBody.db messageKeys 16,22,23,24,25,26,27 (Tracy outbound correspondence).",
-    "devil_advocate": "Tracy is a financially desperate single mother in the middle of a custody battle who was deliberately targeted and manipulated by Carry. She believed she was helping organize a legitimate flash mob event. She had no knowledge of Krasnovian operatives, planned defacement, or any criminal conspiracy beyond what she understood as bending minor gallery rules for a friend. Her financial situation — daughter in expensive private school, ex-husband weaponizing custody — created coercive pressure that substantially diminishes voluntary agency. The keylogger evidence was obtained illegally by her ex-husband without consent, raising admissibility concerns. The stamp conspiracy referenced in her private communications is separate from the Carry plot and may reflect casual speculation rather than active planning.",
-    "expected_mitre_ttps": [
-        "T1078.003",
-        "T1213",
-        "T1530",
-        "T1566.002"
-    ],
-    "peirce_expected": {
-        "firstness": "Keystroke logs capture Tracy identifying a rare stamp collection as a financial opportunity ('Maybe this is our ticket') and accessing Carry's contact email (coralblue2@yahoo.com) on July 12. Keylogger also captures her daughter Terry (age 15) using the same device — collateral surveillance of a minor.",
-        "secondness": "Tracy allows Carry to smuggle a tablet into the National Gallery under flash mob pretext, explicitly offers to bypass security controls ('Our security guards can be pretty ridiculous sometimes'), and provides — or agrees to provide — security shift schedules in exchange for cash payment. She acknowledges the risk in writing: 'I could get in a bunch of trouble.'",
-        "thirdness": "Tracy's actions across ten days constitute a pattern of deliberate insider facilitation: rapport cultivation accepted, physical access granted, security intelligence sold. The financial motivation is documented, the risk was perceived and accepted, and the final confirmation ('Ok.') came four days before seizure with no attempt to withdraw. Dolo eventual is established: she did not seek the harmful outcome but consciously accepted it as a known risk of her chosen actions."
+  "case_id": "VIGIA-NGDC-002",
+  "case_name": "National Gallery DC 2012 — Tracy (Insider Threat / Dolo Eventual)",
+  "schema_version": "1.1",
+  "description": "Tracy is a National Gallery DC supervisor recruited by Carry as an insider asset. Evidence sourced from two independent channels: (1) keystroke logs captured by LogKext Daemon on Tracy's MacBook Air, exfiltrated hourly via cron+postfix to joe.sum.twelve@gmail.com and recovered from email.zip (Digital Corpora); (2) the outbound side of Tracy's correspondence recovered from EmailProviderBody.db extracted from carry-tablet-2012-07-16-final.E01. Tracy was not the initiator and did not know the real objective (defacement of foreign art). She was socially engineered by Carry who deliberately exploited her documented financial distress (divorce, custody battle, private school tuition). However, Tracy explicitly acknowledged the illegality of her actions, accepted cash payment for security shift schedules, and confirmed participation after perceiving the risk. This constitutes dolo eventual: awareness of wrongdoing with conscious acceptance of risk, not ignorance or total deception.",
+  "abstention_risk": "low",
+  "expected_verdict": "MALICE",
+  "carnegie_pattern_expected": "FINANCIAL_MOTIVATION_EXPLOITATION",
+  "confidence_expected": 83,
+  "source_dataset": "Digital Corpora — 2012 National Gallery DC Scenario. Sources: (1) email.zip — LogKext keylogger EML files (12 logs, 2012-06-28 to 2012-07-12); (2) carry-tablet-2012-07-16-final.E01 — EmailProviderBody.db messageKeys 16,22,23,24,25,26,27 (Tracy outbound correspondence).",
+  "devil_advocate": "Tracy is a financially desperate single mother in the middle of a custody battle who was deliberately targeted and manipulated by Carry. She believed she was helping organize a legitimate flash mob event. She had no knowledge of Krasnovian operatives, planned defacement, or any criminal conspiracy beyond what she understood as bending minor gallery rules for a friend. Her financial situation — daughter in expensive private school, ex-husband weaponizing custody — created coercive pressure that substantially diminishes voluntary agency. The keylogger evidence was obtained illegally by her ex-husband without consent, raising admissibility concerns. The stamp conspiracy referenced in her private communications is separate from the Carry plot and may reflect casual speculation rather than active planning.",
+  "expected_mitre_ttps": [
+    "T1078.003",
+    "T1213",
+    "T1530",
+    "T1566.002"
+  ],
+  "peirce_expected": {
+    "firstness": "Keystroke logs capture Tracy identifying a rare stamp collection as a financial opportunity ('Maybe this is our ticket') and accessing Carry's contact email (coralblue2@yahoo.com) on July 12. Keylogger also captures her daughter Terry (age 15) using the same device — collateral surveillance of a minor.",
+    "secondness": "Tracy allows Carry to smuggle a tablet into the National Gallery under flash mob pretext, explicitly offers to bypass security controls ('Our security guards can be pretty ridiculous sometimes'), and provides — or agrees to provide — security shift schedules in exchange for cash payment. She acknowledges the risk in writing: 'I could get in a bunch of trouble.'",
+    "thirdness": "Tracy's actions across ten days constitute a pattern of deliberate insider facilitation: rapport cultivation accepted, physical access granted, security intelligence sold. The financial motivation is documented, the risk was perceived and accepted, and the final confirmation ('Ok.') came four days before seizure with no attempt to withdraw. Dolo eventual is established: she did not seek the harmful outcome but consciously accepted it as a known risk of her chosen actions."
+  },
+  "artifacts": [
+    {
+      "artifact_id": "ngdc002_01",
+      "evidence_type": "keylogger_capture",
+      "source_tool": "LogKext Daemon v? — MacOS keylogger, cron+postfix exfiltration to joe.sum.twelve@gmail.com — logfile-2012-07-03-1000.eml",
+      "timestamp": "2012-07-03T10:00:00Z",
+      "raw_score": 0.94,
+      "prior_trust": 0.88,
+      "provenance_chain": [
+        "email.zip (Digital Corpora)",
+        "logfile-2012-07-03-1000.eml",
+        "LogKext Daemon — User tracysumtwelve — Tracys-MacBook-Air.local"
+      ],
+      "description": "Keystroke log captures Tracy composing the following text on 2012-07-03: 'I was told that we are supposed to be receiving a rare collection of stamps. That would explain why the shipping information looked a bit out of the ordinary to me. I am not certain of the specifics for the stamps, but they seem to be very highly valued by somebody. Maybe this is our ticket.' This constitutes documented TARGET_IDENTIFICATION and CONSPIRACY_FORMATION. Tracy has independently identified a high-value target at the gallery and framed it as a financial opportunity ('our ticket') in private correspondence, predating Carry's approach. The plural 'our' implies a pre-existing conspiratorial relationship with another party (Pat, her brother, a DC police detective).",
+      "metadata": {
+        "acquisition_tool": "LogKext Daemon — MacOS kernel extension keylogger",
+        "acquisition_method": "cron job + postfix SMTP exfiltration to joe.sum.twelve@gmail.com",
+        "device": "Tracys-MacBook-Air.local",
+        "user": "tracysumtwelve",
+        "password_captured": "legalBee",
+        "legal_note": "Keylogger installed by Joe (ex-husband) without Tracy's consent. Admissibility subject to jurisdiction-specific rules on spousal surveillance. Evidence is included as behavioral signal, not as sole basis for verdict.",
+        "target_identified": "rare stamp collection",
+        "conspiracy_language": "Maybe this is our ticket"
+      }
     },
-    "artifacts": [
-        {
-            "artifact_id": "ngdc002_01",
-            "evidence_type": "keylogger_capture",
-            "source_tool": "LogKext Daemon v? — MacOS keylogger, cron+postfix exfiltration to joe.sum.twelve@gmail.com — logfile-2012-07-03-1000.eml",
-            "timestamp": "2012-07-03T10:00:00Z",
-            "raw_score": 0.94,
-            "prior_trust": 0.88,
-            "provenance_chain": [
-                "email.zip (Digital Corpora)",
-                "logfile-2012-07-03-1000.eml",
-                "LogKext Daemon — User tracysumtwelve — Tracys-MacBook-Air.local"
-            ],
-            "description": "Keystroke log captures Tracy composing the following text on 2012-07-03: 'I was told that we are supposed to be receiving a rare collection of stamps. That would explain why the shipping information looked a bit out of the ordinary to me. I am not certain of the specifics for the stamps, but they seem to be very highly valued by somebody. Maybe this is our ticket.' This constitutes documented TARGET_IDENTIFICATION and CONSPIRACY_FORMATION. Tracy has independently identified a high-value target at the gallery and framed it as a financial opportunity ('our ticket') in private correspondence, predating Carry's approach. The plural 'our' implies a pre-existing conspiratorial relationship with another party (Pat, her brother, a DC police detective).",
-            "metadata": {
-                "acquisition_tool": "LogKext Daemon — MacOS kernel extension keylogger",
-                "acquisition_method": "cron job + postfix SMTP exfiltration to joe.sum.twelve@gmail.com",
-                "device": "Tracys-MacBook-Air.local",
-                "user": "tracysumtwelve",
-                "password_captured": "legalBee",
-                "legal_note": "Keylogger installed by Joe (ex-husband) without Tracy's consent. Admissibility subject to jurisdiction-specific rules on spousal surveillance. Evidence is included as behavioral signal, not as sole basis for verdict.",
-                "target_identified": "rare stamp collection",
-                "conspiracy_language": "Maybe this is our ticket"
-            }
-        },
-        {
-            "artifact_id": "ngdc002_02",
-            "evidence_type": "keylogger_capture",
-            "source_tool": "LogKext Daemon — logfile-2012-06-28-1600.eml + logfile-2012-06-29-1100.eml",
-            "timestamp": "2012-06-28T16:00:00Z",
-            "raw_score": 0.87,
-            "prior_trust": 0.85,
-            "provenance_chain": [
-                "email.zip (Digital Corpora)",
-                "logfile-2012-06-28-1600.eml",
-                "logfile-2012-06-29-1100.eml",
-                "LogKext Daemon — User tracysumtwelve"
-            ],
-            "description": "Keystroke logs from June 28-29 capture Tracy establishing contact with Carry via Thunderbird. On June 28: password 'legalBee' entered, email typed to 'coralblue22[corrections]uetwo@hotmail.com' — Carry's Hotmail address. On June 29: 'coralbluetwo@hotmail.com' confirmed as recipient, password re-entered. This documents the initiation of the Tracy-Carry communication channel from Tracy's side, predating the lunch invitation. Tracy already had Carry's contact and was reaching out independently.",
-            "metadata": {
-                "acquisition_tool": "LogKext Daemon",
-                "carry_email_hotmail": "coralbluetwo@hotmail.com",
-                "tracy_password_captured": "legalBee",
-                "email_client": "Thunderbird"
-            }
-        },
-        {
-            "artifact_id": "ngdc002_03",
-            "evidence_type": "email_content",
-            "source_tool": "sqlite3 — EmailProviderBody.db messageKey=23, extracted from carry-tablet-2012-07-16-final.E01",
-            "timestamp": "2012-07-09T00:00:00Z",
-            "raw_score": 0.91,
-            "prior_trust": 0.93,
-            "provenance_chain": [
-                "carry-tablet-2012-07-16-final.E01",
-                "inode 1474510 EmailProviderBody.db",
-                "Message._id=23"
-            ],
-            "description": "Tracy responds to Carry's tablet smuggling request: 'Hey, I can definitely help get your tablet in. Our security guards can be pretty ridiculous sometimes! When would you want to get in and take a look around?' This constitutes active insider facilitation — Tracy volunteers to bypass security controls without hesitation, characterizes her own security team dismissively, and offers to arrange gallery access. The response shows no hesitation or ethical friction at the request to circumvent institutional security protocols.",
-            "metadata": {
-                "acquisition_tool": "sqlite3 on extracted EmailProviderBody.db",
-                "security_bypass_offered": true,
-                "hesitation_expressed": false,
-                "framing": "flash mob photography"
-            }
-        },
-        {
-            "artifact_id": "ngdc002_04",
-            "evidence_type": "email_content",
-            "source_tool": "sqlite3 — EmailProviderBody.db messageKey=25",
-            "timestamp": "2012-07-11T00:00:00Z",
-            "raw_score": 0.96,
-            "prior_trust": 0.93,
-            "provenance_chain": [
-                "carry-tablet-2012-07-16-final.E01",
-                "inode 1474510 EmailProviderBody.db",
-                "Message._id=25"
-            ],
-            "description": "Tracy responds to Carry's request for security shift schedules in exchange for cash. Full text: 'Okay carrie I'm going to send this but you need to make sure no one else sees it okay I could get in a bunch of trouble. I want to help you and I could really use some extra cash too but please please be careful.' This is the highest-value signal in the case. Tracy explicitly: (1) acknowledges illegality ('I could get in a bunch of trouble'), (2) accepts financial motivation ('I could really use some extra cash too'), (3) proceeds despite perceived risk. This is the textbook definition of dolo eventual — conscious acceptance of known risk for personal gain. She does not withdraw, does not ask what the information will be used for, does not condition her compliance on clarification.",
-            "metadata": {
-                "acquisition_tool": "sqlite3 on extracted EmailProviderBody.db",
-                "explicit_risk_acknowledgment": true,
-                "financial_motivation_stated": true,
-                "withdrawal_attempt": false,
-                "dolo_eventual_indicator": "proceeds with explicit awareness of illegality"
-            }
-        },
-        {
-            "artifact_id": "ngdc002_05",
-            "evidence_type": "email_content",
-            "source_tool": "sqlite3 — EmailProviderBody.db messageKey=27",
-            "timestamp": "2012-07-12T00:00:00Z",
-            "raw_score": 0.89,
-            "prior_trust": 0.92,
-            "provenance_chain": [
-                "carry-tablet-2012-07-16-final.E01",
-                "inode 1474510 EmailProviderBody.db",
-                "Message._id=27"
-            ],
-            "description": "After Carry's operational security lapse ('It willbe gun'), Tracy asks 'What do you mean by that?' — showing she perceived the anomaly. Carry corrects to 'It will be fun. Sorry... it's the keyboard on my new phone.' Tracy's final response: 'Ok.' sent from iPhone on July 12, four days before tablet seizure. Tracy noticed the lapse, questioned it, received a deflection, and confirmed anyway. This eliminates the interpretation that she was unaware of risk — she actively interrogated a suspicious signal and chose to continue.",
-            "metadata": {
-                "acquisition_tool": "sqlite3 on extracted EmailProviderBody.db",
-                "opsec_lapse_noticed": true,
-                "opsec_lapse_questioned": true,
-                "continued_after_lapse": true,
-                "final_confirmation_date": "2012-07-12",
-                "days_before_seizure": 4,
-                "device": "iPhone"
-            }
-        },
-        {
-            "artifact_id": "ngdc002_06",
-            "evidence_type": "keylogger_capture",
-            "source_tool": "LogKext Daemon — logfile-2012-07-12-1200.eml",
-            "timestamp": "2012-07-12T12:00:00Z",
-            "raw_score": 0.85,
-            "prior_trust": 0.84,
-            "provenance_chain": [
-                "email.zip (Digital Corpora)",
-                "logfile-2012-07-12-1200.eml",
-                "LogKext Daemon — User tracysumtwelve"
-            ],
-            "description": "Final keylogger capture before seizure. Tracy accesses coralblue2@yahoo.com — Carry's Yahoo operational account (confirmed in carry-tablet EmailProvider.db HostAuth). This is the same account Carry used for all operational communications on the tablet. Direct contact between Tracy and Carry's operational identity on the last documented day before law enforcement involvement, corroborating active conspiracy participation up to the final moment.",
-            "metadata": {
-                "acquisition_tool": "LogKext Daemon",
-                "carry_email_yahoo": "coralblue2@yahoo.com",
-                "cross_reference": "carry-tablet EmailProvider.db HostAuth — carrysum2012@yahoo.com confirmed same account cluster",
-                "days_before_seizure": 3
-            }
-        },
-        {
-            "artifact_id": "ngdc002_07",
-            "evidence_type": "behavioral_profile",
-            "source_tool": "Digital Corpora scenario documentation + keylogger aggregate",
-            "timestamp": "2012-07-05T00:00:00Z",
-            "raw_score": 0.79,
-            "prior_trust": 0.82,
-            "provenance_chain": [
-                "email.zip aggregate — logfile-2012-07-02-1200.eml",
-                "Digital Corpora scenario documentation"
-            ],
-            "description": "Keylogger captures Tracy searching 'national gallery exhibit' and 'value of international' on July 2 and 5 respectively — before Carry's approach and before the stamp identification in ngdc002_01. Tracy was independently researching gallery assets and their value prior to being recruited. This establishes pre-existing motivation independent of Carry's manipulation, weakening the pure victim narrative. Tracy's financial distress is documented and real, but her behavior shows active interest in gallery valuables that predates external pressure.",
-            "metadata": {
-                "acquisition_tool": "LogKext Daemon aggregate",
-                "searches_documented": [
-                    "national gallery exhibit (2012-07-02)",
-                    "value of international (2012-07-05)"
-                ],
-                "pre_recruitment_interest": true
-            }
-        }
-    ],
-    "fractures": [
-        "INSIDER_THREAT_ACTIVE",
-        "FINANCIAL_MOTIVATION_DOCUMENTED",
-        "SECURITY_INTELLIGENCE_DISCLOSED",
-        "TARGET_IDENTIFICATION",
-        "CONSPIRACY_FORMATION",
-        "DOLO_EVENTUAL_CONFIRMED",
-        "RISK_ACKNOWLEDGED_ACCEPTED"
-    ]
+    {
+      "artifact_id": "ngdc002_02",
+      "evidence_type": "keylogger_capture",
+      "source_tool": "LogKext Daemon — logfile-2012-06-28-1600.eml + logfile-2012-06-29-1100.eml",
+      "timestamp": "2012-06-28T16:00:00Z",
+      "raw_score": 0.87,
+      "prior_trust": 0.85,
+      "provenance_chain": [
+        "email.zip (Digital Corpora)",
+        "logfile-2012-06-28-1600.eml",
+        "logfile-2012-06-29-1100.eml",
+        "LogKext Daemon — User tracysumtwelve"
+      ],
+      "description": "Keystroke logs from June 28-29 capture Tracy establishing contact with Carry via Thunderbird. On June 28: password 'legalBee' entered, email typed to 'coralblue22[corrections]uetwo@hotmail.com' — Carry's Hotmail address. On June 29: 'coralbluetwo@hotmail.com' confirmed as recipient, password re-entered. This documents the initiation of the Tracy-Carry communication channel from Tracy's side, predating the lunch invitation. Tracy already had Carry's contact and was reaching out independently.",
+      "metadata": {
+        "acquisition_tool": "LogKext Daemon",
+        "carry_email_hotmail": "coralbluetwo@hotmail.com",
+        "tracy_password_captured": "legalBee",
+        "email_client": "Thunderbird"
+      }
+    },
+    {
+      "artifact_id": "ngdc002_03",
+      "evidence_type": "email_content",
+      "source_tool": "sqlite3 — EmailProviderBody.db messageKey=23, extracted from carry-tablet-2012-07-16-final.E01",
+      "timestamp": "2012-07-09T00:00:00Z",
+      "raw_score": 0.91,
+      "prior_trust": 0.93,
+      "provenance_chain": [
+        "carry-tablet-2012-07-16-final.E01",
+        "inode 1474510 EmailProviderBody.db",
+        "Message._id=23"
+      ],
+      "description": "Tracy responds to Carry's tablet smuggling request: 'Hey, I can definitely help get your tablet in. Our security guards can be pretty ridiculous sometimes! When would you want to get in and take a look around?' This constitutes active insider facilitation — Tracy volunteers to bypass security controls without hesitation, characterizes her own security team dismissively, and offers to arrange gallery access. The response shows no hesitation or ethical friction at the request to circumvent institutional security protocols.",
+      "metadata": {
+        "acquisition_tool": "sqlite3 on extracted EmailProviderBody.db",
+        "security_bypass_offered": true,
+        "hesitation_expressed": false,
+        "framing": "flash mob photography"
+      }
+    },
+    {
+      "artifact_id": "ngdc002_04",
+      "evidence_type": "email_content",
+      "source_tool": "sqlite3 — EmailProviderBody.db messageKey=25",
+      "timestamp": "2012-07-11T00:00:00Z",
+      "raw_score": 0.96,
+      "prior_trust": 0.93,
+      "provenance_chain": [
+        "carry-tablet-2012-07-16-final.E01",
+        "inode 1474510 EmailProviderBody.db",
+        "Message._id=25"
+      ],
+      "description": "Tracy responds to Carry's request for security shift schedules in exchange for cash. Full text: 'Okay carrie I'm going to send this but you need to make sure no one else sees it okay I could get in a bunch of trouble. I want to help you and I could really use some extra cash too but please please be careful.' This is the highest-value signal in the case. Tracy explicitly: (1) acknowledges illegality ('I could get in a bunch of trouble'), (2) accepts financial motivation ('I could really use some extra cash too'), (3) proceeds despite perceived risk. This is the textbook definition of dolo eventual — conscious acceptance of known risk for personal gain. She does not withdraw, does not ask what the information will be used for, does not condition her compliance on clarification.",
+      "metadata": {
+        "acquisition_tool": "sqlite3 on extracted EmailProviderBody.db",
+        "explicit_risk_acknowledgment": true,
+        "financial_motivation_stated": true,
+        "withdrawal_attempt": false,
+        "dolo_eventual_indicator": "proceeds with explicit awareness of illegality"
+      }
+    },
+    {
+      "artifact_id": "ngdc002_05",
+      "evidence_type": "email_content",
+      "source_tool": "sqlite3 — EmailProviderBody.db messageKey=27",
+      "timestamp": "2012-07-12T00:00:00Z",
+      "raw_score": 0.89,
+      "prior_trust": 0.92,
+      "provenance_chain": [
+        "carry-tablet-2012-07-16-final.E01",
+        "inode 1474510 EmailProviderBody.db",
+        "Message._id=27"
+      ],
+      "description": "After Carry's operational security lapse ('It willbe gun'), Tracy asks 'What do you mean by that?' — showing she perceived the anomaly. Carry corrects to 'It will be fun. Sorry... it's the keyboard on my new phone.' Tracy's final response: 'Ok.' sent from iPhone on July 12, four days before tablet seizure. Tracy noticed the lapse, questioned it, received a deflection, and confirmed anyway. This eliminates the interpretation that she was unaware of risk — she actively interrogated a suspicious signal and chose to continue.",
+      "metadata": {
+        "acquisition_tool": "sqlite3 on extracted EmailProviderBody.db",
+        "opsec_lapse_noticed": true,
+        "opsec_lapse_questioned": true,
+        "continued_after_lapse": true,
+        "final_confirmation_date": "2012-07-12",
+        "days_before_seizure": 4,
+        "device": "iPhone"
+      }
+    },
+    {
+      "artifact_id": "ngdc002_06",
+      "evidence_type": "keylogger_capture",
+      "source_tool": "LogKext Daemon — logfile-2012-07-12-1200.eml",
+      "timestamp": "2012-07-12T12:00:00Z",
+      "raw_score": 0.85,
+      "prior_trust": 0.84,
+      "provenance_chain": [
+        "email.zip (Digital Corpora)",
+        "logfile-2012-07-12-1200.eml",
+        "LogKext Daemon — User tracysumtwelve"
+      ],
+      "description": "Final keylogger capture before seizure. Tracy accesses coralblue2@yahoo.com — Carry's Yahoo operational account (confirmed in carry-tablet EmailProvider.db HostAuth). This is the same account Carry used for all operational communications on the tablet. Direct contact between Tracy and Carry's operational identity on the last documented day before law enforcement involvement, corroborating active conspiracy participation up to the final moment.",
+      "metadata": {
+        "acquisition_tool": "LogKext Daemon",
+        "carry_email_yahoo": "coralblue2@yahoo.com",
+        "cross_reference": "carry-tablet EmailProvider.db HostAuth — carrysum2012@yahoo.com confirmed same account cluster",
+        "days_before_seizure": 3
+      }
+    },
+    {
+      "artifact_id": "ngdc002_07",
+      "evidence_type": "behavioral_profile",
+      "source_tool": "Digital Corpora scenario documentation + keylogger aggregate",
+      "timestamp": "2012-07-05T00:00:00Z",
+      "raw_score": 0.79,
+      "prior_trust": 0.82,
+      "provenance_chain": [
+        "email.zip aggregate — logfile-2012-07-02-1200.eml",
+        "Digital Corpora scenario documentation"
+      ],
+      "description": "Keylogger captures Tracy searching 'national gallery exhibit' and 'value of international' on July 2 and 5 respectively — before Carry's approach and before the stamp identification in ngdc002_01. Tracy was independently researching gallery assets and their value prior to being recruited. This establishes pre-existing motivation independent of Carry's manipulation, weakening the pure victim narrative. Tracy's financial distress is documented and real, but her behavior shows active interest in gallery valuables that predates external pressure.",
+      "metadata": {
+        "acquisition_tool": "LogKext Daemon aggregate",
+        "searches_documented": [
+          "national gallery exhibit (2012-07-02)",
+          "value of international (2012-07-05)"
+        ],
+        "pre_recruitment_interest": true
+      }
+    }
+  ],
+  "fractures": [
+    "INSIDER_THREAT_ACTIVE",
+    "FINANCIAL_MOTIVATION_DOCUMENTED",
+    "SECURITY_INTELLIGENCE_DISCLOSED",
+    "TARGET_IDENTIFICATION",
+    "CONSPIRACY_FORMATION",
+    "DOLO_EVENTUAL_CONFIRMED",
+    "RISK_ACKNOWLEDGED_ACCEPTED"
+  ],
+  "signals": [
+    {
+      "artifact_id": "ngdc002_01",
+      "confidence": {
+        "__fraction__": true,
+        "den": 25,
+        "num": 22
+      },
+      "description": "Keystroke log captures Tracy composing the following text on 2012-07-03: 'I was told that we are supposed to be receiving a rare collection of stamps. That would explain why the shipping information l",
+      "evidence_type": "keylogger_capture",
+      "source": "LogKext Daemon v? — MacOS keylogger, cron+postfix exfiltration to joe.sum.twelve@gmail.com — logfile-2012-07-03-1000.eml",
+      "z_score": {
+        "__fraction__": true,
+        "den": 625,
+        "num": 517
+      }
+    },
+    {
+      "artifact_id": "ngdc002_02",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 17
+      },
+      "description": "Keystroke logs from June 28-29 capture Tracy establishing contact with Carry via Thunderbird. On June 28: password 'legalBee' entered, email typed to 'coralblue22[corrections]uetwo@hotmail.com' — Carr",
+      "evidence_type": "keylogger_capture",
+      "source": "LogKext Daemon — logfile-2012-06-28-1600.eml + logfile-2012-06-29-1100.eml",
+      "z_score": {
+        "__fraction__": true,
+        "den": 2000,
+        "num": 1479
+      }
+    },
+    {
+      "artifact_id": "ngdc002_03",
+      "confidence": {
+        "__fraction__": true,
+        "den": 100,
+        "num": 93
+      },
+      "description": "Tracy responds to Carry's tablet smuggling request: 'Hey, I can definitely help get your tablet in. Our security guards can be pretty ridiculous sometimes! When would you want to get in and take a loo",
+      "evidence_type": "email_content",
+      "source": "sqlite3 — EmailProviderBody.db messageKey=23, extracted from carry-tablet-2012-07-16-final.E01",
+      "z_score": {
+        "__fraction__": true,
+        "den": 10000,
+        "num": 8463
+      }
+    },
+    {
+      "artifact_id": "ngdc002_04",
+      "confidence": {
+        "__fraction__": true,
+        "den": 100,
+        "num": 93
+      },
+      "description": "Tracy responds to Carry's request for security shift schedules in exchange for cash. Full text: 'Okay carrie I'm going to send this but you need to make sure no one else sees it okay I could get in a ",
+      "evidence_type": "email_content",
+      "source": "sqlite3 — EmailProviderBody.db messageKey=25",
+      "z_score": {
+        "__fraction__": true,
+        "den": 625,
+        "num": 558
+      }
+    },
+    {
+      "artifact_id": "ngdc002_05",
+      "confidence": {
+        "__fraction__": true,
+        "den": 25,
+        "num": 23
+      },
+      "description": "After Carry's operational security lapse ('It willbe gun'), Tracy asks 'What do you mean by that?' — showing she perceived the anomaly. Carry corrects to 'It will be fun. Sorry... it's the keyboard on",
+      "evidence_type": "email_content",
+      "source": "sqlite3 — EmailProviderBody.db messageKey=27",
+      "z_score": {
+        "__fraction__": true,
+        "den": 2500,
+        "num": 2047
+      }
+    },
+    {
+      "artifact_id": "ngdc002_06",
+      "confidence": {
+        "__fraction__": true,
+        "den": 25,
+        "num": 21
+      },
+      "description": "Final keylogger capture before seizure. Tracy accesses coralblue2@yahoo.com — Carry's Yahoo operational account (confirmed in carry-tablet EmailProvider.db HostAuth). This is the same account Carry us",
+      "evidence_type": "keylogger_capture",
+      "source": "LogKext Daemon — logfile-2012-07-12-1200.eml",
+      "z_score": {
+        "__fraction__": true,
+        "den": 500,
+        "num": 357
+      }
+    },
+    {
+      "artifact_id": "ngdc002_07",
+      "confidence": {
+        "__fraction__": true,
+        "den": 50,
+        "num": 41
+      },
+      "description": "Keylogger captures Tracy searching 'national gallery exhibit' and 'value of international' on July 2 and 5 respectively — before Carry's approach and before the stamp identification in ngdc002_01. Tra",
+      "evidence_type": "behavioral_profile",
+      "source": "Digital Corpora scenario documentation + keylogger aggregate",
+      "z_score": {
+        "__fraction__": true,
+        "den": 5000,
+        "num": 3239
+      }
+    }
+  ],
+  "_migration_note": {
+    "date": "2026-07-06",
+    "source": "results/agent_batch/VIGIA-NGDC-002_agent_bundle.json",
+    "method": "señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canónica preservada",
+    "n_signals": 7
+  }
 }

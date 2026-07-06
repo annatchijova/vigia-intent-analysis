@@ -4,9 +4,12 @@
   "description": "Una analista financiera con horario estrictamente diurno accede a documentos confidenciales a las 3 de la madrugada de un domingo. El sistema la autentica correctamente. VIGÍA debe detectar que la Primeridad (login válido) contradice la Segundidad (contexto temporal imposible para este usuario).",
   "expected_verdict": "MALICE",
   "expected_hypothesis": "credenciales_comprometidas_exfiltracion_nocturna",
-  "expected_mitre_ttps": ["T1078", "T1530", "T1048"],
+  "expected_mitre_ttps": [
+    "T1078",
+    "T1530",
+    "T1048"
+  ],
   "analyst_notes": "Caso de Segundidad pura según Peirce. El sistema tradicional dice 'contraseña correcta, todo bien'. VIGÍA dice 'el contexto temporal rompe el hábito documentado de este usuario'. En español para demostrar capacidad multilingüe.",
-
   "artifacts": [
     {
       "artifact_id": "LOG-001",
@@ -61,17 +64,87 @@
       ]
     }
   ],
-
   "verdad_establecida": {
     "hipotesis_principal": "Las credenciales de María fueron usadas por un tercero que conocía el despido inminente — posiblemente un insider de RRHH",
     "hipotesis_alternativa": "María fue alertada del despido y actuó por cuenta propia para llevarse información antes del lunes",
     "daño_real": "60MB de documentos confidenciales exfiltrados: plan de fusión Q2 y nóminas completas de 2026",
     "exfiltracion_confirmada": true
   },
-
   "cadena_peirce": {
     "primeridad": "Login exitoso con credenciales válidas de una empleada activa. Sin alertas de seguridad.",
     "segundidad": "91 segundos de sesión vs 47 minutos habituales. 3 AM domingo vs horario estrictamente diurno en 847 sesiones previas. IP desconocida. Transferencia inmediata post-logout a servidor externo.",
     "terceridad": "El patrón completo revela una operación de exfiltración de emergencia: alguien conocía el contenido exacto del servidor, conocía las credenciales de María, y tenía motivo urgente para actuar ese fin de semana específico. La precisión de la selección documental (exactamente los documentos más valiosos) descarta acceso accidental."
+  },
+  "signals": [
+    {
+      "artifact_id": "LOG-001",
+      "confidence": {
+        "__fraction__": true,
+        "den": 2,
+        "num": 1
+      },
+      "description": "",
+      "evidence_type": "unknown",
+      "source": "unknown",
+      "z_score": {
+        "__fraction__": true,
+        "den": 1,
+        "num": 0
+      }
+    },
+    {
+      "artifact_id": "LOG-002",
+      "confidence": {
+        "__fraction__": true,
+        "den": 2,
+        "num": 1
+      },
+      "description": "",
+      "evidence_type": "unknown",
+      "source": "unknown",
+      "z_score": {
+        "__fraction__": true,
+        "den": 1,
+        "num": 0
+      }
+    },
+    {
+      "artifact_id": "NET-001",
+      "confidence": {
+        "__fraction__": true,
+        "den": 2,
+        "num": 1
+      },
+      "description": "",
+      "evidence_type": "unknown",
+      "source": "unknown",
+      "z_score": {
+        "__fraction__": true,
+        "den": 1,
+        "num": 0
+      }
+    },
+    {
+      "artifact_id": "CTX-001",
+      "confidence": {
+        "__fraction__": true,
+        "den": 2,
+        "num": 1
+      },
+      "description": "",
+      "evidence_type": "unknown",
+      "source": "unknown",
+      "z_score": {
+        "__fraction__": true,
+        "den": 1,
+        "num": 0
+      }
+    }
+  ],
+  "_migration_note": {
+    "date": "2026-07-06",
+    "source": "results/agent_batch/case_009_insomnio_tactico_es_agent_bundle.json",
+    "method": "señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canónica preservada",
+    "n_signals": 4
   }
 }

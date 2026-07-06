@@ -27,7 +27,9 @@
       "timestamp": "2026-04-10T13:00:05Z",
       "raw_score": 0.88,
       "prior_trust": 0.85,
-      "provenance_chain": ["sha256:partial_chain_ORPHANED"],
+      "provenance_chain": [
+        "sha256:partial_chain_ORPHANED"
+      ],
       "description": "File creation timestamp matches known C2 beacon interval. Strong indicator — but provenance chain has single orphaned hash, no root.",
       "metadata": {
         "created": "2026-04-09T03:14:00Z",
@@ -40,14 +42,20 @@
   "temporal_violations": [],
   "provenance_analysis": {
     "chain_status": "BROKEN",
-    "missing_links": ["acquisition_record", "examiner_signature", "disk_image_hash"],
+    "missing_links": [
+      "acquisition_record",
+      "examiner_signature",
+      "disk_image_hash"
+    ],
     "effective_trust": 0.05,
     "daubert_admissible": false,
     "reason": "No root of trust. Cannot verify evidence was not modified post-acquisition or planted post-incident."
   },
   "expected_verdict": "NOISE",
   "expected_confidence": 0.15,
-  "expected_mitre_ttps": ["T1565.001"],
+  "expected_mitre_ttps": [
+    "T1565.001"
+  ],
   "naive_verdict": "MALICE",
   "naive_score": 0.89,
   "peirce_chain": {
@@ -56,9 +64,57 @@
     "thirdness": "Evidence integrity cannot be verified. Under Daubert, this is inadmissible."
   },
   "baseline_comparison": {
-    "naive": {"verdict": "MALICE", "score": 0.89, "reason": "47/70 VT hits is strong signal"},
-    "vigia": {"verdict": "NOISE", "score": 0.08, "reason": "Chain of custody broken — trust collapses"}
+    "naive": {
+      "verdict": "MALICE",
+      "score": 0.89,
+      "reason": "47/70 VT hits is strong signal"
+    },
+    "vigia": {
+      "verdict": "NOISE",
+      "score": 0.08,
+      "reason": "Chain of custody broken — trust collapses"
+    }
   },
   "demo_command": "python run_vigia_case.py cases/case_004_provenance_break.json",
-  "demo_quote": "This case contains high-quality evidence with strong indicators. However, the chain of custody is broken. VIGÍA collapses trust and rejects the evidence. Traditional systems would accept this. VIGÍA does not."
+  "demo_quote": "This case contains high-quality evidence with strong indicators. However, the chain of custody is broken. VIGÍA collapses trust and rejects the evidence. Traditional systems would accept this. VIGÍA does not.",
+  "signals": [
+    {
+      "artifact_id": "disk_001",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 9
+      },
+      "description": "SHA-256 of suspicious binary: known malware hash match (VirusTotal: 47/70). BUT: no acquisition record. No chain from disk image to this file.",
+      "evidence_type": "file_hash",
+      "source": "generate_forensic_hash",
+      "z_score": {
+        "__fraction__": true,
+        "den": 250,
+        "num": 207
+      }
+    },
+    {
+      "artifact_id": "disk_002",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 17
+      },
+      "description": "File creation timestamp matches known C2 beacon interval. Strong indicator — but provenance chain has single orphaned hash, no root.",
+      "evidence_type": "file_timestamp",
+      "source": "read_evidence",
+      "z_score": {
+        "__fraction__": true,
+        "den": 250,
+        "num": 187
+      }
+    }
+  ],
+  "_migration_note": {
+    "date": "2026-07-06",
+    "source": "results/agent_batch/case_004_provenance_break_agent_bundle.json",
+    "method": "señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canónica preservada",
+    "n_signals": 2
+  }
 }

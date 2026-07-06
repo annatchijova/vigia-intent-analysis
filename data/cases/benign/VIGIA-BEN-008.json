@@ -47,5 +47,61 @@
     "thirdness": "Es monitoreo de disponibilidad de red legítimo. El intervalo exacto es característico de Nagios, no de beaconing malicioso. No hay payload, no hay variación de comportamiento."
   },
   "source_origin": "synthetic_validation",
-  "why_not_malice": "La actividad tiene raíz en infraestructura de monitoreo aprobada y visible. No hay desviación del patrón histórico."
+  "why_not_malice": "La actividad tiene raíz en infraestructura de monitoreo aprobada y visible. No hay desviación del patrón histórico.",
+  "signals": [
+    {
+      "artifact_id": "ART-001",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 3
+      },
+      "description": "Source: 10.0.0.5 (monitoring-server) | Dest: 8.8.8.8:icmp | Interval: 300s (exact) | Duration: continuous since 2022-03-01 | Process: /usr/bin/nagios-check-ping",
+      "evidence_type": "log_entry",
+      "source": "legacy_converter",
+      "z_score": {
+        "__fraction__": true,
+        "den": 400,
+        "num": 21
+      }
+    },
+    {
+      "artifact_id": "ART-002",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 3
+      },
+      "description": "Parent: nagios.service (PID 1122) | Child: /usr/lib/nagios/plugins/check_ping -H 8.8.8.8 -w 3000.0,80% -c 5000.0,100% | Config: /etc/nagios/conf.d/google_dns.cfg | Signed by: noc_admin",
+      "evidence_type": "memory_process",
+      "source": "legacy_converter",
+      "z_score": {
+        "__fraction__": true,
+        "den": 800,
+        "num": 51
+      }
+    },
+    {
+      "artifact_id": "ART-003",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 3
+      },
+      "description": "NOC dashboard: https://monitor.company.com/ping-status | Shows 8.8.8.8 status: UP | Alert history: 3 alerts in 2 years (all network outages, not target failures) | On-call roster: noc_team",
+      "evidence_type": "file_timestamp",
+      "source": "legacy_converter",
+      "z_score": {
+        "__fraction__": true,
+        "den": 800,
+        "num": 57
+      }
+    }
+  ],
+  "_migration_note": {
+    "date": "2026-07-06",
+    "source": "results/agent_batch/VIGIA-BEN-008_agent_bundle.json",
+    "method": "señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canónica preservada",
+    "n_signals": 3
+  }
 }

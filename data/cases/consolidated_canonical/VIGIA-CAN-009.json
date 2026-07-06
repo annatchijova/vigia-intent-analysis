@@ -93,5 +93,77 @@
     "firstness": "False solidarity message with a 'help' link.",
     "secondness": "No post-it visible on camera. Link is a phishing domain registered 6 hours before. Sender has an active admin panel.",
     "thirdness": "Habit of using social vulnerability and reciprocity to induce risky action under the guise of protection."
+  },
+  "signals": [
+    {
+      "artifact_id": "a091_01",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 3
+      },
+      "description": "Slack DM: 'Hey, I saw you left your password on a post-it in the meeting room camera. I wrote it down and deleted it from the capture... [link]'.",
+      "evidence_type": "memory_process",
+      "source": "sift_slack_export",
+      "z_score": {
+        "__fraction__": true,
+        "den": 250,
+        "num": 69
+      }
+    },
+    {
+      "artifact_id": "a091_02",
+      "confidence": {
+        "__fraction__": true,
+        "den": 5,
+        "num": 3
+      },
+      "description": "Review of meeting room camera recording: NO post-it visible in any of the 1,247 analyzed frames.",
+      "evidence_type": "memory_process",
+      "source": "sift_vision_ocr",
+      "z_score": {
+        "__fraction__": true,
+        "den": 125,
+        "num": 69
+      }
+    },
+    {
+      "artifact_id": "a091_03",
+      "confidence": {
+        "__fraction__": true,
+        "den": 2,
+        "num": 1
+      },
+      "description": "Link domain registered 6 hours before the message. Bulletproof hosting, Let's Encrypt certificate.",
+      "evidence_type": "dns_record",
+      "source": "sift_pcap",
+      "z_score": {
+        "__fraction__": true,
+        "den": 50,
+        "num": 23
+      }
+    },
+    {
+      "artifact_id": "a091_04",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 19
+      },
+      "description": "Colleague's browser process with authenticated session on the phishing admin panel.",
+      "evidence_type": "memory_process",
+      "source": "sift_volatility",
+      "z_score": {
+        "__fraction__": true,
+        "den": 400,
+        "num": 361
+      }
+    }
+  ],
+  "_migration_note": {
+    "date": "2026-07-06",
+    "source": "results/agent_batch/VIGIA-CAN-009_agent_bundle.json",
+    "method": "señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canónica preservada",
+    "n_signals": 4
   }
 }

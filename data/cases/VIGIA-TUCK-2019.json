@@ -5,7 +5,12 @@
   "description": "macOS APFS laptop of suspect tuckgorge (Digital Corpora 2019, examiner Simson Garfinkel). Five signal clusters converge on eco-terrorism planning trajectory: (1) sustained ELF/ALF radicalization research campaign Jul-Aug 2019 (NYT ELF arson clip, 133MB Intercept FBI eco-terror article, climate/earthquake PDFs, Earth Day webarchive); (2) curated arson imagery folder 'Good Start Photos' containing Quinn's Crossing ELF arson photograph and fire-themed 'Setting Fires' music video screenshots; (3) sequential material acquisition research Oct 18-20 2019 (nitrogen fertilizer Urea 46-0-0, 45-gallon barrels, Home Depot 55-gallon blue industrial drum); (4) covert communications research (VPN over HTTP: SoftEther, chisel, crowbar) corroborated by Gmail thread on same topic; (5) counter-forensics awareness (Autopsy DFIR tool searches, silent camera research, Apple privacy research, encrypted backup decision). Email subjects: 'Did you get the package?', 'Just got back from training'. Overall verdict: INTENT.",
   "expected_verdict": "INTENT",
   "expected_confidence": 0.82,
-  "expected_mitre_ttps": ["T1573", "T1090", "T1593", "T1562.008"],
+  "expected_mitre_ttps": [
+    "T1573",
+    "T1090",
+    "T1593",
+    "T1562.008"
+  ],
   "peirce_chain": {
     "firstness": "ELF arson NYT clip + 133MB Intercept FBI eco-terror article + 'Good Start Photos' folder with Quinn's Crossing burning house photo + 'Setting Fires' fire lyrics. Chrome Oct 18: 'nitrogen fertilizer' -> Amazon Urea 46-0-0 -> '45 gallon blue barrels'. Chrome Oct 20: Home Depot 55 Gal. Blue Industrial Plastic Drum PTH0933. Safari Oct 18: 'vpn software that runs over http', SoftEther, chisel, crowbar. Gmail: 'Did you get the package?', 'Re: If a network blocks IP addresses of vpn servers...', 'Just got back from training'. Safari Oct 16: 'autopsey'/'autopsy'.",
     "secondness": "133MB deliberate PDF save is not incidental browsing. 'Good Start Photos' folder name is an editorial judgment on arson imagery. Nitrogen fertilizer + barrel search within 38 seconds is not gardening planning. SoftEther/chisel/crowbar are for bypassing network monitoring — not standard privacy VPNs. Gmail VPN thread confirms group coordination on same evasion. 'Autopsey' misspelling indicates first-time DFIR research. Sequential Cluster B (Oct 16-20) is operationally coherent.",
@@ -45,7 +50,7 @@
       "source_tool": "read_evidence",
       "timestamp": "2019-08-19T07:20:00Z",
       "raw_score": 0.85,
-      "prior_trust": 0.90,
+      "prior_trust": 0.9,
       "provenance_chain": [
         "sha256:73e31e69a401912693a2126d258e5fa61d67925473fe2bb7fdb5e5b181fd5bf2"
       ],
@@ -55,7 +60,13 @@
         "size_bytes": 133743136,
         "publisher": "The Intercept",
         "article_date": "2019-03-23",
-        "topics": ["ELF", "ALF", "Green Scare", "Operation Backfire", "eco-terrorism prosecution"],
+        "topics": [
+          "ELF",
+          "ALF",
+          "Green Scare",
+          "Operation Backfire",
+          "eco-terrorism prosecution"
+        ],
         "acquisition_tool": "pdftotext (first 5 pages confirmed)",
         "acquisition_hash": "sha256:73e31e69a401912693a2126d258e5fa61d67925473fe2bb7fdb5e5b181fd5bf2",
         "acquisition_timestamp": "2026-06-30T12:00:00Z",
@@ -68,7 +79,7 @@
       "evidence_type": "file_timestamp",
       "source_tool": "read_evidence",
       "timestamp": "2019-07-12T07:44:23Z",
-      "raw_score": 0.80,
+      "raw_score": 0.8,
       "prior_trust": 0.85,
       "provenance_chain": [
         "sha256:arson_photo_hash_not_extracted"
@@ -100,8 +111,14 @@
       "description": "Chrome History (sqlite3): Oct 18 2019 21:01 'nitrogen fertilizer' search -> Amazon Urea 46-0-0 product page (B005IAXRN4). Oct 18 21:02 '45 gallon blue barrels' search. Oct 20 15:23 Home Depot '55 Gal. Blue Industrial Plastic Drum PTH0933' ($87.01, #205845768). Sequence: fertilizer -> drum sizing -> specific product over 2 days. Confirmed by screenshot Oct 20 06:43 AM showing active Home Depot drum page.",
       "metadata": {
         "chrome_history_path": "Library/Application Support/Google/Chrome/Default/History",
-        "searches": ["nitrogen fertilizer", "45 gallon blue barrels"],
-        "products_viewed": ["Amazon Urea 46-0-0 B005IAXRN4", "Home Depot PTH0933 55-gal drum $87.01"],
+        "searches": [
+          "nitrogen fertilizer",
+          "45 gallon blue barrels"
+        ],
+        "products_viewed": [
+          "Amazon Urea 46-0-0 B005IAXRN4",
+          "Home Depot PTH0933 55-gal drum $87.01"
+        ],
         "timeline_seconds_between_searches": 38,
         "screenshot_confirmation": "Screen Shot 2019-10-20 at 6.43.12 AM.png",
         "acquisition_tool": "sqlite3 Chrome History.db",
@@ -125,8 +142,13 @@
       "metadata": {
         "safari_history_path": "Library/Safari/History.db",
         "search_query": "vpn software that runs over http",
-        "tools_researched": ["SoftEther VPN", "chisel (jpillora)", "crowbar (q3k)", "httptunnel"],
-        "gmail_thread_subject": "Re: \u00bbHi. If a network blocks IP addresses of vpn servers, Can One run A http or https based forwarding...",
+        "tools_researched": [
+          "SoftEther VPN",
+          "chisel (jpillora)",
+          "crowbar (q3k)",
+          "httptunnel"
+        ],
+        "gmail_thread_subject": "Re: »Hi. If a network blocks IP addresses of vpn servers, Can One run A http or https based forwarding...",
         "mitre_ttp": "T1573 T1090",
         "acquisition_tool": "sqlite3 Safari History.db",
         "acquisition_hash": "sha256:b5d0d9df7b393ec89a3a14be7f327f9743aa9d6a90b945dfc0d2d8bdce5541ad",
@@ -141,7 +163,101 @@
       "type": "RADICALIZATION_TO_OPERATIONAL_TRANSITION",
       "description": "Timeline shows 3-month progression from ideological research (Cluster A: Jul-Aug 2019, ELF research, arson imagery) to operational planning behaviors (Cluster B: Oct 2019, DFIR tool research, VPN setup, nitrogen fertilizer, blue barrels, group emails). Transition pattern consistent with ELF cell-based pre-operational phase.",
       "severity": 0.85,
-      "artifacts_involved": ["elf_arson_nyt_clip_001", "intercept_fbi_eco_terror_pdf_001", "good_start_photos_arson_img_001", "chrome_material_acquisition_001", "safari_vpn_covert_comms_001"]
+      "artifacts_involved": [
+        "elf_arson_nyt_clip_001",
+        "intercept_fbi_eco_terror_pdf_001",
+        "good_start_photos_arson_img_001",
+        "chrome_material_acquisition_001",
+        "safari_vpn_covert_comms_001"
+      ]
     }
-  ]
+  ],
+  "signals": [
+    {
+      "artifact_id": "elf_arson_nyt_clip_001",
+      "confidence": {
+        "__fraction__": true,
+        "den": 25,
+        "num": 22
+      },
+      "description": "Documents/Clips/Ecoterrorism Suspected in House Fires in Seattle Suburb - The New York Times.pdf. NYT 2008 article on ELF arson of five luxury homes at Quinn's Crossing, Maltby WA. Signed E.L.F. FBI J",
+      "evidence_type": "file_timestamp",
+      "source": "read_evidence",
+      "z_score": {
+        "__fraction__": true,
+        "den": 50,
+        "num": 33
+      }
+    },
+    {
+      "artifact_id": "intercept_fbi_eco_terror_pdf_001",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 9
+      },
+      "description": "Documents/[FBI eco-terror article].pdf — The Intercept, March 23 2019, 'How a Movement That Never Killed Anyone Became the FBI No. 1 Domestic Terrorism Threat'. 133MB full-page save. Covers Green Scar",
+      "evidence_type": "file_timestamp",
+      "source": "read_evidence",
+      "z_score": {
+        "__fraction__": true,
+        "den": 200,
+        "num": 153
+      }
+    },
+    {
+      "artifact_id": "good_start_photos_arson_img_001",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 17
+      },
+      "description": "Documents/Good Start Photos/04home.600.jpg — photojournalism image of burning house with firefighters. Filename consistent with NYT image format. Appears to be Quinn's Crossing ELF arson photo from th",
+      "evidence_type": "file_timestamp",
+      "source": "read_evidence",
+      "z_score": {
+        "__fraction__": true,
+        "den": 25,
+        "num": 17
+      }
+    },
+    {
+      "artifact_id": "chrome_material_acquisition_001",
+      "confidence": {
+        "__fraction__": true,
+        "den": 25,
+        "num": 23
+      },
+      "description": "Chrome History (sqlite3): Oct 18 2019 21:01 'nitrogen fertilizer' search -> Amazon Urea 46-0-0 product page (B005IAXRN4). Oct 18 21:02 '45 gallon blue barrels' search. Oct 20 15:23 Home Depot '55 Gal.",
+      "evidence_type": "log_entry",
+      "source": "search_pattern",
+      "z_score": {
+        "__fraction__": true,
+        "den": 625,
+        "num": 506
+      }
+    },
+    {
+      "artifact_id": "safari_vpn_covert_comms_001",
+      "confidence": {
+        "__fraction__": true,
+        "den": 25,
+        "num": 22
+      },
+      "description": "Safari History.db: Oct 18 2019 00:53 'vpn software that runs over http' Google search -> SoftEther VPN (softether.org), SoftEther Download, SoftEther NAT traversal docs, GitHub jpillora/chisel 'A fast",
+      "evidence_type": "log_entry",
+      "source": "search_pattern",
+      "z_score": {
+        "__fraction__": true,
+        "den": 625,
+        "num": 451
+      }
+    }
+  ],
+  "_migration_note": {
+    "date": "2026-07-06",
+    "source": "results/agent_batch/VIGIA-TUCK-2019_agent_bundle.json",
+    "method": "señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canónica preservada",
+    "n_signals": 5
+  }
 }

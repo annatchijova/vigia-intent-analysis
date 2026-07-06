@@ -4,9 +4,12 @@
   "description": "A financial analyst with strictly daytime hours accesses confidential documents at 3 AM on a Sunday. The system authenticates her correctly. VIGÍA must detect that the Firstness (valid login) contradicts the Secondness (temporally impossible context for this user).",
   "expected_verdict": "MALICE",
   "expected_hypothesis": "credenciales_comprometidas_exfiltracion_nocturna",
-  "expected_mitre_ttps": ["T1078", "T1530", "T1048"],
+  "expected_mitre_ttps": [
+    "T1078",
+    "T1530",
+    "T1048"
+  ],
   "analyst_notes": "Pure Secondness case according to Peirce. The traditional system says 'correct password, all good'. VIGÍA says 'the temporal context breaks the documented habit of this user'. Originally in Spanish to demonstrate multilingual capability.",
-
   "artifacts": [
     {
       "artifact_id": "LOG-001",
@@ -61,17 +64,87 @@
       ]
     }
   ],
-
   "ground_truth": {
     "primary_hypothesis": "María's credentials were used by a third party who knew about the imminent termination — possibly an HR insider",
     "alternative_hypothesis": "María was alerted about the termination and acted on her own to take information before Monday",
     "real_damage": "60MB of confidential documents exfiltrated: Q2 merger plan and complete 2026 payroll",
     "exfiltration_confirmed": true
   },
-
   "peirce_expected": {
     "firstness": "Successful login with valid credentials of an active employee. No security alerts.",
     "secondness": "91-second session vs 47-minute average. 3 AM Sunday vs strictly daytime schedule across 847 prior sessions. Unknown IP. Immediate post-logout transfer to external server.",
     "thirdness": "The complete pattern reveals an emergency exfiltration operation: someone knew the exact contents of the server, knew María's credentials, and had an urgent reason to act that specific weekend. The precision of document selection (exactly the most valuable documents) rules out accidental access."
+  },
+  "signals": [
+    {
+      "artifact_id": "LOG-001",
+      "confidence": {
+        "__fraction__": true,
+        "den": 2,
+        "num": 1
+      },
+      "description": "",
+      "evidence_type": "unknown",
+      "source": "unknown",
+      "z_score": {
+        "__fraction__": true,
+        "den": 1,
+        "num": 0
+      }
+    },
+    {
+      "artifact_id": "LOG-002",
+      "confidence": {
+        "__fraction__": true,
+        "den": 2,
+        "num": 1
+      },
+      "description": "",
+      "evidence_type": "unknown",
+      "source": "unknown",
+      "z_score": {
+        "__fraction__": true,
+        "den": 1,
+        "num": 0
+      }
+    },
+    {
+      "artifact_id": "NET-001",
+      "confidence": {
+        "__fraction__": true,
+        "den": 2,
+        "num": 1
+      },
+      "description": "",
+      "evidence_type": "unknown",
+      "source": "unknown",
+      "z_score": {
+        "__fraction__": true,
+        "den": 1,
+        "num": 0
+      }
+    },
+    {
+      "artifact_id": "CTX-001",
+      "confidence": {
+        "__fraction__": true,
+        "den": 2,
+        "num": 1
+      },
+      "description": "",
+      "evidence_type": "unknown",
+      "source": "unknown",
+      "z_score": {
+        "__fraction__": true,
+        "den": 1,
+        "num": 0
+      }
+    }
+  ],
+  "_migration_note": {
+    "date": "2026-07-06",
+    "source": "results/agent_batch/case_009_insomnio_tactico_es_agent_bundle.json",
+    "method": "señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canónica preservada",
+    "n_signals": 4
   }
 }

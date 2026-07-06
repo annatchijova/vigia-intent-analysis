@@ -91,5 +91,77 @@
     "secondness": "«» quotes and NBSP are a fingerprint of a Cyrillic keyboard/input method; Moscow timezone; .ru domain in callback.",
     "thirdness": "Habit of an operator who writes fluent English but with 'hands' configured for a different language, revealing idiomatic origin."
   },
-  "notes": "Fine attribution: the English is perfect, but the hands that wrote it were on a keyboard configured for another language."
+  "notes": "Fine attribution: the English is perfect, but the hands that wrote it were on a keyboard configured for another language.",
+  "signals": [
+    {
+      "artifact_id": "a021_script",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 13
+      },
+      "description": "PowerShell script 'Update-GPO.ps1' with perfect English comments but angle quotes « » in strings and non-breaking spaces (U+00A0) between words.",
+      "evidence_type": "file_hash",
+      "source": "sift_file_audit",
+      "z_score": {
+        "__fraction__": true,
+        "den": 400,
+        "num": 221
+      }
+    },
+    {
+      "artifact_id": "a021_locale",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 3
+      },
+      "description": "Locale leakage detection: angle quotes «» are characteristic of Russian keyboards (Windows ru-RU layout); NBSP between words indicates a Cyrillic input method.",
+      "evidence_type": "cultural_marker",
+      "source": "sift_linguistic",
+      "z_score": {
+        "__fraction__": true,
+        "den": 250,
+        "num": 33
+      }
+    },
+    {
+      "artifact_id": "a021_git",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 9
+      },
+      "description": "Script commit from a machine with git config user.name='Admin' but timezone Europe/Moscow and core.autocrlf=false.",
+      "evidence_type": "memory_process",
+      "source": "sift_git_audit",
+      "z_score": {
+        "__fraction__": true,
+        "den": 400,
+        "num": 9
+      }
+    },
+    {
+      "artifact_id": "a021_exec",
+      "confidence": {
+        "__fraction__": true,
+        "den": 5,
+        "num": 2
+      },
+      "description": "Script execution with -EncodedCommand parameter that downloads a payload from a .ru domain; digitally signed with a self-signed certificate 'Microsoft Windows'.",
+      "evidence_type": "memory_process",
+      "source": "sift_syslog",
+      "z_score": {
+        "__fraction__": true,
+        "den": 125,
+        "num": 2
+      }
+    }
+  ],
+  "_migration_note": {
+    "date": "2026-07-06",
+    "source": "results/agent_batch/VIGIA-CAN-045_agent_bundle.json",
+    "method": "señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canónica preservada",
+    "n_signals": 4
+  }
 }

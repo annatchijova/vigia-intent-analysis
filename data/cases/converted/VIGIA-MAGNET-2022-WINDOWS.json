@@ -35,7 +35,11 @@
         "write_blocker_used": true,
         "examiner_id": "vigia_claude_code_mode2",
         "corroborating_source": "rip_output/sam.txt SHA-256:92c791dd45b8002572e9886d18f1959a4c2f6b4ae9da0fb0d6da80607904e688",
-        "mitre_ttps": ["T1136.001", "T1078.003", "T1098"]
+        "mitre_ttps": [
+          "T1136.001",
+          "T1078.003",
+          "T1098"
+        ]
       }
     },
     {
@@ -67,7 +71,10 @@
         "write_blocker_used": true,
         "examiner_id": "vigia_claude_code_mode2",
         "corroborating_source": "rip_output/system.txt SHA-256:2d29ef7fa1b63b7297cb45860efd30b37a5613505f192b3044a3878bd9cb9bbe",
-        "mitre_ttps": ["T1021.001", "T1543.003"]
+        "mitre_ttps": [
+          "T1021.001",
+          "T1543.003"
+        ]
       }
     },
     {
@@ -75,8 +82,8 @@
       "evidence_type": "windows_event_log",
       "source_tool": "python-evtx + RegRipper",
       "timestamp": "2022-02-06T07:15:35Z",
-      "raw_score": 0.80,
-      "prior_trust": 0.80,
+      "raw_score": 0.8,
+      "prior_trust": 0.8,
       "provenance_chain": [
         "sha256:2d29ef7fa1b63b7297cb45860efd30b37a5613505f192b3044a3878bd9cb9bbe",
         "sha256:bb09d4c6e65152a420b995cecfe53a77b52b9e55c1b827508d36fed9e5de093e"
@@ -102,7 +109,11 @@
         "examiner_id": "vigia_claude_code_mode2",
         "confidence_rating": "INFERRED",
         "inferred_reason": "No network captures available to confirm active ZeroTier C2 traffic",
-        "mitre_ttps": ["T1572", "T1543.003", "T1133"]
+        "mitre_ttps": [
+          "T1572",
+          "T1543.003",
+          "T1133"
+        ]
       }
     },
     {
@@ -134,7 +145,10 @@
         "write_blocker_used": true,
         "examiner_id": "vigia_claude_code_mode2",
         "corroborating_source": "rip_output/security.txt SHA-256:2eb2a3a00a57186faacd7a9a6c37fa70ae5a79a6892351d35c7c4689166c635a",
-        "mitre_ttps": ["T1098", "T1078.003"]
+        "mitre_ttps": [
+          "T1098",
+          "T1078.003"
+        ]
       }
     },
     {
@@ -170,12 +184,16 @@
   "temporal_violations": [
     {
       "description": "ZeroTier installation (2022-02-06) precedes RDP enable and account creation (2022-02-12) by 6 days — consistent with two-phase intrusion: initial access/C2 setup, then return for persistence deployment",
-      "artifact_ids": ["REG-SYS-001", "EVTX-SYS-001", "EVTX-SEC-001"],
+      "artifact_ids": [
+        "REG-SYS-001",
+        "EVTX-SYS-001",
+        "EVTX-SEC-001"
+      ],
       "severity": "HIGH"
     }
   ],
   "expected_verdict": "MALICE",
-  "expected_confidence": 0.90,
+  "expected_confidence": 0.9,
   "expected_mitre_ttps": [
     "T1136.001",
     "T1078.003",
@@ -191,7 +209,15 @@
     "abstention_risk": "bajo",
     "carnegie_pattern": "familiarity_transfer — account named 'minecraftsteve' to blend with gaming context household",
     "key_discriminator": "SubjectUserSid=S-1-5-18 across all account lifecycle events — structural impossibility for interactive account creation",
-    "evidence_sources": ["Security.evtx", "System.evtx", "Application.evtx", "SAM hive", "SYSTEM hive", "SOFTWARE hive", "SECURITY hive"],
+    "evidence_sources": [
+      "Security.evtx",
+      "System.evtx",
+      "Application.evtx",
+      "SAM hive",
+      "SYSTEM hive",
+      "SOFTWARE hive",
+      "SECURITY hive"
+    ],
     "known_limitations": [
       "No network packet captures — ZeroTier C2 use INFERRED only",
       "Process Creation auditing=N — initial access vector unknown",
@@ -199,5 +225,93 @@
     ],
     "case_origin": "Magnet Forensics CTF 2022",
     "analyst": "VIGIA Claude Code Mode 2 (Anthropic API)"
+  },
+  "signals": [
+    {
+      "artifact_id": "EVTX-SEC-001",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 19
+      },
+      "description": "EventID 4720 @ 2022-02-12 01:29:43Z: New account 'minecraftsteve' (RID 1002) created. SubjectUserSid=S-1-5-18 (LOCAL SYSTEM). EventID 4722 @ 01:29:43Z: account enabled, SubjectUserSid=S-1-5-18. EventI",
+      "evidence_type": "windows_event_log",
+      "source": "python-evtx",
+      "z_score": {
+        "__fraction__": true,
+        "den": 400,
+        "num": 361
+      }
+    },
+    {
+      "artifact_id": "EVTX-SYS-001",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 17
+      },
+      "description": "EventID 7040 @ 2022-02-12 01:01:32Z: TermService (Remote Desktop Services) start type changed from 'demand start' to 'auto start'. SYSTEM hive TermService key LastWrite corroborates timestamp 2022-02-",
+      "evidence_type": "windows_event_log",
+      "source": "python-evtx",
+      "z_score": {
+        "__fraction__": true,
+        "den": 400,
+        "num": 289
+      }
+    },
+    {
+      "artifact_id": "REG-SYS-001",
+      "confidence": {
+        "__fraction__": true,
+        "den": 5,
+        "num": 4
+      },
+      "description": "EventID 7045 @ 2022-02-06 07:15:35Z: New service 'ZeroTier One' installed. ImagePath=C:\\ProgramData\\ZeroTier\\One\\zerotier-one_x64.exe, StartType=auto start, ServiceAccount=LocalSystem. EventID 7045 @ ",
+      "evidence_type": "windows_event_log",
+      "source": "python-evtx + RegRipper",
+      "z_score": {
+        "__fraction__": true,
+        "den": 25,
+        "num": 16
+      }
+    },
+    {
+      "artifact_id": "EVTX-SEC-002",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 19
+      },
+      "description": "EventID 4724 @ 2022-02-12 02:17:18Z: Password reset on built-in Administrator account (RID 500). SubjectUserSid=S-1-5-18 (LOCAL SYSTEM). Executed 47 minutes after 'minecraftsteve' was fully configured",
+      "evidence_type": "windows_event_log",
+      "source": "python-evtx",
+      "z_score": {
+        "__fraction__": true,
+        "den": 400,
+        "num": 361
+      }
+    },
+    {
+      "artifact_id": "REG-SEC-001",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 7
+      },
+      "description": "SECURITY hive audit policy LastWrite 2022-02-04 (OS installation date). Process Creation auditing=N, Credential Validation auditing=N. Timestamp predates the intrusion window (2022-02-12) by 8 days. T",
+      "evidence_type": "registry_key",
+      "source": "RegRipper",
+      "z_score": {
+        "__fraction__": true,
+        "den": 400,
+        "num": 49
+      }
+    }
+  ],
+  "_migration_note": {
+    "date": "2026-07-06",
+    "source": "results/agent_batch/VIGIA-MAGNET-2022-WINDOWS_agent_bundle.json",
+    "method": "señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canónica preservada",
+    "n_signals": 5
   }
 }

@@ -5,7 +5,13 @@
   "description": "FLARE-On 4 challenge set released in 2017 by FireEye FLARE team. The zip archive (8,293,788 bytes, SHA-256: 760f1130aa0166a25a50c334d5ecc1537a71e3761360fa17b83ab63a402748b7) contains 12 challenges across folders 01–12. Notable artifacts: challenge 01 (login.html, 877 bytes) is a client-side JavaScript authentication challenge where the flag 'ClientSideLoginsAreEasy@flare-on.com' is obscured via ROT13; challenge 02 (IgniteMe.exe, 3,072 bytes) is a tiny PE32 console binary with XOR-based key derivation (prompt: 'G1v3 m3 t3h fl4g:'); challenge 04 (notepad.exe, 76,288 bytes) is a trojanized Windows Notepad binary; challenge 08 (flair.apk, 3,848,256 bytes) is an Android APK; challenge 09 (remorse.ino.hex, 12,503 bytes) is an Arduino firmware hex file; challenge 10 (shell.php, 3,586 bytes) is an obfuscated PHP webshell with base64-encoded XOR payload and MD5-based key derivation; challenge 12 includes a filtered PCAP (20170801_1300_filtered.pcap, 5,747,603 bytes) alongside a PE binary (coolprogram.exe). The collection spans Windows PE, .NET, ELF Linux, Android APK, Arduino firmware, PHP webshell, and PCAP — one of the most technically diverse FLARE-On editions.",
   "expected_verdict": "INTENT",
   "expected_confidence": 0.93,
-  "expected_mitre_ttps": ["T1027", "T1059.006", "T1071", "T1505.001", "T1204.002"],
+  "expected_mitre_ttps": [
+    "T1027",
+    "T1059.006",
+    "T1071",
+    "T1505.001",
+    "T1204.002"
+  ],
   "peirce_chain": {
     "firstness": "13 files in 12 challenge folders. File types: PE32 console (x4), PE32 GUI ELF 64-bit Linux (x1), PE32 DLL x86-64 (x1), Android APK (x1), Arduino Intel HEX (x1), PHP script (x1), HTML/JS (x1), pcap (x1), PE32 GUI x86 (x1). Size range: 877 bytes (login.html) to 5,747,603 bytes (PCAP). Archive is AES-256 encrypted with password 'flare'.",
     "secondness": "No benign archive of this cross-platform composition exists. login.html demonstrates deliberate ROT13 obfuscation of an email flag — a technique used in real phishing infrastructure. shell.php is a functional obfuscated webshell (base64+XOR+MD5 key derivation) of a class actually deployed in the wild. remorse.ino.hex targets an embedded firmware platform rarely seen in CTFs, indicating intent to cover firmware RE. notepad.exe is a trojanized legitimate Windows binary — a masquerading technique (MITRE T1036.005) used in real APT toolchains.",
@@ -58,8 +64,8 @@
       "evidence_type": "web_artifact",
       "source_tool": "read_evidence",
       "timestamp": "2026-06-30T15:22:00Z",
-      "raw_score": 0.70,
-      "prior_trust": 0.90,
+      "raw_score": 0.7,
+      "prior_trust": 0.9,
       "provenance_chain": [
         "sha256:760f1130aa0166a25a50c334d5ecc1537a71e3761360fa17b83ab63a402748b7",
         "zip_entry:01/login.html",
@@ -90,8 +96,8 @@
       "evidence_type": "binary",
       "source_tool": "generate_forensic_hash",
       "timestamp": "2026-06-30T15:20:45Z",
-      "raw_score": 0.80,
-      "prior_trust": 0.90,
+      "raw_score": 0.8,
+      "prior_trust": 0.9,
       "provenance_chain": [
         "sha256:760f1130aa0166a25a50c334d5ecc1537a71e3761360fa17b83ab63a402748b7",
         "zip_entry:02/IgniteMe.exe",
@@ -107,9 +113,18 @@
         "archive_date": "2017-08-02",
         "technique_class": "XOR key derivation / minimal PE crackme",
         "difficulty_estimate": "introductory",
-        "imports": ["GetStdHandle", "ReadFile", "WriteFile", "ExitProcess"],
+        "imports": [
+          "GetStdHandle",
+          "ReadFile",
+          "WriteFile",
+          "ExitProcess"
+        ],
         "import_dll": "KERNEL32.dll",
-        "key_strings": ["G1v3 m3 t3h fl4g:", "G00d j0b!", "N0t t00 h0t R we? 7ry 4ga1nz plzzz!"],
+        "key_strings": [
+          "G1v3 m3 t3h fl4g:",
+          "G00d j0b!",
+          "N0t t00 h0t R we? 7ry 4ga1nz plzzz!"
+        ],
         "acquisition_tool": "7z x -pflare + sha256sum",
         "acquisition_hash": "sha256:785f13da5d5aca22dc4dc2c3c93c798e05d4eded08c291a3b9cabaf18c682bbe",
         "acquisition_timestamp": "2026-06-30T15:20:45Z",
@@ -123,7 +138,7 @@
       "source_tool": "generate_forensic_hash",
       "timestamp": "2026-06-30T15:22:00Z",
       "raw_score": 0.75,
-      "prior_trust": 0.90,
+      "prior_trust": 0.9,
       "provenance_chain": [
         "sha256:760f1130aa0166a25a50c334d5ecc1537a71e3761360fa17b83ab63a402748b7",
         "zip_entry:03/greek_to_me.exe",
@@ -152,7 +167,7 @@
       "source_tool": "generate_forensic_hash",
       "timestamp": "2026-06-30T15:22:00Z",
       "raw_score": 0.85,
-      "prior_trust": 0.90,
+      "prior_trust": 0.9,
       "provenance_chain": [
         "sha256:760f1130aa0166a25a50c334d5ecc1537a71e3761360fa17b83ab63a402748b7",
         "zip_entry:04/notepad.exe",
@@ -168,7 +183,9 @@
         "archive_date": "2008-04-14",
         "technique_class": "trojanized system binary / binary diffing (T1036.005)",
         "difficulty_estimate": "medium",
-        "mitre_ttps": ["T1036.005"],
+        "mitre_ttps": [
+          "T1036.005"
+        ],
         "pe_timestamp": "2008-04-14T09:42:30Z",
         "acquisition_tool": "7z x -pflare + sha256sum",
         "acquisition_hash": "sha256:3bc4c643df6d9976ce2ee8d1317d34c6c6403a3756e6a572994c65069dc26ba8",
@@ -183,7 +200,7 @@
       "source_tool": "generate_forensic_hash",
       "timestamp": "2026-06-30T15:22:00Z",
       "raw_score": 0.75,
-      "prior_trust": 0.90,
+      "prior_trust": 0.9,
       "provenance_chain": [
         "sha256:760f1130aa0166a25a50c334d5ecc1537a71e3761360fa17b83ab63a402748b7",
         "zip_entry:05/pewpewboat.exe",
@@ -212,8 +229,8 @@
       "evidence_type": "binary",
       "source_tool": "generate_forensic_hash",
       "timestamp": "2026-06-30T15:22:00Z",
-      "raw_score": 0.80,
-      "prior_trust": 0.90,
+      "raw_score": 0.8,
+      "prior_trust": 0.9,
       "provenance_chain": [
         "sha256:760f1130aa0166a25a50c334d5ecc1537a71e3761360fa17b83ab63a402748b7",
         "zip_entry:06/payload.dll",
@@ -229,7 +246,9 @@
         "archive_date": "2017-04-28",
         "technique_class": "64-bit DLL analysis / reflective loading (T1055.001)",
         "difficulty_estimate": "medium",
-        "mitre_ttps": ["T1055.001"],
+        "mitre_ttps": [
+          "T1055.001"
+        ],
         "acquisition_tool": "7z x -pflare + sha256sum",
         "acquisition_hash": "sha256:2fbca35e033a0bd34b43ebbbb023bb98e6ac4063f9bb7800dd0f45b8bfe9a3e0",
         "acquisition_timestamp": "2026-06-30T15:22:00Z",
@@ -243,7 +262,7 @@
       "source_tool": "generate_forensic_hash",
       "timestamp": "2026-06-30T15:22:00Z",
       "raw_score": 0.75,
-      "prior_trust": 0.90,
+      "prior_trust": 0.9,
       "provenance_chain": [
         "sha256:760f1130aa0166a25a50c334d5ecc1537a71e3761360fa17b83ab63a402748b7",
         "zip_entry:07/zsud.exe",
@@ -271,8 +290,8 @@
       "evidence_type": "binary",
       "source_tool": "generate_forensic_hash",
       "timestamp": "2026-06-30T15:22:00Z",
-      "raw_score": 0.80,
-      "prior_trust": 0.90,
+      "raw_score": 0.8,
+      "prior_trust": 0.9,
       "provenance_chain": [
         "sha256:760f1130aa0166a25a50c334d5ecc1537a71e3761360fa17b83ab63a402748b7",
         "zip_entry:08/flair.apk",
@@ -301,8 +320,8 @@
       "evidence_type": "binary",
       "source_tool": "generate_forensic_hash",
       "timestamp": "2026-06-30T15:22:00Z",
-      "raw_score": 0.80,
-      "prior_trust": 0.90,
+      "raw_score": 0.8,
+      "prior_trust": 0.9,
       "provenance_chain": [
         "sha256:760f1130aa0166a25a50c334d5ecc1537a71e3761360fa17b83ab63a402748b7",
         "zip_entry:09/remorse.ino.hex",
@@ -332,8 +351,8 @@
       "evidence_type": "web_artifact",
       "source_tool": "read_evidence",
       "timestamp": "2026-06-30T15:22:00Z",
-      "raw_score": 0.90,
-      "prior_trust": 0.90,
+      "raw_score": 0.9,
+      "prior_trust": 0.9,
       "provenance_chain": [
         "sha256:760f1130aa0166a25a50c334d5ecc1537a71e3761360fa17b83ab63a402748b7",
         "zip_entry:10/shell.php",
@@ -349,11 +368,17 @@
         "archive_date": "2017-08-31",
         "technique_class": "PHP webshell / base64+XOR+MD5 obfuscation (T1505.001)",
         "difficulty_estimate": "hard",
-        "obfuscation_layers": ["base64", "XOR with MD5-derived key"],
+        "obfuscation_layers": [
+          "base64",
+          "XOR with MD5-derived key"
+        ],
         "md5_check": "43a141570e0c926e0e3673216a4dd73d",
         "payload_size_bytes": 2268,
         "post_param": "o_o",
-        "mitre_ttps": ["T1505.001", "T1059.006"],
+        "mitre_ttps": [
+          "T1505.001",
+          "T1059.006"
+        ],
         "acquisition_tool": "7z x -pflare + sha256sum",
         "acquisition_hash": "sha256:278bb0066af4204fb23e0e662d2a1ab214529231023814ed13350b70c38e9c2a",
         "acquisition_timestamp": "2026-06-30T15:22:00Z",
@@ -367,7 +392,7 @@
       "source_tool": "generate_forensic_hash",
       "timestamp": "2026-06-30T15:22:00Z",
       "raw_score": 0.75,
-      "prior_trust": 0.90,
+      "prior_trust": 0.9,
       "provenance_chain": [
         "sha256:760f1130aa0166a25a50c334d5ecc1537a71e3761360fa17b83ab63a402748b7",
         "zip_entry:11/covfefe.exe",
@@ -397,7 +422,7 @@
       "source_tool": "generate_forensic_hash",
       "timestamp": "2026-06-30T15:22:00Z",
       "raw_score": 0.85,
-      "prior_trust": 0.90,
+      "prior_trust": 0.9,
       "provenance_chain": [
         "sha256:760f1130aa0166a25a50c334d5ecc1537a71e3761360fa17b83ab63a402748b7",
         "zip_entry:12/20170801_1300_filtered.pcap",
@@ -413,7 +438,9 @@
         "archive_date": "2017-08-01",
         "technique_class": "PCAP forensics / C2 traffic identification (T1071)",
         "difficulty_estimate": "hard",
-        "mitre_ttps": ["T1071"],
+        "mitre_ttps": [
+          "T1071"
+        ],
         "pcap_version": "2.4",
         "link_type": "Ethernet",
         "snaplen": 262144,
@@ -431,7 +458,7 @@
       "source_tool": "generate_forensic_hash",
       "timestamp": "2026-06-30T15:22:00Z",
       "raw_score": 0.85,
-      "prior_trust": 0.90,
+      "prior_trust": 0.9,
       "provenance_chain": [
         "sha256:760f1130aa0166a25a50c334d5ecc1537a71e3761360fa17b83ab63a402748b7",
         "zip_entry:12/coolprogram.exe",
@@ -448,7 +475,10 @@
         "technique_class": "C2 client RE / packed PE / paired binary+traffic analysis (T1071, T1027)",
         "difficulty_estimate": "hard (final boss)",
         "pe_sections": 9,
-        "mitre_ttps": ["T1071", "T1027"],
+        "mitre_ttps": [
+          "T1071",
+          "T1027"
+        ],
         "acquisition_tool": "7z x -pflare + sha256sum",
         "acquisition_hash": "sha256:dd1dafc141661d2dd5331de7fe61c8183c6ade2a67fa8a689030279718e0be5a",
         "acquisition_timestamp": "2026-06-30T15:22:00Z",
@@ -465,5 +495,237 @@
     "Challenge 01 flag confirmed via static ROT13 reversal: ClientSideLoginsAreEasy@flare-on.com."
   ],
   "source_dataset": "FLARE-On 4 CTF — FireEye FLARE Team (2017)",
-  "source_origin": "public_ctf_archive"
+  "source_origin": "public_ctf_archive",
+  "signals": [
+    {
+      "artifact_id": "flareon4-zip-001",
+      "confidence": {
+        "__fraction__": true,
+        "den": 100,
+        "num": 99
+      },
+      "description": "Outer zip archive Flare-On4_Challenges.zip. SHA-256 verified against task specification. Size: 8,293,788 bytes. AES-256 encrypted (PK compat v5.1), password: 'flare'. Contains 13 files in 12 folders (",
+      "evidence_type": "file_hash",
+      "source": "generate_forensic_hash",
+      "z_score": {
+        "__fraction__": true,
+        "den": 2000,
+        "num": 1881
+      }
+    },
+    {
+      "artifact_id": "flareon4-ch01-login-html",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 9
+      },
+      "description": "Challenge 01 — login.html (877 bytes). HTML/JavaScript client-side authentication. The JavaScript applies ROT13 to user input and compares against hardcoded ciphertext 'PyvragFvqrYbtvafNerRnfl@syner-b",
+      "evidence_type": "web_artifact",
+      "source": "read_evidence",
+      "z_score": {
+        "__fraction__": true,
+        "den": 100,
+        "num": 63
+      }
+    },
+    {
+      "artifact_id": "flareon4-ch02-igniteme",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 9
+      },
+      "description": "Challenge 02 — IgniteMe.exe (3,072 bytes). PE32 console Intel 80386, 3 sections. Extremely compact PE (3 KB). Imports: GetStdHandle, ReadFile, WriteFile, ExitProcess (KERNEL32.dll only). Prompts 'G1v3",
+      "evidence_type": "binary",
+      "source": "generate_forensic_hash",
+      "z_score": {
+        "__fraction__": true,
+        "den": 25,
+        "num": 18
+      }
+    },
+    {
+      "artifact_id": "flareon4-ch03-greek-to-me",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 9
+      },
+      "description": "Challenge 03 — greek_to_me.exe (2,048 bytes). PE32 console Intel 80386, 2 sections. Name 'it's all Greek to me' — references incomprehensible content. Tiny 2 KB PE with only 2 sections suggests shellc",
+      "evidence_type": "binary",
+      "source": "generate_forensic_hash",
+      "z_score": {
+        "__fraction__": true,
+        "den": 40,
+        "num": 27
+      }
+    },
+    {
+      "artifact_id": "flareon4-ch04-notepad",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 9
+      },
+      "description": "Challenge 04 — notepad.exe (76,288 bytes). PE32 GUI Intel 80386, 3 sections. Timestamp 2008-04-14 — predating the challenge by 9 years, suggesting this is a modified copy of the Windows XP/Vista Notep",
+      "evidence_type": "binary",
+      "source": "generate_forensic_hash",
+      "z_score": {
+        "__fraction__": true,
+        "den": 200,
+        "num": 153
+      }
+    },
+    {
+      "artifact_id": "flareon4-ch05-pewpewboat",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 9
+      },
+      "description": "Challenge 05 — pewpewboat.exe (80,560 bytes). ELF 64-bit LSB executable, x86-64, dynamically linked, for GNU/Linux 2.6.32, stripped. Name references a Battleship-style shooting game. Cross-platform Li",
+      "evidence_type": "binary",
+      "source": "generate_forensic_hash",
+      "z_score": {
+        "__fraction__": true,
+        "den": 40,
+        "num": 27
+      }
+    },
+    {
+      "artifact_id": "flareon4-ch06-payload-dll",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 9
+      },
+      "description": "Challenge 06 — payload.dll (105,984 bytes). PE32+ DLL (GUI) x86-64, 7 sections. 64-bit DLL with 7 sections — more complex than typical CTF DLLs. Name 'payload' is unambiguous: this is the challenge pa",
+      "evidence_type": "binary",
+      "source": "generate_forensic_hash",
+      "z_score": {
+        "__fraction__": true,
+        "den": 25,
+        "num": 18
+      }
+    },
+    {
+      "artifact_id": "flareon4-ch07-zsud",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 9
+      },
+      "description": "Challenge 07 — zsud.exe (385,536 bytes). PE32 GUI Intel 80386, 6 sections. Name 'zsud' may be a reference to Zork-like text adventure or a custom protocol. Size 385 KB with 6 sections suggests a subst",
+      "evidence_type": "binary",
+      "source": "generate_forensic_hash",
+      "z_score": {
+        "__fraction__": true,
+        "den": 40,
+        "num": 27
+      }
+    },
+    {
+      "artifact_id": "flareon4-ch08-flair-apk",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 9
+      },
+      "description": "Challenge 08 — flair.apk (3,848,256 bytes). Android package (APK) with AndroidManifest.xml and APK Signing Block. Name 'flair' may reference TGI Friday's 'flair' — a cultural in-joke. Largest non-PCAP",
+      "evidence_type": "binary",
+      "source": "generate_forensic_hash",
+      "z_score": {
+        "__fraction__": true,
+        "den": 25,
+        "num": 18
+      }
+    },
+    {
+      "artifact_id": "flareon4-ch09-remorse-hex",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 9
+      },
+      "description": "Challenge 09 — remorse.ino.hex (12,503 bytes). Arduino Intel HEX firmware file (ASCII text, CRLF). '.ino' extension indicates Arduino sketch source; '.hex' indicates compiled Intel HEX firmware. Requi",
+      "evidence_type": "binary",
+      "source": "generate_forensic_hash",
+      "z_score": {
+        "__fraction__": true,
+        "den": 25,
+        "num": 18
+      }
+    },
+    {
+      "artifact_id": "flareon4-ch10-shell-php",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 9
+      },
+      "description": "Challenge 10 — shell.php (3,586 bytes). PHP webshell. Base64-encoded 2,268-byte payload XOR-decrypted with MD5-derived key from POST parameter 'o_o'. MD5 check: if MD5(decrypted) == '43a141570e0c926e0",
+      "evidence_type": "web_artifact",
+      "source": "read_evidence",
+      "z_score": {
+        "__fraction__": true,
+        "den": 100,
+        "num": 81
+      }
+    },
+    {
+      "artifact_id": "flareon4-ch11-covfefe",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 9
+      },
+      "description": "Challenge 11 — covfefe.exe (20,480 bytes). PE32 console Intel 80386, 3 sections. Name references the famous 2017 Trump typo-tweet 'covfefe' — a cultural in-joke for the 2017 CTF edition. Small 20 KB P",
+      "evidence_type": "binary",
+      "source": "generate_forensic_hash",
+      "z_score": {
+        "__fraction__": true,
+        "den": 40,
+        "num": 27
+      }
+    },
+    {
+      "artifact_id": "flareon4-ch12-pcap",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 9
+      },
+      "description": "Challenge 12a — 20170801_1300_filtered.pcap (5,747,603 bytes). libpcap v2.4 Ethernet capture. Filename encodes date 2017-08-01 13:00 'filtered' — suggests traffic was pre-filtered to contain only rele",
+      "evidence_type": "network_traffic",
+      "source": "generate_forensic_hash",
+      "z_score": {
+        "__fraction__": true,
+        "den": 200,
+        "num": 153
+      }
+    },
+    {
+      "artifact_id": "flareon4-ch12-coolprogram",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 9
+      },
+      "description": "Challenge 12b — coolprogram.exe (86,528 bytes). PE32 GUI Intel 80386, 9 sections. Name 'coolprogram' is deliberately banal — a masquerading tactic. 9 PE sections is unusually high and suggests runtime",
+      "evidence_type": "binary",
+      "source": "generate_forensic_hash",
+      "z_score": {
+        "__fraction__": true,
+        "den": 200,
+        "num": 153
+      }
+    }
+  ],
+  "_migration_note": {
+    "date": "2026-07-06",
+    "source": "results/agent_batch/VIGIA-FLAREON-4_agent_bundle.json",
+    "method": "señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canónica preservada",
+    "n_signals": 14
+  }
 }

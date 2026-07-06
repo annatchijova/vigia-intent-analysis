@@ -106,5 +106,77 @@
       "description": "Cron job creado 5 minutos ANTES de la confesión que supuestamente lo motiva. La premeditación es estructuralmente irrefutable.",
       "type": "EFFECT_BEFORE_CAUSE"
     }
-  ]
+  ],
+  "signals": [
+    {
+      "artifact_id": "a083_01",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 7
+      },
+      "description": "Urgent email from senior analyst self-reporting an SSH session left open for 4 hours on a public server. Requests access revocation.",
+      "evidence_type": "log_entry",
+      "source": "sift_mail_gateway",
+      "z_score": {
+        "__fraction__": true,
+        "den": 400,
+        "num": 63
+      }
+    },
+    {
+      "artifact_id": "a083_02",
+      "confidence": {
+        "__fraction__": true,
+        "den": 5,
+        "num": 3
+      },
+      "description": "Scheduled task (cron job) created 5 minutes BEFORE the confession email. Creation timestamp precedes the public report.",
+      "evidence_type": "registry_key",
+      "source": "sift_windows_registry",
+      "z_score": {
+        "__fraction__": true,
+        "den": 125,
+        "num": 66
+      }
+    },
+    {
+      "artifact_id": "a083_03",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 19
+      },
+      "description": "svchost.exe process with persistent connection to external IP under a legitimate system service identity.",
+      "evidence_type": "memory_process",
+      "source": "sift_volatility",
+      "z_score": {
+        "__fraction__": true,
+        "den": 500,
+        "num": 437
+      }
+    },
+    {
+      "artifact_id": "a083_04",
+      "confidence": {
+        "__fraction__": true,
+        "den": 5,
+        "num": 4
+      },
+      "description": "Exfiltration traffic to external IP on port 443 under a system process. 2.3GB transferred during the benign audit window.",
+      "evidence_type": "ip_geolocation",
+      "source": "sift_zeek",
+      "z_score": {
+        "__fraction__": true,
+        "den": 125,
+        "num": 89
+      }
+    }
+  ],
+  "_migration_note": {
+    "date": "2026-07-06",
+    "source": "results/agent_batch/VIGIA-CAN-001_agent_bundle.json",
+    "method": "señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canónica preservada",
+    "n_signals": 4
+  }
 }

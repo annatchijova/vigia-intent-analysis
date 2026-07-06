@@ -47,5 +47,61 @@
     "thirdness": "Es automatización legítima de infraestructura. La 'perfección' es característica de Ansible, no indicio de atacante. La ausencia de entropía humana es esperada en procesos automatizados."
   },
   "source_origin": "synthetic_validation",
-  "why_not_malice": "La ejecución perfecta tiene raíz verificable en infraestructura de automatización aprobada. No hay desviación del playbook."
+  "why_not_malice": "La ejecución perfecta tiene raíz verificable en infraestructura de automatización aprobada. No hay desviación del playbook.",
+  "signals": [
+    {
+      "artifact_id": "ART-001",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 3
+      },
+      "description": "ansible-playbook deploy_production.yml --check --diff | 47 tasks executed | 0 failures | 0 changed (dry run) | 2024-06-10 02:00:00 UTC | User: ansible_svc | SSH key: ansible@tower.company.com",
+      "evidence_type": "log_entry",
+      "source": "legacy_converter",
+      "z_score": {
+        "__fraction__": true,
+        "den": 400,
+        "num": 21
+      }
+    },
+    {
+      "artifact_id": "ART-002",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 3
+      },
+      "description": "Playbook: deploy_production.yml | Git commit: a1b2c3d | Approved by: change_advisory_board #2024-06-05 | Jira ticket: CHG-0042 | Reviewer: senior_dev_lead | Signed off: 2024-06-07",
+      "evidence_type": "file_timestamp",
+      "source": "legacy_converter",
+      "z_score": {
+        "__fraction__": true,
+        "den": 800,
+        "num": 51
+      }
+    },
+    {
+      "artifact_id": "ART-003",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 3
+      },
+      "description": "Parent: ansible-tower.service (PID 1234) | Child: ssh ansible_svc@target | Ansible facts gathered: 2024-06-10 02:00:01 | No interactive shell | No TTY allocated",
+      "evidence_type": "memory_process",
+      "source": "legacy_converter",
+      "z_score": {
+        "__fraction__": true,
+        "den": 800,
+        "num": 57
+      }
+    }
+  ],
+  "_migration_note": {
+    "date": "2026-07-06",
+    "source": "results/agent_batch/VIGIA-BEN-004_agent_bundle.json",
+    "method": "señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canónica preservada",
+    "n_signals": 3
+  }
 }

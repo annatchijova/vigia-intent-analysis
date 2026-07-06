@@ -213,5 +213,93 @@
     "source_origin": "public_incident_report",
     "corpus_tag": "POST-HACKATHON"
   },
-  "schema_version": "1.1"
+  "schema_version": "1.1",
+  "signals": [
+    {
+      "artifact_id": "linux001_01",
+      "confidence": {
+        "__fraction__": true,
+        "den": 100,
+        "num": 93
+      },
+      "description": "Binary diff between XZ Utils 5.6.0 distributed tarball and git repository tree at the same version tag reveals a critical divergence: the tarball's build-to-host.m4 script contains an extraction and e",
+      "evidence_type": "binary_diff",
+      "source": "sift_binary_analysis",
+      "z_score": {
+        "__fraction__": true,
+        "den": 5000,
+        "num": 4557
+      }
+    },
+    {
+      "artifact_id": "linux001_02",
+      "confidence": {
+        "__fraction__": true,
+        "den": 50,
+        "num": 47
+      },
+      "description": "GitHub account JiaT75 was created on 2022-01-26 with no prior contribution history to any public repository. Over 26 months the account made 214 commits across xz and related projects, progressively e",
+      "evidence_type": "git_forensics",
+      "source": "sift_git_forensics",
+      "z_score": {
+        "__fraction__": true,
+        "den": 5000,
+        "num": 3431
+      }
+    },
+    {
+      "artifact_id": "linux001_03",
+      "confidence": {
+        "__fraction__": true,
+        "den": 50,
+        "num": 43
+      },
+      "description": "SSH authentication latency on Debian Sid systems with XZ Utils 5.6.0/5.6.1 installed measured at approximately 500ms, compared to a verified 100ms baseline on unaffected systems. Memory profiling via ",
+      "evidence_type": "network_capture",
+      "source": "sift_network_forensics",
+      "z_score": {
+        "__fraction__": true,
+        "den": 625,
+        "num": 387
+      }
+    },
+    {
+      "artifact_id": "linux001_04",
+      "confidence": {
+        "__fraction__": true,
+        "den": 50,
+        "num": 39
+      },
+      "description": "GitHub issue analysis reveals a coordinated pressure campaign targeting Lasse Collin, XZ Utils sole maintainer. Accounts Jigar Kumar and Dennis Ens filed repeated issues and comments across multiple m",
+      "evidence_type": "osint",
+      "source": "sift_osint",
+      "z_score": {
+        "__fraction__": true,
+        "den": 1000,
+        "num": 663
+      }
+    },
+    {
+      "artifact_id": "linux001_05",
+      "confidence": {
+        "__fraction__": true,
+        "den": 100,
+        "num": 91
+      },
+      "description": "Static analysis of the extracted backdoor payload reveals hardcoded distribution targeting: activation scripts contain explicit system checks that restrict payload execution to Debian and Fedora distr",
+      "evidence_type": "malware_static_analysis",
+      "source": "sift_static_analysis",
+      "z_score": {
+        "__fraction__": true,
+        "den": 625,
+        "num": 546
+      }
+    }
+  ],
+  "_migration_note": {
+    "date": "2026-07-06",
+    "source": "results/agent_batch/VIGIA-LINUX-001_agent_bundle.json",
+    "method": "señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canónica preservada",
+    "n_signals": 5
+  }
 }

@@ -5,7 +5,13 @@
   "description": "FLARE-On 9 challenge set released in 2022 by Mandiant FLARE team. The zip archive (40,293,398 bytes, SHA-256: 8a68663c5e26472cd041482779d3b1a456be2bef5010de12f91b98d29fd95635) contains 11 password-protected 7z archives and a README.txt. The README confirms the shared password is 'flare'. Archive is not AES-encrypted at the zip level — 7z files are individually password-protected. Challenges span: a Wordle-clone browser game (01_flaredle, 4,495 bytes), a pixel-art poker game (02_PixelPoker, 2,887,761 bytes), a magic 8-ball application (03_magic8ball, 1,963,184 bytes), an 'adorable mice' Windows challenge (04_darn_mice, 50,114 bytes), a T8 challenge likely involving a custom cipher (05_t8, 130,992 bytes), an 'a la mode' .NET/scripting challenge (06_alamode, 36,416 bytes), a JavaScript-heavy 'anode' challenge (07_anode, 14,562,659 bytes — largest), a backdoor analysis challenge (08_backdoor, 11,468,099 bytes), an encryptor challenge (09_encryptor, 13,375 bytes), a musical/Unicode challenge ('10_Nur geträumt', 417,392 bytes — German for 'Only Dreamed', a Nena song), and a Harry Potter-themed challenge (11_the_challenge_that_shall_not_be_named, 8,757,107 bytes). Verdict INTENT: the collection represents deliberately crafted adversarial content spanning web game RE, Windows PE, .NET, JavaScript obfuscation, backdoor analysis, custom cryptography, and multilingual/Unicode challenges — consistent with Mandiant FLARE team authorship circa 2022.",
   "expected_verdict": "INTENT",
   "expected_confidence": 0.93,
-  "expected_mitre_ttps": ["T1027", "T1059.007", "T1486", "T1071", "T1564"],
+  "expected_mitre_ttps": [
+    "T1027",
+    "T1059.007",
+    "T1486",
+    "T1071",
+    "T1564"
+  ],
   "peirce_chain": {
     "firstness": "11 CTF challenge 7z archives + README.txt. Sizes range from 4,495 bytes (01_flaredle) to 14,562,659 bytes (07_anode). Archive dates cluster at 2022-09-29 to 2022-09-30, with README dated 2022-11-11 (post-competition). All 7z archives share the same password 'flare' as documented in README.txt. The outer zip (40,293,398 bytes) is not AES-encrypted — only inner 7z files are password-protected.",
     "secondness": "A benign archive of this composition and scale does not exist. 07_anode at 14.5 MB suggests a Node.js or Electron challenge — JavaScript obfuscation at this scale is structurally identical to real-world credential-harvesting malware distributed as 'software installers'. 08_backdoor at 11.5 MB suggests a disk image or large binary requiring backdoor identification — the name removes all ambiguity about technique class. 09_encryptor at 13 KB — extremely compact — suggests a custom encryption algorithm or key material that must be reversed. The German-language challenge name '10_Nur geträumt' demonstrates deliberate multilingual scope, consistent with Mandiant's global threat intel coverage.",
@@ -59,7 +65,7 @@
       "source_tool": "generate_forensic_hash",
       "timestamp": "2026-06-30T15:23:00Z",
       "raw_score": 0.65,
-      "prior_trust": 0.90,
+      "prior_trust": 0.9,
       "provenance_chain": [
         "sha256:8a68663c5e26472cd041482779d3b1a456be2bef5010de12f91b98d29fd95635",
         "zip_entry:01_flaredle.7z",
@@ -88,8 +94,8 @@
       "evidence_type": "binary",
       "source_tool": "generate_forensic_hash",
       "timestamp": "2026-06-30T15:23:00Z",
-      "raw_score": 0.70,
-      "prior_trust": 0.90,
+      "raw_score": 0.7,
+      "prior_trust": 0.9,
       "provenance_chain": [
         "sha256:8a68663c5e26472cd041482779d3b1a456be2bef5010de12f91b98d29fd95635",
         "zip_entry:02_PixelPoker.7z",
@@ -116,8 +122,8 @@
       "evidence_type": "binary",
       "source_tool": "generate_forensic_hash",
       "timestamp": "2026-06-30T15:23:00Z",
-      "raw_score": 0.70,
-      "prior_trust": 0.90,
+      "raw_score": 0.7,
+      "prior_trust": 0.9,
       "provenance_chain": [
         "sha256:8a68663c5e26472cd041482779d3b1a456be2bef5010de12f91b98d29fd95635",
         "zip_entry:03_magic8ball.7z",
@@ -145,7 +151,7 @@
       "source_tool": "generate_forensic_hash",
       "timestamp": "2026-06-30T15:23:00Z",
       "raw_score": 0.75,
-      "prior_trust": 0.90,
+      "prior_trust": 0.9,
       "provenance_chain": [
         "sha256:8a68663c5e26472cd041482779d3b1a456be2bef5010de12f91b98d29fd95635",
         "zip_entry:04_darn_mice.7z",
@@ -173,7 +179,7 @@
       "source_tool": "generate_forensic_hash",
       "timestamp": "2026-06-30T15:23:00Z",
       "raw_score": 0.75,
-      "prior_trust": 0.90,
+      "prior_trust": 0.9,
       "provenance_chain": [
         "sha256:8a68663c5e26472cd041482779d3b1a456be2bef5010de12f91b98d29fd95635",
         "zip_entry:05_t8.7z",
@@ -201,7 +207,7 @@
       "source_tool": "generate_forensic_hash",
       "timestamp": "2026-06-30T15:23:00Z",
       "raw_score": 0.75,
-      "prior_trust": 0.90,
+      "prior_trust": 0.9,
       "provenance_chain": [
         "sha256:8a68663c5e26472cd041482779d3b1a456be2bef5010de12f91b98d29fd95635",
         "zip_entry:06_alamode.7z",
@@ -229,7 +235,7 @@
       "source_tool": "generate_forensic_hash",
       "timestamp": "2026-06-30T15:23:00Z",
       "raw_score": 0.85,
-      "prior_trust": 0.90,
+      "prior_trust": 0.9,
       "provenance_chain": [
         "sha256:8a68663c5e26472cd041482779d3b1a456be2bef5010de12f91b98d29fd95635",
         "zip_entry:07_anode.7z",
@@ -244,7 +250,9 @@
         "archive_date": "2022-09-30",
         "technique_class": "Node.js/Electron RE / JavaScript deobfuscation (T1059.007)",
         "difficulty_estimate": "hard",
-        "mitre_ttps": ["T1059.007"],
+        "mitre_ttps": [
+          "T1059.007"
+        ],
         "platform": "Node.js / Electron",
         "acquisition_tool": "unzip (outer) + sha256sum",
         "acquisition_hash": "sha256:e2fc75077457fdfe9ed735e991d5a0bc3469e209382ad5a948955ac5cb84247a",
@@ -258,8 +266,8 @@
       "evidence_type": "binary",
       "source_tool": "generate_forensic_hash",
       "timestamp": "2026-06-30T15:23:00Z",
-      "raw_score": 0.90,
-      "prior_trust": 0.90,
+      "raw_score": 0.9,
+      "prior_trust": 0.9,
       "provenance_chain": [
         "sha256:8a68663c5e26472cd041482779d3b1a456be2bef5010de12f91b98d29fd95635",
         "zip_entry:08_backdoor.7z",
@@ -274,7 +282,9 @@
         "archive_date": "2022-09-30",
         "technique_class": "backdoor analysis / persistence identification (T1505)",
         "difficulty_estimate": "hard",
-        "mitre_ttps": ["T1505"],
+        "mitre_ttps": [
+          "T1505"
+        ],
         "acquisition_tool": "unzip (outer) + sha256sum",
         "acquisition_hash": "sha256:e6fc2327593ae4855cd2b0aa92822544c2be77dd5ec44ae19cf4f948b60bad64",
         "acquisition_timestamp": "2026-06-30T15:23:00Z",
@@ -288,7 +298,7 @@
       "source_tool": "generate_forensic_hash",
       "timestamp": "2026-06-30T15:23:00Z",
       "raw_score": 0.85,
-      "prior_trust": 0.90,
+      "prior_trust": 0.9,
       "provenance_chain": [
         "sha256:8a68663c5e26472cd041482779d3b1a456be2bef5010de12f91b98d29fd95635",
         "zip_entry:09_encryptor.7z",
@@ -303,7 +313,9 @@
         "archive_date": "2022-09-30",
         "technique_class": "custom encryption / ransomware key recovery (T1486)",
         "difficulty_estimate": "medium-hard",
-        "mitre_ttps": ["T1486"],
+        "mitre_ttps": [
+          "T1486"
+        ],
         "acquisition_tool": "unzip (outer) + sha256sum",
         "acquisition_hash": "sha256:6ae8b5420b860676e038d0ccb4edcfa5ccb466290f71c29fa3278de6953b73c7",
         "acquisition_timestamp": "2026-06-30T15:23:00Z",
@@ -316,8 +328,8 @@
       "evidence_type": "binary",
       "source_tool": "generate_forensic_hash",
       "timestamp": "2026-06-30T15:23:00Z",
-      "raw_score": 0.80,
-      "prior_trust": 0.90,
+      "raw_score": 0.8,
+      "prior_trust": 0.9,
       "provenance_chain": [
         "sha256:8a68663c5e26472cd041482779d3b1a456be2bef5010de12f91b98d29fd95635",
         "zip_entry:10_Nur geträumt.7z"
@@ -345,7 +357,7 @@
       "source_tool": "generate_forensic_hash",
       "timestamp": "2026-06-30T15:23:00Z",
       "raw_score": 0.85,
-      "prior_trust": 0.90,
+      "prior_trust": 0.9,
       "provenance_chain": [
         "sha256:8a68663c5e26472cd041482779d3b1a456be2bef5010de12f91b98d29fd95635",
         "zip_entry:11_the_challenge_that_shall_not_be_named.7z",
@@ -376,5 +388,205 @@
     "The shared 7z password 'flare' is documented in README.txt and publicly known. Individual challenge analysis requires extraction and platform-appropriate tooling (jadx for APK, IDA/Ghidra for PE, Node.js for Electron, etc.)."
   ],
   "source_dataset": "FLARE-On 9 CTF — Mandiant FLARE Team (2022)",
-  "source_origin": "public_ctf_archive"
+  "source_origin": "public_ctf_archive",
+  "signals": [
+    {
+      "artifact_id": "flareon9-zip-001",
+      "confidence": {
+        "__fraction__": true,
+        "den": 100,
+        "num": 99
+      },
+      "description": "Outer zip archive Flare-On9_Challenges.zip. SHA-256 verified against task specification. Size: 40,293,398 bytes. NOT AES-encrypted at zip level. Contains 11 password-protected 7z archives + README.txt",
+      "evidence_type": "file_hash",
+      "source": "generate_forensic_hash",
+      "z_score": {
+        "__fraction__": true,
+        "den": 2000,
+        "num": 1881
+      }
+    },
+    {
+      "artifact_id": "flareon9-ch01-flaredle",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 9
+      },
+      "description": "Challenge 01 — flaredle (4,495 bytes 7z). Exploits the 2022 Wordle cultural moment. A browser-based Wordle clone where the target word is a FLARE-On-related term. Smallest challenge — introductory. Te",
+      "evidence_type": "binary",
+      "source": "generate_forensic_hash",
+      "z_score": {
+        "__fraction__": true,
+        "den": 200,
+        "num": 117
+      }
+    },
+    {
+      "artifact_id": "flareon9-ch02-pixelpoker",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 9
+      },
+      "description": "Challenge 02 — PixelPoker (2,887,761 bytes 7z). Pixel-art poker game. Requires identifying and clicking correct pixels on a game screen — likely a grid-search challenge where correct coordinates deriv",
+      "evidence_type": "binary",
+      "source": "generate_forensic_hash",
+      "z_score": {
+        "__fraction__": true,
+        "den": 100,
+        "num": 63
+      }
+    },
+    {
+      "artifact_id": "flareon9-ch03-magic8ball",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 9
+      },
+      "description": "Challenge 03 — magic8ball (1,963,184 bytes 7z). Magic 8-ball toy simulator. Likely a GUI application where specific query inputs or shake sequences produce flag outputs. Technique class: Windows GUI R",
+      "evidence_type": "binary",
+      "source": "generate_forensic_hash",
+      "z_score": {
+        "__fraction__": true,
+        "den": 100,
+        "num": 63
+      }
+    },
+    {
+      "artifact_id": "flareon9-ch04-darn-mice",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 9
+      },
+      "description": "Challenge 04 — darn_mice (50,114 bytes 7z). Name suggests mouse/input capture or a pun on 'dormice'. Small 50 KB archive. Likely a Windows PE with custom encoding or input-based key derivation. Techni",
+      "evidence_type": "binary",
+      "source": "generate_forensic_hash",
+      "z_score": {
+        "__fraction__": true,
+        "den": 40,
+        "num": 27
+      }
+    },
+    {
+      "artifact_id": "flareon9-ch05-t8",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 9
+      },
+      "description": "Challenge 05 — t8 (130,992 bytes 7z). Name 't8' may reference T-800 (Terminator), a custom cipher called 'T8', or a 'Terminate-8' command. Medium-sized archive. Technique class: custom cipher / encode",
+      "evidence_type": "binary",
+      "source": "generate_forensic_hash",
+      "z_score": {
+        "__fraction__": true,
+        "den": 40,
+        "num": 27
+      }
+    },
+    {
+      "artifact_id": "flareon9-ch06-alamode",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 9
+      },
+      "description": "Challenge 06 — alamode (36,416 bytes 7z). 'A la mode' (French: fashionable; also 'with ice cream'). Small 36 KB archive. May reference an IDA plugin 'Lighthouse/FLIRT' or a .NET/scripting challenge. T",
+      "evidence_type": "binary",
+      "source": "generate_forensic_hash",
+      "z_score": {
+        "__fraction__": true,
+        "den": 40,
+        "num": 27
+      }
+    },
+    {
+      "artifact_id": "flareon9-ch07-anode",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 9
+      },
+      "description": "Challenge 07 — anode (14,562,659 bytes 7z). Largest archive at 14.5 MB. 'Anode' in electronics context; in FLARE-On 9, this is a Node.js/Electron application challenge. The scale (14.5 MB) is consiste",
+      "evidence_type": "binary",
+      "source": "generate_forensic_hash",
+      "z_score": {
+        "__fraction__": true,
+        "den": 200,
+        "num": 153
+      }
+    },
+    {
+      "artifact_id": "flareon9-ch08-backdoor",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 9
+      },
+      "description": "Challenge 08 — backdoor (11,468,099 bytes 7z). Name is explicit: a backdoor binary for analysis. 11.5 MB archive — likely contains a disk image, VM snapshot, or large binary with embedded backdoor. Te",
+      "evidence_type": "binary",
+      "source": "generate_forensic_hash",
+      "z_score": {
+        "__fraction__": true,
+        "den": 100,
+        "num": 81
+      }
+    },
+    {
+      "artifact_id": "flareon9-ch09-encryptor",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 9
+      },
+      "description": "Challenge 09 — encryptor (13,375 bytes 7z). Smallest binary challenge at 13 KB. Name 'encryptor' maps directly to ransomware encryption components. Likely contains a compact encryption binary and encr",
+      "evidence_type": "binary",
+      "source": "generate_forensic_hash",
+      "z_score": {
+        "__fraction__": true,
+        "den": 200,
+        "num": 153
+      }
+    },
+    {
+      "artifact_id": "flareon9-ch10-nur-getraeumt",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 9
+      },
+      "description": "Challenge 10 — Nur geträumt (417,392 bytes 7z). German for 'Only Dreamed' — a 1983 Nena song. 417 KB archive. Non-ASCII filename (ä, ü) demonstrates intentional Unicode/multilingual scope. Likely invo",
+      "evidence_type": "binary",
+      "source": "generate_forensic_hash",
+      "z_score": {
+        "__fraction__": true,
+        "den": 25,
+        "num": 18
+      }
+    },
+    {
+      "artifact_id": "flareon9-ch11-voldemort",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 9
+      },
+      "description": "Challenge 11 — the_challenge_that_shall_not_be_named (8,757,107 bytes 7z). Final boss challenge. Harry Potter reference: 'He Who Shall Not Be Named' = Voldemort. 8.75 MB archive — substantial. The nam",
+      "evidence_type": "binary",
+      "source": "generate_forensic_hash",
+      "z_score": {
+        "__fraction__": true,
+        "den": 200,
+        "num": 153
+      }
+    }
+  ],
+  "_migration_note": {
+    "date": "2026-07-06",
+    "source": "results/agent_batch/VIGIA-FLAREON-9_agent_bundle.json",
+    "method": "señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canónica preservada",
+    "n_signals": 12
+  }
 }

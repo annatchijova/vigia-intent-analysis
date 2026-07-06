@@ -104,5 +104,77 @@
     "firstness": "Tasks of different complexity executed with nearly identical intervals.",
     "secondness": "Variance 0.0033s incompatible with variable cognitive load. Pre-loaded buffer in memory.",
     "thirdness": "Habit of automation that simulates human behavior but lacks the cognitive entropy inherent to real analysis."
+  },
+  "signals": [
+    {
+      "artifact_id": "a105_01",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 11
+      },
+      "description": "Tasks of different complexity with intervals: 1.500s, 1.500s, 1.600s. Variance 0.0033s. Expected for human: >15s.",
+      "evidence_type": "memory_process",
+      "source": "sift_session_analyzer",
+      "z_score": {
+        "__fraction__": true,
+        "den": 500,
+        "num": 253
+      }
+    },
+    {
+      "artifact_id": "a105_02",
+      "confidence": {
+        "__fraction__": true,
+        "den": 5,
+        "num": 3
+      },
+      "description": "Response time entropy: 0.05 bits. Expected for a human with mixed tasks: >2.3 bits.",
+      "evidence_type": "memory_process",
+      "source": "sift_entropy",
+      "z_score": {
+        "__fraction__": true,
+        "den": 125,
+        "num": 69
+      }
+    },
+    {
+      "artifact_id": "a105_03",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 19
+      },
+      "description": "Pre-loaded command buffer in the remote session process heap. No evidence of interactive GUI interaction.",
+      "evidence_type": "memory_process",
+      "source": "sift_volatility",
+      "z_score": {
+        "__fraction__": true,
+        "den": 400,
+        "num": 361
+      }
+    },
+    {
+      "artifact_id": "a105_04",
+      "confidence": {
+        "__fraction__": true,
+        "den": 5,
+        "num": 1
+      },
+      "description": "Session origin: datacenter IP in Amsterdam, cheap hosting ASN.",
+      "evidence_type": "ip_geolocation",
+      "source": "sift_netflow",
+      "z_score": {
+        "__fraction__": true,
+        "den": 100,
+        "num": 9
+      }
+    }
+  ],
+  "_migration_note": {
+    "date": "2026-07-06",
+    "source": "results/agent_batch/VIGIA-CAN-023_agent_bundle.json",
+    "method": "señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canónica preservada",
+    "n_signals": 4
   }
 }

@@ -92,5 +92,77 @@
     "secondness": "Recent ctime reveals metadata modification; recently assigned inode; hash does not match official repository.",
     "thirdness": "Habit of using timestomping to blend into the OS timeline, forgetting that ctime is immutable in user-space."
   },
-  "notes": "Classic forensic timestomping: the attacker copied dates from a legitimate file but forgot to alter ctime."
+  "notes": "Classic forensic timestomping: the attacker copied dates from a legitimate file but forgot to alter ctime.",
+  "signals": [
+    {
+      "artifact_id": "a024_stat",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 7
+      },
+      "description": "Stat of binary: mtime=2024-03-15T10:00:00Z, atime=2024-03-15T10:00:00Z, crtime=2024-03-15T10:00:00Z (identical to /usr/bin/ls). ctime=2026-05-19T11:30:00Z (3h before detection).",
+      "evidence_type": "file_timestamp",
+      "source": "sift_file_audit",
+      "z_score": {
+        "__fraction__": true,
+        "den": 250,
+        "num": 161
+      }
+    },
+    {
+      "artifact_id": "a024_inode",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 13
+      },
+      "description": "File inode number: 8473321 — recently assigned in inode table, inconsistent with 'old' timestamp.",
+      "evidence_type": "file_timestamp",
+      "source": "sift_file_audit",
+      "z_score": {
+        "__fraction__": true,
+        "den": 250,
+        "num": 143
+      }
+    },
+    {
+      "artifact_id": "a024_exec",
+      "confidence": {
+        "__fraction__": true,
+        "den": 5,
+        "num": 2
+      },
+      "description": "Binary system_updater.elf executed with root privileges at 11:35:00Z; establishes reverse shell connection.",
+      "evidence_type": "cultural_marker",
+      "source": "sift_syslog",
+      "z_score": {
+        "__fraction__": true,
+        "den": 250,
+        "num": 91
+      }
+    },
+    {
+      "artifact_id": "a024_hash",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 7
+      },
+      "description": "Binary hash does not match any package in the official repository; high entropy (7.8 bits) indicative of custom compiled code.",
+      "evidence_type": "memory_process",
+      "source": "sift_file_audit",
+      "z_score": {
+        "__fraction__": true,
+        "den": 500,
+        "num": 21
+      }
+    }
+  ],
+  "_migration_note": {
+    "date": "2026-07-06",
+    "source": "results/agent_batch/VIGIA-CAN-046_agent_bundle.json",
+    "method": "señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canónica preservada",
+    "n_signals": 4
+  }
 }

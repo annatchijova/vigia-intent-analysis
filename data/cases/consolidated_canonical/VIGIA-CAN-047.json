@@ -85,5 +85,77 @@
     "secondness": ".text section with RWX permissions; displaced entry point; parent rundll32.exe instead of services.exe; persistent connection to BY.",
     "thirdness": "Habit of using process hollowing: launch a legitimate process, hollow its code, replace with malicious payload before resuming."
   },
-  "notes": "Very strong, very EDR. The OS believes it is svchost.exe but executes the attacker's code."
+  "notes": "Very strong, very EDR. The OS believes it is svchost.exe but executes the attacker's code.",
+  "signals": [
+    {
+      "artifact_id": "a026_process",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 19
+      },
+      "description": "Process svchost.exe (PID 612) in memory: .text section has RWX (read-write-execute) permissions — anomalous for a legitimate image.",
+      "evidence_type": "memory_process",
+      "source": "sift_volatility",
+      "z_score": {
+        "__fraction__": true,
+        "den": 2000,
+        "num": 133
+      }
+    },
+    {
+      "artifact_id": "a026_network",
+      "confidence": {
+        "__fraction__": true,
+        "den": 4,
+        "num": 1
+      },
+      "description": "Persistent TCP connection from svchost.exe (PID 612) to 185.220.101.42:443 for 72 hours; country not classified by organization (BY — Belarus).",
+      "evidence_type": "ip_geolocation",
+      "source": "sift_netflow",
+      "z_score": {
+        "__fraction__": true,
+        "den": 200,
+        "num": 41
+      }
+    },
+    {
+      "artifact_id": "a026_parent",
+      "confidence": {
+        "__fraction__": true,
+        "den": 5,
+        "num": 2
+      },
+      "description": "Anomalous parent process of svchost.exe: rundll32.exe (PID 881) instead of services.exe — indicates launch by injection, not SCM.",
+      "evidence_type": "log_entry",
+      "source": "sift_syslog",
+      "z_score": {
+        "__fraction__": true,
+        "den": 250,
+        "num": 7
+      }
+    },
+    {
+      "artifact_id": "a026_pe",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 7
+      },
+      "description": "PE analysis in memory: entry point displaced 0x4A000 bytes from svchost.exe on-disk baseline; .text section rewritten.",
+      "evidence_type": "file_hash",
+      "source": "sift_file_audit",
+      "z_score": {
+        "__fraction__": true,
+        "den": 200,
+        "num": 119
+      }
+    }
+  ],
+  "_migration_note": {
+    "date": "2026-07-06",
+    "source": "results/agent_batch/VIGIA-CAN-047_agent_bundle.json",
+    "method": "señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canónica preservada",
+    "n_signals": 4
+  }
 }

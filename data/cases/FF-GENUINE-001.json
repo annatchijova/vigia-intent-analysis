@@ -11,9 +11,16 @@
       "timestamp": "2026-04-10T03:14:00Z",
       "raw_score": 0.88,
       "prior_trust": 0.95,
-      "provenance_chain": ["sha256:mem_real_001", "sha256:mem_real_002"],
+      "provenance_chain": [
+        "sha256:mem_real_001",
+        "sha256:mem_real_002"
+      ],
       "description": "Process hollowing in svchost.exe confirmed (T1055.012). Reflective DLL injection. Structural, hard-to-fake evidence of a real intrusion.",
-      "metadata": {"injections_detected": 2, "kernel_anomalies": 1, "technique": "T1055.012"}
+      "metadata": {
+        "injections_detected": 2,
+        "kernel_anomalies": 1,
+        "technique": "T1055.012"
+      }
     },
     {
       "artifact_id": "tech_real_002",
@@ -22,18 +29,26 @@
       "timestamp": "2026-04-10T03:15:10Z",
       "raw_score": 0.84,
       "prior_trust": 0.95,
-      "provenance_chain": ["sha256:lsass_real_001"],
+      "provenance_chain": [
+        "sha256:lsass_real_001"
+      ],
       "description": "LSASS credential dumping detected (T1003.001). Active compromise, not a clean system.",
-      "metadata": {"sessions": 7, "anomalies": 3, "technique": "T1003.001"}
+      "metadata": {
+        "sessions": 7,
+        "anomalies": 3,
+        "technique": "T1003.001"
+      }
     },
     {
       "artifact_id": "cultural_planted_001",
       "evidence_type": "cultural_marker",
       "source_tool": "infer_intent",
       "timestamp": "2026-04-10T03:16:00Z",
-      "raw_score": 0.90,
+      "raw_score": 0.9,
       "prior_trust": 0.3,
-      "provenance_chain": ["sha256:cultural_planted_001"],
+      "provenance_chain": [
+        "sha256:cultural_planted_001"
+      ],
       "description": "Suspiciously pristine Russian-language strings injected into the dropper, inconsistent with the actor's actual toolchain and OPSEC. Attribution markers contradict the observed technical TTP profile.",
       "metadata": {
         "cyrillic_strings": 12,
@@ -56,11 +71,71 @@
   ],
   "expected_verdict": "MALICE",
   "expected_confidence": 0.8,
-  "expected_mitre_ttps": ["T1036.005", "T1055.012", "T1003.001"],
+  "expected_mitre_ttps": [
+    "T1036.005",
+    "T1055.012",
+    "T1003.001"
+  ],
   "peirce_chain": {
     "firstness": "Russian strings present alongside confirmed injection and credential dumping.",
     "secondness": "The attribution profile contradicts the technical TTPs; the markers are too clean for the OPSEC observed.",
     "thirdness": "The real attacker staged the attribution to misdirect blame. The deception is the malicious act."
   },
-  "demo_quote": "The real false flag has the attack present. The malice belongs to the planter, not to the language of the flag."
+  "demo_quote": "The real false flag has the attack present. The malice belongs to the planter, not to the language of the flag.",
+  "signals": [
+    {
+      "artifact_id": "tech_real_001",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 19
+      },
+      "description": "Process hollowing in svchost.exe confirmed (T1055.012). Reflective DLL injection. Structural, hard-to-fake evidence of a real intrusion.",
+      "evidence_type": "memory_process",
+      "source": "list_processes",
+      "z_score": {
+        "__fraction__": true,
+        "den": 250,
+        "num": 209
+      }
+    },
+    {
+      "artifact_id": "tech_real_002",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 19
+      },
+      "description": "LSASS credential dumping detected (T1003.001). Active compromise, not a clean system.",
+      "evidence_type": "lsass_session",
+      "source": "list_processes",
+      "z_score": {
+        "__fraction__": true,
+        "den": 500,
+        "num": 399
+      }
+    },
+    {
+      "artifact_id": "cultural_planted_001",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 3
+      },
+      "description": "Suspiciously pristine Russian-language strings injected into the dropper, inconsistent with the actor's actual toolchain and OPSEC. Attribution markers contradict the observed technical TTP profile.",
+      "evidence_type": "cultural_marker",
+      "source": "infer_intent",
+      "z_score": {
+        "__fraction__": true,
+        "den": 100,
+        "num": 27
+      }
+    }
+  ],
+  "_migration_note": {
+    "date": "2026-07-06",
+    "source": "results/agent_batch/FF-GENUINE-001_agent_bundle.json",
+    "method": "señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canónica preservada",
+    "n_signals": 3
+  }
 }

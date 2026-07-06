@@ -89,5 +89,61 @@
     "schema_version": "1.1",
     "source_file": "VIGIA_FP_FN_AMB.json",
     "source_origin": "synthetic_vigia_collective"
+  },
+  "signals": [
+    {
+      "artifact_id": "fn001_01",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 9
+      },
+      "description": "Successful login by marketing_user",
+      "evidence_type": "log_entry",
+      "source": "sift_azure_ad",
+      "z_score": {
+        "__fraction__": true,
+        "den": 200,
+        "num": 9
+      }
+    },
+    {
+      "artifact_id": "fn001_02",
+      "confidence": {
+        "__fraction__": true,
+        "den": 5,
+        "num": 1
+      },
+      "description": "Google Drive connection with 500MB uploaded from marketing_user workstation",
+      "evidence_type": "memory_process",
+      "source": "sift_netflow",
+      "z_score": {
+        "__fraction__": true,
+        "den": 100,
+        "num": 3
+      }
+    },
+    {
+      "artifact_id": "fn001_03",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 19
+      },
+      "description": "marketing_user registered vacation from 2026-06-15 to 2026-06-30",
+      "evidence_type": "log_entry",
+      "source": "sift_hr_system",
+      "z_score": {
+        "__fraction__": true,
+        "den": 250,
+        "num": 19
+      }
+    }
+  ],
+  "_migration_note": {
+    "date": "2026-07-06",
+    "source": "results/agent_batch/VIGIA-FN-001_agent_bundle.json",
+    "method": "señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canónica preservada",
+    "n_signals": 3
   }
 }

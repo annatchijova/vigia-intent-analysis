@@ -94,5 +94,77 @@
     "secondness": "Webshell created 10s before the message. Session never closed. POST connections from the 'savior's' IP.",
     "thirdness": "Habit of using social reciprocity to cover persistence implantation."
   },
-  "notes": "The noble motive is a barrier against suspicion. Carnegie: 'Be warm in your approval'."
+  "notes": "The noble motive is a barrier against suspicion. Carnegie: 'Be warm in your approval'.",
+  "signals": [
+    {
+      "artifact_id": "a097_01",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 3
+      },
+      "description": "DM: 'Hey, I saved your life. I saw your open session and closed it myself so you don't get disciplined. Don't say anything'.",
+      "evidence_type": "log_entry",
+      "source": "sift_slack_export",
+      "z_score": {
+        "__fraction__": true,
+        "den": 500,
+        "num": 63
+      }
+    },
+    {
+      "artifact_id": "a097_02",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 7
+      },
+      "description": "PHP webshell created in /var/www/html/uploads/ 10 seconds BEFORE the 'help' message.",
+      "evidence_type": "file_timestamp",
+      "source": "sift_file_audit",
+      "z_score": {
+        "__fraction__": true,
+        "den": 1000,
+        "num": 679
+      }
+    },
+    {
+      "artifact_id": "a097_03",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 19
+      },
+      "description": "Colleague's session (dev@corp.com) still active 5 minutes after the alleged closure. No logout event.",
+      "evidence_type": "memory_process",
+      "source": "sift_volatility",
+      "z_score": {
+        "__fraction__": true,
+        "den": 400,
+        "num": 361
+      }
+    },
+    {
+      "artifact_id": "a097_04",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 7
+      },
+      "description": "3 POST connections to webshell.php from analyst_sec IP within 2 minutes of the 'closure' message.",
+      "evidence_type": "log_entry",
+      "source": "sift_syslog",
+      "z_score": {
+        "__fraction__": true,
+        "den": 250,
+        "num": 63
+      }
+    }
+  ],
+  "_migration_note": {
+    "date": "2026-07-06",
+    "source": "results/agent_batch/VIGIA-CAN-015_agent_bundle.json",
+    "method": "señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canónica preservada",
+    "n_signals": 4
+  }
 }

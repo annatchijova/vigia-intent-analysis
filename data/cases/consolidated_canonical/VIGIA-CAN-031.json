@@ -94,5 +94,77 @@
     "secondness": "Same account executes vssadmin and netsh (requiring privileges) then searches 'how to undo a click'.",
     "thirdness": "Habit of creating a technical stupidity alibi to discredit evidence of deliberate execution."
   },
-  "notes": "Brutal contrast between execution capability and subsequent incompetence narrative."
+  "notes": "Brutal contrast between execution capability and subsequent incompetence narrative.",
+  "signals": [
+    {
+      "artifact_id": "a004_01",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 9
+      },
+      "description": "powershell.exe in memory with handle to deleted VSC and disabled firewall. Commands: vssadmin delete shadows /all /quiet + netsh advfirewall set allprofiles state off.",
+      "evidence_type": "memory_process",
+      "source": "sift_volatility",
+      "z_score": {
+        "__fraction__": true,
+        "den": 250,
+        "num": 207
+      }
+    },
+    {
+      "artifact_id": "a004_02",
+      "confidence": {
+        "__fraction__": true,
+        "den": 4,
+        "num": 1
+      },
+      "description": "IT Ticket: 'Help, my screen flickered and something got deleted, I'm hopeless with computers' — 63 seconds after the PowerShell.",
+      "evidence_type": "memory_process",
+      "source": "sift_ticket_system",
+      "z_score": {
+        "__fraction__": true,
+        "den": 100,
+        "num": 23
+      }
+    },
+    {
+      "artifact_id": "a004_03",
+      "confidence": {
+        "__fraction__": true,
+        "den": 4,
+        "num": 1
+      },
+      "description": "Google search: 'how to undo a click' from corporate IP — 48 seconds after the PowerShell.",
+      "evidence_type": "memory_process",
+      "source": "sift_proxy_log",
+      "z_score": {
+        "__fraction__": true,
+        "den": 100,
+        "num": 23
+      }
+    },
+    {
+      "artifact_id": "a004_04",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 11
+      },
+      "description": "ScriptBlock log Event ID 4104: EncodedCommand executes vssadmin and netsh. No syntax errors.",
+      "evidence_type": "log_entry",
+      "source": "sift_sysmon",
+      "z_score": {
+        "__fraction__": true,
+        "den": 200,
+        "num": 99
+      }
+    }
+  ],
+  "_migration_note": {
+    "date": "2026-07-06",
+    "source": "results/agent_batch/VIGIA-CAN-031_agent_bundle.json",
+    "method": "señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canónica preservada",
+    "n_signals": 4
+  }
 }

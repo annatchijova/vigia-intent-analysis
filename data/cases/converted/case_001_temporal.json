@@ -87,5 +87,61 @@
     "thirdness": "Deliberate timestomp to plant pre-existing payload"
   },
   "demo_command": "python run_vigia_case.py cases/case_001_temporal.json",
-  "demo_quote": "Here, a file is written before the process exists. This is physically impossible. The system flags fabrication."
+  "demo_quote": "Here, a file is written before the process exists. This is physically impossible. The system flags fabrication.",
+  "signals": [
+    {
+      "artifact_id": "proc_001",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 19
+      },
+      "description": "Process svchost.exe (PID 4412) spawned at 10:00:05",
+      "evidence_type": "memory_process",
+      "source": "list_processes",
+      "z_score": {
+        "__fraction__": true,
+        "den": 200,
+        "num": 171
+      }
+    },
+    {
+      "artifact_id": "file_001",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 7
+      },
+      "description": "C:\\Windows\\Temp\\payload.dll written at 10:00:00 — 5s BEFORE PID 4412 existed",
+      "evidence_type": "file_timestamp",
+      "source": "read_evidence",
+      "z_score": {
+        "__fraction__": true,
+        "den": 200,
+        "num": 119
+      }
+    },
+    {
+      "artifact_id": "log_001",
+      "confidence": {
+        "__fraction__": true,
+        "den": 2,
+        "num": 1
+      },
+      "description": "EventLog 4663: File creation by PID 4412 at 10:00:02",
+      "evidence_type": "log_entry",
+      "source": "read_evidence",
+      "z_score": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 3
+      }
+    }
+  ],
+  "_migration_note": {
+    "date": "2026-07-06",
+    "source": "results/agent_batch/case_001_temporal_agent_bundle.json",
+    "method": "señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canónica preservada",
+    "n_signals": 3
+  }
 }

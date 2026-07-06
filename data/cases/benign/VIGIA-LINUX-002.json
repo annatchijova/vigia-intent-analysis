@@ -157,5 +157,93 @@
     "source_origin": "synthetic_vigia_collective",
     "corpus_tag": "POST-HACKATHON"
   },
-  "schema_version": "1.1"
+  "schema_version": "1.1",
+  "signals": [
+    {
+      "artifact_id": "linux002_01",
+      "confidence": {
+        "__fraction__": true,
+        "den": 50,
+        "num": 47
+      },
+      "description": "GitHub account atorres-dev was created 8 months prior to contribution with 3 prior commits to unrelated projects (a Python linting tool and a documentation fix). The account has no prior history with ",
+      "evidence_type": "git_forensics",
+      "source": "sift_git_forensics",
+      "z_score": {
+        "__fraction__": true,
+        "den": 5000,
+        "num": 1269
+      }
+    },
+    {
+      "artifact_id": "linux002_02",
+      "confidence": {
+        "__fraction__": true,
+        "den": 100,
+        "num": 97
+      },
+      "description": "Binary comparison between libarchive 3.7.5 distributed tarball and git repository tree at the same version tag confirms hash equivalence: tarball content is deterministically derived from version-cont",
+      "evidence_type": "git_forensics",
+      "source": "sift_git_forensics",
+      "z_score": {
+        "__fraction__": true,
+        "den": 2000,
+        "num": 97
+      }
+    },
+    {
+      "artifact_id": "linux002_03",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 19
+      },
+      "description": "Code review for the submitted patch involved three independent maintainers (Tim Kientzle, Martin Matuska, and Michihiro NAKAJIMA) over a 48-hour window. Review thread contains substantive technical di",
+      "evidence_type": "osint",
+      "source": "sift_osint",
+      "z_score": {
+        "__fraction__": true,
+        "den": 400,
+        "num": 19
+      }
+    },
+    {
+      "artifact_id": "linux002_04",
+      "confidence": {
+        "__fraction__": true,
+        "den": 100,
+        "num": 93
+      },
+      "description": "Static analysis of the submitted patch: 47 lines changed across 2 files (archive_read_support_format_tar.c and test_read_format_tar.c). The change removes a vulnerable code path that allowed path trav",
+      "evidence_type": "malware_static_analysis",
+      "source": "sift_static_analysis",
+      "z_score": {
+        "__fraction__": true,
+        "den": 2500,
+        "num": 93
+      }
+    },
+    {
+      "artifact_id": "linux002_05",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 19
+      },
+      "description": "Public GitHub Issue #2041 by Tim Kientzle (libarchive maintainer since 2007): 'Looking for help fixing the path traversal edge case in the TAR reader — reproducible with the attached corpus file. Patc",
+      "evidence_type": "osint",
+      "source": "sift_osint",
+      "z_score": {
+        "__fraction__": true,
+        "den": 400,
+        "num": 19
+      }
+    }
+  ],
+  "_migration_note": {
+    "date": "2026-07-06",
+    "source": "results/agent_batch/VIGIA-LINUX-002_agent_bundle.json",
+    "method": "señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canónica preservada",
+    "n_signals": 5
+  }
 }

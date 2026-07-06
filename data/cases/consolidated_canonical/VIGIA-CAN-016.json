@@ -86,5 +86,77 @@
     "firstness": "Windows command 'ipconfig' on a Linux server, corrected immediately.",
     "secondness": "Muscle memory contamination error: the operator 'thinks in Windows' but operates in Linux.",
     "thirdness": "Habit of blindly translating commands from the native OS, revealing the origin environment."
+  },
+  "signals": [
+    {
+      "artifact_id": "a098_01",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 7
+      },
+      "description": "Failed command: 'ipconfig /all' in Ubuntu 24.04 bash. Exit code 127: command not found.",
+      "evidence_type": "memory_process",
+      "source": "sift_syslog",
+      "z_score": {
+        "__fraction__": true,
+        "den": 500,
+        "num": 161
+      }
+    },
+    {
+      "artifact_id": "a098_02",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 7
+      },
+      "description": "Correction 1.3 seconds later: 'ip addr'. Native Linux command.",
+      "evidence_type": "memory_process",
+      "source": "sift_syslog",
+      "z_score": {
+        "__fraction__": true,
+        "den": 500,
+        "num": 161
+      }
+    },
+    {
+      "artifact_id": "a098_03",
+      "confidence": {
+        "__fraction__": true,
+        "den": 2,
+        "num": 1
+      },
+      "description": "Keystroke sequence: 'ipconfig' space '/' TAB (failed autocomplete) Ctrl+C 'ip addr'.",
+      "evidence_type": "log_entry",
+      "source": "sift_keylogger",
+      "z_score": {
+        "__fraction__": true,
+        "den": 200,
+        "num": 11
+      }
+    },
+    {
+      "artifact_id": "a098_04",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 19
+      },
+      "description": "SSH session from Windows 11 (PuTTY/0.81) connected to Ubuntu 24.04 Linux server.",
+      "evidence_type": "memory_process",
+      "source": "sift_volatility",
+      "z_score": {
+        "__fraction__": true,
+        "den": 2000,
+        "num": 1653
+      }
+    }
+  ],
+  "_migration_note": {
+    "date": "2026-07-06",
+    "source": "results/agent_batch/VIGIA-CAN-016_agent_bundle.json",
+    "method": "señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canónica preservada",
+    "n_signals": 4
   }
 }

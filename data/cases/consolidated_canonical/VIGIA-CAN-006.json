@@ -82,5 +82,77 @@
     "secondness": "'State of the country' makes no sense for an electric utility server. Matches a literal translation from Russian.",
     "thirdness": "Habit of direct mental translation that reveals native-language thought structure under operational stress."
   },
-  "notes": "Detection of underlying linguistic calque: the attacker operates under a mask of fluency in a non-native language."
+  "notes": "Detection of underlying linguistic calque: the attacker operates under a mask of fluency in a non-native language.",
+  "signals": [
+    {
+      "artifact_id": "a088_01",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 3
+      },
+      "description": "Ticket: 'I need to check the state of the country'. Context: electric utility server.",
+      "evidence_type": "log_entry",
+      "source": "sift_ticket_system",
+      "z_score": {
+        "__fraction__": true,
+        "den": 500,
+        "num": 117
+      }
+    },
+    {
+      "artifact_id": "a088_02",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 3
+      },
+      "description": "Semantic calque: 'state of the country' directly translates 'стране', which in informal Russian means 'area/sector'. Literal translation error.",
+      "evidence_type": "cultural_marker",
+      "source": "sift_linguistic",
+      "z_score": {
+        "__fraction__": true,
+        "den": 1000,
+        "num": 123
+      }
+    },
+    {
+      "artifact_id": "a088_03",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 19
+      },
+      "description": "RDP session from IP geolocated in Moscow, timezone UTC+3, user 'field_tech'.",
+      "evidence_type": "memory_process",
+      "source": "sift_volatility",
+      "z_score": {
+        "__fraction__": true,
+        "den": 1000,
+        "num": 57
+      }
+    },
+    {
+      "artifact_id": "a088_04",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 7
+      },
+      "description": "Command executed: 'Get-StateOfCountry -ServerId NY-42'. Cmdlet does not exist in the official repository; loaded from an unknown module.",
+      "evidence_type": "log_entry",
+      "source": "sift_syslog",
+      "z_score": {
+        "__fraction__": true,
+        "den": 100,
+        "num": 21
+      }
+    }
+  ],
+  "_migration_note": {
+    "date": "2026-07-06",
+    "source": "results/agent_batch/VIGIA-CAN-006_agent_bundle.json",
+    "method": "señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canónica preservada",
+    "n_signals": 4
+  }
 }

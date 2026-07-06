@@ -31,7 +31,12 @@
         "naming_convention": "GitHub archive (branch: main)",
         "primary_language": "Python",
         "containerization": "Docker",
-        "agent_modules": ["safety.py", "orchestrator.py", "impact.py", "memory.py"],
+        "agent_modules": [
+          "safety.py",
+          "orchestrator.py",
+          "impact.py",
+          "memory.py"
+        ],
         "readme_size_bytes": 25600,
         "env_example_present": true,
         "env_actual_present": false,
@@ -56,8 +61,17 @@
       "metadata": {
         "directory": "relay-main/",
         "agent_directory": "backend/agents/",
-        "key_files": ["README.md", ".env.example", "LICENSE"],
-        "agent_files": ["safety.py", "orchestrator.py", "impact.py", "memory.py"],
+        "key_files": [
+          "README.md",
+          ".env.example",
+          "LICENSE"
+        ],
+        "agent_files": [
+          "safety.py",
+          "orchestrator.py",
+          "impact.py",
+          "memory.py"
+        ],
         "infrastructure": "Docker",
         "secrets_exposed": false,
         "obfuscated_content": "none detected",
@@ -71,5 +85,45 @@
   ],
   "caie_fractures": [],
   "source_dataset": "VIGÍA Real Evidence Corpus — Open-Source Software",
-  "source_origin": "github_archive"
+  "source_origin": "github_archive",
+  "signals": [
+    {
+      "artifact_id": "RELAY-ART-001",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 19
+      },
+      "description": "relay-main.zip — container archive. GitHub 'Download ZIP' naming convention ('-main' suffix). Contains Python AI relay backend with Docker, four agent modules, 25KB README, .env.example, LICENSE. Date",
+      "evidence_type": "file_hash",
+      "source": "generate_forensic_hash",
+      "z_score": {
+        "__fraction__": true,
+        "den": 1000,
+        "num": 19
+      }
+    },
+    {
+      "artifact_id": "RELAY-ART-002",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 19
+      },
+      "description": "Directory structure of relay-main/: Docker configuration at root, backend/agents/ containing safety.py, orchestrator.py, impact.py, memory.py. README.md (25KB), .env.example (environment variable temp",
+      "evidence_type": "log_entry",
+      "source": "list_files",
+      "z_score": {
+        "__fraction__": true,
+        "den": 1000,
+        "num": 19
+      }
+    }
+  ],
+  "_migration_note": {
+    "date": "2026-07-06",
+    "source": "results/agent_batch/VIGIA-RELAY-MAIN-2026_agent_bundle.json",
+    "method": "señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canónica preservada",
+    "n_signals": 2
+  }
 }

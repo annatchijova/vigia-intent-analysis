@@ -84,5 +84,77 @@
     "secondness": "Both patterns match direct mental translation from Chinese. Consistent origin IP.",
     "thirdness": "Habit of operating under a mask of linguistic fluency with 'technical thinking' that reveals idiomatic origin."
   },
-  "notes": "The attacker has fluent English, but their thought structure reveals their origin."
+  "notes": "The attacker has fluent English, but their thought structure reveals their origin.",
+  "signals": [
+    {
+      "artifact_id": "a095_01",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 3
+      },
+      "description": "Ticket: 'I'll make the revision of the server'. Use of 'revision' as an action noun (calque of 修订/审核).",
+      "evidence_type": "log_entry",
+      "source": "sift_ticket_system",
+      "z_score": {
+        "__fraction__": true,
+        "den": 100,
+        "num": 21
+      }
+    },
+    {
+      "artifact_id": "a095_02",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 3
+      },
+      "description": "Semantic calque + manual syntax: 'revision' translates 修订. Uppercase flag '-R' appears in Chinese technical translations of Unix manuals.",
+      "evidence_type": "cultural_marker",
+      "source": "sift_linguistic",
+      "z_score": {
+        "__fraction__": true,
+        "den": 25,
+        "num": 3
+      }
+    },
+    {
+      "artifact_id": "a095_03",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 7
+      },
+      "description": "Command executed: grep -R 'password' /etc. Uppercase -R is documented in Chinese translated manuals; a native speaker would use -r.",
+      "evidence_type": "log_entry",
+      "source": "sift_syslog",
+      "z_score": {
+        "__fraction__": true,
+        "den": 2000,
+        "num": 581
+      }
+    },
+    {
+      "artifact_id": "a095_04",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 19
+      },
+      "description": "SSH session from Shanghai IP, timezone UTC+8, user 'support_temp' created 2 days prior.",
+      "evidence_type": "memory_process",
+      "source": "sift_volatility",
+      "z_score": {
+        "__fraction__": true,
+        "den": 400,
+        "num": 19
+      }
+    }
+  ],
+  "_migration_note": {
+    "date": "2026-07-06",
+    "source": "results/agent_batch/VIGIA-CAN-013_agent_bundle.json",
+    "method": "señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canónica preservada",
+    "n_signals": 4
+  }
 }

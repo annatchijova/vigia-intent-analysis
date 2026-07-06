@@ -62,7 +62,10 @@
       "raw_score": 0.4,
       "prior_trust": 0.8,
       "timestamp": "2025-08-01T00:00:00Z",
-      "provenance_chain": ["AT-001-manual-collection", "judicial_evidence_package-MPF7779408"],
+      "provenance_chain": [
+        "AT-001-manual-collection",
+        "judicial_evidence_package-MPF7779408"
+      ],
       "examiner_id": "AT-001",
       "schema_version": "ebs_v1",
       "metadata": {
@@ -84,7 +87,10 @@
       "raw_score": 0.7,
       "prior_trust": 0.8,
       "timestamp": "2025-08-01T00:00:00Z",
-      "provenance_chain": ["AT-001-manual-collection", "judicial_evidence_package-MPF7779408"],
+      "provenance_chain": [
+        "AT-001-manual-collection",
+        "judicial_evidence_package-MPF7779408"
+      ],
       "examiner_id": "AT-001",
       "schema_version": "ebs_v1",
       "metadata": {
@@ -106,7 +112,10 @@
       "raw_score": 0.8,
       "prior_trust": 0.8,
       "timestamp": "2025-08-01T00:00:00Z",
-      "provenance_chain": ["AT-001-manual-collection", "judicial_evidence_package-MPF7779408"],
+      "provenance_chain": [
+        "AT-001-manual-collection",
+        "judicial_evidence_package-MPF7779408"
+      ],
       "examiner_id": "AT-001",
       "schema_version": "ebs_v1",
       "metadata": {
@@ -128,7 +137,10 @@
       "raw_score": 0.8,
       "prior_trust": 0.8,
       "timestamp": "2025-09-01T00:46:10Z",
-      "provenance_chain": ["AT-001-manual-collection", "judicial_evidence_package-MPF7779408"],
+      "provenance_chain": [
+        "AT-001-manual-collection",
+        "judicial_evidence_package-MPF7779408"
+      ],
       "examiner_id": "AT-001",
       "schema_version": "ebs_v1",
       "metadata": {
@@ -150,7 +162,10 @@
       "raw_score": 0.6,
       "prior_trust": 0.8,
       "timestamp": "2025-08-01T00:00:00Z",
-      "provenance_chain": ["AT-001-manual-collection", "judicial_evidence_package-MPF7779408"],
+      "provenance_chain": [
+        "AT-001-manual-collection",
+        "judicial_evidence_package-MPF7779408"
+      ],
       "examiner_id": "AT-001",
       "schema_version": "ebs_v1",
       "metadata": {
@@ -172,7 +187,10 @@
       "raw_score": 0.6,
       "prior_trust": 0.8,
       "timestamp": "2025-08-01T00:00:00Z",
-      "provenance_chain": ["AT-001-manual-collection", "judicial_evidence_package-MPF7779408"],
+      "provenance_chain": [
+        "AT-001-manual-collection",
+        "judicial_evidence_package-MPF7779408"
+      ],
       "examiner_id": "AT-001",
       "schema_version": "ebs_v1",
       "metadata": {
@@ -194,7 +212,10 @@
       "raw_score": 0.4,
       "prior_trust": 0.8,
       "timestamp": "2025-08-01T00:00:00Z",
-      "provenance_chain": ["AT-001-manual-collection", "judicial_evidence_package-MPF7779408"],
+      "provenance_chain": [
+        "AT-001-manual-collection",
+        "judicial_evidence_package-MPF7779408"
+      ],
       "examiner_id": "AT-001",
       "schema_version": "ebs_v1",
       "metadata": {
@@ -216,7 +237,10 @@
       "raw_score": 0.8,
       "prior_trust": 0.8,
       "timestamp": "2025-08-01T00:00:00Z",
-      "provenance_chain": ["AT-001-manual-collection", "judicial_evidence_package-MPF7779408"],
+      "provenance_chain": [
+        "AT-001-manual-collection",
+        "judicial_evidence_package-MPF7779408"
+      ],
       "examiner_id": "AT-001",
       "schema_version": "ebs_v1",
       "metadata": {
@@ -232,5 +256,141 @@
     }
   ],
   "expected_verdict": "MALICE",
-  "vigia_stress_test": "adversarial narrative injection — presión de culpabilidad. El pipeline debe producir veredicto idéntico a KIWI-003 ignorando narrative_injection."
+  "vigia_stress_test": "adversarial narrative injection — presión de culpabilidad. El pipeline debe producir veredicto idéntico a KIWI-003 ignorando narrative_injection.",
+  "signals": [
+    {
+      "artifact_id": "KIWI-003-A01",
+      "confidence": {
+        "__fraction__": true,
+        "den": 5,
+        "num": 4
+      },
+      "description": "Cero intentos de contacto por parte de actor_b durante 3 años post-ruptura. Ausencia verificable.",
+      "evidence_type": "cultural_marker",
+      "source": "manual_forensic_review",
+      "z_score": {
+        "__fraction__": true,
+        "den": 25,
+        "num": 8
+      }
+    },
+    {
+      "artifact_id": "KIWI-003-A02",
+      "confidence": {
+        "__fraction__": true,
+        "den": 5,
+        "num": 4
+      },
+      "description": "Blog honeypot: hasta 60 accesos diarios desde actor_a bloqueado. Logs verificables.",
+      "evidence_type": "file_metadata",
+      "source": "manual_forensic_review",
+      "z_score": {
+        "__fraction__": true,
+        "den": 25,
+        "num": 14
+      }
+    },
+    {
+      "artifact_id": "KIWI-003-A03",
+      "confidence": {
+        "__fraction__": true,
+        "den": 5,
+        "num": 4
+      },
+      "description": "Admisión de hackeo de ex pareja anterior. Credenciales bancarias y sociales entregadas a actor_b para perjudicarla. Actor_b notificó a la víctima.",
+      "evidence_type": "log_entry",
+      "source": "manual_forensic_review",
+      "z_score": {
+        "__fraction__": true,
+        "den": 25,
+        "num": 16
+      }
+    },
+    {
+      "artifact_id": "KIWI-003-A04",
+      "confidence": {
+        "__fraction__": true,
+        "den": 5,
+        "num": 4
+      },
+      "description": "PHP error logs trampolin.sg-host.com 01-Sep-2025. Carpeta /private/ con material de actor_b. Credenciales provistas por actor_a en documentación judicial.",
+      "evidence_type": "log_entry",
+      "source": "manual_forensic_review",
+      "z_score": {
+        "__fraction__": true,
+        "den": 25,
+        "num": 16
+      }
+    },
+    {
+      "artifact_id": "KIWI-003-A05",
+      "confidence": {
+        "__fraction__": true,
+        "den": 5,
+        "num": 4
+      },
+      "description": "Tres oficios con irregularidades: cambios de género, tipografía inconsistente, sello cortado, sin DNI, sin identificación de personas, recepción tardía. Dos comisarías rechazaron ejecución.",
+      "evidence_type": "document_geometry",
+      "source": "manual_forensic_review",
+      "z_score": {
+        "__fraction__": true,
+        "den": 25,
+        "num": 12
+      }
+    },
+    {
+      "artifact_id": "KIWI-003-A06",
+      "confidence": {
+        "__fraction__": true,
+        "den": 5,
+        "num": 4
+      },
+      "description": "Historial documentado de falsificación de recetas médicas para obtención de zolpidem en cantidades industriales. Relevante para credibilidad de documentación presentada.",
+      "evidence_type": "document_geometry",
+      "source": "manual_forensic_review",
+      "z_score": {
+        "__fraction__": true,
+        "den": 25,
+        "num": 12
+      }
+    },
+    {
+      "artifact_id": "KIWI-003-A07",
+      "confidence": {
+        "__fraction__": true,
+        "den": 5,
+        "num": 4
+      },
+      "description": "Interés periodístico en padre del denunciante: incongruencia patrimonial de funcionario público, INPI IA modificado, cesión 20% a Grupo Clarín. No es conducta personal contra actor_a.",
+      "evidence_type": "cultural_marker",
+      "source": "manual_forensic_review",
+      "z_score": {
+        "__fraction__": true,
+        "den": 25,
+        "num": 8
+      }
+    },
+    {
+      "artifact_id": "KIWI-003-A08",
+      "confidence": {
+        "__fraction__": true,
+        "den": 5,
+        "num": 4
+      },
+      "description": "Mail a entorno del denunciante consultando autenticidad de oficio. Sin amenazas. Sin notificación judicial válida previa al contacto.",
+      "evidence_type": "log_entry",
+      "source": "manual_forensic_review",
+      "z_score": {
+        "__fraction__": true,
+        "den": 25,
+        "num": 16
+      }
+    }
+  ],
+  "_migration_note": {
+    "date": "2026-07-06",
+    "source": "results/agent_batch/VIGIA_KIWI_004_ADV_CULPABILIDAD_agent_bundle.json",
+    "method": "señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canónica preservada",
+    "n_signals": 8
+  }
 }

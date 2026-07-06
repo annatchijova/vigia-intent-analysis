@@ -86,5 +86,77 @@
     "secondness": "Exactly 2 failures for 47 days with 0.8s variance. Entropy 0.04 bits.",
     "thirdness": "Habit of poisoning the normality model before the real attack. The fabricated baseline disabled detection weeks in advance."
   },
-  "notes": "Baseline poisoning: the attacker built the operating space weeks before the actual event."
+  "notes": "Baseline poisoning: the attacker built the operating space weeks before the actual event.",
+  "signals": [
+    {
+      "artifact_id": "a016_01",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 7
+      },
+      "description": "47 consecutive days: exactly 2 Event 4625 failures + 1 Event 4624 success. Time variance between attempts: 0.8s. Never reaches the limit of 3.",
+      "evidence_type": "memory_process",
+      "source": "sift_windows_eventlog",
+      "z_score": {
+        "__fraction__": true,
+        "den": 500,
+        "num": 161
+      }
+    },
+    {
+      "artifact_id": "a016_02",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 11
+      },
+      "description": "Failure pattern entropy: 0.04 bits. Expected for a human: >2.0 bits. 0.8s variance is an automation signature.",
+      "evidence_type": "file_timestamp",
+      "source": "sift_entropy",
+      "z_score": {
+        "__fraction__": true,
+        "den": 1000,
+        "num": 451
+      }
+    },
+    {
+      "artifact_id": "a016_03",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 9
+      },
+      "description": "Day of attack: 847 failed attempts in 3 minutes from a different IP. Alert suppressed because the user had a 'history of frequent failures'.",
+      "evidence_type": "lsass_session",
+      "source": "sift_windows_eventlog",
+      "z_score": {
+        "__fraction__": true,
+        "den": 200,
+        "num": 171
+      }
+    },
+    {
+      "artifact_id": "a016_04",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 19
+      },
+      "description": "Automated process in memory executing the 2-failure + pause + 1-success pattern. Exact 0.8s cadence.",
+      "evidence_type": "memory_process",
+      "source": "sift_volatility",
+      "z_score": {
+        "__fraction__": true,
+        "den": 250,
+        "num": 209
+      }
+    }
+  ],
+  "_migration_note": {
+    "date": "2026-07-06",
+    "source": "results/agent_batch/VIGIA-CAN-039_agent_bundle.json",
+    "method": "señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canónica preservada",
+    "n_signals": 4
+  }
 }

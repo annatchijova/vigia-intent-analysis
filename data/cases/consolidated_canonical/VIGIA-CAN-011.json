@@ -99,5 +99,77 @@
     "secondness": "Architect offline. Generic API key. Stylometric match exceeds human biological variance.",
     "thirdness": "Habit of using AI to fabricate code that 'looks' legitimate. Perfect consistency IS the impostor's signature."
   },
-  "notes": "Superhuman statistical consistency is the indicator of algorithmic fabrication."
+  "notes": "Superhuman statistical consistency is the indicator of algorithmic fabrication.",
+  "signals": [
+    {
+      "artifact_id": "a093_01",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 9
+      },
+      "description": "15 commits uploaded via generic API key 'ci-token-legacy' at 4AM. Author: arch_chief@corp.com.",
+      "evidence_type": "cultural_marker",
+      "source": "sift_git_audit",
+      "z_score": {
+        "__fraction__": true,
+        "den": 500,
+        "num": 207
+      }
+    },
+    {
+      "artifact_id": "a093_02",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 9
+      },
+      "description": "Chief Architect offline since 19:30 the previous day. No session between 19:30 and 4AM.",
+      "evidence_type": "memory_process",
+      "source": "sift_vpn_log",
+      "z_score": {
+        "__fraction__": true,
+        "den": 200,
+        "num": 9
+      }
+    },
+    {
+      "artifact_id": "a093_03",
+      "confidence": {
+        "__fraction__": true,
+        "den": 2,
+        "num": 1
+      },
+      "description": "Stylometric analysis: TTR similarity 0.992, grammatical errors replicated ('recieve', 'seperate'). Match exceeds human biological variance (0.82 baseline).",
+      "evidence_type": "file_hash",
+      "source": "sift_stylometry",
+      "z_score": {
+        "__fraction__": true,
+        "den": 100,
+        "num": 41
+      }
+    },
+    {
+      "artifact_id": "a093_04",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 17
+      },
+      "description": "One of the 15 commits introduces a backdoor in the authentication module. Hash mismatch with code reviewed in previous PR. Change obfuscated within 847 lines of legitimate refactoring.",
+      "evidence_type": "file_hash",
+      "source": "sift_code_integrity",
+      "z_score": {
+        "__fraction__": true,
+        "den": 1000,
+        "num": 697
+      }
+    }
+  ],
+  "_migration_note": {
+    "date": "2026-07-06",
+    "source": "results/agent_batch/VIGIA-CAN-011_agent_bundle.json",
+    "method": "señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canónica preservada",
+    "n_signals": 4
+  }
 }

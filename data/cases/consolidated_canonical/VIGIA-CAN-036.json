@@ -94,5 +94,77 @@
     "firstness": "Process with a benevolent name referencing HR and payroll.",
     "secondness": "Entropy 7.8 bits (packed). No signature. C:\\Users\\Public. HR did not confirm update. Active C2.",
     "thirdness": "Habit of using names that appeal to critical processes to make the analyst hesitate before responding."
+  },
+  "signals": [
+    {
+      "artifact_id": "a010_01",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 17
+      },
+      "description": "Update_Fix_For_HR_Payroll.exe: 1.2GB RAM, C:\\Users\\Public\\Documents\\, no digital signature, executed from explorer.exe.",
+      "evidence_type": "memory_process",
+      "source": "sift_volatility",
+      "z_score": {
+        "__fraction__": true,
+        "den": 250,
+        "num": 187
+      }
+    },
+    {
+      "artifact_id": "a010_02",
+      "confidence": {
+        "__fraction__": true,
+        "den": 100,
+        "num": 93
+      },
+      "description": "Shannon entropy: 7.8 bits/byte. Legitimate software range: 5.0-6.5. Indicates encrypted or compressed payload.",
+      "evidence_type": "memory_process",
+      "source": "sift_entropy",
+      "z_score": {
+        "__fraction__": true,
+        "den": 2500,
+        "num": 2139
+      }
+    },
+    {
+      "artifact_id": "a010_03",
+      "confidence": {
+        "__fraction__": true,
+        "den": 4,
+        "num": 1
+      },
+      "description": "Process establishes persistent connection to 91.108.4.200:8080. Not a Microsoft domain or known HR vendor.",
+      "evidence_type": "memory_process",
+      "source": "sift_netflow",
+      "z_score": {
+        "__fraction__": true,
+        "den": 100,
+        "num": 23
+      }
+    },
+    {
+      "artifact_id": "a010_04",
+      "confidence": {
+        "__fraction__": true,
+        "den": 5,
+        "num": 2
+      },
+      "description": "Verification with HR system: NO payroll update is pending or authorized for today.",
+      "evidence_type": "log_entry",
+      "source": "sift_hr_system",
+      "z_score": {
+        "__fraction__": true,
+        "den": 125,
+        "num": 4
+      }
+    }
+  ],
+  "_migration_note": {
+    "date": "2026-07-06",
+    "source": "results/agent_batch/VIGIA-CAN-036_agent_bundle.json",
+    "method": "señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canónica preservada",
+    "n_signals": 4
   }
 }

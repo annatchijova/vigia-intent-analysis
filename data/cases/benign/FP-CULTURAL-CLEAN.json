@@ -11,7 +11,9 @@
       "timestamp": "2026-04-10T12:00:00Z",
       "raw_score": 0.75,
       "prior_trust": 0.4,
-      "provenance_chain": ["sha256:cult_clean_001"],
+      "provenance_chain": [
+        "sha256:cult_clean_001"
+      ],
       "description": "Cyrillic filenames: 'отчет_финансы.docx', 'резюме.pdf', 'фото_отпуск.jpg'. Keyboard layout: RU. Timezone: UTC+3. Language confidence: 0.89. Organic user files with normal creation dates, document properties, and compilation history.",
       "metadata": {
         "cyrillic_filenames": 3,
@@ -30,7 +32,9 @@
       "timestamp": "2026-04-10T12:00:10Z",
       "raw_score": 0.05,
       "prior_trust": 0.95,
-      "provenance_chain": ["sha256:mem_clean_001"],
+      "provenance_chain": [
+        "sha256:mem_clean_001"
+      ],
       "description": "Memory: No process injection. No kernel anomalies. No hollowed processes. Clean system state.",
       "metadata": {
         "injections_detected": 0,
@@ -45,7 +49,9 @@
       "timestamp": "2026-04-10T12:00:12Z",
       "raw_score": 0.06,
       "prior_trust": 0.95,
-      "provenance_chain": ["sha256:lsass_clean_001"],
+      "provenance_chain": [
+        "sha256:lsass_clean_001"
+      ],
       "description": "LSASS: No credential dumping. Normal session count (2). No anomalous access patterns.",
       "metadata": {
         "sessions": 2,
@@ -60,7 +66,9 @@
       "timestamp": "2026-04-10T12:00:15Z",
       "raw_score": 0.04,
       "prior_trust": 0.95,
-      "provenance_chain": ["sha256:mft_clean_001"],
+      "provenance_chain": [
+        "sha256:mft_clean_001"
+      ],
       "description": "MFT: All timestamps consistent. No timestomp. No $SI/$FN discrepancy. Volume creation 2023-09-10. Files created organically over months. No backdating.",
       "metadata": {
         "timestomp_detected": false,
@@ -83,5 +91,77 @@
   },
   "demo_command": "python run_vigia_case.py cases/FP-CULTURAL-CLEAN.json",
   "demo_quote": "Naive classifier might flag this as suspicious due to Cyrillic content. VIGÍA correctly identifies NOISE: the system is clean, the cultural markers are organic, and there is no evidence of manipulation or attack.",
-  "notes": "SENTINEL: if this case ever returns MALICE or SUSPICION after the H-02 fix is applied, the FALSE_FLAG_PATTERN rule is broken. Guard this case."
+  "notes": "SENTINEL: if this case ever returns MALICE or SUSPICION after the H-02 fix is applied, the FALSE_FLAG_PATTERN rule is broken. Guard this case.",
+  "signals": [
+    {
+      "artifact_id": "cultural_clean_001",
+      "confidence": {
+        "__fraction__": true,
+        "den": 5,
+        "num": 2
+      },
+      "description": "Cyrillic filenames: 'отчет_финансы.docx', 'резюме.pdf', 'фото_отпуск.jpg'. Keyboard layout: RU. Timezone: UTC+3. Language confidence: 0.89. Organic user files with normal creation dates, document prop",
+      "evidence_type": "cultural_marker",
+      "source": "infer_intent",
+      "z_score": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 3
+      }
+    },
+    {
+      "artifact_id": "tech_clean_001",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 19
+      },
+      "description": "Memory: No process injection. No kernel anomalies. No hollowed processes. Clean system state.",
+      "evidence_type": "memory_process",
+      "source": "list_processes",
+      "z_score": {
+        "__fraction__": true,
+        "den": 400,
+        "num": 19
+      }
+    },
+    {
+      "artifact_id": "tech_clean_002",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 19
+      },
+      "description": "LSASS: No credential dumping. Normal session count (2). No anomalous access patterns.",
+      "evidence_type": "lsass_session",
+      "source": "list_processes",
+      "z_score": {
+        "__fraction__": true,
+        "den": 1000,
+        "num": 57
+      }
+    },
+    {
+      "artifact_id": "fs_clean_001",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 19
+      },
+      "description": "MFT: All timestamps consistent. No timestomp. No $SI/$FN discrepancy. Volume creation 2023-09-10. Files created organically over months. No backdating.",
+      "evidence_type": "mft_entry",
+      "source": "analyze_mft",
+      "z_score": {
+        "__fraction__": true,
+        "den": 500,
+        "num": 19
+      }
+    }
+  ],
+  "_migration_note": {
+    "date": "2026-07-06",
+    "source": "results/agent_batch/FP-CULTURAL-CLEAN_agent_bundle.json",
+    "method": "señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canónica preservada",
+    "n_signals": 4
+  }
 }

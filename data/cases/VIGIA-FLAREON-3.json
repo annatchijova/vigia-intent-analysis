@@ -5,7 +5,13 @@
   "description": "FLARE-On 3 challenge set released in 2016 by FireEye FLARE team. The zip archive (21,103,076 bytes, SHA-256: 4b1c4c3086c4a6ebc1cfd4e61c1269fba7a01d68d4f65963d471a48a34d90211) contains 10 challenges across folders 1–10. Notable artifacts: challenge 1 (challenge1.exe, 79,360 bytes) is a PE32 console crackme with password-check logic; challenge 2 introduces a ransomware simulator (DudeLocker.exe, 142,336 bytes) and an encrypted Word document (BusinessPapers.doc); challenge 6 (khaki.exe, 3,816,918 bytes) is a Zip archive with extra prepended data — a classic polyglot/appended-payload technique; challenge 7 (hashes, 27,188 bytes) is a Linux ELF 32-bit Go binary; challenge 9 (GUI.exe, 630,784 bytes) is a .NET/Mono Windows GUI binary; challenge 10 (flava.pcap, 22,263,502 bytes) is a libpcap v2.4 Ethernet capture likely containing a covert C2 channel. Verdict INTENT: the collection represents deliberately crafted adversarial content spanning ransomware simulation, polyglot binaries, cross-platform RE (Linux ELF, .NET, x86), network forensics, and a DLL challenge — consistent with a structured CTF curriculum authored by a team with deep offensive malware knowledge.",
   "expected_verdict": "INTENT",
   "expected_confidence": 0.92,
-  "expected_mitre_ttps": ["T1027", "T1059", "T1486", "T1071", "T1055"],
+  "expected_mitre_ttps": [
+    "T1027",
+    "T1059",
+    "T1486",
+    "T1071",
+    "T1055"
+  ],
   "peirce_chain": {
     "firstness": "10 CTF challenges spanning 2,560 bytes (CHIMERA.EXE) to 22,263,502 bytes (flava.pcap). File types observed: PE32 console EXE (x5), PE32 GUI EXE, .NET/Mono assembly, PE32 DLL, Zip polyglot, Linux ELF Go binary, pcap capture, and an encrypted DOC. Challenge names: challenge1.exe, DudeLocker.exe, unknown, flareon2016challenge.dll, smokestack.exe, khaki.exe, hashes, CHIMERA.EXE, GUI.exe, flava.pcap.",
     "secondness": "A benign archive of this composition does not exist. The presence of a ransomware-named binary (DudeLocker) paired with a matching encrypted document (BusinessPapers.doc), a polyglot Zip-over-PE (khaki.exe), a cross-platform Go ELF under the name 'hashes', a .NET GUI crackme, and a 22 MB PCAP capturing network-level covert traffic is not accidental. Each challenge maps to a distinct adversarial technique class used in real-world incidents. The archive is AES-256 encrypted with password 'flare', extracted via 7z.",
@@ -57,7 +63,7 @@
       "source_tool": "generate_forensic_hash",
       "timestamp": "2026-06-30T15:20:44Z",
       "raw_score": 0.75,
-      "prior_trust": 0.90,
+      "prior_trust": 0.9,
       "provenance_chain": [
         "sha256:4b1c4c3086c4a6ebc1cfd4e61c1269fba7a01d68d4f65963d471a48a34d90211",
         "zip_entry:1/challenge1.exe",
@@ -73,7 +79,11 @@
         "archive_date": "2016-09-08",
         "technique_class": "crackme / password check / string obfuscation",
         "difficulty_estimate": "introductory",
-        "key_strings": ["Enter password:", "Wrong password", "Correct!"],
+        "key_strings": [
+          "Enter password:",
+          "Wrong password",
+          "Correct!"
+        ],
         "imports_hint": "KERNEL32.dll / MSVC CRT",
         "acquisition_tool": "7z x -pflare + sha256sum",
         "acquisition_hash": "sha256:0762a62a42dd05d394e6885d68be1d01d25028da6af9f9918f06cd33fd2725de",
@@ -88,7 +98,7 @@
       "source_tool": "generate_forensic_hash",
       "timestamp": "2026-06-30T15:20:44Z",
       "raw_score": 0.85,
-      "prior_trust": 0.90,
+      "prior_trust": 0.9,
       "provenance_chain": [
         "sha256:4b1c4c3086c4a6ebc1cfd4e61c1269fba7a01d68d4f65963d471a48a34d90211",
         "zip_entry:2/DudeLocker.exe",
@@ -104,7 +114,9 @@
         "archive_date": "2016-11-04",
         "technique_class": "ransomware simulation / file encryption (T1486)",
         "difficulty_estimate": "easy",
-        "mitre_ttps": ["T1486"],
+        "mitre_ttps": [
+          "T1486"
+        ],
         "acquisition_tool": "7z x -pflare + sha256sum",
         "acquisition_hash": "sha256:91fe5ece5b64aff83b9eb0e0ba1b681985d355dcf54864e529570973234e1d1c",
         "acquisition_timestamp": "2026-06-30T15:20:44Z",
@@ -117,8 +129,8 @@
       "evidence_type": "binary",
       "source_tool": "generate_forensic_hash",
       "timestamp": "2026-06-30T15:20:44Z",
-      "raw_score": 0.80,
-      "prior_trust": 0.90,
+      "raw_score": 0.8,
+      "prior_trust": 0.9,
       "provenance_chain": [
         "sha256:4b1c4c3086c4a6ebc1cfd4e61c1269fba7a01d68d4f65963d471a48a34d90211",
         "zip_entry:2/BusinessPapers.doc",
@@ -147,7 +159,7 @@
       "source_tool": "generate_forensic_hash",
       "timestamp": "2026-06-30T15:20:44Z",
       "raw_score": 0.75,
-      "prior_trust": 0.90,
+      "prior_trust": 0.9,
       "provenance_chain": [
         "sha256:4b1c4c3086c4a6ebc1cfd4e61c1269fba7a01d68d4f65963d471a48a34d90211",
         "zip_entry:3/unknown",
@@ -175,8 +187,8 @@
       "evidence_type": "binary",
       "source_tool": "generate_forensic_hash",
       "timestamp": "2026-06-30T15:20:44Z",
-      "raw_score": 0.80,
-      "prior_trust": 0.90,
+      "raw_score": 0.8,
+      "prior_trust": 0.9,
       "provenance_chain": [
         "sha256:4b1c4c3086c4a6ebc1cfd4e61c1269fba7a01d68d4f65963d471a48a34d90211",
         "zip_entry:4/flareon2016challenge.dll",
@@ -192,7 +204,9 @@
         "archive_date": "2016-02-25",
         "technique_class": "DLL analysis / export table reversing (T1055.001)",
         "difficulty_estimate": "medium",
-        "mitre_ttps": ["T1055.001"],
+        "mitre_ttps": [
+          "T1055.001"
+        ],
         "acquisition_tool": "7z x -pflare + sha256sum",
         "acquisition_hash": "sha256:c5740486d8041347341e52abd3acf9481d1026fafca9f89569b7ca4e83c35ec1",
         "acquisition_timestamp": "2026-06-30T15:20:44Z",
@@ -206,7 +220,7 @@
       "source_tool": "generate_forensic_hash",
       "timestamp": "2026-06-30T15:20:44Z",
       "raw_score": 0.75,
-      "prior_trust": 0.90,
+      "prior_trust": 0.9,
       "provenance_chain": [
         "sha256:4b1c4c3086c4a6ebc1cfd4e61c1269fba7a01d68d4f65963d471a48a34d90211",
         "zip_entry:5/smokestack.exe",
@@ -235,7 +249,7 @@
       "source_tool": "generate_forensic_hash",
       "timestamp": "2026-06-30T15:20:44Z",
       "raw_score": 0.85,
-      "prior_trust": 0.90,
+      "prior_trust": 0.9,
       "provenance_chain": [
         "sha256:4b1c4c3086c4a6ebc1cfd4e61c1269fba7a01d68d4f65963d471a48a34d90211",
         "zip_entry:6/khaki.exe",
@@ -251,7 +265,9 @@
         "archive_date": "2016-09-23",
         "technique_class": "polyglot binary / format ambiguity (T1027)",
         "difficulty_estimate": "medium",
-        "mitre_ttps": ["T1027"],
+        "mitre_ttps": [
+          "T1027"
+        ],
         "acquisition_tool": "7z x -pflare + sha256sum",
         "acquisition_hash": "sha256:cb5d3fb5adb0ed220901487f7163bf6661e181771d4915967ffed726a8284b58",
         "acquisition_timestamp": "2026-06-30T15:20:44Z",
@@ -264,8 +280,8 @@
       "evidence_type": "binary",
       "source_tool": "generate_forensic_hash",
       "timestamp": "2026-06-30T15:20:44Z",
-      "raw_score": 0.80,
-      "prior_trust": 0.90,
+      "raw_score": 0.8,
+      "prior_trust": 0.9,
       "provenance_chain": [
         "sha256:4b1c4c3086c4a6ebc1cfd4e61c1269fba7a01d68d4f65963d471a48a34d90211",
         "zip_entry:7/hashes",
@@ -282,7 +298,11 @@
         "technique_class": "Go binary RE / cross-platform / hash cracking",
         "difficulty_estimate": "medium",
         "language": "Go",
-        "key_strings": ["You have hashed the hashes!", "Work on your Hash F00!", "abcdefghijklmnopqrstuvwxyz@-._1234"],
+        "key_strings": [
+          "You have hashed the hashes!",
+          "Work on your Hash F00!",
+          "abcdefghijklmnopqrstuvwxyz@-._1234"
+        ],
         "acquisition_tool": "7z x -pflare + sha256sum",
         "acquisition_hash": "sha256:34c5b6a48c8eda1660cf4530b9f55e697b81bf6d435103bea54de084ec3fdd41",
         "acquisition_timestamp": "2026-06-30T15:20:44Z",
@@ -295,8 +315,8 @@
       "evidence_type": "binary",
       "source_tool": "generate_forensic_hash",
       "timestamp": "2026-06-30T15:20:44Z",
-      "raw_score": 0.80,
-      "prior_trust": 0.90,
+      "raw_score": 0.8,
+      "prior_trust": 0.9,
       "provenance_chain": [
         "sha256:4b1c4c3086c4a6ebc1cfd4e61c1269fba7a01d68d4f65963d471a48a34d90211",
         "zip_entry:8/CHIMERA.EXE",
@@ -325,7 +345,7 @@
       "source_tool": "generate_forensic_hash",
       "timestamp": "2026-06-30T15:20:44Z",
       "raw_score": 0.75,
-      "prior_trust": 0.90,
+      "prior_trust": 0.9,
       "provenance_chain": [
         "sha256:4b1c4c3086c4a6ebc1cfd4e61c1269fba7a01d68d4f65963d471a48a34d90211",
         "zip_entry:9/GUI.exe",
@@ -354,8 +374,8 @@
       "evidence_type": "network_traffic",
       "source_tool": "generate_forensic_hash",
       "timestamp": "2026-06-30T15:20:44Z",
-      "raw_score": 0.90,
-      "prior_trust": 0.90,
+      "raw_score": 0.9,
+      "prior_trust": 0.9,
       "provenance_chain": [
         "sha256:4b1c4c3086c4a6ebc1cfd4e61c1269fba7a01d68d4f65963d471a48a34d90211",
         "zip_entry:10/flava.pcap",
@@ -371,7 +391,9 @@
         "archive_date": "2016-09-10",
         "technique_class": "PCAP forensics / network covert channel (T1071)",
         "difficulty_estimate": "hard (final boss)",
-        "mitre_ttps": ["T1071"],
+        "mitre_ttps": [
+          "T1071"
+        ],
         "pcap_version": "2.4",
         "link_type": "Ethernet",
         "snaplen": 262144,
@@ -390,5 +412,205 @@
     "DudeLocker.exe encryption algorithm not fully reversed. Paired with BusinessPapers.doc but decryption key was not extracted in this analysis."
   ],
   "source_dataset": "FLARE-On 3 CTF — FireEye FLARE Team (2016)",
-  "source_origin": "public_ctf_archive"
+  "source_origin": "public_ctf_archive",
+  "signals": [
+    {
+      "artifact_id": "flareon3-zip-001",
+      "confidence": {
+        "__fraction__": true,
+        "den": 100,
+        "num": 99
+      },
+      "description": "Outer zip archive Flare-On3_Challenges.zip. SHA-256 verified against task specification. Size: 21,103,076 bytes. AES-256 encrypted (PK compat v5.1), password: 'flare'. Contains 11 files in 10 folders ",
+      "evidence_type": "file_hash",
+      "source": "generate_forensic_hash",
+      "z_score": {
+        "__fraction__": true,
+        "den": 2000,
+        "num": 1881
+      }
+    },
+    {
+      "artifact_id": "flareon3-ch1-challenge1",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 9
+      },
+      "description": "Challenge 01 — challenge1.exe (79,360 bytes). PE32 console Intel 80386, 6 sections. Password-check crackme. Key strings: 'Enter password:', 'Wrong password', 'Correct!'. Contains ROT/Caesar-shifted al",
+      "evidence_type": "binary",
+      "source": "generate_forensic_hash",
+      "z_score": {
+        "__fraction__": true,
+        "den": 40,
+        "num": 27
+      }
+    },
+    {
+      "artifact_id": "flareon3-ch2-dudelocker",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 9
+      },
+      "description": "Challenge 02a — DudeLocker.exe (142,336 bytes). PE32 console Intel 80386, 4 sections. Simulated ransomware: encrypts 'BusinessPapers.doc'. Name is a parody of the Locky ransomware family. Technique cl",
+      "evidence_type": "binary",
+      "source": "generate_forensic_hash",
+      "z_score": {
+        "__fraction__": true,
+        "den": 200,
+        "num": 153
+      }
+    },
+    {
+      "artifact_id": "flareon3-ch2-businesspapers",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 9
+      },
+      "description": "Challenge 02b — BusinessPapers.doc (232,560 bytes). Identified as 'data' (encrypted/obfuscated) by file(1), not a valid OLE/OOXML document. Paired with DudeLocker.exe — this is the encrypted target fi",
+      "evidence_type": "binary",
+      "source": "generate_forensic_hash",
+      "z_score": {
+        "__fraction__": true,
+        "den": 25,
+        "num": 18
+      }
+    },
+    {
+      "artifact_id": "flareon3-ch3-unknown",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 9
+      },
+      "description": "Challenge 03 — unknown (91,136 bytes). PE32 console Intel 80386, 4 sections. Filename 'unknown' is a deliberate obfuscation of the challenge type. Technique class: unknown binary / packed PE / anti-an",
+      "evidence_type": "binary",
+      "source": "generate_forensic_hash",
+      "z_score": {
+        "__fraction__": true,
+        "den": 40,
+        "num": 27
+      }
+    },
+    {
+      "artifact_id": "flareon3-ch4-flareon2016dll",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 9
+      },
+      "description": "Challenge 04 — flareon2016challenge.dll (30,720 bytes). PE32 DLL (GUI) Intel 80386, 5 sections. DLL challenge requires loading and calling exports to extract the flag. Technique class: DLL analysis / ",
+      "evidence_type": "binary",
+      "source": "generate_forensic_hash",
+      "z_score": {
+        "__fraction__": true,
+        "den": 25,
+        "num": 18
+      }
+    },
+    {
+      "artifact_id": "flareon3-ch5-smokestack",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 9
+      },
+      "description": "Challenge 05 — smokestack.exe (51,200 bytes). PE32 console Intel 80386, 3 sections. Name suggests stack-based obfuscation or custom stack-machine interpreter. Technique class: stack machine / obfuscat",
+      "evidence_type": "binary",
+      "source": "generate_forensic_hash",
+      "z_score": {
+        "__fraction__": true,
+        "den": 40,
+        "num": 27
+      }
+    },
+    {
+      "artifact_id": "flareon3-ch6-khaki",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 9
+      },
+      "description": "Challenge 06 — khaki.exe (3,816,918 bytes). Identified by file(1) as 'Zip archive, with extra data prepended' — a classic polyglot binary where a PE/data header precedes a valid Zip archive. Technique",
+      "evidence_type": "binary",
+      "source": "generate_forensic_hash",
+      "z_score": {
+        "__fraction__": true,
+        "den": 200,
+        "num": 153
+      }
+    },
+    {
+      "artifact_id": "flareon3-ch7-hashes",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 9
+      },
+      "description": "Challenge 07 — hashes (27,188 bytes). ELF 32-bit LSB executable, Intel 80386, dynamically linked, stripped. Compiled with Go runtime (identified via internal type hash symbols: '__go_type_hash_*'). Ke",
+      "evidence_type": "binary",
+      "source": "generate_forensic_hash",
+      "z_score": {
+        "__fraction__": true,
+        "den": 25,
+        "num": 18
+      }
+    },
+    {
+      "artifact_id": "flareon3-ch8-chimera",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 9
+      },
+      "description": "Challenge 08 — CHIMERA.EXE (2,560 bytes). PE32 console Intel 80386, 2 sections. Extremely small PE (2.5 KB) — near-minimal valid PE format. Name 'CHIMERA' suggests a multi-format hybrid or anti-analys",
+      "evidence_type": "binary",
+      "source": "generate_forensic_hash",
+      "z_score": {
+        "__fraction__": true,
+        "den": 25,
+        "num": 18
+      }
+    },
+    {
+      "artifact_id": "flareon3-ch9-gui",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 9
+      },
+      "description": "Challenge 09 — GUI.exe (630,784 bytes). PE32 GUI Intel 80386 Mono/.NET assembly, 3 sections. .NET/Mono assembly with Windows GUI. .NET RE requires IL disassembly (dnSpy/ilspy). Technique class: .NET a",
+      "evidence_type": "binary",
+      "source": "generate_forensic_hash",
+      "z_score": {
+        "__fraction__": true,
+        "den": 40,
+        "num": 27
+      }
+    },
+    {
+      "artifact_id": "flareon3-ch10-flava-pcap",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 9
+      },
+      "description": "Challenge 10 — flava.pcap (22,263,502 bytes). libpcap v2.4 Ethernet capture (little-endian, microsecond timestamps, snaplen 262144). Largest challenge at 22 MB. Name 'flava' (flavor) suggests a networ",
+      "evidence_type": "network_traffic",
+      "source": "generate_forensic_hash",
+      "z_score": {
+        "__fraction__": true,
+        "den": 100,
+        "num": 81
+      }
+    }
+  ],
+  "_migration_note": {
+    "date": "2026-07-06",
+    "source": "results/agent_batch/VIGIA-FLAREON-3_agent_bundle.json",
+    "method": "señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canónica preservada",
+    "n_signals": 12
+  }
 }

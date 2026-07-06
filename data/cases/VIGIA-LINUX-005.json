@@ -14,7 +14,7 @@
       "source_tool": "sift_file_integrity",
       "timestamp": "2024-09-10T14:00:00Z",
       "raw_score": 0.62,
-      "prior_trust": 0.80,
+      "prior_trust": 0.8,
       "provenance_chain": [
         "sha256:linux005_cron_binary_disk"
       ],
@@ -143,5 +143,77 @@
     "source_file": "VIGIA-LINUX-CORPUS.json",
     "source_origin": "synthetic_vigia_collective",
     "corpus_tag": "POST-HACKATHON"
+  },
+  "signals": [
+    {
+      "artifact_id": "linux005_01",
+      "confidence": {
+        "__fraction__": true,
+        "den": 5,
+        "num": 4
+      },
+      "description": "Binary named 'cron' found at /opt/services/cron on a production web server. File entropy 7.4/8.0 (high, consistent with packing or compression). File size 1.8MB. UPX packing detected. Not registered i",
+      "evidence_type": "file_metadata",
+      "source": "sift_file_integrity",
+      "z_score": {
+        "__fraction__": true,
+        "den": 125,
+        "num": 62
+      }
+    },
+    {
+      "artifact_id": "linux005_02",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 17
+      },
+      "description": "Process listing shows /opt/services/cron running as user 'deploy' (UID 1001, non-root) with parent process /usr/bin/supervisord. The process has been running since system boot (uptime 14 days). CPU ut",
+      "evidence_type": "log_entry",
+      "source": "sift_linux_forensics",
+      "z_score": {
+        "__fraction__": true,
+        "den": 400,
+        "num": 119
+      }
+    },
+    {
+      "artifact_id": "linux005_03",
+      "confidence": {
+        "__fraction__": true,
+        "den": 4,
+        "num": 3
+      },
+      "description": "Deployment records show that the 'deploy' user account deployed a custom task scheduler on 2024-09-10 at 02:15 UTC via an Ansible playbook. The playbook references a custom Go binary named 'cron' buil",
+      "evidence_type": "osint",
+      "source": "sift_osint",
+      "z_score": {
+        "__fraction__": true,
+        "den": 16,
+        "num": 3
+      }
+    },
+    {
+      "artifact_id": "linux005_04",
+      "confidence": {
+        "__fraction__": true,
+        "den": 50,
+        "num": 41
+      },
+      "description": "Static analysis of the unpacked binary reveals: Go runtime metadata confirms compilation with Go 1.22. Import table references standard library packages only (net/http, time, os, encoding/json). No sy",
+      "evidence_type": "malware_static_analysis",
+      "source": "sift_static_analysis",
+      "z_score": {
+        "__fraction__": true,
+        "den": 2500,
+        "num": 369
+      }
+    }
+  ],
+  "_migration_note": {
+    "date": "2026-07-06",
+    "source": "results/agent_batch/VIGIA-LINUX-005_agent_bundle.json",
+    "method": "señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canónica preservada",
+    "n_signals": 4
   }
 }

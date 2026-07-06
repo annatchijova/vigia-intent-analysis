@@ -97,5 +97,77 @@
     "secondness": "Noisy tool contradicts the presence of a sophisticated kernel rootkit installed 2 minutes earlier.",
     "thirdness": "Habit of using low-sophistication decoys so the analyst closes the ticket as a script-kiddie case and does not dig deeper."
   },
-  "notes": "The noisy tool is the decoy. The silent one is the real attack."
+  "notes": "The noisy tool is the decoy. The silent one is the real attack.",
+  "signals": [
+    {
+      "artifact_id": "a090_01",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 7
+      },
+      "description": "psexec.exe binary version 1.94 (known hash, signed 2014) detected in C:\\Temp. Noisy tool detectable by any modern EDR.",
+      "evidence_type": "file_hash",
+      "source": "sift_file_audit",
+      "z_score": {
+        "__fraction__": true,
+        "den": 400,
+        "num": 91
+      }
+    },
+    {
+      "artifact_id": "a090_02",
+      "confidence": {
+        "__fraction__": true,
+        "den": 2,
+        "num": 1
+      },
+      "description": "EDR generated 12 'Obsolete remote administration tool' alerts. Marked as FP by Tier-1 analyst.",
+      "evidence_type": "cultural_marker",
+      "source": "sift_edr",
+      "z_score": {
+        "__fraction__": true,
+        "den": 200,
+        "num": 91
+      }
+    },
+    {
+      "artifact_id": "a090_03",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 19
+      },
+      "description": "Unsigned kernel driver loaded 2 minutes BEFORE psexec. 12 SSDT hooks. Requires advanced C++ and Ring-0 knowledge.",
+      "evidence_type": "memory_process",
+      "source": "sift_volatility",
+      "z_score": {
+        "__fraction__": true,
+        "den": 400,
+        "num": 19
+      }
+    },
+    {
+      "artifact_id": "a090_04",
+      "confidence": {
+        "__fraction__": true,
+        "den": 2,
+        "num": 1
+      },
+      "description": "Encrypted C2 traffic on port 8443 initiated 1 minute before the psexec noise. Firewall reports 0 bytes for this port.",
+      "evidence_type": "dns_record",
+      "source": "sift_pcap",
+      "z_score": {
+        "__fraction__": true,
+        "den": 100,
+        "num": 41
+      }
+    }
+  ],
+  "_migration_note": {
+    "date": "2026-07-06",
+    "source": "results/agent_batch/VIGIA-CAN-008_agent_bundle.json",
+    "method": "señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canónica preservada",
+    "n_signals": 4
+  }
 }

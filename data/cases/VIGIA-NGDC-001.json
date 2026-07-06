@@ -1,218 +1,338 @@
 {
-    "case_id": "VIGIA-NGDC-001",
-    "case_name": "National Gallery DC 2012 — Carry (Operational Identity + Physical Infiltration + Covert Channel)",
-    "schema_version": "1.1",
-    "description": "Carry is a Krasnovian supporter recruited by Alex (alex.jfam11@gmail.com) to orchestrate the defacement of foreign art at the National Gallery DC. Evidence extracted empirically from carry-tablet-2012-07-16-final.E01 (Digital Corpora / USNA + West Point 2012) using ewfmount + Sleuth Kit + SQLite. The tablet was purchased specifically for this operation. Carry constructed three separate identities on the same day (2012-06-07), established a covert channel with Alex via steganographic video attachment, coordinated seven Krasnovian operatives via @m57.biz, and socially engineered a gallery employee (Tracy) to smuggle the tablet inside and provide security shift schedules in exchange for cash.",
-    "abstention_risk": "low",
-    "expected_verdict": "MALICE",
-    "carnegie_pattern_expected": "INFLUENCE_VIA_PRETEXT",
-    "confidence_expected": 97,
-    "source_dataset": "Digital Corpora — 2012 National Gallery DC Scenario (USNA / West Point). Empirical extraction: ewfmount 20140814 + Sleuth Kit (mmls, fls, icat) + SQLite3 on carry-tablet-2012-07-16-final.E01",
-    "devil_advocate": "Carry is a socially active Krasnovian-American who legitimately wanted to organize a flash mob at the National Gallery and used a newly purchased tablet for the event. The multiple email accounts may reflect personal privacy preferences rather than operational cover. Contact with @m57.biz addresses could be spam or mailing list traffic.",
-    "expected_mitre_ttps": [
-        "T1585.002",
-        "T1586.002",
-        "T1001",
-        "T1001.002",
-        "T1204.002",
-        "T1078.003",
-        "T1070.004",
-        "T1560"
-    ],
-    "peirce_expected": {
-        "firstness": "Three separate operational identities (carrysum2012@yahoo.com, cat2welve@gmail.com, Skype carry.sums) created within 24 hours on 2012-06-07. High-entropy binary data (7.66/8.0) embedded in wpa_supplicant.conf. Twenty-plus email bodies deleted from Android cache prior to device seizure.",
-        "secondness": "Alex recruits Carry via steganographic video attachment on Dropbox (2012-07-05). Seven Krasnovian operatives (@m57.biz) confirm availability in 10-minute intervals the same day. Carry socially engineers Tracy using her documented financial distress as leverage, physically smuggles the tablet into the gallery, and pays for security shift schedules.",
-        "thirdness": "The 28-day gap between identity construction (2012-06-07) and operational activation (2012-07-05) indicates deliberate preparation, not opportunistic behavior. The convergence of covert storage, deleted communications, operational identity compartmentalization, insider recruitment, and physical site reconnaissance constitutes a coordinated intelligence operation targeting a public institution."
+  "case_id": "VIGIA-NGDC-001",
+  "case_name": "National Gallery DC 2012 — Carry (Operational Identity + Physical Infiltration + Covert Channel)",
+  "schema_version": "1.1",
+  "description": "Carry is a Krasnovian supporter recruited by Alex (alex.jfam11@gmail.com) to orchestrate the defacement of foreign art at the National Gallery DC. Evidence extracted empirically from carry-tablet-2012-07-16-final.E01 (Digital Corpora / USNA + West Point 2012) using ewfmount + Sleuth Kit + SQLite. The tablet was purchased specifically for this operation. Carry constructed three separate identities on the same day (2012-06-07), established a covert channel with Alex via steganographic video attachment, coordinated seven Krasnovian operatives via @m57.biz, and socially engineered a gallery employee (Tracy) to smuggle the tablet inside and provide security shift schedules in exchange for cash.",
+  "abstention_risk": "low",
+  "expected_verdict": "MALICE",
+  "carnegie_pattern_expected": "INFLUENCE_VIA_PRETEXT",
+  "confidence_expected": 97,
+  "source_dataset": "Digital Corpora — 2012 National Gallery DC Scenario (USNA / West Point). Empirical extraction: ewfmount 20140814 + Sleuth Kit (mmls, fls, icat) + SQLite3 on carry-tablet-2012-07-16-final.E01",
+  "devil_advocate": "Carry is a socially active Krasnovian-American who legitimately wanted to organize a flash mob at the National Gallery and used a newly purchased tablet for the event. The multiple email accounts may reflect personal privacy preferences rather than operational cover. Contact with @m57.biz addresses could be spam or mailing list traffic.",
+  "expected_mitre_ttps": [
+    "T1585.002",
+    "T1586.002",
+    "T1001",
+    "T1001.002",
+    "T1204.002",
+    "T1078.003",
+    "T1070.004",
+    "T1560"
+  ],
+  "peirce_expected": {
+    "firstness": "Three separate operational identities (carrysum2012@yahoo.com, cat2welve@gmail.com, Skype carry.sums) created within 24 hours on 2012-06-07. High-entropy binary data (7.66/8.0) embedded in wpa_supplicant.conf. Twenty-plus email bodies deleted from Android cache prior to device seizure.",
+    "secondness": "Alex recruits Carry via steganographic video attachment on Dropbox (2012-07-05). Seven Krasnovian operatives (@m57.biz) confirm availability in 10-minute intervals the same day. Carry socially engineers Tracy using her documented financial distress as leverage, physically smuggles the tablet into the gallery, and pays for security shift schedules.",
+    "thirdness": "The 28-day gap between identity construction (2012-06-07) and operational activation (2012-07-05) indicates deliberate preparation, not opportunistic behavior. The convergence of covert storage, deleted communications, operational identity compartmentalization, insider recruitment, and physical site reconnaissance constitutes a coordinated intelligence operation targeting a public institution."
+  },
+  "artifacts": [
+    {
+      "artifact_id": "ngdc001_01",
+      "evidence_type": "email_account_creation",
+      "source_tool": "sqlite3 — EmailProvider.db extracted via icat from carry-tablet-2012-07-16-final.E01 offset 3278848 inode 1474506",
+      "timestamp": "2012-06-07T18:10:48Z",
+      "raw_score": 0.95,
+      "prior_trust": 0.95,
+      "provenance_chain": [
+        "carry-tablet-2012-07-16-final.E01",
+        "ewfmount offset 3278848 (userdata partition)",
+        "inode 1474506 EmailProvider.db",
+        "inode 1474510 EmailProviderBody.db"
+      ],
+      "description": "Three operational identities created within 24 hours on 2012-06-07: carrysum2012@yahoo.com (IMAP/SMTP confirmed in HostAuth table), cat2welve@gmail.com (Google verification email received 18:10:48 UTC), and Skype account carry.sums (welcome email 19:19:28 UTC, config recovered from inode 1474911 with account tag <Default>carry.sums</Default>). No prior account activity predates this date in the recovered database. Simultaneous creation of three compartmentalized communication channels on a newly purchased device is inconsistent with routine personal use.",
+      "metadata": {
+        "acquisition_tool": "ewfmount 20140814 + icat (Sleuth Kit) + sqlite3",
+        "acquisition_hash": "carry-tablet-2012-07-16-final.E01",
+        "acquisition_timestamp": "2012-07-16T00:00:00Z",
+        "write_blocker_used": true,
+        "examiner_id": "VIGIA-NGDC forensic pipeline",
+        "accounts_created": [
+          "carrysum2012@yahoo.com",
+          "cat2welve@gmail.com",
+          "carry.sums (Skype)"
+        ],
+        "creation_window_minutes": 69
+      }
     },
-    "artifacts": [
-        {
-            "artifact_id": "ngdc001_01",
-            "evidence_type": "email_account_creation",
-            "source_tool": "sqlite3 — EmailProvider.db extracted via icat from carry-tablet-2012-07-16-final.E01 offset 3278848 inode 1474506",
-            "timestamp": "2012-06-07T18:10:48Z",
-            "raw_score": 0.95,
-            "prior_trust": 0.95,
-            "provenance_chain": [
-                "carry-tablet-2012-07-16-final.E01",
-                "ewfmount offset 3278848 (userdata partition)",
-                "inode 1474506 EmailProvider.db",
-                "inode 1474510 EmailProviderBody.db"
-            ],
-            "description": "Three operational identities created within 24 hours on 2012-06-07: carrysum2012@yahoo.com (IMAP/SMTP confirmed in HostAuth table), cat2welve@gmail.com (Google verification email received 18:10:48 UTC), and Skype account carry.sums (welcome email 19:19:28 UTC, config recovered from inode 1474911 with account tag <Default>carry.sums</Default>). No prior account activity predates this date in the recovered database. Simultaneous creation of three compartmentalized communication channels on a newly purchased device is inconsistent with routine personal use.",
-            "metadata": {
-                "acquisition_tool": "ewfmount 20140814 + icat (Sleuth Kit) + sqlite3",
-                "acquisition_hash": "carry-tablet-2012-07-16-final.E01",
-                "acquisition_timestamp": "2012-07-16T00:00:00Z",
-                "write_blocker_used": true,
-                "examiner_id": "VIGIA-NGDC forensic pipeline",
-                "accounts_created": [
-                    "carrysum2012@yahoo.com",
-                    "cat2welve@gmail.com",
-                    "carry.sums (Skype)"
-                ],
-                "creation_window_minutes": 69
-            }
-        },
-        {
-            "artifact_id": "ngdc001_02",
-            "evidence_type": "email_content",
-            "source_tool": "sqlite3 — EmailProviderBody.db messageKey=12",
-            "timestamp": "2012-07-05T13:30:19Z",
-            "raw_score": 0.97,
-            "prior_trust": 0.95,
-            "provenance_chain": [
-                "carry-tablet-2012-07-16-final.E01",
-                "inode 1474510 EmailProviderBody.db",
-                "Message._id=12 fromList=alex.jfam11@gmail.com subject=Video"
-            ],
-            "description": "Alex (alex.jfam11@gmail.com) sends recruitment email to Carry (carrysum2012@yahoo.com) with subject 'Video'. Body text: 'I have some business in the states in the near future that I think you would be perfect for.' Attachment is a Dropbox link to 'funny video.mp4' — consistent with steganographic delivery vector. The framing as a family communication ('Greetings Niece', 'Uncle Alex') provides social cover for the operational contact. Dropbox URL: https://www.dropbox.com/s/8cjhpq2dq70ozzq/funny%20video.mp4",
-            "metadata": {
-                "acquisition_tool": "sqlite3 on extracted EmailProviderBody.db",
-                "from": "alex.jfam11@gmail.com",
-                "to": "carrysum2012@yahoo.com",
-                "subject": "Video",
-                "delivery_vector": "Dropbox steganographic attachment (funny video.mp4)",
-                "social_cover": "family communication (uncle/niece framing)"
-            }
-        },
-        {
-            "artifact_id": "ngdc001_03",
-            "evidence_type": "network_communication_pattern",
-            "source_tool": "sqlite3 — EmailProvider.db Message table",
-            "timestamp": "2012-07-05T17:35:34Z",
-            "raw_score": 0.91,
-            "prior_trust": 0.90,
-            "provenance_chain": [
-                "carry-tablet-2012-07-16-final.E01",
-                "inode 1474506 EmailProvider.db",
-                "Message table — fromList LIKE '%m57.biz%'"
-            ],
-            "description": "Seven distinct @m57.biz addresses send emails to carrysum2012@yahoo.com with subject 'Busy' in 10-to-20-minute intervals between 17:35 and 18:40 on 2012-07-05, the same day Alex initiates contact. Operatives: Untshat.Torak, Awen.Throsam (x2), Ormoso.Angit, Tonser.Atene, Skelak.Dedan, Phasul.Umfny, Deljenth.Ityth. The uniform subject line 'Busy' across seven senders in rapid succession is consistent with availability confirmation from a coordinated team using a pre-agreed code word, not organic correspondence.",
-            "metadata": {
-                "acquisition_tool": "sqlite3 on extracted EmailProvider.db",
-                "operatives": [
-                    "Untshat.Torak@m57.biz",
-                    "Awen.Throsam@m57.biz",
-                    "Ormoso.Angit@m57.biz",
-                    "Tonser.Atene@m57.biz",
-                    "Skelak.Dedan@m57.biz",
-                    "Phasul.Umfny@m57.biz",
-                    "Deljenth.Ityth@m57.biz"
-                ],
-                "interval_minutes": "10-20",
-                "uniform_subject": "Busy",
-                "pattern": "availability_confirmation"
-            }
-        },
-        {
-            "artifact_id": "ngdc001_04",
-            "evidence_type": "email_content",
-            "source_tool": "sqlite3 — EmailProviderBody.db messageKeys 16,22,23,24,25,26,27",
-            "timestamp": "2012-07-05T18:00:01Z",
-            "raw_score": 0.96,
-            "prior_trust": 0.94,
-            "provenance_chain": [
-                "carry-tablet-2012-07-16-final.E01",
-                "inode 1474510 EmailProviderBody.db",
-                "Message._id IN (16,22,23,24,25,26,27)"
-            ],
-            "description": "Seven-email chain between Carry and Tracy (tracysumtwelve@gmail.com) spanning 2012-07-05 to 2012-07-12 documents a complete social engineering and insider recruitment operation. Carry exploits Tracy's documented financial distress ('I saw on Facebook you were having a hard time') as initial pretext (Jul 5). After establishing rapport via lunch, Carry requests tablet smuggling into the gallery under flash mob cover (Jul 9). Tracy agrees and provides gallery access (Jul 10). Carry then requests security shift schedules in exchange for cash — 'I have a pretty good budget for the event if you would like a little something for the info' (Jul 11). Tracy explicitly acknowledges the risk: 'you need to make sure no one else sees it okay I could get in a bunch of trouble... I could really use some extra cash too.' Operational security lapse: Carry sends 'It willbe gun' (intended: 'fun') on Jul 11 — Tracy notices and asks 'What do you mean by that?' Carry deflects. Final message from Tracy: 'Ok.' on Jul 12 from iPhone — four days before tablet seizure.",
-            "metadata": {
-                "acquisition_tool": "sqlite3 on extracted EmailProviderBody.db",
-                "social_engineering_stages": [
-                    "emotional_exploitation_pretext",
-                    "rapport_building_lunch",
-                    "physical_access_request_flash_mob_cover",
-                    "security_intelligence_purchase",
-                    "opsec_lapse_gun_typo"
-                ],
-                "bribery_offer": true,
-                "insider_confirmed": "tracysumtwelve@gmail.com",
-                "opsec_lapse_date": "2012-07-11",
-                "final_confirmation_date": "2012-07-12"
-            }
-        },
-        {
-            "artifact_id": "ngdc001_05",
-            "evidence_type": "file_metadata",
-            "source_tool": "fls + icat (Sleuth Kit) — wpa_supplicant.conf inode 1031957",
-            "timestamp": "2012-07-16T00:00:00Z",
-            "raw_score": 0.93,
-            "prior_trust": 0.90,
-            "provenance_chain": [
-                "carry-tablet-2012-07-16-final.E01",
-                "ewfmount offset 3278848 (userdata partition)",
-                "misc/wifi/wpa_supplicant.conf inode 1031957"
-            ],
-            "description": "File misc/wifi/wpa_supplicant.conf recovered from userdata partition reports Shannon entropy of 7.66/8.0 — anomalously high for a WiFi configuration file (typical wpa_supplicant.conf entropy: 3.5-4.5). The file is flagged as binary by grep, inconsistent with the plain-text XML/INI format of legitimate wpa_supplicant configuration files. This is consistent with encrypted data or a compressed payload embedded within a system configuration file to evade casual inspection. The technique constitutes tool subversion and covert storage.",
-            "metadata": {
-                "acquisition_tool": "icat (Sleuth Kit) — entropy detection via ewfmount pipeline",
-                "file_path": "misc/wifi/wpa_supplicant.conf",
-                "inode": 1031957,
-                "measured_entropy": 7.66,
-                "expected_entropy_range": "3.5-4.5",
-                "anomaly": "COVERT_STORAGE_HIGH_ENTROPY",
-                "legitimate_format": "plain-text INI/XML"
-            }
-        },
-        {
-            "artifact_id": "ngdc001_06",
-            "evidence_type": "deleted_file_recovery",
-            "source_tool": "fls (Sleuth Kit) — data/com.android.email/cache/ realloc inodes",
-            "timestamp": "2012-07-16T00:00:00Z",
-            "raw_score": 0.88,
-            "prior_trust": 0.87,
-            "provenance_chain": [
-                "carry-tablet-2012-07-16-final.E01",
-                "ewfmount offset 3278848 (userdata partition)",
-                "data/com.android.email/cache/ — 20 realloc inodes"
-            ],
-            "description": "Twenty-plus email body cache files deleted from data/com.android.email/cache/ prior to device seizure, recovered as (realloc) entries by Sleuth Kit fls. Inodes include 1474911, 1475098-1475103, 1475105-1475107, 1475110-1475111, 1475184-1475191. The systematic deletion of email body cache files while the EmailProvider.db message index was retained indicates deliberate anti-forensic action — Carry attempted to destroy email content while the metadata (sender, recipient, subject, timestamp) survived in the database. The volume and pattern of deletion is inconsistent with routine cache management.",
-            "metadata": {
-                "acquisition_tool": "fls -r -p (Sleuth Kit)",
-                "deleted_file_count": 20,
-                "recovery_method": "realloc inode enumeration",
-                "anti_forensic_pattern": "content_deletion_with_metadata_retention",
-                "surviving_database": "EmailProvider.db (inode 1474506)"
-            }
-        },
-        {
-            "artifact_id": "ngdc001_07",
-            "evidence_type": "device_acquisition_timeline",
-            "source_tool": "Digital Corpora scenario metadata + EmailProvider.db HostAuth",
-            "timestamp": "2012-06-07T00:00:00Z",
-            "raw_score": 0.92,
-            "prior_trust": 0.93,
-            "provenance_chain": [
-                "carry-tablet-2012-07-16-final.E01",
-                "inode 1474506 EmailProvider.db HostAuth table",
-                "Digital Corpora scenario documentation"
-            ],
-            "description": "The tablet (ASUS TF101, Android 4.0.3 IML74K, build US_epad-9.2.1.24-20120503) was purchased and activated on 2012-06-07 — the same date all operational accounts were created. The device was dedicated exclusively to this operation: no personal accounts, no prior usage history predating the operation. HostAuth confirms carrysum2012@yahoo.com as the sole configured email account. The device was seized on 2012-07-16, 39 days after activation. The operational lifespan of 39 days with no personal use is consistent with a purpose-built operational device, not a personal tablet.",
-            "metadata": {
-                "acquisition_tool": "ewfmount + sqlite3",
-                "device_model": "ASUS TF101 (Eee Pad Transformer)",
-                "android_version": "4.0.3 IML74K",
-                "build": "US_epad-9.2.1.24-20120503",
-                "activation_date": "2012-06-07",
-                "seizure_date": "2012-07-16",
-                "operational_lifespan_days": 39,
-                "personal_accounts": 0,
-                "operational_accounts": 3
-            }
-        }
-    ],
-    "fractures": [
-        "IDENTITY_CONSTRUCTION_OPERATION",
-        "COVERT_CHANNEL_ESTABLISHED",
-        "TOOL_SUBVERSION",
-        "COVERT_STORAGE",
-        "SOCIAL_ENGINEERING_PRETEXT",
-        "INSIDER_THREAT_ACTIVE",
-        "SECURITY_RECONNAISSANCE",
-        "BRIBERY",
-        "ANTI_FORENSIC_ACTION",
-        "OPERATIONAL_SECURITY_LAPSE",
-        "PHYSICAL_INFILTRATION_PREPARATION"
-    ]
+    {
+      "artifact_id": "ngdc001_02",
+      "evidence_type": "email_content",
+      "source_tool": "sqlite3 — EmailProviderBody.db messageKey=12",
+      "timestamp": "2012-07-05T13:30:19Z",
+      "raw_score": 0.97,
+      "prior_trust": 0.95,
+      "provenance_chain": [
+        "carry-tablet-2012-07-16-final.E01",
+        "inode 1474510 EmailProviderBody.db",
+        "Message._id=12 fromList=alex.jfam11@gmail.com subject=Video"
+      ],
+      "description": "Alex (alex.jfam11@gmail.com) sends recruitment email to Carry (carrysum2012@yahoo.com) with subject 'Video'. Body text: 'I have some business in the states in the near future that I think you would be perfect for.' Attachment is a Dropbox link to 'funny video.mp4' — consistent with steganographic delivery vector. The framing as a family communication ('Greetings Niece', 'Uncle Alex') provides social cover for the operational contact. Dropbox URL: https://www.dropbox.com/s/8cjhpq2dq70ozzq/funny%20video.mp4",
+      "metadata": {
+        "acquisition_tool": "sqlite3 on extracted EmailProviderBody.db",
+        "from": "alex.jfam11@gmail.com",
+        "to": "carrysum2012@yahoo.com",
+        "subject": "Video",
+        "delivery_vector": "Dropbox steganographic attachment (funny video.mp4)",
+        "social_cover": "family communication (uncle/niece framing)"
+      }
+    },
+    {
+      "artifact_id": "ngdc001_03",
+      "evidence_type": "network_communication_pattern",
+      "source_tool": "sqlite3 — EmailProvider.db Message table",
+      "timestamp": "2012-07-05T17:35:34Z",
+      "raw_score": 0.91,
+      "prior_trust": 0.9,
+      "provenance_chain": [
+        "carry-tablet-2012-07-16-final.E01",
+        "inode 1474506 EmailProvider.db",
+        "Message table — fromList LIKE '%m57.biz%'"
+      ],
+      "description": "Seven distinct @m57.biz addresses send emails to carrysum2012@yahoo.com with subject 'Busy' in 10-to-20-minute intervals between 17:35 and 18:40 on 2012-07-05, the same day Alex initiates contact. Operatives: Untshat.Torak, Awen.Throsam (x2), Ormoso.Angit, Tonser.Atene, Skelak.Dedan, Phasul.Umfny, Deljenth.Ityth. The uniform subject line 'Busy' across seven senders in rapid succession is consistent with availability confirmation from a coordinated team using a pre-agreed code word, not organic correspondence.",
+      "metadata": {
+        "acquisition_tool": "sqlite3 on extracted EmailProvider.db",
+        "operatives": [
+          "Untshat.Torak@m57.biz",
+          "Awen.Throsam@m57.biz",
+          "Ormoso.Angit@m57.biz",
+          "Tonser.Atene@m57.biz",
+          "Skelak.Dedan@m57.biz",
+          "Phasul.Umfny@m57.biz",
+          "Deljenth.Ityth@m57.biz"
+        ],
+        "interval_minutes": "10-20",
+        "uniform_subject": "Busy",
+        "pattern": "availability_confirmation"
+      }
+    },
+    {
+      "artifact_id": "ngdc001_04",
+      "evidence_type": "email_content",
+      "source_tool": "sqlite3 — EmailProviderBody.db messageKeys 16,22,23,24,25,26,27",
+      "timestamp": "2012-07-05T18:00:01Z",
+      "raw_score": 0.96,
+      "prior_trust": 0.94,
+      "provenance_chain": [
+        "carry-tablet-2012-07-16-final.E01",
+        "inode 1474510 EmailProviderBody.db",
+        "Message._id IN (16,22,23,24,25,26,27)"
+      ],
+      "description": "Seven-email chain between Carry and Tracy (tracysumtwelve@gmail.com) spanning 2012-07-05 to 2012-07-12 documents a complete social engineering and insider recruitment operation. Carry exploits Tracy's documented financial distress ('I saw on Facebook you were having a hard time') as initial pretext (Jul 5). After establishing rapport via lunch, Carry requests tablet smuggling into the gallery under flash mob cover (Jul 9). Tracy agrees and provides gallery access (Jul 10). Carry then requests security shift schedules in exchange for cash — 'I have a pretty good budget for the event if you would like a little something for the info' (Jul 11). Tracy explicitly acknowledges the risk: 'you need to make sure no one else sees it okay I could get in a bunch of trouble... I could really use some extra cash too.' Operational security lapse: Carry sends 'It willbe gun' (intended: 'fun') on Jul 11 — Tracy notices and asks 'What do you mean by that?' Carry deflects. Final message from Tracy: 'Ok.' on Jul 12 from iPhone — four days before tablet seizure.",
+      "metadata": {
+        "acquisition_tool": "sqlite3 on extracted EmailProviderBody.db",
+        "social_engineering_stages": [
+          "emotional_exploitation_pretext",
+          "rapport_building_lunch",
+          "physical_access_request_flash_mob_cover",
+          "security_intelligence_purchase",
+          "opsec_lapse_gun_typo"
+        ],
+        "bribery_offer": true,
+        "insider_confirmed": "tracysumtwelve@gmail.com",
+        "opsec_lapse_date": "2012-07-11",
+        "final_confirmation_date": "2012-07-12"
+      }
+    },
+    {
+      "artifact_id": "ngdc001_05",
+      "evidence_type": "file_metadata",
+      "source_tool": "fls + icat (Sleuth Kit) — wpa_supplicant.conf inode 1031957",
+      "timestamp": "2012-07-16T00:00:00Z",
+      "raw_score": 0.93,
+      "prior_trust": 0.9,
+      "provenance_chain": [
+        "carry-tablet-2012-07-16-final.E01",
+        "ewfmount offset 3278848 (userdata partition)",
+        "misc/wifi/wpa_supplicant.conf inode 1031957"
+      ],
+      "description": "File misc/wifi/wpa_supplicant.conf recovered from userdata partition reports Shannon entropy of 7.66/8.0 — anomalously high for a WiFi configuration file (typical wpa_supplicant.conf entropy: 3.5-4.5). The file is flagged as binary by grep, inconsistent with the plain-text XML/INI format of legitimate wpa_supplicant configuration files. This is consistent with encrypted data or a compressed payload embedded within a system configuration file to evade casual inspection. The technique constitutes tool subversion and covert storage.",
+      "metadata": {
+        "acquisition_tool": "icat (Sleuth Kit) — entropy detection via ewfmount pipeline",
+        "file_path": "misc/wifi/wpa_supplicant.conf",
+        "inode": 1031957,
+        "measured_entropy": 7.66,
+        "expected_entropy_range": "3.5-4.5",
+        "anomaly": "COVERT_STORAGE_HIGH_ENTROPY",
+        "legitimate_format": "plain-text INI/XML"
+      }
+    },
+    {
+      "artifact_id": "ngdc001_06",
+      "evidence_type": "deleted_file_recovery",
+      "source_tool": "fls (Sleuth Kit) — data/com.android.email/cache/ realloc inodes",
+      "timestamp": "2012-07-16T00:00:00Z",
+      "raw_score": 0.88,
+      "prior_trust": 0.87,
+      "provenance_chain": [
+        "carry-tablet-2012-07-16-final.E01",
+        "ewfmount offset 3278848 (userdata partition)",
+        "data/com.android.email/cache/ — 20 realloc inodes"
+      ],
+      "description": "Twenty-plus email body cache files deleted from data/com.android.email/cache/ prior to device seizure, recovered as (realloc) entries by Sleuth Kit fls. Inodes include 1474911, 1475098-1475103, 1475105-1475107, 1475110-1475111, 1475184-1475191. The systematic deletion of email body cache files while the EmailProvider.db message index was retained indicates deliberate anti-forensic action — Carry attempted to destroy email content while the metadata (sender, recipient, subject, timestamp) survived in the database. The volume and pattern of deletion is inconsistent with routine cache management.",
+      "metadata": {
+        "acquisition_tool": "fls -r -p (Sleuth Kit)",
+        "deleted_file_count": 20,
+        "recovery_method": "realloc inode enumeration",
+        "anti_forensic_pattern": "content_deletion_with_metadata_retention",
+        "surviving_database": "EmailProvider.db (inode 1474506)"
+      }
+    },
+    {
+      "artifact_id": "ngdc001_07",
+      "evidence_type": "device_acquisition_timeline",
+      "source_tool": "Digital Corpora scenario metadata + EmailProvider.db HostAuth",
+      "timestamp": "2012-06-07T00:00:00Z",
+      "raw_score": 0.92,
+      "prior_trust": 0.93,
+      "provenance_chain": [
+        "carry-tablet-2012-07-16-final.E01",
+        "inode 1474506 EmailProvider.db HostAuth table",
+        "Digital Corpora scenario documentation"
+      ],
+      "description": "The tablet (ASUS TF101, Android 4.0.3 IML74K, build US_epad-9.2.1.24-20120503) was purchased and activated on 2012-06-07 — the same date all operational accounts were created. The device was dedicated exclusively to this operation: no personal accounts, no prior usage history predating the operation. HostAuth confirms carrysum2012@yahoo.com as the sole configured email account. The device was seized on 2012-07-16, 39 days after activation. The operational lifespan of 39 days with no personal use is consistent with a purpose-built operational device, not a personal tablet.",
+      "metadata": {
+        "acquisition_tool": "ewfmount + sqlite3",
+        "device_model": "ASUS TF101 (Eee Pad Transformer)",
+        "android_version": "4.0.3 IML74K",
+        "build": "US_epad-9.2.1.24-20120503",
+        "activation_date": "2012-06-07",
+        "seizure_date": "2012-07-16",
+        "operational_lifespan_days": 39,
+        "personal_accounts": 0,
+        "operational_accounts": 3
+      }
+    }
+  ],
+  "fractures": [
+    "IDENTITY_CONSTRUCTION_OPERATION",
+    "COVERT_CHANNEL_ESTABLISHED",
+    "TOOL_SUBVERSION",
+    "COVERT_STORAGE",
+    "SOCIAL_ENGINEERING_PRETEXT",
+    "INSIDER_THREAT_ACTIVE",
+    "SECURITY_RECONNAISSANCE",
+    "BRIBERY",
+    "ANTI_FORENSIC_ACTION",
+    "OPERATIONAL_SECURITY_LAPSE",
+    "PHYSICAL_INFILTRATION_PREPARATION"
+  ],
+  "signals": [
+    {
+      "artifact_id": "ngdc001_01",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 19
+      },
+      "description": "Three operational identities created within 24 hours on 2012-06-07: carrysum2012@yahoo.com (IMAP/SMTP confirmed in HostAuth table), cat2welve@gmail.com (Google verification email received 18:10:48 UTC",
+      "evidence_type": "email_account_creation",
+      "source": "sqlite3 — EmailProvider.db extracted via icat from carry-tablet-2012-07-16-final.E01 offset 3278848 inode 1474506",
+      "z_score": {
+        "__fraction__": true,
+        "den": 400,
+        "num": 361
+      }
+    },
+    {
+      "artifact_id": "ngdc001_02",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 19
+      },
+      "description": "Alex (alex.jfam11@gmail.com) sends recruitment email to Carry (carrysum2012@yahoo.com) with subject 'Video'. Body text: 'I have some business in the states in the near future that I think you would be",
+      "evidence_type": "email_content",
+      "source": "sqlite3 — EmailProviderBody.db messageKey=12",
+      "z_score": {
+        "__fraction__": true,
+        "den": 2000,
+        "num": 1843
+      }
+    },
+    {
+      "artifact_id": "ngdc001_03",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 9
+      },
+      "description": "Seven distinct @m57.biz addresses send emails to carrysum2012@yahoo.com with subject 'Busy' in 10-to-20-minute intervals between 17:35 and 18:40 on 2012-07-05, the same day Alex initiates contact. Ope",
+      "evidence_type": "network_communication_pattern",
+      "source": "sqlite3 — EmailProvider.db Message table",
+      "z_score": {
+        "__fraction__": true,
+        "den": 1000,
+        "num": 819
+      }
+    },
+    {
+      "artifact_id": "ngdc001_04",
+      "confidence": {
+        "__fraction__": true,
+        "den": 50,
+        "num": 47
+      },
+      "description": "Seven-email chain between Carry and Tracy (tracysumtwelve@gmail.com) spanning 2012-07-05 to 2012-07-12 documents a complete social engineering and insider recruitment operation. Carry exploits Tracy's",
+      "evidence_type": "email_content",
+      "source": "sqlite3 — EmailProviderBody.db messageKeys 16,22,23,24,25,26,27",
+      "z_score": {
+        "__fraction__": true,
+        "den": 625,
+        "num": 564
+      }
+    },
+    {
+      "artifact_id": "ngdc001_05",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 9
+      },
+      "description": "File misc/wifi/wpa_supplicant.conf recovered from userdata partition reports Shannon entropy of 7.66/8.0 — anomalously high for a WiFi configuration file (typical wpa_supplicant.conf entropy: 3.5-4.5)",
+      "evidence_type": "file_metadata",
+      "source": "fls + icat (Sleuth Kit) — wpa_supplicant.conf inode 1031957",
+      "z_score": {
+        "__fraction__": true,
+        "den": 1000,
+        "num": 837
+      }
+    },
+    {
+      "artifact_id": "ngdc001_06",
+      "confidence": {
+        "__fraction__": true,
+        "den": 100,
+        "num": 87
+      },
+      "description": "Twenty-plus email body cache files deleted from data/com.android.email/cache/ prior to device seizure, recovered as (realloc) entries by Sleuth Kit fls. Inodes include 1474911, 1475098-1475103, 147510",
+      "evidence_type": "deleted_file_recovery",
+      "source": "fls (Sleuth Kit) — data/com.android.email/cache/ realloc inodes",
+      "z_score": {
+        "__fraction__": true,
+        "den": 1250,
+        "num": 957
+      }
+    },
+    {
+      "artifact_id": "ngdc001_07",
+      "confidence": {
+        "__fraction__": true,
+        "den": 100,
+        "num": 93
+      },
+      "description": "The tablet (ASUS TF101, Android 4.0.3 IML74K, build US_epad-9.2.1.24-20120503) was purchased and activated on 2012-06-07 — the same date all operational accounts were created. The device was dedicated",
+      "evidence_type": "device_acquisition_timeline",
+      "source": "Digital Corpora scenario metadata + EmailProvider.db HostAuth",
+      "z_score": {
+        "__fraction__": true,
+        "den": 2500,
+        "num": 2139
+      }
+    }
+  ],
+  "_migration_note": {
+    "date": "2026-07-06",
+    "source": "results/agent_batch/VIGIA-NGDC-001_agent_bundle.json",
+    "method": "señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canónica preservada",
+    "n_signals": 7
+  }
 }

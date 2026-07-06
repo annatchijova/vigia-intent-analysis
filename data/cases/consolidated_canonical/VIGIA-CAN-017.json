@@ -93,5 +93,77 @@
     "firstness": "Condolence email with donation PDF from HR.",
     "secondness": "Employee does not exist. SPF/DKIM fail. PDF steals tokens. 12 hosts compromised.",
     "thirdness": "Habit of using social taboo (death) to nullify technical distrust protocols."
+  },
+  "signals": [
+    {
+      "artifact_id": "a099_01",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 3
+      },
+      "description": "Email from hr@corp.com: 'Condolences - Fund for Juan Pérez's family'. SPF: fail. DKIM: fail.",
+      "evidence_type": "memory_process",
+      "source": "sift_mail_gateway",
+      "z_score": {
+        "__fraction__": true,
+        "den": 250,
+        "num": 69
+      }
+    },
+    {
+      "artifact_id": "a099_02",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 7
+      },
+      "description": "Attached PDF: embedded JavaScript that accesses session cookies (session_id, auth_token, csrf) and sends them to an external domain.",
+      "evidence_type": "memory_process",
+      "source": "sift_file_audit",
+      "z_score": {
+        "__fraction__": true,
+        "den": 250,
+        "num": 161
+      }
+    },
+    {
+      "artifact_id": "a099_03",
+      "confidence": {
+        "__fraction__": true,
+        "den": 2,
+        "num": 1
+      },
+      "description": "HTTPS connection to family-support[.]org from 12 internal hosts within 30 minutes of mass PDF opening.",
+      "evidence_type": "dns_record",
+      "source": "sift_pcap",
+      "z_score": {
+        "__fraction__": true,
+        "den": 40,
+        "num": 17
+      }
+    },
+    {
+      "artifact_id": "a099_04",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 7
+      },
+      "description": "Verification: real HR did not send the email. 'Juan Pérez' does not exist in the active personnel database.",
+      "evidence_type": "memory_process",
+      "source": "sift_syslog",
+      "z_score": {
+        "__fraction__": true,
+        "den": 2000,
+        "num": 651
+      }
+    }
+  ],
+  "_migration_note": {
+    "date": "2026-07-06",
+    "source": "results/agent_batch/VIGIA-CAN-017_agent_bundle.json",
+    "method": "señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canónica preservada",
+    "n_signals": 4
   }
 }

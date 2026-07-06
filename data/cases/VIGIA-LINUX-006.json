@@ -14,7 +14,7 @@
       "source_tool": "sift_process_monitor",
       "timestamp": "2025-03-19T10:00:00Z",
       "raw_score": 0.89,
-      "prior_trust": 0.90,
+      "prior_trust": 0.9,
       "provenance_chain": [
         "sha256:linux006_systemd_logind_process"
       ],
@@ -155,5 +155,77 @@
     "source_file": "VIGIA-LINUX-CORPUS.json",
     "source_origin": "public_incident_report",
     "corpus_tag": "POST-HACKATHON"
+  },
+  "signals": [
+    {
+      "artifact_id": "linux006_01",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 9
+      },
+      "description": "Process /var/tmp/systemd-logind running as root with sustained 100% CPU utilization on all available cores. The legitimate systemd-logind binary resides at /usr/lib/systemd/systemd-logind; the malicio",
+      "evidence_type": "memory_process",
+      "source": "sift_process_monitor",
+      "z_score": {
+        "__fraction__": true,
+        "den": 1000,
+        "num": 801
+      }
+    },
+    {
+      "artifact_id": "linux006_02",
+      "confidence": {
+        "__fraction__": true,
+        "den": 25,
+        "num": 22
+      },
+      "description": "Network connection from /var/tmp/systemd-logind to 62.60.246[.]210:443 over TLS. The destination IP is a known Monero mining pool infrastructure node. The connection has been established since system ",
+      "evidence_type": "network_capture",
+      "source": "sift_network_forensics",
+      "z_score": {
+        "__fraction__": true,
+        "den": 625,
+        "num": 473
+      }
+    },
+    {
+      "artifact_id": "linux006_03",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 17
+      },
+      "description": "Root crontab contains entry: '*/5 * * * * /var/tmp/systemd-logind --config /var/tmp/.config/miner.json >/dev/null 2>&1'. The cron entry restarts the miner every 5 minutes if not running. The config fi",
+      "evidence_type": "log_entry",
+      "source": "sift_linux_forensics",
+      "z_score": {
+        "__fraction__": true,
+        "den": 1000,
+        "num": 663
+      }
+    },
+    {
+      "artifact_id": "linux006_04",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 13
+      },
+      "description": "Bash history and process telemetry show OpenAI Codex-generated commands executed by the legitimate user between 2025-03-19 08:00 and 12:00 UTC. Commands include: 'sudo systemctl stop systemd-logind' (",
+      "evidence_type": "log_entry",
+      "source": "sift_linux_forensics",
+      "z_score": {
+        "__fraction__": true,
+        "den": 400,
+        "num": 117
+      }
+    }
+  ],
+  "_migration_note": {
+    "date": "2026-07-06",
+    "source": "results/agent_batch/VIGIA-LINUX-006_agent_bundle.json",
+    "method": "señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canónica preservada",
+    "n_signals": 4
   }
 }

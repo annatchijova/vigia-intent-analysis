@@ -81,5 +81,77 @@
     "secondness": "кщще is 'root' on a Russian keyboard. The 800ms correction indicates an OPSEC-aware operator betrayed by muscle memory.",
     "thirdness": "Habit of a native Russian operator using 'root' directly. The slip destroys the identity alibi."
   },
-  "notes": "Peirce physical index: key order betrays the mind. High linguistic attribution."
+  "notes": "Peirce physical index: key order betrays the mind. High linguistic attribution.",
+  "signals": [
+    {
+      "artifact_id": "a086_01",
+      "confidence": {
+        "__fraction__": true,
+        "den": 2,
+        "num": 1
+      },
+      "description": "Keystroke sequence: кщще [backspace×4] sudo [enter]. The string кщще is 'root' typed with Russian ЙЦУКЕН layout active.",
+      "evidence_type": "log_entry",
+      "source": "sift_keylogger",
+      "z_score": {
+        "__fraction__": true,
+        "den": 50,
+        "num": 23
+      }
+    },
+    {
+      "artifact_id": "a086_02",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 3
+      },
+      "description": "Phonetic analysis confirms кщще is the exact result of typing 'root' with Russian layout. Regional attribution: RU/CIS.",
+      "evidence_type": "ip_geolocation",
+      "source": "sift_linguistic",
+      "z_score": {
+        "__fraction__": true,
+        "den": 250,
+        "num": 69
+      }
+    },
+    {
+      "artifact_id": "a086_03",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 19
+      },
+      "description": "Root session authenticated 27 seconds after the keyboard slip. The attacker achieved privilege escalation.",
+      "evidence_type": "log_entry",
+      "source": "sift_mimikatz",
+      "z_score": {
+        "__fraction__": true,
+        "den": 500,
+        "num": 57
+      }
+    },
+    {
+      "artifact_id": "a086_04",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 19
+      },
+      "description": "Bash history in memory: 'sudo systemctl restart sshd' executed 120ms after the deleted string.",
+      "evidence_type": "memory_process",
+      "source": "sift_volatility",
+      "z_score": {
+        "__fraction__": true,
+        "den": 250,
+        "num": 19
+      }
+    }
+  ],
+  "_migration_note": {
+    "date": "2026-07-06",
+    "source": "results/agent_batch/VIGIA-CAN-004_agent_bundle.json",
+    "method": "señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canónica preservada",
+    "n_signals": 4
+  }
 }

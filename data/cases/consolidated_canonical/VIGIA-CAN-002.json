@@ -94,5 +94,77 @@
     "firstness": "Non-technical user ticket with a Linux terminal screenshot.",
     "secondness": "A 'non-technical' user cannot accidentally reach a kernel exploit execution state.",
     "thirdness": "Habit of using simulated incompetence to induce privileged action from the support technician."
+  },
+  "signals": [
+    {
+      "artifact_id": "a084_01",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 3
+      },
+      "description": "Ticket: 'I don't know what I touched, black screen with green text, can't open Excel'.",
+      "evidence_type": "memory_process",
+      "source": "sift_ticket_system",
+      "z_score": {
+        "__fraction__": true,
+        "den": 250,
+        "num": 69
+      }
+    },
+    {
+      "artifact_id": "a084_02",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 7
+      },
+      "description": "Attached screenshot: Linux terminal with CVE-2022-0847 (dirty pipe) half-executed. Progress bar visible at 45%.",
+      "evidence_type": "memory_process",
+      "source": "sift_vision_ocr",
+      "z_score": {
+        "__fraction__": true,
+        "den": 250,
+        "num": 161
+      }
+    },
+    {
+      "artifact_id": "a084_03",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 19
+      },
+      "description": "Bash history in memory: wget exploit.sh && chmod +x && ./exploit.sh.",
+      "evidence_type": "memory_process",
+      "source": "sift_volatility",
+      "z_score": {
+        "__fraction__": true,
+        "den": 200,
+        "num": 171
+      }
+    },
+    {
+      "artifact_id": "a084_04",
+      "confidence": {
+        "__fraction__": true,
+        "den": 2,
+        "num": 1
+      },
+      "description": "DNS resolution to a domain registered 2 days before the support ticket.",
+      "evidence_type": "dns_record",
+      "source": "sift_pcap",
+      "z_score": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 3
+      }
+    }
+  ],
+  "_migration_note": {
+    "date": "2026-07-06",
+    "source": "results/agent_batch/VIGIA-CAN-002_agent_bundle.json",
+    "method": "señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canónica preservada",
+    "n_signals": 4
   }
 }

@@ -94,5 +94,77 @@
     "secondness": "O365 confirms normal access. 18/20 tickets with identical pattern. Ransomware active in background.",
     "thirdness": "Habit of using Cognitive DoS to paralyze SOC triage capacity during a real attack."
   },
-  "notes": "Cognitive DoS: the coordinated flow seeks to paralyze triage capacity."
+  "notes": "Cognitive DoS: the coordinated flow seeks to paralyze triage capacity.",
+  "signals": [
+    {
+      "artifact_id": "a112_01",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 3
+      },
+      "description": "20 tickets in a 90-second window from different accounts. Common phrases: 'Can't access mail', 'Were we hacked?'",
+      "evidence_type": "log_entry",
+      "source": "sift_ticket_system",
+      "z_score": {
+        "__fraction__": true,
+        "den": 25,
+        "num": 6
+      }
+    },
+    {
+      "artifact_id": "a112_02",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 9
+      },
+      "description": "O365 logs: 20 reporting accounts have a successful login in the last hour. Zero failed attempts. Zero lockouts.",
+      "evidence_type": "log_entry",
+      "source": "sift_o365_audit",
+      "z_score": {
+        "__fraction__": true,
+        "den": 400,
+        "num": 117
+      }
+    },
+    {
+      "artifact_id": "a112_03",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 3
+      },
+      "description": "Stylometric analysis: 18/20 tickets share an identical punctuation pattern (space before question mark). Entropy between tickets: 0.12 bits.",
+      "evidence_type": "cultural_marker",
+      "source": "sift_linguistic",
+      "z_score": {
+        "__fraction__": true,
+        "den": 2000,
+        "num": 273
+      }
+    },
+    {
+      "artifact_id": "a112_04",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 19
+      },
+      "description": "During the semantic panic window: ransomware.exe active on file server. 1,247 files encrypted.",
+      "evidence_type": "memory_process",
+      "source": "sift_volatility",
+      "z_score": {
+        "__fraction__": true,
+        "den": 400,
+        "num": 19
+      }
+    }
+  ],
+  "_migration_note": {
+    "date": "2026-07-06",
+    "source": "results/agent_batch/VIGIA-CAN-030_agent_bundle.json",
+    "method": "señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canónica preservada",
+    "n_signals": 4
+  }
 }

@@ -89,5 +89,77 @@
     "secondness": "Entropy 0.04 bits impossible for a human; variance 0.8s; automated brute-force process in memory with lockout evasion.",
     "thirdness": "Habit of using doubt as an evasion tool and building a false 'clumsiness' baseline to fatigue Blue Team alerts."
   },
-  "notes": "System Self-Gaslighting: a human is random in their clumsiness. Failing exactly 2 times with a rhythmic cadence is preparation."
+  "notes": "System Self-Gaslighting: a human is random in their clumsiness. Failing exactly 2 times with a rhythmic cadence is preparation.",
+  "signals": [
+    {
+      "artifact_id": "f002_login",
+      "confidence": {
+        "__fraction__": true,
+        "den": 5,
+        "num": 2
+      },
+      "description": "Authentication log: user 'jdoe' fails password exactly 2 times before succeeding on the third attempt, for 47 consecutive days. Never reaches the limit of 3.",
+      "evidence_type": "log_entry",
+      "source": "sift_syslog",
+      "z_score": {
+        "__fraction__": true,
+        "den": 250,
+        "num": 7
+      }
+    },
+    {
+      "artifact_id": "f002_chat",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 3
+      },
+      "description": "Doubt messages at critical moments: 'maybe it was an error', 'I might not have done it', 'I'm not sure' — always before security decisions.",
+      "evidence_type": "log_entry",
+      "source": "sift_chat_system",
+      "z_score": {
+        "__fraction__": true,
+        "den": 500,
+        "num": 9
+      }
+    },
+    {
+      "artifact_id": "f002_entropy",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 11
+      },
+      "description": "Login failure pattern entropy: 0.04 bits (expected for human >2.0). Time variance between attempts: exactly 0.8 seconds.",
+      "evidence_type": "cultural_marker",
+      "source": "sift_entropy",
+      "z_score": {
+        "__fraction__": true,
+        "den": 2000,
+        "num": 979
+      }
+    },
+    {
+      "artifact_id": "f002_bruteforce",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 19
+      },
+      "description": "Automated process in memory executing brute force with a cadence of 2 attempts + pause + 1 successful attempt (evades 3-failure lockout).",
+      "evidence_type": "memory_process",
+      "source": "sift_volatility",
+      "z_score": {
+        "__fraction__": true,
+        "den": 400,
+        "num": 19
+      }
+    }
+  ],
+  "_migration_note": {
+    "date": "2026-07-06",
+    "source": "results/agent_batch/VIGIA-CAN-049_agent_bundle.json",
+    "method": "señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canónica preservada",
+    "n_signals": 4
+  }
 }

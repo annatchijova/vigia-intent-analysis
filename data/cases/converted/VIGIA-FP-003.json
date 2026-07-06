@@ -85,5 +85,61 @@
     "schema_version": "1.1",
     "source_file": "VIGIA_FP_FN_AMB.json",
     "source_origin": "synthetic_vigia_collective"
+  },
+  "signals": [
+    {
+      "artifact_id": "fp003_01",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 3
+      },
+      "description": "DM: 'Hey, saw your password on the post-it, sending it so you can change it'",
+      "evidence_type": "log_entry",
+      "source": "sift_slack_export",
+      "z_score": {
+        "__fraction__": true,
+        "den": 125,
+        "num": 27
+      }
+    },
+    {
+      "artifact_id": "fp003_02",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 9
+      },
+      "description": "Password change recorded 5 minutes after the message",
+      "evidence_type": "log_entry",
+      "source": "sift_azure_ad",
+      "z_score": {
+        "__fraction__": true,
+        "den": 200,
+        "num": 9
+      }
+    },
+    {
+      "artifact_id": "fp003_03",
+      "confidence": {
+        "__fraction__": true,
+        "den": 5,
+        "num": 3
+      },
+      "description": "Camera CONF-01: post-it visible on monitor with written password",
+      "evidence_type": "memory_process",
+      "source": "sift_vision_ocr",
+      "z_score": {
+        "__fraction__": true,
+        "den": 125,
+        "num": 69
+      }
+    }
+  ],
+  "_migration_note": {
+    "date": "2026-07-06",
+    "source": "results/agent_batch/VIGIA-FP-003_agent_bundle.json",
+    "method": "señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canónica preservada",
+    "n_signals": 3
   }
 }

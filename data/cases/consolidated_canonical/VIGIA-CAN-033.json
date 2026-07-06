@@ -97,5 +97,77 @@
     "secondness": "847-day baseline never showed out-of-hours activity. Access to 500MB confidential file at 03:17.",
     "thirdness": "Habit of using valid credentials in a temporal context that breaks the real user's biological pattern."
   },
-  "notes": "Valid Firstness (correct login) but broken Secondness (temporally impossible context for this user)."
+  "notes": "Valid Firstness (correct login) but broken Secondness (temporally impossible context for this user).",
+  "signals": [
+    {
+      "artifact_id": "a007_01",
+      "confidence": {
+        "__fraction__": true,
+        "den": 5,
+        "num": 2
+      },
+      "description": "Successful VPN login at 03:15 AM on Sunday. Correct credentials. MFA approved.",
+      "evidence_type": "memory_process",
+      "source": "sift_vpn_log",
+      "z_score": {
+        "__fraction__": true,
+        "den": 125,
+        "num": 46
+      }
+    },
+    {
+      "artifact_id": "a007_02",
+      "confidence": {
+        "__fraction__": true,
+        "den": 2,
+        "num": 1
+      },
+      "description": "Historical baseline: finance_user had never logged in outside 08:30-18:00 Mon-Fri in 847 days. 6.2 sigma deviation.",
+      "evidence_type": "memory_process",
+      "source": "sift_ueba",
+      "z_score": {
+        "__fraction__": true,
+        "den": 50,
+        "num": 23
+      }
+    },
+    {
+      "artifact_id": "a007_03",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 11
+      },
+      "description": "Access to 'Q2_Financials_Forecast.xlsx' (500MB), confidential-3 classification, at 03:17 AM.",
+      "evidence_type": "file_timestamp",
+      "source": "sift_file_audit",
+      "z_score": {
+        "__fraction__": true,
+        "den": 25,
+        "num": 11
+      }
+    },
+    {
+      "artifact_id": "a007_04",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 19
+      },
+      "description": "excel.exe in memory with mapped file and write handle to \\Temp\\upload.tmp of 500MB.",
+      "evidence_type": "memory_process",
+      "source": "sift_volatility",
+      "z_score": {
+        "__fraction__": true,
+        "den": 400,
+        "num": 361
+      }
+    }
+  ],
+  "_migration_note": {
+    "date": "2026-07-06",
+    "source": "results/agent_batch/VIGIA-CAN-033_agent_bundle.json",
+    "method": "señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canónica preservada",
+    "n_signals": 4
+  }
 }
