@@ -3,7 +3,8 @@
   "case_name": "The Analyst's Error",
   "description": "Tier-1 SOC analyst modifies a rule without a change ticket, citing 'human error'. The modification disables a critical alert. Could be: (1) genuine error, (2) insider sabotage, (3) negligence.",
   "abstention_risk": "high",
-  "expected_verdict": "ABSTAIN",
+  "expected_verdict": "NOISE",
+  "_label_revision": "2026-07-05 (Fase 2, decision de Anna): ABSTAIN -> NOISE per L-012 doctrine — null-signal ambiguity without structural conflict correctly returns NOISE; ABSTAIN requires competing hypotheses with non-trivial evidence. Original synthetic label contradicted the documented design (README Domain B note). Case content unchanged.",
   "carnegie_pattern_expected": null,
   "confidence_expected": 50,
   "artifacts": [

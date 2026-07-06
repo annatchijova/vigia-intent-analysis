@@ -50,6 +50,11 @@ class TestB058AbstainClassification:
         from sift_orchestrator import SIFTOrchestrator
         from vigia_agent import classify_agent_verdict, _signal_stats
         case = json.loads((REPO / "data/cases/VIGIA-AMB-001.json").read_text())
+        # Fase 2 (2026-07-05): la etiqueta del corpus de AMB-001 se revisó
+        # ABSTAIN→NOISE (L-012). Este test pina el contrato B-058 de la rama
+        # legacy para input etiquetado ABSTAIN — se fuerza la etiqueta para
+        # independizar el pin de futuras revisiones de etiquetas del corpus.
+        case["expected_verdict"] = "ABSTAIN"
         import tempfile, os
         f = tempfile.mktemp(suffix=".json")
         json.dump(case, open(f, "w"))

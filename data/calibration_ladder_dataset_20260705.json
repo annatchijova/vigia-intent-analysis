@@ -1,8 +1,9 @@
 {
  "generated": "2026-07-05",
- "method": "motor ciego (_vigia_score sin expected_verdict) sobre find_cases(CASES_DIRS)",
- "purpose": "Fase 2 — dataset de calibración del ladder (regla L-033); backlog B-075",
+ "method": "motor ciego (_vigia_score sin expected_verdict) sobre find_cases(CASES_DIRS); agree = doctrina del comparador batch (BENIGN→NOISE, UNKNOWN acepta todo, MALICE-donde-INTENT acepta)",
+ "purpose": "Fase 2 — dataset de calibración del ladder (regla L-033); backlog B-075/B-076",
  "n_cases": 198,
+ "n_disagreements": 32,
  "cases": [
   {
    "case_id": "FF-GENUINE-001",
@@ -58,9 +59,9 @@
   {
    "case_id": "VIGIA-AMB-001",
    "path": "data/cases/VIGIA-AMB-001.json",
-   "expected": "ABSTAIN",
+   "expected": "NOISE",
    "motor_verdict": "NOISE",
-   "agree": false,
+   "agree": true,
    "score": 0.0293,
    "confidence": 0.97,
    "reason": "Insufficient evidence of malicious intent (score=0.0293)",
@@ -75,9 +76,9 @@
   {
    "case_id": "VIGIA-AMB-002",
    "path": "data/cases/VIGIA-AMB-002.json",
-   "expected": "ABSTAIN",
+   "expected": "NOISE",
    "motor_verdict": "NOISE",
-   "agree": false,
+   "agree": true,
    "score": 0.0487,
    "confidence": 0.95,
    "reason": "Insufficient evidence of malicious intent (score=0.0487)",
@@ -206,7 +207,7 @@
    "mean_effective_trust": 0.5894,
    "caie_fractures": 0,
    "nearest_threshold": "SUSPICION",
-   "dist_to_threshold": 0.0306
+   "dist_to_threshold": 0.1106
   },
   {
    "case_id": "VIGIA-BREAK-016",
@@ -247,7 +248,7 @@
    "path": "data/cases/VIGIA-FLAREON-11.json",
    "expected": "INTENT",
    "motor_verdict": "MALICE",
-   "agree": false,
+   "agree": true,
    "score": 0.5549,
    "confidence": 0.95,
    "reason": "Intent score 0.5549 exceeds MALICE threshold (P2+acq_assurance scale, threshold=0.33)",
@@ -264,7 +265,7 @@
    "path": "data/cases/VIGIA-FLAREON-12.json",
    "expected": "INTENT",
    "motor_verdict": "MALICE",
-   "agree": false,
+   "agree": true,
    "score": 0.627,
    "confidence": 0.95,
    "reason": "Intent score 0.6270 exceeds MALICE threshold (P2+acq_assurance scale, threshold=0.33)",
@@ -281,7 +282,7 @@
    "path": "data/cases/VIGIA-FLAREON-2014.json",
    "expected": "INTENT",
    "motor_verdict": "MALICE",
-   "agree": false,
+   "agree": true,
    "score": 0.3607,
    "confidence": 0.72,
    "reason": "Intent score 0.3607 exceeds MALICE threshold (P2+acq_assurance scale, threshold=0.33)",
@@ -298,7 +299,7 @@
    "path": "data/cases/VIGIA-FLAREON-2015.json",
    "expected": "INTENT",
    "motor_verdict": "MALICE",
-   "agree": false,
+   "agree": true,
    "score": 0.5946,
    "confidence": 0.95,
    "reason": "Intent score 0.5946 exceeds MALICE threshold (P2+acq_assurance scale, threshold=0.33)",
@@ -315,7 +316,7 @@
    "path": "data/cases/VIGIA-FLAREON-3.json",
    "expected": "INTENT",
    "motor_verdict": "MALICE",
-   "agree": false,
+   "agree": true,
    "score": 0.698,
    "confidence": 0.95,
    "reason": "Intent score 0.6980 exceeds MALICE threshold (P2+acq_assurance scale, threshold=0.33)",
@@ -332,7 +333,7 @@
    "path": "data/cases/VIGIA-FLAREON-4.json",
    "expected": "INTENT",
    "motor_verdict": "MALICE",
-   "agree": false,
+   "agree": true,
    "score": 0.8106,
    "confidence": 0.95,
    "reason": "Intent score 0.8106 exceeds MALICE threshold (P2+acq_assurance scale, threshold=0.33)",
@@ -349,7 +350,7 @@
    "path": "data/cases/VIGIA-FLAREON-6.json",
    "expected": "INTENT",
    "motor_verdict": "MALICE",
-   "agree": false,
+   "agree": true,
    "score": 0.7666,
    "confidence": 0.95,
    "reason": "Intent score 0.7666 exceeds MALICE threshold (P2+acq_assurance scale, threshold=0.33)",
@@ -366,7 +367,7 @@
    "path": "data/cases/VIGIA-FLAREON-7.json",
    "expected": "INTENT",
    "motor_verdict": "MALICE",
-   "agree": false,
+   "agree": true,
    "score": 0.6841,
    "confidence": 0.95,
    "reason": "Intent score 0.6841 exceeds MALICE threshold (P2+acq_assurance scale, threshold=0.33)",
@@ -383,7 +384,7 @@
    "path": "data/cases/VIGIA-FLAREON-8.json",
    "expected": "INTENT",
    "motor_verdict": "MALICE",
-   "agree": false,
+   "agree": true,
    "score": 0.7204,
    "confidence": 0.95,
    "reason": "Intent score 0.7204 exceeds MALICE threshold (P2+acq_assurance scale, threshold=0.33)",
@@ -400,7 +401,7 @@
    "path": "data/cases/VIGIA-FLAREON-9.json",
    "expected": "INTENT",
    "motor_verdict": "MALICE",
-   "agree": false,
+   "agree": true,
    "score": 0.6267,
    "confidence": 0.95,
    "reason": "Intent score 0.6267 exceeds MALICE threshold (P2+acq_assurance scale, threshold=0.33)",
@@ -460,8 +461,8 @@
    "n_device_types": 2,
    "mean_effective_trust": 0.8833,
    "caie_fractures": 0,
-   "nearest_threshold": "SUSPICION",
-   "dist_to_threshold": 0.0395
+   "nearest_threshold": "MALICE",
+   "dist_to_threshold": -0.1105
   },
   {
    "case_id": "VIGIA-FP-001",
@@ -512,7 +513,7 @@
    "mean_effective_trust": 0.6,
    "caie_fractures": 0,
    "nearest_threshold": "SUSPICION",
-   "dist_to_threshold": -0.0038
+   "dist_to_threshold": 0.0762
   },
   {
    "case_id": "VIGIA-GOOGLE-TAKEOUT-2020",
@@ -614,7 +615,7 @@
    "mean_effective_trust": 0.805,
    "caie_fractures": 0,
    "nearest_threshold": "SUSPICION",
-   "dist_to_threshold": 0.0068
+   "dist_to_threshold": 0.0868
   },
   {
    "case_id": "VIGIA-LINUX-006",
@@ -682,7 +683,7 @@
    "mean_effective_trust": 0.8625,
    "caie_fractures": 0,
    "nearest_threshold": "SUSPICION",
-   "dist_to_threshold": 0.0192
+   "dist_to_threshold": 0.0992
   },
   {
    "case_id": "VIGIA-MAGNET-2022-IOS-JESS-KEYCHAIN",
@@ -1022,7 +1023,7 @@
    "mean_effective_trust": 0.8,
    "caie_fractures": 0,
    "nearest_threshold": "SUSPICION",
-   "dist_to_threshold": 0.0012
+   "dist_to_threshold": 0.0812
   },
   {
    "case_id": "VIGIA-REAL-M57-PAT-Dec07",
@@ -1039,7 +1040,7 @@
    "mean_effective_trust": 0.85,
    "caie_fractures": 0,
    "nearest_threshold": "SUSPICION",
-   "dist_to_threshold": 0.007
+   "dist_to_threshold": 0.087
   },
   {
    "case_id": "VIGIA-REAL-M57-PAT-Dec11",
@@ -1107,7 +1108,7 @@
    "mean_effective_trust": 0.8125,
    "caie_fractures": 0,
    "nearest_threshold": "SUSPICION",
-   "dist_to_threshold": 0.0257
+   "dist_to_threshold": 0.1057
   },
   {
    "case_id": "VIGIA-REAL-MAGNET-2022-LINUX-RAFAEL",
@@ -1361,8 +1362,8 @@
    "n_device_types": 3,
    "mean_effective_trust": 0.8667,
    "caie_fractures": 0,
-   "nearest_threshold": "SUSPICION",
-   "dist_to_threshold": 0.0737
+   "nearest_threshold": "MALICE",
+   "dist_to_threshold": -0.0763
   },
   {
    "case_id": "VIGIA-SET68I-001",
@@ -1403,7 +1404,7 @@
    "path": "data/cases/VIGIA-TUCK-2019.json",
    "expected": "INTENT",
    "motor_verdict": "MALICE",
-   "agree": false,
+   "agree": true,
    "score": 0.3445,
    "confidence": 0.69,
    "reason": "Intent score 0.3445 exceeds MALICE threshold (P2+acq_assurance scale, threshold=0.33)",
@@ -1464,7 +1465,7 @@
    "mean_effective_trust": 0.3,
    "caie_fractures": 0,
    "nearest_threshold": "SUSPICION",
-   "dist_to_threshold": 0.0203
+   "dist_to_threshold": 0.1003
   },
   {
    "case_id": "VIGIA_KIWI_003_AT_POV",
@@ -1685,7 +1686,7 @@
    "mean_effective_trust": 0.85,
    "caie_fractures": 0,
    "nearest_threshold": "SUSPICION",
-   "dist_to_threshold": 0.0052
+   "dist_to_threshold": 0.0852
   },
   {
    "case_id": "case_009_insomnio_tactico_es",
@@ -1719,7 +1720,7 @@
    "mean_effective_trust": 0.8676,
    "caie_fractures": 0,
    "nearest_threshold": "SUSPICION",
-   "dist_to_threshold": -0.0486
+   "dist_to_threshold": 0.0314
   },
   {
    "case_id": "NPS-2010-EMAILS",
@@ -1752,8 +1753,8 @@
    "n_device_types": 2,
    "mean_effective_trust": 0.85,
    "caie_fractures": 0,
-   "nearest_threshold": "SUSPICION",
-   "dist_to_threshold": 0.0634
+   "nearest_threshold": "MALICE",
+   "dist_to_threshold": -0.0866
   },
   {
    "case_id": "VIGIA-2026-DEMO-007",
@@ -1787,7 +1788,7 @@
    "mean_effective_trust": 0.85,
    "caie_fractures": 0,
    "nearest_threshold": "SUSPICION",
-   "dist_to_threshold": -0.0318
+   "dist_to_threshold": 0.0482
   },
   {
    "case_id": "VIGIA-2026-DEMO-009",
@@ -1804,7 +1805,7 @@
    "mean_effective_trust": 0.85,
    "caie_fractures": 0,
    "nearest_threshold": "SUSPICION",
-   "dist_to_threshold": -0.0318
+   "dist_to_threshold": 0.0482
   },
   {
    "case_id": "VIGIA-BEN-001",
@@ -2083,7 +2084,7 @@
    "path": "data/cases/converted/VIGIA-MAGNET-2020-WINDOWS.json",
    "expected": "INTENT",
    "motor_verdict": "MALICE",
-   "agree": false,
+   "agree": true,
    "score": 0.8406,
    "confidence": 0.95,
    "reason": "Intent score 0.8406 exceeds MALICE threshold (P2+acq_assurance scale, threshold=0.33)",
@@ -2143,8 +2144,8 @@
    "n_device_types": 2,
    "mean_effective_trust": 0.54,
    "caie_fractures": 0,
-   "nearest_threshold": "SUSPICION",
-   "dist_to_threshold": 0.0665
+   "nearest_threshold": "MALICE",
+   "dist_to_threshold": -0.0835
   },
   {
    "case_id": "VIGIA-REAL-NROMANOFF",
@@ -2246,7 +2247,7 @@
    "mean_effective_trust": 0.79,
    "caie_fractures": 0,
    "nearest_threshold": "SUSPICION",
-   "dist_to_threshold": -0.0132
+   "dist_to_threshold": 0.0668
   },
   {
    "case_id": "VIGIA-REAL-TDUNGAN",
@@ -2297,7 +2298,7 @@
    "mean_effective_trust": 0.85,
    "caie_fractures": 0,
    "nearest_threshold": "SUSPICION",
-   "dist_to_threshold": -0.0483
+   "dist_to_threshold": 0.0317
   },
   {
    "case_id": "VIGIA_BREAK_002_VALID_BENIGN",
@@ -2313,8 +2314,8 @@
    "n_device_types": 1,
    "mean_effective_trust": 0.85,
    "caie_fractures": 0,
-   "nearest_threshold": "UNKNOWN",
-   "dist_to_threshold": 0.021
+   "nearest_threshold": "SUSPICION",
+   "dist_to_threshold": 0.001
   },
   {
    "case_id": "VIGIA_BREAK_003_CULTURAL_TRUE_POSITIVE",
@@ -2330,8 +2331,8 @@
    "n_device_types": 1,
    "mean_effective_trust": 0.85,
    "caie_fractures": 0,
-   "nearest_threshold": "UNKNOWN",
-   "dist_to_threshold": 0.045
+   "nearest_threshold": "SUSPICION",
+   "dist_to_threshold": 0.025
   },
   {
    "case_id": "VIGIA_BREAK_004_SIGNAL_DROWNING",
@@ -2348,7 +2349,7 @@
    "mean_effective_trust": 0.85,
    "caie_fractures": 0,
    "nearest_threshold": "SUSPICION",
-   "dist_to_threshold": -0.0483
+   "dist_to_threshold": 0.0317
   },
   {
    "case_id": "VIGIA_BREAK_006_PERFECT_ATTACK",
@@ -2364,8 +2365,8 @@
    "n_device_types": 1,
    "mean_effective_trust": 0.85,
    "caie_fractures": 0,
-   "nearest_threshold": "UNKNOWN",
-   "dist_to_threshold": 0.045
+   "nearest_threshold": "SUSPICION",
+   "dist_to_threshold": 0.025
   },
   {
    "case_id": "VIGIA_BREAK_007_MISSING_LOGS",
@@ -2381,8 +2382,8 @@
    "n_device_types": 1,
    "mean_effective_trust": 0.85,
    "caie_fractures": 0,
-   "nearest_threshold": "UNKNOWN",
-   "dist_to_threshold": 0.021
+   "nearest_threshold": "SUSPICION",
+   "dist_to_threshold": 0.001
   },
   {
    "case_id": "VIGIA_BREAK_008_AMBIGUOUS",
@@ -2398,8 +2399,8 @@
    "n_device_types": 1,
    "mean_effective_trust": 0.85,
    "caie_fractures": 0,
-   "nearest_threshold": "UNKNOWN",
-   "dist_to_threshold": 0.021
+   "nearest_threshold": "SUSPICION",
+   "dist_to_threshold": 0.001
   },
   {
    "case_id": "VIGIA_BREAK_009_PROMPT_POISON",
@@ -2415,8 +2416,8 @@
    "n_device_types": 1,
    "mean_effective_trust": 0.85,
    "caie_fractures": 0,
-   "nearest_threshold": "UNKNOWN",
-   "dist_to_threshold": 0.021
+   "nearest_threshold": "SUSPICION",
+   "dist_to_threshold": 0.001
   },
   {
    "case_id": "VIGIA_BREAK_010_OVERPERFECT",
@@ -2432,8 +2433,8 @@
    "n_device_types": 1,
    "mean_effective_trust": 0.85,
    "caie_fractures": 0,
-   "nearest_threshold": "UNKNOWN",
-   "dist_to_threshold": 0.021
+   "nearest_threshold": "SUSPICION",
+   "dist_to_threshold": 0.001
   },
   {
    "case_id": "FP-CULTURAL-CLEAN",

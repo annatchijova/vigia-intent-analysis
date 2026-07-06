@@ -167,12 +167,20 @@ def main():
             else:
                 got = "NO_BUNDLE"
 
-            # Alias BENIGN → NOISE, INTENT → MALICE para comparación
-            aliases = {"BENIGN": "NOISE", "INTENT": "INTENT"}
+            # Alias BENIGN → NOISE para comparación
+            aliases = {"BENIGN": "NOISE"}
             got_norm = aliases.get(got, got)
             exp_norm = aliases.get(expected, expected)
 
-            ok = (got_norm == exp_norm) or (expected == "UNKNOWN")
+            # Doctrina 2026-07-05 (Fase 2 §4, decisión de Anna, opción (a)):
+            # MALICE donde la etiqueta dice INTENT es SOBRE-severidad, no
+            # error de dirección — la escala define MALICE ⊃ INTENT +
+            # ocultamiento y el ladder del motor no tiene escalón INTENT
+            # (espacio {MALICE, SUSPICION, UNKNOWN, NOISE, ABSTAIN}). La
+            # sub-severidad NO se acepta: INTENT→SUSPICION sigue siendo FAIL.
+            over_severity = (exp_norm == "INTENT" and got_norm == "MALICE")
+
+            ok = (got_norm == exp_norm) or (expected == "UNKNOWN") or over_severity
 
             status = f"{GRN}PASS{RST}" if ok else f"{RED}FAIL{RST}"
             print(f"  got={got:<12} {status}  ({elapsed:.1f}s)")
