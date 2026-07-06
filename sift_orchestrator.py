@@ -308,8 +308,22 @@ class SIFTOrchestrator:
                         logger.info("[SIFT_SHIM] Auto-detected memory image via kwarg '%s': %s", _k, memory_path)
                         break
 
-        # Evidencia de memoria sin disco → vol3 local, no necesita rip.pl
-        if memory_path and not disk_path:
+        # B1-c (2026-07-06): la ruta vol3-solo aplica ÚNICAMENTE a memoria
+        # pura. Antes `memory_path and not disk_path` mandaba a vol3 aunque
+        # el caso trajera evtx/hives/pcap/mft — esos artefactos se
+        # DESCARTABAN en silencio (falso negativo por ruteo). Con otros
+        # artefactos presentes, el caso baja a la rama mixta: orquestador
+        # real con TODO menos la memoria + vol3 sobre la memoria por
+        # separado, señales fusionadas.
+        _other_windows_raw = any(kwargs.get(k) for k in (
+            "event_logs", "event_stream", "registry_hives", "pcap_path",
+            "network_flows", "mft_path", "mft_json", "browser_profile",
+            "prefetch_dir",
+        )) or bool(kwargs.get("log_path")
+                   and not str(kwargs.get("log_path")).endswith(".json"))
+
+        # Evidencia de memoria pura → vol3 local, no necesita rip.pl
+        if memory_path and not disk_path and not _other_windows_raw:
             logger.info("[SIFT_SHIM] Memory-only evidence → vol3 local adapter")
             try:
                 result = self._analyze_memory_vol3(str(memory_path))
@@ -483,8 +497,22 @@ class SIFTOrchestrator:
 
             # Map shim kwargs → run_full_analysis parameters
             run_kwargs: Dict[str, Any] = {}
-            if kwargs.get("memory_path"):
-                run_kwargs["memory_dump_path"] = kwargs["memory_path"]
+            # B1-c: en evidencia mixta la memoria va a vol3 POR SEPARADO —
+            # vol3 es el motor de memoria confiable del modo agente. El
+            # orquestador real recibe TODOS los demás artefactos y NUNCA
+            # memory_dump_path: si su MemoryForensicsEngine existe
+            # (self.memory, binario `vol` presente), re-analizaría la misma
+            # imagen → doble conteo de señales de memoria en los gates de
+            # corroboración y el composite.
+            vol3_result: Optional[Dict[str, Any]] = None
+            vol3_error: Optional[str] = None
+            if memory_path:
+                try:
+                    vol3_result = self._analyze_memory_vol3(str(memory_path))
+                except Exception as e:
+                    logger.error("[SIFT_SHIM] B1-c: vol3 falló sobre %s: %s",
+                                 memory_path, e)
+                    vol3_error = f"{type(e).__name__}: {e}"
             es = kwargs.get("event_stream") or kwargs.get("event_logs")
             if es:
                 run_kwargs["event_logs"] = es if isinstance(es, list) else [es]
@@ -544,7 +572,11 @@ class SIFTOrchestrator:
 
             # disk_path (E01) has no direct mapping — requires prior mounting
             # and artifact extraction (ewfmount + registry hive extraction)
-            if kwargs.get("disk_path") and not run_kwargs:
+            # B1-c: si la memoria ya fue analizada por vol3, NO abortar — el
+            # caso continúa con las señales de memoria aunque el E01 quede
+            # pendiente de extracción.
+            if kwargs.get("disk_path") and not run_kwargs \
+                    and vol3_result is None and not vol3_error:
                 logger.warning(
                     "[SIFT_SHIM] E01 requires prior mounting. "
                     "Mount with ewfmount, extract hives, then pass artifacts directly."
@@ -585,10 +617,112 @@ class SIFTOrchestrator:
                 _meta = result.setdefault("pipeline_meta", {})
                 _meta["pcap_error"] = pcap_error[:200]
 
+            # B1-c: fusionar las señales de memoria de vol3 con el resultado
+            # del orquestador real (evtx/hives/pcap/mft) — mismo patrón F6
+            # que las señales mobile, con escalación determinista auditada.
+            if memory_path:
+                result = self._merge_vol3_signals(
+                    result, vol3_result, vol3_error, str(memory_path))
+
             return self._merge_mobile_signals(result, mobile_signals)
         except Exception as e:
             logger.error("[SIFT_SHIM] Real orchestrator failed: %s", e)
             return self._merge_mobile_signals(self._error_result(str(e)), mobile_signals)
+
+    @staticmethod
+    def _merge_vol3_signals(
+        result: Dict[str, Any],
+        vol3_result: Optional[Dict[str, Any]],
+        vol3_error: Optional[str],
+        memory_path: str,
+    ) -> Dict[str, Any]:
+        """
+        B1-c (2026-07-06): fusiona las señales de memoria de vol3 en el
+        resultado del orquestador real (evidencia mixta memoria + evtx/
+        hives/pcap/mft). Espejo del patrón F6 de _merge_mobile_signals:
+
+        - las señales vol3 se CONCATENAN (sin metadata → cuentan como
+          primarias para los gates de corroboración, F5);
+        - si vol3 (el motor de memoria confiable) formó una hipótesis
+          maliciosa/crítica y el resultado base no está marcado, la
+          hipótesis se ESCALA con rastro de auditoría (`vol3_escalation`);
+          SUSPICION de vol3 escala solo sobre base benigna/indeterminada;
+        - si vol3 no produjo señales (formato rechazado, binario ausente,
+          crash), la memoria se materializa como MEMORY_UNANALYZED (patrón
+          F7): la incapacidad de analizar no es benignidad — degrada
+          NOISE→ABSTAIN aguas arriba si no queda otra señal.
+        """
+        meta = result.setdefault("pipeline_meta", {})
+        meta["b1c_memory_engine"] = "vol3_adapter"
+        vol3_abd = (vol3_result or {}).get("abduction") or {}
+        vol3_hyp = str(
+            vol3_abd.get("best_hypothesis")
+            or ("PIPELINE_ERROR" if vol3_error else "")
+        ).upper()
+        meta["vol3_hypothesis"] = vol3_hyp or None
+        signals = (vol3_result or {}).get("signals") or []
+        meta["n_vol3_signals"] = len(signals)
+
+        if signals:
+            existing = result.get("signals", [])
+            if isinstance(existing, list):
+                result["signals"] = existing + signals
+            if "n_total_signals" in meta:
+                meta["n_total_signals"] = meta["n_total_signals"] + len(signals)
+
+            abduction = result.get("abduction")
+            if isinstance(abduction, dict):
+                current = str(abduction.get("best_hypothesis") or "").upper()
+                flagged_malicious = any(
+                    k in current for k in ("MALICIOUS", "CRITICAL", "OVERRIDE"))
+                flagged_any = flagged_malicious or any(
+                    k in current for k in ("INTENT", "SUSPICION"))
+                escalate_to = None
+                if any(k in vol3_hyp for k in ("MALICIOUS", "CRITICAL")) \
+                        and not flagged_malicious:
+                    escalate_to = vol3_abd.get("best_hypothesis")
+                elif "SUSPICION" in vol3_hyp and not flagged_any:
+                    escalate_to = vol3_abd.get("best_hypothesis")
+                if escalate_to:
+                    abduction["vol3_escalation"] = {
+                        "from": abduction.get("best_hypothesis"),
+                        "to": escalate_to,
+                        "vol3_hypothesis": vol3_abd.get("best_hypothesis"),
+                        "n_vol3_signals": len(signals),
+                    }
+                    abduction["best_hypothesis"] = escalate_to
+                    abduction["narrative"] = (
+                        (abduction.get("narrative") or "")
+                        + f"\n[MEMORY/B1-c] Escalación determinista: vol3 "
+                          f"(motor de memoria confiable) formó hipótesis "
+                          f"{vol3_abd.get('best_hypothesis')} con "
+                          f"{len(signals)} señal(es) sobre {memory_path} — "
+                          f"hipótesis elevada (era: "
+                          f"{abduction['vol3_escalation']['from']})."
+                    )
+        else:
+            err = (vol3_error
+                   or str(vol3_abd.get("narrative") or vol3_hyp or "sin señales"))
+            result.setdefault("signals", []).append({
+                "tool": "MEMORY_UNANALYZED",
+                "z_score": 0.0,
+                "confidence": 0.0,
+                "value": 0.0,
+                "metadata": {
+                    "artifact_type": "memory",
+                    "unanalyzed": True,
+                    "signal_class": "derived",
+                    "error": str(err)[:200],
+                    "path": memory_path,
+                },
+            })
+            _inner = result.setdefault("results", {})
+            if isinstance(_inner, dict):
+                _ua = _inner.setdefault("unanalyzed_artifacts", [])
+                if "memory" not in _ua:
+                    _ua.append("memory")
+            meta["vol3_error"] = str(err)[:200]
+        return result
 
     # ── Mobile forensics (B-045) ────────────────────────────────────────
 
