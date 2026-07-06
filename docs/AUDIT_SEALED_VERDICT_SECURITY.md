@@ -32,27 +32,77 @@ Cada hallazgo de este documento lleva su nivel epistemológico explícito:
 
 ---
 
+## Modelo de amenaza (explícito)
+
+Ningún hallazgo de este documento afirma nada fuera de este modelo. Los veredictos
+"CONFIRMADO" de Q2/Q1 valen **exclusivamente** bajo él.
+
+**Lo que el atacante SÍ puede hacer (supuesto):**
+- Controlar o influir el contenido del **case JSON** que entra al scorer — en particular
+  el campo `semantic_role` de los artefactos. Esto cubre: un examinador comprometido o
+  malicioso; una etapa upstream (adaptador, importador, tool) que derive `semantic_role`
+  de contenido no confiable; o cualquier ruta donde el caso se construya a partir de datos
+  que el atacante toca.
+- Redactar el texto de los artefactos (`description`, `content_preview`) — puede elegir
+  sinónimos que evadan la blocklist Eco.
+
+**Lo que el atacante NO puede hacer (fuera de modelo):**
+- Modificar un `ForensicBundle` **ya sellado** sin romper su hash (la integridad EBS v1 es
+  sólida — ver Q1).
+- Alterar el nonce de sesión, el `engine_attestation_hash` ni el código del scorer en
+  ejecución.
+- Cambiar el veredicto **después** del sellado (rompería `bundle_hash`).
+- Ejecutar el ataque de forma **remota y no autenticada**: requiere control del input, no
+  hay superficie de red.
+
+**Corolario:** la debilidad es de **frontera de confianza sobre el input** (`semantic_role`
+se trata como examiner-declared sin autenticación), no de la criptografía de sellado. Un
+atacante sin acceso al input no puede explotarla.
+
+---
+
 ## Resumen ejecutivo
 
 | # | Pregunta | Veredicto | Nivel |
 |---|----------|-----------|-------|
-| 1 | ¿Se puede manipular el veredicto sellado sin romper el hash? ¿Se sella antes de fijar el veredicto? | Integridad del hash sólida; el veredicto sellado **sí** es manipulable envenenando el input (demostrado por Q2). No hay bug de "sellar antes de fijar" en el camino primario. | CONFIRMADO POR INDUCCIÓN (vía Q2) |
-| 2 | ¿`eco_check.py` puede ser engañado por un artefacto exculpatorio crafteado? | **Sí, por RELABEL** (no por inyección): controlando `semantic_role` + evadiendo la blocklist por paráfrasis, MALICE→NOISE end-to-end. | CONFIRMADO POR INDUCCIÓN |
+| 1 | ¿Se puede manipular el veredicto sellado sin romper el hash? ¿Se sella antes de fijar el veredicto? | Integridad del hash sólida; **es posible sellar un veredicto incorrecto** envenenando el input (demostrado por Q2). No hay bug de "sellar antes de fijar" en el camino primario. | CONFIRMADO bajo el modelo de amenaza (vía Q2) |
+| 2 | ¿`eco_check.py` puede ser engañado por un artefacto exculpatorio crafteado? | **Sí, por RELABEL** (no por inyección): controlando `semantic_role` + evadiendo la blocklist por paráfrasis, MALICE→NOISE end-to-end. | CONFIRMADO bajo el modelo de amenaza donde el atacante controla `semantic_role` |
 | 3 | ¿El Protocolo de Refutación tiene bypass? ¿El LLM cambia el veredicto tras el sellado? | El LLM está fuera del lazo sellado. Pero `run_llm_cases.py` etiqueta mal un pseudo-bundle, y la "refutación obligatoria" es un chequeo de presencia auto-rellenado. | HECHO DE CÓDIGO |
 | 4 | ¿Race condition en escrituras atómicas? ¿Otros paths sin el patrón L-023? | El fix L-023 estaba parcialmente desplegado: camino primario del Modo 1 no atómico. **Corregido en este cambio** con independencia verificada. | HECHO DE CÓDIGO + fix verificado |
 
 **Conclusión transversal:** la fortaleza criptográfica de EBS v1 protege contra
 manipulación *post-sellado*. La debilidad no está en el hash sino en **lo que el hash
 promete**: atesta *integridad* y *coherencia decisión↔riesgo*, nunca *corrección del
-veredicto*. El experimento Q2 lo demuestra: un bundle con hash perfectamente válido
-puede sellar un veredicto NOISE que debería ser MALICE.
+veredicto*. El experimento Q2 lo demuestra: **es posible sellar un veredicto incorrecto**
+— un bundle con hash perfectamente válido sobre un veredicto NOISE cuando la evidencia real
+es MALICE.
 
 ---
 
 ## Q2 — Filtro Eco / neutralización de MALICE (inducción completa)
 
-**Veredicto: CONFIRMADO POR INDUCCIÓN — vector RELABEL, no inyección.**
+**Veredicto: CONFIRMADO bajo el modelo de amenaza donde el atacante controla
+`semantic_role` — vector RELABEL, no inyección.**
 Evidencia reproducible: `scratchpad/q2_induction.py`.
+
+### Cadena causal (mecanismo)
+
+    semantic_role="exculpatory"  (campo input-controlado, sólo validado por enum)
+        │
+        ▼
+    set_aside()  — el artefacto pasa el filtro Eco (texto sin bait) y se aparta
+        │
+        ▼
+    artifact removed  — sale de `artifacts` (vigia_scorer.py:528)
+        │
+        ▼
+    composite recomputed  — media/diversidad/n_artifacts se recalculan sin él
+        │
+        ▼
+    gate B-068 changes  — cae bajo el umbral ≥4 artefactos O ≥3 tipos
+        │
+        ▼
+    verdict changes  — MALICE → SUSPICION/NOISE (veredicto sellado incorrecto)
 
 ### Cadena peirceana
 
@@ -116,8 +166,14 @@ frontera de confianza en cómo se trata `semantic_role`.
   artefactos O ≥3 tipos. — **HECHO DE CÓDIGO.**
 - **Exculpatorio** necesita 1 artefacto relabeleado que pase la wordlist para *cancelar*
   evidencia incriminatoria. Sin barra de corroboración propia. — **HECHO DE CÓDIGO.**
-- **Fail-open** (`vigia_scorer.py:490-491`): si `eco_check` no importa, `_eco_bait_hits`
-  devuelve `[]` → todo exculpatorio se aparta sin filtro. — **HECHO DE CÓDIGO.**
+- **Fail-open → CORREGIDO (Capa 1, fail-closed).** Antes, si `eco_check` no importaba,
+  `_eco_bait_hits` devolvía `[]` → todo exculpatorio se apartaba sin filtro (un adversario
+  que rompiera el import neutralizaba toda la evidencia). Ahora se aplica el patrón
+  fail-loud/fail-closed de B-023/B-026: si D1 no puede correr, el exculpatorio **no se
+  aparta** — se retiene en el scoring y queda sellado en `refutation_context.eco_retained`.
+  Gate comparativo sobre el corpus: **0 regresiones** (fail-closed sólo cambia comportamiento
+  cuando el módulo no está, que no ocurre en operación normal). Test:
+  `test_eco_unavailable_fails_closed_retains`.
 
 ### Sobre `devil_advocate_gen.py` (considerado explícitamente)
 
@@ -220,18 +276,22 @@ independencia antes de tocarse.
 
 ---
 
-## Recomendaciones (registro — fuera del alcance de este cambio)
+## Estado de remediación Q2 (defensa en capas)
 
-1. **Q2:** el fix correcto ataca el vector real, no la blocklist: **autenticar/atestiguar
-   `semantic_role`** (firma o binding de proveniencia, no sólo validación de enum) y darle
-   una **barra de corroboración** propia (simetría Daubert). Convertir el fail-open en
-   fail-closed. Extender `_artifact_text` a contenido completo. Complementar la blocklist con
-   señales estructurales. *(Diseño pendiente de decisión — la barra n≥2 sola no cierra el
-   vector `semantic_role`.)*
-2. **Q3:** no etiquetar `ebs_v1` a los bundles de `run_llm_cases.py`; hacer que la refutación
+- **Capa 1 — fail-closed: IMPLEMENTADO** (este cambio). Cierra el sub-vector "romper el
+  import de `eco_check` para desactivar D1". Gate comparativo: 0 regresiones.
+- **Capa 2 — autenticar `semantic_role`: DIFERIDO a documento de diseño separado.** Es la
+  defensa contra el vector principal (un examinador/upstream que declara `semantic_role`
+  malicioso). Requiere decisiones de diseño (firma/proveniencia, barra de corroboración,
+  alcance de `_artifact_text`, señales estructurales vs blocklist) — **la barra n≥2 sola no
+  cierra el vector `semantic_role`**. No se implementa aquí.
+
+## Otras recomendaciones (registro — fuera del alcance de este cambio)
+
+1. **Q3:** no etiquetar `ebs_v1` a los bundles de `run_llm_cases.py`; hacer que la refutación
    del camino standalone ejecute una falsificación real capaz de degradar.
-3. **Q1:** cruzar `caie_analysis.verdict` contra `risk`/`decision` en el verificador.
-4. **Q4:** extender el fix a `ebs.py` `save()` y a los PDFs firmados, con la misma
+2. **Q1:** cruzar `caie_analysis.verdict` contra `risk`/`decision` en el verificador.
+3. **Q4:** extender el fix a `ebs.py` `save()` y a los PDFs firmados, con la misma
    verificación de independencia.
 
 ---

@@ -167,6 +167,28 @@ class TestD1EcoGate:
         assert r["refutation_context"]["eco_retained"] == []
         assert len(r["refutation_context"]["set_aside"]) == 1
 
+    def test_eco_unavailable_fails_closed_retains(self, monkeypatch):
+        """Capa 1 (Q2, patrón B-023): si vigia.core.eco_check no puede importarse,
+        D1 no puede evaluar la refutación → el exculpatorio NO se aparta
+        automáticamente, se RETIENE en el scoring. Antes (fail-open) se apartaba
+        igual: un adversario que rompiera el import neutralizaba toda la evidencia."""
+        arts = copy.deepcopy(BASE_INCRIMINATORY)
+        arts[2]["semantic_role"] = "exculpatory"
+        arts[2]["description"] = "IT ticket SUP-2024-1120 aprobado por el manager"
+
+        # Con Eco disponible: el memo limpio se aparta (comportamiento normal).
+        base = _score(_case(copy.deepcopy(arts)))
+        assert len(base["refutation_context"]["set_aside"]) == 1
+
+        # Simular eco_check indisponible → el import interno de _vigia_score
+        # levanta ImportError (None en sys.modules) → rama fail-closed.
+        monkeypatch.setitem(sys.modules, "vigia.core.eco_check", None)
+        r = _score(_case(copy.deepcopy(arts)))
+        assert r["refutation_context"]["set_aside"] == []   # NO apartado
+        ret = r["refutation_context"]["eco_retained"]
+        assert len(ret) == 1 and ret[0]["artifact_id"] == "A3"
+        assert "fail-closed" in ret[0]["note"]
+
     def test_single_source_with_mcp_tool(self):
         """El scorer y el tool MCP comparten el criterio (vigia.core.eco_check)."""
         from vigia.core.eco_check import (

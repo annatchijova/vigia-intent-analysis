@@ -484,11 +484,22 @@ def _vigia_score(case: dict) -> dict:
     # demasiado perfecta / mal etiquetada = señal, no refutación. El evento
     # queda sellado en refutation_context.eco_retained.
     # -----------------------------------------------------------------------
+    # Capa 1 — fail-CLOSED (Q2, 2026-07-06). Antes el fallback de import devolvía
+    # [] (fail-OPEN): sin el módulo Eco, D1 no podía correr y el exculpatorio se
+    # apartaba IGUAL — un adversario que rompiera el import de eco_check
+    # neutralizaba TODA la evidencia exculpatoria sin filtro. Ahora se aplica el
+    # mismo patrón fail-loud/fail-closed que B-023/B-026: si D1 no puede
+    # evaluarse, el artefacto NO se aparta automáticamente — se RETIENE en el
+    # scoring y el evento queda sellado en refutation_context.eco_retained. La
+    # neutralización requiere un filtro Eco OPERATIVO que la avale.
+    _ECO_AVAILABLE = True
     try:
         from vigia.core.eco_check import text_obvious_bait_hits as _eco_bait_hits
     except Exception:
-        def _eco_bait_hits(_t):  # fail-open documentado: sin el módulo Eco,
-            return []            # D1 no puede evaluarse — se aparta igual.
+        _ECO_AVAILABLE = False
+
+        def _eco_bait_hits(_t):
+            return []
 
     def _semantic_role(a) -> str:
         role = str(a.get("semantic_role", "incriminatory")).strip().lower()
@@ -504,6 +515,20 @@ def _vigia_score(case: dict) -> dict:
     _scored_artifacts = []
     for a in artifacts:
         if _semantic_role(a) == "exculpatory":
+            if not _ECO_AVAILABLE:
+                # fail-closed: D1 indisponible → RETENER (no apartar). El
+                # examinador declaró exculpatorio, pero sin filtro Eco operativo
+                # no hay aval para removerlo del scoring.
+                _exculpatory_eco_retained.append({
+                    "artifact_id": a.get("artifact_id"),
+                    "evidence_type": a.get("evidence_type"),
+                    "eco_bait_terms": [],
+                    "note": ("examiner-declared exculpatory RETAINED in scoring: "
+                             "Eco module unavailable — fail-closed, refutation "
+                             "cannot be validated (D1, patrón B-023)"),
+                })
+                _scored_artifacts.append(a)
+                continue
             _hits = _eco_bait_hits(_artifact_text(a))
             if _hits:
                 # D1: el filtro Eco disparó — la "refutación" grita ataque.

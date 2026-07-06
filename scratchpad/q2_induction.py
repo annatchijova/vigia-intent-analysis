@@ -30,7 +30,10 @@ Resultado registrado (2026-07-06):
     Agente end-to-end (Exp C) ... MALICE → NOISE (veredicto sellado)
 """
 import copy
+import hashlib
 import json
+import platform
+import subprocess
 import sys
 from pathlib import Path
 
@@ -39,6 +42,38 @@ sys.path.insert(0, str(REPO))
 
 from vigia_scorer import _vigia_score, _normalize_case
 from vigia.core.eco_check import text_obvious_bait_hits, OBVIOUS_BAIT_TERMS
+
+
+def _sha256_file(path: Path) -> str:
+    try:
+        return hashlib.sha256(path.read_bytes()).hexdigest()
+    except OSError:
+        return "UNAVAILABLE"
+
+
+def _git_head() -> str:
+    try:
+        return subprocess.check_output(
+            ["git", "-C", str(REPO), "rev-parse", "HEAD"],
+            stderr=subprocess.DEVNULL,
+        ).decode().strip()
+    except Exception:
+        return "UNAVAILABLE"
+
+
+def provenance(case_files) -> None:
+    """Item (d) revisión externa: procedencia reproducible de la corrida."""
+    corpus_hasher = hashlib.sha256()
+    for f in sorted(case_files):
+        corpus_hasher.update((REPO / f).read_bytes())
+    print("=" * 78)
+    print("PROCEDENCIA DEL EXPERIMENTO (reproducibilidad)")
+    print("=" * 78)
+    print(f"  commit SHA (HEAD) : {_git_head()}")
+    print(f"  scorer sha256     : {_sha256_file(REPO / 'vigia_scorer.py')}")
+    print(f"  eco_check sha256  : {_sha256_file(REPO / 'vigia' / 'core' / 'eco_check.py')}")
+    print(f"  Python            : {platform.python_version()} ({sys.implementation.name})")
+    print(f"  corpus hash (n={len(case_files)})   : {corpus_hasher.hexdigest()}")
 
 # Memo exacto de la auditoría — sinónimos profesionales, sin términos de
 # OBVIOUS_BAIT_TERMS ("credential dump" -> "diagnostic scripts", "delete logs"
@@ -81,7 +116,8 @@ def relabel_clean(artifact) -> None:
 
 
 def main() -> int:
-    print("=" * 78)
+    provenance(CASES)
+    print("\n" + "=" * 78)
     print("DEDUCCIÓN D1 — ¿el memo crafteado evade la blocklist Eco?")
     print("=" * 78)
     hits = text_obvious_bait_hits(CRAFTED_MEMO.lower())
