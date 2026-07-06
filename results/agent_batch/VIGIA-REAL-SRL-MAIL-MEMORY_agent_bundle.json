@@ -1,15 +1,15 @@
 {
   "agent_verdict": "MALICE",
-  "analysis_timestamp": "2026-07-05T15:27:36.326513+00:00",
+  "analysis_timestamp": "2026-07-06T01:30:13.225040+00:00",
   "audit_trail": {
     "agent_version": "1.0.0-SANS-2026",
     "case_id": "VIGIA-REAL-SRL-MAIL-MEMORY",
-    "end_time": "2026-07-05T15:27:36.326519+00:00",
+    "end_time": "2026-07-06T01:30:13.225047+00:00",
     "entries": [
       {
         "action": "AGENT_INITIALIZED",
         "case_id": "VIGIA-REAL-SRL-MAIL-MEMORY",
-        "entry_sha256": "96c314f78fdbeba7527d7da9c97cdd1f504dc71dfbd4c5d7b68a623876b853fd",
+        "entry_sha256": "448b753149b6e90c00720e140cd93a7b2b94655a8c4a16292d630d6763b034b0",
         "inputs_summary": {
           "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
           "case_id": "VIGIA-REAL-SRL-MAIL-MEMORY"
@@ -21,13 +21,13 @@
           "agent_version": "1.0.0-SANS-2026"
         },
         "seq": 1,
-        "timestamp": "2026-07-05T15:27:36.322933+00:00",
+        "timestamp": "2026-07-06T01:30:12.870699+00:00",
         "tool": "vigia_agent"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-REAL-SRL-MAIL-MEMORY",
-        "entry_sha256": "fbc34cbec90b2e475c9c065bf4d1cda0623be0cfa85cedbedff41f688a6231ba",
+        "entry_sha256": "74ad9114562fe422860945efa57f3e89343cbb035d381c55720f0d748081a871",
         "inputs_summary": {
           "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-REAL-SRL-MAIL-MEMORY.json"
         },
@@ -35,13 +35,13 @@
         "note": "Computing SHA-256 of original evidence",
         "outputs_summary": {},
         "seq": 2,
-        "timestamp": "2026-07-05T15:27:36.323024+00:00",
+        "timestamp": "2026-07-06T01:30:12.870792+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-REAL-SRL-MAIL-MEMORY",
-        "entry_sha256": "3e7ea976b13e851497ba5d7a561ae1befd42a7a36bf5a65c9fd71e6dd2b6124a",
+        "entry_sha256": "82612764b257a0e3829631755a8427a9845c6b8a6c892d98e1dd912325e1ddaf",
         "inputs_summary": {
           "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-REAL-SRL-MAIL-MEMORY.json"
         },
@@ -51,13 +51,13 @@
           "sha256": "3f2f93578ef751b9a949d9d2e6a47527cdf6d8faf0536a4c3e6bcdbf1af2b560"
         },
         "seq": 3,
-        "timestamp": "2026-07-05T15:27:36.323116+00:00",
+        "timestamp": "2026-07-06T01:30:12.870885+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "PIPELINE_EXECUTE",
         "case_id": "VIGIA-REAL-SRL-MAIL-MEMORY",
-        "entry_sha256": "ed4ea97ff2d7911eb1abf0bdeb1a7461999d838fcb0aa03450f7fcc86c62d7f0",
+        "entry_sha256": "9a0fd8ccc041a46b7fe2669bed2009dee0523f93138b91d107b0dd18ef3b5d4d",
         "inputs_summary": {
           "evidence": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-REAL-SRL-MAIL-MEMORY.json",
           "iteration": "0",
@@ -67,13 +67,13 @@
         "note": "Executing pipeline \u2014 iteration 0",
         "outputs_summary": {},
         "seq": 4,
-        "timestamp": "2026-07-05T15:27:36.323218+00:00",
+        "timestamp": "2026-07-06T01:30:12.870987+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "PIPELINE_COMPLETE",
         "case_id": "VIGIA-REAL-SRL-MAIL-MEMORY",
-        "entry_sha256": "d4d1f934a41ccad66006b27d8f9b107d7963ef282d32b93c2565156dea1c3223",
+        "entry_sha256": "e44d9f6a780565c89282ed336897eda9f552f09b58bac89f18d6b97517a0b43a",
         "inputs_summary": {
           "iteration": "0"
         },
@@ -82,16 +82,24 @@
         "outputs_summary": {
           "abduction": {
             "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
-            "best_posterior": "0",
-            "confidence": "0",
-            "is_conclusive": "False",
+            "best_posterior": "19/20",
+            "confidence": "19/20",
+            "is_conclusive": "True",
             "narrative": "Volatility3 memory analysis of base-mail-memory.img. Windows Exchange Server. LOTL confirmed: rundll32.exe at 2018-08-31 19:47:10 UTC. malfind timed out (600s) \u2014 large dump, documented limitation. LOT..."
           },
           "case_id": "VIGIA-REAL-SRL-MAIL-MEMORY",
           "pipeline_meta": {
             "artifact_count": "3",
             "avg_score": "0",
+            "ebs_adapter_mode": "motor",
             "expected_verdict": "MALICE",
+            "resolve": {
+              "motor_confidence": "0.95",
+              "motor_reason": "Intent score 0.5131 exceeds MALICE threshold (P2+acq_assurance scale, threshold=0.33)",
+              "motor_score": "0.5131",
+              "motor_verdict": "MALICE",
+              "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+            },
             "source": "ebs_v1_json_adapter"
           },
           "signals": [
@@ -122,13 +130,13 @@
           ]
         },
         "seq": 5,
-        "timestamp": "2026-07-05T15:27:36.325766+00:00",
+        "timestamp": "2026-07-06T01:30:13.224555+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "CONTRADICTION_CHECK",
         "case_id": "VIGIA-REAL-SRL-MAIL-MEMORY",
-        "entry_sha256": "3b3021bb77735ef3d05f80e68e33862ebad43a1ab0dd425f5022d54ed4b7b810",
+        "entry_sha256": "d31aaa32a073894cc65024ce1f2a5fae23ff3f82bc2b489a88152217301f48c9",
         "inputs_summary": {
           "n_signals": "3"
         },
@@ -139,13 +147,13 @@
           "threshold": "2"
         },
         "seq": 6,
-        "timestamp": "2026-07-05T15:27:36.325864+00:00",
+        "timestamp": "2026-07-06T01:30:13.224664+00:00",
         "tool": "contradiction_detector"
       },
       {
         "action": "AGENT_EXIT",
         "case_id": "VIGIA-REAL-SRL-MAIL-MEMORY",
-        "entry_sha256": "01845c3e7bc32649f975ef4f123602bba93da896290688bcad09959934c72ec8",
+        "entry_sha256": "7af26329a2a06d28497c6cc87e56aac1e7d1be30d9dcfec22f6e1a5b10ef48d5",
         "inputs_summary": {
           "verdict": "MALICIOUS_INTENT_DETECTED"
         },
@@ -156,26 +164,26 @@
           "exit_code": "1"
         },
         "seq": 7,
-        "timestamp": "2026-07-05T15:27:36.326051+00:00",
+        "timestamp": "2026-07-06T01:30:13.224860+00:00",
         "tool": "vigia_agent"
       }
     ],
-    "start_time": "2026-07-05T15:27:36.322710+00:00",
+    "start_time": "2026-07-06T01:30:12.870452+00:00",
     "total_entries": 7
   },
   "case_id": "VIGIA-REAL-SRL-MAIL-MEMORY",
   "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-REAL-SRL-MAIL-MEMORY.json",
   "evidence_sha256": "3f2f93578ef751b9a949d9d2e6a47527cdf6d8faf0536a4c3e6bcdbf1af2b560",
   "iterations_executed": 1,
-  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-REAL-SRL-MAIL-MEMORY ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/VIGIA-REAL-SRL-MAIL-MEMORY.json\nEvidence SHA-256: 3f2f93578ef751b9a949d9d2e6a47527cdf6d8faf0536a4c3e6bcdbf1af2b560\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 0\nConclusive: NO \u2014 requires human review\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 3 se\u00f1al(es): 3 primaria(s) de ['LARIAT C2 logs + corpus cross-analysis', 'base-memory.img \u2014 Volatility3 2.28.0 \u2014 vigia_agent.py'], 0 derivada(s)/no-analizada(s). Top z: base-memory.img \u2014 Volatility3 2.28.0 \u2014 v=0.00, base-memory.img \u2014 Volatility3 2.28.0 \u2014 v=0.00, LARIAT C2 logs + corpus cross-analysis=0.00.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: MALICIOUS_INTENT_DETECTED. Conclusiva: no \u2014 requiere revisi\u00f3n humana.\n\nRazonamiento del motor abductivo:\nVolatility3 memory analysis of base-mail-memory.img. Windows Exchange Server. LOTL confirmed: rundll32.exe at 2018-08-31 19:47:10 UTC. malfind timed out (600s) \u2014 large dump, documented limitation. LOTL on mail server consistent with C2 using Exchange as pivot.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [base-memory.img \u2014 Volatility3 2.28.0 \u2014 vigia_agent.py] z=0.000 conf=0.50 \u2014 \n  [base-memory.img \u2014 Volatility3 2.28.0 \u2014 vigia_agent.py] z=0.000 conf=0.50 \u2014 \n  [LARIAT C2 logs + corpus cross-analysis] z=0.000 conf=0.50 \u2014 \n\n--- FINAL ALERT LEVEL ---\nMEDIUM \u2014 MALICE verdict from posterior aggregation. Individual z-scores below threshold. Full signal review recommended. Alert floored (B-028/B-065).\nReconciliation: verdict MALICE rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 3 | Derived: 0 | Total: 3",
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-REAL-SRL-MAIL-MEMORY ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/VIGIA-REAL-SRL-MAIL-MEMORY.json\nEvidence SHA-256: 3f2f93578ef751b9a949d9d2e6a47527cdf6d8faf0536a4c3e6bcdbf1af2b560\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 19/20\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 3 se\u00f1al(es): 3 primaria(s) de ['LARIAT C2 logs + corpus cross-analysis', 'base-memory.img \u2014 Volatility3 2.28.0 \u2014 vigia_agent.py'], 0 derivada(s)/no-analizada(s). Top z: base-memory.img \u2014 Volatility3 2.28.0 \u2014 v=0.00, base-memory.img \u2014 Volatility3 2.28.0 \u2014 v=0.00, LARIAT C2 logs + corpus cross-analysis=0.00.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: MALICIOUS_INTENT_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nVolatility3 memory analysis of base-mail-memory.img. Windows Exchange Server. LOTL confirmed: rundll32.exe at 2018-08-31 19:47:10 UTC. malfind timed out (600s) \u2014 large dump, documented limitation. LOTL on mail server consistent with C2 using Exchange as pivot.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [base-memory.img \u2014 Volatility3 2.28.0 \u2014 vigia_agent.py] z=0.000 conf=0.50 \u2014 \n  [base-memory.img \u2014 Volatility3 2.28.0 \u2014 vigia_agent.py] z=0.000 conf=0.50 \u2014 \n  [LARIAT C2 logs + corpus cross-analysis] z=0.000 conf=0.50 \u2014 \n\n--- FINAL ALERT LEVEL ---\nHIGH \u2014 MALICE verdict from Bayesian posterior aggregation. Individual z-scores below threshold (distributed evidence pattern: no single dominant signal, but aggregate posterior is decisive). Alert floored (B-028/B-065).\nReconciliation: verdict MALICE rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 3 | Derived: 0 | Total: 3",
   "pipeline_results": {
     "abduction": {
       "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
-      "best_posterior": "0",
+      "best_posterior": "19/20",
       "confidence": {
         "__fraction__": true,
-        "den": 1,
-        "num": 0
+        "den": 20,
+        "num": 19
       },
       "devil_advocate": {
         "aggregation": {
@@ -187,7 +195,7 @@
           "primary_alternative_hypothesis": null
         },
         "decision_context": {
-          "confidence": "0",
+          "confidence": "19/20",
           "mapped_verdict": "MALICIOUS_INTENT_DETECTED",
           "raw_verdict": "MALICIOUS_INTENT_DETECTED",
           "score": "0"
@@ -201,14 +209,22 @@
         "pattern_evidence_gaps": [],
         "version": "r7-da-v1"
       },
-      "is_conclusive": false,
+      "is_conclusive": true,
       "narrative": "Volatility3 memory analysis of base-mail-memory.img. Windows Exchange Server. LOTL confirmed: rundll32.exe at 2018-08-31 19:47:10 UTC. malfind timed out (600s) \u2014 large dump, documented limitation. LOTL on mail server consistent with C2 using Exchange as pivot."
     },
     "case_id": "VIGIA-REAL-SRL-MAIL-MEMORY",
     "pipeline_meta": {
       "artifact_count": 3,
       "avg_score": "0",
+      "ebs_adapter_mode": "motor",
       "expected_verdict": "MALICE",
+      "resolve": {
+        "motor_confidence": "0.95",
+        "motor_reason": "Intent score 0.5131 exceeds MALICE threshold (P2+acq_assurance scale, threshold=0.33)",
+        "motor_score": "0.5131",
+        "motor_verdict": "MALICE",
+        "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+      },
       "source": "ebs_v1_json_adapter"
     },
     "signals": [

@@ -1,15 +1,15 @@
 {
   "agent_verdict": "INTENT",
-  "analysis_timestamp": "2026-07-05T15:27:39.711520+00:00",
+  "analysis_timestamp": "2026-07-06T01:30:41.509252+00:00",
   "audit_trail": {
     "agent_version": "1.0.0-SANS-2026",
     "case_id": "VIGIA_BREAK_001_SILENT_INCONSISTENCY",
-    "end_time": "2026-07-05T15:27:39.711525+00:00",
+    "end_time": "2026-07-06T01:30:41.509258+00:00",
     "entries": [
       {
         "action": "AGENT_INITIALIZED",
         "case_id": "VIGIA_BREAK_001_SILENT_INCONSISTENCY",
-        "entry_sha256": "f2eee4b09b542eeae9f4f9c79acff100def4148f18ad7f8c3c1a87c1c81de40c",
+        "entry_sha256": "10e8e729985fa0cd4bb99929e046d854e804cbb0b0517ad8b8c99384b86e321c",
         "inputs_summary": {
           "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
           "case_id": "VIGIA_BREAK_001_SILENT_INCONSISTENCY"
@@ -21,13 +21,13 @@
           "agent_version": "1.0.0-SANS-2026"
         },
         "seq": 1,
-        "timestamp": "2026-07-05T15:27:39.708336+00:00",
+        "timestamp": "2026-07-06T01:30:41.172115+00:00",
         "tool": "vigia_agent"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA_BREAK_001_SILENT_INCONSISTENCY",
-        "entry_sha256": "cdde2db62192d384e86cabf42870d8101b4830f68bf76bf5d3c035112185879d",
+        "entry_sha256": "dd1da0ba093ae98625136811130c426a1b601e2462702e5c02f645c15f5623ad",
         "inputs_summary": {
           "path": "/home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA_BREAK_001_SILENT_INCONSISTENCY.json"
         },
@@ -35,29 +35,29 @@
         "note": "Computing SHA-256 of original evidence",
         "outputs_summary": {},
         "seq": 2,
-        "timestamp": "2026-07-05T15:27:39.708424+00:00",
+        "timestamp": "2026-07-06T01:30:41.172202+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA_BREAK_001_SILENT_INCONSISTENCY",
-        "entry_sha256": "2097032c23b050e55f587979b4de5d14889be09a0d73a03eea0d1d96222f7589",
+        "entry_sha256": "f54e31ff08530ff5a43f83fcdce3de8d578e7a29f30cfcb1ce9f91f2f1063d42",
         "inputs_summary": {
           "path": "/home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA_BREAK_001_SILENT_INCONSISTENCY.json"
         },
         "iteration": 0,
-        "note": "Evidence verified: 17c89610f869dacf...",
+        "note": "Evidence verified: 3951a2aee33d9c3c...",
         "outputs_summary": {
-          "sha256": "17c89610f869dacfb794a5976d8b60ab33c647d2a0cb792aad0d85f085fa5d23"
+          "sha256": "3951a2aee33d9c3c92efb63c00f22fb81dadd75772f5de9d6526a4850c9ae94c"
         },
         "seq": 3,
-        "timestamp": "2026-07-05T15:27:39.708529+00:00",
+        "timestamp": "2026-07-06T01:30:41.172291+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "PIPELINE_EXECUTE",
         "case_id": "VIGIA_BREAK_001_SILENT_INCONSISTENCY",
-        "entry_sha256": "b12f720525738be1f18befa6d36405fe70a9057c0b53ef508547755dff3a91d0",
+        "entry_sha256": "d3c5e80be63861246fed0087411c0244b3da1468b8ab6df4462f37d468f0e805",
         "inputs_summary": {
           "evidence": "/home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA_BREAK_001_SILENT_INCONSISTENCY.json",
           "iteration": "0",
@@ -67,13 +67,13 @@
         "note": "Executing pipeline \u2014 iteration 0",
         "outputs_summary": {},
         "seq": 4,
-        "timestamp": "2026-07-05T15:27:39.708635+00:00",
+        "timestamp": "2026-07-06T01:30:41.172393+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "PIPELINE_COMPLETE",
         "case_id": "VIGIA_BREAK_001_SILENT_INCONSISTENCY",
-        "entry_sha256": "9c3efd0cced67eee6518c57670afb81a8cbd6b35a920e0438873501ae0d38de7",
+        "entry_sha256": "e1292fa5d1163463e817373f68a5becf2c1681fea7de0e3b4674350039a6e508",
         "inputs_summary": {
           "iteration": "0"
         },
@@ -82,16 +82,24 @@
         "outputs_summary": {
           "abduction": {
             "best_hypothesis": "SUSPICION_DETECTED",
-            "best_posterior": "51/400",
-            "confidence": "51/400",
-            "is_conclusive": "True",
+            "best_posterior": "13/50",
+            "confidence": "13/50",
+            "is_conclusive": "False",
             "narrative": "Un \u00fanico artefacto con timezone inconsistente en evento cr\u00edtico"
           },
           "case_id": "VIGIA_BREAK_001_SILENT_INCONSISTENCY",
           "pipeline_meta": {
             "artifact_count": "4",
             "avg_score": "51/80",
+            "ebs_adapter_mode": "motor",
             "expected_verdict": "SUSPICION",
+            "resolve": {
+              "motor_confidence": "0.26",
+              "motor_reason": "Significant signal with structural support (score=0.1317)",
+              "motor_score": "0.1317",
+              "motor_verdict": "SUSPICION",
+              "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+            },
             "source": "ebs_v1_json_adapter"
           },
           "signals": [
@@ -130,13 +138,13 @@
           ]
         },
         "seq": 5,
-        "timestamp": "2026-07-05T15:27:39.711165+00:00",
+        "timestamp": "2026-07-06T01:30:41.508882+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "CONTRADICTION_CHECK",
         "case_id": "VIGIA_BREAK_001_SILENT_INCONSISTENCY",
-        "entry_sha256": "555802e49d31708c4864d835f23e89a47f714f8a502fabf2bae18012167f8045",
+        "entry_sha256": "da79568d02eb95ac8ad45f6d3ddef6bfa853b44c44951e11568d6b018d3c68f2",
         "inputs_summary": {
           "n_signals": "4"
         },
@@ -147,13 +155,13 @@
           "threshold": "2"
         },
         "seq": 6,
-        "timestamp": "2026-07-05T15:27:39.711277+00:00",
+        "timestamp": "2026-07-06T01:30:41.509002+00:00",
         "tool": "contradiction_detector"
       },
       {
         "action": "AGENT_EXIT",
         "case_id": "VIGIA_BREAK_001_SILENT_INCONSISTENCY",
-        "entry_sha256": "d041f33f30e00fceea35b6bb5c3f4be5546a49dbee05028c04dff99476468425",
+        "entry_sha256": "3c480845d2095ffb8854be4a0a6cadbb8ab55daec1aabec734cad4dcebe0fe37",
         "inputs_summary": {
           "verdict": "SUSPICION_DETECTED"
         },
@@ -164,35 +172,43 @@
           "exit_code": "3"
         },
         "seq": 7,
-        "timestamp": "2026-07-05T15:27:39.711469+00:00",
+        "timestamp": "2026-07-06T01:30:41.509199+00:00",
         "tool": "vigia_agent"
       }
     ],
-    "start_time": "2026-07-05T15:27:39.708111+00:00",
+    "start_time": "2026-07-06T01:30:41.171893+00:00",
     "total_entries": 7
   },
   "case_id": "VIGIA_BREAK_001_SILENT_INCONSISTENCY",
   "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA_BREAK_001_SILENT_INCONSISTENCY.json",
-  "evidence_sha256": "17c89610f869dacfb794a5976d8b60ab33c647d2a0cb792aad0d85f085fa5d23",
+  "evidence_sha256": "3951a2aee33d9c3c92efb63c00f22fb81dadd75772f5de9d6526a4850c9ae94c",
   "iterations_executed": 1,
-  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA_BREAK_001_SILENT_INCONSISTENCY ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA_BREAK_001_SILENT_INCONSISTENCY.json\nEvidence SHA-256: 17c89610f869dacfb794a5976d8b60ab33c647d2a0cb792aad0d85f085fa5d23\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: SUSPICION_DETECTED\nPosterior confidence: 51/400\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 4 se\u00f1al(es): 4 primaria(s) de ['legacy_converter'], 0 derivada(s)/no-analizada(s). Top z: SSH login 10:00 UTC+3=0.64, connection 10:00 UTC+3=0.64, command execution 10:00 UTC+3=0.64.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: SUSPICION_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nUn \u00fanico artefacto con timezone inconsistente en evento cr\u00edtico\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [SSH login 10:00 UTC+3] z=0.637 conf=0.85 \u2014 \n  [connection 10:00 UTC+3] z=0.637 conf=0.85 \u2014 \n  [command execution 10:00 UTC+3] z=0.637 conf=0.85 \u2014 \n  [file accessed 10:00 UTC+2] z=0.637 conf=0.85 \u2014 \n\n--- FINAL ALERT LEVEL ---\nMEDIUM \u2014 INTENT verdict with individual z-scores below threshold. Alert floored (B-028/B-065): an intent finding cannot present as LOW.\nReconciliation: verdict INTENT rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 4 | Derived: 0 | Total: 4",
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA_BREAK_001_SILENT_INCONSISTENCY ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA_BREAK_001_SILENT_INCONSISTENCY.json\nEvidence SHA-256: 3951a2aee33d9c3c92efb63c00f22fb81dadd75772f5de9d6526a4850c9ae94c\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: SUSPICION_DETECTED\nPosterior confidence: 13/50\nConclusive: NO \u2014 requires human review\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 4 se\u00f1al(es): 4 primaria(s) de ['legacy_converter'], 0 derivada(s)/no-analizada(s). Top z: SSH login 10:00 UTC+3=0.64, connection 10:00 UTC+3=0.64, command execution 10:00 UTC+3=0.64.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: SUSPICION_DETECTED. Conclusiva: no \u2014 requiere revisi\u00f3n humana.\n\nRazonamiento del motor abductivo:\nUn \u00fanico artefacto con timezone inconsistente en evento cr\u00edtico\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [SSH login 10:00 UTC+3] z=0.637 conf=0.85 \u2014 \n  [connection 10:00 UTC+3] z=0.637 conf=0.85 \u2014 \n  [command execution 10:00 UTC+3] z=0.637 conf=0.85 \u2014 \n  [file accessed 10:00 UTC+2] z=0.637 conf=0.85 \u2014 \n\n--- FINAL ALERT LEVEL ---\nMEDIUM \u2014 INTENT verdict with individual z-scores below threshold. Alert floored (B-028/B-065): an intent finding cannot present as LOW.\nReconciliation: verdict INTENT rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 4 | Derived: 0 | Total: 4",
   "pipeline_results": {
     "abduction": {
       "best_hypothesis": "SUSPICION_DETECTED",
-      "best_posterior": "51/400",
+      "best_posterior": "13/50",
       "confidence": {
         "__fraction__": true,
-        "den": 400,
-        "num": 51
+        "den": 50,
+        "num": 13
       },
-      "is_conclusive": true,
+      "is_conclusive": false,
       "narrative": "Un \u00fanico artefacto con timezone inconsistente en evento cr\u00edtico"
     },
     "case_id": "VIGIA_BREAK_001_SILENT_INCONSISTENCY",
     "pipeline_meta": {
       "artifact_count": 4,
       "avg_score": "51/80",
+      "ebs_adapter_mode": "motor",
       "expected_verdict": "SUSPICION",
+      "resolve": {
+        "motor_confidence": "0.26",
+        "motor_reason": "Significant signal with structural support (score=0.1317)",
+        "motor_score": "0.1317",
+        "motor_verdict": "SUSPICION",
+        "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+      },
       "source": "ebs_v1_json_adapter"
     },
     "signals": [

@@ -1,15 +1,15 @@
 {
   "agent_verdict": "MALICE",
-  "analysis_timestamp": "2026-07-05T15:27:42.926456+00:00",
+  "analysis_timestamp": "2026-07-06T01:31:08.950866+00:00",
   "audit_trail": {
     "agent_version": "1.0.0-SANS-2026",
     "case_id": "VIGIA-CAN-052",
-    "end_time": "2026-07-05T15:27:42.926462+00:00",
+    "end_time": "2026-07-06T01:31:08.950873+00:00",
     "entries": [
       {
         "action": "AGENT_INITIALIZED",
         "case_id": "VIGIA-CAN-052",
-        "entry_sha256": "7e87bbc2b7eb570f09a46f4b059db387f4b06ef54f459326273f496bf5f4c782",
+        "entry_sha256": "2b8d851a06e144e45416d36a4bb25b59c0eb06e62410f580c4c97df498b79b4e",
         "inputs_summary": {
           "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
           "case_id": "VIGIA-CAN-052"
@@ -21,13 +21,13 @@
           "agent_version": "1.0.0-SANS-2026"
         },
         "seq": 1,
-        "timestamp": "2026-07-05T15:27:42.922842+00:00",
+        "timestamp": "2026-07-06T01:31:08.597032+00:00",
         "tool": "vigia_agent"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-CAN-052",
-        "entry_sha256": "a66da8e3110ce2eb1dda99d18708b64369621d7a5de3b18ca6d4f4cd93ebd553",
+        "entry_sha256": "f8858a9d3683e3e4ef336902339ce49a9d165fc5ca08cb84d8d3b976d3c44b12",
         "inputs_summary": {
           "path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-052.json"
         },
@@ -35,29 +35,29 @@
         "note": "Computing SHA-256 of original evidence",
         "outputs_summary": {},
         "seq": 2,
-        "timestamp": "2026-07-05T15:27:42.922926+00:00",
+        "timestamp": "2026-07-06T01:31:08.597115+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-CAN-052",
-        "entry_sha256": "776fe2f6d6ab4f8c0f30b620b8552d138b88c06ea5a3ec619c09af8096058e44",
+        "entry_sha256": "807842f1e366dbfe1ba90784fc09e793105d8f65f1f01102490c784d89918a1b",
         "inputs_summary": {
           "path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-052.json"
         },
         "iteration": 0,
-        "note": "Evidence verified: 5de63a27890c8faa...",
+        "note": "Evidence verified: 61d45c1433e5404d...",
         "outputs_summary": {
-          "sha256": "5de63a27890c8faa1ec659a77ed739bb7832ae128741039160ab5368c5a2f729"
+          "sha256": "61d45c1433e5404dd59f5d450b18823889451bfcb8f03d306e8ab6d1f1af248b"
         },
         "seq": 3,
-        "timestamp": "2026-07-05T15:27:42.923014+00:00",
+        "timestamp": "2026-07-06T01:31:08.597207+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "PIPELINE_EXECUTE",
         "case_id": "VIGIA-CAN-052",
-        "entry_sha256": "1a41f983c18ac7326b69c83406f5f382e1506ea3c9b2fa97577523cb0bb72318",
+        "entry_sha256": "6c474ded01112eb5079068aed22fa2536db87eda777ec31325a3a9b73ed6b13d",
         "inputs_summary": {
           "evidence": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-052.json",
           "iteration": "0",
@@ -67,13 +67,13 @@
         "note": "Executing pipeline \u2014 iteration 0",
         "outputs_summary": {},
         "seq": 4,
-        "timestamp": "2026-07-05T15:27:42.923114+00:00",
+        "timestamp": "2026-07-06T01:31:08.597337+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "PIPELINE_COMPLETE",
         "case_id": "VIGIA-CAN-052",
-        "entry_sha256": "dfe49d7347a540855ef07011b3edb6b6059e1f4af92c9804c6337937fa40a5b4",
+        "entry_sha256": "5fcd0776fd3993b02bb197e2c9c489f2c5a37332352dd0796db42a11520b3838",
         "inputs_summary": {
           "iteration": "0"
         },
@@ -82,16 +82,24 @@
         "outputs_summary": {
           "abduction": {
             "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
-            "best_posterior": "757/50000",
-            "confidence": "757/50000",
-            "is_conclusive": "False",
+            "best_posterior": "41/50",
+            "confidence": "41/50",
+            "is_conclusive": "True",
             "narrative": "Combined pattern of controlled confrontation, blame inversion, and hierarchical aggression to nullify forensic investigations and force security concessions."
           },
           "case_id": "case_fusion_agresion_defensiva",
           "pipeline_meta": {
             "artifact_count": "5",
             "avg_score": "757/10000",
+            "ebs_adapter_mode": "motor",
             "expected_verdict": "MALICE",
+            "resolve": {
+              "motor_confidence": "0.82",
+              "motor_reason": "Intent score 0.4120 exceeds MALICE threshold (P2+acq_assurance scale, threshold=0.33)",
+              "motor_score": "0.412",
+              "motor_verdict": "MALICE",
+              "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+            },
             "source": "ebs_v1_json_adapter"
           },
           "signals": [
@@ -138,13 +146,13 @@
           ]
         },
         "seq": 5,
-        "timestamp": "2026-07-05T15:27:42.925684+00:00",
+        "timestamp": "2026-07-06T01:31:08.950201+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "CONTRADICTION_CHECK",
         "case_id": "VIGIA-CAN-052",
-        "entry_sha256": "5ab9c015eb14e234635154a6d2ab9b006626982271cf98726b1aa55619e7f1de",
+        "entry_sha256": "424d5e7eb8cc649860a25be3efa4d10ac7a7031ee2ee15ca478395451d07aa19",
         "inputs_summary": {
           "n_signals": "5"
         },
@@ -155,13 +163,13 @@
           "threshold": "2"
         },
         "seq": 6,
-        "timestamp": "2026-07-05T15:27:42.925800+00:00",
+        "timestamp": "2026-07-06T01:31:08.950322+00:00",
         "tool": "contradiction_detector"
       },
       {
         "action": "AGENT_EXIT",
         "case_id": "VIGIA-CAN-052",
-        "entry_sha256": "f735c701fafdcdb808d3e3337c4f02d113e8520f1f20969fdd2e407089180317",
+        "entry_sha256": "c64c47e9aa4889907784219cf5a41fbc324aa18dfa799e56b6b8def2e0a500aa",
         "inputs_summary": {
           "verdict": "MALICIOUS_INTENT_DETECTED"
         },
@@ -172,26 +180,26 @@
           "exit_code": "1"
         },
         "seq": 7,
-        "timestamp": "2026-07-05T15:27:42.925996+00:00",
+        "timestamp": "2026-07-06T01:31:08.950542+00:00",
         "tool": "vigia_agent"
       }
     ],
-    "start_time": "2026-07-05T15:27:42.922616+00:00",
+    "start_time": "2026-07-06T01:31:08.596812+00:00",
     "total_entries": 7
   },
   "case_id": "VIGIA-CAN-052",
   "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-052.json",
-  "evidence_sha256": "5de63a27890c8faa1ec659a77ed739bb7832ae128741039160ab5368c5a2f729",
+  "evidence_sha256": "61d45c1433e5404dd59f5d450b18823889451bfcb8f03d306e8ab6d1f1af248b",
   "iterations_executed": 1,
-  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-CAN-052 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-052.json\nEvidence SHA-256: 5de63a27890c8faa1ec659a77ed739bb7832ae128741039160ab5368c5a2f729\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 757/50000\nConclusive: NO \u2014 requires human review\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 5 se\u00f1al(es): 5 primaria(s) de ['sift_chat_system', 'sift_syslog', 'sift_volatility'], 0 derivada(s)/no-analizada(s). Top z: Second response with blame inversion: 'W=0.27, Confirmed malicious activity in memory: =0.05, Initial SOC inquiry: 'We detected unusua=0.03.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: MALICIOUS_INTENT_DETECTED. Conclusiva: no \u2014 requiere revisi\u00f3n humana.\n\nRazonamiento del motor abductivo:\nCombined pattern of controlled confrontation, blame inversion, and hierarchical aggression to nullify forensic investigations and force security concessions.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Second response with blame inversion: 'Why are you asking me this? Don] z=0.270 conf=0.30 \u2014 \n  [Confirmed malicious activity in memory: powershell.exe process downloa] z=0.048 conf=0.95 \u2014 \n  [Initial SOC inquiry: 'We detected unusual activity on your account yes] z=0.028 conf=0.40 \u2014 \n  [Confrontational response: 'How can you be so wrong? This is not an err] z=0.018 conf=0.30 \u2014 \n  [Management verification: NO communication record between user@corp.com] z=0.015 conf=0.30 \u2014 \n\n--- FINAL ALERT LEVEL ---\nMEDIUM \u2014 MALICE verdict from posterior aggregation. Individual z-scores below threshold. Full signal review recommended. Alert floored (B-028/B-065).\nReconciliation: verdict MALICE rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 5 | Derived: 0 | Total: 5",
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-CAN-052 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-052.json\nEvidence SHA-256: 61d45c1433e5404dd59f5d450b18823889451bfcb8f03d306e8ab6d1f1af248b\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 41/50\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 5 se\u00f1al(es): 5 primaria(s) de ['sift_chat_system', 'sift_syslog', 'sift_volatility'], 0 derivada(s)/no-analizada(s). Top z: Second response with blame inversion: 'W=0.27, Confirmed malicious activity in memory: =0.05, Initial SOC inquiry: 'We detected unusua=0.03.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: MALICIOUS_INTENT_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nCombined pattern of controlled confrontation, blame inversion, and hierarchical aggression to nullify forensic investigations and force security concessions.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Second response with blame inversion: 'Why are you asking me this? Don] z=0.270 conf=0.30 \u2014 \n  [Confirmed malicious activity in memory: powershell.exe process downloa] z=0.048 conf=0.95 \u2014 \n  [Initial SOC inquiry: 'We detected unusual activity on your account yes] z=0.028 conf=0.40 \u2014 \n  [Confrontational response: 'How can you be so wrong? This is not an err] z=0.018 conf=0.30 \u2014 \n  [Management verification: NO communication record between user@corp.com] z=0.015 conf=0.30 \u2014 \n\n--- FINAL ALERT LEVEL ---\nHIGH \u2014 MALICE verdict from Bayesian posterior aggregation. Individual z-scores below threshold (distributed evidence pattern: no single dominant signal, but aggregate posterior is decisive). Alert floored (B-028/B-065).\nReconciliation: verdict MALICE rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 5 | Derived: 0 | Total: 5",
   "pipeline_results": {
     "abduction": {
       "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
-      "best_posterior": "757/50000",
+      "best_posterior": "41/50",
       "confidence": {
         "__fraction__": true,
-        "den": 50000,
-        "num": 757
+        "den": 50,
+        "num": 41
       },
       "devil_advocate": {
         "aggregation": {
@@ -203,7 +211,7 @@
           "primary_alternative_hypothesis": null
         },
         "decision_context": {
-          "confidence": "757/50000",
+          "confidence": "41/50",
           "mapped_verdict": "MALICIOUS_INTENT_DETECTED",
           "raw_verdict": "MALICIOUS_INTENT_DETECTED",
           "score": "757/10000"
@@ -217,14 +225,22 @@
         "pattern_evidence_gaps": [],
         "version": "r7-da-v1"
       },
-      "is_conclusive": false,
+      "is_conclusive": true,
       "narrative": "Combined pattern of controlled confrontation, blame inversion, and hierarchical aggression to nullify forensic investigations and force security concessions."
     },
     "case_id": "case_fusion_agresion_defensiva",
     "pipeline_meta": {
       "artifact_count": 5,
       "avg_score": "757/10000",
+      "ebs_adapter_mode": "motor",
       "expected_verdict": "MALICE",
+      "resolve": {
+        "motor_confidence": "0.82",
+        "motor_reason": "Intent score 0.4120 exceeds MALICE threshold (P2+acq_assurance scale, threshold=0.33)",
+        "motor_score": "0.412",
+        "motor_verdict": "MALICE",
+        "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+      },
       "source": "ebs_v1_json_adapter"
     },
     "signals": [

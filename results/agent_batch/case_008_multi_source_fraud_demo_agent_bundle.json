@@ -1,15 +1,15 @@
 {
   "agent_verdict": "INTENT",
-  "analysis_timestamp": "2026-07-05T15:27:37.817355+00:00",
+  "analysis_timestamp": "2026-07-06T01:30:25.680539+00:00",
   "audit_trail": {
     "agent_version": "1.0.0-SANS-2026",
     "case_id": "case_008_multi_source_fraud_demo",
-    "end_time": "2026-07-05T15:27:37.817360+00:00",
+    "end_time": "2026-07-06T01:30:25.680544+00:00",
     "entries": [
       {
         "action": "AGENT_INITIALIZED",
         "case_id": "case_008_multi_source_fraud_demo",
-        "entry_sha256": "3f07979a9397a1ce413d36646ef08b7bbdb82f40017442f0f799f80301fc7268",
+        "entry_sha256": "40f7f563f3a050acc5b3b3eb0e15e30e45e81baf46004d7eb2806cb4f07533ee",
         "inputs_summary": {
           "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
           "case_id": "case_008_multi_source_fraud_demo"
@@ -21,13 +21,13 @@
           "agent_version": "1.0.0-SANS-2026"
         },
         "seq": 1,
-        "timestamp": "2026-07-05T15:27:37.814183+00:00",
+        "timestamp": "2026-07-06T01:30:25.328731+00:00",
         "tool": "vigia_agent"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "case_008_multi_source_fraud_demo",
-        "entry_sha256": "2c348318aea31d18e647e0955ab340fd8aa50e3459bcd815aed4fe1f247ea785",
+        "entry_sha256": "5869f853ed303eaee3cb0df7840c0c4310e43716e5b5e6ca7b2c45632db03637",
         "inputs_summary": {
           "path": "/home/labestiadevigia/vigia-repo/data/cases/case_008_multi_source_fraud_demo.json"
         },
@@ -35,29 +35,29 @@
         "note": "Computing SHA-256 of original evidence",
         "outputs_summary": {},
         "seq": 2,
-        "timestamp": "2026-07-05T15:27:37.814271+00:00",
+        "timestamp": "2026-07-06T01:30:25.328829+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "case_008_multi_source_fraud_demo",
-        "entry_sha256": "1f85c24202cff924ca9efebba42ee483d2bad2cf6fc684a79080e3ba7d20c05e",
+        "entry_sha256": "b3647747eaae4bb12d49f2a0d43e61acdce2c5f8d90fc7289e934cd236f1c953",
         "inputs_summary": {
           "path": "/home/labestiadevigia/vigia-repo/data/cases/case_008_multi_source_fraud_demo.json"
         },
         "iteration": 0,
-        "note": "Evidence verified: 8743426bc838471f...",
+        "note": "Evidence verified: 9cbc715df963814f...",
         "outputs_summary": {
-          "sha256": "8743426bc838471f4233047197a027e03d24b8d94b6dbc8159cd124734dce28b"
+          "sha256": "9cbc715df963814fd99c14e22d132725e84a09c124d4cca61de4f5b784292652"
         },
         "seq": 3,
-        "timestamp": "2026-07-05T15:27:37.814369+00:00",
+        "timestamp": "2026-07-06T01:30:25.328932+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "PIPELINE_EXECUTE",
         "case_id": "case_008_multi_source_fraud_demo",
-        "entry_sha256": "d6d5b0dd0a10db3dcd0330bf9d81ee743dad0d9d941fa96206b2ed402c141feb",
+        "entry_sha256": "9926d4f29b6a2f89c318575d08d431eabc7392cde8561d3dd39121c2854320af",
         "inputs_summary": {
           "evidence": "/home/labestiadevigia/vigia-repo/data/cases/case_008_multi_source_fraud_demo.json",
           "iteration": "0",
@@ -67,13 +67,13 @@
         "note": "Executing pipeline \u2014 iteration 0",
         "outputs_summary": {},
         "seq": 4,
-        "timestamp": "2026-07-05T15:27:37.814488+00:00",
+        "timestamp": "2026-07-06T01:30:25.329055+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "PIPELINE_COMPLETE",
         "case_id": "case_008_multi_source_fraud_demo",
-        "entry_sha256": "bb1ef0836d9a84a24ab1d2ba1ba72ba64b9d74f1674ac7d135e2caf5870e7265",
+        "entry_sha256": "10dbfb5e727cf7c8955cc287c753c3f6e48f769aa89e6f31d581aee3caa41ef5",
         "inputs_summary": {
           "iteration": "0"
         },
@@ -82,16 +82,24 @@
         "outputs_summary": {
           "abduction": {
             "best_hypothesis": "SUSPICION_DETECTED",
-            "best_posterior": "0",
-            "confidence": "0",
-            "is_conclusive": "False",
+            "best_posterior": "37/100",
+            "confidence": "37/100",
+            "is_conclusive": "True",
             "narrative": "A company receives an external audit report concluding there were no accounting irregularities. The report is accompanied by system logs and a screenshot of the financial dashboard. VIG\u00cdA must correla..."
           },
           "case_id": "VIGIA-2026-DEMO-008",
           "pipeline_meta": {
             "artifact_count": "4",
             "avg_score": "0",
+            "ebs_adapter_mode": "motor",
             "expected_verdict": "SUSPICION",
+            "resolve": {
+              "motor_confidence": "0.37",
+              "motor_reason": "Significant signal with structural support (score=0.1852)",
+              "motor_score": "0.1852",
+              "motor_verdict": "SUSPICION",
+              "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+            },
             "source": "ebs_v1_json_adapter"
           },
           "signals": [
@@ -130,13 +138,13 @@
           ]
         },
         "seq": 5,
-        "timestamp": "2026-07-05T15:27:37.817025+00:00",
+        "timestamp": "2026-07-06T01:30:25.680155+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "CONTRADICTION_CHECK",
         "case_id": "case_008_multi_source_fraud_demo",
-        "entry_sha256": "10c2c3642552d7b255dbc1429c21039cc611b6115fc24a2798bd0c6e0a337e7e",
+        "entry_sha256": "ac298a30f23cbf040aaef90771dd0ff1a5ff1bb51399f88a8be16b9837139702",
         "inputs_summary": {
           "n_signals": "4"
         },
@@ -147,13 +155,13 @@
           "threshold": "2"
         },
         "seq": 6,
-        "timestamp": "2026-07-05T15:27:37.817130+00:00",
+        "timestamp": "2026-07-06T01:30:25.680270+00:00",
         "tool": "contradiction_detector"
       },
       {
         "action": "AGENT_EXIT",
         "case_id": "case_008_multi_source_fraud_demo",
-        "entry_sha256": "9f33c4a73e843984ae9694b4b6e5514489f7cfbcc8d165e11b76b3dc62563107",
+        "entry_sha256": "8c6d1bd913f15a03abde7ee8457d4104dc1d2af7026439260ccf107aebf2e775",
         "inputs_summary": {
           "verdict": "SUSPICION_DETECTED"
         },
@@ -164,35 +172,43 @@
           "exit_code": "3"
         },
         "seq": 7,
-        "timestamp": "2026-07-05T15:27:37.817305+00:00",
+        "timestamp": "2026-07-06T01:30:25.680483+00:00",
         "tool": "vigia_agent"
       }
     ],
-    "start_time": "2026-07-05T15:27:37.813957+00:00",
+    "start_time": "2026-07-06T01:30:25.328393+00:00",
     "total_entries": 7
   },
   "case_id": "case_008_multi_source_fraud_demo",
   "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/case_008_multi_source_fraud_demo.json",
-  "evidence_sha256": "8743426bc838471f4233047197a027e03d24b8d94b6dbc8159cd124734dce28b",
+  "evidence_sha256": "9cbc715df963814fd99c14e22d132725e84a09c124d4cca61de4f5b784292652",
   "iterations_executed": 1,
-  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE case_008_multi_source_fraud_demo ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/case_008_multi_source_fraud_demo.json\nEvidence SHA-256: 8743426bc838471f4233047197a027e03d24b8d94b6dbc8159cd124734dce28b\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: SUSPICION_DETECTED\nPosterior confidence: 0\nConclusive: NO \u2014 requires human review\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 4 se\u00f1al(es): 4 primaria(s) de ['unknown'], 0 derivada(s)/no-analizada(s). Top z: unknown=0.00, unknown=0.00, unknown=0.00.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: SUSPICION_DETECTED. Conclusiva: no \u2014 requiere revisi\u00f3n humana.\n\nRazonamiento del motor abductivo:\nA company receives an external audit report concluding there were no accounting irregularities. The report is accompanied by system logs and a screenshot of the financial dashboard. VIG\u00cdA must correlate three independent sources to detect that all three were manipulated with the same objective.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [unknown] z=0.000 conf=0.50 \u2014 \n  [unknown] z=0.000 conf=0.50 \u2014 \n  [unknown] z=0.000 conf=0.50 \u2014 \n  [unknown] z=0.000 conf=0.50 \u2014 \n\n--- FINAL ALERT LEVEL ---\nMEDIUM \u2014 INTENT verdict with individual z-scores below threshold. Alert floored (B-028/B-065): an intent finding cannot present as LOW.\nReconciliation: verdict INTENT rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 4 | Derived: 0 | Total: 4",
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE case_008_multi_source_fraud_demo ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/case_008_multi_source_fraud_demo.json\nEvidence SHA-256: 9cbc715df963814fd99c14e22d132725e84a09c124d4cca61de4f5b784292652\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: SUSPICION_DETECTED\nPosterior confidence: 37/100\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 4 se\u00f1al(es): 4 primaria(s) de ['unknown'], 0 derivada(s)/no-analizada(s). Top z: unknown=0.00, unknown=0.00, unknown=0.00.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: SUSPICION_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nA company receives an external audit report concluding there were no accounting irregularities. The report is accompanied by system logs and a screenshot of the financial dashboard. VIG\u00cdA must correlate three independent sources to detect that all three were manipulated with the same objective.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [unknown] z=0.000 conf=0.50 \u2014 \n  [unknown] z=0.000 conf=0.50 \u2014 \n  [unknown] z=0.000 conf=0.50 \u2014 \n  [unknown] z=0.000 conf=0.50 \u2014 \n\n--- FINAL ALERT LEVEL ---\nMEDIUM \u2014 INTENT verdict with individual z-scores below threshold. Alert floored (B-028/B-065): an intent finding cannot present as LOW.\nReconciliation: verdict INTENT rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 4 | Derived: 0 | Total: 4",
   "pipeline_results": {
     "abduction": {
       "best_hypothesis": "SUSPICION_DETECTED",
-      "best_posterior": "0",
+      "best_posterior": "37/100",
       "confidence": {
         "__fraction__": true,
-        "den": 1,
-        "num": 0
+        "den": 100,
+        "num": 37
       },
-      "is_conclusive": false,
+      "is_conclusive": true,
       "narrative": "A company receives an external audit report concluding there were no accounting irregularities. The report is accompanied by system logs and a screenshot of the financial dashboard. VIG\u00cdA must correlate three independent sources to detect that all three were manipulated with the same objective."
     },
     "case_id": "VIGIA-2026-DEMO-008",
     "pipeline_meta": {
       "artifact_count": 4,
       "avg_score": "0",
+      "ebs_adapter_mode": "motor",
       "expected_verdict": "SUSPICION",
+      "resolve": {
+        "motor_confidence": "0.37",
+        "motor_reason": "Significant signal with structural support (score=0.1852)",
+        "motor_score": "0.1852",
+        "motor_verdict": "SUSPICION",
+        "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+      },
       "source": "ebs_v1_json_adapter"
     },
     "signals": [

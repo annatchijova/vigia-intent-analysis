@@ -1,15 +1,15 @@
 {
   "agent_verdict": "MALICE",
-  "analysis_timestamp": "2026-07-05T15:27:36.534088+00:00",
+  "analysis_timestamp": "2026-07-06T01:30:15.008117+00:00",
   "audit_trail": {
     "agent_version": "1.0.0-SANS-2026",
     "case_id": "VIGIA-REAL-SRL-RD05-MEMORY",
-    "end_time": "2026-07-05T15:27:36.534095+00:00",
+    "end_time": "2026-07-06T01:30:15.008124+00:00",
     "entries": [
       {
         "action": "AGENT_INITIALIZED",
         "case_id": "VIGIA-REAL-SRL-RD05-MEMORY",
-        "entry_sha256": "a11d3e27c26f395b949b00e4552e6d6b01376f4911c2a6314ce004e980b6fd70",
+        "entry_sha256": "d9c27542aa9836a4cc195c81db6d3aea22f779442abdc17e1d2668a50cc2fa3b",
         "inputs_summary": {
           "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
           "case_id": "VIGIA-REAL-SRL-RD05-MEMORY"
@@ -21,13 +21,13 @@
           "agent_version": "1.0.0-SANS-2026"
         },
         "seq": 1,
-        "timestamp": "2026-07-05T15:27:36.530587+00:00",
+        "timestamp": "2026-07-06T01:30:14.654662+00:00",
         "tool": "vigia_agent"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-REAL-SRL-RD05-MEMORY",
-        "entry_sha256": "4c093b2a3d3fd39191b9baf9a7167d32cbe3969f1d9dbeedccc08727652a9db3",
+        "entry_sha256": "9980e0645d62ba7dad6431b2b4b4761473bfc0793e8af6b38ff4713f8f58b003",
         "inputs_summary": {
           "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-REAL-SRL-RD05-MEMORY.json"
         },
@@ -35,13 +35,13 @@
         "note": "Computing SHA-256 of original evidence",
         "outputs_summary": {},
         "seq": 2,
-        "timestamp": "2026-07-05T15:27:36.530671+00:00",
+        "timestamp": "2026-07-06T01:30:14.654742+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-REAL-SRL-RD05-MEMORY",
-        "entry_sha256": "86a4a0b3eaa3878095b80885d761e73b1241124073d00d6c0bff380d4e86d7e6",
+        "entry_sha256": "177172810e8aa633689dd386194d127c5ec426442380bd68227714cef3baaf84",
         "inputs_summary": {
           "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-REAL-SRL-RD05-MEMORY.json"
         },
@@ -51,13 +51,13 @@
           "sha256": "3e94bbf35f9aad6ac7c67803123f52cd2a5720f6898add216b30a0ff32f91f72"
         },
         "seq": 3,
-        "timestamp": "2026-07-05T15:27:36.530763+00:00",
+        "timestamp": "2026-07-06T01:30:14.654833+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "PIPELINE_EXECUTE",
         "case_id": "VIGIA-REAL-SRL-RD05-MEMORY",
-        "entry_sha256": "e774ec7a25a9073b23febbe78823bc556bde867b742e4b428ed072b0416f08e3",
+        "entry_sha256": "d8ef5e2d7d3adedfdd3c3d0439aa5139a9b9acdce2a48353e49c2b7266f80b49",
         "inputs_summary": {
           "evidence": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-REAL-SRL-RD05-MEMORY.json",
           "iteration": "0",
@@ -67,13 +67,13 @@
         "note": "Executing pipeline \u2014 iteration 0",
         "outputs_summary": {},
         "seq": 4,
-        "timestamp": "2026-07-05T15:27:36.530868+00:00",
+        "timestamp": "2026-07-06T01:30:14.654932+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "PIPELINE_COMPLETE",
         "case_id": "VIGIA-REAL-SRL-RD05-MEMORY",
-        "entry_sha256": "7271faae873682ef752c3ad961e184c493dbf0af61105d674e5195bb2a58f849",
+        "entry_sha256": "1b393c9c39b837cdf27f0d2972aae186c170c1b42b759460053b7ecbcb54be97",
         "inputs_summary": {
           "iteration": "0"
         },
@@ -82,16 +82,24 @@
         "outputs_summary": {
           "abduction": {
             "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
-            "best_posterior": "0",
-            "confidence": "0",
-            "is_conclusive": "False",
+            "best_posterior": "19/20",
+            "confidence": "19/20",
+            "is_conclusive": "True",
             "narrative": "Volatility3 memory analysis of base-rd-05-memory.img. Windows 10 64-bit. Severe compromise confirmed: code injection in 43 processes and 3 living-off-the-land processes. Most compromised server in the..."
           },
           "case_id": "VIGIA-REAL-SRL-RD05-MEMORY",
           "pipeline_meta": {
             "artifact_count": "3",
             "avg_score": "0",
+            "ebs_adapter_mode": "motor",
             "expected_verdict": "MALICE",
+            "resolve": {
+              "motor_confidence": "0.95",
+              "motor_reason": "Intent score 0.5292 exceeds MALICE threshold (P2+acq_assurance scale, threshold=0.33)",
+              "motor_score": "0.5292",
+              "motor_verdict": "MALICE",
+              "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+            },
             "source": "ebs_v1_json_adapter"
           },
           "signals": [
@@ -122,13 +130,13 @@
           ]
         },
         "seq": 5,
-        "timestamp": "2026-07-05T15:27:36.533350+00:00",
+        "timestamp": "2026-07-06T01:30:15.007604+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "CONTRADICTION_CHECK",
         "case_id": "VIGIA-REAL-SRL-RD05-MEMORY",
-        "entry_sha256": "afce1a0b37155ddc4a10e2bc954626d5b1e4733a0c0f68f4d865f4e8c46db9ee",
+        "entry_sha256": "bfc4392d298a57026a77e38d42aaf41c30193c161a65334a0868b666f6768a28",
         "inputs_summary": {
           "n_signals": "3"
         },
@@ -139,13 +147,13 @@
           "threshold": "2"
         },
         "seq": 6,
-        "timestamp": "2026-07-05T15:27:36.533460+00:00",
+        "timestamp": "2026-07-06T01:30:15.007711+00:00",
         "tool": "contradiction_detector"
       },
       {
         "action": "AGENT_EXIT",
         "case_id": "VIGIA-REAL-SRL-RD05-MEMORY",
-        "entry_sha256": "9e131551a94e957db550e82b6b81de2300e9690fe7dc71e674dc39593e6e8cb5",
+        "entry_sha256": "40326db6836e814ae5db2fc53a7e3e70e85b4bb6820518da86d99236a1263832",
         "inputs_summary": {
           "verdict": "MALICIOUS_INTENT_DETECTED"
         },
@@ -156,26 +164,26 @@
           "exit_code": "1"
         },
         "seq": 7,
-        "timestamp": "2026-07-05T15:27:36.533635+00:00",
+        "timestamp": "2026-07-06T01:30:15.007913+00:00",
         "tool": "vigia_agent"
       }
     ],
-    "start_time": "2026-07-05T15:27:36.530350+00:00",
+    "start_time": "2026-07-06T01:30:14.654438+00:00",
     "total_entries": 7
   },
   "case_id": "VIGIA-REAL-SRL-RD05-MEMORY",
   "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-REAL-SRL-RD05-MEMORY.json",
   "evidence_sha256": "3e94bbf35f9aad6ac7c67803123f52cd2a5720f6898add216b30a0ff32f91f72",
   "iterations_executed": 1,
-  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-REAL-SRL-RD05-MEMORY ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/VIGIA-REAL-SRL-RD05-MEMORY.json\nEvidence SHA-256: 3e94bbf35f9aad6ac7c67803123f52cd2a5720f6898add216b30a0ff32f91f72\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 0\nConclusive: NO \u2014 requires human review\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 3 se\u00f1al(es): 3 primaria(s) de ['unknown'], 0 derivada(s)/no-analizada(s). Top z: unknown=0.00, unknown=0.00, unknown=0.00.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: MALICIOUS_INTENT_DETECTED. Conclusiva: no \u2014 requiere revisi\u00f3n humana.\n\nRazonamiento del motor abductivo:\nVolatility3 memory analysis of base-rd-05-memory.img. Windows 10 64-bit. Severe compromise confirmed: code injection in 43 processes and 3 living-off-the-land processes. Most compromised server in the SRL-2018 corpus by process count.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [unknown] z=0.000 conf=0.50 \u2014 \n  [unknown] z=0.000 conf=0.50 \u2014 \n  [unknown] z=0.000 conf=0.50 \u2014 \n\n--- FINAL ALERT LEVEL ---\nMEDIUM \u2014 MALICE verdict from posterior aggregation. Individual z-scores below threshold. Full signal review recommended. Alert floored (B-028/B-065).\nReconciliation: verdict MALICE rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 3 | Derived: 0 | Total: 3",
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-REAL-SRL-RD05-MEMORY ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/VIGIA-REAL-SRL-RD05-MEMORY.json\nEvidence SHA-256: 3e94bbf35f9aad6ac7c67803123f52cd2a5720f6898add216b30a0ff32f91f72\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 19/20\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 3 se\u00f1al(es): 3 primaria(s) de ['unknown'], 0 derivada(s)/no-analizada(s). Top z: unknown=0.00, unknown=0.00, unknown=0.00.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: MALICIOUS_INTENT_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nVolatility3 memory analysis of base-rd-05-memory.img. Windows 10 64-bit. Severe compromise confirmed: code injection in 43 processes and 3 living-off-the-land processes. Most compromised server in the SRL-2018 corpus by process count.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [unknown] z=0.000 conf=0.50 \u2014 \n  [unknown] z=0.000 conf=0.50 \u2014 \n  [unknown] z=0.000 conf=0.50 \u2014 \n\n--- FINAL ALERT LEVEL ---\nHIGH \u2014 MALICE verdict from Bayesian posterior aggregation. Individual z-scores below threshold (distributed evidence pattern: no single dominant signal, but aggregate posterior is decisive). Alert floored (B-028/B-065).\nReconciliation: verdict MALICE rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 3 | Derived: 0 | Total: 3",
   "pipeline_results": {
     "abduction": {
       "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
-      "best_posterior": "0",
+      "best_posterior": "19/20",
       "confidence": {
         "__fraction__": true,
-        "den": 1,
-        "num": 0
+        "den": 20,
+        "num": 19
       },
       "devil_advocate": {
         "aggregation": {
@@ -187,7 +195,7 @@
           "primary_alternative_hypothesis": null
         },
         "decision_context": {
-          "confidence": "0",
+          "confidence": "19/20",
           "mapped_verdict": "MALICIOUS_INTENT_DETECTED",
           "raw_verdict": "MALICIOUS_INTENT_DETECTED",
           "score": "0"
@@ -201,14 +209,22 @@
         "pattern_evidence_gaps": [],
         "version": "r7-da-v1"
       },
-      "is_conclusive": false,
+      "is_conclusive": true,
       "narrative": "Volatility3 memory analysis of base-rd-05-memory.img. Windows 10 64-bit. Severe compromise confirmed: code injection in 43 processes and 3 living-off-the-land processes. Most compromised server in the SRL-2018 corpus by process count."
     },
     "case_id": "VIGIA-REAL-SRL-RD05-MEMORY",
     "pipeline_meta": {
       "artifact_count": 3,
       "avg_score": "0",
+      "ebs_adapter_mode": "motor",
       "expected_verdict": "MALICE",
+      "resolve": {
+        "motor_confidence": "0.95",
+        "motor_reason": "Intent score 0.5292 exceeds MALICE threshold (P2+acq_assurance scale, threshold=0.33)",
+        "motor_score": "0.5292",
+        "motor_verdict": "MALICE",
+        "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+      },
       "source": "ebs_v1_json_adapter"
     },
     "signals": [

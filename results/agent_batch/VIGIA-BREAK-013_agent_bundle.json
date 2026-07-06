@@ -1,15 +1,15 @@
 {
   "agent_verdict": "INTENT",
-  "analysis_timestamp": "2026-07-05T15:27:33.110813+00:00",
+  "analysis_timestamp": "2026-07-06T01:29:45.694532+00:00",
   "audit_trail": {
     "agent_version": "1.0.0-SANS-2026",
     "case_id": "VIGIA-BREAK-013",
-    "end_time": "2026-07-05T15:27:33.110818+00:00",
+    "end_time": "2026-07-06T01:29:45.694538+00:00",
     "entries": [
       {
         "action": "AGENT_INITIALIZED",
         "case_id": "VIGIA-BREAK-013",
-        "entry_sha256": "774b6764ba7fe26d13ec80d4820a15e7ee12c6461ba8c2dc80356114f3ac7348",
+        "entry_sha256": "c522e9c1765c0f51fb2403af27f1833fb8e213d3272783d40f98c9e7a6a7ad3d",
         "inputs_summary": {
           "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
           "case_id": "VIGIA-BREAK-013"
@@ -21,13 +21,13 @@
           "agent_version": "1.0.0-SANS-2026"
         },
         "seq": 1,
-        "timestamp": "2026-07-05T15:27:33.107672+00:00",
+        "timestamp": "2026-07-06T01:29:45.346121+00:00",
         "tool": "vigia_agent"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-BREAK-013",
-        "entry_sha256": "2f266619c43cebc890f80e9b549d4ebdafedf8175280a5bb75ba92b96adc8927",
+        "entry_sha256": "daf0906fc54cf6cfc127e1df7ec50f50f85e48d0d473ac567b14bae3c28e1d79",
         "inputs_summary": {
           "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-BREAK-013.json"
         },
@@ -35,29 +35,29 @@
         "note": "Computing SHA-256 of original evidence",
         "outputs_summary": {},
         "seq": 2,
-        "timestamp": "2026-07-05T15:27:33.107756+00:00",
+        "timestamp": "2026-07-06T01:29:45.346204+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-BREAK-013",
-        "entry_sha256": "556ac617a571655e1b67d37bff1ab9d04ca722595f18f994ffdb6d0d219fe9f1",
+        "entry_sha256": "1d238e66077680bbd30fdea2b9b836a81341f28c886203df058158237c8794e7",
         "inputs_summary": {
           "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-BREAK-013.json"
         },
         "iteration": 0,
-        "note": "Evidence verified: e3c13f014a50e13d...",
+        "note": "Evidence verified: 8e8f588c68cfa594...",
         "outputs_summary": {
-          "sha256": "e3c13f014a50e13ddbfecd6021a69f1006568b1f6a6302df630676147894d1f9"
+          "sha256": "8e8f588c68cfa59490e2bf6d79ebf2fa76f64d2768b8fadcc52cac59926b3253"
         },
         "seq": 3,
-        "timestamp": "2026-07-05T15:27:33.107849+00:00",
+        "timestamp": "2026-07-06T01:29:45.346300+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "PIPELINE_EXECUTE",
         "case_id": "VIGIA-BREAK-013",
-        "entry_sha256": "f422dcf1cb11b54f3e12f2fc02027947cb0fa643e038029dfa1ad5f5f749d8aa",
+        "entry_sha256": "a756b3e8953bb53d3538d450f8e1e9ba37d6a3347b503d35ae5a4a2539de3be4",
         "inputs_summary": {
           "evidence": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-BREAK-013.json",
           "iteration": "0",
@@ -67,13 +67,13 @@
         "note": "Executing pipeline \u2014 iteration 0",
         "outputs_summary": {},
         "seq": 4,
-        "timestamp": "2026-07-05T15:27:33.107952+00:00",
+        "timestamp": "2026-07-06T01:29:45.346402+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "PIPELINE_COMPLETE",
         "case_id": "VIGIA-BREAK-013",
-        "entry_sha256": "2d1993e9880d62ebfdcfcf8b0835b8a097654732613e657b94b1db312e3ee479",
+        "entry_sha256": "e58f25ebb664f5f317cc7bbb9c5782cc147de72d377b2604e68e54322ea02cf5",
         "inputs_summary": {
           "iteration": "0"
         },
@@ -82,8 +82,8 @@
         "outputs_summary": {
           "abduction": {
             "best_hypothesis": "SUSPICION_DETECTED",
-            "best_posterior": "807/10000",
-            "confidence": "807/10000",
+            "best_posterior": "53/100",
+            "confidence": "53/100",
             "is_conclusive": "True",
             "narrative": "Everything is consistent. Everything validates. Everything correlates. Everything has coherent timestamps and correct hashes. The problem is the attacker fabricated absolutely everything. The only evi..."
           },
@@ -91,7 +91,15 @@
           "pipeline_meta": {
             "artifact_count": "3",
             "avg_score": "807/2000",
+            "ebs_adapter_mode": "motor",
             "expected_verdict": "SUSPICION",
+            "resolve": {
+              "motor_confidence": "0.53",
+              "motor_reason": "Significant signal with structural support (score=0.2661)",
+              "motor_score": "0.2661",
+              "motor_verdict": "SUSPICION",
+              "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+            },
             "source": "ebs_v1_json_adapter"
           },
           "signals": [
@@ -122,13 +130,13 @@
           ]
         },
         "seq": 5,
-        "timestamp": "2026-07-05T15:27:33.110493+00:00",
+        "timestamp": "2026-07-06T01:29:45.694160+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "CONTRADICTION_CHECK",
         "case_id": "VIGIA-BREAK-013",
-        "entry_sha256": "9baa5d88ac91b5453b85dcbb7d77b4c99c3258a1ba190cef567cdc5546b555f7",
+        "entry_sha256": "c0e77e6fca55a0ed1c0bc7430b3bab3a2272e3170759707c155474ecc52a1de8",
         "inputs_summary": {
           "n_signals": "3"
         },
@@ -139,13 +147,13 @@
           "threshold": "2"
         },
         "seq": 6,
-        "timestamp": "2026-07-05T15:27:33.110597+00:00",
+        "timestamp": "2026-07-06T01:29:45.694272+00:00",
         "tool": "contradiction_detector"
       },
       {
         "action": "AGENT_EXIT",
         "case_id": "VIGIA-BREAK-013",
-        "entry_sha256": "047a55143a4fcfe4c8869f8eeebf1c820a5c5dbc43818c7abaa9c4f32280a0eb",
+        "entry_sha256": "158335fe4a141b0254434e0bff06747658cba28d1173837554e46ff3cce21b28",
         "inputs_summary": {
           "verdict": "SUSPICION_DETECTED"
         },
@@ -156,26 +164,26 @@
           "exit_code": "3"
         },
         "seq": 7,
-        "timestamp": "2026-07-05T15:27:33.110764+00:00",
+        "timestamp": "2026-07-06T01:29:45.694478+00:00",
         "tool": "vigia_agent"
       }
     ],
-    "start_time": "2026-07-05T15:27:33.107447+00:00",
+    "start_time": "2026-07-06T01:29:45.345904+00:00",
     "total_entries": 7
   },
   "case_id": "VIGIA-BREAK-013",
   "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-BREAK-013.json",
-  "evidence_sha256": "e3c13f014a50e13ddbfecd6021a69f1006568b1f6a6302df630676147894d1f9",
+  "evidence_sha256": "8e8f588c68cfa59490e2bf6d79ebf2fa76f64d2768b8fadcc52cac59926b3253",
   "iterations_executed": 1,
-  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-BREAK-013 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/VIGIA-BREAK-013.json\nEvidence SHA-256: e3c13f014a50e13ddbfecd6021a69f1006568b1f6a6302df630676147894d1f9\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: SUSPICION_DETECTED\nPosterior confidence: 807/10000\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 3 se\u00f1al(es): 3 primaria(s) de ['sift_entropy', 'sift_file_audit', 'sift_git_audit'], 0 derivada(s)/no-analizada(s). Top z: Modified filenames: a.py, b.py, c.py... =0.62, Timestamp variance between commits: exac=0.55, 50 git commits with valid hashes, correc=0.04.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: SUSPICION_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nEverything is consistent. Everything validates. Everything correlates. Everything has coherent timestamps and correct hashes. The problem is the attacker fabricated absolutely everything. The only evidence is a minuscule statistical anomaly.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Modified filenames: a.py, b.py, c.py... ax.py. Perfect alphabetical se] z=0.616 conf=0.70 \u2014 \n  [Timestamp variance between commits: exactly 3600.0 seconds (1 hour) in] z=0.552 conf=0.60 \u2014 \n  [50 git commits with valid hashes, correct GPG signatures, coherent tim] z=0.043 conf=0.85 \u2014 \n\n--- FINAL ALERT LEVEL ---\nMEDIUM \u2014 INTENT verdict with individual z-scores below threshold. Alert floored (B-028/B-065): an intent finding cannot present as LOW.\nReconciliation: verdict INTENT rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 3 | Derived: 0 | Total: 3",
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-BREAK-013 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/VIGIA-BREAK-013.json\nEvidence SHA-256: 8e8f588c68cfa59490e2bf6d79ebf2fa76f64d2768b8fadcc52cac59926b3253\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: SUSPICION_DETECTED\nPosterior confidence: 53/100\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 3 se\u00f1al(es): 3 primaria(s) de ['sift_entropy', 'sift_file_audit', 'sift_git_audit'], 0 derivada(s)/no-analizada(s). Top z: Modified filenames: a.py, b.py, c.py... =0.62, Timestamp variance between commits: exac=0.55, 50 git commits with valid hashes, correc=0.04.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: SUSPICION_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nEverything is consistent. Everything validates. Everything correlates. Everything has coherent timestamps and correct hashes. The problem is the attacker fabricated absolutely everything. The only evidence is a minuscule statistical anomaly.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Modified filenames: a.py, b.py, c.py... ax.py. Perfect alphabetical se] z=0.616 conf=0.70 \u2014 \n  [Timestamp variance between commits: exactly 3600.0 seconds (1 hour) in] z=0.552 conf=0.60 \u2014 \n  [50 git commits with valid hashes, correct GPG signatures, coherent tim] z=0.043 conf=0.85 \u2014 \n\n--- FINAL ALERT LEVEL ---\nMEDIUM \u2014 INTENT verdict with individual z-scores below threshold. Alert floored (B-028/B-065): an intent finding cannot present as LOW.\nReconciliation: verdict INTENT rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 3 | Derived: 0 | Total: 3",
   "pipeline_results": {
     "abduction": {
       "best_hypothesis": "SUSPICION_DETECTED",
-      "best_posterior": "807/10000",
+      "best_posterior": "53/100",
       "confidence": {
         "__fraction__": true,
-        "den": 10000,
-        "num": 807
+        "den": 100,
+        "num": 53
       },
       "is_conclusive": true,
       "narrative": "Everything is consistent. Everything validates. Everything correlates. Everything has coherent timestamps and correct hashes. The problem is the attacker fabricated absolutely everything. The only evidence is a minuscule statistical anomaly."
@@ -184,7 +192,15 @@
     "pipeline_meta": {
       "artifact_count": 3,
       "avg_score": "807/2000",
+      "ebs_adapter_mode": "motor",
       "expected_verdict": "SUSPICION",
+      "resolve": {
+        "motor_confidence": "0.53",
+        "motor_reason": "Significant signal with structural support (score=0.2661)",
+        "motor_score": "0.2661",
+        "motor_verdict": "SUSPICION",
+        "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+      },
       "source": "ebs_v1_json_adapter"
     },
     "signals": [

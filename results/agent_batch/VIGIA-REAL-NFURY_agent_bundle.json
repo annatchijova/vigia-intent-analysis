@@ -1,15 +1,15 @@
 {
   "agent_verdict": "INTENT",
-  "analysis_timestamp": "2026-07-05T15:27:39.238478+00:00",
+  "analysis_timestamp": "2026-07-06T01:30:37.482882+00:00",
   "audit_trail": {
     "agent_version": "1.0.0-SANS-2026",
     "case_id": "VIGIA-REAL-NFURY",
-    "end_time": "2026-07-05T15:27:39.238483+00:00",
+    "end_time": "2026-07-06T01:30:37.482887+00:00",
     "entries": [
       {
         "action": "AGENT_INITIALIZED",
         "case_id": "VIGIA-REAL-NFURY",
-        "entry_sha256": "5e432f195a59d0a596441394de3e0d5d41a01c73b2f11f700830ce5223a8d5ef",
+        "entry_sha256": "9c357e79fccbf15c392156a7efe36dc257fa5c7dbdd739f5b503cff4f84a0d39",
         "inputs_summary": {
           "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
           "case_id": "VIGIA-REAL-NFURY"
@@ -21,13 +21,13 @@
           "agent_version": "1.0.0-SANS-2026"
         },
         "seq": 1,
-        "timestamp": "2026-07-05T15:27:39.234993+00:00",
+        "timestamp": "2026-07-06T01:30:37.123679+00:00",
         "tool": "vigia_agent"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-REAL-NFURY",
-        "entry_sha256": "7e3249010f8281c8f1ecb966ec6d5b948ccf77fa45fb6445ec91acdf04563159",
+        "entry_sha256": "80330455202f5af9cd01b16dd023d014ff371c74b47a987d386f01968f8bdb91",
         "inputs_summary": {
           "path": "/home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-REAL-NFURY.json"
         },
@@ -35,13 +35,13 @@
         "note": "Computing SHA-256 of original evidence",
         "outputs_summary": {},
         "seq": 2,
-        "timestamp": "2026-07-05T15:27:39.235078+00:00",
+        "timestamp": "2026-07-06T01:30:37.123766+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-REAL-NFURY",
-        "entry_sha256": "9737a8ad6cdbd72e037b08e985991ef7b461ad94e5720a9eb550b27ad813fdc1",
+        "entry_sha256": "f8700b5a62cd060952d38923c7cb14ad4b5c5baa4f7076eb7b412f765aee2379",
         "inputs_summary": {
           "path": "/home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-REAL-NFURY.json"
         },
@@ -51,13 +51,13 @@
           "sha256": "2824eaaff943b5937a7653aaf1f157537c11c69a87faa32dce97db4d0a1c8596"
         },
         "seq": 3,
-        "timestamp": "2026-07-05T15:27:39.235177+00:00",
+        "timestamp": "2026-07-06T01:30:37.123866+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "PIPELINE_EXECUTE",
         "case_id": "VIGIA-REAL-NFURY",
-        "entry_sha256": "354a864c75ec8b3d4ff7526517f837e023b8b6e05732f9241247c24c9ce49f82",
+        "entry_sha256": "626f404e68642f3afdf05caf1f0aad848f3202f33ec08b3ff707b8e90223acf0",
         "inputs_summary": {
           "evidence": "/home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-REAL-NFURY.json",
           "iteration": "0",
@@ -67,13 +67,13 @@
         "note": "Executing pipeline \u2014 iteration 0",
         "outputs_summary": {},
         "seq": 4,
-        "timestamp": "2026-07-05T15:27:39.235283+00:00",
+        "timestamp": "2026-07-06T01:30:37.123968+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "PIPELINE_COMPLETE",
         "case_id": "VIGIA-REAL-NFURY",
-        "entry_sha256": "ead1e001d682a3335ced4e3c129277ab1d7c4ab7bf1fa63b8477919d2c664c38",
+        "entry_sha256": "d7ab4f69639b40ce55274b54311ee8cb5287edc8beb40d5e517678de13202e23",
         "inputs_summary": {
           "iteration": "0"
         },
@@ -82,16 +82,24 @@
         "outputs_summary": {
           "abduction": {
             "best_hypothesis": "SUSPICION_DETECTED",
-            "best_posterior": "2913/50000",
-            "confidence": "2913/50000",
-            "is_conclusive": "False",
+            "best_posterior": "49/100",
+            "confidence": "49/100",
+            "is_conclusive": "True",
             "narrative": "Nick Fury (nfury), Director-level executive at Stark Research Labs (DC=shieldbase, DC=local), Windows 7 SP1 x64 workstation WKS-WIN764BITA (10.3.58.6). Memory acquired via F-Response Enterprise on 201..."
           },
           "case_id": "VIGIA-REAL-NFURY",
           "pipeline_meta": {
             "artifact_count": "5",
             "avg_score": "2913/10000",
+            "ebs_adapter_mode": "motor",
             "expected_verdict": "SUSPICION",
+            "resolve": {
+              "motor_confidence": "0.49",
+              "motor_reason": "Significant signal with structural support (score=0.2465)",
+              "motor_score": "0.2465",
+              "motor_verdict": "SUSPICION",
+              "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+            },
             "source": "ebs_v1_json_adapter"
           },
           "signals": [
@@ -138,13 +146,13 @@
           ]
         },
         "seq": 5,
-        "timestamp": "2026-07-05T15:27:39.238106+00:00",
+        "timestamp": "2026-07-06T01:30:37.482491+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "CONTRADICTION_CHECK",
         "case_id": "VIGIA-REAL-NFURY",
-        "entry_sha256": "dfbfc97c1bcac16a5045e0a27887bd83a1763352ed5c69bc9e8bcca24387258e",
+        "entry_sha256": "817413b47ad80df8f5150f9540659e7d70a4c53cd15e3dcb321bd763c01012bd",
         "inputs_summary": {
           "n_signals": "5"
         },
@@ -155,13 +163,13 @@
           "threshold": "2"
         },
         "seq": 6,
-        "timestamp": "2026-07-05T15:27:39.238221+00:00",
+        "timestamp": "2026-07-06T01:30:37.482617+00:00",
         "tool": "contradiction_detector"
       },
       {
         "action": "AGENT_EXIT",
         "case_id": "VIGIA-REAL-NFURY",
-        "entry_sha256": "a128bee335c20079a4fd8f3acba35088359c71f4904119c3b114add6be0f5962",
+        "entry_sha256": "2a91307bd921c2c7165d755de40e94b8e4c9ed9c857cdf577a501a521cb44175",
         "inputs_summary": {
           "verdict": "SUSPICION_DETECTED"
         },
@@ -172,35 +180,43 @@
           "exit_code": "3"
         },
         "seq": 7,
-        "timestamp": "2026-07-05T15:27:39.238417+00:00",
+        "timestamp": "2026-07-06T01:30:37.482831+00:00",
         "tool": "vigia_agent"
       }
     ],
-    "start_time": "2026-07-05T15:27:39.234751+00:00",
+    "start_time": "2026-07-06T01:30:37.123457+00:00",
     "total_entries": 7
   },
   "case_id": "VIGIA-REAL-NFURY",
   "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-REAL-NFURY.json",
   "evidence_sha256": "2824eaaff943b5937a7653aaf1f157537c11c69a87faa32dce97db4d0a1c8596",
   "iterations_executed": 1,
-  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-REAL-NFURY ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-REAL-NFURY.json\nEvidence SHA-256: 2824eaaff943b5937a7653aaf1f157537c11c69a87faa32dce97db4d0a1c8596\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: SUSPICION_DETECTED\nPosterior confidence: 2913/50000\nConclusive: NO \u2014 requires human review\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 5 se\u00f1al(es): 5 primaria(s) de ['F-Response Enterprise', 'Redline/MRI', 'Redline/Ports', 'Redline/ProcessTree'], 0 derivada(s)/no-analizada(s). Top z: WmiPrvSE.exe (PID=2508, parent=svchost P=0.50, lsass.exe (PID=552) has CLOSED connectio=0.45, RDP (TCP 3389) actively listening (svcho=0.29.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: SUSPICION_DETECTED. Conclusiva: no \u2014 requiere revisi\u00f3n humana.\n\nRazonamiento del motor abductivo:\nNick Fury (nfury), Director-level executive at Stark Research Labs (DC=shieldbase, DC=local), Windows 7 SP1 x64 workstation WKS-WIN764BITA (10.3.58.6). Memory acquired via F-Response Enterprise on 2012-04-06 \u2014 same day as confirmed Zeus infection on nromanoff (10.3.58.5). Redline analysis (MRI) shows WmiPrvSE.exe without path (score=61, already exited) as highest-risk process. lsass.exe has closed RPC connections to 10.3.58.4 (unknown third workstation). PPID anomaly on csrss.exe/winlogon.exe is\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [WmiPrvSE.exe (PID=2508, parent=svchost PID=656) \u2014 highest MRI score in] z=0.504 conf=0.70 \u2014 \n  [lsass.exe (PID=552) has CLOSED connections to 10.3.58.4:135 (RPC endpo] z=0.450 conf=0.75 \u2014 \n  [RDP (TCP 3389) actively listening (svchost.exe PID=408) on executive w] z=0.292 conf=0.65 \u2014 \n  [Process tree PPID anomaly: csrss.exe (PID=440, MRI=58) and winlogon.ex] z=0.210 conf=0.60 \u2014 \n  [F-Response Enterprise (PID=328) performing live memory acquisition fro] z=0.000 conf=0.00 \u2014 \n\n--- FINAL ALERT LEVEL ---\nMEDIUM \u2014 INTENT verdict with individual z-scores below threshold. Alert floored (B-028/B-065): an intent finding cannot present as LOW.\nReconciliation: verdict INTENT rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 5 | Derived: 0 | Total: 5",
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-REAL-NFURY ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-REAL-NFURY.json\nEvidence SHA-256: 2824eaaff943b5937a7653aaf1f157537c11c69a87faa32dce97db4d0a1c8596\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: SUSPICION_DETECTED\nPosterior confidence: 49/100\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 5 se\u00f1al(es): 5 primaria(s) de ['F-Response Enterprise', 'Redline/MRI', 'Redline/Ports', 'Redline/ProcessTree'], 0 derivada(s)/no-analizada(s). Top z: WmiPrvSE.exe (PID=2508, parent=svchost P=0.50, lsass.exe (PID=552) has CLOSED connectio=0.45, RDP (TCP 3389) actively listening (svcho=0.29.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: SUSPICION_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nNick Fury (nfury), Director-level executive at Stark Research Labs (DC=shieldbase, DC=local), Windows 7 SP1 x64 workstation WKS-WIN764BITA (10.3.58.6). Memory acquired via F-Response Enterprise on 2012-04-06 \u2014 same day as confirmed Zeus infection on nromanoff (10.3.58.5). Redline analysis (MRI) shows WmiPrvSE.exe without path (score=61, already exited) as highest-risk process. lsass.exe has closed RPC connections to 10.3.58.4 (unknown third workstation). PPID anomaly on csrss.exe/winlogon.exe is\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [WmiPrvSE.exe (PID=2508, parent=svchost PID=656) \u2014 highest MRI score in] z=0.504 conf=0.70 \u2014 \n  [lsass.exe (PID=552) has CLOSED connections to 10.3.58.4:135 (RPC endpo] z=0.450 conf=0.75 \u2014 \n  [RDP (TCP 3389) actively listening (svchost.exe PID=408) on executive w] z=0.292 conf=0.65 \u2014 \n  [Process tree PPID anomaly: csrss.exe (PID=440, MRI=58) and winlogon.ex] z=0.210 conf=0.60 \u2014 \n  [F-Response Enterprise (PID=328) performing live memory acquisition fro] z=0.000 conf=0.00 \u2014 \n\n--- FINAL ALERT LEVEL ---\nMEDIUM \u2014 INTENT verdict with individual z-scores below threshold. Alert floored (B-028/B-065): an intent finding cannot present as LOW.\nReconciliation: verdict INTENT rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 5 | Derived: 0 | Total: 5",
   "pipeline_results": {
     "abduction": {
       "best_hypothesis": "SUSPICION_DETECTED",
-      "best_posterior": "2913/50000",
+      "best_posterior": "49/100",
       "confidence": {
         "__fraction__": true,
-        "den": 50000,
-        "num": 2913
+        "den": 100,
+        "num": 49
       },
-      "is_conclusive": false,
+      "is_conclusive": true,
       "narrative": "Nick Fury (nfury), Director-level executive at Stark Research Labs (DC=shieldbase, DC=local), Windows 7 SP1 x64 workstation WKS-WIN764BITA (10.3.58.6). Memory acquired via F-Response Enterprise on 2012-04-06 \u2014 same day as confirmed Zeus infection on nromanoff (10.3.58.5). Redline analysis (MRI) shows WmiPrvSE.exe without path (score=61, already exited) as highest-risk process. lsass.exe has closed RPC connections to 10.3.58.4 (unknown third workstation). PPID anomaly on csrss.exe/winlogon.exe is"
     },
     "case_id": "VIGIA-REAL-NFURY",
     "pipeline_meta": {
       "artifact_count": 5,
       "avg_score": "2913/10000",
+      "ebs_adapter_mode": "motor",
       "expected_verdict": "SUSPICION",
+      "resolve": {
+        "motor_confidence": "0.49",
+        "motor_reason": "Significant signal with structural support (score=0.2465)",
+        "motor_score": "0.2465",
+        "motor_verdict": "SUSPICION",
+        "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+      },
       "source": "ebs_v1_json_adapter"
     },
     "signals": [

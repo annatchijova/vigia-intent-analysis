@@ -1,15 +1,15 @@
 {
-  "agent_verdict": "ABSTAIN",
-  "analysis_timestamp": "2026-07-05T15:27:34.124764+00:00",
+  "agent_verdict": "NOISE",
+  "analysis_timestamp": "2026-07-06T01:29:54.342979+00:00",
   "audit_trail": {
     "agent_version": "1.0.0-SANS-2026",
     "case_id": "VIGIA-FP-002",
-    "end_time": "2026-07-05T15:27:34.124769+00:00",
+    "end_time": "2026-07-06T01:29:54.342985+00:00",
     "entries": [
       {
         "action": "AGENT_INITIALIZED",
         "case_id": "VIGIA-FP-002",
-        "entry_sha256": "0a95c03b3174f3140dee1c8988ff1f7343abba59736a93d82168e49346d6b07e",
+        "entry_sha256": "907cbed95a7e993efbd87b89091a355aa9ad5ca6d2c49d9449f584d031ceb14b",
         "inputs_summary": {
           "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
           "case_id": "VIGIA-FP-002"
@@ -21,13 +21,13 @@
           "agent_version": "1.0.0-SANS-2026"
         },
         "seq": 1,
-        "timestamp": "2026-07-05T15:27:34.121687+00:00",
+        "timestamp": "2026-07-06T01:29:53.997726+00:00",
         "tool": "vigia_agent"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-FP-002",
-        "entry_sha256": "4fdfccf26f7a782e8c48546297c9db8ec1b18258a04354d6c1efcc133294ad98",
+        "entry_sha256": "25a7905b2381f9344876b3861ab804ad8edf87264dadb46956f745d0e36113fc",
         "inputs_summary": {
           "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-FP-002.json"
         },
@@ -35,29 +35,29 @@
         "note": "Computing SHA-256 of original evidence",
         "outputs_summary": {},
         "seq": 2,
-        "timestamp": "2026-07-05T15:27:34.121771+00:00",
+        "timestamp": "2026-07-06T01:29:53.997808+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-FP-002",
-        "entry_sha256": "b6f4fdc56a640bafaf382fec5f128a3a5b1109f9c40085288d235e55b34a26f7",
+        "entry_sha256": "238902ca2a61c3f9d1b9c2723843810ab73cc6ddd340376ea18575ed2addec0b",
         "inputs_summary": {
           "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-FP-002.json"
         },
         "iteration": 0,
-        "note": "Evidence verified: 3854e1ff3452e674...",
+        "note": "Evidence verified: dce4e0abffaf44ac...",
         "outputs_summary": {
-          "sha256": "3854e1ff3452e6743a850e786d160bcd4b2694e44f957dbb033f7097a67efea6"
+          "sha256": "dce4e0abffaf44aca768b20668b1cf6ddc71edec7148bdd2b7572604f074a81d"
         },
         "seq": 3,
-        "timestamp": "2026-07-05T15:27:34.121857+00:00",
+        "timestamp": "2026-07-06T01:29:53.997898+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "PIPELINE_EXECUTE",
         "case_id": "VIGIA-FP-002",
-        "entry_sha256": "e3a49b3aecb6f304ca60a53c4d6e7d15eb8a587a9351565adea85cd15eb4fc8a",
+        "entry_sha256": "5fe3a60dd2edff573b19016d5d8a5d2fe6796bac69bd820b794c0504cf455244",
         "inputs_summary": {
           "evidence": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-FP-002.json",
           "iteration": "0",
@@ -67,13 +67,13 @@
         "note": "Executing pipeline \u2014 iteration 0",
         "outputs_summary": {},
         "seq": 4,
-        "timestamp": "2026-07-05T15:27:34.121959+00:00",
+        "timestamp": "2026-07-06T01:29:53.997998+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "PIPELINE_COMPLETE",
         "case_id": "VIGIA-FP-002",
-        "entry_sha256": "ebf78c86f9cdac8ecb9b3fb8730eb1df6f4fe3b78c8a0319b5e6fe5cb3f15fee",
+        "entry_sha256": "fde24ca69d3078c3bfc50c752de778a168082bba26fb0d3fe629afa0e0f939ba",
         "inputs_summary": {
           "iteration": "0"
         },
@@ -81,17 +81,25 @@
         "note": "Pipeline completed \u2014 2 signals",
         "outputs_summary": {
           "abduction": {
-            "best_hypothesis": "ABSTAIN_DETECTED",
-            "best_posterior": "447/20000",
-            "confidence": "447/20000",
-            "is_conclusive": "False",
+            "best_hypothesis": "NO_SEMIOTIC_ANOMALY_DETECTED",
+            "best_posterior": "19/20",
+            "confidence": "19/20",
+            "is_conclusive": "True",
             "narrative": "Legitimate backup script, documented in Change Management, approved by CISO. Copies 500GB to external storage overnight. Tool is rsync, destination is an approved cloud provider. Everything is documen..."
           },
           "case_id": "VIGIA-FP-002",
           "pipeline_meta": {
             "artifact_count": "2",
             "avg_score": "447/4000",
+            "ebs_adapter_mode": "motor",
             "expected_verdict": "ABSTAIN",
+            "resolve": {
+              "motor_confidence": "0.95",
+              "motor_reason": "Insufficient evidence of malicious intent (score=0.0534)",
+              "motor_score": "0.0534",
+              "motor_verdict": "NOISE",
+              "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+            },
             "source": "ebs_v1_json_adapter"
           },
           "signals": [
@@ -114,13 +122,13 @@
           ]
         },
         "seq": 5,
-        "timestamp": "2026-07-05T15:27:34.124463+00:00",
+        "timestamp": "2026-07-06T01:29:54.342579+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "CONTRADICTION_CHECK",
         "case_id": "VIGIA-FP-002",
-        "entry_sha256": "06e8c76ebe4fc5d78e4bdc4cd49ef82768dbec0a42e64b65a2f877008d7fa99d",
+        "entry_sha256": "99e12fbb08da861e04a79535e94682704ddd69ff94ff9b66fb47ca9f66096100",
         "inputs_summary": {
           "n_signals": "2"
         },
@@ -131,52 +139,60 @@
           "threshold": "2"
         },
         "seq": 6,
-        "timestamp": "2026-07-05T15:27:34.124556+00:00",
+        "timestamp": "2026-07-06T01:29:54.342700+00:00",
         "tool": "contradiction_detector"
       },
       {
         "action": "AGENT_EXIT",
         "case_id": "VIGIA-FP-002",
-        "entry_sha256": "797c9a75d5bdda4f1628be2a98aed84c37212a2c5b9a6c0b249d155d2dcebd01",
+        "entry_sha256": "1870584223694e54547c82467666143a5a76caa3349bc60c5963f240db5de962",
         "inputs_summary": {
-          "verdict": "ABSTAIN_DETECTED"
+          "verdict": "NO_SEMIOTIC_ANOMALY_DETECTED"
         },
         "iteration": 0,
-        "note": "Exit code 4 (ABSTAIN) \u2014 analysis complete.",
+        "note": "Exit code 0 (NOISE) \u2014 analysis complete.",
         "outputs_summary": {
-          "agent_verdict": "ABSTAIN",
-          "exit_code": "4"
+          "agent_verdict": "NOISE",
+          "exit_code": "0"
         },
         "seq": 7,
-        "timestamp": "2026-07-05T15:27:34.124714+00:00",
+        "timestamp": "2026-07-06T01:29:54.342916+00:00",
         "tool": "vigia_agent"
       }
     ],
-    "start_time": "2026-07-05T15:27:34.121461+00:00",
+    "start_time": "2026-07-06T01:29:53.997502+00:00",
     "total_entries": 7
   },
   "case_id": "VIGIA-FP-002",
   "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-FP-002.json",
-  "evidence_sha256": "3854e1ff3452e6743a850e786d160bcd4b2694e44f957dbb033f7097a67efea6",
+  "evidence_sha256": "dce4e0abffaf44aca768b20668b1cf6ddc71edec7148bdd2b7572604f074a81d",
   "iterations_executed": 1,
-  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-FP-002 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/VIGIA-FP-002.json\nEvidence SHA-256: 3854e1ff3452e6743a850e786d160bcd4b2694e44f957dbb033f7097a67efea6\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: ABSTAIN_DETECTED\nPosterior confidence: 447/20000\nConclusive: NO \u2014 requires human review\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 2 se\u00f1al(es): 2 primaria(s) de ['sift_change_management', 'sift_netflow'], 0 derivada(s)/no-analizada(s). Top z: 500GB transferred to external IP 198.51.=0.18, CAB-2026-0610: Approval for nightly back=0.05.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: ABSTAIN_DETECTED. Conclusiva: no \u2014 requiere revisi\u00f3n humana.\n\nRazonamiento del motor abductivo:\nLegitimate backup script, documented in Change Management, approved by CISO. Copies 500GB to external storage overnight. Tool is rsync, destination is an approved cloud provider. Everything is documented.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [500GB transferred to external IP 198.51.100.77 over 4 hours] z=0.176 conf=0.20 \u2014 \n  [CAB-2026-0610: Approval for nightly backup to cloud storage 198.51.100] z=0.048 conf=0.95 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 2 | Derived: 0 | Total: 2",
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-FP-002 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/VIGIA-FP-002.json\nEvidence SHA-256: dce4e0abffaf44aca768b20668b1cf6ddc71edec7148bdd2b7572604f074a81d\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: NO_SEMIOTIC_ANOMALY_DETECTED\nPosterior confidence: 19/20\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 2 se\u00f1al(es): 2 primaria(s) de ['sift_change_management', 'sift_netflow'], 0 derivada(s)/no-analizada(s). Top z: 500GB transferred to external IP 198.51.=0.18, CAB-2026-0610: Approval for nightly back=0.05.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: NO_SEMIOTIC_ANOMALY_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nLegitimate backup script, documented in Change Management, approved by CISO. Copies 500GB to external storage overnight. Tool is rsync, destination is an approved cloud provider. Everything is documented.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [500GB transferred to external IP 198.51.100.77 over 4 hours] z=0.176 conf=0.20 \u2014 \n  [CAB-2026-0610: Approval for nightly backup to cloud storage 198.51.100] z=0.048 conf=0.95 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 2 | Derived: 0 | Total: 2",
   "pipeline_results": {
     "abduction": {
-      "best_hypothesis": "ABSTAIN_DETECTED",
-      "best_posterior": "447/20000",
+      "best_hypothesis": "NO_SEMIOTIC_ANOMALY_DETECTED",
+      "best_posterior": "19/20",
       "confidence": {
         "__fraction__": true,
-        "den": 20000,
-        "num": 447
+        "den": 20,
+        "num": 19
       },
-      "is_conclusive": false,
+      "is_conclusive": true,
       "narrative": "Legitimate backup script, documented in Change Management, approved by CISO. Copies 500GB to external storage overnight. Tool is rsync, destination is an approved cloud provider. Everything is documented."
     },
     "case_id": "VIGIA-FP-002",
     "pipeline_meta": {
       "artifact_count": 2,
       "avg_score": "447/4000",
+      "ebs_adapter_mode": "motor",
       "expected_verdict": "ABSTAIN",
+      "resolve": {
+        "motor_confidence": "0.95",
+        "motor_reason": "Insufficient evidence of malicious intent (score=0.0534)",
+        "motor_score": "0.0534",
+        "motor_verdict": "NOISE",
+        "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+      },
       "source": "ebs_v1_json_adapter"
     },
     "signals": [

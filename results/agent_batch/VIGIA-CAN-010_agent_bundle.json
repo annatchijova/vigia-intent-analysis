@@ -1,15 +1,15 @@
 {
   "agent_verdict": "MALICE",
-  "analysis_timestamp": "2026-07-05T15:27:40.752244+00:00",
+  "analysis_timestamp": "2026-07-06T01:30:50.280451+00:00",
   "audit_trail": {
     "agent_version": "1.0.0-SANS-2026",
     "case_id": "VIGIA-CAN-010",
-    "end_time": "2026-07-05T15:27:40.752252+00:00",
+    "end_time": "2026-07-06T01:30:50.280457+00:00",
     "entries": [
       {
         "action": "AGENT_INITIALIZED",
         "case_id": "VIGIA-CAN-010",
-        "entry_sha256": "e5f520f5666372f4e0a29024e667be704edef10f07fd11c1ae764618d7d8c92c",
+        "entry_sha256": "e6093b9f8abd069e7faa1466de0c05c609b6cbe6cfc9246bc0fe21660a99b42a",
         "inputs_summary": {
           "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
           "case_id": "VIGIA-CAN-010"
@@ -21,13 +21,13 @@
           "agent_version": "1.0.0-SANS-2026"
         },
         "seq": 1,
-        "timestamp": "2026-07-05T15:27:40.748696+00:00",
+        "timestamp": "2026-07-06T01:30:49.932354+00:00",
         "tool": "vigia_agent"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-CAN-010",
-        "entry_sha256": "f2c700ff191078a901cbaa972083f49f23efc211411a25992ec8632e2399be6a",
+        "entry_sha256": "de8cb6bc8cf3980e8b5c6f4c0dbb5db0515b3f0c468fb4e8414b273db69870b6",
         "inputs_summary": {
           "path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-010.json"
         },
@@ -35,29 +35,29 @@
         "note": "Computing SHA-256 of original evidence",
         "outputs_summary": {},
         "seq": 2,
-        "timestamp": "2026-07-05T15:27:40.748781+00:00",
+        "timestamp": "2026-07-06T01:30:49.932451+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-CAN-010",
-        "entry_sha256": "7612f85168c8bc634915d74811fb45a894f3fa08422bed0ffcb9d63d0292d9a9",
+        "entry_sha256": "9517bd0ade0b50aad5127d7e57229c598d8f736aaf14199f38b0e450ad91642f",
         "inputs_summary": {
           "path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-010.json"
         },
         "iteration": 0,
-        "note": "Evidence verified: c056ff13a6b2f0cb...",
+        "note": "Evidence verified: 9bd56d47b4679411...",
         "outputs_summary": {
-          "sha256": "c056ff13a6b2f0cb14764e30bde0557acffd3842d4cdc2c66efa03ecd1427f7c"
+          "sha256": "9bd56d47b46794114f666522b170507e6330fda06ef37b2730ab51de4f0a2f64"
         },
         "seq": 3,
-        "timestamp": "2026-07-05T15:27:40.748870+00:00",
+        "timestamp": "2026-07-06T01:30:49.932546+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "PIPELINE_EXECUTE",
         "case_id": "VIGIA-CAN-010",
-        "entry_sha256": "4c628e5cdd9dfdb176845766d6640c79ab34f50caee564964fd8d1aef5dfbae5",
+        "entry_sha256": "0355eb58ad221b89c9aaa9b900c2af7fdeb8934e206a63256e854ca16f2c81a9",
         "inputs_summary": {
           "evidence": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-010.json",
           "iteration": "0",
@@ -67,13 +67,13 @@
         "note": "Executing pipeline \u2014 iteration 0",
         "outputs_summary": {},
         "seq": 4,
-        "timestamp": "2026-07-05T15:27:40.748972+00:00",
+        "timestamp": "2026-07-06T01:30:49.932647+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "PIPELINE_COMPLETE",
         "case_id": "VIGIA-CAN-010",
-        "entry_sha256": "1bc18862ccb723813e6a56cf9b760c678c84d37fb2545bded54e6b5fb77971df",
+        "entry_sha256": "29b44c5de75c0b93c9a8c024d95d52998bf3afd76154ca03d223978e28def082",
         "inputs_summary": {
           "iteration": "0"
         },
@@ -82,8 +82,8 @@
         "outputs_summary": {
           "abduction": {
             "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
-            "best_posterior": "1699/20000",
-            "confidence": "1699/20000",
+            "best_posterior": "19/20",
+            "confidence": "19/20",
             "is_conclusive": "True",
             "narrative": "40-page PDF report with irrelevant charts hides a 'minor permission adjustment' on page 39 that grants Everyone:FullControl over HKLM\\SAM. Cognitive DoS via documentary volume."
           },
@@ -91,7 +91,15 @@
           "pipeline_meta": {
             "artifact_count": "4",
             "avg_score": "1699/4000",
+            "ebs_adapter_mode": "motor",
             "expected_verdict": "MALICE",
+            "resolve": {
+              "motor_confidence": "0.95",
+              "motor_reason": "Intent score 0.8923 exceeds MALICE threshold (P2+acq_assurance scale, threshold=0.33)",
+              "motor_score": "0.8923",
+              "motor_verdict": "MALICE",
+              "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+            },
             "source": "ebs_v1_json_adapter"
           },
           "signals": [
@@ -130,13 +138,13 @@
           ]
         },
         "seq": 5,
-        "timestamp": "2026-07-05T15:27:40.751495+00:00",
+        "timestamp": "2026-07-06T01:30:50.279932+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "CONTRADICTION_CHECK",
         "case_id": "VIGIA-CAN-010",
-        "entry_sha256": "23617d8616c966b6ddfba9d916ab0f76aaa6ae81b85d38aba96a32e7fec04852",
+        "entry_sha256": "ef8e5dcc0c6477c5511ae1823cca2fed07cc3b34aae99fc7cadf0eb101ea0449",
         "inputs_summary": {
           "n_signals": "4"
         },
@@ -147,13 +155,13 @@
           "threshold": "2"
         },
         "seq": 6,
-        "timestamp": "2026-07-05T15:27:40.751602+00:00",
+        "timestamp": "2026-07-06T01:30:50.280046+00:00",
         "tool": "contradiction_detector"
       },
       {
         "action": "AGENT_EXIT",
         "case_id": "VIGIA-CAN-010",
-        "entry_sha256": "d599b322b2ad147ed7c81d12369c8ac68bce763f699a33fdb32330d25df40c09",
+        "entry_sha256": "79402798b3a25667e0a5f00a6b0a967c4508a7e0e43f5bcdbd7c86797b69b465",
         "inputs_summary": {
           "verdict": "MALICIOUS_INTENT_DETECTED"
         },
@@ -164,26 +172,26 @@
           "exit_code": "1"
         },
         "seq": 7,
-        "timestamp": "2026-07-05T15:27:40.751793+00:00",
+        "timestamp": "2026-07-06T01:30:50.280251+00:00",
         "tool": "vigia_agent"
       }
     ],
-    "start_time": "2026-07-05T15:27:40.748468+00:00",
+    "start_time": "2026-07-06T01:30:49.932133+00:00",
     "total_entries": 7
   },
   "case_id": "VIGIA-CAN-010",
   "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-010.json",
-  "evidence_sha256": "c056ff13a6b2f0cb14764e30bde0557acffd3842d4cdc2c66efa03ecd1427f7c",
+  "evidence_sha256": "9bd56d47b46794114f666522b170507e6330fda06ef37b2730ab51de4f0a2f64",
   "iterations_executed": 1,
-  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-CAN-010 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-010.json\nEvidence SHA-256: c056ff13a6b2f0cb14764e30bde0557acffd3842d4cdc2c66efa03ecd1427f7c\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 1699/20000\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 4 se\u00f1al(es): 4 primaria(s) de ['sift_document', 'sift_metadata', 'sift_syslog', 'sift_windows_audit'], 0 derivada(s)/no-analizada(s). Top z: Page 39: 'minor unimportant permission a=0.78, PDF 'Detailed Suspicious Process Report'=0.47, PDF metadata: created by headless script=0.41.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: MALICIOUS_INTENT_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\n40-page PDF report with irrelevant charts hides a 'minor permission adjustment' on page 39 that grants Everyone:FullControl over HKLM\\SAM. Cognitive DoS via documentary volume.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Page 39: 'minor unimportant permission adjustment'. Actual action: Eve] z=0.782 conf=0.85 \u2014 \n  [PDF 'Detailed Suspicious Process Report': 40 pages. CPU charts, disk t] z=0.475 conf=0.50 \u2014 \n  [PDF metadata: created by headless script (soffice.bin), last modified ] z=0.414 conf=0.45 \u2014 \n  [Event 4663: ACL change on HKLM\\SAM. Actor: admin_jdoe. Timestamp match] z=0.028 conf=0.35 \u2014 \n\n--- FINAL ALERT LEVEL ---\nMEDIUM \u2014 MALICE verdict from posterior aggregation. Individual z-scores below threshold. Full signal review recommended. Alert floored (B-028/B-065).\nReconciliation: verdict MALICE rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 4 | Derived: 0 | Total: 4",
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-CAN-010 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-010.json\nEvidence SHA-256: 9bd56d47b46794114f666522b170507e6330fda06ef37b2730ab51de4f0a2f64\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 19/20\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 4 se\u00f1al(es): 4 primaria(s) de ['sift_document', 'sift_metadata', 'sift_syslog', 'sift_windows_audit'], 0 derivada(s)/no-analizada(s). Top z: Page 39: 'minor unimportant permission a=0.78, PDF 'Detailed Suspicious Process Report'=0.47, PDF metadata: created by headless script=0.41.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: MALICIOUS_INTENT_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\n40-page PDF report with irrelevant charts hides a 'minor permission adjustment' on page 39 that grants Everyone:FullControl over HKLM\\SAM. Cognitive DoS via documentary volume.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Page 39: 'minor unimportant permission adjustment'. Actual action: Eve] z=0.782 conf=0.85 \u2014 \n  [PDF 'Detailed Suspicious Process Report': 40 pages. CPU charts, disk t] z=0.475 conf=0.50 \u2014 \n  [PDF metadata: created by headless script (soffice.bin), last modified ] z=0.414 conf=0.45 \u2014 \n  [Event 4663: ACL change on HKLM\\SAM. Actor: admin_jdoe. Timestamp match] z=0.028 conf=0.35 \u2014 \n\n--- FINAL ALERT LEVEL ---\nHIGH \u2014 MALICE verdict from Bayesian posterior aggregation. Individual z-scores below threshold (distributed evidence pattern: no single dominant signal, but aggregate posterior is decisive). Alert floored (B-028/B-065).\nReconciliation: verdict MALICE rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 4 | Derived: 0 | Total: 4",
   "pipeline_results": {
     "abduction": {
       "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
-      "best_posterior": "1699/20000",
+      "best_posterior": "19/20",
       "confidence": {
         "__fraction__": true,
-        "den": 20000,
-        "num": 1699
+        "den": 20,
+        "num": 19
       },
       "devil_advocate": {
         "aggregation": {
@@ -195,7 +203,7 @@
           "primary_alternative_hypothesis": null
         },
         "decision_context": {
-          "confidence": "1699/20000",
+          "confidence": "19/20",
           "mapped_verdict": "MALICIOUS_INTENT_DETECTED",
           "raw_verdict": "MALICIOUS_INTENT_DETECTED",
           "score": "1699/4000"
@@ -216,7 +224,15 @@
     "pipeline_meta": {
       "artifact_count": 4,
       "avg_score": "1699/4000",
+      "ebs_adapter_mode": "motor",
       "expected_verdict": "MALICE",
+      "resolve": {
+        "motor_confidence": "0.95",
+        "motor_reason": "Intent score 0.8923 exceeds MALICE threshold (P2+acq_assurance scale, threshold=0.33)",
+        "motor_score": "0.8923",
+        "motor_verdict": "MALICE",
+        "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+      },
       "source": "ebs_v1_json_adapter"
     },
     "signals": [

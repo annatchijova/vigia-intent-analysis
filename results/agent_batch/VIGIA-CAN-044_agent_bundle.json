@@ -1,15 +1,15 @@
 {
   "agent_verdict": "MALICE",
-  "analysis_timestamp": "2026-07-05T15:27:42.514162+00:00",
+  "analysis_timestamp": "2026-07-06T01:31:05.433332+00:00",
   "audit_trail": {
     "agent_version": "1.0.0-SANS-2026",
     "case_id": "VIGIA-CAN-044",
-    "end_time": "2026-07-05T15:27:42.514168+00:00",
+    "end_time": "2026-07-06T01:31:05.433341+00:00",
     "entries": [
       {
         "action": "AGENT_INITIALIZED",
         "case_id": "VIGIA-CAN-044",
-        "entry_sha256": "4eb563bc5c3cb792c8d006556acfac1fb2d4384228765c839a8560119bcfb1ca",
+        "entry_sha256": "03c797c8baa583ed7bde58b6d9d58b4b31b1df0772b31564e2d646ab93b77c62",
         "inputs_summary": {
           "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
           "case_id": "VIGIA-CAN-044"
@@ -21,13 +21,13 @@
           "agent_version": "1.0.0-SANS-2026"
         },
         "seq": 1,
-        "timestamp": "2026-07-05T15:27:42.510584+00:00",
+        "timestamp": "2026-07-06T01:31:05.080609+00:00",
         "tool": "vigia_agent"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-CAN-044",
-        "entry_sha256": "1282e104cdfad7a3e346c4e63b8d920a730b1ddbc194a2f509faad19f67af60b",
+        "entry_sha256": "7d0a898f1e003a40f47ff65b34111cd65c849a2bc3dbcbae1215ec7a63919aad",
         "inputs_summary": {
           "path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-044.json"
         },
@@ -35,29 +35,29 @@
         "note": "Computing SHA-256 of original evidence",
         "outputs_summary": {},
         "seq": 2,
-        "timestamp": "2026-07-05T15:27:42.510669+00:00",
+        "timestamp": "2026-07-06T01:31:05.080693+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-CAN-044",
-        "entry_sha256": "da330815bca778ea02ce6734991bc7177351ad98c90b0d9a5de9d7f52b3e37bf",
+        "entry_sha256": "5a016e5c9c4a8dbc8ecb052e99f8930ee76f6ca551a24fb1c15836cce6db3d43",
         "inputs_summary": {
           "path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-044.json"
         },
         "iteration": 0,
-        "note": "Evidence verified: a61f17db3988bcd5...",
+        "note": "Evidence verified: 7eb15c52a2742e79...",
         "outputs_summary": {
-          "sha256": "a61f17db3988bcd52ac37aeadf72fa31a11a65a81e3c42e1a3211902425b9989"
+          "sha256": "7eb15c52a2742e791e97f94c8e0d684565aa0ff1959ff12a3784896ea2e0837f"
         },
         "seq": 3,
-        "timestamp": "2026-07-05T15:27:42.510760+00:00",
+        "timestamp": "2026-07-06T01:31:05.080786+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "PIPELINE_EXECUTE",
         "case_id": "VIGIA-CAN-044",
-        "entry_sha256": "5a06ed9424cbf2d7ace2c21b859db9404991fe267010a9341f3aa37d2bda95a7",
+        "entry_sha256": "a76f7cecaf0415c455fc83ab265d55700f01949ac9a6df03d2044537f894ae06",
         "inputs_summary": {
           "evidence": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-044.json",
           "iteration": "0",
@@ -67,13 +67,13 @@
         "note": "Executing pipeline \u2014 iteration 0",
         "outputs_summary": {},
         "seq": 4,
-        "timestamp": "2026-07-05T15:27:42.510864+00:00",
+        "timestamp": "2026-07-06T01:31:05.080887+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "PIPELINE_COMPLETE",
         "case_id": "VIGIA-CAN-044",
-        "entry_sha256": "8488e482374a81633c8d1580433217ba5df308aa4a0d250f2e4bc1e9ceeba63a",
+        "entry_sha256": "bbeedcc090dddbd43e71ea02982e24e3fe4e4a6d6e43d004ae123f12df91afc7",
         "inputs_summary": {
           "iteration": "0"
         },
@@ -82,16 +82,24 @@
         "outputs_summary": {
           "abduction": {
             "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
-            "best_posterior": "223/12500",
-            "confidence": "223/12500",
-            "is_conclusive": "False",
+            "best_posterior": "81/100",
+            "confidence": "81/100",
+            "is_conclusive": "True",
             "narrative": "Three different users (manager, employee, vendor) from different IPs send tickets requesting a security rule to be disabled. Stylometric analysis detects they all make the exact same rare punctuation ..."
           },
           "case_id": "case_018_clonacion_sintactica",
           "pipeline_meta": {
             "artifact_count": "5",
             "avg_score": "223/2500",
+            "ebs_adapter_mode": "motor",
             "expected_verdict": "MALICE",
+            "resolve": {
+              "motor_confidence": "0.81",
+              "motor_reason": "Intent score 0.4053 exceeds MALICE threshold (P2+acq_assurance scale, threshold=0.33)",
+              "motor_score": "0.4053",
+              "motor_verdict": "MALICE",
+              "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+            },
             "source": "ebs_v1_json_adapter"
           },
           "signals": [
@@ -138,13 +146,13 @@
           ]
         },
         "seq": 5,
-        "timestamp": "2026-07-05T15:27:42.513390+00:00",
+        "timestamp": "2026-07-06T01:31:05.432706+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "CONTRADICTION_CHECK",
         "case_id": "VIGIA-CAN-044",
-        "entry_sha256": "a59e703d28c271f85f917c980fbe8d263600bdf453f065dd14dfb4b300ae05ae",
+        "entry_sha256": "ef862cfa1c8064a873fa8ff7048697fb07c75f78c89bf0d8c7cca68aceee3066",
         "inputs_summary": {
           "n_signals": "5"
         },
@@ -155,13 +163,13 @@
           "threshold": "2"
         },
         "seq": 6,
-        "timestamp": "2026-07-05T15:27:42.513515+00:00",
+        "timestamp": "2026-07-06T01:31:05.432847+00:00",
         "tool": "contradiction_detector"
       },
       {
         "action": "AGENT_EXIT",
         "case_id": "VIGIA-CAN-044",
-        "entry_sha256": "1b773f0f116fcd2b3e7fe1e0032fa42adf0685f58ce9655beb73aa8273c794e3",
+        "entry_sha256": "6a33a8a314af3082f8fc65f13bea9492b2a2d1894514f6b90d5c92d416fde645",
         "inputs_summary": {
           "verdict": "MALICIOUS_INTENT_DETECTED"
         },
@@ -172,26 +180,26 @@
           "exit_code": "1"
         },
         "seq": 7,
-        "timestamp": "2026-07-05T15:27:42.513710+00:00",
+        "timestamp": "2026-07-06T01:31:05.433108+00:00",
         "tool": "vigia_agent"
       }
     ],
-    "start_time": "2026-07-05T15:27:42.510351+00:00",
+    "start_time": "2026-07-06T01:31:05.080381+00:00",
     "total_entries": 7
   },
   "case_id": "VIGIA-CAN-044",
   "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-044.json",
-  "evidence_sha256": "a61f17db3988bcd52ac37aeadf72fa31a11a65a81e3c42e1a3211902425b9989",
+  "evidence_sha256": "7eb15c52a2742e791e97f94c8e0d684565aa0ff1959ff12a3784896ea2e0837f",
   "iterations_executed": 1,
-  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-CAN-044 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-044.json\nEvidence SHA-256: a61f17db3988bcd52ac37aeadf72fa31a11a65a81e3c42e1a3211902425b9989\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 223/12500\nConclusive: NO \u2014 requires human review\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 5 se\u00f1al(es): 5 primaria(s) de ['sift_stylometry', 'sift_syslog', 'sift_ticket_system'], 0 derivada(s)/no-analizada(s). Top z: DLP rule disabled 8 minutes after the th=0.26, Stylometric analysis: all 3 tickets shar=0.13, Vendor ticket: 'Please , disable the DLP=0.02.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: MALICIOUS_INTENT_DETECTED. Conclusiva: no \u2014 requiere revisi\u00f3n humana.\n\nRazonamiento del motor abductivo:\nThree different users (manager, employee, vendor) from different IPs send tickets requesting a security rule to be disabled. Stylometric analysis detects they all make the exact same rare punctuation error.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [DLP rule disabled 8 minutes after the third ticket by a Tier-1 analyst] z=0.260 conf=0.40 \u2014 \n  [Stylometric analysis: all 3 tickets share TTR=0.42, average sentence l] z=0.132 conf=0.15 \u2014 \n  [Vendor ticket: 'Please , disable the DLP rule for this account' \u2014 spac] z=0.024 conf=0.30 \u2014 \n  [Employee ticket: 'The DLP rule , is blocking a legitimate client shipm] z=0.018 conf=0.30 \u2014 \n  [Manager ticket: 'I need you to temporarily disable the DLP rule , it's] z=0.012 conf=0.30 \u2014 \n\n--- FINAL ALERT LEVEL ---\nMEDIUM \u2014 MALICE verdict from posterior aggregation. Individual z-scores below threshold. Full signal review recommended. Alert floored (B-028/B-065).\nReconciliation: verdict MALICE rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 5 | Derived: 0 | Total: 5",
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-CAN-044 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-044.json\nEvidence SHA-256: 7eb15c52a2742e791e97f94c8e0d684565aa0ff1959ff12a3784896ea2e0837f\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 81/100\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 5 se\u00f1al(es): 5 primaria(s) de ['sift_stylometry', 'sift_syslog', 'sift_ticket_system'], 0 derivada(s)/no-analizada(s). Top z: DLP rule disabled 8 minutes after the th=0.26, Stylometric analysis: all 3 tickets shar=0.13, Vendor ticket: 'Please , disable the DLP=0.02.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: MALICIOUS_INTENT_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nThree different users (manager, employee, vendor) from different IPs send tickets requesting a security rule to be disabled. Stylometric analysis detects they all make the exact same rare punctuation error.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [DLP rule disabled 8 minutes after the third ticket by a Tier-1 analyst] z=0.260 conf=0.40 \u2014 \n  [Stylometric analysis: all 3 tickets share TTR=0.42, average sentence l] z=0.132 conf=0.15 \u2014 \n  [Vendor ticket: 'Please , disable the DLP rule for this account' \u2014 spac] z=0.024 conf=0.30 \u2014 \n  [Employee ticket: 'The DLP rule , is blocking a legitimate client shipm] z=0.018 conf=0.30 \u2014 \n  [Manager ticket: 'I need you to temporarily disable the DLP rule , it's] z=0.012 conf=0.30 \u2014 \n\n--- FINAL ALERT LEVEL ---\nHIGH \u2014 MALICE verdict from Bayesian posterior aggregation. Individual z-scores below threshold (distributed evidence pattern: no single dominant signal, but aggregate posterior is decisive). Alert floored (B-028/B-065).\nReconciliation: verdict MALICE rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 5 | Derived: 0 | Total: 5",
   "pipeline_results": {
     "abduction": {
       "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
-      "best_posterior": "223/12500",
+      "best_posterior": "81/100",
       "confidence": {
         "__fraction__": true,
-        "den": 12500,
-        "num": 223
+        "den": 100,
+        "num": 81
       },
       "devil_advocate": {
         "aggregation": {
@@ -203,7 +211,7 @@
           "primary_alternative_hypothesis": null
         },
         "decision_context": {
-          "confidence": "223/12500",
+          "confidence": "81/100",
           "mapped_verdict": "MALICIOUS_INTENT_DETECTED",
           "raw_verdict": "MALICIOUS_INTENT_DETECTED",
           "score": "223/2500"
@@ -217,14 +225,22 @@
         "pattern_evidence_gaps": [],
         "version": "r7-da-v1"
       },
-      "is_conclusive": false,
+      "is_conclusive": true,
       "narrative": "Three different users (manager, employee, vendor) from different IPs send tickets requesting a security rule to be disabled. Stylometric analysis detects they all make the exact same rare punctuation error."
     },
     "case_id": "case_018_clonacion_sintactica",
     "pipeline_meta": {
       "artifact_count": 5,
       "avg_score": "223/2500",
+      "ebs_adapter_mode": "motor",
       "expected_verdict": "MALICE",
+      "resolve": {
+        "motor_confidence": "0.81",
+        "motor_reason": "Intent score 0.4053 exceeds MALICE threshold (P2+acq_assurance scale, threshold=0.33)",
+        "motor_score": "0.4053",
+        "motor_verdict": "MALICE",
+        "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+      },
       "source": "ebs_v1_json_adapter"
     },
     "signals": [

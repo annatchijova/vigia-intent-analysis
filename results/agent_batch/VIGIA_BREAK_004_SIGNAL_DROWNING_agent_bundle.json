@@ -1,15 +1,15 @@
 {
   "agent_verdict": "INTENT",
-  "analysis_timestamp": "2026-07-05T15:27:39.866030+00:00",
+  "analysis_timestamp": "2026-07-06T01:30:42.826175+00:00",
   "audit_trail": {
     "agent_version": "1.0.0-SANS-2026",
     "case_id": "VIGIA_BREAK_004_SIGNAL_DROWNING",
-    "end_time": "2026-07-05T15:27:39.866035+00:00",
+    "end_time": "2026-07-06T01:30:42.826181+00:00",
     "entries": [
       {
         "action": "AGENT_INITIALIZED",
         "case_id": "VIGIA_BREAK_004_SIGNAL_DROWNING",
-        "entry_sha256": "a00c128e66663b9ea90e76231d81b843f92f25c20e7fcd273e3b76bbbbb7dbe1",
+        "entry_sha256": "61e7d549b3376702c46d011fc991ff51617d226c96bb8ad0014dedd30e18dc22",
         "inputs_summary": {
           "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
           "case_id": "VIGIA_BREAK_004_SIGNAL_DROWNING"
@@ -21,13 +21,13 @@
           "agent_version": "1.0.0-SANS-2026"
         },
         "seq": 1,
-        "timestamp": "2026-07-05T15:27:39.862871+00:00",
+        "timestamp": "2026-07-06T01:30:42.475508+00:00",
         "tool": "vigia_agent"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA_BREAK_004_SIGNAL_DROWNING",
-        "entry_sha256": "8fc8fe908a7f38cdd5adac6c0222af9bfc192aab62a7840d0c44a487eeb107c9",
+        "entry_sha256": "15dae9eeb9837b5f6ee4a27c3852239f1bd5e95d0586be71096ea8a1d53621a9",
         "inputs_summary": {
           "path": "/home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA_BREAK_004_SIGNAL_DROWNING.json"
         },
@@ -35,29 +35,29 @@
         "note": "Computing SHA-256 of original evidence",
         "outputs_summary": {},
         "seq": 2,
-        "timestamp": "2026-07-05T15:27:39.862955+00:00",
+        "timestamp": "2026-07-06T01:30:42.475594+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA_BREAK_004_SIGNAL_DROWNING",
-        "entry_sha256": "186700cebd2881688b64c1c103cbcc4d333b67448872b882409826b84a268e30",
+        "entry_sha256": "b2de7ffdb33f0d39f51b4529bf1aa6c2d2379a9ad737405be371ae95a2720e8f",
         "inputs_summary": {
           "path": "/home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA_BREAK_004_SIGNAL_DROWNING.json"
         },
         "iteration": 0,
-        "note": "Evidence verified: d5e0c75ffb89414c...",
+        "note": "Evidence verified: 8e216a3eb6672c22...",
         "outputs_summary": {
-          "sha256": "d5e0c75ffb89414cf28d4e9e7a0344c4e81a0b4d528510e96eac78cc14a30c8e"
+          "sha256": "8e216a3eb6672c2251afec3a4a7fa847b9b752314da4f8a9d43d35f0faeff222"
         },
         "seq": 3,
-        "timestamp": "2026-07-05T15:27:39.863045+00:00",
+        "timestamp": "2026-07-06T01:30:42.475685+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "PIPELINE_EXECUTE",
         "case_id": "VIGIA_BREAK_004_SIGNAL_DROWNING",
-        "entry_sha256": "e6fb86f7ee3346be4cf6391f01a1936429026c3291a740eb649c57cfcc10ede8",
+        "entry_sha256": "f2341c5bfa6c7097c2d13bf66610c04a1e6b433fdc30da477c6071c8c663da43",
         "inputs_summary": {
           "evidence": "/home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA_BREAK_004_SIGNAL_DROWNING.json",
           "iteration": "0",
@@ -67,13 +67,13 @@
         "note": "Executing pipeline \u2014 iteration 0",
         "outputs_summary": {},
         "seq": 4,
-        "timestamp": "2026-07-05T15:27:39.863147+00:00",
+        "timestamp": "2026-07-06T01:30:42.475786+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "PIPELINE_COMPLETE",
         "case_id": "VIGIA_BREAK_004_SIGNAL_DROWNING",
-        "entry_sha256": "3c339ad8fa3a117d73648f27eac6c34548e1848d3aa98c108c29626ab648dc55",
+        "entry_sha256": "14870dbc3be7092a5ccfa515e88baa02642c352a12b634f5ac3abbe8cd40326b",
         "inputs_summary": {
           "iteration": "0"
         },
@@ -82,16 +82,24 @@
         "outputs_summary": {
           "abduction": {
             "best_hypothesis": "SUSPICION_DETECTED",
-            "best_posterior": "51/400",
-            "confidence": "51/400",
-            "is_conclusive": "True",
+            "best_posterior": "13/50",
+            "confidence": "13/50",
+            "is_conclusive": "False",
             "narrative": "Mucho ruido irrelevante + pocos artefactos cr\u00edticos"
           },
           "case_id": "VIGIA_BREAK_004_SIGNAL_DROWNING",
           "pipeline_meta": {
             "artifact_count": "4",
             "avg_score": "51/80",
+            "ebs_adapter_mode": "motor",
             "expected_verdict": "SUSPICION",
+            "resolve": {
+              "motor_confidence": "0.26",
+              "motor_reason": "Significant signal with structural support (score=0.1317)",
+              "motor_score": "0.1317",
+              "motor_verdict": "SUSPICION",
+              "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+            },
             "source": "ebs_v1_json_adapter"
           },
           "signals": [
@@ -130,13 +138,13 @@
           ]
         },
         "seq": 5,
-        "timestamp": "2026-07-05T15:27:39.865689+00:00",
+        "timestamp": "2026-07-06T01:30:42.825801+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "CONTRADICTION_CHECK",
         "case_id": "VIGIA_BREAK_004_SIGNAL_DROWNING",
-        "entry_sha256": "645ded9becfacd86f9aad20942423963a509f6093debd9410b8718ecc6580266",
+        "entry_sha256": "faef666df844c166db7770434c52b583729b0d7b90fca5846f507f097920c52b",
         "inputs_summary": {
           "n_signals": "4"
         },
@@ -147,13 +155,13 @@
           "threshold": "2"
         },
         "seq": 6,
-        "timestamp": "2026-07-05T15:27:39.865800+00:00",
+        "timestamp": "2026-07-06T01:30:42.825925+00:00",
         "tool": "contradiction_detector"
       },
       {
         "action": "AGENT_EXIT",
         "case_id": "VIGIA_BREAK_004_SIGNAL_DROWNING",
-        "entry_sha256": "286a7a7ab92666ed894b12fe67dc1fde22f51e3be3c3a301dda9c78349843619",
+        "entry_sha256": "760eb02c1865bd71ef0122cfe5a9d609fc4b10a8b35063367b7c019d1bd1e6c6",
         "inputs_summary": {
           "verdict": "SUSPICION_DETECTED"
         },
@@ -164,35 +172,43 @@
           "exit_code": "3"
         },
         "seq": 7,
-        "timestamp": "2026-07-05T15:27:39.865982+00:00",
+        "timestamp": "2026-07-06T01:30:42.826123+00:00",
         "tool": "vigia_agent"
       }
     ],
-    "start_time": "2026-07-05T15:27:39.862643+00:00",
+    "start_time": "2026-07-06T01:30:42.475274+00:00",
     "total_entries": 7
   },
   "case_id": "VIGIA_BREAK_004_SIGNAL_DROWNING",
   "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA_BREAK_004_SIGNAL_DROWNING.json",
-  "evidence_sha256": "d5e0c75ffb89414cf28d4e9e7a0344c4e81a0b4d528510e96eac78cc14a30c8e",
+  "evidence_sha256": "8e216a3eb6672c2251afec3a4a7fa847b9b752314da4f8a9d43d35f0faeff222",
   "iterations_executed": 1,
-  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA_BREAK_004_SIGNAL_DROWNING ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA_BREAK_004_SIGNAL_DROWNING.json\nEvidence SHA-256: d5e0c75ffb89414cf28d4e9e7a0344c4e81a0b4d528510e96eac78cc14a30c8e\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: SUSPICION_DETECTED\nPosterior confidence: 51/400\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 4 se\u00f1al(es): 4 primaria(s) de ['legacy_converter'], 0 derivada(s)/no-analizada(s). Top z: irrelevant=0.64, irrelevant=0.64, exfiltration=0.64.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: SUSPICION_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nMucho ruido irrelevante + pocos artefactos cr\u00edticos\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [irrelevant] z=0.637 conf=0.85 \u2014 \n  [irrelevant] z=0.637 conf=0.85 \u2014 \n  [exfiltration] z=0.637 conf=0.85 \u2014 \n  [data dump] z=0.637 conf=0.85 \u2014 \n\n--- FINAL ALERT LEVEL ---\nMEDIUM \u2014 INTENT verdict with individual z-scores below threshold. Alert floored (B-028/B-065): an intent finding cannot present as LOW.\nReconciliation: verdict INTENT rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 4 | Derived: 0 | Total: 4",
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA_BREAK_004_SIGNAL_DROWNING ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA_BREAK_004_SIGNAL_DROWNING.json\nEvidence SHA-256: 8e216a3eb6672c2251afec3a4a7fa847b9b752314da4f8a9d43d35f0faeff222\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: SUSPICION_DETECTED\nPosterior confidence: 13/50\nConclusive: NO \u2014 requires human review\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 4 se\u00f1al(es): 4 primaria(s) de ['legacy_converter'], 0 derivada(s)/no-analizada(s). Top z: irrelevant=0.64, irrelevant=0.64, exfiltration=0.64.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: SUSPICION_DETECTED. Conclusiva: no \u2014 requiere revisi\u00f3n humana.\n\nRazonamiento del motor abductivo:\nMucho ruido irrelevante + pocos artefactos cr\u00edticos\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [irrelevant] z=0.637 conf=0.85 \u2014 \n  [irrelevant] z=0.637 conf=0.85 \u2014 \n  [exfiltration] z=0.637 conf=0.85 \u2014 \n  [data dump] z=0.637 conf=0.85 \u2014 \n\n--- FINAL ALERT LEVEL ---\nMEDIUM \u2014 INTENT verdict with individual z-scores below threshold. Alert floored (B-028/B-065): an intent finding cannot present as LOW.\nReconciliation: verdict INTENT rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 4 | Derived: 0 | Total: 4",
   "pipeline_results": {
     "abduction": {
       "best_hypothesis": "SUSPICION_DETECTED",
-      "best_posterior": "51/400",
+      "best_posterior": "13/50",
       "confidence": {
         "__fraction__": true,
-        "den": 400,
-        "num": 51
+        "den": 50,
+        "num": 13
       },
-      "is_conclusive": true,
+      "is_conclusive": false,
       "narrative": "Mucho ruido irrelevante + pocos artefactos cr\u00edticos"
     },
     "case_id": "VIGIA_BREAK_004_SIGNAL_DROWNING",
     "pipeline_meta": {
       "artifact_count": 4,
       "avg_score": "51/80",
+      "ebs_adapter_mode": "motor",
       "expected_verdict": "SUSPICION",
+      "resolve": {
+        "motor_confidence": "0.26",
+        "motor_reason": "Significant signal with structural support (score=0.1317)",
+        "motor_score": "0.1317",
+        "motor_verdict": "SUSPICION",
+        "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+      },
       "source": "ebs_v1_json_adapter"
     },
     "signals": [

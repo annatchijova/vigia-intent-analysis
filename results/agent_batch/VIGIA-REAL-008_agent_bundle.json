@@ -1,15 +1,15 @@
 {
   "agent_verdict": "MALICE",
-  "analysis_timestamp": "2026-07-05T15:27:35.537504+00:00",
+  "analysis_timestamp": "2026-07-06T01:30:06.228390+00:00",
   "audit_trail": {
     "agent_version": "1.0.0-SANS-2026",
     "case_id": "VIGIA-REAL-008",
-    "end_time": "2026-07-05T15:27:35.537511+00:00",
+    "end_time": "2026-07-06T01:30:06.228398+00:00",
     "entries": [
       {
         "action": "AGENT_INITIALIZED",
         "case_id": "VIGIA-REAL-008",
-        "entry_sha256": "b18b487675da0db2940d85d530f36c16bdc2469e18c981d205ec2d88bb9d9551",
+        "entry_sha256": "741fb516853e7159876bc8109e42bd654e8d7148239f959f71a8b4febd57cff9",
         "inputs_summary": {
           "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
           "case_id": "VIGIA-REAL-008"
@@ -21,13 +21,13 @@
           "agent_version": "1.0.0-SANS-2026"
         },
         "seq": 1,
-        "timestamp": "2026-07-05T15:27:35.533898+00:00",
+        "timestamp": "2026-07-06T01:30:05.872232+00:00",
         "tool": "vigia_agent"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-REAL-008",
-        "entry_sha256": "d55ac0d66989e990cbf4874dab8ee9399bbcfc2820ac6acfa901a71319d58ed8",
+        "entry_sha256": "f992ce8870121a35b178e082168bcf77206898e96f44b32624bb57148f02c2d9",
         "inputs_summary": {
           "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-REAL-008.json"
         },
@@ -35,13 +35,13 @@
         "note": "Computing SHA-256 of original evidence",
         "outputs_summary": {},
         "seq": 2,
-        "timestamp": "2026-07-05T15:27:35.533983+00:00",
+        "timestamp": "2026-07-06T01:30:05.872315+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-REAL-008",
-        "entry_sha256": "7b2799d1ee0267400e5d49527607eb5b13576f7ff8551bf2c63c1b1c30907cae",
+        "entry_sha256": "e356877746693b55c99c61128642088087fb567e355aede90e44b76e279c24e6",
         "inputs_summary": {
           "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-REAL-008.json"
         },
@@ -51,13 +51,13 @@
           "sha256": "46a636cbdac8cf10ea46bd2a8c3e38505f12cfac570729f984186faef3bec8cf"
         },
         "seq": 3,
-        "timestamp": "2026-07-05T15:27:35.534078+00:00",
+        "timestamp": "2026-07-06T01:30:05.872447+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "PIPELINE_EXECUTE",
         "case_id": "VIGIA-REAL-008",
-        "entry_sha256": "d7d15dae4f27a24a3329f47a17d5811cc12b8cdce9d40b00009b868a87ac5f85",
+        "entry_sha256": "9ba5a871c20d53a52469b960632b58ea14da0f95201c966124702c830ac528f9",
         "inputs_summary": {
           "evidence": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-REAL-008.json",
           "iteration": "0",
@@ -67,13 +67,13 @@
         "note": "Executing pipeline \u2014 iteration 0",
         "outputs_summary": {},
         "seq": 4,
-        "timestamp": "2026-07-05T15:27:35.534181+00:00",
+        "timestamp": "2026-07-06T01:30:05.872554+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "PIPELINE_COMPLETE",
         "case_id": "VIGIA-REAL-008",
-        "entry_sha256": "566618d501970b4deaf52dd16b67198b3f1075975a46fe837510c6038d5fc5f9",
+        "entry_sha256": "9af369680fe2c7c5a84788773669895fb18ca0860c5d298174a940a2f60e992d",
         "inputs_summary": {
           "iteration": "0"
         },
@@ -82,16 +82,24 @@
         "outputs_summary": {
           "abduction": {
             "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
-            "best_posterior": "0",
-            "confidence": "0",
-            "is_conclusive": "False",
+            "best_posterior": "19/20",
+            "confidence": "19/20",
+            "is_conclusive": "True",
             "narrative": "Memory dump cridex.vmem from a Windows XP SP2 machine infected with the Cridex banking trojan (Feodo/Bugat, predecessor of Dridex). The malware injects code into explorer.exe and communicates with C&C..."
           },
           "case_id": "VIGIA-REAL-008",
           "pipeline_meta": {
             "artifact_count": "4",
             "avg_score": "0",
+            "ebs_adapter_mode": "motor",
             "expected_verdict": "MALICE",
+            "resolve": {
+              "motor_confidence": "0.95",
+              "motor_reason": "Intent score 0.4926 exceeds MALICE threshold (P2+acq_assurance scale, threshold=0.33)",
+              "motor_score": "0.4926",
+              "motor_verdict": "MALICE",
+              "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+            },
             "source": "ebs_v1_json_adapter"
           },
           "signals": [
@@ -130,13 +138,13 @@
           ]
         },
         "seq": 5,
-        "timestamp": "2026-07-05T15:27:35.536751+00:00",
+        "timestamp": "2026-07-06T01:30:06.227828+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "CONTRADICTION_CHECK",
         "case_id": "VIGIA-REAL-008",
-        "entry_sha256": "dfe273bf977af288be2669dc22c03b205e2dda794a1d0f1f0494d1252a5ca0a2",
+        "entry_sha256": "dbb92e18ab6f53a89dcf9123b05eb8ff3af1860b57693b9e168b932daff72400",
         "inputs_summary": {
           "n_signals": "4"
         },
@@ -147,13 +155,13 @@
           "threshold": "2"
         },
         "seq": 6,
-        "timestamp": "2026-07-05T15:27:35.536855+00:00",
+        "timestamp": "2026-07-06T01:30:06.227970+00:00",
         "tool": "contradiction_detector"
       },
       {
         "action": "AGENT_EXIT",
         "case_id": "VIGIA-REAL-008",
-        "entry_sha256": "1a12163047beb89b52db63baa47bacab2a5bcb44c47e2f711e8af34b66cdb0c4",
+        "entry_sha256": "9f1a35bf18bed51ac98fb55500ecf01f20c3dc15205f202f8f0a556a9879c28c",
         "inputs_summary": {
           "verdict": "MALICIOUS_INTENT_DETECTED"
         },
@@ -164,26 +172,26 @@
           "exit_code": "1"
         },
         "seq": 7,
-        "timestamp": "2026-07-05T15:27:35.537039+00:00",
+        "timestamp": "2026-07-06T01:30:06.228190+00:00",
         "tool": "vigia_agent"
       }
     ],
-    "start_time": "2026-07-05T15:27:35.533665+00:00",
+    "start_time": "2026-07-06T01:30:05.872007+00:00",
     "total_entries": 7
   },
   "case_id": "VIGIA-REAL-008",
   "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-REAL-008.json",
   "evidence_sha256": "46a636cbdac8cf10ea46bd2a8c3e38505f12cfac570729f984186faef3bec8cf",
   "iterations_executed": 1,
-  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-REAL-008 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/VIGIA-REAL-008.json\nEvidence SHA-256: 46a636cbdac8cf10ea46bd2a8c3e38505f12cfac570729f984186faef3bec8cf\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 0\nConclusive: NO \u2014 requires human review\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 4 se\u00f1al(es): 4 primaria(s) de ['unknown'], 0 derivada(s)/no-analizada(s). Top z: unknown=0.00, unknown=0.00, unknown=0.00.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: MALICIOUS_INTENT_DETECTED. Conclusiva: no \u2014 requiere revisi\u00f3n humana.\n\nRazonamiento del motor abductivo:\nMemory dump cridex.vmem from a Windows XP SP2 machine infected with the Cridex banking trojan (Feodo/Bugat, predecessor of Dridex). The malware injects code into explorer.exe and communicates with C&C servers to steal banking credentials.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [unknown] z=0.000 conf=0.50 \u2014 \n  [unknown] z=0.000 conf=0.50 \u2014 \n  [unknown] z=0.000 conf=0.50 \u2014 \n  [unknown] z=0.000 conf=0.50 \u2014 \n\n--- FINAL ALERT LEVEL ---\nMEDIUM \u2014 MALICE verdict from posterior aggregation. Individual z-scores below threshold. Full signal review recommended. Alert floored (B-028/B-065).\nReconciliation: verdict MALICE rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 4 | Derived: 0 | Total: 4",
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-REAL-008 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/VIGIA-REAL-008.json\nEvidence SHA-256: 46a636cbdac8cf10ea46bd2a8c3e38505f12cfac570729f984186faef3bec8cf\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 19/20\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 4 se\u00f1al(es): 4 primaria(s) de ['unknown'], 0 derivada(s)/no-analizada(s). Top z: unknown=0.00, unknown=0.00, unknown=0.00.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: MALICIOUS_INTENT_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nMemory dump cridex.vmem from a Windows XP SP2 machine infected with the Cridex banking trojan (Feodo/Bugat, predecessor of Dridex). The malware injects code into explorer.exe and communicates with C&C servers to steal banking credentials.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [unknown] z=0.000 conf=0.50 \u2014 \n  [unknown] z=0.000 conf=0.50 \u2014 \n  [unknown] z=0.000 conf=0.50 \u2014 \n  [unknown] z=0.000 conf=0.50 \u2014 \n\n--- FINAL ALERT LEVEL ---\nHIGH \u2014 MALICE verdict from Bayesian posterior aggregation. Individual z-scores below threshold (distributed evidence pattern: no single dominant signal, but aggregate posterior is decisive). Alert floored (B-028/B-065).\nReconciliation: verdict MALICE rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 4 | Derived: 0 | Total: 4",
   "pipeline_results": {
     "abduction": {
       "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
-      "best_posterior": "0",
+      "best_posterior": "19/20",
       "confidence": {
         "__fraction__": true,
-        "den": 1,
-        "num": 0
+        "den": 20,
+        "num": 19
       },
       "devil_advocate": {
         "aggregation": {
@@ -195,7 +203,7 @@
           "primary_alternative_hypothesis": null
         },
         "decision_context": {
-          "confidence": "0",
+          "confidence": "19/20",
           "mapped_verdict": "MALICIOUS_INTENT_DETECTED",
           "raw_verdict": "MALICIOUS_INTENT_DETECTED",
           "score": "0"
@@ -209,14 +217,22 @@
         "pattern_evidence_gaps": [],
         "version": "r7-da-v1"
       },
-      "is_conclusive": false,
+      "is_conclusive": true,
       "narrative": "Memory dump cridex.vmem from a Windows XP SP2 machine infected with the Cridex banking trojan (Feodo/Bugat, predecessor of Dridex). The malware injects code into explorer.exe and communicates with C&C servers to steal banking credentials."
     },
     "case_id": "VIGIA-REAL-008",
     "pipeline_meta": {
       "artifact_count": 4,
       "avg_score": "0",
+      "ebs_adapter_mode": "motor",
       "expected_verdict": "MALICE",
+      "resolve": {
+        "motor_confidence": "0.95",
+        "motor_reason": "Intent score 0.4926 exceeds MALICE threshold (P2+acq_assurance scale, threshold=0.33)",
+        "motor_score": "0.4926",
+        "motor_verdict": "MALICE",
+        "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+      },
       "source": "ebs_v1_json_adapter"
     },
     "signals": [

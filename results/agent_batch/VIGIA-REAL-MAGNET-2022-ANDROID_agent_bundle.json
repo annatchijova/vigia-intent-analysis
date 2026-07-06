@@ -1,15 +1,15 @@
 {
   "agent_verdict": "INTENT",
-  "analysis_timestamp": "2026-07-05T15:27:36.015706+00:00",
+  "analysis_timestamp": "2026-07-06T01:30:10.486076+00:00",
   "audit_trail": {
     "agent_version": "1.0.0-SANS-2026",
     "case_id": "VIGIA-REAL-MAGNET-2022-ANDROID",
-    "end_time": "2026-07-05T15:27:36.015711+00:00",
+    "end_time": "2026-07-06T01:30:10.486082+00:00",
     "entries": [
       {
         "action": "AGENT_INITIALIZED",
         "case_id": "VIGIA-REAL-MAGNET-2022-ANDROID",
-        "entry_sha256": "8f5c3155927dcf63c507561d939a0a64c59914341737afab4fc0f5317915ee64",
+        "entry_sha256": "a59a3b99a5434daa9c674556461cc2ff31305460b06e598879bfc9eb8ce60cdd",
         "inputs_summary": {
           "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
           "case_id": "VIGIA-REAL-MAGNET-2022-ANDROID"
@@ -21,13 +21,13 @@
           "agent_version": "1.0.0-SANS-2026"
         },
         "seq": 1,
-        "timestamp": "2026-07-05T15:27:36.012349+00:00",
+        "timestamp": "2026-07-06T01:30:10.147907+00:00",
         "tool": "vigia_agent"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-REAL-MAGNET-2022-ANDROID",
-        "entry_sha256": "8f88d2f5f606bcd3f42fb147511dfab9ab3de6a932ad4aba9b8051ad3d0d0fe8",
+        "entry_sha256": "ac43ccdb5427a0f3f0af6130ccd4fd38982b13f4780e26e0f63fcc96236785c3",
         "inputs_summary": {
           "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-REAL-MAGNET-2022-ANDROID.json"
         },
@@ -35,13 +35,13 @@
         "note": "Computing SHA-256 of original evidence",
         "outputs_summary": {},
         "seq": 2,
-        "timestamp": "2026-07-05T15:27:36.012449+00:00",
+        "timestamp": "2026-07-06T01:30:10.147989+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-REAL-MAGNET-2022-ANDROID",
-        "entry_sha256": "db0b8fffc3c54e3161aa50999ea1d4c5fabbe8ab245ed41488205b9acd3a842c",
+        "entry_sha256": "6492bfc65ec3a72e75fddee5eb6697b59073822675a8ada65beec77d75d2cb93",
         "inputs_summary": {
           "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-REAL-MAGNET-2022-ANDROID.json"
         },
@@ -51,13 +51,13 @@
           "sha256": "3b2def4d06b019f9b1cf7227230758196fd7fa61ca43475828fa4a9391d8decd"
         },
         "seq": 3,
-        "timestamp": "2026-07-05T15:27:36.012545+00:00",
+        "timestamp": "2026-07-06T01:30:10.148082+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "PIPELINE_EXECUTE",
         "case_id": "VIGIA-REAL-MAGNET-2022-ANDROID",
-        "entry_sha256": "e63463b28eae6ca7bae4a095cbfc044073721b7f683ada1f58f83cab489c8f22",
+        "entry_sha256": "d2862da7efae22b1b2f2a43d3cba8de13d23a58556ea100f111249c3a63cad49",
         "inputs_summary": {
           "evidence": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-REAL-MAGNET-2022-ANDROID.json",
           "iteration": "0",
@@ -67,13 +67,13 @@
         "note": "Executing pipeline \u2014 iteration 0",
         "outputs_summary": {},
         "seq": 4,
-        "timestamp": "2026-07-05T15:27:36.012651+00:00",
+        "timestamp": "2026-07-06T01:30:10.148184+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "PIPELINE_COMPLETE",
         "case_id": "VIGIA-REAL-MAGNET-2022-ANDROID",
-        "entry_sha256": "581d37b8a62c3463bd48228fca5d76855913a7db89d3f33f23139be610e05f07",
+        "entry_sha256": "0df72744ff4587dc26722263f60824dc265035fd492898898a781887023dc5c8",
         "inputs_summary": {
           "iteration": "0"
         },
@@ -82,8 +82,8 @@
         "outputs_summary": {
           "abduction": {
             "best_hypothesis": "SUSPICION_DETECTED",
-            "best_posterior": "673/8000",
-            "confidence": "673/8000",
+            "best_posterior": "41/100",
+            "confidence": "41/100",
             "is_conclusive": "True",
             "narrative": "Android data partition image. Rafael Shell (rafaelshell24@gmail.com), Google Pixel 3 rooted with Magisk v23000, Champlain College Burlington VT, Log4Shell vCenter research. Full disk encryption active..."
           },
@@ -91,7 +91,15 @@
           "pipeline_meta": {
             "artifact_count": "4",
             "avg_score": "673/1600",
+            "ebs_adapter_mode": "motor",
             "expected_verdict": "SUSPICION",
+            "resolve": {
+              "motor_confidence": "0.41",
+              "motor_reason": "Significant signal with structural support (score=0.2057)",
+              "motor_score": "0.2057",
+              "motor_verdict": "SUSPICION",
+              "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+            },
             "source": "ebs_v1_json_adapter"
           },
           "signals": [
@@ -130,13 +138,13 @@
           ]
         },
         "seq": 5,
-        "timestamp": "2026-07-05T15:27:36.015343+00:00",
+        "timestamp": "2026-07-06T01:30:10.485702+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "CONTRADICTION_CHECK",
         "case_id": "VIGIA-REAL-MAGNET-2022-ANDROID",
-        "entry_sha256": "19820ef82273eeb680bd7f55fa6dcc45db9a733f9c208b1cf4c97aa31172810a",
+        "entry_sha256": "cdb10db2a16110c4f785de49fa6f948cc168062e098c186a9b76327545d518e8",
         "inputs_summary": {
           "n_signals": "4"
         },
@@ -147,13 +155,13 @@
           "threshold": "2"
         },
         "seq": 6,
-        "timestamp": "2026-07-05T15:27:36.015467+00:00",
+        "timestamp": "2026-07-06T01:30:10.485827+00:00",
         "tool": "contradiction_detector"
       },
       {
         "action": "AGENT_EXIT",
         "case_id": "VIGIA-REAL-MAGNET-2022-ANDROID",
-        "entry_sha256": "c82fce85803eacf22c36d6a3911015c20e64e713887665257910ebc63d6e2011",
+        "entry_sha256": "3fe071af7b8e521d00bd708c7b96383ee892bc39efe3d66080d7829fc50d3584",
         "inputs_summary": {
           "verdict": "SUSPICION_DETECTED"
         },
@@ -164,26 +172,26 @@
           "exit_code": "3"
         },
         "seq": 7,
-        "timestamp": "2026-07-05T15:27:36.015657+00:00",
+        "timestamp": "2026-07-06T01:30:10.486023+00:00",
         "tool": "vigia_agent"
       }
     ],
-    "start_time": "2026-07-05T15:27:36.012108+00:00",
+    "start_time": "2026-07-06T01:30:10.147682+00:00",
     "total_entries": 7
   },
   "case_id": "VIGIA-REAL-MAGNET-2022-ANDROID",
   "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-REAL-MAGNET-2022-ANDROID.json",
   "evidence_sha256": "3b2def4d06b019f9b1cf7227230758196fd7fa61ca43475828fa4a9391d8decd",
   "iterations_executed": 1,
-  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-REAL-MAGNET-2022-ANDROID ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/VIGIA-REAL-MAGNET-2022-ANDROID.json\nEvidence SHA-256: 3b2def4d06b019f9b1cf7227230758196fd7fa61ca43475828fa4a9391d8decd\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: SUSPICION_DETECTED\nPosterior confidence: 673/8000\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 4 se\u00f1al(es): 4 primaria(s) de ['app_analysis', 'browser_analysis', 'filesystem_analysis'], 0 derivada(s)/no-analizada(s). Top z: Log4Shell CVE-2021-44228 bookmark/search=0.72, Wire app 7 bookmarks + Bumble chat with =0.52, data/unencrypted/key/ directory contains=0.24.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: SUSPICION_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nAndroid data partition image. Rafael Shell (rafaelshell24@gmail.com), Google Pixel 3 rooted with Magisk v23000, Champlain College Burlington VT, Log4Shell vCenter research. Full disk encryption active with keymaster key blob. Bluetooth config and recovery artifacts present. Wire app bookmarks and Bumble chat with Discord handle exchange indicate OPSEC-aware communication patterns.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Log4Shell CVE-2021-44228 bookmark/search against VMware vCenter. Indic] z=0.723 conf=0.85 \u2014 \n  [Wire app 7 bookmarks + Bumble chat with Discord handle exchange (PostM] z=0.520 conf=0.80 \u2014 \n  [data/unencrypted/key/ directory contains: keymaster_key_blob, encrypte] z=0.240 conf=0.80 \u2014 \n  [data/misc/bluedroid/bt_config.bak present \u2014 Bluetooth pairing history ] z=0.200 conf=0.80 \u2014 \n\n--- FINAL ALERT LEVEL ---\nMEDIUM \u2014 INTENT verdict with individual z-scores below threshold. Alert floored (B-028/B-065): an intent finding cannot present as LOW.\nReconciliation: verdict INTENT rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 4 | Derived: 0 | Total: 4",
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-REAL-MAGNET-2022-ANDROID ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/VIGIA-REAL-MAGNET-2022-ANDROID.json\nEvidence SHA-256: 3b2def4d06b019f9b1cf7227230758196fd7fa61ca43475828fa4a9391d8decd\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: SUSPICION_DETECTED\nPosterior confidence: 41/100\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 4 se\u00f1al(es): 4 primaria(s) de ['app_analysis', 'browser_analysis', 'filesystem_analysis'], 0 derivada(s)/no-analizada(s). Top z: Log4Shell CVE-2021-44228 bookmark/search=0.72, Wire app 7 bookmarks + Bumble chat with =0.52, data/unencrypted/key/ directory contains=0.24.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: SUSPICION_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nAndroid data partition image. Rafael Shell (rafaelshell24@gmail.com), Google Pixel 3 rooted with Magisk v23000, Champlain College Burlington VT, Log4Shell vCenter research. Full disk encryption active with keymaster key blob. Bluetooth config and recovery artifacts present. Wire app bookmarks and Bumble chat with Discord handle exchange indicate OPSEC-aware communication patterns.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Log4Shell CVE-2021-44228 bookmark/search against VMware vCenter. Indic] z=0.723 conf=0.85 \u2014 \n  [Wire app 7 bookmarks + Bumble chat with Discord handle exchange (PostM] z=0.520 conf=0.80 \u2014 \n  [data/unencrypted/key/ directory contains: keymaster_key_blob, encrypte] z=0.240 conf=0.80 \u2014 \n  [data/misc/bluedroid/bt_config.bak present \u2014 Bluetooth pairing history ] z=0.200 conf=0.80 \u2014 \n\n--- FINAL ALERT LEVEL ---\nMEDIUM \u2014 INTENT verdict with individual z-scores below threshold. Alert floored (B-028/B-065): an intent finding cannot present as LOW.\nReconciliation: verdict INTENT rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 4 | Derived: 0 | Total: 4",
   "pipeline_results": {
     "abduction": {
       "best_hypothesis": "SUSPICION_DETECTED",
-      "best_posterior": "673/8000",
+      "best_posterior": "41/100",
       "confidence": {
         "__fraction__": true,
-        "den": 8000,
-        "num": 673
+        "den": 100,
+        "num": 41
       },
       "is_conclusive": true,
       "narrative": "Android data partition image. Rafael Shell (rafaelshell24@gmail.com), Google Pixel 3 rooted with Magisk v23000, Champlain College Burlington VT, Log4Shell vCenter research. Full disk encryption active with keymaster key blob. Bluetooth config and recovery artifacts present. Wire app bookmarks and Bumble chat with Discord handle exchange indicate OPSEC-aware communication patterns."
@@ -192,7 +200,15 @@
     "pipeline_meta": {
       "artifact_count": 4,
       "avg_score": "673/1600",
+      "ebs_adapter_mode": "motor",
       "expected_verdict": "SUSPICION",
+      "resolve": {
+        "motor_confidence": "0.41",
+        "motor_reason": "Significant signal with structural support (score=0.2057)",
+        "motor_score": "0.2057",
+        "motor_verdict": "SUSPICION",
+        "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+      },
       "source": "ebs_v1_json_adapter"
     },
     "signals": [

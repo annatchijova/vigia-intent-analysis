@@ -1,15 +1,15 @@
 {
-  "agent_verdict": "INTENT",
-  "analysis_timestamp": "2026-07-05T15:27:33.388679+00:00",
+  "agent_verdict": "MALICE",
+  "analysis_timestamp": "2026-07-06T01:29:48.232448+00:00",
   "audit_trail": {
     "agent_version": "1.0.0-SANS-2026",
     "case_id": "VIGIA-FLAREON-11",
-    "end_time": "2026-07-05T15:27:33.388685+00:00",
+    "end_time": "2026-07-06T01:29:48.232455+00:00",
     "entries": [
       {
         "action": "AGENT_INITIALIZED",
         "case_id": "VIGIA-FLAREON-11",
-        "entry_sha256": "ab921e1bd121a7d5bd112241d0c7502f1672ccfcca17d053ac29b7bc662ed1f9",
+        "entry_sha256": "9f6928a2df979895c679a59887b1344388a00255386c490a6b9e892a9fde805b",
         "inputs_summary": {
           "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
           "case_id": "VIGIA-FLAREON-11"
@@ -21,13 +21,13 @@
           "agent_version": "1.0.0-SANS-2026"
         },
         "seq": 1,
-        "timestamp": "2026-07-05T15:27:33.384979+00:00",
+        "timestamp": "2026-07-06T01:29:47.879222+00:00",
         "tool": "vigia_agent"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-FLAREON-11",
-        "entry_sha256": "853c2eea98afa86aed7740edd0e5b54948b6fc399d2c03976b99a64eab82d25f",
+        "entry_sha256": "9118fffcbe342507e3cd85dc546549e46b58b561b2007451fc91a2873ccbad33",
         "inputs_summary": {
           "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-FLAREON-11.json"
         },
@@ -35,29 +35,29 @@
         "note": "Computing SHA-256 of original evidence",
         "outputs_summary": {},
         "seq": 2,
-        "timestamp": "2026-07-05T15:27:33.385065+00:00",
+        "timestamp": "2026-07-06T01:29:47.879303+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-FLAREON-11",
-        "entry_sha256": "45c57ba98fcb8a81bf738a5c012cd59f45e9256bac0fa99ec0c8f35651ef0cd7",
+        "entry_sha256": "91dceaeef175255f667bd54d688c7620032ed9d7f8e436eb40983815132f2ef0",
         "inputs_summary": {
           "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-FLAREON-11.json"
         },
         "iteration": 0,
-        "note": "Evidence verified: 760cb24f54e32b67...",
+        "note": "Evidence verified: b3190fa45637251b...",
         "outputs_summary": {
-          "sha256": "760cb24f54e32b674d517f48bb66b43bbf1e0e0d3e88af173be8fc87a7e60818"
+          "sha256": "b3190fa45637251b29cfe91420ba6563b8c4475e0f61d3cf057fd029a87090ff"
         },
         "seq": 3,
-        "timestamp": "2026-07-05T15:27:33.385181+00:00",
+        "timestamp": "2026-07-06T01:29:47.879411+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "PIPELINE_EXECUTE",
         "case_id": "VIGIA-FLAREON-11",
-        "entry_sha256": "12e63db8dbccdca08612eb45a8bb0c63a8144ee2f3dd943af132ede01fc5d053",
+        "entry_sha256": "a0009a28b7ecf68effb2f8ab2dc52bdaead381f4f04907e48bdb8a35c6417bed",
         "inputs_summary": {
           "evidence": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-FLAREON-11.json",
           "iteration": "0",
@@ -67,13 +67,13 @@
         "note": "Executing pipeline \u2014 iteration 0",
         "outputs_summary": {},
         "seq": 4,
-        "timestamp": "2026-07-05T15:27:33.385283+00:00",
+        "timestamp": "2026-07-06T01:29:47.879524+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "PIPELINE_COMPLETE",
         "case_id": "VIGIA-FLAREON-11",
-        "entry_sha256": "51d3bbc281851a4bcc7700b256287c734faf712e66825242dce4e9144d1b0952",
+        "entry_sha256": "21c39146bd46e2fd9d00a1fb08da5991b455360748dee5de23dc131e43af760f",
         "inputs_summary": {
           "iteration": "0"
         },
@@ -81,9 +81,9 @@
         "note": "Pipeline completed \u2014 11 signals",
         "outputs_summary": {
           "abduction": {
-            "best_hypothesis": "INTENT_DETECTED",
-            "best_posterior": "371/2750",
-            "confidence": "371/2750",
+            "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+            "best_posterior": "19/20",
+            "confidence": "19/20",
             "is_conclusive": "True",
             "narrative": "Flare-On 11 (2024) challenge corpus. Ten CTF reversing challenges distributed as a single ZIP containing individual 7z archives protected with CTF passwords. Challenges span a spectrum of adversarial ..."
           },
@@ -91,7 +91,15 @@
           "pipeline_meta": {
             "artifact_count": "11",
             "avg_score": "371/550",
+            "ebs_adapter_mode": "motor",
             "expected_verdict": "INTENT",
+            "resolve": {
+              "motor_confidence": "0.95",
+              "motor_reason": "Intent score 0.5549 exceeds MALICE threshold (P2+acq_assurance scale, threshold=0.33)",
+              "motor_score": "0.5549",
+              "motor_verdict": "MALICE",
+              "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+            },
             "source": "ebs_v1_json_adapter"
           },
           "signals": [
@@ -138,13 +146,13 @@
           ]
         },
         "seq": 5,
-        "timestamp": "2026-07-05T15:27:33.388109+00:00",
+        "timestamp": "2026-07-06T01:29:48.231833+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "CONTRADICTION_CHECK",
         "case_id": "VIGIA-FLAREON-11",
-        "entry_sha256": "1f9dd8275c17c8f80e192af26fe294acfa4c3c7193ba7f363d58fb91efecaa8c",
+        "entry_sha256": "76b28e1dcbf4a5d41b984c302867bd747051b3ecb9bbe5c49b5077108e50f769",
         "inputs_summary": {
           "n_signals": "11"
         },
@@ -155,43 +163,67 @@
           "threshold": "2"
         },
         "seq": 6,
-        "timestamp": "2026-07-05T15:27:33.388283+00:00",
+        "timestamp": "2026-07-06T01:29:48.231991+00:00",
         "tool": "contradiction_detector"
       },
       {
         "action": "AGENT_EXIT",
         "case_id": "VIGIA-FLAREON-11",
-        "entry_sha256": "daebfab2bae96694100497f8c759d889fab064a770e3deae61fa6c82ac9a16b5",
+        "entry_sha256": "c8b048613c1907b680d3a0e53a755ddc23e499632b81deab9ff63f42830f73a2",
         "inputs_summary": {
-          "verdict": "INTENT_DETECTED"
+          "verdict": "MALICIOUS_INTENT_DETECTED"
         },
         "iteration": 0,
-        "note": "Exit code 3 (INTENT) \u2014 analysis complete.",
+        "note": "Exit code 1 (MALICE) \u2014 analysis complete.",
         "outputs_summary": {
-          "agent_verdict": "INTENT",
-          "exit_code": "3"
+          "agent_verdict": "MALICE",
+          "exit_code": "1"
         },
         "seq": 7,
-        "timestamp": "2026-07-05T15:27:33.388601+00:00",
+        "timestamp": "2026-07-06T01:29:48.232245+00:00",
         "tool": "vigia_agent"
       }
     ],
-    "start_time": "2026-07-05T15:27:33.384751+00:00",
+    "start_time": "2026-07-06T01:29:47.878998+00:00",
     "total_entries": 7
   },
   "case_id": "VIGIA-FLAREON-11",
   "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-FLAREON-11.json",
-  "evidence_sha256": "760cb24f54e32b674d517f48bb66b43bbf1e0e0d3e88af173be8fc87a7e60818",
+  "evidence_sha256": "b3190fa45637251b29cfe91420ba6563b8c4475e0f61d3cf057fd029a87090ff",
   "iterations_executed": 1,
-  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-FLAREON-11 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/VIGIA-FLAREON-11.json\nEvidence SHA-256: 760cb24f54e32b674d517f48bb66b43bbf1e0e0d3e88af173be8fc87a7e60818\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: INTENT_DETECTED\nPosterior confidence: 371/2750\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 11 se\u00f1al(es): 11 primaria(s) de ['generate_forensic_hash', 'list_files'], 0 derivada(s)/no-analizada(s). Top z: Flare-On11_Challenges.zip \u2014 primary dist=0.95, sshd.7z (193,244,435 bytes) \u2014 by far the=0.85, CatbertRansomware.7z (1,692,864 bytes) \u2014=0.83.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: INTENT_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nFlare-On 11 (2024) challenge corpus. Ten CTF reversing challenges distributed as a single ZIP containing individual 7z archives protected with CTF passwords. Challenges span a spectrum of adversarial techniques: array-based obfuscation (aray), BLAKE2 cryptographic keying (bloke2), ransomware (CatbertRansomware), ClearFake-style dropper (clearlyfake), a trojanized OpenSSH server (sshd), and additional RE puzzles. This corpus is used for forensic TTP classification and intentionality analysis trai\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Flare-On11_Challenges.zip \u2014 primary distribution archive. SHA-256 veri] z=0.950 conf=1.00 \u2014 \n  [sshd.7z (193,244,435 bytes) \u2014 by far the largest challenge at 193 MB. ] z=0.855 conf=0.90 \u2014 \n  [CatbertRansomware.7z (1,692,864 bytes) \u2014 ransomware sample. Largest te] z=0.828 conf=0.90 \u2014 \n  [clearlyfake.7z (1,616 bytes) \u2014 ClearFake-style dropper. Extremely smal] z=0.792 conf=0.90 \u2014 \n  [fullspeed.7z (771,776 bytes) \u2014 name suggests a speed-optimization or c] z=0.612 conf=0.85 \u2014 \n\n--- FINAL ALERT LEVEL ---\nMEDIUM \u2014 INTENT verdict with individual z-scores below threshold. Alert floored (B-028/B-065): an intent finding cannot present as LOW.\nReconciliation: verdict INTENT rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 11 | Derived: 0 | Total: 11",
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-FLAREON-11 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/VIGIA-FLAREON-11.json\nEvidence SHA-256: b3190fa45637251b29cfe91420ba6563b8c4475e0f61d3cf057fd029a87090ff\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 19/20\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 11 se\u00f1al(es): 11 primaria(s) de ['generate_forensic_hash', 'list_files'], 0 derivada(s)/no-analizada(s). Top z: Flare-On11_Challenges.zip \u2014 primary dist=0.95, sshd.7z (193,244,435 bytes) \u2014 by far the=0.85, CatbertRansomware.7z (1,692,864 bytes) \u2014=0.83.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: MALICIOUS_INTENT_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nFlare-On 11 (2024) challenge corpus. Ten CTF reversing challenges distributed as a single ZIP containing individual 7z archives protected with CTF passwords. Challenges span a spectrum of adversarial techniques: array-based obfuscation (aray), BLAKE2 cryptographic keying (bloke2), ransomware (CatbertRansomware), ClearFake-style dropper (clearlyfake), a trojanized OpenSSH server (sshd), and additional RE puzzles. This corpus is used for forensic TTP classification and intentionality analysis trai\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Flare-On11_Challenges.zip \u2014 primary distribution archive. SHA-256 veri] z=0.950 conf=1.00 \u2014 \n  [sshd.7z (193,244,435 bytes) \u2014 by far the largest challenge at 193 MB. ] z=0.855 conf=0.90 \u2014 \n  [CatbertRansomware.7z (1,692,864 bytes) \u2014 ransomware sample. Largest te] z=0.828 conf=0.90 \u2014 \n  [clearlyfake.7z (1,616 bytes) \u2014 ClearFake-style dropper. Extremely smal] z=0.792 conf=0.90 \u2014 \n  [fullspeed.7z (771,776 bytes) \u2014 name suggests a speed-optimization or c] z=0.612 conf=0.85 \u2014 \n\n--- FINAL ALERT LEVEL ---\nHIGH \u2014 MALICE verdict from Bayesian posterior aggregation. Individual z-scores below threshold (distributed evidence pattern: no single dominant signal, but aggregate posterior is decisive). Alert floored (B-028/B-065).\nReconciliation: verdict MALICE rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 11 | Derived: 0 | Total: 11",
   "pipeline_results": {
     "abduction": {
-      "best_hypothesis": "INTENT_DETECTED",
-      "best_posterior": "371/2750",
+      "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+      "best_posterior": "19/20",
       "confidence": {
         "__fraction__": true,
-        "den": 2750,
-        "num": 371
+        "den": 20,
+        "num": 19
+      },
+      "devil_advocate": {
+        "aggregation": {
+          "k": 3,
+          "method": "top_k_already_validated_matches_v2",
+          "total_gap_mass": "0"
+        },
+        "counterfactual_summary": {
+          "primary_alternative_hypothesis": null
+        },
+        "decision_context": {
+          "confidence": "19/20",
+          "mapped_verdict": "MALICIOUS_INTENT_DETECTED",
+          "raw_verdict": "MALICIOUS_INTENT_DETECTED",
+          "score": "371/550"
+        },
+        "devil_advocate_source": "deterministic_no_pattern_data_available",
+        "meta": {
+          "deterministic": true,
+          "generated_from": "case_pattern_library"
+        },
+        "narrative": "Eco's Razor (Abductive Falsification) applied to verdict MALICIOUS_INTENT_DETECTED. Pattern-matching data was not available on this code path \u2014 CasePatternLibrary is not invoked here by design (agent audit-trail mode (vigia_agent.py \u2014 JSON-replay / autonomous path); see KNOWN_LIMITATIONS.md). No structured counter-hypothesis could be derived deterministically. This is a documented scope limitation of the current code path, not an absence of falsification attempt.",
+        "pattern_evidence_gaps": [],
+        "version": "r7-da-v1"
       },
       "is_conclusive": true,
       "narrative": "Flare-On 11 (2024) challenge corpus. Ten CTF reversing challenges distributed as a single ZIP containing individual 7z archives protected with CTF passwords. Challenges span a spectrum of adversarial techniques: array-based obfuscation (aray), BLAKE2 cryptographic keying (bloke2), ransomware (CatbertRansomware), ClearFake-style dropper (clearlyfake), a trojanized OpenSSH server (sshd), and additional RE puzzles. This corpus is used for forensic TTP classification and intentionality analysis trai"
@@ -200,7 +232,15 @@
     "pipeline_meta": {
       "artifact_count": 11,
       "avg_score": "371/550",
+      "ebs_adapter_mode": "motor",
       "expected_verdict": "INTENT",
+      "resolve": {
+        "motor_confidence": "0.95",
+        "motor_reason": "Intent score 0.5549 exceeds MALICE threshold (P2+acq_assurance scale, threshold=0.33)",
+        "motor_score": "0.5549",
+        "motor_verdict": "MALICE",
+        "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+      },
       "source": "ebs_v1_json_adapter"
     },
     "signals": [

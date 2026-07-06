@@ -1,15 +1,15 @@
 {
   "agent_verdict": "MALICE",
-  "analysis_timestamp": "2026-07-05T15:27:36.481653+00:00",
+  "analysis_timestamp": "2026-07-06T01:30:14.563647+00:00",
   "audit_trail": {
     "agent_version": "1.0.0-SANS-2026",
     "case_id": "VIGIA-REAL-SRL-RD04-MEMORY",
-    "end_time": "2026-07-05T15:27:36.481659+00:00",
+    "end_time": "2026-07-06T01:30:14.563656+00:00",
     "entries": [
       {
         "action": "AGENT_INITIALIZED",
         "case_id": "VIGIA-REAL-SRL-RD04-MEMORY",
-        "entry_sha256": "fb6381c5981e8f9987277ae4bfda9607f70fe3a210563ba53031a2860e4d513f",
+        "entry_sha256": "3729192fd860c839874f5fb18563b220dd8a297cfdc269909dcffa213651ff6d",
         "inputs_summary": {
           "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
           "case_id": "VIGIA-REAL-SRL-RD04-MEMORY"
@@ -21,13 +21,13 @@
           "agent_version": "1.0.0-SANS-2026"
         },
         "seq": 1,
-        "timestamp": "2026-07-05T15:27:36.478059+00:00",
+        "timestamp": "2026-07-06T01:30:14.208568+00:00",
         "tool": "vigia_agent"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-REAL-SRL-RD04-MEMORY",
-        "entry_sha256": "f5640f75deb835d6572c0fe810f23066a09377ae82344dabda832fc7a682ec94",
+        "entry_sha256": "19f4e31d063d0b4dfe61d87d37068749d8b087855a31b3d04f157832ab45e067",
         "inputs_summary": {
           "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-REAL-SRL-RD04-MEMORY.json"
         },
@@ -35,13 +35,13 @@
         "note": "Computing SHA-256 of original evidence",
         "outputs_summary": {},
         "seq": 2,
-        "timestamp": "2026-07-05T15:27:36.478144+00:00",
+        "timestamp": "2026-07-06T01:30:14.208655+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-REAL-SRL-RD04-MEMORY",
-        "entry_sha256": "ad17bc1c46d24203225a4ff037a6d167bfadbe848aa03f4303654f103a2dba1f",
+        "entry_sha256": "5b6c19c77ec516a2ff1592ea4d5a2ecaa83a03b05a6c282803deef5efdc9167e",
         "inputs_summary": {
           "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-REAL-SRL-RD04-MEMORY.json"
         },
@@ -51,13 +51,13 @@
           "sha256": "79bbf4832deebc9b5d92164a7bbdb88448a393a02189db56c3926d7500d8a300"
         },
         "seq": 3,
-        "timestamp": "2026-07-05T15:27:36.478236+00:00",
+        "timestamp": "2026-07-06T01:30:14.208750+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "PIPELINE_EXECUTE",
         "case_id": "VIGIA-REAL-SRL-RD04-MEMORY",
-        "entry_sha256": "4b217299b1c6731c4d4b44bb5f68618223f3a024b901b4812060baa008fca0ea",
+        "entry_sha256": "f352f2f799ef2f957ee9018c1695068f08e0ee8d94e002fd48537563a4355dd6",
         "inputs_summary": {
           "evidence": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-REAL-SRL-RD04-MEMORY.json",
           "iteration": "0",
@@ -67,13 +67,13 @@
         "note": "Executing pipeline \u2014 iteration 0",
         "outputs_summary": {},
         "seq": 4,
-        "timestamp": "2026-07-05T15:27:36.478336+00:00",
+        "timestamp": "2026-07-06T01:30:14.208852+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "PIPELINE_COMPLETE",
         "case_id": "VIGIA-REAL-SRL-RD04-MEMORY",
-        "entry_sha256": "98f74c84e9c5b5e41bfdc047e39a12fdabe19e0ebabd8eddc01c28f7088690cf",
+        "entry_sha256": "330925a6e1b14ddf99aec8beb5b814063063a71af05e54c36e9927fa7f1452d6",
         "inputs_summary": {
           "iteration": "0"
         },
@@ -82,16 +82,24 @@
         "outputs_summary": {
           "abduction": {
             "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
-            "best_posterior": "0",
-            "confidence": "0",
-            "is_conclusive": "False",
+            "best_posterior": "19/20",
+            "confidence": "19/20",
+            "is_conclusive": "True",
             "narrative": "Volatility3 memory analysis. 30 LOTL processes + code injection in 33 processes. The most operationally active compromised host in SRL-2018 corpus. 30 simultaneous LOTL processes is the signature of a..."
           },
           "case_id": "VIGIA-REAL-SRL-RD04-MEMORY",
           "pipeline_meta": {
             "artifact_count": "3",
             "avg_score": "0",
+            "ebs_adapter_mode": "motor",
             "expected_verdict": "MALICE",
+            "resolve": {
+              "motor_confidence": "0.95",
+              "motor_reason": "Intent score 0.5292 exceeds MALICE threshold (P2+acq_assurance scale, threshold=0.33)",
+              "motor_score": "0.5292",
+              "motor_verdict": "MALICE",
+              "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+            },
             "source": "ebs_v1_json_adapter"
           },
           "signals": [
@@ -122,13 +130,13 @@
           ]
         },
         "seq": 5,
-        "timestamp": "2026-07-05T15:27:36.480914+00:00",
+        "timestamp": "2026-07-06T01:30:14.563047+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "CONTRADICTION_CHECK",
         "case_id": "VIGIA-REAL-SRL-RD04-MEMORY",
-        "entry_sha256": "a25b589ccfbadd15377548ea153834f689e9cf6dcff96e2853b35e44327c49a4",
+        "entry_sha256": "b71201701dbe673b80f6c28b0fbee66c9b02417022276f9213ba8536e9f17083",
         "inputs_summary": {
           "n_signals": "3"
         },
@@ -139,13 +147,13 @@
           "threshold": "2"
         },
         "seq": 6,
-        "timestamp": "2026-07-05T15:27:36.481012+00:00",
+        "timestamp": "2026-07-06T01:30:14.563175+00:00",
         "tool": "contradiction_detector"
       },
       {
         "action": "AGENT_EXIT",
         "case_id": "VIGIA-REAL-SRL-RD04-MEMORY",
-        "entry_sha256": "25cd13f1ada2a9e5047a11a2334420aa8f647185368babb130ed35af06b7fd8c",
+        "entry_sha256": "f72b8ab396a0d7a562fd56b4ede3bb1338833b5a434616c35de396d83794e1d2",
         "inputs_summary": {
           "verdict": "MALICIOUS_INTENT_DETECTED"
         },
@@ -156,26 +164,26 @@
           "exit_code": "1"
         },
         "seq": 7,
-        "timestamp": "2026-07-05T15:27:36.481190+00:00",
+        "timestamp": "2026-07-06T01:30:14.563408+00:00",
         "tool": "vigia_agent"
       }
     ],
-    "start_time": "2026-07-05T15:27:36.477831+00:00",
+    "start_time": "2026-07-06T01:30:14.208331+00:00",
     "total_entries": 7
   },
   "case_id": "VIGIA-REAL-SRL-RD04-MEMORY",
   "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-REAL-SRL-RD04-MEMORY.json",
   "evidence_sha256": "79bbf4832deebc9b5d92164a7bbdb88448a393a02189db56c3926d7500d8a300",
   "iterations_executed": 1,
-  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-REAL-SRL-RD04-MEMORY ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/VIGIA-REAL-SRL-RD04-MEMORY.json\nEvidence SHA-256: 79bbf4832deebc9b5d92164a7bbdb88448a393a02189db56c3926d7500d8a300\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 0\nConclusive: NO \u2014 requires human review\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 3 se\u00f1al(es): 3 primaria(s) de ['unknown'], 0 derivada(s)/no-analizada(s). Top z: unknown=0.00, unknown=0.00, unknown=0.00.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: MALICIOUS_INTENT_DETECTED. Conclusiva: no \u2014 requiere revisi\u00f3n humana.\n\nRazonamiento del motor abductivo:\nVolatility3 memory analysis. 30 LOTL processes + code injection in 33 processes. The most operationally active compromised host in SRL-2018 corpus. 30 simultaneous LOTL processes is the signature of an active C2 framework with multiple concurrent beacons. Primary attacker pivot post-lateral-movement.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [unknown] z=0.000 conf=0.50 \u2014 \n  [unknown] z=0.000 conf=0.50 \u2014 \n  [unknown] z=0.000 conf=0.50 \u2014 \n\n--- FINAL ALERT LEVEL ---\nMEDIUM \u2014 MALICE verdict from posterior aggregation. Individual z-scores below threshold. Full signal review recommended. Alert floored (B-028/B-065).\nReconciliation: verdict MALICE rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 3 | Derived: 0 | Total: 3",
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-REAL-SRL-RD04-MEMORY ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/VIGIA-REAL-SRL-RD04-MEMORY.json\nEvidence SHA-256: 79bbf4832deebc9b5d92164a7bbdb88448a393a02189db56c3926d7500d8a300\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 19/20\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 3 se\u00f1al(es): 3 primaria(s) de ['unknown'], 0 derivada(s)/no-analizada(s). Top z: unknown=0.00, unknown=0.00, unknown=0.00.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: MALICIOUS_INTENT_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nVolatility3 memory analysis. 30 LOTL processes + code injection in 33 processes. The most operationally active compromised host in SRL-2018 corpus. 30 simultaneous LOTL processes is the signature of an active C2 framework with multiple concurrent beacons. Primary attacker pivot post-lateral-movement.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [unknown] z=0.000 conf=0.50 \u2014 \n  [unknown] z=0.000 conf=0.50 \u2014 \n  [unknown] z=0.000 conf=0.50 \u2014 \n\n--- FINAL ALERT LEVEL ---\nHIGH \u2014 MALICE verdict from Bayesian posterior aggregation. Individual z-scores below threshold (distributed evidence pattern: no single dominant signal, but aggregate posterior is decisive). Alert floored (B-028/B-065).\nReconciliation: verdict MALICE rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 3 | Derived: 0 | Total: 3",
   "pipeline_results": {
     "abduction": {
       "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
-      "best_posterior": "0",
+      "best_posterior": "19/20",
       "confidence": {
         "__fraction__": true,
-        "den": 1,
-        "num": 0
+        "den": 20,
+        "num": 19
       },
       "devil_advocate": {
         "aggregation": {
@@ -187,7 +195,7 @@
           "primary_alternative_hypothesis": null
         },
         "decision_context": {
-          "confidence": "0",
+          "confidence": "19/20",
           "mapped_verdict": "MALICIOUS_INTENT_DETECTED",
           "raw_verdict": "MALICIOUS_INTENT_DETECTED",
           "score": "0"
@@ -201,14 +209,22 @@
         "pattern_evidence_gaps": [],
         "version": "r7-da-v1"
       },
-      "is_conclusive": false,
+      "is_conclusive": true,
       "narrative": "Volatility3 memory analysis. 30 LOTL processes + code injection in 33 processes. The most operationally active compromised host in SRL-2018 corpus. 30 simultaneous LOTL processes is the signature of an active C2 framework with multiple concurrent beacons. Primary attacker pivot post-lateral-movement."
     },
     "case_id": "VIGIA-REAL-SRL-RD04-MEMORY",
     "pipeline_meta": {
       "artifact_count": 3,
       "avg_score": "0",
+      "ebs_adapter_mode": "motor",
       "expected_verdict": "MALICE",
+      "resolve": {
+        "motor_confidence": "0.95",
+        "motor_reason": "Intent score 0.5292 exceeds MALICE threshold (P2+acq_assurance scale, threshold=0.33)",
+        "motor_score": "0.5292",
+        "motor_verdict": "MALICE",
+        "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+      },
       "source": "ebs_v1_json_adapter"
     },
     "signals": [

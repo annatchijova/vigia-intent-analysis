@@ -1,15 +1,15 @@
 {
-  "agent_verdict": "INTENT",
-  "analysis_timestamp": "2026-07-05T15:27:37.357375+00:00",
+  "agent_verdict": "NOISE",
+  "analysis_timestamp": "2026-07-06T01:30:21.679370+00:00",
   "audit_trail": {
     "agent_version": "1.0.0-SANS-2026",
     "case_id": "VIGIA_KIWI_006_WITNESS_SELF_INCRIM",
-    "end_time": "2026-07-05T15:27:37.357379+00:00",
+    "end_time": "2026-07-06T01:30:21.679376+00:00",
     "entries": [
       {
         "action": "AGENT_INITIALIZED",
         "case_id": "VIGIA_KIWI_006_WITNESS_SELF_INCRIM",
-        "entry_sha256": "7db12bf496a0cbeca47f9827bc2ef46e5a1da2dee5a369310653f1689f95759d",
+        "entry_sha256": "5338693ee6ebe6c6b507dcc00ab8b515b0e089df96da21a1866cc5ed424cbea4",
         "inputs_summary": {
           "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
           "case_id": "VIGIA_KIWI_006_WITNESS_SELF_INCRIM"
@@ -21,13 +21,13 @@
           "agent_version": "1.0.0-SANS-2026"
         },
         "seq": 1,
-        "timestamp": "2026-07-05T15:27:37.354189+00:00",
+        "timestamp": "2026-07-06T01:30:21.328886+00:00",
         "tool": "vigia_agent"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA_KIWI_006_WITNESS_SELF_INCRIM",
-        "entry_sha256": "adbca93a2d20588f226cc524fc32b7f4e886320de6089cc934a10813c6856d52",
+        "entry_sha256": "975adbfb0257285e6d0e3fdab8efe5f228025bb475554040a6e9b9244b29397f",
         "inputs_summary": {
           "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA_KIWI_006_WITNESS_SELF_INCRIM.json"
         },
@@ -35,29 +35,29 @@
         "note": "Computing SHA-256 of original evidence",
         "outputs_summary": {},
         "seq": 2,
-        "timestamp": "2026-07-05T15:27:37.354278+00:00",
+        "timestamp": "2026-07-06T01:30:21.328971+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA_KIWI_006_WITNESS_SELF_INCRIM",
-        "entry_sha256": "1f411a8e1148fc39b04546f687198a64adc7576090cef8e24acd3fcb42e65bc3",
+        "entry_sha256": "1898b26728b0dd49990d4c0acde00f6e57073807baf91d3470ef62de9802e418",
         "inputs_summary": {
           "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA_KIWI_006_WITNESS_SELF_INCRIM.json"
         },
         "iteration": 0,
-        "note": "Evidence verified: 1748d2ee9fc4488a...",
+        "note": "Evidence verified: 24d978e870851f36...",
         "outputs_summary": {
-          "sha256": "1748d2ee9fc4488a7336993052e9ad2733fd8231d5350b10b2db24f843ca40ed"
+          "sha256": "24d978e870851f3656bb4bbd3d56b7af3dd3af5e5c558b18e618e371710273c6"
         },
         "seq": 3,
-        "timestamp": "2026-07-05T15:27:37.354372+00:00",
+        "timestamp": "2026-07-06T01:30:21.329106+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "PIPELINE_EXECUTE",
         "case_id": "VIGIA_KIWI_006_WITNESS_SELF_INCRIM",
-        "entry_sha256": "022404286f03bf151b4dade384bbfc6fe63914a804db68b833e0bffa2e1268c2",
+        "entry_sha256": "4da688321da919ad07f2f02010b88f684f258a133632c36cd2987fcee1ad5d97",
         "inputs_summary": {
           "evidence": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA_KIWI_006_WITNESS_SELF_INCRIM.json",
           "iteration": "0",
@@ -67,13 +67,13 @@
         "note": "Executing pipeline \u2014 iteration 0",
         "outputs_summary": {},
         "seq": 4,
-        "timestamp": "2026-07-05T15:27:37.354487+00:00",
+        "timestamp": "2026-07-06T01:30:21.329239+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "PIPELINE_COMPLETE",
         "case_id": "VIGIA_KIWI_006_WITNESS_SELF_INCRIM",
-        "entry_sha256": "a145d748ef4451250039bea15d6b0021e802fbddbb1845d74f561b194cb2a285",
+        "entry_sha256": "ec3f4005c001c78ee1ec3062cb457c1e7f9fea23b02019124059bd65bc020da4",
         "inputs_summary": {
           "iteration": "0"
         },
@@ -81,17 +81,25 @@
         "note": "Pipeline completed \u2014 4 signals",
         "outputs_summary": {
           "abduction": {
-            "best_hypothesis": "SUSPICION_DETECTED",
-            "best_posterior": "13/800",
-            "confidence": "13/800",
-            "is_conclusive": "False",
+            "best_hypothesis": "NO_SEMIOTIC_ANOMALY_DETECTED",
+            "best_posterior": "97/100",
+            "confidence": "97/100",
+            "is_conclusive": "True",
             "narrative": "Three coordinated witnesses construct peligrosidad narrative. Each witness testimony contains self-incriminating conduct. Conflicto de inter\u00e9s documentado en todos."
           },
           "case_id": "VIGIA-KIWI-006-WITNESS-SELF-INCRIM",
           "pipeline_meta": {
             "artifact_count": "4",
             "avg_score": "13/160",
+            "ebs_adapter_mode": "motor",
             "expected_verdict": "SUSPICION",
+            "resolve": {
+              "motor_confidence": "0.97",
+              "motor_reason": "Insufficient evidence of malicious intent (score=0.0294)",
+              "motor_score": "0.0294",
+              "motor_verdict": "NOISE",
+              "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+            },
             "source": "ebs_v1_json_adapter"
           },
           "signals": [
@@ -130,13 +138,13 @@
           ]
         },
         "seq": 5,
-        "timestamp": "2026-07-05T15:27:37.357035+00:00",
+        "timestamp": "2026-07-06T01:30:21.679003+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "CONTRADICTION_CHECK",
         "case_id": "VIGIA_KIWI_006_WITNESS_SELF_INCRIM",
-        "entry_sha256": "650ecd364e2ae86dab6f7a29f09c8268220de7507050d9ed6fe7331eb04a178b",
+        "entry_sha256": "12d49a43e7c15db7ca8ccbc631046e4b77f852c0ccb788593141e9ef25064cae",
         "inputs_summary": {
           "n_signals": "4"
         },
@@ -147,52 +155,60 @@
           "threshold": "2"
         },
         "seq": 6,
-        "timestamp": "2026-07-05T15:27:37.357139+00:00",
+        "timestamp": "2026-07-06T01:30:21.679119+00:00",
         "tool": "contradiction_detector"
       },
       {
         "action": "AGENT_EXIT",
         "case_id": "VIGIA_KIWI_006_WITNESS_SELF_INCRIM",
-        "entry_sha256": "1588fb3db5d9f7f2ef6a00bdc81b604cda69915155efde863dcea55db772d60b",
+        "entry_sha256": "f08b3a7dbf3049ed5f6cc1495263e2e10eadbe71af2a5e5c397f265678c94d27",
         "inputs_summary": {
-          "verdict": "SUSPICION_DETECTED"
+          "verdict": "NO_SEMIOTIC_ANOMALY_DETECTED"
         },
         "iteration": 0,
-        "note": "Exit code 3 (INTENT) \u2014 analysis complete.",
+        "note": "Exit code 0 (NOISE) \u2014 analysis complete.",
         "outputs_summary": {
-          "agent_verdict": "INTENT",
-          "exit_code": "3"
+          "agent_verdict": "NOISE",
+          "exit_code": "0"
         },
         "seq": 7,
-        "timestamp": "2026-07-05T15:27:37.357323+00:00",
+        "timestamp": "2026-07-06T01:30:21.679318+00:00",
         "tool": "vigia_agent"
       }
     ],
-    "start_time": "2026-07-05T15:27:37.353959+00:00",
+    "start_time": "2026-07-06T01:30:21.328664+00:00",
     "total_entries": 7
   },
   "case_id": "VIGIA_KIWI_006_WITNESS_SELF_INCRIM",
   "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA_KIWI_006_WITNESS_SELF_INCRIM.json",
-  "evidence_sha256": "1748d2ee9fc4488a7336993052e9ad2733fd8231d5350b10b2db24f843ca40ed",
+  "evidence_sha256": "24d978e870851f3656bb4bbd3d56b7af3dd3af5e5c558b18e618e371710273c6",
   "iterations_executed": 1,
-  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA_KIWI_006_WITNESS_SELF_INCRIM ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/VIGIA_KIWI_006_WITNESS_SELF_INCRIM.json\nEvidence SHA-256: 1748d2ee9fc4488a7336993052e9ad2733fd8231d5350b10b2db24f843ca40ed\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: SUSPICION_DETECTED\nPosterior confidence: 13/800\nConclusive: NO \u2014 requires human review\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 4 se\u00f1al(es): 4 primaria(s) de ['manual_forensic_review'], 0 derivada(s)/no-analizada(s). Top z: Testigo-A descarg\u00f3 10gb de material de i=0.10, Hermano del denunciante descarg\u00f3 materia=0.08, Tres testigos vinculados entre s\u00ed, ningu=0.08.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: SUSPICION_DETECTED. Conclusiva: no \u2014 requiere revisi\u00f3n humana.\n\nRazonamiento del motor abductivo:\nThree coordinated witnesses construct peligrosidad narrative. Each witness testimony contains self-incriminating conduct. Conflicto de inter\u00e9s documentado en todos.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Testigo-A descarg\u00f3 10gb de material de imputada. No la conoce. Declara] z=0.105 conf=0.15 \u2014 \n  [Hermano del denunciante descarg\u00f3 material de imputada. Imputada lo tie] z=0.080 conf=0.10 \u2014 \n  [Tres testigos vinculados entre s\u00ed, ninguno independiente. Testimonios ] z=0.080 conf=0.10 \u2014 \n  [Madre del denunciante declara que imputada est\u00e1 loca y se mete con her] z=0.060 conf=0.10 \u2014 \n\n--- FINAL ALERT LEVEL ---\nMEDIUM \u2014 INTENT verdict with individual z-scores below threshold. Alert floored (B-028/B-065): an intent finding cannot present as LOW.\nReconciliation: verdict INTENT rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 4 | Derived: 0 | Total: 4",
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA_KIWI_006_WITNESS_SELF_INCRIM ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/VIGIA_KIWI_006_WITNESS_SELF_INCRIM.json\nEvidence SHA-256: 24d978e870851f3656bb4bbd3d56b7af3dd3af5e5c558b18e618e371710273c6\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: NO_SEMIOTIC_ANOMALY_DETECTED\nPosterior confidence: 97/100\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 4 se\u00f1al(es): 4 primaria(s) de ['manual_forensic_review'], 0 derivada(s)/no-analizada(s). Top z: Testigo-A descarg\u00f3 10gb de material de i=0.10, Hermano del denunciante descarg\u00f3 materia=0.08, Tres testigos vinculados entre s\u00ed, ningu=0.08.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: NO_SEMIOTIC_ANOMALY_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nThree coordinated witnesses construct peligrosidad narrative. Each witness testimony contains self-incriminating conduct. Conflicto de inter\u00e9s documentado en todos.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Testigo-A descarg\u00f3 10gb de material de imputada. No la conoce. Declara] z=0.105 conf=0.15 \u2014 \n  [Hermano del denunciante descarg\u00f3 material de imputada. Imputada lo tie] z=0.080 conf=0.10 \u2014 \n  [Tres testigos vinculados entre s\u00ed, ninguno independiente. Testimonios ] z=0.080 conf=0.10 \u2014 \n  [Madre del denunciante declara que imputada est\u00e1 loca y se mete con her] z=0.060 conf=0.10 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 4 | Derived: 0 | Total: 4",
   "pipeline_results": {
     "abduction": {
-      "best_hypothesis": "SUSPICION_DETECTED",
-      "best_posterior": "13/800",
+      "best_hypothesis": "NO_SEMIOTIC_ANOMALY_DETECTED",
+      "best_posterior": "97/100",
       "confidence": {
         "__fraction__": true,
-        "den": 800,
-        "num": 13
+        "den": 100,
+        "num": 97
       },
-      "is_conclusive": false,
+      "is_conclusive": true,
       "narrative": "Three coordinated witnesses construct peligrosidad narrative. Each witness testimony contains self-incriminating conduct. Conflicto de inter\u00e9s documentado en todos."
     },
     "case_id": "VIGIA-KIWI-006-WITNESS-SELF-INCRIM",
     "pipeline_meta": {
       "artifact_count": 4,
       "avg_score": "13/160",
+      "ebs_adapter_mode": "motor",
       "expected_verdict": "SUSPICION",
+      "resolve": {
+        "motor_confidence": "0.97",
+        "motor_reason": "Insufficient evidence of malicious intent (score=0.0294)",
+        "motor_score": "0.0294",
+        "motor_verdict": "NOISE",
+        "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+      },
       "source": "ebs_v1_json_adapter"
     },
     "signals": [

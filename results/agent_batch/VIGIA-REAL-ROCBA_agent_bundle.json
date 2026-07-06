@@ -1,15 +1,15 @@
 {
   "agent_verdict": "MALICE",
-  "analysis_timestamp": "2026-07-05T15:27:39.345444+00:00",
+  "analysis_timestamp": "2026-07-06T01:30:38.401571+00:00",
   "audit_trail": {
     "agent_version": "1.0.0-SANS-2026",
     "case_id": "VIGIA-REAL-ROCBA",
-    "end_time": "2026-07-05T15:27:39.345450+00:00",
+    "end_time": "2026-07-06T01:30:38.401579+00:00",
     "entries": [
       {
         "action": "AGENT_INITIALIZED",
         "case_id": "VIGIA-REAL-ROCBA",
-        "entry_sha256": "b1343a72c8576cba3a535657e9b9643d7a6ca193629ad48f5cdb53baf95f823e",
+        "entry_sha256": "abd9859acac381554b89878fe60e512debf73f9f3eb1c9485ba4043d32ab70ea",
         "inputs_summary": {
           "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
           "case_id": "VIGIA-REAL-ROCBA"
@@ -21,13 +21,13 @@
           "agent_version": "1.0.0-SANS-2026"
         },
         "seq": 1,
-        "timestamp": "2026-07-05T15:27:39.341752+00:00",
+        "timestamp": "2026-07-06T01:30:38.044095+00:00",
         "tool": "vigia_agent"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-REAL-ROCBA",
-        "entry_sha256": "e6f3a61d91dd651d07c71fa6a760866f7ed75055cec90858eff05856f02fca78",
+        "entry_sha256": "d32883961426171943d3eef6eb57f2a1bb75dfc95842e71fcdfe7682a2f58e2d",
         "inputs_summary": {
           "path": "/home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-REAL-ROCBA.json"
         },
@@ -35,13 +35,13 @@
         "note": "Computing SHA-256 of original evidence",
         "outputs_summary": {},
         "seq": 2,
-        "timestamp": "2026-07-05T15:27:39.341838+00:00",
+        "timestamp": "2026-07-06T01:30:38.044177+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-REAL-ROCBA",
-        "entry_sha256": "85b01c65ec46558fa97d404fe49baef8cc96caa84b2d8b1c519b68f1832c98e1",
+        "entry_sha256": "95946db515646c5a182eb39d05dad4ed6c946c3ba7731ef31ea0545ea367478f",
         "inputs_summary": {
           "path": "/home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-REAL-ROCBA.json"
         },
@@ -51,13 +51,13 @@
           "sha256": "214a4de606bb55e87b9158dce30cd5568470ef058780091c885b48223cbc2d75"
         },
         "seq": 3,
-        "timestamp": "2026-07-05T15:27:39.341938+00:00",
+        "timestamp": "2026-07-06T01:30:38.044272+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "PIPELINE_EXECUTE",
         "case_id": "VIGIA-REAL-ROCBA",
-        "entry_sha256": "e9f39b7387844992ec0604a5683c03f3ec8f8924a4804e0364e5f3f63c09760b",
+        "entry_sha256": "ae88e11b661901fe2f1618f4f9634c4c6f8e4d437d87d615c8215c85fad853fd",
         "inputs_summary": {
           "evidence": "/home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-REAL-ROCBA.json",
           "iteration": "0",
@@ -67,13 +67,13 @@
         "note": "Executing pipeline \u2014 iteration 0",
         "outputs_summary": {},
         "seq": 4,
-        "timestamp": "2026-07-05T15:27:39.342042+00:00",
+        "timestamp": "2026-07-06T01:30:38.044372+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "PIPELINE_COMPLETE",
         "case_id": "VIGIA-REAL-ROCBA",
-        "entry_sha256": "ee4184221714ccf756feb410e985371a0d6174582ff261fbdd6f38e04a8cda15",
+        "entry_sha256": "c07313ab41790f7051e1c60a7e3a9c55a598a999dad19247c267a8bc13a7f402",
         "inputs_summary": {
           "iteration": "0"
         },
@@ -82,8 +82,8 @@
         "outputs_summary": {
           "abduction": {
             "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
-            "best_posterior": "22621/200000",
-            "confidence": "22621/200000",
+            "best_posterior": "71/100",
+            "confidence": "71/100",
             "is_conclusive": "True",
             "narrative": "User 'fredr', Windows 10 x64 build 19041 (20H2), hostname unknown. IP 192.168.1.5. Memory dump 2020-11-16 02:32:38 UTC (18 GB raw). MRC.exe (VB6, 32-bit, no-ASLR) launched from D:\\Tools\\ 83 seconds be..."
           },
@@ -91,7 +91,15 @@
           "pipeline_meta": {
             "artifact_count": "4",
             "avg_score": "22621/40000",
+            "ebs_adapter_mode": "motor",
             "expected_verdict": "MALICE",
+            "resolve": {
+              "motor_confidence": "0.71",
+              "motor_reason": "Intent score 0.3528 exceeds MALICE threshold (P2+acq_assurance scale, threshold=0.33)",
+              "motor_score": "0.3528",
+              "motor_verdict": "MALICE",
+              "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+            },
             "source": "ebs_v1_json_adapter"
           },
           "signals": [
@@ -130,13 +138,13 @@
           ]
         },
         "seq": 5,
-        "timestamp": "2026-07-05T15:27:39.344676+00:00",
+        "timestamp": "2026-07-06T01:30:38.400924+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "CONTRADICTION_CHECK",
         "case_id": "VIGIA-REAL-ROCBA",
-        "entry_sha256": "cd31288e288a4f9c6a572855676d790e6a77b433b65196e410d44a21a7435634",
+        "entry_sha256": "ac809b8d9d8bba9921e72255a687b21b7f8d3387fd1715c672bcb4b705b2d0ce",
         "inputs_summary": {
           "n_signals": "4"
         },
@@ -147,13 +155,13 @@
           "threshold": "2"
         },
         "seq": 6,
-        "timestamp": "2026-07-05T15:27:39.344791+00:00",
+        "timestamp": "2026-07-06T01:30:38.401078+00:00",
         "tool": "contradiction_detector"
       },
       {
         "action": "AGENT_EXIT",
         "case_id": "VIGIA-REAL-ROCBA",
-        "entry_sha256": "869dafeae0635887c754303e202cd1e2feb16d3563447e73540e48c2e35d14a5",
+        "entry_sha256": "7e662b199a3bcce5f66da90a96c2a7381e95ed6e78c5f2062d2877e99c31fbe6",
         "inputs_summary": {
           "verdict": "MALICIOUS_INTENT_DETECTED"
         },
@@ -164,26 +172,26 @@
           "exit_code": "1"
         },
         "seq": 7,
-        "timestamp": "2026-07-05T15:27:39.344980+00:00",
+        "timestamp": "2026-07-06T01:30:38.401328+00:00",
         "tool": "vigia_agent"
       }
     ],
-    "start_time": "2026-07-05T15:27:39.341520+00:00",
+    "start_time": "2026-07-06T01:30:38.043864+00:00",
     "total_entries": 7
   },
   "case_id": "VIGIA-REAL-ROCBA",
   "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-REAL-ROCBA.json",
   "evidence_sha256": "214a4de606bb55e87b9158dce30cd5568470ef058780091c885b48223cbc2d75",
   "iterations_executed": 1,
-  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-REAL-ROCBA ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-REAL-ROCBA.json\nEvidence SHA-256: 214a4de606bb55e87b9158dce30cd5568470ef058780091c885b48223cbc2d75\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 22621/200000\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 4 se\u00f1al(es): 4 primaria(s) de ['Volatility3/dlllist+pstree', 'Volatility3/malfind', 'Volatility3/netscan'], 0 derivada(s)/no-analizada(s). Top z: SearchApp.exe (PID 8312) has 4 PAGE_EXEC=0.68, MRC.exe (PID 29440) launched from D:\\Too=0.64, SearchFilterHost.exe (PID 24920) has TCP=0.58.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: MALICIOUS_INTENT_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nUser 'fredr', Windows 10 x64 build 19041 (20H2), hostname unknown. IP 192.168.1.5. Memory dump 2020-11-16 02:32:38 UTC (18 GB raw). MRC.exe (VB6, 32-bit, no-ASLR) launched from D:\\Tools\\ 83 seconds before dump. DLL LoadTime timestamps all zeroed (epochs 1600-1718) \u2014 temporal impossibility. SearchApp.exe (PID 8312) has 4 PAGE_EXECUTE_READWRITE regions \u2014 possible injected shellcode. SearchFilterHost (PID 24920) has ESTABLISHED TCP connection to 52.113.194.132:443 (Microsoft Azure) \u2014 unusual for in\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [SearchApp.exe (PID 8312) has 4 PAGE_EXECUTE_READWRITE memory regions n] z=0.680 conf=0.80 \u2014 \n  [MRC.exe (PID 29440) launched from D:\\Tools\\MRC.exe at 2020-11-16 02:31] z=0.640 conf=0.78 \u2014 \n  [SearchFilterHost.exe (PID 24920) has TCP ESTABLISHED connection to 52.] z=0.585 conf=0.75 \u2014 \n  [Five cloud sync processes active with established/recent connections: ] z=0.357 conf=0.65 \u2014 \n\n--- FINAL ALERT LEVEL ---\nMEDIUM \u2014 MALICE verdict from posterior aggregation. Individual z-scores below threshold. Full signal review recommended. Alert floored (B-028/B-065).\nReconciliation: verdict MALICE rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 4 | Derived: 0 | Total: 4",
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-REAL-ROCBA ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-REAL-ROCBA.json\nEvidence SHA-256: 214a4de606bb55e87b9158dce30cd5568470ef058780091c885b48223cbc2d75\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 71/100\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 4 se\u00f1al(es): 4 primaria(s) de ['Volatility3/dlllist+pstree', 'Volatility3/malfind', 'Volatility3/netscan'], 0 derivada(s)/no-analizada(s). Top z: SearchApp.exe (PID 8312) has 4 PAGE_EXEC=0.68, MRC.exe (PID 29440) launched from D:\\Too=0.64, SearchFilterHost.exe (PID 24920) has TCP=0.58.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: MALICIOUS_INTENT_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nUser 'fredr', Windows 10 x64 build 19041 (20H2), hostname unknown. IP 192.168.1.5. Memory dump 2020-11-16 02:32:38 UTC (18 GB raw). MRC.exe (VB6, 32-bit, no-ASLR) launched from D:\\Tools\\ 83 seconds before dump. DLL LoadTime timestamps all zeroed (epochs 1600-1718) \u2014 temporal impossibility. SearchApp.exe (PID 8312) has 4 PAGE_EXECUTE_READWRITE regions \u2014 possible injected shellcode. SearchFilterHost (PID 24920) has ESTABLISHED TCP connection to 52.113.194.132:443 (Microsoft Azure) \u2014 unusual for in\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [SearchApp.exe (PID 8312) has 4 PAGE_EXECUTE_READWRITE memory regions n] z=0.680 conf=0.80 \u2014 \n  [MRC.exe (PID 29440) launched from D:\\Tools\\MRC.exe at 2020-11-16 02:31] z=0.640 conf=0.78 \u2014 \n  [SearchFilterHost.exe (PID 24920) has TCP ESTABLISHED connection to 52.] z=0.585 conf=0.75 \u2014 \n  [Five cloud sync processes active with established/recent connections: ] z=0.357 conf=0.65 \u2014 \n\n--- FINAL ALERT LEVEL ---\nHIGH \u2014 MALICE verdict from Bayesian posterior aggregation. Individual z-scores below threshold (distributed evidence pattern: no single dominant signal, but aggregate posterior is decisive). Alert floored (B-028/B-065).\nReconciliation: verdict MALICE rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 4 | Derived: 0 | Total: 4",
   "pipeline_results": {
     "abduction": {
       "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
-      "best_posterior": "22621/200000",
+      "best_posterior": "71/100",
       "confidence": {
         "__fraction__": true,
-        "den": 200000,
-        "num": 22621
+        "den": 100,
+        "num": 71
       },
       "devil_advocate": {
         "aggregation": {
@@ -195,7 +203,7 @@
           "primary_alternative_hypothesis": null
         },
         "decision_context": {
-          "confidence": "22621/200000",
+          "confidence": "71/100",
           "mapped_verdict": "MALICIOUS_INTENT_DETECTED",
           "raw_verdict": "MALICIOUS_INTENT_DETECTED",
           "score": "22621/40000"
@@ -216,7 +224,15 @@
     "pipeline_meta": {
       "artifact_count": 4,
       "avg_score": "22621/40000",
+      "ebs_adapter_mode": "motor",
       "expected_verdict": "MALICE",
+      "resolve": {
+        "motor_confidence": "0.71",
+        "motor_reason": "Intent score 0.3528 exceeds MALICE threshold (P2+acq_assurance scale, threshold=0.33)",
+        "motor_score": "0.3528",
+        "motor_verdict": "MALICE",
+        "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+      },
       "source": "ebs_v1_json_adapter"
     },
     "signals": [

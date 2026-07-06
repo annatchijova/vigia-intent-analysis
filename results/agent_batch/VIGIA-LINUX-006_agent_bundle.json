@@ -1,15 +1,15 @@
 {
-  "agent_verdict": "MALICE",
-  "analysis_timestamp": "2026-07-05T15:27:34.540549+00:00",
+  "agent_verdict": "INTENT",
+  "analysis_timestamp": "2026-07-06T01:29:57.784114+00:00",
   "audit_trail": {
     "agent_version": "1.0.0-SANS-2026",
     "case_id": "VIGIA-LINUX-006",
-    "end_time": "2026-07-05T15:27:34.540555+00:00",
+    "end_time": "2026-07-06T01:29:57.784119+00:00",
     "entries": [
       {
         "action": "AGENT_INITIALIZED",
         "case_id": "VIGIA-LINUX-006",
-        "entry_sha256": "3b160467ed56e9e57d7f693518033c5ad8c6d6d5849506aba2c55a231a717481",
+        "entry_sha256": "a2247c8048cd5fbba8353aa7fe13522fcd7919eba12c946761c3b081a9053602",
         "inputs_summary": {
           "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
           "case_id": "VIGIA-LINUX-006"
@@ -21,13 +21,13 @@
           "agent_version": "1.0.0-SANS-2026"
         },
         "seq": 1,
-        "timestamp": "2026-07-05T15:27:34.536976+00:00",
+        "timestamp": "2026-07-06T01:29:57.446238+00:00",
         "tool": "vigia_agent"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-LINUX-006",
-        "entry_sha256": "95710843b1b817ea781e621b59b0f644b8985788d8659df5725eb922f528baaa",
+        "entry_sha256": "b021ddf6a51ecb5d9a29cae319ef2f83c7aa1247c568c01dbccdd9ba7136aba0",
         "inputs_summary": {
           "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-LINUX-006.json"
         },
@@ -35,29 +35,29 @@
         "note": "Computing SHA-256 of original evidence",
         "outputs_summary": {},
         "seq": 2,
-        "timestamp": "2026-07-05T15:27:34.537057+00:00",
+        "timestamp": "2026-07-06T01:29:57.446319+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-LINUX-006",
-        "entry_sha256": "005e40973072aa4d1c39b1bb36e159271ad7bb227a07c024dd7ec9719c4b870e",
+        "entry_sha256": "c2614c06ed214ceabb03492e0c656a58c78161eef466ad4f9693d5889a1bdbb3",
         "inputs_summary": {
           "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-LINUX-006.json"
         },
         "iteration": 0,
-        "note": "Evidence verified: 290b477daa467ca7...",
+        "note": "Evidence verified: 8838c49f2b38e5fa...",
         "outputs_summary": {
-          "sha256": "290b477daa467ca775086148c1a50c2ae33c8ba1d2aaba4e49354a8b653f0ba1"
+          "sha256": "8838c49f2b38e5fa3fbb98f98bd77b7f683aa6f77176e6d585e676fb94227871"
         },
         "seq": 3,
-        "timestamp": "2026-07-05T15:27:34.537163+00:00",
+        "timestamp": "2026-07-06T01:29:57.446421+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "PIPELINE_EXECUTE",
         "case_id": "VIGIA-LINUX-006",
-        "entry_sha256": "91d07fd9c6b6987806fba6d3c278f165e819efc14f6df2fec8e4571861de8441",
+        "entry_sha256": "a6882e46464052cb0bfe2673aaaec39d641cf5420e3ce86ae58c58528fe5d2c6",
         "inputs_summary": {
           "evidence": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-LINUX-006.json",
           "iteration": "0",
@@ -67,13 +67,13 @@
         "note": "Executing pipeline \u2014 iteration 0",
         "outputs_summary": {},
         "seq": 4,
-        "timestamp": "2026-07-05T15:27:34.537267+00:00",
+        "timestamp": "2026-07-06T01:29:57.446539+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "PIPELINE_COMPLETE",
         "case_id": "VIGIA-LINUX-006",
-        "entry_sha256": "d1b1dc4f9c5bcec45f5c3b656f4a9e04dd06e765ec521e8de5f90d8ac1ea17e2",
+        "entry_sha256": "61696b26372082f0ece104c5157afc58077dab5cf80bc68054c88516e6fd4399",
         "inputs_summary": {
           "iteration": "0"
         },
@@ -81,9 +81,9 @@
         "note": "Pipeline completed \u2014 4 signals",
         "outputs_summary": {
           "abduction": {
-            "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
-            "best_posterior": "25133/200000",
-            "confidence": "25133/200000",
+            "best_hypothesis": "SUSPICION_DETECTED",
+            "best_posterior": "3/5",
+            "confidence": "3/5",
             "is_conclusive": "True",
             "narrative": "On a Linux endpoint compromised via CVE-2025-55182 (React2Shell, CVSS 10.0), Actor A deployed a Monero cryptominer as /var/tmp/systemd-logind, impersonating the legitimate systemd-logind daemon. The m..."
           },
@@ -91,7 +91,15 @@
           "pipeline_meta": {
             "artifact_count": "4",
             "avg_score": "25133/40000",
+            "ebs_adapter_mode": "motor",
             "expected_verdict": "MALICE",
+            "resolve": {
+              "motor_confidence": "0.6",
+              "motor_reason": "Significant signal with structural support (score=0.3012)",
+              "motor_score": "0.3012",
+              "motor_verdict": "SUSPICION",
+              "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+            },
             "source": "ebs_v1_json_adapter"
           },
           "signals": [
@@ -130,13 +138,13 @@
           ]
         },
         "seq": 5,
-        "timestamp": "2026-07-05T15:27:34.539794+00:00",
+        "timestamp": "2026-07-06T01:29:57.783737+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "CONTRADICTION_CHECK",
         "case_id": "VIGIA-LINUX-006",
-        "entry_sha256": "c347a5c508d6547df897fdfdfe68170e80a712c5ad88d18ee333fa8277d30455",
+        "entry_sha256": "97aa28b0d57a0e9574632a40781e00cd0b35a703a37fb93d4c17ee5624a959fa",
         "inputs_summary": {
           "n_signals": "4"
         },
@@ -147,67 +155,43 @@
           "threshold": "2"
         },
         "seq": 6,
-        "timestamp": "2026-07-05T15:27:34.539906+00:00",
+        "timestamp": "2026-07-06T01:29:57.783862+00:00",
         "tool": "contradiction_detector"
       },
       {
         "action": "AGENT_EXIT",
         "case_id": "VIGIA-LINUX-006",
-        "entry_sha256": "7682a39ecdd58c828c73aec3eca39c235ffce8d594ba39c90d8870c60e030b01",
+        "entry_sha256": "48cd9d65b7be5406942e1b3ef596697e3ffeefc98ef39fc28c36b22c03a50078",
         "inputs_summary": {
-          "verdict": "MALICIOUS_INTENT_DETECTED"
+          "verdict": "SUSPICION_DETECTED"
         },
         "iteration": 0,
-        "note": "Exit code 1 (MALICE) \u2014 analysis complete.",
+        "note": "Exit code 3 (INTENT) \u2014 analysis complete.",
         "outputs_summary": {
-          "agent_verdict": "MALICE",
-          "exit_code": "1"
+          "agent_verdict": "INTENT",
+          "exit_code": "3"
         },
         "seq": 7,
-        "timestamp": "2026-07-05T15:27:34.540090+00:00",
+        "timestamp": "2026-07-06T01:29:57.784062+00:00",
         "tool": "vigia_agent"
       }
     ],
-    "start_time": "2026-07-05T15:27:34.536758+00:00",
+    "start_time": "2026-07-06T01:29:57.446020+00:00",
     "total_entries": 7
   },
   "case_id": "VIGIA-LINUX-006",
   "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-LINUX-006.json",
-  "evidence_sha256": "290b477daa467ca775086148c1a50c2ae33c8ba1d2aaba4e49354a8b653f0ba1",
+  "evidence_sha256": "8838c49f2b38e5fa3fbb98f98bd77b7f683aa6f77176e6d585e676fb94227871",
   "iterations_executed": 1,
-  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-LINUX-006 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/VIGIA-LINUX-006.json\nEvidence SHA-256: 290b477daa467ca775086148c1a50c2ae33c8ba1d2aaba4e49354a8b653f0ba1\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 25133/200000\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 4 se\u00f1al(es): 4 primaria(s) de ['sift_linux_forensics', 'sift_network_forensics', 'sift_process_monitor'], 0 derivada(s)/no-analizada(s). Top z: Process /var/tmp/systemd-logind running =0.80, Network connection from /var/tmp/systemd=0.76, Root crontab contains entry: '*/5 * * * =0.66.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: MALICIOUS_INTENT_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nOn a Linux endpoint compromised via CVE-2025-55182 (React2Shell, CVSS 10.0), Actor A deployed a Monero cryptominer as /var/tmp/systemd-logind, impersonating the legitimate systemd-logind daemon. The miner connected to a private pool at 62.60.246[.]210:443 and ran persistently since boot. The endpoint user noticed loud fan noise and used OpenAI Codex to attempt remediation; Codex silenced the fans but failed to remove the miner. This case isolates Actor A's signals from the concurrent Actor B/C a\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Process /var/tmp/systemd-logind running as root with sustained 100% CP] z=0.801 conf=0.90 \u2014 \n  [Network connection from /var/tmp/systemd-logind to 62.60.246[.]210:443] z=0.757 conf=0.88 \u2014 \n  [Root crontab contains entry: '*/5 * * * * /var/tmp/systemd-logind --co] z=0.663 conf=0.85 \u2014 \n  [Bash history and process telemetry show OpenAI Codex-generated command] z=0.292 conf=0.65 \u2014 \n\n--- FINAL ALERT LEVEL ---\nHIGH \u2014 MALICE verdict from Bayesian posterior aggregation. Individual z-scores below threshold (distributed evidence pattern: no single dominant signal, but aggregate posterior is decisive). Alert floored (B-028/B-065).\nReconciliation: verdict MALICE rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 4 | Derived: 0 | Total: 4",
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-LINUX-006 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/VIGIA-LINUX-006.json\nEvidence SHA-256: 8838c49f2b38e5fa3fbb98f98bd77b7f683aa6f77176e6d585e676fb94227871\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: SUSPICION_DETECTED\nPosterior confidence: 3/5\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 4 se\u00f1al(es): 4 primaria(s) de ['sift_linux_forensics', 'sift_network_forensics', 'sift_process_monitor'], 0 derivada(s)/no-analizada(s). Top z: Process /var/tmp/systemd-logind running =0.80, Network connection from /var/tmp/systemd=0.76, Root crontab contains entry: '*/5 * * * =0.66.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: SUSPICION_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nOn a Linux endpoint compromised via CVE-2025-55182 (React2Shell, CVSS 10.0), Actor A deployed a Monero cryptominer as /var/tmp/systemd-logind, impersonating the legitimate systemd-logind daemon. The miner connected to a private pool at 62.60.246[.]210:443 and ran persistently since boot. The endpoint user noticed loud fan noise and used OpenAI Codex to attempt remediation; Codex silenced the fans but failed to remove the miner. This case isolates Actor A's signals from the concurrent Actor B/C a\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Process /var/tmp/systemd-logind running as root with sustained 100% CP] z=0.801 conf=0.90 \u2014 \n  [Network connection from /var/tmp/systemd-logind to 62.60.246[.]210:443] z=0.757 conf=0.88 \u2014 \n  [Root crontab contains entry: '*/5 * * * * /var/tmp/systemd-logind --co] z=0.663 conf=0.85 \u2014 \n  [Bash history and process telemetry show OpenAI Codex-generated command] z=0.292 conf=0.65 \u2014 \n\n--- FINAL ALERT LEVEL ---\nMEDIUM \u2014 INTENT verdict with individual z-scores below threshold. Alert floored (B-028/B-065): an intent finding cannot present as LOW.\nReconciliation: verdict INTENT rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 4 | Derived: 0 | Total: 4",
   "pipeline_results": {
     "abduction": {
-      "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
-      "best_posterior": "25133/200000",
+      "best_hypothesis": "SUSPICION_DETECTED",
+      "best_posterior": "3/5",
       "confidence": {
         "__fraction__": true,
-        "den": 200000,
-        "num": 25133
-      },
-      "devil_advocate": {
-        "aggregation": {
-          "k": 3,
-          "method": "top_k_already_validated_matches_v2",
-          "total_gap_mass": "0"
-        },
-        "counterfactual_summary": {
-          "primary_alternative_hypothesis": null
-        },
-        "decision_context": {
-          "confidence": "25133/200000",
-          "mapped_verdict": "MALICIOUS_INTENT_DETECTED",
-          "raw_verdict": "MALICIOUS_INTENT_DETECTED",
-          "score": "25133/40000"
-        },
-        "devil_advocate_source": "deterministic_no_pattern_data_available",
-        "meta": {
-          "deterministic": true,
-          "generated_from": "case_pattern_library"
-        },
-        "narrative": "Eco's Razor (Abductive Falsification) applied to verdict MALICIOUS_INTENT_DETECTED. Pattern-matching data was not available on this code path \u2014 CasePatternLibrary is not invoked here by design (agent audit-trail mode (vigia_agent.py \u2014 JSON-replay / autonomous path); see KNOWN_LIMITATIONS.md). No structured counter-hypothesis could be derived deterministically. This is a documented scope limitation of the current code path, not an absence of falsification attempt.",
-        "pattern_evidence_gaps": [],
-        "version": "r7-da-v1"
+        "den": 5,
+        "num": 3
       },
       "is_conclusive": true,
       "narrative": "On a Linux endpoint compromised via CVE-2025-55182 (React2Shell, CVSS 10.0), Actor A deployed a Monero cryptominer as /var/tmp/systemd-logind, impersonating the legitimate systemd-logind daemon. The miner connected to a private pool at 62.60.246[.]210:443 and ran persistently since boot. The endpoint user noticed loud fan noise and used OpenAI Codex to attempt remediation; Codex silenced the fans but failed to remove the miner. This case isolates Actor A's signals from the concurrent Actor B/C a"
@@ -216,7 +200,15 @@
     "pipeline_meta": {
       "artifact_count": 4,
       "avg_score": "25133/40000",
+      "ebs_adapter_mode": "motor",
       "expected_verdict": "MALICE",
+      "resolve": {
+        "motor_confidence": "0.6",
+        "motor_reason": "Significant signal with structural support (score=0.3012)",
+        "motor_score": "0.3012",
+        "motor_verdict": "SUSPICION",
+        "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+      },
       "source": "ebs_v1_json_adapter"
     },
     "signals": [

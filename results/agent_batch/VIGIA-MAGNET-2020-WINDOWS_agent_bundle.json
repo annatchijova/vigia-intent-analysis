@@ -1,15 +1,15 @@
 {
-  "agent_verdict": "INTENT",
-  "analysis_timestamp": "2026-07-05T15:27:39.080979+00:00",
+  "agent_verdict": "MALICE",
+  "analysis_timestamp": "2026-07-06T01:30:36.128178+00:00",
   "audit_trail": {
     "agent_version": "1.0.0-SANS-2026",
     "case_id": "VIGIA-MAGNET-2020-WINDOWS",
-    "end_time": "2026-07-05T15:27:39.080984+00:00",
+    "end_time": "2026-07-06T01:30:36.128185+00:00",
     "entries": [
       {
         "action": "AGENT_INITIALIZED",
         "case_id": "VIGIA-MAGNET-2020-WINDOWS",
-        "entry_sha256": "2a29268be52976b0de7fb474d8df0fe5737bd9419b8192d36ce1230dd9807075",
+        "entry_sha256": "525e0a5fc35ed1246f184f77bd899f3d11bb94323cd5f9d131eceedcbd1edc74",
         "inputs_summary": {
           "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
           "case_id": "VIGIA-MAGNET-2020-WINDOWS"
@@ -21,13 +21,13 @@
           "agent_version": "1.0.0-SANS-2026"
         },
         "seq": 1,
-        "timestamp": "2026-07-05T15:27:39.077637+00:00",
+        "timestamp": "2026-07-06T01:30:35.789444+00:00",
         "tool": "vigia_agent"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-MAGNET-2020-WINDOWS",
-        "entry_sha256": "05e840cef8330bfd8b7d9911622d071f48b8346cf3f4bcd4e676c37e132e4e33",
+        "entry_sha256": "47a421a69dd65fe0cd51fe451091ae0c34d8537f953037d036b49ac951980575",
         "inputs_summary": {
           "path": "/home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-MAGNET-2020-WINDOWS.json"
         },
@@ -35,29 +35,29 @@
         "note": "Computing SHA-256 of original evidence",
         "outputs_summary": {},
         "seq": 2,
-        "timestamp": "2026-07-05T15:27:39.077723+00:00",
+        "timestamp": "2026-07-06T01:30:35.789530+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-MAGNET-2020-WINDOWS",
-        "entry_sha256": "17fb947b83dd9828446e2c3ae6d22cc1c0a9c915fe5452e6ec71f833c02106b0",
+        "entry_sha256": "64dba8d108a473c16edbd61bb00afce4ff4392b3d73af5cc16e713ad65beb8c2",
         "inputs_summary": {
           "path": "/home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-MAGNET-2020-WINDOWS.json"
         },
         "iteration": 0,
-        "note": "Evidence verified: 22c8c489cccdb4ff...",
+        "note": "Evidence verified: b61e8e8f6b5e432d...",
         "outputs_summary": {
-          "sha256": "22c8c489cccdb4ff82138580560448bdc45900f20e9ccb3f971ed346e7de17fd"
+          "sha256": "b61e8e8f6b5e432d553337dc3924e76acf57da286f7d4c6c4f5bc2b185beccca"
         },
         "seq": 3,
-        "timestamp": "2026-07-05T15:27:39.077827+00:00",
+        "timestamp": "2026-07-06T01:30:35.789639+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "PIPELINE_EXECUTE",
         "case_id": "VIGIA-MAGNET-2020-WINDOWS",
-        "entry_sha256": "f96e8bce1b8367a5bf81742af97314d873321c7def27f92c816b3e428a126958",
+        "entry_sha256": "331a78c7efbaf33b1daa271afa6392798a4fb51d6c440aa27b6853b04f8a6553",
         "inputs_summary": {
           "evidence": "/home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-MAGNET-2020-WINDOWS.json",
           "iteration": "0",
@@ -67,13 +67,13 @@
         "note": "Executing pipeline \u2014 iteration 0",
         "outputs_summary": {},
         "seq": 4,
-        "timestamp": "2026-07-05T15:27:39.077930+00:00",
+        "timestamp": "2026-07-06T01:30:35.789743+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "PIPELINE_COMPLETE",
         "case_id": "VIGIA-MAGNET-2020-WINDOWS",
-        "entry_sha256": "332ce59ff80ca52bfe7aeec227194e083ccfdd88a1e95eb9ca46cd190425abf8",
+        "entry_sha256": "5d2f77dda7858b2b2fa9a971906465f4af04b01e240caa1210886869ff042063",
         "inputs_summary": {
           "iteration": "0"
         },
@@ -81,9 +81,9 @@
         "note": "Pipeline completed \u2014 8 signals",
         "outputs_summary": {
           "abduction": {
-            "best_hypothesis": "INTENT_DETECTED",
-            "best_posterior": "779/8000",
-            "confidence": "779/8000",
+            "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+            "best_posterior": "19/20",
+            "confidence": "19/20",
             "is_conclusive": "True",
             "narrative": "Windows 7 x64 VMware VM (ComputerName: WIN-9H6J4FBP8F7, Volume: TestOS, IP: 192.168.10.146) belonging to user Warren. Registry analysis reveals a coordinated piracy toolkit installation: KMSAuto sched..."
           },
@@ -91,7 +91,15 @@
           "pipeline_meta": {
             "artifact_count": "8",
             "avg_score": "779/1600",
+            "ebs_adapter_mode": "motor",
             "expected_verdict": "INTENT",
+            "resolve": {
+              "motor_confidence": "0.95",
+              "motor_reason": "Intent score 0.8406 exceeds MALICE threshold (P2+acq_assurance scale, threshold=0.33)",
+              "motor_score": "0.8406",
+              "motor_verdict": "MALICE",
+              "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+            },
             "source": "ebs_v1_json_adapter"
           },
           "signals": [
@@ -138,13 +146,13 @@
           ]
         },
         "seq": 5,
-        "timestamp": "2026-07-05T15:27:39.080575+00:00",
+        "timestamp": "2026-07-06T01:30:36.127628+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "CONTRADICTION_CHECK",
         "case_id": "VIGIA-MAGNET-2020-WINDOWS",
-        "entry_sha256": "d33f668a08f3d3e510c627e8ee5908111ad46ffdfe5410a0229dcfad2a550353",
+        "entry_sha256": "8efcaeeabfc13cfe22d6ae89b471d47958e2ccbcbca989ae92b735395969e197",
         "inputs_summary": {
           "n_signals": "8"
         },
@@ -155,43 +163,67 @@
           "threshold": "2"
         },
         "seq": 6,
-        "timestamp": "2026-07-05T15:27:39.080709+00:00",
+        "timestamp": "2026-07-06T01:30:36.127772+00:00",
         "tool": "contradiction_detector"
       },
       {
         "action": "AGENT_EXIT",
         "case_id": "VIGIA-MAGNET-2020-WINDOWS",
-        "entry_sha256": "b4078f02a21c60636b5d378e366e2c265667cbd75d00eee808696a9b922c40dc",
+        "entry_sha256": "b19d8f32219c3a212afce8c8c5d0ce8db2d84a7d7d577627b1058fc711d43727",
         "inputs_summary": {
-          "verdict": "INTENT_DETECTED"
+          "verdict": "MALICIOUS_INTENT_DETECTED"
         },
         "iteration": 0,
-        "note": "Exit code 3 (INTENT) \u2014 analysis complete.",
+        "note": "Exit code 1 (MALICE) \u2014 analysis complete.",
         "outputs_summary": {
-          "agent_verdict": "INTENT",
-          "exit_code": "3"
+          "agent_verdict": "MALICE",
+          "exit_code": "1"
         },
         "seq": 7,
-        "timestamp": "2026-07-05T15:27:39.080928+00:00",
+        "timestamp": "2026-07-06T01:30:36.128001+00:00",
         "tool": "vigia_agent"
       }
     ],
-    "start_time": "2026-07-05T15:27:39.077394+00:00",
+    "start_time": "2026-07-06T01:30:35.789210+00:00",
     "total_entries": 7
   },
   "case_id": "VIGIA-MAGNET-2020-WINDOWS",
   "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-MAGNET-2020-WINDOWS.json",
-  "evidence_sha256": "22c8c489cccdb4ff82138580560448bdc45900f20e9ccb3f971ed346e7de17fd",
+  "evidence_sha256": "b61e8e8f6b5e432d553337dc3924e76acf57da286f7d4c6c4f5bc2b185beccca",
   "iterations_executed": 1,
-  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-MAGNET-2020-WINDOWS ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-MAGNET-2020-WINDOWS.json\nEvidence SHA-256: 22c8c489cccdb4ff82138580560448bdc45900f20e9ccb3f971ed346e7de17fd\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: INTENT_DETECTED\nPosterior confidence: 779/8000\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 8 se\u00f1al(es): 8 primaria(s) de ['audit_network', 'detect_habit_incongruence', 'list_processes', 'read_evidence'], 0 derivada(s)/no-analizada(s). Top z: KMSAuto scheduled task registered at \\KM=0.77, RDP enabled (fDenyTSConnections=0) with =0.68, trashreg.exe registered in AppPaths from=0.68.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: INTENT_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nWindows 7 x64 VMware VM (ComputerName: WIN-9H6J4FBP8F7, Volume: TestOS, IP: 192.168.10.146) belonging to user Warren. Registry analysis reveals a coordinated piracy toolkit installation: KMSAuto scheduled task for persistent Windows/Office activation bypass, trashreg.exe registry cleaner from NSIS temp directory, and Office Tab Enterprise \u2014 all installed within a 155-second window on 2020-02-14. The system runs RDP with NLA disabled on an EOL Windows 7 OS, creating a Sticky Keys exploitation vec\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [KMSAuto scheduled task registered at \\KMSAuto (root-level, outside \\Mi] z=0.765 conf=0.90 \u2014 \n  [RDP enabled (fDenyTSConnections=0) with Network Level Authentication d] z=0.680 conf=0.85 \u2014 \n  [trashreg.exe registered in AppPaths from NSIS temp directory: c:\\users] z=0.675 conf=0.90 \u2014 \n  [Office Tab Enterprise v.9.81 installed 2020-02-14 19:44:56Z \u2014 2 minute] z=0.630 conf=0.90 \u2014 \n  [Default Windows 7 audit policy (Policy\\PolAdtEv, LastWrite 2009-07-14 ] z=0.540 conf=0.90 \u2014 \n\n--- FINAL ALERT LEVEL ---\nMEDIUM \u2014 INTENT verdict with individual z-scores below threshold. Alert floored (B-028/B-065): an intent finding cannot present as LOW.\nReconciliation: verdict INTENT rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 8 | Derived: 0 | Total: 8",
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-MAGNET-2020-WINDOWS ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-MAGNET-2020-WINDOWS.json\nEvidence SHA-256: b61e8e8f6b5e432d553337dc3924e76acf57da286f7d4c6c4f5bc2b185beccca\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 19/20\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 8 se\u00f1al(es): 8 primaria(s) de ['audit_network', 'detect_habit_incongruence', 'list_processes', 'read_evidence'], 0 derivada(s)/no-analizada(s). Top z: KMSAuto scheduled task registered at \\KM=0.77, RDP enabled (fDenyTSConnections=0) with =0.68, trashreg.exe registered in AppPaths from=0.68.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: MALICIOUS_INTENT_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nWindows 7 x64 VMware VM (ComputerName: WIN-9H6J4FBP8F7, Volume: TestOS, IP: 192.168.10.146) belonging to user Warren. Registry analysis reveals a coordinated piracy toolkit installation: KMSAuto scheduled task for persistent Windows/Office activation bypass, trashreg.exe registry cleaner from NSIS temp directory, and Office Tab Enterprise \u2014 all installed within a 155-second window on 2020-02-14. The system runs RDP with NLA disabled on an EOL Windows 7 OS, creating a Sticky Keys exploitation vec\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [KMSAuto scheduled task registered at \\KMSAuto (root-level, outside \\Mi] z=0.765 conf=0.90 \u2014 \n  [RDP enabled (fDenyTSConnections=0) with Network Level Authentication d] z=0.680 conf=0.85 \u2014 \n  [trashreg.exe registered in AppPaths from NSIS temp directory: c:\\users] z=0.675 conf=0.90 \u2014 \n  [Office Tab Enterprise v.9.81 installed 2020-02-14 19:44:56Z \u2014 2 minute] z=0.630 conf=0.90 \u2014 \n  [Default Windows 7 audit policy (Policy\\PolAdtEv, LastWrite 2009-07-14 ] z=0.540 conf=0.90 \u2014 \n\n--- FINAL ALERT LEVEL ---\nHIGH \u2014 MALICE verdict from Bayesian posterior aggregation. Individual z-scores below threshold (distributed evidence pattern: no single dominant signal, but aggregate posterior is decisive). Alert floored (B-028/B-065).\nReconciliation: verdict MALICE rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 8 | Derived: 0 | Total: 8",
   "pipeline_results": {
     "abduction": {
-      "best_hypothesis": "INTENT_DETECTED",
-      "best_posterior": "779/8000",
+      "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+      "best_posterior": "19/20",
       "confidence": {
         "__fraction__": true,
-        "den": 8000,
-        "num": 779
+        "den": 20,
+        "num": 19
+      },
+      "devil_advocate": {
+        "aggregation": {
+          "k": 3,
+          "method": "top_k_already_validated_matches_v2",
+          "total_gap_mass": "0"
+        },
+        "counterfactual_summary": {
+          "primary_alternative_hypothesis": null
+        },
+        "decision_context": {
+          "confidence": "19/20",
+          "mapped_verdict": "MALICIOUS_INTENT_DETECTED",
+          "raw_verdict": "MALICIOUS_INTENT_DETECTED",
+          "score": "779/1600"
+        },
+        "devil_advocate_source": "deterministic_no_pattern_data_available",
+        "meta": {
+          "deterministic": true,
+          "generated_from": "case_pattern_library"
+        },
+        "narrative": "Eco's Razor (Abductive Falsification) applied to verdict MALICIOUS_INTENT_DETECTED. Pattern-matching data was not available on this code path \u2014 CasePatternLibrary is not invoked here by design (agent audit-trail mode (vigia_agent.py \u2014 JSON-replay / autonomous path); see KNOWN_LIMITATIONS.md). No structured counter-hypothesis could be derived deterministically. This is a documented scope limitation of the current code path, not an absence of falsification attempt.",
+        "pattern_evidence_gaps": [],
+        "version": "r7-da-v1"
       },
       "is_conclusive": true,
       "narrative": "Windows 7 x64 VMware VM (ComputerName: WIN-9H6J4FBP8F7, Volume: TestOS, IP: 192.168.10.146) belonging to user Warren. Registry analysis reveals a coordinated piracy toolkit installation: KMSAuto scheduled task for persistent Windows/Office activation bypass, trashreg.exe registry cleaner from NSIS temp directory, and Office Tab Enterprise \u2014 all installed within a 155-second window on 2020-02-14. The system runs RDP with NLA disabled on an EOL Windows 7 OS, creating a Sticky Keys exploitation vec"
@@ -200,7 +232,15 @@
     "pipeline_meta": {
       "artifact_count": 8,
       "avg_score": "779/1600",
+      "ebs_adapter_mode": "motor",
       "expected_verdict": "INTENT",
+      "resolve": {
+        "motor_confidence": "0.95",
+        "motor_reason": "Intent score 0.8406 exceeds MALICE threshold (P2+acq_assurance scale, threshold=0.33)",
+        "motor_score": "0.8406",
+        "motor_verdict": "MALICE",
+        "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+      },
       "source": "ebs_v1_json_adapter"
     },
     "signals": [

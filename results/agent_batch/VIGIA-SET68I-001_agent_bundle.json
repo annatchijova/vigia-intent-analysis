@@ -1,15 +1,15 @@
 {
-  "agent_verdict": "ABSTAIN",
-  "analysis_timestamp": "2026-07-05T15:27:36.841695+00:00",
+  "agent_verdict": "NOISE",
+  "analysis_timestamp": "2026-07-06T01:30:17.689656+00:00",
   "audit_trail": {
     "agent_version": "1.0.0-SANS-2026",
     "case_id": "VIGIA-SET68I-001",
-    "end_time": "2026-07-05T15:27:36.841700+00:00",
+    "end_time": "2026-07-06T01:30:17.689662+00:00",
     "entries": [
       {
         "action": "AGENT_INITIALIZED",
         "case_id": "VIGIA-SET68I-001",
-        "entry_sha256": "1a232e9bcf9497d57130a0dab83ec811248bf90118f568ead47e2ce208d20c62",
+        "entry_sha256": "b771725b8d1ba40e0cc1bc7995198268f47cc1a9194913e15c46045214cd37e4",
         "inputs_summary": {
           "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
           "case_id": "VIGIA-SET68I-001"
@@ -21,13 +21,13 @@
           "agent_version": "1.0.0-SANS-2026"
         },
         "seq": 1,
-        "timestamp": "2026-07-05T15:27:36.838564+00:00",
+        "timestamp": "2026-07-06T01:30:17.341540+00:00",
         "tool": "vigia_agent"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-SET68I-001",
-        "entry_sha256": "5f54987b9696ce860c0a89d4ff443f134226f5f518e96f342de3f10166101199",
+        "entry_sha256": "7e13fc19e7dcee4c3242364299c7409785174e5eea84284af72fca647716de81",
         "inputs_summary": {
           "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-SET68I-001.json"
         },
@@ -35,29 +35,29 @@
         "note": "Computing SHA-256 of original evidence",
         "outputs_summary": {},
         "seq": 2,
-        "timestamp": "2026-07-05T15:27:36.838649+00:00",
+        "timestamp": "2026-07-06T01:30:17.341625+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-SET68I-001",
-        "entry_sha256": "eb2f08aff5666a7501a693839c0daca3dc233f590e35d4f24685f2572a98e965",
+        "entry_sha256": "53f8dd75edc9a90f40c63a3b063f689b99fe7c759d7c162282f96da30a994399",
         "inputs_summary": {
           "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-SET68I-001.json"
         },
         "iteration": 0,
-        "note": "Evidence verified: 7a144ec350018409...",
+        "note": "Evidence verified: 12a625e018490f8e...",
         "outputs_summary": {
-          "sha256": "7a144ec350018409ea5fcc397f70fb24626a83d1e066c7d09448059abcc670d6"
+          "sha256": "12a625e018490f8e39fb85967044184738df3b099da34a0936e144550916ee49"
         },
         "seq": 3,
-        "timestamp": "2026-07-05T15:27:36.838746+00:00",
+        "timestamp": "2026-07-06T01:30:17.341722+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "PIPELINE_EXECUTE",
         "case_id": "VIGIA-SET68I-001",
-        "entry_sha256": "fd71198300924682887adadd766b1066ffa09f110c5406133d6531cee8928d5b",
+        "entry_sha256": "86c709abdec6e58b2138709584367c80821515f0e30cc26723e54d8e33dfd3c1",
         "inputs_summary": {
           "evidence": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-SET68I-001.json",
           "iteration": "0",
@@ -67,13 +67,13 @@
         "note": "Executing pipeline \u2014 iteration 0",
         "outputs_summary": {},
         "seq": 4,
-        "timestamp": "2026-07-05T15:27:36.838849+00:00",
+        "timestamp": "2026-07-06T01:30:17.341823+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "PIPELINE_COMPLETE",
         "case_id": "VIGIA-SET68I-001",
-        "entry_sha256": "139708eee29f50c6b4a0dd338f7511e8120ce31e624d7bbdd52791f24d3c4cd3",
+        "entry_sha256": "6b75eafd1c9f872ce529bcd9437890b7b515ff94607ef3e7a9f82342f44af52a",
         "inputs_summary": {
           "iteration": "0"
         },
@@ -81,17 +81,25 @@
         "note": "Pipeline completed \u2014 3 signals",
         "outputs_summary": {
           "abduction": {
-            "best_hypothesis": "ABSTAIN_DETECTED",
-            "best_posterior": "17/1200",
-            "confidence": "17/1200",
-            "is_conclusive": "False",
+            "best_hypothesis": "NO_SEMIOTIC_ANOMALY_DETECTED",
+            "best_posterior": "49/50",
+            "confidence": "49/50",
+            "is_conclusive": "True",
             "narrative": "Forensic image of Sony Ericsson T68i internal flash memory (file ingebjorg.bin, 8388608 bytes, SHA-256: df9aa8809f752434fc4028196b890c28a75924eaec2fbd586538450e2995c71d). File date 2005-03-29. Filenam..."
           },
           "case_id": "VIGIA-SET68I-001",
           "pipeline_meta": {
             "artifact_count": "3",
             "avg_score": "17/240",
+            "ebs_adapter_mode": "motor",
             "expected_verdict": "ABSTAIN",
+            "resolve": {
+              "motor_confidence": "0.98",
+              "motor_reason": "Insufficient evidence of malicious intent (score=0.0222)",
+              "motor_score": "0.0222",
+              "motor_verdict": "NOISE",
+              "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+            },
             "source": "ebs_v1_json_adapter"
           },
           "signals": [
@@ -122,13 +130,13 @@
           ]
         },
         "seq": 5,
-        "timestamp": "2026-07-05T15:27:36.841351+00:00",
+        "timestamp": "2026-07-06T01:30:17.689293+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "CONTRADICTION_CHECK",
         "case_id": "VIGIA-SET68I-001",
-        "entry_sha256": "8f521f278de5c94b9a549670789e3c9e9fdd764233598edfacdbc00a34897bf9",
+        "entry_sha256": "f43d40c61729cfc40ef6a343eb634186f42613291d5d169b34a80dfa3212d479",
         "inputs_summary": {
           "n_signals": "3"
         },
@@ -139,52 +147,60 @@
           "threshold": "2"
         },
         "seq": 6,
-        "timestamp": "2026-07-05T15:27:36.841469+00:00",
+        "timestamp": "2026-07-06T01:30:17.689408+00:00",
         "tool": "contradiction_detector"
       },
       {
         "action": "AGENT_EXIT",
         "case_id": "VIGIA-SET68I-001",
-        "entry_sha256": "e5c08eda2d70fa369037a44f5f9b645117874100ea45944846009d1853f03cf8",
+        "entry_sha256": "f0b467d1fdbb0c9932459aa1cf5d08e4c2249476f09a9f38dbc78cf0284d2823",
         "inputs_summary": {
-          "verdict": "ABSTAIN_DETECTED"
+          "verdict": "NO_SEMIOTIC_ANOMALY_DETECTED"
         },
         "iteration": 0,
-        "note": "Exit code 4 (ABSTAIN) \u2014 analysis complete.",
+        "note": "Exit code 0 (NOISE) \u2014 analysis complete.",
         "outputs_summary": {
-          "agent_verdict": "ABSTAIN",
-          "exit_code": "4"
+          "agent_verdict": "NOISE",
+          "exit_code": "0"
         },
         "seq": 7,
-        "timestamp": "2026-07-05T15:27:36.841645+00:00",
+        "timestamp": "2026-07-06T01:30:17.689604+00:00",
         "tool": "vigia_agent"
       }
     ],
-    "start_time": "2026-07-05T15:27:36.838329+00:00",
+    "start_time": "2026-07-06T01:30:17.341311+00:00",
     "total_entries": 7
   },
   "case_id": "VIGIA-SET68I-001",
   "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-SET68I-001.json",
-  "evidence_sha256": "7a144ec350018409ea5fcc397f70fb24626a83d1e066c7d09448059abcc670d6",
+  "evidence_sha256": "12a625e018490f8e39fb85967044184738df3b099da34a0936e144550916ee49",
   "iterations_executed": 1,
-  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-SET68I-001 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/VIGIA-SET68I-001.json\nEvidence SHA-256: 7a144ec350018409ea5fcc397f70fb24626a83d1e066c7d09448059abcc670d6\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: ABSTAIN_DETECTED\nPosterior confidence: 17/1200\nConclusive: NO \u2014 requires human review\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 3 se\u00f1al(es): 3 primaria(s) de ['generate_forensic_hash', 'read_evidence', 'search_pattern'], 0 derivada(s)/no-analizada(s). Top z: Culturally significant filename: 'ingebj=0.09, String analysis reveals firmware compone=0.07, Sony Ericsson T68i flash image. SHA-256 =0.05.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: ABSTAIN_DETECTED. Conclusiva: no \u2014 requiere revisi\u00f3n humana.\n\nRazonamiento del motor abductivo:\nForensic image of Sony Ericsson T68i internal flash memory (file ingebjorg.bin, 8388608 bytes, SHA-256: df9aa8809f752434fc4028196b890c28a75924eaec2fbd586538450e2995c71d). File date 2005-03-29. Filename 'ingebjorg.bin' indicates device ownership \u2014 'Ingebjorg' is a Norwegian female given name (variant: Ingeborg), strongly suggesting the handset belonged to a Scandinavian female user. String analysis reveals firmware layer with GSM stack processes and image format error handlers (JPEG, GIF, BMP, EB\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Culturally significant filename: 'ingebjorg.bin' \u2014 Ingebjorg/Ingeborg ] z=0.090 conf=0.60 \u2014 \n  [String analysis reveals firmware components: (1) Image format error ha] z=0.075 conf=0.75 \u2014 \n  [Sony Ericsson T68i flash image. SHA-256 verified. Size 8388608 bytes (] z=0.048 conf=0.95 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 3 | Derived: 0 | Total: 3",
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-SET68I-001 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/VIGIA-SET68I-001.json\nEvidence SHA-256: 12a625e018490f8e39fb85967044184738df3b099da34a0936e144550916ee49\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: NO_SEMIOTIC_ANOMALY_DETECTED\nPosterior confidence: 49/50\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 3 se\u00f1al(es): 3 primaria(s) de ['generate_forensic_hash', 'read_evidence', 'search_pattern'], 0 derivada(s)/no-analizada(s). Top z: Culturally significant filename: 'ingebj=0.09, String analysis reveals firmware compone=0.07, Sony Ericsson T68i flash image. SHA-256 =0.05.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: NO_SEMIOTIC_ANOMALY_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nForensic image of Sony Ericsson T68i internal flash memory (file ingebjorg.bin, 8388608 bytes, SHA-256: df9aa8809f752434fc4028196b890c28a75924eaec2fbd586538450e2995c71d). File date 2005-03-29. Filename 'ingebjorg.bin' indicates device ownership \u2014 'Ingebjorg' is a Norwegian female given name (variant: Ingeborg), strongly suggesting the handset belonged to a Scandinavian female user. String analysis reveals firmware layer with GSM stack processes and image format error handlers (JPEG, GIF, BMP, EB\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Culturally significant filename: 'ingebjorg.bin' \u2014 Ingebjorg/Ingeborg ] z=0.090 conf=0.60 \u2014 \n  [String analysis reveals firmware components: (1) Image format error ha] z=0.075 conf=0.75 \u2014 \n  [Sony Ericsson T68i flash image. SHA-256 verified. Size 8388608 bytes (] z=0.048 conf=0.95 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 3 | Derived: 0 | Total: 3",
   "pipeline_results": {
     "abduction": {
-      "best_hypothesis": "ABSTAIN_DETECTED",
-      "best_posterior": "17/1200",
+      "best_hypothesis": "NO_SEMIOTIC_ANOMALY_DETECTED",
+      "best_posterior": "49/50",
       "confidence": {
         "__fraction__": true,
-        "den": 1200,
-        "num": 17
+        "den": 50,
+        "num": 49
       },
-      "is_conclusive": false,
+      "is_conclusive": true,
       "narrative": "Forensic image of Sony Ericsson T68i internal flash memory (file ingebjorg.bin, 8388608 bytes, SHA-256: df9aa8809f752434fc4028196b890c28a75924eaec2fbd586538450e2995c71d). File date 2005-03-29. Filename 'ingebjorg.bin' indicates device ownership \u2014 'Ingebjorg' is a Norwegian female given name (variant: Ingeborg), strongly suggesting the handset belonged to a Scandinavian female user. String analysis reveals firmware layer with GSM stack processes and image format error handlers (JPEG, GIF, BMP, EB"
     },
     "case_id": "VIGIA-SET68I-001",
     "pipeline_meta": {
       "artifact_count": 3,
       "avg_score": "17/240",
+      "ebs_adapter_mode": "motor",
       "expected_verdict": "ABSTAIN",
+      "resolve": {
+        "motor_confidence": "0.98",
+        "motor_reason": "Insufficient evidence of malicious intent (score=0.0222)",
+        "motor_score": "0.0222",
+        "motor_verdict": "NOISE",
+        "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+      },
       "source": "ebs_v1_json_adapter"
     },
     "signals": [

@@ -1,15 +1,15 @@
 {
   "agent_verdict": "MALICE",
-  "analysis_timestamp": "2026-07-05T15:27:36.223377+00:00",
+  "analysis_timestamp": "2026-07-06T01:30:12.330171+00:00",
   "audit_trail": {
     "agent_version": "1.0.0-SANS-2026",
     "case_id": "VIGIA-REAL-SRL-DMZ-FTP",
-    "end_time": "2026-07-05T15:27:36.223384+00:00",
+    "end_time": "2026-07-06T01:30:12.330179+00:00",
     "entries": [
       {
         "action": "AGENT_INITIALIZED",
         "case_id": "VIGIA-REAL-SRL-DMZ-FTP",
-        "entry_sha256": "56afdeb1e2a2c42b7b2fb677d0c1822420b1e13863a9e50f259014bad7df80e8",
+        "entry_sha256": "273db09647d7c8af0e2b270c5fd0c3974367e5e08dd21db73e9fec45e7bcb090",
         "inputs_summary": {
           "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
           "case_id": "VIGIA-REAL-SRL-DMZ-FTP"
@@ -21,13 +21,13 @@
           "agent_version": "1.0.0-SANS-2026"
         },
         "seq": 1,
-        "timestamp": "2026-07-05T15:27:36.219789+00:00",
+        "timestamp": "2026-07-06T01:30:11.969864+00:00",
         "tool": "vigia_agent"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-REAL-SRL-DMZ-FTP",
-        "entry_sha256": "6b4b30c12f713de6aff5d4eae85449923f23ba361a6d05cd9cad09bbd5a12b6f",
+        "entry_sha256": "73d9d399330b5c126239791bd8f073a48fee036689191adbf427da28a4836044",
         "inputs_summary": {
           "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-REAL-SRL-DMZ-FTP.json"
         },
@@ -35,13 +35,13 @@
         "note": "Computing SHA-256 of original evidence",
         "outputs_summary": {},
         "seq": 2,
-        "timestamp": "2026-07-05T15:27:36.219872+00:00",
+        "timestamp": "2026-07-06T01:30:11.969950+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-REAL-SRL-DMZ-FTP",
-        "entry_sha256": "2be70fd06840aacf9e4bde2bdb67ac6c05346a5acd5bd4a12f6692677a6ac3bd",
+        "entry_sha256": "fe6683c980f984dff048798163d68846138610b4d6307512fb07a0c004662c86",
         "inputs_summary": {
           "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-REAL-SRL-DMZ-FTP.json"
         },
@@ -51,13 +51,13 @@
           "sha256": "fd131dd8d180377ebc0c592adc71f7b7f26cbc33647d77c718cbf2dbf18e96ab"
         },
         "seq": 3,
-        "timestamp": "2026-07-05T15:27:36.219965+00:00",
+        "timestamp": "2026-07-06T01:30:11.970047+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "PIPELINE_EXECUTE",
         "case_id": "VIGIA-REAL-SRL-DMZ-FTP",
-        "entry_sha256": "174b9b82c6e23ba33e04505f689ad76368a5a4cf93db6a178ff7ef622fad0152",
+        "entry_sha256": "6cf58e6845c0b7f80e51a0874c9d484f4e6ec8db98d394d7e1f8701a205d5508",
         "inputs_summary": {
           "evidence": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-REAL-SRL-DMZ-FTP.json",
           "iteration": "0",
@@ -67,13 +67,13 @@
         "note": "Executing pipeline \u2014 iteration 0",
         "outputs_summary": {},
         "seq": 4,
-        "timestamp": "2026-07-05T15:27:36.220067+00:00",
+        "timestamp": "2026-07-06T01:30:11.970150+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "PIPELINE_COMPLETE",
         "case_id": "VIGIA-REAL-SRL-DMZ-FTP",
-        "entry_sha256": "1679c2fe0ae6175aa14d931097059032a01116d293a49c3be155b66eb5ca6d76",
+        "entry_sha256": "3291010ce5825cf3fceeae8587eefca70c5021e1ed7e8db7eb8a8b08d87bbf7b",
         "inputs_summary": {
           "iteration": "0"
         },
@@ -82,16 +82,24 @@
         "outputs_summary": {
           "abduction": {
             "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
-            "best_posterior": "0",
-            "confidence": "0",
-            "is_conclusive": "False",
+            "best_posterior": "19/20",
+            "confidence": "19/20",
+            "is_conclusive": "True",
             "narrative": "IIS 8.5 FTP server in DMZ (172.16.10.12). External attackers attempted malware upload and conducted coordinated credential stuffing using valid domain usernames. Server also served as DFIR response in..."
           },
           "case_id": "VIGIA-REAL-SRL-DMZ-FTP",
           "pipeline_meta": {
             "artifact_count": "5",
             "avg_score": "0",
+            "ebs_adapter_mode": "motor",
             "expected_verdict": "MALICE",
+            "resolve": {
+              "motor_confidence": "0.95",
+              "motor_reason": "Intent score 0.5023 exceeds MALICE threshold (P2+acq_assurance scale, threshold=0.33)",
+              "motor_score": "0.5023",
+              "motor_verdict": "MALICE",
+              "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+            },
             "source": "ebs_v1_json_adapter"
           },
           "signals": [
@@ -138,13 +146,13 @@
           ]
         },
         "seq": 5,
-        "timestamp": "2026-07-05T15:27:36.222585+00:00",
+        "timestamp": "2026-07-06T01:30:12.329568+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "CONTRADICTION_CHECK",
         "case_id": "VIGIA-REAL-SRL-DMZ-FTP",
-        "entry_sha256": "a35d4bb242aa0f0d2e951ab3c0a5f8ef8ead8286a3aff1a206a0be5eae626d0e",
+        "entry_sha256": "1e3e1966db41db56ce7f8649d68dd1b6039e810a4ddac6f6a984e7537718ba45",
         "inputs_summary": {
           "n_signals": "5"
         },
@@ -155,13 +163,13 @@
           "threshold": "2"
         },
         "seq": 6,
-        "timestamp": "2026-07-05T15:27:36.222694+00:00",
+        "timestamp": "2026-07-06T01:30:12.329709+00:00",
         "tool": "contradiction_detector"
       },
       {
         "action": "AGENT_EXIT",
         "case_id": "VIGIA-REAL-SRL-DMZ-FTP",
-        "entry_sha256": "5693008d63e8ca2d71a30ca5c702f539eda694995032fa696ebb0fd531209c65",
+        "entry_sha256": "d517a1516b3b244e1b29406f348375eaac6bd98ef6405f792a4d5c865a4a9ab2",
         "inputs_summary": {
           "verdict": "MALICIOUS_INTENT_DETECTED"
         },
@@ -172,26 +180,26 @@
           "exit_code": "1"
         },
         "seq": 7,
-        "timestamp": "2026-07-05T15:27:36.222923+00:00",
+        "timestamp": "2026-07-06T01:30:12.329954+00:00",
         "tool": "vigia_agent"
       }
     ],
-    "start_time": "2026-07-05T15:27:36.219561+00:00",
+    "start_time": "2026-07-06T01:30:11.969637+00:00",
     "total_entries": 7
   },
   "case_id": "VIGIA-REAL-SRL-DMZ-FTP",
   "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-REAL-SRL-DMZ-FTP.json",
   "evidence_sha256": "fd131dd8d180377ebc0c592adc71f7b7f26cbc33647d77c718cbf2dbf18e96ab",
   "iterations_executed": 1,
-  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-REAL-SRL-DMZ-FTP ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/VIGIA-REAL-SRL-DMZ-FTP.json\nEvidence SHA-256: fd131dd8d180377ebc0c592adc71f7b7f26cbc33647d77c718cbf2dbf18e96ab\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 0\nConclusive: NO \u2014 requires human review\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 5 se\u00f1al(es): 5 primaria(s) de ['unknown'], 0 derivada(s)/no-analizada(s). Top z: unknown=0.00, unknown=0.00, unknown=0.00.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: MALICIOUS_INTENT_DETECTED. Conclusiva: no \u2014 requiere revisi\u00f3n humana.\n\nRazonamiento del motor abductivo:\nIIS 8.5 FTP server in DMZ (172.16.10.12). External attackers attempted malware upload and conducted coordinated credential stuffing using valid domain usernames. Server also served as DFIR response infrastructure. Attack blocked at perimeter \u2014 internal compromise used different vector.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [unknown] z=0.000 conf=0.50 \u2014 \n  [unknown] z=0.000 conf=0.50 \u2014 \n  [unknown] z=0.000 conf=0.50 \u2014 \n  [unknown] z=0.000 conf=0.50 \u2014 \n  [unknown] z=0.000 conf=0.50 \u2014 \n\n--- FINAL ALERT LEVEL ---\nMEDIUM \u2014 MALICE verdict from posterior aggregation. Individual z-scores below threshold. Full signal review recommended. Alert floored (B-028/B-065).\nReconciliation: verdict MALICE rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 5 | Derived: 0 | Total: 5",
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-REAL-SRL-DMZ-FTP ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/VIGIA-REAL-SRL-DMZ-FTP.json\nEvidence SHA-256: fd131dd8d180377ebc0c592adc71f7b7f26cbc33647d77c718cbf2dbf18e96ab\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 19/20\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 5 se\u00f1al(es): 5 primaria(s) de ['unknown'], 0 derivada(s)/no-analizada(s). Top z: unknown=0.00, unknown=0.00, unknown=0.00.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: MALICIOUS_INTENT_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nIIS 8.5 FTP server in DMZ (172.16.10.12). External attackers attempted malware upload and conducted coordinated credential stuffing using valid domain usernames. Server also served as DFIR response infrastructure. Attack blocked at perimeter \u2014 internal compromise used different vector.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [unknown] z=0.000 conf=0.50 \u2014 \n  [unknown] z=0.000 conf=0.50 \u2014 \n  [unknown] z=0.000 conf=0.50 \u2014 \n  [unknown] z=0.000 conf=0.50 \u2014 \n  [unknown] z=0.000 conf=0.50 \u2014 \n\n--- FINAL ALERT LEVEL ---\nHIGH \u2014 MALICE verdict from Bayesian posterior aggregation. Individual z-scores below threshold (distributed evidence pattern: no single dominant signal, but aggregate posterior is decisive). Alert floored (B-028/B-065).\nReconciliation: verdict MALICE rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 5 | Derived: 0 | Total: 5",
   "pipeline_results": {
     "abduction": {
       "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
-      "best_posterior": "0",
+      "best_posterior": "19/20",
       "confidence": {
         "__fraction__": true,
-        "den": 1,
-        "num": 0
+        "den": 20,
+        "num": 19
       },
       "devil_advocate": {
         "aggregation": {
@@ -203,7 +211,7 @@
           "primary_alternative_hypothesis": null
         },
         "decision_context": {
-          "confidence": "0",
+          "confidence": "19/20",
           "mapped_verdict": "MALICIOUS_INTENT_DETECTED",
           "raw_verdict": "MALICIOUS_INTENT_DETECTED",
           "score": "0"
@@ -217,14 +225,22 @@
         "pattern_evidence_gaps": [],
         "version": "r7-da-v1"
       },
-      "is_conclusive": false,
+      "is_conclusive": true,
       "narrative": "IIS 8.5 FTP server in DMZ (172.16.10.12). External attackers attempted malware upload and conducted coordinated credential stuffing using valid domain usernames. Server also served as DFIR response infrastructure. Attack blocked at perimeter \u2014 internal compromise used different vector."
     },
     "case_id": "VIGIA-REAL-SRL-DMZ-FTP",
     "pipeline_meta": {
       "artifact_count": 5,
       "avg_score": "0",
+      "ebs_adapter_mode": "motor",
       "expected_verdict": "MALICE",
+      "resolve": {
+        "motor_confidence": "0.95",
+        "motor_reason": "Intent score 0.5023 exceeds MALICE threshold (P2+acq_assurance scale, threshold=0.33)",
+        "motor_score": "0.5023",
+        "motor_verdict": "MALICE",
+        "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+      },
       "source": "ebs_v1_json_adapter"
     },
     "signals": [

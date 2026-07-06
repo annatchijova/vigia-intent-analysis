@@ -1,15 +1,15 @@
 {
   "agent_verdict": "NOISE",
-  "analysis_timestamp": "2026-07-05T15:27:33.332972+00:00",
+  "analysis_timestamp": "2026-07-06T01:29:47.760419+00:00",
   "audit_trail": {
     "agent_version": "1.0.0-SANS-2026",
     "case_id": "VIGIA-DRIVE-DOWNLOAD-2026",
-    "end_time": "2026-07-05T15:27:33.332979+00:00",
+    "end_time": "2026-07-06T01:29:47.760434+00:00",
     "entries": [
       {
         "action": "AGENT_INITIALIZED",
         "case_id": "VIGIA-DRIVE-DOWNLOAD-2026",
-        "entry_sha256": "feb987b77c1623eeb22fdd714d0df5f9807ce50ecf3edaf7f2e58fbd3f2263a3",
+        "entry_sha256": "3b3331043f80bfa7b2f97ca629bf46ea7c8037bf746389654871dc7baed503eb",
         "inputs_summary": {
           "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
           "case_id": "VIGIA-DRIVE-DOWNLOAD-2026"
@@ -21,13 +21,13 @@
           "agent_version": "1.0.0-SANS-2026"
         },
         "seq": 1,
-        "timestamp": "2026-07-05T15:27:33.329051+00:00",
+        "timestamp": "2026-07-06T01:29:47.410342+00:00",
         "tool": "vigia_agent"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-DRIVE-DOWNLOAD-2026",
-        "entry_sha256": "0e68bd7bad8771adea5a6e66a2f225c152532dfaddc75591479d7e5ad206adb0",
+        "entry_sha256": "78ab48c576edeab80041ce943bfeb4f319c8fdb0a4daf08ce3a56d09633ddda8",
         "inputs_summary": {
           "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-DRIVE-DOWNLOAD-2026.json"
         },
@@ -35,29 +35,29 @@
         "note": "Computing SHA-256 of original evidence",
         "outputs_summary": {},
         "seq": 2,
-        "timestamp": "2026-07-05T15:27:33.329141+00:00",
+        "timestamp": "2026-07-06T01:29:47.410439+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-DRIVE-DOWNLOAD-2026",
-        "entry_sha256": "28853dd9b20b592419bebffb32b409c55e423b47f7868eb180deb63bd02e5d25",
+        "entry_sha256": "683440c7013e147346c21f798f26898f32429251502f3b3872cc437d8fb1f3b9",
         "inputs_summary": {
           "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-DRIVE-DOWNLOAD-2026.json"
         },
         "iteration": 0,
-        "note": "Evidence verified: 28fff34d78b576ee...",
+        "note": "Evidence verified: ff0e50b8d8ef15df...",
         "outputs_summary": {
-          "sha256": "28fff34d78b576ee5e5689edb30141768b8ee3fa4596946ee3fce64cba29c9ad"
+          "sha256": "ff0e50b8d8ef15df171631d1bcba7c79f4eb6761059a6c077b490839228c14bd"
         },
         "seq": 3,
-        "timestamp": "2026-07-05T15:27:33.329236+00:00",
+        "timestamp": "2026-07-06T01:29:47.410537+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "PIPELINE_EXECUTE",
         "case_id": "VIGIA-DRIVE-DOWNLOAD-2026",
-        "entry_sha256": "79bd2644f717cdb423eb949367af671878657287cbfde2904356095a5c02e4fb",
+        "entry_sha256": "439f33471bf4d30f78dcc90a68179279fe0fb9ea334e279c84811cee68f7167b",
         "inputs_summary": {
           "evidence": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-DRIVE-DOWNLOAD-2026.json",
           "iteration": "0",
@@ -67,13 +67,13 @@
         "note": "Executing pipeline \u2014 iteration 0",
         "outputs_summary": {},
         "seq": 4,
-        "timestamp": "2026-07-05T15:27:33.329339+00:00",
+        "timestamp": "2026-07-06T01:29:47.410638+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "PIPELINE_COMPLETE",
         "case_id": "VIGIA-DRIVE-DOWNLOAD-2026",
-        "entry_sha256": "25a3fb3bede65ed0001789d84291fd3def77b0e2b40fa1d7031d7944f7389bf3",
+        "entry_sha256": "d29a4630d7d55d289a7656fcc4c0fb4806ee5085294fffcb03c0afd7aca3cb54",
         "inputs_summary": {
           "iteration": "0"
         },
@@ -82,16 +82,24 @@
         "outputs_summary": {
           "abduction": {
             "best_hypothesis": "NO_SEMIOTIC_ANOMALY_DETECTED",
-            "best_posterior": "19/5000",
-            "confidence": "19/5000",
-            "is_conclusive": "False",
+            "best_posterior": "99/100",
+            "confidence": "99/100",
+            "is_conclusive": "True",
             "narrative": "ZIP export from Google Drive (drive-download-20260123T060931Z-3-001.zip, SHA-256: e4f3915ca2dacfd125300e07e06201eaed7f784d153bf30970f56d79452fbedc) containing three PDF documents: vig\u00eda13enero.pdf (36..."
           },
           "case_id": "VIGIA-DRIVE-DOWNLOAD-2026",
           "pipeline_meta": {
             "artifact_count": "4",
             "avg_score": "19/1000",
+            "ebs_adapter_mode": "motor",
             "expected_verdict": "NOISE",
+            "resolve": {
+              "motor_confidence": "0.99",
+              "motor_reason": "Insufficient evidence of malicious intent (score=0.0092)",
+              "motor_score": "0.0092",
+              "motor_verdict": "NOISE",
+              "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+            },
             "source": "ebs_v1_json_adapter"
           },
           "signals": [
@@ -130,13 +138,13 @@
           ]
         },
         "seq": 5,
-        "timestamp": "2026-07-05T15:27:33.332482+00:00",
+        "timestamp": "2026-07-06T01:29:47.759960+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "CONTRADICTION_CHECK",
         "case_id": "VIGIA-DRIVE-DOWNLOAD-2026",
-        "entry_sha256": "3d22ee384a222f981c43f9a09976659eef8459a0b966e7a0bd09fffbeb80abbd",
+        "entry_sha256": "90d1ee715a675f78f26f274eda0d39c28de79cfeabdcff8a401f2e715cb16764",
         "inputs_summary": {
           "n_signals": "4"
         },
@@ -147,13 +155,13 @@
           "threshold": "2"
         },
         "seq": 6,
-        "timestamp": "2026-07-05T15:27:33.332628+00:00",
+        "timestamp": "2026-07-06T01:29:47.760087+00:00",
         "tool": "contradiction_detector"
       },
       {
         "action": "AGENT_EXIT",
         "case_id": "VIGIA-DRIVE-DOWNLOAD-2026",
-        "entry_sha256": "c2bc6cba857e860f99300eff6443939db62256612488b79a4f20b50d814044cf",
+        "entry_sha256": "27e143f9f6bd568add56f830e44384e7cc5c484e91800308496d6d6d88b1cbd9",
         "inputs_summary": {
           "verdict": "NO_SEMIOTIC_ANOMALY_DETECTED"
         },
@@ -164,35 +172,43 @@
           "exit_code": "0"
         },
         "seq": 7,
-        "timestamp": "2026-07-05T15:27:33.332891+00:00",
+        "timestamp": "2026-07-06T01:29:47.760359+00:00",
         "tool": "vigia_agent"
       }
     ],
-    "start_time": "2026-07-05T15:27:33.328794+00:00",
+    "start_time": "2026-07-06T01:29:47.410123+00:00",
     "total_entries": 7
   },
   "case_id": "VIGIA-DRIVE-DOWNLOAD-2026",
   "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-DRIVE-DOWNLOAD-2026.json",
-  "evidence_sha256": "28fff34d78b576ee5e5689edb30141768b8ee3fa4596946ee3fce64cba29c9ad",
+  "evidence_sha256": "ff0e50b8d8ef15df171631d1bcba7c79f4eb6761059a6c077b490839228c14bd",
   "iterations_executed": 1,
-  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-DRIVE-DOWNLOAD-2026 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/VIGIA-DRIVE-DOWNLOAD-2026.json\nEvidence SHA-256: 28fff34d78b576ee5e5689edb30141768b8ee3fa4596946ee3fce64cba29c9ad\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: NO_SEMIOTIC_ANOMALY_DETECTED\nPosterior confidence: 19/5000\nConclusive: NO \u2014 requires human review\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 4 se\u00f1al(es): 4 primaria(s) de ['generate_forensic_hash'], 0 derivada(s)/no-analizada(s). Top z: vig\u00eda13enero.pdf \u2014 personal AI conversat=0.02, vig\u00eda14enero.pdf \u2014 personal AI conversat=0.02, vig\u00eda15cursi.pdf \u2014 personal AI conversat=0.02.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: NO_SEMIOTIC_ANOMALY_DETECTED. Conclusiva: no \u2014 requiere revisi\u00f3n humana.\n\nRazonamiento del motor abductivo:\nZIP export from Google Drive (drive-download-20260123T060931Z-3-001.zip, SHA-256: e4f3915ca2dacfd125300e07e06201eaed7f784d153bf30970f56d79452fbedc) containing three PDF documents: vig\u00eda13enero.pdf (367KB, 2026-01-12), vig\u00eda14enero.pdf (786KB, 2026-01-13), vig\u00eda15cursi.pdf (317KB, 2026-01-15). Content analysis confirms these are personal AI conversation archives in Spanish/Rioplatense register. The user (Anna) converses with AI assistants named 'Vig\u00eda', 'Leo', and 'General Pepinillo'. No technica\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [vig\u00eda13enero.pdf \u2014 personal AI conversation archive, 367KB, dated 2026] z=0.019 conf=0.95 \u2014 \n  [vig\u00eda14enero.pdf \u2014 personal AI conversation archive, 786KB, dated 2026] z=0.019 conf=0.95 \u2014 \n  [vig\u00eda15cursi.pdf \u2014 personal AI conversation archive, 317KB, dated 2026] z=0.019 conf=0.95 \u2014 \n  [Container ZIP: drive-download-20260123T060931Z-3-001.zip. Filename fol] z=0.019 conf=0.95 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 4 | Derived: 0 | Total: 4",
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-DRIVE-DOWNLOAD-2026 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/VIGIA-DRIVE-DOWNLOAD-2026.json\nEvidence SHA-256: ff0e50b8d8ef15df171631d1bcba7c79f4eb6761059a6c077b490839228c14bd\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: NO_SEMIOTIC_ANOMALY_DETECTED\nPosterior confidence: 99/100\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 4 se\u00f1al(es): 4 primaria(s) de ['generate_forensic_hash'], 0 derivada(s)/no-analizada(s). Top z: vig\u00eda13enero.pdf \u2014 personal AI conversat=0.02, vig\u00eda14enero.pdf \u2014 personal AI conversat=0.02, vig\u00eda15cursi.pdf \u2014 personal AI conversat=0.02.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: NO_SEMIOTIC_ANOMALY_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nZIP export from Google Drive (drive-download-20260123T060931Z-3-001.zip, SHA-256: e4f3915ca2dacfd125300e07e06201eaed7f784d153bf30970f56d79452fbedc) containing three PDF documents: vig\u00eda13enero.pdf (367KB, 2026-01-12), vig\u00eda14enero.pdf (786KB, 2026-01-13), vig\u00eda15cursi.pdf (317KB, 2026-01-15). Content analysis confirms these are personal AI conversation archives in Spanish/Rioplatense register. The user (Anna) converses with AI assistants named 'Vig\u00eda', 'Leo', and 'General Pepinillo'. No technica\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [vig\u00eda13enero.pdf \u2014 personal AI conversation archive, 367KB, dated 2026] z=0.019 conf=0.95 \u2014 \n  [vig\u00eda14enero.pdf \u2014 personal AI conversation archive, 786KB, dated 2026] z=0.019 conf=0.95 \u2014 \n  [vig\u00eda15cursi.pdf \u2014 personal AI conversation archive, 317KB, dated 2026] z=0.019 conf=0.95 \u2014 \n  [Container ZIP: drive-download-20260123T060931Z-3-001.zip. Filename fol] z=0.019 conf=0.95 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 4 | Derived: 0 | Total: 4",
   "pipeline_results": {
     "abduction": {
       "best_hypothesis": "NO_SEMIOTIC_ANOMALY_DETECTED",
-      "best_posterior": "19/5000",
+      "best_posterior": "99/100",
       "confidence": {
         "__fraction__": true,
-        "den": 5000,
-        "num": 19
+        "den": 100,
+        "num": 99
       },
-      "is_conclusive": false,
+      "is_conclusive": true,
       "narrative": "ZIP export from Google Drive (drive-download-20260123T060931Z-3-001.zip, SHA-256: e4f3915ca2dacfd125300e07e06201eaed7f784d153bf30970f56d79452fbedc) containing three PDF documents: vig\u00eda13enero.pdf (367KB, 2026-01-12), vig\u00eda14enero.pdf (786KB, 2026-01-13), vig\u00eda15cursi.pdf (317KB, 2026-01-15). Content analysis confirms these are personal AI conversation archives in Spanish/Rioplatense register. The user (Anna) converses with AI assistants named 'Vig\u00eda', 'Leo', and 'General Pepinillo'. No technica"
     },
     "case_id": "VIGIA-DRIVE-DOWNLOAD-2026",
     "pipeline_meta": {
       "artifact_count": 4,
       "avg_score": "19/1000",
+      "ebs_adapter_mode": "motor",
       "expected_verdict": "NOISE",
+      "resolve": {
+        "motor_confidence": "0.99",
+        "motor_reason": "Insufficient evidence of malicious intent (score=0.0092)",
+        "motor_score": "0.0092",
+        "motor_verdict": "NOISE",
+        "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+      },
       "source": "ebs_v1_json_adapter"
     },
     "signals": [

@@ -1,15 +1,15 @@
 {
   "agent_verdict": "MALICE",
-  "analysis_timestamp": "2026-07-05T15:27:37.713911+00:00",
+  "analysis_timestamp": "2026-07-06T01:30:24.793299+00:00",
   "audit_trail": {
     "agent_version": "1.0.0-SANS-2026",
     "case_id": "case_006_false_flag_demo",
-    "end_time": "2026-07-05T15:27:37.713918+00:00",
+    "end_time": "2026-07-06T01:30:24.793306+00:00",
     "entries": [
       {
         "action": "AGENT_INITIALIZED",
         "case_id": "case_006_false_flag_demo",
-        "entry_sha256": "ae3297064c1d89d635df5a1da97ab49d6ba13e099ddad45b4984ed06ab73fa01",
+        "entry_sha256": "9158d89fcc84beb31491a1a044c4adcc82be59d04144dd95527a25d52913826a",
         "inputs_summary": {
           "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
           "case_id": "case_006_false_flag_demo"
@@ -21,13 +21,13 @@
           "agent_version": "1.0.0-SANS-2026"
         },
         "seq": 1,
-        "timestamp": "2026-07-05T15:27:37.710064+00:00",
+        "timestamp": "2026-07-06T01:30:24.438135+00:00",
         "tool": "vigia_agent"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "case_006_false_flag_demo",
-        "entry_sha256": "4fd54bd6538875554584894bfbb4f045fccb1ecd6a0b7ccc1c10e7496aa580bb",
+        "entry_sha256": "73972422315974cf93b8d1a7426ea2cd4d292f403410c315519294ee992eca0e",
         "inputs_summary": {
           "path": "/home/labestiadevigia/vigia-repo/data/cases/case_006_false_flag_demo.json"
         },
@@ -35,29 +35,29 @@
         "note": "Computing SHA-256 of original evidence",
         "outputs_summary": {},
         "seq": 2,
-        "timestamp": "2026-07-05T15:27:37.710147+00:00",
+        "timestamp": "2026-07-06T01:30:24.438218+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "case_006_false_flag_demo",
-        "entry_sha256": "0afe1add10672bb17dfc2b337f92deacac46108e68da48d043cef790dd24ed57",
+        "entry_sha256": "af0d93bd6c0eb9c710e441b8d7fdd535de4067e692bac764a64688ae29ab7710",
         "inputs_summary": {
           "path": "/home/labestiadevigia/vigia-repo/data/cases/case_006_false_flag_demo.json"
         },
         "iteration": 0,
-        "note": "Evidence verified: 1b9c4b2198f594d9...",
+        "note": "Evidence verified: 6eb5654f49cff18b...",
         "outputs_summary": {
-          "sha256": "1b9c4b2198f594d98b333d7a559810e9ab4da3721f3cbb277439e8bcd8c77201"
+          "sha256": "6eb5654f49cff18b00aea3d7d4f9908fa8c4aa37a8d94368eb93f51dc760b11a"
         },
         "seq": 3,
-        "timestamp": "2026-07-05T15:27:37.710239+00:00",
+        "timestamp": "2026-07-06T01:30:24.438312+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "PIPELINE_EXECUTE",
         "case_id": "case_006_false_flag_demo",
-        "entry_sha256": "6c5b313018f61a0a8179adc623f67f4e02c3d0760f9926e8c293238b6091ddd6",
+        "entry_sha256": "dbbc172a8e3b3a945632c92845b720f185048a58f27d351c37aae35ccac7e446",
         "inputs_summary": {
           "evidence": "/home/labestiadevigia/vigia-repo/data/cases/case_006_false_flag_demo.json",
           "iteration": "0",
@@ -67,13 +67,13 @@
         "note": "Executing pipeline \u2014 iteration 0",
         "outputs_summary": {},
         "seq": 4,
-        "timestamp": "2026-07-05T15:27:37.710344+00:00",
+        "timestamp": "2026-07-06T01:30:24.438413+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "PIPELINE_COMPLETE",
         "case_id": "case_006_false_flag_demo",
-        "entry_sha256": "8e9a17f1d65bfe9f63c2e7825b62e20e541ebf472e2af0947a8f51984e23ffae",
+        "entry_sha256": "7dff4ba418122f491da1b273106f2db778b688f72255dfa9b9e9875a39e62484",
         "inputs_summary": {
           "iteration": "0"
         },
@@ -82,16 +82,24 @@
         "outputs_summary": {
           "abduction": {
             "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
-            "best_posterior": "0",
-            "confidence": "0",
-            "is_conclusive": "False",
+            "best_posterior": "19/25",
+            "confidence": "19/25",
+            "is_conclusive": "True",
             "narrative": "Intrusion with deliberate false flag. The attacker left traces designed to attribute the attack to a known Russian APT group. VIG\u00cdA must detect the incoherence of intent."
           },
           "case_id": "VIGIA-2026-DEMO-004",
           "pipeline_meta": {
             "artifact_count": "4",
             "avg_score": "0",
+            "ebs_adapter_mode": "motor",
             "expected_verdict": "MALICE",
+            "resolve": {
+              "motor_confidence": "0.76",
+              "motor_reason": "Intent score 0.3804 exceeds MALICE threshold (P2+acq_assurance scale, threshold=0.33)",
+              "motor_score": "0.3804",
+              "motor_verdict": "MALICE",
+              "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+            },
             "source": "ebs_v1_json_adapter"
           },
           "signals": [
@@ -130,13 +138,13 @@
           ]
         },
         "seq": 5,
-        "timestamp": "2026-07-05T15:27:37.713060+00:00",
+        "timestamp": "2026-07-06T01:30:24.792795+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "CONTRADICTION_CHECK",
         "case_id": "case_006_false_flag_demo",
-        "entry_sha256": "6013b9250713fef3e7fcd44b485274019cd071cb32633fcc761c216c3595eea2",
+        "entry_sha256": "c9b0228cf41dd4ffcad29d0ed916667be8901db5008a948ce9a541d62e20f8ee",
         "inputs_summary": {
           "n_signals": "4"
         },
@@ -147,13 +155,13 @@
           "threshold": "2"
         },
         "seq": 6,
-        "timestamp": "2026-07-05T15:27:37.713176+00:00",
+        "timestamp": "2026-07-06T01:30:24.792908+00:00",
         "tool": "contradiction_detector"
       },
       {
         "action": "AGENT_EXIT",
         "case_id": "case_006_false_flag_demo",
-        "entry_sha256": "79acd61cd73c71dd2030dbda3046761d92d84004674873339e51f18f60453cc6",
+        "entry_sha256": "c91f6cac63462df3a5249352df86047e1a6fb497e4555a4e6f78fcd226b181cf",
         "inputs_summary": {
           "verdict": "MALICIOUS_INTENT_DETECTED"
         },
@@ -164,26 +172,26 @@
           "exit_code": "1"
         },
         "seq": 7,
-        "timestamp": "2026-07-05T15:27:37.713370+00:00",
+        "timestamp": "2026-07-06T01:30:24.793112+00:00",
         "tool": "vigia_agent"
       }
     ],
-    "start_time": "2026-07-05T15:27:37.709845+00:00",
+    "start_time": "2026-07-06T01:30:24.437910+00:00",
     "total_entries": 7
   },
   "case_id": "case_006_false_flag_demo",
   "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/case_006_false_flag_demo.json",
-  "evidence_sha256": "1b9c4b2198f594d98b333d7a559810e9ab4da3721f3cbb277439e8bcd8c77201",
+  "evidence_sha256": "6eb5654f49cff18b00aea3d7d4f9908fa8c4aa37a8d94368eb93f51dc760b11a",
   "iterations_executed": 1,
-  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE case_006_false_flag_demo ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/case_006_false_flag_demo.json\nEvidence SHA-256: 1b9c4b2198f594d98b333d7a559810e9ab4da3721f3cbb277439e8bcd8c77201\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 0\nConclusive: NO \u2014 requires human review\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 4 se\u00f1al(es): 4 primaria(s) de ['unknown'], 0 derivada(s)/no-analizada(s). Top z: unknown=0.00, unknown=0.00, unknown=0.00.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: MALICIOUS_INTENT_DETECTED. Conclusiva: no \u2014 requiere revisi\u00f3n humana.\n\nRazonamiento del motor abductivo:\nIntrusion with deliberate false flag. The attacker left traces designed to attribute the attack to a known Russian APT group. VIG\u00cdA must detect the incoherence of intent.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [unknown] z=0.000 conf=0.50 \u2014 \n  [unknown] z=0.000 conf=0.50 \u2014 \n  [unknown] z=0.000 conf=0.50 \u2014 \n  [unknown] z=0.000 conf=0.50 \u2014 \n\n--- FINAL ALERT LEVEL ---\nMEDIUM \u2014 MALICE verdict from posterior aggregation. Individual z-scores below threshold. Full signal review recommended. Alert floored (B-028/B-065).\nReconciliation: verdict MALICE rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 4 | Derived: 0 | Total: 4",
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE case_006_false_flag_demo ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/case_006_false_flag_demo.json\nEvidence SHA-256: 6eb5654f49cff18b00aea3d7d4f9908fa8c4aa37a8d94368eb93f51dc760b11a\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 19/25\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 4 se\u00f1al(es): 4 primaria(s) de ['unknown'], 0 derivada(s)/no-analizada(s). Top z: unknown=0.00, unknown=0.00, unknown=0.00.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: MALICIOUS_INTENT_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nIntrusion with deliberate false flag. The attacker left traces designed to attribute the attack to a known Russian APT group. VIG\u00cdA must detect the incoherence of intent.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [unknown] z=0.000 conf=0.50 \u2014 \n  [unknown] z=0.000 conf=0.50 \u2014 \n  [unknown] z=0.000 conf=0.50 \u2014 \n  [unknown] z=0.000 conf=0.50 \u2014 \n\n--- FINAL ALERT LEVEL ---\nHIGH \u2014 MALICE verdict from Bayesian posterior aggregation. Individual z-scores below threshold (distributed evidence pattern: no single dominant signal, but aggregate posterior is decisive). Alert floored (B-028/B-065).\nReconciliation: verdict MALICE rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 4 | Derived: 0 | Total: 4",
   "pipeline_results": {
     "abduction": {
       "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
-      "best_posterior": "0",
+      "best_posterior": "19/25",
       "confidence": {
         "__fraction__": true,
-        "den": 1,
-        "num": 0
+        "den": 25,
+        "num": 19
       },
       "devil_advocate": {
         "aggregation": {
@@ -195,7 +203,7 @@
           "primary_alternative_hypothesis": null
         },
         "decision_context": {
-          "confidence": "0",
+          "confidence": "19/25",
           "mapped_verdict": "MALICIOUS_INTENT_DETECTED",
           "raw_verdict": "MALICIOUS_INTENT_DETECTED",
           "score": "0"
@@ -209,14 +217,22 @@
         "pattern_evidence_gaps": [],
         "version": "r7-da-v1"
       },
-      "is_conclusive": false,
+      "is_conclusive": true,
       "narrative": "Intrusion with deliberate false flag. The attacker left traces designed to attribute the attack to a known Russian APT group. VIG\u00cdA must detect the incoherence of intent."
     },
     "case_id": "VIGIA-2026-DEMO-004",
     "pipeline_meta": {
       "artifact_count": 4,
       "avg_score": "0",
+      "ebs_adapter_mode": "motor",
       "expected_verdict": "MALICE",
+      "resolve": {
+        "motor_confidence": "0.76",
+        "motor_reason": "Intent score 0.3804 exceeds MALICE threshold (P2+acq_assurance scale, threshold=0.33)",
+        "motor_score": "0.3804",
+        "motor_verdict": "MALICE",
+        "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+      },
       "source": "ebs_v1_json_adapter"
     },
     "signals": [

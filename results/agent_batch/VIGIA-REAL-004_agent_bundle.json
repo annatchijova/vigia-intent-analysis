@@ -1,15 +1,15 @@
 {
   "agent_verdict": "MALICE",
-  "analysis_timestamp": "2026-07-05T15:27:35.326658+00:00",
+  "analysis_timestamp": "2026-07-06T01:30:04.412016+00:00",
   "audit_trail": {
     "agent_version": "1.0.0-SANS-2026",
     "case_id": "VIGIA-REAL-004",
-    "end_time": "2026-07-05T15:27:35.326666+00:00",
+    "end_time": "2026-07-06T01:30:04.412023+00:00",
     "entries": [
       {
         "action": "AGENT_INITIALIZED",
         "case_id": "VIGIA-REAL-004",
-        "entry_sha256": "f002179c286263bdd48bd252594b30d28a00d21537f1d8b60290bc2dea58bde5",
+        "entry_sha256": "9168eae4a3bf80d69643ee33ef2453f169a151132640f9bb2ac9606c62eaf4ba",
         "inputs_summary": {
           "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
           "case_id": "VIGIA-REAL-004"
@@ -21,13 +21,13 @@
           "agent_version": "1.0.0-SANS-2026"
         },
         "seq": 1,
-        "timestamp": "2026-07-05T15:27:35.322502+00:00",
+        "timestamp": "2026-07-06T01:30:04.051712+00:00",
         "tool": "vigia_agent"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-REAL-004",
-        "entry_sha256": "a8e611e81795b1f837c9a463632f19791d51bf8df1b0b0b4d986da3dfa198960",
+        "entry_sha256": "e6103f460fcd8d4fe978f76abe6b0ca97fc73011eb7e75b66aa691ec25006e13",
         "inputs_summary": {
           "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-REAL-004.json"
         },
@@ -35,13 +35,13 @@
         "note": "Computing SHA-256 of original evidence",
         "outputs_summary": {},
         "seq": 2,
-        "timestamp": "2026-07-05T15:27:35.322641+00:00",
+        "timestamp": "2026-07-06T01:30:04.051796+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-REAL-004",
-        "entry_sha256": "2a29a0982c5adc4e843cca5ea648067b368f989ffb93628ae80961680d606eab",
+        "entry_sha256": "bfd668eaf5779277de179c472a3e76167613e9a4daa55220a70678c88c20ae4c",
         "inputs_summary": {
           "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-REAL-004.json"
         },
@@ -51,13 +51,13 @@
           "sha256": "fe16f56b471237b6aedcc315d6b9e0090315085184717337bb2a69b53cf4ad72"
         },
         "seq": 3,
-        "timestamp": "2026-07-05T15:27:35.322772+00:00",
+        "timestamp": "2026-07-06T01:30:04.051891+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "PIPELINE_EXECUTE",
         "case_id": "VIGIA-REAL-004",
-        "entry_sha256": "66e706176504d16f7aa1e77fe78e9f9cfe5f9a4729cdcd5e42ee2f728dc1c943",
+        "entry_sha256": "6c40945f4cb854433e6db30c708da61f561d8f72b05572f389a1c6da7997c0a7",
         "inputs_summary": {
           "evidence": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-REAL-004.json",
           "iteration": "0",
@@ -67,13 +67,13 @@
         "note": "Executing pipeline \u2014 iteration 0",
         "outputs_summary": {},
         "seq": 4,
-        "timestamp": "2026-07-05T15:27:35.322949+00:00",
+        "timestamp": "2026-07-06T01:30:04.051991+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "PIPELINE_COMPLETE",
         "case_id": "VIGIA-REAL-004",
-        "entry_sha256": "62284d809ef7d81a08344c9071e1c2c568e92b5a4440e28ccca9b7ab808002ae",
+        "entry_sha256": "7bc1f37916156ebab65262ad68fb4ef35c075e9d4c27ad145de3011a88ad5145",
         "inputs_summary": {
           "iteration": "0"
         },
@@ -82,16 +82,24 @@
         "outputs_summary": {
           "abduction": {
             "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
-            "best_posterior": "0",
-            "confidence": "0",
-            "is_conclusive": "False",
+            "best_posterior": "87/100",
+            "confidence": "87/100",
+            "is_conclusive": "True",
             "narrative": "A user downloaded what they believed was the SysInternals Suite but was actually a malware downloader. The system became slow and unresponsive after execution. The malware modified the hosts file, dow..."
           },
           "case_id": "VIGIA-REAL-004",
           "pipeline_meta": {
             "artifact_count": "4",
             "avg_score": "0",
+            "ebs_adapter_mode": "motor",
             "expected_verdict": "MALICE",
+            "resolve": {
+              "motor_confidence": "0.87",
+              "motor_reason": "Intent score 0.4334 exceeds MALICE threshold (P2+acq_assurance scale, threshold=0.33)",
+              "motor_score": "0.4334",
+              "motor_verdict": "MALICE",
+              "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+            },
             "source": "ebs_v1_json_adapter"
           },
           "signals": [
@@ -130,13 +138,13 @@
           ]
         },
         "seq": 5,
-        "timestamp": "2026-07-05T15:27:35.325741+00:00",
+        "timestamp": "2026-07-06T01:30:04.411526+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "CONTRADICTION_CHECK",
         "case_id": "VIGIA-REAL-004",
-        "entry_sha256": "e70a05b24b0f212a519a38a8875d65ef298e03b7053aed79bda7000ff2995e88",
+        "entry_sha256": "fba16db2917155c6c46b1074aaa61d031c6b39c2bddceb0dbb0500dca407df88",
         "inputs_summary": {
           "n_signals": "4"
         },
@@ -147,13 +155,13 @@
           "threshold": "2"
         },
         "seq": 6,
-        "timestamp": "2026-07-05T15:27:35.325875+00:00",
+        "timestamp": "2026-07-06T01:30:04.411637+00:00",
         "tool": "contradiction_detector"
       },
       {
         "action": "AGENT_EXIT",
         "case_id": "VIGIA-REAL-004",
-        "entry_sha256": "e6dfe6ab6c61f7ed4e54b31700cf7cdf6bd517346f9d6e766acb23cf487d1903",
+        "entry_sha256": "d0b103673324f3af3723067fcbe7f6119a46dadc617255a502219e1d8bde3dad",
         "inputs_summary": {
           "verdict": "MALICIOUS_INTENT_DETECTED"
         },
@@ -164,26 +172,26 @@
           "exit_code": "1"
         },
         "seq": 7,
-        "timestamp": "2026-07-05T15:27:35.326142+00:00",
+        "timestamp": "2026-07-06T01:30:04.411834+00:00",
         "tool": "vigia_agent"
       }
     ],
-    "start_time": "2026-07-05T15:27:35.322200+00:00",
+    "start_time": "2026-07-06T01:30:04.051489+00:00",
     "total_entries": 7
   },
   "case_id": "VIGIA-REAL-004",
   "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-REAL-004.json",
   "evidence_sha256": "fe16f56b471237b6aedcc315d6b9e0090315085184717337bb2a69b53cf4ad72",
   "iterations_executed": 1,
-  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-REAL-004 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/VIGIA-REAL-004.json\nEvidence SHA-256: fe16f56b471237b6aedcc315d6b9e0090315085184717337bb2a69b53cf4ad72\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 0\nConclusive: NO \u2014 requires human review\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 4 se\u00f1al(es): 4 primaria(s) de ['unknown'], 0 derivada(s)/no-analizada(s). Top z: unknown=0.00, unknown=0.00, unknown=0.00.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: MALICIOUS_INTENT_DETECTED. Conclusiva: no \u2014 requiere revisi\u00f3n humana.\n\nRazonamiento del motor abductivo:\nA user downloaded what they believed was the SysInternals Suite but was actually a malware downloader. The system became slow and unresponsive after execution. The malware modified the hosts file, downloaded a secondary payload, and installed it as a fake Windows service.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [unknown] z=0.000 conf=0.50 \u2014 \n  [unknown] z=0.000 conf=0.50 \u2014 \n  [unknown] z=0.000 conf=0.50 \u2014 \n  [unknown] z=0.000 conf=0.50 \u2014 \n\n--- FINAL ALERT LEVEL ---\nMEDIUM \u2014 MALICE verdict from posterior aggregation. Individual z-scores below threshold. Full signal review recommended. Alert floored (B-028/B-065).\nReconciliation: verdict MALICE rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 4 | Derived: 0 | Total: 4",
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-REAL-004 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/VIGIA-REAL-004.json\nEvidence SHA-256: fe16f56b471237b6aedcc315d6b9e0090315085184717337bb2a69b53cf4ad72\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 87/100\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 4 se\u00f1al(es): 4 primaria(s) de ['unknown'], 0 derivada(s)/no-analizada(s). Top z: unknown=0.00, unknown=0.00, unknown=0.00.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: MALICIOUS_INTENT_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nA user downloaded what they believed was the SysInternals Suite but was actually a malware downloader. The system became slow and unresponsive after execution. The malware modified the hosts file, downloaded a secondary payload, and installed it as a fake Windows service.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [unknown] z=0.000 conf=0.50 \u2014 \n  [unknown] z=0.000 conf=0.50 \u2014 \n  [unknown] z=0.000 conf=0.50 \u2014 \n  [unknown] z=0.000 conf=0.50 \u2014 \n\n--- FINAL ALERT LEVEL ---\nHIGH \u2014 MALICE verdict from Bayesian posterior aggregation. Individual z-scores below threshold (distributed evidence pattern: no single dominant signal, but aggregate posterior is decisive). Alert floored (B-028/B-065).\nReconciliation: verdict MALICE rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 4 | Derived: 0 | Total: 4",
   "pipeline_results": {
     "abduction": {
       "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
-      "best_posterior": "0",
+      "best_posterior": "87/100",
       "confidence": {
         "__fraction__": true,
-        "den": 1,
-        "num": 0
+        "den": 100,
+        "num": 87
       },
       "devil_advocate": {
         "aggregation": {
@@ -195,7 +203,7 @@
           "primary_alternative_hypothesis": null
         },
         "decision_context": {
-          "confidence": "0",
+          "confidence": "87/100",
           "mapped_verdict": "MALICIOUS_INTENT_DETECTED",
           "raw_verdict": "MALICIOUS_INTENT_DETECTED",
           "score": "0"
@@ -209,14 +217,22 @@
         "pattern_evidence_gaps": [],
         "version": "r7-da-v1"
       },
-      "is_conclusive": false,
+      "is_conclusive": true,
       "narrative": "A user downloaded what they believed was the SysInternals Suite but was actually a malware downloader. The system became slow and unresponsive after execution. The malware modified the hosts file, downloaded a secondary payload, and installed it as a fake Windows service."
     },
     "case_id": "VIGIA-REAL-004",
     "pipeline_meta": {
       "artifact_count": 4,
       "avg_score": "0",
+      "ebs_adapter_mode": "motor",
       "expected_verdict": "MALICE",
+      "resolve": {
+        "motor_confidence": "0.87",
+        "motor_reason": "Intent score 0.4334 exceeds MALICE threshold (P2+acq_assurance scale, threshold=0.33)",
+        "motor_score": "0.4334",
+        "motor_verdict": "MALICE",
+        "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+      },
       "source": "ebs_v1_json_adapter"
     },
     "signals": [

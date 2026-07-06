@@ -1,15 +1,15 @@
 {
   "agent_verdict": "MALICE",
-  "analysis_timestamp": "2026-07-05T15:27:41.780875+00:00",
+  "analysis_timestamp": "2026-07-06T01:30:59.197151+00:00",
   "audit_trail": {
     "agent_version": "1.0.0-SANS-2026",
     "case_id": "VIGIA-CAN-030",
-    "end_time": "2026-07-05T15:27:41.780882+00:00",
+    "end_time": "2026-07-06T01:30:59.197158+00:00",
     "entries": [
       {
         "action": "AGENT_INITIALIZED",
         "case_id": "VIGIA-CAN-030",
-        "entry_sha256": "4960fc9840c927359adfbfe071c46e248a1f8d7c88be44531b481bdc03a0e702",
+        "entry_sha256": "53877629a2c3744931d7261b6394c7b1519805c2e2918b005bbe570f2b68fd5f",
         "inputs_summary": {
           "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
           "case_id": "VIGIA-CAN-030"
@@ -21,13 +21,13 @@
           "agent_version": "1.0.0-SANS-2026"
         },
         "seq": 1,
-        "timestamp": "2026-07-05T15:27:41.777295+00:00",
+        "timestamp": "2026-07-06T01:30:58.844288+00:00",
         "tool": "vigia_agent"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-CAN-030",
-        "entry_sha256": "e4270ea94b3cef12d1db5fb5521a14863a7264ae8f04f6bd1198cc3bad07b20d",
+        "entry_sha256": "8538cf452f05e9ab644dc11f41a45b3ddbdfeea981e7cb296bb79f0089af3859",
         "inputs_summary": {
           "path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-030.json"
         },
@@ -35,29 +35,29 @@
         "note": "Computing SHA-256 of original evidence",
         "outputs_summary": {},
         "seq": 2,
-        "timestamp": "2026-07-05T15:27:41.777382+00:00",
+        "timestamp": "2026-07-06T01:30:58.844375+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-CAN-030",
-        "entry_sha256": "3c39c3b2eb86ed19b1277795a4bb29216b4b8577c6a802c0825af3b457f8ec88",
+        "entry_sha256": "652ef203fe2b7e33ab57851bc346e5ceb5d9119bbcdd6d1e3c68c9ca1d7f7f84",
         "inputs_summary": {
           "path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-030.json"
         },
         "iteration": 0,
-        "note": "Evidence verified: 96206180875b8ad3...",
+        "note": "Evidence verified: 118804c24d020b82...",
         "outputs_summary": {
-          "sha256": "96206180875b8ad361d4c59cc23759de6aa798c96e3516aa5643312e77adc741"
+          "sha256": "118804c24d020b829ffb38fdddf107c32979325e10a2e522397071ffd965286c"
         },
         "seq": 3,
-        "timestamp": "2026-07-05T15:27:41.777489+00:00",
+        "timestamp": "2026-07-06T01:30:58.844546+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "PIPELINE_EXECUTE",
         "case_id": "VIGIA-CAN-030",
-        "entry_sha256": "800b06263134348bc3c70d1622661072b3c03221b419f301615c88caa49bafda",
+        "entry_sha256": "77dcb36f62d6741693559478804f52ce6f31c93336202db8701c2257830d253d",
         "inputs_summary": {
           "evidence": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-030.json",
           "iteration": "0",
@@ -67,13 +67,13 @@
         "note": "Executing pipeline \u2014 iteration 0",
         "outputs_summary": {},
         "seq": 4,
-        "timestamp": "2026-07-05T15:27:41.777594+00:00",
+        "timestamp": "2026-07-06T01:30:58.844655+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "PIPELINE_COMPLETE",
         "case_id": "VIGIA-CAN-030",
-        "entry_sha256": "650a2878daf415362e48736996093d51c1af214640343da80caee3228bbffafd",
+        "entry_sha256": "1ccb8881c861db9fc34cc3da8f176ca25e5038cd5adfade060eb1935ca653538",
         "inputs_summary": {
           "iteration": "0"
         },
@@ -82,16 +82,24 @@
         "outputs_summary": {
           "abduction": {
             "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
-            "best_posterior": "1433/40000",
-            "confidence": "1433/40000",
-            "is_conclusive": "False",
+            "best_posterior": "89/100",
+            "confidence": "89/100",
+            "is_conclusive": "True",
             "narrative": "20 tickets in 90 seconds from different accounts: 'Can't access mail', 'Were we hacked?'. O365 confirms normal access for all. 18/20 tickets share an identical punctuation pattern. Ransomware active o..."
           },
           "case_id": "case_112_sincronizacion_panico_semantico",
           "pipeline_meta": {
             "artifact_count": "4",
             "avg_score": "1433/8000",
+            "ebs_adapter_mode": "motor",
             "expected_verdict": "MALICE",
+            "resolve": {
+              "motor_confidence": "0.89",
+              "motor_reason": "Intent score 0.4444 exceeds MALICE threshold (P2+acq_assurance scale, threshold=0.33)",
+              "motor_score": "0.4444",
+              "motor_verdict": "MALICE",
+              "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+            },
             "source": "ebs_v1_json_adapter"
           },
           "signals": [
@@ -130,13 +138,13 @@
           ]
         },
         "seq": 5,
-        "timestamp": "2026-07-05T15:27:41.780118+00:00",
+        "timestamp": "2026-07-06T01:30:59.196633+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "CONTRADICTION_CHECK",
         "case_id": "VIGIA-CAN-030",
-        "entry_sha256": "0eadec6b1f84aef46e61b7250734998da5dc88b94adc5df1e1fed818567f88de",
+        "entry_sha256": "bba2e0f9f61176190faf725ac657c6bba7d69440fc1f49551f2d957626b6aa53",
         "inputs_summary": {
           "n_signals": "4"
         },
@@ -147,13 +155,13 @@
           "threshold": "2"
         },
         "seq": 6,
-        "timestamp": "2026-07-05T15:27:41.780222+00:00",
+        "timestamp": "2026-07-06T01:30:59.196750+00:00",
         "tool": "contradiction_detector"
       },
       {
         "action": "AGENT_EXIT",
         "case_id": "VIGIA-CAN-030",
-        "entry_sha256": "acadcf2b74b43bfcb23ed60318a21a96772bbfc7cc8edd71ee1488aac9dee2b0",
+        "entry_sha256": "b688e836c3dde9ae0155c58e1c39d223b34d1d30094cd245a4a1bdec2306399b",
         "inputs_summary": {
           "verdict": "MALICIOUS_INTENT_DETECTED"
         },
@@ -164,26 +172,26 @@
           "exit_code": "1"
         },
         "seq": 7,
-        "timestamp": "2026-07-05T15:27:41.780411+00:00",
+        "timestamp": "2026-07-06T01:30:59.196962+00:00",
         "tool": "vigia_agent"
       }
     ],
-    "start_time": "2026-07-05T15:27:41.777068+00:00",
+    "start_time": "2026-07-06T01:30:58.844073+00:00",
     "total_entries": 7
   },
   "case_id": "VIGIA-CAN-030",
   "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-030.json",
-  "evidence_sha256": "96206180875b8ad361d4c59cc23759de6aa798c96e3516aa5643312e77adc741",
+  "evidence_sha256": "118804c24d020b829ffb38fdddf107c32979325e10a2e522397071ffd965286c",
   "iterations_executed": 1,
-  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-CAN-030 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-030.json\nEvidence SHA-256: 96206180875b8ad361d4c59cc23759de6aa798c96e3516aa5643312e77adc741\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 1433/40000\nConclusive: NO \u2014 requires human review\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 4 se\u00f1al(es): 4 primaria(s) de ['sift_linguistic', 'sift_o365_audit', 'sift_ticket_system', 'sift_volatility'], 0 derivada(s)/no-analizada(s). Top z: O365 logs: 20 reporting accounts have a =0.29, 20 tickets in a 90-second window from di=0.24, Stylometric analysis: 18/20 tickets shar=0.14.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: MALICIOUS_INTENT_DETECTED. Conclusiva: no \u2014 requiere revisi\u00f3n humana.\n\nRazonamiento del motor abductivo:\n20 tickets in 90 seconds from different accounts: 'Can't access mail', 'Were we hacked?'. O365 confirms normal access for all. 18/20 tickets share an identical punctuation pattern. Ransomware active on the file server simultaneously.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [O365 logs: 20 reporting accounts have a successful login in the last h] z=0.292 conf=0.45 \u2014 \n  [20 tickets in a 90-second window from different accounts. Common phras] z=0.240 conf=0.30 \u2014 \n  [Stylometric analysis: 18/20 tickets share an identical punctuation pat] z=0.137 conf=0.15 \u2014 \n  [During the semantic panic window: ransomware.exe active on file server] z=0.048 conf=0.95 \u2014 \n\n--- FINAL ALERT LEVEL ---\nMEDIUM \u2014 MALICE verdict from posterior aggregation. Individual z-scores below threshold. Full signal review recommended. Alert floored (B-028/B-065).\nReconciliation: verdict MALICE rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 4 | Derived: 0 | Total: 4",
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-CAN-030 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-030.json\nEvidence SHA-256: 118804c24d020b829ffb38fdddf107c32979325e10a2e522397071ffd965286c\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 89/100\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 4 se\u00f1al(es): 4 primaria(s) de ['sift_linguistic', 'sift_o365_audit', 'sift_ticket_system', 'sift_volatility'], 0 derivada(s)/no-analizada(s). Top z: O365 logs: 20 reporting accounts have a =0.29, 20 tickets in a 90-second window from di=0.24, Stylometric analysis: 18/20 tickets shar=0.14.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: MALICIOUS_INTENT_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\n20 tickets in 90 seconds from different accounts: 'Can't access mail', 'Were we hacked?'. O365 confirms normal access for all. 18/20 tickets share an identical punctuation pattern. Ransomware active on the file server simultaneously.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [O365 logs: 20 reporting accounts have a successful login in the last h] z=0.292 conf=0.45 \u2014 \n  [20 tickets in a 90-second window from different accounts. Common phras] z=0.240 conf=0.30 \u2014 \n  [Stylometric analysis: 18/20 tickets share an identical punctuation pat] z=0.137 conf=0.15 \u2014 \n  [During the semantic panic window: ransomware.exe active on file server] z=0.048 conf=0.95 \u2014 \n\n--- FINAL ALERT LEVEL ---\nHIGH \u2014 MALICE verdict from Bayesian posterior aggregation. Individual z-scores below threshold (distributed evidence pattern: no single dominant signal, but aggregate posterior is decisive). Alert floored (B-028/B-065).\nReconciliation: verdict MALICE rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 4 | Derived: 0 | Total: 4",
   "pipeline_results": {
     "abduction": {
       "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
-      "best_posterior": "1433/40000",
+      "best_posterior": "89/100",
       "confidence": {
         "__fraction__": true,
-        "den": 40000,
-        "num": 1433
+        "den": 100,
+        "num": 89
       },
       "devil_advocate": {
         "aggregation": {
@@ -195,7 +203,7 @@
           "primary_alternative_hypothesis": null
         },
         "decision_context": {
-          "confidence": "1433/40000",
+          "confidence": "89/100",
           "mapped_verdict": "MALICIOUS_INTENT_DETECTED",
           "raw_verdict": "MALICIOUS_INTENT_DETECTED",
           "score": "1433/8000"
@@ -209,14 +217,22 @@
         "pattern_evidence_gaps": [],
         "version": "r7-da-v1"
       },
-      "is_conclusive": false,
+      "is_conclusive": true,
       "narrative": "20 tickets in 90 seconds from different accounts: 'Can't access mail', 'Were we hacked?'. O365 confirms normal access for all. 18/20 tickets share an identical punctuation pattern. Ransomware active on the file server simultaneously."
     },
     "case_id": "case_112_sincronizacion_panico_semantico",
     "pipeline_meta": {
       "artifact_count": 4,
       "avg_score": "1433/8000",
+      "ebs_adapter_mode": "motor",
       "expected_verdict": "MALICE",
+      "resolve": {
+        "motor_confidence": "0.89",
+        "motor_reason": "Intent score 0.4444 exceeds MALICE threshold (P2+acq_assurance scale, threshold=0.33)",
+        "motor_score": "0.4444",
+        "motor_verdict": "MALICE",
+        "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+      },
       "source": "ebs_v1_json_adapter"
     },
     "signals": [

@@ -1,15 +1,15 @@
 {
-  "agent_verdict": "INTENT",
-  "analysis_timestamp": "2026-07-05T15:27:36.945402+00:00",
+  "agent_verdict": "MALICE",
+  "analysis_timestamp": "2026-07-06T01:30:18.556365+00:00",
   "audit_trail": {
     "agent_version": "1.0.0-SANS-2026",
     "case_id": "VIGIA-TUCK-2019",
-    "end_time": "2026-07-05T15:27:36.945407+00:00",
+    "end_time": "2026-07-06T01:30:18.556372+00:00",
     "entries": [
       {
         "action": "AGENT_INITIALIZED",
         "case_id": "VIGIA-TUCK-2019",
-        "entry_sha256": "1b1a17e959c4c01c754a84fe18d1ffb29681365961106fdb2bb6ee0133ffe0e3",
+        "entry_sha256": "b7d97a0cd3f8bd46243cfc7d28f48df4151facdffb54bb7a2f1731b0ae168353",
         "inputs_summary": {
           "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
           "case_id": "VIGIA-TUCK-2019"
@@ -21,13 +21,13 @@
           "agent_version": "1.0.0-SANS-2026"
         },
         "seq": 1,
-        "timestamp": "2026-07-05T15:27:36.942098+00:00",
+        "timestamp": "2026-07-06T01:30:18.214791+00:00",
         "tool": "vigia_agent"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-TUCK-2019",
-        "entry_sha256": "b5bdd5d976bdf8157d972d8942fd8325ea58b30e576c5f1cbffa2301c82b0a05",
+        "entry_sha256": "1d39060b8f7e60489b2c89e10113e6661bb33b972f65a51c0e83edd651a7faaf",
         "inputs_summary": {
           "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-TUCK-2019.json"
         },
@@ -35,29 +35,29 @@
         "note": "Computing SHA-256 of original evidence",
         "outputs_summary": {},
         "seq": 2,
-        "timestamp": "2026-07-05T15:27:36.942183+00:00",
+        "timestamp": "2026-07-06T01:30:18.214875+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-TUCK-2019",
-        "entry_sha256": "d74d90893841f40cdee5a214a339f85e2660e029766f09ace3391596a6601832",
+        "entry_sha256": "ed423257eb13b13c820e442ccb954af004dafd8d268902da5c3d94d027ac1984",
         "inputs_summary": {
           "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-TUCK-2019.json"
         },
         "iteration": 0,
-        "note": "Evidence verified: bac1377afd998cc8...",
+        "note": "Evidence verified: ebad5de5bffccd49...",
         "outputs_summary": {
-          "sha256": "bac1377afd998cc8460d19aa66972dae2b1bff61ae3fa338472efa85a12d202a"
+          "sha256": "ebad5de5bffccd49deb47f58cc0055363a6b374f521c0b923d7a756a1d1d9946"
         },
         "seq": 3,
-        "timestamp": "2026-07-05T15:27:36.942286+00:00",
+        "timestamp": "2026-07-06T01:30:18.214982+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "PIPELINE_EXECUTE",
         "case_id": "VIGIA-TUCK-2019",
-        "entry_sha256": "ab8fb6ff0069d60a0ddb1fcbeb093d8dd9d2166cd551d465b5a92505494ce07d",
+        "entry_sha256": "3d888f6b1fdad465af965ec29f576f514410bff7d40eccf348a350be967dc2c8",
         "inputs_summary": {
           "evidence": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-TUCK-2019.json",
           "iteration": "0",
@@ -67,13 +67,13 @@
         "note": "Executing pipeline \u2014 iteration 0",
         "outputs_summary": {},
         "seq": 4,
-        "timestamp": "2026-07-05T15:27:36.942392+00:00",
+        "timestamp": "2026-07-06T01:30:18.215085+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "PIPELINE_COMPLETE",
         "case_id": "VIGIA-TUCK-2019",
-        "entry_sha256": "76c9c33e928db70127dd2eeb7c7ba32495f394eebbf8bc28c28ac58940208062",
+        "entry_sha256": "1914e81d4215261ad5b6d879717b62e58bff7a2efdaaa1cd8330434cc109ddb1",
         "inputs_summary": {
           "iteration": "0"
         },
@@ -81,9 +81,9 @@
         "note": "Pipeline completed \u2014 5 signals",
         "outputs_summary": {
           "abduction": {
-            "best_hypothesis": "INTENT_DETECTED",
-            "best_posterior": "18181/125000",
-            "confidence": "18181/125000",
+            "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+            "best_posterior": "69/100",
+            "confidence": "69/100",
             "is_conclusive": "True",
             "narrative": "macOS APFS laptop of suspect tuckgorge (Digital Corpora 2019, examiner Simson Garfinkel). Five signal clusters converge on eco-terrorism planning trajectory: (1) sustained ELF/ALF radicalization resea..."
           },
@@ -91,7 +91,15 @@
           "pipeline_meta": {
             "artifact_count": "5",
             "avg_score": "18181/25000",
+            "ebs_adapter_mode": "motor",
             "expected_verdict": "INTENT",
+            "resolve": {
+              "motor_confidence": "0.69",
+              "motor_reason": "Intent score 0.3445 exceeds MALICE threshold (P2+acq_assurance scale, threshold=0.33)",
+              "motor_score": "0.3445",
+              "motor_verdict": "MALICE",
+              "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+            },
             "source": "ebs_v1_json_adapter"
           },
           "signals": [
@@ -138,13 +146,13 @@
           ]
         },
         "seq": 5,
-        "timestamp": "2026-07-05T15:27:36.945037+00:00",
+        "timestamp": "2026-07-06T01:30:18.555843+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "CONTRADICTION_CHECK",
         "case_id": "VIGIA-TUCK-2019",
-        "entry_sha256": "7bc8425b72688bb917c69688d182ef6960e29ce3891bc6d8eee4cb92ce1f7005",
+        "entry_sha256": "626db550bdd8d960d783d67086b2404912c576ec346ee07266e55136292fc550",
         "inputs_summary": {
           "n_signals": "5"
         },
@@ -155,43 +163,67 @@
           "threshold": "2"
         },
         "seq": 6,
-        "timestamp": "2026-07-05T15:27:36.945159+00:00",
+        "timestamp": "2026-07-06T01:30:18.555977+00:00",
         "tool": "contradiction_detector"
       },
       {
         "action": "AGENT_EXIT",
         "case_id": "VIGIA-TUCK-2019",
-        "entry_sha256": "17f48b5016623e0aefde90a3ce29fb40509aa6460852be7dcc5f83696e28716e",
+        "entry_sha256": "537a0a3832764e36e159e4c766de753ef0a52dab8181737edc01516446667cc5",
         "inputs_summary": {
-          "verdict": "INTENT_DETECTED"
+          "verdict": "MALICIOUS_INTENT_DETECTED"
         },
         "iteration": 0,
-        "note": "Exit code 3 (INTENT) \u2014 analysis complete.",
+        "note": "Exit code 1 (MALICE) \u2014 analysis complete.",
         "outputs_summary": {
-          "agent_verdict": "INTENT",
-          "exit_code": "3"
+          "agent_verdict": "MALICE",
+          "exit_code": "1"
         },
         "seq": 7,
-        "timestamp": "2026-07-05T15:27:36.945352+00:00",
+        "timestamp": "2026-07-06T01:30:18.556187+00:00",
         "tool": "vigia_agent"
       }
     ],
-    "start_time": "2026-07-05T15:27:36.941872+00:00",
+    "start_time": "2026-07-06T01:30:18.214572+00:00",
     "total_entries": 7
   },
   "case_id": "VIGIA-TUCK-2019",
   "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-TUCK-2019.json",
-  "evidence_sha256": "bac1377afd998cc8460d19aa66972dae2b1bff61ae3fa338472efa85a12d202a",
+  "evidence_sha256": "ebad5de5bffccd49deb47f58cc0055363a6b374f521c0b923d7a756a1d1d9946",
   "iterations_executed": 1,
-  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-TUCK-2019 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/VIGIA-TUCK-2019.json\nEvidence SHA-256: bac1377afd998cc8460d19aa66972dae2b1bff61ae3fa338472efa85a12d202a\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: INTENT_DETECTED\nPosterior confidence: 18181/125000\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 5 se\u00f1al(es): 5 primaria(s) de ['read_evidence', 'search_pattern'], 0 derivada(s)/no-analizada(s). Top z: Chrome History (sqlite3): Oct 18 2019 21=0.81, Documents/[FBI eco-terror article].pdf \u2014=0.77, Safari History.db: Oct 18 2019 00:53 'vp=0.72.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: INTENT_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nmacOS APFS laptop of suspect tuckgorge (Digital Corpora 2019, examiner Simson Garfinkel). Five signal clusters converge on eco-terrorism planning trajectory: (1) sustained ELF/ALF radicalization research campaign Jul-Aug 2019 (NYT ELF arson clip, 133MB Intercept FBI eco-terror article, climate/earthquake PDFs, Earth Day webarchive); (2) curated arson imagery folder 'Good Start Photos' containing Quinn's Crossing ELF arson photograph and fire-themed 'Setting Fires' music video screenshots; (3) se\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Chrome History (sqlite3): Oct 18 2019 21:01 'nitrogen fertilizer' sear] z=0.810 conf=0.92 \u2014 \n  [Documents/[FBI eco-terror article].pdf \u2014 The Intercept, March 23 2019,] z=0.765 conf=0.90 \u2014 \n  [Safari History.db: Oct 18 2019 00:53 'vpn software that runs over http] z=0.722 conf=0.88 \u2014 \n  [Documents/Good Start Photos/04home.600.jpg \u2014 photojournalism image of ] z=0.680 conf=0.85 \u2014 \n  [Documents/Clips/Ecoterrorism Suspected in House Fires in Seattle Subur] z=0.660 conf=0.88 \u2014 \n\n--- FINAL ALERT LEVEL ---\nMEDIUM \u2014 INTENT verdict with individual z-scores below threshold. Alert floored (B-028/B-065): an intent finding cannot present as LOW.\nReconciliation: verdict INTENT rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 5 | Derived: 0 | Total: 5",
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-TUCK-2019 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/VIGIA-TUCK-2019.json\nEvidence SHA-256: ebad5de5bffccd49deb47f58cc0055363a6b374f521c0b923d7a756a1d1d9946\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 69/100\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 5 se\u00f1al(es): 5 primaria(s) de ['read_evidence', 'search_pattern'], 0 derivada(s)/no-analizada(s). Top z: Chrome History (sqlite3): Oct 18 2019 21=0.81, Documents/[FBI eco-terror article].pdf \u2014=0.77, Safari History.db: Oct 18 2019 00:53 'vp=0.72.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: MALICIOUS_INTENT_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nmacOS APFS laptop of suspect tuckgorge (Digital Corpora 2019, examiner Simson Garfinkel). Five signal clusters converge on eco-terrorism planning trajectory: (1) sustained ELF/ALF radicalization research campaign Jul-Aug 2019 (NYT ELF arson clip, 133MB Intercept FBI eco-terror article, climate/earthquake PDFs, Earth Day webarchive); (2) curated arson imagery folder 'Good Start Photos' containing Quinn's Crossing ELF arson photograph and fire-themed 'Setting Fires' music video screenshots; (3) se\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Chrome History (sqlite3): Oct 18 2019 21:01 'nitrogen fertilizer' sear] z=0.810 conf=0.92 \u2014 \n  [Documents/[FBI eco-terror article].pdf \u2014 The Intercept, March 23 2019,] z=0.765 conf=0.90 \u2014 \n  [Safari History.db: Oct 18 2019 00:53 'vpn software that runs over http] z=0.722 conf=0.88 \u2014 \n  [Documents/Good Start Photos/04home.600.jpg \u2014 photojournalism image of ] z=0.680 conf=0.85 \u2014 \n  [Documents/Clips/Ecoterrorism Suspected in House Fires in Seattle Subur] z=0.660 conf=0.88 \u2014 \n\n--- FINAL ALERT LEVEL ---\nHIGH \u2014 MALICE verdict from Bayesian posterior aggregation. Individual z-scores below threshold (distributed evidence pattern: no single dominant signal, but aggregate posterior is decisive). Alert floored (B-028/B-065).\nReconciliation: verdict MALICE rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 5 | Derived: 0 | Total: 5",
   "pipeline_results": {
     "abduction": {
-      "best_hypothesis": "INTENT_DETECTED",
-      "best_posterior": "18181/125000",
+      "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+      "best_posterior": "69/100",
       "confidence": {
         "__fraction__": true,
-        "den": 125000,
-        "num": 18181
+        "den": 100,
+        "num": 69
+      },
+      "devil_advocate": {
+        "aggregation": {
+          "k": 3,
+          "method": "top_k_already_validated_matches_v2",
+          "total_gap_mass": "0"
+        },
+        "counterfactual_summary": {
+          "primary_alternative_hypothesis": null
+        },
+        "decision_context": {
+          "confidence": "69/100",
+          "mapped_verdict": "MALICIOUS_INTENT_DETECTED",
+          "raw_verdict": "MALICIOUS_INTENT_DETECTED",
+          "score": "18181/25000"
+        },
+        "devil_advocate_source": "deterministic_no_pattern_data_available",
+        "meta": {
+          "deterministic": true,
+          "generated_from": "case_pattern_library"
+        },
+        "narrative": "Eco's Razor (Abductive Falsification) applied to verdict MALICIOUS_INTENT_DETECTED. Pattern-matching data was not available on this code path \u2014 CasePatternLibrary is not invoked here by design (agent audit-trail mode (vigia_agent.py \u2014 JSON-replay / autonomous path); see KNOWN_LIMITATIONS.md). No structured counter-hypothesis could be derived deterministically. This is a documented scope limitation of the current code path, not an absence of falsification attempt.",
+        "pattern_evidence_gaps": [],
+        "version": "r7-da-v1"
       },
       "is_conclusive": true,
       "narrative": "macOS APFS laptop of suspect tuckgorge (Digital Corpora 2019, examiner Simson Garfinkel). Five signal clusters converge on eco-terrorism planning trajectory: (1) sustained ELF/ALF radicalization research campaign Jul-Aug 2019 (NYT ELF arson clip, 133MB Intercept FBI eco-terror article, climate/earthquake PDFs, Earth Day webarchive); (2) curated arson imagery folder 'Good Start Photos' containing Quinn's Crossing ELF arson photograph and fire-themed 'Setting Fires' music video screenshots; (3) se"
@@ -200,7 +232,15 @@
     "pipeline_meta": {
       "artifact_count": 5,
       "avg_score": "18181/25000",
+      "ebs_adapter_mode": "motor",
       "expected_verdict": "INTENT",
+      "resolve": {
+        "motor_confidence": "0.69",
+        "motor_reason": "Intent score 0.3445 exceeds MALICE threshold (P2+acq_assurance scale, threshold=0.33)",
+        "motor_score": "0.3445",
+        "motor_verdict": "MALICE",
+        "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+      },
       "source": "ebs_v1_json_adapter"
     },
     "signals": [

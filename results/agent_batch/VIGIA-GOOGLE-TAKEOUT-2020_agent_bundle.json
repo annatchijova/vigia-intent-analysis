@@ -1,15 +1,15 @@
 {
   "agent_verdict": "MALICE",
-  "analysis_timestamp": "2026-07-05T15:27:34.227650+00:00",
+  "analysis_timestamp": "2026-07-06T01:29:55.208846+00:00",
   "audit_trail": {
     "agent_version": "1.0.0-SANS-2026",
     "case_id": "VIGIA-GOOGLE-TAKEOUT-2020",
-    "end_time": "2026-07-05T15:27:34.227656+00:00",
+    "end_time": "2026-07-06T01:29:55.208853+00:00",
     "entries": [
       {
         "action": "AGENT_INITIALIZED",
         "case_id": "VIGIA-GOOGLE-TAKEOUT-2020",
-        "entry_sha256": "8cf59548bc24cc84a3916bacd46956c429445f885fc9f1991daa43f0b58a5da3",
+        "entry_sha256": "35f226c51ae219f945ee014caf3d821c39b4120c8a88b6673af0d9902b60efc9",
         "inputs_summary": {
           "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
           "case_id": "VIGIA-GOOGLE-TAKEOUT-2020"
@@ -21,13 +21,13 @@
           "agent_version": "1.0.0-SANS-2026"
         },
         "seq": 1,
-        "timestamp": "2026-07-05T15:27:34.223968+00:00",
+        "timestamp": "2026-07-06T01:29:54.870486+00:00",
         "tool": "vigia_agent"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-GOOGLE-TAKEOUT-2020",
-        "entry_sha256": "21fc58b5595c1b9c38833fa92331a69338f3d38ecefdcfe6ff46d7ead34e866d",
+        "entry_sha256": "0e6996623a0bf311f23ff04a6c7afd1e49b4bab3c03861980dff1cfc52901ccf",
         "inputs_summary": {
           "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-GOOGLE-TAKEOUT-2020.json"
         },
@@ -35,29 +35,29 @@
         "note": "Computing SHA-256 of original evidence",
         "outputs_summary": {},
         "seq": 2,
-        "timestamp": "2026-07-05T15:27:34.224053+00:00",
+        "timestamp": "2026-07-06T01:29:54.870570+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-GOOGLE-TAKEOUT-2020",
-        "entry_sha256": "0ab611c9e2dd843d42565e2aa5b7e7432c648734c8aaaddbd787645feb87879d",
+        "entry_sha256": "b8ead64fa1dabd385d98ef3d0e920a9826d1d37ad165b11ac4e884fb14f2c27b",
         "inputs_summary": {
           "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-GOOGLE-TAKEOUT-2020.json"
         },
         "iteration": 0,
-        "note": "Evidence verified: c312c383450cd9cb...",
+        "note": "Evidence verified: 104531d7360cb623...",
         "outputs_summary": {
-          "sha256": "c312c383450cd9cbdd5e93ecc100b229ec4ab96d359d115fa3d0058532da3d14"
+          "sha256": "104531d7360cb6237558c79b9392b372958c3e05a77d0e3e06f8d83d73c7cc2a"
         },
         "seq": 3,
-        "timestamp": "2026-07-05T15:27:34.224153+00:00",
+        "timestamp": "2026-07-06T01:29:54.870673+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "PIPELINE_EXECUTE",
         "case_id": "VIGIA-GOOGLE-TAKEOUT-2020",
-        "entry_sha256": "1087777603cb1651920264335659322d43a706734db36f8f8cddadab44aac374",
+        "entry_sha256": "b883b722355682a85df2e63bcbe3ddc4b5f9b29b2f4975090d4154d729f58fc3",
         "inputs_summary": {
           "evidence": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-GOOGLE-TAKEOUT-2020.json",
           "iteration": "0",
@@ -67,13 +67,13 @@
         "note": "Executing pipeline \u2014 iteration 0",
         "outputs_summary": {},
         "seq": 4,
-        "timestamp": "2026-07-05T15:27:34.224252+00:00",
+        "timestamp": "2026-07-06T01:29:54.870776+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "PIPELINE_COMPLETE",
         "case_id": "VIGIA-GOOGLE-TAKEOUT-2020",
-        "entry_sha256": "fd9198217c19fe46d8f3ce73da924cfff75dd709ea3a5a4e4a055d3d466a7f31",
+        "entry_sha256": "4728b1deb2e7b6d8dbea23d42a6509e62ae66ff06328a59c7ba1fc33776d9daf",
         "inputs_summary": {
           "iteration": "0"
         },
@@ -82,8 +82,8 @@
         "outputs_summary": {
           "abduction": {
             "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
-            "best_posterior": "42251/250000",
-            "confidence": "42251/250000",
+            "best_posterior": "77/100",
+            "confidence": "77/100",
             "is_conclusive": "True",
             "narrative": "Google Takeout export from Chester Russell (king.chester.802@gmail.com), Champlain College cybersecurity student, Google Pixel 3. Three convergent MALICE clusters: (1) Android exploitation research ca..."
           },
@@ -91,7 +91,15 @@
           "pipeline_meta": {
             "artifact_count": "5",
             "avg_score": "42251/50000",
+            "ebs_adapter_mode": "motor",
             "expected_verdict": "MALICE",
+            "resolve": {
+              "motor_confidence": "0.77",
+              "motor_reason": "Intent score 0.3851 exceeds MALICE threshold (P2+acq_assurance scale, threshold=0.33)",
+              "motor_score": "0.3851",
+              "motor_verdict": "MALICE",
+              "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+            },
             "source": "ebs_v1_json_adapter"
           },
           "signals": [
@@ -138,13 +146,13 @@
           ]
         },
         "seq": 5,
-        "timestamp": "2026-07-05T15:27:34.226863+00:00",
+        "timestamp": "2026-07-06T01:29:55.208310+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "CONTRADICTION_CHECK",
         "case_id": "VIGIA-GOOGLE-TAKEOUT-2020",
-        "entry_sha256": "c05b6e48f1c47b786cfeeeb60d82170578e444795f378ec9894ff5985e05ef56",
+        "entry_sha256": "052018a00497f74224da891f843f991e427445b0d39977d7aca97e6674e598b4",
         "inputs_summary": {
           "n_signals": "5"
         },
@@ -155,13 +163,13 @@
           "threshold": "2"
         },
         "seq": 6,
-        "timestamp": "2026-07-05T15:27:34.226986+00:00",
+        "timestamp": "2026-07-06T01:29:55.208453+00:00",
         "tool": "contradiction_detector"
       },
       {
         "action": "AGENT_EXIT",
         "case_id": "VIGIA-GOOGLE-TAKEOUT-2020",
-        "entry_sha256": "e9ceefe893399115cc0766dfd80099671e565154bc58ab9799746917334283b2",
+        "entry_sha256": "df4b0fbd9bf9daa16d0c1b8e5801332038109a5e14b4d400e66c717683f473a9",
         "inputs_summary": {
           "verdict": "MALICIOUS_INTENT_DETECTED"
         },
@@ -172,26 +180,26 @@
           "exit_code": "1"
         },
         "seq": 7,
-        "timestamp": "2026-07-05T15:27:34.227191+00:00",
+        "timestamp": "2026-07-06T01:29:55.208668+00:00",
         "tool": "vigia_agent"
       }
     ],
-    "start_time": "2026-07-05T15:27:34.223738+00:00",
+    "start_time": "2026-07-06T01:29:54.870252+00:00",
     "total_entries": 7
   },
   "case_id": "VIGIA-GOOGLE-TAKEOUT-2020",
   "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-GOOGLE-TAKEOUT-2020.json",
-  "evidence_sha256": "c312c383450cd9cbdd5e93ecc100b229ec4ab96d359d115fa3d0058532da3d14",
+  "evidence_sha256": "104531d7360cb6237558c79b9392b372958c3e05a77d0e3e06f8d83d73c7cc2a",
   "iterations_executed": 1,
-  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-GOOGLE-TAKEOUT-2020 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/VIGIA-GOOGLE-TAKEOUT-2020.json\nEvidence SHA-256: c312c383450cd9cbdd5e93ecc100b229ec4ab96d359d115fa3d0058532da3d14\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 42251/250000\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 5 se\u00f1al(es): 5 primaria(s) de ['generate_forensic_hash', 'read_evidence'], 0 derivada(s)/no-analizada(s). Top z: Chestnut_CV.exe \u2014 PE32+ executable (cons=0.92, Mail/All mail.mbox (97 emails): Mar 23 1=0.87, 2020 CTF - Takeout.zip: complete Google =0.85.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: MALICIOUS_INTENT_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nGoogle Takeout export from Chester Russell (king.chester.802@gmail.com), Champlain College cybersecurity student, Google Pixel 3. Three convergent MALICE clusters: (1) Android exploitation research campaign starting Jan 25 2020 (Metasploit, Magisk hidden root, system partition modification); (2) pre-travel OPSEC implementation Mar 5-6 (Magisk, camera metadata stripping 'camera app no metadata Android', app encryption) immediately before Norway trip; (3) spear-phishing attack Mar 23 against Warre\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Chestnut_CV.exe \u2014 PE32+ executable (console) x86-64, 26,895,731 bytes,] z=0.921 conf=0.97 \u2014 \n  [Mail/All mail.mbox (97 emails): Mar 23 19:52 \u2014 Chester emailed warrenh] z=0.874 conf=0.95 \u2014 \n  [2020 CTF - Takeout.zip: complete Google account export for king.cheste] z=0.855 conf=0.95 \u2014 \n  [Contacts/All Contacts.vcf: Alan Brunswick listed as 'Mastermind (Alan)] z=0.810 conf=0.92 \u2014 \n  [My Activity/Search and Chrome: Jan 25 2020 \u2014 'how do i hack on an andr] z=0.765 conf=0.90 \u2014 \n\n--- FINAL ALERT LEVEL ---\nHIGH \u2014 MALICE verdict from Bayesian posterior aggregation. Individual z-scores below threshold (distributed evidence pattern: no single dominant signal, but aggregate posterior is decisive). Alert floored (B-028/B-065).\nReconciliation: verdict MALICE rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 5 | Derived: 0 | Total: 5",
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-GOOGLE-TAKEOUT-2020 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/VIGIA-GOOGLE-TAKEOUT-2020.json\nEvidence SHA-256: 104531d7360cb6237558c79b9392b372958c3e05a77d0e3e06f8d83d73c7cc2a\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 77/100\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 5 se\u00f1al(es): 5 primaria(s) de ['generate_forensic_hash', 'read_evidence'], 0 derivada(s)/no-analizada(s). Top z: Chestnut_CV.exe \u2014 PE32+ executable (cons=0.92, Mail/All mail.mbox (97 emails): Mar 23 1=0.87, 2020 CTF - Takeout.zip: complete Google =0.85.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: MALICIOUS_INTENT_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nGoogle Takeout export from Chester Russell (king.chester.802@gmail.com), Champlain College cybersecurity student, Google Pixel 3. Three convergent MALICE clusters: (1) Android exploitation research campaign starting Jan 25 2020 (Metasploit, Magisk hidden root, system partition modification); (2) pre-travel OPSEC implementation Mar 5-6 (Magisk, camera metadata stripping 'camera app no metadata Android', app encryption) immediately before Norway trip; (3) spear-phishing attack Mar 23 against Warre\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Chestnut_CV.exe \u2014 PE32+ executable (console) x86-64, 26,895,731 bytes,] z=0.921 conf=0.97 \u2014 \n  [Mail/All mail.mbox (97 emails): Mar 23 19:52 \u2014 Chester emailed warrenh] z=0.874 conf=0.95 \u2014 \n  [2020 CTF - Takeout.zip: complete Google account export for king.cheste] z=0.855 conf=0.95 \u2014 \n  [Contacts/All Contacts.vcf: Alan Brunswick listed as 'Mastermind (Alan)] z=0.810 conf=0.92 \u2014 \n  [My Activity/Search and Chrome: Jan 25 2020 \u2014 'how do i hack on an andr] z=0.765 conf=0.90 \u2014 \n\n--- FINAL ALERT LEVEL ---\nHIGH \u2014 MALICE verdict from Bayesian posterior aggregation. Individual z-scores below threshold (distributed evidence pattern: no single dominant signal, but aggregate posterior is decisive). Alert floored (B-028/B-065).\nReconciliation: verdict MALICE rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 5 | Derived: 0 | Total: 5",
   "pipeline_results": {
     "abduction": {
       "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
-      "best_posterior": "42251/250000",
+      "best_posterior": "77/100",
       "confidence": {
         "__fraction__": true,
-        "den": 250000,
-        "num": 42251
+        "den": 100,
+        "num": 77
       },
       "devil_advocate": {
         "aggregation": {
@@ -203,7 +211,7 @@
           "primary_alternative_hypothesis": null
         },
         "decision_context": {
-          "confidence": "42251/250000",
+          "confidence": "77/100",
           "mapped_verdict": "MALICIOUS_INTENT_DETECTED",
           "raw_verdict": "MALICIOUS_INTENT_DETECTED",
           "score": "42251/50000"
@@ -224,7 +232,15 @@
     "pipeline_meta": {
       "artifact_count": 5,
       "avg_score": "42251/50000",
+      "ebs_adapter_mode": "motor",
       "expected_verdict": "MALICE",
+      "resolve": {
+        "motor_confidence": "0.77",
+        "motor_reason": "Intent score 0.3851 exceeds MALICE threshold (P2+acq_assurance scale, threshold=0.33)",
+        "motor_score": "0.3851",
+        "motor_verdict": "MALICE",
+        "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+      },
       "source": "ebs_v1_json_adapter"
     },
     "signals": [

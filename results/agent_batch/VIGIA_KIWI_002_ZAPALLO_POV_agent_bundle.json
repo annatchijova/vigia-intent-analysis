@@ -1,15 +1,15 @@
 {
   "agent_verdict": "INTENT",
-  "analysis_timestamp": "2026-07-05T15:27:37.150776+00:00",
+  "analysis_timestamp": "2026-07-06T01:30:19.918541+00:00",
   "audit_trail": {
     "agent_version": "1.0.0-SANS-2026",
     "case_id": "VIGIA_KIWI_002_ZAPALLO_POV",
-    "end_time": "2026-07-05T15:27:37.150781+00:00",
+    "end_time": "2026-07-06T01:30:19.918547+00:00",
     "entries": [
       {
         "action": "AGENT_INITIALIZED",
         "case_id": "VIGIA_KIWI_002_ZAPALLO_POV",
-        "entry_sha256": "36cdeb6c72a435f005923635359661c8e440a281536ed2d178a84658ff19ea52",
+        "entry_sha256": "389ccf9aabce643230fe2310991ded2f2415109ad4ed486790c8e29ff83a22a9",
         "inputs_summary": {
           "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
           "case_id": "VIGIA_KIWI_002_ZAPALLO_POV"
@@ -21,13 +21,13 @@
           "agent_version": "1.0.0-SANS-2026"
         },
         "seq": 1,
-        "timestamp": "2026-07-05T15:27:37.147492+00:00",
+        "timestamp": "2026-07-06T01:30:19.576589+00:00",
         "tool": "vigia_agent"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA_KIWI_002_ZAPALLO_POV",
-        "entry_sha256": "f33774737ce655104d8f4b8d8a2efe7bda05974a2a3bef868df69e6fda09e2f6",
+        "entry_sha256": "f36aa80d123a7c7d9f8a69e41c8a410299dcac26b78510ab8d61974a8e83d355",
         "inputs_summary": {
           "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA_KIWI_002_ZAPALLO_POV.json"
         },
@@ -35,29 +35,29 @@
         "note": "Computing SHA-256 of original evidence",
         "outputs_summary": {},
         "seq": 2,
-        "timestamp": "2026-07-05T15:27:37.147579+00:00",
+        "timestamp": "2026-07-06T01:30:19.576673+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA_KIWI_002_ZAPALLO_POV",
-        "entry_sha256": "3e2a021e1301f0fef454c477c5f4780037b6d72adfa4d744977beff18a9460b8",
+        "entry_sha256": "947c2bb3bbd22427446902c4f758303f7868cacbbb4d2f76778739a243fe5da5",
         "inputs_summary": {
           "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA_KIWI_002_ZAPALLO_POV.json"
         },
         "iteration": 0,
-        "note": "Evidence verified: 739f538ad85c01c7...",
+        "note": "Evidence verified: 0ee81263758d9b14...",
         "outputs_summary": {
-          "sha256": "739f538ad85c01c74768d200cbfe9c103702ab4c3eb99bb297d4a5e25eb56c51"
+          "sha256": "0ee81263758d9b141f61c661c9413fb2b2405a2ca3023c05d5b387f47add4a95"
         },
         "seq": 3,
-        "timestamp": "2026-07-05T15:27:37.147677+00:00",
+        "timestamp": "2026-07-06T01:30:19.576771+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "PIPELINE_EXECUTE",
         "case_id": "VIGIA_KIWI_002_ZAPALLO_POV",
-        "entry_sha256": "509ce2bbf7260fc1d3a8b5c5200388ac76a7e3549dfedc5f894bf2d32233fa93",
+        "entry_sha256": "7eea08a26cec1c1d583b9e55e85b8bf5a06c7752129b5eea913972f345787341",
         "inputs_summary": {
           "evidence": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA_KIWI_002_ZAPALLO_POV.json",
           "iteration": "0",
@@ -67,13 +67,13 @@
         "note": "Executing pipeline \u2014 iteration 0",
         "outputs_summary": {},
         "seq": 4,
-        "timestamp": "2026-07-05T15:27:37.147778+00:00",
+        "timestamp": "2026-07-06T01:30:19.576870+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "PIPELINE_COMPLETE",
         "case_id": "VIGIA_KIWI_002_ZAPALLO_POV",
-        "entry_sha256": "c2c2c96ae847c7ae24e8b795ef181adffd41bf5f3a3eb37a14139f5819c6d06a",
+        "entry_sha256": "ae7852d42d6b9024eac7f60c12674327158570be5c24a5aa062a1e463187cc5c",
         "inputs_summary": {
           "iteration": "0"
         },
@@ -82,16 +82,24 @@
         "outputs_summary": {
           "abduction": {
             "best_hypothesis": "SUSPICION_DETECTED",
-            "best_posterior": "6/125",
-            "confidence": "6/125",
-            "is_conclusive": "False",
+            "best_posterior": "2/5",
+            "confidence": "2/5",
+            "is_conclusive": "True",
             "narrative": "Input construido desde narrativa sesgada del denunciante. Test de detecci\u00f3n de apofenia sistem\u00e1tica y razonamiento circular."
           },
           "case_id": "VIGIA-KIWI-002-ZAPALLO-POV",
           "pipeline_meta": {
             "artifact_count": "8",
             "avg_score": "6/25",
+            "ebs_adapter_mode": "motor",
             "expected_verdict": "SUSPICION",
+            "resolve": {
+              "motor_confidence": "0.4",
+              "motor_reason": "Significant signal with structural support (score=0.2003)",
+              "motor_score": "0.2003",
+              "motor_verdict": "SUSPICION",
+              "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+            },
             "source": "ebs_v1_json_adapter"
           },
           "signals": [
@@ -138,13 +146,13 @@
           ]
         },
         "seq": 5,
-        "timestamp": "2026-07-05T15:27:37.150389+00:00",
+        "timestamp": "2026-07-06T01:30:19.918124+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "CONTRADICTION_CHECK",
         "case_id": "VIGIA_KIWI_002_ZAPALLO_POV",
-        "entry_sha256": "85100f28bba9fb5cd257862bad02583a0689363a6168e5f95764736551fe582d",
+        "entry_sha256": "98240c3ee600c3b369bc2ab9cdb2228c44276f20c9284b6c8cc6c03cb960e3b0",
         "inputs_summary": {
           "n_signals": "8"
         },
@@ -155,13 +163,13 @@
           "threshold": "2"
         },
         "seq": 6,
-        "timestamp": "2026-07-05T15:27:37.150524+00:00",
+        "timestamp": "2026-07-06T01:30:19.918255+00:00",
         "tool": "contradiction_detector"
       },
       {
         "action": "AGENT_EXIT",
         "case_id": "VIGIA_KIWI_002_ZAPALLO_POV",
-        "entry_sha256": "7c09db14069bb0f6f24e35ed8b123236ee5edcf61e4bd2ccaf458fe4cb3cef9b",
+        "entry_sha256": "bb51e8c60b9b8ba1ce6405b982c6dfd456f14cc002f690f65efaf54ee1d9bd15",
         "inputs_summary": {
           "verdict": "SUSPICION_DETECTED"
         },
@@ -172,35 +180,43 @@
           "exit_code": "3"
         },
         "seq": 7,
-        "timestamp": "2026-07-05T15:27:37.150725+00:00",
+        "timestamp": "2026-07-06T01:30:19.918486+00:00",
         "tool": "vigia_agent"
       }
     ],
-    "start_time": "2026-07-05T15:27:37.147245+00:00",
+    "start_time": "2026-07-06T01:30:19.576347+00:00",
     "total_entries": 7
   },
   "case_id": "VIGIA_KIWI_002_ZAPALLO_POV",
   "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA_KIWI_002_ZAPALLO_POV.json",
-  "evidence_sha256": "739f538ad85c01c74768d200cbfe9c103702ab4c3eb99bb297d4a5e25eb56c51",
+  "evidence_sha256": "0ee81263758d9b141f61c661c9413fb2b2405a2ca3023c05d5b387f47add4a95",
   "iterations_executed": 1,
-  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA_KIWI_002_ZAPALLO_POV ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/VIGIA_KIWI_002_ZAPALLO_POV.json\nEvidence SHA-256: 739f538ad85c01c74768d200cbfe9c103702ab4c3eb99bb297d4a5e25eb56c51\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: SUSPICION_DETECTED\nPosterior confidence: 6/125\nConclusive: NO \u2014 requires human review\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 8 se\u00f1al(es): 8 primaria(s) de ['manual_forensic_review'], 0 derivada(s)/no-analizada(s). Top z: Claim: capacidad t\u00e9cnica (Ekoparty) impl=0.24, Claim: canciones son declaraciones de am=0.24, Claim: 5 cartas documento enviadas a Cla=0.24.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: SUSPICION_DETECTED. Conclusiva: no \u2014 requiere revisi\u00f3n humana.\n\nRazonamiento del motor abductivo:\nInput construido desde narrativa sesgada del denunciante. Test de detecci\u00f3n de apofenia sistem\u00e1tica y razonamiento circular.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Claim: capacidad t\u00e9cnica (Ekoparty) implica hostigamiento activo.] z=0.240 conf=0.30 \u2014 \n  [Claim: canciones son declaraciones de amor dirigidas al denunciante.] z=0.240 conf=0.30 \u2014 \n  [Claim: 5 cartas documento enviadas a Clar\u00edn. Verificaci\u00f3n: ning\u00fan regi] z=0.240 conf=0.30 \u2014 \n  [Claim: acceso inferido a armas por convivencia con padre. Sin CLU prop] z=0.240 conf=0.30 \u2014 \n  [Claim: deudas econ\u00f3micas como indicador de perfil de riesgo.] z=0.240 conf=0.30 \u2014 \n\n--- FINAL ALERT LEVEL ---\nMEDIUM \u2014 INTENT verdict with individual z-scores below threshold. Alert floored (B-028/B-065): an intent finding cannot present as LOW.\nReconciliation: verdict INTENT rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 8 | Derived: 0 | Total: 8",
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA_KIWI_002_ZAPALLO_POV ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/VIGIA_KIWI_002_ZAPALLO_POV.json\nEvidence SHA-256: 0ee81263758d9b141f61c661c9413fb2b2405a2ca3023c05d5b387f47add4a95\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: SUSPICION_DETECTED\nPosterior confidence: 2/5\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 8 se\u00f1al(es): 8 primaria(s) de ['manual_forensic_review'], 0 derivada(s)/no-analizada(s). Top z: Claim: capacidad t\u00e9cnica (Ekoparty) impl=0.24, Claim: canciones son declaraciones de am=0.24, Claim: 5 cartas documento enviadas a Cla=0.24.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: SUSPICION_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nInput construido desde narrativa sesgada del denunciante. Test de detecci\u00f3n de apofenia sistem\u00e1tica y razonamiento circular.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Claim: capacidad t\u00e9cnica (Ekoparty) implica hostigamiento activo.] z=0.240 conf=0.30 \u2014 \n  [Claim: canciones son declaraciones de amor dirigidas al denunciante.] z=0.240 conf=0.30 \u2014 \n  [Claim: 5 cartas documento enviadas a Clar\u00edn. Verificaci\u00f3n: ning\u00fan regi] z=0.240 conf=0.30 \u2014 \n  [Claim: acceso inferido a armas por convivencia con padre. Sin CLU prop] z=0.240 conf=0.30 \u2014 \n  [Claim: deudas econ\u00f3micas como indicador de perfil de riesgo.] z=0.240 conf=0.30 \u2014 \n\n--- FINAL ALERT LEVEL ---\nMEDIUM \u2014 INTENT verdict with individual z-scores below threshold. Alert floored (B-028/B-065): an intent finding cannot present as LOW.\nReconciliation: verdict INTENT rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 8 | Derived: 0 | Total: 8",
   "pipeline_results": {
     "abduction": {
       "best_hypothesis": "SUSPICION_DETECTED",
-      "best_posterior": "6/125",
+      "best_posterior": "2/5",
       "confidence": {
         "__fraction__": true,
-        "den": 125,
-        "num": 6
+        "den": 5,
+        "num": 2
       },
-      "is_conclusive": false,
+      "is_conclusive": true,
       "narrative": "Input construido desde narrativa sesgada del denunciante. Test de detecci\u00f3n de apofenia sistem\u00e1tica y razonamiento circular."
     },
     "case_id": "VIGIA-KIWI-002-ZAPALLO-POV",
     "pipeline_meta": {
       "artifact_count": 8,
       "avg_score": "6/25",
+      "ebs_adapter_mode": "motor",
       "expected_verdict": "SUSPICION",
+      "resolve": {
+        "motor_confidence": "0.4",
+        "motor_reason": "Significant signal with structural support (score=0.2003)",
+        "motor_score": "0.2003",
+        "motor_verdict": "SUSPICION",
+        "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+      },
       "source": "ebs_v1_json_adapter"
     },
     "signals": [

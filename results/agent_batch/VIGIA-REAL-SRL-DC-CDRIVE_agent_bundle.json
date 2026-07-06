@@ -1,15 +1,15 @@
 {
   "agent_verdict": "MALICE",
-  "analysis_timestamp": "2026-07-05T15:27:39.502855+00:00",
+  "analysis_timestamp": "2026-07-06T01:30:39.734444+00:00",
   "audit_trail": {
     "agent_version": "1.0.0-SANS-2026",
     "case_id": "VIGIA-REAL-SRL-DC-CDRIVE",
-    "end_time": "2026-07-05T15:27:39.502861+00:00",
+    "end_time": "2026-07-06T01:30:39.734451+00:00",
     "entries": [
       {
         "action": "AGENT_INITIALIZED",
         "case_id": "VIGIA-REAL-SRL-DC-CDRIVE",
-        "entry_sha256": "b6183b1ba51f5f49bf335edd39cab2f564d799be478815f66b2c82c1c1a2e39f",
+        "entry_sha256": "6747c8e9f35cb840e87bb8ad794205c82f7eb84a2596443e1344cc44838ee8bc",
         "inputs_summary": {
           "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
           "case_id": "VIGIA-REAL-SRL-DC-CDRIVE"
@@ -21,13 +21,13 @@
           "agent_version": "1.0.0-SANS-2026"
         },
         "seq": 1,
-        "timestamp": "2026-07-05T15:27:39.499097+00:00",
+        "timestamp": "2026-07-06T01:30:39.376263+00:00",
         "tool": "vigia_agent"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-REAL-SRL-DC-CDRIVE",
-        "entry_sha256": "91ab257eec54d131125e91a4d60dbf8860c70973d44384a69ce948c2a6a35ba0",
+        "entry_sha256": "19fe146620a3bb21cbf54907fa7676eba475f8c9d1c8a4796fc4dc5819864ac2",
         "inputs_summary": {
           "path": "/home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-REAL-SRL-DC-CDRIVE.json"
         },
@@ -35,13 +35,13 @@
         "note": "Computing SHA-256 of original evidence",
         "outputs_summary": {},
         "seq": 2,
-        "timestamp": "2026-07-05T15:27:39.499181+00:00",
+        "timestamp": "2026-07-06T01:30:39.376346+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-REAL-SRL-DC-CDRIVE",
-        "entry_sha256": "79ed481870de2e506c3953b96d7a42baefb88e8bc5d99af842731d30ff588333",
+        "entry_sha256": "e1d3f9756cf93883c19309d6cba305f8bc7a1df1033ab7494ba3be8f483f20ad",
         "inputs_summary": {
           "path": "/home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-REAL-SRL-DC-CDRIVE.json"
         },
@@ -51,13 +51,13 @@
           "sha256": "8585bcbf2ba0d32490aba4d19109ecd67bad5039e029861939354174c091345e"
         },
         "seq": 3,
-        "timestamp": "2026-07-05T15:27:39.499283+00:00",
+        "timestamp": "2026-07-06T01:30:39.376454+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "PIPELINE_EXECUTE",
         "case_id": "VIGIA-REAL-SRL-DC-CDRIVE",
-        "entry_sha256": "fea726703966d39ed494391ffb7e2aa434012917e767f56afcea5c345520e80c",
+        "entry_sha256": "b25f5d88a9a6adde3458bcc5bb7701e19a779a9b8e278ad326f90b4dd5956d71",
         "inputs_summary": {
           "evidence": "/home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-REAL-SRL-DC-CDRIVE.json",
           "iteration": "0",
@@ -67,13 +67,13 @@
         "note": "Executing pipeline \u2014 iteration 0",
         "outputs_summary": {},
         "seq": 4,
-        "timestamp": "2026-07-05T15:27:39.499388+00:00",
+        "timestamp": "2026-07-06T01:30:39.376556+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "PIPELINE_COMPLETE",
         "case_id": "VIGIA-REAL-SRL-DC-CDRIVE",
-        "entry_sha256": "d590b3bb64472f5cfa78a18ab28b01bf158f0e54f453a1c053c15b1bcff2ad24",
+        "entry_sha256": "58e09506840153d72fa4cdc3678b0858c7f4e7c80626ad0d974ea14356917aae",
         "inputs_summary": {
           "iteration": "0"
         },
@@ -82,8 +82,8 @@
         "outputs_summary": {
           "abduction": {
             "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
-            "best_posterior": "7059/50000",
-            "confidence": "7059/50000",
+            "best_posterior": "19/20",
+            "confidence": "19/20",
             "is_conclusive": "True",
             "narrative": "SRL-2018 compromised enterprise network. Domain Controller BASE-DC (shieldbase.lan) disk image (12 GB E01, Windows Server 2016). Registry and shimcache analysis reveals: unknown executable subject_srv..."
           },
@@ -91,7 +91,15 @@
           "pipeline_meta": {
             "artifact_count": "8",
             "avg_score": "7059/10000",
+            "ebs_adapter_mode": "motor",
             "expected_verdict": "MALICE",
+            "resolve": {
+              "motor_confidence": "0.95",
+              "motor_reason": "Intent score 0.5118 exceeds MALICE threshold (P2+acq_assurance scale, threshold=0.33)",
+              "motor_score": "0.5118",
+              "motor_verdict": "MALICE",
+              "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+            },
             "source": "ebs_v1_json_adapter"
           },
           "signals": [
@@ -138,13 +146,13 @@
           ]
         },
         "seq": 5,
-        "timestamp": "2026-07-05T15:27:39.502034+00:00",
+        "timestamp": "2026-07-06T01:30:39.733850+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "CONTRADICTION_CHECK",
         "case_id": "VIGIA-REAL-SRL-DC-CDRIVE",
-        "entry_sha256": "877def4452fe169f66c22fb96c70f760a18e6c83f46dd61bfcde54b126feb907",
+        "entry_sha256": "a49c72c4fc7d1fc9e75c43106432343049e2aada56fb2c95e858ea0a9456c894",
         "inputs_summary": {
           "n_signals": "8"
         },
@@ -155,13 +163,13 @@
           "threshold": "2"
         },
         "seq": 6,
-        "timestamp": "2026-07-05T15:27:39.502169+00:00",
+        "timestamp": "2026-07-06T01:30:39.733999+00:00",
         "tool": "contradiction_detector"
       },
       {
         "action": "AGENT_EXIT",
         "case_id": "VIGIA-REAL-SRL-DC-CDRIVE",
-        "entry_sha256": "ef00044d052a772e544de7b652e8f3e9158ae9ccbde91ecd1913056b9502ab99",
+        "entry_sha256": "7505f267146f5c08c20fa0b83a9e445dcc102bc1b24407d25809624a5f341aa5",
         "inputs_summary": {
           "verdict": "MALICIOUS_INTENT_DETECTED"
         },
@@ -172,26 +180,26 @@
           "exit_code": "1"
         },
         "seq": 7,
-        "timestamp": "2026-07-05T15:27:39.502390+00:00",
+        "timestamp": "2026-07-06T01:30:39.734249+00:00",
         "tool": "vigia_agent"
       }
     ],
-    "start_time": "2026-07-05T15:27:39.498865+00:00",
+    "start_time": "2026-07-06T01:30:39.376033+00:00",
     "total_entries": 7
   },
   "case_id": "VIGIA-REAL-SRL-DC-CDRIVE",
   "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-REAL-SRL-DC-CDRIVE.json",
   "evidence_sha256": "8585bcbf2ba0d32490aba4d19109ecd67bad5039e029861939354174c091345e",
   "iterations_executed": 1,
-  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-REAL-SRL-DC-CDRIVE ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-REAL-SRL-DC-CDRIVE.json\nEvidence SHA-256: 8585bcbf2ba0d32490aba4d19109ecd67bad5039e029861939354174c091345e\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 7059/50000\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 8 se\u00f1al(es): 8 primaria(s) de ['EVTX file analysis (file size/presence)', 'regipy manual traversal (SYSTEM hive ControlSet001)', 'regipy/ShimCachePlugin', 'regipy/ShimCachePlugin + manual analysis'], 0 derivada(s)/no-analizada(s). Top z: ntdsutil.exe executed on BASE-DC on 2018=0.87, subject_srv.exe found in AppCompatCache =0.81, Three converging indicators of PowerShel=0.72.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: MALICIOUS_INTENT_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nSRL-2018 compromised enterprise network. Domain Controller BASE-DC (shieldbase.lan) disk image (12 GB E01, Windows Server 2016). Registry and shimcache analysis reveals: unknown executable subject_srv.exe in C:\\windows\\ (2018-04-10), ntdsutil.exe execution for NTDS.dit credential dump (2018-04-25), Windows Kits 10 + WinDbg installed on DC (2018-04-11), SYSVOL GPO script deployed to all domain machines (2018-05-14), Autorunsc.exe executed for persistence verification (2018-08-15). Dual NIC: 10.10\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [ntdsutil.exe executed on BASE-DC on 2018-04-25T20:01:52Z per shimcache] z=0.873 conf=0.90 \u2014 \n  [subject_srv.exe found in AppCompatCache (shimcache) at C:\\windows\\subj] z=0.807 conf=0.85 \u2014 \n  [Three converging indicators of PowerShell abuse: (1) PowerShell Script] z=0.722 conf=0.82 \u2014 \n  [Microsoft-Windows-WinRM%4Operational.evtx weighs 43MB on BASE-DC. WinR] z=0.688 conf=0.80 \u2014 \n  [BASE-DC has two active network interfaces: 10.10.4.4/255.255.0.0 (inte] z=0.656 conf=0.80 \u2014 \n\n--- FINAL ALERT LEVEL ---\nHIGH \u2014 MALICE verdict from Bayesian posterior aggregation. Individual z-scores below threshold (distributed evidence pattern: no single dominant signal, but aggregate posterior is decisive). Alert floored (B-028/B-065).\nReconciliation: verdict MALICE rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 8 | Derived: 0 | Total: 8",
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-REAL-SRL-DC-CDRIVE ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-REAL-SRL-DC-CDRIVE.json\nEvidence SHA-256: 8585bcbf2ba0d32490aba4d19109ecd67bad5039e029861939354174c091345e\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 19/20\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 8 se\u00f1al(es): 8 primaria(s) de ['EVTX file analysis (file size/presence)', 'regipy manual traversal (SYSTEM hive ControlSet001)', 'regipy/ShimCachePlugin', 'regipy/ShimCachePlugin + manual analysis'], 0 derivada(s)/no-analizada(s). Top z: ntdsutil.exe executed on BASE-DC on 2018=0.87, subject_srv.exe found in AppCompatCache =0.81, Three converging indicators of PowerShel=0.72.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: MALICIOUS_INTENT_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nSRL-2018 compromised enterprise network. Domain Controller BASE-DC (shieldbase.lan) disk image (12 GB E01, Windows Server 2016). Registry and shimcache analysis reveals: unknown executable subject_srv.exe in C:\\windows\\ (2018-04-10), ntdsutil.exe execution for NTDS.dit credential dump (2018-04-25), Windows Kits 10 + WinDbg installed on DC (2018-04-11), SYSVOL GPO script deployed to all domain machines (2018-05-14), Autorunsc.exe executed for persistence verification (2018-08-15). Dual NIC: 10.10\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [ntdsutil.exe executed on BASE-DC on 2018-04-25T20:01:52Z per shimcache] z=0.873 conf=0.90 \u2014 \n  [subject_srv.exe found in AppCompatCache (shimcache) at C:\\windows\\subj] z=0.807 conf=0.85 \u2014 \n  [Three converging indicators of PowerShell abuse: (1) PowerShell Script] z=0.722 conf=0.82 \u2014 \n  [Microsoft-Windows-WinRM%4Operational.evtx weighs 43MB on BASE-DC. WinR] z=0.688 conf=0.80 \u2014 \n  [BASE-DC has two active network interfaces: 10.10.4.4/255.255.0.0 (inte] z=0.656 conf=0.80 \u2014 \n\n--- FINAL ALERT LEVEL ---\nHIGH \u2014 MALICE verdict from Bayesian posterior aggregation. Individual z-scores below threshold (distributed evidence pattern: no single dominant signal, but aggregate posterior is decisive). Alert floored (B-028/B-065).\nReconciliation: verdict MALICE rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 8 | Derived: 0 | Total: 8",
   "pipeline_results": {
     "abduction": {
       "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
-      "best_posterior": "7059/50000",
+      "best_posterior": "19/20",
       "confidence": {
         "__fraction__": true,
-        "den": 50000,
-        "num": 7059
+        "den": 20,
+        "num": 19
       },
       "devil_advocate": {
         "aggregation": {
@@ -203,7 +211,7 @@
           "primary_alternative_hypothesis": null
         },
         "decision_context": {
-          "confidence": "7059/50000",
+          "confidence": "19/20",
           "mapped_verdict": "MALICIOUS_INTENT_DETECTED",
           "raw_verdict": "MALICIOUS_INTENT_DETECTED",
           "score": "7059/10000"
@@ -224,7 +232,15 @@
     "pipeline_meta": {
       "artifact_count": 8,
       "avg_score": "7059/10000",
+      "ebs_adapter_mode": "motor",
       "expected_verdict": "MALICE",
+      "resolve": {
+        "motor_confidence": "0.95",
+        "motor_reason": "Intent score 0.5118 exceeds MALICE threshold (P2+acq_assurance scale, threshold=0.33)",
+        "motor_score": "0.5118",
+        "motor_verdict": "MALICE",
+        "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+      },
       "source": "ebs_v1_json_adapter"
     },
     "signals": [

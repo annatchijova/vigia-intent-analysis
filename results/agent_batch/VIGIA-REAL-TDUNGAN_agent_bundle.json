@@ -1,15 +1,15 @@
 {
   "agent_verdict": "MALICE",
-  "analysis_timestamp": "2026-07-05T15:27:39.607094+00:00",
+  "analysis_timestamp": "2026-07-06T01:30:40.649830+00:00",
   "audit_trail": {
     "agent_version": "1.0.0-SANS-2026",
     "case_id": "VIGIA-REAL-TDUNGAN",
-    "end_time": "2026-07-05T15:27:39.607101+00:00",
+    "end_time": "2026-07-06T01:30:40.649839+00:00",
     "entries": [
       {
         "action": "AGENT_INITIALIZED",
         "case_id": "VIGIA-REAL-TDUNGAN",
-        "entry_sha256": "4e9ad281d4e8fd6e5f7fbe308e2c37fbd17f5e78d1d59658adc89bd723089b5d",
+        "entry_sha256": "86444a8758519bae7d8af76647b48da341879f6bc6ebc70ce94761a689e53a19",
         "inputs_summary": {
           "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
           "case_id": "VIGIA-REAL-TDUNGAN"
@@ -21,13 +21,13 @@
           "agent_version": "1.0.0-SANS-2026"
         },
         "seq": 1,
-        "timestamp": "2026-07-05T15:27:39.603343+00:00",
+        "timestamp": "2026-07-06T01:30:40.283749+00:00",
         "tool": "vigia_agent"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-REAL-TDUNGAN",
-        "entry_sha256": "37259f017df1ab9e57d3ef3e073f41ba4f5bbf39796ec5283600554b7d6506a2",
+        "entry_sha256": "fc692a09f1997d8c3fd8ccaeeb3fd71853fb46dcae70fd41936244d1a31fbf95",
         "inputs_summary": {
           "path": "/home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-REAL-TDUNGAN.json"
         },
@@ -35,13 +35,13 @@
         "note": "Computing SHA-256 of original evidence",
         "outputs_summary": {},
         "seq": 2,
-        "timestamp": "2026-07-05T15:27:39.603437+00:00",
+        "timestamp": "2026-07-06T01:30:40.283841+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-REAL-TDUNGAN",
-        "entry_sha256": "982024fad29efd3b489adbabbd0685a576103a3556cbe8e9be9bdd3bc14dcd4d",
+        "entry_sha256": "f4b6e2976814baeba59444563eb7d753a16f629e6ba6fd8f1a31d179e7f0b637",
         "inputs_summary": {
           "path": "/home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-REAL-TDUNGAN.json"
         },
@@ -51,13 +51,13 @@
           "sha256": "4abb051bafc7bc436dc2d0f23bef2675bdd63877a3f34f2c4318352a6bca7d51"
         },
         "seq": 3,
-        "timestamp": "2026-07-05T15:27:39.603538+00:00",
+        "timestamp": "2026-07-06T01:30:40.283937+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "PIPELINE_EXECUTE",
         "case_id": "VIGIA-REAL-TDUNGAN",
-        "entry_sha256": "7e94aa03f2a137574ebb5b0a70ce0249830ca770cd622e3e6e6ef0134796bf03",
+        "entry_sha256": "915441c162d0e641ad0b5f6b1e01f256e2e588ec5f6928dc8ed003ae7e70a796",
         "inputs_summary": {
           "evidence": "/home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-REAL-TDUNGAN.json",
           "iteration": "0",
@@ -67,13 +67,13 @@
         "note": "Executing pipeline \u2014 iteration 0",
         "outputs_summary": {},
         "seq": 4,
-        "timestamp": "2026-07-05T15:27:39.603643+00:00",
+        "timestamp": "2026-07-06T01:30:40.284041+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "PIPELINE_COMPLETE",
         "case_id": "VIGIA-REAL-TDUNGAN",
-        "entry_sha256": "0e8d7a7dbae615d99c3bba30f6368fda3b307b595d3b868539b198e17320c812",
+        "entry_sha256": "d325d1074062d7afbd9159915fb7892aa5cf852b70b0a12b535fe031964b34a3",
         "inputs_summary": {
           "iteration": "0"
         },
@@ -82,8 +82,8 @@
         "outputs_summary": {
           "abduction": {
             "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
-            "best_posterior": "37731/250000",
-            "confidence": "37731/250000",
+            "best_posterior": "19/20",
+            "confidence": "19/20",
             "is_conclusive": "True",
             "narrative": "Timothy Dungan (tdungan), employee of Stark Research Labs, domain SHIELDBASE, authenticated via RDP from FALCONIII (10.3.98.10) at 18:20 EST on 2012-04-02. SeDebugPrivilege assigned at logon. SAM cred..."
           },
@@ -91,7 +91,15 @@
           "pipeline_meta": {
             "artifact_count": "5",
             "avg_score": "37731/50000",
+            "ebs_adapter_mode": "motor",
             "expected_verdict": "MALICE",
+            "resolve": {
+              "motor_confidence": "0.95",
+              "motor_reason": "Intent score 0.8475 exceeds MALICE threshold (P2+acq_assurance scale, threshold=0.33)",
+              "motor_score": "0.8475",
+              "motor_verdict": "MALICE",
+              "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+            },
             "source": "ebs_v1_json_adapter"
           },
           "signals": [
@@ -138,13 +146,13 @@
           ]
         },
         "seq": 5,
-        "timestamp": "2026-07-05T15:27:39.606297+00:00",
+        "timestamp": "2026-07-06T01:30:40.649141+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "CONTRADICTION_CHECK",
         "case_id": "VIGIA-REAL-TDUNGAN",
-        "entry_sha256": "b83340f1e6f07cca24253e84c0f79175ff70e55955fa3e80ee1f9957afd28e82",
+        "entry_sha256": "76b35b2cccec33f26b8f3ab38803cdb1aa26b96ab05c6f3bfd735dead21c2d6f",
         "inputs_summary": {
           "n_signals": "5"
         },
@@ -155,13 +163,13 @@
           "threshold": "2"
         },
         "seq": 6,
-        "timestamp": "2026-07-05T15:27:39.606419+00:00",
+        "timestamp": "2026-07-06T01:30:40.649304+00:00",
         "tool": "contradiction_detector"
       },
       {
         "action": "AGENT_EXIT",
         "case_id": "VIGIA-REAL-TDUNGAN",
-        "entry_sha256": "81134cacdcb6a7a823fd725ca601b4ebc2059828e989cba7b7132a47ceb1a481",
+        "entry_sha256": "4402502653253c8b48023db7f109e6ca56fe43c50e848ff91c44578350071de5",
         "inputs_summary": {
           "verdict": "MALICIOUS_INTENT_DETECTED"
         },
@@ -172,26 +180,26 @@
           "exit_code": "1"
         },
         "seq": 7,
-        "timestamp": "2026-07-05T15:27:39.606638+00:00",
+        "timestamp": "2026-07-06T01:30:40.649586+00:00",
         "tool": "vigia_agent"
       }
     ],
-    "start_time": "2026-07-05T15:27:39.603116+00:00",
+    "start_time": "2026-07-06T01:30:40.283514+00:00",
     "total_entries": 7
   },
   "case_id": "VIGIA-REAL-TDUNGAN",
   "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-REAL-TDUNGAN.json",
   "evidence_sha256": "4abb051bafc7bc436dc2d0f23bef2675bdd63877a3f34f2c4318352a6bca7d51",
   "iterations_executed": 1,
-  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-REAL-TDUNGAN ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-REAL-TDUNGAN.json\nEvidence SHA-256: 4abb051bafc7bc436dc2d0f23bef2675bdd63877a3f34f2c4318352a6bca7d51\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 37731/250000\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 5 se\u00f1al(es): 5 primaria(s) de ['Plaso/McAfee+NTFS', 'Plaso/WinEVT', 'Plaso/WinEVT+Firefox', 'Plaso/WinEVT+Volatility'], 0 derivada(s)/no-analizada(s). Top z: Event 560/562 (Records 90242-90245): Two=0.88, Event 576: Special privileges assigned t=0.86, Event 528: tdungan RDP logon to WKS-WINX=0.72.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: MALICIOUS_INTENT_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nTimothy Dungan (tdungan), employee of Stark Research Labs, domain SHIELDBASE, authenticated via RDP from FALCONIII (10.3.98.10) at 18:20 EST on 2012-04-02. SeDebugPrivilege assigned at logon. SAM credential dump via lsass.exe at 20:50. Password-protected ZIP evading AV. Dropbox active as exfiltration vector. APT1 IOCs present in Redline analysis.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Event 560/562 (Records 90242-90245): Two sequential SAM_SERVER object ] z=0.883 conf=0.93 \u2014 \n  [Event 576: Special privileges assigned to tdungan at logon: SeDebugPri] z=0.856 conf=0.92 \u2014 \n  [Event 528: tdungan RDP logon to WKS-WINXP32BIT from FALCONIII (10.3.98] z=0.722 conf=0.88 \u2014 \n  [McAfee scan failure: password-protected 2011-W2.zip containing 2011-W2] z=0.680 conf=0.84 \u2014 \n  [TermDD Event 50: WARNING Device\\Termdd DATA ENCRYPTION anomaly at 20:0] z=0.632 conf=0.80 \u2014 \n\n--- FINAL ALERT LEVEL ---\nHIGH \u2014 MALICE verdict from Bayesian posterior aggregation. Individual z-scores below threshold (distributed evidence pattern: no single dominant signal, but aggregate posterior is decisive). Alert floored (B-028/B-065).\nReconciliation: verdict MALICE rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 5 | Derived: 0 | Total: 5",
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-REAL-TDUNGAN ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-REAL-TDUNGAN.json\nEvidence SHA-256: 4abb051bafc7bc436dc2d0f23bef2675bdd63877a3f34f2c4318352a6bca7d51\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 19/20\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 5 se\u00f1al(es): 5 primaria(s) de ['Plaso/McAfee+NTFS', 'Plaso/WinEVT', 'Plaso/WinEVT+Firefox', 'Plaso/WinEVT+Volatility'], 0 derivada(s)/no-analizada(s). Top z: Event 560/562 (Records 90242-90245): Two=0.88, Event 576: Special privileges assigned t=0.86, Event 528: tdungan RDP logon to WKS-WINX=0.72.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: MALICIOUS_INTENT_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nTimothy Dungan (tdungan), employee of Stark Research Labs, domain SHIELDBASE, authenticated via RDP from FALCONIII (10.3.98.10) at 18:20 EST on 2012-04-02. SeDebugPrivilege assigned at logon. SAM credential dump via lsass.exe at 20:50. Password-protected ZIP evading AV. Dropbox active as exfiltration vector. APT1 IOCs present in Redline analysis.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Event 560/562 (Records 90242-90245): Two sequential SAM_SERVER object ] z=0.883 conf=0.93 \u2014 \n  [Event 576: Special privileges assigned to tdungan at logon: SeDebugPri] z=0.856 conf=0.92 \u2014 \n  [Event 528: tdungan RDP logon to WKS-WINXP32BIT from FALCONIII (10.3.98] z=0.722 conf=0.88 \u2014 \n  [McAfee scan failure: password-protected 2011-W2.zip containing 2011-W2] z=0.680 conf=0.84 \u2014 \n  [TermDD Event 50: WARNING Device\\Termdd DATA ENCRYPTION anomaly at 20:0] z=0.632 conf=0.80 \u2014 \n\n--- FINAL ALERT LEVEL ---\nHIGH \u2014 MALICE verdict from Bayesian posterior aggregation. Individual z-scores below threshold (distributed evidence pattern: no single dominant signal, but aggregate posterior is decisive). Alert floored (B-028/B-065).\nReconciliation: verdict MALICE rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 5 | Derived: 0 | Total: 5",
   "pipeline_results": {
     "abduction": {
       "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
-      "best_posterior": "37731/250000",
+      "best_posterior": "19/20",
       "confidence": {
         "__fraction__": true,
-        "den": 250000,
-        "num": 37731
+        "den": 20,
+        "num": 19
       },
       "devil_advocate": {
         "aggregation": {
@@ -203,7 +211,7 @@
           "primary_alternative_hypothesis": null
         },
         "decision_context": {
-          "confidence": "37731/250000",
+          "confidence": "19/20",
           "mapped_verdict": "MALICIOUS_INTENT_DETECTED",
           "raw_verdict": "MALICIOUS_INTENT_DETECTED",
           "score": "37731/50000"
@@ -224,7 +232,15 @@
     "pipeline_meta": {
       "artifact_count": 5,
       "avg_score": "37731/50000",
+      "ebs_adapter_mode": "motor",
       "expected_verdict": "MALICE",
+      "resolve": {
+        "motor_confidence": "0.95",
+        "motor_reason": "Intent score 0.8475 exceeds MALICE threshold (P2+acq_assurance scale, threshold=0.33)",
+        "motor_score": "0.8475",
+        "motor_verdict": "MALICE",
+        "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+      },
       "source": "ebs_v1_json_adapter"
     },
     "signals": [

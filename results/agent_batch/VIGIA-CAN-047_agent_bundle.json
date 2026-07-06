@@ -1,15 +1,15 @@
 {
   "agent_verdict": "MALICE",
-  "analysis_timestamp": "2026-07-05T15:27:42.666856+00:00",
+  "analysis_timestamp": "2026-07-06T01:31:06.752270+00:00",
   "audit_trail": {
     "agent_version": "1.0.0-SANS-2026",
     "case_id": "VIGIA-CAN-047",
-    "end_time": "2026-07-05T15:27:42.666862+00:00",
+    "end_time": "2026-07-06T01:31:06.752278+00:00",
     "entries": [
       {
         "action": "AGENT_INITIALIZED",
         "case_id": "VIGIA-CAN-047",
-        "entry_sha256": "ff04beafbca471472361babf4072655aadcb1d9d91cb139090581171b4c85a38",
+        "entry_sha256": "2b30264dc1ffc32516b3b803f174d7033fe7e7b6e1a662280e869e37d09b4424",
         "inputs_summary": {
           "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
           "case_id": "VIGIA-CAN-047"
@@ -21,13 +21,13 @@
           "agent_version": "1.0.0-SANS-2026"
         },
         "seq": 1,
-        "timestamp": "2026-07-05T15:27:42.663194+00:00",
+        "timestamp": "2026-07-06T01:31:06.403130+00:00",
         "tool": "vigia_agent"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-CAN-047",
-        "entry_sha256": "dbd72ae933d51b350b5edbaf631d9c0863a6ed5b01eef02c346e8ab39916e54f",
+        "entry_sha256": "16aaaf899e4264e34a9bd3a4ba0e695b1dc5a7b453f4a11524d5f72b4c3f1a5a",
         "inputs_summary": {
           "path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-047.json"
         },
@@ -35,29 +35,29 @@
         "note": "Computing SHA-256 of original evidence",
         "outputs_summary": {},
         "seq": 2,
-        "timestamp": "2026-07-05T15:27:42.663280+00:00",
+        "timestamp": "2026-07-06T01:31:06.403217+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-CAN-047",
-        "entry_sha256": "7002bd60ef580d2a63cff13df7ee40451ddd9d488015a5e28fc3b7eca0da7a77",
+        "entry_sha256": "3fc8df27365d52187e64ae0bf1e77415b7a6439458f09b5c5a0f8a27d81f1ee3",
         "inputs_summary": {
           "path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-047.json"
         },
         "iteration": 0,
-        "note": "Evidence verified: 8864690ba38fb6de...",
+        "note": "Evidence verified: 98ef56ff338dd88a...",
         "outputs_summary": {
-          "sha256": "8864690ba38fb6de9f76d0ae67563f73db7ffe448ca37752cd5ec8381b5442e2"
+          "sha256": "98ef56ff338dd88ad96f908f949753366369f963b87d327ae674990f261a7d14"
         },
         "seq": 3,
-        "timestamp": "2026-07-05T15:27:42.663372+00:00",
+        "timestamp": "2026-07-06T01:31:06.403311+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "PIPELINE_EXECUTE",
         "case_id": "VIGIA-CAN-047",
-        "entry_sha256": "0d6ff10e030b31131d93933db2f913df4154962052205885dda250b014bf42d7",
+        "entry_sha256": "95607c802805e07ad57f3e8e06fb38e542c9957f08c354971aa545325646d88e",
         "inputs_summary": {
           "evidence": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-047.json",
           "iteration": "0",
@@ -67,13 +67,13 @@
         "note": "Executing pipeline \u2014 iteration 0",
         "outputs_summary": {},
         "seq": 4,
-        "timestamp": "2026-07-05T15:27:42.663493+00:00",
+        "timestamp": "2026-07-06T01:31:06.403412+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "PIPELINE_COMPLETE",
         "case_id": "VIGIA-CAN-047",
-        "entry_sha256": "0ae3aaf2b29b417d718b0823ae57360135ec1853b8131db05fd23d27f4f76d6c",
+        "entry_sha256": "4f12463635c861d5f26d0c0ba73a66da54f4a9571d09939aa9a67d0c90a345dc",
         "inputs_summary": {
           "iteration": "0"
         },
@@ -82,16 +82,24 @@
         "outputs_summary": {
           "abduction": {
             "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
-            "best_posterior": "1789/40000",
-            "confidence": "1789/40000",
-            "is_conclusive": "False",
+            "best_posterior": "19/20",
+            "confidence": "19/20",
+            "is_conclusive": "True",
             "narrative": "Legitimate svchost.exe process running. Everything looks normal. But it maintains a persistent connection to an IP in an unusual country on port 443. Process hollowing detected."
           },
           "case_id": "case_026_ventrilocuo",
           "pipeline_meta": {
             "artifact_count": "4",
             "avg_score": "1789/8000",
+            "ebs_adapter_mode": "motor",
             "expected_verdict": "MALICE",
+            "resolve": {
+              "motor_confidence": "0.95",
+              "motor_reason": "Intent score 0.5509 exceeds MALICE threshold (P2+acq_assurance scale, threshold=0.33)",
+              "motor_score": "0.5509",
+              "motor_verdict": "MALICE",
+              "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+            },
             "source": "ebs_v1_json_adapter"
           },
           "signals": [
@@ -130,13 +138,13 @@
           ]
         },
         "seq": 5,
-        "timestamp": "2026-07-05T15:27:42.666089+00:00",
+        "timestamp": "2026-07-06T01:31:06.751775+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "CONTRADICTION_CHECK",
         "case_id": "VIGIA-CAN-047",
-        "entry_sha256": "ae6a4c22b3590fcdf8cb8b5bfecf8590669592b753a39137797de9b6ed577aa2",
+        "entry_sha256": "87d68e2ad1c057a73a539810136cb70c84ce598366f2d22d25c304afa39511f7",
         "inputs_summary": {
           "n_signals": "4"
         },
@@ -147,13 +155,13 @@
           "threshold": "2"
         },
         "seq": 6,
-        "timestamp": "2026-07-05T15:27:42.666194+00:00",
+        "timestamp": "2026-07-06T01:31:06.751888+00:00",
         "tool": "contradiction_detector"
       },
       {
         "action": "AGENT_EXIT",
         "case_id": "VIGIA-CAN-047",
-        "entry_sha256": "84f1a5fa96292350c6b4a95f58675ca12694dcc1bce01268039273001b89dea5",
+        "entry_sha256": "d17b1681c537e35dd13a832c4468a9e20e9f332be012b1aac5d209ecef08f0c8",
         "inputs_summary": {
           "verdict": "MALICIOUS_INTENT_DETECTED"
         },
@@ -164,26 +172,26 @@
           "exit_code": "1"
         },
         "seq": 7,
-        "timestamp": "2026-07-05T15:27:42.666385+00:00",
+        "timestamp": "2026-07-06T01:31:06.752093+00:00",
         "tool": "vigia_agent"
       }
     ],
-    "start_time": "2026-07-05T15:27:42.662966+00:00",
+    "start_time": "2026-07-06T01:31:06.402913+00:00",
     "total_entries": 7
   },
   "case_id": "VIGIA-CAN-047",
   "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-047.json",
-  "evidence_sha256": "8864690ba38fb6de9f76d0ae67563f73db7ffe448ca37752cd5ec8381b5442e2",
+  "evidence_sha256": "98ef56ff338dd88ad96f908f949753366369f963b87d327ae674990f261a7d14",
   "iterations_executed": 1,
-  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-CAN-047 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-047.json\nEvidence SHA-256: 8864690ba38fb6de9f76d0ae67563f73db7ffe448ca37752cd5ec8381b5442e2\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 1789/40000\nConclusive: NO \u2014 requires human review\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 4 se\u00f1al(es): 4 primaria(s) de ['sift_file_audit', 'sift_netflow', 'sift_syslog', 'sift_volatility'], 0 derivada(s)/no-analizada(s). Top z: PE analysis in memory: entry point displ=0.59, Persistent TCP connection from svchost.e=0.20, Process svchost.exe (PID 612) in memory:=0.07.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: MALICIOUS_INTENT_DETECTED. Conclusiva: no \u2014 requiere revisi\u00f3n humana.\n\nRazonamiento del motor abductivo:\nLegitimate svchost.exe process running. Everything looks normal. But it maintains a persistent connection to an IP in an unusual country on port 443. Process hollowing detected.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [PE analysis in memory: entry point displaced 0x4A000 bytes from svchos] z=0.595 conf=0.70 \u2014 \n  [Persistent TCP connection from svchost.exe (PID 612) to 185.220.101.42] z=0.205 conf=0.25 \u2014 \n  [Process svchost.exe (PID 612) in memory: .text section has RWX (read-w] z=0.067 conf=0.95 \u2014 \n  [Anomalous parent process of svchost.exe: rundll32.exe (PID 881) instea] z=0.028 conf=0.40 \u2014 \n\n--- FINAL ALERT LEVEL ---\nMEDIUM \u2014 MALICE verdict from posterior aggregation. Individual z-scores below threshold. Full signal review recommended. Alert floored (B-028/B-065).\nReconciliation: verdict MALICE rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 4 | Derived: 0 | Total: 4",
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-CAN-047 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-047.json\nEvidence SHA-256: 98ef56ff338dd88ad96f908f949753366369f963b87d327ae674990f261a7d14\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 19/20\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 4 se\u00f1al(es): 4 primaria(s) de ['sift_file_audit', 'sift_netflow', 'sift_syslog', 'sift_volatility'], 0 derivada(s)/no-analizada(s). Top z: PE analysis in memory: entry point displ=0.59, Persistent TCP connection from svchost.e=0.20, Process svchost.exe (PID 612) in memory:=0.07.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: MALICIOUS_INTENT_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nLegitimate svchost.exe process running. Everything looks normal. But it maintains a persistent connection to an IP in an unusual country on port 443. Process hollowing detected.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [PE analysis in memory: entry point displaced 0x4A000 bytes from svchos] z=0.595 conf=0.70 \u2014 \n  [Persistent TCP connection from svchost.exe (PID 612) to 185.220.101.42] z=0.205 conf=0.25 \u2014 \n  [Process svchost.exe (PID 612) in memory: .text section has RWX (read-w] z=0.067 conf=0.95 \u2014 \n  [Anomalous parent process of svchost.exe: rundll32.exe (PID 881) instea] z=0.028 conf=0.40 \u2014 \n\n--- FINAL ALERT LEVEL ---\nHIGH \u2014 MALICE verdict from Bayesian posterior aggregation. Individual z-scores below threshold (distributed evidence pattern: no single dominant signal, but aggregate posterior is decisive). Alert floored (B-028/B-065).\nReconciliation: verdict MALICE rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 4 | Derived: 0 | Total: 4",
   "pipeline_results": {
     "abduction": {
       "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
-      "best_posterior": "1789/40000",
+      "best_posterior": "19/20",
       "confidence": {
         "__fraction__": true,
-        "den": 40000,
-        "num": 1789
+        "den": 20,
+        "num": 19
       },
       "devil_advocate": {
         "aggregation": {
@@ -195,7 +203,7 @@
           "primary_alternative_hypothesis": null
         },
         "decision_context": {
-          "confidence": "1789/40000",
+          "confidence": "19/20",
           "mapped_verdict": "MALICIOUS_INTENT_DETECTED",
           "raw_verdict": "MALICIOUS_INTENT_DETECTED",
           "score": "1789/8000"
@@ -209,14 +217,22 @@
         "pattern_evidence_gaps": [],
         "version": "r7-da-v1"
       },
-      "is_conclusive": false,
+      "is_conclusive": true,
       "narrative": "Legitimate svchost.exe process running. Everything looks normal. But it maintains a persistent connection to an IP in an unusual country on port 443. Process hollowing detected."
     },
     "case_id": "case_026_ventrilocuo",
     "pipeline_meta": {
       "artifact_count": 4,
       "avg_score": "1789/8000",
+      "ebs_adapter_mode": "motor",
       "expected_verdict": "MALICE",
+      "resolve": {
+        "motor_confidence": "0.95",
+        "motor_reason": "Intent score 0.5509 exceeds MALICE threshold (P2+acq_assurance scale, threshold=0.33)",
+        "motor_score": "0.5509",
+        "motor_verdict": "MALICE",
+        "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+      },
       "source": "ebs_v1_json_adapter"
     },
     "signals": [

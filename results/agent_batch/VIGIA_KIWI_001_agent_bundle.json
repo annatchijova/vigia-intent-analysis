@@ -1,15 +1,15 @@
 {
   "agent_verdict": "INTENT",
-  "analysis_timestamp": "2026-07-05T15:27:37.099677+00:00",
+  "analysis_timestamp": "2026-07-06T01:30:19.484732+00:00",
   "audit_trail": {
     "agent_version": "1.0.0-SANS-2026",
     "case_id": "VIGIA_KIWI_001",
-    "end_time": "2026-07-05T15:27:37.099682+00:00",
+    "end_time": "2026-07-06T01:30:19.484737+00:00",
     "entries": [
       {
         "action": "AGENT_INITIALIZED",
         "case_id": "VIGIA_KIWI_001",
-        "entry_sha256": "f6d9e330e2b568b726b3fe4c8423ef7ff32bed8cf69acdce809ce3d987afd9e2",
+        "entry_sha256": "766e79ad140e3eaba230ca6f516fcb8319dcecb71aa964d256d13f0c8eed9fba",
         "inputs_summary": {
           "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
           "case_id": "VIGIA_KIWI_001"
@@ -21,13 +21,13 @@
           "agent_version": "1.0.0-SANS-2026"
         },
         "seq": 1,
-        "timestamp": "2026-07-05T15:27:37.096514+00:00",
+        "timestamp": "2026-07-06T01:30:19.142350+00:00",
         "tool": "vigia_agent"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA_KIWI_001",
-        "entry_sha256": "a2536c102c78b5af8aa8296ccfee58502480d44f411521bfd892010dcd4ff024",
+        "entry_sha256": "b0e50a6de2725ba59230da884691d163f51f823bb13cc11343633e165ee28f8f",
         "inputs_summary": {
           "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA_KIWI_001.json"
         },
@@ -35,13 +35,13 @@
         "note": "Computing SHA-256 of original evidence",
         "outputs_summary": {},
         "seq": 2,
-        "timestamp": "2026-07-05T15:27:37.096599+00:00",
+        "timestamp": "2026-07-06T01:30:19.142448+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA_KIWI_001",
-        "entry_sha256": "8dff3dc877040068a1a2d10145a3962f5240af12844454f7a08d9b64ba3838a2",
+        "entry_sha256": "d6b612d8532f6feaf7deb6e504ed01d77064b35e58e1007caebd6e59a53ecfb2",
         "inputs_summary": {
           "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA_KIWI_001.json"
         },
@@ -51,13 +51,13 @@
           "sha256": "114a73c667abffe94f4fd4210579383b033207b168f1c00f06b187eff45a3d1b"
         },
         "seq": 3,
-        "timestamp": "2026-07-05T15:27:37.096698+00:00",
+        "timestamp": "2026-07-06T01:30:19.142550+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "PIPELINE_EXECUTE",
         "case_id": "VIGIA_KIWI_001",
-        "entry_sha256": "d1484a02a1478cf3ce3340cefd5fc51743c0477ef771f1d9a270fa4b7a725a03",
+        "entry_sha256": "ed014494ba98b85bb0d925b83f2844202b160b50ebe0dce90369c08550b6f81a",
         "inputs_summary": {
           "evidence": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA_KIWI_001.json",
           "iteration": "0",
@@ -67,13 +67,13 @@
         "note": "Executing pipeline \u2014 iteration 0",
         "outputs_summary": {},
         "seq": 4,
-        "timestamp": "2026-07-05T15:27:37.096802+00:00",
+        "timestamp": "2026-07-06T01:30:19.142651+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "PIPELINE_COMPLETE",
         "case_id": "VIGIA_KIWI_001",
-        "entry_sha256": "e1ed8d60310db965dcfeeff408ccba5ea31e397f4c533c149f13e1b3feff43f6",
+        "entry_sha256": "99229bcabde087a92c6705ef3685afa7d8e7e3a5f1e29cdef1028f17db3d8b04",
         "inputs_summary": {
           "iteration": "0"
         },
@@ -82,8 +82,8 @@
         "outputs_summary": {
           "abduction": {
             "best_hypothesis": "SUSPICION_DETECTED",
-            "best_posterior": "21/250",
-            "confidence": "21/250",
+            "best_posterior": "27/50",
+            "confidence": "27/50",
             "is_conclusive": "True",
             "narrative": "Caso maestro adversarial: false flag via asociaci\u00f3n simb\u00f3lica subjetiva. Denunciante construye narrativa de amenaza sin contacto directo en 3 a\u00f1os."
           },
@@ -91,7 +91,15 @@
           "pipeline_meta": {
             "artifact_count": "4",
             "avg_score": "21/50",
+            "ebs_adapter_mode": "motor",
             "expected_verdict": "SUSPICION",
+            "resolve": {
+              "motor_confidence": "0.54",
+              "motor_reason": "Significant signal with structural support (score=0.2696)",
+              "motor_score": "0.2696",
+              "motor_verdict": "SUSPICION",
+              "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+            },
             "source": "ebs_v1_json_adapter"
           },
           "signals": [
@@ -130,13 +138,13 @@
           ]
         },
         "seq": 5,
-        "timestamp": "2026-07-05T15:27:37.099329+00:00",
+        "timestamp": "2026-07-06T01:30:19.484277+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "CONTRADICTION_CHECK",
         "case_id": "VIGIA_KIWI_001",
-        "entry_sha256": "b1126bf8b6719ae96a7992d6b91794615cbc63eea6aa4da0b08b564280f71e5a",
+        "entry_sha256": "a499709eaa6d6e3aeb0237fd8a1a0bbc0d88cb0b49a395228e9f1861de4abe06",
         "inputs_summary": {
           "n_signals": "4"
         },
@@ -147,13 +155,13 @@
           "threshold": "2"
         },
         "seq": 6,
-        "timestamp": "2026-07-05T15:27:37.099448+00:00",
+        "timestamp": "2026-07-06T01:30:19.484470+00:00",
         "tool": "contradiction_detector"
       },
       {
         "action": "AGENT_EXIT",
         "case_id": "VIGIA_KIWI_001",
-        "entry_sha256": "5a5f35ecb38505a8b65378aa4b91c875b09519d4d379dfad67a02d5640a8d2aa",
+        "entry_sha256": "7b97a7432895d2ddfebc6ddaa37de769fb6f1f4da83e1f46342e0ec208340ebe",
         "inputs_summary": {
           "verdict": "SUSPICION_DETECTED"
         },
@@ -164,26 +172,26 @@
           "exit_code": "3"
         },
         "seq": 7,
-        "timestamp": "2026-07-05T15:27:37.099628+00:00",
+        "timestamp": "2026-07-06T01:30:19.484679+00:00",
         "tool": "vigia_agent"
       }
     ],
-    "start_time": "2026-07-05T15:27:37.096275+00:00",
+    "start_time": "2026-07-06T01:30:19.142101+00:00",
     "total_entries": 7
   },
   "case_id": "VIGIA_KIWI_001",
   "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA_KIWI_001.json",
   "evidence_sha256": "114a73c667abffe94f4fd4210579383b033207b168f1c00f06b187eff45a3d1b",
   "iterations_executed": 1,
-  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA_KIWI_001 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/VIGIA_KIWI_001.json\nEvidence SHA-256: 114a73c667abffe94f4fd4210579383b033207b168f1c00f06b187eff45a3d1b\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: SUSPICION_DETECTED\nPosterior confidence: 21/250\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 4 se\u00f1al(es): 4 primaria(s) de ['manual_forensic_review'], 0 derivada(s)/no-analizada(s). Top z: PHP error logs trampolin.sg-host.com 01-=0.56, Blog honeypot: hasta 60 accesos diarios =0.48, Fotos parque: calesita naranja, ramas \u00e1r=0.40.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: SUSPICION_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nCaso maestro adversarial: false flag via asociaci\u00f3n simb\u00f3lica subjetiva. Denunciante construye narrativa de amenaza sin contacto directo en 3 a\u00f1os.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [PHP error logs trampolin.sg-host.com 01-Sep-2025 con usuario trampolin] z=0.560 conf=0.80 \u2014 \n  [Blog honeypot: hasta 60 accesos diarios desde actor_a bloqueado] z=0.480 conf=0.80 \u2014 \n  [Fotos parque: calesita naranja, ramas \u00e1rbol, piloto F1 con texto expl\u00ed] z=0.400 conf=0.80 \u2014 \n  [Imagen arma marr\u00f3n con kiwis enteros. Texto promueve uso legal.] z=0.240 conf=0.80 \u2014 \n\n--- FINAL ALERT LEVEL ---\nMEDIUM \u2014 INTENT verdict with individual z-scores below threshold. Alert floored (B-028/B-065): an intent finding cannot present as LOW.\nReconciliation: verdict INTENT rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 4 | Derived: 0 | Total: 4",
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA_KIWI_001 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/VIGIA_KIWI_001.json\nEvidence SHA-256: 114a73c667abffe94f4fd4210579383b033207b168f1c00f06b187eff45a3d1b\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: SUSPICION_DETECTED\nPosterior confidence: 27/50\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 4 se\u00f1al(es): 4 primaria(s) de ['manual_forensic_review'], 0 derivada(s)/no-analizada(s). Top z: PHP error logs trampolin.sg-host.com 01-=0.56, Blog honeypot: hasta 60 accesos diarios =0.48, Fotos parque: calesita naranja, ramas \u00e1r=0.40.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: SUSPICION_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nCaso maestro adversarial: false flag via asociaci\u00f3n simb\u00f3lica subjetiva. Denunciante construye narrativa de amenaza sin contacto directo en 3 a\u00f1os.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [PHP error logs trampolin.sg-host.com 01-Sep-2025 con usuario trampolin] z=0.560 conf=0.80 \u2014 \n  [Blog honeypot: hasta 60 accesos diarios desde actor_a bloqueado] z=0.480 conf=0.80 \u2014 \n  [Fotos parque: calesita naranja, ramas \u00e1rbol, piloto F1 con texto expl\u00ed] z=0.400 conf=0.80 \u2014 \n  [Imagen arma marr\u00f3n con kiwis enteros. Texto promueve uso legal.] z=0.240 conf=0.80 \u2014 \n\n--- FINAL ALERT LEVEL ---\nMEDIUM \u2014 INTENT verdict with individual z-scores below threshold. Alert floored (B-028/B-065): an intent finding cannot present as LOW.\nReconciliation: verdict INTENT rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 4 | Derived: 0 | Total: 4",
   "pipeline_results": {
     "abduction": {
       "best_hypothesis": "SUSPICION_DETECTED",
-      "best_posterior": "21/250",
+      "best_posterior": "27/50",
       "confidence": {
         "__fraction__": true,
-        "den": 250,
-        "num": 21
+        "den": 50,
+        "num": 27
       },
       "is_conclusive": true,
       "narrative": "Caso maestro adversarial: false flag via asociaci\u00f3n simb\u00f3lica subjetiva. Denunciante construye narrativa de amenaza sin contacto directo en 3 a\u00f1os."
@@ -192,7 +200,15 @@
     "pipeline_meta": {
       "artifact_count": 4,
       "avg_score": "21/50",
+      "ebs_adapter_mode": "motor",
       "expected_verdict": "SUSPICION",
+      "resolve": {
+        "motor_confidence": "0.54",
+        "motor_reason": "Significant signal with structural support (score=0.2696)",
+        "motor_score": "0.2696",
+        "motor_verdict": "SUSPICION",
+        "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+      },
       "source": "ebs_v1_json_adapter"
     },
     "signals": [

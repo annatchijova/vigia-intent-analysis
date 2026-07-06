@@ -1,15 +1,15 @@
 {
-  "agent_verdict": "INTENT",
-  "analysis_timestamp": "2026-07-05T15:27:33.756570+00:00",
+  "agent_verdict": "MALICE",
+  "analysis_timestamp": "2026-07-06T01:29:51.277693+00:00",
   "audit_trail": {
     "agent_version": "1.0.0-SANS-2026",
     "case_id": "VIGIA-FLAREON-7",
-    "end_time": "2026-07-05T15:27:33.756575+00:00",
+    "end_time": "2026-07-06T01:29:51.277700+00:00",
     "entries": [
       {
         "action": "AGENT_INITIALIZED",
         "case_id": "VIGIA-FLAREON-7",
-        "entry_sha256": "f738b0a1280d88abf6ff6d6c5d83e643afc6a4a94ed786692a94aa18094c5165",
+        "entry_sha256": "59ca9df63ced0f54a9ae8f8577ce4f27b8a8cd8402d29df47e34b385643f54aa",
         "inputs_summary": {
           "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
           "case_id": "VIGIA-FLAREON-7"
@@ -21,13 +21,13 @@
           "agent_version": "1.0.0-SANS-2026"
         },
         "seq": 1,
-        "timestamp": "2026-07-05T15:27:33.753193+00:00",
+        "timestamp": "2026-07-06T01:29:50.930296+00:00",
         "tool": "vigia_agent"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-FLAREON-7",
-        "entry_sha256": "ea4c25036d0299c64bb827959eb1c888e3c7a3bd26b132c625717a7dc8b88ebe",
+        "entry_sha256": "aecee8114c4fc083bd273f3bde8a840f6964a0d1a9ec818d89fe9d1390107950",
         "inputs_summary": {
           "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-FLAREON-7.json"
         },
@@ -35,29 +35,29 @@
         "note": "Computing SHA-256 of original evidence",
         "outputs_summary": {},
         "seq": 2,
-        "timestamp": "2026-07-05T15:27:33.753276+00:00",
+        "timestamp": "2026-07-06T01:29:50.930380+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-FLAREON-7",
-        "entry_sha256": "c9520b5cc929ba1d6f08458313893bf2c1b929c11bef5f6fe36f9ed36b1cdbdd",
+        "entry_sha256": "888e17385c2351af53a7f2deeadd13e9b457215020197bbf9bd44a85ef72987e",
         "inputs_summary": {
           "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-FLAREON-7.json"
         },
         "iteration": 0,
-        "note": "Evidence verified: e088bf7f1136e643...",
+        "note": "Evidence verified: 17c2e0032496c302...",
         "outputs_summary": {
-          "sha256": "e088bf7f1136e64345cce25500a50a260c787ff4b420293246ec3161f2529fca"
+          "sha256": "17c2e0032496c3024fb0e46293bf59fbe4767bbbc091b08c288f561b559b2e81"
         },
         "seq": 3,
-        "timestamp": "2026-07-05T15:27:33.753383+00:00",
+        "timestamp": "2026-07-06T01:29:50.930505+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "PIPELINE_EXECUTE",
         "case_id": "VIGIA-FLAREON-7",
-        "entry_sha256": "6c97ac1c12ed15bcf17c3f1d7066668786af21b21c54234e10a33d962720cc40",
+        "entry_sha256": "82821921d9b9f3a140005ffa9b6952679797263504b3080152eb10d3a402a328",
         "inputs_summary": {
           "evidence": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-FLAREON-7.json",
           "iteration": "0",
@@ -67,13 +67,13 @@
         "note": "Executing pipeline \u2014 iteration 0",
         "outputs_summary": {},
         "seq": 4,
-        "timestamp": "2026-07-05T15:27:33.753502+00:00",
+        "timestamp": "2026-07-06T01:29:50.930608+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "PIPELINE_COMPLETE",
         "case_id": "VIGIA-FLAREON-7",
-        "entry_sha256": "a4bdb710a9f9b32ec403b255830d47807686593f5e877534c8524f87f78fd682",
+        "entry_sha256": "50da460fd4fcc3816113919329e7158ade930addde029e37904c000c6077a38c",
         "inputs_summary": {
           "iteration": "0"
         },
@@ -81,9 +81,9 @@
         "note": "Pipeline completed \u2014 12 signals",
         "outputs_summary": {
           "abduction": {
-            "best_hypothesis": "INTENT_DETECTED",
-            "best_posterior": "5727/40000",
-            "confidence": "5727/40000",
+            "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+            "best_posterior": "19/20",
+            "confidence": "19/20",
             "is_conclusive": "True",
             "narrative": "FLARE-On 7 challenge set released in September 2020 by FireEye FLARE team. The zip archive (25,655,653 bytes, SHA-256: bafa1659743bbf55c015ebe7c72d2809f763c498d429505c6c8cee467cdcd877) contains 11 CTF..."
           },
@@ -91,7 +91,15 @@
           "pipeline_meta": {
             "artifact_count": "12",
             "avg_score": "5727/8000",
+            "ebs_adapter_mode": "motor",
             "expected_verdict": "INTENT",
+            "resolve": {
+              "motor_confidence": "0.95",
+              "motor_reason": "Intent score 0.6841 exceeds MALICE threshold (P2+acq_assurance scale, threshold=0.33)",
+              "motor_score": "0.6841",
+              "motor_verdict": "MALICE",
+              "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+            },
             "source": "ebs_v1_json_adapter"
           },
           "signals": [
@@ -138,13 +146,13 @@
           ]
         },
         "seq": 5,
-        "timestamp": "2026-07-05T15:27:33.756130+00:00",
+        "timestamp": "2026-07-06T01:29:51.277089+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "CONTRADICTION_CHECK",
         "case_id": "VIGIA-FLAREON-7",
-        "entry_sha256": "f851d62f38eac1b5d2502bcf3e890e373a091558c199b752b8d660e546825a87",
+        "entry_sha256": "0785bbd1725cfa63b512505595ec2e64291d376a02e80749b89fd91ac6a71392",
         "inputs_summary": {
           "n_signals": "12"
         },
@@ -155,43 +163,67 @@
           "threshold": "2"
         },
         "seq": 6,
-        "timestamp": "2026-07-05T15:27:33.756277+00:00",
+        "timestamp": "2026-07-06T01:29:51.277249+00:00",
         "tool": "contradiction_detector"
       },
       {
         "action": "AGENT_EXIT",
         "case_id": "VIGIA-FLAREON-7",
-        "entry_sha256": "2fb2eede9208fad49bcc1036f379a33a8bbd17fa87a9654f9e787d814c69a5f4",
+        "entry_sha256": "4bebfc7479b3e0ebe9ea5d42b40a077c4e6bc52381efa64ed43e77200c0e1520",
         "inputs_summary": {
-          "verdict": "INTENT_DETECTED"
+          "verdict": "MALICIOUS_INTENT_DETECTED"
         },
         "iteration": 0,
-        "note": "Exit code 3 (INTENT) \u2014 analysis complete.",
+        "note": "Exit code 1 (MALICE) \u2014 analysis complete.",
         "outputs_summary": {
-          "agent_verdict": "INTENT",
-          "exit_code": "3"
+          "agent_verdict": "MALICE",
+          "exit_code": "1"
         },
         "seq": 7,
-        "timestamp": "2026-07-05T15:27:33.756518+00:00",
+        "timestamp": "2026-07-06T01:29:51.277513+00:00",
         "tool": "vigia_agent"
       }
     ],
-    "start_time": "2026-07-05T15:27:33.752972+00:00",
+    "start_time": "2026-07-06T01:29:50.930071+00:00",
     "total_entries": 7
   },
   "case_id": "VIGIA-FLAREON-7",
   "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-FLAREON-7.json",
-  "evidence_sha256": "e088bf7f1136e64345cce25500a50a260c787ff4b420293246ec3161f2529fca",
+  "evidence_sha256": "17c2e0032496c3024fb0e46293bf59fbe4767bbbc091b08c288f561b559b2e81",
   "iterations_executed": 1,
-  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-FLAREON-7 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/VIGIA-FLAREON-7.json\nEvidence SHA-256: e088bf7f1136e64345cce25500a50a260c787ff4b420293246ec3161f2529fca\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: INTENT_DETECTED\nPosterior confidence: 5727/40000\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 12 se\u00f1al(es): 12 primaria(s) de ['generate_forensic_hash', 'list_files'], 0 derivada(s)/no-analizada(s). Top z: Outer zip archive Flare-On7_Challenges.z=0.94, Challenge 11 \u2014 rabbithole (557,952 bytes=0.81, Challenge 05 \u2014 TKApp (1,749,312 bytes). =0.77.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: INTENT_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nFLARE-On 7 challenge set released in September 2020 by FireEye FLARE team. The zip archive (25,655,653 bytes, SHA-256: bafa1659743bbf55c015ebe7c72d2809f763c498d429505c6c8cee467cdcd877) contains 11 CTF challenges (numbered 1\u201311) plus a 7zip_password.txt. 2020 edition is notable for the Tizen smartwatch challenge (TKApp, ch5) and a corrupted-file challenge (garbage, ch2). Challenges range from a Python game (fidler, 11 MB) to a deep rabbit-hole reversing chain (rabbithole, ch11). FLARE-On 7 was he\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Outer zip archive Flare-On7_Challenges.zip. SHA-256 verified against t] z=0.941 conf=0.99 \u2014 \n  [Challenge 11 \u2014 rabbithole (557,952 bytes). Final challenge. 'Rabbithol] z=0.810 conf=0.90 \u2014 \n  [Challenge 05 \u2014 TKApp (1,749,312 bytes). Tizen OS application (.tpk) fo] z=0.765 conf=0.90 \u2014 \n  [Challenge 09 \u2014 crackinstaller (114,336 bytes). Windows kernel driver /] z=0.765 conf=0.90 \u2014 \n  [Challenge 04 \u2014 report (789,856 bytes). Name 'report' and size suggest ] z=0.720 conf=0.90 \u2014 \n\n--- FINAL ALERT LEVEL ---\nMEDIUM \u2014 INTENT verdict with individual z-scores below threshold. Alert floored (B-028/B-065): an intent finding cannot present as LOW.\nReconciliation: verdict INTENT rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 12 | Derived: 0 | Total: 12",
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-FLAREON-7 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/VIGIA-FLAREON-7.json\nEvidence SHA-256: 17c2e0032496c3024fb0e46293bf59fbe4767bbbc091b08c288f561b559b2e81\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 19/20\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 12 se\u00f1al(es): 12 primaria(s) de ['generate_forensic_hash', 'list_files'], 0 derivada(s)/no-analizada(s). Top z: Outer zip archive Flare-On7_Challenges.z=0.94, Challenge 11 \u2014 rabbithole (557,952 bytes=0.81, Challenge 05 \u2014 TKApp (1,749,312 bytes). =0.77.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: MALICIOUS_INTENT_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nFLARE-On 7 challenge set released in September 2020 by FireEye FLARE team. The zip archive (25,655,653 bytes, SHA-256: bafa1659743bbf55c015ebe7c72d2809f763c498d429505c6c8cee467cdcd877) contains 11 CTF challenges (numbered 1\u201311) plus a 7zip_password.txt. 2020 edition is notable for the Tizen smartwatch challenge (TKApp, ch5) and a corrupted-file challenge (garbage, ch2). Challenges range from a Python game (fidler, 11 MB) to a deep rabbit-hole reversing chain (rabbithole, ch11). FLARE-On 7 was he\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Outer zip archive Flare-On7_Challenges.zip. SHA-256 verified against t] z=0.941 conf=0.99 \u2014 \n  [Challenge 11 \u2014 rabbithole (557,952 bytes). Final challenge. 'Rabbithol] z=0.810 conf=0.90 \u2014 \n  [Challenge 05 \u2014 TKApp (1,749,312 bytes). Tizen OS application (.tpk) fo] z=0.765 conf=0.90 \u2014 \n  [Challenge 09 \u2014 crackinstaller (114,336 bytes). Windows kernel driver /] z=0.765 conf=0.90 \u2014 \n  [Challenge 04 \u2014 report (789,856 bytes). Name 'report' and size suggest ] z=0.720 conf=0.90 \u2014 \n\n--- FINAL ALERT LEVEL ---\nHIGH \u2014 MALICE verdict from Bayesian posterior aggregation. Individual z-scores below threshold (distributed evidence pattern: no single dominant signal, but aggregate posterior is decisive). Alert floored (B-028/B-065).\nReconciliation: verdict MALICE rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 12 | Derived: 0 | Total: 12",
   "pipeline_results": {
     "abduction": {
-      "best_hypothesis": "INTENT_DETECTED",
-      "best_posterior": "5727/40000",
+      "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+      "best_posterior": "19/20",
       "confidence": {
         "__fraction__": true,
-        "den": 40000,
-        "num": 5727
+        "den": 20,
+        "num": 19
+      },
+      "devil_advocate": {
+        "aggregation": {
+          "k": 3,
+          "method": "top_k_already_validated_matches_v2",
+          "total_gap_mass": "0"
+        },
+        "counterfactual_summary": {
+          "primary_alternative_hypothesis": null
+        },
+        "decision_context": {
+          "confidence": "19/20",
+          "mapped_verdict": "MALICIOUS_INTENT_DETECTED",
+          "raw_verdict": "MALICIOUS_INTENT_DETECTED",
+          "score": "5727/8000"
+        },
+        "devil_advocate_source": "deterministic_no_pattern_data_available",
+        "meta": {
+          "deterministic": true,
+          "generated_from": "case_pattern_library"
+        },
+        "narrative": "Eco's Razor (Abductive Falsification) applied to verdict MALICIOUS_INTENT_DETECTED. Pattern-matching data was not available on this code path \u2014 CasePatternLibrary is not invoked here by design (agent audit-trail mode (vigia_agent.py \u2014 JSON-replay / autonomous path); see KNOWN_LIMITATIONS.md). No structured counter-hypothesis could be derived deterministically. This is a documented scope limitation of the current code path, not an absence of falsification attempt.",
+        "pattern_evidence_gaps": [],
+        "version": "r7-da-v1"
       },
       "is_conclusive": true,
       "narrative": "FLARE-On 7 challenge set released in September 2020 by FireEye FLARE team. The zip archive (25,655,653 bytes, SHA-256: bafa1659743bbf55c015ebe7c72d2809f763c498d429505c6c8cee467cdcd877) contains 11 CTF challenges (numbered 1\u201311) plus a 7zip_password.txt. 2020 edition is notable for the Tizen smartwatch challenge (TKApp, ch5) and a corrupted-file challenge (garbage, ch2). Challenges range from a Python game (fidler, 11 MB) to a deep rabbit-hole reversing chain (rabbithole, ch11). FLARE-On 7 was he"
@@ -200,7 +232,15 @@
     "pipeline_meta": {
       "artifact_count": 12,
       "avg_score": "5727/8000",
+      "ebs_adapter_mode": "motor",
       "expected_verdict": "INTENT",
+      "resolve": {
+        "motor_confidence": "0.95",
+        "motor_reason": "Intent score 0.6841 exceeds MALICE threshold (P2+acq_assurance scale, threshold=0.33)",
+        "motor_score": "0.6841",
+        "motor_verdict": "MALICE",
+        "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+      },
       "source": "ebs_v1_json_adapter"
     },
     "signals": [

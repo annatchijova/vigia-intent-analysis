@@ -1,15 +1,15 @@
 {
   "agent_verdict": "NOISE",
-  "analysis_timestamp": "2026-07-05T15:27:37.973563+00:00",
+  "analysis_timestamp": "2026-07-06T01:30:27.055904+00:00",
   "audit_trail": {
     "agent_version": "1.0.0-SANS-2026",
     "case_id": "NPS-2010-EMAILS",
-    "end_time": "2026-07-05T15:27:37.973569+00:00",
+    "end_time": "2026-07-06T01:30:27.055909+00:00",
     "entries": [
       {
         "action": "AGENT_INITIALIZED",
         "case_id": "NPS-2010-EMAILS",
-        "entry_sha256": "1e8d50de91d23447b681b30865e4f9238ad8058b32f830b6a668216a5d5503fa",
+        "entry_sha256": "5500aa7f8323c99735625f9f4392bf183a3d2151717d5e903b994d992355a233",
         "inputs_summary": {
           "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
           "case_id": "NPS-2010-EMAILS"
@@ -21,13 +21,13 @@
           "agent_version": "1.0.0-SANS-2026"
         },
         "seq": 1,
-        "timestamp": "2026-07-05T15:27:37.970245+00:00",
+        "timestamp": "2026-07-06T01:30:26.712542+00:00",
         "tool": "vigia_agent"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "NPS-2010-EMAILS",
-        "entry_sha256": "ea8377c35dd78a9f8613743fbcad3c7d1812a2ab38fef108f11b704c50dd4696",
+        "entry_sha256": "83fc30ffaab2364ef649ed45ee288b1ba6763fce70615a3c519cd3fc18b9ee8b",
         "inputs_summary": {
           "path": "/home/labestiadevigia/vigia-repo/data/cases/converted/NPS-2010-EMAILS.json"
         },
@@ -35,29 +35,29 @@
         "note": "Computing SHA-256 of original evidence",
         "outputs_summary": {},
         "seq": 2,
-        "timestamp": "2026-07-05T15:27:37.970331+00:00",
+        "timestamp": "2026-07-06T01:30:26.712626+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "NPS-2010-EMAILS",
-        "entry_sha256": "001c7959a3dd7aa9ff4699c06ae02e7a23002a9df5ea59e48277227c52042c76",
+        "entry_sha256": "d57dd519ed9ce7f709407c0bdbe9308ce670aa95084b57bc326c241b1a3a6705",
         "inputs_summary": {
           "path": "/home/labestiadevigia/vigia-repo/data/cases/converted/NPS-2010-EMAILS.json"
         },
         "iteration": 0,
-        "note": "Evidence verified: 88aacfea8e2d218a...",
+        "note": "Evidence verified: 405f505f04310901...",
         "outputs_summary": {
-          "sha256": "88aacfea8e2d218a21c459b3442a8ceed37452933ea550549dc9ec8e4a98f874"
+          "sha256": "405f505f0431090148794b0d1f16d55b853f32f5a1f47a9b7e950a06d95b991c"
         },
         "seq": 3,
-        "timestamp": "2026-07-05T15:27:37.970440+00:00",
+        "timestamp": "2026-07-06T01:30:26.712720+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "PIPELINE_EXECUTE",
         "case_id": "NPS-2010-EMAILS",
-        "entry_sha256": "339c825c0e859dfce44a377fc1412c16142d8efb019d600b237aaf9a680b9ad5",
+        "entry_sha256": "63eba7deb3d41e09d954d311d5831d8ae59674b1d7a2251dacea38dbe67f998e",
         "inputs_summary": {
           "evidence": "/home/labestiadevigia/vigia-repo/data/cases/converted/NPS-2010-EMAILS.json",
           "iteration": "0",
@@ -67,13 +67,13 @@
         "note": "Executing pipeline \u2014 iteration 0",
         "outputs_summary": {},
         "seq": 4,
-        "timestamp": "2026-07-05T15:27:37.970547+00:00",
+        "timestamp": "2026-07-06T01:30:26.712822+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "PIPELINE_COMPLETE",
         "case_id": "NPS-2010-EMAILS",
-        "entry_sha256": "92063129256048e7cf79bb7415489aa78303f326480c8b9955eb4bbd70e67f06",
+        "entry_sha256": "3f524f3b33fce7e2a430d2825d0cd9182058a00dcb44d2b43caa138b8fd57671",
         "inputs_summary": {
           "iteration": "0"
         },
@@ -82,16 +82,24 @@
         "outputs_summary": {
           "abduction": {
             "best_hypothesis": "NO_SEMIOTIC_ANOMALY_DETECTED",
-            "best_posterior": "1147/150000",
-            "confidence": "1147/150000",
-            "is_conclusive": "False",
+            "best_posterior": "99/100",
+            "confidence": "99/100",
+            "is_conclusive": "True",
             "narrative": "NPS-2010-emails educational forensic corpus. FAT16 E01 disk image containing 26 files with email addresses embedded in 7 application/encoding format families. Created by Simson Garfinkel, Naval Postgr..."
           },
           "case_id": "NPS-2010-EMAILS",
           "pipeline_meta": {
             "artifact_count": "6",
             "avg_score": "1147/30000",
+            "ebs_adapter_mode": "motor",
             "expected_verdict": "NOISE",
+            "resolve": {
+              "motor_confidence": "1.0",
+              "motor_reason": "Insufficient evidence of malicious intent (score=0.0014)",
+              "motor_score": "0.0014",
+              "motor_verdict": "NOISE",
+              "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+            },
             "source": "ebs_v1_json_adapter"
           },
           "signals": [
@@ -138,13 +146,13 @@
           ]
         },
         "seq": 5,
-        "timestamp": "2026-07-05T15:27:37.973167+00:00",
+        "timestamp": "2026-07-06T01:30:27.055501+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "CONTRADICTION_CHECK",
         "case_id": "NPS-2010-EMAILS",
-        "entry_sha256": "c1c8af28bcdaf247c51a3591dbd62d5fb1b1ab17c40864d6ae016c1752013122",
+        "entry_sha256": "e014269cb375642a71feec214f3b6d86551e51a71bd92e5b9c2b889b6cb0dc7a",
         "inputs_summary": {
           "n_signals": "6"
         },
@@ -155,13 +163,13 @@
           "threshold": "2"
         },
         "seq": 6,
-        "timestamp": "2026-07-05T15:27:37.973297+00:00",
+        "timestamp": "2026-07-06T01:30:27.055636+00:00",
         "tool": "contradiction_detector"
       },
       {
         "action": "AGENT_EXIT",
         "case_id": "NPS-2010-EMAILS",
-        "entry_sha256": "b5bbf303ef521757da0d778f23e231786d50dc88b167a9b4dab262066f1abe5c",
+        "entry_sha256": "2e2394bab6d67555d0493ed4283b98d2b8069e29e78b157e1fb99445c64161fa",
         "inputs_summary": {
           "verdict": "NO_SEMIOTIC_ANOMALY_DETECTED"
         },
@@ -172,35 +180,43 @@
           "exit_code": "0"
         },
         "seq": 7,
-        "timestamp": "2026-07-05T15:27:37.973510+00:00",
+        "timestamp": "2026-07-06T01:30:27.055851+00:00",
         "tool": "vigia_agent"
       }
     ],
-    "start_time": "2026-07-05T15:27:37.970012+00:00",
+    "start_time": "2026-07-06T01:30:26.712319+00:00",
     "total_entries": 7
   },
   "case_id": "NPS-2010-EMAILS",
   "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/converted/NPS-2010-EMAILS.json",
-  "evidence_sha256": "88aacfea8e2d218a21c459b3442a8ceed37452933ea550549dc9ec8e4a98f874",
+  "evidence_sha256": "405f505f0431090148794b0d1f16d55b853f32f5a1f47a9b7e950a06d95b991c",
   "iterations_executed": 1,
-  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE NPS-2010-EMAILS ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/converted/NPS-2010-EMAILS.json\nEvidence SHA-256: 88aacfea8e2d218a21c459b3442a8ceed37452933ea550549dc9ec8e4a98f874\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: NO_SEMIOTIC_ANOMALY_DETECTED\nPosterior confidence: 1147/150000\nConclusive: NO \u2014 requires human review\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 6 se\u00f1al(es): 6 primaria(s) de ['unknown'], 0 derivada(s)/no-analizada(s). Top z: strings output: 9/26 email addresses rec=0.06, E01 entropy H=7.95 (HIGH). Expected for =0.05, FAT16 macOS disk image, 10 MB, 26 files,=0.04.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: NO_SEMIOTIC_ANOMALY_DETECTED. Conclusiva: no \u2014 requiere revisi\u00f3n humana.\n\nRazonamiento del motor abductivo:\nNPS-2010-emails educational forensic corpus. FAT16 E01 disk image containing 26 files with email addresses embedded in 7 application/encoding format families. Created by Simson Garfinkel, Naval Postgraduate School.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [strings output: 9/26 email addresses recovered. 17/26 absent. Recovery] z=0.056 conf=0.94 \u2014 \n  [E01 entropy H=7.95 (HIGH). Expected for EWF format compression stackin] z=0.048 conf=0.95 \u2014 \n  [FAT16 macOS disk image, 10 MB, 26 files, 7 format families. Makefile c] z=0.038 conf=0.96 \u2014 \n  [OLE .doc and .xls files: email addresses recoverable by strings. H=3.0] z=0.038 conf=0.96 \u2014 \n  [UTF-16 LE encoding confirmed (BOM ff fe on document3.txt). Null bytes ] z=0.029 conf=0.97 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 6 | Derived: 0 | Total: 6",
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE NPS-2010-EMAILS ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/converted/NPS-2010-EMAILS.json\nEvidence SHA-256: 405f505f0431090148794b0d1f16d55b853f32f5a1f47a9b7e950a06d95b991c\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: NO_SEMIOTIC_ANOMALY_DETECTED\nPosterior confidence: 99/100\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 6 se\u00f1al(es): 6 primaria(s) de ['unknown'], 0 derivada(s)/no-analizada(s). Top z: strings output: 9/26 email addresses rec=0.06, E01 entropy H=7.95 (HIGH). Expected for =0.05, FAT16 macOS disk image, 10 MB, 26 files,=0.04.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: NO_SEMIOTIC_ANOMALY_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nNPS-2010-emails educational forensic corpus. FAT16 E01 disk image containing 26 files with email addresses embedded in 7 application/encoding format families. Created by Simson Garfinkel, Naval Postgraduate School.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [strings output: 9/26 email addresses recovered. 17/26 absent. Recovery] z=0.056 conf=0.94 \u2014 \n  [E01 entropy H=7.95 (HIGH). Expected for EWF format compression stackin] z=0.048 conf=0.95 \u2014 \n  [FAT16 macOS disk image, 10 MB, 26 files, 7 format families. Makefile c] z=0.038 conf=0.96 \u2014 \n  [OLE .doc and .xls files: email addresses recoverable by strings. H=3.0] z=0.038 conf=0.96 \u2014 \n  [UTF-16 LE encoding confirmed (BOM ff fe on document3.txt). Null bytes ] z=0.029 conf=0.97 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 6 | Derived: 0 | Total: 6",
   "pipeline_results": {
     "abduction": {
       "best_hypothesis": "NO_SEMIOTIC_ANOMALY_DETECTED",
-      "best_posterior": "1147/150000",
+      "best_posterior": "99/100",
       "confidence": {
         "__fraction__": true,
-        "den": 150000,
-        "num": 1147
+        "den": 100,
+        "num": 99
       },
-      "is_conclusive": false,
+      "is_conclusive": true,
       "narrative": "NPS-2010-emails educational forensic corpus. FAT16 E01 disk image containing 26 files with email addresses embedded in 7 application/encoding format families. Created by Simson Garfinkel, Naval Postgraduate School."
     },
     "case_id": "NPS-2010-EMAILS",
     "pipeline_meta": {
       "artifact_count": 6,
       "avg_score": "1147/30000",
+      "ebs_adapter_mode": "motor",
       "expected_verdict": "NOISE",
+      "resolve": {
+        "motor_confidence": "1.0",
+        "motor_reason": "Insufficient evidence of malicious intent (score=0.0014)",
+        "motor_score": "0.0014",
+        "motor_verdict": "NOISE",
+        "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+      },
       "source": "ebs_v1_json_adapter"
     },
     "signals": [

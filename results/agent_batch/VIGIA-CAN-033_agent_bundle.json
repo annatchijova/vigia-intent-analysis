@@ -1,15 +1,15 @@
 {
   "agent_verdict": "MALICE",
-  "analysis_timestamp": "2026-07-05T15:27:41.935279+00:00",
+  "analysis_timestamp": "2026-07-06T01:31:00.534866+00:00",
   "audit_trail": {
     "agent_version": "1.0.0-SANS-2026",
     "case_id": "VIGIA-CAN-033",
-    "end_time": "2026-07-05T15:27:41.935286+00:00",
+    "end_time": "2026-07-06T01:31:00.534874+00:00",
     "entries": [
       {
         "action": "AGENT_INITIALIZED",
         "case_id": "VIGIA-CAN-033",
-        "entry_sha256": "1434364e5aec4f2e1ad0e51111bedfb4afb274f9c5ed522cd265ba2a5a0f6a59",
+        "entry_sha256": "9be886bb7a90febf3a35bc08d5db98aa61d98613f680a9868bb9c6db51a78728",
         "inputs_summary": {
           "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
           "case_id": "VIGIA-CAN-033"
@@ -21,13 +21,13 @@
           "agent_version": "1.0.0-SANS-2026"
         },
         "seq": 1,
-        "timestamp": "2026-07-05T15:27:41.931584+00:00",
+        "timestamp": "2026-07-06T01:31:00.173245+00:00",
         "tool": "vigia_agent"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-CAN-033",
-        "entry_sha256": "2aa8988acd93a5eda51ef0a19718c74e36f7faa14d8e847cfe0da33906cbe6a4",
+        "entry_sha256": "a28338e4c917f9bb160a9ee16da804ac54c3d3778c84b701274cd91c570d518c",
         "inputs_summary": {
           "path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-033.json"
         },
@@ -35,29 +35,29 @@
         "note": "Computing SHA-256 of original evidence",
         "outputs_summary": {},
         "seq": 2,
-        "timestamp": "2026-07-05T15:27:41.931671+00:00",
+        "timestamp": "2026-07-06T01:31:00.173334+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-CAN-033",
-        "entry_sha256": "812087ca616c8e0c21d3a6b32ac9030c3f370a2de03c51e3ec58e14b11830498",
+        "entry_sha256": "b8315cc602deab70d29ca150a4371bef0f9f9e8b963e0be6ecec0f326382bf3f",
         "inputs_summary": {
           "path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-033.json"
         },
         "iteration": 0,
-        "note": "Evidence verified: e045919986d0894c...",
+        "note": "Evidence verified: bc1016e8d29f8030...",
         "outputs_summary": {
-          "sha256": "e045919986d0894cf4db54ddecf4588d84beca69d849dc542f2bc04d47050a4a"
+          "sha256": "bc1016e8d29f803014cea29e0df65fc2b8befd6f9a9dd1f6bd87a85801eefed5"
         },
         "seq": 3,
-        "timestamp": "2026-07-05T15:27:41.931768+00:00",
+        "timestamp": "2026-07-06T01:31:00.173433+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "PIPELINE_EXECUTE",
         "case_id": "VIGIA-CAN-033",
-        "entry_sha256": "5e86fa987f65fe741a03f8e7726974249f2512cfa902bf17802537ef55a7ba07",
+        "entry_sha256": "85f5f24c192c46b16c8abc35b1a2801e8d12c59639f42c4514578cd6b5f7faad",
         "inputs_summary": {
           "evidence": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-033.json",
           "iteration": "0",
@@ -67,13 +67,13 @@
         "note": "Executing pipeline \u2014 iteration 0",
         "outputs_summary": {},
         "seq": 4,
-        "timestamp": "2026-07-05T15:27:41.931874+00:00",
+        "timestamp": "2026-07-06T01:31:00.173537+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "PIPELINE_COMPLETE",
         "case_id": "VIGIA-CAN-033",
-        "entry_sha256": "6438d22f394b05949fb63f481a4f8b3d62d3c810d28e5b84277886e704121c68",
+        "entry_sha256": "a0baa1d20567beefd478fd28898d2327c42f74f388febf246097749d556267f6",
         "inputs_summary": {
           "iteration": "0"
         },
@@ -82,8 +82,8 @@
         "outputs_summary": {
           "abduction": {
             "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
-            "best_posterior": "4341/40000",
-            "confidence": "4341/40000",
+            "best_posterior": "19/20",
+            "confidence": "19/20",
             "is_conclusive": "True",
             "narrative": "finance_user with an 847-day baseline of strictly 08:30-18:00 Mon-Fri activity logs in at 03:15 AM on a Sunday. Accesses a 500MB file classified confidential-3. Process excel.exe writes a 500MB upload..."
           },
@@ -91,7 +91,15 @@
           "pipeline_meta": {
             "artifact_count": "4",
             "avg_score": "4341/8000",
+            "ebs_adapter_mode": "motor",
             "expected_verdict": "MALICE",
+            "resolve": {
+              "motor_confidence": "0.95",
+              "motor_reason": "Intent score 0.8622 exceeds MALICE threshold (P2+acq_assurance scale, threshold=0.33)",
+              "motor_score": "0.8622",
+              "motor_verdict": "MALICE",
+              "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+            },
             "source": "ebs_v1_json_adapter"
           },
           "signals": [
@@ -130,13 +138,13 @@
           ]
         },
         "seq": 5,
-        "timestamp": "2026-07-05T15:27:41.934501+00:00",
+        "timestamp": "2026-07-06T01:31:00.533958+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "CONTRADICTION_CHECK",
         "case_id": "VIGIA-CAN-033",
-        "entry_sha256": "8b4718513d928669a28230788d017738839c5b0d49ee412c1adf948105cce4ab",
+        "entry_sha256": "62ce9c86117a96408b71e01559ef413c3d5c8c841a36bde23fee25cd3dd4b795",
         "inputs_summary": {
           "n_signals": "4"
         },
@@ -147,13 +155,13 @@
           "threshold": "2"
         },
         "seq": 6,
-        "timestamp": "2026-07-05T15:27:41.934626+00:00",
+        "timestamp": "2026-07-06T01:31:00.534088+00:00",
         "tool": "contradiction_detector"
       },
       {
         "action": "AGENT_EXIT",
         "case_id": "VIGIA-CAN-033",
-        "entry_sha256": "ae7ca8fec43d204ae5f44293cd43292b0d18fa3dfea080599f74e801e4e8133e",
+        "entry_sha256": "2822d6fe3f601f2cf8945a6c466310d9270f23eafa71ef390013c4740da12a1c",
         "inputs_summary": {
           "verdict": "MALICIOUS_INTENT_DETECTED"
         },
@@ -164,26 +172,26 @@
           "exit_code": "1"
         },
         "seq": 7,
-        "timestamp": "2026-07-05T15:27:41.934813+00:00",
+        "timestamp": "2026-07-06T01:31:00.534322+00:00",
         "tool": "vigia_agent"
       }
     ],
-    "start_time": "2026-07-05T15:27:41.931345+00:00",
+    "start_time": "2026-07-06T01:31:00.173018+00:00",
     "total_entries": 7
   },
   "case_id": "VIGIA-CAN-033",
   "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-033.json",
-  "evidence_sha256": "e045919986d0894cf4db54ddecf4588d84beca69d849dc542f2bc04d47050a4a",
+  "evidence_sha256": "bc1016e8d29f803014cea29e0df65fc2b8befd6f9a9dd1f6bd87a85801eefed5",
   "iterations_executed": 1,
-  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-CAN-033 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-033.json\nEvidence SHA-256: e045919986d0894cf4db54ddecf4588d84beca69d849dc542f2bc04d47050a4a\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 4341/40000\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 4 se\u00f1al(es): 4 primaria(s) de ['sift_file_audit', 'sift_ueba', 'sift_volatility', 'sift_vpn_log'], 0 derivada(s)/no-analizada(s). Top z: excel.exe in memory with mapped file and=0.90, Historical baseline: finance_user had ne=0.46, Access to 'Q2_Financials_Forecast.xlsx' =0.44.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: MALICIOUS_INTENT_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nfinance_user with an 847-day baseline of strictly 08:30-18:00 Mon-Fri activity logs in at 03:15 AM on a Sunday. Accesses a 500MB file classified confidential-3. Process excel.exe writes a 500MB upload.tmp file.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [excel.exe in memory with mapped file and write handle to \\Temp\\upload.] z=0.902 conf=0.95 \u2014 \n  [Historical baseline: finance_user had never logged in outside 08:30-18] z=0.460 conf=0.50 \u2014 \n  [Access to 'Q2_Financials_Forecast.xlsx' (500MB), confidential-3 classi] z=0.440 conf=0.55 \u2014 \n  [Successful VPN login at 03:15 AM on Sunday. Correct credentials. MFA a] z=0.368 conf=0.40 \u2014 \n\n--- FINAL ALERT LEVEL ---\nMEDIUM \u2014 MALICE verdict from posterior aggregation. Individual z-scores below threshold. Full signal review recommended. Alert floored (B-028/B-065).\nReconciliation: verdict MALICE rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 4 | Derived: 0 | Total: 4",
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-CAN-033 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-033.json\nEvidence SHA-256: bc1016e8d29f803014cea29e0df65fc2b8befd6f9a9dd1f6bd87a85801eefed5\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 19/20\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 4 se\u00f1al(es): 4 primaria(s) de ['sift_file_audit', 'sift_ueba', 'sift_volatility', 'sift_vpn_log'], 0 derivada(s)/no-analizada(s). Top z: excel.exe in memory with mapped file and=0.90, Historical baseline: finance_user had ne=0.46, Access to 'Q2_Financials_Forecast.xlsx' =0.44.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: MALICIOUS_INTENT_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nfinance_user with an 847-day baseline of strictly 08:30-18:00 Mon-Fri activity logs in at 03:15 AM on a Sunday. Accesses a 500MB file classified confidential-3. Process excel.exe writes a 500MB upload.tmp file.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [excel.exe in memory with mapped file and write handle to \\Temp\\upload.] z=0.902 conf=0.95 \u2014 \n  [Historical baseline: finance_user had never logged in outside 08:30-18] z=0.460 conf=0.50 \u2014 \n  [Access to 'Q2_Financials_Forecast.xlsx' (500MB), confidential-3 classi] z=0.440 conf=0.55 \u2014 \n  [Successful VPN login at 03:15 AM on Sunday. Correct credentials. MFA a] z=0.368 conf=0.40 \u2014 \n\n--- FINAL ALERT LEVEL ---\nHIGH \u2014 MALICE verdict from Bayesian posterior aggregation. Individual z-scores below threshold (distributed evidence pattern: no single dominant signal, but aggregate posterior is decisive). Alert floored (B-028/B-065).\nReconciliation: verdict MALICE rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 4 | Derived: 0 | Total: 4",
   "pipeline_results": {
     "abduction": {
       "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
-      "best_posterior": "4341/40000",
+      "best_posterior": "19/20",
       "confidence": {
         "__fraction__": true,
-        "den": 40000,
-        "num": 4341
+        "den": 20,
+        "num": 19
       },
       "devil_advocate": {
         "aggregation": {
@@ -195,7 +203,7 @@
           "primary_alternative_hypothesis": null
         },
         "decision_context": {
-          "confidence": "4341/40000",
+          "confidence": "19/20",
           "mapped_verdict": "MALICIOUS_INTENT_DETECTED",
           "raw_verdict": "MALICIOUS_INTENT_DETECTED",
           "score": "4341/8000"
@@ -216,7 +224,15 @@
     "pipeline_meta": {
       "artifact_count": 4,
       "avg_score": "4341/8000",
+      "ebs_adapter_mode": "motor",
       "expected_verdict": "MALICE",
+      "resolve": {
+        "motor_confidence": "0.95",
+        "motor_reason": "Intent score 0.8622 exceeds MALICE threshold (P2+acq_assurance scale, threshold=0.33)",
+        "motor_score": "0.8622",
+        "motor_verdict": "MALICE",
+        "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+      },
       "source": "ebs_v1_json_adapter"
     },
     "signals": [

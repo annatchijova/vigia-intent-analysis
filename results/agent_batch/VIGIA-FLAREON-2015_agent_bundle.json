@@ -1,15 +1,15 @@
 {
-  "agent_verdict": "INTENT",
-  "analysis_timestamp": "2026-07-05T15:27:33.545325+00:00",
+  "agent_verdict": "MALICE",
+  "analysis_timestamp": "2026-07-06T01:29:49.537116+00:00",
   "audit_trail": {
     "agent_version": "1.0.0-SANS-2026",
     "case_id": "VIGIA-FLAREON-2015",
-    "end_time": "2026-07-05T15:27:33.545330+00:00",
+    "end_time": "2026-07-06T01:29:49.537124+00:00",
     "entries": [
       {
         "action": "AGENT_INITIALIZED",
         "case_id": "VIGIA-FLAREON-2015",
-        "entry_sha256": "4a63f3cdfe3d31f0c6a826209aed5536dee05ea9654094d726a7a8f0134fcd6b",
+        "entry_sha256": "29edb975e71c4d2181d18daf35c550c007d0976ede0cc2b863c325f88b49f82b",
         "inputs_summary": {
           "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
           "case_id": "VIGIA-FLAREON-2015"
@@ -21,13 +21,13 @@
           "agent_version": "1.0.0-SANS-2026"
         },
         "seq": 1,
-        "timestamp": "2026-07-05T15:27:33.541935+00:00",
+        "timestamp": "2026-07-06T01:29:49.198159+00:00",
         "tool": "vigia_agent"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-FLAREON-2015",
-        "entry_sha256": "cdff418be604a8e2d94ac5208bf5ddd052f41810743cba662acaf42632edb747",
+        "entry_sha256": "9b77de19011aff21be9ebf6bf9a9296a128141cde9889c114109f4fd7c878579",
         "inputs_summary": {
           "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-FLAREON-2015.json"
         },
@@ -35,29 +35,29 @@
         "note": "Computing SHA-256 of original evidence",
         "outputs_summary": {},
         "seq": 2,
-        "timestamp": "2026-07-05T15:27:33.542018+00:00",
+        "timestamp": "2026-07-06T01:29:49.198242+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-FLAREON-2015",
-        "entry_sha256": "fcb00234ccf0e7e7f20e25f82c5a62601538d1dd409879edbceb4683fa5796a0",
+        "entry_sha256": "f862e33c7dde4828202f61e94bc5ec756079e2203782822cd8bf24dcfa6d2043",
         "inputs_summary": {
           "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-FLAREON-2015.json"
         },
         "iteration": 0,
-        "note": "Evidence verified: 670179a26d980078...",
+        "note": "Evidence verified: 31eb9841d2f28b02...",
         "outputs_summary": {
-          "sha256": "670179a26d980078fdccebb91368b18dc5e7ab47ee07e2071b9637a4f1576826"
+          "sha256": "31eb9841d2f28b026405d2fcd6a407da3c3e937a6d5f8218f258f65a50877551"
         },
         "seq": 3,
-        "timestamp": "2026-07-05T15:27:33.542124+00:00",
+        "timestamp": "2026-07-06T01:29:49.198357+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "PIPELINE_EXECUTE",
         "case_id": "VIGIA-FLAREON-2015",
-        "entry_sha256": "00aa3ff78e8fc7c58f18f490545fc2e22f40d948bd8fbd52e947d252b43f1733",
+        "entry_sha256": "c28bd21ecab7b9aac44960db333b4a6924917c1280c6a1db8fce2dcd37a290d3",
         "inputs_summary": {
           "evidence": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-FLAREON-2015.json",
           "iteration": "0",
@@ -67,13 +67,13 @@
         "note": "Executing pipeline \u2014 iteration 0",
         "outputs_summary": {},
         "seq": 4,
-        "timestamp": "2026-07-05T15:27:33.542224+00:00",
+        "timestamp": "2026-07-06T01:29:49.198469+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "PIPELINE_COMPLETE",
         "case_id": "VIGIA-FLAREON-2015",
-        "entry_sha256": "3060a0f8edbdccf7cfe3e51ca65892cce8169846e79399def4b33e4da0171899",
+        "entry_sha256": "7251d4ca6b119ef85521fb6eba88ada18ba64453076cef50fa1bf644544bd168",
         "inputs_summary": {
           "iteration": "0"
         },
@@ -81,9 +81,9 @@
         "note": "Pipeline completed \u2014 13 signals",
         "outputs_summary": {
           "abduction": {
-            "best_hypothesis": "INTENT_DETECTED",
-            "best_posterior": "13309/130000",
-            "confidence": "13309/130000",
+            "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+            "best_posterior": "19/20",
+            "confidence": "19/20",
             "is_conclusive": "True",
             "narrative": "FireEye FLARE-On CTF 2015 challenge collection. 11 challenges in numbered directories 1-11. Challenge 1 is a directly-extracted Windows PE32+ executable (Flare-On_start_2015.exe, 285184 bytes). Challe..."
           },
@@ -91,7 +91,15 @@
           "pipeline_meta": {
             "artifact_count": "13",
             "avg_score": "13309/26000",
+            "ebs_adapter_mode": "motor",
             "expected_verdict": "INTENT",
+            "resolve": {
+              "motor_confidence": "0.95",
+              "motor_reason": "Intent score 0.5946 exceeds MALICE threshold (P2+acq_assurance scale, threshold=0.33)",
+              "motor_score": "0.5946",
+              "motor_verdict": "MALICE",
+              "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+            },
             "source": "ebs_v1_json_adapter"
           },
           "signals": [
@@ -138,13 +146,13 @@
           ]
         },
         "seq": 5,
-        "timestamp": "2026-07-05T15:27:33.544877+00:00",
+        "timestamp": "2026-07-06T01:29:49.536510+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "CONTRADICTION_CHECK",
         "case_id": "VIGIA-FLAREON-2015",
-        "entry_sha256": "ae4dee8864c283af055925027859f4c8a35fbc705f91e4bb73b1da01c8534c38",
+        "entry_sha256": "e0cd9d4fd1cf1c89159c9ec944241c59c5116371a84f286873d7efe0adeff74c",
         "inputs_summary": {
           "n_signals": "13"
         },
@@ -155,43 +163,67 @@
           "threshold": "2"
         },
         "seq": 6,
-        "timestamp": "2026-07-05T15:27:33.545033+00:00",
+        "timestamp": "2026-07-06T01:29:49.536680+00:00",
         "tool": "contradiction_detector"
       },
       {
         "action": "AGENT_EXIT",
         "case_id": "VIGIA-FLAREON-2015",
-        "entry_sha256": "f11b64cdc283c5672ccc9b7e84f67b1b38528ae35831261df7918bd191da2484",
+        "entry_sha256": "d412fb52562d6f12af2d5aa5edabf68b21dc3d033443968b6b2e731465483af9",
         "inputs_summary": {
-          "verdict": "INTENT_DETECTED"
+          "verdict": "MALICIOUS_INTENT_DETECTED"
         },
         "iteration": 0,
-        "note": "Exit code 3 (INTENT) \u2014 analysis complete.",
+        "note": "Exit code 1 (MALICE) \u2014 analysis complete.",
         "outputs_summary": {
-          "agent_verdict": "INTENT",
-          "exit_code": "3"
+          "agent_verdict": "MALICE",
+          "exit_code": "1"
         },
         "seq": 7,
-        "timestamp": "2026-07-05T15:27:33.545274+00:00",
+        "timestamp": "2026-07-06T01:29:49.536938+00:00",
         "tool": "vigia_agent"
       }
     ],
-    "start_time": "2026-07-05T15:27:33.541706+00:00",
+    "start_time": "2026-07-06T01:29:49.197938+00:00",
     "total_entries": 7
   },
   "case_id": "VIGIA-FLAREON-2015",
   "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-FLAREON-2015.json",
-  "evidence_sha256": "670179a26d980078fdccebb91368b18dc5e7ab47ee07e2071b9637a4f1576826",
+  "evidence_sha256": "31eb9841d2f28b026405d2fcd6a407da3c3e937a6d5f8218f258f65a50877551",
   "iterations_executed": 1,
-  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-FLAREON-2015 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/VIGIA-FLAREON-2015.json\nEvidence SHA-256: 670179a26d980078fdccebb91368b18dc5e7ab47ee07e2071b9637a4f1576826\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: INTENT_DETECTED\nPosterior confidence: 13309/130000\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 13 se\u00f1al(es): 13 primaria(s) de ['generate_forensic_hash', 'read_evidence'], 0 derivada(s)/no-analizada(s). Top z: Flare-On_start_2015.exe \u2014 PE32+ executab=0.70, elfie \u2014 Linux ELF binary in challenge 3.=0.62, 42634F3F5FAF28306EB07675274AA6B6.zip \u2014 C=0.58.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: INTENT_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nFireEye FLARE-On CTF 2015 challenge collection. 11 challenges in numbered directories 1-11. Challenge 1 is a directly-extracted Windows PE32+ executable (Flare-On_start_2015.exe, 285184 bytes). Challenges 2-11 are password-protected zips (password: 'flare', disclosed in co-located password.txt). Challenge 3 contains pre-extracted ELF binary 'elfie'. Challenge 9 contains pre-extracted binary 'you_are_very_good_at_this' (4608 bytes, quarantined by VIG\u00cdA purgatory). Corpus spans Windows PE, Linux E\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Flare-On_start_2015.exe \u2014 PE32+ executable (GUI) x86-64, 285184 bytes.] z=0.702 conf=0.90 \u2014 \n  [elfie \u2014 Linux ELF binary in challenge 3. Stored in directory named 3BD] z=0.616 conf=0.88 \u2014 \n  [42634F3F5FAF28306EB07675274AA6B6.zip \u2014 Challenge 11 container (final c] z=0.585 conf=0.90 \u2014 \n  [DC682778F53E853B3188AC63EB376D8B.zip \u2014 Challenge 10 container. Passwor] z=0.558 conf=0.90 \u2014 \n  [0CC92381BDCA47754B144A4FC2E41623.zip \u2014 Challenge 7 container. Password] z=0.540 conf=0.90 \u2014 \n\n--- FINAL ALERT LEVEL ---\nMEDIUM \u2014 INTENT verdict with individual z-scores below threshold. Alert floored (B-028/B-065): an intent finding cannot present as LOW.\nReconciliation: verdict INTENT rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 13 | Derived: 0 | Total: 13",
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-FLAREON-2015 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/VIGIA-FLAREON-2015.json\nEvidence SHA-256: 31eb9841d2f28b026405d2fcd6a407da3c3e937a6d5f8218f258f65a50877551\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 19/20\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 13 se\u00f1al(es): 13 primaria(s) de ['generate_forensic_hash', 'read_evidence'], 0 derivada(s)/no-analizada(s). Top z: Flare-On_start_2015.exe \u2014 PE32+ executab=0.70, elfie \u2014 Linux ELF binary in challenge 3.=0.62, 42634F3F5FAF28306EB07675274AA6B6.zip \u2014 C=0.58.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: MALICIOUS_INTENT_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nFireEye FLARE-On CTF 2015 challenge collection. 11 challenges in numbered directories 1-11. Challenge 1 is a directly-extracted Windows PE32+ executable (Flare-On_start_2015.exe, 285184 bytes). Challenges 2-11 are password-protected zips (password: 'flare', disclosed in co-located password.txt). Challenge 3 contains pre-extracted ELF binary 'elfie'. Challenge 9 contains pre-extracted binary 'you_are_very_good_at_this' (4608 bytes, quarantined by VIG\u00cdA purgatory). Corpus spans Windows PE, Linux E\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Flare-On_start_2015.exe \u2014 PE32+ executable (GUI) x86-64, 285184 bytes.] z=0.702 conf=0.90 \u2014 \n  [elfie \u2014 Linux ELF binary in challenge 3. Stored in directory named 3BD] z=0.616 conf=0.88 \u2014 \n  [42634F3F5FAF28306EB07675274AA6B6.zip \u2014 Challenge 11 container (final c] z=0.585 conf=0.90 \u2014 \n  [DC682778F53E853B3188AC63EB376D8B.zip \u2014 Challenge 10 container. Passwor] z=0.558 conf=0.90 \u2014 \n  [0CC92381BDCA47754B144A4FC2E41623.zip \u2014 Challenge 7 container. Password] z=0.540 conf=0.90 \u2014 \n\n--- FINAL ALERT LEVEL ---\nHIGH \u2014 MALICE verdict from Bayesian posterior aggregation. Individual z-scores below threshold (distributed evidence pattern: no single dominant signal, but aggregate posterior is decisive). Alert floored (B-028/B-065).\nReconciliation: verdict MALICE rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 13 | Derived: 0 | Total: 13",
   "pipeline_results": {
     "abduction": {
-      "best_hypothesis": "INTENT_DETECTED",
-      "best_posterior": "13309/130000",
+      "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+      "best_posterior": "19/20",
       "confidence": {
         "__fraction__": true,
-        "den": 130000,
-        "num": 13309
+        "den": 20,
+        "num": 19
+      },
+      "devil_advocate": {
+        "aggregation": {
+          "k": 3,
+          "method": "top_k_already_validated_matches_v2",
+          "total_gap_mass": "0"
+        },
+        "counterfactual_summary": {
+          "primary_alternative_hypothesis": null
+        },
+        "decision_context": {
+          "confidence": "19/20",
+          "mapped_verdict": "MALICIOUS_INTENT_DETECTED",
+          "raw_verdict": "MALICIOUS_INTENT_DETECTED",
+          "score": "13309/26000"
+        },
+        "devil_advocate_source": "deterministic_no_pattern_data_available",
+        "meta": {
+          "deterministic": true,
+          "generated_from": "case_pattern_library"
+        },
+        "narrative": "Eco's Razor (Abductive Falsification) applied to verdict MALICIOUS_INTENT_DETECTED. Pattern-matching data was not available on this code path \u2014 CasePatternLibrary is not invoked here by design (agent audit-trail mode (vigia_agent.py \u2014 JSON-replay / autonomous path); see KNOWN_LIMITATIONS.md). No structured counter-hypothesis could be derived deterministically. This is a documented scope limitation of the current code path, not an absence of falsification attempt.",
+        "pattern_evidence_gaps": [],
+        "version": "r7-da-v1"
       },
       "is_conclusive": true,
       "narrative": "FireEye FLARE-On CTF 2015 challenge collection. 11 challenges in numbered directories 1-11. Challenge 1 is a directly-extracted Windows PE32+ executable (Flare-On_start_2015.exe, 285184 bytes). Challenges 2-11 are password-protected zips (password: 'flare', disclosed in co-located password.txt). Challenge 3 contains pre-extracted ELF binary 'elfie'. Challenge 9 contains pre-extracted binary 'you_are_very_good_at_this' (4608 bytes, quarantined by VIG\u00cdA purgatory). Corpus spans Windows PE, Linux E"
@@ -200,7 +232,15 @@
     "pipeline_meta": {
       "artifact_count": 13,
       "avg_score": "13309/26000",
+      "ebs_adapter_mode": "motor",
       "expected_verdict": "INTENT",
+      "resolve": {
+        "motor_confidence": "0.95",
+        "motor_reason": "Intent score 0.5946 exceeds MALICE threshold (P2+acq_assurance scale, threshold=0.33)",
+        "motor_score": "0.5946",
+        "motor_verdict": "MALICE",
+        "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+      },
       "source": "ebs_v1_json_adapter"
     },
     "signals": [

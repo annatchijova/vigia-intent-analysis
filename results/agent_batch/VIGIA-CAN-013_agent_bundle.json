@@ -1,15 +1,15 @@
 {
   "agent_verdict": "MALICE",
-  "analysis_timestamp": "2026-07-05T15:27:40.905283+00:00",
+  "analysis_timestamp": "2026-07-06T01:30:51.616088+00:00",
   "audit_trail": {
     "agent_version": "1.0.0-SANS-2026",
     "case_id": "VIGIA-CAN-013",
-    "end_time": "2026-07-05T15:27:40.905290+00:00",
+    "end_time": "2026-07-06T01:30:51.616095+00:00",
     "entries": [
       {
         "action": "AGENT_INITIALIZED",
         "case_id": "VIGIA-CAN-013",
-        "entry_sha256": "c550c58d7dfd0e925f1d79553e14b792a0c5c1123acac8c2fd12a3952278f6b0",
+        "entry_sha256": "7d693c401f098218f06cc541754f0096366935e782aaf042a5fa3f48902d4c33",
         "inputs_summary": {
           "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
           "case_id": "VIGIA-CAN-013"
@@ -21,13 +21,13 @@
           "agent_version": "1.0.0-SANS-2026"
         },
         "seq": 1,
-        "timestamp": "2026-07-05T15:27:40.901731+00:00",
+        "timestamp": "2026-07-06T01:30:51.260102+00:00",
         "tool": "vigia_agent"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-CAN-013",
-        "entry_sha256": "3f41921d99ea26cc5e21e237a29375f098b884b4d16f5b2f51d7845e93867252",
+        "entry_sha256": "b9df648a363aad049c7de8825c42b37a2e69f95f5fe584b5ade87a076d611663",
         "inputs_summary": {
           "path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-013.json"
         },
@@ -35,29 +35,29 @@
         "note": "Computing SHA-256 of original evidence",
         "outputs_summary": {},
         "seq": 2,
-        "timestamp": "2026-07-05T15:27:40.901817+00:00",
+        "timestamp": "2026-07-06T01:30:51.260189+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-CAN-013",
-        "entry_sha256": "44c28b4eb8a7f34ffa61983f10f3a28e3e14d48821b8075b3ed3b2b05c621b11",
+        "entry_sha256": "1c719dbbb278d465a2372b8bb465a8e698277b5bb6620cbeb1df4fa61a88ebab",
         "inputs_summary": {
           "path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-013.json"
         },
         "iteration": 0,
-        "note": "Evidence verified: b29485d24b8b0746...",
+        "note": "Evidence verified: 475a4d4d65ef3498...",
         "outputs_summary": {
-          "sha256": "b29485d24b8b074698eba7eeb6f96ecc27d434ba748a2b417d901339b972bad1"
+          "sha256": "475a4d4d65ef3498d25c14ea00b50b7a8173304ccff9a45d54cca933ef2b4bfc"
         },
         "seq": 3,
-        "timestamp": "2026-07-05T15:27:40.901908+00:00",
+        "timestamp": "2026-07-06T01:30:51.260284+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "PIPELINE_EXECUTE",
         "case_id": "VIGIA-CAN-013",
-        "entry_sha256": "3b9359ca9ce56eae3945c4c0d57870bcea523c58fa358799e62bfddad89bc790",
+        "entry_sha256": "5e9b9a4bc84fe2f7594d10690c758a1379c0e78dd29472ccfd15d16b4cc74a00",
         "inputs_summary": {
           "evidence": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-013.json",
           "iteration": "0",
@@ -67,13 +67,13 @@
         "note": "Executing pipeline \u2014 iteration 0",
         "outputs_summary": {},
         "seq": 4,
-        "timestamp": "2026-07-05T15:27:40.902012+00:00",
+        "timestamp": "2026-07-06T01:30:51.260386+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "PIPELINE_COMPLETE",
         "case_id": "VIGIA-CAN-013",
-        "entry_sha256": "6e35f35de7351c97dbf49a094bb6be0961888fe15a57ebeb1851b9db8dc601ac",
+        "entry_sha256": "fa822358c20706c5d887dc5141a0c55b2529d9d13f3899b8a438f828548d1412",
         "inputs_summary": {
           "iteration": "0"
         },
@@ -82,16 +82,24 @@
         "outputs_summary": {
           "abduction": {
             "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
-            "best_posterior": "167/5000",
-            "confidence": "167/5000",
-            "is_conclusive": "False",
+            "best_posterior": "22/25",
+            "confidence": "22/25",
+            "is_conclusive": "True",
             "narrative": "Support ticket in English: 'I'll make the revision of the server'. Command executed: grep -R (uppercase R, from translated Chinese manuals). Double calque revealing Chinese native thought structure."
           },
           "case_id": "case_095_sombra_fonetica",
           "pipeline_meta": {
             "artifact_count": "4",
             "avg_score": "167/1000",
+            "ebs_adapter_mode": "motor",
             "expected_verdict": "MALICE",
+            "resolve": {
+              "motor_confidence": "0.88",
+              "motor_reason": "Intent score 0.4395 exceeds MALICE threshold (P2+acq_assurance scale, threshold=0.33)",
+              "motor_score": "0.4395",
+              "motor_verdict": "MALICE",
+              "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+            },
             "source": "ebs_v1_json_adapter"
           },
           "signals": [
@@ -130,13 +138,13 @@
           ]
         },
         "seq": 5,
-        "timestamp": "2026-07-05T15:27:40.904537+00:00",
+        "timestamp": "2026-07-06T01:30:51.615569+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "CONTRADICTION_CHECK",
         "case_id": "VIGIA-CAN-013",
-        "entry_sha256": "99315c3b81170f24d281e25e0b92bb40bf725cba8e4f8a0119e0928daca79a22",
+        "entry_sha256": "1a4437d5ede214811be82c4384500327e7528eb9c91222fc73ea3a3e9d101af7",
         "inputs_summary": {
           "n_signals": "4"
         },
@@ -147,13 +155,13 @@
           "threshold": "2"
         },
         "seq": 6,
-        "timestamp": "2026-07-05T15:27:40.904643+00:00",
+        "timestamp": "2026-07-06T01:30:51.615684+00:00",
         "tool": "contradiction_detector"
       },
       {
         "action": "AGENT_EXIT",
         "case_id": "VIGIA-CAN-013",
-        "entry_sha256": "7e5fbce9eec8003aaf780ccbef24ff6edfdd786b844bb257721720bd21924dbf",
+        "entry_sha256": "a9c80ebd95de319bcd9dbde346aa3aa09300d98b2c62710171426607b9007447",
         "inputs_summary": {
           "verdict": "MALICIOUS_INTENT_DETECTED"
         },
@@ -164,26 +172,26 @@
           "exit_code": "1"
         },
         "seq": 7,
-        "timestamp": "2026-07-05T15:27:40.904831+00:00",
+        "timestamp": "2026-07-06T01:30:51.615900+00:00",
         "tool": "vigia_agent"
       }
     ],
-    "start_time": "2026-07-05T15:27:40.901507+00:00",
+    "start_time": "2026-07-06T01:30:51.259875+00:00",
     "total_entries": 7
   },
   "case_id": "VIGIA-CAN-013",
   "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-013.json",
-  "evidence_sha256": "b29485d24b8b074698eba7eeb6f96ecc27d434ba748a2b417d901339b972bad1",
+  "evidence_sha256": "475a4d4d65ef3498d25c14ea00b50b7a8173304ccff9a45d54cca933ef2b4bfc",
   "iterations_executed": 1,
-  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-CAN-013 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-013.json\nEvidence SHA-256: b29485d24b8b074698eba7eeb6f96ecc27d434ba748a2b417d901339b972bad1\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 167/5000\nConclusive: NO \u2014 requires human review\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 4 se\u00f1al(es): 4 primaria(s) de ['sift_linguistic', 'sift_syslog', 'sift_ticket_system', 'sift_volatility'], 0 derivada(s)/no-analizada(s). Top z: Command executed: grep -R 'password' /et=0.29, Ticket: 'I'll make the revision of the s=0.21, Semantic calque + manual syntax: 'revisi=0.12.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: MALICIOUS_INTENT_DETECTED. Conclusiva: no \u2014 requiere revisi\u00f3n humana.\n\nRazonamiento del motor abductivo:\nSupport ticket in English: 'I'll make the revision of the server'. Command executed: grep -R (uppercase R, from translated Chinese manuals). Double calque revealing Chinese native thought structure.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Command executed: grep -R 'password' /etc. Uppercase -R is documented ] z=0.290 conf=0.35 \u2014 \n  [Ticket: 'I'll make the revision of the server'. Use of 'revision' as a] z=0.210 conf=0.30 \u2014 \n  [Semantic calque + manual syntax: 'revision' translates \u4fee\u8ba2. Uppercase f] z=0.120 conf=0.15 \u2014 \n  [SSH session from Shanghai IP, timezone UTC+8, user 'support_temp' crea] z=0.048 conf=0.95 \u2014 \n\n--- FINAL ALERT LEVEL ---\nMEDIUM \u2014 MALICE verdict from posterior aggregation. Individual z-scores below threshold. Full signal review recommended. Alert floored (B-028/B-065).\nReconciliation: verdict MALICE rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 4 | Derived: 0 | Total: 4",
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-CAN-013 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-013.json\nEvidence SHA-256: 475a4d4d65ef3498d25c14ea00b50b7a8173304ccff9a45d54cca933ef2b4bfc\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 22/25\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 4 se\u00f1al(es): 4 primaria(s) de ['sift_linguistic', 'sift_syslog', 'sift_ticket_system', 'sift_volatility'], 0 derivada(s)/no-analizada(s). Top z: Command executed: grep -R 'password' /et=0.29, Ticket: 'I'll make the revision of the s=0.21, Semantic calque + manual syntax: 'revisi=0.12.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: MALICIOUS_INTENT_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nSupport ticket in English: 'I'll make the revision of the server'. Command executed: grep -R (uppercase R, from translated Chinese manuals). Double calque revealing Chinese native thought structure.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Command executed: grep -R 'password' /etc. Uppercase -R is documented ] z=0.290 conf=0.35 \u2014 \n  [Ticket: 'I'll make the revision of the server'. Use of 'revision' as a] z=0.210 conf=0.30 \u2014 \n  [Semantic calque + manual syntax: 'revision' translates \u4fee\u8ba2. Uppercase f] z=0.120 conf=0.15 \u2014 \n  [SSH session from Shanghai IP, timezone UTC+8, user 'support_temp' crea] z=0.048 conf=0.95 \u2014 \n\n--- FINAL ALERT LEVEL ---\nHIGH \u2014 MALICE verdict from Bayesian posterior aggregation. Individual z-scores below threshold (distributed evidence pattern: no single dominant signal, but aggregate posterior is decisive). Alert floored (B-028/B-065).\nReconciliation: verdict MALICE rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 4 | Derived: 0 | Total: 4",
   "pipeline_results": {
     "abduction": {
       "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
-      "best_posterior": "167/5000",
+      "best_posterior": "22/25",
       "confidence": {
         "__fraction__": true,
-        "den": 5000,
-        "num": 167
+        "den": 25,
+        "num": 22
       },
       "devil_advocate": {
         "aggregation": {
@@ -195,7 +203,7 @@
           "primary_alternative_hypothesis": null
         },
         "decision_context": {
-          "confidence": "167/5000",
+          "confidence": "22/25",
           "mapped_verdict": "MALICIOUS_INTENT_DETECTED",
           "raw_verdict": "MALICIOUS_INTENT_DETECTED",
           "score": "167/1000"
@@ -209,14 +217,22 @@
         "pattern_evidence_gaps": [],
         "version": "r7-da-v1"
       },
-      "is_conclusive": false,
+      "is_conclusive": true,
       "narrative": "Support ticket in English: 'I'll make the revision of the server'. Command executed: grep -R (uppercase R, from translated Chinese manuals). Double calque revealing Chinese native thought structure."
     },
     "case_id": "case_095_sombra_fonetica",
     "pipeline_meta": {
       "artifact_count": 4,
       "avg_score": "167/1000",
+      "ebs_adapter_mode": "motor",
       "expected_verdict": "MALICE",
+      "resolve": {
+        "motor_confidence": "0.88",
+        "motor_reason": "Intent score 0.4395 exceeds MALICE threshold (P2+acq_assurance scale, threshold=0.33)",
+        "motor_score": "0.4395",
+        "motor_verdict": "MALICE",
+        "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+      },
       "source": "ebs_v1_json_adapter"
     },
     "signals": [

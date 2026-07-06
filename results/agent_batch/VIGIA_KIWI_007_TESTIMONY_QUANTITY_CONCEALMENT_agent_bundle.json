@@ -1,15 +1,15 @@
 {
-  "agent_verdict": "INTENT",
-  "analysis_timestamp": "2026-07-05T15:27:37.408691+00:00",
+  "agent_verdict": "NOISE",
+  "analysis_timestamp": "2026-07-06T01:30:22.112740+00:00",
   "audit_trail": {
     "agent_version": "1.0.0-SANS-2026",
     "case_id": "VIGIA_KIWI_007_TESTIMONY_QUANTITY_CONCEALMENT",
-    "end_time": "2026-07-05T15:27:37.408697+00:00",
+    "end_time": "2026-07-06T01:30:22.112746+00:00",
     "entries": [
       {
         "action": "AGENT_INITIALIZED",
         "case_id": "VIGIA_KIWI_007_TESTIMONY_QUANTITY_CONCEALMENT",
-        "entry_sha256": "7b93aba8060c4136a3367f3aa79284d29efac3638947881ccf2736e906246a7b",
+        "entry_sha256": "c8dbb023c5a0498a45c50a1a12a3aed031bf70d7e8e12f2914773b43397ec301",
         "inputs_summary": {
           "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
           "case_id": "VIGIA_KIWI_007_TESTIMONY_QUANTITY_CONCEALMENT"
@@ -21,13 +21,13 @@
           "agent_version": "1.0.0-SANS-2026"
         },
         "seq": 1,
-        "timestamp": "2026-07-05T15:27:37.405551+00:00",
+        "timestamp": "2026-07-06T01:30:21.770303+00:00",
         "tool": "vigia_agent"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA_KIWI_007_TESTIMONY_QUANTITY_CONCEALMENT",
-        "entry_sha256": "2d8c996ca0e23375d79895ddf7ff4982451dbf8887aefd47386d04f5495d22fe",
+        "entry_sha256": "b51d8bd06d664e06bc25b622e20a316cf17e15da988ba9d74f64b71c76d5b087",
         "inputs_summary": {
           "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA_KIWI_007_TESTIMONY_QUANTITY_CONCEALMENT.json"
         },
@@ -35,29 +35,29 @@
         "note": "Computing SHA-256 of original evidence",
         "outputs_summary": {},
         "seq": 2,
-        "timestamp": "2026-07-05T15:27:37.405637+00:00",
+        "timestamp": "2026-07-06T01:30:21.770392+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA_KIWI_007_TESTIMONY_QUANTITY_CONCEALMENT",
-        "entry_sha256": "638526339e171647e5acb516a8df98e5bda93dca1e693c8a5c439b869d7d2ae5",
+        "entry_sha256": "613c45490498799b207bb6c8521171fd7c866b18b6bd0faac3da3293ab7cac2f",
         "inputs_summary": {
           "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA_KIWI_007_TESTIMONY_QUANTITY_CONCEALMENT.json"
         },
         "iteration": 0,
-        "note": "Evidence verified: b17f869ae6282816...",
+        "note": "Evidence verified: 5f04d2e9fa68eeef...",
         "outputs_summary": {
-          "sha256": "b17f869ae628281679b10541fecfdcb50a1a80ed2a09da2f29513df97c407b6b"
+          "sha256": "5f04d2e9fa68eeefd363dae78bc46f3c7415171a4d118364507924ad51231a18"
         },
         "seq": 3,
-        "timestamp": "2026-07-05T15:27:37.405730+00:00",
+        "timestamp": "2026-07-06T01:30:21.770495+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "PIPELINE_EXECUTE",
         "case_id": "VIGIA_KIWI_007_TESTIMONY_QUANTITY_CONCEALMENT",
-        "entry_sha256": "eace8150e9cddf314f1e806e81315afa26e7a1fb612dc36c3b1c1db51f5ae209",
+        "entry_sha256": "629154cf20f02dd9270bfcec39f04596c3a94bae0126e69a734f91f3e8e6cbf6",
         "inputs_summary": {
           "evidence": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA_KIWI_007_TESTIMONY_QUANTITY_CONCEALMENT.json",
           "iteration": "0",
@@ -67,13 +67,13 @@
         "note": "Executing pipeline \u2014 iteration 0",
         "outputs_summary": {},
         "seq": 4,
-        "timestamp": "2026-07-05T15:27:37.405834+00:00",
+        "timestamp": "2026-07-06T01:30:21.770598+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "PIPELINE_COMPLETE",
         "case_id": "VIGIA_KIWI_007_TESTIMONY_QUANTITY_CONCEALMENT",
-        "entry_sha256": "3dcd9a1a9d3b8535704d51ca209e4ad059d335d80083d6f2b39d10ae389767cd",
+        "entry_sha256": "6530e96c34f270b52ba8a8b8903ee243acc5045a1e5e00c22a78c9199109a336",
         "inputs_summary": {
           "iteration": "0"
         },
@@ -81,17 +81,25 @@
         "note": "Pipeline completed \u2014 3 signals",
         "outputs_summary": {
           "abduction": {
-            "best_hypothesis": "SUSPICION_DETECTED",
-            "best_posterior": "41/1500",
-            "confidence": "41/1500",
-            "is_conclusive": "False",
+            "best_hypothesis": "NO_SEMIOTIC_ANOMALY_DETECTED",
+            "best_posterior": "19/20",
+            "confidence": "19/20",
+            "is_conclusive": "True",
             "narrative": "Testigo activo omite cantidad de material descargado. Testigo perif\u00e9rico da cifra exacta. Bot\u00f3n de p\u00e1nico activado con registro policial verificable que contradice el testimonio."
           },
           "case_id": "VIGIA-KIWI-007-TESTIMONY-QUANTITY-CONCEALMENT",
           "pipeline_meta": {
             "artifact_count": "3",
             "avg_score": "41/300",
+            "ebs_adapter_mode": "motor",
             "expected_verdict": "SUSPICION",
+            "resolve": {
+              "motor_confidence": "0.95",
+              "motor_reason": "Insufficient evidence of malicious intent (score=0.0518)",
+              "motor_score": "0.0518",
+              "motor_verdict": "NOISE",
+              "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+            },
             "source": "ebs_v1_json_adapter"
           },
           "signals": [
@@ -122,13 +130,13 @@
           ]
         },
         "seq": 5,
-        "timestamp": "2026-07-05T15:27:37.408357+00:00",
+        "timestamp": "2026-07-06T01:30:22.112362+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "CONTRADICTION_CHECK",
         "case_id": "VIGIA_KIWI_007_TESTIMONY_QUANTITY_CONCEALMENT",
-        "entry_sha256": "b59fedd4599d73728053ef09deb3a7fb51bdf5a5ce6c78f86edeaad9602f2cd7",
+        "entry_sha256": "bdb8c402f65e9874427541dd29a3db97702b2542cda9566a10fb8ad0ea439a2c",
         "inputs_summary": {
           "n_signals": "3"
         },
@@ -139,52 +147,60 @@
           "threshold": "2"
         },
         "seq": 6,
-        "timestamp": "2026-07-05T15:27:37.408467+00:00",
+        "timestamp": "2026-07-06T01:30:22.112490+00:00",
         "tool": "contradiction_detector"
       },
       {
         "action": "AGENT_EXIT",
         "case_id": "VIGIA_KIWI_007_TESTIMONY_QUANTITY_CONCEALMENT",
-        "entry_sha256": "eb30c300ba080575d4be71e4a60108fe2303c7add7439fd3bb2a496417583a6a",
+        "entry_sha256": "5603a129523c253aa18f58d083f30e09752659b586478930fc5d881134bade57",
         "inputs_summary": {
-          "verdict": "SUSPICION_DETECTED"
+          "verdict": "NO_SEMIOTIC_ANOMALY_DETECTED"
         },
         "iteration": 0,
-        "note": "Exit code 3 (INTENT) \u2014 analysis complete.",
+        "note": "Exit code 0 (NOISE) \u2014 analysis complete.",
         "outputs_summary": {
-          "agent_verdict": "INTENT",
-          "exit_code": "3"
+          "agent_verdict": "NOISE",
+          "exit_code": "0"
         },
         "seq": 7,
-        "timestamp": "2026-07-05T15:27:37.408641+00:00",
+        "timestamp": "2026-07-06T01:30:22.112688+00:00",
         "tool": "vigia_agent"
       }
     ],
-    "start_time": "2026-07-05T15:27:37.405315+00:00",
+    "start_time": "2026-07-06T01:30:21.770087+00:00",
     "total_entries": 7
   },
   "case_id": "VIGIA_KIWI_007_TESTIMONY_QUANTITY_CONCEALMENT",
   "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA_KIWI_007_TESTIMONY_QUANTITY_CONCEALMENT.json",
-  "evidence_sha256": "b17f869ae628281679b10541fecfdcb50a1a80ed2a09da2f29513df97c407b6b",
+  "evidence_sha256": "5f04d2e9fa68eeefd363dae78bc46f3c7415171a4d118364507924ad51231a18",
   "iterations_executed": 1,
-  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA_KIWI_007_TESTIMONY_QUANTITY_CONCEALMENT ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/VIGIA_KIWI_007_TESTIMONY_QUANTITY_CONCEALMENT.json\nEvidence SHA-256: b17f869ae628281679b10541fecfdcb50a1a80ed2a09da2f29513df97c407b6b\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: SUSPICION_DETECTED\nPosterior confidence: 41/1500\nConclusive: NO \u2014 requires human review\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 3 se\u00f1al(es): 3 primaria(s) de ['manual_forensic_review'], 0 derivada(s)/no-analizada(s). Top z: Bot\u00f3n de p\u00e1nico activado alegando presen=0.21, Asimetr\u00eda de precisi\u00f3n: hermano activo n=0.12, Hermano declara haber avisado en tiempo =0.08.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: SUSPICION_DETECTED. Conclusiva: no \u2014 requiere revisi\u00f3n humana.\n\nRazonamiento del motor abductivo:\nTestigo activo omite cantidad de material descargado. Testigo perif\u00e9rico da cifra exacta. Bot\u00f3n de p\u00e1nico activado con registro policial verificable que contradice el testimonio.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Bot\u00f3n de p\u00e1nico activado alegando presencia de imputada. Registro poli] z=0.210 conf=0.30 \u2014 \n  [Asimetr\u00eda de precisi\u00f3n: hermano activo no declara cantidad, testigo pe] z=0.120 conf=0.15 \u2014 \n  [Hermano declara haber avisado en tiempo real via capturas. No puede pr] z=0.080 conf=0.10 \u2014 \n\n--- FINAL ALERT LEVEL ---\nMEDIUM \u2014 INTENT verdict with individual z-scores below threshold. Alert floored (B-028/B-065): an intent finding cannot present as LOW.\nReconciliation: verdict INTENT rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 3 | Derived: 0 | Total: 3",
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA_KIWI_007_TESTIMONY_QUANTITY_CONCEALMENT ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/VIGIA_KIWI_007_TESTIMONY_QUANTITY_CONCEALMENT.json\nEvidence SHA-256: 5f04d2e9fa68eeefd363dae78bc46f3c7415171a4d118364507924ad51231a18\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: NO_SEMIOTIC_ANOMALY_DETECTED\nPosterior confidence: 19/20\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 3 se\u00f1al(es): 3 primaria(s) de ['manual_forensic_review'], 0 derivada(s)/no-analizada(s). Top z: Bot\u00f3n de p\u00e1nico activado alegando presen=0.21, Asimetr\u00eda de precisi\u00f3n: hermano activo n=0.12, Hermano declara haber avisado en tiempo =0.08.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: NO_SEMIOTIC_ANOMALY_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nTestigo activo omite cantidad de material descargado. Testigo perif\u00e9rico da cifra exacta. Bot\u00f3n de p\u00e1nico activado con registro policial verificable que contradice el testimonio.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Bot\u00f3n de p\u00e1nico activado alegando presencia de imputada. Registro poli] z=0.210 conf=0.30 \u2014 \n  [Asimetr\u00eda de precisi\u00f3n: hermano activo no declara cantidad, testigo pe] z=0.120 conf=0.15 \u2014 \n  [Hermano declara haber avisado en tiempo real via capturas. No puede pr] z=0.080 conf=0.10 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 3 | Derived: 0 | Total: 3",
   "pipeline_results": {
     "abduction": {
-      "best_hypothesis": "SUSPICION_DETECTED",
-      "best_posterior": "41/1500",
+      "best_hypothesis": "NO_SEMIOTIC_ANOMALY_DETECTED",
+      "best_posterior": "19/20",
       "confidence": {
         "__fraction__": true,
-        "den": 1500,
-        "num": 41
+        "den": 20,
+        "num": 19
       },
-      "is_conclusive": false,
+      "is_conclusive": true,
       "narrative": "Testigo activo omite cantidad de material descargado. Testigo perif\u00e9rico da cifra exacta. Bot\u00f3n de p\u00e1nico activado con registro policial verificable que contradice el testimonio."
     },
     "case_id": "VIGIA-KIWI-007-TESTIMONY-QUANTITY-CONCEALMENT",
     "pipeline_meta": {
       "artifact_count": 3,
       "avg_score": "41/300",
+      "ebs_adapter_mode": "motor",
       "expected_verdict": "SUSPICION",
+      "resolve": {
+        "motor_confidence": "0.95",
+        "motor_reason": "Insufficient evidence of malicious intent (score=0.0518)",
+        "motor_score": "0.0518",
+        "motor_verdict": "NOISE",
+        "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+      },
       "source": "ebs_v1_json_adapter"
     },
     "signals": [

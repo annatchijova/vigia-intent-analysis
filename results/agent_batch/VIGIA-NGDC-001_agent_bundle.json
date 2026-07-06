@@ -1,15 +1,15 @@
 {
   "agent_verdict": "MALICE",
-  "analysis_timestamp": "2026-07-05T15:27:34.801818+00:00",
+  "analysis_timestamp": "2026-07-06T01:29:59.951351+00:00",
   "audit_trail": {
     "agent_version": "1.0.0-SANS-2026",
     "case_id": "VIGIA-NGDC-001",
-    "end_time": "2026-07-05T15:27:34.801824+00:00",
+    "end_time": "2026-07-06T01:29:59.951359+00:00",
     "entries": [
       {
         "action": "AGENT_INITIALIZED",
         "case_id": "VIGIA-NGDC-001",
-        "entry_sha256": "8c7fc26a973f73983b4eb0cd3f41c507569f19a896c09231bfd25f691fe1bb54",
+        "entry_sha256": "a712157196cbb77814f8816f2420c18d5291368a0c3960cf44012afbe0bf47a6",
         "inputs_summary": {
           "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
           "case_id": "VIGIA-NGDC-001"
@@ -21,13 +21,13 @@
           "agent_version": "1.0.0-SANS-2026"
         },
         "seq": 1,
-        "timestamp": "2026-07-05T15:27:34.798024+00:00",
+        "timestamp": "2026-07-06T01:29:59.590164+00:00",
         "tool": "vigia_agent"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-NGDC-001",
-        "entry_sha256": "ac0403090a5f6df5f2c27343c10a8d107091f96126b85eac73d94eb68efc89b8",
+        "entry_sha256": "6782ba38f0477cbe5c2564607f13e938bad1a1c0e2490d0f1607ac247eca14d0",
         "inputs_summary": {
           "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-NGDC-001.json"
         },
@@ -35,29 +35,29 @@
         "note": "Computing SHA-256 of original evidence",
         "outputs_summary": {},
         "seq": 2,
-        "timestamp": "2026-07-05T15:27:34.798111+00:00",
+        "timestamp": "2026-07-06T01:29:59.590248+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-NGDC-001",
-        "entry_sha256": "5a2ba2b4fa0da47d70fa370a1991dec5b7d70072125a6f612ceaa1c46094ad70",
+        "entry_sha256": "db1de0e2578b232a7abd86a79075ee6ee3f12fba3f3845f17d027971ad8e0521",
         "inputs_summary": {
           "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-NGDC-001.json"
         },
         "iteration": 0,
-        "note": "Evidence verified: 4070e78b047a4bc3...",
+        "note": "Evidence verified: 3a41db4a70afff70...",
         "outputs_summary": {
-          "sha256": "4070e78b047a4bc353e5e8907e117ca29cc0680b8ca359712df91d8cf63bec9b"
+          "sha256": "3a41db4a70afff702592de1f342cdc3545427ed7fbb6f82196ffca7cb42d401a"
         },
         "seq": 3,
-        "timestamp": "2026-07-05T15:27:34.798221+00:00",
+        "timestamp": "2026-07-06T01:29:59.590356+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "PIPELINE_EXECUTE",
         "case_id": "VIGIA-NGDC-001",
-        "entry_sha256": "d335e4b861bf4c963c0a4858cc9e7f198ef757228b3a4b3a2dbafe841fc46c1d",
+        "entry_sha256": "5075c4b3ac774942a1d6088acec13d9a170f268201939af2ee9007f28a38be88",
         "inputs_summary": {
           "evidence": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-NGDC-001.json",
           "iteration": "0",
@@ -67,13 +67,13 @@
         "note": "Executing pipeline \u2014 iteration 0",
         "outputs_summary": {},
         "seq": 4,
-        "timestamp": "2026-07-05T15:27:34.798325+00:00",
+        "timestamp": "2026-07-06T01:29:59.590472+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "PIPELINE_COMPLETE",
         "case_id": "VIGIA-NGDC-001",
-        "entry_sha256": "70815de02bdb8f94e1ef275864a027471e1de193c8c9e9c95e159a5d31e3b1fd",
+        "entry_sha256": "3dc0660e9bba15a5b049d30f3933d5a649d7ea20405e80e0cb769c7b04c38a54",
         "inputs_summary": {
           "iteration": "0"
         },
@@ -82,8 +82,8 @@
         "outputs_summary": {
           "abduction": {
             "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
-            "best_posterior": "15009/87500",
-            "confidence": "15009/87500",
+            "best_posterior": "19/20",
+            "confidence": "19/20",
             "is_conclusive": "True",
             "narrative": "Carry is a Krasnovian supporter recruited by Alex (alex.jfam11@gmail.com) to orchestrate the defacement of foreign art at the National Gallery DC. Evidence extracted empirically from carry-tablet-2012..."
           },
@@ -91,7 +91,15 @@
           "pipeline_meta": {
             "artifact_count": "7",
             "avg_score": "15009/17500",
+            "ebs_adapter_mode": "motor",
             "expected_verdict": "MALICE",
+            "resolve": {
+              "motor_confidence": "0.95",
+              "motor_reason": "Intent score 0.7781 exceeds MALICE threshold (P2+acq_assurance scale, threshold=0.33)",
+              "motor_score": "0.7781",
+              "motor_verdict": "MALICE",
+              "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+            },
             "source": "ebs_v1_json_adapter"
           },
           "signals": [
@@ -138,13 +146,13 @@
           ]
         },
         "seq": 5,
-        "timestamp": "2026-07-05T15:27:34.801009+00:00",
+        "timestamp": "2026-07-06T01:29:59.950786+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "CONTRADICTION_CHECK",
         "case_id": "VIGIA-NGDC-001",
-        "entry_sha256": "019e9966f2104c24d1069ae8eee9796c64fb0de66b98597f345c514122e736cf",
+        "entry_sha256": "44d5edae08cbe0b21dc9590cdef9c39dc2aee3ab2aa33107640532741eb6fa0a",
         "inputs_summary": {
           "n_signals": "7"
         },
@@ -155,13 +163,13 @@
           "threshold": "2"
         },
         "seq": 6,
-        "timestamp": "2026-07-05T15:27:34.801140+00:00",
+        "timestamp": "2026-07-06T01:29:59.950922+00:00",
         "tool": "contradiction_detector"
       },
       {
         "action": "AGENT_EXIT",
         "case_id": "VIGIA-NGDC-001",
-        "entry_sha256": "1f4b605b83072f0819e35cb05ab6b8e2377a9c6417b2c2472f2edae9624b495e",
+        "entry_sha256": "369900bf2d413ea693ed1f51cffb01a100552d6a1994bc0c00ae2c55b66c6b46",
         "inputs_summary": {
           "verdict": "MALICIOUS_INTENT_DETECTED"
         },
@@ -172,26 +180,26 @@
           "exit_code": "1"
         },
         "seq": 7,
-        "timestamp": "2026-07-05T15:27:34.801353+00:00",
+        "timestamp": "2026-07-06T01:29:59.951152+00:00",
         "tool": "vigia_agent"
       }
     ],
-    "start_time": "2026-07-05T15:27:34.797794+00:00",
+    "start_time": "2026-07-06T01:29:59.589947+00:00",
     "total_entries": 7
   },
   "case_id": "VIGIA-NGDC-001",
   "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-NGDC-001.json",
-  "evidence_sha256": "4070e78b047a4bc353e5e8907e117ca29cc0680b8ca359712df91d8cf63bec9b",
+  "evidence_sha256": "3a41db4a70afff702592de1f342cdc3545427ed7fbb6f82196ffca7cb42d401a",
   "iterations_executed": 1,
-  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-NGDC-001 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/VIGIA-NGDC-001.json\nEvidence SHA-256: 4070e78b047a4bc353e5e8907e117ca29cc0680b8ca359712df91d8cf63bec9b\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 15009/87500\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 7 se\u00f1al(es): 7 primaria(s) de ['Digital Corpora scenario metadata + EmailProvider.db HostAuth', 'fls (Sleuth Kit) \u2014 data/com.android.email/cache/ realloc inodes', 'fls + icat (Sleuth Kit) \u2014 wpa_supplicant.conf inode 1031957', 'sqlite3 \u2014 EmailProvider.db Message table', 'sqlite3 \u2014 EmailProvider.db extracted via icat from carry-tablet-2012-07-16-final.E01 offset 3278848 inode 1474506', 'sqlite3 \u2014 EmailProviderBody.db messageKey=12', 'sqlite3 \u2014 EmailProviderBody.db messageKeys 16,22,23,24,25,26,27'], 0 derivada(s)/no-analizada(s). Top z: Alex (alex.jfam11@gmail.com) sends recru=0.92, Three operational identities created wit=0.90, Seven-email chain between Carry and Trac=0.90.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: MALICIOUS_INTENT_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nCarry is a Krasnovian supporter recruited by Alex (alex.jfam11@gmail.com) to orchestrate the defacement of foreign art at the National Gallery DC. Evidence extracted empirically from carry-tablet-2012-07-16-final.E01 (Digital Corpora / USNA + West Point 2012) using ewfmount + Sleuth Kit + SQLite. The tablet was purchased specifically for this operation. Carry constructed three separate identities on the same day (2012-06-07), established a covert channel with Alex via steganographic video attach\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Alex (alex.jfam11@gmail.com) sends recruitment email to Carry (carrysu] z=0.921 conf=0.95 \u2014 \n  [Three operational identities created within 24 hours on 2012-06-07: ca] z=0.902 conf=0.95 \u2014 \n  [Seven-email chain between Carry and Tracy (tracysumtwelve@gmail.com) s] z=0.902 conf=0.94 \u2014 \n  [The tablet (ASUS TF101, Android 4.0.3 IML74K, build US_epad-9.2.1.24-2] z=0.856 conf=0.93 \u2014 \n  [File misc/wifi/wpa_supplicant.conf recovered from userdata partition r] z=0.837 conf=0.90 \u2014 \n\n--- FINAL ALERT LEVEL ---\nHIGH \u2014 MALICE verdict from Bayesian posterior aggregation. Individual z-scores below threshold (distributed evidence pattern: no single dominant signal, but aggregate posterior is decisive). Alert floored (B-028/B-065).\nReconciliation: verdict MALICE rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 7 | Derived: 0 | Total: 7",
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-NGDC-001 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/VIGIA-NGDC-001.json\nEvidence SHA-256: 3a41db4a70afff702592de1f342cdc3545427ed7fbb6f82196ffca7cb42d401a\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 19/20\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 7 se\u00f1al(es): 7 primaria(s) de ['Digital Corpora scenario metadata + EmailProvider.db HostAuth', 'fls (Sleuth Kit) \u2014 data/com.android.email/cache/ realloc inodes', 'fls + icat (Sleuth Kit) \u2014 wpa_supplicant.conf inode 1031957', 'sqlite3 \u2014 EmailProvider.db Message table', 'sqlite3 \u2014 EmailProvider.db extracted via icat from carry-tablet-2012-07-16-final.E01 offset 3278848 inode 1474506', 'sqlite3 \u2014 EmailProviderBody.db messageKey=12', 'sqlite3 \u2014 EmailProviderBody.db messageKeys 16,22,23,24,25,26,27'], 0 derivada(s)/no-analizada(s). Top z: Alex (alex.jfam11@gmail.com) sends recru=0.92, Three operational identities created wit=0.90, Seven-email chain between Carry and Trac=0.90.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: MALICIOUS_INTENT_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nCarry is a Krasnovian supporter recruited by Alex (alex.jfam11@gmail.com) to orchestrate the defacement of foreign art at the National Gallery DC. Evidence extracted empirically from carry-tablet-2012-07-16-final.E01 (Digital Corpora / USNA + West Point 2012) using ewfmount + Sleuth Kit + SQLite. The tablet was purchased specifically for this operation. Carry constructed three separate identities on the same day (2012-06-07), established a covert channel with Alex via steganographic video attach\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Alex (alex.jfam11@gmail.com) sends recruitment email to Carry (carrysu] z=0.921 conf=0.95 \u2014 \n  [Three operational identities created within 24 hours on 2012-06-07: ca] z=0.902 conf=0.95 \u2014 \n  [Seven-email chain between Carry and Tracy (tracysumtwelve@gmail.com) s] z=0.902 conf=0.94 \u2014 \n  [The tablet (ASUS TF101, Android 4.0.3 IML74K, build US_epad-9.2.1.24-2] z=0.856 conf=0.93 \u2014 \n  [File misc/wifi/wpa_supplicant.conf recovered from userdata partition r] z=0.837 conf=0.90 \u2014 \n\n--- FINAL ALERT LEVEL ---\nHIGH \u2014 MALICE verdict from Bayesian posterior aggregation. Individual z-scores below threshold (distributed evidence pattern: no single dominant signal, but aggregate posterior is decisive). Alert floored (B-028/B-065).\nReconciliation: verdict MALICE rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 7 | Derived: 0 | Total: 7",
   "pipeline_results": {
     "abduction": {
       "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
-      "best_posterior": "15009/87500",
+      "best_posterior": "19/20",
       "confidence": {
         "__fraction__": true,
-        "den": 87500,
-        "num": 15009
+        "den": 20,
+        "num": 19
       },
       "devil_advocate": {
         "aggregation": {
@@ -203,7 +211,7 @@
           "primary_alternative_hypothesis": null
         },
         "decision_context": {
-          "confidence": "15009/87500",
+          "confidence": "19/20",
           "mapped_verdict": "MALICIOUS_INTENT_DETECTED",
           "raw_verdict": "MALICIOUS_INTENT_DETECTED",
           "score": "15009/17500"
@@ -224,7 +232,15 @@
     "pipeline_meta": {
       "artifact_count": 7,
       "avg_score": "15009/17500",
+      "ebs_adapter_mode": "motor",
       "expected_verdict": "MALICE",
+      "resolve": {
+        "motor_confidence": "0.95",
+        "motor_reason": "Intent score 0.7781 exceeds MALICE threshold (P2+acq_assurance scale, threshold=0.33)",
+        "motor_score": "0.7781",
+        "motor_verdict": "MALICE",
+        "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+      },
       "source": "ebs_v1_json_adapter"
     },
     "signals": [

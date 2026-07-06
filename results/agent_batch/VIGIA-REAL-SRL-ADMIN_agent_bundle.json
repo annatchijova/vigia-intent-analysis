@@ -1,15 +1,15 @@
 {
   "agent_verdict": "MALICE",
-  "analysis_timestamp": "2026-07-05T15:27:39.398376+00:00",
+  "analysis_timestamp": "2026-07-06T01:30:38.846584+00:00",
   "audit_trail": {
     "agent_version": "1.0.0-SANS-2026",
     "case_id": "VIGIA-REAL-SRL-ADMIN",
-    "end_time": "2026-07-05T15:27:39.398382+00:00",
+    "end_time": "2026-07-06T01:30:38.846591+00:00",
     "entries": [
       {
         "action": "AGENT_INITIALIZED",
         "case_id": "VIGIA-REAL-SRL-ADMIN",
-        "entry_sha256": "7f9226bc2f9a2590b23895a8159d57627c8953195c68c36e8f3a97f16a417312",
+        "entry_sha256": "77f3f2ffa221a3983e9a15abf53c200e949e4e4e678ee0c900b5465beca2381e",
         "inputs_summary": {
           "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
           "case_id": "VIGIA-REAL-SRL-ADMIN"
@@ -21,13 +21,13 @@
           "agent_version": "1.0.0-SANS-2026"
         },
         "seq": 1,
-        "timestamp": "2026-07-05T15:27:39.394543+00:00",
+        "timestamp": "2026-07-06T01:30:38.501323+00:00",
         "tool": "vigia_agent"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-REAL-SRL-ADMIN",
-        "entry_sha256": "0a2983d58780d43a201b479b50366bb1651343b6e57d1c82cfb99ca8f414b698",
+        "entry_sha256": "56c50bca1a2b50a83ddfaf8394ca00ad6234d10676e0815d246fe3e7785562d5",
         "inputs_summary": {
           "path": "/home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-REAL-SRL-ADMIN.json"
         },
@@ -35,13 +35,13 @@
         "note": "Computing SHA-256 of original evidence",
         "outputs_summary": {},
         "seq": 2,
-        "timestamp": "2026-07-05T15:27:39.394630+00:00",
+        "timestamp": "2026-07-06T01:30:38.501410+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-REAL-SRL-ADMIN",
-        "entry_sha256": "d880c94e1051109bc00bba9fb117a90bd0637f417c115e5dd891c8bc81f68a22",
+        "entry_sha256": "8620a60a9575b120c743467341a3147ff17f20a4e44ad2bdb58193536807a5aa",
         "inputs_summary": {
           "path": "/home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-REAL-SRL-ADMIN.json"
         },
@@ -51,13 +51,13 @@
           "sha256": "fedae5f24df916d000d7de0f9d2bee98c983d8b7f47fca88455cb4e52c2fe152"
         },
         "seq": 3,
-        "timestamp": "2026-07-05T15:27:39.394753+00:00",
+        "timestamp": "2026-07-06T01:30:38.501516+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "PIPELINE_EXECUTE",
         "case_id": "VIGIA-REAL-SRL-ADMIN",
-        "entry_sha256": "566ab708cbc14a3212f546fd33e68e62d83ed49df4213101e9d4d7ed5e1bbc1a",
+        "entry_sha256": "d090f7b2d97c82384d3d680b37e8180f374e856fa8d97578eadaa28776fb230e",
         "inputs_summary": {
           "evidence": "/home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-REAL-SRL-ADMIN.json",
           "iteration": "0",
@@ -67,13 +67,13 @@
         "note": "Executing pipeline \u2014 iteration 0",
         "outputs_summary": {},
         "seq": 4,
-        "timestamp": "2026-07-05T15:27:39.394913+00:00",
+        "timestamp": "2026-07-06T01:30:38.501619+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "PIPELINE_COMPLETE",
         "case_id": "VIGIA-REAL-SRL-ADMIN",
-        "entry_sha256": "7e0e657f55ae6bb2a330037fea4c76dd18f45af497f5ea04c5780130ec28bddb",
+        "entry_sha256": "f87052e8e5d8947e6c87a68302c6b332963791f57de1951df1f25b82b3817e5a",
         "inputs_summary": {
           "iteration": "0"
         },
@@ -82,8 +82,8 @@
         "outputs_summary": {
           "abduction": {
             "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
-            "best_posterior": "4079/40000",
-            "confidence": "4079/40000",
+            "best_posterior": "81/100",
+            "confidence": "81/100",
             "is_conclusive": "True",
             "narrative": "SRL-2018 compromised enterprise network. Admin server memory dump (5 GB, 2018-09-07). Volatility3 analysis reveals: 2 PowerShell processes (PIDs 1160, 11008) both spawned from PID 6252 \u2014 classic C2 pr..."
           },
@@ -91,7 +91,15 @@
           "pipeline_meta": {
             "artifact_count": "4",
             "avg_score": "4079/8000",
+            "ebs_adapter_mode": "motor",
             "expected_verdict": "MALICE",
+            "resolve": {
+              "motor_confidence": "0.81",
+              "motor_reason": "Intent score 0.4048 exceeds MALICE threshold (P2+acq_assurance scale, threshold=0.33)",
+              "motor_score": "0.4048",
+              "motor_verdict": "MALICE",
+              "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+            },
             "source": "ebs_v1_json_adapter"
           },
           "signals": [
@@ -130,13 +138,13 @@
           ]
         },
         "seq": 5,
-        "timestamp": "2026-07-05T15:27:39.397603+00:00",
+        "timestamp": "2026-07-06T01:30:38.846066+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "CONTRADICTION_CHECK",
         "case_id": "VIGIA-REAL-SRL-ADMIN",
-        "entry_sha256": "56b458603cd041afe287b9f54a52aa3a7ebadb9016ed356819322ba5eccabd06",
+        "entry_sha256": "aed7d815f2bbb72554182e9c92e38f76f266292688199100c8979b3c3854acb6",
         "inputs_summary": {
           "n_signals": "4"
         },
@@ -147,13 +155,13 @@
           "threshold": "2"
         },
         "seq": 6,
-        "timestamp": "2026-07-05T15:27:39.397718+00:00",
+        "timestamp": "2026-07-06T01:30:38.846195+00:00",
         "tool": "contradiction_detector"
       },
       {
         "action": "AGENT_EXIT",
         "case_id": "VIGIA-REAL-SRL-ADMIN",
-        "entry_sha256": "d97a19aaec6dcc7a43a2708f78d7effeebcf57fc209d3919b421da312646cf47",
+        "entry_sha256": "a734592b4ad8f5a8b6cc7cd00deaa8d59d7bbfda7ec9174f782abab1f80f2239",
         "inputs_summary": {
           "verdict": "MALICIOUS_INTENT_DETECTED"
         },
@@ -164,26 +172,26 @@
           "exit_code": "1"
         },
         "seq": 7,
-        "timestamp": "2026-07-05T15:27:39.397909+00:00",
+        "timestamp": "2026-07-06T01:30:38.846394+00:00",
         "tool": "vigia_agent"
       }
     ],
-    "start_time": "2026-07-05T15:27:39.394304+00:00",
+    "start_time": "2026-07-06T01:30:38.501090+00:00",
     "total_entries": 7
   },
   "case_id": "VIGIA-REAL-SRL-ADMIN",
   "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-REAL-SRL-ADMIN.json",
   "evidence_sha256": "fedae5f24df916d000d7de0f9d2bee98c983d8b7f47fca88455cb4e52c2fe152",
   "iterations_executed": 1,
-  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-REAL-SRL-ADMIN ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-REAL-SRL-ADMIN.json\nEvidence SHA-256: fedae5f24df916d000d7de0f9d2bee98c983d8b7f47fca88455cb4e52c2fe152\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 4079/40000\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 4 se\u00f1al(es): 4 primaria(s) de ['Volatility3/malfind', 'Volatility3/netscan', 'Volatility3/pslist', 'Volatility3/windows.info'], 0 derivada(s)/no-analizada(s). Top z: 31 processes with PAGE_EXECUTE_READWRITE=0.79, 2 PowerShell processes (PIDs 1160, 11008=0.70, Network connections active at time of ac=0.46.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: MALICIOUS_INTENT_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nSRL-2018 compromised enterprise network. Admin server memory dump (5 GB, 2018-09-07). Volatility3 analysis reveals: 2 PowerShell processes (PIDs 1160, 11008) both spawned from PID 6252 \u2014 classic C2 process tree. Evidence SHA-256: d58343cb4e4a06ecc56012c8e25760b297594bf4695303527a5cbb2331726891. Malfind: 31 processes with PAGE_EXECUTE_READWRITE regions \u2014 widespread code injection. Consistent with post-exploitation framework (Cobalt Strike / Meterpreter) active in memory.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [31 processes with PAGE_EXECUTE_READWRITE memory regions not backed by ] z=0.790 conf=0.85 \u2014 \n  [2 PowerShell processes (PIDs 1160, 11008) both children of PID 6252. P] z=0.704 conf=0.80 \u2014 \n  [Network connections active at time of acquisition. Admin server with a] z=0.455 conf=0.70 \u2014 \n  [Windows x64 system. Kernel base 0xf8032461e000, DTB 0x1aa000.] z=0.090 conf=0.90 \u2014 \n\n--- FINAL ALERT LEVEL ---\nMEDIUM \u2014 MALICE verdict from posterior aggregation. Individual z-scores below threshold. Full signal review recommended. Alert floored (B-028/B-065).\nReconciliation: verdict MALICE rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 4 | Derived: 0 | Total: 4",
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-REAL-SRL-ADMIN ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-REAL-SRL-ADMIN.json\nEvidence SHA-256: fedae5f24df916d000d7de0f9d2bee98c983d8b7f47fca88455cb4e52c2fe152\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 81/100\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 4 se\u00f1al(es): 4 primaria(s) de ['Volatility3/malfind', 'Volatility3/netscan', 'Volatility3/pslist', 'Volatility3/windows.info'], 0 derivada(s)/no-analizada(s). Top z: 31 processes with PAGE_EXECUTE_READWRITE=0.79, 2 PowerShell processes (PIDs 1160, 11008=0.70, Network connections active at time of ac=0.46.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: MALICIOUS_INTENT_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nSRL-2018 compromised enterprise network. Admin server memory dump (5 GB, 2018-09-07). Volatility3 analysis reveals: 2 PowerShell processes (PIDs 1160, 11008) both spawned from PID 6252 \u2014 classic C2 process tree. Evidence SHA-256: d58343cb4e4a06ecc56012c8e25760b297594bf4695303527a5cbb2331726891. Malfind: 31 processes with PAGE_EXECUTE_READWRITE regions \u2014 widespread code injection. Consistent with post-exploitation framework (Cobalt Strike / Meterpreter) active in memory.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [31 processes with PAGE_EXECUTE_READWRITE memory regions not backed by ] z=0.790 conf=0.85 \u2014 \n  [2 PowerShell processes (PIDs 1160, 11008) both children of PID 6252. P] z=0.704 conf=0.80 \u2014 \n  [Network connections active at time of acquisition. Admin server with a] z=0.455 conf=0.70 \u2014 \n  [Windows x64 system. Kernel base 0xf8032461e000, DTB 0x1aa000.] z=0.090 conf=0.90 \u2014 \n\n--- FINAL ALERT LEVEL ---\nHIGH \u2014 MALICE verdict from Bayesian posterior aggregation. Individual z-scores below threshold (distributed evidence pattern: no single dominant signal, but aggregate posterior is decisive). Alert floored (B-028/B-065).\nReconciliation: verdict MALICE rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 4 | Derived: 0 | Total: 4",
   "pipeline_results": {
     "abduction": {
       "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
-      "best_posterior": "4079/40000",
+      "best_posterior": "81/100",
       "confidence": {
         "__fraction__": true,
-        "den": 40000,
-        "num": 4079
+        "den": 100,
+        "num": 81
       },
       "devil_advocate": {
         "aggregation": {
@@ -195,7 +203,7 @@
           "primary_alternative_hypothesis": null
         },
         "decision_context": {
-          "confidence": "4079/40000",
+          "confidence": "81/100",
           "mapped_verdict": "MALICIOUS_INTENT_DETECTED",
           "raw_verdict": "MALICIOUS_INTENT_DETECTED",
           "score": "4079/8000"
@@ -216,7 +224,15 @@
     "pipeline_meta": {
       "artifact_count": 4,
       "avg_score": "4079/8000",
+      "ebs_adapter_mode": "motor",
       "expected_verdict": "MALICE",
+      "resolve": {
+        "motor_confidence": "0.81",
+        "motor_reason": "Intent score 0.4048 exceeds MALICE threshold (P2+acq_assurance scale, threshold=0.33)",
+        "motor_score": "0.4048",
+        "motor_verdict": "MALICE",
+        "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+      },
       "source": "ebs_v1_json_adapter"
     },
     "signals": [

@@ -1,15 +1,15 @@
 {
   "agent_verdict": "MALICE",
-  "analysis_timestamp": "2026-07-05T15:27:42.355057+00:00",
+  "analysis_timestamp": "2026-07-06T01:31:04.107253+00:00",
   "audit_trail": {
     "agent_version": "1.0.0-SANS-2026",
     "case_id": "VIGIA-CAN-041",
-    "end_time": "2026-07-05T15:27:42.355063+00:00",
+    "end_time": "2026-07-06T01:31:04.107260+00:00",
     "entries": [
       {
         "action": "AGENT_INITIALIZED",
         "case_id": "VIGIA-CAN-041",
-        "entry_sha256": "57950956445d57bb301ff31ef7b8187b1650acf5ad7543f2fc234212ae41c7d1",
+        "entry_sha256": "569247a8d381d24f320c7e7fe5a475822ca1df07aea85cbdd6009aa2ea124369",
         "inputs_summary": {
           "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
           "case_id": "VIGIA-CAN-041"
@@ -21,13 +21,13 @@
           "agent_version": "1.0.0-SANS-2026"
         },
         "seq": 1,
-        "timestamp": "2026-07-05T15:27:42.351443+00:00",
+        "timestamp": "2026-07-06T01:31:03.749600+00:00",
         "tool": "vigia_agent"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-CAN-041",
-        "entry_sha256": "f03d96a2ebb6cea0b32456453c27de2cf36ed6df49f88d91229765849a159b19",
+        "entry_sha256": "6c0ca702362bcb5f3f90e777f5bc26be56a263ecb10d4a63409b62dfaaa3fbf3",
         "inputs_summary": {
           "path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-041.json"
         },
@@ -35,29 +35,29 @@
         "note": "Computing SHA-256 of original evidence",
         "outputs_summary": {},
         "seq": 2,
-        "timestamp": "2026-07-05T15:27:42.351532+00:00",
+        "timestamp": "2026-07-06T01:31:03.749687+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-CAN-041",
-        "entry_sha256": "7625d0ede4fe523c480ec7994b2c325552851095669f677c0875ab1b8f76f8ad",
+        "entry_sha256": "4d1be0838effb1c218b7ba9f37c6fec76b73b727e396c66afc9fde8727e2f84e",
         "inputs_summary": {
           "path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-041.json"
         },
         "iteration": 0,
-        "note": "Evidence verified: 48f5f58748d04e8b...",
+        "note": "Evidence verified: 3a279e64f579b3b5...",
         "outputs_summary": {
-          "sha256": "48f5f58748d04e8b50339b9f54d8b488048041be6b3e99459210af47f1ec92ce"
+          "sha256": "3a279e64f579b3b5d790b1757baebabc204ad8eed05a359ea7d59b957d3da7dc"
         },
         "seq": 3,
-        "timestamp": "2026-07-05T15:27:42.351625+00:00",
+        "timestamp": "2026-07-06T01:31:03.749781+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "PIPELINE_EXECUTE",
         "case_id": "VIGIA-CAN-041",
-        "entry_sha256": "f1eb083f21be1ad629bff8023d538ab5ed05d93f678781289bd4020c51a3c8ed",
+        "entry_sha256": "82161eed63c2c734a1d8f7db2068b223c1b767db92c7745ca71f3b139e34012a",
         "inputs_summary": {
           "evidence": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-041.json",
           "iteration": "0",
@@ -67,13 +67,13 @@
         "note": "Executing pipeline \u2014 iteration 0",
         "outputs_summary": {},
         "seq": 4,
-        "timestamp": "2026-07-05T15:27:42.351728+00:00",
+        "timestamp": "2026-07-06T01:31:03.749882+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "PIPELINE_COMPLETE",
         "case_id": "VIGIA-CAN-041",
-        "entry_sha256": "9a7cbb305bb01c931aaf8249c797b97b3443e1ddbb8d5533c6296b9e590df9bc",
+        "entry_sha256": "68fd8b7cf34ab64d237c4b50aa8a947c982805176c5cb5abcedb4e7551572611",
         "inputs_summary": {
           "iteration": "0"
         },
@@ -82,16 +82,24 @@
         "outputs_summary": {
           "abduction": {
             "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
-            "best_posterior": "823/20000",
-            "confidence": "823/20000",
-            "is_conclusive": "False",
+            "best_posterior": "91/100",
+            "confidence": "91/100",
+            "is_conclusive": "True",
             "narrative": "Urgent email from compromised CEO account requesting a $250,000 transfer. The real CEO always uses 1 space after a period and never uses a period at the end of short messages. This email has 2 spaces ..."
           },
           "case_id": "case_011_traicion_puntuacion",
           "pipeline_meta": {
             "artifact_count": "4",
             "avg_score": "823/4000",
+            "ebs_adapter_mode": "motor",
             "expected_verdict": "MALICE",
+            "resolve": {
+              "motor_confidence": "0.91",
+              "motor_reason": "Intent score 0.4552 exceeds MALICE threshold (P2+acq_assurance scale, threshold=0.33)",
+              "motor_score": "0.4552",
+              "motor_verdict": "MALICE",
+              "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+            },
             "source": "ebs_v1_json_adapter"
           },
           "signals": [
@@ -130,13 +138,13 @@
           ]
         },
         "seq": 5,
-        "timestamp": "2026-07-05T15:27:42.354269+00:00",
+        "timestamp": "2026-07-06T01:31:04.106715+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "CONTRADICTION_CHECK",
         "case_id": "VIGIA-CAN-041",
-        "entry_sha256": "d7533cd80b44f512c33f8297cc0590861c7fa159e0e1837952260bafb4dacba3",
+        "entry_sha256": "0f1001263168e601d70ee9a6f84f0f6ba571c519375ec50a41ae6e69d905cb03",
         "inputs_summary": {
           "n_signals": "4"
         },
@@ -147,13 +155,13 @@
           "threshold": "2"
         },
         "seq": 6,
-        "timestamp": "2026-07-05T15:27:42.354376+00:00",
+        "timestamp": "2026-07-06T01:31:04.106831+00:00",
         "tool": "contradiction_detector"
       },
       {
         "action": "AGENT_EXIT",
         "case_id": "VIGIA-CAN-041",
-        "entry_sha256": "4d6dd294905a9cce5d9d4669ca512f9b3e722d4c3e38f6d4c94d4b6bdb050118",
+        "entry_sha256": "d1061bd1d5d0661639d223cdcd5f2e058d0880bfbb9d6a79a20692a860c51da6",
         "inputs_summary": {
           "verdict": "MALICIOUS_INTENT_DETECTED"
         },
@@ -164,26 +172,26 @@
           "exit_code": "1"
         },
         "seq": 7,
-        "timestamp": "2026-07-05T15:27:42.354576+00:00",
+        "timestamp": "2026-07-06T01:31:04.107046+00:00",
         "tool": "vigia_agent"
       }
     ],
-    "start_time": "2026-07-05T15:27:42.351205+00:00",
+    "start_time": "2026-07-06T01:31:03.749363+00:00",
     "total_entries": 7
   },
   "case_id": "VIGIA-CAN-041",
   "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-041.json",
-  "evidence_sha256": "48f5f58748d04e8b50339b9f54d8b488048041be6b3e99459210af47f1ec92ce",
+  "evidence_sha256": "3a279e64f579b3b5d790b1757baebabc204ad8eed05a359ea7d59b957d3da7dc",
   "iterations_executed": 1,
-  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-CAN-041 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-041.json\nEvidence SHA-256: 48f5f58748d04e8b50339b9f54d8b488048041be6b3e99459210af47f1ec92ce\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 823/20000\nConclusive: NO \u2014 requires human review\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 4 se\u00f1al(es): 4 primaria(s) de ['sift_azure_ad', 'sift_mail_gateway', 'sift_stylometry'], 0 derivada(s)/no-analizada(s). Top z: CEO stylometric baseline: 847 emails. On=0.32, Suspicious email: 'Transfer urgently to =0.29, Stylometric analysis: 4.3 sigma deviatio=0.18.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: MALICIOUS_INTENT_DETECTED. Conclusiva: no \u2014 requiere revisi\u00f3n humana.\n\nRazonamiento del motor abductivo:\nUrgent email from compromised CEO account requesting a $250,000 transfer. The real CEO always uses 1 space after a period and never uses a period at the end of short messages. This email has 2 spaces after a period and a period at the end of a 9-word message. DKIM valid (compromised account). Previous login from a Tor node at 04:15.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [CEO stylometric baseline: 847 emails. One space after period (100%). N] z=0.315 conf=0.45 \u2014 \n  [Suspicious email: 'Transfer urgently to this vendor.  The payment is c] z=0.287 conf=0.35 \u2014 \n  [Stylometric analysis: 4.3 sigma deviation in post-period spacing and p] z=0.176 conf=0.20 \u2014 \n  [Login to CEO account at 04:15 from 185.220.101.50 (Tor node). Session ] z=0.045 conf=0.90 \u2014 \n\n--- FINAL ALERT LEVEL ---\nMEDIUM \u2014 MALICE verdict from posterior aggregation. Individual z-scores below threshold. Full signal review recommended. Alert floored (B-028/B-065).\nReconciliation: verdict MALICE rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 4 | Derived: 0 | Total: 4",
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-CAN-041 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-041.json\nEvidence SHA-256: 3a279e64f579b3b5d790b1757baebabc204ad8eed05a359ea7d59b957d3da7dc\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 91/100\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 4 se\u00f1al(es): 4 primaria(s) de ['sift_azure_ad', 'sift_mail_gateway', 'sift_stylometry'], 0 derivada(s)/no-analizada(s). Top z: CEO stylometric baseline: 847 emails. On=0.32, Suspicious email: 'Transfer urgently to =0.29, Stylometric analysis: 4.3 sigma deviatio=0.18.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: MALICIOUS_INTENT_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nUrgent email from compromised CEO account requesting a $250,000 transfer. The real CEO always uses 1 space after a period and never uses a period at the end of short messages. This email has 2 spaces after a period and a period at the end of a 9-word message. DKIM valid (compromised account). Previous login from a Tor node at 04:15.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [CEO stylometric baseline: 847 emails. One space after period (100%). N] z=0.315 conf=0.45 \u2014 \n  [Suspicious email: 'Transfer urgently to this vendor.  The payment is c] z=0.287 conf=0.35 \u2014 \n  [Stylometric analysis: 4.3 sigma deviation in post-period spacing and p] z=0.176 conf=0.20 \u2014 \n  [Login to CEO account at 04:15 from 185.220.101.50 (Tor node). Session ] z=0.045 conf=0.90 \u2014 \n\n--- FINAL ALERT LEVEL ---\nHIGH \u2014 MALICE verdict from Bayesian posterior aggregation. Individual z-scores below threshold (distributed evidence pattern: no single dominant signal, but aggregate posterior is decisive). Alert floored (B-028/B-065).\nReconciliation: verdict MALICE rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 4 | Derived: 0 | Total: 4",
   "pipeline_results": {
     "abduction": {
       "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
-      "best_posterior": "823/20000",
+      "best_posterior": "91/100",
       "confidence": {
         "__fraction__": true,
-        "den": 20000,
-        "num": 823
+        "den": 100,
+        "num": 91
       },
       "devil_advocate": {
         "aggregation": {
@@ -195,7 +203,7 @@
           "primary_alternative_hypothesis": null
         },
         "decision_context": {
-          "confidence": "823/20000",
+          "confidence": "91/100",
           "mapped_verdict": "MALICIOUS_INTENT_DETECTED",
           "raw_verdict": "MALICIOUS_INTENT_DETECTED",
           "score": "823/4000"
@@ -209,14 +217,22 @@
         "pattern_evidence_gaps": [],
         "version": "r7-da-v1"
       },
-      "is_conclusive": false,
+      "is_conclusive": true,
       "narrative": "Urgent email from compromised CEO account requesting a $250,000 transfer. The real CEO always uses 1 space after a period and never uses a period at the end of short messages. This email has 2 spaces after a period and a period at the end of a 9-word message. DKIM valid (compromised account). Previous login from a Tor node at 04:15."
     },
     "case_id": "case_011_traicion_puntuacion",
     "pipeline_meta": {
       "artifact_count": 4,
       "avg_score": "823/4000",
+      "ebs_adapter_mode": "motor",
       "expected_verdict": "MALICE",
+      "resolve": {
+        "motor_confidence": "0.91",
+        "motor_reason": "Intent score 0.4552 exceeds MALICE threshold (P2+acq_assurance scale, threshold=0.33)",
+        "motor_score": "0.4552",
+        "motor_verdict": "MALICE",
+        "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+      },
       "source": "ebs_v1_json_adapter"
     },
     "signals": [

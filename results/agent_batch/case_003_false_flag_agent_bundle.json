@@ -1,15 +1,15 @@
 {
   "agent_verdict": "MALICE",
-  "analysis_timestamp": "2026-07-05T15:27:37.563197+00:00",
+  "analysis_timestamp": "2026-07-06T01:30:23.452798+00:00",
   "audit_trail": {
     "agent_version": "1.0.0-SANS-2026",
     "case_id": "case_003_false_flag",
-    "end_time": "2026-07-05T15:27:37.563203+00:00",
+    "end_time": "2026-07-06T01:30:23.452806+00:00",
     "entries": [
       {
         "action": "AGENT_INITIALIZED",
         "case_id": "case_003_false_flag",
-        "entry_sha256": "5d9f580a0b74804183e553993b03a8d6f154604a7416a2eb458ab85afde470e4",
+        "entry_sha256": "ea4bc09f314bff42e15588fa7768ca7c9f141fab88e04603c8e1d33d3e82b1ed",
         "inputs_summary": {
           "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
           "case_id": "case_003_false_flag"
@@ -21,13 +21,13 @@
           "agent_version": "1.0.0-SANS-2026"
         },
         "seq": 1,
-        "timestamp": "2026-07-05T15:27:37.559734+00:00",
+        "timestamp": "2026-07-06T01:30:23.103663+00:00",
         "tool": "vigia_agent"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "case_003_false_flag",
-        "entry_sha256": "227196807e4e7371351bb4b76f0cddaf364bafaf849ae22d7311a40124694e3c",
+        "entry_sha256": "b9c312989fb4e86f8faed3372d5500d1faa0eb16d99ecf02f520a5bc1c6453a1",
         "inputs_summary": {
           "path": "/home/labestiadevigia/vigia-repo/data/cases/case_003_false_flag.json"
         },
@@ -35,29 +35,29 @@
         "note": "Computing SHA-256 of original evidence",
         "outputs_summary": {},
         "seq": 2,
-        "timestamp": "2026-07-05T15:27:37.559815+00:00",
+        "timestamp": "2026-07-06T01:30:23.103751+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "case_003_false_flag",
-        "entry_sha256": "86008cbf5b86eb49b5d887d7ecd513bb947cfd4bec930a66bcfa761eb9aaade8",
+        "entry_sha256": "fffced1f2b8fb05d627a5dc3e4febeaf151ed357a753be98c38ebdf1382cad30",
         "inputs_summary": {
           "path": "/home/labestiadevigia/vigia-repo/data/cases/case_003_false_flag.json"
         },
         "iteration": 0,
-        "note": "Evidence verified: d41e816d0c274249...",
+        "note": "Evidence verified: ff7b18774858d8ca...",
         "outputs_summary": {
-          "sha256": "d41e816d0c274249d80c5480316579c45f71e41c74ccc3745b8f150567416701"
+          "sha256": "ff7b18774858d8caba06b4d50e058b8cec8d2889af8e5f0235469e130b817b90"
         },
         "seq": 3,
-        "timestamp": "2026-07-05T15:27:37.559911+00:00",
+        "timestamp": "2026-07-06T01:30:23.103846+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "PIPELINE_EXECUTE",
         "case_id": "case_003_false_flag",
-        "entry_sha256": "bdeb6550ca2b2bcb5b98c2643eff65c5179329fe851774f56b662f30ead0592a",
+        "entry_sha256": "659808115c8b2995b7ecb5df109f945f787f4deff1dea46c34cdcc6bc7ed4ffe",
         "inputs_summary": {
           "evidence": "/home/labestiadevigia/vigia-repo/data/cases/case_003_false_flag.json",
           "iteration": "0",
@@ -67,13 +67,13 @@
         "note": "Executing pipeline \u2014 iteration 0",
         "outputs_summary": {},
         "seq": 4,
-        "timestamp": "2026-07-05T15:27:37.560017+00:00",
+        "timestamp": "2026-07-06T01:30:23.103945+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "PIPELINE_COMPLETE",
         "case_id": "case_003_false_flag",
-        "entry_sha256": "c3df4a607cc1612bd2e0ff1b260ccdca9874a8f90582c505099813ba9dfb30ba",
+        "entry_sha256": "99af076cc668b319b6ffe6acab3907612aca15783669ddd1b4a0354a5075387f",
         "inputs_summary": {
           "iteration": "0"
         },
@@ -82,8 +82,8 @@
         "outputs_summary": {
           "abduction": {
             "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
-            "best_posterior": "238/1875",
-            "confidence": "238/1875",
+            "best_posterior": "89/100",
+            "confidence": "89/100",
             "is_conclusive": "True",
             "narrative": "A real compromise: process hollowing and credential dumping confirmed in memory (hard-to-fake structural evidence). On top of the real attack, the operator planted Cyrillic strings whose profile contr..."
           },
@@ -91,7 +91,15 @@
           "pipeline_meta": {
             "artifact_count": "3",
             "avg_score": "238/375",
+            "ebs_adapter_mode": "motor",
             "expected_verdict": "MALICE",
+            "resolve": {
+              "motor_confidence": "0.89",
+              "motor_reason": "Intent score 0.4458 exceeds MALICE threshold (P2+acq_assurance scale, threshold=0.33)",
+              "motor_score": "0.4458",
+              "motor_verdict": "MALICE",
+              "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+            },
             "source": "ebs_v1_json_adapter"
           },
           "signals": [
@@ -122,13 +130,13 @@
           ]
         },
         "seq": 5,
-        "timestamp": "2026-07-05T15:27:37.562476+00:00",
+        "timestamp": "2026-07-06T01:30:23.452213+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "CONTRADICTION_CHECK",
         "case_id": "case_003_false_flag",
-        "entry_sha256": "ede3003d6960fd1c443e8a5ed5aa14e73d38af7111e78c03c5044aa79cca9b10",
+        "entry_sha256": "0293048cad683e30c247b7f700c99911ee6d65d59d8f3f7250958411b22798ef",
         "inputs_summary": {
           "n_signals": "3"
         },
@@ -139,13 +147,13 @@
           "threshold": "2"
         },
         "seq": 6,
-        "timestamp": "2026-07-05T15:27:37.562580+00:00",
+        "timestamp": "2026-07-06T01:30:23.452328+00:00",
         "tool": "contradiction_detector"
       },
       {
         "action": "AGENT_EXIT",
         "case_id": "case_003_false_flag",
-        "entry_sha256": "67d153bc5d5249d39c346ca7d3cbc5f630821358fb0a14ce3a879791ce2ba7ac",
+        "entry_sha256": "49d3cd2e3e6d9f7c43bb99a9685c8ca05c7546cb501c3ed0017d8defe5b12bed",
         "inputs_summary": {
           "verdict": "MALICIOUS_INTENT_DETECTED"
         },
@@ -156,26 +164,26 @@
           "exit_code": "1"
         },
         "seq": 7,
-        "timestamp": "2026-07-05T15:27:37.562752+00:00",
+        "timestamp": "2026-07-06T01:30:23.452606+00:00",
         "tool": "vigia_agent"
       }
     ],
-    "start_time": "2026-07-05T15:27:37.559515+00:00",
+    "start_time": "2026-07-06T01:30:23.103440+00:00",
     "total_entries": 7
   },
   "case_id": "case_003_false_flag",
   "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/case_003_false_flag.json",
-  "evidence_sha256": "d41e816d0c274249d80c5480316579c45f71e41c74ccc3745b8f150567416701",
+  "evidence_sha256": "ff7b18774858d8caba06b4d50e058b8cec8d2889af8e5f0235469e130b817b90",
   "iterations_executed": 1,
-  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE case_003_false_flag ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/case_003_false_flag.json\nEvidence SHA-256: d41e816d0c274249d80c5480316579c45f71e41c74ccc3745b8f150567416701\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 238/1875\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 3 se\u00f1al(es): 3 primaria(s) de ['infer_intent', 'list_processes'], 0 derivada(s)/no-analizada(s). Top z: Process hollowing in svchost.exe confirm=0.84, LSASS credential dumping detected (T1003=0.80, Cyrillic strings injected into the dropp=0.27.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: MALICIOUS_INTENT_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nA real compromise: process hollowing and credential dumping confirmed in memory (hard-to-fake structural evidence). On top of the real attack, the operator planted Cyrillic strings whose profile contradicts the actual TTPs and OPSEC \u2014 the cultural markers are too pristine and inconsistent with the actor's toolchain. CAIE fracture: FALSE_FLAG_ATTRIBUTION_MISMATCH. The malice belongs to the planter, not to any Russian-speaker.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Process hollowing in svchost.exe confirmed in memory (T1055.012). Refl] z=0.836 conf=0.95 \u2014 \n  [LSASS credential dumping detected (T1003.001). Active compromise confi] z=0.798 conf=0.95 \u2014 \n  [Cyrillic strings injected into the dropper: suspiciously pristine, inc] z=0.270 conf=0.30 \u2014 \n\n--- FINAL ALERT LEVEL ---\nHIGH \u2014 MALICE verdict from Bayesian posterior aggregation. Individual z-scores below threshold (distributed evidence pattern: no single dominant signal, but aggregate posterior is decisive). Alert floored (B-028/B-065).\nReconciliation: verdict MALICE rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 3 | Derived: 0 | Total: 3",
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE case_003_false_flag ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/case_003_false_flag.json\nEvidence SHA-256: ff7b18774858d8caba06b4d50e058b8cec8d2889af8e5f0235469e130b817b90\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 89/100\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 3 se\u00f1al(es): 3 primaria(s) de ['infer_intent', 'list_processes'], 0 derivada(s)/no-analizada(s). Top z: Process hollowing in svchost.exe confirm=0.84, LSASS credential dumping detected (T1003=0.80, Cyrillic strings injected into the dropp=0.27.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: MALICIOUS_INTENT_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nA real compromise: process hollowing and credential dumping confirmed in memory (hard-to-fake structural evidence). On top of the real attack, the operator planted Cyrillic strings whose profile contradicts the actual TTPs and OPSEC \u2014 the cultural markers are too pristine and inconsistent with the actor's toolchain. CAIE fracture: FALSE_FLAG_ATTRIBUTION_MISMATCH. The malice belongs to the planter, not to any Russian-speaker.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Process hollowing in svchost.exe confirmed in memory (T1055.012). Refl] z=0.836 conf=0.95 \u2014 \n  [LSASS credential dumping detected (T1003.001). Active compromise confi] z=0.798 conf=0.95 \u2014 \n  [Cyrillic strings injected into the dropper: suspiciously pristine, inc] z=0.270 conf=0.30 \u2014 \n\n--- FINAL ALERT LEVEL ---\nHIGH \u2014 MALICE verdict from Bayesian posterior aggregation. Individual z-scores below threshold (distributed evidence pattern: no single dominant signal, but aggregate posterior is decisive). Alert floored (B-028/B-065).\nReconciliation: verdict MALICE rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 3 | Derived: 0 | Total: 3",
   "pipeline_results": {
     "abduction": {
       "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
-      "best_posterior": "238/1875",
+      "best_posterior": "89/100",
       "confidence": {
         "__fraction__": true,
-        "den": 1875,
-        "num": 238
+        "den": 100,
+        "num": 89
       },
       "devil_advocate": {
         "aggregation": {
@@ -187,7 +195,7 @@
           "primary_alternative_hypothesis": null
         },
         "decision_context": {
-          "confidence": "238/1875",
+          "confidence": "89/100",
           "mapped_verdict": "MALICIOUS_INTENT_DETECTED",
           "raw_verdict": "MALICIOUS_INTENT_DETECTED",
           "score": "238/375"
@@ -208,7 +216,15 @@
     "pipeline_meta": {
       "artifact_count": 3,
       "avg_score": "238/375",
+      "ebs_adapter_mode": "motor",
       "expected_verdict": "MALICE",
+      "resolve": {
+        "motor_confidence": "0.89",
+        "motor_reason": "Intent score 0.4458 exceeds MALICE threshold (P2+acq_assurance scale, threshold=0.33)",
+        "motor_score": "0.4458",
+        "motor_verdict": "MALICE",
+        "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+      },
       "source": "ebs_v1_json_adapter"
     },
     "signals": [

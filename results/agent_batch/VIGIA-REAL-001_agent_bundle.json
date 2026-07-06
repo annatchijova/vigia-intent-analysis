@@ -1,15 +1,15 @@
 {
   "agent_verdict": "MALICE",
-  "analysis_timestamp": "2026-07-05T15:27:35.167020+00:00",
+  "analysis_timestamp": "2026-07-06T01:30:03.053079+00:00",
   "audit_trail": {
     "agent_version": "1.0.0-SANS-2026",
     "case_id": "VIGIA-REAL-001",
-    "end_time": "2026-07-05T15:27:35.167027+00:00",
+    "end_time": "2026-07-06T01:30:03.053087+00:00",
     "entries": [
       {
         "action": "AGENT_INITIALIZED",
         "case_id": "VIGIA-REAL-001",
-        "entry_sha256": "9ae70467996ac3584ced69675c6d84bfc3ff615323b577c851771bf6dfedfbe9",
+        "entry_sha256": "a853c1840b7a490791b6843b109b6b0b7188be97adf8c1d1049d5535dc9eb4f0",
         "inputs_summary": {
           "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
           "case_id": "VIGIA-REAL-001"
@@ -21,13 +21,13 @@
           "agent_version": "1.0.0-SANS-2026"
         },
         "seq": 1,
-        "timestamp": "2026-07-05T15:27:35.163395+00:00",
+        "timestamp": "2026-07-06T01:30:02.690855+00:00",
         "tool": "vigia_agent"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-REAL-001",
-        "entry_sha256": "b6b66ca3f9be88a3edd197d783ff76a9c7e6529b7e6e99bbe9170317a1cf3b75",
+        "entry_sha256": "975aa64e413ecc1059c8d4288fc618be586712c3e4b59ff6ff6ed9da8a016c4c",
         "inputs_summary": {
           "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-REAL-001.json"
         },
@@ -35,13 +35,13 @@
         "note": "Computing SHA-256 of original evidence",
         "outputs_summary": {},
         "seq": 2,
-        "timestamp": "2026-07-05T15:27:35.163491+00:00",
+        "timestamp": "2026-07-06T01:30:02.690936+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-REAL-001",
-        "entry_sha256": "8f9ee66860f08263a2a5ba06ac0d1cfa0e3d50fe00f755b51ddaa9945cb8434e",
+        "entry_sha256": "8b9434cf0ae0b59143ec22819dff1cb28edf677b37fd8254d38637de46e56bdd",
         "inputs_summary": {
           "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-REAL-001.json"
         },
@@ -51,13 +51,13 @@
           "sha256": "fb998e7add395fc4bf407cf6b59c54bcf37bfc7d82de32da4a632b480c14c5ec"
         },
         "seq": 3,
-        "timestamp": "2026-07-05T15:27:35.163590+00:00",
+        "timestamp": "2026-07-06T01:30:02.691032+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "PIPELINE_EXECUTE",
         "case_id": "VIGIA-REAL-001",
-        "entry_sha256": "90ebbf6800df7236d0ee9301f7f7d2726b5c1d5bcf5b5376873df9d3404c476a",
+        "entry_sha256": "f7f8276dfd55164720c5187d2006962a723b3cf676bb596fc9e7ee83089e9abf",
         "inputs_summary": {
           "evidence": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-REAL-001.json",
           "iteration": "0",
@@ -67,13 +67,13 @@
         "note": "Executing pipeline \u2014 iteration 0",
         "outputs_summary": {},
         "seq": 4,
-        "timestamp": "2026-07-05T15:27:35.163694+00:00",
+        "timestamp": "2026-07-06T01:30:02.691135+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "PIPELINE_COMPLETE",
         "case_id": "VIGIA-REAL-001",
-        "entry_sha256": "7eb5283b5fafe05f482d1d7fedfaca6da9767e3bc61eb8d66de5f3ec8d323d08",
+        "entry_sha256": "21c121ebc85afee066cc7fe089e045d89aa7861aa56e14cd7c4c61aa8064000c",
         "inputs_summary": {
           "iteration": "0"
         },
@@ -82,16 +82,24 @@
         "outputs_summary": {
           "abduction": {
             "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
-            "best_posterior": "0",
-            "confidence": "0",
-            "is_conclusive": "False",
+            "best_posterior": "93/100",
+            "confidence": "93/100",
+            "is_conclusive": "True",
             "narrative": "On 09/20/04, a Dell CPi laptop serial VLQLW was found abandoned with a wireless PCMCIA card and a homemade 802.11b antenna. The suspect Greg Schardt alias Mr. Evil was war driving near public WiFi hot..."
           },
           "case_id": "VIGIA-REAL-001",
           "pipeline_meta": {
             "artifact_count": "5",
             "avg_score": "0",
+            "ebs_adapter_mode": "motor",
             "expected_verdict": "MALICE",
+            "resolve": {
+              "motor_confidence": "0.93",
+              "motor_reason": "Intent score 0.4640 exceeds MALICE threshold (P2+acq_assurance scale, threshold=0.33)",
+              "motor_score": "0.464",
+              "motor_verdict": "MALICE",
+              "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+            },
             "source": "ebs_v1_json_adapter"
           },
           "signals": [
@@ -138,13 +146,13 @@
           ]
         },
         "seq": 5,
-        "timestamp": "2026-07-05T15:27:35.166255+00:00",
+        "timestamp": "2026-07-06T01:30:03.052566+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "CONTRADICTION_CHECK",
         "case_id": "VIGIA-REAL-001",
-        "entry_sha256": "3635faeeb0dbb307fb6bc0723249834936e4c9800f1508e5ab169bcc489594a7",
+        "entry_sha256": "b7984cb233d290652a29f5221cd535dccb5dfb3e31a042a537480121eb88b9a4",
         "inputs_summary": {
           "n_signals": "5"
         },
@@ -155,13 +163,13 @@
           "threshold": "2"
         },
         "seq": 6,
-        "timestamp": "2026-07-05T15:27:35.166365+00:00",
+        "timestamp": "2026-07-06T01:30:03.052684+00:00",
         "tool": "contradiction_detector"
       },
       {
         "action": "AGENT_EXIT",
         "case_id": "VIGIA-REAL-001",
-        "entry_sha256": "727d4bbf226d89c87dcf2f0bb76f746218c85838e55081ccfb92c88ae4c3f0ae",
+        "entry_sha256": "3009752db7e7233170611323c3f05f888b9a352f8fe62a12a15ca12c5bdd8ec7",
         "inputs_summary": {
           "verdict": "MALICIOUS_INTENT_DETECTED"
         },
@@ -172,26 +180,26 @@
           "exit_code": "1"
         },
         "seq": 7,
-        "timestamp": "2026-07-05T15:27:35.166566+00:00",
+        "timestamp": "2026-07-06T01:30:03.052887+00:00",
         "tool": "vigia_agent"
       }
     ],
-    "start_time": "2026-07-05T15:27:35.163172+00:00",
+    "start_time": "2026-07-06T01:30:02.690636+00:00",
     "total_entries": 7
   },
   "case_id": "VIGIA-REAL-001",
   "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-REAL-001.json",
   "evidence_sha256": "fb998e7add395fc4bf407cf6b59c54bcf37bfc7d82de32da4a632b480c14c5ec",
   "iterations_executed": 1,
-  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-REAL-001 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/VIGIA-REAL-001.json\nEvidence SHA-256: fb998e7add395fc4bf407cf6b59c54bcf37bfc7d82de32da4a632b480c14c5ec\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 0\nConclusive: NO \u2014 requires human review\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 5 se\u00f1al(es): 5 primaria(s) de ['unknown'], 0 derivada(s)/no-analizada(s). Top z: unknown=0.00, unknown=0.00, unknown=0.00.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: MALICIOUS_INTENT_DETECTED. Conclusiva: no \u2014 requiere revisi\u00f3n humana.\n\nRazonamiento del motor abductivo:\nOn 09/20/04, a Dell CPi laptop serial VLQLW was found abandoned with a wireless PCMCIA card and a homemade 802.11b antenna. The suspect Greg Schardt alias Mr. Evil was war driving near public WiFi hotspots to intercept traffic and steal credentials.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [unknown] z=0.000 conf=0.50 \u2014 \n  [unknown] z=0.000 conf=0.50 \u2014 \n  [unknown] z=0.000 conf=0.50 \u2014 \n  [unknown] z=0.000 conf=0.50 \u2014 \n  [unknown] z=0.000 conf=0.50 \u2014 \n\n--- FINAL ALERT LEVEL ---\nMEDIUM \u2014 MALICE verdict from posterior aggregation. Individual z-scores below threshold. Full signal review recommended. Alert floored (B-028/B-065).\nReconciliation: verdict MALICE rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 5 | Derived: 0 | Total: 5",
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-REAL-001 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/VIGIA-REAL-001.json\nEvidence SHA-256: fb998e7add395fc4bf407cf6b59c54bcf37bfc7d82de32da4a632b480c14c5ec\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 93/100\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 5 se\u00f1al(es): 5 primaria(s) de ['unknown'], 0 derivada(s)/no-analizada(s). Top z: unknown=0.00, unknown=0.00, unknown=0.00.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: MALICIOUS_INTENT_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nOn 09/20/04, a Dell CPi laptop serial VLQLW was found abandoned with a wireless PCMCIA card and a homemade 802.11b antenna. The suspect Greg Schardt alias Mr. Evil was war driving near public WiFi hotspots to intercept traffic and steal credentials.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [unknown] z=0.000 conf=0.50 \u2014 \n  [unknown] z=0.000 conf=0.50 \u2014 \n  [unknown] z=0.000 conf=0.50 \u2014 \n  [unknown] z=0.000 conf=0.50 \u2014 \n  [unknown] z=0.000 conf=0.50 \u2014 \n\n--- FINAL ALERT LEVEL ---\nHIGH \u2014 MALICE verdict from Bayesian posterior aggregation. Individual z-scores below threshold (distributed evidence pattern: no single dominant signal, but aggregate posterior is decisive). Alert floored (B-028/B-065).\nReconciliation: verdict MALICE rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 5 | Derived: 0 | Total: 5",
   "pipeline_results": {
     "abduction": {
       "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
-      "best_posterior": "0",
+      "best_posterior": "93/100",
       "confidence": {
         "__fraction__": true,
-        "den": 1,
-        "num": 0
+        "den": 100,
+        "num": 93
       },
       "devil_advocate": {
         "aggregation": {
@@ -203,7 +211,7 @@
           "primary_alternative_hypothesis": null
         },
         "decision_context": {
-          "confidence": "0",
+          "confidence": "93/100",
           "mapped_verdict": "MALICIOUS_INTENT_DETECTED",
           "raw_verdict": "MALICIOUS_INTENT_DETECTED",
           "score": "0"
@@ -217,14 +225,22 @@
         "pattern_evidence_gaps": [],
         "version": "r7-da-v1"
       },
-      "is_conclusive": false,
+      "is_conclusive": true,
       "narrative": "On 09/20/04, a Dell CPi laptop serial VLQLW was found abandoned with a wireless PCMCIA card and a homemade 802.11b antenna. The suspect Greg Schardt alias Mr. Evil was war driving near public WiFi hotspots to intercept traffic and steal credentials."
     },
     "case_id": "VIGIA-REAL-001",
     "pipeline_meta": {
       "artifact_count": 5,
       "avg_score": "0",
+      "ebs_adapter_mode": "motor",
       "expected_verdict": "MALICE",
+      "resolve": {
+        "motor_confidence": "0.93",
+        "motor_reason": "Intent score 0.4640 exceeds MALICE threshold (P2+acq_assurance scale, threshold=0.33)",
+        "motor_score": "0.464",
+        "motor_verdict": "MALICE",
+        "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+      },
       "source": "ebs_v1_json_adapter"
     },
     "signals": [

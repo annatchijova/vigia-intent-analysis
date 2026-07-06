@@ -1,15 +1,15 @@
 {
   "agent_verdict": "MALICE",
-  "analysis_timestamp": "2026-07-05T15:27:39.659779+00:00",
+  "analysis_timestamp": "2026-07-06T01:30:41.082773+00:00",
   "audit_trail": {
     "agent_version": "1.0.0-SANS-2026",
     "case_id": "VIGIA-REAL-VANKO",
-    "end_time": "2026-07-05T15:27:39.659786+00:00",
+    "end_time": "2026-07-06T01:30:41.082780+00:00",
     "entries": [
       {
         "action": "AGENT_INITIALIZED",
         "case_id": "VIGIA-REAL-VANKO",
-        "entry_sha256": "de47c7d98ecae976032e3f33e4a9577e8aeba9643beeaa5bfce35bb9e95077c0",
+        "entry_sha256": "1d27222d30be46ee8172e8f6f52be93e5fddf5aeb5e869d589d4ec89ca4546aa",
         "inputs_summary": {
           "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
           "case_id": "VIGIA-REAL-VANKO"
@@ -21,13 +21,13 @@
           "agent_version": "1.0.0-SANS-2026"
         },
         "seq": 1,
-        "timestamp": "2026-07-05T15:27:39.656056+00:00",
+        "timestamp": "2026-07-06T01:30:40.743658+00:00",
         "tool": "vigia_agent"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-REAL-VANKO",
-        "entry_sha256": "253eb7723db448ccf2e4d7573adcae75ccd765c87a3ab7a957d770b458d500ba",
+        "entry_sha256": "90ded19928b8d223622b2d74b32a66ea1ff621dd0907f8b9624c6d205fda23b3",
         "inputs_summary": {
           "path": "/home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-REAL-VANKO.json"
         },
@@ -35,13 +35,13 @@
         "note": "Computing SHA-256 of original evidence",
         "outputs_summary": {},
         "seq": 2,
-        "timestamp": "2026-07-05T15:27:39.656143+00:00",
+        "timestamp": "2026-07-06T01:30:40.743745+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-REAL-VANKO",
-        "entry_sha256": "9fa821258a472a039878cc581f05bc9c13ce0545d1bdcd6903a019663526c327",
+        "entry_sha256": "c05d99430769d23063aeb73bb1944de6c261e05c116b88131c16a764feb3f70b",
         "inputs_summary": {
           "path": "/home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-REAL-VANKO.json"
         },
@@ -51,13 +51,13 @@
           "sha256": "01f388e319aeea9ac06022821f7b18f24baf96ac0ce9352d768513808fd129f1"
         },
         "seq": 3,
-        "timestamp": "2026-07-05T15:27:39.656244+00:00",
+        "timestamp": "2026-07-06T01:30:40.743847+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "PIPELINE_EXECUTE",
         "case_id": "VIGIA-REAL-VANKO",
-        "entry_sha256": "1c9338c3ddebaf17b09ffec6203f1ef10c0640e57b017a9887ae08ab2c3821f1",
+        "entry_sha256": "5a829d74ccda4ea55dd3315677fdd15a24dd9b448662adc2477eaec85e0c6b01",
         "inputs_summary": {
           "evidence": "/home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-REAL-VANKO.json",
           "iteration": "0",
@@ -67,13 +67,13 @@
         "note": "Executing pipeline \u2014 iteration 0",
         "outputs_summary": {},
         "seq": 4,
-        "timestamp": "2026-07-05T15:27:39.656347+00:00",
+        "timestamp": "2026-07-06T01:30:40.743949+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "PIPELINE_COMPLETE",
         "case_id": "VIGIA-REAL-VANKO",
-        "entry_sha256": "c737cb64536471357c1006ed111debcef03c5afba36898d70423f4723791d823",
+        "entry_sha256": "c666c27c4a9697cdf826eb4134dc619bf45b2a47cd71833caba4fb9a8923affe",
         "inputs_summary": {
           "iteration": "0"
         },
@@ -82,8 +82,8 @@
         "outputs_summary": {
           "abduction": {
             "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
-            "best_posterior": "27409/175000",
-            "confidence": "27409/175000",
+            "best_posterior": "19/20",
+            "confidence": "19/20",
             "is_conclusive": "True",
             "narrative": "FOR500 case. Anthony Vanko, lead biochemical engineer at Stark Enterprises DC R&D Facility, suspected of exfiltrating classified research (zebrafish DNA, rapid cell regeneration, weaponization researc..."
           },
@@ -91,7 +91,15 @@
           "pipeline_meta": {
             "artifact_count": "7",
             "avg_score": "27409/35000",
+            "ebs_adapter_mode": "motor",
             "expected_verdict": "MALICE",
+            "resolve": {
+              "motor_confidence": "0.95",
+              "motor_reason": "Intent score 0.4861 exceeds MALICE threshold (P2+acq_assurance scale, threshold=0.33)",
+              "motor_score": "0.4861",
+              "motor_verdict": "MALICE",
+              "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+            },
             "source": "ebs_v1_json_adapter"
           },
           "signals": [
@@ -138,13 +146,13 @@
           ]
         },
         "seq": 5,
-        "timestamp": "2026-07-05T15:27:39.658989+00:00",
+        "timestamp": "2026-07-06T01:30:41.082215+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "CONTRADICTION_CHECK",
         "case_id": "VIGIA-REAL-VANKO",
-        "entry_sha256": "2a74a91eb117f2f8a422abf89ba327017eabff74151f916959279a9fb3144c15",
+        "entry_sha256": "bf0a1f659073fac4b814647dc09fd50ef5e2a2214eea1a027b6906b3ee4385a3",
         "inputs_summary": {
           "n_signals": "7"
         },
@@ -155,13 +163,13 @@
           "threshold": "2"
         },
         "seq": 6,
-        "timestamp": "2026-07-05T15:27:39.659119+00:00",
+        "timestamp": "2026-07-06T01:30:41.082358+00:00",
         "tool": "contradiction_detector"
       },
       {
         "action": "AGENT_EXIT",
         "case_id": "VIGIA-REAL-VANKO",
-        "entry_sha256": "23360cb5f115012292fa9ea239466dfc32cc3ed04148c72c5e5437f06e3da15b",
+        "entry_sha256": "2c18d879481dcb41d67bfa50b0548b8b2398c3509a70461b3b19256516d12155",
         "inputs_summary": {
           "verdict": "MALICIOUS_INTENT_DETECTED"
         },
@@ -172,26 +180,26 @@
           "exit_code": "1"
         },
         "seq": 7,
-        "timestamp": "2026-07-05T15:27:39.659328+00:00",
+        "timestamp": "2026-07-06T01:30:41.082594+00:00",
         "tool": "vigia_agent"
       }
     ],
-    "start_time": "2026-07-05T15:27:39.655825+00:00",
+    "start_time": "2026-07-06T01:30:40.743437+00:00",
     "total_entries": 7
   },
   "case_id": "VIGIA-REAL-VANKO",
   "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-REAL-VANKO.json",
   "evidence_sha256": "01f388e319aeea9ac06022821f7b18f24baf96ac0ce9352d768513808fd129f1",
   "iterations_executed": 1,
-  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-REAL-VANKO ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-REAL-VANKO.json\nEvidence SHA-256: 01f388e319aeea9ac06022821f7b18f24baf96ac0ce9352d768513808fd129f1\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 27409/175000\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 7 se\u00f1al(es): 7 primaria(s) de ['RegRipper ntuser plugin on NTUSER_defaultprinter.DAT', 'ntfs-3g read-only mount + directory listing', 'ntfs-3g read-only mount + manual analysis', 'tshark + strings analysis'], 0 derivada(s)/no-analizada(s). Top z: transfers.log at C:\\Users\\defaultprinter=0.90, Classified Stark Enterprises research do=0.87, ftpd.ini configuration file at C:\\Users\\=0.84.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: MALICIOUS_INTENT_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nFOR500 case. Anthony Vanko, lead biochemical engineer at Stark Enterprises DC R&D Facility, suspected of exfiltrating classified research (zebrafish DNA, rapid cell regeneration, weaponization research) to a Chinese university server. Evidence: Microsoft Surface 3 (119GB physical EWF image, FTK Imager 2.9, examiner Ovie Carroll, 2016-11-04). Key findings: hidden 'defaultprinter' service account; smallftpd.exe FTP server (VT 1/72, packed); ftpd.ini with auto_run=1 exposing entire user directory; \n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [transfers.log at C:\\Users\\defaultprinter\\transfers.log. Single entry: ] z=0.902 conf=0.92 \u2014 \n  [Classified Stark Enterprises research documents found on device under ] z=0.873 conf=0.90 \u2014 \n  [ftpd.ini configuration file at C:\\Users\\defaultprinter\\ftpd.ini. Criti] z=0.845 conf=0.88 \u2014 \n  [Hidden user account 'defaultprinter' at C:\\Users\\defaultprinter\\. Acco] z=0.809 conf=0.87 \u2014 \n  [smallftpd.exe found at C:\\Users\\defaultprinter\\smallftpd.exe, SHA-256:] z=0.746 conf=0.82 \u2014 \n\n--- FINAL ALERT LEVEL ---\nHIGH \u2014 MALICE verdict from Bayesian posterior aggregation. Individual z-scores below threshold (distributed evidence pattern: no single dominant signal, but aggregate posterior is decisive). Alert floored (B-028/B-065).\nReconciliation: verdict MALICE rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 7 | Derived: 0 | Total: 7",
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-REAL-VANKO ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-REAL-VANKO.json\nEvidence SHA-256: 01f388e319aeea9ac06022821f7b18f24baf96ac0ce9352d768513808fd129f1\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 19/20\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 7 se\u00f1al(es): 7 primaria(s) de ['RegRipper ntuser plugin on NTUSER_defaultprinter.DAT', 'ntfs-3g read-only mount + directory listing', 'ntfs-3g read-only mount + manual analysis', 'tshark + strings analysis'], 0 derivada(s)/no-analizada(s). Top z: transfers.log at C:\\Users\\defaultprinter=0.90, Classified Stark Enterprises research do=0.87, ftpd.ini configuration file at C:\\Users\\=0.84.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: MALICIOUS_INTENT_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nFOR500 case. Anthony Vanko, lead biochemical engineer at Stark Enterprises DC R&D Facility, suspected of exfiltrating classified research (zebrafish DNA, rapid cell regeneration, weaponization research) to a Chinese university server. Evidence: Microsoft Surface 3 (119GB physical EWF image, FTK Imager 2.9, examiner Ovie Carroll, 2016-11-04). Key findings: hidden 'defaultprinter' service account; smallftpd.exe FTP server (VT 1/72, packed); ftpd.ini with auto_run=1 exposing entire user directory; \n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [transfers.log at C:\\Users\\defaultprinter\\transfers.log. Single entry: ] z=0.902 conf=0.92 \u2014 \n  [Classified Stark Enterprises research documents found on device under ] z=0.873 conf=0.90 \u2014 \n  [ftpd.ini configuration file at C:\\Users\\defaultprinter\\ftpd.ini. Criti] z=0.845 conf=0.88 \u2014 \n  [Hidden user account 'defaultprinter' at C:\\Users\\defaultprinter\\. Acco] z=0.809 conf=0.87 \u2014 \n  [smallftpd.exe found at C:\\Users\\defaultprinter\\smallftpd.exe, SHA-256:] z=0.746 conf=0.82 \u2014 \n\n--- FINAL ALERT LEVEL ---\nHIGH \u2014 MALICE verdict from Bayesian posterior aggregation. Individual z-scores below threshold (distributed evidence pattern: no single dominant signal, but aggregate posterior is decisive). Alert floored (B-028/B-065).\nReconciliation: verdict MALICE rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 7 | Derived: 0 | Total: 7",
   "pipeline_results": {
     "abduction": {
       "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
-      "best_posterior": "27409/175000",
+      "best_posterior": "19/20",
       "confidence": {
         "__fraction__": true,
-        "den": 175000,
-        "num": 27409
+        "den": 20,
+        "num": 19
       },
       "devil_advocate": {
         "aggregation": {
@@ -203,7 +211,7 @@
           "primary_alternative_hypothesis": null
         },
         "decision_context": {
-          "confidence": "27409/175000",
+          "confidence": "19/20",
           "mapped_verdict": "MALICIOUS_INTENT_DETECTED",
           "raw_verdict": "MALICIOUS_INTENT_DETECTED",
           "score": "27409/35000"
@@ -224,7 +232,15 @@
     "pipeline_meta": {
       "artifact_count": 7,
       "avg_score": "27409/35000",
+      "ebs_adapter_mode": "motor",
       "expected_verdict": "MALICE",
+      "resolve": {
+        "motor_confidence": "0.95",
+        "motor_reason": "Intent score 0.4861 exceeds MALICE threshold (P2+acq_assurance scale, threshold=0.33)",
+        "motor_score": "0.4861",
+        "motor_verdict": "MALICE",
+        "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+      },
       "source": "ebs_v1_json_adapter"
     },
     "signals": [

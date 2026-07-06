@@ -1,15 +1,15 @@
 {
-  "agent_verdict": "MALICE",
-  "analysis_timestamp": "2026-07-05T15:27:34.645735+00:00",
+  "agent_verdict": "INTENT",
+  "analysis_timestamp": "2026-07-06T01:29:58.638701+00:00",
   "audit_trail": {
     "agent_version": "1.0.0-SANS-2026",
     "case_id": "VIGIA-LINUX-008",
-    "end_time": "2026-07-05T15:27:34.645741+00:00",
+    "end_time": "2026-07-06T01:29:58.638707+00:00",
     "entries": [
       {
         "action": "AGENT_INITIALIZED",
         "case_id": "VIGIA-LINUX-008",
-        "entry_sha256": "4a5309e09eb30aa2e414fa09e4668be924443feb906249fd9ae553cf69ff3585",
+        "entry_sha256": "dd587ba8fdd6dc04ed7826a8e91129f2e96a164467fefee69214ce10eafcad6e",
         "inputs_summary": {
           "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
           "case_id": "VIGIA-LINUX-008"
@@ -21,13 +21,13 @@
           "agent_version": "1.0.0-SANS-2026"
         },
         "seq": 1,
-        "timestamp": "2026-07-05T15:27:34.642021+00:00",
+        "timestamp": "2026-07-06T01:29:58.298025+00:00",
         "tool": "vigia_agent"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-LINUX-008",
-        "entry_sha256": "4412d898e473e86286359122f4e6fc9232f08fcd06c349881089e490fa1986a6",
+        "entry_sha256": "60f1d8e5c439cd857bc1a331b5f435a2ad2ca0364e2d9e9fc17274aa4f483104",
         "inputs_summary": {
           "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-LINUX-008.json"
         },
@@ -35,29 +35,29 @@
         "note": "Computing SHA-256 of original evidence",
         "outputs_summary": {},
         "seq": 2,
-        "timestamp": "2026-07-05T15:27:34.642105+00:00",
+        "timestamp": "2026-07-06T01:29:58.298108+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-LINUX-008",
-        "entry_sha256": "4a4b99276ef946000accf17b239c891c4e5a806daeaae69d3d3bb2ae49546b20",
+        "entry_sha256": "1e693199b18e7602bb2090b851ec7e3b257d2219188c3f579396393bada0545a",
         "inputs_summary": {
           "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-LINUX-008.json"
         },
         "iteration": 0,
-        "note": "Evidence verified: 759487141e6a8a97...",
+        "note": "Evidence verified: 6a6bb01bdadf12f1...",
         "outputs_summary": {
-          "sha256": "759487141e6a8a97c9a66e06fc3cff3d5ae7b0a685e806f40eaca92d8b6dd5af"
+          "sha256": "6a6bb01bdadf12f1f5dac03fe82de218d21d837e721da52ccaf7f92591997a60"
         },
         "seq": 3,
-        "timestamp": "2026-07-05T15:27:34.642215+00:00",
+        "timestamp": "2026-07-06T01:29:58.298216+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "PIPELINE_EXECUTE",
         "case_id": "VIGIA-LINUX-008",
-        "entry_sha256": "e912261268ff6443f1390b83689095726be2ae7d7dd64f6921c78f258985afc6",
+        "entry_sha256": "13d04b82f408a5d9758815fe3a8c26745debfb43e084e2e42e54d4b0e914652e",
         "inputs_summary": {
           "evidence": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-LINUX-008.json",
           "iteration": "0",
@@ -67,13 +67,13 @@
         "note": "Executing pipeline \u2014 iteration 0",
         "outputs_summary": {},
         "seq": 4,
-        "timestamp": "2026-07-05T15:27:34.642317+00:00",
+        "timestamp": "2026-07-06T01:29:58.298319+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "PIPELINE_COMPLETE",
         "case_id": "VIGIA-LINUX-008",
-        "entry_sha256": "143e7039557297ec32cb7535bb70e72aa57ad256e8f1680f713eba9c0453ec4b",
+        "entry_sha256": "ba24a504603b4d90e903fd2e5086d277054da3c17ce21cb82948e03a056ef469",
         "inputs_summary": {
           "iteration": "0"
         },
@@ -81,9 +81,9 @@
         "note": "Pipeline completed \u2014 5 signals",
         "outputs_summary": {
           "abduction": {
-            "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
-            "best_posterior": "4481/31250",
-            "confidence": "4481/31250",
+            "best_hypothesis": "SUSPICION_DETECTED",
+            "best_posterior": "3/5",
+            "confidence": "3/5",
             "is_conclusive": "True",
             "narrative": "Epistemological boundary test derived from the Huntress multi-actor incident (VIGIA-LINUX-006 + VIGIA-LINUX-007). All signals from Actor A (cryptominer), Actor B/C (botnet + credential harvester), and..."
           },
@@ -91,7 +91,15 @@
           "pipeline_meta": {
             "artifact_count": "5",
             "avg_score": "4481/6250",
+            "ebs_adapter_mode": "motor",
             "expected_verdict": "MALICE",
+            "resolve": {
+              "motor_confidence": "0.6",
+              "motor_reason": "Significant signal with structural support (score=0.3020)",
+              "motor_score": "0.302",
+              "motor_verdict": "SUSPICION",
+              "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+            },
             "source": "ebs_v1_json_adapter"
           },
           "signals": [
@@ -138,13 +146,13 @@
           ]
         },
         "seq": 5,
-        "timestamp": "2026-07-05T15:27:34.644956+00:00",
+        "timestamp": "2026-07-06T01:29:58.638301+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "CONTRADICTION_CHECK",
         "case_id": "VIGIA-LINUX-008",
-        "entry_sha256": "e9c36e380a99b4904f79c85775a5714f368f9586d3101f76d73c93adfd5dd1b6",
+        "entry_sha256": "c9589fe50e4de7ebe8be21ffc5e86b3f30862c613612dbc16130af8890089de5",
         "inputs_summary": {
           "n_signals": "5"
         },
@@ -155,67 +163,43 @@
           "threshold": "2"
         },
         "seq": 6,
-        "timestamp": "2026-07-05T15:27:34.645079+00:00",
+        "timestamp": "2026-07-06T01:29:58.638444+00:00",
         "tool": "contradiction_detector"
       },
       {
         "action": "AGENT_EXIT",
         "case_id": "VIGIA-LINUX-008",
-        "entry_sha256": "71767a6a5779532824324116ca08f47e0ded6a1cb1e239094e692d1013836677",
+        "entry_sha256": "71ff0cc8450a03a07dcd593fb2c0459a98a30efc25283bf81d5094f60982bdda",
         "inputs_summary": {
-          "verdict": "MALICIOUS_INTENT_DETECTED"
+          "verdict": "SUSPICION_DETECTED"
         },
         "iteration": 0,
-        "note": "Exit code 1 (MALICE) \u2014 analysis complete.",
+        "note": "Exit code 3 (INTENT) \u2014 analysis complete.",
         "outputs_summary": {
-          "agent_verdict": "MALICE",
-          "exit_code": "1"
+          "agent_verdict": "INTENT",
+          "exit_code": "3"
         },
         "seq": 7,
-        "timestamp": "2026-07-05T15:27:34.645275+00:00",
+        "timestamp": "2026-07-06T01:29:58.638649+00:00",
         "tool": "vigia_agent"
       }
     ],
-    "start_time": "2026-07-05T15:27:34.641796+00:00",
+    "start_time": "2026-07-06T01:29:58.297809+00:00",
     "total_entries": 7
   },
   "case_id": "VIGIA-LINUX-008",
   "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-LINUX-008.json",
-  "evidence_sha256": "759487141e6a8a97c9a66e06fc3cff3d5ae7b0a685e806f40eaca92d8b6dd5af",
+  "evidence_sha256": "6a6bb01bdadf12f1f5dac03fe82de218d21d837e721da52ccaf7f92591997a60",
   "iterations_executed": 1,
-  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-LINUX-008 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/VIGIA-LINUX-008.json\nEvidence SHA-256: 759487141e6a8a97c9a66e06fc3cff3d5ae7b0a685e806f40eaca92d8b6dd5af\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 4481/31250\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 5 se\u00f1al(es): 5 primaria(s) de ['sift_linux_forensics', 'sift_network_forensics', 'sift_process_monitor'], 0 derivada(s)/no-analizada(s). Top z: Timeline reconstruction from EDR telemet=0.84, Full process listing at triage time show=0.80, Network connection listing shows simulta=0.77.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: MALICIOUS_INTENT_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nEpistemological boundary test derived from the Huntress multi-actor incident (VIGIA-LINUX-006 + VIGIA-LINUX-007). All signals from Actor A (cryptominer), Actor B/C (botnet + credential harvester), and the legitimate user's Codex-generated commands are presented as an interleaved, unseparated evidence stream \u2014 as they would appear to a SOC analyst during initial triage before attribution. VIG\u00cdA must determine: (1) is this one actor or multiple actors? (2) what is the correct verdict when signals \n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Timeline reconstruction from EDR telemetry shows a critical temporal o] z=0.837 conf=0.91 \u2014 \n  [Full process listing at triage time shows: (1) /var/tmp/systemd-logind] z=0.801 conf=0.90 \u2014 \n  [Network connection listing shows simultaneous outbound connections to:] z=0.766 conf=0.88 \u2014 \n  [Full persistence enumeration reveals nine entries: (1) root crontab: /] z=0.656 conf=0.82 \u2014 \n  [Bash history for user 'dev' contains interleaved entries: legitimate d] z=0.525 conf=0.70 \u2014 \n\n--- FINAL ALERT LEVEL ---\nHIGH \u2014 MALICE verdict from Bayesian posterior aggregation. Individual z-scores below threshold (distributed evidence pattern: no single dominant signal, but aggregate posterior is decisive). Alert floored (B-028/B-065).\nReconciliation: verdict MALICE rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 5 | Derived: 0 | Total: 5",
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-LINUX-008 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/VIGIA-LINUX-008.json\nEvidence SHA-256: 6a6bb01bdadf12f1f5dac03fe82de218d21d837e721da52ccaf7f92591997a60\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: SUSPICION_DETECTED\nPosterior confidence: 3/5\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 5 se\u00f1al(es): 5 primaria(s) de ['sift_linux_forensics', 'sift_network_forensics', 'sift_process_monitor'], 0 derivada(s)/no-analizada(s). Top z: Timeline reconstruction from EDR telemet=0.84, Full process listing at triage time show=0.80, Network connection listing shows simulta=0.77.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: SUSPICION_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nEpistemological boundary test derived from the Huntress multi-actor incident (VIGIA-LINUX-006 + VIGIA-LINUX-007). All signals from Actor A (cryptominer), Actor B/C (botnet + credential harvester), and the legitimate user's Codex-generated commands are presented as an interleaved, unseparated evidence stream \u2014 as they would appear to a SOC analyst during initial triage before attribution. VIG\u00cdA must determine: (1) is this one actor or multiple actors? (2) what is the correct verdict when signals \n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Timeline reconstruction from EDR telemetry shows a critical temporal o] z=0.837 conf=0.91 \u2014 \n  [Full process listing at triage time shows: (1) /var/tmp/systemd-logind] z=0.801 conf=0.90 \u2014 \n  [Network connection listing shows simultaneous outbound connections to:] z=0.766 conf=0.88 \u2014 \n  [Full persistence enumeration reveals nine entries: (1) root crontab: /] z=0.656 conf=0.82 \u2014 \n  [Bash history for user 'dev' contains interleaved entries: legitimate d] z=0.525 conf=0.70 \u2014 \n\n--- FINAL ALERT LEVEL ---\nMEDIUM \u2014 INTENT verdict with individual z-scores below threshold. Alert floored (B-028/B-065): an intent finding cannot present as LOW.\nReconciliation: verdict INTENT rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 5 | Derived: 0 | Total: 5",
   "pipeline_results": {
     "abduction": {
-      "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
-      "best_posterior": "4481/31250",
+      "best_hypothesis": "SUSPICION_DETECTED",
+      "best_posterior": "3/5",
       "confidence": {
         "__fraction__": true,
-        "den": 31250,
-        "num": 4481
-      },
-      "devil_advocate": {
-        "aggregation": {
-          "k": 3,
-          "method": "top_k_already_validated_matches_v2",
-          "total_gap_mass": "0"
-        },
-        "counterfactual_summary": {
-          "primary_alternative_hypothesis": null
-        },
-        "decision_context": {
-          "confidence": "4481/31250",
-          "mapped_verdict": "MALICIOUS_INTENT_DETECTED",
-          "raw_verdict": "MALICIOUS_INTENT_DETECTED",
-          "score": "4481/6250"
-        },
-        "devil_advocate_source": "deterministic_no_pattern_data_available",
-        "meta": {
-          "deterministic": true,
-          "generated_from": "case_pattern_library"
-        },
-        "narrative": "Eco's Razor (Abductive Falsification) applied to verdict MALICIOUS_INTENT_DETECTED. Pattern-matching data was not available on this code path \u2014 CasePatternLibrary is not invoked here by design (agent audit-trail mode (vigia_agent.py \u2014 JSON-replay / autonomous path); see KNOWN_LIMITATIONS.md). No structured counter-hypothesis could be derived deterministically. This is a documented scope limitation of the current code path, not an absence of falsification attempt.",
-        "pattern_evidence_gaps": [],
-        "version": "r7-da-v1"
+        "den": 5,
+        "num": 3
       },
       "is_conclusive": true,
       "narrative": "Epistemological boundary test derived from the Huntress multi-actor incident (VIGIA-LINUX-006 + VIGIA-LINUX-007). All signals from Actor A (cryptominer), Actor B/C (botnet + credential harvester), and the legitimate user's Codex-generated commands are presented as an interleaved, unseparated evidence stream \u2014 as they would appear to a SOC analyst during initial triage before attribution. VIG\u00cdA must determine: (1) is this one actor or multiple actors? (2) what is the correct verdict when signals "
@@ -224,7 +208,15 @@
     "pipeline_meta": {
       "artifact_count": 5,
       "avg_score": "4481/6250",
+      "ebs_adapter_mode": "motor",
       "expected_verdict": "MALICE",
+      "resolve": {
+        "motor_confidence": "0.6",
+        "motor_reason": "Significant signal with structural support (score=0.3020)",
+        "motor_score": "0.302",
+        "motor_verdict": "SUSPICION",
+        "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+      },
       "source": "ebs_v1_json_adapter"
     },
     "signals": [

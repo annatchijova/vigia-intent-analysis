@@ -1,15 +1,15 @@
 {
   "agent_verdict": "NOISE",
-  "analysis_timestamp": "2026-07-05T15:27:38.769230+00:00",
+  "analysis_timestamp": "2026-07-06T01:30:33.520942+00:00",
   "audit_trail": {
     "agent_version": "1.0.0-SANS-2026",
     "case_id": "VIGIA-BEN-011",
-    "end_time": "2026-07-05T15:27:38.769235+00:00",
+    "end_time": "2026-07-06T01:30:33.520948+00:00",
     "entries": [
       {
         "action": "AGENT_INITIALIZED",
         "case_id": "VIGIA-BEN-011",
-        "entry_sha256": "8d1059ed6246a332ce0e0e7f1920457bdb66e17b9cc631ac30cfe6b596a5aefd",
+        "entry_sha256": "d3dad38adfb67c77129203ae31d026d742d390f849a8c3d495fcd156d7e8e2c8",
         "inputs_summary": {
           "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
           "case_id": "VIGIA-BEN-011"
@@ -21,13 +21,13 @@
           "agent_version": "1.0.0-SANS-2026"
         },
         "seq": 1,
-        "timestamp": "2026-07-05T15:27:38.766081+00:00",
+        "timestamp": "2026-07-06T01:30:33.171939+00:00",
         "tool": "vigia_agent"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-BEN-011",
-        "entry_sha256": "9a0b4197f40c0be1e55d787c4336c6977165ac39c617837bda1e292e920dc44b",
+        "entry_sha256": "ebf62e8a1b067724ab3c0edb43d8b979a3a149a25902a4b4619c04acc7655482",
         "inputs_summary": {
           "path": "/home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-BEN-011.json"
         },
@@ -35,29 +35,29 @@
         "note": "Computing SHA-256 of original evidence",
         "outputs_summary": {},
         "seq": 2,
-        "timestamp": "2026-07-05T15:27:38.766165+00:00",
+        "timestamp": "2026-07-06T01:30:33.172026+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-BEN-011",
-        "entry_sha256": "6185ed8379523f18580b34ddf88edc2e6272c5a5231700d10b71079ee292c9b2",
+        "entry_sha256": "ad0dddfacb22b2a455a8606b6e4cbd9c785b2b51fa12f5bbc28e1218a67a671b",
         "inputs_summary": {
           "path": "/home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-BEN-011.json"
         },
         "iteration": 0,
-        "note": "Evidence verified: 770b3c6293c44716...",
+        "note": "Evidence verified: cd151d79ede72a4a...",
         "outputs_summary": {
-          "sha256": "770b3c6293c44716029eca1a399c07362a16cf6d65fe74a4855488cdd383a0be"
+          "sha256": "cd151d79ede72a4a88c490e654ce1357bb2c5dee30ee2fabc12470751500a066"
         },
         "seq": 3,
-        "timestamp": "2026-07-05T15:27:38.766262+00:00",
+        "timestamp": "2026-07-06T01:30:33.172125+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "PIPELINE_EXECUTE",
         "case_id": "VIGIA-BEN-011",
-        "entry_sha256": "b6609433f01e88398141020fc55d4c5bfbb168cf92866214a44dc50a74df6cab",
+        "entry_sha256": "b6874237394a661813f95424b741ccb494922c72e22d747e143ad3f57f00f58a",
         "inputs_summary": {
           "evidence": "/home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-BEN-011.json",
           "iteration": "0",
@@ -67,13 +67,13 @@
         "note": "Executing pipeline \u2014 iteration 0",
         "outputs_summary": {},
         "seq": 4,
-        "timestamp": "2026-07-05T15:27:38.766366+00:00",
+        "timestamp": "2026-07-06T01:30:33.172229+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "PIPELINE_COMPLETE",
         "case_id": "VIGIA-BEN-011",
-        "entry_sha256": "978afbccd484b1cd8881a8bec895d825a4cd98b6f466b17041059ea005388800",
+        "entry_sha256": "227759c2be68acd18b1011b80284f253240b0ae87761fce6bcdc37f389ab8dde",
         "inputs_summary": {
           "iteration": "0"
         },
@@ -82,16 +82,24 @@
         "outputs_summary": {
           "abduction": {
             "best_hypothesis": "NO_SEMIOTIC_ANOMALY_DETECTED",
-            "best_posterior": "1/80",
-            "confidence": "1/80",
-            "is_conclusive": "False",
+            "best_posterior": "49/50",
+            "confidence": "49/50",
+            "is_conclusive": "True",
             "narrative": "USB connected to a finance machine. It is the IT technician updating fiscal printer drivers, with a support ticket, manager authorization, and a procedure checklist."
           },
           "case_id": "VIGIA-BEN-011",
           "pipeline_meta": {
             "artifact_count": "3",
             "avg_score": "1/16",
+            "ebs_adapter_mode": "motor",
             "expected_verdict": "NOISE",
+            "resolve": {
+              "motor_confidence": "0.98",
+              "motor_reason": "Insufficient evidence of malicious intent (score=0.0202)",
+              "motor_score": "0.0202",
+              "motor_verdict": "NOISE",
+              "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+            },
             "source": "ebs_v1_json_adapter"
           },
           "signals": [
@@ -122,13 +130,13 @@
           ]
         },
         "seq": 5,
-        "timestamp": "2026-07-05T15:27:38.768903+00:00",
+        "timestamp": "2026-07-06T01:30:33.520584+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "CONTRADICTION_CHECK",
         "case_id": "VIGIA-BEN-011",
-        "entry_sha256": "521f7acf2147fd0eeb891d6b7cdc6351942f5c582fc62757c371a2f62428441a",
+        "entry_sha256": "1d6bd0d4e8e60af6241b527fe2e05f4c72aba81a1c9934dd60702667b770204f",
         "inputs_summary": {
           "n_signals": "3"
         },
@@ -139,13 +147,13 @@
           "threshold": "2"
         },
         "seq": 6,
-        "timestamp": "2026-07-05T15:27:38.769004+00:00",
+        "timestamp": "2026-07-06T01:30:33.520697+00:00",
         "tool": "contradiction_detector"
       },
       {
         "action": "AGENT_EXIT",
         "case_id": "VIGIA-BEN-011",
-        "entry_sha256": "da467d42f3d7e88e4c8a61a5a55988a32e3e43f6018287ab150dd5a8525c3206",
+        "entry_sha256": "09116d3f9ef944685fb3240d7885ae5136f40564643d789c2d85f023fbdf7d33",
         "inputs_summary": {
           "verdict": "NO_SEMIOTIC_ANOMALY_DETECTED"
         },
@@ -156,35 +164,43 @@
           "exit_code": "0"
         },
         "seq": 7,
-        "timestamp": "2026-07-05T15:27:38.769181+00:00",
+        "timestamp": "2026-07-06T01:30:33.520890+00:00",
         "tool": "vigia_agent"
       }
     ],
-    "start_time": "2026-07-05T15:27:38.765850+00:00",
+    "start_time": "2026-07-06T01:30:33.171711+00:00",
     "total_entries": 7
   },
   "case_id": "VIGIA-BEN-011",
   "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-BEN-011.json",
-  "evidence_sha256": "770b3c6293c44716029eca1a399c07362a16cf6d65fe74a4855488cdd383a0be",
+  "evidence_sha256": "cd151d79ede72a4a88c490e654ce1357bb2c5dee30ee2fabc12470751500a066",
   "iterations_executed": 1,
-  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-BEN-011 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-BEN-011.json\nEvidence SHA-256: 770b3c6293c44716029eca1a399c07362a16cf6d65fe74a4855488cdd383a0be\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: NO_SEMIOTIC_ANOMALY_DETECTED\nPosterior confidence: 1/80\nConclusive: NO \u2014 requires human review\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 3 se\u00f1al(es): 3 primaria(s) de ['legacy_converter'], 0 derivada(s)/no-analizada(s). Top z: lsusb | grep SanDisk | dmesg | tail -20 =0.07, IT ticket SUP-2024-1120: 'HP LaserJet fi=0.06, USB inserted: SanDisk Cruzer, S/N 4C5300=0.05.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: NO_SEMIOTIC_ANOMALY_DETECTED. Conclusiva: no \u2014 requiere revisi\u00f3n humana.\n\nRazonamiento del motor abductivo:\nUSB connected to a finance machine. It is the IT technician updating fiscal printer drivers, with a support ticket, manager authorization, and a procedure checklist.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [lsusb | grep SanDisk | dmesg | tail -20 | mount /dev/sdb1 /mnt/usb | c] z=0.071 conf=0.30 \u2014 \n  [IT ticket SUP-2024-1120: 'HP LaserJet fiscal printer not printing. Req] z=0.064 conf=0.30 \u2014 \n  [USB inserted: SanDisk Cruzer, S/N 4C530001230512345678 | Time: 2024-04] z=0.052 conf=0.30 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 3 | Derived: 0 | Total: 3",
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-BEN-011 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-BEN-011.json\nEvidence SHA-256: cd151d79ede72a4a88c490e654ce1357bb2c5dee30ee2fabc12470751500a066\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: NO_SEMIOTIC_ANOMALY_DETECTED\nPosterior confidence: 49/50\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 3 se\u00f1al(es): 3 primaria(s) de ['legacy_converter'], 0 derivada(s)/no-analizada(s). Top z: lsusb | grep SanDisk | dmesg | tail -20 =0.07, IT ticket SUP-2024-1120: 'HP LaserJet fi=0.06, USB inserted: SanDisk Cruzer, S/N 4C5300=0.05.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: NO_SEMIOTIC_ANOMALY_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nUSB connected to a finance machine. It is the IT technician updating fiscal printer drivers, with a support ticket, manager authorization, and a procedure checklist.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [lsusb | grep SanDisk | dmesg | tail -20 | mount /dev/sdb1 /mnt/usb | c] z=0.071 conf=0.30 \u2014 \n  [IT ticket SUP-2024-1120: 'HP LaserJet fiscal printer not printing. Req] z=0.064 conf=0.30 \u2014 \n  [USB inserted: SanDisk Cruzer, S/N 4C530001230512345678 | Time: 2024-04] z=0.052 conf=0.30 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 3 | Derived: 0 | Total: 3",
   "pipeline_results": {
     "abduction": {
       "best_hypothesis": "NO_SEMIOTIC_ANOMALY_DETECTED",
-      "best_posterior": "1/80",
+      "best_posterior": "49/50",
       "confidence": {
         "__fraction__": true,
-        "den": 80,
-        "num": 1
+        "den": 50,
+        "num": 49
       },
-      "is_conclusive": false,
+      "is_conclusive": true,
       "narrative": "USB connected to a finance machine. It is the IT technician updating fiscal printer drivers, with a support ticket, manager authorization, and a procedure checklist."
     },
     "case_id": "VIGIA-BEN-011",
     "pipeline_meta": {
       "artifact_count": 3,
       "avg_score": "1/16",
+      "ebs_adapter_mode": "motor",
       "expected_verdict": "NOISE",
+      "resolve": {
+        "motor_confidence": "0.98",
+        "motor_reason": "Insufficient evidence of malicious intent (score=0.0202)",
+        "motor_score": "0.0202",
+        "motor_verdict": "NOISE",
+        "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+      },
       "source": "ebs_v1_json_adapter"
     },
     "signals": [

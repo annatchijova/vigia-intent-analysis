@@ -1,15 +1,15 @@
 {
   "agent_verdict": "MALICE",
-  "analysis_timestamp": "2026-07-05T15:27:35.219097+00:00",
+  "analysis_timestamp": "2026-07-06T01:30:03.507096+00:00",
   "audit_trail": {
     "agent_version": "1.0.0-SANS-2026",
     "case_id": "VIGIA-REAL-002",
-    "end_time": "2026-07-05T15:27:35.219105+00:00",
+    "end_time": "2026-07-06T01:30:03.507103+00:00",
     "entries": [
       {
         "action": "AGENT_INITIALIZED",
         "case_id": "VIGIA-REAL-002",
-        "entry_sha256": "4cf9b90868b82fd17217750d04b19988f45f966b5393f322cfcd5b61d833d62f",
+        "entry_sha256": "b0fc884ee372b032bd3aa3349dd812606ab7c8eb6fcb328bcdfe01d7d1c48a06",
         "inputs_summary": {
           "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
           "case_id": "VIGIA-REAL-002"
@@ -21,13 +21,13 @@
           "agent_version": "1.0.0-SANS-2026"
         },
         "seq": 1,
-        "timestamp": "2026-07-05T15:27:35.215378+00:00",
+        "timestamp": "2026-07-06T01:30:03.147999+00:00",
         "tool": "vigia_agent"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-REAL-002",
-        "entry_sha256": "9f96f65b97b4c5055156347c10c91f1e1b865f6d1514505cefd346fe3d276d84",
+        "entry_sha256": "c6548719a2c8cb57689c632ce98eed8f73e14a1ba09e38c92f2587b06f107b11",
         "inputs_summary": {
           "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-REAL-002.json"
         },
@@ -35,13 +35,13 @@
         "note": "Computing SHA-256 of original evidence",
         "outputs_summary": {},
         "seq": 2,
-        "timestamp": "2026-07-05T15:27:35.215479+00:00",
+        "timestamp": "2026-07-06T01:30:03.148082+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-REAL-002",
-        "entry_sha256": "7a958e7b000078c56a828954ddfa0a117430a2310bd0bd3d3dfcf63e26f39560",
+        "entry_sha256": "413b32593a825cb5c152ffe0a737985dc31567531e11a3d7d1f45c002b0ffec0",
         "inputs_summary": {
           "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-REAL-002.json"
         },
@@ -51,13 +51,13 @@
           "sha256": "88af6b47b9aa249146dde6b3e7663aad3c9ddf693788eda081ef15da8f397ddd"
         },
         "seq": 3,
-        "timestamp": "2026-07-05T15:27:35.215577+00:00",
+        "timestamp": "2026-07-06T01:30:03.148179+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "PIPELINE_EXECUTE",
         "case_id": "VIGIA-REAL-002",
-        "entry_sha256": "716b1f759ff441b0768c55177ffbaf3cc604dd18d8c3910b08d72a643ccf02ff",
+        "entry_sha256": "45eeb508c2489727714b33658f6d29a679ae253b62c147bf2e89464ab67ef14f",
         "inputs_summary": {
           "evidence": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-REAL-002.json",
           "iteration": "0",
@@ -67,13 +67,13 @@
         "note": "Executing pipeline \u2014 iteration 0",
         "outputs_summary": {},
         "seq": 4,
-        "timestamp": "2026-07-05T15:27:35.215681+00:00",
+        "timestamp": "2026-07-06T01:30:03.148284+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "PIPELINE_COMPLETE",
         "case_id": "VIGIA-REAL-002",
-        "entry_sha256": "c2687b9ba953ef1baf9b71e60806ac681bd3d1717e78ff1021799265a0ca2276",
+        "entry_sha256": "9ec582767731479fdc56a18d9eee46465080093e49879c5463c9c719c6b78b0b",
         "inputs_summary": {
           "iteration": "0"
         },
@@ -82,16 +82,24 @@
         "outputs_summary": {
           "abduction": {
             "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
-            "best_posterior": "0",
-            "confidence": "0",
-            "is_conclusive": "False",
+            "best_posterior": "19/25",
+            "confidence": "19/25",
+            "is_conclusive": "True",
             "narrative": "Sr. Informant, a technology development manager at OOO company, received an offer from a conspirator to leak confidential information about new technologies. He used email, Google Drive, USB, and CD-R..."
           },
           "case_id": "VIGIA-REAL-002",
           "pipeline_meta": {
             "artifact_count": "5",
             "avg_score": "0",
+            "ebs_adapter_mode": "motor",
             "expected_verdict": "MALICE",
+            "resolve": {
+              "motor_confidence": "0.76",
+              "motor_reason": "Intent score 0.3815 exceeds MALICE threshold (P2+acq_assurance scale, threshold=0.33)",
+              "motor_score": "0.3815",
+              "motor_verdict": "MALICE",
+              "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+            },
             "source": "ebs_v1_json_adapter"
           },
           "signals": [
@@ -138,13 +146,13 @@
           ]
         },
         "seq": 5,
-        "timestamp": "2026-07-05T15:27:35.218308+00:00",
+        "timestamp": "2026-07-06T01:30:03.506525+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "CONTRADICTION_CHECK",
         "case_id": "VIGIA-REAL-002",
-        "entry_sha256": "51d0bbc6448494d0873256f71c9c7dcd2995516f988488a114429642c3583b49",
+        "entry_sha256": "6c978fd6f3ed678d9d9023202711ce010663de96b05eee3e360fb89b0bff8f6c",
         "inputs_summary": {
           "n_signals": "5"
         },
@@ -155,13 +163,13 @@
           "threshold": "2"
         },
         "seq": 6,
-        "timestamp": "2026-07-05T15:27:35.218418+00:00",
+        "timestamp": "2026-07-06T01:30:03.506652+00:00",
         "tool": "contradiction_detector"
       },
       {
         "action": "AGENT_EXIT",
         "case_id": "VIGIA-REAL-002",
-        "entry_sha256": "13a348a1788de7e800fff7c43ea4694273caa6029fac84942828f85c9aac5634",
+        "entry_sha256": "53f295d2516be90f2f4fc2d6325451de47f661a6ef83432772063a2372afda7e",
         "inputs_summary": {
           "verdict": "MALICIOUS_INTENT_DETECTED"
         },
@@ -172,26 +180,26 @@
           "exit_code": "1"
         },
         "seq": 7,
-        "timestamp": "2026-07-05T15:27:35.218620+00:00",
+        "timestamp": "2026-07-06T01:30:03.506873+00:00",
         "tool": "vigia_agent"
       }
     ],
-    "start_time": "2026-07-05T15:27:35.215138+00:00",
+    "start_time": "2026-07-06T01:30:03.147777+00:00",
     "total_entries": 7
   },
   "case_id": "VIGIA-REAL-002",
   "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-REAL-002.json",
   "evidence_sha256": "88af6b47b9aa249146dde6b3e7663aad3c9ddf693788eda081ef15da8f397ddd",
   "iterations_executed": 1,
-  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-REAL-002 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/VIGIA-REAL-002.json\nEvidence SHA-256: 88af6b47b9aa249146dde6b3e7663aad3c9ddf693788eda081ef15da8f397ddd\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 0\nConclusive: NO \u2014 requires human review\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 5 se\u00f1al(es): 5 primaria(s) de ['unknown'], 0 derivada(s)/no-analizada(s). Top z: unknown=0.00, unknown=0.00, unknown=0.00.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: MALICIOUS_INTENT_DETECTED. Conclusiva: no \u2014 requiere revisi\u00f3n humana.\n\nRazonamiento del motor abductivo:\nSr. Informant, a technology development manager at OOO company, received an offer from a conspirator to leak confidential information about new technologies. He used email, Google Drive, USB, and CD-R to exfiltrate data while applying anti-forensic techniques.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [unknown] z=0.000 conf=0.50 \u2014 \n  [unknown] z=0.000 conf=0.50 \u2014 \n  [unknown] z=0.000 conf=0.50 \u2014 \n  [unknown] z=0.000 conf=0.50 \u2014 \n  [unknown] z=0.000 conf=0.50 \u2014 \n\n--- FINAL ALERT LEVEL ---\nMEDIUM \u2014 MALICE verdict from posterior aggregation. Individual z-scores below threshold. Full signal review recommended. Alert floored (B-028/B-065).\nReconciliation: verdict MALICE rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 5 | Derived: 0 | Total: 5",
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-REAL-002 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/VIGIA-REAL-002.json\nEvidence SHA-256: 88af6b47b9aa249146dde6b3e7663aad3c9ddf693788eda081ef15da8f397ddd\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 19/25\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 5 se\u00f1al(es): 5 primaria(s) de ['unknown'], 0 derivada(s)/no-analizada(s). Top z: unknown=0.00, unknown=0.00, unknown=0.00.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: MALICIOUS_INTENT_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nSr. Informant, a technology development manager at OOO company, received an offer from a conspirator to leak confidential information about new technologies. He used email, Google Drive, USB, and CD-R to exfiltrate data while applying anti-forensic techniques.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [unknown] z=0.000 conf=0.50 \u2014 \n  [unknown] z=0.000 conf=0.50 \u2014 \n  [unknown] z=0.000 conf=0.50 \u2014 \n  [unknown] z=0.000 conf=0.50 \u2014 \n  [unknown] z=0.000 conf=0.50 \u2014 \n\n--- FINAL ALERT LEVEL ---\nHIGH \u2014 MALICE verdict from Bayesian posterior aggregation. Individual z-scores below threshold (distributed evidence pattern: no single dominant signal, but aggregate posterior is decisive). Alert floored (B-028/B-065).\nReconciliation: verdict MALICE rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 5 | Derived: 0 | Total: 5",
   "pipeline_results": {
     "abduction": {
       "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
-      "best_posterior": "0",
+      "best_posterior": "19/25",
       "confidence": {
         "__fraction__": true,
-        "den": 1,
-        "num": 0
+        "den": 25,
+        "num": 19
       },
       "devil_advocate": {
         "aggregation": {
@@ -203,7 +211,7 @@
           "primary_alternative_hypothesis": null
         },
         "decision_context": {
-          "confidence": "0",
+          "confidence": "19/25",
           "mapped_verdict": "MALICIOUS_INTENT_DETECTED",
           "raw_verdict": "MALICIOUS_INTENT_DETECTED",
           "score": "0"
@@ -217,14 +225,22 @@
         "pattern_evidence_gaps": [],
         "version": "r7-da-v1"
       },
-      "is_conclusive": false,
+      "is_conclusive": true,
       "narrative": "Sr. Informant, a technology development manager at OOO company, received an offer from a conspirator to leak confidential information about new technologies. He used email, Google Drive, USB, and CD-R to exfiltrate data while applying anti-forensic techniques."
     },
     "case_id": "VIGIA-REAL-002",
     "pipeline_meta": {
       "artifact_count": 5,
       "avg_score": "0",
+      "ebs_adapter_mode": "motor",
       "expected_verdict": "MALICE",
+      "resolve": {
+        "motor_confidence": "0.76",
+        "motor_reason": "Intent score 0.3815 exceeds MALICE threshold (P2+acq_assurance scale, threshold=0.33)",
+        "motor_score": "0.3815",
+        "motor_verdict": "MALICE",
+        "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+      },
       "source": "ebs_v1_json_adapter"
     },
     "signals": [

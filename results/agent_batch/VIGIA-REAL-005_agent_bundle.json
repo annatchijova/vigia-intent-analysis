@@ -1,15 +1,15 @@
 {
   "agent_verdict": "INTENT",
-  "analysis_timestamp": "2026-07-05T15:27:35.381410+00:00",
+  "analysis_timestamp": "2026-07-06T01:30:04.860668+00:00",
   "audit_trail": {
     "agent_version": "1.0.0-SANS-2026",
     "case_id": "VIGIA-REAL-005",
-    "end_time": "2026-07-05T15:27:35.381416+00:00",
+    "end_time": "2026-07-06T01:30:04.860674+00:00",
     "entries": [
       {
         "action": "AGENT_INITIALIZED",
         "case_id": "VIGIA-REAL-005",
-        "entry_sha256": "954aabec878fd19a04d5fbfdb535440527259958c1cab4282f62a809c5ee5c30",
+        "entry_sha256": "3f214e145525e81e90c8770b873cabdd6bb0b648adfcb441ff397208dccec4ef",
         "inputs_summary": {
           "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
           "case_id": "VIGIA-REAL-005"
@@ -21,13 +21,13 @@
           "agent_version": "1.0.0-SANS-2026"
         },
         "seq": 1,
-        "timestamp": "2026-07-05T15:27:35.377220+00:00",
+        "timestamp": "2026-07-06T01:30:04.505325+00:00",
         "tool": "vigia_agent"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-REAL-005",
-        "entry_sha256": "e4df34f491cdc35600ec83eb1e0ac4da7c9c8a82825187fa621aac369bbae558",
+        "entry_sha256": "6f0e539e6c932fa0755087e62047fa3aa31b21aab20238b0131ad4bff60a2e5c",
         "inputs_summary": {
           "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-REAL-005.json"
         },
@@ -35,13 +35,13 @@
         "note": "Computing SHA-256 of original evidence",
         "outputs_summary": {},
         "seq": 2,
-        "timestamp": "2026-07-05T15:27:35.377363+00:00",
+        "timestamp": "2026-07-06T01:30:04.505411+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-REAL-005",
-        "entry_sha256": "f706a0818e5910216e127130d3799485a3f08f60e4259c1fdeb6418c8c3c1adf",
+        "entry_sha256": "65a7e0c614cd163d632666a9b424dd942f224241d4612d3e89fee639e84570a0",
         "inputs_summary": {
           "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-REAL-005.json"
         },
@@ -51,13 +51,13 @@
           "sha256": "36924f236f6960131e15e80a763640c76e538a1c315b0de0b6c71deaae43e2e4"
         },
         "seq": 3,
-        "timestamp": "2026-07-05T15:27:35.377500+00:00",
+        "timestamp": "2026-07-06T01:30:04.505519+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "PIPELINE_EXECUTE",
         "case_id": "VIGIA-REAL-005",
-        "entry_sha256": "a97a882551fd9b0e252d8407690266318789d9c04d68dc01c1b684540e121c8f",
+        "entry_sha256": "852dd3c26d5d1002355852f80b9bfb46674f1586f832d027b13abfb2fe4b7bff",
         "inputs_summary": {
           "evidence": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-REAL-005.json",
           "iteration": "0",
@@ -67,13 +67,13 @@
         "note": "Executing pipeline \u2014 iteration 0",
         "outputs_summary": {},
         "seq": 4,
-        "timestamp": "2026-07-05T15:27:35.377683+00:00",
+        "timestamp": "2026-07-06T01:30:04.505621+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "PIPELINE_COMPLETE",
         "case_id": "VIGIA-REAL-005",
-        "entry_sha256": "00989a3c10e1a5c0a202fc52c1a15b901001acbd07bd3cfd4aaf48b1bdd9804e",
+        "entry_sha256": "836af10ea52eab2e27c7f5f329fbeda41cf1595f194bcdc9e5424c18901df5a5",
         "inputs_summary": {
           "iteration": "0"
         },
@@ -82,16 +82,24 @@
         "outputs_summary": {
           "abduction": {
             "best_hypothesis": "SUSPICION_DETECTED",
-            "best_posterior": "0",
-            "confidence": "0",
-            "is_conclusive": "False",
+            "best_posterior": "19/25",
+            "confidence": "19/25",
+            "is_conclusive": "True",
             "narrative": "Jane has been using multiple encryption methods to conceal communication: an AES-encrypted README file in Documents, a BitLocker volume named R2D2, and a keys file in Downloads encrypted with GPG/PGP ..."
           },
           "case_id": "VIGIA-REAL-005",
           "pipeline_meta": {
             "artifact_count": "3",
             "avg_score": "0",
+            "ebs_adapter_mode": "motor",
             "expected_verdict": "SUSPICION",
+            "resolve": {
+              "motor_confidence": "0.76",
+              "motor_reason": "Intent score 0.3792 exceeds MALICE threshold but corroboration rests on 3 technical artifact(s) / 2 technical evidence class(es) \u2014 context/narrative classes do not corroborate MALICE (B-068 Daubert ga",
+              "motor_score": "0.3792",
+              "motor_verdict": "SUSPICION",
+              "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+            },
             "source": "ebs_v1_json_adapter"
           },
           "signals": [
@@ -122,13 +130,13 @@
           ]
         },
         "seq": 5,
-        "timestamp": "2026-07-05T15:27:35.381013+00:00",
+        "timestamp": "2026-07-06T01:30:04.860313+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "CONTRADICTION_CHECK",
         "case_id": "VIGIA-REAL-005",
-        "entry_sha256": "90c065646dfd748f38991684a8b1f4b0e0ed15f3f51266443339a5a6a78bad03",
+        "entry_sha256": "a1fa45799d2400cc06adff644e2763e8d646d4fb894964ede0907ab284bdf528",
         "inputs_summary": {
           "n_signals": "3"
         },
@@ -139,13 +147,13 @@
           "threshold": "2"
         },
         "seq": 6,
-        "timestamp": "2026-07-05T15:27:35.381144+00:00",
+        "timestamp": "2026-07-06T01:30:04.860421+00:00",
         "tool": "contradiction_detector"
       },
       {
         "action": "AGENT_EXIT",
         "case_id": "VIGIA-REAL-005",
-        "entry_sha256": "f88a9746740d9c69eda327cc3573ffdf2964053050eda7b2509201213084ce01",
+        "entry_sha256": "6da32ad8189b4752673e33c988552c301ae0bd0d862a8f24b0fcad044153da81",
         "inputs_summary": {
           "verdict": "SUSPICION_DETECTED"
         },
@@ -156,35 +164,43 @@
           "exit_code": "3"
         },
         "seq": 7,
-        "timestamp": "2026-07-05T15:27:35.381359+00:00",
+        "timestamp": "2026-07-06T01:30:04.860617+00:00",
         "tool": "vigia_agent"
       }
     ],
-    "start_time": "2026-07-05T15:27:35.376892+00:00",
+    "start_time": "2026-07-06T01:30:04.505100+00:00",
     "total_entries": 7
   },
   "case_id": "VIGIA-REAL-005",
   "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-REAL-005.json",
   "evidence_sha256": "36924f236f6960131e15e80a763640c76e538a1c315b0de0b6c71deaae43e2e4",
   "iterations_executed": 1,
-  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-REAL-005 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/VIGIA-REAL-005.json\nEvidence SHA-256: 36924f236f6960131e15e80a763640c76e538a1c315b0de0b6c71deaae43e2e4\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: SUSPICION_DETECTED\nPosterior confidence: 0\nConclusive: NO \u2014 requires human review\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 3 se\u00f1al(es): 3 primaria(s) de ['unknown'], 0 derivada(s)/no-analizada(s). Top z: unknown=0.00, unknown=0.00, unknown=0.00.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: SUSPICION_DETECTED. Conclusiva: no \u2014 requiere revisi\u00f3n humana.\n\nRazonamiento del motor abductivo:\nJane has been using multiple encryption methods to conceal communication: an AES-encrypted README file in Documents, a BitLocker volume named R2D2, and a keys file in Downloads encrypted with GPG/PGP public/private key.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [unknown] z=0.000 conf=0.50 \u2014 \n  [unknown] z=0.000 conf=0.50 \u2014 \n  [unknown] z=0.000 conf=0.50 \u2014 \n\n--- FINAL ALERT LEVEL ---\nMEDIUM \u2014 INTENT verdict with individual z-scores below threshold. Alert floored (B-028/B-065): an intent finding cannot present as LOW.\nReconciliation: verdict INTENT rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 3 | Derived: 0 | Total: 3",
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-REAL-005 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/VIGIA-REAL-005.json\nEvidence SHA-256: 36924f236f6960131e15e80a763640c76e538a1c315b0de0b6c71deaae43e2e4\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: SUSPICION_DETECTED\nPosterior confidence: 19/25\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 3 se\u00f1al(es): 3 primaria(s) de ['unknown'], 0 derivada(s)/no-analizada(s). Top z: unknown=0.00, unknown=0.00, unknown=0.00.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: SUSPICION_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nJane has been using multiple encryption methods to conceal communication: an AES-encrypted README file in Documents, a BitLocker volume named R2D2, and a keys file in Downloads encrypted with GPG/PGP public/private key.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [unknown] z=0.000 conf=0.50 \u2014 \n  [unknown] z=0.000 conf=0.50 \u2014 \n  [unknown] z=0.000 conf=0.50 \u2014 \n\n--- FINAL ALERT LEVEL ---\nMEDIUM \u2014 INTENT verdict with individual z-scores below threshold. Alert floored (B-028/B-065): an intent finding cannot present as LOW.\nReconciliation: verdict INTENT rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 3 | Derived: 0 | Total: 3",
   "pipeline_results": {
     "abduction": {
       "best_hypothesis": "SUSPICION_DETECTED",
-      "best_posterior": "0",
+      "best_posterior": "19/25",
       "confidence": {
         "__fraction__": true,
-        "den": 1,
-        "num": 0
+        "den": 25,
+        "num": 19
       },
-      "is_conclusive": false,
+      "is_conclusive": true,
       "narrative": "Jane has been using multiple encryption methods to conceal communication: an AES-encrypted README file in Documents, a BitLocker volume named R2D2, and a keys file in Downloads encrypted with GPG/PGP public/private key."
     },
     "case_id": "VIGIA-REAL-005",
     "pipeline_meta": {
       "artifact_count": 3,
       "avg_score": "0",
+      "ebs_adapter_mode": "motor",
       "expected_verdict": "SUSPICION",
+      "resolve": {
+        "motor_confidence": "0.76",
+        "motor_reason": "Intent score 0.3792 exceeds MALICE threshold but corroboration rests on 3 technical artifact(s) / 2 technical evidence class(es) \u2014 context/narrative classes do not corroborate MALICE (B-068 Daubert ga",
+        "motor_score": "0.3792",
+        "motor_verdict": "SUSPICION",
+        "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+      },
       "source": "ebs_v1_json_adapter"
     },
     "signals": [

@@ -1,15 +1,15 @@
 {
   "agent_verdict": "MALICE",
-  "analysis_timestamp": "2026-07-05T15:27:42.408562+00:00",
+  "analysis_timestamp": "2026-07-06T01:31:04.549753+00:00",
   "audit_trail": {
     "agent_version": "1.0.0-SANS-2026",
     "case_id": "VIGIA-CAN-042",
-    "end_time": "2026-07-05T15:27:42.408569+00:00",
+    "end_time": "2026-07-06T01:31:04.549762+00:00",
     "entries": [
       {
         "action": "AGENT_INITIALIZED",
         "case_id": "VIGIA-CAN-042",
-        "entry_sha256": "35b7d4666ac9ec69f0501ccb0b297c6647a8c4a1bbdab2d2cbd7e6d89071087b",
+        "entry_sha256": "d9abecca166642e28ca087fead44de4fc570afea3db28c080917cb614175a931",
         "inputs_summary": {
           "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
           "case_id": "VIGIA-CAN-042"
@@ -21,13 +21,13 @@
           "agent_version": "1.0.0-SANS-2026"
         },
         "seq": 1,
-        "timestamp": "2026-07-05T15:27:42.404845+00:00",
+        "timestamp": "2026-07-06T01:31:04.197058+00:00",
         "tool": "vigia_agent"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-CAN-042",
-        "entry_sha256": "79790240179c70c7ebaa2def42973484ebe58ccacf586f35b988b79826dd1927",
+        "entry_sha256": "d529e4ff2d378fda6f631556e56bd366c5370b7fb0fc95b7d8ae0a2611d2bf5b",
         "inputs_summary": {
           "path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-042.json"
         },
@@ -35,29 +35,29 @@
         "note": "Computing SHA-256 of original evidence",
         "outputs_summary": {},
         "seq": 2,
-        "timestamp": "2026-07-05T15:27:42.404931+00:00",
+        "timestamp": "2026-07-06T01:31:04.197145+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-CAN-042",
-        "entry_sha256": "4ecd8d11b264469dd31dc06e0d7e0a281f2c7d6ba2df955e16b5b34e5ab7ead4",
+        "entry_sha256": "6165603a5b2a8be721100227de8376c95be19f1de470109db23d627fef6d1e73",
         "inputs_summary": {
           "path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-042.json"
         },
         "iteration": 0,
-        "note": "Evidence verified: a10a06a0b6422b33...",
+        "note": "Evidence verified: 3cf6c9d69eb7f24f...",
         "outputs_summary": {
-          "sha256": "a10a06a0b6422b333bec8d068136f00e10ca30c7a913ad103fb21fba0deb652d"
+          "sha256": "3cf6c9d69eb7f24fcbb16254e5447460ae3c617bf02ecf7e1ff8f7d22be02ac7"
         },
         "seq": 3,
-        "timestamp": "2026-07-05T15:27:42.405027+00:00",
+        "timestamp": "2026-07-06T01:31:04.197239+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "PIPELINE_EXECUTE",
         "case_id": "VIGIA-CAN-042",
-        "entry_sha256": "262644baaedc1d90d151065a3be86b7a8c579bba4c123298a427ce1fd602e4e1",
+        "entry_sha256": "5e94ebd6427333d76fe97344be73a244b2a2c746fc38feb3df28e4a968a271e0",
         "inputs_summary": {
           "evidence": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-042.json",
           "iteration": "0",
@@ -67,13 +67,13 @@
         "note": "Executing pipeline \u2014 iteration 0",
         "outputs_summary": {},
         "seq": 4,
-        "timestamp": "2026-07-05T15:27:42.405132+00:00",
+        "timestamp": "2026-07-06T01:31:04.197339+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "PIPELINE_COMPLETE",
         "case_id": "VIGIA-CAN-042",
-        "entry_sha256": "ef2645ca19def8ae6099cdcfc0123b4e18323c7e07f91165c35293461eb13886",
+        "entry_sha256": "45bc18351d1e147994a17296a2afef123b71aeb7b84f6dbc33ef7cf23b952482",
         "inputs_summary": {
           "iteration": "0"
         },
@@ -82,8 +82,8 @@
         "outputs_summary": {
           "abduction": {
             "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
-            "best_posterior": "57/800",
-            "confidence": "57/800",
+            "best_posterior": "19/20",
+            "confidence": "19/20",
             "is_conclusive": "True",
             "narrative": "Hidden process in memory makes no network traffic for hours. When the user opens Zoom/Teams for a video call, in that very millisecond it begins exfiltrating GB within the legitimate video noise."
           },
@@ -91,7 +91,15 @@
           "pipeline_meta": {
             "artifact_count": "4",
             "avg_score": "57/160",
+            "ebs_adapter_mode": "motor",
             "expected_verdict": "MALICE",
+            "resolve": {
+              "motor_confidence": "0.95",
+              "motor_reason": "Intent score 0.7608 exceeds MALICE threshold (P2+acq_assurance scale, threshold=0.33)",
+              "motor_score": "0.7608",
+              "motor_verdict": "MALICE",
+              "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+            },
             "source": "ebs_v1_json_adapter"
           },
           "signals": [
@@ -130,13 +138,13 @@
           ]
         },
         "seq": 5,
-        "timestamp": "2026-07-05T15:27:42.407777+00:00",
+        "timestamp": "2026-07-06T01:31:04.549119+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "CONTRADICTION_CHECK",
         "case_id": "VIGIA-CAN-042",
-        "entry_sha256": "b89907a34d0dce3dc7acfcc24ecf7c438011caa74a07e08918b4cfd4ba686ba1",
+        "entry_sha256": "f1dc6e1855ca1e39e71730dfea106db469ff684f71b95409c4b19c5d0086014b",
         "inputs_summary": {
           "n_signals": "4"
         },
@@ -147,13 +155,13 @@
           "threshold": "2"
         },
         "seq": 6,
-        "timestamp": "2026-07-05T15:27:42.407887+00:00",
+        "timestamp": "2026-07-06T01:31:04.549260+00:00",
         "tool": "contradiction_detector"
       },
       {
         "action": "AGENT_EXIT",
         "case_id": "VIGIA-CAN-042",
-        "entry_sha256": "eeda656c9e466b407bd944ce5ed1d1395ef515c070c6eec09cffb38dbbe5315a",
+        "entry_sha256": "5bdcb0e88ce9bb2e4f5a47181721aab2bb472692402470b42cbc960637804ebc",
         "inputs_summary": {
           "verdict": "MALICIOUS_INTENT_DETECTED"
         },
@@ -164,26 +172,26 @@
           "exit_code": "1"
         },
         "seq": 7,
-        "timestamp": "2026-07-05T15:27:42.408076+00:00",
+        "timestamp": "2026-07-06T01:31:04.549527+00:00",
         "tool": "vigia_agent"
       }
     ],
-    "start_time": "2026-07-05T15:27:42.404615+00:00",
+    "start_time": "2026-07-06T01:31:04.196837+00:00",
     "total_entries": 7
   },
   "case_id": "VIGIA-CAN-042",
   "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-042.json",
-  "evidence_sha256": "a10a06a0b6422b333bec8d068136f00e10ca30c7a913ad103fb21fba0deb652d",
+  "evidence_sha256": "3cf6c9d69eb7f24fcbb16254e5447460ae3c617bf02ecf7e1ff8f7d22be02ac7",
   "iterations_executed": 1,
-  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-CAN-042 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-042.json\nEvidence SHA-256: a10a06a0b6422b333bec8d068136f00e10ca30c7a913ad103fb21fba0deb652d\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 57/800\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 4 se\u00f1al(es): 4 primaria(s) de ['sift_netflow', 'sift_syslog', 'sift_volatility'], 0 derivada(s)/no-analizada(s). Top z: Hidden process in memory (no entry in us=0.85, User opens zoom.exe at 14:32:15.000; vid=0.32, Outbound traffic spike of 2.3GB in 180 s=0.23.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: MALICIOUS_INTENT_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nHidden process in memory makes no network traffic for hours. When the user opens Zoom/Teams for a video call, in that very millisecond it begins exfiltrating GB within the legitimate video noise.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Hidden process in memory (no entry in userland process list) with hand] z=0.855 conf=0.95 \u2014 \n  [User opens zoom.exe at 14:32:15.000; video call start log with externa] z=0.322 conf=0.35 \u2014 \n  [Outbound traffic spike of 2.3GB in 180 seconds initiated exactly at 14] z=0.230 conf=0.25 \u2014 \n  [Zoom reports 4.2Mbps bandwidth usage (HD video); total traffic measure] z=0.018 conf=0.30 \u2014 \n\n--- FINAL ALERT LEVEL ---\nMEDIUM \u2014 MALICE verdict from posterior aggregation. Individual z-scores below threshold. Full signal review recommended. Alert floored (B-028/B-065).\nReconciliation: verdict MALICE rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 4 | Derived: 0 | Total: 4",
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-CAN-042 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-042.json\nEvidence SHA-256: 3cf6c9d69eb7f24fcbb16254e5447460ae3c617bf02ecf7e1ff8f7d22be02ac7\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 19/20\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 4 se\u00f1al(es): 4 primaria(s) de ['sift_netflow', 'sift_syslog', 'sift_volatility'], 0 derivada(s)/no-analizada(s). Top z: Hidden process in memory (no entry in us=0.85, User opens zoom.exe at 14:32:15.000; vid=0.32, Outbound traffic spike of 2.3GB in 180 s=0.23.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: MALICIOUS_INTENT_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nHidden process in memory makes no network traffic for hours. When the user opens Zoom/Teams for a video call, in that very millisecond it begins exfiltrating GB within the legitimate video noise.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Hidden process in memory (no entry in userland process list) with hand] z=0.855 conf=0.95 \u2014 \n  [User opens zoom.exe at 14:32:15.000; video call start log with externa] z=0.322 conf=0.35 \u2014 \n  [Outbound traffic spike of 2.3GB in 180 seconds initiated exactly at 14] z=0.230 conf=0.25 \u2014 \n  [Zoom reports 4.2Mbps bandwidth usage (HD video); total traffic measure] z=0.018 conf=0.30 \u2014 \n\n--- FINAL ALERT LEVEL ---\nHIGH \u2014 MALICE verdict from Bayesian posterior aggregation. Individual z-scores below threshold (distributed evidence pattern: no single dominant signal, but aggregate posterior is decisive). Alert floored (B-028/B-065).\nReconciliation: verdict MALICE rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 4 | Derived: 0 | Total: 4",
   "pipeline_results": {
     "abduction": {
       "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
-      "best_posterior": "57/800",
+      "best_posterior": "19/20",
       "confidence": {
         "__fraction__": true,
-        "den": 800,
-        "num": 57
+        "den": 20,
+        "num": 19
       },
       "devil_advocate": {
         "aggregation": {
@@ -195,7 +203,7 @@
           "primary_alternative_hypothesis": null
         },
         "decision_context": {
-          "confidence": "57/800",
+          "confidence": "19/20",
           "mapped_verdict": "MALICIOUS_INTENT_DETECTED",
           "raw_verdict": "MALICIOUS_INTENT_DETECTED",
           "score": "57/160"
@@ -216,7 +224,15 @@
     "pipeline_meta": {
       "artifact_count": 4,
       "avg_score": "57/160",
+      "ebs_adapter_mode": "motor",
       "expected_verdict": "MALICE",
+      "resolve": {
+        "motor_confidence": "0.95",
+        "motor_reason": "Intent score 0.7608 exceeds MALICE threshold (P2+acq_assurance scale, threshold=0.33)",
+        "motor_score": "0.7608",
+        "motor_verdict": "MALICE",
+        "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+      },
       "source": "ebs_v1_json_adapter"
     },
     "signals": [

@@ -1,15 +1,15 @@
 {
   "agent_verdict": "INTENT",
-  "analysis_timestamp": "2026-07-05T15:27:41.058693+00:00",
+  "analysis_timestamp": "2026-07-06T01:30:53.017862+00:00",
   "audit_trail": {
     "agent_version": "1.0.0-SANS-2026",
     "case_id": "VIGIA-CAN-016",
-    "end_time": "2026-07-05T15:27:41.058698+00:00",
+    "end_time": "2026-07-06T01:30:53.017868+00:00",
     "entries": [
       {
         "action": "AGENT_INITIALIZED",
         "case_id": "VIGIA-CAN-016",
-        "entry_sha256": "b1bb464dd06881ecc984e9219e2f8ddb31717d90ec5bdfcecee1c82516c8fb36",
+        "entry_sha256": "36b7ad5c2eff87e85f79a1ed0053814efe7d13a25d8e3fd2124cfc61c3c4deb5",
         "inputs_summary": {
           "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
           "case_id": "VIGIA-CAN-016"
@@ -21,13 +21,13 @@
           "agent_version": "1.0.0-SANS-2026"
         },
         "seq": 1,
-        "timestamp": "2026-07-05T15:27:41.055525+00:00",
+        "timestamp": "2026-07-06T01:30:52.663277+00:00",
         "tool": "vigia_agent"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-CAN-016",
-        "entry_sha256": "dccdd91c68f5ac149aa8c069ece79510b7ed2668db8876afb83708c10fa89194",
+        "entry_sha256": "4ece526a198e01f5cdb033b96cfda3bc47b5a7d47f8e459eb2a5d3687314be5d",
         "inputs_summary": {
           "path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-016.json"
         },
@@ -35,29 +35,29 @@
         "note": "Computing SHA-256 of original evidence",
         "outputs_summary": {},
         "seq": 2,
-        "timestamp": "2026-07-05T15:27:41.055610+00:00",
+        "timestamp": "2026-07-06T01:30:52.663363+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-CAN-016",
-        "entry_sha256": "5891bcc51fd51f1a6ff319e30ad931cbc058c05a5efa99255437d12d8f3b0415",
+        "entry_sha256": "ed3f0e1ae9f865564c10af1061257f328348afb3a2365044c408b8a1e93aace2",
         "inputs_summary": {
           "path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-016.json"
         },
         "iteration": 0,
-        "note": "Evidence verified: f14997415ec3bece...",
+        "note": "Evidence verified: f18c1f40ac0be103...",
         "outputs_summary": {
-          "sha256": "f14997415ec3becedf2356309ef2d43532b96b207804754f044f5130ce9effdc"
+          "sha256": "f18c1f40ac0be103edadd83ba61ad989ad1f4c02df8383ef3dbf31ed6d0570b1"
         },
         "seq": 3,
-        "timestamp": "2026-07-05T15:27:41.055700+00:00",
+        "timestamp": "2026-07-06T01:30:52.663460+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "PIPELINE_EXECUTE",
         "case_id": "VIGIA-CAN-016",
-        "entry_sha256": "fd92881fb0e1439c8d327270671bc35b928f20a92f507ff6c2c0980b490e6d1b",
+        "entry_sha256": "c475873a076811a3b377cc2bc32921c5cbb60535ae900b4807a3a10d97cbe99c",
         "inputs_summary": {
           "evidence": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-016.json",
           "iteration": "0",
@@ -67,13 +67,13 @@
         "note": "Executing pipeline \u2014 iteration 0",
         "outputs_summary": {},
         "seq": 4,
-        "timestamp": "2026-07-05T15:27:41.055802+00:00",
+        "timestamp": "2026-07-06T01:30:52.663560+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "PIPELINE_COMPLETE",
         "case_id": "VIGIA-CAN-016",
-        "entry_sha256": "76587a47b366f11e0e2ac459ea4926b512b28d5074939c6d7023a8b0e456b63b",
+        "entry_sha256": "04bcf4b18d937cff1e6f96904bfc0f8f72cf34ce5ecdd98cbd8af9cee8c53196",
         "inputs_summary": {
           "iteration": "0"
         },
@@ -82,8 +82,8 @@
         "outputs_summary": {
           "abduction": {
             "best_hypothesis": "SUSPICION_DETECTED",
-            "best_posterior": "3051/40000",
-            "confidence": "3051/40000",
+            "best_posterior": "11/20",
+            "confidence": "11/20",
             "is_conclusive": "True",
             "narrative": "User types 'ipconfig /all' on an Ubuntu 24.04 LTS server. Fails with 'command not found'. Corrects to 'ip addr' 1.3 seconds later. Cross-platform muscle memory contamination reveals a Windows origin e..."
           },
@@ -91,7 +91,15 @@
           "pipeline_meta": {
             "artifact_count": "4",
             "avg_score": "3051/8000",
+            "ebs_adapter_mode": "motor",
             "expected_verdict": "SUSPICION",
+            "resolve": {
+              "motor_confidence": "0.55",
+              "motor_reason": "Significant signal with structural support (score=0.2733)",
+              "motor_score": "0.2733",
+              "motor_verdict": "SUSPICION",
+              "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+            },
             "source": "ebs_v1_json_adapter"
           },
           "signals": [
@@ -130,13 +138,13 @@
           ]
         },
         "seq": 5,
-        "timestamp": "2026-07-05T15:27:41.058344+00:00",
+        "timestamp": "2026-07-06T01:30:53.017493+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "CONTRADICTION_CHECK",
         "case_id": "VIGIA-CAN-016",
-        "entry_sha256": "6a415f27e80adf8f00ac9a3ba233000606585e647b67b758c58d27a8cbced133",
+        "entry_sha256": "afb29a8a257334d7aa99834d922b9990c6c1637b6e27aaf01ac2d048a89f2cf2",
         "inputs_summary": {
           "n_signals": "4"
         },
@@ -147,13 +155,13 @@
           "threshold": "2"
         },
         "seq": 6,
-        "timestamp": "2026-07-05T15:27:41.058460+00:00",
+        "timestamp": "2026-07-06T01:30:53.017608+00:00",
         "tool": "contradiction_detector"
       },
       {
         "action": "AGENT_EXIT",
         "case_id": "VIGIA-CAN-016",
-        "entry_sha256": "107ec1d0a9494d46b7dd59bcf61c5e5e4d016ad11e412a112858986b442f4d57",
+        "entry_sha256": "c0cd23dee9a5d4e3201b9fab21a9dc1ac439d7a6689d361cdfd0d3c803e062cc",
         "inputs_summary": {
           "verdict": "SUSPICION_DETECTED"
         },
@@ -164,26 +172,26 @@
           "exit_code": "3"
         },
         "seq": 7,
-        "timestamp": "2026-07-05T15:27:41.058646+00:00",
+        "timestamp": "2026-07-06T01:30:53.017813+00:00",
         "tool": "vigia_agent"
       }
     ],
-    "start_time": "2026-07-05T15:27:41.055290+00:00",
+    "start_time": "2026-07-06T01:30:52.663054+00:00",
     "total_entries": 7
   },
   "case_id": "VIGIA-CAN-016",
   "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-016.json",
-  "evidence_sha256": "f14997415ec3becedf2356309ef2d43532b96b207804754f044f5130ce9effdc",
+  "evidence_sha256": "f18c1f40ac0be103edadd83ba61ad989ad1f4c02df8383ef3dbf31ed6d0570b1",
   "iterations_executed": 1,
-  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-CAN-016 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-016.json\nEvidence SHA-256: f14997415ec3becedf2356309ef2d43532b96b207804754f044f5130ce9effdc\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: SUSPICION_DETECTED\nPosterior confidence: 3051/40000\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 4 se\u00f1al(es): 4 primaria(s) de ['sift_keylogger', 'sift_syslog', 'sift_volatility'], 0 derivada(s)/no-analizada(s). Top z: SSH session from Windows 11 (PuTTY/0.81)=0.83, Failed command: 'ipconfig /all' in Ubunt=0.32, Correction 1.3 seconds later: 'ip addr'.=0.32.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: SUSPICION_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nUser types 'ipconfig /all' on an Ubuntu 24.04 LTS server. Fails with 'command not found'. Corrects to 'ip addr' 1.3 seconds later. Cross-platform muscle memory contamination reveals a Windows origin environment.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [SSH session from Windows 11 (PuTTY/0.81) connected to Ubuntu 24.04 Lin] z=0.827 conf=0.95 \u2014 \n  [Failed command: 'ipconfig /all' in Ubuntu 24.04 bash. Exit code 127: c] z=0.322 conf=0.35 \u2014 \n  [Correction 1.3 seconds later: 'ip addr'. Native Linux command.] z=0.322 conf=0.35 \u2014 \n  [Keystroke sequence: 'ipconfig' space '/' TAB (failed autocomplete) Ctr] z=0.055 conf=0.50 \u2014 \n\n--- FINAL ALERT LEVEL ---\nMEDIUM \u2014 INTENT verdict with individual z-scores below threshold. Alert floored (B-028/B-065): an intent finding cannot present as LOW.\nReconciliation: verdict INTENT rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 4 | Derived: 0 | Total: 4",
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-CAN-016 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-016.json\nEvidence SHA-256: f18c1f40ac0be103edadd83ba61ad989ad1f4c02df8383ef3dbf31ed6d0570b1\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: SUSPICION_DETECTED\nPosterior confidence: 11/20\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 4 se\u00f1al(es): 4 primaria(s) de ['sift_keylogger', 'sift_syslog', 'sift_volatility'], 0 derivada(s)/no-analizada(s). Top z: SSH session from Windows 11 (PuTTY/0.81)=0.83, Failed command: 'ipconfig /all' in Ubunt=0.32, Correction 1.3 seconds later: 'ip addr'.=0.32.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: SUSPICION_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nUser types 'ipconfig /all' on an Ubuntu 24.04 LTS server. Fails with 'command not found'. Corrects to 'ip addr' 1.3 seconds later. Cross-platform muscle memory contamination reveals a Windows origin environment.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [SSH session from Windows 11 (PuTTY/0.81) connected to Ubuntu 24.04 Lin] z=0.827 conf=0.95 \u2014 \n  [Failed command: 'ipconfig /all' in Ubuntu 24.04 bash. Exit code 127: c] z=0.322 conf=0.35 \u2014 \n  [Correction 1.3 seconds later: 'ip addr'. Native Linux command.] z=0.322 conf=0.35 \u2014 \n  [Keystroke sequence: 'ipconfig' space '/' TAB (failed autocomplete) Ctr] z=0.055 conf=0.50 \u2014 \n\n--- FINAL ALERT LEVEL ---\nMEDIUM \u2014 INTENT verdict with individual z-scores below threshold. Alert floored (B-028/B-065): an intent finding cannot present as LOW.\nReconciliation: verdict INTENT rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 4 | Derived: 0 | Total: 4",
   "pipeline_results": {
     "abduction": {
       "best_hypothesis": "SUSPICION_DETECTED",
-      "best_posterior": "3051/40000",
+      "best_posterior": "11/20",
       "confidence": {
         "__fraction__": true,
-        "den": 40000,
-        "num": 3051
+        "den": 20,
+        "num": 11
       },
       "is_conclusive": true,
       "narrative": "User types 'ipconfig /all' on an Ubuntu 24.04 LTS server. Fails with 'command not found'. Corrects to 'ip addr' 1.3 seconds later. Cross-platform muscle memory contamination reveals a Windows origin environment."
@@ -192,7 +200,15 @@
     "pipeline_meta": {
       "artifact_count": 4,
       "avg_score": "3051/8000",
+      "ebs_adapter_mode": "motor",
       "expected_verdict": "SUSPICION",
+      "resolve": {
+        "motor_confidence": "0.55",
+        "motor_reason": "Significant signal with structural support (score=0.2733)",
+        "motor_score": "0.2733",
+        "motor_verdict": "SUSPICION",
+        "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+      },
       "source": "ebs_v1_json_adapter"
     },
     "signals": [

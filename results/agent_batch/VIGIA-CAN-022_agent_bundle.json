@@ -1,15 +1,15 @@
 {
   "agent_verdict": "MALICE",
-  "analysis_timestamp": "2026-07-05T15:27:41.368568+00:00",
+  "analysis_timestamp": "2026-07-06T01:30:55.658376+00:00",
   "audit_trail": {
     "agent_version": "1.0.0-SANS-2026",
     "case_id": "VIGIA-CAN-022",
-    "end_time": "2026-07-05T15:27:41.368574+00:00",
+    "end_time": "2026-07-06T01:30:55.658383+00:00",
     "entries": [
       {
         "action": "AGENT_INITIALIZED",
         "case_id": "VIGIA-CAN-022",
-        "entry_sha256": "855e8a7b7f5026b971e6bf41b5e10ee88bd681ccce3f41513c81f164e175d24f",
+        "entry_sha256": "16c40e0ed5bb3cb74826f2f7dc08bcc5192aa0bc44c5b55abf92d8f8ab175e66",
         "inputs_summary": {
           "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
           "case_id": "VIGIA-CAN-022"
@@ -21,13 +21,13 @@
           "agent_version": "1.0.0-SANS-2026"
         },
         "seq": 1,
-        "timestamp": "2026-07-05T15:27:41.364957+00:00",
+        "timestamp": "2026-07-06T01:30:55.305358+00:00",
         "tool": "vigia_agent"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-CAN-022",
-        "entry_sha256": "8b0bc808e2f8d8d6cd191e6db1a89fa0b57df393a9392274c35c6f1b0ffa8518",
+        "entry_sha256": "3c679355e1f2993c33d1aa20efaae42bbe1909664960ab790f5a5a3244666d95",
         "inputs_summary": {
           "path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-022.json"
         },
@@ -35,29 +35,29 @@
         "note": "Computing SHA-256 of original evidence",
         "outputs_summary": {},
         "seq": 2,
-        "timestamp": "2026-07-05T15:27:41.365043+00:00",
+        "timestamp": "2026-07-06T01:30:55.305463+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-CAN-022",
-        "entry_sha256": "51a2dc94d12cc83014e45d4a4092b922d64403e90553971c0f56a111c4dd7535",
+        "entry_sha256": "a43667a52958104f6bbcace29aba1a7ae410827c11721f814a1e204782b90e01",
         "inputs_summary": {
           "path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-022.json"
         },
         "iteration": 0,
-        "note": "Evidence verified: a1cda257c61f9b01...",
+        "note": "Evidence verified: a07d0a7ca9460091...",
         "outputs_summary": {
-          "sha256": "a1cda257c61f9b018d4fc8af5e3dede8436bd8c27fc328e4fa351180e3e1bd73"
+          "sha256": "a07d0a7ca9460091b9122782da4ee04d69088cb6dcc9ac8a28e154993250b41b"
         },
         "seq": 3,
-        "timestamp": "2026-07-05T15:27:41.365133+00:00",
+        "timestamp": "2026-07-06T01:30:55.305553+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "PIPELINE_EXECUTE",
         "case_id": "VIGIA-CAN-022",
-        "entry_sha256": "b9a29cc02ceda65c5c2b4ab27c710ceeca8c72476d1c168ffd618da0d8820beb",
+        "entry_sha256": "2e2d540775fd67e31fb5449d7fbefd973034ae66d17f04333c07c7c5db18b019",
         "inputs_summary": {
           "evidence": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-022.json",
           "iteration": "0",
@@ -67,13 +67,13 @@
         "note": "Executing pipeline \u2014 iteration 0",
         "outputs_summary": {},
         "seq": 4,
-        "timestamp": "2026-07-05T15:27:41.365235+00:00",
+        "timestamp": "2026-07-06T01:30:55.305654+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "PIPELINE_COMPLETE",
         "case_id": "VIGIA-CAN-022",
-        "entry_sha256": "019f863188e3c114991650eb6bac2b4b8a1e654a0bd6c29fdaea476cce552f44",
+        "entry_sha256": "26c1e494c444cac4fbe26d3d42d9b892b50b77ebb3ace8d0e20f2482eaf9c0a4",
         "inputs_summary": {
           "iteration": "0"
         },
@@ -82,16 +82,24 @@
         "outputs_summary": {
           "abduction": {
             "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
-            "best_posterior": "2199/40000",
-            "confidence": "2199/40000",
-            "is_conclusive": "False",
+            "best_posterior": "19/20",
+            "confidence": "19/20",
+            "is_conclusive": "True",
             "narrative": "Production script has a comment: '# TODO: fix the cnfnbz.py script'. The word 'cnfnbz' is '\u0441\u0442\u0430\u0442\u044c\u044f' (article) typed with active Russian layout. Commit from a machine with locale ru_RU and timezone Euro..."
           },
           "case_id": "case_104_error_layout_comentario",
           "pipeline_meta": {
             "artifact_count": "4",
             "avg_score": "2199/8000",
+            "ebs_adapter_mode": "motor",
             "expected_verdict": "MALICE",
+            "resolve": {
+              "motor_confidence": "0.95",
+              "motor_reason": "Intent score 0.5675 exceeds MALICE threshold (P2+acq_assurance scale, threshold=0.33)",
+              "motor_score": "0.5675",
+              "motor_verdict": "MALICE",
+              "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+            },
             "source": "ebs_v1_json_adapter"
           },
           "signals": [
@@ -130,13 +138,13 @@
           ]
         },
         "seq": 5,
-        "timestamp": "2026-07-05T15:27:41.367805+00:00",
+        "timestamp": "2026-07-06T01:30:55.657869+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "CONTRADICTION_CHECK",
         "case_id": "VIGIA-CAN-022",
-        "entry_sha256": "ae4c675a2185cb03a4b9dc96b94e9c65a50c9b9ac72cce688ea2c605f26715a5",
+        "entry_sha256": "7efe9fadaba07054611d34184b80ef4a76968d727070453df227054fbd387bc8",
         "inputs_summary": {
           "n_signals": "4"
         },
@@ -147,13 +155,13 @@
           "threshold": "2"
         },
         "seq": 6,
-        "timestamp": "2026-07-05T15:27:41.367910+00:00",
+        "timestamp": "2026-07-06T01:30:55.657990+00:00",
         "tool": "contradiction_detector"
       },
       {
         "action": "AGENT_EXIT",
         "case_id": "VIGIA-CAN-022",
-        "entry_sha256": "0585a8d58edf4e2a3e62fb9f21eb79b1ad98a661470c2c353f118f805dd20402",
+        "entry_sha256": "0edcb0635d6bc9eae4ed417c3f46196f831ac303f9a814031722afd36ad1e6c3",
         "inputs_summary": {
           "verdict": "MALICIOUS_INTENT_DETECTED"
         },
@@ -164,26 +172,26 @@
           "exit_code": "1"
         },
         "seq": 7,
-        "timestamp": "2026-07-05T15:27:41.368097+00:00",
+        "timestamp": "2026-07-06T01:30:55.658193+00:00",
         "tool": "vigia_agent"
       }
     ],
-    "start_time": "2026-07-05T15:27:41.364731+00:00",
+    "start_time": "2026-07-06T01:30:55.305124+00:00",
     "total_entries": 7
   },
   "case_id": "VIGIA-CAN-022",
   "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-022.json",
-  "evidence_sha256": "a1cda257c61f9b018d4fc8af5e3dede8436bd8c27fc328e4fa351180e3e1bd73",
+  "evidence_sha256": "a07d0a7ca9460091b9122782da4ee04d69088cb6dcc9ac8a28e154993250b41b",
   "iterations_executed": 1,
-  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-CAN-022 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-022.json\nEvidence SHA-256: a1cda257c61f9b018d4fc8af5e3dede8436bd8c27fc328e4fa351180e3e1bd73\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 2199/40000\nConclusive: NO \u2014 requires human review\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 4 se\u00f1al(es): 4 primaria(s) de ['sift_code_audit', 'sift_git_audit', 'sift_linguistic', 'sift_volatility'], 0 derivada(s)/no-analizada(s). Top z: Comment in production script: '# TODO: f=0.57, Commit made from a machine with git conf=0.34, Keyboard slip: 'cnfnbz' maps exactly to =0.14.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: MALICIOUS_INTENT_DETECTED. Conclusiva: no \u2014 requiere revisi\u00f3n humana.\n\nRazonamiento del motor abductivo:\nProduction script has a comment: '# TODO: fix the cnfnbz.py script'. The word 'cnfnbz' is '\u0441\u0442\u0430\u0442\u044c\u044f' (article) typed with active Russian layout. Commit from a machine with locale ru_RU and timezone Europe/Moscow.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Comment in production script: '# TODO: fix the cnfnbz.py script'. Mean] z=0.572 conf=0.65 \u2014 \n  [Commit made from a machine with git config locale ru_RU.UTF-8, timezon] z=0.342 conf=0.45 \u2014 \n  [Keyboard slip: 'cnfnbz' maps exactly to '\u0441\u0442\u0430\u0442\u044c\u044f' (article) in active R] z=0.138 conf=0.15 \u2014 \n  [Development session from IP geolocated in St. Petersburg with a physic] z=0.048 conf=0.95 \u2014 \n\n--- FINAL ALERT LEVEL ---\nMEDIUM \u2014 MALICE verdict from posterior aggregation. Individual z-scores below threshold. Full signal review recommended. Alert floored (B-028/B-065).\nReconciliation: verdict MALICE rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 4 | Derived: 0 | Total: 4",
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-CAN-022 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-022.json\nEvidence SHA-256: a07d0a7ca9460091b9122782da4ee04d69088cb6dcc9ac8a28e154993250b41b\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 19/20\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 4 se\u00f1al(es): 4 primaria(s) de ['sift_code_audit', 'sift_git_audit', 'sift_linguistic', 'sift_volatility'], 0 derivada(s)/no-analizada(s). Top z: Comment in production script: '# TODO: f=0.57, Commit made from a machine with git conf=0.34, Keyboard slip: 'cnfnbz' maps exactly to =0.14.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: MALICIOUS_INTENT_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nProduction script has a comment: '# TODO: fix the cnfnbz.py script'. The word 'cnfnbz' is '\u0441\u0442\u0430\u0442\u044c\u044f' (article) typed with active Russian layout. Commit from a machine with locale ru_RU and timezone Europe/Moscow.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Comment in production script: '# TODO: fix the cnfnbz.py script'. Mean] z=0.572 conf=0.65 \u2014 \n  [Commit made from a machine with git config locale ru_RU.UTF-8, timezon] z=0.342 conf=0.45 \u2014 \n  [Keyboard slip: 'cnfnbz' maps exactly to '\u0441\u0442\u0430\u0442\u044c\u044f' (article) in active R] z=0.138 conf=0.15 \u2014 \n  [Development session from IP geolocated in St. Petersburg with a physic] z=0.048 conf=0.95 \u2014 \n\n--- FINAL ALERT LEVEL ---\nHIGH \u2014 MALICE verdict from Bayesian posterior aggregation. Individual z-scores below threshold (distributed evidence pattern: no single dominant signal, but aggregate posterior is decisive). Alert floored (B-028/B-065).\nReconciliation: verdict MALICE rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 4 | Derived: 0 | Total: 4",
   "pipeline_results": {
     "abduction": {
       "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
-      "best_posterior": "2199/40000",
+      "best_posterior": "19/20",
       "confidence": {
         "__fraction__": true,
-        "den": 40000,
-        "num": 2199
+        "den": 20,
+        "num": 19
       },
       "devil_advocate": {
         "aggregation": {
@@ -195,7 +203,7 @@
           "primary_alternative_hypothesis": null
         },
         "decision_context": {
-          "confidence": "2199/40000",
+          "confidence": "19/20",
           "mapped_verdict": "MALICIOUS_INTENT_DETECTED",
           "raw_verdict": "MALICIOUS_INTENT_DETECTED",
           "score": "2199/8000"
@@ -209,14 +217,22 @@
         "pattern_evidence_gaps": [],
         "version": "r7-da-v1"
       },
-      "is_conclusive": false,
+      "is_conclusive": true,
       "narrative": "Production script has a comment: '# TODO: fix the cnfnbz.py script'. The word 'cnfnbz' is '\u0441\u0442\u0430\u0442\u044c\u044f' (article) typed with active Russian layout. Commit from a machine with locale ru_RU and timezone Europe/Moscow."
     },
     "case_id": "case_104_error_layout_comentario",
     "pipeline_meta": {
       "artifact_count": 4,
       "avg_score": "2199/8000",
+      "ebs_adapter_mode": "motor",
       "expected_verdict": "MALICE",
+      "resolve": {
+        "motor_confidence": "0.95",
+        "motor_reason": "Intent score 0.5675 exceeds MALICE threshold (P2+acq_assurance scale, threshold=0.33)",
+        "motor_score": "0.5675",
+        "motor_verdict": "MALICE",
+        "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+      },
       "source": "ebs_v1_json_adapter"
     },
     "signals": [

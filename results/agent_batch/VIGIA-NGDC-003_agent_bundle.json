@@ -1,15 +1,15 @@
 {
   "agent_verdict": "INTENT",
-  "analysis_timestamp": "2026-07-05T15:27:34.905343+00:00",
+  "analysis_timestamp": "2026-07-06T01:30:00.838963+00:00",
   "audit_trail": {
     "agent_version": "1.0.0-SANS-2026",
     "case_id": "VIGIA-NGDC-003",
-    "end_time": "2026-07-05T15:27:34.905348+00:00",
+    "end_time": "2026-07-06T01:30:00.838968+00:00",
     "entries": [
       {
         "action": "AGENT_INITIALIZED",
         "case_id": "VIGIA-NGDC-003",
-        "entry_sha256": "351627f3fc17690d2dbca88f8be9790bea2ebb8dd289dd85f63f17eddddf1820",
+        "entry_sha256": "b2ac21e54647af89bda96f51677c490f8e84265e1c539a47eeb38f6bfe9005e9",
         "inputs_summary": {
           "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
           "case_id": "VIGIA-NGDC-003"
@@ -21,13 +21,13 @@
           "agent_version": "1.0.0-SANS-2026"
         },
         "seq": 1,
-        "timestamp": "2026-07-05T15:27:34.902152+00:00",
+        "timestamp": "2026-07-06T01:30:00.486682+00:00",
         "tool": "vigia_agent"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-NGDC-003",
-        "entry_sha256": "e646373fa4a90ff07864ddbbfaee9045668435170560092e3f6e1beb6711b67b",
+        "entry_sha256": "9ea34307eae1ea690825ebfe975e380926ffb9abc908cf0f0afbb0f928215ad0",
         "inputs_summary": {
           "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-NGDC-003.json"
         },
@@ -35,29 +35,29 @@
         "note": "Computing SHA-256 of original evidence",
         "outputs_summary": {},
         "seq": 2,
-        "timestamp": "2026-07-05T15:27:34.902235+00:00",
+        "timestamp": "2026-07-06T01:30:00.486765+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-NGDC-003",
-        "entry_sha256": "db90497c68dd6ebcf22cad61309ddf7eb523d78164976f90704a216ef1e2116e",
+        "entry_sha256": "1fb343cbd04dc8900152f3c782f5826be37449d0802a3f54a131ba6b5547c491",
         "inputs_summary": {
           "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-NGDC-003.json"
         },
         "iteration": 0,
-        "note": "Evidence verified: b822c9eba781c49b...",
+        "note": "Evidence verified: 13e0a155abf84536...",
         "outputs_summary": {
-          "sha256": "b822c9eba781c49b479e6842c9a4f9a4e6f27e516844a7e4d52d22f3315d38a2"
+          "sha256": "13e0a155abf84536c2b3816acdc635485ea9c03acbdfdaf3445561549dbd4c60"
         },
         "seq": 3,
-        "timestamp": "2026-07-05T15:27:34.902336+00:00",
+        "timestamp": "2026-07-06T01:30:00.486870+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "PIPELINE_EXECUTE",
         "case_id": "VIGIA-NGDC-003",
-        "entry_sha256": "f4258265a2f27ad76b3c8342fd79df28fd097d0bb7a890ffda9c8f445ff35cfc",
+        "entry_sha256": "c97e1415b31bf416e515c9cfb16c2c3222a914a5c392208ed7a5fc940441272c",
         "inputs_summary": {
           "evidence": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-NGDC-003.json",
           "iteration": "0",
@@ -67,13 +67,13 @@
         "note": "Executing pipeline \u2014 iteration 0",
         "outputs_summary": {},
         "seq": 4,
-        "timestamp": "2026-07-05T15:27:34.902446+00:00",
+        "timestamp": "2026-07-06T01:30:00.486973+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "PIPELINE_COMPLETE",
         "case_id": "VIGIA-NGDC-003",
-        "entry_sha256": "880d52a802d24580d688c1f9d5503f646b5b5af44d24b11e128ede9c40f11155",
+        "entry_sha256": "1a3ecdf40a6972d5d6873e3a7320cf5c02835111b83a7f9821e623371026f26a",
         "inputs_summary": {
           "iteration": "0"
         },
@@ -82,8 +82,8 @@
         "outputs_summary": {
           "abduction": {
             "best_hypothesis": "SUSPICION_DETECTED",
-            "best_posterior": "3511/31250",
-            "confidence": "3511/31250",
+            "best_posterior": "14/25",
+            "confidence": "14/25",
             "is_conclusive": "True",
             "narrative": "Joe installed LogKext Daemon on the family MacBook Air prior to his divorce from Tracy. His declared purpose was monitoring Terry, his 15-year-old daughter, whose online behavior he was concerned abou..."
           },
@@ -91,7 +91,15 @@
           "pipeline_meta": {
             "artifact_count": "5",
             "avg_score": "3511/6250",
+            "ebs_adapter_mode": "motor",
             "expected_verdict": "SUSPICION",
+            "resolve": {
+              "motor_confidence": "0.56",
+              "motor_reason": "Significant signal with structural support (score=0.2803)",
+              "motor_score": "0.2803",
+              "motor_verdict": "SUSPICION",
+              "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+            },
             "source": "ebs_v1_json_adapter"
           },
           "signals": [
@@ -138,13 +146,13 @@
           ]
         },
         "seq": 5,
-        "timestamp": "2026-07-05T15:27:34.904977+00:00",
+        "timestamp": "2026-07-06T01:30:00.838565+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "CONTRADICTION_CHECK",
         "case_id": "VIGIA-NGDC-003",
-        "entry_sha256": "609575f88798642f47c5268d38e0ab8e6fbdce9a1853da210ed9c5914ba40f57",
+        "entry_sha256": "9e6b28fcf5d7e096f1c6487d615802d00fac750e31b6c95a5acc9eb257576c2c",
         "inputs_summary": {
           "n_signals": "5"
         },
@@ -155,13 +163,13 @@
           "threshold": "2"
         },
         "seq": 6,
-        "timestamp": "2026-07-05T15:27:34.905098+00:00",
+        "timestamp": "2026-07-06T01:30:00.838696+00:00",
         "tool": "contradiction_detector"
       },
       {
         "action": "AGENT_EXIT",
         "case_id": "VIGIA-NGDC-003",
-        "entry_sha256": "ce0ce200295ed552476281f6d48bf033b0152852e3a9b51779fb3f68554ad312",
+        "entry_sha256": "4b29634d14bc175dd1acb98b3c1f2249efcbd0b7f45a16c497ef3008f84314f1",
         "inputs_summary": {
           "verdict": "SUSPICION_DETECTED"
         },
@@ -172,26 +180,26 @@
           "exit_code": "3"
         },
         "seq": 7,
-        "timestamp": "2026-07-05T15:27:34.905292+00:00",
+        "timestamp": "2026-07-06T01:30:00.838911+00:00",
         "tool": "vigia_agent"
       }
     ],
-    "start_time": "2026-07-05T15:27:34.901931+00:00",
+    "start_time": "2026-07-06T01:30:00.486462+00:00",
     "total_entries": 7
   },
   "case_id": "VIGIA-NGDC-003",
   "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-NGDC-003.json",
-  "evidence_sha256": "b822c9eba781c49b479e6842c9a4f9a4e6f27e516844a7e4d52d22f3315d38a2",
+  "evidence_sha256": "13e0a155abf84536c2b3816acdc635485ea9c03acbdfdaf3445561549dbd4c60",
   "iterations_executed": 1,
-  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-NGDC-003 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/VIGIA-NGDC-003.json\nEvidence SHA-256: b822c9eba781c49b479e6842c9a4f9a4e6f27e516844a7e4d52d22f3315d38a2\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: SUSPICION_DETECTED\nPosterior confidence: 3511/31250\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 5 se\u00f1al(es): 5 primaria(s) de ['Digital Corpora scenario documentation', 'Digital Corpora scenario documentation + EML aggregate', 'EML header analysis \u2014 logfile-2012-06-28-1600.eml', 'LogKext Daemon \u2014 aggregate across 12 EML files', 'LogKext Daemon \u2014 logfile-2012-07-06-1100.eml'], 0 derivada(s)/no-analizada(s). Top z: LogKext Daemon running as root on Tracys=0.75, Tracy (tracysumtwelve) is the active use=0.66, Terry (age 15, username terrysumtwelve) =0.55.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: SUSPICION_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nJoe installed LogKext Daemon on the family MacBook Air prior to his divorce from Tracy. His declared purpose was monitoring Terry, his 15-year-old daughter, whose online behavior he was concerned about. The implementation captures all keystrokes indiscriminately from all users on the device \u2014 Tracy included \u2014 and exfiltrates them hourly via cron+postfix running as root to joe.sum.twelve@gmail.com. Joe had a former account on the device that was deleted during the separation; the home folder may \n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [LogKext Daemon running as root on Tracys-MacBook-Air.local. Hourly cro] z=0.748 conf=0.85 \u2014 \n  [Tracy (tracysumtwelve) is the active user in 11 of 12 recovered log se] z=0.656 conf=0.80 \u2014 \n  [Terry (age 15, username terrysumtwelve) logs in on July 6 at 10:51am. ] z=0.554 conf=0.78 \u2014 \n  [Joe is described as financially well-off, bitter about the divorce, an] z=0.455 conf=0.70 \u2014 \n  [Joe reported Tracy's conspiracy to law enforcement based on informatio] z=0.396 conf=0.72 \u2014 \n\n--- FINAL ALERT LEVEL ---\nMEDIUM \u2014 INTENT verdict with individual z-scores below threshold. Alert floored (B-028/B-065): an intent finding cannot present as LOW.\nReconciliation: verdict INTENT rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 5 | Derived: 0 | Total: 5",
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-NGDC-003 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/VIGIA-NGDC-003.json\nEvidence SHA-256: 13e0a155abf84536c2b3816acdc635485ea9c03acbdfdaf3445561549dbd4c60\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: SUSPICION_DETECTED\nPosterior confidence: 14/25\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 5 se\u00f1al(es): 5 primaria(s) de ['Digital Corpora scenario documentation', 'Digital Corpora scenario documentation + EML aggregate', 'EML header analysis \u2014 logfile-2012-06-28-1600.eml', 'LogKext Daemon \u2014 aggregate across 12 EML files', 'LogKext Daemon \u2014 logfile-2012-07-06-1100.eml'], 0 derivada(s)/no-analizada(s). Top z: LogKext Daemon running as root on Tracys=0.75, Tracy (tracysumtwelve) is the active use=0.66, Terry (age 15, username terrysumtwelve) =0.55.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: SUSPICION_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nJoe installed LogKext Daemon on the family MacBook Air prior to his divorce from Tracy. His declared purpose was monitoring Terry, his 15-year-old daughter, whose online behavior he was concerned about. The implementation captures all keystrokes indiscriminately from all users on the device \u2014 Tracy included \u2014 and exfiltrates them hourly via cron+postfix running as root to joe.sum.twelve@gmail.com. Joe had a former account on the device that was deleted during the separation; the home folder may \n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [LogKext Daemon running as root on Tracys-MacBook-Air.local. Hourly cro] z=0.748 conf=0.85 \u2014 \n  [Tracy (tracysumtwelve) is the active user in 11 of 12 recovered log se] z=0.656 conf=0.80 \u2014 \n  [Terry (age 15, username terrysumtwelve) logs in on July 6 at 10:51am. ] z=0.554 conf=0.78 \u2014 \n  [Joe is described as financially well-off, bitter about the divorce, an] z=0.455 conf=0.70 \u2014 \n  [Joe reported Tracy's conspiracy to law enforcement based on informatio] z=0.396 conf=0.72 \u2014 \n\n--- FINAL ALERT LEVEL ---\nMEDIUM \u2014 INTENT verdict with individual z-scores below threshold. Alert floored (B-028/B-065): an intent finding cannot present as LOW.\nReconciliation: verdict INTENT rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 5 | Derived: 0 | Total: 5",
   "pipeline_results": {
     "abduction": {
       "best_hypothesis": "SUSPICION_DETECTED",
-      "best_posterior": "3511/31250",
+      "best_posterior": "14/25",
       "confidence": {
         "__fraction__": true,
-        "den": 31250,
-        "num": 3511
+        "den": 25,
+        "num": 14
       },
       "is_conclusive": true,
       "narrative": "Joe installed LogKext Daemon on the family MacBook Air prior to his divorce from Tracy. His declared purpose was monitoring Terry, his 15-year-old daughter, whose online behavior he was concerned about. The implementation captures all keystrokes indiscriminately from all users on the device \u2014 Tracy included \u2014 and exfiltrates them hourly via cron+postfix running as root to joe.sum.twelve@gmail.com. Joe had a former account on the device that was deleted during the separation; the home folder may "
@@ -200,7 +208,15 @@
     "pipeline_meta": {
       "artifact_count": 5,
       "avg_score": "3511/6250",
+      "ebs_adapter_mode": "motor",
       "expected_verdict": "SUSPICION",
+      "resolve": {
+        "motor_confidence": "0.56",
+        "motor_reason": "Significant signal with structural support (score=0.2803)",
+        "motor_score": "0.2803",
+        "motor_verdict": "SUSPICION",
+        "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+      },
       "source": "ebs_v1_json_adapter"
     },
     "signals": [

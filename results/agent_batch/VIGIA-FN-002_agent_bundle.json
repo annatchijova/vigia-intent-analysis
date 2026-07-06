@@ -1,15 +1,15 @@
 {
-  "agent_verdict": "MALICE",
-  "analysis_timestamp": "2026-07-05T15:27:33.970600+00:00",
+  "agent_verdict": "NOISE",
+  "analysis_timestamp": "2026-07-06T01:29:53.024912+00:00",
   "audit_trail": {
     "agent_version": "1.0.0-SANS-2026",
     "case_id": "VIGIA-FN-002",
-    "end_time": "2026-07-05T15:27:33.970607+00:00",
+    "end_time": "2026-07-06T01:29:53.024918+00:00",
     "entries": [
       {
         "action": "AGENT_INITIALIZED",
         "case_id": "VIGIA-FN-002",
-        "entry_sha256": "b1dfccc7275012e2d4da4ecd59d8db231d34001d8bb34cb32b36d34da5c9372e",
+        "entry_sha256": "719d6731bdde41805f75af806812114e9b9504999ad8de2b13b6b02866405461",
         "inputs_summary": {
           "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
           "case_id": "VIGIA-FN-002"
@@ -21,13 +21,13 @@
           "agent_version": "1.0.0-SANS-2026"
         },
         "seq": 1,
-        "timestamp": "2026-07-05T15:27:33.966967+00:00",
+        "timestamp": "2026-07-06T01:29:52.667637+00:00",
         "tool": "vigia_agent"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-FN-002",
-        "entry_sha256": "ebcfa3d3601502a4f18d4b93f913489912a6fd6eaba8b3fa24306d2ca7f208e7",
+        "entry_sha256": "fe9dc005e57b2fa687a9e5191961958ff3f4e30862d426315a8bca8d2ce6c9bc",
         "inputs_summary": {
           "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-FN-002.json"
         },
@@ -35,29 +35,29 @@
         "note": "Computing SHA-256 of original evidence",
         "outputs_summary": {},
         "seq": 2,
-        "timestamp": "2026-07-05T15:27:33.967054+00:00",
+        "timestamp": "2026-07-06T01:29:52.667725+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-FN-002",
-        "entry_sha256": "6a6da22cdd3c3ae0c25c24375e6e23a22808bcf2459ed80146e85acf8f96ae10",
+        "entry_sha256": "2dd6d2ece61c169ca1e0bbcf341d05f540a0afb3de21d1849db544adf5b6ccfb",
         "inputs_summary": {
           "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-FN-002.json"
         },
         "iteration": 0,
-        "note": "Evidence verified: b31538bc3f295e3b...",
+        "note": "Evidence verified: 4d1ce9028850ead8...",
         "outputs_summary": {
-          "sha256": "b31538bc3f295e3b14b1c39b5092b10df0776a1df7e55bdc02ac5adec74bfc22"
+          "sha256": "4d1ce9028850ead8c9c0fb5c73bd1d4f6bd815c96064ac4229ab0047a570242d"
         },
         "seq": 3,
-        "timestamp": "2026-07-05T15:27:33.967143+00:00",
+        "timestamp": "2026-07-06T01:29:52.667816+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "PIPELINE_EXECUTE",
         "case_id": "VIGIA-FN-002",
-        "entry_sha256": "7af24517fe25824b2d50ae609a89777be1fa63ddcef65cb5787a40f6db8e5165",
+        "entry_sha256": "345ef619c02854af31da011f0c156d69f258a154e30b81cc2905d3002517aa50",
         "inputs_summary": {
           "evidence": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-FN-002.json",
           "iteration": "0",
@@ -67,13 +67,13 @@
         "note": "Executing pipeline \u2014 iteration 0",
         "outputs_summary": {},
         "seq": 4,
-        "timestamp": "2026-07-05T15:27:33.967247+00:00",
+        "timestamp": "2026-07-06T01:29:52.667918+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "PIPELINE_COMPLETE",
         "case_id": "VIGIA-FN-002",
-        "entry_sha256": "f7eeef4a59484bf033eb16e1fac3a74effc0f72103443af1e7604384c5928cb8",
+        "entry_sha256": "0856000957fd6fd9c9eff87fc7f983f7bd21b4b68a5c1c2ca48c53e7fe2b707a",
         "inputs_summary": {
           "iteration": "0"
         },
@@ -81,17 +81,25 @@
         "note": "Pipeline completed \u2014 3 signals",
         "outputs_summary": {
           "abduction": {
-            "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
-            "best_posterior": "163/30000",
-            "confidence": "163/30000",
-            "is_conclusive": "False",
+            "best_hypothesis": "NO_SEMIOTIC_ANOMALY_DETECTED",
+            "best_posterior": "49/50",
+            "confidence": "49/50",
+            "is_conclusive": "True",
             "narrative": "Attacker installs a legitimate backup agent (Veeam) with a valid licence, configured to send data to a cloud instance they rented. The tool is legitimate, signed, and the traffic is indistinguishable ..."
           },
           "case_id": "VIGIA-FN-002",
           "pipeline_meta": {
             "artifact_count": "3",
             "avg_score": "163/6000",
+            "ebs_adapter_mode": "motor",
             "expected_verdict": "MALICE",
+            "resolve": {
+              "motor_confidence": "0.98",
+              "motor_reason": "Insufficient evidence of malicious intent (score=0.0179)",
+              "motor_score": "0.0179",
+              "motor_verdict": "NOISE",
+              "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+            },
             "source": "ebs_v1_json_adapter"
           },
           "signals": [
@@ -122,13 +130,13 @@
           ]
         },
         "seq": 5,
-        "timestamp": "2026-07-05T15:27:33.969858+00:00",
+        "timestamp": "2026-07-06T01:29:53.024533+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "CONTRADICTION_CHECK",
         "case_id": "VIGIA-FN-002",
-        "entry_sha256": "835ba810ba19a924dc3172cb0ddc6d132a807e5fbe998f88d061c6dd38b817ab",
+        "entry_sha256": "91f7a831fea38fa995edd9f99d1f97573331303b862513ad5c1e1ebcfe557b41",
         "inputs_summary": {
           "n_signals": "3"
         },
@@ -139,76 +147,60 @@
           "threshold": "2"
         },
         "seq": 6,
-        "timestamp": "2026-07-05T15:27:33.969958+00:00",
+        "timestamp": "2026-07-06T01:29:53.024653+00:00",
         "tool": "contradiction_detector"
       },
       {
         "action": "AGENT_EXIT",
         "case_id": "VIGIA-FN-002",
-        "entry_sha256": "81490896374ba70ab6d24f48573b4a0d96b05ca3d5f9c3e08d124ecbeb3df7fd",
+        "entry_sha256": "8be80180e8dd893aacc2a66876bbdb1139e7becadf7f974e0ddba47c55787173",
         "inputs_summary": {
-          "verdict": "MALICIOUS_INTENT_DETECTED"
+          "verdict": "NO_SEMIOTIC_ANOMALY_DETECTED"
         },
         "iteration": 0,
-        "note": "Exit code 1 (MALICE) \u2014 analysis complete.",
+        "note": "Exit code 0 (NOISE) \u2014 analysis complete.",
         "outputs_summary": {
-          "agent_verdict": "MALICE",
-          "exit_code": "1"
+          "agent_verdict": "NOISE",
+          "exit_code": "0"
         },
         "seq": 7,
-        "timestamp": "2026-07-05T15:27:33.970137+00:00",
+        "timestamp": "2026-07-06T01:29:53.024860+00:00",
         "tool": "vigia_agent"
       }
     ],
-    "start_time": "2026-07-05T15:27:33.966735+00:00",
+    "start_time": "2026-07-06T01:29:52.667388+00:00",
     "total_entries": 7
   },
   "case_id": "VIGIA-FN-002",
   "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-FN-002.json",
-  "evidence_sha256": "b31538bc3f295e3b14b1c39b5092b10df0776a1df7e55bdc02ac5adec74bfc22",
+  "evidence_sha256": "4d1ce9028850ead8c9c0fb5c73bd1d4f6bd815c96064ac4229ab0047a570242d",
   "iterations_executed": 1,
-  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-FN-002 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/VIGIA-FN-002.json\nEvidence SHA-256: b31538bc3f295e3b14b1c39b5092b10df0776a1df7e55bdc02ac5adec74bfc22\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 163/30000\nConclusive: NO \u2014 requires human review\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 3 se\u00f1al(es): 3 primaria(s) de ['sift_change_management', 'sift_netflow', 'sift_process_list'], 0 derivada(s)/no-analizada(s). Top z: veeam_agent.exe running with valid certi=0.05, NO change ticket found for Veeam install=0.02, Backup traffic to 198.51.100.77 on port =0.01.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: MALICIOUS_INTENT_DETECTED. Conclusiva: no \u2014 requiere revisi\u00f3n humana.\n\nRazonamiento del motor abductivo:\nAttacker installs a legitimate backup agent (Veeam) with a valid licence, configured to send data to a cloud instance they rented. The tool is legitimate, signed, and the traffic is indistinguishable from real backups.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [veeam_agent.exe running with valid certificate] z=0.048 conf=0.95 \u2014 \n  [NO change ticket found for Veeam installation on server 10.0.8.44] z=0.024 conf=0.30 \u2014 \n  [Backup traffic to 198.51.100.77 on port 443] z=0.010 conf=0.20 \u2014 \n\n--- FINAL ALERT LEVEL ---\nMEDIUM \u2014 MALICE verdict from posterior aggregation. Individual z-scores below threshold. Full signal review recommended. Alert floored (B-028/B-065).\nReconciliation: verdict MALICE rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 3 | Derived: 0 | Total: 3",
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-FN-002 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/VIGIA-FN-002.json\nEvidence SHA-256: 4d1ce9028850ead8c9c0fb5c73bd1d4f6bd815c96064ac4229ab0047a570242d\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: NO_SEMIOTIC_ANOMALY_DETECTED\nPosterior confidence: 49/50\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 3 se\u00f1al(es): 3 primaria(s) de ['sift_change_management', 'sift_netflow', 'sift_process_list'], 0 derivada(s)/no-analizada(s). Top z: veeam_agent.exe running with valid certi=0.05, NO change ticket found for Veeam install=0.02, Backup traffic to 198.51.100.77 on port =0.01.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: NO_SEMIOTIC_ANOMALY_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nAttacker installs a legitimate backup agent (Veeam) with a valid licence, configured to send data to a cloud instance they rented. The tool is legitimate, signed, and the traffic is indistinguishable from real backups.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [veeam_agent.exe running with valid certificate] z=0.048 conf=0.95 \u2014 \n  [NO change ticket found for Veeam installation on server 10.0.8.44] z=0.024 conf=0.30 \u2014 \n  [Backup traffic to 198.51.100.77 on port 443] z=0.010 conf=0.20 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 3 | Derived: 0 | Total: 3",
   "pipeline_results": {
     "abduction": {
-      "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
-      "best_posterior": "163/30000",
+      "best_hypothesis": "NO_SEMIOTIC_ANOMALY_DETECTED",
+      "best_posterior": "49/50",
       "confidence": {
         "__fraction__": true,
-        "den": 30000,
-        "num": 163
+        "den": 50,
+        "num": 49
       },
-      "devil_advocate": {
-        "aggregation": {
-          "k": 3,
-          "method": "top_k_already_validated_matches_v2",
-          "total_gap_mass": "0"
-        },
-        "counterfactual_summary": {
-          "primary_alternative_hypothesis": null
-        },
-        "decision_context": {
-          "confidence": "163/30000",
-          "mapped_verdict": "MALICIOUS_INTENT_DETECTED",
-          "raw_verdict": "MALICIOUS_INTENT_DETECTED",
-          "score": "163/6000"
-        },
-        "devil_advocate_source": "deterministic_no_pattern_data_available",
-        "meta": {
-          "deterministic": true,
-          "generated_from": "case_pattern_library"
-        },
-        "narrative": "Eco's Razor (Abductive Falsification) applied to verdict MALICIOUS_INTENT_DETECTED. Pattern-matching data was not available on this code path \u2014 CasePatternLibrary is not invoked here by design (agent audit-trail mode (vigia_agent.py \u2014 JSON-replay / autonomous path); see KNOWN_LIMITATIONS.md). No structured counter-hypothesis could be derived deterministically. This is a documented scope limitation of the current code path, not an absence of falsification attempt.",
-        "pattern_evidence_gaps": [],
-        "version": "r7-da-v1"
-      },
-      "is_conclusive": false,
+      "is_conclusive": true,
       "narrative": "Attacker installs a legitimate backup agent (Veeam) with a valid licence, configured to send data to a cloud instance they rented. The tool is legitimate, signed, and the traffic is indistinguishable from real backups."
     },
     "case_id": "VIGIA-FN-002",
     "pipeline_meta": {
       "artifact_count": 3,
       "avg_score": "163/6000",
+      "ebs_adapter_mode": "motor",
       "expected_verdict": "MALICE",
+      "resolve": {
+        "motor_confidence": "0.98",
+        "motor_reason": "Insufficient evidence of malicious intent (score=0.0179)",
+        "motor_score": "0.0179",
+        "motor_verdict": "NOISE",
+        "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+      },
       "source": "ebs_v1_json_adapter"
     },
     "signals": [

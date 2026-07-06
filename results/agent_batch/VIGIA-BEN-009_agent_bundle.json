@@ -1,15 +1,15 @@
 {
   "agent_verdict": "NOISE",
-  "analysis_timestamp": "2026-07-05T15:27:38.666499+00:00",
+  "analysis_timestamp": "2026-07-06T01:30:32.636681+00:00",
   "audit_trail": {
     "agent_version": "1.0.0-SANS-2026",
     "case_id": "VIGIA-BEN-009",
-    "end_time": "2026-07-05T15:27:38.666504+00:00",
+    "end_time": "2026-07-06T01:30:32.636686+00:00",
     "entries": [
       {
         "action": "AGENT_INITIALIZED",
         "case_id": "VIGIA-BEN-009",
-        "entry_sha256": "4873660ae66dad9a92f9b55b17d9d94b2f21a49b46387f7ee1af8267f8bb03c2",
+        "entry_sha256": "5b7068a152fdd4fd7e52808a0d789375bcb3b21a9444e97c7467bb11c567b664",
         "inputs_summary": {
           "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
           "case_id": "VIGIA-BEN-009"
@@ -21,13 +21,13 @@
           "agent_version": "1.0.0-SANS-2026"
         },
         "seq": 1,
-        "timestamp": "2026-07-05T15:27:38.663323+00:00",
+        "timestamp": "2026-07-06T01:30:32.299172+00:00",
         "tool": "vigia_agent"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-BEN-009",
-        "entry_sha256": "d9a054de019041232718fec50b3fa35d1fb600b90d9c368bcdcf5a282745eaa8",
+        "entry_sha256": "5d3c32d46233fbf53bd40f25a95851cf0ba471d891dfbb83bdcbeaa59b2020aa",
         "inputs_summary": {
           "path": "/home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-BEN-009.json"
         },
@@ -35,29 +35,29 @@
         "note": "Computing SHA-256 of original evidence",
         "outputs_summary": {},
         "seq": 2,
-        "timestamp": "2026-07-05T15:27:38.663411+00:00",
+        "timestamp": "2026-07-06T01:30:32.299258+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-BEN-009",
-        "entry_sha256": "8667b3c02501169e5b92a6669f3920e2d111d2a8cd1775195b23068072d0f37f",
+        "entry_sha256": "bbbcdcfbf728c3d16266f7476a4ff62e6d97f72c3344c75d4c6c39f27b2df465",
         "inputs_summary": {
           "path": "/home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-BEN-009.json"
         },
         "iteration": 0,
-        "note": "Evidence verified: 3da212c9f46e75ab...",
+        "note": "Evidence verified: aebbeb1752d6c27d...",
         "outputs_summary": {
-          "sha256": "3da212c9f46e75abc67cf1fc63ad944a872dac34101cca3cdda358d61da1abf5"
+          "sha256": "aebbeb1752d6c27d20b66c6025288fd13fbf65b2963a0c4e4e907537313fed79"
         },
         "seq": 3,
-        "timestamp": "2026-07-05T15:27:38.663525+00:00",
+        "timestamp": "2026-07-06T01:30:32.299356+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "PIPELINE_EXECUTE",
         "case_id": "VIGIA-BEN-009",
-        "entry_sha256": "32112e94114aaf9f6114eb7a943ff080e60196384ba1cdb489c313086ac451fd",
+        "entry_sha256": "3232209f4efc7d8396237f7dd82e5f6b973d41d3d0b20fdd223d14c34137c3f0",
         "inputs_summary": {
           "evidence": "/home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-BEN-009.json",
           "iteration": "0",
@@ -67,13 +67,13 @@
         "note": "Executing pipeline \u2014 iteration 0",
         "outputs_summary": {},
         "seq": 4,
-        "timestamp": "2026-07-05T15:27:38.663631+00:00",
+        "timestamp": "2026-07-06T01:30:32.299472+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "PIPELINE_COMPLETE",
         "case_id": "VIGIA-BEN-009",
-        "entry_sha256": "f76b355501a44bd9fc479acef5d58a56e1bca3347545971d49977d8560ecf6c7",
+        "entry_sha256": "1281cfa06cb755c303600f5f2f72ba9413326639ba8cd87904779bdd5ce98fb8",
         "inputs_summary": {
           "iteration": "0"
         },
@@ -82,16 +82,24 @@
         "outputs_summary": {
           "abduction": {
             "best_hypothesis": "NO_SEMIOTIC_ANOMALY_DETECTED",
-            "best_posterior": "1/80",
-            "confidence": "1/80",
-            "is_conclusive": "False",
+            "best_posterior": "24/25",
+            "confidence": "24/25",
+            "is_conclusive": "True",
             "narrative": "Directorio /var/lib/legacy_app tiene permisos 777. Es requerimiento t\u00e9cnico de aplicaci\u00f3n de 1998 que no soporta ACLs modernas, documentado en deuda t\u00e9cnica y con plan de migraci\u00f3n aprobado."
           },
           "case_id": "VIGIA-BEN-009",
           "pipeline_meta": {
             "artifact_count": "3",
             "avg_score": "1/16",
+            "ebs_adapter_mode": "motor",
             "expected_verdict": "NOISE",
+            "resolve": {
+              "motor_confidence": "0.96",
+              "motor_reason": "Insufficient evidence of malicious intent (score=0.0361)",
+              "motor_score": "0.0361",
+              "motor_verdict": "NOISE",
+              "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+            },
             "source": "ebs_v1_json_adapter"
           },
           "signals": [
@@ -122,13 +130,13 @@
           ]
         },
         "seq": 5,
-        "timestamp": "2026-07-05T15:27:38.666161+00:00",
+        "timestamp": "2026-07-06T01:30:32.636317+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "CONTRADICTION_CHECK",
         "case_id": "VIGIA-BEN-009",
-        "entry_sha256": "b4df4742f129a532495d1ea939c77f7807bb24a61158f9f47a4036c0d445b210",
+        "entry_sha256": "29e5c37bbccc63f7f29ccbde9209fbbe61caeea7d3c910943ff85713ec281484",
         "inputs_summary": {
           "n_signals": "3"
         },
@@ -139,13 +147,13 @@
           "threshold": "2"
         },
         "seq": 6,
-        "timestamp": "2026-07-05T15:27:38.666261+00:00",
+        "timestamp": "2026-07-06T01:30:32.636439+00:00",
         "tool": "contradiction_detector"
       },
       {
         "action": "AGENT_EXIT",
         "case_id": "VIGIA-BEN-009",
-        "entry_sha256": "6bc6b288df3b20f0521222a77e1e60be1406172a7c554bdcee5299ffa44d75af",
+        "entry_sha256": "0433a0d6fcd6b40a47ef48866a5de80efc0b71165a5e8963caeebbec4c75771b",
         "inputs_summary": {
           "verdict": "NO_SEMIOTIC_ANOMALY_DETECTED"
         },
@@ -156,35 +164,43 @@
           "exit_code": "0"
         },
         "seq": 7,
-        "timestamp": "2026-07-05T15:27:38.666448+00:00",
+        "timestamp": "2026-07-06T01:30:32.636628+00:00",
         "tool": "vigia_agent"
       }
     ],
-    "start_time": "2026-07-05T15:27:38.663091+00:00",
+    "start_time": "2026-07-06T01:30:32.298954+00:00",
     "total_entries": 7
   },
   "case_id": "VIGIA-BEN-009",
   "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-BEN-009.json",
-  "evidence_sha256": "3da212c9f46e75abc67cf1fc63ad944a872dac34101cca3cdda358d61da1abf5",
+  "evidence_sha256": "aebbeb1752d6c27d20b66c6025288fd13fbf65b2963a0c4e4e907537313fed79",
   "iterations_executed": 1,
-  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-BEN-009 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-BEN-009.json\nEvidence SHA-256: 3da212c9f46e75abc67cf1fc63ad944a872dac34101cca3cdda358d61da1abf5\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: NO_SEMIOTIC_ANOMALY_DETECTED\nPosterior confidence: 1/80\nConclusive: NO \u2014 requires human review\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 3 se\u00f1al(es): 3 primaria(s) de ['legacy_converter'], 0 derivada(s)/no-analizada(s). Top z: Application: legacy_app (PID 3344, start=0.07, Technical debt ticket: TD-2019-042 | 'le=0.06, ls -ld /var/lib/legacy_app | drwxrwxrwx =0.05.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: NO_SEMIOTIC_ANOMALY_DETECTED. Conclusiva: no \u2014 requiere revisi\u00f3n humana.\n\nRazonamiento del motor abductivo:\nDirectorio /var/lib/legacy_app tiene permisos 777. Es requerimiento t\u00e9cnico de aplicaci\u00f3n de 1998 que no soporta ACLs modernas, documentado en deuda t\u00e9cnica y con plan de migraci\u00f3n aprobado.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Application: legacy_app (PID 3344, started 2020-01-02) | User: legacy_] z=0.071 conf=0.30 \u2014 \n  [Technical debt ticket: TD-2019-042 | 'legacy_app v1.2 requires 777 for] z=0.064 conf=0.30 \u2014 \n  [ls -ld /var/lib/legacy_app | drwxrwxrwx 3 root root 4096 2020-01-01 /v] z=0.052 conf=0.30 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 3 | Derived: 0 | Total: 3",
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-BEN-009 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-BEN-009.json\nEvidence SHA-256: aebbeb1752d6c27d20b66c6025288fd13fbf65b2963a0c4e4e907537313fed79\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: NO_SEMIOTIC_ANOMALY_DETECTED\nPosterior confidence: 24/25\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 3 se\u00f1al(es): 3 primaria(s) de ['legacy_converter'], 0 derivada(s)/no-analizada(s). Top z: Application: legacy_app (PID 3344, start=0.07, Technical debt ticket: TD-2019-042 | 'le=0.06, ls -ld /var/lib/legacy_app | drwxrwxrwx =0.05.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: NO_SEMIOTIC_ANOMALY_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nDirectorio /var/lib/legacy_app tiene permisos 777. Es requerimiento t\u00e9cnico de aplicaci\u00f3n de 1998 que no soporta ACLs modernas, documentado en deuda t\u00e9cnica y con plan de migraci\u00f3n aprobado.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Application: legacy_app (PID 3344, started 2020-01-02) | User: legacy_] z=0.071 conf=0.30 \u2014 \n  [Technical debt ticket: TD-2019-042 | 'legacy_app v1.2 requires 777 for] z=0.064 conf=0.30 \u2014 \n  [ls -ld /var/lib/legacy_app | drwxrwxrwx 3 root root 4096 2020-01-01 /v] z=0.052 conf=0.30 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 3 | Derived: 0 | Total: 3",
   "pipeline_results": {
     "abduction": {
       "best_hypothesis": "NO_SEMIOTIC_ANOMALY_DETECTED",
-      "best_posterior": "1/80",
+      "best_posterior": "24/25",
       "confidence": {
         "__fraction__": true,
-        "den": 80,
-        "num": 1
+        "den": 25,
+        "num": 24
       },
-      "is_conclusive": false,
+      "is_conclusive": true,
       "narrative": "Directorio /var/lib/legacy_app tiene permisos 777. Es requerimiento t\u00e9cnico de aplicaci\u00f3n de 1998 que no soporta ACLs modernas, documentado en deuda t\u00e9cnica y con plan de migraci\u00f3n aprobado."
     },
     "case_id": "VIGIA-BEN-009",
     "pipeline_meta": {
       "artifact_count": 3,
       "avg_score": "1/16",
+      "ebs_adapter_mode": "motor",
       "expected_verdict": "NOISE",
+      "resolve": {
+        "motor_confidence": "0.96",
+        "motor_reason": "Insufficient evidence of malicious intent (score=0.0361)",
+        "motor_score": "0.0361",
+        "motor_verdict": "NOISE",
+        "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+      },
       "source": "ebs_v1_json_adapter"
     },
     "signals": [

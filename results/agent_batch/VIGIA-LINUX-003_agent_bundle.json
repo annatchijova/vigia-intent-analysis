@@ -1,15 +1,15 @@
 {
   "agent_verdict": "MALICE",
-  "analysis_timestamp": "2026-07-05T15:27:34.384337+00:00",
+  "analysis_timestamp": "2026-07-06T01:29:56.500918+00:00",
   "audit_trail": {
     "agent_version": "1.0.0-SANS-2026",
     "case_id": "VIGIA-LINUX-003",
-    "end_time": "2026-07-05T15:27:34.384343+00:00",
+    "end_time": "2026-07-06T01:29:56.500924+00:00",
     "entries": [
       {
         "action": "AGENT_INITIALIZED",
         "case_id": "VIGIA-LINUX-003",
-        "entry_sha256": "0f39138df743381a696ae74475b70e334ed3614009b61e28d8040151a745da47",
+        "entry_sha256": "fde8b6adf58a11183269768fcf7defd1cbae670c0d022e29f267a62cbff96d7b",
         "inputs_summary": {
           "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
           "case_id": "VIGIA-LINUX-003"
@@ -21,13 +21,13 @@
           "agent_version": "1.0.0-SANS-2026"
         },
         "seq": 1,
-        "timestamp": "2026-07-05T15:27:34.380667+00:00",
+        "timestamp": "2026-07-06T01:29:56.159633+00:00",
         "tool": "vigia_agent"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-LINUX-003",
-        "entry_sha256": "ee159e29a4daaa578a3a14aa33d2e089f2e6842a8d82c848551b8396be32168e",
+        "entry_sha256": "8fde79d45578314831b1ec8e8e2c8b462fb6360489790b2ae6736119b87a8e14",
         "inputs_summary": {
           "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-LINUX-003.json"
         },
@@ -35,29 +35,29 @@
         "note": "Computing SHA-256 of original evidence",
         "outputs_summary": {},
         "seq": 2,
-        "timestamp": "2026-07-05T15:27:34.380755+00:00",
+        "timestamp": "2026-07-06T01:29:56.159716+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-LINUX-003",
-        "entry_sha256": "3496977a1270dde0f4b083cb0d848996ed8d429e7b86d276da230f7c8d96cfde",
+        "entry_sha256": "314ac1cbdb1ce001f24324cb8a4c79785e8e7bb3a2adaa12a5e1f43b481a02fa",
         "inputs_summary": {
           "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-LINUX-003.json"
         },
         "iteration": 0,
-        "note": "Evidence verified: 5a34c9c89f97f3e2...",
+        "note": "Evidence verified: 5f8c9625fabe1ac5...",
         "outputs_summary": {
-          "sha256": "5a34c9c89f97f3e2c36cfacca12cc23232f877b7b1527fdceb95e69612705c43"
+          "sha256": "5f8c9625fabe1ac520853cc8ad029d8e4ae49532f7b47ec1dbe4cbd7098c2692"
         },
         "seq": 3,
-        "timestamp": "2026-07-05T15:27:34.380862+00:00",
+        "timestamp": "2026-07-06T01:29:56.159832+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "PIPELINE_EXECUTE",
         "case_id": "VIGIA-LINUX-003",
-        "entry_sha256": "0ff132ed2b3bb0d4b220d4bfc539b5fb84e2da1de3c15f7b576f137502f968c1",
+        "entry_sha256": "738494114e204ef8cc7b26ceb52c64869ac33a63f2f0a71073a24f51ad2aa4aa",
         "inputs_summary": {
           "evidence": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-LINUX-003.json",
           "iteration": "0",
@@ -67,13 +67,13 @@
         "note": "Executing pipeline \u2014 iteration 0",
         "outputs_summary": {},
         "seq": 4,
-        "timestamp": "2026-07-05T15:27:34.380965+00:00",
+        "timestamp": "2026-07-06T01:29:56.159934+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "PIPELINE_COMPLETE",
         "case_id": "VIGIA-LINUX-003",
-        "entry_sha256": "d7a137ce6902bb8ddedb335a178173b18aa501bd2e041c2ea6a1620b6e6e926b",
+        "entry_sha256": "254f9c5c162b53aa658488604a972b6cb65459d51b3286fada51a251f26dbc34",
         "inputs_summary": {
           "iteration": "0"
         },
@@ -82,8 +82,8 @@
         "outputs_summary": {
           "abduction": {
             "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
-            "best_posterior": "4031/25000",
-            "confidence": "4031/25000",
+            "best_posterior": "19/20",
+            "confidence": "19/20",
             "is_conclusive": "True",
             "narrative": "A Linux server running Apache RocketMQ 5.0.0 was compromised via CVE-2023-33246 (unauthenticated RCE, CVSS 9.8). The threat actor deployed the perfctl malware family, which replaced system binaries /u..."
           },
@@ -91,7 +91,15 @@
           "pipeline_meta": {
             "artifact_count": "5",
             "avg_score": "4031/5000",
+            "ebs_adapter_mode": "motor",
             "expected_verdict": "MALICE",
+            "resolve": {
+              "motor_confidence": "0.95",
+              "motor_reason": "Intent score 0.9385 exceeds MALICE threshold (P2+acq_assurance scale, threshold=0.33)",
+              "motor_score": "0.9385",
+              "motor_verdict": "MALICE",
+              "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+            },
             "source": "ebs_v1_json_adapter"
           },
           "signals": [
@@ -138,13 +146,13 @@
           ]
         },
         "seq": 5,
-        "timestamp": "2026-07-05T15:27:34.383587+00:00",
+        "timestamp": "2026-07-06T01:29:56.500385+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "CONTRADICTION_CHECK",
         "case_id": "VIGIA-LINUX-003",
-        "entry_sha256": "8ba979e24c61f4d59289c5e3cae204686ff1eef886cb2358b6143c9f978f9cbd",
+        "entry_sha256": "699529948947a6aca452187cb4525dbffae2896bfdee59cf6e41e453ed25da34",
         "inputs_summary": {
           "n_signals": "5"
         },
@@ -155,13 +163,13 @@
           "threshold": "2"
         },
         "seq": 6,
-        "timestamp": "2026-07-05T15:27:34.383707+00:00",
+        "timestamp": "2026-07-06T01:29:56.500526+00:00",
         "tool": "contradiction_detector"
       },
       {
         "action": "AGENT_EXIT",
         "case_id": "VIGIA-LINUX-003",
-        "entry_sha256": "6daddc886ce849cce0ff6c941e059253b1de4af984578ece5c562ac8fff23447",
+        "entry_sha256": "7eb6ebd1ea4595e5cca82c240ae18961b8b99276589089333bd4ae6e9b7381e7",
         "inputs_summary": {
           "verdict": "MALICIOUS_INTENT_DETECTED"
         },
@@ -172,26 +180,26 @@
           "exit_code": "1"
         },
         "seq": 7,
-        "timestamp": "2026-07-05T15:27:34.383896+00:00",
+        "timestamp": "2026-07-06T01:29:56.500738+00:00",
         "tool": "vigia_agent"
       }
     ],
-    "start_time": "2026-07-05T15:27:34.380422+00:00",
+    "start_time": "2026-07-06T01:29:56.159399+00:00",
     "total_entries": 7
   },
   "case_id": "VIGIA-LINUX-003",
   "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-LINUX-003.json",
-  "evidence_sha256": "5a34c9c89f97f3e2c36cfacca12cc23232f877b7b1527fdceb95e69612705c43",
+  "evidence_sha256": "5f8c9625fabe1ac520853cc8ad029d8e4ae49532f7b47ec1dbe4cbd7098c2692",
   "iterations_executed": 1,
-  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-LINUX-003 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/VIGIA-LINUX-003.json\nEvidence SHA-256: 5a34c9c89f97f3e2c36cfacca12cc23232f877b7b1527fdceb95e69612705c43\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 4031/25000\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 5 se\u00f1al(es): 5 primaria(s) de ['sift_file_integrity', 'sift_linux_forensics', 'sift_process_monitor', 'sift_static_analysis'], 0 derivada(s)/no-analizada(s). Top z: File integrity check against dpkg packag=0.93, /etc/ld.so.preload contains a single non=0.82, Direct inspection of /proc/<PIDs> reveal=0.81.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: MALICIOUS_INTENT_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nA Linux server running Apache RocketMQ 5.0.0 was compromised via CVE-2023-33246 (unauthenticated RCE, CVSS 9.8). The threat actor deployed the perfctl malware family, which replaced system binaries /usr/bin/crontab, /usr/bin/ldd, and /usr/bin/top with trojanized versions and installed a userland rootkit via LD_PRELOAD (/lib/libgcwrap.so). The trojanized crontab binary intercepts crontab -l output and suppresses all malicious cron entries, creating a forensic blind spot. A watchdog script at /dev\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [File integrity check against dpkg package manifest reveals that /usr/b] z=0.931 conf=0.96 \u2014 \n  [/etc/ld.so.preload contains a single non-standard entry: /lib/libgcwra] z=0.818 conf=0.93 \u2014 \n  [Direct inspection of /proc/<PIDs> reveals active processes with cmdlin] z=0.809 conf=0.87 \u2014 \n  [Script recovered at /dev/health (non-standard path for an executable: ] z=0.801 conf=0.88 \u2014 \n  [/tmp/.xdiag/int/.per.s is a runtime log file written by the malware co] z=0.671 conf=0.79 \u2014 \n\n--- FINAL ALERT LEVEL ---\nHIGH \u2014 MALICE verdict from Bayesian posterior aggregation. Individual z-scores below threshold (distributed evidence pattern: no single dominant signal, but aggregate posterior is decisive). Alert floored (B-028/B-065).\nReconciliation: verdict MALICE rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 5 | Derived: 0 | Total: 5",
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-LINUX-003 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/VIGIA-LINUX-003.json\nEvidence SHA-256: 5f8c9625fabe1ac520853cc8ad029d8e4ae49532f7b47ec1dbe4cbd7098c2692\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 19/20\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 5 se\u00f1al(es): 5 primaria(s) de ['sift_file_integrity', 'sift_linux_forensics', 'sift_process_monitor', 'sift_static_analysis'], 0 derivada(s)/no-analizada(s). Top z: File integrity check against dpkg packag=0.93, /etc/ld.so.preload contains a single non=0.82, Direct inspection of /proc/<PIDs> reveal=0.81.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: MALICIOUS_INTENT_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nA Linux server running Apache RocketMQ 5.0.0 was compromised via CVE-2023-33246 (unauthenticated RCE, CVSS 9.8). The threat actor deployed the perfctl malware family, which replaced system binaries /usr/bin/crontab, /usr/bin/ldd, and /usr/bin/top with trojanized versions and installed a userland rootkit via LD_PRELOAD (/lib/libgcwrap.so). The trojanized crontab binary intercepts crontab -l output and suppresses all malicious cron entries, creating a forensic blind spot. A watchdog script at /dev\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [File integrity check against dpkg package manifest reveals that /usr/b] z=0.931 conf=0.96 \u2014 \n  [/etc/ld.so.preload contains a single non-standard entry: /lib/libgcwra] z=0.818 conf=0.93 \u2014 \n  [Direct inspection of /proc/<PIDs> reveals active processes with cmdlin] z=0.809 conf=0.87 \u2014 \n  [Script recovered at /dev/health (non-standard path for an executable: ] z=0.801 conf=0.88 \u2014 \n  [/tmp/.xdiag/int/.per.s is a runtime log file written by the malware co] z=0.671 conf=0.79 \u2014 \n\n--- FINAL ALERT LEVEL ---\nHIGH \u2014 MALICE verdict from Bayesian posterior aggregation. Individual z-scores below threshold (distributed evidence pattern: no single dominant signal, but aggregate posterior is decisive). Alert floored (B-028/B-065).\nReconciliation: verdict MALICE rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 5 | Derived: 0 | Total: 5",
   "pipeline_results": {
     "abduction": {
       "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
-      "best_posterior": "4031/25000",
+      "best_posterior": "19/20",
       "confidence": {
         "__fraction__": true,
-        "den": 25000,
-        "num": 4031
+        "den": 20,
+        "num": 19
       },
       "devil_advocate": {
         "aggregation": {
@@ -203,7 +211,7 @@
           "primary_alternative_hypothesis": null
         },
         "decision_context": {
-          "confidence": "4031/25000",
+          "confidence": "19/20",
           "mapped_verdict": "MALICIOUS_INTENT_DETECTED",
           "raw_verdict": "MALICIOUS_INTENT_DETECTED",
           "score": "4031/5000"
@@ -224,7 +232,15 @@
     "pipeline_meta": {
       "artifact_count": 5,
       "avg_score": "4031/5000",
+      "ebs_adapter_mode": "motor",
       "expected_verdict": "MALICE",
+      "resolve": {
+        "motor_confidence": "0.95",
+        "motor_reason": "Intent score 0.9385 exceeds MALICE threshold (P2+acq_assurance scale, threshold=0.33)",
+        "motor_score": "0.9385",
+        "motor_verdict": "MALICE",
+        "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+      },
       "source": "ebs_v1_json_adapter"
     },
     "signals": [

@@ -1,15 +1,15 @@
 {
   "agent_verdict": "INTENT",
-  "analysis_timestamp": "2026-07-05T15:27:40.124597+00:00",
+  "analysis_timestamp": "2026-07-06T01:30:44.987612+00:00",
   "audit_trail": {
     "agent_version": "1.0.0-SANS-2026",
     "case_id": "VIGIA_BREAK_010_OVERPERFECT",
-    "end_time": "2026-07-05T15:27:40.124602+00:00",
+    "end_time": "2026-07-06T01:30:44.987617+00:00",
     "entries": [
       {
         "action": "AGENT_INITIALIZED",
         "case_id": "VIGIA_BREAK_010_OVERPERFECT",
-        "entry_sha256": "17e6c0deb9cba3eb0cd45d4c1cc2899ccc952440ee353ded789f29d0d56395e9",
+        "entry_sha256": "41aab4dce1bd024a561b5479c26fbf60d65b0c7745f927b592b43c8cb4bf0405",
         "inputs_summary": {
           "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
           "case_id": "VIGIA_BREAK_010_OVERPERFECT"
@@ -21,13 +21,13 @@
           "agent_version": "1.0.0-SANS-2026"
         },
         "seq": 1,
-        "timestamp": "2026-07-05T15:27:40.121480+00:00",
+        "timestamp": "2026-07-06T01:30:44.650739+00:00",
         "tool": "vigia_agent"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA_BREAK_010_OVERPERFECT",
-        "entry_sha256": "5d6c53d683fc41c5cc604570ff5a691e12df05ec989faade065e177e386225c9",
+        "entry_sha256": "c85d0780e280f0159a7035395beb02f1627933bb13e5c07f98aee8c6728e9aa9",
         "inputs_summary": {
           "path": "/home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA_BREAK_010_OVERPERFECT.json"
         },
@@ -35,29 +35,29 @@
         "note": "Computing SHA-256 of original evidence",
         "outputs_summary": {},
         "seq": 2,
-        "timestamp": "2026-07-05T15:27:40.121567+00:00",
+        "timestamp": "2026-07-06T01:30:44.650822+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA_BREAK_010_OVERPERFECT",
-        "entry_sha256": "9c7ddcb4fc31bb3edf0c80bbfe0beeb438640dda19b2b6ba9da2436db2d067e0",
+        "entry_sha256": "e65c80f9a7433c67a85a08b203e4b9af1df2e656ad883c26d2aaf391e0d69033",
         "inputs_summary": {
           "path": "/home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA_BREAK_010_OVERPERFECT.json"
         },
         "iteration": 0,
-        "note": "Evidence verified: 9a9b4ea88d82b2d4...",
+        "note": "Evidence verified: 60d3df5fd5438110...",
         "outputs_summary": {
-          "sha256": "9a9b4ea88d82b2d48f23c9b48dfb88b25f32012782ffb1d2e8d1618500195429"
+          "sha256": "60d3df5fd5438110b049c7db12ab7c26e878acc5ef0b7317ce29bf7fa9a8108d"
         },
         "seq": 3,
-        "timestamp": "2026-07-05T15:27:40.121654+00:00",
+        "timestamp": "2026-07-06T01:30:44.650911+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "PIPELINE_EXECUTE",
         "case_id": "VIGIA_BREAK_010_OVERPERFECT",
-        "entry_sha256": "367a08a244f391b24ef8a477bed32bf220f51bb8f7d9bcf8df82b62bb7d670f9",
+        "entry_sha256": "b6ffc458ef7be43231e02695c8257ed30c32eb6955c8075192dfdffdfd9b2ffb",
         "inputs_summary": {
           "evidence": "/home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA_BREAK_010_OVERPERFECT.json",
           "iteration": "0",
@@ -67,13 +67,13 @@
         "note": "Executing pipeline \u2014 iteration 0",
         "outputs_summary": {},
         "seq": 4,
-        "timestamp": "2026-07-05T15:27:40.121758+00:00",
+        "timestamp": "2026-07-06T01:30:44.651015+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "PIPELINE_COMPLETE",
         "case_id": "VIGIA_BREAK_010_OVERPERFECT",
-        "entry_sha256": "2fa9df0b65858d3bdb21192ce61092e2aad648770d4ddb308734b5a385a7e14f",
+        "entry_sha256": "689b5069d5e7c4afe585308e6f448515f4463172102c288dff0eb401fc4847b1",
         "inputs_summary": {
           "iteration": "0"
         },
@@ -82,16 +82,24 @@
         "outputs_summary": {
           "abduction": {
             "best_hypothesis": "SUSPICION_DETECTED",
-            "best_posterior": "51/400",
-            "confidence": "51/400",
-            "is_conclusive": "True",
+            "best_posterior": "1/5",
+            "confidence": "1/5",
+            "is_conclusive": "False",
             "narrative": "Logs demasiado perfectos"
           },
           "case_id": "VIGIA_BREAK_010_OVERPERFECT",
           "pipeline_meta": {
             "artifact_count": "2",
             "avg_score": "51/80",
+            "ebs_adapter_mode": "motor",
             "expected_verdict": "SUSPICION",
+            "resolve": {
+              "motor_confidence": "0.2",
+              "motor_reason": "Significant signal with structural support (score=0.1010)",
+              "motor_score": "0.101",
+              "motor_verdict": "SUSPICION",
+              "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+            },
             "source": "ebs_v1_json_adapter"
           },
           "signals": [
@@ -114,13 +122,13 @@
           ]
         },
         "seq": 5,
-        "timestamp": "2026-07-05T15:27:40.124262+00:00",
+        "timestamp": "2026-07-06T01:30:44.987265+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "CONTRADICTION_CHECK",
         "case_id": "VIGIA_BREAK_010_OVERPERFECT",
-        "entry_sha256": "b9a333a55c551e3949148c80f7701523b072644fe6cfa9edee40fa226ef5f3dd",
+        "entry_sha256": "ce89aaa44ae92c64f27257273dd09b74c05cd156ed22c1e6e834c16fe3c26cbc",
         "inputs_summary": {
           "n_signals": "2"
         },
@@ -131,13 +139,13 @@
           "threshold": "2"
         },
         "seq": 6,
-        "timestamp": "2026-07-05T15:27:40.124360+00:00",
+        "timestamp": "2026-07-06T01:30:44.987372+00:00",
         "tool": "contradiction_detector"
       },
       {
         "action": "AGENT_EXIT",
         "case_id": "VIGIA_BREAK_010_OVERPERFECT",
-        "entry_sha256": "9dc4752ecd49122f08a0e1d3881925ce5e468b9ff6b064078d3510739a177dec",
+        "entry_sha256": "55f705759c3334db7c0b45c0aa2fe2dfcea9ca5d2d766e44aec5525252ecadc1",
         "inputs_summary": {
           "verdict": "SUSPICION_DETECTED"
         },
@@ -148,35 +156,43 @@
           "exit_code": "3"
         },
         "seq": 7,
-        "timestamp": "2026-07-05T15:27:40.124547+00:00",
+        "timestamp": "2026-07-06T01:30:44.987560+00:00",
         "tool": "vigia_agent"
       }
     ],
-    "start_time": "2026-07-05T15:27:40.121236+00:00",
+    "start_time": "2026-07-06T01:30:44.650516+00:00",
     "total_entries": 7
   },
   "case_id": "VIGIA_BREAK_010_OVERPERFECT",
   "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA_BREAK_010_OVERPERFECT.json",
-  "evidence_sha256": "9a9b4ea88d82b2d48f23c9b48dfb88b25f32012782ffb1d2e8d1618500195429",
+  "evidence_sha256": "60d3df5fd5438110b049c7db12ab7c26e878acc5ef0b7317ce29bf7fa9a8108d",
   "iterations_executed": 1,
-  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA_BREAK_010_OVERPERFECT ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA_BREAK_010_OVERPERFECT.json\nEvidence SHA-256: 9a9b4ea88d82b2d48f23c9b48dfb88b25f32012782ffb1d2e8d1618500195429\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: SUSPICION_DETECTED\nPosterior confidence: 51/400\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 2 se\u00f1al(es): 2 primaria(s) de ['legacy_converter'], 0 derivada(s)/no-analizada(s). Top z: events every exactly 10.000 seconds=0.64, zero jitter=0.64.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: SUSPICION_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nLogs demasiado perfectos\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [events every exactly 10.000 seconds] z=0.637 conf=0.85 \u2014 \n  [zero jitter] z=0.637 conf=0.85 \u2014 \n\n--- FINAL ALERT LEVEL ---\nMEDIUM \u2014 INTENT verdict with individual z-scores below threshold. Alert floored (B-028/B-065): an intent finding cannot present as LOW.\nReconciliation: verdict INTENT rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 2 | Derived: 0 | Total: 2",
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA_BREAK_010_OVERPERFECT ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA_BREAK_010_OVERPERFECT.json\nEvidence SHA-256: 60d3df5fd5438110b049c7db12ab7c26e878acc5ef0b7317ce29bf7fa9a8108d\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: SUSPICION_DETECTED\nPosterior confidence: 1/5\nConclusive: NO \u2014 requires human review\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 2 se\u00f1al(es): 2 primaria(s) de ['legacy_converter'], 0 derivada(s)/no-analizada(s). Top z: events every exactly 10.000 seconds=0.64, zero jitter=0.64.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: SUSPICION_DETECTED. Conclusiva: no \u2014 requiere revisi\u00f3n humana.\n\nRazonamiento del motor abductivo:\nLogs demasiado perfectos\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [events every exactly 10.000 seconds] z=0.637 conf=0.85 \u2014 \n  [zero jitter] z=0.637 conf=0.85 \u2014 \n\n--- FINAL ALERT LEVEL ---\nMEDIUM \u2014 INTENT verdict with individual z-scores below threshold. Alert floored (B-028/B-065): an intent finding cannot present as LOW.\nReconciliation: verdict INTENT rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 2 | Derived: 0 | Total: 2",
   "pipeline_results": {
     "abduction": {
       "best_hypothesis": "SUSPICION_DETECTED",
-      "best_posterior": "51/400",
+      "best_posterior": "1/5",
       "confidence": {
         "__fraction__": true,
-        "den": 400,
-        "num": 51
+        "den": 5,
+        "num": 1
       },
-      "is_conclusive": true,
+      "is_conclusive": false,
       "narrative": "Logs demasiado perfectos"
     },
     "case_id": "VIGIA_BREAK_010_OVERPERFECT",
     "pipeline_meta": {
       "artifact_count": 2,
       "avg_score": "51/80",
+      "ebs_adapter_mode": "motor",
       "expected_verdict": "SUSPICION",
+      "resolve": {
+        "motor_confidence": "0.2",
+        "motor_reason": "Significant signal with structural support (score=0.1010)",
+        "motor_score": "0.101",
+        "motor_verdict": "SUSPICION",
+        "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+      },
       "source": "ebs_v1_json_adapter"
     },
     "signals": [

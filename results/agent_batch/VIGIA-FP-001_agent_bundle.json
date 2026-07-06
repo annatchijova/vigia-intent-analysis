@@ -1,15 +1,15 @@
 {
   "agent_verdict": "NOISE",
-  "analysis_timestamp": "2026-07-05T15:27:34.074022+00:00",
+  "analysis_timestamp": "2026-07-06T01:29:53.907244+00:00",
   "audit_trail": {
     "agent_version": "1.0.0-SANS-2026",
     "case_id": "VIGIA-FP-001",
-    "end_time": "2026-07-05T15:27:34.074027+00:00",
+    "end_time": "2026-07-06T01:29:53.907250+00:00",
     "entries": [
       {
         "action": "AGENT_INITIALIZED",
         "case_id": "VIGIA-FP-001",
-        "entry_sha256": "c15ef12d9e337ca5a9c828c7b7d77bda380621c91352874a9f23737ace78ca7f",
+        "entry_sha256": "cf6946d52a893548b9ac3fc0c66c6c2f625e1116a2c1c39a96556578607714c8",
         "inputs_summary": {
           "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
           "case_id": "VIGIA-FP-001"
@@ -21,13 +21,13 @@
           "agent_version": "1.0.0-SANS-2026"
         },
         "seq": 1,
-        "timestamp": "2026-07-05T15:27:34.070932+00:00",
+        "timestamp": "2026-07-06T01:29:53.555250+00:00",
         "tool": "vigia_agent"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-FP-001",
-        "entry_sha256": "a3d26d096d39b9fc2ee982638e2e096d705c895bc663747bc7ca32c49ed4eb69",
+        "entry_sha256": "5dc2036d14611593d954f31ed0faac93875ff6e3f3981fd6715bd0a75622b697",
         "inputs_summary": {
           "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-FP-001.json"
         },
@@ -35,29 +35,29 @@
         "note": "Computing SHA-256 of original evidence",
         "outputs_summary": {},
         "seq": 2,
-        "timestamp": "2026-07-05T15:27:34.071016+00:00",
+        "timestamp": "2026-07-06T01:29:53.555332+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-FP-001",
-        "entry_sha256": "91c2bcfbaa46f7c5f4c832f4d54984868aed99deedbaffdaa69defbb01376d55",
+        "entry_sha256": "7c59f3c3bc11745ed04951766b56530ed87e10b91a21eb360bff9ac07ebd669b",
         "inputs_summary": {
           "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-FP-001.json"
         },
         "iteration": 0,
-        "note": "Evidence verified: 6a7ae14f46a54851...",
+        "note": "Evidence verified: bde81e7c0bf65fd0...",
         "outputs_summary": {
-          "sha256": "6a7ae14f46a5485168cd8ca837127ffda9f5aa98fb6cae25f41966595f255721"
+          "sha256": "bde81e7c0bf65fd08ae45f4d2967317fd029c6abbbcdfb40dcbf9e0ae0c7b50c"
         },
         "seq": 3,
-        "timestamp": "2026-07-05T15:27:34.071104+00:00",
+        "timestamp": "2026-07-06T01:29:53.555423+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "PIPELINE_EXECUTE",
         "case_id": "VIGIA-FP-001",
-        "entry_sha256": "646d210805c287f1ea9dd6e85bbb37aed0460ac62a2df57919ed19b8a0aea903",
+        "entry_sha256": "2efc0a602771612f70d06765b86f4b0c3bf4f699cc8ab9fa690e7a9dec1d1d84",
         "inputs_summary": {
           "evidence": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-FP-001.json",
           "iteration": "0",
@@ -67,13 +67,13 @@
         "note": "Executing pipeline \u2014 iteration 0",
         "outputs_summary": {},
         "seq": 4,
-        "timestamp": "2026-07-05T15:27:34.071211+00:00",
+        "timestamp": "2026-07-06T01:29:53.555544+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "PIPELINE_COMPLETE",
         "case_id": "VIGIA-FP-001",
-        "entry_sha256": "9804658a2af4cd8e897234c53c61b98ef21b31c58d6d2e86e2f3d9eff5385d67",
+        "entry_sha256": "5b4f9c68d842c017a0654627f9bcdb220788bd6bce28df684607c3c3a5e8f62b",
         "inputs_summary": {
           "iteration": "0"
         },
@@ -81,9 +81,9 @@
         "note": "Pipeline completed \u2014 2 signals",
         "outputs_summary": {
           "abduction": {
-            "best_hypothesis": "BENIGN_DETECTED",
-            "best_posterior": "1561/20000",
-            "confidence": "1561/20000",
+            "best_hypothesis": "NO_SEMIOTIC_ANOMALY_DETECTED",
+            "best_posterior": "93/100",
+            "confidence": "93/100",
             "is_conclusive": "True",
             "narrative": "Systems administrator with 12 years of tenure, impeccable track record. Runs nmap against his own IP range during business hours, justifying it as 'unscheduled internal audit'. Has domain credentials,..."
           },
@@ -91,7 +91,15 @@
           "pipeline_meta": {
             "artifact_count": "2",
             "avg_score": "1561/4000",
+            "ebs_adapter_mode": "motor",
             "expected_verdict": "BENIGN",
+            "resolve": {
+              "motor_confidence": "0.93",
+              "motor_reason": "Insufficient evidence of malicious intent (score=0.0720)",
+              "motor_score": "0.072",
+              "motor_verdict": "NOISE",
+              "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+            },
             "source": "ebs_v1_json_adapter"
           },
           "signals": [
@@ -114,13 +122,13 @@
           ]
         },
         "seq": 5,
-        "timestamp": "2026-07-05T15:27:34.073717+00:00",
+        "timestamp": "2026-07-06T01:29:53.906838+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "CONTRADICTION_CHECK",
         "case_id": "VIGIA-FP-001",
-        "entry_sha256": "ef49813cee20dd27eca47f060f7d70488979912ebd35bd319e1232960a38804e",
+        "entry_sha256": "2454fbd150663062b91091b0fe3cb7ab31dddb02a7ede4fb08034302723591c9",
         "inputs_summary": {
           "n_signals": "2"
         },
@@ -131,15 +139,15 @@
           "threshold": "2"
         },
         "seq": 6,
-        "timestamp": "2026-07-05T15:27:34.073814+00:00",
+        "timestamp": "2026-07-06T01:29:53.906967+00:00",
         "tool": "contradiction_detector"
       },
       {
         "action": "AGENT_EXIT",
         "case_id": "VIGIA-FP-001",
-        "entry_sha256": "f04b72fe2512e56e8b5495d521e21459a2e075dc3e8ade021ae31daca5ed5b1d",
+        "entry_sha256": "d206cb97d228496db639f85320418e4de5d612b0a8da51baba7c83c7cdea026c",
         "inputs_summary": {
-          "verdict": "BENIGN_DETECTED"
+          "verdict": "NO_SEMIOTIC_ANOMALY_DETECTED"
         },
         "iteration": 0,
         "note": "Exit code 0 (NOISE) \u2014 analysis complete.",
@@ -148,26 +156,26 @@
           "exit_code": "0"
         },
         "seq": 7,
-        "timestamp": "2026-07-05T15:27:34.073973+00:00",
+        "timestamp": "2026-07-06T01:29:53.907182+00:00",
         "tool": "vigia_agent"
       }
     ],
-    "start_time": "2026-07-05T15:27:34.070710+00:00",
+    "start_time": "2026-07-06T01:29:53.555028+00:00",
     "total_entries": 7
   },
   "case_id": "VIGIA-FP-001",
   "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-FP-001.json",
-  "evidence_sha256": "6a7ae14f46a5485168cd8ca837127ffda9f5aa98fb6cae25f41966595f255721",
+  "evidence_sha256": "bde81e7c0bf65fd08ae45f4d2967317fd029c6abbbcdfb40dcbf9e0ae0c7b50c",
   "iterations_executed": 1,
-  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-FP-001 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/VIGIA-FP-001.json\nEvidence SHA-256: 6a7ae14f46a5485168cd8ca837127ffda9f5aa98fb6cae25f41966595f255721\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: BENIGN_DETECTED\nPosterior confidence: 1561/20000\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 2 se\u00f1al(es): 2 primaria(s) de ['sift_bash_history', 'sift_ticket_system'], 0 derivada(s)/no-analizada(s). Top z: nmap -sS -p- 10.0.0.0/24 executed from a=0.74, Ticket self-created by admin_sys: 'Runni=0.04.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: BENIGN_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nSystems administrator with 12 years of tenure, impeccable track record. Runs nmap against his own IP range during business hours, justifying it as 'unscheduled internal audit'. Has domain credentials, elevated permissions, and no other anomaly.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [nmap -sS -p- 10.0.0.0/24 executed from admin workstation] z=0.738 conf=0.90 \u2014 \n  [Ticket self-created by admin_sys: 'Running internal network reconnaiss] z=0.043 conf=0.85 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 2 | Derived: 0 | Total: 2",
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-FP-001 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/VIGIA-FP-001.json\nEvidence SHA-256: bde81e7c0bf65fd08ae45f4d2967317fd029c6abbbcdfb40dcbf9e0ae0c7b50c\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: NO_SEMIOTIC_ANOMALY_DETECTED\nPosterior confidence: 93/100\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 2 se\u00f1al(es): 2 primaria(s) de ['sift_bash_history', 'sift_ticket_system'], 0 derivada(s)/no-analizada(s). Top z: nmap -sS -p- 10.0.0.0/24 executed from a=0.74, Ticket self-created by admin_sys: 'Runni=0.04.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: NO_SEMIOTIC_ANOMALY_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nSystems administrator with 12 years of tenure, impeccable track record. Runs nmap against his own IP range during business hours, justifying it as 'unscheduled internal audit'. Has domain credentials, elevated permissions, and no other anomaly.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [nmap -sS -p- 10.0.0.0/24 executed from admin workstation] z=0.738 conf=0.90 \u2014 \n  [Ticket self-created by admin_sys: 'Running internal network reconnaiss] z=0.043 conf=0.85 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 2 | Derived: 0 | Total: 2",
   "pipeline_results": {
     "abduction": {
-      "best_hypothesis": "BENIGN_DETECTED",
-      "best_posterior": "1561/20000",
+      "best_hypothesis": "NO_SEMIOTIC_ANOMALY_DETECTED",
+      "best_posterior": "93/100",
       "confidence": {
         "__fraction__": true,
-        "den": 20000,
-        "num": 1561
+        "den": 100,
+        "num": 93
       },
       "is_conclusive": true,
       "narrative": "Systems administrator with 12 years of tenure, impeccable track record. Runs nmap against his own IP range during business hours, justifying it as 'unscheduled internal audit'. Has domain credentials, elevated permissions, and no other anomaly."
@@ -176,7 +184,15 @@
     "pipeline_meta": {
       "artifact_count": 2,
       "avg_score": "1561/4000",
+      "ebs_adapter_mode": "motor",
       "expected_verdict": "BENIGN",
+      "resolve": {
+        "motor_confidence": "0.93",
+        "motor_reason": "Insufficient evidence of malicious intent (score=0.0720)",
+        "motor_score": "0.072",
+        "motor_verdict": "NOISE",
+        "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+      },
       "source": "ebs_v1_json_adapter"
     },
     "signals": [

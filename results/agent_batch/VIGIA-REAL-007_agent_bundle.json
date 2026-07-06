@@ -1,15 +1,15 @@
 {
-  "agent_verdict": "MALICE",
-  "analysis_timestamp": "2026-07-05T15:27:35.485139+00:00",
+  "agent_verdict": "INTENT",
+  "analysis_timestamp": "2026-07-06T01:30:05.777666+00:00",
   "audit_trail": {
     "agent_version": "1.0.0-SANS-2026",
     "case_id": "VIGIA-REAL-007",
-    "end_time": "2026-07-05T15:27:35.485146+00:00",
+    "end_time": "2026-07-06T01:30:05.777674+00:00",
     "entries": [
       {
         "action": "AGENT_INITIALIZED",
         "case_id": "VIGIA-REAL-007",
-        "entry_sha256": "fa1cb516ac7d9bdeec4271c018c7364e9f7aac22dcbd0c5fe1c46fc39ff4d471",
+        "entry_sha256": "50361f1df6c4ef8facf20508c2892dec3b65b93ae272a367b934faa28cf3932c",
         "inputs_summary": {
           "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
           "case_id": "VIGIA-REAL-007"
@@ -21,13 +21,13 @@
           "agent_version": "1.0.0-SANS-2026"
         },
         "seq": 1,
-        "timestamp": "2026-07-05T15:27:35.481579+00:00",
+        "timestamp": "2026-07-06T01:30:05.416996+00:00",
         "tool": "vigia_agent"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-REAL-007",
-        "entry_sha256": "8fc38bd6b78c7924bc26f921dee41b6558d27c533127be7a5e10ba235db8d9ec",
+        "entry_sha256": "afb8aa18aa8e9aba67337cd802a31e95382e5d21b02cf4f812f70b3a58f01956",
         "inputs_summary": {
           "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-REAL-007.json"
         },
@@ -35,13 +35,13 @@
         "note": "Computing SHA-256 of original evidence",
         "outputs_summary": {},
         "seq": 2,
-        "timestamp": "2026-07-05T15:27:35.481666+00:00",
+        "timestamp": "2026-07-06T01:30:05.417081+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-REAL-007",
-        "entry_sha256": "75563e7b2f5cfab69f494681f21859198552bf9b6b24a121fedce3bae45c3216",
+        "entry_sha256": "3ec9a59cceea4f90e35e177c6949f7c0878f4fd815b7ce611838f943d094db99",
         "inputs_summary": {
           "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-REAL-007.json"
         },
@@ -51,13 +51,13 @@
           "sha256": "5091f4e04f9df581d7dfa7124eb15610a068eff909e4c49b035456abd08aa564"
         },
         "seq": 3,
-        "timestamp": "2026-07-05T15:27:35.481760+00:00",
+        "timestamp": "2026-07-06T01:30:05.417176+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "PIPELINE_EXECUTE",
         "case_id": "VIGIA-REAL-007",
-        "entry_sha256": "875b00af726a21b0eaca5f12cc2be604f8f8775672ca9970cb22de540feeb4c5",
+        "entry_sha256": "bad9c0ea44fb44b203105518733bdf07c9b422b3504ca8bf4f48a7e09324c076",
         "inputs_summary": {
           "evidence": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-REAL-007.json",
           "iteration": "0",
@@ -67,13 +67,13 @@
         "note": "Executing pipeline \u2014 iteration 0",
         "outputs_summary": {},
         "seq": 4,
-        "timestamp": "2026-07-05T15:27:35.481863+00:00",
+        "timestamp": "2026-07-06T01:30:05.417281+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "PIPELINE_COMPLETE",
         "case_id": "VIGIA-REAL-007",
-        "entry_sha256": "7eaa15aaf06d3db1720f5acdaedc15f71fd4c7e817b7359564bb9d1433cac706",
+        "entry_sha256": "ba0c2356008552fb582334572ab45bf345aac36064314f5db624a91a8970e894",
         "inputs_summary": {
           "iteration": "0"
         },
@@ -81,17 +81,25 @@
         "note": "Pipeline completed \u2014 3 signals",
         "outputs_summary": {
           "abduction": {
-            "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
-            "best_posterior": "0",
-            "confidence": "0",
-            "is_conclusive": "False",
+            "best_hypothesis": "SUSPICION_DETECTED",
+            "best_posterior": "57/100",
+            "confidence": "57/100",
+            "is_conclusive": "True",
             "narrative": "Chemistry professor Lily Tuckrige at Nitroba State University received harassment emails. The captured network traffic (~60MB pcap) revealed the perpetrator used Gmail webmail from an internal dormito..."
           },
           "case_id": "VIGIA-REAL-007",
           "pipeline_meta": {
             "artifact_count": "3",
             "avg_score": "0",
+            "ebs_adapter_mode": "motor",
             "expected_verdict": "MALICE",
+            "resolve": {
+              "motor_confidence": "0.57",
+              "motor_reason": "Significant signal with structural support (score=0.2866)",
+              "motor_score": "0.2866",
+              "motor_verdict": "SUSPICION",
+              "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+            },
             "source": "ebs_v1_json_adapter"
           },
           "signals": [
@@ -122,13 +130,13 @@
           ]
         },
         "seq": 5,
-        "timestamp": "2026-07-05T15:27:35.484404+00:00",
+        "timestamp": "2026-07-06T01:30:05.777175+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "CONTRADICTION_CHECK",
         "case_id": "VIGIA-REAL-007",
-        "entry_sha256": "b8c1249b8b316291592bb63b5d86fcecfa1511106643cd1bac16c5d48390f7cd",
+        "entry_sha256": "5ea08795b3ba3032274c39442ec060b1fdab35cfcbb0b1088a9c49792cf316c3",
         "inputs_summary": {
           "n_signals": "3"
         },
@@ -139,76 +147,60 @@
           "threshold": "2"
         },
         "seq": 6,
-        "timestamp": "2026-07-05T15:27:35.484515+00:00",
+        "timestamp": "2026-07-06T01:30:05.777303+00:00",
         "tool": "contradiction_detector"
       },
       {
         "action": "AGENT_EXIT",
         "case_id": "VIGIA-REAL-007",
-        "entry_sha256": "7a383695a5d5ecba59a32fc91501687d6bec6c33bf541f584c2a05c339d5e203",
+        "entry_sha256": "315d267ed4c8ca776b94bde6080a8dd016e3b55efbcbc51442fee95a836bdef0",
         "inputs_summary": {
-          "verdict": "MALICIOUS_INTENT_DETECTED"
+          "verdict": "SUSPICION_DETECTED"
         },
         "iteration": 0,
-        "note": "Exit code 1 (MALICE) \u2014 analysis complete.",
+        "note": "Exit code 3 (INTENT) \u2014 analysis complete.",
         "outputs_summary": {
-          "agent_verdict": "MALICE",
-          "exit_code": "1"
+          "agent_verdict": "INTENT",
+          "exit_code": "3"
         },
         "seq": 7,
-        "timestamp": "2026-07-05T15:27:35.484690+00:00",
+        "timestamp": "2026-07-06T01:30:05.777594+00:00",
         "tool": "vigia_agent"
       }
     ],
-    "start_time": "2026-07-05T15:27:35.481348+00:00",
+    "start_time": "2026-07-06T01:30:05.416771+00:00",
     "total_entries": 7
   },
   "case_id": "VIGIA-REAL-007",
   "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-REAL-007.json",
   "evidence_sha256": "5091f4e04f9df581d7dfa7124eb15610a068eff909e4c49b035456abd08aa564",
   "iterations_executed": 1,
-  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-REAL-007 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/VIGIA-REAL-007.json\nEvidence SHA-256: 5091f4e04f9df581d7dfa7124eb15610a068eff909e4c49b035456abd08aa564\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 0\nConclusive: NO \u2014 requires human review\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 3 se\u00f1al(es): 3 primaria(s) de ['unknown'], 0 derivada(s)/no-analizada(s). Top z: unknown=0.00, unknown=0.00, unknown=0.00.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: MALICIOUS_INTENT_DETECTED. Conclusiva: no \u2014 requiere revisi\u00f3n humana.\n\nRazonamiento del motor abductivo:\nChemistry professor Lily Tuckrige at Nitroba State University received harassment emails. The captured network traffic (~60MB pcap) revealed the perpetrator used Gmail webmail from an internal dormitory IP address, sending cookies in plaintext over HTTP.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [unknown] z=0.000 conf=0.50 \u2014 \n  [unknown] z=0.000 conf=0.50 \u2014 \n  [unknown] z=0.000 conf=0.50 \u2014 \n\n--- FINAL ALERT LEVEL ---\nMEDIUM \u2014 MALICE verdict from posterior aggregation. Individual z-scores below threshold. Full signal review recommended. Alert floored (B-028/B-065).\nReconciliation: verdict MALICE rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 3 | Derived: 0 | Total: 3",
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-REAL-007 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/VIGIA-REAL-007.json\nEvidence SHA-256: 5091f4e04f9df581d7dfa7124eb15610a068eff909e4c49b035456abd08aa564\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: SUSPICION_DETECTED\nPosterior confidence: 57/100\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 3 se\u00f1al(es): 3 primaria(s) de ['unknown'], 0 derivada(s)/no-analizada(s). Top z: unknown=0.00, unknown=0.00, unknown=0.00.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: SUSPICION_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nChemistry professor Lily Tuckrige at Nitroba State University received harassment emails. The captured network traffic (~60MB pcap) revealed the perpetrator used Gmail webmail from an internal dormitory IP address, sending cookies in plaintext over HTTP.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [unknown] z=0.000 conf=0.50 \u2014 \n  [unknown] z=0.000 conf=0.50 \u2014 \n  [unknown] z=0.000 conf=0.50 \u2014 \n\n--- FINAL ALERT LEVEL ---\nMEDIUM \u2014 INTENT verdict with individual z-scores below threshold. Alert floored (B-028/B-065): an intent finding cannot present as LOW.\nReconciliation: verdict INTENT rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 3 | Derived: 0 | Total: 3",
   "pipeline_results": {
     "abduction": {
-      "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
-      "best_posterior": "0",
+      "best_hypothesis": "SUSPICION_DETECTED",
+      "best_posterior": "57/100",
       "confidence": {
         "__fraction__": true,
-        "den": 1,
-        "num": 0
+        "den": 100,
+        "num": 57
       },
-      "devil_advocate": {
-        "aggregation": {
-          "k": 3,
-          "method": "top_k_already_validated_matches_v2",
-          "total_gap_mass": "0"
-        },
-        "counterfactual_summary": {
-          "primary_alternative_hypothesis": null
-        },
-        "decision_context": {
-          "confidence": "0",
-          "mapped_verdict": "MALICIOUS_INTENT_DETECTED",
-          "raw_verdict": "MALICIOUS_INTENT_DETECTED",
-          "score": "0"
-        },
-        "devil_advocate_source": "deterministic_no_pattern_data_available",
-        "meta": {
-          "deterministic": true,
-          "generated_from": "case_pattern_library"
-        },
-        "narrative": "Eco's Razor (Abductive Falsification) applied to verdict MALICIOUS_INTENT_DETECTED. Pattern-matching data was not available on this code path \u2014 CasePatternLibrary is not invoked here by design (agent audit-trail mode (vigia_agent.py \u2014 JSON-replay / autonomous path); see KNOWN_LIMITATIONS.md). No structured counter-hypothesis could be derived deterministically. This is a documented scope limitation of the current code path, not an absence of falsification attempt.",
-        "pattern_evidence_gaps": [],
-        "version": "r7-da-v1"
-      },
-      "is_conclusive": false,
+      "is_conclusive": true,
       "narrative": "Chemistry professor Lily Tuckrige at Nitroba State University received harassment emails. The captured network traffic (~60MB pcap) revealed the perpetrator used Gmail webmail from an internal dormitory IP address, sending cookies in plaintext over HTTP."
     },
     "case_id": "VIGIA-REAL-007",
     "pipeline_meta": {
       "artifact_count": 3,
       "avg_score": "0",
+      "ebs_adapter_mode": "motor",
       "expected_verdict": "MALICE",
+      "resolve": {
+        "motor_confidence": "0.57",
+        "motor_reason": "Significant signal with structural support (score=0.2866)",
+        "motor_score": "0.2866",
+        "motor_verdict": "SUSPICION",
+        "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+      },
       "source": "ebs_v1_json_adapter"
     },
     "signals": [

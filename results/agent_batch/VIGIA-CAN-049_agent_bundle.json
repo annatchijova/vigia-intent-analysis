@@ -1,15 +1,15 @@
 {
   "agent_verdict": "MALICE",
-  "analysis_timestamp": "2026-07-05T15:27:42.770598+00:00",
+  "analysis_timestamp": "2026-07-06T01:31:07.628989+00:00",
   "audit_trail": {
     "agent_version": "1.0.0-SANS-2026",
     "case_id": "VIGIA-CAN-049",
-    "end_time": "2026-07-05T15:27:42.770605+00:00",
+    "end_time": "2026-07-06T01:31:07.628996+00:00",
     "entries": [
       {
         "action": "AGENT_INITIALIZED",
         "case_id": "VIGIA-CAN-049",
-        "entry_sha256": "5e0eec478953b4f8e01b748908343d4f43869f73bdfe014767bdeb48611a1a4d",
+        "entry_sha256": "b808d5caec2f66ce36fab610fbcfde91489c55de19c19f50deae057045d18556",
         "inputs_summary": {
           "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
           "case_id": "VIGIA-CAN-049"
@@ -21,13 +21,13 @@
           "agent_version": "1.0.0-SANS-2026"
         },
         "seq": 1,
-        "timestamp": "2026-07-05T15:27:42.766948+00:00",
+        "timestamp": "2026-07-06T01:31:07.280077+00:00",
         "tool": "vigia_agent"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-CAN-049",
-        "entry_sha256": "08295baba666754b4a9b23b0b33ab300b548599ef64c4030ca9f52bc97f20981",
+        "entry_sha256": "107e62c26a2f425d11071abe3f626978073320d28e9c41702c920fbb1bce488c",
         "inputs_summary": {
           "path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-049.json"
         },
@@ -35,29 +35,29 @@
         "note": "Computing SHA-256 of original evidence",
         "outputs_summary": {},
         "seq": 2,
-        "timestamp": "2026-07-05T15:27:42.767034+00:00",
+        "timestamp": "2026-07-06T01:31:07.280162+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-CAN-049",
-        "entry_sha256": "23adef21e7210712c4ec13bcbc3ed9042993996a78b6eb20b7e2017ff677d24c",
+        "entry_sha256": "8e6c0d523a2da3cfa9ae430e03f54c856c7b515ca66780ac3bcd5ec7480a1b42",
         "inputs_summary": {
           "path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-049.json"
         },
         "iteration": 0,
-        "note": "Evidence verified: 307ac296cda4a88e...",
+        "note": "Evidence verified: 791bd26e842e4120...",
         "outputs_summary": {
-          "sha256": "307ac296cda4a88e4ef0c9561a497c3668df8d9acc90c49ec4758eb1cd4877cc"
+          "sha256": "791bd26e842e41204c811c0551637d62b05616573071a5e3bc85ab582e8bc0d0"
         },
         "seq": 3,
-        "timestamp": "2026-07-05T15:27:42.767126+00:00",
+        "timestamp": "2026-07-06T01:31:07.280254+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "PIPELINE_EXECUTE",
         "case_id": "VIGIA-CAN-049",
-        "entry_sha256": "a0240f071d29fe01c63a8a4ab0dd36697af04dca111d4276817a0ffa7a821995",
+        "entry_sha256": "d6fc6cf843450d347e4684947c4e690d06891939b8fba4eeede5391203e6a7f5",
         "inputs_summary": {
           "evidence": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-049.json",
           "iteration": "0",
@@ -67,13 +67,13 @@
         "note": "Executing pipeline \u2014 iteration 0",
         "outputs_summary": {},
         "seq": 4,
-        "timestamp": "2026-07-05T15:27:42.767227+00:00",
+        "timestamp": "2026-07-06T01:31:07.280354+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "PIPELINE_COMPLETE",
         "case_id": "VIGIA-CAN-049",
-        "entry_sha256": "6a863b27ac6dd281f39c148c1910cf9b7124350df99c3f7e4f72f60066bf9092",
+        "entry_sha256": "4f32c1942a6e37f50f4366dc39f9fff6bc43cb1e326063835017112dfe0be9d5",
         "inputs_summary": {
           "iteration": "0"
         },
@@ -82,16 +82,24 @@
         "outputs_summary": {
           "abduction": {
             "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
-            "best_posterior": "583/20000",
-            "confidence": "583/20000",
-            "is_conclusive": "False",
+            "best_posterior": "22/25",
+            "confidence": "22/25",
+            "is_conclusive": "True",
             "narrative": "Systematic pattern of controlled doubt combined with system self-gaslighting: user fails password exactly 2 times always (never locks out) while issuing doubt messages at critical moments."
           },
           "case_id": "case_fusion_duda_instrumental",
           "pipeline_meta": {
             "artifact_count": "4",
             "avg_score": "583/4000",
+            "ebs_adapter_mode": "motor",
             "expected_verdict": "MALICE",
+            "resolve": {
+              "motor_confidence": "0.88",
+              "motor_reason": "Intent score 0.4382 exceeds MALICE threshold (P2+acq_assurance scale, threshold=0.33)",
+              "motor_score": "0.4382",
+              "motor_verdict": "MALICE",
+              "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+            },
             "source": "ebs_v1_json_adapter"
           },
           "signals": [
@@ -130,13 +138,13 @@
           ]
         },
         "seq": 5,
-        "timestamp": "2026-07-05T15:27:42.769833+00:00",
+        "timestamp": "2026-07-06T01:31:07.628457+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "CONTRADICTION_CHECK",
         "case_id": "VIGIA-CAN-049",
-        "entry_sha256": "3b5f3c64db9461f091edb8a573c1112e90dcc0eb97d185570b5c2a7e997a9c63",
+        "entry_sha256": "ca71d99be9fd8a751399409a9180ea2b4f44b989e5588fd2f452d01a0b4f470e",
         "inputs_summary": {
           "n_signals": "4"
         },
@@ -147,13 +155,13 @@
           "threshold": "2"
         },
         "seq": 6,
-        "timestamp": "2026-07-05T15:27:42.769939+00:00",
+        "timestamp": "2026-07-06T01:31:07.628577+00:00",
         "tool": "contradiction_detector"
       },
       {
         "action": "AGENT_EXIT",
         "case_id": "VIGIA-CAN-049",
-        "entry_sha256": "0868384bd2216c3be98bc51d1686e14a31a3d83f90b75adc873a9c15af054918",
+        "entry_sha256": "c38736e2be88ed749e8ad5214b48756e4bc65f07c71edc6de6975a276016b2ac",
         "inputs_summary": {
           "verdict": "MALICIOUS_INTENT_DETECTED"
         },
@@ -164,26 +172,26 @@
           "exit_code": "1"
         },
         "seq": 7,
-        "timestamp": "2026-07-05T15:27:42.770127+00:00",
+        "timestamp": "2026-07-06T01:31:07.628794+00:00",
         "tool": "vigia_agent"
       }
     ],
-    "start_time": "2026-07-05T15:27:42.766718+00:00",
+    "start_time": "2026-07-06T01:31:07.279865+00:00",
     "total_entries": 7
   },
   "case_id": "VIGIA-CAN-049",
   "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-049.json",
-  "evidence_sha256": "307ac296cda4a88e4ef0c9561a497c3668df8d9acc90c49ec4758eb1cd4877cc",
+  "evidence_sha256": "791bd26e842e41204c811c0551637d62b05616573071a5e3bc85ab582e8bc0d0",
   "iterations_executed": 1,
-  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-CAN-049 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-049.json\nEvidence SHA-256: 307ac296cda4a88e4ef0c9561a497c3668df8d9acc90c49ec4758eb1cd4877cc\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 583/20000\nConclusive: NO \u2014 requires human review\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 4 se\u00f1al(es): 4 primaria(s) de ['sift_chat_system', 'sift_entropy', 'sift_syslog', 'sift_volatility'], 0 derivada(s)/no-analizada(s). Top z: Login failure pattern entropy: 0.04 bits=0.49, Automated process in memory executing br=0.05, Authentication log: user 'jdoe' fails pa=0.03.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: MALICIOUS_INTENT_DETECTED. Conclusiva: no \u2014 requiere revisi\u00f3n humana.\n\nRazonamiento del motor abductivo:\nSystematic pattern of controlled doubt combined with system self-gaslighting: user fails password exactly 2 times always (never locks out) while issuing doubt messages at critical moments.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Login failure pattern entropy: 0.04 bits (expected for human >2.0). Ti] z=0.489 conf=0.55 \u2014 \n  [Automated process in memory executing brute force with a cadence of 2 ] z=0.048 conf=0.95 \u2014 \n  [Authentication log: user 'jdoe' fails password exactly 2 times before ] z=0.028 conf=0.40 \u2014 \n  [Doubt messages at critical moments: 'maybe it was an error', 'I might ] z=0.018 conf=0.30 \u2014 \n\n--- FINAL ALERT LEVEL ---\nMEDIUM \u2014 MALICE verdict from posterior aggregation. Individual z-scores below threshold. Full signal review recommended. Alert floored (B-028/B-065).\nReconciliation: verdict MALICE rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 4 | Derived: 0 | Total: 4",
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-CAN-049 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-049.json\nEvidence SHA-256: 791bd26e842e41204c811c0551637d62b05616573071a5e3bc85ab582e8bc0d0\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 22/25\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 4 se\u00f1al(es): 4 primaria(s) de ['sift_chat_system', 'sift_entropy', 'sift_syslog', 'sift_volatility'], 0 derivada(s)/no-analizada(s). Top z: Login failure pattern entropy: 0.04 bits=0.49, Automated process in memory executing br=0.05, Authentication log: user 'jdoe' fails pa=0.03.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: MALICIOUS_INTENT_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nSystematic pattern of controlled doubt combined with system self-gaslighting: user fails password exactly 2 times always (never locks out) while issuing doubt messages at critical moments.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Login failure pattern entropy: 0.04 bits (expected for human >2.0). Ti] z=0.489 conf=0.55 \u2014 \n  [Automated process in memory executing brute force with a cadence of 2 ] z=0.048 conf=0.95 \u2014 \n  [Authentication log: user 'jdoe' fails password exactly 2 times before ] z=0.028 conf=0.40 \u2014 \n  [Doubt messages at critical moments: 'maybe it was an error', 'I might ] z=0.018 conf=0.30 \u2014 \n\n--- FINAL ALERT LEVEL ---\nHIGH \u2014 MALICE verdict from Bayesian posterior aggregation. Individual z-scores below threshold (distributed evidence pattern: no single dominant signal, but aggregate posterior is decisive). Alert floored (B-028/B-065).\nReconciliation: verdict MALICE rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 4 | Derived: 0 | Total: 4",
   "pipeline_results": {
     "abduction": {
       "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
-      "best_posterior": "583/20000",
+      "best_posterior": "22/25",
       "confidence": {
         "__fraction__": true,
-        "den": 20000,
-        "num": 583
+        "den": 25,
+        "num": 22
       },
       "devil_advocate": {
         "aggregation": {
@@ -195,7 +203,7 @@
           "primary_alternative_hypothesis": null
         },
         "decision_context": {
-          "confidence": "583/20000",
+          "confidence": "22/25",
           "mapped_verdict": "MALICIOUS_INTENT_DETECTED",
           "raw_verdict": "MALICIOUS_INTENT_DETECTED",
           "score": "583/4000"
@@ -209,14 +217,22 @@
         "pattern_evidence_gaps": [],
         "version": "r7-da-v1"
       },
-      "is_conclusive": false,
+      "is_conclusive": true,
       "narrative": "Systematic pattern of controlled doubt combined with system self-gaslighting: user fails password exactly 2 times always (never locks out) while issuing doubt messages at critical moments."
     },
     "case_id": "case_fusion_duda_instrumental",
     "pipeline_meta": {
       "artifact_count": 4,
       "avg_score": "583/4000",
+      "ebs_adapter_mode": "motor",
       "expected_verdict": "MALICE",
+      "resolve": {
+        "motor_confidence": "0.88",
+        "motor_reason": "Intent score 0.4382 exceeds MALICE threshold (P2+acq_assurance scale, threshold=0.33)",
+        "motor_score": "0.4382",
+        "motor_verdict": "MALICE",
+        "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+      },
       "source": "ebs_v1_json_adapter"
     },
     "signals": [

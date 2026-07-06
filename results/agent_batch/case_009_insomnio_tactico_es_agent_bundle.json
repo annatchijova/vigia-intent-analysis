@@ -1,15 +1,15 @@
 {
   "agent_verdict": "MALICE",
-  "analysis_timestamp": "2026-07-05T15:27:37.869169+00:00",
+  "analysis_timestamp": "2026-07-06T01:30:26.132310+00:00",
   "audit_trail": {
     "agent_version": "1.0.0-SANS-2026",
     "case_id": "case_009_insomnio_tactico_es",
-    "end_time": "2026-07-05T15:27:37.869175+00:00",
+    "end_time": "2026-07-06T01:30:26.132317+00:00",
     "entries": [
       {
         "action": "AGENT_INITIALIZED",
         "case_id": "case_009_insomnio_tactico_es",
-        "entry_sha256": "d1a6db1b3bd7b0092b10f630d100a381b2da4f2cd6ae431f620416e2b669f4ab",
+        "entry_sha256": "565a4b490792e53eda68a9b26cc9f97b42f2a99966b441803bffd7ec571faf88",
         "inputs_summary": {
           "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
           "case_id": "case_009_insomnio_tactico_es"
@@ -21,13 +21,13 @@
           "agent_version": "1.0.0-SANS-2026"
         },
         "seq": 1,
-        "timestamp": "2026-07-05T15:27:37.865602+00:00",
+        "timestamp": "2026-07-06T01:30:25.773969+00:00",
         "tool": "vigia_agent"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "case_009_insomnio_tactico_es",
-        "entry_sha256": "9142151e93c336e91750abcc98ba5531c816bdfb57ec7f9270707d5a05d7e754",
+        "entry_sha256": "f730a4a80f332f7e4314d4788a0e12f81ea2598d6368d977f839aa6af0ae69d0",
         "inputs_summary": {
           "path": "/home/labestiadevigia/vigia-repo/data/cases/case_009_insomnio_tactico_es.json"
         },
@@ -35,29 +35,29 @@
         "note": "Computing SHA-256 of original evidence",
         "outputs_summary": {},
         "seq": 2,
-        "timestamp": "2026-07-05T15:27:37.865685+00:00",
+        "timestamp": "2026-07-06T01:30:25.774052+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "case_009_insomnio_tactico_es",
-        "entry_sha256": "ea1df2daa6b9b30c5522e6eca47c1da130775d0d40ddee8aacadecdef9eabecf",
+        "entry_sha256": "0778c28fb16a257186b101d1c09f2a955a235644f35ef9ee549dab689e2caa1f",
         "inputs_summary": {
           "path": "/home/labestiadevigia/vigia-repo/data/cases/case_009_insomnio_tactico_es.json"
         },
         "iteration": 0,
-        "note": "Evidence verified: 761f836a6fc0b089...",
+        "note": "Evidence verified: 9f6e1de7e64d39fc...",
         "outputs_summary": {
-          "sha256": "761f836a6fc0b0893c65c93ac207525f4309d118e53de97ddc50ddfbe430d6be"
+          "sha256": "9f6e1de7e64d39fc0cc98f34d86a0b178ab17a71d1202d99ee36cc63f8942c1b"
         },
         "seq": 3,
-        "timestamp": "2026-07-05T15:27:37.865779+00:00",
+        "timestamp": "2026-07-06T01:30:25.774143+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "PIPELINE_EXECUTE",
         "case_id": "case_009_insomnio_tactico_es",
-        "entry_sha256": "a641daee2f6c3ce3682dc1261074ab2ca313ec0e67cfc4ab8e66eeb6b5f37802",
+        "entry_sha256": "ff02c82996f6e1e9ae26768b066b3140833621f3e17a71592eea328c83702078",
         "inputs_summary": {
           "evidence": "/home/labestiadevigia/vigia-repo/data/cases/case_009_insomnio_tactico_es.json",
           "iteration": "0",
@@ -67,13 +67,13 @@
         "note": "Executing pipeline \u2014 iteration 0",
         "outputs_summary": {},
         "seq": 4,
-        "timestamp": "2026-07-05T15:27:37.865882+00:00",
+        "timestamp": "2026-07-06T01:30:25.774243+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "PIPELINE_COMPLETE",
         "case_id": "case_009_insomnio_tactico_es",
-        "entry_sha256": "679999e21ad9896171601c0dd5c0bc08d7ff6e8ebd98d1087316ee33f20fcb0d",
+        "entry_sha256": "b2439b70a7900620d22233badc7780c42773c65000f3d4b34397696efc3b2e89",
         "inputs_summary": {
           "iteration": "0"
         },
@@ -82,16 +82,24 @@
         "outputs_summary": {
           "abduction": {
             "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
-            "best_posterior": "0",
-            "confidence": "0",
-            "is_conclusive": "False",
+            "best_posterior": "73/100",
+            "confidence": "73/100",
+            "is_conclusive": "True",
             "narrative": "A financial analyst with strictly daytime hours accesses confidential documents at 3 AM on a Sunday. The system authenticates her correctly. VIG\u00cdA must detect that the Firstness (valid login) contradi..."
           },
           "case_id": "VIGIA-2026-DEMO-009",
           "pipeline_meta": {
             "artifact_count": "4",
             "avg_score": "0",
+            "ebs_adapter_mode": "motor",
             "expected_verdict": "MALICE",
+            "resolve": {
+              "motor_confidence": "0.73",
+              "motor_reason": "Intent score 0.3661 exceeds MALICE threshold (P2+acq_assurance scale, threshold=0.33)",
+              "motor_score": "0.3661",
+              "motor_verdict": "MALICE",
+              "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+            },
             "source": "ebs_v1_json_adapter"
           },
           "signals": [
@@ -130,13 +138,13 @@
           ]
         },
         "seq": 5,
-        "timestamp": "2026-07-05T15:27:37.868411+00:00",
+        "timestamp": "2026-07-06T01:30:26.131643+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "CONTRADICTION_CHECK",
         "case_id": "case_009_insomnio_tactico_es",
-        "entry_sha256": "4ec27aaea1a1a9f203f88734f298d8ac5bc4e152561f0b4ba4e2b2da69bdb0dc",
+        "entry_sha256": "981fd224d31258fae03b1ab04ea4e43559cb933e2650f909148ff3d38da1bf4b",
         "inputs_summary": {
           "n_signals": "4"
         },
@@ -147,13 +155,13 @@
           "threshold": "2"
         },
         "seq": 6,
-        "timestamp": "2026-07-05T15:27:37.868528+00:00",
+        "timestamp": "2026-07-06T01:30:26.131823+00:00",
         "tool": "contradiction_detector"
       },
       {
         "action": "AGENT_EXIT",
         "case_id": "case_009_insomnio_tactico_es",
-        "entry_sha256": "b2afac512a3fa3162799398a742cd19c6d6ec6c91a7994fc3cc6c5082d06eb11",
+        "entry_sha256": "0dde60d38c7a232c1bbbd1f82d8bedffec2c030c731babb7e13f27486ffcf665",
         "inputs_summary": {
           "verdict": "MALICIOUS_INTENT_DETECTED"
         },
@@ -164,26 +172,26 @@
           "exit_code": "1"
         },
         "seq": 7,
-        "timestamp": "2026-07-05T15:27:37.868713+00:00",
+        "timestamp": "2026-07-06T01:30:26.132073+00:00",
         "tool": "vigia_agent"
       }
     ],
-    "start_time": "2026-07-05T15:27:37.865360+00:00",
+    "start_time": "2026-07-06T01:30:25.773741+00:00",
     "total_entries": 7
   },
   "case_id": "case_009_insomnio_tactico_es",
   "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/case_009_insomnio_tactico_es.json",
-  "evidence_sha256": "761f836a6fc0b0893c65c93ac207525f4309d118e53de97ddc50ddfbe430d6be",
+  "evidence_sha256": "9f6e1de7e64d39fc0cc98f34d86a0b178ab17a71d1202d99ee36cc63f8942c1b",
   "iterations_executed": 1,
-  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE case_009_insomnio_tactico_es ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/case_009_insomnio_tactico_es.json\nEvidence SHA-256: 761f836a6fc0b0893c65c93ac207525f4309d118e53de97ddc50ddfbe430d6be\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 0\nConclusive: NO \u2014 requires human review\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 4 se\u00f1al(es): 4 primaria(s) de ['unknown'], 0 derivada(s)/no-analizada(s). Top z: unknown=0.00, unknown=0.00, unknown=0.00.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: MALICIOUS_INTENT_DETECTED. Conclusiva: no \u2014 requiere revisi\u00f3n humana.\n\nRazonamiento del motor abductivo:\nA financial analyst with strictly daytime hours accesses confidential documents at 3 AM on a Sunday. The system authenticates her correctly. VIG\u00cdA must detect that the Firstness (valid login) contradicts the Secondness (temporally impossible context for this user).\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [unknown] z=0.000 conf=0.50 \u2014 \n  [unknown] z=0.000 conf=0.50 \u2014 \n  [unknown] z=0.000 conf=0.50 \u2014 \n  [unknown] z=0.000 conf=0.50 \u2014 \n\n--- FINAL ALERT LEVEL ---\nMEDIUM \u2014 MALICE verdict from posterior aggregation. Individual z-scores below threshold. Full signal review recommended. Alert floored (B-028/B-065).\nReconciliation: verdict MALICE rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 4 | Derived: 0 | Total: 4",
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE case_009_insomnio_tactico_es ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/case_009_insomnio_tactico_es.json\nEvidence SHA-256: 9f6e1de7e64d39fc0cc98f34d86a0b178ab17a71d1202d99ee36cc63f8942c1b\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 73/100\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 4 se\u00f1al(es): 4 primaria(s) de ['unknown'], 0 derivada(s)/no-analizada(s). Top z: unknown=0.00, unknown=0.00, unknown=0.00.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: MALICIOUS_INTENT_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nA financial analyst with strictly daytime hours accesses confidential documents at 3 AM on a Sunday. The system authenticates her correctly. VIG\u00cdA must detect that the Firstness (valid login) contradicts the Secondness (temporally impossible context for this user).\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [unknown] z=0.000 conf=0.50 \u2014 \n  [unknown] z=0.000 conf=0.50 \u2014 \n  [unknown] z=0.000 conf=0.50 \u2014 \n  [unknown] z=0.000 conf=0.50 \u2014 \n\n--- FINAL ALERT LEVEL ---\nHIGH \u2014 MALICE verdict from Bayesian posterior aggregation. Individual z-scores below threshold (distributed evidence pattern: no single dominant signal, but aggregate posterior is decisive). Alert floored (B-028/B-065).\nReconciliation: verdict MALICE rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 4 | Derived: 0 | Total: 4",
   "pipeline_results": {
     "abduction": {
       "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
-      "best_posterior": "0",
+      "best_posterior": "73/100",
       "confidence": {
         "__fraction__": true,
-        "den": 1,
-        "num": 0
+        "den": 100,
+        "num": 73
       },
       "devil_advocate": {
         "aggregation": {
@@ -195,7 +203,7 @@
           "primary_alternative_hypothesis": null
         },
         "decision_context": {
-          "confidence": "0",
+          "confidence": "73/100",
           "mapped_verdict": "MALICIOUS_INTENT_DETECTED",
           "raw_verdict": "MALICIOUS_INTENT_DETECTED",
           "score": "0"
@@ -209,14 +217,22 @@
         "pattern_evidence_gaps": [],
         "version": "r7-da-v1"
       },
-      "is_conclusive": false,
+      "is_conclusive": true,
       "narrative": "A financial analyst with strictly daytime hours accesses confidential documents at 3 AM on a Sunday. The system authenticates her correctly. VIG\u00cdA must detect that the Firstness (valid login) contradicts the Secondness (temporally impossible context for this user)."
     },
     "case_id": "VIGIA-2026-DEMO-009",
     "pipeline_meta": {
       "artifact_count": 4,
       "avg_score": "0",
+      "ebs_adapter_mode": "motor",
       "expected_verdict": "MALICE",
+      "resolve": {
+        "motor_confidence": "0.73",
+        "motor_reason": "Intent score 0.3661 exceeds MALICE threshold (P2+acq_assurance scale, threshold=0.33)",
+        "motor_score": "0.3661",
+        "motor_verdict": "MALICE",
+        "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+      },
       "source": "ebs_v1_json_adapter"
     },
     "signals": [

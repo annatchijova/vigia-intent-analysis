@@ -1,15 +1,15 @@
 {
   "agent_verdict": "NOISE",
-  "analysis_timestamp": "2026-07-05T15:27:38.717547+00:00",
+  "analysis_timestamp": "2026-07-06T01:30:33.070340+00:00",
   "audit_trail": {
     "agent_version": "1.0.0-SANS-2026",
     "case_id": "VIGIA-BEN-010",
-    "end_time": "2026-07-05T15:27:38.717553+00:00",
+    "end_time": "2026-07-06T01:30:33.070345+00:00",
     "entries": [
       {
         "action": "AGENT_INITIALIZED",
         "case_id": "VIGIA-BEN-010",
-        "entry_sha256": "9ee795d7513c229603399ac0c05537922cac9b5dd7c1021c06eab6a9fc9ce7ba",
+        "entry_sha256": "703fb6b954d8a11508b8c5e5f8d507cbc8ae967fddf9d54a43160a66feb025e0",
         "inputs_summary": {
           "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
           "case_id": "VIGIA-BEN-010"
@@ -21,13 +21,13 @@
           "agent_version": "1.0.0-SANS-2026"
         },
         "seq": 1,
-        "timestamp": "2026-07-05T15:27:38.714333+00:00",
+        "timestamp": "2026-07-06T01:30:32.727374+00:00",
         "tool": "vigia_agent"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-BEN-010",
-        "entry_sha256": "f6a59fb61a434a0937fb89458500f6e6e0e2b8df706bd48937885e0646bf7ade",
+        "entry_sha256": "f263ede1770ebaab04d55631b2095efae433611275caf75389f1990b78a4b818",
         "inputs_summary": {
           "path": "/home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-BEN-010.json"
         },
@@ -35,29 +35,29 @@
         "note": "Computing SHA-256 of original evidence",
         "outputs_summary": {},
         "seq": 2,
-        "timestamp": "2026-07-05T15:27:38.714418+00:00",
+        "timestamp": "2026-07-06T01:30:32.727471+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-BEN-010",
-        "entry_sha256": "1cbaa76c02dd1ad04726ea385f9ecbe2643c798d83fb5ea9b47462b453a4a66b",
+        "entry_sha256": "232ea61c78eabca1ca9cc83629da29478b83a50a4ec4e5cc44283ff584268885",
         "inputs_summary": {
           "path": "/home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-BEN-010.json"
         },
         "iteration": 0,
-        "note": "Evidence verified: 8b0842372ff313f3...",
+        "note": "Evidence verified: cef85e4b700b44b9...",
         "outputs_summary": {
-          "sha256": "8b0842372ff313f3e24e10beb721b4dd22827dd712471528d637933b3541a241"
+          "sha256": "cef85e4b700b44b940c49a3f823b483411bddbb1a62f2224247acfe3567067f3"
         },
         "seq": 3,
-        "timestamp": "2026-07-05T15:27:38.714529+00:00",
+        "timestamp": "2026-07-06T01:30:32.727574+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "PIPELINE_EXECUTE",
         "case_id": "VIGIA-BEN-010",
-        "entry_sha256": "274fbb412b63366c88720be644b6d0de595f10ac564d957b15362a8aa9e7b16c",
+        "entry_sha256": "b28ca28ca9515b5295dbf8640d078456f1457db62ae2b98f7ce779b7acbb10ce",
         "inputs_summary": {
           "evidence": "/home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-BEN-010.json",
           "iteration": "0",
@@ -67,13 +67,13 @@
         "note": "Executing pipeline \u2014 iteration 0",
         "outputs_summary": {},
         "seq": 4,
-        "timestamp": "2026-07-05T15:27:38.714632+00:00",
+        "timestamp": "2026-07-06T01:30:32.727678+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "PIPELINE_COMPLETE",
         "case_id": "VIGIA-BEN-010",
-        "entry_sha256": "3c56854e4b8ebd556a068ac0c5a4461b77cd03fe4cec995b3a1f81222ff56571",
+        "entry_sha256": "59305735525fb5626ce244ac7e928a3ff8719dcc16e2f3ce7e13fedb9075f5a9",
         "inputs_summary": {
           "iteration": "0"
         },
@@ -82,16 +82,24 @@
         "outputs_summary": {
           "abduction": {
             "best_hypothesis": "NO_SEMIOTIC_ANOMALY_DETECTED",
-            "best_posterior": "1/80",
-            "confidence": "1/80",
-            "is_conclusive": "False",
+            "best_posterior": "99/100",
+            "confidence": "99/100",
+            "is_conclusive": "True",
             "narrative": "Email from CEO with 'URGENT: I need the report for the investor board meeting in 2 hours'. It is real: the meeting is on the calendar, the report was requested a week ago, and the CEO only uses the wo..."
           },
           "case_id": "VIGIA-BEN-010",
           "pipeline_meta": {
             "artifact_count": "3",
             "avg_score": "1/16",
+            "ebs_adapter_mode": "motor",
             "expected_verdict": "NOISE",
+            "resolve": {
+              "motor_confidence": "0.99",
+              "motor_reason": "Insufficient evidence of malicious intent (score=0.0127)",
+              "motor_score": "0.0127",
+              "motor_verdict": "NOISE",
+              "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+            },
             "source": "ebs_v1_json_adapter"
           },
           "signals": [
@@ -122,13 +130,13 @@
           ]
         },
         "seq": 5,
-        "timestamp": "2026-07-05T15:27:38.717214+00:00",
+        "timestamp": "2026-07-06T01:30:33.069972+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "CONTRADICTION_CHECK",
         "case_id": "VIGIA-BEN-010",
-        "entry_sha256": "7dd4896b1090e14d0d7fc98c1a7d5222735041ccba579a3f6f3e884d301cd0bf",
+        "entry_sha256": "16c5170dc8b2a9ff68f935a38362b4ece7a089cdd44174e7cfda861f1ed200aa",
         "inputs_summary": {
           "n_signals": "3"
         },
@@ -139,13 +147,13 @@
           "threshold": "2"
         },
         "seq": 6,
-        "timestamp": "2026-07-05T15:27:38.717313+00:00",
+        "timestamp": "2026-07-06T01:30:33.070084+00:00",
         "tool": "contradiction_detector"
       },
       {
         "action": "AGENT_EXIT",
         "case_id": "VIGIA-BEN-010",
-        "entry_sha256": "9cdbb19265d2bd1fd406a30479893b72d917278d03ab40955830997618bea43d",
+        "entry_sha256": "c153c5159f8cc943afbf3c1fa6d596aaf0d6199cdce9600a6325522ffa84cb75",
         "inputs_summary": {
           "verdict": "NO_SEMIOTIC_ANOMALY_DETECTED"
         },
@@ -156,35 +164,43 @@
           "exit_code": "0"
         },
         "seq": 7,
-        "timestamp": "2026-07-05T15:27:38.717495+00:00",
+        "timestamp": "2026-07-06T01:30:33.070287+00:00",
         "tool": "vigia_agent"
       }
     ],
-    "start_time": "2026-07-05T15:27:38.714101+00:00",
+    "start_time": "2026-07-06T01:30:32.727160+00:00",
     "total_entries": 7
   },
   "case_id": "VIGIA-BEN-010",
   "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-BEN-010.json",
-  "evidence_sha256": "8b0842372ff313f3e24e10beb721b4dd22827dd712471528d637933b3541a241",
+  "evidence_sha256": "cef85e4b700b44b940c49a3f823b483411bddbb1a62f2224247acfe3567067f3",
   "iterations_executed": 1,
-  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-BEN-010 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-BEN-010.json\nEvidence SHA-256: 8b0842372ff313f3e24e10beb721b4dd22827dd712471528d637933b3541a241\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: NO_SEMIOTIC_ANOMALY_DETECTED\nPosterior confidence: 1/80\nConclusive: NO \u2014 requires human review\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 3 se\u00f1al(es): 3 primaria(s) de ['legacy_converter'], 0 derivada(s)/no-analizada(s). Top z: Email thread: 2024-03-08 | ceo\u2192cfo: 'Ple=0.07, Calendar event: 'Investor Board Meeting =0.06, From: ceo@company.com | To: cfo@company.=0.05.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: NO_SEMIOTIC_ANOMALY_DETECTED. Conclusiva: no \u2014 requiere revisi\u00f3n humana.\n\nRazonamiento del motor abductivo:\nEmail from CEO with 'URGENT: I need the report for the investor board meeting in 2 hours'. It is real: the meeting is on the calendar, the report was requested a week ago, and the CEO only uses the word 'urgent' in board meeting contexts.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Email thread: 2024-03-08 | ceo\u2192cfo: 'Please prepare Q4 report for boar] z=0.071 conf=0.30 \u2014 \n  [Calendar event: 'Investor Board Meeting \u2014 Q4 Presentation' | Date: 202] z=0.064 conf=0.30 \u2014 \n  [From: ceo@company.com | To: cfo@company.com | Subject: URGENT: Q4 Fina] z=0.052 conf=0.30 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 3 | Derived: 0 | Total: 3",
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-BEN-010 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-BEN-010.json\nEvidence SHA-256: cef85e4b700b44b940c49a3f823b483411bddbb1a62f2224247acfe3567067f3\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: NO_SEMIOTIC_ANOMALY_DETECTED\nPosterior confidence: 99/100\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 3 se\u00f1al(es): 3 primaria(s) de ['legacy_converter'], 0 derivada(s)/no-analizada(s). Top z: Email thread: 2024-03-08 | ceo\u2192cfo: 'Ple=0.07, Calendar event: 'Investor Board Meeting =0.06, From: ceo@company.com | To: cfo@company.=0.05.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: NO_SEMIOTIC_ANOMALY_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nEmail from CEO with 'URGENT: I need the report for the investor board meeting in 2 hours'. It is real: the meeting is on the calendar, the report was requested a week ago, and the CEO only uses the word 'urgent' in board meeting contexts.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Email thread: 2024-03-08 | ceo\u2192cfo: 'Please prepare Q4 report for boar] z=0.071 conf=0.30 \u2014 \n  [Calendar event: 'Investor Board Meeting \u2014 Q4 Presentation' | Date: 202] z=0.064 conf=0.30 \u2014 \n  [From: ceo@company.com | To: cfo@company.com | Subject: URGENT: Q4 Fina] z=0.052 conf=0.30 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 3 | Derived: 0 | Total: 3",
   "pipeline_results": {
     "abduction": {
       "best_hypothesis": "NO_SEMIOTIC_ANOMALY_DETECTED",
-      "best_posterior": "1/80",
+      "best_posterior": "99/100",
       "confidence": {
         "__fraction__": true,
-        "den": 80,
-        "num": 1
+        "den": 100,
+        "num": 99
       },
-      "is_conclusive": false,
+      "is_conclusive": true,
       "narrative": "Email from CEO with 'URGENT: I need the report for the investor board meeting in 2 hours'. It is real: the meeting is on the calendar, the report was requested a week ago, and the CEO only uses the word 'urgent' in board meeting contexts."
     },
     "case_id": "VIGIA-BEN-010",
     "pipeline_meta": {
       "artifact_count": 3,
       "avg_score": "1/16",
+      "ebs_adapter_mode": "motor",
       "expected_verdict": "NOISE",
+      "resolve": {
+        "motor_confidence": "0.99",
+        "motor_reason": "Insufficient evidence of malicious intent (score=0.0127)",
+        "motor_score": "0.0127",
+        "motor_verdict": "NOISE",
+        "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+      },
       "source": "ebs_v1_json_adapter"
     },
     "signals": [

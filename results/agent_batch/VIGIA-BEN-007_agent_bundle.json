@@ -1,15 +1,15 @@
 {
   "agent_verdict": "NOISE",
-  "analysis_timestamp": "2026-07-05T15:27:38.561371+00:00",
+  "analysis_timestamp": "2026-07-06T01:30:31.785829+00:00",
   "audit_trail": {
     "agent_version": "1.0.0-SANS-2026",
     "case_id": "VIGIA-BEN-007",
-    "end_time": "2026-07-05T15:27:38.561376+00:00",
+    "end_time": "2026-07-06T01:30:31.785835+00:00",
     "entries": [
       {
         "action": "AGENT_INITIALIZED",
         "case_id": "VIGIA-BEN-007",
-        "entry_sha256": "ec8f2447de9dae045645c640ebcf0447caf7822a25e755f53aaf05b583e7d574",
+        "entry_sha256": "bf9cfa5595d442f0c851756868d4c956bed17a1840d926c75e51348ac9f12bad",
         "inputs_summary": {
           "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
           "case_id": "VIGIA-BEN-007"
@@ -21,13 +21,13 @@
           "agent_version": "1.0.0-SANS-2026"
         },
         "seq": 1,
-        "timestamp": "2026-07-05T15:27:38.558157+00:00",
+        "timestamp": "2026-07-06T01:30:31.448317+00:00",
         "tool": "vigia_agent"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-BEN-007",
-        "entry_sha256": "0473e5636dbfc024b2edb9f5534fb85bc891edae72c4fbbd45028ae85d779ab0",
+        "entry_sha256": "936c506c3a893b551045651372f6c12c4be3009cba804e998fe80371add79472",
         "inputs_summary": {
           "path": "/home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-BEN-007.json"
         },
@@ -35,29 +35,29 @@
         "note": "Computing SHA-256 of original evidence",
         "outputs_summary": {},
         "seq": 2,
-        "timestamp": "2026-07-05T15:27:38.558240+00:00",
+        "timestamp": "2026-07-06T01:30:31.448404+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-BEN-007",
-        "entry_sha256": "febaaddc54d6066fe886ce637a88b6902e9ac1b9f2436e4236f6e05e90f5c8ec",
+        "entry_sha256": "d8a553c3676b3de497273cf23b97a1f804d9d51f190d9129d14ebe86c9e6b635",
         "inputs_summary": {
           "path": "/home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-BEN-007.json"
         },
         "iteration": 0,
-        "note": "Evidence verified: 880158ab6179c1a1...",
+        "note": "Evidence verified: f06025ab6e07341e...",
         "outputs_summary": {
-          "sha256": "880158ab6179c1a1646256b2bb4cd318eeb17c06b133581ca7384d471683916f"
+          "sha256": "f06025ab6e07341ed36ff58ff547e1cc7ae884089ed97e18286487d8bb0b5465"
         },
         "seq": 3,
-        "timestamp": "2026-07-05T15:27:38.558331+00:00",
+        "timestamp": "2026-07-06T01:30:31.448514+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "PIPELINE_EXECUTE",
         "case_id": "VIGIA-BEN-007",
-        "entry_sha256": "5a28e80af73629c72d6519cb6f216e0cca677ba59a7bc8731b621494d0ffa985",
+        "entry_sha256": "e3e74235654d2accb47d59b09b30e342c98ba46fb1bdecd01c2b8f26b4ee4c77",
         "inputs_summary": {
           "evidence": "/home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-BEN-007.json",
           "iteration": "0",
@@ -67,13 +67,13 @@
         "note": "Executing pipeline \u2014 iteration 0",
         "outputs_summary": {},
         "seq": 4,
-        "timestamp": "2026-07-05T15:27:38.558450+00:00",
+        "timestamp": "2026-07-06T01:30:31.448618+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "PIPELINE_COMPLETE",
         "case_id": "VIGIA-BEN-007",
-        "entry_sha256": "404a66e08c323e4a8408e6dfea35a0bb5bf831bf0c2bda532e929e9f27960a76",
+        "entry_sha256": "5f1939cef4cf500f364b5029fd3a48ffb21c9fec1658f687509724f0b4020043",
         "inputs_summary": {
           "iteration": "0"
         },
@@ -82,16 +82,24 @@
         "outputs_summary": {
           "abduction": {
             "best_hypothesis": "NO_SEMIOTIC_ANOMALY_DETECTED",
-            "best_posterior": "1/80",
-            "confidence": "1/80",
-            "is_conclusive": "False",
+            "best_posterior": "49/50",
+            "confidence": "49/50",
+            "is_conclusive": "True",
             "narrative": "Archivo 'salaries_2024_confidential.pdf' aparece en Desktop de empleado. Es la gu\u00eda de compensaci\u00f3n anual distribuida por RRHH a todos los managers, con email de distribuci\u00f3n y lista de destinatarios."
           },
           "case_id": "VIGIA-BEN-007",
           "pipeline_meta": {
             "artifact_count": "3",
             "avg_score": "1/16",
+            "ebs_adapter_mode": "motor",
             "expected_verdict": "NOISE",
+            "resolve": {
+              "motor_confidence": "0.98",
+              "motor_reason": "Insufficient evidence of malicious intent (score=0.0222)",
+              "motor_score": "0.0222",
+              "motor_verdict": "NOISE",
+              "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+            },
             "source": "ebs_v1_json_adapter"
           },
           "signals": [
@@ -122,13 +130,13 @@
           ]
         },
         "seq": 5,
-        "timestamp": "2026-07-05T15:27:38.561050+00:00",
+        "timestamp": "2026-07-06T01:30:31.785478+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "CONTRADICTION_CHECK",
         "case_id": "VIGIA-BEN-007",
-        "entry_sha256": "18fbd32011f76ea186f432991a2286d36b492cee37ff8ba98aeafdfb98b0bce8",
+        "entry_sha256": "0f233cf9b727a1a9a3c00e640ec6b4664a8617d9d80db603735f4d27cd0c319a",
         "inputs_summary": {
           "n_signals": "3"
         },
@@ -139,13 +147,13 @@
           "threshold": "2"
         },
         "seq": 6,
-        "timestamp": "2026-07-05T15:27:38.561151+00:00",
+        "timestamp": "2026-07-06T01:30:31.785590+00:00",
         "tool": "contradiction_detector"
       },
       {
         "action": "AGENT_EXIT",
         "case_id": "VIGIA-BEN-007",
-        "entry_sha256": "7657722f7ed0bb0d7029e4c2a8220720f86ec8c16097e1b82684053f936f7f07",
+        "entry_sha256": "36d7b7072385ba1ba430e2ae74f888dc3534f937342cc0a1d04b160478bbec39",
         "inputs_summary": {
           "verdict": "NO_SEMIOTIC_ANOMALY_DETECTED"
         },
@@ -156,35 +164,43 @@
           "exit_code": "0"
         },
         "seq": 7,
-        "timestamp": "2026-07-05T15:27:38.561322+00:00",
+        "timestamp": "2026-07-06T01:30:31.785776+00:00",
         "tool": "vigia_agent"
       }
     ],
-    "start_time": "2026-07-05T15:27:38.557924+00:00",
+    "start_time": "2026-07-06T01:30:31.448100+00:00",
     "total_entries": 7
   },
   "case_id": "VIGIA-BEN-007",
   "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-BEN-007.json",
-  "evidence_sha256": "880158ab6179c1a1646256b2bb4cd318eeb17c06b133581ca7384d471683916f",
+  "evidence_sha256": "f06025ab6e07341ed36ff58ff547e1cc7ae884089ed97e18286487d8bb0b5465",
   "iterations_executed": 1,
-  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-BEN-007 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-BEN-007.json\nEvidence SHA-256: 880158ab6179c1a1646256b2bb4cd318eeb17c06b133581ca7384d471683916f\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: NO_SEMIOTIC_ANOMALY_DETECTED\nPosterior confidence: 1/80\nConclusive: NO \u2014 requires human review\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 3 se\u00f1al(es): 3 primaria(s) de ['legacy_converter'], 0 derivada(s)/no-analizada(s). Top z: HR policy HR-2023-044: 'Gu\u00eda de compensa=0.07, From: hr@company.com | To: managers@comp=0.06, File: salaries_2024_confidential.pdf | O=0.05.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: NO_SEMIOTIC_ANOMALY_DETECTED. Conclusiva: no \u2014 requiere revisi\u00f3n humana.\n\nRazonamiento del motor abductivo:\nArchivo 'salaries_2024_confidential.pdf' aparece en Desktop de empleado. Es la gu\u00eda de compensaci\u00f3n anual distribuida por RRHH a todos los managers, con email de distribuci\u00f3n y lista de destinatarios.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [HR policy HR-2023-044: 'Gu\u00eda de compensaci\u00f3n se distribuye anualmente ] z=0.071 conf=0.30 \u2014 \n  [From: hr@company.com | To: managers@company.com (distribution list, 45] z=0.064 conf=0.30 \u2014 \n  [File: salaries_2024_confidential.pdf | Owner: juan.manager | Location:] z=0.052 conf=0.30 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 3 | Derived: 0 | Total: 3",
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-BEN-007 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-BEN-007.json\nEvidence SHA-256: f06025ab6e07341ed36ff58ff547e1cc7ae884089ed97e18286487d8bb0b5465\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: NO_SEMIOTIC_ANOMALY_DETECTED\nPosterior confidence: 49/50\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 3 se\u00f1al(es): 3 primaria(s) de ['legacy_converter'], 0 derivada(s)/no-analizada(s). Top z: HR policy HR-2023-044: 'Gu\u00eda de compensa=0.07, From: hr@company.com | To: managers@comp=0.06, File: salaries_2024_confidential.pdf | O=0.05.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: NO_SEMIOTIC_ANOMALY_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nArchivo 'salaries_2024_confidential.pdf' aparece en Desktop de empleado. Es la gu\u00eda de compensaci\u00f3n anual distribuida por RRHH a todos los managers, con email de distribuci\u00f3n y lista de destinatarios.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [HR policy HR-2023-044: 'Gu\u00eda de compensaci\u00f3n se distribuye anualmente ] z=0.071 conf=0.30 \u2014 \n  [From: hr@company.com | To: managers@company.com (distribution list, 45] z=0.064 conf=0.30 \u2014 \n  [File: salaries_2024_confidential.pdf | Owner: juan.manager | Location:] z=0.052 conf=0.30 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 3 | Derived: 0 | Total: 3",
   "pipeline_results": {
     "abduction": {
       "best_hypothesis": "NO_SEMIOTIC_ANOMALY_DETECTED",
-      "best_posterior": "1/80",
+      "best_posterior": "49/50",
       "confidence": {
         "__fraction__": true,
-        "den": 80,
-        "num": 1
+        "den": 50,
+        "num": 49
       },
-      "is_conclusive": false,
+      "is_conclusive": true,
       "narrative": "Archivo 'salaries_2024_confidential.pdf' aparece en Desktop de empleado. Es la gu\u00eda de compensaci\u00f3n anual distribuida por RRHH a todos los managers, con email de distribuci\u00f3n y lista de destinatarios."
     },
     "case_id": "VIGIA-BEN-007",
     "pipeline_meta": {
       "artifact_count": 3,
       "avg_score": "1/16",
+      "ebs_adapter_mode": "motor",
       "expected_verdict": "NOISE",
+      "resolve": {
+        "motor_confidence": "0.98",
+        "motor_reason": "Insufficient evidence of malicious intent (score=0.0222)",
+        "motor_score": "0.0222",
+        "motor_verdict": "NOISE",
+        "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+      },
       "source": "ebs_v1_json_adapter"
     },
     "signals": [

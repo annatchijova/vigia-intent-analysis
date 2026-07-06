@@ -1,15 +1,15 @@
 {
   "agent_verdict": "MALICE",
-  "analysis_timestamp": "2026-07-05T15:27:41.471543+00:00",
+  "analysis_timestamp": "2026-07-06T01:30:56.550191+00:00",
   "audit_trail": {
     "agent_version": "1.0.0-SANS-2026",
     "case_id": "VIGIA-CAN-024",
-    "end_time": "2026-07-05T15:27:41.471550+00:00",
+    "end_time": "2026-07-06T01:30:56.550199+00:00",
     "entries": [
       {
         "action": "AGENT_INITIALIZED",
         "case_id": "VIGIA-CAN-024",
-        "entry_sha256": "fb6259a6ba5021c0b74eae3cc8ba46dbaab8cc6054494c5e7c0d4563ee642491",
+        "entry_sha256": "d5c982c050d649233ade8a3e3e1f6313473e031b654f3a37f5a2e1c69af4c99f",
         "inputs_summary": {
           "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
           "case_id": "VIGIA-CAN-024"
@@ -21,13 +21,13 @@
           "agent_version": "1.0.0-SANS-2026"
         },
         "seq": 1,
-        "timestamp": "2026-07-05T15:27:41.467987+00:00",
+        "timestamp": "2026-07-06T01:30:56.193490+00:00",
         "tool": "vigia_agent"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-CAN-024",
-        "entry_sha256": "0056257529fb67c892f9a89f08d73ae3b5a6703753245d377d6e8f47a0909b83",
+        "entry_sha256": "8b2d3ab715a2b933147e078861f7abd9871a1cfe083f1241a64e42a802d933e8",
         "inputs_summary": {
           "path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-024.json"
         },
@@ -35,29 +35,29 @@
         "note": "Computing SHA-256 of original evidence",
         "outputs_summary": {},
         "seq": 2,
-        "timestamp": "2026-07-05T15:27:41.468074+00:00",
+        "timestamp": "2026-07-06T01:30:56.193577+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-CAN-024",
-        "entry_sha256": "2faca47899e9dc1e4e318dff5ccb1225fd9f1110dd2b6e0c6b1b05e99272fcb0",
+        "entry_sha256": "6506f4c519e29368eeb2ffff159bef8773e513d856102491cdf6142ba946f2f8",
         "inputs_summary": {
           "path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-024.json"
         },
         "iteration": 0,
-        "note": "Evidence verified: 6e2524691d6bcfab...",
+        "note": "Evidence verified: ffa5b1ba3e577a21...",
         "outputs_summary": {
-          "sha256": "6e2524691d6bcfab293f4efd1b4b91e332e403a6e435c187cae7857cdac6ed32"
+          "sha256": "ffa5b1ba3e577a21c9d046203dc1f3a855d887bb0968169c715254b0358916c9"
         },
         "seq": 3,
-        "timestamp": "2026-07-05T15:27:41.468163+00:00",
+        "timestamp": "2026-07-06T01:30:56.193673+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "PIPELINE_EXECUTE",
         "case_id": "VIGIA-CAN-024",
-        "entry_sha256": "7777f977733f83140516d0e924e8a02bde00cdc42764168f0856111691bb0842",
+        "entry_sha256": "63548226bb8adbf0f8064ff4ce7dc1db5ae68ae2bb7aac3fb9518b1b793963f8",
         "inputs_summary": {
           "evidence": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-024.json",
           "iteration": "0",
@@ -67,13 +67,13 @@
         "note": "Executing pipeline \u2014 iteration 0",
         "outputs_summary": {},
         "seq": 4,
-        "timestamp": "2026-07-05T15:27:41.468266+00:00",
+        "timestamp": "2026-07-06T01:30:56.193771+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "PIPELINE_COMPLETE",
         "case_id": "VIGIA-CAN-024",
-        "entry_sha256": "84d12d6d764062e63e24eb2d843b8b22ff0d7e6ad44a11ee4eda04f4996223a3",
+        "entry_sha256": "538c6e002d21d8e3620fd6ddb06041bca56363a1e872f8d8425fda39b790b3c7",
         "inputs_summary": {
           "iteration": "0"
         },
@@ -82,16 +82,24 @@
         "outputs_summary": {
           "abduction": {
             "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
-            "best_posterior": "2349/40000",
-            "confidence": "2349/40000",
-            "is_conclusive": "False",
+            "best_posterior": "19/20",
+            "confidence": "19/20",
+            "is_conclusive": "True",
             "narrative": "PDF invoice with a 'printing error' covering the CBU/IBAN. Sender sends the 'corrected' account number via informal email. The account does not exist in the validated supplier database. Hash of the or..."
           },
           "case_id": "case_106_mimesis_error_administrativo",
           "pipeline_meta": {
             "artifact_count": "4",
             "avg_score": "2349/8000",
+            "ebs_adapter_mode": "motor",
             "expected_verdict": "MALICE",
+            "resolve": {
+              "motor_confidence": "0.95",
+              "motor_reason": "Intent score 0.5807 exceeds MALICE threshold (P2+acq_assurance scale, threshold=0.33)",
+              "motor_score": "0.5807",
+              "motor_verdict": "MALICE",
+              "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+            },
             "source": "ebs_v1_json_adapter"
           },
           "signals": [
@@ -130,13 +138,13 @@
           ]
         },
         "seq": 5,
-        "timestamp": "2026-07-05T15:27:41.470792+00:00",
+        "timestamp": "2026-07-06T01:30:56.549669+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "CONTRADICTION_CHECK",
         "case_id": "VIGIA-CAN-024",
-        "entry_sha256": "254b70f9e0b730ca19051d419ada0f21468bc73d062813bac85986142411bb9e",
+        "entry_sha256": "a38f581b1e51beb69ebf8768a3da64e573b4dfd8c700afd928581043b5947bbb",
         "inputs_summary": {
           "n_signals": "4"
         },
@@ -147,13 +155,13 @@
           "threshold": "2"
         },
         "seq": 6,
-        "timestamp": "2026-07-05T15:27:41.470896+00:00",
+        "timestamp": "2026-07-06T01:30:56.549783+00:00",
         "tool": "contradiction_detector"
       },
       {
         "action": "AGENT_EXIT",
         "case_id": "VIGIA-CAN-024",
-        "entry_sha256": "cfbcdafc58ee4e659b9f369f17eab3bd2b6d1f4c77da506ac511bddf0ae575cd",
+        "entry_sha256": "f7e663d8b7cdc2f147cc99df975bb84a6b8474960cbfd9b19d007b5a987f53a6",
         "inputs_summary": {
           "verdict": "MALICIOUS_INTENT_DETECTED"
         },
@@ -164,26 +172,26 @@
           "exit_code": "1"
         },
         "seq": 7,
-        "timestamp": "2026-07-05T15:27:41.471079+00:00",
+        "timestamp": "2026-07-06T01:30:56.549997+00:00",
         "tool": "vigia_agent"
       }
     ],
-    "start_time": "2026-07-05T15:27:41.467761+00:00",
+    "start_time": "2026-07-06T01:30:56.193259+00:00",
     "total_entries": 7
   },
   "case_id": "VIGIA-CAN-024",
   "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-024.json",
-  "evidence_sha256": "6e2524691d6bcfab293f4efd1b4b91e332e403a6e435c187cae7857cdac6ed32",
+  "evidence_sha256": "ffa5b1ba3e577a21c9d046203dc1f3a855d887bb0968169c715254b0358916c9",
   "iterations_executed": 1,
-  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-CAN-024 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-024.json\nEvidence SHA-256: 6e2524691d6bcfab293f4efd1b4b91e332e403a6e435c187cae7857cdac6ed32\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 2349/40000\nConclusive: NO \u2014 requires human review\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 4 se\u00f1al(es): 4 primaria(s) de ['sift_document', 'sift_file_audit', 'sift_mail_gateway', 'sift_pcap'], 0 derivada(s)/no-analizada(s). Top z: 'Corrected' account number does not exis=0.44, PDF invoice: CBU/IBAN area covered by a =0.43, Follow-up email: 'Oops, the PDF came out=0.27.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: MALICIOUS_INTENT_DETECTED. Conclusiva: no \u2014 requiere revisi\u00f3n humana.\n\nRazonamiento del motor abductivo:\nPDF invoice with a 'printing error' covering the CBU/IBAN. Sender sends the 'corrected' account number via informal email. The account does not exist in the validated supplier database. Hash of the original PDF shows a visible legitimate CBU.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  ['Corrected' account number does not exist in the validated supplier da] z=0.440 conf=0.50 \u2014 \n  [PDF invoice: CBU/IBAN area covered by a black rectangle. Metadata says] z=0.432 conf=0.60 \u2014 \n  [Follow-up email: 'Oops, the PDF came out wrong, sending the CBU here s] z=0.270 conf=0.30 \u2014 \n  [Hash of the original PDF (sent 2 days earlier) shows a visible legitim] z=0.033 conf=0.65 \u2014 \n\n--- FINAL ALERT LEVEL ---\nMEDIUM \u2014 MALICE verdict from posterior aggregation. Individual z-scores below threshold. Full signal review recommended. Alert floored (B-028/B-065).\nReconciliation: verdict MALICE rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 4 | Derived: 0 | Total: 4",
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-CAN-024 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-024.json\nEvidence SHA-256: ffa5b1ba3e577a21c9d046203dc1f3a855d887bb0968169c715254b0358916c9\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 19/20\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 4 se\u00f1al(es): 4 primaria(s) de ['sift_document', 'sift_file_audit', 'sift_mail_gateway', 'sift_pcap'], 0 derivada(s)/no-analizada(s). Top z: 'Corrected' account number does not exis=0.44, PDF invoice: CBU/IBAN area covered by a =0.43, Follow-up email: 'Oops, the PDF came out=0.27.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: MALICIOUS_INTENT_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nPDF invoice with a 'printing error' covering the CBU/IBAN. Sender sends the 'corrected' account number via informal email. The account does not exist in the validated supplier database. Hash of the original PDF shows a visible legitimate CBU.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  ['Corrected' account number does not exist in the validated supplier da] z=0.440 conf=0.50 \u2014 \n  [PDF invoice: CBU/IBAN area covered by a black rectangle. Metadata says] z=0.432 conf=0.60 \u2014 \n  [Follow-up email: 'Oops, the PDF came out wrong, sending the CBU here s] z=0.270 conf=0.30 \u2014 \n  [Hash of the original PDF (sent 2 days earlier) shows a visible legitim] z=0.033 conf=0.65 \u2014 \n\n--- FINAL ALERT LEVEL ---\nHIGH \u2014 MALICE verdict from Bayesian posterior aggregation. Individual z-scores below threshold (distributed evidence pattern: no single dominant signal, but aggregate posterior is decisive). Alert floored (B-028/B-065).\nReconciliation: verdict MALICE rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 4 | Derived: 0 | Total: 4",
   "pipeline_results": {
     "abduction": {
       "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
-      "best_posterior": "2349/40000",
+      "best_posterior": "19/20",
       "confidence": {
         "__fraction__": true,
-        "den": 40000,
-        "num": 2349
+        "den": 20,
+        "num": 19
       },
       "devil_advocate": {
         "aggregation": {
@@ -195,7 +203,7 @@
           "primary_alternative_hypothesis": null
         },
         "decision_context": {
-          "confidence": "2349/40000",
+          "confidence": "19/20",
           "mapped_verdict": "MALICIOUS_INTENT_DETECTED",
           "raw_verdict": "MALICIOUS_INTENT_DETECTED",
           "score": "2349/8000"
@@ -209,14 +217,22 @@
         "pattern_evidence_gaps": [],
         "version": "r7-da-v1"
       },
-      "is_conclusive": false,
+      "is_conclusive": true,
       "narrative": "PDF invoice with a 'printing error' covering the CBU/IBAN. Sender sends the 'corrected' account number via informal email. The account does not exist in the validated supplier database. Hash of the original PDF shows a visible legitimate CBU."
     },
     "case_id": "case_106_mimesis_error_administrativo",
     "pipeline_meta": {
       "artifact_count": 4,
       "avg_score": "2349/8000",
+      "ebs_adapter_mode": "motor",
       "expected_verdict": "MALICE",
+      "resolve": {
+        "motor_confidence": "0.95",
+        "motor_reason": "Intent score 0.5807 exceeds MALICE threshold (P2+acq_assurance scale, threshold=0.33)",
+        "motor_score": "0.5807",
+        "motor_verdict": "MALICE",
+        "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+      },
       "source": "ebs_v1_json_adapter"
     },
     "signals": [

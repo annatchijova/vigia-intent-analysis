@@ -1,15 +1,15 @@
 {
   "agent_verdict": "NOISE",
-  "analysis_timestamp": "2026-07-05T15:27:38.340714+00:00",
+  "analysis_timestamp": "2026-07-06T01:30:30.058852+00:00",
   "audit_trail": {
     "agent_version": "1.0.0-SANS-2026",
     "case_id": "VIGIA-BEN-003",
-    "end_time": "2026-07-05T15:27:38.340720+00:00",
+    "end_time": "2026-07-06T01:30:30.058858+00:00",
     "entries": [
       {
         "action": "AGENT_INITIALIZED",
         "case_id": "VIGIA-BEN-003",
-        "entry_sha256": "e7e388e367c699e1c19d004db4dda0bdad4cdfe980a26d0a4dcd4ccf36e3e4ed",
+        "entry_sha256": "cf57f07c5ffd1e0eaaf36f72a2ccf03b79f160896ea174e529a2cc6b1e784abb",
         "inputs_summary": {
           "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
           "case_id": "VIGIA-BEN-003"
@@ -21,13 +21,13 @@
           "agent_version": "1.0.0-SANS-2026"
         },
         "seq": 1,
-        "timestamp": "2026-07-05T15:27:38.336913+00:00",
+        "timestamp": "2026-07-06T01:30:29.719306+00:00",
         "tool": "vigia_agent"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-BEN-003",
-        "entry_sha256": "39991a9e57a839ee20ba723890e975d64f28361b6877a33827ea8e743e6d6c7b",
+        "entry_sha256": "fd44d56b8ce8281618701c0c6fee9adbbf43ff19d9e31415524dea51879812c3",
         "inputs_summary": {
           "path": "/home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-BEN-003.json"
         },
@@ -35,29 +35,29 @@
         "note": "Computing SHA-256 of original evidence",
         "outputs_summary": {},
         "seq": 2,
-        "timestamp": "2026-07-05T15:27:38.336999+00:00",
+        "timestamp": "2026-07-06T01:30:29.719392+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-BEN-003",
-        "entry_sha256": "0ba56628aa48ad210a2ccd163d457cfcc64729de1c9e02cf885e5d510bc12163",
+        "entry_sha256": "e4af041e77832d7bab5c2df332417ba195103c15a0a22ab01a74e8710bb2e5d5",
         "inputs_summary": {
           "path": "/home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-BEN-003.json"
         },
         "iteration": 0,
-        "note": "Evidence verified: c376aff11901aaea...",
+        "note": "Evidence verified: 8e261288d5360fd7...",
         "outputs_summary": {
-          "sha256": "c376aff11901aaeaac41f882df1aaee2dc96f00292d57ff9ad84d1b98eae39db"
+          "sha256": "8e261288d5360fd72f2ccb4a8cf69f4c0efe24092e0a4bca15031552ea41c656"
         },
         "seq": 3,
-        "timestamp": "2026-07-05T15:27:38.337093+00:00",
+        "timestamp": "2026-07-06T01:30:29.719508+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "PIPELINE_EXECUTE",
         "case_id": "VIGIA-BEN-003",
-        "entry_sha256": "765cace5b6cff4644ebe1844c19e3687a5b3acab910612ac7e2e0f226b2d51f5",
+        "entry_sha256": "0e1bfeaac380f12cd5f0ca5d814dad7902bad7b27a8e94e3130f6232a8fedd86",
         "inputs_summary": {
           "evidence": "/home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-BEN-003.json",
           "iteration": "0",
@@ -67,13 +67,13 @@
         "note": "Executing pipeline \u2014 iteration 0",
         "outputs_summary": {},
         "seq": 4,
-        "timestamp": "2026-07-05T15:27:38.337194+00:00",
+        "timestamp": "2026-07-06T01:30:29.719609+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "PIPELINE_COMPLETE",
         "case_id": "VIGIA-BEN-003",
-        "entry_sha256": "ae676459dfdf7ad176d58db3aa5dd9b258c0b0ef51be068d6f15aa08e953e77e",
+        "entry_sha256": "b041c77d69897b23390dd2c57bdccd4347b0bc3c01fc0d5f162e54e2892701f3",
         "inputs_summary": {
           "iteration": "0"
         },
@@ -82,16 +82,24 @@
         "outputs_summary": {
           "abduction": {
             "best_hypothesis": "NO_SEMIOTIC_ANOMALY_DETECTED",
-            "best_posterior": "1/80",
-            "confidence": "1/80",
-            "is_conclusive": "False",
+            "best_posterior": "99/100",
+            "confidence": "99/100",
+            "is_conclusive": "True",
             "narrative": "Junior user submits ticket: 'I'm a disaster, I accidentally deleted the customers table'. Analysis shows they actually executed DELETE without WHERE, the recovery log is active, and the supervisor con..."
           },
           "case_id": "VIGIA-BEN-003",
           "pipeline_meta": {
             "artifact_count": "3",
             "avg_score": "1/16",
+            "ebs_adapter_mode": "motor",
             "expected_verdict": "NOISE",
+            "resolve": {
+              "motor_confidence": "0.99",
+              "motor_reason": "Insufficient evidence of malicious intent (score=0.0127)",
+              "motor_score": "0.0127",
+              "motor_verdict": "NOISE",
+              "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+            },
             "source": "ebs_v1_json_adapter"
           },
           "signals": [
@@ -122,13 +130,13 @@
           ]
         },
         "seq": 5,
-        "timestamp": "2026-07-05T15:27:38.340239+00:00",
+        "timestamp": "2026-07-06T01:30:30.058499+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "CONTRADICTION_CHECK",
         "case_id": "VIGIA-BEN-003",
-        "entry_sha256": "140fe77562ba5e33c66dcafb8fc2d9ac74e3b05d0644ec34cf5a9ff0c9121546",
+        "entry_sha256": "129a1e01c73926bb335d22b6d1fa2bfe2abd1d08559aa010bb7081a287b29288",
         "inputs_summary": {
           "n_signals": "3"
         },
@@ -139,13 +147,13 @@
           "threshold": "2"
         },
         "seq": 6,
-        "timestamp": "2026-07-05T15:27:38.340373+00:00",
+        "timestamp": "2026-07-06T01:30:30.058612+00:00",
         "tool": "contradiction_detector"
       },
       {
         "action": "AGENT_EXIT",
         "case_id": "VIGIA-BEN-003",
-        "entry_sha256": "d21ba3b479524df0c9264ba8a2f405b8c3a1a20aad512bc8eac7d21fea231c83",
+        "entry_sha256": "4bde27284755304c30ba0a7291e609e8944be169c3d108b9b0a2dd9492e595d1",
         "inputs_summary": {
           "verdict": "NO_SEMIOTIC_ANOMALY_DETECTED"
         },
@@ -156,35 +164,43 @@
           "exit_code": "0"
         },
         "seq": 7,
-        "timestamp": "2026-07-05T15:27:38.340638+00:00",
+        "timestamp": "2026-07-06T01:30:30.058801+00:00",
         "tool": "vigia_agent"
       }
     ],
-    "start_time": "2026-07-05T15:27:38.336670+00:00",
+    "start_time": "2026-07-06T01:30:29.719085+00:00",
     "total_entries": 7
   },
   "case_id": "VIGIA-BEN-003",
   "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-BEN-003.json",
-  "evidence_sha256": "c376aff11901aaeaac41f882df1aaee2dc96f00292d57ff9ad84d1b98eae39db",
+  "evidence_sha256": "8e261288d5360fd72f2ccb4a8cf69f4c0efe24092e0a4bca15031552ea41c656",
   "iterations_executed": 1,
-  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-BEN-003 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-BEN-003.json\nEvidence SHA-256: c376aff11901aaeaac41f882df1aaee2dc96f00292d57ff9ad84d1b98eae39db\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: NO_SEMIOTIC_ANOMALY_DETECTED\nPosterior confidence: 1/80\nConclusive: NO \u2014 requires human review\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 3 se\u00f1al(es): 3 primaria(s) de ['legacy_converter'], 0 derivada(s)/no-analizada(s). Top z: HR record: dev_junior, hired 2023-12-01 =0.07, mysql> DELETE FROM customers; (no WHERE)=0.06, [dev_junior]: 'Guys, I'm a disaster, I d=0.05.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: NO_SEMIOTIC_ANOMALY_DETECTED. Conclusiva: no \u2014 requiere revisi\u00f3n humana.\n\nRazonamiento del motor abductivo:\nJunior user submits ticket: 'I'm a disaster, I accidentally deleted the customers table'. Analysis shows they actually executed DELETE without WHERE, the recovery log is active, and the supervisor confirmed it is their first month.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [HR record: dev_junior, hired 2023-12-01 | Training status: DB basics i] z=0.071 conf=0.30 \u2014 \n  [mysql> DELETE FROM customers; (no WHERE) | mysql> SHOW TABLES; (panic)] z=0.064 conf=0.30 \u2014 \n  [[dev_junior]: 'Guys, I'm a disaster, I deleted the customers table wit] z=0.052 conf=0.30 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 3 | Derived: 0 | Total: 3",
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-BEN-003 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-BEN-003.json\nEvidence SHA-256: 8e261288d5360fd72f2ccb4a8cf69f4c0efe24092e0a4bca15031552ea41c656\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: NO_SEMIOTIC_ANOMALY_DETECTED\nPosterior confidence: 99/100\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 3 se\u00f1al(es): 3 primaria(s) de ['legacy_converter'], 0 derivada(s)/no-analizada(s). Top z: HR record: dev_junior, hired 2023-12-01 =0.07, mysql> DELETE FROM customers; (no WHERE)=0.06, [dev_junior]: 'Guys, I'm a disaster, I d=0.05.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: NO_SEMIOTIC_ANOMALY_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nJunior user submits ticket: 'I'm a disaster, I accidentally deleted the customers table'. Analysis shows they actually executed DELETE without WHERE, the recovery log is active, and the supervisor confirmed it is their first month.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [HR record: dev_junior, hired 2023-12-01 | Training status: DB basics i] z=0.071 conf=0.30 \u2014 \n  [mysql> DELETE FROM customers; (no WHERE) | mysql> SHOW TABLES; (panic)] z=0.064 conf=0.30 \u2014 \n  [[dev_junior]: 'Guys, I'm a disaster, I deleted the customers table wit] z=0.052 conf=0.30 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 3 | Derived: 0 | Total: 3",
   "pipeline_results": {
     "abduction": {
       "best_hypothesis": "NO_SEMIOTIC_ANOMALY_DETECTED",
-      "best_posterior": "1/80",
+      "best_posterior": "99/100",
       "confidence": {
         "__fraction__": true,
-        "den": 80,
-        "num": 1
+        "den": 100,
+        "num": 99
       },
-      "is_conclusive": false,
+      "is_conclusive": true,
       "narrative": "Junior user submits ticket: 'I'm a disaster, I accidentally deleted the customers table'. Analysis shows they actually executed DELETE without WHERE, the recovery log is active, and the supervisor confirmed it is their first month."
     },
     "case_id": "VIGIA-BEN-003",
     "pipeline_meta": {
       "artifact_count": 3,
       "avg_score": "1/16",
+      "ebs_adapter_mode": "motor",
       "expected_verdict": "NOISE",
+      "resolve": {
+        "motor_confidence": "0.99",
+        "motor_reason": "Insufficient evidence of malicious intent (score=0.0127)",
+        "motor_score": "0.0127",
+        "motor_verdict": "NOISE",
+        "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+      },
       "source": "ebs_v1_json_adapter"
     },
     "signals": [

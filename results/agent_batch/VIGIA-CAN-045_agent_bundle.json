@@ -1,15 +1,15 @@
 {
   "agent_verdict": "MALICE",
-  "analysis_timestamp": "2026-07-05T15:27:42.564849+00:00",
+  "analysis_timestamp": "2026-07-06T01:31:05.877774+00:00",
   "audit_trail": {
     "agent_version": "1.0.0-SANS-2026",
     "case_id": "VIGIA-CAN-045",
-    "end_time": "2026-07-05T15:27:42.564855+00:00",
+    "end_time": "2026-07-06T01:31:05.877780+00:00",
     "entries": [
       {
         "action": "AGENT_INITIALIZED",
         "case_id": "VIGIA-CAN-045",
-        "entry_sha256": "278385657ba660332a691d6dff6f9e63d7ac815b5910fe1338968d5d96e3376e",
+        "entry_sha256": "3b116d05f9e7e54235fc0638902ffd12164dc364c9ddf9fdd23fe4c6a8193416",
         "inputs_summary": {
           "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
           "case_id": "VIGIA-CAN-045"
@@ -21,13 +21,13 @@
           "agent_version": "1.0.0-SANS-2026"
         },
         "seq": 1,
-        "timestamp": "2026-07-05T15:27:42.561321+00:00",
+        "timestamp": "2026-07-06T01:31:05.522747+00:00",
         "tool": "vigia_agent"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-CAN-045",
-        "entry_sha256": "39840a81b066c8cbcde29a64937feb6b92346b3b6ef49890fb65885255771c27",
+        "entry_sha256": "46d1d4aa72cf10432e2f8d1859dc413bfadd465eee5a3752cd10ff9aba5ced94",
         "inputs_summary": {
           "path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-045.json"
         },
@@ -35,29 +35,29 @@
         "note": "Computing SHA-256 of original evidence",
         "outputs_summary": {},
         "seq": 2,
-        "timestamp": "2026-07-05T15:27:42.561406+00:00",
+        "timestamp": "2026-07-06T01:31:05.522834+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-CAN-045",
-        "entry_sha256": "c05eee6c3f5b1f892bf72c309a575c0c1041d7f5f48fc54a259100c302fe3c9f",
+        "entry_sha256": "caac9c354a4fa01820fe32ff221ddf16b59e7a1a4ec4de93b3b0c95efb8f689a",
         "inputs_summary": {
           "path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-045.json"
         },
         "iteration": 0,
-        "note": "Evidence verified: 79ba57dea9270a99...",
+        "note": "Evidence verified: c7ce8bc506781317...",
         "outputs_summary": {
-          "sha256": "79ba57dea9270a99f4060a59b2fdef0b974f00983ee6f0f70c05fbe99cd93a81"
+          "sha256": "c7ce8bc506781317a5e1586ad270bb22e7c98eacc1232d7619695bb01913279a"
         },
         "seq": 3,
-        "timestamp": "2026-07-05T15:27:42.561507+00:00",
+        "timestamp": "2026-07-06T01:31:05.522928+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "PIPELINE_EXECUTE",
         "case_id": "VIGIA-CAN-045",
-        "entry_sha256": "4de72fd685104593431ed5111503625b248a6825950e6a0176e1413b561441d1",
+        "entry_sha256": "6191bb31c8844bbae061ff0d75180ea6f3c0bde4bc9b77d479af8e5789866b09",
         "inputs_summary": {
           "evidence": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-045.json",
           "iteration": "0",
@@ -67,13 +67,13 @@
         "note": "Executing pipeline \u2014 iteration 0",
         "outputs_summary": {},
         "seq": 4,
-        "timestamp": "2026-07-05T15:27:42.561609+00:00",
+        "timestamp": "2026-07-06T01:31:05.523033+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "PIPELINE_COMPLETE",
         "case_id": "VIGIA-CAN-045",
-        "entry_sha256": "770ec4214dacb79010407899d0e45059c0f91d6722ad1748f8a54291db1be459",
+        "entry_sha256": "e067da50618feeafbb3a48c0cea8e484f82eecfb2e6a443cf361ddb92fecefe4",
         "inputs_summary": {
           "iteration": "0"
         },
@@ -82,16 +82,24 @@
         "outputs_summary": {
           "abduction": {
             "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
-            "best_posterior": "723/20000",
-            "confidence": "723/20000",
-            "is_conclusive": "False",
+            "best_posterior": "19/20",
+            "confidence": "19/20",
+            "is_conclusive": "True",
             "narrative": "PowerShell script from a US IT department has perfect English comments but uses angle quotes \u00ab \u00bb and non-breaking spaces typical of Cyrillic/European keyboards."
           },
           "case_id": "case_021_motin_comillas",
           "pipeline_meta": {
             "artifact_count": "4",
             "avg_score": "723/4000",
+            "ebs_adapter_mode": "motor",
             "expected_verdict": "MALICE",
+            "resolve": {
+              "motor_confidence": "0.95",
+              "motor_reason": "Intent score 0.5135 exceeds MALICE threshold (P2+acq_assurance scale, threshold=0.33)",
+              "motor_score": "0.5135",
+              "motor_verdict": "MALICE",
+              "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+            },
             "source": "ebs_v1_json_adapter"
           },
           "signals": [
@@ -130,13 +138,13 @@
           ]
         },
         "seq": 5,
-        "timestamp": "2026-07-05T15:27:42.564098+00:00",
+        "timestamp": "2026-07-06T01:31:05.877266+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "CONTRADICTION_CHECK",
         "case_id": "VIGIA-CAN-045",
-        "entry_sha256": "b815fe62f2e6f91c1c68645f320c31700abfa4f5d40a7bd45071d4b276a1df6e",
+        "entry_sha256": "eebec8993f0c4962ad5bd7de8f6ff70cb229ff860387f5e82644feded53ef31f",
         "inputs_summary": {
           "n_signals": "4"
         },
@@ -147,13 +155,13 @@
           "threshold": "2"
         },
         "seq": 6,
-        "timestamp": "2026-07-05T15:27:42.564203+00:00",
+        "timestamp": "2026-07-06T01:31:05.877378+00:00",
         "tool": "contradiction_detector"
       },
       {
         "action": "AGENT_EXIT",
         "case_id": "VIGIA-CAN-045",
-        "entry_sha256": "e115dc28ad62447f03ae0afbc78850d8098d1ef6b8b9bb02199b6a798cfe711e",
+        "entry_sha256": "04c213f6661d532d47ce9660a66026e1b2a9b5c1daabbd5b73b7feec0aab9654",
         "inputs_summary": {
           "verdict": "MALICIOUS_INTENT_DETECTED"
         },
@@ -164,26 +172,26 @@
           "exit_code": "1"
         },
         "seq": 7,
-        "timestamp": "2026-07-05T15:27:42.564386+00:00",
+        "timestamp": "2026-07-06T01:31:05.877594+00:00",
         "tool": "vigia_agent"
       }
     ],
-    "start_time": "2026-07-05T15:27:42.561100+00:00",
+    "start_time": "2026-07-06T01:31:05.522529+00:00",
     "total_entries": 7
   },
   "case_id": "VIGIA-CAN-045",
   "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-045.json",
-  "evidence_sha256": "79ba57dea9270a99f4060a59b2fdef0b974f00983ee6f0f70c05fbe99cd93a81",
+  "evidence_sha256": "c7ce8bc506781317a5e1586ad270bb22e7c98eacc1232d7619695bb01913279a",
   "iterations_executed": 1,
-  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-CAN-045 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-045.json\nEvidence SHA-256: 79ba57dea9270a99f4060a59b2fdef0b974f00983ee6f0f70c05fbe99cd93a81\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 723/20000\nConclusive: NO \u2014 requires human review\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 4 se\u00f1al(es): 4 primaria(s) de ['sift_file_audit', 'sift_git_audit', 'sift_linguistic', 'sift_syslog'], 0 derivada(s)/no-analizada(s). Top z: PowerShell script 'Update-GPO.ps1' with =0.55, Locale leakage detection: angle quotes \u00ab=0.13, Script commit from a machine with git co=0.02.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: MALICIOUS_INTENT_DETECTED. Conclusiva: no \u2014 requiere revisi\u00f3n humana.\n\nRazonamiento del motor abductivo:\nPowerShell script from a US IT department has perfect English comments but uses angle quotes \u00ab \u00bb and non-breaking spaces typical of Cyrillic/European keyboards.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [PowerShell script 'Update-GPO.ps1' with perfect English comments but a] z=0.552 conf=0.65 \u2014 \n  [Locale leakage detection: angle quotes \u00ab\u00bb are characteristic of Russia] z=0.132 conf=0.15 \u2014 \n  [Script commit from a machine with git config user.name='Admin' but tim] z=0.022 conf=0.45 \u2014 \n  [Script execution with -EncodedCommand parameter that downloads a paylo] z=0.016 conf=0.40 \u2014 \n\n--- FINAL ALERT LEVEL ---\nMEDIUM \u2014 MALICE verdict from posterior aggregation. Individual z-scores below threshold. Full signal review recommended. Alert floored (B-028/B-065).\nReconciliation: verdict MALICE rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 4 | Derived: 0 | Total: 4",
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-CAN-045 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-045.json\nEvidence SHA-256: c7ce8bc506781317a5e1586ad270bb22e7c98eacc1232d7619695bb01913279a\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 19/20\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 4 se\u00f1al(es): 4 primaria(s) de ['sift_file_audit', 'sift_git_audit', 'sift_linguistic', 'sift_syslog'], 0 derivada(s)/no-analizada(s). Top z: PowerShell script 'Update-GPO.ps1' with =0.55, Locale leakage detection: angle quotes \u00ab=0.13, Script commit from a machine with git co=0.02.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: MALICIOUS_INTENT_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nPowerShell script from a US IT department has perfect English comments but uses angle quotes \u00ab \u00bb and non-breaking spaces typical of Cyrillic/European keyboards.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [PowerShell script 'Update-GPO.ps1' with perfect English comments but a] z=0.552 conf=0.65 \u2014 \n  [Locale leakage detection: angle quotes \u00ab\u00bb are characteristic of Russia] z=0.132 conf=0.15 \u2014 \n  [Script commit from a machine with git config user.name='Admin' but tim] z=0.022 conf=0.45 \u2014 \n  [Script execution with -EncodedCommand parameter that downloads a paylo] z=0.016 conf=0.40 \u2014 \n\n--- FINAL ALERT LEVEL ---\nHIGH \u2014 MALICE verdict from Bayesian posterior aggregation. Individual z-scores below threshold (distributed evidence pattern: no single dominant signal, but aggregate posterior is decisive). Alert floored (B-028/B-065).\nReconciliation: verdict MALICE rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 4 | Derived: 0 | Total: 4",
   "pipeline_results": {
     "abduction": {
       "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
-      "best_posterior": "723/20000",
+      "best_posterior": "19/20",
       "confidence": {
         "__fraction__": true,
-        "den": 20000,
-        "num": 723
+        "den": 20,
+        "num": 19
       },
       "devil_advocate": {
         "aggregation": {
@@ -195,7 +203,7 @@
           "primary_alternative_hypothesis": null
         },
         "decision_context": {
-          "confidence": "723/20000",
+          "confidence": "19/20",
           "mapped_verdict": "MALICIOUS_INTENT_DETECTED",
           "raw_verdict": "MALICIOUS_INTENT_DETECTED",
           "score": "723/4000"
@@ -209,14 +217,22 @@
         "pattern_evidence_gaps": [],
         "version": "r7-da-v1"
       },
-      "is_conclusive": false,
+      "is_conclusive": true,
       "narrative": "PowerShell script from a US IT department has perfect English comments but uses angle quotes \u00ab \u00bb and non-breaking spaces typical of Cyrillic/European keyboards."
     },
     "case_id": "case_021_motin_comillas",
     "pipeline_meta": {
       "artifact_count": 4,
       "avg_score": "723/4000",
+      "ebs_adapter_mode": "motor",
       "expected_verdict": "MALICE",
+      "resolve": {
+        "motor_confidence": "0.95",
+        "motor_reason": "Intent score 0.5135 exceeds MALICE threshold (P2+acq_assurance scale, threshold=0.33)",
+        "motor_score": "0.5135",
+        "motor_verdict": "MALICE",
+        "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+      },
       "source": "ebs_v1_json_adapter"
     },
     "signals": [

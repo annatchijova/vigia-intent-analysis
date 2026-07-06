@@ -1,15 +1,15 @@
 {
-  "agent_verdict": "ABSTAIN",
-  "analysis_timestamp": "2026-07-05T15:27:32.907611+00:00",
+  "agent_verdict": "NOISE",
+  "analysis_timestamp": "2026-07-06T01:29:43.899704+00:00",
   "audit_trail": {
     "agent_version": "1.0.0-SANS-2026",
     "case_id": "VIGIA-ANDROID11-001",
-    "end_time": "2026-07-05T15:27:32.907616+00:00",
+    "end_time": "2026-07-06T01:29:43.899710+00:00",
     "entries": [
       {
         "action": "AGENT_INITIALIZED",
         "case_id": "VIGIA-ANDROID11-001",
-        "entry_sha256": "d12e049f63f48f214e1bb7a0fe45c112897ef7232396f069f29401d55aa0b071",
+        "entry_sha256": "cd54b56930ef758be54ab1b4b9b4d18ddd023065470c6b0dc32281ec664d62db",
         "inputs_summary": {
           "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
           "case_id": "VIGIA-ANDROID11-001"
@@ -21,13 +21,13 @@
           "agent_version": "1.0.0-SANS-2026"
         },
         "seq": 1,
-        "timestamp": "2026-07-05T15:27:32.904572+00:00",
+        "timestamp": "2026-07-06T01:29:43.551820+00:00",
         "tool": "vigia_agent"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-ANDROID11-001",
-        "entry_sha256": "c34863fc8ddc39d96e0695f69e90032f862aa4b00a2ee0f5ba1947e671447400",
+        "entry_sha256": "a535ac1165b1d58a7cdf4ebda4d422068f08011a1f141b96db019c2854abbe2b",
         "inputs_summary": {
           "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-ANDROID11-001.json"
         },
@@ -35,29 +35,29 @@
         "note": "Computing SHA-256 of original evidence",
         "outputs_summary": {},
         "seq": 2,
-        "timestamp": "2026-07-05T15:27:32.904655+00:00",
+        "timestamp": "2026-07-06T01:29:43.551905+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-ANDROID11-001",
-        "entry_sha256": "6c810b6e4cc5f79eed369e1af8762578f6048825ff2685e53eb9b42623168257",
+        "entry_sha256": "971fee4a2bb3a11aa74d9e570587d7fad86703fc4409d9d1855a6fa317499c45",
         "inputs_summary": {
           "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-ANDROID11-001.json"
         },
         "iteration": 0,
-        "note": "Evidence verified: 3c1d32575ff9ad24...",
+        "note": "Evidence verified: b7889b8267ab3ae0...",
         "outputs_summary": {
-          "sha256": "3c1d32575ff9ad24adf3b3ed09e03ea5146a76f1c03d8b4cb03645a36b6d3d22"
+          "sha256": "b7889b8267ab3ae088e8d23e6e955315eccb16561922d782862c98787095fa81"
         },
         "seq": 3,
-        "timestamp": "2026-07-05T15:27:32.904751+00:00",
+        "timestamp": "2026-07-06T01:29:43.552001+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "PIPELINE_EXECUTE",
         "case_id": "VIGIA-ANDROID11-001",
-        "entry_sha256": "274a576241b73e1edc960576a41b8e9b9cba38df78f1e70f2ac67a95e94576b0",
+        "entry_sha256": "1a83fd3255c2e5b67c663f597215b7db06548cea9c9e5c069b6c488b406cc0da",
         "inputs_summary": {
           "evidence": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-ANDROID11-001.json",
           "iteration": "0",
@@ -67,13 +67,13 @@
         "note": "Executing pipeline \u2014 iteration 0",
         "outputs_summary": {},
         "seq": 4,
-        "timestamp": "2026-07-05T15:27:32.904853+00:00",
+        "timestamp": "2026-07-06T01:29:43.552105+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "PIPELINE_COMPLETE",
         "case_id": "VIGIA-ANDROID11-001",
-        "entry_sha256": "a6287e19cac29ca0dfbf9d22aad01b389e6f490bbb16323967a9313a98639979",
+        "entry_sha256": "557fecbe26545af065674ae05cdcd85938a4b2c54a6f35eded81d97f10fab9f7",
         "inputs_summary": {
           "iteration": "0"
         },
@@ -81,17 +81,25 @@
         "note": "Pipeline completed \u2014 2 signals",
         "outputs_summary": {
           "abduction": {
-            "best_hypothesis": "ABSTAIN_DETECTED",
-            "best_posterior": "29/4000",
-            "confidence": "29/4000",
-            "is_conclusive": "False",
+            "best_hypothesis": "NO_SEMIOTIC_ANOMALY_DETECTED",
+            "best_posterior": "99/100",
+            "confidence": "99/100",
+            "is_conclusive": "True",
             "narrative": "Forensic archive android_11.zip (SHA-256: abb27d4c5a57692d192a7619d179749abbd916d985d9fb4b10455d96d34d44a7, 10,944,907,975 bytes = 10.94GB). Contains nested archive: 'Android 11/Android 11 Image with ..."
           },
           "case_id": "VIGIA-ANDROID11-001",
           "pipeline_meta": {
             "artifact_count": "2",
             "avg_score": "29/800",
+            "ebs_adapter_mode": "motor",
             "expected_verdict": "ABSTAIN",
+            "resolve": {
+              "motor_confidence": "0.99",
+              "motor_reason": "Insufficient evidence of malicious intent (score=0.0088)",
+              "motor_score": "0.0088",
+              "motor_verdict": "NOISE",
+              "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+            },
             "source": "ebs_v1_json_adapter"
           },
           "signals": [
@@ -114,13 +122,13 @@
           ]
         },
         "seq": 5,
-        "timestamp": "2026-07-05T15:27:32.907287+00:00",
+        "timestamp": "2026-07-06T01:29:43.899361+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "CONTRADICTION_CHECK",
         "case_id": "VIGIA-ANDROID11-001",
-        "entry_sha256": "ca5a430e2b4022308af50e599eafd5334cd25cb3eb385a68caa23fd797ec8ebb",
+        "entry_sha256": "31a5f12b57994a66482349c5e09ab160f2a9465f17654b37fddf4efffab28cfd",
         "inputs_summary": {
           "n_signals": "2"
         },
@@ -131,52 +139,60 @@
           "threshold": "2"
         },
         "seq": 6,
-        "timestamp": "2026-07-05T15:27:32.907384+00:00",
+        "timestamp": "2026-07-06T01:29:43.899474+00:00",
         "tool": "contradiction_detector"
       },
       {
         "action": "AGENT_EXIT",
         "case_id": "VIGIA-ANDROID11-001",
-        "entry_sha256": "71df1bc4013ceb957451f730fe4da4c833e2378d19fd077f7446a3c8a072c6bc",
+        "entry_sha256": "9d40379c56b881c880bd8f28b20b4ef08a9a717a7722299e475f7f84767c602e",
         "inputs_summary": {
-          "verdict": "ABSTAIN_DETECTED"
+          "verdict": "NO_SEMIOTIC_ANOMALY_DETECTED"
         },
         "iteration": 0,
-        "note": "Exit code 4 (ABSTAIN) \u2014 analysis complete.",
+        "note": "Exit code 0 (NOISE) \u2014 analysis complete.",
         "outputs_summary": {
-          "agent_verdict": "ABSTAIN",
-          "exit_code": "4"
+          "agent_verdict": "NOISE",
+          "exit_code": "0"
         },
         "seq": 7,
-        "timestamp": "2026-07-05T15:27:32.907562+00:00",
+        "timestamp": "2026-07-06T01:29:43.899653+00:00",
         "tool": "vigia_agent"
       }
     ],
-    "start_time": "2026-07-05T15:27:32.904342+00:00",
+    "start_time": "2026-07-06T01:29:43.551599+00:00",
     "total_entries": 7
   },
   "case_id": "VIGIA-ANDROID11-001",
   "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-ANDROID11-001.json",
-  "evidence_sha256": "3c1d32575ff9ad24adf3b3ed09e03ea5146a76f1c03d8b4cb03645a36b6d3d22",
+  "evidence_sha256": "b7889b8267ab3ae088e8d23e6e955315eccb16561922d782862c98787095fa81",
   "iterations_executed": 1,
-  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-ANDROID11-001 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/VIGIA-ANDROID11-001.json\nEvidence SHA-256: 3c1d32575ff9ad24adf3b3ed09e03ea5146a76f1c03d8b4cb03645a36b6d3d22\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: ABSTAIN_DETECTED\nPosterior confidence: 29/4000\nConclusive: NO \u2014 requires human review\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 2 se\u00f1al(es): 2 primaria(s) de ['generate_forensic_hash', 'read_evidence'], 0 derivada(s)/no-analizada(s). Top z: Android 11 forensic archive. Outer archi=0.05, Zip directory listing only (no extractio=0.03.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: ABSTAIN_DETECTED. Conclusiva: no \u2014 requiere revisi\u00f3n humana.\n\nRazonamiento del motor abductivo:\nForensic archive android_11.zip (SHA-256: abb27d4c5a57692d192a7619d179749abbd916d985d9fb4b10455d96d34d44a7, 10,944,907,975 bytes = 10.94GB). Contains nested archive: 'Android 11/Android 11 Image with Documentation.zip' (10,973,972,708 bytes = 10.97GB). File date: 2022-09-04. ABSTAIN verdict for this intake record: the outer archive has been hashed and its chain of custody established, but the nested image has not yet been extracted and analyzed due to size constraints (full extraction requires ~\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Android 11 forensic archive. Outer archive SHA-256 computed and verifi] z=0.048 conf=0.95 \u2014 \n  [Zip directory listing only (no extraction). Inner file path: 'Android ] z=0.025 conf=0.50 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 2 | Derived: 0 | Total: 2",
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-ANDROID11-001 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/VIGIA-ANDROID11-001.json\nEvidence SHA-256: b7889b8267ab3ae088e8d23e6e955315eccb16561922d782862c98787095fa81\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: NO_SEMIOTIC_ANOMALY_DETECTED\nPosterior confidence: 99/100\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 2 se\u00f1al(es): 2 primaria(s) de ['generate_forensic_hash', 'read_evidence'], 0 derivada(s)/no-analizada(s). Top z: Android 11 forensic archive. Outer archi=0.05, Zip directory listing only (no extractio=0.03.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: NO_SEMIOTIC_ANOMALY_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nForensic archive android_11.zip (SHA-256: abb27d4c5a57692d192a7619d179749abbd916d985d9fb4b10455d96d34d44a7, 10,944,907,975 bytes = 10.94GB). Contains nested archive: 'Android 11/Android 11 Image with Documentation.zip' (10,973,972,708 bytes = 10.97GB). File date: 2022-09-04. ABSTAIN verdict for this intake record: the outer archive has been hashed and its chain of custody established, but the nested image has not yet been extracted and analyzed due to size constraints (full extraction requires ~\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Android 11 forensic archive. Outer archive SHA-256 computed and verifi] z=0.048 conf=0.95 \u2014 \n  [Zip directory listing only (no extraction). Inner file path: 'Android ] z=0.025 conf=0.50 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 2 | Derived: 0 | Total: 2",
   "pipeline_results": {
     "abduction": {
-      "best_hypothesis": "ABSTAIN_DETECTED",
-      "best_posterior": "29/4000",
+      "best_hypothesis": "NO_SEMIOTIC_ANOMALY_DETECTED",
+      "best_posterior": "99/100",
       "confidence": {
         "__fraction__": true,
-        "den": 4000,
-        "num": 29
+        "den": 100,
+        "num": 99
       },
-      "is_conclusive": false,
+      "is_conclusive": true,
       "narrative": "Forensic archive android_11.zip (SHA-256: abb27d4c5a57692d192a7619d179749abbd916d985d9fb4b10455d96d34d44a7, 10,944,907,975 bytes = 10.94GB). Contains nested archive: 'Android 11/Android 11 Image with Documentation.zip' (10,973,972,708 bytes = 10.97GB). File date: 2022-09-04. ABSTAIN verdict for this intake record: the outer archive has been hashed and its chain of custody established, but the nested image has not yet been extracted and analyzed due to size constraints (full extraction requires ~"
     },
     "case_id": "VIGIA-ANDROID11-001",
     "pipeline_meta": {
       "artifact_count": 2,
       "avg_score": "29/800",
+      "ebs_adapter_mode": "motor",
       "expected_verdict": "ABSTAIN",
+      "resolve": {
+        "motor_confidence": "0.99",
+        "motor_reason": "Insufficient evidence of malicious intent (score=0.0088)",
+        "motor_score": "0.0088",
+        "motor_verdict": "NOISE",
+        "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+      },
       "source": "ebs_v1_json_adapter"
     },
     "signals": [

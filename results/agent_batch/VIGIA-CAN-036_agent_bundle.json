@@ -1,15 +1,15 @@
 {
   "agent_verdict": "INTENT",
-  "analysis_timestamp": "2026-07-05T15:27:42.091972+00:00",
+  "analysis_timestamp": "2026-07-06T01:31:01.915767+00:00",
   "audit_trail": {
     "agent_version": "1.0.0-SANS-2026",
     "case_id": "VIGIA-CAN-036",
-    "end_time": "2026-07-05T15:27:42.091977+00:00",
+    "end_time": "2026-07-06T01:31:01.915774+00:00",
     "entries": [
       {
         "action": "AGENT_INITIALIZED",
         "case_id": "VIGIA-CAN-036",
-        "entry_sha256": "8c6f0cedfd1852572abde8b482e9d156f253157871f68b4377d89a864ae50e5c",
+        "entry_sha256": "c7e4a325dc587179b050e740fc271b52b13d91cd30a9bfb338d71ca2341aa3d6",
         "inputs_summary": {
           "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
           "case_id": "VIGIA-CAN-036"
@@ -21,13 +21,13 @@
           "agent_version": "1.0.0-SANS-2026"
         },
         "seq": 1,
-        "timestamp": "2026-07-05T15:27:42.088711+00:00",
+        "timestamp": "2026-07-06T01:31:01.554170+00:00",
         "tool": "vigia_agent"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-CAN-036",
-        "entry_sha256": "d04baa7c4154363dc75d0664c920e33dc2c22d96b1415622103219eec5174299",
+        "entry_sha256": "78b2cf9c1e212e0688c3468ef0009a46df317ca526b08c124176ec9b59401b06",
         "inputs_summary": {
           "path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-036.json"
         },
@@ -35,29 +35,29 @@
         "note": "Computing SHA-256 of original evidence",
         "outputs_summary": {},
         "seq": 2,
-        "timestamp": "2026-07-05T15:27:42.088799+00:00",
+        "timestamp": "2026-07-06T01:31:01.554257+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-CAN-036",
-        "entry_sha256": "a585e7edadea9e21a19675ea14d8212ee935e3a0e3727c6b4694046d9ef280d7",
+        "entry_sha256": "b8d5f2d9d6c4d689cf902f23ca6b0ca11faba46d14d982d08ed5cd9d30aa0af8",
         "inputs_summary": {
           "path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-036.json"
         },
         "iteration": 0,
-        "note": "Evidence verified: 58b36249eaebec98...",
+        "note": "Evidence verified: 7cc9c43835358782...",
         "outputs_summary": {
-          "sha256": "58b36249eaebec98840664512749f668fcc37ca198a9c8d76783cd1b2d890dd3"
+          "sha256": "7cc9c43835358782df7611b2b8d2d9fa899c0120d19a81d3bb9916eff1707ef3"
         },
         "seq": 3,
-        "timestamp": "2026-07-05T15:27:42.088891+00:00",
+        "timestamp": "2026-07-06T01:31:01.554353+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "PIPELINE_EXECUTE",
         "case_id": "VIGIA-CAN-036",
-        "entry_sha256": "a876a72aeeed3877b6480f94b198ff67ff9af2345cdf4dafb4ef48e351598103",
+        "entry_sha256": "43f4994e3edb729d278a8e8024f6ee84979e632489e72f79c062685bfc59a767",
         "inputs_summary": {
           "evidence": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-036.json",
           "iteration": "0",
@@ -67,13 +67,13 @@
         "note": "Executing pipeline \u2014 iteration 0",
         "outputs_summary": {},
         "seq": 4,
-        "timestamp": "2026-07-05T15:27:42.088992+00:00",
+        "timestamp": "2026-07-06T01:31:01.554469+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "PIPELINE_COMPLETE",
         "case_id": "VIGIA-CAN-036",
-        "entry_sha256": "44a33ca68f95049644cd6a65e3a879002101165ae7136fc97003e49cc86ac7ff",
+        "entry_sha256": "85851a8fafeeb640d3e18a1677d258e5e96325cf621ea6163ffc2f95ac20893e",
         "inputs_summary": {
           "iteration": "0"
         },
@@ -82,8 +82,8 @@
         "outputs_summary": {
           "abduction": {
             "best_hypothesis": "SUSPICION_DETECTED",
-            "best_posterior": "583/6250",
-            "confidence": "583/6250",
+            "best_posterior": "33/50",
+            "confidence": "33/50",
             "is_conclusive": "True",
             "narrative": "Process 'Update_Fix_For_HR_Payroll.exe' consuming 1.2GB RAM from C:\\Users\\Public\\Documents, without a digital signature. Shannon entropy: 7.8 bits (packed/encrypted). The name appeals to HR to induce ..."
           },
@@ -91,7 +91,15 @@
           "pipeline_meta": {
             "artifact_count": "4",
             "avg_score": "583/1250",
+            "ebs_adapter_mode": "motor",
             "expected_verdict": "SUSPICION",
+            "resolve": {
+              "motor_confidence": "0.66",
+              "motor_reason": "Significant signal with structural support (score=0.3297)",
+              "motor_score": "0.3297",
+              "motor_verdict": "SUSPICION",
+              "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+            },
             "source": "ebs_v1_json_adapter"
           },
           "signals": [
@@ -130,13 +138,13 @@
           ]
         },
         "seq": 5,
-        "timestamp": "2026-07-05T15:27:42.091619+00:00",
+        "timestamp": "2026-07-06T01:31:01.915377+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "CONTRADICTION_CHECK",
         "case_id": "VIGIA-CAN-036",
-        "entry_sha256": "9d09adf5c1e60e501c2240f3938658e4f8fc9039911b91c011e916e80d37bc0f",
+        "entry_sha256": "c44380500e0c5dee632bff0cf202cb9f3aff37040356e36b72d1c9ac4a79c965",
         "inputs_summary": {
           "n_signals": "4"
         },
@@ -147,13 +155,13 @@
           "threshold": "2"
         },
         "seq": 6,
-        "timestamp": "2026-07-05T15:27:42.091734+00:00",
+        "timestamp": "2026-07-06T01:31:01.915510+00:00",
         "tool": "contradiction_detector"
       },
       {
         "action": "AGENT_EXIT",
         "case_id": "VIGIA-CAN-036",
-        "entry_sha256": "58bdf702d756f974406a1613f13a23753b4585e7d639b6f5168f9c76afa5bcaa",
+        "entry_sha256": "df1e29304504115c6507932c3749557a2e749296d127aaf6862323e2315dd61a",
         "inputs_summary": {
           "verdict": "SUSPICION_DETECTED"
         },
@@ -164,26 +172,26 @@
           "exit_code": "3"
         },
         "seq": 7,
-        "timestamp": "2026-07-05T15:27:42.091921+00:00",
+        "timestamp": "2026-07-06T01:31:01.915717+00:00",
         "tool": "vigia_agent"
       }
     ],
-    "start_time": "2026-07-05T15:27:42.088482+00:00",
+    "start_time": "2026-07-06T01:31:01.553955+00:00",
     "total_entries": 7
   },
   "case_id": "VIGIA-CAN-036",
   "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-036.json",
-  "evidence_sha256": "58b36249eaebec98840664512749f668fcc37ca198a9c8d76783cd1b2d890dd3",
+  "evidence_sha256": "7cc9c43835358782df7611b2b8d2d9fa899c0120d19a81d3bb9916eff1707ef3",
   "iterations_executed": 1,
-  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-CAN-036 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-036.json\nEvidence SHA-256: 58b36249eaebec98840664512749f668fcc37ca198a9c8d76783cd1b2d890dd3\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: SUSPICION_DETECTED\nPosterior confidence: 583/6250\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 4 se\u00f1al(es): 4 primaria(s) de ['sift_entropy', 'sift_hr_system', 'sift_netflow', 'sift_volatility'], 0 derivada(s)/no-analizada(s). Top z: Shannon entropy: 7.8 bits/byte. Legitima=0.86, Update_Fix_For_HR_Payroll.exe: 1.2GB RAM=0.75, Process establishes persistent connectio=0.23.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: SUSPICION_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nProcess 'Update_Fix_For_HR_Payroll.exe' consuming 1.2GB RAM from C:\\Users\\Public\\Documents, without a digital signature. Shannon entropy: 7.8 bits (packed/encrypted). The name appeals to HR to induce doubt before killing the process.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Shannon entropy: 7.8 bits/byte. Legitimate software range: 5.0-6.5. In] z=0.856 conf=0.93 \u2014 \n  [Update_Fix_For_HR_Payroll.exe: 1.2GB RAM, C:\\Users\\Public\\Documents\\, ] z=0.748 conf=0.85 \u2014 \n  [Process establishes persistent connection to 91.108.4.200:8080. Not a ] z=0.230 conf=0.25 \u2014 \n  [Verification with HR system: NO payroll update is pending or authorize] z=0.032 conf=0.40 \u2014 \n\n--- FINAL ALERT LEVEL ---\nMEDIUM \u2014 INTENT verdict with individual z-scores below threshold. Alert floored (B-028/B-065): an intent finding cannot present as LOW.\nReconciliation: verdict INTENT rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 4 | Derived: 0 | Total: 4",
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-CAN-036 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-036.json\nEvidence SHA-256: 7cc9c43835358782df7611b2b8d2d9fa899c0120d19a81d3bb9916eff1707ef3\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: SUSPICION_DETECTED\nPosterior confidence: 33/50\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 4 se\u00f1al(es): 4 primaria(s) de ['sift_entropy', 'sift_hr_system', 'sift_netflow', 'sift_volatility'], 0 derivada(s)/no-analizada(s). Top z: Shannon entropy: 7.8 bits/byte. Legitima=0.86, Update_Fix_For_HR_Payroll.exe: 1.2GB RAM=0.75, Process establishes persistent connectio=0.23.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: SUSPICION_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nProcess 'Update_Fix_For_HR_Payroll.exe' consuming 1.2GB RAM from C:\\Users\\Public\\Documents, without a digital signature. Shannon entropy: 7.8 bits (packed/encrypted). The name appeals to HR to induce doubt before killing the process.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Shannon entropy: 7.8 bits/byte. Legitimate software range: 5.0-6.5. In] z=0.856 conf=0.93 \u2014 \n  [Update_Fix_For_HR_Payroll.exe: 1.2GB RAM, C:\\Users\\Public\\Documents\\, ] z=0.748 conf=0.85 \u2014 \n  [Process establishes persistent connection to 91.108.4.200:8080. Not a ] z=0.230 conf=0.25 \u2014 \n  [Verification with HR system: NO payroll update is pending or authorize] z=0.032 conf=0.40 \u2014 \n\n--- FINAL ALERT LEVEL ---\nMEDIUM \u2014 INTENT verdict with individual z-scores below threshold. Alert floored (B-028/B-065): an intent finding cannot present as LOW.\nReconciliation: verdict INTENT rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 4 | Derived: 0 | Total: 4",
   "pipeline_results": {
     "abduction": {
       "best_hypothesis": "SUSPICION_DETECTED",
-      "best_posterior": "583/6250",
+      "best_posterior": "33/50",
       "confidence": {
         "__fraction__": true,
-        "den": 6250,
-        "num": 583
+        "den": 50,
+        "num": 33
       },
       "is_conclusive": true,
       "narrative": "Process 'Update_Fix_For_HR_Payroll.exe' consuming 1.2GB RAM from C:\\Users\\Public\\Documents, without a digital signature. Shannon entropy: 7.8 bits (packed/encrypted). The name appeals to HR to induce doubt before killing the process."
@@ -192,7 +200,15 @@
     "pipeline_meta": {
       "artifact_count": 4,
       "avg_score": "583/1250",
+      "ebs_adapter_mode": "motor",
       "expected_verdict": "SUSPICION",
+      "resolve": {
+        "motor_confidence": "0.66",
+        "motor_reason": "Significant signal with structural support (score=0.3297)",
+        "motor_score": "0.3297",
+        "motor_verdict": "SUSPICION",
+        "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+      },
       "source": "ebs_v1_json_adapter"
     },
     "signals": [

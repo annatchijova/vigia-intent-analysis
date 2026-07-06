@@ -1,15 +1,15 @@
 {
   "agent_verdict": "MALICE",
-  "analysis_timestamp": "2026-07-05T15:27:40.546237+00:00",
+  "analysis_timestamp": "2026-07-06T01:30:48.523227+00:00",
   "audit_trail": {
     "agent_version": "1.0.0-SANS-2026",
     "case_id": "VIGIA-CAN-006",
-    "end_time": "2026-07-05T15:27:40.546243+00:00",
+    "end_time": "2026-07-06T01:30:48.523233+00:00",
     "entries": [
       {
         "action": "AGENT_INITIALIZED",
         "case_id": "VIGIA-CAN-006",
-        "entry_sha256": "839dfef0e76b86ba7f94d80b51d22fa0ea78697b2c3ce5efa91f4ed431f72137",
+        "entry_sha256": "db9f8c09e8f4cfcf03c7f4a193a953b9e34a2f524487d5fbe55d5698d7d09361",
         "inputs_summary": {
           "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
           "case_id": "VIGIA-CAN-006"
@@ -21,13 +21,13 @@
           "agent_version": "1.0.0-SANS-2026"
         },
         "seq": 1,
-        "timestamp": "2026-07-05T15:27:40.542603+00:00",
+        "timestamp": "2026-07-06T01:30:48.173472+00:00",
         "tool": "vigia_agent"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-CAN-006",
-        "entry_sha256": "0204f68a66f1600fb567679285cb95e9ed695bd806e9b7e947940186d1be5b22",
+        "entry_sha256": "cde85b4897fd2ba2ec862e93631c6183141f7e486a8ac52aa8e39e4527fcfbfe",
         "inputs_summary": {
           "path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-006.json"
         },
@@ -35,29 +35,29 @@
         "note": "Computing SHA-256 of original evidence",
         "outputs_summary": {},
         "seq": 2,
-        "timestamp": "2026-07-05T15:27:40.542691+00:00",
+        "timestamp": "2026-07-06T01:30:48.173561+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-CAN-006",
-        "entry_sha256": "3951b6315c2c0791e48dcd0a7e1b49ac676717bb7b738cf49462653863b8517c",
+        "entry_sha256": "185541184fedfa329a35a91f2bd8042c15028f1cb2eebac156822dcb5fad3994",
         "inputs_summary": {
           "path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-006.json"
         },
         "iteration": 0,
-        "note": "Evidence verified: 702cccfee4b2a114...",
+        "note": "Evidence verified: 6428d2b8f5a20a43...",
         "outputs_summary": {
-          "sha256": "702cccfee4b2a1142aafb7486e8ffd39bcdd5e7a09b0b4aefd2e5663dbf6a066"
+          "sha256": "6428d2b8f5a20a431fd90e4e428be73edd472143c9c0c58855cfe86520a54bba"
         },
         "seq": 3,
-        "timestamp": "2026-07-05T15:27:40.542782+00:00",
+        "timestamp": "2026-07-06T01:30:48.173656+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "PIPELINE_EXECUTE",
         "case_id": "VIGIA-CAN-006",
-        "entry_sha256": "7469687049dfb1701f050df762b7fd22316e91f959441f2c537f200bb913f032",
+        "entry_sha256": "c647f65f9251da30d151d29eaa8a87f85e9efb1b3fd5956d76f700b60b6b7935",
         "inputs_summary": {
           "evidence": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-006.json",
           "iteration": "0",
@@ -67,13 +67,13 @@
         "note": "Executing pipeline \u2014 iteration 0",
         "outputs_summary": {},
         "seq": 4,
-        "timestamp": "2026-07-05T15:27:40.542884+00:00",
+        "timestamp": "2026-07-06T01:30:48.173756+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "PIPELINE_COMPLETE",
         "case_id": "VIGIA-CAN-006",
-        "entry_sha256": "102859c527feb6d5c8402b486b2e70d0a68973ba25873eefba983abff4092947",
+        "entry_sha256": "99c67d4fba1638198d32d665fe9bf53c0ccd038f04066983c3e77193e2fdf17c",
         "inputs_summary": {
           "iteration": "0"
         },
@@ -82,16 +82,24 @@
         "outputs_summary": {
           "abduction": {
             "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
-            "best_posterior": "39/1250",
-            "confidence": "39/1250",
-            "is_conclusive": "False",
+            "best_posterior": "87/100",
+            "confidence": "87/100",
+            "is_conclusive": "True",
             "narrative": "Internal ticket in English uses 'state of the country' as a calque of '\u0441\u0442\u0440\u0430\u043d\u0435' (area/side in Russian) in an electric utility company. The error reveals a native-language thought structure."
           },
           "case_id": "case_088_calco_semantico",
           "pipeline_meta": {
             "artifact_count": "4",
             "avg_score": "39/250",
+            "ebs_adapter_mode": "motor",
             "expected_verdict": "MALICE",
+            "resolve": {
+              "motor_confidence": "0.87",
+              "motor_reason": "Intent score 0.4368 exceeds MALICE threshold (P2+acq_assurance scale, threshold=0.33)",
+              "motor_score": "0.4368",
+              "motor_verdict": "MALICE",
+              "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+            },
             "source": "ebs_v1_json_adapter"
           },
           "signals": [
@@ -130,13 +138,13 @@
           ]
         },
         "seq": 5,
-        "timestamp": "2026-07-05T15:27:40.545480+00:00",
+        "timestamp": "2026-07-06T01:30:48.522719+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "CONTRADICTION_CHECK",
         "case_id": "VIGIA-CAN-006",
-        "entry_sha256": "733eb2f46d80ed88a9b694d4b48c42838d483d540214efeba7964e6ad90d66dc",
+        "entry_sha256": "3aa0ef8de8cd9f069b817c48bef0bd849483b970faa71172d109453093b92321",
         "inputs_summary": {
           "n_signals": "4"
         },
@@ -147,13 +155,13 @@
           "threshold": "2"
         },
         "seq": 6,
-        "timestamp": "2026-07-05T15:27:40.545587+00:00",
+        "timestamp": "2026-07-06T01:30:48.522834+00:00",
         "tool": "contradiction_detector"
       },
       {
         "action": "AGENT_EXIT",
         "case_id": "VIGIA-CAN-006",
-        "entry_sha256": "f47267c32b472d125b0fc47edd8db70dfce96a843ec15babdaa0083c1c0a081c",
+        "entry_sha256": "6ba19882b1d66c0007a3d4c868f695ad0ae197de06013fa7df51bfb40daf1b29",
         "inputs_summary": {
           "verdict": "MALICIOUS_INTENT_DETECTED"
         },
@@ -164,26 +172,26 @@
           "exit_code": "1"
         },
         "seq": 7,
-        "timestamp": "2026-07-05T15:27:40.545780+00:00",
+        "timestamp": "2026-07-06T01:30:48.523044+00:00",
         "tool": "vigia_agent"
       }
     ],
-    "start_time": "2026-07-05T15:27:40.542359+00:00",
+    "start_time": "2026-07-06T01:30:48.173239+00:00",
     "total_entries": 7
   },
   "case_id": "VIGIA-CAN-006",
   "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-006.json",
-  "evidence_sha256": "702cccfee4b2a1142aafb7486e8ffd39bcdd5e7a09b0b4aefd2e5663dbf6a066",
+  "evidence_sha256": "6428d2b8f5a20a431fd90e4e428be73edd472143c9c0c58855cfe86520a54bba",
   "iterations_executed": 1,
-  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-CAN-006 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-006.json\nEvidence SHA-256: 702cccfee4b2a1142aafb7486e8ffd39bcdd5e7a09b0b4aefd2e5663dbf6a066\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 39/1250\nConclusive: NO \u2014 requires human review\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 4 se\u00f1al(es): 4 primaria(s) de ['sift_linguistic', 'sift_syslog', 'sift_ticket_system', 'sift_volatility'], 0 derivada(s)/no-analizada(s). Top z: Ticket: 'I need to check the state of th=0.23, Command executed: 'Get-StateOfCountry -S=0.21, Semantic calque: 'state of the country' =0.12.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: MALICIOUS_INTENT_DETECTED. Conclusiva: no \u2014 requiere revisi\u00f3n humana.\n\nRazonamiento del motor abductivo:\nInternal ticket in English uses 'state of the country' as a calque of '\u0441\u0442\u0440\u0430\u043d\u0435' (area/side in Russian) in an electric utility company. The error reveals a native-language thought structure.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Ticket: 'I need to check the state of the country'. Context: electric ] z=0.234 conf=0.30 \u2014 \n  [Command executed: 'Get-StateOfCountry -ServerId NY-42'. Cmdlet does no] z=0.210 conf=0.35 \u2014 \n  [Semantic calque: 'state of the country' directly translates '\u0441\u0442\u0440\u0430\u043d\u0435', ] z=0.123 conf=0.15 \u2014 \n  [RDP session from IP geolocated in Moscow, timezone UTC+3, user 'field_] z=0.057 conf=0.95 \u2014 \n\n--- FINAL ALERT LEVEL ---\nMEDIUM \u2014 MALICE verdict from posterior aggregation. Individual z-scores below threshold. Full signal review recommended. Alert floored (B-028/B-065).\nReconciliation: verdict MALICE rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 4 | Derived: 0 | Total: 4",
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-CAN-006 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-006.json\nEvidence SHA-256: 6428d2b8f5a20a431fd90e4e428be73edd472143c9c0c58855cfe86520a54bba\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 87/100\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 4 se\u00f1al(es): 4 primaria(s) de ['sift_linguistic', 'sift_syslog', 'sift_ticket_system', 'sift_volatility'], 0 derivada(s)/no-analizada(s). Top z: Ticket: 'I need to check the state of th=0.23, Command executed: 'Get-StateOfCountry -S=0.21, Semantic calque: 'state of the country' =0.12.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: MALICIOUS_INTENT_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nInternal ticket in English uses 'state of the country' as a calque of '\u0441\u0442\u0440\u0430\u043d\u0435' (area/side in Russian) in an electric utility company. The error reveals a native-language thought structure.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Ticket: 'I need to check the state of the country'. Context: electric ] z=0.234 conf=0.30 \u2014 \n  [Command executed: 'Get-StateOfCountry -ServerId NY-42'. Cmdlet does no] z=0.210 conf=0.35 \u2014 \n  [Semantic calque: 'state of the country' directly translates '\u0441\u0442\u0440\u0430\u043d\u0435', ] z=0.123 conf=0.15 \u2014 \n  [RDP session from IP geolocated in Moscow, timezone UTC+3, user 'field_] z=0.057 conf=0.95 \u2014 \n\n--- FINAL ALERT LEVEL ---\nHIGH \u2014 MALICE verdict from Bayesian posterior aggregation. Individual z-scores below threshold (distributed evidence pattern: no single dominant signal, but aggregate posterior is decisive). Alert floored (B-028/B-065).\nReconciliation: verdict MALICE rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 4 | Derived: 0 | Total: 4",
   "pipeline_results": {
     "abduction": {
       "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
-      "best_posterior": "39/1250",
+      "best_posterior": "87/100",
       "confidence": {
         "__fraction__": true,
-        "den": 1250,
-        "num": 39
+        "den": 100,
+        "num": 87
       },
       "devil_advocate": {
         "aggregation": {
@@ -195,7 +203,7 @@
           "primary_alternative_hypothesis": null
         },
         "decision_context": {
-          "confidence": "39/1250",
+          "confidence": "87/100",
           "mapped_verdict": "MALICIOUS_INTENT_DETECTED",
           "raw_verdict": "MALICIOUS_INTENT_DETECTED",
           "score": "39/250"
@@ -209,14 +217,22 @@
         "pattern_evidence_gaps": [],
         "version": "r7-da-v1"
       },
-      "is_conclusive": false,
+      "is_conclusive": true,
       "narrative": "Internal ticket in English uses 'state of the country' as a calque of '\u0441\u0442\u0440\u0430\u043d\u0435' (area/side in Russian) in an electric utility company. The error reveals a native-language thought structure."
     },
     "case_id": "case_088_calco_semantico",
     "pipeline_meta": {
       "artifact_count": 4,
       "avg_score": "39/250",
+      "ebs_adapter_mode": "motor",
       "expected_verdict": "MALICE",
+      "resolve": {
+        "motor_confidence": "0.87",
+        "motor_reason": "Intent score 0.4368 exceeds MALICE threshold (P2+acq_assurance scale, threshold=0.33)",
+        "motor_score": "0.4368",
+        "motor_verdict": "MALICE",
+        "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+      },
       "source": "ebs_v1_json_adapter"
     },
     "signals": [

@@ -1,15 +1,15 @@
 {
   "agent_verdict": "NOISE",
-  "analysis_timestamp": "2026-07-05T15:27:38.400788+00:00",
+  "analysis_timestamp": "2026-07-06T01:30:30.498714+00:00",
   "audit_trail": {
     "agent_version": "1.0.0-SANS-2026",
     "case_id": "VIGIA-BEN-004",
-    "end_time": "2026-07-05T15:27:38.400795+00:00",
+    "end_time": "2026-07-06T01:30:30.498720+00:00",
     "entries": [
       {
         "action": "AGENT_INITIALIZED",
         "case_id": "VIGIA-BEN-004",
-        "entry_sha256": "e5a2c1b350b52a3687bf6ad938386b0b5279e6f2cd6d4091bbb346aa1c844543",
+        "entry_sha256": "09ebcf28817523d426af6ee68e690e046363f5c34a53b72a978b51cc268f19b0",
         "inputs_summary": {
           "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
           "case_id": "VIGIA-BEN-004"
@@ -21,13 +21,13 @@
           "agent_version": "1.0.0-SANS-2026"
         },
         "seq": 1,
-        "timestamp": "2026-07-05T15:27:38.397141+00:00",
+        "timestamp": "2026-07-06T01:30:30.155376+00:00",
         "tool": "vigia_agent"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-BEN-004",
-        "entry_sha256": "e1fce45b46c00ecb4c58a8ed2fa07a24fb42ac6db39c80f53b78b1ce12db3b67",
+        "entry_sha256": "bbdede5374f6f54140c7dea013f1bc0d5d7b98629adc3a230b349a458f14731e",
         "inputs_summary": {
           "path": "/home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-BEN-004.json"
         },
@@ -35,29 +35,29 @@
         "note": "Computing SHA-256 of original evidence",
         "outputs_summary": {},
         "seq": 2,
-        "timestamp": "2026-07-05T15:27:38.397260+00:00",
+        "timestamp": "2026-07-06T01:30:30.155478+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-BEN-004",
-        "entry_sha256": "9e75a67555d11c1b4f1ee2060b08e303a1ec6de3c0bed115415e372395c0b641",
+        "entry_sha256": "a9a7587ba1d7d8b78d4d3214fcd8585f83d09a0497bffcffed5f38a37358e840",
         "inputs_summary": {
           "path": "/home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-BEN-004.json"
         },
         "iteration": 0,
-        "note": "Evidence verified: 6dec399c422cc92b...",
+        "note": "Evidence verified: 34f8ed1327b60c14...",
         "outputs_summary": {
-          "sha256": "6dec399c422cc92b00ae84dd9a8af4bbe5f4b1964356ea6cde15b10f164ae27f"
+          "sha256": "34f8ed1327b60c14ffca7a2e381222bbc164f0a31411dbf0c69b69211530de32"
         },
         "seq": 3,
-        "timestamp": "2026-07-05T15:27:38.397362+00:00",
+        "timestamp": "2026-07-06T01:30:30.155577+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "PIPELINE_EXECUTE",
         "case_id": "VIGIA-BEN-004",
-        "entry_sha256": "83f632c081737d11cb58385a2388898cd26b8a25019f79507533558ae0162557",
+        "entry_sha256": "886086459bfb53636abcf9b66c9310daaba9b8e3953580327c999a69dd31bc39",
         "inputs_summary": {
           "evidence": "/home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-BEN-004.json",
           "iteration": "0",
@@ -67,13 +67,13 @@
         "note": "Executing pipeline \u2014 iteration 0",
         "outputs_summary": {},
         "seq": 4,
-        "timestamp": "2026-07-05T15:27:38.397482+00:00",
+        "timestamp": "2026-07-06T01:30:30.155680+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "PIPELINE_COMPLETE",
         "case_id": "VIGIA-BEN-004",
-        "entry_sha256": "bffbd34c5549cf6db80c0b1109eb039359fffdb566158b5abf57872a64f1d34d",
+        "entry_sha256": "bd44d31114dff405d96180da75dd4d78789157c1a5341e3c2a1fdff2e9de9672",
         "inputs_summary": {
           "iteration": "0"
         },
@@ -82,16 +82,24 @@
         "outputs_summary": {
           "abduction": {
             "best_hypothesis": "NO_SEMIOTIC_ANOMALY_DETECTED",
-            "best_posterior": "1/80",
-            "confidence": "1/80",
-            "is_conclusive": "False",
+            "best_posterior": "24/25",
+            "confidence": "24/25",
+            "is_conclusive": "True",
             "narrative": "Script de despliegue ejecuta 47 comandos sin errores, sin reintentos, con timing exacto. Es generado por Ansible Tower con playbook aprobado por change management."
           },
           "case_id": "VIGIA-BEN-004",
           "pipeline_meta": {
             "artifact_count": "3",
             "avg_score": "1/16",
+            "ebs_adapter_mode": "motor",
             "expected_verdict": "NOISE",
+            "resolve": {
+              "motor_confidence": "0.96",
+              "motor_reason": "Insufficient evidence of malicious intent (score=0.0361)",
+              "motor_score": "0.0361",
+              "motor_verdict": "NOISE",
+              "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+            },
             "source": "ebs_v1_json_adapter"
           },
           "signals": [
@@ -122,13 +130,13 @@
           ]
         },
         "seq": 5,
-        "timestamp": "2026-07-05T15:27:38.400302+00:00",
+        "timestamp": "2026-07-06T01:30:30.498353+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "CONTRADICTION_CHECK",
         "case_id": "VIGIA-BEN-004",
-        "entry_sha256": "8fdfb25cfd37c39588bc48e4a9478ae589c7f6bc3b6aeee97e308be72096eb02",
+        "entry_sha256": "f6e11be5b3dbf6634ec251c11c75692fe45a05f2991d4f94d5bd02b3a808aea1",
         "inputs_summary": {
           "n_signals": "3"
         },
@@ -139,13 +147,13 @@
           "threshold": "2"
         },
         "seq": 6,
-        "timestamp": "2026-07-05T15:27:38.400405+00:00",
+        "timestamp": "2026-07-06T01:30:30.498472+00:00",
         "tool": "contradiction_detector"
       },
       {
         "action": "AGENT_EXIT",
         "case_id": "VIGIA-BEN-004",
-        "entry_sha256": "0d5c9cfec9e86c5cd7bb775f11abb3083dcf8dc0bb95e75ec923765243394e6b",
+        "entry_sha256": "0528c824bc0e4d8bd90148f0f2adbc1ea250f9dc04fc5d6e1244ea015412f28e",
         "inputs_summary": {
           "verdict": "NO_SEMIOTIC_ANOMALY_DETECTED"
         },
@@ -156,35 +164,43 @@
           "exit_code": "0"
         },
         "seq": 7,
-        "timestamp": "2026-07-05T15:27:38.400709+00:00",
+        "timestamp": "2026-07-06T01:30:30.498663+00:00",
         "tool": "vigia_agent"
       }
     ],
-    "start_time": "2026-07-05T15:27:38.396859+00:00",
+    "start_time": "2026-07-06T01:30:30.155148+00:00",
     "total_entries": 7
   },
   "case_id": "VIGIA-BEN-004",
   "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-BEN-004.json",
-  "evidence_sha256": "6dec399c422cc92b00ae84dd9a8af4bbe5f4b1964356ea6cde15b10f164ae27f",
+  "evidence_sha256": "34f8ed1327b60c14ffca7a2e381222bbc164f0a31411dbf0c69b69211530de32",
   "iterations_executed": 1,
-  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-BEN-004 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-BEN-004.json\nEvidence SHA-256: 6dec399c422cc92b00ae84dd9a8af4bbe5f4b1964356ea6cde15b10f164ae27f\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: NO_SEMIOTIC_ANOMALY_DETECTED\nPosterior confidence: 1/80\nConclusive: NO \u2014 requires human review\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 3 se\u00f1al(es): 3 primaria(s) de ['legacy_converter'], 0 derivada(s)/no-analizada(s). Top z: Parent: ansible-tower.service (PID 1234)=0.07, Playbook: deploy_production.yml | Git co=0.06, ansible-playbook deploy_production.yml -=0.05.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: NO_SEMIOTIC_ANOMALY_DETECTED. Conclusiva: no \u2014 requiere revisi\u00f3n humana.\n\nRazonamiento del motor abductivo:\nScript de despliegue ejecuta 47 comandos sin errores, sin reintentos, con timing exacto. Es generado por Ansible Tower con playbook aprobado por change management.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Parent: ansible-tower.service (PID 1234) | Child: ssh ansible_svc@targ] z=0.071 conf=0.30 \u2014 \n  [Playbook: deploy_production.yml | Git commit: a1b2c3d | Approved by: c] z=0.064 conf=0.30 \u2014 \n  [ansible-playbook deploy_production.yml --check --diff | 47 tasks execu] z=0.052 conf=0.30 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 3 | Derived: 0 | Total: 3",
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-BEN-004 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-BEN-004.json\nEvidence SHA-256: 34f8ed1327b60c14ffca7a2e381222bbc164f0a31411dbf0c69b69211530de32\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: NO_SEMIOTIC_ANOMALY_DETECTED\nPosterior confidence: 24/25\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 3 se\u00f1al(es): 3 primaria(s) de ['legacy_converter'], 0 derivada(s)/no-analizada(s). Top z: Parent: ansible-tower.service (PID 1234)=0.07, Playbook: deploy_production.yml | Git co=0.06, ansible-playbook deploy_production.yml -=0.05.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: NO_SEMIOTIC_ANOMALY_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nScript de despliegue ejecuta 47 comandos sin errores, sin reintentos, con timing exacto. Es generado por Ansible Tower con playbook aprobado por change management.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Parent: ansible-tower.service (PID 1234) | Child: ssh ansible_svc@targ] z=0.071 conf=0.30 \u2014 \n  [Playbook: deploy_production.yml | Git commit: a1b2c3d | Approved by: c] z=0.064 conf=0.30 \u2014 \n  [ansible-playbook deploy_production.yml --check --diff | 47 tasks execu] z=0.052 conf=0.30 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 3 | Derived: 0 | Total: 3",
   "pipeline_results": {
     "abduction": {
       "best_hypothesis": "NO_SEMIOTIC_ANOMALY_DETECTED",
-      "best_posterior": "1/80",
+      "best_posterior": "24/25",
       "confidence": {
         "__fraction__": true,
-        "den": 80,
-        "num": 1
+        "den": 25,
+        "num": 24
       },
-      "is_conclusive": false,
+      "is_conclusive": true,
       "narrative": "Script de despliegue ejecuta 47 comandos sin errores, sin reintentos, con timing exacto. Es generado por Ansible Tower con playbook aprobado por change management."
     },
     "case_id": "VIGIA-BEN-004",
     "pipeline_meta": {
       "artifact_count": 3,
       "avg_score": "1/16",
+      "ebs_adapter_mode": "motor",
       "expected_verdict": "NOISE",
+      "resolve": {
+        "motor_confidence": "0.96",
+        "motor_reason": "Insufficient evidence of malicious intent (score=0.0361)",
+        "motor_score": "0.0361",
+        "motor_verdict": "NOISE",
+        "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+      },
       "source": "ebs_v1_json_adapter"
     },
     "signals": [

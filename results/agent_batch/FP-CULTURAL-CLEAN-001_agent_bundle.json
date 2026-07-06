@@ -1,15 +1,15 @@
 {
-  "agent_verdict": "NOISE",
-  "analysis_timestamp": "2026-07-05T15:27:32.703097+00:00",
+  "agent_verdict": "MALICE",
+  "analysis_timestamp": "2026-07-06T01:29:42.094419+00:00",
   "audit_trail": {
     "agent_version": "1.0.0-SANS-2026",
     "case_id": "FP-CULTURAL-CLEAN-001",
-    "end_time": "2026-07-05T15:27:32.703101+00:00",
+    "end_time": "2026-07-06T01:29:42.094434+00:00",
     "entries": [
       {
         "action": "AGENT_INITIALIZED",
         "case_id": "FP-CULTURAL-CLEAN-001",
-        "entry_sha256": "7941e757d4049cd780f723c32a36e266adcff8abc2da539fdf8cb6c89f7a4c44",
+        "entry_sha256": "1554ece59089f4697f8a2dba703bb1ebb42cab202d5e69ea0df684f08c4c4969",
         "inputs_summary": {
           "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
           "case_id": "FP-CULTURAL-CLEAN-001"
@@ -21,13 +21,13 @@
           "agent_version": "1.0.0-SANS-2026"
         },
         "seq": 1,
-        "timestamp": "2026-07-05T15:27:32.699956+00:00",
+        "timestamp": "2026-07-06T01:29:41.747835+00:00",
         "tool": "vigia_agent"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "FP-CULTURAL-CLEAN-001",
-        "entry_sha256": "052d0e5042b278c2468c26595e68cc4741cbfab803476ce41dffea8015f3cc87",
+        "entry_sha256": "ded0526bbfce3e82dcddeb1e1d4e6a8b54ff0d4dc6362290b5b7708abbae4adf",
         "inputs_summary": {
           "path": "/home/labestiadevigia/vigia-repo/data/cases/FP-CULTURAL-CLEAN-001.json"
         },
@@ -35,29 +35,29 @@
         "note": "Computing SHA-256 of original evidence",
         "outputs_summary": {},
         "seq": 2,
-        "timestamp": "2026-07-05T15:27:32.700042+00:00",
+        "timestamp": "2026-07-06T01:29:41.747921+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "FP-CULTURAL-CLEAN-001",
-        "entry_sha256": "2c17c13cbc6fbb4c927ee8c6ddbc47584c847a36d07bf454837d664cfecdaa5c",
+        "entry_sha256": "489c9cf95d4cde78788ef8c2d2fbe489b4baa4abc46bd48422f211877142a45a",
         "inputs_summary": {
           "path": "/home/labestiadevigia/vigia-repo/data/cases/FP-CULTURAL-CLEAN-001.json"
         },
         "iteration": 0,
-        "note": "Evidence verified: 43561576ba3cdaad...",
+        "note": "Evidence verified: 2a8bcd19cf9c26ee...",
         "outputs_summary": {
-          "sha256": "43561576ba3cdaadaa73314e5be54701213c4d4d0c5b57aa8280cf6d1d66a112"
+          "sha256": "2a8bcd19cf9c26eee1f2f86b921e0a0f3cf63bb00910e1b8258127593c43de41"
         },
         "seq": 3,
-        "timestamp": "2026-07-05T15:27:32.700129+00:00",
+        "timestamp": "2026-07-06T01:29:41.748012+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "PIPELINE_EXECUTE",
         "case_id": "FP-CULTURAL-CLEAN-001",
-        "entry_sha256": "220d40fd2764fa387c280f40e5484b596874ad178b958aa05bfb189ccfb345b3",
+        "entry_sha256": "0bf373ab863b7e250aa1d0e380b3e4dda8c98c99ea59134e5a41783b70e24747",
         "inputs_summary": {
           "evidence": "/home/labestiadevigia/vigia-repo/data/cases/FP-CULTURAL-CLEAN-001.json",
           "iteration": "0",
@@ -67,13 +67,13 @@
         "note": "Executing pipeline \u2014 iteration 0",
         "outputs_summary": {},
         "seq": 4,
-        "timestamp": "2026-07-05T15:27:32.700230+00:00",
+        "timestamp": "2026-07-06T01:29:41.748116+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "PIPELINE_COMPLETE",
         "case_id": "FP-CULTURAL-CLEAN-001",
-        "entry_sha256": "ce6c04d0566df6c10396e7fa67fbaa1eefda12442ae8d8cbc4a53564c7b1814c",
+        "entry_sha256": "bc4e3e68715c0e5e3d875285a76a7607eef727e3dd961560a2d5966c21fce7ef",
         "inputs_summary": {
           "iteration": "0"
         },
@@ -81,17 +81,25 @@
         "note": "Pipeline completed \u2014 3 signals",
         "outputs_summary": {
           "abduction": {
-            "best_hypothesis": "NO_SEMIOTIC_ANOMALY_DETECTED",
-            "best_posterior": "757/30000",
-            "confidence": "757/30000",
-            "is_conclusive": "False",
+            "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+            "best_posterior": "21/25",
+            "confidence": "21/25",
+            "is_conclusive": "True",
             "narrative": "A developer in Torzhok. Cyrillic filenames, RU keyboard, UTC+3 timezone. Memory, LSASS and kernel are clean. There was NO incident. The cultural markers are native configuration, not planted bait. Thi..."
           },
           "case_id": "FP-CULTURAL-CLEAN-001",
           "pipeline_meta": {
             "artifact_count": "3",
             "avg_score": "757/6000",
+            "ebs_adapter_mode": "motor",
             "expected_verdict": "NOISE",
+            "resolve": {
+              "motor_confidence": "0.84",
+              "motor_reason": "Intent score 0.4209 exceeds MALICE threshold (P2+acq_assurance scale, threshold=0.33)",
+              "motor_score": "0.4209",
+              "motor_verdict": "MALICE",
+              "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+            },
             "source": "ebs_v1_json_adapter"
           },
           "signals": [
@@ -122,13 +130,13 @@
           ]
         },
         "seq": 5,
-        "timestamp": "2026-07-05T15:27:32.702764+00:00",
+        "timestamp": "2026-07-06T01:29:42.093932+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "CONTRADICTION_CHECK",
         "case_id": "FP-CULTURAL-CLEAN-001",
-        "entry_sha256": "ed78550679a569f0645892ca5d55cdf3e4a75aebb70772fb67235a5d8530db96",
+        "entry_sha256": "5f804a2721b01a3a4607222e18bdd76cfcc3501f7ce5fb3620331638fdcc4edf",
         "inputs_summary": {
           "n_signals": "3"
         },
@@ -139,52 +147,84 @@
           "threshold": "2"
         },
         "seq": 6,
-        "timestamp": "2026-07-05T15:27:32.702871+00:00",
+        "timestamp": "2026-07-06T01:29:42.094046+00:00",
         "tool": "contradiction_detector"
       },
       {
         "action": "AGENT_EXIT",
         "case_id": "FP-CULTURAL-CLEAN-001",
-        "entry_sha256": "d7c5aae7b3e97ac29d9abb9fdbe69d6c29fabbd0fba36b49efc8ddc487b406c7",
+        "entry_sha256": "aaca1661cb106cf4dad04afa44160ec1975d14c5303612e84e96a3721c650362",
         "inputs_summary": {
-          "verdict": "NO_SEMIOTIC_ANOMALY_DETECTED"
+          "verdict": "MALICIOUS_INTENT_DETECTED"
         },
         "iteration": 0,
-        "note": "Exit code 0 (NOISE) \u2014 analysis complete.",
+        "note": "Exit code 1 (MALICE) \u2014 analysis complete.",
         "outputs_summary": {
-          "agent_verdict": "NOISE",
-          "exit_code": "0"
+          "agent_verdict": "MALICE",
+          "exit_code": "1"
         },
         "seq": 7,
-        "timestamp": "2026-07-05T15:27:32.703046+00:00",
+        "timestamp": "2026-07-06T01:29:42.094240+00:00",
         "tool": "vigia_agent"
       }
     ],
-    "start_time": "2026-07-05T15:27:32.699726+00:00",
+    "start_time": "2026-07-06T01:29:41.747619+00:00",
     "total_entries": 7
   },
   "case_id": "FP-CULTURAL-CLEAN-001",
   "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/FP-CULTURAL-CLEAN-001.json",
-  "evidence_sha256": "43561576ba3cdaadaa73314e5be54701213c4d4d0c5b57aa8280cf6d1d66a112",
+  "evidence_sha256": "2a8bcd19cf9c26eee1f2f86b921e0a0f3cf63bb00910e1b8258127593c43de41",
   "iterations_executed": 1,
-  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE FP-CULTURAL-CLEAN-001 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/FP-CULTURAL-CLEAN-001.json\nEvidence SHA-256: 43561576ba3cdaadaa73314e5be54701213c4d4d0c5b57aa8280cf6d1d66a112\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: NO_SEMIOTIC_ANOMALY_DETECTED\nPosterior confidence: 757/30000\nConclusive: NO \u2014 requires human review\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 3 se\u00f1al(es): 3 primaria(s) de ['infer_intent', 'list_processes'], 0 derivada(s)/no-analizada(s). Top z: Cyrillic filename: '\u043e\u0442\u0447\u0435\u0442_\u0444\u0438\u043d\u0430\u043d\u0441\u044b.docx'.=0.26, LSASS: No credential dumping. Normal ses=0.08, Memory: No process injection. No kernel =0.05.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: NO_SEMIOTIC_ANOMALY_DETECTED. Conclusiva: no \u2014 requiere revisi\u00f3n humana.\n\nRazonamiento del motor abductivo:\nA developer in Torzhok. Cyrillic filenames, RU keyboard, UTC+3 timezone. Memory, LSASS and kernel are clean. There was NO incident. The cultural markers are native configuration, not planted bait. This is the discriminating negative case for FALSE_FLAG_PATTERN: high cultural markers + clean system must NOT be MALICE. The absence of a malicious event is not evidence of a staged one.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Cyrillic filename: '\u043e\u0442\u0447\u0435\u0442_\u0444\u0438\u043d\u0430\u043d\u0441\u044b.docx'. Keyboard layout: RU. Timezone] z=0.255 conf=0.30 \u2014 \n  [LSASS: No credential dumping. Normal session count.] z=0.076 conf=0.95 \u2014 \n  [Memory: No process injection. No kernel anomalies. Clean system state.] z=0.048 conf=0.95 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 3 | Derived: 0 | Total: 3",
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE FP-CULTURAL-CLEAN-001 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/FP-CULTURAL-CLEAN-001.json\nEvidence SHA-256: 2a8bcd19cf9c26eee1f2f86b921e0a0f3cf63bb00910e1b8258127593c43de41\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 21/25\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 3 se\u00f1al(es): 3 primaria(s) de ['infer_intent', 'list_processes'], 0 derivada(s)/no-analizada(s). Top z: Cyrillic filename: '\u043e\u0442\u0447\u0435\u0442_\u0444\u0438\u043d\u0430\u043d\u0441\u044b.docx'.=0.26, LSASS: No credential dumping. Normal ses=0.08, Memory: No process injection. No kernel =0.05.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: MALICIOUS_INTENT_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nA developer in Torzhok. Cyrillic filenames, RU keyboard, UTC+3 timezone. Memory, LSASS and kernel are clean. There was NO incident. The cultural markers are native configuration, not planted bait. This is the discriminating negative case for FALSE_FLAG_PATTERN: high cultural markers + clean system must NOT be MALICE. The absence of a malicious event is not evidence of a staged one.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Cyrillic filename: '\u043e\u0442\u0447\u0435\u0442_\u0444\u0438\u043d\u0430\u043d\u0441\u044b.docx'. Keyboard layout: RU. Timezone] z=0.255 conf=0.30 \u2014 \n  [LSASS: No credential dumping. Normal session count.] z=0.076 conf=0.95 \u2014 \n  [Memory: No process injection. No kernel anomalies. Clean system state.] z=0.048 conf=0.95 \u2014 \n\n--- FINAL ALERT LEVEL ---\nHIGH \u2014 MALICE verdict from Bayesian posterior aggregation. Individual z-scores below threshold (distributed evidence pattern: no single dominant signal, but aggregate posterior is decisive). Alert floored (B-028/B-065).\nReconciliation: verdict MALICE rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 3 | Derived: 0 | Total: 3",
   "pipeline_results": {
     "abduction": {
-      "best_hypothesis": "NO_SEMIOTIC_ANOMALY_DETECTED",
-      "best_posterior": "757/30000",
+      "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+      "best_posterior": "21/25",
       "confidence": {
         "__fraction__": true,
-        "den": 30000,
-        "num": 757
+        "den": 25,
+        "num": 21
       },
-      "is_conclusive": false,
+      "devil_advocate": {
+        "aggregation": {
+          "k": 3,
+          "method": "top_k_already_validated_matches_v2",
+          "total_gap_mass": "0"
+        },
+        "counterfactual_summary": {
+          "primary_alternative_hypothesis": null
+        },
+        "decision_context": {
+          "confidence": "21/25",
+          "mapped_verdict": "MALICIOUS_INTENT_DETECTED",
+          "raw_verdict": "MALICIOUS_INTENT_DETECTED",
+          "score": "757/6000"
+        },
+        "devil_advocate_source": "deterministic_no_pattern_data_available",
+        "meta": {
+          "deterministic": true,
+          "generated_from": "case_pattern_library"
+        },
+        "narrative": "Eco's Razor (Abductive Falsification) applied to verdict MALICIOUS_INTENT_DETECTED. Pattern-matching data was not available on this code path \u2014 CasePatternLibrary is not invoked here by design (agent audit-trail mode (vigia_agent.py \u2014 JSON-replay / autonomous path); see KNOWN_LIMITATIONS.md). No structured counter-hypothesis could be derived deterministically. This is a documented scope limitation of the current code path, not an absence of falsification attempt.",
+        "pattern_evidence_gaps": [],
+        "version": "r7-da-v1"
+      },
+      "is_conclusive": true,
       "narrative": "A developer in Torzhok. Cyrillic filenames, RU keyboard, UTC+3 timezone. Memory, LSASS and kernel are clean. There was NO incident. The cultural markers are native configuration, not planted bait. This is the discriminating negative case for FALSE_FLAG_PATTERN: high cultural markers + clean system must NOT be MALICE. The absence of a malicious event is not evidence of a staged one."
     },
     "case_id": "FP-CULTURAL-CLEAN-001",
     "pipeline_meta": {
       "artifact_count": 3,
       "avg_score": "757/6000",
+      "ebs_adapter_mode": "motor",
       "expected_verdict": "NOISE",
+      "resolve": {
+        "motor_confidence": "0.84",
+        "motor_reason": "Intent score 0.4209 exceeds MALICE threshold (P2+acq_assurance scale, threshold=0.33)",
+        "motor_score": "0.4209",
+        "motor_verdict": "MALICE",
+        "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+      },
       "source": "ebs_v1_json_adapter"
     },
     "signals": [

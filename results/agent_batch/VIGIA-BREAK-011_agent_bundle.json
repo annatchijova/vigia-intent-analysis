@@ -1,15 +1,15 @@
 {
-  "agent_verdict": "INTENT",
-  "analysis_timestamp": "2026-07-05T15:27:33.008854+00:00",
+  "agent_verdict": "NOISE",
+  "analysis_timestamp": "2026-07-06T01:29:44.807936+00:00",
   "audit_trail": {
     "agent_version": "1.0.0-SANS-2026",
     "case_id": "VIGIA-BREAK-011",
-    "end_time": "2026-07-05T15:27:33.008858+00:00",
+    "end_time": "2026-07-06T01:29:44.807943+00:00",
     "entries": [
       {
         "action": "AGENT_INITIALIZED",
         "case_id": "VIGIA-BREAK-011",
-        "entry_sha256": "5a203d5fdce3e82b703fe495e86dbe4678b91995f23af23d29a89d1c6a78734d",
+        "entry_sha256": "69a2de7e48e9562f2cffeb5353752fc91b7261506d4558fbc46f28a1d07b5040",
         "inputs_summary": {
           "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
           "case_id": "VIGIA-BREAK-011"
@@ -21,13 +21,13 @@
           "agent_version": "1.0.0-SANS-2026"
         },
         "seq": 1,
-        "timestamp": "2026-07-05T15:27:33.005313+00:00",
+        "timestamp": "2026-07-06T01:29:44.411857+00:00",
         "tool": "vigia_agent"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-BREAK-011",
-        "entry_sha256": "f2e9a1fa5a7c7781b5b2680793f77073c1c9073df017e0627ef05d40431ce4f6",
+        "entry_sha256": "138a9ea44c1a1dade8bbf529533515d83445185ae036fa39f53e2d1bd0b53be8",
         "inputs_summary": {
           "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-BREAK-011.json"
         },
@@ -35,29 +35,29 @@
         "note": "Computing SHA-256 of original evidence",
         "outputs_summary": {},
         "seq": 2,
-        "timestamp": "2026-07-05T15:27:33.005396+00:00",
+        "timestamp": "2026-07-06T01:29:44.411938+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-BREAK-011",
-        "entry_sha256": "a5a64ac0eeb79a8799400aab4a8aa29c61a401f613a293d6f1f91042b50ca1f5",
+        "entry_sha256": "bfa0e2c540590397ed395c6e8a8b4151b8640cf12c4b92a53bb861a2664fc770",
         "inputs_summary": {
           "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-BREAK-011.json"
         },
         "iteration": 0,
-        "note": "Evidence verified: 4b3d47f4ce2f6cd1...",
+        "note": "Evidence verified: daf59414312777c8...",
         "outputs_summary": {
-          "sha256": "4b3d47f4ce2f6cd144a471d085367b88fc043cc2ee8ddb2c6a5c46c2506bb1c9"
+          "sha256": "daf59414312777c83b9e235ea2f49d89eec9bf2c7e0dba07c32473db06311993"
         },
         "seq": 3,
-        "timestamp": "2026-07-05T15:27:33.005510+00:00",
+        "timestamp": "2026-07-06T01:29:44.412048+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "PIPELINE_EXECUTE",
         "case_id": "VIGIA-BREAK-011",
-        "entry_sha256": "cd53ae54b9143c33a95528dcb4a78085564b466f1c31dcd13944347ee749dbcd",
+        "entry_sha256": "15053976d52208a20b83a7963dfe2434bb8e80459e7410a9ea594ab3ba354779",
         "inputs_summary": {
           "evidence": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-BREAK-011.json",
           "iteration": "0",
@@ -67,13 +67,13 @@
         "note": "Executing pipeline \u2014 iteration 0",
         "outputs_summary": {},
         "seq": 4,
-        "timestamp": "2026-07-05T15:27:33.005614+00:00",
+        "timestamp": "2026-07-06T01:29:44.412149+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "PIPELINE_COMPLETE",
         "case_id": "VIGIA-BREAK-011",
-        "entry_sha256": "b362c1d8e46e1e3f01756a11ce3337f6cf3b6dfd63db5efe15bd70e3f70fb4b2",
+        "entry_sha256": "c7a0cb0afb0417f4fb58de38b7d8a579d787b88e78d21a86ea401928656fd380",
         "inputs_summary": {
           "iteration": "0"
         },
@@ -81,17 +81,25 @@
         "note": "Pipeline completed \u2014 21 signals",
         "outputs_summary": {
           "abduction": {
-            "best_hypothesis": "SUSPICION_DETECTED",
-            "best_posterior": "83/10500",
-            "confidence": "83/10500",
-            "is_conclusive": "False",
+            "best_hypothesis": "NO_SEMIOTIC_ANOMALY_DETECTED",
+            "best_posterior": "47/50",
+            "confidence": "47/50",
+            "is_conclusive": "True",
             "narrative": "20 weak evidence items, none crossing the formal threshold individually, all pointing to the same target. A human expert concludes SUSPICION. VIG\u00cdA might get trapped in ABSTAIN because no individual p..."
           },
           "case_id": "VIGIA-BREAK-011",
           "pipeline_meta": {
             "artifact_count": "21",
             "avg_score": "83/2100",
+            "ebs_adapter_mode": "motor",
             "expected_verdict": "SUSPICION",
+            "resolve": {
+              "motor_confidence": "0.94",
+              "motor_reason": "Insufficient evidence of malicious intent (score=0.0593)",
+              "motor_score": "0.0593",
+              "motor_verdict": "NOISE",
+              "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+            },
             "source": "ebs_v1_json_adapter"
           },
           "signals": [
@@ -138,13 +146,13 @@
           ]
         },
         "seq": 5,
-        "timestamp": "2026-07-05T15:27:33.008346+00:00",
+        "timestamp": "2026-07-06T01:29:44.807397+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "CONTRADICTION_CHECK",
         "case_id": "VIGIA-BREAK-011",
-        "entry_sha256": "b5f326d34e0fd06044719851da50863340966c23a1f3b3adef982c8da98889cd",
+        "entry_sha256": "15e4b32f3319e68d9b4ecbe384742b20a5e26beb9a67b4bdaca60e708f723121",
         "inputs_summary": {
           "n_signals": "21"
         },
@@ -155,52 +163,60 @@
           "threshold": "2"
         },
         "seq": 6,
-        "timestamp": "2026-07-05T15:27:33.008515+00:00",
+        "timestamp": "2026-07-06T01:29:44.807578+00:00",
         "tool": "contradiction_detector"
       },
       {
         "action": "AGENT_EXIT",
         "case_id": "VIGIA-BREAK-011",
-        "entry_sha256": "a60b5eb8ae1d3a2c1b3a07d2f3ca955fc95672dad11a07dc32c588eedfee338e",
+        "entry_sha256": "4d63d4acd4673d2ae14f723cb797c33f7c6bb3349310a41b5efe047d9f5efafc",
         "inputs_summary": {
-          "verdict": "SUSPICION_DETECTED"
+          "verdict": "NO_SEMIOTIC_ANOMALY_DETECTED"
         },
         "iteration": 0,
-        "note": "Exit code 3 (INTENT) \u2014 analysis complete.",
+        "note": "Exit code 0 (NOISE) \u2014 analysis complete.",
         "outputs_summary": {
-          "agent_verdict": "INTENT",
-          "exit_code": "3"
+          "agent_verdict": "NOISE",
+          "exit_code": "0"
         },
         "seq": 7,
-        "timestamp": "2026-07-05T15:27:33.008802+00:00",
+        "timestamp": "2026-07-06T01:29:44.807883+00:00",
         "tool": "vigia_agent"
       }
     ],
-    "start_time": "2026-07-05T15:27:33.005090+00:00",
+    "start_time": "2026-07-06T01:29:44.411642+00:00",
     "total_entries": 7
   },
   "case_id": "VIGIA-BREAK-011",
   "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-BREAK-011.json",
-  "evidence_sha256": "4b3d47f4ce2f6cd144a471d085367b88fc043cc2ee8ddb2c6a5c46c2506bb1c9",
+  "evidence_sha256": "daf59414312777c83b9e235ea2f49d89eec9bf2c7e0dba07c32473db06311993",
   "iterations_executed": 1,
-  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-BREAK-011 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/VIGIA-BREAK-011.json\nEvidence SHA-256: 4b3d47f4ce2f6cd144a471d085367b88fc043cc2ee8ddb2c6a5c46c2506bb1c9\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: SUSPICION_DETECTED\nPosterior confidence: 83/10500\nConclusive: NO \u2014 requires human review\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 21 se\u00f1al(es): 21 primaria(s) de ['sift_firewall', 'sift_zeek'], 0 derivada(s)/no-analizada(s). Top z: All 20 IPs belong to the same bulletproo=0.23, SYN packet to port 443 from IP 185.220.1=0.03, SYN packet to port 443 from IP 185.220.1=0.03.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: SUSPICION_DETECTED. Conclusiva: no \u2014 requiere revisi\u00f3n humana.\n\nRazonamiento del motor abductivo:\n20 weak evidence items, none crossing the formal threshold individually, all pointing to the same target. A human expert concludes SUSPICION. VIG\u00cdA might get trapped in ABSTAIN because no individual piece reaches the confidence threshold.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [All 20 IPs belong to the same bulletproof hosting ASN (AS14061, Digita] z=0.230 conf=0.25 \u2014 \n  [SYN packet to port 443 from IP 185.220.101.1] z=0.030 conf=0.20 \u2014 \n  [SYN packet to port 443 from IP 185.220.101.2] z=0.030 conf=0.20 \u2014 \n  [SYN packet to port 443 from IP 185.220.101.3] z=0.030 conf=0.20 \u2014 \n  [SYN packet to port 443 from IP 185.220.101.4] z=0.030 conf=0.20 \u2014 \n\n--- FINAL ALERT LEVEL ---\nMEDIUM \u2014 INTENT verdict with individual z-scores below threshold. Alert floored (B-028/B-065): an intent finding cannot present as LOW.\nReconciliation: verdict INTENT rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 21 | Derived: 0 | Total: 21",
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-BREAK-011 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/VIGIA-BREAK-011.json\nEvidence SHA-256: daf59414312777c83b9e235ea2f49d89eec9bf2c7e0dba07c32473db06311993\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: NO_SEMIOTIC_ANOMALY_DETECTED\nPosterior confidence: 47/50\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 21 se\u00f1al(es): 21 primaria(s) de ['sift_firewall', 'sift_zeek'], 0 derivada(s)/no-analizada(s). Top z: All 20 IPs belong to the same bulletproo=0.23, SYN packet to port 443 from IP 185.220.1=0.03, SYN packet to port 443 from IP 185.220.1=0.03.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: NO_SEMIOTIC_ANOMALY_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\n20 weak evidence items, none crossing the formal threshold individually, all pointing to the same target. A human expert concludes SUSPICION. VIG\u00cdA might get trapped in ABSTAIN because no individual piece reaches the confidence threshold.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [All 20 IPs belong to the same bulletproof hosting ASN (AS14061, Digita] z=0.230 conf=0.25 \u2014 \n  [SYN packet to port 443 from IP 185.220.101.1] z=0.030 conf=0.20 \u2014 \n  [SYN packet to port 443 from IP 185.220.101.2] z=0.030 conf=0.20 \u2014 \n  [SYN packet to port 443 from IP 185.220.101.3] z=0.030 conf=0.20 \u2014 \n  [SYN packet to port 443 from IP 185.220.101.4] z=0.030 conf=0.20 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 21 | Derived: 0 | Total: 21",
   "pipeline_results": {
     "abduction": {
-      "best_hypothesis": "SUSPICION_DETECTED",
-      "best_posterior": "83/10500",
+      "best_hypothesis": "NO_SEMIOTIC_ANOMALY_DETECTED",
+      "best_posterior": "47/50",
       "confidence": {
         "__fraction__": true,
-        "den": 10500,
-        "num": 83
+        "den": 50,
+        "num": 47
       },
-      "is_conclusive": false,
+      "is_conclusive": true,
       "narrative": "20 weak evidence items, none crossing the formal threshold individually, all pointing to the same target. A human expert concludes SUSPICION. VIG\u00cdA might get trapped in ABSTAIN because no individual piece reaches the confidence threshold."
     },
     "case_id": "VIGIA-BREAK-011",
     "pipeline_meta": {
       "artifact_count": 21,
       "avg_score": "83/2100",
+      "ebs_adapter_mode": "motor",
       "expected_verdict": "SUSPICION",
+      "resolve": {
+        "motor_confidence": "0.94",
+        "motor_reason": "Insufficient evidence of malicious intent (score=0.0593)",
+        "motor_score": "0.0593",
+        "motor_verdict": "NOISE",
+        "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+      },
       "source": "ebs_v1_json_adapter"
     },
     "signals": [

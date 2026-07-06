@@ -1,15 +1,15 @@
 {
   "agent_verdict": "MALICE",
-  "analysis_timestamp": "2026-07-05T15:27:34.853984+00:00",
+  "analysis_timestamp": "2026-07-06T01:30:00.396534+00:00",
   "audit_trail": {
     "agent_version": "1.0.0-SANS-2026",
     "case_id": "VIGIA-NGDC-002",
-    "end_time": "2026-07-05T15:27:34.853990+00:00",
+    "end_time": "2026-07-06T01:30:00.396540+00:00",
     "entries": [
       {
         "action": "AGENT_INITIALIZED",
         "case_id": "VIGIA-NGDC-002",
-        "entry_sha256": "b30a295e574aa7a8bb2ac37bf510628b4f5963d833f985f0cd46f248aa67ad2e",
+        "entry_sha256": "f1938ec8f6964cbffaee996440ddca8f8775b9f50aeb7724a92b572ede5afb10",
         "inputs_summary": {
           "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
           "case_id": "VIGIA-NGDC-002"
@@ -21,13 +21,13 @@
           "agent_version": "1.0.0-SANS-2026"
         },
         "seq": 1,
-        "timestamp": "2026-07-05T15:27:34.850034+00:00",
+        "timestamp": "2026-07-06T01:30:00.042074+00:00",
         "tool": "vigia_agent"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-NGDC-002",
-        "entry_sha256": "b683946447845b211d0cdc657b7e9d55d61443a78e2112438ebe2ab0f9e7b339",
+        "entry_sha256": "f7d7bd32361a10c6145214c6e8200b7f7257cf7f695841509869b1b859f3fa2b",
         "inputs_summary": {
           "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-NGDC-002.json"
         },
@@ -35,29 +35,29 @@
         "note": "Computing SHA-256 of original evidence",
         "outputs_summary": {},
         "seq": 2,
-        "timestamp": "2026-07-05T15:27:34.850120+00:00",
+        "timestamp": "2026-07-06T01:30:00.042157+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-NGDC-002",
-        "entry_sha256": "0d7317ec3f9f7f63ed999bb4fcda49ad20eff259653efb8511eea6d887f5cde0",
+        "entry_sha256": "a245d83474a0c16f1c8653d422ea49e9ad4378f98ead65553d4cffee72d92406",
         "inputs_summary": {
           "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-NGDC-002.json"
         },
         "iteration": 0,
-        "note": "Evidence verified: c26a33c31fa27cb4...",
+        "note": "Evidence verified: a0a97e9040cbd5c9...",
         "outputs_summary": {
-          "sha256": "c26a33c31fa27cb4ea8f4b6d81c9233e759a282883ae06a6f398109453c525e8"
+          "sha256": "a0a97e9040cbd5c95b96ea4243c44a6e8c3eaee78d6b7fde3ff694eacbf86b31"
         },
         "seq": 3,
-        "timestamp": "2026-07-05T15:27:34.850227+00:00",
+        "timestamp": "2026-07-06T01:30:00.042266+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "PIPELINE_EXECUTE",
         "case_id": "VIGIA-NGDC-002",
-        "entry_sha256": "2bf3365c34b2f3c5c62397bd6549a06071eb3b9e7b41b93cb1bb9c6573dba175",
+        "entry_sha256": "4546f91a067d39ae7c500f84da00ae0c0a6b0e8a7aff5fbe5fd81c6f7b428971",
         "inputs_summary": {
           "evidence": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-NGDC-002.json",
           "iteration": "0",
@@ -67,13 +67,13 @@
         "note": "Executing pipeline \u2014 iteration 0",
         "outputs_summary": {},
         "seq": 4,
-        "timestamp": "2026-07-05T15:27:34.850334+00:00",
+        "timestamp": "2026-07-06T01:30:00.042368+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "PIPELINE_COMPLETE",
         "case_id": "VIGIA-NGDC-002",
-        "entry_sha256": "5deaf5fd5b555bf7642a4f063df6aa74b4ba1d8ba25c49227b7bb760e6b746d7",
+        "entry_sha256": "7c27ab7e2b7074f4a998d6efef21bec216744426c702896c84014322bfc9006f",
         "inputs_summary": {
           "iteration": "0"
         },
@@ -82,8 +82,8 @@
         "outputs_summary": {
           "abduction": {
             "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
-            "best_posterior": "3429/21875",
-            "confidence": "3429/21875",
+            "best_posterior": "19/20",
+            "confidence": "19/20",
             "is_conclusive": "True",
             "narrative": "Tracy is a National Gallery DC supervisor recruited by Carry as an insider asset. Evidence sourced from two independent channels: (1) keystroke logs captured by LogKext Daemon on Tracy's MacBook Air, ..."
           },
@@ -91,7 +91,15 @@
           "pipeline_meta": {
             "artifact_count": "7",
             "avg_score": "3429/4375",
+            "ebs_adapter_mode": "motor",
             "expected_verdict": "MALICE",
+            "resolve": {
+              "motor_confidence": "0.95",
+              "motor_reason": "Intent score 0.4785 exceeds MALICE threshold (P2+acq_assurance scale, threshold=0.33)",
+              "motor_score": "0.4785",
+              "motor_verdict": "MALICE",
+              "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+            },
             "source": "ebs_v1_json_adapter"
           },
           "signals": [
@@ -138,13 +146,13 @@
           ]
         },
         "seq": 5,
-        "timestamp": "2026-07-05T15:27:34.853132+00:00",
+        "timestamp": "2026-07-06T01:30:00.395971+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "CONTRADICTION_CHECK",
         "case_id": "VIGIA-NGDC-002",
-        "entry_sha256": "8bd92795516ba99c7c6ce34366c60edcdf28ac53320802ac9a1cd7bef385211e",
+        "entry_sha256": "84646dfa09ce465cc763658399b03bd649a75e50d469802ecc1f1787b962af57",
         "inputs_summary": {
           "n_signals": "7"
         },
@@ -155,13 +163,13 @@
           "threshold": "2"
         },
         "seq": 6,
-        "timestamp": "2026-07-05T15:27:34.853264+00:00",
+        "timestamp": "2026-07-06T01:30:00.396112+00:00",
         "tool": "contradiction_detector"
       },
       {
         "action": "AGENT_EXIT",
         "case_id": "VIGIA-NGDC-002",
-        "entry_sha256": "d50749e1dac2042db7be8f607a66df5854683239a0bf7a920c42ba3db076326e",
+        "entry_sha256": "b848b108a9ade69dbe263a7d91e36e672ba4e473bcb213782aa84a0434a3af37",
         "inputs_summary": {
           "verdict": "MALICIOUS_INTENT_DETECTED"
         },
@@ -172,26 +180,26 @@
           "exit_code": "1"
         },
         "seq": 7,
-        "timestamp": "2026-07-05T15:27:34.853519+00:00",
+        "timestamp": "2026-07-06T01:30:00.396342+00:00",
         "tool": "vigia_agent"
       }
     ],
-    "start_time": "2026-07-05T15:27:34.849798+00:00",
+    "start_time": "2026-07-06T01:30:00.041854+00:00",
     "total_entries": 7
   },
   "case_id": "VIGIA-NGDC-002",
   "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-NGDC-002.json",
-  "evidence_sha256": "c26a33c31fa27cb4ea8f4b6d81c9233e759a282883ae06a6f398109453c525e8",
+  "evidence_sha256": "a0a97e9040cbd5c95b96ea4243c44a6e8c3eaee78d6b7fde3ff694eacbf86b31",
   "iterations_executed": 1,
-  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-NGDC-002 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/VIGIA-NGDC-002.json\nEvidence SHA-256: c26a33c31fa27cb4ea8f4b6d81c9233e759a282883ae06a6f398109453c525e8\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 3429/21875\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 7 se\u00f1al(es): 7 primaria(s) de ['Digital Corpora scenario documentation + keylogger aggregate', 'LogKext Daemon v? \u2014 MacOS keylogger, cron+postfix exfiltration to joe.sum.twelve@gmail.com \u2014 logfile-2012-07-03-1000.eml', 'LogKext Daemon \u2014 logfile-2012-06-28-1600.eml + logfile-2012-06-29-1100.eml', 'LogKext Daemon \u2014 logfile-2012-07-12-1200.eml', 'sqlite3 \u2014 EmailProviderBody.db messageKey=23, extracted from carry-tablet-2012-07-16-final.E01', 'sqlite3 \u2014 EmailProviderBody.db messageKey=25', 'sqlite3 \u2014 EmailProviderBody.db messageKey=27'], 0 derivada(s)/no-analizada(s). Top z: Tracy responds to Carry's request for se=0.89, Tracy responds to Carry's tablet smuggli=0.85, Keystroke log captures Tracy composing t=0.83.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: MALICIOUS_INTENT_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nTracy is a National Gallery DC supervisor recruited by Carry as an insider asset. Evidence sourced from two independent channels: (1) keystroke logs captured by LogKext Daemon on Tracy's MacBook Air, exfiltrated hourly via cron+postfix to joe.sum.twelve@gmail.com and recovered from email.zip (Digital Corpora); (2) the outbound side of Tracy's correspondence recovered from EmailProviderBody.db extracted from carry-tablet-2012-07-16-final.E01. Tracy was not the initiator and did not know the real \n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Tracy responds to Carry's request for security shift schedules in exch] z=0.893 conf=0.93 \u2014 \n  [Tracy responds to Carry's tablet smuggling request: 'Hey, I can defini] z=0.846 conf=0.93 \u2014 \n  [Keystroke log captures Tracy composing the following text on 2012-07-0] z=0.827 conf=0.88 \u2014 \n  [After Carry's operational security lapse ('It willbe gun'), Tracy asks] z=0.819 conf=0.92 \u2014 \n  [Keystroke logs from June 28-29 capture Tracy establishing contact with] z=0.740 conf=0.85 \u2014 \n\n--- FINAL ALERT LEVEL ---\nHIGH \u2014 MALICE verdict from Bayesian posterior aggregation. Individual z-scores below threshold (distributed evidence pattern: no single dominant signal, but aggregate posterior is decisive). Alert floored (B-028/B-065).\nReconciliation: verdict MALICE rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 7 | Derived: 0 | Total: 7",
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-NGDC-002 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/VIGIA-NGDC-002.json\nEvidence SHA-256: a0a97e9040cbd5c95b96ea4243c44a6e8c3eaee78d6b7fde3ff694eacbf86b31\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 19/20\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 7 se\u00f1al(es): 7 primaria(s) de ['Digital Corpora scenario documentation + keylogger aggregate', 'LogKext Daemon v? \u2014 MacOS keylogger, cron+postfix exfiltration to joe.sum.twelve@gmail.com \u2014 logfile-2012-07-03-1000.eml', 'LogKext Daemon \u2014 logfile-2012-06-28-1600.eml + logfile-2012-06-29-1100.eml', 'LogKext Daemon \u2014 logfile-2012-07-12-1200.eml', 'sqlite3 \u2014 EmailProviderBody.db messageKey=23, extracted from carry-tablet-2012-07-16-final.E01', 'sqlite3 \u2014 EmailProviderBody.db messageKey=25', 'sqlite3 \u2014 EmailProviderBody.db messageKey=27'], 0 derivada(s)/no-analizada(s). Top z: Tracy responds to Carry's request for se=0.89, Tracy responds to Carry's tablet smuggli=0.85, Keystroke log captures Tracy composing t=0.83.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: MALICIOUS_INTENT_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nTracy is a National Gallery DC supervisor recruited by Carry as an insider asset. Evidence sourced from two independent channels: (1) keystroke logs captured by LogKext Daemon on Tracy's MacBook Air, exfiltrated hourly via cron+postfix to joe.sum.twelve@gmail.com and recovered from email.zip (Digital Corpora); (2) the outbound side of Tracy's correspondence recovered from EmailProviderBody.db extracted from carry-tablet-2012-07-16-final.E01. Tracy was not the initiator and did not know the real \n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Tracy responds to Carry's request for security shift schedules in exch] z=0.893 conf=0.93 \u2014 \n  [Tracy responds to Carry's tablet smuggling request: 'Hey, I can defini] z=0.846 conf=0.93 \u2014 \n  [Keystroke log captures Tracy composing the following text on 2012-07-0] z=0.827 conf=0.88 \u2014 \n  [After Carry's operational security lapse ('It willbe gun'), Tracy asks] z=0.819 conf=0.92 \u2014 \n  [Keystroke logs from June 28-29 capture Tracy establishing contact with] z=0.740 conf=0.85 \u2014 \n\n--- FINAL ALERT LEVEL ---\nHIGH \u2014 MALICE verdict from Bayesian posterior aggregation. Individual z-scores below threshold (distributed evidence pattern: no single dominant signal, but aggregate posterior is decisive). Alert floored (B-028/B-065).\nReconciliation: verdict MALICE rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 7 | Derived: 0 | Total: 7",
   "pipeline_results": {
     "abduction": {
       "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
-      "best_posterior": "3429/21875",
+      "best_posterior": "19/20",
       "confidence": {
         "__fraction__": true,
-        "den": 21875,
-        "num": 3429
+        "den": 20,
+        "num": 19
       },
       "devil_advocate": {
         "aggregation": {
@@ -203,7 +211,7 @@
           "primary_alternative_hypothesis": null
         },
         "decision_context": {
-          "confidence": "3429/21875",
+          "confidence": "19/20",
           "mapped_verdict": "MALICIOUS_INTENT_DETECTED",
           "raw_verdict": "MALICIOUS_INTENT_DETECTED",
           "score": "3429/4375"
@@ -224,7 +232,15 @@
     "pipeline_meta": {
       "artifact_count": 7,
       "avg_score": "3429/4375",
+      "ebs_adapter_mode": "motor",
       "expected_verdict": "MALICE",
+      "resolve": {
+        "motor_confidence": "0.95",
+        "motor_reason": "Intent score 0.4785 exceeds MALICE threshold (P2+acq_assurance scale, threshold=0.33)",
+        "motor_score": "0.4785",
+        "motor_verdict": "MALICE",
+        "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+      },
       "source": "ebs_v1_json_adapter"
     },
     "signals": [

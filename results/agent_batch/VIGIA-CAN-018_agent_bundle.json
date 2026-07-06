@@ -1,15 +1,15 @@
 {
   "agent_verdict": "MALICE",
-  "analysis_timestamp": "2026-07-05T15:27:41.161104+00:00",
+  "analysis_timestamp": "2026-07-06T01:30:53.900741+00:00",
   "audit_trail": {
     "agent_version": "1.0.0-SANS-2026",
     "case_id": "VIGIA-CAN-018",
-    "end_time": "2026-07-05T15:27:41.161110+00:00",
+    "end_time": "2026-07-06T01:30:53.900750+00:00",
     "entries": [
       {
         "action": "AGENT_INITIALIZED",
         "case_id": "VIGIA-CAN-018",
-        "entry_sha256": "330606a05aec714809295cab641cdccc5a855af508c4458a9af1cda7314668bb",
+        "entry_sha256": "eb07bfcad6d0bf127a3f7c893063da88523ae0cbd890e270411ac9451978fc6e",
         "inputs_summary": {
           "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
           "case_id": "VIGIA-CAN-018"
@@ -21,13 +21,13 @@
           "agent_version": "1.0.0-SANS-2026"
         },
         "seq": 1,
-        "timestamp": "2026-07-05T15:27:41.157525+00:00",
+        "timestamp": "2026-07-06T01:30:53.552313+00:00",
         "tool": "vigia_agent"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-CAN-018",
-        "entry_sha256": "88fd663045f9d086a6ef4b35772199bd2a06d38f53bcc16967bbd214f5223a4d",
+        "entry_sha256": "300953dbb15ede45cb1def88e350e62d0da13a0d54c2ae8fec27bae92f3f0d8d",
         "inputs_summary": {
           "path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-018.json"
         },
@@ -35,29 +35,29 @@
         "note": "Computing SHA-256 of original evidence",
         "outputs_summary": {},
         "seq": 2,
-        "timestamp": "2026-07-05T15:27:41.157613+00:00",
+        "timestamp": "2026-07-06T01:30:53.552398+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-CAN-018",
-        "entry_sha256": "1aecbe4b174e1e75038bfeb44cdd882f70569359a7ccdc33cdefd41499f6b8f9",
+        "entry_sha256": "3845a7a869fdb89e2ef27837d38da92370c55b9ba9e0784a74c7fa3620fe4032",
         "inputs_summary": {
           "path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-018.json"
         },
         "iteration": 0,
-        "note": "Evidence verified: 9d38db1d40643c72...",
+        "note": "Evidence verified: 94a73fbd42f4e1b4...",
         "outputs_summary": {
-          "sha256": "9d38db1d40643c72f263016e5f1fe12603f84f57c2d42a80e75491f17d7232a9"
+          "sha256": "94a73fbd42f4e1b467f0415a616bfa7f2f846bc9b3c35648933a31acec703b38"
         },
         "seq": 3,
-        "timestamp": "2026-07-05T15:27:41.157706+00:00",
+        "timestamp": "2026-07-06T01:30:53.552501+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "PIPELINE_EXECUTE",
         "case_id": "VIGIA-CAN-018",
-        "entry_sha256": "f29a1ec809bfcc693e5290c7304f75bf7dfaa71fbd1a5938e4b8a693c16d2560",
+        "entry_sha256": "f052f4651d8f0f250511165d91fbfdbad7ad54807c673bf62ee8558920cb7361",
         "inputs_summary": {
           "evidence": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-018.json",
           "iteration": "0",
@@ -67,13 +67,13 @@
         "note": "Executing pipeline \u2014 iteration 0",
         "outputs_summary": {},
         "seq": 4,
-        "timestamp": "2026-07-05T15:27:41.157811+00:00",
+        "timestamp": "2026-07-06T01:30:53.552662+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "PIPELINE_COMPLETE",
         "case_id": "VIGIA-CAN-018",
-        "entry_sha256": "5d7fe57f48d703a1349ce37ae6f24da4c039059079795985a35e7b0906e7bf3a",
+        "entry_sha256": "bc0141589d58ddf608df2ea22595f8021b168e13ccddaa5ad1513ad109cefa8a",
         "inputs_summary": {
           "iteration": "0"
         },
@@ -82,8 +82,8 @@
         "outputs_summary": {
           "abduction": {
             "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
-            "best_posterior": "401/4000",
-            "confidence": "401/4000",
+            "best_posterior": "67/100",
+            "confidence": "67/100",
             "is_conclusive": "True",
             "narrative": "Service account performs maintenance with 847 commands at exact 300.0s intervals. Temporal entropy: 0.00 bits. The expected process does not exist in memory. 847 exfiltration connections of 50MB each ..."
           },
@@ -91,7 +91,15 @@
           "pipeline_meta": {
             "artifact_count": "4",
             "avg_score": "401/800",
+            "ebs_adapter_mode": "motor",
             "expected_verdict": "MALICE",
+            "resolve": {
+              "motor_confidence": "0.67",
+              "motor_reason": "Intent score 0.3353 exceeds MALICE threshold (P2+acq_assurance scale, threshold=0.33)",
+              "motor_score": "0.3353",
+              "motor_verdict": "MALICE",
+              "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+            },
             "source": "ebs_v1_json_adapter"
           },
           "signals": [
@@ -130,13 +138,13 @@
           ]
         },
         "seq": 5,
-        "timestamp": "2026-07-05T15:27:41.160353+00:00",
+        "timestamp": "2026-07-06T01:30:53.900111+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "CONTRADICTION_CHECK",
         "case_id": "VIGIA-CAN-018",
-        "entry_sha256": "636138e09068065d446a322ff3fcdba75501dff5612fc5e83d1f58c52e03e79a",
+        "entry_sha256": "b2819c8894d1c8bc1163d40629c3912ba99ed07fdc30dd9a8693e06fd903b7b5",
         "inputs_summary": {
           "n_signals": "4"
         },
@@ -147,13 +155,13 @@
           "threshold": "2"
         },
         "seq": 6,
-        "timestamp": "2026-07-05T15:27:41.160468+00:00",
+        "timestamp": "2026-07-06T01:30:53.900249+00:00",
         "tool": "contradiction_detector"
       },
       {
         "action": "AGENT_EXIT",
         "case_id": "VIGIA-CAN-018",
-        "entry_sha256": "6acdc6a904594d6d44809c6be1202aebfba800e58b7af04e7c54ad7dd8e900b5",
+        "entry_sha256": "812e4018ea62adcdff400e63052054e5115e82dc669227a390568a5bc6c47283",
         "inputs_summary": {
           "verdict": "MALICIOUS_INTENT_DETECTED"
         },
@@ -164,26 +172,26 @@
           "exit_code": "1"
         },
         "seq": 7,
-        "timestamp": "2026-07-05T15:27:41.160655+00:00",
+        "timestamp": "2026-07-06T01:30:53.900511+00:00",
         "tool": "vigia_agent"
       }
     ],
-    "start_time": "2026-07-05T15:27:41.157292+00:00",
+    "start_time": "2026-07-06T01:30:53.552102+00:00",
     "total_entries": 7
   },
   "case_id": "VIGIA-CAN-018",
   "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-018.json",
-  "evidence_sha256": "9d38db1d40643c72f263016e5f1fe12603f84f57c2d42a80e75491f17d7232a9",
+  "evidence_sha256": "94a73fbd42f4e1b467f0415a616bfa7f2f846bc9b3c35648933a31acec703b38",
   "iterations_executed": 1,
-  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-CAN-018 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-018.json\nEvidence SHA-256: 9d38db1d40643c72f263016e5f1fe12603f84f57c2d42a80e75491f17d7232a9\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 401/4000\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 4 se\u00f1al(es): 4 primaria(s) de ['sift_entropy', 'sift_netflow', 'sift_syslog', 'sift_volatility'], 0 derivada(s)/no-analizada(s). Top z: Process 'maintenance_tool.exe' NOT found=0.85, Log temporal entropy: 0.00 bits. Expecte=0.55, 847 commands executed at exact 300.0-sec=0.37.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: MALICIOUS_INTENT_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nService account performs maintenance with 847 commands at exact 300.0s intervals. Temporal entropy: 0.00 bits. The expected process does not exist in memory. 847 exfiltration connections of 50MB each exactly every 300s.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Process 'maintenance_tool.exe' NOT found in memory during execution wi] z=0.855 conf=0.95 \u2014 \n  [Log temporal entropy: 0.00 bits. Expected for legitimate service: 1.2 ] z=0.552 conf=0.60 \u2014 \n  [847 commands executed at exact 300.0-second intervals. Zero errors. Ze] z=0.368 conf=0.40 \u2014 \n  [847 outbound connections to a cloud storage IP with encrypted 50MB pay] z=0.230 conf=0.25 \u2014 \n\n--- FINAL ALERT LEVEL ---\nMEDIUM \u2014 MALICE verdict from posterior aggregation. Individual z-scores below threshold. Full signal review recommended. Alert floored (B-028/B-065).\nReconciliation: verdict MALICE rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 4 | Derived: 0 | Total: 4",
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-CAN-018 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-018.json\nEvidence SHA-256: 94a73fbd42f4e1b467f0415a616bfa7f2f846bc9b3c35648933a31acec703b38\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 67/100\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 4 se\u00f1al(es): 4 primaria(s) de ['sift_entropy', 'sift_netflow', 'sift_syslog', 'sift_volatility'], 0 derivada(s)/no-analizada(s). Top z: Process 'maintenance_tool.exe' NOT found=0.85, Log temporal entropy: 0.00 bits. Expecte=0.55, 847 commands executed at exact 300.0-sec=0.37.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: MALICIOUS_INTENT_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nService account performs maintenance with 847 commands at exact 300.0s intervals. Temporal entropy: 0.00 bits. The expected process does not exist in memory. 847 exfiltration connections of 50MB each exactly every 300s.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Process 'maintenance_tool.exe' NOT found in memory during execution wi] z=0.855 conf=0.95 \u2014 \n  [Log temporal entropy: 0.00 bits. Expected for legitimate service: 1.2 ] z=0.552 conf=0.60 \u2014 \n  [847 commands executed at exact 300.0-second intervals. Zero errors. Ze] z=0.368 conf=0.40 \u2014 \n  [847 outbound connections to a cloud storage IP with encrypted 50MB pay] z=0.230 conf=0.25 \u2014 \n\n--- FINAL ALERT LEVEL ---\nHIGH \u2014 MALICE verdict from Bayesian posterior aggregation. Individual z-scores below threshold (distributed evidence pattern: no single dominant signal, but aggregate posterior is decisive). Alert floored (B-028/B-065).\nReconciliation: verdict MALICE rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 4 | Derived: 0 | Total: 4",
   "pipeline_results": {
     "abduction": {
       "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
-      "best_posterior": "401/4000",
+      "best_posterior": "67/100",
       "confidence": {
         "__fraction__": true,
-        "den": 4000,
-        "num": 401
+        "den": 100,
+        "num": 67
       },
       "devil_advocate": {
         "aggregation": {
@@ -195,7 +203,7 @@
           "primary_alternative_hypothesis": null
         },
         "decision_context": {
-          "confidence": "401/4000",
+          "confidence": "67/100",
           "mapped_verdict": "MALICIOUS_INTENT_DETECTED",
           "raw_verdict": "MALICIOUS_INTENT_DETECTED",
           "score": "401/800"
@@ -216,7 +224,15 @@
     "pipeline_meta": {
       "artifact_count": 4,
       "avg_score": "401/800",
+      "ebs_adapter_mode": "motor",
       "expected_verdict": "MALICE",
+      "resolve": {
+        "motor_confidence": "0.67",
+        "motor_reason": "Intent score 0.3353 exceeds MALICE threshold (P2+acq_assurance scale, threshold=0.33)",
+        "motor_score": "0.3353",
+        "motor_verdict": "MALICE",
+        "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+      },
       "source": "ebs_v1_json_adapter"
     },
     "signals": [

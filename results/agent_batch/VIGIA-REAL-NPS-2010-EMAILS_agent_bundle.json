@@ -1,15 +1,15 @@
 {
   "agent_verdict": "NOISE",
-  "analysis_timestamp": "2026-07-05T15:27:36.120717+00:00",
+  "analysis_timestamp": "2026-07-06T01:30:11.422156+00:00",
   "audit_trail": {
     "agent_version": "1.0.0-SANS-2026",
     "case_id": "VIGIA-REAL-NPS-2010-EMAILS",
-    "end_time": "2026-07-05T15:27:36.120723+00:00",
+    "end_time": "2026-07-06T01:30:11.422162+00:00",
     "entries": [
       {
         "action": "AGENT_INITIALIZED",
         "case_id": "VIGIA-REAL-NPS-2010-EMAILS",
-        "entry_sha256": "307b79426fe6124b6659efc7db1472115667e049cdaa2d2f6bb8de6b9abbdbe9",
+        "entry_sha256": "a072eb8908c9d7ef04a914ef197b216225ae3e13457cc3a84bd5dab40e7cc54b",
         "inputs_summary": {
           "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
           "case_id": "VIGIA-REAL-NPS-2010-EMAILS"
@@ -21,13 +21,13 @@
           "agent_version": "1.0.0-SANS-2026"
         },
         "seq": 1,
-        "timestamp": "2026-07-05T15:27:36.117018+00:00",
+        "timestamp": "2026-07-06T01:30:11.007206+00:00",
         "tool": "vigia_agent"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-REAL-NPS-2010-EMAILS",
-        "entry_sha256": "ce3ac0e3afec59a1e0ff5a1252948b71f221217f57b69c530f15a33737231c5b",
+        "entry_sha256": "8cdc8e8ce0add293253864b9de7b1440a1723450ee942b9cac13a9b2e02e333c",
         "inputs_summary": {
           "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-REAL-NPS-2010-EMAILS.json"
         },
@@ -35,13 +35,13 @@
         "note": "Computing SHA-256 of original evidence",
         "outputs_summary": {},
         "seq": 2,
-        "timestamp": "2026-07-05T15:27:36.117104+00:00",
+        "timestamp": "2026-07-06T01:30:11.007290+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-REAL-NPS-2010-EMAILS",
-        "entry_sha256": "0e0cdb05dcef16e987e7c31a971d9eff585ed0d78a1c7e3153fde3a75b3b2815",
+        "entry_sha256": "3f0fd1d6f63c4b585d86f1c6d6e2416d051dcd8692b0416d716dbe9b51f9ef33",
         "inputs_summary": {
           "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-REAL-NPS-2010-EMAILS.json"
         },
@@ -51,13 +51,13 @@
           "sha256": "a06e174b37d4b91732d4aad62b45c42b64c89936a25ead815952e8380be1f684"
         },
         "seq": 3,
-        "timestamp": "2026-07-05T15:27:36.117224+00:00",
+        "timestamp": "2026-07-06T01:30:11.007403+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "PIPELINE_EXECUTE",
         "case_id": "VIGIA-REAL-NPS-2010-EMAILS",
-        "entry_sha256": "080efa983e5b11824dea496ed893a6a97c2e93fbb45cd753f2334795e995b0c1",
+        "entry_sha256": "ae18dd1868dcd12b1e5e5cb619000d186260dfc149dcf130b431e3add9a28188",
         "inputs_summary": {
           "evidence": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-REAL-NPS-2010-EMAILS.json",
           "iteration": "0",
@@ -67,13 +67,13 @@
         "note": "Executing pipeline \u2014 iteration 0",
         "outputs_summary": {},
         "seq": 4,
-        "timestamp": "2026-07-05T15:27:36.117327+00:00",
+        "timestamp": "2026-07-06T01:30:11.007516+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "PIPELINE_COMPLETE",
         "case_id": "VIGIA-REAL-NPS-2010-EMAILS",
-        "entry_sha256": "259ef3ae8f0db5b9b56d5da5edc1ee26118c1588420e143a72c7f6e891c3409c",
+        "entry_sha256": "80b56f5031e9fbfbd0a2bae247c71f13ec266ab0508b3fc3605f06a1a67fcb80",
         "inputs_summary": {
           "iteration": "0"
         },
@@ -82,16 +82,24 @@
         "outputs_summary": {
           "abduction": {
             "best_hypothesis": "NO_SEMIOTIC_ANOMALY_DETECTED",
-            "best_posterior": "0",
-            "confidence": "0",
-            "is_conclusive": "False",
+            "best_posterior": "99/100",
+            "confidence": "99/100",
+            "is_conclusive": "True",
             "narrative": "Digital Corpora NPS-2010-emails corpus. A FAT32 disk image (nps_emails_fs) containing 25 document files, each embedding an email address using a different encoding or container format: plain ASCII, UT..."
           },
           "case_id": "VIGIA-REAL-NPS-2010-EMAILS",
           "pipeline_meta": {
             "artifact_count": "25",
             "avg_score": "0",
+            "ebs_adapter_mode": "motor",
             "expected_verdict": "NOISE",
+            "resolve": {
+              "motor_confidence": "1.0",
+              "motor_reason": "Insufficient evidence of malicious intent (score=0.0000)",
+              "motor_score": "0.0",
+              "motor_verdict": "NOISE",
+              "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+            },
             "source": "ebs_v1_json_adapter"
           },
           "signals": [
@@ -138,13 +146,13 @@
           ]
         },
         "seq": 5,
-        "timestamp": "2026-07-05T15:27:36.120138+00:00",
+        "timestamp": "2026-07-06T01:30:11.421604+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "CONTRADICTION_CHECK",
         "case_id": "VIGIA-REAL-NPS-2010-EMAILS",
-        "entry_sha256": "a0b59e6869cf1136967db2cfa5b54555abaa37d56b2bbae1afbe5aaaf5edde0a",
+        "entry_sha256": "4affc5fe2017d3502c3a7474e3ca015aaa70a26223274a32ea9dea57e5701e69",
         "inputs_summary": {
           "n_signals": "25"
         },
@@ -155,13 +163,13 @@
           "threshold": "2"
         },
         "seq": 6,
-        "timestamp": "2026-07-05T15:27:36.120333+00:00",
+        "timestamp": "2026-07-06T01:30:11.421807+00:00",
         "tool": "contradiction_detector"
       },
       {
         "action": "AGENT_EXIT",
         "case_id": "VIGIA-REAL-NPS-2010-EMAILS",
-        "entry_sha256": "5a264ca67bda529548bfe26ab637fa1046d049a69c73de713ad30cf374f0a39a",
+        "entry_sha256": "b1f797e49427eaaf9bff5c31f4fd66b54976404dc40b51b9232933a071bcafcc",
         "inputs_summary": {
           "verdict": "NO_SEMIOTIC_ANOMALY_DETECTED"
         },
@@ -172,35 +180,43 @@
           "exit_code": "0"
         },
         "seq": 7,
-        "timestamp": "2026-07-05T15:27:36.120663+00:00",
+        "timestamp": "2026-07-06T01:30:11.422102+00:00",
         "tool": "vigia_agent"
       }
     ],
-    "start_time": "2026-07-05T15:27:36.116788+00:00",
+    "start_time": "2026-07-06T01:30:11.006983+00:00",
     "total_entries": 7
   },
   "case_id": "VIGIA-REAL-NPS-2010-EMAILS",
   "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-REAL-NPS-2010-EMAILS.json",
   "evidence_sha256": "a06e174b37d4b91732d4aad62b45c42b64c89936a25ead815952e8380be1f684",
   "iterations_executed": 1,
-  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-REAL-NPS-2010-EMAILS ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/VIGIA-REAL-NPS-2010-EMAILS.json\nEvidence SHA-256: a06e174b37d4b91732d4aad62b45c42b64c89936a25ead815952e8380be1f684\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: NO_SEMIOTIC_ANOMALY_DETECTED\nPosterior confidence: 0\nConclusive: NO \u2014 requires human review\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 25 se\u00f1al(es): 25 primaria(s) de ['catdoc', 'python3 gzip (nested)', 'read_evidence', 'strings', 'strings+grep', 'unzip', 'unzip (nested)', 'unzip+xml_parse', 'xls2csv', 'zcat'], 0 derivada(s)/no-analizada(s). Top z: Baseline file: email address stored as p=0.00, Email stored as UTF-16 LE. The BOM (FF F=0.00, Email embedded in RTF body. RTF control =0.00.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: NO_SEMIOTIC_ANOMALY_DETECTED. Conclusiva: no \u2014 requiere revisi\u00f3n humana.\n\nRazonamiento del motor abductivo:\nDigital Corpora NPS-2010-emails corpus. A FAT32 disk image (nps_emails_fs) containing 25 document files, each embedding an email address using a different encoding or container format: plain ASCII, UTF-16 LE, RTF, PDF, OLE2 binary (DOC/XLS), OOXML/ZIP (DOCX/XLSX), nested containers (DOC-in-DOC, PPTX-in-DOCX, XLS-in-DOC, DOCX-in-DOCX, XLSX-in-DOCX), ZIP, ZIP-in-ZIP, GZIP, GZIP-in-GZIP, iWork Pages/Keynote/Numbers, and spreadsheet comments vs. cell content. The corpus exists for DFIR tool validati\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Baseline file: email address stored as plain ASCII. No obfuscation.] z=0.000 conf=1.00 \u2014 \n  [Email stored as UTF-16 LE. The BOM (FF FE) makes it unreadable to tool] z=0.000 conf=1.00 \u2014 \n  [Email embedded in RTF body. RTF control words wrap the plaintext; pars] z=0.000 conf=1.00 \u2014 \n  [Email in PDF content stream. Raw bytes do not expose plaintext email; ] z=0.000 conf=1.00 \u2014 \n  [PDF generated from RTF source document. Double container: RTF content ] z=0.000 conf=1.00 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 25 | Derived: 0 | Total: 25",
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-REAL-NPS-2010-EMAILS ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/VIGIA-REAL-NPS-2010-EMAILS.json\nEvidence SHA-256: a06e174b37d4b91732d4aad62b45c42b64c89936a25ead815952e8380be1f684\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: NO_SEMIOTIC_ANOMALY_DETECTED\nPosterior confidence: 99/100\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 25 se\u00f1al(es): 25 primaria(s) de ['catdoc', 'python3 gzip (nested)', 'read_evidence', 'strings', 'strings+grep', 'unzip', 'unzip (nested)', 'unzip+xml_parse', 'xls2csv', 'zcat'], 0 derivada(s)/no-analizada(s). Top z: Baseline file: email address stored as p=0.00, Email stored as UTF-16 LE. The BOM (FF F=0.00, Email embedded in RTF body. RTF control =0.00.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: NO_SEMIOTIC_ANOMALY_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nDigital Corpora NPS-2010-emails corpus. A FAT32 disk image (nps_emails_fs) containing 25 document files, each embedding an email address using a different encoding or container format: plain ASCII, UTF-16 LE, RTF, PDF, OLE2 binary (DOC/XLS), OOXML/ZIP (DOCX/XLSX), nested containers (DOC-in-DOC, PPTX-in-DOCX, XLS-in-DOC, DOCX-in-DOCX, XLSX-in-DOCX), ZIP, ZIP-in-ZIP, GZIP, GZIP-in-GZIP, iWork Pages/Keynote/Numbers, and spreadsheet comments vs. cell content. The corpus exists for DFIR tool validati\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Baseline file: email address stored as plain ASCII. No obfuscation.] z=0.000 conf=1.00 \u2014 \n  [Email stored as UTF-16 LE. The BOM (FF FE) makes it unreadable to tool] z=0.000 conf=1.00 \u2014 \n  [Email embedded in RTF body. RTF control words wrap the plaintext; pars] z=0.000 conf=1.00 \u2014 \n  [Email in PDF content stream. Raw bytes do not expose plaintext email; ] z=0.000 conf=1.00 \u2014 \n  [PDF generated from RTF source document. Double container: RTF content ] z=0.000 conf=1.00 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 25 | Derived: 0 | Total: 25",
   "pipeline_results": {
     "abduction": {
       "best_hypothesis": "NO_SEMIOTIC_ANOMALY_DETECTED",
-      "best_posterior": "0",
+      "best_posterior": "99/100",
       "confidence": {
         "__fraction__": true,
-        "den": 1,
-        "num": 0
+        "den": 100,
+        "num": 99
       },
-      "is_conclusive": false,
+      "is_conclusive": true,
       "narrative": "Digital Corpora NPS-2010-emails corpus. A FAT32 disk image (nps_emails_fs) containing 25 document files, each embedding an email address using a different encoding or container format: plain ASCII, UTF-16 LE, RTF, PDF, OLE2 binary (DOC/XLS), OOXML/ZIP (DOCX/XLSX), nested containers (DOC-in-DOC, PPTX-in-DOCX, XLS-in-DOC, DOCX-in-DOCX, XLSX-in-DOCX), ZIP, ZIP-in-ZIP, GZIP, GZIP-in-GZIP, iWork Pages/Keynote/Numbers, and spreadsheet comments vs. cell content. The corpus exists for DFIR tool validati"
     },
     "case_id": "VIGIA-REAL-NPS-2010-EMAILS",
     "pipeline_meta": {
       "artifact_count": 25,
       "avg_score": "0",
+      "ebs_adapter_mode": "motor",
       "expected_verdict": "NOISE",
+      "resolve": {
+        "motor_confidence": "1.0",
+        "motor_reason": "Insufficient evidence of malicious intent (score=0.0000)",
+        "motor_score": "0.0",
+        "motor_verdict": "NOISE",
+        "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+      },
       "source": "ebs_v1_json_adapter"
     },
     "signals": [

@@ -1,15 +1,15 @@
 {
   "agent_verdict": "MALICE",
-  "analysis_timestamp": "2026-07-05T15:27:35.694095+00:00",
+  "analysis_timestamp": "2026-07-06T01:30:07.646133+00:00",
   "audit_trail": {
     "agent_version": "1.0.0-SANS-2026",
     "case_id": "VIGIA-REAL-DEFI-DRAIN-001",
-    "end_time": "2026-07-05T15:27:35.694102+00:00",
+    "end_time": "2026-07-06T01:30:07.646140+00:00",
     "entries": [
       {
         "action": "AGENT_INITIALIZED",
         "case_id": "VIGIA-REAL-DEFI-DRAIN-001",
-        "entry_sha256": "73d1a496b31f9745e0ff1cb5fa3138effa276044f013f94d7451fe0207ce9f4b",
+        "entry_sha256": "1599c1e380390fad8053dfa71a6f1e0dc053c4a5219ba422c4c9386c7ad5a5b3",
         "inputs_summary": {
           "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
           "case_id": "VIGIA-REAL-DEFI-DRAIN-001"
@@ -21,13 +21,13 @@
           "agent_version": "1.0.0-SANS-2026"
         },
         "seq": 1,
-        "timestamp": "2026-07-05T15:27:35.690487+00:00",
+        "timestamp": "2026-07-06T01:30:07.280088+00:00",
         "tool": "vigia_agent"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-REAL-DEFI-DRAIN-001",
-        "entry_sha256": "223dd50d600cdb528a9718e96ed7ced056266616dd006a700dc3b5bc00e67a59",
+        "entry_sha256": "3dfc6600b39145108e62065a6fb62303e3a01bf62cf8434e903988074a3f5e19",
         "inputs_summary": {
           "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-REAL-DEFI-DRAIN-001.json"
         },
@@ -35,13 +35,13 @@
         "note": "Computing SHA-256 of original evidence",
         "outputs_summary": {},
         "seq": 2,
-        "timestamp": "2026-07-05T15:27:35.690576+00:00",
+        "timestamp": "2026-07-06T01:30:07.280171+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-REAL-DEFI-DRAIN-001",
-        "entry_sha256": "62c108398575fadd777f647694ee3b67e63c234bfef186d2e54b93eb64a549e3",
+        "entry_sha256": "214c87d035c9bdcb003d0c76a432f6ac7fefac3182f45a8181bf30ae88313a71",
         "inputs_summary": {
           "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-REAL-DEFI-DRAIN-001.json"
         },
@@ -51,13 +51,13 @@
           "sha256": "919e68ed68710d55ec5f3aba7ff72566b777879bea253b975936dc664095904f"
         },
         "seq": 3,
-        "timestamp": "2026-07-05T15:27:35.690671+00:00",
+        "timestamp": "2026-07-06T01:30:07.280263+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "PIPELINE_EXECUTE",
         "case_id": "VIGIA-REAL-DEFI-DRAIN-001",
-        "entry_sha256": "59e0a78a883211e35312f0b1d45c2505b85cca02df902f29f492600d706ae6cc",
+        "entry_sha256": "388983a425a4ac39d017838ccd6afe210a5cd87441f1bbb00d77aa876bfd001e",
         "inputs_summary": {
           "evidence": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-REAL-DEFI-DRAIN-001.json",
           "iteration": "0",
@@ -67,13 +67,13 @@
         "note": "Executing pipeline \u2014 iteration 0",
         "outputs_summary": {},
         "seq": 4,
-        "timestamp": "2026-07-05T15:27:35.690776+00:00",
+        "timestamp": "2026-07-06T01:30:07.280445+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "PIPELINE_COMPLETE",
         "case_id": "VIGIA-REAL-DEFI-DRAIN-001",
-        "entry_sha256": "d649135210f44ccbf8f64b3570c9738b9d3c5aafa90ed992d4ca06b09e18b02b",
+        "entry_sha256": "065ab6a0f30f38441fda51b42eae858f331d00635a7170377993e7ca930aee6e",
         "inputs_summary": {
           "iteration": "0"
         },
@@ -82,8 +82,8 @@
         "outputs_summary": {
           "abduction": {
             "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
-            "best_posterior": "34901/200000",
-            "confidence": "34901/200000",
+            "best_posterior": "19/20",
+            "confidence": "19/20",
             "is_conclusive": "True",
             "narrative": "Multi-chain cryptocurrency drainer distributed via paid Instagram ads. Full attacker backend exposed in client-side JS bundle. Carnegie manipulation documented in source code."
           },
@@ -91,7 +91,15 @@
           "pipeline_meta": {
             "artifact_count": "4",
             "avg_score": "34901/40000",
+            "ebs_adapter_mode": "motor",
             "expected_verdict": "MALICE",
+            "resolve": {
+              "motor_confidence": "0.95",
+              "motor_reason": "Intent score 0.4964 exceeds MALICE threshold (P2+acq_assurance scale, threshold=0.33)",
+              "motor_score": "0.4964",
+              "motor_verdict": "MALICE",
+              "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+            },
             "source": "ebs_v1_json_adapter"
           },
           "signals": [
@@ -130,13 +138,13 @@
           ]
         },
         "seq": 5,
-        "timestamp": "2026-07-05T15:27:35.693322+00:00",
+        "timestamp": "2026-07-06T01:30:07.645590+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "CONTRADICTION_CHECK",
         "case_id": "VIGIA-REAL-DEFI-DRAIN-001",
-        "entry_sha256": "a59d707fdba93641166de5ee36a8d2892a6371900e183ee853f89631ab97b6ac",
+        "entry_sha256": "4e1b1222c06fed294916b64e5fdb5b4c109f42dfe24f6269e8221d82b9efcb9b",
         "inputs_summary": {
           "n_signals": "4"
         },
@@ -147,13 +155,13 @@
           "threshold": "2"
         },
         "seq": 6,
-        "timestamp": "2026-07-05T15:27:35.693447+00:00",
+        "timestamp": "2026-07-06T01:30:07.645718+00:00",
         "tool": "contradiction_detector"
       },
       {
         "action": "AGENT_EXIT",
         "case_id": "VIGIA-REAL-DEFI-DRAIN-001",
-        "entry_sha256": "dde1e82fdc2746550de61e5d1a4364c85d4976e6d2417c9d5f941673c21921c7",
+        "entry_sha256": "5788d718eeb816b81051e3501edda03ae9cfa755cf5a02bf796a85a10ef6ed2b",
         "inputs_summary": {
           "verdict": "MALICIOUS_INTENT_DETECTED"
         },
@@ -164,26 +172,26 @@
           "exit_code": "1"
         },
         "seq": 7,
-        "timestamp": "2026-07-05T15:27:35.693641+00:00",
+        "timestamp": "2026-07-06T01:30:07.645937+00:00",
         "tool": "vigia_agent"
       }
     ],
-    "start_time": "2026-07-05T15:27:35.690241+00:00",
+    "start_time": "2026-07-06T01:30:07.279869+00:00",
     "total_entries": 7
   },
   "case_id": "VIGIA-REAL-DEFI-DRAIN-001",
   "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-REAL-DEFI-DRAIN-001.json",
   "evidence_sha256": "919e68ed68710d55ec5f3aba7ff72566b777879bea253b975936dc664095904f",
   "iterations_executed": 1,
-  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-REAL-DEFI-DRAIN-001 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/VIGIA-REAL-DEFI-DRAIN-001.json\nEvidence SHA-256: 919e68ed68710d55ec5f3aba7ff72566b777879bea253b975936dc664095904f\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 34901/200000\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 4 se\u00f1al(es): 4 primaria(s) de ['playwright_cdp_network_intercept', 'playwright_cdp_sandbox'], 0 derivada(s)/no-analizada(s). Top z: JS bundle index-BJT51uc1.js (578KB) cont=0.93, WalletConnect v2 modal auto-activates on=0.92, Active Instagram paid ad campaign (utm_i=0.83.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: MALICIOUS_INTENT_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nMulti-chain cryptocurrency drainer distributed via paid Instagram ads. Full attacker backend exposed in client-side JS bundle. Carnegie manipulation documented in source code.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [JS bundle index-BJT51uc1.js (578KB) contains VITE_DRAINER_SECRET, EVM ] z=0.931 conf=0.95 \u2014 \n  [WalletConnect v2 modal auto-activates on page load. connectWallet() en] z=0.921 conf=0.95 \u2014 \n  [Active Instagram paid ad campaign (utm_id: 52525097425042) impersonati] z=0.828 conf=0.90 \u2014 \n  [WalletConnect project ID 5816c5bba147eba277e1575494697210 abused to di] z=0.810 conf=0.92 \u2014 \n\n--- FINAL ALERT LEVEL ---\nHIGH \u2014 MALICE verdict from Bayesian posterior aggregation. Individual z-scores below threshold (distributed evidence pattern: no single dominant signal, but aggregate posterior is decisive). Alert floored (B-028/B-065).\nReconciliation: verdict MALICE rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 4 | Derived: 0 | Total: 4",
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-REAL-DEFI-DRAIN-001 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/VIGIA-REAL-DEFI-DRAIN-001.json\nEvidence SHA-256: 919e68ed68710d55ec5f3aba7ff72566b777879bea253b975936dc664095904f\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 19/20\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 4 se\u00f1al(es): 4 primaria(s) de ['playwright_cdp_network_intercept', 'playwright_cdp_sandbox'], 0 derivada(s)/no-analizada(s). Top z: JS bundle index-BJT51uc1.js (578KB) cont=0.93, WalletConnect v2 modal auto-activates on=0.92, Active Instagram paid ad campaign (utm_i=0.83.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: MALICIOUS_INTENT_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nMulti-chain cryptocurrency drainer distributed via paid Instagram ads. Full attacker backend exposed in client-side JS bundle. Carnegie manipulation documented in source code.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [JS bundle index-BJT51uc1.js (578KB) contains VITE_DRAINER_SECRET, EVM ] z=0.931 conf=0.95 \u2014 \n  [WalletConnect v2 modal auto-activates on page load. connectWallet() en] z=0.921 conf=0.95 \u2014 \n  [Active Instagram paid ad campaign (utm_id: 52525097425042) impersonati] z=0.828 conf=0.90 \u2014 \n  [WalletConnect project ID 5816c5bba147eba277e1575494697210 abused to di] z=0.810 conf=0.92 \u2014 \n\n--- FINAL ALERT LEVEL ---\nHIGH \u2014 MALICE verdict from Bayesian posterior aggregation. Individual z-scores below threshold (distributed evidence pattern: no single dominant signal, but aggregate posterior is decisive). Alert floored (B-028/B-065).\nReconciliation: verdict MALICE rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 4 | Derived: 0 | Total: 4",
   "pipeline_results": {
     "abduction": {
       "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
-      "best_posterior": "34901/200000",
+      "best_posterior": "19/20",
       "confidence": {
         "__fraction__": true,
-        "den": 200000,
-        "num": 34901
+        "den": 20,
+        "num": 19
       },
       "devil_advocate": {
         "aggregation": {
@@ -195,7 +203,7 @@
           "primary_alternative_hypothesis": null
         },
         "decision_context": {
-          "confidence": "34901/200000",
+          "confidence": "19/20",
           "mapped_verdict": "MALICIOUS_INTENT_DETECTED",
           "raw_verdict": "MALICIOUS_INTENT_DETECTED",
           "score": "34901/40000"
@@ -216,7 +224,15 @@
     "pipeline_meta": {
       "artifact_count": 4,
       "avg_score": "34901/40000",
+      "ebs_adapter_mode": "motor",
       "expected_verdict": "MALICE",
+      "resolve": {
+        "motor_confidence": "0.95",
+        "motor_reason": "Intent score 0.4964 exceeds MALICE threshold (P2+acq_assurance scale, threshold=0.33)",
+        "motor_score": "0.4964",
+        "motor_verdict": "MALICE",
+        "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+      },
       "source": "ebs_v1_json_adapter"
     },
     "signals": [

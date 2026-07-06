@@ -1,15 +1,15 @@
 {
   "agent_verdict": "INTENT",
-  "analysis_timestamp": "2026-07-05T15:27:35.009541+00:00",
+  "analysis_timestamp": "2026-07-06T01:30:01.736552+00:00",
   "audit_trail": {
     "agent_version": "1.0.0-SANS-2026",
     "case_id": "VIGIA-NITROBA-M57-001",
-    "end_time": "2026-07-05T15:27:35.009547+00:00",
+    "end_time": "2026-07-06T01:30:01.736557+00:00",
     "entries": [
       {
         "action": "AGENT_INITIALIZED",
         "case_id": "VIGIA-NITROBA-M57-001",
-        "entry_sha256": "08beb549a88c0f1a4e64c434ecf20d2916bee111a8ad98e9e6677f62fe37bd0e",
+        "entry_sha256": "3fbf3d4110b425c9995242aa6d63f832a4d789aaed708eb825bdc524d63d2736",
         "inputs_summary": {
           "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
           "case_id": "VIGIA-NITROBA-M57-001"
@@ -21,13 +21,13 @@
           "agent_version": "1.0.0-SANS-2026"
         },
         "seq": 1,
-        "timestamp": "2026-07-05T15:27:35.006245+00:00",
+        "timestamp": "2026-07-06T01:30:01.381069+00:00",
         "tool": "vigia_agent"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-NITROBA-M57-001",
-        "entry_sha256": "b9b0c14f8cf6d3de2d902caf0b53951cce2dbd48764a172ec935d0fbd5109663",
+        "entry_sha256": "7031b87f6fa1f4c73a6f1b1c91e63124005ea48b5edbced37505f8c4b218a111",
         "inputs_summary": {
           "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-NITROBA-M57-001.json"
         },
@@ -35,29 +35,29 @@
         "note": "Computing SHA-256 of original evidence",
         "outputs_summary": {},
         "seq": 2,
-        "timestamp": "2026-07-05T15:27:35.006329+00:00",
+        "timestamp": "2026-07-06T01:30:01.381151+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-NITROBA-M57-001",
-        "entry_sha256": "336e42ead9229e23fb6f2cad6221f34a32a4611ac450155099ac77b2621608c1",
+        "entry_sha256": "69c1c0e8e24e11b40de17acd5583c88b22c57a049d8767271f1c6139ea9e03ab",
         "inputs_summary": {
           "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-NITROBA-M57-001.json"
         },
         "iteration": 0,
-        "note": "Evidence verified: 45b88d1892d9d91e...",
+        "note": "Evidence verified: e6e861878bb13535...",
         "outputs_summary": {
-          "sha256": "45b88d1892d9d91e036cfee8ea697827ab1cc49eb3669b62281a1db74f16acef"
+          "sha256": "e6e861878bb13535ded1ed879fdaec54b3f05d991146f8eed7531869d2bc2907"
         },
         "seq": 3,
-        "timestamp": "2026-07-05T15:27:35.006434+00:00",
+        "timestamp": "2026-07-06T01:30:01.381250+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "PIPELINE_EXECUTE",
         "case_id": "VIGIA-NITROBA-M57-001",
-        "entry_sha256": "e1077812f2a54bd1194698ba5018d6c3f0176b118a492ce5606bbb44569fb7e2",
+        "entry_sha256": "5148d764cfd6e4f86ad5bcafa602c21828d73e911c8568ae0e3574764c1a532b",
         "inputs_summary": {
           "evidence": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-NITROBA-M57-001.json",
           "iteration": "0",
@@ -67,13 +67,13 @@
         "note": "Executing pipeline \u2014 iteration 0",
         "outputs_summary": {},
         "seq": 4,
-        "timestamp": "2026-07-05T15:27:35.006588+00:00",
+        "timestamp": "2026-07-06T01:30:01.381353+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "PIPELINE_COMPLETE",
         "case_id": "VIGIA-NITROBA-M57-001",
-        "entry_sha256": "5628bfbfd350e9f5d1cea5b1c844f901febb0b3152593358bf424d15ad6fb216",
+        "entry_sha256": "94cf13451dd688b0bfd7095bca75f730c8f1bbd1fb70638e2b5cc4ace1564738",
         "inputs_summary": {
           "iteration": "0"
         },
@@ -82,8 +82,8 @@
         "outputs_summary": {
           "abduction": {
             "best_hypothesis": "SUSPICION_DETECTED",
-            "best_posterior": "223/2500",
-            "confidence": "223/2500",
+            "best_posterior": "31/50",
+            "confidence": "31/50",
             "is_conclusive": "True",
             "narrative": "Network packet capture (nitroba.pcap, 56180821 bytes, SHA-256: 2b77a9eaefc1d6af163d1ba793c96dbccacb04e6befdf1a0b01f8c67553ec2fb) from the M57 Patents DFRWS 2009 forensics challenge. Capture period: Ju..."
           },
@@ -91,7 +91,15 @@
           "pipeline_meta": {
             "artifact_count": "5",
             "avg_score": "223/500",
+            "ebs_adapter_mode": "motor",
             "expected_verdict": "SUSPICION",
+            "resolve": {
+              "motor_confidence": "0.62",
+              "motor_reason": "Significant signal with structural support (score=0.3098)",
+              "motor_score": "0.3098",
+              "motor_verdict": "SUSPICION",
+              "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+            },
             "source": "ebs_v1_json_adapter"
           },
           "signals": [
@@ -138,13 +146,13 @@
           ]
         },
         "seq": 5,
-        "timestamp": "2026-07-05T15:27:35.009169+00:00",
+        "timestamp": "2026-07-06T01:30:01.736084+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "CONTRADICTION_CHECK",
         "case_id": "VIGIA-NITROBA-M57-001",
-        "entry_sha256": "ddf505f26db1b32138e7b5c723355f2602f8dffb3b6d4f669a94b11a5151fb6a",
+        "entry_sha256": "82c7d02abe319097d064aa518be86ba11fce2aec0fc95de795e5f5b771233493",
         "inputs_summary": {
           "n_signals": "5"
         },
@@ -155,13 +163,13 @@
           "threshold": "2"
         },
         "seq": 6,
-        "timestamp": "2026-07-05T15:27:35.009289+00:00",
+        "timestamp": "2026-07-06T01:30:01.736237+00:00",
         "tool": "contradiction_detector"
       },
       {
         "action": "AGENT_EXIT",
         "case_id": "VIGIA-NITROBA-M57-001",
-        "entry_sha256": "37f4ecb69614e0181cce7a28669dac0dedc71cbcad360073a6732883758a868c",
+        "entry_sha256": "817d53d8d59a3017d8e2c75826a5b3ab8a2a048d3c9cb3391136fa29ed8165a0",
         "inputs_summary": {
           "verdict": "SUSPICION_DETECTED"
         },
@@ -172,26 +180,26 @@
           "exit_code": "3"
         },
         "seq": 7,
-        "timestamp": "2026-07-05T15:27:35.009490+00:00",
+        "timestamp": "2026-07-06T01:30:01.736493+00:00",
         "tool": "vigia_agent"
       }
     ],
-    "start_time": "2026-07-05T15:27:35.006023+00:00",
+    "start_time": "2026-07-06T01:30:01.380850+00:00",
     "total_entries": 7
   },
   "case_id": "VIGIA-NITROBA-M57-001",
   "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-NITROBA-M57-001.json",
-  "evidence_sha256": "45b88d1892d9d91e036cfee8ea697827ab1cc49eb3669b62281a1db74f16acef",
+  "evidence_sha256": "e6e861878bb13535ded1ed879fdaec54b3f05d991146f8eed7531869d2bc2907",
   "iterations_executed": 1,
-  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-NITROBA-M57-001 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/VIGIA-NITROBA-M57-001.json\nEvidence SHA-256: 45b88d1892d9d91e036cfee8ea697827ab1cc49eb3669b62281a1db74f16acef\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: SUSPICION_DETECTED\nPosterior confidence: 223/2500\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 5 se\u00f1al(es): 5 primaria(s) de ['audit_network', 'generate_forensic_hash', 'search_pattern'], 0 derivada(s)/no-analizada(s). Top z: AOL AIM SyncML contact synchronization f=0.68, Gmail session cookies captured in plaint=0.68, SIP VoIP registration on LAN. SIP From/T=0.48.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: SUSPICION_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nNetwork packet capture (nitroba.pcap, 56180821 bytes, SHA-256: 2b77a9eaefc1d6af163d1ba793c96dbccacb04e6befdf1a0b01f8c67553ec2fb) from the M57 Patents DFRWS 2009 forensics challenge. Capture period: July 21-22, 2008. The packet capture contains traffic from a residential LAN with two identified devices: (1) 192.168.1.64 \u2014 Mac OS X 10.5.4 (both PPC and Intel variants seen), running Safari 3.1.2 and Firefox 2.0.0.16. User logged into Gmail as mylady.ixchel@gmail.com, then logged out. Reading BBC Ne\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [AOL AIM SyncML contact synchronization from 192.168.15.4 (Windows XP) ] z=0.680 conf=0.85 \u2014 \n  [Gmail session cookies captured in plaintext HTTP at 22:51:07. Cookie: ] z=0.675 conf=0.90 \u2014 \n  [SIP VoIP registration on LAN. SIP From/To: sip:16178766111@t.voncp.com] z=0.480 conf=0.80 \u2014 \n  [Browsing context and user profile indicators: (1) PHD Comics (phdcomic] z=0.300 conf=0.75 \u2014 \n  [PCAP file integrity verified. File: nitroba.pcap. Format: tcpdump/libp] z=0.095 conf=0.95 \u2014 \n\n--- FINAL ALERT LEVEL ---\nMEDIUM \u2014 INTENT verdict with individual z-scores below threshold. Alert floored (B-028/B-065): an intent finding cannot present as LOW.\nReconciliation: verdict INTENT rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 5 | Derived: 0 | Total: 5",
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-NITROBA-M57-001 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/VIGIA-NITROBA-M57-001.json\nEvidence SHA-256: e6e861878bb13535ded1ed879fdaec54b3f05d991146f8eed7531869d2bc2907\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: SUSPICION_DETECTED\nPosterior confidence: 31/50\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 5 se\u00f1al(es): 5 primaria(s) de ['audit_network', 'generate_forensic_hash', 'search_pattern'], 0 derivada(s)/no-analizada(s). Top z: AOL AIM SyncML contact synchronization f=0.68, Gmail session cookies captured in plaint=0.68, SIP VoIP registration on LAN. SIP From/T=0.48.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: SUSPICION_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nNetwork packet capture (nitroba.pcap, 56180821 bytes, SHA-256: 2b77a9eaefc1d6af163d1ba793c96dbccacb04e6befdf1a0b01f8c67553ec2fb) from the M57 Patents DFRWS 2009 forensics challenge. Capture period: July 21-22, 2008. The packet capture contains traffic from a residential LAN with two identified devices: (1) 192.168.1.64 \u2014 Mac OS X 10.5.4 (both PPC and Intel variants seen), running Safari 3.1.2 and Firefox 2.0.0.16. User logged into Gmail as mylady.ixchel@gmail.com, then logged out. Reading BBC Ne\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [AOL AIM SyncML contact synchronization from 192.168.15.4 (Windows XP) ] z=0.680 conf=0.85 \u2014 \n  [Gmail session cookies captured in plaintext HTTP at 22:51:07. Cookie: ] z=0.675 conf=0.90 \u2014 \n  [SIP VoIP registration on LAN. SIP From/To: sip:16178766111@t.voncp.com] z=0.480 conf=0.80 \u2014 \n  [Browsing context and user profile indicators: (1) PHD Comics (phdcomic] z=0.300 conf=0.75 \u2014 \n  [PCAP file integrity verified. File: nitroba.pcap. Format: tcpdump/libp] z=0.095 conf=0.95 \u2014 \n\n--- FINAL ALERT LEVEL ---\nMEDIUM \u2014 INTENT verdict with individual z-scores below threshold. Alert floored (B-028/B-065): an intent finding cannot present as LOW.\nReconciliation: verdict INTENT rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 5 | Derived: 0 | Total: 5",
   "pipeline_results": {
     "abduction": {
       "best_hypothesis": "SUSPICION_DETECTED",
-      "best_posterior": "223/2500",
+      "best_posterior": "31/50",
       "confidence": {
         "__fraction__": true,
-        "den": 2500,
-        "num": 223
+        "den": 50,
+        "num": 31
       },
       "is_conclusive": true,
       "narrative": "Network packet capture (nitroba.pcap, 56180821 bytes, SHA-256: 2b77a9eaefc1d6af163d1ba793c96dbccacb04e6befdf1a0b01f8c67553ec2fb) from the M57 Patents DFRWS 2009 forensics challenge. Capture period: July 21-22, 2008. The packet capture contains traffic from a residential LAN with two identified devices: (1) 192.168.1.64 \u2014 Mac OS X 10.5.4 (both PPC and Intel variants seen), running Safari 3.1.2 and Firefox 2.0.0.16. User logged into Gmail as mylady.ixchel@gmail.com, then logged out. Reading BBC Ne"
@@ -200,7 +208,15 @@
     "pipeline_meta": {
       "artifact_count": 5,
       "avg_score": "223/500",
+      "ebs_adapter_mode": "motor",
       "expected_verdict": "SUSPICION",
+      "resolve": {
+        "motor_confidence": "0.62",
+        "motor_reason": "Significant signal with structural support (score=0.3098)",
+        "motor_score": "0.3098",
+        "motor_verdict": "SUSPICION",
+        "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+      },
       "source": "ebs_v1_json_adapter"
     },
     "signals": [
