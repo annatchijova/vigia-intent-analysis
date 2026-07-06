@@ -49,32 +49,23 @@ from typing import Any, Dict, List, Optional
 
 
 # ══════════════════════════════════════════════════════════════════════════
-# ESCALA ENFSI DE LIKELIHOOD RATIO
+# ESCALA ENFSI DE LIKELIHOOD RATIO — B-059: fuente única en vigia/core/enfsi
 # ══════════════════════════════════════════════════════════════════════════
+# La escala local de 7 buckets divergía de la sellada en el bundle (ebs_v1):
+# LR=5 era "limited" en el bundle y "weak support" en este reporte judicial —
+# inconsistencia citable por un perito contrario (AUDITORIA_INVARIANTES_
+# ASIMETRIAS_20260703, B-059). La escala canónica vive en vigia/core/enfsi.py
+# (stdlib-only, igual que este runner): bundle y reporte comparten el mismo
+# bucketing por construcción. SIN fallback local — recrearía la divergencia;
+# si el import falla, este generador debe fallar ruidosamente, no emitir
+# etiquetas de otra escala.
 
-ENFSI_SCALE = [
-    (1e6,  float("inf"), "Proporciona evidencia extremadamente fuerte",
-              "provides extremely strong support"),
-    (1e4,  1e6,          "Proporciona evidencia muy fuerte",
-              "provides very strong support"),
-    (1e2,  1e4,          "Proporciona evidencia fuerte",
-              "provides strong support"),
-    (10,   1e2,          "Proporciona evidencia moderada",
-              "provides moderate support"),
-    (1,    10,           "Proporciona evidencia leve",
-              "provides weak support"),
-    (0.1,  1,            "Proporciona evidencia leve en contra",
-              "provides weak support against"),
-    (0.0,  0.1,          "Proporciona evidencia fuerte en contra",
-              "provides strong support against"),
-]
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+from vigia.core.enfsi import enfsi_narrative as _enfsi_canonical_narrative  # noqa: E402
 
 
 def _enfsi_label(lr: float, lang: str = "es") -> str:
-    for lo, hi, label_es, label_en in ENFSI_SCALE:
-        if lo <= lr < hi:
-            return label_es if lang == "es" else label_en
-    return "inconcluyente" if lang == "es" else "inconclusive"
+    return _enfsi_canonical_narrative(lr, lang)
 
 
 # ══════════════════════════════════════════════════════════════════════════

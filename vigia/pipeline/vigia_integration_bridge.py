@@ -105,7 +105,8 @@ _signal_mod, _signal_name = _try_imports(
 if _signal_mod is not None:
     SignalOutput = getattr(_signal_mod, "SignalOutput")
     SignalBuilder = getattr(_signal_mod, "SignalBuilder", None)
-    enfsi_label = getattr(_signal_mod, "enfsi_label", None)
+    # B-059: enfsi_label ya no se toma del signal_contract — la escala vive
+    # en vigia/core/enfsi (fuente única) y el use-site la importa directo.
     _SIGNAL_CONTRACT_AVAILABLE = True
     logger.info("[bridge] signal_contract importado desde '%s'", _signal_name)
 else:
@@ -976,21 +977,11 @@ class ReportAdapter:
         p_clamp = max(0.001, min(0.999, posterior))
         lr = p_clamp / (1.0 - p_clamp)
 
-        # Escala ENFSI desde signal_contract si disponible
-        if _SIGNAL_CONTRACT_AVAILABLE:
-            label = enfsi_label(lr)
-        else:
-            # Escala mínima inline (mismo criterio que signal_contract__2_.py)
-            if lr >= 10_000:
-                label = "EXTREMADAMENTE FUERTE — Evidencia concluyente bajo estándar ENFSI"
-            elif lr >= 1_000:
-                label = "MUY FUERTE — Alto soporte para hipótesis de fabricación"
-            elif lr >= 100:
-                label = "FUERTE — Soporte sustancial, requiere corroboración"
-            elif lr >= 10:
-                label = "MODERADA — Indicios consistentes, insuficiente de forma aislada"
-            else:
-                label = "DÉBIL / NEUTRA — Evidencia no discriminante"
+        # B-059 (TANDA 1): escala ENFSI canónica — fuente única, sin fallback
+        # inline (la copia local de 5 buckets era la 4ta implementación
+        # divergente; el mismo LR etiquetaba distinto que el bundle sellado).
+        from vigia.core.enfsi import enfsi_label as _enfsi_canonical
+        label = _enfsi_canonical(lr)
 
         # Señales del grafo de evidencia
         eg = sealed_dict.get("evidence_graph", {})

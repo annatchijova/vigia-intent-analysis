@@ -768,34 +768,9 @@ def make_default_policy(
         description="VIGIA default policy — SANS FIND EVIL 2026",
     )
 
-def enfsi_label(lr: float) -> str:
-    """
-    Convert a Likelihood Ratio to a verbal label
-    per the ENFSI scale (European Network of Forensic Science Institutes).
-
-    Scale:
-        LR == 0:            "inconclusive"
-        LR < 1:             "supports_H0"  (evidence favors authenticity)
-        1  <= LR < 2:       "weak"
-        2  <= LR < 10:      "limited"
-        10 <= LR < 100:     "moderate"
-        100 <= LR < 1000:   "moderately strong"
-        1000 <= LR < 10000: "strong"
-        LR >= 10000:        "very strong"
-    """
-    if lr == 0:
-        return "inconclusive"
-    elif lr < 1:
-        return "supports_H0"  # Evidence favors authenticity
-    elif lr < 2:
-        return "weak"
-    elif lr < 10:
-        return "limited"
-    elif lr < 100:
-        return "moderate"
-    elif lr < 1000:
-        return "moderately strong"
-    elif lr < 10000:
-        return "strong"
-    else:
-        return "very strong"
+# B-059 (TANDA 1, 2026-07-06): la escala ENFSI vive en un módulo único.
+# Esta era la implementación canónica (la que se sella en el bundle) — se
+# movió a vigia/core/enfsi.py con semántica bit-idéntica para LR finito.
+# Re-export para compatibilidad: `from vigia.core.ebs_v1 import enfsi_label`
+# sigue funcionando (likelihood_ratio.py y consumidores externos).
+from vigia.core.enfsi import enfsi_label  # noqa: E402,F401

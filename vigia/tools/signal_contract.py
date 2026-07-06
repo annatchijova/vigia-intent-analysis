@@ -207,23 +207,11 @@ class SignalBuilder:
 
 
 # ---------------------------------------------------------------------------
-# Escala ENFSI — usada por REPORT LAYER para traducir LR a lenguaje forense
+# Escala ENFSI — B-059 (TANDA 1, 2026-07-06): fuente única en vigia/core/enfsi.
+# La escala local de 5 buckets en español divergía de la sellada en el bundle
+# (8 buckets, ebs_v1): el mismo LR producía etiquetas distintas entre el
+# bundle criptográfico y el reporte — inconsistencia citable bajo Daubert.
+# El REPORT LAYER ahora consume el bucket canónico (el mismo del bundle).
 # ---------------------------------------------------------------------------
 
-ENFSI_SCALE = [
-    (10_000,  "EXTREMADAMENTE FUERTE — Evidencia concluyente bajo estándar ENFSI"),
-    (1_000,   "MUY FUERTE — Alto soporte para hipótesis de fabricación"),
-    (100,     "FUERTE — Soporte sustancial, requiere corroboración"),
-    (10,      "MODERADA — Indicios consistentes, insuficiente de forma aislada"),
-    (1,       "DÉBIL / NEUTRA — Evidencia no discriminante"),
-]
-
-
-def enfsi_label(lr: float) -> str:
-    """Traduce un Likelihood Ratio a su categoría ENFSI verbal."""
-    if not math.isfinite(lr) or lr <= 0:
-        return "NO CALCULABLE — LR inválido"
-    for threshold, label in ENFSI_SCALE:
-        if lr >= threshold:
-            return label
-    return "DÉBIL / NEUTRA — Evidencia no discriminante"
+from vigia.core.enfsi import enfsi_label  # noqa: E402,F401
