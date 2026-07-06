@@ -707,12 +707,22 @@ Estos números no están inflados. Reflejan resultados en un corpus específico,
 > la etiqueta removida (`VIGIA_EBS_RESOLVE=motor`, ahora el default), y la métrica del
 > corpus mide **detección real ciega a la etiqueta**:
 >
-> **TODAS las cifras de esta nota son del modo AGENTE (Modo 1 — autónomo,
-> determinista, sin LLM), sobre el corpus JSON.** El modo Claude Code / MCP
-> (Modo 2, el modo de investigación principal) se evalúa aparte y por caso:
-> **100% de veredictos correctos en todas las investigaciones sobre evidencia
-> raw corridas en ese modo** — incluyendo casos donde el modo agente abstiene
-> o no llega (NPS-2010/2014: el Modo 2 determinó NOISE mientras el Modo 1
+> ## ⚠ CÓMO LEER LOS NÚMEROS DE VIGÍA — un modo, una lectura (2026-07-06)
+>
+> **El 91.8% de abajo es SOLO el camino JSON del agente. No dice nada de cómo
+> le va a VIGÍA sobre evidencia raw real — eso se mide por caso, en los otros
+> dos modos.** La presentación honesta es una línea por modo:
+>
+> | Modo | Qué procesa | El número honesto |
+> |---|---|---|
+> | **Claude/MCP (Dominio A)** — principal | evidencia raw real, cadena de extracción MCP completa | **Análisis profundo por caso — sin número agregado por diseño.** Registro a la fecha: 100% de veredictos correctos en todas las investigaciones corridas (docs por caso en `evidence/`, `results/`, `reports/`) |
+> | **Agente sobre JSON (Dominio B)** | casos JSON sintéticos/convertidos | **91.8% (146/159) en el corpus de detección** — el ÚNICO modo con número de corpus; agregado del corpus mixto 167/199 (segmentación abajo) |
+> | **Agente sobre RAW (Dominio C)** | corpus forense público real | **43 fuentes de evidencia raw distintas con bundles sellados en `results/`** — SRL 2018 (22 imágenes de memoria), MUS2019/Narcos (13 dumps), M57 (3), NPS 2010/2014, Magnet 2020 CTF, Tuck 2019 macOS, Vanko — más las investigaciones Magnet 2022 (Windows/iOS/Android), Owl HD1/Nexus 5 y HMG documentadas por caso. **Cada una es una investigación individual con sus propios findings — NO se agrega como precisión** |
+>
+> El modo Claude Code / MCP (Modo 2) se evalúa aparte y por caso: **100% de
+> veredictos correctos en todas las investigaciones sobre evidencia raw
+> corridas en ese modo** — incluyendo casos donde el modo agente abstiene o
+> no llega (NPS-2010/2014: el Modo 2 determinó NOISE mientras el Modo 1
 > quedaba en PIPELINE_ERROR; MAGNET-2022-WINDOWS: el Modo 2 llegó a MALICE
 > con evidencia de C2 donde el Modo 1 decía NOISE). Ver Dominio A abajo.
 >
@@ -771,15 +781,19 @@ segmentada de la nota de arriba (**corpus de detección: 146/159, 91.8%**; agreg
 la cifra anterior 165/167 medía reproducción de etiqueta (ver la nota de cambio de
 métrica).
 
-**Dominio C — Agente autónomo, evidencia raw (E01/evtx):** El agente parsea
+**Dominio C — Agente autónomo, evidencia raw (E01/evtx/memoria):** El agente parsea
 artefactos raw directamente (MFT, prefetch, browser, event logs, pcap, memoria vía
-vol3), pero **la cobertura es parcial por diseño: algunas clases de artefacto todavía
-no alcanzan los motores** (los hives de registro USB/shellbag/amcache son stubs
-honestos que abstienen; ver `KNOWN_LIMITATIONS.md`). Un caso cuya señal vive en una
-clase no cubierta degrada a ABSTAIN en vez de producir un NOISE falso (patrón
-F7/P1-E). B-032 (routing de `event_logs`) y B-036 (threshold `z>5.0` imposible)
-están resueltos; ver [L-036](./KNOWN_LIMITATIONS.md) para el override de hipótesis
-basado en señales.
+vol3). **Acá viven los casos reales de corpus público: 43 fuentes de evidencia raw
+distintas llevan bundles sellados en `results/`** (SRL 2018, MUS2019/Narcos, M57,
+NPS, Magnet 2020 CTF, Tuck 2019 macOS, Vanko), cada una una investigación individual
+con veredictos y findings por caso — este modo no tiene número de corpus porque son
+investigaciones, no filas de benchmark. La cobertura es parcial por diseño: algunas
+clases de artefacto todavía no alcanzan los motores (los hives de registro
+USB/shellbag/amcache son stubs honestos que abstienen; ver `KNOWN_LIMITATIONS.md`),
+y un caso cuya señal vive en una clase no cubierta degrada a ABSTAIN en vez de
+producir un NOISE falso (patrón F7/P1-E). B-032 (routing de `event_logs`) y B-036
+(threshold `z>5.0` imposible) están resueltos; ver [L-036](./KNOWN_LIMITATIONS.md)
+para el override de hipótesis basado en señales.
 
 > Los porcentajes de corpus de arriba aplican **solo al Dominio B**. Los resultados
 > del Dominio A están documentados por caso en `evidence/` y `results/`; los límites

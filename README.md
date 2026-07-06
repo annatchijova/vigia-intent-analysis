@@ -706,11 +706,21 @@ These numbers are not inflated. They reflect results on a specific, diverse, doc
 > now the default), and the corpus metric measures **real label-blind
 > detection**:
 >
-> **ALL figures in this note are AGENT mode (Mode 1 — autonomous,
-> deterministic, no LLM), over the JSON corpus.** Claude Code / MCP mode
-> (Mode 2, the primary investigative mode) is evaluated separately and
-> per-case: **100% correct verdicts on every raw-evidence investigation run
-> in that mode** — including cases where agent mode abstains or falls short
+> ## ⚠ HOW TO READ VIGÍA's NUMBERS — one mode, one reading (2026-07-06)
+>
+> **The 91.8% below is the agent's JSON path ONLY. It says nothing about how
+> VIGÍA performs on real raw evidence — that is measured per case, in the
+> other two modes.** The honest presentation is one line per mode:
+>
+> | Mode | What it processes | The honest number |
+> |---|---|---|
+> | **Claude/MCP (Domain A)** — primary | real raw evidence, full MCP extraction chain | **Deep per-case analysis — no aggregate number by design.** Record to date: 100% correct verdicts on every investigation run (per-case docs in `evidence/`, `results/`, `reports/`) |
+> | **Agent over JSON (Domain B)** | synthetic/converted JSON cases | **91.8% (146/159) on the detection corpus** — the ONLY mode with a corpus-wide number; mixed-corpus aggregate 167/199 (segmentation below) |
+> | **Agent over RAW (Domain C)** | real public forensic corpora | **43 distinct raw evidence sources with sealed bundles in `results/`** — SRL 2018 (22 memory images), MUS2019/Narcos (13 dumps), M57 (3), NPS 2010/2014, Magnet 2020 CTF, Tuck 2019 macOS, Vanko — plus the Magnet 2022 (Windows/iOS/Android), Owl HD1/Nexus 5 and HMG investigations documented per case. **Each is an individual investigation with its own findings — NOT aggregated as accuracy** |
+>
+> Claude Code / MCP mode (Mode 2) is evaluated separately and per-case:
+> **100% correct verdicts on every raw-evidence investigation run in that
+> mode** — including cases where agent mode abstains or falls short
 > (NPS-2010/2014: Mode 2 determined NOISE while Mode 1 sat in
 > PIPELINE_ERROR; MAGNET-2022-WINDOWS: Mode 2 reached MALICE with C2
 > evidence where Mode 1 said NOISE). See Domain A below.
@@ -768,14 +778,19 @@ segmented metric in the note above (**detection corpus: 146/159, 91.8%**; aggreg
 167/199). Since B-075 the verdict comes from the label-blind deterministic scorer;
 the previous 165/167 figure measured label reproduction (see metric change note).
 
-**Domain C — Autonomous agent, raw evidence (E01/evtx):** The agent parses raw
-artifacts directly (MFT, prefetch, browser, event logs, pcap, memory via vol3), but
-**coverage is partial by design: some artifact classes do not reach the engines yet**
-(USB/shellbag/amcache registry hives are honest ABSTAIN stubs; see
-`KNOWN_LIMITATIONS.md`). Cases whose signal lives in an uncovered class degrade to
-ABSTAIN rather than producing a false NOISE (F7/P1-E pattern). B-032 (`event_logs`
-routing) and B-036 (`z>5.0` impossible threshold) are resolved; see
-[L-036](./KNOWN_LIMITATIONS.md) for the signal-based hypothesis override.
+**Domain C — Autonomous agent, raw evidence (E01/evtx/memory):** The agent parses
+raw artifacts directly (MFT, prefetch, browser, event logs, pcap, memory via vol3).
+**This is where the real public-corpus cases live: 43 distinct raw evidence sources
+carry sealed bundles in `results/`** (SRL 2018, MUS2019/Narcos, M57, NPS, Magnet
+2020 CTF, Tuck 2019 macOS, Vanko), each an individual investigation with per-case
+verdicts and findings — there is no corpus number for this mode because these are
+investigations, not benchmark rows. Coverage is partial by design: some artifact
+classes do not reach the engines yet (USB/shellbag/amcache registry hives are honest
+ABSTAIN stubs; see `KNOWN_LIMITATIONS.md`), and cases whose signal lives in an
+uncovered class degrade to ABSTAIN rather than producing a false NOISE (F7/P1-E
+pattern). B-032 (`event_logs` routing) and B-036 (`z>5.0` impossible threshold) are
+resolved; see [L-036](./KNOWN_LIMITATIONS.md) for the signal-based hypothesis
+override.
 
 > The corpus percentages above apply to **Domain B only**. Domain A results are
 > documented per-case in `evidence/` and `results/`; Domain C coverage limits are
