@@ -294,4 +294,60 @@ Además el conversor **reescribe las etiquetas mismas** en el corpus persistido 
 
 ---
 
-*Auditoría ejecutada sin modificar código. Todos los números provienen de ejecuciones reproducibles sobre HEAD `849475b` con los comandos descriptos en cada sección.*
+## ADDENDUM 2 — 2026-07-06 — REVISIÓN DE ETIQUETAS VIGIA-BEN-001..015
+
+| Campo | Valor |
+|-------|-------|
+| **Tag de restauración** | `pre-session-20260706-025125` (local; push de tags rechazado por el remoto, igual que el anterior) |
+| **Mandato** | Re-etiquetar cada BEN con el veredicto del motor limpio SI la evidencia lo justifica; si la evidencia es claramente benigna, documentar como FP del motor y mantener NOISE. Sin tocar la reducción ×0.25. |
+| **Resultado** | **0 etiquetas cambiadas — 15/15 documentados como FP del motor, candidatos a calibración Fase 2.** Ningún archivo de caso fue modificado. |
+
+### Método
+
+1. **Motor limpio, dos variantes por robustez**: (a) el original legacy de `data/cases/benign/` puntuado ciego (normalización canónica del bridge, sin etiqueta → sin reducción); (b) el convertido de `data/cases/converted/` con la reducción invertida (`raw_score/0.25`, `prior_trust` restaurado del mapeo Peirce del conversor). **Las dos variantes coinciden en veredicto en los 15 casos.**
+2. **Revisión forense de la evidencia**: lectura completa de `description`, `content` y `forensic_anomalies` de los 3 artefactos de cada caso.
+3. **Criterio de decisión**: el propio Protocolo de Refutación del repo (CLAUDE.md) — si la hipótesis benigna explica TODAS las anomalías estructurales sin contradicción, el veredicto correcto es NOISE.
+
+### Tabla de revisión
+
+| Caso | Motor limpio (orig / des-red) | Anomalía aparente | Corroboración benigna en la propia evidencia | Decisión |
+|------|------------------------------|-------------------|---------------------------------------------|----------|
+| BEN-001 | SUSPICION 0.2543 / 0.2178 | Cirílico en layout latino | Empleado ruso verificado en HR, hardware RU provisto por IT, geoIP+horario Moscú consistentes | **NOISE — FP del motor** |
+| BEN-002 | SUSPICION 0.3037 / 0.2098 | Transferencia masiva 3AM a S3 | Cron de backup 2023, runbook p.47, auditoría Q3 PASSED, IAM role de servicio | **NOISE — FP del motor** |
+| BEN-003 | SUSPICION 0.2391 / 0.1347 | DELETE sin WHERE | Admisión pública inmediata, recovery en 3 min, supervisor asume el error de permisos | **NOISE — FP del motor** (hipótesis de incompetencia benigna literal) |
+| BEN-004 | **MALICE** 0.4008 / 0.3734 | 47 comandos con timing perfecto | Ansible Tower, playbook firmado, CAB #2024-06-05, sin TTY | **NOISE — FP del motor** |
+| BEN-005 | SUSPICION 0.2543 / 0.2178 | 3 logins fallidos | Teclado nuevo con ticket IT-4492, jitter humano 6-7s, jornada normal posterior | **NOISE — FP del motor** |
+| BEN-006 | SUSPICION 0.2543 / 0.2178 | 12 sudo en 2 horas | Mantenimiento mensual en calendario, CHG-0038, reporte post-mantenimiento firmado | **NOISE — FP del motor** |
+| BEN-007 | SUSPICION 0.2667 / 0.2262 | PDF "confidential" en Desktop | Distribución oficial de RRHH a 45 managers, política HR-2023-044, acuse firmado | **NOISE — FP del motor** |
+| BEN-008 | **MALICE** 0.4033 / 0.3563 | Ping periódico a 8.8.8.8 | Nagios del NOC desde 2022, dashboard público, config versionada | **NOISE — FP del motor** |
+| BEN-009 | **MALICE** 0.4008 / 0.3734 | chmod 777 | Deuda técnica TD-2019-042 documentada, app sin red ni sudo, migración planificada | **NOISE — FP del motor** |
+| BEN-010 | SUSPICION 0.1600 / 0.1347 | Email URGENT del CEO | DKIM/SPF PASS, reunión real en calendario, thread de pedido 7 días antes | **NOISE — FP del motor** |
+| BEN-011 | SUSPICION 0.2483 / 0.2098 | USB en máquina de finanzas | Ticket SUP-2024-1120, técnico escoltado, drivers de impresora fiscal (sin red por política) | **NOISE — FP del motor** |
+| BEN-012 | SUSPICION 0.3630 / 0.3337 | Proceso sin parent en pslist | `kworker` hijo de `kthreadd` (PID 2), comportamiento documentado del kernel | **NOISE — FP del motor** |
+| BEN-013 | SUSPICION 0.2483 / 0.2098 | `rm -rf` diario de logs | Política de retención GDPR 30 días, aprobada por DPO, borra solo >30d | **NOISE — FP del motor** |
+| BEN-014 | SUSPICION 0.2783 / 0.2098 | Conexión Tor | Periodista con autorización escrita del editor, 100% del tráfico a plataforma whistleblower | **NOISE — FP del motor** |
+| BEN-015 | SUSPICION 0.2667 / 0.2262 | 100 timestamps idénticos | Restore de snapshot Veeam tras falla de hardware, ticket INF-2024-0551, 47 VMs | **NOISE — FP del motor** |
+
+### Por qué NO corresponde re-etiquetar ninguno
+
+1. **La evidencia es inequívocamente benigna en los 15.** El corpus BEN está diseñado como trampas de falso positivo: cada caso presenta una señal alarmante en Firstness y su explicación benigna corroborada (HR, change tickets, calendario, GDPR, autorización legal) en Secondness/Thirdness. Bajo el Protocolo de Refutación, la hipótesis benigna explica todas las anomalías sin contradicción → NOISE.
+2. **Re-etiquetar aquí sería B-075 invertido.** Ajustar el ground truth para que coincida con el motor es fuga de etiqueta en la dirección opuesta: el corpus dejaría de medir al motor y pasaría a confirmarlo. El desacuerdo motor-limpio-vs-etiqueta es el dato honesto que la reducción ×0.25 venía ocultando.
+3. **Causa raíz de los 15 FPs (dato para Fase 2):** el conversor asigna `raw_score` mecánicamente desde `peirce_layer` (0.60/0.75/0.88, +0.10 si ≥2 `forensic_anomalies`) **sin leer la semántica de la evidencia**. En estos casos el campo `forensic_anomalies` contiene enunciados exculpatorios ("Documentación de empleado verificable en HR") que igualmente suman +0.10, y el artefacto de corroboración benigna (Thirdness) recibe el score MÁS alto (0.88→0.95). Los 3 MALICE (004/008/009) cruzan además el gate de corroboración B-068 porque los 3 artefactos aportan ≥3 clases DEVICE distintas. El FP es inducido por la conversión: el motor nunca ve un solo bit que distinga evidencia incriminatoria de exculpatoria.
+
+### Corpus comparativo antes/después
+
+Réplica del comparador (doctrina `generate_ladder_dataset.agree`: alias BENIGN→NOISE, UNKNOWN acepta todo, MALICE-donde-INTENT es acierto) sobre `find_cases(CASES_DIRS)`, motor blind:
+
+```
+ANTES  (etiquetas actuales): 166/198
+DESPUÉS (0 etiquetas cambiadas): 166/198 — idéntico por construcción
+Filas BEN-001..015: exp=NOISE, motor=NOISE (sobre datos reducidos), agree=True en las 15.
+```
+
+Nota de honestidad sobre la línea base: 166/198 difiere del 153/199 histórico de B-076 — la medición histórica se hizo sobre el HEAD de 2026-07-05; desde entonces entraron cambios de routing (`dbba7ca` B1-c) y esta réplica implementa el comparador del generador del dataset, no `run_all_agent` completo. Para el propósito de este addendum lo relevante es que ANTES y DESPUÉS se midieron con el mismo método y son idénticos.
+
+**Estado resultante:** los 15 BEN quedan como candidatos de calibración Fase 2 con esta ficha: etiqueta NOISE correcta, motor limpio SUSPICION×12/MALICE×3, causa raíz en la conversión semántica-ciega. Cuando se remueva la reducción ×0.25 (pendiente, fuera de este mandato), estos 15 aparecerán como desacuerdos reales del motor — ese es el estado honesto del sistema, no una regresión.
+
+---
+
+*Auditoría ejecutada sin modificar código. Todos los números provienen de ejecuciones reproducibles sobre HEAD `849475b` (addenda: `651ca10`) con los comandos descriptos en cada sección.*
