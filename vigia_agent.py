@@ -1838,6 +1838,14 @@ Exit codes:
     bundle_canonical_digest = bundle.pop("_canonical_digest", None)
 
     # Export result
+    # L-023 (auditoría 2026-07-06, F-1): la escritura del bundle sellado —
+    # artefacto de custodia primario del Modo 1 — pasa por atomic_io
+    # (mkstemp+fsync+os.replace+fsync de directorio), en paridad con
+    # BundleBuilder.save y con los writers de vigia/pipeline. Antes se usaba
+    # Path.write_text directo: el patrón NO atómico que L-023 vino a corregir,
+    # aún presente en el camino primario.
+    from vigia.core.atomic_io import atomic_write_text
+
     if args.audit_only:
         output_text = json.dumps(bundle["audit_trail"], indent=2, sort_keys=True,
                                  default=_json_serial, ensure_ascii=True)
@@ -1846,13 +1854,20 @@ Exit codes:
         output_text = bundle_canonical_text or json.dumps(
             bundle, indent=2, sort_keys=True, default=_json_serial, ensure_ascii=True
         )
-    Path(output_path).write_text(output_text, encoding="utf-8")
+    atomic_write_text(output_path, output_text)
 
     # Write .sha256 file — verifies exactly what is on disk
     if bundle_canonical_text and not args.audit_only:
         sha256_path = output_path + ".sha256"
-        # Recalculate over the text written to disk (must match bundle_digest)
-        disk_digest = hashlib.sha256(output_text.encode("utf-8")).hexdigest()
+        # F-1b (auditoría 2026-07-06): el digest se computa RE-LEYENDO el archivo
+        # de disco, no sobre output_text en memoria. Antes se hasheaba la variable
+        # en memoria y se comparaba contra bundle_canonical_digest (también
+        # memoria): un chequeo tautológico que NO detectaba write parcial, swap
+        # concurrente ni symlink. Ahora el .sha256 atesta exactamente lo escrito
+        # — paridad con BundleBuilder.save, que ya re-lee de disco.
+        with open(output_path, "rb") as _bf:
+            disk_bytes = _bf.read()
+        disk_digest = hashlib.sha256(disk_bytes).hexdigest()
         # FIX P2-8: verify that what was written to disk matches the bundle digest
         if bundle_canonical_digest and disk_digest != bundle_canonical_digest:
             logger.error(
@@ -1864,9 +1879,7 @@ Exit codes:
             )
         # Use absolute path so sha256sum -c works from any directory
         abs_output_path = str(Path(output_path).resolve())
-        Path(sha256_path).write_text(
-            f"{disk_digest}  {abs_output_path}\n", encoding="utf-8"
-        )
+        atomic_write_text(sha256_path, f"{disk_digest}  {abs_output_path}\n")
         logger.info("[BUNDLE] Verification: sha256sum -c %s", sha256_path)
 
     # Console summary

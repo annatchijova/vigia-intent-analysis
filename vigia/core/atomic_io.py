@@ -13,6 +13,34 @@ import os
 import tempfile
 
 
+def _fsync_parent_dir(target_dir: str) -> None:
+    """
+    fsync del directorio contenedor tras os.replace (F-6, auditoría 2026-07-06).
+
+    fsync del descriptor del archivo garantiza que los DATOS llegaron a disco,
+    pero NO que la entrada de directorio (el rename de os.replace) sea durable.
+    En algunos filesystems (ext4 con data=ordered por defecto) un crash
+    inmediatamente posterior al rename puede perder la publicación y revertir
+    al archivo previo — el artefacto de custodia sellado desaparece o retrocede:
+    ruptura de cadena de custodia bajo Daubert. fsync del directorio lo cierra.
+
+    Best-effort en plataformas sin fsync de directorio (p.ej. Windows, donde
+    os.replace ya es atómico y la semántica de durabilidad difiere): se ignora
+    silenciosamente sólo el caso no soportado, nunca un error de datos.
+    """
+    try:
+        dir_fd = os.open(target_dir, os.O_RDONLY | getattr(os, "O_DIRECTORY", 0))
+    except OSError:
+        return  # el SO no permite abrir el directorio para fsync (no-POSIX)
+    try:
+        os.fsync(dir_fd)
+    except OSError:
+        # Algunos SO no soportan fsync sobre un fd de directorio.
+        pass
+    finally:
+        os.close(dir_fd)
+
+
 def _atomic_write(path: str, data, mode: str, encoding=None) -> None:
     abs_path = os.path.abspath(path)
     target_dir = os.path.dirname(abs_path) or "."
@@ -31,6 +59,10 @@ def _atomic_write(path: str, data, mode: str, encoding=None) -> None:
         except OSError:
             pass
         raise
+    # Durabilidad del rename (F-6): sólo tras un os.replace exitoso. Si fallara
+    # aquí, el artefacto YA está publicado en abs_path — por eso va fuera del
+    # try/except que limpia tmp_path (que ya no existe).
+    _fsync_parent_dir(target_dir)
 
 
 def atomic_write_text(path: str, content: str, encoding: str = "utf-8") -> None:
