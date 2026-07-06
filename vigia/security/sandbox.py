@@ -636,29 +636,45 @@ async def safe_grep(
             "depth_limit_applied": effective_depth,
         }
 
-    # LaBestia fix (2026-07-06): grep exit 0 = matches found, 1 = clean run,
-    # no matches (benign — the only two codes this function used to treat as
-    # "search worked"). ANY other code (2 = usage/file error, 126/127 =
-    # dynamic-linker/exec failure, negative = killed by signal) meant grep
-    # never actually searched, but fell through silently to "matches: [],
-    # error: None" below — the exact false-negative pattern this repo's own
-    # doctrine treats as inadmissible elsewhere (silent absence ≠ clean
-    # result).
-    if grep_result["returncode"] not in (0, 1):
-        return {
-            "matches": [],
-            "truncated": grep_result["truncated"],
-            "error": (
-                f"grep exited with code {grep_result['returncode']} — "
-                f"treating as a failed search, not \"no matches\" "
-                f"(stderr: {grep_result['stderr'][:300]!r})"
-            ),
-            "returncode": grep_result["returncode"],
-            "depth_limit_applied": effective_depth,
-        }
-
     raw_output = grep_result["stdout"].decode("utf-8", errors="replace")
     lines = [ln for ln in raw_output.splitlines() if ln.strip()]
+
+    # LaBestia fix v2 (2026-07-06): the returncode of THIS phase is xargs's,
+    # not grep's — and xargs COLLAPSES grep's exit codes. When grep finds no
+    # match in a file it exits 1, and xargs reports that whole run as 123.
+    # Worse: if xargs splits the file list across several grep invocations
+    # (large evidence dir), the batch WITHOUT the pattern exits 1 → xargs 123
+    # EVEN WHEN another batch matched and produced output. The previous fix
+    # (e10a364) treated any code ∉ {0,1} as a failed search, so a normal
+    # search over a populated directory came back as an error — the exact
+    # cause of the LaBestia failure (it passed here because the test dir held
+    # a single matching file, so xargs never split and returned 0).
+    #
+    # xargs cannot tell benign no-match from a real grep error through its
+    # returncode alone (both collapse to 123). So decide on OBSERVABLE state,
+    # not the code:
+    #   - any stdout → grep matched something → success, parse it.
+    #   - no stdout, xargs signalled a hard exec/signal failure (124/125/
+    #     126/127) OR grep wrote to stderr → the search never ran → error.
+    #   - no stdout, quiet, code 0/1/123 → clean "no matches" → benign.
+    # This keeps the genuine-failure detection (loader/OOM errors always hit
+    # stderr) without regressing the no-match path.
+    rc = grep_result["returncode"]
+    stderr_txt = grep_result["stderr"].decode("utf-8", errors="replace").strip()
+    if not lines:
+        hard_fail = rc in (124, 125, 126, 127) or (rc != 0 and bool(stderr_txt))
+        if hard_fail:
+            return {
+                "matches": [],
+                "truncated": grep_result["truncated"],
+                "error": (
+                    f"grep/xargs failed (exit {rc}) with no output — treating "
+                    f"as a failed search, not \"no matches\" "
+                    f"(stderr: {stderr_txt[:300]!r})"
+                ),
+                "returncode": rc,
+                "depth_limit_applied": effective_depth,
+            }
 
     return {
         "matches": lines,

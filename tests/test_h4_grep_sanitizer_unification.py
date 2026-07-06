@@ -104,3 +104,30 @@ class TestSafeGrepIntegration:
         r = asyncio.run(safe_grep("mal\x00ware", evidence_dir))
         assert r["matches"] == []
         assert r["error"] and "null byte" in r["error"]
+
+    def test_safe_grep_populated_dir_with_match(self, tmp_path, monkeypatch):
+        """LaBestia fix v2: el escenario que fallaba en el entorno real.
+
+        Con muchos archivos, xargs parte la lista en varias invocaciones de
+        grep; el batch SIN el patrón sale con grep exit 1 y xargs COLAPSA
+        todo a exit 123 — aun cuando otro batch SÍ matcheó y produjo salida.
+        El fix e10a364 trataba 123 como fallo → error espurio pese a haber
+        matches. Este test pasa un directorio poblado (no el single-file del
+        fixture) para ejercitar el split de xargs.
+        """
+        monkeypatch.setenv("VIGIA_EVIDENCE_DIR", str(tmp_path))
+        for i in range(12):
+            (tmp_path / f"clean_{i}.txt").write_text("nothing relevant here\n")
+        (tmp_path / "hit.txt").write_text("hello malware line\n")
+        r = asyncio.run(safe_grep("malware", str(tmp_path)))
+        assert r["error"] is None, f"falso error en dir poblado con match: {r}"
+        assert any("malware" in m for m in r["matches"]), f"sin matches: {r}"
+
+    def test_safe_grep_populated_dir_no_match_is_benign(self, tmp_path, monkeypatch):
+        """El no-match en dir poblado (xargs 123) NO es un error."""
+        monkeypatch.setenv("VIGIA_EVIDENCE_DIR", str(tmp_path))
+        for i in range(12):
+            (tmp_path / f"f_{i}.txt").write_text("nothing relevant here\n")
+        r = asyncio.run(safe_grep("zzz_pattern_absent_zzz", str(tmp_path)))
+        assert r["error"] is None, f"no-match tratado como error: {r}"
+        assert r["matches"] == []
