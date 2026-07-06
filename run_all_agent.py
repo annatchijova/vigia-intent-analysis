@@ -238,6 +238,9 @@ def main():
     parser.add_argument("--dir", default="", help="Directorio específico")
     parser.add_argument("--dry-run", action="store_true", help="Solo listar casos sin correr")
     parser.add_argument("--timeout", type=int, default=120, help="Timeout por caso (seg)")
+    parser.add_argument("--rerun", action="store_true",
+                        help="Forzar re-ejecución del agente aunque exista un "
+                             "bundle sellado (default: bundle existente gana)")
     args = parser.parse_args()
 
     # R3-3: fail-loud si data/cases/ y data/cases/converted/ discrepan en la
@@ -280,21 +283,46 @@ def main():
 
         t0 = time.time()
         try:
-            proc = subprocess.run(
-                [PYTHON, str(AGENT),
-                 "--evidence", str(case_path),
-                 "--case-id", case_id,
-                 "--output", str(output_path)],
-                capture_output=True, text=True,
-                timeout=args.timeout,
-                cwd=REPO,
-            )
-            elapsed = time.time() - t0
+            # ── Cache de bundles sellados (2026-07-06, pedido de Anna) ──────
+            # Default: si ya existe un bundle con agent_verdict sellado, se
+            # usa ese veredicto sin re-correr el agente. --rerun fuerza la
+            # re-ejecución. PROCEDENCIA: cada bundle declara su era via
+            # pipeline_meta.ebs_adapter_mode ("motor" = post-B-075 ciego a la
+            # etiqueta; "legacy" = eco de etiqueta explícito; AUSENTE =
+            # sellado pre-B-075, era del label leak P2-C). El censo de
+            # procedencia se imprime en el resumen: un PASS sostenido por un
+            # bundle pre-B-075/legacy mide reproducción de etiqueta, no
+            # detección (docs/FASE1_RESOLVE_EBS.md).
+            cached = False
+            cache_mode = None
+            if not args.rerun and output_path.exists():
+                try:
+                    _bundle = json.loads(output_path.read_text())
+                    _sealed = _bundle.get("agent_verdict")
+                    if _sealed:
+                        cached = True
+                        cache_mode = (_bundle.get("pipeline_results", {})
+                                      .get("pipeline_meta", {})
+                                      .get("ebs_adapter_mode") or "pre-B075")
+                        got = extract_verdict_from_bundle(output_path)
+                except (json.JSONDecodeError, OSError):
+                    cached = False  # bundle ilegible → correr el agente
 
-            if output_path.exists():
-                got = extract_verdict_from_bundle(output_path)
-            else:
-                got = "NO_BUNDLE"
+            if not cached:
+                proc = subprocess.run(
+                    [PYTHON, str(AGENT),
+                     "--evidence", str(case_path),
+                     "--case-id", case_id,
+                     "--output", str(output_path)],
+                    capture_output=True, text=True,
+                    timeout=args.timeout,
+                    cwd=REPO,
+                )
+                if output_path.exists():
+                    got = extract_verdict_from_bundle(output_path)
+                else:
+                    got = "NO_BUNDLE"
+            elapsed = time.time() - t0
 
             # B-058 (B10): doctrina de comparación centralizada en
             # verdict_matches (over-severity INTENT⊆MALICE, SUSPICION⊆tier
@@ -302,7 +330,8 @@ def main():
             ok = verdict_matches(expected, got)
 
             status = f"{GRN}PASS{RST}" if ok else f"{RED}FAIL{RST}"
-            print(f"  got={got:<12} {status}  ({elapsed:.1f}s)")
+            tag = f" {CYA}[CACHED:{cache_mode}]{RST}" if cached else ""
+            print(f"  got={got:<12} {status}  ({elapsed:.1f}s){tag}")
 
             results.append({
                 "case_id": case_id,
@@ -310,6 +339,8 @@ def main():
                 "got": got,
                 "pass": ok,
                 "elapsed": round(elapsed, 1),
+                "cached": cached,
+                "cache_mode": cache_mode,
             })
 
         except subprocess.TimeoutExpired:
@@ -327,6 +358,20 @@ def main():
 
     print(f"\n{'─'*70}")
     print(f"  Results: {GRN}{passed}/{len(results)} PASS{RST}  {RED}{len(failed)} FAIL{RST}")
+
+    # ── Censo de procedencia del cache ────────────────────────────────────────
+    n_cached = sum(1 for r in results if r.get("cached"))
+    if n_cached:
+        from collections import Counter
+        census = Counter(r.get("cache_mode") for r in results if r.get("cached"))
+        census_str = ", ".join(f"{m}: {n}" for m, n in census.most_common())
+        print(f"  Cache: {n_cached}/{len(results)} desde bundle sellado ({census_str})")
+        stale = sum(n for m, n in census.items() if m != "motor")
+        if stale:
+            print(f"  {YEL}⚠ {stale} bundle(s) cacheados son pre-B-075/legacy: sus "
+                  f"veredictos provienen de la era del eco de etiqueta (P2-C).{RST}")
+            print(f"  {YEL}  Un PASS sostenido por esos bundles mide reproducción de "
+                  f"etiqueta, no detección. Para la métrica honesta: --rerun{RST}")
     if failed:
         print(f"\n  FAILED CASES:")
         for r in failed:
