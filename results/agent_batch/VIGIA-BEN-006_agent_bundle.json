@@ -1,15 +1,15 @@
 {
-  "agent_verdict": "INTENT",
-  "analysis_timestamp": "2026-07-06T04:39:53.178206+00:00",
+  "agent_verdict": "NOISE",
+  "analysis_timestamp": "2026-07-06T17:13:27.696689+00:00",
   "audit_trail": {
     "agent_version": "1.0.0-SANS-2026",
     "case_id": "VIGIA-BEN-006",
-    "end_time": "2026-07-06T04:39:53.178213+00:00",
+    "end_time": "2026-07-06T17:13:27.696695+00:00",
     "entries": [
       {
         "action": "AGENT_INITIALIZED",
         "case_id": "VIGIA-BEN-006",
-        "entry_sha256": "0482741884d114d1b2de78ca52797a73f66a6695701f061caaf0249f175b6a6d",
+        "entry_sha256": "a2ccc957bf37c3f4e96599bf52b6c56e5dda4f56419cdebabe6a9e498ae84478",
         "inputs_summary": {
           "agent_file": "/home/user/vigia-intent-analysis/vigia_agent.py",
           "case_id": "VIGIA-BEN-006"
@@ -21,13 +21,13 @@
           "agent_version": "1.0.0-SANS-2026"
         },
         "seq": 1,
-        "timestamp": "2026-07-06T04:39:52.411768+00:00",
+        "timestamp": "2026-07-06T17:13:26.801908+00:00",
         "tool": "vigia_agent"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-BEN-006",
-        "entry_sha256": "84e4b8a8f7d7cfc696676ee0a5cb59cb0d1d24e7c5731b990ea7f39d61cb3c07",
+        "entry_sha256": "ecde9aad8039262309f4595890d750de971f2552473b76b4a85b4b7fe86b495b",
         "inputs_summary": {
           "path": "/home/user/vigia-intent-analysis/data/cases/converted/VIGIA-BEN-006.json"
         },
@@ -35,29 +35,29 @@
         "note": "Computing SHA-256 of original evidence",
         "outputs_summary": {},
         "seq": 2,
-        "timestamp": "2026-07-06T04:39:52.411926+00:00",
+        "timestamp": "2026-07-06T17:13:26.802016+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-BEN-006",
-        "entry_sha256": "accc7af1d9c9af79771c2a1fa548a3aafeca677fcfedafddf7c722095a64d86f",
+        "entry_sha256": "aea3953e8b07e98e28c5c4602090185d8f16e4417dd5fbe6bce54cf63931428b",
         "inputs_summary": {
           "path": "/home/user/vigia-intent-analysis/data/cases/converted/VIGIA-BEN-006.json"
         },
         "iteration": 0,
-        "note": "Evidence verified: 79c6e84dc50554e0...",
+        "note": "Evidence verified: 4be8c88d1fd2a14a...",
         "outputs_summary": {
-          "sha256": "79c6e84dc50554e08edac09b1d64fa3797c8fb05fb0124e9ea6b8b96f8975cb6"
+          "sha256": "4be8c88d1fd2a14aa321029c653ebf6c0ca32ccc712701363f7567f4b3921f8c"
         },
         "seq": 3,
-        "timestamp": "2026-07-06T04:39:52.412061+00:00",
+        "timestamp": "2026-07-06T17:13:26.802104+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "PIPELINE_EXECUTE",
         "case_id": "VIGIA-BEN-006",
-        "entry_sha256": "597835a5bd97ae7ac78c7b143f537d363c8580202ebc3cffa2f69d09fab74447",
+        "entry_sha256": "8a1928f36ea66026efeab3e6fb2cc22a32cc0e68fe975912d9f1d454d8a8ee0f",
         "inputs_summary": {
           "evidence": "/home/user/vigia-intent-analysis/data/cases/converted/VIGIA-BEN-006.json",
           "iteration": "0",
@@ -67,13 +67,13 @@
         "note": "Executing pipeline \u2014 iteration 0",
         "outputs_summary": {},
         "seq": 4,
-        "timestamp": "2026-07-06T04:39:52.412282+00:00",
+        "timestamp": "2026-07-06T17:13:26.802240+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "PIPELINE_COMPLETE",
         "case_id": "VIGIA-BEN-006",
-        "entry_sha256": "2eb922d5c52121d276354201cfb0f109533c9e916735705696cc06aabf1bc37b",
+        "entry_sha256": "ad2b9b114be11a9d8bd30f777b99e7b6314a5519aa22891dabe997f64cf59fd2",
         "inputs_summary": {
           "iteration": "0"
         },
@@ -81,9 +81,9 @@
         "note": "Pipeline completed \u2014 3 signals",
         "outputs_summary": {
           "abduction": {
-            "best_hypothesis": "SUSPICION_DETECTED",
-            "best_posterior": "11/25",
-            "confidence": "11/25",
+            "best_hypothesis": "NO_SEMIOTIC_ANOMALY_DETECTED",
+            "best_posterior": "19/20",
+            "confidence": "19/20",
             "is_conclusive": "True",
             "narrative": "Logs muestran 12 ejecuciones de sudo en 2 horas. Es el mantenimiento mensual del servidor de base de datos, programado en calendario compartido, con ticket de change approval."
           },
@@ -94,10 +94,10 @@
             "ebs_adapter_mode": "motor",
             "expected_verdict": "NOISE",
             "resolve": {
-              "motor_confidence": "0.44",
-              "motor_reason": "Significant signal with structural support (score=0.2178)",
-              "motor_score": "0.2178",
-              "motor_verdict": "SUSPICION",
+              "motor_confidence": "0.95",
+              "motor_reason": "Insufficient evidence of malicious intent (score=0.0457)",
+              "motor_score": "0.0457",
+              "motor_verdict": "NOISE",
               "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
             },
             "source": "ebs_v1_json_adapter"
@@ -130,13 +130,13 @@
           ]
         },
         "seq": 5,
-        "timestamp": "2026-07-06T04:39:53.177641+00:00",
+        "timestamp": "2026-07-06T17:13:27.696138+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "CONTRADICTION_CHECK",
         "case_id": "VIGIA-BEN-006",
-        "entry_sha256": "1c1c6c289d7e7b88075400ba3166c49bec36abf6b347adf4d8066c9e4d35b7eb",
+        "entry_sha256": "cb3cfcd033d84462591341b1b9cea218802c3c3aa030508cc0ed78d3cdf336c4",
         "inputs_summary": {
           "n_signals": "3"
         },
@@ -147,43 +147,43 @@
           "threshold": "2"
         },
         "seq": 6,
-        "timestamp": "2026-07-06T04:39:53.177826+00:00",
+        "timestamp": "2026-07-06T17:13:27.696317+00:00",
         "tool": "contradiction_detector"
       },
       {
         "action": "AGENT_EXIT",
         "case_id": "VIGIA-BEN-006",
-        "entry_sha256": "f069ed416b7e3bc4acdff787436f24f63169f1391f0b550d958d349d0b964dab",
+        "entry_sha256": "5374b32c511dd3133453b30bd79d9bfad3dfc98fe26bb56b4292aa566f199a4f",
         "inputs_summary": {
-          "verdict": "SUSPICION_DETECTED"
+          "verdict": "NO_SEMIOTIC_ANOMALY_DETECTED"
         },
         "iteration": 0,
-        "note": "Exit code 3 (INTENT) \u2014 analysis complete.",
+        "note": "Exit code 0 (NOISE) \u2014 analysis complete.",
         "outputs_summary": {
-          "agent_verdict": "INTENT",
-          "exit_code": "3"
+          "agent_verdict": "NOISE",
+          "exit_code": "0"
         },
         "seq": 7,
-        "timestamp": "2026-07-06T04:39:53.178117+00:00",
+        "timestamp": "2026-07-06T17:13:27.696611+00:00",
         "tool": "vigia_agent"
       }
     ],
-    "start_time": "2026-07-06T04:39:52.411274+00:00",
+    "start_time": "2026-07-06T17:13:26.801592+00:00",
     "total_entries": 7
   },
   "case_id": "VIGIA-BEN-006",
   "evidence_path": "/home/user/vigia-intent-analysis/data/cases/converted/VIGIA-BEN-006.json",
-  "evidence_sha256": "79c6e84dc50554e08edac09b1d64fa3797c8fb05fb0124e9ea6b8b96f8975cb6",
+  "evidence_sha256": "4be8c88d1fd2a14aa321029c653ebf6c0ca32ccc712701363f7567f4b3921f8c",
   "iterations_executed": 1,
-  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-BEN-006 ===\nEvidence: /home/user/vigia-intent-analysis/data/cases/converted/VIGIA-BEN-006.json\nEvidence SHA-256: 79c6e84dc50554e08edac09b1d64fa3797c8fb05fb0124e9ea6b8b96f8975cb6\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: SUSPICION_DETECTED\nPosterior confidence: 11/25\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 3 se\u00f1al(es): 3 primaria(s) de ['legacy_converter'], 0 derivada(s)/no-analizada(s). Top z: Post-maintenance report: Carlos Rodrigue=0.85, Calendar event: 'DB Server Maintenance \u2014=0.72, sudo systemctl restart postgresql | sudo=0.49.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: SUSPICION_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nLogs muestran 12 ejecuciones de sudo en 2 horas. Es el mantenimiento mensual del servidor de base de datos, programado en calendario compartido, con ticket de change approval.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Post-maintenance report: Carlos Rodriguez | 'PostgreSQL updated to 15.] z=0.855 conf=0.90 \u2014 \n  [Calendar event: 'DB Server Maintenance \u2014 Carlos Rodriguez' | Date: 202] z=0.723 conf=0.85 \u2014 \n  [sudo systemctl restart postgresql | sudo apt update | sudo apt upgrade] z=0.490 conf=0.70 \u2014 \n\n--- FINAL ALERT LEVEL ---\nMEDIUM \u2014 INTENT verdict with individual z-scores below threshold. Alert floored (B-028/B-065): an intent finding cannot present as LOW.\nReconciliation: verdict INTENT rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 3 | Derived: 0 | Total: 3",
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-BEN-006 ===\nEvidence: /home/user/vigia-intent-analysis/data/cases/converted/VIGIA-BEN-006.json\nEvidence SHA-256: 4be8c88d1fd2a14aa321029c653ebf6c0ca32ccc712701363f7567f4b3921f8c\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: NO_SEMIOTIC_ANOMALY_DETECTED\nPosterior confidence: 19/20\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 3 se\u00f1al(es): 3 primaria(s) de ['legacy_converter'], 0 derivada(s)/no-analizada(s). Top z: Post-maintenance report: Carlos Rodrigue=0.85, Calendar event: 'DB Server Maintenance \u2014=0.72, sudo systemctl restart postgresql | sudo=0.49.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: NO_SEMIOTIC_ANOMALY_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nLogs muestran 12 ejecuciones de sudo en 2 horas. Es el mantenimiento mensual del servidor de base de datos, programado en calendario compartido, con ticket de change approval.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Post-maintenance report: Carlos Rodriguez | 'PostgreSQL updated to 15.] z=0.855 conf=0.90 \u2014 \n  [Calendar event: 'DB Server Maintenance \u2014 Carlos Rodriguez' | Date: 202] z=0.723 conf=0.85 \u2014 \n  [sudo systemctl restart postgresql | sudo apt update | sudo apt upgrade] z=0.490 conf=0.70 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 3 | Derived: 0 | Total: 3",
   "pipeline_results": {
     "abduction": {
-      "best_hypothesis": "SUSPICION_DETECTED",
-      "best_posterior": "11/25",
+      "best_hypothesis": "NO_SEMIOTIC_ANOMALY_DETECTED",
+      "best_posterior": "19/20",
       "confidence": {
         "__fraction__": true,
-        "den": 25,
-        "num": 11
+        "den": 20,
+        "num": 19
       },
       "is_conclusive": true,
       "narrative": "Logs muestran 12 ejecuciones de sudo en 2 horas. Es el mantenimiento mensual del servidor de base de datos, programado en calendario compartido, con ticket de change approval."
@@ -195,10 +195,10 @@
       "ebs_adapter_mode": "motor",
       "expected_verdict": "NOISE",
       "resolve": {
-        "motor_confidence": "0.44",
-        "motor_reason": "Significant signal with structural support (score=0.2178)",
-        "motor_score": "0.2178",
-        "motor_verdict": "SUSPICION",
+        "motor_confidence": "0.95",
+        "motor_reason": "Insufficient evidence of malicious intent (score=0.0457)",
+        "motor_score": "0.0457",
+        "motor_verdict": "NOISE",
         "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
       },
       "source": "ebs_v1_json_adapter"

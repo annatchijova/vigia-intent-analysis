@@ -1,15 +1,15 @@
 {
-  "agent_verdict": "MALICE",
-  "analysis_timestamp": "2026-07-06T04:39:55.043955+00:00",
+  "agent_verdict": "NOISE",
+  "analysis_timestamp": "2026-07-06T17:13:29.701538+00:00",
   "audit_trail": {
     "agent_version": "1.0.0-SANS-2026",
     "case_id": "VIGIA-BEN-008",
-    "end_time": "2026-07-06T04:39:55.043964+00:00",
+    "end_time": "2026-07-06T17:13:29.701543+00:00",
     "entries": [
       {
         "action": "AGENT_INITIALIZED",
         "case_id": "VIGIA-BEN-008",
-        "entry_sha256": "c83ee351dba3ec9393d1d93f1c55f439244a7d358c9d06bd364b4f484175fed7",
+        "entry_sha256": "c52c233bd79df2ebca4151e9a73db9622a2433df9e977a28d3589c6e819b5aae",
         "inputs_summary": {
           "agent_file": "/home/user/vigia-intent-analysis/vigia_agent.py",
           "case_id": "VIGIA-BEN-008"
@@ -21,13 +21,13 @@
           "agent_version": "1.0.0-SANS-2026"
         },
         "seq": 1,
-        "timestamp": "2026-07-06T04:39:54.264950+00:00",
+        "timestamp": "2026-07-06T17:13:28.860234+00:00",
         "tool": "vigia_agent"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-BEN-008",
-        "entry_sha256": "ab7232aface4fe5226963ebf86842e99979d063a20102718a466da75a3c8409a",
+        "entry_sha256": "67e26841dcd05000f6d4e3f113206654e6fdeecd15764932312416b0fe9b070f",
         "inputs_summary": {
           "path": "/home/user/vigia-intent-analysis/data/cases/converted/VIGIA-BEN-008.json"
         },
@@ -35,29 +35,29 @@
         "note": "Computing SHA-256 of original evidence",
         "outputs_summary": {},
         "seq": 2,
-        "timestamp": "2026-07-06T04:39:54.265107+00:00",
+        "timestamp": "2026-07-06T17:13:28.860355+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-BEN-008",
-        "entry_sha256": "1f9db0fcac77deee67b6cbd4fe166e13307bc6f34305e4ad1f94d8817d035abb",
+        "entry_sha256": "0526cbdc849b19ebc4a1dad9df24018e82212e628b3b8b79d7cec58383b3c6f7",
         "inputs_summary": {
           "path": "/home/user/vigia-intent-analysis/data/cases/converted/VIGIA-BEN-008.json"
         },
         "iteration": 0,
-        "note": "Evidence verified: ca2f2672b4f7a9bd...",
+        "note": "Evidence verified: bf00c81b4c0d059a...",
         "outputs_summary": {
-          "sha256": "ca2f2672b4f7a9bdd1dd7ff6e2586b5490c6d719b04b57d98270977bdc9af1e5"
+          "sha256": "bf00c81b4c0d059a3a6360314fe27a1e6df948c8df1944f50a25adfb140be2f4"
         },
         "seq": 3,
-        "timestamp": "2026-07-06T04:39:54.265245+00:00",
+        "timestamp": "2026-07-06T17:13:28.860465+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "PIPELINE_EXECUTE",
         "case_id": "VIGIA-BEN-008",
-        "entry_sha256": "9047639f803b70e3e74bb1101024aae970eb738ba230736f8d98d109a27afafb",
+        "entry_sha256": "89496d16280e51336b4ac6a53a9c198971e6c71eb76c2779e67bd5d68974f7e7",
         "inputs_summary": {
           "evidence": "/home/user/vigia-intent-analysis/data/cases/converted/VIGIA-BEN-008.json",
           "iteration": "0",
@@ -67,13 +67,13 @@
         "note": "Executing pipeline \u2014 iteration 0",
         "outputs_summary": {},
         "seq": 4,
-        "timestamp": "2026-07-06T04:39:54.265458+00:00",
+        "timestamp": "2026-07-06T17:13:28.860635+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "PIPELINE_COMPLETE",
         "case_id": "VIGIA-BEN-008",
-        "entry_sha256": "6c36bcf8db67f08e3c140392b2bec2a5924d7874931c11dddd2aa0b64a219b4e",
+        "entry_sha256": "10d27d999275a3c0ed165f3d6441ae3fc18cae62e32a0894aa42d7094e0daa02",
         "inputs_summary": {
           "iteration": "0"
         },
@@ -81,9 +81,9 @@
         "note": "Pipeline completed \u2014 3 signals",
         "outputs_summary": {
           "abduction": {
-            "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
-            "best_posterior": "71/100",
-            "confidence": "71/100",
+            "best_hypothesis": "NO_SEMIOTIC_ANOMALY_DETECTED",
+            "best_posterior": "19/20",
+            "confidence": "19/20",
             "is_conclusive": "True",
             "narrative": "Servidor interno hace ping cada 5 minutos a 8.8.8.8. Es el monitor de disponibilidad de red configurado por NOC, con dashboard p\u00fablico y alertas a on-call."
           },
@@ -94,10 +94,10 @@
             "ebs_adapter_mode": "motor",
             "expected_verdict": "NOISE",
             "resolve": {
-              "motor_confidence": "0.71",
-              "motor_reason": "Intent score 0.3563 exceeds MALICE threshold (P2+acq_assurance scale, threshold=0.33)",
-              "motor_score": "0.3563",
-              "motor_verdict": "MALICE",
+              "motor_confidence": "0.95",
+              "motor_reason": "Insufficient evidence of malicious intent (score=0.0457)",
+              "motor_score": "0.0457",
+              "motor_verdict": "NOISE",
               "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
             },
             "source": "ebs_v1_json_adapter"
@@ -130,13 +130,13 @@
           ]
         },
         "seq": 5,
-        "timestamp": "2026-07-06T04:39:55.043191+00:00",
+        "timestamp": "2026-07-06T17:13:29.700916+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "CONTRADICTION_CHECK",
         "case_id": "VIGIA-BEN-008",
-        "entry_sha256": "2a2354aeecd00a3445d27864d0e973e9be6680a2966d85507f54a2ac02cab489",
+        "entry_sha256": "6d0291de283e4f2250132cce4b58d7c09ee369f5f2bb9c417a425675aa9e809d",
         "inputs_summary": {
           "n_signals": "3"
         },
@@ -147,67 +147,43 @@
           "threshold": "2"
         },
         "seq": 6,
-        "timestamp": "2026-07-06T04:39:55.043380+00:00",
+        "timestamp": "2026-07-06T17:13:29.701088+00:00",
         "tool": "contradiction_detector"
       },
       {
         "action": "AGENT_EXIT",
         "case_id": "VIGIA-BEN-008",
-        "entry_sha256": "33b5a84bef2841364ff9f501f582e425c4a475a6e0f87e7bb6fb0c06009fc41e",
+        "entry_sha256": "54e43b7c29c3b6201fd31f6b4365d9c22395357e098c78bd71eb7f2db4b5799a",
         "inputs_summary": {
-          "verdict": "MALICIOUS_INTENT_DETECTED"
+          "verdict": "NO_SEMIOTIC_ANOMALY_DETECTED"
         },
         "iteration": 0,
-        "note": "Exit code 1 (MALICE) \u2014 analysis complete.",
+        "note": "Exit code 0 (NOISE) \u2014 analysis complete.",
         "outputs_summary": {
-          "agent_verdict": "MALICE",
-          "exit_code": "1"
+          "agent_verdict": "NOISE",
+          "exit_code": "0"
         },
         "seq": 7,
-        "timestamp": "2026-07-06T04:39:55.043677+00:00",
+        "timestamp": "2026-07-06T17:13:29.701461+00:00",
         "tool": "vigia_agent"
       }
     ],
-    "start_time": "2026-07-06T04:39:54.264402+00:00",
+    "start_time": "2026-07-06T17:13:28.859912+00:00",
     "total_entries": 7
   },
   "case_id": "VIGIA-BEN-008",
   "evidence_path": "/home/user/vigia-intent-analysis/data/cases/converted/VIGIA-BEN-008.json",
-  "evidence_sha256": "ca2f2672b4f7a9bdd1dd7ff6e2586b5490c6d719b04b57d98270977bdc9af1e5",
+  "evidence_sha256": "bf00c81b4c0d059a3a6360314fe27a1e6df948c8df1944f50a25adfb140be2f4",
   "iterations_executed": 1,
-  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-BEN-008 ===\nEvidence: /home/user/vigia-intent-analysis/data/cases/converted/VIGIA-BEN-008.json\nEvidence SHA-256: ca2f2672b4f7a9bdd1dd7ff6e2586b5490c6d719b04b57d98270977bdc9af1e5\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 71/100\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 3 se\u00f1al(es): 3 primaria(s) de ['legacy_converter'], 0 derivada(s)/no-analizada(s). Top z: NOC dashboard: https://monitor.company.c=0.85, Parent: nagios.service (PID 1122) | Chil=0.72, Source: 10.0.0.5 (monitoring-server) | D=0.49.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: MALICIOUS_INTENT_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nServidor interno hace ping cada 5 minutos a 8.8.8.8. Es el monitor de disponibilidad de red configurado por NOC, con dashboard p\u00fablico y alertas a on-call.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [NOC dashboard: https://monitor.company.com/ping-status | Shows 8.8.8.8] z=0.855 conf=0.90 \u2014 \n  [Parent: nagios.service (PID 1122) | Child: /usr/lib/nagios/plugins/che] z=0.723 conf=0.85 \u2014 \n  [Source: 10.0.0.5 (monitoring-server) | Dest: 8.8.8.8:icmp | Interval: ] z=0.490 conf=0.70 \u2014 \n\n--- FINAL ALERT LEVEL ---\nHIGH \u2014 MALICE verdict from Bayesian posterior aggregation. Individual z-scores below threshold (distributed evidence pattern: no single dominant signal, but aggregate posterior is decisive). Alert floored (B-028/B-065).\nReconciliation: verdict MALICE rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 3 | Derived: 0 | Total: 3",
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-BEN-008 ===\nEvidence: /home/user/vigia-intent-analysis/data/cases/converted/VIGIA-BEN-008.json\nEvidence SHA-256: bf00c81b4c0d059a3a6360314fe27a1e6df948c8df1944f50a25adfb140be2f4\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: NO_SEMIOTIC_ANOMALY_DETECTED\nPosterior confidence: 19/20\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 3 se\u00f1al(es): 3 primaria(s) de ['legacy_converter'], 0 derivada(s)/no-analizada(s). Top z: NOC dashboard: https://monitor.company.c=0.85, Parent: nagios.service (PID 1122) | Chil=0.72, Source: 10.0.0.5 (monitoring-server) | D=0.49.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: NO_SEMIOTIC_ANOMALY_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nServidor interno hace ping cada 5 minutos a 8.8.8.8. Es el monitor de disponibilidad de red configurado por NOC, con dashboard p\u00fablico y alertas a on-call.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [NOC dashboard: https://monitor.company.com/ping-status | Shows 8.8.8.8] z=0.855 conf=0.90 \u2014 \n  [Parent: nagios.service (PID 1122) | Child: /usr/lib/nagios/plugins/che] z=0.723 conf=0.85 \u2014 \n  [Source: 10.0.0.5 (monitoring-server) | Dest: 8.8.8.8:icmp | Interval: ] z=0.490 conf=0.70 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 3 | Derived: 0 | Total: 3",
   "pipeline_results": {
     "abduction": {
-      "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
-      "best_posterior": "71/100",
+      "best_hypothesis": "NO_SEMIOTIC_ANOMALY_DETECTED",
+      "best_posterior": "19/20",
       "confidence": {
         "__fraction__": true,
-        "den": 100,
-        "num": 71
-      },
-      "devil_advocate": {
-        "aggregation": {
-          "k": 3,
-          "method": "top_k_already_validated_matches_v2",
-          "total_gap_mass": "0"
-        },
-        "counterfactual_summary": {
-          "primary_alternative_hypothesis": null
-        },
-        "decision_context": {
-          "confidence": "71/100",
-          "mapped_verdict": "MALICIOUS_INTENT_DETECTED",
-          "raw_verdict": "MALICIOUS_INTENT_DETECTED",
-          "score": "827/1200"
-        },
-        "devil_advocate_source": "deterministic_no_pattern_data_available",
-        "meta": {
-          "deterministic": true,
-          "generated_from": "case_pattern_library"
-        },
-        "narrative": "Eco's Razor (Abductive Falsification) applied to verdict MALICIOUS_INTENT_DETECTED. Pattern-matching data was not available on this code path \u2014 CasePatternLibrary is not invoked here by design (agent audit-trail mode (vigia_agent.py \u2014 JSON-replay / autonomous path); see KNOWN_LIMITATIONS.md). No structured counter-hypothesis could be derived deterministically. This is a documented scope limitation of the current code path, not an absence of falsification attempt.",
-        "pattern_evidence_gaps": [],
-        "version": "r7-da-v1"
+        "den": 20,
+        "num": 19
       },
       "is_conclusive": true,
       "narrative": "Servidor interno hace ping cada 5 minutos a 8.8.8.8. Es el monitor de disponibilidad de red configurado por NOC, con dashboard p\u00fablico y alertas a on-call."
@@ -219,10 +195,10 @@
       "ebs_adapter_mode": "motor",
       "expected_verdict": "NOISE",
       "resolve": {
-        "motor_confidence": "0.71",
-        "motor_reason": "Intent score 0.3563 exceeds MALICE threshold (P2+acq_assurance scale, threshold=0.33)",
-        "motor_score": "0.3563",
-        "motor_verdict": "MALICE",
+        "motor_confidence": "0.95",
+        "motor_reason": "Insufficient evidence of malicious intent (score=0.0457)",
+        "motor_score": "0.0457",
+        "motor_verdict": "NOISE",
         "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
       },
       "source": "ebs_v1_json_adapter"

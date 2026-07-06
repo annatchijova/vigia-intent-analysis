@@ -81,4 +81,35 @@ Los ~27 artefactos de la categoría A: `VIGIA-BEN-001..015` → `ART-002`, `ART-
 
 ---
 
-*Investigación ejecutada sin modificar código ni datos. Scripts de censo y simulación reproducibles descriptos en §1 y §3; salidas completas en el log de la sesión. La implementación queda pendiente de la decisión de doctrina sobre §4.2 y §4.5.*
+## ADDENDUM — 2026-07-06 — IMPLEMENTACIÓN APLICADA (D1 + D2 APROBADAS)
+
+| Campo | Valor |
+|-------|-------|
+| **Tag de restauración** | `pre-fase2-impl-semantic-role-20260706-170327` (local) |
+| **Decisiones de doctrina (Anna)** | **D1**: los exculpatorios pasan por el filtro Eco antes de apartarse — doc demasiado perfecta = señal. **D2**: `BREAK_002` re-etiquetado SUSPICION→NOISE con `_label_revision` (pentest autorizado con memo legítimo examiner-declared = NOISE). |
+
+### Qué se implementó
+
+1. **`semantic_role` en el scorer** (`vigia_scorer.py`, bloque FASE 2 tras el filtro B-070): `incriminatory` (default) / `exculpatory` (semántica V1: fuera del composite Y del gate B-068, retenido en `refutation_context.set_aside` del resultado sellado) / `contextual` (permanece en composite, no corrobora el gate). Valores desconocidos degradan a incriminatory en el scorer (fail-safe) y fallan ruidoso en `validate_case_schema` (fail-loud, bridge). Caso borde: toda la evidencia device exculpatoria y limpia de Eco → NOISE explícito con razón de refutación documental (no ABSTAIN: hay evidencia, y refuta).
+2. **D1 — filtro Eco con fuente única**: la lógica pura de `detect_eco_overinterpretation` se extrajo a `vigia/core/eco_check.py` (stdlib, sin floats en la decisión: `2*hits > total`); el tool MCP delega (misma conducta, misma lista de cebo) y el scorer aplica `text_obvious_bait_hits` a cada exculpatorio ANTES de apartarlo. Si dispara: el artefacto **permanece en el scoring** y el evento queda sellado en `refutation_context.eco_retained` con los términos exactos.
+3. **D2**: `data/cases/converted/VIGIA_BREAK_002_VALID_BENIGN.json` → `expected_verdict: NOISE` + `_label_revision` (formato AMB-001/002). Contenido del caso sin cambios.
+4. **Etiquetado inicial (worklist §5)**: 33 artefactos `semantic_role: exculpatory` examiner-declared — BEN-001..015 (ART-002+ART-003, en `converted/`), LINUX-002 (`linux002_03`), FP-002 (`fp002_02`), BREAK_002 (`ART-002`). Ningún caso MALICE lleva etiqueta exculpatoria (los tickets de la categoría B quedan incriminatory por diseño del ataque).
+
+### Resultados medidos (todos los gates verdes)
+
+| Gate | Antes | Después |
+|---|---|---|
+| Corpus (`run_all_agent.py --timeout 90`) | **152/199** | **165/199** (+13 — la estimación §3 ajustada por D1, exacta) |
+| BEN ciegos | SUSPICION×12 / MALICE×3 | **NOISE×13** / SUSPICION×2 |
+| Suite | 789 passed / 7 xfailed | **804 passed / 7 xfailed** (+15 tests de esta fase) |
+| Agente end-to-end (BEN-001) | SUSPICION | `NO_SEMIOTIC_ANOMALY_DETECTED`, exit 0 — resolve() toma el campo sin cambios adicionales |
+
+**D1 en acción, medido:** el único disparo del filtro Eco en el corpus etiquetado es `VIGIA-BEN-014 ART-003` (análisis de tráfico Tor: `onion`, `c&c`) — retenido en el scoring, sellado en `eco_retained`, y BEN-014 queda SUSPICION. Es el costo honesto de D1 (13/15 en vez de 14/15): una "refutación" cuyo texto es análisis de tráfico con vocabulario de ataque no es un memo de autorización, y el sistema ahora lo dice explícitamente en el bundle. BEN-012 sigue SUSPICION por la causa ya documentada (§3: el fenómeno kworker puntúa, no la doc — fuera del alcance de `semantic_role`).
+
+**Los 2 fallos BEN restantes + los 32 pre-existentes = 34 FAIL.** Un test de la Tanda 4 (`test_regenerated_ben_scores_honestly`) se actualizó: afirmaba que BEN-001 ciego no podía ser NOISE (detector de reintroducción de la reducción ×0.25); ahora BEN-001 es NOISE legítimamente y el test verifica el invariante real — sin huella de reducción en datos Y la vía NOISE tiene que ser `refutation_context` poblado.
+
+**READMEs intactos** (doctrina 2026-07-06: los números públicos no se actualizan por tanda; este documento es la fuente de verdad del estado del corpus: 165/199).
+
+---
+
+*Investigación (§1-§5) ejecutada sin modificar código ni datos; implementación aplicada en el addendum bajo protocolo completo con D1/D2 aprobadas.*

@@ -110,14 +110,29 @@ class TestCorpusRegenerated:
                 )
 
     def test_regenerated_ben_scores_honestly(self):
-        """El scoring ciego del corpus regenerado muestra los FPs reales del
-        motor (Addendum 2/4): ya no hay NOISE fabricado por la etiqueta."""
+        """El scoring ciego del corpus regenerado no contiene NOISE fabricado
+        por la etiqueta (Addendum 2/4). Actualizado FASE 2: BEN-001 ahora ES
+        NOISE legítimamente — vía semantic_role=exculpatory examiner-declared
+        (refutation_context poblado), NO vía la reducción ×0.25. El invariante
+        real: si el veredicto es benigno, la vía tiene que ser la refutación
+        documental apartada, jamás scores reducidos por la etiqueta."""
         from vigia_scorer import _vigia_score, _normalize_case
 
         case = json.loads((REPO / "data/cases/converted/VIGIA-BEN-001.json")
                           .read_text(encoding="utf-8"))
+        # 1) sin huella de reducción en los datos (el invariante de TANDA 4)
+        for a in case["artifacts"]:
+            assert a["raw_score"] >= 0.6 and a["prior_trust"] != 0.3, (
+                "huella de reducción ×0.25 reintroducida en BEN-001"
+            )
         blind = {k: v for k, v in case.items() if k != "expected_verdict"}
         r = _vigia_score(_normalize_case(copy.deepcopy(blind)))
-        assert r["verdict"] in ("SUSPICION", "MALICE"), (
-            "BEN-001 regenerado volvió a NOISE — ¿reducción reintroducida?"
-        )
+        # 2) si es NOISE, es por la vía exculpatoria sellada — no por datos
+        #    moldeados (pre-FASE-2 este caso daba SUSPICION 0.2543 ciego)
+        if r["verdict"] == "NOISE":
+            assert r.get("refutation_context", {}).get("set_aside"), (
+                "BEN-001 NOISE sin refutation_context — ¿reducción "
+                "reintroducida por otra puerta?"
+            )
+        else:
+            assert r["verdict"] in ("SUSPICION", "MALICE")

@@ -1,15 +1,15 @@
 {
-  "agent_verdict": "MALICE",
-  "analysis_timestamp": "2026-07-06T04:39:51.292983+00:00",
+  "agent_verdict": "NOISE",
+  "analysis_timestamp": "2026-07-06T17:13:25.516045+00:00",
   "audit_trail": {
     "agent_version": "1.0.0-SANS-2026",
     "case_id": "VIGIA-BEN-004",
-    "end_time": "2026-07-06T04:39:51.292993+00:00",
+    "end_time": "2026-07-06T17:13:25.516050+00:00",
     "entries": [
       {
         "action": "AGENT_INITIALIZED",
         "case_id": "VIGIA-BEN-004",
-        "entry_sha256": "a61e4d61d6cc51992a1be9b2e60cdf1ff03c511faad2bb62616dd69d0cacb928",
+        "entry_sha256": "1e084c6b273c033d4bc6cfa046fdf729d4fe116b23a8117e639e19d63ad333c3",
         "inputs_summary": {
           "agent_file": "/home/user/vigia-intent-analysis/vigia_agent.py",
           "case_id": "VIGIA-BEN-004"
@@ -21,13 +21,13 @@
           "agent_version": "1.0.0-SANS-2026"
         },
         "seq": 1,
-        "timestamp": "2026-07-06T04:39:50.427547+00:00",
+        "timestamp": "2026-07-06T17:13:24.640089+00:00",
         "tool": "vigia_agent"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-BEN-004",
-        "entry_sha256": "38cd1e5435bc7f5be4719952dc1c5d2b96bd35cf3721b5d2f88e4a7ff75539ac",
+        "entry_sha256": "9f45ca66a5ef61337fd3eb75d4af34fab5bff0d6a2e74e236ff3176696880215",
         "inputs_summary": {
           "path": "/home/user/vigia-intent-analysis/data/cases/converted/VIGIA-BEN-004.json"
         },
@@ -35,29 +35,29 @@
         "note": "Computing SHA-256 of original evidence",
         "outputs_summary": {},
         "seq": 2,
-        "timestamp": "2026-07-06T04:39:50.427718+00:00",
+        "timestamp": "2026-07-06T17:13:24.640218+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-BEN-004",
-        "entry_sha256": "937cd8b1cfb95c666c1f2f35b5728528119d1d42b4c2b858829c879959f3c0af",
+        "entry_sha256": "cf48607a237b6c76bdbf00b81f568261c844fb96d8c36b3edcc00eb2ab78cd39",
         "inputs_summary": {
           "path": "/home/user/vigia-intent-analysis/data/cases/converted/VIGIA-BEN-004.json"
         },
         "iteration": 0,
-        "note": "Evidence verified: cbc08ce05807f6c9...",
+        "note": "Evidence verified: 18e7b0b0159d3d02...",
         "outputs_summary": {
-          "sha256": "cbc08ce05807f6c900bef1aef05f1c3d7da6bb3ce533576890935c05b68dd784"
+          "sha256": "18e7b0b0159d3d022e0d673fe8e5c09e3f69ffda9b5c2a0d0003a27e2b1f2685"
         },
         "seq": 3,
-        "timestamp": "2026-07-06T04:39:50.427883+00:00",
+        "timestamp": "2026-07-06T17:13:24.640317+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "PIPELINE_EXECUTE",
         "case_id": "VIGIA-BEN-004",
-        "entry_sha256": "57da4bab1fb8679092a8fb199bf35632d03c10653ef39ccb590f719b96210a49",
+        "entry_sha256": "5c218ca3dfac8638ae8ba9c976ae1fd357dac70b7b657dce68168056089887d6",
         "inputs_summary": {
           "evidence": "/home/user/vigia-intent-analysis/data/cases/converted/VIGIA-BEN-004.json",
           "iteration": "0",
@@ -67,13 +67,13 @@
         "note": "Executing pipeline \u2014 iteration 0",
         "outputs_summary": {},
         "seq": 4,
-        "timestamp": "2026-07-06T04:39:50.428093+00:00",
+        "timestamp": "2026-07-06T17:13:24.640493+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "PIPELINE_COMPLETE",
         "case_id": "VIGIA-BEN-004",
-        "entry_sha256": "74615141a77d76ac029c2aa361ebb67a43b4d9b0acb94f345e9a7664d82166f4",
+        "entry_sha256": "85ad4b431a2df7274250205c5108ba8407d8fb4f7b6c2d170652a619a06ba7c6",
         "inputs_summary": {
           "iteration": "0"
         },
@@ -81,9 +81,9 @@
         "note": "Pipeline completed \u2014 3 signals",
         "outputs_summary": {
           "abduction": {
-            "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
-            "best_posterior": "3/4",
-            "confidence": "3/4",
+            "best_hypothesis": "NO_SEMIOTIC_ANOMALY_DETECTED",
+            "best_posterior": "19/20",
+            "confidence": "19/20",
             "is_conclusive": "True",
             "narrative": "Script de despliegue ejecuta 47 comandos sin errores, sin reintentos, con timing exacto. Es generado por Ansible Tower con playbook aprobado por change management."
           },
@@ -94,10 +94,10 @@
             "ebs_adapter_mode": "motor",
             "expected_verdict": "NOISE",
             "resolve": {
-              "motor_confidence": "0.75",
-              "motor_reason": "Intent score 0.3734 exceeds MALICE threshold (P2+acq_assurance scale, threshold=0.33)",
-              "motor_score": "0.3734",
-              "motor_verdict": "MALICE",
+              "motor_confidence": "0.95",
+              "motor_reason": "Insufficient evidence of malicious intent (score=0.0457)",
+              "motor_score": "0.0457",
+              "motor_verdict": "NOISE",
               "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
             },
             "source": "ebs_v1_json_adapter"
@@ -130,13 +130,13 @@
           ]
         },
         "seq": 5,
-        "timestamp": "2026-07-06T04:39:51.292166+00:00",
+        "timestamp": "2026-07-06T17:13:25.515447+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "CONTRADICTION_CHECK",
         "case_id": "VIGIA-BEN-004",
-        "entry_sha256": "a36c9e2a11f3a9c3da261ae0299a1d9a1f69bbf437be664ddd10cfaa1d3a40d4",
+        "entry_sha256": "892afd32efe726855694ae9e2a613611fa83052ee362106d796ede27f488246c",
         "inputs_summary": {
           "n_signals": "3"
         },
@@ -147,67 +147,43 @@
           "threshold": "2"
         },
         "seq": 6,
-        "timestamp": "2026-07-06T04:39:51.292353+00:00",
+        "timestamp": "2026-07-06T17:13:25.515682+00:00",
         "tool": "contradiction_detector"
       },
       {
         "action": "AGENT_EXIT",
         "case_id": "VIGIA-BEN-004",
-        "entry_sha256": "7415c075324298e495353dbfa9cb22cc9c6a80d5d587dcd0f6606322f7139353",
+        "entry_sha256": "13d4bf9bd7911f8dda2386416015ef52ebe63e43a3353a653860cacc14de056f",
         "inputs_summary": {
-          "verdict": "MALICIOUS_INTENT_DETECTED"
+          "verdict": "NO_SEMIOTIC_ANOMALY_DETECTED"
         },
         "iteration": 0,
-        "note": "Exit code 1 (MALICE) \u2014 analysis complete.",
+        "note": "Exit code 0 (NOISE) \u2014 analysis complete.",
         "outputs_summary": {
-          "agent_verdict": "MALICE",
-          "exit_code": "1"
+          "agent_verdict": "NOISE",
+          "exit_code": "0"
         },
         "seq": 7,
-        "timestamp": "2026-07-06T04:39:51.292695+00:00",
+        "timestamp": "2026-07-06T17:13:25.515972+00:00",
         "tool": "vigia_agent"
       }
     ],
-    "start_time": "2026-07-06T04:39:50.427003+00:00",
+    "start_time": "2026-07-06T17:13:24.639733+00:00",
     "total_entries": 7
   },
   "case_id": "VIGIA-BEN-004",
   "evidence_path": "/home/user/vigia-intent-analysis/data/cases/converted/VIGIA-BEN-004.json",
-  "evidence_sha256": "cbc08ce05807f6c900bef1aef05f1c3d7da6bb3ce533576890935c05b68dd784",
+  "evidence_sha256": "18e7b0b0159d3d022e0d673fe8e5c09e3f69ffda9b5c2a0d0003a27e2b1f2685",
   "iterations_executed": 1,
-  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-BEN-004 ===\nEvidence: /home/user/vigia-intent-analysis/data/cases/converted/VIGIA-BEN-004.json\nEvidence SHA-256: cbc08ce05807f6c900bef1aef05f1c3d7da6bb3ce533576890935c05b68dd784\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 3/4\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 3 se\u00f1al(es): 3 primaria(s) de ['legacy_converter'], 0 derivada(s)/no-analizada(s). Top z: Parent: ansible-tower.service (PID 1234)=0.85, Playbook: deploy_production.yml | Git co=0.72, ansible-playbook deploy_production.yml -=0.49.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: MALICIOUS_INTENT_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nScript de despliegue ejecuta 47 comandos sin errores, sin reintentos, con timing exacto. Es generado por Ansible Tower con playbook aprobado por change management.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Parent: ansible-tower.service (PID 1234) | Child: ssh ansible_svc@targ] z=0.855 conf=0.90 \u2014 \n  [Playbook: deploy_production.yml | Git commit: a1b2c3d | Approved by: c] z=0.723 conf=0.85 \u2014 \n  [ansible-playbook deploy_production.yml --check --diff | 47 tasks execu] z=0.490 conf=0.70 \u2014 \n\n--- FINAL ALERT LEVEL ---\nHIGH \u2014 MALICE verdict from Bayesian posterior aggregation. Individual z-scores below threshold (distributed evidence pattern: no single dominant signal, but aggregate posterior is decisive). Alert floored (B-028/B-065).\nReconciliation: verdict MALICE rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 3 | Derived: 0 | Total: 3",
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-BEN-004 ===\nEvidence: /home/user/vigia-intent-analysis/data/cases/converted/VIGIA-BEN-004.json\nEvidence SHA-256: 18e7b0b0159d3d022e0d673fe8e5c09e3f69ffda9b5c2a0d0003a27e2b1f2685\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: NO_SEMIOTIC_ANOMALY_DETECTED\nPosterior confidence: 19/20\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 3 se\u00f1al(es): 3 primaria(s) de ['legacy_converter'], 0 derivada(s)/no-analizada(s). Top z: Parent: ansible-tower.service (PID 1234)=0.85, Playbook: deploy_production.yml | Git co=0.72, ansible-playbook deploy_production.yml -=0.49.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: NO_SEMIOTIC_ANOMALY_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nScript de despliegue ejecuta 47 comandos sin errores, sin reintentos, con timing exacto. Es generado por Ansible Tower con playbook aprobado por change management.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Parent: ansible-tower.service (PID 1234) | Child: ssh ansible_svc@targ] z=0.855 conf=0.90 \u2014 \n  [Playbook: deploy_production.yml | Git commit: a1b2c3d | Approved by: c] z=0.723 conf=0.85 \u2014 \n  [ansible-playbook deploy_production.yml --check --diff | 47 tasks execu] z=0.490 conf=0.70 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 3 | Derived: 0 | Total: 3",
   "pipeline_results": {
     "abduction": {
-      "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
-      "best_posterior": "3/4",
+      "best_hypothesis": "NO_SEMIOTIC_ANOMALY_DETECTED",
+      "best_posterior": "19/20",
       "confidence": {
         "__fraction__": true,
-        "den": 4,
-        "num": 3
-      },
-      "devil_advocate": {
-        "aggregation": {
-          "k": 3,
-          "method": "top_k_already_validated_matches_v2",
-          "total_gap_mass": "0"
-        },
-        "counterfactual_summary": {
-          "primary_alternative_hypothesis": null
-        },
-        "decision_context": {
-          "confidence": "3/4",
-          "mapped_verdict": "MALICIOUS_INTENT_DETECTED",
-          "raw_verdict": "MALICIOUS_INTENT_DETECTED",
-          "score": "827/1200"
-        },
-        "devil_advocate_source": "deterministic_no_pattern_data_available",
-        "meta": {
-          "deterministic": true,
-          "generated_from": "case_pattern_library"
-        },
-        "narrative": "Eco's Razor (Abductive Falsification) applied to verdict MALICIOUS_INTENT_DETECTED. Pattern-matching data was not available on this code path \u2014 CasePatternLibrary is not invoked here by design (agent audit-trail mode (vigia_agent.py \u2014 JSON-replay / autonomous path); see KNOWN_LIMITATIONS.md). No structured counter-hypothesis could be derived deterministically. This is a documented scope limitation of the current code path, not an absence of falsification attempt.",
-        "pattern_evidence_gaps": [],
-        "version": "r7-da-v1"
+        "den": 20,
+        "num": 19
       },
       "is_conclusive": true,
       "narrative": "Script de despliegue ejecuta 47 comandos sin errores, sin reintentos, con timing exacto. Es generado por Ansible Tower con playbook aprobado por change management."
@@ -219,10 +195,10 @@
       "ebs_adapter_mode": "motor",
       "expected_verdict": "NOISE",
       "resolve": {
-        "motor_confidence": "0.75",
-        "motor_reason": "Intent score 0.3734 exceeds MALICE threshold (P2+acq_assurance scale, threshold=0.33)",
-        "motor_score": "0.3734",
-        "motor_verdict": "MALICE",
+        "motor_confidence": "0.95",
+        "motor_reason": "Insufficient evidence of malicious intent (score=0.0457)",
+        "motor_score": "0.0457",
+        "motor_verdict": "NOISE",
         "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
       },
       "source": "ebs_v1_json_adapter"
