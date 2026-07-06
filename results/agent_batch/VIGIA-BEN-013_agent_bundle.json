@@ -1,17 +1,17 @@
 {
-  "agent_verdict": "NOISE",
-  "analysis_timestamp": "2026-07-06T02:08:30.766790+00:00",
+  "agent_verdict": "INTENT",
+  "analysis_timestamp": "2026-07-06T04:39:59.769780+00:00",
   "audit_trail": {
     "agent_version": "1.0.0-SANS-2026",
     "case_id": "VIGIA-BEN-013",
-    "end_time": "2026-07-06T02:08:30.766796+00:00",
+    "end_time": "2026-07-06T04:39:59.769811+00:00",
     "entries": [
       {
         "action": "AGENT_INITIALIZED",
         "case_id": "VIGIA-BEN-013",
-        "entry_sha256": "f84c830efa2d3051aa3533f385f55b3193130da24782735bab40ec7837eef52c",
+        "entry_sha256": "c010d66d8ee11063926f9de86af490008f2ba7e36540e6d6bdc1eba4732399c9",
         "inputs_summary": {
-          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "agent_file": "/home/user/vigia-intent-analysis/vigia_agent.py",
           "case_id": "VIGIA-BEN-013"
         },
         "iteration": 0,
@@ -21,45 +21,45 @@
           "agent_version": "1.0.0-SANS-2026"
         },
         "seq": 1,
-        "timestamp": "2026-07-06T02:08:30.721968+00:00",
+        "timestamp": "2026-07-06T04:39:58.990075+00:00",
         "tool": "vigia_agent"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-BEN-013",
-        "entry_sha256": "bc43f8b0d0e08d7db02a31804f4be14091c2a18811f308a4406c63a981919271",
+        "entry_sha256": "acc30b66524bbd0e79034cd3ab04b836b621121158f6edfd09d2ad7f5a4b3d1f",
         "inputs_summary": {
-          "path": "/home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-BEN-013.json"
+          "path": "/home/user/vigia-intent-analysis/data/cases/converted/VIGIA-BEN-013.json"
         },
         "iteration": 0,
         "note": "Computing SHA-256 of original evidence",
         "outputs_summary": {},
         "seq": 2,
-        "timestamp": "2026-07-06T02:08:30.722053+00:00",
+        "timestamp": "2026-07-06T04:39:58.990236+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-BEN-013",
-        "entry_sha256": "a43ffd5b3110c45fdb8fe4e50e9cd4b8a15b5df8e00966efbadea709cd80e627",
+        "entry_sha256": "591a94ce3fd74e5e8968d68a8cbf268933ec22b1f6c259dd4f5e3c91c0484ea1",
         "inputs_summary": {
-          "path": "/home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-BEN-013.json"
+          "path": "/home/user/vigia-intent-analysis/data/cases/converted/VIGIA-BEN-013.json"
         },
         "iteration": 0,
-        "note": "Evidence verified: 9e8c3f2a60775136...",
+        "note": "Evidence verified: d10cb05af432692e...",
         "outputs_summary": {
-          "sha256": "9e8c3f2a60775136fc0d8e5cb55fc49c752565331b0da967bda986e473b54ebd"
+          "sha256": "d10cb05af432692e5dbe05839d7f04e478352cec10c41e2b19b6465eb1fb467a"
         },
         "seq": 3,
-        "timestamp": "2026-07-06T02:08:30.722144+00:00",
+        "timestamp": "2026-07-06T04:39:58.990390+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "PIPELINE_EXECUTE",
         "case_id": "VIGIA-BEN-013",
-        "entry_sha256": "975ad806f9f845d7541c7ca2bffbdaddff906e7653744ffb1909f1e125c6bd42",
+        "entry_sha256": "6d2c0548c72f6d7871d058b93d0c249ab6f6196afa6ca967ef237c0adf04567f",
         "inputs_summary": {
-          "evidence": "/home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-BEN-013.json",
+          "evidence": "/home/user/vigia-intent-analysis/data/cases/converted/VIGIA-BEN-013.json",
           "iteration": "0",
           "params": {}
         },
@@ -67,13 +67,13 @@
         "note": "Executing pipeline \u2014 iteration 0",
         "outputs_summary": {},
         "seq": 4,
-        "timestamp": "2026-07-06T02:08:30.722247+00:00",
+        "timestamp": "2026-07-06T04:39:58.990640+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "PIPELINE_COMPLETE",
         "case_id": "VIGIA-BEN-013",
-        "entry_sha256": "0a50164e44501593f7b1505d0da3c8776513f0e0569795623639936e3df4caea",
+        "entry_sha256": "b840dfb016dd90648fe8fda92ae9e7476cfdaa0920dc57f60fe71f5b8ab3cfc9",
         "inputs_summary": {
           "iteration": "0"
         },
@@ -81,23 +81,23 @@
         "note": "Pipeline completed \u2014 3 signals",
         "outputs_summary": {
           "abduction": {
-            "best_hypothesis": "NO_SEMIOTIC_ANOMALY_DETECTED",
-            "best_posterior": "49/50",
-            "confidence": "49/50",
+            "best_hypothesis": "SUSPICION_DETECTED",
+            "best_posterior": "21/50",
+            "confidence": "21/50",
             "is_conclusive": "True",
             "narrative": "Script rm -rf /var/log/app/*.log ejecutado diariamente. Es la pol\u00edtica de retenci\u00f3n de logs de la aplicaci\u00f3n, definida en GDPR compliance document, con retenci\u00f3n de 30 d\u00edas y aprobaci\u00f3n de DPO."
           },
           "case_id": "VIGIA-BEN-013",
           "pipeline_meta": {
             "artifact_count": "3",
-            "avg_score": "1/16",
+            "avg_score": "827/1200",
             "ebs_adapter_mode": "motor",
             "expected_verdict": "NOISE",
             "resolve": {
-              "motor_confidence": "0.98",
-              "motor_reason": "Insufficient evidence of malicious intent (score=0.0202)",
-              "motor_score": "0.0202",
-              "motor_verdict": "NOISE",
+              "motor_confidence": "0.42",
+              "motor_reason": "Significant signal with structural support (score=0.2098)",
+              "motor_score": "0.2098",
+              "motor_verdict": "SUSPICION",
               "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
             },
             "source": "ebs_v1_json_adapter"
@@ -105,38 +105,38 @@
           "signals": [
             {
               "artifact_id": "ART-001",
-              "confidence": "3/10",
+              "confidence": "7/10",
               "description": "00 02 * * * /usr/local/bin/cleanup_logs.sh --retention=30 --path=/var/log/app | crontab -l shows entry from 2023-05-20 | User: log_admin | Script signed by: dpo@company.com",
               "evidence_type": "log_entry",
               "source": "legacy_converter",
-              "z_score": "21/400"
+              "z_score": "49/100"
             },
             {
               "artifact_id": "ART-002",
-              "confidence": "3/10",
+              "confidence": "17/20",
               "description": "GDPR compliance doc v3.2, section 4.3: 'Application logs retained for 30 days maximum. Automated deletion after retention period.' | Approved by: DPO | Legal review: 2023-04-15 | Audit: PASSED 2024-Q1",
               "evidence_type": "file_timestamp",
               "source": "legacy_converter",
-              "z_score": "51/800"
+              "z_score": "289/400"
             },
             {
               "artifact_id": "ART-003",
-              "confidence": "3/10",
+              "confidence": "9/10",
               "description": "cleanup_logs.sh content: find /var/log/app -name '*.log' -mtime +30 -delete | Logs to syslog: 'Deleted 45 files older than 30 days' | No deletion of files < 30 days | No deletion of audit logs (/var/l",
               "evidence_type": "log_entry",
               "source": "legacy_converter",
-              "z_score": "57/800"
+              "z_score": "171/200"
             }
           ]
         },
         "seq": 5,
-        "timestamp": "2026-07-06T02:08:30.766453+00:00",
+        "timestamp": "2026-07-06T04:39:59.769205+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "CONTRADICTION_CHECK",
         "case_id": "VIGIA-BEN-013",
-        "entry_sha256": "bec17ee73a455b922968abf01ae55c99d2628bf1538cb67b4717c9e3c486e76d",
+        "entry_sha256": "844a455240eeaa5c233fd7d6f0bb556d1f6cf8940b13914329b1758acf7a3df7",
         "inputs_summary": {
           "n_signals": "3"
         },
@@ -147,43 +147,43 @@
           "threshold": "2"
         },
         "seq": 6,
-        "timestamp": "2026-07-06T02:08:30.766564+00:00",
+        "timestamp": "2026-07-06T04:39:59.769394+00:00",
         "tool": "contradiction_detector"
       },
       {
         "action": "AGENT_EXIT",
         "case_id": "VIGIA-BEN-013",
-        "entry_sha256": "60f61ea620a5fc49caba0c41b1d399fac21eb759178454e5083bc8ee1ce251e0",
+        "entry_sha256": "bc2bd179633e9f443823e8cb3f7a2f5de9fcc7bfa2c45471e9dc65ceb6a11a7e",
         "inputs_summary": {
-          "verdict": "NO_SEMIOTIC_ANOMALY_DETECTED"
+          "verdict": "SUSPICION_DETECTED"
         },
         "iteration": 0,
-        "note": "Exit code 0 (NOISE) \u2014 analysis complete.",
+        "note": "Exit code 3 (INTENT) \u2014 analysis complete.",
         "outputs_summary": {
-          "agent_verdict": "NOISE",
-          "exit_code": "0"
+          "agent_verdict": "INTENT",
+          "exit_code": "3"
         },
         "seq": 7,
-        "timestamp": "2026-07-06T02:08:30.766739+00:00",
+        "timestamp": "2026-07-06T04:39:59.769696+00:00",
         "tool": "vigia_agent"
       }
     ],
-    "start_time": "2026-07-06T02:08:30.721765+00:00",
+    "start_time": "2026-07-06T04:39:58.989562+00:00",
     "total_entries": 7
   },
   "case_id": "VIGIA-BEN-013",
-  "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-BEN-013.json",
-  "evidence_sha256": "9e8c3f2a60775136fc0d8e5cb55fc49c752565331b0da967bda986e473b54ebd",
+  "evidence_path": "/home/user/vigia-intent-analysis/data/cases/converted/VIGIA-BEN-013.json",
+  "evidence_sha256": "d10cb05af432692e5dbe05839d7f04e478352cec10c41e2b19b6465eb1fb467a",
   "iterations_executed": 1,
-  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-BEN-013 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-BEN-013.json\nEvidence SHA-256: 9e8c3f2a60775136fc0d8e5cb55fc49c752565331b0da967bda986e473b54ebd\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: NO_SEMIOTIC_ANOMALY_DETECTED\nPosterior confidence: 49/50\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 3 se\u00f1al(es): 3 primaria(s) de ['legacy_converter'], 0 derivada(s)/no-analizada(s). Top z: cleanup_logs.sh content: find /var/log/a=0.07, GDPR compliance doc v3.2, section 4.3: '=0.06, 00 02 * * * /usr/local/bin/cleanup_logs.=0.05.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: NO_SEMIOTIC_ANOMALY_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nScript rm -rf /var/log/app/*.log ejecutado diariamente. Es la pol\u00edtica de retenci\u00f3n de logs de la aplicaci\u00f3n, definida en GDPR compliance document, con retenci\u00f3n de 30 d\u00edas y aprobaci\u00f3n de DPO.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [cleanup_logs.sh content: find /var/log/app -name '*.log' -mtime +30 -d] z=0.071 conf=0.30 \u2014 \n  [GDPR compliance doc v3.2, section 4.3: 'Application logs retained for ] z=0.064 conf=0.30 \u2014 \n  [00 02 * * * /usr/local/bin/cleanup_logs.sh --retention=30 --path=/var/] z=0.052 conf=0.30 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 3 | Derived: 0 | Total: 3",
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-BEN-013 ===\nEvidence: /home/user/vigia-intent-analysis/data/cases/converted/VIGIA-BEN-013.json\nEvidence SHA-256: d10cb05af432692e5dbe05839d7f04e478352cec10c41e2b19b6465eb1fb467a\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: SUSPICION_DETECTED\nPosterior confidence: 21/50\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 3 se\u00f1al(es): 3 primaria(s) de ['legacy_converter'], 0 derivada(s)/no-analizada(s). Top z: cleanup_logs.sh content: find /var/log/a=0.85, GDPR compliance doc v3.2, section 4.3: '=0.72, 00 02 * * * /usr/local/bin/cleanup_logs.=0.49.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: SUSPICION_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nScript rm -rf /var/log/app/*.log ejecutado diariamente. Es la pol\u00edtica de retenci\u00f3n de logs de la aplicaci\u00f3n, definida en GDPR compliance document, con retenci\u00f3n de 30 d\u00edas y aprobaci\u00f3n de DPO.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [cleanup_logs.sh content: find /var/log/app -name '*.log' -mtime +30 -d] z=0.855 conf=0.90 \u2014 \n  [GDPR compliance doc v3.2, section 4.3: 'Application logs retained for ] z=0.723 conf=0.85 \u2014 \n  [00 02 * * * /usr/local/bin/cleanup_logs.sh --retention=30 --path=/var/] z=0.490 conf=0.70 \u2014 \n\n--- FINAL ALERT LEVEL ---\nMEDIUM \u2014 INTENT verdict with individual z-scores below threshold. Alert floored (B-028/B-065): an intent finding cannot present as LOW.\nReconciliation: verdict INTENT rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 3 | Derived: 0 | Total: 3",
   "pipeline_results": {
     "abduction": {
-      "best_hypothesis": "NO_SEMIOTIC_ANOMALY_DETECTED",
-      "best_posterior": "49/50",
+      "best_hypothesis": "SUSPICION_DETECTED",
+      "best_posterior": "21/50",
       "confidence": {
         "__fraction__": true,
         "den": 50,
-        "num": 49
+        "num": 21
       },
       "is_conclusive": true,
       "narrative": "Script rm -rf /var/log/app/*.log ejecutado diariamente. Es la pol\u00edtica de retenci\u00f3n de logs de la aplicaci\u00f3n, definida en GDPR compliance document, con retenci\u00f3n de 30 d\u00edas y aprobaci\u00f3n de DPO."
@@ -191,14 +191,14 @@
     "case_id": "VIGIA-BEN-013",
     "pipeline_meta": {
       "artifact_count": 3,
-      "avg_score": "1/16",
+      "avg_score": "827/1200",
       "ebs_adapter_mode": "motor",
       "expected_verdict": "NOISE",
       "resolve": {
-        "motor_confidence": "0.98",
-        "motor_reason": "Insufficient evidence of malicious intent (score=0.0202)",
-        "motor_score": "0.0202",
-        "motor_verdict": "NOISE",
+        "motor_confidence": "0.42",
+        "motor_reason": "Significant signal with structural support (score=0.2098)",
+        "motor_score": "0.2098",
+        "motor_verdict": "SUSPICION",
         "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
       },
       "source": "ebs_v1_json_adapter"
@@ -209,31 +209,31 @@
         "confidence": {
           "__fraction__": true,
           "den": 10,
-          "num": 3
+          "num": 7
         },
         "description": "00 02 * * * /usr/local/bin/cleanup_logs.sh --retention=30 --path=/var/log/app | crontab -l shows entry from 2023-05-20 | User: log_admin | Script signed by: dpo@company.com",
         "evidence_type": "log_entry",
         "source": "legacy_converter",
         "z_score": {
           "__fraction__": true,
-          "den": 400,
-          "num": 21
+          "den": 100,
+          "num": 49
         }
       },
       {
         "artifact_id": "ART-002",
         "confidence": {
           "__fraction__": true,
-          "den": 10,
-          "num": 3
+          "den": 20,
+          "num": 17
         },
         "description": "GDPR compliance doc v3.2, section 4.3: 'Application logs retained for 30 days maximum. Automated deletion after retention period.' | Approved by: DPO | Legal review: 2023-04-15 | Audit: PASSED 2024-Q1",
         "evidence_type": "file_timestamp",
         "source": "legacy_converter",
         "z_score": {
           "__fraction__": true,
-          "den": 800,
-          "num": 51
+          "den": 400,
+          "num": 289
         }
       },
       {
@@ -241,15 +241,15 @@
         "confidence": {
           "__fraction__": true,
           "den": 10,
-          "num": 3
+          "num": 9
         },
         "description": "cleanup_logs.sh content: find /var/log/app -name '*.log' -mtime +30 -delete | Logs to syslog: 'Deleted 45 files older than 30 days' | No deletion of files < 30 days | No deletion of audit logs (/var/l",
         "evidence_type": "log_entry",
         "source": "legacy_converter",
         "z_score": {
           "__fraction__": true,
-          "den": 800,
-          "num": 57
+          "den": 200,
+          "num": 171
         }
       }
     ]

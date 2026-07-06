@@ -1,17 +1,17 @@
 {
-  "agent_verdict": "NOISE",
-  "analysis_timestamp": "2026-07-06T02:08:29.902289+00:00",
+  "agent_verdict": "MALICE",
+  "analysis_timestamp": "2026-07-06T04:39:51.292983+00:00",
   "audit_trail": {
     "agent_version": "1.0.0-SANS-2026",
     "case_id": "VIGIA-BEN-004",
-    "end_time": "2026-07-06T02:08:29.902295+00:00",
+    "end_time": "2026-07-06T04:39:51.292993+00:00",
     "entries": [
       {
         "action": "AGENT_INITIALIZED",
         "case_id": "VIGIA-BEN-004",
-        "entry_sha256": "a7471c089db26ba3282329d16f0497a3c882623b477ceea392dc173db8e5419c",
+        "entry_sha256": "a61e4d61d6cc51992a1be9b2e60cdf1ff03c511faad2bb62616dd69d0cacb928",
         "inputs_summary": {
-          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "agent_file": "/home/user/vigia-intent-analysis/vigia_agent.py",
           "case_id": "VIGIA-BEN-004"
         },
         "iteration": 0,
@@ -21,45 +21,45 @@
           "agent_version": "1.0.0-SANS-2026"
         },
         "seq": 1,
-        "timestamp": "2026-07-06T02:08:29.856954+00:00",
+        "timestamp": "2026-07-06T04:39:50.427547+00:00",
         "tool": "vigia_agent"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-BEN-004",
-        "entry_sha256": "57b4c13b96d16189af9f4cca6a9421c8f3cbcad8a47ac0a9331c2c6b04520cad",
+        "entry_sha256": "38cd1e5435bc7f5be4719952dc1c5d2b96bd35cf3721b5d2f88e4a7ff75539ac",
         "inputs_summary": {
-          "path": "/home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-BEN-004.json"
+          "path": "/home/user/vigia-intent-analysis/data/cases/converted/VIGIA-BEN-004.json"
         },
         "iteration": 0,
         "note": "Computing SHA-256 of original evidence",
         "outputs_summary": {},
         "seq": 2,
-        "timestamp": "2026-07-06T02:08:29.857039+00:00",
+        "timestamp": "2026-07-06T04:39:50.427718+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-BEN-004",
-        "entry_sha256": "d5bfe83e19c5f94dbef7a83d55533188be68079b58c534ba7034d68ec93771c0",
+        "entry_sha256": "937cd8b1cfb95c666c1f2f35b5728528119d1d42b4c2b858829c879959f3c0af",
         "inputs_summary": {
-          "path": "/home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-BEN-004.json"
+          "path": "/home/user/vigia-intent-analysis/data/cases/converted/VIGIA-BEN-004.json"
         },
         "iteration": 0,
-        "note": "Evidence verified: 34f8ed1327b60c14...",
+        "note": "Evidence verified: cbc08ce05807f6c9...",
         "outputs_summary": {
-          "sha256": "34f8ed1327b60c14ffca7a2e381222bbc164f0a31411dbf0c69b69211530de32"
+          "sha256": "cbc08ce05807f6c900bef1aef05f1c3d7da6bb3ce533576890935c05b68dd784"
         },
         "seq": 3,
-        "timestamp": "2026-07-06T02:08:29.857136+00:00",
+        "timestamp": "2026-07-06T04:39:50.427883+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "PIPELINE_EXECUTE",
         "case_id": "VIGIA-BEN-004",
-        "entry_sha256": "07b5a93ddbdac475e28bd7b4931a139050d15f62b6f853075f0f9b1725cad1e5",
+        "entry_sha256": "57da4bab1fb8679092a8fb199bf35632d03c10653ef39ccb590f719b96210a49",
         "inputs_summary": {
-          "evidence": "/home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-BEN-004.json",
+          "evidence": "/home/user/vigia-intent-analysis/data/cases/converted/VIGIA-BEN-004.json",
           "iteration": "0",
           "params": {}
         },
@@ -67,13 +67,13 @@
         "note": "Executing pipeline \u2014 iteration 0",
         "outputs_summary": {},
         "seq": 4,
-        "timestamp": "2026-07-06T02:08:29.857242+00:00",
+        "timestamp": "2026-07-06T04:39:50.428093+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "PIPELINE_COMPLETE",
         "case_id": "VIGIA-BEN-004",
-        "entry_sha256": "4f5e59513a6bd3222f37a7119e6b8e8f597a157d78bdb14fc63ff794cdea2ddc",
+        "entry_sha256": "74615141a77d76ac029c2aa361ebb67a43b4d9b0acb94f345e9a7664d82166f4",
         "inputs_summary": {
           "iteration": "0"
         },
@@ -81,23 +81,23 @@
         "note": "Pipeline completed \u2014 3 signals",
         "outputs_summary": {
           "abduction": {
-            "best_hypothesis": "NO_SEMIOTIC_ANOMALY_DETECTED",
-            "best_posterior": "24/25",
-            "confidence": "24/25",
+            "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+            "best_posterior": "3/4",
+            "confidence": "3/4",
             "is_conclusive": "True",
             "narrative": "Script de despliegue ejecuta 47 comandos sin errores, sin reintentos, con timing exacto. Es generado por Ansible Tower con playbook aprobado por change management."
           },
           "case_id": "VIGIA-BEN-004",
           "pipeline_meta": {
             "artifact_count": "3",
-            "avg_score": "1/16",
+            "avg_score": "827/1200",
             "ebs_adapter_mode": "motor",
             "expected_verdict": "NOISE",
             "resolve": {
-              "motor_confidence": "0.96",
-              "motor_reason": "Insufficient evidence of malicious intent (score=0.0361)",
-              "motor_score": "0.0361",
-              "motor_verdict": "NOISE",
+              "motor_confidence": "0.75",
+              "motor_reason": "Intent score 0.3734 exceeds MALICE threshold (P2+acq_assurance scale, threshold=0.33)",
+              "motor_score": "0.3734",
+              "motor_verdict": "MALICE",
               "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
             },
             "source": "ebs_v1_json_adapter"
@@ -105,38 +105,38 @@
           "signals": [
             {
               "artifact_id": "ART-001",
-              "confidence": "3/10",
+              "confidence": "7/10",
               "description": "ansible-playbook deploy_production.yml --check --diff | 47 tasks executed | 0 failures | 0 changed (dry run) | 2024-06-10 02:00:00 UTC | User: ansible_svc | SSH key: ansible@tower.company.com",
               "evidence_type": "log_entry",
               "source": "legacy_converter",
-              "z_score": "21/400"
+              "z_score": "49/100"
             },
             {
               "artifact_id": "ART-002",
-              "confidence": "3/10",
+              "confidence": "17/20",
               "description": "Playbook: deploy_production.yml | Git commit: a1b2c3d | Approved by: change_advisory_board #2024-06-05 | Jira ticket: CHG-0042 | Reviewer: senior_dev_lead | Signed off: 2024-06-07",
               "evidence_type": "file_timestamp",
               "source": "legacy_converter",
-              "z_score": "51/800"
+              "z_score": "289/400"
             },
             {
               "artifact_id": "ART-003",
-              "confidence": "3/10",
+              "confidence": "9/10",
               "description": "Parent: ansible-tower.service (PID 1234) | Child: ssh ansible_svc@target | Ansible facts gathered: 2024-06-10 02:00:01 | No interactive shell | No TTY allocated",
               "evidence_type": "memory_process",
               "source": "legacy_converter",
-              "z_score": "57/800"
+              "z_score": "171/200"
             }
           ]
         },
         "seq": 5,
-        "timestamp": "2026-07-06T02:08:29.901951+00:00",
+        "timestamp": "2026-07-06T04:39:51.292166+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "CONTRADICTION_CHECK",
         "case_id": "VIGIA-BEN-004",
-        "entry_sha256": "6deed70c309b89e7a6d66b3926dfb4d4647fbd44a2bdea5e16d0d87dcbe1402b",
+        "entry_sha256": "a36c9e2a11f3a9c3da261ae0299a1d9a1f69bbf437be664ddd10cfaa1d3a40d4",
         "inputs_summary": {
           "n_signals": "3"
         },
@@ -147,43 +147,67 @@
           "threshold": "2"
         },
         "seq": 6,
-        "timestamp": "2026-07-06T02:08:29.902059+00:00",
+        "timestamp": "2026-07-06T04:39:51.292353+00:00",
         "tool": "contradiction_detector"
       },
       {
         "action": "AGENT_EXIT",
         "case_id": "VIGIA-BEN-004",
-        "entry_sha256": "21086e88397d99ebe9ccebadc81654b059be7ba957c12aa5a2017e80bd08a8fb",
+        "entry_sha256": "7415c075324298e495353dbfa9cb22cc9c6a80d5d587dcd0f6606322f7139353",
         "inputs_summary": {
-          "verdict": "NO_SEMIOTIC_ANOMALY_DETECTED"
+          "verdict": "MALICIOUS_INTENT_DETECTED"
         },
         "iteration": 0,
-        "note": "Exit code 0 (NOISE) \u2014 analysis complete.",
+        "note": "Exit code 1 (MALICE) \u2014 analysis complete.",
         "outputs_summary": {
-          "agent_verdict": "NOISE",
-          "exit_code": "0"
+          "agent_verdict": "MALICE",
+          "exit_code": "1"
         },
         "seq": 7,
-        "timestamp": "2026-07-06T02:08:29.902237+00:00",
+        "timestamp": "2026-07-06T04:39:51.292695+00:00",
         "tool": "vigia_agent"
       }
     ],
-    "start_time": "2026-07-06T02:08:29.856751+00:00",
+    "start_time": "2026-07-06T04:39:50.427003+00:00",
     "total_entries": 7
   },
   "case_id": "VIGIA-BEN-004",
-  "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-BEN-004.json",
-  "evidence_sha256": "34f8ed1327b60c14ffca7a2e381222bbc164f0a31411dbf0c69b69211530de32",
+  "evidence_path": "/home/user/vigia-intent-analysis/data/cases/converted/VIGIA-BEN-004.json",
+  "evidence_sha256": "cbc08ce05807f6c900bef1aef05f1c3d7da6bb3ce533576890935c05b68dd784",
   "iterations_executed": 1,
-  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-BEN-004 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-BEN-004.json\nEvidence SHA-256: 34f8ed1327b60c14ffca7a2e381222bbc164f0a31411dbf0c69b69211530de32\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: NO_SEMIOTIC_ANOMALY_DETECTED\nPosterior confidence: 24/25\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 3 se\u00f1al(es): 3 primaria(s) de ['legacy_converter'], 0 derivada(s)/no-analizada(s). Top z: Parent: ansible-tower.service (PID 1234)=0.07, Playbook: deploy_production.yml | Git co=0.06, ansible-playbook deploy_production.yml -=0.05.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: NO_SEMIOTIC_ANOMALY_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nScript de despliegue ejecuta 47 comandos sin errores, sin reintentos, con timing exacto. Es generado por Ansible Tower con playbook aprobado por change management.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Parent: ansible-tower.service (PID 1234) | Child: ssh ansible_svc@targ] z=0.071 conf=0.30 \u2014 \n  [Playbook: deploy_production.yml | Git commit: a1b2c3d | Approved by: c] z=0.064 conf=0.30 \u2014 \n  [ansible-playbook deploy_production.yml --check --diff | 47 tasks execu] z=0.052 conf=0.30 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 3 | Derived: 0 | Total: 3",
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-BEN-004 ===\nEvidence: /home/user/vigia-intent-analysis/data/cases/converted/VIGIA-BEN-004.json\nEvidence SHA-256: cbc08ce05807f6c900bef1aef05f1c3d7da6bb3ce533576890935c05b68dd784\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 3/4\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 3 se\u00f1al(es): 3 primaria(s) de ['legacy_converter'], 0 derivada(s)/no-analizada(s). Top z: Parent: ansible-tower.service (PID 1234)=0.85, Playbook: deploy_production.yml | Git co=0.72, ansible-playbook deploy_production.yml -=0.49.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: MALICIOUS_INTENT_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nScript de despliegue ejecuta 47 comandos sin errores, sin reintentos, con timing exacto. Es generado por Ansible Tower con playbook aprobado por change management.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Parent: ansible-tower.service (PID 1234) | Child: ssh ansible_svc@targ] z=0.855 conf=0.90 \u2014 \n  [Playbook: deploy_production.yml | Git commit: a1b2c3d | Approved by: c] z=0.723 conf=0.85 \u2014 \n  [ansible-playbook deploy_production.yml --check --diff | 47 tasks execu] z=0.490 conf=0.70 \u2014 \n\n--- FINAL ALERT LEVEL ---\nHIGH \u2014 MALICE verdict from Bayesian posterior aggregation. Individual z-scores below threshold (distributed evidence pattern: no single dominant signal, but aggregate posterior is decisive). Alert floored (B-028/B-065).\nReconciliation: verdict MALICE rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 3 | Derived: 0 | Total: 3",
   "pipeline_results": {
     "abduction": {
-      "best_hypothesis": "NO_SEMIOTIC_ANOMALY_DETECTED",
-      "best_posterior": "24/25",
+      "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+      "best_posterior": "3/4",
       "confidence": {
         "__fraction__": true,
-        "den": 25,
-        "num": 24
+        "den": 4,
+        "num": 3
+      },
+      "devil_advocate": {
+        "aggregation": {
+          "k": 3,
+          "method": "top_k_already_validated_matches_v2",
+          "total_gap_mass": "0"
+        },
+        "counterfactual_summary": {
+          "primary_alternative_hypothesis": null
+        },
+        "decision_context": {
+          "confidence": "3/4",
+          "mapped_verdict": "MALICIOUS_INTENT_DETECTED",
+          "raw_verdict": "MALICIOUS_INTENT_DETECTED",
+          "score": "827/1200"
+        },
+        "devil_advocate_source": "deterministic_no_pattern_data_available",
+        "meta": {
+          "deterministic": true,
+          "generated_from": "case_pattern_library"
+        },
+        "narrative": "Eco's Razor (Abductive Falsification) applied to verdict MALICIOUS_INTENT_DETECTED. Pattern-matching data was not available on this code path \u2014 CasePatternLibrary is not invoked here by design (agent audit-trail mode (vigia_agent.py \u2014 JSON-replay / autonomous path); see KNOWN_LIMITATIONS.md). No structured counter-hypothesis could be derived deterministically. This is a documented scope limitation of the current code path, not an absence of falsification attempt.",
+        "pattern_evidence_gaps": [],
+        "version": "r7-da-v1"
       },
       "is_conclusive": true,
       "narrative": "Script de despliegue ejecuta 47 comandos sin errores, sin reintentos, con timing exacto. Es generado por Ansible Tower con playbook aprobado por change management."
@@ -191,14 +215,14 @@
     "case_id": "VIGIA-BEN-004",
     "pipeline_meta": {
       "artifact_count": 3,
-      "avg_score": "1/16",
+      "avg_score": "827/1200",
       "ebs_adapter_mode": "motor",
       "expected_verdict": "NOISE",
       "resolve": {
-        "motor_confidence": "0.96",
-        "motor_reason": "Insufficient evidence of malicious intent (score=0.0361)",
-        "motor_score": "0.0361",
-        "motor_verdict": "NOISE",
+        "motor_confidence": "0.75",
+        "motor_reason": "Intent score 0.3734 exceeds MALICE threshold (P2+acq_assurance scale, threshold=0.33)",
+        "motor_score": "0.3734",
+        "motor_verdict": "MALICE",
         "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
       },
       "source": "ebs_v1_json_adapter"
@@ -209,31 +233,31 @@
         "confidence": {
           "__fraction__": true,
           "den": 10,
-          "num": 3
+          "num": 7
         },
         "description": "ansible-playbook deploy_production.yml --check --diff | 47 tasks executed | 0 failures | 0 changed (dry run) | 2024-06-10 02:00:00 UTC | User: ansible_svc | SSH key: ansible@tower.company.com",
         "evidence_type": "log_entry",
         "source": "legacy_converter",
         "z_score": {
           "__fraction__": true,
-          "den": 400,
-          "num": 21
+          "den": 100,
+          "num": 49
         }
       },
       {
         "artifact_id": "ART-002",
         "confidence": {
           "__fraction__": true,
-          "den": 10,
-          "num": 3
+          "den": 20,
+          "num": 17
         },
         "description": "Playbook: deploy_production.yml | Git commit: a1b2c3d | Approved by: change_advisory_board #2024-06-05 | Jira ticket: CHG-0042 | Reviewer: senior_dev_lead | Signed off: 2024-06-07",
         "evidence_type": "file_timestamp",
         "source": "legacy_converter",
         "z_score": {
           "__fraction__": true,
-          "den": 800,
-          "num": 51
+          "den": 400,
+          "num": 289
         }
       },
       {
@@ -241,15 +265,15 @@
         "confidence": {
           "__fraction__": true,
           "den": 10,
-          "num": 3
+          "num": 9
         },
         "description": "Parent: ansible-tower.service (PID 1234) | Child: ssh ansible_svc@target | Ansible facts gathered: 2024-06-10 02:00:01 | No interactive shell | No TTY allocated",
         "evidence_type": "memory_process",
         "source": "legacy_converter",
         "z_score": {
           "__fraction__": true,
-          "den": 800,
-          "num": 57
+          "den": 200,
+          "num": 171
         }
       }
     ]

@@ -1,17 +1,17 @@
 {
-  "agent_verdict": "NOISE",
-  "analysis_timestamp": "2026-07-06T02:08:30.957017+00:00",
+  "agent_verdict": "INTENT",
+  "analysis_timestamp": "2026-07-06T04:40:01.651358+00:00",
   "audit_trail": {
     "agent_version": "1.0.0-SANS-2026",
     "case_id": "VIGIA-BEN-015",
-    "end_time": "2026-07-06T02:08:30.957024+00:00",
+    "end_time": "2026-07-06T04:40:01.651365+00:00",
     "entries": [
       {
         "action": "AGENT_INITIALIZED",
         "case_id": "VIGIA-BEN-015",
-        "entry_sha256": "ad78511d00588588a04e23a6aa27ac870d6a0172e699c66a451d9b559b4a4f9a",
+        "entry_sha256": "af04c3ecb1513005a6d7e5b1fe65370dc6513572573bd22b19b12229c7ccb728",
         "inputs_summary": {
-          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "agent_file": "/home/user/vigia-intent-analysis/vigia_agent.py",
           "case_id": "VIGIA-BEN-015"
         },
         "iteration": 0,
@@ -21,45 +21,45 @@
           "agent_version": "1.0.0-SANS-2026"
         },
         "seq": 1,
-        "timestamp": "2026-07-06T02:08:30.911897+00:00",
+        "timestamp": "2026-07-06T04:40:00.864592+00:00",
         "tool": "vigia_agent"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-BEN-015",
-        "entry_sha256": "945e88865ce2f16c57ce4fd1ceee97b84b59289a09ea94cb80bcbd81c31baa2d",
+        "entry_sha256": "6c8e625cf52378467c31c48a8d677af02f7a372ed434b2288121fe6396938cb7",
         "inputs_summary": {
-          "path": "/home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-BEN-015.json"
+          "path": "/home/user/vigia-intent-analysis/data/cases/converted/VIGIA-BEN-015.json"
         },
         "iteration": 0,
         "note": "Computing SHA-256 of original evidence",
         "outputs_summary": {},
         "seq": 2,
-        "timestamp": "2026-07-06T02:08:30.911980+00:00",
+        "timestamp": "2026-07-06T04:40:00.864765+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-BEN-015",
-        "entry_sha256": "b3cbe2691e7b0e87022db41b98789241796946160a26e2565e3688f1e33d0d10",
+        "entry_sha256": "ab0f3fe0a82bf74d46e30731166416c0670dd812218b23540d5ca5a3d1a5c740",
         "inputs_summary": {
-          "path": "/home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-BEN-015.json"
+          "path": "/home/user/vigia-intent-analysis/data/cases/converted/VIGIA-BEN-015.json"
         },
         "iteration": 0,
-        "note": "Evidence verified: e87048ddb56e6040...",
+        "note": "Evidence verified: 228870ff94a4e426...",
         "outputs_summary": {
-          "sha256": "e87048ddb56e6040bda63b9fa6a585ab7368914432992ecdae2b762be3431ec4"
+          "sha256": "228870ff94a4e42658b831c0de3ffe1a48888926bc1acf788565dcfda318bf1c"
         },
         "seq": 3,
-        "timestamp": "2026-07-06T02:08:30.912071+00:00",
+        "timestamp": "2026-07-06T04:40:00.864935+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "PIPELINE_EXECUTE",
         "case_id": "VIGIA-BEN-015",
-        "entry_sha256": "04da3448154a0c3729c3e3ff8f18e2153097126a2db06235dde4aa88b213514d",
+        "entry_sha256": "03b58f232f629ee2ede1ba659fb0f139b2974028716f37a3ecd4f0886b315c44",
         "inputs_summary": {
-          "evidence": "/home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-BEN-015.json",
+          "evidence": "/home/user/vigia-intent-analysis/data/cases/converted/VIGIA-BEN-015.json",
           "iteration": "0",
           "params": {}
         },
@@ -67,13 +67,13 @@
         "note": "Executing pipeline \u2014 iteration 0",
         "outputs_summary": {},
         "seq": 4,
-        "timestamp": "2026-07-06T02:08:30.912174+00:00",
+        "timestamp": "2026-07-06T04:40:00.865147+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "PIPELINE_COMPLETE",
         "case_id": "VIGIA-BEN-015",
-        "entry_sha256": "b146e7ef0b0bc8ca402742cc102ace389dab5790262904fc38bf0361ab10a239",
+        "entry_sha256": "d54ad90970e7707134da2f3427bc0eaca89f5a167a566fdd14eb76440298f376",
         "inputs_summary": {
           "iteration": "0"
         },
@@ -81,23 +81,23 @@
         "note": "Pipeline completed \u2014 3 signals",
         "outputs_summary": {
           "abduction": {
-            "best_hypothesis": "NO_SEMIOTIC_ANOMALY_DETECTED",
-            "best_posterior": "49/50",
-            "confidence": "49/50",
+            "best_hypothesis": "SUSPICION_DETECTED",
+            "best_posterior": "9/20",
+            "confidence": "9/20",
             "is_conclusive": "True",
             "narrative": "100 files in /data show identical modification timestamp. It is a VM snapshot restoration after a hardware incident, documented in an infrastructure ticket, affecting 47 users."
           },
           "case_id": "VIGIA-BEN-015",
           "pipeline_meta": {
             "artifact_count": "3",
-            "avg_score": "1/16",
+            "avg_score": "827/1200",
             "ebs_adapter_mode": "motor",
             "expected_verdict": "NOISE",
             "resolve": {
-              "motor_confidence": "0.98",
-              "motor_reason": "Insufficient evidence of malicious intent (score=0.0222)",
-              "motor_score": "0.0222",
-              "motor_verdict": "NOISE",
+              "motor_confidence": "0.45",
+              "motor_reason": "Significant signal with structural support (score=0.2262)",
+              "motor_score": "0.2262",
+              "motor_verdict": "SUSPICION",
               "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
             },
             "source": "ebs_v1_json_adapter"
@@ -105,38 +105,38 @@
           "signals": [
             {
               "artifact_id": "ART-001",
-              "confidence": "3/10",
+              "confidence": "7/10",
               "description": "ls -l /data | 100 files with identical mtime: 2024-05-10 03:47:22 | atime varies | ctime identical | All files from same snapshot",
               "evidence_type": "file_timestamp",
               "source": "legacy_converter",
-              "z_score": "21/400"
+              "z_score": "49/100"
             },
             {
               "artifact_id": "ART-002",
-              "confidence": "3/10",
+              "confidence": "17/20",
               "description": "Infrastructure ticket INF-2024-0551: 'Hardware failure on VM host node-07. 47 VMs affected. Restored from backup snapshot 2024-05-09-23:00.' | Technician: infra_team | Approval: VP Infrastructure | Do",
               "evidence_type": "log_entry",
               "source": "legacy_converter",
-              "z_score": "51/800"
+              "z_score": "289/400"
             },
             {
               "artifact_id": "ART-003",
-              "confidence": "3/10",
+              "confidence": "9/10",
               "description": "Backup system: Veeam | Snapshot: 2024-05-09-23:00 | Restore point: 2024-05-10-03:47 (completion time) | 47 VMs restored simultaneously | All show identical mtime for restored files | atime reflects po",
               "evidence_type": "file_timestamp",
               "source": "legacy_converter",
-              "z_score": "57/800"
+              "z_score": "171/200"
             }
           ]
         },
         "seq": 5,
-        "timestamp": "2026-07-06T02:08:30.956686+00:00",
+        "timestamp": "2026-07-06T04:40:01.650702+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "CONTRADICTION_CHECK",
         "case_id": "VIGIA-BEN-015",
-        "entry_sha256": "eb09fe1011bc6a75aa489737279e37587411a6fb37ab2cea6b5d93cc9db82603",
+        "entry_sha256": "6bf31e10cc46ae6b5e2f531b9dab2e3e8daefb31c14e7c4d96f1f96209dd3df6",
         "inputs_summary": {
           "n_signals": "3"
         },
@@ -147,43 +147,43 @@
           "threshold": "2"
         },
         "seq": 6,
-        "timestamp": "2026-07-06T02:08:30.956794+00:00",
+        "timestamp": "2026-07-06T04:40:01.650934+00:00",
         "tool": "contradiction_detector"
       },
       {
         "action": "AGENT_EXIT",
         "case_id": "VIGIA-BEN-015",
-        "entry_sha256": "406580a6611f26876225c17785950333e9968f5d403d98d3f982fe88857d1836",
+        "entry_sha256": "3d0ae7eee72691810cc08f5b175f15d46b09095d72ff7be8d24d21aa6b98a72d",
         "inputs_summary": {
-          "verdict": "NO_SEMIOTIC_ANOMALY_DETECTED"
+          "verdict": "SUSPICION_DETECTED"
         },
         "iteration": 0,
-        "note": "Exit code 0 (NOISE) \u2014 analysis complete.",
+        "note": "Exit code 3 (INTENT) \u2014 analysis complete.",
         "outputs_summary": {
-          "agent_verdict": "NOISE",
-          "exit_code": "0"
+          "agent_verdict": "INTENT",
+          "exit_code": "3"
         },
         "seq": 7,
-        "timestamp": "2026-07-06T02:08:30.956968+00:00",
+        "timestamp": "2026-07-06T04:40:01.651272+00:00",
         "tool": "vigia_agent"
       }
     ],
-    "start_time": "2026-07-06T02:08:30.911698+00:00",
+    "start_time": "2026-07-06T04:40:00.864057+00:00",
     "total_entries": 7
   },
   "case_id": "VIGIA-BEN-015",
-  "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-BEN-015.json",
-  "evidence_sha256": "e87048ddb56e6040bda63b9fa6a585ab7368914432992ecdae2b762be3431ec4",
+  "evidence_path": "/home/user/vigia-intent-analysis/data/cases/converted/VIGIA-BEN-015.json",
+  "evidence_sha256": "228870ff94a4e42658b831c0de3ffe1a48888926bc1acf788565dcfda318bf1c",
   "iterations_executed": 1,
-  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-BEN-015 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-BEN-015.json\nEvidence SHA-256: e87048ddb56e6040bda63b9fa6a585ab7368914432992ecdae2b762be3431ec4\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: NO_SEMIOTIC_ANOMALY_DETECTED\nPosterior confidence: 49/50\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 3 se\u00f1al(es): 3 primaria(s) de ['legacy_converter'], 0 derivada(s)/no-analizada(s). Top z: Backup system: Veeam | Snapshot: 2024-05=0.07, Infrastructure ticket INF-2024-0551: 'Ha=0.06, ls -l /data | 100 files with identical m=0.05.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: NO_SEMIOTIC_ANOMALY_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\n100 files in /data show identical modification timestamp. It is a VM snapshot restoration after a hardware incident, documented in an infrastructure ticket, affecting 47 users.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Backup system: Veeam | Snapshot: 2024-05-09-23:00 | Restore point: 202] z=0.071 conf=0.30 \u2014 \n  [Infrastructure ticket INF-2024-0551: 'Hardware failure on VM host node] z=0.064 conf=0.30 \u2014 \n  [ls -l /data | 100 files with identical mtime: 2024-05-10 03:47:22 | at] z=0.052 conf=0.30 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 3 | Derived: 0 | Total: 3",
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-BEN-015 ===\nEvidence: /home/user/vigia-intent-analysis/data/cases/converted/VIGIA-BEN-015.json\nEvidence SHA-256: 228870ff94a4e42658b831c0de3ffe1a48888926bc1acf788565dcfda318bf1c\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: SUSPICION_DETECTED\nPosterior confidence: 9/20\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 3 se\u00f1al(es): 3 primaria(s) de ['legacy_converter'], 0 derivada(s)/no-analizada(s). Top z: Backup system: Veeam | Snapshot: 2024-05=0.85, Infrastructure ticket INF-2024-0551: 'Ha=0.72, ls -l /data | 100 files with identical m=0.49.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: SUSPICION_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\n100 files in /data show identical modification timestamp. It is a VM snapshot restoration after a hardware incident, documented in an infrastructure ticket, affecting 47 users.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Backup system: Veeam | Snapshot: 2024-05-09-23:00 | Restore point: 202] z=0.855 conf=0.90 \u2014 \n  [Infrastructure ticket INF-2024-0551: 'Hardware failure on VM host node] z=0.723 conf=0.85 \u2014 \n  [ls -l /data | 100 files with identical mtime: 2024-05-10 03:47:22 | at] z=0.490 conf=0.70 \u2014 \n\n--- FINAL ALERT LEVEL ---\nMEDIUM \u2014 INTENT verdict with individual z-scores below threshold. Alert floored (B-028/B-065): an intent finding cannot present as LOW.\nReconciliation: verdict INTENT rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 3 | Derived: 0 | Total: 3",
   "pipeline_results": {
     "abduction": {
-      "best_hypothesis": "NO_SEMIOTIC_ANOMALY_DETECTED",
-      "best_posterior": "49/50",
+      "best_hypothesis": "SUSPICION_DETECTED",
+      "best_posterior": "9/20",
       "confidence": {
         "__fraction__": true,
-        "den": 50,
-        "num": 49
+        "den": 20,
+        "num": 9
       },
       "is_conclusive": true,
       "narrative": "100 files in /data show identical modification timestamp. It is a VM snapshot restoration after a hardware incident, documented in an infrastructure ticket, affecting 47 users."
@@ -191,14 +191,14 @@
     "case_id": "VIGIA-BEN-015",
     "pipeline_meta": {
       "artifact_count": 3,
-      "avg_score": "1/16",
+      "avg_score": "827/1200",
       "ebs_adapter_mode": "motor",
       "expected_verdict": "NOISE",
       "resolve": {
-        "motor_confidence": "0.98",
-        "motor_reason": "Insufficient evidence of malicious intent (score=0.0222)",
-        "motor_score": "0.0222",
-        "motor_verdict": "NOISE",
+        "motor_confidence": "0.45",
+        "motor_reason": "Significant signal with structural support (score=0.2262)",
+        "motor_score": "0.2262",
+        "motor_verdict": "SUSPICION",
         "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
       },
       "source": "ebs_v1_json_adapter"
@@ -209,31 +209,31 @@
         "confidence": {
           "__fraction__": true,
           "den": 10,
-          "num": 3
+          "num": 7
         },
         "description": "ls -l /data | 100 files with identical mtime: 2024-05-10 03:47:22 | atime varies | ctime identical | All files from same snapshot",
         "evidence_type": "file_timestamp",
         "source": "legacy_converter",
         "z_score": {
           "__fraction__": true,
-          "den": 400,
-          "num": 21
+          "den": 100,
+          "num": 49
         }
       },
       {
         "artifact_id": "ART-002",
         "confidence": {
           "__fraction__": true,
-          "den": 10,
-          "num": 3
+          "den": 20,
+          "num": 17
         },
         "description": "Infrastructure ticket INF-2024-0551: 'Hardware failure on VM host node-07. 47 VMs affected. Restored from backup snapshot 2024-05-09-23:00.' | Technician: infra_team | Approval: VP Infrastructure | Do",
         "evidence_type": "log_entry",
         "source": "legacy_converter",
         "z_score": {
           "__fraction__": true,
-          "den": 800,
-          "num": 51
+          "den": 400,
+          "num": 289
         }
       },
       {
@@ -241,15 +241,15 @@
         "confidence": {
           "__fraction__": true,
           "den": 10,
-          "num": 3
+          "num": 9
         },
         "description": "Backup system: Veeam | Snapshot: 2024-05-09-23:00 | Restore point: 2024-05-10-03:47 (completion time) | 47 VMs restored simultaneously | All show identical mtime for restored files | atime reflects po",
         "evidence_type": "file_timestamp",
         "source": "legacy_converter",
         "z_score": {
           "__fraction__": true,
-          "den": 800,
-          "num": 57
+          "den": 200,
+          "num": 171
         }
       }
     ]

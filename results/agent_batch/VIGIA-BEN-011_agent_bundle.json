@@ -1,17 +1,17 @@
 {
-  "agent_verdict": "NOISE",
-  "analysis_timestamp": "2026-07-06T02:08:30.575612+00:00",
+  "agent_verdict": "INTENT",
+  "analysis_timestamp": "2026-07-06T04:39:57.887298+00:00",
   "audit_trail": {
     "agent_version": "1.0.0-SANS-2026",
     "case_id": "VIGIA-BEN-011",
-    "end_time": "2026-07-06T02:08:30.575617+00:00",
+    "end_time": "2026-07-06T04:39:57.887305+00:00",
     "entries": [
       {
         "action": "AGENT_INITIALIZED",
         "case_id": "VIGIA-BEN-011",
-        "entry_sha256": "c0d8eecb43e23f89fd4510bf90272bf5bc66a0dcaf1a1c430b654415e9ee9138",
+        "entry_sha256": "36650215af17b18237c70249cf4a0fa751bc337f4f82c5c6c947f47d5f0f303c",
         "inputs_summary": {
-          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "agent_file": "/home/user/vigia-intent-analysis/vigia_agent.py",
           "case_id": "VIGIA-BEN-011"
         },
         "iteration": 0,
@@ -21,45 +21,45 @@
           "agent_version": "1.0.0-SANS-2026"
         },
         "seq": 1,
-        "timestamp": "2026-07-06T02:08:30.530495+00:00",
+        "timestamp": "2026-07-06T04:39:57.086615+00:00",
         "tool": "vigia_agent"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-BEN-011",
-        "entry_sha256": "98780e25a9d9fc30b4030686fa819f06f27aab223c79cd3505aef948f7e2bea4",
+        "entry_sha256": "59aa3dd92e350cb732b997c797eea3d22d3460fefa777a19c1e2b8acdf13829c",
         "inputs_summary": {
-          "path": "/home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-BEN-011.json"
+          "path": "/home/user/vigia-intent-analysis/data/cases/converted/VIGIA-BEN-011.json"
         },
         "iteration": 0,
         "note": "Computing SHA-256 of original evidence",
         "outputs_summary": {},
         "seq": 2,
-        "timestamp": "2026-07-06T02:08:30.530582+00:00",
+        "timestamp": "2026-07-06T04:39:57.086838+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-BEN-011",
-        "entry_sha256": "1e3c452c01d305bee922f4f3ce824c077f3ffe20b04cd164c6d2386edba96dde",
+        "entry_sha256": "00a578b478e4a44d0a3448605f41a37efc56184f3c001e1b1b7bae4bbfbce532",
         "inputs_summary": {
-          "path": "/home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-BEN-011.json"
+          "path": "/home/user/vigia-intent-analysis/data/cases/converted/VIGIA-BEN-011.json"
         },
         "iteration": 0,
-        "note": "Evidence verified: cd151d79ede72a4a...",
+        "note": "Evidence verified: 2e4ed272fbd202cd...",
         "outputs_summary": {
-          "sha256": "cd151d79ede72a4a88c490e654ce1357bb2c5dee30ee2fabc12470751500a066"
+          "sha256": "2e4ed272fbd202cdaa6d7c48cf1a747f908c0d3b9d66814855d9720be2ba9823"
         },
         "seq": 3,
-        "timestamp": "2026-07-06T02:08:30.530675+00:00",
+        "timestamp": "2026-07-06T04:39:57.087004+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "PIPELINE_EXECUTE",
         "case_id": "VIGIA-BEN-011",
-        "entry_sha256": "5971d7792e0fd8bb2b831f2dad2886a1b31c06f180d54f947e57850d94ed45f2",
+        "entry_sha256": "4c559b10e298b1518f3267ec2441234b2cdf1215f1ed27faa9c98eb6f15869cb",
         "inputs_summary": {
-          "evidence": "/home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-BEN-011.json",
+          "evidence": "/home/user/vigia-intent-analysis/data/cases/converted/VIGIA-BEN-011.json",
           "iteration": "0",
           "params": {}
         },
@@ -67,13 +67,13 @@
         "note": "Executing pipeline \u2014 iteration 0",
         "outputs_summary": {},
         "seq": 4,
-        "timestamp": "2026-07-06T02:08:30.530779+00:00",
+        "timestamp": "2026-07-06T04:39:57.087305+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "PIPELINE_COMPLETE",
         "case_id": "VIGIA-BEN-011",
-        "entry_sha256": "aac7319ff9025b7e21456109cd003ec6b7739ea9c5fd906734baa853cdac7391",
+        "entry_sha256": "9feec9621caa122e54cc2866fad3fe3aa3b8030d2640fb747cca28fd0629ca27",
         "inputs_summary": {
           "iteration": "0"
         },
@@ -81,23 +81,23 @@
         "note": "Pipeline completed \u2014 3 signals",
         "outputs_summary": {
           "abduction": {
-            "best_hypothesis": "NO_SEMIOTIC_ANOMALY_DETECTED",
-            "best_posterior": "49/50",
-            "confidence": "49/50",
+            "best_hypothesis": "SUSPICION_DETECTED",
+            "best_posterior": "21/50",
+            "confidence": "21/50",
             "is_conclusive": "True",
             "narrative": "USB connected to a finance machine. It is the IT technician updating fiscal printer drivers, with a support ticket, manager authorization, and a procedure checklist."
           },
           "case_id": "VIGIA-BEN-011",
           "pipeline_meta": {
             "artifact_count": "3",
-            "avg_score": "1/16",
+            "avg_score": "827/1200",
             "ebs_adapter_mode": "motor",
             "expected_verdict": "NOISE",
             "resolve": {
-              "motor_confidence": "0.98",
-              "motor_reason": "Insufficient evidence of malicious intent (score=0.0202)",
-              "motor_score": "0.0202",
-              "motor_verdict": "NOISE",
+              "motor_confidence": "0.42",
+              "motor_reason": "Significant signal with structural support (score=0.2098)",
+              "motor_score": "0.2098",
+              "motor_verdict": "SUSPICION",
               "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
             },
             "source": "ebs_v1_json_adapter"
@@ -105,38 +105,38 @@
           "signals": [
             {
               "artifact_id": "ART-001",
-              "confidence": "3/10",
+              "confidence": "7/10",
               "description": "USB inserted: SanDisk Cruzer, S/N 4C530001230512345678 | Time: 2024-04-20 14:30 | User: it.technician (badge: IT-204) | Escorted by: finance.manager | Location: Finance Dept, Desk 12",
               "evidence_type": "log_entry",
               "source": "legacy_converter",
-              "z_score": "21/400"
+              "z_score": "49/100"
             },
             {
               "artifact_id": "ART-002",
-              "confidence": "3/10",
+              "confidence": "17/20",
               "description": "IT ticket SUP-2024-1120: 'HP LaserJet fiscal printer not printing. Requires driver update v3.2.1 from USB (no network on machine per policy).' | Approved by: finance.manager | SLA: 4 hours | Technicia",
               "evidence_type": "file_timestamp",
               "source": "legacy_converter",
-              "z_score": "51/800"
+              "z_score": "289/400"
             },
             {
               "artifact_id": "ART-003",
-              "confidence": "3/10",
+              "confidence": "9/10",
               "description": "lsusb | grep SanDisk | dmesg | tail -20 | mount /dev/sdb1 /mnt/usb | cp /mnt/usb/drivers/hp_lj_fiscal_321.exe /tmp/ | ./hp_lj_fiscal_321.exe /silent | umount /mnt/usb | dmesg | tail -5",
               "evidence_type": "log_entry",
               "source": "legacy_converter",
-              "z_score": "57/800"
+              "z_score": "171/200"
             }
           ]
         },
         "seq": 5,
-        "timestamp": "2026-07-06T02:08:30.575275+00:00",
+        "timestamp": "2026-07-06T04:39:57.886662+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "CONTRADICTION_CHECK",
         "case_id": "VIGIA-BEN-011",
-        "entry_sha256": "091e938a2589e5b8f0675543e313a0ff44d503cded901a5b95e1dc3584dee338",
+        "entry_sha256": "f01a960fc1e002dd7ec2426a365b757f7384c871ff6aa4e383fab25b32bea692",
         "inputs_summary": {
           "n_signals": "3"
         },
@@ -147,43 +147,43 @@
           "threshold": "2"
         },
         "seq": 6,
-        "timestamp": "2026-07-06T02:08:30.575380+00:00",
+        "timestamp": "2026-07-06T04:39:57.886891+00:00",
         "tool": "contradiction_detector"
       },
       {
         "action": "AGENT_EXIT",
         "case_id": "VIGIA-BEN-011",
-        "entry_sha256": "8ee1d5b90ca0666097bf5d469137c66013e9dae4e2e4d87895305b7637e6cc59",
+        "entry_sha256": "ca38eab74bdd20f2629858703601c581bdf8c5e0d15496d2284c965c955e4bed",
         "inputs_summary": {
-          "verdict": "NO_SEMIOTIC_ANOMALY_DETECTED"
+          "verdict": "SUSPICION_DETECTED"
         },
         "iteration": 0,
-        "note": "Exit code 0 (NOISE) \u2014 analysis complete.",
+        "note": "Exit code 3 (INTENT) \u2014 analysis complete.",
         "outputs_summary": {
-          "agent_verdict": "NOISE",
-          "exit_code": "0"
+          "agent_verdict": "INTENT",
+          "exit_code": "3"
         },
         "seq": 7,
-        "timestamp": "2026-07-06T02:08:30.575562+00:00",
+        "timestamp": "2026-07-06T04:39:57.887206+00:00",
         "tool": "vigia_agent"
       }
     ],
-    "start_time": "2026-07-06T02:08:30.530284+00:00",
+    "start_time": "2026-07-06T04:39:57.086064+00:00",
     "total_entries": 7
   },
   "case_id": "VIGIA-BEN-011",
-  "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-BEN-011.json",
-  "evidence_sha256": "cd151d79ede72a4a88c490e654ce1357bb2c5dee30ee2fabc12470751500a066",
+  "evidence_path": "/home/user/vigia-intent-analysis/data/cases/converted/VIGIA-BEN-011.json",
+  "evidence_sha256": "2e4ed272fbd202cdaa6d7c48cf1a747f908c0d3b9d66814855d9720be2ba9823",
   "iterations_executed": 1,
-  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-BEN-011 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-BEN-011.json\nEvidence SHA-256: cd151d79ede72a4a88c490e654ce1357bb2c5dee30ee2fabc12470751500a066\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: NO_SEMIOTIC_ANOMALY_DETECTED\nPosterior confidence: 49/50\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 3 se\u00f1al(es): 3 primaria(s) de ['legacy_converter'], 0 derivada(s)/no-analizada(s). Top z: lsusb | grep SanDisk | dmesg | tail -20 =0.07, IT ticket SUP-2024-1120: 'HP LaserJet fi=0.06, USB inserted: SanDisk Cruzer, S/N 4C5300=0.05.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: NO_SEMIOTIC_ANOMALY_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nUSB connected to a finance machine. It is the IT technician updating fiscal printer drivers, with a support ticket, manager authorization, and a procedure checklist.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [lsusb | grep SanDisk | dmesg | tail -20 | mount /dev/sdb1 /mnt/usb | c] z=0.071 conf=0.30 \u2014 \n  [IT ticket SUP-2024-1120: 'HP LaserJet fiscal printer not printing. Req] z=0.064 conf=0.30 \u2014 \n  [USB inserted: SanDisk Cruzer, S/N 4C530001230512345678 | Time: 2024-04] z=0.052 conf=0.30 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 3 | Derived: 0 | Total: 3",
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-BEN-011 ===\nEvidence: /home/user/vigia-intent-analysis/data/cases/converted/VIGIA-BEN-011.json\nEvidence SHA-256: 2e4ed272fbd202cdaa6d7c48cf1a747f908c0d3b9d66814855d9720be2ba9823\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: SUSPICION_DETECTED\nPosterior confidence: 21/50\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 3 se\u00f1al(es): 3 primaria(s) de ['legacy_converter'], 0 derivada(s)/no-analizada(s). Top z: lsusb | grep SanDisk | dmesg | tail -20 =0.85, IT ticket SUP-2024-1120: 'HP LaserJet fi=0.72, USB inserted: SanDisk Cruzer, S/N 4C5300=0.49.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: SUSPICION_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nUSB connected to a finance machine. It is the IT technician updating fiscal printer drivers, with a support ticket, manager authorization, and a procedure checklist.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [lsusb | grep SanDisk | dmesg | tail -20 | mount /dev/sdb1 /mnt/usb | c] z=0.855 conf=0.90 \u2014 \n  [IT ticket SUP-2024-1120: 'HP LaserJet fiscal printer not printing. Req] z=0.723 conf=0.85 \u2014 \n  [USB inserted: SanDisk Cruzer, S/N 4C530001230512345678 | Time: 2024-04] z=0.490 conf=0.70 \u2014 \n\n--- FINAL ALERT LEVEL ---\nMEDIUM \u2014 INTENT verdict with individual z-scores below threshold. Alert floored (B-028/B-065): an intent finding cannot present as LOW.\nReconciliation: verdict INTENT rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 3 | Derived: 0 | Total: 3",
   "pipeline_results": {
     "abduction": {
-      "best_hypothesis": "NO_SEMIOTIC_ANOMALY_DETECTED",
-      "best_posterior": "49/50",
+      "best_hypothesis": "SUSPICION_DETECTED",
+      "best_posterior": "21/50",
       "confidence": {
         "__fraction__": true,
         "den": 50,
-        "num": 49
+        "num": 21
       },
       "is_conclusive": true,
       "narrative": "USB connected to a finance machine. It is the IT technician updating fiscal printer drivers, with a support ticket, manager authorization, and a procedure checklist."
@@ -191,14 +191,14 @@
     "case_id": "VIGIA-BEN-011",
     "pipeline_meta": {
       "artifact_count": 3,
-      "avg_score": "1/16",
+      "avg_score": "827/1200",
       "ebs_adapter_mode": "motor",
       "expected_verdict": "NOISE",
       "resolve": {
-        "motor_confidence": "0.98",
-        "motor_reason": "Insufficient evidence of malicious intent (score=0.0202)",
-        "motor_score": "0.0202",
-        "motor_verdict": "NOISE",
+        "motor_confidence": "0.42",
+        "motor_reason": "Significant signal with structural support (score=0.2098)",
+        "motor_score": "0.2098",
+        "motor_verdict": "SUSPICION",
         "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
       },
       "source": "ebs_v1_json_adapter"
@@ -209,31 +209,31 @@
         "confidence": {
           "__fraction__": true,
           "den": 10,
-          "num": 3
+          "num": 7
         },
         "description": "USB inserted: SanDisk Cruzer, S/N 4C530001230512345678 | Time: 2024-04-20 14:30 | User: it.technician (badge: IT-204) | Escorted by: finance.manager | Location: Finance Dept, Desk 12",
         "evidence_type": "log_entry",
         "source": "legacy_converter",
         "z_score": {
           "__fraction__": true,
-          "den": 400,
-          "num": 21
+          "den": 100,
+          "num": 49
         }
       },
       {
         "artifact_id": "ART-002",
         "confidence": {
           "__fraction__": true,
-          "den": 10,
-          "num": 3
+          "den": 20,
+          "num": 17
         },
         "description": "IT ticket SUP-2024-1120: 'HP LaserJet fiscal printer not printing. Requires driver update v3.2.1 from USB (no network on machine per policy).' | Approved by: finance.manager | SLA: 4 hours | Technicia",
         "evidence_type": "file_timestamp",
         "source": "legacy_converter",
         "z_score": {
           "__fraction__": true,
-          "den": 800,
-          "num": 51
+          "den": 400,
+          "num": 289
         }
       },
       {
@@ -241,15 +241,15 @@
         "confidence": {
           "__fraction__": true,
           "den": 10,
-          "num": 3
+          "num": 9
         },
         "description": "lsusb | grep SanDisk | dmesg | tail -20 | mount /dev/sdb1 /mnt/usb | cp /mnt/usb/drivers/hp_lj_fiscal_321.exe /tmp/ | ./hp_lj_fiscal_321.exe /silent | umount /mnt/usb | dmesg | tail -5",
         "evidence_type": "log_entry",
         "source": "legacy_converter",
         "z_score": {
           "__fraction__": true,
-          "den": 800,
-          "num": 57
+          "den": 200,
+          "num": 171
         }
       }
     ]

@@ -1,17 +1,17 @@
 {
-  "agent_verdict": "NOISE",
-  "analysis_timestamp": "2026-07-06T02:08:30.000146+00:00",
+  "agent_verdict": "INTENT",
+  "analysis_timestamp": "2026-07-06T04:39:52.258522+00:00",
   "audit_trail": {
     "agent_version": "1.0.0-SANS-2026",
     "case_id": "VIGIA-BEN-005",
-    "end_time": "2026-07-06T02:08:30.000152+00:00",
+    "end_time": "2026-07-06T04:39:52.258530+00:00",
     "entries": [
       {
         "action": "AGENT_INITIALIZED",
         "case_id": "VIGIA-BEN-005",
-        "entry_sha256": "c289e79dcb10c381229399219c7ad41a3ebe92d10710ac8f863f7b2cfadcdd0d",
+        "entry_sha256": "78d5a32feddd47abd6edb48e201f27d7e91776cefc9f08364450858c1bf74d75",
         "inputs_summary": {
-          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "agent_file": "/home/user/vigia-intent-analysis/vigia_agent.py",
           "case_id": "VIGIA-BEN-005"
         },
         "iteration": 0,
@@ -21,45 +21,45 @@
           "agent_version": "1.0.0-SANS-2026"
         },
         "seq": 1,
-        "timestamp": "2026-07-06T02:08:29.954992+00:00",
+        "timestamp": "2026-07-06T04:39:51.464217+00:00",
         "tool": "vigia_agent"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-BEN-005",
-        "entry_sha256": "d428a6ab00675ceb8b6d331aa7e3133dd0697405b94c94dc2c740fef91a3a275",
+        "entry_sha256": "f3fa9c6bfb18814ad24310481e08b550d82962f4e8e4dbee896d7b4475dc3129",
         "inputs_summary": {
-          "path": "/home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-BEN-005.json"
+          "path": "/home/user/vigia-intent-analysis/data/cases/converted/VIGIA-BEN-005.json"
         },
         "iteration": 0,
         "note": "Computing SHA-256 of original evidence",
         "outputs_summary": {},
         "seq": 2,
-        "timestamp": "2026-07-06T02:08:29.955077+00:00",
+        "timestamp": "2026-07-06T04:39:51.464382+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-BEN-005",
-        "entry_sha256": "6bab5df8a988162fa7f96195af62cd0d6f1b4fd5fce5fb2ba1d6a56f8d2de45b",
+        "entry_sha256": "260ed7e1141258cf49b3e40f1c1c79e470d3aac086ab5cdabc073db2e4c09c99",
         "inputs_summary": {
-          "path": "/home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-BEN-005.json"
+          "path": "/home/user/vigia-intent-analysis/data/cases/converted/VIGIA-BEN-005.json"
         },
         "iteration": 0,
-        "note": "Evidence verified: c2cf13749fbff1c5...",
+        "note": "Evidence verified: 0fc4f8d9ab78e2b5...",
         "outputs_summary": {
-          "sha256": "c2cf13749fbff1c5ac7fa81ae8bb85c7f6c700f1657c8972f787fc604c849e23"
+          "sha256": "0fc4f8d9ab78e2b59b8834d57c53d61110118f0f238d571ab84690b2e1f33633"
         },
         "seq": 3,
-        "timestamp": "2026-07-06T02:08:29.955166+00:00",
+        "timestamp": "2026-07-06T04:39:51.464547+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "PIPELINE_EXECUTE",
         "case_id": "VIGIA-BEN-005",
-        "entry_sha256": "e2fe91afb7143dc6148368023561308bc5b92d273841236a0612c09b18f46392",
+        "entry_sha256": "80480b9e7811a9ab4a54c5c31e9ae8cb0693d2244d15440f495f2f68fb75800c",
         "inputs_summary": {
-          "evidence": "/home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-BEN-005.json",
+          "evidence": "/home/user/vigia-intent-analysis/data/cases/converted/VIGIA-BEN-005.json",
           "iteration": "0",
           "params": {}
         },
@@ -67,13 +67,13 @@
         "note": "Executing pipeline \u2014 iteration 0",
         "outputs_summary": {},
         "seq": 4,
-        "timestamp": "2026-07-06T02:08:29.955270+00:00",
+        "timestamp": "2026-07-06T04:39:51.464778+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "PIPELINE_COMPLETE",
         "case_id": "VIGIA-BEN-005",
-        "entry_sha256": "234aa40f0015920b000da9bcc1cfbe7c140b95ce625b86b30f5a2ed86bce437e",
+        "entry_sha256": "6debb050a46b01a588b190cc380d9762ba83a3ac81e783f00722410b6ccf513f",
         "inputs_summary": {
           "iteration": "0"
         },
@@ -81,23 +81,23 @@
         "note": "Pipeline completed \u2014 3 signals",
         "outputs_summary": {
           "abduction": {
-            "best_hypothesis": "NO_SEMIOTIC_ANOMALY_DETECTED",
-            "best_posterior": "49/50",
-            "confidence": "49/50",
+            "best_hypothesis": "SUSPICION_DETECTED",
+            "best_posterior": "11/25",
+            "confidence": "11/25",
             "is_conclusive": "True",
             "narrative": "User with a new mechanical keyboard (different switches) makes 3 typing errors before entering the correct password. The pattern is: error, quick correction, successful login, normal 8-hour activity."
           },
           "case_id": "VIGIA-BEN-005",
           "pipeline_meta": {
             "artifact_count": "3",
-            "avg_score": "1/16",
+            "avg_score": "827/1200",
             "ebs_adapter_mode": "motor",
             "expected_verdict": "NOISE",
             "resolve": {
-              "motor_confidence": "0.98",
-              "motor_reason": "Insufficient evidence of malicious intent (score=0.0207)",
-              "motor_score": "0.0207",
-              "motor_verdict": "NOISE",
+              "motor_confidence": "0.44",
+              "motor_reason": "Significant signal with structural support (score=0.2178)",
+              "motor_score": "0.2178",
+              "motor_verdict": "SUSPICION",
               "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
             },
             "source": "ebs_v1_json_adapter"
@@ -105,38 +105,38 @@
           "signals": [
             {
               "artifact_id": "ART-001",
-              "confidence": "3/10",
+              "confidence": "7/10",
               "description": "2024-03-10 09:05:12 | user: maria.garcia | login attempt 1: FAILED (password mismatch) | 09:05:18 | attempt 2: FAILED | 09:05:25 | attempt 3: SUCCESS | Source IP: 10.0.1.45 (main office)",
               "evidence_type": "log_entry",
               "source": "legacy_converter",
-              "z_score": "21/400"
+              "z_score": "49/100"
             },
             {
               "artifact_id": "ART-002",
-              "confidence": "3/10",
+              "confidence": "17/20",
               "description": "09:05-17:30 | Normal work pattern: Outlook, Excel, Teams, internal sites | No sudo | No external access | No file transfers | Keystroke dynamics: high variance, consistent with new mechanical keyboard",
               "evidence_type": "log_entry",
               "source": "legacy_converter",
-              "z_score": "51/800"
+              "z_score": "289/400"
             },
             {
               "artifact_id": "ART-003",
-              "confidence": "3/10",
+              "confidence": "9/10",
               "description": "IT ticket IT-4492: 'Maria Garcia requests Keychron K2 mechanical keyboard' | Approved: 2024-03-05 | Delivered: 2024-03-08 | Asset tag: KB-2024-044 | Photo of old membrane keyboard in recycling bin",
               "evidence_type": "file_timestamp",
               "source": "legacy_converter",
-              "z_score": "57/800"
+              "z_score": "171/200"
             }
           ]
         },
         "seq": 5,
-        "timestamp": "2026-07-06T02:08:29.999809+00:00",
+        "timestamp": "2026-07-06T04:39:52.257918+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "CONTRADICTION_CHECK",
         "case_id": "VIGIA-BEN-005",
-        "entry_sha256": "f6c87808ccfc01bdcd5faa9092cc617eb5255ad2ae3f3cf3ce49985bf33fe051",
+        "entry_sha256": "7510de5ec28e1eb75d6b85704f156135487f520625c493b0ed28325ed950fa8f",
         "inputs_summary": {
           "n_signals": "3"
         },
@@ -147,43 +147,43 @@
           "threshold": "2"
         },
         "seq": 6,
-        "timestamp": "2026-07-06T02:08:29.999918+00:00",
+        "timestamp": "2026-07-06T04:39:52.258124+00:00",
         "tool": "contradiction_detector"
       },
       {
         "action": "AGENT_EXIT",
         "case_id": "VIGIA-BEN-005",
-        "entry_sha256": "f878b5e38c0e3870be40cdf45c9d5f7a21fa7a9fb4c3c9c9dae9b2163ce836a7",
+        "entry_sha256": "f800daefab228c1f98c52624355edcd34abb31db298d7ff0713057d767181acf",
         "inputs_summary": {
-          "verdict": "NO_SEMIOTIC_ANOMALY_DETECTED"
+          "verdict": "SUSPICION_DETECTED"
         },
         "iteration": 0,
-        "note": "Exit code 0 (NOISE) \u2014 analysis complete.",
+        "note": "Exit code 3 (INTENT) \u2014 analysis complete.",
         "outputs_summary": {
-          "agent_verdict": "NOISE",
-          "exit_code": "0"
+          "agent_verdict": "INTENT",
+          "exit_code": "3"
         },
         "seq": 7,
-        "timestamp": "2026-07-06T02:08:30.000094+00:00",
+        "timestamp": "2026-07-06T04:39:52.258425+00:00",
         "tool": "vigia_agent"
       }
     ],
-    "start_time": "2026-07-06T02:08:29.954789+00:00",
+    "start_time": "2026-07-06T04:39:51.463679+00:00",
     "total_entries": 7
   },
   "case_id": "VIGIA-BEN-005",
-  "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-BEN-005.json",
-  "evidence_sha256": "c2cf13749fbff1c5ac7fa81ae8bb85c7f6c700f1657c8972f787fc604c849e23",
+  "evidence_path": "/home/user/vigia-intent-analysis/data/cases/converted/VIGIA-BEN-005.json",
+  "evidence_sha256": "0fc4f8d9ab78e2b59b8834d57c53d61110118f0f238d571ab84690b2e1f33633",
   "iterations_executed": 1,
-  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-BEN-005 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-BEN-005.json\nEvidence SHA-256: c2cf13749fbff1c5ac7fa81ae8bb85c7f6c700f1657c8972f787fc604c849e23\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: NO_SEMIOTIC_ANOMALY_DETECTED\nPosterior confidence: 49/50\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 3 se\u00f1al(es): 3 primaria(s) de ['legacy_converter'], 0 derivada(s)/no-analizada(s). Top z: IT ticket IT-4492: 'Maria Garcia request=0.07, 09:05-17:30 | Normal work pattern: Outlo=0.06, 2024-03-10 09:05:12 | user: maria.garcia=0.05.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: NO_SEMIOTIC_ANOMALY_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nUser with a new mechanical keyboard (different switches) makes 3 typing errors before entering the correct password. The pattern is: error, quick correction, successful login, normal 8-hour activity.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [IT ticket IT-4492: 'Maria Garcia requests Keychron K2 mechanical keybo] z=0.071 conf=0.30 \u2014 \n  [09:05-17:30 | Normal work pattern: Outlook, Excel, Teams, internal sit] z=0.064 conf=0.30 \u2014 \n  [2024-03-10 09:05:12 | user: maria.garcia | login attempt 1: FAILED (pa] z=0.052 conf=0.30 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 3 | Derived: 0 | Total: 3",
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-BEN-005 ===\nEvidence: /home/user/vigia-intent-analysis/data/cases/converted/VIGIA-BEN-005.json\nEvidence SHA-256: 0fc4f8d9ab78e2b59b8834d57c53d61110118f0f238d571ab84690b2e1f33633\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: SUSPICION_DETECTED\nPosterior confidence: 11/25\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 3 se\u00f1al(es): 3 primaria(s) de ['legacy_converter'], 0 derivada(s)/no-analizada(s). Top z: IT ticket IT-4492: 'Maria Garcia request=0.85, 09:05-17:30 | Normal work pattern: Outlo=0.72, 2024-03-10 09:05:12 | user: maria.garcia=0.49.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: SUSPICION_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nUser with a new mechanical keyboard (different switches) makes 3 typing errors before entering the correct password. The pattern is: error, quick correction, successful login, normal 8-hour activity.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [IT ticket IT-4492: 'Maria Garcia requests Keychron K2 mechanical keybo] z=0.855 conf=0.90 \u2014 \n  [09:05-17:30 | Normal work pattern: Outlook, Excel, Teams, internal sit] z=0.723 conf=0.85 \u2014 \n  [2024-03-10 09:05:12 | user: maria.garcia | login attempt 1: FAILED (pa] z=0.490 conf=0.70 \u2014 \n\n--- FINAL ALERT LEVEL ---\nMEDIUM \u2014 INTENT verdict with individual z-scores below threshold. Alert floored (B-028/B-065): an intent finding cannot present as LOW.\nReconciliation: verdict INTENT rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 3 | Derived: 0 | Total: 3",
   "pipeline_results": {
     "abduction": {
-      "best_hypothesis": "NO_SEMIOTIC_ANOMALY_DETECTED",
-      "best_posterior": "49/50",
+      "best_hypothesis": "SUSPICION_DETECTED",
+      "best_posterior": "11/25",
       "confidence": {
         "__fraction__": true,
-        "den": 50,
-        "num": 49
+        "den": 25,
+        "num": 11
       },
       "is_conclusive": true,
       "narrative": "User with a new mechanical keyboard (different switches) makes 3 typing errors before entering the correct password. The pattern is: error, quick correction, successful login, normal 8-hour activity."
@@ -191,14 +191,14 @@
     "case_id": "VIGIA-BEN-005",
     "pipeline_meta": {
       "artifact_count": 3,
-      "avg_score": "1/16",
+      "avg_score": "827/1200",
       "ebs_adapter_mode": "motor",
       "expected_verdict": "NOISE",
       "resolve": {
-        "motor_confidence": "0.98",
-        "motor_reason": "Insufficient evidence of malicious intent (score=0.0207)",
-        "motor_score": "0.0207",
-        "motor_verdict": "NOISE",
+        "motor_confidence": "0.44",
+        "motor_reason": "Significant signal with structural support (score=0.2178)",
+        "motor_score": "0.2178",
+        "motor_verdict": "SUSPICION",
         "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
       },
       "source": "ebs_v1_json_adapter"
@@ -209,31 +209,31 @@
         "confidence": {
           "__fraction__": true,
           "den": 10,
-          "num": 3
+          "num": 7
         },
         "description": "2024-03-10 09:05:12 | user: maria.garcia | login attempt 1: FAILED (password mismatch) | 09:05:18 | attempt 2: FAILED | 09:05:25 | attempt 3: SUCCESS | Source IP: 10.0.1.45 (main office)",
         "evidence_type": "log_entry",
         "source": "legacy_converter",
         "z_score": {
           "__fraction__": true,
-          "den": 400,
-          "num": 21
+          "den": 100,
+          "num": 49
         }
       },
       {
         "artifact_id": "ART-002",
         "confidence": {
           "__fraction__": true,
-          "den": 10,
-          "num": 3
+          "den": 20,
+          "num": 17
         },
         "description": "09:05-17:30 | Normal work pattern: Outlook, Excel, Teams, internal sites | No sudo | No external access | No file transfers | Keystroke dynamics: high variance, consistent with new mechanical keyboard",
         "evidence_type": "log_entry",
         "source": "legacy_converter",
         "z_score": {
           "__fraction__": true,
-          "den": 800,
-          "num": 51
+          "den": 400,
+          "num": 289
         }
       },
       {
@@ -241,15 +241,15 @@
         "confidence": {
           "__fraction__": true,
           "den": 10,
-          "num": 3
+          "num": 9
         },
         "description": "IT ticket IT-4492: 'Maria Garcia requests Keychron K2 mechanical keyboard' | Approved: 2024-03-05 | Delivered: 2024-03-08 | Asset tag: KB-2024-044 | Photo of old membrane keyboard in recycling bin",
         "evidence_type": "file_timestamp",
         "source": "legacy_converter",
         "z_score": {
           "__fraction__": true,
-          "den": 800,
-          "num": 57
+          "den": 200,
+          "num": 171
         }
       }
     ]

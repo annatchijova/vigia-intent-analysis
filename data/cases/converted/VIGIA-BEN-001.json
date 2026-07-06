@@ -8,8 +8,8 @@
       "evidence_type": "log_entry",
       "source_tool": "legacy_converter",
       "timestamp": "2026-04-10T10:00:00Z",
-      "raw_score": 0.175,
-      "prior_trust": 0.3,
+      "raw_score": 0.7,
+      "prior_trust": 0.7,
       "provenance_chain": [
         "sha256:legacy_ART-001"
       ],
@@ -37,8 +37,8 @@
       "evidence_type": "log_entry",
       "source_tool": "legacy_converter",
       "timestamp": "2026-04-10T10:00:00Z",
-      "raw_score": 0.2125,
-      "prior_trust": 0.3,
+      "raw_score": 0.85,
+      "prior_trust": 0.85,
       "provenance_chain": [
         "sha256:legacy_ART-002"
       ],
@@ -66,8 +66,8 @@
       "evidence_type": "file_timestamp",
       "source_tool": "legacy_converter",
       "timestamp": "2026-04-10T10:00:00Z",
-      "raw_score": 0.2375,
-      "prior_trust": 0.3,
+      "raw_score": 0.95,
+      "prior_trust": 0.9,
       "provenance_chain": [
         "sha256:legacy_ART-003"
       ],
@@ -106,55 +106,64 @@
       "artifact_id": "ART-001",
       "confidence": {
         "__fraction__": true,
-        "den": 10,
-        "num": 3
+        "num": 7,
+        "den": 10
       },
       "description": "[dmitri.volkov@server ~]$ ghbdtn (привет) | [dmitri.volkov@server ~]$ ls -la /var/log | [dmitri.volkov@server ~]$ cnfnbz.py (статья.py)",
       "evidence_type": "log_entry",
       "source": "legacy_converter",
       "z_score": {
         "__fraction__": true,
-        "den": 400,
-        "num": 21
+        "num": 49,
+        "den": 100
       }
     },
     {
       "artifact_id": "ART-002",
       "confidence": {
         "__fraction__": true,
-        "den": 10,
-        "num": 3
+        "num": 17,
+        "den": 20
       },
       "description": "User dmitri.volkov from IP 185.XXX.XXX.XXX (Moscow ISP) | GeoIP: RU | Timezone: Europe/Moscow | Login consistente con horario laboral local (09:00-18:00 MSK)",
       "evidence_type": "log_entry",
       "source": "legacy_converter",
       "z_score": {
         "__fraction__": true,
-        "den": 800,
-        "num": 51
+        "num": 289,
+        "den": 400
       }
     },
     {
       "artifact_id": "ART-003",
       "confidence": {
         "__fraction__": true,
-        "den": 10,
-        "num": 3
+        "num": 9,
+        "den": 10
       },
       "description": "HR record: Dmitri Volkov, Senior SysAdmin, hired 2023-03-15 | Contract: Remote from Moscow | Hardware provisioned: Lenovo with RU keyboard | VPN access: Moscow endpoint",
       "evidence_type": "file_timestamp",
       "source": "legacy_converter",
       "z_score": {
         "__fraction__": true,
-        "den": 800,
-        "num": 57
+        "num": 171,
+        "den": 200
       }
     }
   ],
   "_migration_note": {
-    "date": "2026-07-06",
-    "source": "results/agent_batch/VIGIA-BEN-001_agent_bundle.json",
-    "method": "señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canónica preservada",
-    "n_signals": 3
+    "history": [
+      {
+        "date": "2026-07-06",
+        "source": "results/agent_batch/VIGIA-BEN-001_agent_bundle.json",
+        "method": "señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canónica preservada",
+        "n_signals": 3
+      },
+      {
+        "date": "2026-07-06",
+        "action": "TANDA 4 (H1c, AUDITORIA_FUGA_INDIRECTA): de-reducción x0.25",
+        "detail": "raw_score y prior_trust restaurados a los valores del conversor SIN el bloque is_benign (fuga de etiqueta persistida); signals recomputadas con la misma fórmula del adaptador (z = raw*prior)."
+      }
+    ]
   }
 }

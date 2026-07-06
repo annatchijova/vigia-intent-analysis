@@ -117,8 +117,13 @@ def convert_artifact(art: dict, idx: int) -> dict:
     }
 
 
-def convert_case(case: dict) -> dict:
-    """Convierte un caso completo al schema canónico."""
+def convert_case(case: dict, *, legacy_benign_reduction: bool = False) -> dict:
+    """Convierte un caso completo al schema canónico.
+
+    legacy_benign_reduction: SOLO para reproducir el corpus histórico
+    pre-TANDA-4 (H1c). La conversión NO debe leer la etiqueta para moldear
+    scores — ver bloque en cuarentena abajo.
+    """
     case_id = case.get("case_id", "UNKNOWN")
     name = case.get("case_name", case.get("name", case_id))
 
@@ -146,18 +151,26 @@ def convert_case(case: dict) -> dict:
                   case.get("verdict", "SUSPICION")))
     verdict = VERDICT_MAP.get(str(raw_verdict).upper(), "SUSPICION")
 
-    # Reducir scores para casos benignos — evitar falsos positivos
-    # Misma lógica que normalize_case_schema en vigia_integration_bridge.py
-    is_benign = verdict in ("NOISE", "ABSTAIN")
-    if is_benign:
-        reduced_arts = []
-        for art in canonical_arts:
-            if isinstance(art, dict) and "raw_score" in art:
-                art = dict(art)
-                art["raw_score"] = round(art["raw_score"] * 0.25, 4)
-                art["prior_trust"] = 0.3
-            reduced_arts.append(art)
-        canonical_arts = reduced_arts
+    # CUARENTENA (TANDA 4 / H1c, AUDITORIA_FUGA_INDIRECTA 2026-07-06): la
+    # reducción benigna leía la ETIQUETA ground-truth y dividía los scores ÷4
+    # exactamente cuando la respuesta esperada era benigna — y este script la
+    # PERSISTÍA en los archivos del corpus canónico. La fuga sobrevivía al
+    # fix runtime de B-075/fix-P1 porque vivía en los datos: un run "ciego"
+    # sobre data/cases/converted/ acertaba los 15 BEN no por detección sino
+    # porque el conversor ya conocía la respuesta. Retenida SOLO tras opt-in
+    # explícito para reproducir el corpus histórico pre-fix; nunca para
+    # generar datos de evaluación nuevos.
+    if legacy_benign_reduction:
+        is_benign = verdict in ("NOISE", "ABSTAIN")
+        if is_benign:
+            reduced_arts = []
+            for art in canonical_arts:
+                if isinstance(art, dict) and "raw_score" in art:
+                    art = dict(art)
+                    art["raw_score"] = round(art["raw_score"] * 0.25, 4)
+                    art["prior_trust"] = 0.3
+                reduced_arts.append(art)
+            canonical_arts = reduced_arts
 
     return {
         "case_id": case_id,

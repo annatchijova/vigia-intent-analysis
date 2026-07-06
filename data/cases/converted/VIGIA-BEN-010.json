@@ -8,8 +8,8 @@
       "evidence_type": "log_entry",
       "source_tool": "legacy_converter",
       "timestamp": "2026-04-10T10:00:00Z",
-      "raw_score": 0.175,
-      "prior_trust": 0.3,
+      "raw_score": 0.7,
+      "prior_trust": 0.7,
       "provenance_chain": [
         "sha256:legacy_ART-001"
       ],
@@ -37,8 +37,8 @@
       "evidence_type": "log_entry",
       "source_tool": "legacy_converter",
       "timestamp": "2026-04-10T10:00:00Z",
-      "raw_score": 0.2125,
-      "prior_trust": 0.3,
+      "raw_score": 0.85,
+      "prior_trust": 0.85,
       "provenance_chain": [
         "sha256:legacy_ART-002"
       ],
@@ -66,8 +66,8 @@
       "evidence_type": "log_entry",
       "source_tool": "legacy_converter",
       "timestamp": "2026-04-10T10:00:00Z",
-      "raw_score": 0.2375,
-      "prior_trust": 0.3,
+      "raw_score": 0.95,
+      "prior_trust": 0.9,
       "provenance_chain": [
         "sha256:legacy_ART-003"
       ],
@@ -106,55 +106,64 @@
       "artifact_id": "ART-001",
       "confidence": {
         "__fraction__": true,
-        "den": 10,
-        "num": 3
+        "num": 7,
+        "den": 10
       },
       "description": "From: ceo@company.com | To: cfo@company.com | Subject: URGENT: Q4 Financial Report for investor board meeting | Date: 2024-03-15 08:00 | DKIM: PASS | SPF: PASS | Reply-To: ceo@company.com",
       "evidence_type": "log_entry",
       "source": "legacy_converter",
       "z_score": {
         "__fraction__": true,
-        "den": 400,
-        "num": 21
+        "num": 49,
+        "den": 100
       }
     },
     {
       "artifact_id": "ART-002",
       "confidence": {
         "__fraction__": true,
-        "den": 10,
-        "num": 3
+        "num": 17,
+        "den": 20
       },
       "description": "Calendar event: 'Investor Board Meeting — Q4 Presentation' | Date: 2024-03-15 10:00 | Location: Room A | Attendees: board_members, cfo, ceo | Created: 2024-02-01 by executive_assistant",
       "evidence_type": "log_entry",
       "source": "legacy_converter",
       "z_score": {
         "__fraction__": true,
-        "den": 800,
-        "num": 51
+        "num": 289,
+        "den": 400
       }
     },
     {
       "artifact_id": "ART-003",
       "confidence": {
         "__fraction__": true,
-        "den": 10,
-        "num": 3
+        "num": 9,
+        "den": 10
       },
       "description": "Email thread: 2024-03-08 | ceo→cfo: 'Please prepare Q4 report for board meeting on the 15th' | cfo→ceo: 'OK, I'll have it by the 12th' | 2024-03-12 | cfo→ceo: 'Draft attached' | 2024-03-14 | ceo→cfo: ",
       "evidence_type": "log_entry",
       "source": "legacy_converter",
       "z_score": {
         "__fraction__": true,
-        "den": 800,
-        "num": 57
+        "num": 171,
+        "den": 200
       }
     }
   ],
   "_migration_note": {
-    "date": "2026-07-06",
-    "source": "results/agent_batch/VIGIA-BEN-010_agent_bundle.json",
-    "method": "señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canónica preservada",
-    "n_signals": 3
+    "history": [
+      {
+        "date": "2026-07-06",
+        "source": "results/agent_batch/VIGIA-BEN-010_agent_bundle.json",
+        "method": "señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canónica preservada",
+        "n_signals": 3
+      },
+      {
+        "date": "2026-07-06",
+        "action": "TANDA 4 (H1c, AUDITORIA_FUGA_INDIRECTA): de-reducción x0.25",
+        "detail": "raw_score y prior_trust restaurados a los valores del conversor SIN el bloque is_benign (fuga de etiqueta persistida); signals recomputadas con la misma fórmula del adaptador (z = raw*prior)."
+      }
+    ]
   }
 }

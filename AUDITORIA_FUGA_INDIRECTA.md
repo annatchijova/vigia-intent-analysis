@@ -219,7 +219,7 @@ Medido por barrido de 5001 puntos en [0, 5]: **`INTENT_DETECTED` es inalcanzable
 
 ## PRIORIZACIÓN SUGERIDA (sin implementar — solo derivada de lo medido)
 
-1. **H1c (P1)** — La reducción por etiqueta persistida en `data/cases/converted/` contamina cualquier métrica "ciega" que incluya esos 15+ archivos. Requiere regenerar los convertidos sin el bloque `is_benign` del conversor y re-medir el corpus.
+1. **H1c (P1)** — ✅ **RESUELTO 2026-07-06** (ver Addendum 4). La reducción por etiqueta persistida en `data/cases/converted/` contamina cualquier métrica "ciega" que incluya esos 15+ archivos. Requiere regenerar los convertidos sin el bloque `is_benign` del conversor y re-medir el corpus.
 2. **H1b (P1)** — ✅ **RESUELTO 2026-07-06** (ver Addendum 3). Eliminar (o aislar tras flag de reproducción, patrón B-075) el bloque `is_benign` de `normalize_case_schema`; contamina harness (`run_vigia_case.py`), API y **calibración** (`run_calibration.py`).
 3. **H5-vol3 (P2)** — Rama INTENT muerta + MALICIOUS de fuente única en el adaptador vol3: mismo tipo de hallazgo que el "umbral muerto 3c" de AUDITORIA_MOTOR_SIN_LABEL.
 4. **H3 (P2)** — Endurecer `generate_forensic_hash` al patrón de `read_evidence`/`path_guard` y decidir si el protocolo de custodia exige cross-check hash≡read.
@@ -366,4 +366,40 @@ Nota de honestidad sobre la línea base: 166/198 difiere del 153/199 histórico 
 
 ---
 
-*Auditoría ejecutada sin modificar código en los addenda 1-2. El Addendum 3 introduce el primer cambio de código de esta serie (fix P1/H1b), bajo protocolo completo. Números reproducibles sobre HEAD `849475b` (addenda: `651ca10`, `9a33982`) con los comandos descriptos en cada sección.*
+## ADDENDUM 4 — 2026-07-06 — TANDA 4 APLICADA: PUERTA DE DATOS H1c CERRADA
+
+| Campo | Valor |
+|-------|-------|
+| **Tag de restauración** | `pre-tanda4-h1c-20260706-043436` (local) |
+| **Cambios** | (1) `scripts/convert_legacy_cases.py`: el bloque de reducción benigna quedó en cuarentena tras `legacy_benign_reduction=False` (mismo patrón que el fix P1 del bridge) — la conversión es ciega a la etiqueta por default. (2) Los 15 archivos `data/cases/converted/VIGIA-BEN-*.json` regenerados sin la reducción: `raw_score/0.25` (inversa exacta), `prior_trust` restaurado del mapa Peirce del conversor (0.70/0.85/0.90), el campo derivado `signals` recomputado con la fórmula del adaptador (`z = raw×prior`, codificación Fraction canónica — verificada contra los valores contaminados previos), `_migration_note` ampliada con historia. |
+| **Test** | `tests/test_h1c_converter_label_blind.py` — 13 tests: label-flip a nivel conversor (7 etiquetas parametrizadas → scores idénticos), sin huella de reducción por default, pin del corpus histórico bajo el opt-in, flag inerte para etiquetas maliciosas, los 15 archivos del corpus sin huella, `signals` consistente con los artifacts limpios, y BEN-001 regenerado puntúa honesto. |
+| **Verificación empírica** | Scoring ciego de los 15 regenerados: **SUSPICION×12 / MALICE×3** — exactamente la predicción del Addendum 2 (columna "convertido des-reducido"). |
+| **Suite** | **789 passed, 7 xfailed** (baseline tanda 3: 776+7; +13 de esta tanda). |
+| **Corpus** | `run_all_agent.py --timeout 90` → **152/199 PASS, 47 FAIL**. Delta contra el 167/199 previo: **exactamente −15, cero colaterales** (verificado por diff de case_ids: los 47 fallos = los 32 previos + los 15 BEN). |
+
+### El impacto honesto en el corpus
+
+Los 15 "aciertos" que desaparecen no eran detección: eran el conversor
+escribiendo la respuesta en los datos (÷4 al score porque la etiqueta decía
+benigno). El 152/199 es el primer número del corpus donde ninguna fila
+benigna está pre-resuelta. Los 15 BEN emergen como los falsos positivos
+reales del motor documentados en el Addendum 2 (causa raíz: conversión
+semántica-ciega peirce_layer→score que puntúa alto la evidencia
+exculpatoria) — ese es el backlog de calibración de Fase 2, ahora visible en
+la métrica en lugar de oculto bajo la reducción.
+
+READMEs actualizados (EN+ES): agregado 167/199 → 152/199, corpus de
+detección 146/159 (91.8%) → 131/159 (82.4%) con el segmento benigno 15/15 →
+0/15 explicado, paso de la tanda agregado a la trayectoria del agregado, y
+bloque de output esperado del runner. `SUBMISSION_COMPLIANCE.md`
+intencionalmente sin tocar (registro de lo presentado).
+
+**Residual documentado:** `data/calibration_ladder_dataset_20260705.json`
+(base de B-076) es previo a la regeneración — sus 15 filas BEN conservan los
+scores contaminados. Regenerarlo y re-examinar el umbral 0.10 de B-076 sobre
+datos limpios queda como trabajo de Fase 2 (el Addendum Q1 ya midió que
+BEN-010 limpio cae en la banda delta).
+
+---
+
+*Auditoría ejecutada sin modificar código en los addenda 1-2. El Addendum 3 introduce el primer cambio de código de esta serie (fix P1/H1b); el Addendum 4 cierra la puerta de datos (TANDA 4), ambos bajo protocolo completo. Números reproducibles con los comandos descriptos en cada sección.*
