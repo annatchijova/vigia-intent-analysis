@@ -428,7 +428,11 @@ def _normalize_artifact_legacy(artifact: Dict[str, Any], idx: int) -> Dict[str, 
     return art
 
 
-def normalize_case_schema(case: Dict[str, Any]) -> Dict[str, Any]:
+def normalize_case_schema(
+    case: Dict[str, Any],
+    *,
+    legacy_benign_reduction: bool = False,
+) -> Dict[str, Any]:
     """
     Punto de entrada público del normalizador.
 
@@ -439,6 +443,16 @@ def normalize_case_schema(case: Dict[str, Any]) -> Dict[str, Any]:
 
     Invariante: esta función nunca lanza excepción — los errores de schema
     son responsabilidad de validate_case_schema() que sigue después.
+
+    Invariante (fix P1, AUDITORIA_FUGA_INDIRECTA 2026-07-06): la normalización
+    NO lee `expected_verdict`. La etiqueta ground-truth no puede modificar el
+    input del scoring — hacerlo es fuga de etiqueta (familia B-075): 15/15
+    casos legacy benignos cambiaban de veredicto según la etiqueta estuviera
+    presente (raw_score ×0.25 + prior_trust=0.3).
+
+    legacy_benign_reduction: SOLO para reproducción histórica de bundles
+    generados antes de este fix. Nunca debe activarse en un path que alimente
+    `_vigia_score` ni ningún veredicto. Default False en todos los callers.
     """
     artifacts = case.get("artifacts", [])
     if not isinstance(artifacts, list) or not artifacts:
@@ -468,28 +482,34 @@ def normalize_case_schema(case: Dict[str, Any]) -> Dict[str, Any]:
     ]
     case_out = dict(case)
     case_out["artifacts"] = normalized_arts
-    
-    # FIX: Detectar casos benignos y reducir scores para evitar falsos positivos
-    expected_verdict = case.get("expected_verdict", "").upper()
-    expected_mitre = case.get("expected_mitre_ttps", [])
-    is_benign = (expected_verdict in ("NOISE", "BENIGN", "ABSTAIN") and 
-                 (isinstance(expected_mitre, list) and len(expected_mitre) == 0))
-    
-    if is_benign:
-        logger.info(
-            "[normalize_case_schema] caso '%s': detectado como BENIGNO — reduciendo scores",
-            case.get("case_id", "?"),
-        )
-        for art in case_out["artifacts"]:
-            if isinstance(art, dict) and "raw_score" in art:
-                # Reducir score a 1/3 para casos benignos (evitar falsos positivos)
-                old_score = art["raw_score"]
-                art["raw_score"] = round(old_score * 0.25, 4)
-                art["prior_trust"] = 0.3  # Baja confianza para benignos
-                logger.debug(
-                    "[normalize_case_schema] artifact %s: score %.4f → %.4f (benigno)",
-                    art.get("artifact_id", "?"), old_score, art["raw_score"],
-                )
+
+    # CUARENTENA (fix P1, AUDITORIA_FUGA_INDIRECTA): la reducción benigna leía
+    # la etiqueta ground-truth y dividía los scores ÷4 exactamente cuando la
+    # respuesta esperada era "benigno" — el veredicto dejaba de ser detección.
+    # Se retiene SOLO tras opt-in explícito para reproducir bundles históricos;
+    # jamás en el path de scoring.
+    if legacy_benign_reduction:
+        expected_verdict = case.get("expected_verdict", "").upper()
+        expected_mitre = case.get("expected_mitre_ttps", [])
+        is_benign = (expected_verdict in ("NOISE", "BENIGN", "ABSTAIN") and
+                     (isinstance(expected_mitre, list) and len(expected_mitre) == 0))
+
+        if is_benign:
+            logger.warning(
+                "[normalize_case_schema] caso '%s': legacy_benign_reduction ACTIVO — "
+                "scores reducidos por etiqueta (solo reproducción histórica, "
+                "NO usar para veredictos)",
+                case.get("case_id", "?"),
+            )
+            for art in case_out["artifacts"]:
+                if isinstance(art, dict) and "raw_score" in art:
+                    old_score = art["raw_score"]
+                    art["raw_score"] = round(old_score * 0.25, 4)
+                    art["prior_trust"] = 0.3
+                    logger.debug(
+                        "[normalize_case_schema] artifact %s: score %.4f → %.4f (benigno)",
+                        art.get("artifact_id", "?"), old_score, art["raw_score"],
+                    )
 
     return case_out
 

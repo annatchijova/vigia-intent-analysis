@@ -220,7 +220,7 @@ Medido por barrido de 5001 puntos en [0, 5]: **`INTENT_DETECTED` es inalcanzable
 ## PRIORIZACIÓN SUGERIDA (sin implementar — solo derivada de lo medido)
 
 1. **H1c (P1)** — La reducción por etiqueta persistida en `data/cases/converted/` contamina cualquier métrica "ciega" que incluya esos 15+ archivos. Requiere regenerar los convertidos sin el bloque `is_benign` del conversor y re-medir el corpus.
-2. **H1b (P1)** — Eliminar (o aislar tras flag de reproducción, patrón B-075) el bloque `is_benign` de `normalize_case_schema`; contamina harness (`run_vigia_case.py`), API y **calibración** (`run_calibration.py`).
+2. **H1b (P1)** — ✅ **RESUELTO 2026-07-06** (ver Addendum 3). Eliminar (o aislar tras flag de reproducción, patrón B-075) el bloque `is_benign` de `normalize_case_schema`; contamina harness (`run_vigia_case.py`), API y **calibración** (`run_calibration.py`).
 3. **H5-vol3 (P2)** — Rama INTENT muerta + MALICIOUS de fuente única en el adaptador vol3: mismo tipo de hallazgo que el "umbral muerto 3c" de AUDITORIA_MOTOR_SIN_LABEL.
 4. **H3 (P2)** — Endurecer `generate_forensic_hash` al patrón de `read_evidence`/`path_guard` y decidir si el protocolo de custodia exige cross-check hash≡read.
 5. **H5-mobile / H4 (P3)** — Documentar (o corregir) la banda muerta del peldaño 3.0; borrar o archivar las copias muertas divergentes.
@@ -350,4 +350,20 @@ Nota de honestidad sobre la línea base: 166/198 difiere del 153/199 histórico 
 
 ---
 
-*Auditoría ejecutada sin modificar código. Todos los números provienen de ejecuciones reproducibles sobre HEAD `849475b` (addenda: `651ca10`) con los comandos descriptos en cada sección.*
+## ADDENDUM 3 — 2026-07-06 — FIX P1 APLICADO: CUARENTENA DEL BLOQUE is_benign (H1b)
+
+| Campo | Valor |
+|-------|-------|
+| **Tag de restauración** | `pre-session-20260706-030212` (local) |
+| **Archivo** | `vigia/pipeline/vigia_integration_bridge.py` — `normalize_case_schema()` |
+| **Fix** | El bloque de reducción benigna (`raw_score×0.25` + `prior_trust=0.3` cuando la etiqueta es NOISE/BENIGN/ABSTAIN) quedó tras el parámetro keyword-only `legacy_benign_reduction=False`. Default False en TODOS los callers — la normalización ya no lee `expected_verdict` en ningún path que alimente `_vigia_score`. El opt-in existe solo para reproducir bundles históricos pre-fix y emite `logger.warning` al activarse. |
+| **Test** | `tests/test_label_leak_normalize_case_schema.py` — 12 tests: label-flip no cambia artefactos (5 etiquetas parametrizadas), `_vigia_score` invariante a la etiqueta (sintético + BEN-001 real), pin del comportamiento histórico bajo el flag, flag inerte para etiquetas no benignas y para schema canónico. 12/12 verdes. |
+| **Verificación empírica** | Los 15 casos VIGIA-BEN re-medidos post-fix: **0/15 flips** (pre-fix: 15/15). Con y sin etiqueta: mismo veredicto y mismo score (SUSPICION×12, MALICE×3 — los FPs honestos del Addendum 2, ahora visibles también con la etiqueta presente). |
+| **Corpus** | `python3 run_all_agent.py --timeout 90` → **167/199 PASS, 32 FAIL** — idéntico al valor documentado en README; 0 regresiones (esperado: el path del agente ya era blind por B-075, y los archivos convertidos aún portan la reducción persistida — H1c sigue abierto). |
+| **Suite** | **731 passed, 7 xfailed** con el comando documentado (`pytest tests/ vigia/tests/ --ignore=tests/integration`) — línea base pre-fix: 719 passed / 7 xfailed; los 12 nuevos son los tests de este fix. Los 2 errores de colección iniciales eran `ModuleNotFoundError` del entorno (`psutil`, `mcp` — pre-existentes, idénticos con el fix stasheado), resueltos instalando dependencias. |
+
+**Efecto colateral documentado:** los callers del harness (`tests/run_vigia_case.py`, `vigia_api.py`, `scripts/run_vigia_full.py`, `scripts/run_calibration.py`, `show_4_hashes.py`) dejan de aplicar la reducción — sus resultados sobre los 15 BEN *originales* (legacy) pasan a mostrar los FPs reales del motor en lugar de NOISE fabricado. Es el estado honesto; la mitigación real de esos FPs es trabajo de calibración Fase 2 (Addendum 2). Una futura re-calibración del LRCalibrator (`run_calibration.py`) ya no heredará la puerta runtime; la puerta de datos (H1c, archivos convertidos) sigue pendiente.
+
+---
+
+*Auditoría ejecutada sin modificar código en los addenda 1-2. El Addendum 3 introduce el primer cambio de código de esta serie (fix P1/H1b), bajo protocolo completo. Números reproducibles sobre HEAD `849475b` (addenda: `651ca10`, `9a33982`) con los comandos descriptos en cada sección.*
