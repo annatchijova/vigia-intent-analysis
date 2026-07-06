@@ -952,8 +952,46 @@ class SIFTOrchestrator:
             avg   = sum(self._frac(s["z_score"]) for s in signals) / n_sig
         else:
             avg = Fraction(0, 1)
-        is_malice = avg > Fraction(33, 100)
-        logger.info("[VOL3] Memory analysis complete: %d signals, avg_score=%s", len(signals), str(avg))
+
+        # ── TANDA 3 (H5, AUDITORIA_FUGA_INDIRECTA) — escalera corregida ────
+        # Pre-fix: `avg > 1/3 → MALICIOUS` con `INTENT si avg > 1/2` evaluado
+        # DESPUÉS — orden de umbrales invertido respecto a la severidad:
+        # INTENT_DETECTED era estructuralmente inalcanzable (exigía avg>1/2
+        # tras haber fallado avg>1/3; verificado por barrido de 5001 puntos).
+        # Además una SOLA señal (p.ej. inyección z=3.5) emitía la hipótesis
+        # MALICIOUS — contra la doctrina de 2 fuentes (misma barra que
+        # _mobile_hypothesis y el gate Daubert del scorer B-068/B-070).
+        # Post-fix, mismos umbrales que _mobile_hypothesis (z>3 crítico,
+        # z>2 sospecha; estrictos):
+        #   ≥2 señales z>3 → MALICIOUS_INTENT_DETECTED (gate de 2 fuentes)
+        #   max_z > 3      → INTENT_DETECTED (ahora alcanzable: 1 señal 3.5)
+        #   señal débil    → SUSPICION_DETECTED (banda pre-fix conservada:
+        #                    cualquier señal no nula sigue siendo al menos
+        #                    sospecha — sin cambio en esa banda)
+        #   sin señal / 0  → NO_SEMIOTIC_ANOMALY_DETECTED
+        # Nota de alcance: n_critical cuenta señales (hallazgos de plugins
+        # distintos sobre la misma imagen), el mismo criterio que el path
+        # mobile usa para dispositivos. La independencia plena de fuente la
+        # arbitra aguas abajo el gate B-068 del scorer sobre clases DEVICE.
+        z_values = [abs(self._frac(s["z_score"])) for s in signals]
+        max_z = max(z_values) if z_values else Fraction(0, 1)
+        n_critical = sum(1 for z in z_values if z > Fraction(3, 1))
+
+        if n_critical >= 2:
+            hypothesis = "MALICIOUS_INTENT_DETECTED"
+        elif max_z > Fraction(3, 1):
+            hypothesis = "INTENT_DETECTED"
+        elif max_z > Fraction(2, 1):
+            hypothesis = "SUSPICION_DETECTED"
+        elif avg == Fraction(0, 1):
+            hypothesis = "NO_SEMIOTIC_ANOMALY_DETECTED"
+        else:
+            hypothesis = "SUSPICION_DETECTED"
+
+        logger.info(
+            "[VOL3] Memory analysis complete: %d signals, avg_score=%s, max_z=%s, n_critical=%d → %s",
+            len(signals), str(avg), str(max_z), n_critical, hypothesis,
+        )
         # Confidence: clampear y calcular en Fraction
         # FIX P2 (Kimi post-patch-v2): normalizar confidence [0,1] con Z_CLIP_MAX=5
         _Z_MAX_VOL = Fraction(5, 1)
@@ -963,14 +1001,17 @@ class SIFTOrchestrator:
             "case_id": self.case_id,
             "signals": signals,
             "abduction": {
-                "best_hypothesis": "MALICIOUS_INTENT_DETECTED" if is_malice else "NO_SEMIOTIC_ANOMALY_DETECTED" if avg == Fraction(0, 1) else "INTENT_DETECTED" if avg > Fraction(5, 10) else "SUSPICION_DETECTED",
+                "best_hypothesis": hypothesis,
                 # FIX P2: Fraction puro — sin float
                 # B-027 FIX: este path nunca produce hipótesis ABSTAIN hoy,
                 # pero el flag queda condicionado por coherencia (si la
                 # escalera de hipótesis incorporara ABSTAIN, el flag no puede
                 # quedar en True). Los paths UNANALYZED/FORMAT_NOT_SUPPORTED
                 # de arriba ya emiten is_conclusive=False explícito.
-                "is_conclusive": avg > Fraction(3, 2),
+                # TANDA 3: conclusivo = al menos una señal crítica (max_z>3),
+                # espejo exacto de _mobile_hypothesis (antes: avg > 3/2,
+                # escala inconsistente con el resto de la escalera).
+                "is_conclusive": max_z > Fraction(3, 1),
                 "confidence": conf_vol3,
                 "best_posterior": str(conf_vol3),
                 # F8 (N12): el texto de cierre coincide con la hipótesis. Antes
@@ -981,13 +1022,17 @@ class SIFTOrchestrator:
                     f"Volatility3 memory analysis: {len(signals)} signals from "
                     f"{Path(memory_path).name}. "
                     f"Average intentionality score: {avg.numerator}/{avg.denominator}. "
-                    + ("Malicious activity indicated." if is_malice
-                       else ("No signals extracted — analysis produced no reviewable "
-                             "output; absence of extraction output is not evidence "
-                             "of benignity." if not signals
-                             else ("No anomalous signals above threshold — nothing "
-                                   "to review in this image." if avg == Fraction(0, 1)
-                                   else "Suspicious activity — requires human review.")))
+                    + (f"Malicious activity indicated ({n_critical} critical signals — "
+                       "two-source gate satisfied)." if hypothesis == "MALICIOUS_INTENT_DETECTED"
+                       else ("Deliberate-intent signal from a single critical finding — "
+                             "corroboration by a second source required for MALICE."
+                             if hypothesis == "INTENT_DETECTED"
+                             else ("No signals extracted — analysis produced no reviewable "
+                                   "output; absence of extraction output is not evidence "
+                                   "of benignity." if not signals
+                                   else ("No anomalous signals above threshold — nothing "
+                                         "to review in this image." if avg == Fraction(0, 1)
+                                         else "Suspicious activity — requires human review."))))
                 ),
             },
             "pipeline_meta": {
@@ -995,6 +1040,10 @@ class SIFTOrchestrator:
                 "memory_path": str(memory_path),
                 "signal_count": len(signals),
                 "avg_score": avg,
+                # TANDA 3: trazabilidad de la escalera — qué decidió y por qué
+                "max_z": max_z,
+                "n_critical_signals": n_critical,
+                "ladder": "mobile_hypothesis_thresholds_v2 (z>3 critical, z>2 suspicion, 2-source gate)",
                 "vol3_binary": _VOL3,
             },
         }
