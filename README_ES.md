@@ -707,19 +707,30 @@ Estos números no están inflados. Reflejan resultados en un corpus específico,
 > la etiqueta removida (`VIGIA_EBS_RESOLVE=motor`, ahora el default), y la métrica del
 > corpus mide **detección real ciega a la etiqueta**:
 >
-> **`run_all_agent.py` sobre el corpus JSON de 199 casos: 167/199 (83.9%) —
-> ciego a la etiqueta, distribución idéntica a la del scorer standalone corriendo
-> ciego.** Trayectoria, cada paso con gate: el flip B-075 quedó en 143/199; B-076
-> calibró el umbral SUSPICION contra el dataset de ground truth de 198 casos
-> (`data/calibration_ladder_dataset_20260705.json`): +10, cero regresiones
-> (153/199); las decisiones de doctrina del 2026-07-05 sumaron +14 (el comparador
-> acepta MALICE-donde-INTENT como sobre-severidad — el ladder del motor no tiene
-> escalón INTENT — nunca al revés; etiquetas sintéticas de AMB-001/002 revisadas
-> ABSTAIN→NOISE según el diseño documentado L-012, corpus real intacto). De los 32
-> desacuerdos restantes, la mayoría son de severidad adyacente; los errores duros
-> de dirección son ~7 (2 FP + 5 FN). Esos 32 son el backlog de calibración
-> abierto. Metodología completa, prueba de invariancia al label-flip y análisis
-> por cluster: [`docs/FASE1_RESOLVE_EBS.md`](./docs/FASE1_RESOLVE_EBS.md) y
+> **`run_all_agent.py` sobre el corpus JSON de 199 casos — agregado: 167/199
+> (83.9%), ciego a la etiqueta, distribución idéntica a la del scorer standalone
+> corriendo ciego.** Ese agregado NO es una cifra de precisión por sí solo: el
+> corpus mezcla deliberadamente conjuntos de evaluación con propósitos distintos —
+> incluyendo suites adversariales *diseñadas para romper el sistema* y casos de
+> frontera epistémica — y deben leerse por separado (segmentación desde el dataset
+> de ground truth, 2026-07-06):
+>
+> | Segmento | Casos | Ciego a etiqueta | Lectura |
+> |---|---|---|---|
+> | **Corpus de detección** (canónico 61, benigno 15, FLARE-ON CTF 10, real/convertido 51, demo 4, otros 18) | **159** | **146/159 (91.8%)** | **la métrica de precisión de este camino** — canónico 61/61, benigno 15/15, FLARE-ON 10/10; los 13 fallos son mayormente severidad adyacente (MALICE→SUSPICION) en casos reales/convertidos |
+> | Suites adversariales (BREAK 16, KIWI 7, suite FN 3, suite FP 5) | 31 | 18/31 | Material del Dominio C, *diseñado para romper*: sus fallos SON los límites documentados (L-014 constelaciones emergentes, L-016 consenso de confianza, FP de cultural_marker) — datos de resistencia, no precisión |
+> | Frontera epistémica / intake ABSTAIN | 8 | 2/8 | revisión de etiquetas pendiente (FASE2 §5): el motor limpia casos cuyas etiquetas los declaran indecidibles |
+> | Caso agregado pipeline-error | 1 | 1/1 | agregado legacy con forma de lista, expected UNKNOWN |
+>
+> Trayectoria del agregado honesto, cada paso con gate: el flip B-075 quedó en
+> 143/199; B-076 calibró el umbral SUSPICION contra el dataset de ground truth de
+> 198 casos (`data/calibration_ladder_dataset_20260705.json`): +10, cero
+> regresiones (153/199); las decisiones de doctrina del 2026-07-05 sumaron +14 (el
+> comparador acepta MALICE-donde-INTENT como sobre-severidad — el ladder del motor
+> no tiene escalón INTENT — nunca al revés; etiquetas sintéticas de AMB-001/002
+> revisadas ABSTAIN→NOISE según el diseño documentado L-012, corpus real intacto).
+> Metodología completa, prueba de invariancia al label-flip y análisis por
+> cluster: [`docs/FASE1_RESOLVE_EBS.md`](./docs/FASE1_RESOLVE_EBS.md) y
 > [`docs/FASE2_DATASET_CALIBRACION.md`](./docs/FASE2_DATASET_CALIBRACION.md).
 >
 > Las tasas pre-B-075 de este camino (p.ej. "129/129", "165/167") medían
@@ -731,26 +742,37 @@ Estos números no están inflados. Reflejan resultados en un corpus específico,
 > cifras mostradas reflejan el corpus al momento de la última actualización y pueden
 > subestimar la cobertura actual.
 
-**VIGÍA opera en tres modos distintos con perfiles de precisión diferentes:**
+**VIGÍA opera en tres modos distintos, y sus números NO son comparables entre sí —
+cada modo llega a la evidencia de manera diferente:**
 
-**Dominio A — Claude Code / MCP (evidencia forense raw):** Pipeline completo. Probado
-en imágenes de disco E01 reales, volcados de memoria y archivos de logs. Este es el
-modo de investigación principal. **Las cifras de precisión en este README reflejan el
-Dominio A.**
+**Dominio A — Claude Code / MCP (evidencia forense raw):** Pipeline completo, modo de
+investigación principal. **Todo artefacto pasa por la cadena de extracción MCP**
+(hash → lectura → entropía → búsqueda de patrones → inferencia de intención), así que
+todo tipo de evidencia alcanza los motores de análisis. Probado en imágenes E01
+reales, volcados de memoria y archivos de logs. Sus resultados son
+**investigaciones por caso** documentadas en `evidence/` y `results/` — este modo no
+tiene un número único de corpus.
 
 **Dominio B — Agente autónomo, casos pre-procesados en JSON:** Runner batch sobre
-bundles de casos estructurados. **Detección ciega a la etiqueta: 167/199** desde
-B-075/B-076 + las decisiones de doctrina del 2026-07-05; la cifra anterior 165/167
-medía reproducción de etiqueta (ver la nota de cambio de métrica arriba).
+bundles EBS estructurados — es el ÚNICO modo con número de corpus, la métrica
+segmentada de la nota de arriba (**corpus de detección: 146/159, 91.8%**; agregado
+167/199). Desde B-075 el veredicto sale del scorer determinista ciego a la etiqueta;
+la cifra anterior 165/167 medía reproducción de etiqueta (ver la nota de cambio de
+métrica).
 
-**Dominio C — Agente autónomo, evidencia raw (E01/evtx):** El agente ahora produce
-correctamente INTENT/SUSPICION (exit code 3) para evidencia de disco Windows en modo
-RAW. B-032 (bug de routing `event_logs`) y B-036 (threshold `z>5.0` imposible) han
-sido resueltos. Ver [L-036](./KNOWN_LIMITATIONS.md) para el override de hipótesis
+**Dominio C — Agente autónomo, evidencia raw (E01/evtx):** El agente parsea
+artefactos raw directamente (MFT, prefetch, browser, event logs, pcap, memoria vía
+vol3), pero **la cobertura es parcial por diseño: algunas clases de artefacto todavía
+no alcanzan los motores** (los hives de registro USB/shellbag/amcache son stubs
+honestos que abstienen; ver `KNOWN_LIMITATIONS.md`). Un caso cuya señal vive en una
+clase no cubierta degrada a ABSTAIN en vez de producir un NOISE falso (patrón
+F7/P1-E). B-032 (routing de `event_logs`) y B-036 (threshold `z>5.0` imposible)
+están resueltos; ver [L-036](./KNOWN_LIMITATIONS.md) para el override de hipótesis
 basado en señales.
 
-> El porcentaje de precisión mostrado a continuación aplica **solo al Dominio B**.
-> Los resultados del Dominio A están documentados por caso en `evidence/` y `results/`.
+> Los porcentajes de corpus de arriba aplican **solo al Dominio B**. Los resultados
+> del Dominio A están documentados por caso en `evidence/` y `results/`; los límites
+> de cobertura del Dominio C están documentados en `KNOWN_LIMITATIONS.md`.
 
 ---
 
@@ -1313,15 +1335,27 @@ por completo.
 
 ---
 
-### Dominio A — 129/129 precisión determinista
+### Detección ciega a la etiqueta — métrica segmentada del corpus (actualizado 2026-07-06)
 
-**Afirmación:** 129 casos, 100% correctos en modo fallback (sin API key, sin LLM).
+**Afirmación (vigente, post-B-075/B-076):** corpus de detección 146/159 (91.8%);
+agregado del corpus mixto completo 167/199 — segmentación en la NOTA DE PRECISIÓN
+de arriba. El claim histórico "129/129, 100%" medía reproducción de etiqueta (fuga
+P2-C pre-B-075) y se conserva solo como registro histórico.
 
 ```bash
-python3 run_all_agent.py --timeout 90
+python3 run_all_agent.py --timeout 90          # bundles sellados en cache (rápido)
+python3 run_all_agent.py --timeout 90 --rerun  # re-ejecución completa
 ```
 
-`run_all_agent.py` ejecuta los 147 casos (Dominio A + B + C combinados).
+`run_all_agent.py` ejecuta los 199 casos del corpus (conjuntos de detección +
+adversarial + frontera combinados) e imprime un censo de procedencia del cache.
+
+Salida esperada (agregado sobre el corpus mixto):
+```
+Results: 167/199 PASS  32 FAIL
+Cache: 199/199 desde bundle sellado (motor: 198, pre-B075: 1)
+```
+Salida histórica pre-B-075 (eco de etiqueta — conservada como registro):
 
 Salida esperada:
 ```

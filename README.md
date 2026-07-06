@@ -706,19 +706,30 @@ These numbers are not inflated. They reflect results on a specific, diverse, doc
 > now the default), and the corpus metric measures **real label-blind
 > detection**:
 >
-> **`run_all_agent.py` over the 199-case JSON corpus: 167/199 (83.9%) —
-> label-blind, distribution identical to the standalone scorer run blind.**
-> Trajectory, every step gated: the B-075 flip landed at 143/199; B-076
-> calibrated the SUSPICION threshold against the 198-case ground-truth
-> dataset (`data/calibration_ladder_dataset_20260705.json`): +10, zero
-> regressions (153/199); the 2026-07-05 doctrine decisions added +14
-> (comparator accepts MALICE-where-INTENT as over-severity since the motor
-> ladder has no INTENT rung — never the reverse; synthetic AMB-001/002
+> **`run_all_agent.py` over the 199-case JSON corpus — aggregate: 167/199
+> (83.9%), label-blind, distribution identical to the standalone scorer run
+> blind.** That aggregate is NOT an accuracy figure on its own: the corpus
+> deliberately mixes evaluation sets with different purposes — including
+> adversarial suites *designed to break the system* and epistemic-boundary
+> cases — and they must be read separately (segmentation from the
+> ground-truth dataset, 2026-07-06):
+>
+> | Segment | Cases | Label-blind | Reading |
+> |---|---|---|---|
+> | **Detection corpus** (canonical 61, benign 15, FLARE-ON CTF 10, real/converted 51, demo 4, other 18) | **159** | **146/159 (91.8%)** | **the accuracy-bearing metric for this path** — canonical 61/61, benign 15/15, FLARE-ON 10/10; the 13 misses are mostly adjacent-severity (MALICE→SUSPICION) on real/converted cases |
+> | Adversarial suites (BREAK 16, KIWI 7, FN-suite 3, FP-suite 5) | 31 | 18/31 | Domain C material, *designed to break*: failures here ARE the documented limits (L-014 emergent constellations, L-016 trust consensus, cultural_marker FP) — resistance data, not accuracy |
+> | Epistemic boundary / intake ABSTAIN | 8 | 2/8 | label review pending (FASE2 §5): the motor clears cases whose labels declare them undecidable |
+> | Aggregate pipeline-error case | 1 | 1/1 | list-shaped legacy aggregate, expected UNKNOWN |
+>
+> Trajectory of the honest aggregate, every step gated: the B-075 flip landed
+> at 143/199; B-076 calibrated the SUSPICION threshold against the 198-case
+> ground-truth dataset (`data/calibration_ladder_dataset_20260705.json`):
+> +10, zero regressions (153/199); the 2026-07-05 doctrine decisions added
+> +14 (comparator accepts MALICE-where-INTENT as over-severity since the
+> motor ladder has no INTENT rung — never the reverse; synthetic AMB-001/002
 > labels revised ABSTAIN→NOISE per the documented L-012 design, real-corpus
-> labels untouched). Of the 32 remaining disagreements, most are
-> adjacent-severity; hard direction errors are ~7 (2 FP + 5 FN). These 32
-> are the open calibration backlog. Full methodology, label-flip invariance
-> proof, and per-cluster analysis:
+> labels untouched). Full methodology, label-flip invariance proof, and
+> per-cluster analysis:
 > [`docs/FASE1_RESOLVE_EBS.md`](./docs/FASE1_RESOLVE_EBS.md) and
 > [`docs/FASE2_DATASET_CALIBRACION.md`](./docs/FASE2_DATASET_CALIBRACION.md).
 >
@@ -730,24 +741,34 @@ These numbers are not inflated. They reflect results on a specific, diverse, doc
 > raw-evidence (E01/evtx) investigations. The figures shown reflect the corpus at the
 > time of last update and may undercount current coverage.
 
-**VIGÍA operates across three distinct modes with different accuracy profiles:**
+**VIGÍA operates across three distinct modes, and their numbers are NOT comparable
+with each other — each mode reaches the evidence differently:**
 
-**Domain A — Claude Code / MCP mode (raw forensic evidence):** Full pipeline. Tested
-on real-world E01 disk images, memory dumps, and log archives. This is the primary
-investigative mode. **Accuracy figures in this README reflect Domain A.**
+**Domain A — Claude Code / MCP mode (raw forensic evidence):** Full pipeline, primary
+investigative mode. **Every artifact flows through the MCP extraction toolchain**
+(hash → read → entropy → pattern search → intent inference), so every evidence type
+reaches the analysis engines. Tested on real-world E01 disk images, memory dumps, and
+log archives. Its results are **per-case investigations** documented in `evidence/`
+and `results/` — there is no single corpus number for this mode.
 
-**Domain B — Autonomous agent, JSON pre-processed cases:** Batch runner over structured
-case bundles. **167/199 label-blind detection** since B-075/B-076 + the 2026-07-05
-doctrine decisions; the previous 165/167 figure measured label reproduction (see
-metric change note above).
+**Domain B — Autonomous agent, JSON pre-processed cases:** Batch runner over
+structured EBS case bundles — this is the ONLY mode with a corpus-wide number, the
+segmented metric in the note above (**detection corpus: 146/159, 91.8%**; aggregate
+167/199). Since B-075 the verdict comes from the label-blind deterministic scorer;
+the previous 165/167 figure measured label reproduction (see metric change note).
 
-**Domain C — Autonomous agent, raw evidence (E01/evtx):** The agent now correctly
-produces INTENT/SUSPICION (exit code 3) for Windows disk evidence in RAW mode.
-B-032 (`event_logs` routing bug) and B-036 (`z>5.0` impossible threshold) have been
-resolved. See [L-036](./KNOWN_LIMITATIONS.md) for the signal-based hypothesis override.
+**Domain C — Autonomous agent, raw evidence (E01/evtx):** The agent parses raw
+artifacts directly (MFT, prefetch, browser, event logs, pcap, memory via vol3), but
+**coverage is partial by design: some artifact classes do not reach the engines yet**
+(USB/shellbag/amcache registry hives are honest ABSTAIN stubs; see
+`KNOWN_LIMITATIONS.md`). Cases whose signal lives in an uncovered class degrade to
+ABSTAIN rather than producing a false NOISE (F7/P1-E pattern). B-032 (`event_logs`
+routing) and B-036 (`z>5.0` impossible threshold) are resolved; see
+[L-036](./KNOWN_LIMITATIONS.md) for the signal-based hypothesis override.
 
-> The accuracy percentage shown below applies to **Domain B only**. Domain A results are
-> documented per-case in `evidence/` and `results/`.
+> The corpus percentages above apply to **Domain B only**. Domain A results are
+> documented per-case in `evidence/` and `results/`; Domain C coverage limits are
+> documented in `KNOWN_LIMITATIONS.md`.
 
 ---
 
@@ -1305,17 +1326,27 @@ or benchmark reports, this section can be ignored entirely.
 
 ---
 
-### Domain A — 129/129 deterministic accuracy
+### Label-blind detection — segmented corpus metric (updated 2026-07-06)
 
-**Claim:** 129 cases, 100% correct in fallback mode (no API key, no LLM).
+**Claim (current, post-B-075/B-076):** detection corpus 146/159 (91.8%);
+full mixed-corpus aggregate 167/199 — segmentation in the ACCURACY NOTE above.
+The historical "129/129, 100%" claim measured label reproduction (pre-B-075
+label leak, P2-C) and is retained only as historical record.
 
 ```bash
-python3 run_all_agent.py --timeout 90
+python3 run_all_agent.py --timeout 90          # cached sealed bundles (fast)
+python3 run_all_agent.py --timeout 90 --rerun  # full re-execution
 ```
 
-`run_all_agent.py` runs all 147 cases (Domain A + B + C combined).
+`run_all_agent.py` runs all 199 corpus cases (detection + adversarial +
+boundary sets combined) and prints a cache-provenance census.
 
-Expected output:
+Expected output (aggregate over the mixed corpus):
+```
+Results: 167/199 PASS  32 FAIL
+Cache: 199/199 desde bundle sellado (motor: 198, pre-B075: 1)
+```
+Historical output before B-075 (label echo — retained for the record):
 ```
 Results: 145/147 PASS  2 FAIL
 
