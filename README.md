@@ -715,7 +715,7 @@ These numbers are not inflated. They reflect results on a specific, diverse, doc
 > | Mode | What it processes | The honest number |
 > |---|---|---|
 > | **Claude/MCP (Domain A)** — primary | real raw evidence, full MCP extraction chain | **Deep per-case analysis — no aggregate number by design.** Record to date: 100% correct verdicts on every investigation run (per-case docs in `evidence/`, `results/`, `reports/`) |
-> | **Agent over JSON (Domain B)** | synthetic/converted JSON cases | **91.8% (146/159) on the detection corpus** — the ONLY mode with a corpus-wide number; mixed-corpus aggregate 167/199 (segmentation below) |
+> | **Agent over JSON (Domain B)** | synthetic/converted JSON cases | **91.8% (146/159) on the detection corpus** — the ONLY mode with a corpus-wide number |
 > | **Agent over RAW (Domain C)** | real public forensic corpora | **43 distinct raw evidence sources with sealed bundles in `results/`** — SRL 2018 (22 memory images), MUS2019/Narcos (13 dumps), M57 (3), NPS 2010/2014, Magnet 2020 CTF, Tuck 2019 macOS, Vanko — plus the Magnet 2022 (Windows/iOS/Android), Owl HD1/Nexus 5 and HMG investigations documented per case. **Each is an individual investigation with its own findings — NOT aggregated as accuracy** |
 >
 > Claude Code / MCP mode (Mode 2) is evaluated separately and per-case:
@@ -725,18 +725,13 @@ These numbers are not inflated. They reflect results on a specific, diverse, doc
 > PIPELINE_ERROR; MAGNET-2022-WINDOWS: Mode 2 reached MALICE with C2
 > evidence where Mode 1 said NOISE). See Domain A below.
 >
-> **Agent mode — `run_all_agent.py` over the 199-case JSON corpus —
-> aggregate: 167/199 (83.9%), label-blind, distribution identical to the
-> standalone scorer run blind.** That aggregate is NOT an accuracy figure on
-> its own: the corpus deliberately mixes evaluation sets with different
-> purposes — including adversarial suites *designed to break the system* and
-> epistemic-boundary cases — and they must be read separately (segmentation
-> from the ground-truth dataset, 2026-07-06):
->
-> **Note:** 167/199 covers ALL cases in JSON format — including the 31
-> BREAK/adversarial cases that are NOT the detection corpus. The detection
-> corpus (Domain A) is 146/159 (91.8%). For raw evidence (Domain C), the
-> agent reaches better results or returns ABSTAIN — work in progress.
+> **Detection corpus (Domain A): 146/159 (91.8%).** The table below
+> breaks down all JSON cases. Adversarial/BREAK cases (31) are resistance
+> data, not accuracy — they are separate from the detection corpus and
+> deliberately designed to break the system. Epistemic boundary cases (8)
+> have labels under review. Raw evidence (Domain C) is evaluated
+> per-investigation and reaches better results or returns ABSTAIN — it is
+> not part of this count. (Dataset: ground-truth 2026-07-06)
 >
 > | Segment | Cases | Label-blind | Reading |
 > |---|---|---|---|
@@ -1161,6 +1156,9 @@ a system prompt.
 ---
 
 ## Theoretical Foundation
+
+VIGÍA's abductive reasoning methodology is documented as a reusable
+engineering skill in [`docs/skills/abductive-engineering/SKILL.md`](./docs/skills/abductive-engineering/SKILL.md).
 
 ### Charles S. Peirce — Abductive Semiotics
 
