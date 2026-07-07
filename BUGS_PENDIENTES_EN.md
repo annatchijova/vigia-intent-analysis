@@ -696,11 +696,11 @@ surface area.
 
 ---
 
-## B-016 — memory_forensics.py Does Not Validate Memory Image Format (VMware vs Raw RAM Dump) [PARTIALLY MITIGATED]
+## B-016 — memory_forensics.py Does Not Validate Memory Image Format (VMware vs Raw RAM Dump) [RESOLVED]
 
 | Field | Value |
 |-------|-------|
-| **Status** | PARTIALLY MITIGATED — operational path covered; pending in V4 engine |
+| **Status** | RESOLVED — POST HACKATHON (2026-07-07, Grupo B / B3): stderr detector ported to the V4 engine (`classify_vol3_stderr` + `MemoryImageFormatError` + `unanalyzed` signal), red tests first — see B-087 |
 | **Severity** | P2 — produces uninformative error instead of clear diagnostics |
 | **File** | `vigia/sift/memory_forensics.py` (or the caller that invokes Volatility3) |
 | **Detected** | Session 2026-06-27 |
@@ -811,11 +811,11 @@ back to `xml.etree`). Tests: `TestA1DefusedxmlResilient` (4).
 
 ---
 
-## B-018 — Volatility3 Subprocess Timeout in `vigia_agent.py` for Large Dumps (>=4 GB) [PARTIALLY MITIGATED]
+## B-018 — Volatility3 Subprocess Timeout in `vigia_agent.py` for Large Dumps (>=4 GB) [RESOLVED]
 
 | Field | Value |
 |-------|-------|
-| **Status** | PARTIALLY MITIGATED — full timeout already degrades to honest ABSTAIN |
+| **Status** | RESOLVED — POST HACKATHON (2026-07-07, Grupo B / B4): VIGIA_VOL3_TIMEOUT + size scaling + full trace in pipeline_meta (timeout_partial/timeout_all) — see B-087 |
 | **Severity** | P1 — pipeline seals a bundle with 0 signals without warning that Volatility3 did not finish |
 | **File** | `vigia/pipeline/` / `vigia_agent.py` (vol3 subprocess orchestrator) |
 | **Detected** | Session 2026-06-27, batch NARCOS SRL-2018, 12 dumps >=4 GB |
@@ -4444,3 +4444,47 @@ parsing, logged at WARNING (honest degradation §5.3 — "could not read" ≠
 **Induction:** suite **980 passed** (+104). Coverage: ios 41.5%, android
 38.4%, macos 44.5% (from ≈15%). Corpus **166/199, 0 new flips** (the 2
 observed movements are the ones already documented in B-085).
+
+---
+
+## B-087 — Grupo B, full batch: B3/B4/B7/B8/B9 (5 bounded no-doctrine fixes) [RESOLVED]
+
+| Field | Value |
+|-------|-------|
+| **Status** | RESOLVED — POST HACKATHON (2026-07-07), commits `7ce09e5`, `2f9ee9b`, `1fc85d3`, `2572958`, `3737946` |
+| **Severity** | P1–P3 per item |
+| **Antecedent** | PLAN_ABDUCTIVO_PENDIENTES §2 Grupo B; AUDITORIA_INVARIANTES_ASIMETRIAS (B-061, A-1, A-2) |
+
+Protocol per item: restore tag, red tests first, green suite, corpus
+166/199, own commit. Final batch suite: **1034 passed**.
+
+- **B3 / B-016 residual** (`7ce09e5`): stderr format detector ported to the
+  V4 memory engine — `classify_vol3_stderr` (list shared with the shim) +
+  `MemoryImageFormatError` + `unanalyzed=True`/confidence=0 signal. A vol3
+  that rejects the image no longer reads "clean" (P0-A false negative).
+  5 red.
+- **B4 / B-018 residual** (`2f9ee9b`): `VIGIA_VOL3_TIMEOUT` (exact value,
+  the examiner rules) + size scaling without env (≥4 GiB ×2, ≥16 GiB ×4) +
+  trace in pipeline_meta (`vol3_plugin_timeouts`, `vol3_timeout_config`,
+  `pipeline_status` completed/timeout_partial/timeout_all) — the NARCOS-Jane
+  case ("0 signals from timeout" vs "clean") is now distinguishable from the
+  bundle. 9 red.
+- **B7 / B-061** (`1fc85d3`): FINITE out-of-range confidence unified to
+  CLAMP on both routes (ebs_v1 + signal_contract; Field without ge/le, the
+  validator clamps) — the same input no longer crashes-or-not depending on
+  deployment. B-083/B-083b non-finite boundary intact and pinned; 4-way
+  implementation agreement pinned. 7 red.
+- **B8 / A-1** (`2572958`): `verify_daubert_record_hash()` — the hash is no
+  longer decorative: recomputation with the producer's U7 quantization,
+  stable under JSON round-trip, fail-closed; self-check in
+  `signal_adapter.run_full_pipeline` (a serialization asymmetry breaks at
+  the producer, not at expert-witness time). 8 red (collection).
+- **B9 / A-2** (`3737946`): honey token lifecycle — `deactivate_honey_token`
+  with audit trail and strict containment (realpath inside
+  `_HONEY_TOKEN_DIR` + `honey_*` basename; traversal blocked), optional TTL
+  persisted in a `.meta.json` sidecar, lazy sweep of expired tokens with
+  audit (`HONEY_TOKEN_EXPIRED`). 11 red.
+
+**Remaining in Grupo B:** B1 (requirements-ci import contract), B2
+(OOV/xfail), B6 (ARTIFACT_TYPE_REGISTRY), B10 (comparator reads sealed
+agent_verdict), C1/C2 from the P0-001 census.

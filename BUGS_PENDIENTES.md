@@ -687,11 +687,11 @@ sobre superficie ya cubierta.
 
 ---
 
-## B-016 — memory_forensics.py no valida formato de imagen de memoria (VMware vs RAM dump puro) [PARCIALMENTE MITIGADO]
+## B-016 — memory_forensics.py no valida formato de imagen de memoria (VMware vs RAM dump puro) [RESUELTO]
 
 | Campo | Valor |
 |-------|-------|
-| **Estado** | PARCIALMENTE MITIGADO — camino operativo cubierto; pendiente en motor V4 |
+| **Estado** | RESUELTO — POST HACKATHON (2026-07-07, Grupo B / B3): detector stderr portado al motor V4 (`classify_vol3_stderr` + `MemoryImageFormatError` + señal `unanalyzed`), tests rojos primero — ver B-087 |
 | **Severidad** | P2 — produce error poco informativo en lugar de diagnóstico claro |
 | **Archivo** | `vigia/sift/memory_forensics.py` (o el caller que invoca Volatility3) |
 | **Detectado en** | Sesión 2026-06-27 |
@@ -820,11 +820,11 @@ pip install defusedxml>=0.7.1
 
 ---
 
-## B-018 — Volatility3 subprocess timeout en `vigia_agent.py` para dumps grandes (≥4 GB) [PARCIALMENTE MITIGADO]
+## B-018 — Volatility3 subprocess timeout en `vigia_agent.py` para dumps grandes (≥4 GB) [RESUELTO]
 
 | Campo | Valor |
 |-------|-------|
-| **Estado** | PARCIALMENTE MITIGADO — timeout total ya degrada a ABSTAIN honesto |
+| **Estado** | RESUELTO — POST HACKATHON (2026-07-07, Grupo B / B4): VIGIA_VOL3_TIMEOUT + escalado por tamaño + rastro completo en pipeline_meta (timeout_partial/timeout_all) — ver B-087 |
 | **Severidad** | P1 — el pipeline sella un bundle con 0 señales sin advertir que Volatility3 no terminó |
 | **Archivo** | `vigia/pipeline/` / `vigia_agent.py` (orquestador de subprocess vol3) |
 | **Detectado en** | Sesión 2026-06-27, batch NARCOS SRL-2018, 12 dumps ≥4 GB |
@@ -4177,3 +4177,46 @@ pude leer" ≠ "no hay persistencia"). Test rojo primero (2 rojos pre-fix).
 **Inducción:** suite **980 passed** (+104). Cobertura: ios 41.5%, android
 38.4%, macos 44.5% (desde ≈15%). Corpus **166/199, 0 flips nuevos** (los 2
 movimientos observados son los ya documentados en B-085).
+
+---
+
+## B-087 — Grupo B, tanda completa: B3/B4/B7/B8/B9 (5 fixes acotados sin doctrina) [RESUELTO]
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | RESUELTO — POST HACKATHON (2026-07-07), commits `7ce09e5`, `2f9ee9b`, `1fc85d3`, `2572958`, `3737946` |
+| **Severidad** | P1–P3 según ítem |
+| **Antecedente** | PLAN_ABDUCTIVO_PENDIENTES §2 Grupo B; AUDITORIA_INVARIANTES_ASIMETRIAS (B-061, A-1, A-2) |
+
+Protocolo por ítem: restore tag, tests rojos primero, suite verde, corpus
+166/199, commit propio. Suite final de la tanda: **1034 passed**.
+
+- **B3 / B-016 residual** (`7ce09e5`): detector de formato stderr portado al
+  motor V4 de memoria — `classify_vol3_stderr` (lista compartida con el shim)
+  + `MemoryImageFormatError` + señal `unanalyzed=True`/confidence=0. Un vol3
+  que rechaza la imagen ya no lee "limpio" (falso negativo P0-A). 5 rojos.
+- **B4 / B-018 residual** (`2f9ee9b`): `VIGIA_VOL3_TIMEOUT` (valor exacto,
+  el perito manda) + escalado por tamaño sin env (≥4 GiB ×2, ≥16 GiB ×4) +
+  rastro en pipeline_meta (`vol3_plugin_timeouts`, `vol3_timeout_config`,
+  `pipeline_status` completed/timeout_partial/timeout_all) — el caso
+  NARCOS-Jane ("0 señales por timeout" vs "limpio") ahora es distinguible
+  desde el bundle. 9 rojos.
+- **B7 / B-061** (`1fc85d3`): confidence fuera-de-rango FINITO unificado a
+  CLAMP en ambas rutas (ebs_v1 + signal_contract; Field sin ge/le, el
+  validador clampea) — el mismo input ya no crashea o no según el
+  despliegue. Frontera no-finita B-083/B-083b intacta y pineada; acuerdo de
+  las 4 implementaciones pineado. 7 rojos.
+- **B8 / A-1** (`2572958`): `verify_daubert_record_hash()` — el hash dejó de
+  ser decorativo: recomputación con la cuantización U7 del productor,
+  estable ante round-trip JSON, fail-closed; self-check en
+  `signal_adapter.run_full_pipeline` (una asimetría de serialización rompe
+  en el productor, no en el peritaje). 8 rojos (colección).
+- **B9 / A-2** (`3737946`): ciclo de vida del honey token —
+  `deactivate_honey_token` con auditoría y contención estricta (realpath en
+  `_HONEY_TOKEN_DIR` + basename `honey_*`; traversal bloqueado), TTL opcional
+  persistido en sidecar `.meta.json`, sweep perezoso de vencidos con
+  auditoría (`HONEY_TOKEN_EXPIRED`). 11 rojos.
+
+**Queda del Grupo B:** B1 (requirements-ci contrato de imports), B2 (OOV/
+xfail), B6 (ARTIFACT_TYPE_REGISTRY), B10 (comparador lee agent_verdict
+sellado), C1/C2 del censo P0-001.
