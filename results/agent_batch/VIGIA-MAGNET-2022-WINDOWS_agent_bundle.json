@@ -1,49 +1,49 @@
 {
-  "agent_verdict": "INTENT",
-  "analysis_timestamp": "2026-07-06T02:08:31.270294+00:00",
+  "agent_verdict": "MALICE",
+  "analysis_timestamp": "2026-07-07T03:22:42.055461+00:00",
   "audit_trail": {
     "agent_version": "1.0.0-SANS-2026",
     "case_id": "VIGIA-MAGNET-2022-WINDOWS",
-    "end_time": "2026-07-06T02:08:31.270299+00:00",
+    "end_time": "2026-07-07T03:22:42.055468+00:00",
     "entries": [
       {
         "action": "AGENT_INITIALIZED",
         "case_id": "VIGIA-MAGNET-2022-WINDOWS",
-        "entry_sha256": "975f0253b0a2091190367820a530bfd1351767722f27d61e565b25446d64638f",
+        "entry_sha256": "9488198bc1d13014ba9616693c38b681a81b00ba177203f6255d5d905dfa69c9",
         "inputs_summary": {
-          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "agent_file": "/home/user/vigia-intent-analysis/vigia_agent.py",
           "case_id": "VIGIA-MAGNET-2022-WINDOWS"
         },
         "iteration": 0,
-        "note": "Agent initialized \u2014 source SHA-256: 23d8581225c57725...",
+        "note": "Agent initialized \u2014 source SHA-256: 1477828f53797b25...",
         "outputs_summary": {
-          "agent_sha256": "23d8581225c577250e3cd8db6e82cbc8c8e9144bc1f796ceb68c606364a7ef6c",
+          "agent_sha256": "1477828f53797b25d2b39b2762e31383665cdf2ff2b2335afa44afac2065068a",
           "agent_version": "1.0.0-SANS-2026"
         },
         "seq": 1,
-        "timestamp": "2026-07-06T02:08:31.225130+00:00",
+        "timestamp": "2026-07-07T03:22:41.923809+00:00",
         "tool": "vigia_agent"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-MAGNET-2022-WINDOWS",
-        "entry_sha256": "23de9f509954deff79fa8f28b7689dff76d3438105dd4a1c91cb41aafe0915ed",
+        "entry_sha256": "129084725e7157f273488afc0926f0cee5abaff5d07e8d59242f21d6b2699d94",
         "inputs_summary": {
-          "path": "/home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-MAGNET-2022-WINDOWS.json"
+          "path": "/home/user/vigia-intent-analysis/data/cases/converted/VIGIA-MAGNET-2022-WINDOWS.json"
         },
         "iteration": 0,
         "note": "Computing SHA-256 of original evidence",
         "outputs_summary": {},
         "seq": 2,
-        "timestamp": "2026-07-06T02:08:31.225222+00:00",
+        "timestamp": "2026-07-07T03:22:41.923927+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-MAGNET-2022-WINDOWS",
-        "entry_sha256": "c83f41c6c9e105f9248271e0349ed9926e1198f663e47cc864709baa93527aa0",
+        "entry_sha256": "7a4f197e234d1180e38a08aef6153ddb2ed8c7b678d048170423ba28a1a93530",
         "inputs_summary": {
-          "path": "/home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-MAGNET-2022-WINDOWS.json"
+          "path": "/home/user/vigia-intent-analysis/data/cases/converted/VIGIA-MAGNET-2022-WINDOWS.json"
         },
         "iteration": 0,
         "note": "Evidence verified: 01ab095059d46f8a...",
@@ -51,15 +51,15 @@
           "sha256": "01ab095059d46f8a12d270eda38deb121ff868d44c4572b26acd42f6a589f79d"
         },
         "seq": 3,
-        "timestamp": "2026-07-06T02:08:31.225325+00:00",
+        "timestamp": "2026-07-07T03:22:41.924045+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "PIPELINE_EXECUTE",
         "case_id": "VIGIA-MAGNET-2022-WINDOWS",
-        "entry_sha256": "2aa9f839c47db86718aa1cdf612dbffa4d1ebbce54f1bbf52887578adaac4227",
+        "entry_sha256": "a4f1f1337269a3295723ca084e163dbf7790c6a8347d1aa73ada4a69a36e721f",
         "inputs_summary": {
-          "evidence": "/home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-MAGNET-2022-WINDOWS.json",
+          "evidence": "/home/user/vigia-intent-analysis/data/cases/converted/VIGIA-MAGNET-2022-WINDOWS.json",
           "iteration": "0",
           "params": {}
         },
@@ -67,13 +67,13 @@
         "note": "Executing pipeline \u2014 iteration 0",
         "outputs_summary": {},
         "seq": 4,
-        "timestamp": "2026-07-06T02:08:31.225440+00:00",
+        "timestamp": "2026-07-07T03:22:41.924251+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "PIPELINE_COMPLETE",
         "case_id": "VIGIA-MAGNET-2022-WINDOWS",
-        "entry_sha256": "33d4c011f84b9ebf1a94fbac5394ebfc7d3a27dc21764d47d9d3a3c2217d59bd",
+        "entry_sha256": "b6f4a07d00e69dd7ec111afc2da60ba3e16ade8006004ec35b33cb0a5bc5f97d",
         "inputs_summary": {
           "iteration": "0"
         },
@@ -81,9 +81,9 @@
         "note": "Pipeline completed \u2014 5 signals",
         "outputs_summary": {
           "abduction": {
-            "best_hypothesis": "SUSPICION_DETECTED",
-            "best_posterior": "33/50",
-            "confidence": "33/50",
+            "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+            "best_posterior": "67/100",
+            "confidence": "67/100",
             "is_conclusive": "True",
             "narrative": "Windows workstation compromised via ZeroTier encrypted overlay (C2). Attacker obtained SYSTEM-level shell and executed a structured persistence sequence: RDP enabled, backdoor admin account 'minecraft..."
           },
@@ -94,10 +94,10 @@
             "ebs_adapter_mode": "motor",
             "expected_verdict": "MALICE",
             "resolve": {
-              "motor_confidence": "0.66",
-              "motor_reason": "Significant signal with structural support (score=0.3281)",
-              "motor_score": "0.3281",
-              "motor_verdict": "SUSPICION",
+              "motor_confidence": "0.67",
+              "motor_reason": "Intent score 0.3363 exceeds MALICE threshold (P2+acq_assurance scale, threshold=0.33)",
+              "motor_score": "0.3363",
+              "motor_verdict": "MALICE",
               "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
             },
             "source": "ebs_v1_json_adapter"
@@ -146,13 +146,13 @@
           ]
         },
         "seq": 5,
-        "timestamp": "2026-07-06T02:08:31.269920+00:00",
+        "timestamp": "2026-07-07T03:22:42.054712+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "CONTRADICTION_CHECK",
         "case_id": "VIGIA-MAGNET-2022-WINDOWS",
-        "entry_sha256": "61a491620a2cba93996b0507783cfdcfab5eea55cdfa2a78e0a55ad8383606da",
+        "entry_sha256": "4c7c4e0c95eb95b578894417cc6ec56105ee0a8d217c416c1d7ad148a13c0bc8",
         "inputs_summary": {
           "n_signals": "5"
         },
@@ -163,43 +163,67 @@
           "threshold": "2"
         },
         "seq": 6,
-        "timestamp": "2026-07-06T02:08:31.270051+00:00",
+        "timestamp": "2026-07-07T03:22:42.054900+00:00",
         "tool": "contradiction_detector"
       },
       {
         "action": "AGENT_EXIT",
         "case_id": "VIGIA-MAGNET-2022-WINDOWS",
-        "entry_sha256": "b46207c514675c9c2ca032b7337052c35ea163a527182b48a28578b2b960c369",
+        "entry_sha256": "55baa77d4d3bd4a57814bbb58deddb81479573022f5f9377b1de37111da586b2",
         "inputs_summary": {
-          "verdict": "SUSPICION_DETECTED"
+          "verdict": "MALICIOUS_INTENT_DETECTED"
         },
         "iteration": 0,
-        "note": "Exit code 3 (INTENT) \u2014 analysis complete.",
+        "note": "Exit code 1 (MALICE) \u2014 analysis complete.",
         "outputs_summary": {
-          "agent_verdict": "INTENT",
-          "exit_code": "3"
+          "agent_verdict": "MALICE",
+          "exit_code": "1"
         },
         "seq": 7,
-        "timestamp": "2026-07-06T02:08:31.270243+00:00",
+        "timestamp": "2026-07-07T03:22:42.055187+00:00",
         "tool": "vigia_agent"
       }
     ],
-    "start_time": "2026-07-06T02:08:31.224926+00:00",
+    "start_time": "2026-07-07T03:22:41.923497+00:00",
     "total_entries": 7
   },
   "case_id": "VIGIA-MAGNET-2022-WINDOWS",
-  "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-MAGNET-2022-WINDOWS.json",
+  "evidence_path": "/home/user/vigia-intent-analysis/data/cases/converted/VIGIA-MAGNET-2022-WINDOWS.json",
   "evidence_sha256": "01ab095059d46f8a12d270eda38deb121ff868d44c4572b26acd42f6a589f79d",
   "iterations_executed": 1,
-  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-MAGNET-2022-WINDOWS ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-MAGNET-2022-WINDOWS.json\nEvidence SHA-256: 01ab095059d46f8a12d270eda38deb121ff868d44c4572b26acd42f6a589f79d\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: SUSPICION_DETECTED\nPosterior confidence: 33/50\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 5 se\u00f1al(es): 5 primaria(s) de ['RegRipper', 'python-evtx', 'python-evtx + RegRipper'], 0 derivada(s)/no-analizada(s). Top z: EventID 4720 @ 2022-02-12 01:29:43Z: New=0.90, EventID 4724 @ 2022-02-12 02:17:18Z: Pas=0.90, EventID 7040 @ 2022-02-12 01:01:32Z: Ter=0.72.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: SUSPICION_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nWindows workstation compromised via ZeroTier encrypted overlay (C2). Attacker obtained SYSTEM-level shell and executed a structured persistence sequence: RDP enabled, backdoor admin account 'minecraftsteve' created under SubjectUserSid=S-1-5-18, built-in Administrator password reset. All privileged operations executed within a 75-minute window on 2022-02-12. Carnegie familiarity-transfer technique used for account naming. VIG\u00cdA must detect SYSTEM-as-creator anomaly as the decisive MALICE discrim\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [EventID 4720 @ 2022-02-12 01:29:43Z: New account 'minecraftsteve' (RID] z=0.902 conf=0.95 \u2014 \n  [EventID 4724 @ 2022-02-12 02:17:18Z: Password reset on built-in Admini] z=0.902 conf=0.95 \u2014 \n  [EventID 7040 @ 2022-02-12 01:01:32Z: TermService (Remote Desktop Servi] z=0.723 conf=0.85 \u2014 \n  [EventID 7045 @ 2022-02-06 07:15:35Z: New service 'ZeroTier One' instal] z=0.640 conf=0.80 \u2014 \n  [SECURITY hive audit policy LastWrite 2022-02-04 (OS installation date)] z=0.122 conf=0.35 \u2014 \n\n--- FINAL ALERT LEVEL ---\nMEDIUM \u2014 INTENT verdict with individual z-scores below threshold. Alert floored (B-028/B-065): an intent finding cannot present as LOW.\nReconciliation: verdict INTENT rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 5 | Derived: 0 | Total: 5",
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-MAGNET-2022-WINDOWS ===\nEvidence: /home/user/vigia-intent-analysis/data/cases/converted/VIGIA-MAGNET-2022-WINDOWS.json\nEvidence SHA-256: 01ab095059d46f8a12d270eda38deb121ff868d44c4572b26acd42f6a589f79d\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 67/100\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 5 se\u00f1al(es): 5 primaria(s) de ['RegRipper', 'python-evtx', 'python-evtx + RegRipper'], 0 derivada(s)/no-analizada(s). Top z: EventID 4720 @ 2022-02-12 01:29:43Z: New=0.90, EventID 4724 @ 2022-02-12 02:17:18Z: Pas=0.90, EventID 7040 @ 2022-02-12 01:01:32Z: Ter=0.72.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: MALICIOUS_INTENT_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nWindows workstation compromised via ZeroTier encrypted overlay (C2). Attacker obtained SYSTEM-level shell and executed a structured persistence sequence: RDP enabled, backdoor admin account 'minecraftsteve' created under SubjectUserSid=S-1-5-18, built-in Administrator password reset. All privileged operations executed within a 75-minute window on 2022-02-12. Carnegie familiarity-transfer technique used for account naming. VIG\u00cdA must detect SYSTEM-as-creator anomaly as the decisive MALICE discrim\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [EventID 4720 @ 2022-02-12 01:29:43Z: New account 'minecraftsteve' (RID] z=0.902 conf=0.95 \u2014 \n  [EventID 4724 @ 2022-02-12 02:17:18Z: Password reset on built-in Admini] z=0.902 conf=0.95 \u2014 \n  [EventID 7040 @ 2022-02-12 01:01:32Z: TermService (Remote Desktop Servi] z=0.723 conf=0.85 \u2014 \n  [EventID 7045 @ 2022-02-06 07:15:35Z: New service 'ZeroTier One' instal] z=0.640 conf=0.80 \u2014 \n  [SECURITY hive audit policy LastWrite 2022-02-04 (OS installation date)] z=0.122 conf=0.35 \u2014 \n\n--- FINAL ALERT LEVEL ---\nHIGH \u2014 MALICE verdict from Bayesian posterior aggregation. Individual z-scores below threshold (distributed evidence pattern: no single dominant signal, but aggregate posterior is decisive). Alert floored (B-028/B-065).\nReconciliation: verdict MALICE rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 5 | Derived: 0 | Total: 5",
   "pipeline_results": {
     "abduction": {
-      "best_hypothesis": "SUSPICION_DETECTED",
-      "best_posterior": "33/50",
+      "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+      "best_posterior": "67/100",
       "confidence": {
         "__fraction__": true,
-        "den": 50,
-        "num": 33
+        "den": 100,
+        "num": 67
+      },
+      "devil_advocate": {
+        "aggregation": {
+          "k": 3,
+          "method": "top_k_already_validated_matches_v2",
+          "total_gap_mass": "0"
+        },
+        "counterfactual_summary": {
+          "primary_alternative_hypothesis": null
+        },
+        "decision_context": {
+          "confidence": "67/100",
+          "mapped_verdict": "MALICIOUS_INTENT_DETECTED",
+          "raw_verdict": "MALICIOUS_INTENT_DETECTED",
+          "score": "329/500"
+        },
+        "devil_advocate_source": "deterministic_no_pattern_data_available",
+        "meta": {
+          "deterministic": true,
+          "generated_from": "case_pattern_library"
+        },
+        "narrative": "Eco's Razor (Abductive Falsification) applied to verdict MALICIOUS_INTENT_DETECTED. Pattern-matching data was not available on this code path \u2014 CasePatternLibrary is not invoked here by design (agent audit-trail mode (vigia_agent.py \u2014 JSON-replay / autonomous path); see KNOWN_LIMITATIONS.md). No structured counter-hypothesis could be derived deterministically. This is a documented scope limitation of the current code path, not an absence of falsification attempt.",
+        "pattern_evidence_gaps": [],
+        "version": "r7-da-v1"
       },
       "is_conclusive": true,
       "narrative": "Windows workstation compromised via ZeroTier encrypted overlay (C2). Attacker obtained SYSTEM-level shell and executed a structured persistence sequence: RDP enabled, backdoor admin account 'minecraftsteve' created under SubjectUserSid=S-1-5-18, built-in Administrator password reset. All privileged operations executed within a 75-minute window on 2022-02-12. Carnegie familiarity-transfer technique used for account naming. VIG\u00cdA must detect SYSTEM-as-creator anomaly as the decisive MALICE discrim"
@@ -211,10 +235,10 @@
       "ebs_adapter_mode": "motor",
       "expected_verdict": "MALICE",
       "resolve": {
-        "motor_confidence": "0.66",
-        "motor_reason": "Significant signal with structural support (score=0.3281)",
-        "motor_score": "0.3281",
-        "motor_verdict": "SUSPICION",
+        "motor_confidence": "0.67",
+        "motor_reason": "Intent score 0.3363 exceeds MALICE threshold (P2+acq_assurance scale, threshold=0.33)",
+        "motor_score": "0.3363",
+        "motor_verdict": "MALICE",
         "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
       },
       "source": "ebs_v1_json_adapter"

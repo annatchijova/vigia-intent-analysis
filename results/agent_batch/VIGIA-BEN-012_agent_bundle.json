@@ -1,33 +1,33 @@
 {
   "agent_verdict": "INTENT",
-  "analysis_timestamp": "2026-07-06T04:39:58.824557+00:00",
+  "analysis_timestamp": "2026-07-07T03:22:40.593546+00:00",
   "audit_trail": {
     "agent_version": "1.0.0-SANS-2026",
     "case_id": "VIGIA-BEN-012",
-    "end_time": "2026-07-06T04:39:58.824564+00:00",
+    "end_time": "2026-07-07T03:22:40.593551+00:00",
     "entries": [
       {
         "action": "AGENT_INITIALIZED",
         "case_id": "VIGIA-BEN-012",
-        "entry_sha256": "baa258459879d542ef5539986091358519324ac2dbebef53aae3a215916eba1d",
+        "entry_sha256": "858f2fe8fa9875b68e5fdf48fab3db483e6b12e8fb5c75623c54d6dda9258d3e",
         "inputs_summary": {
           "agent_file": "/home/user/vigia-intent-analysis/vigia_agent.py",
           "case_id": "VIGIA-BEN-012"
         },
         "iteration": 0,
-        "note": "Agent initialized \u2014 source SHA-256: 23d8581225c57725...",
+        "note": "Agent initialized \u2014 source SHA-256: 1477828f53797b25...",
         "outputs_summary": {
-          "agent_sha256": "23d8581225c577250e3cd8db6e82cbc8c8e9144bc1f796ceb68c606364a7ef6c",
+          "agent_sha256": "1477828f53797b25d2b39b2762e31383665cdf2ff2b2335afa44afac2065068a",
           "agent_version": "1.0.0-SANS-2026"
         },
         "seq": 1,
-        "timestamp": "2026-07-06T04:39:58.043990+00:00",
+        "timestamp": "2026-07-07T03:22:40.458165+00:00",
         "tool": "vigia_agent"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-BEN-012",
-        "entry_sha256": "3dd36d6be40d456e93a6bb4c9c3ef2824a5108a125e893c8ee19c25e882c24fe",
+        "entry_sha256": "d843209eef682a5b5c562c68ce2b6e4f398505adcb7888965fa02a3289e12a3a",
         "inputs_summary": {
           "path": "/home/user/vigia-intent-analysis/data/cases/converted/VIGIA-BEN-012.json"
         },
@@ -35,29 +35,29 @@
         "note": "Computing SHA-256 of original evidence",
         "outputs_summary": {},
         "seq": 2,
-        "timestamp": "2026-07-06T04:39:58.044148+00:00",
+        "timestamp": "2026-07-07T03:22:40.458363+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-BEN-012",
-        "entry_sha256": "aa0841849eab9f374b913b9857f582763a64a866af48ea2df70b68df26e4e3e5",
+        "entry_sha256": "19581df8bfdb290a7cb0215966db1a69f6a7ed961e04fd8f8d3d05bf7ec78aed",
         "inputs_summary": {
           "path": "/home/user/vigia-intent-analysis/data/cases/converted/VIGIA-BEN-012.json"
         },
         "iteration": 0,
-        "note": "Evidence verified: e20f3735bc1338ce...",
+        "note": "Evidence verified: d2ff4fa8620bb664...",
         "outputs_summary": {
-          "sha256": "e20f3735bc1338ce2bcc129b8e2033e9a903805b7d79e2f476baed8c87b787c1"
+          "sha256": "d2ff4fa8620bb664254b92da197f88d6662c4d269b63979bf9598130662649ae"
         },
         "seq": 3,
-        "timestamp": "2026-07-06T04:39:58.044286+00:00",
+        "timestamp": "2026-07-07T03:22:40.458500+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "PIPELINE_EXECUTE",
         "case_id": "VIGIA-BEN-012",
-        "entry_sha256": "f5bad101433f6d73a661faf6379df14bec2a695953e958c924b60a0aec663bd3",
+        "entry_sha256": "9381c842c49607628f480482674b9e63042c08c5a4f16ce3991d747fdd2c9f17",
         "inputs_summary": {
           "evidence": "/home/user/vigia-intent-analysis/data/cases/converted/VIGIA-BEN-012.json",
           "iteration": "0",
@@ -67,13 +67,13 @@
         "note": "Executing pipeline \u2014 iteration 0",
         "outputs_summary": {},
         "seq": 4,
-        "timestamp": "2026-07-06T04:39:58.044504+00:00",
+        "timestamp": "2026-07-07T03:22:40.458730+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "PIPELINE_COMPLETE",
         "case_id": "VIGIA-BEN-012",
-        "entry_sha256": "247f264e704ee057ddc083441f3dcf756be3533fd3a49be081aafb5a10f2b5ec",
+        "entry_sha256": "59a80fbc5fbd30031415694725ed332d80631f84f9a195ee939cea148417ed2c",
         "inputs_summary": {
           "iteration": "0"
         },
@@ -82,9 +82,9 @@
         "outputs_summary": {
           "abduction": {
             "best_hypothesis": "SUSPICION_DETECTED",
-            "best_posterior": "67/100",
-            "confidence": "67/100",
-            "is_conclusive": "True",
+            "best_posterior": "1/4",
+            "confidence": "1/4",
+            "is_conclusive": "False",
             "narrative": "Proceso kworker/0:1H aparece sin parent en pslist. Es un kernel worker thread de Linux, normal en sistemas con I/O intensivo, documentado en kernel.org y presente en todas las distribuciones."
           },
           "case_id": "VIGIA-BEN-012",
@@ -94,9 +94,9 @@
             "ebs_adapter_mode": "motor",
             "expected_verdict": "NOISE",
             "resolve": {
-              "motor_confidence": "0.67",
-              "motor_reason": "Intent score 0.3337 exceeds MALICE threshold but corroboration rests on 3 technical artifact(s) / 2 technical evidence class(es) \u2014 context/narrative classes do not corroborate MALICE (B-068 Daubert ga",
-              "motor_score": "0.3337",
+              "motor_confidence": "0.25",
+              "motor_reason": "Significant signal with structural support (score=0.1248)",
+              "motor_score": "0.1248",
               "motor_verdict": "SUSPICION",
               "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
             },
@@ -130,13 +130,13 @@
           ]
         },
         "seq": 5,
-        "timestamp": "2026-07-06T04:39:58.823986+00:00",
+        "timestamp": "2026-07-07T03:22:40.593035+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "CONTRADICTION_CHECK",
         "case_id": "VIGIA-BEN-012",
-        "entry_sha256": "3b3d3b83d7d347eb9b3922ce0c0ea1b97215d18ea382b9e587806285a2ce022a",
+        "entry_sha256": "6446fa0d82e7ad6ff1cce586c24bb4e25e7e9a845bee353b7a5ca184903b82ba",
         "inputs_summary": {
           "n_signals": "3"
         },
@@ -147,13 +147,13 @@
           "threshold": "2"
         },
         "seq": 6,
-        "timestamp": "2026-07-06T04:39:58.824175+00:00",
+        "timestamp": "2026-07-07T03:22:40.593240+00:00",
         "tool": "contradiction_detector"
       },
       {
         "action": "AGENT_EXIT",
         "case_id": "VIGIA-BEN-012",
-        "entry_sha256": "a3cd071b327615dcfc3ed74d6e3864d658c5e9ef09af3098d1788c9a60c6b253",
+        "entry_sha256": "a696d95327ae5ec0d62b3519766fdfc493aa152203e9699b5b90d87d3d898e62",
         "inputs_summary": {
           "verdict": "SUSPICION_DETECTED"
         },
@@ -164,28 +164,28 @@
           "exit_code": "3"
         },
         "seq": 7,
-        "timestamp": "2026-07-06T04:39:58.824471+00:00",
+        "timestamp": "2026-07-07T03:22:40.593482+00:00",
         "tool": "vigia_agent"
       }
     ],
-    "start_time": "2026-07-06T04:39:58.043462+00:00",
+    "start_time": "2026-07-07T03:22:40.457801+00:00",
     "total_entries": 7
   },
   "case_id": "VIGIA-BEN-012",
   "evidence_path": "/home/user/vigia-intent-analysis/data/cases/converted/VIGIA-BEN-012.json",
-  "evidence_sha256": "e20f3735bc1338ce2bcc129b8e2033e9a903805b7d79e2f476baed8c87b787c1",
+  "evidence_sha256": "d2ff4fa8620bb664254b92da197f88d6662c4d269b63979bf9598130662649ae",
   "iterations_executed": 1,
-  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-BEN-012 ===\nEvidence: /home/user/vigia-intent-analysis/data/cases/converted/VIGIA-BEN-012.json\nEvidence SHA-256: e20f3735bc1338ce2bcc129b8e2033e9a903805b7d79e2f476baed8c87b787c1\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: SUSPICION_DETECTED\nPosterior confidence: 67/100\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 3 se\u00f1al(es): 3 primaria(s) de ['legacy_converter'], 0 derivada(s)/no-analizada(s). Top z: System: Ubuntu 22.04 LTS | Kernel: 5.15.=0.85, Parent in kernel space: kthreadd (PID 2)=0.72, PID: 7 | Name: kworker/0:1H | PPID: 2 (k=0.49.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: SUSPICION_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nProceso kworker/0:1H aparece sin parent en pslist. Es un kernel worker thread de Linux, normal en sistemas con I/O intensivo, documentado en kernel.org y presente en todas las distribuciones.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [System: Ubuntu 22.04 LTS | Kernel: 5.15.0-generic | Uptime: 45 days | ] z=0.855 conf=0.90 \u2014 \n  [Parent in kernel space: kthreadd (PID 2) | All kernel threads children] z=0.723 conf=0.85 \u2014 \n  [PID: 7 | Name: kworker/0:1H | PPID: 2 (kthreadd) | User: root | CPU: 0] z=0.490 conf=0.70 \u2014 \n\n--- FINAL ALERT LEVEL ---\nMEDIUM \u2014 INTENT verdict with individual z-scores below threshold. Alert floored (B-028/B-065): an intent finding cannot present as LOW.\nReconciliation: verdict INTENT rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 3 | Derived: 0 | Total: 3",
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-BEN-012 ===\nEvidence: /home/user/vigia-intent-analysis/data/cases/converted/VIGIA-BEN-012.json\nEvidence SHA-256: d2ff4fa8620bb664254b92da197f88d6662c4d269b63979bf9598130662649ae\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: SUSPICION_DETECTED\nPosterior confidence: 1/4\nConclusive: NO \u2014 requires human review\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 3 se\u00f1al(es): 3 primaria(s) de ['legacy_converter'], 0 derivada(s)/no-analizada(s). Top z: System: Ubuntu 22.04 LTS | Kernel: 5.15.=0.85, Parent in kernel space: kthreadd (PID 2)=0.72, PID: 7 | Name: kworker/0:1H | PPID: 2 (k=0.49.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: SUSPICION_DETECTED. Conclusiva: no \u2014 requiere revisi\u00f3n humana.\n\nRazonamiento del motor abductivo:\nProceso kworker/0:1H aparece sin parent en pslist. Es un kernel worker thread de Linux, normal en sistemas con I/O intensivo, documentado en kernel.org y presente en todas las distribuciones.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [System: Ubuntu 22.04 LTS | Kernel: 5.15.0-generic | Uptime: 45 days | ] z=0.855 conf=0.90 \u2014 \n  [Parent in kernel space: kthreadd (PID 2) | All kernel threads children] z=0.723 conf=0.85 \u2014 \n  [PID: 7 | Name: kworker/0:1H | PPID: 2 (kthreadd) | User: root | CPU: 0] z=0.490 conf=0.70 \u2014 \n\n--- FINAL ALERT LEVEL ---\nMEDIUM \u2014 INTENT verdict with individual z-scores below threshold. Alert floored (B-028/B-065): an intent finding cannot present as LOW.\nReconciliation: verdict INTENT rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 3 | Derived: 0 | Total: 3",
   "pipeline_results": {
     "abduction": {
       "best_hypothesis": "SUSPICION_DETECTED",
-      "best_posterior": "67/100",
+      "best_posterior": "1/4",
       "confidence": {
         "__fraction__": true,
-        "den": 100,
-        "num": 67
+        "den": 4,
+        "num": 1
       },
-      "is_conclusive": true,
+      "is_conclusive": false,
       "narrative": "Proceso kworker/0:1H aparece sin parent en pslist. Es un kernel worker thread de Linux, normal en sistemas con I/O intensivo, documentado en kernel.org y presente en todas las distribuciones."
     },
     "case_id": "VIGIA-BEN-012",
@@ -195,9 +195,9 @@
       "ebs_adapter_mode": "motor",
       "expected_verdict": "NOISE",
       "resolve": {
-        "motor_confidence": "0.67",
-        "motor_reason": "Intent score 0.3337 exceeds MALICE threshold but corroboration rests on 3 technical artifact(s) / 2 technical evidence class(es) \u2014 context/narrative classes do not corroborate MALICE (B-068 Daubert ga",
-        "motor_score": "0.3337",
+        "motor_confidence": "0.25",
+        "motor_reason": "Significant signal with structural support (score=0.1248)",
+        "motor_score": "0.1248",
         "motor_verdict": "SUSPICION",
         "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
       },

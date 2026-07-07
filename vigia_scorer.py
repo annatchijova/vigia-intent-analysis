@@ -125,6 +125,33 @@ _EXP_NEG2_TABLE: dict[int, Fraction] = {
     20: Fraction(12957, 95740),
 }
 # ─────────────────────────────────────────────────────────────────────────────
+
+# M2-2 (Red-Team Round 2, docs/REDTEAM_ROUND2_MONOTONICITY.md): umbral mínimo
+# de VALOR EVIDENCIAL para que un artefacto cuente como SEÑAL estructural —
+# es decir, para que incremente n_artifacts/support_score, unique_types/
+# diversity_bonus y la corroboración del gate B-068. Sin este umbral, el gate
+# contaba cardinalidad sin consultar la señal y un documento vacío
+# (README.txt, una foto, un manual.pdf) de tipo nuevo volteaba SUSPICION →
+# MALICE (invariante No-Dilution).
+#
+# El umbral se mide sobre adjusted_score = raw × (1−spoofability) × weight ×
+# trust — la métrica de valor evidencial propia del scorer (fórmula Kimi) —
+# y NO sobre raw_score crudo: un raw 0.08 en memory_process (clase pesada,
+# difícil de fabricar, cadena confiable) porta más valor probatorio que el
+# mismo 0.08 en un log_entry spoofeable con trust degradado. raw_score=0 ⇒
+# adjusted=0 ⇒ nunca corrobora (pedido mínimo M2-2); un artefacto con señal
+# pero trust efectivo 0 tampoco (más estricto que raw>0 — y más defendible:
+# evidencia sin cadena de custodia no puede ser "fuente independiente").
+# Comparación ESTRICTA (adjusted > umbral).
+#
+# Valor 0.0 (estricto >): CUALQUIER valor evidencial positivo corrobora,
+# como en el esquema legacy. NOTA DE CALIBRACIÓN (medido, 2026-07-07): no
+# existe umbral > 0 compatible con el corpus de 199 casos — los casos MALICE
+# canónicos corroboran con artefactos de adjusted 0.0017–0.002, mientras que
+# excluir el diluyente de VIGIA-CAN-029 exigiría > 0.013. Intervalo vacío;
+# ver docs/REDTEAM_ROUND2_MONOTONICITY.md §Round 2.1.
+_M2_MIN_SIGNAL_ADJ: float = 0.0
+
 from pathlib import Path
 
 # ---------------------------------------------------------------------------
@@ -711,21 +738,71 @@ def _vigia_score(case: dict) -> dict:
     # B4: diversity_bonus multiplicative before clamping.
     #     Original bug: additive, could saturate the score without enough evidence.
     # -----------------------------------------------------------------------
-    source_counts: dict[str, int] = {}
-    for a in artifacts:
-        src = a.get("evidence_type", "?")
-        source_counts[src] = source_counts.get(src, 0) + 1
+    # M2-2: bandera de señal por artefacto (valor evidencial > umbral).
+    # effective_trusts es paralelo a artifacts (mismo orden, una entrada por
+    # artefacto); adjusted_score ya pasó el Finite Math Shield y el redondeo
+    # determinista.
+    _signal_flags = [et["adjusted_score"] > _M2_MIN_SIGNAL_ADJ for et in effective_trusts]
+    _n_signal     = sum(_signal_flags)
 
-    unique_types    = len(set(a.get("evidence_type") for a in artifacts))
-    diversity_bonus = _dround(min(0.2, (unique_types - 1) * 0.05), _DETERMINISTIC_INTERNAL_PREC)
+    # M2-2: diversity_bonus cuenta solo tipos CON señal — un artefacto con
+    # raw_score=0 no aporta información y no puede comprar el bono de
+    # diversidad (cruzaba bordes de banda: NOISE→UNKNOWN con un doc vacío).
+    unique_types    = len({
+        et["evidence_type"] for et, _sig in zip(effective_trusts, _signal_flags) if _sig
+    })
+    diversity_bonus = _dround(
+        min(0.2, max(0, unique_types - 1) * 0.05), _DETERMINISTIC_INTERNAL_PREC
+    )
 
-    adj_scores = []
-    for et in effective_trusts:
-        et_type        = et["evidence_type"]
-        count          = source_counts.get(et_type, 1)
-        source_penalty = min(0.5, (count - 1) * 0.15)
-        adj            = _dround(et["adjusted_score"] * (1 - source_penalty), _DETERMINISTIC_OUTPUT_PREC)
-        adj_scores.append(adj)
+    # M2-1 (Red-Team Round 2): redundancy decay evaluado en el MEJOR PREFIJO
+    # por tipo, no sobre el conjunto completo a ciegas. El esquema legacy
+    # penalizaba a TODOS los artefactos de un tipo con (count-1)·0.15:
+    # agregar un artefacto incriminatorio débil del mismo tipo SUBÍA
+    # retroactivamente la penalización de los incumbentes fuertes y BAJABA el
+    # score (violación de monotonicidad positiva — 29/30 celdas de la matriz
+    # z_score×prior_trust, Δ hasta -0.093).
+    #
+    # Ahora, por tipo: se ordenan los artefactos por adjusted_score
+    # descendente (empates: orden de inserción, sort estable — determinista)
+    # y se evalúa la MISMA fórmula legacy sobre cada prefijo top-k
+    # (penalty(k) = min(0.5, (k-1)·0.15) aplicada a los k del prefijo). Se
+    # queda el prefijo cuya contribución Noisy-OR del grupo es máxima. Un
+    # duplicado que solo resta información no puede debilitar la evidencia
+    # que duplica — queda fuera del prefijo elegido y contribuye 0.
+    #
+    # Propiedades: (a) monotonicidad — agregar un artefacto solo agranda el
+    # conjunto de prefijos candidatos, así que la contribución del grupo (y
+    # el composite) nunca baja; (b) compatibilidad — cuando el conjunto
+    # completo ya era el óptimo (todos los casos regulares del corpus), el
+    # prefijo elegido es el conjunto completo y el resultado es bit a bit
+    # idéntico al legacy.
+    _by_type: dict[str, list[int]] = {}
+    for _idx, et in enumerate(effective_trusts):
+        _by_type.setdefault(et["evidence_type"], []).append(_idx)
+
+    adj_scores = [0.0] * len(effective_trusts)
+    for _idxs in _by_type.values():
+        _ranked = sorted(_idxs, key=lambda i: -effective_trusts[i]["adjusted_score"])
+        _best_factor = 1.0   # factor Noisy-OR del grupo: menor = más señal
+        _best_k      = 0
+        _best_adjs: list[float] = []
+        for _k in range(1, len(_ranked) + 1):
+            _pen  = min(0.5, (_k - 1) * 0.15)
+            _adjs = [
+                _dround(
+                    effective_trusts[_i]["adjusted_score"] * (1 - _pen),
+                    _DETERMINISTIC_OUTPUT_PREC,
+                )
+                for _i in _ranked[:_k]
+            ]
+            _factor = math.prod(max(0.0, 1.0 - _s) for _s in _adjs)
+            # <= : ante empate se prefiere el prefijo MÁS GRANDE (máxima
+            # atribución de evidencia) — determinista.
+            if _factor <= _best_factor:
+                _best_factor, _best_k, _best_adjs = _factor, _k, _adjs
+        for _pos, _i in enumerate(_ranked):
+            adj_scores[_i] = _best_adjs[_pos] if _pos < _best_k else 0.0
 
     if not adj_scores:
         composite = 0.0
@@ -864,8 +941,14 @@ def _vigia_score(case: dict) -> dict:
         _DETERMINISTIC_OUTPUT_PREC,
     )
 
-    n_artifacts   = len(artifacts)
-    support_score = _SUPPORT_SCORE_TABLE.get(n_artifacts, Fraction(1, 1))  # P0: Fraction lookup, no math.log()
+    # M2-2: el soporte estructural cuenta artefactos CON señal, no la
+    # cardinalidad de la lista — un README vacío no "corrobora". n=0 → la
+    # propia fórmula log(1+n)/log(5) da 0.
+    n_artifacts   = _n_signal
+    support_score = (
+        _SUPPORT_SCORE_TABLE.get(n_artifacts, Fraction(1, 1))  # P0: Fraction lookup, no math.log()
+        if n_artifacts > 0 else Fraction(0, 1)
+    )
     final_score   = _dround(raw_intent_score * (0.9 + 0.1 * support_score), _DETERMINISTIC_OUTPUT_PREC)
 
     mean_effective = _dround(
@@ -922,8 +1005,13 @@ def _vigia_score(case: dict) -> dict:
         # lista local. NGDC-003 (intención disputada) cruzaba el gate contando
         # documentación de escenario como corroboración.
         _tech_arts = [
-            a for a in artifacts
-            if _evidence_role(str(a.get("evidence_type", ""))) == _ROLE_DEVICE
+            a for a, _sig in zip(artifacts, _signal_flags)
+            # M2-2: sin señal (adjusted_score <= _M2_MIN_SIGNAL_ADJ) no hay
+            # corroboración — el gate contaba cardinalidad sin consultar
+            # la señal y un manual.pdf vacío de tipo nuevo lo abría
+            # (SUSPICION → MALICE con raw_score=0).
+            if _sig
+            and _evidence_role(str(a.get("evidence_type", ""))) == _ROLE_DEVICE
             # FASE 2: semantic_role=contextual no corrobora MALICE (mismo
             # trato que el rol contextual de B-070); los exculpatory ya no
             # están en `artifacts` (apartados arriba, semántica V1).

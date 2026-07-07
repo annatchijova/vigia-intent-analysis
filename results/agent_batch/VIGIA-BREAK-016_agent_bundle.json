@@ -1,49 +1,49 @@
 {
   "agent_verdict": "MALICE",
-  "analysis_timestamp": "2026-07-06T02:08:19.957538+00:00",
+  "analysis_timestamp": "2026-07-07T03:22:15.068252+00:00",
   "audit_trail": {
     "agent_version": "1.0.0-SANS-2026",
     "case_id": "VIGIA-BREAK-016",
-    "end_time": "2026-07-06T02:08:19.957546+00:00",
+    "end_time": "2026-07-07T03:22:15.068258+00:00",
     "entries": [
       {
         "action": "AGENT_INITIALIZED",
         "case_id": "VIGIA-BREAK-016",
-        "entry_sha256": "3b244d024a09fc55a3e2b03d9cdeb7acd56afbabab1d46cb0c2315fdc7ff18e3",
+        "entry_sha256": "e495cdab7de1164c10a9d0faa89d2a6c052a3fec62b0b37db26939705df99b8d",
         "inputs_summary": {
-          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "agent_file": "/home/user/vigia-intent-analysis/vigia_agent.py",
           "case_id": "VIGIA-BREAK-016"
         },
         "iteration": 0,
-        "note": "Agent initialized \u2014 source SHA-256: 23d8581225c57725...",
+        "note": "Agent initialized \u2014 source SHA-256: 1477828f53797b25...",
         "outputs_summary": {
-          "agent_sha256": "23d8581225c577250e3cd8db6e82cbc8c8e9144bc1f796ceb68c606364a7ef6c",
+          "agent_sha256": "1477828f53797b25d2b39b2762e31383665cdf2ff2b2335afa44afac2065068a",
           "agent_version": "1.0.0-SANS-2026"
         },
         "seq": 1,
-        "timestamp": "2026-07-06T02:08:19.891628+00:00",
+        "timestamp": "2026-07-07T03:22:14.925148+00:00",
         "tool": "vigia_agent"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-BREAK-016",
-        "entry_sha256": "c0c14dcc49fb8e51d2271a38ff481383bd5bdf73bb4010108d294d150f83f335",
+        "entry_sha256": "11e730cf6748b23ee9dc1e49fbc6b23fd6c3f28378faf233fb7c78c2a539e97e",
         "inputs_summary": {
-          "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-BREAK-016.json"
+          "path": "/home/user/vigia-intent-analysis/data/cases/VIGIA-BREAK-016.json"
         },
         "iteration": 0,
         "note": "Computing SHA-256 of original evidence",
         "outputs_summary": {},
         "seq": 2,
-        "timestamp": "2026-07-06T02:08:19.891713+00:00",
+        "timestamp": "2026-07-07T03:22:14.925297+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-BREAK-016",
-        "entry_sha256": "9d342c47e654d5c3d820de058ee2c2f0ac09064cb6524b62ad64ed872b49dc22",
+        "entry_sha256": "f7190caccbfcb476a0ee1bfa1c55af37214c0204df72037f90829fff39ced768",
         "inputs_summary": {
-          "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-BREAK-016.json"
+          "path": "/home/user/vigia-intent-analysis/data/cases/VIGIA-BREAK-016.json"
         },
         "iteration": 0,
         "note": "Evidence verified: b2a1d99999208049...",
@@ -51,15 +51,15 @@
           "sha256": "b2a1d9999920804932a5cd424abd6b01d5372d3dd50d3fc5f07ee28e6978e629"
         },
         "seq": 3,
-        "timestamp": "2026-07-06T02:08:19.891815+00:00",
+        "timestamp": "2026-07-07T03:22:14.925414+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "PIPELINE_EXECUTE",
         "case_id": "VIGIA-BREAK-016",
-        "entry_sha256": "0d4cc89b1c411a40ec10d0b366166336e09e1255eaa64acb12789aca89ed1270",
+        "entry_sha256": "6e6afde494a67ebe6720d06a01856ce0057af11ecd0636865469815270d5d18c",
         "inputs_summary": {
-          "evidence": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-BREAK-016.json",
+          "evidence": "/home/user/vigia-intent-analysis/data/cases/VIGIA-BREAK-016.json",
           "iteration": "0",
           "params": {}
         },
@@ -67,13 +67,13 @@
         "note": "Executing pipeline \u2014 iteration 0",
         "outputs_summary": {},
         "seq": 4,
-        "timestamp": "2026-07-06T02:08:19.891917+00:00",
+        "timestamp": "2026-07-07T03:22:14.925581+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "PIPELINE_COMPLETE",
         "case_id": "VIGIA-BREAK-016",
-        "entry_sha256": "d0242a7c90e48d1958a5cbc0e1735018d32a63d8a386125af89bfb77534686b5",
+        "entry_sha256": "cab9e7660ace88279a50deff57f6a7d54b309a6042a2cfd74fca75cdf12a839b",
         "inputs_summary": {
           "iteration": "0"
         },
@@ -95,8 +95,8 @@
             "expected_verdict": "MALICE",
             "resolve": {
               "motor_confidence": "0.95",
-              "motor_reason": "Intent score 0.7448 exceeds MALICE threshold (P2+acq_assurance scale, threshold=0.33)",
-              "motor_score": "0.7448",
+              "motor_reason": "Intent score 0.7524 exceeds MALICE threshold (P2+acq_assurance scale, threshold=0.33)",
+              "motor_score": "0.7524",
               "motor_verdict": "MALICE",
               "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
             },
@@ -146,13 +146,13 @@
           ]
         },
         "seq": 5,
-        "timestamp": "2026-07-06T02:08:19.956894+00:00",
+        "timestamp": "2026-07-07T03:22:15.067509+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "CONTRADICTION_CHECK",
         "case_id": "VIGIA-BREAK-016",
-        "entry_sha256": "c6f0d08ee99c47d2438cf415a7294d6fa441167e350cac66042f8a47cd97c935",
+        "entry_sha256": "81f9a51dff5aa4fa60448d426550eba3a0f81a40a8c0f02f29f643f46eb4b6b4",
         "inputs_summary": {
           "n_signals": "7"
         },
@@ -163,13 +163,13 @@
           "threshold": "2"
         },
         "seq": 6,
-        "timestamp": "2026-07-06T02:08:19.957059+00:00",
+        "timestamp": "2026-07-07T03:22:15.067694+00:00",
         "tool": "contradiction_detector"
       },
       {
         "action": "AGENT_EXIT",
         "case_id": "VIGIA-BREAK-016",
-        "entry_sha256": "0e15829d99b4bb0a955f057b67ee300438f6009f4b54e9d5dd810ba009fa1850",
+        "entry_sha256": "55f49c848f4403f507157390abebb86555e62c129692f00e0fbda3bdb2296680",
         "inputs_summary": {
           "verdict": "MALICIOUS_INTENT_DETECTED"
         },
@@ -180,18 +180,18 @@
           "exit_code": "1"
         },
         "seq": 7,
-        "timestamp": "2026-07-06T02:08:19.957320+00:00",
+        "timestamp": "2026-07-07T03:22:15.067971+00:00",
         "tool": "vigia_agent"
       }
     ],
-    "start_time": "2026-07-06T02:08:19.891410+00:00",
+    "start_time": "2026-07-07T03:22:14.924868+00:00",
     "total_entries": 7
   },
   "case_id": "VIGIA-BREAK-016",
-  "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-BREAK-016.json",
+  "evidence_path": "/home/user/vigia-intent-analysis/data/cases/VIGIA-BREAK-016.json",
   "evidence_sha256": "b2a1d9999920804932a5cd424abd6b01d5372d3dd50d3fc5f07ee28e6978e629",
   "iterations_executed": 1,
-  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-BREAK-016 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/VIGIA-BREAK-016.json\nEvidence SHA-256: b2a1d9999920804932a5cd424abd6b01d5372d3dd50d3fc5f07ee28e6978e629\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 19/20\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 7 se\u00f1al(es): 7 primaria(s) de ['sift_hr_system', 'sift_mail_gateway', 'sift_syslog', 'sift_volatility'], 0 derivada(s)/no-analizada(s). Top z: Post-reboot analysis: 847 system logs de=0.78, System reboot initiated by user jdoe at =0.33, jdoe registered vacation from 2026-06-15=0.05.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: MALICIOUS_INTENT_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nNarrative A appears artificial but is true. Narrative B appears human and natural but is false. Can VIG\u00cdA distinguish truth from plausibility? Many systems cannot.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Post-reboot analysis: 847 system logs deleted between 02:15 and 02:45.] z=0.782 conf=0.85 \u2014 \n  [System reboot initiated by user jdoe at 02:15:00] z=0.330 conf=0.60 \u2014 \n  [jdoe registered vacation from 2026-06-15 to 2026-06-30. Approved by ma] z=0.048 conf=0.95 \u2014 \n  [BACKUP_COMPLETE: 847 files, 0 errors, duration 3600s. Automated script] z=0.045 conf=0.90 \u2014 \n  [BACKUP_COMPLETE: 848 files, 0 errors, duration 3601s. Automated script] z=0.045 conf=0.90 \u2014 \n\n--- FINAL ALERT LEVEL ---\nHIGH \u2014 MALICE verdict from Bayesian posterior aggregation. Individual z-scores below threshold (distributed evidence pattern: no single dominant signal, but aggregate posterior is decisive). Alert floored (B-028/B-065).\nReconciliation: verdict MALICE rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 7 | Derived: 0 | Total: 7",
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-BREAK-016 ===\nEvidence: /home/user/vigia-intent-analysis/data/cases/VIGIA-BREAK-016.json\nEvidence SHA-256: b2a1d9999920804932a5cd424abd6b01d5372d3dd50d3fc5f07ee28e6978e629\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 19/20\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 7 se\u00f1al(es): 7 primaria(s) de ['sift_hr_system', 'sift_mail_gateway', 'sift_syslog', 'sift_volatility'], 0 derivada(s)/no-analizada(s). Top z: Post-reboot analysis: 847 system logs de=0.78, System reboot initiated by user jdoe at =0.33, jdoe registered vacation from 2026-06-15=0.05.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: MALICIOUS_INTENT_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nNarrative A appears artificial but is true. Narrative B appears human and natural but is false. Can VIG\u00cdA distinguish truth from plausibility? Many systems cannot.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Post-reboot analysis: 847 system logs deleted between 02:15 and 02:45.] z=0.782 conf=0.85 \u2014 \n  [System reboot initiated by user jdoe at 02:15:00] z=0.330 conf=0.60 \u2014 \n  [jdoe registered vacation from 2026-06-15 to 2026-06-30. Approved by ma] z=0.048 conf=0.95 \u2014 \n  [BACKUP_COMPLETE: 847 files, 0 errors, duration 3600s. Automated script] z=0.045 conf=0.90 \u2014 \n  [BACKUP_COMPLETE: 848 files, 0 errors, duration 3601s. Automated script] z=0.045 conf=0.90 \u2014 \n\n--- FINAL ALERT LEVEL ---\nHIGH \u2014 MALICE verdict from Bayesian posterior aggregation. Individual z-scores below threshold (distributed evidence pattern: no single dominant signal, but aggregate posterior is decisive). Alert floored (B-028/B-065).\nReconciliation: verdict MALICE rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 7 | Derived: 0 | Total: 7",
   "pipeline_results": {
     "abduction": {
       "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
@@ -236,8 +236,8 @@
       "expected_verdict": "MALICE",
       "resolve": {
         "motor_confidence": "0.95",
-        "motor_reason": "Intent score 0.7448 exceeds MALICE threshold (P2+acq_assurance scale, threshold=0.33)",
-        "motor_score": "0.7448",
+        "motor_reason": "Intent score 0.7524 exceeds MALICE threshold (P2+acq_assurance scale, threshold=0.33)",
+        "motor_score": "0.7524",
         "motor_verdict": "MALICE",
         "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
       },

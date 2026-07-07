@@ -261,6 +261,73 @@ scored from *more* incriminating evidence.
 
 ---
 
+## Round 2.1 — Implementation of the fixes (2026-07-07, follow-up session)
+
+M2-1 and M2-2 were implemented in `vigia_scorer.py` on this branch. Protocol:
+restore tag `pre-session-20260707-025439`, red tests first
+(`tests/test_m2_monotonicity_invariants.py`, 6 red / 1 control green at
+`e78d94b`), then the fix, then green suite + corpus comparison.
+
+**M2-2 (no-dilution):** a per-artifact *signal flag*
+(`adjusted_score > _M2_MIN_SIGNAL_ADJ`, strict, floor 0.0) now gates every
+cardinality channel: `n_artifacts`/`support_score`,
+`unique_types`/`diversity_bonus`, the single-artifact 0.65 cap, and the B-068
+corroboration gate. A `raw_score=0` document (adjusted = 0) is fully inert.
+The floor is measured on **adjusted evidential value**, not raw score —
+stricter than the suggested `raw_score > 0` (an artifact with signal but zero
+effective trust does not corroborate either) and more Daubert-defensible.
+
+**M2-1 (positive monotonicity):** redundancy decay is now evaluated on the
+**best prefix per evidence type**: artifacts of a type are sorted by
+`adjusted_score` (descending, stable ties), the legacy count penalty
+`min(0.5, (k−1)·0.15)` is evaluated on every top-k prefix, and the prefix with
+the highest Noisy-OR group contribution wins; artifacts outside it contribute
+0. Adding an artifact only widens the candidate set, so the composite is
+monotone non-decreasing by construction; wherever the full set was already
+optimal (all regular corpus cases), the result is bit-for-bit identical to
+legacy.
+
+**Verification (CPython 3.11.15):**
+- `tests/test_m2_monotonicity_invariants.py`: 7/7 green.
+- `scripts/redteam_round2_monotonicity.py`: **HOLDS on all experiments**
+  (was: 29/30 violations, 2 verdict flips).
+- Full suite: 776 passed (21 pre-existing, environment-dependent e2e failures
+  present identically at the restore tag).
+- Corpus `run_all_agent.py`: baseline **165/199** → **163/199**:
+  `VIGIA-MAGNET-2022-WINDOWS` fixed (+1), and exactly 3 regressions —
+  `VIGIA-FP-001`, `VIGIA-CAN-029`, `VIGIA-CAN-036`.
+
+### The label conflict (measured impossibility, not an implementation gap)
+
+The 3 regressed labels **encode the defect the invariants forbid**:
+
+- `VIGIA-FP-001` (exp BENIGN) passes only because a `log_entry raw=0.05`
+  *dilutes* the strong log's composite 0.083 → 0.0744, under the 0.08 NOISE
+  edge. Undiluted, the case scores 0.0804 (UNKNOWN) under any monotone scheme.
+- `VIGIA-CAN-029` / `VIGIA-CAN-036` (exp SUSPICION) pass only because a
+  near-zero same-type artifact dilutes the composite below the 0.33 MALICE
+  threshold; monotone scoring lifts them to 0.34–0.36 and the B-068 gate is
+  satisfied by their own 4 signal artifacts.
+
+Two impossibility results, both confirmed by induction on the full corpus:
+
+1. **No signal floor exists** (raw or adjusted) that re-caps CAN-029/036 while
+   preserving the canonical MALICE set: the corpus requires corroboration by
+   artifacts with adjusted value as low as **0.0017** (25 MALICE cases regress
+   at floor 0.015, incl. `VIGIA-CAN-003/006/007/010/011`, `VIGIA-REAL-SRL-*`),
+   while excluding CAN-029's diluter requires a floor **> 0.013**. Empty
+   interval. (Runs: floor 0.10 → 140/199; floor 0.015 → 142/199.)
+2. **Any count-increasing redundancy decay is non-monotone somewhere**, and
+   its monotone closure (best prefix) necessarily scores ≥ every sub-multiset
+   — which crosses the labelled thresholds of exactly these 3 cases. A decay
+   that never increases with count would forfeit the Noisy-OR flood
+   protection (P1) entirely.
+
+Therefore `{invariants hold} ∧ {199/199 label-compatible}` is unsatisfiable.
+Resolution of the 3 labels is a doctrine decision (relabel vs. document as
+known limitation vs. officially scope the invariant); recorded for that
+decision, not silently resolved here.
+
 ## Recommendations (out of scope of this read-only audit — record only)
 
 1. **B-068 gate should count signal, not cardinality.** Require corroborating

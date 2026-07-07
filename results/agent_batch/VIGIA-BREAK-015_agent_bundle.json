@@ -1,49 +1,49 @@
 {
   "agent_verdict": "INTENT",
-  "analysis_timestamp": "2026-07-06T02:08:19.841487+00:00",
+  "analysis_timestamp": "2026-07-07T03:22:14.832282+00:00",
   "audit_trail": {
     "agent_version": "1.0.0-SANS-2026",
     "case_id": "VIGIA-BREAK-015",
-    "end_time": "2026-07-06T02:08:19.841492+00:00",
+    "end_time": "2026-07-07T03:22:14.832287+00:00",
     "entries": [
       {
         "action": "AGENT_INITIALIZED",
         "case_id": "VIGIA-BREAK-015",
-        "entry_sha256": "169d007eb1b714638352a47a8abf32ae2af12498be6d1dfeec9f874cc7a888bd",
+        "entry_sha256": "2304d3ae5f5a409802330f28bca8de90241c1858ec00a95bb8e8657a2bff3f3e",
         "inputs_summary": {
-          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "agent_file": "/home/user/vigia-intent-analysis/vigia_agent.py",
           "case_id": "VIGIA-BREAK-015"
         },
         "iteration": 0,
-        "note": "Agent initialized \u2014 source SHA-256: 23d8581225c57725...",
+        "note": "Agent initialized \u2014 source SHA-256: 1477828f53797b25...",
         "outputs_summary": {
-          "agent_sha256": "23d8581225c577250e3cd8db6e82cbc8c8e9144bc1f796ceb68c606364a7ef6c",
+          "agent_sha256": "1477828f53797b25d2b39b2762e31383665cdf2ff2b2335afa44afac2065068a",
           "agent_version": "1.0.0-SANS-2026"
         },
         "seq": 1,
-        "timestamp": "2026-07-06T02:08:19.781141+00:00",
+        "timestamp": "2026-07-07T03:22:14.696172+00:00",
         "tool": "vigia_agent"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-BREAK-015",
-        "entry_sha256": "d640cb795a962e121c8b4c6237122316e0fec4363ecfe4c78a8b145f2ab58326",
+        "entry_sha256": "74aabbb0b27cc091d3a1cf4268a2185908b31e1d5c8e4aefe8a44b31e2d30f94",
         "inputs_summary": {
-          "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-BREAK-015.json"
+          "path": "/home/user/vigia-intent-analysis/data/cases/VIGIA-BREAK-015.json"
         },
         "iteration": 0,
         "note": "Computing SHA-256 of original evidence",
         "outputs_summary": {},
         "seq": 2,
-        "timestamp": "2026-07-06T02:08:19.781274+00:00",
+        "timestamp": "2026-07-07T03:22:14.696317+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-BREAK-015",
-        "entry_sha256": "d40cd122a636e783ab60f93c23c6094c60ee76571a976e80ab5410993976e97d",
+        "entry_sha256": "20468aed312f68fabc82fd53cd654cd6041c2516798a4863a07e92d254aca630",
         "inputs_summary": {
-          "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-BREAK-015.json"
+          "path": "/home/user/vigia-intent-analysis/data/cases/VIGIA-BREAK-015.json"
         },
         "iteration": 0,
         "note": "Evidence verified: 7ff146c5bde9919a...",
@@ -51,15 +51,15 @@
           "sha256": "7ff146c5bde9919a6303921e87d54849672b6acdae7e946ef11e3d68b22931c1"
         },
         "seq": 3,
-        "timestamp": "2026-07-06T02:08:19.781409+00:00",
+        "timestamp": "2026-07-07T03:22:14.696428+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "PIPELINE_EXECUTE",
         "case_id": "VIGIA-BREAK-015",
-        "entry_sha256": "c5ae094330dfa368a1435b6cfec840afd4b26d58ef7ea66d3e14e76595710ab8",
+        "entry_sha256": "870f1f122db1c334a2ba26ab570acfde8cda4b99fa95ea96003ae9993eaf424b",
         "inputs_summary": {
-          "evidence": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-BREAK-015.json",
+          "evidence": "/home/user/vigia-intent-analysis/data/cases/VIGIA-BREAK-015.json",
           "iteration": "0",
           "params": {}
         },
@@ -67,13 +67,13 @@
         "note": "Executing pipeline \u2014 iteration 0",
         "outputs_summary": {},
         "seq": 4,
-        "timestamp": "2026-07-06T02:08:19.781594+00:00",
+        "timestamp": "2026-07-07T03:22:14.696589+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "PIPELINE_COMPLETE",
         "case_id": "VIGIA-BREAK-015",
-        "entry_sha256": "9d001668d63a041c2c52971479a0daba3d259231fd330f3358d9ceed627e1555",
+        "entry_sha256": "f2b4fbd360e1c3f56efadcb601a91d98fe5f6751bb707f6365a846a36c6cd6f3",
         "inputs_summary": {
           "iteration": "0"
         },
@@ -82,8 +82,8 @@
         "outputs_summary": {
           "abduction": {
             "best_hypothesis": "SUSPICION_DETECTED",
-            "best_posterior": "21/50",
-            "confidence": "21/50",
+            "best_posterior": "12/25",
+            "confidence": "12/25",
             "is_conclusive": "True",
             "narrative": "99% of human experts would conclude MALICE. Evidence is sufficient, unambiguous, non-contradictory, with no missing data. But VIG\u00cdA might detect minimal formal uncertainty and emit ABSTAIN from excess..."
           },
@@ -94,9 +94,9 @@
             "ebs_adapter_mode": "motor",
             "expected_verdict": "MALICE",
             "resolve": {
-              "motor_confidence": "0.42",
-              "motor_reason": "Significant signal with structural support (score=0.2106)",
-              "motor_score": "0.2106",
+              "motor_confidence": "0.48",
+              "motor_reason": "Significant signal with structural support (score=0.2382)",
+              "motor_score": "0.2382",
               "motor_verdict": "SUSPICION",
               "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
             },
@@ -146,13 +146,13 @@
           ]
         },
         "seq": 5,
-        "timestamp": "2026-07-06T02:08:19.841101+00:00",
+        "timestamp": "2026-07-07T03:22:14.831766+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "CONTRADICTION_CHECK",
         "case_id": "VIGIA-BREAK-015",
-        "entry_sha256": "3efb8d293c170e4a98faec4f30b1fc292c60b4a62fa540a6cc74b5006335354d",
+        "entry_sha256": "202bee402a528217f37f282e3a4a56b47662fca0b8264a19fdb859477e40c9b6",
         "inputs_summary": {
           "n_signals": "5"
         },
@@ -163,13 +163,13 @@
           "threshold": "2"
         },
         "seq": 6,
-        "timestamp": "2026-07-06T02:08:19.841225+00:00",
+        "timestamp": "2026-07-07T03:22:14.831938+00:00",
         "tool": "contradiction_detector"
       },
       {
         "action": "AGENT_EXIT",
         "case_id": "VIGIA-BREAK-015",
-        "entry_sha256": "cc3d245e0dd28f73d86ff3e8a78af686ce76bc1348b2b50ee6e35ca434476800",
+        "entry_sha256": "a50bb069e2459b77625e23408b5d6ddffdfec493c4df4c468aeb52d8d4f8146d",
         "inputs_summary": {
           "verdict": "SUSPICION_DETECTED"
         },
@@ -180,26 +180,26 @@
           "exit_code": "3"
         },
         "seq": 7,
-        "timestamp": "2026-07-06T02:08:19.841434+00:00",
+        "timestamp": "2026-07-07T03:22:14.832195+00:00",
         "tool": "vigia_agent"
       }
     ],
-    "start_time": "2026-07-06T02:08:19.780926+00:00",
+    "start_time": "2026-07-07T03:22:14.695869+00:00",
     "total_entries": 7
   },
   "case_id": "VIGIA-BREAK-015",
-  "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-BREAK-015.json",
+  "evidence_path": "/home/user/vigia-intent-analysis/data/cases/VIGIA-BREAK-015.json",
   "evidence_sha256": "7ff146c5bde9919a6303921e87d54849672b6acdae7e946ef11e3d68b22931c1",
   "iterations_executed": 1,
-  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-BREAK-015 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/VIGIA-BREAK-015.json\nEvidence SHA-256: 7ff146c5bde9919a6303921e87d54849672b6acdae7e946ef11e3d68b22931c1\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: SUSPICION_DETECTED\nPosterior confidence: 21/50\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 5 se\u00f1al(es): 5 primaria(s) de ['sift_biometric_verifier', 'sift_cctv_forensic', 'sift_hr_system', 'sift_vpn_gateway'], 0 derivada(s)/no-analizada(s). Top z: Forensic video analysis: subject in CAM-=0.81, Successful VPN login by 'jdoe' from IP 1=0.18, jdoe badged into physical office at 08:0=0.05.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: SUSPICION_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\n99% of human experts would conclude MALICE. Evidence is sufficient, unambiguous, non-contradictory, with no missing data. But VIG\u00cdA might detect minimal formal uncertainty and emit ABSTAIN from excessive rigour.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Forensic video analysis: subject in CAM-OFFICE-03 has birthmark on lef] z=0.807 conf=0.85 \u2014 \n  [Successful VPN login by 'jdoe' from IP 185.220.101.42 (Tor exit node)] z=0.176 conf=0.20 \u2014 \n  [jdoe badged into physical office at 08:00. No badge-out recorded.] z=0.048 conf=0.95 \u2014 \n  [Successful VPN login by 'jdoe' from IP 10.0.1.50 (office)] z=0.045 conf=0.90 \u2014 \n  [Security camera video: user 'jdoe' at their desk, timestamp 14:30:00] z=0.035 conf=0.70 \u2014 \n\n--- FINAL ALERT LEVEL ---\nMEDIUM \u2014 INTENT verdict with individual z-scores below threshold. Alert floored (B-028/B-065): an intent finding cannot present as LOW.\nReconciliation: verdict INTENT rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 5 | Derived: 0 | Total: 5",
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-BREAK-015 ===\nEvidence: /home/user/vigia-intent-analysis/data/cases/VIGIA-BREAK-015.json\nEvidence SHA-256: 7ff146c5bde9919a6303921e87d54849672b6acdae7e946ef11e3d68b22931c1\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: SUSPICION_DETECTED\nPosterior confidence: 12/25\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 5 se\u00f1al(es): 5 primaria(s) de ['sift_biometric_verifier', 'sift_cctv_forensic', 'sift_hr_system', 'sift_vpn_gateway'], 0 derivada(s)/no-analizada(s). Top z: Forensic video analysis: subject in CAM-=0.81, Successful VPN login by 'jdoe' from IP 1=0.18, jdoe badged into physical office at 08:0=0.05.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: SUSPICION_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\n99% of human experts would conclude MALICE. Evidence is sufficient, unambiguous, non-contradictory, with no missing data. But VIG\u00cdA might detect minimal formal uncertainty and emit ABSTAIN from excessive rigour.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Forensic video analysis: subject in CAM-OFFICE-03 has birthmark on lef] z=0.807 conf=0.85 \u2014 \n  [Successful VPN login by 'jdoe' from IP 185.220.101.42 (Tor exit node)] z=0.176 conf=0.20 \u2014 \n  [jdoe badged into physical office at 08:00. No badge-out recorded.] z=0.048 conf=0.95 \u2014 \n  [Successful VPN login by 'jdoe' from IP 10.0.1.50 (office)] z=0.045 conf=0.90 \u2014 \n  [Security camera video: user 'jdoe' at their desk, timestamp 14:30:00] z=0.035 conf=0.70 \u2014 \n\n--- FINAL ALERT LEVEL ---\nMEDIUM \u2014 INTENT verdict with individual z-scores below threshold. Alert floored (B-028/B-065): an intent finding cannot present as LOW.\nReconciliation: verdict INTENT rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 5 | Derived: 0 | Total: 5",
   "pipeline_results": {
     "abduction": {
       "best_hypothesis": "SUSPICION_DETECTED",
-      "best_posterior": "21/50",
+      "best_posterior": "12/25",
       "confidence": {
         "__fraction__": true,
-        "den": 50,
-        "num": 21
+        "den": 25,
+        "num": 12
       },
       "is_conclusive": true,
       "narrative": "99% of human experts would conclude MALICE. Evidence is sufficient, unambiguous, non-contradictory, with no missing data. But VIG\u00cdA might detect minimal formal uncertainty and emit ABSTAIN from excessive rigour."
@@ -211,9 +211,9 @@
       "ebs_adapter_mode": "motor",
       "expected_verdict": "MALICE",
       "resolve": {
-        "motor_confidence": "0.42",
-        "motor_reason": "Significant signal with structural support (score=0.2106)",
-        "motor_score": "0.2106",
+        "motor_confidence": "0.48",
+        "motor_reason": "Significant signal with structural support (score=0.2382)",
+        "motor_score": "0.2382",
         "motor_verdict": "SUSPICION",
         "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
       },

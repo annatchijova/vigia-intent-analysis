@@ -1,49 +1,49 @@
 {
   "agent_verdict": "MALICE",
-  "analysis_timestamp": "2026-07-06T02:08:36.131219+00:00",
+  "analysis_timestamp": "2026-07-07T03:22:53.499593+00:00",
   "audit_trail": {
     "agent_version": "1.0.0-SANS-2026",
     "case_id": "VIGIA-CAN-026",
-    "end_time": "2026-07-06T02:08:36.131226+00:00",
+    "end_time": "2026-07-07T03:22:53.499599+00:00",
     "entries": [
       {
         "action": "AGENT_INITIALIZED",
         "case_id": "VIGIA-CAN-026",
-        "entry_sha256": "86909a5eccf58e4edbe6f6c5086651ba92de16f177b4f2e30c60138359798070",
+        "entry_sha256": "048e5a963fe771d88a9b89331f5697194adc194c247e0d268caa8bcce3ffed7b",
         "inputs_summary": {
-          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "agent_file": "/home/user/vigia-intent-analysis/vigia_agent.py",
           "case_id": "VIGIA-CAN-026"
         },
         "iteration": 0,
-        "note": "Agent initialized \u2014 source SHA-256: 23d8581225c57725...",
+        "note": "Agent initialized \u2014 source SHA-256: 1477828f53797b25...",
         "outputs_summary": {
-          "agent_sha256": "23d8581225c577250e3cd8db6e82cbc8c8e9144bc1f796ceb68c606364a7ef6c",
+          "agent_sha256": "1477828f53797b25d2b39b2762e31383665cdf2ff2b2335afa44afac2065068a",
           "agent_version": "1.0.0-SANS-2026"
         },
         "seq": 1,
-        "timestamp": "2026-07-06T02:08:36.085763+00:00",
+        "timestamp": "2026-07-07T03:22:53.374143+00:00",
         "tool": "vigia_agent"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-CAN-026",
-        "entry_sha256": "84997b6d05dbb027763b58b68ce11ca0236d62679c271f6bd700396c09283833",
+        "entry_sha256": "96a2df89526d2a056357226557ec9e39dbea3ae40cd5013b4aec4ac19ddfb933",
         "inputs_summary": {
-          "path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-026.json"
+          "path": "/home/user/vigia-intent-analysis/data/cases/consolidated_canonical/VIGIA-CAN-026.json"
         },
         "iteration": 0,
         "note": "Computing SHA-256 of original evidence",
         "outputs_summary": {},
         "seq": 2,
-        "timestamp": "2026-07-06T02:08:36.085850+00:00",
+        "timestamp": "2026-07-07T03:22:53.374286+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-CAN-026",
-        "entry_sha256": "7ad33adaa954161c775b974889b4aa48ce3525de9e3a980a70ba2a73181eeb7a",
+        "entry_sha256": "43f51c458d665906ac466b13645d6491ab46e5a7557ebd79c03c72c756505a80",
         "inputs_summary": {
-          "path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-026.json"
+          "path": "/home/user/vigia-intent-analysis/data/cases/consolidated_canonical/VIGIA-CAN-026.json"
         },
         "iteration": 0,
         "note": "Evidence verified: 2d051f649efffc3e...",
@@ -51,15 +51,15 @@
           "sha256": "2d051f649efffc3eb20f580c5a3a251f1ca2ce3b143f15f700f4996c23432570"
         },
         "seq": 3,
-        "timestamp": "2026-07-06T02:08:36.085940+00:00",
+        "timestamp": "2026-07-07T03:22:53.374391+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "PIPELINE_EXECUTE",
         "case_id": "VIGIA-CAN-026",
-        "entry_sha256": "76566bb839714de407eb543da5e75b27a4d3421a97ed76e65ad02bc61c916493",
+        "entry_sha256": "9bccc5135e83b0a5e22c0d9e95e94c1de29de0900399e22db008585e515cbb6c",
         "inputs_summary": {
-          "evidence": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-026.json",
+          "evidence": "/home/user/vigia-intent-analysis/data/cases/consolidated_canonical/VIGIA-CAN-026.json",
           "iteration": "0",
           "params": {}
         },
@@ -67,13 +67,13 @@
         "note": "Executing pipeline \u2014 iteration 0",
         "outputs_summary": {},
         "seq": 4,
-        "timestamp": "2026-07-06T02:08:36.086045+00:00",
+        "timestamp": "2026-07-07T03:22:53.374609+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "PIPELINE_COMPLETE",
         "case_id": "VIGIA-CAN-026",
-        "entry_sha256": "13b5812539901d1742ebd78934599b70f45dc6460cd86934f64b2613355cb582",
+        "entry_sha256": "4a2df3faa4877ab592792c4f605240f8190dc52299125873a8b46fd1880baf2b",
         "inputs_summary": {
           "iteration": "0"
         },
@@ -95,8 +95,8 @@
             "expected_verdict": "MALICE",
             "resolve": {
               "motor_confidence": "0.95",
-              "motor_reason": "Intent score 0.7752 exceeds MALICE threshold (P2+acq_assurance scale, threshold=0.33)",
-              "motor_score": "0.7752",
+              "motor_reason": "Intent score 0.7789 exceeds MALICE threshold (P2+acq_assurance scale, threshold=0.33)",
+              "motor_score": "0.7789",
               "motor_verdict": "MALICE",
               "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
             },
@@ -138,13 +138,13 @@
           ]
         },
         "seq": 5,
-        "timestamp": "2026-07-06T02:08:36.130718+00:00",
+        "timestamp": "2026-07-07T03:22:53.498956+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "CONTRADICTION_CHECK",
         "case_id": "VIGIA-CAN-026",
-        "entry_sha256": "e0cdd04c0529a06949631692d7edd52a7f71a4769920318e3f10ad029205b75e",
+        "entry_sha256": "4587b7433ee0abb0d6eed5aa3be490fadae5f6d50a55a3a4e3f5d2f91cb8485b",
         "inputs_summary": {
           "n_signals": "4"
         },
@@ -155,13 +155,13 @@
           "threshold": "2"
         },
         "seq": 6,
-        "timestamp": "2026-07-06T02:08:36.130843+00:00",
+        "timestamp": "2026-07-07T03:22:53.499094+00:00",
         "tool": "contradiction_detector"
       },
       {
         "action": "AGENT_EXIT",
         "case_id": "VIGIA-CAN-026",
-        "entry_sha256": "c5f50a6facc3cfaa92aba209b656c5ff533499d3d5241267edd2ebeb22748893",
+        "entry_sha256": "a78dbb1a4df704e8bee1940d7edb696032bef600d35566de076d2218ac618356",
         "inputs_summary": {
           "verdict": "MALICIOUS_INTENT_DETECTED"
         },
@@ -172,18 +172,18 @@
           "exit_code": "1"
         },
         "seq": 7,
-        "timestamp": "2026-07-06T02:08:36.131043+00:00",
+        "timestamp": "2026-07-07T03:22:53.499360+00:00",
         "tool": "vigia_agent"
       }
     ],
-    "start_time": "2026-07-06T02:08:36.085558+00:00",
+    "start_time": "2026-07-07T03:22:53.373825+00:00",
     "total_entries": 7
   },
   "case_id": "VIGIA-CAN-026",
-  "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-026.json",
+  "evidence_path": "/home/user/vigia-intent-analysis/data/cases/consolidated_canonical/VIGIA-CAN-026.json",
   "evidence_sha256": "2d051f649efffc3eb20f580c5a3a251f1ca2ce3b143f15f700f4996c23432570",
   "iterations_executed": 1,
-  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-CAN-026 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-026.json\nEvidence SHA-256: 2d051f649efffc3eb20f580c5a3a251f1ca2ce3b143f15f700f4996c23432570\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 19/20\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 4 se\u00f1al(es): 4 primaria(s) de ['sift_chat_system', 'sift_syslog', 'sift_volatility'], 0 derivada(s)/no-analizada(s). Top z: powershell.exe process in memory: downlo=0.85, SOC inquiry: 'We detected unusual activi=0.37, Response: 'Why are you asking me? Don't =0.28.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: MALICIOUS_INTENT_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nSOC inquires about suspicious activity at 03:15. User responds with defensive aggression: 'Don't you trust my work? I already talked to the manager'. Memory confirms PowerShell with Mimikatz and download from a Russian IP. No record of manager conversation.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [powershell.exe process in memory: downloading payload from 185.220.101] z=0.855 conf=0.95 \u2014 \n  [SOC inquiry: 'We detected unusual activity on your account yesterday a] z=0.368 conf=0.40 \u2014 \n  [Response: 'Why are you asking me? Don't you trust my work? I already s] z=0.276 conf=0.30 \u2014 \n  [Management verification: NO communication record between user@corp.com] z=0.018 conf=0.30 \u2014 \n\n--- FINAL ALERT LEVEL ---\nHIGH \u2014 MALICE verdict from Bayesian posterior aggregation. Individual z-scores below threshold (distributed evidence pattern: no single dominant signal, but aggregate posterior is decisive). Alert floored (B-028/B-065).\nReconciliation: verdict MALICE rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 4 | Derived: 0 | Total: 4",
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-CAN-026 ===\nEvidence: /home/user/vigia-intent-analysis/data/cases/consolidated_canonical/VIGIA-CAN-026.json\nEvidence SHA-256: 2d051f649efffc3eb20f580c5a3a251f1ca2ce3b143f15f700f4996c23432570\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 19/20\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 4 se\u00f1al(es): 4 primaria(s) de ['sift_chat_system', 'sift_syslog', 'sift_volatility'], 0 derivada(s)/no-analizada(s). Top z: powershell.exe process in memory: downlo=0.85, SOC inquiry: 'We detected unusual activi=0.37, Response: 'Why are you asking me? Don't =0.28.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: MALICIOUS_INTENT_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nSOC inquires about suspicious activity at 03:15. User responds with defensive aggression: 'Don't you trust my work? I already talked to the manager'. Memory confirms PowerShell with Mimikatz and download from a Russian IP. No record of manager conversation.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [powershell.exe process in memory: downloading payload from 185.220.101] z=0.855 conf=0.95 \u2014 \n  [SOC inquiry: 'We detected unusual activity on your account yesterday a] z=0.368 conf=0.40 \u2014 \n  [Response: 'Why are you asking me? Don't you trust my work? I already s] z=0.276 conf=0.30 \u2014 \n  [Management verification: NO communication record between user@corp.com] z=0.018 conf=0.30 \u2014 \n\n--- FINAL ALERT LEVEL ---\nHIGH \u2014 MALICE verdict from Bayesian posterior aggregation. Individual z-scores below threshold (distributed evidence pattern: no single dominant signal, but aggregate posterior is decisive). Alert floored (B-028/B-065).\nReconciliation: verdict MALICE rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 4 | Derived: 0 | Total: 4",
   "pipeline_results": {
     "abduction": {
       "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
@@ -228,8 +228,8 @@
       "expected_verdict": "MALICE",
       "resolve": {
         "motor_confidence": "0.95",
-        "motor_reason": "Intent score 0.7752 exceeds MALICE threshold (P2+acq_assurance scale, threshold=0.33)",
-        "motor_score": "0.7752",
+        "motor_reason": "Intent score 0.7789 exceeds MALICE threshold (P2+acq_assurance scale, threshold=0.33)",
+        "motor_score": "0.7789",
         "motor_verdict": "MALICE",
         "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
       },

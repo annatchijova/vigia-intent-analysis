@@ -1,49 +1,49 @@
 {
   "agent_verdict": "MALICE",
-  "analysis_timestamp": "2026-07-06T02:08:31.619400+00:00",
+  "analysis_timestamp": "2026-07-07T03:22:42.875750+00:00",
   "audit_trail": {
     "agent_version": "1.0.0-SANS-2026",
     "case_id": "VIGIA-REAL-NROMANOFF",
-    "end_time": "2026-07-06T02:08:31.619406+00:00",
+    "end_time": "2026-07-07T03:22:42.875757+00:00",
     "entries": [
       {
         "action": "AGENT_INITIALIZED",
         "case_id": "VIGIA-REAL-NROMANOFF",
-        "entry_sha256": "6593968ee431003182ded45727fb713517db4730ed960c8a416a5670e6288dfe",
+        "entry_sha256": "24ad34bb5f9933b13b7ef94b37fac0d48dee3a352902afa1efb6ddbb69f069da",
         "inputs_summary": {
-          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "agent_file": "/home/user/vigia-intent-analysis/vigia_agent.py",
           "case_id": "VIGIA-REAL-NROMANOFF"
         },
         "iteration": 0,
-        "note": "Agent initialized \u2014 source SHA-256: 23d8581225c57725...",
+        "note": "Agent initialized \u2014 source SHA-256: 1477828f53797b25...",
         "outputs_summary": {
-          "agent_sha256": "23d8581225c577250e3cd8db6e82cbc8c8e9144bc1f796ceb68c606364a7ef6c",
+          "agent_sha256": "1477828f53797b25d2b39b2762e31383665cdf2ff2b2335afa44afac2065068a",
           "agent_version": "1.0.0-SANS-2026"
         },
         "seq": 1,
-        "timestamp": "2026-07-06T02:08:31.560049+00:00",
+        "timestamp": "2026-07-07T03:22:42.729588+00:00",
         "tool": "vigia_agent"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-REAL-NROMANOFF",
-        "entry_sha256": "2eb18ac00ea7552d12c2bc41ebe64556b77375d272c73a6ea07c6577fd6f1abd",
+        "entry_sha256": "49c8568464da76ef2c992f1b39011db144ff586ec5c9a1134331c389fffcdd88",
         "inputs_summary": {
-          "path": "/home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-REAL-NROMANOFF.json"
+          "path": "/home/user/vigia-intent-analysis/data/cases/converted/VIGIA-REAL-NROMANOFF.json"
         },
         "iteration": 0,
         "note": "Computing SHA-256 of original evidence",
         "outputs_summary": {},
         "seq": 2,
-        "timestamp": "2026-07-06T02:08:31.560130+00:00",
+        "timestamp": "2026-07-07T03:22:42.729723+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-REAL-NROMANOFF",
-        "entry_sha256": "45a05eb04dc38448184cead5f5cba0da18655559ae41d3762ef2fb259e1eca2b",
+        "entry_sha256": "8911c6abdc4d728824fdaac3cbb07da55759f60118efe74204e458c8a1be2389",
         "inputs_summary": {
-          "path": "/home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-REAL-NROMANOFF.json"
+          "path": "/home/user/vigia-intent-analysis/data/cases/converted/VIGIA-REAL-NROMANOFF.json"
         },
         "iteration": 0,
         "note": "Evidence verified: cdcaac23c1f4d232...",
@@ -51,15 +51,15 @@
           "sha256": "cdcaac23c1f4d232c3a8fdea4827c61e7df3818e31a965509eeb8a6bde21ff48"
         },
         "seq": 3,
-        "timestamp": "2026-07-06T02:08:31.560230+00:00",
+        "timestamp": "2026-07-07T03:22:42.729838+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "PIPELINE_EXECUTE",
         "case_id": "VIGIA-REAL-NROMANOFF",
-        "entry_sha256": "f780da77de449c0fd7641b53d76a60402a70d2b7dc484a4c996404d07f1f8753",
+        "entry_sha256": "0dd23cc0812d4e9685ec9f5aaefe8241b664720e8bbf93e93f015ed68ce4ff89",
         "inputs_summary": {
-          "evidence": "/home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-REAL-NROMANOFF.json",
+          "evidence": "/home/user/vigia-intent-analysis/data/cases/converted/VIGIA-REAL-NROMANOFF.json",
           "iteration": "0",
           "params": {}
         },
@@ -67,13 +67,13 @@
         "note": "Executing pipeline \u2014 iteration 0",
         "outputs_summary": {},
         "seq": 4,
-        "timestamp": "2026-07-06T02:08:31.560335+00:00",
+        "timestamp": "2026-07-07T03:22:42.730005+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "PIPELINE_COMPLETE",
         "case_id": "VIGIA-REAL-NROMANOFF",
-        "entry_sha256": "e4b9c109f011d4b9f26c05f4e8c916fbfcad5db85cf5b91d6280a891275a03e3",
+        "entry_sha256": "628951d1a31843dab74e2de1fbe57cc23238e3c28ebadac08a6898245b8dbac8",
         "inputs_summary": {
           "iteration": "0"
         },
@@ -82,8 +82,8 @@
         "outputs_summary": {
           "abduction": {
             "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
-            "best_posterior": "87/100",
-            "confidence": "87/100",
+            "best_posterior": "21/25",
+            "confidence": "21/25",
             "is_conclusive": "True",
             "narrative": "Natasha Romanoff (nromanoff), Executive at Stark Research Labs (OU=Executives, DC=shieldbase DC=local), Windows 7 SP1 x86 workstation WKS-WIN732BITA. Zeus banking trojan confirmed by Volatility zeus-a..."
           },
@@ -94,9 +94,9 @@
             "ebs_adapter_mode": "motor",
             "expected_verdict": "MALICE",
             "resolve": {
-              "motor_confidence": "0.87",
-              "motor_reason": "Intent score 0.4370 exceeds MALICE threshold (P2+acq_assurance scale, threshold=0.33)",
-              "motor_score": "0.437",
+              "motor_confidence": "0.84",
+              "motor_reason": "Intent score 0.4188 exceeds MALICE threshold (P2+acq_assurance scale, threshold=0.33)",
+              "motor_score": "0.4188",
               "motor_verdict": "MALICE",
               "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
             },
@@ -146,13 +146,13 @@
           ]
         },
         "seq": 5,
-        "timestamp": "2026-07-06T02:08:31.618772+00:00",
+        "timestamp": "2026-07-07T03:22:42.875004+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "CONTRADICTION_CHECK",
         "case_id": "VIGIA-REAL-NROMANOFF",
-        "entry_sha256": "346dde05262dfae7887782e4a980eadfe71d17e75206fd52146f4617786e8a91",
+        "entry_sha256": "24d74976f73f86b5e87f8265b2c23707190a81d260b6aa6cbaab306102d2968c",
         "inputs_summary": {
           "n_signals": "5"
         },
@@ -163,13 +163,13 @@
           "threshold": "2"
         },
         "seq": 6,
-        "timestamp": "2026-07-06T02:08:31.618938+00:00",
+        "timestamp": "2026-07-07T03:22:42.875198+00:00",
         "tool": "contradiction_detector"
       },
       {
         "action": "AGENT_EXIT",
         "case_id": "VIGIA-REAL-NROMANOFF",
-        "entry_sha256": "7c07d64e30ef4e622a679021ed5f4331627c857cc6cae8e3cc27bc7ab22a2e88",
+        "entry_sha256": "75c6ba5bb42519db05d4eb32d3e1ca8ba446fd6f931d0657fa00bf7f681cece6",
         "inputs_summary": {
           "verdict": "MALICIOUS_INTENT_DETECTED"
         },
@@ -180,26 +180,26 @@
           "exit_code": "1"
         },
         "seq": 7,
-        "timestamp": "2026-07-06T02:08:31.619185+00:00",
+        "timestamp": "2026-07-07T03:22:42.875491+00:00",
         "tool": "vigia_agent"
       }
     ],
-    "start_time": "2026-07-06T02:08:31.559839+00:00",
+    "start_time": "2026-07-07T03:22:42.729256+00:00",
     "total_entries": 7
   },
   "case_id": "VIGIA-REAL-NROMANOFF",
-  "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-REAL-NROMANOFF.json",
+  "evidence_path": "/home/user/vigia-intent-analysis/data/cases/converted/VIGIA-REAL-NROMANOFF.json",
   "evidence_sha256": "cdcaac23c1f4d232c3a8fdea4827c61e7df3818e31a965509eeb8a6bde21ff48",
   "iterations_executed": 1,
-  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-REAL-NROMANOFF ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-REAL-NROMANOFF.json\nEvidence SHA-256: cdcaac23c1f4d232c3a8fdea4827c61e7df3818e31a965509eeb8a6bde21ff48\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 87/100\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 5 se\u00f1al(es): 5 primaria(s) de ['Plaso/MSIE Cache', 'Plaso/WinEVTX', 'Volatility/shimcachemem', 'Volatility/shimcachemem + AppCompatCache', 'Volatility/zeus-apihooks'], 0 derivada(s)/no-analizada(s). Top z: Zeus banking trojan: Inline/Trampoline h=0.92, Persistence binary a.exe executed every =0.87, Group Policy Event 5017: CN=Natasha Roma=0.79.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: MALICIOUS_INTENT_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nNatasha Romanoff (nromanoff), Executive at Stark Research Labs (OU=Executives, DC=shieldbase DC=local), Windows 7 SP1 x86 workstation WKS-WIN732BITA. Zeus banking trojan confirmed by Volatility zeus-apihooks. Inline/Trampoline hooks on ntdll.dll!NtCreateThread and NtQueryDirectoryFile in services.exe (PID 676) redirect to unknown module at 0x7e3b47 \u2014 kernel-level process hiding. Persistence binary a.exe runs every 65 seconds from C:\\Users\\VIBRAN~1\\AppData\\Local\\Temp\\ (shimcachemem, 29+ entries) \n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Zeus banking trojan: Inline/Trampoline hooks on ntdll.dll!NtCreateThre] z=0.921 conf=0.95 \u2014 \n  [Persistence binary a.exe executed every 65 seconds from C:\\Users\\VIBRA] z=0.874 conf=0.93 \u2014 \n  [Group Policy Event 5017: CN=Natasha Romanoff OU=Executives DC=shieldba] z=0.792 conf=0.90 \u2014 \n  [IE cache: Twitter profile images fetched from a0.twimg.com at 00:25 an] z=0.648 conf=0.82 \u2014 \n  [shimcachemem entry 20: f-response-ent.exe (2012-02-27 17:54:36) \u2014 F-Re] z=0.000 conf=0.00 \u2014 \n\n--- FINAL ALERT LEVEL ---\nHIGH \u2014 MALICE verdict from Bayesian posterior aggregation. Individual z-scores below threshold (distributed evidence pattern: no single dominant signal, but aggregate posterior is decisive). Alert floored (B-028/B-065).\nReconciliation: verdict MALICE rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 5 | Derived: 0 | Total: 5",
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-REAL-NROMANOFF ===\nEvidence: /home/user/vigia-intent-analysis/data/cases/converted/VIGIA-REAL-NROMANOFF.json\nEvidence SHA-256: cdcaac23c1f4d232c3a8fdea4827c61e7df3818e31a965509eeb8a6bde21ff48\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 21/25\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 5 se\u00f1al(es): 5 primaria(s) de ['Plaso/MSIE Cache', 'Plaso/WinEVTX', 'Volatility/shimcachemem', 'Volatility/shimcachemem + AppCompatCache', 'Volatility/zeus-apihooks'], 0 derivada(s)/no-analizada(s). Top z: Zeus banking trojan: Inline/Trampoline h=0.92, Persistence binary a.exe executed every =0.87, Group Policy Event 5017: CN=Natasha Roma=0.79.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: MALICIOUS_INTENT_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nNatasha Romanoff (nromanoff), Executive at Stark Research Labs (OU=Executives, DC=shieldbase DC=local), Windows 7 SP1 x86 workstation WKS-WIN732BITA. Zeus banking trojan confirmed by Volatility zeus-apihooks. Inline/Trampoline hooks on ntdll.dll!NtCreateThread and NtQueryDirectoryFile in services.exe (PID 676) redirect to unknown module at 0x7e3b47 \u2014 kernel-level process hiding. Persistence binary a.exe runs every 65 seconds from C:\\Users\\VIBRAN~1\\AppData\\Local\\Temp\\ (shimcachemem, 29+ entries) \n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Zeus banking trojan: Inline/Trampoline hooks on ntdll.dll!NtCreateThre] z=0.921 conf=0.95 \u2014 \n  [Persistence binary a.exe executed every 65 seconds from C:\\Users\\VIBRA] z=0.874 conf=0.93 \u2014 \n  [Group Policy Event 5017: CN=Natasha Romanoff OU=Executives DC=shieldba] z=0.792 conf=0.90 \u2014 \n  [IE cache: Twitter profile images fetched from a0.twimg.com at 00:25 an] z=0.648 conf=0.82 \u2014 \n  [shimcachemem entry 20: f-response-ent.exe (2012-02-27 17:54:36) \u2014 F-Re] z=0.000 conf=0.00 \u2014 \n\n--- FINAL ALERT LEVEL ---\nHIGH \u2014 MALICE verdict from Bayesian posterior aggregation. Individual z-scores below threshold (distributed evidence pattern: no single dominant signal, but aggregate posterior is decisive). Alert floored (B-028/B-065).\nReconciliation: verdict MALICE rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 5 | Derived: 0 | Total: 5",
   "pipeline_results": {
     "abduction": {
       "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
-      "best_posterior": "87/100",
+      "best_posterior": "21/25",
       "confidence": {
         "__fraction__": true,
-        "den": 100,
-        "num": 87
+        "den": 25,
+        "num": 21
       },
       "devil_advocate": {
         "aggregation": {
@@ -211,7 +211,7 @@
           "primary_alternative_hypothesis": null
         },
         "decision_context": {
-          "confidence": "87/100",
+          "confidence": "21/25",
           "mapped_verdict": "MALICIOUS_INTENT_DETECTED",
           "raw_verdict": "MALICIOUS_INTENT_DETECTED",
           "score": "6471/10000"
@@ -235,9 +235,9 @@
       "ebs_adapter_mode": "motor",
       "expected_verdict": "MALICE",
       "resolve": {
-        "motor_confidence": "0.87",
-        "motor_reason": "Intent score 0.4370 exceeds MALICE threshold (P2+acq_assurance scale, threshold=0.33)",
-        "motor_score": "0.437",
+        "motor_confidence": "0.84",
+        "motor_reason": "Intent score 0.4188 exceeds MALICE threshold (P2+acq_assurance scale, threshold=0.33)",
+        "motor_score": "0.4188",
         "motor_verdict": "MALICE",
         "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
       },

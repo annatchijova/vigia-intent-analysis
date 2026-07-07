@@ -1,33 +1,33 @@
 {
   "agent_verdict": "INTENT",
-  "analysis_timestamp": "2026-07-06T04:40:00.705113+00:00",
+  "analysis_timestamp": "2026-07-07T03:22:41.106063+00:00",
   "audit_trail": {
     "agent_version": "1.0.0-SANS-2026",
     "case_id": "VIGIA-BEN-014",
-    "end_time": "2026-07-06T04:40:00.705120+00:00",
+    "end_time": "2026-07-07T03:22:41.106068+00:00",
     "entries": [
       {
         "action": "AGENT_INITIALIZED",
         "case_id": "VIGIA-BEN-014",
-        "entry_sha256": "708d6ccf7b94195f26ba5f71a4bb6b672b8ff8cca4f786ce4d0381f6dd650b2c",
+        "entry_sha256": "ea31552f1061add64ed9302a486a45ac740206e05400858a81132a247a09755c",
         "inputs_summary": {
           "agent_file": "/home/user/vigia-intent-analysis/vigia_agent.py",
           "case_id": "VIGIA-BEN-014"
         },
         "iteration": 0,
-        "note": "Agent initialized \u2014 source SHA-256: 23d8581225c57725...",
+        "note": "Agent initialized \u2014 source SHA-256: 1477828f53797b25...",
         "outputs_summary": {
-          "agent_sha256": "23d8581225c577250e3cd8db6e82cbc8c8e9144bc1f796ceb68c606364a7ef6c",
+          "agent_sha256": "1477828f53797b25d2b39b2762e31383665cdf2ff2b2335afa44afac2065068a",
           "agent_version": "1.0.0-SANS-2026"
         },
         "seq": 1,
-        "timestamp": "2026-07-06T04:39:59.924955+00:00",
+        "timestamp": "2026-07-07T03:22:40.950685+00:00",
         "tool": "vigia_agent"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-BEN-014",
-        "entry_sha256": "73616639b93a87b40cfa2e7e767b40657d94769a1519dcc27e478b2f11f0bc4e",
+        "entry_sha256": "32770047faa8b4e288ec62e239edd606462c7ffb6632576e9100d987232798d6",
         "inputs_summary": {
           "path": "/home/user/vigia-intent-analysis/data/cases/converted/VIGIA-BEN-014.json"
         },
@@ -35,29 +35,29 @@
         "note": "Computing SHA-256 of original evidence",
         "outputs_summary": {},
         "seq": 2,
-        "timestamp": "2026-07-06T04:39:59.925114+00:00",
+        "timestamp": "2026-07-07T03:22:40.950877+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-BEN-014",
-        "entry_sha256": "518267b9502a7b16daaccf3d0233864543bbc92f85b7f412b23ade1a847a9826",
+        "entry_sha256": "20827fab0643f311e49f1cef0af9a2b8b54e35e32e08b2a5aa710a475b5972ec",
         "inputs_summary": {
           "path": "/home/user/vigia-intent-analysis/data/cases/converted/VIGIA-BEN-014.json"
         },
         "iteration": 0,
-        "note": "Evidence verified: 44bac36258ec12f0...",
+        "note": "Evidence verified: 79eb2b6ca8eb258e...",
         "outputs_summary": {
-          "sha256": "44bac36258ec12f0158b3879f237456d65f4dca700f1006abb5f810c62791235"
+          "sha256": "79eb2b6ca8eb258e3cfae0ac33a2bbd4c6367b02ae903d39a377f290d0302912"
         },
         "seq": 3,
-        "timestamp": "2026-07-06T04:39:59.925251+00:00",
+        "timestamp": "2026-07-07T03:22:40.951031+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "PIPELINE_EXECUTE",
         "case_id": "VIGIA-BEN-014",
-        "entry_sha256": "76542ebfe1195e219c0f9625c7e39264a397c36c48b38833ffb5e6f86f7b8813",
+        "entry_sha256": "586c5570d500a68d7ad540a7c677536a6dbf663d6be0a14835aab4cf2c32d12f",
         "inputs_summary": {
           "evidence": "/home/user/vigia-intent-analysis/data/cases/converted/VIGIA-BEN-014.json",
           "iteration": "0",
@@ -67,13 +67,13 @@
         "note": "Executing pipeline \u2014 iteration 0",
         "outputs_summary": {},
         "seq": 4,
-        "timestamp": "2026-07-06T04:39:59.925460+00:00",
+        "timestamp": "2026-07-07T03:22:40.951291+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "PIPELINE_COMPLETE",
         "case_id": "VIGIA-BEN-014",
-        "entry_sha256": "5294f3711ddb2dc27eb5d44ac83f1fafe269a955db9020c65aeaf0e2d7da231b",
+        "entry_sha256": "ff8b52043dfcf6d9d673faa80f0244598f579cbde6f32de1604fc86a6c79bf7a",
         "inputs_summary": {
           "iteration": "0"
         },
@@ -82,9 +82,9 @@
         "outputs_summary": {
           "abduction": {
             "best_hypothesis": "SUSPICION_DETECTED",
-            "best_posterior": "21/50",
-            "confidence": "21/50",
-            "is_conclusive": "True",
+            "best_posterior": "21/100",
+            "confidence": "21/100",
+            "is_conclusive": "False",
             "narrative": "Investigative journalist's machine connects to Tor. Has written authorization from editor, legally approved source protection policy, and traffic goes only to whistleblower platform .onion."
           },
           "case_id": "VIGIA-BEN-014",
@@ -94,9 +94,9 @@
             "ebs_adapter_mode": "motor",
             "expected_verdict": "NOISE",
             "resolve": {
-              "motor_confidence": "0.42",
-              "motor_reason": "Significant signal with structural support (score=0.2098)",
-              "motor_score": "0.2098",
+              "motor_confidence": "0.21",
+              "motor_reason": "Significant signal with structural support (score=0.1066)",
+              "motor_score": "0.1066",
               "motor_verdict": "SUSPICION",
               "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
             },
@@ -130,13 +130,13 @@
           ]
         },
         "seq": 5,
-        "timestamp": "2026-07-06T04:40:00.704468+00:00",
+        "timestamp": "2026-07-07T03:22:41.105627+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "CONTRADICTION_CHECK",
         "case_id": "VIGIA-BEN-014",
-        "entry_sha256": "a806b4d14dd9c2a97d4f9db6d9b0dc9ecbfebf5cda18f9303387bf8153a21ca3",
+        "entry_sha256": "3200e103c82108dc30fd80cb5a35421a18c8f32c3b646d5fb836f3c18dfd54fa",
         "inputs_summary": {
           "n_signals": "3"
         },
@@ -147,13 +147,13 @@
           "threshold": "2"
         },
         "seq": 6,
-        "timestamp": "2026-07-06T04:40:00.704676+00:00",
+        "timestamp": "2026-07-07T03:22:41.105780+00:00",
         "tool": "contradiction_detector"
       },
       {
         "action": "AGENT_EXIT",
         "case_id": "VIGIA-BEN-014",
-        "entry_sha256": "07f0220db78e6b124d845929ffd2b05cd8ea10fccb0936e179411b8153d487c3",
+        "entry_sha256": "50373e214ca33ecd9447f44138453e80a0743a82969c979e331a612845f77192",
         "inputs_summary": {
           "verdict": "SUSPICION_DETECTED"
         },
@@ -164,28 +164,28 @@
           "exit_code": "3"
         },
         "seq": 7,
-        "timestamp": "2026-07-06T04:40:00.705020+00:00",
+        "timestamp": "2026-07-07T03:22:41.105998+00:00",
         "tool": "vigia_agent"
       }
     ],
-    "start_time": "2026-07-06T04:39:59.924431+00:00",
+    "start_time": "2026-07-07T03:22:40.950196+00:00",
     "total_entries": 7
   },
   "case_id": "VIGIA-BEN-014",
   "evidence_path": "/home/user/vigia-intent-analysis/data/cases/converted/VIGIA-BEN-014.json",
-  "evidence_sha256": "44bac36258ec12f0158b3879f237456d65f4dca700f1006abb5f810c62791235",
+  "evidence_sha256": "79eb2b6ca8eb258e3cfae0ac33a2bbd4c6367b02ae903d39a377f290d0302912",
   "iterations_executed": 1,
-  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-BEN-014 ===\nEvidence: /home/user/vigia-intent-analysis/data/cases/converted/VIGIA-BEN-014.json\nEvidence SHA-256: 44bac36258ec12f0158b3879f237456d65f4dca700f1006abb5f810c62791235\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: SUSPICION_DETECTED\nPosterior confidence: 21/50\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 3 se\u00f1al(es): 3 primaria(s) de ['legacy_converter'], 0 derivada(s)/no-analizada(s). Top z: Traffic analysis: 100% to whistleblower-=0.85, Authorization memo: 'Journalist Ana Mart=0.72, Tor connection established: 10.0.2.15:90=0.49.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: SUSPICION_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nInvestigative journalist's machine connects to Tor. Has written authorization from editor, legally approved source protection policy, and traffic goes only to whistleblower platform .onion.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Traffic analysis: 100% to whistleblower-platform.onion | No financial ] z=0.855 conf=0.90 \u2014 \n  [Authorization memo: 'Journalist Ana Martinez authorized for Tor access] z=0.723 conf=0.85 \u2014 \n  [Tor connection established: 10.0.2.15:9050 \u2192 Tor guard node | Process:] z=0.490 conf=0.70 \u2014 \n\n--- FINAL ALERT LEVEL ---\nMEDIUM \u2014 INTENT verdict with individual z-scores below threshold. Alert floored (B-028/B-065): an intent finding cannot present as LOW.\nReconciliation: verdict INTENT rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 3 | Derived: 0 | Total: 3",
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-BEN-014 ===\nEvidence: /home/user/vigia-intent-analysis/data/cases/converted/VIGIA-BEN-014.json\nEvidence SHA-256: 79eb2b6ca8eb258e3cfae0ac33a2bbd4c6367b02ae903d39a377f290d0302912\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: SUSPICION_DETECTED\nPosterior confidence: 21/100\nConclusive: NO \u2014 requires human review\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 3 se\u00f1al(es): 3 primaria(s) de ['legacy_converter'], 0 derivada(s)/no-analizada(s). Top z: Traffic analysis: 100% to whistleblower-=0.85, Authorization memo: 'Journalist Ana Mart=0.72, Tor connection established: 10.0.2.15:90=0.49.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: SUSPICION_DETECTED. Conclusiva: no \u2014 requiere revisi\u00f3n humana.\n\nRazonamiento del motor abductivo:\nInvestigative journalist's machine connects to Tor. Has written authorization from editor, legally approved source protection policy, and traffic goes only to whistleblower platform .onion.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Traffic analysis: 100% to whistleblower-platform.onion | No financial ] z=0.855 conf=0.90 \u2014 \n  [Authorization memo: 'Journalist Ana Martinez authorized for Tor access] z=0.723 conf=0.85 \u2014 \n  [Tor connection established: 10.0.2.15:9050 \u2192 Tor guard node | Process:] z=0.490 conf=0.70 \u2014 \n\n--- FINAL ALERT LEVEL ---\nMEDIUM \u2014 INTENT verdict with individual z-scores below threshold. Alert floored (B-028/B-065): an intent finding cannot present as LOW.\nReconciliation: verdict INTENT rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 3 | Derived: 0 | Total: 3",
   "pipeline_results": {
     "abduction": {
       "best_hypothesis": "SUSPICION_DETECTED",
-      "best_posterior": "21/50",
+      "best_posterior": "21/100",
       "confidence": {
         "__fraction__": true,
-        "den": 50,
+        "den": 100,
         "num": 21
       },
-      "is_conclusive": true,
+      "is_conclusive": false,
       "narrative": "Investigative journalist's machine connects to Tor. Has written authorization from editor, legally approved source protection policy, and traffic goes only to whistleblower platform .onion."
     },
     "case_id": "VIGIA-BEN-014",
@@ -195,9 +195,9 @@
       "ebs_adapter_mode": "motor",
       "expected_verdict": "NOISE",
       "resolve": {
-        "motor_confidence": "0.42",
-        "motor_reason": "Significant signal with structural support (score=0.2098)",
-        "motor_score": "0.2098",
+        "motor_confidence": "0.21",
+        "motor_reason": "Significant signal with structural support (score=0.1066)",
+        "motor_score": "0.1066",
         "motor_verdict": "SUSPICION",
         "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
       },

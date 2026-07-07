@@ -1,49 +1,49 @@
 {
   "agent_verdict": "NOISE",
-  "analysis_timestamp": "2026-07-06T02:08:18.758159+00:00",
+  "analysis_timestamp": "2026-07-07T03:22:12.841960+00:00",
   "audit_trail": {
     "agent_version": "1.0.0-SANS-2026",
     "case_id": "VIGIA-AMB-002",
-    "end_time": "2026-07-06T02:08:18.758165+00:00",
+    "end_time": "2026-07-07T03:22:12.841966+00:00",
     "entries": [
       {
         "action": "AGENT_INITIALIZED",
         "case_id": "VIGIA-AMB-002",
-        "entry_sha256": "8d62fba8aa53dc65a69fc6c131371ccd06bcc43bc1b8dc791e1d3843865c3288",
+        "entry_sha256": "0aaac22abba30cdedc85072d087f96409fe50f6e354d1dc147c4191b071a2c15",
         "inputs_summary": {
-          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "agent_file": "/home/user/vigia-intent-analysis/vigia_agent.py",
           "case_id": "VIGIA-AMB-002"
         },
         "iteration": 0,
-        "note": "Agent initialized \u2014 source SHA-256: 23d8581225c57725...",
+        "note": "Agent initialized \u2014 source SHA-256: 1477828f53797b25...",
         "outputs_summary": {
-          "agent_sha256": "23d8581225c577250e3cd8db6e82cbc8c8e9144bc1f796ceb68c606364a7ef6c",
+          "agent_sha256": "1477828f53797b25d2b39b2762e31383665cdf2ff2b2335afa44afac2065068a",
           "agent_version": "1.0.0-SANS-2026"
         },
         "seq": 1,
-        "timestamp": "2026-07-06T02:08:18.704917+00:00",
+        "timestamp": "2026-07-07T03:22:12.709675+00:00",
         "tool": "vigia_agent"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-AMB-002",
-        "entry_sha256": "e332e309854fc790777eda0af3f04e65efe8d31ec16fca0d43356eb14d9ad7c3",
+        "entry_sha256": "83158d0d084d3d1755c8c0649e396521143b7178ce8f14e57aa4bec324502234",
         "inputs_summary": {
-          "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-AMB-002.json"
+          "path": "/home/user/vigia-intent-analysis/data/cases/VIGIA-AMB-002.json"
         },
         "iteration": 0,
         "note": "Computing SHA-256 of original evidence",
         "outputs_summary": {},
         "seq": 2,
-        "timestamp": "2026-07-06T02:08:18.705004+00:00",
+        "timestamp": "2026-07-07T03:22:12.709788+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-AMB-002",
-        "entry_sha256": "28c6179be1ab8e8d4bb324bb0665b1729738f25f09a37724a243d2e57dba815f",
+        "entry_sha256": "e63db4cf4562488bf865494387758ae7c466778145e9c46ab0e87e64a910552a",
         "inputs_summary": {
-          "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-AMB-002.json"
+          "path": "/home/user/vigia-intent-analysis/data/cases/VIGIA-AMB-002.json"
         },
         "iteration": 0,
         "note": "Evidence verified: 33a7d30794c5249a...",
@@ -51,15 +51,15 @@
           "sha256": "33a7d30794c5249ab60b506492a985da5a8ca4017964239cedd40c0c95a3326a"
         },
         "seq": 3,
-        "timestamp": "2026-07-06T02:08:18.705096+00:00",
+        "timestamp": "2026-07-07T03:22:12.709891+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "PIPELINE_EXECUTE",
         "case_id": "VIGIA-AMB-002",
-        "entry_sha256": "0fee4a05b653cdc6653d2615c92573d0d626c135a63b0cfcb60cd593852196df",
+        "entry_sha256": "5151ddc62bd11250ab11c77be60cb8c3d7be861061f7f09270ef220dc7eebe7b",
         "inputs_summary": {
-          "evidence": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-AMB-002.json",
+          "evidence": "/home/user/vigia-intent-analysis/data/cases/VIGIA-AMB-002.json",
           "iteration": "0",
           "params": {}
         },
@@ -67,13 +67,13 @@
         "note": "Executing pipeline \u2014 iteration 0",
         "outputs_summary": {},
         "seq": 4,
-        "timestamp": "2026-07-06T02:08:18.705201+00:00",
+        "timestamp": "2026-07-07T03:22:12.710054+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "PIPELINE_COMPLETE",
         "case_id": "VIGIA-AMB-002",
-        "entry_sha256": "e388d57b2c538b800068fa410a6d7caa9e096789d42bf18ca6dc65ef9df4598e",
+        "entry_sha256": "7d32697b02eb3130577508d4fa4c3b738876b6b6c40c5bda1421409e91a58d6b",
         "inputs_summary": {
           "iteration": "0"
         },
@@ -95,8 +95,8 @@
             "expected_verdict": "NOISE",
             "resolve": {
               "motor_confidence": "0.95",
-              "motor_reason": "Insufficient evidence of malicious intent (score=0.0487)",
-              "motor_score": "0.0487",
+              "motor_reason": "Insufficient evidence of malicious intent (score=0.0512)",
+              "motor_score": "0.0512",
               "motor_verdict": "NOISE",
               "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
             },
@@ -130,13 +130,13 @@
           ]
         },
         "seq": 5,
-        "timestamp": "2026-07-06T02:08:18.757816+00:00",
+        "timestamp": "2026-07-07T03:22:12.841506+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "CONTRADICTION_CHECK",
         "case_id": "VIGIA-AMB-002",
-        "entry_sha256": "7918e1c9eea150e3e3f3e0ce794306f1f17f06bd935aa8a08eb0fe3e5e2ac251",
+        "entry_sha256": "81698dfcea3694de88656f666cd42062edce79521aabd81cfd88a2748c66e610",
         "inputs_summary": {
           "n_signals": "3"
         },
@@ -147,13 +147,13 @@
           "threshold": "2"
         },
         "seq": 6,
-        "timestamp": "2026-07-06T02:08:18.757928+00:00",
+        "timestamp": "2026-07-07T03:22:12.841659+00:00",
         "tool": "contradiction_detector"
       },
       {
         "action": "AGENT_EXIT",
         "case_id": "VIGIA-AMB-002",
-        "entry_sha256": "6cc4b2d677da4d948e878cb3587fd37b0478f57afb9496a5b6df7eba04d4cac7",
+        "entry_sha256": "6ed1a0890b69275acd573979bf576ea4b48efe7cd84eb3d2df357af496081570",
         "inputs_summary": {
           "verdict": "NO_SEMIOTIC_ANOMALY_DETECTED"
         },
@@ -164,18 +164,18 @@
           "exit_code": "0"
         },
         "seq": 7,
-        "timestamp": "2026-07-06T02:08:18.758108+00:00",
+        "timestamp": "2026-07-07T03:22:12.841899+00:00",
         "tool": "vigia_agent"
       }
     ],
-    "start_time": "2026-07-06T02:08:18.704718+00:00",
+    "start_time": "2026-07-07T03:22:12.709367+00:00",
     "total_entries": 7
   },
   "case_id": "VIGIA-AMB-002",
-  "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-AMB-002.json",
+  "evidence_path": "/home/user/vigia-intent-analysis/data/cases/VIGIA-AMB-002.json",
   "evidence_sha256": "33a7d30794c5249ab60b506492a985da5a8ca4017964239cedd40c0c95a3326a",
   "iterations_executed": 1,
-  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-AMB-002 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/VIGIA-AMB-002.json\nEvidence SHA-256: 33a7d30794c5249ab60b506492a985da5a8ca4017964239cedd40c0c95a3326a\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: NO_SEMIOTIC_ANOMALY_DETECTED\nPosterior confidence: 19/20\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 3 se\u00f1al(es): 3 primaria(s) de ['sift_chat_system', 'sift_syslog', 'sift_volatility'], 0 derivada(s)/no-analizada(s). Top z: Tier-1 analyst disabled DLP rule DLP-001=0.33, No malicious processes on tier1_003 work=0.05, Analyst: 'Oops, accidentally touched a D=0.04.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: NO_SEMIOTIC_ANOMALY_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nTier-1 SOC analyst modifies a rule without a change ticket, citing 'human error'. The modification disables a critical alert. Could be: (1) genuine error, (2) insider sabotage, (3) negligence.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Tier-1 analyst disabled DLP rule DLP-001] z=0.330 conf=0.60 \u2014 \n  [No malicious processes on tier1_003 workstation] z=0.048 conf=0.95 \u2014 \n  [Analyst: 'Oops, accidentally touched a DLP rule. Already re-enabled it] z=0.035 conf=0.70 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 3 | Derived: 0 | Total: 3",
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-AMB-002 ===\nEvidence: /home/user/vigia-intent-analysis/data/cases/VIGIA-AMB-002.json\nEvidence SHA-256: 33a7d30794c5249ab60b506492a985da5a8ca4017964239cedd40c0c95a3326a\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: NO_SEMIOTIC_ANOMALY_DETECTED\nPosterior confidence: 19/20\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 3 se\u00f1al(es): 3 primaria(s) de ['sift_chat_system', 'sift_syslog', 'sift_volatility'], 0 derivada(s)/no-analizada(s). Top z: Tier-1 analyst disabled DLP rule DLP-001=0.33, No malicious processes on tier1_003 work=0.05, Analyst: 'Oops, accidentally touched a D=0.04.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: NO_SEMIOTIC_ANOMALY_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nTier-1 SOC analyst modifies a rule without a change ticket, citing 'human error'. The modification disables a critical alert. Could be: (1) genuine error, (2) insider sabotage, (3) negligence.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Tier-1 analyst disabled DLP rule DLP-001] z=0.330 conf=0.60 \u2014 \n  [No malicious processes on tier1_003 workstation] z=0.048 conf=0.95 \u2014 \n  [Analyst: 'Oops, accidentally touched a DLP rule. Already re-enabled it] z=0.035 conf=0.70 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 3 | Derived: 0 | Total: 3",
   "pipeline_results": {
     "abduction": {
       "best_hypothesis": "NO_SEMIOTIC_ANOMALY_DETECTED",
@@ -196,8 +196,8 @@
       "expected_verdict": "NOISE",
       "resolve": {
         "motor_confidence": "0.95",
-        "motor_reason": "Insufficient evidence of malicious intent (score=0.0487)",
-        "motor_score": "0.0487",
+        "motor_reason": "Insufficient evidence of malicious intent (score=0.0512)",
+        "motor_score": "0.0512",
         "motor_verdict": "NOISE",
         "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
       },

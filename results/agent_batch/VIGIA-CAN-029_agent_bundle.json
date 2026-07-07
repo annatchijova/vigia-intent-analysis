@@ -1,49 +1,49 @@
 {
-  "agent_verdict": "INTENT",
-  "analysis_timestamp": "2026-07-06T02:08:36.453315+00:00",
+  "agent_verdict": "MALICE",
+  "analysis_timestamp": "2026-07-07T03:22:54.242707+00:00",
   "audit_trail": {
     "agent_version": "1.0.0-SANS-2026",
     "case_id": "VIGIA-CAN-029",
-    "end_time": "2026-07-06T02:08:36.453323+00:00",
+    "end_time": "2026-07-07T03:22:54.242715+00:00",
     "entries": [
       {
         "action": "AGENT_INITIALIZED",
         "case_id": "VIGIA-CAN-029",
-        "entry_sha256": "15219b1889dd7a1d09487c60d489bed7a76a589a1fd0c75306c022f8192fabb2",
+        "entry_sha256": "f7db0c42ae0f4b2051940d6fcb6eb4ffeea7f8b2ae6ed68de0eafcfb3ccd4a28",
         "inputs_summary": {
-          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "agent_file": "/home/user/vigia-intent-analysis/vigia_agent.py",
           "case_id": "VIGIA-CAN-029"
         },
         "iteration": 0,
-        "note": "Agent initialized \u2014 source SHA-256: 23d8581225c57725...",
+        "note": "Agent initialized \u2014 source SHA-256: 1477828f53797b25...",
         "outputs_summary": {
-          "agent_sha256": "23d8581225c577250e3cd8db6e82cbc8c8e9144bc1f796ceb68c606364a7ef6c",
+          "agent_sha256": "1477828f53797b25d2b39b2762e31383665cdf2ff2b2335afa44afac2065068a",
           "agent_version": "1.0.0-SANS-2026"
         },
         "seq": 1,
-        "timestamp": "2026-07-06T02:08:36.395193+00:00",
+        "timestamp": "2026-07-07T03:22:54.098191+00:00",
         "tool": "vigia_agent"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-CAN-029",
-        "entry_sha256": "6d09c377f4eadb20e8eeca380b18d70122fcf5e0b1fa9a480ce27c71473f8d92",
+        "entry_sha256": "0cf0dd9cca532c0df0bba5cda160b9c3e077ba1254de9e6fb58df8e425c9394b",
         "inputs_summary": {
-          "path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-029.json"
+          "path": "/home/user/vigia-intent-analysis/data/cases/consolidated_canonical/VIGIA-CAN-029.json"
         },
         "iteration": 0,
         "note": "Computing SHA-256 of original evidence",
         "outputs_summary": {},
         "seq": 2,
-        "timestamp": "2026-07-06T02:08:36.395278+00:00",
+        "timestamp": "2026-07-07T03:22:54.098347+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-CAN-029",
-        "entry_sha256": "bf75294d6577f79f3ca952ef3e3c0a12aa2d5b20d481ebe82d9def37599bde8f",
+        "entry_sha256": "0cc11b67e3f7398f1195e999621b334c639f33e47abb0a8817ebd921cc6d5133",
         "inputs_summary": {
-          "path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-029.json"
+          "path": "/home/user/vigia-intent-analysis/data/cases/consolidated_canonical/VIGIA-CAN-029.json"
         },
         "iteration": 0,
         "note": "Evidence verified: 36ba6600849359fa...",
@@ -51,15 +51,15 @@
           "sha256": "36ba6600849359faada0d25e4776c487528b34ef445845eb7d0d3b06cea90cec"
         },
         "seq": 3,
-        "timestamp": "2026-07-06T02:08:36.395364+00:00",
+        "timestamp": "2026-07-07T03:22:54.098449+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "PIPELINE_EXECUTE",
         "case_id": "VIGIA-CAN-029",
-        "entry_sha256": "497d44614381786fff2248b227b5bb63f2db3be3bce6fb822b9082fa59584965",
+        "entry_sha256": "3ecef489953b98e2db79336381423c30ce1b160d86534ccc3ca7444b239a0ab4",
         "inputs_summary": {
-          "evidence": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-029.json",
+          "evidence": "/home/user/vigia-intent-analysis/data/cases/consolidated_canonical/VIGIA-CAN-029.json",
           "iteration": "0",
           "params": {}
         },
@@ -67,13 +67,13 @@
         "note": "Executing pipeline \u2014 iteration 0",
         "outputs_summary": {},
         "seq": 4,
-        "timestamp": "2026-07-06T02:08:36.395475+00:00",
+        "timestamp": "2026-07-07T03:22:54.098682+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "PIPELINE_COMPLETE",
         "case_id": "VIGIA-CAN-029",
-        "entry_sha256": "4fcdccf8680bce3b1bf39a13e446db276a5deb2a567f85c70d37dee559e719bf",
+        "entry_sha256": "30dd1be646bf49f0a97dc1222859ca16415d545c8905a7b4b5139c421f7f3e05",
         "inputs_summary": {
           "iteration": "0"
         },
@@ -81,9 +81,9 @@
         "note": "Pipeline completed \u2014 4 signals",
         "outputs_summary": {
           "abduction": {
-            "best_hypothesis": "SUSPICION_DETECTED",
-            "best_posterior": "63/100",
-            "confidence": "63/100",
+            "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+            "best_posterior": "69/100",
+            "confidence": "69/100",
             "is_conclusive": "True",
             "narrative": "Noisy nmap scan (SYN flood, 65535 ports) generates 47 EDR alerts classified as low severity. Memory analysis reveals a C++ driver with SSDT hooks and a hollowed process with active C2. The nmap is the..."
           },
@@ -94,10 +94,10 @@
             "ebs_adapter_mode": "motor",
             "expected_verdict": "SUSPICION",
             "resolve": {
-              "motor_confidence": "0.63",
-              "motor_reason": "Significant signal with structural support (score=0.3134)",
-              "motor_score": "0.3134",
-              "motor_verdict": "SUSPICION",
+              "motor_confidence": "0.69",
+              "motor_reason": "Intent score 0.3449 exceeds MALICE threshold (P2+acq_assurance scale, threshold=0.33)",
+              "motor_score": "0.3449",
+              "motor_verdict": "MALICE",
               "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
             },
             "source": "ebs_v1_json_adapter"
@@ -138,13 +138,13 @@
           ]
         },
         "seq": 5,
-        "timestamp": "2026-07-06T02:08:36.452865+00:00",
+        "timestamp": "2026-07-07T03:22:54.241849+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "CONTRADICTION_CHECK",
         "case_id": "VIGIA-CAN-029",
-        "entry_sha256": "a4676c4017ecd5b5348ad212fe83e6934d78c5147034bd3a5292b15da5a4e59a",
+        "entry_sha256": "6228d1c47015ae3e25ad1df5880d24c7997d16440823e35e6aa527d268143ca7",
         "inputs_summary": {
           "n_signals": "4"
         },
@@ -155,43 +155,67 @@
           "threshold": "2"
         },
         "seq": 6,
-        "timestamp": "2026-07-06T02:08:36.453020+00:00",
+        "timestamp": "2026-07-07T03:22:54.242017+00:00",
         "tool": "contradiction_detector"
       },
       {
         "action": "AGENT_EXIT",
         "case_id": "VIGIA-CAN-029",
-        "entry_sha256": "9d1d27cdf901f5688d738bfda4b1545d4434422e9f114cb8df000c1b995da1d8",
+        "entry_sha256": "28e1c80c13cfa242ca1906c5a4d6fd6b8c54951e94432c7075c0d256b4ca980b",
         "inputs_summary": {
-          "verdict": "SUSPICION_DETECTED"
+          "verdict": "MALICIOUS_INTENT_DETECTED"
         },
         "iteration": 0,
-        "note": "Exit code 3 (INTENT) \u2014 analysis complete.",
+        "note": "Exit code 1 (MALICE) \u2014 analysis complete.",
         "outputs_summary": {
-          "agent_verdict": "INTENT",
-          "exit_code": "3"
+          "agent_verdict": "MALICE",
+          "exit_code": "1"
         },
         "seq": 7,
-        "timestamp": "2026-07-06T02:08:36.453251+00:00",
+        "timestamp": "2026-07-07T03:22:54.242336+00:00",
         "tool": "vigia_agent"
       }
     ],
-    "start_time": "2026-07-06T02:08:36.394989+00:00",
+    "start_time": "2026-07-07T03:22:54.097850+00:00",
     "total_entries": 7
   },
   "case_id": "VIGIA-CAN-029",
-  "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-029.json",
+  "evidence_path": "/home/user/vigia-intent-analysis/data/cases/consolidated_canonical/VIGIA-CAN-029.json",
   "evidence_sha256": "36ba6600849359faada0d25e4776c487528b34ef445845eb7d0d3b06cea90cec",
   "iterations_executed": 1,
-  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-CAN-029 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-029.json\nEvidence SHA-256: 36ba6600849359faada0d25e4776c487528b34ef445845eb7d0d3b06cea90cec\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: SUSPICION_DETECTED\nPosterior confidence: 63/100\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 4 se\u00f1al(es): 4 primaria(s) de ['sift_edr', 'sift_ids', 'sift_volatility'], 0 derivada(s)/no-analizada(s). Top z: Hidden process (SSDT hook). Persistent c=0.84, EDR classifies nmap as 'Reconnaissance \u2014=0.42, Noisy nmap scan: SYN scan of ports 1-655=0.28.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: SUSPICION_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nNoisy nmap scan (SYN flood, 65535 ports) generates 47 EDR alerts classified as low severity. Memory analysis reveals a C++ driver with SSDT hooks and a hollowed process with active C2. The nmap is theater.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Hidden process (SSDT hook). Persistent connection to 185.220.101.42:44] z=0.836 conf=0.95 \u2014 \n  [EDR classifies nmap as 'Reconnaissance \u2014 Low Severity'. Tier-1 queue, ] z=0.418 conf=0.45 \u2014 \n  [Noisy nmap scan: SYN scan of ports 1-65535 from external IP. Trivially] z=0.276 conf=0.30 \u2014 \n  [Custom kernel driver: C++ with SSDT hooks, process hiding, memory inje] z=0.048 conf=0.96 \u2014 \n\n--- FINAL ALERT LEVEL ---\nMEDIUM \u2014 INTENT verdict with individual z-scores below threshold. Alert floored (B-028/B-065): an intent finding cannot present as LOW.\nReconciliation: verdict INTENT rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 4 | Derived: 0 | Total: 4",
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-CAN-029 ===\nEvidence: /home/user/vigia-intent-analysis/data/cases/consolidated_canonical/VIGIA-CAN-029.json\nEvidence SHA-256: 36ba6600849359faada0d25e4776c487528b34ef445845eb7d0d3b06cea90cec\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 69/100\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 4 se\u00f1al(es): 4 primaria(s) de ['sift_edr', 'sift_ids', 'sift_volatility'], 0 derivada(s)/no-analizada(s). Top z: Hidden process (SSDT hook). Persistent c=0.84, EDR classifies nmap as 'Reconnaissance \u2014=0.42, Noisy nmap scan: SYN scan of ports 1-655=0.28.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: MALICIOUS_INTENT_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nNoisy nmap scan (SYN flood, 65535 ports) generates 47 EDR alerts classified as low severity. Memory analysis reveals a C++ driver with SSDT hooks and a hollowed process with active C2. The nmap is theater.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Hidden process (SSDT hook). Persistent connection to 185.220.101.42:44] z=0.836 conf=0.95 \u2014 \n  [EDR classifies nmap as 'Reconnaissance \u2014 Low Severity'. Tier-1 queue, ] z=0.418 conf=0.45 \u2014 \n  [Noisy nmap scan: SYN scan of ports 1-65535 from external IP. Trivially] z=0.276 conf=0.30 \u2014 \n  [Custom kernel driver: C++ with SSDT hooks, process hiding, memory inje] z=0.048 conf=0.96 \u2014 \n\n--- FINAL ALERT LEVEL ---\nHIGH \u2014 MALICE verdict from Bayesian posterior aggregation. Individual z-scores below threshold (distributed evidence pattern: no single dominant signal, but aggregate posterior is decisive). Alert floored (B-028/B-065).\nReconciliation: verdict MALICE rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 4 | Derived: 0 | Total: 4",
   "pipeline_results": {
     "abduction": {
-      "best_hypothesis": "SUSPICION_DETECTED",
-      "best_posterior": "63/100",
+      "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+      "best_posterior": "69/100",
       "confidence": {
         "__fraction__": true,
         "den": 100,
-        "num": 63
+        "num": 69
+      },
+      "devil_advocate": {
+        "aggregation": {
+          "k": 3,
+          "method": "top_k_already_validated_matches_v2",
+          "total_gap_mass": "0"
+        },
+        "counterfactual_summary": {
+          "primary_alternative_hypothesis": null
+        },
+        "decision_context": {
+          "confidence": "69/100",
+          "mapped_verdict": "MALICIOUS_INTENT_DETECTED",
+          "raw_verdict": "MALICIOUS_INTENT_DETECTED",
+          "score": "3157/8000"
+        },
+        "devil_advocate_source": "deterministic_no_pattern_data_available",
+        "meta": {
+          "deterministic": true,
+          "generated_from": "case_pattern_library"
+        },
+        "narrative": "Eco's Razor (Abductive Falsification) applied to verdict MALICIOUS_INTENT_DETECTED. Pattern-matching data was not available on this code path \u2014 CasePatternLibrary is not invoked here by design (agent audit-trail mode (vigia_agent.py \u2014 JSON-replay / autonomous path); see KNOWN_LIMITATIONS.md). No structured counter-hypothesis could be derived deterministically. This is a documented scope limitation of the current code path, not an absence of falsification attempt.",
+        "pattern_evidence_gaps": [],
+        "version": "r7-da-v1"
       },
       "is_conclusive": true,
       "narrative": "Noisy nmap scan (SYN flood, 65535 ports) generates 47 EDR alerts classified as low severity. Memory analysis reveals a C++ driver with SSDT hooks and a hollowed process with active C2. The nmap is theater."
@@ -203,10 +227,10 @@
       "ebs_adapter_mode": "motor",
       "expected_verdict": "SUSPICION",
       "resolve": {
-        "motor_confidence": "0.63",
-        "motor_reason": "Significant signal with structural support (score=0.3134)",
-        "motor_score": "0.3134",
-        "motor_verdict": "SUSPICION",
+        "motor_confidence": "0.69",
+        "motor_reason": "Intent score 0.3449 exceeds MALICE threshold (P2+acq_assurance scale, threshold=0.33)",
+        "motor_score": "0.3449",
+        "motor_verdict": "MALICE",
         "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
       },
       "source": "ebs_v1_json_adapter"

@@ -1,65 +1,65 @@
 {
   "agent_verdict": "NOISE",
-  "analysis_timestamp": "2026-07-06T02:08:33.373671+00:00",
+  "analysis_timestamp": "2026-07-07T03:22:47.147866+00:00",
   "audit_trail": {
     "agent_version": "1.0.0-SANS-2026",
     "case_id": "VIGIA-LINUX-002",
-    "end_time": "2026-07-06T02:08:33.373676+00:00",
+    "end_time": "2026-07-07T03:22:47.147873+00:00",
     "entries": [
       {
         "action": "AGENT_INITIALIZED",
         "case_id": "VIGIA-LINUX-002",
-        "entry_sha256": "8f1f89a2a432283d67f286f345c9b4170539259840c05eeec2cde81417a3efcd",
+        "entry_sha256": "e5dca83e62d17a50d538e9f19e793db636b6a04428df07e23c2b84e487184bff",
         "inputs_summary": {
-          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "agent_file": "/home/user/vigia-intent-analysis/vigia_agent.py",
           "case_id": "VIGIA-LINUX-002"
         },
         "iteration": 0,
-        "note": "Agent initialized \u2014 source SHA-256: 23d8581225c57725...",
+        "note": "Agent initialized \u2014 source SHA-256: 1477828f53797b25...",
         "outputs_summary": {
-          "agent_sha256": "23d8581225c577250e3cd8db6e82cbc8c8e9144bc1f796ceb68c606364a7ef6c",
+          "agent_sha256": "1477828f53797b25d2b39b2762e31383665cdf2ff2b2335afa44afac2065068a",
           "agent_version": "1.0.0-SANS-2026"
         },
         "seq": 1,
-        "timestamp": "2026-07-06T02:08:33.328716+00:00",
+        "timestamp": "2026-07-07T03:22:47.015366+00:00",
         "tool": "vigia_agent"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-LINUX-002",
-        "entry_sha256": "36d845b872ec091ccbe7d38aee3c16ebea72d5bbc53ed7a88321407fc15853b8",
+        "entry_sha256": "001315112e3b46bf0b7f86e22f2b46f22e1c82acfd46d37c21a7da09d11806d4",
         "inputs_summary": {
-          "path": "/home/labestiadevigia/vigia-repo/data/cases/benign/VIGIA-LINUX-002.json"
+          "path": "/home/user/vigia-intent-analysis/data/cases/benign/VIGIA-LINUX-002.json"
         },
         "iteration": 0,
         "note": "Computing SHA-256 of original evidence",
         "outputs_summary": {},
         "seq": 2,
-        "timestamp": "2026-07-06T02:08:33.328802+00:00",
+        "timestamp": "2026-07-07T03:22:47.015489+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-LINUX-002",
-        "entry_sha256": "e39875934f31e36f99d4a53d19e75545b251f925e6c428cbf1b48b1612113cb3",
+        "entry_sha256": "a1170c9f3669672cdafad82d0a56f011d5058add89059d59808663e20a3a74fc",
         "inputs_summary": {
-          "path": "/home/labestiadevigia/vigia-repo/data/cases/benign/VIGIA-LINUX-002.json"
+          "path": "/home/user/vigia-intent-analysis/data/cases/benign/VIGIA-LINUX-002.json"
         },
         "iteration": 0,
-        "note": "Evidence verified: 43c037c317940642...",
+        "note": "Evidence verified: 60012e0a135366df...",
         "outputs_summary": {
-          "sha256": "43c037c31794064231dc681e6ad75eec393d586f74a7dce705fcc3d6e035c30a"
+          "sha256": "60012e0a135366dfb7c6dc3d6fcd81c29c7c1b14dd35570c8ab89d2207c5fb03"
         },
         "seq": 3,
-        "timestamp": "2026-07-06T02:08:33.328905+00:00",
+        "timestamp": "2026-07-07T03:22:47.015604+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "PIPELINE_EXECUTE",
         "case_id": "VIGIA-LINUX-002",
-        "entry_sha256": "6b1f875c4a1ba6a75f4ae67b6ad710dff466f96cc0586e6b4ebc9d66197497a4",
+        "entry_sha256": "372b97b8373b6a9b18dbd79055c2a7b1fdf3067120889df598c72c357bd370a5",
         "inputs_summary": {
-          "evidence": "/home/labestiadevigia/vigia-repo/data/cases/benign/VIGIA-LINUX-002.json",
+          "evidence": "/home/user/vigia-intent-analysis/data/cases/benign/VIGIA-LINUX-002.json",
           "iteration": "0",
           "params": {}
         },
@@ -67,13 +67,13 @@
         "note": "Executing pipeline \u2014 iteration 0",
         "outputs_summary": {},
         "seq": 4,
-        "timestamp": "2026-07-06T02:08:33.329009+00:00",
+        "timestamp": "2026-07-07T03:22:47.015772+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "PIPELINE_COMPLETE",
         "case_id": "VIGIA-LINUX-002",
-        "entry_sha256": "e5fe03dfdf6ae3c735696d1d53f9bfb1a2908a922c504561dc1bedc891ca67bf",
+        "entry_sha256": "b922bd048503342f2d0d4ddbb539278463399aee65ffb455f8ab537872a1d82c",
         "inputs_summary": {
           "iteration": "0"
         },
@@ -82,8 +82,8 @@
         "outputs_summary": {
           "abduction": {
             "best_hypothesis": "NO_SEMIOTIC_ANOMALY_DETECTED",
-            "best_posterior": "93/100",
-            "confidence": "93/100",
+            "best_posterior": "47/50",
+            "confidence": "47/50",
             "is_conclusive": "True",
             "narrative": "Developer Alex Torres (GitHub: atorres-dev) submits a security patch to the libarchive project fixing a path traversal vulnerability. The contribution was explicitly solicited by a project maintainer ..."
           },
@@ -94,9 +94,9 @@
             "ebs_adapter_mode": "motor",
             "expected_verdict": "NOISE",
             "resolve": {
-              "motor_confidence": "0.93",
-              "motor_reason": "Insufficient evidence of malicious intent (score=0.0696)",
-              "motor_score": "0.0696",
+              "motor_confidence": "0.94",
+              "motor_reason": "Insufficient evidence of malicious intent (score=0.0636)",
+              "motor_score": "0.0636",
               "motor_verdict": "NOISE",
               "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
             },
@@ -146,13 +146,13 @@
           ]
         },
         "seq": 5,
-        "timestamp": "2026-07-06T02:08:33.373290+00:00",
+        "timestamp": "2026-07-07T03:22:47.147148+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "CONTRADICTION_CHECK",
         "case_id": "VIGIA-LINUX-002",
-        "entry_sha256": "eb36ec135620a843953bb2a05de5257b0877c6962d98f9eb2ab48bd83f9e3e75",
+        "entry_sha256": "da2f80b31dd1d370c30ce9f3ae90a4ed90d3e0b7d69144dac5023634b4580213",
         "inputs_summary": {
           "n_signals": "5"
         },
@@ -163,13 +163,13 @@
           "threshold": "2"
         },
         "seq": 6,
-        "timestamp": "2026-07-06T02:08:33.373417+00:00",
+        "timestamp": "2026-07-07T03:22:47.147441+00:00",
         "tool": "contradiction_detector"
       },
       {
         "action": "AGENT_EXIT",
         "case_id": "VIGIA-LINUX-002",
-        "entry_sha256": "b8c797c42b3709c6a4295ec06af1f7465749c5acc1a8ae3ed8a592dd00d0afbd",
+        "entry_sha256": "ede89241febd61cb4057cac2efc5e04a2816665b1ca81c0f9f41bfcb566883a8",
         "inputs_summary": {
           "verdict": "NO_SEMIOTIC_ANOMALY_DETECTED"
         },
@@ -180,26 +180,26 @@
           "exit_code": "0"
         },
         "seq": 7,
-        "timestamp": "2026-07-06T02:08:33.373619+00:00",
+        "timestamp": "2026-07-07T03:22:47.147779+00:00",
         "tool": "vigia_agent"
       }
     ],
-    "start_time": "2026-07-06T02:08:33.328511+00:00",
+    "start_time": "2026-07-07T03:22:47.015012+00:00",
     "total_entries": 7
   },
   "case_id": "VIGIA-LINUX-002",
-  "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/benign/VIGIA-LINUX-002.json",
-  "evidence_sha256": "43c037c31794064231dc681e6ad75eec393d586f74a7dce705fcc3d6e035c30a",
+  "evidence_path": "/home/user/vigia-intent-analysis/data/cases/benign/VIGIA-LINUX-002.json",
+  "evidence_sha256": "60012e0a135366dfb7c6dc3d6fcd81c29c7c1b14dd35570c8ab89d2207c5fb03",
   "iterations_executed": 1,
-  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-LINUX-002 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/benign/VIGIA-LINUX-002.json\nEvidence SHA-256: 43c037c31794064231dc681e6ad75eec393d586f74a7dce705fcc3d6e035c30a\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: NO_SEMIOTIC_ANOMALY_DETECTED\nPosterior confidence: 93/100\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 5 se\u00f1al(es): 5 primaria(s) de ['sift_git_forensics', 'sift_osint', 'sift_static_analysis'], 0 derivada(s)/no-analizada(s). Top z: GitHub account atorres-dev was created 8=0.25, Binary comparison between libarchive 3.7=0.05, Code review for the submitted patch invo=0.05.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: NO_SEMIOTIC_ANOMALY_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nDeveloper Alex Torres (GitHub: atorres-dev) submits a security patch to the libarchive project fixing a path traversal vulnerability. The contribution was explicitly solicited by a project maintainer via a public GitHub issue. All code changes are present in the git repository with no tarball divergence. The patch was reviewed and approved by three independent maintainers before merge. The surface-level profile \u2014 new contributor, modifying a widely-deployed system library \u2014 may trigger pattern-m\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [GitHub account atorres-dev was created 8 months prior to contribution ] z=0.254 conf=0.94 \u2014 \n  [Binary comparison between libarchive 3.7.5 distributed tarball and git] z=0.049 conf=0.97 \u2014 \n  [Code review for the submitted patch involved three independent maintai] z=0.048 conf=0.95 \u2014 \n  [Public GitHub Issue #2041 by Tim Kientzle (libarchive maintainer since] z=0.048 conf=0.95 \u2014 \n  [Static analysis of the submitted patch: 47 lines changed across 2 file] z=0.037 conf=0.93 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 5 | Derived: 0 | Total: 5",
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-LINUX-002 ===\nEvidence: /home/user/vigia-intent-analysis/data/cases/benign/VIGIA-LINUX-002.json\nEvidence SHA-256: 60012e0a135366dfb7c6dc3d6fcd81c29c7c1b14dd35570c8ab89d2207c5fb03\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: NO_SEMIOTIC_ANOMALY_DETECTED\nPosterior confidence: 47/50\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 5 se\u00f1al(es): 5 primaria(s) de ['sift_git_forensics', 'sift_osint', 'sift_static_analysis'], 0 derivada(s)/no-analizada(s). Top z: GitHub account atorres-dev was created 8=0.25, Binary comparison between libarchive 3.7=0.05, Code review for the submitted patch invo=0.05.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: NO_SEMIOTIC_ANOMALY_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nDeveloper Alex Torres (GitHub: atorres-dev) submits a security patch to the libarchive project fixing a path traversal vulnerability. The contribution was explicitly solicited by a project maintainer via a public GitHub issue. All code changes are present in the git repository with no tarball divergence. The patch was reviewed and approved by three independent maintainers before merge. The surface-level profile \u2014 new contributor, modifying a widely-deployed system library \u2014 may trigger pattern-m\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [GitHub account atorres-dev was created 8 months prior to contribution ] z=0.254 conf=0.94 \u2014 \n  [Binary comparison between libarchive 3.7.5 distributed tarball and git] z=0.049 conf=0.97 \u2014 \n  [Code review for the submitted patch involved three independent maintai] z=0.048 conf=0.95 \u2014 \n  [Public GitHub Issue #2041 by Tim Kientzle (libarchive maintainer since] z=0.048 conf=0.95 \u2014 \n  [Static analysis of the submitted patch: 47 lines changed across 2 file] z=0.037 conf=0.93 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 5 | Derived: 0 | Total: 5",
   "pipeline_results": {
     "abduction": {
       "best_hypothesis": "NO_SEMIOTIC_ANOMALY_DETECTED",
-      "best_posterior": "93/100",
+      "best_posterior": "47/50",
       "confidence": {
         "__fraction__": true,
-        "den": 100,
-        "num": 93
+        "den": 50,
+        "num": 47
       },
       "is_conclusive": true,
       "narrative": "Developer Alex Torres (GitHub: atorres-dev) submits a security patch to the libarchive project fixing a path traversal vulnerability. The contribution was explicitly solicited by a project maintainer via a public GitHub issue. All code changes are present in the git repository with no tarball divergence. The patch was reviewed and approved by three independent maintainers before merge. The surface-level profile \u2014 new contributor, modifying a widely-deployed system library \u2014 may trigger pattern-m"
@@ -211,9 +211,9 @@
       "ebs_adapter_mode": "motor",
       "expected_verdict": "NOISE",
       "resolve": {
-        "motor_confidence": "0.93",
-        "motor_reason": "Insufficient evidence of malicious intent (score=0.0696)",
-        "motor_score": "0.0696",
+        "motor_confidence": "0.94",
+        "motor_reason": "Insufficient evidence of malicious intent (score=0.0636)",
+        "motor_score": "0.0636",
         "motor_verdict": "NOISE",
         "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
       },

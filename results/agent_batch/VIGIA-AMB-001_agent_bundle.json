@@ -1,49 +1,49 @@
 {
   "agent_verdict": "NOISE",
-  "analysis_timestamp": "2026-07-06T02:08:18.655169+00:00",
+  "analysis_timestamp": "2026-07-07T03:22:12.609236+00:00",
   "audit_trail": {
     "agent_version": "1.0.0-SANS-2026",
     "case_id": "VIGIA-AMB-001",
-    "end_time": "2026-07-06T02:08:18.655175+00:00",
+    "end_time": "2026-07-07T03:22:12.609243+00:00",
     "entries": [
       {
         "action": "AGENT_INITIALIZED",
         "case_id": "VIGIA-AMB-001",
-        "entry_sha256": "6a365114038316dcc0781af87cd934c60c0e2f2d7da06a3a7c6fdf910c10e4c2",
+        "entry_sha256": "362309af37bc191b63df47eb3066723c6904a71cb3328b3f7bbe80d54cd6cc1c",
         "inputs_summary": {
-          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "agent_file": "/home/user/vigia-intent-analysis/vigia_agent.py",
           "case_id": "VIGIA-AMB-001"
         },
         "iteration": 0,
-        "note": "Agent initialized \u2014 source SHA-256: 23d8581225c57725...",
+        "note": "Agent initialized \u2014 source SHA-256: 1477828f53797b25...",
         "outputs_summary": {
-          "agent_sha256": "23d8581225c577250e3cd8db6e82cbc8c8e9144bc1f796ceb68c606364a7ef6c",
+          "agent_sha256": "1477828f53797b25d2b39b2762e31383665cdf2ff2b2335afa44afac2065068a",
           "agent_version": "1.0.0-SANS-2026"
         },
         "seq": 1,
-        "timestamp": "2026-07-06T02:08:18.601384+00:00",
+        "timestamp": "2026-07-07T03:22:12.470385+00:00",
         "tool": "vigia_agent"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-AMB-001",
-        "entry_sha256": "0f0c8c5c2eca987e19dcdbafa593a2f36aaf03f27139da87d848ab16b9d85b89",
+        "entry_sha256": "16501811c34cae7a6d40831cc4f9eec913350bb642b26a8095c197fd8d21ae05",
         "inputs_summary": {
-          "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-AMB-001.json"
+          "path": "/home/user/vigia-intent-analysis/data/cases/VIGIA-AMB-001.json"
         },
         "iteration": 0,
         "note": "Computing SHA-256 of original evidence",
         "outputs_summary": {},
         "seq": 2,
-        "timestamp": "2026-07-06T02:08:18.601489+00:00",
+        "timestamp": "2026-07-07T03:22:12.470551+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-AMB-001",
-        "entry_sha256": "0b8c492274b4f4ab666e8c856f28e3de0fa1fd4541563e33f02f4e78b79bc8a2",
+        "entry_sha256": "6b7c1c0c61831f1c222dc490e1b23fc0669d347037aad98324f5b8c6463c3a36",
         "inputs_summary": {
-          "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-AMB-001.json"
+          "path": "/home/user/vigia-intent-analysis/data/cases/VIGIA-AMB-001.json"
         },
         "iteration": 0,
         "note": "Evidence verified: ee26dfea456492d5...",
@@ -51,15 +51,15 @@
           "sha256": "ee26dfea456492d5520f590b4ba933bf9b4cfe6e8a07563d5b2078f5a63bb8a8"
         },
         "seq": 3,
-        "timestamp": "2026-07-06T02:08:18.601586+00:00",
+        "timestamp": "2026-07-07T03:22:12.470674+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "PIPELINE_EXECUTE",
         "case_id": "VIGIA-AMB-001",
-        "entry_sha256": "43cecc046b9d006efe6ea96d98b05e4ce4747ee48204d7954284170931c10f56",
+        "entry_sha256": "f09fd1d614196d9fe7defa62fdc117179a0612e4c1c675edaa7e050a4278a5dd",
         "inputs_summary": {
-          "evidence": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-AMB-001.json",
+          "evidence": "/home/user/vigia-intent-analysis/data/cases/VIGIA-AMB-001.json",
           "iteration": "0",
           "params": {}
         },
@@ -67,13 +67,13 @@
         "note": "Executing pipeline \u2014 iteration 0",
         "outputs_summary": {},
         "seq": 4,
-        "timestamp": "2026-07-06T02:08:18.601689+00:00",
+        "timestamp": "2026-07-07T03:22:12.470843+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "PIPELINE_COMPLETE",
         "case_id": "VIGIA-AMB-001",
-        "entry_sha256": "74cb7d8f353494bc7b8f61f0f8e72a1afeb78eaae5a33d42e8ff11ab79a4a222",
+        "entry_sha256": "21ed3133065e3426ad777418a1e9414c191a3ef5b2ae6946e1ba328ff5f38295",
         "inputs_summary": {
           "iteration": "0"
         },
@@ -95,8 +95,8 @@
             "expected_verdict": "NOISE",
             "resolve": {
               "motor_confidence": "0.97",
-              "motor_reason": "Insufficient evidence of malicious intent (score=0.0293)",
-              "motor_score": "0.0293",
+              "motor_reason": "Insufficient evidence of malicious intent (score=0.0332)",
+              "motor_score": "0.0332",
               "motor_verdict": "NOISE",
               "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
             },
@@ -130,13 +130,13 @@
           ]
         },
         "seq": 5,
-        "timestamp": "2026-07-06T02:08:18.654836+00:00",
+        "timestamp": "2026-07-07T03:22:12.608759+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "CONTRADICTION_CHECK",
         "case_id": "VIGIA-AMB-001",
-        "entry_sha256": "5a9d7b11c4b56d1a997108587ae48ba2bd033317b353c50475b2beef69ed05b2",
+        "entry_sha256": "0a0abdda0eda8be13165370057d90b79ae4247bb16befcfceae3770feceda2bc",
         "inputs_summary": {
           "n_signals": "3"
         },
@@ -147,13 +147,13 @@
           "threshold": "2"
         },
         "seq": 6,
-        "timestamp": "2026-07-06T02:08:18.654942+00:00",
+        "timestamp": "2026-07-07T03:22:12.608904+00:00",
         "tool": "contradiction_detector"
       },
       {
         "action": "AGENT_EXIT",
         "case_id": "VIGIA-AMB-001",
-        "entry_sha256": "3f9e1f443631751f1c5a2da5c5477dd30b5b7f4a60f2dfaa01c1b55b708fe9e0",
+        "entry_sha256": "9fa7a738ae3d8d2251f965595435a65634b526fbc96379e9f4193932573e514c",
         "inputs_summary": {
           "verdict": "NO_SEMIOTIC_ANOMALY_DETECTED"
         },
@@ -164,18 +164,18 @@
           "exit_code": "0"
         },
         "seq": 7,
-        "timestamp": "2026-07-06T02:08:18.655117+00:00",
+        "timestamp": "2026-07-07T03:22:12.609150+00:00",
         "tool": "vigia_agent"
       }
     ],
-    "start_time": "2026-07-06T02:08:18.601178+00:00",
+    "start_time": "2026-07-07T03:22:12.470043+00:00",
     "total_entries": 7
   },
   "case_id": "VIGIA-AMB-001",
-  "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-AMB-001.json",
+  "evidence_path": "/home/user/vigia-intent-analysis/data/cases/VIGIA-AMB-001.json",
   "evidence_sha256": "ee26dfea456492d5520f590b4ba933bf9b4cfe6e8a07563d5b2078f5a63bb8a8",
   "iterations_executed": 1,
-  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-AMB-001 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/VIGIA-AMB-001.json\nEvidence SHA-256: ee26dfea456492d5520f590b4ba933bf9b4cfe6e8a07563d5b2078f5a63bb8a8\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: NO_SEMIOTIC_ANOMALY_DETECTED\nPosterior confidence: 97/100\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 3 se\u00f1al(es): 3 primaria(s) de ['sift_file_audit', 'sift_mail_gateway', 'sift_netflow'], 0 derivada(s)/no-analizada(s). Top z: Finance manager accessed confidential cl=0.27, No exfiltration detected from finance ma=0.01, Anonymous email: 'The finance manager is=0.01.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: NO_SEMIOTIC_ANOMALY_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nAnonymous email alleges 'the finance manager is stealing data'. Manager denies. Logs show access to confidential files, but also show the manager had authorisation. No exfiltration detected. Could be: (1) real theft, (2) employee error, (3) false accusation by a third party.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Finance manager accessed confidential client files] z=0.270 conf=0.60 \u2014 \n  [No exfiltration detected from finance manager workstation] z=0.015 conf=0.30 \u2014 \n  [Anonymous email: 'The finance manager is stealing data'] z=0.010 conf=0.20 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 3 | Derived: 0 | Total: 3",
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-AMB-001 ===\nEvidence: /home/user/vigia-intent-analysis/data/cases/VIGIA-AMB-001.json\nEvidence SHA-256: ee26dfea456492d5520f590b4ba933bf9b4cfe6e8a07563d5b2078f5a63bb8a8\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: NO_SEMIOTIC_ANOMALY_DETECTED\nPosterior confidence: 97/100\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 3 se\u00f1al(es): 3 primaria(s) de ['sift_file_audit', 'sift_mail_gateway', 'sift_netflow'], 0 derivada(s)/no-analizada(s). Top z: Finance manager accessed confidential cl=0.27, No exfiltration detected from finance ma=0.01, Anonymous email: 'The finance manager is=0.01.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: NO_SEMIOTIC_ANOMALY_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nAnonymous email alleges 'the finance manager is stealing data'. Manager denies. Logs show access to confidential files, but also show the manager had authorisation. No exfiltration detected. Could be: (1) real theft, (2) employee error, (3) false accusation by a third party.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Finance manager accessed confidential client files] z=0.270 conf=0.60 \u2014 \n  [No exfiltration detected from finance manager workstation] z=0.015 conf=0.30 \u2014 \n  [Anonymous email: 'The finance manager is stealing data'] z=0.010 conf=0.20 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 3 | Derived: 0 | Total: 3",
   "pipeline_results": {
     "abduction": {
       "best_hypothesis": "NO_SEMIOTIC_ANOMALY_DETECTED",
@@ -196,8 +196,8 @@
       "expected_verdict": "NOISE",
       "resolve": {
         "motor_confidence": "0.97",
-        "motor_reason": "Insufficient evidence of malicious intent (score=0.0293)",
-        "motor_score": "0.0293",
+        "motor_reason": "Insufficient evidence of malicious intent (score=0.0332)",
+        "motor_score": "0.0332",
         "motor_verdict": "NOISE",
         "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
       },
