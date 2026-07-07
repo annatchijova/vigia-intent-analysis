@@ -3845,3 +3845,187 @@ Experimentos hermanos medidos y NO aplicados (documentados en
 ABSTAIN — refutado: neto ≈ +1 con costo doctrinal). El hueco estructural
 INTENT del ladder y la revisión de etiquetas ABSTAIN/L-012 quedan como
 decisiones abiertas (doc §4 y §5).
+
+---
+
+## B-077 — Agente ciego colapsaba a NOISE/ABSTAIN: semantic_role (Fase 2, D1+D2) [RESUELTO]
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | RESUELTO — POST HACKATHON (2026-07-06), commit `ffe5693` |
+| **Severidad** | P1 — continuación de A1/P2-C (PLAN_ABDUCTIVO Fase 1): sin la fuga de expected_verdict (B-075), el agente carecía de señal semántica propia |
+| **Archivo** | `vigia_scorer.py`, `vigia/vigia_sift_bridge.py` |
+| **Documento** | `docs/FASE2_EVIDENCIA_EXCULPATORIA.md` |
+
+**Descripción:** tras cerrar B-075 (resolve() motor default), la medición blind
+mostró el hueco real: el pipeline no distinguía el rol semántico de la evidencia
+(inculpatoria vs exculpatoria vs neutra). Implementación D1+D2 de la
+investigación de Fase 2.
+
+**Validación:** corpus 152/199 → **165/199** (+13), 0 regresiones. Suite verde.
+
+---
+
+## B-078 — LaBestia (sandbox de búsqueda): 3 fallos operativos encadenados [RESUELTO]
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | RESUELTO — POST HACKATHON (2026-07-06), commits `e10a364`, `e649307`, `2275316` |
+| **Severidad** | P1 — resultados de búsqueda forense silenciosamente vacíos |
+| **Archivo** | `vigia/security/sandbox.py` |
+
+**Descripción (3 capas, cada fix destapó la siguiente):**
+1. Default de memoria de `safe_grep` obsoleto (256MB) + fallos de `find`/`grep`
+   reportados como "sin resultados" en vez de error (`e10a364`).
+2. El fix anterior trataba el exit code 123 como fallo — pero `xargs` colapsa a
+   123 el "algún grep no matcheó", que es un resultado válido (`e649307`).
+3. `RLIMIT_NPROC` del sandbox demasiado bajo: el fallo real de LaBestia en
+   producción; docstrings corregidos a honestos (`2275316`).
+
+**Validación:** `tests/test_h4_grep_sanitizer_unification.py` ampliado en los
+3 commits. Suite verde en cada paso.
+
+---
+
+## B-079 — Q2 Capa 1: eco_check fail-open ante error interno [RESUELTO]
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | RESUELTO — POST HACKATHON (2026-07-06), commit `0daf5a9` |
+| **Severidad** | P1 — un filtro de sobreinterpretación que crashea no debe dejar pasar el caso |
+| **Archivo** | `vigia/core/eco_check.py`, `vigia_scorer.py` |
+| **Documento** | `docs/AUDIT_SEALED_VERDICT_SECURITY.md` (hallazgo Q2) |
+
+**Descripción:** el filtro Eco (detección de evidencia "demasiado perfecta")
+degradaba fail-open ante excepción interna. Ahora fail-closed + correcciones de
+la revisión externa del patch. Suite verde.
+
+---
+
+## B-080 — Q4 / L-023: escritura atómica en el camino primario y en ebs.py [RESUELTO]
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | RESUELTO — POST HACKATHON (2026-07-06/07), commits `dce9040`, `606469d` |
+| **Severidad** | P1 — patrón pre-L-023 (open("w") directo) en el artefacto de custodia primario |
+| **Archivo** | `vigia_agent.py`, `vigia/core/atomic_io.py`, `vigia/models/ebs.py:847` y `:1174` |
+| **Documento** | `docs/AUDIT_SEALED_VERDICT_SECURITY.md` (hallazgo Q4) |
+
+**Descripción:** (a) el bundle sellado del Modo 1 se escribía con
+`Path.write_text` directo — enrutado por `atomic_io` (mkstemp+fsync+os.replace+
+fsync del directorio, F-6) y el `.sha256` se computa RE-LEYENDO de disco, no de
+memoria (F-1b: el chequeo anterior era tautológico). (b) Los dos `save()` de
+`vigia/models/ebs.py` (`ForensicBundle.save`, `BundleBuilder.save`) seguían con
+`open("w")` — mismos fixes, con verificación disco-vs-memoria → RuntimeError en
+divergencia. Consumidores verificados independientes (models/ebs.py sin
+consumidores de producción; pipeline usa core/ebs_v1 + core/bundle_builder).
+
+**Validación:** suite verde, corpus 166/199, 0 flips.
+
+---
+
+## B-081 — M2-1/M2-2 + Round 2.1: invariantes de monotonicidad del scorer [RESUELTO]
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | RESUELTO — POST HACKATHON (2026-07-07), commits `433d61a` (audit), `f85f171` (fixes), `1d84c84` (doctrina) |
+| **Severidad** | P1 — agregar evidencia inculpatoria podía BAJAR el score (no-monotonicidad) |
+| **Archivo** | `vigia_scorer.py` |
+| **Documento** | `docs/REDTEAM_ROUND2_MONOTONICITY.md` |
+
+**Descripción:** Red-Team Round 2 confirmó dos violaciones de monotonicidad
+(M2-1, M2-2). Fixes implementados con gate comparativo: corpus 165→163 (+1 fix,
+3 conflictos de etiqueta que codificaban la dilución). Round 2.1 (decisión de
+doctrina): relabel de esas 3 etiquetas → corpus **166/199**.
+
+**Validación:** `tests/test_m2_monotonicity_invariants.py`. Suite verde.
+
+---
+
+## B-082 — R3-1..R3-4: cuatro fracturas emergentes del Red-Team Round 3 [RESUELTO]
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | RESUELTO — POST HACKATHON (2026-07-07), commits `03f6c10` (audit), `22f6edc`, `b981803`, `e0e7be0` |
+| **Severidad** | P1/P2 — integridad del sello y del ground truth |
+| **Archivo** | `vigia/tools/caie.py`, `vigia/core/canonicalize.py`, `vigia/core/hash_chain.py`, `verify_tool_log.py`, runner |
+| **Documento** | `docs/REDTEAM_ROUND3_EMERGENT.md` |
+
+**Descripción y fixes:**
+- **R3-1:** guard de rango temporal en TCV (`22f6edc`).
+- **R3-2:** canonicalización v2 cierra colisiones de tipo (`True`/`"true"`,
+  `1`/`"1:int"`), versionada con v1 legacy retenido para bundles históricos
+  (`b981803`).
+- **R3-3:** assert de consistencia de etiquetas en el runner — 59 stems
+  duplicados en el corpus, 3 con `expected_verdict` divergente resuelto
+  silenciosamente por precedencia de directorio (`22f6edc`). La deduplicación
+  física del corpus queda pendiente (Grupo D).
+- **R3-4:** validación de orden causal en el verificador de la cadena, eje
+  separado del sello (`e0e7be0`).
+
+**Validación:** suite verde y corpus 166/199 en cada fix.
+
+---
+
+## B-083 — Censo P0-001 de float() + fixes adyacentes (timestamps, gamma, umbrales) [RESUELTO]
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | RESUELTO — POST HACKATHON (2026-07-07), commits `b620385` (censo), `15e858d` (fixes) |
+| **Severidad** | P2 — precisión y doctrina Fraction-pura; ningún sitio violaba determinismo |
+| **Archivo** | `vigia/sift/android_forensics.py`, `vigia/sift/_math_utils.py`, `vigia/inference/abductive_reasoner.py` |
+| **Documento** | `docs/AUDIT_P0001_FLOAT_CENSUS.md` |
+
+**Descripción:** censo exhaustivo de los 37 call sites de `float()` en los 12
+módulos del path de scoring (10 SIFT Windows + iOS + Android). Veredicto: 36/37
+son la frontera de contrato del DTO `SignalOutput` (decisión de alcance P0-001
+vigente); todos los consumidores re-cuantizan determinísticamente. Fixes
+aplicados sobre los hallazgos adyacentes:
+- §3.1: `int(float(raw_ts))` perdía µs por encima de 2^53 (timestamps WebKit
+  ~1.7e16) → `int(Decimal(str(raw_ts)))`.
+- §5.4: `int(ts / 1_000_000)` cruzaba bordes de segundo por redondeo IEEE 754
+  (ts=18396007234999999 → …235 en vez de …234) → división entera `//`.
+- §5.1: recurrencia del patrón pre-P0-001 en el gamma dinámico
+  (`int(round(float(x)*20))`; x=0.42500000000000004 → 8/20 en vez de 9/20) →
+  `Fraction(round(Fraction(str(x)) * 20), 20)`.
+- §5.3: umbrales del reasoner abductivo comparados en float → `_z_frac()` +
+  umbrales `Fraction` (semántica idéntica, doctrina Fraction-pura).
+
+**Pendiente del censo (mejoras opcionales):** emitir `z_frac`/`conf_frac`
+exactas en metadata de `to_signal()`; unificar el estilo `float(z)/Z_CLIP_MAX`
+(Windows, doble redondeo) con `float(z/z_clip)` (móvil, redondeo único).
+Observación menor: el clip de `ebs_v1.SignalOutput` convierte NaN → 5.0 en
+silencio (semántica de `min` con NaN); la variante de `signal_contract` rechaza
+no-finitos con error.
+
+**Validación:** `tests/test_census_adjacent_fixes.py` (13, valores divergentes
+hallados por búsqueda exhaustiva). Suite verde, corpus 166/199, 0 flips.
+
+---
+
+## B-084 — TANDAS 1–4 de AUDITORIA_FUGA_INDIRECTA: H1b, B-059, H4, H5, H1c [RESUELTO]
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | RESUELTO — POST HACKATHON (2026-07-06), commits `b3246c9`, `f1e3f75`, `b43a8af`, `b31c4c5`, `c865da9` |
+| **Severidad** | P1 — fuga indirecta de etiquetas y escaleras rotas |
+| **Documento** | `docs/AUDITORIA_FUGA_INDIRECTA.md` |
+
+**Descripción (una entrada por tanda):**
+- **TANDA 1 / B-059** (`f1e3f75`): escala ENFSI unificada en
+  `vigia/core/enfsi.py` — cierra el ítem B5 del PLAN_ABDUCTIVO (3
+  implementaciones divergentes).
+- **TANDA 2 / H4** (`b43a8af`): `_sanitize_grep_pattern` unificado fail-closed
+  + fix de NameError latente en `safe_grep`.
+- **TANDA 3 / H5** (`b31c4c5`): escalera vol3 corregida — INTENT alcanzable +
+  gate de 2 fuentes para MALICIOUS.
+- **TANDA 4 / H1c** (`c865da9`): puerta de datos cerrada — 15 casos BEN
+  regenerados sin la reducción ×0.25; corpus honesto 152/199.
+- **H1b previo** (`b3246c9`): cuarentena del bloque `is_benign` en
+  `normalize_case_schema`.
+- Contexto de auditoría: revisión de etiquetas BEN-001..015 (`9a33982`, 0
+  cambios, 15 FPs del motor documentados) y addendum B-076 calibrado sobre
+  datos contaminados (`651ca10`).
+
+**Validación:** suite verde por tanda; el corpus post-TANDA-4 (152/199) es la
+base honesta sobre la que Fase 2 (B-077) midió su +13.

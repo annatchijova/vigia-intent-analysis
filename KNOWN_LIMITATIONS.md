@@ -823,7 +823,7 @@ Reproduce: `python3 run_all_agent.py --timeout 90`
 | L-020 | Claude Code bundle lacks granular audit_trail | Mode 2 bundles | Known limitation |
 | L-021 | Float intermediates in scoring path | vigia_scorer.py, caie.py | **RESOLVED** |
 | L-022 | devil_advocate validation partially architectural | Mode 2 bundles | Post-audit improvement |
-| L-023 | Bundle save TOCTOU race (SEC-04) | bundle_builder.py | **RESOLVED** 2026-07-03 (atomic write) |
+| L-023 | Bundle save TOCTOU race (SEC-04) | bundle_builder.py | **RESOLVED** 2026-07-03 (atomic write); extended 2026-07-06/07 to vigia_agent.py primary path and models/ebs.py (B-080) |
 | L-024 | Forensic mount allowlist includes generic /mnt | sift_orchestrator.py | **RESOLVED** 2026-07-03 (forensic prefixes) |
 | L-025 | Devil's Advocate has no autonomous generator for unlabeled evidence | All live MALICE/INTENT findings | RESOLVED — see L-026 |
 | L-026 | Devil's Advocate generator wired in; 1 pre-fix corpus bundle flagged | VIGIA-REAL-SRL-DMZ-FTP | **RESOLVED** / documented exception |
@@ -838,7 +838,7 @@ Reproduce: `python3 run_all_agent.py --timeout 90`
 | L-034 | Multi-source corroboration sub-threshold aggregation | MAGNET-2022/2020-WINDOWS | Documented |
 | L-035 | event_log mapped to log_entry in forensic_adapter | forensic_adapter.py | **RESOLVED** |
 | L-036 | Pipeline RAW hypothesis override for UNDETERMINED | vigia_agent.py RAW path | **RESOLVED** |
-| L-037 | ARTIFACT_RELIABILITY not propagated to CAIE | iOS/Android forensics | PENDING |
+| L-037 | Acquisition metadata not propagated to CAIE | iOS/Android forensics | **RESOLVED** 2026-06-30 (see entry body; L-037b closed by Tanda B PR-B2) |
 | L-038 | Dynamic gamma for windows_event_log | Scoring pipeline | IMPLEMENTED |
 
 ---

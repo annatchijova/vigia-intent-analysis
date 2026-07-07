@@ -3855,6 +3855,186 @@ registry (layer+ontology+profile+role in a single source).
 
 ---
 
+## B-072 — Mobile: "unparseable == empty" conflation escalated the verdict [RESOLVED]
+
+| Field | Value |
+|-------|-------|
+| **Status** | RESOLVED — POST HACKATHON (2026-07-04) |
+| **Severity** | P1 — false INTENT/MALICE (P0-A family: inability to analyze presented as a signal) |
+| **File** | `ios_forensics.py::_analyze_contacts`, `android_forensics.py::_analyze_contacts` + `_analyze_call_log` |
+| **Detected** | AUDITORIA_COBERTURA_MOBILE_SIFT §D |
+| **Tag** | `pre-p1-mobile-verdict-20260704-022839` |
+
+**Description:** when the expected table did not exist (unknown schema), the
+`OperationalError` was swallowed and the counter stayed at its default 0 →
+`EMPTY_CONTACTS`/`EMPTY_CALL_LOG` was emitted → fed `data_minimization` →
+escalated the verdict. An innocent parse failure scored identically to a
+deliberately wiped contact list.
+
+**§4.1 verification (audit-before-patch):** of the 4 methods the audit flagged,
+only 3 had the bug. `ios_forensics::_analyze_call_history` already did `return`
+in the `except` before emitting EMPTY — audit false positive, rejected untouched.
+
+**Fix v1 (2026-07-04, PARTIAL — cosmetic):** local `parsed` flag — `EMPTY_*`
+emitted only on a successful count of 0. **The red-team
+(AUDITORIA_REDTEAM_P1_MOBILE) refuted it:** `to_signal` does NOT read the
+finding — it computes `empty_contacts = self.total_contacts == 0` from the raw
+counter, which stays 0 after a failed parse. Reproduced: unparseable
+contacts+calls still escalated from z=2.4 to **z=3.0** via `data_minimization`.
+The false INTENT/MALICE was still alive. The finding was removed, not the
+escalation.
+
+**Fix v2 (2026-07-04, REAL):** `contacts_parsed`/`calls_parsed` sentinels on the
+dataclasses (default False), set True only on a successful count. `to_signal`
+now computes `empty_contacts = self.contacts_parsed and self.total_contacts == 0`
+— a failed parse or a missing DB (parsed=False) does NOT escalate
+`data_minimization`. Verified: the red-team scenario now yields z=2.4 (== the
+with-data case), while a REALLY parsed-and-empty contact list does escalate
+(z=3.0). The distinction is now correct.
+
+**Validation:** `tests/test_b072_b074_mobile_verdict_fixes.py` — 9 for B-072
+(5 finding + 4 `TestB072DataMinimizationEscalation`: failed parse does not
+escalate, real empty does, end-to-end flags). Suite 489, corpus 198/198.
+
+---
+
+## B-073 — iOS: has_phishing computed but never used in the ladder (dead branch) [RESOLVED]
+
+| Field | Value |
+|-------|-------|
+| **Status** | RESOLVED — POST HACKATHON (2026-07-04) |
+| **Severity** | P2 — live detection with no effect on the verdict |
+| **File** | `vigia/sift/ios_forensics.py::to_signal` |
+| **Detected** | AUDITORIA_COBERTURA_MOBILE_SIFT §A |
+
+**Description:** `has_phishing` (finding_type `SMS_PHISHING_RECEIVED`, genuinely
+emitted by `_analyze_sms`) was computed but never entered the z ladder — a pure
+phishing case fell to the generic 1.2 floor.
+
+**Fix v1:** `elif has_phishing: z=1.6` branch. It is a PASSIVE signal (phishing
+received happened *to* the user, they did not generate it) → weighs less than
+ACTIVE exploit searching (has_hacking_search=1.8). **The red-team
+(AUDITORIA_REDTEAM_P1_MOBILE) marked it verdict-cosmetic:** 1.6 (even 2.0 with
+max bump) never crosses the strict >2 threshold — no verdict changed.
+
+**Fix v2 (2026-07-05, Anna's doctrine decision — option b):** *"received
+phishing may reach SUSPICION combined with other signals"*. New branch
+`elif has_phishing and (n_encrypted >= 2 or data_minimization): z=2.2` —
+crosses the strict >2 threshold of `_mobile_hypothesis` only in combination:
+
+- **Alone, never:** pure phishing = 1.6; with max bump = 2.0 (not >2).
+- **Combined, yes:** with ≥2 encrypted apps or with **parsed**
+  `data_minimization` (B-072 interplay: counters at 0 from a failed parse do
+  NOT enable the branch) → z=2.2 → SUSPICION_DETECTED.
+- **Still passive:** 2.2 stays below ACTIVE-search combinations
+  (hacking+data_min=2.6, enc2+hacking=2.8). Existing branches intact
+  (2 apps alone=2.0, hacking alone=1.8).
+- Mapping note (pre-existing, for awareness): the `SUSPICION_DETECTED`
+  hypothesis seals `agent_verdict=INTENT` (exit 3) on the agent's 4-value
+  scale, whose INTENT tier represents "INTENT/SUSPICION".
+
+**Validation:** 8 tests (2 from v1 + 6 `TestB073DoctrineCombined`: combined
+crosses, alone does not even with bump, B-072 interplay, passive < active,
+existing branches unchanged). Suite 509, corpus 198/198. Restore tag:
+`pre-b073-doctrine-20260705-014509`.
+
+---
+
+## B-074 — macOS: has_sip_disabled always False → dead verdict branches [RESOLVED]
+
+| Field | Value |
+|-------|-------|
+| **Status** | RESOLVED — POST HACKATHON (2026-07-04). Anna's decision: VIGÍA must detect SIP disabled from a real check. |
+| **Severity** | P1 — anti-forensic escalation unreachable |
+| **File** | `vigia/sift/macos_forensics.py` (new `_detect_sip_status` + wire in `analyze`) |
+| **Detected** | AUDITORIA_COBERTURA_MOBILE_SIFT §A (empirically confirmed: `SIP_DISABLED` only appeared where it is read) |
+
+**Description:** `to_signal` reads `has_sip_disabled` (finding_type
+`SIP_DISABLED`) in two anti-forensic branches (z=3.4 and z=2.4), but NO analyzer
+emitted that finding → structurally DEAD branches. A macOS with SIP disabled +
+anti-forensic tooling never received the escalation coded for that scenario.
+
+**Fix v1 (2026-07-04):** `_detect_sip_status` with only the shell-history
+fallback (`csrutil disable`/`enable --without`). **The red-team
+(AUDITORIA_REDTEAM_P1_MOBILE) marked it low-recall:** `csrutil disable` runs
+ONLY from Recovery OS, so it almost never appears in the booted-OS shell
+histories forensic tools capture → missed most Macs with SIP actually disabled.
+
+**Fix v2 (2026-07-04, real recall):** added the **authoritative NVRAM source
+`csr-active-config`** (`_parse_csr_config` parser + `_CSR_FLAGS` table). Reads
+`nvram.plist` (bare key or GUID-prefixed), interprets the 32-bit little-endian
+value: `0x0` = SIP enabled (authoritative note, no finding); ≠0 =
+`SIP_DISABLED` with the concrete CSR_ALLOW_* flags in the evidence
+(e.g. `0x77` = UNTRUSTED_KEXTS, UNRESTRICTED_FS, TASK_FOR_PID, APPLE_INTERNAL,
+UNRESTRICTED_DTRACE, UNRESTRICTED_NVRAM). **NVRAM wins over shell history**
+(a `csrutil disable` in history may be a failed/re-enabled attempt; the NVRAM
+state is the real one). Shell history remains as fallback when there is no
+NVRAM. Honest degradation (§5.3): with no source at all, "undetermined".
+
+**Doctrine RESOLVED (2026-07-05, Anna's decision):** SIP-disabled counts as
+`has_antiforensic` (T1562.001) and escalates on its own. Implementation with an
+empirically verified anti-FP guard:
+- `has_antiforensic = has_antiforensic_finding or has_sip_disabled` (SIP counts).
+- SIP alone → `has_sip_disabled` branch → **z=2.4 (SUSPICION)** — escalates alone.
+- SIP + exploit → `exploit and has_antiforensic` branch → z=3.8.
+- **Anti-FP guard:** the STRONG combination branches (3.4 triple, 2.8) use the
+  EXPLICIT `has_antiforensic_finding` flag (a separate, deliberate anti-forensic
+  act), NOT the inclusive one. Without this, the global OR collapsed the triple
+  branch: measured → SIP + 2 normal encrypted apps (Signal/WhatsApp of a dev
+  with SIP off) jumped to **3.4 (INTENT)** — false positive on innocent
+  profiles. With the guard: SIP + normal apps = 2.4 (SUSPICION), and the genuine
+  triple (SIP + real anti-forensic act + apps) = 3.4, distinguished.
+- Unchanged controls: real-AF+2apps=2.8, 2apps=2.0, exploit=3.5.
+
+**Validation:** `tests/test_b072_b074_mobile_verdict_fixes.py` — 11 for B-074
+(3 shell-history/branch + 4 `TestB074NvramAuthoritative` + 4 `TestB074CsrParser`).
+NVRAM 0x77 → SIP_DISABLED with flags; 0x0 → authoritative note; NVRAM wins over
+history; GUID-prefixed key; parser bytes/int/hex/garbage. Suite 499,
+corpus 198/198. Restore tag: `pre-b074-nvram-20260704-...`.
+
+---
+
+## B-071 — Mobile: evidence SQLite access read-only + immutable (S1) [RESOLVED]
+
+| Field | Value |
+|-------|-------|
+| **Status** | RESOLVED — POST HACKATHON (2026-07-04) |
+| **Severity** | P1 — writes into evidence (violates read-only invariant) + silent empty DB |
+| **File** | `vigia/sift/_sql_utils.py` (new) + the 3 `_safe_sqlite_connect` |
+| **Detected** | AUDITORIA_COBERTURA_MOBILE_SIFT §C / systemic pattern S1 |
+
+**Description:** the 3 `_safe_sqlite_connect` opened `sqlite3.connect(str(path))`
+read-WRITE. A DB with a dirty WAL/journal triggers auto-recovery that writes
+`-wal`/`-journal` back into `VIGIA_EVIDENCE_DIR` (violates invariant #1), and a
+nonexistent path CREATES an empty DB (0 findings reads as clean). Both
+empirically verified.
+
+**Fix v1 (mode=ro&immutable=1) — REFUTED by the red-team:** closed the write and
+the creation, but `immutable=1` IGNORES the `-wal` → a WAL-mode DB with data in
+the `-wal` (the normal state of a live phone) read as an empty table →
+**serious false negative** (inculpatory evidence invisible). `mode=ro` alone was
+no good either: it creates the `-shm` in evidence. It traded custody for
+completeness.
+
+**Fix v2 (copy-to-working-dir) — REAL:** `safe_sqlite_connect` copies the
+`db` + `-wal` + `-shm` + `-journal` family to an ephemeral working dir and opens
+the COPY read-write there. Satisfies both invariants at once: zero writes into
+evidence (the original is never opened) AND full WAL read. The working dir is
+deleted when the connection closes (`_WorkingCopyConnection.close`) + GC
+backstop (`weakref.finalize`). Missing path → None (does not create). Malformed
+DB → lazy error at query time (caught by the parser). One implementation,
+shared contract.
+
+**Honest limitation (§5.3):** copies the file — O(DB size) cost per artifact;
+acceptable because callers bound how many DBs they open (`_safe_rglob` limit=N).
+
+**Validation:** `tests/test_b071_sqlite_readonly.py` (12): writing to the copy
+does NOT touch the evidence (identical hash), **WAL data visible** (the FN),
+working dir cleaned on close, missing path does not create, malformed DB lazy.
+Suite 491, corpus 198/198. Restore tag: `pre-b071-rework-20260704-...`.
+
+---
+
 ## B-075 — EBS adapter: expected_verdict leaks into the verdict (P2-C) — resolve() implemented, default motor [RESOLVED]
 
 | Field | Value |
@@ -3935,3 +4115,186 @@ refuted: would break 49 correct MALICE cases) and E3 (NOISE with <3
 artifacts → ABSTAIN — refuted: net ≈ +1 with doctrinal cost). The ladder's
 structural INTENT gap and the ABSTAIN/L-012 label review remain open
 decisions (doc §4 and §5).
+
+---
+
+## B-077 — Blind agent collapsed to NOISE/ABSTAIN: semantic_role (Fase 2, D1+D2) [RESOLVED]
+
+| Field | Value |
+|-------|-------|
+| **Status** | RESOLVED — POST HACKATHON (2026-07-06), commit `ffe5693` |
+| **Severity** | P1 — continuation of A1/P2-C (PLAN_ABDUCTIVO Fase 1): with the expected_verdict leak closed (B-075), the agent had no semantic signal of its own |
+| **File** | `vigia_scorer.py`, `vigia/vigia_sift_bridge.py` |
+| **Document** | `docs/FASE2_EVIDENCIA_EXCULPATORIA.md` |
+
+**Description:** after closing B-075 (resolve() as default motor), the blind
+measurement exposed the real gap: the pipeline did not distinguish the semantic
+role of evidence (inculpatory vs exculpatory vs neutral). D1+D2 implementation
+from the Fase 2 investigation.
+
+**Validation:** corpus 152/199 → **165/199** (+13), 0 regressions. Suite green.
+
+---
+
+## B-078 — LaBestia (search sandbox): 3 chained operational failures [RESOLVED]
+
+| Field | Value |
+|-------|-------|
+| **Status** | RESOLVED — POST HACKATHON (2026-07-06), commits `e10a364`, `e649307`, `2275316` |
+| **Severity** | P1 — forensic search results silently empty |
+| **File** | `vigia/security/sandbox.py` |
+
+**Description (3 layers, each fix uncovered the next):**
+1. Stale `safe_grep` memory default (256MB) + `find`/`grep` failures reported
+   as "no results" instead of an error (`e10a364`).
+2. The previous fix treated exit code 123 as failure — but `xargs` collapses
+   "some grep did not match" to 123, which is a valid result (`e649307`).
+3. Sandbox `RLIMIT_NPROC` too low: LaBestia's real production failure;
+   docstrings corrected to honest (`2275316`).
+
+**Validation:** `tests/test_h4_grep_sanitizer_unification.py` extended in all
+3 commits. Suite green at each step.
+
+---
+
+## B-079 — Q2 Layer 1: eco_check fail-open on internal error [RESOLVED]
+
+| Field | Value |
+|-------|-------|
+| **Status** | RESOLVED — POST HACKATHON (2026-07-06), commit `0daf5a9` |
+| **Severity** | P1 — an overinterpretation filter that crashes must not let the case through |
+| **File** | `vigia/core/eco_check.py`, `vigia_scorer.py` |
+| **Document** | `docs/AUDIT_SEALED_VERDICT_SECURITY.md` (finding Q2) |
+
+**Description:** the Eco filter ("too perfect" evidence detection) degraded
+fail-open on internal exception. Now fail-closed + external review corrections
+to the patch. Suite green.
+
+---
+
+## B-080 — Q4 / L-023: atomic writes on the primary path and in ebs.py [RESOLVED]
+
+| Field | Value |
+|-------|-------|
+| **Status** | RESOLVED — POST HACKATHON (2026-07-06/07), commits `dce9040`, `606469d` |
+| **Severity** | P1 — pre-L-023 pattern (direct open("w")) on the primary custody artifact |
+| **File** | `vigia_agent.py`, `vigia/core/atomic_io.py`, `vigia/models/ebs.py:847` and `:1174` |
+| **Document** | `docs/AUDIT_SEALED_VERDICT_SECURITY.md` (finding Q4) |
+
+**Description:** (a) the Mode 1 sealed bundle was written with direct
+`Path.write_text` — now routed through `atomic_io` (mkstemp+fsync+os.replace+
+directory fsync, F-6) and the `.sha256` is computed by RE-READING from disk,
+not memory (F-1b: the previous check was tautological). (b) The two `save()`
+methods in `vigia/models/ebs.py` (`ForensicBundle.save`, `BundleBuilder.save`)
+still used `open("w")` — same fixes, with disk-vs-memory verification →
+RuntimeError on divergence. Consumers verified independent (models/ebs.py has
+no production consumers; the pipeline uses core/ebs_v1 + core/bundle_builder).
+
+**Validation:** suite green, corpus 166/199, 0 flips.
+
+---
+
+## B-081 — M2-1/M2-2 + Round 2.1: scorer monotonicity invariants [RESOLVED]
+
+| Field | Value |
+|-------|-------|
+| **Status** | RESOLVED — POST HACKATHON (2026-07-07), commits `433d61a` (audit), `f85f171` (fixes), `1d84c84` (doctrine) |
+| **Severity** | P1 — adding inculpatory evidence could LOWER the score (non-monotonicity) |
+| **File** | `vigia_scorer.py` |
+| **Document** | `docs/REDTEAM_ROUND2_MONOTONICITY.md` |
+
+**Description:** Red-Team Round 2 confirmed two monotonicity violations (M2-1,
+M2-2). Fixes implemented behind a comparative gate: corpus 165→163 (+1 fix,
+3 label conflicts that encoded the dilution). Round 2.1 (doctrine decision):
+relabel of those 3 labels → corpus **166/199**.
+
+**Validation:** `tests/test_m2_monotonicity_invariants.py`. Suite green.
+
+---
+
+## B-082 — R3-1..R3-4: four emergent fractures from Red-Team Round 3 [RESOLVED]
+
+| Field | Value |
+|-------|-------|
+| **Status** | RESOLVED — POST HACKATHON (2026-07-07), commits `03f6c10` (audit), `22f6edc`, `b981803`, `e0e7be0` |
+| **Severity** | P1/P2 — seal and ground-truth integrity |
+| **File** | `vigia/tools/caie.py`, `vigia/core/canonicalize.py`, `vigia/core/hash_chain.py`, `verify_tool_log.py`, runner |
+| **Document** | `docs/REDTEAM_ROUND3_EMERGENT.md` |
+
+**Description and fixes:**
+- **R3-1:** temporal range guard in TCV (`22f6edc`).
+- **R3-2:** canonicalization v2 closes type collisions (`True`/`"true"`,
+  `1`/`"1:int"`), versioned with v1 legacy retained for historical bundles
+  (`b981803`).
+- **R3-3:** label-consistency assert in the runner — 59 duplicated case stems
+  in the corpus, 3 with divergent `expected_verdict` silently resolved by
+  directory precedence (`22f6edc`). Physical corpus deduplication remains
+  pending (Group D).
+- **R3-4:** causal-order validation in the chain verifier, separate axis from
+  the seal (`e0e7be0`).
+
+**Validation:** suite green and corpus 166/199 at each fix.
+
+---
+
+## B-083 — P0-001 float() census + adjacent fixes (timestamps, gamma, thresholds) [RESOLVED]
+
+| Field | Value |
+|-------|-------|
+| **Status** | RESOLVED — POST HACKATHON (2026-07-07), commits `b620385` (census), `15e858d` (fixes) |
+| **Severity** | P2 — precision and Fraction-pure doctrine; no site violated determinism |
+| **File** | `vigia/sift/android_forensics.py`, `vigia/sift/_math_utils.py`, `vigia/inference/abductive_reasoner.py` |
+| **Document** | `docs/AUDIT_P0001_FLOAT_CENSUS.md` |
+
+**Description:** exhaustive census of the 37 `float()` call sites in the 12
+scoring-path modules (10 Windows SIFT + iOS + Android). Verdict: 36/37 are the
+`SignalOutput` DTO contract boundary (P0-001 scope decision stands); all
+consumers re-quantize deterministically. Fixes applied on the adjacent findings:
+- §3.1: `int(float(raw_ts))` lost µs above 2^53 (WebKit timestamps ~1.7e16) →
+  `int(Decimal(str(raw_ts)))`.
+- §5.4: `int(ts / 1_000_000)` crossed second boundaries via IEEE 754 rounding
+  (ts=18396007234999999 → …235 instead of …234) → integer division `//`.
+- §5.1: pre-P0-001 pattern recurrence in the dynamic gamma
+  (`int(round(float(x)*20))`; x=0.42500000000000004 → 8/20 instead of 9/20) →
+  `Fraction(round(Fraction(str(x)) * 20), 20)`.
+- §5.3: abductive reasoner thresholds compared in float → `_z_frac()` +
+  `Fraction` thresholds (identical semantics, Fraction-pure doctrine).
+
+**Census leftovers (optional improvements):** emit exact `z_frac`/`conf_frac`
+in `to_signal()` metadata; unify the `float(z)/Z_CLIP_MAX` style (Windows,
+double rounding) with `float(z/z_clip)` (mobile, single rounding). Minor
+observation: the `ebs_v1.SignalOutput` clip silently converts NaN → 5.0
+(`min` semantics with NaN); the `signal_contract` variant rejects non-finite
+values with an error.
+
+**Validation:** `tests/test_census_adjacent_fixes.py` (13, divergent values
+found by exhaustive search). Suite green, corpus 166/199, 0 flips.
+
+---
+
+## B-084 — TANDAS 1–4 from AUDITORIA_FUGA_INDIRECTA: H1b, B-059, H4, H5, H1c [RESOLVED]
+
+| Field | Value |
+|-------|-------|
+| **Status** | RESOLVED — POST HACKATHON (2026-07-06), commits `b3246c9`, `f1e3f75`, `b43a8af`, `b31c4c5`, `c865da9` |
+| **Severity** | P1 — indirect label leakage and broken ladders |
+| **Document** | `docs/AUDITORIA_FUGA_INDIRECTA.md` |
+
+**Description (one entry per tanda):**
+- **TANDA 1 / B-059** (`f1e3f75`): ENFSI scale unified in
+  `vigia/core/enfsi.py` — closes PLAN_ABDUCTIVO item B5 (3 divergent
+  implementations).
+- **TANDA 2 / H4** (`b43a8af`): `_sanitize_grep_pattern` unified fail-closed
+  + latent NameError fix in `safe_grep`.
+- **TANDA 3 / H5** (`b31c4c5`): vol3 ladder corrected — INTENT reachable +
+  2-source gate for MALICIOUS.
+- **TANDA 4 / H1c** (`c865da9`): data gate closed — 15 BEN cases regenerated
+  without the ×0.25 reduction; honest corpus 152/199.
+- **Prior H1b** (`b3246c9`): quarantine of the `is_benign` block in
+  `normalize_case_schema`.
+- Audit context: BEN-001..015 label review (`9a33982`, 0 changes, 15 engine
+  FPs documented) and B-076-calibrated-on-contaminated-data addendum
+  (`651ca10`).
+
+**Validation:** suite green per tanda; the post-TANDA-4 corpus (152/199) is
+the honest baseline on which Fase 2 (B-077) measured its +13.

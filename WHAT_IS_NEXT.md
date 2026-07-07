@@ -1,155 +1,176 @@
-# QUE_SIGUE.md — Theoretical Deepening Track (Post-Hackathon)
+# WHAT_IS_NEXT.md — Estado real del proyecto y qué sigue
 
-> **Status: NOT part of the SANS FIND EVIL Hackathon 2026 submission.**
-> The hackathon is closed. Nothing in this document is evaluated by judges,
-> required for compliance, or tied to the submitted accuracy claims. This is
-> a pure-interest research track on the philosophical/logical foundations of
-> abduction, pursued because VIGÍA's design deserves a deeper theoretical
-> floor than "inspired by Peirce and Eco." Any commits produced from this
-> track must be tagged `POST HACKATHON` in the commit message.
+> **Actualizado: 2026-07-07.** El hackathon SANS FIND EVIL 2026 está cerrado;
+> todo lo listado acá es track POST HACKATHON. Este documento reemplaza la
+> versión anterior (que era solo el track teórico Magnani/Aliseda/Nishida —
+> ahora §4, con sus claims corregidos: `resolve()` ya no está "ausente").
+> Todo commit derivado de este documento se etiqueta `POST HACKATHON`.
 
-## 0. Why this track exists
+---
 
-VIGÍA's abductive engine currently rests on two pillars:
+## 0. Estado verificado hoy (2026-07-07)
 
-- **Peirce**: the formal shape of abduction (the surprising fact C, the rule
-  that would explain it, the adoption of that rule as hypothesis worth
-  testing) and the original IoC→IoI inversion.
-- **Eco**: the semiotic reading of clues as a chain of interpretants, and the
-  "detective" model of evidence interpretation.
+| Métrica | Valor | Fuente |
+|---------|-------|--------|
+| Corpus (batch agente) | **166/199** | `results/agent_batch/_batch_summary.json` |
+| Suite | **848 passed** (835 + 13 nuevos), 1 skipped, 7 xfailed | corrida 2026-07-07 (excluye `tests/e2e`, que requiere sandbox SIFT del entorno) |
+| Trackers | `BUGS_PENDIENTES.md` (ES) y `BUGS_PENDIENTES_EN.md` sincronizados hasta **B-084** | este commit |
+| Última tanda cerrada | TANDAS 1–4, Fase 2 semantic_role, LaBestia, Q2/Q4, Round 2/2.1, Round 3, censo P0-001 + fixes adyacentes | B-077..B-084 |
 
-Neither author gives VIGÍA a *computational* or *logically formal* account of
-abduction. Three authors close that gap, each addressing a different layer
-of the stack:
+Trayectoria del corpus en la semana: 143 → 153 (B-076, umbral SUSPICION) →
+165 (B-077, semantic_role) → 163 (B-081, monotonicidad con gate) → **166**
+(Round 2.1, relabel de 3 etiquetas que codificaban la dilución).
 
-| Author   | Layer addressed                                  | VIGÍA component it speaks to              |
-|----------|---------------------------------------------------|--------------------------------------------|
-| Magnani  | Abduction as physical/embodied action, not just inference | Forensic technical detectors (disk, registry, memory) |
-| Aliseda  | Logical formalization: generation vs. selection of hypotheses | The missing `resolve(ccs, risk, epsilon)` function |
-| Nishida  | Early computational implementation: multi-hypothesis tracking, contradiction detection, plausibility update | The Fraction-based scoring pipeline, likelihood_ratio.py, trust_fusion.py |
+### Cerrado del 2026-07-05 al 07 (detalle en trackers B-077..B-084)
 
-This document is the plan for studying each one and deciding, deliberately,
-whether and how their ideas get absorbed into VIGÍA's architecture.
+- **B-084** — TANDAS 1–4 (AUDITORIA_FUGA_INDIRECTA): H1b, B-059/enfsi
+  unificado, H4, H5, H1c — puerta de datos cerrada, corpus honesto 152/199.
+- **B-077** — semantic_role (D1+D2): el agente ciego distingue rol semántico
+  de la evidencia; +13 casos.
+- **B-078** — LaBestia: 3 fallos encadenados del sandbox de búsqueda.
+- **B-079** — Q2: eco_check fail-closed.
+- **B-080** — Q4/L-023: escritura atómica en el camino primario
+  (`vigia_agent.py`) y en `vigia/models/ebs.py` ×2; `.sha256` re-leído de disco.
+- **B-081** — M2-1/M2-2 + Round 2.1: invariantes de monotonicidad del scorer.
+- **B-082** — R3-1..R3-4: guard temporal TCV, canonicalización v2, assert de
+  etiquetas del runner, orden causal en el verificador de cadena.
+- **B-083** — Censo P0-001 de `float()` (37 sitios, veredicto: frontera de
+  contrato sana) + 4 fixes adyacentes (timestamp WebKit, división entera,
+  gamma racional, umbrales Fraction del reasoner).
 
-## 1. Magnani — Manipulative Abduction
+---
 
-**Core idea to study**: Magnani's distinction between *theoretical* abduction
-(sentential or model-based, purely symbolic) and *manipulative* abduction,
-where acting on external representations and physical/epistemic mediators is
-itself part of generating a hypothesis — not just a step before or after
-reasoning about it.
+## 1. Qué sigue, en orden
 
-**Why it matters for VIGÍA**: every forensic technical detector
-(`shellbag_analyzer.py`, `prefetch_analyzer.py`, `amcache_shimcache.py`,
-`mft_timeline_analyzer.py`) does not merely *read* artifacts — it manipulates
-disk structures, parses binary formats, and reconstructs timelines through
-that manipulation. Magnani's framework gives a theoretical name to what these
-modules are actually doing: manipulative abduction over digital artifacts,
-not pure symbolic inference over a log file. This could reframe how
-`KNOWN_LIMITATIONS.md` and the architecture docs describe the technical
-detector layer versus the semiotic/narrative layer.
+El orden hereda la economía de investigación del
+`docs/PLAN_ABDUCTIVO_PENDIENTES_20260705.md` (bucle A–D–I), actualizado con lo
+que ya se cerró desde entonces. La Fase 0 (sorpresas protegidas) y la Fase 1
+(A1: agente ciego — cerrada por B-075 + B-076 + B-077) ya no están pendientes.
 
-**Reading plan**:
-- Magnani, *Abductive Cognition: The Epistemological and Eco-Cognitive
-  Dimensions of Hypothetical Reasoning* (2009) — chapter 1, on external
-  representations and epistemic mediators.
-- Magnani, "Model-Based and Manipulative Abduction in Science" (2004).
+### 1.1 Higiene del corpus (Grupo D + secuela de R3-3) — primero, es precondición
 
-**Concrete next action**: write a short internal note (`notes/magnani_manipulative.md`,
-not part of the submission tree) mapping each technical detector module to
-either theoretical or manipulative abduction, and flag whether any detector
-is mislabeled in current docs as "pure inference" when it is actually
-manipulative.
+1. **Deduplicación física del corpus**: R3-3 dejó el assert de consistencia en
+   el runner, pero los 59 stems duplicados siguen en disco (3 tenían
+   `expected_verdict` divergente). Una ubicación canónica por stem.
+2. **Metadata de adquisición por lotes**: 145/199 casos fallan el validador por
+   metadata ausente (hipótesis "el validador causa los FP/FN" ya refutada).
+   Precondición práctica del dataset de calibración de la Tanda C (A4).
 
-## 2. Aliseda — Logical Formalization of Abduction
+### 1.2 Doctrina y calibración (Grupo A / Tanda C — requieren decisión de Anna y/o ground truth)
 
-**Core idea to study**: Aliseda's *Abductive Reasoning: Logical
-Investigations into Discovery and Explanation* (2006) formalizes abduction
-using semantic tableaux and AGM belief revision, and — critically — draws a
-sharp line between abduction as **generation** of new hypotheses and
-abduction as **selection** among hypotheses already on the table.
+En orden de dependencia:
 
-**Why it matters for VIGÍA**: this is the most direct theoretical fit for the
-single most important open item in the technical debt list — the absent
-`resolve(ccs, risk, epsilon) → final_verdict` function. Right now VIGÍA
-generates candidate hypotheses (via `abductive_reasoner.py`,
-`abductive_intent_engine.py`) but the step that *selects* MALICE over
-SUSPICION over ABSTAIN given a CCS/risk/epsilon triple is not formalized as
-a discrete, citable selection function. Aliseda's selection-vs-generation
-distinction gives a vocabulary and a logical structure (tableaux-based
-consistency checking) to formalize that missing function in a way that is
-defensible under cross-examination, not just "the code happens to do this."
+1. **A2 / B-052-P2** — granularidad mobile/macOS: `to_signal()` →
+   `to_signals()` por dominio, ruteo V4 con ≥3 señales. Cambia TODOS los
+   veredictos mobile → corpus gate obligatorio. **Antes de esto, escribir los
+   pins de Grupo C (§1.3) — son el arnés de la migración.**
+2. **A5 / B-041b** — CAIE retroalimenta el veredicto: DIFERIDO, se desbloquea
+   con A2 (necesita artefactos multi-capa).
+3. **A4 / B-069** — re-fit conjunto perfiles+umbrales con dataset etiquetado
+   (`fit_calibration.py`); la calibración aislada ya fue rechazada por el gate
+   comparativo (70.8→70.4%). Depende de §1.1.2.
+4. **A3 / L-033/L-034** — cadena de atenuación gamma×FRS: no tocar sin ≥20
+   señales reales etiquetadas (regla L-033).
+5. **Hueco estructural INTENT del ladder + revisión ABSTAIN/L-012** — decisiones
+   abiertas documentadas en `docs/FASE2_DATASET_CALIBRACION.md` §4–§5 (los
+   experimentos E2/E3 ya fueron medidos y refutados).
+6. **A7 / L-041** — SMS semántico (léxicos + calibración multi-caso).
 
-**Reading plan**:
-- Aliseda (2006), chapters on semantic tableaux and the generation/selection
-  distinction.
-- Aliseda (2000), "Abduction as Epistemic Change: A Peircean Model in
-  Artificial Intelligence" — directly bridges Peirce to AI implementation,
-  which is VIGÍA's exact lineage claim.
+### 1.3 Cobertura mobile (Grupo C — bajo riesgo, alto valor de arnés)
 
-**Concrete next action**: draft a formal specification of `resolve()` as a
-selection function over the hypothesis set, citing Aliseda's
-generation/selection split explicitly in the docstring and in
-`DAUBERT_JUDICIAL.md` (as a future revision, post-hackathon, not touching the
-submitted version).
+Los 3 módulos mobile siguen ≈15% de cobertura vs 77–89% de sus hermanos.
+B-071..B-074 atacaron lo crítico; queda del plan de
+`docs/AUDITORIA_COBERTURA_MOBILE_SIFT.md`:
 
-## 3. Nishida — Computational Precedent
+1. Pin de la escalera `to_signal` completa en los 3 módulos (caza ramas muertas).
+2. Bordes de banda de los conversores de timestamp (el fix B-083 §5.4 agregó
+   los primeros; faltan los sistemáticos).
+3. `_safe_rglob` acotado y call-sites con `Path.rglob` directo.
+4. `_safe_plist_load` con límite de tamaño.
 
-**Core idea to study**: Nishida's early work (Kyoto University, with Doshita)
-on an "integrated parsing engine" for natural language understanding — a
-uniform abductive inference mechanism able to generate plausible assumptions,
-reason over multiple alternatives simultaneously, switch search toward the
-most plausible alternative, detect contradictions that invalidate
-conclusions resting on inconsistent assumptions, and update the plausibility
-of each belief as new evidence arrives.
+### 1.4 Fixes acotados restantes (Grupo B — paralelo, 1–2 h cada uno)
 
-**Why it matters for VIGÍA**: this is close to a functional description of
-what VIGÍA's Fraction-based scoring pipeline already does — and it predates
-VIGÍA by decades, which means VIGÍA can be positioned as a forensic
-specialization of a known computational-abduction lineage rather than a
-novel, unverified approach. The plausibility-update mechanism is directly
-relevant to `likelihood_ratio.py` and `trust_fusion.py`.
+Del inventario original quedan (B5/enfsi cerrado 2026-07-06 con `f1e3f75`;
+B11/higiene de trackers cerrado con este commit):
 
-**Reading plan**:
-- Nishida & Doshita, work on abductive inference for NLU and the integrated
-  parsing engine (locate primary sources, originally Japanese-language AI
-  literature with some English translations/citations — verify access before
-  committing to deep reading).
+| # | Ítem | Fix diseñado |
+|---|------|--------------|
+| B1 | S-1 | sincronizar `requirements-ci.txt` + test de contrato de imports |
+| B2 | S-2 / BUG-NLP-002 | heurística OOV o centinela `xfail(strict=True)` |
+| B3 | B-016 residual | detector magic-number/stderr en `memory_forensics.py` |
+| B4 | B-018 residual | `VIGIA_VOL3_TIMEOUT` + escalado por tamaño en `pipeline_meta` |
+| B6 | B-060 | `ARTIFACT_TYPE_REGISTRY` único o test de consistencia de mapas |
+| B7 | B-061 | unificar clamp vs rechazo de `confidence` en ambas rutas |
+| B8 | A-1 | verificador de `daubert_record_hash` (hoy se crea, nunca se verifica) |
+| B9 | A-2 | `deactivate_honey_token` / expiry |
+| B10 | B-058 | comparador de `run_all_agent.py` lee `agent_verdict` sellado |
 
-**Concrete next action**: confirm primary-source availability (some of
-Nishida's foundational work may only exist in Japanese-language venues or
-hard-to-access proceedings). If primary sources are not accessible, rely on
-secondary citations and be explicit about that limitation in any note that
-references him — same evidentiary discipline VIGÍA applies to forensic
-claims applies here.
+Sumados por el censo P0-001 (B-083, opcionales):
 
-## 4. Sequencing
+| # | Ítem | Fix diseñado |
+|---|------|--------------|
+| C1 | metadata exacta | `z_frac`/`conf_frac` (str de Fraction) en `to_signal()` de los 12 módulos |
+| C2 | consistencia de estilo | unificar `float(z)/Z_CLIP_MAX` (Windows) con `float(z/z_clip)` (móvil) |
+| C3 | NaN silencioso | el clip de `ebs_v1.SignalOutput` convierte NaN→5.0; `signal_contract` lo rechaza — unificar al fail-closed |
 
-This is exploratory and unscheduled by design — no hackathon deadline
-pressure applies. Suggested order, lightest-to-heaviest:
+### 1.5 Abiertos de larga data (sin cambio de estado)
 
-1. Aliseda first — most directly actionable (resolve() formalization).
-2. Magnani second — reframes existing detector documentation, no new code.
-3. Nishida third — depends on source accessibility, may take longer.
+- **B-010** — migrar `forensic_technical_detector.py` a SemioticDetectorV2 (TODO).
+- **L-029 / FW-009** — detector DARVO: `vigia/core/darvo_detector.py` existe
+  pero no está cableado al orchestrator/agente; `false_flag` sigue sin ser tipo
+  de veredicto del scorer. IN_PROGRESS.
+- **L-040** — `likelihood_ratio.py` opera en float: limitación documentada,
+  0 flips empíricos; revisar solo si el corpus crece cerca de los bordes de
+  decisión (mapa de cierre en `docs/AUDITORIA_L040_LIKELIHOOD_RATIO.md` §4).
+- **L-034** — agregación sub-umbral multi-fuente: documentada.
+- **A6 / B-013** — reabrir solo si aparece FP real post-L-037b.
 
-## 5. Explicit non-goals
+---
 
-- This track does **not** modify any file inside the submitted hackathon
-  scope without separate, explicit confirmation.
-- This track does **not** change any accuracy claim, test count, or BREAK
-  case framing already locked in `SUBMISSION_COMPLIANCE.md`.
-- Any code change arising from this track ships as its own commit batch,
-  clearly tagged `POST HACKATHON`, never silently folded into prior commits.
+## 2. Reglas de trabajo (sin cambios)
 
-## 6. References (working list, not yet verified against full-text access)
+- Tag de restauración antes de cada sesión de cambios.
+- Audit-before-patch: leer las líneas exactas; verificar que el bug existe.
+- Gate comparativo obligatorio para todo cambio que toque veredictos
+  (patrón B-069: medir, y si empeora, NO aplicar).
+- Suite verde + corpus 166/199 (o mejor, con explicación por caso) antes de
+  commitear. 0 flips no explicados.
+- Commits `POST HACKATHON — ...`; los trackers EN/ES se actualizan en el mismo
+  commit que cierra el bug (lección de esta sincronización: B-071..B-074
+  faltaban en EN, y todo lo posterior al 07-05 faltaba en ambos).
 
-- Magnani, L. (2009). *Abductive Cognition: The Epistemological and
-  Eco-Cognitive Dimensions of Hypothetical Reasoning*.
-- Magnani, L. (2004). "Model-Based and Manipulative Abduction in Science."
-- Aliseda, A. (2006). *Abductive Reasoning: Logical Investigations into
-  Discovery and Explanation*. Springer.
-- Aliseda, A. (2000). "Abduction as Epistemic Change: A Peircean Model in
-  Artificial Intelligence." In Flach & Kakas (eds.), *Abductive and Inductive
-  Reasoning*.
-- Nishida, T. & Doshita, S. — early work on abductive inference mechanisms
-  for natural language understanding, Kyoto University.
+## 3. Qué NO hacer (sin cambios respecto al triage)
+
+- No tocar la cadena gamma×FRS sin las ≥20 señales etiquetadas (L-033).
+- No recalibrar perfiles aislados (B-069 lo refutó empíricamente).
+- No cambiar claims de accuracy ni el framing de los BREAK cases sellados en
+  `SUBMISSION_COMPLIANCE.md`.
+- No convertir el tipo de `SignalOutput` a Fraction: es la frontera de contrato
+  (decisión de alcance P0-001, reconfirmada por el censo B-083).
+
+---
+
+## 4. Track teórico (Magnani / Aliseda / Nishida) — actualizado
+
+El plan de lectura original de este archivo sigue vigente como track de
+investigación, con dos correcciones de estado:
+
+1. **Aliseda — YA NO es "la pieza ausente".** La función
+   `resolve(ccs, risk, epsilon)` que la versión anterior de este documento
+   describía como el ítem técnico faltante **se implementó y es el motor
+   default desde 2026-07-05** (B-075). Lo que queda del ítem Aliseda es
+   *formalizarla*: especificar `resolve()` como función de selección
+   (generación vs selección de hipótesis, tableaux) citable en
+   `DAUBERT_JUDICIAL.md`, con la implementación ya existente como referente.
+2. **Magnani** — nota interna mapeando cada detector técnico a abducción
+   teórica vs manipulativa (`notes/magnani_manipulative.md`); sin código.
+3. **Nishida** — verificar accesibilidad de fuentes primarias antes de
+   comprometerse; si solo hay citas secundarias, decirlo explícitamente
+   (la misma disciplina evidencial que VIGÍA aplica a claims forenses).
+
+Orden sugerido sin cambios: Aliseda → Magnani → Nishida. Referencias completas
+en el historial de git de este archivo (versión 2026-07-05).
+
+---
+
+*VIGÍA — WHAT_IS_NEXT | actualizado 2026-07-07 | corpus 166/199, suite 848*
