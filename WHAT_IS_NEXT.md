@@ -12,8 +12,8 @@
 
 | Métrica | Valor | Fuente |
 |---------|-------|--------|
-| Corpus (batch agente) | **166/199** | `results/agent_batch/_batch_summary.json` |
-| Suite | **848 passed** (835 + 13 nuevos), 1 skipped, 7 xfailed | corrida 2026-07-07 (excluye `tests/e2e`, que requiere sandbox SIFT del entorno) |
+| Corpus (batch agente) | **166/199** (post R3-3c: denominador honesto — sale un auto-pass falso, entra BREAK_005 real) | `results/agent_batch/_batch_summary.json` |
+| Suite | **866 passed**, 1 skipped, 7 xfailed | corrida 2026-07-07 (excluye `tests/e2e`, que requiere sandbox SIFT del entorno) |
 | Trackers | `BUGS_PENDIENTES.md` (ES) y `BUGS_PENDIENTES_EN.md` sincronizados hasta **B-084** | este commit |
 | Última tanda cerrada | TANDAS 1–4, Fase 2 semantic_role, LaBestia, Q2/Q4, Round 2/2.1, Round 3, censo P0-001 + fixes adyacentes | B-077..B-084 |
 
@@ -49,14 +49,16 @@ que ya se cerró desde entonces. La Fase 0 (sorpresas protegidas) y la Fase 1
 
 ### 1.1 Higiene del corpus (Grupo D + secuela de R3-3) — primero, es precondición
 
-1. **Deduplicación física del corpus**: R3-3b (censo total 2026-07-07) cerró
-   las etiquetas divergentes — el guard ahora cubre las 5 CASES_DIRS y el
-   censo da **0 divergencias** (case_008 propagado a legacy/; AMB ya estaban
-   alineadas). Quedan los 62 stems duplicados en disco (copias muertas
-   coherentes) y una decisión de doctrina: `VIGIA_BREAK_001-010.json` es una
-   lista malformada que entra como UNKNOWN y auto-pasa — retirarla cambia el
-   denominador 199. Una ubicación canónica por stem sigue siendo el cierre
-   definitivo.
+1. ~~**Deduplicación física del corpus**~~ — **CERRADO (R3-3b + R3-3c,
+   2026-07-07)**: etiquetas divergentes 0 (guard sobre las 5 CASES_DIRS);
+   las 20 copias muertas byte-idénticas retiradas; los árboles fuente
+   (`benign/`, `legacy/`: 36 schema-distinto + 13 variantes) se conservan
+   deliberadamente — alimentan los conversores y el guard los vigila. El
+   bundle `VIGIA_BREAK_001-010` excluido vía SKIP_STEMS (double-contaba y
+   auto-pasaba). Bonus del test rojo: el substring de SKIP_STEMS se tragaba
+   `VIGIA_BREAK_005_FALSE_CORRELATION` desde su creación — hoy entra al
+   corpus y el agente lo acierta. Corpus 166/199 honesto (mismo número,
+   denominador mejor).
 2. **Metadata de adquisición por lotes**: 145/199 casos fallan el validador por
    metadata ausente (hipótesis "el validador causa los FP/FN" ya refutada).
    Precondición práctica del dataset de calibración de la Tanda C (A4).

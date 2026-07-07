@@ -35,7 +35,22 @@ SKIP_STEMS = {
     "_index", "dataset", "calibration", "covariance", "correlation",
     "vigia_forensic_cases", "vigia_60_cases", "vigia_cases_canonical",
     "vigia_input_defcon", "fsv_schema", "phonetic_dict",
+    # R3-3c: bundle pre-migración (lista JSON de 10 casos que existen
+    # individualmente en converted/) — double-contaba y auto-pasaba como
+    # UNKNOWN. Se conserva en disco como historia; no es un caso.
+    "vigia_break_001-010",
 }
+
+
+def _is_skipped(stem: str) -> bool:
+    """R3-3c: matching por PREFIJO, no substring. El substring se tragaba el
+    caso real VIGIA_BREAK_005_FALSE_CORRELATION (contiene "correlation") —
+    nunca entró al corpus. Los términos de SKIP_STEMS nombran familias de
+    archivos auxiliares por prefijo (dataset_*, vigia_cases_canonical_*, ...);
+    censo 2026-07-07: prefijo cubre todos los auxiliares reales sin falsos
+    positivos."""
+    s = stem.lower()
+    return s in SKIP_STEMS or any(s.startswith(t) for t in SKIP_STEMS)
 
 RED  = "\033[91m"; GRN = "\033[92m"; YEL = "\033[93m"
 CYA  = "\033[96m"; RST = "\033[0m";  BLD = "\033[1m"
@@ -89,8 +104,7 @@ def check_label_consistency(base_dir: Path | None = None,
         if not d.exists():
             continue
         for f in sorted(d.glob("*.json")):
-            s = f.stem.lower()
-            if s in SKIP_STEMS or any(skip in s for skip in SKIP_STEMS):
+            if _is_skipped(f.stem):
                 continue
             by_stem.setdefault(f.stem, {})[str(f)] = _label(f)
 
@@ -108,9 +122,7 @@ def find_cases(dirs: list[Path], filter_str: str = "") -> list[Path]:
         if not d.exists():
             continue
         for f in sorted(d.glob("*.json")):
-            if f.stem.lower() in SKIP_STEMS:
-                continue
-            if any(skip in f.stem.lower() for skip in SKIP_STEMS):
+            if _is_skipped(f.stem):
                 continue
             if filter_str and filter_str.upper() not in f.stem.upper():
                 continue

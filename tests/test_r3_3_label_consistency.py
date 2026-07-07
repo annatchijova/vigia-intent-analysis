@@ -94,3 +94,80 @@ def test_case_008_relabel_applied_to_both_copies():
         f"case_008 divergente: {a['expected_verdict']} vs {b['expected_verdict']} "
         "(el relabel MALICE→SUSPICION de cdeb32f no llegó a la copia legacy)"
     )
+
+
+# ---------------------------------------------------------------------------
+# R3-3c — dedup física (censo clasificado 2026-07-07). De 70 copias sombra:
+# 36 con schema distinto (fuente vs derivado: benign/ y legacy/ alimentan los
+# conversores) y 13 variantes de contenido se CONSERVAN — comparten stem
+# legítimamente y el guard de etiquetas las vigila. Las 20 byte-idénticas son
+# copias muertas sin consumidor (censo de consumidores en el commit) y se
+# retiran. El bundle malformado VIGIA_BREAK_001-010 (lista JSON pre-migración
+# de 10 casos que ya existen individualmente en converted/) double-contaba y
+# auto-pasaba como UNKNOWN: se excluye vía SKIP_STEMS, el archivo se conserva
+# como historia. Tests escritos ROJOS contra el corpus previo.
+# ---------------------------------------------------------------------------
+
+
+def _corpus_stem_map():
+    """stem -> [paths], honrando la misma vista de no-casos que find_cases."""
+    by_stem = {}
+    for d in runner.CASES_DIRS:
+        if not d.exists():
+            continue
+        for f in sorted(d.glob("*.json")):
+            if runner._is_skipped(f.stem):
+                continue
+            by_stem.setdefault(f.stem, []).append(f)
+    return by_stem
+
+
+def test_skip_stems_is_prefix_match_not_substring():
+    """R3-3c: el matching por substring se tragaba
+    VIGIA_BREAK_005_FALSE_CORRELATION (contiene "correlation") — un caso real
+    excluido en silencio del corpus desde su creación."""
+    assert not runner._is_skipped("VIGIA_BREAK_005_FALSE_CORRELATION")
+    assert runner._is_skipped("VIGIA_BREAK_001-010")
+    assert runner._is_skipped("dataset_test_cases")
+    assert runner._is_skipped("vigia_cases_canonical_v2")
+    assert runner._is_skipped("vigia_input_defcon_nist")
+    stems = {c.stem for c in runner.find_cases(runner.CASES_DIRS)}
+    assert "VIGIA_BREAK_005_FALSE_CORRELATION" in stems
+
+
+def test_no_byte_identical_dead_copies():
+    """Una copia byte-idéntica de un stem ya ganador es ground truth muerto:
+    editarla es un no-op silencioso. Post-R3-3c no debe quedar ninguna."""
+    dead = []
+    for stem, paths in _corpus_stem_map().items():
+        if len(paths) < 2:
+            continue
+        try:
+            winner = json.loads(paths[0].read_text())
+        except Exception:
+            continue
+        for shadow in paths[1:]:
+            try:
+                if json.loads(shadow.read_text()) == winner:
+                    dead.append(str(shadow))
+            except Exception:
+                continue
+    assert dead == [], f"copias muertas byte-idénticas: {dead}"
+
+
+def test_malformed_break_bundle_excluded_from_corpus():
+    """El bundle pre-migración VIGIA_BREAK_001-010 (lista JSON) double-contaba
+    sus 10 casos —que existen individualmente— y auto-pasaba como UNKNOWN."""
+    cases = runner.find_cases(runner.CASES_DIRS)
+    stems = {c.stem for c in cases}
+    assert "VIGIA_BREAK_001-010" not in stems, (
+        "el bundle malformado sigue entrando al corpus como caso auto-pass"
+    )
+    # Los 10 casos individuales (canónicos, migrados) sí están.
+    for i, suffix in enumerate([
+        "001_SILENT_INCONSISTENCY", "002_VALID_BENIGN",
+        "003_CULTURAL_TRUE_POSITIVE", "004_SIGNAL_DROWNING",
+        "005_FALSE_CORRELATION", "006_PERFECT_ATTACK", "007_MISSING_LOGS",
+        "008_AMBIGUOUS", "009_PROMPT_POISON", "010_OVERPERFECT",
+    ], start=1):
+        assert f"VIGIA_BREAK_{suffix}" in stems, f"falta el caso individual {suffix}"

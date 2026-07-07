@@ -4245,6 +4245,23 @@ relabel of those 3 labels → corpus **166/199**.
     removing it would change the 199 denominator, doctrine decision pending in
     Group D). Red tests first: 3 red in
     `tests/test_r3_3_label_consistency.py`. Suite 863, corpus 166/199, 0 flips.
+  - **R3-3c (physical dedup, 2026-07-07):** classified census of the 70
+    shadows: 36 with distinct schema (SOURCE trees — `benign/` and `legacy/`
+    feed the converters; not dead copies) and 13 content variants are KEPT
+    under the label guard; the **20 byte-identical ones** (consumer census:
+    none in the suite) were removed with `git rm`. The pre-migration
+    `VIGIA_BREAK_001-010` bundle was excluded via SKIP_STEMS (file kept as
+    history; it double-counted 10 cases that exist individually and
+    auto-passed as UNKNOWN). **Red-test discovery:** SKIP_STEMS substring
+    matching swallowed the real case `VIGIA_BREAK_005_FALSE_CORRELATION`
+    (contains "correlation") — silently excluded from the corpus SINCE ITS
+    CREATION. Fix: prefix-based `_is_skipped()` (census: covers all real
+    auxiliaries, 0 false positives). Net result: 199 cases again — the fake
+    auto-pass leaves, BREAK_005 enters and the agent gets it RIGHT
+    (SUSPICION). Corpus **166/199 honest** (same number, better denominator),
+    0 flips on the remaining 197, 0 shadow promotions verified against
+    snapshot. Red tests first: 2+1 red. Suite 866. Orphan bundle
+    `VIGIA_BREAK_001-010_agent_bundle` removed from results/.
 - **R3-4:** causal-order validation in the chain verifier, separate axis from
   the seal (`e0e7be0`).
 

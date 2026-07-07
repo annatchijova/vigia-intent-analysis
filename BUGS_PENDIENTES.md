@@ -3975,6 +3975,24 @@ doctrina): relabel de esas 3 etiquetas → corpus **166/199**.
     UNKNOWN y auto-pasa: retirarlo cambiaría el denominador 199, decisión de
     doctrina pendiente en Grupo D). Tests rojos primero: 3 rojos en
     `tests/test_r3_3_label_consistency.py`. Suite 863, corpus 166/199, 0 flips.
+  - **R3-3c (dedup física, 2026-07-07):** censo clasificado de las 70 sombras:
+    36 con schema distinto (árboles FUENTE — `benign/` y `legacy/` alimentan
+    los conversores; no son copias muertas) y 13 variantes de contenido se
+    CONSERVAN bajo el guard de etiquetas; las **20 byte-idénticas** (censo de
+    consumidores: ninguno en suite) se retiraron con `git rm`. El bundle
+    pre-migración `VIGIA_BREAK_001-010` se excluyó vía SKIP_STEMS (archivo
+    conservado como historia; double-contaba 10 casos que existen
+    individualmente y auto-pasaba como UNKNOWN). **Descubrimiento del test
+    rojo:** el matching por substring de SKIP_STEMS se tragaba el caso real
+    `VIGIA_BREAK_005_FALSE_CORRELATION` (contiene "correlation") — excluido
+    en silencio del corpus DESDE SU CREACIÓN. Fix: `_is_skipped()` por
+    prefijo (censo: cubre todos los auxiliares reales, 0 falsos positivos).
+    Resultado neto: 199 casos de nuevo — sale el auto-pass falso, entra
+    BREAK_005 y el agente lo ACIERTA (SUSPICION). Corpus **166/199 honesto**
+    (mismo número, mejor denominador), 0 flips en los 197 restantes, 0
+    promociones de sombra verificadas contra snapshot. Tests rojos primero:
+    2+1 rojos. Suite 866. Bundle huérfano `VIGIA_BREAK_001-010_agent_bundle`
+    retirado de results/.
 - **R3-4:** validación de orden causal en el verificador de la cadena, eje
   separado del sello (`e0e7be0`).
 
