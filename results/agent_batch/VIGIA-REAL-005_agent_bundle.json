@@ -1,15 +1,15 @@
 {
   "agent_verdict": "INTENT",
-  "analysis_timestamp": "2026-07-07T17:14:48.972866+00:00",
+  "analysis_timestamp": "2026-07-07T19:22:13.584290+00:00",
   "audit_trail": {
     "agent_version": "1.0.0-SANS-2026",
     "case_id": "VIGIA-REAL-005",
-    "end_time": "2026-07-07T17:14:48.972874+00:00",
+    "end_time": "2026-07-07T19:22:13.584297+00:00",
     "entries": [
       {
         "action": "AGENT_INITIALIZED",
         "case_id": "VIGIA-REAL-005",
-        "entry_sha256": "f899012bf68005880dd9509a8258f2d64f30dfce9b939e475d391f9e20a8ed62",
+        "entry_sha256": "38bc4f901cdcbc5dadc61c5039f655301717db1f3e0853c3b61100b8e701514e",
         "inputs_summary": {
           "agent_file": "/home/user/vigia-intent-analysis/vigia_agent.py",
           "case_id": "VIGIA-REAL-005"
@@ -21,13 +21,13 @@
           "agent_version": "1.0.0-SANS-2026"
         },
         "seq": 1,
-        "timestamp": "2026-07-07T17:14:48.800669+00:00",
+        "timestamp": "2026-07-07T19:22:13.401893+00:00",
         "tool": "vigia_agent"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-REAL-005",
-        "entry_sha256": "3e2f728420e76d66cffa83ccb3e5ed8e7086d7fdbea7ac552a34662b135b1aec",
+        "entry_sha256": "79114d234f7e0393f4fb293589106464bcbac3ee3d26e2fa798cbef65654876d",
         "inputs_summary": {
           "path": "/home/user/vigia-intent-analysis/data/cases/VIGIA-REAL-005.json"
         },
@@ -35,29 +35,29 @@
         "note": "Computing SHA-256 of original evidence",
         "outputs_summary": {},
         "seq": 2,
-        "timestamp": "2026-07-07T17:14:48.800852+00:00",
+        "timestamp": "2026-07-07T19:22:13.402060+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-REAL-005",
-        "entry_sha256": "11de95f60c6662f60969b0a6d0cf1ed386a5f9f2a2cc777188777af814dc6614",
+        "entry_sha256": "42efb8faeb9537c31fa80e3bfa5ad7c7c3ce3448e361f182cc7b955b74103ab4",
         "inputs_summary": {
           "path": "/home/user/vigia-intent-analysis/data/cases/VIGIA-REAL-005.json"
         },
         "iteration": 0,
-        "note": "Evidence verified: 36924f236f696013...",
+        "note": "Evidence verified: beffcf25686d2b98...",
         "outputs_summary": {
-          "sha256": "36924f236f6960131e15e80a763640c76e538a1c315b0de0b6c71deaae43e2e4"
+          "sha256": "beffcf25686d2b98dbc2dba52e51df98ffebff91c37bcc03213ce9c809461b2a"
         },
         "seq": 3,
-        "timestamp": "2026-07-07T17:14:48.801000+00:00",
+        "timestamp": "2026-07-07T19:22:13.402211+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "PIPELINE_EXECUTE",
         "case_id": "VIGIA-REAL-005",
-        "entry_sha256": "4aa712df3dec58ff8e4b884df57e298486662cdf60aaf7589e9a5802f8ec3044",
+        "entry_sha256": "6580ce1505da7b10fd1f7a39f67ae42da9122fc16d98c817b32079d2a535df88",
         "inputs_summary": {
           "evidence": "/home/user/vigia-intent-analysis/data/cases/VIGIA-REAL-005.json",
           "iteration": "0",
@@ -67,13 +67,13 @@
         "note": "Executing pipeline \u2014 iteration 0",
         "outputs_summary": {},
         "seq": 4,
-        "timestamp": "2026-07-07T17:14:48.801262+00:00",
+        "timestamp": "2026-07-07T19:22:13.402442+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "PIPELINE_COMPLETE",
         "case_id": "VIGIA-REAL-005",
-        "entry_sha256": "d891235a73286884da6248d819ab424c424cf594058ce875168f83e842c3b328",
+        "entry_sha256": "9981d5515a4bcea1f2d381a36e90af65474e44dbf985a62d6e22d7def3fe7ad9",
         "inputs_summary": {
           "iteration": "0"
         },
@@ -130,13 +130,13 @@
           ]
         },
         "seq": 5,
-        "timestamp": "2026-07-07T17:14:48.972196+00:00",
+        "timestamp": "2026-07-07T19:22:13.583747+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "CONTRADICTION_CHECK",
         "case_id": "VIGIA-REAL-005",
-        "entry_sha256": "d2a9db07f2343f6df7922dcecd8f3f9e7a360fa75fe4e4ed6f024ea7b9e64689",
+        "entry_sha256": "ea0db7bd9fdb3c240bd63c044d03b0d86c7d9131aa8033401d72d9eff79ffb51",
         "inputs_summary": {
           "n_signals": "3"
         },
@@ -147,13 +147,13 @@
           "threshold": "2"
         },
         "seq": 6,
-        "timestamp": "2026-07-07T17:14:48.972442+00:00",
+        "timestamp": "2026-07-07T19:22:13.583918+00:00",
         "tool": "contradiction_detector"
       },
       {
         "action": "AGENT_EXIT",
         "case_id": "VIGIA-REAL-005",
-        "entry_sha256": "ce87ed378a4b2212d320ecad1333499315385b0bb3fe33acd947f8b771a15176",
+        "entry_sha256": "1dcf316e9150e9bf61969ab81a28b77781672ad4fb5b765d73f08250ddc4590b",
         "inputs_summary": {
           "verdict": "SUSPICION_DETECTED"
         },
@@ -164,18 +164,18 @@
           "exit_code": "3"
         },
         "seq": 7,
-        "timestamp": "2026-07-07T17:14:48.972769+00:00",
+        "timestamp": "2026-07-07T19:22:13.584215+00:00",
         "tool": "vigia_agent"
       }
     ],
-    "start_time": "2026-07-07T17:14:48.800133+00:00",
+    "start_time": "2026-07-07T19:22:13.401382+00:00",
     "total_entries": 7
   },
   "case_id": "VIGIA-REAL-005",
   "evidence_path": "/home/user/vigia-intent-analysis/data/cases/VIGIA-REAL-005.json",
-  "evidence_sha256": "36924f236f6960131e15e80a763640c76e538a1c315b0de0b6c71deaae43e2e4",
+  "evidence_sha256": "beffcf25686d2b98dbc2dba52e51df98ffebff91c37bcc03213ce9c809461b2a",
   "iterations_executed": 1,
-  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-REAL-005 ===\nEvidence: /home/user/vigia-intent-analysis/data/cases/VIGIA-REAL-005.json\nEvidence SHA-256: 36924f236f6960131e15e80a763640c76e538a1c315b0de0b6c71deaae43e2e4\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: SUSPICION_DETECTED\nPosterior confidence: 19/25\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 3 se\u00f1al(es): 3 primaria(s) de ['unknown'], 0 derivada(s)/no-analizada(s). Top z: unknown=0.00, unknown=0.00, unknown=0.00.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: SUSPICION_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nJane has been using multiple encryption methods to conceal communication: an AES-encrypted README file in Documents, a BitLocker volume named R2D2, and a keys file in Downloads encrypted with GPG/PGP public/private key.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [unknown] z=0.000 conf=0.50 \u2014 \n  [unknown] z=0.000 conf=0.50 \u2014 \n  [unknown] z=0.000 conf=0.50 \u2014 \n\n--- FINAL ALERT LEVEL ---\nMEDIUM \u2014 INTENT verdict with individual z-scores below threshold. Alert floored (B-028/B-065): an intent finding cannot present as LOW.\nReconciliation: verdict INTENT rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 3 | Derived: 0 | Total: 3",
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-REAL-005 ===\nEvidence: /home/user/vigia-intent-analysis/data/cases/VIGIA-REAL-005.json\nEvidence SHA-256: beffcf25686d2b98dbc2dba52e51df98ffebff91c37bcc03213ce9c809461b2a\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: SUSPICION_DETECTED\nPosterior confidence: 19/25\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 3 se\u00f1al(es): 3 primaria(s) de ['unknown'], 0 derivada(s)/no-analizada(s). Top z: unknown=0.00, unknown=0.00, unknown=0.00.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: SUSPICION_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nJane has been using multiple encryption methods to conceal communication: an AES-encrypted README file in Documents, a BitLocker volume named R2D2, and a keys file in Downloads encrypted with GPG/PGP public/private key.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [unknown] z=0.000 conf=0.50 \u2014 \n  [unknown] z=0.000 conf=0.50 \u2014 \n  [unknown] z=0.000 conf=0.50 \u2014 \n\n--- FINAL ALERT LEVEL ---\nMEDIUM \u2014 INTENT verdict with individual z-scores below threshold. Alert floored (B-028/B-065): an intent finding cannot present as LOW.\nReconciliation: verdict INTENT rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 3 | Derived: 0 | Total: 3",
   "pipeline_results": {
     "abduction": {
       "best_hypothesis": "SUSPICION_DETECTED",

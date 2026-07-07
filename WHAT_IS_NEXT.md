@@ -110,18 +110,20 @@ macos 44.5% (desde ≈15%). El arnés para B-052-P2 existe.
 ### 1.4 Fixes acotados restantes (Grupo B — paralelo, 1–2 h cada uno)
 
 Del inventario original quedan (B5/enfsi cerrado 2026-07-06 con `f1e3f75`;
-B11/higiene de trackers cerrado con este commit):
+B11/higiene de trackers cerrado 2026-07-07; **B3/B4/B7/B8/B9 cerrados
+2026-07-07 como tanda B-087** — 5 commits, tests rojos primero cada uno,
+suite 1034):
 
 | # | Ítem | Fix diseñado |
 |---|------|--------------|
 | B1 | S-1 | sincronizar `requirements-ci.txt` + test de contrato de imports |
 | B2 | S-2 / BUG-NLP-002 | heurística OOV o centinela `xfail(strict=True)` |
-| B3 | B-016 residual | detector magic-number/stderr en `memory_forensics.py` |
-| B4 | B-018 residual | `VIGIA_VOL3_TIMEOUT` + escalado por tamaño en `pipeline_meta` |
+| ~~B3~~ | ~~B-016 residual~~ | **CERRADO** — detector stderr en el motor V4 (B-087) |
+| ~~B4~~ | ~~B-018 residual~~ | **CERRADO** — VIGIA_VOL3_TIMEOUT + escalado + pipeline_meta (B-087) |
 | B6 | B-060 | `ARTIFACT_TYPE_REGISTRY` único o test de consistencia de mapas |
-| B7 | B-061 | unificar clamp vs rechazo de `confidence` en ambas rutas |
-| B8 | A-1 | verificador de `daubert_record_hash` (hoy se crea, nunca se verifica) |
-| B9 | A-2 | `deactivate_honey_token` / expiry |
+| ~~B7~~ | ~~B-061~~ | **CERRADO** — clamp unificado, 4 implementaciones acordadas (B-087) |
+| ~~B8~~ | ~~A-1~~ | **CERRADO** — verify_daubert_record_hash + self-check (B-087) |
+| ~~B9~~ | ~~A-2~~ | **CERRADO** — deactivate + TTL + sweep auditado (B-087) |
 | B10 | B-058 | comparador de `run_all_agent.py` lee `agent_verdict` sellado |
 
 Sumados por el censo P0-001 (B-083, opcionales):

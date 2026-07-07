@@ -1,15 +1,15 @@
 {
   "agent_verdict": "NOISE",
-  "analysis_timestamp": "2026-07-07T17:14:56.479766+00:00",
+  "analysis_timestamp": "2026-07-07T19:22:20.943844+00:00",
   "audit_trail": {
     "agent_version": "1.0.0-SANS-2026",
     "case_id": "VIGIA-SEP800-001",
-    "end_time": "2026-07-07T17:14:56.479774+00:00",
+    "end_time": "2026-07-07T19:22:20.943850+00:00",
     "entries": [
       {
         "action": "AGENT_INITIALIZED",
         "case_id": "VIGIA-SEP800-001",
-        "entry_sha256": "936a361becabb4cd62d9aa1733ace9c6a617fa6b266769aa48908cc2d0dae7bd",
+        "entry_sha256": "70a0ac355b5b680824b39942c07494c1ffb9ee43efafb3ef1e16ee537cf81f3a",
         "inputs_summary": {
           "agent_file": "/home/user/vigia-intent-analysis/vigia_agent.py",
           "case_id": "VIGIA-SEP800-001"
@@ -21,13 +21,13 @@
           "agent_version": "1.0.0-SANS-2026"
         },
         "seq": 1,
-        "timestamp": "2026-07-07T17:14:56.304357+00:00",
+        "timestamp": "2026-07-07T19:22:20.757060+00:00",
         "tool": "vigia_agent"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-SEP800-001",
-        "entry_sha256": "1ecac88336d99feaa56642c6416719569533393ec4c3708201378caf3244b7d0",
+        "entry_sha256": "5697fc7e0ba3154f2479ea7b3c5305da0c26f2fbbbc3e2c2dca0c7765bc5532a",
         "inputs_summary": {
           "path": "/home/user/vigia-intent-analysis/data/cases/VIGIA-SEP800-001.json"
         },
@@ -35,29 +35,29 @@
         "note": "Computing SHA-256 of original evidence",
         "outputs_summary": {},
         "seq": 2,
-        "timestamp": "2026-07-07T17:14:56.304535+00:00",
+        "timestamp": "2026-07-07T19:22:20.757205+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-SEP800-001",
-        "entry_sha256": "178bf248d4ac884957417c68c499837a0bbc45c506d9c8693cc4217f2a2b08a0",
+        "entry_sha256": "52c8a694e178df75a00a680898c68992af7f937f2e79cc05c9e9f69656a5f09a",
         "inputs_summary": {
           "path": "/home/user/vigia-intent-analysis/data/cases/VIGIA-SEP800-001.json"
         },
         "iteration": 0,
-        "note": "Evidence verified: 52f8de4abf8dd97c...",
+        "note": "Evidence verified: 3ed496cf7856c35a...",
         "outputs_summary": {
-          "sha256": "52f8de4abf8dd97c366b34a4d22761419d6c68b10f6194b4610585b1942b19b4"
+          "sha256": "3ed496cf7856c35a96b55c67903b808a0c10375148a967051902adff3c7cb0d1"
         },
         "seq": 3,
-        "timestamp": "2026-07-07T17:14:56.304729+00:00",
+        "timestamp": "2026-07-07T19:22:20.757345+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "PIPELINE_EXECUTE",
         "case_id": "VIGIA-SEP800-001",
-        "entry_sha256": "8c4e3985c45fe46c2ba1f985130cccc245009cf14628cc0a6439062325fc5be5",
+        "entry_sha256": "f938134a36668dd9a2aab6973ca42d55963bfc1317cc1f99485b6ae357a20cbf",
         "inputs_summary": {
           "evidence": "/home/user/vigia-intent-analysis/data/cases/VIGIA-SEP800-001.json",
           "iteration": "0",
@@ -67,13 +67,13 @@
         "note": "Executing pipeline \u2014 iteration 0",
         "outputs_summary": {},
         "seq": 4,
-        "timestamp": "2026-07-07T17:14:56.304970+00:00",
+        "timestamp": "2026-07-07T19:22:20.757555+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "PIPELINE_COMPLETE",
         "case_id": "VIGIA-SEP800-001",
-        "entry_sha256": "834ddfd65d9febfe14d11d988ac31d0a9899a5f3870bb9d51527014870d2de7c",
+        "entry_sha256": "106d634731ef31067cd580baae004a0597ddd5f7b54ca188bb7633ec694184dc",
         "inputs_summary": {
           "iteration": "0"
         },
@@ -82,8 +82,8 @@
         "outputs_summary": {
           "abduction": {
             "best_hypothesis": "NO_SEMIOTIC_ANOMALY_DETECTED",
-            "best_posterior": "49/50",
-            "confidence": "49/50",
+            "best_posterior": "97/100",
+            "confidence": "97/100",
             "is_conclusive": "True",
             "narrative": "Forensic image of Sony Ericsson P800 MCU (microcontroller unit) flash memory (file mcu.bin, 4194304 bytes, SHA-256: 2b8054d66bf8c2f1178ed70038fd557d53ab121890f2225ad32cf4a31c8a4b34). File date 2004-09..."
           },
@@ -94,9 +94,9 @@
             "ebs_adapter_mode": "motor",
             "expected_verdict": "ABSTAIN",
             "resolve": {
-              "motor_confidence": "0.98",
-              "motor_reason": "Insufficient evidence of malicious intent (score=0.0248)",
-              "motor_score": "0.0248",
+              "motor_confidence": "0.97",
+              "motor_reason": "Insufficient evidence of malicious intent (score=0.0269)",
+              "motor_score": "0.0269",
               "motor_verdict": "NOISE",
               "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
             },
@@ -130,13 +130,13 @@
           ]
         },
         "seq": 5,
-        "timestamp": "2026-07-07T17:14:56.479075+00:00",
+        "timestamp": "2026-07-07T19:22:20.943321+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "CONTRADICTION_CHECK",
         "case_id": "VIGIA-SEP800-001",
-        "entry_sha256": "72574947c4b51dfc825e1a8ae3a21795949b1a190e94104e4b684a30c36fda34",
+        "entry_sha256": "f2662cb9f34479ca760b0ac9d207c09bc82b314d03309590f17fb7ef30c0fa5f",
         "inputs_summary": {
           "n_signals": "3"
         },
@@ -147,13 +147,13 @@
           "threshold": "2"
         },
         "seq": 6,
-        "timestamp": "2026-07-07T17:14:56.479300+00:00",
+        "timestamp": "2026-07-07T19:22:20.943497+00:00",
         "tool": "contradiction_detector"
       },
       {
         "action": "AGENT_EXIT",
         "case_id": "VIGIA-SEP800-001",
-        "entry_sha256": "a26568aa33d51fbf51e4d4e530859f5554692e9985acd1da18cbe201da98901e",
+        "entry_sha256": "147709d984d623dc76adc89e0392295ae288ccd129ec9c804c1afb3cf4c3417e",
         "inputs_summary": {
           "verdict": "NO_SEMIOTIC_ANOMALY_DETECTED"
         },
@@ -164,26 +164,26 @@
           "exit_code": "0"
         },
         "seq": 7,
-        "timestamp": "2026-07-07T17:14:56.479662+00:00",
+        "timestamp": "2026-07-07T19:22:20.943763+00:00",
         "tool": "vigia_agent"
       }
     ],
-    "start_time": "2026-07-07T17:14:56.303849+00:00",
+    "start_time": "2026-07-07T19:22:20.756523+00:00",
     "total_entries": 7
   },
   "case_id": "VIGIA-SEP800-001",
   "evidence_path": "/home/user/vigia-intent-analysis/data/cases/VIGIA-SEP800-001.json",
-  "evidence_sha256": "52f8de4abf8dd97c366b34a4d22761419d6c68b10f6194b4610585b1942b19b4",
+  "evidence_sha256": "3ed496cf7856c35a96b55c67903b808a0c10375148a967051902adff3c7cb0d1",
   "iterations_executed": 1,
-  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-SEP800-001 ===\nEvidence: /home/user/vigia-intent-analysis/data/cases/VIGIA-SEP800-001.json\nEvidence SHA-256: 52f8de4abf8dd97c366b34a4d22761419d6c68b10f6194b4610585b1942b19b4\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: NO_SEMIOTIC_ANOMALY_DETECTED\nPosterior confidence: 49/50\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 3 se\u00f1al(es): 3 primaria(s) de ['calculate_shannon_entropy', 'generate_forensic_hash', 'read_evidence'], 0 derivada(s)/no-analizada(s). Top z: Binary firmware analysis. Mixed binary d=0.08, Sony Ericsson P800 MCU firmware image. S=0.05, String analysis of mcu.bin reveals: GSM =0.04.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: NO_SEMIOTIC_ANOMALY_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nForensic image of Sony Ericsson P800 MCU (microcontroller unit) flash memory (file mcu.bin, 4194304 bytes, SHA-256: 2b8054d66bf8c2f1178ed70038fd557d53ab121890f2225ad32cf4a31c8a4b34). File date 2004-09-21. Examination reveals this is a Sony Ericsson GSM protocol stack firmware binary. The file contains the device's baseband firmware: GSM radio stack processes (FrameTick, SIMRX, LH_RX, LH_TX, LLC, RLC, MPH), SIM management (UICC, SIMTOOL), data processes (SNDCP, PPP, RLPH), phonebook/PB management\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Binary firmware analysis. Mixed binary data (ARM/RISC machine code) an] z=0.080 conf=0.80 \u2014 \n  [Sony Ericsson P800 MCU firmware image. SHA-256 verified. Size 4194304 ] z=0.048 conf=0.95 \u2014 \n  [String analysis of mcu.bin reveals: GSM stack process table (FrameTick] z=0.040 conf=0.80 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 3 | Derived: 0 | Total: 3",
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-SEP800-001 ===\nEvidence: /home/user/vigia-intent-analysis/data/cases/VIGIA-SEP800-001.json\nEvidence SHA-256: 3ed496cf7856c35a96b55c67903b808a0c10375148a967051902adff3c7cb0d1\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: NO_SEMIOTIC_ANOMALY_DETECTED\nPosterior confidence: 97/100\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 3 se\u00f1al(es): 3 primaria(s) de ['calculate_shannon_entropy', 'generate_forensic_hash', 'read_evidence'], 0 derivada(s)/no-analizada(s). Top z: Binary firmware analysis. Mixed binary d=0.08, Sony Ericsson P800 MCU firmware image. S=0.05, String analysis of mcu.bin reveals: GSM =0.04.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: NO_SEMIOTIC_ANOMALY_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nForensic image of Sony Ericsson P800 MCU (microcontroller unit) flash memory (file mcu.bin, 4194304 bytes, SHA-256: 2b8054d66bf8c2f1178ed70038fd557d53ab121890f2225ad32cf4a31c8a4b34). File date 2004-09-21. Examination reveals this is a Sony Ericsson GSM protocol stack firmware binary. The file contains the device's baseband firmware: GSM radio stack processes (FrameTick, SIMRX, LH_RX, LH_TX, LLC, RLC, MPH), SIM management (UICC, SIMTOOL), data processes (SNDCP, PPP, RLPH), phonebook/PB management\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Binary firmware analysis. Mixed binary data (ARM/RISC machine code) an] z=0.080 conf=0.80 \u2014 \n  [Sony Ericsson P800 MCU firmware image. SHA-256 verified. Size 4194304 ] z=0.048 conf=0.95 \u2014 \n  [String analysis of mcu.bin reveals: GSM stack process table (FrameTick] z=0.040 conf=0.80 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 3 | Derived: 0 | Total: 3",
   "pipeline_results": {
     "abduction": {
       "best_hypothesis": "NO_SEMIOTIC_ANOMALY_DETECTED",
-      "best_posterior": "49/50",
+      "best_posterior": "97/100",
       "confidence": {
         "__fraction__": true,
-        "den": 50,
-        "num": 49
+        "den": 100,
+        "num": 97
       },
       "is_conclusive": true,
       "narrative": "Forensic image of Sony Ericsson P800 MCU (microcontroller unit) flash memory (file mcu.bin, 4194304 bytes, SHA-256: 2b8054d66bf8c2f1178ed70038fd557d53ab121890f2225ad32cf4a31c8a4b34). File date 2004-09-21. Examination reveals this is a Sony Ericsson GSM protocol stack firmware binary. The file contains the device's baseband firmware: GSM radio stack processes (FrameTick, SIMRX, LH_RX, LH_TX, LLC, RLC, MPH), SIM management (UICC, SIMTOOL), data processes (SNDCP, PPP, RLPH), phonebook/PB management"
@@ -195,9 +195,9 @@
       "ebs_adapter_mode": "motor",
       "expected_verdict": "ABSTAIN",
       "resolve": {
-        "motor_confidence": "0.98",
-        "motor_reason": "Insufficient evidence of malicious intent (score=0.0248)",
-        "motor_score": "0.0248",
+        "motor_confidence": "0.97",
+        "motor_reason": "Insufficient evidence of malicious intent (score=0.0269)",
+        "motor_score": "0.0269",
         "motor_verdict": "NOISE",
         "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
       },

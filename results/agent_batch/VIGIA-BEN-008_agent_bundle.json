@@ -1,15 +1,15 @@
 {
   "agent_verdict": "NOISE",
-  "analysis_timestamp": "2026-07-07T17:15:06.581987+00:00",
+  "analysis_timestamp": "2026-07-07T19:22:30.778705+00:00",
   "audit_trail": {
     "agent_version": "1.0.0-SANS-2026",
     "case_id": "VIGIA-BEN-008",
-    "end_time": "2026-07-07T17:15:06.581994+00:00",
+    "end_time": "2026-07-07T19:22:30.778711+00:00",
     "entries": [
       {
         "action": "AGENT_INITIALIZED",
         "case_id": "VIGIA-BEN-008",
-        "entry_sha256": "34870ec72ff737606d23d6ca0fd1614285ba4f5e91101b39d9192686d89ee71c",
+        "entry_sha256": "b6733b85d19992841e78130a89a26c98d9474c1e1c4834c22c635a35aff260f2",
         "inputs_summary": {
           "agent_file": "/home/user/vigia-intent-analysis/vigia_agent.py",
           "case_id": "VIGIA-BEN-008"
@@ -21,13 +21,13 @@
           "agent_version": "1.0.0-SANS-2026"
         },
         "seq": 1,
-        "timestamp": "2026-07-07T17:15:06.421612+00:00",
+        "timestamp": "2026-07-07T19:22:30.602959+00:00",
         "tool": "vigia_agent"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-BEN-008",
-        "entry_sha256": "eb1b361a926e851543abc6afdc7320fff65a96652df871eef9bd08a6ab7ee605",
+        "entry_sha256": "cf5ebd8b85806f3e0196f8904f70e6251b23f7d2cc8454e0477de21b4409e185",
         "inputs_summary": {
           "path": "/home/user/vigia-intent-analysis/data/cases/converted/VIGIA-BEN-008.json"
         },
@@ -35,29 +35,29 @@
         "note": "Computing SHA-256 of original evidence",
         "outputs_summary": {},
         "seq": 2,
-        "timestamp": "2026-07-07T17:15:06.421792+00:00",
+        "timestamp": "2026-07-07T19:22:30.603126+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-BEN-008",
-        "entry_sha256": "1cd8d34bfbba3c342bf45d78a5d7434f669852bb321f19a0fa0cec6d1339e6f8",
+        "entry_sha256": "f9b1f9dbd0eae47ddbec6d1505098a408ef45ee48e8976d87ec763d83bfc805f",
         "inputs_summary": {
           "path": "/home/user/vigia-intent-analysis/data/cases/converted/VIGIA-BEN-008.json"
         },
         "iteration": 0,
-        "note": "Evidence verified: bf00c81b4c0d059a...",
+        "note": "Evidence verified: e6b9e126e5233dd6...",
         "outputs_summary": {
-          "sha256": "bf00c81b4c0d059a3a6360314fe27a1e6df948c8df1944f50a25adfb140be2f4"
+          "sha256": "e6b9e126e5233dd69875929c4703cbadac0d6c313f9540553f365ebe967c09fb"
         },
         "seq": 3,
-        "timestamp": "2026-07-07T17:15:06.421993+00:00",
+        "timestamp": "2026-07-07T19:22:30.603267+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "PIPELINE_EXECUTE",
         "case_id": "VIGIA-BEN-008",
-        "entry_sha256": "97d834f0a3d35c88fc0f5b864951f686768ddc0fc5487ce0147f111a04b737f0",
+        "entry_sha256": "05a96f2b955365596c2f73bbf773fced82e43c528263d4cea1e99955159943db",
         "inputs_summary": {
           "evidence": "/home/user/vigia-intent-analysis/data/cases/converted/VIGIA-BEN-008.json",
           "iteration": "0",
@@ -67,13 +67,13 @@
         "note": "Executing pipeline \u2014 iteration 0",
         "outputs_summary": {},
         "seq": 4,
-        "timestamp": "2026-07-07T17:15:06.422237+00:00",
+        "timestamp": "2026-07-07T19:22:30.603466+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "PIPELINE_COMPLETE",
         "case_id": "VIGIA-BEN-008",
-        "entry_sha256": "877e1e6251c2b25a45438007b3bdd06ae37427737e3e057b73231eef49a72d88",
+        "entry_sha256": "38636969dde2a9ec9a5eac64845bf67c01d27ccf4f1cfff743221b0a2ef21639",
         "inputs_summary": {
           "iteration": "0"
         },
@@ -130,13 +130,13 @@
           ]
         },
         "seq": 5,
-        "timestamp": "2026-07-07T17:15:06.581325+00:00",
+        "timestamp": "2026-07-07T19:22:30.778191+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "CONTRADICTION_CHECK",
         "case_id": "VIGIA-BEN-008",
-        "entry_sha256": "c388d061ef70fe49e4d6ee396e2705173527d9e57735ab5c6f191f8f212006d8",
+        "entry_sha256": "0851caf1a4f34399babb8d74b43ef6142d44e7ffcaee7a3eedbc9b938021aca4",
         "inputs_summary": {
           "n_signals": "3"
         },
@@ -147,13 +147,13 @@
           "threshold": "2"
         },
         "seq": 6,
-        "timestamp": "2026-07-07T17:15:06.581539+00:00",
+        "timestamp": "2026-07-07T19:22:30.778380+00:00",
         "tool": "contradiction_detector"
       },
       {
         "action": "AGENT_EXIT",
         "case_id": "VIGIA-BEN-008",
-        "entry_sha256": "e99b118964172e80a21ac11790d66e206059dd26bb4b750144e53b37f722ba97",
+        "entry_sha256": "1b511501f11e31eaad8130bafc7823c3f51742e8552ba3c18af15b8242f37484",
         "inputs_summary": {
           "verdict": "NO_SEMIOTIC_ANOMALY_DETECTED"
         },
@@ -164,18 +164,18 @@
           "exit_code": "0"
         },
         "seq": 7,
-        "timestamp": "2026-07-07T17:15:06.581875+00:00",
+        "timestamp": "2026-07-07T19:22:30.778624+00:00",
         "tool": "vigia_agent"
       }
     ],
-    "start_time": "2026-07-07T17:15:06.421102+00:00",
+    "start_time": "2026-07-07T19:22:30.602424+00:00",
     "total_entries": 7
   },
   "case_id": "VIGIA-BEN-008",
   "evidence_path": "/home/user/vigia-intent-analysis/data/cases/converted/VIGIA-BEN-008.json",
-  "evidence_sha256": "bf00c81b4c0d059a3a6360314fe27a1e6df948c8df1944f50a25adfb140be2f4",
+  "evidence_sha256": "e6b9e126e5233dd69875929c4703cbadac0d6c313f9540553f365ebe967c09fb",
   "iterations_executed": 1,
-  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-BEN-008 ===\nEvidence: /home/user/vigia-intent-analysis/data/cases/converted/VIGIA-BEN-008.json\nEvidence SHA-256: bf00c81b4c0d059a3a6360314fe27a1e6df948c8df1944f50a25adfb140be2f4\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: NO_SEMIOTIC_ANOMALY_DETECTED\nPosterior confidence: 19/20\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 3 se\u00f1al(es): 3 primaria(s) de ['legacy_converter'], 0 derivada(s)/no-analizada(s). Top z: NOC dashboard: https://monitor.company.c=0.85, Parent: nagios.service (PID 1122) | Chil=0.72, Source: 10.0.0.5 (monitoring-server) | D=0.49.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: NO_SEMIOTIC_ANOMALY_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nServidor interno hace ping cada 5 minutos a 8.8.8.8. Es el monitor de disponibilidad de red configurado por NOC, con dashboard p\u00fablico y alertas a on-call.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [NOC dashboard: https://monitor.company.com/ping-status | Shows 8.8.8.8] z=0.855 conf=0.90 \u2014 \n  [Parent: nagios.service (PID 1122) | Child: /usr/lib/nagios/plugins/che] z=0.723 conf=0.85 \u2014 \n  [Source: 10.0.0.5 (monitoring-server) | Dest: 8.8.8.8:icmp | Interval: ] z=0.490 conf=0.70 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 3 | Derived: 0 | Total: 3",
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-BEN-008 ===\nEvidence: /home/user/vigia-intent-analysis/data/cases/converted/VIGIA-BEN-008.json\nEvidence SHA-256: e6b9e126e5233dd69875929c4703cbadac0d6c313f9540553f365ebe967c09fb\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: NO_SEMIOTIC_ANOMALY_DETECTED\nPosterior confidence: 19/20\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 3 se\u00f1al(es): 3 primaria(s) de ['legacy_converter'], 0 derivada(s)/no-analizada(s). Top z: NOC dashboard: https://monitor.company.c=0.85, Parent: nagios.service (PID 1122) | Chil=0.72, Source: 10.0.0.5 (monitoring-server) | D=0.49.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: NO_SEMIOTIC_ANOMALY_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nServidor interno hace ping cada 5 minutos a 8.8.8.8. Es el monitor de disponibilidad de red configurado por NOC, con dashboard p\u00fablico y alertas a on-call.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [NOC dashboard: https://monitor.company.com/ping-status | Shows 8.8.8.8] z=0.855 conf=0.90 \u2014 \n  [Parent: nagios.service (PID 1122) | Child: /usr/lib/nagios/plugins/che] z=0.723 conf=0.85 \u2014 \n  [Source: 10.0.0.5 (monitoring-server) | Dest: 8.8.8.8:icmp | Interval: ] z=0.490 conf=0.70 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 3 | Derived: 0 | Total: 3",
   "pipeline_results": {
     "abduction": {
       "best_hypothesis": "NO_SEMIOTIC_ANOMALY_DETECTED",

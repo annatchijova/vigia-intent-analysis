@@ -8,6 +8,8 @@ import os
 import re
 import subprocess
 import sys
+
+from vigia.sift.memory_forensics import vol3_effective_timeout as _vol3_eff_timeout
 from fractions import Fraction
 from pathlib import Path
 from typing import Any, Dict, List, Optional
@@ -795,7 +797,7 @@ class SIFTOrchestrator:
         signals = []
 
         # ── 1. OS identification ──────────────────────────────────────────
-        info = self._vol3_run(memory_path, "windows.info", timeout=120)
+        info = self._vol3_run(memory_path, "windows.info", timeout=_vol3_eff_timeout(120, memory_path))
         if info["ok"]:
             signals.append({
                 "source": "vol3.windows.info",
@@ -843,7 +845,7 @@ class SIFTOrchestrator:
             logger.warning("[VOL3] windows.info failed: %s", info["stderr"][:200])
 
         # ── 2. Process list ───────────────────────────────────────────────
-        pslist = self._vol3_run(memory_path, "windows.pslist.PsList", timeout=300)
+        pslist = self._vol3_run(memory_path, "windows.pslist.PsList", timeout=_vol3_eff_timeout(300, memory_path))
         if pslist["ok"]:
             suspicious = [l for l in pslist["stdout"].splitlines()
                           if any(p in l.lower() for p in
@@ -869,7 +871,7 @@ class SIFTOrchestrator:
                 })
 
         # ── 3. Network connections ────────────────────────────────────────
-        netscan = self._vol3_run(memory_path, "windows.netscan.NetScan", timeout=300)
+        netscan = self._vol3_run(memory_path, "windows.netscan.NetScan", timeout=_vol3_eff_timeout(300, memory_path))
         if netscan["ok"]:
             external = [l for l in netscan["stdout"].splitlines()
                         if "ESTABLISHED" in l and _netscan_has_external_conn(l)]
@@ -884,7 +886,14 @@ class SIFTOrchestrator:
                 })
 
         # ── 4. Code injection (malfind) ───────────────────────────────────
-        malfind = self._vol3_run(memory_path, "windows.malfind.Malfind", timeout=600)
+        malfind = self._vol3_run(memory_path, "windows.malfind.Malfind", timeout=_vol3_eff_timeout(600, memory_path))
+
+        # B4: rastro de timeouts para pipeline_meta.
+        _vol3_runs = {"windows.info": info, "windows.pslist.PsList": pslist,
+                      "windows.netscan.NetScan": netscan,
+                      "windows.malfind.Malfind": malfind}
+        _plugin_timeouts = sorted(p for p, r in _vol3_runs.items()
+                                  if r.get("timed_out"))
         if malfind["ok"] and len(malfind["stdout"]) > 100:
             hits = [l for l in malfind["stdout"].splitlines()
                     if l and not l.startswith("Volatility") and not l.startswith("PID")]
@@ -943,6 +952,18 @@ class SIFTOrchestrator:
                     "memory_path": str(memory_path),
                     "error": "VOL3_UNAVAILABLE" if vol_missing else "VOL3_ALL_PLUGINS_FAILED",
                     "vol3_binary": _VOL3,
+                    # B4 (B-018): este ES el caso NARCOS — todos los plugins
+                    # caídos. El rastro distingue "binario ausente" de
+                    # "todos en timeout" (pipeline_status=timeout_all).
+                    "vol3_plugin_timeouts": _plugin_timeouts,
+                    "pipeline_status": ("timeout_all"
+                                        if _plugin_timeouts and len(_plugin_timeouts) == len(_vol3_runs)
+                                        else "failed"),
+                    "vol3_timeout_config": {
+                        "env_VIGIA_VOL3_TIMEOUT": os.environ.get("VIGIA_VOL3_TIMEOUT"),
+                        "effective_per_plugin": {p: r.get("timeout_used")
+                                                 for p, r in _vol3_runs.items()},
+                    },
                 },
             }
 
@@ -1045,11 +1066,24 @@ class SIFTOrchestrator:
                 "n_critical_signals": n_critical,
                 "ladder": "mobile_hypothesis_thresholds_v2 (z>3 critical, z>2 suspicion, 2-source gate)",
                 "vol3_binary": _VOL3,
+                # B4 (B-018): la pérdida por timeout es VISIBLE en el bundle.
+                "vol3_plugin_timeouts": _plugin_timeouts,
+                "pipeline_status": "timeout_partial" if _plugin_timeouts else "completed",
+                "vol3_timeout_config": {
+                    "env_VIGIA_VOL3_TIMEOUT": os.environ.get("VIGIA_VOL3_TIMEOUT"),
+                    "effective_per_plugin": {p: r.get("timeout_used")
+                                             for p, r in _vol3_runs.items()},
+                },
             },
         }
 
     def _vol3_run(self, memory_path: str, plugin: str, timeout: int = 300) -> Dict:
-        """Ejecuta un plugin de Volatility3 y retorna stdout/stderr."""
+        """Ejecuta un plugin de Volatility3 y retorna stdout/stderr.
+
+        B4 (B-018): timed_out/timeout_used viajan en el resultado para que
+        _analyze_memory_vol3 deje rastro en pipeline_meta — "0 señales por
+        timeout" tiene que ser distinguible de "0 señales porque está limpio".
+        """
         try:
             result = subprocess.run(
                 [_VOL3, "-f", memory_path, plugin],
@@ -1059,13 +1093,17 @@ class SIFTOrchestrator:
                 "ok": result.returncode == 0 and len(result.stdout) > 50,
                 "stdout": result.stdout,
                 "stderr": result.stderr,
+                "timed_out": False,
+                "timeout_used": timeout,
             }
         except subprocess.TimeoutExpired:
             logger.warning("[VOL3] Plugin %s timed out after %ds", plugin, timeout)
-            return {"ok": False, "stdout": "", "stderr": f"timeout after {timeout}s"}
+            return {"ok": False, "stdout": "", "stderr": f"timeout after {timeout}s",
+                    "timed_out": True, "timeout_used": timeout}
         except Exception as e:
             logger.error("[VOL3] Plugin %s error: %s", plugin, e)
-            return {"ok": False, "stdout": "", "stderr": str(e)}
+            return {"ok": False, "stdout": "", "stderr": str(e),
+                    "timed_out": False, "timeout_used": timeout}
 
 
 __all__ = ["SIFTOrchestrator"]

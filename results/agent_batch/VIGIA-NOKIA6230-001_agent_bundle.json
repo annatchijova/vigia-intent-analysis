@@ -1,15 +1,15 @@
 {
   "agent_verdict": "NOISE",
-  "analysis_timestamp": "2026-07-07T17:14:47.287268+00:00",
+  "analysis_timestamp": "2026-07-07T19:22:11.897348+00:00",
   "audit_trail": {
     "agent_version": "1.0.0-SANS-2026",
     "case_id": "VIGIA-NOKIA6230-001",
-    "end_time": "2026-07-07T17:14:47.287277+00:00",
+    "end_time": "2026-07-07T19:22:11.897354+00:00",
     "entries": [
       {
         "action": "AGENT_INITIALIZED",
         "case_id": "VIGIA-NOKIA6230-001",
-        "entry_sha256": "7f0db34bb5e2eefc5235843d4a1a1061721182f6bad0f43c4b767ab7eeb2e993",
+        "entry_sha256": "bab698ecd632e0c12460c19e954e186d0452218482e4f3cc430524e440912741",
         "inputs_summary": {
           "agent_file": "/home/user/vigia-intent-analysis/vigia_agent.py",
           "case_id": "VIGIA-NOKIA6230-001"
@@ -21,13 +21,13 @@
           "agent_version": "1.0.0-SANS-2026"
         },
         "seq": 1,
-        "timestamp": "2026-07-07T17:14:47.106047+00:00",
+        "timestamp": "2026-07-07T19:22:11.712648+00:00",
         "tool": "vigia_agent"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-NOKIA6230-001",
-        "entry_sha256": "3abb1a9f859428be01114fb89e5a310bb89c1a6a099699b1e3629792ac7f0f44",
+        "entry_sha256": "bdc455a3c7eb7d42dfc694344265dc8cda4e0467d72700dec016fb01c94baad7",
         "inputs_summary": {
           "path": "/home/user/vigia-intent-analysis/data/cases/VIGIA-NOKIA6230-001.json"
         },
@@ -35,29 +35,29 @@
         "note": "Computing SHA-256 of original evidence",
         "outputs_summary": {},
         "seq": 2,
-        "timestamp": "2026-07-07T17:14:47.106242+00:00",
+        "timestamp": "2026-07-07T19:22:11.712806+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-NOKIA6230-001",
-        "entry_sha256": "83caf8dbf932fc5f2f9d0c433eeacefd339e4e25ad7adc1cac62e4b1dfe55319",
+        "entry_sha256": "558e3ff8771a8bfeef858d2336c1b71b5c1a5a59a9b9a27c39e8edb07465ade1",
         "inputs_summary": {
           "path": "/home/user/vigia-intent-analysis/data/cases/VIGIA-NOKIA6230-001.json"
         },
         "iteration": 0,
-        "note": "Evidence verified: fa4b8495543b597a...",
+        "note": "Evidence verified: 85fe221dc8134e67...",
         "outputs_summary": {
-          "sha256": "fa4b8495543b597adcec42153ef58fee5b4fb55716805f942b51461f29fd500f"
+          "sha256": "85fe221dc8134e67c30e7a69689ee97415a17d802e09096f5a1b1c4af1809455"
         },
         "seq": 3,
-        "timestamp": "2026-07-07T17:14:47.106437+00:00",
+        "timestamp": "2026-07-07T19:22:11.712961+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "PIPELINE_EXECUTE",
         "case_id": "VIGIA-NOKIA6230-001",
-        "entry_sha256": "c299e8056248ef5e765e0ec33da77b71e5c1992cc6632316f38fe013d8d20720",
+        "entry_sha256": "dfea781047f5dd7697b16ecd55e9b6ff61e463ddc85be87db6855782b04cf205",
         "inputs_summary": {
           "evidence": "/home/user/vigia-intent-analysis/data/cases/VIGIA-NOKIA6230-001.json",
           "iteration": "0",
@@ -67,13 +67,13 @@
         "note": "Executing pipeline \u2014 iteration 0",
         "outputs_summary": {},
         "seq": 4,
-        "timestamp": "2026-07-07T17:14:47.106680+00:00",
+        "timestamp": "2026-07-07T19:22:11.713186+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "PIPELINE_COMPLETE",
         "case_id": "VIGIA-NOKIA6230-001",
-        "entry_sha256": "78849d2ae1f21fcf95cbacf61465678585219104c19e4658b7fd62a7d8a6ebe7",
+        "entry_sha256": "9c496a9122fce813180070328b3347da6d71d71df7bba1391c4f0a8fe44f7ca8",
         "inputs_summary": {
           "iteration": "0"
         },
@@ -82,8 +82,8 @@
         "outputs_summary": {
           "abduction": {
             "best_hypothesis": "NO_SEMIOTIC_ANOMALY_DETECTED",
-            "best_posterior": "47/50",
-            "confidence": "47/50",
+            "best_posterior": "93/100",
+            "confidence": "93/100",
             "is_conclusive": "True",
             "narrative": "Forensic image of Nokia 6230 internal flash memory (file Rh-12_352953003422072-bilder.bin). IMEI 352953003422072. Contains WAP browser cache and picture storage from a Norwegian user, June\u2013August 2004..."
           },
@@ -94,9 +94,9 @@
             "ebs_adapter_mode": "motor",
             "expected_verdict": "NOISE",
             "resolve": {
-              "motor_confidence": "0.94",
-              "motor_reason": "Insufficient evidence of malicious intent (score=0.0624)",
-              "motor_score": "0.0624",
+              "motor_confidence": "0.93",
+              "motor_reason": "Insufficient evidence of malicious intent (score=0.0664)",
+              "motor_score": "0.0664",
               "motor_verdict": "NOISE",
               "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
             },
@@ -138,13 +138,13 @@
           ]
         },
         "seq": 5,
-        "timestamp": "2026-07-07T17:14:47.286556+00:00",
+        "timestamp": "2026-07-07T19:22:11.896753+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "CONTRADICTION_CHECK",
         "case_id": "VIGIA-NOKIA6230-001",
-        "entry_sha256": "883261e48ca4b3cc042314e648141411732e5076d7cc961600cc3f071a8c90a7",
+        "entry_sha256": "ed9449d3db5bfe101e0471a09812199c57dc4bea23ffa5714b8ebdba991decf2",
         "inputs_summary": {
           "n_signals": "4"
         },
@@ -155,13 +155,13 @@
           "threshold": "2"
         },
         "seq": 6,
-        "timestamp": "2026-07-07T17:14:47.286787+00:00",
+        "timestamp": "2026-07-07T19:22:11.896943+00:00",
         "tool": "contradiction_detector"
       },
       {
         "action": "AGENT_EXIT",
         "case_id": "VIGIA-NOKIA6230-001",
-        "entry_sha256": "4d4a08db57c28c9ec15e1aab6213988e01a6b40739f3c525f7f6f14a78ff0788",
+        "entry_sha256": "97ffdcfddc29665e3a551774855328dcde6b1aeb37e59b3467155fec62d93dee",
         "inputs_summary": {
           "verdict": "NO_SEMIOTIC_ANOMALY_DETECTED"
         },
@@ -172,26 +172,26 @@
           "exit_code": "0"
         },
         "seq": 7,
-        "timestamp": "2026-07-07T17:14:47.287168+00:00",
+        "timestamp": "2026-07-07T19:22:11.897263+00:00",
         "tool": "vigia_agent"
       }
     ],
-    "start_time": "2026-07-07T17:14:47.105517+00:00",
+    "start_time": "2026-07-07T19:22:11.712065+00:00",
     "total_entries": 7
   },
   "case_id": "VIGIA-NOKIA6230-001",
   "evidence_path": "/home/user/vigia-intent-analysis/data/cases/VIGIA-NOKIA6230-001.json",
-  "evidence_sha256": "fa4b8495543b597adcec42153ef58fee5b4fb55716805f942b51461f29fd500f",
+  "evidence_sha256": "85fe221dc8134e67c30e7a69689ee97415a17d802e09096f5a1b1c4af1809455",
   "iterations_executed": 1,
-  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-NOKIA6230-001 ===\nEvidence: /home/user/vigia-intent-analysis/data/cases/VIGIA-NOKIA6230-001.json\nEvidence SHA-256: fa4b8495543b597adcec42153ef58fee5b4fb55716805f942b51461f29fd500f\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: NO_SEMIOTIC_ANOMALY_DETECTED\nPosterior confidence: 47/50\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 4 se\u00f1al(es): 4 primaria(s) de ['calculate_shannon_entropy', 'generate_forensic_hash', 'read_evidence', 'search_pattern'], 0 derivada(s)/no-analizada(s). Top z: Shannon entropy 5.2114 bits/byte on samp=0.18, Two MMS MMSC session tokens found in bin=0.10, Nokia 6230 flash image. SHA-256 verified=0.10.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: NO_SEMIOTIC_ANOMALY_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nForensic image of Nokia 6230 internal flash memory (file Rh-12_352953003422072-bilder.bin). IMEI 352953003422072. Contains WAP browser cache and picture storage from a Norwegian user, June\u2013August 2004. User browsed Norwegian-language WAP sites: Yahoo Norway (no.wap.yahoo.com), NRK Norwegian Broadcasting (wap.nrk.no), TV2 (tv2.by.com), Aftenposten newspaper, Telenor Mobile WAP portal, Nordialog telecom. Two MMS sessions via internal Telenor MMSC (10.250.31.100:10021) with unique session tokens. W\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Shannon entropy 5.2114 bits/byte on sampled content. SUSPICIOUS range ] z=0.180 conf=0.90 \u2014 \n  [Two MMS MMSC session tokens found in binary: http://10.250.31.100:1002] z=0.105 conf=0.70 \u2014 \n  [Nokia 6230 flash image. SHA-256 verified. Size 4718496 bytes. File dat] z=0.095 conf=0.95 \u2014 \n  [WAP browser cache content. Norwegian-language WML pages from: no.wap.y] z=0.080 conf=0.80 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 4 | Derived: 0 | Total: 4",
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-NOKIA6230-001 ===\nEvidence: /home/user/vigia-intent-analysis/data/cases/VIGIA-NOKIA6230-001.json\nEvidence SHA-256: 85fe221dc8134e67c30e7a69689ee97415a17d802e09096f5a1b1c4af1809455\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: NO_SEMIOTIC_ANOMALY_DETECTED\nPosterior confidence: 93/100\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 4 se\u00f1al(es): 4 primaria(s) de ['calculate_shannon_entropy', 'generate_forensic_hash', 'read_evidence', 'search_pattern'], 0 derivada(s)/no-analizada(s). Top z: Shannon entropy 5.2114 bits/byte on samp=0.18, Two MMS MMSC session tokens found in bin=0.10, Nokia 6230 flash image. SHA-256 verified=0.10.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: NO_SEMIOTIC_ANOMALY_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nForensic image of Nokia 6230 internal flash memory (file Rh-12_352953003422072-bilder.bin). IMEI 352953003422072. Contains WAP browser cache and picture storage from a Norwegian user, June\u2013August 2004. User browsed Norwegian-language WAP sites: Yahoo Norway (no.wap.yahoo.com), NRK Norwegian Broadcasting (wap.nrk.no), TV2 (tv2.by.com), Aftenposten newspaper, Telenor Mobile WAP portal, Nordialog telecom. Two MMS sessions via internal Telenor MMSC (10.250.31.100:10021) with unique session tokens. W\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Shannon entropy 5.2114 bits/byte on sampled content. SUSPICIOUS range ] z=0.180 conf=0.90 \u2014 \n  [Two MMS MMSC session tokens found in binary: http://10.250.31.100:1002] z=0.105 conf=0.70 \u2014 \n  [Nokia 6230 flash image. SHA-256 verified. Size 4718496 bytes. File dat] z=0.095 conf=0.95 \u2014 \n  [WAP browser cache content. Norwegian-language WML pages from: no.wap.y] z=0.080 conf=0.80 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 4 | Derived: 0 | Total: 4",
   "pipeline_results": {
     "abduction": {
       "best_hypothesis": "NO_SEMIOTIC_ANOMALY_DETECTED",
-      "best_posterior": "47/50",
+      "best_posterior": "93/100",
       "confidence": {
         "__fraction__": true,
-        "den": 50,
-        "num": 47
+        "den": 100,
+        "num": 93
       },
       "is_conclusive": true,
       "narrative": "Forensic image of Nokia 6230 internal flash memory (file Rh-12_352953003422072-bilder.bin). IMEI 352953003422072. Contains WAP browser cache and picture storage from a Norwegian user, June\u2013August 2004. User browsed Norwegian-language WAP sites: Yahoo Norway (no.wap.yahoo.com), NRK Norwegian Broadcasting (wap.nrk.no), TV2 (tv2.by.com), Aftenposten newspaper, Telenor Mobile WAP portal, Nordialog telecom. Two MMS sessions via internal Telenor MMSC (10.250.31.100:10021) with unique session tokens. W"
@@ -203,9 +203,9 @@
       "ebs_adapter_mode": "motor",
       "expected_verdict": "NOISE",
       "resolve": {
-        "motor_confidence": "0.94",
-        "motor_reason": "Insufficient evidence of malicious intent (score=0.0624)",
-        "motor_score": "0.0624",
+        "motor_confidence": "0.93",
+        "motor_reason": "Insufficient evidence of malicious intent (score=0.0664)",
+        "motor_score": "0.0664",
         "motor_verdict": "NOISE",
         "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
       },

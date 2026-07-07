@@ -33,6 +33,58 @@ logger = logging.getLogger(__name__)
 TOOL_NAME = "MEMORY_FORENSICS"
 ARTIFACT_RELIABILITY = Fraction(95, 100)
 
+# B3 (B-016 residual): marcadores de stderr de Volatility3 que significan
+# "esto no es un RAM dump Windows válido" (snapshot VMware sin companion
+# .vmss/.vmsn, imagen de disco, layout irresoluble). MISMA lista que el shim
+# del agente (sift_orchestrator._analyze_memory_vol3), que es el detector
+# probado en el camino operativo.
+_VOL3_FORMAT_MARKERS = (
+    "invalidaddressexception", "offset outside", "buffer boundaries",
+    "no valid kernel", "unable to determine", "vmware", "snapshot",
+)
+
+
+def classify_vol3_stderr(stderr: str) -> Optional[str]:
+    """FORMAT_NOT_SUPPORTED si el stderr indica formato de imagen inválido;
+    None para errores ordinarios de plugin (que siguen degradando blando)."""
+    s = (stderr or "").lower()
+    if any(m in s for m in _VOL3_FORMAT_MARKERS):
+        return "FORMAT_NOT_SUPPORTED"
+    return None
+
+
+def vol3_effective_timeout(base: int, memory_path: str) -> int:
+    """B4 (B-018 residual): timeout efectivo para un plugin de Volatility3.
+
+    - VIGIA_VOL3_TIMEOUT=<segundos> fija el timeout EXACTO (el perito manda;
+      sin escalado encima). Valor no numérico → se ignora con warning.
+    - Sin env: el base por-plugin se escala por tamaño del dump — los números
+      de B-018 (un dump ≥4 GiB multiplica los tiempos de pslist/netscan/
+      malfind): ≥16 GiB ×4, ≥4 GiB ×2, menor usa el base.
+    """
+    env = os.environ.get("VIGIA_VOL3_TIMEOUT")
+    if env:
+        try:
+            return max(1, int(env))
+        except ValueError:
+            logger.warning("VIGIA_VOL3_TIMEOUT=%r no numérico — ignorado", env)
+    try:
+        size = os.path.getsize(memory_path)
+    except OSError:
+        return base
+    if size >= 16 * 2**30:
+        return base * 4
+    if size >= 4 * 2**30:
+        return base * 2
+    return base
+
+
+class MemoryImageFormatError(RuntimeError):
+    """La imagen no es un RAM dump que Volatility3 pueda resolver."""
+    def __init__(self, stderr_excerpt: str):
+        super().__init__(f"FORMAT_NOT_SUPPORTED: {stderr_excerpt[:300]}")
+        self.stderr_excerpt = stderr_excerpt[:300]
+
 # --- ALLOWLIST DE DIRECTORIOS PERMITIDOS (configurable) ---
 # FIX P1 (Kimi/2026-06): ALLOWED_BASE_PATHS configurable — no hardcodeado.
 # Leer de VIGIA_ALLOWED_DUMP_PATHS (paths separados por ":") o usar defaults.
@@ -174,6 +226,8 @@ class MemoryAnalysisResult:
     composite_score: Fraction = Fraction(0)
     volatility_version: str = "unknown"
     analysis_notes: List[str] = field(default_factory=list)
+    # B3: la imagen fue RECHAZADA por formato — el resultado NO es un análisis.
+    format_not_supported: bool = False
 
     def to_signal(self) -> SignalOutput:
         z = Fraction(0, 1)
@@ -184,6 +238,22 @@ class MemoryAnalysisResult:
         elif self.findings:
             z = Fraction(21, 10)
         conf = min(self.composite_score * Fraction(11, 10) * ARTIFACT_RELIABILITY, Fraction(95, 100))
+        if self.format_not_supported:
+            # B3: 0 hallazgos porque NO SE PUDO analizar, no porque esté
+            # limpio. unanalyzed=True hace que el orchestrator lo clasifique
+            # como derived (pérdida, no evidencia) → ABSTAIN, nunca NOISE.
+            return SignalOutput(
+                tool_name=TOOL_NAME, value=0.0, z_score=0.0, confidence=0.0,
+                description="Memory image REJECTED by Volatility3 (format)",
+                metadata={
+                    "dump_sha256": self.dump_sha256,
+                    "artifact_type": "memory",
+                    "artifact_reliability": str(ARTIFACT_RELIABILITY),
+                    "unanalyzed": True,
+                    "format_error": "FORMAT_NOT_SUPPORTED",
+                    "finding_types": [],
+                },
+            )
         return SignalOutput(
             tool_name=TOOL_NAME, value=float(z) / Z_CLIP_MAX if Z_CLIP_MAX > 0 else 0.0,
             z_score=float(z), confidence=float(conf),
@@ -201,10 +271,20 @@ class MemoryAnalysisResult:
 class Volatility3Interface:
     """FIX P0: Toda ejecución usa lista de argumentos + shlex.quote. NUNCA shell=True."""
 
-    def __init__(self, vol_binary: str = "vol", timeout_seconds: int = 300):
+    def __init__(self, vol_binary: str = "vol", timeout_seconds: Optional[int] = None):
         # FIX P2 (V24): Validar que el binario sea ruta absoluta y verificable
         self._vol_binary = self._validate_binary(vol_binary)
-        self._timeout = timeout_seconds
+        # B4: un timeout explícito del caller gana; sin él, VIGIA_VOL3_TIMEOUT
+        # (si está seteado) define el default, y 300 es el fallback histórico.
+        if timeout_seconds is not None:
+            self._timeout = timeout_seconds
+        else:
+            env = os.environ.get("VIGIA_VOL3_TIMEOUT")
+            try:
+                self._timeout = max(1, int(env)) if env else 300
+            except ValueError:
+                logger.warning("VIGIA_VOL3_TIMEOUT=%r no numérico — ignorado", env)
+                self._timeout = 300
         self._version = self._detect_version()
 
     @staticmethod
@@ -266,10 +346,17 @@ class Volatility3Interface:
         try:
             result = subprocess.run(
                 cmd,
-                capture_output=True, text=True, timeout=self._timeout,
+                capture_output=True, text=True,
+                # B4: escalado por tamaño del dump (o VIGIA_VOL3_TIMEOUT exacto)
+                timeout=vol3_effective_timeout(self._timeout, safe_path),
                 shell=False  # EXPLÍCITO
             )
             if result.returncode != 0:
+                # B3: distinguir "el plugin falló" (blando, []) de "la IMAGEN
+                # no es un RAM dump válido" (duro — el caso entero no es
+                # analizable y presentarlo como limpio es un falso negativo).
+                if classify_vol3_stderr(result.stderr):
+                    raise MemoryImageFormatError(result.stderr)
                 logger.warning("Volatility3 plugin %s falló: %s", plugin, result.stderr[:500])
                 return []
             data = json.loads(result.stdout)
@@ -509,7 +596,7 @@ class NetworkAnomalyDetector:
 
 
 class MemoryForensicsEngine:
-    def __init__(self, vol_binary: str = "vol", timeout_seconds: int = 300, hash_dump: bool = True):
+    def __init__(self, vol_binary: str = "vol", timeout_seconds: Optional[int] = None, hash_dump: bool = True):
         self._vol = Volatility3Interface(vol_binary, timeout_seconds)
         self._hash_dump = hash_dump
         self._proc_det = ProcessTreeAnomalyDetector()
@@ -525,9 +612,26 @@ class MemoryForensicsEngine:
         if chain:
             chain.acquire(validated.read_bytes()[:4096], "MEMORY_ANALYST", timestamp_utc, notes=f"Dump: {dump_sha256[:16]}")
 
-        pslist_raw = self._vol.get_process_list(str(validated))
-        malfind_raw = self._vol.get_malfind(str(validated))
-        netscan_raw = self._vol.get_netscan(str(validated))
+        try:
+            pslist_raw = self._vol.get_process_list(str(validated))
+            malfind_raw = self._vol.get_malfind(str(validated))
+            netscan_raw = self._vol.get_netscan(str(validated))
+        except MemoryImageFormatError as e:
+            # B3: mismo contrato que el shim del agente (FORMAT_NOT_SUPPORTED
+            # → ABSTAIN). Nota accionable: qué es y qué hacer.
+            logger.error("[MEMORY] Imagen rechazada por formato: %s", e.stderr_excerpt)
+            return MemoryAnalysisResult(
+                dump_path=str(validated), dump_sha256=dump_sha256,
+                volatility_version=self._vol.version,
+                format_not_supported=True,
+                analysis_notes=[
+                    "FORMAT_NOT_SUPPORTED: Volatility3 rechazó la imagen — no es "
+                    "un RAM dump Windows válido (¿snapshot VMware sin companion "
+                    ".vmss/.vmsn, o imagen de disco?).",
+                    f"stderr: {e.stderr_excerpt}",
+                    "0 hallazgos = NO ANALIZADO, no 'limpio'. Ver BUGS_PENDIENTES B-016.",
+                ],
+            )
 
         processes = VolatilityParsers.resolve_parent_names(VolatilityParsers.parse_pslist(pslist_raw))
         malfind_recs = VolatilityParsers.parse_malfind(malfind_raw)

@@ -1,15 +1,15 @@
 {
   "agent_verdict": "INTENT",
-  "analysis_timestamp": "2026-07-07T17:14:35.575316+00:00",
+  "analysis_timestamp": "2026-07-07T19:22:01.033381+00:00",
   "audit_trail": {
     "agent_version": "1.0.0-SANS-2026",
     "case_id": "VIGIA-BREAK-012",
-    "end_time": "2026-07-07T17:14:35.575325+00:00",
+    "end_time": "2026-07-07T19:22:01.033387+00:00",
     "entries": [
       {
         "action": "AGENT_INITIALIZED",
         "case_id": "VIGIA-BREAK-012",
-        "entry_sha256": "1f9634d9556874e54b0aed2bbce4297431e8ea8d48bcc4bfba7f64b790a7e10e",
+        "entry_sha256": "10199b1c85b63cbdc2500fa3f67b3a7712c0ed6bf084cf7c238a75c651884772",
         "inputs_summary": {
           "agent_file": "/home/user/vigia-intent-analysis/vigia_agent.py",
           "case_id": "VIGIA-BREAK-012"
@@ -21,13 +21,13 @@
           "agent_version": "1.0.0-SANS-2026"
         },
         "seq": 1,
-        "timestamp": "2026-07-07T17:14:35.398073+00:00",
+        "timestamp": "2026-07-07T19:22:00.842108+00:00",
         "tool": "vigia_agent"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-BREAK-012",
-        "entry_sha256": "6bd5db5f710a16a22318ec7a7fa27b455507f307b69c078a337eb01d402275d7",
+        "entry_sha256": "92a28c245424625e918a4a0105b2d2da4ce0b4f5e3c3b003c47b930396faf522",
         "inputs_summary": {
           "path": "/home/user/vigia-intent-analysis/data/cases/VIGIA-BREAK-012.json"
         },
@@ -35,29 +35,29 @@
         "note": "Computing SHA-256 of original evidence",
         "outputs_summary": {},
         "seq": 2,
-        "timestamp": "2026-07-07T17:14:35.398261+00:00",
+        "timestamp": "2026-07-07T19:22:00.842272+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-BREAK-012",
-        "entry_sha256": "a1ab5900474a23bc248d91f305fff320c31697253d920c2360056fdf0e83294a",
+        "entry_sha256": "ccdc28c683d7e096957b5883c3f042de11d69cfec4b68076e07dad3b273afa94",
         "inputs_summary": {
           "path": "/home/user/vigia-intent-analysis/data/cases/VIGIA-BREAK-012.json"
         },
         "iteration": 0,
-        "note": "Evidence verified: e69439f4a68520a5...",
+        "note": "Evidence verified: e9babf2bcb5c8a88...",
         "outputs_summary": {
-          "sha256": "e69439f4a68520a5d1f02056d461904257dbd3f7eb181cf4623b2eb9d3f7e753"
+          "sha256": "e9babf2bcb5c8a884e4aa06772f4046fd564c421796dd03e1e82084b899b7beb"
         },
         "seq": 3,
-        "timestamp": "2026-07-07T17:14:35.398464+00:00",
+        "timestamp": "2026-07-07T19:22:00.842453+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "PIPELINE_EXECUTE",
         "case_id": "VIGIA-BREAK-012",
-        "entry_sha256": "05fbc57987bbef78f20f053fa0e8dab8176f2d17a54d77411dd2ffa384dab757",
+        "entry_sha256": "a0aade06518bb5027c67ccef0c7ea3e2970998641bd91e5f01b587559dd22c62",
         "inputs_summary": {
           "evidence": "/home/user/vigia-intent-analysis/data/cases/VIGIA-BREAK-012.json",
           "iteration": "0",
@@ -67,13 +67,13 @@
         "note": "Executing pipeline \u2014 iteration 0",
         "outputs_summary": {},
         "seq": 4,
-        "timestamp": "2026-07-07T17:14:35.398701+00:00",
+        "timestamp": "2026-07-07T19:22:00.842678+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "PIPELINE_COMPLETE",
         "case_id": "VIGIA-BREAK-012",
-        "entry_sha256": "6beb12f172b825b2a20197837bd04e096355feb0f27cc824c3cdbd5d281e924c",
+        "entry_sha256": "fa454236fa25fb8b28bbe9fe16b9f7b02e2f5fd6c55b80c37a3aeb07dcb0da7a",
         "inputs_summary": {
           "iteration": "0"
         },
@@ -146,13 +146,13 @@
           ]
         },
         "seq": 5,
-        "timestamp": "2026-07-07T17:14:35.574526+00:00",
+        "timestamp": "2026-07-07T19:22:01.032746+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "CONTRADICTION_CHECK",
         "case_id": "VIGIA-BREAK-012",
-        "entry_sha256": "8355a76220bee85a74e60a493bca7b688546a34b3a5f5d456148775df0ea2d03",
+        "entry_sha256": "5f353c41be679bf80012f0e23e7a7c1781fd545be79dc128adaf9440daafe6ee",
         "inputs_summary": {
           "n_signals": "6"
         },
@@ -163,13 +163,13 @@
           "threshold": "2"
         },
         "seq": 6,
-        "timestamp": "2026-07-07T17:14:35.574772+00:00",
+        "timestamp": "2026-07-07T19:22:01.032940+00:00",
         "tool": "contradiction_detector"
       },
       {
         "action": "AGENT_EXIT",
         "case_id": "VIGIA-BREAK-012",
-        "entry_sha256": "52e3899ea208e0757216ad24e986ca77f9be67d9c45eb8b34b44a634892acb91",
+        "entry_sha256": "9db2b60e90136e4f66896631e16be86f3d6c46743e9df35e639d2a5ff00c0224",
         "inputs_summary": {
           "verdict": "SUSPICION_DETECTED"
         },
@@ -180,18 +180,18 @@
           "exit_code": "3"
         },
         "seq": 7,
-        "timestamp": "2026-07-07T17:14:35.575201+00:00",
+        "timestamp": "2026-07-07T19:22:01.033277+00:00",
         "tool": "vigia_agent"
       }
     ],
-    "start_time": "2026-07-07T17:14:35.397549+00:00",
+    "start_time": "2026-07-07T19:22:00.841609+00:00",
     "total_entries": 7
   },
   "case_id": "VIGIA-BREAK-012",
   "evidence_path": "/home/user/vigia-intent-analysis/data/cases/VIGIA-BREAK-012.json",
-  "evidence_sha256": "e69439f4a68520a5d1f02056d461904257dbd3f7eb181cf4623b2eb9d3f7e753",
+  "evidence_sha256": "e9babf2bcb5c8a884e4aa06772f4046fd564c421796dd03e1e82084b899b7beb",
   "iterations_executed": 1,
-  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-BREAK-012 ===\nEvidence: /home/user/vigia-intent-analysis/data/cases/VIGIA-BREAK-012.json\nEvidence SHA-256: e69439f4a68520a5d1f02056d461904257dbd3f7eb181cf4623b2eb9d3f7e753\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: SUSPICION_DETECTED\nPosterior confidence: 27/50\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 6 se\u00f1al(es): 6 primaria(s) de ['sift_crypto_audit', 'sift_syslog'], 0 derivada(s)/no-analizada(s). Top z: SSH key analysis: WEB-01 through WEB-04 =0.78, Server WEB-01: 'user jdoe executed rm -r=0.25, Server WEB-02: 'user jdoe executed rm -r=0.25.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: SUSPICION_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nFive 'independent' sources report the same event. Four are compromised. One is legitimate but in the minority. Majority wins in aggregative logic. VIG\u00cdA must weight by channel reliability, not source count.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [SSH key analysis: WEB-01 through WEB-04 share the same compromised SSH] z=0.782 conf=0.85 \u2014 \n  [Server WEB-01: 'user jdoe executed rm -rf / at 03:00'] z=0.246 conf=0.30 \u2014 \n  [Server WEB-02: 'user jdoe executed rm -rf / at 03:00'] z=0.246 conf=0.30 \u2014 \n  [Server WEB-03: 'user jdoe executed rm -rf / at 03:00'] z=0.246 conf=0.30 \u2014 \n  [Server WEB-04: 'user jdoe executed rm -rf / at 03:00'] z=0.246 conf=0.30 \u2014 \n\n--- FINAL ALERT LEVEL ---\nMEDIUM \u2014 INTENT verdict with individual z-scores below threshold. Alert floored (B-028/B-065): an intent finding cannot present as LOW.\nReconciliation: verdict INTENT rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 6 | Derived: 0 | Total: 6",
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-BREAK-012 ===\nEvidence: /home/user/vigia-intent-analysis/data/cases/VIGIA-BREAK-012.json\nEvidence SHA-256: e9babf2bcb5c8a884e4aa06772f4046fd564c421796dd03e1e82084b899b7beb\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: SUSPICION_DETECTED\nPosterior confidence: 27/50\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 6 se\u00f1al(es): 6 primaria(s) de ['sift_crypto_audit', 'sift_syslog'], 0 derivada(s)/no-analizada(s). Top z: SSH key analysis: WEB-01 through WEB-04 =0.78, Server WEB-01: 'user jdoe executed rm -r=0.25, Server WEB-02: 'user jdoe executed rm -r=0.25.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: SUSPICION_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nFive 'independent' sources report the same event. Four are compromised. One is legitimate but in the minority. Majority wins in aggregative logic. VIG\u00cdA must weight by channel reliability, not source count.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [SSH key analysis: WEB-01 through WEB-04 share the same compromised SSH] z=0.782 conf=0.85 \u2014 \n  [Server WEB-01: 'user jdoe executed rm -rf / at 03:00'] z=0.246 conf=0.30 \u2014 \n  [Server WEB-02: 'user jdoe executed rm -rf / at 03:00'] z=0.246 conf=0.30 \u2014 \n  [Server WEB-03: 'user jdoe executed rm -rf / at 03:00'] z=0.246 conf=0.30 \u2014 \n  [Server WEB-04: 'user jdoe executed rm -rf / at 03:00'] z=0.246 conf=0.30 \u2014 \n\n--- FINAL ALERT LEVEL ---\nMEDIUM \u2014 INTENT verdict with individual z-scores below threshold. Alert floored (B-028/B-065): an intent finding cannot present as LOW.\nReconciliation: verdict INTENT rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 6 | Derived: 0 | Total: 6",
   "pipeline_results": {
     "abduction": {
       "best_hypothesis": "SUSPICION_DETECTED",

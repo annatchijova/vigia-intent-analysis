@@ -1,15 +1,15 @@
 {
-  "agent_verdict": "NOISE",
-  "analysis_timestamp": "2026-07-07T17:15:08.817308+00:00",
+  "agent_verdict": "MALICE",
+  "analysis_timestamp": "2026-07-07T19:22:33.014009+00:00",
   "audit_trail": {
     "agent_version": "1.0.0-SANS-2026",
     "case_id": "VIGIA-CTF-2021-iOS-Eli-iPhone8",
-    "end_time": "2026-07-07T17:15:08.817316+00:00",
+    "end_time": "2026-07-07T19:22:33.014017+00:00",
     "entries": [
       {
         "action": "AGENT_INITIALIZED",
         "case_id": "VIGIA-CTF-2021-iOS-Eli-iPhone8",
-        "entry_sha256": "8b3ff60bccee6d6e5a3999f4d89f2936bbf53743185133684f20cbb149ecc9f1",
+        "entry_sha256": "f876a19b97d9cf3f6f6c6b8e3b5e3ec800255e02017e4e18a4cce79132bc73aa",
         "inputs_summary": {
           "agent_file": "/home/user/vigia-intent-analysis/vigia_agent.py",
           "case_id": "VIGIA-CTF-2021-iOS-Eli-iPhone8"
@@ -21,13 +21,13 @@
           "agent_version": "1.0.0-SANS-2026"
         },
         "seq": 1,
-        "timestamp": "2026-07-07T17:15:08.629634+00:00",
+        "timestamp": "2026-07-07T19:22:32.818274+00:00",
         "tool": "vigia_agent"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-CTF-2021-iOS-Eli-iPhone8",
-        "entry_sha256": "e2badb9d5d40caa11bda1bffb7324ba9aab5a984f11a2db389f3b86bb126b99c",
+        "entry_sha256": "7330c3575111c7f152fe824fe8095b85b0a2c634329c97e13ac3e179ae8caf9c",
         "inputs_summary": {
           "path": "/home/user/vigia-intent-analysis/data/cases/converted/VIGIA-CTF-2021-iOS-Eli-iPhone8.json"
         },
@@ -35,29 +35,29 @@
         "note": "Computing SHA-256 of original evidence",
         "outputs_summary": {},
         "seq": 2,
-        "timestamp": "2026-07-07T17:15:08.629863+00:00",
+        "timestamp": "2026-07-07T19:22:32.818430+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-CTF-2021-iOS-Eli-iPhone8",
-        "entry_sha256": "c6ecb7875a212532ac9c8ab4e1e0db841189c47f8b511bc4dea37c307eef009c",
+        "entry_sha256": "1eb20e9d11659ad9a453baba632eb2afaeb7fb27fa2dcb355459a193629f77ad",
         "inputs_summary": {
           "path": "/home/user/vigia-intent-analysis/data/cases/converted/VIGIA-CTF-2021-iOS-Eli-iPhone8.json"
         },
         "iteration": 0,
-        "note": "Evidence verified: 77809cab79697be4...",
+        "note": "Evidence verified: 3f1a23d51c331278...",
         "outputs_summary": {
-          "sha256": "77809cab79697be4d9af42dc497bb674dc6f5ef5c5d798ea1536dfa8d027b305"
+          "sha256": "3f1a23d51c3312787db4e4fa6977e88d119d0250399e55602019e86bb6d60783"
         },
         "seq": 3,
-        "timestamp": "2026-07-07T17:15:08.630051+00:00",
+        "timestamp": "2026-07-07T19:22:32.818621+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "PIPELINE_EXECUTE",
         "case_id": "VIGIA-CTF-2021-iOS-Eli-iPhone8",
-        "entry_sha256": "22975e586b5110875c31fee7e9950a5eb479942d9f4282b75056a75fce9c1ebb",
+        "entry_sha256": "8ce2d403a611dd3cad4206eeb6accf073cae9106562888f60aa9ca1f48a17806",
         "inputs_summary": {
           "evidence": "/home/user/vigia-intent-analysis/data/cases/converted/VIGIA-CTF-2021-iOS-Eli-iPhone8.json",
           "iteration": "0",
@@ -67,13 +67,13 @@
         "note": "Executing pipeline \u2014 iteration 0",
         "outputs_summary": {},
         "seq": 4,
-        "timestamp": "2026-07-07T17:15:08.630286+00:00",
+        "timestamp": "2026-07-07T19:22:32.818855+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "PIPELINE_COMPLETE",
         "case_id": "VIGIA-CTF-2021-iOS-Eli-iPhone8",
-        "entry_sha256": "418a9121c799ea5685fb06681b817b961c39d5b7d57928baa16fe6e76ef92f62",
+        "entry_sha256": "e617949cca7423c3eab45c17546f12da6ab1096e80f7aab75210b644d7c03a6b",
         "inputs_summary": {
           "iteration": "0"
         },
@@ -81,9 +81,9 @@
         "note": "Pipeline completed \u2014 9 signals",
         "outputs_summary": {
           "abduction": {
-            "best_hypothesis": "NO_SEMIOTIC_ANOMALY_DETECTED",
-            "best_posterior": "19/20",
-            "confidence": "19/20",
+            "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+            "best_posterior": "83/100",
+            "confidence": "83/100",
             "is_conclusive": "True",
             "narrative": "GrayKey extraction of iPhone 8 (iOS 14.4) belonging to Eli Flatt. Triple encrypted comms stack (Wickr+Psiphon, Signal, ProtonMail) with active recruitment to Wickr, minimal digital footprint, prepaid ..."
           },
@@ -94,10 +94,10 @@
             "ebs_adapter_mode": "motor",
             "expected_verdict": "UNKNOWN",
             "resolve": {
-              "motor_confidence": "0.95",
-              "motor_reason": "Insufficient evidence of malicious intent (score=0.0494)",
-              "motor_score": "0.0494",
-              "motor_verdict": "NOISE",
+              "motor_confidence": "0.83",
+              "motor_reason": "Intent score 0.4170 exceeds MALICE threshold (P2+acq_assurance scale, threshold=0.33)",
+              "motor_score": "0.417",
+              "motor_verdict": "MALICE",
               "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
             },
             "source": "ebs_v1_json_adapter"
@@ -146,13 +146,13 @@
           ]
         },
         "seq": 5,
-        "timestamp": "2026-07-07T17:15:08.816514+00:00",
+        "timestamp": "2026-07-07T19:22:33.013108+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "CONTRADICTION_CHECK",
         "case_id": "VIGIA-CTF-2021-iOS-Eli-iPhone8",
-        "entry_sha256": "19afa699597b1e71f96d265cd06e0246814bab38875def40e7b3d1354aae6c13",
+        "entry_sha256": "74d1df4958c18e801e811736cfa665f5a4b448b2479b5afff6a8f2d3e68f6b72",
         "inputs_summary": {
           "n_signals": "9"
         },
@@ -163,43 +163,67 @@
           "threshold": "2"
         },
         "seq": 6,
-        "timestamp": "2026-07-07T17:15:08.816813+00:00",
+        "timestamp": "2026-07-07T19:22:33.013332+00:00",
         "tool": "contradiction_detector"
       },
       {
         "action": "AGENT_EXIT",
         "case_id": "VIGIA-CTF-2021-iOS-Eli-iPhone8",
-        "entry_sha256": "e40efd271afc64b8e83396dc3a0566a126005f2c56d1f175b3f118d4cbce375b",
+        "entry_sha256": "877ad699304a7b468dfeb59eace0833d835b5f341fdd55994daaed65050a1240",
         "inputs_summary": {
-          "verdict": "NO_SEMIOTIC_ANOMALY_DETECTED"
+          "verdict": "MALICIOUS_INTENT_DETECTED"
         },
         "iteration": 0,
-        "note": "Exit code 0 (NOISE) \u2014 analysis complete.",
+        "note": "Exit code 1 (MALICE) \u2014 analysis complete.",
         "outputs_summary": {
-          "agent_verdict": "NOISE",
-          "exit_code": "0"
+          "agent_verdict": "MALICE",
+          "exit_code": "1"
         },
         "seq": 7,
-        "timestamp": "2026-07-07T17:15:08.817212+00:00",
+        "timestamp": "2026-07-07T19:22:33.013721+00:00",
         "tool": "vigia_agent"
       }
     ],
-    "start_time": "2026-07-07T17:15:08.629105+00:00",
+    "start_time": "2026-07-07T19:22:32.817766+00:00",
     "total_entries": 7
   },
   "case_id": "VIGIA-CTF-2021-iOS-Eli-iPhone8",
   "evidence_path": "/home/user/vigia-intent-analysis/data/cases/converted/VIGIA-CTF-2021-iOS-Eli-iPhone8.json",
-  "evidence_sha256": "77809cab79697be4d9af42dc497bb674dc6f5ef5c5d798ea1536dfa8d027b305",
+  "evidence_sha256": "3f1a23d51c3312787db4e4fa6977e88d119d0250399e55602019e86bb6d60783",
   "iterations_executed": 1,
-  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-CTF-2021-iOS-Eli-iPhone8 ===\nEvidence: /home/user/vigia-intent-analysis/data/cases/converted/VIGIA-CTF-2021-iOS-Eli-iPhone8.json\nEvidence SHA-256: 77809cab79697be4d9af42dc497bb674dc6f5ef5c5d798ea1536dfa8d027b305\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: NO_SEMIOTIC_ANOMALY_DETECTED\nPosterior confidence: 19/20\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 9 se\u00f1al(es): 9 primaria(s) de ['addressbook_analysis', 'database_analysis', 'filesystem_analysis', 'keychain_analysis', 'location_analysis', 'passcode_analysis', 'sms_analysis'], 0 derivada(s)/no-analizada(s). Top z: SMS sent from device recruiting contact =0.40, WickrEnterprise (com.mywickr.wickr) with=0.35, 5 encrypted Wickr messages with auto-des=0.30.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: NO_SEMIOTIC_ANOMALY_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nGrayKey extraction of iPhone 8 (iOS 14.4) belonging to Eli Flatt. Triple encrypted comms stack (Wickr+Psiphon, Signal, ProtonMail) with active recruitment to Wickr, minimal digital footprint, prepaid carrier. SUSPICION verdict \u2014 coherent evasion pattern but each artifact individually explainable.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [SMS sent from device recruiting contact +15713106012 to join Wickr: 'H] z=0.400 conf=0.50 \u2014 \n  [WickrEnterprise (com.mywickr.wickr) with embedded PsiphonTunnel.framew] z=0.350 conf=0.50 \u2014 \n  [5 encrypted Wickr messages with auto-destruct between 2021-03-04 and 2] z=0.300 conf=0.50 \u2014 \n  [Signal v5.4.0 (org.whispersystems.signal) registered 2021-02-16 via SM] z=0.250 conf=0.50 \u2014 \n  [ProtonMail (ch.protonmail.protonmail) with iCloud sync enabled. Persis] z=0.250 conf=0.50 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 9 | Derived: 0 | Total: 9",
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-CTF-2021-iOS-Eli-iPhone8 ===\nEvidence: /home/user/vigia-intent-analysis/data/cases/converted/VIGIA-CTF-2021-iOS-Eli-iPhone8.json\nEvidence SHA-256: 3f1a23d51c3312787db4e4fa6977e88d119d0250399e55602019e86bb6d60783\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 83/100\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 9 se\u00f1al(es): 9 primaria(s) de ['addressbook_analysis', 'database_analysis', 'filesystem_analysis', 'keychain_analysis', 'location_analysis', 'passcode_analysis', 'sms_analysis'], 0 derivada(s)/no-analizada(s). Top z: SMS sent from device recruiting contact =0.40, WickrEnterprise (com.mywickr.wickr) with=0.35, 5 encrypted Wickr messages with auto-des=0.30.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: MALICIOUS_INTENT_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nGrayKey extraction of iPhone 8 (iOS 14.4) belonging to Eli Flatt. Triple encrypted comms stack (Wickr+Psiphon, Signal, ProtonMail) with active recruitment to Wickr, minimal digital footprint, prepaid carrier. SUSPICION verdict \u2014 coherent evasion pattern but each artifact individually explainable.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [SMS sent from device recruiting contact +15713106012 to join Wickr: 'H] z=0.400 conf=0.50 \u2014 \n  [WickrEnterprise (com.mywickr.wickr) with embedded PsiphonTunnel.framew] z=0.350 conf=0.50 \u2014 \n  [5 encrypted Wickr messages with auto-destruct between 2021-03-04 and 2] z=0.300 conf=0.50 \u2014 \n  [Signal v5.4.0 (org.whispersystems.signal) registered 2021-02-16 via SM] z=0.250 conf=0.50 \u2014 \n  [ProtonMail (ch.protonmail.protonmail) with iCloud sync enabled. Persis] z=0.250 conf=0.50 \u2014 \n\n--- FINAL ALERT LEVEL ---\nHIGH \u2014 MALICE verdict from Bayesian posterior aggregation. Individual z-scores below threshold (distributed evidence pattern: no single dominant signal, but aggregate posterior is decisive). Alert floored (B-028/B-065).\nReconciliation: verdict MALICE rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 9 | Derived: 0 | Total: 9",
   "pipeline_results": {
     "abduction": {
-      "best_hypothesis": "NO_SEMIOTIC_ANOMALY_DETECTED",
-      "best_posterior": "19/20",
+      "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+      "best_posterior": "83/100",
       "confidence": {
         "__fraction__": true,
-        "den": 20,
-        "num": 19
+        "den": 100,
+        "num": 83
+      },
+      "devil_advocate": {
+        "aggregation": {
+          "k": 3,
+          "method": "top_k_already_validated_matches_v2",
+          "total_gap_mass": "0"
+        },
+        "counterfactual_summary": {
+          "primary_alternative_hypothesis": null
+        },
+        "decision_context": {
+          "confidence": "83/100",
+          "mapped_verdict": "MALICIOUS_INTENT_DETECTED",
+          "raw_verdict": "MALICIOUS_INTENT_DETECTED",
+          "score": "89/360"
+        },
+        "devil_advocate_source": "deterministic_no_pattern_data_available",
+        "meta": {
+          "deterministic": true,
+          "generated_from": "case_pattern_library"
+        },
+        "narrative": "Eco's Razor (Abductive Falsification) applied to verdict MALICIOUS_INTENT_DETECTED. Pattern-matching data was not available on this code path \u2014 CasePatternLibrary is not invoked here by design (agent audit-trail mode (vigia_agent.py \u2014 JSON-replay / autonomous path); see KNOWN_LIMITATIONS.md). No structured counter-hypothesis could be derived deterministically. This is a documented scope limitation of the current code path, not an absence of falsification attempt.",
+        "pattern_evidence_gaps": [],
+        "version": "r7-da-v1"
       },
       "is_conclusive": true,
       "narrative": "GrayKey extraction of iPhone 8 (iOS 14.4) belonging to Eli Flatt. Triple encrypted comms stack (Wickr+Psiphon, Signal, ProtonMail) with active recruitment to Wickr, minimal digital footprint, prepaid carrier. SUSPICION verdict \u2014 coherent evasion pattern but each artifact individually explainable."
@@ -211,10 +235,10 @@
       "ebs_adapter_mode": "motor",
       "expected_verdict": "UNKNOWN",
       "resolve": {
-        "motor_confidence": "0.95",
-        "motor_reason": "Insufficient evidence of malicious intent (score=0.0494)",
-        "motor_score": "0.0494",
-        "motor_verdict": "NOISE",
+        "motor_confidence": "0.83",
+        "motor_reason": "Intent score 0.4170 exceeds MALICE threshold (P2+acq_assurance scale, threshold=0.33)",
+        "motor_score": "0.417",
+        "motor_verdict": "MALICE",
         "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
       },
       "source": "ebs_v1_json_adapter"

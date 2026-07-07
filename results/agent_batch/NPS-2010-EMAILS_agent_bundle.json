@@ -1,15 +1,15 @@
 {
   "agent_verdict": "NOISE",
-  "analysis_timestamp": "2026-07-07T17:15:03.292778+00:00",
+  "analysis_timestamp": "2026-07-07T19:22:27.513532+00:00",
   "audit_trail": {
     "agent_version": "1.0.0-SANS-2026",
     "case_id": "NPS-2010-EMAILS",
-    "end_time": "2026-07-07T17:15:03.292786+00:00",
+    "end_time": "2026-07-07T19:22:27.513541+00:00",
     "entries": [
       {
         "action": "AGENT_INITIALIZED",
         "case_id": "NPS-2010-EMAILS",
-        "entry_sha256": "94c4ef112c5464b5984702010e82dc54363e665559b2b494ed5640b8cb4257cf",
+        "entry_sha256": "1fed241f529132bf3910814811d66aae08e74fd2bbefca57ce726a12dc44b991",
         "inputs_summary": {
           "agent_file": "/home/user/vigia-intent-analysis/vigia_agent.py",
           "case_id": "NPS-2010-EMAILS"
@@ -21,13 +21,13 @@
           "agent_version": "1.0.0-SANS-2026"
         },
         "seq": 1,
-        "timestamp": "2026-07-07T17:15:03.136348+00:00",
+        "timestamp": "2026-07-07T19:22:27.334308+00:00",
         "tool": "vigia_agent"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "NPS-2010-EMAILS",
-        "entry_sha256": "ff7f67f13ac8a53bd1f571e36e9675aae5b63180aa5a33110d85cfbd5b03c5af",
+        "entry_sha256": "5285a2035885c7af36a8846b3e9421d259171103c72f2529c373ac4319f40212",
         "inputs_summary": {
           "path": "/home/user/vigia-intent-analysis/data/cases/converted/NPS-2010-EMAILS.json"
         },
@@ -35,29 +35,29 @@
         "note": "Computing SHA-256 of original evidence",
         "outputs_summary": {},
         "seq": 2,
-        "timestamp": "2026-07-07T17:15:03.136532+00:00",
+        "timestamp": "2026-07-07T19:22:27.334469+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "NPS-2010-EMAILS",
-        "entry_sha256": "791721de92a1a688b6e9a62d0445e04152be49efeb865c7402aa9546d7278a82",
+        "entry_sha256": "e50e1a6bc1843b376d3cb501ce17c1c1047b86317adb154c9c8ae8ad42b12182",
         "inputs_summary": {
           "path": "/home/user/vigia-intent-analysis/data/cases/converted/NPS-2010-EMAILS.json"
         },
         "iteration": 0,
-        "note": "Evidence verified: 405f505f04310901...",
+        "note": "Evidence verified: 8b704abd1843a725...",
         "outputs_summary": {
-          "sha256": "405f505f0431090148794b0d1f16d55b853f32f5a1f47a9b7e950a06d95b991c"
+          "sha256": "8b704abd1843a725ec390942ba915dc372a1e6b77a0229f450c059e1d57c2a3a"
         },
         "seq": 3,
-        "timestamp": "2026-07-07T17:15:03.136707+00:00",
+        "timestamp": "2026-07-07T19:22:27.334625+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "PIPELINE_EXECUTE",
         "case_id": "NPS-2010-EMAILS",
-        "entry_sha256": "04f4f81293df31deef28a359017634789a8dd9ca8d4d53c6077be36a074d96b6",
+        "entry_sha256": "6c9490fe139d77bc5a1afbb735a4835dec30cb7d36a3c5c2f60110d1a9720136",
         "inputs_summary": {
           "evidence": "/home/user/vigia-intent-analysis/data/cases/converted/NPS-2010-EMAILS.json",
           "iteration": "0",
@@ -67,13 +67,13 @@
         "note": "Executing pipeline \u2014 iteration 0",
         "outputs_summary": {},
         "seq": 4,
-        "timestamp": "2026-07-07T17:15:03.136941+00:00",
+        "timestamp": "2026-07-07T19:22:27.334847+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "PIPELINE_COMPLETE",
         "case_id": "NPS-2010-EMAILS",
-        "entry_sha256": "85daef6331f0f52007ddf83478240e3980d717fd9583a4fa3379a3ec80eb34ce",
+        "entry_sha256": "d3d1516ccbec003b6619843c0c2dc7ef2905bcaf8b6775a782952ebe36dd2134",
         "inputs_summary": {
           "iteration": "0"
         },
@@ -94,9 +94,9 @@
             "ebs_adapter_mode": "motor",
             "expected_verdict": "NOISE",
             "resolve": {
-              "motor_confidence": "1.0",
-              "motor_reason": "Insufficient evidence of malicious intent (score=0.0014)",
-              "motor_score": "0.0014",
+              "motor_confidence": "0.99",
+              "motor_reason": "Insufficient evidence of malicious intent (score=0.0130)",
+              "motor_score": "0.013",
               "motor_verdict": "NOISE",
               "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
             },
@@ -146,13 +146,13 @@
           ]
         },
         "seq": 5,
-        "timestamp": "2026-07-07T17:15:03.292059+00:00",
+        "timestamp": "2026-07-07T19:22:27.512940+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "CONTRADICTION_CHECK",
         "case_id": "NPS-2010-EMAILS",
-        "entry_sha256": "0eee8b141c2c0c59a6a8f9f0dbd624aa29f78f0cb0891a0c0e1f3e28c2eb0f8c",
+        "entry_sha256": "0b6830327c45cfdc5a48f8370d00d695b35866ee4b602000943a64da93a8fd84",
         "inputs_summary": {
           "n_signals": "6"
         },
@@ -163,13 +163,13 @@
           "threshold": "2"
         },
         "seq": 6,
-        "timestamp": "2026-07-07T17:15:03.292347+00:00",
+        "timestamp": "2026-07-07T19:22:27.513158+00:00",
         "tool": "contradiction_detector"
       },
       {
         "action": "AGENT_EXIT",
         "case_id": "NPS-2010-EMAILS",
-        "entry_sha256": "c0f878e3f773a39b3e3cef0efbb90046c46d9ffc8a2f52419fee24bc996213ee",
+        "entry_sha256": "7c32d59de97476c740761c40c6ac38933840ec1c463077080e8f20921bf54b31",
         "inputs_summary": {
           "verdict": "NO_SEMIOTIC_ANOMALY_DETECTED"
         },
@@ -180,18 +180,18 @@
           "exit_code": "0"
         },
         "seq": 7,
-        "timestamp": "2026-07-07T17:15:03.292686+00:00",
+        "timestamp": "2026-07-07T19:22:27.513439+00:00",
         "tool": "vigia_agent"
       }
     ],
-    "start_time": "2026-07-07T17:15:03.135817+00:00",
+    "start_time": "2026-07-07T19:22:27.333766+00:00",
     "total_entries": 7
   },
   "case_id": "NPS-2010-EMAILS",
   "evidence_path": "/home/user/vigia-intent-analysis/data/cases/converted/NPS-2010-EMAILS.json",
-  "evidence_sha256": "405f505f0431090148794b0d1f16d55b853f32f5a1f47a9b7e950a06d95b991c",
+  "evidence_sha256": "8b704abd1843a725ec390942ba915dc372a1e6b77a0229f450c059e1d57c2a3a",
   "iterations_executed": 1,
-  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE NPS-2010-EMAILS ===\nEvidence: /home/user/vigia-intent-analysis/data/cases/converted/NPS-2010-EMAILS.json\nEvidence SHA-256: 405f505f0431090148794b0d1f16d55b853f32f5a1f47a9b7e950a06d95b991c\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: NO_SEMIOTIC_ANOMALY_DETECTED\nPosterior confidence: 99/100\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 6 se\u00f1al(es): 6 primaria(s) de ['unknown'], 0 derivada(s)/no-analizada(s). Top z: strings output: 9/26 email addresses rec=0.06, E01 entropy H=7.95 (HIGH). Expected for =0.05, FAT16 macOS disk image, 10 MB, 26 files,=0.04.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: NO_SEMIOTIC_ANOMALY_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nNPS-2010-emails educational forensic corpus. FAT16 E01 disk image containing 26 files with email addresses embedded in 7 application/encoding format families. Created by Simson Garfinkel, Naval Postgraduate School.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [strings output: 9/26 email addresses recovered. 17/26 absent. Recovery] z=0.056 conf=0.94 \u2014 \n  [E01 entropy H=7.95 (HIGH). Expected for EWF format compression stackin] z=0.048 conf=0.95 \u2014 \n  [FAT16 macOS disk image, 10 MB, 26 files, 7 format families. Makefile c] z=0.038 conf=0.96 \u2014 \n  [OLE .doc and .xls files: email addresses recoverable by strings. H=3.0] z=0.038 conf=0.96 \u2014 \n  [UTF-16 LE encoding confirmed (BOM ff fe on document3.txt). Null bytes ] z=0.029 conf=0.97 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 6 | Derived: 0 | Total: 6",
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE NPS-2010-EMAILS ===\nEvidence: /home/user/vigia-intent-analysis/data/cases/converted/NPS-2010-EMAILS.json\nEvidence SHA-256: 8b704abd1843a725ec390942ba915dc372a1e6b77a0229f450c059e1d57c2a3a\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: NO_SEMIOTIC_ANOMALY_DETECTED\nPosterior confidence: 99/100\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 6 se\u00f1al(es): 6 primaria(s) de ['unknown'], 0 derivada(s)/no-analizada(s). Top z: strings output: 9/26 email addresses rec=0.06, E01 entropy H=7.95 (HIGH). Expected for =0.05, FAT16 macOS disk image, 10 MB, 26 files,=0.04.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: NO_SEMIOTIC_ANOMALY_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nNPS-2010-emails educational forensic corpus. FAT16 E01 disk image containing 26 files with email addresses embedded in 7 application/encoding format families. Created by Simson Garfinkel, Naval Postgraduate School.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [strings output: 9/26 email addresses recovered. 17/26 absent. Recovery] z=0.056 conf=0.94 \u2014 \n  [E01 entropy H=7.95 (HIGH). Expected for EWF format compression stackin] z=0.048 conf=0.95 \u2014 \n  [FAT16 macOS disk image, 10 MB, 26 files, 7 format families. Makefile c] z=0.038 conf=0.96 \u2014 \n  [OLE .doc and .xls files: email addresses recoverable by strings. H=3.0] z=0.038 conf=0.96 \u2014 \n  [UTF-16 LE encoding confirmed (BOM ff fe on document3.txt). Null bytes ] z=0.029 conf=0.97 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 6 | Derived: 0 | Total: 6",
   "pipeline_results": {
     "abduction": {
       "best_hypothesis": "NO_SEMIOTIC_ANOMALY_DETECTED",
@@ -211,9 +211,9 @@
       "ebs_adapter_mode": "motor",
       "expected_verdict": "NOISE",
       "resolve": {
-        "motor_confidence": "1.0",
-        "motor_reason": "Insufficient evidence of malicious intent (score=0.0014)",
-        "motor_score": "0.0014",
+        "motor_confidence": "0.99",
+        "motor_reason": "Insufficient evidence of malicious intent (score=0.0130)",
+        "motor_score": "0.013",
         "motor_verdict": "NOISE",
         "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
       },

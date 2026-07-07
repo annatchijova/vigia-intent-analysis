@@ -2550,9 +2550,112 @@ _HONEY_VAR_BLACKLIST = frozenset({
     "VIGIA_HMAC_KEY_FILE", "VIGIA_EVIDENCE_DIR", "VIGIA_LLM_BACKEND",
 })
 
+def _honey_meta_path(token_path: str) -> str:
+    return token_path + ".meta.json"
+
+
+def _sweep_expired_honey_tokens() -> list:
+    """B9 (A-2): retiro perezoso de tokens vencidos. Un token con sidecar
+    .meta.json cuyo expires_at quedó en el pasado se retira CON auditoría;
+    sin sidecar, el token no expira (compatibilidad con los previos)."""
+    removed = []
+    try:
+        entries = sorted(os.listdir(_HONEY_TOKEN_DIR))
+    except OSError:
+        return removed
+    from datetime import datetime, timezone
+    now = datetime.now(timezone.utc)
+    for name in entries:
+        if not name.endswith(".meta.json"):
+            continue
+        meta_path = os.path.join(_HONEY_TOKEN_DIR, name)
+        token_path = meta_path[: -len(".meta.json")]
+        try:
+            expires_at = json.loads(open(meta_path).read()).get("expires_at")
+            if not expires_at:
+                continue
+            if datetime.fromisoformat(expires_at) <= now:
+                for p in (token_path, meta_path):
+                    if os.path.exists(p):
+                        os.unlink(p)
+                removed.append(token_path)
+                audit_logger.log_info(
+                    event_type="HONEY_TOKEN_EXPIRED",
+                    tool="deactivate_honey_token",
+                    message=f"Token expirado retirado: {token_path}",
+                )
+        except (OSError, ValueError) as e:
+            audit_logger.log_info(
+                event_type="HONEY_TOKEN_SWEEP_ERROR",
+                tool="deactivate_honey_token",
+                message=f"Sweep no pudo procesar {meta_path}: {e}",
+            )
+    return removed
+
+
+def _deactivate_honey_token_impl(file_path: str) -> dict:
+    """B9 (A-2): retiro de un token CON auditoría y contención estricta —
+    NO es un rm arbitrario: realpath dentro de _HONEY_TOKEN_DIR y basename
+    honey_* obligatorios (sin traversal, sin symlink escape)."""
+    real = os.path.realpath(file_path)
+    honey_root = os.path.realpath(_HONEY_TOKEN_DIR)
+    if not (real == honey_root or real.startswith(honey_root + os.sep)) \
+            or not os.path.basename(real).startswith("honey_"):
+        audit_logger.log_block(
+            event_type="HONEY_TOKEN_DEACTIVATE_BLOCKED",
+            tool="deactivate_honey_token",
+            input_preview=file_path,
+            reason="Path fuera de _HONEY_TOKEN_DIR o basename no honey_*",
+        )
+        return {
+            "error": "Path fuera del directorio de honey tokens.",
+            "security_block": True,
+            "timestamp": _utcnow(),
+        }
+    if not os.path.isfile(real):
+        return {
+            "error": f"Token no encontrado: {real}",
+            "timestamp": _utcnow(),
+        }
+    try:
+        os.unlink(real)
+        meta = _honey_meta_path(real)
+        if os.path.exists(meta):
+            os.unlink(meta)
+    except OSError as e:
+        return {"error": f"No se pudo retirar el token: {e}",
+                "timestamp": _utcnow()}
+    audit_logger.log_info(
+        event_type="HONEY_TOKEN_DEACTIVATED",
+        tool="deactivate_honey_token",
+        message=f"Token retirado con auditoría: {real}",
+    )
+    return {
+        "status": "HONEY_TOKEN_DEACTIVATED",
+        "file_path": real,
+        "timestamp": _utcnow(),
+        "vigia_verdict": (
+            f"[VIGIA_VERDICT]: HONEYPOT_RETIRED. Retirar también el watch: "
+            f"auditctl -W {real} -p r -k honey_access"
+        ),
+    }
+
+
 @mcp.tool()
 @rate_limit(max_calls=5, window_seconds=60, raise_on_limit=False)
-async def activate_honey_token(variable_name: str, fake_value: str) -> dict:
+async def deactivate_honey_token(file_path: str) -> dict:
+    """
+    Retire a planted honey-token with audit trail (B9/A-2). The token file
+    must live inside the honey-token directory; anything else is blocked.
+    Also sweeps any expired tokens (lazy expiry).
+    """
+    _sweep_expired_honey_tokens()
+    return _deactivate_honey_token_impl(file_path)
+
+
+@mcp.tool()
+@rate_limit(max_calls=5, window_seconds=60, raise_on_limit=False)
+async def activate_honey_token(variable_name: str, fake_value: str, ttl_hours: float = 0.0) -> dict:
     """
     Plant a honey-token in a secure file. If suspicious process reads this file,
     exfiltration intent is confirmed.
@@ -2563,6 +2666,9 @@ async def activate_honey_token(variable_name: str, fake_value: str) -> dict:
     - Token stored in secure file (tempfile.mkstemp, 0o600), NEVER in os.environ
     - Logs absolute path for external auditctl monitoring
     """
+    # B9: sweep perezoso — cada activación retira los tokens vencidos.
+    _sweep_expired_honey_tokens()
+
     # Validate variable name
     if not variable_name.startswith(_ALLOWED_HONEY_VAR_PREFIX):
         audit_logger.log_block(
@@ -2627,15 +2733,28 @@ async def activate_honey_token(variable_name: str, fake_value: str) -> dict:
         os.chmod(file_path, 0o600)
         abs_path = os.path.abspath(file_path)
 
+        # B9: expiración opcional persistida en sidecar (.meta.json). Sin
+        # TTL no hay sidecar — el token no expira (comportamiento previo).
+        expires_at = None
+        if ttl_hours and ttl_hours > 0:
+            from datetime import datetime, timedelta, timezone
+            expires_at = (datetime.now(timezone.utc)
+                          + timedelta(hours=float(ttl_hours))).isoformat()
+            with open(_honey_meta_path(abs_path), "w") as mf:
+                json.dump({"variable": variable_name,
+                           "expires_at": expires_at}, mf)
+
         audit_logger.log_info(
             event_type="HONEY_TOKEN_PLANTED",
             tool="activate_honey_token",
-            message=f"Token planted: {abs_path} (variable: {variable_name})",
+            message=f"Token planted: {abs_path} (variable: {variable_name}, "
+                    f"ttl_hours: {ttl_hours or 'sin expiración'})",
         )
 
         return {
             "status": "HONEY_TOKEN_PLANTED",
             "variable": variable_name,
+            "expires_at": expires_at,
             "file_path": abs_path,
             "alert": f"Monitoring {abs_path}. Any read = MALICE.",
             "timestamp": _utcnow(),

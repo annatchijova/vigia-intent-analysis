@@ -184,6 +184,35 @@ class ForensicRecord:
         return hashlib.sha256(raw.encode()).hexdigest()
 
 
+def verify_daubert_record_hash(exported: dict) -> tuple:
+    """
+    B8 (A-1): verifica que `daubert_record_hash` corresponde al `lr_record`
+    embebido en un export de signal_adapter. Antes el hash se creaba y NADA
+    lo chequeaba (hash decorativo): un lr_record alterado post-export con el
+    hash intacto pasaba invisible.
+
+    Recomputa con la MISMA cuantización U7 del productor
+    (ForensicRecord._quantize_for_hash) sobre el dict exportado — estable
+    ante round-trip JSON (to_dict emite solo tipos JSON-nativos).
+
+    Retorna (ok: bool, mensaje: str). Fail-closed: campos ausentes → False.
+    """
+    expected = exported.get("daubert_record_hash") if isinstance(exported, dict) else None
+    record = exported.get("lr_record") if isinstance(exported, dict) else None
+    if not expected:
+        return False, "daubert_record_hash ausente en el export"
+    if not isinstance(record, dict):
+        return False, "lr_record ausente o no es dict"
+    raw = json.dumps(ForensicRecord._quantize_for_hash(record),
+                     sort_keys=True, ensure_ascii=False)
+    computed = hashlib.sha256(raw.encode()).hexdigest()
+    if computed == expected:
+        return True, "OK — daubert_record_hash verificado"
+    return False, (f"HASH MISMATCH: esperado={expected[:16]}… "
+                   f"calculado={computed[:16]}… — lr_record alterado o "
+                   f"asimetría de serialización")
+
+
 # ---------------------------------------------------------------------------
 # LikelihoodEngine — motor principal
 # ---------------------------------------------------------------------------

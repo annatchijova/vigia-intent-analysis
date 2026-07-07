@@ -101,7 +101,12 @@ if _USE_PYDANTIC:
         signal_id: str = Field(default_factory=_new_uuid)
         value: float
         z_score: float
-        confidence: float = Field(default=1.0, ge=0.0, le=1.0)
+        confidence: float = Field(default=1.0)  # B-061: sin ge/le — el bound
+        # de Field RECHAZABA el fuera-de-rango finito antes de que el
+        # validador clampeara, mientras el fallback dataclass clampeaba:
+        # el mismo input crasheaba o no según el despliegue. Unificado a
+        # CLAMP en ambas rutas (coherente con z_score); no-finito sigue
+        # rechazando (B-083b).
         metadata: Optional[Dict[str, Any]] = None
         description: Optional[str] = None
 
