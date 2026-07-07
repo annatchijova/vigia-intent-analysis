@@ -24,7 +24,12 @@
         "justification": "unscheduled internal audit",
         "historical_similar_commands": 0,
         "tenure_years": 12,
-        "privilege_level": "domain_admin"
+        "privilege_level": "domain_admin",
+        "acquisition_tool": "VIGIA deterministic pipeline — señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canóni",
+        "acquisition_timestamp": "2026-07-06T00:00:00Z",
+        "acquisition_hash": "sha256:bb75146efd9d94ae320a1c6850edbc64cdfd5d7ef0c8bc498fc4dce4158bf2dd",
+        "acquisition_note": "Metadata documentada retroactivamente (2026-07-07, WHAT_IS_NEXT §1.1.2). Sin adquisición física: caso de corpus. El hash cubre: bundle fuente results/agent_batch/VIGIA-FP-001_agent_bundle.json.",
+        "write_blocker_used": false
       }
     },
     {
@@ -42,7 +47,12 @@
         "ticket_id": "AUDIT-2026-0615",
         "creator": "admin_sys",
         "category": "security_audit",
-        "approved_by": "self"
+        "approved_by": "self",
+        "acquisition_tool": "VIGIA deterministic pipeline — señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canóni",
+        "acquisition_timestamp": "2026-07-06T00:00:00Z",
+        "acquisition_hash": "sha256:bb75146efd9d94ae320a1c6850edbc64cdfd5d7ef0c8bc498fc4dce4158bf2dd",
+        "acquisition_note": "Metadata documentada retroactivamente (2026-07-07, WHAT_IS_NEXT §1.1.2). Sin adquisición física: caso de corpus. El hash cubre: bundle fuente results/agent_batch/VIGIA-FP-001_agent_bundle.json.",
+        "write_blocker_used": false
       }
     }
   ],
@@ -118,5 +128,6 @@
     "to": "UNKNOWN",
     "decided_by": "Anna Tchijova (decision de doctrina, Round 2.1)",
     "reason": "El BENIGN original dependia de que un log_entry raw=0.05 DILUYERA el composite del log fuerte (0.083 -> 0.0744) bajo el borde NOISE (0.08) via el correlation-decay legacy. M2-1 (monotonicidad positiva, docs/REDTEAM_ROUND2_MONOTONICITY.md SS Round 2.1) prohibe esa dilucion: agregar evidencia incriminatoria no puede bajar el score. Sin dilucion el caso puntua 0.0804 -> UNKNOWN (anomalia debil sin soporte estructural), que es la lectura honesta: una senal 0.82 en un log no se vuelve benigna porque un segundo log casi limpio la acompanie."
-  }
+  },
+  "schema_version": 1
 }

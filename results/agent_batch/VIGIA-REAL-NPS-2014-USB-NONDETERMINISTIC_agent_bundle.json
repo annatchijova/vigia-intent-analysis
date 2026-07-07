@@ -1,15 +1,15 @@
 {
   "agent_verdict": "NOISE",
-  "analysis_timestamp": "2026-07-07T17:24:41.981267+00:00",
+  "analysis_timestamp": "2026-07-07T17:54:56.578501+00:00",
   "audit_trail": {
     "agent_version": "1.0.0-SANS-2026",
     "case_id": "VIGIA-REAL-NPS-2014-USB-NONDETERMINISTIC",
-    "end_time": "2026-07-07T17:24:41.981273+00:00",
+    "end_time": "2026-07-07T17:54:56.578506+00:00",
     "entries": [
       {
         "action": "AGENT_INITIALIZED",
         "case_id": "VIGIA-REAL-NPS-2014-USB-NONDETERMINISTIC",
-        "entry_sha256": "1d23f212ec65b7d1b1c25bb287f39702855cfe03d609e7685864ddb648b899a6",
+        "entry_sha256": "d63152b45365eb6bd4a9681c39176de3c82557ef7ac25d1800f7747652b6bcd8",
         "inputs_summary": {
           "agent_file": "/home/user/vigia-intent-analysis/vigia_agent.py",
           "case_id": "VIGIA-REAL-NPS-2014-USB-NONDETERMINISTIC"
@@ -21,13 +21,13 @@
           "agent_version": "1.0.0-SANS-2026"
         },
         "seq": 1,
-        "timestamp": "2026-07-07T17:24:41.842950+00:00",
+        "timestamp": "2026-07-07T17:54:56.438740+00:00",
         "tool": "vigia_agent"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-REAL-NPS-2014-USB-NONDETERMINISTIC",
-        "entry_sha256": "d0cafd57dcd3318d7254cebdde8e071886d1c13aab05fa1b4c471dd10db8bea5",
+        "entry_sha256": "f2a1bf803a76c7c05d1aab3e2097cda6658d8b43d29c7d6754f4aeb2957dcfd8",
         "inputs_summary": {
           "path": "/home/user/vigia-intent-analysis/data/cases/VIGIA-REAL-NPS-2014-USB-NONDETERMINISTIC.json"
         },
@@ -35,29 +35,29 @@
         "note": "Computing SHA-256 of original evidence",
         "outputs_summary": {},
         "seq": 2,
-        "timestamp": "2026-07-07T17:24:41.843057+00:00",
+        "timestamp": "2026-07-07T17:54:56.438875+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-REAL-NPS-2014-USB-NONDETERMINISTIC",
-        "entry_sha256": "531e3cc7b55dfb0268731909a69628d7f02b0d7ac6e7f34cdc0380d819776ee1",
+        "entry_sha256": "f454cad5d7e7ca91ad20d1fd0a5904adaf8dc66f67452dad70a7f1dde3ffff83",
         "inputs_summary": {
           "path": "/home/user/vigia-intent-analysis/data/cases/VIGIA-REAL-NPS-2014-USB-NONDETERMINISTIC.json"
         },
         "iteration": 0,
-        "note": "Evidence verified: ab6a0ad5fe83adb3...",
+        "note": "Evidence verified: 0734b4c4de73295d...",
         "outputs_summary": {
-          "sha256": "ab6a0ad5fe83adb345cdcc885d380333e05b1064a055918382762341ed8b50a8"
+          "sha256": "0734b4c4de73295dc90564a60333fb5ce7c7f68bfc6e92a1cd9010b7b6fa7400"
         },
         "seq": 3,
-        "timestamp": "2026-07-07T17:24:41.843159+00:00",
+        "timestamp": "2026-07-07T17:54:56.438995+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "PIPELINE_EXECUTE",
         "case_id": "VIGIA-REAL-NPS-2014-USB-NONDETERMINISTIC",
-        "entry_sha256": "aa91bdb3a566ea6d6648728c21062a8b3be6470a9486eee1a7bd69c15454700d",
+        "entry_sha256": "b749a58151c9138723704bc41d9b23114a93c1121a7e054a9cf4dd070b59f710",
         "inputs_summary": {
           "evidence": "/home/user/vigia-intent-analysis/data/cases/VIGIA-REAL-NPS-2014-USB-NONDETERMINISTIC.json",
           "iteration": "0",
@@ -67,13 +67,13 @@
         "note": "Executing pipeline \u2014 iteration 0",
         "outputs_summary": {},
         "seq": 4,
-        "timestamp": "2026-07-07T17:24:41.843293+00:00",
+        "timestamp": "2026-07-07T17:54:56.439180+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "PIPELINE_COMPLETE",
         "case_id": "VIGIA-REAL-NPS-2014-USB-NONDETERMINISTIC",
-        "entry_sha256": "4f9d42a61a3384afdcaa971ecd69949b7132e04fdf7e659f59fd20ed81c7c5d2",
+        "entry_sha256": "6eb5079f346aa96848c5b12e51bf4cb3532d135992e50f3cb72b32210d2abffc",
         "inputs_summary": {
           "iteration": "0"
         },
@@ -82,8 +82,8 @@
         "outputs_summary": {
           "abduction": {
             "best_hypothesis": "NO_SEMIOTIC_ANOMALY_DETECTED",
-            "best_posterior": "99/100",
-            "confidence": "99/100",
+            "best_posterior": "97/100",
+            "confidence": "97/100",
             "is_conclusive": "True",
             "narrative": "NPS-2014 USB non-deterministic corpus. Transcend JetFlash V10 1GB (D33193). Four E01 images (two Linux dc3dd, two Windows FTK Imager) of the same unchanged USB device. All four images have different h..."
           },
@@ -94,9 +94,9 @@
             "ebs_adapter_mode": "motor",
             "expected_verdict": "NOISE",
             "resolve": {
-              "motor_confidence": "1.0",
-              "motor_reason": "Insufficient evidence of malicious intent (score=0.0027)",
-              "motor_score": "0.0027",
+              "motor_confidence": "0.97",
+              "motor_reason": "Insufficient evidence of malicious intent (score=0.0253)",
+              "motor_score": "0.0253",
               "motor_verdict": "NOISE",
               "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
             },
@@ -146,13 +146,13 @@
           ]
         },
         "seq": 5,
-        "timestamp": "2026-07-07T17:24:41.980516+00:00",
+        "timestamp": "2026-07-07T17:54:56.577933+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "CONTRADICTION_CHECK",
         "case_id": "VIGIA-REAL-NPS-2014-USB-NONDETERMINISTIC",
-        "entry_sha256": "5ced8acf7f5bdda1ece1e8fd406fa3abb59a339b5098418038178146927443f8",
+        "entry_sha256": "6ca300ef5b6b800a51c95428f3f32e118c2c9af9cf521b2a9974361cb41847e9",
         "inputs_summary": {
           "n_signals": "6"
         },
@@ -163,13 +163,13 @@
           "threshold": "2"
         },
         "seq": 6,
-        "timestamp": "2026-07-07T17:24:41.980827+00:00",
+        "timestamp": "2026-07-07T17:54:56.578135+00:00",
         "tool": "contradiction_detector"
       },
       {
         "action": "AGENT_EXIT",
         "case_id": "VIGIA-REAL-NPS-2014-USB-NONDETERMINISTIC",
-        "entry_sha256": "de6db7e8657fda5d4ed52c6b155c549502cc8b10a3032592667f79fdce6a9c75",
+        "entry_sha256": "55e2010148d374f100866db92fb46c46d2309b298a3ec2da04d510f824f35191",
         "inputs_summary": {
           "verdict": "NO_SEMIOTIC_ANOMALY_DETECTED"
         },
@@ -180,26 +180,26 @@
           "exit_code": "0"
         },
         "seq": 7,
-        "timestamp": "2026-07-07T17:24:41.981179+00:00",
+        "timestamp": "2026-07-07T17:54:56.578432+00:00",
         "tool": "vigia_agent"
       }
     ],
-    "start_time": "2026-07-07T17:24:41.842492+00:00",
+    "start_time": "2026-07-07T17:54:56.438400+00:00",
     "total_entries": 7
   },
   "case_id": "VIGIA-REAL-NPS-2014-USB-NONDETERMINISTIC",
   "evidence_path": "/home/user/vigia-intent-analysis/data/cases/VIGIA-REAL-NPS-2014-USB-NONDETERMINISTIC.json",
-  "evidence_sha256": "ab6a0ad5fe83adb345cdcc885d380333e05b1064a055918382762341ed8b50a8",
+  "evidence_sha256": "0734b4c4de73295dc90564a60333fb5ce7c7f68bfc6e92a1cd9010b7b6fa7400",
   "iterations_executed": 1,
-  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-REAL-NPS-2014-USB-NONDETERMINISTIC ===\nEvidence: /home/user/vigia-intent-analysis/data/cases/VIGIA-REAL-NPS-2014-USB-NONDETERMINISTIC.json\nEvidence SHA-256: ab6a0ad5fe83adb345cdcc885d380333e05b1064a055918382762341ed8b50a8\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: NO_SEMIOTIC_ANOMALY_DETECTED\nPosterior confidence: 99/100\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 6 se\u00f1al(es): 6 primaria(s) de ['unknown'], 0 derivada(s)/no-analizada(s). Top z: linux-dc3dd-first.E01 SHA-256: c473e8886=0.07, windows-ftkimager-first.E01 SHA-256: d42=0.07, Disk: Transcend JetFlash V10 1GB, 197222=0.05.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: NO_SEMIOTIC_ANOMALY_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nNPS-2014 USB non-deterministic corpus. Transcend JetFlash V10 1GB (D33193). Four E01 images (two Linux dc3dd, two Windows FTK Imager) of the same unchanged USB device. All four images have different hashes due to USB firmware returning SCSI READ(10) command content in non-written flash sectors. Hardware non-determinism \u2014 not anti-forensics.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [linux-dc3dd-first.E01 SHA-256: c473e88868c26423bb908f7cb4feede8c015c27] z=0.065 conf=0.93 \u2014 \n  [windows-ftkimager-first.E01 SHA-256: d423e721ef568202462f4d030c46348b6] z=0.065 conf=0.93 \u2014 \n  [Disk: Transcend JetFlash V10 1GB, 1972224 sectors x 512 bytes = 963 MB] z=0.048 conf=0.95 \u2014 \n  [Cross-acquisition sector diff at sector 100005: linux-first Tag=940600] z=0.038 conf=0.96 \u2014 \n  [dc3dd firstrun: 1972224 sectors in, 0 bad sectors, completed 2014-05-2] z=0.029 conf=0.97 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 6 | Derived: 0 | Total: 6",
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-REAL-NPS-2014-USB-NONDETERMINISTIC ===\nEvidence: /home/user/vigia-intent-analysis/data/cases/VIGIA-REAL-NPS-2014-USB-NONDETERMINISTIC.json\nEvidence SHA-256: 0734b4c4de73295dc90564a60333fb5ce7c7f68bfc6e92a1cd9010b7b6fa7400\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: NO_SEMIOTIC_ANOMALY_DETECTED\nPosterior confidence: 97/100\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 6 se\u00f1al(es): 6 primaria(s) de ['unknown'], 0 derivada(s)/no-analizada(s). Top z: linux-dc3dd-first.E01 SHA-256: c473e8886=0.07, windows-ftkimager-first.E01 SHA-256: d42=0.07, Disk: Transcend JetFlash V10 1GB, 197222=0.05.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: NO_SEMIOTIC_ANOMALY_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nNPS-2014 USB non-deterministic corpus. Transcend JetFlash V10 1GB (D33193). Four E01 images (two Linux dc3dd, two Windows FTK Imager) of the same unchanged USB device. All four images have different hashes due to USB firmware returning SCSI READ(10) command content in non-written flash sectors. Hardware non-determinism \u2014 not anti-forensics.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [linux-dc3dd-first.E01 SHA-256: c473e88868c26423bb908f7cb4feede8c015c27] z=0.065 conf=0.93 \u2014 \n  [windows-ftkimager-first.E01 SHA-256: d423e721ef568202462f4d030c46348b6] z=0.065 conf=0.93 \u2014 \n  [Disk: Transcend JetFlash V10 1GB, 1972224 sectors x 512 bytes = 963 MB] z=0.048 conf=0.95 \u2014 \n  [Cross-acquisition sector diff at sector 100005: linux-first Tag=940600] z=0.038 conf=0.96 \u2014 \n  [dc3dd firstrun: 1972224 sectors in, 0 bad sectors, completed 2014-05-2] z=0.029 conf=0.97 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 6 | Derived: 0 | Total: 6",
   "pipeline_results": {
     "abduction": {
       "best_hypothesis": "NO_SEMIOTIC_ANOMALY_DETECTED",
-      "best_posterior": "99/100",
+      "best_posterior": "97/100",
       "confidence": {
         "__fraction__": true,
         "den": 100,
-        "num": 99
+        "num": 97
       },
       "is_conclusive": true,
       "narrative": "NPS-2014 USB non-deterministic corpus. Transcend JetFlash V10 1GB (D33193). Four E01 images (two Linux dc3dd, two Windows FTK Imager) of the same unchanged USB device. All four images have different hashes due to USB firmware returning SCSI READ(10) command content in non-written flash sectors. Hardware non-determinism \u2014 not anti-forensics."
@@ -211,9 +211,9 @@
       "ebs_adapter_mode": "motor",
       "expected_verdict": "NOISE",
       "resolve": {
-        "motor_confidence": "1.0",
-        "motor_reason": "Insufficient evidence of malicious intent (score=0.0027)",
-        "motor_score": "0.0027",
+        "motor_confidence": "0.97",
+        "motor_reason": "Insufficient evidence of malicious intent (score=0.0253)",
+        "motor_score": "0.0253",
         "motor_verdict": "NOISE",
         "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
       },

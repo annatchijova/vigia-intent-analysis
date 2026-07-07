@@ -15,7 +15,12 @@
         "process_creation_time": "2026-04-27T09:18:00Z",
         "scan_type": "SYN",
         "source_ip": "198.51.100.99",
-        "tool_detected": "nmap"
+        "tool_detected": "nmap",
+        "acquisition_tool": "VIGIA deterministic pipeline — señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canóni",
+        "acquisition_timestamp": "2026-07-06T00:00:00Z",
+        "acquisition_hash": "sha256:481f44d751af3abe4fcda8f1b155a6a3a13029e21fac6e846007b3b3bbebac44",
+        "acquisition_note": "Metadata documentada retroactivamente (2026-07-07, WHAT_IS_NEXT §1.1.2). Sin adquisición física: caso de corpus. El hash cubre: bundle fuente results/agent_batch/VIGIA-CAN-029_agent_bundle.json.",
+        "write_blocker_used": false
       },
       "prior_trust": 0.3,
       "provenance_chain": [
@@ -33,7 +38,12 @@
         "auto_response": "none",
         "edr_severity": "low",
         "queue": "tier1_backlog",
-        "sla_hours": 48
+        "sla_hours": 48,
+        "acquisition_tool": "VIGIA deterministic pipeline — señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canóni",
+        "acquisition_timestamp": "2026-07-06T00:00:00Z",
+        "acquisition_hash": "sha256:481f44d751af3abe4fcda8f1b155a6a3a13029e21fac6e846007b3b3bbebac44",
+        "acquisition_note": "Metadata documentada retroactivamente (2026-07-07, WHAT_IS_NEXT §1.1.2). Sin adquisición física: caso de corpus. El hash cubre: bundle fuente results/agent_batch/VIGIA-CAN-029_agent_bundle.json.",
+        "write_blocker_used": false
       },
       "prior_trust": 0.45,
       "provenance_chain": [
@@ -55,7 +65,12 @@
           "SSDT_hook",
           "process_hiding",
           "memory_injection"
-        ]
+        ],
+        "acquisition_tool": "VIGIA deterministic pipeline — señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canóni",
+        "acquisition_timestamp": "2026-07-06T00:00:00Z",
+        "acquisition_hash": "sha256:481f44d751af3abe4fcda8f1b155a6a3a13029e21fac6e846007b3b3bbebac44",
+        "acquisition_note": "Metadata documentada retroactivamente (2026-07-07, WHAT_IS_NEXT §1.1.2). Sin adquisición física: caso de corpus. El hash cubre: bundle fuente results/agent_batch/VIGIA-CAN-029_agent_bundle.json.",
+        "write_blocker_used": false
       },
       "prior_trust": 0.96,
       "provenance_chain": [
@@ -73,7 +88,12 @@
         "injection_technique": "process_hollowing",
         "pid_hidden": true,
         "process_name": "svchost.exe (hollowed)",
-        "tcp_connection": "185.220.101.42:443"
+        "tcp_connection": "185.220.101.42:443",
+        "acquisition_tool": "VIGIA deterministic pipeline — señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canóni",
+        "acquisition_timestamp": "2026-07-06T00:00:00Z",
+        "acquisition_hash": "sha256:481f44d751af3abe4fcda8f1b155a6a3a13029e21fac6e846007b3b3bbebac44",
+        "acquisition_note": "Metadata documentada retroactivamente (2026-07-07, WHAT_IS_NEXT §1.1.2). Sin adquisición física: caso de corpus. El hash cubre: bundle fuente results/agent_batch/VIGIA-CAN-029_agent_bundle.json.",
+        "write_blocker_used": false
       },
       "prior_trust": 0.95,
       "provenance_chain": [
@@ -179,5 +199,7 @@
     "to": "MALICE",
     "decided_by": "Anna Tchijova (decision de doctrina, Round 2.1)",
     "reason": "El SUSPICION original dependia de que un memory_process raw=0.05 (adjusted 0.013) DILUYERA el grupo memory bajo el umbral MALICE (0.33) via el correlation-decay legacy. M2-1 (monotonicidad positiva, docs/REDTEAM_ROUND2_MONOTONICITY.md SS Round 2.1) prohibe esa dilucion. Sin ella el caso puntua 0.340 con 4 artefactos de senal / 2 clases device -> gate B-068 satisfecho -> MALICE: un volcado casi limpio adicional no debilita dos memory dumps fuertes + LSASS."
-  }
+  },
+  "schema_version": 1,
+  "case_name": "case_111_falso_rastro_incompetencia"
 }

@@ -1,10 +1,10 @@
 {
   "case_id": "VIGIA-REAL-SRL-RD03-MEMORY",
-  "case_name": "SRL-2018 Remote Desktop Server RD-03 \u2014 Memory Forensics",
-  "description": "Volatility3 memory analysis. 1 LOTL process + code injection in 7 processes. Lightest compromise among RD servers. Code injection present but minimal active C2 activity \u2014 possible earlier stage of infection or cleanup in progress.",
+  "case_name": "SRL-2018 Remote Desktop Server RD-03 — Memory Forensics",
+  "description": "Volatility3 memory analysis. 1 LOTL process + code injection in 7 processes. Lightest compromise among RD servers. Code injection present but minimal active C2 activity — possible earlier stage of infection or cleanup in progress.",
   "expected_verdict": "MALICE",
   "source_dataset": "SANS SRL-2018",
-  "source_origin": "base-rd03-memory.img \u2014 vol3 RD03-001",
+  "source_origin": "base-rd03-memory.img — vol3 RD03-001",
   "source_url": "https://sansorg.egnyte.com",
   "carnegie_pattern_expected": null,
   "peirce_expected": "SECONDNESS",
@@ -27,7 +27,7 @@
         "Pattern consistent with staged compromise: initial injection phase (7 processes) followed by operational security reduction to 1 active beacon"
       ],
       "examiner_id": "SANS_HACKATHON_2026",
-      "source_tool": "base-memory.img \u2014 Volatility3 2.28.0 \u2014 vigia_agent.py"
+      "source_tool": "base-memory.img — Volatility3 2.28.0 — vigia_agent.py"
     },
     {
       "artifact_id": "ART-RD03-002",
@@ -35,31 +35,32 @@
       "peirce_layer": "SECONDNESS",
       "content": "vol3 windows.malfind: code injection in 7 processes (PIDs: 8824, 4688, __, 00, 8120 and others). PAGE_EXECUTE_READWRITE regions. Memory acquisition 2018-09-07.",
       "forensic_anomalies": [
-        "Code injection in 7 processes with same +RWX memory signature as other corpus hosts \u2014 identical attacker toolkit confirms same campaign",
+        "Code injection in 7 processes with same +RWX memory signature as other corpus hosts — identical attacker toolkit confirms same campaign",
         "7 injected processes without full LOTL activity: payload established persistence before reducing operational footprint",
-        "First active injection detected 2018-08-17 (from rsydow-a Documents folder timestamps on RD-02) \u2014 RD-03 infected approximately same period"
+        "First active injection detected 2018-08-17 (from rsydow-a Documents folder timestamps on RD-02) — RD-03 infected approximately same period"
       ],
       "examiner_id": "SANS_HACKATHON_2026",
-      "source_tool": "base-memory.img \u2014 Volatility3 2.28.0 \u2014 vigia_agent.py"
+      "source_tool": "base-memory.img — Volatility3 2.28.0 — vigia_agent.py"
     },
     {
       "artifact_id": "ART-RD03-003",
       "type": "log_entry",
       "peirce_layer": "THIRDNESS",
-      "content": "RD-03 in attack chain as propagation target with reduced operational presence. 5 of 6 RD servers compromised (RD-01, RD-03, RD-04, RD-05, RD-06 \u2014 only RD-02 memory clean). Systematic compromise of entire RD server farm confirms attacker goal was broad interactive access, not targeted exfiltration from specific host.",
+      "content": "RD-03 in attack chain as propagation target with reduced operational presence. 5 of 6 RD servers compromised (RD-01, RD-03, RD-04, RD-05, RD-06 — only RD-02 memory clean). Systematic compromise of entire RD server farm confirms attacker goal was broad interactive access, not targeted exfiltration from specific host.",
       "forensic_anomalies": [
-        "5/6 RD servers compromised \u2014 systematic sweep, not opportunistic. Attacker used RD-04 as hub to compromise all available RD servers",
-        "RD-03 low LOTL count (1) vs RD-04 (30) positions it as peripheral node \u2014 attacker allocated C2 resources proportionally to server value",
+        "5/6 RD servers compromised — systematic sweep, not opportunistic. Attacker used RD-04 as hub to compromise all available RD servers",
+        "RD-03 low LOTL count (1) vs RD-04 (30) positions it as peripheral node — attacker allocated C2 resources proportionally to server value",
         "Corpus correlation: all 5 compromised RD servers show identical injection signature, confirming single attacker operating from LARIAT C2 framework on RD-04"
       ],
       "examiner_id": "SANS_HACKATHON_2026",
-      "source_tool": "Corpus cross-analysis \u2014 5 RD server comparison"
+      "source_tool": "Corpus cross-analysis — 5 RD server comparison"
     }
   ],
   "peirce_chain": {
-    "firstness": "RD server in compromised network \u2014 lateral movement target",
-    "secondness": "Code injection in 7 processes confirmed \u2014 deliberate compromise, not accidental",
+    "firstness": "RD server in compromised network — lateral movement target",
+    "secondness": "Code injection in 7 processes confirmed — deliberate compromise, not accidental",
     "thirdness": "Minimal LOTL with moderate injection count suggests RD-03 was a propagation target rather than an operational C2 base. Attacker spread payload across all RD servers systematically."
   },
-  "_consolidation": "VIG\u00cdA-REAL. vol3 RD03-001. Bundle: results/srl2018/RD03-001_bundle.json."
+  "_consolidation": "VIGÍA-REAL. vol3 RD03-001. Bundle: results/srl2018/RD03-001_bundle.json.",
+  "schema_version": 1
 }

@@ -10,7 +10,12 @@
   "peirce_expected": "THIRDNESS",
   "confidence_expected": "HIGH",
   "abstention_risk": "LOW",
-  "expected_mitre_ttps": ["T1071.002", "T1110.003", "T1190", "T1078.002"],
+  "expected_mitre_ttps": [
+    "T1071.002",
+    "T1110.003",
+    "T1190",
+    "T1078.002"
+  ],
   "devil_advocate": "FTP server is DFIR infrastructure — legitimate tools present. Malware upload attempts were blocked and no successful compromise confirmed at this host.",
   "artifacts": [
     {
@@ -75,5 +80,6 @@
     "secondness": "Concrete attacks: Photo.scr malware upload blocked, credential stuffing with exact domain usernames from multiple IPs",
     "thirdness": "Attack pattern (enumeration -> malware upload attempt -> credential stuffing with specific usernames) demonstrates persistent, intelligence-driven threat actor targeting shieldbase.lan / stark-research-labs.com"
   },
-  "_consolidation": "VIGÍA-REAL. Extracted from dmz-ftp-cdrive.E01 via ewfmount+NTFS mount in SANS SIFT. IIS FTP logs analyzed directly from Windows/System32/winevt and inetpub/logs/LogFiles/FTPSVC2/. Chain of custody maintained."
+  "_consolidation": "VIGÍA-REAL. Extracted from dmz-ftp-cdrive.E01 via ewfmount+NTFS mount in SANS SIFT. IIS FTP logs analyzed directly from Windows/System32/winevt and inetpub/logs/LogFiles/FTPSVC2/. Chain of custody maintained.",
+  "schema_version": 1
 }

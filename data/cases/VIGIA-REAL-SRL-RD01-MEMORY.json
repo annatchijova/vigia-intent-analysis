@@ -1,10 +1,10 @@
 {
   "case_id": "VIGIA-REAL-SRL-RD01-MEMORY",
-  "case_name": "SRL-2018 Remote Desktop Server RD-01 \u2014 Memory Forensics",
+  "case_name": "SRL-2018 Remote Desktop Server RD-01 — Memory Forensics",
   "description": "Volatility3 memory analysis. 12 LOTL processes + code injection in 12 processes. Second most heavily compromised RD server after RD-04. 12 LOTL processes indicates active C2 beaconing at time of memory acquisition.",
   "expected_verdict": "MALICE",
   "source_dataset": "SANS SRL-2018",
-  "source_origin": "base-rd01-memory.img \u2014 vol3 RD01-001",
+  "source_origin": "base-rd01-memory.img — vol3 RD01-001",
   "source_url": "https://sansorg.egnyte.com",
   "carnegie_pattern_expected": null,
   "peirce_expected": "SECONDNESS",
@@ -23,25 +23,25 @@
       "peirce_layer": "SECONDNESS",
       "content": "vol3 windows.pslist LOLBAS: 12 living-off-the-land processes detected simultaneously. Multiple cmd.exe, powershell.exe, rundll32.exe instances. Windows 10 Enterprise, acquisition 2018-09-07.",
       "forensic_anomalies": [
-        "12 simultaneous LOTL processes exceeds any legitimate administrative baseline \u2014 typical admin sessions spawn 1-2 at most",
+        "12 simultaneous LOTL processes exceeds any legitimate administrative baseline — typical admin sessions spawn 1-2 at most",
         "Multiple concurrent LOTL instances is the signature of C2 framework (Cobalt Strike/Empire) maintaining multiple beacons or lateral movement threads",
-        "LOTL count (12) matches injection count exactly \u2014 each LOLBAS process is a shellcode container"
+        "LOTL count (12) matches injection count exactly — each LOLBAS process is a shellcode container"
       ],
       "examiner_id": "SANS_HACKATHON_2026",
-      "source_tool": "base-memory.img \u2014 Volatility3 2.28.0 \u2014 vigia_agent.py"
+      "source_tool": "base-memory.img — Volatility3 2.28.0 — vigia_agent.py"
     },
     {
       "artifact_id": "ART-RD01-002",
       "type": "kernel_structure",
       "peirce_layer": "SECONDNESS",
-      "content": "vol3 windows.malfind: code injection in 12 processes (PIDs include: ee, 00, 8128, 30, 6036 and others). PAGE_EXECUTE_READWRITE regions detected \u2014 classic shellcode memory protection signature.",
+      "content": "vol3 windows.malfind: code injection in 12 processes (PIDs include: ee, 00, 8128, 30, 6036 and others). PAGE_EXECUTE_READWRITE regions detected — classic shellcode memory protection signature.",
       "forensic_anomalies": [
-        "Exact correlation between LOTL count (12) and injection count (12) \u2014 each LOLBAS binary is hollowed/injected, consistent with reflective DLL injection or process hollowing",
-        "PAGE_EXECUTE_READWRITE in non-JIT processes is anomalous \u2014 legitimate Windows processes do not allocate +RWX memory outside JIT compilers",
-        "Same injection pattern as RD-03 (7), RD-04 (33), RD-05 (43), RD-06 (4), WKSTN-04 (24) \u2014 identical attacker toolset deployed across all compromised hosts"
+        "Exact correlation between LOTL count (12) and injection count (12) — each LOLBAS binary is hollowed/injected, consistent with reflective DLL injection or process hollowing",
+        "PAGE_EXECUTE_READWRITE in non-JIT processes is anomalous — legitimate Windows processes do not allocate +RWX memory outside JIT compilers",
+        "Same injection pattern as RD-03 (7), RD-04 (33), RD-05 (43), RD-06 (4), WKSTN-04 (24) — identical attacker toolset deployed across all compromised hosts"
       ],
       "examiner_id": "SANS_HACKATHON_2026",
-      "source_tool": "base-memory.img \u2014 Volatility3 2.28.0 \u2014 vigia_agent.py"
+      "source_tool": "base-memory.img — Volatility3 2.28.0 — vigia_agent.py"
     },
     {
       "artifact_id": "ART-RD01-003",
@@ -49,18 +49,19 @@
       "peirce_layer": "THIRDNESS",
       "content": "RD-01 positioned in attack chain as secondary C2 relay. Attack progression: admin (LOTL Jul 2018) -> AV (LOTL, 29 injected) -> RD-04 (primary C2 pivot, 30 LOTL) -> RD-01 (12 LOTL, lateral from RD-04 via RDP). All 5 RD servers compromised with same toolset. RD-01 first login from rsydow-a post-compromise (timeline from RD-02 PowerShell transcripts).",
       "forensic_anomalies": [
-        "RD-01 is second highest LOTL count (12) after RD-04 (30) \u2014 used as active operational platform, not just payload host",
-        "RD server compromise via RDP lateral movement from RD-04 gives attacker interactive GUI access \u2014 higher privilege escalation than server-only compromise",
+        "RD-01 is second highest LOTL count (12) after RD-04 (30) — used as active operational platform, not just payload host",
+        "RD server compromise via RDP lateral movement from RD-04 gives attacker interactive GUI access — higher privilege escalation than server-only compromise",
         "12 LOTL on RD-01 + 30 on RD-04 confirms distributed C2 resilience strategy: killing beacons on one RD server does not disrupt operations on others"
       ],
       "examiner_id": "SANS_HACKATHON_2026",
-      "source_tool": "Corpus cross-analysis \u2014 RD-02 PowerShell transcripts + vol3 multi-host comparison"
+      "source_tool": "Corpus cross-analysis — RD-02 PowerShell transcripts + vol3 multi-host comparison"
     }
   ],
   "peirce_chain": {
-    "firstness": "RD server in compromised network \u2014 interactive access target for attacker",
-    "secondness": "12 LOTL + 12 code injection confirmed by vol3 \u2014 systematic compromise, not opportunistic",
+    "firstness": "RD server in compromised network — interactive access target for attacker",
+    "secondness": "12 LOTL + 12 code injection confirmed by vol3 — systematic compromise, not opportunistic",
     "thirdness": "Equal LOTL and injection counts indicate deliberate framework deployment: each LOLBAS process is a shellcode container. Attacker established interactive RDP foothold on RD-01."
   },
-  "_consolidation": "VIG\u00cdA-REAL. vol3 RD01-001. Bundle: results/srl2018/RD01-001_bundle.json."
+  "_consolidation": "VIGÍA-REAL. vol3 RD01-001. Bundle: results/srl2018/RD01-001_bundle.json.",
+  "schema_version": 1
 }

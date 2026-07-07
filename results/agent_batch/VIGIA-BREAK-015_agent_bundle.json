@@ -1,15 +1,15 @@
 {
   "agent_verdict": "INTENT",
-  "analysis_timestamp": "2026-07-07T17:24:28.187520+00:00",
+  "analysis_timestamp": "2026-07-07T17:54:42.568126+00:00",
   "audit_trail": {
     "agent_version": "1.0.0-SANS-2026",
     "case_id": "VIGIA-BREAK-015",
-    "end_time": "2026-07-07T17:24:28.187527+00:00",
+    "end_time": "2026-07-07T17:54:42.568132+00:00",
     "entries": [
       {
         "action": "AGENT_INITIALIZED",
         "case_id": "VIGIA-BREAK-015",
-        "entry_sha256": "26c635268f1d85094a69719d4381de9ae84a609ca7b12129b326de5601a0edb0",
+        "entry_sha256": "ea191d63a6935275c7137100d00a1549b51007f885209db3d8c05f545b7294d0",
         "inputs_summary": {
           "agent_file": "/home/user/vigia-intent-analysis/vigia_agent.py",
           "case_id": "VIGIA-BREAK-015"
@@ -21,13 +21,13 @@
           "agent_version": "1.0.0-SANS-2026"
         },
         "seq": 1,
-        "timestamp": "2026-07-07T17:24:28.031575+00:00",
+        "timestamp": "2026-07-07T17:54:42.404711+00:00",
         "tool": "vigia_agent"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-BREAK-015",
-        "entry_sha256": "74290ddbb6bec5babeabc10636a12813108e95376cec2e33b1e60a686ee72d52",
+        "entry_sha256": "1953034b9c6255adb9b332d75bfae8e36269ded4301e4df0a2f7f8d4ad2e11d1",
         "inputs_summary": {
           "path": "/home/user/vigia-intent-analysis/data/cases/VIGIA-BREAK-015.json"
         },
@@ -35,29 +35,29 @@
         "note": "Computing SHA-256 of original evidence",
         "outputs_summary": {},
         "seq": 2,
-        "timestamp": "2026-07-07T17:24:28.031740+00:00",
+        "timestamp": "2026-07-07T17:54:42.404844+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-BREAK-015",
-        "entry_sha256": "1db50d6f5d7e4c92987c517de654880978a930fe2c285bfb4d8e09c81b5ffc5c",
+        "entry_sha256": "ccec2e13f385e551ac5f0a2cdf23c25a6d96ef8dd6bdb4f4ffaec5cb7372b3ce",
         "inputs_summary": {
           "path": "/home/user/vigia-intent-analysis/data/cases/VIGIA-BREAK-015.json"
         },
         "iteration": 0,
-        "note": "Evidence verified: 7ff146c5bde9919a...",
+        "note": "Evidence verified: 343779c28fd46804...",
         "outputs_summary": {
-          "sha256": "7ff146c5bde9919a6303921e87d54849672b6acdae7e946ef11e3d68b22931c1"
+          "sha256": "343779c28fd468042a4a849b6d491fb51755e6a797287de9fed06c9b012e9979"
         },
         "seq": 3,
-        "timestamp": "2026-07-07T17:24:28.031887+00:00",
+        "timestamp": "2026-07-07T17:54:42.404961+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "PIPELINE_EXECUTE",
         "case_id": "VIGIA-BREAK-015",
-        "entry_sha256": "e973dce14407958d3ed96faf5cfdb752cc18a2a3172aa896652788f4eecf724e",
+        "entry_sha256": "cd3972a430d63bf91b0855fe81062078158fc359f1d93e9d69944a9f812064fa",
         "inputs_summary": {
           "evidence": "/home/user/vigia-intent-analysis/data/cases/VIGIA-BREAK-015.json",
           "iteration": "0",
@@ -67,13 +67,13 @@
         "note": "Executing pipeline \u2014 iteration 0",
         "outputs_summary": {},
         "seq": 4,
-        "timestamp": "2026-07-07T17:24:28.032093+00:00",
+        "timestamp": "2026-07-07T17:54:42.405142+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "PIPELINE_COMPLETE",
         "case_id": "VIGIA-BREAK-015",
-        "entry_sha256": "c28f4420e37beac7a57ae5766a12128dc809e94b820b089d23a2a5387a29697c",
+        "entry_sha256": "a9449b835353574e27911aba6227e9be2d1fe5b49bd979323d10a738edf78309",
         "inputs_summary": {
           "iteration": "0"
         },
@@ -146,13 +146,13 @@
           ]
         },
         "seq": 5,
-        "timestamp": "2026-07-07T17:24:28.186867+00:00",
+        "timestamp": "2026-07-07T17:54:42.567555+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "CONTRADICTION_CHECK",
         "case_id": "VIGIA-BREAK-015",
-        "entry_sha256": "6ca288003ebb74cdf504d2cc8bf705abd80295f51b5a4f320e0c69559c5c7258",
+        "entry_sha256": "eacbeb2c4439f81111b58ef880c7e30d6e66d9a318324bdb0e5feb07a70fa8a8",
         "inputs_summary": {
           "n_signals": "5"
         },
@@ -163,13 +163,13 @@
           "threshold": "2"
         },
         "seq": 6,
-        "timestamp": "2026-07-07T17:24:28.187084+00:00",
+        "timestamp": "2026-07-07T17:54:42.567766+00:00",
         "tool": "contradiction_detector"
       },
       {
         "action": "AGENT_EXIT",
         "case_id": "VIGIA-BREAK-015",
-        "entry_sha256": "def0d3ef4c4e71b25b78efd0cf79a8a482ed1b4e05a1ea4348bc0b946b405c31",
+        "entry_sha256": "2827b714af30bc4b64a3fc3d8d982b7751c43c0a0df13a152ebbc659e2cda2fe",
         "inputs_summary": {
           "verdict": "SUSPICION_DETECTED"
         },
@@ -180,18 +180,18 @@
           "exit_code": "3"
         },
         "seq": 7,
-        "timestamp": "2026-07-07T17:24:28.187438+00:00",
+        "timestamp": "2026-07-07T17:54:42.568057+00:00",
         "tool": "vigia_agent"
       }
     ],
-    "start_time": "2026-07-07T17:24:28.031047+00:00",
+    "start_time": "2026-07-07T17:54:42.404370+00:00",
     "total_entries": 7
   },
   "case_id": "VIGIA-BREAK-015",
   "evidence_path": "/home/user/vigia-intent-analysis/data/cases/VIGIA-BREAK-015.json",
-  "evidence_sha256": "7ff146c5bde9919a6303921e87d54849672b6acdae7e946ef11e3d68b22931c1",
+  "evidence_sha256": "343779c28fd468042a4a849b6d491fb51755e6a797287de9fed06c9b012e9979",
   "iterations_executed": 1,
-  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-BREAK-015 ===\nEvidence: /home/user/vigia-intent-analysis/data/cases/VIGIA-BREAK-015.json\nEvidence SHA-256: 7ff146c5bde9919a6303921e87d54849672b6acdae7e946ef11e3d68b22931c1\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: SUSPICION_DETECTED\nPosterior confidence: 12/25\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 5 se\u00f1al(es): 5 primaria(s) de ['sift_biometric_verifier', 'sift_cctv_forensic', 'sift_hr_system', 'sift_vpn_gateway'], 0 derivada(s)/no-analizada(s). Top z: Forensic video analysis: subject in CAM-=0.81, Successful VPN login by 'jdoe' from IP 1=0.18, jdoe badged into physical office at 08:0=0.05.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: SUSPICION_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\n99% of human experts would conclude MALICE. Evidence is sufficient, unambiguous, non-contradictory, with no missing data. But VIG\u00cdA might detect minimal formal uncertainty and emit ABSTAIN from excessive rigour.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Forensic video analysis: subject in CAM-OFFICE-03 has birthmark on lef] z=0.807 conf=0.85 \u2014 \n  [Successful VPN login by 'jdoe' from IP 185.220.101.42 (Tor exit node)] z=0.176 conf=0.20 \u2014 \n  [jdoe badged into physical office at 08:00. No badge-out recorded.] z=0.048 conf=0.95 \u2014 \n  [Successful VPN login by 'jdoe' from IP 10.0.1.50 (office)] z=0.045 conf=0.90 \u2014 \n  [Security camera video: user 'jdoe' at their desk, timestamp 14:30:00] z=0.035 conf=0.70 \u2014 \n\n--- FINAL ALERT LEVEL ---\nMEDIUM \u2014 INTENT verdict with individual z-scores below threshold. Alert floored (B-028/B-065): an intent finding cannot present as LOW.\nReconciliation: verdict INTENT rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 5 | Derived: 0 | Total: 5",
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-BREAK-015 ===\nEvidence: /home/user/vigia-intent-analysis/data/cases/VIGIA-BREAK-015.json\nEvidence SHA-256: 343779c28fd468042a4a849b6d491fb51755e6a797287de9fed06c9b012e9979\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: SUSPICION_DETECTED\nPosterior confidence: 12/25\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 5 se\u00f1al(es): 5 primaria(s) de ['sift_biometric_verifier', 'sift_cctv_forensic', 'sift_hr_system', 'sift_vpn_gateway'], 0 derivada(s)/no-analizada(s). Top z: Forensic video analysis: subject in CAM-=0.81, Successful VPN login by 'jdoe' from IP 1=0.18, jdoe badged into physical office at 08:0=0.05.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: SUSPICION_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\n99% of human experts would conclude MALICE. Evidence is sufficient, unambiguous, non-contradictory, with no missing data. But VIG\u00cdA might detect minimal formal uncertainty and emit ABSTAIN from excessive rigour.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Forensic video analysis: subject in CAM-OFFICE-03 has birthmark on lef] z=0.807 conf=0.85 \u2014 \n  [Successful VPN login by 'jdoe' from IP 185.220.101.42 (Tor exit node)] z=0.176 conf=0.20 \u2014 \n  [jdoe badged into physical office at 08:00. No badge-out recorded.] z=0.048 conf=0.95 \u2014 \n  [Successful VPN login by 'jdoe' from IP 10.0.1.50 (office)] z=0.045 conf=0.90 \u2014 \n  [Security camera video: user 'jdoe' at their desk, timestamp 14:30:00] z=0.035 conf=0.70 \u2014 \n\n--- FINAL ALERT LEVEL ---\nMEDIUM \u2014 INTENT verdict with individual z-scores below threshold. Alert floored (B-028/B-065): an intent finding cannot present as LOW.\nReconciliation: verdict INTENT rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 5 | Derived: 0 | Total: 5",
   "pipeline_results": {
     "abduction": {
       "best_hypothesis": "SUSPICION_DETECTED",

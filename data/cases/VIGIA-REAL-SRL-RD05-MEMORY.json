@@ -10,7 +10,11 @@
   "peirce_expected": "SECONDNESS",
   "confidence_expected": "HIGH",
   "abstention_risk": "LOW",
-  "expected_mitre_ttps": ["T1055", "T1059.001", "T1021.001"],
+  "expected_mitre_ttps": [
+    "T1055",
+    "T1059.001",
+    "T1021.001"
+  ],
   "devil_advocate": "RD server is high-traffic by nature — some code injection may be legitimate. LOTL processes could be admin activity.",
   "artifacts": [
     {
@@ -52,5 +56,6 @@
     "secondness": "43 processes with code injection confirmed by vol3 malfind, 3 LOTL processes active",
     "thirdness": "Most severely compromised host in SRL-2018 corpus — attacker established persistent interactive foothold via RDP after compromising AV and admin servers"
   },
-  "_consolidation": "VIGÍA-REAL. vol3 analysis via vigia_agent.py with z-score sigma scale. Bundle: RD05-003_bundle.json"
+  "_consolidation": "VIGÍA-REAL. vol3 analysis via vigia_agent.py with z-score sigma scale. Bundle: RD05-003_bundle.json",
+  "schema_version": 1
 }

@@ -1,15 +1,15 @@
 {
   "agent_verdict": "NOISE",
-  "analysis_timestamp": "2026-07-07T17:24:52.862780+00:00",
+  "analysis_timestamp": "2026-07-07T17:55:07.913082+00:00",
   "audit_trail": {
     "agent_version": "1.0.0-SANS-2026",
     "case_id": "VIGIA-BEN-006",
-    "end_time": "2026-07-07T17:24:52.862786+00:00",
+    "end_time": "2026-07-07T17:55:07.913088+00:00",
     "entries": [
       {
         "action": "AGENT_INITIALIZED",
         "case_id": "VIGIA-BEN-006",
-        "entry_sha256": "fd92fcd3d47042e95de9c66e843c7e8b47b4ee6c79573cd9c20f0ae8350b7841",
+        "entry_sha256": "713db0a0524a2d16913a791df4139e893e679746a1d7c5c6a46a9e68722d0fcb",
         "inputs_summary": {
           "agent_file": "/home/user/vigia-intent-analysis/vigia_agent.py",
           "case_id": "VIGIA-BEN-006"
@@ -21,13 +21,13 @@
           "agent_version": "1.0.0-SANS-2026"
         },
         "seq": 1,
-        "timestamp": "2026-07-07T17:24:52.720933+00:00",
+        "timestamp": "2026-07-07T17:55:07.770122+00:00",
         "tool": "vigia_agent"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-BEN-006",
-        "entry_sha256": "d53f451d5e03d3b7c96467599968cbe85fe9fe5c39d7cff6f34102d7cfc5ef7f",
+        "entry_sha256": "4dd7648c73795bfda1eeafc2221f3ca426e8d32a5f7350950c296bc2a670cb50",
         "inputs_summary": {
           "path": "/home/user/vigia-intent-analysis/data/cases/converted/VIGIA-BEN-006.json"
         },
@@ -35,29 +35,29 @@
         "note": "Computing SHA-256 of original evidence",
         "outputs_summary": {},
         "seq": 2,
-        "timestamp": "2026-07-07T17:24:52.721091+00:00",
+        "timestamp": "2026-07-07T17:55:07.770262+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-BEN-006",
-        "entry_sha256": "8515350f4fe0a7406ad1dbf127f24e507d3b20a71d446253704ede6914374d96",
+        "entry_sha256": "0c9b788cc92e3c4a548d7f6339c9a408ee60c25a09b255468cc3f88521494f77",
         "inputs_summary": {
           "path": "/home/user/vigia-intent-analysis/data/cases/converted/VIGIA-BEN-006.json"
         },
         "iteration": 0,
-        "note": "Evidence verified: 4be8c88d1fd2a14a...",
+        "note": "Evidence verified: 71de51f569cf9287...",
         "outputs_summary": {
-          "sha256": "4be8c88d1fd2a14aa321029c653ebf6c0ca32ccc712701363f7567f4b3921f8c"
+          "sha256": "71de51f569cf9287f0b84ffe535c2dd53ac52a5c48e8e3ef455a5752b7972640"
         },
         "seq": 3,
-        "timestamp": "2026-07-07T17:24:52.721261+00:00",
+        "timestamp": "2026-07-07T17:55:07.770383+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "PIPELINE_EXECUTE",
         "case_id": "VIGIA-BEN-006",
-        "entry_sha256": "43263c1bb45eff00294ac56172b57d01dd0e51bb409047b99e8e5000cb9d9052",
+        "entry_sha256": "592978adb9d23d8def9c99b2dca9d5aba4b1cba9fcfd2914e4892d632069152d",
         "inputs_summary": {
           "evidence": "/home/user/vigia-intent-analysis/data/cases/converted/VIGIA-BEN-006.json",
           "iteration": "0",
@@ -67,13 +67,13 @@
         "note": "Executing pipeline \u2014 iteration 0",
         "outputs_summary": {},
         "seq": 4,
-        "timestamp": "2026-07-07T17:24:52.721467+00:00",
+        "timestamp": "2026-07-07T17:55:07.770593+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "PIPELINE_COMPLETE",
         "case_id": "VIGIA-BEN-006",
-        "entry_sha256": "9831e703b342bd8a43c4b7495f138e82c0066ec249203e637671bd23904b9d95",
+        "entry_sha256": "1f666c3e32c105dfdbe1101c995070e44fc69761d8451e1edc482ef41e2dba0c",
         "inputs_summary": {
           "iteration": "0"
         },
@@ -130,13 +130,13 @@
           ]
         },
         "seq": 5,
-        "timestamp": "2026-07-07T17:24:52.862182+00:00",
+        "timestamp": "2026-07-07T17:55:07.912543+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "CONTRADICTION_CHECK",
         "case_id": "VIGIA-BEN-006",
-        "entry_sha256": "ab737e8aec04c1889357def5d21a3f706157355af3a216f191e6911c4720444c",
+        "entry_sha256": "0afa422958ff4ad85f72415c345ea78a76d0ff1bbd8d44b4afb7c5b5ec5a827a",
         "inputs_summary": {
           "n_signals": "3"
         },
@@ -147,13 +147,13 @@
           "threshold": "2"
         },
         "seq": 6,
-        "timestamp": "2026-07-07T17:24:52.862400+00:00",
+        "timestamp": "2026-07-07T17:55:07.912738+00:00",
         "tool": "contradiction_detector"
       },
       {
         "action": "AGENT_EXIT",
         "case_id": "VIGIA-BEN-006",
-        "entry_sha256": "69324dcebd1b9e33fad6c1e4ee50107edbc6fba1f2f8c8707e2334b7968d8ae8",
+        "entry_sha256": "91ba161ab79b22a8fbabb924eac6e5408508532e4b63b19706a117e396358855",
         "inputs_summary": {
           "verdict": "NO_SEMIOTIC_ANOMALY_DETECTED"
         },
@@ -164,18 +164,18 @@
           "exit_code": "0"
         },
         "seq": 7,
-        "timestamp": "2026-07-07T17:24:52.862695+00:00",
+        "timestamp": "2026-07-07T17:55:07.913009+00:00",
         "tool": "vigia_agent"
       }
     ],
-    "start_time": "2026-07-07T17:24:52.720373+00:00",
+    "start_time": "2026-07-07T17:55:07.769779+00:00",
     "total_entries": 7
   },
   "case_id": "VIGIA-BEN-006",
   "evidence_path": "/home/user/vigia-intent-analysis/data/cases/converted/VIGIA-BEN-006.json",
-  "evidence_sha256": "4be8c88d1fd2a14aa321029c653ebf6c0ca32ccc712701363f7567f4b3921f8c",
+  "evidence_sha256": "71de51f569cf9287f0b84ffe535c2dd53ac52a5c48e8e3ef455a5752b7972640",
   "iterations_executed": 1,
-  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-BEN-006 ===\nEvidence: /home/user/vigia-intent-analysis/data/cases/converted/VIGIA-BEN-006.json\nEvidence SHA-256: 4be8c88d1fd2a14aa321029c653ebf6c0ca32ccc712701363f7567f4b3921f8c\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: NO_SEMIOTIC_ANOMALY_DETECTED\nPosterior confidence: 19/20\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 3 se\u00f1al(es): 3 primaria(s) de ['legacy_converter'], 0 derivada(s)/no-analizada(s). Top z: Post-maintenance report: Carlos Rodrigue=0.85, Calendar event: 'DB Server Maintenance \u2014=0.72, sudo systemctl restart postgresql | sudo=0.49.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: NO_SEMIOTIC_ANOMALY_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nLogs muestran 12 ejecuciones de sudo en 2 horas. Es el mantenimiento mensual del servidor de base de datos, programado en calendario compartido, con ticket de change approval.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Post-maintenance report: Carlos Rodriguez | 'PostgreSQL updated to 15.] z=0.855 conf=0.90 \u2014 \n  [Calendar event: 'DB Server Maintenance \u2014 Carlos Rodriguez' | Date: 202] z=0.723 conf=0.85 \u2014 \n  [sudo systemctl restart postgresql | sudo apt update | sudo apt upgrade] z=0.490 conf=0.70 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 3 | Derived: 0 | Total: 3",
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-BEN-006 ===\nEvidence: /home/user/vigia-intent-analysis/data/cases/converted/VIGIA-BEN-006.json\nEvidence SHA-256: 71de51f569cf9287f0b84ffe535c2dd53ac52a5c48e8e3ef455a5752b7972640\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: NO_SEMIOTIC_ANOMALY_DETECTED\nPosterior confidence: 19/20\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 3 se\u00f1al(es): 3 primaria(s) de ['legacy_converter'], 0 derivada(s)/no-analizada(s). Top z: Post-maintenance report: Carlos Rodrigue=0.85, Calendar event: 'DB Server Maintenance \u2014=0.72, sudo systemctl restart postgresql | sudo=0.49.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: NO_SEMIOTIC_ANOMALY_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nLogs muestran 12 ejecuciones de sudo en 2 horas. Es el mantenimiento mensual del servidor de base de datos, programado en calendario compartido, con ticket de change approval.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Post-maintenance report: Carlos Rodriguez | 'PostgreSQL updated to 15.] z=0.855 conf=0.90 \u2014 \n  [Calendar event: 'DB Server Maintenance \u2014 Carlos Rodriguez' | Date: 202] z=0.723 conf=0.85 \u2014 \n  [sudo systemctl restart postgresql | sudo apt update | sudo apt upgrade] z=0.490 conf=0.70 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 3 | Derived: 0 | Total: 3",
   "pipeline_results": {
     "abduction": {
       "best_hypothesis": "NO_SEMIOTIC_ANOMALY_DETECTED",

@@ -4345,3 +4345,54 @@ found by exhaustive search). Suite green, corpus 166/199, 0 flips.
 
 **Validation:** suite green per tanda; the post-TANDA-4 corpus (152/199) is
 the honest baseline on which Fase 2 (B-077) measured its +13.
+
+---
+
+## B-085 — Schema-aware validator + acquisition metadata batch (WHAT_IS_NEXT §1.1.2) [RESOLVED]
+
+| Field | Value |
+|-------|-------|
+| **Status** | RESOLVED — POST HACKATHON (2026-07-07) |
+| **Severity** | P2 — corpus hygiene; precondition for the calibration dataset (Tanda C / A4) |
+| **File** | `validate_case.py`, `scripts/complete_acquisition_metadata.py` (new), 145 corpus cases |
+| **Antecedent** | AUDITORIA_MOTOR_SIN_LABEL §1 (54/199 PASS) and §3 (causal hypothesis already refuted: missing metadata ≠ FP/FN) |
+
+**Abduction (the headline hid two distinct defects):** the "145/199 FAIL"
+mixed (a) legitimately incomplete EBS cases and (b) **false positives from the
+validator itself**: the corpus has TWO artifact schemas — EBS-signals
+(raw_score → CAIE) and narrative/semiotic (content/peirce_layer → text path) —
+and validate_case.py only knew the first. The audit's 41
+"raw_score=-1 out of range" errors were the validator's own DEFAULT applied to
+narrative artifacts without raw_score. Classified census: 90 EBS acq-ok,
+85 EBS missing acq, 24 narrative/mixed.
+
+**Fix 1 — schema-aware validator:** `artifact_schema()` discriminates by the
+signal (raw_score present → EBS contract; content/forensic_anomalies →
+minimal narrative contract: artifact_id + interpretable content; neither →
+unrecognizable schema error). The EBS contract is EXACTLY unchanged. Bonus:
+module-level accumulator reset (a second in-process call carried over errors).
+
+**Fix 2 — honest additive batch (L-037 doctrine):** the script does NOT
+fabricate physical provenance — it documents the real one: `acquisition_tool`
+= `_migration_note` method or an explicit corpus-case declaration;
+`acquisition_hash` = sha256 of the SOURCE bundle when it exists on disk,
+otherwise artifact self-attestation (with `acquisition_note` declaring what
+the hash covers); `acquisition_timestamp` = migration date or this
+retroactive documentation date; `write_blocker_used=False` (no physical
+medium). It only ADDS missing fields on non-context EBS artifacts; never
+overwrites; does not touch narrative artifacts. 145 cases touched.
+
+**Induction (gates):**
+- Validator: 54/199 → **194/199 PASS**. The 5 remaining are real shape
+  defects: OWL-NEXUS5 (20 narrative artifacts without artifact_id),
+  NPS-2010-EMAILS ×2 and NPS-2014-USB (EBS artifacts without timestamp),
+  CTF-2021-iOS — documented, NOT blindly patched.
+- Suite **876 passed** (+10 validator tests, 4 red pre-fix).
+- Corpus **166/199 — 0 regressions**. 2 movements without pass/fail change,
+  both mechanism-coherent (metadata present → acquisition_assurance up →
+  trust up): VIGIA-MAGNET-2022-iOS-JESS NOISE→SUSPICION (expected INTENT:
+  **one rung closer to ground truth** — a documented FN) and
+  VIGIA-CTF-2021-iOS NOISE→MALICE (expected UNKNOWN, auto-passes; 3-band jump
+  noted for label review in Tanda C).
+
+**Tests:** `tests/test_validator_schema_aware.py` (10; red first).

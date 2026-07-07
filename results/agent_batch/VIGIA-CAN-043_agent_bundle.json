@@ -1,15 +1,15 @@
 {
   "agent_verdict": "MALICE",
-  "analysis_timestamp": "2026-07-07T17:25:11.873487+00:00",
+  "analysis_timestamp": "2026-07-07T17:55:27.952164+00:00",
   "audit_trail": {
     "agent_version": "1.0.0-SANS-2026",
     "case_id": "VIGIA-CAN-043",
-    "end_time": "2026-07-07T17:25:11.873495+00:00",
+    "end_time": "2026-07-07T17:55:27.952172+00:00",
     "entries": [
       {
         "action": "AGENT_INITIALIZED",
         "case_id": "VIGIA-CAN-043",
-        "entry_sha256": "8efc6b57558d298ff92f0ed959ea0a87d25320c33ef19570eb1c56ed38ee3fea",
+        "entry_sha256": "500bc3df8e7bb6d7ba778c17e2394d4a518ddafd4993fe193c4ed29d742479d8",
         "inputs_summary": {
           "agent_file": "/home/user/vigia-intent-analysis/vigia_agent.py",
           "case_id": "VIGIA-CAN-043"
@@ -21,13 +21,13 @@
           "agent_version": "1.0.0-SANS-2026"
         },
         "seq": 1,
-        "timestamp": "2026-07-07T17:25:11.711885+00:00",
+        "timestamp": "2026-07-07T17:55:27.796299+00:00",
         "tool": "vigia_agent"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-CAN-043",
-        "entry_sha256": "a658a80c1e28a3875f15a6f8de52ed25420af02e26b287639bb483f33980b519",
+        "entry_sha256": "ee731a033880e8c3717a85dae070d821e4ffa06103c309772e2f4e520f38dfa0",
         "inputs_summary": {
           "path": "/home/user/vigia-intent-analysis/data/cases/consolidated_canonical/VIGIA-CAN-043.json"
         },
@@ -35,29 +35,29 @@
         "note": "Computing SHA-256 of original evidence",
         "outputs_summary": {},
         "seq": 2,
-        "timestamp": "2026-07-07T17:25:11.712038+00:00",
+        "timestamp": "2026-07-07T17:55:27.796420+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-CAN-043",
-        "entry_sha256": "db3d04ca8317740d9920acadee3d08d4a07a735bf25401dcc9779bd6b806d576",
+        "entry_sha256": "4f6d038d749dac7192b691de6dcd2e19567cb5f95a29bd738b84343a89e9cadb",
         "inputs_summary": {
           "path": "/home/user/vigia-intent-analysis/data/cases/consolidated_canonical/VIGIA-CAN-043.json"
         },
         "iteration": 0,
-        "note": "Evidence verified: d33eede91b9bdbe5...",
+        "note": "Evidence verified: c6b00d2bd00bd02b...",
         "outputs_summary": {
-          "sha256": "d33eede91b9bdbe5cd6a28c1eab4038d1a6acf65bad8dffd8a6040ad490e0bb4"
+          "sha256": "c6b00d2bd00bd02b996dd6b47c6d2b4d0773ef9ea029495ce90145ff00123c20"
         },
         "seq": 3,
-        "timestamp": "2026-07-07T17:25:11.712212+00:00",
+        "timestamp": "2026-07-07T17:55:27.796527+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "PIPELINE_EXECUTE",
         "case_id": "VIGIA-CAN-043",
-        "entry_sha256": "fc97160897c64129bd4d1687dcb31fbde8a182996c9fdcc76be6ce6d4afb4c5d",
+        "entry_sha256": "48a6050cbcd6a6a26c21f6b8fdd9a792b46439e8a79e4624297b8a2c3069775f",
         "inputs_summary": {
           "evidence": "/home/user/vigia-intent-analysis/data/cases/consolidated_canonical/VIGIA-CAN-043.json",
           "iteration": "0",
@@ -67,13 +67,13 @@
         "note": "Executing pipeline \u2014 iteration 0",
         "outputs_summary": {},
         "seq": 4,
-        "timestamp": "2026-07-07T17:25:11.712436+00:00",
+        "timestamp": "2026-07-07T17:55:27.796747+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "PIPELINE_COMPLETE",
         "case_id": "VIGIA-CAN-043",
-        "entry_sha256": "5a085f5c64fb959cb1ca544bbc02beefabfd115e1c4556ec54ffd091fbca8d2f",
+        "entry_sha256": "8977dc46f3bb1052a95d78e8b428b3c574684b51e77cc58829d7070f00c8bcae",
         "inputs_summary": {
           "iteration": "0"
         },
@@ -138,13 +138,13 @@
           ]
         },
         "seq": 5,
-        "timestamp": "2026-07-07T17:25:11.872739+00:00",
+        "timestamp": "2026-07-07T17:55:27.951376+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "CONTRADICTION_CHECK",
         "case_id": "VIGIA-CAN-043",
-        "entry_sha256": "9762840a97e30a2a5df206d4a9097449b94251ece25bc5de4d15031a64d83217",
+        "entry_sha256": "474b10ac8449aa5d3b6928ea48325dcfbb2ee987b7f665f3ca9ef1232fd6651f",
         "inputs_summary": {
           "n_signals": "4"
         },
@@ -155,13 +155,13 @@
           "threshold": "2"
         },
         "seq": 6,
-        "timestamp": "2026-07-07T17:25:11.872920+00:00",
+        "timestamp": "2026-07-07T17:55:27.951562+00:00",
         "tool": "contradiction_detector"
       },
       {
         "action": "AGENT_EXIT",
         "case_id": "VIGIA-CAN-043",
-        "entry_sha256": "dab15d58026c571abd30c71ec0cb0ddc61ebbb7a6e4c37abf3342555461367f8",
+        "entry_sha256": "377ae6efb0f06f76cdabee740a5e6fe15565bf05a274ecdcdb855efe7657c5da",
         "inputs_summary": {
           "verdict": "MALICIOUS_INTENT_DETECTED"
         },
@@ -172,18 +172,18 @@
           "exit_code": "1"
         },
         "seq": 7,
-        "timestamp": "2026-07-07T17:25:11.873230+00:00",
+        "timestamp": "2026-07-07T17:55:27.951880+00:00",
         "tool": "vigia_agent"
       }
     ],
-    "start_time": "2026-07-07T17:25:11.711372+00:00",
+    "start_time": "2026-07-07T17:55:27.795972+00:00",
     "total_entries": 7
   },
   "case_id": "VIGIA-CAN-043",
   "evidence_path": "/home/user/vigia-intent-analysis/data/cases/consolidated_canonical/VIGIA-CAN-043.json",
-  "evidence_sha256": "d33eede91b9bdbe5cd6a28c1eab4038d1a6acf65bad8dffd8a6040ad490e0bb4",
+  "evidence_sha256": "c6b00d2bd00bd02b996dd6b47c6d2b4d0773ef9ea029495ce90145ff00123c20",
   "iterations_executed": 1,
-  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-CAN-043 ===\nEvidence: /home/user/vigia-intent-analysis/data/cases/consolidated_canonical/VIGIA-CAN-043.json\nEvidence SHA-256: d33eede91b9bdbe5cd6a28c1eab4038d1a6acf65bad8dffd8a6040ad490e0bb4\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 77/100\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 4 se\u00f1al(es): 4 primaria(s) de ['sift_chat_system', 'sift_linguistic', 'sift_syslog'], 0 derivada(s)/no-analizada(s). Top z: Use of exact internal analyst jargon: 'l=0.12, svc_backup password reset executed by ti=0.04, Support chat: user starts with 'Hi, I ne=0.01.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: MALICIOUS_INTENT_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nUser contacts technical support for an admin password reset. Excessively polite, provides all technical details before being asked, uses the analyst's exact jargon, and praises the operator.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Use of exact internal analyst jargon: 'let's rotate the hash', 'I need] z=0.123 conf=0.15 \u2014 \n  [svc_backup password reset executed by tier2_009 without an approved ch] z=0.036 conf=0.45 \u2014 \n  [Support chat: user starts with 'Hi, I need an admin password reset for] z=0.015 conf=0.30 \u2014 \n  [Flattery messages: 'You're the best on the team, you helped me last ti] z=0.015 conf=0.25 \u2014 \n\n--- FINAL ALERT LEVEL ---\nHIGH \u2014 MALICE verdict from Bayesian posterior aggregation. Individual z-scores below threshold (distributed evidence pattern: no single dominant signal, but aggregate posterior is decisive). Alert floored (B-028/B-065).\nReconciliation: verdict MALICE rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 4 | Derived: 0 | Total: 4",
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-CAN-043 ===\nEvidence: /home/user/vigia-intent-analysis/data/cases/consolidated_canonical/VIGIA-CAN-043.json\nEvidence SHA-256: c6b00d2bd00bd02b996dd6b47c6d2b4d0773ef9ea029495ce90145ff00123c20\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 77/100\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 4 se\u00f1al(es): 4 primaria(s) de ['sift_chat_system', 'sift_linguistic', 'sift_syslog'], 0 derivada(s)/no-analizada(s). Top z: Use of exact internal analyst jargon: 'l=0.12, svc_backup password reset executed by ti=0.04, Support chat: user starts with 'Hi, I ne=0.01.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: MALICIOUS_INTENT_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nUser contacts technical support for an admin password reset. Excessively polite, provides all technical details before being asked, uses the analyst's exact jargon, and praises the operator.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Use of exact internal analyst jargon: 'let's rotate the hash', 'I need] z=0.123 conf=0.15 \u2014 \n  [svc_backup password reset executed by tier2_009 without an approved ch] z=0.036 conf=0.45 \u2014 \n  [Support chat: user starts with 'Hi, I need an admin password reset for] z=0.015 conf=0.30 \u2014 \n  [Flattery messages: 'You're the best on the team, you helped me last ti] z=0.015 conf=0.25 \u2014 \n\n--- FINAL ALERT LEVEL ---\nHIGH \u2014 MALICE verdict from Bayesian posterior aggregation. Individual z-scores below threshold (distributed evidence pattern: no single dominant signal, but aggregate posterior is decisive). Alert floored (B-028/B-065).\nReconciliation: verdict MALICE rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 4 | Derived: 0 | Total: 4",
   "pipeline_results": {
     "abduction": {
       "best_hypothesis": "MALICIOUS_INTENT_DETECTED",

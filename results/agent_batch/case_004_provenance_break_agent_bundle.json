@@ -1,15 +1,15 @@
 {
   "agent_verdict": "NOISE",
-  "analysis_timestamp": "2026-07-07T17:24:48.609925+00:00",
+  "analysis_timestamp": "2026-07-07T17:55:03.533370+00:00",
   "audit_trail": {
     "agent_version": "1.0.0-SANS-2026",
     "case_id": "case_004_provenance_break",
-    "end_time": "2026-07-07T17:24:48.609931+00:00",
+    "end_time": "2026-07-07T17:55:03.533376+00:00",
     "entries": [
       {
         "action": "AGENT_INITIALIZED",
         "case_id": "case_004_provenance_break",
-        "entry_sha256": "a980562da1192dd3f59764db579c2e6fe7da6ddd1ae5298986fce6b4d2433783",
+        "entry_sha256": "6d158d4669156ba12cbf778484a3d2e7297d675ebffde44d72381ab81507de32",
         "inputs_summary": {
           "agent_file": "/home/user/vigia-intent-analysis/vigia_agent.py",
           "case_id": "case_004_provenance_break"
@@ -21,13 +21,13 @@
           "agent_version": "1.0.0-SANS-2026"
         },
         "seq": 1,
-        "timestamp": "2026-07-07T17:24:48.473586+00:00",
+        "timestamp": "2026-07-07T17:55:03.381634+00:00",
         "tool": "vigia_agent"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "case_004_provenance_break",
-        "entry_sha256": "134f0f704759f5512959d9c52226b36c21ec467ddf967cfacc1abb366dfb4184",
+        "entry_sha256": "5000c3bd2f807a0855870d7ecea5f0ebf8abfc9262c6df7be7a53b41691bb65a",
         "inputs_summary": {
           "path": "/home/user/vigia-intent-analysis/data/cases/case_004_provenance_break.json"
         },
@@ -35,29 +35,29 @@
         "note": "Computing SHA-256 of original evidence",
         "outputs_summary": {},
         "seq": 2,
-        "timestamp": "2026-07-07T17:24:48.473751+00:00",
+        "timestamp": "2026-07-07T17:55:03.381835+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "case_004_provenance_break",
-        "entry_sha256": "f0d9f872228e232cd9971ff54a91d511b9de81cfe1cd2ce35a64a518a6caca19",
+        "entry_sha256": "ef10468dc86335712cfda5cf07a3784a7a260595dee98acb7330b4900370fa44",
         "inputs_summary": {
           "path": "/home/user/vigia-intent-analysis/data/cases/case_004_provenance_break.json"
         },
         "iteration": 0,
-        "note": "Evidence verified: d8d4e38e095e3f9c...",
+        "note": "Evidence verified: e417b6b945d6e9d0...",
         "outputs_summary": {
-          "sha256": "d8d4e38e095e3f9c6c1102ebfb4b2ef55f148350a26228864576cce543ff84ba"
+          "sha256": "e417b6b945d6e9d01b327a16541b71b64514761b6f1ce47fb9f3a4e7d195bbe3"
         },
         "seq": 3,
-        "timestamp": "2026-07-07T17:24:48.473883+00:00",
+        "timestamp": "2026-07-07T17:55:03.381946+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "PIPELINE_EXECUTE",
         "case_id": "case_004_provenance_break",
-        "entry_sha256": "39eb0348502ead8acff34b8c6a9eddf05d55f61c9452c240ada194736ea346d5",
+        "entry_sha256": "f2903574362456c6127a65d8b23e9ada9874bd5b6a0fc5473eac56cc226bda76",
         "inputs_summary": {
           "evidence": "/home/user/vigia-intent-analysis/data/cases/case_004_provenance_break.json",
           "iteration": "0",
@@ -67,13 +67,13 @@
         "note": "Executing pipeline \u2014 iteration 0",
         "outputs_summary": {},
         "seq": 4,
-        "timestamp": "2026-07-07T17:24:48.474087+00:00",
+        "timestamp": "2026-07-07T17:55:03.382130+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "PIPELINE_COMPLETE",
         "case_id": "case_004_provenance_break",
-        "entry_sha256": "5a24c644b2c1ee71a748b1623fb2d1e2cba6a5fcc2d7f90ee3e4aa6a6ef22bef",
+        "entry_sha256": "7b1d1f4164b0b0c6a89290092d9a7388798d2a689c24ab0368ace449b01d177a",
         "inputs_summary": {
           "iteration": "0"
         },
@@ -122,13 +122,13 @@
           ]
         },
         "seq": 5,
-        "timestamp": "2026-07-07T17:24:48.609395+00:00",
+        "timestamp": "2026-07-07T17:55:03.532880+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "CONTRADICTION_CHECK",
         "case_id": "case_004_provenance_break",
-        "entry_sha256": "6dfd1c95829d9cc431b2e21c91ad239bf11bd8a5efab1386196c948e9d4f073b",
+        "entry_sha256": "1cbabc9982d92a464a4dfd98b0d368727f70e45c041c657f0e7fa8dde53160cc",
         "inputs_summary": {
           "n_signals": "2"
         },
@@ -139,13 +139,13 @@
           "threshold": "2"
         },
         "seq": 6,
-        "timestamp": "2026-07-07T17:24:48.609556+00:00",
+        "timestamp": "2026-07-07T17:55:03.533037+00:00",
         "tool": "contradiction_detector"
       },
       {
         "action": "AGENT_EXIT",
         "case_id": "case_004_provenance_break",
-        "entry_sha256": "0c3c39103de93600c14ac014d540581468507d6a9d4f112e5d56b9b32aca4736",
+        "entry_sha256": "1085ea6735c05e960e78f4e218f679a4d669cbea49c6f4c13a10e6047c0827fd",
         "inputs_summary": {
           "verdict": "NO_SEMIOTIC_ANOMALY_DETECTED"
         },
@@ -156,18 +156,18 @@
           "exit_code": "0"
         },
         "seq": 7,
-        "timestamp": "2026-07-07T17:24:48.609841+00:00",
+        "timestamp": "2026-07-07T17:55:03.533302+00:00",
         "tool": "vigia_agent"
       }
     ],
-    "start_time": "2026-07-07T17:24:48.473051+00:00",
+    "start_time": "2026-07-07T17:55:03.381310+00:00",
     "total_entries": 7
   },
   "case_id": "case_004_provenance_break",
   "evidence_path": "/home/user/vigia-intent-analysis/data/cases/case_004_provenance_break.json",
-  "evidence_sha256": "d8d4e38e095e3f9c6c1102ebfb4b2ef55f148350a26228864576cce543ff84ba",
+  "evidence_sha256": "e417b6b945d6e9d01b327a16541b71b64514761b6f1ce47fb9f3a4e7d195bbe3",
   "iterations_executed": 1,
-  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE case_004_provenance_break ===\nEvidence: /home/user/vigia-intent-analysis/data/cases/case_004_provenance_break.json\nEvidence SHA-256: d8d4e38e095e3f9c6c1102ebfb4b2ef55f148350a26228864576cce543ff84ba\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: NO_SEMIOTIC_ANOMALY_DETECTED\nPosterior confidence: 97/100\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 2 se\u00f1al(es): 2 primaria(s) de ['generate_forensic_hash', 'read_evidence'], 0 derivada(s)/no-analizada(s). Top z: SHA-256 of suspicious binary: known malw=0.83, File creation timestamp matches known C2=0.75.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: NO_SEMIOTIC_ANOMALY_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nHigh-quality evidence with strong indicators \u2014 but the chain of custody has a missing ancestor. Trust collapses to near-zero. Traditional systems accept this. VIG\u00cdA rejects it.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [SHA-256 of suspicious binary: known malware hash match (VirusTotal: 47] z=0.828 conf=0.90 \u2014 \n  [File creation timestamp matches known C2 beacon interval. Strong indic] z=0.748 conf=0.85 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 2 | Derived: 0 | Total: 2",
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE case_004_provenance_break ===\nEvidence: /home/user/vigia-intent-analysis/data/cases/case_004_provenance_break.json\nEvidence SHA-256: e417b6b945d6e9d01b327a16541b71b64514761b6f1ce47fb9f3a4e7d195bbe3\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: NO_SEMIOTIC_ANOMALY_DETECTED\nPosterior confidence: 97/100\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 2 se\u00f1al(es): 2 primaria(s) de ['generate_forensic_hash', 'read_evidence'], 0 derivada(s)/no-analizada(s). Top z: SHA-256 of suspicious binary: known malw=0.83, File creation timestamp matches known C2=0.75.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: NO_SEMIOTIC_ANOMALY_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nHigh-quality evidence with strong indicators \u2014 but the chain of custody has a missing ancestor. Trust collapses to near-zero. Traditional systems accept this. VIG\u00cdA rejects it.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [SHA-256 of suspicious binary: known malware hash match (VirusTotal: 47] z=0.828 conf=0.90 \u2014 \n  [File creation timestamp matches known C2 beacon interval. Strong indic] z=0.748 conf=0.85 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 2 | Derived: 0 | Total: 2",
   "pipeline_results": {
     "abduction": {
       "best_hypothesis": "NO_SEMIOTIC_ANOMALY_DETECTED",

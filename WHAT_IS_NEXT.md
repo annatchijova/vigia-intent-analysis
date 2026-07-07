@@ -59,9 +59,16 @@ que ya se cerró desde entonces. La Fase 0 (sorpresas protegidas) y la Fase 1
    `VIGIA_BREAK_005_FALSE_CORRELATION` desde su creación — hoy entra al
    corpus y el agente lo acierta. Corpus 166/199 honesto (mismo número,
    denominador mejor).
-2. **Metadata de adquisición por lotes**: 145/199 casos fallan el validador por
-   metadata ausente (hipótesis "el validador causa los FP/FN" ya refutada).
-   Precondición práctica del dataset de calibración de la Tanda C (A4).
+2. ~~**Metadata de adquisición por lotes**~~ — **CERRADO (B-085, 2026-07-07)**:
+   validador schema-aware (el 145/199 mezclaba defectos reales con falsos
+   positivos del validador sobre artefactos narrativos) + lote aditivo honesto
+   sobre 145 casos (`scripts/complete_acquisition_metadata.py`, doctrina
+   L-037: documenta proveniencia real, no la fabrica). Validador
+   **54→194/199 PASS**; corpus 166/199, 0 regresiones. Residuo con defectos
+   reales de forma (5 casos: OWL-NEXUS5, NPS-2010-EMAILS ×2, NPS-2014-USB,
+   CTF-2021-iOS) + 1 etiqueta a revisar en Tanda C (CTF-2021-iOS saltó
+   NOISE→MALICE con expected UNKNOWN al subir el trust). La precondición de
+   la Tanda C (A4) quedó satisfecha.
 
 ### 1.2 Doctrina y calibración (Grupo A / Tanda C — requieren decisión de Anna y/o ground truth)
 

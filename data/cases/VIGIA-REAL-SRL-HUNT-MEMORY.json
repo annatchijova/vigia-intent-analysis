@@ -1,17 +1,17 @@
 {
   "case_id": "VIGIA-REAL-SRL-HUNT-MEMORY",
-  "case_name": "SRL-2018 Hunt Server \u2014 Memory Forensics (DFIR Infrastructure)",
-  "description": "Volatility3 memory analysis of base-hunt-memory.img. Windows 10 64-bit. No malicious activity detected. Server confirmed as DFIR response infrastructure \u2014 used by incident response team during investigation of SRL-2018 compromise.",
+  "case_name": "SRL-2018 Hunt Server — Memory Forensics (DFIR Infrastructure)",
+  "description": "Volatility3 memory analysis of base-hunt-memory.img. Windows 10 64-bit. No malicious activity detected. Server confirmed as DFIR response infrastructure — used by incident response team during investigation of SRL-2018 compromise.",
   "expected_verdict": "MALICE",
   "source_dataset": "SANS SRL-2018",
-  "source_origin": "base-hunt-memory.img \u2014 vol3 analysis via VIG\u00cdA agent",
+  "source_origin": "base-hunt-memory.img — vol3 analysis via VIGÍA agent",
   "source_url": "https://sansorg.egnyte.com",
   "carnegie_pattern_expected": null,
   "peirce_expected": "FIRSTNESS",
   "confidence_expected": "MEDIUM",
   "abstention_risk": "MEDIUM",
   "expected_mitre_ttps": [],
-  "devil_advocate": "Server is confirmed DFIR infrastructure (F-Response acquisition point, nfury/Asgard toolset). Score 0.3314 is borderline \u2014 VIG\u00cdA correctly applies conservatism when remote access tools and compromised-network context are present without explicit exculpatory evidence. Demonstrates correct Daubert behavior: system does not assume benign intent without sufficient corroboration.",
+  "devil_advocate": "Server is confirmed DFIR infrastructure (F-Response acquisition point, nfury/Asgard toolset). Score 0.3314 is borderline — VIGÍA correctly applies conservatism when remote access tools and compromised-network context are present without explicit exculpatory evidence. Demonstrates correct Daubert behavior: system does not assume benign intent without sufficient corroboration.",
   "artifacts": [
     {
       "artifact_id": "ART-HUNT-001",
@@ -19,8 +19,8 @@
       "peirce_layer": "FIRSTNESS",
       "content": "vol3 windows.info: Windows 10 64-bit, SystemTime 2018-09-07 01:03:57 UTC | vol3 windows.pslist: no LOLBAS processes detected | vol3 windows.malfind: no code injection | 2 signals total, avg z-score 0.3",
       "forensic_anomalies": [
-        "No malicious processes, no code injection, no LOTL activity \u2014 consistent with clean DFIR workstation",
-        "Memory captured at same timestamp as other SRL-2018 systems (2018-09-07) \u2014 part of coordinated acquisition by incident response team"
+        "No malicious processes, no code injection, no LOTL activity — consistent with clean DFIR workstation",
+        "Memory captured at same timestamp as other SRL-2018 systems (2018-09-07) — part of coordinated acquisition by incident response team"
       ]
     },
     {
@@ -29,8 +29,8 @@
       "peirce_layer": "SECONDNESS",
       "content": "F-Response agent sub-win-x64_base-hunt_5682_3262.exe found on DMZ FTP server srl-ftp directory | Agent specifically generated for base-hunt server (hostname in filename) | nfury/Asgard directory on DMZ FTP used by incident responder",
       "forensic_anomalies": [
-        "F-Response agent filename encodes destination hostname \u2014 standard F-Response deployment practice for remote memory acquisition",
-        "DFIR analyst nfury used Asgard directory on DMZ FTP for toolset \u2014 confirms legitimate forensic workflow"
+        "F-Response agent filename encodes destination hostname — standard F-Response deployment practice for remote memory acquisition",
+        "DFIR analyst nfury used Asgard directory on DMZ FTP for toolset — confirms legitimate forensic workflow"
       ]
     },
     {
@@ -39,15 +39,16 @@
       "peirce_layer": "THIRDNESS",
       "content": "Hunt server role: threat hunting platform for detecting lateral movement across shieldbase.lan | Accessed DMZ FTP to retrieve DFIR tools | Connected to compromised systems for memory acquisition via F-Response",
       "forensic_anomalies": [
-        "Network connectivity to other SRL-2018 servers expected for forensic acquisition workflow \u2014 not indicative of lateral movement",
+        "Network connectivity to other SRL-2018 servers expected for forensic acquisition workflow — not indicative of lateral movement",
         "Absence of malicious indicators while having broad network access confirms effective operational security of DFIR team"
       ]
     }
   ],
   "peirce_chain": {
-    "firstness": "Hunt server present in compromised network \u2014 role ambiguous without context",
+    "firstness": "Hunt server present in compromised network — role ambiguous without context",
     "secondness": "Memory clean: no code injection, no LOTL. F-Response agent on DMZ FTP confirms forensic acquisition role",
-    "thirdness": "Hunt server is DFIR infrastructure operated by incident responders (nfury). Clean memory expected and confirmed \u2014 validates acquisition integrity of other corpus dumps"
+    "thirdness": "Hunt server is DFIR infrastructure operated by incident responders (nfury). Clean memory expected and confirmed — validates acquisition integrity of other corpus dumps"
   },
-  "_consolidation": "VIG\u00cdA-REAL. vol3 analysis via vigia_agent.py. Bundle: HUNT-004_bundle.json. SUSPICION expected because server exists within compromised network boundary."
+  "_consolidation": "VIGÍA-REAL. vol3 analysis via vigia_agent.py. Bundle: HUNT-004_bundle.json. SUSPICION expected because server exists within compromised network boundary.",
+  "schema_version": 1
 }

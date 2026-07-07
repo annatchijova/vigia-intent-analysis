@@ -1,10 +1,10 @@
 {
   "case_id": "VIGIA-REAL-SRL-RD04-MEMORY",
-  "case_name": "SRL-2018 Remote Desktop Server RD-04 \u2014 Memory Forensics (Primary C2 Pivot)",
+  "case_name": "SRL-2018 Remote Desktop Server RD-04 — Memory Forensics (Primary C2 Pivot)",
   "description": "Volatility3 memory analysis. 30 LOTL processes + code injection in 33 processes. The most operationally active compromised host in SRL-2018 corpus. 30 simultaneous LOTL processes is the signature of an active C2 framework with multiple concurrent beacons. Primary attacker pivot post-lateral-movement.",
   "expected_verdict": "MALICE",
   "source_dataset": "SANS SRL-2018",
-  "source_origin": "base-rd04-memory.img \u2014 vol3 RD04-001",
+  "source_origin": "base-rd04-memory.img — vol3 RD04-001",
   "source_url": "https://sansorg.egnyte.com",
   "carnegie_pattern_expected": null,
   "peirce_expected": "THIRDNESS",
@@ -24,8 +24,8 @@
       "peirce_layer": "SECONDNESS",
       "content": "vol3 windows.pslist LOLBAS: 30 living-off-the-land processes detected simultaneously. Highest LOTL count in entire SRL-2018 corpus. Cobalt Strike beacon pattern: multiple short-lived rundll32.exe instances spawned by powershell.exe parent (confirmed in RD-02 transcript analysis).",
       "forensic_anomalies": [
-        "30 simultaneous LOTL processes is 15x the maximum expected for legitimate admin activity \u2014 no legitimate use case produces this count",
-        "Pattern matches Cobalt Strike beacon with sleep jitter spawning multiple rundll32.exe shellcode hosts in rotation \u2014 each short-lived process executes one C2 task then exits",
+        "30 simultaneous LOTL processes is 15x the maximum expected for legitimate admin activity — no legitimate use case produces this count",
+        "Pattern matches Cobalt Strike beacon with sleep jitter spawning multiple rundll32.exe shellcode hosts in rotation — each short-lived process executes one C2 task then exits",
         "Highest LOTL count in corpus (RD04: 30 > RD01: 12 > ADMIN: 2 > WKSTN04: 2) identifies RD-04 as primary operational C2 base"
       ]
     },
@@ -33,9 +33,9 @@
       "artifact_id": "ART-RD04-002",
       "type": "memory_dump",
       "peirce_layer": "SECONDNESS",
-      "content": "vol3 windows.malfind: code injection in 33 processes (PIDs: 8b, 4896, ac, 10, a4 and 28 others). 33 injected processes \u2014 the broadest injection footprint among all servers except RD-05.",
+      "content": "vol3 windows.malfind: code injection in 33 processes (PIDs: 8b, 4896, ac, 10, a4 and 28 others). 33 injected processes — the broadest injection footprint among all servers except RD-05.",
       "forensic_anomalies": [
-        "33 injected processes with 30 active LOTL indicates nearly every LOLBAS process is a shellcode container \u2014 systematic framework deployment, not selective targeting",
+        "33 injected processes with 30 active LOTL indicates nearly every LOLBAS process is a shellcode container — systematic framework deployment, not selective targeting",
         "Breadth of injection (33 processes) suggests the attacker established redundant persistence to survive process termination by defenders",
         "Combined LOTL (30) + injection (33) count indicates RD-04 was the attacker's primary working environment for extended operations"
       ]
@@ -47,15 +47,16 @@
       "content": "RD-04 as C2 pivot: 30 active beacon processes at acquisition time indicates continuous external communication. Attack timeline: admin compromised (Jul 2018) -> AV disabled -> RD-04 established as primary C2 -> lateral spread to RD-01/03/05/06 and WKSTN-04.",
       "forensic_anomalies": [
         "Primary C2 pivot identification changes incident narrative: the attacker operated primarily from RD-04, not the admin server",
-        "30 concurrent beacons provides high resilience against partial cleanup \u2014 killing some processes does not disrupt C2 continuity",
+        "30 concurrent beacons provides high resilience against partial cleanup — killing some processes does not disrupt C2 continuity",
         "RD-04 connectivity to all RD servers and WKSTN via RDP explains the uniform injection pattern across the corpus"
       ]
     }
   ],
   "peirce_chain": {
-    "firstness": "RD server in network \u2014 highest RDP connectivity to other servers and workstations",
-    "secondness": "30 LOTL + 33 code injection \u2014 most operationally active compromised host in corpus",
+    "firstness": "RD server in network — highest RDP connectivity to other servers and workstations",
+    "secondness": "30 LOTL + 33 code injection — most operationally active compromised host in corpus",
     "thirdness": "30 concurrent beacons identifies RD-04 as primary C2 pivot. Attacker conducted extended operations from this host, using it to spread to all other RD servers and WKSTN-04. Highest persistence value to attacker."
   },
-  "_consolidation": "VIG\u00cdA-REAL. vol3 RD04-001. Bundle: results/srl2018/RD04-001_bundle.json. PRIMARY C2 PIVOT identification \u2014 highest forensic value in SRL-2018 memory corpus."
+  "_consolidation": "VIGÍA-REAL. vol3 RD04-001. Bundle: results/srl2018/RD04-001_bundle.json. PRIMARY C2 PIVOT identification — highest forensic value in SRL-2018 memory corpus.",
+  "schema_version": 1
 }

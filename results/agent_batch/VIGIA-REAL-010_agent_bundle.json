@@ -1,15 +1,15 @@
 {
   "agent_verdict": "MALICE",
-  "analysis_timestamp": "2026-07-07T17:24:39.588177+00:00",
+  "analysis_timestamp": "2026-07-07T17:54:54.041066+00:00",
   "audit_trail": {
     "agent_version": "1.0.0-SANS-2026",
     "case_id": "VIGIA-REAL-010",
-    "end_time": "2026-07-07T17:24:39.588184+00:00",
+    "end_time": "2026-07-07T17:54:54.041072+00:00",
     "entries": [
       {
         "action": "AGENT_INITIALIZED",
         "case_id": "VIGIA-REAL-010",
-        "entry_sha256": "386f4cf17303f54c5a0a7cddb447b9eb89c2d96266ce34177fd206fff4bf41fa",
+        "entry_sha256": "e6cadc7df0581626ca8ec403f50575a01d3e1ac6e0bd9d39abd4d157e5f46ac4",
         "inputs_summary": {
           "agent_file": "/home/user/vigia-intent-analysis/vigia_agent.py",
           "case_id": "VIGIA-REAL-010"
@@ -21,13 +21,13 @@
           "agent_version": "1.0.0-SANS-2026"
         },
         "seq": 1,
-        "timestamp": "2026-07-07T17:24:39.426423+00:00",
+        "timestamp": "2026-07-07T17:54:53.884871+00:00",
         "tool": "vigia_agent"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-REAL-010",
-        "entry_sha256": "0372a419ee5d0a059c2830e6732bf7510e12e0e014287580bc804ef747814770",
+        "entry_sha256": "1553f5f1128e1e399da6d42fb9ce21a5acb583b527871d49df0f92e87474a21c",
         "inputs_summary": {
           "path": "/home/user/vigia-intent-analysis/data/cases/VIGIA-REAL-010.json"
         },
@@ -35,29 +35,29 @@
         "note": "Computing SHA-256 of original evidence",
         "outputs_summary": {},
         "seq": 2,
-        "timestamp": "2026-07-07T17:24:39.426618+00:00",
+        "timestamp": "2026-07-07T17:54:53.885007+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-REAL-010",
-        "entry_sha256": "aafb8f2e3b9babac6031155267538a8df2c359888c1caf77b62b299a502251f4",
+        "entry_sha256": "1236be674cfe0f67cc154ab0d632315581fb1ba0e5aa9872dab9ebca0b954e19",
         "inputs_summary": {
           "path": "/home/user/vigia-intent-analysis/data/cases/VIGIA-REAL-010.json"
         },
         "iteration": 0,
-        "note": "Evidence verified: 16558f387e69a4d0...",
+        "note": "Evidence verified: 3b3f58edac81d31c...",
         "outputs_summary": {
-          "sha256": "16558f387e69a4d0d1ada2ffe7370c74ad79eb26220a0d27e712e362c8cc9c82"
+          "sha256": "3b3f58edac81d31c48a9ed9ae30e3f54705d6e15008949f49792accec7ef9c1a"
         },
         "seq": 3,
-        "timestamp": "2026-07-07T17:24:39.426759+00:00",
+        "timestamp": "2026-07-07T17:54:53.885110+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "PIPELINE_EXECUTE",
         "case_id": "VIGIA-REAL-010",
-        "entry_sha256": "04d07cc4a07fc8e63267874bfbe098112089ee34df9b3c709c4b68d73310af0c",
+        "entry_sha256": "ee42ac6c0a72707e7428c4cc386d927bda8546ee5217ed298a2ec45de8c24949",
         "inputs_summary": {
           "evidence": "/home/user/vigia-intent-analysis/data/cases/VIGIA-REAL-010.json",
           "iteration": "0",
@@ -67,13 +67,13 @@
         "note": "Executing pipeline \u2014 iteration 0",
         "outputs_summary": {},
         "seq": 4,
-        "timestamp": "2026-07-07T17:24:39.426967+00:00",
+        "timestamp": "2026-07-07T17:54:53.885301+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "PIPELINE_COMPLETE",
         "case_id": "VIGIA-REAL-010",
-        "entry_sha256": "b8e2ed476777c6f2094dac1038f3f3a4e9bbaf10eb1b8ee58b14a6e63127a79a",
+        "entry_sha256": "2f85f01bc94c373d14a4353b65fb1720ae623c05bf6c173cac988a4e7b2315c3",
         "inputs_summary": {
           "iteration": "0"
         },
@@ -138,13 +138,13 @@
           ]
         },
         "seq": 5,
-        "timestamp": "2026-07-07T17:24:39.587418+00:00",
+        "timestamp": "2026-07-07T17:54:54.040288+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "CONTRADICTION_CHECK",
         "case_id": "VIGIA-REAL-010",
-        "entry_sha256": "c8a31ab2d66f51fae25b6135761d2e306979b75ffd5a3d5a539337540eab2b5b",
+        "entry_sha256": "8427e121a1bdada61d1067a3b0002a2ef240e62a0dfa637f3388281478798861",
         "inputs_summary": {
           "n_signals": "4"
         },
@@ -155,13 +155,13 @@
           "threshold": "2"
         },
         "seq": 6,
-        "timestamp": "2026-07-07T17:24:39.587624+00:00",
+        "timestamp": "2026-07-07T17:54:54.040463+00:00",
         "tool": "contradiction_detector"
       },
       {
         "action": "AGENT_EXIT",
         "case_id": "VIGIA-REAL-010",
-        "entry_sha256": "2f144f291a369655789b6fa565a5199a20e55c237895e1c6415aa0e91d0cd723",
+        "entry_sha256": "7c10ddb64eae3a07d58b10efe71f39315146cdc74606e2d4774b1f3822bf8fd4",
         "inputs_summary": {
           "verdict": "MALICIOUS_INTENT_DETECTED"
         },
@@ -172,18 +172,18 @@
           "exit_code": "1"
         },
         "seq": 7,
-        "timestamp": "2026-07-07T17:24:39.587920+00:00",
+        "timestamp": "2026-07-07T17:54:54.040782+00:00",
         "tool": "vigia_agent"
       }
     ],
-    "start_time": "2026-07-07T17:24:39.425817+00:00",
+    "start_time": "2026-07-07T17:54:53.884518+00:00",
     "total_entries": 7
   },
   "case_id": "VIGIA-REAL-010",
   "evidence_path": "/home/user/vigia-intent-analysis/data/cases/VIGIA-REAL-010.json",
-  "evidence_sha256": "16558f387e69a4d0d1ada2ffe7370c74ad79eb26220a0d27e712e362c8cc9c82",
+  "evidence_sha256": "3b3f58edac81d31c48a9ed9ae30e3f54705d6e15008949f49792accec7ef9c1a",
   "iterations_executed": 1,
-  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-REAL-010 ===\nEvidence: /home/user/vigia-intent-analysis/data/cases/VIGIA-REAL-010.json\nEvidence SHA-256: 16558f387e69a4d0d1ada2ffe7370c74ad79eb26220a0d27e712e362c8cc9c82\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 71/100\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 4 se\u00f1al(es): 4 primaria(s) de ['unknown'], 0 derivada(s)/no-analizada(s). Top z: unknown=0.00, unknown=0.00, unknown=0.00.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: MALICIOUS_INTENT_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nDual case: Donald Norby stole confidential documents from SwiftLogic Inc. and was found dead. He was negotiating the sale of Palomino product documents with Mr. E. Yob Taog's phone was compromised with malware that exfiltrated PDFs.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [unknown] z=0.000 conf=0.50 \u2014 \n  [unknown] z=0.000 conf=0.50 \u2014 \n  [unknown] z=0.000 conf=0.50 \u2014 \n  [unknown] z=0.000 conf=0.50 \u2014 \n\n--- FINAL ALERT LEVEL ---\nHIGH \u2014 MALICE verdict from Bayesian posterior aggregation. Individual z-scores below threshold (distributed evidence pattern: no single dominant signal, but aggregate posterior is decisive). Alert floored (B-028/B-065).\nReconciliation: verdict MALICE rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 4 | Derived: 0 | Total: 4",
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-REAL-010 ===\nEvidence: /home/user/vigia-intent-analysis/data/cases/VIGIA-REAL-010.json\nEvidence SHA-256: 3b3f58edac81d31c48a9ed9ae30e3f54705d6e15008949f49792accec7ef9c1a\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 71/100\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 4 se\u00f1al(es): 4 primaria(s) de ['unknown'], 0 derivada(s)/no-analizada(s). Top z: unknown=0.00, unknown=0.00, unknown=0.00.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: MALICIOUS_INTENT_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nDual case: Donald Norby stole confidential documents from SwiftLogic Inc. and was found dead. He was negotiating the sale of Palomino product documents with Mr. E. Yob Taog's phone was compromised with malware that exfiltrated PDFs.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [unknown] z=0.000 conf=0.50 \u2014 \n  [unknown] z=0.000 conf=0.50 \u2014 \n  [unknown] z=0.000 conf=0.50 \u2014 \n  [unknown] z=0.000 conf=0.50 \u2014 \n\n--- FINAL ALERT LEVEL ---\nHIGH \u2014 MALICE verdict from Bayesian posterior aggregation. Individual z-scores below threshold (distributed evidence pattern: no single dominant signal, but aggregate posterior is decisive). Alert floored (B-028/B-065).\nReconciliation: verdict MALICE rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 4 | Derived: 0 | Total: 4",
   "pipeline_results": {
     "abduction": {
       "best_hypothesis": "MALICIOUS_INTENT_DETECTED",

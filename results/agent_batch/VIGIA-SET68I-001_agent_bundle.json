@@ -1,15 +1,15 @@
 {
   "agent_verdict": "NOISE",
-  "analysis_timestamp": "2026-07-07T17:24:45.246202+00:00",
+  "analysis_timestamp": "2026-07-07T17:55:00.015490+00:00",
   "audit_trail": {
     "agent_version": "1.0.0-SANS-2026",
     "case_id": "VIGIA-SET68I-001",
-    "end_time": "2026-07-07T17:24:45.246209+00:00",
+    "end_time": "2026-07-07T17:55:00.015496+00:00",
     "entries": [
       {
         "action": "AGENT_INITIALIZED",
         "case_id": "VIGIA-SET68I-001",
-        "entry_sha256": "f92e01e6679a6612ac286ab22ed6801d400913726013af56ab1179a91eaef5eb",
+        "entry_sha256": "a113c9fa20d6de4c11b44064af427a0dcae602ace9898313f09ca9960a760557",
         "inputs_summary": {
           "agent_file": "/home/user/vigia-intent-analysis/vigia_agent.py",
           "case_id": "VIGIA-SET68I-001"
@@ -21,13 +21,13 @@
           "agent_version": "1.0.0-SANS-2026"
         },
         "seq": 1,
-        "timestamp": "2026-07-07T17:24:45.088191+00:00",
+        "timestamp": "2026-07-07T17:54:59.850946+00:00",
         "tool": "vigia_agent"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-SET68I-001",
-        "entry_sha256": "b90633e7641f0a1f494d7444c3573ab095a32fc8d3a4b5cc65ba4b245fbf97dd",
+        "entry_sha256": "4f697250205124a2e52bbca2aab32b277f2036d6955e31548950da3879c140bd",
         "inputs_summary": {
           "path": "/home/user/vigia-intent-analysis/data/cases/VIGIA-SET68I-001.json"
         },
@@ -35,29 +35,29 @@
         "note": "Computing SHA-256 of original evidence",
         "outputs_summary": {},
         "seq": 2,
-        "timestamp": "2026-07-07T17:24:45.088401+00:00",
+        "timestamp": "2026-07-07T17:54:59.851122+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-SET68I-001",
-        "entry_sha256": "ef4b01b2490d783eafff3481e9865e938e7ba6b2410a223a17fa9a9f4a89896a",
+        "entry_sha256": "177d8261bb9b852cad52f18e7107258ececd301ec4da0ed3b2b75097d792b478",
         "inputs_summary": {
           "path": "/home/user/vigia-intent-analysis/data/cases/VIGIA-SET68I-001.json"
         },
         "iteration": 0,
-        "note": "Evidence verified: 12a625e018490f8e...",
+        "note": "Evidence verified: 2f2572285315f317...",
         "outputs_summary": {
-          "sha256": "12a625e018490f8e39fb85967044184738df3b099da34a0936e144550916ee49"
+          "sha256": "2f2572285315f317b74427d9938f9fb4263c29293ea6eb8f49fabf0677a4986b"
         },
         "seq": 3,
-        "timestamp": "2026-07-07T17:24:45.088591+00:00",
+        "timestamp": "2026-07-07T17:54:59.851249+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "PIPELINE_EXECUTE",
         "case_id": "VIGIA-SET68I-001",
-        "entry_sha256": "18855380069d48b68f8bd6378e35b2e04d3d8a859a01c74e3e7a665d17b3f732",
+        "entry_sha256": "4860a3a4fdc8ba5cf1bd8eca75f49fea9a28d5d1de7aeeaaf5ac59e57d243bf3",
         "inputs_summary": {
           "evidence": "/home/user/vigia-intent-analysis/data/cases/VIGIA-SET68I-001.json",
           "iteration": "0",
@@ -67,13 +67,13 @@
         "note": "Executing pipeline \u2014 iteration 0",
         "outputs_summary": {},
         "seq": 4,
-        "timestamp": "2026-07-07T17:24:45.088865+00:00",
+        "timestamp": "2026-07-07T17:54:59.851436+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "PIPELINE_COMPLETE",
         "case_id": "VIGIA-SET68I-001",
-        "entry_sha256": "4ba15104dbb7717c83a58c5a28c28327e8cc99b7c1a734b6b16797c8f38e906b",
+        "entry_sha256": "7b7a2a4d86755c2e916e913c027c4d07f900e998de56d26b694f79a0981f648c",
         "inputs_summary": {
           "iteration": "0"
         },
@@ -95,8 +95,8 @@
             "expected_verdict": "ABSTAIN",
             "resolve": {
               "motor_confidence": "0.98",
-              "motor_reason": "Insufficient evidence of malicious intent (score=0.0222)",
-              "motor_score": "0.0222",
+              "motor_reason": "Insufficient evidence of malicious intent (score=0.0247)",
+              "motor_score": "0.0247",
               "motor_verdict": "NOISE",
               "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
             },
@@ -130,13 +130,13 @@
           ]
         },
         "seq": 5,
-        "timestamp": "2026-07-07T17:24:45.245623+00:00",
+        "timestamp": "2026-07-07T17:55:00.014959+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "CONTRADICTION_CHECK",
         "case_id": "VIGIA-SET68I-001",
-        "entry_sha256": "ef1c93f1faa0725248959d8e7c0c4ff257378b43525151de3a6394eaa94dae15",
+        "entry_sha256": "f8de72f69d65dc4e5b90ec42bd010e27d930fb9d621bf2699d9c368ec2d4ce9c",
         "inputs_summary": {
           "n_signals": "3"
         },
@@ -147,13 +147,13 @@
           "threshold": "2"
         },
         "seq": 6,
-        "timestamp": "2026-07-07T17:24:45.245812+00:00",
+        "timestamp": "2026-07-07T17:55:00.015126+00:00",
         "tool": "contradiction_detector"
       },
       {
         "action": "AGENT_EXIT",
         "case_id": "VIGIA-SET68I-001",
-        "entry_sha256": "e32d73db7e2b28cad45a68fbf6237e5e8d95751ad7882bec617ebcc47f72dbcf",
+        "entry_sha256": "d688839d6d67318d183bb8caf954b91f29e79998d6810e7288c8e17113d3f645",
         "inputs_summary": {
           "verdict": "NO_SEMIOTIC_ANOMALY_DETECTED"
         },
@@ -164,18 +164,18 @@
           "exit_code": "0"
         },
         "seq": 7,
-        "timestamp": "2026-07-07T17:24:45.246124+00:00",
+        "timestamp": "2026-07-07T17:55:00.015412+00:00",
         "tool": "vigia_agent"
       }
     ],
-    "start_time": "2026-07-07T17:24:45.087662+00:00",
+    "start_time": "2026-07-07T17:54:59.850547+00:00",
     "total_entries": 7
   },
   "case_id": "VIGIA-SET68I-001",
   "evidence_path": "/home/user/vigia-intent-analysis/data/cases/VIGIA-SET68I-001.json",
-  "evidence_sha256": "12a625e018490f8e39fb85967044184738df3b099da34a0936e144550916ee49",
+  "evidence_sha256": "2f2572285315f317b74427d9938f9fb4263c29293ea6eb8f49fabf0677a4986b",
   "iterations_executed": 1,
-  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-SET68I-001 ===\nEvidence: /home/user/vigia-intent-analysis/data/cases/VIGIA-SET68I-001.json\nEvidence SHA-256: 12a625e018490f8e39fb85967044184738df3b099da34a0936e144550916ee49\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: NO_SEMIOTIC_ANOMALY_DETECTED\nPosterior confidence: 49/50\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 3 se\u00f1al(es): 3 primaria(s) de ['generate_forensic_hash', 'read_evidence', 'search_pattern'], 0 derivada(s)/no-analizada(s). Top z: Culturally significant filename: 'ingebj=0.09, String analysis reveals firmware compone=0.07, Sony Ericsson T68i flash image. SHA-256 =0.05.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: NO_SEMIOTIC_ANOMALY_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nForensic image of Sony Ericsson T68i internal flash memory (file ingebjorg.bin, 8388608 bytes, SHA-256: df9aa8809f752434fc4028196b890c28a75924eaec2fbd586538450e2995c71d). File date 2005-03-29. Filename 'ingebjorg.bin' indicates device ownership \u2014 'Ingebjorg' is a Norwegian female given name (variant: Ingeborg), strongly suggesting the handset belonged to a Scandinavian female user. String analysis reveals firmware layer with GSM stack processes and image format error handlers (JPEG, GIF, BMP, EB\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Culturally significant filename: 'ingebjorg.bin' \u2014 Ingebjorg/Ingeborg ] z=0.090 conf=0.60 \u2014 \n  [String analysis reveals firmware components: (1) Image format error ha] z=0.075 conf=0.75 \u2014 \n  [Sony Ericsson T68i flash image. SHA-256 verified. Size 8388608 bytes (] z=0.048 conf=0.95 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 3 | Derived: 0 | Total: 3",
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-SET68I-001 ===\nEvidence: /home/user/vigia-intent-analysis/data/cases/VIGIA-SET68I-001.json\nEvidence SHA-256: 2f2572285315f317b74427d9938f9fb4263c29293ea6eb8f49fabf0677a4986b\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: NO_SEMIOTIC_ANOMALY_DETECTED\nPosterior confidence: 49/50\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 3 se\u00f1al(es): 3 primaria(s) de ['generate_forensic_hash', 'read_evidence', 'search_pattern'], 0 derivada(s)/no-analizada(s). Top z: Culturally significant filename: 'ingebj=0.09, String analysis reveals firmware compone=0.07, Sony Ericsson T68i flash image. SHA-256 =0.05.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: NO_SEMIOTIC_ANOMALY_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nForensic image of Sony Ericsson T68i internal flash memory (file ingebjorg.bin, 8388608 bytes, SHA-256: df9aa8809f752434fc4028196b890c28a75924eaec2fbd586538450e2995c71d). File date 2005-03-29. Filename 'ingebjorg.bin' indicates device ownership \u2014 'Ingebjorg' is a Norwegian female given name (variant: Ingeborg), strongly suggesting the handset belonged to a Scandinavian female user. String analysis reveals firmware layer with GSM stack processes and image format error handlers (JPEG, GIF, BMP, EB\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Culturally significant filename: 'ingebjorg.bin' \u2014 Ingebjorg/Ingeborg ] z=0.090 conf=0.60 \u2014 \n  [String analysis reveals firmware components: (1) Image format error ha] z=0.075 conf=0.75 \u2014 \n  [Sony Ericsson T68i flash image. SHA-256 verified. Size 8388608 bytes (] z=0.048 conf=0.95 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 3 | Derived: 0 | Total: 3",
   "pipeline_results": {
     "abduction": {
       "best_hypothesis": "NO_SEMIOTIC_ANOMALY_DETECTED",
@@ -196,8 +196,8 @@
       "expected_verdict": "ABSTAIN",
       "resolve": {
         "motor_confidence": "0.98",
-        "motor_reason": "Insufficient evidence of malicious intent (score=0.0222)",
-        "motor_score": "0.0222",
+        "motor_reason": "Insufficient evidence of malicious intent (score=0.0247)",
+        "motor_score": "0.0247",
         "motor_verdict": "NOISE",
         "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
       },

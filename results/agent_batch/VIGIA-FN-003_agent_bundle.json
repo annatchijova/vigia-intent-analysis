@@ -1,15 +1,15 @@
 {
   "agent_verdict": "INTENT",
-  "analysis_timestamp": "2026-07-07T17:24:31.831635+00:00",
+  "analysis_timestamp": "2026-07-07T17:54:46.267313+00:00",
   "audit_trail": {
     "agent_version": "1.0.0-SANS-2026",
     "case_id": "VIGIA-FN-003",
-    "end_time": "2026-07-07T17:24:31.831643+00:00",
+    "end_time": "2026-07-07T17:54:46.267319+00:00",
     "entries": [
       {
         "action": "AGENT_INITIALIZED",
         "case_id": "VIGIA-FN-003",
-        "entry_sha256": "c7d422e1fd25efb3fcffd2ee6e59e9de443a18b47e8e50d28b03105830a65942",
+        "entry_sha256": "e2af6241b614fe8d6f06ec37c125b354889c2493ae5b64f23e76e60dbf4184f2",
         "inputs_summary": {
           "agent_file": "/home/user/vigia-intent-analysis/vigia_agent.py",
           "case_id": "VIGIA-FN-003"
@@ -21,13 +21,13 @@
           "agent_version": "1.0.0-SANS-2026"
         },
         "seq": 1,
-        "timestamp": "2026-07-07T17:24:31.679329+00:00",
+        "timestamp": "2026-07-07T17:54:46.101291+00:00",
         "tool": "vigia_agent"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-FN-003",
-        "entry_sha256": "57c3ec5e63f9b1ce414126b4e2ec829ab53a275b70611ce1f74b8b5cdfb5edc9",
+        "entry_sha256": "5a302191251b23429b282763b8b02cbd39113ede0118300acb27d33a3281275f",
         "inputs_summary": {
           "path": "/home/user/vigia-intent-analysis/data/cases/VIGIA-FN-003.json"
         },
@@ -35,29 +35,29 @@
         "note": "Computing SHA-256 of original evidence",
         "outputs_summary": {},
         "seq": 2,
-        "timestamp": "2026-07-07T17:24:31.679545+00:00",
+        "timestamp": "2026-07-07T17:54:46.101420+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-FN-003",
-        "entry_sha256": "af8e7fb1a64b55b76aa7e3eef9f31e6803c3c8a12eacfa95d0d798e47bebea4e",
+        "entry_sha256": "f1ca7e6b617a5d872f835ab9073b37735869f2b6fe466b603cf4f27763895e0b",
         "inputs_summary": {
           "path": "/home/user/vigia-intent-analysis/data/cases/VIGIA-FN-003.json"
         },
         "iteration": 0,
-        "note": "Evidence verified: 1098a6c55f5f0e24...",
+        "note": "Evidence verified: 8eccd3235ad799ad...",
         "outputs_summary": {
-          "sha256": "1098a6c55f5f0e24321330ceaffa66c5a9ec956da4b5aa7a422aa6f61d1a3ae0"
+          "sha256": "8eccd3235ad799adaa6e286597207305ef3b0ef42878cca362b13ce5f044147a"
         },
         "seq": 3,
-        "timestamp": "2026-07-07T17:24:31.679698+00:00",
+        "timestamp": "2026-07-07T17:54:46.101533+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "PIPELINE_EXECUTE",
         "case_id": "VIGIA-FN-003",
-        "entry_sha256": "4586cb8246f0cb1e0f93424c276ae3a9f8c4b4cbea216aaf7ff1f9287959829c",
+        "entry_sha256": "eb19b96f7c58e15cdd528e4fb7917466b198762c4837e6f6b2dd702c732f8afa",
         "inputs_summary": {
           "evidence": "/home/user/vigia-intent-analysis/data/cases/VIGIA-FN-003.json",
           "iteration": "0",
@@ -67,13 +67,13 @@
         "note": "Executing pipeline \u2014 iteration 0",
         "outputs_summary": {},
         "seq": 4,
-        "timestamp": "2026-07-07T17:24:31.679917+00:00",
+        "timestamp": "2026-07-07T17:54:46.101819+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "PIPELINE_COMPLETE",
         "case_id": "VIGIA-FN-003",
-        "entry_sha256": "e41ffcc602ebc945bd5a7461bc81096bf56ca3be5f9ccd8ce710eb838f291ade",
+        "entry_sha256": "aa4db837a127e69bf9bc4d10b4a05d99081f5b3da2a8cc10d3458a7a7feb45f0",
         "inputs_summary": {
           "iteration": "0"
         },
@@ -130,13 +130,13 @@
           ]
         },
         "seq": 5,
-        "timestamp": "2026-07-07T17:24:31.831037+00:00",
+        "timestamp": "2026-07-07T17:54:46.266734+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "CONTRADICTION_CHECK",
         "case_id": "VIGIA-FN-003",
-        "entry_sha256": "fa5b0bbf751ba796547fc537d0f1a001c6cd2bf08a162c003606b99db4c583fb",
+        "entry_sha256": "3e3ff65ef103c6a50b3718f991dd1f34217ea7eb7340fb45620a3838153a4394",
         "inputs_summary": {
           "n_signals": "3"
         },
@@ -147,13 +147,13 @@
           "threshold": "2"
         },
         "seq": 6,
-        "timestamp": "2026-07-07T17:24:31.831235+00:00",
+        "timestamp": "2026-07-07T17:54:46.266975+00:00",
         "tool": "contradiction_detector"
       },
       {
         "action": "AGENT_EXIT",
         "case_id": "VIGIA-FN-003",
-        "entry_sha256": "6678c8e2debe5bfae7ae2101fd9d80adc2d462e07920da2ff84301c893dd9b14",
+        "entry_sha256": "7f1eed128fada71545a8b29b64ee5c8b31f1868439d5d8e12e22ba720bc4b9af",
         "inputs_summary": {
           "verdict": "SUSPICION_DETECTED"
         },
@@ -164,18 +164,18 @@
           "exit_code": "3"
         },
         "seq": 7,
-        "timestamp": "2026-07-07T17:24:31.831555+00:00",
+        "timestamp": "2026-07-07T17:54:46.267245+00:00",
         "tool": "vigia_agent"
       }
     ],
-    "start_time": "2026-07-07T17:24:31.678808+00:00",
+    "start_time": "2026-07-07T17:54:46.100922+00:00",
     "total_entries": 7
   },
   "case_id": "VIGIA-FN-003",
   "evidence_path": "/home/user/vigia-intent-analysis/data/cases/VIGIA-FN-003.json",
-  "evidence_sha256": "1098a6c55f5f0e24321330ceaffa66c5a9ec956da4b5aa7a422aa6f61d1a3ae0",
+  "evidence_sha256": "8eccd3235ad799adaa6e286597207305ef3b0ef42878cca362b13ce5f044147a",
   "iterations_executed": 1,
-  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-FN-003 ===\nEvidence: /home/user/vigia-intent-analysis/data/cases/VIGIA-FN-003.json\nEvidence SHA-256: 1098a6c55f5f0e24321330ceaffa66c5a9ec956da4b5aa7a422aa6f61d1a3ae0\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: SUSPICION_DETECTED\nPosterior confidence: 9/20\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 3 se\u00f1al(es): 3 primaria(s) de ['sift_netflow', 'sift_parent_process', 'sift_volatility'], 0 derivada(s)/no-analizada(s). Top z: Parent of svchost.exe PID 612: cmd.exe (=0.79, svchost.exe PID 612 with RWX memory regi=0.14, Connection to 52.85.0.0/16 (AWS CloudFro=0.04.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: SUSPICION_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nAttacker performs process hollowing on svchost.exe. The on-disk binary is the legitimate Microsoft one, signed. Network connections are to AWS IPs (legitimate CDN). Exfiltration occurs inside TLS, indistinguishable from normal traffic.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Parent of svchost.exe PID 612: cmd.exe (PID 4412), not services.exe] z=0.792 conf=0.90 \u2014 \n  [svchost.exe PID 612 with RWX memory regions] z=0.142 conf=0.95 \u2014 \n  [Connection to 52.85.0.0/16 (AWS CloudFront) from svchost.exe] z=0.040 conf=0.80 \u2014 \n\n--- FINAL ALERT LEVEL ---\nMEDIUM \u2014 INTENT verdict with individual z-scores below threshold. Alert floored (B-028/B-065): an intent finding cannot present as LOW.\nReconciliation: verdict INTENT rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 3 | Derived: 0 | Total: 3",
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-FN-003 ===\nEvidence: /home/user/vigia-intent-analysis/data/cases/VIGIA-FN-003.json\nEvidence SHA-256: 8eccd3235ad799adaa6e286597207305ef3b0ef42878cca362b13ce5f044147a\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: SUSPICION_DETECTED\nPosterior confidence: 9/20\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 3 se\u00f1al(es): 3 primaria(s) de ['sift_netflow', 'sift_parent_process', 'sift_volatility'], 0 derivada(s)/no-analizada(s). Top z: Parent of svchost.exe PID 612: cmd.exe (=0.79, svchost.exe PID 612 with RWX memory regi=0.14, Connection to 52.85.0.0/16 (AWS CloudFro=0.04.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: SUSPICION_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nAttacker performs process hollowing on svchost.exe. The on-disk binary is the legitimate Microsoft one, signed. Network connections are to AWS IPs (legitimate CDN). Exfiltration occurs inside TLS, indistinguishable from normal traffic.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Parent of svchost.exe PID 612: cmd.exe (PID 4412), not services.exe] z=0.792 conf=0.90 \u2014 \n  [svchost.exe PID 612 with RWX memory regions] z=0.142 conf=0.95 \u2014 \n  [Connection to 52.85.0.0/16 (AWS CloudFront) from svchost.exe] z=0.040 conf=0.80 \u2014 \n\n--- FINAL ALERT LEVEL ---\nMEDIUM \u2014 INTENT verdict with individual z-scores below threshold. Alert floored (B-028/B-065): an intent finding cannot present as LOW.\nReconciliation: verdict INTENT rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 3 | Derived: 0 | Total: 3",
   "pipeline_results": {
     "abduction": {
       "best_hypothesis": "SUSPICION_DETECTED",

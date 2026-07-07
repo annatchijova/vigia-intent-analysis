@@ -19,8 +19,28 @@ ACQ_CRITICAL = ["acquisition_tool", "acquisition_hash", "acquisition_timestamp"]
 ACQ_RECOMMENDED = ["write_blocker_used", "examiner_id"]
 ARTIFACT_REQUIRED = ["artifact_id", "evidence_type", "source_tool",
                      "description", "raw_score", "prior_trust", "timestamp"]
+# Schema narrativo/semiótico (vía de texto del pipeline): el artefacto lleva
+# contenido interpretable, no una señal numérica. CAIE no le ingiere
+# raw_score ni acquisition_assurance — exigirle el contrato EBS producía
+# 6 errores espurios por artefacto (WHAT_IS_NEXT §1.1.2, censo 2026-07-07;
+# los 41 "raw_score=-1 fuera de rango" del audit eran el DEFAULT de este
+# propio validador aplicado a artefactos sin raw_score).
+NARRATIVE_REQUIRED = ["artifact_id"]
+NARRATIVE_CONTENT_KEYS = ("content", "forensic_anomalies", "peirce_layer")
 CASE_REQUIRED = ["case_id", "case_name", "description",
                  "expected_verdict", "schema_version", "artifacts"]
+
+
+def artifact_schema(art: dict) -> str:
+    """Discrimina el schema por la SEÑAL: raw_score presente → EBS (CAIE
+    ingiere el número); contenido narrativo presente → narrativo. La mera
+    presencia de source_tool/examiner_id no convierte en EBS (los
+    SRL-MEMORY reales son narrativos que nombran su herramienta)."""
+    if "raw_score" in art:
+        return "ebs"
+    if any(k in art for k in NARRATIVE_CONTENT_KEYS):
+        return "narrative"
+    return "unknown"
 
 ERRORS = []
 WARNINGS = []
@@ -32,6 +52,9 @@ def fix(msg): FIXES.append(f"  [FIX]   {msg}")
 
 
 def validate_case(path: str, autofix: bool = False) -> bool:
+    # Los acumuladores son module-level: sin reset, una segunda llamada en el
+    # mismo proceso arrastra los errores de la anterior.
+    ERRORS.clear(); WARNINGS.clear(); FIXES.clear()
     p = Path(path)
     if not p.exists():
         print(f"FATAL: archivo no encontrado: {path}")
@@ -57,12 +80,33 @@ def validate_case(path: str, autofix: bool = False) -> bool:
         _print_results()
         return False
 
-    # 2. Validar cada artefacto
+    # 2. Validar cada artefacto según su schema real
     modified = False
     for art in artifacts:
         aid = art.get("artifact_id", "?")
+        schema = artifact_schema(art) if isinstance(art, dict) else "unknown"
 
-        # Campos obligatorios del artefacto
+        if schema == "narrative":
+            # Contrato mínimo narrativo: identidad + contenido interpretable.
+            for field in NARRATIVE_REQUIRED:
+                if field not in art:
+                    err(f"{aid}: campo obligatorio ausente: '{field}' (narrativo)")
+            # peirce_layer clasifica pero no ES contenido: la vía de texto
+            # necesita content o forensic_anomalies para interpretar algo.
+            if not (art.get("content") or art.get("forensic_anomalies")):
+                err(f"{aid}: artefacto narrativo sin contenido interpretable "
+                    f"(content/forensic_anomalies vacíos)")
+            # Sin señal numérica no hay ingesta CAIE: no aplican raw_score,
+            # rangos ni acquisition_assurance.
+            continue
+
+        if schema == "unknown":
+            err(f"{aid}: artefacto sin señal EBS (raw_score) ni contenido "
+                f"narrativo ({'/'.join(NARRATIVE_CONTENT_KEYS)}) — schema "
+                f"irreconocible")
+            continue
+
+        # Campos obligatorios del artefacto (schema EBS)
         for field in ARTIFACT_REQUIRED:
             if field not in art:
                 err(f"{aid}: campo obligatorio ausente: '{field}'")

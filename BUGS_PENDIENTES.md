@@ -4077,3 +4077,55 @@ hallados por búsqueda exhaustiva). Suite verde, corpus 166/199, 0 flips.
 
 **Validación:** suite verde por tanda; el corpus post-TANDA-4 (152/199) es la
 base honesta sobre la que Fase 2 (B-077) midió su +13.
+
+---
+
+## B-085 — Validador schema-aware + lote de metadata de adquisición (WHAT_IS_NEXT §1.1.2) [RESUELTO]
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | RESUELTO — POST HACKATHON (2026-07-07) |
+| **Severidad** | P2 — higiene de corpus; precondición del dataset de calibración (Tanda C / A4) |
+| **Archivo** | `validate_case.py`, `scripts/complete_acquisition_metadata.py` (nuevo), 145 casos del corpus |
+| **Antecedente** | AUDITORIA_MOTOR_SIN_LABEL §1 (54/199 PASS) y §3 (hipótesis causal ya refutada: metadata ausente ≠ FP/FN) |
+
+**Abducción (el titular escondía dos defectos distintos):** el "145/199 FAIL"
+mezclaba (a) casos EBS legítimamente incompletos y (b) **falsos positivos del
+propio validador**: el corpus tiene DOS schemas de artefacto — EBS-señales
+(raw_score → CAIE) y narrativo/semiótico (content/peirce_layer → vía de
+texto) — y validate_case.py solo conocía el primero. Los 41 errores
+"raw_score=-1 fuera de rango" del audit eran el DEFAULT del validador aplicado
+a artefactos narrativos sin raw_score. Censo clasificado: 90 EBS acq-ok,
+85 EBS sin acq, 24 narrativos/mixtos.
+
+**Fix 1 — validador schema-aware:** `artifact_schema()` discrimina por la
+señal (raw_score presente → contrato EBS; content/forensic_anomalies →
+contrato narrativo mínimo: artifact_id + contenido interpretable; ninguno →
+error de schema irreconocible). El contrato EBS queda EXACTAMENTE igual.
+Bonus: reset de acumuladores module-level (segunda llamada in-process
+arrastraba errores).
+
+**Fix 2 — lote aditivo honesto (doctrina L-037):** el script NO fabrica
+proveniencia física — documenta la real: `acquisition_tool` = método de
+`_migration_note` o declaración explícita de caso de corpus;
+`acquisition_hash` = sha256 del bundle FUENTE si existe en disco, si no
+auto-atestación del artefacto (con `acquisition_note` declarando qué cubre);
+`acquisition_timestamp` = fecha de migración o de esta documentación
+retroactiva; `write_blocker_used=False` (no hubo medio físico). Solo AGREGA
+campos ausentes en artefactos EBS no-contexto; nunca sobreescribe; no toca
+narrativos. 145 casos tocados.
+
+**Inducción (gates):**
+- Validador: 54/199 → **194/199 PASS**. Los 5 restantes son defectos reales
+  de forma: OWL-NEXUS5 (20 artefactos narrativos sin artifact_id),
+  NPS-2010-EMAILS ×2 y NPS-2014-USB (artefactos EBS sin timestamp),
+  CTF-2021-iOS — documentados, NO parcheados a ciegas.
+- Suite **876 passed** (+10 tests del validador, 4 rojos pre-fix).
+- Corpus **166/199 — 0 regresiones**. 2 movimientos sin cambio de pass/fail,
+  ambos coherentes con el mecanismo (metadata presente → acquisition_assurance
+  sube → trust sube): VIGIA-MAGNET-2022-iOS-JESS NOISE→SUSPICION (expected
+  INTENT: **un escalón más cerca del ground truth** — era FN documentado) y
+  VIGIA-CTF-2021-iOS NOISE→MALICE (expected UNKNOWN, auto-pasa; salto de 3
+  bandas anotado para revisión de etiqueta en Tanda C).
+
+**Tests:** `tests/test_validator_schema_aware.py` (10; rojos primero).

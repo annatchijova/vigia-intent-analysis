@@ -1,10 +1,10 @@
 {
   "case_id": "VIGIA-REAL-SRL-RD06-MEMORY",
-  "case_name": "SRL-2018 Remote Desktop Server RD-06 \u2014 Memory Forensics",
-  "description": "Volatility3 memory analysis. 0 LOTL processes + code injection in 4 processes. Minimal compromise \u2014 payload deployed but no active C2 at acquisition time. Likely a propagation target at the periphery of the attack.",
+  "case_name": "SRL-2018 Remote Desktop Server RD-06 — Memory Forensics",
+  "description": "Volatility3 memory analysis. 0 LOTL processes + code injection in 4 processes. Minimal compromise — payload deployed but no active C2 at acquisition time. Likely a propagation target at the periphery of the attack.",
   "expected_verdict": "MALICE",
   "source_dataset": "SANS SRL-2018",
-  "source_origin": "base-rd06-memory.img \u2014 vol3 RD06-001",
+  "source_origin": "base-rd06-memory.img — vol3 RD06-001",
   "source_url": "https://sansorg.egnyte.com",
   "carnegie_pattern_expected": null,
   "peirce_expected": "SECONDNESS",
@@ -19,36 +19,36 @@
       "artifact_id": "ART-RD06-001",
       "type": "kernel_structure",
       "peirce_layer": "SECONDNESS",
-      "content": "vol3 windows.malfind: code injection in 4 processes (PIDs: 3996, 112, 400, 00). PAGE_EXECUTE_READWRITE regions. Windows 10 Enterprise. No LOTL processes detected via pslist \u2014 payload dormant or beacon in long sleep cycle at acquisition.",
+      "content": "vol3 windows.malfind: code injection in 4 processes (PIDs: 3996, 112, 400, 00). PAGE_EXECUTE_READWRITE regions. Windows 10 Enterprise. No LOTL processes detected via pslist — payload dormant or beacon in long sleep cycle at acquisition.",
       "forensic_anomalies": [
-        "4 injected processes with PAGE_EXECUTE_READWRITE \u2014 same shellcode signature as all other compromised SRL-2018 hosts",
+        "4 injected processes with PAGE_EXECUTE_READWRITE — same shellcode signature as all other compromised SRL-2018 hosts",
         "Absence of active LOTL despite 4 injections: beacon may be in long sleep (hours/days) at 2018-09-07 acquisition time, or active LOTL terminated between infection and snapshot",
-        "Low injection count (4) vs other RD servers (12-43) positions RD-06 as peripheral propagation target \u2014 attacker allocated minimal resources to this host"
+        "Low injection count (4) vs other RD servers (12-43) positions RD-06 as peripheral propagation target — attacker allocated minimal resources to this host"
       ],
       "examiner_id": "SANS_HACKATHON_2026",
-      "source_tool": "base-memory.img \u2014 Volatility3 2.28.0 \u2014 vigia_agent.py"
+      "source_tool": "base-memory.img — Volatility3 2.28.0 — vigia_agent.py"
     },
     {
       "artifact_id": "ART-RD06-002",
       "type": "memory_process",
       "peirce_layer": "SECONDNESS",
-      "content": "vol3 windows.pslist: 0 living-off-the-land processes at acquisition time. Process list analyzed \u2014 no active cmd.exe, powershell.exe, rundll32.exe, or other LOLBAS anomalies in running state. Injected code present in memory but not executing via LOTL at snapshot time.",
+      "content": "vol3 windows.pslist: 0 living-off-the-land processes at acquisition time. Process list analyzed — no active cmd.exe, powershell.exe, rundll32.exe, or other LOLBAS anomalies in running state. Injected code present in memory but not executing via LOTL at snapshot time.",
       "forensic_anomalies": [
-        "Injected payload (4 processes confirmed by malfind) is dormant \u2014 shellcode present but beacon not calling out at acquisition time",
+        "Injected payload (4 processes confirmed by malfind) is dormant — shellcode present but beacon not calling out at acquisition time",
         "Dormant payload is a deliberate attacker OpSec choice: reduced network noise while maintaining persistence for future activation",
-        "0 LOTL with 4 injections is the lowest activity signature in the compromised RD server set \u2014 consistent with attacker treating RD-06 as a reserve/fallback pivot"
+        "0 LOTL with 4 injections is the lowest activity signature in the compromised RD server set — consistent with attacker treating RD-06 as a reserve/fallback pivot"
       ],
       "examiner_id": "SANS_HACKATHON_2026",
-      "source_tool": "base-memory.img \u2014 Volatility3 2.28.0 \u2014 vigia_agent.py"
+      "source_tool": "base-memory.img — Volatility3 2.28.0 — vigia_agent.py"
     },
     {
       "artifact_id": "ART-RD06-003",
       "type": "network_flow",
       "peirce_layer": "THIRDNESS",
-      "content": "vol3 windows.netscan: no established external connections at acquisition. Internal network connectivity expected via RDP (3389) and SMB (445) from RD-04 (primary pivot). Absence of external C2 connections consistent with dormant beacon state \u2014 payload injected but outbound communication suppressed.",
+      "content": "vol3 windows.netscan: no established external connections at acquisition. Internal network connectivity expected via RDP (3389) and SMB (445) from RD-04 (primary pivot). Absence of external C2 connections consistent with dormant beacon state — payload injected but outbound communication suppressed.",
       "forensic_anomalies": [
         "No external connections despite confirmed code injection: attacker deployed payload but has not yet activated external C2 on this host",
-        "Dormant + no external connections + 4 injections: classic sleeper compromise \u2014 attacker pre-positioned on RD-06 for future use if primary pivots (RD-04, RD-01) are detected",
+        "Dormant + no external connections + 4 injections: classic sleeper compromise — attacker pre-positioned on RD-06 for future use if primary pivots (RD-04, RD-01) are detected",
         "RD-06 dormant state increases forensic difficulty: standard network-based detection (IDS/IPS) would not alert on this host despite confirmed compromise"
       ],
       "examiner_id": "SANS_HACKATHON_2026",
@@ -58,20 +58,21 @@
       "artifact_id": "ART-RD06-004",
       "type": "log_entry",
       "peirce_layer": "THIRDNESS",
-      "content": "Corpus context: RD-06 is 5th of 5 compromised RD servers. Compromise chain: admin -> AV -> RD-04 (hub) -> RD-01, RD-03, RD-05, RD-06 (propagated). LARIAT C2 logs confirm systematic RD server sweep from hub at RD-04. RD-06 infected last in the sequence \u2014 explains minimal investment (4 injections, 0 active LOTL).",
+      "content": "Corpus context: RD-06 is 5th of 5 compromised RD servers. Compromise chain: admin -> AV -> RD-04 (hub) -> RD-01, RD-03, RD-05, RD-06 (propagated). LARIAT C2 logs confirm systematic RD server sweep from hub at RD-04. RD-06 infected last in the sequence — explains minimal investment (4 injections, 0 active LOTL).",
       "forensic_anomalies": [
-        "5/6 RD servers systematically compromised confirms deliberate sweep, not random propagation \u2014 attacker enumerated all available RD servers from hub",
+        "5/6 RD servers systematically compromised confirms deliberate sweep, not random propagation — attacker enumerated all available RD servers from hub",
         "RD-06 last in infection sequence: attacker priorities were RD-01 (12 LOTL) and RD-04 (30 LOTL) first, spreading to RD-06 as final redundancy",
         "Even dormant compromise provides attacker with persistence: if primary C2 pivots are cleaned, dormant RD-06 payload can be reactivated without re-exploitation"
       ],
       "examiner_id": "SANS_HACKATHON_2026",
-      "source_tool": "Corpus cross-analysis \u2014 LARIAT C2 logs"
+      "source_tool": "Corpus cross-analysis — LARIAT C2 logs"
     }
   ],
   "peirce_chain": {
-    "firstness": "RD server in compromised network \u2014 propagation target",
-    "secondness": "Code injection in 4 processes confirmed \u2014 same attacker toolset as RD-01/03/04/05",
+    "firstness": "RD server in compromised network — propagation target",
+    "secondness": "Code injection in 4 processes confirmed — same attacker toolset as RD-01/03/04/05",
     "thirdness": "Minimal footprint (0 LOTL, 4 injections) positions RD-06 as a peripheral propagation target. Attacker spread payload broadly across all RD servers but concentrated C2 activity on RD-04."
   },
-  "_consolidation": "VIG\u00cdA-REAL. vol3 RD06-001. Bundle: results/srl2018/RD06-001_bundle.json."
+  "_consolidation": "VIGÍA-REAL. vol3 RD06-001. Bundle: results/srl2018/RD06-001_bundle.json.",
+  "schema_version": 1
 }

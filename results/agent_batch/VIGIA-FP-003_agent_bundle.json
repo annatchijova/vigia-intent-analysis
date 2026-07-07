@@ -1,15 +1,15 @@
 {
   "agent_verdict": "INTENT",
-  "analysis_timestamp": "2026-07-07T17:24:32.585737+00:00",
+  "analysis_timestamp": "2026-07-07T17:54:47.014741+00:00",
   "audit_trail": {
     "agent_version": "1.0.0-SANS-2026",
     "case_id": "VIGIA-FP-003",
-    "end_time": "2026-07-07T17:24:32.585744+00:00",
+    "end_time": "2026-07-07T17:54:47.014747+00:00",
     "entries": [
       {
         "action": "AGENT_INITIALIZED",
         "case_id": "VIGIA-FP-003",
-        "entry_sha256": "421d4dc5d7e9ab3e2c2b31aa0f9fd195f313adefc79507f47b57b668e5b5eca2",
+        "entry_sha256": "8145ff8d009d265f51ead2bd575d7cdad06934ce1ea55c0b00375dac4f96758c",
         "inputs_summary": {
           "agent_file": "/home/user/vigia-intent-analysis/vigia_agent.py",
           "case_id": "VIGIA-FP-003"
@@ -21,13 +21,13 @@
           "agent_version": "1.0.0-SANS-2026"
         },
         "seq": 1,
-        "timestamp": "2026-07-07T17:24:32.433795+00:00",
+        "timestamp": "2026-07-07T17:54:46.865148+00:00",
         "tool": "vigia_agent"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-FP-003",
-        "entry_sha256": "c1ab6e208a7a8b8c65dac859545f94271030264c6419556f1a37d81d3b0403a1",
+        "entry_sha256": "04d33d9406cf21bfbe0256382e0e9639d67c4e4a89832d5ddc640ffa29be7da3",
         "inputs_summary": {
           "path": "/home/user/vigia-intent-analysis/data/cases/VIGIA-FP-003.json"
         },
@@ -35,29 +35,29 @@
         "note": "Computing SHA-256 of original evidence",
         "outputs_summary": {},
         "seq": 2,
-        "timestamp": "2026-07-07T17:24:32.433934+00:00",
+        "timestamp": "2026-07-07T17:54:46.865278+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-FP-003",
-        "entry_sha256": "0f661b87ebc11dbf0e56cda0fc470ea03f9ceb6e4f8f6ff30db0e78737f18abe",
+        "entry_sha256": "c6b4a840136a98ddad1b547b171614aee2e47e8302ac3510b997bb70470a38ef",
         "inputs_summary": {
           "path": "/home/user/vigia-intent-analysis/data/cases/VIGIA-FP-003.json"
         },
         "iteration": 0,
-        "note": "Evidence verified: 94938d4d6e0de5e2...",
+        "note": "Evidence verified: cb6536e650f9528f...",
         "outputs_summary": {
-          "sha256": "94938d4d6e0de5e272303800081c9d01c76129f708fbb4eb8c370854985d9439"
+          "sha256": "cb6536e650f9528f2ba54a1f0fb821ca588a24b618a8b85a0abd027534ca9869"
         },
         "seq": 3,
-        "timestamp": "2026-07-07T17:24:32.434073+00:00",
+        "timestamp": "2026-07-07T17:54:46.865402+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "PIPELINE_EXECUTE",
         "case_id": "VIGIA-FP-003",
-        "entry_sha256": "b5f905d993dbec9396608291f9eb66a15219924370f33bcb1c87e742730ee035",
+        "entry_sha256": "568c040b6bcb969ab3409e2c9de03fb825d897db1dbc3ec67a1f59154151591b",
         "inputs_summary": {
           "evidence": "/home/user/vigia-intent-analysis/data/cases/VIGIA-FP-003.json",
           "iteration": "0",
@@ -67,13 +67,13 @@
         "note": "Executing pipeline \u2014 iteration 0",
         "outputs_summary": {},
         "seq": 4,
-        "timestamp": "2026-07-07T17:24:32.434274+00:00",
+        "timestamp": "2026-07-07T17:54:46.865582+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "PIPELINE_COMPLETE",
         "case_id": "VIGIA-FP-003",
-        "entry_sha256": "2c2b401f32bdca6a8d472f606b7b8ce3889a128425139eb518c1c4e879820ea8",
+        "entry_sha256": "9bf51488113986ebfe275a7252ced7b37a5f539f1e17fada0bf4095e20c23a6a",
         "inputs_summary": {
           "iteration": "0"
         },
@@ -130,13 +130,13 @@
           ]
         },
         "seq": 5,
-        "timestamp": "2026-07-07T17:24:32.585169+00:00",
+        "timestamp": "2026-07-07T17:54:47.014216+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "CONTRADICTION_CHECK",
         "case_id": "VIGIA-FP-003",
-        "entry_sha256": "8806f6da4e6f7f8d9f65cf4c3baa4061804afb58bb5ec2e60d199e6987f722ce",
+        "entry_sha256": "ee04452181afc2a408ff8151c87ce581c14cd56c969f507c130b695c3d471801",
         "inputs_summary": {
           "n_signals": "3"
         },
@@ -147,13 +147,13 @@
           "threshold": "2"
         },
         "seq": 6,
-        "timestamp": "2026-07-07T17:24:32.585350+00:00",
+        "timestamp": "2026-07-07T17:54:47.014380+00:00",
         "tool": "contradiction_detector"
       },
       {
         "action": "AGENT_EXIT",
         "case_id": "VIGIA-FP-003",
-        "entry_sha256": "f9653c96267ae2a2c8b83822e7f339f5e09fa6c3d85f26ff6693622e0d505c2b",
+        "entry_sha256": "2773c82c712724d32d5c9be12bbff66cb063e9d2a8a7d5119975f65be5783926",
         "inputs_summary": {
           "verdict": "SUSPICION_DETECTED"
         },
@@ -164,18 +164,18 @@
           "exit_code": "3"
         },
         "seq": 7,
-        "timestamp": "2026-07-07T17:24:32.585660+00:00",
+        "timestamp": "2026-07-07T17:54:47.014645+00:00",
         "tool": "vigia_agent"
       }
     ],
-    "start_time": "2026-07-07T17:24:32.433275+00:00",
+    "start_time": "2026-07-07T17:54:46.864826+00:00",
     "total_entries": 7
   },
   "case_id": "VIGIA-FP-003",
   "evidence_path": "/home/user/vigia-intent-analysis/data/cases/VIGIA-FP-003.json",
-  "evidence_sha256": "94938d4d6e0de5e272303800081c9d01c76129f708fbb4eb8c370854985d9439",
+  "evidence_sha256": "cb6536e650f9528f2ba54a1f0fb821ca588a24b618a8b85a0abd027534ca9869",
   "iterations_executed": 1,
-  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-FP-003 ===\nEvidence: /home/user/vigia-intent-analysis/data/cases/VIGIA-FP-003.json\nEvidence SHA-256: 94938d4d6e0de5e272303800081c9d01c76129f708fbb4eb8c370854985d9439\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: SUSPICION_DETECTED\nPosterior confidence: 7/20\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 3 se\u00f1al(es): 3 primaria(s) de ['sift_azure_ad', 'sift_slack_export', 'sift_vision_ocr'], 0 derivada(s)/no-analizada(s). Top z: Camera CONF-01: post-it visible on monit=0.55, DM: 'Hey, saw your password on the post-=0.22, Password change recorded 5 minutes after=0.04.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: SUSPICION_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nFinance user writes their password on a post-it visible on a conference room camera. A colleague sees it, sends it via internal chat, the user changes it. No credential abuse occurs.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Camera CONF-01: post-it visible on monitor with written password] z=0.552 conf=0.60 \u2014 \n  [DM: 'Hey, saw your password on the post-it, sending it so you can chan] z=0.216 conf=0.30 \u2014 \n  [Password change recorded 5 minutes after the message] z=0.045 conf=0.90 \u2014 \n\n--- FINAL ALERT LEVEL ---\nMEDIUM \u2014 INTENT verdict with individual z-scores below threshold. Alert floored (B-028/B-065): an intent finding cannot present as LOW.\nReconciliation: verdict INTENT rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 3 | Derived: 0 | Total: 3",
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-FP-003 ===\nEvidence: /home/user/vigia-intent-analysis/data/cases/VIGIA-FP-003.json\nEvidence SHA-256: cb6536e650f9528f2ba54a1f0fb821ca588a24b618a8b85a0abd027534ca9869\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: SUSPICION_DETECTED\nPosterior confidence: 7/20\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 3 se\u00f1al(es): 3 primaria(s) de ['sift_azure_ad', 'sift_slack_export', 'sift_vision_ocr'], 0 derivada(s)/no-analizada(s). Top z: Camera CONF-01: post-it visible on monit=0.55, DM: 'Hey, saw your password on the post-=0.22, Password change recorded 5 minutes after=0.04.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: SUSPICION_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nFinance user writes their password on a post-it visible on a conference room camera. A colleague sees it, sends it via internal chat, the user changes it. No credential abuse occurs.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Camera CONF-01: post-it visible on monitor with written password] z=0.552 conf=0.60 \u2014 \n  [DM: 'Hey, saw your password on the post-it, sending it so you can chan] z=0.216 conf=0.30 \u2014 \n  [Password change recorded 5 minutes after the message] z=0.045 conf=0.90 \u2014 \n\n--- FINAL ALERT LEVEL ---\nMEDIUM \u2014 INTENT verdict with individual z-scores below threshold. Alert floored (B-028/B-065): an intent finding cannot present as LOW.\nReconciliation: verdict INTENT rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 3 | Derived: 0 | Total: 3",
   "pipeline_results": {
     "abduction": {
       "best_hypothesis": "SUSPICION_DETECTED",

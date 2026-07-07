@@ -1,15 +1,15 @@
 {
   "agent_verdict": "MALICE",
-  "analysis_timestamp": "2026-07-07T17:24:36.242250+00:00",
+  "analysis_timestamp": "2026-07-07T17:54:50.729853+00:00",
   "audit_trail": {
     "agent_version": "1.0.0-SANS-2026",
     "case_id": "VIGIA-NGDC-004",
-    "end_time": "2026-07-07T17:24:36.242260+00:00",
+    "end_time": "2026-07-07T17:54:50.729861+00:00",
     "entries": [
       {
         "action": "AGENT_INITIALIZED",
         "case_id": "VIGIA-NGDC-004",
-        "entry_sha256": "b5e36919d153902ab5fd7961a4cecae00a6a2dac9a7178a86136e2f091ae1b96",
+        "entry_sha256": "7e556823a9fe786b417b386aaaf9b5f89b3af7ce2156e0ef56f164744faf8a67",
         "inputs_summary": {
           "agent_file": "/home/user/vigia-intent-analysis/vigia_agent.py",
           "case_id": "VIGIA-NGDC-004"
@@ -21,13 +21,13 @@
           "agent_version": "1.0.0-SANS-2026"
         },
         "seq": 1,
-        "timestamp": "2026-07-07T17:24:36.081855+00:00",
+        "timestamp": "2026-07-07T17:54:50.571526+00:00",
         "tool": "vigia_agent"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-NGDC-004",
-        "entry_sha256": "23610ad52dc5a2a11ae04bca7b27dd936d166c1db96f0a791272335fc4f156f7",
+        "entry_sha256": "4f40b7c6e656234332432f29874e97d6dc08bbd3f517a925269c9ba09cfbe9f9",
         "inputs_summary": {
           "path": "/home/user/vigia-intent-analysis/data/cases/VIGIA-NGDC-004.json"
         },
@@ -35,29 +35,29 @@
         "note": "Computing SHA-256 of original evidence",
         "outputs_summary": {},
         "seq": 2,
-        "timestamp": "2026-07-07T17:24:36.082032+00:00",
+        "timestamp": "2026-07-07T17:54:50.571682+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-NGDC-004",
-        "entry_sha256": "35038de4edd5f9d2ed2b016466e3300c33540a3dee5c95e4de995da598890a2d",
+        "entry_sha256": "ebf252cbfb0516315306d8d256720008274b05a0de234c2d69962cd605c2e7e1",
         "inputs_summary": {
           "path": "/home/user/vigia-intent-analysis/data/cases/VIGIA-NGDC-004.json"
         },
         "iteration": 0,
-        "note": "Evidence verified: 40f91d229a18ee46...",
+        "note": "Evidence verified: 920e9c3bd17ebfb0...",
         "outputs_summary": {
-          "sha256": "40f91d229a18ee46466079f6855de9c88c66b6560f372ca525c439dee17f96a1"
+          "sha256": "920e9c3bd17ebfb07069d885e8c5aba87a9ffbacdfdf832ca01c47de391d0bd2"
         },
         "seq": 3,
-        "timestamp": "2026-07-07T17:24:36.082221+00:00",
+        "timestamp": "2026-07-07T17:54:50.571804+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "PIPELINE_EXECUTE",
         "case_id": "VIGIA-NGDC-004",
-        "entry_sha256": "6b0469c94184bb366c72cca41fdbbd5f6bdcf12b0fe1096bc7658b4684aaae7f",
+        "entry_sha256": "77ab464ea3bd11fb0cee0cb496f9f58ccf81c9c47a7c2c942ae1086734fe5c1c",
         "inputs_summary": {
           "evidence": "/home/user/vigia-intent-analysis/data/cases/VIGIA-NGDC-004.json",
           "iteration": "0",
@@ -67,13 +67,13 @@
         "note": "Executing pipeline \u2014 iteration 0",
         "outputs_summary": {},
         "seq": 4,
-        "timestamp": "2026-07-07T17:24:36.082441+00:00",
+        "timestamp": "2026-07-07T17:54:50.571945+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "PIPELINE_COMPLETE",
         "case_id": "VIGIA-NGDC-004",
-        "entry_sha256": "b8f76b6ff4d02ee8449c7bc3233e81571cd22a478483a9a7611864f8b8609655",
+        "entry_sha256": "c7434ca98db3d266b0c4c531c95bce1e009a6d743c8148d9e2e0319c03aa46bc",
         "inputs_summary": {
           "iteration": "0"
         },
@@ -146,13 +146,13 @@
           ]
         },
         "seq": 5,
-        "timestamp": "2026-07-07T17:24:36.241297+00:00",
+        "timestamp": "2026-07-07T17:54:50.728985+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "CONTRADICTION_CHECK",
         "case_id": "VIGIA-NGDC-004",
-        "entry_sha256": "ddc1dc76b9bbf4e7968818deb3d162a865e31112de24a73652a9c5c224caaa7e",
+        "entry_sha256": "15f13a2ea07d02ee5992d9227456254d6e0fc1b82b77a6f733cf94cdf4976130",
         "inputs_summary": {
           "n_signals": "6"
         },
@@ -163,13 +163,13 @@
           "threshold": "2"
         },
         "seq": 6,
-        "timestamp": "2026-07-07T17:24:36.241567+00:00",
+        "timestamp": "2026-07-07T17:54:50.729195+00:00",
         "tool": "contradiction_detector"
       },
       {
         "action": "AGENT_EXIT",
         "case_id": "VIGIA-NGDC-004",
-        "entry_sha256": "bcb53e1bcd1cf21b8ca83dcb0fac1748efe5ddcc2466a5f88591d252718feca9",
+        "entry_sha256": "9696b9c7de16205ba828c0c8b0460bf0e9ffb6ebcb4f7256f063325064296897",
         "inputs_summary": {
           "verdict": "MALICIOUS_INTENT_DETECTED"
         },
@@ -180,18 +180,18 @@
           "exit_code": "1"
         },
         "seq": 7,
-        "timestamp": "2026-07-07T17:24:36.241944+00:00",
+        "timestamp": "2026-07-07T17:54:50.729505+00:00",
         "tool": "vigia_agent"
       }
     ],
-    "start_time": "2026-07-07T17:24:36.081280+00:00",
+    "start_time": "2026-07-07T17:54:50.571169+00:00",
     "total_entries": 7
   },
   "case_id": "VIGIA-NGDC-004",
   "evidence_path": "/home/user/vigia-intent-analysis/data/cases/VIGIA-NGDC-004.json",
-  "evidence_sha256": "40f91d229a18ee46466079f6855de9c88c66b6560f372ca525c439dee17f96a1",
+  "evidence_sha256": "920e9c3bd17ebfb07069d885e8c5aba87a9ffbacdfdf832ca01c47de391d0bd2",
   "iterations_executed": 1,
-  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-NGDC-004 ===\nEvidence: /home/user/vigia-intent-analysis/data/cases/VIGIA-NGDC-004.json\nEvidence SHA-256: 40f91d229a18ee46466079f6855de9c88c66b6560f372ca525c439dee17f96a1\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 19/20\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 6 se\u00f1al(es): 6 primaria(s) de ['EML aggregate \u2014 email.zip (12 files, LogKext exfiltration output)', 'fls (Sleuth Kit) + ewfmount 20140814 \u2014 tracy-home-2012-07-16-final.E01, HFS+ direct (no partition table)', 'fls (Sleuth Kit) + icat \u2014 tracy-home E01, Trash contents', 'fls (Sleuth Kit) \u2014 inode 377895 joesumtwelve DELETED', 'icat (Sleuth Kit) \u2014 joesumtwelve/.bash_history', 'sqlite3 \u2014 EmailProviderBody.db messageKeys 16-27, carry-tablet-2012-07-16-final.E01'], 0 derivada(s)/no-analizada(s). Top z: bash_history from joesumtwelve's deleted=0.89, LogKext LaunchDaemon plist (com.fsb.logK=0.88, User account joesumtwelve exists as a DE=0.85.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: MALICIOUS_INTENT_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nThis bundle upgrades VIGIA-NGDC-003 (Joe, SUSPICION) to MALICE based on physical disk evidence extracted from tracy-home-2012-07-16-final.E01 (4.0GB + 1.4GB E02, Apple HFS+ v4, acquired 2012-07-16). Three independent evidence sources now converge on the same actor: (1) 12 EML keylogger exfiltration logs (email.zip), (2) EmailProviderBody.db from carry-tablet-2012-07-16-final.E01, and (3) physical disk artifacts from Tracy's MacBook Air. The disk image reveals joesumtwelve as a DELETED user accou\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [bash_history from joesumtwelve's deleted home directory contains comma] z=0.893 conf=0.93 \u2014 \n  [LogKext LaunchDaemon plist (com.fsb.logKext) physically present on Tra] z=0.883 conf=0.93 \u2014 \n  [User account joesumtwelve exists as a DELETED entry (inode 377895) on ] z=0.846 conf=0.91 \u2014 \n  [12 exfiltration sessions confirmed via EML files spanning 2012-06-28 t] z=0.819 conf=0.90 \u2014 \n  [Tracy-Carry email thread recovered from Carry's tablet provides indepe] z=0.783 conf=0.89 \u2014 \n\n--- FINAL ALERT LEVEL ---\nHIGH \u2014 MALICE verdict from Bayesian posterior aggregation. Individual z-scores below threshold (distributed evidence pattern: no single dominant signal, but aggregate posterior is decisive). Alert floored (B-028/B-065).\nReconciliation: verdict MALICE rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 6 | Derived: 0 | Total: 6",
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-NGDC-004 ===\nEvidence: /home/user/vigia-intent-analysis/data/cases/VIGIA-NGDC-004.json\nEvidence SHA-256: 920e9c3bd17ebfb07069d885e8c5aba87a9ffbacdfdf832ca01c47de391d0bd2\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 19/20\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 6 se\u00f1al(es): 6 primaria(s) de ['EML aggregate \u2014 email.zip (12 files, LogKext exfiltration output)', 'fls (Sleuth Kit) + ewfmount 20140814 \u2014 tracy-home-2012-07-16-final.E01, HFS+ direct (no partition table)', 'fls (Sleuth Kit) + icat \u2014 tracy-home E01, Trash contents', 'fls (Sleuth Kit) \u2014 inode 377895 joesumtwelve DELETED', 'icat (Sleuth Kit) \u2014 joesumtwelve/.bash_history', 'sqlite3 \u2014 EmailProviderBody.db messageKeys 16-27, carry-tablet-2012-07-16-final.E01'], 0 derivada(s)/no-analizada(s). Top z: bash_history from joesumtwelve's deleted=0.89, LogKext LaunchDaemon plist (com.fsb.logK=0.88, User account joesumtwelve exists as a DE=0.85.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: MALICIOUS_INTENT_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nThis bundle upgrades VIGIA-NGDC-003 (Joe, SUSPICION) to MALICE based on physical disk evidence extracted from tracy-home-2012-07-16-final.E01 (4.0GB + 1.4GB E02, Apple HFS+ v4, acquired 2012-07-16). Three independent evidence sources now converge on the same actor: (1) 12 EML keylogger exfiltration logs (email.zip), (2) EmailProviderBody.db from carry-tablet-2012-07-16-final.E01, and (3) physical disk artifacts from Tracy's MacBook Air. The disk image reveals joesumtwelve as a DELETED user accou\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [bash_history from joesumtwelve's deleted home directory contains comma] z=0.893 conf=0.93 \u2014 \n  [LogKext LaunchDaemon plist (com.fsb.logKext) physically present on Tra] z=0.883 conf=0.93 \u2014 \n  [User account joesumtwelve exists as a DELETED entry (inode 377895) on ] z=0.846 conf=0.91 \u2014 \n  [12 exfiltration sessions confirmed via EML files spanning 2012-06-28 t] z=0.819 conf=0.90 \u2014 \n  [Tracy-Carry email thread recovered from Carry's tablet provides indepe] z=0.783 conf=0.89 \u2014 \n\n--- FINAL ALERT LEVEL ---\nHIGH \u2014 MALICE verdict from Bayesian posterior aggregation. Individual z-scores below threshold (distributed evidence pattern: no single dominant signal, but aggregate posterior is decisive). Alert floored (B-028/B-065).\nReconciliation: verdict MALICE rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 6 | Derived: 0 | Total: 6",
   "pipeline_results": {
     "abduction": {
       "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
