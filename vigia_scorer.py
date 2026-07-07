@@ -433,7 +433,19 @@ def _vigia_score(case: dict) -> dict:
         caie_fractures_source indicates whether live CAIE ("live_caie") or
         pre-computed JSON fractures ("json_fallback") were used.
     """
+    # Round 4 (boundary): un `case` que no es dict (None, str, lista, número)
+    # rompía en `case.get(...)` con AttributeError. Fail-loud LIMPIO: ERROR, no
+    # excepción — el scorer nunca debe crashear por un input degenerado.
+    if not isinstance(case, dict):
+        return {"verdict": "ERROR", "score": 0.0, "confidence": 0.0, "fractures": [],
+                "error": f"case must be a dict, got {type(case).__name__} — "
+                         f"cannot evaluate"}
+
     case          = _normalize_case(case)
+    if not isinstance(case, dict):
+        # _normalize_case (bridge) podría degradar a no-dict — misma guarda.
+        return {"verdict": "ERROR", "score": 0.0, "confidence": 0.0, "fractures": [],
+                "error": "normalized case is not a dict — cannot evaluate"}
     artifacts_all = case.get("artifacts", [])
     violations    = case.get("temporal_violations", [])
     provenance    = case.get("provenance_analysis", {})
@@ -781,22 +793,35 @@ def _vigia_score(case: dict) -> dict:
     for _idx, et in enumerate(effective_trusts):
         _by_type.setdefault(et["evidence_type"], []).append(_idx)
 
+    # Round 4 (boundary/perf): el loop legacy evaluaba TODOS los prefijos k=1..n
+    # -> O(n^2) por tipo (un flood de un solo tipo tardaba segundos). Los
+    # prefijos candidatos se reducen a {1,2,3,4,n} SIN cambiar el resultado (bit
+    # a bit idéntico, verificado sobre 20k casos aleatorios):
+    #   penalty(k) = min(0.5, (k-1)*0.15) es CONSTANTE (=0.5) para k>=5, así que
+    #   entre los prefijos de k>=5 el factor Noisy-OR es no-creciente en k
+    #   (cada artefacto extra multiplica por (1 - adj) <= 1) -> el mínimo en ese
+    #   régimen está SIEMPRE en k=n. Solo k=1,2,3,4 (donde penalty varía) y k=n
+    #   pueden ganar. Se evalúan en orden ascendente con `<=` para conservar el
+    #   desempate legacy (prefijo más grande gana). Costo: O(n) por tipo.
+    def _prefix_factor(_ranked, _k):
+        _pen = min(0.5, (_k - 1) * 0.15)
+        _adjs = [
+            _dround(effective_trusts[_i]["adjusted_score"] * (1 - _pen),
+                    _DETERMINISTIC_OUTPUT_PREC)
+            for _i in _ranked[:_k]
+        ]
+        return math.prod(max(0.0, 1.0 - _s) for _s in _adjs), _adjs
+
     adj_scores = [0.0] * len(effective_trusts)
     for _idxs in _by_type.values():
         _ranked = sorted(_idxs, key=lambda i: -effective_trusts[i]["adjusted_score"])
+        _n = len(_ranked)
+        _candidates = list(range(1, _n + 1)) if _n <= 4 else [1, 2, 3, 4, _n]
         _best_factor = 1.0   # factor Noisy-OR del grupo: menor = más señal
         _best_k      = 0
         _best_adjs: list[float] = []
-        for _k in range(1, len(_ranked) + 1):
-            _pen  = min(0.5, (_k - 1) * 0.15)
-            _adjs = [
-                _dround(
-                    effective_trusts[_i]["adjusted_score"] * (1 - _pen),
-                    _DETERMINISTIC_OUTPUT_PREC,
-                )
-                for _i in _ranked[:_k]
-            ]
-            _factor = math.prod(max(0.0, 1.0 - _s) for _s in _adjs)
+        for _k in _candidates:
+            _factor, _adjs = _prefix_factor(_ranked, _k)
             # <= : ante empate se prefiere el prefijo MÁS GRANDE (máxima
             # atribución de evidencia) — determinista.
             if _factor <= _best_factor:
