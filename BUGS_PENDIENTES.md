@@ -3994,9 +3994,14 @@ aplicados sobre los hallazgos adyacentes:
 **Pendiente del censo (mejoras opcionales):** emitir `z_frac`/`conf_frac`
 exactas en metadata de `to_signal()`; unificar el estilo `float(z)/Z_CLIP_MAX`
 (Windows, doble redondeo) con `float(z/z_clip)` (móvil, redondeo único).
-Observación menor: el clip de `ebs_v1.SignalOutput` convierte NaN → 5.0 en
-silencio (semántica de `min` con NaN); la variante de `signal_contract` rechaza
-no-finitos con error.
+Observación menor — **CERRADA (2026-07-07, mismo día):** el clip de
+`ebs_v1.SignalOutput` convertía NaN → 5.0 en silencio (semántica de `min` con
+NaN) — un z_score corrupto entraba como señal CRÍTICA máxima. Unificado al
+patrón fail-closed de `signal_contract`: `value`/`z_score` no-finitos →
+ValueError en ambas variantes (Pydantic y fallback dataclass, esta última
+verificada bloqueando pydantic). Clip/clamp sobre finitos sin cambio. Tests
+rojos primero: `tests/test_b083_signaloutput_fail_closed.py` (14, 8 rojos
+pre-fix). Suite 849, corpus 166/199, 0 flips.
 
 **Validación:** `tests/test_census_adjacent_fixes.py` (13, valores divergentes
 hallados por búsqueda exhaustiva). Suite verde, corpus 166/199, 0 flips.

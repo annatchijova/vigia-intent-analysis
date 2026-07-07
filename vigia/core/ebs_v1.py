@@ -52,6 +52,7 @@ COMPATIBILITY:
 """
 from __future__ import annotations
 
+import math
 import uuid
 from datetime import datetime, timezone
 from typing import Any, Dict, List, Literal, Optional, Tuple
@@ -104,6 +105,16 @@ if _USE_PYDANTIC:
         metadata: Optional[Dict[str, Any]] = None
         description: Optional[str] = None
 
+        @field_validator("value", "z_score")
+        @classmethod
+        def _must_be_finite(cls, v: float) -> float:
+            # B-083: fail-closed como signal_contract. Antes, min() con NaN
+            # retornaba Z_CLIP_MAX (nan < x es False) → un z_score corrupto
+            # entraba en silencio como señal CRÍTICA z=5.0.
+            if not math.isfinite(v):
+                raise ValueError(f"SignalOutput requiere valores finitos; recibido: {v}")
+            return float(v)
+
         @field_validator("z_score")
         @classmethod
         def _clip_z(cls, v: float) -> float:
@@ -129,6 +140,13 @@ else:
         description: Optional[str] = None
 
         def __post_init__(self) -> None:
+            # B-083: fail-closed como signal_contract (ver validador Pydantic).
+            for _fname in ("value", "z_score"):
+                _v = float(getattr(self, _fname))
+                if not math.isfinite(_v):
+                    raise ValueError(
+                        f"SignalOutput requiere valores finitos; recibido {_fname}={_v}"
+                    )
             self.z_score = max(-Z_CLIP_MAX, min(Z_CLIP_MAX, float(self.z_score)))
             self.confidence = max(0.0, min(1.0, float(self.confidence)))
 

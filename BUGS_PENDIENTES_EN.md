@@ -4263,9 +4263,14 @@ consumers re-quantize deterministically. Fixes applied on the adjacent findings:
 **Census leftovers (optional improvements):** emit exact `z_frac`/`conf_frac`
 in `to_signal()` metadata; unify the `float(z)/Z_CLIP_MAX` style (Windows,
 double rounding) with `float(z/z_clip)` (mobile, single rounding). Minor
-observation: the `ebs_v1.SignalOutput` clip silently converts NaN → 5.0
-(`min` semantics with NaN); the `signal_contract` variant rejects non-finite
-values with an error.
+observation — **CLOSED (2026-07-07, same day):** the `ebs_v1.SignalOutput`
+clip silently converted NaN → 5.0 (`min` semantics with NaN) — a corrupt
+z_score entered as a maximum CRITICAL signal. Unified to the fail-closed
+pattern of `signal_contract`: non-finite `value`/`z_score` → ValueError in
+both variants (Pydantic and dataclass fallback, the latter verified by
+blocking pydantic). Clip/clamp on finite values unchanged. Red tests first:
+`tests/test_b083_signaloutput_fail_closed.py` (14, 8 red pre-fix). Suite 849,
+corpus 166/199, 0 flips.
 
 **Validation:** `tests/test_census_adjacent_fixes.py` (13, divergent values
 found by exhaustive search). Suite green, corpus 166/199, 0 flips.

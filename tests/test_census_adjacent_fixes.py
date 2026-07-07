@@ -114,7 +114,7 @@ class TestReasonerFractionThresholds:
         from vigia.inference.abductive_reasoner import _z_frac
         assert _z_frac(self._sig(2.8)) == Fraction(14, 5)
         assert _z_frac(self._sig(0.0)) == Fraction(0, 1)
-        # NaN directo (el DTO ebs_v1 lo clipea a 5.0 antes de llegar acá;
+        # NaN directo (el DTO ebs_v1 lo rechaza con ValueError desde B-083;
         # el guard cubre adaptadores que no pasan por ese validador).
         assert _z_frac(SimpleNamespace(z_score=float("nan"))) == Fraction(0, 1)
         assert _z_frac(SimpleNamespace(z_score=float("inf"))) == Fraction(0, 1)
