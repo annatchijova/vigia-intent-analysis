@@ -101,6 +101,36 @@ class TestSignedZeroNormalization:
                 f"payload — encoder copies are no longer in lockstep"
             )
 
+    def test_v1_legacy_copies_agree(self):
+        """R3-2: la ruta de compatibilidad (fallback a v1 para bundles
+        historicos) tambien debe estar en lockstep — si una copia deriva su
+        _canonicalize_v1, un bundle historico verificaria distinto segun quien
+        lo verifique (contradiccion ante un tribunal)."""
+        from vigia.core.canonicalize import _canonicalize_v1 as v1_source
+        reference = v1_source(MIXED_PAYLOAD)
+        impls = {
+            "core.canonicalize": v1_source,
+            "bundle_builder": pytest.importorskip("vigia.core.bundle_builder")._canonicalize_v1,
+            "models.ebs": pytest.importorskip("vigia.models.ebs")._canonicalize_v1,
+        }
+        for name, rel in _SCRIPT_COPIES.items():
+            mod = _load_script(rel, f"lockstep_v1_{name}")
+            fn = getattr(mod, "_canonicalize_v1", None)
+            if fn is not None:
+                impls[name] = fn
+        for name, fn in impls.items():
+            assert fn(MIXED_PAYLOAD) == reference, (
+                f"{name}._canonicalize_v1 diverged — la ruta de verificacion "
+                f"de bundles historicos ya no esta en lockstep (R3-2)"
+            )
+
+    def test_v2_closes_string_scalar_collision(self):
+        """R3-2 en el guard de lockstep: el default (v2) separa el string
+        "true" del bool True en toda copia."""
+        for name, fn in _all_impls().items():
+            assert fn("true") != fn(True), f"{name}: colision True/'true' no cerrada (v2)"
+            assert fn("1:int") != fn(1), f"{name}: colision 1/'1:int' no cerrada (v2)"
+
     def test_producer_and_authoritative_verifier_hash_identically(self):
         verifier = _load_script(
             _SCRIPT_COPIES["forensics_verifier"], "lockstep_hash_check"

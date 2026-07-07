@@ -45,9 +45,22 @@ def _sha256(text: str) -> str:
     return hashlib.sha256(text.encode("utf-8")).hexdigest()
 
 
-# ── Copia stdlib-only de vigia/core/canonicalize.py (esquema v1) ──────────
+# ── Copia stdlib-only de vigia/core/canonicalize.py ───────────────────────
+# Mantiene su propia copia por diseño (verificador de terceros, sin imports de
+# produccion). DEBE quedar en lockstep con vigia/core/canonicalize.py — lo
+# verifica tests/test_canonicalize_lockstep.py.
+import unicodedata as _unicodedata
+from fractions import Fraction as _Fraction
 
-def _canonicalize(obj):
+_V2_STR_PREFIX = "s:"
+
+
+def _v2_norm_str(s):
+    return _unicodedata.normalize("NFC", s.replace("\r\n", "\n").replace("\r", "\n"))
+
+
+def _canonicalize_v1(obj):
+    """Esquema v1 (LEGACY — solo para verificar bundles historicos)."""
     if isinstance(obj, bool):
         return "true" if obj else "false"
     if isinstance(obj, int):
@@ -65,22 +78,63 @@ def _canonicalize(obj):
     if obj is None:
         return "null"
     if isinstance(obj, dict):
-        return {k: _canonicalize(v) for k, v in sorted(obj.items())}
+        return {k: _canonicalize_v1(v) for k, v in sorted(obj.items())}
     if isinstance(obj, (list, tuple)):
-        return [_canonicalize(v) for v in obj]
+        return [_canonicalize_v1(v) for v in obj]
     return str(obj)
 
 
-def _canonical_hash(payload: dict) -> str:
-    canonical = json.dumps(_canonicalize(payload), sort_keys=True, ensure_ascii=True)
+def _canonicalize_v2(obj):
+    """Esquema v2 (R3-2) — DEFAULT. Escalares identicos a v1; strings escapados
+    (s: + NFC/CRLF->LF); Fraction explicito. Cierra las colisiones de tipo."""
+    if isinstance(obj, bool):
+        return "true" if obj else "false"
+    if isinstance(obj, int):
+        return f"{obj}:int"
+    if isinstance(obj, float):
+        if obj != obj:
+            return "nan"
+        if obj == float("inf"):
+            return "inf"
+        if obj == float("-inf"):
+            return "-inf"
+        return f"{obj + 0.0:.8f}"  # +0.0 maps -0.0 -> 0.0: signed zero must canonicalize identically
+    if isinstance(obj, str):
+        return _V2_STR_PREFIX + _v2_norm_str(obj)
+    if obj is None:
+        return "null"
+    if isinstance(obj, _Fraction):
+        return f"{obj.numerator}/{obj.denominator}:frac"
+    if isinstance(obj, dict):
+        return {k: _canonicalize_v2(v) for k, v in sorted(obj.items())}
+    if isinstance(obj, (list, tuple)):
+        return [_canonicalize_v2(v) for v in obj]
+    return _V2_STR_PREFIX + _v2_norm_str(str(obj))
+
+
+def _canonicalize(obj):
+    """Forma canonica DEFAULT (v2)."""
+    return _canonicalize_v2(obj)
+
+
+def _canonical_hash(payload: dict, canon=_canonicalize) -> str:
+    canonical = json.dumps(canon(payload), sort_keys=True, ensure_ascii=True)
     return _sha256(canonical)
 
 
-def _entry_hash_v2(entry: dict) -> str:
+def _entry_hash_v2(entry: dict, canon=_canonicalize) -> str:
     payload = {k: v for k, v in entry.items() if k not in _STRUCTURAL_FIELDS}
     payload["seq"] = entry.get("seq")
     payload["prev_hash"] = entry.get("prev_hash", "")
-    return _canonical_hash(payload)
+    return _canonical_hash(payload, canon=canon)
+
+
+def _entry_hash_matches(entry: dict, stored: str) -> bool:
+    """True si el entry_hash almacenado recomputa bajo v2 O v1 (R3-2 compat)."""
+    return any(
+        _entry_hash_v2(entry, canon=c) == stored
+        for c in (_canonicalize_v2, _canonicalize_v1)
+    )
 
 
 def _resolve_hmac_key(args) -> bytes | None:
@@ -158,11 +212,11 @@ def _verify_v2(log: list, verbose: bool, hmac_key: bytes | None) -> bool:
             expected_seq = seq if isinstance(seq, int) else expected_seq
         if entry.get("prev_hash", "") != expected_prev:
             errors.append("prev_hash no coincide con entry_hash anterior")
-        recomputed = _entry_hash_v2(entry)
         stored = entry.get("entry_hash", "")
-        if recomputed != stored:
+        if not _entry_hash_matches(entry, stored):
+            recomputed = _entry_hash_v2(entry)
             errors.append(
-                f"entry_hash no recomputa (contenido alterado): "
+                f"entry_hash no recomputa (contenido alterado, ni v2 ni v1): "
                 f"esperado {recomputed[:16]}..., almacenado {(stored or '(empty)')[:16]}..."
             )
         if hmac_key is not None:

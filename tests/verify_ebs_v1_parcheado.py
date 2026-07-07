@@ -81,29 +81,25 @@ _DETERMINISTIC_FLOAT_PREC = 6
 
 # Implementación standalone de _canonicalize/_sha256_dict
 # Copiada de vigia/core/bundle_builder.py para funcionar sin PYTHONPATH
-def _canonicalize(obj: Any) -> Any:
-    """
-    Convierte recursivamente un objeto a forma canónica estricta para hasheo (H22).
+# Lockstep con vigia/core/canonicalize.py (R3-2): v2 default, v1 legacy.
+import unicodedata as _unicodedata
+from fractions import Fraction as _Fraction
 
-    Problema: JSON no distingue int de float (1 vs 1.0 → strings distintos).
-    Si el Optimizer produce un score como int y otro módulo lo lee como float,
-    el bundle_hash cambia sin que el contenido haya cambiado — rompe Invariante I2.
+_V2_STR_PREFIX = "s:"
 
-    Reglas de canonicalización:
-    - float  → string con 8 decimales fijos ("1.00000000")
-    - int    → string con sufijo ":int" ("1:int") — diferencia de float(1)
-    - bool   → "true" / "false" (minúsculas, antes de int porque bool es subclase)
-    - None   → "null"
-    - str    → sin cambios
-    - dict   → keys ordenadas, valores recursivos
-    - list   → elementos recursivos (orden preservado — listas son ordenadas)
-    """
+
+def _v2_norm_str(s):
+    return _unicodedata.normalize("NFC", s.replace("\r\n", "\n").replace("\r", "\n"))
+
+
+def _canonicalize_v1(obj: Any) -> Any:
+    """Esquema v1 (LEGACY — solo verificacion de bundles historicos)."""
     if isinstance(obj, bool):
         return "true" if obj else "false"
     if isinstance(obj, int):
         return f"{obj}:int"
     if isinstance(obj, float):
-        if obj != obj:          # NaN
+        if obj != obj:
             return "nan"
         if obj == float("inf"):
             return "inf"
@@ -115,11 +111,43 @@ def _canonicalize(obj: Any) -> Any:
     if obj is None:
         return "null"
     if isinstance(obj, dict):
-        return {k: _canonicalize(v) for k, v in sorted(obj.items())}
+        return {k: _canonicalize_v1(v) for k, v in sorted(obj.items())}
     if isinstance(obj, (list, tuple)):
-        return [_canonicalize(v) for v in obj]
-    # Fallback para tipos no reconocidos — str() para no romper el hash
+        return [_canonicalize_v1(v) for v in obj]
     return str(obj)
+
+
+def _canonicalize_v2(obj: Any) -> Any:
+    """Esquema v2 (R3-2) — DEFAULT. Escalares identicos a v1; strings escapados
+    (s: + NFC/CRLF->LF); Fraction explicito. Cierra las colisiones de tipo."""
+    if isinstance(obj, bool):
+        return "true" if obj else "false"
+    if isinstance(obj, int):
+        return f"{obj}:int"
+    if isinstance(obj, float):
+        if obj != obj:
+            return "nan"
+        if obj == float("inf"):
+            return "inf"
+        if obj == float("-inf"):
+            return "-inf"
+        return f"{obj + 0.0:.8f}"  # +0.0 maps -0.0 -> 0.0: signed zero must canonicalize identically
+    if isinstance(obj, str):
+        return _V2_STR_PREFIX + _v2_norm_str(obj)
+    if obj is None:
+        return "null"
+    if isinstance(obj, _Fraction):
+        return f"{obj.numerator}/{obj.denominator}:frac"
+    if isinstance(obj, dict):
+        return {k: _canonicalize_v2(v) for k, v in sorted(obj.items())}
+    if isinstance(obj, (list, tuple)):
+        return [_canonicalize_v2(v) for v in obj]
+    return _V2_STR_PREFIX + _v2_norm_str(str(obj))
+
+
+def _canonicalize(obj: Any) -> Any:
+    """Forma canonica DEFAULT (v2). Ver vigia/core/canonicalize.py."""
+    return _canonicalize_v2(obj)
 
 
 def _sha256_dict(obj: Dict) -> str:

@@ -34,8 +34,14 @@ def _utcnow_iso() -> str:
     return datetime.now(timezone.utc).isoformat()
 
 
-# P1-19: importar _canonicalize canónico — unificación de esquemas
-from vigia.core.canonicalize import _canonicalize  # noqa: F401
+# P1-19: importar _canonicalize canónico — unificación de esquemas.
+# R3-2: este logger usa la forma canónica como REPRESENTACIÓN ALMACENADA del
+# JSONL (no solo como insumo de hash) — `_seq` se guarda como "N:int",
+# strings verbatim, etc., y los consumidores parsean ese formato. El fix v2
+# (prefijo "s:" en strings) es para la CANONICALIZACIÓN DE BUNDLES SELLADOS
+# (bundle_builder / hash_chain / verificadores), NO para este log local de
+# ejecución. Se fija a v1 para preservar el formato de almacenamiento estable.
+from vigia.core.canonicalize import _canonicalize_v1 as _canonicalize  # noqa: F401
 
 
 # ── Logger principal ──────────────────────────────────────────────────────

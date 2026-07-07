@@ -36,7 +36,10 @@ LEVEL_ORDER = ["INFO", "LOW", "MEDIUM", "HIGH", "CRITICAL"]
 # ── I2 Compliant canonical hash ──────────────────────────────────────────
 
 # P1-19: importar _canonicalize canónico
-from vigia.core.canonicalize import _canonicalize  # noqa: F401
+# R3-2: consumidor fuera del camino de bundle sellado — hashing local de comparación entre corridas (no bundle sellado).
+# Se fija a v1 (comportamiento previo) para que el fix v2 (prefijo "s:"
+# en strings) no altere su salida/hash. v2 es solo para el sellado.
+from vigia.core.canonicalize import _canonicalize_v1 as _canonicalize  # noqa: F401
 
 def hash_forensic(obj: Dict) -> str:
     raw = json.dumps(_canonicalize(obj), sort_keys=True, ensure_ascii=True).encode()

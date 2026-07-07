@@ -48,7 +48,11 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Sequence
 
-from vigia.core.canonicalize import _canonicalize
+from vigia.core.canonicalize import (
+    _canonicalize,       # default v2
+    _canonicalize_v1,
+    _canonicalize_v2,
+)
 
 CHAIN_SCHEMA_VERSION: str = "2"
 GENESIS_HASH: str = "0" * 64
@@ -62,23 +66,39 @@ _HMAC_KEY_FILE_ENV = "VIGIA_HMAC_KEY_FILE"
 # Hashing
 # ──────────────────────────────────────────────────────────────────────────
 
-def canonical_hash(payload: Dict[str, Any]) -> str:
-    """SHA-256 del payload en forma canónica v1 (canonicalize.py)."""
+def canonical_hash(payload: Dict[str, Any], canon=_canonicalize) -> str:
+    """SHA-256 del payload en forma canónica (canonicalize.py). `canon` elige
+    el esquema: default v2 (sellos nuevos); v1 solo para verificar historicos."""
     canonical = json.dumps(
-        _canonicalize(payload), sort_keys=True, ensure_ascii=True,
+        canon(payload), sort_keys=True, ensure_ascii=True,
     )
     return hashlib.sha256(canonical.encode("utf-8")).hexdigest()
 
 
-def compute_entry_hash(seq: int, prev_hash: str, payload: Dict[str, Any]) -> str:
+def compute_entry_hash(seq: int, prev_hash: str, payload: Dict[str, Any],
+                       canon=_canonicalize) -> str:
     """
     Hash de un eslabón: payload completo + seq + prev_hash.
 
     El payload NO debe contener las claves 'seq' ni 'prev_hash' (se
     agregan acá). Si las contiene, se sobreescriben — el hash siempre
     usa los valores estructurales de la cadena.
+
+    `canon` = esquema de canonicalizacion: default v2. La verificacion prueba
+    v2 y cae a v1 para eslabones sellados bajo el esquema legacy (R3-2).
     """
-    return canonical_hash({**payload, "seq": seq, "prev_hash": prev_hash})
+    return canonical_hash({**payload, "seq": seq, "prev_hash": prev_hash}, canon=canon)
+
+
+def _entry_hash_matches(link: "ChainLink") -> bool:
+    """True si el entry_hash almacenado recomputa bajo v2 O bajo v1 (R3-2
+    backward-compat). Un eslabon manipulado no reproduce ninguno de los dos:
+    ofrecer dos formas canonicas no ayuda al falsificador (ambas son
+    resistentes a preimagen), pero permite verificar cadenas legacy v1."""
+    for canon in (_canonicalize_v2, _canonicalize_v1):
+        if compute_entry_hash(link.seq, link.prev_hash, link.payload, canon=canon) == link.entry_hash:
+            return True
+    return False
 
 
 def compute_entry_hmac(key: bytes, entry_hash: str) -> str:
@@ -259,13 +279,13 @@ def verify_chain(
             })
             _flag(link.seq)
 
-        recomputed = compute_entry_hash(link.seq, link.prev_hash, link.payload)
-        if recomputed != link.entry_hash:
+        if not _entry_hash_matches(link):
+            recomputed = compute_entry_hash(link.seq, link.prev_hash, link.payload)
             result.tampered_content.append({
                 "seq": link.seq,
                 "stored": link.entry_hash[:16] + "...",
                 "recomputed": recomputed[:16] + "...",
-                "note": "entry_hash no recomputa desde el contenido — entrada modificada",
+                "note": "entry_hash no recomputa desde el contenido (ni v2 ni v1) — entrada modificada",
             })
             _flag(link.seq)
 

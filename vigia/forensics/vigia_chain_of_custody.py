@@ -133,7 +133,12 @@ def _sha256(data: str) -> str:
 try:
     from vigia.core.canonicalize import _canonicalize
 except ImportError:  # pragma: no cover — solo CLI standalone
+    import unicodedata as _unicodedata
+    from fractions import Fraction as _Fraction
+
     def _canonicalize(obj):
+        # v2 (R3-2): escalares idénticos a v1; strings escapados (s: + NFC/
+        # CRLF->LF); Fraction explícito. Lockstep con vigia/core/canonicalize.py.
         if isinstance(obj, bool):
             return "true" if obj else "false"
         if isinstance(obj, int):
@@ -147,14 +152,16 @@ except ImportError:  # pragma: no cover — solo CLI standalone
                 return "-inf"
             return f"{obj + 0.0:.8f}"  # +0.0 maps -0.0 -> 0.0: signed zero must canonicalize identically
         if isinstance(obj, str):
-            return obj
+            return "s:" + _unicodedata.normalize("NFC", obj.replace("\r\n", "\n").replace("\r", "\n"))
         if obj is None:
             return "null"
+        if isinstance(obj, _Fraction):
+            return f"{obj.numerator}/{obj.denominator}:frac"
         if isinstance(obj, dict):
             return {k: _canonicalize(v) for k, v in sorted(obj.items())}
         if isinstance(obj, (list, tuple)):
             return [_canonicalize(v) for v in obj]
-        return str(obj)
+        return "s:" + _unicodedata.normalize("NFC", str(obj).replace("\r\n", "\n").replace("\r", "\n"))
 
 
 def _recompute_sealed_bundle_hash(bundle: Dict) -> str:

@@ -31,7 +31,10 @@ from typing import Dict, List, Any, Optional
 # Falla ruidosamente si hay un Fraction suelto — eso es un bug de arquitectura.
 
 # P1-19: importar _canonicalize canónico
-from vigia.core.canonicalize import _canonicalize  # noqa: F401
+# R3-2: consumidor fuera del camino de bundle sellado — output JSON de métricas/outputs (formato legible, no bundle sellado).
+# Se fija a v1 (comportamiento previo) para que el fix v2 (prefijo "s:"
+# en strings) no altere su salida/hash. v2 es solo para el sellado.
+from vigia.core.canonicalize import _canonicalize_v1 as _canonicalize  # noqa: F401
 
 # ── Configuración ─────────────────────────────────────────────────────────
 DETECTION_THRESHOLD = "MEDIUM"

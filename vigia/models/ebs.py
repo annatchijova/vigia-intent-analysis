@@ -74,11 +74,19 @@ EPS_NUMERIC: float = 1e-9
 # Helpers criptográficos — sin dependencias externas
 # ---------------------------------------------------------------------------
 
-def _canonicalize(obj: Any) -> Any:
-    """
-    Canonicalización estricta para hasheo determinista (H22).
-    DEBE ser idéntica a verify_ebs_v1._canonicalize — ambas son la fuente de verdad.
-    """
+# Lockstep con vigia/core/canonicalize.py (R3-2): v2 default, v1 legacy.
+import unicodedata as _unicodedata
+from fractions import Fraction as _Fraction
+
+_V2_STR_PREFIX = "s:"
+
+
+def _v2_norm_str(s):
+    return _unicodedata.normalize("NFC", s.replace("\r\n", "\n").replace("\r", "\n"))
+
+
+def _canonicalize_v1(obj: Any) -> Any:
+    """Esquema v1 (LEGACY — solo verificacion de bundles historicos)."""
     if isinstance(obj, bool):
         return "true" if obj else "false"
     if isinstance(obj, int):
@@ -96,10 +104,43 @@ def _canonicalize(obj: Any) -> Any:
     if obj is None:
         return "null"
     if isinstance(obj, dict):
-        return {k: _canonicalize(v) for k, v in sorted(obj.items())}
+        return {k: _canonicalize_v1(v) for k, v in sorted(obj.items())}
     if isinstance(obj, (list, tuple)):
-        return [_canonicalize(v) for v in obj]
+        return [_canonicalize_v1(v) for v in obj]
     return str(obj)
+
+
+def _canonicalize_v2(obj: Any) -> Any:
+    """Esquema v2 (R3-2) — DEFAULT. Escalares identicos a v1; strings escapados
+    (s: + NFC/CRLF->LF); Fraction explicito. Cierra las colisiones de tipo."""
+    if isinstance(obj, bool):
+        return "true" if obj else "false"
+    if isinstance(obj, int):
+        return f"{obj}:int"
+    if isinstance(obj, float):
+        if obj != obj:
+            return "nan"
+        if obj == float("inf"):
+            return "inf"
+        if obj == float("-inf"):
+            return "-inf"
+        return f"{obj + 0.0:.8f}"  # +0.0 maps -0.0 -> 0.0: signed zero must canonicalize identically
+    if isinstance(obj, str):
+        return _V2_STR_PREFIX + _v2_norm_str(obj)
+    if obj is None:
+        return "null"
+    if isinstance(obj, _Fraction):
+        return f"{obj.numerator}/{obj.denominator}:frac"
+    if isinstance(obj, dict):
+        return {k: _canonicalize_v2(v) for k, v in sorted(obj.items())}
+    if isinstance(obj, (list, tuple)):
+        return [_canonicalize_v2(v) for v in obj]
+    return _V2_STR_PREFIX + _v2_norm_str(str(obj))
+
+
+def _canonicalize(obj: Any) -> Any:
+    """Forma canonica DEFAULT (v2). Ver vigia/core/canonicalize.py."""
+    return _canonicalize_v2(obj)
 
 
 def _sha256_dict(obj: Dict) -> str:

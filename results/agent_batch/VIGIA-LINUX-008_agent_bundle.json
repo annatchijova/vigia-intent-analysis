@@ -1,15 +1,15 @@
 {
   "agent_verdict": "INTENT",
-  "analysis_timestamp": "2026-07-07T12:08:32.667913+00:00",
+  "analysis_timestamp": "2026-07-07T14:49:18.626023+00:00",
   "audit_trail": {
     "agent_version": "1.0.0-SANS-2026",
     "case_id": "VIGIA-LINUX-008",
-    "end_time": "2026-07-07T12:08:32.667923+00:00",
+    "end_time": "2026-07-07T14:49:18.626031+00:00",
     "entries": [
       {
         "action": "AGENT_INITIALIZED",
         "case_id": "VIGIA-LINUX-008",
-        "entry_sha256": "d3070177799eb8935e9e41cbbb4d42e7bbc8d2870d9a5f2471f0156d2aee467c",
+        "entry_sha256": "419a03bf3362ba37de23a818b454ee167c90375881e18869e14b532b1febb475",
         "inputs_summary": {
           "agent_file": "/home/user/vigia-intent-analysis/vigia_agent.py",
           "case_id": "VIGIA-LINUX-008"
@@ -21,13 +21,13 @@
           "agent_version": "1.0.0-SANS-2026"
         },
         "seq": 1,
-        "timestamp": "2026-07-07T12:08:32.475288+00:00",
+        "timestamp": "2026-07-07T14:49:18.421753+00:00",
         "tool": "vigia_agent"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-LINUX-008",
-        "entry_sha256": "f9568c83fbaa6fb742175392958104bf1c98475614e378a536525f9cc9c66c3c",
+        "entry_sha256": "c7061ee04169a73a0cc0603a186a7382b6981de016987cf2e07877fd6f875948",
         "inputs_summary": {
           "path": "/home/user/vigia-intent-analysis/data/cases/VIGIA-LINUX-008.json"
         },
@@ -35,13 +35,13 @@
         "note": "Computing SHA-256 of original evidence",
         "outputs_summary": {},
         "seq": 2,
-        "timestamp": "2026-07-07T12:08:32.475594+00:00",
+        "timestamp": "2026-07-07T14:49:18.421975+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-LINUX-008",
-        "entry_sha256": "5e121800a9bd19ed8f5ee129e5cdd316bd8d1927e3dcd2ef85fbed8d9ed9b6ce",
+        "entry_sha256": "66ffa59487abc396a1a39e126167d8aac1f61db61ea6ce85daa1496dc65a67c7",
         "inputs_summary": {
           "path": "/home/user/vigia-intent-analysis/data/cases/VIGIA-LINUX-008.json"
         },
@@ -51,13 +51,13 @@
           "sha256": "6a6bb01bdadf12f1f5dac03fe82de218d21d837e721da52ccaf7f92591997a60"
         },
         "seq": 3,
-        "timestamp": "2026-07-07T12:08:32.475868+00:00",
+        "timestamp": "2026-07-07T14:49:18.422259+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "PIPELINE_EXECUTE",
         "case_id": "VIGIA-LINUX-008",
-        "entry_sha256": "eb4527be8ade56bdf258862ee79cb31131efe2b867c29f769c376ed199074929",
+        "entry_sha256": "c6faaba56b2dbeb0ea340ad95d3b9bfab3015184a0f310473af324735c88f78b",
         "inputs_summary": {
           "evidence": "/home/user/vigia-intent-analysis/data/cases/VIGIA-LINUX-008.json",
           "iteration": "0",
@@ -67,13 +67,13 @@
         "note": "Executing pipeline \u2014 iteration 0",
         "outputs_summary": {},
         "seq": 4,
-        "timestamp": "2026-07-07T12:08:32.476154+00:00",
+        "timestamp": "2026-07-07T14:49:18.422578+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "PIPELINE_COMPLETE",
         "case_id": "VIGIA-LINUX-008",
-        "entry_sha256": "f16ca33d3bb6c3253441bc7d131ec12e1f84b038bb3c4adbfbec4b62bcdcd417",
+        "entry_sha256": "d46850b211c6594e472e370514ba2b8bc9feef3952c900fe74401206a08a7233",
         "inputs_summary": {
           "iteration": "0"
         },
@@ -146,13 +146,13 @@
           ]
         },
         "seq": 5,
-        "timestamp": "2026-07-07T12:08:32.666937+00:00",
+        "timestamp": "2026-07-07T14:49:18.625218+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "CONTRADICTION_CHECK",
         "case_id": "VIGIA-LINUX-008",
-        "entry_sha256": "5a0eda44361eb61535242117b09c58ff2c6d84969402f28499092aba4350ac3d",
+        "entry_sha256": "b0f3a0989a1d83548bf4bed50f1a1ce82d5f9c0616d38d2c0aab695224589473",
         "inputs_summary": {
           "n_signals": "5"
         },
@@ -163,13 +163,13 @@
           "threshold": "2"
         },
         "seq": 6,
-        "timestamp": "2026-07-07T12:08:32.667255+00:00",
+        "timestamp": "2026-07-07T14:49:18.625530+00:00",
         "tool": "contradiction_detector"
       },
       {
         "action": "AGENT_EXIT",
         "case_id": "VIGIA-LINUX-008",
-        "entry_sha256": "1af9d7f867c60552875732aab306fc4fcd2f7ca1e320d7c29d91335802cbd110",
+        "entry_sha256": "d71bedfc734ff0696ee28817b3ac7f36948ac5e78a9816ebfcf07cca8bb4b80f",
         "inputs_summary": {
           "verdict": "SUSPICION_DETECTED"
         },
@@ -180,11 +180,11 @@
           "exit_code": "3"
         },
         "seq": 7,
-        "timestamp": "2026-07-07T12:08:32.667772+00:00",
+        "timestamp": "2026-07-07T14:49:18.625912+00:00",
         "tool": "vigia_agent"
       }
     ],
-    "start_time": "2026-07-07T12:08:32.474525+00:00",
+    "start_time": "2026-07-07T14:49:18.421069+00:00",
     "total_entries": 7
   },
   "case_id": "VIGIA-LINUX-008",
