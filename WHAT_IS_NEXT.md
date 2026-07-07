@@ -111,7 +111,7 @@ Sumados por el censo P0-001 (B-083, opcionales):
 |---|------|--------------|
 | C1 | metadata exacta | `z_frac`/`conf_frac` (str de Fraction) en `to_signal()` de los 12 módulos |
 | C2 | consistencia de estilo | unificar `float(z)/Z_CLIP_MAX` (Windows) con `float(z/z_clip)` (móvil) |
-| ~~C3~~ | ~~NaN silencioso~~ | **CERRADO 2026-07-07** — `ebs_v1.SignalOutput` fail-closed como `signal_contract` (B-083, tests rojos primero) |
+| ~~C3~~ | ~~NaN silencioso~~ | **CERRADO 2026-07-07** — `value`/`z_score`/`confidence` fail-closed en `ebs_v1` y `signal_contract`, ambas variantes (B-083/B-083b, tests rojos primero) |
 
 ### 1.5 Abiertos de larga data (sin cambio de estado)
 

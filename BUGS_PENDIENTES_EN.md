@@ -4272,6 +4272,16 @@ blocking pydantic). Clip/clamp on finite values unchanged. Red tests first:
 `tests/test_b083_signaloutput_fail_closed.py` (14, 8 red pre-fix). Suite 849,
 corpus 166/199, 0 flips.
 
+**B-083b — confidence too (2026-07-07):** the same pattern applied to
+`confidence` in `ebs_v1` AND `signal_contract`. The real gap was in the
+dataclass fallbacks: `max(0.0, min(1.0, nan))` → 1.0 — a corrupt confidence
+entered as silent MAXIMUM confidence (±inf clamped to 1.0/0.0). In the
+Pydantic variants, `Field(ge/le)` already rejected NaN via comparison
+semantics; the `math.isfinite` check is now explicit so the contract does not
+depend on that detail. Red tests first: 6 red (both fallbacks, loaded with
+pydantic blocked) + pins for the Pydantic variants. Suite 860, corpus
+166/199, 0 flips.
+
 **Validation:** `tests/test_census_adjacent_fixes.py` (13, divergent values
 found by exhaustive search). Suite green, corpus 166/199, 0 flips.
 

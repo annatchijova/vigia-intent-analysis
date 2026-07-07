@@ -123,6 +123,10 @@ if _USE_PYDANTIC:
         @field_validator("confidence")
         @classmethod
         def _clamp_conf(cls, v: float) -> float:
+            # B-083b: explícito — Field(ge/le) ya rechazaba NaN por semántica
+            # de comparación, pero el contrato no debe depender de eso.
+            if not math.isfinite(v):
+                raise ValueError(f"SignalOutput requiere confidence finita; recibido: {v}")
             return max(0.0, min(1.0, float(v)))
 
         def to_dict(self) -> Dict[str, Any]:
@@ -140,8 +144,10 @@ else:
         description: Optional[str] = None
 
         def __post_init__(self) -> None:
-            # B-083: fail-closed como signal_contract (ver validador Pydantic).
-            for _fname in ("value", "z_score"):
+            # B-083/B-083b: fail-closed como signal_contract (ver validadores
+            # Pydantic). Sin el chequeo, max(0.0, min(1.0, nan)) → 1.0:
+            # una confidence corrupta entraba como confianza MÁXIMA.
+            for _fname in ("value", "z_score", "confidence"):
                 _v = float(getattr(self, _fname))
                 if not math.isfinite(_v):
                     raise ValueError(

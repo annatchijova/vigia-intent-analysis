@@ -58,6 +58,10 @@ try:
         @field_validator("confidence")
         @classmethod
         def _clamp_confidence(cls, v: float) -> float:
+            # B-083b: explícito — Field(ge/le) ya rechazaba NaN por semántica
+            # de comparación, pero el contrato no debe depender de eso.
+            if not math.isfinite(v):
+                raise ValueError(f"SignalOutput requiere confidence finita; recibido: {v}")
             return max(0.0, min(1.0, float(v)))
 
         @field_validator("z_score", "value")
@@ -86,6 +90,12 @@ except ImportError:
                 raise ValueError(f"value debe ser finito; recibido: {self.value}")
             if not math.isfinite(self.z_score):
                 raise ValueError(f"z_score debe ser finito; recibido: {self.z_score}")
+            # B-083b: sin este chequeo, max(0.0, min(1.0, nan)) → 1.0 — una
+            # confidence corrupta entraba como confianza MÁXIMA silenciosa.
+            if not math.isfinite(float(self.confidence)):
+                raise ValueError(
+                    f"confidence debe ser finita; recibido: {self.confidence}"
+                )
             self.confidence = max(0.0, min(1.0, float(self.confidence)))
 
     _PYDANTIC_AVAILABLE = False
