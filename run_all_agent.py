@@ -41,21 +41,23 @@ RED  = "\033[91m"; GRN = "\033[92m"; YEL = "\033[93m"
 CYA  = "\033[96m"; RST = "\033[0m";  BLD = "\033[1m"
 
 
-def check_label_consistency(base_dir: Path | None = None,
-                            converted_dir: Path | None = None) -> list[dict]:
+def check_label_consistency(dirs: list[Path] | None = None) -> list[dict]:
     """
     R3-3 (docs/REDTEAM_ROUND3_EMERGENT.md): guard de fuente-unica-de-verdad.
 
     El runner deduplica casos por stem tomando el primer directorio de
-    CASES_DIRS, asi que una copia sombra en data/cases/converted/ con
-    expected_verdict distinto al de data/cases/ queda muerta y puede voltear la
-    metrica en silencio (fue exactamente el bug del shadow de VIGIA-FP-001,
-    Ronda 2.1). Este chequeo enumera los stems presentes en AMBAS ubicaciones y
-    devuelve la lista de divergencias de expected_verdict. main() aborta fuerte
-    si la lista no esta vacia.
+    CASES_DIRS, asi que una copia sombra de un caso en CUALQUIER otra carpeta
+    (converted/, legacy/, consolidated_canonical/, benign/) con expected_verdict
+    distinto al que gana por precedencia queda muerta y puede voltear la metrica
+    en silencio (fue el bug del shadow de VIGIA-FP-001, Ronda 2.1, y del shadow
+    legacy/ de case_008). Este chequeo agrupa por stem TODAS las copias en TODAS
+    las carpetas y devuelve las divergencias de expected_verdict. main() aborta
+    fuerte si la lista no esta vacia.
+
+    Censo COMPLETO (no solo data/cases vs converted): cierra todos los shadows,
+    no un par especifico de carpetas.
     """
-    base_dir = Path(base_dir) if base_dir else (REPO / "data/cases")
-    converted_dir = Path(converted_dir) if converted_dir else (REPO / "data/cases/converted")
+    dirs = dirs if dirs is not None else CASES_DIRS
 
     def _label(path: Path) -> str:
         try:
@@ -68,23 +70,30 @@ def check_label_consistency(base_dir: Path | None = None,
         except Exception:
             return "ERROR"
 
+    # Agrupar por stem todas las copias, en el ORDEN de precedencia de dirs
+    # (el primero es el que usa el runner).
+    by_stem: dict[str, list[Path]] = {}
+    for d in dirs:
+        d = Path(d)
+        if not d.exists():
+            continue
+        for f in sorted(d.glob("*.json")):
+            s = f.stem.lower()
+            # Honrar la misma lista de no-casos que find_cases.
+            if s in SKIP_STEMS or any(skip in s for skip in SKIP_STEMS):
+                continue
+            by_stem.setdefault(f.stem, []).append(f)
+
     conflicts: list[dict] = []
-    if not (base_dir.exists() and converted_dir.exists()):
-        return conflicts
-    for f in sorted(base_dir.glob("*.json")):
-        # Honrar la misma lista de no-casos que find_cases: un archivo que el
-        # runner nunca carga como caso no es ground truth.
-        s = f.stem.lower()
-        if s in SKIP_STEMS or any(skip in s for skip in SKIP_STEMS):
+    for stem, paths in sorted(by_stem.items()):
+        if len(paths) < 2:
             continue
-        shadow = converted_dir / f.name
-        if not shadow.exists():
-            continue
-        la, lb = _label(f), _label(shadow)
-        if la != lb:
+        labels = {str(p): _label(p) for p in paths}
+        if len(set(labels.values())) > 1:
             conflicts.append({
-                "stem": f.stem,
-                "labels": {str(f): la, str(shadow): lb},
+                "stem": stem,
+                "winner": str(paths[0]),          # el que usa el runner
+                "labels": labels,
             })
     return conflicts
 
