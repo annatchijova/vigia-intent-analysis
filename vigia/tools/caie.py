@@ -387,6 +387,20 @@ def evidence_role(evidence_type: str) -> str:
     return _EVIDENCE_ROLE.get(evidence_type, EVIDENCE_ROLE_DEVICE)
 
 
+# R3-1 — Ventana forense plausible para timestamps en la regla TCV.
+# LIMITES FIJOS (no now()): la reproducibilidad bit-a-bit del pipeline (Daubert,
+# invariante 4 de CLAUDE.md) prohibe reloj de pared en el scoring path — el
+# mismo caso debe puntuar identico hoy y en 2030. Fechas fuera de esta ventana
+# se leen como DATO AUSENTE, no como senal temporal.
+#   MIN 2000-01-01 : era de la forensia digital moderna; descarta 1970 (epoch
+#                    Unix / sentinela de fecha no parseada) y 1601 (FILETIME).
+#   MAX 2038-01-19 : desbordamiento del epoch Unix de 32 bits con signo — techo
+#                    forense natural y bien entendido; descarta 2099/9999.
+# El corpus real vive en [2004, 2026] (medido) — cero artefactos legitimos
+# tocados. Revisar el techo antes de 2038 (limitacion documentada).
+_TCV_PLAUSIBLE_MIN: Final[datetime] = datetime(2000, 1, 1, tzinfo=timezone.utc)
+_TCV_PLAUSIBLE_MAX: Final[datetime] = datetime(2038, 1, 19, 3, 14, 7, tzinfo=timezone.utc)
+
 # Maximum artifacts per evaluation — prevents DoS via artifact flooding
 _MAX_ARTIFACTS: Final[int] = 1000
 
@@ -1370,6 +1384,41 @@ class CrossArtifactIncongruenceEngine:
         ]
         process_artifacts = [a for a in self._artifacts if a.evidence_type == "memory_process"]
 
+        def _range_guard_tcv(dt: "datetime", ts_str: str, artifact_tool: str,
+                             field: str) -> "datetime | None":
+            """
+            R3-1 (docs/REDTEAM_ROUND3_EMERGENT.md): guard de RANGO ABSOLUTO.
+
+            _parse_ts_tcv aceptaba cualquier fecha ISO sintacticamente valida.
+            La regla TCV compara net_time < proc_time sin cota, asi que un
+            timestamp fuera de rango — sobre todo 1970-01-01 (el sentinela
+            universal de "fecha no parseada"/epoch-0, y su primo Windows
+            FILETIME 1601) o un futuro absurdo (2099) — fabricaba un
+            TEMPORAL_CAUSALITY_VIOLATION severity=1.0 y volteaba el veredicto.
+
+            Una fecha fuera de _TCV_PLAUSIBLE_MIN.._TCV_PLAUSIBLE_MAX se lee
+            como DATO AUSENTE (return None): un endpoint implausible no es
+            evidencia de plantado, es un defecto de calidad de dato. Los
+            limites son FIJOS (no now()) para preservar la reproducibilidad
+            bit-a-bit Daubert del pipeline; ver constantes del modulo.
+            """
+            cmp_dt = dt if dt.tzinfo is not None else dt.replace(tzinfo=timezone.utc)
+            if not (_TCV_PLAUSIBLE_MIN <= cmp_dt < _TCV_PLAUSIBLE_MAX):
+                audit_logger.log_info(
+                    event_type="TCV_TIMESTAMP_OUT_OF_RANGE",
+                    tool="CrossArtifactIncongruenceEngine",
+                    message=(
+                        f"TCV rule: {field}={ts_str!r} from {artifact_tool!r} "
+                        f"is outside the plausible forensic window "
+                        f"[{_TCV_PLAUSIBLE_MIN.date()}, {_TCV_PLAUSIBLE_MAX.date()}). "
+                        "Treated as MISSING, not as a temporal-causality signal "
+                        "(epoch/overflow sentinels must not fabricate MALICE). "
+                        "R3-1."
+                    ),
+                )
+                return None
+            return cmp_dt
+
         def _parse_ts_tcv(ts_str: object, artifact_tool: str, field: str) -> "datetime | None":
             """
             Robust ISO 8601 timestamp parser for TCV rule.
@@ -1379,6 +1428,7 @@ class CrossArtifactIncongruenceEngine:
             - Naive timestamps (no offset) → assumes UTC, logs assumption
             - None or empty string → returns None, logs missing field
             - Unparseable formats → returns None, logs format error
+            - Out-of-range dates → returns None, logs (R3-1 range guard)
 
             Rationale (Grok P0 audit): silent continue on parse failure
             hides data quality problems. In Daubert context, unparseable
@@ -1398,7 +1448,9 @@ class CrossArtifactIncongruenceEngine:
             # Normalize Z suffix
             normalized = ts_str.strip().replace('Z', '+00:00')
             try:
-                return datetime.fromisoformat(normalized)
+                return _range_guard_tcv(
+                    datetime.fromisoformat(normalized), ts_str, artifact_tool, field
+                )
             except ValueError:
                 pass
             # Try naive timestamp (no offset) — assume UTC, log the assumption
@@ -1414,8 +1466,7 @@ class CrossArtifactIncongruenceEngine:
                         "clock was in a non-UTC timezone."
                     ),
                 )
-                from datetime import timezone as _tz
-                return dt.replace(tzinfo=_tz.utc)
+                return _range_guard_tcv(dt, ts_str, artifact_tool, field)
             except (ValueError, TypeError):
                 pass
             audit_logger.log_info(

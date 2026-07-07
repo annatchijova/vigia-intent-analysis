@@ -41,6 +41,54 @@ RED  = "\033[91m"; GRN = "\033[92m"; YEL = "\033[93m"
 CYA  = "\033[96m"; RST = "\033[0m";  BLD = "\033[1m"
 
 
+def check_label_consistency(base_dir: Path | None = None,
+                            converted_dir: Path | None = None) -> list[dict]:
+    """
+    R3-3 (docs/REDTEAM_ROUND3_EMERGENT.md): guard de fuente-unica-de-verdad.
+
+    El runner deduplica casos por stem tomando el primer directorio de
+    CASES_DIRS, asi que una copia sombra en data/cases/converted/ con
+    expected_verdict distinto al de data/cases/ queda muerta y puede voltear la
+    metrica en silencio (fue exactamente el bug del shadow de VIGIA-FP-001,
+    Ronda 2.1). Este chequeo enumera los stems presentes en AMBAS ubicaciones y
+    devuelve la lista de divergencias de expected_verdict. main() aborta fuerte
+    si la lista no esta vacia.
+    """
+    base_dir = Path(base_dir) if base_dir else (REPO / "data/cases")
+    converted_dir = Path(converted_dir) if converted_dir else (REPO / "data/cases/converted")
+
+    def _label(path: Path) -> str:
+        try:
+            d = json.loads(path.read_text())
+            if isinstance(d, dict):
+                return (d.get("expected_verdict")
+                        or d.get("ground_truth", {}).get("expected_verdict")
+                        or "UNKNOWN")
+            return "MALFORMED"
+        except Exception:
+            return "ERROR"
+
+    conflicts: list[dict] = []
+    if not (base_dir.exists() and converted_dir.exists()):
+        return conflicts
+    for f in sorted(base_dir.glob("*.json")):
+        # Honrar la misma lista de no-casos que find_cases: un archivo que el
+        # runner nunca carga como caso no es ground truth.
+        s = f.stem.lower()
+        if s in SKIP_STEMS or any(skip in s for skip in SKIP_STEMS):
+            continue
+        shadow = converted_dir / f.name
+        if not shadow.exists():
+            continue
+        la, lb = _label(f), _label(shadow)
+        if la != lb:
+            conflicts.append({
+                "stem": f.stem,
+                "labels": {str(f): la, str(shadow): lb},
+            })
+    return conflicts
+
+
 def find_cases(dirs: list[Path], filter_str: str = "") -> list[Path]:
     seen = set()
     cases = []
@@ -123,6 +171,19 @@ def main():
     parser.add_argument("--dry-run", action="store_true", help="Solo listar casos sin correr")
     parser.add_argument("--timeout", type=int, default=120, help="Timeout por caso (seg)")
     args = parser.parse_args()
+
+    # R3-3: fail-loud si data/cases/ y data/cases/converted/ discrepan en la
+    # etiqueta de un mismo stem — el runner usaria una y descartaria la otra en
+    # silencio (bug del shadow de VIGIA-FP-001, Ronda 2.1).
+    conflicts = check_label_consistency()
+    if conflicts:
+        print(f"{RED}{BLD}[R3-3] ETIQUETAS DIVERGENTES entre data/cases/ y "
+              f"data/cases/converted/ — fuente de verdad ambigua:{RST}")
+        for c in conflicts:
+            print(f"  {c['stem']}: {c['labels']}")
+        print(f"{RED}Reconcilie las copias antes de correr el corpus "
+              f"(o corrija check_label_consistency).{RST}")
+        sys.exit(2)
 
     dirs = [Path(args.dir)] if args.dir else CASES_DIRS
     cases = find_cases(dirs, args.filter)

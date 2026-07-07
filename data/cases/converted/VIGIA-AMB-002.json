@@ -3,7 +3,7 @@
   "case_name": "The Analyst's Error",
   "description": "Tier-1 SOC analyst modifies a rule without a change ticket, citing 'human error'. The modification disables a critical alert. Could be: (1) genuine error, (2) insider sabotage, (3) negligence.",
   "abstention_risk": "high",
-  "expected_verdict": "ABSTAIN",
+  "expected_verdict": "NOISE",
   "carnegie_pattern_expected": null,
   "confidence_expected": 50,
   "artifacts": [
@@ -142,5 +142,6 @@
     "source": "results/agent_batch/VIGIA-AMB-002_agent_bundle.json",
     "method": "señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canónica preservada",
     "n_signals": 3
-  }
+  },
+  "_label_revision": "2026-07-07 (R3-3, docs/REDTEAM_ROUND3_EMERGENT.md): ABSTAIN -> NOISE para reconciliar con la copia canonica data/cases/VIGIA-AMB-002.json, que aplico la doctrina L-012 el 2026-07-05 (decision de Anna): ambiguedad de senal nula sin conflicto estructural retorna NOISE, no ABSTAIN. Esta copia converted/ era una sombra muerta con la etiqueta vieja; el runner ya usaba NOISE por precedencia de directorio. Contenido del caso sin cambios."
 }
