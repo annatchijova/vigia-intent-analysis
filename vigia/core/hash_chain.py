@@ -45,6 +45,7 @@ import json
 import os
 import sys
 from dataclasses import dataclass, field
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Sequence
 
@@ -56,6 +57,35 @@ from vigia.core.canonicalize import (
 
 CHAIN_SCHEMA_VERSION: str = "2"
 GENESIS_HASH: str = "0" * 64
+
+# R3-4 (docs/REDTEAM_ROUND3_EMERGENT.md): ventana forense plausible para los
+# timestamps de la cadena. MISMOS limites FIJOS que la regla TCV (R3-1) — un
+# timestamp fuera de rango (1970 epoch / 1601 FILETIME / 2099) es implausible.
+# Limites fijos (no now()) para reproducibilidad; techo 2038 = overflow epoch
+# 32-bit. Esto NO es integridad criptografica: es plausibilidad temporal,
+# reportada por SEPARADO (una historia causalmente imposible no rompe el sello).
+_PLAUSIBLE_MIN = datetime(2000, 1, 1, tzinfo=timezone.utc)
+_PLAUSIBLE_MAX = datetime(2038, 1, 19, 3, 14, 7, tzinfo=timezone.utc)
+
+
+def _parse_iso_ts(ts):
+    """Parseo ISO-8601 tolerante para el chequeo de plausibilidad. Devuelve un
+    datetime tz-aware (naive -> UTC) o None si no es parseable/ausente."""
+    if not isinstance(ts, str) or not ts.strip():
+        return None
+    try:
+        dt = datetime.fromisoformat(ts.strip().replace("Z", "+00:00"))
+    except ValueError:
+        return None
+    return dt if dt.tzinfo is not None else dt.replace(tzinfo=timezone.utc)
+
+
+def _content_signature(payload: Dict[str, Any]) -> str:
+    """Firma de contenido de un eslabon para detectar eventos duplicados —
+    excluye lo que legitimamente varia entre eventos (timestamp, event_id) y
+    los campos estructurales (ya fuera del payload)."""
+    body = {k: v for k, v in payload.items() if k not in ("timestamp", "event_id")}
+    return canonical_hash(body)
 
 # Mismas variables de entorno que SecurityAuditLog (vigia/security/security.py)
 _HMAC_KEY_ENV = "VIGIA_HMAC_KEY"
@@ -186,6 +216,12 @@ class ChainVerification:
     tampered_content: List[Dict[str, Any]] = field(default_factory=list)
     hmac_failures: List[Dict[str, Any]] = field(default_factory=list)
     hmac_checked: bool = False
+    # R3-4: eje SEPARADO de plausibilidad temporal. NO afecta `valid` (que es
+    # integridad criptografica): una historia causalmente imposible se sella y
+    # verifica perfecto; esto solo advierte que la LINEA DE TIEMPO registrada no
+    # es plausible (orden no monotono, fuera de rango, evento duplicado).
+    timeline_plausible: bool = True
+    temporal_anomalies: List[Dict[str, Any]] = field(default_factory=list)
 
     def to_dict(self) -> Dict[str, Any]:
         return {
@@ -197,11 +233,14 @@ class ChainVerification:
             "tampered_content": self.tampered_content,
             "hmac_failures": self.hmac_failures,
             "hmac_checked": self.hmac_checked,
+            "timeline_plausible": self.timeline_plausible,
+            "temporal_anomalies": self.temporal_anomalies,
             "summary": {
                 "seq_discontinuities": len(self.seq_discontinuities),
                 "broken_links": len(self.broken_links),
                 "tampered_content": len(self.tampered_content),
                 "hmac_failures": len(self.hmac_failures),
+                "temporal_anomalies": len(self.temporal_anomalies),
             },
         }
 
@@ -308,4 +347,63 @@ def verify_chain(
         expected_prev = link.entry_hash
         expected_seq = link.seq + 1
 
+    # ── R3-4: plausibilidad temporal (eje separado, NO afecta `valid`) ──────
+    _check_timeline_plausibility(links, result)
     return result
+
+
+def _check_timeline_plausibility(
+    links: Sequence[ChainLink], result: "ChainVerification"
+) -> None:
+    """
+    R3-4: valida el ORDEN CAUSAL de la linea de tiempo registrada — separado de
+    la integridad criptografica. Detecta:
+      - NON_MONOTONIC_TIMESTAMP : un eslabon con timestamp ANTERIOR al previo
+        (efecto antes que la causa en el orden de insercion).
+      - OUT_OF_RANGE_TIMESTAMP  : fuera de [2000, 2038) — 1970/1601/2099.
+      - DUPLICATE_CONTENT        : contenido identico a un eslabon anterior
+        (mismo evento re-registrado).
+    Un timestamp ausente/no parseable NO marca implausible (no se puede juzgar);
+    se anota como MISSING/UNPARSEABLE solo si acompaña a otra anomalia? No — se
+    omite en silencio para no inflar el reporte. `timeline_plausible` = sin
+    anomalias duras. Esto es plausibilidad, no un veredicto de manipulacion.
+    """
+    prev_ts = None
+    prev_seq = None
+    seen_sig: Dict[str, int] = {}
+    for link in links:
+        ts_raw = link.payload.get("timestamp")
+        dt = _parse_iso_ts(ts_raw)
+        if dt is not None:
+            if not (_PLAUSIBLE_MIN <= dt < _PLAUSIBLE_MAX):
+                result.temporal_anomalies.append({
+                    "seq": link.seq,
+                    "type": "OUT_OF_RANGE_TIMESTAMP",
+                    "timestamp": str(ts_raw),
+                    "note": f"timestamp fuera de la ventana forense plausible "
+                            f"[{_PLAUSIBLE_MIN.date()}, {_PLAUSIBLE_MAX.date()}) "
+                            f"— sentinela epoch/overflow, no un instante real",
+                })
+            if prev_ts is not None and dt < prev_ts:
+                result.temporal_anomalies.append({
+                    "seq": link.seq,
+                    "type": "NON_MONOTONIC_TIMESTAMP",
+                    "timestamp": str(ts_raw),
+                    "note": f"timestamp anterior al del eslabon seq={prev_seq} "
+                            f"— orden causal imposible (efecto antes que causa)",
+                })
+            prev_ts, prev_seq = dt, link.seq
+
+        sig = _content_signature(link.payload)
+        if sig in seen_sig:
+            result.temporal_anomalies.append({
+                "seq": link.seq,
+                "type": "DUPLICATE_CONTENT",
+                "note": f"contenido identico al eslabon seq={seen_sig[sig]} "
+                        f"— evento re-registrado (la cadena prueba insercion, "
+                        f"no unicidad causal)",
+            })
+        else:
+            seen_sig[sig] = link.seq
+
+    result.timeline_plausible = not result.temporal_anomalies

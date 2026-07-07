@@ -40,6 +40,50 @@ GENESIS_V1 = "GENESIS"
 GENESIS_V2 = "0" * 64
 _STRUCTURAL_FIELDS = frozenset({"seq", "prev_hash", "entry_hash", "entry_hmac"})
 
+# R3-4: ventana forense plausible (mismos limites fijos que la libreria /
+# regla TCV R3-1). Techo 2038 = overflow epoch 32-bit.
+from datetime import datetime as _dt, timezone as _tz
+_PLAUSIBLE_MIN = _dt(2000, 1, 1, tzinfo=_tz.utc)
+_PLAUSIBLE_MAX = _dt(2038, 1, 19, 3, 14, 7, tzinfo=_tz.utc)
+
+
+def _parse_iso_ts(ts):
+    if not isinstance(ts, str) or not ts.strip():
+        return None
+    try:
+        d = _dt.fromisoformat(ts.strip().replace("Z", "+00:00"))
+    except ValueError:
+        return None
+    return d if d.tzinfo is not None else d.replace(tzinfo=_tz.utc)
+
+
+def _check_timeline(log):
+    """R3-4: plausibilidad del orden causal, SEPARADA de la integridad del
+    hash. Devuelve (plausible: bool, anomalies: list). Una historia
+    causalmente imposible NO rompe el sello — la cadena prueba orden de
+    insercion e integridad, no causalidad."""
+    anomalies = []
+    prev_ts = prev_seq = None
+    seen = {}
+    for entry in log:
+        seq = entry.get("seq", "?")
+        dt = _parse_iso_ts(entry.get("timestamp"))
+        if dt is not None:
+            if not (_PLAUSIBLE_MIN <= dt < _PLAUSIBLE_MAX):
+                anomalies.append((seq, "OUT_OF_RANGE_TIMESTAMP", entry.get("timestamp")))
+            if prev_ts is not None and dt < prev_ts:
+                anomalies.append((seq, "NON_MONOTONIC_TIMESTAMP",
+                                  f"antes de seq={prev_seq}"))
+            prev_ts, prev_seq = dt, seq
+        sig = _canonical_hash({k: v for k, v in entry.items()
+                               if k not in _STRUCTURAL_FIELDS
+                               and k not in ("timestamp", "event_id")})
+        if sig in seen:
+            anomalies.append((seq, "DUPLICATE_CONTENT", f"= seq={seen[sig]}"))
+        else:
+            seen[sig] = seq
+    return (not anomalies), anomalies
+
 
 def _sha256(text: str) -> str:
     return hashlib.sha256(text.encode("utf-8")).hexdigest()
@@ -302,6 +346,20 @@ def verify_chain(bundle_path: str, verbose: bool = False, args=None) -> int:
 
     status = f"CHAIN VERIFIED ({len(log)} entries, schema v{version})" if ok else "CHAIN BROKEN"
     print(f"\nResult: {status}")
+
+    # R3-4: plausibilidad temporal — reportada por SEPARADO. Una linea de tiempo
+    # implausible NO invalida el sello (no cambia el exit code): la cadena
+    # prueba orden de insercion e integridad, no causalidad. Se informa para que
+    # "CHAIN VERIFIED" nunca se lea como "la cronologia es plausible".
+    plausible, anomalies = _check_timeline(log)
+    if plausible:
+        print("Timeline: PLAUSIBLE (timestamps monotonos y en rango)")
+    else:
+        print(f"Timeline: {len(anomalies)} ANOMALIA(S) — cronologia implausible "
+              f"(NO invalida el sello; la cadena prueba orden de insercion, no causalidad):")
+        for seq, kind, detail in anomalies:
+            print(f"  seq={seq} | {kind} | {detail}")
+
     return 0 if ok else 1
 
 
