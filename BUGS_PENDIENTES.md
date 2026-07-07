@@ -4129,3 +4129,51 @@ narrativos. 145 casos tocados.
   bandas anotado para revisión de etiqueta en Tanda C).
 
 **Tests:** `tests/test_validator_schema_aware.py` (10; rojos primero).
+
+---
+
+## B-086 — Pins mobile S2/S3/S4/S5: el arnés previo a B-052-P2 (WHAT_IS_NEXT §1.3) [RESUELTO]
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | RESUELTO — POST HACKATHON (2026-07-07) |
+| **Severidad** | P2 — deuda de arnés; los 3 módulos mobile tenían ≈15% de cobertura vs 77–89% de sus hermanos SIFT |
+| **Archivo** | `tests/test_mobile_pins_s2_ladder.py`, `tests/test_mobile_pins_s3_timestamps.py`, `tests/test_mobile_pins_s4_s5_safe_helpers.py` (nuevos); fixes S4/S5 en los 3 módulos mobile |
+| **Antecedente** | AUDITORIA_COBERTURA_MOBILE_SIFT (patrones S2–S5); decisión de Anna: arnés antes que Grupo B |
+
+**Propósito:** red de seguridad para B-052-P2 (`to_signal()` → `to_signals()`
+cambia TODOS los veredictos mobile). Con las escaleras fijadas rama por rama,
+una regresión rompe con diff legible, no como corpus opaco.
+
+**S2 — escaleras completas (52 pins):** las 13 ramas iOS + 11 Android + 14
+macOS con inputs mínimos exactos; el cruce `opsec_bump` 3.0→3.4 sobre el
+umbral estricto >3 (el que el audit señaló sin fijar) queda pineado como
+comportamiento vigente; interplay B-072 (parsed=False no minimiza), techos
+reales (3.9 iOS / 4.2 Android < Z_CLIP), cap de confidence, value=z/5.
+**Cazador de ramas muertas:** todo finding_type que la escalera LEE debe
+tener emisor fuera de to_signal — hoy 0 muertas (B-073/074 cerraron las
+conocidas); el pin impide reintroducir la clase.
+
+**S3 — bordes de banda de timestamps (28 pins):** cada borde EXACTO de
+`_chrome_ts_to_unix` (>1e15/1e12/1e10, WebKit) y `_coredata_to_unix`
+(>1e17/1e14/1e11, Core Data ×2) + `_cocoa_ts_to_unix` (float trunca);
+pin de acuerdo iOS≡macOS (implementaciones gemelas); ts≤0/None → 0. Los
+umbrales difieren entre módulos A PROPÓSITO (épocas distintas) — una
+"unificación" ingenua dispara acá.
+
+**S4 — `_safe_rglob` acotado (fix + 18 pins):** materializaba y ordenaba el
+árbol ENTERO antes del slice — el limit no protegía la memoria. Ahora
+`heapq.nsmallest` (memoria O(limit)) con salida IDÉNTICA — los pins de
+contrato (primeros N en orden global, symlinks/dirs excluidos, no-dir → [])
+son el testigo de la equivalencia. Los call-sites con `Path.rglob` directo
+(ios:269/604/608/641, android:240/360-362) quedan para la sesión B-052-P2:
+migrarlos cambia semántica de detección y ahora existe el arnés para hacerlo.
+
+**S5 — `_safe_plist_load` con techo (fix + 6 pins):** un plist VÁLIDO pero
+gigante se cargaba entero (bomba de memoria). `_PLIST_MAX_BYTES=8MiB`,
+rechazo ANTES de parsear, logueado a WARNING (degradación honesta §5.3 — "no
+pude leer" ≠ "no hay persistencia"). Test rojo primero (2 rojos pre-fix).
+
+**Inducción:** suite **980 passed** (+104). Cobertura: ios 41.5%, android
+38.4%, macos 44.5% (desde ≈15%). Corpus **166/199, 0 flips nuevos** (los 2
+movimientos observados son los ya documentados en B-085).

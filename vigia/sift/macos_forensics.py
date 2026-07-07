@@ -14,6 +14,7 @@ FIX P0: All numerical values in evidence dict use Fraction/str. NEVER float.
 
 from __future__ import annotations
 
+import heapq
 import logging
 import plistlib
 import re
@@ -35,6 +36,12 @@ ARTIFACT_RELIABILITY = Fraction(70, 100)
 
 # Core Data Reference Date: 2001-01-01 00:00:00 UTC in Unix epoch
 _COREDATA_EPOCH_OFFSET = 978307200
+
+# S5 (AUDITORIA_COBERTURA_MOBILE_SIFT §C): techo de tamaño para plists de
+# evidencia. Un plist VALIDO pero gigante (bomba de memoria) se cargaba
+# entero; los plists forenses reales (LaunchAgents, SystemVersion,
+# QuarantineEvents) miden KB. 8 MiB es holgado por ordenes de magnitud.
+_PLIST_MAX_BYTES = 8 * 1024 * 1024
 
 # ──────────────────────────────────────────────────────────────────────────────
 # CATALOGS — severity in Fraction, MITRE TTP, description
@@ -366,11 +373,21 @@ class MacOSForensicsAnalyzer:
 
     @staticmethod
     def _safe_rglob(base: Path, pattern: str, limit: int = 5) -> List[Path]:
-        """rglob with symlink filtering, deterministic sort, and limit."""
+        """rglob with symlink filtering, deterministic sort, and limit.
+
+        S4 (AUDITORIA_COBERTURA_MOBILE_SIFT §C): antes materializaba y ordenaba
+        el arbol ENTERO antes del slice — el limit no protegia la memoria ante
+        un arbol de evidencia hostil/gigante. heapq.nsmallest produce los
+        mismos primeros N en orden global determinista con memoria O(limit).
+        """
         if not base.is_dir():
             return []
-        return [f for f in sorted(base.rglob(pattern), key=lambda p: str(p))
-                if not f.is_symlink() and f.is_file()][:limit]
+        return heapq.nsmallest(
+            limit,
+            (f for f in base.rglob(pattern)
+             if not f.is_symlink() and f.is_file()),
+            key=lambda p: str(p),
+        )
 
     def _build_correlation_groups(self) -> Dict[int, set]:
         """Correlation map for noisy_or_correlated — delegates to the shared
@@ -825,11 +842,23 @@ class MacOSForensicsAnalyzer:
         self._analyze_loginitems_plists(evidence_path, result)
 
     def _safe_plist_load(self, path: Path) -> Optional[dict]:
-        """Load a plist file (binary or XML). Returns None on failure."""
+        """Load a plist file (binary or XML). Returns None on failure.
+
+        S5: rechaza por tamano ANTES de parsear — un plist valido pero
+        gigante inflaba la memoria del analyzer sin limite. El rechazo se
+        loguea a WARNING (visible), no DEBUG: "no pude leer persistencia"
+        no es lo mismo que "no hay persistencia" (degradacion honesta §5.3).
+        """
         try:
+            if path.stat().st_size > _PLIST_MAX_BYTES:
+                logger.warning(
+                    "[MACOS] Plist %s excede el limite de %d bytes — "
+                    "omitido sin parsear (S5)", path, _PLIST_MAX_BYTES,
+                )
+                return None
             with open(path, "rb") as f:
                 return plistlib.load(f)
-        except (OSError, plistlib.InvalidFileException, Exception) as e:
+        except Exception as e:
             logger.debug("[MACOS] Plist parse failed for %s: %s", path, e)
             return None
 

@@ -4396,3 +4396,51 @@ overwrites; does not touch narrative artifacts. 145 cases touched.
   noted for label review in Tanda C).
 
 **Tests:** `tests/test_validator_schema_aware.py` (10; red first).
+
+---
+
+## B-086 — Mobile pins S2/S3/S4/S5: the harness before B-052-P2 (WHAT_IS_NEXT §1.3) [RESOLVED]
+
+| Field | Value |
+|-------|-------|
+| **Status** | RESOLVED — POST HACKATHON (2026-07-07) |
+| **Severity** | P2 — harness debt; the 3 mobile modules sat at ≈15% coverage vs 77–89% for their SIFT siblings |
+| **File** | `tests/test_mobile_pins_s2_ladder.py`, `tests/test_mobile_pins_s3_timestamps.py`, `tests/test_mobile_pins_s4_s5_safe_helpers.py` (new); S4/S5 fixes in the 3 mobile modules |
+| **Antecedent** | AUDITORIA_COBERTURA_MOBILE_SIFT (patterns S2–S5); Anna's call: harness before Grupo B |
+
+**Purpose:** safety net for B-052-P2 (`to_signal()` → `to_signals()` changes
+ALL mobile verdicts). With the ladders pinned branch by branch, a regression
+breaks with a readable diff, not as opaque corpus movement.
+
+**S2 — full ladders (52 pins):** all 13 iOS + 11 Android + 14 macOS branches
+with exact minimal inputs; the `opsec_bump` 3.0→3.4 crossing over the strict
+>3 threshold (the one the audit flagged unpinned) is now pinned as current
+behavior; B-072 interplay (parsed=False does not minimize), real ceilings
+(3.9 iOS / 4.2 Android < Z_CLIP), confidence cap, value=z/5.
+**Dead-branch hunter:** every finding_type the ladder READS must have an
+emitter outside to_signal — 0 dead today (B-073/074 closed the known ones);
+the pin prevents reintroducing the class.
+
+**S3 — timestamp band edges (28 pins):** every EXACT edge of
+`_chrome_ts_to_unix` (>1e15/1e12/1e10, WebKit) and `_coredata_to_unix`
+(>1e17/1e14/1e11, Core Data ×2) + `_cocoa_ts_to_unix` (float truncates);
+iOS≡macOS agreement pin (twin implementations); ts≤0/None → 0. Thresholds
+differ across modules ON PURPOSE (different epochs) — a naive "unification"
+trips here.
+
+**S4 — bounded `_safe_rglob` (fix + 18 pins):** it materialized and sorted
+the ENTIRE tree before slicing — the limit did not protect memory. Now
+`heapq.nsmallest` (O(limit) memory) with IDENTICAL output — the contract pins
+(first N in global order, symlinks/dirs excluded, non-dir → []) witness the
+equivalence. Call-sites using direct `Path.rglob` (ios:269/604/608/641,
+android:240/360-362) are left for the B-052-P2 session: migrating them
+changes detection semantics, and the harness now exists to do it safely.
+
+**S5 — `_safe_plist_load` ceiling (fix + 6 pins):** a VALID but huge plist
+was loaded whole (memory bomb). `_PLIST_MAX_BYTES=8MiB`, rejection BEFORE
+parsing, logged at WARNING (honest degradation §5.3 — "could not read" ≠
+"no persistence"). Red test first (2 red pre-fix).
+
+**Induction:** suite **980 passed** (+104). Coverage: ios 41.5%, android
+38.4%, macos 44.5% (from ≈15%). Corpus **166/199, 0 new flips** (the 2
+observed movements are the ones already documented in B-085).

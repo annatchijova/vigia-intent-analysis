@@ -90,17 +90,22 @@ En orden de dependencia:
    experimentos E2/E3 ya fueron medidos y refutados).
 6. **A7 / L-041** — SMS semántico (léxicos + calibración multi-caso).
 
-### 1.3 Cobertura mobile (Grupo C — bajo riesgo, alto valor de arnés)
+### 1.3 Cobertura mobile (Grupo C) — **CERRADO en lo sustancial (B-086, 2026-07-07)**
 
-Los 3 módulos mobile siguen ≈15% de cobertura vs 77–89% de sus hermanos.
-B-071..B-074 atacaron lo crítico; queda del plan de
-`docs/AUDITORIA_COBERTURA_MOBILE_SIFT.md`:
+104 pins nuevos + 2 fixes acotados; cobertura ios 41.5% / android 38.4% /
+macos 44.5% (desde ≈15%). El arnés para B-052-P2 existe.
 
-1. Pin de la escalera `to_signal` completa en los 3 módulos (caza ramas muertas).
-2. Bordes de banda de los conversores de timestamp (el fix B-083 §5.4 agregó
-   los primeros; faltan los sistemáticos).
-3. `_safe_rglob` acotado y call-sites con `Path.rglob` directo.
-4. `_safe_plist_load` con límite de tamaño.
+1. ~~Pin de la escalera `to_signal` completa~~ — 52 pins (13+11+14 ramas,
+   cruce opsec_bump, interplay B-072, techos) + cazador de ramas muertas
+   como invariante.
+2. ~~Bordes de banda de timestamps~~ — 28 pins (cada borde exacto de los 3
+   conversores + acuerdo iOS≡macOS + ts≤0/None).
+3. `_safe_rglob` **acotado** (heapq.nsmallest, salida idéntica, 18 pins).
+   **Residuo para la sesión B-052-P2:** migrar los call-sites con
+   `Path.rglob` directo (ios:269/604/608/641, android:240/360-362) — cambia
+   semántica de detección; hacerlo con el arnés puesto.
+4. ~~`_safe_plist_load` con límite~~ — `_PLIST_MAX_BYTES=8MiB`, rechazo antes
+   de parsear, WARNING visible (rojo primero).
 
 ### 1.4 Fixes acotados restantes (Grupo B — paralelo, 1–2 h cada uno)
 

@@ -14,6 +14,7 @@ FIX P0: All numerical values in evidence dict use Fraction/str. NEVER float.
 
 from __future__ import annotations
 
+import heapq
 import json
 import logging
 import re
@@ -319,10 +320,21 @@ class AndroidForensicsAnalyzer:
 
     @staticmethod
     def _safe_rglob(base: Path, pattern: str, limit: int = 5) -> List[Path]:
+        """rglob with symlink filtering, deterministic sort, and limit.
+
+        S4 (AUDITORIA_COBERTURA_MOBILE_SIFT §C): antes materializaba y ordenaba
+        el arbol ENTERO antes del slice — el limit no protegia la memoria ante
+        un arbol de evidencia hostil/gigante. heapq.nsmallest produce los
+        mismos primeros N en orden global determinista con memoria O(limit).
+        """
         if not base.is_dir():
             return []
-        return [f for f in sorted(base.rglob(pattern), key=lambda p: str(p))
-                if not f.is_symlink() and f.is_file()][:limit]
+        return heapq.nsmallest(
+            limit,
+            (f for f in base.rglob(pattern)
+             if not f.is_symlink() and f.is_file()),
+            key=lambda p: str(p),
+        )
 
     def _build_correlation_groups(self) -> Dict[int, set]:
         """Correlation map for noisy_or_correlated — delegates to the shared
