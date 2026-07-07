@@ -583,7 +583,7 @@ def run_full_pipeline(
             "Posible: patrón nuevo, dataset insuficiente o adversario sofisticado."
         )
 
-    return {
+    result = {
         "document_id": doc_id,
         "baseline": {
             "version": bl.version,
@@ -623,3 +623,11 @@ def run_full_pipeline(
         },
         "daubert_record_hash": lr_record.record_hash(),
     }
+    # B8 (A-1): self-check del hash que acabamos de embeber — una asimetría
+    # de serialización/cuantización rompe ACÁ (fail-loud), no años después
+    # en el peritaje. El verificador es el mismo que usaría el perito.
+    from vigia.core.likelihood_ratio import verify_daubert_record_hash
+    _ok, _msg = verify_daubert_record_hash(result)
+    if not _ok:
+        raise RuntimeError(f"B8 self-check daubert_record_hash falló: {_msg}")
+    return result

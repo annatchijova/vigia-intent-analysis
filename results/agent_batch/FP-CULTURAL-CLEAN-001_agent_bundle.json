@@ -1,15 +1,15 @@
 {
   "agent_verdict": "MALICE",
-  "analysis_timestamp": "2026-07-07T19:13:24.786288+00:00",
+  "analysis_timestamp": "2026-07-07T19:18:47.357242+00:00",
   "audit_trail": {
     "agent_version": "1.0.0-SANS-2026",
     "case_id": "FP-CULTURAL-CLEAN-001",
-    "end_time": "2026-07-07T19:13:24.786295+00:00",
+    "end_time": "2026-07-07T19:18:47.357251+00:00",
     "entries": [
       {
         "action": "AGENT_INITIALIZED",
         "case_id": "FP-CULTURAL-CLEAN-001",
-        "entry_sha256": "b30d838d30c4d2a4214c01ea34a59ae13b044a9d63c821943933263d0fae6aa7",
+        "entry_sha256": "335ea95cc59c6b1de8563e3edb2491b1c7826412926f32b2aee5dc0cede002b2",
         "inputs_summary": {
           "agent_file": "/home/user/vigia-intent-analysis/vigia_agent.py",
           "case_id": "FP-CULTURAL-CLEAN-001"
@@ -21,13 +21,13 @@
           "agent_version": "1.0.0-SANS-2026"
         },
         "seq": 1,
-        "timestamp": "2026-07-07T19:13:24.602620+00:00",
+        "timestamp": "2026-07-07T19:18:47.166198+00:00",
         "tool": "vigia_agent"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "FP-CULTURAL-CLEAN-001",
-        "entry_sha256": "d20669680566311a9db6c0fed1451760f09d217112a99348c5dec60c6b815ab4",
+        "entry_sha256": "3e6305e66adf20c33eaee5de6ebb22daf8a62ec4fc39da1cac894da84a08c765",
         "inputs_summary": {
           "path": "/home/user/vigia-intent-analysis/data/cases/FP-CULTURAL-CLEAN-001.json"
         },
@@ -35,13 +35,13 @@
         "note": "Computing SHA-256 of original evidence",
         "outputs_summary": {},
         "seq": 2,
-        "timestamp": "2026-07-07T19:13:24.602762+00:00",
+        "timestamp": "2026-07-07T19:18:47.166353+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "FP-CULTURAL-CLEAN-001",
-        "entry_sha256": "c67520e9aee760ead5357c5495aace212f7ac6b99379742b1f2fc18843146752",
+        "entry_sha256": "28163ef6dc1f1d752d2f0f3aae9714cce9809098e13db1451f6a07297fb4490d",
         "inputs_summary": {
           "path": "/home/user/vigia-intent-analysis/data/cases/FP-CULTURAL-CLEAN-001.json"
         },
@@ -51,13 +51,13 @@
           "sha256": "709d3cb48771e4a762586b4243ed453e923f8ed5a4ffa291d7b3d4b5cdba6e7d"
         },
         "seq": 3,
-        "timestamp": "2026-07-07T19:13:24.602921+00:00",
+        "timestamp": "2026-07-07T19:18:47.166497+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "PIPELINE_EXECUTE",
         "case_id": "FP-CULTURAL-CLEAN-001",
-        "entry_sha256": "2755eb7ea251bac83ff9483986e75881bedf9a88eeb1efcc009c13e83b189fda",
+        "entry_sha256": "084da4a2ba725d2f4abf3a594d66e8087990d8d70b3ec63af7fe804e360af4c1",
         "inputs_summary": {
           "evidence": "/home/user/vigia-intent-analysis/data/cases/FP-CULTURAL-CLEAN-001.json",
           "iteration": "0",
@@ -67,13 +67,13 @@
         "note": "Executing pipeline \u2014 iteration 0",
         "outputs_summary": {},
         "seq": 4,
-        "timestamp": "2026-07-07T19:13:24.603135+00:00",
+        "timestamp": "2026-07-07T19:18:47.166703+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "PIPELINE_COMPLETE",
         "case_id": "FP-CULTURAL-CLEAN-001",
-        "entry_sha256": "610d538dfb2890b0b7dc239637a6334bd253692d97b4a6bd1dd5355ee046fae3",
+        "entry_sha256": "27976406eea1e982ecd737a2b2533ffc4888c03db970356aec0aa851388dce71",
         "inputs_summary": {
           "iteration": "0"
         },
@@ -130,13 +130,13 @@
           ]
         },
         "seq": 5,
-        "timestamp": "2026-07-07T19:13:24.785585+00:00",
+        "timestamp": "2026-07-07T19:18:47.356419+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "CONTRADICTION_CHECK",
         "case_id": "FP-CULTURAL-CLEAN-001",
-        "entry_sha256": "fac3aed4663ab55e30f0dabe6563bb4359761d8039b3444d693115bec3420032",
+        "entry_sha256": "c1975488676ebd33cb74c95e75314160c8679fea0a1042e06f76672f14872775",
         "inputs_summary": {
           "n_signals": "3"
         },
@@ -147,13 +147,13 @@
           "threshold": "2"
         },
         "seq": 6,
-        "timestamp": "2026-07-07T19:13:24.785760+00:00",
+        "timestamp": "2026-07-07T19:18:47.356623+00:00",
         "tool": "contradiction_detector"
       },
       {
         "action": "AGENT_EXIT",
         "case_id": "FP-CULTURAL-CLEAN-001",
-        "entry_sha256": "a4dabc8d643ddf97d050610728800039a70626bc5384ad8f267931555080e543",
+        "entry_sha256": "aa73d5093b340b569592ffc05b592ca7a00e0acd604e8c9fce6c3c34f31ca537",
         "inputs_summary": {
           "verdict": "MALICIOUS_INTENT_DETECTED"
         },
@@ -164,11 +164,11 @@
           "exit_code": "1"
         },
         "seq": 7,
-        "timestamp": "2026-07-07T19:13:24.786056+00:00",
+        "timestamp": "2026-07-07T19:18:47.356974+00:00",
         "tool": "vigia_agent"
       }
     ],
-    "start_time": "2026-07-07T19:13:24.602111+00:00",
+    "start_time": "2026-07-07T19:18:47.165594+00:00",
     "total_entries": 7
   },
   "case_id": "FP-CULTURAL-CLEAN-001",
