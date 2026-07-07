@@ -848,12 +848,30 @@ class ForensicBundle:
         """
         Guarda el bundle sellado en disco.
         Retorna el hash del archivo para verificación de transporte.
+
+        L-023 (Q4): escritura ATÓMICA vía atomic_io (mkstemp mismo directorio
+        + fsync + os.replace + fsync del directorio) — paridad con
+        vigia/core/bundle_builder.py y vigia_agent.py. El hash retornado se
+        computa RE-LEYENDO de disco (lo que se atesta es lo que quedó escrito,
+        no la variable en memoria) y se verifica contra el hash en memoria —
+        divergencia = RuntimeError, nunca un hash que no corresponde al archivo.
         """
+        # Import en scope de función: preserva la regla de aislamiento de capa
+        # (models no importa vigia.* a nivel módulo; atomic_io es stdlib-only).
+        from vigia.core.atomic_io import atomic_write_text
+
         content = self.to_json()
-        with open(path, "w", encoding="utf-8") as f:
-            f.write(content)
-        file_hash = hashlib.sha256(content.encode("utf-8")).hexdigest()
-        return file_hash
+        mem_hash = hashlib.sha256(content.encode("utf-8")).hexdigest()
+        atomic_write_text(path, content)
+        with open(path, "rb") as f:
+            disk_hash = hashlib.sha256(f.read()).hexdigest()
+        if disk_hash != mem_hash:
+            raise RuntimeError(
+                f"L-023: hash en disco difiere del hash en memoria tras la "
+                f"escritura atómica ({disk_hash[:16]} != {mem_hash[:16]}) — "
+                f"posible corrupción de filesystem o tampering concurrente."
+            )
+        return disk_hash
 
     # ------------------------------------------------------------------
     # Verificación rápida interna (no reemplaza verify_ebs_v1.py)
@@ -1173,9 +1191,23 @@ class BundleBuilder:
 
     @staticmethod
     def save(sealed_dict: dict, path: str) -> str:
-        """Guarda el dict sellado en disco. Retorna hash del archivo."""
+        """
+        Guarda el dict sellado en disco. Retorna hash del archivo.
+
+        L-023 (Q4): atómico vía atomic_io + hash re-leído de disco y verificado
+        contra memoria — mismo contrato que vigia/core/bundle_builder.py.save.
+        """
         import hashlib as _hl, json as _json
+        from vigia.core.atomic_io import atomic_write_text
         content = _json.dumps(sealed_dict, sort_keys=True, indent=2, default=str)
-        with open(path, "w", encoding="utf-8") as f:
-            f.write(content)
-        return _hl.sha256(content.encode("utf-8")).hexdigest()
+        mem_hash = _hl.sha256(content.encode("utf-8")).hexdigest()
+        atomic_write_text(path, content)
+        with open(path, "rb") as f:
+            disk_hash = _hl.sha256(f.read()).hexdigest()
+        if disk_hash != mem_hash:
+            raise RuntimeError(
+                f"L-023: hash en disco difiere del hash en memoria tras la "
+                f"escritura atómica ({disk_hash[:16]} != {mem_hash[:16]}) — "
+                f"posible corrupción de filesystem o tampering concurrente."
+            )
+        return disk_hash
