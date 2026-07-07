@@ -93,7 +93,7 @@
   ],
   "case_id": "case_111_falso_rastro_incompetencia",
   "description": "Noisy nmap scan (SYN flood, 65535 ports) generates 47 EDR alerts classified as low severity. Memory analysis reveals a C++ driver with SSDT hooks and a hollowed process with active C2. The nmap is theater.",
-  "expected_verdict": "SUSPICION",
+  "expected_verdict": "MALICE",
   "name": "The False Senior Incompetence Trail",
   "notes": "The attacker wants the analyst to think 'script-kiddie' and stop searching.",
   "peirce_chain": {
@@ -172,5 +172,12 @@
     "source": "results/agent_batch/VIGIA-CAN-029_agent_bundle.json",
     "method": "señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canónica preservada",
     "n_signals": 4
+  },
+  "_label_revision": {
+    "date": "2026-07-07",
+    "from": "SUSPICION",
+    "to": "MALICE",
+    "decided_by": "Anna Tchijova (decision de doctrina, Round 2.1)",
+    "reason": "El SUSPICION original dependia de que un memory_process raw=0.05 (adjusted 0.013) DILUYERA el grupo memory bajo el umbral MALICE (0.33) via el correlation-decay legacy. M2-1 (monotonicidad positiva, docs/REDTEAM_ROUND2_MONOTONICITY.md SS Round 2.1) prohibe esa dilucion. Sin ella el caso puntua 0.340 con 4 artefactos de senal / 2 clases device -> gate B-068 satisfecho -> MALICE: un volcado casi limpio adicional no debilita dos memory dumps fuertes + LSASS."
   }
 }

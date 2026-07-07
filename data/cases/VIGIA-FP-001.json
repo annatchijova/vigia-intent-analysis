@@ -3,7 +3,7 @@
   "case_name": "The Admin Auditing His Own House",
   "description": "Systems administrator with 12 years of tenure, impeccable track record. Runs nmap against his own IP range during business hours, justifying it as 'unscheduled internal audit'. Has domain credentials, elevated permissions, and no other anomaly.",
   "abstention_risk": "medium",
-  "expected_verdict": "BENIGN",
+  "expected_verdict": "UNKNOWN",
   "carnegie_pattern_expected": null,
   "confidence_expected": 75,
   "artifacts": [
@@ -111,5 +111,12 @@
     "source": "results/agent_batch/VIGIA-FP-001_agent_bundle.json",
     "method": "señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canónica preservada",
     "n_signals": 2
+  },
+  "_label_revision": {
+    "date": "2026-07-07",
+    "from": "BENIGN",
+    "to": "UNKNOWN",
+    "decided_by": "Anna Tchijova (decision de doctrina, Round 2.1)",
+    "reason": "El BENIGN original dependia de que un log_entry raw=0.05 DILUYERA el composite del log fuerte (0.083 -> 0.0744) bajo el borde NOISE (0.08) via el correlation-decay legacy. M2-1 (monotonicidad positiva, docs/REDTEAM_ROUND2_MONOTONICITY.md SS Round 2.1) prohibe esa dilucion: agregar evidencia incriminatoria no puede bajar el score. Sin dilucion el caso puntua 0.0804 -> UNKNOWN (anomalia debil sin soporte estructural), que es la lectura honesta: una senal 0.82 en un log no se vuelve benigna porque un segundo log casi limpio la acompanie."
   }
 }

@@ -87,7 +87,7 @@
   ],
   "case_id": "case_010_falso_positivo_empatico",
   "description": "Process 'Update_Fix_For_HR_Payroll.exe' consuming 1.2GB RAM from C:\\Users\\Public\\Documents, without a digital signature. Shannon entropy: 7.8 bits (packed/encrypted). The name appeals to HR to induce doubt before killing the process.",
-  "expected_verdict": "SUSPICION",
+  "expected_verdict": "MALICE",
   "name": "The Empathetic False Positive",
   "notes": "VIGÍA ignores the name and analyzes entropy, path, and behavior. False Benign Authority.",
   "peirce_chain": {
@@ -166,5 +166,12 @@
     "source": "results/agent_batch/VIGIA-CAN-036_agent_bundle.json",
     "method": "señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canónica preservada",
     "n_signals": 4
+  },
+  "_label_revision": {
+    "date": "2026-07-07",
+    "from": "SUSPICION",
+    "to": "MALICE",
+    "decided_by": "Anna Tchijova (decision de doctrina, Round 2.1)",
+    "reason": "El SUSPICION original dependia de que un memory_process con trust 0.25 (adjusted 0.0621) DILUYERA a sus pares fuertes bajo el umbral MALICE (0.33) via el correlation-decay legacy. M2-1 (monotonicidad positiva, docs/REDTEAM_ROUND2_MONOTONICITY.md SS Round 2.1) prohibe esa dilucion. Sin ella el caso puntua ~0.36 -> MALICE: un duplicado de baja confianza no resta valor probatorio a la evidencia que duplica."
   }
 }

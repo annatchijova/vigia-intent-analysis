@@ -328,6 +328,14 @@ Resolution of the 3 labels is a doctrine decision (relabel vs. document as
 known limitation vs. officially scope the invariant); recorded for that
 decision, not silently resolved here.
 
+**Doctrine decision (Anna, 2026-07-07): relabel the 3 cases.** If dilution is
+a defect, labels that depend on it are too. Applied with a `_label_revision`
+note in each JSON (including the shadowing duplicate
+`data/cases/VIGIA-FP-001.json`, which the batch runner prefers over
+`converted/`): `VIGIA-FP-001` BENIGN → UNKNOWN, `VIGIA-CAN-029` and
+`VIGIA-CAN-036` SUSPICION → MALICE. Post-relabel corpus: **166/199 — zero
+regressions vs. the 165/199 baseline, +1 (`VIGIA-MAGNET-2022-WINDOWS`)**.
+
 ## Recommendations (out of scope of this read-only audit — record only)
 
 1. **B-068 gate should count signal, not cardinality.** Require corroborating
