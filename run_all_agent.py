@@ -35,54 +35,29 @@ SKIP_STEMS = {
     "_index", "dataset", "calibration", "covariance", "correlation",
     "vigia_forensic_cases", "vigia_60_cases", "vigia_cases_canonical",
     "vigia_input_defcon", "fsv_schema", "phonetic_dict",
-    # R3-3c: bundle pre-migración (lista JSON de 10 casos que existen
-    # individualmente en converted/) — double-contaba y auto-pasaba como
-    # UNKNOWN. Se conserva en disco como historia; no es un caso.
-    "vigia_break_001-010",
 }
-
-
-def _is_skipped(stem: str) -> bool:
-    """R3-3c: matching por PREFIJO, no substring. El substring se tragaba el
-    caso real VIGIA_BREAK_005_FALSE_CORRELATION (contiene "correlation") —
-    nunca entró al corpus. Los términos de SKIP_STEMS nombran familias de
-    archivos auxiliares por prefijo (dataset_*, vigia_cases_canonical_*, ...);
-    censo 2026-07-07: prefijo cubre todos los auxiliares reales sin falsos
-    positivos."""
-    s = stem.lower()
-    return s in SKIP_STEMS or any(s.startswith(t) for t in SKIP_STEMS)
 
 RED  = "\033[91m"; GRN = "\033[92m"; YEL = "\033[93m"
 CYA  = "\033[96m"; RST = "\033[0m";  BLD = "\033[1m"
 
 
-def check_label_consistency(base_dir: Path | None = None,
-                            converted_dir: Path | None = None,
-                            dirs: list[Path] | None = None) -> list[dict]:
+def check_label_consistency(dirs: list[Path] | None = None) -> list[dict]:
     """
     R3-3 (docs/REDTEAM_ROUND3_EMERGENT.md): guard de fuente-unica-de-verdad.
 
     El runner deduplica casos por stem tomando el primer directorio de
-    CASES_DIRS, asi que una copia sombra con expected_verdict distinto queda
-    muerta y puede voltear la metrica en silencio (fue exactamente el bug del
-    shadow de VIGIA-FP-001, Ronda 2.1). Este chequeo enumera los stems
-    duplicados y devuelve la lista de divergencias de expected_verdict.
-    main() aborta fuerte si la lista no esta vacia.
+    CASES_DIRS, asi que una copia sombra de un caso en CUALQUIER otra carpeta
+    (converted/, legacy/, consolidated_canonical/, benign/) con expected_verdict
+    distinto al que gana por precedencia queda muerta y puede voltear la metrica
+    en silencio (fue el bug del shadow de VIGIA-FP-001, Ronda 2.1, y del shadow
+    legacy/ de case_008). Este chequeo agrupa por stem TODAS las copias en TODAS
+    las carpetas y devuelve las divergencias de expected_verdict. main() aborta
+    fuerte si la lista no esta vacia.
 
-    R3-3b (censo 2026-07-07): la version original solo comparaba data/cases/
-    contra converted/ — la divergencia viva estaba en legacy/
-    (case_008_multi_source_fraud_demo, relabel cdeb32f nunca propagado).
-    Ahora cubre TODOS los pares de directorios: `dirs` (default: CASES_DIRS
-    completo). base_dir/converted_dir se conservan por compatibilidad.
+    Censo COMPLETO (no solo data/cases vs converted): cierra todos los shadows,
+    no un par especifico de carpetas.
     """
-    if dirs is None:
-        if base_dir is not None or converted_dir is not None:
-            dirs = [
-                Path(base_dir) if base_dir else (REPO / "data/cases"),
-                Path(converted_dir) if converted_dir else (REPO / "data/cases/converted"),
-            ]
-        else:
-            dirs = CASES_DIRS
+    dirs = dirs if dirs is not None else CASES_DIRS
 
     def _label(path: Path) -> str:
         try:
@@ -95,23 +70,31 @@ def check_label_consistency(base_dir: Path | None = None,
         except Exception:
             return "ERROR"
 
-    # stem -> {path: label} sobre todos los dirs, honrando la misma lista de
-    # no-casos que find_cases: un archivo que el runner nunca carga como caso
-    # no es ground truth.
-    by_stem: dict[str, dict[str, str]] = {}
+    # Agrupar por stem todas las copias, en el ORDEN de precedencia de dirs
+    # (el primero es el que usa el runner).
+    by_stem: dict[str, list[Path]] = {}
     for d in dirs:
         d = Path(d)
         if not d.exists():
             continue
         for f in sorted(d.glob("*.json")):
-            if _is_skipped(f.stem):
+            s = f.stem.lower()
+            # Honrar la misma lista de no-casos que find_cases.
+            if s in SKIP_STEMS or any(skip in s for skip in SKIP_STEMS):
                 continue
-            by_stem.setdefault(f.stem, {})[str(f)] = _label(f)
+            by_stem.setdefault(f.stem, []).append(f)
 
     conflicts: list[dict] = []
-    for stem, labels in sorted(by_stem.items()):
-        if len(labels) > 1 and len(set(labels.values())) > 1:
-            conflicts.append({"stem": stem, "labels": labels})
+    for stem, paths in sorted(by_stem.items()):
+        if len(paths) < 2:
+            continue
+        labels = {str(p): _label(p) for p in paths}
+        if len(set(labels.values())) > 1:
+            conflicts.append({
+                "stem": stem,
+                "winner": str(paths[0]),          # el que usa el runner
+                "labels": labels,
+            })
     return conflicts
 
 
@@ -122,7 +105,9 @@ def find_cases(dirs: list[Path], filter_str: str = "") -> list[Path]:
         if not d.exists():
             continue
         for f in sorted(d.glob("*.json")):
-            if _is_skipped(f.stem):
+            if f.stem.lower() in SKIP_STEMS:
+                continue
+            if any(skip in f.stem.lower() for skip in SKIP_STEMS):
                 continue
             if filter_str and filter_str.upper() not in f.stem.upper():
                 continue
@@ -196,14 +181,13 @@ def main():
     parser.add_argument("--timeout", type=int, default=120, help="Timeout por caso (seg)")
     args = parser.parse_args()
 
-    # R3-3/R3-3b: fail-loud si CUALQUIER par de CASES_DIRS discrepa en la
+    # R3-3: fail-loud si data/cases/ y data/cases/converted/ discrepan en la
     # etiqueta de un mismo stem — el runner usaria una y descartaria la otra en
-    # silencio (bug del shadow de VIGIA-FP-001, Ronda 2.1; divergencia de
-    # case_008 en legacy/, censo 2026-07-07).
-    conflicts = check_label_consistency(dirs=CASES_DIRS)
+    # silencio (bug del shadow de VIGIA-FP-001, Ronda 2.1).
+    conflicts = check_label_consistency()
     if conflicts:
-        print(f"{RED}{BLD}[R3-3] ETIQUETAS DIVERGENTES entre directorios del "
-              f"corpus — fuente de verdad ambigua:{RST}")
+        print(f"{RED}{BLD}[R3-3] ETIQUETAS DIVERGENTES entre data/cases/ y "
+              f"data/cases/converted/ — fuente de verdad ambigua:{RST}")
         for c in conflicts:
             print(f"  {c['stem']}: {c['labels']}")
         print(f"{RED}Reconcilie las copias antes de correr el corpus "

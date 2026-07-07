@@ -1,15 +1,15 @@
 {
   "agent_verdict": "NOISE",
-  "analysis_timestamp": "2026-07-07T18:31:45.425455+00:00",
+  "analysis_timestamp": "2026-07-07T17:15:08.515895+00:00",
   "audit_trail": {
     "agent_version": "1.0.0-SANS-2026",
     "case_id": "VIGIA-BEN-015",
-    "end_time": "2026-07-07T18:31:45.425460+00:00",
+    "end_time": "2026-07-07T17:15:08.515904+00:00",
     "entries": [
       {
         "action": "AGENT_INITIALIZED",
         "case_id": "VIGIA-BEN-015",
-        "entry_sha256": "3aea837450f34a36736314e97b0e600b8c3275b64ba88de16055e0254d1748a8",
+        "entry_sha256": "8546e9adf982583a566d3756776a82539617ec55817ed53f3640806f9f85c4e7",
         "inputs_summary": {
           "agent_file": "/home/user/vigia-intent-analysis/vigia_agent.py",
           "case_id": "VIGIA-BEN-015"
@@ -21,13 +21,13 @@
           "agent_version": "1.0.0-SANS-2026"
         },
         "seq": 1,
-        "timestamp": "2026-07-07T18:31:45.291222+00:00",
+        "timestamp": "2026-07-07T17:15:08.354494+00:00",
         "tool": "vigia_agent"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-BEN-015",
-        "entry_sha256": "aad1dee3268379d71448533cf136e7f47bd2270dec920e34b17f8f739b8d98d8",
+        "entry_sha256": "bb990ecd9b6990ead2055dea8f777a868d163e0504b5f200c9ad32db421dee13",
         "inputs_summary": {
           "path": "/home/user/vigia-intent-analysis/data/cases/converted/VIGIA-BEN-015.json"
         },
@@ -35,29 +35,29 @@
         "note": "Computing SHA-256 of original evidence",
         "outputs_summary": {},
         "seq": 2,
-        "timestamp": "2026-07-07T18:31:45.291387+00:00",
+        "timestamp": "2026-07-07T17:15:08.354662+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-BEN-015",
-        "entry_sha256": "5dbec3580ec44c2c16d2ede2ea48f9f72788325bacdbb69b2e6b0e460d4bb210",
+        "entry_sha256": "132eedb5d64de97d36a29aed05ba83d4e89e40e0350c7a03b815bdd8a4093a6f",
         "inputs_summary": {
           "path": "/home/user/vigia-intent-analysis/data/cases/converted/VIGIA-BEN-015.json"
         },
         "iteration": 0,
-        "note": "Evidence verified: bbc31beb9dfdb452...",
+        "note": "Evidence verified: f02d5b9737416645...",
         "outputs_summary": {
-          "sha256": "bbc31beb9dfdb452e85a3548f710c22b05556fa76318a56ce8beae6a12e0cdb3"
+          "sha256": "f02d5b97374166451d53639d4cd4570e08f16b9123781631c28540267aef3954"
         },
         "seq": 3,
-        "timestamp": "2026-07-07T18:31:45.291500+00:00",
+        "timestamp": "2026-07-07T17:15:08.354851+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "PIPELINE_EXECUTE",
         "case_id": "VIGIA-BEN-015",
-        "entry_sha256": "9b75afdaa595c94412cbe5f8bd0999820ab786ce5abd513f930546ddc47b724b",
+        "entry_sha256": "0154187123b1be42c0273709c5d88f64b04b1fdf61a42ddb0b23292ff1b4d845",
         "inputs_summary": {
           "evidence": "/home/user/vigia-intent-analysis/data/cases/converted/VIGIA-BEN-015.json",
           "iteration": "0",
@@ -67,13 +67,13 @@
         "note": "Executing pipeline \u2014 iteration 0",
         "outputs_summary": {},
         "seq": 4,
-        "timestamp": "2026-07-07T18:31:45.291728+00:00",
+        "timestamp": "2026-07-07T17:15:08.355157+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "PIPELINE_COMPLETE",
         "case_id": "VIGIA-BEN-015",
-        "entry_sha256": "cb17b7bb7da5ffdd69874fb1e6ebba9ead72751b750c697745a2eb5f1ca3dc98",
+        "entry_sha256": "c3066bbf32edbf35d59dfeada92e6d3f13ad141d9e830ea95629efb05d51e262",
         "inputs_summary": {
           "iteration": "0"
         },
@@ -130,13 +130,13 @@
           ]
         },
         "seq": 5,
-        "timestamp": "2026-07-07T18:31:45.424968+00:00",
+        "timestamp": "2026-07-07T17:15:08.515152+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "CONTRADICTION_CHECK",
         "case_id": "VIGIA-BEN-015",
-        "entry_sha256": "5904cb31d350aed9f489fbcff676e1def7fb90ced3b352b3882770fd3523e23b",
+        "entry_sha256": "2e078286c4c3425d82e0b879dd4420aff9ad067610c2a64c7ea307f789d9dc7c",
         "inputs_summary": {
           "n_signals": "3"
         },
@@ -147,13 +147,13 @@
           "threshold": "2"
         },
         "seq": 6,
-        "timestamp": "2026-07-07T18:31:45.425136+00:00",
+        "timestamp": "2026-07-07T17:15:08.515394+00:00",
         "tool": "contradiction_detector"
       },
       {
         "action": "AGENT_EXIT",
         "case_id": "VIGIA-BEN-015",
-        "entry_sha256": "fe02886f1c17041709ecd5ee15633c5aaa7423323e4ad9a6d1178b37b79991ba",
+        "entry_sha256": "4af3a11b462ef9a6040a25bc4ada035491a2abff6f590688fd744f349ffe3584",
         "inputs_summary": {
           "verdict": "NO_SEMIOTIC_ANOMALY_DETECTED"
         },
@@ -164,18 +164,18 @@
           "exit_code": "0"
         },
         "seq": 7,
-        "timestamp": "2026-07-07T18:31:45.425383+00:00",
+        "timestamp": "2026-07-07T17:15:08.515788+00:00",
         "tool": "vigia_agent"
       }
     ],
-    "start_time": "2026-07-07T18:31:45.290919+00:00",
+    "start_time": "2026-07-07T17:15:08.353968+00:00",
     "total_entries": 7
   },
   "case_id": "VIGIA-BEN-015",
   "evidence_path": "/home/user/vigia-intent-analysis/data/cases/converted/VIGIA-BEN-015.json",
-  "evidence_sha256": "bbc31beb9dfdb452e85a3548f710c22b05556fa76318a56ce8beae6a12e0cdb3",
+  "evidence_sha256": "f02d5b97374166451d53639d4cd4570e08f16b9123781631c28540267aef3954",
   "iterations_executed": 1,
-  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-BEN-015 ===\nEvidence: /home/user/vigia-intent-analysis/data/cases/converted/VIGIA-BEN-015.json\nEvidence SHA-256: bbc31beb9dfdb452e85a3548f710c22b05556fa76318a56ce8beae6a12e0cdb3\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: NO_SEMIOTIC_ANOMALY_DETECTED\nPosterior confidence: 93/100\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 3 se\u00f1al(es): 3 primaria(s) de ['legacy_converter'], 0 derivada(s)/no-analizada(s). Top z: Backup system: Veeam | Snapshot: 2024-05=0.85, Infrastructure ticket INF-2024-0551: 'Ha=0.72, ls -l /data | 100 files with identical m=0.49.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: NO_SEMIOTIC_ANOMALY_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\n100 files in /data show identical modification timestamp. It is a VM snapshot restoration after a hardware incident, documented in an infrastructure ticket, affecting 47 users.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Backup system: Veeam | Snapshot: 2024-05-09-23:00 | Restore point: 202] z=0.855 conf=0.90 \u2014 \n  [Infrastructure ticket INF-2024-0551: 'Hardware failure on VM host node] z=0.723 conf=0.85 \u2014 \n  [ls -l /data | 100 files with identical mtime: 2024-05-10 03:47:22 | at] z=0.490 conf=0.70 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 3 | Derived: 0 | Total: 3",
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-BEN-015 ===\nEvidence: /home/user/vigia-intent-analysis/data/cases/converted/VIGIA-BEN-015.json\nEvidence SHA-256: f02d5b97374166451d53639d4cd4570e08f16b9123781631c28540267aef3954\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: NO_SEMIOTIC_ANOMALY_DETECTED\nPosterior confidence: 93/100\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 3 se\u00f1al(es): 3 primaria(s) de ['legacy_converter'], 0 derivada(s)/no-analizada(s). Top z: Backup system: Veeam | Snapshot: 2024-05=0.85, Infrastructure ticket INF-2024-0551: 'Ha=0.72, ls -l /data | 100 files with identical m=0.49.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: NO_SEMIOTIC_ANOMALY_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\n100 files in /data show identical modification timestamp. It is a VM snapshot restoration after a hardware incident, documented in an infrastructure ticket, affecting 47 users.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Backup system: Veeam | Snapshot: 2024-05-09-23:00 | Restore point: 202] z=0.855 conf=0.90 \u2014 \n  [Infrastructure ticket INF-2024-0551: 'Hardware failure on VM host node] z=0.723 conf=0.85 \u2014 \n  [ls -l /data | 100 files with identical mtime: 2024-05-10 03:47:22 | at] z=0.490 conf=0.70 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 3 | Derived: 0 | Total: 3",
   "pipeline_results": {
     "abduction": {
       "best_hypothesis": "NO_SEMIOTIC_ANOMALY_DETECTED",

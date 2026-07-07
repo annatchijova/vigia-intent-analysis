@@ -1,15 +1,15 @@
 {
   "agent_verdict": "INTENT",
-  "analysis_timestamp": "2026-07-07T18:31:35.890411+00:00",
+  "analysis_timestamp": "2026-07-07T17:14:56.758228+00:00",
   "audit_trail": {
     "agent_version": "1.0.0-SANS-2026",
     "case_id": "VIGIA-SET630-001",
-    "end_time": "2026-07-07T18:31:35.890416+00:00",
+    "end_time": "2026-07-07T17:14:56.758236+00:00",
     "entries": [
       {
         "action": "AGENT_INITIALIZED",
         "case_id": "VIGIA-SET630-001",
-        "entry_sha256": "f411e7e206481e27a59d6ee53d5db4afe7c4171c88634094a56997ade37f324d",
+        "entry_sha256": "577f14675f9f91ba7013f6d7309fbee133444aa5371da5ef4eee2fa4285b25d8",
         "inputs_summary": {
           "agent_file": "/home/user/vigia-intent-analysis/vigia_agent.py",
           "case_id": "VIGIA-SET630-001"
@@ -21,13 +21,13 @@
           "agent_version": "1.0.0-SANS-2026"
         },
         "seq": 1,
-        "timestamp": "2026-07-07T18:31:35.750071+00:00",
+        "timestamp": "2026-07-07T17:14:56.589174+00:00",
         "tool": "vigia_agent"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-SET630-001",
-        "entry_sha256": "72502460ab58bcb524d2d99ba7877351ce4a2861b5edd45ce160f6ab5cbf43ee",
+        "entry_sha256": "ce32bfcea7425cdd79444ad4c3d975c0bfc863e29dfebe789dba268c0fe8c066",
         "inputs_summary": {
           "path": "/home/user/vigia-intent-analysis/data/cases/VIGIA-SET630-001.json"
         },
@@ -35,29 +35,29 @@
         "note": "Computing SHA-256 of original evidence",
         "outputs_summary": {},
         "seq": 2,
-        "timestamp": "2026-07-07T18:31:35.750200+00:00",
+        "timestamp": "2026-07-07T17:14:56.589356+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-SET630-001",
-        "entry_sha256": "9d5199e52062b81efc31942271c7d7d58b461697919a32c8ddeb4ea1a4987c0b",
+        "entry_sha256": "2d7cd4d29b4efe4ffcae96ee47711eb5555b8db2d6e1504c89806a820bde9cd5",
         "inputs_summary": {
           "path": "/home/user/vigia-intent-analysis/data/cases/VIGIA-SET630-001.json"
         },
         "iteration": 0,
-        "note": "Evidence verified: aaf0b8a8827190ab...",
+        "note": "Evidence verified: aa497eea9165c42b...",
         "outputs_summary": {
-          "sha256": "aaf0b8a8827190ab673b0dc7fad89426aab45670c081ed1e676003f69fb65d0d"
+          "sha256": "aa497eea9165c42b5127207cedf0c20a8e4af719d8c5de4e2e522b1d546cda70"
         },
         "seq": 3,
-        "timestamp": "2026-07-07T18:31:35.750320+00:00",
+        "timestamp": "2026-07-07T17:14:56.589525+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "PIPELINE_EXECUTE",
         "case_id": "VIGIA-SET630-001",
-        "entry_sha256": "6724e6fe204474e45928963fd6e5771de2a5cd79257b66bd2f38a01bc0a4fa9b",
+        "entry_sha256": "ddb32db228b23c9b7ff2e3f140b201bc6a94158b49ef0f46a5204a8bd54cc234",
         "inputs_summary": {
           "evidence": "/home/user/vigia-intent-analysis/data/cases/VIGIA-SET630-001.json",
           "iteration": "0",
@@ -67,13 +67,13 @@
         "note": "Executing pipeline \u2014 iteration 0",
         "outputs_summary": {},
         "seq": 4,
-        "timestamp": "2026-07-07T18:31:35.750504+00:00",
+        "timestamp": "2026-07-07T17:14:56.589789+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "PIPELINE_COMPLETE",
         "case_id": "VIGIA-SET630-001",
-        "entry_sha256": "e9e7f5bd3f7179f382438e1961a04a234f080bbe32d2d57eed149133d8fd7f00",
+        "entry_sha256": "caf1a4ac4de6c309b9f5ca11032596730bc43b01e4a5f3a30941a4723525ed45",
         "inputs_summary": {
           "iteration": "0"
         },
@@ -82,8 +82,8 @@
         "outputs_summary": {
           "abduction": {
             "best_hypothesis": "SUSPICION_DETECTED",
-            "best_posterior": "13/25",
-            "confidence": "13/25",
+            "best_posterior": "51/100",
+            "confidence": "51/100",
             "is_conclusive": "True",
             "narrative": "Forensic comparison of two Sony Ericsson T630 image memory dumps: images.bin (active state, SHA-256: b6b904e63a51e6a1c2350fade1f166dcd378eeb1c1b93b432c07a726f5095bfb) and images-deleted.bin (forensic ..."
           },
@@ -94,9 +94,9 @@
             "ebs_adapter_mode": "motor",
             "expected_verdict": "SUSPICION",
             "resolve": {
-              "motor_confidence": "0.52",
-              "motor_reason": "Significant signal with structural support (score=0.2578)",
-              "motor_score": "0.2578",
+              "motor_confidence": "0.51",
+              "motor_reason": "Significant signal with structural support (score=0.2537)",
+              "motor_score": "0.2537",
               "motor_verdict": "SUSPICION",
               "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
             },
@@ -130,13 +130,13 @@
           ]
         },
         "seq": 5,
-        "timestamp": "2026-07-07T18:31:35.889920+00:00",
+        "timestamp": "2026-07-07T17:14:56.757586+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "CONTRADICTION_CHECK",
         "case_id": "VIGIA-SET630-001",
-        "entry_sha256": "d69366791f6919cdbd7c7a292f4d12f79b4c8037fb47ad028e9d9cf68cd2f9dc",
+        "entry_sha256": "fa6e2c3a8161aa5580f574f1938a79d80c6f59651a1fbff7e4895ab160071568",
         "inputs_summary": {
           "n_signals": "3"
         },
@@ -147,13 +147,13 @@
           "threshold": "2"
         },
         "seq": 6,
-        "timestamp": "2026-07-07T18:31:35.890082+00:00",
+        "timestamp": "2026-07-07T17:14:56.757827+00:00",
         "tool": "contradiction_detector"
       },
       {
         "action": "AGENT_EXIT",
         "case_id": "VIGIA-SET630-001",
-        "entry_sha256": "1e1e45e19b24bc3e71f012918f9d8d409e31d8671499962234c22706d266d663",
+        "entry_sha256": "b53a20633696a26094df8fb03b0e5ee464a26dc02aeeeebaa0cfa4ffbebfc734",
         "inputs_summary": {
           "verdict": "SUSPICION_DETECTED"
         },
@@ -164,26 +164,26 @@
           "exit_code": "3"
         },
         "seq": 7,
-        "timestamp": "2026-07-07T18:31:35.890342+00:00",
+        "timestamp": "2026-07-07T17:14:56.758137+00:00",
         "tool": "vigia_agent"
       }
     ],
-    "start_time": "2026-07-07T18:31:35.749773+00:00",
+    "start_time": "2026-07-07T17:14:56.588667+00:00",
     "total_entries": 7
   },
   "case_id": "VIGIA-SET630-001",
   "evidence_path": "/home/user/vigia-intent-analysis/data/cases/VIGIA-SET630-001.json",
-  "evidence_sha256": "aaf0b8a8827190ab673b0dc7fad89426aab45670c081ed1e676003f69fb65d0d",
+  "evidence_sha256": "aa497eea9165c42b5127207cedf0c20a8e4af719d8c5de4e2e522b1d546cda70",
   "iterations_executed": 1,
-  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-SET630-001 ===\nEvidence: /home/user/vigia-intent-analysis/data/cases/VIGIA-SET630-001.json\nEvidence SHA-256: aaf0b8a8827190ab673b0dc7fad89426aab45670c081ed1e676003f69fb65d0d\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: SUSPICION_DETECTED\nPosterior confidence: 13/25\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 3 se\u00f1al(es): 3 primaria(s) de ['audit_image_metadata', 'generate_forensic_hash', 'search_pattern'], 0 derivada(s)/no-analizada(s). Top z: Binary comparison (cmp -l) of both files=0.77, Recovered image data in images-deleted.b=0.53, Sony Ericsson T630 image memory dumps. B=0.10.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: SUSPICION_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nForensic comparison of two Sony Ericsson T630 image memory dumps: images.bin (active state, SHA-256: b6b904e63a51e6a1c2350fade1f166dcd378eeb1c1b93b432c07a726f5095bfb) and images-deleted.bin (forensic recovery, SHA-256: c0be1453dd5d84b0225d23486ed508744c6f821b057e8247fd0d4a904266e14a). Both files 12582912 bytes (12MB). File dates: 2004-09-25. Binary comparison reveals: (1) First 8388608 bytes (8MB) are BYTE-FOR-BYTE IDENTICAL \u2014 this is the device firmware. (2) Files diverge at byte 8388610 (first\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Binary comparison (cmp -l) of both files: IDENTICAL for bytes 0\u2013838860] z=0.765 conf=0.90 \u2014 \n  [Recovered image data in images-deleted.bin: binary pattern starting at] z=0.525 conf=0.75 \u2014 \n  [Sony Ericsson T630 image memory dumps. Both files 12582912 bytes. File] z=0.095 conf=0.95 \u2014 \n\n--- FINAL ALERT LEVEL ---\nMEDIUM \u2014 INTENT verdict with individual z-scores below threshold. Alert floored (B-028/B-065): an intent finding cannot present as LOW.\nReconciliation: verdict INTENT rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 3 | Derived: 0 | Total: 3",
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-SET630-001 ===\nEvidence: /home/user/vigia-intent-analysis/data/cases/VIGIA-SET630-001.json\nEvidence SHA-256: aa497eea9165c42b5127207cedf0c20a8e4af719d8c5de4e2e522b1d546cda70\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: SUSPICION_DETECTED\nPosterior confidence: 51/100\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 3 se\u00f1al(es): 3 primaria(s) de ['audit_image_metadata', 'generate_forensic_hash', 'search_pattern'], 0 derivada(s)/no-analizada(s). Top z: Binary comparison (cmp -l) of both files=0.77, Recovered image data in images-deleted.b=0.53, Sony Ericsson T630 image memory dumps. B=0.10.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: SUSPICION_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nForensic comparison of two Sony Ericsson T630 image memory dumps: images.bin (active state, SHA-256: b6b904e63a51e6a1c2350fade1f166dcd378eeb1c1b93b432c07a726f5095bfb) and images-deleted.bin (forensic recovery, SHA-256: c0be1453dd5d84b0225d23486ed508744c6f821b057e8247fd0d4a904266e14a). Both files 12582912 bytes (12MB). File dates: 2004-09-25. Binary comparison reveals: (1) First 8388608 bytes (8MB) are BYTE-FOR-BYTE IDENTICAL \u2014 this is the device firmware. (2) Files diverge at byte 8388610 (first\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Binary comparison (cmp -l) of both files: IDENTICAL for bytes 0\u2013838860] z=0.765 conf=0.90 \u2014 \n  [Recovered image data in images-deleted.bin: binary pattern starting at] z=0.525 conf=0.75 \u2014 \n  [Sony Ericsson T630 image memory dumps. Both files 12582912 bytes. File] z=0.095 conf=0.95 \u2014 \n\n--- FINAL ALERT LEVEL ---\nMEDIUM \u2014 INTENT verdict with individual z-scores below threshold. Alert floored (B-028/B-065): an intent finding cannot present as LOW.\nReconciliation: verdict INTENT rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 3 | Derived: 0 | Total: 3",
   "pipeline_results": {
     "abduction": {
       "best_hypothesis": "SUSPICION_DETECTED",
-      "best_posterior": "13/25",
+      "best_posterior": "51/100",
       "confidence": {
         "__fraction__": true,
-        "den": 25,
-        "num": 13
+        "den": 100,
+        "num": 51
       },
       "is_conclusive": true,
       "narrative": "Forensic comparison of two Sony Ericsson T630 image memory dumps: images.bin (active state, SHA-256: b6b904e63a51e6a1c2350fade1f166dcd378eeb1c1b93b432c07a726f5095bfb) and images-deleted.bin (forensic recovery, SHA-256: c0be1453dd5d84b0225d23486ed508744c6f821b057e8247fd0d4a904266e14a). Both files 12582912 bytes (12MB). File dates: 2004-09-25. Binary comparison reveals: (1) First 8388608 bytes (8MB) are BYTE-FOR-BYTE IDENTICAL \u2014 this is the device firmware. (2) Files diverge at byte 8388610 (first"
@@ -195,9 +195,9 @@
       "ebs_adapter_mode": "motor",
       "expected_verdict": "SUSPICION",
       "resolve": {
-        "motor_confidence": "0.52",
-        "motor_reason": "Significant signal with structural support (score=0.2578)",
-        "motor_score": "0.2578",
+        "motor_confidence": "0.51",
+        "motor_reason": "Significant signal with structural support (score=0.2537)",
+        "motor_score": "0.2537",
         "motor_verdict": "SUSPICION",
         "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
       },
