@@ -19,6 +19,7 @@ import logging
 import re
 import sqlite3
 from dataclasses import dataclass, field
+from decimal import Decimal
 from fractions import Fraction
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
@@ -334,10 +335,14 @@ class AndroidForensicsAnalyzer:
         2024 magnitudes: micros ~1.7e16, millis ~1.7e13, secs ~1.7e10."""
         if ts is None or ts <= 0:
             return 0
+        # P0-001 census §5.4: división entera — int(ts / 1_000_000) pasaba por
+        # float y podía cruzar el borde de segundo (p.ej. ts=18396007234999999
+        # daba ...235 en vez de ...234). Para ts>0, // equivale a la truncación
+        # de int() sin el redondeo IEEE 754 intermedio.
         if ts > 1_000_000_000_000_000:
-            return int(ts / 1_000_000) - _CHROME_EPOCH_OFFSET
+            return int(ts) // 1_000_000 - _CHROME_EPOCH_OFFSET
         elif ts > 1_000_000_000_000:
-            return int(ts / 1_000) - _CHROME_EPOCH_OFFSET
+            return int(ts) // 1_000 - _CHROME_EPOCH_OFFSET
         elif ts > 10_000_000_000:
             return int(ts) - _CHROME_EPOCH_OFFSET
         return int(ts)
@@ -548,8 +553,12 @@ class AndroidForensicsAnalyzer:
                 title = str(row["title"] or "")
                 raw_ts = row["last_visit_time"]
                 try:
-                    ts = self._chrome_ts_to_unix(int(float(raw_ts))) if raw_ts is not None else 0
-                except (ValueError, TypeError):
+                    # P0-001 census §3.1: los timestamps WebKit en µs (~1.7e16)
+                    # exceden 2^53 — int(float(x)) perdía hasta ±2 µs de mantisa.
+                    # Decimal(str(x)) acepta int, string decimal y notación
+                    # científica sin pasar por IEEE 754.
+                    ts = self._chrome_ts_to_unix(int(Decimal(str(raw_ts)))) if raw_ts is not None else 0
+                except (ValueError, TypeError, ArithmeticError):
                     ts = 0
                 combined = f"{url[:500]} {title[:200]}"  # ReDoS guard
 

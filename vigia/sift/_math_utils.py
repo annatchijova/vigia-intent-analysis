@@ -338,7 +338,13 @@ def apply_artifact_reliability_dynamic(
         num, den = composite_raw.split("/")
         composite_frac = Fraction(int(num), int(den))
     elif composite_raw is not None:
-        composite_frac = Fraction(int(round(float(composite_raw) * 20)), 20)
+        # P0-001 census §5.1: cuantización a granularidad 1/20 en aritmética
+        # racional pura. Antes: int(round(float(x) * 20)) — round() sobre el
+        # producto IEEE 754 pre-multiplicado, la misma clase de bug que P0-001
+        # corrigió en el orchestrator (p.ej. x=0.42500000000000004 daba 8/20 en
+        # vez de 9/20). Fraction(str(x)) captura la representación decimal
+        # exacta; round(Fraction) es exacto (half-even).
+        composite_frac = Fraction(round(Fraction(str(composite_raw)) * 20), 20)
     else:
         composite_frac = Fraction(0)
 

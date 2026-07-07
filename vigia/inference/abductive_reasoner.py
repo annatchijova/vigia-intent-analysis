@@ -54,6 +54,30 @@ class AbductionTrace:
     ontological_level: Optional[str] = None
 
 
+# P0-001 census §5.3: umbrales de clasificación en Fraction — el invariante
+# Fraction-pura del path de veredicto pide que las comparaciones no dependan
+# de literales float. Semántica idéntica a los literales previos (2.0, 1.5,
+# 3.0, 0.5 son exactamente representables); mismo patrón que el override
+# L-036 en vigia_agent.py (_to_frac + Fraction thresholds).
+_Z_TECHNIQUE = Fraction(2, 1)   # antes: > 2.0
+_Z_ACTIVE = Fraction(3, 2)      # antes: > 1.5
+_Z_CRITICAL = Fraction(3, 1)    # antes: > 3.0
+_Z_CONTRADICT = Fraction(1, 2)  # antes: <= 0.5
+
+
+def _z_frac(signal: SignalOutput) -> Fraction:
+    """z_score del DTO (float) → Fraction vía str(), NaN/inf → 0."""
+    z = signal.z_score
+    if isinstance(z, Fraction):
+        return z
+    try:
+        if z != z or z in (float("inf"), float("-inf")):
+            return Fraction(0, 1)
+        return Fraction(str(z))
+    except (ValueError, TypeError, ZeroDivisionError):
+        return Fraction(0, 1)
+
+
 def _is_primary_signal(signal: SignalOutput) -> bool:
     """
     F5 (AUDITORIA_PIPELINE_ROBUSTEZ): una señal es PRIMARIA si proviene de un
@@ -136,7 +160,7 @@ class AbductiveReasoner:
                 candidate_hypotheses=hypotheses,
                 baseline_expectations=baseline,
                 memory_has_active_thread=any(
-                    s.tool_name == "MEMORY_FORENSICS" and s.z_score > 2.0
+                    s.tool_name == "MEMORY_FORENSICS" and _z_frac(s) > _Z_TECHNIQUE
                     for s in primary
                 ),
                 si_fn_delta_seconds=None,  # No disponible en esta capa
@@ -182,7 +206,7 @@ class AbductiveReasoner:
         artifacts = []
         for i, s in enumerate(signals):
             layer = layer_map.get(s.tool_name, EvidenceLayer.DISK_MFT)
-            ont_level = OntologicalLevel.TECHNIQUE if s.z_score > 2.0 else OntologicalLevel.TACTIC
+            ont_level = OntologicalLevel.TECHNIQUE if _z_frac(s) > _Z_TECHNIQUE else OntologicalLevel.TACTIC
             artifacts.append(ArtifactRecord(
                 artifact_id=f"SIG-{i:03d}-{s.tool_name}",
                 source_path=s.tool_name,
@@ -210,8 +234,8 @@ class AbductiveReasoner:
           phase_thirdness, resuelto por orden lexicográfico a favor de
           H2-BENIGN (sesgo benigno estructural).
         """
-        active_tools = sorted({s.tool_name for s in signals if s.z_score > 1.5})
-        inactive_tools = sorted({s.tool_name for s in signals if s.z_score <= 1.5})
+        active_tools = sorted({s.tool_name for s in signals if _z_frac(s) > _Z_ACTIVE})
+        inactive_tools = sorted({s.tool_name for s in signals if _z_frac(s) <= _Z_ACTIVE})
 
         # Hipótesis MALICIOSA
         mal_scores = HypothesisScores(
@@ -236,7 +260,7 @@ class AbductiveReasoner:
         mal_links = []
         ben_links = []
         for i, s in enumerate(signals):
-            is_active = s.z_score > 1.5
+            is_active = _z_frac(s) > _Z_ACTIVE
             mal_links.append(CausalLink(
                 link_id=f"H1-{i:03d}-{s.tool_name}",
                 description=s.tool_name,
@@ -329,7 +353,7 @@ class AbductiveReasoner:
         # fuentes independientes para poder afirmar MALICIOUS.
         critical_types = sorted({
             (s.metadata or {}).get("artifact_type", s.tool_name)
-            for s in signals if s.z_score > 3.0
+            for s in signals if _z_frac(s) > _Z_CRITICAL
         })
 
         if verdict == "ABSTAIN" or not selected:
@@ -403,8 +427,8 @@ class AbductiveReasoner:
             is_conclusive=is_conclusive,
             ontological_level="TECHNIQUE",
             ranked_hypotheses=ranked,
-            key_supporting=[s.tool_name for s in signals if s.z_score > 1.5],
-            key_contradicting=[s.tool_name for s in signals if s.z_score <= 0.5],
+            key_supporting=[s.tool_name for s in signals if _z_frac(s) > _Z_ACTIVE],
+            key_contradicting=[s.tool_name for s in signals if _z_frac(s) <= _Z_CONTRADICT],
             pruned=[],
             contradiction_type=None,
         )
