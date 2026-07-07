@@ -49,9 +49,14 @@ que ya se cerró desde entonces. La Fase 0 (sorpresas protegidas) y la Fase 1
 
 ### 1.1 Higiene del corpus (Grupo D + secuela de R3-3) — primero, es precondición
 
-1. **Deduplicación física del corpus**: R3-3 dejó el assert de consistencia en
-   el runner, pero los 59 stems duplicados siguen en disco (3 tenían
-   `expected_verdict` divergente). Una ubicación canónica por stem.
+1. **Deduplicación física del corpus**: R3-3b (censo total 2026-07-07) cerró
+   las etiquetas divergentes — el guard ahora cubre las 5 CASES_DIRS y el
+   censo da **0 divergencias** (case_008 propagado a legacy/; AMB ya estaban
+   alineadas). Quedan los 62 stems duplicados en disco (copias muertas
+   coherentes) y una decisión de doctrina: `VIGIA_BREAK_001-010.json` es una
+   lista malformada que entra como UNKNOWN y auto-pasa — retirarla cambia el
+   denominador 199. Una ubicación canónica por stem sigue siendo el cierre
+   definitivo.
 2. **Metadata de adquisición por lotes**: 145/199 casos fallan el validador por
    metadata ausente (hipótesis "el validador causa los FP/FN" ya refutada).
    Precondición práctica del dataset de calibración de la Tanda C (A4).

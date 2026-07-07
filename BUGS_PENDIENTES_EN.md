@@ -4230,6 +4230,21 @@ relabel of those 3 labels → corpus **166/199**.
   in the corpus, 3 with divergent `expected_verdict` silently resolved by
   directory precedence (`22f6edc`). Physical corpus deduplication remains
   pending (Group D).
+  - **R3-3b (full census, 2026-07-07):** the original guard only compared
+    `data/cases/` against `converted/`. Full census over all 5 CASES_DIRS:
+    62 duplicated stems, **1 live divergence** —
+    `case_008_multi_source_fraud_demo` SUSPICION (canonical, doctrinal relabel
+    `cdeb32f` documented in `_notes`) vs MALICE (`legacy/`, never received the
+    relabel). Closed by propagating the relabel to the legacy copy (metric
+    unchanged: the winner was already SUSPICION). `check_label_consistency`
+    now covers ALL directory pairs (default `CASES_DIRS`) and `main()` aborts
+    on the full census. The AMB-001/002 from the original finding were already
+    aligned. 3 malformed stems documented (JSON lists: `VIGIA_BREAK_001-010`
+    ×2, `dataset_test_cases`, `vigia_input_defcon_nist` ×3 — the latter two
+    excluded via SKIP_STEMS; BREAK_001-010 loads as UNKNOWN and auto-passes:
+    removing it would change the 199 denominator, doctrine decision pending in
+    Group D). Red tests first: 3 red in
+    `tests/test_r3_3_label_consistency.py`. Suite 863, corpus 166/199, 0 flips.
 - **R3-4:** causal-order validation in the chain verifier, separate axis from
   the seal (`e0e7be0`).
 

@@ -2,7 +2,7 @@
   "case_id": "VIGIA-2026-DEMO-008",
   "case_name": "Operación Tres Espejos",
   "description": "Una empresa recibe un informe de auditoría externa que concluye que no hubo irregularidades contables. El informe viene acompañado de logs del sistema y una captura de pantalla del dashboard financiero. VIGÍA debe correlacionar tres fuentes independientes para detectar que las tres fueron manipuladas con el mismo objetivo.",
-  "expected_verdict": "MALICE",
+  "expected_verdict": "SUSPICION",
   "expected_hypothesis": "coordinated_evidence_fabrication",
   "expected_mitre_ttps": [
     "T1565.001",
@@ -191,5 +191,8 @@
     "source": "results/agent_batch/case_008_multi_source_fraud_demo_agent_bundle.json",
     "method": "señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canónica preservada",
     "n_signals": 4
-  }
+  },
+  "_notes": [
+    "expected_verdict: MALICE→SUSPICION — propagación del relabel doctrinal de la copia canónica (data/cases/, cdeb32f): sin acquisition metadata, evidencia blanda queda en SUSPICION. Cierre de la divergencia R3-3 (censo total 2026-07-07): esta copia legacy nunca había recibido el relabel y era ground truth muerto con potencial de flip silencioso."
+  ]
 }
