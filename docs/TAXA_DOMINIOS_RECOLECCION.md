@@ -124,6 +124,12 @@ comparte modo de fabricación con cualquier otro log, no con un pcap. 100
 entradas de log las produce un solo `for` del atacante; el drowning de
 BREAK-014 vive acá.
 
+**Sub-bandas (CR-002, Kimi):** D1a texto plano (log_entry, event_log —
+fabricable con un editor) / D1b estructurado tamper-evident
+(windows_event_log — EVTX binario, record IDs, checksums: mismo canal
+declarativo, factor de fabricación distinto). La corroboración D1a↔D1b vale
+más que intra-D1a y menos que entre dominios.
+
 ### D2 — `memory_kernel` (memoria volátil y estructuras de kernel)
 
 **Qué se necesita:** compromiso live (Ring-0 para las estructuras).
@@ -149,14 +155,25 @@ Spoofability 0.60–0.90 pero con modo de fabricación DISTINTO al de D1.
 **Qué se necesita:** habilidad de fabricación de contenido (compilar un
 binario señuelo, falsificar un documento) — costo por-artefacto alto, no
 replicable con un loop. Spoofability 0.05 (hash criptográfico) a 0.90
-(marcador cultural) — es el dominio más heterogéneo; ver nota en §5.
+(marcador cultural) — el dominio más heterogéneo, por eso lleva sub-bandas.
 **Sensor:** análisis estático/visual/criptográfico del objeto.
+
+**Sub-bandas (CR-004, Kimi — el eje es B-068/B-070):** D5-hard
+(criptográfico: cryptographic_hash, TPM_attestation, digital_signature —
+irrefutable, ancla de corroboración) / D5-media (objeto analizado: binarios,
+documentos, archives — costo por-artefacto) / D5-soft (interpretativo:
+cultural_marker, osint — NO puede corroborar como la dura; es la
+generalización por-dominio del FP NGDC-003, donde documentación de escenario
+contaba como corroboración de MALICE). Fuente única con `_EVIDENCE_ROLE`
+(caie.py, B-070): las sub-bandas no duplican el registro de roles, lo
+complementan por canal.
 
 ### D0 — `assurance_context` (pseudo-dominio, fuera de Noisy-OR)
 
 Artefactos que describen la ADQUISICIÓN, no el ataque
-(`acquisition_context`, `device_acquisition_timeline`, `TPM_attestation`,
-`outcome_signal`, `behavioral_context/profile`). Ya existe el precedente:
+(`acquisition_context`, `device_acquisition_timeline`, `outcome_signal`,
+`behavioral_context/profile` — TPM_attestation salió a D5-hard por CR-003:
+es contenido probatorio criptográfico, no metadata). Ya existe el precedente:
 el validador los excluye vía `ACQUISITION_CONTEXT_NOT_ATTACK_EVIDENCE`.
 No deben corroborar hipótesis de malicia — alimentan trust, no score.
 
@@ -166,12 +183,15 @@ No deben corroborar hipótesis de malicia — alimentan trust, no score.
 
 | Dominio | evidence_types (artefactos) |
 |---|---|
-| **D1 log_symbolic** | log_entry (376), windows_event_log (4), event_log (3), keylogger_capture (5), plaintext_credential (1), email_account_creation (1) — *windows_event_log tiene spoofability 0.55 (EVTX binario, tamper-evident): es el miembro DURO del dominio, sigue siendo registro simbólico pero su factor de fabricación difiere; candidato a sub-banda* |
-| **D2 memory_kernel** | memory_process (173), lsass_session (10), kernel_structure (6), memory_os_profile (2) |
+| **D1a log_symbolic (texto plano)** | log_entry (376), event_log (3), plaintext_credential (1), email_account_creation (1) — spoofability ≥0.85, fabricables con un editor |
+| **D1b log_symbolic (estructurado tamper-evident)** | windows_event_log (4) — spoofability 0.55: EVTX binario con record IDs y checksums de chunk. Sigue siendo registro simbólico (mismo canal declarativo) pero fabricarlo exige atacar el formato, no escribir texto — **CR-002 (Kimi): sub-banda formalizada**; la corroboración D1a↔D1b vale más que intra-D1a, menos que entre dominios |
+| **D2 memory_kernel** | memory_process (173), lsass_session (10), kernel_structure (6), memory_os_profile (2), keylogger_capture (5) — *keylogger_capture reclasificado desde D1 (**CR-001, Kimi**): el buffer de captura lo produce un implante VIVO en runtime — su modo de fabricación es plantar y ejecutar el implante (compromiso live), no escribir un archivo de texto. Condición de borde: si un caso presenta el "capture" como archivo suelto sin implante corroborante, el rol epistémico (B-070) es quien degrada, no el dominio* |
 | **D3 filesystem_metadata** | file_timestamp (53), file_hash (36), file_metadata (29), registry_key (18), registry_hive (2), mft_entry (4), shimcache (4), filesystem_artifact (5), deleted_file_recovery (1), disk_image (4) — *+ los tipos de código sin uso en corpus: usn_journal, usn_journal_gap, timestamp_precision, prefetch* |
 | **D4 network_telemetry** | network_flow (10), network_traffic (5), network_capture (5), dns_record (7), ip_geolocation (17), user_agent (1), network_communication_pattern (1), malware_infrastructure (1) |
-| **D5 content_artifact** | binary (59), binary_executable (17), pe_executable (3), elf_executable (1), binary_diff (1), malware_static_analysis (7), document (16), document_visual (6), document_geometry (7), spreadsheet (3), file_text (2), email_content (6), web_artifact (2), archive (6), container_zip (15), git_forensics (3), cryptographic_hash (8), cultural_marker (50), osint (4) |
-| **D0 assurance_context** | acquisition_context (2), device_acquisition_timeline (1), TPM_attestation (1), behavioral_context (1), behavioral_profile (1), outcome_signal (1) |
+| **D5-hard content_artifact (criptográfico)** | cryptographic_hash (8), TPM_attestation (1) — *+ digital_signature (en EVIDENCE_PROFILES, sin uso en corpus)*. Spoofability ≤0.10. TPM_attestation reclasificado desde D0 (**CR-003, Kimi**): es CONTENIDO probatorio criptográfico (atestación firmada por hardware), no metadata de adquisición — ancla dura del dominio |
+| **D5-media content_artifact (objeto analizado)** | binary (59), binary_executable (17), pe_executable (3), elf_executable (1), binary_diff (1), malware_static_analysis (7), document (16), document_visual (6), document_geometry (7), spreadsheet (3), file_text (2), email_content (6), web_artifact (2), archive (6), container_zip (15), git_forensics (3) — spoofability 0.40–0.65, fabricación con costo por-artefacto |
+| **D5-soft content_artifact (interpretativo)** | cultural_marker (50), osint (4) — spoofability ≥0.85. **CR-004 (Kimi): la sub-banda existe por B-068/B-070** — la evidencia interpretativa/narrativa no puede corroborar como la dura (el FP NGDC-003: documentación del escenario contaba como corroboración de MALICE). Alineada con `_EVIDENCE_ROLE` de caie.py (fuente única): osint ya es rol `contextual`; cultural_marker es device pero soft — la sub-banda D5-soft es la generalización por-dominio de esa doctrina |
+| **D0 assurance_context** | acquisition_context (2), device_acquisition_timeline (1), behavioral_context (1), behavioral_profile (1), outcome_signal (1) — coincide exactamente con los roles `narrative` + los `contextual` de adquisición del registro `_EVIDENCE_ROLE` (B-070); TPM_attestation salió a D5-hard (CR-003) |
 
 Cobertura: 53/53 tipos del corpus + los 6 tipos definidos en
 `EVIDENCE_PROFILES` que el corpus aún no usa. Ningún tipo queda en "UNKNOWN".
@@ -187,8 +207,10 @@ Casos borde argumentados:
   irrefutabilidad (0.05) lo hace el ancla del dominio, no un dominio aparte.
 - **`disk_image` → D3:** es el contenedor de adquisición del filesystem;
   comparte cadena con lo que contiene.
-- **`keylogger_capture` → D1:** output textual de un proceso de registro —
-  fabricable escribiendo el archivo, como cualquier log.
+- **`keylogger_capture` → D2 (revisado por CR-001):** la clasificación
+  inicial (D1, "output textual fabricable") perdía el punto — el buffer lo
+  produce un implante vivo en runtime; el modo de fabricación es el del
+  compromiso live, no el del editor de texto.
 
 ---
 
@@ -222,7 +244,23 @@ Casos borde argumentados:
 
 ---
 
-## 6. Método
+## 6. Revisión del colectivo — CR-001..CR-004 (Kimi), resueltas 2026-07-07
+
+| CR | Cambio | Resolución |
+|----|--------|------------|
+| CR-001 | `keylogger_capture` D1 → **D2** | El buffer lo produce un implante VIVO; fabricarlo = plantar y ejecutar el implante (compromiso live), no escribir texto. Borde: un "capture" suelto sin implante corroborante lo degrada el rol epistémico (B-070), no el dominio. |
+| CR-002 | `windows_event_log` → **D1b** | Sub-bandas D1a (texto plano, ≥0.85) / D1b (EVTX tamper-evident, 0.55) formalizadas — mismo canal declarativo, factor de fabricación distinto. |
+| CR-003 | `TPM_attestation` D0 → **D5-hard** | Es contenido probatorio criptográfico (atestación firmada por hardware), no metadata de adquisición. D0 queda alineado EXACTAMENTE con los roles narrative/contextual-de-adquisición de `_EVIDENCE_ROLE`. |
+| CR-004 | **Sub-bandas en D5** | D5-hard / D5-media / D5-soft — el eje es B-068/B-070: la evidencia interpretativa (cultural_marker, osint) no corrobora como la dura; generalización por-dominio del FP NGDC-003. Fuente única con el registro de roles de caie.py. |
+
+Taxonomía resultante: **5 dominios (D1 y D5 con sub-bandas) + D0**. Conteo
+exacto por dominio post-revisión (1.007/1.007 artefactos asignados, 0 sin
+clasificar): D1 385 (D1a 381 / D1b 4), D2 196, D3 156, D4 47,
+D5 217 (hard 9 / media 154 / soft 54), D0 6.
+
+---
+
+## 7. Método
 
 1. Tag `restore-point-r43-taxa-f30f9aa`.
 2. Censo: walk de `data/cases/**/*.json` (263 archivos), extracción de
