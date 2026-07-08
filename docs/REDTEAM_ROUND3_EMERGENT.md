@@ -46,6 +46,7 @@ CODE FACT · PLAUSIBLE HYPOTHESIS · **CONFIRMED BY INDUCTION** · FALSIFIED
 | R3-2 | Medium | **CONFIRMED BY INDUCTION** | `_canonicalize` injectivity | `True`/`"true"`, `1`/`"1:int"`, `None`/`"null"`, `0.1`/`"0.10000000"` all collide to one hash; `NFC`/`NFD` and `CRLF`/`LF` map one logical string to two hashes. |
 | R3-3 | Medium | **CONFIRMED BY INDUCTION** | corpus loader dedup | 59 duplicated case stems across dirs; **3 carry divergent `expected_verdict`** (silently resolved by dir precedence), plus 1 malformed duplicated stem. |
 | R3-4 | Low–Med | **CONFIRMED BY INDUCTION** | tool-log chain verifier | A v2 chain with timestamps running backwards, sitting at 1970, and duplicating a prior event verifies as CHAIN VERIFIED. Chain attests seq-order + integrity, not causality. |
+| R3-5 | Low–Med | **CONFIRMED BY INDUCTION → FIXED** | tool-log chain verifier (tail) | Deleting (or appending) entries strictly *after* the last verified link leaves the remaining v2 chain internally consistent — nothing downstream notices they are gone. Fixed with `chain_tip_sha256` (+ keyed `chain_tip_hmac`), an externally-anchored bundle field the verifier checks against the recomputed tip. |
 
 ---
 
@@ -279,6 +280,95 @@ success is **necessary but not sufficient** for a plausible custody timeline.
 Recommend an optional plausibility pass (monotone non-decreasing timestamps
 within a sane absolute window, duplicate-content flagging) reported alongside —
 never conflated with — the cryptographic result.
+
+---
+
+## R3-5 — Tail truncation of the tool-log chain is invisible without an external anchor
+
+**Bucket:** software vulnerability (emergent), fixed in this pass. **Severity:
+Low–Medium** — requires write access to the bundle (same threat model as
+R3-2/R3-4), and the fix closes it. **Restore tag:**
+`pre-session-20260708-145401`. **Reproducible evidence:**
+`tests/test_r3_5_chain_tip_truncation.py` (`PYTHONPATH=$(pwd) python3 -m
+pytest tests/test_r3_5_chain_tip_truncation.py -v`).
+
+### Surprise / expectation violated
+R3-2/A1/A2 (`test_hash_chain_hardening.py`) already close every field-tamper
+and last-entry-edit vector for the v2 chain, and `prev_hash` linkage already
+catches an entry deleted, inserted, or reordered in the **middle** of the log
+(`seq_discontinuities` + `broken_links`,
+`test_deleted_middle_link`). The expectation these tests build is that
+"CHAIN VERIFIED" on a v2 log means the log is complete. It does not: deleting
+(or appending) entries strictly **after** the last surviving link leaves that
+shorter (or longer) chain internally consistent on its own terms — there is
+nothing past the new last entry to notice the old one is missing.
+
+### Peircean chain
+- **Firstness:** `verify_chain` walks `links` in order and only ever compares
+  `link.prev_hash` against the *previous link already in the list*. Nothing
+  compares the final `entry_hash` against any value recorded outside that
+  list.
+- **Secondness:** this is exactly the failure mode R3-5's sibling problem
+  already has a fix for at the ledger level —
+  `ChainOfCustody.checkpoint()` anchors the sqlite ledger's tip outside the
+  table an attacker could `DELETE FROM ... WHERE sequence > N` (A5/A6 in
+  `test_hash_chain_hardening.py`). The single-bundle `tool_execution_log` —
+  produced per investigation, not accumulated in a ledger — had no equivalent
+  anchor. `verify_tool_log.py` and `tool_log_chain.py` treated "linkage holds
+  for what's here" as sufficient.
+- **Thirdness:** a hash chain proves relationships among the elements it is
+  handed; it says nothing about elements that are absent. Any bounded,
+  self-contained hash chain needs a tip anchored *outside its own array* to
+  make completeness — not just consistency — verifiable. Cryptographic
+  chaining alone cannot distinguish "this is the whole log" from "this is a
+  truthful prefix of a longer log."
+
+### Fix
+`ToolExecutionLogChain.bundle_fields()` returns `chain_tip_sha256` (the
+`entry_hash` of the last appended entry) and, when an HMAC key is configured,
+`chain_tip_hmac = HMAC(key, chain_tip_sha256)`. The producer writes both as
+bundle-level fields, siblings of `tool_execution_log` — outside the array a
+truncating attacker would edit. `verify_chain` (`hash_chain.py`) gained
+`expected_tip` / `expected_tip_hmac` parameters; `verify_tool_execution_log`
+/ `verify_bundle_tool_log` (`tool_log_chain.py`) and the standalone
+`verify_tool_log.py` thread `bundle["chain_tip_sha256"]` /
+`bundle["chain_tip_hmac"]` through automatically when present (v2 only —
+v1 predates the field and is unaffected).
+
+### Induction (`tests/test_r3_5_chain_tip_truncation.py`)
+```
+chain = ToolExecutionLogChain(...); log = [chain.append(...) for _ in range(5)]
+tip = chain.tip_hash                          # recorded BEFORE the attack
+truncated = log[:3]                           # attacker deletes the last 2 entries
+
+verify_tool_execution_log(truncated)                          -> valid=True   (no anchor passed)
+verify_tool_execution_log(truncated, expected_tip=tip)        -> valid=False, tip_mismatch=True
+```
+Both predicted and observed, before/after, in `TestPrimitiveExpectedTip` /
+`TestToolLogChainTip` / `TestFullTruncationAttackEndToEnd` in the test file;
+the CLI (`verify_tool_log.py`) is exercised the same way via subprocess in
+`TestStandaloneVerifierCLI`.
+
+### Honest residual limit (not overclaimed)
+`chain_tip_sha256` alone is a plain SHA-256 — recomputable by anyone with
+write access to the bundle, exactly like the per-entry `entry_hash` under A3.
+An attacker who truncates the tail **and** rewrites `chain_tip_sha256` to
+match is invisible under hash-only verification
+(`test_a8_tip_recompute_without_key_still_invisible`) — the same documented
+limit as `test_a5_without_checkpoint_truncation_is_invisible` for the ledger.
+`chain_tip_hmac` closes that gap the same way `entry_hmac` closes it for A3:
+recomputable only by whoever holds `VIGIA_HMAC_KEY`. Without a configured key,
+the field is simply absent and the limit is unchanged from R3-4's honest
+framing — a hash proves integrity of what is present, not completeness.
+
+### Precise impact
+Before this fix, an attacker with write access to a sealed bundle (but not
+the HMAC key) could delete the last N tool-log entries — e.g. the ones
+showing a `read_evidence` call on a file later claimed never to have been
+opened — and `verify_tool_log.py` would still print `CHAIN VERIFIED`. After
+the fix, that same edit is caught by hash-only verification unless the
+attacker also updates `chain_tip_sha256` (a residual, documented, and now
+keyed-closeable gap, not a silent one).
 
 ---
 

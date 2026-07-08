@@ -19,6 +19,12 @@ Soporta ambos esquemas de cadena:
     - entry_hmac = HMAC-SHA256(key, entry_hash) — verificado si se pasa
       --hmac-key-hex / --hmac-key-file o VIGIA_HMAC_KEY[_FILE] en el entorno.
     - Cualquier campo alterado rompe la cadena.
+    - chain_tip_sha256 (R3-5, opcional, nivel-bundle): ancla el entry_hash de
+      la ÚLTIMA entrada FUERA del arreglo tool_execution_log. Sin esto,
+      borrar las últimas N entradas deja el resto de la cadena internamente
+      válida — nada lo nota. chain_tip_hmac (si hay clave) cierra el
+      residual de que chain_tip_sha256 por sí solo es recomputable por
+      cualquiera con acceso de escritura.
 
 self_correction_events are reported separately (not in hash chain by design).
 
@@ -241,7 +247,10 @@ def _verify_v1(log: list, verbose: bool) -> bool:
 
 # ── Verificación v2 (contenido completo + HMAC opcional) ─────────────────
 
-def _verify_v2(log: list, verbose: bool, hmac_key: bytes | None) -> bool:
+def _verify_v2(
+    log: list, verbose: bool, hmac_key: bytes | None,
+    expected_tip: str | None = None, expected_tip_hmac: str | None = None,
+) -> bool:
     ok = True
     expected_prev = GENESIS_V2
     expected_seq = 1
@@ -287,6 +296,35 @@ def _verify_v2(log: list, verbose: bool, hmac_key: bytes | None) -> bool:
         expected_prev = stored
         expected_seq = (seq + 1) if isinstance(seq, int) else expected_seq
 
+    # R3-5: anclaje de cola — expected_prev sostiene el tip recomputado
+    # (entry_hash de la última entrada, o GENESIS_V2 si el log está vacío).
+    if expected_tip is not None:
+        if expected_prev != expected_tip:
+            print(
+                f"  [FAIL] chain_tip_sha256 | bundle declara "
+                f"{expected_tip[:16]}..., recomputado {expected_prev[:16]}... "
+                f"— entradas borradas o agregadas después del sellado"
+            )
+            ok = False
+        else:
+            print(f"  [OK  ] chain_tip_sha256 | coincide con la punta recomputada")
+        if hmac_key is not None and expected_tip_hmac is not None:
+            expected = _hmac.new(hmac_key, expected_prev.encode("utf-8"), "sha256").hexdigest()
+            if not _hmac.compare_digest(expected_tip_hmac, expected):
+                print(
+                    "  [FAIL] chain_tip_hmac | no recomputa — la punta fue "
+                    "recalculada sin la clave"
+                )
+                ok = False
+            else:
+                print("  [OK  ] chain_tip_hmac | coincide")
+    else:
+        print(
+            "\n  [NOTE] Sin chain_tip_sha256 en el bundle: truncar la cola "
+            "(borrar las últimas entradas) es indetectable solo por linkage "
+            "— ver R3-5 en docs/REDTEAM_ROUND3_EMERGENT.md."
+        )
+
     if hmac_key is None:
         print(
             "\n  [NOTE] Sin clave HMAC: verificada estructura y contenido, "
@@ -322,7 +360,9 @@ def verify_chain(bundle_path: str, verbose: bool = False, args=None) -> int:
 
     if version == "2":
         hmac_key = _resolve_hmac_key(args) if args else None
-        ok = _verify_v2(log, verbose, hmac_key)
+        expected_tip = bundle.get("chain_tip_sha256")
+        expected_tip_hmac = bundle.get("chain_tip_hmac")
+        ok = _verify_v2(log, verbose, hmac_key, expected_tip, expected_tip_hmac)
     else:
         ok = _verify_v1(log, verbose)
 

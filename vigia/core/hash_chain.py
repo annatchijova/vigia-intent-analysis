@@ -216,6 +216,20 @@ class ChainVerification:
     tampered_content: List[Dict[str, Any]] = field(default_factory=list)
     hmac_failures: List[Dict[str, Any]] = field(default_factory=list)
     hmac_checked: bool = False
+    # R3-5 (docs/REDTEAM_ROUND3_EMERGENT.md): tail-truncation anchor. Deleting
+    # or appending entries AFTER the last verified link leaves the remaining
+    # chain internally consistent — nothing downstream notices. expected_tip
+    # (chain_tip_sha256) is an externally-recorded anchor for the last
+    # entry_hash; a mismatch means the tail was altered after it was sealed.
+    tip_checked: bool = False
+    tip_mismatch: bool = False
+    expected_tip: Optional[str] = None
+    actual_tip: Optional[str] = None
+    # Keyed sibling of tip_checked — closes the residual gap where an
+    # attacker with write access recomputes chain_tip_sha256 to match a
+    # truncated tail (same limit as A3 for entry_hmac, see docstring above).
+    tip_hmac_checked: bool = False
+    tip_hmac_mismatch: bool = False
     # R3-4: eje SEPARADO de plausibilidad temporal. NO afecta `valid` (que es
     # integridad criptografica): una historia causalmente imposible se sella y
     # verifica perfecto; esto solo advierte que la LINEA DE TIEMPO registrada no
@@ -233,6 +247,12 @@ class ChainVerification:
             "tampered_content": self.tampered_content,
             "hmac_failures": self.hmac_failures,
             "hmac_checked": self.hmac_checked,
+            "tip_checked": self.tip_checked,
+            "tip_mismatch": self.tip_mismatch,
+            "expected_tip": self.expected_tip,
+            "actual_tip": self.actual_tip,
+            "tip_hmac_checked": self.tip_hmac_checked,
+            "tip_hmac_mismatch": self.tip_hmac_mismatch,
             "timeline_plausible": self.timeline_plausible,
             "temporal_anomalies": self.temporal_anomalies,
             "summary": {
@@ -273,6 +293,8 @@ def verify_chain(
     *,
     first_seq: int = 1,
     hmac_key: Optional[bytes] = None,
+    expected_tip: Optional[str] = None,
+    expected_tip_hmac: Optional[str] = None,
 ) -> ChainVerification:
     """
     Verifica una cadena completa, ordenada por seq ascendente.
@@ -283,9 +305,18 @@ def verify_chain(
       - tampered_content    : entry_hash no recomputa desde el contenido
       - hmac_failures       : entry_hmac ausente o no recomputa (si hay clave)
 
-    NOTA truncation: borrar los ÚLTIMOS eslabones deja una cadena
-    internamente válida — eso solo lo detecta un checkpoint de punta
-    anclado fuera del almacén (ver ChainOfCustody.checkpoint / RFC 3161).
+    R3-5 — anclaje de cola (opcional, pasado por el caller):
+      - expected_tip      : entry_hash declarado del último eslabón (p.ej.
+        bundle["chain_tip_sha256"]), anclado FUERA de la lista `links` que un
+        atacante truncaría. Si no coincide con el tip recomputado, la cola
+        fue alterada después del sellado — borrar o insertar SOLO al final
+        deja el resto de la cadena internamente válida (ver ChainOfCustody
+        .checkpoint / RFC 3161 para el mismo problema en el ledger).
+      - expected_tip_hmac : HMAC-SHA256(hmac_key, expected_tip) declarado.
+        Cierra el límite residual de expected_tip: un SHA-256 puro es
+        recomputable por cualquiera con acceso de escritura (igual que A3
+        para entry_hmac); el HMAC de la punta solo lo recomputa quien tiene
+        la clave. Sin hmac_key, no se verifica (documentado, no error).
     """
     result = ChainVerification(
         valid=True, length=len(links), hmac_checked=hmac_key is not None,
@@ -346,6 +377,25 @@ def verify_chain(
 
         expected_prev = link.entry_hash
         expected_seq = link.seq + 1
+
+    # ── R3-5: anclaje de cola — expected_prev ya sostiene el tip recomputado
+    # (entry_hash del último eslabón procesado, o GENESIS_HASH si no hay
+    # eslabones) ──────────────────────────────────────────────────────────
+    if expected_tip is not None:
+        result.tip_checked = True
+        result.expected_tip = expected_tip
+        result.actual_tip = expected_prev
+        if expected_prev != expected_tip:
+            result.tip_mismatch = True
+            _flag(links[-1].seq if links else first_seq)
+
+        if hmac_key is not None and expected_tip_hmac is not None:
+            result.tip_hmac_checked = True
+            if not _hmac.compare_digest(
+                expected_tip_hmac, compute_entry_hmac(hmac_key, expected_prev)
+            ):
+                result.tip_hmac_mismatch = True
+                _flag(links[-1].seq if links else first_seq)
 
     # ── R3-4: plausibilidad temporal (eje separado, NO afecta `valid`) ──────
     _check_timeline_plausibility(links, result)

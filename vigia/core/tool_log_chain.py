@@ -93,8 +93,38 @@ class ToolExecutionLogChain:
         return self._prev_hash
 
     @property
+    def tip_hmac(self) -> Optional[str]:
+        """HMAC-SHA256(clave, tip_hash) — None si no hay clave configurada."""
+        if not self._hmac_key:
+            return None
+        return compute_entry_hmac(self._hmac_key, self._prev_hash)
+
+    @property
     def length(self) -> int:
         return self._seq
+
+    def bundle_fields(self) -> Dict[str, Any]:
+        """
+        Campos de nivel-bundle que anclan la cola de la cadena (R3-5):
+        chain_tip_sha256 (siempre) y chain_tip_hmac (si hay clave HMAC).
+
+        El caller los escribe como hermanos de tool_execution_log, FUERA del
+        arreglo que un atacante truncaría:
+
+            bundle["tool_execution_log"] = log
+            bundle.update(chain.bundle_fields())
+
+        Sin esto, borrar las últimas N entradas de tool_execution_log deja el
+        resto de la cadena internamente válida — nada lo nota (ver docstring
+        del módulo). chain_tip_sha256 detecta el ataque salvo que el atacante
+        también lo recalcule; chain_tip_hmac cierra ese residual (requiere la
+        clave, igual que entry_hmac para el resto de la cadena).
+        """
+        fields: Dict[str, Any] = {"chain_tip_sha256": self.tip_hash}
+        tip_hmac = self.tip_hmac
+        if tip_hmac is not None:
+            fields["chain_tip_hmac"] = tip_hmac
+        return fields
 
     def append(
         self,
@@ -155,6 +185,8 @@ def verify_tool_execution_log(
     log: Sequence[Dict[str, Any]],
     *,
     hmac_key: Optional[bytes] = None,
+    expected_tip: Optional[str] = None,
+    expected_tip_hmac: Optional[str] = None,
 ) -> ChainVerification:
     """
     Verifica un tool_execution_log completo, auto-detectando el esquema.
@@ -163,7 +195,13 @@ def verify_tool_execution_log(
     completo + linkage + seq + HMAC si hay clave).
     v1 → verificación legacy: solo linkage de result_summary. El resultado
     marca hmac_checked=False y NO garantiza integridad de los demás campos
-    (debilidad estructural de v1, ver docstring del módulo).
+    (debilidad estructural de v1, ver docstring del módulo). expected_tip /
+    expected_tip_hmac (R3-5) se ignoran bajo v1 — chain_tip_sha256 es un
+    concepto v2, ver verify_bundle_tool_log.
+
+    expected_tip/expected_tip_hmac (R3-5): pasar bundle["chain_tip_sha256"] /
+    bundle["chain_tip_hmac"] aquí ancla la COLA del log — sin esto, borrar
+    las últimas entradas deja el resto de la cadena internamente válida.
     """
     if detect_chain_version(log) == "2":
         links = [
@@ -176,7 +214,10 @@ def verify_tool_execution_log(
             )
             for e in log
         ]
-        return verify_chain(links, first_seq=1, hmac_key=hmac_key)
+        return verify_chain(
+            links, first_seq=1, hmac_key=hmac_key,
+            expected_tip=expected_tip, expected_tip_hmac=expected_tip_hmac,
+        )
 
     # ── v1 legacy ──────────────────────────────────────────────────────
     result = ChainVerification(valid=True, length=len(log), hmac_checked=False)
@@ -223,10 +264,20 @@ def verify_bundle_tool_log(
     """
     Conveniencia: verifica bundle["tool_execution_log"] y retorna un dict
     reportable (para incluir en amicus curiae / reportes).
+
+    R3-5: si el bundle trae chain_tip_sha256 (y opcionalmente
+    chain_tip_hmac), se usan para anclar la cola del log — ver
+    ToolExecutionLogChain.bundle_fields y el docstring de verify_chain.
+    Solo aplica bajo v2; chain_tip_sha256 es un concepto v2.
     """
     log: List[Dict[str, Any]] = bundle.get("tool_execution_log", [])
     version = detect_chain_version(log)
-    verification = verify_tool_execution_log(log, hmac_key=hmac_key)
+    expected_tip = bundle.get("chain_tip_sha256") if version == "2" else None
+    expected_tip_hmac = bundle.get("chain_tip_hmac") if version == "2" else None
+    verification = verify_tool_execution_log(
+        log, hmac_key=hmac_key,
+        expected_tip=expected_tip, expected_tip_hmac=expected_tip_hmac,
+    )
     report = verification.to_dict()
     report["chain_version"] = version
     if version == "1":
@@ -235,5 +286,13 @@ def verify_bundle_tool_log(
             "timestamp/tool/target/input_hash no son tamper-evident, y el "
             "result_summary de la última entrada es editable. Verificación "
             "estructural, no de contenido completo."
+        )
+    elif expected_tip is None:
+        report["chain_tip_caveat"] = (
+            "chain_tip_sha256 ausente del bundle: la cola de "
+            "tool_execution_log puede truncarse (últimas entradas borradas) "
+            "sin que la cadena interna lo detecte — la linkage solo prueba "
+            "consistencia de lo que quedó, no completitud. Ver R3-5 en "
+            "docs/REDTEAM_ROUND3_EMERGENT.md."
         )
     return report

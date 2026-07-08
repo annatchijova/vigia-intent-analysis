@@ -551,9 +551,32 @@ input_hash were editable, and the last entry was fully editable).
 `entry_hmac` additionally detects an attacker who rewrites and recomputes the
 whole chain: SHA-256 alone is recomputable without the key.
 
+**Bundle-level tail anchor (R3-5).** Deleting or appending entries strictly
+AFTER the last one leaves the remaining chain internally consistent — nothing
+inside `tool_execution_log` notices the tail is gone. Write
+`chain.bundle_fields()` (`ToolExecutionLogChain`) as siblings of
+`tool_execution_log`, OUTSIDE the array a truncating attacker would edit:
+
+```json
+{
+  "tool_execution_log": [...],
+  "chain_tip_sha256": "<entry_hash of the last entry>",
+  "chain_tip_hmac": "<HMAC-SHA256(VIGIA_HMAC_KEY, chain_tip_sha256) — present when key is set>"
+}
+```
+
+`chain_tip_sha256` alone catches an attacker who truncates the tail without
+also updating it; it does NOT catch one who updates both (a bare SHA-256 is
+recomputable by anyone with write access — same limit as `entry_hash`
+without `entry_hmac`). `chain_tip_hmac` closes that residual, same as
+`entry_hmac` does for the rest of the chain. Omitting `chain_tip_sha256`
+entirely is backward-compatible (older bundles), not an error — the verifier
+reports the gap as a caveat, not a failure.
+
 Verification: `python3 verify_tool_log.py <bundle>` (stdlib-only, verifies
-both v1 legacy bundles and v2; pass `--hmac-key-hex/--hmac-key-file` or set
-`VIGIA_HMAC_KEY[_FILE]` for keyed verification).
+both v1 legacy bundles and v2, including the tail anchor when present; pass
+`--hmac-key-hex/--hmac-key-file` or set `VIGIA_HMAC_KEY[_FILE]` for keyed
+verification).
 
 Legacy v1 (`prev_hash = SHA-256(previous result_summary)`, `"GENESIS"` at
 seq=1) remains verifiable for historical bundles in `results/` but MUST NOT
