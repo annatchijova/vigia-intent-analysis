@@ -1,7 +1,9 @@
 # VIGÍA — Known Limitations
 
-**Version:** EBS v1 + P2 calibration | **Updated:** 2026-06-29
+**Version:** EBS v1 + P2 calibration | **Updated:** 2026-07-08
 **Applies to:** `github.com/annatchijova/vigia-intent-analysis`
+**Corpus baseline:** 167/199 label-blind deterministic detection (see `README.md`
+for the segmentation and doctrine notes behind this figure).
 
 > VIGÍA does not claim to be infallible — it claims to be **auditable**.
 > These limitations are documented deliberately as part of the Daubert
@@ -840,6 +842,16 @@ Reproduce: `python3 run_all_agent.py --timeout 90`
 | L-036 | Pipeline RAW hypothesis override for UNDETERMINED | vigia_agent.py RAW path | **RESOLVED** |
 | L-037 | Acquisition metadata not propagated to CAIE | iOS/Android forensics | **RESOLVED** 2026-06-30 (see entry body; L-037b closed by Tanda B PR-B2) |
 | L-038 | Dynamic gamma for windows_event_log | Scoring pipeline | IMPLEMENTED |
+| L-039 | PCAP parser requires tshark in PATH | Evidence ingestion | Documented |
+| L-041 | android SMS analysis limited to encrypted-app keywords | android_forensics.py | PENDING |
+| L-044 | MetabolicProfiler/BehavioralFingerprint not run in Mode 1 | inference/*.py | Documented (design) |
+| L-045 | `mcp` not installable in minimal CI (PyJWT conflict) | requirements-ci.txt | Documented (CI) |
+| L-046 | Scorer non-monotonicity (M2-1/M2-2) | vigia_scorer.py | **RESOLVED** (B-081) |
+| L-047 | Bundle canonicalization v1 type collisions (Canon v2) | core/canonicalize.py | **RESOLVED** (B-082/R3-2) |
+| L-048 | Tool-log chain tail truncation (chain_tip_sha256) | core/tool_log_chain.py | **RESOLVED** (R3-5) |
+| L-049 | Spoofable-type flood saturates to MALICE (R4-3) | vigia_scorer.py | Documented (needs calibration doctrine) |
+| L-050 | Non-finite fail-closed on value/z_score/confidence × 4 impls | ebs_v1.py, signal_contract.py | **RESOLVED** (B-083/B-083b) |
+| L-032 | Agent fallback FN on raw Windows E01 | VIGIA-MAGNET-2022-WINDOWS | **RESOLVED** (B-032) |
 
 ---
 
@@ -1292,9 +1304,9 @@ vs. canonical EBS v1 schema).
 
 ---
 
-## L-032 — False Negative: Agent Fallback on Raw Windows Disk Evidence (E01)
+## L-032 — False Negative: Agent Fallback on Raw Windows Disk Evidence (E01) [RESOLVED]
 
-**Status:** [FIX DESIGNED] 2026-06-29, POST HACKATHON
+**Status:** [RESOLVED] — B-032 fixed. Originally [FIX DESIGNED] 2026-06-29, POST HACKATHON.
 **Severity:** P1
 **Mode affected:** Autonomous agent fallback (`vigia_agent.py`) — raw Windows disk evidence
 **Discovered:** 2026-06-29 | Case: `VIGIA-MAGNET-2022-WINDOWS`
@@ -1318,11 +1330,18 @@ pre-staging, `SubjectUserSid=S-1-5-18` throughout.
 **Forensic implication:** Agent fallback is not reliable for raw Windows disk evidence.
 Use Claude Code / MCP mode for E01 investigations until B-032 is resolved.
 
-**Fix designed:** Change `event_stream` to `event_logs` in `_build_orchestrator_kwargs()`
-for `.evtx` files. Tracked as **B-032**.
+**Fix applied (B-032, RESOLVED):** `_build_orchestrator_kwargs()` now maps `.evtx`
+files to `event_logs` (routed to `EventLogCorrelator`) instead of `event_stream`
+(which `SIFTOrchestrator.analyze()` routes to `MetabolicProfiler`). `EventLogCorrelator`
+now receives the parsed events and the composite score is no longer suppressed to `z=0`.
+See B-032 in `BUGS_PENDIENTES(_EN).md`.
 
-**Workaround:** Use Claude Code / MCP mode (Mode 2) for raw Windows disk evidence.
-Domain C accuracy figures for raw E01 are not reliable until B-032 is deployed.
+**Residual note:** `MetabolicProfiler` / `BehavioralFingerprint` still do not run in
+agent Mode 1 because no `event_stream` is generated — this is the separate, documented
+design limitation L-044, not a regression of this fix.
+
+**Historical workaround (pre-fix):** Claude Code / MCP mode (Mode 2) was recommended for
+raw Windows disk evidence. With B-032 deployed, agent fallback correctly parses EVTX.
 
 ---
 
@@ -1701,3 +1720,206 @@ both reproduced 2026-07-05).
 
 **Workaround for full local runs:** `pip install --ignore-installed PyJWT`
 first (gives pip a RECORD to manage), then `pip install mcp`.
+
+---
+
+## L-046 — Scorer Non-Monotonicity: Inculpatory Evidence Could Lower the Score [RESOLVED]
+
+**Affects:** `vigia_scorer.py` | **Status:** [RESOLVED] 2026-07-07, POST HACKATHON —
+commits `433d61a` (audit), `f85f171` (fixes), `1d84c84` (doctrine). Tracked as **B-081**.
+**Severity:** P1
+**Document:** `docs/REDTEAM_ROUND2_MONOTONICITY.md`
+
+**Description:** Red-Team Round 2 confirmed two monotonicity violations in the
+composite scorer:
+
+- **M2-1 (monotonicity):** adding an additional inculpatory artifact could *lower*
+  the composite score rather than raise or preserve it — a forensic scorer must never
+  reward an examiner for withholding evidence.
+- **M2-2 (no-dilution):** padding a case with weak same-type artifacts could dilute a
+  strong signal below its correct verdict band.
+
+**Root cause:** the redundancy penalty / best-prefix aggregation did not guarantee a
+non-decreasing composite as strong evidence was added. The violation was latent — no
+prior test asserted the invariant.
+
+**Why this matters (Daubert):** non-monotonic scoring is not defensible in court. An
+opposing expert could demonstrate that the same evidence set scores differently
+depending on the order or count of corroborating artifacts. The invariant "more
+inculpatory evidence never lowers the verdict" must hold by construction, not by luck.
+
+**Fix applied:** the M2-1/M2-2 fixes were landed behind a comparative gate (corpus
+165→163 on the fix alone: +1 correct fix, −3 label conflicts that had *encoded* the
+dilution as ground truth). Round 2.1 was a doctrine decision — relabelling those 3
+mislabelled cases — restoring the corpus to **166/199** (now 167/199 after later
+label-hygiene work). The invariant is now pinned:
+`tests/test_m2_monotonicity_invariants.py`.
+
+**Forensic note:** three corpus cases had to be *relabelled*, not the code bent to
+match them — their prior labels were the artifact of the very dilution bug being
+fixed. This is documented as a doctrine decision, not a metric massage.
+
+---
+
+## L-047 — Bundle Canonicalization v1 Type Collisions (Canon v2) [RESOLVED]
+
+**Affects:** `vigia/core/canonicalize.py`, seal/verify path | **Status:** [RESOLVED]
+2026-07-07, POST HACKATHON — commit `b981803` (R3-2). Tracked as **B-082**.
+**Severity:** P1 — seal integrity
+**Document:** `docs/REDTEAM_ROUND3_EMERGENT.md`
+
+**Description:** the v1 canonical form used to compute the bundle hash did not
+disambiguate values that serialise to the same string across distinct types. A boolean
+`True` and the string `"true"`, or an integer `1` and the string `"1"`, could canonicalise
+to the same byte sequence. An attacker with write access to the pre-seal structure could
+therefore swap a typed value for its string twin without changing the bundle hash — a
+seal-integrity gap.
+
+**Fix applied (canonicalization v2):** v2 encodes the *type tag* alongside the value
+(`1` vs `"1:int"`, `True` vs `"true"`), closing the collision class. The change is
+**backward-compatible**: v1 remains available and is used to verify historical bundles
+sealed under the old canonical form, so no previously sealed bundle is invalidated. New
+bundles seal under v2.
+
+**Related Round 3 emergent findings (B-082, same batch):**
+
+- **R3-1** — temporal range guard added in the Timestamp Comparability Validator
+  (commit `22f6edc`); rejects out-of-range timestamps instead of silently comparing them.
+- **R3-3** — label-consistency assertion added to the corpus runner (`22f6edc`); the
+  full census (R3-3b/R3-3c) surfaced 62 duplicated case stems and one live
+  `expected_verdict` divergence, and physically deduplicated 20 byte-identical copies.
+  It also rescued `VIGIA_BREAK_005_FALSE_CORRELATION`, silently excluded since creation
+  by a substring `SKIP_STEMS` match — the honest denominator was restored to 199.
+- **R3-4** — causal-order validation added to the chain verifier as an axis independent
+  of the cryptographic seal (commit `e0e7be0`).
+
+**Forensic note:** a canonical form is only as trustworthy as its injectivity. Any two
+distinct pre-seal structures must produce distinct canonical bytes, or the seal proves
+less than it claims. v2 restores that property without breaking auditability of older
+sealed evidence.
+
+---
+
+## L-048 — Tool-Log Chain Tail Truncation Invisible Without an External Anchor (chain_tip_sha256) [RESOLVED]
+
+**Affects:** `vigia/core/tool_log_chain.py`, `verify_tool_log.py` |
+**Status:** [RESOLVED] 2026-07-07, POST HACKATHON — commit `0d5abc2` (R3-5).
+**Severity:** Low–Medium
+**Document:** `docs/REDTEAM_ROUND3_EMERGENT.md`
+
+**Description:** the v2 tool-execution-log hash chain makes every field of every entry
+tamper-evident, and `prev_hash` linkage catches an entry deleted, inserted, or reordered
+*in the middle* of the log. But deleting (or appending) entries strictly *after* the last
+verified link leaves the remaining chain internally consistent — there is nothing past
+the final entry to notice that later entries are gone. A truncating attacker could drop
+the tail of the audit trail (e.g. the evidence of their own last actions) undetected.
+
+**Fix applied:** the producer now writes `chain_tip_sha256` — the `entry_hash` of the last
+entry — as a **bundle-level field, sibling to `tool_execution_log`**, outside the array a
+truncating attacker would edit. The verifier recomputes the tip from the log it is handed
+and compares; a mismatch means entries were removed or appended after the tip was recorded.
+`verify_tool_log.py` threads the field through automatically when present (v2 only).
+
+**Honest limit (documented, not overclaimed):** `chain_tip_sha256` alone is a plain
+SHA-256, recomputable by any attacker with write access to the bundle — exactly like the
+per-entry `entry_hash`. An attacker who truncates the tail *and* rewrites
+`chain_tip_sha256` to match is invisible under hash-only verification. The keyed sibling
+`chain_tip_hmac = HMAC(VIGIA_HMAC_KEY, chain_tip_sha256)` closes that residual the same way
+`entry_hmac` does for the per-entry case: recomputable only by a holder of the key. Bundles
+that omit `chain_tip_sha256` entirely (older bundles) remain verifiable — the verifier
+reports the gap as a caveat, not a failure.
+
+**Test:** `tests/test_r3_5_chain_tip_truncation.py`.
+
+**Forensic note:** this is the single-bundle analogue of the checkpoint anchor
+`ChainOfCustody` already provides for its sqlite ledger. An audit trail whose tail can be
+silently amputated does not meet chain-of-custody completeness under Daubert.
+
+---
+
+## L-049 — Spoofable-Type Flood Saturates the Composite to MALICE [DOCUMENTED]
+
+**Affects:** `vigia_scorer.py::_vigia_score` composite, B-068 corroboration gate |
+**Status:** [DOCUMENTED] 2026-07-07, POST HACKATHON — recorded for a calibration-doctrine
+decision, deliberately **not** silently patched. Tracked as **R4-3**.
+**Severity:** Medium — invariant/semantic
+**Document:** `docs/REDTEAM_ROUND4_BOUNDARIES.md`
+
+**Description:** a flood of the *single most spoofable* evidence class saturates the
+Noisy-OR composite to MALICE, even though every source is `log_entry` — the class an
+administrator (or an attacker with shell access) can forge with `echo >> syslog`:
+
+```
+  4× log_entry (spoofability 0.85) → SUSPICION  score = 0.1672
+ 10× log_entry                     → MALICE     score = 0.3393
+ 50× log_entry                     → MALICE     score = 0.8741
+100× log_entry                     → MALICE     score = 0.9842
+```
+
+This directly contradicts CAIE's own docstring claim that Noisy-OR grouping "prevents
+flood attacks where one tool generates 100 alerts."
+
+**Root cause:** the composite is `1 − ∏(1 − adj_i)` over *all* artifacts after a
+redundancy (FRS) penalty **capped at 0.5**. Beyond ~4 same-type artifacts the penalty is
+maxed, so each additional artifact still contributes Noisy-OR mass and the composite
+saturates toward 0.99. The B-068 corroboration gate then opens on `n_artifacts ≥ 4` and
+emits MALICE — cardinality of a *cheap* class manufactures a high-severity verdict. This
+is the flood-attack analogue of the Round 2 No-Dilution finding (L-046 / M2-2).
+
+**Forensic implication:** in fallback (deterministic) mode, an examiner or adversary who
+can inject many low-cost, high-spoofability artifacts of one type can push a case to
+MALICE without any low-spoofability corroboration. Treat MALICE verdicts resting on a
+homogeneous flood of a single spoofable class as unproven pending heterogeneous
+corroboration.
+
+**Why not fixed here:** damping the flood changes scoring *semantics* and needs a
+calibration decision — the same doctrine-call shape as the M2 relabels (L-046). Adjusting
+it without a calibration corpus would trade one uncalibrated behavior for another.
+
+**Recommendation (record only):** cap the composite contribution *per evidence class*
+(domain-grouped FRS — group Noisy-OR within a class, then combine across classes, as CAIE
+already does internally), and/or require the B-068 corroboration to rest on at least one
+low-spoofability class before MALICE.
+
+**Round 4 siblings (same audit, `docs/REDTEAM_ROUND4_BOUNDARIES.md`):** R4-1 (same-type
+flood was O(n²) in the M2-1 best-prefix decay → **FIXED**, O(n), bit-identical over 20 000
+random cases), R4-2 (no scorer-level artifact cap; per-artifact CAIE instantiation
+dominates cost — documented recommendation), R4-4 (`None`/non-dict `case` crashed with
+`AttributeError` → **FIXED** with a fail-loud `ERROR` guard).
+
+---
+
+## L-050 — Non-Finite (NaN / ±inf) Silently Admitted as Maximum-Severity Signal [RESOLVED]
+
+**Affects:** `vigia/core/ebs_v1.py`, `vigia/core/signal_contract.py` (`SignalOutput`) |
+**Status:** [RESOLVED] 2026-07-07, POST HACKATHON — commit `15e858d`. Tracked as
+**B-083 / B-083b** (from the P0-001 `float()` census, `docs/AUDIT_P0001_FLOAT_CENSUS.md`).
+**Severity:** P2 → security-relevant (silent maximum-severity injection)
+
+**Description:** the `SignalOutput` clip/clamp logic silently converted non-finite inputs
+into maximum-severity values on three fields, across four implementations:
+
+- **`z_score`:** `min(z, Z_CLIP_MAX)` with a `NaN` argument returns the *clip ceiling*
+  (`5.0`) under IEEE 754 `min` semantics — a corrupt z-score entered the pipeline as a
+  maximum CRITICAL signal.
+- **`value`:** same non-finite path.
+- **`confidence`:** `max(0.0, min(1.0, nan))` collapsed to `1.0` — a corrupt confidence
+  entered as silent *maximum* confidence; `±inf` clamped to `1.0`/`0.0`.
+
+The **three fields × four implementations** are: `value`, `z_score`, and `confidence`,
+each in (1) the `ebs_v1` Pydantic model, (2) the `ebs_v1` dataclass fallback, (3) the
+`signal_contract` Pydantic model, and (4) the `signal_contract` dataclass fallback. The
+Pydantic variants already rejected `NaN` via `Field(ge/le)` comparison semantics; the
+**dataclass fallbacks** (used when Pydantic is unavailable) were the real gap.
+
+**Fix applied (fail-closed):** non-finite `value` / `z_score` / `confidence` now raise
+`ValueError` in all four variants — `math.isfinite` is checked explicitly so the contract
+no longer depends on an incidental property of Pydantic's comparison operators. Clip and
+clamp on *finite* values are unchanged. Tests were written red-first:
+`tests/test_b083_signaloutput_fail_closed.py` (14, 8 red pre-fix; the dataclass fallbacks
+verified by blocking Pydantic at import). Suite green, corpus 166/199, 0 verdict flips.
+
+**Forensic note:** a scorer must never treat "I could not compute this value" as "this
+value is maximally incriminating." Fail-closed (reject the corrupt signal loudly) is the
+only defensible behavior — a silently-substituted `5.0` z-score is a fabricated CRITICAL
+finding with no evidentiary basis.
