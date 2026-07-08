@@ -148,6 +148,66 @@ _ONTOLOGY_MAP = {
 }
 
 
+def check_adapter_map_consistency(
+    layer_map: Dict[str, Any] | None = None,
+    ontology_map: Dict[str, Any] | None = None,
+    evidence_map: Dict[str, Any] | None = None,
+) -> list[str]:
+    """B-060 guard: verify the three adapter maps stay mutually consistent.
+
+    Every map routes an artifact type with a SILENT default
+    (``.get(art_type, DEFAULT)``). A type categorized in one map but missing
+    from another falls through to that default with no signal — a mapping no
+    maintainer ever decided. This returns a list of violation messages
+    (empty == consistent) so it can back both a contract test and, if desired,
+    an import-time assertion.
+
+    Contract:
+      1. ``_LAYER_MAP`` and ``_ONTOLOGY_MAP`` share the exact same key set —
+         both are keyed by the raw art_type category and move in lockstep.
+      2. Every ``_LAYER_MAP``/``_ONTOLOGY_MAP`` key is also an ``_EVIDENCE_MAP``
+         key — a categorized type always has an explicit evidence mapping,
+         never the identity fallback.
+      3. ``_EVIDENCE_MAP`` may be a superset; the extra keys are canonical
+         evidence types (identity-mapped, ``value == key``) that arrive
+         pre-typed and need no layer/ontology categorization.
+    """
+    layer = layer_map if layer_map is not None else _LAYER_MAP
+    ontology = ontology_map if ontology_map is not None else _ONTOLOGY_MAP
+    evidence = evidence_map if evidence_map is not None else _EVIDENCE_MAP
+
+    violations: list[str] = []
+
+    only_layer = set(layer) - set(ontology)
+    only_ontology = set(ontology) - set(layer)
+    for t in sorted(only_layer):
+        violations.append(
+            f"{t!r} in _LAYER_MAP but not _ONTOLOGY_MAP "
+            f"(would silently default ontology to TECHNIQUE)"
+        )
+    for t in sorted(only_ontology):
+        violations.append(
+            f"{t!r} in _ONTOLOGY_MAP but not _LAYER_MAP "
+            f"(would silently default layer to DISK_MFT)"
+        )
+
+    for t in sorted(set(layer) - set(evidence)):
+        violations.append(
+            f"{t!r} categorized in _LAYER_MAP/_ONTOLOGY_MAP but absent from "
+            f"_EVIDENCE_MAP (would silently identity-map the evidence type)"
+        )
+
+    for t in sorted(set(evidence) - set(layer)):
+        if evidence[t] != t:
+            violations.append(
+                f"{t!r} in _EVIDENCE_MAP with a non-identity value "
+                f"{evidence[t]!r} but missing from _LAYER_MAP/_ONTOLOGY_MAP "
+                f"(a raw art_type must be categorized in all three maps)"
+            )
+
+    return violations
+
+
 def _canonical_json(obj: Dict[str, Any]) -> str:
     return json.dumps(obj, sort_keys=True, separators=(",", ":"), ensure_ascii=True, default=str)
 

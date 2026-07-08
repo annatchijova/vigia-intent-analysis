@@ -116,15 +116,20 @@ suite 1034):
 
 | # | Ítem | Fix diseñado |
 |---|------|--------------|
-| B1 | S-1 | sincronizar `requirements-ci.txt` + test de contrato de imports |
-| B2 | S-2 / BUG-NLP-002 | heurística OOV o centinela `xfail(strict=True)` |
+| ~~B1~~ | ~~S-1~~ | **CERRADO** — `requirements-ci.txt` sincronizado (psutil/pyyaml/pytest-cov/pytest-asyncio) + `tests/test_requirements_ci_contract.py` verde (verificado 2026-07-08) |
+| ~~B2~~ | ~~S-2 / BUG-NLP-002~~ | **CERRADO** — `TestL33tOOVUnreachable::test_analyze_surfaces_l33tspeak_as_oov` con `xfail(strict=True)`: suite verde sin ocultar el hallazgo, XPASS truena si el tokenizer lo arregla (verificado 2026-07-08) |
 | ~~B3~~ | ~~B-016 residual~~ | **CERRADO** — detector stderr en el motor V4 (B-087) |
 | ~~B4~~ | ~~B-018 residual~~ | **CERRADO** — VIGIA_VOL3_TIMEOUT + escalado + pipeline_meta (B-087) |
-| B6 | B-060 | `ARTIFACT_TYPE_REGISTRY` único o test de consistencia de mapas |
+| ~~B6~~ | ~~B-060~~ | **CERRADO 2026-07-08** — `check_adapter_map_consistency()` en `forensic_adapter.py` + `tests/test_b060_adapter_map_consistency.py` (LAYER≡ONTOLOGY, LAYER⊆EVIDENCE, superset identity; tests rojos primero con "dientes") |
 | ~~B7~~ | ~~B-061~~ | **CERRADO** — clamp unificado, 4 implementaciones acordadas (B-087) |
 | ~~B8~~ | ~~A-1~~ | **CERRADO** — verify_daubert_record_hash + self-check (B-087) |
 | ~~B9~~ | ~~A-2~~ | **CERRADO** — deactivate + TTL + sweep auditado (B-087) |
-| B10 | B-058 | comparador de `run_all_agent.py` lee `agent_verdict` sellado |
+| ~~B10~~ | ~~B-058~~ | **CERRADO 2026-07-08** — `extract_verdict_from_bundle` lee el `agent_verdict` sellado (autoritativo, decide el exit) con fallback legacy; doctrina en `verdict_matches`. Gate comparativo sobre 198 bundles: **0 regresiones, +3 mejoras** (casos INTENT sub-reportados como SUSPICION) |
+
+**Nota (auditoría cruzada 2026-07-08):** B1 y B2 ya estaban implementados en el
+código (requirements-ci sincronizado, xfail strict presente) pero figuraban como
+pendientes en este documento — mismo patrón "el tracker miente" que documentó
+`docs/AUDITORIA_B047_CORRELATION.md`. Verificados verdes y cerrados aquí.
 
 Sumados por el censo P0-001 (B-083, opcionales):
 

@@ -4333,3 +4333,87 @@ también se aplique acá.
 **Aún no aplicado.** Requiere verification-before-patch según la propia
 disciplina de este tracker — esta entrada documenta el hueco, no un bug vivo
 confirmado.
+
+---
+
+## B-060 — Guard de consistencia de mapas del adapter (Grupo B / B6) [RESUELTO]
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | RESUELTO — POST HACKATHON (2026-07-08) |
+| **Severidad** | P2 — ruteo por default silencioso (un tipo en un mapa, defaulteado en otro) |
+| **Archivo** | `vigia/core/forensic_adapter.py` (nueva `check_adapter_map_consistency`), `tests/test_b060_adapter_map_consistency.py` (nuevo) |
+| **Antecedente** | AUDITORIA_MOBILE_WHITELIST §4 (registro `ARTIFACT_TYPE_REGISTRY` único O test de consistencia — la opción de riesgo-cero) |
+
+**Descripción:** `forensic_adapter.py` rutea cada artefacto por tres mapas
+paralelos (`_LAYER_MAP`, `_ONTOLOGY_MAP`, `_EVIDENCE_MAP`), cada uno con un
+`.get(art_type, DEFAULT)` silencioso. Un tipo categorizado en un mapa pero
+olvidado en otro cae a `DISK_MFT`/`TECHNIQUE`/identidad sin aviso — un mapeo que
+ningún mantenedor decidió. B-066 agregó los tipos mobile a los tres pero no dejó
+guard contra deriva futura.
+
+**Fix aplicado:** `check_adapter_map_consistency()` devuelve lista de violaciones
+(vacía == consistente), exigiendo: (1) `_LAYER_MAP` y `_ONTOLOGY_MAP` comparten
+el mismo key-set (lockstep); (2) toda clave categorizada está en `_EVIDENCE_MAP`;
+(3) el superset de `_EVIDENCE_MAP` son tipos canónicos identity. Test rojo
+primero (el import fallaba pre-fix) con casos "con dientes" que inyectan una
+inconsistencia y verifican que se detecta. Mapas actuales: 0 violaciones. Solo
+aditivo — impacto de veredicto nulo.
+
+**Validación:** `tests/test_b060_adapter_map_consistency.py` (7). Suite verde.
+
+---
+
+## B-058 (B10) — El comparador batch lee el agent_verdict SELLADO, no best_hypothesis [RESUELTO]
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | RESUELTO — POST HACKATHON (2026-07-08) |
+| **Severidad** | P2 — caminos de veredicto divergentes (el batch podía reportar un veredicto distinto del sellado / del exit code) |
+| **Archivo** | `run_all_agent.py` (`extract_verdict_from_bundle`, nueva `verdict_matches`), `tests/test_b058_batch_reads_sealed_verdict.py` (nuevo) |
+| **Antecedente** | AUDITORIA_INVARIANTES_ASIMETRIAS_20260703 §B-058 (recomendación no aplicada) |
+
+**Descripción:** `extract_verdict_from_bundle` re-derivaba el veredicto de
+`pipeline_results.abduction.best_hypothesis` (y hasta hacía substring matching),
+que puede DIVERGIR del `agent_verdict` top-level que `_seal_bundle` embebe — el
+mismo valor que decide el exit code. Ejemplo: `SUSPICION_DETECTED` re-deriva a
+"SUSPICION" mientras el veredicto sellado de 4 valores es "INTENT" (la escala del
+agente no tiene escalón SUSPICION). El batch podía así reportar un veredicto que
+el agente nunca selló, enmascarando una divergencia del clasificador.
+
+**Fix aplicado:** `extract_verdict_from_bundle` ahora lee el `agent_verdict`
+sellado primero (autoritativo), con fallback al camino legacy de best_hypothesis
+solo para bundles previos al campo. La doctrina de comparación se centralizó en
+`verdict_matches(expected, got)`: alias BENIGN→NOISE, expected==UNKNOWN siempre
+PASS, over-severity (etiqueta INTENT + MALICE), y etiqueta SUSPICION aceptando un
+INTENT sellado (el tier INTENT del agente representa "INTENT/SUSPICION" — B-073,
+Fase 2 §4).
+
+**Gate comparativo (obligatorio, disciplina B-069):** medido viejo vs nuevo
+lector sobre el corpus de 199 casos recién sellado — **0 regresiones, +3
+mejoras** (166/199 → 169/199). Las +3 son casos etiquetados INTENT que el agente
+selló como INTENT pero el camino viejo sub-reportaba como SUSPICION → FAIL
+(VIGIA-MAGNET-2014-TIMELINE, VIGIA-MAGNET-2022-iOS-JESS,
+VIGIA-MAGNET-2022-IOS-JESS-KEYCHAIN). Ningún caso que pasaba con el lector viejo
+falla con el nuevo.
+
+**Validación:** `tests/test_b058_batch_reads_sealed_verdict.py` (13, rojo
+primero). Suite verde (el único fallo en la corrida completa es `mcp` ausente,
+L-045, no relacionado).
+
+---
+
+## B1/B2 (Grupo B) — verificados ya-cerrados (deriva del tracker) [RESUELTO]
+
+Dos ítems del Grupo B listados como pendientes en `WHAT_IS_NEXT.md` estaban ya
+implementados en el código, encontrado en el barrido del 2026-07-08 (misma clase
+"el tracker miente" que B-047):
+
+- **B1 / S-1** — `requirements-ci.txt` ya trae psutil, pyyaml, pytest-cov,
+  pytest-asyncio (cada uno con su nota S-1), y
+  `tests/test_requirements_ci_contract.py` ya hace cumplir el contrato de
+  imports. Verificado verde.
+- **B2 / S-2 / BUG-NLP-002** — `TestL33tOOVUnreachable::test_analyze_surfaces_l33tspeak_as_oov`
+  ya tiene `@pytest.mark.xfail(strict=True)`: la suite queda verde sin ocultar el
+  hallazgo, y un XPASS truena fuerte si un fix del tokenizer lo alcanza.
+  Verificado (1 passed + 1 xfailed).

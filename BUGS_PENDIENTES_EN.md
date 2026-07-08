@@ -4591,3 +4591,86 @@ emission on `timestamps>0`, or ensure the `derived` tag is applied here too.
 
 **Not yet applied.** Needs verification-before-patch per this tracker's own
 discipline — this entry documents the gap, not a confirmed live bug.
+
+---
+
+## B-060 — Adapter map consistency guard (Grupo B / B6) [RESOLVED]
+
+| Field | Value |
+|-------|-------|
+| **Status** | RESOLVED — POST HACKATHON (2026-07-08) |
+| **Severity** | P2 — silent-default routing (a type in one adapter map, defaulted in another) |
+| **File** | `vigia/core/forensic_adapter.py` (new `check_adapter_map_consistency`), `tests/test_b060_adapter_map_consistency.py` (new) |
+| **Antecedent** | AUDITORIA_MOBILE_WHITELIST §4 (unified `ARTIFACT_TYPE_REGISTRY` OR consistency test — the zero-verdict-risk option) |
+
+**Description:** `forensic_adapter.py` routes each artifact through three parallel
+maps (`_LAYER_MAP`, `_ONTOLOGY_MAP`, `_EVIDENCE_MAP`), each with a silent
+`.get(art_type, DEFAULT)`. A type categorized in one map but forgotten in
+another falls to `DISK_MFT`/`TECHNIQUE`/identity with no signal — a mapping no
+maintainer decided. B-066 added the mobile types to all three but left no guard
+against future drift.
+
+**Fix applied:** `check_adapter_map_consistency()` returns a list of violations
+(empty == consistent), enforcing: (1) `_LAYER_MAP` and `_ONTOLOGY_MAP` share the
+exact key set (lockstep); (2) every categorized key is present in
+`_EVIDENCE_MAP`; (3) `_EVIDENCE_MAP`'s superset keys are identity-mapped
+canonical types. Test written red-first (import failed pre-fix) with "teeth"
+cases that inject an inconsistency and assert it is caught. Current maps: 0
+violations. Additive only — zero verdict impact.
+
+**Validation:** `tests/test_b060_adapter_map_consistency.py` (7). Suite green.
+
+---
+
+## B-058 (B10) — Batch comparator reads the SEALED agent_verdict, not best_hypothesis [RESOLVED]
+
+| Field | Value |
+|-------|-------|
+| **Status** | RESOLVED — POST HACKATHON (2026-07-08) |
+| **Severity** | P2 — divergent verdict paths (the batch could report a verdict differing from what was sealed / from the exit code) |
+| **File** | `run_all_agent.py` (`extract_verdict_from_bundle`, new `verdict_matches`), `tests/test_b058_batch_reads_sealed_verdict.py` (new) |
+| **Antecedent** | AUDITORIA_INVARIANTES_ASIMETRIAS_20260703 §B-058 (recommendation left unapplied) |
+
+**Description:** `extract_verdict_from_bundle` re-derived the verdict from
+`pipeline_results.abduction.best_hypothesis` (and even substring-matched it),
+which can DIVERGE from the top-level `agent_verdict` that `_seal_bundle` embeds —
+the same value that decides the process exit code. Example: `SUSPICION_DETECTED`
+re-derives to "SUSPICION" while the sealed 4-value verdict is "INTENT" (the agent
+scale has no SUSPICION rung). The batch could therefore report a verdict the
+agent never sealed, masking a classifier divergence.
+
+**Fix applied:** `extract_verdict_from_bundle` now reads the sealed
+`agent_verdict` first (authoritative), falling back to the legacy
+best_hypothesis derivation only for bundles predating the field. The comparison
+doctrine is centralized in `verdict_matches(expected, got)`: BENIGN→NOISE alias,
+expected==UNKNOWN always-pass, over-severity (INTENT label + MALICE), and
+SUSPICION label accepting a sealed INTENT (the agent's INTENT tier represents
+"INTENT/SUSPICION" — B-073, Fase 2 §4).
+
+**Comparative gate (mandatory, per B-069 discipline):** measured old vs new
+reader over the freshly-sealed 199-case corpus — **0 regressions, +3
+improvements** (166/199 → 169/199). The +3 are INTENT-labeled cases the agent
+sealed as INTENT but the old path under-reported as SUSPICION → FAIL
+(VIGIA-MAGNET-2014-TIMELINE, VIGIA-MAGNET-2022-iOS-JESS,
+VIGIA-MAGNET-2022-IOS-JESS-KEYCHAIN). No case that passed under the old reader
+fails under the new one.
+
+**Validation:** `tests/test_b058_batch_reads_sealed_verdict.py` (13, red-first).
+Suite green (the single failure in a full run is `mcp`-missing, L-045, unrelated).
+
+---
+
+## B1/B2 (Grupo B) — verified already-closed (tracker drift) [RESOLVED]
+
+Two Grupo B items listed as pending in `WHAT_IS_NEXT.md` were found already
+implemented in the code during the 2026-07-08 sweep (same "tracker lies" class
+as B-047):
+
+- **B1 / S-1** — `requirements-ci.txt` already carries psutil, pyyaml,
+  pytest-cov, pytest-asyncio (each with an S-1 note), and
+  `tests/test_requirements_ci_contract.py` already enforces the import contract.
+  Verified green.
+- **B2 / S-2 / BUG-NLP-002** — `TestL33tOOVUnreachable::test_analyze_surfaces_l33tspeak_as_oov`
+  already carries `@pytest.mark.xfail(strict=True)`: the suite is green without
+  hiding the finding, and an XPASS fails loudly if a tokenizer fix reaches it.
+  Verified (1 passed + 1 xfailed).
