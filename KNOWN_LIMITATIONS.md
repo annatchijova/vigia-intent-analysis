@@ -831,7 +831,7 @@ Reproduce: `python3 run_all_agent.py --timeout 90`
 | L-026 | Devil's Advocate generator wired in; 1 pre-fix corpus bundle flagged | VIGIA-REAL-SRL-DMZ-FTP | **RESOLVED** / documented exception |
 | L-027 | AbductiveIntentEngine call site in VigiaPipeline used wrong signature since birth | `vigia/pipeline/pipeline.py::run_full()` | **RESOLVED** 2026-06-22 — zero submission impact |
 | L-028 | Golden Rule LOG_VS_MEMORY requires metadata["verdict"] convention | `vigia/tools/caie.py` | **RESOLVED** 2026-06-24 |
-| L-029 | DARVO false flag victim signal dilution — agent fallback blind; scorer lacks false_flag verdict type | VIGIA-KIWI-001/002/003 | **IN_PROGRESS** — FW-009 DARVO detector |
+| L-029 | DARVO false flag victim signal dilution — agent fallback blind; scorer lacks false_flag verdict type (was briefly co-numbered with L-051; see L-051's numbering note) | VIGIA-KIWI-001/002/003 | **IN_PROGRESS** — FW-009 DARVO detector |
 | — | Normalization schema mismatch | vigia_scorer.py | **RESOLVED** |
 | — | Gate G1 accepting legacy hashes | caie.py | **RESOLVED** |
 | — | Uniform prior_trust=0.7 in converter | convert_legacy_cases.py | **RESOLVED** |
@@ -851,6 +851,7 @@ Reproduce: `python3 run_all_agent.py --timeout 90`
 | L-048 | Tool-log chain tail truncation (chain_tip_sha256) | core/tool_log_chain.py | **RESOLVED** (R3-5) |
 | L-049 | Spoofable-type flood saturates to MALICE (R4-3) | vigia_scorer.py | Documented (needs calibration doctrine) |
 | L-050 | Non-finite fail-closed on value/z_score/confidence × 4 impls | ebs_v1.py, signal_contract.py | **RESOLVED** (B-083/B-083b) |
+| L-051 | Formal specification of arbitration contract (Axiom A1) — renumbered from shared L-029 | Scoring/CAIE precedence | [OPEN] — design gap, not a bug |
 | L-032 | Agent fallback FN on raw Windows E01 | VIGIA-MAGNET-2022-WINDOWS | **RESOLVED** (B-032) |
 
 ---
@@ -1169,9 +1170,20 @@ verdict vocabulary to include `false_flag` as a relational verdict type.
 ---
 
 
-## L-029 — Formal Specification of Arbitration Contract Between Probabilistic Inference and Structural Contradiction Reasoning
+## L-051 — Formal Specification of Arbitration Contract Between Probabilistic Inference and Structural Contradiction Reasoning
 
 **Status:** [OPEN] 2026-06-25, POST HACKATHON — design gap, not implementation bug
+
+**Numbering note (2026-07-08):** this entry originally shared the ID L-029 with
+the unrelated DARVO false-flag finding (`DARVO_FALSE_FLAG_VICTIM_SIGNAL_DILUTION`,
+discovered 2026-06-24). The two are independent findings that happened to be
+assigned the same number. Renumbered to **L-051** — the chronologically later of
+the pair (2026-06-25 vs. 2026-06-24) — so each has a unique, citable ID. DARVO
+keeps **L-029**. No cross-references to the old shared "L-029 — Formal
+Specification..." title were found in `BUGS_PENDIENTES.md`/`BUGS_PENDIENTES_EN.md`
+or elsewhere in the repository (confirmed by repo-wide search 2026-07-08); the
+only other file referencing "L-029" is `WHAT_IS_NEXT.md:140`, which is about the
+DARVO detector (FW-009) and correctly continues to point at L-029, unchanged.
 
 **Description:**
 
