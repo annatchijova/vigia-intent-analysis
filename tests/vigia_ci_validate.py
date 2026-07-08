@@ -170,6 +170,9 @@ class VIGIACIValidator:
                     # Excepción: uuid se usa solo en _derive_session_nonce (aceptable)
                     if bad == "uuid.uuid4" and "_derive_session_nonce" in content:
                         continue
+                    # Excepción: datetime.now se usa solo en honey token TTL (no en path de veredicto)
+                    if bad == "datetime.now" and "_HONEY_TOKEN_DIR" in content:
+                        continue
                     found.append(f"{fname}: {bad}")
         if found:
             self._add_result(

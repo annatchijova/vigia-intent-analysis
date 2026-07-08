@@ -2564,7 +2564,7 @@ def _sweep_expired_honey_tokens() -> list:
     except OSError:
         return removed
     from datetime import datetime, timezone
-    now = datetime.now(timezone.utc)
+    now = datetime.now(timezone.utc)  # CI-EXEMPT: honey token TTL, not in verdict path
     for name in entries:
         if not name.endswith(".meta.json"):
             continue
@@ -2738,7 +2738,7 @@ async def activate_honey_token(variable_name: str, fake_value: str, ttl_hours: f
         expires_at = None
         if ttl_hours and ttl_hours > 0:
             from datetime import datetime, timedelta, timezone
-            expires_at = (datetime.now(timezone.utc)
+            expires_at = (datetime.now(timezone.utc)  # CI-EXEMPT: honey token expiry, not in verdict path
                           + timedelta(hours=float(ttl_hours))).isoformat()
             with open(_honey_meta_path(abs_path), "w") as mf:
                 json.dump({"variable": variable_name,
