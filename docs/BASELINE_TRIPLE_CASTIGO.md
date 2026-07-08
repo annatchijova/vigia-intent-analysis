@@ -176,3 +176,27 @@ este caso por diseño — ese es el hallazgo).
    sobrevendiendo el veredicto.
 
 *VIGÍA — baseline previo a R4-3 | 2026-07-07 | solo medición, 0 código*
+
+
+---
+
+## ADDENDUM POST-FIX (2026-07-07, B-088)
+
+R4-3 implementado (`vigia_scorer.py` etapa 2 + gate v2; `classify_domain` v2
+en caie.py). Números de aceptación del §6, medidos:
+
+| Medición | Pre-fix | Post-fix |
+|---|---|---|
+| BREAK-014 completo | MALICE 0.3867 / conf 0.77 | **SUSPICION 0.2322 / conf 0.46** |
+| Curva decisivos+N (25/50/95) | 0.2762 / 0.3176 / 0.3867 | **0.2322 / 0.2322 / 0.2322 (plana)** |
+| Solo ruido (95×0.05) | SUSPICION 0.1888 | **NOISE 0.0109** |
+| 96 MALICE correctos | — | **0 regresiones** |
+| Corpus | 166/199 | **167/199** (único flip: BREAK-014→PASS) |
+
+La predicción del §6.2 se cumplió con matiz: la maquinaria FRS no se portó
+literalmente (su fórmula 1/N viola la monotonicidad M2-1); se implementó la
+variante monótona (decay geométrico de cola) con la misma semántica de
+convergencia. El §6.1 se confirmó duro: cuatro corridas comparativas — la
+cabeza del scorer estaba calibrada al filo (gemelos de forma idéntica con
+etiquetas opuestas: CAN-018/CAN-032) y solo la cola era el defecto. Detalle
+completo en BUGS_PENDIENTES B-088.

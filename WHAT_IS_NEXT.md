@@ -12,7 +12,7 @@
 
 | Métrica | Valor | Fuente |
 |---------|-------|--------|
-| Corpus (batch agente) | **166/199** (post R3-3c: denominador honesto — sale un auto-pass falso, entra BREAK_005 real) | `results/agent_batch/_batch_summary.json` |
+| Corpus (batch agente) | **167/199** (R4-3/B-088 cerró BREAK-014: el drowning por volumen del mismo dominio ya no compra MALICE) | `results/agent_batch/_batch_summary.json` |
 | Suite | **866 passed**, 1 skipped, 7 xfailed | corrida 2026-07-07 (excluye `tests/e2e`, que requiere sandbox SIFT del entorno) |
 | Trackers | `BUGS_PENDIENTES.md` (ES) y `BUGS_PENDIENTES_EN.md` sincronizados hasta **B-084** | este commit |
 | Última tanda cerrada | TANDAS 1–4, Fase 2 semantic_role, LaBestia, Q2/Q4, Round 2/2.1, Round 3, censo P0-001 + fixes adyacentes | B-077..B-084 |
