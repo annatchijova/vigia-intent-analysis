@@ -134,6 +134,28 @@ Sumados por el censo P0-001 (B-083, opcionales):
 | C2 | consistencia de estilo | unificar `float(z)/Z_CLIP_MAX` (Windows) con `float(z/z_clip)` (móvil) |
 | ~~C3~~ | ~~NaN silencioso~~ | **CERRADO 2026-07-07** — `value`/`z_score`/`confidence` fail-closed en `ebs_v1` y `signal_contract`, ambas variantes (B-083/B-083b, tests rojos primero) |
 
+**Sincronización 2026-07-08 (auditoría de pendientes cruzada contra
+`docs/AUDITORIA_PIPELINE_ROBUSTEZ.md`):** los hallazgos N13/N14/P2-E de esa
+auditoría (2026-07-03) nunca habían recibido ID de tracker — quedaban solo en
+el doc, sin entrada en `BUGS_PENDIENTES(_EN).md`. Asignados ahora:
+
+| # | Ítem | Qué falta |
+|---|------|-----------|
+| B88 | N13 | `sans_compliance.accuracy_validation` exige clave `tool`; adaptadores del shim (vol3/EBS-JSON/mobile) emiten `source` → falso negativo de compliance en esos bundles |
+| B89 | N14 | `_to_signal_safe` traga cualquier excepción de `to_signal()` y retorna `None` sin marca `unanalyzed` — mismo hueco que N7/N8, no cubierto por el fix F7 |
+| B90 | P2-E | `UNIFIED_TIMELINE` emite señal derivada aun con `timestamps=0`; sigue marcado "⏳ abierto" en la auditoría fuente tras el fix F5 — requiere re-verificación |
+
+Ninguno de los tres tiene audit-before-patch re-corrido contra HEAD actual —
+son documentación del hueco, no bugs confirmados vivos hoy. Ver
+`BUGS_PENDIENTES_EN.md` (B-088/B-089/B-090) para el detalle completo.
+
+**También corregido (documental, sin cambio de código):** la entrada B-041
+original (`BUGS_PENDIENTES(_EN).md`) quedaba marcada `[PENDING]`/`[PENDIENTE]`
+con un diagnóstico que la propia entrada siguiente (B-041a/B-041b) ya había
+refutado y corregido — un ID duplicado con dos veredictos contradictorios en
+el mismo archivo. Marcada `[SUPERSEDED]`/`[SUPERSEDIDO]`, apuntando a la
+entrada correcta; no se borró, para conservar el rastro de auditoría.
+
 ### 1.5 Abiertos de larga data (sin cambio de estado)
 
 - **B-010** — migrar `forensic_technical_detector.py` a SemioticDetectorV2 (TODO).
