@@ -4223,14 +4223,21 @@ sellado), C1/C2 del censo P0-001.
 
 ---
 
-## B-088 — `sans_compliance.accuracy_validation` exige clave `tool`, los adaptadores del shim emiten `source` [PENDIENTE]
+## B-088 — `sans_compliance.accuracy_validation` exige clave `tool`, los adaptadores del shim emiten `source` [RESUELTO — verificado ya-arreglado]
 
 | Campo | Valor |
 |-------|-------|
-| **Estado** | PENDIENTE — nunca tuvo ID de tracker asignado hasta esta entrada (2026-07-08) |
+| **Estado** | RESUELTO — el audit-before-patch (2026-07-08) lo encontró ya arreglado por **F8** (la propia tanda de remediación de la auditoría). No hizo falta código nuevo. |
 | **Severidad** | P2 |
-| **Archivo** | `vigia_agent.py:936-942` |
+| **Archivo** | `vigia_agent.py` (`_seal_bundle`, bloque `sans_compliance`) |
 | **Detectado en** | `docs/AUDITORIA_PIPELINE_ROBUSTEZ.md` §3.1, hallazgo **N13** (2026-07-03) |
+
+**Verificación (2026-07-08, audit-before-patch):** el único `accuracy_validation`
+en `vigia_agent.py` ya lee `(s.get("tool") or s.get("source"))` — con el comentario
+inline `# F8 (N13): los adaptadores del shim (vol3, EBS-JSON, mobile) etiquetan la
+herramienta como "source" — aceptar ambos.` La referencia `936-942` era a un layout
+previo del archivo; el chequeo se movió y F8 lo cerró. Ningún bundle de camino
+adaptador da falso negativo en este flag. Cerrado como verificado, no re-parcheado.
 
 **Descripción:** `sans_compliance.accuracy_validation` exige la clave `tool`
 en cada señal para calcular su flag de compliance. Los adaptadores del shim
@@ -4246,27 +4253,35 @@ falló un chequeo de compliance que en realidad pasó. Es un riesgo de falsa
 alarma, no un falso negativo sobre el veredicto mismo — el pipeline de
 veredicto no consume este flag.
 
-**Camino de fix:** aceptar `source` como alias de `tool` en
-`accuracy_validation`, o normalizar la salida del adaptador para que emita
-`tool` de forma consistente con los módulos SIFT nativos antes de que corra
-el chequeo de compliance. Requiere decidir cuál nombre de campo es canónico
-antes de parchear (evitar reabrir una inconsistencia de mapeo de adaptador
-estilo B-060).
-
-**Aún no aplicado.** El audit-before-patch no se re-corrió contra el HEAD
-actual; los números de línea de arriba son de la auditoría del 2026-07-03 y
-deben re-verificarse antes de aplicar el fix.
+**Camino de fix original (ahora moot):** aceptar `source` como alias de `tool`
+en `accuracy_validation` — exactamente lo que F8 ya hizo.
 
 ---
 
-## B-089 — `_to_signal_safe` descarta señales silenciosamente ante cualquier excepción de `to_signal()`, sin marca `unanalyzed` [PENDIENTE]
+## B-089 — `_to_signal_safe` descarta señales silenciosamente ante cualquier excepción de `to_signal()` [RESUELTO — verificado ya-arreglado]
 
 | Campo | Valor |
 |-------|-------|
-| **Estado** | PENDIENTE — nunca tuvo ID de tracker asignado hasta esta entrada (2026-07-08) |
+| **Estado** | RESUELTO — el audit-before-patch (2026-07-08) lo encontró ya arreglado por **F8**, y el camino de fix originalmente propuesto era en sí mismo incorrecto. No hizo falta código nuevo. |
 | **Severidad** | P2 |
-| **Archivo** | `vigia/sift:267-275` |
+| **Archivo** | `vigia/sift/sift_orchestrator.py::_to_signal_safe` (:311) |
 | **Detectado en** | `docs/AUDITORIA_PIPELINE_ROBUSTEZ.md` §3.1, hallazgo **N14** (2026-07-03) |
+
+**Verificación (2026-07-08, audit-before-patch):** `_to_signal_safe` ya no
+descarta en silencio — ante una excepción de `to_signal()` agrega a
+`self._signal_drops` (`# F8 (N14)`, :320), que se surface como
+`results["signal_conversion_drops"]` (lista completa, :883) y
+`pipeline_meta.n_signal_conversion_drops` (conteo, :926). La pérdida es visible
+en el bundle.
+
+**Corrección al camino de fix original:** la entrada proponía emitir una señal
+sintética `*_UNANALYZED`. Eso sería **semánticamente incorrecto** — un fallo de
+conversión `to_signal()` significa que el artefacto *sí* se analizó (el motor
+produjo un resultado) pero la conversión DTO tiene un defecto; representarlo como
+"evidencia no analizada" engañaría. Un contador de drops es la representación
+honesta, distinta de la marca `_UNANALYZED` que F7 usa para motores que
+genuinamente no corrieron. El comportamiento F8 en producción es el diseño
+correcto.
 
 **Descripción:** `_to_signal_safe` captura cualquier excepción lanzada por
 `to_signal()` y retorna `None` con una entrada de log — nada más. La señal se
@@ -4284,25 +4299,36 @@ mismo hueco de cobertura silencioso que se corrigió para N7/N8 (Tanda 1/F7 en
 rechazos de PathGuard; este camino a nivel conversión no quedó incluido en ese
 fix.
 
-**Camino de fix:** ante una excepción de `to_signal()`, emitir una señal
-sintética `*_UNANALYZED` (el mismo mecanismo que F7 ya construyó para crashes
-de motor) en lugar de retornar `None` a secas, para que el artefacto sea
-visible en `unanalyzed_artifacts`/la sección "ARTEFACTOS NO ANALIZADOS" de la
-narrativa.
-
-**Aún no aplicado.** El audit-before-patch no se re-corrió contra el HEAD
-actual.
+**Residual (no-defecto):** si `signal_conversion_drops` se refleja además en la
+narrativa legible (más allá del `pipeline_meta` JSON) es cosmético; el requisito
+forense — que la pérdida no sea silenciosa — está cumplido.
 
 ---
 
-## B-090 — UNIFIED_TIMELINE emite señal derivada aun con `timestamps=0` [PENDIENTE]
+## B-090 — UNIFIED_TIMELINE emite señal derivada aun con `timestamps=0` [RESUELTO — impacto de veredicto cerrado por F5]
 
 | Campo | Valor |
 |-------|-------|
-| **Estado** | PENDIENTE — nunca tuvo ID de tracker asignado hasta esta entrada (2026-07-08). Marcado explícitamente "⏳ abierto" en la propia tabla de estado de la auditoría fuente, ítem **P2-E** |
-| **Severidad** | P2 |
-| **Archivo** | `sift_orchestrator.py` — cableado del motor `UNIFIED_TIMELINE` |
+| **Estado** | RESUELTO (impacto de veredicto) — el audit-before-patch (2026-07-08) confirmó que el tag `derived` hace la señal de timeline inerte a todo gate de veredicto. El residual es cosmético. |
+| **Severidad** | P2 → cosmético |
+| **Archivo** | `sift_orchestrator.py` — cableado `UNIFIED_TIMELINE` (:760), `vigia_agent.py::_is_primary_signal` (:101) |
 | **Detectado en** | `docs/AUDITORIA_PIPELINE_ROBUSTEZ.md` §3.2 |
+
+**Verificación (2026-07-08, audit-before-patch):** la señal de timeline se emite
+vía `_mark_derived(...)` (`sift_orchestrator.py:760`), estampando
+`signal_class="derived"`. `_is_primary_signal` (`vigia_agent.py:101`) devuelve
+False para cualquier señal `derived`/`unanalyzed`, y todo gate de veredicto —
+el `≥3` del reasoner, el `<3 → ABSTAIN` de `classify_agent_verdict`, y el
+override L-036 — cuenta solo `n_primary` de `_signal_stats`. Así una derivación
+de timeline (vacía o no) **no puede inflar el conteo de señales ni influir en
+ningún veredicto**. Se renderiza además `[DERIVED]` en la narrativa (:982). La
+marca "⏳ abierto" de la fila §3.2 de la auditoría está stale — precede a F5;
+la tabla de implementación al tope del mismo documento ya lista F5 como ✅.
+
+**Residual (no-defecto):** si `UnifiedTimelineEngine` emite señal o no ante un
+input de timestamp cero es una cuestión cosmética sobre una señal derivada,
+excluida de los gates, etiquetada `[DERIVED]` y sin contenido de timeline — sin
+impacto forense.
 
 **Descripción:** el motor `UNIFIED_TIMELINE` emite una señal derivada
 independientemente de si efectivamente encontró eventos con timestamp
@@ -4323,16 +4349,9 @@ contribuir a un veredicto no-ABSTAIN. Requiere re-verificación contra el
 tagging `signal_class` actual para confirmar si F5 ya cerró esto o si el caso
 específico de timeline vacío todavía se filtra.
 
-**Camino de fix:** re-correr la reproducción de N4/F5 de
-`docs/AUDITORIA_PIPELINE_ROBUSTEZ.md` §1 contra el HEAD actual con un caso de
-timestamp cero. Si el tag `derived` ya lo excluye, cerrar como
-RESUELTO-por-F5 y actualizar esta entrada. Si no, condicionar la emisión de
-señal de `UNIFIED_TIMELINE` a `timestamps>0`, o asegurar que el tag `derived`
-también se aplique acá.
-
-**Aún no aplicado.** Requiere verification-before-patch según la propia
-disciplina de este tracker — esta entrada documenta el hueco, no un bug vivo
-confirmado.
+**Resultado:** cerrado como RESUELTO-por-F5 para la parte relevante al veredicto,
+exactamente la disposición que el "camino de fix" original anticipaba una vez
+confirmado que el tag `derived` lo excluye.
 
 ---
 

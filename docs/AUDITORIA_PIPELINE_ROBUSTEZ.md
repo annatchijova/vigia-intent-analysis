@@ -318,7 +318,7 @@ actual qué sigue abierto y qué interactúa con la narrativa:
 | P2-A (atenuación gamma×FRS) | ⏳ diferido (L-033) | Alimenta N1: si nada supera z>1.5, H1 también viola INVARIANTE 4 |
 | P2-B (gate ≥3 señales) | vigente por diseño | N4 lo puentea con señales derivadas (en la dirección opuesta) |
 | P2-C (fuga `expected_verdict`) | ⏳ retenida deliberadamente | E9: además de la fuga, ese adaptador ni siquiera genera narrativa propia |
-| P2-E (timeline timestamps=0) | ⏳ abierto | UNIFIED_TIMELINE emite igual una señal derivada que cuenta para N4 |
+| P2-E (timeline timestamps=0) | ✅ cerrado por F5 (verificado 2026-07-08, B-090) | La señal de timeline se emite `_mark_derived` (`sift_orchestrator.py:760`) → `signal_class="derived"` → `_is_primary_signal` la excluye de TODO gate (≥3, <3→ABSTAIN, L-036). NO cuenta para N4. La marca "⏳ abierto" previa era stale (precedía a F5, ya ✅ en la tabla de implementación al tope). Residual cosmético: si emite o no con 0 timestamps es inerte al veredicto |
 
 ### 3.3 Correlación con el corpus (`AUDIT_NARRATIVAS_20260702.md`)
 

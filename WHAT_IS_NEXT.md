@@ -146,13 +146,15 @@ el doc, sin entrada en `BUGS_PENDIENTES(_EN).md`. Asignados ahora:
 
 | # | Ítem | Qué falta |
 |---|------|-----------|
-| B88 | N13 | `sans_compliance.accuracy_validation` exige clave `tool`; adaptadores del shim (vol3/EBS-JSON/mobile) emiten `source` → falso negativo de compliance en esos bundles |
-| B89 | N14 | `_to_signal_safe` traga cualquier excepción de `to_signal()` y retorna `None` sin marca `unanalyzed` — mismo hueco que N7/N8, no cubierto por el fix F7 |
-| B90 | P2-E | `UNIFIED_TIMELINE` emite señal derivada aun con `timestamps=0`; sigue marcado "⏳ abierto" en la auditoría fuente tras el fix F5 — requiere re-verificación |
+| B88 | N13 | **RESUELTO (verificado 2026-07-08)** — ya arreglado por F8: `accuracy_validation` lee `tool or source` |
+| B89 | N14 | **RESUELTO (verificado 2026-07-08)** — ya arreglado por F8: el drop se contabiliza en `signal_conversion_drops`/`pipeline_meta`. El fix propuesto original (`_UNANALYZED`) era semánticamente incorrecto |
+| B90 | P2-E | **RESUELTO impacto de veredicto (verificado 2026-07-08)** — F5 etiqueta la señal `derived`; `_is_primary_signal` la excluye de todo gate. La marca "⏳ abierto" de la auditoría era stale |
 
-Ninguno de los tres tiene audit-before-patch re-corrido contra HEAD actual —
-son documentación del hueco, no bugs confirmados vivos hoy. Ver
-`BUGS_PENDIENTES_EN.md` (B-088/B-089/B-090) para el detalle completo.
+**Actualización 2026-07-08 (audit-before-patch):** los tres se verificaron contra
+HEAD y resultaron YA resueltos por las tandas F5/F8 de la propia auditoría de
+robustez (F1–F9 sí aterrizaron). La disciplina de audit-before-patch evitó
+parchear código ya arreglado; se corrigió el registro en su lugar. Ver
+`BUGS_PENDIENTES_EN.md` (B-088/B-089/B-090) para la evidencia de código.
 
 **También corregido (documental, sin cambio de código):** la entrada B-041
 original (`BUGS_PENDIENTES(_EN).md`) quedaba marcada `[PENDING]`/`[PENDIENTE]`
