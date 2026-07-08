@@ -2093,15 +2093,15 @@ estanca porque el fix se registró bajo L-037b sin cerrar B-040.
 
 ---
 
-### B-041 [PENDING] — caie_artifacts not returned by run_full_analysis() — CAIE never runs in RAW mode
+### B-041 [SUPERSEDIDO — ver diagnóstico corregido más abajo] — caie_artifacts no retornado por run_full_analysis() — CAIE nunca corre en modo RAW
 
 | Campo | Valor |
 |-------|-------|
-| **Estado** | PENDIENTE |
-| **Severidad** | P1 |
+| **Estado** | SUPERSEDIDO — este diagnóstico original estaba EQUIVOCADO. La auditoría de seguimiento (2026-06-30, adyacente a `docs/AUDITORIA_PIPELINE_ROBUSTEZ.md`) encontró que CAIE SÍ corre dentro de `sift_orchestrator.py` y SÍ se retorna en `results["caie"]`. Ver la entrada corregida "B-041 — CAIE output no expuesto en vigia_agent.py narrative [PARTIAL FIX]" más abajo en este archivo para los bugs reales (B-041a, resuelto; B-041b, diferido — rastreado en la tabla resumen y en `KNOWN_LIMITATIONS.md`). Se deja en su lugar, no se borra, siguiendo la convención de auditabilidad de este tracker — un ID duplicado que quedó como `[PENDIENTE]` junto a su propia corrección es en sí mismo un defecto documental que merece rastro visible. |
+| **Severidad** | P1 (como se archivó originalmente — ver la entrada corregida para la severidad real desagregada) |
 | **Detectado en** | Sesión 2026-06-29 |
 
-**Descripción:** `run_full_analysis()` does not return `caie_artifacts` in its output, so the CAIE cross-artifact analysis engine never receives artifacts when processing RAW evidence. This means structural fracture detection (LOG_VS_MEMORY, TIMELINE_PARADOX, etc.) is bypassed in RAW mode.
+**Descripción original (incorrecta):** `run_full_analysis()` no retornaba `caie_artifacts` en su salida, por lo que el motor de análisis cross-artifact CAIE nunca recibía artefactos al procesar evidencia RAW. Esto implicaría que la detección de fracturas estructurales (LOG_VS_MEMORY, TIMELINE_PARADOX, etc.) se saltea en modo RAW. **Esta premisa fue refutada por la auditoría de seguimiento** — no actuar sobre ella.
 
 ---
 
@@ -4220,3 +4220,116 @@ Protocolo por ítem: restore tag, tests rojos primero, suite verde, corpus
 **Queda del Grupo B:** B1 (requirements-ci contrato de imports), B2 (OOV/
 xfail), B6 (ARTIFACT_TYPE_REGISTRY), B10 (comparador lee agent_verdict
 sellado), C1/C2 del censo P0-001.
+
+---
+
+## B-088 — `sans_compliance.accuracy_validation` exige clave `tool`, los adaptadores del shim emiten `source` [PENDIENTE]
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | PENDIENTE — nunca tuvo ID de tracker asignado hasta esta entrada (2026-07-08) |
+| **Severidad** | P2 |
+| **Archivo** | `vigia_agent.py:936-942` |
+| **Detectado en** | `docs/AUDITORIA_PIPELINE_ROBUSTEZ.md` §3.1, hallazgo **N13** (2026-07-03) |
+
+**Descripción:** `sans_compliance.accuracy_validation` exige la clave `tool`
+en cada señal para calcular su flag de compliance. Los adaptadores del shim
+(vol3, EBS-JSON, mobile) emiten `source` en lugar de `tool`. El resultado es
+un flag de compliance **falso negativo** en todo bundle producido por un
+camino de adaptador — el análisis es compliant, pero el flag dice lo
+contrario.
+
+**Implicación forense:** un examinador o auditor que lea el flag de
+compliance en un bundle de camino adaptador (dumps de memoria vol3, evidencia
+mobile, importaciones EBS-JSON) concluiría incorrectamente que el análisis
+falló un chequeo de compliance que en realidad pasó. Es un riesgo de falsa
+alarma, no un falso negativo sobre el veredicto mismo — el pipeline de
+veredicto no consume este flag.
+
+**Camino de fix:** aceptar `source` como alias de `tool` en
+`accuracy_validation`, o normalizar la salida del adaptador para que emita
+`tool` de forma consistente con los módulos SIFT nativos antes de que corra
+el chequeo de compliance. Requiere decidir cuál nombre de campo es canónico
+antes de parchear (evitar reabrir una inconsistencia de mapeo de adaptador
+estilo B-060).
+
+**Aún no aplicado.** El audit-before-patch no se re-corrió contra el HEAD
+actual; los números de línea de arriba son de la auditoría del 2026-07-03 y
+deben re-verificarse antes de aplicar el fix.
+
+---
+
+## B-089 — `_to_signal_safe` descarta señales silenciosamente ante cualquier excepción de `to_signal()`, sin marca `unanalyzed` [PENDIENTE]
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | PENDIENTE — nunca tuvo ID de tracker asignado hasta esta entrada (2026-07-08) |
+| **Severidad** | P2 |
+| **Archivo** | `vigia/sift:267-275` |
+| **Detectado en** | `docs/AUDITORIA_PIPELINE_ROBUSTEZ.md` §3.1, hallazgo **N14** (2026-07-03) |
+
+**Descripción:** `_to_signal_safe` captura cualquier excepción lanzada por
+`to_signal()` y retorna `None` con una entrada de log — nada más. La señal se
+pierde silenciosamente: no se setea marca `unanalyzed=True` (el mecanismo que
+`_to_signal_safe` saltea), así que el conteo de `unanalyzed_artifacts` tampoco
+la ve. Es la misma clase de falla que N7 (crashes de motores SIFT tragados sin
+marca), pero en el paso de conversión resultado→señal en lugar del paso del
+motor.
+
+**Implicación forense:** un artefacto cuya conversión `to_signal()` crashea
+desaparece del bundle exactamente como si nunca hubiera existido — sin rastro
+en la narrativa, sin rastro en el conteo de artefactos no analizados. Es el
+mismo hueco de cobertura silencioso que se corrigió para N7/N8 (Tanda 1/F7 en
+`docs/AUDITORIA_PIPELINE_ROBUSTEZ.md`) — F7 cubrió crashes a nivel motor y
+rechazos de PathGuard; este camino a nivel conversión no quedó incluido en ese
+fix.
+
+**Camino de fix:** ante una excepción de `to_signal()`, emitir una señal
+sintética `*_UNANALYZED` (el mismo mecanismo que F7 ya construyó para crashes
+de motor) en lugar de retornar `None` a secas, para que el artefacto sea
+visible en `unanalyzed_artifacts`/la sección "ARTEFACTOS NO ANALIZADOS" de la
+narrativa.
+
+**Aún no aplicado.** El audit-before-patch no se re-corrió contra el HEAD
+actual.
+
+---
+
+## B-090 — UNIFIED_TIMELINE emite señal derivada aun con `timestamps=0` [PENDIENTE]
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | PENDIENTE — nunca tuvo ID de tracker asignado hasta esta entrada (2026-07-08). Marcado explícitamente "⏳ abierto" en la propia tabla de estado de la auditoría fuente, ítem **P2-E** |
+| **Severidad** | P2 |
+| **Archivo** | `sift_orchestrator.py` — cableado del motor `UNIFIED_TIMELINE` |
+| **Detectado en** | `docs/AUDITORIA_PIPELINE_ROBUSTEZ.md` §3.2 |
+
+**Descripción:** el motor `UNIFIED_TIMELINE` emite una señal derivada
+independientemente de si efectivamente encontró eventos con timestamp
+(incluido el caso `timestamps=0`). Esa señal derivada cuenta para el gate
+`≥3 señales` del reasoner y para el gate `n_signals<3 → ABSTAIN` de
+`classify_agent_verdict` igual que una señal respaldada por evidencia real —
+el mismo patrón de inflación documentado y parcialmente corregido bajo **N4**
+(Tanda 1/F5, tagging `signal_class`: SIFT=primary,
+engine/timeline/adv/unanalyzed=derived). F5 marca la señal como `derived`, lo
+cual la excluye de los gates de señal primaria en los casos que N4 cubre —
+pero la auditoría fuente lista P2-E como aún abierto después de que F5 se
+aplicó, lo que significa que el caso específico de timeline vacío de
+`UNIFIED_TIMELINE` no quedó confirmado como cerrado por ese fix.
+
+**Implicación forense:** un caso cuya única "evidencia" para cruzar el gate de
+conteo de señales sea una derivación de timeline vacía no debería poder
+contribuir a un veredicto no-ABSTAIN. Requiere re-verificación contra el
+tagging `signal_class` actual para confirmar si F5 ya cerró esto o si el caso
+específico de timeline vacío todavía se filtra.
+
+**Camino de fix:** re-correr la reproducción de N4/F5 de
+`docs/AUDITORIA_PIPELINE_ROBUSTEZ.md` §1 contra el HEAD actual con un caso de
+timestamp cero. Si el tag `derived` ya lo excluye, cerrar como
+RESUELTO-por-F5 y actualizar esta entrada. Si no, condicionar la emisión de
+señal de `UNIFIED_TIMELINE` a `timestamps>0`, o asegurar que el tag `derived`
+también se aplique acá.
+
+**Aún no aplicado.** Requiere verification-before-patch según la propia
+disciplina de este tracker — esta entrada documenta el hueco, no un bug vivo
+confirmado.

@@ -2370,15 +2370,15 @@ stale because the fix was recorded under L-037b without closing B-040.
 
 ---
 
-### B-041 [PENDING] — caie_artifacts not returned by run_full_analysis() — CAIE never runs in RAW mode
+### B-041 [SUPERSEDED — see corrected diagnosis below] — caie_artifacts not returned by run_full_analysis() — CAIE never runs in RAW mode
 
 | Field | Value |
 |-------|-------|
-| **Status** | PENDING |
-| **Severity** | P1 |
+| **Status** | SUPERSEDED — this original diagnosis was WRONG. `docs/AUDITORIA_PIPELINE_ROBUSTEZ.md`-adjacent audit (2026-06-30) found CAIE DOES run inside `sift_orchestrator.py` and IS returned in `results["caie"]`. See the corrected "B-041 — CAIE output not surfaced in vigia_agent.py narrative [PARTIAL FIX]" entry further down this file for the real bugs (B-041a, fixed; B-041b, deferred — tracked in the summary table and `KNOWN_LIMITATIONS.md`). Left in place, not deleted, per this tracker's own auditability convention — a duplicate ID that sat as `[PENDING]` next to its own correction is itself a documentation defect worth a visible trail. |
+| **Severity** | P1 (as originally filed — see corrected entry for the real severity split) |
 | **Detected** | Session 2026-06-29 |
 
-**Description:** `run_full_analysis()` does not return `caie_artifacts` in its output, so the CAIE cross-artifact analysis engine never receives artifacts when processing RAW evidence. This means structural fracture detection (LOG_VS_MEMORY, TIMELINE_PARADOX, etc.) is bypassed in RAW mode.
+**Original (incorrect) description:** `run_full_analysis()` does not return `caie_artifacts` in its output, so the CAIE cross-artifact analysis engine never receives artifacts when processing RAW evidence. This means structural fracture detection (LOG_VS_MEMORY, TIMELINE_PARADOX, etc.) is bypassed in RAW mode. **This premise was falsified by the follow-up audit** — do not act on it.
 
 ---
 
@@ -4488,3 +4488,106 @@ Protocol per item: restore tag, red tests first, green suite, corpus
 **Remaining in Grupo B:** B1 (requirements-ci import contract), B2
 (OOV/xfail), B6 (ARTIFACT_TYPE_REGISTRY), B10 (comparator reads sealed
 agent_verdict), C1/C2 from the P0-001 census.
+
+---
+
+## B-088 — `sans_compliance.accuracy_validation` requires key `tool`, shim adapters emit `source` [PENDING]
+
+| Field | Value |
+|-------|-------|
+| **Status** | PENDING — never assigned a tracker ID until this entry (2026-07-08) |
+| **Severity** | P2 |
+| **File** | `vigia_agent.py:936-942` |
+| **Detected** | `docs/AUDITORIA_PIPELINE_ROBUSTEZ.md` §3.1, finding **N13** (2026-07-03) |
+
+**Description:** `sans_compliance.accuracy_validation` requires the key `tool`
+on every signal to compute its compliance flag. The shim adapters (vol3,
+EBS-JSON, mobile) emit `source` instead of `tool`. The result is a false
+**negative** compliance flag on every bundle produced through an adapter path
+— the analysis is compliant, but the flag says otherwise.
+
+**Forensic implication:** an examiner or auditor reading the compliance flag
+on an adapter-path bundle (vol3 memory dumps, mobile evidence, EBS-JSON
+imports) would incorrectly conclude the analysis failed a compliance check
+that it actually passed. This is a false-alarm risk, not a false-negative on
+the verdict itself — the verdict pipeline does not consume this flag.
+
+**Fix path:** either accept `source` as an alias for `tool` in
+`accuracy_validation`, or normalize adapter output to emit `tool` consistently
+with the SIFT-native modules before the compliance check runs. Needs a
+decision on which field name is canonical before patching (avoid re-opening a
+B-060-style adapter-mapping inconsistency).
+
+**Not yet applied.** Audit-before-patch not yet re-run against current HEAD;
+line numbers above are from the 2026-07-03 audit and should be re-verified
+before fixing.
+
+---
+
+## B-089 — `_to_signal_safe` silently drops signals on any `to_signal()` exception, no `unanalyzed` mark [PENDING]
+
+| Field | Value |
+|-------|-------|
+| **Status** | PENDING — never assigned a tracker ID until this entry (2026-07-08) |
+| **Severity** | P2 |
+| **File** | `vigia/sift:267-275` |
+| **Detected** | `docs/AUDITORIA_PIPELINE_ROBUSTEZ.md` §3.1, finding **N14** (2026-07-03) |
+
+**Description:** `_to_signal_safe` catches any exception raised by
+`to_signal()` and returns `None` with a log entry — nothing else. The signal
+is lost silently: no `unanalyzed=True` marker is set (the mechanism `_to_signal_safe`
+skips), so `unanalyzed_artifacts` accounting does not see it either. This is
+the same failure class as N7 (SIFT engine crashes swallowed without a mark),
+but at the result→signal conversion step instead of the engine step.
+
+**Forensic implication:** an artifact whose `to_signal()` conversion crashes
+disappears from the bundle exactly as if it had never existed — no trace in
+the narrative, no trace in the unanalyzed-artifact count. This is a silent
+coverage gap of the same shape N7/N8 were fixed for (Tanda 1/F7 in
+`docs/AUDITORIA_PIPELINE_ROBUSTEZ.md`) — F7 covered engine-level crashes and
+PathGuard rejections; this conversion-level path was not included in that fix.
+
+**Fix path:** on `to_signal()` exception, emit a synthetic `*_UNANALYZED`
+signal (same mechanism F7 already built for engine crashes) instead of
+returning bare `None`, so the artifact is visible in
+`unanalyzed_artifacts`/the narrative's "ARTEFACTOS NO ANALIZADOS" section.
+
+**Not yet applied.** Audit-before-patch not yet re-run against current HEAD.
+
+---
+
+## B-090 — UNIFIED_TIMELINE emits a derived signal even when `timestamps=0` [PENDING]
+
+| Field | Value |
+|-------|-------|
+| **Status** | PENDING — never assigned a tracker ID until this entry (2026-07-08). Explicitly marked "⏳ abierto" (open) in the source audit's own status table, item **P2-E** |
+| **Severity** | P2 |
+| **File** | `sift_orchestrator.py` — `UNIFIED_TIMELINE` engine wiring |
+| **Detected** | `docs/AUDITORIA_PIPELINE_ROBUSTEZ.md` §3.2 |
+
+**Description:** the `UNIFIED_TIMELINE` engine emits a derived signal
+regardless of whether it actually found any timestamped events
+(`timestamps=0` case included). That derived signal counts toward the
+reasoner's `≥3 signals` gate and toward `classify_agent_verdict`'s
+`n_signals<3 → ABSTAIN` gate the same as a signal backed by real evidence —
+the same inflation pattern documented and partially fixed under **N4** (Tanda
+1/F5, `signal_class` tagging: SIFT=primary, engine/timeline/adv/unanalyzed=derived).
+F5 tags the signal as `derived`, which excludes it from the primary-signal
+gates in the cases N4 covers — but the source audit lists P2-E as still open
+after F5 landed, meaning `UNIFIED_TIMELINE`'s empty-timeline case specifically
+was not confirmed closed by that fix.
+
+**Forensic implication:** a case whose only "evidence" for crossing the
+signal-count gate is an empty timeline derivation should not be able to
+contribute toward a non-ABSTAIN verdict. Needs re-verification against
+current `signal_class` tagging to confirm whether F5 already closed this or
+whether the empty-timeline case specifically still leaks through.
+
+**Fix path:** re-run the N4/F5 reproduction from
+`docs/AUDITORIA_PIPELINE_ROBUSTEZ.md` §1 against current HEAD with a
+zero-timestamp case. If the derived tag already excludes it, close as
+RESOLVED-by-F5 and update this entry. If not, gate `UNIFIED_TIMELINE` signal
+emission on `timestamps>0`, or ensure the `derived` tag is applied here too.
+
+**Not yet applied.** Needs verification-before-patch per this tracker's own
+discipline — this entry documents the gap, not a confirmed live bug.
